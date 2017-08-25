@@ -83,6 +83,7 @@ class LogEntry {
     this.networkRequestId,
     this.workerId,
   });
+  factory LogEntry.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -122,6 +123,7 @@ class ViolationSetting {
     @required this.name,
     @required this.threshold,
   });
+  factory ViolationSetting.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

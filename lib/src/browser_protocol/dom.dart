@@ -595,6 +595,7 @@ class PerformSearchResult {
     @required this.searchId,
     @required this.resultCount,
   });
+  factory PerformSearchResult.fromJson(Map json) {}
 }
 
 /// Unique DOM node identifier.
@@ -602,6 +603,7 @@ class NodeId {
   final int value;
 
   NodeId(this.value);
+  factory NodeId.fromJson(int value) => new NodeId(value);
 
   int toJson() => value;
 }
@@ -611,6 +613,7 @@ class BackendNodeId {
   final int value;
 
   BackendNodeId(this.value);
+  factory BackendNodeId.fromJson(int value) => new BackendNodeId(value);
 
   int toJson() => value;
 }
@@ -630,6 +633,7 @@ class BackendNode {
     @required this.nodeName,
     @required this.backendNodeId,
   });
+  factory BackendNode.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -669,6 +673,7 @@ class PseudoType {
   final String value;
 
   const PseudoType._(this.value);
+  factory PseudoType.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -682,6 +687,7 @@ class ShadowRootType {
   final String value;
 
   const ShadowRootType._(this.value);
+  factory ShadowRootType.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -802,6 +808,7 @@ class Node {
     this.distributedNodes,
     this.isSVG,
   });
+  factory Node.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -903,6 +910,7 @@ class RGBA {
     @required this.b,
     this.a,
   });
+  factory RGBA.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -922,6 +930,7 @@ class Quad {
   final List<num> value;
 
   Quad(this.value);
+  factory Quad.fromJson(List<num> value) => new Quad(value);
 
   List<num> toJson() => value;
 }
@@ -958,6 +967,7 @@ class BoxModel {
     @required this.height,
     this.shapeOutside,
   });
+  factory BoxModel.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -991,6 +1001,7 @@ class ShapeOutsideInfo {
     @required this.shape,
     @required this.marginShape,
   });
+  factory ShapeOutsideInfo.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -1022,6 +1033,7 @@ class Rect {
     @required this.width,
     @required this.height,
   });
+  factory Rect.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

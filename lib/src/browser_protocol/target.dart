@@ -187,6 +187,7 @@ class TargetID {
   final String value;
 
   TargetID(this.value);
+  factory TargetID.fromJson(String value) => new TargetID(value);
 
   String toJson() => value;
 }
@@ -196,6 +197,7 @@ class SessionID {
   final String value;
 
   SessionID(this.value);
+  factory SessionID.fromJson(String value) => new SessionID(value);
 
   String toJson() => value;
 }
@@ -204,6 +206,8 @@ class BrowserContextID {
   final String value;
 
   BrowserContextID(this.value);
+  factory BrowserContextID.fromJson(String value) =>
+      new BrowserContextID(value);
 
   String toJson() => value;
 }
@@ -227,6 +231,7 @@ class TargetInfo {
     @required this.url,
     @required this.attached,
   });
+  factory TargetInfo.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -249,6 +254,7 @@ class RemoteLocation {
     @required this.host,
     @required this.port,
   });
+  factory RemoteLocation.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

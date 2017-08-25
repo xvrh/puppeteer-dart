@@ -88,6 +88,7 @@ class RequestEntriesResult {
     @required this.cacheDataEntries,
     @required this.hasMore,
   });
+  factory RequestEntriesResult.fromJson(Map json) {}
 }
 
 /// Unique identifier of the Cache object.
@@ -95,6 +96,7 @@ class CacheId {
   final String value;
 
   CacheId(this.value);
+  factory CacheId.fromJson(String value) => new CacheId(value);
 
   String toJson() => value;
 }
@@ -115,6 +117,7 @@ class DataEntry {
     @required this.response,
     @required this.responseTime,
   });
+  factory DataEntry.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -142,6 +145,7 @@ class Cache {
     @required this.securityOrigin,
     @required this.cacheName,
   });
+  factory Cache.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -156,7 +160,7 @@ class Cache {
 /// Cached response
 class CachedResponse {
   /// Response headers
-  final Object headers;
+  final Map headers;
 
   /// Entry content, base64-encoded.
   final String body;
@@ -165,6 +169,7 @@ class CachedResponse {
     @required this.headers,
     @required this.body,
   });
+  factory CachedResponse.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

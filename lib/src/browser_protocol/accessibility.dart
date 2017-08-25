@@ -31,6 +31,7 @@ class AXNodeId {
   final String value;
 
   AXNodeId(this.value);
+  factory AXNodeId.fromJson(String value) => new AXNodeId(value);
 
   String toJson() => value;
 }
@@ -61,6 +62,7 @@ class AXValueType {
   final String value;
 
   const AXValueType._(this.value);
+  factory AXValueType.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -82,6 +84,7 @@ class AXValueSourceType {
   final String value;
 
   const AXValueSourceType._(this.value);
+  factory AXValueSourceType.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -108,6 +111,7 @@ class AXValueNativeSourceType {
   final String value;
 
   const AXValueNativeSourceType._(this.value);
+  factory AXValueNativeSourceType.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -152,6 +156,7 @@ class AXValueSource {
     this.invalid,
     this.invalidReason,
   });
+  factory AXValueSource.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -200,6 +205,7 @@ class AXRelatedNode {
     this.idref,
     this.text,
   });
+  factory AXRelatedNode.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -226,6 +232,7 @@ class AXProperty {
     @required this.name,
     @required this.value,
   });
+  factory AXProperty.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -256,6 +263,7 @@ class AXValue {
     this.relatedNodes,
     this.sources,
   });
+  factory AXValue.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -289,6 +297,7 @@ class AXGlobalStates {
   final String value;
 
   const AXGlobalStates._(this.value);
+  factory AXGlobalStates.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -307,6 +316,7 @@ class AXLiveRegionAttributes {
   final String value;
 
   const AXLiveRegionAttributes._(this.value);
+  factory AXLiveRegionAttributes.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -338,6 +348,7 @@ class AXWidgetAttributes {
   final String value;
 
   const AXWidgetAttributes._(this.value);
+  factory AXWidgetAttributes.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -353,6 +364,7 @@ class AXWidgetStates {
   final String value;
 
   const AXWidgetStates._(this.value);
+  factory AXWidgetStates.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -379,6 +391,7 @@ class AXRelationshipAttributes {
   final String value;
 
   const AXRelationshipAttributes._(this.value);
+  factory AXRelationshipAttributes.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -427,6 +440,7 @@ class AXNode {
     this.childIds,
     this.backendDOMNodeId,
   });
+  factory AXNode.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

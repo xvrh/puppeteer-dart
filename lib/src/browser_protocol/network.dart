@@ -362,6 +362,7 @@ class GetResponseBodyResult {
     @required this.body,
     @required this.base64Encoded,
   });
+  factory GetResponseBodyResult.fromJson(Map json) {}
 }
 
 /// Unique loader identifier.
@@ -369,6 +370,7 @@ class LoaderId {
   final String value;
 
   LoaderId(this.value);
+  factory LoaderId.fromJson(String value) => new LoaderId(value);
 
   String toJson() => value;
 }
@@ -378,6 +380,7 @@ class RequestId {
   final String value;
 
   RequestId(this.value);
+  factory RequestId.fromJson(String value) => new RequestId(value);
 
   String toJson() => value;
 }
@@ -387,6 +390,7 @@ class InterceptionId {
   final String value;
 
   InterceptionId(this.value);
+  factory InterceptionId.fromJson(String value) => new InterceptionId(value);
 
   String toJson() => value;
 }
@@ -417,6 +421,7 @@ class ErrorReason {
   final String value;
 
   const ErrorReason._(this.value);
+  factory ErrorReason.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -426,6 +431,7 @@ class TimeSinceEpoch {
   final num value;
 
   TimeSinceEpoch(this.value);
+  factory TimeSinceEpoch.fromJson(num value) => new TimeSinceEpoch(value);
 
   num toJson() => value;
 }
@@ -435,17 +441,19 @@ class MonotonicTime {
   final num value;
 
   MonotonicTime(this.value);
+  factory MonotonicTime.fromJson(num value) => new MonotonicTime(value);
 
   num toJson() => value;
 }
 
 /// Request / response headers as keys / values of JSON object.
 class Headers {
-  final Object value;
+  final Map value;
 
   Headers(this.value);
+  factory Headers.fromJson(Map value) => new Headers(value);
 
-  Object toJson() => value;
+  Map toJson() => value;
 }
 
 /// Loading priority of a resource request.
@@ -463,6 +471,7 @@ class ConnectionType {
   final String value;
 
   const ConnectionType._(this.value);
+  factory ConnectionType.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -475,6 +484,7 @@ class CookieSameSite {
   final String value;
 
   const CookieSameSite._(this.value);
+  factory CookieSameSite.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -547,6 +557,7 @@ class ResourceTiming {
     @required this.pushEnd,
     @required this.receiveHeadersEnd,
   });
+  factory ResourceTiming.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -582,6 +593,7 @@ class ResourcePriority {
   final String value;
 
   const ResourcePriority._(this.value);
+  factory ResourcePriority.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -622,6 +634,7 @@ class Request {
     @required this.referrerPolicy,
     this.isLinkPreload,
   });
+  factory Request.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -680,6 +693,7 @@ class SignedCertificateTimestamp {
     @required this.signatureAlgorithm,
     @required this.signatureData,
   });
+  factory SignedCertificateTimestamp.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -748,6 +762,7 @@ class SecurityDetails {
     @required this.validTo,
     @required this.signedCertificateTimestampList,
   });
+  factory SecurityDetails.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -787,6 +802,7 @@ class BlockedReason {
   final String value;
 
   const BlockedReason._(this.value);
+  factory BlockedReason.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -871,6 +887,7 @@ class Response {
     @required this.securityState,
     this.securityDetails,
   });
+  factory Response.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -925,6 +942,7 @@ class WebSocketRequest {
   WebSocketRequest({
     @required this.headers,
   });
+  factory WebSocketRequest.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -962,6 +980,7 @@ class WebSocketResponse {
     this.requestHeaders,
     this.requestHeadersText,
   });
+  factory WebSocketResponse.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -998,6 +1017,7 @@ class WebSocketFrame {
     @required this.mask,
     @required this.payloadData,
   });
+  factory WebSocketFrame.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -1029,6 +1049,7 @@ class CachedResource {
     this.response,
     @required this.bodySize,
   });
+  factory CachedResource.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -1063,6 +1084,7 @@ class Initiator {
     this.url,
     this.lineNumber,
   });
+  factory Initiator.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -1125,6 +1147,7 @@ class Cookie {
     @required this.session,
     this.sameSite,
   });
+  factory Cookie.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -1185,6 +1208,7 @@ class CookieParam {
     this.sameSite,
     this.expires,
   });
+  factory CookieParam.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -1236,6 +1260,7 @@ class AuthChallenge {
     @required this.scheme,
     @required this.realm,
   });
+  factory AuthChallenge.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -1266,6 +1291,7 @@ class AuthChallengeResponse {
     this.username,
     this.password,
   });
+  factory AuthChallengeResponse.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

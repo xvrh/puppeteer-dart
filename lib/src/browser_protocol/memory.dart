@@ -46,6 +46,7 @@ class GetDOMCountersResult {
     @required this.nodes,
     @required this.jsEventListeners,
   });
+  factory GetDOMCountersResult.fromJson(Map json) {}
 }
 
 /// Memory pressure level.
@@ -56,6 +57,7 @@ class PressureLevel {
   final String value;
 
   const PressureLevel._(this.value);
+  factory PressureLevel.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }

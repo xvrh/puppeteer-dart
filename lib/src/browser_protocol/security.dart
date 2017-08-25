@@ -50,6 +50,7 @@ class CertificateId {
   final int value;
 
   CertificateId(this.value);
+  factory CertificateId.fromJson(int value) => new CertificateId(value);
 
   int toJson() => value;
 }
@@ -65,6 +66,7 @@ class MixedContentType {
   final String value;
 
   const MixedContentType._(this.value);
+  factory MixedContentType.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -81,6 +83,7 @@ class SecurityState {
   final String value;
 
   const SecurityState._(this.value);
+  factory SecurityState.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -109,6 +112,7 @@ class SecurityStateExplanation {
     @required this.mixedContentType,
     @required this.certificate,
   });
+  factory SecurityStateExplanation.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -154,6 +158,7 @@ class InsecureContentStatus {
     @required this.ranInsecureContentStyle,
     @required this.displayedInsecureContentStyle,
   });
+  factory InsecureContentStatus.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -180,6 +185,7 @@ class CertificateErrorAction {
   final String value;
 
   const CertificateErrorAction._(this.value);
+  factory CertificateErrorAction.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }

@@ -70,6 +70,7 @@ class ReadResult {
     @required this.data,
     @required this.eof,
   });
+  factory ReadResult.fromJson(Map json) {}
 }
 
 /// This is either obtained from another method or specifed as <code>blob:&lt;uuid&gt;</code> where <code>&lt;uuid&gt</code> is an UUID of a Blob.
@@ -77,6 +78,7 @@ class StreamHandle {
   final String value;
 
   StreamHandle(this.value);
+  factory StreamHandle.fromJson(String value) => new StreamHandle(value);
 
   String toJson() => value;
 }

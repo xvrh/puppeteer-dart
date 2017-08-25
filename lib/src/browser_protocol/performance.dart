@@ -36,6 +36,7 @@ class Metric {
     @required this.name,
     @required this.value,
   });
+  factory Metric.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

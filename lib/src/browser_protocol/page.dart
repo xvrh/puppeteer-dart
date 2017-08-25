@@ -584,6 +584,7 @@ class GetNavigationHistoryResult {
     @required this.currentIndex,
     @required this.entries,
   });
+  factory GetNavigationHistoryResult.fromJson(Map json) {}
 }
 
 class GetResourceContentResult {
@@ -597,6 +598,7 @@ class GetResourceContentResult {
     @required this.content,
     @required this.base64Encoded,
   });
+  factory GetResourceContentResult.fromJson(Map json) {}
 }
 
 class GetAppManifestResult {
@@ -613,6 +615,7 @@ class GetAppManifestResult {
     @required this.errors,
     this.data,
   });
+  factory GetAppManifestResult.fromJson(Map json) {}
 }
 
 class GetLayoutMetricsResult {
@@ -630,6 +633,7 @@ class GetLayoutMetricsResult {
     @required this.visualViewport,
     @required this.contentSize,
   });
+  factory GetLayoutMetricsResult.fromJson(Map json) {}
 }
 
 /// Resource type as it was perceived by the rendering engine.
@@ -651,6 +655,7 @@ class ResourceType {
   final String value;
 
   const ResourceType._(this.value);
+  factory ResourceType.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -660,6 +665,7 @@ class FrameId {
   final String value;
 
   FrameId(this.value);
+  factory FrameId.fromJson(String value) => new FrameId(value);
 
   String toJson() => value;
 }
@@ -700,6 +706,7 @@ class Frame {
     @required this.mimeType,
     this.unreachableUrl,
   });
+  factory Frame.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -754,6 +761,7 @@ class FrameResource {
     this.failed,
     this.canceled,
   });
+  factory FrameResource.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -793,6 +801,7 @@ class FrameResourceTree {
     this.childFrames,
     @required this.resources,
   });
+  factory FrameResourceTree.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -811,6 +820,8 @@ class ScriptIdentifier {
   final String value;
 
   ScriptIdentifier(this.value);
+  factory ScriptIdentifier.fromJson(String value) =>
+      new ScriptIdentifier(value);
 
   String toJson() => value;
 }
@@ -839,6 +850,7 @@ class TransitionType {
   final String value;
 
   const TransitionType._(this.value);
+  factory TransitionType.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -867,6 +879,7 @@ class NavigationEntry {
     @required this.title,
     @required this.transitionType,
   });
+  factory NavigationEntry.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -912,6 +925,7 @@ class ScreencastFrameMetadata {
     @required this.scrollOffsetY,
     this.timestamp,
   });
+  factory ScreencastFrameMetadata.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -939,6 +953,7 @@ class DialogType {
   final String value;
 
   const DialogType._(this.value);
+  factory DialogType.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -963,6 +978,7 @@ class AppManifestError {
     @required this.line,
     @required this.column,
   });
+  factory AppManifestError.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -986,6 +1002,7 @@ class NavigationResponse {
   final String value;
 
   const NavigationResponse._(this.value);
+  factory NavigationResponse.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -1010,6 +1027,7 @@ class LayoutViewport {
     @required this.clientWidth,
     @required this.clientHeight,
   });
+  factory LayoutViewport.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -1054,6 +1072,7 @@ class VisualViewport {
     @required this.clientHeight,
     @required this.scale,
   });
+  factory VisualViewport.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -1093,6 +1112,7 @@ class Viewport {
     @required this.height,
     @required this.scale,
   });
+  factory Viewport.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

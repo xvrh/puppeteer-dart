@@ -264,8 +264,21 @@ class _InternalType extends _PropertyBag {
       code.writeln('$id(this.value);');
     }
 
+    if (hasProperties) {
+      code.writeln('factory $id.fromJson(Map json) {');
+
+      code.writeln('}');
+    } else if (isEnum) {
+      code.writeln('factory $id.fromJson(String value) => const {}[value];');
+    } else {
+      code.writeln('factory $id.fromJson(${_getPropertyType(properties.first)} value) => new $id(value);');
+    }
+
     //TODO(xha): il ne faut pas générer une méthode toJson pour les types qui sont
     // des types de retour.
+    // Pour ça, avant de faire la génération, on parcour tous les parameters des commands
+    // et tous les returns des commandes récursivement pour trouver les types.
+    // On les catégorise ensuite en 2 groupes
     if (generateToJson) {
       code.writeln('');
       if (hasProperties) {
@@ -327,7 +340,7 @@ class _PropertyBag {
       return 'List<$innerType>';
     }
     if (type == 'any') return 'dynamic';
-    if (type == 'object') return 'Object';
+    if (type == 'object') return 'Map';
     return type;
   }
 }

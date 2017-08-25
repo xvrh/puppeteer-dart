@@ -220,7 +220,7 @@ class OverlayManager {
   /// For testing.
   /// [nodeId] Id of the node to get highlight object for.
   /// Return: Highlight data for the node.
-  Future<Object> getHighlightObjectForTest(
+  Future<Map> getHighlightObjectForTest(
     dom.NodeId nodeId,
   ) async {
     Map parameters = {
@@ -285,6 +285,7 @@ class HighlightConfig {
     this.selectorList,
     this.cssGridColor,
   });
+  factory HighlightConfig.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {};
@@ -340,6 +341,7 @@ class InspectMode {
   final String value;
 
   const InspectMode._(this.value);
+  factory InspectMode.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }

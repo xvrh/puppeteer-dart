@@ -121,7 +121,7 @@ class LayerTreeManager {
   /// Replays the layer snapshot and returns canvas log.
   /// [snapshotId] The id of the layer snapshot.
   /// Return: The array of canvas function calls.
-  Future<List<Object>> snapshotCommandLog(
+  Future<List<Map>> snapshotCommandLog(
     SnapshotId snapshotId,
   ) async {
     Map parameters = {
@@ -136,6 +136,7 @@ class LayerId {
   final String value;
 
   LayerId(this.value);
+  factory LayerId.fromJson(String value) => new LayerId(value);
 
   String toJson() => value;
 }
@@ -145,6 +146,7 @@ class SnapshotId {
   final String value;
 
   SnapshotId(this.value);
+  factory SnapshotId.fromJson(String value) => new SnapshotId(value);
 
   String toJson() => value;
 }
@@ -161,6 +163,7 @@ class ScrollRect {
     @required this.rect,
     @required this.type,
   });
+  factory ScrollRect.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -191,6 +194,7 @@ class StickyPositionConstraint {
     this.nearestLayerShiftingStickyBox,
     this.nearestLayerShiftingContainingBlock,
   });
+  factory StickyPositionConstraint.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -225,6 +229,7 @@ class PictureTile {
     @required this.y,
     @required this.picture,
   });
+  factory PictureTile.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -304,6 +309,7 @@ class Layer {
     this.scrollRects,
     this.stickyPositionConstraint,
   });
+  factory Layer.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -351,6 +357,7 @@ class PaintProfile {
   final List<num> value;
 
   PaintProfile(this.value);
+  factory PaintProfile.fromJson(List<num> value) => new PaintProfile(value);
 
   List<num> toJson() => value;
 }

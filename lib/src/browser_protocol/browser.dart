@@ -64,6 +64,7 @@ class GetWindowForTargetResult {
     @required this.windowId,
     @required this.bounds,
   });
+  factory GetWindowForTargetResult.fromJson(Map json) {}
 }
 
 class GetVersionResult {
@@ -89,12 +90,14 @@ class GetVersionResult {
     @required this.userAgent,
     @required this.jsVersion,
   });
+  factory GetVersionResult.fromJson(Map json) {}
 }
 
 class WindowID {
   final int value;
 
   WindowID(this.value);
+  factory WindowID.fromJson(int value) => new WindowID(value);
 
   int toJson() => value;
 }
@@ -109,6 +112,7 @@ class WindowState {
   final String value;
 
   const WindowState._(this.value);
+  factory WindowState.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -137,6 +141,7 @@ class Bounds {
     this.height,
     this.windowState,
   });
+  factory Bounds.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {};

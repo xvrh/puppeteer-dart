@@ -61,6 +61,7 @@ class ApplicationCacheResource {
     @required this.size,
     @required this.type,
   });
+  factory ApplicationCacheResource.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -96,6 +97,7 @@ class ApplicationCache {
     @required this.updateTime,
     @required this.resources,
   });
+  factory ApplicationCache.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -125,6 +127,7 @@ class FrameWithManifest {
     @required this.manifestURL,
     @required this.status,
   });
+  factory FrameWithManifest.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

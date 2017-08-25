@@ -151,6 +151,7 @@ class DOMBreakpointType {
   final String value;
 
   const DOMBreakpointType._(this.value);
+  factory DOMBreakpointType.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -199,6 +200,7 @@ class EventListener {
     this.originalHandler,
     this.backendNodeId,
   });
+  factory EventListener.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

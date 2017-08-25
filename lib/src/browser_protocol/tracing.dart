@@ -78,15 +78,17 @@ class RequestMemoryDumpResult {
     @required this.dumpGuid,
     @required this.success,
   });
+  factory RequestMemoryDumpResult.fromJson(Map json) {}
 }
 
 /// Configuration for memory dump. Used only when "memory-infra" category is enabled.
 class MemoryDumpConfig {
-  final Object value;
+  final Map value;
 
   MemoryDumpConfig(this.value);
+  factory MemoryDumpConfig.fromJson(Map value) => new MemoryDumpConfig(value);
 
-  Object toJson() => value;
+  Map toJson() => value;
 }
 
 class TraceConfig {
@@ -124,6 +126,7 @@ class TraceConfig {
     this.syntheticDelays,
     this.memoryDumpConfig,
   });
+  factory TraceConfig.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {};

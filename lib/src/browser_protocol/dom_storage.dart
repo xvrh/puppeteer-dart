@@ -74,6 +74,7 @@ class StorageId {
     @required this.securityOrigin,
     @required this.isLocalStorage,
   });
+  factory StorageId.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -89,6 +90,7 @@ class Item {
   final List<String> value;
 
   Item(this.value);
+  factory Item.fromJson(List<String> value) => new Item(value);
 
   List<String> toJson() => value;
 }

@@ -238,6 +238,7 @@ class ScreenOrientation {
     @required this.type,
     @required this.angle,
   });
+  factory ScreenOrientation.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -258,6 +259,7 @@ class VirtualTimePolicy {
   final String value;
 
   const VirtualTimePolicy._(this.value);
+  factory VirtualTimePolicy.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }

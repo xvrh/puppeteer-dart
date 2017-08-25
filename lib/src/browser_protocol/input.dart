@@ -355,6 +355,7 @@ class TouchPoint {
     this.force,
     this.id,
   });
+  factory TouchPoint.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -389,6 +390,7 @@ class GestureSourceType {
   final String value;
 
   const GestureSourceType._(this.value);
+  factory GestureSourceType.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -398,6 +400,7 @@ class TimeSinceEpoch {
   final num value;
 
   TimeSinceEpoch(this.value);
+  factory TimeSinceEpoch.fromJson(num value) => new TimeSinceEpoch(value);
 
   num toJson() => value;
 }

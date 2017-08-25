@@ -272,6 +272,7 @@ class GetMatchedStylesForNodeResult {
     this.inherited,
     this.cssKeyframesRules,
   });
+  factory GetMatchedStylesForNodeResult.fromJson(Map json) {}
 }
 
 class GetInlineStylesForNodeResult {
@@ -285,6 +286,7 @@ class GetInlineStylesForNodeResult {
     this.inlineStyle,
     this.attributesStyle,
   });
+  factory GetInlineStylesForNodeResult.fromJson(Map json) {}
 }
 
 class GetBackgroundColorsResult {
@@ -306,12 +308,14 @@ class GetBackgroundColorsResult {
     this.computedFontWeight,
     this.computedBodyFontSize,
   });
+  factory GetBackgroundColorsResult.fromJson(Map json) {}
 }
 
 class StyleSheetId {
   final String value;
 
   StyleSheetId(this.value);
+  factory StyleSheetId.fromJson(String value) => new StyleSheetId(value);
 
   String toJson() => value;
 }
@@ -328,6 +332,7 @@ class StyleSheetOrigin {
   final String value;
 
   const StyleSheetOrigin._(this.value);
+  factory StyleSheetOrigin.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -344,6 +349,7 @@ class PseudoElementMatches {
     @required this.pseudoType,
     @required this.matches,
   });
+  factory PseudoElementMatches.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -366,6 +372,7 @@ class InheritedStyleEntry {
     this.inlineStyle,
     @required this.matchedCSSRules,
   });
+  factory InheritedStyleEntry.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -390,6 +397,7 @@ class RuleMatch {
     @required this.rule,
     @required this.matchingSelectors,
   });
+  factory RuleMatch.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -412,6 +420,7 @@ class Value {
     @required this.text,
     this.range,
   });
+  factory Value.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -436,6 +445,7 @@ class SelectorList {
     @required this.selectors,
     @required this.text,
   });
+  factory SelectorList.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -502,6 +512,7 @@ class CSSStyleSheetHeader {
     @required this.startColumn,
     @required this.length,
   });
+  factory CSSStyleSheetHeader.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -553,6 +564,7 @@ class CSSRule {
     @required this.style,
     this.media,
   });
+  factory CSSRule.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -590,6 +602,7 @@ class RuleUsage {
     @required this.endOffset,
     @required this.used,
   });
+  factory RuleUsage.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -622,6 +635,7 @@ class SourceRange {
     @required this.endLine,
     @required this.endColumn,
   });
+  factory SourceRange.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -649,6 +663,7 @@ class ShorthandEntry {
     @required this.value,
     this.important,
   });
+  factory ShorthandEntry.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -673,6 +688,7 @@ class CSSComputedStyleProperty {
     @required this.name,
     @required this.value,
   });
+  factory CSSComputedStyleProperty.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -707,6 +723,7 @@ class CSSStyle {
     this.cssText,
     this.range,
   });
+  factory CSSStyle.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -762,6 +779,7 @@ class CSSProperty {
     this.disabled,
     this.range,
   });
+  factory CSSProperty.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -818,6 +836,7 @@ class CSSMedia {
     this.styleSheetId,
     this.mediaList,
   });
+  factory CSSMedia.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -852,6 +871,7 @@ class MediaQuery {
     @required this.expressions,
     @required this.active,
   });
+  factory MediaQuery.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -886,6 +906,7 @@ class MediaQueryExpression {
     this.valueRange,
     this.computedLength,
   });
+  factory MediaQueryExpression.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -919,6 +940,7 @@ class PlatformFontUsage {
     @required this.isCustomFont,
     @required this.glyphCount,
   });
+  factory PlatformFontUsage.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -942,6 +964,7 @@ class CSSKeyframesRule {
     @required this.animationName,
     @required this.keyframes,
   });
+  factory CSSKeyframesRule.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -972,6 +995,7 @@ class CSSKeyframeRule {
     @required this.keyText,
     @required this.style,
   });
+  factory CSSKeyframeRule.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -1002,6 +1026,7 @@ class StyleDeclarationEdit {
     @required this.range,
     @required this.text,
   });
+  factory StyleDeclarationEdit.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -1029,6 +1054,7 @@ class InlineTextBox {
     @required this.startCharacterIndex,
     @required this.numCharacters,
   });
+  factory InlineTextBox.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

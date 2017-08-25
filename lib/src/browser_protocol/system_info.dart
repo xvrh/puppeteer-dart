@@ -34,6 +34,7 @@ class GetInfoResult {
     @required this.modelVersion,
     @required this.commandLine,
   });
+  factory GetInfoResult.fromJson(Map json) {}
 }
 
 /// Describes a single graphics processor (GPU).
@@ -56,6 +57,7 @@ class GPUDevice {
     @required this.vendorString,
     @required this.deviceString,
   });
+  factory GPUDevice.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -74,10 +76,10 @@ class GPUInfo {
   final List<GPUDevice> devices;
 
   /// An optional dictionary of additional GPU related attributes.
-  final Object auxAttributes;
+  final Map auxAttributes;
 
   /// An optional dictionary of graphics features and their status.
-  final Object featureStatus;
+  final Map featureStatus;
 
   /// An optional array of GPU driver bug workarounds.
   final List<String> driverBugWorkarounds;
@@ -88,6 +90,7 @@ class GPUInfo {
     this.featureStatus,
     @required this.driverBugWorkarounds,
   });
+  factory GPUInfo.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

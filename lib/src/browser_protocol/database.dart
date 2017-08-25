@@ -50,6 +50,7 @@ class ExecuteSQLResult {
     this.values,
     this.sqlError,
   });
+  factory ExecuteSQLResult.fromJson(Map json) {}
 }
 
 /// Unique identifier of Database object.
@@ -57,6 +58,7 @@ class DatabaseId {
   final String value;
 
   DatabaseId(this.value);
+  factory DatabaseId.fromJson(String value) => new DatabaseId(value);
 
   String toJson() => value;
 }
@@ -81,6 +83,7 @@ class Database {
     @required this.name,
     @required this.version,
   });
+  factory Database.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -105,6 +108,7 @@ class Error {
     @required this.message,
     @required this.code,
   });
+  factory Error.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

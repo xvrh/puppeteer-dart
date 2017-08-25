@@ -161,6 +161,7 @@ class Animation {
     @required this.type,
     this.cssId,
   });
+  factory Animation.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -225,6 +226,7 @@ class AnimationEffect {
     this.keyframesRule,
     @required this.easing,
   });
+  factory AnimationEffect.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -257,6 +259,7 @@ class KeyframesRule {
     this.name,
     @required this.keyframes,
   });
+  factory KeyframesRule.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -281,6 +284,7 @@ class KeyframeStyle {
     @required this.offset,
     @required this.easing,
   });
+  factory KeyframeStyle.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

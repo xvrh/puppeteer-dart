@@ -40,6 +40,7 @@ class GetSnapshotResult {
     @required this.layoutTreeNodes,
     @required this.computedStyles,
   });
+  factory GetSnapshotResult.fromJson(Map json) {}
 }
 
 /// A Node in the DOM tree.
@@ -142,6 +143,7 @@ class DOMNode {
     this.pseudoType,
     this.isClickable,
   });
+  factory DOMNode.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -240,6 +242,7 @@ class LayoutTreeNode {
     this.inlineTextNodes,
     this.styleIndex,
   });
+  factory LayoutTreeNode.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -267,6 +270,7 @@ class ComputedStyle {
   ComputedStyle({
     @required this.properties,
   });
+  factory ComputedStyle.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -288,6 +292,7 @@ class NameValue {
     @required this.name,
     @required this.value,
   });
+  factory NameValue.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

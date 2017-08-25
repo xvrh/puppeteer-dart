@@ -50,4 +50,5 @@ class GetEncodedResponseResult {
     @required this.originalSize,
     @required this.encodedSize,
   });
+  factory GetEncodedResponseResult.fromJson(Map json) {}
 }

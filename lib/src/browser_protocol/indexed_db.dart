@@ -119,6 +119,7 @@ class RequestDataResult {
     @required this.objectStoreDataEntries,
     @required this.hasMore,
   });
+  factory RequestDataResult.fromJson(Map json) {}
 }
 
 /// Database with an array of object stores.
@@ -137,6 +138,7 @@ class DatabaseWithObjectStores {
     @required this.version,
     @required this.objectStores,
   });
+  factory DatabaseWithObjectStores.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -168,6 +170,7 @@ class ObjectStore {
     @required this.autoIncrement,
     @required this.indexes,
   });
+  factory ObjectStore.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -200,6 +203,7 @@ class ObjectStoreIndex {
     @required this.unique,
     @required this.multiEntry,
   });
+  factory ObjectStoreIndex.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -236,6 +240,7 @@ class Key {
     this.date,
     this.array,
   });
+  factory Key.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -277,6 +282,7 @@ class KeyRange {
     @required this.lowerOpen,
     @required this.upperOpen,
   });
+  factory KeyRange.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -309,6 +315,7 @@ class DataEntry {
     @required this.primaryKey,
     @required this.value,
   });
+  factory DataEntry.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -336,6 +343,7 @@ class KeyPath {
     this.string,
     this.array,
   });
+  factory KeyPath.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

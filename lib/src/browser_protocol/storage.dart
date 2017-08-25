@@ -70,6 +70,7 @@ class GetUsageAndQuotaResult {
     @required this.quota,
     @required this.usageBreakdown,
   });
+  factory GetUsageAndQuotaResult.fromJson(Map json) {}
 }
 
 /// Enum of possible storage types.
@@ -90,6 +91,7 @@ class StorageType {
   final String value;
 
   const StorageType._(this.value);
+  factory StorageType.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -106,6 +108,7 @@ class UsageForType {
     @required this.storageType,
     @required this.usage,
   });
+  factory UsageForType.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {

@@ -121,6 +121,7 @@ class ServiceWorkerRegistration {
     @required this.scopeURL,
     @required this.isDeleted,
   });
+  factory ServiceWorkerRegistration.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -145,6 +146,8 @@ class ServiceWorkerVersionRunningStatus {
   final String value;
 
   const ServiceWorkerVersionRunningStatus._(this.value);
+  factory ServiceWorkerVersionRunningStatus.fromJson(String value) =>
+      const {}[value];
 
   String toJson() => value;
 }
@@ -166,6 +169,7 @@ class ServiceWorkerVersionStatus {
   final String value;
 
   const ServiceWorkerVersionStatus._(this.value);
+  factory ServiceWorkerVersionStatus.fromJson(String value) => const {}[value];
 
   String toJson() => value;
 }
@@ -203,6 +207,7 @@ class ServiceWorkerVersion {
     this.controlledClients,
     this.targetId,
   });
+  factory ServiceWorkerVersion.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
@@ -251,6 +256,7 @@ class ServiceWorkerErrorMessage {
     @required this.lineNumber,
     @required this.columnNumber,
   });
+  factory ServiceWorkerErrorMessage.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
