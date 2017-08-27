@@ -9,6 +9,24 @@ class AnimationManager {
 
   AnimationManager(this._client);
 
+  final StreamController<String> _animationCreated =
+      new StreamController<String>.broadcast();
+
+  /// Event for each animation that has been created.
+  Stream<String> get onAnimationCreated => _animationCreated.stream;
+
+  final StreamController<Animation> _animationStarted =
+      new StreamController<Animation>.broadcast();
+
+  /// Event for animation that has been started.
+  Stream<Animation> get onAnimationStarted => _animationStarted.stream;
+
+  final StreamController<String> _animationCanceled =
+      new StreamController<String>.broadcast();
+
+  /// Event for when an animation has been cancelled.
+  Stream<String> get onAnimationCanceled => _animationCanceled.stream;
+
   /// Enables animation domain notifications.
   Future enable() async {
     await _client.send('Animation.enable');
@@ -31,7 +49,7 @@ class AnimationManager {
     num playbackRate,
   ) async {
     Map parameters = {
-      'playbackRate': playbackRate.toString(),
+      'playbackRate': playbackRate,
     };
     await _client.send('Animation.setPlaybackRate', parameters);
   }
@@ -43,7 +61,7 @@ class AnimationManager {
     String id,
   ) async {
     Map parameters = {
-      'id': id.toString(),
+      'id': id,
     };
     await _client.send('Animation.getCurrentTime', parameters);
   }
@@ -56,8 +74,8 @@ class AnimationManager {
     bool paused,
   ) async {
     Map parameters = {
-      'animations': animations.map((e) => e.toString()).toList(),
-      'paused': paused.toString(),
+      'animations': animations.map((e) => e).toList(),
+      'paused': paused,
     };
     await _client.send('Animation.setPaused', parameters);
   }
@@ -72,9 +90,9 @@ class AnimationManager {
     num delay,
   ) async {
     Map parameters = {
-      'animationId': animationId.toString(),
-      'duration': duration.toString(),
-      'delay': delay.toString(),
+      'animationId': animationId,
+      'duration': duration,
+      'delay': delay,
     };
     await _client.send('Animation.setTiming', parameters);
   }
@@ -87,8 +105,8 @@ class AnimationManager {
     num currentTime,
   ) async {
     Map parameters = {
-      'animations': animations.map((e) => e.toString()).toList(),
-      'currentTime': currentTime.toString(),
+      'animations': animations.map((e) => e).toList(),
+      'currentTime': currentTime,
     };
     await _client.send('Animation.seekAnimations', parameters);
   }
@@ -99,7 +117,7 @@ class AnimationManager {
     List<String> animations,
   ) async {
     Map parameters = {
-      'animations': animations.map((e) => e.toString()).toList(),
+      'animations': animations.map((e) => e).toList(),
     };
     await _client.send('Animation.releaseAnimations', parameters);
   }
@@ -111,7 +129,7 @@ class AnimationManager {
     String animationId,
   ) async {
     Map parameters = {
-      'animationId': animationId.toString(),
+      'animationId': animationId,
     };
     await _client.send('Animation.resolveAnimation', parameters);
   }
@@ -161,22 +179,36 @@ class Animation {
     @required this.type,
     this.cssId,
   });
-  factory Animation.fromJson(Map json) {}
+
+  factory Animation.fromJson(Map json) {
+    return new Animation(
+      id: json['id'],
+      name: json['name'],
+      pausedState: json['pausedState'],
+      playState: json['playState'],
+      playbackRate: json['playbackRate'],
+      startTime: json['startTime'],
+      currentTime: json['currentTime'],
+      source: new AnimationEffect.fromJson(json['source']),
+      type: json['type'],
+      cssId: json.containsKey('cssId') ? json['cssId'] : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'id': id.toString(),
-      'name': name.toString(),
-      'pausedState': pausedState.toString(),
-      'playState': playState.toString(),
-      'playbackRate': playbackRate.toString(),
-      'startTime': startTime.toString(),
-      'currentTime': currentTime.toString(),
+      'id': id,
+      'name': name,
+      'pausedState': pausedState,
+      'playState': playState,
+      'playbackRate': playbackRate,
+      'startTime': startTime,
+      'currentTime': currentTime,
       'source': source.toJson(),
-      'type': type.toString(),
+      'type': type,
     };
     if (cssId != null) {
-      json['cssId'] = cssId.toString();
+      json['cssId'] = cssId;
     }
     return json;
   }
@@ -226,19 +258,35 @@ class AnimationEffect {
     this.keyframesRule,
     @required this.easing,
   });
-  factory AnimationEffect.fromJson(Map json) {}
+
+  factory AnimationEffect.fromJson(Map json) {
+    return new AnimationEffect(
+      delay: json['delay'],
+      endDelay: json['endDelay'],
+      iterationStart: json['iterationStart'],
+      iterations: json['iterations'],
+      duration: json['duration'],
+      direction: json['direction'],
+      fill: json['fill'],
+      backendNodeId: new dom.BackendNodeId.fromJson(json['backendNodeId']),
+      keyframesRule: json.containsKey('keyframesRule')
+          ? new KeyframesRule.fromJson(json['keyframesRule'])
+          : null,
+      easing: json['easing'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'delay': delay.toString(),
-      'endDelay': endDelay.toString(),
-      'iterationStart': iterationStart.toString(),
-      'iterations': iterations.toString(),
-      'duration': duration.toString(),
-      'direction': direction.toString(),
-      'fill': fill.toString(),
+      'delay': delay,
+      'endDelay': endDelay,
+      'iterationStart': iterationStart,
+      'iterations': iterations,
+      'duration': duration,
+      'direction': direction,
+      'fill': fill,
       'backendNodeId': backendNodeId.toJson(),
-      'easing': easing.toString(),
+      'easing': easing,
     };
     if (keyframesRule != null) {
       json['keyframesRule'] = keyframesRule.toJson();
@@ -259,14 +307,22 @@ class KeyframesRule {
     this.name,
     @required this.keyframes,
   });
-  factory KeyframesRule.fromJson(Map json) {}
+
+  factory KeyframesRule.fromJson(Map json) {
+    return new KeyframesRule(
+      name: json.containsKey('name') ? json['name'] : null,
+      keyframes: (json['keyframes'] as List)
+          .map((e) => new KeyframeStyle.fromJson(e))
+          .toList(),
+    );
+  }
 
   Map toJson() {
     Map json = {
       'keyframes': keyframes.map((e) => e.toJson()).toList(),
     };
     if (name != null) {
-      json['name'] = name.toString();
+      json['name'] = name;
     }
     return json;
   }
@@ -284,12 +340,18 @@ class KeyframeStyle {
     @required this.offset,
     @required this.easing,
   });
-  factory KeyframeStyle.fromJson(Map json) {}
+
+  factory KeyframeStyle.fromJson(Map json) {
+    return new KeyframeStyle(
+      offset: json['offset'],
+      easing: json['easing'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'offset': offset.toString(),
-      'easing': easing.toString(),
+      'offset': offset,
+      'easing': easing,
     };
     return json;
   }

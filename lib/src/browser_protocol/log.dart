@@ -11,6 +11,12 @@ class LogManager {
 
   LogManager(this._client);
 
+  final StreamController<LogEntry> _entryAdded =
+      new StreamController<LogEntry>.broadcast();
+
+  /// Issued when new message was logged.
+  Stream<LogEntry> get onEntryAdded => _entryAdded.stream;
+
   /// Enables log domain, sends the entries collected so far to the client by means of the <code>entryAdded</code> notification.
   Future enable() async {
     await _client.send('Log.enable');
@@ -83,20 +89,37 @@ class LogEntry {
     this.networkRequestId,
     this.workerId,
   });
-  factory LogEntry.fromJson(Map json) {}
+
+  factory LogEntry.fromJson(Map json) {
+    return new LogEntry(
+      source: json['source'],
+      level: json['level'],
+      text: json['text'],
+      timestamp: new runtime.Timestamp.fromJson(json['timestamp']),
+      url: json.containsKey('url') ? json['url'] : null,
+      lineNumber: json.containsKey('lineNumber') ? json['lineNumber'] : null,
+      stackTrace: json.containsKey('stackTrace')
+          ? new runtime.StackTrace.fromJson(json['stackTrace'])
+          : null,
+      networkRequestId: json.containsKey('networkRequestId')
+          ? new network.RequestId.fromJson(json['networkRequestId'])
+          : null,
+      workerId: json.containsKey('workerId') ? json['workerId'] : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'source': source.toString(),
-      'level': level.toString(),
-      'text': text.toString(),
+      'source': source,
+      'level': level,
+      'text': text,
       'timestamp': timestamp.toJson(),
     };
     if (url != null) {
-      json['url'] = url.toString();
+      json['url'] = url;
     }
     if (lineNumber != null) {
-      json['lineNumber'] = lineNumber.toString();
+      json['lineNumber'] = lineNumber;
     }
     if (stackTrace != null) {
       json['stackTrace'] = stackTrace.toJson();
@@ -105,7 +128,7 @@ class LogEntry {
       json['networkRequestId'] = networkRequestId.toJson();
     }
     if (workerId != null) {
-      json['workerId'] = workerId.toString();
+      json['workerId'] = workerId;
     }
     return json;
   }
@@ -123,12 +146,18 @@ class ViolationSetting {
     @required this.name,
     @required this.threshold,
   });
-  factory ViolationSetting.fromJson(Map json) {}
+
+  factory ViolationSetting.fromJson(Map json) {
+    return new ViolationSetting(
+      name: json['name'],
+      threshold: json['threshold'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'name': name.toString(),
-      'threshold': threshold.toString(),
+      'name': name,
+      'threshold': threshold,
     };
     return json;
   }

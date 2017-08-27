@@ -9,6 +9,20 @@ class SecurityManager {
 
   SecurityManager(this._client);
 
+  final StreamController<SecurityStateChangedResult> _securityStateChanged =
+      new StreamController<SecurityStateChangedResult>.broadcast();
+
+  /// The security state of the page changed.
+  Stream<SecurityStateChangedResult> get onSecurityStateChanged =>
+      _securityStateChanged.stream;
+
+  final StreamController<CertificateErrorResult> _certificateError =
+      new StreamController<CertificateErrorResult>.broadcast();
+
+  /// There is a certificate error. If overriding certificate errors is enabled, then it should be handled with the handleCertificateError command. Note: this event does not fire if the certificate error has been allowed internally.
+  Stream<CertificateErrorResult> get onCertificateError =>
+      _certificateError.stream;
+
   /// Enables tracking security state changes.
   Future enable() async {
     await _client.send('Security.enable');
@@ -19,6 +33,11 @@ class SecurityManager {
     await _client.send('Security.disable');
   }
 
+  /// Displays native dialog with the certificate details.
+  Future showCertificateViewer() async {
+    await _client.send('Security.showCertificateViewer');
+  }
+
   /// Handles a certificate error that fired a certificateError event.
   /// [eventId] The ID of the event.
   /// [action] The action to take on the certificate error.
@@ -27,7 +46,7 @@ class SecurityManager {
     CertificateErrorAction action,
   ) async {
     Map parameters = {
-      'eventId': eventId.toString(),
+      'eventId': eventId,
       'action': action.toJson(),
     };
     await _client.send('Security.handleCertificateError', parameters);
@@ -39,9 +58,72 @@ class SecurityManager {
     bool override,
   ) async {
     Map parameters = {
-      'override': override.toString(),
+      'override': override,
     };
     await _client.send('Security.setOverrideCertificateErrors', parameters);
+  }
+}
+
+class SecurityStateChangedResult {
+  /// Security state.
+  final SecurityState securityState;
+
+  /// True if the page was loaded over cryptographic transport such as HTTPS.
+  final bool schemeIsCryptographic;
+
+  /// List of explanations for the security state. If the overall security state is `insecure` or `warning`, at least one corresponding explanation should be included.
+  final List<SecurityStateExplanation> explanations;
+
+  /// Information about insecure content on the page.
+  final InsecureContentStatus insecureContentStatus;
+
+  /// Overrides user-visible description of the state.
+  final String summary;
+
+  SecurityStateChangedResult({
+    @required this.securityState,
+    @required this.schemeIsCryptographic,
+    @required this.explanations,
+    @required this.insecureContentStatus,
+    this.summary,
+  });
+
+  factory SecurityStateChangedResult.fromJson(Map json) {
+    return new SecurityStateChangedResult(
+      securityState: new SecurityState.fromJson(json['securityState']),
+      schemeIsCryptographic: json['schemeIsCryptographic'],
+      explanations: (json['explanations'] as List)
+          .map((e) => new SecurityStateExplanation.fromJson(e))
+          .toList(),
+      insecureContentStatus:
+          new InsecureContentStatus.fromJson(json['insecureContentStatus']),
+      summary: json.containsKey('summary') ? json['summary'] : null,
+    );
+  }
+}
+
+class CertificateErrorResult {
+  /// The ID of the event.
+  final int eventId;
+
+  /// The type of the error.
+  final String errorType;
+
+  /// The url that was requested.
+  final String requestURL;
+
+  CertificateErrorResult({
+    @required this.eventId,
+    @required this.errorType,
+    @required this.requestURL,
+  });
+
+  factory CertificateErrorResult.fromJson(Map json) {
+    return new CertificateErrorResult(
+      eventId: json['eventId'],
+      errorType: json['errorType'],
+      requestURL: json['requestURL'],
+    );
   }
 }
 
@@ -50,6 +132,7 @@ class CertificateId {
   final int value;
 
   CertificateId(this.value);
+
   factory CertificateId.fromJson(int value) => new CertificateId(value);
 
   int toJson() => value;
@@ -62,11 +145,17 @@ class MixedContentType {
   static const MixedContentType optionallyBlockable =
       const MixedContentType._('optionally-blockable');
   static const MixedContentType none = const MixedContentType._('none');
+  static const values = const {
+    'blockable': blockable,
+    'optionally-blockable': optionallyBlockable,
+    'none': none,
+  };
 
   final String value;
 
   const MixedContentType._(this.value);
-  factory MixedContentType.fromJson(String value) => const {}[value];
+
+  factory MixedContentType.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -79,11 +168,20 @@ class SecurityState {
   static const SecurityState warning = const SecurityState._('warning');
   static const SecurityState secure = const SecurityState._('secure');
   static const SecurityState info = const SecurityState._('info');
+  static const values = const {
+    'unknown': unknown,
+    'neutral': neutral,
+    'insecure': insecure,
+    'warning': warning,
+    'secure': secure,
+    'info': info,
+  };
 
   final String value;
 
   const SecurityState._(this.value);
-  factory SecurityState.fromJson(String value) => const {}[value];
+
+  factory SecurityState.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -99,28 +197,37 @@ class SecurityStateExplanation {
   /// Full text explanation of the factor.
   final String description;
 
+  /// True if the page has a certificate.
+  final bool hasCertificate;
+
   /// The type of mixed content described by the explanation.
   final MixedContentType mixedContentType;
-
-  /// Page certificate.
-  final List<String> certificate;
 
   SecurityStateExplanation({
     @required this.securityState,
     @required this.summary,
     @required this.description,
+    @required this.hasCertificate,
     @required this.mixedContentType,
-    @required this.certificate,
   });
-  factory SecurityStateExplanation.fromJson(Map json) {}
+
+  factory SecurityStateExplanation.fromJson(Map json) {
+    return new SecurityStateExplanation(
+      securityState: new SecurityState.fromJson(json['securityState']),
+      summary: json['summary'],
+      description: json['description'],
+      hasCertificate: json['hasCertificate'],
+      mixedContentType: new MixedContentType.fromJson(json['mixedContentType']),
+    );
+  }
 
   Map toJson() {
     Map json = {
       'securityState': securityState.toJson(),
-      'summary': summary.toString(),
-      'description': description.toString(),
+      'summary': summary,
+      'description': description,
+      'hasCertificate': hasCertificate,
       'mixedContentType': mixedContentType.toJson(),
-      'certificate': certificate.map((e) => e.toString()).toList(),
     };
     return json;
   }
@@ -158,16 +265,28 @@ class InsecureContentStatus {
     @required this.ranInsecureContentStyle,
     @required this.displayedInsecureContentStyle,
   });
-  factory InsecureContentStatus.fromJson(Map json) {}
+
+  factory InsecureContentStatus.fromJson(Map json) {
+    return new InsecureContentStatus(
+      ranMixedContent: json['ranMixedContent'],
+      displayedMixedContent: json['displayedMixedContent'],
+      containedMixedForm: json['containedMixedForm'],
+      ranContentWithCertErrors: json['ranContentWithCertErrors'],
+      displayedContentWithCertErrors: json['displayedContentWithCertErrors'],
+      ranInsecureContentStyle:
+          new SecurityState.fromJson(json['ranInsecureContentStyle']),
+      displayedInsecureContentStyle:
+          new SecurityState.fromJson(json['displayedInsecureContentStyle']),
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'ranMixedContent': ranMixedContent.toString(),
-      'displayedMixedContent': displayedMixedContent.toString(),
-      'containedMixedForm': containedMixedForm.toString(),
-      'ranContentWithCertErrors': ranContentWithCertErrors.toString(),
-      'displayedContentWithCertErrors':
-          displayedContentWithCertErrors.toString(),
+      'ranMixedContent': ranMixedContent,
+      'displayedMixedContent': displayedMixedContent,
+      'containedMixedForm': containedMixedForm,
+      'ranContentWithCertErrors': ranContentWithCertErrors,
+      'displayedContentWithCertErrors': displayedContentWithCertErrors,
       'ranInsecureContentStyle': ranInsecureContentStyle.toJson(),
       'displayedInsecureContentStyle': displayedInsecureContentStyle.toJson(),
     };
@@ -181,11 +300,16 @@ class CertificateErrorAction {
       const CertificateErrorAction._('continue');
   static const CertificateErrorAction cancel =
       const CertificateErrorAction._('cancel');
+  static const values = const {
+    'continue': continue$,
+    'cancel': cancel,
+  };
 
   final String value;
 
   const CertificateErrorAction._(this.value);
-  factory CertificateErrorAction.fromJson(String value) => const {}[value];
+
+  factory CertificateErrorAction.fromJson(String value) => values[value];
 
   String toJson() => value;
 }

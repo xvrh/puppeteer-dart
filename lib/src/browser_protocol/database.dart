@@ -7,6 +7,11 @@ class DatabaseManager {
 
   DatabaseManager(this._client);
 
+  final StreamController<Database> _addDatabase =
+      new StreamController<Database>.broadcast();
+
+  Stream<Database> get onAddDatabase => _addDatabase.stream;
+
   /// Enables database tracking, database events will now be delivered to the client.
   Future enable() async {
     await _client.send('Database.enable');
@@ -32,7 +37,7 @@ class DatabaseManager {
   ) async {
     Map parameters = {
       'databaseId': databaseId.toJson(),
-      'query': query.toString(),
+      'query': query,
     };
     await _client.send('Database.executeSQL', parameters);
   }
@@ -50,7 +55,20 @@ class ExecuteSQLResult {
     this.values,
     this.sqlError,
   });
-  factory ExecuteSQLResult.fromJson(Map json) {}
+
+  factory ExecuteSQLResult.fromJson(Map json) {
+    return new ExecuteSQLResult(
+      columnNames: json.containsKey('columnNames')
+          ? (json['columnNames'] as List).map((e) => e as String).toList()
+          : null,
+      values: json.containsKey('values')
+          ? (json['values'] as List).map((e) => e as dynamic).toList()
+          : null,
+      sqlError: json.containsKey('sqlError')
+          ? new Error.fromJson(json['sqlError'])
+          : null,
+    );
+  }
 }
 
 /// Unique identifier of Database object.
@@ -58,6 +76,7 @@ class DatabaseId {
   final String value;
 
   DatabaseId(this.value);
+
   factory DatabaseId.fromJson(String value) => new DatabaseId(value);
 
   String toJson() => value;
@@ -83,14 +102,22 @@ class Database {
     @required this.name,
     @required this.version,
   });
-  factory Database.fromJson(Map json) {}
+
+  factory Database.fromJson(Map json) {
+    return new Database(
+      id: new DatabaseId.fromJson(json['id']),
+      domain: json['domain'],
+      name: json['name'],
+      version: json['version'],
+    );
+  }
 
   Map toJson() {
     Map json = {
       'id': id.toJson(),
-      'domain': domain.toString(),
-      'name': name.toString(),
-      'version': version.toString(),
+      'domain': domain,
+      'name': name,
+      'version': version,
     };
     return json;
   }
@@ -108,12 +135,18 @@ class Error {
     @required this.message,
     @required this.code,
   });
-  factory Error.fromJson(Map json) {}
+
+  factory Error.fromJson(Map json) {
+    return new Error(
+      message: json['message'],
+      code: json['code'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'message': message.toString(),
-      'code': code.toString(),
+      'message': message,
+      'code': code,
     };
     return json;
   }

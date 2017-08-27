@@ -13,7 +13,7 @@ class InputManager {
     bool ignore,
   ) async {
     Map parameters = {
-      'ignore': ignore.toString(),
+      'ignore': ignore,
     };
     await _client.send('Input.setIgnoreInputEvents', parameters);
   }
@@ -48,43 +48,43 @@ class InputManager {
     bool isSystemKey,
   }) async {
     Map parameters = {
-      'type': type.toString(),
+      'type': type,
     };
     if (modifiers != null) {
-      parameters['modifiers'] = modifiers.toString();
+      parameters['modifiers'] = modifiers;
     }
     if (timestamp != null) {
       parameters['timestamp'] = timestamp.toJson();
     }
     if (text != null) {
-      parameters['text'] = text.toString();
+      parameters['text'] = text;
     }
     if (unmodifiedText != null) {
-      parameters['unmodifiedText'] = unmodifiedText.toString();
+      parameters['unmodifiedText'] = unmodifiedText;
     }
     if (keyIdentifier != null) {
-      parameters['keyIdentifier'] = keyIdentifier.toString();
+      parameters['keyIdentifier'] = keyIdentifier;
     }
     if (code != null) {
-      parameters['code'] = code.toString();
+      parameters['code'] = code;
     }
     if (key != null) {
-      parameters['key'] = key.toString();
+      parameters['key'] = key;
     }
     if (windowsVirtualKeyCode != null) {
-      parameters['windowsVirtualKeyCode'] = windowsVirtualKeyCode.toString();
+      parameters['windowsVirtualKeyCode'] = windowsVirtualKeyCode;
     }
     if (nativeVirtualKeyCode != null) {
-      parameters['nativeVirtualKeyCode'] = nativeVirtualKeyCode.toString();
+      parameters['nativeVirtualKeyCode'] = nativeVirtualKeyCode;
     }
     if (autoRepeat != null) {
-      parameters['autoRepeat'] = autoRepeat.toString();
+      parameters['autoRepeat'] = autoRepeat;
     }
     if (isKeypad != null) {
-      parameters['isKeypad'] = isKeypad.toString();
+      parameters['isKeypad'] = isKeypad;
     }
     if (isSystemKey != null) {
-      parameters['isSystemKey'] = isSystemKey.toString();
+      parameters['isSystemKey'] = isSystemKey;
     }
     await _client.send('Input.dispatchKeyEvent', parameters);
   }
@@ -97,8 +97,6 @@ class InputManager {
   /// [timestamp] Time at which the event occurred.
   /// [button] Mouse button (default: "none").
   /// [clickCount] Number of times the mouse button was clicked (default: 0).
-  /// [deltaX] X delta in CSS pixels for mouse wheel event (default: 0).
-  /// [deltaY] Y delta in CSS pixels for mouse wheel event (default: 0).
   Future dispatchMouseEvent(
     String type,
     num x,
@@ -107,38 +105,30 @@ class InputManager {
     TimeSinceEpoch timestamp,
     String button,
     int clickCount,
-    num deltaX,
-    num deltaY,
   }) async {
     Map parameters = {
-      'type': type.toString(),
-      'x': x.toString(),
-      'y': y.toString(),
+      'type': type,
+      'x': x,
+      'y': y,
     };
     if (modifiers != null) {
-      parameters['modifiers'] = modifiers.toString();
+      parameters['modifiers'] = modifiers;
     }
     if (timestamp != null) {
       parameters['timestamp'] = timestamp.toJson();
     }
     if (button != null) {
-      parameters['button'] = button.toString();
+      parameters['button'] = button;
     }
     if (clickCount != null) {
-      parameters['clickCount'] = clickCount.toString();
-    }
-    if (deltaX != null) {
-      parameters['deltaX'] = deltaX.toString();
-    }
-    if (deltaY != null) {
-      parameters['deltaY'] = deltaY.toString();
+      parameters['clickCount'] = clickCount;
     }
     await _client.send('Input.dispatchMouseEvent', parameters);
   }
 
   /// Dispatches a touch event to the page.
-  /// [type] Type of the touch event. TouchEnd and TouchCancel must not contain any touch points, while TouchStart and TouchMove must contains at least one.
-  /// [touchPoints] Active touch points on the touch device. One event per any changed point (compared to previous touch event in a sequence) is generated, emulating pressing/moving/releasing points one by one.
+  /// [type] Type of the touch event.
+  /// [touchPoints] Touch points.
   /// [modifiers] Bit field representing pressed modifier keys. Alt=1, Ctrl=2, Meta/Command=4, Shift=8 (default: 0).
   /// [timestamp] Time at which the event occurred.
   Future dispatchTouchEvent(
@@ -148,11 +138,11 @@ class InputManager {
     TimeSinceEpoch timestamp,
   }) async {
     Map parameters = {
-      'type': type.toString(),
+      'type': type,
       'touchPoints': touchPoints.map((e) => e.toJson()).toList(),
     };
     if (modifiers != null) {
-      parameters['modifiers'] = modifiers.toString();
+      parameters['modifiers'] = modifiers;
     }
     if (timestamp != null) {
       parameters['timestamp'] = timestamp.toJson();
@@ -182,23 +172,23 @@ class InputManager {
     int clickCount,
   }) async {
     Map parameters = {
-      'type': type.toString(),
-      'x': x.toString(),
-      'y': y.toString(),
+      'type': type,
+      'x': x,
+      'y': y,
       'timestamp': timestamp.toJson(),
-      'button': button.toString(),
+      'button': button,
     };
     if (deltaX != null) {
-      parameters['deltaX'] = deltaX.toString();
+      parameters['deltaX'] = deltaX;
     }
     if (deltaY != null) {
-      parameters['deltaY'] = deltaY.toString();
+      parameters['deltaY'] = deltaY;
     }
     if (modifiers != null) {
-      parameters['modifiers'] = modifiers.toString();
+      parameters['modifiers'] = modifiers;
     }
     if (clickCount != null) {
-      parameters['clickCount'] = clickCount.toString();
+      parameters['clickCount'] = clickCount;
     }
     await _client.send('Input.emulateTouchFromMouseEvent', parameters);
   }
@@ -217,12 +207,12 @@ class InputManager {
     GestureSourceType gestureSourceType,
   }) async {
     Map parameters = {
-      'x': x.toString(),
-      'y': y.toString(),
-      'scaleFactor': scaleFactor.toString(),
+      'x': x,
+      'y': y,
+      'scaleFactor': scaleFactor,
     };
     if (relativeSpeed != null) {
-      parameters['relativeSpeed'] = relativeSpeed.toString();
+      parameters['relativeSpeed'] = relativeSpeed;
     }
     if (gestureSourceType != null) {
       parameters['gestureSourceType'] = gestureSourceType.toJson();
@@ -258,38 +248,38 @@ class InputManager {
     String interactionMarkerName,
   }) async {
     Map parameters = {
-      'x': x.toString(),
-      'y': y.toString(),
+      'x': x,
+      'y': y,
     };
     if (xDistance != null) {
-      parameters['xDistance'] = xDistance.toString();
+      parameters['xDistance'] = xDistance;
     }
     if (yDistance != null) {
-      parameters['yDistance'] = yDistance.toString();
+      parameters['yDistance'] = yDistance;
     }
     if (xOverscroll != null) {
-      parameters['xOverscroll'] = xOverscroll.toString();
+      parameters['xOverscroll'] = xOverscroll;
     }
     if (yOverscroll != null) {
-      parameters['yOverscroll'] = yOverscroll.toString();
+      parameters['yOverscroll'] = yOverscroll;
     }
     if (preventFling != null) {
-      parameters['preventFling'] = preventFling.toString();
+      parameters['preventFling'] = preventFling;
     }
     if (speed != null) {
-      parameters['speed'] = speed.toString();
+      parameters['speed'] = speed;
     }
     if (gestureSourceType != null) {
       parameters['gestureSourceType'] = gestureSourceType.toJson();
     }
     if (repeatCount != null) {
-      parameters['repeatCount'] = repeatCount.toString();
+      parameters['repeatCount'] = repeatCount;
     }
     if (repeatDelayMs != null) {
-      parameters['repeatDelayMs'] = repeatDelayMs.toString();
+      parameters['repeatDelayMs'] = repeatDelayMs;
     }
     if (interactionMarkerName != null) {
-      parameters['interactionMarkerName'] = interactionMarkerName.toString();
+      parameters['interactionMarkerName'] = interactionMarkerName;
     }
     await _client.send('Input.synthesizeScrollGesture', parameters);
   }
@@ -308,14 +298,14 @@ class InputManager {
     GestureSourceType gestureSourceType,
   }) async {
     Map parameters = {
-      'x': x.toString(),
-      'y': y.toString(),
+      'x': x,
+      'y': y,
     };
     if (duration != null) {
-      parameters['duration'] = duration.toString();
+      parameters['duration'] = duration;
     }
     if (tapCount != null) {
-      parameters['tapCount'] = tapCount.toString();
+      parameters['tapCount'] = tapCount;
     }
     if (gestureSourceType != null) {
       parameters['gestureSourceType'] = gestureSourceType.toJson();
@@ -325,10 +315,13 @@ class InputManager {
 }
 
 class TouchPoint {
-  /// X coordinate of the event relative to the main frame's viewport in CSS pixels.
+  /// State of the touch point.
+  final String state;
+
+  /// X coordinate of the event relative to the main frame's viewport.
   final int x;
 
-  /// Y coordinate of the event relative to the main frame's viewport in CSS pixels. 0 refers to the top of the viewport and Y increases as it proceeds towards the bottom of the viewport.
+  /// Y coordinate of the event relative to the main frame's viewport. 0 refers to the top of the viewport and Y increases as it proceeds towards the bottom of the viewport.
   final int y;
 
   /// X radius of the touch area (default: 1).
@@ -347,6 +340,7 @@ class TouchPoint {
   final num id;
 
   TouchPoint({
+    @required this.state,
     @required this.x,
     @required this.y,
     this.radiusX,
@@ -355,27 +349,41 @@ class TouchPoint {
     this.force,
     this.id,
   });
-  factory TouchPoint.fromJson(Map json) {}
+
+  factory TouchPoint.fromJson(Map json) {
+    return new TouchPoint(
+      state: json['state'],
+      x: json['x'],
+      y: json['y'],
+      radiusX: json.containsKey('radiusX') ? json['radiusX'] : null,
+      radiusY: json.containsKey('radiusY') ? json['radiusY'] : null,
+      rotationAngle:
+          json.containsKey('rotationAngle') ? json['rotationAngle'] : null,
+      force: json.containsKey('force') ? json['force'] : null,
+      id: json.containsKey('id') ? json['id'] : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'x': x.toString(),
-      'y': y.toString(),
+      'state': state,
+      'x': x,
+      'y': y,
     };
     if (radiusX != null) {
-      json['radiusX'] = radiusX.toString();
+      json['radiusX'] = radiusX;
     }
     if (radiusY != null) {
-      json['radiusY'] = radiusY.toString();
+      json['radiusY'] = radiusY;
     }
     if (rotationAngle != null) {
-      json['rotationAngle'] = rotationAngle.toString();
+      json['rotationAngle'] = rotationAngle;
     }
     if (force != null) {
-      json['force'] = force.toString();
+      json['force'] = force;
     }
     if (id != null) {
-      json['id'] = id.toString();
+      json['id'] = id;
     }
     return json;
   }
@@ -386,11 +394,17 @@ class GestureSourceType {
       const GestureSourceType._('default');
   static const GestureSourceType touch = const GestureSourceType._('touch');
   static const GestureSourceType mouse = const GestureSourceType._('mouse');
+  static const values = const {
+    'default': default$,
+    'touch': touch,
+    'mouse': mouse,
+  };
 
   final String value;
 
   const GestureSourceType._(this.value);
-  factory GestureSourceType.fromJson(String value) => const {}[value];
+
+  factory GestureSourceType.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -400,6 +414,7 @@ class TimeSinceEpoch {
   final num value;
 
   TimeSinceEpoch(this.value);
+
   factory TimeSinceEpoch.fromJson(num value) => new TimeSinceEpoch(value);
 
   num toJson() => value;

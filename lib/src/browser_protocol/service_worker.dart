@@ -8,6 +8,25 @@ class ServiceWorkerManager {
 
   ServiceWorkerManager(this._client);
 
+  final StreamController<List<ServiceWorkerRegistration>>
+      _workerRegistrationUpdated =
+      new StreamController<List<ServiceWorkerRegistration>>.broadcast();
+
+  Stream<List<ServiceWorkerRegistration>> get onWorkerRegistrationUpdated =>
+      _workerRegistrationUpdated.stream;
+
+  final StreamController<List<ServiceWorkerVersion>> _workerVersionUpdated =
+      new StreamController<List<ServiceWorkerVersion>>.broadcast();
+
+  Stream<List<ServiceWorkerVersion>> get onWorkerVersionUpdated =>
+      _workerVersionUpdated.stream;
+
+  final StreamController<ServiceWorkerErrorMessage> _workerErrorReported =
+      new StreamController<ServiceWorkerErrorMessage>.broadcast();
+
+  Stream<ServiceWorkerErrorMessage> get onWorkerErrorReported =>
+      _workerErrorReported.stream;
+
   Future enable() async {
     await _client.send('ServiceWorker.enable');
   }
@@ -20,7 +39,7 @@ class ServiceWorkerManager {
     String scopeURL,
   ) async {
     Map parameters = {
-      'scopeURL': scopeURL.toString(),
+      'scopeURL': scopeURL,
     };
     await _client.send('ServiceWorker.unregister', parameters);
   }
@@ -29,7 +48,7 @@ class ServiceWorkerManager {
     String scopeURL,
   ) async {
     Map parameters = {
-      'scopeURL': scopeURL.toString(),
+      'scopeURL': scopeURL,
     };
     await _client.send('ServiceWorker.updateRegistration', parameters);
   }
@@ -38,7 +57,7 @@ class ServiceWorkerManager {
     String scopeURL,
   ) async {
     Map parameters = {
-      'scopeURL': scopeURL.toString(),
+      'scopeURL': scopeURL,
     };
     await _client.send('ServiceWorker.startWorker', parameters);
   }
@@ -47,7 +66,7 @@ class ServiceWorkerManager {
     String scopeURL,
   ) async {
     Map parameters = {
-      'scopeURL': scopeURL.toString(),
+      'scopeURL': scopeURL,
     };
     await _client.send('ServiceWorker.skipWaiting', parameters);
   }
@@ -56,7 +75,7 @@ class ServiceWorkerManager {
     String versionId,
   ) async {
     Map parameters = {
-      'versionId': versionId.toString(),
+      'versionId': versionId,
     };
     await _client.send('ServiceWorker.stopWorker', parameters);
   }
@@ -65,7 +84,7 @@ class ServiceWorkerManager {
     String versionId,
   ) async {
     Map parameters = {
-      'versionId': versionId.toString(),
+      'versionId': versionId,
     };
     await _client.send('ServiceWorker.inspectWorker', parameters);
   }
@@ -74,7 +93,7 @@ class ServiceWorkerManager {
     bool forceUpdateOnPageLoad,
   ) async {
     Map parameters = {
-      'forceUpdateOnPageLoad': forceUpdateOnPageLoad.toString(),
+      'forceUpdateOnPageLoad': forceUpdateOnPageLoad,
     };
     await _client.send('ServiceWorker.setForceUpdateOnPageLoad', parameters);
   }
@@ -85,9 +104,9 @@ class ServiceWorkerManager {
     String data,
   ) async {
     Map parameters = {
-      'origin': origin.toString(),
-      'registrationId': registrationId.toString(),
-      'data': data.toString(),
+      'origin': origin,
+      'registrationId': registrationId,
+      'data': data,
     };
     await _client.send('ServiceWorker.deliverPushMessage', parameters);
   }
@@ -99,10 +118,10 @@ class ServiceWorkerManager {
     bool lastChance,
   ) async {
     Map parameters = {
-      'origin': origin.toString(),
-      'registrationId': registrationId.toString(),
-      'tag': tag.toString(),
-      'lastChance': lastChance.toString(),
+      'origin': origin,
+      'registrationId': registrationId,
+      'tag': tag,
+      'lastChance': lastChance,
     };
     await _client.send('ServiceWorker.dispatchSyncEvent', parameters);
   }
@@ -121,13 +140,20 @@ class ServiceWorkerRegistration {
     @required this.scopeURL,
     @required this.isDeleted,
   });
-  factory ServiceWorkerRegistration.fromJson(Map json) {}
+
+  factory ServiceWorkerRegistration.fromJson(Map json) {
+    return new ServiceWorkerRegistration(
+      registrationId: json['registrationId'],
+      scopeURL: json['scopeURL'],
+      isDeleted: json['isDeleted'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'registrationId': registrationId.toString(),
-      'scopeURL': scopeURL.toString(),
-      'isDeleted': isDeleted.toString(),
+      'registrationId': registrationId,
+      'scopeURL': scopeURL,
+      'isDeleted': isDeleted,
     };
     return json;
   }
@@ -142,12 +168,19 @@ class ServiceWorkerVersionRunningStatus {
       const ServiceWorkerVersionRunningStatus._('running');
   static const ServiceWorkerVersionRunningStatus stopping =
       const ServiceWorkerVersionRunningStatus._('stopping');
+  static const values = const {
+    'stopped': stopped,
+    'starting': starting,
+    'running': running,
+    'stopping': stopping,
+  };
 
   final String value;
 
   const ServiceWorkerVersionRunningStatus._(this.value);
+
   factory ServiceWorkerVersionRunningStatus.fromJson(String value) =>
-      const {}[value];
+      values[value];
 
   String toJson() => value;
 }
@@ -165,11 +198,20 @@ class ServiceWorkerVersionStatus {
       const ServiceWorkerVersionStatus._('activated');
   static const ServiceWorkerVersionStatus redundant =
       const ServiceWorkerVersionStatus._('redundant');
+  static const values = const {
+    'new': new$,
+    'installing': installing,
+    'installed': installed,
+    'activating': activating,
+    'activated': activated,
+    'redundant': redundant,
+  };
 
   final String value;
 
   const ServiceWorkerVersionStatus._(this.value);
-  factory ServiceWorkerVersionStatus.fromJson(String value) => const {}[value];
+
+  factory ServiceWorkerVersionStatus.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -207,21 +249,45 @@ class ServiceWorkerVersion {
     this.controlledClients,
     this.targetId,
   });
-  factory ServiceWorkerVersion.fromJson(Map json) {}
+
+  factory ServiceWorkerVersion.fromJson(Map json) {
+    return new ServiceWorkerVersion(
+      versionId: json['versionId'],
+      registrationId: json['registrationId'],
+      scriptURL: json['scriptURL'],
+      runningStatus:
+          new ServiceWorkerVersionRunningStatus.fromJson(json['runningStatus']),
+      status: new ServiceWorkerVersionStatus.fromJson(json['status']),
+      scriptLastModified: json.containsKey('scriptLastModified')
+          ? json['scriptLastModified']
+          : null,
+      scriptResponseTime: json.containsKey('scriptResponseTime')
+          ? json['scriptResponseTime']
+          : null,
+      controlledClients: json.containsKey('controlledClients')
+          ? (json['controlledClients'] as List)
+              .map((e) => new target.TargetID.fromJson(e))
+              .toList()
+          : null,
+      targetId: json.containsKey('targetId')
+          ? new target.TargetID.fromJson(json['targetId'])
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'versionId': versionId.toString(),
-      'registrationId': registrationId.toString(),
-      'scriptURL': scriptURL.toString(),
+      'versionId': versionId,
+      'registrationId': registrationId,
+      'scriptURL': scriptURL,
       'runningStatus': runningStatus.toJson(),
       'status': status.toJson(),
     };
     if (scriptLastModified != null) {
-      json['scriptLastModified'] = scriptLastModified.toString();
+      json['scriptLastModified'] = scriptLastModified;
     }
     if (scriptResponseTime != null) {
-      json['scriptResponseTime'] = scriptResponseTime.toString();
+      json['scriptResponseTime'] = scriptResponseTime;
     }
     if (controlledClients != null) {
       json['controlledClients'] =
@@ -256,16 +322,26 @@ class ServiceWorkerErrorMessage {
     @required this.lineNumber,
     @required this.columnNumber,
   });
-  factory ServiceWorkerErrorMessage.fromJson(Map json) {}
+
+  factory ServiceWorkerErrorMessage.fromJson(Map json) {
+    return new ServiceWorkerErrorMessage(
+      errorMessage: json['errorMessage'],
+      registrationId: json['registrationId'],
+      versionId: json['versionId'],
+      sourceURL: json['sourceURL'],
+      lineNumber: json['lineNumber'],
+      columnNumber: json['columnNumber'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'errorMessage': errorMessage.toString(),
-      'registrationId': registrationId.toString(),
-      'versionId': versionId.toString(),
-      'sourceURL': sourceURL.toString(),
-      'lineNumber': lineNumber.toString(),
-      'columnNumber': columnNumber.toString(),
+      'errorMessage': errorMessage,
+      'registrationId': registrationId,
+      'versionId': versionId,
+      'sourceURL': sourceURL,
+      'lineNumber': lineNumber,
+      'columnNumber': columnNumber,
     };
     return json;
   }

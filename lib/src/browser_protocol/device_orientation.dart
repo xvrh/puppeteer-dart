@@ -17,9 +17,9 @@ class DeviceOrientationManager {
     num gamma,
   ) async {
     Map parameters = {
-      'alpha': alpha.toString(),
-      'beta': beta.toString(),
-      'gamma': gamma.toString(),
+      'alpha': alpha,
+      'beta': beta,
+      'gamma': gamma,
     };
     await _client.send(
         'DeviceOrientation.setDeviceOrientationOverride', parameters);

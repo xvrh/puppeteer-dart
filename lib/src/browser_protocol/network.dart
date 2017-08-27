@@ -12,6 +12,122 @@ class NetworkManager {
 
   NetworkManager(this._client);
 
+  final StreamController<ResourceChangedPriorityResult>
+      _resourceChangedPriority =
+      new StreamController<ResourceChangedPriorityResult>.broadcast();
+
+  /// Fired when resource loading priority is changed
+  Stream<ResourceChangedPriorityResult> get onResourceChangedPriority =>
+      _resourceChangedPriority.stream;
+
+  final StreamController<RequestWillBeSentResult> _requestWillBeSent =
+      new StreamController<RequestWillBeSentResult>.broadcast();
+
+  /// Fired when page is about to send HTTP request.
+  Stream<RequestWillBeSentResult> get onRequestWillBeSent =>
+      _requestWillBeSent.stream;
+
+  final StreamController<RequestId> _requestServedFromCache =
+      new StreamController<RequestId>.broadcast();
+
+  /// Fired if request ended up loading from cache.
+  Stream<RequestId> get onRequestServedFromCache =>
+      _requestServedFromCache.stream;
+
+  final StreamController<ResponseReceivedResult> _responseReceived =
+      new StreamController<ResponseReceivedResult>.broadcast();
+
+  /// Fired when HTTP response is available.
+  Stream<ResponseReceivedResult> get onResponseReceived =>
+      _responseReceived.stream;
+
+  final StreamController<DataReceivedResult> _dataReceived =
+      new StreamController<DataReceivedResult>.broadcast();
+
+  /// Fired when data chunk was received over the network.
+  Stream<DataReceivedResult> get onDataReceived => _dataReceived.stream;
+
+  final StreamController<LoadingFinishedResult> _loadingFinished =
+      new StreamController<LoadingFinishedResult>.broadcast();
+
+  /// Fired when HTTP request has finished loading.
+  Stream<LoadingFinishedResult> get onLoadingFinished =>
+      _loadingFinished.stream;
+
+  final StreamController<LoadingFailedResult> _loadingFailed =
+      new StreamController<LoadingFailedResult>.broadcast();
+
+  /// Fired when HTTP request has failed to load.
+  Stream<LoadingFailedResult> get onLoadingFailed => _loadingFailed.stream;
+
+  final StreamController<WebSocketWillSendHandshakeRequestResult>
+      _webSocketWillSendHandshakeRequest =
+      new StreamController<WebSocketWillSendHandshakeRequestResult>.broadcast();
+
+  /// Fired when WebSocket is about to initiate handshake.
+  Stream<WebSocketWillSendHandshakeRequestResult>
+      get onWebSocketWillSendHandshakeRequest =>
+          _webSocketWillSendHandshakeRequest.stream;
+
+  final StreamController<WebSocketHandshakeResponseReceivedResult>
+      _webSocketHandshakeResponseReceived = new StreamController<
+          WebSocketHandshakeResponseReceivedResult>.broadcast();
+
+  /// Fired when WebSocket handshake response becomes available.
+  Stream<WebSocketHandshakeResponseReceivedResult>
+      get onWebSocketHandshakeResponseReceived =>
+          _webSocketHandshakeResponseReceived.stream;
+
+  final StreamController<WebSocketCreatedResult> _webSocketCreated =
+      new StreamController<WebSocketCreatedResult>.broadcast();
+
+  /// Fired upon WebSocket creation.
+  Stream<WebSocketCreatedResult> get onWebSocketCreated =>
+      _webSocketCreated.stream;
+
+  final StreamController<WebSocketClosedResult> _webSocketClosed =
+      new StreamController<WebSocketClosedResult>.broadcast();
+
+  /// Fired when WebSocket is closed.
+  Stream<WebSocketClosedResult> get onWebSocketClosed =>
+      _webSocketClosed.stream;
+
+  final StreamController<WebSocketFrameReceivedResult> _webSocketFrameReceived =
+      new StreamController<WebSocketFrameReceivedResult>.broadcast();
+
+  /// Fired when WebSocket frame is received.
+  Stream<WebSocketFrameReceivedResult> get onWebSocketFrameReceived =>
+      _webSocketFrameReceived.stream;
+
+  final StreamController<WebSocketFrameErrorResult> _webSocketFrameError =
+      new StreamController<WebSocketFrameErrorResult>.broadcast();
+
+  /// Fired when WebSocket frame error occurs.
+  Stream<WebSocketFrameErrorResult> get onWebSocketFrameError =>
+      _webSocketFrameError.stream;
+
+  final StreamController<WebSocketFrameSentResult> _webSocketFrameSent =
+      new StreamController<WebSocketFrameSentResult>.broadcast();
+
+  /// Fired when WebSocket frame is sent.
+  Stream<WebSocketFrameSentResult> get onWebSocketFrameSent =>
+      _webSocketFrameSent.stream;
+
+  final StreamController<EventSourceMessageReceivedResult>
+      _eventSourceMessageReceived =
+      new StreamController<EventSourceMessageReceivedResult>.broadcast();
+
+  /// Fired when EventSource message is received.
+  Stream<EventSourceMessageReceivedResult> get onEventSourceMessageReceived =>
+      _eventSourceMessageReceived.stream;
+
+  final StreamController<RequestInterceptedResult> _requestIntercepted =
+      new StreamController<RequestInterceptedResult>.broadcast();
+
+  /// Details of an intercepted HTTP request, which must be either allowed, blocked, modified or mocked.
+  Stream<RequestInterceptedResult> get onRequestIntercepted =>
+      _requestIntercepted.stream;
+
   /// Enables network tracking, network events will now be delivered to the client.
   /// [maxTotalBufferSize] Buffer size in bytes to use when preserving network payloads (XHRs, etc).
   /// [maxResourceBufferSize] Per-resource buffer size in bytes to use when preserving network payloads (XHRs, etc).
@@ -21,10 +137,10 @@ class NetworkManager {
   }) async {
     Map parameters = {};
     if (maxTotalBufferSize != null) {
-      parameters['maxTotalBufferSize'] = maxTotalBufferSize.toString();
+      parameters['maxTotalBufferSize'] = maxTotalBufferSize;
     }
     if (maxResourceBufferSize != null) {
-      parameters['maxResourceBufferSize'] = maxResourceBufferSize.toString();
+      parameters['maxResourceBufferSize'] = maxResourceBufferSize;
     }
     await _client.send('Network.enable', parameters);
   }
@@ -40,7 +156,7 @@ class NetworkManager {
     String userAgent,
   ) async {
     Map parameters = {
-      'userAgent': userAgent.toString(),
+      'userAgent': userAgent,
     };
     await _client.send('Network.setUserAgentOverride', parameters);
   }
@@ -73,7 +189,7 @@ class NetworkManager {
     List<String> urls,
   ) async {
     Map parameters = {
-      'urls': urls.map((e) => e.toString()).toList(),
+      'urls': urls.map((e) => e).toList(),
     };
     await _client.send('Network.setBlockedURLs', parameters);
   }
@@ -119,7 +235,7 @@ class NetworkManager {
   }) async {
     Map parameters = {};
     if (urls != null) {
-      parameters['urls'] = urls.map((e) => e.toString()).toList();
+      parameters['urls'] = urls.map((e) => e).toList();
     }
     await _client.send('Network.getCookies', parameters);
   }
@@ -130,91 +246,66 @@ class NetworkManager {
     await _client.send('Network.getAllCookies');
   }
 
-  /// Deletes browser cookies with matching name and url or domain/path pair.
-  /// [name] Name of the cookies to remove.
-  /// [url] If specified, deletes all the cookies with the given name where domain and path match provided URL.
-  /// [domain] If specified, deletes only cookies with the exact domain.
-  /// [path] If specified, deletes only cookies with the exact path.
-  Future deleteCookies(
-    String name, {
+  /// Deletes browser cookie with given name, domain and path.
+  /// [cookieName] Name of the cookie to remove.
+  /// [url] URL to match cooke domain and path.
+  Future deleteCookie(
+    String cookieName,
     String url,
-    String domain,
-    String path,
-  }) async {
+  ) async {
     Map parameters = {
-      'name': name.toString(),
+      'cookieName': cookieName,
+      'url': url,
     };
-    if (url != null) {
-      parameters['url'] = url.toString();
-    }
-    if (domain != null) {
-      parameters['domain'] = domain.toString();
-    }
-    if (path != null) {
-      parameters['path'] = path.toString();
-    }
-    await _client.send('Network.deleteCookies', parameters);
+    await _client.send('Network.deleteCookie', parameters);
   }
 
   /// Sets a cookie with the given cookie data; may overwrite equivalent cookies if they exist.
-  /// [name] Cookie name.
-  /// [value] Cookie value.
   /// [url] The request-URI to associate with the setting of the cookie. This value can affect the default domain and path values of the created cookie.
-  /// [domain] Cookie domain.
-  /// [path] Cookie path.
-  /// [secure] True if cookie is secure.
-  /// [httpOnly] True if cookie is http-only.
-  /// [sameSite] Cookie SameSite type.
-  /// [expires] Cookie expiration date, session cookie if not set
+  /// [name] The name of the cookie.
+  /// [value] The value of the cookie.
+  /// [domain] If omitted, the cookie becomes a host-only cookie.
+  /// [path] Defaults to the path portion of the url parameter.
+  /// [secure] Defaults ot false.
+  /// [httpOnly] Defaults to false.
+  /// [sameSite] Defaults to browser default behavior.
+  /// [expirationDate] If omitted, the cookie becomes a session cookie.
   /// Return: True if successfully set cookie.
   Future<bool> setCookie(
+    String url,
     String name,
     String value, {
-    String url,
     String domain,
     String path,
     bool secure,
     bool httpOnly,
     CookieSameSite sameSite,
-    TimeSinceEpoch expires,
+    TimeSinceEpoch expirationDate,
   }) async {
     Map parameters = {
-      'name': name.toString(),
-      'value': value.toString(),
+      'url': url,
+      'name': name,
+      'value': value,
     };
-    if (url != null) {
-      parameters['url'] = url.toString();
-    }
     if (domain != null) {
-      parameters['domain'] = domain.toString();
+      parameters['domain'] = domain;
     }
     if (path != null) {
-      parameters['path'] = path.toString();
+      parameters['path'] = path;
     }
     if (secure != null) {
-      parameters['secure'] = secure.toString();
+      parameters['secure'] = secure;
     }
     if (httpOnly != null) {
-      parameters['httpOnly'] = httpOnly.toString();
+      parameters['httpOnly'] = httpOnly;
     }
     if (sameSite != null) {
       parameters['sameSite'] = sameSite.toJson();
     }
-    if (expires != null) {
-      parameters['expires'] = expires.toJson();
+    if (expirationDate != null) {
+      parameters['expirationDate'] = expirationDate.toJson();
     }
     await _client.send('Network.setCookie', parameters);
-  }
-
-  /// Sets given cookies.
-  /// [cookies] Cookies to be set.
-  Future setCookies(
-    List<CookieParam> cookies,
-  ) async {
-    Map parameters = {
-      'cookies': cookies.map((e) => e.toJson()).toList(),
-    };
-    await _client.send('Network.setCookies', parameters);
   }
 
   /// Tells whether emulation of network conditions is supported.
@@ -237,10 +328,10 @@ class NetworkManager {
     ConnectionType connectionType,
   }) async {
     Map parameters = {
-      'offline': offline.toString(),
-      'latency': latency.toString(),
-      'downloadThroughput': downloadThroughput.toString(),
-      'uploadThroughput': uploadThroughput.toString(),
+      'offline': offline,
+      'latency': latency,
+      'downloadThroughput': downloadThroughput,
+      'uploadThroughput': uploadThroughput,
     };
     if (connectionType != null) {
       parameters['connectionType'] = connectionType.toJson();
@@ -254,7 +345,7 @@ class NetworkManager {
     bool cacheDisabled,
   ) async {
     Map parameters = {
-      'cacheDisabled': cacheDisabled.toString(),
+      'cacheDisabled': cacheDisabled,
     };
     await _client.send('Network.setCacheDisabled', parameters);
   }
@@ -265,7 +356,7 @@ class NetworkManager {
     bool bypass,
   ) async {
     Map parameters = {
-      'bypass': bypass.toString(),
+      'bypass': bypass,
     };
     await _client.send('Network.setBypassServiceWorker', parameters);
   }
@@ -278,8 +369,8 @@ class NetworkManager {
     int maxResourceSize,
   ) async {
     Map parameters = {
-      'maxTotalSize': maxTotalSize.toString(),
-      'maxResourceSize': maxResourceSize.toString(),
+      'maxTotalSize': maxTotalSize,
+      'maxResourceSize': maxResourceSize,
     };
     await _client.send('Network.setDataSizeLimitsForTest', parameters);
   }
@@ -290,7 +381,7 @@ class NetworkManager {
     String origin,
   ) async {
     Map parameters = {
-      'origin': origin.toString(),
+      'origin': origin,
     };
     await _client.send('Network.getCertificate', parameters);
   }
@@ -300,13 +391,13 @@ class NetworkManager {
     bool enabled,
   ) async {
     Map parameters = {
-      'enabled': enabled.toString(),
+      'enabled': enabled,
     };
     await _client.send('Network.setRequestInterceptionEnabled', parameters);
   }
 
   /// Response to Network.requestIntercepted which either modifies the request to continue with any modifications, or blocks it, or completes it with the provided response bytes. If a network fetch occurs as a result which encounters a redirect an additional Network.requestIntercepted event will be sent with the same InterceptionId.
-  /// [errorReason] If set this causes the request to fail with the given reason. Passing <code>Aborted</code> for requests marked with <code>isNavigationRequest</code> also cancels the navigation. Must not be set in response to an authChallenge.
+  /// [errorReason] If set this causes the request to fail with the given reason. Must not be set in response to an authChallenge.
   /// [rawResponse] If set the requests completes using with the provided base64 encoded raw response, including HTTP status line and headers etc... Must not be set in response to an authChallenge.
   /// [url] If set the request url will be modified in a way that's not observable by page. Must not be set in response to an authChallenge.
   /// [method] If set this allows the request method to be overridden. Must not be set in response to an authChallenge.
@@ -330,16 +421,16 @@ class NetworkManager {
       parameters['errorReason'] = errorReason.toJson();
     }
     if (rawResponse != null) {
-      parameters['rawResponse'] = rawResponse.toString();
+      parameters['rawResponse'] = rawResponse;
     }
     if (url != null) {
-      parameters['url'] = url.toString();
+      parameters['url'] = url;
     }
     if (method != null) {
-      parameters['method'] = method.toString();
+      parameters['method'] = method;
     }
     if (postData != null) {
-      parameters['postData'] = postData.toString();
+      parameters['postData'] = postData;
     }
     if (headers != null) {
       parameters['headers'] = headers.toJson();
@@ -348,6 +439,498 @@ class NetworkManager {
       parameters['authChallengeResponse'] = authChallengeResponse.toJson();
     }
     await _client.send('Network.continueInterceptedRequest', parameters);
+  }
+}
+
+class ResourceChangedPriorityResult {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// New priority
+  final ResourcePriority newPriority;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  ResourceChangedPriorityResult({
+    @required this.requestId,
+    @required this.newPriority,
+    @required this.timestamp,
+  });
+
+  factory ResourceChangedPriorityResult.fromJson(Map json) {
+    return new ResourceChangedPriorityResult(
+      requestId: new RequestId.fromJson(json['requestId']),
+      newPriority: new ResourcePriority.fromJson(json['newPriority']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+    );
+  }
+}
+
+class RequestWillBeSentResult {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Loader identifier. Empty string if the request is fetched form worker.
+  final LoaderId loaderId;
+
+  /// URL of the document this request is loaded for.
+  final String documentURL;
+
+  /// Request data.
+  final Request request;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// Timestamp.
+  final TimeSinceEpoch wallTime;
+
+  /// Request initiator.
+  final Initiator initiator;
+
+  /// Redirect response data.
+  final Response redirectResponse;
+
+  /// Type of this resource.
+  final page.ResourceType type;
+
+  /// Frame identifier.
+  final page.FrameId frameId;
+
+  RequestWillBeSentResult({
+    @required this.requestId,
+    @required this.loaderId,
+    @required this.documentURL,
+    @required this.request,
+    @required this.timestamp,
+    @required this.wallTime,
+    @required this.initiator,
+    this.redirectResponse,
+    this.type,
+    this.frameId,
+  });
+
+  factory RequestWillBeSentResult.fromJson(Map json) {
+    return new RequestWillBeSentResult(
+      requestId: new RequestId.fromJson(json['requestId']),
+      loaderId: new LoaderId.fromJson(json['loaderId']),
+      documentURL: json['documentURL'],
+      request: new Request.fromJson(json['request']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      wallTime: new TimeSinceEpoch.fromJson(json['wallTime']),
+      initiator: new Initiator.fromJson(json['initiator']),
+      redirectResponse: json.containsKey('redirectResponse')
+          ? new Response.fromJson(json['redirectResponse'])
+          : null,
+      type: json.containsKey('type')
+          ? new page.ResourceType.fromJson(json['type'])
+          : null,
+      frameId: json.containsKey('frameId')
+          ? new page.FrameId.fromJson(json['frameId'])
+          : null,
+    );
+  }
+}
+
+class ResponseReceivedResult {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Loader identifier. Empty string if the request is fetched form worker.
+  final LoaderId loaderId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// Resource type.
+  final page.ResourceType type;
+
+  /// Response data.
+  final Response response;
+
+  /// Frame identifier.
+  final page.FrameId frameId;
+
+  ResponseReceivedResult({
+    @required this.requestId,
+    @required this.loaderId,
+    @required this.timestamp,
+    @required this.type,
+    @required this.response,
+    this.frameId,
+  });
+
+  factory ResponseReceivedResult.fromJson(Map json) {
+    return new ResponseReceivedResult(
+      requestId: new RequestId.fromJson(json['requestId']),
+      loaderId: new LoaderId.fromJson(json['loaderId']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      type: new page.ResourceType.fromJson(json['type']),
+      response: new Response.fromJson(json['response']),
+      frameId: json.containsKey('frameId')
+          ? new page.FrameId.fromJson(json['frameId'])
+          : null,
+    );
+  }
+}
+
+class DataReceivedResult {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// Data chunk length.
+  final int dataLength;
+
+  /// Actual bytes received (might be less than dataLength for compressed encodings).
+  final int encodedDataLength;
+
+  DataReceivedResult({
+    @required this.requestId,
+    @required this.timestamp,
+    @required this.dataLength,
+    @required this.encodedDataLength,
+  });
+
+  factory DataReceivedResult.fromJson(Map json) {
+    return new DataReceivedResult(
+      requestId: new RequestId.fromJson(json['requestId']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      dataLength: json['dataLength'],
+      encodedDataLength: json['encodedDataLength'],
+    );
+  }
+}
+
+class LoadingFinishedResult {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// Total number of bytes received for this request.
+  final num encodedDataLength;
+
+  LoadingFinishedResult({
+    @required this.requestId,
+    @required this.timestamp,
+    @required this.encodedDataLength,
+  });
+
+  factory LoadingFinishedResult.fromJson(Map json) {
+    return new LoadingFinishedResult(
+      requestId: new RequestId.fromJson(json['requestId']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      encodedDataLength: json['encodedDataLength'],
+    );
+  }
+}
+
+class LoadingFailedResult {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// Resource type.
+  final page.ResourceType type;
+
+  /// User friendly error message.
+  final String errorText;
+
+  /// True if loading was canceled.
+  final bool canceled;
+
+  /// The reason why loading was blocked, if any.
+  final BlockedReason blockedReason;
+
+  LoadingFailedResult({
+    @required this.requestId,
+    @required this.timestamp,
+    @required this.type,
+    @required this.errorText,
+    this.canceled,
+    this.blockedReason,
+  });
+
+  factory LoadingFailedResult.fromJson(Map json) {
+    return new LoadingFailedResult(
+      requestId: new RequestId.fromJson(json['requestId']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      type: new page.ResourceType.fromJson(json['type']),
+      errorText: json['errorText'],
+      canceled: json.containsKey('canceled') ? json['canceled'] : null,
+      blockedReason: json.containsKey('blockedReason')
+          ? new BlockedReason.fromJson(json['blockedReason'])
+          : null,
+    );
+  }
+}
+
+class WebSocketWillSendHandshakeRequestResult {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// UTC Timestamp.
+  final TimeSinceEpoch wallTime;
+
+  /// WebSocket request data.
+  final WebSocketRequest request;
+
+  WebSocketWillSendHandshakeRequestResult({
+    @required this.requestId,
+    @required this.timestamp,
+    @required this.wallTime,
+    @required this.request,
+  });
+
+  factory WebSocketWillSendHandshakeRequestResult.fromJson(Map json) {
+    return new WebSocketWillSendHandshakeRequestResult(
+      requestId: new RequestId.fromJson(json['requestId']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      wallTime: new TimeSinceEpoch.fromJson(json['wallTime']),
+      request: new WebSocketRequest.fromJson(json['request']),
+    );
+  }
+}
+
+class WebSocketHandshakeResponseReceivedResult {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// WebSocket response data.
+  final WebSocketResponse response;
+
+  WebSocketHandshakeResponseReceivedResult({
+    @required this.requestId,
+    @required this.timestamp,
+    @required this.response,
+  });
+
+  factory WebSocketHandshakeResponseReceivedResult.fromJson(Map json) {
+    return new WebSocketHandshakeResponseReceivedResult(
+      requestId: new RequestId.fromJson(json['requestId']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      response: new WebSocketResponse.fromJson(json['response']),
+    );
+  }
+}
+
+class WebSocketCreatedResult {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// WebSocket request URL.
+  final String url;
+
+  /// Request initiator.
+  final Initiator initiator;
+
+  WebSocketCreatedResult({
+    @required this.requestId,
+    @required this.url,
+    this.initiator,
+  });
+
+  factory WebSocketCreatedResult.fromJson(Map json) {
+    return new WebSocketCreatedResult(
+      requestId: new RequestId.fromJson(json['requestId']),
+      url: json['url'],
+      initiator: json.containsKey('initiator')
+          ? new Initiator.fromJson(json['initiator'])
+          : null,
+    );
+  }
+}
+
+class WebSocketClosedResult {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  WebSocketClosedResult({
+    @required this.requestId,
+    @required this.timestamp,
+  });
+
+  factory WebSocketClosedResult.fromJson(Map json) {
+    return new WebSocketClosedResult(
+      requestId: new RequestId.fromJson(json['requestId']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+    );
+  }
+}
+
+class WebSocketFrameReceivedResult {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// WebSocket response data.
+  final WebSocketFrame response;
+
+  WebSocketFrameReceivedResult({
+    @required this.requestId,
+    @required this.timestamp,
+    @required this.response,
+  });
+
+  factory WebSocketFrameReceivedResult.fromJson(Map json) {
+    return new WebSocketFrameReceivedResult(
+      requestId: new RequestId.fromJson(json['requestId']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      response: new WebSocketFrame.fromJson(json['response']),
+    );
+  }
+}
+
+class WebSocketFrameErrorResult {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// WebSocket frame error message.
+  final String errorMessage;
+
+  WebSocketFrameErrorResult({
+    @required this.requestId,
+    @required this.timestamp,
+    @required this.errorMessage,
+  });
+
+  factory WebSocketFrameErrorResult.fromJson(Map json) {
+    return new WebSocketFrameErrorResult(
+      requestId: new RequestId.fromJson(json['requestId']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      errorMessage: json['errorMessage'],
+    );
+  }
+}
+
+class WebSocketFrameSentResult {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// WebSocket response data.
+  final WebSocketFrame response;
+
+  WebSocketFrameSentResult({
+    @required this.requestId,
+    @required this.timestamp,
+    @required this.response,
+  });
+
+  factory WebSocketFrameSentResult.fromJson(Map json) {
+    return new WebSocketFrameSentResult(
+      requestId: new RequestId.fromJson(json['requestId']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      response: new WebSocketFrame.fromJson(json['response']),
+    );
+  }
+}
+
+class EventSourceMessageReceivedResult {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// Message type.
+  final String eventName;
+
+  /// Message identifier.
+  final String eventId;
+
+  /// Message content.
+  final String data;
+
+  EventSourceMessageReceivedResult({
+    @required this.requestId,
+    @required this.timestamp,
+    @required this.eventName,
+    @required this.eventId,
+    @required this.data,
+  });
+
+  factory EventSourceMessageReceivedResult.fromJson(Map json) {
+    return new EventSourceMessageReceivedResult(
+      requestId: new RequestId.fromJson(json['requestId']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      eventName: json['eventName'],
+      eventId: json['eventId'],
+      data: json['data'],
+    );
+  }
+}
+
+class RequestInterceptedResult {
+  /// Each request the page makes will have a unique id, however if any redirects are encountered while processing that fetch, they will be reported with the same id as the original fetch. Likewise if HTTP authentication is needed then the same fetch id will be used.
+  final InterceptionId interceptionId;
+
+  final Request request;
+
+  /// How the requested resource will be used.
+  final page.ResourceType resourceType;
+
+  /// HTTP response headers, only sent if a redirect was intercepted.
+  final Headers redirectHeaders;
+
+  /// HTTP response code, only sent if a redirect was intercepted.
+  final int redirectStatusCode;
+
+  /// Redirect location, only sent if a redirect was intercepted.
+  final String redirectUrl;
+
+  /// Details of the Authorization Challenge encountered. If this is set then continueInterceptedRequest must contain an authChallengeResponse.
+  final AuthChallenge authChallenge;
+
+  RequestInterceptedResult({
+    @required this.interceptionId,
+    @required this.request,
+    @required this.resourceType,
+    this.redirectHeaders,
+    this.redirectStatusCode,
+    this.redirectUrl,
+    this.authChallenge,
+  });
+
+  factory RequestInterceptedResult.fromJson(Map json) {
+    return new RequestInterceptedResult(
+      interceptionId: new InterceptionId.fromJson(json['interceptionId']),
+      request: new Request.fromJson(json['request']),
+      resourceType: new page.ResourceType.fromJson(json['resourceType']),
+      redirectHeaders: json.containsKey('redirectHeaders')
+          ? new Headers.fromJson(json['redirectHeaders'])
+          : null,
+      redirectStatusCode: json.containsKey('redirectStatusCode')
+          ? json['redirectStatusCode']
+          : null,
+      redirectUrl: json.containsKey('redirectUrl') ? json['redirectUrl'] : null,
+      authChallenge: json.containsKey('authChallenge')
+          ? new AuthChallenge.fromJson(json['authChallenge'])
+          : null,
+    );
   }
 }
 
@@ -362,7 +945,13 @@ class GetResponseBodyResult {
     @required this.body,
     @required this.base64Encoded,
   });
-  factory GetResponseBodyResult.fromJson(Map json) {}
+
+  factory GetResponseBodyResult.fromJson(Map json) {
+    return new GetResponseBodyResult(
+      body: json['body'],
+      base64Encoded: json['base64Encoded'],
+    );
+  }
 }
 
 /// Unique loader identifier.
@@ -370,6 +959,7 @@ class LoaderId {
   final String value;
 
   LoaderId(this.value);
+
   factory LoaderId.fromJson(String value) => new LoaderId(value);
 
   String toJson() => value;
@@ -380,6 +970,7 @@ class RequestId {
   final String value;
 
   RequestId(this.value);
+
   factory RequestId.fromJson(String value) => new RequestId(value);
 
   String toJson() => value;
@@ -390,6 +981,7 @@ class InterceptionId {
   final String value;
 
   InterceptionId(this.value);
+
   factory InterceptionId.fromJson(String value) => new InterceptionId(value);
 
   String toJson() => value;
@@ -417,11 +1009,26 @@ class ErrorReason {
       const ErrorReason._('InternetDisconnected');
   static const ErrorReason addressUnreachable =
       const ErrorReason._('AddressUnreachable');
+  static const values = const {
+    'Failed': failed,
+    'Aborted': aborted,
+    'TimedOut': timedOut,
+    'AccessDenied': accessDenied,
+    'ConnectionClosed': connectionClosed,
+    'ConnectionReset': connectionReset,
+    'ConnectionRefused': connectionRefused,
+    'ConnectionAborted': connectionAborted,
+    'ConnectionFailed': connectionFailed,
+    'NameNotResolved': nameNotResolved,
+    'InternetDisconnected': internetDisconnected,
+    'AddressUnreachable': addressUnreachable,
+  };
 
   final String value;
 
   const ErrorReason._(this.value);
-  factory ErrorReason.fromJson(String value) => const {}[value];
+
+  factory ErrorReason.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -431,6 +1038,7 @@ class TimeSinceEpoch {
   final num value;
 
   TimeSinceEpoch(this.value);
+
   factory TimeSinceEpoch.fromJson(num value) => new TimeSinceEpoch(value);
 
   num toJson() => value;
@@ -441,6 +1049,7 @@ class MonotonicTime {
   final num value;
 
   MonotonicTime(this.value);
+
   factory MonotonicTime.fromJson(num value) => new MonotonicTime(value);
 
   num toJson() => value;
@@ -451,6 +1060,7 @@ class Headers {
   final Map value;
 
   Headers(this.value);
+
   factory Headers.fromJson(Map value) => new Headers(value);
 
   Map toJson() => value;
@@ -467,11 +1077,23 @@ class ConnectionType {
   static const ConnectionType wifi = const ConnectionType._('wifi');
   static const ConnectionType wimax = const ConnectionType._('wimax');
   static const ConnectionType other = const ConnectionType._('other');
+  static const values = const {
+    'none': none,
+    'cellular2g': cellular2g,
+    'cellular3g': cellular3g,
+    'cellular4g': cellular4g,
+    'bluetooth': bluetooth,
+    'ethernet': ethernet,
+    'wifi': wifi,
+    'wimax': wimax,
+    'other': other,
+  };
 
   final String value;
 
   const ConnectionType._(this.value);
-  factory ConnectionType.fromJson(String value) => const {}[value];
+
+  factory ConnectionType.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -480,11 +1102,16 @@ class ConnectionType {
 class CookieSameSite {
   static const CookieSameSite strict = const CookieSameSite._('Strict');
   static const CookieSameSite lax = const CookieSameSite._('Lax');
+  static const values = const {
+    'Strict': strict,
+    'Lax': lax,
+  };
 
   final String value;
 
   const CookieSameSite._(this.value);
-  factory CookieSameSite.fromJson(String value) => const {}[value];
+
+  factory CookieSameSite.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -557,26 +1184,46 @@ class ResourceTiming {
     @required this.pushEnd,
     @required this.receiveHeadersEnd,
   });
-  factory ResourceTiming.fromJson(Map json) {}
+
+  factory ResourceTiming.fromJson(Map json) {
+    return new ResourceTiming(
+      requestTime: json['requestTime'],
+      proxyStart: json['proxyStart'],
+      proxyEnd: json['proxyEnd'],
+      dnsStart: json['dnsStart'],
+      dnsEnd: json['dnsEnd'],
+      connectStart: json['connectStart'],
+      connectEnd: json['connectEnd'],
+      sslStart: json['sslStart'],
+      sslEnd: json['sslEnd'],
+      workerStart: json['workerStart'],
+      workerReady: json['workerReady'],
+      sendStart: json['sendStart'],
+      sendEnd: json['sendEnd'],
+      pushStart: json['pushStart'],
+      pushEnd: json['pushEnd'],
+      receiveHeadersEnd: json['receiveHeadersEnd'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'requestTime': requestTime.toString(),
-      'proxyStart': proxyStart.toString(),
-      'proxyEnd': proxyEnd.toString(),
-      'dnsStart': dnsStart.toString(),
-      'dnsEnd': dnsEnd.toString(),
-      'connectStart': connectStart.toString(),
-      'connectEnd': connectEnd.toString(),
-      'sslStart': sslStart.toString(),
-      'sslEnd': sslEnd.toString(),
-      'workerStart': workerStart.toString(),
-      'workerReady': workerReady.toString(),
-      'sendStart': sendStart.toString(),
-      'sendEnd': sendEnd.toString(),
-      'pushStart': pushStart.toString(),
-      'pushEnd': pushEnd.toString(),
-      'receiveHeadersEnd': receiveHeadersEnd.toString(),
+      'requestTime': requestTime,
+      'proxyStart': proxyStart,
+      'proxyEnd': proxyEnd,
+      'dnsStart': dnsStart,
+      'dnsEnd': dnsEnd,
+      'connectStart': connectStart,
+      'connectEnd': connectEnd,
+      'sslStart': sslStart,
+      'sslEnd': sslEnd,
+      'workerStart': workerStart,
+      'workerReady': workerReady,
+      'sendStart': sendStart,
+      'sendEnd': sendEnd,
+      'pushStart': pushStart,
+      'pushEnd': pushEnd,
+      'receiveHeadersEnd': receiveHeadersEnd,
     };
     return json;
   }
@@ -589,11 +1236,19 @@ class ResourcePriority {
   static const ResourcePriority medium = const ResourcePriority._('Medium');
   static const ResourcePriority high = const ResourcePriority._('High');
   static const ResourcePriority veryHigh = const ResourcePriority._('VeryHigh');
+  static const values = const {
+    'VeryLow': veryLow,
+    'Low': low,
+    'Medium': medium,
+    'High': high,
+    'VeryHigh': veryHigh,
+  };
 
   final String value;
 
   const ResourcePriority._(this.value);
-  factory ResourcePriority.fromJson(String value) => const {}[value];
+
+  factory ResourcePriority.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -634,24 +1289,39 @@ class Request {
     @required this.referrerPolicy,
     this.isLinkPreload,
   });
-  factory Request.fromJson(Map json) {}
+
+  factory Request.fromJson(Map json) {
+    return new Request(
+      url: json['url'],
+      method: json['method'],
+      headers: new Headers.fromJson(json['headers']),
+      postData: json.containsKey('postData') ? json['postData'] : null,
+      mixedContentType: json.containsKey('mixedContentType')
+          ? new security.MixedContentType.fromJson(json['mixedContentType'])
+          : null,
+      initialPriority: new ResourcePriority.fromJson(json['initialPriority']),
+      referrerPolicy: json['referrerPolicy'],
+      isLinkPreload:
+          json.containsKey('isLinkPreload') ? json['isLinkPreload'] : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'url': url.toString(),
-      'method': method.toString(),
+      'url': url,
+      'method': method,
       'headers': headers.toJson(),
       'initialPriority': initialPriority.toJson(),
-      'referrerPolicy': referrerPolicy.toString(),
+      'referrerPolicy': referrerPolicy,
     };
     if (postData != null) {
-      json['postData'] = postData.toString();
+      json['postData'] = postData;
     }
     if (mixedContentType != null) {
       json['mixedContentType'] = mixedContentType.toJson();
     }
     if (isLinkPreload != null) {
-      json['isLinkPreload'] = isLinkPreload.toString();
+      json['isLinkPreload'] = isLinkPreload;
     }
     return json;
   }
@@ -693,18 +1363,30 @@ class SignedCertificateTimestamp {
     @required this.signatureAlgorithm,
     @required this.signatureData,
   });
-  factory SignedCertificateTimestamp.fromJson(Map json) {}
+
+  factory SignedCertificateTimestamp.fromJson(Map json) {
+    return new SignedCertificateTimestamp(
+      status: json['status'],
+      origin: json['origin'],
+      logDescription: json['logDescription'],
+      logId: json['logId'],
+      timestamp: new TimeSinceEpoch.fromJson(json['timestamp']),
+      hashAlgorithm: json['hashAlgorithm'],
+      signatureAlgorithm: json['signatureAlgorithm'],
+      signatureData: json['signatureData'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'status': status.toString(),
-      'origin': origin.toString(),
-      'logDescription': logDescription.toString(),
-      'logId': logId.toString(),
+      'status': status,
+      'origin': origin,
+      'logDescription': logDescription,
+      'logId': logId,
       'timestamp': timestamp.toJson(),
-      'hashAlgorithm': hashAlgorithm.toString(),
-      'signatureAlgorithm': signatureAlgorithm.toString(),
-      'signatureData': signatureData.toString(),
+      'hashAlgorithm': hashAlgorithm,
+      'signatureAlgorithm': signatureAlgorithm,
+      'signatureData': signatureData,
     };
     return json;
   }
@@ -762,27 +1444,48 @@ class SecurityDetails {
     @required this.validTo,
     @required this.signedCertificateTimestampList,
   });
-  factory SecurityDetails.fromJson(Map json) {}
+
+  factory SecurityDetails.fromJson(Map json) {
+    return new SecurityDetails(
+      protocol: json['protocol'],
+      keyExchange: json['keyExchange'],
+      keyExchangeGroup: json.containsKey('keyExchangeGroup')
+          ? json['keyExchangeGroup']
+          : null,
+      cipher: json['cipher'],
+      mac: json.containsKey('mac') ? json['mac'] : null,
+      certificateId: new security.CertificateId.fromJson(json['certificateId']),
+      subjectName: json['subjectName'],
+      sanList: (json['sanList'] as List).map((e) => e as String).toList(),
+      issuer: json['issuer'],
+      validFrom: new TimeSinceEpoch.fromJson(json['validFrom']),
+      validTo: new TimeSinceEpoch.fromJson(json['validTo']),
+      signedCertificateTimestampList:
+          (json['signedCertificateTimestampList'] as List)
+              .map((e) => new SignedCertificateTimestamp.fromJson(e))
+              .toList(),
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'protocol': protocol.toString(),
-      'keyExchange': keyExchange.toString(),
-      'cipher': cipher.toString(),
+      'protocol': protocol,
+      'keyExchange': keyExchange,
+      'cipher': cipher,
       'certificateId': certificateId.toJson(),
-      'subjectName': subjectName.toString(),
-      'sanList': sanList.map((e) => e.toString()).toList(),
-      'issuer': issuer.toString(),
+      'subjectName': subjectName,
+      'sanList': sanList.map((e) => e).toList(),
+      'issuer': issuer,
       'validFrom': validFrom.toJson(),
       'validTo': validTo.toJson(),
       'signedCertificateTimestampList':
           signedCertificateTimestampList.map((e) => e.toJson()).toList(),
     };
     if (keyExchangeGroup != null) {
-      json['keyExchangeGroup'] = keyExchangeGroup.toString();
+      json['keyExchangeGroup'] = keyExchangeGroup;
     }
     if (mac != null) {
-      json['mac'] = mac.toString();
+      json['mac'] = mac;
     }
     return json;
   }
@@ -798,11 +1501,20 @@ class BlockedReason {
   static const BlockedReason subresourceFilter =
       const BlockedReason._('subresource-filter');
   static const BlockedReason other = const BlockedReason._('other');
+  static const values = const {
+    'csp': csp,
+    'mixed-content': mixedContent,
+    'origin': origin,
+    'inspector': inspector,
+    'subresource-filter': subresourceFilter,
+    'other': other,
+  };
 
   final String value;
 
   const BlockedReason._(this.value);
-  factory BlockedReason.fromJson(String value) => const {}[value];
+
+  factory BlockedReason.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -887,45 +1599,81 @@ class Response {
     @required this.securityState,
     this.securityDetails,
   });
-  factory Response.fromJson(Map json) {}
+
+  factory Response.fromJson(Map json) {
+    return new Response(
+      url: json['url'],
+      status: json['status'],
+      statusText: json['statusText'],
+      headers: new Headers.fromJson(json['headers']),
+      headersText: json.containsKey('headersText') ? json['headersText'] : null,
+      mimeType: json['mimeType'],
+      requestHeaders: json.containsKey('requestHeaders')
+          ? new Headers.fromJson(json['requestHeaders'])
+          : null,
+      requestHeadersText: json.containsKey('requestHeadersText')
+          ? json['requestHeadersText']
+          : null,
+      connectionReused: json['connectionReused'],
+      connectionId: json['connectionId'],
+      remoteIPAddress:
+          json.containsKey('remoteIPAddress') ? json['remoteIPAddress'] : null,
+      remotePort: json.containsKey('remotePort') ? json['remotePort'] : null,
+      fromDiskCache:
+          json.containsKey('fromDiskCache') ? json['fromDiskCache'] : null,
+      fromServiceWorker: json.containsKey('fromServiceWorker')
+          ? json['fromServiceWorker']
+          : null,
+      encodedDataLength: json['encodedDataLength'],
+      timing: json.containsKey('timing')
+          ? new ResourceTiming.fromJson(json['timing'])
+          : null,
+      protocol: json.containsKey('protocol') ? json['protocol'] : null,
+      securityState: new security.SecurityState.fromJson(json['securityState']),
+      securityDetails: json.containsKey('securityDetails')
+          ? new SecurityDetails.fromJson(json['securityDetails'])
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'url': url.toString(),
-      'status': status.toString(),
-      'statusText': statusText.toString(),
+      'url': url,
+      'status': status,
+      'statusText': statusText,
       'headers': headers.toJson(),
-      'mimeType': mimeType.toString(),
-      'connectionReused': connectionReused.toString(),
-      'connectionId': connectionId.toString(),
+      'mimeType': mimeType,
+      'connectionReused': connectionReused,
+      'connectionId': connectionId,
+      'encodedDataLength': encodedDataLength,
       'securityState': securityState.toJson(),
     };
     if (headersText != null) {
-      json['headersText'] = headersText.toString();
+      json['headersText'] = headersText;
     }
     if (requestHeaders != null) {
       json['requestHeaders'] = requestHeaders.toJson();
     }
     if (requestHeadersText != null) {
-      json['requestHeadersText'] = requestHeadersText.toString();
+      json['requestHeadersText'] = requestHeadersText;
     }
     if (remoteIPAddress != null) {
-      json['remoteIPAddress'] = remoteIPAddress.toString();
+      json['remoteIPAddress'] = remoteIPAddress;
     }
     if (remotePort != null) {
-      json['remotePort'] = remotePort.toString();
+      json['remotePort'] = remotePort;
     }
     if (fromDiskCache != null) {
-      json['fromDiskCache'] = fromDiskCache.toString();
+      json['fromDiskCache'] = fromDiskCache;
     }
     if (fromServiceWorker != null) {
-      json['fromServiceWorker'] = fromServiceWorker.toString();
+      json['fromServiceWorker'] = fromServiceWorker;
     }
     if (timing != null) {
       json['timing'] = timing.toJson();
     }
     if (protocol != null) {
-      json['protocol'] = protocol.toString();
+      json['protocol'] = protocol;
     }
     if (securityDetails != null) {
       json['securityDetails'] = securityDetails.toJson();
@@ -942,7 +1690,12 @@ class WebSocketRequest {
   WebSocketRequest({
     @required this.headers,
   });
-  factory WebSocketRequest.fromJson(Map json) {}
+
+  factory WebSocketRequest.fromJson(Map json) {
+    return new WebSocketRequest(
+      headers: new Headers.fromJson(json['headers']),
+    );
+  }
 
   Map toJson() {
     Map json = {
@@ -980,22 +1733,36 @@ class WebSocketResponse {
     this.requestHeaders,
     this.requestHeadersText,
   });
-  factory WebSocketResponse.fromJson(Map json) {}
+
+  factory WebSocketResponse.fromJson(Map json) {
+    return new WebSocketResponse(
+      status: json['status'],
+      statusText: json['statusText'],
+      headers: new Headers.fromJson(json['headers']),
+      headersText: json.containsKey('headersText') ? json['headersText'] : null,
+      requestHeaders: json.containsKey('requestHeaders')
+          ? new Headers.fromJson(json['requestHeaders'])
+          : null,
+      requestHeadersText: json.containsKey('requestHeadersText')
+          ? json['requestHeadersText']
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'status': status.toString(),
-      'statusText': statusText.toString(),
+      'status': status,
+      'statusText': statusText,
       'headers': headers.toJson(),
     };
     if (headersText != null) {
-      json['headersText'] = headersText.toString();
+      json['headersText'] = headersText;
     }
     if (requestHeaders != null) {
       json['requestHeaders'] = requestHeaders.toJson();
     }
     if (requestHeadersText != null) {
-      json['requestHeadersText'] = requestHeadersText.toString();
+      json['requestHeadersText'] = requestHeadersText;
     }
     return json;
   }
@@ -1017,13 +1784,20 @@ class WebSocketFrame {
     @required this.mask,
     @required this.payloadData,
   });
-  factory WebSocketFrame.fromJson(Map json) {}
+
+  factory WebSocketFrame.fromJson(Map json) {
+    return new WebSocketFrame(
+      opcode: json['opcode'],
+      mask: json['mask'],
+      payloadData: json['payloadData'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'opcode': opcode.toString(),
-      'mask': mask.toString(),
-      'payloadData': payloadData.toString(),
+      'opcode': opcode,
+      'mask': mask,
+      'payloadData': payloadData,
     };
     return json;
   }
@@ -1049,13 +1823,23 @@ class CachedResource {
     this.response,
     @required this.bodySize,
   });
-  factory CachedResource.fromJson(Map json) {}
+
+  factory CachedResource.fromJson(Map json) {
+    return new CachedResource(
+      url: json['url'],
+      type: new page.ResourceType.fromJson(json['type']),
+      response: json.containsKey('response')
+          ? new Response.fromJson(json['response'])
+          : null,
+      bodySize: json['bodySize'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'url': url.toString(),
+      'url': url,
       'type': type.toJson(),
-      'bodySize': bodySize.toString(),
+      'bodySize': bodySize,
     };
     if (response != null) {
       json['response'] = response.toJson();
@@ -1084,20 +1868,30 @@ class Initiator {
     this.url,
     this.lineNumber,
   });
-  factory Initiator.fromJson(Map json) {}
+
+  factory Initiator.fromJson(Map json) {
+    return new Initiator(
+      type: json['type'],
+      stack: json.containsKey('stack')
+          ? new runtime.StackTrace.fromJson(json['stack'])
+          : null,
+      url: json.containsKey('url') ? json['url'] : null,
+      lineNumber: json.containsKey('lineNumber') ? json['lineNumber'] : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'type': type.toString(),
+      'type': type,
     };
     if (stack != null) {
       json['stack'] = stack.toJson();
     }
     if (url != null) {
-      json['url'] = url.toString();
+      json['url'] = url;
     }
     if (lineNumber != null) {
-      json['lineNumber'] = lineNumber.toString();
+      json['lineNumber'] = lineNumber;
     }
     return json;
   }
@@ -1147,94 +1941,38 @@ class Cookie {
     @required this.session,
     this.sameSite,
   });
-  factory Cookie.fromJson(Map json) {}
 
-  Map toJson() {
-    Map json = {
-      'name': name.toString(),
-      'value': value.toString(),
-      'domain': domain.toString(),
-      'path': path.toString(),
-      'expires': expires.toString(),
-      'size': size.toString(),
-      'httpOnly': httpOnly.toString(),
-      'secure': secure.toString(),
-      'session': session.toString(),
-    };
-    if (sameSite != null) {
-      json['sameSite'] = sameSite.toJson();
-    }
-    return json;
+  factory Cookie.fromJson(Map json) {
+    return new Cookie(
+      name: json['name'],
+      value: json['value'],
+      domain: json['domain'],
+      path: json['path'],
+      expires: json['expires'],
+      size: json['size'],
+      httpOnly: json['httpOnly'],
+      secure: json['secure'],
+      session: json['session'],
+      sameSite: json.containsKey('sameSite')
+          ? new CookieSameSite.fromJson(json['sameSite'])
+          : null,
+    );
   }
-}
-
-/// Cookie parameter object
-class CookieParam {
-  /// Cookie name.
-  final String name;
-
-  /// Cookie value.
-  final String value;
-
-  /// The request-URI to associate with the setting of the cookie. This value can affect the default domain and path values of the created cookie.
-  final String url;
-
-  /// Cookie domain.
-  final String domain;
-
-  /// Cookie path.
-  final String path;
-
-  /// True if cookie is secure.
-  final bool secure;
-
-  /// True if cookie is http-only.
-  final bool httpOnly;
-
-  /// Cookie SameSite type.
-  final CookieSameSite sameSite;
-
-  /// Cookie expiration date, session cookie if not set
-  final TimeSinceEpoch expires;
-
-  CookieParam({
-    @required this.name,
-    @required this.value,
-    this.url,
-    this.domain,
-    this.path,
-    this.secure,
-    this.httpOnly,
-    this.sameSite,
-    this.expires,
-  });
-  factory CookieParam.fromJson(Map json) {}
 
   Map toJson() {
     Map json = {
-      'name': name.toString(),
-      'value': value.toString(),
+      'name': name,
+      'value': value,
+      'domain': domain,
+      'path': path,
+      'expires': expires,
+      'size': size,
+      'httpOnly': httpOnly,
+      'secure': secure,
+      'session': session,
     };
-    if (url != null) {
-      json['url'] = url.toString();
-    }
-    if (domain != null) {
-      json['domain'] = domain.toString();
-    }
-    if (path != null) {
-      json['path'] = path.toString();
-    }
-    if (secure != null) {
-      json['secure'] = secure.toString();
-    }
-    if (httpOnly != null) {
-      json['httpOnly'] = httpOnly.toString();
-    }
     if (sameSite != null) {
       json['sameSite'] = sameSite.toJson();
-    }
-    if (expires != null) {
-      json['expires'] = expires.toJson();
     }
     return json;
   }
@@ -1260,16 +1998,24 @@ class AuthChallenge {
     @required this.scheme,
     @required this.realm,
   });
-  factory AuthChallenge.fromJson(Map json) {}
+
+  factory AuthChallenge.fromJson(Map json) {
+    return new AuthChallenge(
+      source: json.containsKey('source') ? json['source'] : null,
+      origin: json['origin'],
+      scheme: json['scheme'],
+      realm: json['realm'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'origin': origin.toString(),
-      'scheme': scheme.toString(),
-      'realm': realm.toString(),
+      'origin': origin,
+      'scheme': scheme,
+      'realm': realm,
     };
     if (source != null) {
-      json['source'] = source.toString();
+      json['source'] = source;
     }
     return json;
   }
@@ -1291,17 +2037,24 @@ class AuthChallengeResponse {
     this.username,
     this.password,
   });
-  factory AuthChallengeResponse.fromJson(Map json) {}
+
+  factory AuthChallengeResponse.fromJson(Map json) {
+    return new AuthChallengeResponse(
+      response: json['response'],
+      username: json.containsKey('username') ? json['username'] : null,
+      password: json.containsKey('password') ? json['password'] : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'response': response.toString(),
+      'response': response,
     };
     if (username != null) {
-      json['username'] = username.toString();
+      json['username'] = username;
     }
     if (password != null) {
-      json['password'] = password.toString();
+      json['password'] = password;
     }
     return json;
   }

@@ -9,13 +9,52 @@ class TargetManager {
 
   TargetManager(this._client);
 
+  final StreamController<TargetInfo> _targetCreated =
+      new StreamController<TargetInfo>.broadcast();
+
+  /// Issued when a possible inspection target is created.
+  Stream<TargetInfo> get onTargetCreated => _targetCreated.stream;
+
+  final StreamController<TargetInfo> _targetInfoChanged =
+      new StreamController<TargetInfo>.broadcast();
+
+  /// Issued when some information about a target has changed. This only happens between <code>targetCreated</code> and <code>targetDestroyed</code>.
+  Stream<TargetInfo> get onTargetInfoChanged => _targetInfoChanged.stream;
+
+  final StreamController<TargetID> _targetDestroyed =
+      new StreamController<TargetID>.broadcast();
+
+  /// Issued when a target is destroyed.
+  Stream<TargetID> get onTargetDestroyed => _targetDestroyed.stream;
+
+  final StreamController<AttachedToTargetResult> _attachedToTarget =
+      new StreamController<AttachedToTargetResult>.broadcast();
+
+  /// Issued when attached to target because of auto-attach or <code>attachToTarget</code> command.
+  Stream<AttachedToTargetResult> get onAttachedToTarget =>
+      _attachedToTarget.stream;
+
+  final StreamController<TargetID> _detachedFromTarget =
+      new StreamController<TargetID>.broadcast();
+
+  /// Issued when detached from target for any reason (including <code>detachFromTarget</code> command).
+  Stream<TargetID> get onDetachedFromTarget => _detachedFromTarget.stream;
+
+  final StreamController<ReceivedMessageFromTargetResult>
+      _receivedMessageFromTarget =
+      new StreamController<ReceivedMessageFromTargetResult>.broadcast();
+
+  /// Notifies about new protocol message from attached target.
+  Stream<ReceivedMessageFromTargetResult> get onReceivedMessageFromTarget =>
+      _receivedMessageFromTarget.stream;
+
   /// Controls whether to discover available targets and notify via <code>targetCreated/targetInfoChanged/targetDestroyed</code> events.
   /// [discover] Whether to discover available targets.
   Future setDiscoverTargets(
     bool discover,
   ) async {
     Map parameters = {
-      'discover': discover.toString(),
+      'discover': discover,
     };
     await _client.send('Target.setDiscoverTargets', parameters);
   }
@@ -28,8 +67,8 @@ class TargetManager {
     bool waitForDebuggerOnStart,
   ) async {
     Map parameters = {
-      'autoAttach': autoAttach.toString(),
-      'waitForDebuggerOnStart': waitForDebuggerOnStart.toString(),
+      'autoAttach': autoAttach,
+      'waitForDebuggerOnStart': waitForDebuggerOnStart,
     };
     await _client.send('Target.setAutoAttach', parameters);
   }
@@ -39,7 +78,7 @@ class TargetManager {
     bool value,
   ) async {
     Map parameters = {
-      'value': value.toString(),
+      'value': value,
     };
     await _client.send('Target.setAttachToFrames', parameters);
   }
@@ -55,23 +94,15 @@ class TargetManager {
     await _client.send('Target.setRemoteLocations', parameters);
   }
 
-  /// Sends protocol message over session with given id.
-  /// [sessionId] Identifier of the session.
-  /// [targetId] Deprecated.
+  /// Sends protocol message to the target with given id.
   Future sendMessageToTarget(
-    String message, {
-    SessionID sessionId,
     TargetID targetId,
-  }) async {
+    String message,
+  ) async {
     Map parameters = {
-      'message': message.toString(),
+      'targetId': targetId.toJson(),
+      'message': message,
     };
-    if (sessionId != null) {
-      parameters['sessionId'] = sessionId.toJson();
-    }
-    if (targetId != null) {
-      parameters['targetId'] = targetId.toJson();
-    }
     await _client.send('Target.sendMessageToTarget', parameters);
   }
 
@@ -106,8 +137,8 @@ class TargetManager {
   }
 
   /// Attaches to the target with given id.
-  /// Return: Id assigned to the session.
-  Future<SessionID> attachToTarget(
+  /// Return: Whether attach succeeded.
+  Future<bool> attachToTarget(
     TargetID targetId,
   ) async {
     Map parameters = {
@@ -116,20 +147,13 @@ class TargetManager {
     await _client.send('Target.attachToTarget', parameters);
   }
 
-  /// Detaches session with given id.
-  /// [sessionId] Session to detach.
-  /// [targetId] Deprecated.
-  Future detachFromTarget({
-    SessionID sessionId,
+  /// Detaches from the target with given id.
+  Future detachFromTarget(
     TargetID targetId,
-  }) async {
-    Map parameters = {};
-    if (sessionId != null) {
-      parameters['sessionId'] = sessionId.toJson();
-    }
-    if (targetId != null) {
-      parameters['targetId'] = targetId.toJson();
-    }
+  ) async {
+    Map parameters = {
+      'targetId': targetId.toJson(),
+    };
     await _client.send('Target.detachFromTarget', parameters);
   }
 
@@ -162,13 +186,13 @@ class TargetManager {
     BrowserContextID browserContextId,
   }) async {
     Map parameters = {
-      'url': url.toString(),
+      'url': url,
     };
     if (width != null) {
-      parameters['width'] = width.toString();
+      parameters['width'] = width;
     }
     if (height != null) {
-      parameters['height'] = height.toString();
+      parameters['height'] = height;
     }
     if (browserContextId != null) {
       parameters['browserContextId'] = browserContextId.toJson();
@@ -183,21 +207,48 @@ class TargetManager {
   }
 }
 
+class AttachedToTargetResult {
+  final TargetInfo targetInfo;
+
+  final bool waitingForDebugger;
+
+  AttachedToTargetResult({
+    @required this.targetInfo,
+    @required this.waitingForDebugger,
+  });
+
+  factory AttachedToTargetResult.fromJson(Map json) {
+    return new AttachedToTargetResult(
+      targetInfo: new TargetInfo.fromJson(json['targetInfo']),
+      waitingForDebugger: json['waitingForDebugger'],
+    );
+  }
+}
+
+class ReceivedMessageFromTargetResult {
+  final TargetID targetId;
+
+  final String message;
+
+  ReceivedMessageFromTargetResult({
+    @required this.targetId,
+    @required this.message,
+  });
+
+  factory ReceivedMessageFromTargetResult.fromJson(Map json) {
+    return new ReceivedMessageFromTargetResult(
+      targetId: new TargetID.fromJson(json['targetId']),
+      message: json['message'],
+    );
+  }
+}
+
 class TargetID {
   final String value;
 
   TargetID(this.value);
+
   factory TargetID.fromJson(String value) => new TargetID(value);
-
-  String toJson() => value;
-}
-
-/// Unique identifier of attached debugging session.
-class SessionID {
-  final String value;
-
-  SessionID(this.value);
-  factory SessionID.fromJson(String value) => new SessionID(value);
 
   String toJson() => value;
 }
@@ -206,6 +257,7 @@ class BrowserContextID {
   final String value;
 
   BrowserContextID(this.value);
+
   factory BrowserContextID.fromJson(String value) =>
       new BrowserContextID(value);
 
@@ -231,15 +283,24 @@ class TargetInfo {
     @required this.url,
     @required this.attached,
   });
-  factory TargetInfo.fromJson(Map json) {}
+
+  factory TargetInfo.fromJson(Map json) {
+    return new TargetInfo(
+      targetId: new TargetID.fromJson(json['targetId']),
+      type: json['type'],
+      title: json['title'],
+      url: json['url'],
+      attached: json['attached'],
+    );
+  }
 
   Map toJson() {
     Map json = {
       'targetId': targetId.toJson(),
-      'type': type.toString(),
-      'title': title.toString(),
-      'url': url.toString(),
-      'attached': attached.toString(),
+      'type': type,
+      'title': title,
+      'url': url,
+      'attached': attached,
     };
     return json;
   }
@@ -254,12 +315,18 @@ class RemoteLocation {
     @required this.host,
     @required this.port,
   });
-  factory RemoteLocation.fromJson(Map json) {}
+
+  factory RemoteLocation.fromJson(Map json) {
+    return new RemoteLocation(
+      host: json['host'],
+      port: json['port'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'host': host.toString(),
-      'port': port.toString(),
+      'host': host,
+      'port': port,
     };
     return json;
   }

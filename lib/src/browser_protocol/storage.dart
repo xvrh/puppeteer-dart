@@ -15,8 +15,8 @@ class StorageManager {
     String storageTypes,
   ) async {
     Map parameters = {
-      'origin': origin.toString(),
-      'storageTypes': storageTypes.toString(),
+      'origin': origin,
+      'storageTypes': storageTypes,
     };
     await _client.send('Storage.clearDataForOrigin', parameters);
   }
@@ -27,31 +27,9 @@ class StorageManager {
     String origin,
   ) async {
     Map parameters = {
-      'origin': origin.toString(),
+      'origin': origin,
     };
     await _client.send('Storage.getUsageAndQuota', parameters);
-  }
-
-  /// Registers origin to be notified when an update occurs to its cache storage list.
-  /// [origin] Security origin.
-  Future trackCacheStorageForOrigin(
-    String origin,
-  ) async {
-    Map parameters = {
-      'origin': origin.toString(),
-    };
-    await _client.send('Storage.trackCacheStorageForOrigin', parameters);
-  }
-
-  /// Unregisters origin from receiving notifications for cache storage.
-  /// [origin] Security origin.
-  Future untrackCacheStorageForOrigin(
-    String origin,
-  ) async {
-    Map parameters = {
-      'origin': origin.toString(),
-    };
-    await _client.send('Storage.untrackCacheStorageForOrigin', parameters);
   }
 }
 
@@ -70,7 +48,16 @@ class GetUsageAndQuotaResult {
     @required this.quota,
     @required this.usageBreakdown,
   });
-  factory GetUsageAndQuotaResult.fromJson(Map json) {}
+
+  factory GetUsageAndQuotaResult.fromJson(Map json) {
+    return new GetUsageAndQuotaResult(
+      usage: json['usage'],
+      quota: json['quota'],
+      usageBreakdown: (json['usageBreakdown'] as List)
+          .map((e) => new UsageForType.fromJson(e))
+          .toList(),
+    );
+  }
 }
 
 /// Enum of possible storage types.
@@ -87,11 +74,25 @@ class StorageType {
   static const StorageType cacheStorage = const StorageType._('cache_storage');
   static const StorageType all = const StorageType._('all');
   static const StorageType other = const StorageType._('other');
+  static const values = const {
+    'appcache': appcache,
+    'cookies': cookies,
+    'file_systems': fileSystems,
+    'indexeddb': indexeddb,
+    'local_storage': localStorage,
+    'shader_cache': shaderCache,
+    'websql': websql,
+    'service_workers': serviceWorkers,
+    'cache_storage': cacheStorage,
+    'all': all,
+    'other': other,
+  };
 
   final String value;
 
   const StorageType._(this.value);
-  factory StorageType.fromJson(String value) => const {}[value];
+
+  factory StorageType.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -108,12 +109,18 @@ class UsageForType {
     @required this.storageType,
     @required this.usage,
   });
-  factory UsageForType.fromJson(Map json) {}
+
+  factory UsageForType.fromJson(Map json) {
+    return new UsageForType(
+      storageType: new StorageType.fromJson(json['storageType']),
+      usage: json['usage'],
+    );
+  }
 
   Map toJson() {
     Map json = {
       'storageType': storageType.toJson(),
-      'usage': usage.toString(),
+      'usage': usage,
     };
     return json;
   }

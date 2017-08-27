@@ -17,7 +17,7 @@ class MemoryManager {
     bool suppressed,
   ) async {
     Map parameters = {
-      'suppressed': suppressed.toString(),
+      'suppressed': suppressed,
     };
     await _client.send('Memory.setPressureNotificationsSuppressed', parameters);
   }
@@ -46,18 +46,30 @@ class GetDOMCountersResult {
     @required this.nodes,
     @required this.jsEventListeners,
   });
-  factory GetDOMCountersResult.fromJson(Map json) {}
+
+  factory GetDOMCountersResult.fromJson(Map json) {
+    return new GetDOMCountersResult(
+      documents: json['documents'],
+      nodes: json['nodes'],
+      jsEventListeners: json['jsEventListeners'],
+    );
+  }
 }
 
 /// Memory pressure level.
 class PressureLevel {
   static const PressureLevel moderate = const PressureLevel._('moderate');
   static const PressureLevel critical = const PressureLevel._('critical');
+  static const values = const {
+    'moderate': moderate,
+    'critical': critical,
+  };
 
   final String value;
 
   const PressureLevel._(this.value);
-  factory PressureLevel.fromJson(String value) => const {}[value];
+
+  factory PressureLevel.fromJson(String value) => values[value];
 
   String toJson() => value;
 }

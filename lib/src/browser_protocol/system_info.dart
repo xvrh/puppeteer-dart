@@ -34,7 +34,15 @@ class GetInfoResult {
     @required this.modelVersion,
     @required this.commandLine,
   });
-  factory GetInfoResult.fromJson(Map json) {}
+
+  factory GetInfoResult.fromJson(Map json) {
+    return new GetInfoResult(
+      gpu: new GPUInfo.fromJson(json['gpu']),
+      modelName: json['modelName'],
+      modelVersion: json['modelVersion'],
+      commandLine: json['commandLine'],
+    );
+  }
 }
 
 /// Describes a single graphics processor (GPU).
@@ -57,14 +65,22 @@ class GPUDevice {
     @required this.vendorString,
     @required this.deviceString,
   });
-  factory GPUDevice.fromJson(Map json) {}
+
+  factory GPUDevice.fromJson(Map json) {
+    return new GPUDevice(
+      vendorId: json['vendorId'],
+      deviceId: json['deviceId'],
+      vendorString: json['vendorString'],
+      deviceString: json['deviceString'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'vendorId': vendorId.toString(),
-      'deviceId': deviceId.toString(),
-      'vendorString': vendorString.toString(),
-      'deviceString': deviceString.toString(),
+      'vendorId': vendorId,
+      'deviceId': deviceId,
+      'vendorString': vendorString,
+      'deviceString': deviceString,
     };
     return json;
   }
@@ -90,19 +106,32 @@ class GPUInfo {
     this.featureStatus,
     @required this.driverBugWorkarounds,
   });
-  factory GPUInfo.fromJson(Map json) {}
+
+  factory GPUInfo.fromJson(Map json) {
+    return new GPUInfo(
+      devices: (json['devices'] as List)
+          .map((e) => new GPUDevice.fromJson(e))
+          .toList(),
+      auxAttributes:
+          json.containsKey('auxAttributes') ? json['auxAttributes'] : null,
+      featureStatus:
+          json.containsKey('featureStatus') ? json['featureStatus'] : null,
+      driverBugWorkarounds: (json['driverBugWorkarounds'] as List)
+          .map((e) => e as String)
+          .toList(),
+    );
+  }
 
   Map toJson() {
     Map json = {
       'devices': devices.map((e) => e.toJson()).toList(),
-      'driverBugWorkarounds':
-          driverBugWorkarounds.map((e) => e.toString()).toList(),
+      'driverBugWorkarounds': driverBugWorkarounds.map((e) => e).toList(),
     };
     if (auxAttributes != null) {
-      json['auxAttributes'] = auxAttributes.toJson();
+      json['auxAttributes'] = auxAttributes;
     }
     if (featureStatus != null) {
-      json['featureStatus'] = featureStatus.toJson();
+      json['featureStatus'] = featureStatus;
     }
     return json;
   }

@@ -1,25 +1,47 @@
-
-
 class StackTrace {
-  Map toJson() => throw new UnimplementedError();
+  final value;
+
+  StackTrace.fromJson(this.value);
+
+  toJson() => value;
 }
 
 class RemoteObject {
-  Map toJson() => throw new UnimplementedError();
+  final value;
+
+  RemoteObject.fromJson(this.value);
+
+  toJson() => value;
 }
 
 class Timestamp {
-  Map toJson() => throw new UnimplementedError();
+  final value;
+
+  Timestamp.fromJson(this.value);
+
+  toJson() => value;
 }
 
 class ScriptId {
-  Map toJson() => throw new UnimplementedError();
+  final value;
+
+  ScriptId.fromJson(this.value);
+
+  toJson() => value;
 }
 
 class RemoteObjectId {
-  Map toJson() => throw new UnimplementedError();
+  final value;
+
+  RemoteObjectId.fromJson(this.value);
+
+  toJson() => value;
 }
 
 class ExecutionContextId {
-  Map toJson() => throw new UnimplementedError();
+  final value;
+
+  ExecutionContextId.fromJson(this.value);
+
+  toJson() => value;
 }

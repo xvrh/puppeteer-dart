@@ -18,8 +18,7 @@ class DOMSnapshotManager {
     List<String> computedStyleWhitelist,
   ) async {
     Map parameters = {
-      'computedStyleWhitelist':
-          computedStyleWhitelist.map((e) => e.toString()).toList(),
+      'computedStyleWhitelist': computedStyleWhitelist.map((e) => e).toList(),
     };
     await _client.send('DOMSnapshot.getSnapshot', parameters);
   }
@@ -40,7 +39,20 @@ class GetSnapshotResult {
     @required this.layoutTreeNodes,
     @required this.computedStyles,
   });
-  factory GetSnapshotResult.fromJson(Map json) {}
+
+  factory GetSnapshotResult.fromJson(Map json) {
+    return new GetSnapshotResult(
+      domNodes: (json['domNodes'] as List)
+          .map((e) => new DOMNode.fromJson(e))
+          .toList(),
+      layoutTreeNodes: (json['layoutTreeNodes'] as List)
+          .map((e) => new LayoutTreeNode.fromJson(e))
+          .toList(),
+      computedStyles: (json['computedStyles'] as List)
+          .map((e) => new ComputedStyle.fromJson(e))
+          .toList(),
+    );
+  }
 }
 
 /// A Node in the DOM tree.
@@ -90,16 +102,13 @@ class DOMNode {
   /// Only set for documents, contains the document's content language.
   final String contentLanguage;
 
-  /// Only set for documents, contains the document's character set encoding.
-  final String documentEncoding;
-
   /// <code>DocumentType</code> node's publicId.
   final String publicId;
 
   /// <code>DocumentType</code> node's systemId.
   final String systemId;
 
-  /// Frame ID for frame owner elements and also for the document node.
+  /// Frame ID for frame owner elements.
   final page.FrameId frameId;
 
   /// The index of a frame owner element's content document in the <code>domNodes</code> array returned by <code>getSnapshot</code>, if any.
@@ -133,7 +142,6 @@ class DOMNode {
     this.documentURL,
     this.baseURL,
     this.contentLanguage,
-    this.documentEncoding,
     this.publicId,
     this.systemId,
     this.frameId,
@@ -143,76 +151,121 @@ class DOMNode {
     this.pseudoType,
     this.isClickable,
   });
-  factory DOMNode.fromJson(Map json) {}
+
+  factory DOMNode.fromJson(Map json) {
+    return new DOMNode(
+      nodeType: json['nodeType'],
+      nodeName: json['nodeName'],
+      nodeValue: json['nodeValue'],
+      textValue: json.containsKey('textValue') ? json['textValue'] : null,
+      inputValue: json.containsKey('inputValue') ? json['inputValue'] : null,
+      inputChecked:
+          json.containsKey('inputChecked') ? json['inputChecked'] : null,
+      optionSelected:
+          json.containsKey('optionSelected') ? json['optionSelected'] : null,
+      backendNodeId: new dom.BackendNodeId.fromJson(json['backendNodeId']),
+      childNodeIndexes: json.containsKey('childNodeIndexes')
+          ? (json['childNodeIndexes'] as List).map((e) => e as int).toList()
+          : null,
+      attributes: json.containsKey('attributes')
+          ? (json['attributes'] as List)
+              .map((e) => new NameValue.fromJson(e))
+              .toList()
+          : null,
+      pseudoElementIndexes: json.containsKey('pseudoElementIndexes')
+          ? (json['pseudoElementIndexes'] as List).map((e) => e as int).toList()
+          : null,
+      layoutNodeIndex:
+          json.containsKey('layoutNodeIndex') ? json['layoutNodeIndex'] : null,
+      documentURL: json.containsKey('documentURL') ? json['documentURL'] : null,
+      baseURL: json.containsKey('baseURL') ? json['baseURL'] : null,
+      contentLanguage:
+          json.containsKey('contentLanguage') ? json['contentLanguage'] : null,
+      publicId: json.containsKey('publicId') ? json['publicId'] : null,
+      systemId: json.containsKey('systemId') ? json['systemId'] : null,
+      frameId: json.containsKey('frameId')
+          ? new page.FrameId.fromJson(json['frameId'])
+          : null,
+      contentDocumentIndex: json.containsKey('contentDocumentIndex')
+          ? json['contentDocumentIndex']
+          : null,
+      importedDocumentIndex: json.containsKey('importedDocumentIndex')
+          ? json['importedDocumentIndex']
+          : null,
+      templateContentIndex: json.containsKey('templateContentIndex')
+          ? json['templateContentIndex']
+          : null,
+      pseudoType: json.containsKey('pseudoType')
+          ? new dom.PseudoType.fromJson(json['pseudoType'])
+          : null,
+      isClickable: json.containsKey('isClickable') ? json['isClickable'] : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'nodeType': nodeType.toString(),
-      'nodeName': nodeName.toString(),
-      'nodeValue': nodeValue.toString(),
+      'nodeType': nodeType,
+      'nodeName': nodeName,
+      'nodeValue': nodeValue,
       'backendNodeId': backendNodeId.toJson(),
     };
     if (textValue != null) {
-      json['textValue'] = textValue.toString();
+      json['textValue'] = textValue;
     }
     if (inputValue != null) {
-      json['inputValue'] = inputValue.toString();
+      json['inputValue'] = inputValue;
     }
     if (inputChecked != null) {
-      json['inputChecked'] = inputChecked.toString();
+      json['inputChecked'] = inputChecked;
     }
     if (optionSelected != null) {
-      json['optionSelected'] = optionSelected.toString();
+      json['optionSelected'] = optionSelected;
     }
     if (childNodeIndexes != null) {
-      json['childNodeIndexes'] =
-          childNodeIndexes.map((e) => e.toString()).toList();
+      json['childNodeIndexes'] = childNodeIndexes.map((e) => e).toList();
     }
     if (attributes != null) {
       json['attributes'] = attributes.map((e) => e.toJson()).toList();
     }
     if (pseudoElementIndexes != null) {
       json['pseudoElementIndexes'] =
-          pseudoElementIndexes.map((e) => e.toString()).toList();
+          pseudoElementIndexes.map((e) => e).toList();
     }
     if (layoutNodeIndex != null) {
-      json['layoutNodeIndex'] = layoutNodeIndex.toString();
+      json['layoutNodeIndex'] = layoutNodeIndex;
     }
     if (documentURL != null) {
-      json['documentURL'] = documentURL.toString();
+      json['documentURL'] = documentURL;
     }
     if (baseURL != null) {
-      json['baseURL'] = baseURL.toString();
+      json['baseURL'] = baseURL;
     }
     if (contentLanguage != null) {
-      json['contentLanguage'] = contentLanguage.toString();
-    }
-    if (documentEncoding != null) {
-      json['documentEncoding'] = documentEncoding.toString();
+      json['contentLanguage'] = contentLanguage;
     }
     if (publicId != null) {
-      json['publicId'] = publicId.toString();
+      json['publicId'] = publicId;
     }
     if (systemId != null) {
-      json['systemId'] = systemId.toString();
+      json['systemId'] = systemId;
     }
     if (frameId != null) {
       json['frameId'] = frameId.toJson();
     }
     if (contentDocumentIndex != null) {
-      json['contentDocumentIndex'] = contentDocumentIndex.toString();
+      json['contentDocumentIndex'] = contentDocumentIndex;
     }
     if (importedDocumentIndex != null) {
-      json['importedDocumentIndex'] = importedDocumentIndex.toString();
+      json['importedDocumentIndex'] = importedDocumentIndex;
     }
     if (templateContentIndex != null) {
-      json['templateContentIndex'] = templateContentIndex.toString();
+      json['templateContentIndex'] = templateContentIndex;
     }
     if (pseudoType != null) {
       json['pseudoType'] = pseudoType.toJson();
     }
     if (isClickable != null) {
-      json['isClickable'] = isClickable.toString();
+      json['isClickable'] = isClickable;
     }
     return json;
   }
@@ -242,21 +295,34 @@ class LayoutTreeNode {
     this.inlineTextNodes,
     this.styleIndex,
   });
-  factory LayoutTreeNode.fromJson(Map json) {}
+
+  factory LayoutTreeNode.fromJson(Map json) {
+    return new LayoutTreeNode(
+      domNodeIndex: json['domNodeIndex'],
+      boundingBox: new dom.Rect.fromJson(json['boundingBox']),
+      layoutText: json.containsKey('layoutText') ? json['layoutText'] : null,
+      inlineTextNodes: json.containsKey('inlineTextNodes')
+          ? (json['inlineTextNodes'] as List)
+              .map((e) => new css.InlineTextBox.fromJson(e))
+              .toList()
+          : null,
+      styleIndex: json.containsKey('styleIndex') ? json['styleIndex'] : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'domNodeIndex': domNodeIndex.toString(),
+      'domNodeIndex': domNodeIndex,
       'boundingBox': boundingBox.toJson(),
     };
     if (layoutText != null) {
-      json['layoutText'] = layoutText.toString();
+      json['layoutText'] = layoutText;
     }
     if (inlineTextNodes != null) {
       json['inlineTextNodes'] = inlineTextNodes.map((e) => e.toJson()).toList();
     }
     if (styleIndex != null) {
-      json['styleIndex'] = styleIndex.toString();
+      json['styleIndex'] = styleIndex;
     }
     return json;
   }
@@ -270,7 +336,14 @@ class ComputedStyle {
   ComputedStyle({
     @required this.properties,
   });
-  factory ComputedStyle.fromJson(Map json) {}
+
+  factory ComputedStyle.fromJson(Map json) {
+    return new ComputedStyle(
+      properties: (json['properties'] as List)
+          .map((e) => new NameValue.fromJson(e))
+          .toList(),
+    );
+  }
 
   Map toJson() {
     Map json = {
@@ -292,12 +365,18 @@ class NameValue {
     @required this.name,
     @required this.value,
   });
-  factory NameValue.fromJson(Map json) {}
+
+  factory NameValue.fromJson(Map json) {
+    return new NameValue(
+      name: json['name'],
+      value: json['value'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'name': name.toString(),
-      'value': value.toString(),
+      'name': name,
+      'value': value,
     };
     return json;
   }

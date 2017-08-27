@@ -25,7 +25,7 @@ class IndexedDBManager {
     String securityOrigin,
   ) async {
     Map parameters = {
-      'securityOrigin': securityOrigin.toString(),
+      'securityOrigin': securityOrigin,
     };
     await _client.send('IndexedDB.requestDatabaseNames', parameters);
   }
@@ -39,8 +39,8 @@ class IndexedDBManager {
     String databaseName,
   ) async {
     Map parameters = {
-      'securityOrigin': securityOrigin.toString(),
-      'databaseName': databaseName.toString(),
+      'securityOrigin': securityOrigin,
+      'databaseName': databaseName,
     };
     await _client.send('IndexedDB.requestDatabase', parameters);
   }
@@ -63,12 +63,12 @@ class IndexedDBManager {
     KeyRange keyRange,
   }) async {
     Map parameters = {
-      'securityOrigin': securityOrigin.toString(),
-      'databaseName': databaseName.toString(),
-      'objectStoreName': objectStoreName.toString(),
-      'indexName': indexName.toString(),
-      'skipCount': skipCount.toString(),
-      'pageSize': pageSize.toString(),
+      'securityOrigin': securityOrigin,
+      'databaseName': databaseName,
+      'objectStoreName': objectStoreName,
+      'indexName': indexName,
+      'skipCount': skipCount,
+      'pageSize': pageSize,
     };
     if (keyRange != null) {
       parameters['keyRange'] = keyRange.toJson();
@@ -86,9 +86,9 @@ class IndexedDBManager {
     String objectStoreName,
   ) async {
     Map parameters = {
-      'securityOrigin': securityOrigin.toString(),
-      'databaseName': databaseName.toString(),
-      'objectStoreName': objectStoreName.toString(),
+      'securityOrigin': securityOrigin,
+      'databaseName': databaseName,
+      'objectStoreName': objectStoreName,
     };
     await _client.send('IndexedDB.clearObjectStore', parameters);
   }
@@ -101,8 +101,8 @@ class IndexedDBManager {
     String databaseName,
   ) async {
     Map parameters = {
-      'securityOrigin': securityOrigin.toString(),
-      'databaseName': databaseName.toString(),
+      'securityOrigin': securityOrigin,
+      'databaseName': databaseName,
     };
     await _client.send('IndexedDB.deleteDatabase', parameters);
   }
@@ -119,7 +119,15 @@ class RequestDataResult {
     @required this.objectStoreDataEntries,
     @required this.hasMore,
   });
-  factory RequestDataResult.fromJson(Map json) {}
+
+  factory RequestDataResult.fromJson(Map json) {
+    return new RequestDataResult(
+      objectStoreDataEntries: (json['objectStoreDataEntries'] as List)
+          .map((e) => new DataEntry.fromJson(e))
+          .toList(),
+      hasMore: json['hasMore'],
+    );
+  }
 }
 
 /// Database with an array of object stores.
@@ -138,12 +146,21 @@ class DatabaseWithObjectStores {
     @required this.version,
     @required this.objectStores,
   });
-  factory DatabaseWithObjectStores.fromJson(Map json) {}
+
+  factory DatabaseWithObjectStores.fromJson(Map json) {
+    return new DatabaseWithObjectStores(
+      name: json['name'],
+      version: json['version'],
+      objectStores: (json['objectStores'] as List)
+          .map((e) => new ObjectStore.fromJson(e))
+          .toList(),
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'name': name.toString(),
-      'version': version.toString(),
+      'name': name,
+      'version': version,
       'objectStores': objectStores.map((e) => e.toJson()).toList(),
     };
     return json;
@@ -170,13 +187,23 @@ class ObjectStore {
     @required this.autoIncrement,
     @required this.indexes,
   });
-  factory ObjectStore.fromJson(Map json) {}
+
+  factory ObjectStore.fromJson(Map json) {
+    return new ObjectStore(
+      name: json['name'],
+      keyPath: new KeyPath.fromJson(json['keyPath']),
+      autoIncrement: json['autoIncrement'],
+      indexes: (json['indexes'] as List)
+          .map((e) => new ObjectStoreIndex.fromJson(e))
+          .toList(),
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'name': name.toString(),
+      'name': name,
       'keyPath': keyPath.toJson(),
-      'autoIncrement': autoIncrement.toString(),
+      'autoIncrement': autoIncrement,
       'indexes': indexes.map((e) => e.toJson()).toList(),
     };
     return json;
@@ -203,14 +230,22 @@ class ObjectStoreIndex {
     @required this.unique,
     @required this.multiEntry,
   });
-  factory ObjectStoreIndex.fromJson(Map json) {}
+
+  factory ObjectStoreIndex.fromJson(Map json) {
+    return new ObjectStoreIndex(
+      name: json['name'],
+      keyPath: new KeyPath.fromJson(json['keyPath']),
+      unique: json['unique'],
+      multiEntry: json['multiEntry'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'name': name.toString(),
+      'name': name,
       'keyPath': keyPath.toJson(),
-      'unique': unique.toString(),
-      'multiEntry': multiEntry.toString(),
+      'unique': unique,
+      'multiEntry': multiEntry,
     };
     return json;
   }
@@ -240,20 +275,31 @@ class Key {
     this.date,
     this.array,
   });
-  factory Key.fromJson(Map json) {}
+
+  factory Key.fromJson(Map json) {
+    return new Key(
+      type: json['type'],
+      number: json.containsKey('number') ? json['number'] : null,
+      string: json.containsKey('string') ? json['string'] : null,
+      date: json.containsKey('date') ? json['date'] : null,
+      array: json.containsKey('array')
+          ? (json['array'] as List).map((e) => new Key.fromJson(e)).toList()
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'type': type.toString(),
+      'type': type,
     };
     if (number != null) {
-      json['number'] = number.toString();
+      json['number'] = number;
     }
     if (string != null) {
-      json['string'] = string.toString();
+      json['string'] = string;
     }
     if (date != null) {
-      json['date'] = date.toString();
+      json['date'] = date;
     }
     if (array != null) {
       json['array'] = array.map((e) => e.toJson()).toList();
@@ -282,12 +328,20 @@ class KeyRange {
     @required this.lowerOpen,
     @required this.upperOpen,
   });
-  factory KeyRange.fromJson(Map json) {}
+
+  factory KeyRange.fromJson(Map json) {
+    return new KeyRange(
+      lower: json.containsKey('lower') ? new Key.fromJson(json['lower']) : null,
+      upper: json.containsKey('upper') ? new Key.fromJson(json['upper']) : null,
+      lowerOpen: json['lowerOpen'],
+      upperOpen: json['upperOpen'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'lowerOpen': lowerOpen.toString(),
-      'upperOpen': upperOpen.toString(),
+      'lowerOpen': lowerOpen,
+      'upperOpen': upperOpen,
     };
     if (lower != null) {
       json['lower'] = lower.toJson();
@@ -315,7 +369,14 @@ class DataEntry {
     @required this.primaryKey,
     @required this.value,
   });
-  factory DataEntry.fromJson(Map json) {}
+
+  factory DataEntry.fromJson(Map json) {
+    return new DataEntry(
+      key: new runtime.RemoteObject.fromJson(json['key']),
+      primaryKey: new runtime.RemoteObject.fromJson(json['primaryKey']),
+      value: new runtime.RemoteObject.fromJson(json['value']),
+    );
+  }
 
   Map toJson() {
     Map json = {
@@ -343,17 +404,26 @@ class KeyPath {
     this.string,
     this.array,
   });
-  factory KeyPath.fromJson(Map json) {}
+
+  factory KeyPath.fromJson(Map json) {
+    return new KeyPath(
+      type: json['type'],
+      string: json.containsKey('string') ? json['string'] : null,
+      array: json.containsKey('array')
+          ? (json['array'] as List).map((e) => e as String).toList()
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'type': type.toString(),
+      'type': type,
     };
     if (string != null) {
-      json['string'] = string.toString();
+      json['string'] = string;
     }
     if (array != null) {
-      json['array'] = array.map((e) => e.toString()).toList();
+      json['array'] = array.map((e) => e).toList();
     }
     return json;
   }

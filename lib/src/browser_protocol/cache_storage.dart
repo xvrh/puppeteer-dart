@@ -14,7 +14,7 @@ class CacheStorageManager {
     String securityOrigin,
   ) async {
     Map parameters = {
-      'securityOrigin': securityOrigin.toString(),
+      'securityOrigin': securityOrigin,
     };
     await _client.send('CacheStorage.requestCacheNames', parameters);
   }
@@ -30,8 +30,8 @@ class CacheStorageManager {
   ) async {
     Map parameters = {
       'cacheId': cacheId.toJson(),
-      'skipCount': skipCount.toString(),
-      'pageSize': pageSize.toString(),
+      'skipCount': skipCount,
+      'pageSize': pageSize,
     };
     await _client.send('CacheStorage.requestEntries', parameters);
   }
@@ -56,24 +56,9 @@ class CacheStorageManager {
   ) async {
     Map parameters = {
       'cacheId': cacheId.toJson(),
-      'request': request.toString(),
+      'request': request,
     };
     await _client.send('CacheStorage.deleteEntry', parameters);
-  }
-
-  /// Fetches cache entry.
-  /// [cacheId] Id of cache that contains the enty.
-  /// [requestURL] URL spec of the request.
-  /// Return: Response read from the cache.
-  Future<CachedResponse> requestCachedResponse(
-    CacheId cacheId,
-    String requestURL,
-  ) async {
-    Map parameters = {
-      'cacheId': cacheId.toJson(),
-      'requestURL': requestURL.toString(),
-    };
-    await _client.send('CacheStorage.requestCachedResponse', parameters);
   }
 }
 
@@ -88,7 +73,15 @@ class RequestEntriesResult {
     @required this.cacheDataEntries,
     @required this.hasMore,
   });
-  factory RequestEntriesResult.fromJson(Map json) {}
+
+  factory RequestEntriesResult.fromJson(Map json) {
+    return new RequestEntriesResult(
+      cacheDataEntries: (json['cacheDataEntries'] as List)
+          .map((e) => new DataEntry.fromJson(e))
+          .toList(),
+      hasMore: json['hasMore'],
+    );
+  }
 }
 
 /// Unique identifier of the Cache object.
@@ -96,6 +89,7 @@ class CacheId {
   final String value;
 
   CacheId(this.value);
+
   factory CacheId.fromJson(String value) => new CacheId(value);
 
   String toJson() => value;
@@ -117,13 +111,20 @@ class DataEntry {
     @required this.response,
     @required this.responseTime,
   });
-  factory DataEntry.fromJson(Map json) {}
+
+  factory DataEntry.fromJson(Map json) {
+    return new DataEntry(
+      request: json['request'],
+      response: json['response'],
+      responseTime: json['responseTime'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'request': request.toString(),
-      'response': response.toString(),
-      'responseTime': responseTime.toString(),
+      'request': request,
+      'response': response,
+      'responseTime': responseTime,
     };
     return json;
   }
@@ -145,36 +146,20 @@ class Cache {
     @required this.securityOrigin,
     @required this.cacheName,
   });
-  factory Cache.fromJson(Map json) {}
+
+  factory Cache.fromJson(Map json) {
+    return new Cache(
+      cacheId: new CacheId.fromJson(json['cacheId']),
+      securityOrigin: json['securityOrigin'],
+      cacheName: json['cacheName'],
+    );
+  }
 
   Map toJson() {
     Map json = {
       'cacheId': cacheId.toJson(),
-      'securityOrigin': securityOrigin.toString(),
-      'cacheName': cacheName.toString(),
-    };
-    return json;
-  }
-}
-
-/// Cached response
-class CachedResponse {
-  /// Response headers
-  final Map headers;
-
-  /// Entry content, base64-encoded.
-  final String body;
-
-  CachedResponse({
-    @required this.headers,
-    @required this.body,
-  });
-  factory CachedResponse.fromJson(Map json) {}
-
-  Map toJson() {
-    Map json = {
-      'headers': headers.toJson(),
-      'body': body.toString(),
+      'securityOrigin': securityOrigin,
+      'cacheName': cacheName,
     };
     return json;
   }

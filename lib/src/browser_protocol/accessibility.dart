@@ -20,7 +20,7 @@ class AccessibilityManager {
       'nodeId': nodeId.toJson(),
     };
     if (fetchRelatives != null) {
-      parameters['fetchRelatives'] = fetchRelatives.toString();
+      parameters['fetchRelatives'] = fetchRelatives;
     }
     await _client.send('Accessibility.getPartialAXTree', parameters);
   }
@@ -31,6 +31,7 @@ class AXNodeId {
   final String value;
 
   AXNodeId(this.value);
+
   factory AXNodeId.fromJson(String value) => new AXNodeId(value);
 
   String toJson() => value;
@@ -58,11 +59,31 @@ class AXValueType {
   static const AXValueType internalRole = const AXValueType._('internalRole');
   static const AXValueType valueUndefined =
       const AXValueType._('valueUndefined');
+  static const values = const {
+    'boolean': boolean,
+    'tristate': tristate,
+    'booleanOrUndefined': booleanOrUndefined,
+    'idref': idref,
+    'idrefList': idrefList,
+    'integer': integer,
+    'node': node,
+    'nodeList': nodeList,
+    'number': number,
+    'string': string,
+    'computedString': computedString,
+    'token': token,
+    'tokenList': tokenList,
+    'domRelation': domRelation,
+    'role': role,
+    'internalRole': internalRole,
+    'valueUndefined': valueUndefined,
+  };
 
   final String value;
 
   const AXValueType._(this.value);
-  factory AXValueType.fromJson(String value) => const {}[value];
+
+  factory AXValueType.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -80,11 +101,20 @@ class AXValueSourceType {
       const AXValueSourceType._('placeholder');
   static const AXValueSourceType relatedElement =
       const AXValueSourceType._('relatedElement');
+  static const values = const {
+    'attribute': attribute,
+    'implicit': implicit,
+    'style': style,
+    'contents': contents,
+    'placeholder': placeholder,
+    'relatedElement': relatedElement,
+  };
 
   final String value;
 
   const AXValueSourceType._(this.value);
-  factory AXValueSourceType.fromJson(String value) => const {}[value];
+
+  factory AXValueSourceType.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -107,11 +137,22 @@ class AXValueNativeSourceType {
       const AXValueNativeSourceType._('title');
   static const AXValueNativeSourceType other =
       const AXValueNativeSourceType._('other');
+  static const values = const {
+    'figcaption': figcaption,
+    'label': label,
+    'labelfor': labelfor,
+    'labelwrapped': labelwrapped,
+    'legend': legend,
+    'tablecaption': tablecaption,
+    'title': title,
+    'other': other,
+  };
 
   final String value;
 
   const AXValueNativeSourceType._(this.value);
-  factory AXValueNativeSourceType.fromJson(String value) => const {}[value];
+
+  factory AXValueNativeSourceType.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -156,7 +197,29 @@ class AXValueSource {
     this.invalid,
     this.invalidReason,
   });
-  factory AXValueSource.fromJson(Map json) {}
+
+  factory AXValueSource.fromJson(Map json) {
+    return new AXValueSource(
+      type: new AXValueSourceType.fromJson(json['type']),
+      value: json.containsKey('value')
+          ? new AXValue.fromJson(json['value'])
+          : null,
+      attribute: json.containsKey('attribute') ? json['attribute'] : null,
+      attributeValue: json.containsKey('attributeValue')
+          ? new AXValue.fromJson(json['attributeValue'])
+          : null,
+      superseded: json.containsKey('superseded') ? json['superseded'] : null,
+      nativeSource: json.containsKey('nativeSource')
+          ? new AXValueNativeSourceType.fromJson(json['nativeSource'])
+          : null,
+      nativeSourceValue: json.containsKey('nativeSourceValue')
+          ? new AXValue.fromJson(json['nativeSourceValue'])
+          : null,
+      invalid: json.containsKey('invalid') ? json['invalid'] : null,
+      invalidReason:
+          json.containsKey('invalidReason') ? json['invalidReason'] : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
@@ -166,13 +229,13 @@ class AXValueSource {
       json['value'] = value.toJson();
     }
     if (attribute != null) {
-      json['attribute'] = attribute.toString();
+      json['attribute'] = attribute;
     }
     if (attributeValue != null) {
       json['attributeValue'] = attributeValue.toJson();
     }
     if (superseded != null) {
-      json['superseded'] = superseded.toString();
+      json['superseded'] = superseded;
     }
     if (nativeSource != null) {
       json['nativeSource'] = nativeSource.toJson();
@@ -181,10 +244,10 @@ class AXValueSource {
       json['nativeSourceValue'] = nativeSourceValue.toJson();
     }
     if (invalid != null) {
-      json['invalid'] = invalid.toString();
+      json['invalid'] = invalid;
     }
     if (invalidReason != null) {
-      json['invalidReason'] = invalidReason.toString();
+      json['invalidReason'] = invalidReason;
     }
     return json;
   }
@@ -205,17 +268,25 @@ class AXRelatedNode {
     this.idref,
     this.text,
   });
-  factory AXRelatedNode.fromJson(Map json) {}
+
+  factory AXRelatedNode.fromJson(Map json) {
+    return new AXRelatedNode(
+      backendDOMNodeId:
+          new dom.BackendNodeId.fromJson(json['backendDOMNodeId']),
+      idref: json.containsKey('idref') ? json['idref'] : null,
+      text: json.containsKey('text') ? json['text'] : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
       'backendDOMNodeId': backendDOMNodeId.toJson(),
     };
     if (idref != null) {
-      json['idref'] = idref.toString();
+      json['idref'] = idref;
     }
     if (text != null) {
-      json['text'] = text.toString();
+      json['text'] = text;
     }
     return json;
   }
@@ -232,11 +303,17 @@ class AXProperty {
     @required this.name,
     @required this.value,
   });
-  factory AXProperty.fromJson(Map json) {}
+
+  factory AXProperty.fromJson(Map json) {
+    return new AXProperty(
+      name: json['name'],
+      value: new AXValue.fromJson(json['value']),
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'name': name.toString(),
+      'name': name,
       'value': value.toJson(),
     };
     return json;
@@ -263,7 +340,23 @@ class AXValue {
     this.relatedNodes,
     this.sources,
   });
-  factory AXValue.fromJson(Map json) {}
+
+  factory AXValue.fromJson(Map json) {
+    return new AXValue(
+      type: new AXValueType.fromJson(json['type']),
+      value: json.containsKey('value') ? json['value'] : null,
+      relatedNodes: json.containsKey('relatedNodes')
+          ? (json['relatedNodes'] as List)
+              .map((e) => new AXRelatedNode.fromJson(e))
+              .toList()
+          : null,
+      sources: json.containsKey('sources')
+          ? (json['sources'] as List)
+              .map((e) => new AXValueSource.fromJson(e))
+              .toList()
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
@@ -284,7 +377,6 @@ class AXValue {
 
 /// States which apply to every AX node.
 class AXGlobalStates {
-  static const AXGlobalStates busy = const AXGlobalStates._('busy');
   static const AXGlobalStates disabled = const AXGlobalStates._('disabled');
   static const AXGlobalStates hidden = const AXGlobalStates._('hidden');
   static const AXGlobalStates hiddenRoot = const AXGlobalStates._('hiddenRoot');
@@ -293,11 +385,20 @@ class AXGlobalStates {
       const AXGlobalStates._('keyshortcuts');
   static const AXGlobalStates roledescription =
       const AXGlobalStates._('roledescription');
+  static const values = const {
+    'disabled': disabled,
+    'hidden': hidden,
+    'hiddenRoot': hiddenRoot,
+    'invalid': invalid,
+    'keyshortcuts': keyshortcuts,
+    'roledescription': roledescription,
+  };
 
   final String value;
 
   const AXGlobalStates._(this.value);
-  factory AXGlobalStates.fromJson(String value) => const {}[value];
+
+  factory AXGlobalStates.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -310,13 +411,23 @@ class AXLiveRegionAttributes {
       const AXLiveRegionAttributes._('atomic');
   static const AXLiveRegionAttributes relevant =
       const AXLiveRegionAttributes._('relevant');
+  static const AXLiveRegionAttributes busy =
+      const AXLiveRegionAttributes._('busy');
   static const AXLiveRegionAttributes root =
       const AXLiveRegionAttributes._('root');
+  static const values = const {
+    'live': live,
+    'atomic': atomic,
+    'relevant': relevant,
+    'busy': busy,
+    'root': root,
+  };
 
   final String value;
 
   const AXLiveRegionAttributes._(this.value);
-  factory AXLiveRegionAttributes.fromJson(String value) => const {}[value];
+
+  factory AXLiveRegionAttributes.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -344,11 +455,25 @@ class AXWidgetAttributes {
       const AXWidgetAttributes._('valuemax');
   static const AXWidgetAttributes valuetext =
       const AXWidgetAttributes._('valuetext');
+  static const values = const {
+    'autocomplete': autocomplete,
+    'haspopup': haspopup,
+    'level': level,
+    'multiselectable': multiselectable,
+    'orientation': orientation,
+    'multiline': multiline,
+    'readonly': readonly,
+    'required': required,
+    'valuemin': valuemin,
+    'valuemax': valuemax,
+    'valuetext': valuetext,
+  };
 
   final String value;
 
   const AXWidgetAttributes._(this.value);
-  factory AXWidgetAttributes.fromJson(String value) => const {}[value];
+
+  factory AXWidgetAttributes.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -360,11 +485,19 @@ class AXWidgetStates {
   static const AXWidgetStates modal = const AXWidgetStates._('modal');
   static const AXWidgetStates pressed = const AXWidgetStates._('pressed');
   static const AXWidgetStates selected = const AXWidgetStates._('selected');
+  static const values = const {
+    'checked': checked,
+    'expanded': expanded,
+    'modal': modal,
+    'pressed': pressed,
+    'selected': selected,
+  };
 
   final String value;
 
   const AXWidgetStates._(this.value);
-  factory AXWidgetStates.fromJson(String value) => const {}[value];
+
+  factory AXWidgetStates.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -387,11 +520,22 @@ class AXRelationshipAttributes {
       const AXRelationshipAttributes._('labelledby');
   static const AXRelationshipAttributes owns =
       const AXRelationshipAttributes._('owns');
+  static const values = const {
+    'activedescendant': activedescendant,
+    'controls': controls,
+    'describedby': describedby,
+    'details': details,
+    'errormessage': errormessage,
+    'flowto': flowto,
+    'labelledby': labelledby,
+    'owns': owns,
+  };
 
   final String value;
 
   const AXRelationshipAttributes._(this.value);
-  factory AXRelationshipAttributes.fromJson(String value) => const {}[value];
+
+  factory AXRelationshipAttributes.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -440,12 +584,46 @@ class AXNode {
     this.childIds,
     this.backendDOMNodeId,
   });
-  factory AXNode.fromJson(Map json) {}
+
+  factory AXNode.fromJson(Map json) {
+    return new AXNode(
+      nodeId: new AXNodeId.fromJson(json['nodeId']),
+      ignored: json['ignored'],
+      ignoredReasons: json.containsKey('ignoredReasons')
+          ? (json['ignoredReasons'] as List)
+              .map((e) => new AXProperty.fromJson(e))
+              .toList()
+          : null,
+      role:
+          json.containsKey('role') ? new AXValue.fromJson(json['role']) : null,
+      name:
+          json.containsKey('name') ? new AXValue.fromJson(json['name']) : null,
+      description: json.containsKey('description')
+          ? new AXValue.fromJson(json['description'])
+          : null,
+      value: json.containsKey('value')
+          ? new AXValue.fromJson(json['value'])
+          : null,
+      properties: json.containsKey('properties')
+          ? (json['properties'] as List)
+              .map((e) => new AXProperty.fromJson(e))
+              .toList()
+          : null,
+      childIds: json.containsKey('childIds')
+          ? (json['childIds'] as List)
+              .map((e) => new AXNodeId.fromJson(e))
+              .toList()
+          : null,
+      backendDOMNodeId: json.containsKey('backendDOMNodeId')
+          ? new dom.BackendNodeId.fromJson(json['backendDOMNodeId'])
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
       'nodeId': nodeId.toJson(),
-      'ignored': ignored.toString(),
+      'ignored': ignored,
     };
     if (ignoredReasons != null) {
       json['ignoredReasons'] = ignoredReasons.map((e) => e.toJson()).toList();

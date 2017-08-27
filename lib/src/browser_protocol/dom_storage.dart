@@ -9,6 +9,30 @@ class DOMStorageManager {
 
   DOMStorageManager(this._client);
 
+  final StreamController<StorageId> _domStorageItemsCleared =
+      new StreamController<StorageId>.broadcast();
+
+  Stream<StorageId> get onDomStorageItemsCleared =>
+      _domStorageItemsCleared.stream;
+
+  final StreamController<DomStorageItemRemovedResult> _domStorageItemRemoved =
+      new StreamController<DomStorageItemRemovedResult>.broadcast();
+
+  Stream<DomStorageItemRemovedResult> get onDomStorageItemRemoved =>
+      _domStorageItemRemoved.stream;
+
+  final StreamController<DomStorageItemAddedResult> _domStorageItemAdded =
+      new StreamController<DomStorageItemAddedResult>.broadcast();
+
+  Stream<DomStorageItemAddedResult> get onDomStorageItemAdded =>
+      _domStorageItemAdded.stream;
+
+  final StreamController<DomStorageItemUpdatedResult> _domStorageItemUpdated =
+      new StreamController<DomStorageItemUpdatedResult>.broadcast();
+
+  Stream<DomStorageItemUpdatedResult> get onDomStorageItemUpdated =>
+      _domStorageItemUpdated.stream;
+
   /// Enables storage tracking, storage events will now be delivered to the client.
   Future enable() async {
     await _client.send('DOMStorage.enable');
@@ -44,8 +68,8 @@ class DOMStorageManager {
   ) async {
     Map parameters = {
       'storageId': storageId.toJson(),
-      'key': key.toString(),
-      'value': value.toString(),
+      'key': key,
+      'value': value,
     };
     await _client.send('DOMStorage.setDOMStorageItem', parameters);
   }
@@ -56,9 +80,75 @@ class DOMStorageManager {
   ) async {
     Map parameters = {
       'storageId': storageId.toJson(),
-      'key': key.toString(),
+      'key': key,
     };
     await _client.send('DOMStorage.removeDOMStorageItem', parameters);
+  }
+}
+
+class DomStorageItemRemovedResult {
+  final StorageId storageId;
+
+  final String key;
+
+  DomStorageItemRemovedResult({
+    @required this.storageId,
+    @required this.key,
+  });
+
+  factory DomStorageItemRemovedResult.fromJson(Map json) {
+    return new DomStorageItemRemovedResult(
+      storageId: new StorageId.fromJson(json['storageId']),
+      key: json['key'],
+    );
+  }
+}
+
+class DomStorageItemAddedResult {
+  final StorageId storageId;
+
+  final String key;
+
+  final String newValue;
+
+  DomStorageItemAddedResult({
+    @required this.storageId,
+    @required this.key,
+    @required this.newValue,
+  });
+
+  factory DomStorageItemAddedResult.fromJson(Map json) {
+    return new DomStorageItemAddedResult(
+      storageId: new StorageId.fromJson(json['storageId']),
+      key: json['key'],
+      newValue: json['newValue'],
+    );
+  }
+}
+
+class DomStorageItemUpdatedResult {
+  final StorageId storageId;
+
+  final String key;
+
+  final String oldValue;
+
+  final String newValue;
+
+  DomStorageItemUpdatedResult({
+    @required this.storageId,
+    @required this.key,
+    @required this.oldValue,
+    @required this.newValue,
+  });
+
+  factory DomStorageItemUpdatedResult.fromJson(Map json) {
+    return new DomStorageItemUpdatedResult(
+      storageId: new StorageId.fromJson(json['storageId']),
+      key: json['key'],
+      oldValue: json['oldValue'],
+      newValue: json['newValue'],
+    );
   }
 }
 
@@ -74,12 +164,18 @@ class StorageId {
     @required this.securityOrigin,
     @required this.isLocalStorage,
   });
-  factory StorageId.fromJson(Map json) {}
+
+  factory StorageId.fromJson(Map json) {
+    return new StorageId(
+      securityOrigin: json['securityOrigin'],
+      isLocalStorage: json['isLocalStorage'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'securityOrigin': securityOrigin.toString(),
-      'isLocalStorage': isLocalStorage.toString(),
+      'securityOrigin': securityOrigin,
+      'isLocalStorage': isLocalStorage,
     };
     return json;
   }
@@ -90,6 +186,7 @@ class Item {
   final List<String> value;
 
   Item(this.value);
+
   factory Item.fromJson(List<String> value) => new Item(value);
 
   List<String> toJson() => value;

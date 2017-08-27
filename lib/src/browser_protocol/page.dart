@@ -14,6 +14,111 @@ class PageManager {
 
   PageManager(this._client);
 
+  final StreamController<network.MonotonicTime> _domContentEventFired =
+      new StreamController<network.MonotonicTime>.broadcast();
+
+  Stream<network.MonotonicTime> get onDomContentEventFired =>
+      _domContentEventFired.stream;
+
+  final StreamController<network.MonotonicTime> _loadEventFired =
+      new StreamController<network.MonotonicTime>.broadcast();
+
+  Stream<network.MonotonicTime> get onLoadEventFired => _loadEventFired.stream;
+
+  final StreamController<FrameAttachedResult> _frameAttached =
+      new StreamController<FrameAttachedResult>.broadcast();
+
+  /// Fired when frame has been attached to its parent.
+  Stream<FrameAttachedResult> get onFrameAttached => _frameAttached.stream;
+
+  final StreamController<Frame> _frameNavigated =
+      new StreamController<Frame>.broadcast();
+
+  /// Fired once navigation of the frame has completed. Frame is now associated with the new loader.
+  Stream<Frame> get onFrameNavigated => _frameNavigated.stream;
+
+  final StreamController<FrameId> _frameDetached =
+      new StreamController<FrameId>.broadcast();
+
+  /// Fired when frame has been detached from its parent.
+  Stream<FrameId> get onFrameDetached => _frameDetached.stream;
+
+  final StreamController<FrameId> _frameStartedLoading =
+      new StreamController<FrameId>.broadcast();
+
+  /// Fired when frame has started loading.
+  Stream<FrameId> get onFrameStartedLoading => _frameStartedLoading.stream;
+
+  final StreamController<FrameId> _frameStoppedLoading =
+      new StreamController<FrameId>.broadcast();
+
+  /// Fired when frame has stopped loading.
+  Stream<FrameId> get onFrameStoppedLoading => _frameStoppedLoading.stream;
+
+  final StreamController<FrameScheduledNavigationResult>
+      _frameScheduledNavigation =
+      new StreamController<FrameScheduledNavigationResult>.broadcast();
+
+  /// Fired when frame schedules a potential navigation.
+  Stream<FrameScheduledNavigationResult> get onFrameScheduledNavigation =>
+      _frameScheduledNavigation.stream;
+
+  final StreamController<FrameId> _frameClearedScheduledNavigation =
+      new StreamController<FrameId>.broadcast();
+
+  /// Fired when frame no longer has a scheduled navigation.
+  Stream<FrameId> get onFrameClearedScheduledNavigation =>
+      _frameClearedScheduledNavigation.stream;
+
+  final StreamController _frameResized = new StreamController.broadcast();
+
+  Stream get onFrameResized => _frameResized.stream;
+
+  final StreamController<JavascriptDialogOpeningResult>
+      _javascriptDialogOpening =
+      new StreamController<JavascriptDialogOpeningResult>.broadcast();
+
+  /// Fired when a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload) is about to open.
+  Stream<JavascriptDialogOpeningResult> get onJavascriptDialogOpening =>
+      _javascriptDialogOpening.stream;
+
+  final StreamController<bool> _javascriptDialogClosed =
+      new StreamController<bool>.broadcast();
+
+  /// Fired when a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload) has been closed.
+  Stream<bool> get onJavascriptDialogClosed => _javascriptDialogClosed.stream;
+
+  final StreamController<ScreencastFrameResult> _screencastFrame =
+      new StreamController<ScreencastFrameResult>.broadcast();
+
+  /// Compressed image data requested by the <code>startScreencast</code>.
+  Stream<ScreencastFrameResult> get onScreencastFrame =>
+      _screencastFrame.stream;
+
+  final StreamController<bool> _screencastVisibilityChanged =
+      new StreamController<bool>.broadcast();
+
+  /// Fired when the page with currently enabled screencast was shown or hidden </code>.
+  Stream<bool> get onScreencastVisibilityChanged =>
+      _screencastVisibilityChanged.stream;
+
+  final StreamController _interstitialShown = new StreamController.broadcast();
+
+  /// Fired when interstitial page was shown
+  Stream get onInterstitialShown => _interstitialShown.stream;
+
+  final StreamController _interstitialHidden = new StreamController.broadcast();
+
+  /// Fired when interstitial page was hidden
+  Stream get onInterstitialHidden => _interstitialHidden.stream;
+
+  final StreamController<NavigationRequestedResult> _navigationRequested =
+      new StreamController<NavigationRequestedResult>.broadcast();
+
+  /// Fired when a navigation is started if navigation throttles are enabled.  The navigation will be deferred until processNavigation is called.
+  Stream<NavigationRequestedResult> get onNavigationRequested =>
+      _navigationRequested.stream;
+
   /// Enables page domain notifications.
   Future enable() async {
     await _client.send('Page.enable');
@@ -30,7 +135,7 @@ class PageManager {
     String scriptSource,
   ) async {
     Map parameters = {
-      'scriptSource': scriptSource.toString(),
+      'scriptSource': scriptSource,
     };
     await _client.send('Page.addScriptToEvaluateOnLoad', parameters);
   }
@@ -51,7 +156,7 @@ class PageManager {
     String source,
   ) async {
     Map parameters = {
-      'source': source.toString(),
+      'source': source,
     };
     await _client.send('Page.addScriptToEvaluateOnNewDocument', parameters);
   }
@@ -72,7 +177,7 @@ class PageManager {
     bool autoAttach,
   ) async {
     Map parameters = {
-      'autoAttach': autoAttach.toString(),
+      'autoAttach': autoAttach,
     };
     await _client.send('Page.setAutoAttachToCreatedPages', parameters);
   }
@@ -86,23 +191,12 @@ class PageManager {
   }) async {
     Map parameters = {};
     if (ignoreCache != null) {
-      parameters['ignoreCache'] = ignoreCache.toString();
+      parameters['ignoreCache'] = ignoreCache;
     }
     if (scriptToEvaluateOnLoad != null) {
-      parameters['scriptToEvaluateOnLoad'] = scriptToEvaluateOnLoad.toString();
+      parameters['scriptToEvaluateOnLoad'] = scriptToEvaluateOnLoad;
     }
     await _client.send('Page.reload', parameters);
-  }
-
-  /// Enable Chrome's experimental ad filter on all sites.
-  /// [enabled] Whether to block ads.
-  Future setAdBlockingEnabled(
-    bool enabled,
-  ) async {
-    Map parameters = {
-      'enabled': enabled.toString(),
-    };
-    await _client.send('Page.setAdBlockingEnabled', parameters);
   }
 
   /// Navigates current page to the given URL.
@@ -116,10 +210,10 @@ class PageManager {
     TransitionType transitionType,
   }) async {
     Map parameters = {
-      'url': url.toString(),
+      'url': url,
     };
     if (referrer != null) {
-      parameters['referrer'] = referrer.toString();
+      parameters['referrer'] = referrer;
     }
     if (transitionType != null) {
       parameters['transitionType'] = transitionType.toJson();
@@ -143,7 +237,7 @@ class PageManager {
     int entryId,
   ) async {
     Map parameters = {
-      'entryId': entryId.toString(),
+      'entryId': entryId,
     };
     await _client.send('Page.navigateToHistoryEntry', parameters);
   }
@@ -162,8 +256,8 @@ class PageManager {
     String url,
   ) async {
     Map parameters = {
-      'cookieName': cookieName.toString(),
-      'url': url.toString(),
+      'cookieName': cookieName,
+      'url': url,
     };
     await _client.send('Page.deleteCookie', parameters);
   }
@@ -183,7 +277,7 @@ class PageManager {
   ) async {
     Map parameters = {
       'frameId': frameId.toJson(),
-      'url': url.toString(),
+      'url': url,
     };
     await _client.send('Page.getResourceContent', parameters);
   }
@@ -204,14 +298,14 @@ class PageManager {
   }) async {
     Map parameters = {
       'frameId': frameId.toJson(),
-      'url': url.toString(),
-      'query': query.toString(),
+      'url': url,
+      'query': query,
     };
     if (caseSensitive != null) {
-      parameters['caseSensitive'] = caseSensitive.toString();
+      parameters['caseSensitive'] = caseSensitive;
     }
     if (isRegex != null) {
-      parameters['isRegex'] = isRegex.toString();
+      parameters['isRegex'] = isRegex;
     }
     await _client.send('Page.searchInResource', parameters);
   }
@@ -225,7 +319,7 @@ class PageManager {
   ) async {
     Map parameters = {
       'frameId': frameId.toJson(),
-      'html': html.toString(),
+      'html': html,
     };
     await _client.send('Page.setDocumentContent', parameters);
   }
@@ -235,49 +329,59 @@ class PageManager {
   /// [height] Overriding height value in pixels (minimum 0, maximum 10000000). 0 disables the override.
   /// [deviceScaleFactor] Overriding device scale factor value. 0 disables the override.
   /// [mobile] Whether to emulate mobile device. This includes viewport meta tag, overlay scrollbars, text autosizing and more.
+  /// [fitWindow] Whether a view that exceeds the available browser window area should be scaled down to fit.
   /// [scale] Scale to apply to resulting view image. Ignored in |fitWindow| mode.
+  /// [offsetX] X offset to shift resulting view image by. Ignored in |fitWindow| mode.
+  /// [offsetY] Y offset to shift resulting view image by. Ignored in |fitWindow| mode.
   /// [screenWidth] Overriding screen width value in pixels (minimum 0, maximum 10000000). Only used for |mobile==true|.
   /// [screenHeight] Overriding screen height value in pixels (minimum 0, maximum 10000000). Only used for |mobile==true|.
   /// [positionX] Overriding view X position on screen in pixels (minimum 0, maximum 10000000). Only used for |mobile==true|.
   /// [positionY] Overriding view Y position on screen in pixels (minimum 0, maximum 10000000). Only used for |mobile==true|.
-  /// [dontSetVisibleSize] Do not set visible view size, rely upon explicit setVisibleSize call.
   /// [screenOrientation] Screen orientation override.
   Future setDeviceMetricsOverride(
     int width,
     int height,
     num deviceScaleFactor,
     bool mobile, {
+    bool fitWindow,
     num scale,
+    num offsetX,
+    num offsetY,
     int screenWidth,
     int screenHeight,
     int positionX,
     int positionY,
-    bool dontSetVisibleSize,
     emulation.ScreenOrientation screenOrientation,
   }) async {
     Map parameters = {
-      'width': width.toString(),
-      'height': height.toString(),
-      'deviceScaleFactor': deviceScaleFactor.toString(),
-      'mobile': mobile.toString(),
+      'width': width,
+      'height': height,
+      'deviceScaleFactor': deviceScaleFactor,
+      'mobile': mobile,
     };
+    if (fitWindow != null) {
+      parameters['fitWindow'] = fitWindow;
+    }
     if (scale != null) {
-      parameters['scale'] = scale.toString();
+      parameters['scale'] = scale;
+    }
+    if (offsetX != null) {
+      parameters['offsetX'] = offsetX;
+    }
+    if (offsetY != null) {
+      parameters['offsetY'] = offsetY;
     }
     if (screenWidth != null) {
-      parameters['screenWidth'] = screenWidth.toString();
+      parameters['screenWidth'] = screenWidth;
     }
     if (screenHeight != null) {
-      parameters['screenHeight'] = screenHeight.toString();
+      parameters['screenHeight'] = screenHeight;
     }
     if (positionX != null) {
-      parameters['positionX'] = positionX.toString();
+      parameters['positionX'] = positionX;
     }
     if (positionY != null) {
-      parameters['positionY'] = positionY.toString();
-    }
-    if (dontSetVisibleSize != null) {
-      parameters['dontSetVisibleSize'] = dontSetVisibleSize.toString();
+      parameters['positionY'] = positionY;
     }
     if (screenOrientation != null) {
       parameters['screenOrientation'] = screenOrientation.toJson();
@@ -301,13 +405,13 @@ class PageManager {
   }) async {
     Map parameters = {};
     if (latitude != null) {
-      parameters['latitude'] = latitude.toString();
+      parameters['latitude'] = latitude;
     }
     if (longitude != null) {
-      parameters['longitude'] = longitude.toString();
+      parameters['longitude'] = longitude;
     }
     if (accuracy != null) {
-      parameters['accuracy'] = accuracy.toString();
+      parameters['accuracy'] = accuracy;
     }
     await _client.send('Page.setGeolocationOverride', parameters);
   }
@@ -327,9 +431,9 @@ class PageManager {
     num gamma,
   ) async {
     Map parameters = {
-      'alpha': alpha.toString(),
-      'beta': beta.toString(),
-      'gamma': gamma.toString(),
+      'alpha': alpha,
+      'beta': beta,
+      'gamma': gamma,
     };
     await _client.send('Page.setDeviceOrientationOverride', parameters);
   }
@@ -347,10 +451,10 @@ class PageManager {
     String configuration,
   }) async {
     Map parameters = {
-      'enabled': enabled.toString(),
+      'enabled': enabled,
     };
     if (configuration != null) {
-      parameters['configuration'] = configuration.toString();
+      parameters['configuration'] = configuration;
     }
     await _client.send('Page.setTouchEmulationEnabled', parameters);
   }
@@ -369,16 +473,16 @@ class PageManager {
   }) async {
     Map parameters = {};
     if (format != null) {
-      parameters['format'] = format.toString();
+      parameters['format'] = format;
     }
     if (quality != null) {
-      parameters['quality'] = quality.toString();
+      parameters['quality'] = quality;
     }
     if (clip != null) {
       parameters['clip'] = clip.toJson();
     }
     if (fromSurface != null) {
-      parameters['fromSurface'] = fromSurface.toString();
+      parameters['fromSurface'] = fromSurface;
     }
     await _client.send('Page.captureScreenshot', parameters);
   }
@@ -395,7 +499,6 @@ class PageManager {
   /// [marginLeft] Left margin in inches. Defaults to 1cm (~0.4 inches).
   /// [marginRight] Right margin in inches. Defaults to 1cm (~0.4 inches).
   /// [pageRanges] Paper ranges to print, e.g., '1-5, 8, 11-13'. Defaults to the empty string, which means print all pages.
-  /// [ignoreInvalidPageRanges] Whether to silently ignore invalid but successfully parsed page ranges, such as '3-2'. Defaults to false.
   /// Return: Base64-encoded pdf data.
   Future<String> printToPDF({
     bool landscape,
@@ -409,45 +512,40 @@ class PageManager {
     num marginLeft,
     num marginRight,
     String pageRanges,
-    bool ignoreInvalidPageRanges,
   }) async {
     Map parameters = {};
     if (landscape != null) {
-      parameters['landscape'] = landscape.toString();
+      parameters['landscape'] = landscape;
     }
     if (displayHeaderFooter != null) {
-      parameters['displayHeaderFooter'] = displayHeaderFooter.toString();
+      parameters['displayHeaderFooter'] = displayHeaderFooter;
     }
     if (printBackground != null) {
-      parameters['printBackground'] = printBackground.toString();
+      parameters['printBackground'] = printBackground;
     }
     if (scale != null) {
-      parameters['scale'] = scale.toString();
+      parameters['scale'] = scale;
     }
     if (paperWidth != null) {
-      parameters['paperWidth'] = paperWidth.toString();
+      parameters['paperWidth'] = paperWidth;
     }
     if (paperHeight != null) {
-      parameters['paperHeight'] = paperHeight.toString();
+      parameters['paperHeight'] = paperHeight;
     }
     if (marginTop != null) {
-      parameters['marginTop'] = marginTop.toString();
+      parameters['marginTop'] = marginTop;
     }
     if (marginBottom != null) {
-      parameters['marginBottom'] = marginBottom.toString();
+      parameters['marginBottom'] = marginBottom;
     }
     if (marginLeft != null) {
-      parameters['marginLeft'] = marginLeft.toString();
+      parameters['marginLeft'] = marginLeft;
     }
     if (marginRight != null) {
-      parameters['marginRight'] = marginRight.toString();
+      parameters['marginRight'] = marginRight;
     }
     if (pageRanges != null) {
-      parameters['pageRanges'] = pageRanges.toString();
-    }
-    if (ignoreInvalidPageRanges != null) {
-      parameters['ignoreInvalidPageRanges'] =
-          ignoreInvalidPageRanges.toString();
+      parameters['pageRanges'] = pageRanges;
     }
     await _client.send('Page.printToPDF', parameters);
   }
@@ -467,19 +565,19 @@ class PageManager {
   }) async {
     Map parameters = {};
     if (format != null) {
-      parameters['format'] = format.toString();
+      parameters['format'] = format;
     }
     if (quality != null) {
-      parameters['quality'] = quality.toString();
+      parameters['quality'] = quality;
     }
     if (maxWidth != null) {
-      parameters['maxWidth'] = maxWidth.toString();
+      parameters['maxWidth'] = maxWidth;
     }
     if (maxHeight != null) {
-      parameters['maxHeight'] = maxHeight.toString();
+      parameters['maxHeight'] = maxHeight;
     }
     if (everyNthFrame != null) {
-      parameters['everyNthFrame'] = everyNthFrame.toString();
+      parameters['everyNthFrame'] = everyNthFrame;
     }
     await _client.send('Page.startScreencast', parameters);
   }
@@ -495,7 +593,7 @@ class PageManager {
     int sessionId,
   ) async {
     Map parameters = {
-      'sessionId': sessionId.toString(),
+      'sessionId': sessionId,
     };
     await _client.send('Page.screencastFrameAck', parameters);
   }
@@ -508,10 +606,10 @@ class PageManager {
     String promptText,
   }) async {
     Map parameters = {
-      'accept': accept.toString(),
+      'accept': accept,
     };
     if (promptText != null) {
-      parameters['promptText'] = promptText.toString();
+      parameters['promptText'] = promptText;
     }
     await _client.send('Page.handleJavaScriptDialog', parameters);
   }
@@ -522,6 +620,28 @@ class PageManager {
 
   Future requestAppBanner() async {
     await _client.send('Page.requestAppBanner');
+  }
+
+  /// Toggles navigation throttling which allows programatic control over navigation and redirect response.
+  Future setControlNavigations(
+    bool enabled,
+  ) async {
+    Map parameters = {
+      'enabled': enabled,
+    };
+    await _client.send('Page.setControlNavigations', parameters);
+  }
+
+  /// Should be sent in response to a navigationRequested or a redirectRequested event, telling the browser how to handle the navigation.
+  Future processNavigation(
+    NavigationResponse response,
+    int navigationId,
+  ) async {
+    Map parameters = {
+      'response': response.toJson(),
+      'navigationId': navigationId,
+    };
+    await _client.send('Page.processNavigation', parameters);
   }
 
   /// Returns metrics relating to the layouting of the page, such as viewport bounds/scale.
@@ -543,33 +663,133 @@ class PageManager {
       'frameId': frameId.toJson(),
     };
     if (worldName != null) {
-      parameters['worldName'] = worldName.toString();
+      parameters['worldName'] = worldName;
     }
     if (grantUniveralAccess != null) {
-      parameters['grantUniveralAccess'] = grantUniveralAccess.toString();
+      parameters['grantUniveralAccess'] = grantUniveralAccess;
     }
     await _client.send('Page.createIsolatedWorld', parameters);
   }
+}
 
-  /// Brings page to front (activates tab).
-  Future bringToFront() async {
-    await _client.send('Page.bringToFront');
+class FrameAttachedResult {
+  /// Id of the frame that has been attached.
+  final FrameId frameId;
+
+  /// Parent frame identifier.
+  final FrameId parentFrameId;
+
+  /// JavaScript stack trace of when frame was attached, only set if frame initiated from script.
+  final runtime.StackTrace stack;
+
+  FrameAttachedResult({
+    @required this.frameId,
+    @required this.parentFrameId,
+    this.stack,
+  });
+
+  factory FrameAttachedResult.fromJson(Map json) {
+    return new FrameAttachedResult(
+      frameId: new FrameId.fromJson(json['frameId']),
+      parentFrameId: new FrameId.fromJson(json['parentFrameId']),
+      stack: json.containsKey('stack')
+          ? new runtime.StackTrace.fromJson(json['stack'])
+          : null,
+    );
   }
+}
 
-  /// Set the behavior when downloading a file.
-  /// [behavior] Whether to allow all or deny all download requests, or use default Chrome behavior if available (otherwise deny).
-  /// [downloadPath] The default path to save downloaded files to. This is requred if behavior is set to 'allow'
-  Future setDownloadBehavior(
-    String behavior, {
-    String downloadPath,
-  }) async {
-    Map parameters = {
-      'behavior': behavior.toString(),
-    };
-    if (downloadPath != null) {
-      parameters['downloadPath'] = downloadPath.toString();
-    }
-    await _client.send('Page.setDownloadBehavior', parameters);
+class FrameScheduledNavigationResult {
+  /// Id of the frame that has scheduled a navigation.
+  final FrameId frameId;
+
+  /// Delay (in seconds) until the navigation is scheduled to begin. The navigation is not guaranteed to start.
+  final num delay;
+
+  FrameScheduledNavigationResult({
+    @required this.frameId,
+    @required this.delay,
+  });
+
+  factory FrameScheduledNavigationResult.fromJson(Map json) {
+    return new FrameScheduledNavigationResult(
+      frameId: new FrameId.fromJson(json['frameId']),
+      delay: json['delay'],
+    );
+  }
+}
+
+class JavascriptDialogOpeningResult {
+  /// Message that will be displayed by the dialog.
+  final String message;
+
+  /// Dialog type.
+  final DialogType type;
+
+  JavascriptDialogOpeningResult({
+    @required this.message,
+    @required this.type,
+  });
+
+  factory JavascriptDialogOpeningResult.fromJson(Map json) {
+    return new JavascriptDialogOpeningResult(
+      message: json['message'],
+      type: new DialogType.fromJson(json['type']),
+    );
+  }
+}
+
+class ScreencastFrameResult {
+  /// Base64-encoded compressed image.
+  final String data;
+
+  /// Screencast frame metadata.
+  final ScreencastFrameMetadata metadata;
+
+  /// Frame number.
+  final int sessionId;
+
+  ScreencastFrameResult({
+    @required this.data,
+    @required this.metadata,
+    @required this.sessionId,
+  });
+
+  factory ScreencastFrameResult.fromJson(Map json) {
+    return new ScreencastFrameResult(
+      data: json['data'],
+      metadata: new ScreencastFrameMetadata.fromJson(json['metadata']),
+      sessionId: json['sessionId'],
+    );
+  }
+}
+
+class NavigationRequestedResult {
+  /// Whether the navigation is taking place in the main frame or in a subframe.
+  final bool isInMainFrame;
+
+  /// Whether the navigation has encountered a server redirect or not.
+  final bool isRedirect;
+
+  final int navigationId;
+
+  /// URL of requested navigation.
+  final String url;
+
+  NavigationRequestedResult({
+    @required this.isInMainFrame,
+    @required this.isRedirect,
+    @required this.navigationId,
+    @required this.url,
+  });
+
+  factory NavigationRequestedResult.fromJson(Map json) {
+    return new NavigationRequestedResult(
+      isInMainFrame: json['isInMainFrame'],
+      isRedirect: json['isRedirect'],
+      navigationId: json['navigationId'],
+      url: json['url'],
+    );
   }
 }
 
@@ -584,7 +804,15 @@ class GetNavigationHistoryResult {
     @required this.currentIndex,
     @required this.entries,
   });
-  factory GetNavigationHistoryResult.fromJson(Map json) {}
+
+  factory GetNavigationHistoryResult.fromJson(Map json) {
+    return new GetNavigationHistoryResult(
+      currentIndex: json['currentIndex'],
+      entries: (json['entries'] as List)
+          .map((e) => new NavigationEntry.fromJson(e))
+          .toList(),
+    );
+  }
 }
 
 class GetResourceContentResult {
@@ -598,7 +826,13 @@ class GetResourceContentResult {
     @required this.content,
     @required this.base64Encoded,
   });
-  factory GetResourceContentResult.fromJson(Map json) {}
+
+  factory GetResourceContentResult.fromJson(Map json) {
+    return new GetResourceContentResult(
+      content: json['content'],
+      base64Encoded: json['base64Encoded'],
+    );
+  }
 }
 
 class GetAppManifestResult {
@@ -615,7 +849,16 @@ class GetAppManifestResult {
     @required this.errors,
     this.data,
   });
-  factory GetAppManifestResult.fromJson(Map json) {}
+
+  factory GetAppManifestResult.fromJson(Map json) {
+    return new GetAppManifestResult(
+      url: json['url'],
+      errors: (json['errors'] as List)
+          .map((e) => new AppManifestError.fromJson(e))
+          .toList(),
+      data: json.containsKey('data') ? json['data'] : null,
+    );
+  }
 }
 
 class GetLayoutMetricsResult {
@@ -633,7 +876,14 @@ class GetLayoutMetricsResult {
     @required this.visualViewport,
     @required this.contentSize,
   });
-  factory GetLayoutMetricsResult.fromJson(Map json) {}
+
+  factory GetLayoutMetricsResult.fromJson(Map json) {
+    return new GetLayoutMetricsResult(
+      layoutViewport: new LayoutViewport.fromJson(json['layoutViewport']),
+      visualViewport: new VisualViewport.fromJson(json['visualViewport']),
+      contentSize: new dom.Rect.fromJson(json['contentSize']),
+    );
+  }
 }
 
 /// Resource type as it was perceived by the rendering engine.
@@ -651,11 +901,27 @@ class ResourceType {
   static const ResourceType webSocket = const ResourceType._('WebSocket');
   static const ResourceType manifest = const ResourceType._('Manifest');
   static const ResourceType other = const ResourceType._('Other');
+  static const values = const {
+    'Document': document,
+    'Stylesheet': stylesheet,
+    'Image': image,
+    'Media': media,
+    'Font': font,
+    'Script': script,
+    'TextTrack': textTrack,
+    'XHR': xHR,
+    'Fetch': fetch,
+    'EventSource': eventSource,
+    'WebSocket': webSocket,
+    'Manifest': manifest,
+    'Other': other,
+  };
 
   final String value;
 
   const ResourceType._(this.value);
-  factory ResourceType.fromJson(String value) => const {}[value];
+
+  factory ResourceType.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -665,6 +931,7 @@ class FrameId {
   final String value;
 
   FrameId(this.value);
+
   factory FrameId.fromJson(String value) => new FrameId(value);
 
   String toJson() => value;
@@ -693,9 +960,6 @@ class Frame {
   /// Frame document's mimeType as determined by the browser.
   final String mimeType;
 
-  /// If the frame failed to load, this contains the URL that could not be loaded.
-  final String unreachableUrl;
-
   Frame({
     @required this.id,
     this.parentId,
@@ -704,26 +968,33 @@ class Frame {
     @required this.url,
     @required this.securityOrigin,
     @required this.mimeType,
-    this.unreachableUrl,
   });
-  factory Frame.fromJson(Map json) {}
+
+  factory Frame.fromJson(Map json) {
+    return new Frame(
+      id: json['id'],
+      parentId: json.containsKey('parentId') ? json['parentId'] : null,
+      loaderId: new network.LoaderId.fromJson(json['loaderId']),
+      name: json.containsKey('name') ? json['name'] : null,
+      url: json['url'],
+      securityOrigin: json['securityOrigin'],
+      mimeType: json['mimeType'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'id': id.toString(),
+      'id': id,
       'loaderId': loaderId.toJson(),
-      'url': url.toString(),
-      'securityOrigin': securityOrigin.toString(),
-      'mimeType': mimeType.toString(),
+      'url': url,
+      'securityOrigin': securityOrigin,
+      'mimeType': mimeType,
     };
     if (parentId != null) {
-      json['parentId'] = parentId.toString();
+      json['parentId'] = parentId;
     }
     if (name != null) {
-      json['name'] = name.toString();
-    }
-    if (unreachableUrl != null) {
-      json['unreachableUrl'] = unreachableUrl.toString();
+      json['name'] = name;
     }
     return json;
   }
@@ -761,25 +1032,38 @@ class FrameResource {
     this.failed,
     this.canceled,
   });
-  factory FrameResource.fromJson(Map json) {}
+
+  factory FrameResource.fromJson(Map json) {
+    return new FrameResource(
+      url: json['url'],
+      type: new ResourceType.fromJson(json['type']),
+      mimeType: json['mimeType'],
+      lastModified: json.containsKey('lastModified')
+          ? new network.TimeSinceEpoch.fromJson(json['lastModified'])
+          : null,
+      contentSize: json.containsKey('contentSize') ? json['contentSize'] : null,
+      failed: json.containsKey('failed') ? json['failed'] : null,
+      canceled: json.containsKey('canceled') ? json['canceled'] : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'url': url.toString(),
+      'url': url,
       'type': type.toJson(),
-      'mimeType': mimeType.toString(),
+      'mimeType': mimeType,
     };
     if (lastModified != null) {
       json['lastModified'] = lastModified.toJson();
     }
     if (contentSize != null) {
-      json['contentSize'] = contentSize.toString();
+      json['contentSize'] = contentSize;
     }
     if (failed != null) {
-      json['failed'] = failed.toString();
+      json['failed'] = failed;
     }
     if (canceled != null) {
-      json['canceled'] = canceled.toString();
+      json['canceled'] = canceled;
     }
     return json;
   }
@@ -801,7 +1085,20 @@ class FrameResourceTree {
     this.childFrames,
     @required this.resources,
   });
-  factory FrameResourceTree.fromJson(Map json) {}
+
+  factory FrameResourceTree.fromJson(Map json) {
+    return new FrameResourceTree(
+      frame: new Frame.fromJson(json['frame']),
+      childFrames: json.containsKey('childFrames')
+          ? (json['childFrames'] as List)
+              .map((e) => new FrameResourceTree.fromJson(e))
+              .toList()
+          : null,
+      resources: (json['resources'] as List)
+          .map((e) => new FrameResource.fromJson(e))
+          .toList(),
+    );
+  }
 
   Map toJson() {
     Map json = {
@@ -820,6 +1117,7 @@ class ScriptIdentifier {
   final String value;
 
   ScriptIdentifier(this.value);
+
   factory ScriptIdentifier.fromJson(String value) =>
       new ScriptIdentifier(value);
 
@@ -846,11 +1144,26 @@ class TransitionType {
   static const TransitionType keywordGenerated =
       const TransitionType._('keyword_generated');
   static const TransitionType other = const TransitionType._('other');
+  static const values = const {
+    'link': link,
+    'typed': typed,
+    'auto_bookmark': autoBookmark,
+    'auto_subframe': autoSubframe,
+    'manual_subframe': manualSubframe,
+    'generated': generated,
+    'auto_toplevel': autoToplevel,
+    'form_submit': formSubmit,
+    'reload': reload,
+    'keyword': keyword,
+    'keyword_generated': keywordGenerated,
+    'other': other,
+  };
 
   final String value;
 
   const TransitionType._(this.value);
-  factory TransitionType.fromJson(String value) => const {}[value];
+
+  factory TransitionType.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -879,14 +1192,23 @@ class NavigationEntry {
     @required this.title,
     @required this.transitionType,
   });
-  factory NavigationEntry.fromJson(Map json) {}
+
+  factory NavigationEntry.fromJson(Map json) {
+    return new NavigationEntry(
+      id: json['id'],
+      url: json['url'],
+      userTypedURL: json['userTypedURL'],
+      title: json['title'],
+      transitionType: new TransitionType.fromJson(json['transitionType']),
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'id': id.toString(),
-      'url': url.toString(),
-      'userTypedURL': userTypedURL.toString(),
-      'title': title.toString(),
+      'id': id,
+      'url': url,
+      'userTypedURL': userTypedURL,
+      'title': title,
       'transitionType': transitionType.toJson(),
     };
     return json;
@@ -925,16 +1247,29 @@ class ScreencastFrameMetadata {
     @required this.scrollOffsetY,
     this.timestamp,
   });
-  factory ScreencastFrameMetadata.fromJson(Map json) {}
+
+  factory ScreencastFrameMetadata.fromJson(Map json) {
+    return new ScreencastFrameMetadata(
+      offsetTop: json['offsetTop'],
+      pageScaleFactor: json['pageScaleFactor'],
+      deviceWidth: json['deviceWidth'],
+      deviceHeight: json['deviceHeight'],
+      scrollOffsetX: json['scrollOffsetX'],
+      scrollOffsetY: json['scrollOffsetY'],
+      timestamp: json.containsKey('timestamp')
+          ? new network.TimeSinceEpoch.fromJson(json['timestamp'])
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'offsetTop': offsetTop.toString(),
-      'pageScaleFactor': pageScaleFactor.toString(),
-      'deviceWidth': deviceWidth.toString(),
-      'deviceHeight': deviceHeight.toString(),
-      'scrollOffsetX': scrollOffsetX.toString(),
-      'scrollOffsetY': scrollOffsetY.toString(),
+      'offsetTop': offsetTop,
+      'pageScaleFactor': pageScaleFactor,
+      'deviceWidth': deviceWidth,
+      'deviceHeight': deviceHeight,
+      'scrollOffsetX': scrollOffsetX,
+      'scrollOffsetY': scrollOffsetY,
     };
     if (timestamp != null) {
       json['timestamp'] = timestamp.toJson();
@@ -949,11 +1284,18 @@ class DialogType {
   static const DialogType confirm = const DialogType._('confirm');
   static const DialogType prompt = const DialogType._('prompt');
   static const DialogType beforeunload = const DialogType._('beforeunload');
+  static const values = const {
+    'alert': alert,
+    'confirm': confirm,
+    'prompt': prompt,
+    'beforeunload': beforeunload,
+  };
 
   final String value;
 
   const DialogType._(this.value);
-  factory DialogType.fromJson(String value) => const {}[value];
+
+  factory DialogType.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -978,14 +1320,22 @@ class AppManifestError {
     @required this.line,
     @required this.column,
   });
-  factory AppManifestError.fromJson(Map json) {}
+
+  factory AppManifestError.fromJson(Map json) {
+    return new AppManifestError(
+      message: json['message'],
+      critical: json['critical'],
+      line: json['line'],
+      column: json['column'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'message': message.toString(),
-      'critical': critical.toString(),
-      'line': line.toString(),
-      'column': column.toString(),
+      'message': message,
+      'critical': critical,
+      'line': line,
+      'column': column,
     };
     return json;
   }
@@ -998,11 +1348,17 @@ class NavigationResponse {
   static const NavigationResponse cancel = const NavigationResponse._('Cancel');
   static const NavigationResponse cancelAndIgnore =
       const NavigationResponse._('CancelAndIgnore');
+  static const values = const {
+    'Proceed': proceed,
+    'Cancel': cancel,
+    'CancelAndIgnore': cancelAndIgnore,
+  };
 
   final String value;
 
   const NavigationResponse._(this.value);
-  factory NavigationResponse.fromJson(String value) => const {}[value];
+
+  factory NavigationResponse.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -1027,14 +1383,22 @@ class LayoutViewport {
     @required this.clientWidth,
     @required this.clientHeight,
   });
-  factory LayoutViewport.fromJson(Map json) {}
+
+  factory LayoutViewport.fromJson(Map json) {
+    return new LayoutViewport(
+      pageX: json['pageX'],
+      pageY: json['pageY'],
+      clientWidth: json['clientWidth'],
+      clientHeight: json['clientHeight'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'pageX': pageX.toString(),
-      'pageY': pageY.toString(),
-      'clientWidth': clientWidth.toString(),
-      'clientHeight': clientHeight.toString(),
+      'pageX': pageX,
+      'pageY': pageY,
+      'clientWidth': clientWidth,
+      'clientHeight': clientHeight,
     };
     return json;
   }
@@ -1072,17 +1436,28 @@ class VisualViewport {
     @required this.clientHeight,
     @required this.scale,
   });
-  factory VisualViewport.fromJson(Map json) {}
+
+  factory VisualViewport.fromJson(Map json) {
+    return new VisualViewport(
+      offsetX: json['offsetX'],
+      offsetY: json['offsetY'],
+      pageX: json['pageX'],
+      pageY: json['pageY'],
+      clientWidth: json['clientWidth'],
+      clientHeight: json['clientHeight'],
+      scale: json['scale'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'offsetX': offsetX.toString(),
-      'offsetY': offsetY.toString(),
-      'pageX': pageX.toString(),
-      'pageY': pageY.toString(),
-      'clientWidth': clientWidth.toString(),
-      'clientHeight': clientHeight.toString(),
-      'scale': scale.toString(),
+      'offsetX': offsetX,
+      'offsetY': offsetY,
+      'pageX': pageX,
+      'pageY': pageY,
+      'clientWidth': clientWidth,
+      'clientHeight': clientHeight,
+      'scale': scale,
     };
     return json;
   }
@@ -1112,15 +1487,24 @@ class Viewport {
     @required this.height,
     @required this.scale,
   });
-  factory Viewport.fromJson(Map json) {}
+
+  factory Viewport.fromJson(Map json) {
+    return new Viewport(
+      x: json['x'],
+      y: json['y'],
+      width: json['width'],
+      height: json['height'],
+      scale: json['scale'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'x': x.toString(),
-      'y': y.toString(),
-      'width': width.toString(),
-      'height': height.toString(),
-      'scale': scale.toString(),
+      'x': x,
+      'y': y,
+      'width': width,
+      'height': height,
+      'scale': scale,
     };
     return json;
   }

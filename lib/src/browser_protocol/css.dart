@@ -11,6 +11,35 @@ class CSSManager {
 
   CSSManager(this._client);
 
+  final StreamController _mediaQueryResultChanged =
+      new StreamController.broadcast();
+
+  /// Fires whenever a MediaQuery result changes (for example, after a browser window has been resized.) The current implementation considers only viewport-dependent media features.
+  Stream get onMediaQueryResultChanged => _mediaQueryResultChanged.stream;
+
+  final StreamController _fontsUpdated = new StreamController.broadcast();
+
+  /// Fires whenever a web font gets loaded.
+  Stream get onFontsUpdated => _fontsUpdated.stream;
+
+  final StreamController<StyleSheetId> _styleSheetChanged =
+      new StreamController<StyleSheetId>.broadcast();
+
+  /// Fired whenever a stylesheet is changed as a result of the client operation.
+  Stream<StyleSheetId> get onStyleSheetChanged => _styleSheetChanged.stream;
+
+  final StreamController<CSSStyleSheetHeader> _styleSheetAdded =
+      new StreamController<CSSStyleSheetHeader>.broadcast();
+
+  /// Fired whenever an active document stylesheet is added.
+  Stream<CSSStyleSheetHeader> get onStyleSheetAdded => _styleSheetAdded.stream;
+
+  final StreamController<StyleSheetId> _styleSheetRemoved =
+      new StreamController<StyleSheetId>.broadcast();
+
+  /// Fired whenever an active document stylesheet is removed.
+  Stream<StyleSheetId> get onStyleSheetRemoved => _styleSheetRemoved.stream;
+
   /// Enables the CSS agent for the given page. Clients should not assume that the CSS agent has been enabled until the result of this command is received.
   Future enable() async {
     await _client.send('CSS.enable');
@@ -93,7 +122,7 @@ class CSSManager {
   ) async {
     Map parameters = {
       'styleSheetId': styleSheetId.toJson(),
-      'text': text.toString(),
+      'text': text,
     };
     await _client.send('CSS.setStyleSheetText', parameters);
   }
@@ -108,7 +137,7 @@ class CSSManager {
     Map parameters = {
       'styleSheetId': styleSheetId.toJson(),
       'range': range.toJson(),
-      'selector': selector.toString(),
+      'selector': selector,
     };
     await _client.send('CSS.setRuleSelector', parameters);
   }
@@ -123,7 +152,7 @@ class CSSManager {
     Map parameters = {
       'styleSheetId': styleSheetId.toJson(),
       'range': range.toJson(),
-      'keyText': keyText.toString(),
+      'keyText': keyText,
     };
     await _client.send('CSS.setKeyframeKey', parameters);
   }
@@ -149,7 +178,7 @@ class CSSManager {
     Map parameters = {
       'styleSheetId': styleSheetId.toJson(),
       'range': range.toJson(),
-      'text': text.toString(),
+      'text': text,
     };
     await _client.send('CSS.setMediaText', parameters);
   }
@@ -178,7 +207,7 @@ class CSSManager {
   ) async {
     Map parameters = {
       'styleSheetId': styleSheetId.toJson(),
-      'ruleText': ruleText.toString(),
+      'ruleText': ruleText,
       'location': location.toJson(),
     };
     await _client.send('CSS.addRule', parameters);
@@ -193,8 +222,7 @@ class CSSManager {
   ) async {
     Map parameters = {
       'nodeId': nodeId.toJson(),
-      'forcedPseudoClasses':
-          forcedPseudoClasses.map((e) => e.toString()).toList(),
+      'forcedPseudoClasses': forcedPseudoClasses.map((e) => e).toList(),
     };
     await _client.send('CSS.forcePseudoState', parameters);
   }
@@ -213,14 +241,15 @@ class CSSManager {
   ) async {
     Map parameters = {
       'nodeId': nodeId.toJson(),
-      'propertyName': propertyName.toString(),
-      'value': value.toString(),
+      'propertyName': propertyName,
+      'value': value,
     };
     await _client.send('CSS.setEffectivePropertyValueForNode', parameters);
   }
 
   /// [nodeId] Id of the node to get background colors for.
-  Future<GetBackgroundColorsResult> getBackgroundColors(
+  /// Return: The range of background colors behind this element, if it contains any visible text. If no visible text is present, this will be undefined. In the case of a flat background color, this will consist of simply that color. In the case of a gradient, this will consist of each of the color stops. For anything more complicated, this will be an empty array. Images will be ignored (as if the image had failed to load).
+  Future<List<String>> getBackgroundColors(
     dom.NodeId nodeId,
   ) async {
     Map parameters = {
@@ -272,7 +301,37 @@ class GetMatchedStylesForNodeResult {
     this.inherited,
     this.cssKeyframesRules,
   });
-  factory GetMatchedStylesForNodeResult.fromJson(Map json) {}
+
+  factory GetMatchedStylesForNodeResult.fromJson(Map json) {
+    return new GetMatchedStylesForNodeResult(
+      inlineStyle: json.containsKey('inlineStyle')
+          ? new CSSStyle.fromJson(json['inlineStyle'])
+          : null,
+      attributesStyle: json.containsKey('attributesStyle')
+          ? new CSSStyle.fromJson(json['attributesStyle'])
+          : null,
+      matchedCSSRules: json.containsKey('matchedCSSRules')
+          ? (json['matchedCSSRules'] as List)
+              .map((e) => new RuleMatch.fromJson(e))
+              .toList()
+          : null,
+      pseudoElements: json.containsKey('pseudoElements')
+          ? (json['pseudoElements'] as List)
+              .map((e) => new PseudoElementMatches.fromJson(e))
+              .toList()
+          : null,
+      inherited: json.containsKey('inherited')
+          ? (json['inherited'] as List)
+              .map((e) => new InheritedStyleEntry.fromJson(e))
+              .toList()
+          : null,
+      cssKeyframesRules: json.containsKey('cssKeyframesRules')
+          ? (json['cssKeyframesRules'] as List)
+              .map((e) => new CSSKeyframesRule.fromJson(e))
+              .toList()
+          : null,
+    );
+  }
 }
 
 class GetInlineStylesForNodeResult {
@@ -286,35 +345,24 @@ class GetInlineStylesForNodeResult {
     this.inlineStyle,
     this.attributesStyle,
   });
-  factory GetInlineStylesForNodeResult.fromJson(Map json) {}
-}
 
-class GetBackgroundColorsResult {
-  /// The range of background colors behind this element, if it contains any visible text. If no visible text is present, this will be undefined. In the case of a flat background color, this will consist of simply that color. In the case of a gradient, this will consist of each of the color stops. For anything more complicated, this will be an empty array. Images will be ignored (as if the image had failed to load).
-  final List<String> backgroundColors;
-
-  /// The computed font size for this node, as a CSS computed value string (e.g. '12px').
-  final String computedFontSize;
-
-  /// The computed font weight for this node, as a CSS computed value string (e.g. 'normal' or '100').
-  final String computedFontWeight;
-
-  /// The computed font size for the document body, as a computed CSS value string (e.g. '16px').
-  final String computedBodyFontSize;
-
-  GetBackgroundColorsResult({
-    this.backgroundColors,
-    this.computedFontSize,
-    this.computedFontWeight,
-    this.computedBodyFontSize,
-  });
-  factory GetBackgroundColorsResult.fromJson(Map json) {}
+  factory GetInlineStylesForNodeResult.fromJson(Map json) {
+    return new GetInlineStylesForNodeResult(
+      inlineStyle: json.containsKey('inlineStyle')
+          ? new CSSStyle.fromJson(json['inlineStyle'])
+          : null,
+      attributesStyle: json.containsKey('attributesStyle')
+          ? new CSSStyle.fromJson(json['attributesStyle'])
+          : null,
+    );
+  }
 }
 
 class StyleSheetId {
   final String value;
 
   StyleSheetId(this.value);
+
   factory StyleSheetId.fromJson(String value) => new StyleSheetId(value);
 
   String toJson() => value;
@@ -328,11 +376,18 @@ class StyleSheetOrigin {
   static const StyleSheetOrigin inspector =
       const StyleSheetOrigin._('inspector');
   static const StyleSheetOrigin regular = const StyleSheetOrigin._('regular');
+  static const values = const {
+    'injected': injected,
+    'user-agent': userAgent,
+    'inspector': inspector,
+    'regular': regular,
+  };
 
   final String value;
 
   const StyleSheetOrigin._(this.value);
-  factory StyleSheetOrigin.fromJson(String value) => const {}[value];
+
+  factory StyleSheetOrigin.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -349,7 +404,15 @@ class PseudoElementMatches {
     @required this.pseudoType,
     @required this.matches,
   });
-  factory PseudoElementMatches.fromJson(Map json) {}
+
+  factory PseudoElementMatches.fromJson(Map json) {
+    return new PseudoElementMatches(
+      pseudoType: new dom.PseudoType.fromJson(json['pseudoType']),
+      matches: (json['matches'] as List)
+          .map((e) => new RuleMatch.fromJson(e))
+          .toList(),
+    );
+  }
 
   Map toJson() {
     Map json = {
@@ -372,7 +435,17 @@ class InheritedStyleEntry {
     this.inlineStyle,
     @required this.matchedCSSRules,
   });
-  factory InheritedStyleEntry.fromJson(Map json) {}
+
+  factory InheritedStyleEntry.fromJson(Map json) {
+    return new InheritedStyleEntry(
+      inlineStyle: json.containsKey('inlineStyle')
+          ? new CSSStyle.fromJson(json['inlineStyle'])
+          : null,
+      matchedCSSRules: (json['matchedCSSRules'] as List)
+          .map((e) => new RuleMatch.fromJson(e))
+          .toList(),
+    );
+  }
 
   Map toJson() {
     Map json = {
@@ -397,12 +470,19 @@ class RuleMatch {
     @required this.rule,
     @required this.matchingSelectors,
   });
-  factory RuleMatch.fromJson(Map json) {}
+
+  factory RuleMatch.fromJson(Map json) {
+    return new RuleMatch(
+      rule: new CSSRule.fromJson(json['rule']),
+      matchingSelectors:
+          (json['matchingSelectors'] as List).map((e) => e as int).toList(),
+    );
+  }
 
   Map toJson() {
     Map json = {
       'rule': rule.toJson(),
-      'matchingSelectors': matchingSelectors.map((e) => e.toString()).toList(),
+      'matchingSelectors': matchingSelectors.map((e) => e).toList(),
     };
     return json;
   }
@@ -420,11 +500,19 @@ class Value {
     @required this.text,
     this.range,
   });
-  factory Value.fromJson(Map json) {}
+
+  factory Value.fromJson(Map json) {
+    return new Value(
+      text: json['text'],
+      range: json.containsKey('range')
+          ? new SourceRange.fromJson(json['range'])
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'text': text.toString(),
+      'text': text,
     };
     if (range != null) {
       json['range'] = range.toJson();
@@ -445,12 +533,20 @@ class SelectorList {
     @required this.selectors,
     @required this.text,
   });
-  factory SelectorList.fromJson(Map json) {}
+
+  factory SelectorList.fromJson(Map json) {
+    return new SelectorList(
+      selectors: (json['selectors'] as List)
+          .map((e) => new Value.fromJson(e))
+          .toList(),
+      text: json['text'],
+    );
+  }
 
   Map toJson() {
     Map json = {
       'selectors': selectors.map((e) => e.toJson()).toList(),
-      'text': text.toString(),
+      'text': text,
     };
     return json;
   }
@@ -512,29 +608,50 @@ class CSSStyleSheetHeader {
     @required this.startColumn,
     @required this.length,
   });
-  factory CSSStyleSheetHeader.fromJson(Map json) {}
+
+  factory CSSStyleSheetHeader.fromJson(Map json) {
+    return new CSSStyleSheetHeader(
+      styleSheetId: new StyleSheetId.fromJson(json['styleSheetId']),
+      frameId: new page.FrameId.fromJson(json['frameId']),
+      sourceURL: json['sourceURL'],
+      sourceMapURL:
+          json.containsKey('sourceMapURL') ? json['sourceMapURL'] : null,
+      origin: new StyleSheetOrigin.fromJson(json['origin']),
+      title: json['title'],
+      ownerNode: json.containsKey('ownerNode')
+          ? new dom.BackendNodeId.fromJson(json['ownerNode'])
+          : null,
+      disabled: json['disabled'],
+      hasSourceURL:
+          json.containsKey('hasSourceURL') ? json['hasSourceURL'] : null,
+      isInline: json['isInline'],
+      startLine: json['startLine'],
+      startColumn: json['startColumn'],
+      length: json['length'],
+    );
+  }
 
   Map toJson() {
     Map json = {
       'styleSheetId': styleSheetId.toJson(),
       'frameId': frameId.toJson(),
-      'sourceURL': sourceURL.toString(),
+      'sourceURL': sourceURL,
       'origin': origin.toJson(),
-      'title': title.toString(),
-      'disabled': disabled.toString(),
-      'isInline': isInline.toString(),
-      'startLine': startLine.toString(),
-      'startColumn': startColumn.toString(),
-      'length': length.toString(),
+      'title': title,
+      'disabled': disabled,
+      'isInline': isInline,
+      'startLine': startLine,
+      'startColumn': startColumn,
+      'length': length,
     };
     if (sourceMapURL != null) {
-      json['sourceMapURL'] = sourceMapURL.toString();
+      json['sourceMapURL'] = sourceMapURL;
     }
     if (ownerNode != null) {
       json['ownerNode'] = ownerNode.toJson();
     }
     if (hasSourceURL != null) {
-      json['hasSourceURL'] = hasSourceURL.toString();
+      json['hasSourceURL'] = hasSourceURL;
     }
     return json;
   }
@@ -564,7 +681,22 @@ class CSSRule {
     @required this.style,
     this.media,
   });
-  factory CSSRule.fromJson(Map json) {}
+
+  factory CSSRule.fromJson(Map json) {
+    return new CSSRule(
+      styleSheetId: json.containsKey('styleSheetId')
+          ? new StyleSheetId.fromJson(json['styleSheetId'])
+          : null,
+      selectorList: new SelectorList.fromJson(json['selectorList']),
+      origin: new StyleSheetOrigin.fromJson(json['origin']),
+      style: new CSSStyle.fromJson(json['style']),
+      media: json.containsKey('media')
+          ? (json['media'] as List)
+              .map((e) => new CSSMedia.fromJson(e))
+              .toList()
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
@@ -602,14 +734,22 @@ class RuleUsage {
     @required this.endOffset,
     @required this.used,
   });
-  factory RuleUsage.fromJson(Map json) {}
+
+  factory RuleUsage.fromJson(Map json) {
+    return new RuleUsage(
+      styleSheetId: new StyleSheetId.fromJson(json['styleSheetId']),
+      startOffset: json['startOffset'],
+      endOffset: json['endOffset'],
+      used: json['used'],
+    );
+  }
 
   Map toJson() {
     Map json = {
       'styleSheetId': styleSheetId.toJson(),
-      'startOffset': startOffset.toString(),
-      'endOffset': endOffset.toString(),
-      'used': used.toString(),
+      'startOffset': startOffset,
+      'endOffset': endOffset,
+      'used': used,
     };
     return json;
   }
@@ -635,14 +775,22 @@ class SourceRange {
     @required this.endLine,
     @required this.endColumn,
   });
-  factory SourceRange.fromJson(Map json) {}
+
+  factory SourceRange.fromJson(Map json) {
+    return new SourceRange(
+      startLine: json['startLine'],
+      startColumn: json['startColumn'],
+      endLine: json['endLine'],
+      endColumn: json['endColumn'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'startLine': startLine.toString(),
-      'startColumn': startColumn.toString(),
-      'endLine': endLine.toString(),
-      'endColumn': endColumn.toString(),
+      'startLine': startLine,
+      'startColumn': startColumn,
+      'endLine': endLine,
+      'endColumn': endColumn,
     };
     return json;
   }
@@ -663,15 +811,22 @@ class ShorthandEntry {
     @required this.value,
     this.important,
   });
-  factory ShorthandEntry.fromJson(Map json) {}
+
+  factory ShorthandEntry.fromJson(Map json) {
+    return new ShorthandEntry(
+      name: json['name'],
+      value: json['value'],
+      important: json.containsKey('important') ? json['important'] : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'name': name.toString(),
-      'value': value.toString(),
+      'name': name,
+      'value': value,
     };
     if (important != null) {
-      json['important'] = important.toString();
+      json['important'] = important;
     }
     return json;
   }
@@ -688,12 +843,18 @@ class CSSComputedStyleProperty {
     @required this.name,
     @required this.value,
   });
-  factory CSSComputedStyleProperty.fromJson(Map json) {}
+
+  factory CSSComputedStyleProperty.fromJson(Map json) {
+    return new CSSComputedStyleProperty(
+      name: json['name'],
+      value: json['value'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'name': name.toString(),
-      'value': value.toString(),
+      'name': name,
+      'value': value,
     };
     return json;
   }
@@ -723,7 +884,24 @@ class CSSStyle {
     this.cssText,
     this.range,
   });
-  factory CSSStyle.fromJson(Map json) {}
+
+  factory CSSStyle.fromJson(Map json) {
+    return new CSSStyle(
+      styleSheetId: json.containsKey('styleSheetId')
+          ? new StyleSheetId.fromJson(json['styleSheetId'])
+          : null,
+      cssProperties: (json['cssProperties'] as List)
+          .map((e) => new CSSProperty.fromJson(e))
+          .toList(),
+      shorthandEntries: (json['shorthandEntries'] as List)
+          .map((e) => new ShorthandEntry.fromJson(e))
+          .toList(),
+      cssText: json.containsKey('cssText') ? json['cssText'] : null,
+      range: json.containsKey('range')
+          ? new SourceRange.fromJson(json['range'])
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
@@ -734,7 +912,7 @@ class CSSStyle {
       json['styleSheetId'] = styleSheetId.toJson();
     }
     if (cssText != null) {
-      json['cssText'] = cssText.toString();
+      json['cssText'] = cssText;
     }
     if (range != null) {
       json['range'] = range.toJson();
@@ -779,27 +957,41 @@ class CSSProperty {
     this.disabled,
     this.range,
   });
-  factory CSSProperty.fromJson(Map json) {}
+
+  factory CSSProperty.fromJson(Map json) {
+    return new CSSProperty(
+      name: json['name'],
+      value: json['value'],
+      important: json.containsKey('important') ? json['important'] : null,
+      implicit: json.containsKey('implicit') ? json['implicit'] : null,
+      text: json.containsKey('text') ? json['text'] : null,
+      parsedOk: json.containsKey('parsedOk') ? json['parsedOk'] : null,
+      disabled: json.containsKey('disabled') ? json['disabled'] : null,
+      range: json.containsKey('range')
+          ? new SourceRange.fromJson(json['range'])
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'name': name.toString(),
-      'value': value.toString(),
+      'name': name,
+      'value': value,
     };
     if (important != null) {
-      json['important'] = important.toString();
+      json['important'] = important;
     }
     if (implicit != null) {
-      json['implicit'] = implicit.toString();
+      json['implicit'] = implicit;
     }
     if (text != null) {
-      json['text'] = text.toString();
+      json['text'] = text;
     }
     if (parsedOk != null) {
-      json['parsedOk'] = parsedOk.toString();
+      json['parsedOk'] = parsedOk;
     }
     if (disabled != null) {
-      json['disabled'] = disabled.toString();
+      json['disabled'] = disabled;
     }
     if (range != null) {
       json['range'] = range.toJson();
@@ -836,15 +1028,33 @@ class CSSMedia {
     this.styleSheetId,
     this.mediaList,
   });
-  factory CSSMedia.fromJson(Map json) {}
+
+  factory CSSMedia.fromJson(Map json) {
+    return new CSSMedia(
+      text: json['text'],
+      source: json['source'],
+      sourceURL: json.containsKey('sourceURL') ? json['sourceURL'] : null,
+      range: json.containsKey('range')
+          ? new SourceRange.fromJson(json['range'])
+          : null,
+      styleSheetId: json.containsKey('styleSheetId')
+          ? new StyleSheetId.fromJson(json['styleSheetId'])
+          : null,
+      mediaList: json.containsKey('mediaList')
+          ? (json['mediaList'] as List)
+              .map((e) => new MediaQuery.fromJson(e))
+              .toList()
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'text': text.toString(),
-      'source': source.toString(),
+      'text': text,
+      'source': source,
     };
     if (sourceURL != null) {
-      json['sourceURL'] = sourceURL.toString();
+      json['sourceURL'] = sourceURL;
     }
     if (range != null) {
       json['range'] = range.toJson();
@@ -871,12 +1081,20 @@ class MediaQuery {
     @required this.expressions,
     @required this.active,
   });
-  factory MediaQuery.fromJson(Map json) {}
+
+  factory MediaQuery.fromJson(Map json) {
+    return new MediaQuery(
+      expressions: (json['expressions'] as List)
+          .map((e) => new MediaQueryExpression.fromJson(e))
+          .toList(),
+      active: json['active'],
+    );
+  }
 
   Map toJson() {
     Map json = {
       'expressions': expressions.map((e) => e.toJson()).toList(),
-      'active': active.toString(),
+      'active': active,
     };
     return json;
   }
@@ -906,19 +1124,31 @@ class MediaQueryExpression {
     this.valueRange,
     this.computedLength,
   });
-  factory MediaQueryExpression.fromJson(Map json) {}
+
+  factory MediaQueryExpression.fromJson(Map json) {
+    return new MediaQueryExpression(
+      value: json['value'],
+      unit: json['unit'],
+      feature: json['feature'],
+      valueRange: json.containsKey('valueRange')
+          ? new SourceRange.fromJson(json['valueRange'])
+          : null,
+      computedLength:
+          json.containsKey('computedLength') ? json['computedLength'] : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'value': value.toString(),
-      'unit': unit.toString(),
-      'feature': feature.toString(),
+      'value': value,
+      'unit': unit,
+      'feature': feature,
     };
     if (valueRange != null) {
       json['valueRange'] = valueRange.toJson();
     }
     if (computedLength != null) {
-      json['computedLength'] = computedLength.toString();
+      json['computedLength'] = computedLength;
     }
     return json;
   }
@@ -940,13 +1170,20 @@ class PlatformFontUsage {
     @required this.isCustomFont,
     @required this.glyphCount,
   });
-  factory PlatformFontUsage.fromJson(Map json) {}
+
+  factory PlatformFontUsage.fromJson(Map json) {
+    return new PlatformFontUsage(
+      familyName: json['familyName'],
+      isCustomFont: json['isCustomFont'],
+      glyphCount: json['glyphCount'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'familyName': familyName.toString(),
-      'isCustomFont': isCustomFont.toString(),
-      'glyphCount': glyphCount.toString(),
+      'familyName': familyName,
+      'isCustomFont': isCustomFont,
+      'glyphCount': glyphCount,
     };
     return json;
   }
@@ -964,7 +1201,15 @@ class CSSKeyframesRule {
     @required this.animationName,
     @required this.keyframes,
   });
-  factory CSSKeyframesRule.fromJson(Map json) {}
+
+  factory CSSKeyframesRule.fromJson(Map json) {
+    return new CSSKeyframesRule(
+      animationName: new Value.fromJson(json['animationName']),
+      keyframes: (json['keyframes'] as List)
+          .map((e) => new CSSKeyframeRule.fromJson(e))
+          .toList(),
+    );
+  }
 
   Map toJson() {
     Map json = {
@@ -995,7 +1240,17 @@ class CSSKeyframeRule {
     @required this.keyText,
     @required this.style,
   });
-  factory CSSKeyframeRule.fromJson(Map json) {}
+
+  factory CSSKeyframeRule.fromJson(Map json) {
+    return new CSSKeyframeRule(
+      styleSheetId: json.containsKey('styleSheetId')
+          ? new StyleSheetId.fromJson(json['styleSheetId'])
+          : null,
+      origin: new StyleSheetOrigin.fromJson(json['origin']),
+      keyText: new Value.fromJson(json['keyText']),
+      style: new CSSStyle.fromJson(json['style']),
+    );
+  }
 
   Map toJson() {
     Map json = {
@@ -1026,13 +1281,20 @@ class StyleDeclarationEdit {
     @required this.range,
     @required this.text,
   });
-  factory StyleDeclarationEdit.fromJson(Map json) {}
+
+  factory StyleDeclarationEdit.fromJson(Map json) {
+    return new StyleDeclarationEdit(
+      styleSheetId: new StyleSheetId.fromJson(json['styleSheetId']),
+      range: new SourceRange.fromJson(json['range']),
+      text: json['text'],
+    );
+  }
 
   Map toJson() {
     Map json = {
       'styleSheetId': styleSheetId.toJson(),
       'range': range.toJson(),
-      'text': text.toString(),
+      'text': text,
     };
     return json;
   }
@@ -1054,13 +1316,20 @@ class InlineTextBox {
     @required this.startCharacterIndex,
     @required this.numCharacters,
   });
-  factory InlineTextBox.fromJson(Map json) {}
+
+  factory InlineTextBox.fromJson(Map json) {
+    return new InlineTextBox(
+      boundingBox: new dom.Rect.fromJson(json['boundingBox']),
+      startCharacterIndex: json['startCharacterIndex'],
+      numCharacters: json['numCharacters'],
+    );
+  }
 
   Map toJson() {
     Map json = {
       'boundingBox': boundingBox.toJson(),
-      'startCharacterIndex': startCharacterIndex.toString(),
-      'numCharacters': numCharacters.toString(),
+      'startCharacterIndex': startCharacterIndex,
+      'numCharacters': numCharacters,
     };
     return json;
   }

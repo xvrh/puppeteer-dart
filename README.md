@@ -1,3 +1,5 @@
-# puppeteer_dart
+# chrome_dev_tools
 
-A port of the [`puppeteer` library](https://github.com/GoogleChrome/puppeteer) in Dart.
+An API to control headless Chrome over the DevTools Protocol.
+
+Inspired by [`puppeteer`](https://github.com/GoogleChrome/puppeteer) Node library.

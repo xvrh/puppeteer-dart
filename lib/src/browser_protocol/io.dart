@@ -3,7 +3,6 @@
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../connection.dart';
-import '../runtime.dart' as runtime;
 
 class IOManager {
   final Session _client;
@@ -23,10 +22,10 @@ class IOManager {
       'handle': handle.toJson(),
     };
     if (offset != null) {
-      parameters['offset'] = offset.toString();
+      parameters['offset'] = offset;
     }
     if (size != null) {
-      parameters['size'] = size.toString();
+      parameters['size'] = size;
     }
     await _client.send('IO.read', parameters);
   }
@@ -41,24 +40,9 @@ class IOManager {
     };
     await _client.send('IO.close', parameters);
   }
-
-  /// Return UUID of Blob object specified by a remote object id.
-  /// [objectId] Object id of a Blob object wrapper.
-  /// Return: UUID of the specified Blob.
-  Future<String> resolveBlob(
-    runtime.RemoteObjectId objectId,
-  ) async {
-    Map parameters = {
-      'objectId': objectId.toJson(),
-    };
-    await _client.send('IO.resolveBlob', parameters);
-  }
 }
 
 class ReadResult {
-  /// Set if the data is base64-encoded
-  final bool base64Encoded;
-
   /// Data that were read.
   final String data;
 
@@ -66,18 +50,23 @@ class ReadResult {
   final bool eof;
 
   ReadResult({
-    this.base64Encoded,
     @required this.data,
     @required this.eof,
   });
-  factory ReadResult.fromJson(Map json) {}
+
+  factory ReadResult.fromJson(Map json) {
+    return new ReadResult(
+      data: json['data'],
+      eof: json['eof'],
+    );
+  }
 }
 
-/// This is either obtained from another method or specifed as <code>blob:&lt;uuid&gt;</code> where <code>&lt;uuid&gt</code> is an UUID of a Blob.
 class StreamHandle {
   final String value;
 
   StreamHandle(this.value);
+
   factory StreamHandle.fromJson(String value) => new StreamHandle(value);
 
   String toJson() => value;

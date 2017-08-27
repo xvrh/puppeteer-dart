@@ -12,6 +12,102 @@ class DOMManager {
 
   DOMManager(this._client);
 
+  final StreamController _documentUpdated = new StreamController.broadcast();
+
+  /// Fired when <code>Document</code> has been totally updated. Node ids are no longer valid.
+  Stream get onDocumentUpdated => _documentUpdated.stream;
+
+  final StreamController<SetChildNodesResult> _setChildNodes =
+      new StreamController<SetChildNodesResult>.broadcast();
+
+  /// Fired when backend wants to provide client with the missing DOM structure. This happens upon most of the calls requesting node ids.
+  Stream<SetChildNodesResult> get onSetChildNodes => _setChildNodes.stream;
+
+  final StreamController<AttributeModifiedResult> _attributeModified =
+      new StreamController<AttributeModifiedResult>.broadcast();
+
+  /// Fired when <code>Element</code>'s attribute is modified.
+  Stream<AttributeModifiedResult> get onAttributeModified =>
+      _attributeModified.stream;
+
+  final StreamController<AttributeRemovedResult> _attributeRemoved =
+      new StreamController<AttributeRemovedResult>.broadcast();
+
+  /// Fired when <code>Element</code>'s attribute is removed.
+  Stream<AttributeRemovedResult> get onAttributeRemoved =>
+      _attributeRemoved.stream;
+
+  final StreamController<List<NodeId>> _inlineStyleInvalidated =
+      new StreamController<List<NodeId>>.broadcast();
+
+  /// Fired when <code>Element</code>'s inline style is modified via a CSS property modification.
+  Stream<List<NodeId>> get onInlineStyleInvalidated =>
+      _inlineStyleInvalidated.stream;
+
+  final StreamController<CharacterDataModifiedResult> _characterDataModified =
+      new StreamController<CharacterDataModifiedResult>.broadcast();
+
+  /// Mirrors <code>DOMCharacterDataModified</code> event.
+  Stream<CharacterDataModifiedResult> get onCharacterDataModified =>
+      _characterDataModified.stream;
+
+  final StreamController<ChildNodeCountUpdatedResult> _childNodeCountUpdated =
+      new StreamController<ChildNodeCountUpdatedResult>.broadcast();
+
+  /// Fired when <code>Container</code>'s child node count has changed.
+  Stream<ChildNodeCountUpdatedResult> get onChildNodeCountUpdated =>
+      _childNodeCountUpdated.stream;
+
+  final StreamController<ChildNodeInsertedResult> _childNodeInserted =
+      new StreamController<ChildNodeInsertedResult>.broadcast();
+
+  /// Mirrors <code>DOMNodeInserted</code> event.
+  Stream<ChildNodeInsertedResult> get onChildNodeInserted =>
+      _childNodeInserted.stream;
+
+  final StreamController<ChildNodeRemovedResult> _childNodeRemoved =
+      new StreamController<ChildNodeRemovedResult>.broadcast();
+
+  /// Mirrors <code>DOMNodeRemoved</code> event.
+  Stream<ChildNodeRemovedResult> get onChildNodeRemoved =>
+      _childNodeRemoved.stream;
+
+  final StreamController<ShadowRootPushedResult> _shadowRootPushed =
+      new StreamController<ShadowRootPushedResult>.broadcast();
+
+  /// Called when shadow root is pushed into the element.
+  Stream<ShadowRootPushedResult> get onShadowRootPushed =>
+      _shadowRootPushed.stream;
+
+  final StreamController<ShadowRootPoppedResult> _shadowRootPopped =
+      new StreamController<ShadowRootPoppedResult>.broadcast();
+
+  /// Called when shadow root is popped from the element.
+  Stream<ShadowRootPoppedResult> get onShadowRootPopped =>
+      _shadowRootPopped.stream;
+
+  final StreamController<PseudoElementAddedResult> _pseudoElementAdded =
+      new StreamController<PseudoElementAddedResult>.broadcast();
+
+  /// Called when a pseudo element is added to an element.
+  Stream<PseudoElementAddedResult> get onPseudoElementAdded =>
+      _pseudoElementAdded.stream;
+
+  final StreamController<PseudoElementRemovedResult> _pseudoElementRemoved =
+      new StreamController<PseudoElementRemovedResult>.broadcast();
+
+  /// Called when a pseudo element is removed from an element.
+  Stream<PseudoElementRemovedResult> get onPseudoElementRemoved =>
+      _pseudoElementRemoved.stream;
+
+  final StreamController<DistributedNodesUpdatedResult>
+      _distributedNodesUpdated =
+      new StreamController<DistributedNodesUpdatedResult>.broadcast();
+
+  /// Called when distrubution is changed.
+  Stream<DistributedNodesUpdatedResult> get onDistributedNodesUpdated =>
+      _distributedNodesUpdated.stream;
+
   /// Enables DOM agent for the given page.
   Future enable() async {
     await _client.send('DOM.enable');
@@ -32,10 +128,10 @@ class DOMManager {
   }) async {
     Map parameters = {};
     if (depth != null) {
-      parameters['depth'] = depth.toString();
+      parameters['depth'] = depth;
     }
     if (pierce != null) {
-      parameters['pierce'] = pierce.toString();
+      parameters['pierce'] = pierce;
     }
     await _client.send('DOM.getDocument', parameters);
   }
@@ -50,10 +146,10 @@ class DOMManager {
   }) async {
     Map parameters = {};
     if (depth != null) {
-      parameters['depth'] = depth.toString();
+      parameters['depth'] = depth;
     }
     if (pierce != null) {
-      parameters['pierce'] = pierce.toString();
+      parameters['pierce'] = pierce;
     }
     await _client.send('DOM.getFlattenedDocument', parameters);
   }
@@ -83,10 +179,10 @@ class DOMManager {
       'nodeId': nodeId.toJson(),
     };
     if (depth != null) {
-      parameters['depth'] = depth.toString();
+      parameters['depth'] = depth;
     }
     if (pierce != null) {
-      parameters['pierce'] = pierce.toString();
+      parameters['pierce'] = pierce;
     }
     await _client.send('DOM.requestChildNodes', parameters);
   }
@@ -101,7 +197,7 @@ class DOMManager {
   ) async {
     Map parameters = {
       'nodeId': nodeId.toJson(),
-      'selector': selector.toString(),
+      'selector': selector,
     };
     await _client.send('DOM.querySelector', parameters);
   }
@@ -116,7 +212,7 @@ class DOMManager {
   ) async {
     Map parameters = {
       'nodeId': nodeId.toJson(),
-      'selector': selector.toString(),
+      'selector': selector,
     };
     await _client.send('DOM.querySelectorAll', parameters);
   }
@@ -131,7 +227,7 @@ class DOMManager {
   ) async {
     Map parameters = {
       'nodeId': nodeId.toJson(),
-      'name': name.toString(),
+      'name': name,
     };
     await _client.send('DOM.setNodeName', parameters);
   }
@@ -145,7 +241,7 @@ class DOMManager {
   ) async {
     Map parameters = {
       'nodeId': nodeId.toJson(),
-      'value': value.toString(),
+      'value': value,
     };
     await _client.send('DOM.setNodeValue', parameters);
   }
@@ -172,8 +268,8 @@ class DOMManager {
   ) async {
     Map parameters = {
       'nodeId': nodeId.toJson(),
-      'name': name.toString(),
-      'value': value.toString(),
+      'name': name,
+      'value': value,
     };
     await _client.send('DOM.setAttributeValue', parameters);
   }
@@ -189,10 +285,10 @@ class DOMManager {
   }) async {
     Map parameters = {
       'nodeId': nodeId.toJson(),
-      'text': text.toString(),
+      'text': text,
     };
     if (name != null) {
-      parameters['name'] = name.toString();
+      parameters['name'] = name;
     }
     await _client.send('DOM.setAttributesAsText', parameters);
   }
@@ -206,31 +302,20 @@ class DOMManager {
   ) async {
     Map parameters = {
       'nodeId': nodeId.toJson(),
-      'name': name.toString(),
+      'name': name,
     };
     await _client.send('DOM.removeAttribute', parameters);
   }
 
   /// Returns node's HTML markup.
-  /// [nodeId] Identifier of the node.
-  /// [backendNodeId] Identifier of the backend node.
-  /// [objectId] JavaScript object id of the node wrapper.
+  /// [nodeId] Id of the node to get markup for.
   /// Return: Outer HTML markup.
-  Future<String> getOuterHTML({
+  Future<String> getOuterHTML(
     NodeId nodeId,
-    BackendNodeId backendNodeId,
-    runtime.RemoteObjectId objectId,
-  }) async {
-    Map parameters = {};
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
+  ) async {
+    Map parameters = {
+      'nodeId': nodeId.toJson(),
+    };
     await _client.send('DOM.getOuterHTML', parameters);
   }
 
@@ -243,7 +328,7 @@ class DOMManager {
   ) async {
     Map parameters = {
       'nodeId': nodeId.toJson(),
-      'outerHTML': outerHTML.toString(),
+      'outerHTML': outerHTML,
     };
     await _client.send('DOM.setOuterHTML', parameters);
   }
@@ -256,11 +341,10 @@ class DOMManager {
     bool includeUserAgentShadowDOM,
   }) async {
     Map parameters = {
-      'query': query.toString(),
+      'query': query,
     };
     if (includeUserAgentShadowDOM != null) {
-      parameters['includeUserAgentShadowDOM'] =
-          includeUserAgentShadowDOM.toString();
+      parameters['includeUserAgentShadowDOM'] = includeUserAgentShadowDOM;
     }
     await _client.send('DOM.performSearch', parameters);
   }
@@ -276,9 +360,9 @@ class DOMManager {
     int toIndex,
   ) async {
     Map parameters = {
-      'searchId': searchId.toString(),
-      'fromIndex': fromIndex.toString(),
-      'toIndex': toIndex.toString(),
+      'searchId': searchId,
+      'fromIndex': fromIndex,
+      'toIndex': toIndex,
     };
     await _client.send('DOM.getSearchResults', parameters);
   }
@@ -289,7 +373,7 @@ class DOMManager {
     String searchId,
   ) async {
     Map parameters = {
-      'searchId': searchId.toString(),
+      'searchId': searchId,
     };
     await _client.send('DOM.discardSearchResults', parameters);
   }
@@ -328,7 +412,7 @@ class DOMManager {
     String path,
   ) async {
     Map parameters = {
-      'path': path.toString(),
+      'path': path,
     };
     await _client.send('DOM.pushNodeByPathToFrontend', parameters);
   }
@@ -374,7 +458,7 @@ class DOMManager {
       parameters['backendNodeId'] = backendNodeId.toJson();
     }
     if (objectGroup != null) {
-      parameters['objectGroup'] = objectGroup.toString();
+      parameters['objectGroup'] = objectGroup;
     }
     await _client.send('DOM.resolveNode', parameters);
   }
@@ -480,7 +564,7 @@ class DOMManager {
     runtime.RemoteObjectId objectId,
   }) async {
     Map parameters = {
-      'files': files.map((e) => e.toString()).toList(),
+      'files': files.map((e) => e).toList(),
     };
     if (nodeId != null) {
       parameters['nodeId'] = nodeId.toJson();
@@ -528,12 +612,11 @@ class DOMManager {
     bool includeUserAgentShadowDOM,
   }) async {
     Map parameters = {
-      'x': x.toString(),
-      'y': y.toString(),
+      'x': x,
+      'y': y,
     };
     if (includeUserAgentShadowDOM != null) {
-      parameters['includeUserAgentShadowDOM'] =
-          includeUserAgentShadowDOM.toString();
+      parameters['includeUserAgentShadowDOM'] = includeUserAgentShadowDOM;
     }
     await _client.send('DOM.getNodeForLocation', parameters);
   }
@@ -549,38 +632,257 @@ class DOMManager {
     };
     await _client.send('DOM.getRelayoutBoundary', parameters);
   }
+}
 
-  /// Describes node given its id, does not require domain to be enabled. Does not start tracking any objects, can be used for automation.
-  /// [nodeId] Identifier of the node.
-  /// [backendNodeId] Identifier of the backend node.
-  /// [objectId] JavaScript object id of the node wrapper.
-  /// [depth] The maximum depth at which children should be retrieved, defaults to 1. Use -1 for the entire subtree or provide an integer larger than 0.
-  /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the subtree (default is false).
-  /// Return: Node description.
-  Future<Node> describeNode({
-    NodeId nodeId,
-    BackendNodeId backendNodeId,
-    runtime.RemoteObjectId objectId,
-    int depth,
-    bool pierce,
-  }) async {
-    Map parameters = {};
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
-    if (depth != null) {
-      parameters['depth'] = depth.toString();
-    }
-    if (pierce != null) {
-      parameters['pierce'] = pierce.toString();
-    }
-    await _client.send('DOM.describeNode', parameters);
+class SetChildNodesResult {
+  /// Parent node id to populate with children.
+  final NodeId parentId;
+
+  /// Child nodes array.
+  final List<Node> nodes;
+
+  SetChildNodesResult({
+    @required this.parentId,
+    @required this.nodes,
+  });
+
+  factory SetChildNodesResult.fromJson(Map json) {
+    return new SetChildNodesResult(
+      parentId: new NodeId.fromJson(json['parentId']),
+      nodes: (json['nodes'] as List).map((e) => new Node.fromJson(e)).toList(),
+    );
+  }
+}
+
+class AttributeModifiedResult {
+  /// Id of the node that has changed.
+  final NodeId nodeId;
+
+  /// Attribute name.
+  final String name;
+
+  /// Attribute value.
+  final String value;
+
+  AttributeModifiedResult({
+    @required this.nodeId,
+    @required this.name,
+    @required this.value,
+  });
+
+  factory AttributeModifiedResult.fromJson(Map json) {
+    return new AttributeModifiedResult(
+      nodeId: new NodeId.fromJson(json['nodeId']),
+      name: json['name'],
+      value: json['value'],
+    );
+  }
+}
+
+class AttributeRemovedResult {
+  /// Id of the node that has changed.
+  final NodeId nodeId;
+
+  /// A ttribute name.
+  final String name;
+
+  AttributeRemovedResult({
+    @required this.nodeId,
+    @required this.name,
+  });
+
+  factory AttributeRemovedResult.fromJson(Map json) {
+    return new AttributeRemovedResult(
+      nodeId: new NodeId.fromJson(json['nodeId']),
+      name: json['name'],
+    );
+  }
+}
+
+class CharacterDataModifiedResult {
+  /// Id of the node that has changed.
+  final NodeId nodeId;
+
+  /// New text value.
+  final String characterData;
+
+  CharacterDataModifiedResult({
+    @required this.nodeId,
+    @required this.characterData,
+  });
+
+  factory CharacterDataModifiedResult.fromJson(Map json) {
+    return new CharacterDataModifiedResult(
+      nodeId: new NodeId.fromJson(json['nodeId']),
+      characterData: json['characterData'],
+    );
+  }
+}
+
+class ChildNodeCountUpdatedResult {
+  /// Id of the node that has changed.
+  final NodeId nodeId;
+
+  /// New node count.
+  final int childNodeCount;
+
+  ChildNodeCountUpdatedResult({
+    @required this.nodeId,
+    @required this.childNodeCount,
+  });
+
+  factory ChildNodeCountUpdatedResult.fromJson(Map json) {
+    return new ChildNodeCountUpdatedResult(
+      nodeId: new NodeId.fromJson(json['nodeId']),
+      childNodeCount: json['childNodeCount'],
+    );
+  }
+}
+
+class ChildNodeInsertedResult {
+  /// Id of the node that has changed.
+  final NodeId parentNodeId;
+
+  /// If of the previous siblint.
+  final NodeId previousNodeId;
+
+  /// Inserted node data.
+  final Node node;
+
+  ChildNodeInsertedResult({
+    @required this.parentNodeId,
+    @required this.previousNodeId,
+    @required this.node,
+  });
+
+  factory ChildNodeInsertedResult.fromJson(Map json) {
+    return new ChildNodeInsertedResult(
+      parentNodeId: new NodeId.fromJson(json['parentNodeId']),
+      previousNodeId: new NodeId.fromJson(json['previousNodeId']),
+      node: new Node.fromJson(json['node']),
+    );
+  }
+}
+
+class ChildNodeRemovedResult {
+  /// Parent id.
+  final NodeId parentNodeId;
+
+  /// Id of the node that has been removed.
+  final NodeId nodeId;
+
+  ChildNodeRemovedResult({
+    @required this.parentNodeId,
+    @required this.nodeId,
+  });
+
+  factory ChildNodeRemovedResult.fromJson(Map json) {
+    return new ChildNodeRemovedResult(
+      parentNodeId: new NodeId.fromJson(json['parentNodeId']),
+      nodeId: new NodeId.fromJson(json['nodeId']),
+    );
+  }
+}
+
+class ShadowRootPushedResult {
+  /// Host element id.
+  final NodeId hostId;
+
+  /// Shadow root.
+  final Node root;
+
+  ShadowRootPushedResult({
+    @required this.hostId,
+    @required this.root,
+  });
+
+  factory ShadowRootPushedResult.fromJson(Map json) {
+    return new ShadowRootPushedResult(
+      hostId: new NodeId.fromJson(json['hostId']),
+      root: new Node.fromJson(json['root']),
+    );
+  }
+}
+
+class ShadowRootPoppedResult {
+  /// Host element id.
+  final NodeId hostId;
+
+  /// Shadow root id.
+  final NodeId rootId;
+
+  ShadowRootPoppedResult({
+    @required this.hostId,
+    @required this.rootId,
+  });
+
+  factory ShadowRootPoppedResult.fromJson(Map json) {
+    return new ShadowRootPoppedResult(
+      hostId: new NodeId.fromJson(json['hostId']),
+      rootId: new NodeId.fromJson(json['rootId']),
+    );
+  }
+}
+
+class PseudoElementAddedResult {
+  /// Pseudo element's parent element id.
+  final NodeId parentId;
+
+  /// The added pseudo element.
+  final Node pseudoElement;
+
+  PseudoElementAddedResult({
+    @required this.parentId,
+    @required this.pseudoElement,
+  });
+
+  factory PseudoElementAddedResult.fromJson(Map json) {
+    return new PseudoElementAddedResult(
+      parentId: new NodeId.fromJson(json['parentId']),
+      pseudoElement: new Node.fromJson(json['pseudoElement']),
+    );
+  }
+}
+
+class PseudoElementRemovedResult {
+  /// Pseudo element's parent element id.
+  final NodeId parentId;
+
+  /// The removed pseudo element id.
+  final NodeId pseudoElementId;
+
+  PseudoElementRemovedResult({
+    @required this.parentId,
+    @required this.pseudoElementId,
+  });
+
+  factory PseudoElementRemovedResult.fromJson(Map json) {
+    return new PseudoElementRemovedResult(
+      parentId: new NodeId.fromJson(json['parentId']),
+      pseudoElementId: new NodeId.fromJson(json['pseudoElementId']),
+    );
+  }
+}
+
+class DistributedNodesUpdatedResult {
+  /// Insertion point where distrubuted nodes were updated.
+  final NodeId insertionPointId;
+
+  /// Distributed nodes for given insertion point.
+  final List<BackendNode> distributedNodes;
+
+  DistributedNodesUpdatedResult({
+    @required this.insertionPointId,
+    @required this.distributedNodes,
+  });
+
+  factory DistributedNodesUpdatedResult.fromJson(Map json) {
+    return new DistributedNodesUpdatedResult(
+      insertionPointId: new NodeId.fromJson(json['insertionPointId']),
+      distributedNodes: (json['distributedNodes'] as List)
+          .map((e) => new BackendNode.fromJson(e))
+          .toList(),
+    );
   }
 }
 
@@ -595,7 +897,13 @@ class PerformSearchResult {
     @required this.searchId,
     @required this.resultCount,
   });
-  factory PerformSearchResult.fromJson(Map json) {}
+
+  factory PerformSearchResult.fromJson(Map json) {
+    return new PerformSearchResult(
+      searchId: json['searchId'],
+      resultCount: json['resultCount'],
+    );
+  }
 }
 
 /// Unique DOM node identifier.
@@ -603,6 +911,7 @@ class NodeId {
   final int value;
 
   NodeId(this.value);
+
   factory NodeId.fromJson(int value) => new NodeId(value);
 
   int toJson() => value;
@@ -613,6 +922,7 @@ class BackendNodeId {
   final int value;
 
   BackendNodeId(this.value);
+
   factory BackendNodeId.fromJson(int value) => new BackendNodeId(value);
 
   int toJson() => value;
@@ -633,12 +943,19 @@ class BackendNode {
     @required this.nodeName,
     @required this.backendNodeId,
   });
-  factory BackendNode.fromJson(Map json) {}
+
+  factory BackendNode.fromJson(Map json) {
+    return new BackendNode(
+      nodeType: json['nodeType'],
+      nodeName: json['nodeName'],
+      backendNodeId: new BackendNodeId.fromJson(json['backendNodeId']),
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'nodeType': nodeType.toString(),
-      'nodeName': nodeName.toString(),
+      'nodeType': nodeType,
+      'nodeName': nodeName,
       'backendNodeId': backendNodeId.toJson(),
     };
     return json;
@@ -669,11 +986,29 @@ class PseudoType {
   static const PseudoType resizer = const PseudoType._('resizer');
   static const PseudoType inputListButton =
       const PseudoType._('input-list-button');
+  static const values = const {
+    'first-line': firstLine,
+    'first-letter': firstLetter,
+    'before': before,
+    'after': after,
+    'backdrop': backdrop,
+    'selection': selection,
+    'first-line-inherited': firstLineInherited,
+    'scrollbar': scrollbar,
+    'scrollbar-thumb': scrollbarThumb,
+    'scrollbar-button': scrollbarButton,
+    'scrollbar-track': scrollbarTrack,
+    'scrollbar-track-piece': scrollbarTrackPiece,
+    'scrollbar-corner': scrollbarCorner,
+    'resizer': resizer,
+    'input-list-button': inputListButton,
+  };
 
   final String value;
 
   const PseudoType._(this.value);
-  factory PseudoType.fromJson(String value) => const {}[value];
+
+  factory PseudoType.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -683,11 +1018,17 @@ class ShadowRootType {
   static const ShadowRootType userAgent = const ShadowRootType._('user-agent');
   static const ShadowRootType open = const ShadowRootType._('open');
   static const ShadowRootType closed = const ShadowRootType._('closed');
+  static const values = const {
+    'user-agent': userAgent,
+    'open': open,
+    'closed': closed,
+  };
 
   final String value;
 
   const ShadowRootType._(this.value);
-  factory ShadowRootType.fromJson(String value) => const {}[value];
+
+  factory ShadowRootType.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -808,52 +1149,116 @@ class Node {
     this.distributedNodes,
     this.isSVG,
   });
-  factory Node.fromJson(Map json) {}
+
+  factory Node.fromJson(Map json) {
+    return new Node(
+      nodeId: new NodeId.fromJson(json['nodeId']),
+      parentId: json.containsKey('parentId')
+          ? new NodeId.fromJson(json['parentId'])
+          : null,
+      backendNodeId: new BackendNodeId.fromJson(json['backendNodeId']),
+      nodeType: json['nodeType'],
+      nodeName: json['nodeName'],
+      localName: json['localName'],
+      nodeValue: json['nodeValue'],
+      childNodeCount:
+          json.containsKey('childNodeCount') ? json['childNodeCount'] : null,
+      children: json.containsKey('children')
+          ? (json['children'] as List).map((e) => new Node.fromJson(e)).toList()
+          : null,
+      attributes: json.containsKey('attributes')
+          ? (json['attributes'] as List).map((e) => e as String).toList()
+          : null,
+      documentURL: json.containsKey('documentURL') ? json['documentURL'] : null,
+      baseURL: json.containsKey('baseURL') ? json['baseURL'] : null,
+      publicId: json.containsKey('publicId') ? json['publicId'] : null,
+      systemId: json.containsKey('systemId') ? json['systemId'] : null,
+      internalSubset:
+          json.containsKey('internalSubset') ? json['internalSubset'] : null,
+      xmlVersion: json.containsKey('xmlVersion') ? json['xmlVersion'] : null,
+      name: json.containsKey('name') ? json['name'] : null,
+      value: json.containsKey('value') ? json['value'] : null,
+      pseudoType: json.containsKey('pseudoType')
+          ? new PseudoType.fromJson(json['pseudoType'])
+          : null,
+      shadowRootType: json.containsKey('shadowRootType')
+          ? new ShadowRootType.fromJson(json['shadowRootType'])
+          : null,
+      frameId: json.containsKey('frameId')
+          ? new page.FrameId.fromJson(json['frameId'])
+          : null,
+      contentDocument: json.containsKey('contentDocument')
+          ? new Node.fromJson(json['contentDocument'])
+          : null,
+      shadowRoots: json.containsKey('shadowRoots')
+          ? (json['shadowRoots'] as List)
+              .map((e) => new Node.fromJson(e))
+              .toList()
+          : null,
+      templateContent: json.containsKey('templateContent')
+          ? new Node.fromJson(json['templateContent'])
+          : null,
+      pseudoElements: json.containsKey('pseudoElements')
+          ? (json['pseudoElements'] as List)
+              .map((e) => new Node.fromJson(e))
+              .toList()
+          : null,
+      importedDocument: json.containsKey('importedDocument')
+          ? new Node.fromJson(json['importedDocument'])
+          : null,
+      distributedNodes: json.containsKey('distributedNodes')
+          ? (json['distributedNodes'] as List)
+              .map((e) => new BackendNode.fromJson(e))
+              .toList()
+          : null,
+      isSVG: json.containsKey('isSVG') ? json['isSVG'] : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
       'nodeId': nodeId.toJson(),
       'backendNodeId': backendNodeId.toJson(),
-      'nodeType': nodeType.toString(),
-      'nodeName': nodeName.toString(),
-      'localName': localName.toString(),
-      'nodeValue': nodeValue.toString(),
+      'nodeType': nodeType,
+      'nodeName': nodeName,
+      'localName': localName,
+      'nodeValue': nodeValue,
     };
     if (parentId != null) {
       json['parentId'] = parentId.toJson();
     }
     if (childNodeCount != null) {
-      json['childNodeCount'] = childNodeCount.toString();
+      json['childNodeCount'] = childNodeCount;
     }
     if (children != null) {
       json['children'] = children.map((e) => e.toJson()).toList();
     }
     if (attributes != null) {
-      json['attributes'] = attributes.map((e) => e.toString()).toList();
+      json['attributes'] = attributes.map((e) => e).toList();
     }
     if (documentURL != null) {
-      json['documentURL'] = documentURL.toString();
+      json['documentURL'] = documentURL;
     }
     if (baseURL != null) {
-      json['baseURL'] = baseURL.toString();
+      json['baseURL'] = baseURL;
     }
     if (publicId != null) {
-      json['publicId'] = publicId.toString();
+      json['publicId'] = publicId;
     }
     if (systemId != null) {
-      json['systemId'] = systemId.toString();
+      json['systemId'] = systemId;
     }
     if (internalSubset != null) {
-      json['internalSubset'] = internalSubset.toString();
+      json['internalSubset'] = internalSubset;
     }
     if (xmlVersion != null) {
-      json['xmlVersion'] = xmlVersion.toString();
+      json['xmlVersion'] = xmlVersion;
     }
     if (name != null) {
-      json['name'] = name.toString();
+      json['name'] = name;
     }
     if (value != null) {
-      json['value'] = value.toString();
+      json['value'] = value;
     }
     if (pseudoType != null) {
       json['pseudoType'] = pseudoType.toJson();
@@ -884,7 +1289,7 @@ class Node {
           distributedNodes.map((e) => e.toJson()).toList();
     }
     if (isSVG != null) {
-      json['isSVG'] = isSVG.toString();
+      json['isSVG'] = isSVG;
     }
     return json;
   }
@@ -910,16 +1315,24 @@ class RGBA {
     @required this.b,
     this.a,
   });
-  factory RGBA.fromJson(Map json) {}
+
+  factory RGBA.fromJson(Map json) {
+    return new RGBA(
+      r: json['r'],
+      g: json['g'],
+      b: json['b'],
+      a: json.containsKey('a') ? json['a'] : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'r': r.toString(),
-      'g': g.toString(),
-      'b': b.toString(),
+      'r': r,
+      'g': g,
+      'b': b,
     };
     if (a != null) {
-      json['a'] = a.toString();
+      json['a'] = a;
     }
     return json;
   }
@@ -930,6 +1343,7 @@ class Quad {
   final List<num> value;
 
   Quad(this.value);
+
   factory Quad.fromJson(List<num> value) => new Quad(value);
 
   List<num> toJson() => value;
@@ -967,7 +1381,20 @@ class BoxModel {
     @required this.height,
     this.shapeOutside,
   });
-  factory BoxModel.fromJson(Map json) {}
+
+  factory BoxModel.fromJson(Map json) {
+    return new BoxModel(
+      content: new Quad.fromJson(json['content']),
+      padding: new Quad.fromJson(json['padding']),
+      border: new Quad.fromJson(json['border']),
+      margin: new Quad.fromJson(json['margin']),
+      width: json['width'],
+      height: json['height'],
+      shapeOutside: json.containsKey('shapeOutside')
+          ? new ShapeOutsideInfo.fromJson(json['shapeOutside'])
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
@@ -975,8 +1402,8 @@ class BoxModel {
       'padding': padding.toJson(),
       'border': border.toJson(),
       'margin': margin.toJson(),
-      'width': width.toString(),
-      'height': height.toString(),
+      'width': width,
+      'height': height,
     };
     if (shapeOutside != null) {
       json['shapeOutside'] = shapeOutside.toJson();
@@ -1001,7 +1428,15 @@ class ShapeOutsideInfo {
     @required this.shape,
     @required this.marginShape,
   });
-  factory ShapeOutsideInfo.fromJson(Map json) {}
+
+  factory ShapeOutsideInfo.fromJson(Map json) {
+    return new ShapeOutsideInfo(
+      bounds: new Quad.fromJson(json['bounds']),
+      shape: (json['shape'] as List).map((e) => e as dynamic).toList(),
+      marginShape:
+          (json['marginShape'] as List).map((e) => e as dynamic).toList(),
+    );
+  }
 
   Map toJson() {
     Map json = {
@@ -1033,14 +1468,22 @@ class Rect {
     @required this.width,
     @required this.height,
   });
-  factory Rect.fromJson(Map json) {}
+
+  factory Rect.fromJson(Map json) {
+    return new Rect(
+      x: json['x'],
+      y: json['y'],
+      width: json['width'],
+      height: json['height'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'x': x.toString(),
-      'y': y.toString(),
-      'width': width.toString(),
-      'height': height.toString(),
+      'x': x,
+      'y': y,
+      'width': width,
+      'height': height,
     };
     return json;
   }

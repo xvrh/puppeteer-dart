@@ -8,6 +8,19 @@ class ApplicationCacheManager {
 
   ApplicationCacheManager(this._client);
 
+  final StreamController<ApplicationCacheStatusUpdatedResult>
+      _applicationCacheStatusUpdated =
+      new StreamController<ApplicationCacheStatusUpdatedResult>.broadcast();
+
+  Stream<ApplicationCacheStatusUpdatedResult>
+      get onApplicationCacheStatusUpdated =>
+          _applicationCacheStatusUpdated.stream;
+
+  final StreamController<bool> _networkStateUpdated =
+      new StreamController<bool>.broadcast();
+
+  Stream<bool> get onNetworkStateUpdated => _networkStateUpdated.stream;
+
   /// Returns array of frame identifiers with manifest urls for each frame containing a document associated with some application cache.
   /// Return: Array of frame identifiers with manifest urls for each frame containing a document associated with some application cache.
   Future<List<FrameWithManifest>> getFramesWithManifests() async {
@@ -45,6 +58,31 @@ class ApplicationCacheManager {
   }
 }
 
+class ApplicationCacheStatusUpdatedResult {
+  /// Identifier of the frame containing document whose application cache updated status.
+  final page.FrameId frameId;
+
+  /// Manifest URL.
+  final String manifestURL;
+
+  /// Updated application cache status.
+  final int status;
+
+  ApplicationCacheStatusUpdatedResult({
+    @required this.frameId,
+    @required this.manifestURL,
+    @required this.status,
+  });
+
+  factory ApplicationCacheStatusUpdatedResult.fromJson(Map json) {
+    return new ApplicationCacheStatusUpdatedResult(
+      frameId: new page.FrameId.fromJson(json['frameId']),
+      manifestURL: json['manifestURL'],
+      status: json['status'],
+    );
+  }
+}
+
 /// Detailed application cache resource information.
 class ApplicationCacheResource {
   /// Resource url.
@@ -61,13 +99,20 @@ class ApplicationCacheResource {
     @required this.size,
     @required this.type,
   });
-  factory ApplicationCacheResource.fromJson(Map json) {}
+
+  factory ApplicationCacheResource.fromJson(Map json) {
+    return new ApplicationCacheResource(
+      url: json['url'],
+      size: json['size'],
+      type: json['type'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'url': url.toString(),
-      'size': size.toString(),
-      'type': type.toString(),
+      'url': url,
+      'size': size,
+      'type': type,
     };
     return json;
   }
@@ -97,14 +142,25 @@ class ApplicationCache {
     @required this.updateTime,
     @required this.resources,
   });
-  factory ApplicationCache.fromJson(Map json) {}
+
+  factory ApplicationCache.fromJson(Map json) {
+    return new ApplicationCache(
+      manifestURL: json['manifestURL'],
+      size: json['size'],
+      creationTime: json['creationTime'],
+      updateTime: json['updateTime'],
+      resources: (json['resources'] as List)
+          .map((e) => new ApplicationCacheResource.fromJson(e))
+          .toList(),
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'manifestURL': manifestURL.toString(),
-      'size': size.toString(),
-      'creationTime': creationTime.toString(),
-      'updateTime': updateTime.toString(),
+      'manifestURL': manifestURL,
+      'size': size,
+      'creationTime': creationTime,
+      'updateTime': updateTime,
       'resources': resources.map((e) => e.toJson()).toList(),
     };
     return json;
@@ -127,13 +183,20 @@ class FrameWithManifest {
     @required this.manifestURL,
     @required this.status,
   });
-  factory FrameWithManifest.fromJson(Map json) {}
+
+  factory FrameWithManifest.fromJson(Map json) {
+    return new FrameWithManifest(
+      frameId: new page.FrameId.fromJson(json['frameId']),
+      manifestURL: json['manifestURL'],
+      status: json['status'],
+    );
+  }
 
   Map toJson() {
     Map json = {
       'frameId': frameId.toJson(),
-      'manifestURL': manifestURL.toString(),
-      'status': status.toString(),
+      'manifestURL': manifestURL,
+      'status': status,
     };
     return json;
   }

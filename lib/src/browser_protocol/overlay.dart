@@ -12,6 +12,20 @@ class OverlayManager {
 
   OverlayManager(this._client);
 
+  final StreamController<dom.NodeId> _nodeHighlightRequested =
+      new StreamController<dom.NodeId>.broadcast();
+
+  /// Fired when the node should be highlighted. This happens after call to <code>setInspectMode</code>.
+  Stream<dom.NodeId> get onNodeHighlightRequested =>
+      _nodeHighlightRequested.stream;
+
+  final StreamController<dom.BackendNodeId> _inspectNodeRequested =
+      new StreamController<dom.BackendNodeId>.broadcast();
+
+  /// Fired when the node should be inspected. This happens after call to <code>setInspectMode</code> or when user manually inspects an element.
+  Stream<dom.BackendNodeId> get onInspectNodeRequested =>
+      _inspectNodeRequested.stream;
+
   /// Enables domain notifications.
   Future enable() async {
     await _client.send('Overlay.enable');
@@ -28,7 +42,7 @@ class OverlayManager {
     bool result,
   ) async {
     Map parameters = {
-      'result': result.toString(),
+      'result': result,
     };
     await _client.send('Overlay.setShowPaintRects', parameters);
   }
@@ -39,7 +53,7 @@ class OverlayManager {
     bool show,
   ) async {
     Map parameters = {
-      'show': show.toString(),
+      'show': show,
     };
     await _client.send('Overlay.setShowDebugBorders', parameters);
   }
@@ -50,7 +64,7 @@ class OverlayManager {
     bool show,
   ) async {
     Map parameters = {
-      'show': show.toString(),
+      'show': show,
     };
     await _client.send('Overlay.setShowFPSCounter', parameters);
   }
@@ -61,7 +75,7 @@ class OverlayManager {
     bool show,
   ) async {
     Map parameters = {
-      'show': show.toString(),
+      'show': show,
     };
     await _client.send('Overlay.setShowScrollBottleneckRects', parameters);
   }
@@ -72,7 +86,7 @@ class OverlayManager {
     bool show,
   ) async {
     Map parameters = {
-      'show': show.toString(),
+      'show': show,
     };
     await _client.send('Overlay.setShowViewportSizeOnResize', parameters);
   }
@@ -83,7 +97,7 @@ class OverlayManager {
   }) async {
     Map parameters = {};
     if (message != null) {
-      parameters['message'] = message.toString();
+      parameters['message'] = message;
     }
     await _client.send('Overlay.setPausedInDebuggerMessage', parameters);
   }
@@ -93,7 +107,7 @@ class OverlayManager {
     bool suspended,
   ) async {
     Map parameters = {
-      'suspended': suspended.toString(),
+      'suspended': suspended,
     };
     await _client.send('Overlay.setSuspended', parameters);
   }
@@ -130,10 +144,10 @@ class OverlayManager {
     dom.RGBA outlineColor,
   }) async {
     Map parameters = {
-      'x': x.toString(),
-      'y': y.toString(),
-      'width': width.toString(),
-      'height': height.toString(),
+      'x': x,
+      'y': y,
+      'width': width,
+      'height': height,
     };
     if (color != null) {
       parameters['color'] = color.toJson();
@@ -267,9 +281,6 @@ class HighlightConfig {
   /// Selectors to highlight relevant nodes.
   final String selectorList;
 
-  /// The grid layout color (default: transparent).
-  final dom.RGBA cssGridColor;
-
   HighlightConfig({
     this.showInfo,
     this.showRulers,
@@ -283,23 +294,57 @@ class HighlightConfig {
     this.shapeColor,
     this.shapeMarginColor,
     this.selectorList,
-    this.cssGridColor,
   });
-  factory HighlightConfig.fromJson(Map json) {}
+
+  factory HighlightConfig.fromJson(Map json) {
+    return new HighlightConfig(
+      showInfo: json.containsKey('showInfo') ? json['showInfo'] : null,
+      showRulers: json.containsKey('showRulers') ? json['showRulers'] : null,
+      showExtensionLines: json.containsKey('showExtensionLines')
+          ? json['showExtensionLines']
+          : null,
+      displayAsMaterial: json.containsKey('displayAsMaterial')
+          ? json['displayAsMaterial']
+          : null,
+      contentColor: json.containsKey('contentColor')
+          ? new dom.RGBA.fromJson(json['contentColor'])
+          : null,
+      paddingColor: json.containsKey('paddingColor')
+          ? new dom.RGBA.fromJson(json['paddingColor'])
+          : null,
+      borderColor: json.containsKey('borderColor')
+          ? new dom.RGBA.fromJson(json['borderColor'])
+          : null,
+      marginColor: json.containsKey('marginColor')
+          ? new dom.RGBA.fromJson(json['marginColor'])
+          : null,
+      eventTargetColor: json.containsKey('eventTargetColor')
+          ? new dom.RGBA.fromJson(json['eventTargetColor'])
+          : null,
+      shapeColor: json.containsKey('shapeColor')
+          ? new dom.RGBA.fromJson(json['shapeColor'])
+          : null,
+      shapeMarginColor: json.containsKey('shapeMarginColor')
+          ? new dom.RGBA.fromJson(json['shapeMarginColor'])
+          : null,
+      selectorList:
+          json.containsKey('selectorList') ? json['selectorList'] : null,
+    );
+  }
 
   Map toJson() {
     Map json = {};
     if (showInfo != null) {
-      json['showInfo'] = showInfo.toString();
+      json['showInfo'] = showInfo;
     }
     if (showRulers != null) {
-      json['showRulers'] = showRulers.toString();
+      json['showRulers'] = showRulers;
     }
     if (showExtensionLines != null) {
-      json['showExtensionLines'] = showExtensionLines.toString();
+      json['showExtensionLines'] = showExtensionLines;
     }
     if (displayAsMaterial != null) {
-      json['displayAsMaterial'] = displayAsMaterial.toString();
+      json['displayAsMaterial'] = displayAsMaterial;
     }
     if (contentColor != null) {
       json['contentColor'] = contentColor.toJson();
@@ -323,10 +368,7 @@ class HighlightConfig {
       json['shapeMarginColor'] = shapeMarginColor.toJson();
     }
     if (selectorList != null) {
-      json['selectorList'] = selectorList.toString();
-    }
-    if (cssGridColor != null) {
-      json['cssGridColor'] = cssGridColor.toJson();
+      json['selectorList'] = selectorList;
     }
     return json;
   }
@@ -337,11 +379,17 @@ class InspectMode {
   static const InspectMode searchForUAShadowDOM =
       const InspectMode._('searchForUAShadowDOM');
   static const InspectMode none = const InspectMode._('none');
+  static const values = const {
+    'searchForNode': searchForNode,
+    'searchForUAShadowDOM': searchForUAShadowDOM,
+    'none': none,
+  };
 
   final String value;
 
   const InspectMode._(this.value);
-  factory InspectMode.fromJson(String value) => const {}[value];
+
+  factory InspectMode.fromJson(String value) => values[value];
 
   String toJson() => value;
 }

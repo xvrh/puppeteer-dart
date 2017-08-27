@@ -47,10 +47,10 @@ class DOMDebuggerManager {
     String targetName,
   }) async {
     Map parameters = {
-      'eventName': eventName.toString(),
+      'eventName': eventName,
     };
     if (targetName != null) {
-      parameters['targetName'] = targetName.toString();
+      parameters['targetName'] = targetName;
     }
     await _client.send('DOMDebugger.setEventListenerBreakpoint', parameters);
   }
@@ -63,10 +63,10 @@ class DOMDebuggerManager {
     String targetName,
   }) async {
     Map parameters = {
-      'eventName': eventName.toString(),
+      'eventName': eventName,
     };
     if (targetName != null) {
-      parameters['targetName'] = targetName.toString();
+      parameters['targetName'] = targetName;
     }
     await _client.send('DOMDebugger.removeEventListenerBreakpoint', parameters);
   }
@@ -77,7 +77,7 @@ class DOMDebuggerManager {
     String eventName,
   ) async {
     Map parameters = {
-      'eventName': eventName.toString(),
+      'eventName': eventName,
     };
     await _client.send('DOMDebugger.setInstrumentationBreakpoint', parameters);
   }
@@ -88,7 +88,7 @@ class DOMDebuggerManager {
     String eventName,
   ) async {
     Map parameters = {
-      'eventName': eventName.toString(),
+      'eventName': eventName,
     };
     await _client.send(
         'DOMDebugger.removeInstrumentationBreakpoint', parameters);
@@ -100,7 +100,7 @@ class DOMDebuggerManager {
     String url,
   ) async {
     Map parameters = {
-      'url': url.toString(),
+      'url': url,
     };
     await _client.send('DOMDebugger.setXHRBreakpoint', parameters);
   }
@@ -111,7 +111,7 @@ class DOMDebuggerManager {
     String url,
   ) async {
     Map parameters = {
-      'url': url.toString(),
+      'url': url,
     };
     await _client.send('DOMDebugger.removeXHRBreakpoint', parameters);
   }
@@ -130,10 +130,10 @@ class DOMDebuggerManager {
       'objectId': objectId.toJson(),
     };
     if (depth != null) {
-      parameters['depth'] = depth.toString();
+      parameters['depth'] = depth;
     }
     if (pierce != null) {
-      parameters['pierce'] = pierce.toString();
+      parameters['pierce'] = pierce;
     }
     await _client.send('DOMDebugger.getEventListeners', parameters);
   }
@@ -147,11 +147,17 @@ class DOMBreakpointType {
       const DOMBreakpointType._('attribute-modified');
   static const DOMBreakpointType nodeRemoved =
       const DOMBreakpointType._('node-removed');
+  static const values = const {
+    'subtree-modified': subtreeModified,
+    'attribute-modified': attributeModified,
+    'node-removed': nodeRemoved,
+  };
 
   final String value;
 
   const DOMBreakpointType._(this.value);
-  factory DOMBreakpointType.fromJson(String value) => const {}[value];
+
+  factory DOMBreakpointType.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -200,17 +206,37 @@ class EventListener {
     this.originalHandler,
     this.backendNodeId,
   });
-  factory EventListener.fromJson(Map json) {}
+
+  factory EventListener.fromJson(Map json) {
+    return new EventListener(
+      type: json['type'],
+      useCapture: json['useCapture'],
+      passive: json['passive'],
+      once: json['once'],
+      scriptId: new runtime.ScriptId.fromJson(json['scriptId']),
+      lineNumber: json['lineNumber'],
+      columnNumber: json['columnNumber'],
+      handler: json.containsKey('handler')
+          ? new runtime.RemoteObject.fromJson(json['handler'])
+          : null,
+      originalHandler: json.containsKey('originalHandler')
+          ? new runtime.RemoteObject.fromJson(json['originalHandler'])
+          : null,
+      backendNodeId: json.containsKey('backendNodeId')
+          ? new dom.BackendNodeId.fromJson(json['backendNodeId'])
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'type': type.toString(),
-      'useCapture': useCapture.toString(),
-      'passive': passive.toString(),
-      'once': once.toString(),
+      'type': type,
+      'useCapture': useCapture,
+      'passive': passive,
+      'once': once,
       'scriptId': scriptId.toJson(),
-      'lineNumber': lineNumber.toString(),
-      'columnNumber': columnNumber.toString(),
+      'lineNumber': lineNumber,
+      'columnNumber': columnNumber,
     };
     if (handler != null) {
       json['handler'] = handler.toJson();

@@ -10,54 +10,70 @@ class EmulationManager {
 
   EmulationManager(this._client);
 
+  final StreamController _virtualTimeBudgetExpired =
+      new StreamController.broadcast();
+
+  /// Notification sent after the virual time budget for the current VirtualTimePolicy has run out.
+  Stream get onVirtualTimeBudgetExpired => _virtualTimeBudgetExpired.stream;
+
   /// Overrides the values of device screen dimensions (window.screen.width, window.screen.height, window.innerWidth, window.innerHeight, and "device-width"/"device-height"-related CSS media query results).
   /// [width] Overriding width value in pixels (minimum 0, maximum 10000000). 0 disables the override.
   /// [height] Overriding height value in pixels (minimum 0, maximum 10000000). 0 disables the override.
   /// [deviceScaleFactor] Overriding device scale factor value. 0 disables the override.
   /// [mobile] Whether to emulate mobile device. This includes viewport meta tag, overlay scrollbars, text autosizing and more.
+  /// [fitWindow] Whether a view that exceeds the available browser window area should be scaled down to fit.
   /// [scale] Scale to apply to resulting view image. Ignored in |fitWindow| mode.
+  /// [offsetX] Not used.
+  /// [offsetY] Not used.
   /// [screenWidth] Overriding screen width value in pixels (minimum 0, maximum 10000000). Only used for |mobile==true|.
   /// [screenHeight] Overriding screen height value in pixels (minimum 0, maximum 10000000). Only used for |mobile==true|.
   /// [positionX] Overriding view X position on screen in pixels (minimum 0, maximum 10000000). Only used for |mobile==true|.
   /// [positionY] Overriding view Y position on screen in pixels (minimum 0, maximum 10000000). Only used for |mobile==true|.
-  /// [dontSetVisibleSize] Do not set visible view size, rely upon explicit setVisibleSize call.
   /// [screenOrientation] Screen orientation override.
   Future setDeviceMetricsOverride(
     int width,
     int height,
     num deviceScaleFactor,
     bool mobile, {
+    bool fitWindow,
     num scale,
+    num offsetX,
+    num offsetY,
     int screenWidth,
     int screenHeight,
     int positionX,
     int positionY,
-    bool dontSetVisibleSize,
     ScreenOrientation screenOrientation,
   }) async {
     Map parameters = {
-      'width': width.toString(),
-      'height': height.toString(),
-      'deviceScaleFactor': deviceScaleFactor.toString(),
-      'mobile': mobile.toString(),
+      'width': width,
+      'height': height,
+      'deviceScaleFactor': deviceScaleFactor,
+      'mobile': mobile,
     };
+    if (fitWindow != null) {
+      parameters['fitWindow'] = fitWindow;
+    }
     if (scale != null) {
-      parameters['scale'] = scale.toString();
+      parameters['scale'] = scale;
+    }
+    if (offsetX != null) {
+      parameters['offsetX'] = offsetX;
+    }
+    if (offsetY != null) {
+      parameters['offsetY'] = offsetY;
     }
     if (screenWidth != null) {
-      parameters['screenWidth'] = screenWidth.toString();
+      parameters['screenWidth'] = screenWidth;
     }
     if (screenHeight != null) {
-      parameters['screenHeight'] = screenHeight.toString();
+      parameters['screenHeight'] = screenHeight;
     }
     if (positionX != null) {
-      parameters['positionX'] = positionX.toString();
+      parameters['positionX'] = positionX;
     }
     if (positionY != null) {
-      parameters['positionY'] = positionY.toString();
-    }
-    if (dontSetVisibleSize != null) {
-      parameters['dontSetVisibleSize'] = dontSetVisibleSize.toString();
+      parameters['positionY'] = positionY;
     }
     if (screenOrientation != null) {
       parameters['screenOrientation'] = screenOrientation.toJson();
@@ -81,12 +97,12 @@ class EmulationManager {
     num pageScaleFactor,
   ) async {
     Map parameters = {
-      'pageScaleFactor': pageScaleFactor.toString(),
+      'pageScaleFactor': pageScaleFactor,
     };
     await _client.send('Emulation.setPageScaleFactor', parameters);
   }
 
-  /// Resizes the frame/viewport of the page. Note that this does not affect the frame's container (e.g. browser window). Can be used to produce screenshots of the specified size. Not supported on Android.
+  /// Deprecated, does nothing. Please use setDeviceMetricsOverride instead.
   /// [width] Frame width (DIP).
   /// [height] Frame height (DIP).
   Future setVisibleSize(
@@ -94,8 +110,8 @@ class EmulationManager {
     int height,
   ) async {
     Map parameters = {
-      'width': width.toString(),
-      'height': height.toString(),
+      'width': width,
+      'height': height,
     };
     await _client.send('Emulation.setVisibleSize', parameters);
   }
@@ -106,7 +122,7 @@ class EmulationManager {
     bool value,
   ) async {
     Map parameters = {
-      'value': value.toString(),
+      'value': value,
     };
     await _client.send('Emulation.setScriptExecutionDisabled', parameters);
   }
@@ -122,13 +138,13 @@ class EmulationManager {
   }) async {
     Map parameters = {};
     if (latitude != null) {
-      parameters['latitude'] = latitude.toString();
+      parameters['latitude'] = latitude;
     }
     if (longitude != null) {
-      parameters['longitude'] = longitude.toString();
+      parameters['longitude'] = longitude;
     }
     if (accuracy != null) {
-      parameters['accuracy'] = accuracy.toString();
+      parameters['accuracy'] = accuracy;
     }
     await _client.send('Emulation.setGeolocationOverride', parameters);
   }
@@ -138,35 +154,20 @@ class EmulationManager {
     await _client.send('Emulation.clearGeolocationOverride');
   }
 
-  /// Enables touch on platforms which do not support them.
+  /// Toggles mouse event-based touch event emulation.
   /// [enabled] Whether the touch event emulation should be enabled.
-  /// [maxTouchPoints] Maximum touch points supported. Defaults to one.
-  Future setTouchEmulationEnabled(
-    bool enabled, {
-    int maxTouchPoints,
-  }) async {
-    Map parameters = {
-      'enabled': enabled.toString(),
-    };
-    if (maxTouchPoints != null) {
-      parameters['maxTouchPoints'] = maxTouchPoints.toString();
-    }
-    await _client.send('Emulation.setTouchEmulationEnabled', parameters);
-  }
-
-  /// [enabled] Whether touch emulation based on mouse input should be enabled.
   /// [configuration] Touch/gesture events configuration. Default: current platform.
-  Future setEmitTouchEventsForMouse(
+  Future setTouchEmulationEnabled(
     bool enabled, {
     String configuration,
   }) async {
     Map parameters = {
-      'enabled': enabled.toString(),
+      'enabled': enabled,
     };
     if (configuration != null) {
-      parameters['configuration'] = configuration.toString();
+      parameters['configuration'] = configuration;
     }
-    await _client.send('Emulation.setEmitTouchEventsForMouse', parameters);
+    await _client.send('Emulation.setTouchEmulationEnabled', parameters);
   }
 
   /// Emulates the given media for CSS media queries.
@@ -175,7 +176,7 @@ class EmulationManager {
     String media,
   ) async {
     Map parameters = {
-      'media': media.toString(),
+      'media': media,
     };
     await _client.send('Emulation.setEmulatedMedia', parameters);
   }
@@ -186,7 +187,7 @@ class EmulationManager {
     num rate,
   ) async {
     Map parameters = {
-      'rate': rate.toString(),
+      'rate': rate,
     };
     await _client.send('Emulation.setCPUThrottlingRate', parameters);
   }
@@ -207,7 +208,7 @@ class EmulationManager {
       'policy': policy.toJson(),
     };
     if (budget != null) {
-      parameters['budget'] = budget.toString();
+      parameters['budget'] = budget;
     }
     await _client.send('Emulation.setVirtualTimePolicy', parameters);
   }
@@ -238,12 +239,18 @@ class ScreenOrientation {
     @required this.type,
     @required this.angle,
   });
-  factory ScreenOrientation.fromJson(Map json) {}
+
+  factory ScreenOrientation.fromJson(Map json) {
+    return new ScreenOrientation(
+      type: json['type'],
+      angle: json['angle'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'type': type.toString(),
-      'angle': angle.toString(),
+      'type': type,
+      'angle': angle,
     };
     return json;
   }
@@ -255,11 +262,17 @@ class VirtualTimePolicy {
   static const VirtualTimePolicy pause = const VirtualTimePolicy._('pause');
   static const VirtualTimePolicy pauseIfNetworkFetchesPending =
       const VirtualTimePolicy._('pauseIfNetworkFetchesPending');
+  static const values = const {
+    'advance': advance,
+    'pause': pause,
+    'pauseIfNetworkFetchesPending': pauseIfNetworkFetchesPending,
+  };
 
   final String value;
 
   const VirtualTimePolicy._(this.value);
-  factory VirtualTimePolicy.fromJson(String value) => const {}[value];
+
+  factory VirtualTimePolicy.fromJson(String value) => values[value];
 
   String toJson() => value;
 }

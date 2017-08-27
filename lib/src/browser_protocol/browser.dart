@@ -21,11 +21,6 @@ class BrowserManager {
     await _client.send('Browser.getWindowForTarget', parameters);
   }
 
-  /// Returns version information.
-  Future<GetVersionResult> getVersion() async {
-    await _client.send('Browser.getVersion');
-  }
-
   /// Set position and/or size of the browser window.
   /// [windowId] Browser window id.
   /// [bounds] New window bounds. The 'minimized', 'maximized' and 'fullscreen' states cannot be combined with 'left', 'top', 'width' or 'height'. Leaves unspecified fields unchanged.
@@ -64,39 +59,20 @@ class GetWindowForTargetResult {
     @required this.windowId,
     @required this.bounds,
   });
-  factory GetWindowForTargetResult.fromJson(Map json) {}
-}
 
-class GetVersionResult {
-  /// Protocol version.
-  final String protocolVersion;
-
-  /// Product name.
-  final String product;
-
-  /// Product revision.
-  final String revision;
-
-  /// User-Agent.
-  final String userAgent;
-
-  /// V8 version.
-  final String jsVersion;
-
-  GetVersionResult({
-    @required this.protocolVersion,
-    @required this.product,
-    @required this.revision,
-    @required this.userAgent,
-    @required this.jsVersion,
-  });
-  factory GetVersionResult.fromJson(Map json) {}
+  factory GetWindowForTargetResult.fromJson(Map json) {
+    return new GetWindowForTargetResult(
+      windowId: new WindowID.fromJson(json['windowId']),
+      bounds: new Bounds.fromJson(json['bounds']),
+    );
+  }
 }
 
 class WindowID {
   final int value;
 
   WindowID(this.value);
+
   factory WindowID.fromJson(int value) => new WindowID(value);
 
   int toJson() => value;
@@ -108,11 +84,18 @@ class WindowState {
   static const WindowState minimized = const WindowState._('minimized');
   static const WindowState maximized = const WindowState._('maximized');
   static const WindowState fullscreen = const WindowState._('fullscreen');
+  static const values = const {
+    'normal': normal,
+    'minimized': minimized,
+    'maximized': maximized,
+    'fullscreen': fullscreen,
+  };
 
   final String value;
 
   const WindowState._(this.value);
-  factory WindowState.fromJson(String value) => const {}[value];
+
+  factory WindowState.fromJson(String value) => values[value];
 
   String toJson() => value;
 }
@@ -141,21 +124,32 @@ class Bounds {
     this.height,
     this.windowState,
   });
-  factory Bounds.fromJson(Map json) {}
+
+  factory Bounds.fromJson(Map json) {
+    return new Bounds(
+      left: json.containsKey('left') ? json['left'] : null,
+      top: json.containsKey('top') ? json['top'] : null,
+      width: json.containsKey('width') ? json['width'] : null,
+      height: json.containsKey('height') ? json['height'] : null,
+      windowState: json.containsKey('windowState')
+          ? new WindowState.fromJson(json['windowState'])
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {};
     if (left != null) {
-      json['left'] = left.toString();
+      json['left'] = left;
     }
     if (top != null) {
-      json['top'] = top.toString();
+      json['top'] = top;
     }
     if (width != null) {
-      json['width'] = width.toString();
+      json['width'] = width;
     }
     if (height != null) {
-      json['height'] = height.toString();
+      json['height'] = height;
     }
     if (windowState != null) {
       json['windowState'] = windowState.toJson();

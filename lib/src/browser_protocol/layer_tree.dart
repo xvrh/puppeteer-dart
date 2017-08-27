@@ -8,6 +8,16 @@ class LayerTreeManager {
 
   LayerTreeManager(this._client);
 
+  final StreamController<List<Layer>> _layerTreeDidChange =
+      new StreamController<List<Layer>>.broadcast();
+
+  Stream<List<Layer>> get onLayerTreeDidChange => _layerTreeDidChange.stream;
+
+  final StreamController<LayerPaintedResult> _layerPainted =
+      new StreamController<LayerPaintedResult>.broadcast();
+
+  Stream<LayerPaintedResult> get onLayerPainted => _layerPainted.stream;
+
   /// Enables compositing tree inspection.
   Future enable() async {
     await _client.send('LayerTree.enable');
@@ -80,10 +90,10 @@ class LayerTreeManager {
       'snapshotId': snapshotId.toJson(),
     };
     if (minRepeatCount != null) {
-      parameters['minRepeatCount'] = minRepeatCount.toString();
+      parameters['minRepeatCount'] = minRepeatCount;
     }
     if (minDuration != null) {
-      parameters['minDuration'] = minDuration.toString();
+      parameters['minDuration'] = minDuration;
     }
     if (clipRect != null) {
       parameters['clipRect'] = clipRect.toJson();
@@ -107,13 +117,13 @@ class LayerTreeManager {
       'snapshotId': snapshotId.toJson(),
     };
     if (fromStep != null) {
-      parameters['fromStep'] = fromStep.toString();
+      parameters['fromStep'] = fromStep;
     }
     if (toStep != null) {
-      parameters['toStep'] = toStep.toString();
+      parameters['toStep'] = toStep;
     }
     if (scale != null) {
-      parameters['scale'] = scale.toString();
+      parameters['scale'] = scale;
     }
     await _client.send('LayerTree.replaySnapshot', parameters);
   }
@@ -131,11 +141,32 @@ class LayerTreeManager {
   }
 }
 
+class LayerPaintedResult {
+  /// The id of the painted layer.
+  final LayerId layerId;
+
+  /// Clip rectangle.
+  final dom.Rect clip;
+
+  LayerPaintedResult({
+    @required this.layerId,
+    @required this.clip,
+  });
+
+  factory LayerPaintedResult.fromJson(Map json) {
+    return new LayerPaintedResult(
+      layerId: new LayerId.fromJson(json['layerId']),
+      clip: new dom.Rect.fromJson(json['clip']),
+    );
+  }
+}
+
 /// Unique Layer identifier.
 class LayerId {
   final String value;
 
   LayerId(this.value);
+
   factory LayerId.fromJson(String value) => new LayerId(value);
 
   String toJson() => value;
@@ -146,6 +177,7 @@ class SnapshotId {
   final String value;
 
   SnapshotId(this.value);
+
   factory SnapshotId.fromJson(String value) => new SnapshotId(value);
 
   String toJson() => value;
@@ -163,52 +195,19 @@ class ScrollRect {
     @required this.rect,
     @required this.type,
   });
-  factory ScrollRect.fromJson(Map json) {}
+
+  factory ScrollRect.fromJson(Map json) {
+    return new ScrollRect(
+      rect: new dom.Rect.fromJson(json['rect']),
+      type: json['type'],
+    );
+  }
 
   Map toJson() {
     Map json = {
       'rect': rect.toJson(),
-      'type': type.toString(),
+      'type': type,
     };
-    return json;
-  }
-}
-
-/// Sticky position constraints.
-class StickyPositionConstraint {
-  /// Layout rectangle of the sticky element before being shifted
-  final dom.Rect stickyBoxRect;
-
-  /// Layout rectangle of the containing block of the sticky element
-  final dom.Rect containingBlockRect;
-
-  /// The nearest sticky layer that shifts the sticky box
-  final LayerId nearestLayerShiftingStickyBox;
-
-  /// The nearest sticky layer that shifts the containing block
-  final LayerId nearestLayerShiftingContainingBlock;
-
-  StickyPositionConstraint({
-    @required this.stickyBoxRect,
-    @required this.containingBlockRect,
-    this.nearestLayerShiftingStickyBox,
-    this.nearestLayerShiftingContainingBlock,
-  });
-  factory StickyPositionConstraint.fromJson(Map json) {}
-
-  Map toJson() {
-    Map json = {
-      'stickyBoxRect': stickyBoxRect.toJson(),
-      'containingBlockRect': containingBlockRect.toJson(),
-    };
-    if (nearestLayerShiftingStickyBox != null) {
-      json['nearestLayerShiftingStickyBox'] =
-          nearestLayerShiftingStickyBox.toJson();
-    }
-    if (nearestLayerShiftingContainingBlock != null) {
-      json['nearestLayerShiftingContainingBlock'] =
-          nearestLayerShiftingContainingBlock.toJson();
-    }
     return json;
   }
 }
@@ -229,13 +228,20 @@ class PictureTile {
     @required this.y,
     @required this.picture,
   });
-  factory PictureTile.fromJson(Map json) {}
+
+  factory PictureTile.fromJson(Map json) {
+    return new PictureTile(
+      x: json['x'],
+      y: json['y'],
+      picture: json['picture'],
+    );
+  }
 
   Map toJson() {
     Map json = {
-      'x': x.toString(),
-      'y': y.toString(),
-      'picture': picture.toString(),
+      'x': x,
+      'y': y,
+      'picture': picture,
     };
     return json;
   }
@@ -288,9 +294,6 @@ class Layer {
   /// Rectangles scrolling on main thread only.
   final List<ScrollRect> scrollRects;
 
-  /// Sticky position constraint information
-  final StickyPositionConstraint stickyPositionConstraint;
-
   Layer({
     @required this.layerId,
     this.parentLayerId,
@@ -307,19 +310,47 @@ class Layer {
     @required this.drawsContent,
     this.invisible,
     this.scrollRects,
-    this.stickyPositionConstraint,
   });
-  factory Layer.fromJson(Map json) {}
+
+  factory Layer.fromJson(Map json) {
+    return new Layer(
+      layerId: new LayerId.fromJson(json['layerId']),
+      parentLayerId: json.containsKey('parentLayerId')
+          ? new LayerId.fromJson(json['parentLayerId'])
+          : null,
+      backendNodeId: json.containsKey('backendNodeId')
+          ? new dom.BackendNodeId.fromJson(json['backendNodeId'])
+          : null,
+      offsetX: json['offsetX'],
+      offsetY: json['offsetY'],
+      width: json['width'],
+      height: json['height'],
+      transform: json.containsKey('transform')
+          ? (json['transform'] as List).map((e) => e as num).toList()
+          : null,
+      anchorX: json.containsKey('anchorX') ? json['anchorX'] : null,
+      anchorY: json.containsKey('anchorY') ? json['anchorY'] : null,
+      anchorZ: json.containsKey('anchorZ') ? json['anchorZ'] : null,
+      paintCount: json['paintCount'],
+      drawsContent: json['drawsContent'],
+      invisible: json.containsKey('invisible') ? json['invisible'] : null,
+      scrollRects: json.containsKey('scrollRects')
+          ? (json['scrollRects'] as List)
+              .map((e) => new ScrollRect.fromJson(e))
+              .toList()
+          : null,
+    );
+  }
 
   Map toJson() {
     Map json = {
       'layerId': layerId.toJson(),
-      'offsetX': offsetX.toString(),
-      'offsetY': offsetY.toString(),
-      'width': width.toString(),
-      'height': height.toString(),
-      'paintCount': paintCount.toString(),
-      'drawsContent': drawsContent.toString(),
+      'offsetX': offsetX,
+      'offsetY': offsetY,
+      'width': width,
+      'height': height,
+      'paintCount': paintCount,
+      'drawsContent': drawsContent,
     };
     if (parentLayerId != null) {
       json['parentLayerId'] = parentLayerId.toJson();
@@ -328,25 +359,22 @@ class Layer {
       json['backendNodeId'] = backendNodeId.toJson();
     }
     if (transform != null) {
-      json['transform'] = transform.map((e) => e.toString()).toList();
+      json['transform'] = transform.map((e) => e).toList();
     }
     if (anchorX != null) {
-      json['anchorX'] = anchorX.toString();
+      json['anchorX'] = anchorX;
     }
     if (anchorY != null) {
-      json['anchorY'] = anchorY.toString();
+      json['anchorY'] = anchorY;
     }
     if (anchorZ != null) {
-      json['anchorZ'] = anchorZ.toString();
+      json['anchorZ'] = anchorZ;
     }
     if (invisible != null) {
-      json['invisible'] = invisible.toString();
+      json['invisible'] = invisible;
     }
     if (scrollRects != null) {
       json['scrollRects'] = scrollRects.map((e) => e.toJson()).toList();
-    }
-    if (stickyPositionConstraint != null) {
-      json['stickyPositionConstraint'] = stickyPositionConstraint.toJson();
     }
     return json;
   }
@@ -357,6 +385,7 @@ class PaintProfile {
   final List<num> value;
 
   PaintProfile(this.value);
+
   factory PaintProfile.fromJson(List<num> value) => new PaintProfile(value);
 
   List<num> toJson() => value;
