@@ -1,216 +1,191 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
-class Session {
+import 'package:chrome_dev_tools/domains/target.dart';
+import 'package:logging/logging.dart';
 
-  Future send(String command, [Map parameters]) {
-
-  }
+abstract class Client {
+  Future<Map> send(String method, [Map parameters]);
+  Stream<Event> get onEvent;
 }
 
-/*
-const debugProtocol = require('debug')('puppeteer:protocol');
-const debugSession = require('debug')('puppeteer:session');
+class Event {
+  final String name;
+  final Map parameters;
 
-const EventEmitter = require('events');
-const WebSocket = require('ws');
+  Event._(this.name, this.parameters);
+}
 
-class Connection {
-  /**
-   * @param {string} url
-   * @param {number=} delay
-   * @return {!Promise<!Connection>}
-   */
-  static  create(url, delay = 0) async {
-  return new Promise((resolve, reject) => {
-  const ws = new WebSocket(url, { perMessageDeflate: false });
-  ws.on('open', () => resolve(new Connection(url, ws, delay)));
-  ws.on('error', reject);
-  });
+class Connection implements Client {
+  final Logger _logger = new Logger('connection');
+  static int _lastId = 0;
+  final WebSocket _webSocket;
+  final Map<int, Completer> _completers = {};
+  final List<Session> _sessions = [];
+  final StreamController<Event> _eventController =
+      new StreamController<Event>.broadcast();
+  TargetManager _targetManager;
+  final List<StreamSubscription> _subscriptions = [];
+
+  Connection._(this._webSocket) {
+    _subscriptions.add(_webSocket.listen(_onMessage));
+
+    _targetManager = new TargetManager(this);
+
+    _subscriptions.add(_targetManager.onReceivedMessageFromTarget
+        .listen((ReceivedMessageFromTargetEvent e) {
+      Session session = _getSession(e.sessionId);
+      session._onMessage(e.message);
+    }));
+    _subscriptions.add(
+        _targetManager.onDetachedFromTarget.listen((DetachedFromTargetEvent e) {
+      Session session = _getSession(e.sessionId);
+      session._onClosed();
+      _sessions.remove(session);
+    }));
   }
 
-  /**
-   * @param {string} url
-   * @param {!WebSocket} ws
-   * @param {number=} delay
-   */
-  constructor(url, ws, delay = 0) {
-  super();
-  this._url = url;
-  this._lastId = 0;
-  /** @type {!Map<number, {resolve: function, reject: function, method: string}>}*/
-  this._callbacks = new Map();
-  this._delay = delay;
+  TargetManager get targets => _targetManager;
 
-  this._ws = ws;
-  this._ws.on('message', this._onMessage.bind(this));
-  this._ws.on('close', this._onClose.bind(this));
-  /** @type {!Map<string, !Session>}*/
-  this._sessions = new Map();
+  Session _getSession(SessionID sessionId) =>
+      _sessions.firstWhere((s) => s.sessionId.value == sessionId.value);
+
+  static Future<Connection> create(String url) async {
+    WebSocket webSocket = await WebSocket.connect(url);
+
+    return new Connection._(webSocket);
   }
 
-  /**
-   * @return {string}
-   */
-  url() {
-    return this._url;
+  Stream<Event> get onEvent => _eventController.stream;
+
+  Future<Map> send(String method, [Map parameters]) {
+    int id = ++_lastId;
+    String message = _encodeMessage(id, method, parameters);
+
+    _logger.info('SEND ► $message');
+
+    Completer completer = new Completer();
+    _completers[id] = completer;
+    _webSocket.add(message);
+
+    return completer.future;
   }
 
-  /**
-   * @param {string} method
-   * @param {!Object=} params
-   * @return {!Promise<?Object>}
-   */
-  send(method, params = {}) {
-  const id = ++this._lastId;
-  const message = JSON.stringify({id, method, params});
-  debugProtocol('SEND ► ' + message);
-  this._ws.send(message);
-  return new Promise((resolve, reject) => {
-  this._callbacks.set(id, {resolve, reject, method});
-  });
-  }
+  Future<Session> createSession(TargetID targetId) async {
+    SessionID sessionId = await _targetManager.attachToTarget(targetId);
+    Session session = new Session(_targetManager, targetId, sessionId);
+    _sessions.add(session);
 
-  /**
-   * @param {string} message
-   */
-   _onMessage(message) async {
-    if (this._delay)
-      await new Promise(f => setTimeout(f, this._delay));
-    debugProtocol('◀ RECV ' + message);
-    const object = JSON.parse(message);
-    if (object.id && this._callbacks.has(object.id)) {
-    const callback = this._callbacks.get(object.id);
-    this._callbacks.delete(object.id);
-    if (object.error)
-    callback.reject(new Error(`Protocol error (${callback.method}): ${object.error.message} ${object.error.data}`));
-    else
-    callback.resolve(object.result);
-    } else {
-    console.assert(!object.id);
-    if (object.method === 'Target.receivedMessageFromTarget') {
-    const session = this._sessions.get(object.params.sessionId);
-    if (session)
-    session._onMessage(object.params.message);
-    } else if (object.method === 'Target.detachedFromTarget') {
-    const session = this._sessions.get(object.params.sessionId);
-    if (session)
-    session._onClosed();
-    this._sessions.delete(object.params.sessionId);
-    } else {
-    this.emit(object.method, object.params);
-    }
-    }
-  }
-
-  _onClose() {
-    this._ws.removeAllListeners();
-    for (const callback of this._callbacks.values())
-    callback.reject(new Error(`Protocol error (${callback.method}): Target closed.`));
-    this._callbacks.clear();
-    for (const session of this._sessions.values())
-    session._onClosed();
-    this._sessions.clear();
-  }
-
-  /**
-   * @return {!Promise}
-   */
-  dispose() {
-    this._onClose();
-    this._ws.close();
-  }
-
-  /**
-   * @param {string} targetId
-   * @return {!Promise<!Session>}
-   */
-   createSession(targetId) async {
-    const {sessionId} = await this.send('Target.attachToTarget', {targetId});
-    const session = new Session(this, targetId, sessionId);
-    this._sessions.set(sessionId, session);
     return session;
+  }
+
+  _onMessage(String message) {
+    Map object = JSON.decode(message);
+    int id = object['id'];
+    if (id != null) {
+      _logger.info('◀ RECV $message');
+
+      Completer completer = _completers.remove(id);
+      assert(completer != null);
+
+      Map error = object['error'];
+      if (error != null) {
+        completer.completeError(new Exception(error['message']));
+      } else {
+        completer.complete(object['result']);
+      }
+    } else {
+      String method = object['method'];
+      Map params = object['params'];
+
+      _logger.info('◀ EVENT $message');
+
+      _eventController.add(new Event._(method, params));
     }
+  }
+
+  Future dispose() async {
+    await _eventController.close();
+    for (Completer completer in _completers.values) {
+      completer.completeError(new Exception('Target closed'));
+    }
+    _completers.clear();
+
+    for (Session session in _sessions) {
+      session._onClosed();
+    }
+    _sessions.clear();
+
+    for (StreamSubscription subscription in _subscriptions) {
+      await subscription.cancel();
+    }
+    await _webSocket.close();
+  }
 }
 
-class Session {
-  /**
-   * @param {!Connection} connection
-   * @param {string} targetId
-   * @param {string} sessionId
-   */
-  constructor(connection, targetId, sessionId) {
-    super();
-    this._lastId = 0;
-    /** @type {!Map<number, {resolve: function, reject: function, method: string}>}*/
-    this._callbacks = new Map();
-    this._connection = connection;
-    this._targetId = targetId;
-    this._sessionId = sessionId;
-  }
-
-  /**
-   * @return {string}
-   */
-  targetId() {
-    return this._targetId;
-  }
-
-  /**
-   * @param {string} method
-   * @param {!Object=} params
-   * @return {!Promise<?Object>}
-   */
-  send(method, params = {}) {
-  if (!this._connection)
-  return Promise.reject(new Error(`Protocol error (${method}): Session closed. Most likely the page has been closed.`));
-  const id = ++this._lastId;
-  const message = JSON.stringify({id, method, params});
-  debugSession('SEND ► ' + message);
-  this._connection.send('Target.sendMessageToTarget', {sessionId: this._sessionId, message}).catch(e => {
-  // The response from target might have been already dispatched.
-  if (!this._callbacks.has(id))
-  return;
-  const callback = this._callbacks.get(id);
-  this._callbacks.delete(object.id);
-  callback.reject(e);
+String _encodeMessage(int id, String method, Map parameters) {
+  return JSON.encode({
+    'id': id,
+    'method': method,
+    'params': parameters,
   });
-  return new Promise((resolve, reject) => {
-  this._callbacks.set(id, {resolve, reject, method});
-  });
-  }
+}
 
-  /**
-   * @param {string} message
-   */
-  _onMessage(message) {
-    debugSession('◀ RECV ' + message);
-    const object = JSON.parse(message);
-    if (object.id && this._callbacks.has(object.id)) {
-      const callback = this._callbacks.get(object.id);
-      this._callbacks.delete(object.id);
-      if (object.error)
-        callback.reject(new Error(`Protocol error (${callback.method}): ${object.error.message} ${object.error.data}`));
-    else
-    callback.resolve(object.result);
-    } else {
-    console.assert(!object.id);
-    this.emit(object.method, object.params);
+class Session implements Client {
+  static int _lastId = 0;
+  final TargetID targetID;
+  final SessionID sessionId;
+  final TargetManager _targetManager;
+  final Map<int, Completer> _completers = {};
+  final StreamController<Event> _eventController =
+      new StreamController<Event>.broadcast();
+
+  Session(this._targetManager, this.targetID, this.sessionId);
+
+  Future<Map> send(String method, [Map parameters]) {
+    if (_eventController.isClosed) {
+      throw new Exception('Session closed');
     }
+    int id = ++_lastId;
+    String message = _encodeMessage(id, method, parameters);
+
+    Completer completer = new Completer();
+    _completers[id] = completer;
+
+    _targetManager.sendMessageToTarget(message, sessionId: sessionId);
+
+    return completer.future;
   }
 
-  /**
-   * @return {!Promise}
-   */
-   dispose() async {
-    await this._connection.send('Target.closeTarget', {targetId: this._targetId});
+  Stream<Event> get onEvent => _eventController.stream;
+
+  _onMessage(String message) {
+    Map object = JSON.decode(message);
+
+    int id = object['id'];
+    if (id != null) {
+      Completer completer = _completers.remove(id);
+      Map error = object['error'];
+      if (error != null) {
+        completer.completeError(new Exception(error['message']));
+      } else {
+        completer.complete(object['result']);
+      }
+    } else {
+      _eventController.add(new Event._(object['method'], object['params']));
+    }
   }
 
   _onClosed() {
-    for (const callback of this._callbacks.values())
-    callback.reject(new Error(`Protocol error (${callback.method}): Target closed.`));
-    this._callbacks.clear();
-    this._connection = null;
+    _eventController.close();
+    for (Completer completer in _completers.values) {
+      completer.completeError(new Exception('Target closed'));
+    }
+    _completers.clear();
+  }
+
+  Future dispose() {
+    return _targetManager.closeTarget(targetID);
   }
 }
-
-*/
