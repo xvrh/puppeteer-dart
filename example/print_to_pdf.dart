@@ -21,42 +21,28 @@ main() async {
 
   Chrome chrome = await Chrome.launch(_canary, headless: true);
 
-  try {
-    TargetID targetId = await chrome.targets.createTarget('https://github.com');
-    Session session = await chrome.connection.createSession(targetId);
+  TargetID targetId = await chrome.targets.createTarget('https://github.com');
+  Session session = await chrome.connection.createSession(targetId);
 
-    PageManager page = new PageManager(session);
+  PageManager page = new PageManager(session);
 
-    NetworkManager networkManager = new NetworkManager(session);
-    await networkManager.enable();
-    await waitUntilNetworkIdle(networkManager);
+  NetworkManager networkManager = new NetworkManager(session);
+  await networkManager.enable();
+  await waitUntilNetworkIdle(networkManager);
 
-//    List<int> screenshot =
-//        BASE64.decode(await page.captureScreenshot(format: 'png'));
-//
-//    await new File.fromUri(Platform.script.resolve('google.png'))
-//        .writeAsBytes(screenshot);
+  List<int> pdf = BASE64.decode(await page.printToPDF(
+      pageRanges: '1',
+      landscape: true,
+      printBackground: true,
+      marginBottom: 0,
+      marginLeft: 0,
+      marginRight: 0,
+      marginTop: 0));
 
-    List<int> pdf = BASE64.decode(await page.printToPDF(
-        pageRanges: '1',
-        landscape: true,
-        printBackground: true,
-        marginBottom: 0,
-        marginLeft: 0,
-        marginRight: 0,
-        marginTop: 0));
-    print('Pdf ${pdf.length}');
-
-    await new File.fromUri(Platform.script.resolve('_github.pdf'))
-        .writeAsBytes(pdf);
-  } catch (e, stackTrace) {
-    print('Catch $e\n$stackTrace');
-  }
+  await new File.fromUri(Platform.script.resolve('_github.pdf'))
+      .writeAsBytes(pdf);
 
   chrome.kill();
-
   await chrome.onClose;
-  print('Closed');
-
   exit(0);
 }
