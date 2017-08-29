@@ -11,8 +11,7 @@ main() async {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen(print);
 
-  String chromiumPath = await downloadChromium(
-      cachePath: Platform.script.resolve('.chromium').toFilePath());
+  String chromiumPath = (await downloadChromium()).executablePath;
 
   Chromium chromium =
       await Chromium.launch(chromiumPath, headless: true);

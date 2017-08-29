@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 import 'package:http/http.dart' as http;
 import 'package:archive/archive.dart';
 
 const int _lastRevision = 497674;
 
-Future<String> downloadChromium(
+Future<ChromiumPath> downloadChromium(
     {int revision: _lastRevision, String cachePath}) async {
   cachePath ??= p.join(Directory.systemTemp.path, 'local-chromium');
 
@@ -29,13 +30,16 @@ Future<String> downloadChromium(
   }
 
   assert(executableFile.existsSync());
-  return executableFile.path;
+  return new ChromiumPath(
+      folderPath: revisionDirectory.path,
+      executablePath: executableFile.path,
+      revision: revision);
 }
 
 Future _downloadFile(String url, String output) async {
   http.Client client = new http.Client();
   http.StreamedResponse response =
-  await client.send(new http.Request('get', Uri.parse(url)));
+      await client.send(new http.Request('get', Uri.parse(url)));
   await response.stream.pipe(new File(output).openWrite());
 }
 
@@ -83,4 +87,15 @@ String _executablePath(String revisionPath) {
   } else {
     throw new UnsupportedError('Unknown platform ${Platform.operatingSystem}');
   }
+}
+
+class ChromiumPath {
+  final String executablePath;
+  final String folderPath;
+  final int revision;
+
+  ChromiumPath(
+      {@required this.executablePath,
+      @required this.folderPath,
+      @required this.revision});
 }

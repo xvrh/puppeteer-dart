@@ -17,7 +17,7 @@ import 'package:chrome_dev_tools/chromium_downloader.dart';
 
 main() async {
   // Download Chromium if necessary. You can also specify the cache folder and a specific revision.
-  String chromeExecutable = await downloadChromium();
+  String chromeExecutable = (await downloadChromium()).executablePath;
 
   // Launch a process and connect to the DevTools
   Chromium chromium = await Chromium.launch(chromeExecutable, headless: true);

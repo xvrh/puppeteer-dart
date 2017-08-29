@@ -8,7 +8,8 @@ main() async {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen(print);
 
-  Chromium chromium = await Chromium.launch(await downloadChromium());
+  Chromium chromium =
+      await Chromium.launch((await downloadChromium()).executablePath);
 
   TargetID targetId =
       await chromium.targets.createTarget('https://www.google.com');
