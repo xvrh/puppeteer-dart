@@ -44,7 +44,9 @@ class Chromium {
   Chromium._(this.process, this.connection);
 
   static Future<Chromium> launch(String chromiumExecutable,
-      {bool headless: true, bool useTemporaryUserData: false}) async {
+      {bool headless: true,
+      bool useTemporaryUserData: false,
+      bool sandbox: true}) async {
     Directory userDataDir;
     if (useTemporaryUserData) {
       userDataDir = await Directory.systemTemp.createTemp('chrome_');
@@ -57,6 +59,9 @@ class Chromium {
 
     if (headless) {
       chromeArgs.addAll(_headlessArgs);
+    }
+    if (!sandbox) {
+      chromeArgs.add('--no-sandbox');
     }
 
     _logger.info('Start $chromiumExecutable with $chromeArgs');
@@ -113,8 +118,7 @@ class Chromium {
     if (Platform.isWindows) {
       // Allow a clean exit on Windows.
       // With `process.kill`, it seems that chrome retain a lock on the user-data directory
-      Process
-          .runSync('taskkill', ['/pid', process.pid.toString(), '/T', '/F']);
+      Process.runSync('taskkill', ['/pid', process.pid.toString(), '/T', '/F']);
     } else {
       process.kill(ProcessSignal.SIGINT);
     }
