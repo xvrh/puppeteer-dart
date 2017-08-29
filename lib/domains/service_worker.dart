@@ -4,10 +4,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'target.dart' as target;
 
-class ServiceWorkerManager {
+class ServiceWorkerDomain {
   final Client _client;
 
-  ServiceWorkerManager(this._client);
+  ServiceWorkerDomain(this._client);
 
   Stream<List<ServiceWorkerRegistration>> get onWorkerRegistrationUpdated =>
       _client.onEvent
@@ -186,6 +186,11 @@ class ServiceWorkerVersionRunningStatus {
       values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) =>
+      other is ServiceWorkerVersionRunningStatus && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 class ServiceWorkerVersionStatus {
@@ -217,6 +222,11 @@ class ServiceWorkerVersionStatus {
   factory ServiceWorkerVersionStatus.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) =>
+      other is ServiceWorkerVersionStatus && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// ServiceWorker version.

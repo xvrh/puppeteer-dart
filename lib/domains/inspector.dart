@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class InspectorManager {
+class InspectorDomain {
   final Client _client;
 
-  InspectorManager(this._client);
+  InspectorDomain(this._client);
 
   /// Fired when remote debugging connection is about to be terminated. Contains detach reason.
   Stream<String> get onDetached => _client.onEvent

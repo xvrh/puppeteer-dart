@@ -8,10 +8,10 @@ import 'page.dart' as page;
 import 'runtime.dart' as runtime;
 import 'dom.dart' as dom;
 
-class DOMManager {
+class DOMDomain {
   final Client _client;
 
-  DOMManager(this._client);
+  DOMDomain(this._client);
 
   /// Fired when <code>Document</code> has been totally updated. Node ids are no longer valid.
   Stream get onDocumentUpdated => _client.onEvent
@@ -978,6 +978,10 @@ class NodeId {
   factory NodeId.fromJson(int value) => new NodeId(value);
 
   int toJson() => value;
+
+  bool operator ==(other) => other is NodeId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Unique DOM node identifier used to reference a node that may not have been pushed to the front-end.
@@ -989,6 +993,10 @@ class BackendNodeId {
   factory BackendNodeId.fromJson(int value) => new BackendNodeId(value);
 
   int toJson() => value;
+
+  bool operator ==(other) => other is BackendNodeId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Backend node with a friendly name.
@@ -1074,6 +1082,10 @@ class PseudoType {
   factory PseudoType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is PseudoType && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Shadow root type.
@@ -1094,6 +1106,10 @@ class ShadowRootType {
   factory ShadowRootType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is ShadowRootType && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// DOM interaction is implemented in terms of mirror objects that represent the actual DOM nodes. DOMNode is a base node mirror type.
@@ -1410,6 +1426,10 @@ class Quad {
   factory Quad.fromJson(List<num> value) => new Quad(value);
 
   List<num> toJson() => value;
+
+  bool operator ==(other) => other is Quad && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Box model.

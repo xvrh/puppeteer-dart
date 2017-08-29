@@ -7,10 +7,10 @@ import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 import 'dom.dart' as dom;
 
-class DOMDebuggerManager {
+class DOMDebuggerDomain {
   final Client _client;
 
-  DOMDebuggerManager(this._client);
+  DOMDebuggerDomain(this._client);
 
   /// Sets breakpoint on particular operation with DOM.
   /// [nodeId] Identifier of the node to set breakpoint on.
@@ -165,6 +165,10 @@ class DOMBreakpointType {
   factory DOMBreakpointType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is DOMBreakpointType && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Object event listener.

@@ -8,10 +8,10 @@ import 'security.dart' as security;
 import 'page.dart' as page;
 import 'runtime.dart' as runtime;
 
-class NetworkManager {
+class NetworkDomain {
   final Client _client;
 
-  NetworkManager(this._client);
+  NetworkDomain(this._client);
 
   /// Fired when resource loading priority is changed
   Stream<ResourceChangedPriorityEvent> get onResourceChangedPriority => _client
@@ -1000,6 +1000,10 @@ class LoaderId {
   factory LoaderId.fromJson(String value) => new LoaderId(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is LoaderId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Unique request identifier.
@@ -1011,6 +1015,10 @@ class RequestId {
   factory RequestId.fromJson(String value) => new RequestId(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is RequestId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Unique intercepted request identifier.
@@ -1022,6 +1030,10 @@ class InterceptionId {
   factory InterceptionId.fromJson(String value) => new InterceptionId(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is InterceptionId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Network level fetch failure reason.
@@ -1068,6 +1080,10 @@ class ErrorReason {
   factory ErrorReason.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is ErrorReason && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// UTC time in seconds, counted from January 1, 1970.
@@ -1079,6 +1095,10 @@ class TimeSinceEpoch {
   factory TimeSinceEpoch.fromJson(num value) => new TimeSinceEpoch(value);
 
   num toJson() => value;
+
+  bool operator ==(other) => other is TimeSinceEpoch && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Monotonically increasing time in seconds since an arbitrary point in the past.
@@ -1090,6 +1110,10 @@ class MonotonicTime {
   factory MonotonicTime.fromJson(num value) => new MonotonicTime(value);
 
   num toJson() => value;
+
+  bool operator ==(other) => other is MonotonicTime && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Request / response headers as keys / values of JSON object.
@@ -1101,6 +1125,10 @@ class Headers {
   factory Headers.fromJson(Map value) => new Headers(value);
 
   Map toJson() => value;
+
+  bool operator ==(other) => other is Headers && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Loading priority of a resource request.
@@ -1133,6 +1161,10 @@ class ConnectionType {
   factory ConnectionType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is ConnectionType && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Represents the cookie's 'SameSite' status: https://tools.ietf.org/html/draft-west-first-party-cookies
@@ -1151,6 +1183,10 @@ class CookieSameSite {
   factory CookieSameSite.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is CookieSameSite && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Timing information for the request.
@@ -1288,6 +1324,10 @@ class ResourcePriority {
   factory ResourcePriority.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is ResourcePriority && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// HTTP request data.
@@ -1554,6 +1594,10 @@ class BlockedReason {
   factory BlockedReason.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is BlockedReason && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// HTTP response data.

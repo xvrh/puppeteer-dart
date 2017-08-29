@@ -6,10 +6,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'target.dart' as target;
 
-class BrowserManager {
+class BrowserDomain {
   final Client _client;
 
-  BrowserManager(this._client);
+  BrowserDomain(this._client);
 
   /// Get the browser window that contains the devtools target.
   /// [targetId] Devtools agent host id.
@@ -120,6 +120,10 @@ class WindowID {
   factory WindowID.fromJson(int value) => new WindowID(value);
 
   int toJson() => value;
+
+  bool operator ==(other) => other is WindowID && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// The state of the browser window.
@@ -142,6 +146,10 @@ class WindowState {
   factory WindowState.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is WindowState && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Browser window bounds information

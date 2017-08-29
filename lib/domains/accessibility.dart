@@ -4,10 +4,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 
-class AccessibilityManager {
+class AccessibilityDomain {
   final Client _client;
 
-  AccessibilityManager(this._client);
+  AccessibilityDomain(this._client);
 
   /// Fetches the accessibility node and partial accessibility tree for this DOM node, if it exists.
   /// [nodeId] ID of node to get the partial accessibility tree for.
@@ -40,6 +40,10 @@ class AXNodeId {
   factory AXNodeId.fromJson(String value) => new AXNodeId(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is AXNodeId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Enum of possible property types.
@@ -91,6 +95,10 @@ class AXValueType {
   factory AXValueType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is AXValueType && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Enum of possible property sources.
@@ -122,6 +130,10 @@ class AXValueSourceType {
   factory AXValueSourceType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is AXValueSourceType && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Enum of possible native property sources (as a subtype of a particular AXValueSourceType).
@@ -160,6 +172,11 @@ class AXValueNativeSourceType {
   factory AXValueNativeSourceType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) =>
+      other is AXValueNativeSourceType && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// A single source for a computed AX property.
@@ -408,6 +425,10 @@ class AXGlobalStates {
   factory AXGlobalStates.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is AXGlobalStates && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Attributes which apply to nodes in live regions.
@@ -434,6 +455,11 @@ class AXLiveRegionAttributes {
   factory AXLiveRegionAttributes.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) =>
+      other is AXLiveRegionAttributes && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Attributes which apply to widgets.
@@ -480,6 +506,11 @@ class AXWidgetAttributes {
   factory AXWidgetAttributes.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) =>
+      other is AXWidgetAttributes && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// States which apply to widgets.
@@ -504,6 +535,10 @@ class AXWidgetStates {
   factory AXWidgetStates.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is AXWidgetStates && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Relationships between elements other than parent/child/sibling.
@@ -542,6 +577,11 @@ class AXRelationshipAttributes {
   factory AXRelationshipAttributes.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) =>
+      other is AXRelationshipAttributes && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// A node in the accessibility tree.

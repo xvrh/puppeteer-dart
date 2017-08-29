@@ -5,10 +5,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class DOMStorageManager {
+class DOMStorageDomain {
   final Client _client;
 
-  DOMStorageManager(this._client);
+  DOMStorageDomain(this._client);
 
   Stream<StorageId> get onDomStorageItemsCleared => _client.onEvent
       .where((Event event) => event.name == 'DOMStorage.domStorageItemsCleared')
@@ -193,4 +193,8 @@ class Item {
   factory Item.fromJson(List<String> value) => new Item(value);
 
   List<String> toJson() => value;
+
+  bool operator ==(other) => other is Item && other.value == value;
+
+  int get hashCode => value.hashCode;
 }

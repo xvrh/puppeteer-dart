@@ -4,10 +4,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 
-class LayerTreeManager {
+class LayerTreeDomain {
   final Client _client;
 
-  LayerTreeManager(this._client);
+  LayerTreeDomain(this._client);
 
   Stream<List<Layer>> get onLayerTreeDidChange => _client.onEvent
       .where((Event event) => event.name == 'LayerTree.layerTreeDidChange')
@@ -181,6 +181,10 @@ class LayerId {
   factory LayerId.fromJson(String value) => new LayerId(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is LayerId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Unique snapshot identifier.
@@ -192,6 +196,10 @@ class SnapshotId {
   factory SnapshotId.fromJson(String value) => new SnapshotId(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is SnapshotId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Rectangle where scrolling happens on the main thread.
@@ -464,4 +472,8 @@ class PaintProfile {
   factory PaintProfile.fromJson(List<num> value) => new PaintProfile(value);
 
   List<num> toJson() => value;
+
+  bool operator ==(other) => other is PaintProfile && other.value == value;
+
+  int get hashCode => value.hashCode;
 }

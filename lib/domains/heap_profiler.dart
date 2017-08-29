@@ -4,10 +4,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
-class HeapProfilerManager {
+class HeapProfilerDomain {
   final Client _client;
 
-  HeapProfilerManager(this._client);
+  HeapProfilerDomain(this._client);
 
   Stream<String> get onAddHeapSnapshotChunk => _client.onEvent
       .where((Event event) => event.name == 'HeapProfiler.addHeapSnapshotChunk')
@@ -188,6 +188,11 @@ class HeapSnapshotObjectId {
       new HeapSnapshotObjectId(value);
 
   String toJson() => value;
+
+  bool operator ==(other) =>
+      other is HeapSnapshotObjectId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Sampling Heap Profile node. Holds callsite information, allocation statistics and child nodes.

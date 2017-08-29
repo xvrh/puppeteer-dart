@@ -8,10 +8,10 @@ import 'dom.dart' as dom;
 import 'page.dart' as page;
 import 'css.dart' as css;
 
-class DOMSnapshotManager {
+class DOMSnapshotDomain {
   final Client _client;
 
-  DOMSnapshotManager(this._client);
+  DOMSnapshotDomain(this._client);
 
   /// Returns a document snapshot, including the full DOM tree of the root node (including iframes, template contents, and imported documents) in a flattened array, as well as layout and white-listed computed style information for the nodes. Shadow DOM in the returned DOM tree is flattened.
   /// [computedStyleWhitelist] Whitelist of computed styles to return.

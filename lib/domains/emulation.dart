@@ -6,10 +6,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 
-class EmulationManager {
+class EmulationDomain {
   final Client _client;
 
-  EmulationManager(this._client);
+  EmulationDomain(this._client);
 
   /// Notification sent after the virual time budget for the current VirtualTimePolicy has run out.
   Stream get onVirtualTimeBudgetExpired => _client.onEvent.where(
@@ -280,4 +280,8 @@ class VirtualTimePolicy {
   factory VirtualTimePolicy.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is VirtualTimePolicy && other.value == value;
+
+  int get hashCode => value.hashCode;
 }

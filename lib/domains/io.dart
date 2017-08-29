@@ -6,10 +6,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
-class IOManager {
+class IODomain {
   final Client _client;
 
-  IOManager(this._client);
+  IODomain(this._client);
 
   /// Read a chunk of the stream
   /// [handle] Handle of the stream to read.
@@ -93,4 +93,8 @@ class StreamHandle {
   factory StreamHandle.fromJson(String value) => new StreamHandle(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is StreamHandle && other.value == value;
+
+  int get hashCode => value.hashCode;
 }

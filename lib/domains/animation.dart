@@ -5,10 +5,10 @@ import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'runtime.dart' as runtime;
 
-class AnimationManager {
+class AnimationDomain {
   final Client _client;
 
-  AnimationManager(this._client);
+  AnimationDomain(this._client);
 
   /// Event for each animation that has been created.
   Stream<String> get onAnimationCreated => _client.onEvent

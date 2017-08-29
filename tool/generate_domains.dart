@@ -66,7 +66,7 @@ main() {
       code.writeln("import '$normalizedDep.dart' as $normalizedDep;");
     }
 
-    String className = '${domainName}Manager';
+    String className = '${domainName}Domain';
     code.writeln('class $className {');
     code.writeln('final Client _client;');
     code.writeln();
@@ -420,11 +420,8 @@ class _InternalType {
           'factory $id.fromJson(${context.getPropertyType(properties.first)} value) => new $id(value);');
     }
 
-    //TODO(xha): il ne faut pas générer une méthode toJson pour les types qui sont
-    // des types de retour.
-    // Pour ça, avant de faire la génération, on parcour tous les parameters des commands
-    // et tous les returns des commandes récursivement pour trouver les types.
-    // On les catégorise ensuite en 2 groupes
+    //TODO(xha): only generate toJson when the type is actually going to be serialized.
+    // And only generate fromJson when the type is actually un-serialized
     if (generateToJson) {
       code.writeln('');
       if (hasProperties) {
@@ -446,6 +443,16 @@ class _InternalType {
             '${context.getPropertyType(properties.first)} toJson() => value;');
       }
     }
+
+    if (!hasProperties) {
+      //TODO(xha): generate operator== and hashcode also for complex type?
+      code.writeln();
+      code.writeln('bool operator ==(other) => other is $id && other.value == value;');
+      code.writeln();
+      code.writeln('int get hashCode => value.hashCode;');
+    }
+
+    //TODO(xha): generate a readable toString() method.
 
     code.writeln('}');
 

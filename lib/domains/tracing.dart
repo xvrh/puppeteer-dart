@@ -4,10 +4,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'io.dart' as io;
 
-class TracingManager {
+class TracingDomain {
   final Client _client;
 
-  TracingManager(this._client);
+  TracingDomain(this._client);
 
   /// Contains an bucket of collected trace events. When tracing is stopped collected events will be send as a sequence of dataCollected events followed by tracingComplete event.
   Stream<List<Map>> get onDataCollected => _client.onEvent
@@ -140,6 +140,10 @@ class MemoryDumpConfig {
   factory MemoryDumpConfig.fromJson(Map value) => new MemoryDumpConfig(value);
 
   Map toJson() => value;
+
+  bool operator ==(other) => other is MemoryDumpConfig && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 class TraceConfig {

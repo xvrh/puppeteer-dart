@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class StorageManager {
+class StorageDomain {
   final Client _client;
 
-  StorageManager(this._client);
+  StorageDomain(this._client);
 
   /// A cache has been added/deleted.
   Stream<String> get onCacheStorageListUpdated => _client.onEvent
@@ -152,6 +152,10 @@ class StorageType {
   factory StorageType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is StorageType && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Usage for a storage type.

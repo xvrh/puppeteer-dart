@@ -7,10 +7,10 @@ import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'page.dart' as page;
 
-class CSSManager {
+class CSSDomain {
   final Client _client;
 
-  CSSManager(this._client);
+  CSSDomain(this._client);
 
   /// Fires whenever a MediaQuery result changes (for example, after a browser window has been resized.) The current implementation considers only viewport-dependent media features.
   Stream get onMediaQueryResultChanged => _client.onEvent
@@ -430,6 +430,10 @@ class StyleSheetId {
   factory StyleSheetId.fromJson(String value) => new StyleSheetId(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is StyleSheetId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Stylesheet type: "injected" for stylesheets injected via extension, "user-agent" for user-agent stylesheets, "inspector" for stylesheets created by the inspector (i.e. those holding the "via inspector" rules), "regular" for regular stylesheets.
@@ -454,6 +458,10 @@ class StyleSheetOrigin {
   factory StyleSheetOrigin.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is StyleSheetOrigin && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// CSS rule collection for a single pseudo style.

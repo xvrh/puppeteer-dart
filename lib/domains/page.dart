@@ -10,10 +10,10 @@ import 'emulation.dart' as emulation;
 import 'dom.dart' as dom;
 import 'runtime.dart' as runtime;
 
-class PageManager {
+class PageDomain {
   final Client _client;
 
-  PageManager(this._client);
+  PageDomain(this._client);
 
   Stream<network.MonotonicTime> get onDomContentEventFired => _client.onEvent
       .where((Event event) => event.name == 'Page.domContentEventFired')
@@ -964,6 +964,10 @@ class ResourceType {
   factory ResourceType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is ResourceType && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Unique frame identifier.
@@ -975,6 +979,10 @@ class FrameId {
   factory FrameId.fromJson(String value) => new FrameId(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is FrameId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Information about the Frame on the page.
@@ -1171,6 +1179,10 @@ class ScriptIdentifier {
       new ScriptIdentifier(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is ScriptIdentifier && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Transition type.
@@ -1215,6 +1227,10 @@ class TransitionType {
   factory TransitionType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is TransitionType && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Navigation history entry.
@@ -1347,6 +1363,10 @@ class DialogType {
   factory DialogType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is DialogType && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Error while paring app manifest.
@@ -1410,6 +1430,11 @@ class NavigationResponse {
   factory NavigationResponse.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) =>
+      other is NavigationResponse && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Layout viewport position and dimensions.

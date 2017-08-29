@@ -1,34 +1,33 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/src/connection.dart';
-import 'package:chrome_dev_tools/domains/network.dart';
+import 'package:chrome_dev_tools/chromium_downloader.dart';
+import 'package:chrome_dev_tools/domains/emulation.dart';
 import 'package:chrome_dev_tools/domains/page.dart';
-import 'package:chrome_dev_tools/domains/target.dart';
 import 'package:chrome_dev_tools/src/wait_until.dart';
 import 'package:logging/logging.dart';
-
-//TODO(xha): manage an internal version of chromium
-const _chromePath =
-    r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe';
-
-const _canary =
-    r'C:\Users\xavier.hainaux\AppData\Local\Google\Chrome SxS\Application\chrome.exe';
 
 main() async {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen(print);
 
-  Chrome chrome = await Chrome.launch(_canary, headless: true);
+  String chromiumPath = await downloadChromium(
+      cachePath: Platform.script.resolve('.chromium').toFilePath());
 
-  TargetID targetId = await chrome.targets.createTarget('https://github.com');
-  Session session = await chrome.connection.createSession(targetId);
+  Chromium chromium =
+      await Chromium.launch(chromiumPath, headless: true);
 
-  PageManager page = new PageManager(session);
+  TargetID targetId = await chromium.targets.createTarget(
+      'https://www.github.com');
+  Session session = await chromium.connection.createSession(targetId);
 
-  NetworkManager networkManager = new NetworkManager(session);
-  await networkManager.enable();
-  await waitUntilNetworkIdle(networkManager);
+  PageDomain page = new PageDomain(session);
+
+  // Force the "screen" media or some CSS @media print can change the look
+  EmulationDomain emulation = new EmulationDomain(session);
+  await emulation.setEmulatedMedia('screen');
+
+  await waitUntilNetworkIdle(session);
 
   List<int> pdf = BASE64.decode(await page.printToPDF(
       pageRanges: '1',
@@ -42,7 +41,5 @@ main() async {
   await new File.fromUri(Platform.script.resolve('_github.pdf'))
       .writeAsBytes(pdf);
 
-  chrome.kill();
-  await chrome.onClose;
-  exit(0);
+  await chromium.close();
 }

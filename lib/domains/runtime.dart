@@ -5,10 +5,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class RuntimeManager {
+class RuntimeDomain {
   final Client _client;
 
-  RuntimeManager(this._client);
+  RuntimeDomain(this._client);
 
   /// Issued when new execution context is created.
   Stream<ExecutionContextDescription> get onExecutionContextCreated => _client
@@ -587,6 +587,10 @@ class ScriptId {
   factory ScriptId.fromJson(String value) => new ScriptId(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is ScriptId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Unique object identifier.
@@ -598,6 +602,10 @@ class RemoteObjectId {
   factory RemoteObjectId.fromJson(String value) => new RemoteObjectId(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is RemoteObjectId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Primitive value which cannot be JSON-stringified.
@@ -623,6 +631,11 @@ class UnserializableValue {
   factory UnserializableValue.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) =>
+      other is UnserializableValue && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Mirror object referencing original JavaScript object.
@@ -1102,6 +1115,11 @@ class ExecutionContextId {
       new ExecutionContextId(value);
 
   int toJson() => value;
+
+  bool operator ==(other) =>
+      other is ExecutionContextId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Description of an isolated world.
@@ -1245,6 +1263,10 @@ class Timestamp {
   factory Timestamp.fromJson(num value) => new Timestamp(value);
 
   num toJson() => value;
+
+  bool operator ==(other) => other is Timestamp && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Stack entry for runtime errors and assertions.

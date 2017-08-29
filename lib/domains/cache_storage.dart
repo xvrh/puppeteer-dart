@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class CacheStorageManager {
+class CacheStorageDomain {
   final Client _client;
 
-  CacheStorageManager(this._client);
+  CacheStorageDomain(this._client);
 
   /// Requests cache names.
   /// [securityOrigin] Security origin.
@@ -116,6 +116,10 @@ class CacheId {
   factory CacheId.fromJson(String value) => new CacheId(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is CacheId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Data entry.

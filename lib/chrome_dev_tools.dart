@@ -6,6 +6,7 @@ import 'package:chrome_dev_tools/domains/target.dart';
 import 'dart:convert';
 import 'package:logging/logging.dart';
 export 'src/connection.dart' show Connection, Session;
+export 'domains/target.dart';
 
 final Logger _logger = new Logger('chrome_dev_tools');
 
@@ -29,16 +30,21 @@ const List<String> _defaultArgs = const <String>[
   '--disable-extensions',
 ];
 
-class Chrome {
-  final Process _process;
+const List<String> _headlessArgs = const [
+  '--headless',
+  '--disable-gpu',
+  '--hide-scrollbars',
+  '--mute-audio'
+];
+
+class Chromium {
+  final Process process;
   final Connection connection;
 
-  Chrome._(this._process, this.connection);
+  Chromium._(this.process, this.connection);
 
-  static final RegExp _devToolRegExp =
-      new RegExp(r'^DevTools listening on (ws:\/\/.*)$');
-  static Future<Chrome> launch(String binary,
-      {bool headless: true, bool useTemporaryUserData: true}) async {
+  static Future<Chromium> launch(String chromiumExecutable,
+      {bool headless: true, bool useTemporaryUserData: false}) async {
     Directory userDataDir;
     if (useTemporaryUserData) {
       userDataDir = await Directory.systemTemp.createTemp('chrome_');
@@ -50,12 +56,11 @@ class Chrome {
     }
 
     if (headless) {
-      chromeArgs.addAll(
-          ['--headless', '--disable-gpu', '--hide-scrollbars', '--mute-audio']);
+      chromeArgs.addAll(_headlessArgs);
     }
 
-    _logger.info('Start $binary with $chromeArgs');
-    Process chromeProcess = await Process.start(binary, chromeArgs);
+    _logger.info('Start $chromiumExecutable with $chromeArgs');
+    Process chromeProcess = await Process.start(chromiumExecutable, chromeArgs);
 
     chromeProcess.exitCode.then((int exitCode) {
       _logger.info('Chrome exit with $exitCode.');
@@ -69,17 +74,19 @@ class Chrome {
     if (webSocketUrl != null) {
       Connection connection = await Connection.create(webSocketUrl);
 
-      return new Chrome._(chromeProcess, connection);
+      return new Chromium._(chromeProcess, connection);
     } else {
       throw new Exception('Not able to connect to Chrome DevTools');
     }
   }
 
+  static final RegExp _devToolRegExp =
+      new RegExp(r'^DevTools listening on (ws:\/\/.*)$');
   static Future _waitForWebSocketUrl(Process chromeProcess) async {
     await for (String line in chromeProcess.stderr
         .transform(new Utf8Decoder())
         .transform(new LineSplitter())) {
-      _logger.warning('Chrome $line');
+      _logger.warning('[Chrome stderr]: $line');
       Match match = _devToolRegExp.firstMatch(line);
       if (match != null) {
         return match.group(1);
@@ -87,13 +94,13 @@ class Chrome {
     }
   }
 
-  TargetManager get targets => connection.targets;
+  TargetDomain get targets => connection.targets;
 
-  Future<PageManager> newPage() async {
+  Future<PageDomain> newPage() async {
     TargetID targetId = await connection.targets.createTarget('about:blank');
     Session client = await connection.createSession(targetId);
 
-    return new PageManager(client);
+    return new PageDomain(client);
   }
 
   Future closeAllTabs() async {
@@ -102,16 +109,16 @@ class Chrome {
     }
   }
 
-  Future get onClose => _process.exitCode;
-
-  void kill() {
+  Future<int> close() {
     if (Platform.isWindows) {
       // Allow a clean exit on Windows.
       // With `process.kill`, it seems that chrome retain a lock on the user-data directory
       Process
-          .runSync('taskkill', ['/pid', _process.pid.toString(), '/T', '/F']);
+          .runSync('taskkill', ['/pid', process.pid.toString(), '/T', '/F']);
     } else {
-      _process.kill(ProcessSignal.SIGINT);
+      process.kill(ProcessSignal.SIGINT);
     }
+
+    return process.exitCode;
   }
 }

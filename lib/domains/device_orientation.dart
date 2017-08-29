@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class DeviceOrientationManager {
+class DeviceOrientationDomain {
   final Client _client;
 
-  DeviceOrientationManager(this._client);
+  DeviceOrientationDomain(this._client);
 
   /// Overrides the Device Orientation.
   /// [alpha] Mock alpha

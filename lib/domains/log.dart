@@ -7,10 +7,10 @@ import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 import 'network.dart' as network;
 
-class LogManager {
+class LogDomain {
   final Client _client;
 
-  LogManager(this._client);
+  LogDomain(this._client);
 
   /// Issued when new message was logged.
   Stream<LogEntry> get onEntryAdded => _client.onEvent

@@ -8,10 +8,10 @@ import 'dom.dart' as dom;
 import 'runtime.dart' as runtime;
 import 'page.dart' as page;
 
-class OverlayManager {
+class OverlayDomain {
   final Client _client;
 
-  OverlayManager(this._client);
+  OverlayDomain(this._client);
 
   /// Fired when the node should be highlighted. This happens after call to <code>setInspectMode</code>.
   Stream<dom.NodeId> get onNodeHighlightRequested => _client.onEvent
@@ -409,4 +409,8 @@ class InspectMode {
   factory InspectMode.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is InspectMode && other.value == value;
+
+  int get hashCode => value.hashCode;
 }

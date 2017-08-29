@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class InputManager {
+class InputDomain {
   final Client _client;
 
-  InputManager(this._client);
+  InputDomain(this._client);
 
   /// Ignores input events (useful while auditing page).
   /// [ignore] Ignores input events processing when set to true.
@@ -412,6 +412,10 @@ class GestureSourceType {
   factory GestureSourceType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is GestureSourceType && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// UTC time in seconds, counted from January 1, 1970.
@@ -423,4 +427,8 @@ class TimeSinceEpoch {
   factory TimeSinceEpoch.fromJson(num value) => new TimeSinceEpoch(value);
 
   num toJson() => value;
+
+  bool operator ==(other) => other is TimeSinceEpoch && other.value == value;
+
+  int get hashCode => value.hashCode;
 }

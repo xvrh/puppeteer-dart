@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class MemoryManager {
+class MemoryDomain {
   final Client _client;
 
-  MemoryManager(this._client);
+  MemoryDomain(this._client);
 
   Future<GetDOMCountersResult> getDOMCounters() async {
     Map result = await _client.send('Memory.getDOMCounters');
@@ -74,4 +74,8 @@ class PressureLevel {
   factory PressureLevel.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is PressureLevel && other.value == value;
+
+  int get hashCode => value.hashCode;
 }

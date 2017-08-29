@@ -5,10 +5,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class TargetManager {
+class TargetDomain {
   final Client _client;
 
-  TargetManager(this._client);
+  TargetDomain(this._client);
 
   /// Issued when a possible inspection target is created.
   Stream<TargetInfo> get onTargetCreated => _client.onEvent
@@ -310,6 +310,10 @@ class TargetID {
   factory TargetID.fromJson(String value) => new TargetID(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is TargetID && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Unique identifier of attached debugging session.
@@ -321,6 +325,10 @@ class SessionID {
   factory SessionID.fromJson(String value) => new SessionID(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is SessionID && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 class BrowserContextID {
@@ -332,6 +340,10 @@ class BrowserContextID {
       new BrowserContextID(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is BrowserContextID && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 class TargetInfo {

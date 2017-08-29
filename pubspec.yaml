@@ -9,8 +9,9 @@ environment:
 
 dependencies:
   path: ^1.4.1
-  meta:
-  logging:
+  meta: ^1.1.1
+  logging: ^0.11.3+1
+  archive: ^1.0.31
 
 dev_dependencies:
   test: ^0.12.24+2

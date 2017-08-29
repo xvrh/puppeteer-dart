@@ -25,28 +25,28 @@ class Connection implements Client {
   final List<Session> _sessions = [];
   final StreamController<Event> _eventController =
       new StreamController<Event>.broadcast();
-  TargetManager _targetManager;
+  TargetDomain _targets;
   final List<StreamSubscription> _subscriptions = [];
 
   Connection._(this._webSocket) {
     _subscriptions.add(_webSocket.listen(_onMessage));
 
-    _targetManager = new TargetManager(this);
+    _targets = new TargetDomain(this);
 
-    _subscriptions.add(_targetManager.onReceivedMessageFromTarget
+    _subscriptions.add(_targets.onReceivedMessageFromTarget
         .listen((ReceivedMessageFromTargetEvent e) {
       Session session = _getSession(e.sessionId);
       session._onMessage(e.message);
     }));
     _subscriptions.add(
-        _targetManager.onDetachedFromTarget.listen((DetachedFromTargetEvent e) {
+        _targets.onDetachedFromTarget.listen((DetachedFromTargetEvent e) {
       Session session = _getSession(e.sessionId);
       session._onClosed();
       _sessions.remove(session);
     }));
   }
 
-  TargetManager get targets => _targetManager;
+  TargetDomain get targets => _targets;
 
   Session _getSession(SessionID sessionId) =>
       _sessions.firstWhere((s) => s.sessionId.value == sessionId.value);
@@ -63,7 +63,7 @@ class Connection implements Client {
     int id = ++_lastId;
     String message = _encodeMessage(id, method, parameters);
 
-    _logger.info('SEND ► $message');
+    _logger.fine('SEND ► $message');
 
     Completer completer = new Completer();
     _completers[id] = completer;
@@ -73,8 +73,8 @@ class Connection implements Client {
   }
 
   Future<Session> createSession(TargetID targetId) async {
-    SessionID sessionId = await _targetManager.attachToTarget(targetId);
-    Session session = new Session(_targetManager, targetId, sessionId);
+    SessionID sessionId = await _targets.attachToTarget(targetId);
+    Session session = new Session._(_targets, targetId, sessionId);
     _sessions.add(session);
 
     return session;
@@ -84,7 +84,7 @@ class Connection implements Client {
     Map object = JSON.decode(message);
     int id = object['id'];
     if (id != null) {
-      _logger.info('◀ RECV $message');
+      _logger.fine('◀ RECV $message');
 
       Completer completer = _completers.remove(id);
       assert(completer != null);
@@ -99,7 +99,7 @@ class Connection implements Client {
       String method = object['method'];
       Map params = object['params'];
 
-      _logger.info('◀ EVENT $message');
+      _logger.fine('◀ EVENT $message');
 
       _eventController.add(new Event._(method, params));
     }
@@ -136,12 +136,12 @@ class Session implements Client {
   static int _lastId = 0;
   final TargetID targetID;
   final SessionID sessionId;
-  final TargetManager _targetManager;
+  final TargetDomain _targets;
   final Map<int, Completer> _completers = {};
   final StreamController<Event> _eventController =
       new StreamController<Event>.broadcast();
 
-  Session(this._targetManager, this.targetID, this.sessionId);
+  Session._(this._targets, this.targetID, this.sessionId);
 
   Future<Map> send(String method, [Map parameters]) {
     if (_eventController.isClosed) {
@@ -153,7 +153,7 @@ class Session implements Client {
     Completer completer = new Completer();
     _completers[id] = completer;
 
-    _targetManager.sendMessageToTarget(message, sessionId: sessionId);
+    _targets.sendMessageToTarget(message, sessionId: sessionId);
 
     return completer.future;
   }
@@ -186,6 +186,6 @@ class Session implements Client {
   }
 
   Future dispose() {
-    return _targetManager.closeTarget(targetID);
+    return _targets.closeTarget(targetID);
   }
 }

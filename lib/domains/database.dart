@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class DatabaseManager {
+class DatabaseDomain {
   final Client _client;
 
-  DatabaseManager(this._client);
+  DatabaseDomain(this._client);
 
   Stream<Database> get onAddDatabase => _client.onEvent
       .where((Event event) => event.name == 'Database.addDatabase')
@@ -84,6 +84,10 @@ class DatabaseId {
   factory DatabaseId.fromJson(String value) => new DatabaseId(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is DatabaseId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Database object.

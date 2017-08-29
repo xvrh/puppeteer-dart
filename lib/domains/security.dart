@@ -5,10 +5,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class SecurityManager {
+class SecurityDomain {
   final Client _client;
 
-  SecurityManager(this._client);
+  SecurityDomain(this._client);
 
   /// The security state of the page changed.
   Stream<SecurityStateChangedEvent> get onSecurityStateChanged =>
@@ -131,6 +131,10 @@ class CertificateId {
   factory CertificateId.fromJson(int value) => new CertificateId(value);
 
   int toJson() => value;
+
+  bool operator ==(other) => other is CertificateId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// A description of mixed content (HTTP resources on HTTPS pages), as defined by https://www.w3.org/TR/mixed-content/#categories
@@ -153,6 +157,10 @@ class MixedContentType {
   factory MixedContentType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is MixedContentType && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// The security level of a page or resource.
@@ -177,6 +185,10 @@ class SecurityState {
   factory SecurityState.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) => other is SecurityState && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// An explanation of an factor contributing to the security state.
@@ -306,4 +318,9 @@ class CertificateErrorAction {
   factory CertificateErrorAction.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  bool operator ==(other) =>
+      other is CertificateErrorAction && other.value == value;
+
+  int get hashCode => value.hashCode;
 }

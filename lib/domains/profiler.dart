@@ -5,10 +5,10 @@ import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 import 'debugger.dart' as debugger;
 
-class ProfilerManager {
+class ProfilerDomain {
   final Client _client;
 
-  ProfilerManager(this._client);
+  ProfilerDomain(this._client);
 
   /// Sent when new profile recording is started using console.profile() call.
   Stream<ConsoleProfileStartedEvent> get onConsoleProfileStarted => _client

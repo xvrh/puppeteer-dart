@@ -6,10 +6,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
-class DebuggerManager {
+class DebuggerDomain {
   final Client _client;
 
-  DebuggerManager(this._client);
+  DebuggerDomain(this._client);
 
   /// Fired when virtual machine parses script. This event is also fired for all known and uncollected scripts upon enabling debugger.
   Stream<ScriptParsedEvent> get onScriptParsed => _client.onEvent
@@ -760,6 +760,10 @@ class BreakpointId {
   factory BreakpointId.fromJson(String value) => new BreakpointId(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is BreakpointId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Call frame identifier.
@@ -771,6 +775,10 @@ class CallFrameId {
   factory CallFrameId.fromJson(String value) => new CallFrameId(value);
 
   String toJson() => value;
+
+  bool operator ==(other) => other is CallFrameId && other.value == value;
+
+  int get hashCode => value.hashCode;
 }
 
 /// Location in the source code.

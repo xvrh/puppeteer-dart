@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class PerformanceManager {
+class PerformanceDomain {
   final Client _client;
 
-  PerformanceManager(this._client);
+  PerformanceDomain(this._client);
 
   /// Current values of the metrics.
   Stream<MetricsEvent> get onMetrics => _client.onEvent
