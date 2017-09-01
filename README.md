@@ -3,7 +3,7 @@
 A Dart library to control Chrome over the DevTools Protocol.
 
 This is a simple 1:1 mapping with the [Chrome DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).  
-All the code in `lib/domains` are generated from the [browser_protocol.json](browser_protocol.json) and [js_protocol.json](js_protocol.json).
+All the code in `lib/domains` are generated from the [browser_protocol.json](https://chromium.googlesource.com/chromium/src/+/master/third_party/WebKit/Source/core/inspector/browser_protocol.json) and [js_protocol.json](https://chromium.googlesource.com/v8/v8/+/master/src/inspector/js_protocol.json).
 
 
 ## Usage
@@ -16,8 +16,9 @@ import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:chrome_dev_tools/chromium_downloader.dart';
 
 main() async {
-  // Download Chromium if necessary. You can also specify the cache folder and a specific revision.
-  String chromeExecutable = (await downloadChromium()).executablePath;
+  // Download a version of Chromium in a cache folder.
+  // Depending of your OS, you may need to add some execution permission.
+  String chromeExecutable = (await downloadChromium(revision: 497674)).executablePath;
 
   // Launch a process and connect to the DevTools
   Chromium chromium = await Chromium.launch(chromeExecutable, headless: true);
@@ -25,7 +26,7 @@ main() async {
   // Open a new tab
   await chromium.targets.createTarget('https://www.github.com');
 
-  // Kill the process and delete the user-data directory
+  // Kill the process
   await chromium.close();
 }
 ```
@@ -55,8 +56,9 @@ main() async {
   // A small helper to wait until the network is quite
   await waitUntilNetworkIdle(session);
 
-  PageDomain page = new PageDomain(session);
+
   // Capture the PDF and convert it to a List of bytes.
+  PageDomain page = new PageDomain(session);
   List<int> pdf = BASE64.decode(await page.printToPDF(
       pageRanges: '1',
       landscape: true,
@@ -96,18 +98,34 @@ main() async {
   // Capture a zone of the page.
   String screenshot = await page.captureScreenshot(clip: clip);
 
-  // Save it in a file
+  // Save it in a file next to this script
   await new File.fromUri(Platform.script.resolve('_github_form.png'))
       .writeAsBytes(BASE64.decode(screenshot));
 }
 ```
 ### Create a static version of a Single Page Application
-TODO
+```dart
+main() async {
+  Session session; //...
+  
+  // Take a snapshot of the DOM of the current page
+  DOMSnapshotDomain dom = new DOMSnapshotDomain(session);
+  var result = await dom.getSnapshot([]);
 
+  // Iterate the nodes and output some html.
+  // This example needs a lot more work
+  for (DOMNode node in result.domNodes) {
+    String nodeString = '<${node.nodeName}';
+    if (node.attributes != null) {
+      nodeString +=
+          ' ${node.attributes.map((n) => '${n.name}=${n.value}').toList()}';
+    }
+    nodeString += '>';
+    print(nodeString);
+  }
+}
+```
 
 ## Related work
  * [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface)
  * [puppeteer](https://github.com/GoogleChrome/puppeteer)
-
-[browser_protocol.json]: https://chromium.googlesource.com/chromium/src/+/master/third_party/WebKit/Source/core/inspector/browser_protocol.json
-[js_protocol.json]: https://chromium.googlesource.com/v8/v8/+/master/src/inspector/js_protocol.json
