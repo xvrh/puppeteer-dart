@@ -144,6 +144,8 @@ class MemoryDumpConfig {
   bool operator ==(other) => other is MemoryDumpConfig && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 class TraceConfig {

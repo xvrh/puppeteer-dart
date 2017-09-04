@@ -764,6 +764,8 @@ class BreakpointId {
   bool operator ==(other) => other is BreakpointId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Call frame identifier.
@@ -779,6 +781,8 @@ class CallFrameId {
   bool operator ==(other) => other is CallFrameId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Location in the source code.

@@ -193,6 +193,8 @@ class HeapSnapshotObjectId {
       other is HeapSnapshotObjectId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Sampling Heap Profile node. Holds callsite information, allocation statistics and child nodes.

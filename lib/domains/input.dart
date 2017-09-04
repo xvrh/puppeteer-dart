@@ -413,9 +413,7 @@ class GestureSourceType {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is GestureSourceType && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// UTC time in seconds, counted from January 1, 1970.
@@ -431,4 +429,6 @@ class TimeSinceEpoch {
   bool operator ==(other) => other is TimeSinceEpoch && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }

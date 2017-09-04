@@ -187,10 +187,7 @@ class ServiceWorkerVersionRunningStatus {
 
   String toJson() => value;
 
-  bool operator ==(other) =>
-      other is ServiceWorkerVersionRunningStatus && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 class ServiceWorkerVersionStatus {
@@ -223,10 +220,7 @@ class ServiceWorkerVersionStatus {
 
   String toJson() => value;
 
-  bool operator ==(other) =>
-      other is ServiceWorkerVersionStatus && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// ServiceWorker version.

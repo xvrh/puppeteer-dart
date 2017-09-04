@@ -434,6 +434,8 @@ class StyleSheetId {
   bool operator ==(other) => other is StyleSheetId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Stylesheet type: "injected" for stylesheets injected via extension, "user-agent" for user-agent stylesheets, "inspector" for stylesheets created by the inspector (i.e. those holding the "via inspector" rules), "regular" for regular stylesheets.
@@ -459,9 +461,7 @@ class StyleSheetOrigin {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is StyleSheetOrigin && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// CSS rule collection for a single pseudo style.

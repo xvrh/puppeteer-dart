@@ -120,6 +120,8 @@ class CacheId {
   bool operator ==(other) => other is CacheId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Data entry.

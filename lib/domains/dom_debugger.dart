@@ -166,9 +166,7 @@ class DOMBreakpointType {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is DOMBreakpointType && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// Object event listener.

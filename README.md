@@ -72,36 +72,42 @@ main() async {
 
 ### Take a screenshot of an element.
 ```dart
+import 'dart:convert';
+import 'dart:io';
+import 'package:chrome_dev_tools/chrome_dev_tools.dart';
+import 'package:chrome_dev_tools/chromium_downloader.dart';
+import 'package:chrome_dev_tools/domains/page.dart';
+import 'package:chrome_dev_tools/domains/runtime.dart';
+import 'package:chrome_dev_tools/src/remote_object.dart';
+import 'package:chrome_dev_tools/src/wait_until.dart';
+
 main() async {
-  Session session; // ....
-  
+  Session session; // ...
+
+  await waitUntilNetworkIdle(session);
+
   RuntimeDomain runtime = new RuntimeDomain(session);
-  
-  // Evaluate a Javascript expression to get the absolute bounds of a specific element 
   var result = await runtime.evaluate(
       '''document.querySelector('form[action="/join"]').getBoundingClientRect();''');
-  var object = await runtime.getProperties(result.result.objectId);
 
-  num getNum(String propertyName) {
-    return object.result.firstWhere((p) => p.name == propertyName).value.value;
-  }
+  Map rect = await getProperties(session, result.result);
 
   Viewport clip = new Viewport(
-      x: getNum('x'),
-      y: getNum('y'),
-      width: getNum('width'),
-      height: getNum('height'),
+      x: rect['x'],
+      y: rect['y'],
+      width: rect['width'],
+      height: rect['height'],
       scale: 1);
 
   PageDomain page = new PageDomain(session);
-  
-  // Capture a zone of the page.
   String screenshot = await page.captureScreenshot(clip: clip);
 
-  // Save it in a file next to this script
   await new File.fromUri(Platform.script.resolve('_github_form.png'))
       .writeAsBytes(BASE64.decode(screenshot));
+
+  await chromium.close();
 }
+
 ```
 ### Create a static version of a Single Page Application
 ```dart

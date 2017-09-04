@@ -44,6 +44,8 @@ class AXNodeId {
   bool operator ==(other) => other is AXNodeId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Enum of possible property types.
@@ -96,9 +98,7 @@ class AXValueType {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is AXValueType && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// Enum of possible property sources.
@@ -131,9 +131,7 @@ class AXValueSourceType {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is AXValueSourceType && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// Enum of possible native property sources (as a subtype of a particular AXValueSourceType).
@@ -173,10 +171,7 @@ class AXValueNativeSourceType {
 
   String toJson() => value;
 
-  bool operator ==(other) =>
-      other is AXValueNativeSourceType && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// A single source for a computed AX property.
@@ -426,9 +421,7 @@ class AXGlobalStates {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is AXGlobalStates && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// Attributes which apply to nodes in live regions.
@@ -456,10 +449,7 @@ class AXLiveRegionAttributes {
 
   String toJson() => value;
 
-  bool operator ==(other) =>
-      other is AXLiveRegionAttributes && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// Attributes which apply to widgets.
@@ -507,10 +497,7 @@ class AXWidgetAttributes {
 
   String toJson() => value;
 
-  bool operator ==(other) =>
-      other is AXWidgetAttributes && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// States which apply to widgets.
@@ -536,9 +523,7 @@ class AXWidgetStates {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is AXWidgetStates && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// Relationships between elements other than parent/child/sibling.
@@ -578,10 +563,7 @@ class AXRelationshipAttributes {
 
   String toJson() => value;
 
-  bool operator ==(other) =>
-      other is AXRelationshipAttributes && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// A node in the accessibility tree.

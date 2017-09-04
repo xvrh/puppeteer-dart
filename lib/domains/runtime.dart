@@ -591,6 +591,8 @@ class ScriptId {
   bool operator ==(other) => other is ScriptId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Unique object identifier.
@@ -606,6 +608,8 @@ class RemoteObjectId {
   bool operator ==(other) => other is RemoteObjectId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Primitive value which cannot be JSON-stringified.
@@ -613,15 +617,15 @@ class UnserializableValue {
   static const UnserializableValue infinity =
       const UnserializableValue._('Infinity');
   static const UnserializableValue naN = const UnserializableValue._('NaN');
-  static const UnserializableValue minusInfinity =
+  static const UnserializableValue negativeInfinity =
       const UnserializableValue._('-Infinity');
-  static const UnserializableValue minusZero =
+  static const UnserializableValue negativeZero =
       const UnserializableValue._('-0');
   static const values = const {
     'Infinity': infinity,
     'NaN': naN,
-    '-Infinity': minusInfinity,
-    '-0': minusZero,
+    '-Infinity': negativeInfinity,
+    '-0': negativeZero,
   };
 
   final String value;
@@ -632,10 +636,7 @@ class UnserializableValue {
 
   String toJson() => value;
 
-  bool operator ==(other) =>
-      other is UnserializableValue && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// Mirror object referencing original JavaScript object.
@@ -1120,6 +1121,8 @@ class ExecutionContextId {
       other is ExecutionContextId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Description of an isolated world.
@@ -1267,6 +1270,8 @@ class Timestamp {
   bool operator ==(other) => other is Timestamp && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Stack entry for runtime errors and assertions.

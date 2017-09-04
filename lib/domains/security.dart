@@ -135,6 +135,8 @@ class CertificateId {
   bool operator ==(other) => other is CertificateId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// A description of mixed content (HTTP resources on HTTPS pages), as defined by https://www.w3.org/TR/mixed-content/#categories
@@ -158,9 +160,7 @@ class MixedContentType {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is MixedContentType && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// The security level of a page or resource.
@@ -186,9 +186,7 @@ class SecurityState {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is SecurityState && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// An explanation of an factor contributing to the security state.
@@ -319,8 +317,5 @@ class CertificateErrorAction {
 
   String toJson() => value;
 
-  bool operator ==(other) =>
-      other is CertificateErrorAction && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }

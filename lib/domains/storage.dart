@@ -153,9 +153,7 @@ class StorageType {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is StorageType && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// Usage for a storage type.

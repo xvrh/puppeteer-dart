@@ -410,7 +410,5 @@ class InspectMode {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is InspectMode && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }

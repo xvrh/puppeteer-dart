@@ -124,6 +124,8 @@ class WindowID {
   bool operator ==(other) => other is WindowID && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// The state of the browser window.
@@ -147,9 +149,7 @@ class WindowState {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is WindowState && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// Browser window bounds information

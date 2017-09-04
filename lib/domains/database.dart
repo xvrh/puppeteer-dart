@@ -88,6 +88,8 @@ class DatabaseId {
   bool operator ==(other) => other is DatabaseId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Database object.

@@ -1004,6 +1004,8 @@ class LoaderId {
   bool operator ==(other) => other is LoaderId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Unique request identifier.
@@ -1019,6 +1021,8 @@ class RequestId {
   bool operator ==(other) => other is RequestId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Unique intercepted request identifier.
@@ -1034,6 +1038,8 @@ class InterceptionId {
   bool operator ==(other) => other is InterceptionId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Network level fetch failure reason.
@@ -1081,9 +1087,7 @@ class ErrorReason {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is ErrorReason && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// UTC time in seconds, counted from January 1, 1970.
@@ -1099,6 +1103,8 @@ class TimeSinceEpoch {
   bool operator ==(other) => other is TimeSinceEpoch && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Monotonically increasing time in seconds since an arbitrary point in the past.
@@ -1114,6 +1120,8 @@ class MonotonicTime {
   bool operator ==(other) => other is MonotonicTime && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Request / response headers as keys / values of JSON object.
@@ -1129,6 +1137,8 @@ class Headers {
   bool operator ==(other) => other is Headers && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Loading priority of a resource request.
@@ -1162,9 +1172,7 @@ class ConnectionType {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is ConnectionType && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// Represents the cookie's 'SameSite' status: https://tools.ietf.org/html/draft-west-first-party-cookies
@@ -1184,9 +1192,7 @@ class CookieSameSite {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is CookieSameSite && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// Timing information for the request.
@@ -1325,9 +1331,7 @@ class ResourcePriority {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is ResourcePriority && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// HTTP request data.
@@ -1595,9 +1599,7 @@ class BlockedReason {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is BlockedReason && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// HTTP response data.

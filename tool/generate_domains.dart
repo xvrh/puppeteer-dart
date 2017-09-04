@@ -444,7 +444,7 @@ class _InternalType {
       }
     }
 
-    if (!hasProperties) {
+    if (!hasProperties && enumValues == null) {
       //TODO(xha): generate operator== and hashcode also for complex type?
       code.writeln();
       code.writeln('bool operator ==(other) => other is $id && other.value == value;');
@@ -452,7 +452,11 @@ class _InternalType {
       code.writeln('int get hashCode => value.hashCode;');
     }
 
-    //TODO(xha): generate a readable toString() method.
+    if (!hasProperties) {
+      code.writeln();
+      code.writeln('String toString() => value.toString();');
+    }
+    //TODO(xha): generate a readable toString() method for the complex type
 
     code.writeln('}');
 
@@ -548,9 +552,9 @@ String _toComment(String comment) {
 
 String _sanitizeName(String input) {
   if (input == '-0') {
-    return 'minusZero';
+    return 'negativeZero';
   } else if (input == '-Infinity') {
-    return 'minusInfinity';
+    return 'negativeInfinity';
   }
   return input;
 }

@@ -185,6 +185,8 @@ class LayerId {
   bool operator ==(other) => other is LayerId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Unique snapshot identifier.
@@ -200,6 +202,8 @@ class SnapshotId {
   bool operator ==(other) => other is SnapshotId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Rectangle where scrolling happens on the main thread.
@@ -476,4 +480,6 @@ class PaintProfile {
   bool operator ==(other) => other is PaintProfile && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }

@@ -982,6 +982,8 @@ class NodeId {
   bool operator ==(other) => other is NodeId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Unique DOM node identifier used to reference a node that may not have been pushed to the front-end.
@@ -997,6 +999,8 @@ class BackendNodeId {
   bool operator ==(other) => other is BackendNodeId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Backend node with a friendly name.
@@ -1083,9 +1087,7 @@ class PseudoType {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is PseudoType && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// Shadow root type.
@@ -1107,9 +1109,7 @@ class ShadowRootType {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is ShadowRootType && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// DOM interaction is implemented in terms of mirror objects that represent the actual DOM nodes. DOMNode is a base node mirror type.
@@ -1430,6 +1430,8 @@ class Quad {
   bool operator ==(other) => other is Quad && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Box model.

@@ -75,7 +75,5 @@ class PressureLevel {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is PressureLevel && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }

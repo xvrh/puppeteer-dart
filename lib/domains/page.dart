@@ -965,9 +965,7 @@ class ResourceType {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is ResourceType && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// Unique frame identifier.
@@ -983,6 +981,8 @@ class FrameId {
   bool operator ==(other) => other is FrameId && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Information about the Frame on the page.
@@ -1183,6 +1183,8 @@ class ScriptIdentifier {
   bool operator ==(other) => other is ScriptIdentifier && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Transition type.
@@ -1228,9 +1230,7 @@ class TransitionType {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is TransitionType && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// Navigation history entry.
@@ -1364,9 +1364,7 @@ class DialogType {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is DialogType && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// Error while paring app manifest.
@@ -1431,10 +1429,7 @@ class NavigationResponse {
 
   String toJson() => value;
 
-  bool operator ==(other) =>
-      other is NavigationResponse && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }
 
 /// Layout viewport position and dimensions.

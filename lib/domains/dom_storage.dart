@@ -197,4 +197,6 @@ class Item {
   bool operator ==(other) => other is Item && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }

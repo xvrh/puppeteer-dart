@@ -97,4 +97,6 @@ class StreamHandle {
   bool operator ==(other) => other is StreamHandle && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }

@@ -281,7 +281,5 @@ class VirtualTimePolicy {
 
   String toJson() => value;
 
-  bool operator ==(other) => other is VirtualTimePolicy && other.value == value;
-
-  int get hashCode => value.hashCode;
+  String toString() => value.toString();
 }

@@ -314,6 +314,8 @@ class TargetID {
   bool operator ==(other) => other is TargetID && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 /// Unique identifier of attached debugging session.
@@ -329,6 +331,8 @@ class SessionID {
   bool operator ==(other) => other is SessionID && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 class BrowserContextID {
@@ -344,6 +348,8 @@ class BrowserContextID {
   bool operator ==(other) => other is BrowserContextID && other.value == value;
 
   int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
 }
 
 class TargetInfo {
