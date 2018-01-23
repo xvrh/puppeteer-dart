@@ -17,9 +17,9 @@ class LogDomain {
       .where((Event event) => event.name == 'Log.entryAdded')
       .map((Event event) => new LogEntry.fromJson(event.parameters['entry']));
 
-  /// Enables log domain, sends the entries collected so far to the client by means of the <code>entryAdded</code> notification.
-  Future enable() async {
-    await _client.send('Log.enable');
+  /// Clears the log.
+  Future clear() async {
+    await _client.send('Log.clear');
   }
 
   /// Disables log domain, prevents further log entries from being reported to the client.
@@ -27,9 +27,10 @@ class LogDomain {
     await _client.send('Log.disable');
   }
 
-  /// Clears the log.
-  Future clear() async {
-    await _client.send('Log.clear');
+  /// Enables log domain, sends the entries collected so far to the client by means of the
+  /// `entryAdded` notification.
+  Future enable() async {
+    await _client.send('Log.enable');
   }
 
   /// start violation reporting.
@@ -78,6 +79,9 @@ class LogEntry {
   /// Identifier of the worker associated with this entry.
   final String workerId;
 
+  /// Call arguments.
+  final List<runtime.RemoteObject> args;
+
   LogEntry({
     @required this.source,
     @required this.level,
@@ -88,6 +92,7 @@ class LogEntry {
     this.stackTrace,
     this.networkRequestId,
     this.workerId,
+    this.args,
   });
 
   factory LogEntry.fromJson(Map json) {
@@ -105,6 +110,11 @@ class LogEntry {
           ? new network.RequestId.fromJson(json['networkRequestId'])
           : null,
       workerId: json.containsKey('workerId') ? json['workerId'] : null,
+      args: json.containsKey('args')
+          ? (json['args'] as List)
+              .map((e) => new runtime.RemoteObject.fromJson(e))
+              .toList()
+          : null,
     );
   }
 
@@ -129,6 +139,9 @@ class LogEntry {
     }
     if (workerId != null) {
       json['workerId'] = workerId;
+    }
+    if (args != null) {
+      json['args'] = args.map((e) => e.toJson()).toList();
     }
     return json;
   }

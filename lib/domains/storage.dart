@@ -8,11 +8,6 @@ class StorageDomain {
 
   StorageDomain(this._client);
 
-  /// A cache has been added/deleted.
-  Stream<String> get onCacheStorageListUpdated => _client.onEvent
-      .where((Event event) => event.name == 'Storage.cacheStorageListUpdated')
-      .map((Event event) => event.parameters['origin'] as String);
-
   /// A cache's contents have been modified.
   Stream<CacheStorageContentUpdatedEvent> get onCacheStorageContentUpdated =>
       _client.onEvent
@@ -20,6 +15,23 @@ class StorageDomain {
               event.name == 'Storage.cacheStorageContentUpdated')
           .map((Event event) =>
               new CacheStorageContentUpdatedEvent.fromJson(event.parameters));
+
+  /// A cache has been added/deleted.
+  Stream<String> get onCacheStorageListUpdated => _client.onEvent
+      .where((Event event) => event.name == 'Storage.cacheStorageListUpdated')
+      .map((Event event) => event.parameters['origin'] as String);
+
+  /// The origin's IndexedDB object store has been modified.
+  Stream<IndexedDBContentUpdatedEvent> get onIndexedDBContentUpdated => _client
+      .onEvent
+      .where((Event event) => event.name == 'Storage.indexedDBContentUpdated')
+      .map((Event event) =>
+          new IndexedDBContentUpdatedEvent.fromJson(event.parameters));
+
+  /// The origin's IndexedDB database list has been modified.
+  Stream<String> get onIndexedDBListUpdated => _client.onEvent
+      .where((Event event) => event.name == 'Storage.indexedDBListUpdated')
+      .map((Event event) => event.parameters['origin'] as String);
 
   /// Clears storage for origin.
   /// [origin] Security origin.
@@ -58,6 +70,17 @@ class StorageDomain {
     await _client.send('Storage.trackCacheStorageForOrigin', parameters);
   }
 
+  /// Registers origin to be notified when an update occurs to its IndexedDB.
+  /// [origin] Security origin.
+  Future trackIndexedDBForOrigin(
+    String origin,
+  ) async {
+    Map parameters = {
+      'origin': origin,
+    };
+    await _client.send('Storage.trackIndexedDBForOrigin', parameters);
+  }
+
   /// Unregisters origin from receiving notifications for cache storage.
   /// [origin] Security origin.
   Future untrackCacheStorageForOrigin(
@@ -67,6 +90,17 @@ class StorageDomain {
       'origin': origin,
     };
     await _client.send('Storage.untrackCacheStorageForOrigin', parameters);
+  }
+
+  /// Unregisters origin from receiving notifications for IndexedDB.
+  /// [origin] Security origin.
+  Future untrackIndexedDBForOrigin(
+    String origin,
+  ) async {
+    Map parameters = {
+      'origin': origin,
+    };
+    await _client.send('Storage.untrackIndexedDBForOrigin', parameters);
   }
 }
 
@@ -86,6 +120,31 @@ class CacheStorageContentUpdatedEvent {
     return new CacheStorageContentUpdatedEvent(
       origin: json['origin'],
       cacheName: json['cacheName'],
+    );
+  }
+}
+
+class IndexedDBContentUpdatedEvent {
+  /// Origin to update.
+  final String origin;
+
+  /// Database to update.
+  final String databaseName;
+
+  /// ObjectStore to update.
+  final String objectStoreName;
+
+  IndexedDBContentUpdatedEvent({
+    @required this.origin,
+    @required this.databaseName,
+    @required this.objectStoreName,
+  });
+
+  factory IndexedDBContentUpdatedEvent.fromJson(Map json) {
+    return new IndexedDBContentUpdatedEvent(
+      origin: json['origin'],
+      databaseName: json['databaseName'],
+      objectStoreName: json['objectStoreName'],
     );
   }
 }

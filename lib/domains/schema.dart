@@ -1,4 +1,4 @@
-/// Provides information about the protocol schema.
+/// This domain is deprecated.
 
 import 'dart:async';
 // ignore: unused_import

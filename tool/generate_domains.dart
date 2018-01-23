@@ -9,14 +9,6 @@ import 'package:path/path.dart' as p;
 final DartFormatter _dartFormatter =
     new DartFormatter(lineEnding: Platform.isWindows ? '\r\n' : '\n');
 
-// TODO(xha): lundi
-//  - Reprendre le code pour lancer chrome, se connecter en WebSocket.
-//  - Binder l'envoie et la lecture du JSON pour forwarder au bonnes targets.
-//  - Faire quelques tests avec chrome normal pour l'impression PDF
-// Autres idées où ça peut servir:
-//  - remplacer le webdriver pour les tests
-//  - faire une capture d'écran d'un élément html (exemple, un label)
-//  - capture les requêtes https pour rajouter ces infos dans le résumé des tests.
 main() {
   Protocol readProtocol(String fileName) {
     return new Protocol.fromString(
@@ -293,7 +285,8 @@ class _Event {
           mapCode =
               "(event.parameters['${parameter.name}'] as List).map((e) => $insideCode).toList()";
         } else {
-          mapCode = "new $streamTypeName.fromJson(event.parameters['${parameter.name}'])";
+          mapCode =
+              "new $streamTypeName.fromJson(event.parameters['${parameter.name}'])";
         }
       } else {
         mapCode = 'new $streamTypeName.fromJson(event.parameters)';
@@ -447,7 +440,8 @@ class _InternalType {
     if (!hasProperties && enumValues == null) {
       //TODO(xha): generate operator== and hashcode also for complex type?
       code.writeln();
-      code.writeln('bool operator ==(other) => other is $id && other.value == value;');
+      code.writeln(
+          'bool operator ==(other) => other is $id && other.value == value;');
       code.writeln();
       code.writeln('int get hashCode => value.hashCode;');
     }
@@ -543,7 +537,8 @@ bool isRawType(String type) =>
 
 String _toComment(String comment) {
   if (comment != null && comment.isNotEmpty) {
-    //TODO(xha): handle multi-lines comments and auto-split after 80 characters
+    comment = comment.replaceAll('\n', '\n/// ');
+    //TODO(xha): auto-split after 80 characters
     return '/// $comment';
   } else {
     return '';

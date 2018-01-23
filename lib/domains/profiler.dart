@@ -10,6 +10,12 @@ class ProfilerDomain {
 
   ProfilerDomain(this._client);
 
+  Stream<ConsoleProfileFinishedEvent> get onConsoleProfileFinished => _client
+      .onEvent
+      .where((Event event) => event.name == 'Profiler.consoleProfileFinished')
+      .map((Event event) =>
+          new ConsoleProfileFinishedEvent.fromJson(event.parameters));
+
   /// Sent when new profile recording is started using console.profile() call.
   Stream<ConsoleProfileStartedEvent> get onConsoleProfileStarted => _client
       .onEvent
@@ -17,18 +23,22 @@ class ProfilerDomain {
       .map((Event event) =>
           new ConsoleProfileStartedEvent.fromJson(event.parameters));
 
-  Stream<ConsoleProfileFinishedEvent> get onConsoleProfileFinished => _client
-      .onEvent
-      .where((Event event) => event.name == 'Profiler.consoleProfileFinished')
-      .map((Event event) =>
-          new ConsoleProfileFinishedEvent.fromJson(event.parameters));
+  Future disable() async {
+    await _client.send('Profiler.disable');
+  }
 
   Future enable() async {
     await _client.send('Profiler.enable');
   }
 
-  Future disable() async {
-    await _client.send('Profiler.disable');
+  /// Collect coverage data for the current isolate. The coverage data may be incomplete due to
+  /// garbage collection.
+  /// Return: Coverage data for the current isolate.
+  Future<List<ScriptCoverage>> getBestEffortCoverage() async {
+    Map result = await _client.send('Profiler.getBestEffortCoverage');
+    return (result['result'] as List)
+        .map((e) => new ScriptCoverage.fromJson(e))
+        .toList();
   }
 
   /// Changes CPU profiler sampling interval. Must be called before CPU profiles recording started.
@@ -46,13 +56,9 @@ class ProfilerDomain {
     await _client.send('Profiler.start');
   }
 
-  /// Return: Recorded profile.
-  Future<Profile> stop() async {
-    Map result = await _client.send('Profiler.stop');
-    return new Profile.fromJson(result['profile']);
-  }
-
-  /// Enable precise code coverage. Coverage data for JavaScript executed before enabling precise code coverage may be incomplete. Enabling prevents running optimized code and resets execution counters.
+  /// Enable precise code coverage. Coverage data for JavaScript executed before enabling precise code
+  /// coverage may be incomplete. Enabling prevents running optimized code and resets execution
+  /// counters.
   /// [callCount] Collect accurate call counts beyond simple 'covered' or 'not covered'.
   /// [detailed] Collect block-based coverage.
   Future startPreciseCoverage({
@@ -69,12 +75,30 @@ class ProfilerDomain {
     await _client.send('Profiler.startPreciseCoverage', parameters);
   }
 
-  /// Disable precise code coverage. Disabling releases unnecessary execution count records and allows executing optimized code.
+  /// Enable type profile.
+  Future startTypeProfile() async {
+    await _client.send('Profiler.startTypeProfile');
+  }
+
+  /// Return: Recorded profile.
+  Future<Profile> stop() async {
+    Map result = await _client.send('Profiler.stop');
+    return new Profile.fromJson(result['profile']);
+  }
+
+  /// Disable precise code coverage. Disabling releases unnecessary execution count records and allows
+  /// executing optimized code.
   Future stopPreciseCoverage() async {
     await _client.send('Profiler.stopPreciseCoverage');
   }
 
-  /// Collect coverage data for the current isolate, and resets execution counters. Precise code coverage needs to have started.
+  /// Disable type profile. Disabling releases type profile data collected so far.
+  Future stopTypeProfile() async {
+    await _client.send('Profiler.stopTypeProfile');
+  }
+
+  /// Collect coverage data for the current isolate, and resets execution counters. Precise code
+  /// coverage needs to have started.
   /// Return: Coverage data for the current isolate.
   Future<List<ScriptCoverage>> takePreciseCoverage() async {
     Map result = await _client.send('Profiler.takePreciseCoverage');
@@ -83,37 +107,13 @@ class ProfilerDomain {
         .toList();
   }
 
-  /// Collect coverage data for the current isolate. The coverage data may be incomplete due to garbage collection.
-  /// Return: Coverage data for the current isolate.
-  Future<List<ScriptCoverage>> getBestEffortCoverage() async {
-    Map result = await _client.send('Profiler.getBestEffortCoverage');
+  /// Collect type profile.
+  /// Return: Type profile for all scripts since startTypeProfile() was turned on.
+  Future<List<ScriptTypeProfile>> takeTypeProfile() async {
+    Map result = await _client.send('Profiler.takeTypeProfile');
     return (result['result'] as List)
-        .map((e) => new ScriptCoverage.fromJson(e))
+        .map((e) => new ScriptTypeProfile.fromJson(e))
         .toList();
-  }
-}
-
-class ConsoleProfileStartedEvent {
-  final String id;
-
-  /// Location of console.profile().
-  final debugger.Location location;
-
-  /// Profile title passed as an argument to console.profile().
-  final String title;
-
-  ConsoleProfileStartedEvent({
-    @required this.id,
-    @required this.location,
-    this.title,
-  });
-
-  factory ConsoleProfileStartedEvent.fromJson(Map json) {
-    return new ConsoleProfileStartedEvent(
-      id: json['id'],
-      location: new debugger.Location.fromJson(json['location']),
-      title: json.containsKey('title') ? json['title'] : null,
-    );
   }
 }
 
@@ -145,6 +145,30 @@ class ConsoleProfileFinishedEvent {
   }
 }
 
+class ConsoleProfileStartedEvent {
+  final String id;
+
+  /// Location of console.profile().
+  final debugger.Location location;
+
+  /// Profile title passed as an argument to console.profile().
+  final String title;
+
+  ConsoleProfileStartedEvent({
+    @required this.id,
+    @required this.location,
+    this.title,
+  });
+
+  factory ConsoleProfileStartedEvent.fromJson(Map json) {
+    return new ConsoleProfileStartedEvent(
+      id: json['id'],
+      location: new debugger.Location.fromJson(json['location']),
+      title: json.containsKey('title') ? json['title'] : null,
+    );
+  }
+}
+
 /// Profile node. Holds callsite information, execution statistics and child nodes.
 class ProfileNode {
   /// Unique id of the node.
@@ -159,7 +183,8 @@ class ProfileNode {
   /// Child node ids.
   final List<int> children;
 
-  /// The reason of being not optimized. The function may be deoptimized or marked as don't optimize.
+  /// The reason of being not optimized. The function may be deoptimized or marked as don't
+  /// optimize.
   final String deoptReason;
 
   /// An array of source position ticks.
@@ -226,7 +251,8 @@ class Profile {
   /// Ids of samples top nodes.
   final List<int> samples;
 
-  /// Time intervals between adjacent samples in microseconds. The first delta is relative to the profile startTime.
+  /// Time intervals between adjacent samples in microseconds. The first delta is relative to the
+  /// profile startTime.
   final List<int> timeDeltas;
 
   Profile({
@@ -402,6 +428,97 @@ class ScriptCoverage {
       'scriptId': scriptId.toJson(),
       'url': url,
       'functions': functions.map((e) => e.toJson()).toList(),
+    };
+    return json;
+  }
+}
+
+/// Describes a type collected during runtime.
+class TypeObject {
+  /// Name of a type collected with type profiling.
+  final String name;
+
+  TypeObject({
+    @required this.name,
+  });
+
+  factory TypeObject.fromJson(Map json) {
+    return new TypeObject(
+      name: json['name'],
+    );
+  }
+
+  Map toJson() {
+    Map json = {
+      'name': name,
+    };
+    return json;
+  }
+}
+
+/// Source offset and types for a parameter or return value.
+class TypeProfileEntry {
+  /// Source offset of the parameter or end of function for return values.
+  final int offset;
+
+  /// The types for this parameter or return value.
+  final List<TypeObject> types;
+
+  TypeProfileEntry({
+    @required this.offset,
+    @required this.types,
+  });
+
+  factory TypeProfileEntry.fromJson(Map json) {
+    return new TypeProfileEntry(
+      offset: json['offset'],
+      types: (json['types'] as List)
+          .map((e) => new TypeObject.fromJson(e))
+          .toList(),
+    );
+  }
+
+  Map toJson() {
+    Map json = {
+      'offset': offset,
+      'types': types.map((e) => e.toJson()).toList(),
+    };
+    return json;
+  }
+}
+
+/// Type profile data collected during runtime for a JavaScript script.
+class ScriptTypeProfile {
+  /// JavaScript script id.
+  final runtime.ScriptId scriptId;
+
+  /// JavaScript script name or url.
+  final String url;
+
+  /// Type profile entries for parameters and return values of the functions in the script.
+  final List<TypeProfileEntry> entries;
+
+  ScriptTypeProfile({
+    @required this.scriptId,
+    @required this.url,
+    @required this.entries,
+  });
+
+  factory ScriptTypeProfile.fromJson(Map json) {
+    return new ScriptTypeProfile(
+      scriptId: new runtime.ScriptId.fromJson(json['scriptId']),
+      url: json['url'],
+      entries: (json['entries'] as List)
+          .map((e) => new TypeProfileEntry.fromJson(e))
+          .toList(),
+    );
+  }
+
+  Map toJson() {
+    Map json = {
+      'scriptId': scriptId.toJson(),
+      'url': url,
+      'entries': entries.map((e) => e.toJson()).toList(),
     };
     return json;
   }

@@ -10,6 +10,11 @@ class AnimationDomain {
 
   AnimationDomain(this._client);
 
+  /// Event for when an animation has been cancelled.
+  Stream<String> get onAnimationCanceled => _client.onEvent
+      .where((Event event) => event.name == 'Animation.animationCanceled')
+      .map((Event event) => event.parameters['id'] as String);
+
   /// Event for each animation that has been created.
   Stream<String> get onAnimationCreated => _client.onEvent
       .where((Event event) => event.name == 'Animation.animationCreated')
@@ -21,37 +26,14 @@ class AnimationDomain {
       .map((Event event) =>
           new Animation.fromJson(event.parameters['animation']));
 
-  /// Event for when an animation has been cancelled.
-  Stream<String> get onAnimationCanceled => _client.onEvent
-      .where((Event event) => event.name == 'Animation.animationCanceled')
-      .map((Event event) => event.parameters['id'] as String);
-
-  /// Enables animation domain notifications.
-  Future enable() async {
-    await _client.send('Animation.enable');
-  }
-
   /// Disables animation domain notifications.
   Future disable() async {
     await _client.send('Animation.disable');
   }
 
-  /// Gets the playback rate of the document timeline.
-  /// Return: Playback rate for animations on page.
-  Future<num> getPlaybackRate() async {
-    Map result = await _client.send('Animation.getPlaybackRate');
-    return result['playbackRate'];
-  }
-
-  /// Sets the playback rate of the document timeline.
-  /// [playbackRate] Playback rate for animations on page
-  Future setPlaybackRate(
-    num playbackRate,
-  ) async {
-    Map parameters = {
-      'playbackRate': playbackRate,
-    };
-    await _client.send('Animation.setPlaybackRate', parameters);
+  /// Enables animation domain notifications.
+  Future enable() async {
+    await _client.send('Animation.enable');
   }
 
   /// Returns the current time of the an animation.
@@ -67,49 +49,11 @@ class AnimationDomain {
     return result['currentTime'];
   }
 
-  /// Sets the paused state of a set of animations.
-  /// [animations] Animations to set the pause state of.
-  /// [paused] Paused state to set to.
-  Future setPaused(
-    List<String> animations,
-    bool paused,
-  ) async {
-    Map parameters = {
-      'animations': animations.map((e) => e).toList(),
-      'paused': paused,
-    };
-    await _client.send('Animation.setPaused', parameters);
-  }
-
-  /// Sets the timing of an animation node.
-  /// [animationId] Animation id.
-  /// [duration] Duration of the animation.
-  /// [delay] Delay of the animation.
-  Future setTiming(
-    String animationId,
-    num duration,
-    num delay,
-  ) async {
-    Map parameters = {
-      'animationId': animationId,
-      'duration': duration,
-      'delay': delay,
-    };
-    await _client.send('Animation.setTiming', parameters);
-  }
-
-  /// Seek a set of animations to a particular time within each animation.
-  /// [animations] List of animation ids to seek.
-  /// [currentTime] Set the current time of each animation.
-  Future seekAnimations(
-    List<String> animations,
-    num currentTime,
-  ) async {
-    Map parameters = {
-      'animations': animations.map((e) => e).toList(),
-      'currentTime': currentTime,
-    };
-    await _client.send('Animation.seekAnimations', parameters);
+  /// Gets the playback rate of the document timeline.
+  /// Return: Playback rate for animations on page.
+  Future<num> getPlaybackRate() async {
+    Map result = await _client.send('Animation.getPlaybackRate');
+    return result['playbackRate'];
   }
 
   /// Releases a set of animations to no longer be manipulated.
@@ -135,38 +79,95 @@ class AnimationDomain {
     Map result = await _client.send('Animation.resolveAnimation', parameters);
     return new runtime.RemoteObject.fromJson(result['remoteObject']);
   }
+
+  /// Seek a set of animations to a particular time within each animation.
+  /// [animations] List of animation ids to seek.
+  /// [currentTime] Set the current time of each animation.
+  Future seekAnimations(
+    List<String> animations,
+    num currentTime,
+  ) async {
+    Map parameters = {
+      'animations': animations.map((e) => e).toList(),
+      'currentTime': currentTime,
+    };
+    await _client.send('Animation.seekAnimations', parameters);
+  }
+
+  /// Sets the paused state of a set of animations.
+  /// [animations] Animations to set the pause state of.
+  /// [paused] Paused state to set to.
+  Future setPaused(
+    List<String> animations,
+    bool paused,
+  ) async {
+    Map parameters = {
+      'animations': animations.map((e) => e).toList(),
+      'paused': paused,
+    };
+    await _client.send('Animation.setPaused', parameters);
+  }
+
+  /// Sets the playback rate of the document timeline.
+  /// [playbackRate] Playback rate for animations on page
+  Future setPlaybackRate(
+    num playbackRate,
+  ) async {
+    Map parameters = {
+      'playbackRate': playbackRate,
+    };
+    await _client.send('Animation.setPlaybackRate', parameters);
+  }
+
+  /// Sets the timing of an animation node.
+  /// [animationId] Animation id.
+  /// [duration] Duration of the animation.
+  /// [delay] Delay of the animation.
+  Future setTiming(
+    String animationId,
+    num duration,
+    num delay,
+  ) async {
+    Map parameters = {
+      'animationId': animationId,
+      'duration': duration,
+      'delay': delay,
+    };
+    await _client.send('Animation.setTiming', parameters);
+  }
 }
 
 /// Animation instance.
 class Animation {
-  /// <code>Animation</code>'s id.
+  /// `Animation`'s id.
   final String id;
 
-  /// <code>Animation</code>'s name.
+  /// `Animation`'s name.
   final String name;
 
-  /// <code>Animation</code>'s internal paused state.
+  /// `Animation`'s internal paused state.
   final bool pausedState;
 
-  /// <code>Animation</code>'s play state.
+  /// `Animation`'s play state.
   final String playState;
 
-  /// <code>Animation</code>'s playback rate.
+  /// `Animation`'s playback rate.
   final num playbackRate;
 
-  /// <code>Animation</code>'s start time.
+  /// `Animation`'s start time.
   final num startTime;
 
-  /// <code>Animation</code>'s current time.
+  /// `Animation`'s current time.
   final num currentTime;
 
-  /// <code>Animation</code>'s source animation node.
-  final AnimationEffect source;
-
-  /// Animation type of <code>Animation</code>.
+  /// Animation type of `Animation`.
   final String type;
 
-  /// A unique ID for <code>Animation</code> representing the sources that triggered this CSS animation/transition.
+  /// `Animation`'s source animation node.
+  final AnimationEffect source;
+
+  /// A unique ID for `Animation` representing the sources that triggered this CSS
+  /// animation/transition.
   final String cssId;
 
   Animation({
@@ -177,8 +178,8 @@ class Animation {
     @required this.playbackRate,
     @required this.startTime,
     @required this.currentTime,
-    @required this.source,
     @required this.type,
+    this.source,
     this.cssId,
   });
 
@@ -191,8 +192,10 @@ class Animation {
       playbackRate: json['playbackRate'],
       startTime: json['startTime'],
       currentTime: json['currentTime'],
-      source: new AnimationEffect.fromJson(json['source']),
       type: json['type'],
+      source: json.containsKey('source')
+          ? new AnimationEffect.fromJson(json['source'])
+          : null,
       cssId: json.containsKey('cssId') ? json['cssId'] : null,
     );
   }
@@ -206,9 +209,11 @@ class Animation {
       'playbackRate': playbackRate,
       'startTime': startTime,
       'currentTime': currentTime,
-      'source': source.toJson(),
       'type': type,
     };
+    if (source != null) {
+      json['source'] = source.toJson();
+    }
     if (cssId != null) {
       json['cssId'] = cssId;
     }
@@ -218,34 +223,34 @@ class Animation {
 
 /// AnimationEffect instance
 class AnimationEffect {
-  /// <code>AnimationEffect</code>'s delay.
+  /// `AnimationEffect`'s delay.
   final num delay;
 
-  /// <code>AnimationEffect</code>'s end delay.
+  /// `AnimationEffect`'s end delay.
   final num endDelay;
 
-  /// <code>AnimationEffect</code>'s iteration start.
+  /// `AnimationEffect`'s iteration start.
   final num iterationStart;
 
-  /// <code>AnimationEffect</code>'s iterations.
+  /// `AnimationEffect`'s iterations.
   final num iterations;
 
-  /// <code>AnimationEffect</code>'s iteration duration.
+  /// `AnimationEffect`'s iteration duration.
   final num duration;
 
-  /// <code>AnimationEffect</code>'s playback direction.
+  /// `AnimationEffect`'s playback direction.
   final String direction;
 
-  /// <code>AnimationEffect</code>'s fill mode.
+  /// `AnimationEffect`'s fill mode.
   final String fill;
 
-  /// <code>AnimationEffect</code>'s target node.
+  /// `AnimationEffect`'s target node.
   final dom.BackendNodeId backendNodeId;
 
-  /// <code>AnimationEffect</code>'s keyframes.
+  /// `AnimationEffect`'s keyframes.
   final KeyframesRule keyframesRule;
 
-  /// <code>AnimationEffect</code>'s timing function.
+  /// `AnimationEffect`'s timing function.
   final String easing;
 
   AnimationEffect({
@@ -256,7 +261,7 @@ class AnimationEffect {
     @required this.duration,
     @required this.direction,
     @required this.fill,
-    @required this.backendNodeId,
+    this.backendNodeId,
     this.keyframesRule,
     @required this.easing,
   });
@@ -270,7 +275,9 @@ class AnimationEffect {
       duration: json['duration'],
       direction: json['direction'],
       fill: json['fill'],
-      backendNodeId: new dom.BackendNodeId.fromJson(json['backendNodeId']),
+      backendNodeId: json.containsKey('backendNodeId')
+          ? new dom.BackendNodeId.fromJson(json['backendNodeId'])
+          : null,
       keyframesRule: json.containsKey('keyframesRule')
           ? new KeyframesRule.fromJson(json['keyframesRule'])
           : null,
@@ -287,9 +294,11 @@ class AnimationEffect {
       'duration': duration,
       'direction': direction,
       'fill': fill,
-      'backendNodeId': backendNodeId.toJson(),
       'easing': easing,
     };
+    if (backendNodeId != null) {
+      json['backendNodeId'] = backendNodeId.toJson();
+    }
     if (keyframesRule != null) {
       json['keyframesRule'] = keyframesRule.toJson();
     }
@@ -335,7 +344,7 @@ class KeyframeStyle {
   /// Keyframe's time offset.
   final String offset;
 
-  /// <code>AnimationEffect</code>'s timing function.
+  /// `AnimationEffect`'s timing function.
   final String easing;
 
   KeyframeStyle({

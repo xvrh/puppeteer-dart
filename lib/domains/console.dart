@@ -16,9 +16,9 @@ class ConsoleDomain {
       .map((Event event) =>
           new ConsoleMessage.fromJson(event.parameters['message']));
 
-  /// Enables console domain, sends the messages collected so far to the client by means of the <code>messageAdded</code> notification.
-  Future enable() async {
-    await _client.send('Console.enable');
+  /// Does nothing.
+  Future clearMessages() async {
+    await _client.send('Console.clearMessages');
   }
 
   /// Disables console domain, prevents further console messages from being reported to the client.
@@ -26,9 +26,10 @@ class ConsoleDomain {
     await _client.send('Console.disable');
   }
 
-  /// Does nothing.
-  Future clearMessages() async {
-    await _client.send('Console.clearMessages');
+  /// Enables console domain, sends the messages collected so far to the client by means of the
+  /// `messageAdded` notification.
+  Future enable() async {
+    await _client.send('Console.enable');
   }
 }
 

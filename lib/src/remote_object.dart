@@ -23,12 +23,9 @@ Future getRemoteObject(Client client, RemoteObject remoteObject) async {
   if (remoteObject.subtype == 'promise') return remoteObject.description;
   try {
     RuntimeDomain runtime = new RuntimeDomain(client);
-    final response = await runtime.callFunctionOn(
-        remoteObject.objectId, 'function() { return this; }',
-        returnByValue: true);
+    final response = await runtime.callFunctionOn('function() { return this; }',
+        objectId: remoteObject.objectId, returnByValue: true);
     return response.result.value;
-
-    var properties = await runtime.getProperties(remoteObject.objectId);
   } catch (e) {
     // Return description for unserializable object, e.g. 'window'.
     return remoteObject.description;

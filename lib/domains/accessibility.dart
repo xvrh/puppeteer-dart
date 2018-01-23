@@ -12,7 +12,8 @@ class AccessibilityDomain {
   /// Fetches the accessibility node and partial accessibility tree for this DOM node, if it exists.
   /// [nodeId] ID of node to get the partial accessibility tree for.
   /// [fetchRelatives] Whether to fetch this nodes ancestors, siblings and children. Defaults to true.
-  /// Return: The <code>Accessibility.AXNode</code> for this DOM node, if it exists, plus its ancestors, siblings and children, if requested.
+  /// Return: The `Accessibility.AXNode` for this DOM node, if it exists, plus its ancestors, siblings and
+  /// children, if requested.
   Future<List<AXNode>> getPartialAXTree(
     dom.NodeId nodeId, {
     bool fetchRelatives,
@@ -311,7 +312,7 @@ class AXRelatedNode {
 
 class AXProperty {
   /// The name of this property.
-  final String name;
+  final AXPropertyName name;
 
   /// The value of this property.
   final AXValue value;
@@ -323,14 +324,14 @@ class AXProperty {
 
   factory AXProperty.fromJson(Map json) {
     return new AXProperty(
-      name: json['name'],
+      name: new AXPropertyName.fromJson(json['name']),
       value: new AXValue.fromJson(json['value']),
     );
   }
 
   Map toJson() {
     Map json = {
-      'name': name,
+      'name': name.toJson(),
       'value': value.toJson(),
     };
     return json;
@@ -392,17 +393,55 @@ class AXValue {
   }
 }
 
-/// States which apply to every AX node.
-class AXGlobalStates {
-  static const AXGlobalStates busy = const AXGlobalStates._('busy');
-  static const AXGlobalStates disabled = const AXGlobalStates._('disabled');
-  static const AXGlobalStates hidden = const AXGlobalStates._('hidden');
-  static const AXGlobalStates hiddenRoot = const AXGlobalStates._('hiddenRoot');
-  static const AXGlobalStates invalid = const AXGlobalStates._('invalid');
-  static const AXGlobalStates keyshortcuts =
-      const AXGlobalStates._('keyshortcuts');
-  static const AXGlobalStates roledescription =
-      const AXGlobalStates._('roledescription');
+/// Values of AXProperty name: from 'busy' to 'roledescription' - states which apply to every AX
+/// node, from 'live' to 'root' - attributes which apply to nodes in live regions, from
+/// 'autocomplete' to 'valuetext' - attributes which apply to widgets, from 'checked' to 'selected'
+/// - states which apply to widgets, from 'activedescendant' to 'owns' - relationships between
+/// elements other than parent/child/sibling.
+class AXPropertyName {
+  static const AXPropertyName busy = const AXPropertyName._('busy');
+  static const AXPropertyName disabled = const AXPropertyName._('disabled');
+  static const AXPropertyName hidden = const AXPropertyName._('hidden');
+  static const AXPropertyName hiddenRoot = const AXPropertyName._('hiddenRoot');
+  static const AXPropertyName invalid = const AXPropertyName._('invalid');
+  static const AXPropertyName keyshortcuts =
+      const AXPropertyName._('keyshortcuts');
+  static const AXPropertyName roledescription =
+      const AXPropertyName._('roledescription');
+  static const AXPropertyName live = const AXPropertyName._('live');
+  static const AXPropertyName atomic = const AXPropertyName._('atomic');
+  static const AXPropertyName relevant = const AXPropertyName._('relevant');
+  static const AXPropertyName root = const AXPropertyName._('root');
+  static const AXPropertyName autocomplete =
+      const AXPropertyName._('autocomplete');
+  static const AXPropertyName haspopup = const AXPropertyName._('haspopup');
+  static const AXPropertyName level = const AXPropertyName._('level');
+  static const AXPropertyName multiselectable =
+      const AXPropertyName._('multiselectable');
+  static const AXPropertyName orientation =
+      const AXPropertyName._('orientation');
+  static const AXPropertyName multiline = const AXPropertyName._('multiline');
+  static const AXPropertyName readonly = const AXPropertyName._('readonly');
+  static const AXPropertyName required = const AXPropertyName._('required');
+  static const AXPropertyName valuemin = const AXPropertyName._('valuemin');
+  static const AXPropertyName valuemax = const AXPropertyName._('valuemax');
+  static const AXPropertyName valuetext = const AXPropertyName._('valuetext');
+  static const AXPropertyName checked = const AXPropertyName._('checked');
+  static const AXPropertyName expanded = const AXPropertyName._('expanded');
+  static const AXPropertyName modal = const AXPropertyName._('modal');
+  static const AXPropertyName pressed = const AXPropertyName._('pressed');
+  static const AXPropertyName selected = const AXPropertyName._('selected');
+  static const AXPropertyName activedescendant =
+      const AXPropertyName._('activedescendant');
+  static const AXPropertyName controls = const AXPropertyName._('controls');
+  static const AXPropertyName describedby =
+      const AXPropertyName._('describedby');
+  static const AXPropertyName details = const AXPropertyName._('details');
+  static const AXPropertyName errormessage =
+      const AXPropertyName._('errormessage');
+  static const AXPropertyName flowto = const AXPropertyName._('flowto');
+  static const AXPropertyName labelledby = const AXPropertyName._('labelledby');
+  static const AXPropertyName owns = const AXPropertyName._('owns');
   static const values = const {
     'busy': busy,
     'disabled': disabled,
@@ -411,71 +450,10 @@ class AXGlobalStates {
     'invalid': invalid,
     'keyshortcuts': keyshortcuts,
     'roledescription': roledescription,
-  };
-
-  final String value;
-
-  const AXGlobalStates._(this.value);
-
-  factory AXGlobalStates.fromJson(String value) => values[value];
-
-  String toJson() => value;
-
-  String toString() => value.toString();
-}
-
-/// Attributes which apply to nodes in live regions.
-class AXLiveRegionAttributes {
-  static const AXLiveRegionAttributes live =
-      const AXLiveRegionAttributes._('live');
-  static const AXLiveRegionAttributes atomic =
-      const AXLiveRegionAttributes._('atomic');
-  static const AXLiveRegionAttributes relevant =
-      const AXLiveRegionAttributes._('relevant');
-  static const AXLiveRegionAttributes root =
-      const AXLiveRegionAttributes._('root');
-  static const values = const {
     'live': live,
     'atomic': atomic,
     'relevant': relevant,
     'root': root,
-  };
-
-  final String value;
-
-  const AXLiveRegionAttributes._(this.value);
-
-  factory AXLiveRegionAttributes.fromJson(String value) => values[value];
-
-  String toJson() => value;
-
-  String toString() => value.toString();
-}
-
-/// Attributes which apply to widgets.
-class AXWidgetAttributes {
-  static const AXWidgetAttributes autocomplete =
-      const AXWidgetAttributes._('autocomplete');
-  static const AXWidgetAttributes haspopup =
-      const AXWidgetAttributes._('haspopup');
-  static const AXWidgetAttributes level = const AXWidgetAttributes._('level');
-  static const AXWidgetAttributes multiselectable =
-      const AXWidgetAttributes._('multiselectable');
-  static const AXWidgetAttributes orientation =
-      const AXWidgetAttributes._('orientation');
-  static const AXWidgetAttributes multiline =
-      const AXWidgetAttributes._('multiline');
-  static const AXWidgetAttributes readonly =
-      const AXWidgetAttributes._('readonly');
-  static const AXWidgetAttributes required =
-      const AXWidgetAttributes._('required');
-  static const AXWidgetAttributes valuemin =
-      const AXWidgetAttributes._('valuemin');
-  static const AXWidgetAttributes valuemax =
-      const AXWidgetAttributes._('valuemax');
-  static const AXWidgetAttributes valuetext =
-      const AXWidgetAttributes._('valuetext');
-  static const values = const {
     'autocomplete': autocomplete,
     'haspopup': haspopup,
     'level': level,
@@ -487,64 +465,11 @@ class AXWidgetAttributes {
     'valuemin': valuemin,
     'valuemax': valuemax,
     'valuetext': valuetext,
-  };
-
-  final String value;
-
-  const AXWidgetAttributes._(this.value);
-
-  factory AXWidgetAttributes.fromJson(String value) => values[value];
-
-  String toJson() => value;
-
-  String toString() => value.toString();
-}
-
-/// States which apply to widgets.
-class AXWidgetStates {
-  static const AXWidgetStates checked = const AXWidgetStates._('checked');
-  static const AXWidgetStates expanded = const AXWidgetStates._('expanded');
-  static const AXWidgetStates modal = const AXWidgetStates._('modal');
-  static const AXWidgetStates pressed = const AXWidgetStates._('pressed');
-  static const AXWidgetStates selected = const AXWidgetStates._('selected');
-  static const values = const {
     'checked': checked,
     'expanded': expanded,
     'modal': modal,
     'pressed': pressed,
     'selected': selected,
-  };
-
-  final String value;
-
-  const AXWidgetStates._(this.value);
-
-  factory AXWidgetStates.fromJson(String value) => values[value];
-
-  String toJson() => value;
-
-  String toString() => value.toString();
-}
-
-/// Relationships between elements other than parent/child/sibling.
-class AXRelationshipAttributes {
-  static const AXRelationshipAttributes activedescendant =
-      const AXRelationshipAttributes._('activedescendant');
-  static const AXRelationshipAttributes controls =
-      const AXRelationshipAttributes._('controls');
-  static const AXRelationshipAttributes describedby =
-      const AXRelationshipAttributes._('describedby');
-  static const AXRelationshipAttributes details =
-      const AXRelationshipAttributes._('details');
-  static const AXRelationshipAttributes errormessage =
-      const AXRelationshipAttributes._('errormessage');
-  static const AXRelationshipAttributes flowto =
-      const AXRelationshipAttributes._('flowto');
-  static const AXRelationshipAttributes labelledby =
-      const AXRelationshipAttributes._('labelledby');
-  static const AXRelationshipAttributes owns =
-      const AXRelationshipAttributes._('owns');
-  static const values = const {
     'activedescendant': activedescendant,
     'controls': controls,
     'describedby': describedby,
@@ -557,9 +482,9 @@ class AXRelationshipAttributes {
 
   final String value;
 
-  const AXRelationshipAttributes._(this.value);
+  const AXPropertyName._(this.value);
 
-  factory AXRelationshipAttributes.fromJson(String value) => values[value];
+  factory AXPropertyName.fromJson(String value) => values[value];
 
   String toJson() => value;
 
@@ -577,16 +502,16 @@ class AXNode {
   /// Collection of reasons why this node is hidden.
   final List<AXProperty> ignoredReasons;
 
-  /// This <code>Node</code>'s role, whether explicit or implicit.
+  /// This `Node`'s role, whether explicit or implicit.
   final AXValue role;
 
-  /// The accessible name for this <code>Node</code>.
+  /// The accessible name for this `Node`.
   final AXValue name;
 
-  /// The accessible description for this <code>Node</code>.
+  /// The accessible description for this `Node`.
   final AXValue description;
 
-  /// The value for this <code>Node</code>.
+  /// The value for this `Node`.
   final AXValue value;
 
   /// All other properties

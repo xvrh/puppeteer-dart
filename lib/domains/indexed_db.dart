@@ -9,35 +9,27 @@ class IndexedDBDomain {
 
   IndexedDBDomain(this._client);
 
-  /// Enables events from backend.
-  Future enable() async {
-    await _client.send('IndexedDB.enable');
-  }
-
-  /// Disables events from backend.
-  Future disable() async {
-    await _client.send('IndexedDB.disable');
-  }
-
-  /// Requests database names for given security origin.
+  /// Clears all entries from an object store.
   /// [securityOrigin] Security origin.
-  /// Return: Database names for origin.
-  Future<List<String>> requestDatabaseNames(
+  /// [databaseName] Database name.
+  /// [objectStoreName] Object store name.
+  Future clearObjectStore(
     String securityOrigin,
+    String databaseName,
+    String objectStoreName,
   ) async {
     Map parameters = {
       'securityOrigin': securityOrigin,
+      'databaseName': databaseName,
+      'objectStoreName': objectStoreName,
     };
-    Map result =
-        await _client.send('IndexedDB.requestDatabaseNames', parameters);
-    return (result['databaseNames'] as List).map((e) => e as String).toList();
+    await _client.send('IndexedDB.clearObjectStore', parameters);
   }
 
-  /// Requests database with given name in given frame.
+  /// Deletes a database.
   /// [securityOrigin] Security origin.
   /// [databaseName] Database name.
-  /// Return: Database with an array of object stores.
-  Future<DatabaseWithObjectStores> requestDatabase(
+  Future deleteDatabase(
     String securityOrigin,
     String databaseName,
   ) async {
@@ -45,9 +37,34 @@ class IndexedDBDomain {
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
     };
-    Map result = await _client.send('IndexedDB.requestDatabase', parameters);
-    return new DatabaseWithObjectStores.fromJson(
-        result['databaseWithObjectStores']);
+    await _client.send('IndexedDB.deleteDatabase', parameters);
+  }
+
+  /// Delete a range of entries from an object store
+  /// [keyRange] Range of entry keys to delete
+  Future deleteObjectStoreEntries(
+    String securityOrigin,
+    String databaseName,
+    String objectStoreName,
+    KeyRange keyRange,
+  ) async {
+    Map parameters = {
+      'securityOrigin': securityOrigin,
+      'databaseName': databaseName,
+      'objectStoreName': objectStoreName,
+      'keyRange': keyRange.toJson(),
+    };
+    await _client.send('IndexedDB.deleteObjectStoreEntries', parameters);
+  }
+
+  /// Disables events from backend.
+  Future disable() async {
+    await _client.send('IndexedDB.disable');
+  }
+
+  /// Enables events from backend.
+  Future enable() async {
+    await _client.send('IndexedDB.enable');
   }
 
   /// Requests data from object store or index.
@@ -82,35 +99,35 @@ class IndexedDBDomain {
     return new RequestDataResult.fromJson(result);
   }
 
-  /// Clears all entries from an object store.
+  /// Requests database with given name in given frame.
   /// [securityOrigin] Security origin.
   /// [databaseName] Database name.
-  /// [objectStoreName] Object store name.
-  Future clearObjectStore(
+  /// Return: Database with an array of object stores.
+  Future<DatabaseWithObjectStores> requestDatabase(
     String securityOrigin,
     String databaseName,
-    String objectStoreName,
   ) async {
     Map parameters = {
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
-      'objectStoreName': objectStoreName,
     };
-    await _client.send('IndexedDB.clearObjectStore', parameters);
+    Map result = await _client.send('IndexedDB.requestDatabase', parameters);
+    return new DatabaseWithObjectStores.fromJson(
+        result['databaseWithObjectStores']);
   }
 
-  /// Deletes a database.
+  /// Requests database names for given security origin.
   /// [securityOrigin] Security origin.
-  /// [databaseName] Database name.
-  Future deleteDatabase(
+  /// Return: Database names for origin.
+  Future<List<String>> requestDatabaseNames(
     String securityOrigin,
-    String databaseName,
   ) async {
     Map parameters = {
       'securityOrigin': securityOrigin,
-      'databaseName': databaseName,
     };
-    await _client.send('IndexedDB.deleteDatabase', parameters);
+    Map result =
+        await _client.send('IndexedDB.requestDatabaseNames', parameters);
+    return (result['databaseNames'] as List).map((e) => e as String).toList();
   }
 }
 

@@ -1,4 +1,8 @@
-/// Runtime domain exposes JavaScript runtime by means of remote evaluation and mirror objects. Evaluation results are returned as mirror object that expose object type, string representation and unique identifier that can be used for further object reference. Original objects are maintained in memory unless they are either explicitly released or are released along with the other objects in their object group.
+/// Runtime domain exposes JavaScript runtime by means of remote evaluation and mirror objects.
+/// Evaluation results are returned as mirror object that expose object type, string representation
+/// and unique identifier that can be used for further object reference. Original objects are
+/// maintained in memory unless they are either explicitly released or are released along with the
+/// other objects in their object group.
 
 import 'dart:async';
 // ignore: unused_import
@@ -9,6 +13,24 @@ class RuntimeDomain {
   final Client _client;
 
   RuntimeDomain(this._client);
+
+  /// Issued when console API was called.
+  Stream<ConsoleAPICalledEvent> get onConsoleAPICalled => _client.onEvent
+      .where((Event event) => event.name == 'Runtime.consoleAPICalled')
+      .map((Event event) =>
+          new ConsoleAPICalledEvent.fromJson(event.parameters));
+
+  /// Issued when unhandled exception was revoked.
+  Stream<ExceptionRevokedEvent> get onExceptionRevoked => _client.onEvent
+      .where((Event event) => event.name == 'Runtime.exceptionRevoked')
+      .map((Event event) =>
+          new ExceptionRevokedEvent.fromJson(event.parameters));
+
+  /// Issued when exception was thrown and unhandled.
+  Stream<ExceptionThrownEvent> get onExceptionThrown => _client.onEvent
+      .where((Event event) => event.name == 'Runtime.exceptionThrown')
+      .map(
+          (Event event) => new ExceptionThrownEvent.fromJson(event.parameters));
 
   /// Issued when new execution context is created.
   Stream<ExecutionContextDescription> get onExecutionContextCreated => _client
@@ -27,40 +49,153 @@ class RuntimeDomain {
   Stream get onExecutionContextsCleared => _client.onEvent
       .where((Event event) => event.name == 'Runtime.executionContextsCleared');
 
-  /// Issued when exception was thrown and unhandled.
-  Stream<ExceptionThrownEvent> get onExceptionThrown => _client.onEvent
-      .where((Event event) => event.name == 'Runtime.exceptionThrown')
-      .map(
-          (Event event) => new ExceptionThrownEvent.fromJson(event.parameters));
-
-  /// Issued when unhandled exception was revoked.
-  Stream<ExceptionRevokedEvent> get onExceptionRevoked => _client.onEvent
-      .where((Event event) => event.name == 'Runtime.exceptionRevoked')
-      .map((Event event) =>
-          new ExceptionRevokedEvent.fromJson(event.parameters));
-
-  /// Issued when console API was called.
-  Stream<ConsoleAPICalledEvent> get onConsoleAPICalled => _client.onEvent
-      .where((Event event) => event.name == 'Runtime.consoleAPICalled')
-      .map((Event event) =>
-          new ConsoleAPICalledEvent.fromJson(event.parameters));
-
-  /// Issued when object should be inspected (for example, as a result of inspect() command line API call).
+  /// Issued when object should be inspected (for example, as a result of inspect() command line API
+  /// call).
   Stream<InspectRequestedEvent> get onInspectRequested => _client.onEvent
       .where((Event event) => event.name == 'Runtime.inspectRequested')
       .map((Event event) =>
           new InspectRequestedEvent.fromJson(event.parameters));
 
+  /// Add handler to promise with given promise object id.
+  /// [promiseObjectId] Identifier of the promise.
+  /// [returnByValue] Whether the result is expected to be a JSON object that should be sent by value.
+  /// [generatePreview] Whether preview should be generated for the result.
+  Future<AwaitPromiseResult> awaitPromise(
+    RemoteObjectId promiseObjectId, {
+    bool returnByValue,
+    bool generatePreview,
+  }) async {
+    Map parameters = {
+      'promiseObjectId': promiseObjectId.toJson(),
+    };
+    if (returnByValue != null) {
+      parameters['returnByValue'] = returnByValue;
+    }
+    if (generatePreview != null) {
+      parameters['generatePreview'] = generatePreview;
+    }
+    Map result = await _client.send('Runtime.awaitPromise', parameters);
+    return new AwaitPromiseResult.fromJson(result);
+  }
+
+  /// Calls function with given declaration on the given object. Object group of the result is
+  /// inherited from the target object.
+  /// [functionDeclaration] Declaration of the function to call.
+  /// [objectId] Identifier of the object to call function on. Either objectId or executionContextId should
+  /// be specified.
+  /// [arguments] Call arguments. All call arguments must belong to the same JavaScript world as the target
+  /// object.
+  /// [silent] In silent mode exceptions thrown during evaluation are not reported and do not pause
+  /// execution. Overrides `setPauseOnException` state.
+  /// [returnByValue] Whether the result is expected to be a JSON object which should be sent by value.
+  /// [generatePreview] Whether preview should be generated for the result.
+  /// [userGesture] Whether execution should be treated as initiated by user in the UI.
+  /// [awaitPromise] Whether execution should `await` for resulting value and return once awaited promise is
+  /// resolved.
+  /// [executionContextId] Specifies execution context which global object will be used to call function on. Either
+  /// executionContextId or objectId should be specified.
+  /// [objectGroup] Symbolic group name that can be used to release multiple objects. If objectGroup is not
+  /// specified and objectId is, objectGroup will be inherited from object.
+  Future<CallFunctionOnResult> callFunctionOn(
+    String functionDeclaration, {
+    RemoteObjectId objectId,
+    List<CallArgument> arguments,
+    bool silent,
+    bool returnByValue,
+    bool generatePreview,
+    bool userGesture,
+    bool awaitPromise,
+    ExecutionContextId executionContextId,
+    String objectGroup,
+  }) async {
+    Map parameters = {
+      'functionDeclaration': functionDeclaration,
+    };
+    if (objectId != null) {
+      parameters['objectId'] = objectId.toJson();
+    }
+    if (arguments != null) {
+      parameters['arguments'] = arguments.map((e) => e.toJson()).toList();
+    }
+    if (silent != null) {
+      parameters['silent'] = silent;
+    }
+    if (returnByValue != null) {
+      parameters['returnByValue'] = returnByValue;
+    }
+    if (generatePreview != null) {
+      parameters['generatePreview'] = generatePreview;
+    }
+    if (userGesture != null) {
+      parameters['userGesture'] = userGesture;
+    }
+    if (awaitPromise != null) {
+      parameters['awaitPromise'] = awaitPromise;
+    }
+    if (executionContextId != null) {
+      parameters['executionContextId'] = executionContextId.toJson();
+    }
+    if (objectGroup != null) {
+      parameters['objectGroup'] = objectGroup;
+    }
+    Map result = await _client.send('Runtime.callFunctionOn', parameters);
+    return new CallFunctionOnResult.fromJson(result);
+  }
+
+  /// Compiles expression.
+  /// [expression] Expression to compile.
+  /// [sourceURL] Source url to be set for the script.
+  /// [persistScript] Specifies whether the compiled script should be persisted.
+  /// [executionContextId] Specifies in which execution context to perform script run. If the parameter is omitted the
+  /// evaluation will be performed in the context of the inspected page.
+  Future<CompileScriptResult> compileScript(
+    String expression,
+    String sourceURL,
+    bool persistScript, {
+    ExecutionContextId executionContextId,
+  }) async {
+    Map parameters = {
+      'expression': expression,
+      'sourceURL': sourceURL,
+      'persistScript': persistScript,
+    };
+    if (executionContextId != null) {
+      parameters['executionContextId'] = executionContextId.toJson();
+    }
+    Map result = await _client.send('Runtime.compileScript', parameters);
+    return new CompileScriptResult.fromJson(result);
+  }
+
+  /// Disables reporting of execution contexts creation.
+  Future disable() async {
+    await _client.send('Runtime.disable');
+  }
+
+  /// Discards collected exceptions and console API calls.
+  Future discardConsoleEntries() async {
+    await _client.send('Runtime.discardConsoleEntries');
+  }
+
+  /// Enables reporting of execution contexts creation by means of `executionContextCreated` event.
+  /// When the reporting gets enabled the event will be sent immediately for each existing execution
+  /// context.
+  Future enable() async {
+    await _client.send('Runtime.enable');
+  }
+
   /// Evaluates expression on global object.
   /// [expression] Expression to evaluate.
   /// [objectGroup] Symbolic group name that can be used to release multiple objects.
   /// [includeCommandLineAPI] Determines whether Command Line API should be available during the evaluation.
-  /// [silent] In silent mode exceptions thrown during evaluation are not reported and do not pause execution. Overrides <code>setPauseOnException</code> state.
-  /// [contextId] Specifies in which execution context to perform evaluation. If the parameter is omitted the evaluation will be performed in the context of the inspected page.
+  /// [silent] In silent mode exceptions thrown during evaluation are not reported and do not pause
+  /// execution. Overrides `setPauseOnException` state.
+  /// [contextId] Specifies in which execution context to perform evaluation. If the parameter is omitted the
+  /// evaluation will be performed in the context of the inspected page.
   /// [returnByValue] Whether the result is expected to be a JSON object that should be sent by value.
   /// [generatePreview] Whether preview should be generated for the result.
   /// [userGesture] Whether execution should be treated as initiated by user in the UI.
-  /// [awaitPromise] Whether execution should <code>await</code> for resulting value and return once awaited promise is resolved.
+  /// [awaitPromise] Whether execution should `await` for resulting value and return once awaited promise is
+  /// resolved.
   Future<EvaluateResult> evaluate(
     String expression, {
     String objectGroup,
@@ -103,77 +238,13 @@ class RuntimeDomain {
     return new EvaluateResult.fromJson(result);
   }
 
-  /// Add handler to promise with given promise object id.
-  /// [promiseObjectId] Identifier of the promise.
-  /// [returnByValue] Whether the result is expected to be a JSON object that should be sent by value.
-  /// [generatePreview] Whether preview should be generated for the result.
-  Future<AwaitPromiseResult> awaitPromise(
-    RemoteObjectId promiseObjectId, {
-    bool returnByValue,
-    bool generatePreview,
-  }) async {
-    Map parameters = {
-      'promiseObjectId': promiseObjectId.toJson(),
-    };
-    if (returnByValue != null) {
-      parameters['returnByValue'] = returnByValue;
-    }
-    if (generatePreview != null) {
-      parameters['generatePreview'] = generatePreview;
-    }
-    Map result = await _client.send('Runtime.awaitPromise', parameters);
-    return new AwaitPromiseResult.fromJson(result);
-  }
-
-  /// Calls function with given declaration on the given object. Object group of the result is inherited from the target object.
-  /// [objectId] Identifier of the object to call function on.
-  /// [functionDeclaration] Declaration of the function to call.
-  /// [arguments] Call arguments. All call arguments must belong to the same JavaScript world as the target object.
-  /// [silent] In silent mode exceptions thrown during evaluation are not reported and do not pause execution. Overrides <code>setPauseOnException</code> state.
-  /// [returnByValue] Whether the result is expected to be a JSON object which should be sent by value.
-  /// [generatePreview] Whether preview should be generated for the result.
-  /// [userGesture] Whether execution should be treated as initiated by user in the UI.
-  /// [awaitPromise] Whether execution should <code>await</code> for resulting value and return once awaited promise is resolved.
-  Future<CallFunctionOnResult> callFunctionOn(
-    RemoteObjectId objectId,
-    String functionDeclaration, {
-    List<CallArgument> arguments,
-    bool silent,
-    bool returnByValue,
-    bool generatePreview,
-    bool userGesture,
-    bool awaitPromise,
-  }) async {
-    Map parameters = {
-      'objectId': objectId.toJson(),
-      'functionDeclaration': functionDeclaration,
-    };
-    if (arguments != null) {
-      parameters['arguments'] = arguments.map((e) => e.toJson()).toList();
-    }
-    if (silent != null) {
-      parameters['silent'] = silent;
-    }
-    if (returnByValue != null) {
-      parameters['returnByValue'] = returnByValue;
-    }
-    if (generatePreview != null) {
-      parameters['generatePreview'] = generatePreview;
-    }
-    if (userGesture != null) {
-      parameters['userGesture'] = userGesture;
-    }
-    if (awaitPromise != null) {
-      parameters['awaitPromise'] = awaitPromise;
-    }
-    Map result = await _client.send('Runtime.callFunctionOn', parameters);
-    return new CallFunctionOnResult.fromJson(result);
-  }
-
-  /// Returns properties of a given object. Object group of the result is inherited from the target object.
+  /// Returns properties of a given object. Object group of the result is inherited from the target
+  /// object.
   /// [objectId] Identifier of the object to return properties for.
-  /// [ownProperties] If true, returns properties belonging only to the element itself, not to its prototype chain.
-  /// [accessorPropertiesOnly] If true, returns accessor properties (with getter/setter) only; internal properties are not returned either.
+  /// [ownProperties] If true, returns properties belonging only to the element itself, not to its prototype
+  /// chain.
+  /// [accessorPropertiesOnly] If true, returns accessor properties (with getter/setter) only; internal properties are not
+  /// returned either.
   /// [generatePreview] Whether preview should be generated for the results.
   Future<GetPropertiesResult> getProperties(
     RemoteObjectId objectId, {
@@ -195,6 +266,32 @@ class RuntimeDomain {
     }
     Map result = await _client.send('Runtime.getProperties', parameters);
     return new GetPropertiesResult.fromJson(result);
+  }
+
+  /// Returns all let, const and class variables from global scope.
+  /// [executionContextId] Specifies in which execution context to lookup global scope variables.
+  Future<List<String>> globalLexicalScopeNames({
+    ExecutionContextId executionContextId,
+  }) async {
+    Map parameters = {};
+    if (executionContextId != null) {
+      parameters['executionContextId'] = executionContextId.toJson();
+    }
+    Map result =
+        await _client.send('Runtime.globalLexicalScopeNames', parameters);
+    return (result['names'] as List).map((e) => e as String).toList();
+  }
+
+  /// [prototypeObjectId] Identifier of the prototype to return objects for.
+  /// Return: Array with objects.
+  Future<RemoteObject> queryObjects(
+    RemoteObjectId prototypeObjectId,
+  ) async {
+    Map parameters = {
+      'prototypeObjectId': prototypeObjectId.toJson(),
+    };
+    Map result = await _client.send('Runtime.queryObjects', parameters);
+    return new RemoteObject.fromJson(result['objects']);
   }
 
   /// Releases remote object with given id.
@@ -224,62 +321,18 @@ class RuntimeDomain {
     await _client.send('Runtime.runIfWaitingForDebugger');
   }
 
-  /// Enables reporting of execution contexts creation by means of <code>executionContextCreated</code> event. When the reporting gets enabled the event will be sent immediately for each existing execution context.
-  Future enable() async {
-    await _client.send('Runtime.enable');
-  }
-
-  /// Disables reporting of execution contexts creation.
-  Future disable() async {
-    await _client.send('Runtime.disable');
-  }
-
-  /// Discards collected exceptions and console API calls.
-  Future discardConsoleEntries() async {
-    await _client.send('Runtime.discardConsoleEntries');
-  }
-
-  Future setCustomObjectFormatterEnabled(
-    bool enabled,
-  ) async {
-    Map parameters = {
-      'enabled': enabled,
-    };
-    await _client.send('Runtime.setCustomObjectFormatterEnabled', parameters);
-  }
-
-  /// Compiles expression.
-  /// [expression] Expression to compile.
-  /// [sourceURL] Source url to be set for the script.
-  /// [persistScript] Specifies whether the compiled script should be persisted.
-  /// [executionContextId] Specifies in which execution context to perform script run. If the parameter is omitted the evaluation will be performed in the context of the inspected page.
-  Future<CompileScriptResult> compileScript(
-    String expression,
-    String sourceURL,
-    bool persistScript, {
-    ExecutionContextId executionContextId,
-  }) async {
-    Map parameters = {
-      'expression': expression,
-      'sourceURL': sourceURL,
-      'persistScript': persistScript,
-    };
-    if (executionContextId != null) {
-      parameters['executionContextId'] = executionContextId.toJson();
-    }
-    Map result = await _client.send('Runtime.compileScript', parameters);
-    return new CompileScriptResult.fromJson(result);
-  }
-
   /// Runs script with given id in a given context.
   /// [scriptId] Id of the script to run.
-  /// [executionContextId] Specifies in which execution context to perform script run. If the parameter is omitted the evaluation will be performed in the context of the inspected page.
+  /// [executionContextId] Specifies in which execution context to perform script run. If the parameter is omitted the
+  /// evaluation will be performed in the context of the inspected page.
   /// [objectGroup] Symbolic group name that can be used to release multiple objects.
-  /// [silent] In silent mode exceptions thrown during evaluation are not reported and do not pause execution. Overrides <code>setPauseOnException</code> state.
+  /// [silent] In silent mode exceptions thrown during evaluation are not reported and do not pause
+  /// execution. Overrides `setPauseOnException` state.
   /// [includeCommandLineAPI] Determines whether Command Line API should be available during the evaluation.
   /// [returnByValue] Whether the result is expected to be a JSON object which should be sent by value.
   /// [generatePreview] Whether preview should be generated for the result.
-  /// [awaitPromise] Whether execution should <code>await</code> for resulting value and return once awaited promise is resolved.
+  /// [awaitPromise] Whether execution should `await` for resulting value and return once awaited promise is
+  /// resolved.
   Future<RunScriptResult> runScript(
     ScriptId scriptId, {
     ExecutionContextId executionContextId,
@@ -318,55 +371,13 @@ class RuntimeDomain {
     return new RunScriptResult.fromJson(result);
   }
 
-  /// [prototypeObjectId] Identifier of the prototype to return objects for.
-  /// Return: Array with objects.
-  Future<RemoteObject> queryObjects(
-    RemoteObjectId prototypeObjectId,
+  Future setCustomObjectFormatterEnabled(
+    bool enabled,
   ) async {
     Map parameters = {
-      'prototypeObjectId': prototypeObjectId.toJson(),
+      'enabled': enabled,
     };
-    Map result = await _client.send('Runtime.queryObjects', parameters);
-    return new RemoteObject.fromJson(result['objects']);
-  }
-}
-
-class ExceptionThrownEvent {
-  /// Timestamp of the exception.
-  final Timestamp timestamp;
-
-  final ExceptionDetails exceptionDetails;
-
-  ExceptionThrownEvent({
-    @required this.timestamp,
-    @required this.exceptionDetails,
-  });
-
-  factory ExceptionThrownEvent.fromJson(Map json) {
-    return new ExceptionThrownEvent(
-      timestamp: new Timestamp.fromJson(json['timestamp']),
-      exceptionDetails: new ExceptionDetails.fromJson(json['exceptionDetails']),
-    );
-  }
-}
-
-class ExceptionRevokedEvent {
-  /// Reason describing why exception was revoked.
-  final String reason;
-
-  /// The id of revoked exception, as reported in <code>exceptionUnhandled</code>.
-  final int exceptionId;
-
-  ExceptionRevokedEvent({
-    @required this.reason,
-    @required this.exceptionId,
-  });
-
-  factory ExceptionRevokedEvent.fromJson(Map json) {
-    return new ExceptionRevokedEvent(
-      reason: json['reason'],
-      exceptionId: json['exceptionId'],
-    );
+    await _client.send('Runtime.setCustomObjectFormatterEnabled', parameters);
   }
 }
 
@@ -386,7 +397,9 @@ class ConsoleAPICalledEvent {
   /// Stack trace captured when the call was made.
   final StackTrace stackTrace;
 
-  /// Console context descriptor for calls on non-default console context (not console.*): 'anonymous#unique-logger-id' for call on unnamed context, 'name#unique-logger-id' for call on named context.
+  /// Console context descriptor for calls on non-default console context (not console.*):
+  /// 'anonymous#unique-logger-id' for call on unnamed context, 'name#unique-logger-id' for call
+  /// on named context.
   final String context;
 
   ConsoleAPICalledEvent({
@@ -415,6 +428,45 @@ class ConsoleAPICalledEvent {
   }
 }
 
+class ExceptionRevokedEvent {
+  /// Reason describing why exception was revoked.
+  final String reason;
+
+  /// The id of revoked exception, as reported in `exceptionThrown`.
+  final int exceptionId;
+
+  ExceptionRevokedEvent({
+    @required this.reason,
+    @required this.exceptionId,
+  });
+
+  factory ExceptionRevokedEvent.fromJson(Map json) {
+    return new ExceptionRevokedEvent(
+      reason: json['reason'],
+      exceptionId: json['exceptionId'],
+    );
+  }
+}
+
+class ExceptionThrownEvent {
+  /// Timestamp of the exception.
+  final Timestamp timestamp;
+
+  final ExceptionDetails exceptionDetails;
+
+  ExceptionThrownEvent({
+    @required this.timestamp,
+    @required this.exceptionDetails,
+  });
+
+  factory ExceptionThrownEvent.fromJson(Map json) {
+    return new ExceptionThrownEvent(
+      timestamp: new Timestamp.fromJson(json['timestamp']),
+      exceptionDetails: new ExceptionDetails.fromJson(json['exceptionDetails']),
+    );
+  }
+}
+
 class InspectRequestedEvent {
   final RemoteObject object;
 
@@ -429,28 +481,6 @@ class InspectRequestedEvent {
     return new InspectRequestedEvent(
       object: new RemoteObject.fromJson(json['object']),
       hints: json['hints'],
-    );
-  }
-}
-
-class EvaluateResult {
-  /// Evaluation result.
-  final RemoteObject result;
-
-  /// Exception details.
-  final ExceptionDetails exceptionDetails;
-
-  EvaluateResult({
-    @required this.result,
-    this.exceptionDetails,
-  });
-
-  factory EvaluateResult.fromJson(Map json) {
-    return new EvaluateResult(
-      result: new RemoteObject.fromJson(json['result']),
-      exceptionDetails: json.containsKey('exceptionDetails')
-          ? new ExceptionDetails.fromJson(json['exceptionDetails'])
-          : null,
     );
   }
 }
@@ -499,6 +529,52 @@ class CallFunctionOnResult {
   }
 }
 
+class CompileScriptResult {
+  /// Id of the script.
+  final ScriptId scriptId;
+
+  /// Exception details.
+  final ExceptionDetails exceptionDetails;
+
+  CompileScriptResult({
+    this.scriptId,
+    this.exceptionDetails,
+  });
+
+  factory CompileScriptResult.fromJson(Map json) {
+    return new CompileScriptResult(
+      scriptId: json.containsKey('scriptId')
+          ? new ScriptId.fromJson(json['scriptId'])
+          : null,
+      exceptionDetails: json.containsKey('exceptionDetails')
+          ? new ExceptionDetails.fromJson(json['exceptionDetails'])
+          : null,
+    );
+  }
+}
+
+class EvaluateResult {
+  /// Evaluation result.
+  final RemoteObject result;
+
+  /// Exception details.
+  final ExceptionDetails exceptionDetails;
+
+  EvaluateResult({
+    @required this.result,
+    this.exceptionDetails,
+  });
+
+  factory EvaluateResult.fromJson(Map json) {
+    return new EvaluateResult(
+      result: new RemoteObject.fromJson(json['result']),
+      exceptionDetails: json.containsKey('exceptionDetails')
+          ? new ExceptionDetails.fromJson(json['exceptionDetails'])
+          : null,
+    );
+  }
+}
+
 class GetPropertiesResult {
   /// Object properties.
   final List<PropertyDescriptor> result;
@@ -524,30 +600,6 @@ class GetPropertiesResult {
           ? (json['internalProperties'] as List)
               .map((e) => new InternalPropertyDescriptor.fromJson(e))
               .toList()
-          : null,
-      exceptionDetails: json.containsKey('exceptionDetails')
-          ? new ExceptionDetails.fromJson(json['exceptionDetails'])
-          : null,
-    );
-  }
-}
-
-class CompileScriptResult {
-  /// Id of the script.
-  final ScriptId scriptId;
-
-  /// Exception details.
-  final ExceptionDetails exceptionDetails;
-
-  CompileScriptResult({
-    this.scriptId,
-    this.exceptionDetails,
-  });
-
-  factory CompileScriptResult.fromJson(Map json) {
-    return new CompileScriptResult(
-      scriptId: json.containsKey('scriptId')
-          ? new ScriptId.fromJson(json['scriptId'])
           : null,
       exceptionDetails: json.containsKey('exceptionDetails')
           ? new ExceptionDetails.fromJson(json['exceptionDetails'])
@@ -644,16 +696,17 @@ class RemoteObject {
   /// Object type.
   final String type;
 
-  /// Object subtype hint. Specified for <code>object</code> type values only.
+  /// Object subtype hint. Specified for `object` type values only.
   final String subtype;
 
-  /// Object class (constructor) name. Specified for <code>object</code> type values only.
+  /// Object class (constructor) name. Specified for `object` type values only.
   final String className;
 
   /// Remote object value in case of primitive values or JSON values (if it was requested).
   final dynamic value;
 
-  /// Primitive value which can not be JSON-stringified does not have <code>value</code>, but gets this property.
+  /// Primitive value which can not be JSON-stringified does not have `value`, but gets this
+  /// property.
   final UnserializableValue unserializableValue;
 
   /// String representation of the object.
@@ -662,7 +715,7 @@ class RemoteObject {
   /// Unique object identifier (for non-primitive values).
   final RemoteObjectId objectId;
 
-  /// Preview containing abbreviated property values. Specified for <code>object</code> type values only.
+  /// Preview containing abbreviated property values. Specified for `object` type values only.
   final ObjectPreview preview;
 
   final CustomPreview customPreview;
@@ -784,7 +837,7 @@ class ObjectPreview {
   /// Object type.
   final String type;
 
-  /// Object subtype hint. Specified for <code>object</code> type values only.
+  /// Object subtype hint. Specified for `object` type values only.
   final String subtype;
 
   /// String representation of the object.
@@ -796,7 +849,7 @@ class ObjectPreview {
   /// List of the properties.
   final List<PropertyPreview> properties;
 
-  /// List of the entries. Specified for <code>map</code> and <code>set</code> subtype values only.
+  /// List of the entries. Specified for `map` and `set` subtype values only.
   final List<EntryPreview> entries;
 
   ObjectPreview({
@@ -857,7 +910,7 @@ class PropertyPreview {
   /// Nested value preview.
   final ObjectPreview valuePreview;
 
-  /// Object subtype hint. Specified for <code>object</code> type values only.
+  /// Object subtype hint. Specified for `object` type values only.
   final String subtype;
 
   PropertyPreview({
@@ -941,16 +994,20 @@ class PropertyDescriptor {
   /// True if the value associated with the property may be changed (data descriptors only).
   final bool writable;
 
-  /// A function which serves as a getter for the property, or <code>undefined</code> if there is no getter (accessor descriptors only).
+  /// A function which serves as a getter for the property, or `undefined` if there is no getter
+  /// (accessor descriptors only).
   final RemoteObject get;
 
-  /// A function which serves as a setter for the property, or <code>undefined</code> if there is no setter (accessor descriptors only).
+  /// A function which serves as a setter for the property, or `undefined` if there is no setter
+  /// (accessor descriptors only).
   final RemoteObject set;
 
-  /// True if the type of this property descriptor may be changed and if the property may be deleted from the corresponding object.
+  /// True if the type of this property descriptor may be changed and if the property may be
+  /// deleted from the corresponding object.
   final bool configurable;
 
-  /// True if this property shows up during enumeration of the properties on the corresponding object.
+  /// True if this property shows up during enumeration of the properties on the corresponding
+  /// object.
   final bool enumerable;
 
   /// True if the result was thrown during the evaluation.
@@ -959,7 +1016,7 @@ class PropertyDescriptor {
   /// True if the property is owned for the object.
   final bool isOwn;
 
-  /// Property symbol object, if the property is of the <code>symbol</code> type.
+  /// Property symbol object, if the property is of the `symbol` type.
   final RemoteObject symbol;
 
   PropertyDescriptor({
@@ -1062,7 +1119,8 @@ class InternalPropertyDescriptor {
   }
 }
 
-/// Represents function call argument. Either remote object id <code>objectId</code>, primitive <code>value</code>, unserializable primitive value or neither of (for undefined) them should be specified.
+/// Represents function call argument. Either remote object id `objectId`, primitive `value`,
+/// unserializable primitive value or neither of (for undefined) them should be specified.
 class CallArgument {
   /// Primitive value or serializable javascript object.
   final dynamic value;
@@ -1127,7 +1185,8 @@ class ExecutionContextId {
 
 /// Description of an isolated world.
 class ExecutionContextDescription {
-  /// Unique id of the execution context. It can be used to specify in which execution context script evaluation should be performed.
+  /// Unique id of the execution context. It can be used to specify in which execution context
+  /// script evaluation should be performed.
   final ExecutionContextId id;
 
   /// Execution context origin.
@@ -1168,7 +1227,8 @@ class ExecutionContextDescription {
   }
 }
 
-/// Detailed information about exception (or error) that was thrown during script compilation or execution.
+/// Detailed information about exception (or error) that was thrown during script compilation or
+/// execution.
 class ExceptionDetails {
   /// Exception id.
   final int exceptionId;
@@ -1323,7 +1383,8 @@ class CallFrame {
 
 /// Call frames for assertions or error messages.
 class StackTrace {
-  /// String label of this stack trace. For async traces this may be a name of the function that initiated the async call.
+  /// String label of this stack trace. For async traces this may be a name of the function that
+  /// initiated the async call.
   final String description;
 
   /// JavaScript function name.
@@ -1332,14 +1393,14 @@ class StackTrace {
   /// Asynchronous JavaScript stack trace that preceded this stack, if available.
   final StackTrace parent;
 
-  /// Creation frame of the Promise which produced the next synchronous trace when resolved, if available.
-  final CallFrame promiseCreationFrame;
+  /// Asynchronous JavaScript stack trace that preceded this stack, if available.
+  final StackTraceId parentId;
 
   StackTrace({
     this.description,
     @required this.callFrames,
     this.parent,
-    this.promiseCreationFrame,
+    this.parentId,
   });
 
   factory StackTrace.fromJson(Map json) {
@@ -1351,8 +1412,8 @@ class StackTrace {
       parent: json.containsKey('parent')
           ? new StackTrace.fromJson(json['parent'])
           : null,
-      promiseCreationFrame: json.containsKey('promiseCreationFrame')
-          ? new CallFrame.fromJson(json['promiseCreationFrame'])
+      parentId: json.containsKey('parentId')
+          ? new StackTraceId.fromJson(json['parentId'])
           : null,
     );
   }
@@ -1367,8 +1428,58 @@ class StackTrace {
     if (parent != null) {
       json['parent'] = parent.toJson();
     }
-    if (promiseCreationFrame != null) {
-      json['promiseCreationFrame'] = promiseCreationFrame.toJson();
+    if (parentId != null) {
+      json['parentId'] = parentId.toJson();
+    }
+    return json;
+  }
+}
+
+/// Unique identifier of current debugger.
+class UniqueDebuggerId {
+  final String value;
+
+  UniqueDebuggerId(this.value);
+
+  factory UniqueDebuggerId.fromJson(String value) =>
+      new UniqueDebuggerId(value);
+
+  String toJson() => value;
+
+  bool operator ==(other) => other is UniqueDebuggerId && other.value == value;
+
+  int get hashCode => value.hashCode;
+
+  String toString() => value.toString();
+}
+
+/// If `debuggerId` is set stack trace comes from another debugger and can be resolved there. This
+/// allows to track cross-debugger calls. See `Runtime.StackTrace` and `Debugger.paused` for usages.
+class StackTraceId {
+  final String id;
+
+  final UniqueDebuggerId debuggerId;
+
+  StackTraceId({
+    @required this.id,
+    this.debuggerId,
+  });
+
+  factory StackTraceId.fromJson(Map json) {
+    return new StackTraceId(
+      id: json['id'],
+      debuggerId: json.containsKey('debuggerId')
+          ? new UniqueDebuggerId.fromJson(json['debuggerId'])
+          : null,
+    );
+  }
+
+  Map toJson() {
+    Map json = {
+      'id': id,
+    };
+    if (debuggerId != null) {
+      json['debuggerId'] = debuggerId.toJson();
     }
     return json;
   }

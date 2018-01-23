@@ -17,13 +17,13 @@ class InspectorDomain {
   Stream get onTargetCrashed => _client.onEvent
       .where((Event event) => event.name == 'Inspector.targetCrashed');
 
-  /// Enables inspector domain notifications.
-  Future enable() async {
-    await _client.send('Inspector.enable');
-  }
-
   /// Disables inspector domain notifications.
   Future disable() async {
     await _client.send('Inspector.disable');
+  }
+
+  /// Enables inspector domain notifications.
+  Future enable() async {
+    await _client.send('Inspector.enable');
   }
 }

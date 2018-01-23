@@ -6,21 +6,29 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'page.dart' as page;
-import 'css.dart' as css;
+import 'dom_debugger.dart' as dom_debugger;
 
 class DOMSnapshotDomain {
   final Client _client;
 
   DOMSnapshotDomain(this._client);
 
-  /// Returns a document snapshot, including the full DOM tree of the root node (including iframes, template contents, and imported documents) in a flattened array, as well as layout and white-listed computed style information for the nodes. Shadow DOM in the returned DOM tree is flattened.
+  /// Returns a document snapshot, including the full DOM tree of the root node (including iframes,
+  /// template contents, and imported documents) in a flattened array, as well as layout and
+  /// white-listed computed style information for the nodes. Shadow DOM in the returned DOM tree is
+  /// flattened.
   /// [computedStyleWhitelist] Whitelist of computed styles to return.
+  /// [includeEventListeners] Whether or not to retrieve details of DOM listeners (default false).
   Future<GetSnapshotResult> getSnapshot(
-    List<String> computedStyleWhitelist,
-  ) async {
+    List<String> computedStyleWhitelist, {
+    bool includeEventListeners,
+  }) async {
     Map parameters = {
       'computedStyleWhitelist': computedStyleWhitelist.map((e) => e).toList(),
     };
+    if (includeEventListeners != null) {
+      parameters['includeEventListeners'] = includeEventListeners;
+    }
     Map result = await _client.send('DOMSnapshot.getSnapshot', parameters);
     return new GetSnapshotResult.fromJson(result);
   }
@@ -59,13 +67,13 @@ class GetSnapshotResult {
 
 /// A Node in the DOM tree.
 class DOMNode {
-  /// <code>Node</code>'s nodeType.
+  /// `Node`'s nodeType.
   final int nodeType;
 
-  /// <code>Node</code>'s nodeName.
+  /// `Node`'s nodeName.
   final String nodeName;
 
-  /// <code>Node</code>'s nodeValue.
+  /// `Node`'s nodeValue.
   final String nodeValue;
 
   /// Only set for textarea elements, contains the text value.
@@ -80,25 +88,28 @@ class DOMNode {
   /// Only set for option elements, indicates if the element has been selected
   final bool optionSelected;
 
-  /// <code>Node</code>'s id, corresponds to DOM.Node.backendNodeId.
+  /// `Node`'s id, corresponds to DOM.Node.backendNodeId.
   final dom.BackendNodeId backendNodeId;
 
-  /// The indexes of the node's child nodes in the <code>domNodes</code> array returned by <code>getSnapshot</code>, if any.
+  /// The indexes of the node's child nodes in the `domNodes` array returned by `getSnapshot`, if
+  /// any.
   final List<int> childNodeIndexes;
 
-  /// Attributes of an <code>Element</code> node.
+  /// Attributes of an `Element` node.
   final List<NameValue> attributes;
 
-  /// Indexes of pseudo elements associated with this node in the <code>domNodes</code> array returned by <code>getSnapshot</code>, if any.
+  /// Indexes of pseudo elements associated with this node in the `domNodes` array returned by
+  /// `getSnapshot`, if any.
   final List<int> pseudoElementIndexes;
 
-  /// The index of the node's related layout tree node in the <code>layoutTreeNodes</code> array returned by <code>getSnapshot</code>, if any.
+  /// The index of the node's related layout tree node in the `layoutTreeNodes` array returned by
+  /// `getSnapshot`, if any.
   final int layoutNodeIndex;
 
-  /// Document URL that <code>Document</code> or <code>FrameOwner</code> node points to.
+  /// Document URL that `Document` or `FrameOwner` node points to.
   final String documentURL;
 
-  /// Base URL that <code>Document</code> or <code>FrameOwner</code> node uses for URL completion.
+  /// Base URL that `Document` or `FrameOwner` node uses for URL completion.
   final String baseURL;
 
   /// Only set for documents, contains the document's content language.
@@ -107,29 +118,40 @@ class DOMNode {
   /// Only set for documents, contains the document's character set encoding.
   final String documentEncoding;
 
-  /// <code>DocumentType</code> node's publicId.
+  /// `DocumentType` node's publicId.
   final String publicId;
 
-  /// <code>DocumentType</code> node's systemId.
+  /// `DocumentType` node's systemId.
   final String systemId;
 
   /// Frame ID for frame owner elements and also for the document node.
   final page.FrameId frameId;
 
-  /// The index of a frame owner element's content document in the <code>domNodes</code> array returned by <code>getSnapshot</code>, if any.
+  /// The index of a frame owner element's content document in the `domNodes` array returned by
+  /// `getSnapshot`, if any.
   final int contentDocumentIndex;
 
-  /// Index of the imported document's node of a link element in the <code>domNodes</code> array returned by <code>getSnapshot</code>, if any.
+  /// Index of the imported document's node of a link element in the `domNodes` array returned by
+  /// `getSnapshot`, if any.
   final int importedDocumentIndex;
 
-  /// Index of the content node of a template element in the <code>domNodes</code> array returned by <code>getSnapshot</code>.
+  /// Index of the content node of a template element in the `domNodes` array returned by
+  /// `getSnapshot`.
   final int templateContentIndex;
 
   /// Type of a pseudo element node.
   final dom.PseudoType pseudoType;
 
-  /// Whether this DOM node responds to mouse clicks. This includes nodes that have had click event listeners attached via JavaScript as well as anchor tags that naturally navigate when clicked.
+  /// Whether this DOM node responds to mouse clicks. This includes nodes that have had click
+  /// event listeners attached via JavaScript as well as anchor tags that naturally navigate when
+  /// clicked.
   final bool isClickable;
+
+  /// Details of the node's event listeners, if any.
+  final List<dom_debugger.EventListener> eventListeners;
+
+  /// The selected url for nodes with a srcset attribute.
+  final String currentSourceURL;
 
   DOMNode({
     @required this.nodeType,
@@ -156,6 +178,8 @@ class DOMNode {
     this.templateContentIndex,
     this.pseudoType,
     this.isClickable,
+    this.eventListeners,
+    this.currentSourceURL,
   });
 
   factory DOMNode.fromJson(Map json) {
@@ -208,6 +232,14 @@ class DOMNode {
           ? new dom.PseudoType.fromJson(json['pseudoType'])
           : null,
       isClickable: json.containsKey('isClickable') ? json['isClickable'] : null,
+      eventListeners: json.containsKey('eventListeners')
+          ? (json['eventListeners'] as List)
+              .map((e) => new dom_debugger.EventListener.fromJson(e))
+              .toList()
+          : null,
+      currentSourceURL: json.containsKey('currentSourceURL')
+          ? json['currentSourceURL']
+          : null,
     );
   }
 
@@ -279,13 +311,55 @@ class DOMNode {
     if (isClickable != null) {
       json['isClickable'] = isClickable;
     }
+    if (eventListeners != null) {
+      json['eventListeners'] = eventListeners.map((e) => e.toJson()).toList();
+    }
+    if (currentSourceURL != null) {
+      json['currentSourceURL'] = currentSourceURL;
+    }
+    return json;
+  }
+}
+
+/// Details of post layout rendered text positions. The exact layout should not be regarded as
+/// stable and may change between versions.
+class InlineTextBox {
+  /// The absolute position bounding box.
+  final dom.Rect boundingBox;
+
+  /// The starting index in characters, for this post layout textbox substring.
+  final int startCharacterIndex;
+
+  /// The number of characters in this post layout textbox substring.
+  final int numCharacters;
+
+  InlineTextBox({
+    @required this.boundingBox,
+    @required this.startCharacterIndex,
+    @required this.numCharacters,
+  });
+
+  factory InlineTextBox.fromJson(Map json) {
+    return new InlineTextBox(
+      boundingBox: new dom.Rect.fromJson(json['boundingBox']),
+      startCharacterIndex: json['startCharacterIndex'],
+      numCharacters: json['numCharacters'],
+    );
+  }
+
+  Map toJson() {
+    Map json = {
+      'boundingBox': boundingBox.toJson(),
+      'startCharacterIndex': startCharacterIndex,
+      'numCharacters': numCharacters,
+    };
     return json;
   }
 }
 
 /// Details of an element in the DOM tree with a LayoutObject.
 class LayoutTreeNode {
-  /// The index of the related DOM node in the <code>domNodes</code> array returned by <code>getSnapshot</code>.
+  /// The index of the related DOM node in the `domNodes` array returned by `getSnapshot`.
   final int domNodeIndex;
 
   /// The absolute position bounding box.
@@ -295,9 +369,9 @@ class LayoutTreeNode {
   final String layoutText;
 
   /// The post-layout inline text nodes, if any.
-  final List<css.InlineTextBox> inlineTextNodes;
+  final List<InlineTextBox> inlineTextNodes;
 
-  /// Index into the <code>computedStyles</code> array returned by <code>getSnapshot</code>.
+  /// Index into the `computedStyles` array returned by `getSnapshot`.
   final int styleIndex;
 
   LayoutTreeNode({
@@ -315,7 +389,7 @@ class LayoutTreeNode {
       layoutText: json.containsKey('layoutText') ? json['layoutText'] : null,
       inlineTextNodes: json.containsKey('inlineTextNodes')
           ? (json['inlineTextNodes'] as List)
-              .map((e) => new css.InlineTextBox.fromJson(e))
+              .map((e) => new InlineTextBox.fromJson(e))
               .toList()
           : null,
       styleIndex: json.containsKey('styleIndex') ? json['styleIndex'] : null,

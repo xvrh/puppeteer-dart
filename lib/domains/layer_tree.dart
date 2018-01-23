@@ -9,25 +9,15 @@ class LayerTreeDomain {
 
   LayerTreeDomain(this._client);
 
+  Stream<LayerPaintedEvent> get onLayerPainted => _client.onEvent
+      .where((Event event) => event.name == 'LayerTree.layerPainted')
+      .map((Event event) => new LayerPaintedEvent.fromJson(event.parameters));
+
   Stream<List<Layer>> get onLayerTreeDidChange => _client.onEvent
       .where((Event event) => event.name == 'LayerTree.layerTreeDidChange')
       .map((Event event) => (event.parameters['layers'] as List)
           .map((e) => new Layer.fromJson(e))
           .toList());
-
-  Stream<LayerPaintedEvent> get onLayerPainted => _client.onEvent
-      .where((Event event) => event.name == 'LayerTree.layerPainted')
-      .map((Event event) => new LayerPaintedEvent.fromJson(event.parameters));
-
-  /// Enables compositing tree inspection.
-  Future enable() async {
-    await _client.send('LayerTree.enable');
-  }
-
-  /// Disables compositing tree inspection.
-  Future disable() async {
-    await _client.send('LayerTree.disable');
-  }
 
   /// Provides the reasons why the given layer was composited.
   /// [layerId] The id of the layer for which we want to get the reasons it was composited.
@@ -44,17 +34,14 @@ class LayerTreeDomain {
         .toList();
   }
 
-  /// Returns the layer snapshot identifier.
-  /// [layerId] The id of the layer.
-  /// Return: The id of the layer snapshot.
-  Future<SnapshotId> makeSnapshot(
-    LayerId layerId,
-  ) async {
-    Map parameters = {
-      'layerId': layerId.toJson(),
-    };
-    Map result = await _client.send('LayerTree.makeSnapshot', parameters);
-    return new SnapshotId.fromJson(result['snapshotId']);
+  /// Disables compositing tree inspection.
+  Future disable() async {
+    await _client.send('LayerTree.disable');
+  }
+
+  /// Enables compositing tree inspection.
+  Future enable() async {
+    await _client.send('LayerTree.enable');
   }
 
   /// Returns the snapshot identifier.
@@ -70,15 +57,17 @@ class LayerTreeDomain {
     return new SnapshotId.fromJson(result['snapshotId']);
   }
 
-  /// Releases layer snapshot captured by the back-end.
-  /// [snapshotId] The id of the layer snapshot.
-  Future releaseSnapshot(
-    SnapshotId snapshotId,
+  /// Returns the layer snapshot identifier.
+  /// [layerId] The id of the layer.
+  /// Return: The id of the layer snapshot.
+  Future<SnapshotId> makeSnapshot(
+    LayerId layerId,
   ) async {
     Map parameters = {
-      'snapshotId': snapshotId.toJson(),
+      'layerId': layerId.toJson(),
     };
-    await _client.send('LayerTree.releaseSnapshot', parameters);
+    Map result = await _client.send('LayerTree.makeSnapshot', parameters);
+    return new SnapshotId.fromJson(result['snapshotId']);
   }
 
   /// [snapshotId] The id of the layer snapshot.
@@ -108,6 +97,17 @@ class LayerTreeDomain {
     return (result['timings'] as List)
         .map((e) => new PaintProfile.fromJson(e))
         .toList();
+  }
+
+  /// Releases layer snapshot captured by the back-end.
+  /// [snapshotId] The id of the layer snapshot.
+  Future releaseSnapshot(
+    SnapshotId snapshotId,
+  ) async {
+    Map parameters = {
+      'snapshotId': snapshotId.toJson(),
+    };
+    await _client.send('LayerTree.releaseSnapshot', parameters);
   }
 
   /// Replays the layer snapshot and returns the resulting bitmap.
@@ -361,7 +361,8 @@ class Layer {
   /// Indicates how many time this layer has painted.
   final int paintCount;
 
-  /// Indicates whether this layer hosts any content, rather than being used for transform/scrolling purposes only.
+  /// Indicates whether this layer hosts any content, rather than being used for
+  /// transform/scrolling purposes only.
   final bool drawsContent;
 
   /// Set if layer is not visible.

@@ -13,8 +13,20 @@ class HeapProfilerDomain {
       .where((Event event) => event.name == 'HeapProfiler.addHeapSnapshotChunk')
       .map((Event event) => event.parameters['chunk'] as String);
 
-  Stream get onResetProfiles => _client.onEvent
-      .where((Event event) => event.name == 'HeapProfiler.resetProfiles');
+  /// If heap objects tracking has been started then backend may send update for one or more fragments
+  Stream<List<int>> get onHeapStatsUpdate => _client.onEvent
+      .where((Event event) => event.name == 'HeapProfiler.heapStatsUpdate')
+      .map((Event event) => (event.parameters['statsUpdate'] as List)
+          .map((e) => e as int)
+          .toList());
+
+  /// If heap objects tracking has been started then backend regularly sends a current value for last
+  /// seen object id and corresponding timestamp. If the were changes in the heap since last event
+  /// then one or more heapStatsUpdate events will be sent before a new lastSeenObjectId event.
+  Stream<LastSeenObjectIdEvent> get onLastSeenObjectId => _client.onEvent
+      .where((Event event) => event.name == 'HeapProfiler.lastSeenObjectId')
+      .map((Event event) =>
+          new LastSeenObjectIdEvent.fromJson(event.parameters));
 
   Stream<ReportHeapSnapshotProgressEvent> get onReportHeapSnapshotProgress =>
       _client.onEvent
@@ -23,25 +35,78 @@ class HeapProfilerDomain {
           .map((Event event) =>
               new ReportHeapSnapshotProgressEvent.fromJson(event.parameters));
 
-  /// If heap objects tracking has been started then backend regularly sends a current value for last seen object id and corresponding timestamp. If the were changes in the heap since last event then one or more heapStatsUpdate events will be sent before a new lastSeenObjectId event.
-  Stream<LastSeenObjectIdEvent> get onLastSeenObjectId => _client.onEvent
-      .where((Event event) => event.name == 'HeapProfiler.lastSeenObjectId')
-      .map((Event event) =>
-          new LastSeenObjectIdEvent.fromJson(event.parameters));
+  Stream get onResetProfiles => _client.onEvent
+      .where((Event event) => event.name == 'HeapProfiler.resetProfiles');
 
-  /// If heap objects tracking has been started then backend may send update for one or more fragments
-  Stream<List<int>> get onHeapStatsUpdate => _client.onEvent
-      .where((Event event) => event.name == 'HeapProfiler.heapStatsUpdate')
-      .map((Event event) => (event.parameters['statsUpdate'] as List)
-          .map((e) => e as int)
-          .toList());
+  /// Enables console to refer to the node with given id via $x (see Command Line API for more details
+  /// $x functions).
+  /// [heapObjectId] Heap snapshot object id to be accessible by means of $x command line API.
+  Future addInspectedHeapObject(
+    HeapSnapshotObjectId heapObjectId,
+  ) async {
+    Map parameters = {
+      'heapObjectId': heapObjectId.toJson(),
+    };
+    await _client.send('HeapProfiler.addInspectedHeapObject', parameters);
+  }
+
+  Future collectGarbage() async {
+    await _client.send('HeapProfiler.collectGarbage');
+  }
+
+  Future disable() async {
+    await _client.send('HeapProfiler.disable');
+  }
 
   Future enable() async {
     await _client.send('HeapProfiler.enable');
   }
 
-  Future disable() async {
-    await _client.send('HeapProfiler.disable');
+  /// [objectId] Identifier of the object to get heap object id for.
+  /// Return: Id of the heap snapshot object corresponding to the passed remote object id.
+  Future<HeapSnapshotObjectId> getHeapObjectId(
+    runtime.RemoteObjectId objectId,
+  ) async {
+    Map parameters = {
+      'objectId': objectId.toJson(),
+    };
+    Map result = await _client.send('HeapProfiler.getHeapObjectId', parameters);
+    return new HeapSnapshotObjectId.fromJson(result['heapSnapshotObjectId']);
+  }
+
+  /// [objectGroup] Symbolic group name that can be used to release multiple objects.
+  /// Return: Evaluation result.
+  Future<runtime.RemoteObject> getObjectByHeapObjectId(
+    HeapSnapshotObjectId objectId, {
+    String objectGroup,
+  }) async {
+    Map parameters = {
+      'objectId': objectId.toJson(),
+    };
+    if (objectGroup != null) {
+      parameters['objectGroup'] = objectGroup;
+    }
+    Map result =
+        await _client.send('HeapProfiler.getObjectByHeapObjectId', parameters);
+    return new runtime.RemoteObject.fromJson(result['result']);
+  }
+
+  /// Return: Return the sampling profile being collected.
+  Future<SamplingHeapProfile> getSamplingProfile() async {
+    Map result = await _client.send('HeapProfiler.getSamplingProfile');
+    return new SamplingHeapProfile.fromJson(result['profile']);
+  }
+
+  /// [samplingInterval] Average sample interval in bytes. Poisson distribution is used for the intervals. The
+  /// default value is 32768 bytes.
+  Future startSampling({
+    num samplingInterval,
+  }) async {
+    Map parameters = {};
+    if (samplingInterval != null) {
+      parameters['samplingInterval'] = samplingInterval;
+    }
+    await _client.send('HeapProfiler.startSampling', parameters);
   }
 
   Future startTrackingHeapObjects({
@@ -54,7 +119,14 @@ class HeapProfilerDomain {
     await _client.send('HeapProfiler.startTrackingHeapObjects', parameters);
   }
 
-  /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken when the tracking is stopped.
+  /// Return: Recorded sampling heap profile.
+  Future<SamplingHeapProfile> stopSampling() async {
+    Map result = await _client.send('HeapProfiler.stopSampling');
+    return new SamplingHeapProfile.fromJson(result['profile']);
+  }
+
+  /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken
+  /// when the tracking is stopped.
   Future stopTrackingHeapObjects({
     bool reportProgress,
   }) async {
@@ -75,66 +147,23 @@ class HeapProfilerDomain {
     }
     await _client.send('HeapProfiler.takeHeapSnapshot', parameters);
   }
+}
 
-  Future collectGarbage() async {
-    await _client.send('HeapProfiler.collectGarbage');
-  }
+class LastSeenObjectIdEvent {
+  final int lastSeenObjectId;
 
-  /// [objectGroup] Symbolic group name that can be used to release multiple objects.
-  /// Return: Evaluation result.
-  Future<runtime.RemoteObject> getObjectByHeapObjectId(
-    HeapSnapshotObjectId objectId, {
-    String objectGroup,
-  }) async {
-    Map parameters = {
-      'objectId': objectId.toJson(),
-    };
-    if (objectGroup != null) {
-      parameters['objectGroup'] = objectGroup;
-    }
-    Map result =
-        await _client.send('HeapProfiler.getObjectByHeapObjectId', parameters);
-    return new runtime.RemoteObject.fromJson(result['result']);
-  }
+  final num timestamp;
 
-  /// Enables console to refer to the node with given id via $x (see Command Line API for more details $x functions).
-  /// [heapObjectId] Heap snapshot object id to be accessible by means of $x command line API.
-  Future addInspectedHeapObject(
-    HeapSnapshotObjectId heapObjectId,
-  ) async {
-    Map parameters = {
-      'heapObjectId': heapObjectId.toJson(),
-    };
-    await _client.send('HeapProfiler.addInspectedHeapObject', parameters);
-  }
+  LastSeenObjectIdEvent({
+    @required this.lastSeenObjectId,
+    @required this.timestamp,
+  });
 
-  /// [objectId] Identifier of the object to get heap object id for.
-  /// Return: Id of the heap snapshot object corresponding to the passed remote object id.
-  Future<HeapSnapshotObjectId> getHeapObjectId(
-    runtime.RemoteObjectId objectId,
-  ) async {
-    Map parameters = {
-      'objectId': objectId.toJson(),
-    };
-    Map result = await _client.send('HeapProfiler.getHeapObjectId', parameters);
-    return new HeapSnapshotObjectId.fromJson(result['heapSnapshotObjectId']);
-  }
-
-  /// [samplingInterval] Average sample interval in bytes. Poisson distribution is used for the intervals. The default value is 32768 bytes.
-  Future startSampling({
-    num samplingInterval,
-  }) async {
-    Map parameters = {};
-    if (samplingInterval != null) {
-      parameters['samplingInterval'] = samplingInterval;
-    }
-    await _client.send('HeapProfiler.startSampling', parameters);
-  }
-
-  /// Return: Recorded sampling heap profile.
-  Future<SamplingHeapProfile> stopSampling() async {
-    Map result = await _client.send('HeapProfiler.stopSampling');
-    return new SamplingHeapProfile.fromJson(result['profile']);
+  factory LastSeenObjectIdEvent.fromJson(Map json) {
+    return new LastSeenObjectIdEvent(
+      lastSeenObjectId: json['lastSeenObjectId'],
+      timestamp: json['timestamp'],
+    );
   }
 }
 
@@ -156,24 +185,6 @@ class ReportHeapSnapshotProgressEvent {
       done: json['done'],
       total: json['total'],
       finished: json.containsKey('finished') ? json['finished'] : null,
-    );
-  }
-}
-
-class LastSeenObjectIdEvent {
-  final int lastSeenObjectId;
-
-  final num timestamp;
-
-  LastSeenObjectIdEvent({
-    @required this.lastSeenObjectId,
-    @required this.timestamp,
-  });
-
-  factory LastSeenObjectIdEvent.fromJson(Map json) {
-    return new LastSeenObjectIdEvent(
-      lastSeenObjectId: json['lastSeenObjectId'],
-      timestamp: json['timestamp'],
     );
   }
 }

@@ -8,6 +8,11 @@ class DeviceOrientationDomain {
 
   DeviceOrientationDomain(this._client);
 
+  /// Clears the overridden Device Orientation.
+  Future clearDeviceOrientationOverride() async {
+    await _client.send('DeviceOrientation.clearDeviceOrientationOverride');
+  }
+
   /// Overrides the Device Orientation.
   /// [alpha] Mock alpha
   /// [beta] Mock beta
@@ -24,10 +29,5 @@ class DeviceOrientationDomain {
     };
     await _client.send(
         'DeviceOrientation.setDeviceOrientationOverride', parameters);
-  }
-
-  /// Clears the overridden Device Orientation.
-  Future clearDeviceOrientationOverride() async {
-    await _client.send('DeviceOrientation.clearDeviceOrientationOverride');
   }
 }
