@@ -4,7 +4,7 @@ import 'package:chrome_dev_tools/src/connection.dart';
 
 Future waitUntilNetworkIdle(Session session,
     {Duration idleDuration: const Duration(milliseconds: 1000),
-    int idleInflight: 2}) async {
+    int idleInFlight: 0}) async {
   NetworkDomain network = new NetworkDomain(session);
   await network.enable();
 
@@ -25,14 +25,14 @@ Future waitUntilNetworkIdle(Session session,
       .add(network.onRequestWillBeSent.listen((RequestWillBeSentEvent e) {
     requestIds.add(e.requestId.value);
 
-    if (requestIds.length > idleInflight) {
+    if (requestIds.length > idleInFlight) {
       idleTimer?.cancel();
       idleTimer = null;
     }
   }));
   remove(RequestId id) {
     requestIds.remove(id.value);
-    if (requestIds.length <= idleInflight && idleTimer == null) {
+    if (requestIds.length <= idleInFlight && idleTimer == null) {
       idleTimer = new Timer(idleDuration, complete);
     }
   }
