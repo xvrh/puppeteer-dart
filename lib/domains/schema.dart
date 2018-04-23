@@ -5,10 +5,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class SchemaDomain {
+class SchemaManager {
   final Client _client;
 
-  SchemaDomain(this._client);
+  SchemaManager(this._client);
 
   /// Returns supported domains.
   /// Return: List of supported domains.

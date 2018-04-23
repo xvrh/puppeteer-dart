@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class StorageDomain {
+class StorageManager {
   final Client _client;
 
-  StorageDomain(this._client);
+  StorageManager(this._client);
 
   /// A cache has been added/deleted.
   Stream<String> get onCacheStorageListUpdated => _client.onEvent

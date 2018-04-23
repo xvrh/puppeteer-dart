@@ -21,7 +21,7 @@ main() async {
 
   await waitUntilNetworkIdle(session);
 
-  RuntimeDomain runtime = new RuntimeDomain(session);
+  RuntimeManager runtime = new RuntimeManager(session);
   var result = await runtime.evaluate(
       '''document.querySelector('form[action="/join"]').getBoundingClientRect();''');
 
@@ -34,7 +34,7 @@ main() async {
       height: rect['height'],
       scale: 1);
 
-  PageDomain page = new PageDomain(session);
+  PageManager page = new PageManager(session);
   String screenshot = await page.captureScreenshot(clip: clip);
 
   await new File.fromUri(Platform.script.resolve('_github_form.png'))

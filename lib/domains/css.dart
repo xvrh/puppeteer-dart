@@ -14,10 +14,10 @@ import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'page.dart' as page;
 
-class CSSDomain {
+class CSSManager {
   final Client _client;
 
-  CSSDomain(this._client);
+  CSSManager(this._client);
 
   /// Fires whenever a MediaQuery result changes (for example, after a browser
   /// window has been resized.) The current implementation considers only

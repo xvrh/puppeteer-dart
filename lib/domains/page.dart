@@ -10,10 +10,10 @@ import 'emulation.dart' as emulation;
 import 'dom.dart' as dom;
 import 'runtime.dart' as runtime;
 
-class PageDomain {
+class PageManager {
   final Client _client;
 
-  PageDomain(this._client);
+  PageManager(this._client);
 
   Stream<network.MonotonicTime> get onDomContentEventFired => _client.onEvent
       .where((Event event) => event.name == 'Page.domContentEventFired')

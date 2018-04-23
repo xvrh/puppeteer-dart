@@ -59,7 +59,7 @@ main() {
       code.writeln("import '$normalizedDep.dart' as $normalizedDep;");
     }
 
-    String className = '${domainName}Domain';
+    String className = '${domainName}Manager';
     code.writeln('class $className {');
     code.writeln('final Client _client;');
     code.writeln();

@@ -13,10 +13,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class RuntimeDomain {
+class RuntimeManager {
   final Client _client;
 
-  RuntimeDomain(this._client);
+  RuntimeManager(this._client);
 
   /// Issued when console API was called.
   Stream<ConsoleAPICalledEvent> get onConsoleAPICalled => _client.onEvent

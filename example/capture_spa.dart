@@ -17,7 +17,7 @@ main() async {
 
   await waitUntilNetworkIdle(session);
 
-  DOMSnapshotDomain dom = new DOMSnapshotDomain(session);
+  DOMSnapshotManager dom = new DOMSnapshotManager(session);
   var result = await dom.getSnapshot([]);
 
   for (DOMNode node in result.domNodes) {

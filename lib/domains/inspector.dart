@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class InspectorDomain {
+class InspectorManager {
   final Client _client;
 
-  InspectorDomain(this._client);
+  InspectorManager(this._client);
 
   /// Fired when remote debugging connection is about to be terminated. Contains
   /// detach reason.

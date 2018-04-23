@@ -5,10 +5,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class SecurityDomain {
+class SecurityManager {
   final Client _client;
 
-  SecurityDomain(this._client);
+  SecurityManager(this._client);
 
   /// The security state of the page changed.
   Stream<SecurityStateChangedEvent> get onSecurityStateChanged =>

@@ -99,13 +99,13 @@ class Chromium {
     }
   }
 
-  TargetDomain get targets => connection.targets;
+  TargetManager get targets => connection.targets;
 
-  Future<PageDomain> newPage() async {
+  Future<PageManager> newPage() async {
     TargetID targetId = await connection.targets.createTarget('about:blank');
     Session client = await connection.createSession(targetId);
 
-    return new PageDomain(client);
+    return new PageManager(client);
   }
 
   Future closeAllTabs() async {

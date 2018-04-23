@@ -3,7 +3,7 @@
 A Dart library to control Chrome over the DevTools Protocol.
 
 This is a simple 1:1 mapping with the [Chrome DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).  
-All the code in `lib/domains` are generated from the [browser_protocol.json](https://chromium.googlesource.com/chromium/src/+/master/third_party/WebKit/Source/core/inspector/browser_protocol.json) and [js_protocol.json](https://chromium.googlesource.com/v8/v8/+/master/src/inspector/js_protocol.json).
+All the code in `lib/domains` are generated from the [browser_protocol.json](https://chromium.googlesource.com/chromium/src/+/master/third_party/blink/renderer/core/inspector/browser_protocol-1.3.json) and [js_protocol.json](https://chromium.googlesource.com/v8/v8/+/master/src/inspector/js_protocol.json).
 
 
 ## Usage
@@ -50,7 +50,7 @@ main() async {
   Session session = await chromium.connection.createSession(targetId);
 
   // Force the "screen" media. Then CSS "@media print" won't change the look
-  EmulationDomain emulation = new EmulationDomain(session);
+  EmulationManager emulation = new EmulationManager(session);
   await emulation.setEmulatedMedia('screen');
 
   // A small helper to wait until the network is quite
@@ -58,7 +58,7 @@ main() async {
 
 
   // Capture the PDF and convert it to a List of bytes.
-  PageDomain page = new PageDomain(session);
+  PageManager page = new PageManager(session);
   List<int> pdf = BASE64.decode(await page.printToPDF(
       pageRanges: '1',
       landscape: true,
@@ -86,7 +86,7 @@ main() async {
 
   await waitUntilNetworkIdle(session);
 
-  RuntimeDomain runtime = new RuntimeDomain(session);
+  RuntimeManager runtime = new RuntimeManager(session);
   var result = await runtime.evaluate(
       '''document.querySelector('form[action="/join"]').getBoundingClientRect();''');
 
@@ -99,7 +99,7 @@ main() async {
       height: rect['height'],
       scale: 1);
 
-  PageDomain page = new PageDomain(session);
+  PageManager page = new PageManager(session);
   String screenshot = await page.captureScreenshot(clip: clip);
 
   await new File.fromUri(Platform.script.resolve('_github_form.png'))
@@ -115,7 +115,7 @@ main() async {
   Session session; //...
   
   // Take a snapshot of the DOM of the current page
-  DOMSnapshotDomain dom = new DOMSnapshotDomain(session);
+  DOMSnapshotManager dom = new DOMSnapshotManager(session);
   var result = await dom.getSnapshot([]);
 
   // Iterate the nodes and output some html.

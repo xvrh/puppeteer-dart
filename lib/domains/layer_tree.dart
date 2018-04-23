@@ -4,10 +4,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 
-class LayerTreeDomain {
+class LayerTreeManager {
   final Client _client;
 
-  LayerTreeDomain(this._client);
+  LayerTreeManager(this._client);
 
   Stream<List<Layer>> get onLayerTreeDidChange => _client.onEvent
       .where((Event event) => event.name == 'LayerTree.layerTreeDidChange')

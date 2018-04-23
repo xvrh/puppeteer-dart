@@ -9,10 +9,10 @@ import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 import 'dom.dart' as dom;
 
-class DOMDebuggerDomain {
+class DOMDebuggerManager {
   final Client _client;
 
-  DOMDebuggerDomain(this._client);
+  DOMDebuggerManager(this._client);
 
   /// Sets breakpoint on particular operation with DOM.
   /// [nodeId] Identifier of the node to set breakpoint on.

@@ -4,10 +4,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 
-class AccessibilityDomain {
+class AccessibilityManager {
   final Client _client;
 
-  AccessibilityDomain(this._client);
+  AccessibilityManager(this._client);
 
   /// Fetches the accessibility node and partial accessibility tree for this DOM
   /// node, if it exists.

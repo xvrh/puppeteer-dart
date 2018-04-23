@@ -6,10 +6,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
-class IODomain {
+class IOManager {
   final Client _client;
 
-  IODomain(this._client);
+  IOManager(this._client);
 
   /// Read a chunk of the stream
   /// [handle] Handle of the stream to read.

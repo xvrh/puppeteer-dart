@@ -25,13 +25,13 @@ class Connection implements Client {
   final List<Session> _sessions = [];
   final StreamController<Event> _eventController =
       new StreamController<Event>.broadcast();
-  TargetDomain _targets;
+  TargetManager _targets;
   final List<StreamSubscription> _subscriptions = [];
 
   Connection._(this._webSocket) {
     _subscriptions.add(_webSocket.listen(_onMessage));
 
-    _targets = new TargetDomain(this);
+    _targets = new TargetManager(this);
 
     _subscriptions.add(_targets.onReceivedMessageFromTarget
         .listen((ReceivedMessageFromTargetEvent e) {
@@ -46,7 +46,7 @@ class Connection implements Client {
     }));
   }
 
-  TargetDomain get targets => _targets;
+  TargetManager get targets => _targets;
 
   Session _getSession(SessionID sessionId) =>
       _sessions.firstWhere((s) => s.sessionId.value == sessionId.value);
@@ -136,7 +136,7 @@ class Session implements Client {
   static int _lastId = 0;
   final TargetID targetID;
   final SessionID sessionId;
-  final TargetDomain _targets;
+  final TargetManager _targets;
   final Map<int, Completer> _completers = {};
   final StreamController<Event> _eventController =
       new StreamController<Event>.broadcast();

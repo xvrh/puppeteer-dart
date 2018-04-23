@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class CacheStorageDomain {
+class CacheStorageManager {
   final Client _client;
 
-  CacheStorageDomain(this._client);
+  CacheStorageManager(this._client);
 
   /// Requests cache names.
   /// [securityOrigin] Security origin.

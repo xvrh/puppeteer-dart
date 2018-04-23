@@ -8,10 +8,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
-class DebuggerDomain {
+class DebuggerManager {
   final Client _client;
 
-  DebuggerDomain(this._client);
+  DebuggerManager(this._client);
 
   /// Fired when breakpoint is resolved to an actual script and location.
   Stream<BreakpointResolvedEvent> get onBreakpointResolved => _client.onEvent

@@ -8,10 +8,10 @@ import 'page.dart' as page;
 import 'runtime.dart' as runtime;
 import 'dom.dart' as dom;
 
-class EmulationDomain {
+class EmulationManager {
   final Client _client;
 
-  EmulationDomain(this._client);
+  EmulationManager(this._client);
 
   /// Notification sent after the virtual time budget for the current
   /// VirtualTimePolicy has run out.

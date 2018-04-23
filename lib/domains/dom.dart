@@ -16,10 +16,10 @@ import 'page.dart' as page;
 import 'runtime.dart' as runtime;
 import 'dom.dart' as dom;
 
-class DOMDomain {
+class DOMManager {
   final Client _client;
 
-  DOMDomain(this._client);
+  DOMManager(this._client);
 
   /// Fired when `Document` has been totally updated. Node ids are no longer
   /// valid.

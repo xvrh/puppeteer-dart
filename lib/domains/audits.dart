@@ -7,10 +7,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'network.dart' as network;
 
-class AuditsDomain {
+class AuditsManager {
   final Client _client;
 
-  AuditsDomain(this._client);
+  AuditsManager(this._client);
 
   /// Returns the response body and size if it were re-encoded with the specified
   /// settings. Only applies to images.

@@ -5,10 +5,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class ConsoleDomain {
+class ConsoleManager {
   final Client _client;
 
-  ConsoleDomain(this._client);
+  ConsoleManager(this._client);
 
   /// Issued when new console message is added.
   Stream<ConsoleMessage> get onMessageAdded => _client.onEvent

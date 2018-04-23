@@ -6,10 +6,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class SystemInfoDomain {
+class SystemInfoManager {
   final Client _client;
 
-  SystemInfoDomain(this._client);
+  SystemInfoManager(this._client);
 
   /// Returns information about the system.
   Future<GetInfoResult> getInfo() async {

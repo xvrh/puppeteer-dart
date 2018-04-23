@@ -6,10 +6,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
-class HeadlessExperimentalDomain {
+class HeadlessExperimentalManager {
   final Client _client;
 
-  HeadlessExperimentalDomain(this._client);
+  HeadlessExperimentalManager(this._client);
 
   /// Issued when the target starts or stops needing BeginFrames.
   Stream<bool> get onNeedsBeginFramesChanged => _client.onEvent

@@ -4,10 +4,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'io.dart' as io;
 
-class TracingDomain {
+class TracingManager {
   final Client _client;
 
-  TracingDomain(this._client);
+  TracingManager(this._client);
 
   /// Contains an bucket of collected trace events. When tracing is stopped
   /// collected events will be send as a sequence of dataCollected events followed

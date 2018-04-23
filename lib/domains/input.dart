@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class InputDomain {
+class InputManager {
   final Client _client;
 
-  InputDomain(this._client);
+  InputManager(this._client);
 
   /// Ignores input events (useful while auditing page).
   /// [ignore] Ignores input events processing when set to true.

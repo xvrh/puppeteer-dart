@@ -4,10 +4,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'target.dart' as target;
 
-class ServiceWorkerDomain {
+class ServiceWorkerManager {
   final Client _client;
 
-  ServiceWorkerDomain(this._client);
+  ServiceWorkerManager(this._client);
 
   Stream<List<ServiceWorkerRegistration>> get onWorkerRegistrationUpdated =>
       _client.onEvent

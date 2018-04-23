@@ -4,10 +4,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'page.dart' as page;
 
-class ApplicationCacheDomain {
+class ApplicationCacheManager {
   final Client _client;
 
-  ApplicationCacheDomain(this._client);
+  ApplicationCacheManager(this._client);
 
   Stream<ApplicationCacheStatusUpdatedEvent>
       get onApplicationCacheStatusUpdated => _client.onEvent

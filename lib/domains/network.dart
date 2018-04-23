@@ -11,10 +11,10 @@ import 'page.dart' as page;
 import 'runtime.dart' as runtime;
 import 'debugger.dart' as debugger;
 
-class NetworkDomain {
+class NetworkManager {
   final Client _client;
 
-  NetworkDomain(this._client);
+  NetworkManager(this._client);
 
   /// Fired when resource loading priority is changed
   Stream<ResourceChangedPriorityEvent> get onResourceChangedPriority => _client

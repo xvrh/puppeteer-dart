@@ -20,10 +20,10 @@ main() async {
       'https://www.github.com');
   Session session = await chromium.connection.createSession(targetId);
 
-  PageDomain page = new PageDomain(session);
+  PageManager page = new PageManager(session);
 
   // Force the "screen" media or some CSS @media print can change the look
-  EmulationDomain emulation = new EmulationDomain(session);
+  EmulationManager emulation = new EmulationManager(session);
   await emulation.setEmulatedMedia('screen');
 
   await waitUntilNetworkIdle(session);

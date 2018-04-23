@@ -5,10 +5,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class DOMStorageDomain {
+class DOMStorageManager {
   final Client _client;
 
-  DOMStorageDomain(this._client);
+  DOMStorageManager(this._client);
 
   Stream<StorageId> get onDomStorageItemsCleared => _client.onEvent
       .where((Event event) => event.name == 'DOMStorage.domStorageItemsCleared')

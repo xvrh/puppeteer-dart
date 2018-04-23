@@ -6,10 +6,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'target.dart' as target;
 
-class BrowserDomain {
+class BrowserManager {
   final Client _client;
 
-  BrowserDomain(this._client);
+  BrowserManager(this._client);
 
   /// Close browser gracefully.
   Future close() async {

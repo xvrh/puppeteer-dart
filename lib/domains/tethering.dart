@@ -5,10 +5,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class TetheringDomain {
+class TetheringManager {
   final Client _client;
 
-  TetheringDomain(this._client);
+  TetheringManager(this._client);
 
   /// Informs that port was successfully bound and got a specified connection id.
   Stream<AcceptedEvent> get onAccepted => _client.onEvent

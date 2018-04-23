@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class MemoryDomain {
+class MemoryManager {
   final Client _client;
 
-  MemoryDomain(this._client);
+  MemoryManager(this._client);
 
   Future<GetDOMCountersResult> getDOMCounters() async {
     Map result = await _client.send('Memory.getDOMCounters');

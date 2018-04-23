@@ -5,10 +5,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class TargetDomain {
+class TargetManager {
   final Client _client;
 
-  TargetDomain(this._client);
+  TargetManager(this._client);
 
   /// Issued when a possible inspection target is created.
   Stream<TargetInfo> get onTargetCreated => _client.onEvent

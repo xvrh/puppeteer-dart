@@ -4,10 +4,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
-class IndexedDBDomain {
+class IndexedDBManager {
   final Client _client;
 
-  IndexedDBDomain(this._client);
+  IndexedDBManager(this._client);
 
   /// Enables events from backend.
   Future enable() async {

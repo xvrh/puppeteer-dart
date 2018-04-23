@@ -4,10 +4,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
-class HeapProfilerDomain {
+class HeapProfilerManager {
   final Client _client;
 
-  HeapProfilerDomain(this._client);
+  HeapProfilerManager(this._client);
 
   Stream<String> get onAddHeapSnapshotChunk => _client.onEvent
       .where((Event event) => event.name == 'HeapProfiler.addHeapSnapshotChunk')

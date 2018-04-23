@@ -9,10 +9,10 @@ import 'dom.dart' as dom;
 import 'runtime.dart' as runtime;
 import 'page.dart' as page;
 
-class OverlayDomain {
+class OverlayManager {
   final Client _client;
 
-  OverlayDomain(this._client);
+  OverlayManager(this._client);
 
   /// Fired when the node should be highlighted. This happens after call to
   /// `setInspectMode`.

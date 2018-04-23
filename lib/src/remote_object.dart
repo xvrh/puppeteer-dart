@@ -22,7 +22,7 @@ Future getRemoteObject(Client client, RemoteObject remoteObject) async {
   if (remoteObject.objectId == null) return remoteObject.value;
   if (remoteObject.subtype == 'promise') return remoteObject.description;
   try {
-    RuntimeDomain runtime = new RuntimeDomain(client);
+    RuntimeManager runtime = new RuntimeManager(client);
     final response = await runtime.callFunctionOn('function() { return this; }',
         objectId: remoteObject.objectId, returnByValue: true);
     return response.result.value;
@@ -36,7 +36,7 @@ Future getRemoteObject(Client client, RemoteObject remoteObject) async {
 
 Future<Map<String, dynamic>> getProperties(
     Client client, RemoteObject remoteObject) async {
-  RuntimeDomain runtime = new RuntimeDomain(client);
+  RuntimeManager runtime = new RuntimeManager(client);
   var properties = await runtime.getProperties(remoteObject.objectId);
 
   Map<String, dynamic> result = {};
@@ -54,8 +54,8 @@ Future<Map<String, dynamic>> getProperties(
 Future releaseObject(Client client, RemoteObject remoteObject) async {
   if (remoteObject.objectId == null) return;
   try {
-    RuntimeDomain runtimeDomain = new RuntimeDomain(client);
-    await runtimeDomain.releaseObject(remoteObject.objectId);
+    RuntimeManager runtime = new RuntimeManager(client);
+    await runtime.releaseObject(remoteObject.objectId);
   } catch (e) {
     // Exceptions might happen in case of a page been navigated or closed.
     // Swallow these since they are harmless and we don't leak anything in this case.

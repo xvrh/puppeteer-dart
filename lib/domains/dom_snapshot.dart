@@ -8,10 +8,10 @@ import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'page.dart' as page;
 
-class DOMSnapshotDomain {
+class DOMSnapshotManager {
   final Client _client;
 
-  DOMSnapshotDomain(this._client);
+  DOMSnapshotManager(this._client);
 
   /// Returns a document snapshot, including the full DOM tree of the root node
   /// (including iframes, template contents, and imported documents) in a
