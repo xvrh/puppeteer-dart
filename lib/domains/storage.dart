@@ -8,6 +8,11 @@ class StorageDomain {
 
   StorageDomain(this._client);
 
+  /// A cache has been added/deleted.
+  Stream<String> get onCacheStorageListUpdated => _client.onEvent
+      .where((Event event) => event.name == 'Storage.cacheStorageListUpdated')
+      .map((Event event) => event.parameters['origin'] as String);
+
   /// A cache's contents have been modified.
   Stream<CacheStorageContentUpdatedEvent> get onCacheStorageContentUpdated =>
       _client.onEvent
@@ -16,9 +21,9 @@ class StorageDomain {
           .map((Event event) =>
               new CacheStorageContentUpdatedEvent.fromJson(event.parameters));
 
-  /// A cache has been added/deleted.
-  Stream<String> get onCacheStorageListUpdated => _client.onEvent
-      .where((Event event) => event.name == 'Storage.cacheStorageListUpdated')
+  /// The origin's IndexedDB database list has been modified.
+  Stream<String> get onIndexedDBListUpdated => _client.onEvent
+      .where((Event event) => event.name == 'Storage.indexedDBListUpdated')
       .map((Event event) => event.parameters['origin'] as String);
 
   /// The origin's IndexedDB object store has been modified.
@@ -27,11 +32,6 @@ class StorageDomain {
       .where((Event event) => event.name == 'Storage.indexedDBContentUpdated')
       .map((Event event) =>
           new IndexedDBContentUpdatedEvent.fromJson(event.parameters));
-
-  /// The origin's IndexedDB database list has been modified.
-  Stream<String> get onIndexedDBListUpdated => _client.onEvent
-      .where((Event event) => event.name == 'Storage.indexedDBListUpdated')
-      .map((Event event) => event.parameters['origin'] as String);
 
   /// Clears storage for origin.
   /// [origin] Security origin.
@@ -59,7 +59,8 @@ class StorageDomain {
     return new GetUsageAndQuotaResult.fromJson(result);
   }
 
-  /// Registers origin to be notified when an update occurs to its cache storage list.
+  /// Registers origin to be notified when an update occurs to its cache storage
+  /// list.
   /// [origin] Security origin.
   Future trackCacheStorageForOrigin(
     String origin,
@@ -68,17 +69,6 @@ class StorageDomain {
       'origin': origin,
     };
     await _client.send('Storage.trackCacheStorageForOrigin', parameters);
-  }
-
-  /// Registers origin to be notified when an update occurs to its IndexedDB.
-  /// [origin] Security origin.
-  Future trackIndexedDBForOrigin(
-    String origin,
-  ) async {
-    Map parameters = {
-      'origin': origin,
-    };
-    await _client.send('Storage.trackIndexedDBForOrigin', parameters);
   }
 
   /// Unregisters origin from receiving notifications for cache storage.
@@ -90,6 +80,17 @@ class StorageDomain {
       'origin': origin,
     };
     await _client.send('Storage.untrackCacheStorageForOrigin', parameters);
+  }
+
+  /// Registers origin to be notified when an update occurs to its IndexedDB.
+  /// [origin] Security origin.
+  Future trackIndexedDBForOrigin(
+    String origin,
+  ) async {
+    Map parameters = {
+      'origin': origin,
+    };
+    await _client.send('Storage.trackIndexedDBForOrigin', parameters);
   }
 
   /// Unregisters origin from receiving notifications for IndexedDB.

@@ -8,6 +8,40 @@ class CacheStorageDomain {
 
   CacheStorageDomain(this._client);
 
+  /// Requests cache names.
+  /// [securityOrigin] Security origin.
+  /// Return: Caches for the security origin.
+  Future<List<Cache>> requestCacheNames(
+    String securityOrigin,
+  ) async {
+    Map parameters = {
+      'securityOrigin': securityOrigin,
+    };
+    Map result =
+        await _client.send('CacheStorage.requestCacheNames', parameters);
+    return (result['caches'] as List)
+        .map((e) => new Cache.fromJson(e))
+        .toList();
+  }
+
+  /// Requests data from cache.
+  /// [cacheId] ID of cache to get entries from.
+  /// [skipCount] Number of records to skip.
+  /// [pageSize] Number of records to fetch.
+  Future<RequestEntriesResult> requestEntries(
+    CacheId cacheId,
+    int skipCount,
+    int pageSize,
+  ) async {
+    Map parameters = {
+      'cacheId': cacheId.toJson(),
+      'skipCount': skipCount,
+      'pageSize': pageSize,
+    };
+    Map result = await _client.send('CacheStorage.requestEntries', parameters);
+    return new RequestEntriesResult.fromJson(result);
+  }
+
   /// Deletes a cache.
   /// [cacheId] Id of cache for deletion.
   Future deleteCache(
@@ -33,22 +67,6 @@ class CacheStorageDomain {
     await _client.send('CacheStorage.deleteEntry', parameters);
   }
 
-  /// Requests cache names.
-  /// [securityOrigin] Security origin.
-  /// Return: Caches for the security origin.
-  Future<List<Cache>> requestCacheNames(
-    String securityOrigin,
-  ) async {
-    Map parameters = {
-      'securityOrigin': securityOrigin,
-    };
-    Map result =
-        await _client.send('CacheStorage.requestCacheNames', parameters);
-    return (result['caches'] as List)
-        .map((e) => new Cache.fromJson(e))
-        .toList();
-  }
-
   /// Fetches cache entry.
   /// [cacheId] Id of cache that contains the enty.
   /// [requestURL] URL spec of the request.
@@ -64,24 +82,6 @@ class CacheStorageDomain {
     Map result =
         await _client.send('CacheStorage.requestCachedResponse', parameters);
     return new CachedResponse.fromJson(result['response']);
-  }
-
-  /// Requests data from cache.
-  /// [cacheId] ID of cache to get entries from.
-  /// [skipCount] Number of records to skip.
-  /// [pageSize] Number of records to fetch.
-  Future<RequestEntriesResult> requestEntries(
-    CacheId cacheId,
-    int skipCount,
-    int pageSize,
-  ) async {
-    Map parameters = {
-      'cacheId': cacheId.toJson(),
-      'skipCount': skipCount,
-      'pageSize': pageSize,
-    };
-    Map result = await _client.send('CacheStorage.requestEntries', parameters);
-    return new RequestEntriesResult.fromJson(result);
   }
 }
 

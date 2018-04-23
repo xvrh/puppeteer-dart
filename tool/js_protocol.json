@@ -2252,6 +2252,11 @@
                     "type": "number"
                 },
                 {
+                    "id": "TimeDelta",
+                    "description": "Number of milliseconds.",
+                    "type": "number"
+                },
+                {
                     "id": "CallFrame",
                     "description": "Stack entry for runtime errors and assertions.",
                     "type": "object",
@@ -2577,6 +2582,13 @@
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "timeout",
+                            "description": "Terminate execution after timing out (number of milliseconds).",
+                            "experimental": true,
+                            "optional": true,
+                            "$ref": "TimeDelta"
                         }
                     ],
                     "returns": [
@@ -2590,6 +2602,35 @@
                             "description": "Exception details.",
                             "optional": true,
                             "$ref": "ExceptionDetails"
+                        }
+                    ]
+                },
+                {
+                    "name": "getIsolateId",
+                    "description": "Returns the isolate id.",
+                    "experimental": true,
+                    "returns": [
+                        {
+                            "name": "id",
+                            "description": "The isolate id.",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "getHeapUsage",
+                    "description": "Returns the JavaScript heap usage.\nIt is the total usage of the corresponding isolate not scoped to a particular Runtime.",
+                    "experimental": true,
+                    "returns": [
+                        {
+                            "name": "usedSize",
+                            "description": "Used heap size in bytes.",
+                            "type": "number"
+                        },
+                        {
+                            "name": "totalSize",
+                            "description": "Allocated heap size in bytes.",
+                            "type": "number"
                         }
                     ]
                 },
@@ -2677,6 +2718,12 @@
                             "name": "prototypeObjectId",
                             "description": "Identifier of the prototype to return objects for.",
                             "$ref": "RemoteObjectId"
+                        },
+                        {
+                            "name": "objectGroup",
+                            "description": "Symbolic group name that can be used to release the results.",
+                            "optional": true,
+                            "type": "string"
                         }
                     ],
                     "returns": [
@@ -2788,6 +2835,11 @@
                             "type": "boolean"
                         }
                     ]
+                },
+                {
+                    "name": "terminateExecution",
+                    "description": "Terminate current or next JavaScript execution.\nWill cancel the termination when the outer-most script execution ends.",
+                    "experimental": true
                 }
             ],
             "events": [

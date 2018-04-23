@@ -38,49 +38,6 @@ class MemoryDomain {
     };
     await _client.send('Memory.simulatePressureNotification', parameters);
   }
-
-  /// Start collecting native memory profile.
-  /// [samplingInterval] Average number of bytes between samples.
-  /// [suppressRandomness] Do not randomize intervals between samples.
-  Future startSampling({
-    int samplingInterval,
-    bool suppressRandomness,
-  }) async {
-    Map parameters = {};
-    if (samplingInterval != null) {
-      parameters['samplingInterval'] = samplingInterval;
-    }
-    if (suppressRandomness != null) {
-      parameters['suppressRandomness'] = suppressRandomness;
-    }
-    await _client.send('Memory.startSampling', parameters);
-  }
-
-  /// Stop collecting native memory profile.
-  Future stopSampling() async {
-    await _client.send('Memory.stopSampling');
-  }
-
-  /// Retrieve native memory allocations profile
-  /// collected since renderer process startup.
-  Future<SamplingProfile> getAllTimeSamplingProfile() async {
-    Map result = await _client.send('Memory.getAllTimeSamplingProfile');
-    return new SamplingProfile.fromJson(result['profile']);
-  }
-
-  /// Retrieve native memory allocations profile
-  /// collected since browser process startup.
-  Future<SamplingProfile> getBrowserSamplingProfile() async {
-    Map result = await _client.send('Memory.getBrowserSamplingProfile');
-    return new SamplingProfile.fromJson(result['profile']);
-  }
-
-  /// Retrieve native memory allocations profile collected since last
-  /// `startSampling` call.
-  Future<SamplingProfile> getSamplingProfile() async {
-    Map result = await _client.send('Memory.getSamplingProfile');
-    return new SamplingProfile.fromJson(result['profile']);
-  }
 }
 
 class GetDOMCountersResult {
@@ -123,63 +80,4 @@ class PressureLevel {
   String toJson() => value;
 
   String toString() => value.toString();
-}
-
-/// Heap profile sample.
-class SamplingProfileNode {
-  /// Size of the sampled allocation.
-  final num size;
-
-  /// Total bytes attributed to this sample.
-  final num total;
-
-  /// Execution stack at the point of allocation.
-  final List<String> stack;
-
-  SamplingProfileNode({
-    @required this.size,
-    @required this.total,
-    @required this.stack,
-  });
-
-  factory SamplingProfileNode.fromJson(Map json) {
-    return new SamplingProfileNode(
-      size: json['size'],
-      total: json['total'],
-      stack: (json['stack'] as List).map((e) => e as String).toList(),
-    );
-  }
-
-  Map toJson() {
-    Map json = {
-      'size': size,
-      'total': total,
-      'stack': stack.map((e) => e).toList(),
-    };
-    return json;
-  }
-}
-
-/// Array of heap profile samples.
-class SamplingProfile {
-  final List<SamplingProfileNode> samples;
-
-  SamplingProfile({
-    @required this.samples,
-  });
-
-  factory SamplingProfile.fromJson(Map json) {
-    return new SamplingProfile(
-      samples: (json['samples'] as List)
-          .map((e) => new SamplingProfileNode.fromJson(e))
-          .toList(),
-    );
-  }
-
-  Map toJson() {
-    Map json = {
-      'samples': samples.map((e) => e.toJson()).toList(),
-    };
-    return json;
-  }
 }

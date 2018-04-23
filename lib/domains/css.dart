@@ -1,9 +1,11 @@
-/// This domain exposes CSS read/write operations. All CSS objects (stylesheets, rules, and styles)
-/// have an associated `id` used in subsequent operations on the related object. Each object type has
-/// a specific `id` structure, and those are not interchangeable between objects of different kinds.
-/// CSS objects can be loaded using the `get*ForNode()` calls (which accept a DOM node id). A client
-/// can also keep track of stylesheets via the `styleSheetAdded`/`styleSheetRemoved` events and
-/// subsequently load the required stylesheet contents using the `getStyleSheet[Text]()` methods.
+/// This domain exposes CSS read/write operations. All CSS objects (stylesheets,
+/// rules, and styles) have an associated `id` used in subsequent operations on
+/// the related object. Each object type has a specific `id` structure, and
+/// those are not interchangeable between objects of different kinds. CSS
+/// objects can be loaded using the `get*ForNode()` calls (which accept a DOM
+/// node id). A client can also keep track of stylesheets via the
+/// `styleSheetAdded`/`styleSheetRemoved` events and subsequently load the
+/// required stylesheet contents using the `getStyleSheet[Text]()` methods.
 
 import 'dart:async';
 // ignore: unused_import
@@ -17,22 +19,15 @@ class CSSDomain {
 
   CSSDomain(this._client);
 
-  /// Fires whenever a web font is updated.  A non-empty font parameter indicates a successfully loaded
-  /// web font
-  Stream<FontFace> get onFontsUpdated => _client.onEvent
-      .where((Event event) => event.name == 'CSS.fontsUpdated')
-      .map((Event event) => new FontFace.fromJson(event.parameters['font']));
-
-  /// Fires whenever a MediaQuery result changes (for example, after a browser window has been
-  /// resized.) The current implementation considers only viewport-dependent media features.
+  /// Fires whenever a MediaQuery result changes (for example, after a browser
+  /// window has been resized.) The current implementation considers only
+  /// viewport-dependent media features.
   Stream get onMediaQueryResultChanged => _client.onEvent
       .where((Event event) => event.name == 'CSS.mediaQueryResultChanged');
 
-  /// Fired whenever an active document stylesheet is added.
-  Stream<CSSStyleSheetHeader> get onStyleSheetAdded => _client.onEvent
-      .where((Event event) => event.name == 'CSS.styleSheetAdded')
-      .map((Event event) =>
-          new CSSStyleSheetHeader.fromJson(event.parameters['header']));
+  /// Fires whenever a web font gets loaded.
+  Stream get onFontsUpdated =>
+      _client.onEvent.where((Event event) => event.name == 'CSS.fontsUpdated');
 
   /// Fired whenever a stylesheet is changed as a result of the client operation.
   Stream<StyleSheetId> get onStyleSheetChanged => _client.onEvent
@@ -40,55 +35,22 @@ class CSSDomain {
       .map((Event event) =>
           new StyleSheetId.fromJson(event.parameters['styleSheetId']));
 
+  /// Fired whenever an active document stylesheet is added.
+  Stream<CSSStyleSheetHeader> get onStyleSheetAdded => _client.onEvent
+      .where((Event event) => event.name == 'CSS.styleSheetAdded')
+      .map((Event event) =>
+          new CSSStyleSheetHeader.fromJson(event.parameters['header']));
+
   /// Fired whenever an active document stylesheet is removed.
   Stream<StyleSheetId> get onStyleSheetRemoved => _client.onEvent
       .where((Event event) => event.name == 'CSS.styleSheetRemoved')
       .map((Event event) =>
           new StyleSheetId.fromJson(event.parameters['styleSheetId']));
 
-  /// Inserts a new rule with the given `ruleText` in a stylesheet with given `styleSheetId`, at the
-  /// position specified by `location`.
-  /// [styleSheetId] The css style sheet identifier where a new rule should be inserted.
-  /// [ruleText] The text of a new rule.
-  /// [location] Text position of a new rule in the target style sheet.
-  /// Return: The newly created rule.
-  Future<CSSRule> addRule(
-    StyleSheetId styleSheetId,
-    String ruleText,
-    SourceRange location,
-  ) async {
-    Map parameters = {
-      'styleSheetId': styleSheetId.toJson(),
-      'ruleText': ruleText,
-      'location': location.toJson(),
-    };
-    Map result = await _client.send('CSS.addRule', parameters);
-    return new CSSRule.fromJson(result['rule']);
-  }
-
-  /// Returns all class names from specified stylesheet.
-  /// Return: Class name list.
-  Future<List<String>> collectClassNames(
-    StyleSheetId styleSheetId,
-  ) async {
-    Map parameters = {
-      'styleSheetId': styleSheetId.toJson(),
-    };
-    Map result = await _client.send('CSS.collectClassNames', parameters);
-    return (result['classNames'] as List).map((e) => e as String).toList();
-  }
-
-  /// Creates a new special "via-inspector" stylesheet in the frame with given `frameId`.
-  /// [frameId] Identifier of the frame where "via-inspector" stylesheet should be created.
-  /// Return: Identifier of the created "via-inspector" stylesheet.
-  Future<StyleSheetId> createStyleSheet(
-    page.FrameId frameId,
-  ) async {
-    Map parameters = {
-      'frameId': frameId.toJson(),
-    };
-    Map result = await _client.send('CSS.createStyleSheet', parameters);
-    return new StyleSheetId.fromJson(result['styleSheetId']);
+  /// Enables the CSS agent for the given page. Clients should not assume that the
+  /// CSS agent has been enabled until the result of this command is received.
+  Future enable() async {
+    await _client.send('CSS.enable');
   }
 
   /// Disables the CSS agent for the given page.
@@ -96,36 +58,27 @@ class CSSDomain {
     await _client.send('CSS.disable');
   }
 
-  /// Enables the CSS agent for the given page. Clients should not assume that the CSS agent has been
-  /// enabled until the result of this command is received.
-  Future enable() async {
-    await _client.send('CSS.enable');
-  }
-
-  /// Ensures that the given node will have specified pseudo-classes whenever its style is computed by
-  /// the browser.
-  /// [nodeId] The element id for which to force the pseudo state.
-  /// [forcedPseudoClasses] Element pseudo classes to force when computing the element's style.
-  Future forcePseudoState(
-    dom.NodeId nodeId,
-    List<String> forcedPseudoClasses,
-  ) async {
-    Map parameters = {
-      'nodeId': nodeId.toJson(),
-      'forcedPseudoClasses': forcedPseudoClasses.map((e) => e).toList(),
-    };
-    await _client.send('CSS.forcePseudoState', parameters);
-  }
-
-  /// [nodeId] Id of the node to get background colors for.
-  Future<GetBackgroundColorsResult> getBackgroundColors(
+  /// Returns requested styles for a DOM node identified by `nodeId`.
+  Future<GetMatchedStylesForNodeResult> getMatchedStylesForNode(
     dom.NodeId nodeId,
   ) async {
     Map parameters = {
       'nodeId': nodeId.toJson(),
     };
-    Map result = await _client.send('CSS.getBackgroundColors', parameters);
-    return new GetBackgroundColorsResult.fromJson(result);
+    Map result = await _client.send('CSS.getMatchedStylesForNode', parameters);
+    return new GetMatchedStylesForNodeResult.fromJson(result);
+  }
+
+  /// Returns the styles defined inline (explicitly in the "style" attribute and
+  /// implicitly, using DOM attributes) for a DOM node identified by `nodeId`.
+  Future<GetInlineStylesForNodeResult> getInlineStylesForNode(
+    dom.NodeId nodeId,
+  ) async {
+    Map parameters = {
+      'nodeId': nodeId.toJson(),
+    };
+    Map result = await _client.send('CSS.getInlineStylesForNode', parameters);
+    return new GetInlineStylesForNodeResult.fromJson(result);
   }
 
   /// Returns the computed style for a DOM node identified by `nodeId`.
@@ -142,39 +95,8 @@ class CSSDomain {
         .toList();
   }
 
-  /// Returns the styles defined inline (explicitly in the "style" attribute and implicitly, using DOM
-  /// attributes) for a DOM node identified by `nodeId`.
-  Future<GetInlineStylesForNodeResult> getInlineStylesForNode(
-    dom.NodeId nodeId,
-  ) async {
-    Map parameters = {
-      'nodeId': nodeId.toJson(),
-    };
-    Map result = await _client.send('CSS.getInlineStylesForNode', parameters);
-    return new GetInlineStylesForNodeResult.fromJson(result);
-  }
-
-  /// Returns requested styles for a DOM node identified by `nodeId`.
-  Future<GetMatchedStylesForNodeResult> getMatchedStylesForNode(
-    dom.NodeId nodeId,
-  ) async {
-    Map parameters = {
-      'nodeId': nodeId.toJson(),
-    };
-    Map result = await _client.send('CSS.getMatchedStylesForNode', parameters);
-    return new GetMatchedStylesForNodeResult.fromJson(result);
-  }
-
-  /// Returns all media queries parsed by the rendering engine.
-  Future<List<CSSMedia>> getMediaQueries() async {
-    Map result = await _client.send('CSS.getMediaQueries');
-    return (result['medias'] as List)
-        .map((e) => new CSSMedia.fromJson(e))
-        .toList();
-  }
-
-  /// Requests information about platform fonts which we used to render child TextNodes in the given
-  /// node.
+  /// Requests information about platform fonts which we used to render child
+  /// TextNodes in the given node.
   /// Return: Usage statistics for every employed platform font.
   Future<List<PlatformFontUsage>> getPlatformFontsForNode(
     dom.NodeId nodeId,
@@ -200,52 +122,30 @@ class CSSDomain {
     return result['text'];
   }
 
-  /// Find a rule with the given active property for the given node and set the new value for this
-  /// property
-  /// [nodeId] The element id for which to set property.
-  Future setEffectivePropertyValueForNode(
-    dom.NodeId nodeId,
-    String propertyName,
-    String value,
-  ) async {
-    Map parameters = {
-      'nodeId': nodeId.toJson(),
-      'propertyName': propertyName,
-      'value': value,
-    };
-    await _client.send('CSS.setEffectivePropertyValueForNode', parameters);
-  }
-
-  /// Modifies the keyframe rule key text.
-  /// Return: The resulting key text after modification.
-  Future<Value> setKeyframeKey(
+  /// Returns all class names from specified stylesheet.
+  /// Return: Class name list.
+  Future<List<String>> collectClassNames(
     StyleSheetId styleSheetId,
-    SourceRange range,
-    String keyText,
   ) async {
     Map parameters = {
       'styleSheetId': styleSheetId.toJson(),
-      'range': range.toJson(),
-      'keyText': keyText,
     };
-    Map result = await _client.send('CSS.setKeyframeKey', parameters);
-    return new Value.fromJson(result['keyText']);
+    Map result = await _client.send('CSS.collectClassNames', parameters);
+    return (result['classNames'] as List).map((e) => e as String).toList();
   }
 
-  /// Modifies the rule selector.
-  /// Return: The resulting CSS media rule after modification.
-  Future<CSSMedia> setMediaText(
+  /// Sets the new stylesheet text.
+  /// Return: URL of source map associated with script (if any).
+  Future<String> setStyleSheetText(
     StyleSheetId styleSheetId,
-    SourceRange range,
     String text,
   ) async {
     Map parameters = {
       'styleSheetId': styleSheetId.toJson(),
-      'range': range.toJson(),
       'text': text,
     };
-    Map result = await _client.send('CSS.setMediaText', parameters);
-    return new CSSMedia.fromJson(result['media']);
+    Map result = await _client.send('CSS.setStyleSheetText', parameters);
+    return result['sourceMapURL'];
   }
 
   /// Modifies the rule selector.
@@ -264,18 +164,20 @@ class CSSDomain {
     return new SelectorList.fromJson(result['selectorList']);
   }
 
-  /// Sets the new stylesheet text.
-  /// Return: URL of source map associated with script (if any).
-  Future<String> setStyleSheetText(
+  /// Modifies the keyframe rule key text.
+  /// Return: The resulting key text after modification.
+  Future<Value> setKeyframeKey(
     StyleSheetId styleSheetId,
-    String text,
+    SourceRange range,
+    String keyText,
   ) async {
     Map parameters = {
       'styleSheetId': styleSheetId.toJson(),
-      'text': text,
+      'range': range.toJson(),
+      'keyText': keyText,
     };
-    Map result = await _client.send('CSS.setStyleSheetText', parameters);
-    return result['sourceMapURL'];
+    Map result = await _client.send('CSS.setKeyframeKey', parameters);
+    return new Value.fromJson(result['keyText']);
   }
 
   /// Applies specified style edits one after another in the given order.
@@ -292,94 +194,129 @@ class CSSDomain {
         .toList();
   }
 
+  /// Modifies the rule selector.
+  /// Return: The resulting CSS media rule after modification.
+  Future<CSSMedia> setMediaText(
+    StyleSheetId styleSheetId,
+    SourceRange range,
+    String text,
+  ) async {
+    Map parameters = {
+      'styleSheetId': styleSheetId.toJson(),
+      'range': range.toJson(),
+      'text': text,
+    };
+    Map result = await _client.send('CSS.setMediaText', parameters);
+    return new CSSMedia.fromJson(result['media']);
+  }
+
+  /// Creates a new special "via-inspector" stylesheet in the frame with given
+  /// `frameId`.
+  /// [frameId] Identifier of the frame where "via-inspector" stylesheet should be
+  /// created.
+  /// Return: Identifier of the created "via-inspector" stylesheet.
+  Future<StyleSheetId> createStyleSheet(
+    page.FrameId frameId,
+  ) async {
+    Map parameters = {
+      'frameId': frameId.toJson(),
+    };
+    Map result = await _client.send('CSS.createStyleSheet', parameters);
+    return new StyleSheetId.fromJson(result['styleSheetId']);
+  }
+
+  /// Inserts a new rule with the given `ruleText` in a stylesheet with given
+  /// `styleSheetId`, at the position specified by `location`.
+  /// [styleSheetId] The css style sheet identifier where a new rule should be
+  /// inserted.
+  /// [ruleText] The text of a new rule.
+  /// [location] Text position of a new rule in the target style sheet.
+  /// Return: The newly created rule.
+  Future<CSSRule> addRule(
+    StyleSheetId styleSheetId,
+    String ruleText,
+    SourceRange location,
+  ) async {
+    Map parameters = {
+      'styleSheetId': styleSheetId.toJson(),
+      'ruleText': ruleText,
+      'location': location.toJson(),
+    };
+    Map result = await _client.send('CSS.addRule', parameters);
+    return new CSSRule.fromJson(result['rule']);
+  }
+
+  /// Ensures that the given node will have specified pseudo-classes whenever its
+  /// style is computed by the browser.
+  /// [nodeId] The element id for which to force the pseudo state.
+  /// [forcedPseudoClasses] Element pseudo classes to force when computing the
+  /// element's style.
+  Future forcePseudoState(
+    dom.NodeId nodeId,
+    List<String> forcedPseudoClasses,
+  ) async {
+    Map parameters = {
+      'nodeId': nodeId.toJson(),
+      'forcedPseudoClasses': forcedPseudoClasses.map((e) => e).toList(),
+    };
+    await _client.send('CSS.forcePseudoState', parameters);
+  }
+
+  /// Returns all media queries parsed by the rendering engine.
+  Future<List<CSSMedia>> getMediaQueries() async {
+    Map result = await _client.send('CSS.getMediaQueries');
+    return (result['medias'] as List)
+        .map((e) => new CSSMedia.fromJson(e))
+        .toList();
+  }
+
+  /// Find a rule with the given active property for the given node and set the
+  /// new value for this property
+  /// [nodeId] The element id for which to set property.
+  Future setEffectivePropertyValueForNode(
+    dom.NodeId nodeId,
+    String propertyName,
+    String value,
+  ) async {
+    Map parameters = {
+      'nodeId': nodeId.toJson(),
+      'propertyName': propertyName,
+      'value': value,
+    };
+    await _client.send('CSS.setEffectivePropertyValueForNode', parameters);
+  }
+
+  /// [nodeId] Id of the node to get background colors for.
+  Future<GetBackgroundColorsResult> getBackgroundColors(
+    dom.NodeId nodeId,
+  ) async {
+    Map parameters = {
+      'nodeId': nodeId.toJson(),
+    };
+    Map result = await _client.send('CSS.getBackgroundColors', parameters);
+    return new GetBackgroundColorsResult.fromJson(result);
+  }
+
   /// Enables the selector recording.
   Future startRuleUsageTracking() async {
     await _client.send('CSS.startRuleUsageTracking');
   }
 
-  /// Stop tracking rule usage and return the list of rules that were used since last call to
-  /// `takeCoverageDelta` (or since start of coverage instrumentation)
-  Future<List<RuleUsage>> stopRuleUsageTracking() async {
-    Map result = await _client.send('CSS.stopRuleUsageTracking');
-    return (result['ruleUsage'] as List)
-        .map((e) => new RuleUsage.fromJson(e))
-        .toList();
-  }
-
-  /// Obtain list of rules that became used since last call to this method (or since start of coverage
-  /// instrumentation)
+  /// Obtain list of rules that became used since last call to this method (or
+  /// since start of coverage instrumentation)
   Future<List<RuleUsage>> takeCoverageDelta() async {
     Map result = await _client.send('CSS.takeCoverageDelta');
     return (result['coverage'] as List)
         .map((e) => new RuleUsage.fromJson(e))
         .toList();
   }
-}
 
-class GetBackgroundColorsResult {
-  /// The range of background colors behind this element, if it contains any visible text. If no
-  /// visible text is present, this will be undefined. In the case of a flat background color,
-  /// this will consist of simply that color. In the case of a gradient, this will consist of each
-  /// of the color stops. For anything more complicated, this will be an empty array. Images will
-  /// be ignored (as if the image had failed to load).
-  final List<String> backgroundColors;
-
-  /// The computed font size for this node, as a CSS computed value string (e.g. '12px').
-  final String computedFontSize;
-
-  /// The computed font weight for this node, as a CSS computed value string (e.g. 'normal' or
-  /// '100').
-  final String computedFontWeight;
-
-  /// The computed font size for the document body, as a computed CSS value string (e.g. '16px').
-  final String computedBodyFontSize;
-
-  GetBackgroundColorsResult({
-    this.backgroundColors,
-    this.computedFontSize,
-    this.computedFontWeight,
-    this.computedBodyFontSize,
-  });
-
-  factory GetBackgroundColorsResult.fromJson(Map json) {
-    return new GetBackgroundColorsResult(
-      backgroundColors: json.containsKey('backgroundColors')
-          ? (json['backgroundColors'] as List).map((e) => e as String).toList()
-          : null,
-      computedFontSize: json.containsKey('computedFontSize')
-          ? json['computedFontSize']
-          : null,
-      computedFontWeight: json.containsKey('computedFontWeight')
-          ? json['computedFontWeight']
-          : null,
-      computedBodyFontSize: json.containsKey('computedBodyFontSize')
-          ? json['computedBodyFontSize']
-          : null,
-    );
-  }
-}
-
-class GetInlineStylesForNodeResult {
-  /// Inline style for the specified DOM node.
-  final CSSStyle inlineStyle;
-
-  /// Attribute-defined element style (e.g. resulting from "width=20 height=100%").
-  final CSSStyle attributesStyle;
-
-  GetInlineStylesForNodeResult({
-    this.inlineStyle,
-    this.attributesStyle,
-  });
-
-  factory GetInlineStylesForNodeResult.fromJson(Map json) {
-    return new GetInlineStylesForNodeResult(
-      inlineStyle: json.containsKey('inlineStyle')
-          ? new CSSStyle.fromJson(json['inlineStyle'])
-          : null,
-      attributesStyle: json.containsKey('attributesStyle')
-          ? new CSSStyle.fromJson(json['attributesStyle'])
-          : null,
-    );
+  /// The list of rules with an indication of whether these were used
+  Future<List<RuleUsage>> stopRuleUsageTracking() async {
+    Map result = await _client.send('CSS.stopRuleUsageTracking');
+    return (result['ruleUsage'] as List)
+        .map((e) => new RuleUsage.fromJson(e))
+        .toList();
   }
 }
 
@@ -387,7 +324,8 @@ class GetMatchedStylesForNodeResult {
   /// Inline style for the specified DOM node.
   final CSSStyle inlineStyle;
 
-  /// Attribute-defined element style (e.g. resulting from "width=20 height=100%").
+  /// Attribute-defined element style (e.g. resulting from "width=20
+  /// height=100%").
   final CSSStyle attributesStyle;
 
   /// CSS rules matching this node, from all applicable stylesheets.
@@ -396,7 +334,8 @@ class GetMatchedStylesForNodeResult {
   /// Pseudo style matches for this node.
   final List<PseudoElementMatches> pseudoElements;
 
-  /// A chain of inherited styles (from the immediate node parent up to the DOM tree root).
+  /// A chain of inherited styles (from the immediate node parent up to the DOM
+  /// tree root).
   final List<InheritedStyleEntry> inherited;
 
   /// A list of CSS keyframed animations matching this node.
@@ -443,6 +382,77 @@ class GetMatchedStylesForNodeResult {
   }
 }
 
+class GetInlineStylesForNodeResult {
+  /// Inline style for the specified DOM node.
+  final CSSStyle inlineStyle;
+
+  /// Attribute-defined element style (e.g. resulting from "width=20
+  /// height=100%").
+  final CSSStyle attributesStyle;
+
+  GetInlineStylesForNodeResult({
+    this.inlineStyle,
+    this.attributesStyle,
+  });
+
+  factory GetInlineStylesForNodeResult.fromJson(Map json) {
+    return new GetInlineStylesForNodeResult(
+      inlineStyle: json.containsKey('inlineStyle')
+          ? new CSSStyle.fromJson(json['inlineStyle'])
+          : null,
+      attributesStyle: json.containsKey('attributesStyle')
+          ? new CSSStyle.fromJson(json['attributesStyle'])
+          : null,
+    );
+  }
+}
+
+class GetBackgroundColorsResult {
+  /// The range of background colors behind this element, if it contains any
+  /// visible text. If no visible text is present, this will be undefined. In the
+  /// case of a flat background color, this will consist of simply that color. In
+  /// the case of a gradient, this will consist of each of the color stops. For
+  /// anything more complicated, this will be an empty array. Images will be
+  /// ignored (as if the image had failed to load).
+  final List<String> backgroundColors;
+
+  /// The computed font size for this node, as a CSS computed value string (e.g.
+  /// '12px').
+  final String computedFontSize;
+
+  /// The computed font weight for this node, as a CSS computed value string (e.g.
+  /// 'normal' or '100').
+  final String computedFontWeight;
+
+  /// The computed font size for the document body, as a computed CSS value string
+  /// (e.g. '16px').
+  final String computedBodyFontSize;
+
+  GetBackgroundColorsResult({
+    this.backgroundColors,
+    this.computedFontSize,
+    this.computedFontWeight,
+    this.computedBodyFontSize,
+  });
+
+  factory GetBackgroundColorsResult.fromJson(Map json) {
+    return new GetBackgroundColorsResult(
+      backgroundColors: json.containsKey('backgroundColors')
+          ? (json['backgroundColors'] as List).map((e) => e as String).toList()
+          : null,
+      computedFontSize: json.containsKey('computedFontSize')
+          ? json['computedFontSize']
+          : null,
+      computedFontWeight: json.containsKey('computedFontWeight')
+          ? json['computedFontWeight']
+          : null,
+      computedBodyFontSize: json.containsKey('computedBodyFontSize')
+          ? json['computedBodyFontSize']
+          : null,
+    );
+  }
+}
+
 class StyleSheetId {
   final String value;
 
@@ -459,9 +469,10 @@ class StyleSheetId {
   String toString() => value.toString();
 }
 
-/// Stylesheet type: "injected" for stylesheets injected via extension, "user-agent" for user-agent
-/// stylesheets, "inspector" for stylesheets created by the inspector (i.e. those holding the "via
-/// inspector" rules), "regular" for regular stylesheets.
+/// Stylesheet type: "injected" for stylesheets injected via extension,
+/// "user-agent" for user-agent stylesheets, "inspector" for stylesheets created
+/// by the inspector (i.e. those holding the "via inspector" rules), "regular"
+/// for regular stylesheets.
 class StyleSheetOrigin {
   static const StyleSheetOrigin injected = const StyleSheetOrigin._('injected');
   static const StyleSheetOrigin userAgent =
@@ -523,7 +534,8 @@ class InheritedStyleEntry {
   /// The ancestor node's inline style, if any, in the style inheritance chain.
   final CSSStyle inlineStyle;
 
-  /// Matches of CSS rules matching the ancestor node in the style inheritance chain.
+  /// Matches of CSS rules matching the ancestor node in the style inheritance
+  /// chain.
   final List<RuleMatch> matchedCSSRules;
 
   InheritedStyleEntry({
@@ -583,7 +595,8 @@ class RuleMatch {
   }
 }
 
-/// Data for a simple selector (these are delimited by commas in a selector list).
+/// Data for a simple selector (these are delimited by commas in a selector
+/// list).
 class Value {
   /// Value text.
   final String text;
@@ -676,8 +689,8 @@ class CSSStyleSheetHeader {
   /// Whether the sourceURL field value comes from the sourceURL comment.
   final bool hasSourceURL;
 
-  /// Whether this stylesheet is created for STYLE tag by parser. This flag is not set for
-  /// document.written STYLE tags.
+  /// Whether this stylesheet is created for STYLE tag by parser. This flag is not
+  /// set for document.written STYLE tags.
   final bool isInline;
 
   /// Line offset of the stylesheet within the resource (zero based).
@@ -755,8 +768,8 @@ class CSSStyleSheetHeader {
 
 /// CSS rule representation.
 class CSSRule {
-  /// The css style sheet identifier (absent for user agent stylesheet and user-specified
-  /// stylesheet rules) this rule came from.
+  /// The css style sheet identifier (absent for user agent stylesheet and
+  /// user-specified stylesheet rules) this rule came from.
   final StyleSheetId styleSheetId;
 
   /// Rule selector data.
@@ -768,8 +781,8 @@ class CSSRule {
   /// Associated style declaration.
   final CSSStyle style;
 
-  /// Media list array (for rules involving media queries). The array enumerates media queries
-  /// starting with the innermost one, going outwards.
+  /// Media list array (for rules involving media queries). The array enumerates
+  /// media queries starting with the innermost one, going outwards.
   final List<CSSMedia> media;
 
   CSSRule({
@@ -814,11 +827,12 @@ class CSSRule {
 
 /// CSS coverage information.
 class RuleUsage {
-  /// The css style sheet identifier (absent for user agent stylesheet and user-specified
-  /// stylesheet rules) this rule came from.
+  /// The css style sheet identifier (absent for user agent stylesheet and
+  /// user-specified stylesheet rules) this rule came from.
   final StyleSheetId styleSheetId;
 
-  /// Offset of the start of the rule (including selector) from the beginning of the stylesheet.
+  /// Offset of the start of the rule (including selector) from the beginning of
+  /// the stylesheet.
   final num startOffset;
 
   /// Offset of the end of the rule body from the beginning of the stylesheet.
@@ -902,7 +916,8 @@ class ShorthandEntry {
   /// Shorthand value.
   final String value;
 
-  /// Whether the property has "!important" annotation (implies `false` if absent).
+  /// Whether the property has "!important" annotation (implies `false` if
+  /// absent).
   final bool important;
 
   ShorthandEntry({
@@ -961,8 +976,8 @@ class CSSComputedStyleProperty {
 
 /// CSS style representation.
 class CSSStyle {
-  /// The css style sheet identifier (absent for user agent stylesheet and user-specified
-  /// stylesheet rules) this rule came from.
+  /// The css style sheet identifier (absent for user agent stylesheet and
+  /// user-specified stylesheet rules) this rule came from.
   final StyleSheetId styleSheetId;
 
   /// CSS properties in the style.
@@ -1029,7 +1044,8 @@ class CSSProperty {
   /// The property value.
   final String value;
 
-  /// Whether the property has "!important" annotation (implies `false` if absent).
+  /// Whether the property has "!important" annotation (implies `false` if
+  /// absent).
   final bool important;
 
   /// Whether the property is implicit (implies `false` if absent).
@@ -1038,10 +1054,12 @@ class CSSProperty {
   /// The full property text as specified in the style.
   final String text;
 
-  /// Whether the property is understood by the browser (implies `true` if absent).
+  /// Whether the property is understood by the browser (implies `true` if
+  /// absent).
   final bool parsedOk;
 
-  /// Whether the property is disabled by the user (present for source-based properties only).
+  /// Whether the property is disabled by the user (present for source-based
+  /// properties only).
   final bool disabled;
 
   /// The entire property range in the enclosing style declaration (if available).
@@ -1105,17 +1123,17 @@ class CSSMedia {
   /// Media query text.
   final String text;
 
-  /// Source of the media query: "mediaRule" if specified by a @media rule, "importRule" if
-  /// specified by an @import rule, "linkedSheet" if specified by a "media" attribute in a linked
-  /// stylesheet's LINK tag, "inlineSheet" if specified by a "media" attribute in an inline
-  /// stylesheet's STYLE tag.
+  /// Source of the media query: "mediaRule" if specified by a @media rule,
+  /// "importRule" if specified by an @import rule, "linkedSheet" if specified by
+  /// a "media" attribute in a linked stylesheet's LINK tag, "inlineSheet" if
+  /// specified by a "media" attribute in an inline stylesheet's STYLE tag.
   final String source;
 
   /// URL of the document containing the media query description.
   final String sourceURL;
 
-  /// The associated rule (@media or @import) header range in the enclosing stylesheet (if
-  /// available).
+  /// The associated rule (@media or @import) header range in the enclosing
+  /// stylesheet (if available).
   final SourceRange range;
 
   /// Identifier of the stylesheet containing this object (if exists).
@@ -1215,7 +1233,8 @@ class MediaQueryExpression {
   /// Media query expression feature.
   final String feature;
 
-  /// The associated range of the value text in the enclosing stylesheet (if available).
+  /// The associated range of the value text in the enclosing stylesheet (if
+  /// available).
   final SourceRange valueRange;
 
   /// Computed length of media query expression (if applicable).
@@ -1293,71 +1312,6 @@ class PlatformFontUsage {
   }
 }
 
-/// Properties of a web font: https://www.w3.org/TR/2008/REC-CSS2-20080411/fonts.html#font-descriptions
-class FontFace {
-  /// The font-family.
-  final String fontFamily;
-
-  /// The font-style.
-  final String fontStyle;
-
-  /// The font-variant.
-  final String fontVariant;
-
-  /// The font-weight.
-  final String fontWeight;
-
-  /// The font-stretch.
-  final String fontStretch;
-
-  /// The unicode-range.
-  final String unicodeRange;
-
-  /// The src.
-  final String src;
-
-  /// The resolved platform font family
-  final String platformFontFamily;
-
-  FontFace({
-    @required this.fontFamily,
-    @required this.fontStyle,
-    @required this.fontVariant,
-    @required this.fontWeight,
-    @required this.fontStretch,
-    @required this.unicodeRange,
-    @required this.src,
-    @required this.platformFontFamily,
-  });
-
-  factory FontFace.fromJson(Map json) {
-    return new FontFace(
-      fontFamily: json['fontFamily'],
-      fontStyle: json['fontStyle'],
-      fontVariant: json['fontVariant'],
-      fontWeight: json['fontWeight'],
-      fontStretch: json['fontStretch'],
-      unicodeRange: json['unicodeRange'],
-      src: json['src'],
-      platformFontFamily: json['platformFontFamily'],
-    );
-  }
-
-  Map toJson() {
-    Map json = {
-      'fontFamily': fontFamily,
-      'fontStyle': fontStyle,
-      'fontVariant': fontVariant,
-      'fontWeight': fontWeight,
-      'fontStretch': fontStretch,
-      'unicodeRange': unicodeRange,
-      'src': src,
-      'platformFontFamily': platformFontFamily,
-    };
-    return json;
-  }
-}
-
 /// CSS keyframes rule representation.
 class CSSKeyframesRule {
   /// Animation name.
@@ -1391,8 +1345,8 @@ class CSSKeyframesRule {
 
 /// CSS keyframe rule representation.
 class CSSKeyframeRule {
-  /// The css style sheet identifier (absent for user agent stylesheet and user-specified
-  /// stylesheet rules) this rule came from.
+  /// The css style sheet identifier (absent for user agent stylesheet and
+  /// user-specified stylesheet rules) this rule came from.
   final StyleSheetId styleSheetId;
 
   /// Parent stylesheet's origin.

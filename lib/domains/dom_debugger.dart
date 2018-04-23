@@ -1,5 +1,6 @@
-/// DOM debugging allows setting breakpoints on particular DOM operations and events. JavaScript
-/// execution will stop on these operations as if there was a regular breakpoint set.
+/// DOM debugging allows setting breakpoints on particular DOM operations and
+/// events. JavaScript execution will stop on these operations as if there was a
+/// regular breakpoint set.
 
 import 'dart:async';
 // ignore: unused_import
@@ -13,12 +14,121 @@ class DOMDebuggerDomain {
 
   DOMDebuggerDomain(this._client);
 
+  /// Sets breakpoint on particular operation with DOM.
+  /// [nodeId] Identifier of the node to set breakpoint on.
+  /// [type] Type of the operation to stop upon.
+  Future setDOMBreakpoint(
+    dom.NodeId nodeId,
+    DOMBreakpointType type,
+  ) async {
+    Map parameters = {
+      'nodeId': nodeId.toJson(),
+      'type': type.toJson(),
+    };
+    await _client.send('DOMDebugger.setDOMBreakpoint', parameters);
+  }
+
+  /// Removes DOM breakpoint that was set using `setDOMBreakpoint`.
+  /// [nodeId] Identifier of the node to remove breakpoint from.
+  /// [type] Type of the breakpoint to remove.
+  Future removeDOMBreakpoint(
+    dom.NodeId nodeId,
+    DOMBreakpointType type,
+  ) async {
+    Map parameters = {
+      'nodeId': nodeId.toJson(),
+      'type': type.toJson(),
+    };
+    await _client.send('DOMDebugger.removeDOMBreakpoint', parameters);
+  }
+
+  /// Sets breakpoint on particular DOM event.
+  /// [eventName] DOM Event name to stop on (any DOM event will do).
+  /// [targetName] EventTarget interface name to stop on. If equal to `"*"` or not
+  /// provided, will stop on any EventTarget.
+  Future setEventListenerBreakpoint(
+    String eventName, {
+    String targetName,
+  }) async {
+    Map parameters = {
+      'eventName': eventName,
+    };
+    if (targetName != null) {
+      parameters['targetName'] = targetName;
+    }
+    await _client.send('DOMDebugger.setEventListenerBreakpoint', parameters);
+  }
+
+  /// Removes breakpoint on particular DOM event.
+  /// [eventName] Event name.
+  /// [targetName] EventTarget interface name.
+  Future removeEventListenerBreakpoint(
+    String eventName, {
+    String targetName,
+  }) async {
+    Map parameters = {
+      'eventName': eventName,
+    };
+    if (targetName != null) {
+      parameters['targetName'] = targetName;
+    }
+    await _client.send('DOMDebugger.removeEventListenerBreakpoint', parameters);
+  }
+
+  /// Sets breakpoint on particular native event.
+  /// [eventName] Instrumentation name to stop on.
+  Future setInstrumentationBreakpoint(
+    String eventName,
+  ) async {
+    Map parameters = {
+      'eventName': eventName,
+    };
+    await _client.send('DOMDebugger.setInstrumentationBreakpoint', parameters);
+  }
+
+  /// Removes breakpoint on particular native event.
+  /// [eventName] Instrumentation name to stop on.
+  Future removeInstrumentationBreakpoint(
+    String eventName,
+  ) async {
+    Map parameters = {
+      'eventName': eventName,
+    };
+    await _client.send(
+        'DOMDebugger.removeInstrumentationBreakpoint', parameters);
+  }
+
+  /// Sets breakpoint on XMLHttpRequest.
+  /// [url] Resource URL substring. All XHRs having this substring in the URL will
+  /// get stopped upon.
+  Future setXHRBreakpoint(
+    String url,
+  ) async {
+    Map parameters = {
+      'url': url,
+    };
+    await _client.send('DOMDebugger.setXHRBreakpoint', parameters);
+  }
+
+  /// Removes breakpoint from XMLHttpRequest.
+  /// [url] Resource URL substring.
+  Future removeXHRBreakpoint(
+    String url,
+  ) async {
+    Map parameters = {
+      'url': url,
+    };
+    await _client.send('DOMDebugger.removeXHRBreakpoint', parameters);
+  }
+
   /// Returns event listeners of the given object.
   /// [objectId] Identifier of the object to return listeners for.
-  /// [depth] The maximum depth at which Node children should be retrieved, defaults to 1. Use -1 for the
-  /// entire subtree or provide an integer larger than 0.
-  /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the subtree
-  /// (default is false). Reports listeners for all contexts if pierce is enabled.
+  /// [depth] The maximum depth at which Node children should be retrieved,
+  /// defaults to 1. Use -1 for the entire subtree or provide an integer larger
+  /// than 0.
+  /// [pierce] Whether or not iframes and shadow roots should be traversed when
+  /// returning the subtree (default is false). Reports listeners for all contexts
+  /// if pierce is enabled.
   /// Return: Array of relevant listeners.
   Future<List<EventListener>> getEventListeners(
     runtime.RemoteObjectId objectId, {
@@ -39,112 +149,6 @@ class DOMDebuggerDomain {
     return (result['listeners'] as List)
         .map((e) => new EventListener.fromJson(e))
         .toList();
-  }
-
-  /// Removes DOM breakpoint that was set using `setDOMBreakpoint`.
-  /// [nodeId] Identifier of the node to remove breakpoint from.
-  /// [type] Type of the breakpoint to remove.
-  Future removeDOMBreakpoint(
-    dom.NodeId nodeId,
-    DOMBreakpointType type,
-  ) async {
-    Map parameters = {
-      'nodeId': nodeId.toJson(),
-      'type': type.toJson(),
-    };
-    await _client.send('DOMDebugger.removeDOMBreakpoint', parameters);
-  }
-
-  /// Removes breakpoint on particular DOM event.
-  /// [eventName] Event name.
-  /// [targetName] EventTarget interface name.
-  Future removeEventListenerBreakpoint(
-    String eventName, {
-    String targetName,
-  }) async {
-    Map parameters = {
-      'eventName': eventName,
-    };
-    if (targetName != null) {
-      parameters['targetName'] = targetName;
-    }
-    await _client.send('DOMDebugger.removeEventListenerBreakpoint', parameters);
-  }
-
-  /// Removes breakpoint on particular native event.
-  /// [eventName] Instrumentation name to stop on.
-  Future removeInstrumentationBreakpoint(
-    String eventName,
-  ) async {
-    Map parameters = {
-      'eventName': eventName,
-    };
-    await _client.send(
-        'DOMDebugger.removeInstrumentationBreakpoint', parameters);
-  }
-
-  /// Removes breakpoint from XMLHttpRequest.
-  /// [url] Resource URL substring.
-  Future removeXHRBreakpoint(
-    String url,
-  ) async {
-    Map parameters = {
-      'url': url,
-    };
-    await _client.send('DOMDebugger.removeXHRBreakpoint', parameters);
-  }
-
-  /// Sets breakpoint on particular operation with DOM.
-  /// [nodeId] Identifier of the node to set breakpoint on.
-  /// [type] Type of the operation to stop upon.
-  Future setDOMBreakpoint(
-    dom.NodeId nodeId,
-    DOMBreakpointType type,
-  ) async {
-    Map parameters = {
-      'nodeId': nodeId.toJson(),
-      'type': type.toJson(),
-    };
-    await _client.send('DOMDebugger.setDOMBreakpoint', parameters);
-  }
-
-  /// Sets breakpoint on particular DOM event.
-  /// [eventName] DOM Event name to stop on (any DOM event will do).
-  /// [targetName] EventTarget interface name to stop on. If equal to `"*"` or not provided, will stop on any
-  /// EventTarget.
-  Future setEventListenerBreakpoint(
-    String eventName, {
-    String targetName,
-  }) async {
-    Map parameters = {
-      'eventName': eventName,
-    };
-    if (targetName != null) {
-      parameters['targetName'] = targetName;
-    }
-    await _client.send('DOMDebugger.setEventListenerBreakpoint', parameters);
-  }
-
-  /// Sets breakpoint on particular native event.
-  /// [eventName] Instrumentation name to stop on.
-  Future setInstrumentationBreakpoint(
-    String eventName,
-  ) async {
-    Map parameters = {
-      'eventName': eventName,
-    };
-    await _client.send('DOMDebugger.setInstrumentationBreakpoint', parameters);
-  }
-
-  /// Sets breakpoint on XMLHttpRequest.
-  /// [url] Resource URL substring. All XHRs having this substring in the URL will get stopped upon.
-  Future setXHRBreakpoint(
-    String url,
-  ) async {
-    Map parameters = {
-      'url': url,
-    };
-    await _client.send('DOMDebugger.setXHRBreakpoint', parameters);
   }
 }
 

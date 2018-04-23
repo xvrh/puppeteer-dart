@@ -9,11 +9,6 @@ class ServiceWorkerDomain {
 
   ServiceWorkerDomain(this._client);
 
-  Stream<ServiceWorkerErrorMessage> get onWorkerErrorReported => _client.onEvent
-      .where((Event event) => event.name == 'ServiceWorker.workerErrorReported')
-      .map((Event event) => new ServiceWorkerErrorMessage.fromJson(
-          event.parameters['errorMessage']));
-
   Stream<List<ServiceWorkerRegistration>> get onWorkerRegistrationUpdated =>
       _client.onEvent
           .where((Event event) =>
@@ -30,40 +25,66 @@ class ServiceWorkerDomain {
           .map((e) => new ServiceWorkerVersion.fromJson(e))
           .toList());
 
-  Future deliverPushMessage(
-    String origin,
-    String registrationId,
-    String data,
-  ) async {
-    Map parameters = {
-      'origin': origin,
-      'registrationId': registrationId,
-      'data': data,
-    };
-    await _client.send('ServiceWorker.deliverPushMessage', parameters);
+  Stream<ServiceWorkerErrorMessage> get onWorkerErrorReported => _client.onEvent
+      .where((Event event) => event.name == 'ServiceWorker.workerErrorReported')
+      .map((Event event) => new ServiceWorkerErrorMessage.fromJson(
+          event.parameters['errorMessage']));
+
+  Future enable() async {
+    await _client.send('ServiceWorker.enable');
   }
 
   Future disable() async {
     await _client.send('ServiceWorker.disable');
   }
 
-  Future dispatchSyncEvent(
-    String origin,
-    String registrationId,
-    String tag,
-    bool lastChance,
+  Future unregister(
+    String scopeURL,
   ) async {
     Map parameters = {
-      'origin': origin,
-      'registrationId': registrationId,
-      'tag': tag,
-      'lastChance': lastChance,
+      'scopeURL': scopeURL,
     };
-    await _client.send('ServiceWorker.dispatchSyncEvent', parameters);
+    await _client.send('ServiceWorker.unregister', parameters);
   }
 
-  Future enable() async {
-    await _client.send('ServiceWorker.enable');
+  Future updateRegistration(
+    String scopeURL,
+  ) async {
+    Map parameters = {
+      'scopeURL': scopeURL,
+    };
+    await _client.send('ServiceWorker.updateRegistration', parameters);
+  }
+
+  Future startWorker(
+    String scopeURL,
+  ) async {
+    Map parameters = {
+      'scopeURL': scopeURL,
+    };
+    await _client.send('ServiceWorker.startWorker', parameters);
+  }
+
+  Future skipWaiting(
+    String scopeURL,
+  ) async {
+    Map parameters = {
+      'scopeURL': scopeURL,
+    };
+    await _client.send('ServiceWorker.skipWaiting', parameters);
+  }
+
+  Future stopWorker(
+    String versionId,
+  ) async {
+    Map parameters = {
+      'versionId': versionId,
+    };
+    await _client.send('ServiceWorker.stopWorker', parameters);
+  }
+
+  Future stopAllWorkers() async {
+    await _client.send('ServiceWorker.stopAllWorkers');
   }
 
   Future inspectWorker(
@@ -84,53 +105,32 @@ class ServiceWorkerDomain {
     await _client.send('ServiceWorker.setForceUpdateOnPageLoad', parameters);
   }
 
-  Future skipWaiting(
-    String scopeURL,
+  Future deliverPushMessage(
+    String origin,
+    String registrationId,
+    String data,
   ) async {
     Map parameters = {
-      'scopeURL': scopeURL,
+      'origin': origin,
+      'registrationId': registrationId,
+      'data': data,
     };
-    await _client.send('ServiceWorker.skipWaiting', parameters);
+    await _client.send('ServiceWorker.deliverPushMessage', parameters);
   }
 
-  Future startWorker(
-    String scopeURL,
+  Future dispatchSyncEvent(
+    String origin,
+    String registrationId,
+    String tag,
+    bool lastChance,
   ) async {
     Map parameters = {
-      'scopeURL': scopeURL,
+      'origin': origin,
+      'registrationId': registrationId,
+      'tag': tag,
+      'lastChance': lastChance,
     };
-    await _client.send('ServiceWorker.startWorker', parameters);
-  }
-
-  Future stopAllWorkers() async {
-    await _client.send('ServiceWorker.stopAllWorkers');
-  }
-
-  Future stopWorker(
-    String versionId,
-  ) async {
-    Map parameters = {
-      'versionId': versionId,
-    };
-    await _client.send('ServiceWorker.stopWorker', parameters);
-  }
-
-  Future unregister(
-    String scopeURL,
-  ) async {
-    Map parameters = {
-      'scopeURL': scopeURL,
-    };
-    await _client.send('ServiceWorker.unregister', parameters);
-  }
-
-  Future updateRegistration(
-    String scopeURL,
-  ) async {
-    Map parameters = {
-      'scopeURL': scopeURL,
-    };
-    await _client.send('ServiceWorker.updateRegistration', parameters);
+    await _client.send('ServiceWorker.dispatchSyncEvent', parameters);
   }
 }
 
@@ -242,8 +242,9 @@ class ServiceWorkerVersion {
   /// The Last-Modified header value of the main script.
   final num scriptLastModified;
 
-  /// The time at which the response headers of the main script were received from the server.
-  /// For cached script it is the last time the cache entry was validated.
+  /// The time at which the response headers of the main script were received from
+  /// the server.  For cached script it is the last time the cache entry was
+  /// validated.
   final num scriptResponseTime;
 
   final List<target.TargetID> controlledClients;

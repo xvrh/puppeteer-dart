@@ -9,11 +9,13 @@ class AccessibilityDomain {
 
   AccessibilityDomain(this._client);
 
-  /// Fetches the accessibility node and partial accessibility tree for this DOM node, if it exists.
+  /// Fetches the accessibility node and partial accessibility tree for this DOM
+  /// node, if it exists.
   /// [nodeId] ID of node to get the partial accessibility tree for.
-  /// [fetchRelatives] Whether to fetch this nodes ancestors, siblings and children. Defaults to true.
-  /// Return: The `Accessibility.AXNode` for this DOM node, if it exists, plus its ancestors, siblings and
-  /// children, if requested.
+  /// [fetchRelatives] Whether to fetch this nodes ancestors, siblings and
+  /// children. Defaults to true.
+  /// Return: The `Accessibility.AXNode` for this DOM node, if it exists, plus its
+  /// ancestors, siblings and children, if requested.
   Future<List<AXNode>> getPartialAXTree(
     dom.NodeId nodeId, {
     bool fetchRelatives,
@@ -135,7 +137,8 @@ class AXValueSourceType {
   String toString() => value.toString();
 }
 
-/// Enum of possible native property sources (as a subtype of a particular AXValueSourceType).
+/// Enum of possible native property sources (as a subtype of a particular
+/// AXValueSourceType).
 class AXValueNativeSourceType {
   static const AXValueNativeSourceType figcaption =
       const AXValueNativeSourceType._('figcaption');
@@ -393,11 +396,12 @@ class AXValue {
   }
 }
 
-/// Values of AXProperty name: from 'busy' to 'roledescription' - states which apply to every AX
-/// node, from 'live' to 'root' - attributes which apply to nodes in live regions, from
-/// 'autocomplete' to 'valuetext' - attributes which apply to widgets, from 'checked' to 'selected'
-/// - states which apply to widgets, from 'activedescendant' to 'owns' - relationships between
-/// elements other than parent/child/sibling.
+/// Values of AXProperty name: from 'busy' to 'roledescription' - states which
+/// apply to every AX node, from 'live' to 'root' - attributes which apply to
+/// nodes in live regions, from 'autocomplete' to 'valuetext' - attributes which
+/// apply to widgets, from 'checked' to 'selected' - states which apply to
+/// widgets, from 'activedescendant' to 'owns' - relationships between elements
+/// other than parent/child/sibling.
 class AXPropertyName {
   static const AXPropertyName busy = const AXPropertyName._('busy');
   static const AXPropertyName disabled = const AXPropertyName._('disabled');
