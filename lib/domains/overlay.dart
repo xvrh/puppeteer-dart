@@ -1,30 +1,32 @@
-/// This domain provides various functionality related to drawing atop the inspected page.
+/// This domain provides various functionality related to drawing atop the
+/// inspected page.
 
 import 'dart:async';
 // ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
-import 'page.dart' as page;
 import 'runtime.dart' as runtime;
+import 'page.dart' as page;
 
 class OverlayDomain {
   final Client _client;
 
   OverlayDomain(this._client);
 
-  /// Fired when the node should be inspected. This happens after call to `setInspectMode` or when
-  /// user manually inspects an element.
-  Stream<dom.BackendNodeId> get onInspectNodeRequested => _client.onEvent
-      .where((Event event) => event.name == 'Overlay.inspectNodeRequested')
-      .map((Event event) =>
-          new dom.BackendNodeId.fromJson(event.parameters['backendNodeId']));
-
-  /// Fired when the node should be highlighted. This happens after call to `setInspectMode`.
+  /// Fired when the node should be highlighted. This happens after call to
+  /// `setInspectMode`.
   Stream<dom.NodeId> get onNodeHighlightRequested => _client.onEvent
       .where((Event event) => event.name == 'Overlay.nodeHighlightRequested')
       .map(
           (Event event) => new dom.NodeId.fromJson(event.parameters['nodeId']));
+
+  /// Fired when the node should be inspected. This happens after call to
+  /// `setInspectMode` or when user manually inspects an element.
+  Stream<dom.BackendNodeId> get onInspectNodeRequested => _client.onEvent
+      .where((Event event) => event.name == 'Overlay.inspectNodeRequested')
+      .map((Event event) =>
+          new dom.BackendNodeId.fromJson(event.parameters['backendNodeId']));
 
   /// Fired when user asks to capture screenshot of some area on the page.
   Stream<page.Viewport> get onScreenshotRequested => _client.onEvent
@@ -32,105 +34,115 @@ class OverlayDomain {
       .map((Event event) =>
           new page.Viewport.fromJson(event.parameters['viewport']));
 
-  /// Disables domain notifications.
-  Future disable() async {
-    await _client.send('Overlay.disable');
-  }
-
   /// Enables domain notifications.
   Future enable() async {
     await _client.send('Overlay.enable');
   }
 
-  /// For testing.
-  /// [nodeId] Id of the node to get highlight object for.
-  /// Return: Highlight data for the node.
-  Future<Map> getHighlightObjectForTest(
-    dom.NodeId nodeId,
+  /// Disables domain notifications.
+  Future disable() async {
+    await _client.send('Overlay.disable');
+  }
+
+  /// Requests that backend shows paint rectangles
+  /// [result] True for showing paint rectangles
+  Future setShowPaintRects(
+    bool result,
   ) async {
     Map parameters = {
-      'nodeId': nodeId.toJson(),
+      'result': result,
     };
-    Map result =
-        await _client.send('Overlay.getHighlightObjectForTest', parameters);
-    return result['highlight'];
+    await _client.send('Overlay.setShowPaintRects', parameters);
   }
 
-  /// Hides any highlight.
-  Future hideHighlight() async {
-    await _client.send('Overlay.hideHighlight');
+  /// Requests that backend shows debug borders on layers
+  /// [show] True for showing debug borders
+  Future setShowDebugBorders(
+    bool show,
+  ) async {
+    Map parameters = {
+      'show': show,
+    };
+    await _client.send('Overlay.setShowDebugBorders', parameters);
   }
 
-  /// Highlights owner element of the frame with given id.
-  /// [frameId] Identifier of the frame to highlight.
-  /// [contentColor] The content box highlight fill color (default: transparent).
-  /// [contentOutlineColor] The content box highlight outline color (default: transparent).
-  Future highlightFrame(
-    page.FrameId frameId, {
-    dom.RGBA contentColor,
-    dom.RGBA contentOutlineColor,
+  /// Requests that backend shows the FPS counter
+  /// [show] True for showing the FPS counter
+  Future setShowFPSCounter(
+    bool show,
+  ) async {
+    Map parameters = {
+      'show': show,
+    };
+    await _client.send('Overlay.setShowFPSCounter', parameters);
+  }
+
+  /// Requests that backend shows scroll bottleneck rects
+  /// [show] True for showing scroll bottleneck rects
+  Future setShowScrollBottleneckRects(
+    bool show,
+  ) async {
+    Map parameters = {
+      'show': show,
+    };
+    await _client.send('Overlay.setShowScrollBottleneckRects', parameters);
+  }
+
+  /// Paints viewport size upon main frame resize.
+  /// [show] Whether to paint size or not.
+  Future setShowViewportSizeOnResize(
+    bool show,
+  ) async {
+    Map parameters = {
+      'show': show,
+    };
+    await _client.send('Overlay.setShowViewportSizeOnResize', parameters);
+  }
+
+  /// [message] The message to display, also triggers resume and step over
+  /// controls.
+  Future setPausedInDebuggerMessage({
+    String message,
+  }) async {
+    Map parameters = {};
+    if (message != null) {
+      parameters['message'] = message;
+    }
+    await _client.send('Overlay.setPausedInDebuggerMessage', parameters);
+  }
+
+  /// [suspended] Whether overlay should be suspended and not consume any
+  /// resources until resumed.
+  Future setSuspended(
+    bool suspended,
+  ) async {
+    Map parameters = {
+      'suspended': suspended,
+    };
+    await _client.send('Overlay.setSuspended', parameters);
+  }
+
+  /// Enters the 'inspect' mode. In this mode, elements that user is hovering over
+  /// are highlighted. Backend then generates 'inspectNodeRequested' event upon
+  /// element selection.
+  /// [mode] Set an inspection mode.
+  /// [highlightConfig] A descriptor for the highlight appearance of hovered-over
+  /// nodes. May be omitted if `enabled == false`.
+  Future setInspectMode(
+    InspectMode mode, {
+    HighlightConfig highlightConfig,
   }) async {
     Map parameters = {
-      'frameId': frameId.toJson(),
+      'mode': mode.toJson(),
     };
-    if (contentColor != null) {
-      parameters['contentColor'] = contentColor.toJson();
+    if (highlightConfig != null) {
+      parameters['highlightConfig'] = highlightConfig.toJson();
     }
-    if (contentOutlineColor != null) {
-      parameters['contentOutlineColor'] = contentOutlineColor.toJson();
-    }
-    await _client.send('Overlay.highlightFrame', parameters);
+    await _client.send('Overlay.setInspectMode', parameters);
   }
 
-  /// Highlights DOM node with given id or with the given JavaScript object wrapper. Either nodeId or
-  /// objectId must be specified.
-  /// [highlightConfig] A descriptor for the highlight appearance.
-  /// [nodeId] Identifier of the node to highlight.
-  /// [backendNodeId] Identifier of the backend node to highlight.
-  /// [objectId] JavaScript object id of the node to be highlighted.
-  Future highlightNode(
-    HighlightConfig highlightConfig, {
-    dom.NodeId nodeId,
-    dom.BackendNodeId backendNodeId,
-    runtime.RemoteObjectId objectId,
-  }) async {
-    Map parameters = {
-      'highlightConfig': highlightConfig.toJson(),
-    };
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
-    await _client.send('Overlay.highlightNode', parameters);
-  }
-
-  /// Highlights given quad. Coordinates are absolute with respect to the main frame viewport.
-  /// [quad] Quad to highlight
-  /// [color] The highlight fill color (default: transparent).
-  /// [outlineColor] The highlight outline color (default: transparent).
-  Future highlightQuad(
-    dom.Quad quad, {
-    dom.RGBA color,
-    dom.RGBA outlineColor,
-  }) async {
-    Map parameters = {
-      'quad': quad.toJson(),
-    };
-    if (color != null) {
-      parameters['color'] = color.toJson();
-    }
-    if (outlineColor != null) {
-      parameters['outlineColor'] = outlineColor.toJson();
-    }
-    await _client.send('Overlay.highlightQuad', parameters);
-  }
-
-  /// Highlights given rectangle. Coordinates are absolute with respect to the main frame viewport.
+  /// Highlights given rectangle. Coordinates are absolute with respect to the
+  /// main frame viewport.
   /// [x] X coordinate
   /// [y] Y coordinate
   /// [width] Rectangle width
@@ -160,98 +172,94 @@ class OverlayDomain {
     await _client.send('Overlay.highlightRect', parameters);
   }
 
-  /// Enters the 'inspect' mode. In this mode, elements that user is hovering over are highlighted.
-  /// Backend then generates 'inspectNodeRequested' event upon element selection.
-  /// [mode] Set an inspection mode.
-  /// [highlightConfig] A descriptor for the highlight appearance of hovered-over nodes. May be omitted if `enabled
-  /// == false`.
-  Future setInspectMode(
-    InspectMode mode, {
-    HighlightConfig highlightConfig,
+  /// Highlights given quad. Coordinates are absolute with respect to the main
+  /// frame viewport.
+  /// [quad] Quad to highlight
+  /// [color] The highlight fill color (default: transparent).
+  /// [outlineColor] The highlight outline color (default: transparent).
+  Future highlightQuad(
+    dom.Quad quad, {
+    dom.RGBA color,
+    dom.RGBA outlineColor,
   }) async {
     Map parameters = {
-      'mode': mode.toJson(),
+      'quad': quad.toJson(),
     };
-    if (highlightConfig != null) {
-      parameters['highlightConfig'] = highlightConfig.toJson();
+    if (color != null) {
+      parameters['color'] = color.toJson();
     }
-    await _client.send('Overlay.setInspectMode', parameters);
+    if (outlineColor != null) {
+      parameters['outlineColor'] = outlineColor.toJson();
+    }
+    await _client.send('Overlay.highlightQuad', parameters);
   }
 
-  /// [message] The message to display, also triggers resume and step over controls.
-  Future setPausedInDebuggerMessage({
-    String message,
+  /// Highlights DOM node with given id or with the given JavaScript object
+  /// wrapper. Either nodeId or objectId must be specified.
+  /// [highlightConfig] A descriptor for the highlight appearance.
+  /// [nodeId] Identifier of the node to highlight.
+  /// [backendNodeId] Identifier of the backend node to highlight.
+  /// [objectId] JavaScript object id of the node to be highlighted.
+  Future highlightNode(
+    HighlightConfig highlightConfig, {
+    dom.NodeId nodeId,
+    dom.BackendNodeId backendNodeId,
+    runtime.RemoteObjectId objectId,
   }) async {
-    Map parameters = {};
-    if (message != null) {
-      parameters['message'] = message;
+    Map parameters = {
+      'highlightConfig': highlightConfig.toJson(),
+    };
+    if (nodeId != null) {
+      parameters['nodeId'] = nodeId.toJson();
     }
-    await _client.send('Overlay.setPausedInDebuggerMessage', parameters);
+    if (backendNodeId != null) {
+      parameters['backendNodeId'] = backendNodeId.toJson();
+    }
+    if (objectId != null) {
+      parameters['objectId'] = objectId.toJson();
+    }
+    await _client.send('Overlay.highlightNode', parameters);
   }
 
-  /// Requests that backend shows debug borders on layers
-  /// [show] True for showing debug borders
-  Future setShowDebugBorders(
-    bool show,
-  ) async {
+  /// Highlights owner element of the frame with given id.
+  /// [frameId] Identifier of the frame to highlight.
+  /// [contentColor] The content box highlight fill color (default: transparent).
+  /// [contentOutlineColor] The content box highlight outline color (default:
+  /// transparent).
+  Future highlightFrame(
+    page.FrameId frameId, {
+    dom.RGBA contentColor,
+    dom.RGBA contentOutlineColor,
+  }) async {
     Map parameters = {
-      'show': show,
+      'frameId': frameId.toJson(),
     };
-    await _client.send('Overlay.setShowDebugBorders', parameters);
+    if (contentColor != null) {
+      parameters['contentColor'] = contentColor.toJson();
+    }
+    if (contentOutlineColor != null) {
+      parameters['contentOutlineColor'] = contentOutlineColor.toJson();
+    }
+    await _client.send('Overlay.highlightFrame', parameters);
   }
 
-  /// Requests that backend shows the FPS counter
-  /// [show] True for showing the FPS counter
-  Future setShowFPSCounter(
-    bool show,
-  ) async {
-    Map parameters = {
-      'show': show,
-    };
-    await _client.send('Overlay.setShowFPSCounter', parameters);
+  /// Hides any highlight.
+  Future hideHighlight() async {
+    await _client.send('Overlay.hideHighlight');
   }
 
-  /// Requests that backend shows paint rectangles
-  /// [result] True for showing paint rectangles
-  Future setShowPaintRects(
-    bool result,
+  /// For testing.
+  /// [nodeId] Id of the node to get highlight object for.
+  /// Return: Highlight data for the node.
+  Future<Map> getHighlightObjectForTest(
+    dom.NodeId nodeId,
   ) async {
     Map parameters = {
-      'result': result,
+      'nodeId': nodeId.toJson(),
     };
-    await _client.send('Overlay.setShowPaintRects', parameters);
-  }
-
-  /// Requests that backend shows scroll bottleneck rects
-  /// [show] True for showing scroll bottleneck rects
-  Future setShowScrollBottleneckRects(
-    bool show,
-  ) async {
-    Map parameters = {
-      'show': show,
-    };
-    await _client.send('Overlay.setShowScrollBottleneckRects', parameters);
-  }
-
-  /// Paints viewport size upon main frame resize.
-  /// [show] Whether to paint size or not.
-  Future setShowViewportSizeOnResize(
-    bool show,
-  ) async {
-    Map parameters = {
-      'show': show,
-    };
-    await _client.send('Overlay.setShowViewportSizeOnResize', parameters);
-  }
-
-  /// [suspended] Whether overlay should be suspended and not consume any resources until resumed.
-  Future setSuspended(
-    bool suspended,
-  ) async {
-    Map parameters = {
-      'suspended': suspended,
-    };
-    await _client.send('Overlay.setSuspended', parameters);
+    Map result =
+        await _client.send('Overlay.getHighlightObjectForTest', parameters);
+    return result['highlight'];
   }
 }
 
@@ -263,7 +271,8 @@ class HighlightConfig {
   /// Whether the rulers should be shown (default: false).
   final bool showRulers;
 
-  /// Whether the extension lines from node to the rulers should be shown (default: false).
+  /// Whether the extension lines from node to the rulers should be shown
+  /// (default: false).
   final bool showExtensionLines;
 
   final bool displayAsMaterial;

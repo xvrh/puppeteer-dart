@@ -21,29 +21,10 @@ class ApplicationCacheDomain {
           (Event event) => event.name == 'ApplicationCache.networkStateUpdated')
       .map((Event event) => event.parameters['isNowOnline'] as bool);
 
-  /// Enables application cache domain notifications.
-  Future enable() async {
-    await _client.send('ApplicationCache.enable');
-  }
-
-  /// Returns relevant application cache data for the document in given frame.
-  /// [frameId] Identifier of the frame containing document whose application cache is retrieved.
-  /// Return: Relevant application cache data for the document in given frame.
-  Future<ApplicationCache> getApplicationCacheForFrame(
-    page.FrameId frameId,
-  ) async {
-    Map parameters = {
-      'frameId': frameId.toJson(),
-    };
-    Map result = await _client.send(
-        'ApplicationCache.getApplicationCacheForFrame', parameters);
-    return new ApplicationCache.fromJson(result['applicationCache']);
-  }
-
-  /// Returns array of frame identifiers with manifest urls for each frame containing a document
-  /// associated with some application cache.
-  /// Return: Array of frame identifiers with manifest urls for each frame containing a document
-  /// associated with some application cache.
+  /// Returns array of frame identifiers with manifest urls for each frame
+  /// containing a document associated with some application cache.
+  /// Return: Array of frame identifiers with manifest urls for each frame
+  /// containing a document associated with some application cache.
   Future<List<FrameWithManifest>> getFramesWithManifests() async {
     Map result = await _client.send('ApplicationCache.getFramesWithManifests');
     return (result['frameIds'] as List)
@@ -51,8 +32,14 @@ class ApplicationCacheDomain {
         .toList();
   }
 
+  /// Enables application cache domain notifications.
+  Future enable() async {
+    await _client.send('ApplicationCache.enable');
+  }
+
   /// Returns manifest URL for document in the given frame.
-  /// [frameId] Identifier of the frame containing document whose manifest is retrieved.
+  /// [frameId] Identifier of the frame containing document whose manifest is
+  /// retrieved.
   /// Return: Manifest URL for document in the given frame.
   Future<String> getManifestForFrame(
     page.FrameId frameId,
@@ -64,10 +51,26 @@ class ApplicationCacheDomain {
         await _client.send('ApplicationCache.getManifestForFrame', parameters);
     return result['manifestURL'];
   }
+
+  /// Returns relevant application cache data for the document in given frame.
+  /// [frameId] Identifier of the frame containing document whose application
+  /// cache is retrieved.
+  /// Return: Relevant application cache data for the document in given frame.
+  Future<ApplicationCache> getApplicationCacheForFrame(
+    page.FrameId frameId,
+  ) async {
+    Map parameters = {
+      'frameId': frameId.toJson(),
+    };
+    Map result = await _client.send(
+        'ApplicationCache.getApplicationCacheForFrame', parameters);
+    return new ApplicationCache.fromJson(result['applicationCache']);
+  }
 }
 
 class ApplicationCacheStatusUpdatedEvent {
-  /// Identifier of the frame containing document whose application cache updated status.
+  /// Identifier of the frame containing document whose application cache updated
+  /// status.
   final page.FrameId frameId;
 
   /// Manifest URL.

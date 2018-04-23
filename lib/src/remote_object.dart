@@ -5,14 +5,14 @@ import 'package:chrome_dev_tools/src/connection.dart';
 
 Future getRemoteObject(Client client, RemoteObject remoteObject) async {
   if (remoteObject.unserializableValue != null) {
-    switch (remoteObject.unserializableValue) {
-      case UnserializableValue.negativeZero:
+    switch (remoteObject.unserializableValue.value) {
+      case '-0':
         return -0;
-      case UnserializableValue.naN:
+      case 'NaN':
         return double.NAN;
-      case UnserializableValue.infinity:
+      case 'Infinity':
         return double.INFINITY;
-      case UnserializableValue.negativeInfinity:
+      case '-Infinity':
         return double.NEGATIVE_INFINITY;
       default:
         throw new Exception(

@@ -1,4 +1,5 @@
-/// Audits domain allows investigation of page violations and possible improvements.
+/// Audits domain allows investigation of page violations and possible
+/// improvements.
 
 import 'dart:async';
 // ignore: unused_import
@@ -11,8 +12,8 @@ class AuditsDomain {
 
   AuditsDomain(this._client);
 
-  /// Returns the response body and size if it were re-encoded with the specified settings. Only
-  /// applies to images.
+  /// Returns the response body and size if it were re-encoded with the specified
+  /// settings. Only applies to images.
   /// [requestId] Identifier of the network request to get content for.
   /// [encoding] The encoding to use.
   /// [quality] The quality of the encoding (0-1). (defaults to 1)

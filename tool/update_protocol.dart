@@ -3,7 +3,7 @@ import 'package:http/http.dart';
 import 'dart:convert';
 import 'dart:io';
 
-const _inspectorJson = 'https://chromium.googlesource.com/chromium/src/+/master/third_party/WebKit/Source/core/inspector/browser_protocol.json?format=TEXT';
+const _inspectorJson = 'https://chromium.googlesource.com/chromium/src/+/master/third_party/blink/renderer/core/inspector/browser_protocol-1.3.json?format=TEXT';
 const _v8Json = 'https://chromium.googlesource.com/v8/v8/+/master/src/inspector/js_protocol.json?format=TEXT';
 
 main() async {

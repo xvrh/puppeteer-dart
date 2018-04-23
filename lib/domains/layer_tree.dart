@@ -9,19 +9,31 @@ class LayerTreeDomain {
 
   LayerTreeDomain(this._client);
 
-  Stream<LayerPaintedEvent> get onLayerPainted => _client.onEvent
-      .where((Event event) => event.name == 'LayerTree.layerPainted')
-      .map((Event event) => new LayerPaintedEvent.fromJson(event.parameters));
-
   Stream<List<Layer>> get onLayerTreeDidChange => _client.onEvent
       .where((Event event) => event.name == 'LayerTree.layerTreeDidChange')
       .map((Event event) => (event.parameters['layers'] as List)
           .map((e) => new Layer.fromJson(e))
           .toList());
 
+  Stream<LayerPaintedEvent> get onLayerPainted => _client.onEvent
+      .where((Event event) => event.name == 'LayerTree.layerPainted')
+      .map((Event event) => new LayerPaintedEvent.fromJson(event.parameters));
+
+  /// Enables compositing tree inspection.
+  Future enable() async {
+    await _client.send('LayerTree.enable');
+  }
+
+  /// Disables compositing tree inspection.
+  Future disable() async {
+    await _client.send('LayerTree.disable');
+  }
+
   /// Provides the reasons why the given layer was composited.
-  /// [layerId] The id of the layer for which we want to get the reasons it was composited.
-  /// Return: A list of strings specifying reasons for the given layer to become composited.
+  /// [layerId] The id of the layer for which we want to get the reasons it was
+  /// composited.
+  /// Return: A list of strings specifying reasons for the given layer to become
+  /// composited.
   Future<List<String>> compositingReasons(
     LayerId layerId,
   ) async {
@@ -32,29 +44,6 @@ class LayerTreeDomain {
     return (result['compositingReasons'] as List)
         .map((e) => e as String)
         .toList();
-  }
-
-  /// Disables compositing tree inspection.
-  Future disable() async {
-    await _client.send('LayerTree.disable');
-  }
-
-  /// Enables compositing tree inspection.
-  Future enable() async {
-    await _client.send('LayerTree.enable');
-  }
-
-  /// Returns the snapshot identifier.
-  /// [tiles] An array of tiles composing the snapshot.
-  /// Return: The id of the snapshot.
-  Future<SnapshotId> loadSnapshot(
-    List<PictureTile> tiles,
-  ) async {
-    Map parameters = {
-      'tiles': tiles.map((e) => e.toJson()).toList(),
-    };
-    Map result = await _client.send('LayerTree.loadSnapshot', parameters);
-    return new SnapshotId.fromJson(result['snapshotId']);
   }
 
   /// Returns the layer snapshot identifier.
@@ -70,8 +59,33 @@ class LayerTreeDomain {
     return new SnapshotId.fromJson(result['snapshotId']);
   }
 
+  /// Returns the snapshot identifier.
+  /// [tiles] An array of tiles composing the snapshot.
+  /// Return: The id of the snapshot.
+  Future<SnapshotId> loadSnapshot(
+    List<PictureTile> tiles,
+  ) async {
+    Map parameters = {
+      'tiles': tiles.map((e) => e.toJson()).toList(),
+    };
+    Map result = await _client.send('LayerTree.loadSnapshot', parameters);
+    return new SnapshotId.fromJson(result['snapshotId']);
+  }
+
+  /// Releases layer snapshot captured by the back-end.
   /// [snapshotId] The id of the layer snapshot.
-  /// [minRepeatCount] The maximum number of times to replay the snapshot (1, if not specified).
+  Future releaseSnapshot(
+    SnapshotId snapshotId,
+  ) async {
+    Map parameters = {
+      'snapshotId': snapshotId.toJson(),
+    };
+    await _client.send('LayerTree.releaseSnapshot', parameters);
+  }
+
+  /// [snapshotId] The id of the layer snapshot.
+  /// [minRepeatCount] The maximum number of times to replay the snapshot (1, if
+  /// not specified).
   /// [minDuration] The minimum duration (in seconds) to replay the snapshot.
   /// [clipRect] The clip rectangle to apply when replaying the snapshot.
   /// Return: The array of paint profiles, one per run.
@@ -99,20 +113,10 @@ class LayerTreeDomain {
         .toList();
   }
 
-  /// Releases layer snapshot captured by the back-end.
-  /// [snapshotId] The id of the layer snapshot.
-  Future releaseSnapshot(
-    SnapshotId snapshotId,
-  ) async {
-    Map parameters = {
-      'snapshotId': snapshotId.toJson(),
-    };
-    await _client.send('LayerTree.releaseSnapshot', parameters);
-  }
-
   /// Replays the layer snapshot and returns the resulting bitmap.
   /// [snapshotId] The id of the layer snapshot.
-  /// [fromStep] The first step to replay from (replay from the very start if not specified).
+  /// [fromStep] The first step to replay from (replay from the very start if not
+  /// specified).
   /// [toStep] The last step to replay to (replay till the end if not specified).
   /// [scale] The scale to apply while replaying (defaults to 1).
   /// Return: A data: URL for resulting image.

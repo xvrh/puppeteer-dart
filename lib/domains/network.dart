@@ -1,5 +1,6 @@
-/// Network domain allows tracking network activities of the page. It exposes information about http,
-/// file, data and other requests and responses, their headers, bodies, timing, etc.
+/// Network domain allows tracking network activities of the page. It exposes
+/// information about http, file, data and other requests and responses, their
+/// headers, bodies, timing, etc.
 
 import 'dart:async';
 // ignore: unused_import
@@ -15,49 +16,6 @@ class NetworkDomain {
 
   NetworkDomain(this._client);
 
-  /// Fired when data chunk was received over the network.
-  Stream<DataReceivedEvent> get onDataReceived => _client.onEvent
-      .where((Event event) => event.name == 'Network.dataReceived')
-      .map((Event event) => new DataReceivedEvent.fromJson(event.parameters));
-
-  /// Fired when EventSource message is received.
-  Stream<EventSourceMessageReceivedEvent> get onEventSourceMessageReceived =>
-      _client.onEvent
-          .where((Event event) =>
-              event.name == 'Network.eventSourceMessageReceived')
-          .map((Event event) =>
-              new EventSourceMessageReceivedEvent.fromJson(event.parameters));
-
-  /// Fired when HTTP request has failed to load.
-  Stream<LoadingFailedEvent> get onLoadingFailed => _client.onEvent
-      .where((Event event) => event.name == 'Network.loadingFailed')
-      .map((Event event) => new LoadingFailedEvent.fromJson(event.parameters));
-
-  /// Fired when HTTP request has finished loading.
-  Stream<LoadingFinishedEvent> get onLoadingFinished => _client.onEvent
-      .where((Event event) => event.name == 'Network.loadingFinished')
-      .map(
-          (Event event) => new LoadingFinishedEvent.fromJson(event.parameters));
-
-  /// Details of an intercepted HTTP request, which must be either allowed, blocked, modified or
-  /// mocked.
-  Stream<RequestInterceptedEvent> get onRequestIntercepted => _client.onEvent
-      .where((Event event) => event.name == 'Network.requestIntercepted')
-      .map((Event event) =>
-          new RequestInterceptedEvent.fromJson(event.parameters));
-
-  /// Fired if request ended up loading from cache.
-  Stream<RequestId> get onRequestServedFromCache => _client.onEvent
-      .where((Event event) => event.name == 'Network.requestServedFromCache')
-      .map((Event event) =>
-          new RequestId.fromJson(event.parameters['requestId']));
-
-  /// Fired when page is about to send HTTP request.
-  Stream<RequestWillBeSentEvent> get onRequestWillBeSent => _client.onEvent
-      .where((Event event) => event.name == 'Network.requestWillBeSent')
-      .map((Event event) =>
-          new RequestWillBeSentEvent.fromJson(event.parameters));
-
   /// Fired when resource loading priority is changed
   Stream<ResourceChangedPriorityEvent> get onResourceChangedPriority => _client
       .onEvent
@@ -65,51 +23,39 @@ class NetworkDomain {
       .map((Event event) =>
           new ResourceChangedPriorityEvent.fromJson(event.parameters));
 
+  /// Fired when page is about to send HTTP request.
+  Stream<RequestWillBeSentEvent> get onRequestWillBeSent => _client.onEvent
+      .where((Event event) => event.name == 'Network.requestWillBeSent')
+      .map((Event event) =>
+          new RequestWillBeSentEvent.fromJson(event.parameters));
+
+  /// Fired if request ended up loading from cache.
+  Stream<RequestId> get onRequestServedFromCache => _client.onEvent
+      .where((Event event) => event.name == 'Network.requestServedFromCache')
+      .map((Event event) =>
+          new RequestId.fromJson(event.parameters['requestId']));
+
   /// Fired when HTTP response is available.
   Stream<ResponseReceivedEvent> get onResponseReceived => _client.onEvent
       .where((Event event) => event.name == 'Network.responseReceived')
       .map((Event event) =>
           new ResponseReceivedEvent.fromJson(event.parameters));
 
-  /// Fired when WebSocket is closed.
-  Stream<WebSocketClosedEvent> get onWebSocketClosed => _client.onEvent
-      .where((Event event) => event.name == 'Network.webSocketClosed')
+  /// Fired when data chunk was received over the network.
+  Stream<DataReceivedEvent> get onDataReceived => _client.onEvent
+      .where((Event event) => event.name == 'Network.dataReceived')
+      .map((Event event) => new DataReceivedEvent.fromJson(event.parameters));
+
+  /// Fired when HTTP request has finished loading.
+  Stream<LoadingFinishedEvent> get onLoadingFinished => _client.onEvent
+      .where((Event event) => event.name == 'Network.loadingFinished')
       .map(
-          (Event event) => new WebSocketClosedEvent.fromJson(event.parameters));
+          (Event event) => new LoadingFinishedEvent.fromJson(event.parameters));
 
-  /// Fired upon WebSocket creation.
-  Stream<WebSocketCreatedEvent> get onWebSocketCreated => _client.onEvent
-      .where((Event event) => event.name == 'Network.webSocketCreated')
-      .map((Event event) =>
-          new WebSocketCreatedEvent.fromJson(event.parameters));
-
-  /// Fired when WebSocket frame error occurs.
-  Stream<WebSocketFrameErrorEvent> get onWebSocketFrameError => _client.onEvent
-      .where((Event event) => event.name == 'Network.webSocketFrameError')
-      .map((Event event) =>
-          new WebSocketFrameErrorEvent.fromJson(event.parameters));
-
-  /// Fired when WebSocket frame is received.
-  Stream<WebSocketFrameReceivedEvent> get onWebSocketFrameReceived => _client
-      .onEvent
-      .where((Event event) => event.name == 'Network.webSocketFrameReceived')
-      .map((Event event) =>
-          new WebSocketFrameReceivedEvent.fromJson(event.parameters));
-
-  /// Fired when WebSocket frame is sent.
-  Stream<WebSocketFrameSentEvent> get onWebSocketFrameSent => _client.onEvent
-      .where((Event event) => event.name == 'Network.webSocketFrameSent')
-      .map((Event event) =>
-          new WebSocketFrameSentEvent.fromJson(event.parameters));
-
-  /// Fired when WebSocket handshake response becomes available.
-  Stream<WebSocketHandshakeResponseReceivedEvent>
-      get onWebSocketHandshakeResponseReceived => _client.onEvent
-          .where((Event event) =>
-              event.name == 'Network.webSocketHandshakeResponseReceived')
-          .map((Event event) =>
-              new WebSocketHandshakeResponseReceivedEvent.fromJson(
-                  event.parameters));
+  /// Fired when HTTP request has failed to load.
+  Stream<LoadingFailedEvent> get onLoadingFailed => _client.onEvent
+      .where((Event event) => event.name == 'Network.loadingFailed')
+      .map((Event event) => new LoadingFailedEvent.fromJson(event.parameters));
 
   /// Fired when WebSocket is about to initiate handshake.
   Stream<WebSocketWillSendHandshakeRequestEvent>
@@ -120,156 +66,70 @@ class NetworkDomain {
               new WebSocketWillSendHandshakeRequestEvent.fromJson(
                   event.parameters));
 
-  /// Tells whether clearing browser cache is supported.
-  /// Return: True if browser cache can be cleared.
-  Future<bool> canClearBrowserCache() async {
-    Map result = await _client.send('Network.canClearBrowserCache');
-    return result['result'];
-  }
+  /// Fired when WebSocket handshake response becomes available.
+  Stream<WebSocketHandshakeResponseReceivedEvent>
+      get onWebSocketHandshakeResponseReceived => _client.onEvent
+          .where((Event event) =>
+              event.name == 'Network.webSocketHandshakeResponseReceived')
+          .map((Event event) =>
+              new WebSocketHandshakeResponseReceivedEvent.fromJson(
+                  event.parameters));
 
-  /// Tells whether clearing browser cookies is supported.
-  /// Return: True if browser cookies can be cleared.
-  Future<bool> canClearBrowserCookies() async {
-    Map result = await _client.send('Network.canClearBrowserCookies');
-    return result['result'];
-  }
+  /// Fired upon WebSocket creation.
+  Stream<WebSocketCreatedEvent> get onWebSocketCreated => _client.onEvent
+      .where((Event event) => event.name == 'Network.webSocketCreated')
+      .map((Event event) =>
+          new WebSocketCreatedEvent.fromJson(event.parameters));
 
-  /// Tells whether emulation of network conditions is supported.
-  /// Return: True if emulation of network conditions is supported.
-  Future<bool> canEmulateNetworkConditions() async {
-    Map result = await _client.send('Network.canEmulateNetworkConditions');
-    return result['result'];
-  }
+  /// Fired when WebSocket is closed.
+  Stream<WebSocketClosedEvent> get onWebSocketClosed => _client.onEvent
+      .where((Event event) => event.name == 'Network.webSocketClosed')
+      .map(
+          (Event event) => new WebSocketClosedEvent.fromJson(event.parameters));
 
-  /// Clears browser cache.
-  Future clearBrowserCache() async {
-    await _client.send('Network.clearBrowserCache');
-  }
+  /// Fired when WebSocket frame is received.
+  Stream<WebSocketFrameReceivedEvent> get onWebSocketFrameReceived => _client
+      .onEvent
+      .where((Event event) => event.name == 'Network.webSocketFrameReceived')
+      .map((Event event) =>
+          new WebSocketFrameReceivedEvent.fromJson(event.parameters));
 
-  /// Clears browser cookies.
-  Future clearBrowserCookies() async {
-    await _client.send('Network.clearBrowserCookies');
-  }
+  /// Fired when WebSocket frame error occurs.
+  Stream<WebSocketFrameErrorEvent> get onWebSocketFrameError => _client.onEvent
+      .where((Event event) => event.name == 'Network.webSocketFrameError')
+      .map((Event event) =>
+          new WebSocketFrameErrorEvent.fromJson(event.parameters));
 
-  /// Response to Network.requestIntercepted which either modifies the request to continue with any
-  /// modifications, or blocks it, or completes it with the provided response bytes. If a network
-  /// fetch occurs as a result which encounters a redirect an additional Network.requestIntercepted
-  /// event will be sent with the same InterceptionId.
-  /// [errorReason] If set this causes the request to fail with the given reason. Passing `Aborted` for requests
-  /// marked with `isNavigationRequest` also cancels the navigation. Must not be set in response
-  /// to an authChallenge.
-  /// [rawResponse] If set the requests completes using with the provided base64 encoded raw response, including
-  /// HTTP status line and headers etc... Must not be set in response to an authChallenge.
-  /// [url] If set the request url will be modified in a way that's not observable by page. Must not be
-  /// set in response to an authChallenge.
-  /// [method] If set this allows the request method to be overridden. Must not be set in response to an
-  /// authChallenge.
-  /// [postData] If set this allows postData to be set. Must not be set in response to an authChallenge.
-  /// [headers] If set this allows the request headers to be changed. Must not be set in response to an
-  /// authChallenge.
-  /// [authChallengeResponse] Response to a requestIntercepted with an authChallenge. Must not be set otherwise.
-  Future continueInterceptedRequest(
-    InterceptionId interceptionId, {
-    ErrorReason errorReason,
-    String rawResponse,
-    String url,
-    String method,
-    String postData,
-    Headers headers,
-    AuthChallengeResponse authChallengeResponse,
-  }) async {
-    Map parameters = {
-      'interceptionId': interceptionId.toJson(),
-    };
-    if (errorReason != null) {
-      parameters['errorReason'] = errorReason.toJson();
-    }
-    if (rawResponse != null) {
-      parameters['rawResponse'] = rawResponse;
-    }
-    if (url != null) {
-      parameters['url'] = url;
-    }
-    if (method != null) {
-      parameters['method'] = method;
-    }
-    if (postData != null) {
-      parameters['postData'] = postData;
-    }
-    if (headers != null) {
-      parameters['headers'] = headers.toJson();
-    }
-    if (authChallengeResponse != null) {
-      parameters['authChallengeResponse'] = authChallengeResponse.toJson();
-    }
-    await _client.send('Network.continueInterceptedRequest', parameters);
-  }
+  /// Fired when WebSocket frame is sent.
+  Stream<WebSocketFrameSentEvent> get onWebSocketFrameSent => _client.onEvent
+      .where((Event event) => event.name == 'Network.webSocketFrameSent')
+      .map((Event event) =>
+          new WebSocketFrameSentEvent.fromJson(event.parameters));
 
-  /// Deletes browser cookies with matching name and url or domain/path pair.
-  /// [name] Name of the cookies to remove.
-  /// [url] If specified, deletes all the cookies with the given name where domain and path match
-  /// provided URL.
-  /// [domain] If specified, deletes only cookies with the exact domain.
-  /// [path] If specified, deletes only cookies with the exact path.
-  Future deleteCookies(
-    String name, {
-    String url,
-    String domain,
-    String path,
-  }) async {
-    Map parameters = {
-      'name': name,
-    };
-    if (url != null) {
-      parameters['url'] = url;
-    }
-    if (domain != null) {
-      parameters['domain'] = domain;
-    }
-    if (path != null) {
-      parameters['path'] = path;
-    }
-    await _client.send('Network.deleteCookies', parameters);
-  }
+  /// Fired when EventSource message is received.
+  Stream<EventSourceMessageReceivedEvent> get onEventSourceMessageReceived =>
+      _client.onEvent
+          .where((Event event) =>
+              event.name == 'Network.eventSourceMessageReceived')
+          .map((Event event) =>
+              new EventSourceMessageReceivedEvent.fromJson(event.parameters));
 
-  /// Disables network tracking, prevents network events from being sent to the client.
-  Future disable() async {
-    await _client.send('Network.disable');
-  }
+  /// Details of an intercepted HTTP request, which must be either allowed,
+  /// blocked, modified or mocked.
+  Stream<RequestInterceptedEvent> get onRequestIntercepted => _client.onEvent
+      .where((Event event) => event.name == 'Network.requestIntercepted')
+      .map((Event event) =>
+          new RequestInterceptedEvent.fromJson(event.parameters));
 
-  /// Activates emulation of network conditions.
-  /// [offline] True to emulate internet disconnection.
-  /// [latency] Minimum latency from request sent to response headers received (ms).
-  /// [downloadThroughput] Maximal aggregated download throughput (bytes/sec). -1 disables download throttling.
-  /// [uploadThroughput] Maximal aggregated upload throughput (bytes/sec).  -1 disables upload throttling.
-  /// [connectionType] Connection type if known.
-  Future emulateNetworkConditions(
-    bool offline,
-    num latency,
-    num downloadThroughput,
-    num uploadThroughput, {
-    ConnectionType connectionType,
-  }) async {
-    Map parameters = {
-      'offline': offline,
-      'latency': latency,
-      'downloadThroughput': downloadThroughput,
-      'uploadThroughput': uploadThroughput,
-    };
-    if (connectionType != null) {
-      parameters['connectionType'] = connectionType.toJson();
-    }
-    await _client.send('Network.emulateNetworkConditions', parameters);
-  }
-
-  /// Enables network tracking, network events will now be delivered to the client.
-  /// [maxTotalBufferSize] Buffer size in bytes to use when preserving network payloads (XHRs, etc).
-  /// [maxResourceBufferSize] Per-resource buffer size in bytes to use when preserving network payloads (XHRs, etc).
-  /// [maxPostDataSize] Longest post body size (in bytes) that would be included in requestWillBeSent notification
+  /// Enables network tracking, network events will now be delivered to the
+  /// client.
+  /// [maxTotalBufferSize] Buffer size in bytes to use when preserving network
+  /// payloads (XHRs, etc).
+  /// [maxResourceBufferSize] Per-resource buffer size in bytes to use when
+  /// preserving network payloads (XHRs, etc).
   Future enable({
     int maxTotalBufferSize,
     int maxResourceBufferSize,
-    int maxPostDataSize,
   }) async {
     Map parameters = {};
     if (maxTotalBufferSize != null) {
@@ -278,100 +138,24 @@ class NetworkDomain {
     if (maxResourceBufferSize != null) {
       parameters['maxResourceBufferSize'] = maxResourceBufferSize;
     }
-    if (maxPostDataSize != null) {
-      parameters['maxPostDataSize'] = maxPostDataSize;
-    }
     await _client.send('Network.enable', parameters);
   }
 
-  /// Returns all browser cookies. Depending on the backend support, will return detailed cookie
-  /// information in the `cookies` field.
-  /// Return: Array of cookie objects.
-  Future<List<Cookie>> getAllCookies() async {
-    Map result = await _client.send('Network.getAllCookies');
-    return (result['cookies'] as List)
-        .map((e) => new Cookie.fromJson(e))
-        .toList();
+  /// Disables network tracking, prevents network events from being sent to the
+  /// client.
+  Future disable() async {
+    await _client.send('Network.disable');
   }
 
-  /// Returns the DER-encoded certificate.
-  /// [origin] Origin to get certificate for.
-  Future<List<String>> getCertificate(
-    String origin,
+  /// Allows overriding user agent with the given string.
+  /// [userAgent] User agent to use.
+  Future setUserAgentOverride(
+    String userAgent,
   ) async {
     Map parameters = {
-      'origin': origin,
+      'userAgent': userAgent,
     };
-    Map result = await _client.send('Network.getCertificate', parameters);
-    return (result['tableNames'] as List).map((e) => e as String).toList();
-  }
-
-  /// Returns all browser cookies for the current URL. Depending on the backend support, will return
-  /// detailed cookie information in the `cookies` field.
-  /// [urls] The list of URLs for which applicable cookies will be fetched
-  /// Return: Array of cookie objects.
-  Future<List<Cookie>> getCookies({
-    List<String> urls,
-  }) async {
-    Map parameters = {};
-    if (urls != null) {
-      parameters['urls'] = urls.map((e) => e).toList();
-    }
-    Map result = await _client.send('Network.getCookies', parameters);
-    return (result['cookies'] as List)
-        .map((e) => new Cookie.fromJson(e))
-        .toList();
-  }
-
-  /// Returns content served for the given request.
-  /// [requestId] Identifier of the network request to get content for.
-  Future<GetResponseBodyResult> getResponseBody(
-    RequestId requestId,
-  ) async {
-    Map parameters = {
-      'requestId': requestId.toJson(),
-    };
-    Map result = await _client.send('Network.getResponseBody', parameters);
-    return new GetResponseBodyResult.fromJson(result);
-  }
-
-  /// Returns post data sent with the request. Returns an error when no data was sent with the request.
-  /// [requestId] Identifier of the network request to get content for.
-  /// Return: Base64-encoded request body.
-  Future<String> getRequestPostData(
-    RequestId requestId,
-  ) async {
-    Map parameters = {
-      'requestId': requestId.toJson(),
-    };
-    Map result = await _client.send('Network.getRequestPostData', parameters);
-    return result['postData'];
-  }
-
-  /// Returns content served for the given currently intercepted request.
-  /// [interceptionId] Identifier for the intercepted request to get body for.
-  Future<GetResponseBodyForInterceptionResult> getResponseBodyForInterception(
-    InterceptionId interceptionId,
-  ) async {
-    Map parameters = {
-      'interceptionId': interceptionId.toJson(),
-    };
-    Map result = await _client.send(
-        'Network.getResponseBodyForInterception', parameters);
-    return new GetResponseBodyForInterceptionResult.fromJson(result);
-  }
-
-  /// This method sends a new XMLHttpRequest which is identical to the original one. The following
-  /// parameters should be identical: method, url, async, request body, extra headers, withCredentials
-  /// attribute, user, password.
-  /// [requestId] Identifier of XHR to replay.
-  Future replayXHR(
-    RequestId requestId,
-  ) async {
-    Map parameters = {
-      'requestId': requestId.toJson(),
-    };
-    await _client.send('Network.replayXHR', parameters);
+    await _client.send('Network.setUserAgentOverride', parameters);
   }
 
   /// Searches for given string in response content.
@@ -402,6 +186,30 @@ class NetworkDomain {
         .toList();
   }
 
+  /// Specifies whether to always send extra HTTP headers with the requests from
+  /// this page.
+  /// [headers] Map with extra HTTP headers.
+  Future setExtraHTTPHeaders(
+    Headers headers,
+  ) async {
+    Map parameters = {
+      'headers': headers.toJson(),
+    };
+    await _client.send('Network.setExtraHTTPHeaders', parameters);
+  }
+
+  /// Returns content served for the given request.
+  /// [requestId] Identifier of the network request to get content for.
+  Future<GetResponseBodyResult> getResponseBody(
+    RequestId requestId,
+  ) async {
+    Map parameters = {
+      'requestId': requestId.toJson(),
+    };
+    Map result = await _client.send('Network.getResponseBody', parameters);
+    return new GetResponseBodyResult.fromJson(result);
+  }
+
   /// Blocks URLs from loading.
   /// [urls] URL patterns to block. Wildcards ('*') are allowed.
   Future setBlockedURLs(
@@ -413,33 +221,103 @@ class NetworkDomain {
     await _client.send('Network.setBlockedURLs', parameters);
   }
 
-  /// Toggles ignoring of service worker for each request.
-  /// [bypass] Bypass service worker and load from network.
-  Future setBypassServiceWorker(
-    bool bypass,
+  /// This method sends a new XMLHttpRequest which is identical to the original
+  /// one. The following parameters should be identical: method, url, async,
+  /// request body, extra headers, withCredentials attribute, user, password.
+  /// [requestId] Identifier of XHR to replay.
+  Future replayXHR(
+    RequestId requestId,
   ) async {
     Map parameters = {
-      'bypass': bypass,
+      'requestId': requestId.toJson(),
     };
-    await _client.send('Network.setBypassServiceWorker', parameters);
+    await _client.send('Network.replayXHR', parameters);
   }
 
-  /// Toggles ignoring cache for each request. If `true`, cache will not be used.
-  /// [cacheDisabled] Cache disabled state.
-  Future setCacheDisabled(
-    bool cacheDisabled,
-  ) async {
+  /// Tells whether clearing browser cache is supported.
+  /// Return: True if browser cache can be cleared.
+  Future<bool> canClearBrowserCache() async {
+    Map result = await _client.send('Network.canClearBrowserCache');
+    return result['result'];
+  }
+
+  /// Clears browser cache.
+  Future clearBrowserCache() async {
+    await _client.send('Network.clearBrowserCache');
+  }
+
+  /// Tells whether clearing browser cookies is supported.
+  /// Return: True if browser cookies can be cleared.
+  Future<bool> canClearBrowserCookies() async {
+    Map result = await _client.send('Network.canClearBrowserCookies');
+    return result['result'];
+  }
+
+  /// Clears browser cookies.
+  Future clearBrowserCookies() async {
+    await _client.send('Network.clearBrowserCookies');
+  }
+
+  /// Returns all browser cookies for the current URL. Depending on the backend
+  /// support, will return detailed cookie information in the `cookies` field.
+  /// [urls] The list of URLs for which applicable cookies will be fetched
+  /// Return: Array of cookie objects.
+  Future<List<Cookie>> getCookies({
+    List<String> urls,
+  }) async {
+    Map parameters = {};
+    if (urls != null) {
+      parameters['urls'] = urls.map((e) => e).toList();
+    }
+    Map result = await _client.send('Network.getCookies', parameters);
+    return (result['cookies'] as List)
+        .map((e) => new Cookie.fromJson(e))
+        .toList();
+  }
+
+  /// Returns all browser cookies. Depending on the backend support, will return
+  /// detailed cookie information in the `cookies` field.
+  /// Return: Array of cookie objects.
+  Future<List<Cookie>> getAllCookies() async {
+    Map result = await _client.send('Network.getAllCookies');
+    return (result['cookies'] as List)
+        .map((e) => new Cookie.fromJson(e))
+        .toList();
+  }
+
+  /// Deletes browser cookies with matching name and url or domain/path pair.
+  /// [name] Name of the cookies to remove.
+  /// [url] If specified, deletes all the cookies with the given name where domain
+  /// and path match provided URL.
+  /// [domain] If specified, deletes only cookies with the exact domain.
+  /// [path] If specified, deletes only cookies with the exact path.
+  Future deleteCookies(
+    String name, {
+    String url,
+    String domain,
+    String path,
+  }) async {
     Map parameters = {
-      'cacheDisabled': cacheDisabled,
+      'name': name,
     };
-    await _client.send('Network.setCacheDisabled', parameters);
+    if (url != null) {
+      parameters['url'] = url;
+    }
+    if (domain != null) {
+      parameters['domain'] = domain;
+    }
+    if (path != null) {
+      parameters['path'] = path;
+    }
+    await _client.send('Network.deleteCookies', parameters);
   }
 
-  /// Sets a cookie with the given cookie data; may overwrite equivalent cookies if they exist.
+  /// Sets a cookie with the given cookie data; may overwrite equivalent cookies
+  /// if they exist.
   /// [name] Cookie name.
   /// [value] Cookie value.
-  /// [url] The request-URI to associate with the setting of the cookie. This value can affect the
-  /// default domain and path values of the created cookie.
+  /// [url] The request-URI to associate with the setting of the cookie. This
+  /// value can affect the default domain and path values of the created cookie.
   /// [domain] Cookie domain.
   /// [path] Cookie path.
   /// [secure] True if cookie is secure.
@@ -498,6 +376,63 @@ class NetworkDomain {
     await _client.send('Network.setCookies', parameters);
   }
 
+  /// Tells whether emulation of network conditions is supported.
+  /// Return: True if emulation of network conditions is supported.
+  Future<bool> canEmulateNetworkConditions() async {
+    Map result = await _client.send('Network.canEmulateNetworkConditions');
+    return result['result'];
+  }
+
+  /// Activates emulation of network conditions.
+  /// [offline] True to emulate internet disconnection.
+  /// [latency] Minimum latency from request sent to response headers received
+  /// (ms).
+  /// [downloadThroughput] Maximal aggregated download throughput (bytes/sec). -1
+  /// disables download throttling.
+  /// [uploadThroughput] Maximal aggregated upload throughput (bytes/sec).  -1
+  /// disables upload throttling.
+  /// [connectionType] Connection type if known.
+  Future emulateNetworkConditions(
+    bool offline,
+    num latency,
+    num downloadThroughput,
+    num uploadThroughput, {
+    ConnectionType connectionType,
+  }) async {
+    Map parameters = {
+      'offline': offline,
+      'latency': latency,
+      'downloadThroughput': downloadThroughput,
+      'uploadThroughput': uploadThroughput,
+    };
+    if (connectionType != null) {
+      parameters['connectionType'] = connectionType.toJson();
+    }
+    await _client.send('Network.emulateNetworkConditions', parameters);
+  }
+
+  /// Toggles ignoring cache for each request. If `true`, cache will not be used.
+  /// [cacheDisabled] Cache disabled state.
+  Future setCacheDisabled(
+    bool cacheDisabled,
+  ) async {
+    Map parameters = {
+      'cacheDisabled': cacheDisabled,
+    };
+    await _client.send('Network.setCacheDisabled', parameters);
+  }
+
+  /// Toggles ignoring of service worker for each request.
+  /// [bypass] Bypass service worker and load from network.
+  Future setBypassServiceWorker(
+    bool bypass,
+  ) async {
+    Map parameters = {
+      'bypass': bypass,
+    };
+    await _client.send('Network.setBypassServiceWorker', parameters);
+  }
+
   /// For testing.
   /// [maxTotalSize] Maximum total buffer size.
   /// [maxResourceSize] Maximum per-resource size.
@@ -512,20 +447,22 @@ class NetworkDomain {
     await _client.send('Network.setDataSizeLimitsForTest', parameters);
   }
 
-  /// Specifies whether to always send extra HTTP headers with the requests from this page.
-  /// [headers] Map with extra HTTP headers.
-  Future setExtraHTTPHeaders(
-    Headers headers,
+  /// Returns the DER-encoded certificate.
+  /// [origin] Origin to get certificate for.
+  Future<List<String>> getCertificate(
+    String origin,
   ) async {
     Map parameters = {
-      'headers': headers.toJson(),
+      'origin': origin,
     };
-    await _client.send('Network.setExtraHTTPHeaders', parameters);
+    Map result = await _client.send('Network.getCertificate', parameters);
+    return (result['tableNames'] as List).map((e) => e as String).toList();
   }
 
-  /// Sets the requests to intercept that match a the provided patterns and optionally resource types.
-  /// [patterns] Requests matching any of these patterns will be forwarded and wait for the corresponding
-  /// continueInterceptedRequest call.
+  /// Sets the requests to intercept that match a the provided patterns and
+  /// optionally resource types.
+  /// [patterns] Requests matching any of these patterns will be forwarded and
+  /// wait for the corresponding continueInterceptedRequest call.
   Future setRequestInterception(
     List<RequestPattern> patterns,
   ) async {
@@ -535,226 +472,99 @@ class NetworkDomain {
     await _client.send('Network.setRequestInterception', parameters);
   }
 
-  /// Allows overriding user agent with the given string.
-  /// [userAgent] User agent to use.
-  Future setUserAgentOverride(
-    String userAgent,
+  /// Response to Network.requestIntercepted which either modifies the request to
+  /// continue with any modifications, or blocks it, or completes it with the
+  /// provided response bytes. If a network fetch occurs as a result which
+  /// encounters a redirect an additional Network.requestIntercepted event will be
+  /// sent with the same InterceptionId.
+  /// [errorReason] If set this causes the request to fail with the given reason.
+  /// Passing `Aborted` for requests marked with `isNavigationRequest` also
+  /// cancels the navigation. Must not be set in response to an authChallenge.
+  /// [rawResponse] If set the requests completes using with the provided base64
+  /// encoded raw response, including HTTP status line and headers etc... Must not
+  /// be set in response to an authChallenge.
+  /// [url] If set the request url will be modified in a way that's not observable
+  /// by page. Must not be set in response to an authChallenge.
+  /// [method] If set this allows the request method to be overridden. Must not be
+  /// set in response to an authChallenge.
+  /// [postData] If set this allows postData to be set. Must not be set in
+  /// response to an authChallenge.
+  /// [headers] If set this allows the request headers to be changed. Must not be
+  /// set in response to an authChallenge.
+  /// [authChallengeResponse] Response to a requestIntercepted with an
+  /// authChallenge. Must not be set otherwise.
+  Future continueInterceptedRequest(
+    InterceptionId interceptionId, {
+    ErrorReason errorReason,
+    String rawResponse,
+    String url,
+    String method,
+    String postData,
+    Headers headers,
+    AuthChallengeResponse authChallengeResponse,
+  }) async {
+    Map parameters = {
+      'interceptionId': interceptionId.toJson(),
+    };
+    if (errorReason != null) {
+      parameters['errorReason'] = errorReason.toJson();
+    }
+    if (rawResponse != null) {
+      parameters['rawResponse'] = rawResponse;
+    }
+    if (url != null) {
+      parameters['url'] = url;
+    }
+    if (method != null) {
+      parameters['method'] = method;
+    }
+    if (postData != null) {
+      parameters['postData'] = postData;
+    }
+    if (headers != null) {
+      parameters['headers'] = headers.toJson();
+    }
+    if (authChallengeResponse != null) {
+      parameters['authChallengeResponse'] = authChallengeResponse.toJson();
+    }
+    await _client.send('Network.continueInterceptedRequest', parameters);
+  }
+
+  /// Returns content served for the given currently intercepted request.
+  /// [interceptionId] Identifier for the intercepted request to get body for.
+  Future<GetResponseBodyForInterceptionResult> getResponseBodyForInterception(
+    InterceptionId interceptionId,
   ) async {
     Map parameters = {
-      'userAgent': userAgent,
+      'interceptionId': interceptionId.toJson(),
     };
-    await _client.send('Network.setUserAgentOverride', parameters);
+    Map result = await _client.send(
+        'Network.getResponseBodyForInterception', parameters);
+    return new GetResponseBodyForInterceptionResult.fromJson(result);
   }
 }
 
-class DataReceivedEvent {
+class ResourceChangedPriorityEvent {
   /// Request identifier.
   final RequestId requestId;
+
+  /// New priority
+  final ResourcePriority newPriority;
 
   /// Timestamp.
   final MonotonicTime timestamp;
 
-  /// Data chunk length.
-  final int dataLength;
-
-  /// Actual bytes received (might be less than dataLength for compressed encodings).
-  final int encodedDataLength;
-
-  DataReceivedEvent({
+  ResourceChangedPriorityEvent({
     @required this.requestId,
+    @required this.newPriority,
     @required this.timestamp,
-    @required this.dataLength,
-    @required this.encodedDataLength,
   });
 
-  factory DataReceivedEvent.fromJson(Map json) {
-    return new DataReceivedEvent(
+  factory ResourceChangedPriorityEvent.fromJson(Map json) {
+    return new ResourceChangedPriorityEvent(
       requestId: new RequestId.fromJson(json['requestId']),
+      newPriority: new ResourcePriority.fromJson(json['newPriority']),
       timestamp: new MonotonicTime.fromJson(json['timestamp']),
-      dataLength: json['dataLength'],
-      encodedDataLength: json['encodedDataLength'],
-    );
-  }
-}
-
-class EventSourceMessageReceivedEvent {
-  /// Request identifier.
-  final RequestId requestId;
-
-  /// Timestamp.
-  final MonotonicTime timestamp;
-
-  /// Message type.
-  final String eventName;
-
-  /// Message identifier.
-  final String eventId;
-
-  /// Message content.
-  final String data;
-
-  EventSourceMessageReceivedEvent({
-    @required this.requestId,
-    @required this.timestamp,
-    @required this.eventName,
-    @required this.eventId,
-    @required this.data,
-  });
-
-  factory EventSourceMessageReceivedEvent.fromJson(Map json) {
-    return new EventSourceMessageReceivedEvent(
-      requestId: new RequestId.fromJson(json['requestId']),
-      timestamp: new MonotonicTime.fromJson(json['timestamp']),
-      eventName: json['eventName'],
-      eventId: json['eventId'],
-      data: json['data'],
-    );
-  }
-}
-
-class LoadingFailedEvent {
-  /// Request identifier.
-  final RequestId requestId;
-
-  /// Timestamp.
-  final MonotonicTime timestamp;
-
-  /// Resource type.
-  final page.ResourceType type;
-
-  /// User friendly error message.
-  final String errorText;
-
-  /// True if loading was canceled.
-  final bool canceled;
-
-  /// The reason why loading was blocked, if any.
-  final BlockedReason blockedReason;
-
-  LoadingFailedEvent({
-    @required this.requestId,
-    @required this.timestamp,
-    @required this.type,
-    @required this.errorText,
-    this.canceled,
-    this.blockedReason,
-  });
-
-  factory LoadingFailedEvent.fromJson(Map json) {
-    return new LoadingFailedEvent(
-      requestId: new RequestId.fromJson(json['requestId']),
-      timestamp: new MonotonicTime.fromJson(json['timestamp']),
-      type: new page.ResourceType.fromJson(json['type']),
-      errorText: json['errorText'],
-      canceled: json.containsKey('canceled') ? json['canceled'] : null,
-      blockedReason: json.containsKey('blockedReason')
-          ? new BlockedReason.fromJson(json['blockedReason'])
-          : null,
-    );
-  }
-}
-
-class LoadingFinishedEvent {
-  /// Request identifier.
-  final RequestId requestId;
-
-  /// Timestamp.
-  final MonotonicTime timestamp;
-
-  /// Total number of bytes received for this request.
-  final num encodedDataLength;
-
-  /// Set when response was blocked due to being cross-site document response.
-  final bool blockedCrossSiteDocument;
-
-  LoadingFinishedEvent({
-    @required this.requestId,
-    @required this.timestamp,
-    @required this.encodedDataLength,
-    this.blockedCrossSiteDocument,
-  });
-
-  factory LoadingFinishedEvent.fromJson(Map json) {
-    return new LoadingFinishedEvent(
-      requestId: new RequestId.fromJson(json['requestId']),
-      timestamp: new MonotonicTime.fromJson(json['timestamp']),
-      encodedDataLength: json['encodedDataLength'],
-      blockedCrossSiteDocument: json.containsKey('blockedCrossSiteDocument')
-          ? json['blockedCrossSiteDocument']
-          : null,
-    );
-  }
-}
-
-class RequestInterceptedEvent {
-  /// Each request the page makes will have a unique id, however if any redirects are encountered
-  /// while processing that fetch, they will be reported with the same id as the original fetch.
-  /// Likewise if HTTP authentication is needed then the same fetch id will be used.
-  final InterceptionId interceptionId;
-
-  final Request request;
-
-  /// The id of the frame that initiated the request.
-  final page.FrameId frameId;
-
-  /// How the requested resource will be used.
-  final page.ResourceType resourceType;
-
-  /// Whether this is a navigation request, which can abort the navigation completely.
-  final bool isNavigationRequest;
-
-  /// Redirect location, only sent if a redirect was intercepted.
-  final String redirectUrl;
-
-  /// Details of the Authorization Challenge encountered. If this is set then
-  /// continueInterceptedRequest must contain an authChallengeResponse.
-  final AuthChallenge authChallenge;
-
-  /// Response error if intercepted at response stage or if redirect occurred while intercepting
-  /// request.
-  final ErrorReason responseErrorReason;
-
-  /// Response code if intercepted at response stage or if redirect occurred while intercepting
-  /// request or auth retry occurred.
-  final int responseStatusCode;
-
-  /// Response headers if intercepted at the response stage or if redirect occurred while
-  /// intercepting request or auth retry occurred.
-  final Headers responseHeaders;
-
-  RequestInterceptedEvent({
-    @required this.interceptionId,
-    @required this.request,
-    @required this.frameId,
-    @required this.resourceType,
-    @required this.isNavigationRequest,
-    this.redirectUrl,
-    this.authChallenge,
-    this.responseErrorReason,
-    this.responseStatusCode,
-    this.responseHeaders,
-  });
-
-  factory RequestInterceptedEvent.fromJson(Map json) {
-    return new RequestInterceptedEvent(
-      interceptionId: new InterceptionId.fromJson(json['interceptionId']),
-      request: new Request.fromJson(json['request']),
-      frameId: new page.FrameId.fromJson(json['frameId']),
-      resourceType: new page.ResourceType.fromJson(json['resourceType']),
-      isNavigationRequest: json['isNavigationRequest'],
-      redirectUrl: json.containsKey('redirectUrl') ? json['redirectUrl'] : null,
-      authChallenge: json.containsKey('authChallenge')
-          ? new AuthChallenge.fromJson(json['authChallenge'])
-          : null,
-      responseErrorReason: json.containsKey('responseErrorReason')
-          ? new ErrorReason.fromJson(json['responseErrorReason'])
-          : null,
-      responseStatusCode: json.containsKey('responseStatusCode')
-          ? json['responseStatusCode']
-          : null,
-      responseHeaders: json.containsKey('responseHeaders')
-          ? new Headers.fromJson(json['responseHeaders'])
-          : null,
     );
   }
 }
@@ -825,31 +635,6 @@ class RequestWillBeSentEvent {
   }
 }
 
-class ResourceChangedPriorityEvent {
-  /// Request identifier.
-  final RequestId requestId;
-
-  /// New priority
-  final ResourcePriority newPriority;
-
-  /// Timestamp.
-  final MonotonicTime timestamp;
-
-  ResourceChangedPriorityEvent({
-    @required this.requestId,
-    @required this.newPriority,
-    @required this.timestamp,
-  });
-
-  factory ResourceChangedPriorityEvent.fromJson(Map json) {
-    return new ResourceChangedPriorityEvent(
-      requestId: new RequestId.fromJson(json['requestId']),
-      newPriority: new ResourcePriority.fromJson(json['newPriority']),
-      timestamp: new MonotonicTime.fromJson(json['timestamp']),
-    );
-  }
-}
-
 class ResponseReceivedEvent {
   /// Request identifier.
   final RequestId requestId;
@@ -892,22 +677,155 @@ class ResponseReceivedEvent {
   }
 }
 
-class WebSocketClosedEvent {
+class DataReceivedEvent {
   /// Request identifier.
   final RequestId requestId;
 
   /// Timestamp.
   final MonotonicTime timestamp;
 
-  WebSocketClosedEvent({
+  /// Data chunk length.
+  final int dataLength;
+
+  /// Actual bytes received (might be less than dataLength for compressed
+  /// encodings).
+  final int encodedDataLength;
+
+  DataReceivedEvent({
     @required this.requestId,
     @required this.timestamp,
+    @required this.dataLength,
+    @required this.encodedDataLength,
   });
 
-  factory WebSocketClosedEvent.fromJson(Map json) {
-    return new WebSocketClosedEvent(
+  factory DataReceivedEvent.fromJson(Map json) {
+    return new DataReceivedEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      dataLength: json['dataLength'],
+      encodedDataLength: json['encodedDataLength'],
+    );
+  }
+}
+
+class LoadingFinishedEvent {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// Total number of bytes received for this request.
+  final num encodedDataLength;
+
+  LoadingFinishedEvent({
+    @required this.requestId,
+    @required this.timestamp,
+    @required this.encodedDataLength,
+  });
+
+  factory LoadingFinishedEvent.fromJson(Map json) {
+    return new LoadingFinishedEvent(
+      requestId: new RequestId.fromJson(json['requestId']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      encodedDataLength: json['encodedDataLength'],
+    );
+  }
+}
+
+class LoadingFailedEvent {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// Resource type.
+  final page.ResourceType type;
+
+  /// User friendly error message.
+  final String errorText;
+
+  /// True if loading was canceled.
+  final bool canceled;
+
+  /// The reason why loading was blocked, if any.
+  final BlockedReason blockedReason;
+
+  LoadingFailedEvent({
+    @required this.requestId,
+    @required this.timestamp,
+    @required this.type,
+    @required this.errorText,
+    this.canceled,
+    this.blockedReason,
+  });
+
+  factory LoadingFailedEvent.fromJson(Map json) {
+    return new LoadingFailedEvent(
+      requestId: new RequestId.fromJson(json['requestId']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      type: new page.ResourceType.fromJson(json['type']),
+      errorText: json['errorText'],
+      canceled: json.containsKey('canceled') ? json['canceled'] : null,
+      blockedReason: json.containsKey('blockedReason')
+          ? new BlockedReason.fromJson(json['blockedReason'])
+          : null,
+    );
+  }
+}
+
+class WebSocketWillSendHandshakeRequestEvent {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// UTC Timestamp.
+  final TimeSinceEpoch wallTime;
+
+  /// WebSocket request data.
+  final WebSocketRequest request;
+
+  WebSocketWillSendHandshakeRequestEvent({
+    @required this.requestId,
+    @required this.timestamp,
+    @required this.wallTime,
+    @required this.request,
+  });
+
+  factory WebSocketWillSendHandshakeRequestEvent.fromJson(Map json) {
+    return new WebSocketWillSendHandshakeRequestEvent(
+      requestId: new RequestId.fromJson(json['requestId']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      wallTime: new TimeSinceEpoch.fromJson(json['wallTime']),
+      request: new WebSocketRequest.fromJson(json['request']),
+    );
+  }
+}
+
+class WebSocketHandshakeResponseReceivedEvent {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// WebSocket response data.
+  final WebSocketResponse response;
+
+  WebSocketHandshakeResponseReceivedEvent({
+    @required this.requestId,
+    @required this.timestamp,
+    @required this.response,
+  });
+
+  factory WebSocketHandshakeResponseReceivedEvent.fromJson(Map json) {
+    return new WebSocketHandshakeResponseReceivedEvent(
+      requestId: new RequestId.fromJson(json['requestId']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      response: new WebSocketResponse.fromJson(json['response']),
     );
   }
 }
@@ -939,27 +857,22 @@ class WebSocketCreatedEvent {
   }
 }
 
-class WebSocketFrameErrorEvent {
+class WebSocketClosedEvent {
   /// Request identifier.
   final RequestId requestId;
 
   /// Timestamp.
   final MonotonicTime timestamp;
 
-  /// WebSocket frame error message.
-  final String errorMessage;
-
-  WebSocketFrameErrorEvent({
+  WebSocketClosedEvent({
     @required this.requestId,
     @required this.timestamp,
-    @required this.errorMessage,
   });
 
-  factory WebSocketFrameErrorEvent.fromJson(Map json) {
-    return new WebSocketFrameErrorEvent(
+  factory WebSocketClosedEvent.fromJson(Map json) {
+    return new WebSocketClosedEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       timestamp: new MonotonicTime.fromJson(json['timestamp']),
-      errorMessage: json['errorMessage'],
     );
   }
 }
@@ -989,6 +902,31 @@ class WebSocketFrameReceivedEvent {
   }
 }
 
+class WebSocketFrameErrorEvent {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// WebSocket frame error message.
+  final String errorMessage;
+
+  WebSocketFrameErrorEvent({
+    @required this.requestId,
+    @required this.timestamp,
+    @required this.errorMessage,
+  });
+
+  factory WebSocketFrameErrorEvent.fromJson(Map json) {
+    return new WebSocketFrameErrorEvent(
+      requestId: new RequestId.fromJson(json['requestId']),
+      timestamp: new MonotonicTime.fromJson(json['timestamp']),
+      errorMessage: json['errorMessage'],
+    );
+  }
+}
+
 class WebSocketFrameSentEvent {
   /// Request identifier.
   final RequestId requestId;
@@ -1014,57 +952,112 @@ class WebSocketFrameSentEvent {
   }
 }
 
-class WebSocketHandshakeResponseReceivedEvent {
+class EventSourceMessageReceivedEvent {
   /// Request identifier.
   final RequestId requestId;
 
   /// Timestamp.
   final MonotonicTime timestamp;
 
-  /// WebSocket response data.
-  final WebSocketResponse response;
+  /// Message type.
+  final String eventName;
 
-  WebSocketHandshakeResponseReceivedEvent({
+  /// Message identifier.
+  final String eventId;
+
+  /// Message content.
+  final String data;
+
+  EventSourceMessageReceivedEvent({
     @required this.requestId,
     @required this.timestamp,
-    @required this.response,
+    @required this.eventName,
+    @required this.eventId,
+    @required this.data,
   });
 
-  factory WebSocketHandshakeResponseReceivedEvent.fromJson(Map json) {
-    return new WebSocketHandshakeResponseReceivedEvent(
+  factory EventSourceMessageReceivedEvent.fromJson(Map json) {
+    return new EventSourceMessageReceivedEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       timestamp: new MonotonicTime.fromJson(json['timestamp']),
-      response: new WebSocketResponse.fromJson(json['response']),
+      eventName: json['eventName'],
+      eventId: json['eventId'],
+      data: json['data'],
     );
   }
 }
 
-class WebSocketWillSendHandshakeRequestEvent {
-  /// Request identifier.
-  final RequestId requestId;
+class RequestInterceptedEvent {
+  /// Each request the page makes will have a unique id, however if any redirects
+  /// are encountered while processing that fetch, they will be reported with the
+  /// same id as the original fetch. Likewise if HTTP authentication is needed
+  /// then the same fetch id will be used.
+  final InterceptionId interceptionId;
 
-  /// Timestamp.
-  final MonotonicTime timestamp;
+  final Request request;
 
-  /// UTC Timestamp.
-  final TimeSinceEpoch wallTime;
+  /// The id of the frame that initiated the request.
+  final page.FrameId frameId;
 
-  /// WebSocket request data.
-  final WebSocketRequest request;
+  /// How the requested resource will be used.
+  final page.ResourceType resourceType;
 
-  WebSocketWillSendHandshakeRequestEvent({
-    @required this.requestId,
-    @required this.timestamp,
-    @required this.wallTime,
+  /// Whether this is a navigation request, which can abort the navigation
+  /// completely.
+  final bool isNavigationRequest;
+
+  /// Redirect location, only sent if a redirect was intercepted.
+  final String redirectUrl;
+
+  /// Details of the Authorization Challenge encountered. If this is set then
+  /// continueInterceptedRequest must contain an authChallengeResponse.
+  final AuthChallenge authChallenge;
+
+  /// Response error if intercepted at response stage or if redirect occurred
+  /// while intercepting request.
+  final ErrorReason responseErrorReason;
+
+  /// Response code if intercepted at response stage or if redirect occurred while
+  /// intercepting request or auth retry occurred.
+  final int responseStatusCode;
+
+  /// Response headers if intercepted at the response stage or if redirect
+  /// occurred while intercepting request or auth retry occurred.
+  final Headers responseHeaders;
+
+  RequestInterceptedEvent({
+    @required this.interceptionId,
     @required this.request,
+    @required this.frameId,
+    @required this.resourceType,
+    @required this.isNavigationRequest,
+    this.redirectUrl,
+    this.authChallenge,
+    this.responseErrorReason,
+    this.responseStatusCode,
+    this.responseHeaders,
   });
 
-  factory WebSocketWillSendHandshakeRequestEvent.fromJson(Map json) {
-    return new WebSocketWillSendHandshakeRequestEvent(
-      requestId: new RequestId.fromJson(json['requestId']),
-      timestamp: new MonotonicTime.fromJson(json['timestamp']),
-      wallTime: new TimeSinceEpoch.fromJson(json['wallTime']),
-      request: new WebSocketRequest.fromJson(json['request']),
+  factory RequestInterceptedEvent.fromJson(Map json) {
+    return new RequestInterceptedEvent(
+      interceptionId: new InterceptionId.fromJson(json['interceptionId']),
+      request: new Request.fromJson(json['request']),
+      frameId: new page.FrameId.fromJson(json['frameId']),
+      resourceType: new page.ResourceType.fromJson(json['resourceType']),
+      isNavigationRequest: json['isNavigationRequest'],
+      redirectUrl: json.containsKey('redirectUrl') ? json['redirectUrl'] : null,
+      authChallenge: json.containsKey('authChallenge')
+          ? new AuthChallenge.fromJson(json['authChallenge'])
+          : null,
+      responseErrorReason: json.containsKey('responseErrorReason')
+          ? new ErrorReason.fromJson(json['responseErrorReason'])
+          : null,
+      responseStatusCode: json.containsKey('responseStatusCode')
+          ? json['responseStatusCode']
+          : null,
+      responseHeaders: json.containsKey('responseHeaders')
+          ? new Headers.fromJson(json['responseHeaders'])
+          : null,
     );
   }
 }
@@ -1225,7 +1218,8 @@ class TimeSinceEpoch {
   String toString() => value.toString();
 }
 
-/// Monotonically increasing time in seconds since an arbitrary point in the past.
+/// Monotonically increasing time in seconds since an arbitrary point in the
+/// past.
 class MonotonicTime {
   final num value;
 
@@ -1316,8 +1310,8 @@ class CookieSameSite {
 
 /// Timing information for the request.
 class ResourceTiming {
-  /// Timing's requestTime is a baseline in seconds, while the other numbers are ticks in
-  /// milliseconds relatively to this requestTime.
+  /// Timing's requestTime is a baseline in seconds, while the other numbers are
+  /// ticks in milliseconds relatively to this requestTime.
   final num requestTime;
 
   /// Started resolving proxy.
@@ -1468,16 +1462,14 @@ class Request {
   /// HTTP POST request data.
   final String postData;
 
-  /// True when the request has POST data. Note that postData might still be omitted when this flag is true when the data is too long.
-  final bool hasPostData;
-
   /// The mixed content type of the request.
   final security.MixedContentType mixedContentType;
 
   /// Priority of the resource request at the time request is sent.
   final ResourcePriority initialPriority;
 
-  /// The referrer policy of the request, as defined in https://www.w3.org/TR/referrer-policy/
+  /// The referrer policy of the request, as defined in
+  /// https://www.w3.org/TR/referrer-policy/
   final String referrerPolicy;
 
   /// Whether is loaded via link preload.
@@ -1488,7 +1480,6 @@ class Request {
     @required this.method,
     @required this.headers,
     this.postData,
-    this.hasPostData,
     this.mixedContentType,
     @required this.initialPriority,
     @required this.referrerPolicy,
@@ -1501,7 +1492,6 @@ class Request {
       method: json['method'],
       headers: new Headers.fromJson(json['headers']),
       postData: json.containsKey('postData') ? json['postData'] : null,
-      hasPostData: json.containsKey('hasPostData') ? json['hasPostData'] : null,
       mixedContentType: json.containsKey('mixedContentType')
           ? new security.MixedContentType.fromJson(json['mixedContentType'])
           : null,
@@ -1522,9 +1512,6 @@ class Request {
     };
     if (postData != null) {
       json['postData'] = postData;
-    }
-    if (hasPostData != null) {
-      json['hasPostData'] = hasPostData;
     }
     if (mixedContentType != null) {
       json['mixedContentType'] = mixedContentType.toJson();
@@ -1732,7 +1719,8 @@ class BlockedReason {
 
 /// HTTP response data.
 class Response {
-  /// Response URL. This URL can be different from CachedResource.url in case of redirect.
+  /// Response URL. This URL can be different from CachedResource.url in case of
+  /// redirect.
   final String url;
 
   /// HTTP response status code.
@@ -1750,7 +1738,8 @@ class Response {
   /// Resource mimeType as determined by the browser.
   final String mimeType;
 
-  /// Refined HTTP request headers that were actually transmitted over the network.
+  /// Refined HTTP request headers that were actually transmitted over the
+  /// network.
   final Headers requestHeaders;
 
   /// HTTP request headers text.
@@ -2067,11 +2056,12 @@ class Initiator {
   /// Initiator JavaScript stack trace, set for Script only.
   final runtime.StackTrace stack;
 
-  /// Initiator URL, set for Parser type or for Script type (when script is importing module).
+  /// Initiator URL, set for Parser type or for Script type (when script is
+  /// importing module).
   final String url;
 
-  /// Initiator line number, set for Parser type or for Script type (when script is importing
-  /// module) (0-based).
+  /// Initiator line number, set for Parser type or for Script type (when script
+  /// is importing module) (0-based).
   final num lineNumber;
 
   Initiator({
@@ -2198,8 +2188,8 @@ class CookieParam {
   /// Cookie value.
   final String value;
 
-  /// The request-URI to associate with the setting of the cookie. This value can affect the
-  /// default domain and path values of the created cookie.
+  /// The request-URI to associate with the setting of the cookie. This value can
+  /// affect the default domain and path values of the created cookie.
   final String url;
 
   /// Cookie domain.
@@ -2325,9 +2315,9 @@ class AuthChallenge {
 
 /// Response to an AuthChallenge.
 class AuthChallengeResponse {
-  /// The decision on what to do in response to the authorization challenge.  Default means
-  /// deferring to the default behavior of the net stack, which will likely either the Cancel
-  /// authentication or display a popup dialog box.
+  /// The decision on what to do in response to the authorization challenge.
+  /// Default means deferring to the default behavior of the net stack, which will
+  /// likely either the Cancel authentication or display a popup dialog box.
   final String response;
 
   /// The username to provide, possibly empty. Should only be set if response is
@@ -2366,8 +2356,9 @@ class AuthChallengeResponse {
   }
 }
 
-/// Stages of the interception to begin intercepting. Request will intercept before the request is
-/// sent. Response will intercept after the response is received.
+/// Stages of the interception to begin intercepting. Request will intercept
+/// before the request is sent. Response will intercept after the response is
+/// received.
 class InterceptionStage {
   static const InterceptionStage request = const InterceptionStage._('Request');
   static const InterceptionStage headersReceived =
@@ -2390,8 +2381,8 @@ class InterceptionStage {
 
 /// Request pattern for interception.
 class RequestPattern {
-  /// Wildcards ('*' -> zero or more, '?' -> exactly one) are allowed. Escape character is
-  /// backslash. Omitting is equivalent to "*".
+  /// Wildcards ('*' -> zero or more, '?' -> exactly one) are allowed. Escape
+  /// character is backslash. Omitting is equivalent to "*".
   final String urlPattern;
 
   /// If set, only requests for matching resource types will be intercepted.

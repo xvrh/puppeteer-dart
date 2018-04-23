@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'model.dart';
@@ -44,7 +45,7 @@ main() {
 
     StringBuffer code = new StringBuffer();
 
-    code.writeln(_toComment(domain.description));
+    code.writeln(toComment(domain.description));
     code.writeln();
 
     //TODO(xha): sort imports
@@ -118,17 +119,17 @@ class _Command {
     StringBuffer code = new StringBuffer();
 
     //TODO(xha): create a CommentBuilder to simplify and better manage the spacings between groups.
-    code.writeln(_toComment(command.description));
+    code.writeln(toComment(command.description));
     for (Parameter parameter in parameters) {
       String description = parameter.description;
       if (description != null && description.isNotEmpty) {
-        code.writeln(_toComment('[${parameter.name}] $description'));
+        code.writeln(toComment('[${parameter.name}] $description'));
       }
     }
     if (returns.length == 1) {
       String description = returns[0].description;
       if (description != null && description.isNotEmpty) {
-        code.writeln(_toComment('Return: ${description}'));
+        code.writeln(toComment('Return: ${description}'));
       }
     }
 
@@ -257,7 +258,7 @@ class _Event {
     }
 
     //TODO(xha): create a CommentBuilder to simplify and better manage the spacings between groups.
-    code.writeln(_toComment(event.description));
+    code.writeln(toComment(event.description));
 
     String streamName = 'on${firstLetterUpper(name)}';
     code.writeln(
@@ -332,7 +333,7 @@ class _InternalType {
 
     StringBuffer code = new StringBuffer();
 
-    code.writeln(_toComment(type.description));
+    code.writeln(toComment(type.description));
     code.writeln('class $id {');
 
     List<Parameter> properties = [];
@@ -365,7 +366,7 @@ class _InternalType {
     }
 
     for (Parameter property in properties) {
-      code.writeln(_toComment(property.description));
+      code.writeln(toComment(property.description));
       code.writeln(
           'final ${context.getPropertyType(property)} ${property.normalizedName};');
       code.writeln('');
@@ -535,11 +536,32 @@ class _DomainContext {
 bool isRawType(String type) =>
     const ['int', 'num', 'String', 'bool', 'dynamic', 'Map'].contains(type);
 
-String _toComment(String comment) {
+String toComment(String comment, {int lineLength: 76}) {
   if (comment != null && comment.isNotEmpty) {
-    comment = comment.replaceAll('\n', '\n/// ');
-    //TODO(xha): auto-split after 80 characters
-    return '/// $comment';
+    List<String> commentLines = [];
+
+    comment = comment.replaceAll('<code>', '`').replaceAll('</code>', '`');
+
+    for (String hardLine in LineSplitter.split(comment)) {
+      List<String> currentLine = [];
+      int currentLineLength = 0;
+      for (String word in hardLine.split(' ')) {
+        if (currentLine.isEmpty ||
+            currentLineLength + word.length < lineLength) {
+          currentLineLength += word.length + (currentLine.isEmpty ? 0 : 1);
+          currentLine.add(word);
+        } else {
+          commentLines.add(currentLine.join(' '));
+          currentLine = [word];
+          currentLineLength = word.length;
+        }
+      }
+      if (currentLine.isNotEmpty) {
+        commentLines.add(currentLine.join(' '));
+      }
+    }
+
+    return commentLines.map((line) => '/// $line').join('\n');
   } else {
     return '';
   }

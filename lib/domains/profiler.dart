@@ -31,7 +31,8 @@ class ProfilerDomain {
     await _client.send('Profiler.enable');
   }
 
-  /// Collect coverage data for the current isolate. The coverage data may be incomplete due to
+  /// Collect coverage data for the current isolate. The coverage data may be
+  /// incomplete due to
   /// garbage collection.
   /// Return: Coverage data for the current isolate.
   Future<List<ScriptCoverage>> getBestEffortCoverage() async {
@@ -41,7 +42,8 @@ class ProfilerDomain {
         .toList();
   }
 
-  /// Changes CPU profiler sampling interval. Must be called before CPU profiles recording started.
+  /// Changes CPU profiler sampling interval. Must be called before CPU profiles
+  /// recording started.
   /// [interval] New sampling interval in microseconds.
   Future setSamplingInterval(
     int interval,
@@ -56,10 +58,13 @@ class ProfilerDomain {
     await _client.send('Profiler.start');
   }
 
-  /// Enable precise code coverage. Coverage data for JavaScript executed before enabling precise code
-  /// coverage may be incomplete. Enabling prevents running optimized code and resets execution
+  /// Enable precise code coverage. Coverage data for JavaScript executed before
+  /// enabling precise code
+  /// coverage may be incomplete. Enabling prevents running optimized code and
+  /// resets execution
   /// counters.
-  /// [callCount] Collect accurate call counts beyond simple 'covered' or 'not covered'.
+  /// [callCount] Collect accurate call counts beyond simple 'covered' or 'not
+  /// covered'.
   /// [detailed] Collect block-based coverage.
   Future startPreciseCoverage({
     bool callCount,
@@ -86,7 +91,8 @@ class ProfilerDomain {
     return new Profile.fromJson(result['profile']);
   }
 
-  /// Disable precise code coverage. Disabling releases unnecessary execution count records and allows
+  /// Disable precise code coverage. Disabling releases unnecessary execution
+  /// count records and allows
   /// executing optimized code.
   Future stopPreciseCoverage() async {
     await _client.send('Profiler.stopPreciseCoverage');
@@ -97,7 +103,8 @@ class ProfilerDomain {
     await _client.send('Profiler.stopTypeProfile');
   }
 
-  /// Collect coverage data for the current isolate, and resets execution counters. Precise code
+  /// Collect coverage data for the current isolate, and resets execution
+  /// counters. Precise code
   /// coverage needs to have started.
   /// Return: Coverage data for the current isolate.
   Future<List<ScriptCoverage>> takePreciseCoverage() async {
@@ -169,7 +176,8 @@ class ConsoleProfileStartedEvent {
   }
 }
 
-/// Profile node. Holds callsite information, execution statistics and child nodes.
+/// Profile node. Holds callsite information, execution statistics and child
+/// nodes.
 class ProfileNode {
   /// Unique id of the node.
   final int id;
@@ -183,7 +191,8 @@ class ProfileNode {
   /// Child node ids.
   final List<int> children;
 
-  /// The reason of being not optimized. The function may be deoptimized or marked as don't
+  /// The reason of being not optimized. The function may be deoptimized or marked
+  /// as don't
   /// optimize.
   final String deoptReason;
 
@@ -251,7 +260,8 @@ class Profile {
   /// Ids of samples top nodes.
   final List<int> samples;
 
-  /// Time intervals between adjacent samples in microseconds. The first delta is relative to the
+  /// Time intervals between adjacent samples in microseconds. The first delta is
+  /// relative to the
   /// profile startTime.
   final List<int> timeDeltas;
 
@@ -495,7 +505,8 @@ class ScriptTypeProfile {
   /// JavaScript script name or url.
   final String url;
 
-  /// Type profile entries for parameters and return values of the functions in the script.
+  /// Type profile entries for parameters and return values of the functions in
+  /// the script.
   final List<TypeProfileEntry> entries;
 
   ScriptTypeProfile({

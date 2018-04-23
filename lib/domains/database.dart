@@ -13,14 +13,27 @@ class DatabaseDomain {
       .map(
           (Event event) => new Database.fromJson(event.parameters['database']));
 
-  /// Disables database tracking, prevents database events from being sent to the client.
+  /// Enables database tracking, database events will now be delivered to the
+  /// client.
+  Future enable() async {
+    await _client.send('Database.enable');
+  }
+
+  /// Disables database tracking, prevents database events from being sent to the
+  /// client.
   Future disable() async {
     await _client.send('Database.disable');
   }
 
-  /// Enables database tracking, database events will now be delivered to the client.
-  Future enable() async {
-    await _client.send('Database.enable');
+  Future<List<String>> getDatabaseTableNames(
+    DatabaseId databaseId,
+  ) async {
+    Map parameters = {
+      'databaseId': databaseId.toJson(),
+    };
+    Map result =
+        await _client.send('Database.getDatabaseTableNames', parameters);
+    return (result['tableNames'] as List).map((e) => e as String).toList();
   }
 
   Future<ExecuteSQLResult> executeSQL(
@@ -33,17 +46,6 @@ class DatabaseDomain {
     };
     Map result = await _client.send('Database.executeSQL', parameters);
     return new ExecuteSQLResult.fromJson(result);
-  }
-
-  Future<List<String>> getDatabaseTableNames(
-    DatabaseId databaseId,
-  ) async {
-    Map parameters = {
-      'databaseId': databaseId.toJson(),
-    };
-    Map result =
-        await _client.send('Database.getDatabaseTableNames', parameters);
-    return (result['tableNames'] as List).map((e) => e as String).toList();
   }
 }
 
