@@ -194,16 +194,6 @@ class TargetDomain {
     await _client.send('Target.sendMessageToTarget', parameters);
   }
 
-  /// [value] Whether to attach to frames.
-  Future setAttachToFrames(
-    bool value,
-  ) async {
-    Map parameters = {
-      'value': value,
-    };
-    await _client.send('Target.setAttachToFrames', parameters);
-  }
-
   /// Controls whether to automatically attach to new targets which are considered to be related to
   /// this one. When turned on, attaches to all existing related targets as well. When turned off,
   /// automatically detaches from all currently attached targets.

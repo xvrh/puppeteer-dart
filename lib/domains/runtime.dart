@@ -196,6 +196,7 @@ class RuntimeDomain {
   /// [userGesture] Whether execution should be treated as initiated by user in the UI.
   /// [awaitPromise] Whether execution should `await` for resulting value and return once awaited promise is
   /// resolved.
+  /// [throwOnSideEffect] Whether to throw an exception if side effect cannot be ruled out during evaluation.
   Future<EvaluateResult> evaluate(
     String expression, {
     String objectGroup,
@@ -206,6 +207,7 @@ class RuntimeDomain {
     bool generatePreview,
     bool userGesture,
     bool awaitPromise,
+    bool throwOnSideEffect,
   }) async {
     Map parameters = {
       'expression': expression,
@@ -233,6 +235,9 @@ class RuntimeDomain {
     }
     if (awaitPromise != null) {
       parameters['awaitPromise'] = awaitPromise;
+    }
+    if (throwOnSideEffect != null) {
+      parameters['throwOnSideEffect'] = throwOnSideEffect;
     }
     Map result = await _client.send('Runtime.evaluate', parameters);
     return new EvaluateResult.fromJson(result);
@@ -664,29 +669,22 @@ class RemoteObjectId {
   String toString() => value.toString();
 }
 
-/// Primitive value which cannot be JSON-stringified.
+/// Primitive value which cannot be JSON-stringified. Includes values `-0`, `NaN`, `Infinity`,
+/// `-Infinity`, and bigint literals.
 class UnserializableValue {
-  static const UnserializableValue infinity =
-      const UnserializableValue._('Infinity');
-  static const UnserializableValue naN = const UnserializableValue._('NaN');
-  static const UnserializableValue negativeInfinity =
-      const UnserializableValue._('-Infinity');
-  static const UnserializableValue negativeZero =
-      const UnserializableValue._('-0');
-  static const values = const {
-    'Infinity': infinity,
-    'NaN': naN,
-    '-Infinity': negativeInfinity,
-    '-0': negativeZero,
-  };
-
   final String value;
 
-  const UnserializableValue._(this.value);
+  UnserializableValue(this.value);
 
-  factory UnserializableValue.fromJson(String value) => values[value];
+  factory UnserializableValue.fromJson(String value) =>
+      new UnserializableValue(value);
 
   String toJson() => value;
+
+  bool operator ==(other) =>
+      other is UnserializableValue && other.value == value;
+
+  int get hashCode => value.hashCode;
 
   String toString() => value.toString();
 }

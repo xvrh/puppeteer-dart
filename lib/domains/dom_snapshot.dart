@@ -142,6 +142,9 @@ class DOMNode {
   /// Type of a pseudo element node.
   final dom.PseudoType pseudoType;
 
+  /// Shadow root type.
+  final dom.ShadowRootType shadowRootType;
+
   /// Whether this DOM node responds to mouse clicks. This includes nodes that have had click
   /// event listeners attached via JavaScript as well as anchor tags that naturally navigate when
   /// clicked.
@@ -177,6 +180,7 @@ class DOMNode {
     this.importedDocumentIndex,
     this.templateContentIndex,
     this.pseudoType,
+    this.shadowRootType,
     this.isClickable,
     this.eventListeners,
     this.currentSourceURL,
@@ -230,6 +234,9 @@ class DOMNode {
           : null,
       pseudoType: json.containsKey('pseudoType')
           ? new dom.PseudoType.fromJson(json['pseudoType'])
+          : null,
+      shadowRootType: json.containsKey('shadowRootType')
+          ? new dom.ShadowRootType.fromJson(json['shadowRootType'])
           : null,
       isClickable: json.containsKey('isClickable') ? json['isClickable'] : null,
       eventListeners: json.containsKey('eventListeners')
@@ -308,6 +315,9 @@ class DOMNode {
     if (pseudoType != null) {
       json['pseudoType'] = pseudoType.toJson();
     }
+    if (shadowRootType != null) {
+      json['shadowRootType'] = shadowRootType.toJson();
+    }
     if (isClickable != null) {
       json['isClickable'] = isClickable;
     }
@@ -327,10 +337,10 @@ class InlineTextBox {
   /// The absolute position bounding box.
   final dom.Rect boundingBox;
 
-  /// The starting index in characters, for this post layout textbox substring.
+  /// The starting index in characters, for this post layout textbox substring. Characters that would be represented as a surrogate pair in UTF-16 have length 2.
   final int startCharacterIndex;
 
-  /// The number of characters in this post layout textbox substring.
+  /// The number of characters in this post layout textbox substring. Characters that would be represented as a surrogate pair in UTF-16 have length 2.
   final int numCharacters;
 
   InlineTextBox({

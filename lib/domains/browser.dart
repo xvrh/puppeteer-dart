@@ -22,6 +22,14 @@ class BrowserDomain {
     return new GetVersionResult.fromJson(result);
   }
 
+  /// Returns the command line switches for the browser process if, and only if
+  /// --enable-automation is on the commandline.
+  /// Return: Commandline parameters
+  Future<List<String>> getBrowserCommandLine() async {
+    Map result = await _client.send('Browser.getBrowserCommandLine');
+    return (result['arguments'] as List).map((e) => e as String).toList();
+  }
+
   /// Get Chrome histograms.
   /// [query] Requested substring in name. Only histograms which have query as a
   /// substring in their name are extracted. An empty or absent query returns

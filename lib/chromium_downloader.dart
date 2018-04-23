@@ -5,7 +5,7 @@ import 'package:path/path.dart' as p;
 import 'package:http/http.dart' as http;
 import 'package:archive/archive.dart';
 
-const int _lastRevision = 526987;
+const int _lastRevision = 551292;
 
 Future<ChromiumPath> downloadChromium(
     {int revision: _lastRevision, String cachePath}) async {

@@ -17,9 +17,11 @@ class CSSDomain {
 
   CSSDomain(this._client);
 
-  /// Fires whenever a web font gets loaded.
-  Stream get onFontsUpdated =>
-      _client.onEvent.where((Event event) => event.name == 'CSS.fontsUpdated');
+  /// Fires whenever a web font is updated.  A non-empty font parameter indicates a successfully loaded
+  /// web font
+  Stream<FontFace> get onFontsUpdated => _client.onEvent
+      .where((Event event) => event.name == 'CSS.fontsUpdated')
+      .map((Event event) => new FontFace.fromJson(event.parameters['font']));
 
   /// Fires whenever a MediaQuery result changes (for example, after a browser window has been
   /// resized.) The current implementation considers only viewport-dependent media features.
@@ -295,7 +297,8 @@ class CSSDomain {
     await _client.send('CSS.startRuleUsageTracking');
   }
 
-  /// The list of rules with an indication of whether these were used
+  /// Stop tracking rule usage and return the list of rules that were used since last call to
+  /// `takeCoverageDelta` (or since start of coverage instrumentation)
   Future<List<RuleUsage>> stopRuleUsageTracking() async {
     Map result = await _client.send('CSS.stopRuleUsageTracking');
     return (result['ruleUsage'] as List)
@@ -1285,6 +1288,71 @@ class PlatformFontUsage {
       'familyName': familyName,
       'isCustomFont': isCustomFont,
       'glyphCount': glyphCount,
+    };
+    return json;
+  }
+}
+
+/// Properties of a web font: https://www.w3.org/TR/2008/REC-CSS2-20080411/fonts.html#font-descriptions
+class FontFace {
+  /// The font-family.
+  final String fontFamily;
+
+  /// The font-style.
+  final String fontStyle;
+
+  /// The font-variant.
+  final String fontVariant;
+
+  /// The font-weight.
+  final String fontWeight;
+
+  /// The font-stretch.
+  final String fontStretch;
+
+  /// The unicode-range.
+  final String unicodeRange;
+
+  /// The src.
+  final String src;
+
+  /// The resolved platform font family
+  final String platformFontFamily;
+
+  FontFace({
+    @required this.fontFamily,
+    @required this.fontStyle,
+    @required this.fontVariant,
+    @required this.fontWeight,
+    @required this.fontStretch,
+    @required this.unicodeRange,
+    @required this.src,
+    @required this.platformFontFamily,
+  });
+
+  factory FontFace.fromJson(Map json) {
+    return new FontFace(
+      fontFamily: json['fontFamily'],
+      fontStyle: json['fontStyle'],
+      fontVariant: json['fontVariant'],
+      fontWeight: json['fontWeight'],
+      fontStretch: json['fontStretch'],
+      unicodeRange: json['unicodeRange'],
+      src: json['src'],
+      platformFontFamily: json['platformFontFamily'],
+    );
+  }
+
+  Map toJson() {
+    Map json = {
+      'fontFamily': fontFamily,
+      'fontStyle': fontStyle,
+      'fontVariant': fontVariant,
+      'fontWeight': fontWeight,
+      'fontStretch': fontStretch,
+      'unicodeRange': unicodeRange,
+      'src': src,
+      'platformFontFamily': platformFontFamily,
     };
     return json;
   }

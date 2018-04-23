@@ -790,6 +790,9 @@ class RequestWillBeSentEvent {
   /// Frame identifier.
   final page.FrameId frameId;
 
+  /// Whether the request is initiated by a user gesture. Defaults to false.
+  final bool hasUserGesture;
+
   RequestWillBeSentEvent({
     @required this.requestId,
     @required this.loaderId,
@@ -801,6 +804,7 @@ class RequestWillBeSentEvent {
     this.redirectResponse,
     this.type,
     this.frameId,
+    this.hasUserGesture,
   });
 
   factory RequestWillBeSentEvent.fromJson(Map json) {
@@ -821,6 +825,8 @@ class RequestWillBeSentEvent {
       frameId: json.containsKey('frameId')
           ? new page.FrameId.fromJson(json['frameId'])
           : null,
+      hasUserGesture:
+          json.containsKey('hasUserGesture') ? json['hasUserGesture'] : null,
     );
   }
 }

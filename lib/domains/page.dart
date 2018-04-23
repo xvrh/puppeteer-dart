@@ -313,10 +313,12 @@ class PageDomain {
   /// [url] URL to navigate the page to.
   /// [referrer] Referrer URL.
   /// [transitionType] Intended transition type.
+  /// [frameId] Frame id to navigate, if not specified navigates the top frame.
   Future<NavigateResult> navigate(
     String url, {
     String referrer,
     TransitionType transitionType,
+    FrameId frameId,
   }) async {
     Map parameters = {
       'url': url,
@@ -326,6 +328,9 @@ class PageDomain {
     }
     if (transitionType != null) {
       parameters['transitionType'] = transitionType.toJson();
+    }
+    if (frameId != null) {
+      parameters['frameId'] = frameId.toJson();
     }
     Map result = await _client.send('Page.navigate', parameters);
     return new NavigateResult.fromJson(result);
@@ -367,6 +372,8 @@ class PageDomain {
   ///
   /// For example, <span class=title></span> would generate span containing the title.
   /// [footerTemplate] HTML template for the print footer. Should use the same format as the `headerTemplate`.
+  /// [preferCSSPageSize] Whether or not to prefer page size as defined by css. Defaults to false,
+  /// in which case the content will be scaled to fit the paper size.
   /// Return: Base64-encoded pdf data.
   Future<String> printToPDF({
     bool landscape,
@@ -383,6 +390,7 @@ class PageDomain {
     bool ignoreInvalidPageRanges,
     String headerTemplate,
     String footerTemplate,
+    bool preferCSSPageSize,
   }) async {
     Map parameters = {};
     if (landscape != null) {
@@ -426,6 +434,9 @@ class PageDomain {
     }
     if (footerTemplate != null) {
       parameters['footerTemplate'] = footerTemplate;
+    }
+    if (preferCSSPageSize != null) {
+      parameters['preferCSSPageSize'] = preferCSSPageSize;
     }
     Map result = await _client.send('Page.printToPDF', parameters);
     return result['data'];

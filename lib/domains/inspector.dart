@@ -17,6 +17,10 @@ class InspectorDomain {
   Stream get onTargetCrashed => _client.onEvent
       .where((Event event) => event.name == 'Inspector.targetCrashed');
 
+  /// Fired when debugging target has reloaded after crash
+  Stream get onTargetReloadedAfterCrash => _client.onEvent.where(
+      (Event event) => event.name == 'Inspector.targetReloadedAfterCrash');
+
   /// Disables inspector domain notifications.
   Future disable() async {
     await _client.send('Inspector.disable');
