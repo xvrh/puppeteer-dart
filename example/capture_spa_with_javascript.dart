@@ -1,6 +1,6 @@
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:chrome_dev_tools/chromium_downloader.dart';
-import 'package:chrome_dev_tools/domains/dom_snapshot.dart';
+import 'package:chrome_dev_tools/domains/runtime.dart';
 import 'package:chrome_dev_tools/src/wait_until.dart';
 import 'package:logging/logging.dart';
 
@@ -13,23 +13,17 @@ main() async {
       await Chromium.launch((await downloadChromium()).executablePath);
 
   TargetID targetId =
-      await chromium.targets.createTarget('https://www.google.com');
+      await chromium.targets.createTarget('https://news.ycombinator.com/news');
   Session session = await chromium.connection.createSession(targetId);
 
   await waitUntilNetworkIdle(session);
 
-  DOMSnapshotManager dom = new DOMSnapshotManager(session);
-  var result = await dom.getSnapshot([]);
+  RuntimeManager runtime = new RuntimeManager(session);
+  var result = await runtime.evaluate('document.documentElement.outerHTML;',
+      returnByValue: true);
 
-  for (DOMNode node in result.domNodes) {
-    String nodeString = '<${node.nodeName}';
-    if (node.attributes != null) {
-      nodeString +=
-          ' ${node.attributes.map((n) => '${n.name}=${n.value}').toList()}';
-    }
-    nodeString += '>';
-    print(nodeString);
-  }
+  String pageContent = result.result.value;
+  print(pageContent);
 
   await chromium.close();
 }

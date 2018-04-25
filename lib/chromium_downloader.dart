@@ -5,14 +5,13 @@ import 'package:path/path.dart' as p;
 import 'package:http/http.dart' as http;
 import 'package:archive/archive.dart';
 
-const int _lastRevision = 551292;
+const int _lastRevision = 553380;
 
 Future<ChromiumPath> downloadChromium(
     {int revision: _lastRevision, String cachePath}) async {
   cachePath ??= p.join(Directory.systemTemp.path, 'local-chromium');
 
-  Directory revisionDirectory =
-      new Directory(p.join(cachePath, revision.toString()));
+  Directory revisionDirectory = new Directory(p.join(cachePath, '$revision'));
   if (!revisionDirectory.existsSync()) {
     revisionDirectory.createSync(recursive: true);
   }
@@ -29,7 +28,14 @@ Future<ChromiumPath> downloadChromium(
     new File(zipPath).deleteSync();
   }
 
-  assert(executableFile.existsSync());
+  if (!executableFile.existsSync()) {
+    throw "$executablePath doesn't exist";
+  }
+
+  if (!Platform.isWindows) {
+    Process.runSync("chmod", ["+x", executableFile.absolute.path]);
+  }
+
   return new ChromiumPath(
       folderPath: revisionDirectory.path,
       executablePath: executableFile.path,
@@ -44,6 +50,18 @@ Future _downloadFile(String url, String output) async {
 }
 
 void _unzip(String path, String targetPath) {
+  if (Platform.isMacOS) {
+    // On Mac we cannot unzip with the simple approach in _simpleUnzip because
+    // we need to support symlinks
+    Process.runSync('unzip', [path, '-d', targetPath]);
+  } else {
+    _simpleUnzip(path, targetPath);
+  }
+}
+
+//TODO(xha): implement a more complet unzip
+//https://github.com/maxogden/extract-zip/blob/master/index.js
+void _simpleUnzip(String path, String targetPath) {
   Directory targetDirectory = new Directory(targetPath);
   if (targetDirectory.existsSync()) {
     targetDirectory.deleteSync(recursive: true);
@@ -63,13 +81,15 @@ void _unzip(String path, String targetPath) {
   }
 }
 
+const _baseUrl = 'https://storage.googleapis.com/chromium-browser-snapshots';
+
 String _downloadURLs(int revision) {
   if (Platform.isWindows) {
-    return 'https://storage.googleapis.com/chromium-browser-snapshots/Win_x64/$revision/chrome-win32.zip';
+    return '$_baseUrl/Win_x64/$revision/chrome-win32.zip';
   } else if (Platform.isLinux) {
-    return 'https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/$revision/chrome-linux.zip';
+    return '$_baseUrl/Linux_x64/$revision/chrome-linux.zip';
   } else if (Platform.isMacOS) {
-    return 'https://storage.googleapis.com/chromium-browser-snapshots/Mac/$revision/chrome-mac.zip';
+    return '$_baseUrl/Mac/$revision/chrome-mac.zip';
   } else {
     throw new UnsupportedError(
         "Can't download chromium for platform ${Platform.operatingSystem}");

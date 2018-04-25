@@ -4,6 +4,8 @@ import 'package:chrome_dev_tools/domains/runtime.dart';
 import 'package:chrome_dev_tools/src/connection.dart';
 
 Future getRemoteObject(Client client, RemoteObject remoteObject) async {
+  if (remoteObject.subtype == 'error') throw 'RemoteObject has error: ${remoteObject.description}';
+
   if (remoteObject.unserializableValue != null) {
     switch (remoteObject.unserializableValue.value) {
       case '-0':

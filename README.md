@@ -16,22 +16,35 @@ import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:chrome_dev_tools/chromium_downloader.dart';
 
 main() async {
+  // Setup a logger to output the chrome protocol
+  Logger.root
+    ..level = Level.ALL
+    ..onRecord.listen(print);
+  
   // Download a version of Chromium in a cache folder.
-  // Depending of your OS, you may need to add some execution permission.
-  String chromeExecutable = (await downloadChromium(revision: 497674)).executablePath;
+  // `downloadChromium` optionally take `revision` and `cacheFolder` to specify
+  // the particular version of Chromium and the cache folder where to download
+  // the binaries.
+  String chromeExecutable = (await downloadChromium()).executablePath;
+  
+  // Or just use an absolute path to an existing version of Chrome
+  chromeExecutable = r'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
-  // Launch a process and connect to the DevTools
-  Chromium chromium = await Chromium.launch(chromeExecutable, headless: true);
+  // Launch the `Chromium` process and connect to the DevTools
+  // By default it is start in `headless` mode
+  Chromium chromium = await Chromium.launch(chromeExecutable);
 
   // Open a new tab
   await chromium.targets.createTarget('https://www.github.com');
+  
+  // Do something (see examples bellow).
 
   // Kill the process
   await chromium.close();
 }
 ```
 
-### Generate a PDf from a page
+### Generate a PDF from a page
 
 ```dart
 import 'dart:convert';
@@ -42,6 +55,7 @@ import 'package:chrome_dev_tools/domains/target.dart';
 import 'package:chrome_dev_tools/src/wait_until.dart';
 
 main() async {
+  // Launch Chromium, see previous example
   Chromium chromium; // ....
   
   // Open github in a new tab
@@ -53,9 +67,8 @@ main() async {
   EmulationManager emulation = new EmulationManager(session);
   await emulation.setEmulatedMedia('screen');
 
-  // A small helper to wait until the network is quite
+  // A small helper to wait until the network is quiet
   await waitUntilNetworkIdle(session);
-
 
   // Capture the PDF and convert it to a List of bytes.
   PageManager page = new PageManager(session);
@@ -82,14 +95,16 @@ import 'package:chrome_dev_tools/src/remote_object.dart';
 import 'package:chrome_dev_tools/src/wait_until.dart';
 
 main() async {
+  // Launch chrome, open a page, wait for network. See previous examples
   Session session; // ...
 
-  await waitUntilNetworkIdle(session);
-
   RuntimeManager runtime = new RuntimeManager(session);
+  
+  // Execute some Javascript to get the rectangle that we want to capture
   var result = await runtime.evaluate(
       '''document.querySelector('form[action="/join"]').getBoundingClientRect();''');
 
+  // Helper to convert a "RemoteObject" to a Map
   Map rect = await getProperties(session, result.result);
 
   Viewport clip = new Viewport(
@@ -100,8 +115,11 @@ main() async {
       scale: 1);
 
   PageManager page = new PageManager(session);
+  
+  // Capture the screenshot with the clip region
   String screenshot = await page.captureScreenshot(clip: clip);
 
+  // Save it to a file
   await new File.fromUri(Platform.script.resolve('_github_form.png'))
       .writeAsBytes(BASE64.decode(screenshot));
 
@@ -112,6 +130,7 @@ main() async {
 ### Create a static version of a Single Page Application
 ```dart
 main() async {
+  // Launch chrome, open a page, wait for network. See previous examples
   Session session; //...
   
   // Take a snapshot of the DOM of the current page
@@ -120,6 +139,7 @@ main() async {
 
   // Iterate the nodes and output some html.
   // This example needs a lot more work
+  // Or see alternative way directly in javascript in example/capture_spa_with_javascript.dart
   for (DOMNode node in result.domNodes) {
     String nodeString = '<${node.nodeName}';
     if (node.attributes != null) {
