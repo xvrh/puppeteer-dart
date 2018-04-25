@@ -14,6 +14,7 @@ Download the last revision of chromium and launch it.
 ```dart
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:chrome_dev_tools/chromium_downloader.dart';
+import 'package:logging/logging.dart';
 
 main() async {
   // Setup a logger to output the chrome protocol

@@ -38,8 +38,8 @@ class Connection implements Client {
       Session session = _getSession(e.sessionId);
       session._onMessage(e.message);
     }));
-    _subscriptions.add(
-        _targets.onDetachedFromTarget.listen((DetachedFromTargetEvent e) {
+    _subscriptions
+        .add(_targets.onDetachedFromTarget.listen((DetachedFromTargetEvent e) {
       Session session = _getSession(e.sessionId);
       session._onClosed();
       _sessions.remove(session);
