@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:chrome_dev_tools/chromium_downloader.dart';
 import 'package:chrome_dev_tools/domains/page.dart';
@@ -14,7 +16,8 @@ main() {
   test('Can download and launch chromium', () async {
     String chromeExecutable = (await downloadChromium()).executablePath;
 
-    Chromium chromium = await Chromium.launch(chromeExecutable);
+    Chromium chromium =
+        await Chromium.launch(chromeExecutable, sandbox: !Platform.isLinux);
     try {
       //TODO(xha): replace by a local page
       TargetID targetId =
