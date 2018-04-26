@@ -1,5 +1,7 @@
 # chrome_dev_tools
 
+[![Build Status](https://travis-ci.org/xavierhainaux/chrome_dev_tools.svg?branch=master)](https://travis-ci.org/xavierhainaux/chrome_dev_tools)
+
 A Dart library to control Chrome over the DevTools Protocol.
 
 This is a simple 1:1 mapping with the [Chrome DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).  
