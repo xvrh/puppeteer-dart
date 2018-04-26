@@ -1,7 +1,7 @@
 _*
 .*
 !.gitignore
-!.travis.yaml
+!.travis.yml
 build/
 pubspec.lock
 
