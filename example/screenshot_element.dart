@@ -12,8 +12,7 @@ main() async {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen(print);
 
-  Chrome chrome =
-      await Chrome.launch((await downloadChrome()).executablePath);
+  Chrome chrome = await Chrome.launch((await downloadChrome()).executablePath);
 
   TargetID targetId =
       await chrome.targets.createTarget('https://www.github.com');

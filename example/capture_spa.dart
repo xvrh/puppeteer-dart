@@ -9,8 +9,7 @@ main() async {
     ..level = Level.ALL
     ..onRecord.listen(print);
 
-  Chrome chrome =
-      await Chrome.launch((await downloadChrome()).executablePath);
+  Chrome chrome = await Chrome.launch((await downloadChrome()).executablePath);
 
   TargetID targetId =
       await chrome.targets.createTarget('https://www.google.com');
