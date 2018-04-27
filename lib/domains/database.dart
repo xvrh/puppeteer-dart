@@ -18,8 +18,8 @@ class DatabaseManager {
     await _client.send('Database.enable');
   }
 
-  /// Disables database tracking, prevents database events from being sent to the
-  /// client.
+  /// Disables database tracking, prevents database events from being sent to
+  /// the client.
   Future disable() async {
     await _client.send('Database.disable');
   }

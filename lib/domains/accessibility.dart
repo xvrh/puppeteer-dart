@@ -13,8 +13,8 @@ class AccessibilityManager {
   /// [nodeId] ID of node to get the partial accessibility tree for.
   /// [fetchRelatives] Whether to fetch this nodes ancestors, siblings and
   /// children. Defaults to true.
-  /// Return: The `Accessibility.AXNode` for this DOM node, if it exists, plus its
-  /// ancestors, siblings and children, if requested.
+  /// Returns: The `Accessibility.AXNode` for this DOM node, if it exists, plus
+  /// its ancestors, siblings and children, if requested.
   Future<List<AXNode>> getPartialAXTree(
     dom.NodeId nodeId, {
     bool fetchRelatives,

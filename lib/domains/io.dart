@@ -47,7 +47,7 @@ class IOManager {
 
   /// Return UUID of Blob object specified by a remote object id.
   /// [objectId] Object id of a Blob object wrapper.
-  /// Return: UUID of the specified Blob.
+  /// Returns: UUID of the specified Blob.
   Future<String> resolveBlob(
     runtime.RemoteObjectId objectId,
   ) async {

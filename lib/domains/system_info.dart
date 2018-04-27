@@ -30,8 +30,8 @@ class GetInfoResult {
   /// this is, for example, '10.1'. Will be the empty string if not supported.
   final String modelVersion;
 
-  /// The command line string used to launch the browser. Will be the empty string
-  /// if not supported.
+  /// The command line string used to launch the browser. Will be the empty
+  /// string if not supported.
   final String commandLine;
 
   GetInfoResult({

@@ -15,8 +15,8 @@ class DOMSnapshotManager {
   /// Returns a document snapshot, including the full DOM tree of the root node
   /// (including iframes, template contents, and imported documents) in a
   /// flattened array, as well as layout and white-listed computed style
-  /// information for the nodes. Shadow DOM in the returned DOM tree is flattened.
-  ///
+  /// information for the nodes. Shadow DOM in the returned DOM tree is
+  /// flattened.
   /// [computedStyleWhitelist] Whitelist of computed styles to return.
   Future<GetSnapshotResult> getSnapshot(
     List<String> computedStyleWhitelist,
@@ -78,8 +78,8 @@ class DOMNode {
   /// Only set for input elements, contains the input's associated text value.
   final String inputValue;
 
-  /// Only set for radio and checkbox input elements, indicates if the element has
-  /// been checked
+  /// Only set for radio and checkbox input elements, indicates if the element
+  /// has been checked
   final bool inputChecked;
 
   /// Only set for option elements, indicates if the element has been selected
@@ -95,8 +95,8 @@ class DOMNode {
   /// Attributes of an `Element` node.
   final List<NameValue> attributes;
 
-  /// Indexes of pseudo elements associated with this node in the `domNodes` array
-  /// returned by `getSnapshot`, if any.
+  /// Indexes of pseudo elements associated with this node in the `domNodes`
+  /// array returned by `getSnapshot`, if any.
   final List<int> pseudoElementIndexes;
 
   /// The index of the node's related layout tree node in the `layoutTreeNodes`

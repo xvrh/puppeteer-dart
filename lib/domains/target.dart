@@ -43,8 +43,8 @@ class TargetManager {
       .map((Event event) =>
           new DetachedFromTargetEvent.fromJson(event.parameters));
 
-  /// Notifies about a new protocol message received from the session (as reported
-  /// in `attachedToTarget` event).
+  /// Notifies about a new protocol message received from the session (as
+  /// reported in `attachedToTarget` event).
   Stream<ReceivedMessageFromTargetEvent> get onReceivedMessageFromTarget =>
       _client.onEvent
           .where(
@@ -64,10 +64,10 @@ class TargetManager {
     await _client.send('Target.setDiscoverTargets', parameters);
   }
 
-  /// Controls whether to automatically attach to new targets which are considered
-  /// to be related to this one. When turned on, attaches to all existing related
-  /// targets as well. When turned off, automatically detaches from all currently
-  /// attached targets.
+  /// Controls whether to automatically attach to new targets which are
+  /// considered to be related to this one. When turned on, attaches to all
+  /// existing related targets as well. When turned off, automatically detaches
+  /// from all currently attached targets.
   /// [autoAttach] Whether to auto-attach to related targets.
   /// [waitForDebuggerOnStart] Whether to pause new targets when attaching to
   /// them. Use `Runtime.runIfWaitingForDebugger` to run paused targets.
@@ -157,7 +157,7 @@ class TargetManager {
   }
 
   /// Attaches to the target with given id.
-  /// Return: Id assigned to the session.
+  /// Returns: Id assigned to the session.
   Future<SessionID> attachToTarget(
     TargetID targetId,
   ) async {
@@ -185,9 +185,9 @@ class TargetManager {
     await _client.send('Target.detachFromTarget', parameters);
   }
 
-  /// Creates a new empty BrowserContext. Similar to an incognito profile but you
-  /// can have more than one.
-  /// Return: The id of the context created.
+  /// Creates a new empty BrowserContext. Similar to an incognito profile but
+  /// you can have more than one.
+  /// Returns: The id of the context created.
   Future<BrowserContextID> createBrowserContext() async {
     Map result = await _client.send('Target.createBrowserContext');
     return new BrowserContextID.fromJson(result['browserContextId']);
@@ -213,7 +213,7 @@ class TargetManager {
   /// [enableBeginFrameControl] Whether BeginFrames for this target will be
   /// controlled via DevTools (headless chrome only, not supported on MacOS yet,
   /// false by default).
-  /// Return: The id of the page opened.
+  /// Returns: The id of the page opened.
   Future<TargetID> createTarget(
     String url, {
     int width,
@@ -241,7 +241,7 @@ class TargetManager {
   }
 
   /// Retrieves a list of available targets.
-  /// Return: The list of targets.
+  /// Returns: The list of targets.
   Future<List<TargetInfo>> getTargets() async {
     Map result = await _client.send('Target.getTargets');
     return (result['targetInfos'] as List)

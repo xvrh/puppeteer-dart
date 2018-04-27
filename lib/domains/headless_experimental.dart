@@ -34,17 +34,17 @@ class HeadlessExperimentalManager {
   }
 
   /// Sends a BeginFrame to the target and returns when the frame was completed.
-  /// Optionally captures a screenshot from the resulting frame. Requires that the
-  /// target was created with enabled BeginFrameControl.
-  /// [frameTime] Timestamp of this BeginFrame (milliseconds since epoch). If not
-  /// set, the current time will be used.
+  /// Optionally captures a screenshot from the resulting frame. Requires that
+  /// the target was created with enabled BeginFrameControl.
+  /// [frameTime] Timestamp of this BeginFrame (milliseconds since epoch). If
+  /// not set, the current time will be used.
   /// [deadline] Deadline of this BeginFrame (milliseconds since epoch). If not
   /// set, the deadline will be calculated from the frameTime and interval.
   /// [interval] The interval between BeginFrames that is reported to the
   /// compositor, in milliseconds. Defaults to a 60 frames/second interval, i.e.
   /// about 16.666 milliseconds.
-  /// [screenshot] If set, a screenshot of the frame will be captured and returned
-  /// in the response. Otherwise, no screenshot will be captured.
+  /// [screenshot] If set, a screenshot of the frame will be captured and
+  /// returned in the response. Otherwise, no screenshot will be captured.
   Future<BeginFrameResult> beginFrame({
     runtime.Timestamp frameTime,
     runtime.Timestamp deadline,

@@ -71,8 +71,8 @@ class SecurityStateChangedEvent {
   final bool schemeIsCryptographic;
 
   /// List of explanations for the security state. If the overall security state
-  /// is `insecure` or `warning`, at least one corresponding explanation should be
-  /// included.
+  /// is `insecure` or `warning`, at least one corresponding explanation should
+  /// be included.
   final List<SecurityStateExplanation> explanations;
 
   /// Information about insecure content on the page.
@@ -251,8 +251,8 @@ class SecurityStateExplanation {
 
 /// Information about insecure content on the page.
 class InsecureContentStatus {
-  /// True if the page was loaded over HTTPS and ran mixed (HTTP) content such as
-  /// scripts.
+  /// True if the page was loaded over HTTPS and ran mixed (HTTP) content such
+  /// as scripts.
   final bool ranMixedContent;
 
   /// True if the page was loaded over HTTPS and displayed mixed (HTTP) content

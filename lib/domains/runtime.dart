@@ -87,14 +87,14 @@ class RuntimeManager {
   /// the result is
   /// inherited from the target object.
   /// [functionDeclaration] Declaration of the function to call.
-  /// [objectId] Identifier of the object to call function on. Either objectId or
-  /// executionContextId should
+  /// [objectId] Identifier of the object to call function on. Either objectId
+  /// or executionContextId should
   /// be specified.
   /// [arguments] Call arguments. All call arguments must belong to the same
   /// JavaScript world as the target
   /// object.
-  /// [silent] In silent mode exceptions thrown during evaluation are not reported
-  /// and do not pause
+  /// [silent] In silent mode exceptions thrown during evaluation are not
+  /// reported and do not pause
   /// execution. Overrides `setPauseOnException` state.
   /// [returnByValue] Whether the result is expected to be a JSON object which
   /// should be sent by value.
@@ -104,8 +104,8 @@ class RuntimeManager {
   /// [awaitPromise] Whether execution should `await` for resulting value and
   /// return once awaited promise is
   /// resolved.
-  /// [executionContextId] Specifies execution context which global object will be
-  /// used to call function on. Either
+  /// [executionContextId] Specifies execution context which global object will
+  /// be used to call function on. Either
   /// executionContextId or objectId should be specified.
   /// [objectGroup] Symbolic group name that can be used to release multiple
   /// objects. If objectGroup is not
@@ -160,8 +160,8 @@ class RuntimeManager {
   /// [expression] Expression to compile.
   /// [sourceURL] Source url to be set for the script.
   /// [persistScript] Specifies whether the compiled script should be persisted.
-  /// [executionContextId] Specifies in which execution context to perform script
-  /// run. If the parameter is omitted the
+  /// [executionContextId] Specifies in which execution context to perform
+  /// script run. If the parameter is omitted the
   /// evaluation will be performed in the context of the inspected page.
   Future<CompileScriptResult> compileScript(
     String expression,
@@ -193,8 +193,8 @@ class RuntimeManager {
 
   /// Enables reporting of execution contexts creation by means of
   /// `executionContextCreated` event.
-  /// When the reporting gets enabled the event will be sent immediately for each
-  /// existing execution
+  /// When the reporting gets enabled the event will be sent immediately for
+  /// each existing execution
   /// context.
   Future enable() async {
     await _client.send('Runtime.enable');
@@ -206,8 +206,8 @@ class RuntimeManager {
   /// objects.
   /// [includeCommandLineAPI] Determines whether Command Line API should be
   /// available during the evaluation.
-  /// [silent] In silent mode exceptions thrown during evaluation are not reported
-  /// and do not pause
+  /// [silent] In silent mode exceptions thrown during evaluation are not
+  /// reported and do not pause
   /// execution. Overrides `setPauseOnException` state.
   /// [contextId] Specifies in which execution context to perform evaluation. If
   /// the parameter is omitted the
@@ -274,7 +274,7 @@ class RuntimeManager {
   }
 
   /// Returns the isolate id.
-  /// Return: The isolate id.
+  /// Returns: The isolate id.
   Future<String> getIsolateId() async {
     Map result = await _client.send('Runtime.getIsolateId');
     return result['id'];
@@ -338,7 +338,7 @@ class RuntimeManager {
 
   /// [prototypeObjectId] Identifier of the prototype to return objects for.
   /// [objectGroup] Symbolic group name that can be used to release the results.
-  /// Return: Array with objects.
+  /// Returns: Array with objects.
   Future<RemoteObject> queryObjects(
     RemoteObjectId prototypeObjectId, {
     String objectGroup,
@@ -382,13 +382,13 @@ class RuntimeManager {
 
   /// Runs script with given id in a given context.
   /// [scriptId] Id of the script to run.
-  /// [executionContextId] Specifies in which execution context to perform script
-  /// run. If the parameter is omitted the
+  /// [executionContextId] Specifies in which execution context to perform
+  /// script run. If the parameter is omitted the
   /// evaluation will be performed in the context of the inspected page.
   /// [objectGroup] Symbolic group name that can be used to release multiple
   /// objects.
-  /// [silent] In silent mode exceptions thrown during evaluation are not reported
-  /// and do not pause
+  /// [silent] In silent mode exceptions thrown during evaluation are not
+  /// reported and do not pause
   /// execution. Overrides `setPauseOnException` state.
   /// [includeCommandLineAPI] Determines whether Command Line API should be
   /// available during the evaluation.
@@ -802,8 +802,8 @@ class RemoteObject {
   /// requested).
   final dynamic value;
 
-  /// Primitive value which can not be JSON-stringified does not have `value`, but
-  /// gets this
+  /// Primitive value which can not be JSON-stringified does not have `value`,
+  /// but gets this
   /// property.
   final UnserializableValue unserializableValue;
 
@@ -813,8 +813,8 @@ class RemoteObject {
   /// Unique object identifier (for non-primitive values).
   final RemoteObjectId objectId;
 
-  /// Preview containing abbreviated property values. Specified for `object` type
-  /// values only.
+  /// Preview containing abbreviated property values. Specified for `object`
+  /// type values only.
   final ObjectPreview preview;
 
   final CustomPreview customPreview;
@@ -1360,7 +1360,8 @@ class ExceptionDetails {
   /// Script ID of the exception location.
   final ScriptId scriptId;
 
-  /// URL of the exception location, to be used when the script was not reported.
+  /// URL of the exception location, to be used when the script was not
+  /// reported.
   final String url;
 
   /// JavaScript stack trace if available.
@@ -1521,18 +1522,20 @@ class CallFrame {
 
 /// Call frames for assertions or error messages.
 class StackTrace {
-  /// String label of this stack trace. For async traces this may be a name of the
-  /// function that
+  /// String label of this stack trace. For async traces this may be a name of
+  /// the function that
   /// initiated the async call.
   final String description;
 
   /// JavaScript function name.
   final List<CallFrame> callFrames;
 
-  /// Asynchronous JavaScript stack trace that preceded this stack, if available.
+  /// Asynchronous JavaScript stack trace that preceded this stack, if
+  /// available.
   final StackTrace parent;
 
-  /// Asynchronous JavaScript stack trace that preceded this stack, if available.
+  /// Asynchronous JavaScript stack trace that preceded this stack, if
+  /// available.
   final StackTraceId parentId;
 
   StackTrace({

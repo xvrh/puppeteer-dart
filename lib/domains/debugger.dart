@@ -64,7 +64,7 @@ class DebuggerManager {
   /// Enables debugger for the given page. Clients should not assume that the
   /// debugging has been
   /// enabled until the result for this command is received.
-  /// Return: Unique identifier of the debugger.
+  /// Returns: Unique identifier of the debugger.
   Future<runtime.UniqueDebuggerId> enable() async {
     Map result = await _client.send('Debugger.enable');
     return new runtime.UniqueDebuggerId.fromJson(result['debuggerId']);
@@ -79,8 +79,8 @@ class DebuggerManager {
   /// [includeCommandLineAPI] Specifies whether command line API should be
   /// available to the evaluated expression, defaults
   /// to false.
-  /// [silent] In silent mode exceptions thrown during evaluation are not reported
-  /// and do not pause
+  /// [silent] In silent mode exceptions thrown during evaluation are not
+  /// reported and do not pause
   /// execution. Overrides `setPauseOnException` state.
   /// [returnByValue] Whether the result is expected to be a JSON object that
   /// should be sent by value.
@@ -137,7 +137,7 @@ class DebuggerManager {
   /// of scripts is used as end of range.
   /// [restrictToFunction] Only consider locations which are in the same
   /// (non-nested) function as start.
-  /// Return: List of the possible breakpoint locations.
+  /// Returns: List of the possible breakpoint locations.
   Future<List<BreakLocation>> getPossibleBreakpoints(
     Location start, {
     Location end,
@@ -161,7 +161,7 @@ class DebuggerManager {
 
   /// Returns source for the script with given id.
   /// [scriptId] Id of the script to get source for.
-  /// Return: Script source.
+  /// Returns: Script source.
   Future<String> getScriptSource(
     runtime.ScriptId scriptId,
   ) async {
@@ -226,7 +226,8 @@ class DebuggerManager {
     await _client.send('Debugger.resume');
   }
 
-  /// This method is deprecated - use Debugger.stepInto with breakOnAsyncCall and
+  /// This method is deprecated - use Debugger.stepInto with breakOnAsyncCall
+  /// and
   /// Debugger.pauseOnAsyncTask instead. Steps into next scheduled async task if
   /// any is scheduled
   /// before next pause. Returns success when async task is actually scheduled,
@@ -241,7 +242,7 @@ class DebuggerManager {
   /// [query] String to search for.
   /// [caseSensitive] If true, search is case sensitive.
   /// [isRegex] If true, treats string parameter as regex.
-  /// Return: List of search matches.
+  /// Returns: List of search matches.
   Future<List<SearchMatch>> searchInContent(
     runtime.ScriptId scriptId,
     String query, {
@@ -277,8 +278,8 @@ class DebuggerManager {
     await _client.send('Debugger.setAsyncCallStackDepth', parameters);
   }
 
-  /// Replace previous blackbox patterns with passed ones. Forces backend to skip
-  /// stepping/pausing in
+  /// Replace previous blackbox patterns with passed ones. Forces backend to
+  /// skip stepping/pausing in
   /// scripts with url matching one of the patterns. VM will try to leave
   /// blackboxed script by
   /// performing 'step in' several times, finally resorting to 'step out' if
@@ -332,8 +333,8 @@ class DebuggerManager {
     return new SetBreakpointResult.fromJson(result);
   }
 
-  /// Sets JavaScript breakpoint at given location specified either by URL or URL
-  /// regex. Once this
+  /// Sets JavaScript breakpoint at given location specified either by URL or
+  /// URL regex. Once this
   /// command is issued, all existing parsed scripts will have breakpoints
   /// resolved and returned in
   /// `locations` property. Further matching script parsing will result in
@@ -387,7 +388,7 @@ class DebuggerManager {
   /// [condition] Expression to use as a breakpoint condition. When specified,
   /// debugger will
   /// stop on the breakpoint if this expression evaluates to true.
-  /// Return: Id of the created breakpoint for further reference.
+  /// Returns: Id of the created breakpoint for further reference.
   Future<BreakpointId> setBreakpointOnFunctionCall(
     runtime.RemoteObjectId objectId, {
     String condition,
@@ -427,7 +428,8 @@ class DebuggerManager {
     await _client.send('Debugger.setPauseOnExceptions', parameters);
   }
 
-  /// Changes return value in top frame. Available only at return break position.
+  /// Changes return value in top frame. Available only at return break
+  /// position.
   /// [newValue] New return value.
   Future setReturnValue(
     runtime.CallArgument newValue,
@@ -460,8 +462,8 @@ class DebuggerManager {
     return new SetScriptSourceResult.fromJson(result);
   }
 
-  /// Makes page not interrupt on any pauses (breakpoint, exception, dom exception
-  /// etc).
+  /// Makes page not interrupt on any pauses (breakpoint, exception, dom
+  /// exception etc).
   /// [skip] New value for skip pauses state.
   Future setSkipAllPauses(
     bool skip,
@@ -560,8 +562,8 @@ class PausedEvent {
   /// Async stack trace, if any.
   final runtime.StackTraceId asyncStackTraceId;
 
-  /// Just scheduled async call will have this stack trace as parent stack during
-  /// async execution.
+  /// Just scheduled async call will have this stack trace as parent stack
+  /// during async execution.
   /// This field is available only after `Debugger.stepInto` call with
   /// `breakOnAsynCall` flag.
   final runtime.StackTraceId asyncCallStackTraceId;
@@ -640,8 +642,8 @@ class ScriptFailedToParseEvent {
   /// This script length.
   final int length;
 
-  /// JavaScript top stack frame of where the script parsed event was triggered if
-  /// available.
+  /// JavaScript top stack frame of where the script parsed event was triggered
+  /// if available.
   final runtime.StackTrace stackTrace;
 
   ScriptFailedToParseEvent({
@@ -732,8 +734,8 @@ class ScriptParsedEvent {
   /// This script length.
   final int length;
 
-  /// JavaScript top stack frame of where the script parsed event was triggered if
-  /// available.
+  /// JavaScript top stack frame of where the script parsed event was triggered
+  /// if available.
   final runtime.StackTrace stackTrace;
 
   ScriptParsedEvent({
@@ -1109,8 +1111,8 @@ class Scope {
   /// Scope type.
   final String type;
 
-  /// Object representing the scope. For `global` and `with` scopes it represents
-  /// the actual
+  /// Object representing the scope. For `global` and `with` scopes it
+  /// represents the actual
   /// object; for the rest of the scopes, it is artificial transient object
   /// enumerating scope
   /// variables as its properties.

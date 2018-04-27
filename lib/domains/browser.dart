@@ -51,8 +51,8 @@ class BrowserManager {
 
   /// Get position and size of the browser window.
   /// [windowId] Browser window id.
-  /// Return: Bounds information of the window. When window state is 'minimized',
-  /// the restored window position and size are returned.
+  /// Returns: Bounds information of the window. When window state is
+  /// 'minimized', the restored window position and size are returned.
   Future<Bounds> getWindowBounds(
     WindowID windowId,
   ) async {

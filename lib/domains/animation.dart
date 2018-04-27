@@ -36,7 +36,7 @@ class AnimationManager {
   }
 
   /// Gets the playback rate of the document timeline.
-  /// Return: Playback rate for animations on page.
+  /// Returns: Playback rate for animations on page.
   Future<num> getPlaybackRate() async {
     Map result = await _client.send('Animation.getPlaybackRate');
     return result['playbackRate'];
@@ -55,7 +55,7 @@ class AnimationManager {
 
   /// Returns the current time of the an animation.
   /// [id] Id of animation.
-  /// Return: Current time of the page.
+  /// Returns: Current time of the page.
   Future<num> getCurrentTime(
     String id,
   ) async {
@@ -124,7 +124,7 @@ class AnimationManager {
 
   /// Gets the remote object of the Animation.
   /// [animationId] Animation id.
-  /// Return: Corresponding remote object.
+  /// Returns: Corresponding remote object.
   Future<runtime.RemoteObject> resolveAnimation(
     String animationId,
   ) async {
@@ -165,8 +165,8 @@ class Animation {
   /// `Animation`'s source animation node.
   final AnimationEffect source;
 
-  /// A unique ID for `Animation` representing the sources that triggered this CSS
-  /// animation/transition.
+  /// A unique ID for `Animation` representing the sources that triggered this
+  /// CSS animation/transition.
   final String cssId;
 
   Animation({
