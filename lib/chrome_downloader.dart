@@ -7,9 +7,9 @@ import 'package:archive/archive.dart';
 
 const int _lastRevision = 553380;
 
-Future<ChromiumPath> downloadChromium(
+Future<ChromePath> downloadChrome(
     {int revision: _lastRevision, String cachePath}) async {
-  cachePath ??= p.join(Directory.systemTemp.path, 'local-chromium');
+  cachePath ??= p.join(Directory.systemTemp.path, 'local-chrome');
 
   Directory revisionDirectory = new Directory(p.join(cachePath, '$revision'));
   if (!revisionDirectory.existsSync()) {
@@ -36,7 +36,7 @@ Future<ChromiumPath> downloadChromium(
     Process.runSync("chmod", ["+x", executableFile.absolute.path]);
   }
 
-  return new ChromiumPath(
+  return new ChromePath(
       folderPath: revisionDirectory.path,
       executablePath: executableFile.path,
       revision: revision);
@@ -92,7 +92,7 @@ String _downloadURLs(int revision) {
     return '$_baseUrl/Mac/$revision/chrome-mac.zip';
   } else {
     throw new UnsupportedError(
-        "Can't download chromium for platform ${Platform.operatingSystem}");
+        "Can't download chrome for platform ${Platform.operatingSystem}");
   }
 }
 
@@ -109,12 +109,12 @@ String _executablePath(String revisionPath) {
   }
 }
 
-class ChromiumPath {
+class ChromePath {
   final String executablePath;
   final String folderPath;
   final int revision;
 
-  ChromiumPath(
+  ChromePath(
       {@required this.executablePath,
       @required this.folderPath,
       @required this.revision});

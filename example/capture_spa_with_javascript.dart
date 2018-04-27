@@ -1,5 +1,5 @@
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/chromium_downloader.dart';
+import 'package:chrome_dev_tools/chrome_downloader.dart';
 import 'package:chrome_dev_tools/domains/runtime.dart';
 import 'package:chrome_dev_tools/src/wait_until.dart';
 import 'package:logging/logging.dart';
@@ -9,12 +9,12 @@ main() async {
     ..level = Level.ALL
     ..onRecord.listen(print);
 
-  Chromium chromium =
-      await Chromium.launch((await downloadChromium()).executablePath);
+  Chrome chrome =
+      await Chrome.launch((await downloadChrome()).executablePath);
 
   TargetID targetId =
-      await chromium.targets.createTarget('https://news.ycombinator.com/news');
-  Session session = await chromium.connection.createSession(targetId);
+      await chrome.targets.createTarget('https://news.ycombinator.com/news');
+  Session session = await chrome.connection.createSession(targetId);
 
   await waitUntilNetworkIdle(session);
 
@@ -25,5 +25,5 @@ main() async {
   String pageContent = result.result.value;
   print(pageContent);
 
-  await chromium.close();
+  await chrome.close();
 }

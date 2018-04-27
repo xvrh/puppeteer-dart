@@ -10,12 +10,12 @@ All the code in `lib/domains` are generated from the [browser_protocol.json](htt
 
 ## Usage
 
-### Launch Chromium
+### Launch Chrome
 
-Download the last revision of chromium and launch it.
+Download the last revision of chrome and launch it.
 ```dart
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/chromium_downloader.dart';
+import 'package:chrome_dev_tools/chrome_downloader.dart';
 import 'package:logging/logging.dart';
 
 main() async {
@@ -24,26 +24,26 @@ main() async {
     ..level = Level.ALL
     ..onRecord.listen(print);
   
-  // Download a version of Chromium in a cache folder.
-  // `downloadChromium` optionally take `revision` and `cacheFolder` to specify
-  // the particular version of Chromium and the cache folder where to download
+  // Download a version of Chrome in a cache folder.
+  // `downloadChrome` optionally take `revision` and `cacheFolder` to specify
+  // the particular version of Chrome and the cache folder where to download
   // the binaries.
-  String chromeExecutable = (await downloadChromium()).executablePath;
+  String chromeExecutable = (await downloadChrome()).executablePath;
   
   // Or just use an absolute path to an existing version of Chrome
   chromeExecutable = r'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
-  // Launch the `Chromium` process and connect to the DevTools
+  // Launch the `Chrome` process and connect to the DevTools
   // By default it is start in `headless` mode
-  Chromium chromium = await Chromium.launch(chromeExecutable);
+  Chrome chrome = await Chrome.launch(chromeExecutable);
 
   // Open a new tab
-  await chromium.targets.createTarget('https://www.github.com');
+  await chrome.targets.createTarget('https://www.github.com');
   
   // Do something (see examples bellow).
 
   // Kill the process
-  await chromium.close();
+  await chrome.close();
 }
 ```
 
@@ -58,13 +58,13 @@ import 'package:chrome_dev_tools/domains/target.dart';
 import 'package:chrome_dev_tools/src/wait_until.dart';
 
 main() async {
-  // Launch Chromium, see previous example
-  Chromium chromium; // ....
+  // Launch Chrome, see previous example
+  Chrome chrome; // ....
   
   // Open github in a new tab
-  TargetID targetId = await chromium.targets.createTarget(
+  TargetID targetId = await chrome.targets.createTarget(
       'https://www.github.com');
-  Session session = await chromium.connection.createSession(targetId);
+  Session session = await chrome.connection.createSession(targetId);
 
   // Force the "screen" media. Then CSS "@media print" won't change the look
   EmulationManager emulation = new EmulationManager(session);
@@ -91,7 +91,7 @@ main() async {
 import 'dart:convert';
 import 'dart:io';
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/chromium_downloader.dart';
+import 'package:chrome_dev_tools/chrome_downloader.dart';
 import 'package:chrome_dev_tools/domains/page.dart';
 import 'package:chrome_dev_tools/domains/runtime.dart';
 import 'package:chrome_dev_tools/src/remote_object.dart';
@@ -126,7 +126,7 @@ main() async {
   await new File.fromUri(Platform.script.resolve('_github_form.png'))
       .writeAsBytes(BASE64.decode(screenshot));
 
-  await chromium.close();
+  await chrome.close();
 }
 
 ```
