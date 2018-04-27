@@ -4,7 +4,9 @@ import '../tool/generate_domains.dart';
 
 main() {
   test('Split comment at specified length', () {
-    String result = toComment(r'''This is a long comment that should be split''', lineLength: 20);
+    String result = toComment(
+        r'''This is a long comment that should be split''',
+        lineLength: 20);
     expect(result, equals(r'''
 /// This is a long
 /// comment that should

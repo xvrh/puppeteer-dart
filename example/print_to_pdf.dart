@@ -13,11 +13,10 @@ main() async {
 
   String chromiumPath = (await downloadChromium()).executablePath;
 
-  Chromium chromium =
-      await Chromium.launch(chromiumPath, headless: true);
+  Chromium chromium = await Chromium.launch(chromiumPath, headless: true);
 
-  TargetID targetId = await chromium.targets.createTarget(
-      'https://www.github.com');
+  TargetID targetId =
+      await chromium.targets.createTarget('https://www.github.com');
   Session session = await chromium.connection.createSession(targetId);
 
   PageManager page = new PageManager(session);
