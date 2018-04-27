@@ -88,6 +88,7 @@ class DebuggerManager {
   /// [generatePreview] Whether preview should be generated for the result.
   /// [throwOnSideEffect] Whether to throw an exception if side effect cannot be
   /// ruled out during evaluation.
+  /// [timeout] Terminate execution after timing out (number of milliseconds).
   Future<EvaluateOnCallFrameResult> evaluateOnCallFrame(
     CallFrameId callFrameId,
     String expression, {
@@ -97,6 +98,7 @@ class DebuggerManager {
     bool returnByValue,
     bool generatePreview,
     bool throwOnSideEffect,
+    runtime.TimeDelta timeout,
   }) async {
     Map parameters = {
       'callFrameId': callFrameId.toJson(),
@@ -119,6 +121,9 @@ class DebuggerManager {
     }
     if (throwOnSideEffect != null) {
       parameters['throwOnSideEffect'] = throwOnSideEffect;
+    }
+    if (timeout != null) {
+      parameters['timeout'] = timeout.toJson();
     }
     Map result = await _client.send('Debugger.evaluateOnCallFrame', parameters);
     return new EvaluateOnCallFrameResult.fromJson(result);
@@ -374,6 +379,29 @@ class DebuggerManager {
     }
     Map result = await _client.send('Debugger.setBreakpointByUrl', parameters);
     return new SetBreakpointByUrlResult.fromJson(result);
+  }
+
+  /// Sets JavaScript breakpoint before each call to the given function.
+  /// If another function was created from the same source as a given one,
+  /// calling it will also trigger the breakpoint.
+  /// [objectId] Function object id.
+  /// [condition] Expression to use as a breakpoint condition. When specified,
+  /// debugger will
+  /// stop on the breakpoint if this expression evaluates to true.
+  /// Return: Id of the created breakpoint for further reference.
+  Future<BreakpointId> setBreakpointOnFunctionCall(
+    runtime.RemoteObjectId objectId, {
+    String condition,
+  }) async {
+    Map parameters = {
+      'objectId': objectId.toJson(),
+    };
+    if (condition != null) {
+      parameters['condition'] = condition;
+    }
+    Map result =
+        await _client.send('Debugger.setBreakpointOnFunctionCall', parameters);
+    return new BreakpointId.fromJson(result['breakpointId']);
   }
 
   /// Activates / deactivates all breakpoints on the page.
