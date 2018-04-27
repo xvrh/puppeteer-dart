@@ -50,16 +50,15 @@ Future _downloadFile(String url, String output) async {
 }
 
 void _unzip(String path, String targetPath) {
-  if (Platform.isMacOS) {
-    // On Mac we cannot unzip with the simple approach in _simpleUnzip because
-    // we need to support symlinks
+  if (Platform.isMacOS || Platform.isLinux) {
+    // The _simpleUnzip doesn't support symlinks so we prefer a native command
     Process.runSync('unzip', [path, '-d', targetPath]);
   } else {
     _simpleUnzip(path, targetPath);
   }
 }
 
-//TODO(xha): implement a more complet unzip
+//TODO(xha): implement a more complete unzip
 //https://github.com/maxogden/extract-zip/blob/master/index.js
 void _simpleUnzip(String path, String targetPath) {
   Directory targetDirectory = new Directory(targetPath);
