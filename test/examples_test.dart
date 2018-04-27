@@ -14,8 +14,7 @@ main() {
       f is File &&
       f.path.endsWith('.dart') &&
       !p.basename(f.path).startsWith('_'))) {
-    String fileName = p.basenameWithoutExtension(exampleFile.path);
-    test('Text example $fileName', () {
+    test('Text example/${p.basename(exampleFile.path)}', () {
       var result = Process.runSync(
           Platform.resolvedExecutable, [exampleFile.absolute.path],
           environment: envVariables);
