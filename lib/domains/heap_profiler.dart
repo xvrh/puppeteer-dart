@@ -22,8 +22,8 @@ class HeapProfilerManager {
 
   /// If heap objects tracking has been started then backend regularly sends a
   /// current value for last
-  /// seen object id and corresponding timestamp. If the were changes in the heap
-  /// since last event
+  /// seen object id and corresponding timestamp. If the were changes in the
+  /// heap since last event
   /// then one or more heapStatsUpdate events will be sent before a new
   /// lastSeenObjectId event.
   Stream<LastSeenObjectIdEvent> get onLastSeenObjectId => _client.onEvent
@@ -41,8 +41,8 @@ class HeapProfilerManager {
   Stream get onResetProfiles => _client.onEvent
       .where((Event event) => event.name == 'HeapProfiler.resetProfiles');
 
-  /// Enables console to refer to the node with given id via $x (see Command Line
-  /// API for more details
+  /// Enables console to refer to the node with given id via $x (see Command
+  /// Line API for more details
   /// $x functions).
   /// [heapObjectId] Heap snapshot object id to be accessible by means of $x
   /// command line API.
@@ -68,7 +68,7 @@ class HeapProfilerManager {
   }
 
   /// [objectId] Identifier of the object to get heap object id for.
-  /// Return: Id of the heap snapshot object corresponding to the passed remote
+  /// Returns: Id of the heap snapshot object corresponding to the passed remote
   /// object id.
   Future<HeapSnapshotObjectId> getHeapObjectId(
     runtime.RemoteObjectId objectId,
@@ -82,7 +82,7 @@ class HeapProfilerManager {
 
   /// [objectGroup] Symbolic group name that can be used to release multiple
   /// objects.
-  /// Return: Evaluation result.
+  /// Returns: Evaluation result.
   Future<runtime.RemoteObject> getObjectByHeapObjectId(
     HeapSnapshotObjectId objectId, {
     String objectGroup,
@@ -98,14 +98,14 @@ class HeapProfilerManager {
     return new runtime.RemoteObject.fromJson(result['result']);
   }
 
-  /// Return: Return the sampling profile being collected.
+  /// Returns: Return the sampling profile being collected.
   Future<SamplingHeapProfile> getSamplingProfile() async {
     Map result = await _client.send('HeapProfiler.getSamplingProfile');
     return new SamplingHeapProfile.fromJson(result['profile']);
   }
 
-  /// [samplingInterval] Average sample interval in bytes. Poisson distribution is
-  /// used for the intervals. The
+  /// [samplingInterval] Average sample interval in bytes. Poisson distribution
+  /// is used for the intervals. The
   /// default value is 32768 bytes.
   Future startSampling({
     num samplingInterval,
@@ -127,7 +127,7 @@ class HeapProfilerManager {
     await _client.send('HeapProfiler.startTrackingHeapObjects', parameters);
   }
 
-  /// Return: Recorded sampling heap profile.
+  /// Returns: Recorded sampling heap profile.
   Future<SamplingHeapProfile> stopSampling() async {
     Map result = await _client.send('HeapProfiler.stopSampling');
     return new SamplingHeapProfile.fromJson(result['profile']);

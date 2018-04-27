@@ -120,17 +120,17 @@ class _Command {
     StringBuffer code = new StringBuffer();
 
     //TODO(xha): create a CommentBuilder to simplify and better manage the spacings between groups.
-    code.writeln(toComment(command.description));
+    code.writeln(toComment(command.description, indent: 2));
     for (Parameter parameter in parameters) {
       String description = parameter.description;
       if (description != null && description.isNotEmpty) {
-        code.writeln(toComment('[${parameter.name}] $description'));
+        code.writeln(toComment('[${parameter.name}] $description', indent: 2));
       }
     }
     if (returns.length == 1) {
       String description = returns[0].description;
       if (description != null && description.isNotEmpty) {
-        code.writeln(toComment('Return: $description'));
+        code.writeln(toComment('Returns: $description', indent: 2));
       }
     }
 
@@ -259,7 +259,7 @@ class _Event {
     }
 
     //TODO(xha): create a CommentBuilder to simplify and better manage the spacings between groups.
-    code.writeln(toComment(event.description));
+    code.writeln(toComment(event.description, indent: 2));
 
     String streamName = 'on${firstLetterUpper(name)}';
     code.writeln(
@@ -367,7 +367,7 @@ class _InternalType {
     }
 
     for (Parameter property in properties) {
-      code.writeln(toComment(property.description));
+      code.writeln(toComment(property.description, indent: 2));
       code.writeln(
           'final ${context.getPropertyType(property)} ${property.normalizedName};');
       code.writeln('');
@@ -549,18 +549,21 @@ class _DomainContext {
 bool isRawType(String type) =>
     const ['int', 'num', 'String', 'bool', 'dynamic', 'Map'].contains(type);
 
-String toComment(String comment, {int lineLength: 76}) {
+String toComment(String comment, {int indent: 0, int lineLength: 80}) {
   if (comment != null && comment.isNotEmpty) {
     List<String> commentLines = [];
 
     comment = comment.replaceAll('<code>', '`').replaceAll('</code>', '`');
+
+    const String docStarter = '/// ';
+    int maxLineLength = lineLength - indent - docStarter.length;
 
     for (String hardLine in LineSplitter.split(comment)) {
       List<String> currentLine = [];
       int currentLineLength = 0;
       for (String word in hardLine.split(' ')) {
         if (currentLine.isEmpty ||
-            currentLineLength + word.length < lineLength) {
+            currentLineLength + word.length < maxLineLength) {
           currentLineLength += word.length + (currentLine.isEmpty ? 0 : 1);
           currentLine.add(word);
         } else {
@@ -574,7 +577,9 @@ String toComment(String comment, {int lineLength: 76}) {
       }
     }
 
-    return commentLines.map((line) => '/// $line').join('\n');
+    return commentLines
+        .map((line) => '${' ' * indent}$docStarter$line')
+        .join('\n');
   } else {
     return '';
   }

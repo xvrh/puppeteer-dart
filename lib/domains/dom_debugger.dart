@@ -43,8 +43,8 @@ class DOMDebuggerManager {
 
   /// Sets breakpoint on particular DOM event.
   /// [eventName] DOM Event name to stop on (any DOM event will do).
-  /// [targetName] EventTarget interface name to stop on. If equal to `"*"` or not
-  /// provided, will stop on any EventTarget.
+  /// [targetName] EventTarget interface name to stop on. If equal to `"*"` or
+  /// not provided, will stop on any EventTarget.
   Future setEventListenerBreakpoint(
     String eventName, {
     String targetName,
@@ -98,8 +98,8 @@ class DOMDebuggerManager {
   }
 
   /// Sets breakpoint on XMLHttpRequest.
-  /// [url] Resource URL substring. All XHRs having this substring in the URL will
-  /// get stopped upon.
+  /// [url] Resource URL substring. All XHRs having this substring in the URL
+  /// will get stopped upon.
   Future setXHRBreakpoint(
     String url,
   ) async {
@@ -126,9 +126,9 @@ class DOMDebuggerManager {
   /// defaults to 1. Use -1 for the entire subtree or provide an integer larger
   /// than 0.
   /// [pierce] Whether or not iframes and shadow roots should be traversed when
-  /// returning the subtree (default is false). Reports listeners for all contexts
-  /// if pierce is enabled.
-  /// Return: Array of relevant listeners.
+  /// returning the subtree (default is false). Reports listeners for all
+  /// contexts if pierce is enabled.
+  /// Returns: Array of relevant listeners.
   Future<List<EventListener>> getEventListeners(
     runtime.RemoteObjectId objectId, {
     int depth,

@@ -20,7 +20,7 @@ class IndexedDBManager {
 
   /// Requests database names for given security origin.
   /// [securityOrigin] Security origin.
-  /// Return: Database names for origin.
+  /// Returns: Database names for origin.
   Future<List<String>> requestDatabaseNames(
     String securityOrigin,
   ) async {
@@ -35,7 +35,7 @@ class IndexedDBManager {
   /// Requests database with given name in given frame.
   /// [securityOrigin] Security origin.
   /// [databaseName] Database name.
-  /// Return: Database with an array of object stores.
+  /// Returns: Database with an array of object stores.
   Future<DatabaseWithObjectStores> requestDatabase(
     String securityOrigin,
     String databaseName,

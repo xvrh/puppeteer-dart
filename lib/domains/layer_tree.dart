@@ -31,8 +31,8 @@ class LayerTreeManager {
   /// Provides the reasons why the given layer was composited.
   /// [layerId] The id of the layer for which we want to get the reasons it was
   /// composited.
-  /// Return: A list of strings specifying reasons for the given layer to become
-  /// composited.
+  /// Returns: A list of strings specifying reasons for the given layer to
+  /// become composited.
   Future<List<String>> compositingReasons(
     LayerId layerId,
   ) async {
@@ -47,7 +47,7 @@ class LayerTreeManager {
 
   /// Returns the layer snapshot identifier.
   /// [layerId] The id of the layer.
-  /// Return: The id of the layer snapshot.
+  /// Returns: The id of the layer snapshot.
   Future<SnapshotId> makeSnapshot(
     LayerId layerId,
   ) async {
@@ -60,7 +60,7 @@ class LayerTreeManager {
 
   /// Returns the snapshot identifier.
   /// [tiles] An array of tiles composing the snapshot.
-  /// Return: The id of the snapshot.
+  /// Returns: The id of the snapshot.
   Future<SnapshotId> loadSnapshot(
     List<PictureTile> tiles,
   ) async {
@@ -87,7 +87,7 @@ class LayerTreeManager {
   /// not specified).
   /// [minDuration] The minimum duration (in seconds) to replay the snapshot.
   /// [clipRect] The clip rectangle to apply when replaying the snapshot.
-  /// Return: The array of paint profiles, one per run.
+  /// Returns: The array of paint profiles, one per run.
   Future<List<PaintProfile>> profileSnapshot(
     SnapshotId snapshotId, {
     int minRepeatCount,
@@ -114,11 +114,12 @@ class LayerTreeManager {
 
   /// Replays the layer snapshot and returns the resulting bitmap.
   /// [snapshotId] The id of the layer snapshot.
-  /// [fromStep] The first step to replay from (replay from the very start if not
+  /// [fromStep] The first step to replay from (replay from the very start if
+  /// not specified).
+  /// [toStep] The last step to replay to (replay till the end if not
   /// specified).
-  /// [toStep] The last step to replay to (replay till the end if not specified).
   /// [scale] The scale to apply while replaying (defaults to 1).
-  /// Return: A data: URL for resulting image.
+  /// Returns: A data: URL for resulting image.
   Future<String> replaySnapshot(
     SnapshotId snapshotId, {
     int fromStep,
@@ -143,7 +144,7 @@ class LayerTreeManager {
 
   /// Replays the layer snapshot and returns canvas log.
   /// [snapshotId] The id of the layer snapshot.
-  /// Return: The array of canvas function calls.
+  /// Returns: The array of canvas function calls.
   Future<List<Map>> snapshotCommandLog(
     SnapshotId snapshotId,
   ) async {

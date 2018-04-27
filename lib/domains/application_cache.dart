@@ -22,7 +22,7 @@ class ApplicationCacheManager {
 
   /// Returns array of frame identifiers with manifest urls for each frame
   /// containing a document associated with some application cache.
-  /// Return: Array of frame identifiers with manifest urls for each frame
+  /// Returns: Array of frame identifiers with manifest urls for each frame
   /// containing a document associated with some application cache.
   Future<List<FrameWithManifest>> getFramesWithManifests() async {
     Map result = await _client.send('ApplicationCache.getFramesWithManifests');
@@ -39,7 +39,7 @@ class ApplicationCacheManager {
   /// Returns manifest URL for document in the given frame.
   /// [frameId] Identifier of the frame containing document whose manifest is
   /// retrieved.
-  /// Return: Manifest URL for document in the given frame.
+  /// Returns: Manifest URL for document in the given frame.
   Future<String> getManifestForFrame(
     page.FrameId frameId,
   ) async {
@@ -54,7 +54,7 @@ class ApplicationCacheManager {
   /// Returns relevant application cache data for the document in given frame.
   /// [frameId] Identifier of the frame containing document whose application
   /// cache is retrieved.
-  /// Return: Relevant application cache data for the document in given frame.
+  /// Returns: Relevant application cache data for the document in given frame.
   Future<ApplicationCache> getApplicationCacheForFrame(
     page.FrameId frameId,
   ) async {
@@ -68,8 +68,8 @@ class ApplicationCacheManager {
 }
 
 class ApplicationCacheStatusUpdatedEvent {
-  /// Identifier of the frame containing document whose application cache updated
-  /// status.
+  /// Identifier of the frame containing document whose application cache
+  /// updated status.
   final page.FrameId frameId;
 
   /// Manifest URL.

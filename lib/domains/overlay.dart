@@ -120,12 +120,12 @@ class OverlayManager {
     await _client.send('Overlay.setSuspended', parameters);
   }
 
-  /// Enters the 'inspect' mode. In this mode, elements that user is hovering over
-  /// are highlighted. Backend then generates 'inspectNodeRequested' event upon
-  /// element selection.
+  /// Enters the 'inspect' mode. In this mode, elements that user is hovering
+  /// over are highlighted. Backend then generates 'inspectNodeRequested' event
+  /// upon element selection.
   /// [mode] Set an inspection mode.
-  /// [highlightConfig] A descriptor for the highlight appearance of hovered-over
-  /// nodes. May be omitted if `enabled == false`.
+  /// [highlightConfig] A descriptor for the highlight appearance of
+  /// hovered-over nodes. May be omitted if `enabled == false`.
   Future setInspectMode(
     InspectMode mode, {
     HighlightConfig highlightConfig,
@@ -221,7 +221,8 @@ class OverlayManager {
 
   /// Highlights owner element of the frame with given id.
   /// [frameId] Identifier of the frame to highlight.
-  /// [contentColor] The content box highlight fill color (default: transparent).
+  /// [contentColor] The content box highlight fill color (default:
+  /// transparent).
   /// [contentOutlineColor] The content box highlight outline color (default:
   /// transparent).
   Future highlightFrame(
@@ -248,7 +249,7 @@ class OverlayManager {
 
   /// For testing.
   /// [nodeId] Id of the node to get highlight object for.
-  /// Return: Highlight data for the node.
+  /// Returns: Highlight data for the node.
   Future<Map> getHighlightObjectForTest(
     dom.NodeId nodeId,
   ) async {

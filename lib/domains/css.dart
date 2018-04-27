@@ -28,7 +28,8 @@ class CSSManager {
   Stream get onFontsUpdated =>
       _client.onEvent.where((Event event) => event.name == 'CSS.fontsUpdated');
 
-  /// Fired whenever a stylesheet is changed as a result of the client operation.
+  /// Fired whenever a stylesheet is changed as a result of the client
+  /// operation.
   Stream<StyleSheetId> get onStyleSheetChanged => _client.onEvent
       .where((Event event) => event.name == 'CSS.styleSheetChanged')
       .map((Event event) =>
@@ -46,8 +47,9 @@ class CSSManager {
       .map((Event event) =>
           new StyleSheetId.fromJson(event.parameters['styleSheetId']));
 
-  /// Enables the CSS agent for the given page. Clients should not assume that the
-  /// CSS agent has been enabled until the result of this command is received.
+  /// Enables the CSS agent for the given page. Clients should not assume that
+  /// the CSS agent has been enabled until the result of this command is
+  /// received.
   Future enable() async {
     await _client.send('CSS.enable');
   }
@@ -81,7 +83,7 @@ class CSSManager {
   }
 
   /// Returns the computed style for a DOM node identified by `nodeId`.
-  /// Return: Computed style for the specified DOM node.
+  /// Returns: Computed style for the specified DOM node.
   Future<List<CSSComputedStyleProperty>> getComputedStyleForNode(
     dom.NodeId nodeId,
   ) async {
@@ -96,7 +98,7 @@ class CSSManager {
 
   /// Requests information about platform fonts which we used to render child
   /// TextNodes in the given node.
-  /// Return: Usage statistics for every employed platform font.
+  /// Returns: Usage statistics for every employed platform font.
   Future<List<PlatformFontUsage>> getPlatformFontsForNode(
     dom.NodeId nodeId,
   ) async {
@@ -110,7 +112,7 @@ class CSSManager {
   }
 
   /// Returns the current textual content and the URL for a stylesheet.
-  /// Return: The stylesheet text.
+  /// Returns: The stylesheet text.
   Future<String> getStyleSheetText(
     StyleSheetId styleSheetId,
   ) async {
@@ -122,7 +124,7 @@ class CSSManager {
   }
 
   /// Returns all class names from specified stylesheet.
-  /// Return: Class name list.
+  /// Returns: Class name list.
   Future<List<String>> collectClassNames(
     StyleSheetId styleSheetId,
   ) async {
@@ -134,7 +136,7 @@ class CSSManager {
   }
 
   /// Sets the new stylesheet text.
-  /// Return: URL of source map associated with script (if any).
+  /// Returns: URL of source map associated with script (if any).
   Future<String> setStyleSheetText(
     StyleSheetId styleSheetId,
     String text,
@@ -148,7 +150,7 @@ class CSSManager {
   }
 
   /// Modifies the rule selector.
-  /// Return: The resulting selector list after modification.
+  /// Returns: The resulting selector list after modification.
   Future<SelectorList> setRuleSelector(
     StyleSheetId styleSheetId,
     SourceRange range,
@@ -164,7 +166,7 @@ class CSSManager {
   }
 
   /// Modifies the keyframe rule key text.
-  /// Return: The resulting key text after modification.
+  /// Returns: The resulting key text after modification.
   Future<Value> setKeyframeKey(
     StyleSheetId styleSheetId,
     SourceRange range,
@@ -180,7 +182,7 @@ class CSSManager {
   }
 
   /// Applies specified style edits one after another in the given order.
-  /// Return: The resulting styles after modification.
+  /// Returns: The resulting styles after modification.
   Future<List<CSSStyle>> setStyleTexts(
     List<StyleDeclarationEdit> edits,
   ) async {
@@ -194,7 +196,7 @@ class CSSManager {
   }
 
   /// Modifies the rule selector.
-  /// Return: The resulting CSS media rule after modification.
+  /// Returns: The resulting CSS media rule after modification.
   Future<CSSMedia> setMediaText(
     StyleSheetId styleSheetId,
     SourceRange range,
@@ -211,9 +213,9 @@ class CSSManager {
 
   /// Creates a new special "via-inspector" stylesheet in the frame with given
   /// `frameId`.
-  /// [frameId] Identifier of the frame where "via-inspector" stylesheet should be
-  /// created.
-  /// Return: Identifier of the created "via-inspector" stylesheet.
+  /// [frameId] Identifier of the frame where "via-inspector" stylesheet should
+  /// be created.
+  /// Returns: Identifier of the created "via-inspector" stylesheet.
   Future<StyleSheetId> createStyleSheet(
     page.FrameId frameId,
   ) async {
@@ -230,7 +232,7 @@ class CSSManager {
   /// inserted.
   /// [ruleText] The text of a new rule.
   /// [location] Text position of a new rule in the target style sheet.
-  /// Return: The newly created rule.
+  /// Returns: The newly created rule.
   Future<CSSRule> addRule(
     StyleSheetId styleSheetId,
     String ruleText,
@@ -245,8 +247,8 @@ class CSSManager {
     return new CSSRule.fromJson(result['rule']);
   }
 
-  /// Ensures that the given node will have specified pseudo-classes whenever its
-  /// style is computed by the browser.
+  /// Ensures that the given node will have specified pseudo-classes whenever
+  /// its style is computed by the browser.
   /// [nodeId] The element id for which to force the pseudo state.
   /// [forcedPseudoClasses] Element pseudo classes to force when computing the
   /// element's style.
@@ -408,23 +410,23 @@ class GetInlineStylesForNodeResult {
 
 class GetBackgroundColorsResult {
   /// The range of background colors behind this element, if it contains any
-  /// visible text. If no visible text is present, this will be undefined. In the
-  /// case of a flat background color, this will consist of simply that color. In
-  /// the case of a gradient, this will consist of each of the color stops. For
-  /// anything more complicated, this will be an empty array. Images will be
-  /// ignored (as if the image had failed to load).
+  /// visible text. If no visible text is present, this will be undefined. In
+  /// the case of a flat background color, this will consist of simply that
+  /// color. In the case of a gradient, this will consist of each of the color
+  /// stops. For anything more complicated, this will be an empty array. Images
+  /// will be ignored (as if the image had failed to load).
   final List<String> backgroundColors;
 
   /// The computed font size for this node, as a CSS computed value string (e.g.
   /// '12px').
   final String computedFontSize;
 
-  /// The computed font weight for this node, as a CSS computed value string (e.g.
-  /// 'normal' or '100').
+  /// The computed font weight for this node, as a CSS computed value string
+  /// (e.g. 'normal' or '100').
   final String computedFontWeight;
 
-  /// The computed font size for the document body, as a computed CSS value string
-  /// (e.g. '16px').
+  /// The computed font size for the document body, as a computed CSS value
+  /// string (e.g. '16px').
   final String computedBodyFontSize;
 
   GetBackgroundColorsResult({
@@ -692,8 +694,8 @@ class CSSStyleSheetHeader {
   /// Whether the sourceURL field value comes from the sourceURL comment.
   final bool hasSourceURL;
 
-  /// Whether this stylesheet is created for STYLE tag by parser. This flag is not
-  /// set for document.written STYLE tags.
+  /// Whether this stylesheet is created for STYLE tag by parser. This flag is
+  /// not set for document.written STYLE tags.
   final bool isInline;
 
   /// Line offset of the stylesheet within the resource (zero based).
@@ -1065,7 +1067,8 @@ class CSSProperty {
   /// properties only).
   final bool disabled;
 
-  /// The entire property range in the enclosing style declaration (if available).
+  /// The entire property range in the enclosing style declaration (if
+  /// available).
   final SourceRange range;
 
   CSSProperty({
@@ -1127,8 +1130,8 @@ class CSSMedia {
   final String text;
 
   /// Source of the media query: "mediaRule" if specified by a @media rule,
-  /// "importRule" if specified by an @import rule, "linkedSheet" if specified by
-  /// a "media" attribute in a linked stylesheet's LINK tag, "inlineSheet" if
+  /// "importRule" if specified by an @import rule, "linkedSheet" if specified
+  /// by a "media" attribute in a linked stylesheet's LINK tag, "inlineSheet" if
   /// specified by a "media" attribute in an inline stylesheet's STYLE tag.
   final String source;
 

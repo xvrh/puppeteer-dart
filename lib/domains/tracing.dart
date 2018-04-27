@@ -9,15 +9,15 @@ class TracingManager {
   TracingManager(this._client);
 
   /// Contains an bucket of collected trace events. When tracing is stopped
-  /// collected events will be send as a sequence of dataCollected events followed
-  /// by tracingComplete event.
+  /// collected events will be send as a sequence of dataCollected events
+  /// followed by tracingComplete event.
   Stream<List<Map>> get onDataCollected => _client.onEvent
       .where((Event event) => event.name == 'Tracing.dataCollected')
       .map((Event event) =>
           (event.parameters['value'] as List).map((e) => e as Map).toList());
 
-  /// Signals that tracing is stopped and there is no trace buffers pending flush,
-  /// all data were delivered via dataCollected events.
+  /// Signals that tracing is stopped and there is no trace buffers pending
+  /// flush, all data were delivered via dataCollected events.
   Stream<io.StreamHandle> get onTracingComplete => _client.onEvent
       .where((Event event) => event.name == 'Tracing.tracingComplete')
       .map((Event event) =>
@@ -66,7 +66,7 @@ class TracingManager {
   }
 
   /// Gets supported tracing categories.
-  /// Return: A list of supported tracing categories.
+  /// Returns: A list of supported tracing categories.
   Future<List<String>> getCategories() async {
     Map result = await _client.send('Tracing.getCategories');
     return (result['categories'] as List).map((e) => e as String).toList();

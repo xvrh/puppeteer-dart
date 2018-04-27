@@ -32,17 +32,17 @@ class EmulationManager {
   /// "device-width"/"device-height"-related CSS media query results).
   /// [width] Overriding width value in pixels (minimum 0, maximum 10000000). 0
   /// disables the override.
-  /// [height] Overriding height value in pixels (minimum 0, maximum 10000000). 0
-  /// disables the override.
+  /// [height] Overriding height value in pixels (minimum 0, maximum 10000000).
+  /// 0 disables the override.
   /// [deviceScaleFactor] Overriding device scale factor value. 0 disables the
   /// override.
-  /// [mobile] Whether to emulate mobile device. This includes viewport meta tag,
-  /// overlay scrollbars, text autosizing and more.
+  /// [mobile] Whether to emulate mobile device. This includes viewport meta
+  /// tag, overlay scrollbars, text autosizing and more.
   /// [scale] Scale to apply to resulting view image.
   /// [screenWidth] Overriding screen width value in pixels (minimum 0, maximum
   /// 10000000).
-  /// [screenHeight] Overriding screen height value in pixels (minimum 0, maximum
-  /// 10000000).
+  /// [screenHeight] Overriding screen height value in pixels (minimum 0,
+  /// maximum 10000000).
   /// [positionX] Overriding view X position on screen in pixels (minimum 0,
   /// maximum 10000000).
   /// [positionY] Overriding view Y position on screen in pixels (minimum 0,
@@ -122,8 +122,8 @@ class EmulationManager {
   }
 
   /// Resizes the frame/viewport of the page. Note that this does not affect the
-  /// frame's container (e.g. browser window). Can be used to produce screenshots
-  /// of the specified size. Not supported on Android.
+  /// frame's container (e.g. browser window). Can be used to produce
+  /// screenshots of the specified size. Not supported on Android.
   /// [width] Frame width (DIP).
   /// [height] Frame height (DIP).
   Future setVisibleSize(
@@ -148,8 +148,8 @@ class EmulationManager {
     await _client.send('Emulation.setScriptExecutionDisabled', parameters);
   }
 
-  /// Overrides the Geolocation Position or Error. Omitting any of the parameters
-  /// emulates position unavailable.
+  /// Overrides the Geolocation Position or Error. Omitting any of the
+  /// parameters emulates position unavailable.
   /// [latitude] Mock latitude
   /// [longitude] Mock longitude
   /// [accuracy] Mock accuracy
@@ -232,21 +232,21 @@ class EmulationManager {
   }
 
   /// Tells whether emulation is supported.
-  /// Return: True if emulation is supported.
+  /// Returns: True if emulation is supported.
   Future<bool> canEmulate() async {
     Map result = await _client.send('Emulation.canEmulate');
     return result['result'];
   }
 
   /// Turns on virtual time for all frames (replacing real-time with a synthetic
-  /// time source) and sets the current virtual time policy.  Note this supersedes
-  /// any previous time budget.
+  /// time source) and sets the current virtual time policy.  Note this
+  /// supersedes any previous time budget.
   /// [budget] If set, after this many virtual milliseconds have elapsed virtual
   /// time will be paused and a virtualTimeBudgetExpired event is sent.
-  /// [maxVirtualTimeTaskStarvationCount] If set this specifies the maximum number
-  /// of tasks that can be run before virtual is forced forwards to prevent
-  /// deadlock.
-  /// Return: Absolute timestamp at which virtual time was first enabled
+  /// [maxVirtualTimeTaskStarvationCount] If set this specifies the maximum
+  /// number of tasks that can be run before virtual is forced forwards to
+  /// prevent deadlock.
+  /// Returns: Absolute timestamp at which virtual time was first enabled
   /// (milliseconds since epoch).
   Future<runtime.Timestamp> setVirtualTimePolicy(
     VirtualTimePolicy policy, {
@@ -281,8 +281,8 @@ class EmulationManager {
 
   /// Sets or clears an override of the default background color of the frame.
   /// This override is used if the content does not specify one.
-  /// [color] RGBA of the default background color. If not specified, any existing
-  /// override will be cleared.
+  /// [color] RGBA of the default background color. If not specified, any
+  /// existing override will be cleared.
   Future setDefaultBackgroundColorOverride({
     dom.RGBA color,
   }) async {

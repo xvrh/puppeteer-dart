@@ -120,11 +120,11 @@ class DOMManager {
   }
 
   /// Returns the root DOM node (and optionally the subtree) to the caller.
-  /// [depth] The maximum depth at which children should be retrieved, defaults to
-  /// 1. Use -1 for the entire subtree or provide an integer larger than 0.
+  /// [depth] The maximum depth at which children should be retrieved, defaults
+  /// to 1. Use -1 for the entire subtree or provide an integer larger than 0.
   /// [pierce] Whether or not iframes and shadow roots should be traversed when
   /// returning the subtree (default is false).
-  /// Return: Resulting node.
+  /// Returns: Resulting node.
   Future<Node> getDocument({
     int depth,
     bool pierce,
@@ -141,11 +141,11 @@ class DOMManager {
   }
 
   /// Returns the root DOM node (and optionally the subtree) to the caller.
-  /// [depth] The maximum depth at which children should be retrieved, defaults to
-  /// 1. Use -1 for the entire subtree or provide an integer larger than 0.
+  /// [depth] The maximum depth at which children should be retrieved, defaults
+  /// to 1. Use -1 for the entire subtree or provide an integer larger than 0.
   /// [pierce] Whether or not iframes and shadow roots should be traversed when
   /// returning the subtree (default is false).
-  /// Return: Resulting node.
+  /// Returns: Resulting node.
   Future<List<Node>> getFlattenedDocument({
     int depth,
     bool pierce,
@@ -161,9 +161,10 @@ class DOMManager {
     return (result['nodes'] as List).map((e) => new Node.fromJson(e)).toList();
   }
 
-  /// Collects class names for the node with given id and all of it's child nodes.
+  /// Collects class names for the node with given id and all of it's child
+  /// nodes.
   /// [nodeId] Id of the node to collect class names.
-  /// Return: Class name list.
+  /// Returns: Class name list.
   Future<List<String>> collectClassNamesFromSubtree(
     NodeId nodeId,
   ) async {
@@ -175,12 +176,12 @@ class DOMManager {
     return (result['classNames'] as List).map((e) => e as String).toList();
   }
 
-  /// Requests that children of the node with given id are returned to the caller
-  /// in form of `setChildNodes` events where not only immediate children are
-  /// retrieved, but all children down to the specified depth.
+  /// Requests that children of the node with given id are returned to the
+  /// caller in form of `setChildNodes` events where not only immediate children
+  /// are retrieved, but all children down to the specified depth.
   /// [nodeId] Id of the node to get children for.
-  /// [depth] The maximum depth at which children should be retrieved, defaults to
-  /// 1. Use -1 for the entire subtree or provide an integer larger than 0.
+  /// [depth] The maximum depth at which children should be retrieved, defaults
+  /// to 1. Use -1 for the entire subtree or provide an integer larger than 0.
   /// [pierce] Whether or not iframes and shadow roots should be traversed when
   /// returning the sub-tree (default is false).
   Future requestChildNodes(
@@ -203,7 +204,7 @@ class DOMManager {
   /// Executes `querySelector` on a given node.
   /// [nodeId] Id of the node to query upon.
   /// [selector] Selector string.
-  /// Return: Query selector result.
+  /// Returns: Query selector result.
   Future<NodeId> querySelector(
     NodeId nodeId,
     String selector,
@@ -219,7 +220,7 @@ class DOMManager {
   /// Executes `querySelectorAll` on a given node.
   /// [nodeId] Id of the node to query upon.
   /// [selector] Selector string.
-  /// Return: Query selector result.
+  /// Returns: Query selector result.
   Future<List<NodeId>> querySelectorAll(
     NodeId nodeId,
     String selector,
@@ -237,7 +238,7 @@ class DOMManager {
   /// Sets node name for a node with given id.
   /// [nodeId] Id of the node to set name for.
   /// [name] New node's name.
-  /// Return: New node's id.
+  /// Returns: New node's id.
   Future<NodeId> setNodeName(
     NodeId nodeId,
     String name,
@@ -333,7 +334,7 @@ class DOMManager {
   /// [nodeId] Identifier of the node.
   /// [backendNodeId] Identifier of the backend node.
   /// [objectId] JavaScript object id of the node wrapper.
-  /// Return: Outer HTML markup.
+  /// Returns: Outer HTML markup.
   Future<String> getOuterHTML({
     NodeId nodeId,
     BackendNodeId backendNodeId,
@@ -390,7 +391,7 @@ class DOMManager {
   /// [searchId] Unique search session identifier.
   /// [fromIndex] Start index of the search result to be returned.
   /// [toIndex] End index of the search result to be returned.
-  /// Return: Ids of the search result nodes.
+  /// Returns: Ids of the search result nodes.
   Future<List<NodeId>> getSearchResults(
     String searchId,
     int fromIndex,
@@ -420,10 +421,10 @@ class DOMManager {
   }
 
   /// Requests that the node is sent to the caller given the JavaScript node
-  /// object reference. All nodes that form the path from the node to the root are
-  /// also sent to the client as a series of `setChildNodes` notifications.
+  /// object reference. All nodes that form the path from the node to the root
+  /// are also sent to the client as a series of `setChildNodes` notifications.
   /// [objectId] JavaScript object id to convert into node.
-  /// Return: Node id for given object.
+  /// Returns: Node id for given object.
   Future<NodeId> requestNode(
     runtime.RemoteObjectId objectId,
   ) async {
@@ -452,7 +453,7 @@ class DOMManager {
   /// Requests that the node is sent to the caller given its path. // FIXME, use
   /// XPath
   /// [path] Path to node in the proprietary format.
-  /// Return: Id of the node for given path.
+  /// Returns: Id of the node for given path.
   Future<NodeId> pushNodeByPathToFrontend(
     String path,
   ) async {
@@ -466,8 +467,8 @@ class DOMManager {
   /// Requests that a batch of nodes is sent to the caller given their backend
   /// node ids.
   /// [backendNodeIds] The array of backend node ids.
-  /// Return: The array of ids of pushed nodes that correspond to the backend ids
-  /// specified in backendNodeIds.
+  /// Returns: The array of ids of pushed nodes that correspond to the backend
+  /// ids specified in backendNodeIds.
   Future<List<NodeId>> pushNodesByBackendIdsToFrontend(
     List<BackendNodeId> backendNodeIds,
   ) async {
@@ -481,8 +482,8 @@ class DOMManager {
         .toList();
   }
 
-  /// Enables console to refer to the node with given id via $x (see Command Line
-  /// API for more details $x functions).
+  /// Enables console to refer to the node with given id via $x (see Command
+  /// Line API for more details $x functions).
   /// [nodeId] DOM node id to be accessible by means of $x command line API.
   Future setInspectedNode(
     NodeId nodeId,
@@ -498,7 +499,7 @@ class DOMManager {
   /// [backendNodeId] Backend identifier of the node to resolve.
   /// [objectGroup] Symbolic group name that can be used to release multiple
   /// objects.
-  /// Return: JavaScript object wrapper for given node.
+  /// Returns: JavaScript object wrapper for given node.
   Future<runtime.RemoteObject> resolveNode({
     NodeId nodeId,
     dom.BackendNodeId backendNodeId,
@@ -520,7 +521,7 @@ class DOMManager {
 
   /// Returns attributes for the specified node.
   /// [nodeId] Id of the node to retrieve attibutes for.
-  /// Return: An interleaved array of node attribute names and values.
+  /// Returns: An interleaved array of node attribute names and values.
   Future<List<String>> getAttributes(
     NodeId nodeId,
   ) async {
@@ -537,7 +538,7 @@ class DOMManager {
   /// [targetNodeId] Id of the element to drop the copy into.
   /// [insertBeforeNodeId] Drop the copy before this node (if absent, the copy
   /// becomes the last child of `targetNodeId`).
-  /// Return: Id of the node clone.
+  /// Returns: Id of the node clone.
   Future<NodeId> copyTo(
     NodeId nodeId,
     NodeId targetNodeId, {
@@ -559,7 +560,7 @@ class DOMManager {
   /// [targetNodeId] Id of the element to drop the moved node into.
   /// [insertBeforeNodeId] Drop node before this one (if absent, the moved node
   /// becomes the last child of `targetNodeId`).
-  /// Return: New id of the moved node.
+  /// Returns: New id of the moved node.
   Future<NodeId> moveTo(
     NodeId nodeId,
     NodeId targetNodeId, {
@@ -643,7 +644,7 @@ class DOMManager {
   /// [nodeId] Identifier of the node.
   /// [backendNodeId] Identifier of the backend node.
   /// [objectId] JavaScript object id of the node wrapper.
-  /// Return: Box model for the node.
+  /// Returns: Box model for the node.
   Future<BoxModel> getBoxModel({
     NodeId nodeId,
     BackendNodeId backendNodeId,
@@ -666,9 +667,9 @@ class DOMManager {
   /// Returns node id at given location.
   /// [x] X coordinate.
   /// [y] Y coordinate.
-  /// [includeUserAgentShadowDOM] False to skip to the nearest non-UA shadow root
-  /// ancestor (default: false).
-  /// Return: Id of the node at given coordinates.
+  /// [includeUserAgentShadowDOM] False to skip to the nearest non-UA shadow
+  /// root ancestor (default: false).
+  /// Returns: Id of the node at given coordinates.
   Future<NodeId> getNodeForLocation(
     int x,
     int y, {
@@ -687,7 +688,7 @@ class DOMManager {
 
   /// Returns the id of the nearest ancestor that is a relayout boundary.
   /// [nodeId] Id of the node.
-  /// Return: Relayout boundary node id for the given node.
+  /// Returns: Relayout boundary node id for the given node.
   Future<NodeId> getRelayoutBoundary(
     NodeId nodeId,
   ) async {
@@ -698,16 +699,16 @@ class DOMManager {
     return new NodeId.fromJson(result['nodeId']);
   }
 
-  /// Describes node given its id, does not require domain to be enabled. Does not
-  /// start tracking any objects, can be used for automation.
+  /// Describes node given its id, does not require domain to be enabled. Does
+  /// not start tracking any objects, can be used for automation.
   /// [nodeId] Identifier of the node.
   /// [backendNodeId] Identifier of the backend node.
   /// [objectId] JavaScript object id of the node wrapper.
-  /// [depth] The maximum depth at which children should be retrieved, defaults to
-  /// 1. Use -1 for the entire subtree or provide an integer larger than 0.
+  /// [depth] The maximum depth at which children should be retrieved, defaults
+  /// to 1. Use -1 for the entire subtree or provide an integer larger than 0.
   /// [pierce] Whether or not iframes and shadow roots should be traversed when
   /// returning the subtree (default is false).
-  /// Return: Node description.
+  /// Returns: Node description.
   Future<Node> describeNode({
     NodeId nodeId,
     BackendNodeId backendNodeId,
@@ -1193,8 +1194,8 @@ class Node {
   /// Child nodes of this node when requested with children.
   final List<Node> children;
 
-  /// Attributes of the `Element` node in the form of flat array `[name1, value1,
-  /// name2, value2]`.
+  /// Attributes of the `Element` node in the form of flat array `[name1,
+  /// value1, name2, value2]`.
   final List<String> attributes;
 
   /// Document URL that `Document` or `FrameOwner` node points to.

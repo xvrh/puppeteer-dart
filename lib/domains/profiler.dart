@@ -33,7 +33,7 @@ class ProfilerManager {
   /// Collect coverage data for the current isolate. The coverage data may be
   /// incomplete due to
   /// garbage collection.
-  /// Return: Coverage data for the current isolate.
+  /// Returns: Coverage data for the current isolate.
   Future<List<ScriptCoverage>> getBestEffortCoverage() async {
     Map result = await _client.send('Profiler.getBestEffortCoverage');
     return (result['result'] as List)
@@ -84,7 +84,7 @@ class ProfilerManager {
     await _client.send('Profiler.startTypeProfile');
   }
 
-  /// Return: Recorded profile.
+  /// Returns: Recorded profile.
   Future<Profile> stop() async {
     Map result = await _client.send('Profiler.stop');
     return new Profile.fromJson(result['profile']);
@@ -97,7 +97,8 @@ class ProfilerManager {
     await _client.send('Profiler.stopPreciseCoverage');
   }
 
-  /// Disable type profile. Disabling releases type profile data collected so far.
+  /// Disable type profile. Disabling releases type profile data collected so
+  /// far.
   Future stopTypeProfile() async {
     await _client.send('Profiler.stopTypeProfile');
   }
@@ -105,7 +106,7 @@ class ProfilerManager {
   /// Collect coverage data for the current isolate, and resets execution
   /// counters. Precise code
   /// coverage needs to have started.
-  /// Return: Coverage data for the current isolate.
+  /// Returns: Coverage data for the current isolate.
   Future<List<ScriptCoverage>> takePreciseCoverage() async {
     Map result = await _client.send('Profiler.takePreciseCoverage');
     return (result['result'] as List)
@@ -114,7 +115,8 @@ class ProfilerManager {
   }
 
   /// Collect type profile.
-  /// Return: Type profile for all scripts since startTypeProfile() was turned on.
+  /// Returns: Type profile for all scripts since startTypeProfile() was turned
+  /// on.
   Future<List<ScriptTypeProfile>> takeTypeProfile() async {
     Map result = await _client.send('Profiler.takeTypeProfile');
     return (result['result'] as List)
@@ -190,8 +192,8 @@ class ProfileNode {
   /// Child node ids.
   final List<int> children;
 
-  /// The reason of being not optimized. The function may be deoptimized or marked
-  /// as don't
+  /// The reason of being not optimized. The function may be deoptimized or
+  /// marked as don't
   /// optimize.
   final String deoptReason;
 
@@ -259,8 +261,8 @@ class Profile {
   /// Ids of samples top nodes.
   final List<int> samples;
 
-  /// Time intervals between adjacent samples in microseconds. The first delta is
-  /// relative to the
+  /// Time intervals between adjacent samples in microseconds. The first delta
+  /// is relative to the
   /// profile startTime.
   final List<int> timeDeltas;
 

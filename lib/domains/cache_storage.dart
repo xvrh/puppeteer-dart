@@ -9,7 +9,7 @@ class CacheStorageManager {
 
   /// Requests cache names.
   /// [securityOrigin] Security origin.
-  /// Return: Caches for the security origin.
+  /// Returns: Caches for the security origin.
   Future<List<Cache>> requestCacheNames(
     String securityOrigin,
   ) async {
@@ -69,7 +69,7 @@ class CacheStorageManager {
   /// Fetches cache entry.
   /// [cacheId] Id of cache that contains the enty.
   /// [requestURL] URL spec of the request.
-  /// Return: Response read from the cache.
+  /// Returns: Response read from the cache.
   Future<CachedResponse> requestCachedResponse(
     CacheId cacheId,
     String requestURL,

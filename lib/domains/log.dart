@@ -22,8 +22,8 @@ class LogManager {
     await _client.send('Log.enable');
   }
 
-  /// Disables log domain, prevents further log entries from being reported to the
-  /// client.
+  /// Disables log domain, prevents further log entries from being reported to
+  /// the client.
   Future disable() async {
     await _client.send('Log.disable');
   }

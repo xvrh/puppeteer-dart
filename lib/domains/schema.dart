@@ -10,7 +10,7 @@ class SchemaManager {
   SchemaManager(this._client);
 
   /// Returns supported domains.
-  /// Return: List of supported domains.
+  /// Returns: List of supported domains.
   Future<List<Domain>> getDomains() async {
     Map result = await _client.send('Schema.getDomains');
     return (result['domains'] as List)

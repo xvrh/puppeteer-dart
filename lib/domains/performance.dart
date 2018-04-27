@@ -23,7 +23,7 @@ class PerformanceManager {
   }
 
   /// Retrieve current values of run-time metrics.
-  /// Return: Current values for run-time metrics.
+  /// Returns: Current values for run-time metrics.
   Future<List<Metric>> getMetrics() async {
     Map result = await _client.send('Performance.getMetrics');
     return (result['metrics'] as List)

@@ -94,7 +94,8 @@ class PageManager {
       .map(
           (Event event) => new ScreencastFrameEvent.fromJson(event.parameters));
 
-  /// Fired when the page with currently enabled screencast was shown or hidden `.
+  /// Fired when the page with currently enabled screencast was shown or hidden
+  /// `.
   Stream<bool> get onScreencastVisibilityChanged => _client.onEvent
       .where((Event event) => event.name == 'Page.screencastVisibilityChanged')
       .map((Event event) => event.parameters['visible'] as bool);
@@ -124,7 +125,7 @@ class PageManager {
   }
 
   /// Deprecated, please use addScriptToEvaluateOnNewDocument instead.
-  /// Return: Identifier of the added script.
+  /// Returns: Identifier of the added script.
   Future<ScriptIdentifier> addScriptToEvaluateOnLoad(
     String scriptSource,
   ) async {
@@ -146,9 +147,9 @@ class PageManager {
     await _client.send('Page.removeScriptToEvaluateOnLoad', parameters);
   }
 
-  /// Evaluates given script in every frame upon creation (before loading frame's
-  /// scripts).
-  /// Return: Identifier of the added script.
+  /// Evaluates given script in every frame upon creation (before loading
+  /// frame's scripts).
+  /// Returns: Identifier of the added script.
   Future<ScriptIdentifier> addScriptToEvaluateOnNewDocument(
     String source,
   ) async {
@@ -197,8 +198,8 @@ class PageManager {
   /// Reloads given page optionally ignoring the cache.
   /// [ignoreCache] If true, browser cache is ignored (as if the user pressed
   /// Shift+refresh).
-  /// [scriptToEvaluateOnLoad] If set, the script will be injected into all frames
-  /// of the inspected page after reload.
+  /// [scriptToEvaluateOnLoad] If set, the script will be injected into all
+  /// frames of the inspected page after reload.
   Future reload({
     bool ignoreCache,
     String scriptToEvaluateOnLoad,
@@ -270,7 +271,7 @@ class PageManager {
 
   /// Returns all browser cookies. Depending on the backend support, will return
   /// detailed cookie information in the `cookies` field.
-  /// Return: Array of cookie objects.
+  /// Returns: Array of cookie objects.
   Future<List<network.Cookie>> getCookies() async {
     Map result = await _client.send('Page.getCookies');
     return (result['cookies'] as List)
@@ -293,14 +294,14 @@ class PageManager {
   }
 
   /// Returns present frame / resource tree structure.
-  /// Return: Present frame / resource tree structure.
+  /// Returns: Present frame / resource tree structure.
   Future<FrameResourceTree> getResourceTree() async {
     Map result = await _client.send('Page.getResourceTree');
     return new FrameResourceTree.fromJson(result['frameTree']);
   }
 
   /// Returns present frame tree structure.
-  /// Return: Present frame tree structure.
+  /// Returns: Present frame tree structure.
   Future<FrameTree> getFrameTree() async {
     Map result = await _client.send('Page.getFrameTree');
     return new FrameTree.fromJson(result['frameTree']);
@@ -327,7 +328,7 @@ class PageManager {
   /// [query] String to search for.
   /// [caseSensitive] If true, search is case sensitive.
   /// [isRegex] If true, treats string parameter as regex.
-  /// Return: List of search matches.
+  /// Returns: List of search matches.
   Future<List<debugger.SearchMatch>> searchInResource(
     FrameId frameId,
     String url,
@@ -371,17 +372,17 @@ class PageManager {
   /// "device-width"/"device-height"-related CSS media query results).
   /// [width] Overriding width value in pixels (minimum 0, maximum 10000000). 0
   /// disables the override.
-  /// [height] Overriding height value in pixels (minimum 0, maximum 10000000). 0
-  /// disables the override.
+  /// [height] Overriding height value in pixels (minimum 0, maximum 10000000).
+  /// 0 disables the override.
   /// [deviceScaleFactor] Overriding device scale factor value. 0 disables the
   /// override.
-  /// [mobile] Whether to emulate mobile device. This includes viewport meta tag,
-  /// overlay scrollbars, text autosizing and more.
+  /// [mobile] Whether to emulate mobile device. This includes viewport meta
+  /// tag, overlay scrollbars, text autosizing and more.
   /// [scale] Scale to apply to resulting view image.
   /// [screenWidth] Overriding screen width value in pixels (minimum 0, maximum
   /// 10000000).
-  /// [screenHeight] Overriding screen height value in pixels (minimum 0, maximum
-  /// 10000000).
+  /// [screenHeight] Overriding screen height value in pixels (minimum 0,
+  /// maximum 10000000).
   /// [positionX] Overriding view X position on screen in pixels (minimum 0,
   /// maximum 10000000).
   /// [positionY] Overriding view Y position on screen in pixels (minimum 0,
@@ -443,8 +444,8 @@ class PageManager {
     await _client.send('Page.clearDeviceMetricsOverride');
   }
 
-  /// Overrides the Geolocation Position or Error. Omitting any of the parameters
-  /// emulates position unavailable.
+  /// Overrides the Geolocation Position or Error. Omitting any of the
+  /// parameters emulates position unavailable.
   /// [latitude] Mock latitude
   /// [longitude] Mock longitude
   /// [accuracy] Mock accuracy
@@ -514,9 +515,9 @@ class PageManager {
   /// [format] Image compression format (defaults to png).
   /// [quality] Compression quality from range [0..100] (jpeg only).
   /// [clip] Capture the screenshot of a given region only.
-  /// [fromSurface] Capture the screenshot from the surface, rather than the view.
-  /// Defaults to true.
-  /// Return: Base64-encoded image data.
+  /// [fromSurface] Capture the screenshot from the surface, rather than the
+  /// view. Defaults to true.
+  /// Returns: Base64-encoded image data.
   Future<String> captureScreenshot({
     String format,
     int quality,
@@ -555,7 +556,7 @@ class PageManager {
   /// empty string, which means print all pages.
   /// [ignoreInvalidPageRanges] Whether to silently ignore invalid but
   /// successfully parsed page ranges, such as '3-2'. Defaults to false.
-  /// Return: Base64-encoded pdf data.
+  /// Returns: Base64-encoded pdf data.
   Future<String> printToPDF({
     bool landscape,
     bool displayHeaderFooter,
@@ -659,11 +660,11 @@ class PageManager {
     await _client.send('Page.screencastFrameAck', parameters);
   }
 
-  /// Accepts or dismisses a JavaScript initiated dialog (alert, confirm, prompt,
-  /// or onbeforeunload).
+  /// Accepts or dismisses a JavaScript initiated dialog (alert, confirm,
+  /// prompt, or onbeforeunload).
   /// [accept] Whether to accept or dismiss the dialog.
-  /// [promptText] The text to enter into the dialog prompt before accepting. Used
-  /// only if this is a prompt dialog.
+  /// [promptText] The text to enter into the dialog prompt before accepting.
+  /// Used only if this is a prompt dialog.
   Future handleJavaScriptDialog(
     bool accept, {
     String promptText,
@@ -698,7 +699,7 @@ class PageManager {
   /// [worldName] An optional name which is reported in the Execution Context.
   /// [grantUniveralAccess] Whether or not universal access should be granted to
   /// the isolated world. This is a powerful option, use with caution.
-  /// Return: Execution context of the isolated world.
+  /// Returns: Execution context of the isolated world.
   Future<runtime.ExecutionContextId> createIsolatedWorld(
     FrameId frameId, {
     String worldName,
@@ -726,8 +727,8 @@ class PageManager {
   /// Set the behavior when downloading a file.
   /// [behavior] Whether to allow all or deny all download requests, or use
   /// default Chrome behavior if available (otherwise deny).
-  /// [downloadPath] The default path to save downloaded files to. This is requred
-  /// if behavior is set to 'allow'
+  /// [downloadPath] The default path to save downloaded files to. This is
+  /// requred if behavior is set to 'allow'
   Future setDownloadBehavior(
     String behavior, {
     String downloadPath,
@@ -1142,7 +1143,8 @@ class Frame {
   /// Frame document's mimeType as determined by the browser.
   final String mimeType;
 
-  /// If the frame failed to load, this contains the URL that could not be loaded.
+  /// If the frame failed to load, this contains the URL that could not be
+  /// loaded.
   final String unreachableUrl;
 
   Frame({

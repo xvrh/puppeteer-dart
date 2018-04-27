@@ -162,7 +162,7 @@ class NetworkManager {
   /// [query] String to search for.
   /// [caseSensitive] If true, search is case sensitive.
   /// [isRegex] If true, treats string parameter as regex.
-  /// Return: List of search matches.
+  /// Returns: List of search matches.
   Future<List<debugger.SearchMatch>> searchInResponseBody(
     RequestId requestId,
     String query, {
@@ -234,7 +234,7 @@ class NetworkManager {
   }
 
   /// Tells whether clearing browser cache is supported.
-  /// Return: True if browser cache can be cleared.
+  /// Returns: True if browser cache can be cleared.
   Future<bool> canClearBrowserCache() async {
     Map result = await _client.send('Network.canClearBrowserCache');
     return result['result'];
@@ -246,7 +246,7 @@ class NetworkManager {
   }
 
   /// Tells whether clearing browser cookies is supported.
-  /// Return: True if browser cookies can be cleared.
+  /// Returns: True if browser cookies can be cleared.
   Future<bool> canClearBrowserCookies() async {
     Map result = await _client.send('Network.canClearBrowserCookies');
     return result['result'];
@@ -260,7 +260,7 @@ class NetworkManager {
   /// Returns all browser cookies for the current URL. Depending on the backend
   /// support, will return detailed cookie information in the `cookies` field.
   /// [urls] The list of URLs for which applicable cookies will be fetched
-  /// Return: Array of cookie objects.
+  /// Returns: Array of cookie objects.
   Future<List<Cookie>> getCookies({
     List<String> urls,
   }) async {
@@ -276,7 +276,7 @@ class NetworkManager {
 
   /// Returns all browser cookies. Depending on the backend support, will return
   /// detailed cookie information in the `cookies` field.
-  /// Return: Array of cookie objects.
+  /// Returns: Array of cookie objects.
   Future<List<Cookie>> getAllCookies() async {
     Map result = await _client.send('Network.getAllCookies');
     return (result['cookies'] as List)
@@ -286,8 +286,8 @@ class NetworkManager {
 
   /// Deletes browser cookies with matching name and url or domain/path pair.
   /// [name] Name of the cookies to remove.
-  /// [url] If specified, deletes all the cookies with the given name where domain
-  /// and path match provided URL.
+  /// [url] If specified, deletes all the cookies with the given name where
+  /// domain and path match provided URL.
   /// [domain] If specified, deletes only cookies with the exact domain.
   /// [path] If specified, deletes only cookies with the exact path.
   Future deleteCookies(
@@ -323,7 +323,7 @@ class NetworkManager {
   /// [httpOnly] True if cookie is http-only.
   /// [sameSite] Cookie SameSite type.
   /// [expires] Cookie expiration date, session cookie if not set
-  /// Return: True if successfully set cookie.
+  /// Returns: True if successfully set cookie.
   Future<bool> setCookie(
     String name,
     String value, {
@@ -376,7 +376,7 @@ class NetworkManager {
   }
 
   /// Tells whether emulation of network conditions is supported.
-  /// Return: True if emulation of network conditions is supported.
+  /// Returns: True if emulation of network conditions is supported.
   Future<bool> canEmulateNetworkConditions() async {
     Map result = await _client.send('Network.canEmulateNetworkConditions');
     return result['result'];
@@ -386,8 +386,8 @@ class NetworkManager {
   /// [offline] True to emulate internet disconnection.
   /// [latency] Minimum latency from request sent to response headers received
   /// (ms).
-  /// [downloadThroughput] Maximal aggregated download throughput (bytes/sec). -1
-  /// disables download throttling.
+  /// [downloadThroughput] Maximal aggregated download throughput (bytes/sec).
+  /// -1 disables download throttling.
   /// [uploadThroughput] Maximal aggregated upload throughput (bytes/sec).  -1
   /// disables upload throttling.
   /// [connectionType] Connection type if known.
@@ -410,7 +410,8 @@ class NetworkManager {
     await _client.send('Network.emulateNetworkConditions', parameters);
   }
 
-  /// Toggles ignoring cache for each request. If `true`, cache will not be used.
+  /// Toggles ignoring cache for each request. If `true`, cache will not be
+  /// used.
   /// [cacheDisabled] Cache disabled state.
   Future setCacheDisabled(
     bool cacheDisabled,
@@ -471,25 +472,26 @@ class NetworkManager {
     await _client.send('Network.setRequestInterception', parameters);
   }
 
-  /// Response to Network.requestIntercepted which either modifies the request to
-  /// continue with any modifications, or blocks it, or completes it with the
+  /// Response to Network.requestIntercepted which either modifies the request
+  /// to continue with any modifications, or blocks it, or completes it with the
   /// provided response bytes. If a network fetch occurs as a result which
-  /// encounters a redirect an additional Network.requestIntercepted event will be
-  /// sent with the same InterceptionId.
-  /// [errorReason] If set this causes the request to fail with the given reason.
-  /// Passing `Aborted` for requests marked with `isNavigationRequest` also
-  /// cancels the navigation. Must not be set in response to an authChallenge.
+  /// encounters a redirect an additional Network.requestIntercepted event will
+  /// be sent with the same InterceptionId.
+  /// [errorReason] If set this causes the request to fail with the given
+  /// reason. Passing `Aborted` for requests marked with `isNavigationRequest`
+  /// also cancels the navigation. Must not be set in response to an
+  /// authChallenge.
   /// [rawResponse] If set the requests completes using with the provided base64
-  /// encoded raw response, including HTTP status line and headers etc... Must not
+  /// encoded raw response, including HTTP status line and headers etc... Must
+  /// not be set in response to an authChallenge.
+  /// [url] If set the request url will be modified in a way that's not
+  /// observable by page. Must not be set in response to an authChallenge.
+  /// [method] If set this allows the request method to be overridden. Must not
   /// be set in response to an authChallenge.
-  /// [url] If set the request url will be modified in a way that's not observable
-  /// by page. Must not be set in response to an authChallenge.
-  /// [method] If set this allows the request method to be overridden. Must not be
-  /// set in response to an authChallenge.
   /// [postData] If set this allows postData to be set. Must not be set in
   /// response to an authChallenge.
-  /// [headers] If set this allows the request headers to be changed. Must not be
-  /// set in response to an authChallenge.
+  /// [headers] If set this allows the request headers to be changed. Must not
+  /// be set in response to an authChallenge.
   /// [authChallengeResponse] Response to a requestIntercepted with an
   /// authChallenge. Must not be set otherwise.
   Future continueInterceptedRequest(
@@ -987,10 +989,10 @@ class EventSourceMessageReceivedEvent {
 }
 
 class RequestInterceptedEvent {
-  /// Each request the page makes will have a unique id, however if any redirects
-  /// are encountered while processing that fetch, they will be reported with the
-  /// same id as the original fetch. Likewise if HTTP authentication is needed
-  /// then the same fetch id will be used.
+  /// Each request the page makes will have a unique id, however if any
+  /// redirects are encountered while processing that fetch, they will be
+  /// reported with the same id as the original fetch. Likewise if HTTP
+  /// authentication is needed then the same fetch id will be used.
   final InterceptionId interceptionId;
 
   final Request request;
@@ -1016,8 +1018,8 @@ class RequestInterceptedEvent {
   /// while intercepting request.
   final ErrorReason responseErrorReason;
 
-  /// Response code if intercepted at response stage or if redirect occurred while
-  /// intercepting request or auth retry occurred.
+  /// Response code if intercepted at response stage or if redirect occurred
+  /// while intercepting request or auth retry occurred.
   final int responseStatusCode;
 
   /// Response headers if intercepted at the response stage or if redirect
@@ -1614,7 +1616,8 @@ class SecurityDetails {
   /// Protocol name (e.g. "TLS 1.2" or "QUIC").
   final String protocol;
 
-  /// Key Exchange used by the connection, or the empty string if not applicable.
+  /// Key Exchange used by the connection, or the empty string if not
+  /// applicable.
   final String keyExchange;
 
   /// (EC)DH group used by the connection, if applicable.
@@ -1767,7 +1770,8 @@ class Response {
   /// HTTP request headers text.
   final String requestHeadersText;
 
-  /// Specifies whether physical connection was actually reused for this request.
+  /// Specifies whether physical connection was actually reused for this
+  /// request.
   final bool connectionReused;
 
   /// Physical connection id that was actually used for this request.
@@ -2210,8 +2214,8 @@ class CookieParam {
   /// Cookie value.
   final String value;
 
-  /// The request-URI to associate with the setting of the cookie. This value can
-  /// affect the default domain and path values of the created cookie.
+  /// The request-URI to associate with the setting of the cookie. This value
+  /// can affect the default domain and path values of the created cookie.
   final String url;
 
   /// Cookie domain.
@@ -2338,8 +2342,9 @@ class AuthChallenge {
 /// Response to an AuthChallenge.
 class AuthChallengeResponse {
   /// The decision on what to do in response to the authorization challenge.
-  /// Default means deferring to the default behavior of the net stack, which will
-  /// likely either the Cancel authentication or display a popup dialog box.
+  /// Default means deferring to the default behavior of the net stack, which
+  /// will likely either the Cancel authentication or display a popup dialog
+  /// box.
   final String response;
 
   /// The username to provide, possibly empty. Should only be set if response is
