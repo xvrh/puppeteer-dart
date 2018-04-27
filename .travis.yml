@@ -9,7 +9,7 @@ dart:
  - dev
 
 dart_task:
- - test: --platform vm
+ - test: --platform vm --concurrency=1
  - dartanalyzer: --fatal-warnings lib
  - dartfmt
 

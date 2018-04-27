@@ -48,6 +48,7 @@ Future _downloadFile(String url, String output) async {
       await client.send(new http.Request('get', Uri.parse(url)));
   File ouputFile = new File(output);
   await response.stream.pipe(ouputFile.openWrite());
+  client.close();
 
   if (!ouputFile.existsSync() || ouputFile.lengthSync() == 0) {
     throw 'File was not downloaded from $url to $output';
@@ -55,7 +56,7 @@ Future _downloadFile(String url, String output) async {
 }
 
 void _unzip(String path, String targetPath) {
-  if (Platform.isMacOS || Platform.isLinux) {
+  if (Platform.isMacOS) {
     // The _simpleUnzip doesn't support symlinks so we prefer a native command
     Process.runSync('unzip', [path, '-d', targetPath]);
   } else {
