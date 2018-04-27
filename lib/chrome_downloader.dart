@@ -7,9 +7,9 @@ import 'package:archive/archive.dart';
 
 const int _lastRevision = 553380;
 
-Future<ChromiumPath> downloadChromium(
+Future<ChromePath> downloadChrome(
     {int revision: _lastRevision, String cachePath}) async {
-  cachePath ??= p.join(Directory.systemTemp.path, 'local-chromium');
+  cachePath ??= p.join(Directory.systemTemp.path, 'local-chrome');
 
   Directory revisionDirectory = new Directory(p.join(cachePath, '$revision'));
   if (!revisionDirectory.existsSync()) {
@@ -21,8 +21,8 @@ Future<ChromiumPath> downloadChromium(
   File executableFile = new File(executablePath);
 
   if (!executableFile.existsSync()) {
-    String url = _downloadURLs(revision);
-    String zipPath = p.join(cachePath, '${revision}_${p.basename(url)}');
+    String url = _downloadUrl(revision);
+    String zipPath = p.join(cachePath, '${revision}_${p.url.basename(url)}');
     await _downloadFile(url, zipPath);
     _unzip(zipPath, revisionDirectory.path);
     new File(zipPath).deleteSync();
@@ -36,7 +36,7 @@ Future<ChromiumPath> downloadChromium(
     Process.runSync("chmod", ["+x", executableFile.absolute.path]);
   }
 
-  return new ChromiumPath(
+  return new ChromePath(
       folderPath: revisionDirectory.path,
       executablePath: executableFile.path,
       revision: revision);
@@ -46,20 +46,25 @@ Future _downloadFile(String url, String output) async {
   http.Client client = new http.Client();
   http.StreamedResponse response =
       await client.send(new http.Request('get', Uri.parse(url)));
-  await response.stream.pipe(new File(output).openWrite());
+  File ouputFile = new File(output);
+  await response.stream.pipe(ouputFile.openWrite());
+  client.close();
+
+  if (!ouputFile.existsSync() || ouputFile.lengthSync() == 0) {
+    throw 'File was not downloaded from $url to $output';
+  }
 }
 
 void _unzip(String path, String targetPath) {
   if (Platform.isMacOS) {
-    // On Mac we cannot unzip with the simple approach in _simpleUnzip because
-    // we need to support symlinks
+    // The _simpleUnzip doesn't support symlinks so we prefer a native command
     Process.runSync('unzip', [path, '-d', targetPath]);
   } else {
     _simpleUnzip(path, targetPath);
   }
 }
 
-//TODO(xha): implement a more complet unzip
+//TODO(xha): implement a more complete unzip
 //https://github.com/maxogden/extract-zip/blob/master/index.js
 void _simpleUnzip(String path, String targetPath) {
   Directory targetDirectory = new Directory(targetPath);
@@ -83,7 +88,7 @@ void _simpleUnzip(String path, String targetPath) {
 
 const _baseUrl = 'https://storage.googleapis.com/chromium-browser-snapshots';
 
-String _downloadURLs(int revision) {
+String _downloadUrl(int revision) {
   if (Platform.isWindows) {
     return '$_baseUrl/Win_x64/$revision/chrome-win32.zip';
   } else if (Platform.isLinux) {
@@ -92,7 +97,7 @@ String _downloadURLs(int revision) {
     return '$_baseUrl/Mac/$revision/chrome-mac.zip';
   } else {
     throw new UnsupportedError(
-        "Can't download chromium for platform ${Platform.operatingSystem}");
+        "Can't download chrome for platform ${Platform.operatingSystem}");
   }
 }
 
@@ -109,12 +114,12 @@ String _executablePath(String revisionPath) {
   }
 }
 
-class ChromiumPath {
+class ChromePath {
   final String executablePath;
   final String folderPath;
   final int revision;
 
-  ChromiumPath(
+  ChromePath(
       {@required this.executablePath,
       @required this.folderPath,
       @required this.revision});

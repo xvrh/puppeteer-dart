@@ -38,16 +38,19 @@ const List<String> _headlessArgs = const [
   '--mute-audio'
 ];
 
-class Chromium {
+class Chrome {
   final Process process;
   final Connection connection;
 
-  Chromium._(this.process, this.connection);
+  Chrome._(this.process, this.connection);
 
-  static Future<Chromium> launch(String chromiumExecutable,
+  static Future<Chrome> launch(String chromeExecutable,
       {bool headless: true,
       bool useTemporaryUserData: false,
-      bool noSandboxFlag: false}) async {
+      bool noSandboxFlag}) async {
+    // In docker environment we want to force the '--no-sandbox' flag automatically
+    noSandboxFlag ??= Platform.environment['CHROME_FORCE_NO_SANDBOX'] == 'true';
+
     Directory userDataDir;
     if (useTemporaryUserData) {
       userDataDir = await Directory.systemTemp.createTemp('chrome_');
@@ -65,8 +68,8 @@ class Chromium {
       chromeArgs.add('--no-sandbox');
     }
 
-    _logger.info('Start $chromiumExecutable with $chromeArgs');
-    Process chromeProcess = await Process.start(chromiumExecutable, chromeArgs);
+    _logger.info('Start $chromeExecutable with $chromeArgs');
+    Process chromeProcess = await Process.start(chromeExecutable, chromeArgs);
 
     // ignore: unawaited_futures
     chromeProcess.exitCode.then((int exitCode) {
@@ -81,7 +84,7 @@ class Chromium {
     if (webSocketUrl != null) {
       Connection connection = await Connection.create(webSocketUrl);
 
-      return new Chromium._(chromeProcess, connection);
+      return new Chrome._(chromeProcess, connection);
     } else {
       throw new Exception('Not able to connect to Chrome DevTools');
     }

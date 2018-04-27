@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/chromium_downloader.dart';
+import 'package:chrome_dev_tools/chrome_downloader.dart';
 import 'package:chrome_dev_tools/domains/emulation.dart';
 import 'package:chrome_dev_tools/domains/page.dart';
 import 'package:chrome_dev_tools/src/wait_until.dart';
@@ -11,13 +11,13 @@ main() async {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen(print);
 
-  String chromiumPath = (await downloadChromium()).executablePath;
+  String chromePath = (await downloadChrome()).executablePath;
 
-  Chromium chromium = await Chromium.launch(chromiumPath, headless: true);
+  Chrome chrome = await Chrome.launch(chromePath, headless: true);
 
   TargetID targetId =
-      await chromium.targets.createTarget('https://www.github.com');
-  Session session = await chromium.connection.createSession(targetId);
+      await chrome.targets.createTarget('https://www.github.com');
+  Session session = await chrome.connection.createSession(targetId);
 
   PageManager page = new PageManager(session);
 
@@ -39,5 +39,5 @@ main() async {
   await new File.fromUri(Platform.script.resolve('_github.pdf'))
       .writeAsBytes(pdf);
 
-  await chromium.close();
+  await chrome.close();
 }

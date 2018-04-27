@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'package:chrome_dev_tools/chromium_downloader.dart';
+import 'package:chrome_dev_tools/chrome_downloader.dart';
 
 main() async {
-  ChromiumPath chromiumPath = await downloadChromium(
-      cachePath: Platform.script.resolve('.chromium').toFilePath(),
+  ChromePath chromePath = await downloadChrome(
+      cachePath: Platform.script.resolve('.chrome').toFilePath(),
       revision: 497674);
-  print(chromiumPath.executablePath);
+  print(chromePath.executablePath);
 }
