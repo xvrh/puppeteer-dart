@@ -116,9 +116,9 @@ class TargetManager {
     if (sessionId != null) {
       parameters['sessionId'] = sessionId.toJson();
     }
-// ignore: deprecated_member_use
+    // ignore: deprecated_member_use
     if (targetId != null) {
-// ignore: deprecated_member_use
+      // ignore: deprecated_member_use
       parameters['targetId'] = targetId.toJson();
     }
     await _client.send('Target.sendMessageToTarget', parameters);
@@ -178,9 +178,9 @@ class TargetManager {
     if (sessionId != null) {
       parameters['sessionId'] = sessionId.toJson();
     }
-// ignore: deprecated_member_use
+    // ignore: deprecated_member_use
     if (targetId != null) {
-// ignore: deprecated_member_use
+      // ignore: deprecated_member_use
       parameters['targetId'] = targetId.toJson();
     }
     await _client.send('Target.detachFromTarget', parameters);

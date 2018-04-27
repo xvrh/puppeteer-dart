@@ -40,14 +40,14 @@ class TracingManager {
     TraceConfig traceConfig,
   }) async {
     Map parameters = {};
-// ignore: deprecated_member_use
+    // ignore: deprecated_member_use
     if (categories != null) {
-// ignore: deprecated_member_use
+      // ignore: deprecated_member_use
       parameters['categories'] = categories;
     }
-// ignore: deprecated_member_use
+    // ignore: deprecated_member_use
     if (options != null) {
-// ignore: deprecated_member_use
+      // ignore: deprecated_member_use
       parameters['options'] = options;
     }
     if (bufferUsageReportingInterval != null) {

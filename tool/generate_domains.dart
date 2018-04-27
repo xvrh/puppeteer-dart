@@ -185,12 +185,12 @@ class _Command {
       for (Parameter parameter in optionals) {
         if (parameter.deprecated) {
           //TODO(xha): it shouldn't be necessary: https://github.com/dart-lang/sdk/issues/30084
-          code.writeln('// ignore: deprecated_member_use');
+          code.writeln('    // ignore: deprecated_member_use');
         }
         code.writeln('if (${parameter.normalizedName} != null) {');
         if (parameter.deprecated) {
           //TODO(xha): it shouldn't be necessary: https://github.com/dart-lang/sdk/issues/30084
-          code.writeln('// ignore: deprecated_member_use');
+          code.writeln('      // ignore: deprecated_member_use');
         }
         code.writeln(
             "parameters['${parameter.name}'] = ${_toJsonCode(parameter)};");
