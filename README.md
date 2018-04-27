@@ -158,3 +158,4 @@ main() async {
 ## Related work
  * [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface)
  * [puppeteer](https://github.com/GoogleChrome/puppeteer)
+ * [webkit_inspection_protocol](https://github.com/google/webkit_inspection_protocol.dart)

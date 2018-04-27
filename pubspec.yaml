@@ -1,6 +1,6 @@
 name: chrome_dev_tools
-description: An API to control Chrome over the DevTools Protocol.
-version: 0.0.1+1
+description: A library to automate the Chrome browser over the DevTools Protocol.
+version: 0.0.2
 homepage: https://github.com/xavierhainaux/chrome_dev_tools
 author: Xavier Hainaux <xavier.hainaux@gmail.com>
 
