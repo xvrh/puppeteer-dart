@@ -57,8 +57,10 @@ class Connection implements Client {
     return new Connection._(webSocket);
   }
 
+  @override
   Stream<Event> get onEvent => _eventController.stream;
 
+  @override
   Future<Map> send(String method, [Map parameters]) {
     int id = ++_lastId;
     String message = _encodeMessage(id, method, parameters);
@@ -143,6 +145,7 @@ class Session implements Client {
 
   Session._(this._targets, this.targetID, this.sessionId);
 
+  @override
   Future<Map> send(String method, [Map parameters]) {
     if (_eventController.isClosed) {
       throw new Exception('Session closed');
@@ -158,6 +161,7 @@ class Session implements Client {
     return completer.future;
   }
 
+  @override
   Stream<Event> get onEvent => _eventController.stream;
 
   _onMessage(String message) {

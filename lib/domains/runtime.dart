@@ -9,7 +9,6 @@
 /// other objects in their object group.
 
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
@@ -734,10 +733,13 @@ class ScriptId {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is ScriptId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -751,10 +753,13 @@ class RemoteObjectId {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is RemoteObjectId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -771,11 +776,14 @@ class UnserializableValue {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) =>
       other is UnserializableValue && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1276,11 +1284,14 @@ class ExecutionContextId {
 
   int toJson() => value;
 
+  @override
   bool operator ==(other) =>
       other is ExecutionContextId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1431,10 +1442,13 @@ class Timestamp {
 
   num toJson() => value;
 
+  @override
   bool operator ==(other) => other is Timestamp && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1448,10 +1462,13 @@ class TimeDelta {
 
   num toJson() => value;
 
+  @override
   bool operator ==(other) => other is TimeDelta && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1568,10 +1585,13 @@ class UniqueDebuggerId {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is UniqueDebuggerId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 

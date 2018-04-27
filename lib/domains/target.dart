@@ -1,7 +1,6 @@
 /// Supports additional targets discovery and allows to attach to them.
 
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
@@ -331,10 +330,13 @@ class TargetID {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is TargetID && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -348,10 +350,13 @@ class SessionID {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is SessionID && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -365,10 +370,13 @@ class BrowserContextID {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is BrowserContextID && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 

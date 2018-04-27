@@ -1,5 +1,4 @@
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
@@ -213,6 +212,7 @@ class StorageType {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 

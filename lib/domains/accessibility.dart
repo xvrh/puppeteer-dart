@@ -1,5 +1,4 @@
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
@@ -44,10 +43,13 @@ class AXNodeId {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is AXNodeId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -101,6 +103,7 @@ class AXValueType {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -134,6 +137,7 @@ class AXValueSourceType {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -175,6 +179,7 @@ class AXValueNativeSourceType {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -492,6 +497,7 @@ class AXPropertyName {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 

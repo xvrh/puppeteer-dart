@@ -1,7 +1,6 @@
 /// Actions and events related to the inspected page belong to the page domain.
 
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'network.dart' as network;
@@ -1096,6 +1095,7 @@ class ResourceType {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1109,10 +1109,13 @@ class FrameId {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is FrameId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1346,10 +1349,13 @@ class ScriptIdentifier {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is ScriptIdentifier && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1396,6 +1402,7 @@ class TransitionType {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1530,6 +1537,7 @@ class DialogType {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 

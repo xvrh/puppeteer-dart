@@ -1,7 +1,6 @@
 /// This domain emulates different environments for the page.
 
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'page.dart' as page;
@@ -348,5 +347,6 @@ class VirtualTimePolicy {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }

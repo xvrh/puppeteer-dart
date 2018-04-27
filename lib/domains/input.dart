@@ -1,5 +1,4 @@
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
@@ -454,6 +453,7 @@ class GestureSourceType {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -467,9 +467,12 @@ class TimeSinceEpoch {
 
   num toJson() => value;
 
+  @override
   bool operator ==(other) => other is TimeSinceEpoch && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }

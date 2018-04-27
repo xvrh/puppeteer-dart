@@ -1,5 +1,4 @@
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'io.dart' as io;
@@ -149,10 +148,13 @@ class MemoryDumpConfig {
 
   Map toJson() => value;
 
+  @override
   bool operator ==(other) => other is MemoryDumpConfig && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 

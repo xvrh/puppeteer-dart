@@ -8,7 +8,6 @@
 /// required stylesheet contents using the `getStyleSheet[Text]()` methods.
 
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
@@ -462,10 +461,13 @@ class StyleSheetId {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is StyleSheetId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -495,6 +497,7 @@ class StyleSheetOrigin {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
