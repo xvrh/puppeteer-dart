@@ -258,7 +258,6 @@ class _Event {
       }
     }
 
-    //TODO(xha): create a CommentBuilder to simplify and better manage the spacings between groups.
     code.writeln(toComment(event.description, indent: 2));
 
     String streamName = 'on${firstLetterUpper(name)}';
@@ -418,8 +417,6 @@ class _InternalType {
           'factory $id.fromJson(${context.getPropertyType(properties.first)} value) => new $id(value);');
     }
 
-    //TODO(xha): only generate toJson when the type is actually going to be serialized.
-    // And only generate fromJson when the type is actually un-serialized
     if (generateToJson) {
       code.writeln('');
       if (hasProperties) {
