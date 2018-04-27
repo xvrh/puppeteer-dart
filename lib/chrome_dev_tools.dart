@@ -47,7 +47,10 @@ class Chrome {
   static Future<Chrome> launch(String chromeExecutable,
       {bool headless: true,
       bool useTemporaryUserData: false,
-      bool noSandboxFlag: false}) async {
+      bool noSandboxFlag}) async {
+    // In docker environment we want to force the '--no-sandbox' flag automatically
+    noSandboxFlag ??= Platform.environment['CHROME_FORCE_NO_SANDBOX'] == 'true';
+
     Directory userDataDir;
     if (useTemporaryUserData) {
       userDataDir = await Directory.systemTemp.createTemp('chrome_');

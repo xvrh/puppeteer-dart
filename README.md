@@ -31,7 +31,7 @@ main() async {
   String chromeExecutable = (await downloadChrome()).executablePath;
   
   // Or just use an absolute path to an existing version of Chrome
-  chromeExecutable = r'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+  //chromeExecutable = r'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
   // Launch the `Chrome` process and connect to the DevTools
   // By default it is start in `headless` mode
@@ -59,7 +59,7 @@ import 'package:chrome_dev_tools/src/wait_until.dart';
 
 main() async {
   // Launch Chrome, see previous example
-  Chrome chrome; // ....
+  Chrome chrome; // ...
   
   // Open github in a new tab
   TargetID targetId = await chrome.targets.createTarget(

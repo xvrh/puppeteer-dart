@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:chrome_dev_tools/chrome_downloader.dart';
 import 'package:logging/logging.dart';
@@ -16,11 +14,8 @@ main() async {
   // the binaries.
   String chromeExecutable = (await downloadChrome()).executablePath;
 
-  if (Platform.isMacOS) {
-    // Or just use an absolute path to an existing version of Chrome
-    chromeExecutable =
-        r'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-  }
+  // Or just use an absolute path to an existing version of Chrome
+  //chromeExecutable = r'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
   // Launch the `Chrome` process and connect to the DevTools
   // By default it is start in `headless` mode
