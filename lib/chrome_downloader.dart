@@ -21,8 +21,8 @@ Future<ChromePath> downloadChrome(
   File executableFile = new File(executablePath);
 
   if (!executableFile.existsSync()) {
-    String url = _downloadURLs(revision);
-    String zipPath = p.join(cachePath, '${revision}_${p.basename(url)}');
+    String url = _downloadUrl(revision);
+    String zipPath = p.join(cachePath, '${revision}_${p.url.basename(url)}');
     await _downloadFile(url, zipPath);
     _unzip(zipPath, revisionDirectory.path);
     new File(zipPath).deleteSync();
@@ -46,7 +46,12 @@ Future _downloadFile(String url, String output) async {
   http.Client client = new http.Client();
   http.StreamedResponse response =
       await client.send(new http.Request('get', Uri.parse(url)));
-  await response.stream.pipe(new File(output).openWrite());
+  File ouputFile = new File(output);
+  await response.stream.pipe(ouputFile.openWrite());
+
+  if (!ouputFile.existsSync() || ouputFile.lengthSync() == 0) {
+    throw 'File was not downloaded from $url to $output';
+  }
 }
 
 void _unzip(String path, String targetPath) {
@@ -82,7 +87,7 @@ void _simpleUnzip(String path, String targetPath) {
 
 const _baseUrl = 'https://storage.googleapis.com/chromium-browser-snapshots';
 
-String _downloadURLs(int revision) {
+String _downloadUrl(int revision) {
   if (Platform.isWindows) {
     return '$_baseUrl/Win_x64/$revision/chrome-win32.zip';
   } else if (Platform.isLinux) {
