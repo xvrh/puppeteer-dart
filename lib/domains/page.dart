@@ -125,6 +125,7 @@ class PageManager {
 
   /// Deprecated, please use addScriptToEvaluateOnNewDocument instead.
   /// Returns: Identifier of the added script.
+  @deprecated
   Future<ScriptIdentifier> addScriptToEvaluateOnLoad(
     String scriptSource,
   ) async {
@@ -137,6 +138,7 @@ class PageManager {
   }
 
   /// Deprecated, please use removeScriptToEvaluateOnNewDocument instead.
+  @deprecated
   Future removeScriptToEvaluateOnLoad(
     ScriptIdentifier identifier,
   ) async {
@@ -271,6 +273,7 @@ class PageManager {
   /// Returns all browser cookies. Depending on the backend support, will return
   /// detailed cookie information in the `cookies` field.
   /// Returns: Array of cookie objects.
+  @deprecated
   Future<List<network.Cookie>> getCookies() async {
     Map result = await _client.send('Page.getCookies');
     return (result['cookies'] as List)
@@ -281,6 +284,7 @@ class PageManager {
   /// Deletes browser cookie with given name, domain and path.
   /// [cookieName] Name of the cookie to remove.
   /// [url] URL to match cooke domain and path.
+  @deprecated
   Future deleteCookie(
     String cookieName,
     String url,
@@ -391,6 +395,7 @@ class PageManager {
   /// [screenOrientation] Screen orientation override.
   /// [viewport] The viewport dimensions and scale. If not set, the override is
   /// cleared.
+  @deprecated
   Future setDeviceMetricsOverride(
     int width,
     int height,
@@ -439,6 +444,7 @@ class PageManager {
   }
 
   /// Clears the overriden device metrics.
+  @deprecated
   Future clearDeviceMetricsOverride() async {
     await _client.send('Page.clearDeviceMetricsOverride');
   }
@@ -448,6 +454,7 @@ class PageManager {
   /// [latitude] Mock latitude
   /// [longitude] Mock longitude
   /// [accuracy] Mock accuracy
+  @deprecated
   Future setGeolocationOverride({
     num latitude,
     num longitude,
@@ -467,6 +474,7 @@ class PageManager {
   }
 
   /// Clears the overriden Geolocation Position and Error.
+  @deprecated
   Future clearGeolocationOverride() async {
     await _client.send('Page.clearGeolocationOverride');
   }
@@ -475,6 +483,7 @@ class PageManager {
   /// [alpha] Mock alpha
   /// [beta] Mock beta
   /// [gamma] Mock gamma
+  @deprecated
   Future setDeviceOrientationOverride(
     num alpha,
     num beta,
@@ -489,6 +498,7 @@ class PageManager {
   }
 
   /// Clears the overridden Device Orientation.
+  @deprecated
   Future clearDeviceOrientationOverride() async {
     await _client.send('Page.clearDeviceOrientationOverride');
   }
@@ -497,6 +507,7 @@ class PageManager {
   /// [enabled] Whether the touch event emulation should be enabled.
   /// [configuration] Touch/gesture events configuration. Default: current
   /// platform.
+  @deprecated
   Future setTouchEmulationEnabled(
     bool enabled, {
     String configuration,

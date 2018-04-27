@@ -57,8 +57,13 @@ main() {
       code.writeln("import '$normalizedDep.dart' as $normalizedDep;");
     }
 
+    code.writeln();
+
     String className = '${domainName}Manager';
     code.writeln(toComment(domain.description));
+    if (domain.deprecated) {
+      code.writeln('@deprecated');
+    }
     code.writeln('class $className {');
     code.writeln('final Client _client;');
     code.writeln();
@@ -119,7 +124,7 @@ class _Command {
 
     //TODO(xha): create a CommentBuilder to simplify and better manage the spacings between groups.
     code.writeln(toComment(command.description, indent: 2));
-    for (Parameter parameter in parameters) {
+    for (Parameter parameter in parameters.where((p) => !p.deprecated)) {
       String description = parameter.description;
       if (description != null && description.isNotEmpty) {
         code.writeln(toComment('[${parameter.name}] $description', indent: 2));
@@ -130,6 +135,10 @@ class _Command {
       if (description != null && description.isNotEmpty) {
         code.writeln(toComment('Returns: $description', indent: 2));
       }
+    }
+
+    if (command.deprecated) {
+      code.writeln('@deprecated');
     }
 
     String returnTypeName;
@@ -154,13 +163,13 @@ class _Command {
 
     for (Parameter parameter in requireds) {
       code.writeln(
-          '${context.getPropertyType(parameter)} ${parameter.normalizedName}, ');
+          '${parameter.deprecatedAttribute} ${context.getPropertyType(parameter)} ${parameter.normalizedName}, ');
     }
     if (optionals.isNotEmpty) {
       code.writeln('{');
       for (Parameter parameter in optionals) {
         code.writeln(
-            '${context.getPropertyType(parameter)} ${parameter.normalizedName}, ');
+            '${parameter.deprecatedAttribute} ${context.getPropertyType(parameter)} ${parameter.normalizedName}, ');
       }
       code.writeln('}');
     }
@@ -174,7 +183,15 @@ class _Command {
       code.writeln('};');
 
       for (Parameter parameter in optionals) {
+        if (parameter.deprecated) {
+          //TODO(xha): it shouldn't be necessary: https://github.com/dart-lang/sdk/issues/30084
+          code.writeln('    // ignore: deprecated_member_use');
+        }
         code.writeln('if (${parameter.normalizedName} != null) {');
+        if (parameter.deprecated) {
+          //TODO(xha): it shouldn't be necessary: https://github.com/dart-lang/sdk/issues/30084
+          code.writeln('      // ignore: deprecated_member_use');
+        }
         code.writeln(
             "parameters['${parameter.name}'] = ${_toJsonCode(parameter)};");
         code.writeln('}');
@@ -363,7 +380,7 @@ class _InternalType {
       }
     }
 
-    for (Parameter property in properties) {
+    for (Parameter property in properties.where((p) => !p.deprecated)) {
       code.writeln(toComment(property.description, indent: 2));
       code.writeln(
           'final ${context.getPropertyType(property)} ${property.normalizedName};');
@@ -376,7 +393,7 @@ class _InternalType {
 
     if (hasProperties) {
       code.writeln('$id({');
-      for (Parameter property in properties) {
+      for (Parameter property in properties.where((p) => !p.deprecated)) {
         bool isOptional = property.optional;
         code.writeln(
             '${isOptional ? '' : '@required '}this.${property.normalizedName},');
@@ -395,7 +412,7 @@ class _InternalType {
     if (hasProperties) {
       code.writeln('factory $id.fromJson(Map json) {');
       code.writeln('return new $id(');
-      for (Parameter property in properties) {
+      for (Parameter property in properties.where((p) => !p.deprecated)) {
         String propertyName = property.name;
         String instantiateCode =
             _fromJsonCode(property, "json['$propertyName']");

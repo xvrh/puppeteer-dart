@@ -234,6 +234,7 @@ class NetworkManager {
 
   /// Tells whether clearing browser cache is supported.
   /// Returns: True if browser cache can be cleared.
+  @deprecated
   Future<bool> canClearBrowserCache() async {
     Map result = await _client.send('Network.canClearBrowserCache');
     return result['result'];
@@ -246,6 +247,7 @@ class NetworkManager {
 
   /// Tells whether clearing browser cookies is supported.
   /// Returns: True if browser cookies can be cleared.
+  @deprecated
   Future<bool> canClearBrowserCookies() async {
     Map result = await _client.send('Network.canClearBrowserCookies');
     return result['result'];
@@ -376,6 +378,7 @@ class NetworkManager {
 
   /// Tells whether emulation of network conditions is supported.
   /// Returns: True if emulation of network conditions is supported.
+  @deprecated
   Future<bool> canEmulateNetworkConditions() async {
     Map result = await _client.send('Network.canEmulateNetworkConditions');
     return result['result'];

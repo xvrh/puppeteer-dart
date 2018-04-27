@@ -28,24 +28,26 @@ class TracingManager {
       .map((Event event) => new BufferUsageEvent.fromJson(event.parameters));
 
   /// Start trace events collection.
-  /// [categories] Category/tag filter
-  /// [options] Tracing options
   /// [bufferUsageReportingInterval] If set, the agent will issue bufferUsage
   /// events at this interval, specified in milliseconds
   /// [transferMode] Whether to report trace events as series of dataCollected
   /// events or to save trace to a stream (defaults to `ReportEvents`).
   Future start({
-    String categories,
-    String options,
+    @deprecated String categories,
+    @deprecated String options,
     num bufferUsageReportingInterval,
     String transferMode,
     TraceConfig traceConfig,
   }) async {
     Map parameters = {};
+    // ignore: deprecated_member_use
     if (categories != null) {
+      // ignore: deprecated_member_use
       parameters['categories'] = categories;
     }
+    // ignore: deprecated_member_use
     if (options != null) {
+      // ignore: deprecated_member_use
       parameters['options'] = options;
     }
     if (bufferUsageReportingInterval != null) {

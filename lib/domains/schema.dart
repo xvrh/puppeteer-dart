@@ -3,6 +3,7 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// This domain is deprecated.
+@deprecated
 class SchemaManager {
   final Client _client;
 

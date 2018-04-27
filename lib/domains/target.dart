@@ -105,11 +105,10 @@ class TargetManager {
 
   /// Sends protocol message over session with given id.
   /// [sessionId] Identifier of the session.
-  /// [targetId] Deprecated.
   Future sendMessageToTarget(
     String message, {
     SessionID sessionId,
-    TargetID targetId,
+    @deprecated TargetID targetId,
   }) async {
     Map parameters = {
       'message': message,
@@ -117,7 +116,9 @@ class TargetManager {
     if (sessionId != null) {
       parameters['sessionId'] = sessionId.toJson();
     }
+    // ignore: deprecated_member_use
     if (targetId != null) {
+      // ignore: deprecated_member_use
       parameters['targetId'] = targetId.toJson();
     }
     await _client.send('Target.sendMessageToTarget', parameters);
@@ -169,16 +170,17 @@ class TargetManager {
 
   /// Detaches session with given id.
   /// [sessionId] Session to detach.
-  /// [targetId] Deprecated.
   Future detachFromTarget({
     SessionID sessionId,
-    TargetID targetId,
+    @deprecated TargetID targetId,
   }) async {
     Map parameters = {};
     if (sessionId != null) {
       parameters['sessionId'] = sessionId.toJson();
     }
+    // ignore: deprecated_member_use
     if (targetId != null) {
+      // ignore: deprecated_member_use
       parameters['targetId'] = targetId.toJson();
     }
     await _client.send('Target.detachFromTarget', parameters);
@@ -276,20 +278,13 @@ class DetachedFromTargetEvent {
   /// Detached session identifier.
   final SessionID sessionId;
 
-  /// Deprecated.
-  final TargetID targetId;
-
   DetachedFromTargetEvent({
     @required this.sessionId,
-    this.targetId,
   });
 
   factory DetachedFromTargetEvent.fromJson(Map json) {
     return new DetachedFromTargetEvent(
       sessionId: new SessionID.fromJson(json['sessionId']),
-      targetId: json.containsKey('targetId')
-          ? new TargetID.fromJson(json['targetId'])
-          : null,
     );
   }
 }
@@ -300,22 +295,15 @@ class ReceivedMessageFromTargetEvent {
 
   final String message;
 
-  /// Deprecated.
-  final TargetID targetId;
-
   ReceivedMessageFromTargetEvent({
     @required this.sessionId,
     @required this.message,
-    this.targetId,
   });
 
   factory ReceivedMessageFromTargetEvent.fromJson(Map json) {
     return new ReceivedMessageFromTargetEvent(
       sessionId: new SessionID.fromJson(json['sessionId']),
       message: json['message'],
-      targetId: json.containsKey('targetId')
-          ? new TargetID.fromJson(json['targetId'])
-          : null,
     );
   }
 }
