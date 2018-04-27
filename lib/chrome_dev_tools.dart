@@ -47,7 +47,7 @@ class Chromium {
   static Future<Chromium> launch(String chromiumExecutable,
       {bool headless: true,
       bool useTemporaryUserData: false,
-      bool sandbox: true}) async {
+      bool noSandboxFlag: false}) async {
     Directory userDataDir;
     if (useTemporaryUserData) {
       userDataDir = await Directory.systemTemp.createTemp('chrome_');
@@ -61,7 +61,7 @@ class Chromium {
     if (headless) {
       chromeArgs.addAll(_headlessArgs);
     }
-    if (!sandbox) {
+    if (noSandboxFlag) {
       chromeArgs.add('--no-sandbox');
     }
 
