@@ -1,13 +1,12 @@
-/// DOM debugging allows setting breakpoints on particular DOM operations and
-/// events. JavaScript execution will stop on these operations as if there was a
-/// regular breakpoint set.
-
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 import 'dom.dart' as dom;
 
+/// DOM debugging allows setting breakpoints on particular DOM operations and
+/// events. JavaScript execution will stop on these operations as if there was a
+/// regular breakpoint set.
 class DOMDebuggerManager {
   final Client _client;
 

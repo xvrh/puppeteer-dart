@@ -1,9 +1,8 @@
-/// Security
-
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
+/// Security
 class SecurityManager {
   final Client _client;
 

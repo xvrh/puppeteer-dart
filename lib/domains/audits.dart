@@ -1,11 +1,10 @@
-/// Audits domain allows investigation of page violations and possible
-/// improvements.
-
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'network.dart' as network;
 
+/// Audits domain allows investigation of page violations and possible
+/// improvements.
 class AuditsManager {
   final Client _client;
 

@@ -1,12 +1,11 @@
-/// This domain provides various functionality related to drawing atop the
-/// inspected page.
-
 import 'dart:async';
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'runtime.dart' as runtime;
 import 'page.dart' as page;
 
+/// This domain provides various functionality related to drawing atop the
+/// inspected page.
 class OverlayManager {
   final Client _client;
 

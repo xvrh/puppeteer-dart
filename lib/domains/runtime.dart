@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'package:meta/meta.dart' show required;
+import '../src/connection.dart';
+
 /// Runtime domain exposes JavaScript runtime by means of remote evaluation and
 /// mirror objects.
 /// Evaluation results are returned as mirror object that expose object type,
@@ -7,11 +11,6 @@
 /// maintained in memory unless they are either explicitly released or are
 /// released along with the
 /// other objects in their object group.
-
-import 'dart:async';
-import 'package:meta/meta.dart' show required;
-import '../src/connection.dart';
-
 class RuntimeManager {
   final Client _client;
 

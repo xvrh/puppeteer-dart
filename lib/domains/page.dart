@@ -1,5 +1,3 @@
-/// Actions and events related to the inspected page belong to the page domain.
-
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
@@ -9,6 +7,7 @@ import 'emulation.dart' as emulation;
 import 'dom.dart' as dom;
 import 'runtime.dart' as runtime;
 
+/// Actions and events related to the inspected page belong to the page domain.
 class PageManager {
   final Client _client;
 

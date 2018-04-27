@@ -1,9 +1,8 @@
-/// This domain is deprecated.
-
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
+/// This domain is deprecated.
 class SchemaManager {
   final Client _client;
 
