@@ -18,6 +18,7 @@ class Domain {
   final List<ComplexType> types;
   final List<Command> commands;
   final List<Event> events;
+  final bool deprecated;
 
   Domain.fromJson(Map json)
       : domain = json['domain'],
@@ -36,7 +37,8 @@ class Domain {
             ? (json['events'] as List)
                 .map((j) => new Event.fromJson(j))
                 .toList()
-            : const [];
+            : const [],
+        deprecated = json['deprecated'] ?? false;
 }
 
 class ComplexType {
@@ -75,10 +77,12 @@ class Command {
   final String description;
   final List<Parameter> parameters;
   final List<Parameter> returns;
+  final bool deprecated;
 
   Command.fromJson(Map json)
       : name = json['name'],
         description = json['description'],
+        deprecated = json['deprecated'] ?? false,
         parameters = json.containsKey('parameters')
             ? (json['parameters'] as List)
                 .map((j) => new Parameter.fromJson(j))
@@ -110,6 +114,7 @@ class Parameter implements Typed {
   final String name;
   final String description;
   final bool optional;
+  final bool deprecated;
   final ListItems items;
 
   @override
@@ -124,6 +129,7 @@ class Parameter implements Typed {
       this.type,
       this.ref,
       this.optional: false,
+      this.deprecated: false,
       this.items});
 
   Parameter.fromJson(Map json)
@@ -132,11 +138,14 @@ class Parameter implements Typed {
         type = json['type'],
         ref = json[r'$ref'],
         optional = json['optional'] ?? false,
+        deprecated = json['deprecated'] ?? false,
         items = json.containsKey('items')
             ? new ListItems.fromJson(json['items'])
             : null;
 
   String get normalizedName => preventKeywords(name);
+
+  String get deprecatedAttribute => deprecated ? '@deprecated' : '';
 }
 
 class ListItems implements Typed {

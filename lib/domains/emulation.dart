@@ -125,6 +125,7 @@ class EmulationManager {
   /// screenshots of the specified size. Not supported on Android.
   /// [width] Frame width (DIP).
   /// [height] Frame height (DIP).
+  @deprecated
   Future setVisibleSize(
     int width,
     int height,

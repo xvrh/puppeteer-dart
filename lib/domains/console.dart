@@ -3,6 +3,7 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// This domain is deprecated - use Runtime or Log instead.
+@deprecated
 class ConsoleManager {
   final Client _client;
 
