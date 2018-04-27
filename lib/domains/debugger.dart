@@ -3,7 +3,6 @@
 /// breakpoints, stepping through execution, exploring stack traces, etc.
 
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
@@ -934,10 +933,13 @@ class BreakpointId {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is BreakpointId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -951,10 +953,13 @@ class CallFrameId {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is CallFrameId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1087,7 +1092,7 @@ class CallFrame {
       'location': location.toJson(),
       'url': url,
       'scopeChain': scopeChain.map((e) => e.toJson()).toList(),
-      'this': this.toJson(),
+      'this': this$.toJson(),
     };
     if (functionLocation != null) {
       json['functionLocation'] = functionLocation.toJson();

@@ -109,10 +109,14 @@ class Event {
 class Parameter implements Typed {
   final String name;
   final String description;
-  final String type;
-  final String ref;
   final bool optional;
   final ListItems items;
+
+  @override
+  final String type;
+
+  @override
+  final String ref;
 
   Parameter(
       {this.name,
@@ -136,7 +140,10 @@ class Parameter implements Typed {
 }
 
 class ListItems implements Typed {
+  @override
   final String type;
+
+  @override
   final String ref;
 
   ListItems.fromJson(Map json)

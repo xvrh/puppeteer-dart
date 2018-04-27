@@ -1,7 +1,6 @@
 /// Security
 
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
@@ -139,10 +138,13 @@ class CertificateId {
 
   int toJson() => value;
 
+  @override
   bool operator ==(other) => other is CertificateId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -168,6 +170,7 @@ class MixedContentType {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -194,6 +197,7 @@ class SecurityState {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -331,5 +335,6 @@ class CertificateErrorAction {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }

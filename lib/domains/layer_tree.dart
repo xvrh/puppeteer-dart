@@ -1,5 +1,4 @@
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
@@ -186,10 +185,13 @@ class LayerId {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is LayerId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -203,10 +205,13 @@ class SnapshotId {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is SnapshotId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -482,9 +487,12 @@ class PaintProfile {
 
   List<num> toJson() => value;
 
+  @override
   bool operator ==(other) => other is PaintProfile && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }

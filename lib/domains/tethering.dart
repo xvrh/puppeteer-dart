@@ -1,7 +1,6 @@
 /// The Tethering domain defines methods and events for browser port binding.
 
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 

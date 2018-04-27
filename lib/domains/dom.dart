@@ -9,7 +9,6 @@
 /// document elements as their child nodes.</p>
 
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'page.dart' as page;
@@ -1019,10 +1018,13 @@ class NodeId {
 
   int toJson() => value;
 
+  @override
   bool operator ==(other) => other is NodeId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1037,10 +1039,13 @@ class BackendNodeId {
 
   int toJson() => value;
 
+  @override
   bool operator ==(other) => other is BackendNodeId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1128,6 +1133,7 @@ class PseudoType {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1150,6 +1156,7 @@ class ShadowRootType {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1474,10 +1481,13 @@ class Quad {
 
   List<num> toJson() => value;
 
+  @override
   bool operator ==(other) => other is Quad && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 

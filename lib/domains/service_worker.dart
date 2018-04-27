@@ -1,5 +1,4 @@
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'target.dart' as target;
@@ -191,6 +190,7 @@ class ServiceWorkerVersionRunningStatus {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -224,6 +224,7 @@ class ServiceWorkerVersionStatus {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 

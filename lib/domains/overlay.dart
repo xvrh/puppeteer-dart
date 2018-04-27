@@ -2,8 +2,6 @@
 /// inspected page.
 
 import 'dart:async';
-// ignore: unused_import
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'runtime.dart' as runtime;
@@ -423,5 +421,6 @@ class InspectMode {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }

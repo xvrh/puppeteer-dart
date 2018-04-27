@@ -50,8 +50,9 @@ main() {
 
     //TODO(xha): sort imports
     code.writeln("import 'dart:async';");
-    code.writeln('// ignore: unused_import');
-    code.writeln("import 'package:meta/meta.dart' show required;");
+    if (context.needsMetaPackage) {
+      code.writeln("import 'package:meta/meta.dart' show required;");
+    }
     code.writeln("import '../src/connection.dart';");
 
     for (String dependency in context.dependencies) {
@@ -129,7 +130,7 @@ class _Command {
     if (returns.length == 1) {
       String description = returns[0].description;
       if (description != null && description.isNotEmpty) {
-        code.writeln(toComment('Return: ${description}'));
+        code.writeln(toComment('Return: $description'));
       }
     }
 
@@ -307,7 +308,7 @@ class _Event {
 }
 
 String _toJsonCode(Parameter parameter) {
-  String name = parameter.name;
+  String name = parameter.normalizedName;
   String type = parameter.type;
 
   if (type != null &&
@@ -381,7 +382,10 @@ class _InternalType {
       for (Parameter property in properties) {
         bool isOptional = property.optional;
         code.writeln(
-            '${!isOptional ? '@required ' : ''}this.${property.normalizedName},');
+            '${isOptional ? '' : '@required '}this.${property.normalizedName},');
+        if (!isOptional) {
+          context.useMetaPackage();
+        }
       }
       code.writeln('});');
     } else if (isEnum) {
@@ -441,14 +445,17 @@ class _InternalType {
     if (!hasProperties && enumValues == null) {
       //TODO(xha): generate operator== and hashcode also for complex type?
       code.writeln();
+      code.writeln('@override');
       code.writeln(
           'bool operator ==(other) => other is $id && other.value == value;');
       code.writeln();
+      code.writeln('@override');
       code.writeln('int get hashCode => value.hashCode;');
     }
 
     if (!hasProperties) {
       code.writeln();
+      code.writeln('@override');
       code.writeln('String toString() => value.toString();');
     }
     //TODO(xha): generate a readable toString() method for the complex type
@@ -493,6 +500,7 @@ class _InternalType {
 class _DomainContext {
   final Domain domain;
   final Set<String> dependencies = new Set();
+  bool _useMetaPackage = false;
 
   _DomainContext(this.domain);
 
@@ -530,6 +538,11 @@ class _DomainContext {
     }
 
     return type;
+  }
+
+  bool get needsMetaPackage => _useMetaPackage;
+  useMetaPackage() {
+    _useMetaPackage = true;
   }
 }
 

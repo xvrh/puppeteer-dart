@@ -1,7 +1,6 @@
 /// The Browser domain defines methods and events for browser managing.
 
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'target.dart' as target;
@@ -130,10 +129,13 @@ class WindowID {
 
   int toJson() => value;
 
+  @override
   bool operator ==(other) => other is WindowID && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -158,6 +160,7 @@ class WindowState {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 

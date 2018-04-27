@@ -68,6 +68,7 @@ class Chromium {
     _logger.info('Start $chromiumExecutable with $chromeArgs');
     Process chromeProcess = await Process.start(chromiumExecutable, chromeArgs);
 
+    // ignore: unawaited_futures
     chromeProcess.exitCode.then((int exitCode) {
       _logger.info('Chrome exit with $exitCode.');
       if (userDataDir != null) {

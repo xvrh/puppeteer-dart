@@ -1,7 +1,6 @@
 /// This domain is deprecated.
 
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 

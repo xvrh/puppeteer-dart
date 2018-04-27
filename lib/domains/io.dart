@@ -1,7 +1,6 @@
 /// Input/Output operations for streams produced by DevTools.
 
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
@@ -97,9 +96,12 @@ class StreamHandle {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is StreamHandle && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }

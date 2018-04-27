@@ -22,8 +22,12 @@ Future getRemoteObject(Client client, RemoteObject remoteObject) async {
             'Unsupported unserializable value: ${remoteObject.unserializableValue}');
     }
   }
-  if (remoteObject.objectId == null) return remoteObject.value;
-  if (remoteObject.subtype == 'promise') return remoteObject.description;
+  if (remoteObject.objectId == null) {
+    return remoteObject.value;
+  }
+  if (remoteObject.subtype == 'promise') {
+    return remoteObject.description;
+  }
   try {
     RuntimeManager runtime = new RuntimeManager(client);
     final response = await runtime.callFunctionOn('function() { return this; }',

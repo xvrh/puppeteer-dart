@@ -3,7 +3,6 @@
 /// regular breakpoint set.
 
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
@@ -174,6 +173,7 @@ class DOMBreakpointType {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 

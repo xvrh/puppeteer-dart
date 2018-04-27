@@ -3,7 +3,6 @@
 /// headers, bodies, timing, etc.
 
 import 'dart:async';
-// ignore: unused_import
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'security.dart' as security;
@@ -1112,10 +1111,13 @@ class LoaderId {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is LoaderId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1129,10 +1131,13 @@ class RequestId {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is RequestId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1146,10 +1151,13 @@ class InterceptionId {
 
   String toJson() => value;
 
+  @override
   bool operator ==(other) => other is InterceptionId && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1198,6 +1206,7 @@ class ErrorReason {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1211,10 +1220,13 @@ class TimeSinceEpoch {
 
   num toJson() => value;
 
+  @override
   bool operator ==(other) => other is TimeSinceEpoch && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1229,10 +1241,13 @@ class MonotonicTime {
 
   num toJson() => value;
 
+  @override
   bool operator ==(other) => other is MonotonicTime && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1246,10 +1261,13 @@ class Headers {
 
   Map toJson() => value;
 
+  @override
   bool operator ==(other) => other is Headers && other.value == value;
 
+  @override
   int get hashCode => value.hashCode;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1284,6 +1302,7 @@ class ConnectionType {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1305,6 +1324,7 @@ class CookieSameSite {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1445,6 +1465,7 @@ class ResourcePriority {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -1714,6 +1735,7 @@ class BlockedReason {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
@@ -2376,6 +2398,7 @@ class InterceptionStage {
 
   String toJson() => value;
 
+  @override
   String toString() => value.toString();
 }
 
