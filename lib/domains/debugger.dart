@@ -1,12 +1,11 @@
-/// Debugger domain exposes JavaScript debugging capabilities. It allows setting
-/// and removing
-/// breakpoints, stepping through execution, exploring stack traces, etc.
-
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
+/// Debugger domain exposes JavaScript debugging capabilities. It allows setting
+/// and removing
+/// breakpoints, stepping through execution, exploring stack traces, etc.
 class DebuggerManager {
   final Client _client;
 

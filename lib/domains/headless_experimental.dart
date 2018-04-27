@@ -1,10 +1,9 @@
-/// This domain provides experimental commands only supported in headless mode.
-
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
+/// This domain provides experimental commands only supported in headless mode.
 class HeadlessExperimentalManager {
   final Client _client;
 

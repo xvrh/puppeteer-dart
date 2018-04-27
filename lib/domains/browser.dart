@@ -1,10 +1,9 @@
-/// The Browser domain defines methods and events for browser managing.
-
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'target.dart' as target;
 
+/// The Browser domain defines methods and events for browser managing.
 class BrowserManager {
   final Client _client;
 

@@ -1,10 +1,9 @@
-/// Input/Output operations for streams produced by DevTools.
-
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
+/// Input/Output operations for streams produced by DevTools.
 class IOManager {
   final Client _client;
 

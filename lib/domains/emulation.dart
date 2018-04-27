@@ -1,5 +1,3 @@
-/// This domain emulates different environments for the page.
-
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
@@ -7,6 +5,7 @@ import 'page.dart' as page;
 import 'runtime.dart' as runtime;
 import 'dom.dart' as dom;
 
+/// This domain emulates different environments for the page.
 class EmulationManager {
   final Client _client;
 

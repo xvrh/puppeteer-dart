@@ -1,12 +1,11 @@
-/// This domain facilitates obtaining document snapshots with DOM, layout, and
-/// style information.
-
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'page.dart' as page;
 
+/// This domain facilitates obtaining document snapshots with DOM, layout, and
+/// style information.
 class DOMSnapshotManager {
   final Client _client;
 

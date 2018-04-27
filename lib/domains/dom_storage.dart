@@ -1,9 +1,8 @@
-/// Query and modify DOM storage.
-
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
+/// Query and modify DOM storage.
 class DOMStorageManager {
   final Client _client;
 

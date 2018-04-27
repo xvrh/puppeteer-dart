@@ -45,9 +45,6 @@ main() {
 
     StringBuffer code = new StringBuffer();
 
-    code.writeln(toComment(domain.description));
-    code.writeln();
-
     //TODO(xha): sort imports
     code.writeln("import 'dart:async';");
     if (context.needsMetaPackage) {
@@ -61,6 +58,7 @@ main() {
     }
 
     String className = '${domainName}Manager';
+    code.writeln(toComment(domain.description));
     code.writeln('class $className {');
     code.writeln('final Client _client;');
     code.writeln();

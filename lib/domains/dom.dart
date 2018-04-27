@@ -1,3 +1,10 @@
+import 'dart:async';
+import 'package:meta/meta.dart' show required;
+import '../src/connection.dart';
+import 'page.dart' as page;
+import 'runtime.dart' as runtime;
+import 'dom.dart' as dom;
+
 /// This domain exposes DOM read/write operations. Each DOM Node is represented
 /// with its mirror object that has an `id`. This `id` can be used to get
 /// additional information on the Node, resolve it into the JavaScript object
@@ -7,14 +14,6 @@
 /// responsibility to collect information about the nodes that were sent to the
 /// client.<p>Note that `iframe` owner elements will return corresponding
 /// document elements as their child nodes.</p>
-
-import 'dart:async';
-import 'package:meta/meta.dart' show required;
-import '../src/connection.dart';
-import 'page.dart' as page;
-import 'runtime.dart' as runtime;
-import 'dom.dart' as dom;
-
 class DOMManager {
   final Client _client;
 

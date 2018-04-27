@@ -1,9 +1,8 @@
-/// Supports additional targets discovery and allows to attach to them.
-
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
+/// Supports additional targets discovery and allows to attach to them.
 class TargetManager {
   final Client _client;
 

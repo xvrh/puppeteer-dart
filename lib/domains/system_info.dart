@@ -1,10 +1,9 @@
-/// The SystemInfo domain defines methods and events for querying low-level
-/// system information.
-
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
+/// The SystemInfo domain defines methods and events for querying low-level
+/// system information.
 class SystemInfoManager {
   final Client _client;
 

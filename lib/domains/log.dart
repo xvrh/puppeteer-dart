@@ -1,11 +1,10 @@
-/// Provides access to log entries.
-
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 import 'network.dart' as network;
 
+/// Provides access to log entries.
 class LogManager {
   final Client _client;
 
