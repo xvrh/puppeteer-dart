@@ -9,7 +9,13 @@ All the code in `lib/domains` are generated from the [browser_protocol.json](htt
 
 
 ## Usage
+[Launch chrome](#launch)  
+[Generate a PDF from an HTML page](#pdf)  
+[Take a screenshot of a page](#screenshot_page)  
+[Take a screenshot of an element in a page](#screenshot_element)  
+[Create a static version of a Single Page Application](#spa)  
 
+<a name="launch"></a>
 ### Launch Chrome
 
 Download the last revision of chrome and launch it.
@@ -49,6 +55,7 @@ main() async {
 }
 ```
 
+<a name="pdf"></a>
 ### Generate a PDF from a page
 
 ```dart
@@ -82,7 +89,10 @@ main() {
 }
 ```
 
+<a name="screenshot"></a>
 ### Take a screenshot
+
+<a name="screenshot_page"></a>
 Of a complete page
 ```dart
 import 'dart:convert';
@@ -111,6 +121,7 @@ main() {
 }
 ```
 
+<a name="screenshot_element"></a>
 Of a specific element in the page
 ```dart
 import 'dart:convert';
@@ -150,6 +161,7 @@ main() {
 ```
 
 ### Create a static version of a Single Page Application
+<a name="spa"></a>
 ```dart
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:chrome_dev_tools/domains/dom_snapshot.dart';
