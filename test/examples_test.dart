@@ -14,15 +14,19 @@ main() {
       f is File &&
       f.path.endsWith('.dart') &&
       !p.basename(f.path).startsWith('_'))) {
-    test('Text example/${p.basename(exampleFile.path)}', () {
-      var result = Process.runSync(
-          Platform.resolvedExecutable, [exampleFile.absolute.path],
-          environment: envVariables);
-      if (result.exitCode != 0) {
-        print(result.stdout);
-        print(result.stderr);
-        fail('Exit code is ${result.exitCode}');
-      }
-    });
+    String fileContent = exampleFile.readAsStringSync();
+
+    if (fileContent.contains('main()')) {
+      test('Text example/${p.basename(exampleFile.path)}', () {
+        var result = Process.runSync(
+            Platform.resolvedExecutable, [exampleFile.absolute.path],
+            environment: envVariables);
+        if (result.exitCode != 0) {
+          print(result.stdout);
+          print(result.stderr);
+          fail('Exit code is ${result.exitCode}');
+        }
+      });
+    }
   }
 }

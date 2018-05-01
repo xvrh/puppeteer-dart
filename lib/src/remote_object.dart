@@ -1,9 +1,8 @@
 import 'dart:async';
 
 import 'package:chrome_dev_tools/domains/runtime.dart';
-import 'package:chrome_dev_tools/src/connection.dart';
 
-Future getRemoteObject(Client client, RemoteObject remoteObject) async {
+Future remoteObject(RuntimeManager runtime, RemoteObject remoteObject) async {
   if (remoteObject.subtype == 'error')
     throw 'RemoteObject has error: ${remoteObject.description}';
 
@@ -29,7 +28,6 @@ Future getRemoteObject(Client client, RemoteObject remoteObject) async {
     return remoteObject.description;
   }
   try {
-    RuntimeManager runtime = new RuntimeManager(client);
     final response = await runtime.callFunctionOn('function() { return this; }',
         objectId: remoteObject.objectId, returnByValue: true);
     return response.result.value;
@@ -37,13 +35,12 @@ Future getRemoteObject(Client client, RemoteObject remoteObject) async {
     // Return description for unserializable object, e.g. 'window'.
     return remoteObject.description;
   } finally {
-    await releaseObject(client, remoteObject);
+    await releaseObject(runtime, remoteObject);
   }
 }
 
-Future<Map<String, dynamic>> getProperties(
-    Client client, RemoteObject remoteObject) async {
-  RuntimeManager runtime = new RuntimeManager(client);
+Future<Map<String, dynamic>> remoteObjectProperties(
+    RuntimeManager runtime, RemoteObject remoteObject) async {
   var properties = await runtime.getProperties(remoteObject.objectId);
 
   Map<String, dynamic> result = {};
@@ -58,10 +55,9 @@ Future<Map<String, dynamic>> getProperties(
   return result;
 }
 
-Future releaseObject(Client client, RemoteObject remoteObject) async {
+Future releaseObject(RuntimeManager runtime, RemoteObject remoteObject) async {
   if (remoteObject.objectId == null) return;
   try {
-    RuntimeManager runtime = new RuntimeManager(client);
     await runtime.releaseObject(remoteObject.objectId);
   } catch (e) {
     // Exceptions might happen in case of a page been navigated or closed.

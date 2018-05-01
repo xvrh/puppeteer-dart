@@ -1,5 +1,15 @@
+import 'dart:io';
+
+import 'package:test/test.dart';
+
+import '../tool/generate_readme.dart';
+
 main() {
-  //TODO(xha): validate that the examples in the readme are correct:
-  // - Doesn't have any Dart analysis warning
-  // - Execute without errors
+  test('The readme has been generated', () {
+    String currentReadme = new File('README.md').readAsStringSync();
+
+    String expectedReadme = generateReadme();
+
+    expect(currentReadme, equals(expectedReadme));
+  });
 }

@@ -51,7 +51,7 @@ linter:
    - empty_catches
    - empty_constructor_bodies
    #- implementation_imports
-   - join_return_with_assignment
+   #- join_return_with_assignment
    - library_names
    - library_prefixes
    - non_constant_identifier_names

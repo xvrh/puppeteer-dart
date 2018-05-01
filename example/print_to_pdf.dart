@@ -1,43 +1,29 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/chrome_downloader.dart';
-import 'package:chrome_dev_tools/domains/emulation.dart';
-import 'package:chrome_dev_tools/domains/page.dart';
-import 'package:chrome_dev_tools/src/wait_until.dart';
-import 'package:logging/logging.dart';
+
+import 'utils.dart';
 
 main() async {
-  Logger.root.level = Level.ALL;
-  Logger.root.onRecord.listen(print);
+  await withTab('https://www.github.com', (Tab tab) async {
+    // Force the "screen" media or some CSS @media print can change the look
+    await tab.emulation.setEmulatedMedia('screen');
 
-  String chromePath = (await downloadChrome()).executablePath;
+    // A small helper to wait until the network is quiet
+    await tab.waitUntilNetworkIdle();
 
-  Chrome chrome = await Chrome.launch(chromePath, headless: true);
+    // Capture the PDF and convert it to a List of bytes.
+    List<int> pdf = BASE64.decode(await tab.page.printToPDF(
+        pageRanges: '1',
+        landscape: true,
+        printBackground: true,
+        marginBottom: 0,
+        marginLeft: 0,
+        marginRight: 0,
+        marginTop: 0));
 
-  TargetID targetId =
-      await chrome.targets.createTarget('https://www.github.com');
-  Session session = await chrome.connection.createSession(targetId);
-
-  PageManager page = new PageManager(session);
-
-  // Force the "screen" media or some CSS @media print can change the look
-  EmulationManager emulation = new EmulationManager(session);
-  await emulation.setEmulatedMedia('screen');
-
-  await waitUntilNetworkIdle(session);
-
-  List<int> pdf = BASE64.decode(await page.printToPDF(
-      pageRanges: '1',
-      landscape: true,
-      printBackground: true,
-      marginBottom: 0,
-      marginLeft: 0,
-      marginRight: 0,
-      marginTop: 0));
-
-  await new File.fromUri(Platform.script.resolve('_github.pdf'))
-      .writeAsBytes(pdf);
-
-  await chrome.close();
+    // Save the bytes in a file
+    await new File.fromUri(Platform.script.resolve('_github.pdf'))
+        .writeAsBytes(pdf);
+  });
 }

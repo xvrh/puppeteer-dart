@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'package:chrome_dev_tools/domains/network.dart';
-import 'package:chrome_dev_tools/src/connection.dart';
 
-Future waitUntilNetworkIdle(Session session,
+import 'package:chrome_dev_tools/domains/network.dart';
+
+Future waitUntilNetworkIdle(NetworkManager network,
     {Duration idleDuration: const Duration(milliseconds: 1000),
     int idleInFlight: 0}) async {
-  NetworkManager network = new NetworkManager(session);
   await network.enable();
 
   List<String> requestIds = [];

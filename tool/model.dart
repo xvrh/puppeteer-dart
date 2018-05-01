@@ -13,7 +13,7 @@ class Protocol {
 }
 
 class Domain {
-  final String domain;
+  final String name;
   final String description;
   final List<ComplexType> types;
   final List<Command> commands;
@@ -21,7 +21,7 @@ class Domain {
   final bool deprecated;
 
   Domain.fromJson(Map json)
-      : domain = json['domain'],
+      : name = json['domain'],
         description = json['description'],
         types = json.containsKey('types')
             ? (json['types'] as List)
