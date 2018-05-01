@@ -34,19 +34,19 @@ import 'example/print_to_pdf.dart';
 ### Take a screenshot
 
 <a name="screenshot_page"></a>
-Of a complete page
+Screenshot the complete HTML page
 ```dart
 import 'example/screenshot_page.dart';
 ```
 
 <a name="screenshot_element"></a>
-Of a specific element in the page
+Screenshot a specific node in the page
 ```dart
 import 'example/screenshot_element.dart';
 ```
 
-### Create a static version of a Single Page Application
 <a name="spa"></a>
+### Create a static version of a Single Page Application
 ```dart
 import 'example/capture_spa.dart';
 ```
