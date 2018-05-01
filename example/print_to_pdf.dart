@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-
 import 'utils.dart';
 
-main() async {
-  await withTab('https://www.github.com', (Tab tab) async {
+main() {
+  chromeTab('https://www.github.com', (Tab tab) async {
     // Force the "screen" media or some CSS @media print can change the look
     await tab.emulation.setEmulatedMedia('screen');
 

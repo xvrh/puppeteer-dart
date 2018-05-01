@@ -55,11 +55,10 @@ main() async {
 import 'dart:convert';
 import 'dart:io';
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-
 import 'utils.dart';
 
-main() async {
-  await withTab('https://www.github.com', (Tab tab) async {
+main() {
+  chromeTab('https://www.github.com', (Tab tab) async {
     // Force the "screen" media or some CSS @media print can change the look
     await tab.emulation.setEmulatedMedia('screen');
 
@@ -90,11 +89,10 @@ import 'dart:io';
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:chrome_dev_tools/domains/page.dart';
 import 'package:chrome_dev_tools/domains/runtime.dart';
-
 import 'utils.dart';
 
-main() async {
-  await withTab('https://www.github.com', (Tab tab) async {
+main() {
+  chromeTab('https://www.github.com', (Tab tab) async {
     // A small helper to wait until the network is quiet
     await tab.waitUntilNetworkIdle();
 
@@ -126,11 +124,10 @@ main() async {
 ```dart
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:chrome_dev_tools/domains/dom_snapshot.dart';
-
 import 'utils.dart';
 
-main() async {
-  await withTab('https://www.google.com', (Tab tab) async {
+main() {
+  chromeTab('https://www.google.com', (Tab tab) async {
     // A small helper to wait until the network is quiet
     await tab.waitUntilNetworkIdle();
 
@@ -147,6 +144,25 @@ main() async {
       nodeString += '>';
       print(nodeString);
     }
+  });
+}
+```
+Or more simply
+```dart
+import 'package:chrome_dev_tools/chrome_dev_tools.dart';
+import 'utils.dart';
+
+main() {
+  chromeTab('https://news.ycombinator.com/news', (Tab tab) async {
+    // A small helper to wait until the network is quiet
+    await tab.waitUntilNetworkIdle();
+
+    // Execute some javascript to serialize the document
+    var result = await tab.runtime
+        .evaluate('document.documentElement.outerHTML;', returnByValue: true);
+
+    String pageContent = result.result.value;
+    print(pageContent);
   });
 }
 ```

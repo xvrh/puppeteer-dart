@@ -6,7 +6,8 @@ import 'package:logging/logging.dart';
 
 typedef _Callback(Tab tab);
 
-Future withTab(String url, _Callback callback, {bool setupLogger: true}) async {
+Future chromeTab(String url, _Callback callback,
+    {bool setupLogger: true}) async {
   if (setupLogger) {
     Logger.root.level = Level.ALL;
     Logger.root.onRecord.listen(print);

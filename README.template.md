@@ -32,6 +32,10 @@ import 'example/screenshot_element.dart';
 ```dart
 import 'example/capture_spa.dart';
 ```
+Or more simply
+```dart
+import 'example/capture_spa_with_javascript.dart';
+```
 
 ## Related work
  * [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface)

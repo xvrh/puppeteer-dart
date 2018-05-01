@@ -3,11 +3,10 @@ import 'dart:io';
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:chrome_dev_tools/domains/page.dart';
 import 'package:chrome_dev_tools/domains/runtime.dart';
-
 import 'utils.dart';
 
-main() async {
-  await withTab('https://www.github.com', (Tab tab) async {
+main() {
+  chromeTab('https://www.github.com', (Tab tab) async {
     // A small helper to wait until the network is quiet
     await tab.waitUntilNetworkIdle();
 
