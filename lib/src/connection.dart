@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:chrome_dev_tools/domains/target.dart';
 import 'package:logging/logging.dart';
+import '../domains/target.dart';
 
 abstract class Client {
   Future<Map> send(String method, [Map parameters]);
@@ -138,12 +137,12 @@ class Session implements Client {
   static int _lastId = 0;
   final TargetID targetID;
   final SessionID sessionId;
-  final TargetManager _targets;
+  final TargetManager _targetManager;
   final Map<int, Completer> _completers = {};
   final StreamController<Event> _eventController =
       new StreamController<Event>.broadcast();
 
-  Session._(this._targets, this.targetID, this.sessionId);
+  Session._(this._targetManager, this.targetID, this.sessionId);
 
   @override
   Future<Map> send(String method, [Map parameters]) {
@@ -156,7 +155,7 @@ class Session implements Client {
     Completer completer = new Completer();
     _completers[id] = completer;
 
-    _targets.sendMessageToTarget(message, sessionId: sessionId);
+    _targetManager.sendMessageToTarget(message, sessionId: sessionId);
 
     return completer.future;
   }
@@ -189,7 +188,7 @@ class Session implements Client {
     _completers.clear();
   }
 
-  Future dispose() {
-    return _targets.closeTarget(targetID);
+  Future close() {
+    return _targetManager.closeTarget(targetID);
   }
 }

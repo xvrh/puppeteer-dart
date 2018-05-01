@@ -1,6 +1,5 @@
 import 'dart:async';
-
-import 'package:chrome_dev_tools/domains/network.dart';
+import '../domains/network.dart';
 
 Future waitUntilNetworkIdle(NetworkManager network,
     {Duration idleDuration: const Duration(milliseconds: 1000),

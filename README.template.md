@@ -23,7 +23,13 @@ import 'example/example.dart';
 import 'example/print_to_pdf.dart';
 ```
 
-### Take a screenshot of an element.
+### Take a screenshot
+Of a complete page
+```dart
+import 'example/screenshot_page.dart';
+```
+
+Of a specific element in the page
 ```dart
 import 'example/screenshot_element.dart';
 ```

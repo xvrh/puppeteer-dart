@@ -1,6 +1,5 @@
 import 'dart:async';
-
-import 'package:chrome_dev_tools/domains/runtime.dart';
+import '../domains/runtime.dart';
 
 Future remoteObject(RuntimeManager runtime, RemoteObject remoteObject) async {
   if (remoteObject.subtype == 'error')

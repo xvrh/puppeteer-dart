@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:chrome_dev_tools/domains/target.dart';
-import 'package:chrome_dev_tools/src/connection.dart';
-import 'package:chrome_dev_tools/src/tab.dart';
+import 'domains/target.dart';
+import 'src/connection.dart';
+import 'src/tab.dart';
 import 'package:logging/logging.dart';
 
-export 'domains/target.dart';
 export 'src/tab.dart';
 
 final Logger _logger = new Logger('chrome_dev_tools');
@@ -110,9 +108,9 @@ class Chrome {
 
   Future<Tab> newTab(String url) async {
     TargetID targetId = await connection.targets.createTarget(url);
-    Session client = await connection.createSession(targetId);
+    Session session = await connection.createSession(targetId);
 
-    return new Tab(client);
+    return new Tab(session);
   }
 
   Future closeAllTabs() async {

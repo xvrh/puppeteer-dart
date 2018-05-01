@@ -82,7 +82,36 @@ main() {
 }
 ```
 
-### Take a screenshot of an element.
+### Take a screenshot
+Of a complete page
+```dart
+import 'dart:convert';
+import 'dart:io';
+import 'package:chrome_dev_tools/chrome_dev_tools.dart';
+import 'utils.dart';
+
+main() {
+  chromeTab('https://www.youtube.com', (Tab tab) async {
+    // A small helper to wait until the network is quiet
+    await tab.waitUntilNetworkIdle();
+
+    var pageMetrics = await tab.page.getLayoutMetrics();
+
+    // Set page size to the content size
+    await tab.emulation.setDeviceMetricsOverride(pageMetrics.contentSize.width,
+        pageMetrics.contentSize.height, 1, false);
+
+    // Capture the screenshot
+    String screenshot = await tab.page.captureScreenshot();
+
+    // Save it to a file
+    await new File.fromUri(Platform.script.resolve('_github.png'))
+        .writeAsBytes(BASE64.decode(screenshot));
+  });
+}
+```
+
+Of a specific element in the page
 ```dart
 import 'dart:convert';
 import 'dart:io';
@@ -139,9 +168,10 @@ main() {
       String nodeString = '<${node.nodeName}';
       if (node.attributes != null) {
         nodeString +=
-            ' ${node.attributes.map((n) => '${n.name}=${n.value}').toList()}';
+            ' ${node.attributes.map((n) => '${n.name}="${n.value}"').join(' ')}';
       }
       nodeString += '>';
+      //This example needs a lot more work to output correct HTML
       print(nodeString);
     }
   });
@@ -153,7 +183,7 @@ import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'utils.dart';
 
 main() {
-  chromeTab('https://news.ycombinator.com/news', (Tab tab) async {
+  chromeTab('https://news.google.com', (Tab tab) async {
     // A small helper to wait until the network is quiet
     await tab.waitUntilNetworkIdle();
 
