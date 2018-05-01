@@ -1,34 +1,24 @@
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/chrome_downloader.dart';
 import 'package:chrome_dev_tools/domains/dom_snapshot.dart';
-import 'package:chrome_dev_tools/src/wait_until.dart';
-import 'package:logging/logging.dart';
+import 'utils.dart';
 
-main() async {
-  Logger.root
-    ..level = Level.ALL
-    ..onRecord.listen(print);
+main() {
+  chromeTab('https://www.google.com', (Tab tab) async {
+    // A small helper to wait until the network is quiet
+    await tab.waitUntilNetworkIdle();
 
-  Chrome chrome = await Chrome.launch((await downloadChrome()).executablePath);
+    // Take a snapshot of the DOM of the current page
+    GetSnapshotResult result = await tab.domSnapshot.getSnapshot([]);
 
-  TargetID targetId =
-      await chrome.targets.createTarget('https://www.google.com');
-  Session session = await chrome.connection.createSession(targetId);
-
-  await waitUntilNetworkIdle(session);
-
-  DOMSnapshotManager dom = new DOMSnapshotManager(session);
-  var result = await dom.getSnapshot([]);
-
-  for (DOMNode node in result.domNodes) {
-    String nodeString = '<${node.nodeName}';
-    if (node.attributes != null) {
-      nodeString +=
-          ' ${node.attributes.map((n) => '${n.name}=${n.value}').toList()}';
+    // Iterate the nodes and output some HTML.
+    for (DOMNode node in result.domNodes) {
+      String nodeString = '<${node.nodeName}';
+      if (node.attributes != null) {
+        nodeString +=
+            ' ${node.attributes.map((n) => '${n.name}=${n.value}').toList()}';
+      }
+      nodeString += '>';
+      print(nodeString);
     }
-    nodeString += '>';
-    print(nodeString);
-  }
-
-  await chrome.close();
+  });
 }

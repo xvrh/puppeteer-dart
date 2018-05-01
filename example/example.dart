@@ -2,29 +2,33 @@ import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:chrome_dev_tools/chrome_downloader.dart';
 import 'package:logging/logging.dart';
 
+// ignore_for_file: unused_local_variable
+
 main() async {
-  // Setup a logger to output the chrome protocol
+  // Setup a logger if you want to see the raw chrome protocol
   Logger.root
     ..level = Level.ALL
     ..onRecord.listen(print);
 
   // Download a version of Chrome in a cache folder.
-  // `downloadChrome` optionally take `revision` and `cacheFolder` to specify
-  // the particular version of Chrome and the cache folder where to download
-  // the binaries.
-  String chromeExecutable = (await downloadChrome()).executablePath;
+  String chromePath = (await downloadChrome()).executablePath;
+
+  // You can specify the cache location and a specific version of chrome
+  var chromePath2 =
+      await downloadChrome(cachePath: '.chrome', revision: 497674);
 
   // Or just use an absolute path to an existing version of Chrome
-  //chromeExecutable = r'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+  String chromePath3 =
+      r'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
-  // Launch the `Chrome` process and connect to the DevTools
+  // Start the `Chrome` process and connect to the DevTools
   // By default it is start in `headless` mode
-  Chrome chrome = await Chrome.launch(chromeExecutable);
+  Chrome chrome = await Chrome.start(chromePath);
 
   // Open a new tab
-  await chrome.targets.createTarget('https://www.github.com');
+  Tab myTab = await chrome.newTab('https://www.github.com');
 
-  // Do something (see examples bellow).
+  // Do something (see example/ folder).
 
   // Kill the process
   await chrome.close();

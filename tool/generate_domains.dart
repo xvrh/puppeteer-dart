@@ -7,32 +7,31 @@ import 'utils/string_helpers.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as p;
 
-final DartFormatter _dartFormatter =
-    new DartFormatter(lineEnding: Platform.isWindows ? '\r\n' : '\n');
-
 main() {
   Protocol readProtocol(String fileName) {
     return new Protocol.fromString(
         new File.fromUri(Platform.script.resolve(fileName)).readAsStringSync());
   }
 
-  Directory targetDir =
-      new Directory.fromUri(Platform.script.resolve('../lib/domains'));
+  Uri libUri = Platform.script.resolve('../lib');
+
+  Directory targetDir = new Directory(p.join(libUri.path, 'domains'));
   if (targetDir.existsSync()) {
     targetDir.deleteSync(recursive: true);
   }
   targetDir.createSync();
 
-  for (Domain domain in [
+  List<Domain> domains = [
     readProtocol('browser_protocol.json').domains,
     readProtocol('js_protocol.json').domains
-  ].expand((f) => f)) {
-    String domainName = domain.domain;
+  ].expand((f) => f).toList();
+
+  for (Domain domain in domains) {
     List<ComplexType> types = domain.types;
     List<Command> commandsJson = domain.commands;
     _DomainContext context = new _DomainContext(domain);
 
-    String fileName = '${_underscoreize(domainName)}.dart';
+    String fileName = '${_underscoreize(domain.name)}.dart';
 
     List<_InternalType> internalTypes =
         types.map((json) => new _InternalType(context, json)).toList();
@@ -59,7 +58,7 @@ main() {
 
     code.writeln();
 
-    String className = '${domainName}Manager';
+    String className = '${domain.name}Manager';
     code.writeln(toComment(domain.description));
     if (domain.deprecated) {
       code.writeln('@deprecated');
@@ -93,15 +92,57 @@ main() {
       code.writeln(type.code);
     }
 
-    try {
-      String formattedCode = _dartFormatter.format(code.toString());
+    _writeDartFile(p.join(targetDir.path, fileName), code.toString());
+  }
 
-      new File(p.join(targetDir.path, fileName))
-          .writeAsStringSync(formattedCode);
-    } catch (_) {
-      print('Error with code\n$code');
-      rethrow;
-    }
+  StringBuffer tabBuffer = new StringBuffer();
+
+  List<Domain> tabDomains = domains
+      .where((d) =>
+          !d.deprecated &&
+          !const ['Target', 'SystemInfo', 'Browser', 'IO', 'Audits']
+              .contains(d.name))
+      .toList();
+
+  for (Domain domain in tabDomains) {
+    tabBuffer
+        .writeln("import '../domains/${_underscoreize(domain.name)}.dart';");
+  }
+  tabBuffer.writeln("import 'connection.dart';");
+  tabBuffer.writeln();
+  tabBuffer.writeln('''
+abstract class TabMixin {
+  Session get session;
+''');
+
+  for (Domain domain in tabDomains) {
+    String camelizedName = firstLetterLower(splitWords(domain.name)
+        .map((w) => firstLetterUpper(w.toLowerCase()))
+        .join());
+
+    tabBuffer.writeln(toComment(domain.description, indent: 2));
+    tabBuffer.writeln('${domain.name}Manager get $camelizedName =>  '
+        '_$camelizedName ??= new ${domain.name}Manager(session);');
+    tabBuffer.writeln('${domain.name}Manager _$camelizedName;');
+    tabBuffer.writeln('');
+  }
+  tabBuffer.writeln('}');
+
+  _writeDartFile(
+      p.join(libUri.path, 'src', 'tab_mixin.dart'), tabBuffer.toString());
+}
+
+final DartFormatter _dartFormatter =
+    new DartFormatter(lineEnding: Platform.isWindows ? '\r\n' : '\n');
+
+_writeDartFile(String target, String code) {
+  try {
+    String formattedCode = _dartFormatter.format(code);
+
+    new File(target).writeAsStringSync(formattedCode);
+  } catch (_) {
+    print('Error with code\n$code');
+    rethrow;
   }
 }
 
@@ -198,7 +239,7 @@ class _Command {
       }
     }
 
-    String sendCode = " await _client.send('${context.domain.domain}.$name'";
+    String sendCode = " await _client.send('${context.domain.name}.$name'";
     if (parameters.isNotEmpty) {
       sendCode += ', parameters';
     }
@@ -278,7 +319,7 @@ class _Event {
     String streamName = 'on${firstLetterUpper(name)}';
     code.writeln(
         'Stream${streamTypeName != null ? '<$streamTypeName>':''} get $streamName => '
-        "_client.onEvent.where((Event event) => event.name == '${context.domain.domain}.$name')");
+        "_client.onEvent.where((Event event) => event.name == '${context.domain.name}.$name')");
 
     if (parameters.isNotEmpty) {
       String mapCode;

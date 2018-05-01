@@ -1,9 +1,21 @@
 import 'dart:async';
 import 'dart:io';
+
+import 'package:archive/archive.dart';
+import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
-import 'package:http/http.dart' as http;
-import 'package:archive/archive.dart';
+
+class ChromePath {
+  final String executablePath;
+  final String folderPath;
+  final int revision;
+
+  ChromePath(
+      {@required this.executablePath,
+      @required this.folderPath,
+      @required this.revision});
+}
 
 const int _lastRevision = 553380;
 
@@ -112,15 +124,4 @@ String _executablePath(String revisionPath) {
   } else {
     throw new UnsupportedError('Unknown platform ${Platform.operatingSystem}');
   }
-}
-
-class ChromePath {
-  final String executablePath;
-  final String folderPath;
-  final int revision;
-
-  ChromePath(
-      {@required this.executablePath,
-      @required this.folderPath,
-      @required this.revision});
 }

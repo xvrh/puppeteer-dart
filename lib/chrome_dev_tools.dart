@@ -1,12 +1,14 @@
 import 'dart:async';
-import 'dart:io';
-import 'package:chrome_dev_tools/src/connection.dart';
-import 'package:chrome_dev_tools/domains/page.dart';
-import 'package:chrome_dev_tools/domains/target.dart';
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:chrome_dev_tools/domains/target.dart';
+import 'package:chrome_dev_tools/src/connection.dart';
+import 'package:chrome_dev_tools/src/tab.dart';
 import 'package:logging/logging.dart';
-export 'src/connection.dart' show Connection, Session;
+
 export 'domains/target.dart';
+export 'src/tab.dart';
 
 final Logger _logger = new Logger('chrome_dev_tools');
 
@@ -44,7 +46,7 @@ class Chrome {
 
   Chrome._(this.process, this.connection);
 
-  static Future<Chrome> launch(String chromeExecutable,
+  static Future<Chrome> start(String chromeExecutable,
       {bool headless: true,
       bool useTemporaryUserData: false,
       bool noSandboxFlag}) async {
@@ -106,11 +108,11 @@ class Chrome {
 
   TargetManager get targets => connection.targets;
 
-  Future<PageManager> newPage() async {
-    TargetID targetId = await connection.targets.createTarget('about:blank');
+  Future<Tab> newTab(String url) async {
+    TargetID targetId = await connection.targets.createTarget(url);
     Session client = await connection.createSession(targetId);
 
-    return new PageManager(client);
+    return new Tab(client);
   }
 
   Future closeAllTabs() async {
