@@ -15,9 +15,10 @@ main() {
       String nodeString = '<${node.nodeName}';
       if (node.attributes != null) {
         nodeString +=
-            ' ${node.attributes.map((n) => '${n.name}=${n.value}').toList()}';
+            ' ${node.attributes.map((n) => '${n.name}="${n.value}"').join(' ')}';
       }
       nodeString += '>';
+      //This example needs a lot more work to output correct HTML
       print(nodeString);
     }
   });

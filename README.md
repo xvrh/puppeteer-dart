@@ -9,7 +9,13 @@ All the code in `lib/domains` are generated from the [browser_protocol.json](htt
 
 
 ## Usage
+- [Launch chrome](#launch)  
+- [Generate a PDF from an HTML page](#pdf)  
+- [Take a screenshot of a page](#screenshot_page)  
+- [Take a screenshot of an element in a page](#screenshot_element)  
+- [Create a static version of a Single Page Application](#spa)  
 
+<a name="launch"></a>
 ### Launch Chrome
 
 Download the last revision of chrome and launch it.
@@ -49,6 +55,7 @@ main() async {
 }
 ```
 
+<a name="pdf"></a>
 ### Generate a PDF from a page
 
 ```dart
@@ -82,7 +89,40 @@ main() {
 }
 ```
 
-### Take a screenshot of an element.
+<a name="screenshot"></a>
+### Take a screenshot
+
+<a name="screenshot_page"></a>
+Screenshot the complete HTML page
+```dart
+import 'dart:convert';
+import 'dart:io';
+import 'package:chrome_dev_tools/chrome_dev_tools.dart';
+import 'utils.dart';
+
+main() {
+  chromeTab('https://www.github.com', (Tab tab) async {
+    // A small helper to wait until the network is quiet
+    await tab.waitUntilNetworkIdle();
+
+    var pageMetrics = await tab.page.getLayoutMetrics();
+
+    // Set page size to the content size
+    await tab.emulation.setDeviceMetricsOverride(pageMetrics.contentSize.width,
+        pageMetrics.contentSize.height, 1, false);
+
+    // Capture the screenshot
+    String screenshot = await tab.page.captureScreenshot();
+
+    // Save it to a file
+    await new File.fromUri(Platform.script.resolve('_github.png'))
+        .writeAsBytes(BASE64.decode(screenshot));
+  });
+}
+```
+
+<a name="screenshot_element"></a>
+Screenshot a specific node in the page
 ```dart
 import 'dart:convert';
 import 'dart:io';
@@ -120,6 +160,7 @@ main() {
 }
 ```
 
+<a name="spa"></a>
 ### Create a static version of a Single Page Application
 ```dart
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
@@ -139,9 +180,10 @@ main() {
       String nodeString = '<${node.nodeName}';
       if (node.attributes != null) {
         nodeString +=
-            ' ${node.attributes.map((n) => '${n.name}=${n.value}').toList()}';
+            ' ${node.attributes.map((n) => '${n.name}="${n.value}"').join(' ')}';
       }
       nodeString += '>';
+      //This example needs a lot more work to output correct HTML
       print(nodeString);
     }
   });
@@ -153,7 +195,7 @@ import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'utils.dart';
 
 main() {
-  chromeTab('https://news.ycombinator.com/news', (Tab tab) async {
+  chromeTab('https://www.google.com', (Tab tab) async {
     // A small helper to wait until the network is quiet
     await tab.waitUntilNetworkIdle();
 
