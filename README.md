@@ -101,7 +101,7 @@ import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'utils.dart';
 
 main() {
-  chromeTab('https://www.youtube.com', (Tab tab) async {
+  chromeTab('https://www.github.com', (Tab tab) async {
     // A small helper to wait until the network is quiet
     await tab.waitUntilNetworkIdle();
 
@@ -195,7 +195,7 @@ import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'utils.dart';
 
 main() {
-  chromeTab('https://news.google.com', (Tab tab) async {
+  chromeTab('https://www.google.com', (Tab tab) async {
     // A small helper to wait until the network is quiet
     await tab.waitUntilNetworkIdle();
 
