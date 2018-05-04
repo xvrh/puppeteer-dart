@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.3+1
+- Upgrade chrome
+- Add an incognito mode
+
 ## 0.0.3
 - Expose the domains throught some getters in the `Tab` class.
 
