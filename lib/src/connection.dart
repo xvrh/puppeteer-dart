@@ -73,9 +73,11 @@ class Connection implements Client {
     return completer.future;
   }
 
-  Future<Session> createSession(TargetID targetId, {BrowserContextID browserContextID}) async {
+  Future<Session> createSession(TargetID targetId,
+      {BrowserContextID browserContextID}) async {
     SessionID sessionId = await _targets.attachToTarget(targetId);
-    Session session = new Session._(_targets, targetId, sessionId, browserContextID: browserContextID);
+    Session session = new Session._(_targets, targetId, sessionId,
+        browserContextID: browserContextID);
     _sessions.add(session);
 
     return session;
@@ -143,7 +145,9 @@ class Session implements Client {
   final StreamController<Event> _eventController =
       new StreamController<Event>.broadcast();
 
-  Session._(this._targetManager, this.targetID, this.sessionId, {BrowserContextID browserContextID}): _browserContextID = browserContextID;
+  Session._(this._targetManager, this.targetID, this.sessionId,
+      {BrowserContextID browserContextID})
+      : _browserContextID = browserContextID;
 
   @override
   Future<Map> send(String method, [Map parameters]) {
