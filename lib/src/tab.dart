@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'package:chrome_dev_tools/chrome_dev_tools.dart';
+import 'package:chrome_dev_tools/domains/target.dart';
+
 import '../domains/runtime.dart';
 import 'connection.dart';
 import 'tab_mixin.dart';

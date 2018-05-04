@@ -106,9 +106,16 @@ class Chrome {
 
   TargetManager get targets => connection.targets;
 
-  Future<Tab> newTab(String url) async {
-    TargetID targetId = await connection.targets.createTarget(url);
-    Session session = await connection.createSession(targetId);
+  Future<Tab> newTab(String url, {bool incognito: false}) async {
+    BrowserContextID contextID;
+    if (incognito) {
+      contextID = await targets.createBrowserContext();
+    }
+
+    TargetID targetId =
+        await targets.createTarget(url, browserContextId: contextID);
+    Session session =
+        await connection.createSession(targetId, browserContextID: contextID);
 
     return new Tab(session);
   }
