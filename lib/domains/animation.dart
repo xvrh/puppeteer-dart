@@ -9,6 +9,11 @@ class AnimationManager {
 
   AnimationManager(this._client);
 
+  /// Event for when an animation has been cancelled.
+  Stream<String> get onAnimationCanceled => _client.onEvent
+      .where((Event event) => event.name == 'Animation.animationCanceled')
+      .map((Event event) => event.parameters['id'] as String);
+
   /// Event for each animation that has been created.
   Stream<String> get onAnimationCreated => _client.onEvent
       .where((Event event) => event.name == 'Animation.animationCreated')
@@ -20,37 +25,14 @@ class AnimationManager {
       .map((Event event) =>
           new Animation.fromJson(event.parameters['animation']));
 
-  /// Event for when an animation has been cancelled.
-  Stream<String> get onAnimationCanceled => _client.onEvent
-      .where((Event event) => event.name == 'Animation.animationCanceled')
-      .map((Event event) => event.parameters['id'] as String);
-
-  /// Enables animation domain notifications.
-  Future enable() async {
-    await _client.send('Animation.enable');
-  }
-
   /// Disables animation domain notifications.
   Future disable() async {
     await _client.send('Animation.disable');
   }
 
-  /// Gets the playback rate of the document timeline.
-  /// Returns: Playback rate for animations on page.
-  Future<num> getPlaybackRate() async {
-    Map result = await _client.send('Animation.getPlaybackRate');
-    return result['playbackRate'];
-  }
-
-  /// Sets the playback rate of the document timeline.
-  /// [playbackRate] Playback rate for animations on page
-  Future setPlaybackRate(
-    num playbackRate,
-  ) async {
-    Map parameters = {
-      'playbackRate': playbackRate,
-    };
-    await _client.send('Animation.setPlaybackRate', parameters);
+  /// Enables animation domain notifications.
+  Future enable() async {
+    await _client.send('Animation.enable');
   }
 
   /// Returns the current time of the an animation.
@@ -66,49 +48,11 @@ class AnimationManager {
     return result['currentTime'];
   }
 
-  /// Sets the paused state of a set of animations.
-  /// [animations] Animations to set the pause state of.
-  /// [paused] Paused state to set to.
-  Future setPaused(
-    List<String> animations,
-    bool paused,
-  ) async {
-    Map parameters = {
-      'animations': animations.map((e) => e).toList(),
-      'paused': paused,
-    };
-    await _client.send('Animation.setPaused', parameters);
-  }
-
-  /// Sets the timing of an animation node.
-  /// [animationId] Animation id.
-  /// [duration] Duration of the animation.
-  /// [delay] Delay of the animation.
-  Future setTiming(
-    String animationId,
-    num duration,
-    num delay,
-  ) async {
-    Map parameters = {
-      'animationId': animationId,
-      'duration': duration,
-      'delay': delay,
-    };
-    await _client.send('Animation.setTiming', parameters);
-  }
-
-  /// Seek a set of animations to a particular time within each animation.
-  /// [animations] List of animation ids to seek.
-  /// [currentTime] Set the current time of each animation.
-  Future seekAnimations(
-    List<String> animations,
-    num currentTime,
-  ) async {
-    Map parameters = {
-      'animations': animations.map((e) => e).toList(),
-      'currentTime': currentTime,
-    };
-    await _client.send('Animation.seekAnimations', parameters);
+  /// Gets the playback rate of the document timeline.
+  /// Returns: Playback rate for animations on page.
+  Future<num> getPlaybackRate() async {
+    Map result = await _client.send('Animation.getPlaybackRate');
+    return result['playbackRate'];
   }
 
   /// Releases a set of animations to no longer be manipulated.
@@ -133,6 +77,62 @@ class AnimationManager {
     };
     Map result = await _client.send('Animation.resolveAnimation', parameters);
     return new runtime.RemoteObject.fromJson(result['remoteObject']);
+  }
+
+  /// Seek a set of animations to a particular time within each animation.
+  /// [animations] List of animation ids to seek.
+  /// [currentTime] Set the current time of each animation.
+  Future seekAnimations(
+    List<String> animations,
+    num currentTime,
+  ) async {
+    Map parameters = {
+      'animations': animations.map((e) => e).toList(),
+      'currentTime': currentTime,
+    };
+    await _client.send('Animation.seekAnimations', parameters);
+  }
+
+  /// Sets the paused state of a set of animations.
+  /// [animations] Animations to set the pause state of.
+  /// [paused] Paused state to set to.
+  Future setPaused(
+    List<String> animations,
+    bool paused,
+  ) async {
+    Map parameters = {
+      'animations': animations.map((e) => e).toList(),
+      'paused': paused,
+    };
+    await _client.send('Animation.setPaused', parameters);
+  }
+
+  /// Sets the playback rate of the document timeline.
+  /// [playbackRate] Playback rate for animations on page
+  Future setPlaybackRate(
+    num playbackRate,
+  ) async {
+    Map parameters = {
+      'playbackRate': playbackRate,
+    };
+    await _client.send('Animation.setPlaybackRate', parameters);
+  }
+
+  /// Sets the timing of an animation node.
+  /// [animationId] Animation id.
+  /// [duration] Duration of the animation.
+  /// [delay] Delay of the animation.
+  Future setTiming(
+    String animationId,
+    num duration,
+    num delay,
+  ) async {
+    Map parameters = {
+      'animationId': animationId,
+      'duration': duration,
+      'delay': delay,
+    };
+    await _client.send('Animation.setTiming', parameters);
   }
 }
 
@@ -165,8 +165,8 @@ class Animation {
   /// `Animation`'s source animation node.
   final AnimationEffect source;
 
-  /// A unique ID for `Animation` representing the sources that triggered this
-  /// CSS animation/transition.
+  /// A unique ID for `Animation` representing the sources that triggered this CSS
+  /// animation/transition.
   final String cssId;
 
   Animation({

@@ -8,31 +8,19 @@ class LayerTreeManager {
 
   LayerTreeManager(this._client);
 
+  Stream<LayerPaintedEvent> get onLayerPainted => _client.onEvent
+      .where((Event event) => event.name == 'LayerTree.layerPainted')
+      .map((Event event) => new LayerPaintedEvent.fromJson(event.parameters));
+
   Stream<List<Layer>> get onLayerTreeDidChange => _client.onEvent
       .where((Event event) => event.name == 'LayerTree.layerTreeDidChange')
       .map((Event event) => (event.parameters['layers'] as List)
           .map((e) => new Layer.fromJson(e))
           .toList());
 
-  Stream<LayerPaintedEvent> get onLayerPainted => _client.onEvent
-      .where((Event event) => event.name == 'LayerTree.layerPainted')
-      .map((Event event) => new LayerPaintedEvent.fromJson(event.parameters));
-
-  /// Enables compositing tree inspection.
-  Future enable() async {
-    await _client.send('LayerTree.enable');
-  }
-
-  /// Disables compositing tree inspection.
-  Future disable() async {
-    await _client.send('LayerTree.disable');
-  }
-
   /// Provides the reasons why the given layer was composited.
-  /// [layerId] The id of the layer for which we want to get the reasons it was
-  /// composited.
-  /// Returns: A list of strings specifying reasons for the given layer to
-  /// become composited.
+  /// [layerId] The id of the layer for which we want to get the reasons it was composited.
+  /// Returns: A list of strings specifying reasons for the given layer to become composited.
   Future<List<String>> compositingReasons(
     LayerId layerId,
   ) async {
@@ -45,17 +33,14 @@ class LayerTreeManager {
         .toList();
   }
 
-  /// Returns the layer snapshot identifier.
-  /// [layerId] The id of the layer.
-  /// Returns: The id of the layer snapshot.
-  Future<SnapshotId> makeSnapshot(
-    LayerId layerId,
-  ) async {
-    Map parameters = {
-      'layerId': layerId.toJson(),
-    };
-    Map result = await _client.send('LayerTree.makeSnapshot', parameters);
-    return new SnapshotId.fromJson(result['snapshotId']);
+  /// Disables compositing tree inspection.
+  Future disable() async {
+    await _client.send('LayerTree.disable');
+  }
+
+  /// Enables compositing tree inspection.
+  Future enable() async {
+    await _client.send('LayerTree.enable');
   }
 
   /// Returns the snapshot identifier.
@@ -71,20 +56,21 @@ class LayerTreeManager {
     return new SnapshotId.fromJson(result['snapshotId']);
   }
 
-  /// Releases layer snapshot captured by the back-end.
-  /// [snapshotId] The id of the layer snapshot.
-  Future releaseSnapshot(
-    SnapshotId snapshotId,
+  /// Returns the layer snapshot identifier.
+  /// [layerId] The id of the layer.
+  /// Returns: The id of the layer snapshot.
+  Future<SnapshotId> makeSnapshot(
+    LayerId layerId,
   ) async {
     Map parameters = {
-      'snapshotId': snapshotId.toJson(),
+      'layerId': layerId.toJson(),
     };
-    await _client.send('LayerTree.releaseSnapshot', parameters);
+    Map result = await _client.send('LayerTree.makeSnapshot', parameters);
+    return new SnapshotId.fromJson(result['snapshotId']);
   }
 
   /// [snapshotId] The id of the layer snapshot.
-  /// [minRepeatCount] The maximum number of times to replay the snapshot (1, if
-  /// not specified).
+  /// [minRepeatCount] The maximum number of times to replay the snapshot (1, if not specified).
   /// [minDuration] The minimum duration (in seconds) to replay the snapshot.
   /// [clipRect] The clip rectangle to apply when replaying the snapshot.
   /// Returns: The array of paint profiles, one per run.
@@ -112,12 +98,21 @@ class LayerTreeManager {
         .toList();
   }
 
+  /// Releases layer snapshot captured by the back-end.
+  /// [snapshotId] The id of the layer snapshot.
+  Future releaseSnapshot(
+    SnapshotId snapshotId,
+  ) async {
+    Map parameters = {
+      'snapshotId': snapshotId.toJson(),
+    };
+    await _client.send('LayerTree.releaseSnapshot', parameters);
+  }
+
   /// Replays the layer snapshot and returns the resulting bitmap.
   /// [snapshotId] The id of the layer snapshot.
-  /// [fromStep] The first step to replay from (replay from the very start if
-  /// not specified).
-  /// [toStep] The last step to replay to (replay till the end if not
-  /// specified).
+  /// [fromStep] The first step to replay from (replay from the very start if not specified).
+  /// [toStep] The last step to replay to (replay till the end if not specified).
   /// [scale] The scale to apply while replaying (defaults to 1).
   /// Returns: A data: URL for resulting image.
   Future<String> replaySnapshot(

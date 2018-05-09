@@ -8,16 +8,31 @@ class TargetManager {
 
   TargetManager(this._client);
 
+  /// Issued when attached to target because of auto-attach or `attachToTarget` command.
+  Stream<AttachedToTargetEvent> get onAttachedToTarget => _client.onEvent
+      .where((Event event) => event.name == 'Target.attachedToTarget')
+      .map((Event event) =>
+          new AttachedToTargetEvent.fromJson(event.parameters));
+
+  /// Issued when detached from target for any reason (including `detachFromTarget` command). Can be
+  /// issued multiple times per target if multiple sessions have been attached to it.
+  Stream<DetachedFromTargetEvent> get onDetachedFromTarget => _client.onEvent
+      .where((Event event) => event.name == 'Target.detachedFromTarget')
+      .map((Event event) =>
+          new DetachedFromTargetEvent.fromJson(event.parameters));
+
+  /// Notifies about a new protocol message received from the session (as reported in
+  /// `attachedToTarget` event).
+  Stream<ReceivedMessageFromTargetEvent> get onReceivedMessageFromTarget =>
+      _client.onEvent
+          .where(
+              (Event event) => event.name == 'Target.receivedMessageFromTarget')
+          .map((Event event) =>
+              new ReceivedMessageFromTargetEvent.fromJson(event.parameters));
+
   /// Issued when a possible inspection target is created.
   Stream<TargetInfo> get onTargetCreated => _client.onEvent
       .where((Event event) => event.name == 'Target.targetCreated')
-      .map((Event event) =>
-          new TargetInfo.fromJson(event.parameters['targetInfo']));
-
-  /// Issued when some information about a target has changed. This only happens
-  /// between `targetCreated` and `targetDestroyed`.
-  Stream<TargetInfo> get onTargetInfoChanged => _client.onEvent
-      .where((Event event) => event.name == 'Target.targetInfoChanged')
       .map((Event event) =>
           new TargetInfo.fromJson(event.parameters['targetInfo']));
 
@@ -27,113 +42,12 @@ class TargetManager {
       .map(
           (Event event) => new TargetID.fromJson(event.parameters['targetId']));
 
-  /// Issued when attached to target because of auto-attach or `attachToTarget`
-  /// command.
-  Stream<AttachedToTargetEvent> get onAttachedToTarget => _client.onEvent
-      .where((Event event) => event.name == 'Target.attachedToTarget')
+  /// Issued when some information about a target has changed. This only happens between
+  /// `targetCreated` and `targetDestroyed`.
+  Stream<TargetInfo> get onTargetInfoChanged => _client.onEvent
+      .where((Event event) => event.name == 'Target.targetInfoChanged')
       .map((Event event) =>
-          new AttachedToTargetEvent.fromJson(event.parameters));
-
-  /// Issued when detached from target for any reason (including
-  /// `detachFromTarget` command). Can be issued multiple times per target if
-  /// multiple sessions have been attached to it.
-  Stream<DetachedFromTargetEvent> get onDetachedFromTarget => _client.onEvent
-      .where((Event event) => event.name == 'Target.detachedFromTarget')
-      .map((Event event) =>
-          new DetachedFromTargetEvent.fromJson(event.parameters));
-
-  /// Notifies about a new protocol message received from the session (as
-  /// reported in `attachedToTarget` event).
-  Stream<ReceivedMessageFromTargetEvent> get onReceivedMessageFromTarget =>
-      _client.onEvent
-          .where(
-              (Event event) => event.name == 'Target.receivedMessageFromTarget')
-          .map((Event event) =>
-              new ReceivedMessageFromTargetEvent.fromJson(event.parameters));
-
-  /// Controls whether to discover available targets and notify via
-  /// `targetCreated/targetInfoChanged/targetDestroyed` events.
-  /// [discover] Whether to discover available targets.
-  Future setDiscoverTargets(
-    bool discover,
-  ) async {
-    Map parameters = {
-      'discover': discover,
-    };
-    await _client.send('Target.setDiscoverTargets', parameters);
-  }
-
-  /// Controls whether to automatically attach to new targets which are
-  /// considered to be related to this one. When turned on, attaches to all
-  /// existing related targets as well. When turned off, automatically detaches
-  /// from all currently attached targets.
-  /// [autoAttach] Whether to auto-attach to related targets.
-  /// [waitForDebuggerOnStart] Whether to pause new targets when attaching to
-  /// them. Use `Runtime.runIfWaitingForDebugger` to run paused targets.
-  Future setAutoAttach(
-    bool autoAttach,
-    bool waitForDebuggerOnStart,
-  ) async {
-    Map parameters = {
-      'autoAttach': autoAttach,
-      'waitForDebuggerOnStart': waitForDebuggerOnStart,
-    };
-    await _client.send('Target.setAutoAttach', parameters);
-  }
-
-  /// [value] Whether to attach to frames.
-  Future setAttachToFrames(
-    bool value,
-  ) async {
-    Map parameters = {
-      'value': value,
-    };
-    await _client.send('Target.setAttachToFrames', parameters);
-  }
-
-  /// Enables target discovery for the specified locations, when
-  /// `setDiscoverTargets` was set to `true`.
-  /// [locations] List of remote locations.
-  Future setRemoteLocations(
-    List<RemoteLocation> locations,
-  ) async {
-    Map parameters = {
-      'locations': locations.map((e) => e.toJson()).toList(),
-    };
-    await _client.send('Target.setRemoteLocations', parameters);
-  }
-
-  /// Sends protocol message over session with given id.
-  /// [sessionId] Identifier of the session.
-  Future sendMessageToTarget(
-    String message, {
-    SessionID sessionId,
-    @deprecated TargetID targetId,
-  }) async {
-    Map parameters = {
-      'message': message,
-    };
-    if (sessionId != null) {
-      parameters['sessionId'] = sessionId.toJson();
-    }
-    // ignore: deprecated_member_use
-    if (targetId != null) {
-      // ignore: deprecated_member_use
-      parameters['targetId'] = targetId.toJson();
-    }
-    await _client.send('Target.sendMessageToTarget', parameters);
-  }
-
-  /// Returns information about a target.
-  Future<TargetInfo> getTargetInfo(
-    TargetID targetId,
-  ) async {
-    Map parameters = {
-      'targetId': targetId.toJson(),
-    };
-    Map result = await _client.send('Target.getTargetInfo', parameters);
-    return new TargetInfo.fromJson(result['targetInfo']);
-  }
+          new TargetInfo.fromJson(event.parameters['targetInfo']));
 
   /// Activates (focuses) the target.
   Future activateTarget(
@@ -143,17 +57,6 @@ class TargetManager {
       'targetId': targetId.toJson(),
     };
     await _client.send('Target.activateTarget', parameters);
-  }
-
-  /// Closes the target. If the target is a page that gets closed too.
-  Future<bool> closeTarget(
-    TargetID targetId,
-  ) async {
-    Map parameters = {
-      'targetId': targetId.toJson(),
-    };
-    Map result = await _client.send('Target.closeTarget', parameters);
-    return result['success'];
   }
 
   /// Attaches to the target with given id.
@@ -168,52 +71,41 @@ class TargetManager {
     return new SessionID.fromJson(result['sessionId']);
   }
 
-  /// Detaches session with given id.
-  /// [sessionId] Session to detach.
-  Future detachFromTarget({
-    SessionID sessionId,
-    @deprecated TargetID targetId,
-  }) async {
-    Map parameters = {};
-    if (sessionId != null) {
-      parameters['sessionId'] = sessionId.toJson();
-    }
-    // ignore: deprecated_member_use
-    if (targetId != null) {
-      // ignore: deprecated_member_use
-      parameters['targetId'] = targetId.toJson();
-    }
-    await _client.send('Target.detachFromTarget', parameters);
+  /// Closes the target. If the target is a page that gets closed too.
+  Future<bool> closeTarget(
+    TargetID targetId,
+  ) async {
+    Map parameters = {
+      'targetId': targetId.toJson(),
+    };
+    Map result = await _client.send('Target.closeTarget', parameters);
+    return result['success'];
   }
 
-  /// Creates a new empty BrowserContext. Similar to an incognito profile but
-  /// you can have more than one.
+  /// Creates a new empty BrowserContext. Similar to an incognito profile but you can have more than
+  /// one.
   /// Returns: The id of the context created.
   Future<BrowserContextID> createBrowserContext() async {
     Map result = await _client.send('Target.createBrowserContext');
     return new BrowserContextID.fromJson(result['browserContextId']);
   }
 
-  /// Deletes a BrowserContext, will fail of any open page uses it.
-  Future<bool> disposeBrowserContext(
-    BrowserContextID browserContextId,
-  ) async {
-    Map parameters = {
-      'browserContextId': browserContextId.toJson(),
-    };
-    Map result = await _client.send('Target.disposeBrowserContext', parameters);
-    return result['success'];
+  /// Returns all browser contexts created with `Target.createBrowserContext` method.
+  /// Returns: An array of browser context ids.
+  Future<List<BrowserContextID>> getBrowserContexts() async {
+    Map result = await _client.send('Target.getBrowserContexts');
+    return (result['browserContextIds'] as List)
+        .map((e) => new BrowserContextID.fromJson(e))
+        .toList();
   }
 
   /// Creates a new page.
   /// [url] The initial URL the page will be navigated to.
   /// [width] Frame width in DIP (headless chrome only).
   /// [height] Frame height in DIP (headless chrome only).
-  /// [browserContextId] The browser context to create the page in (headless
-  /// chrome only).
-  /// [enableBeginFrameControl] Whether BeginFrames for this target will be
-  /// controlled via DevTools (headless chrome only, not supported on MacOS yet,
-  /// false by default).
+  /// [browserContextId] The browser context to create the page in.
+  /// [enableBeginFrameControl] Whether BeginFrames for this target will be controlled via DevTools (headless chrome only,
+  /// not supported on MacOS yet, false by default).
   /// Returns: The id of the page opened.
   Future<TargetID> createTarget(
     String url, {
@@ -241,6 +133,46 @@ class TargetManager {
     return new TargetID.fromJson(result['targetId']);
   }
 
+  /// Detaches session with given id.
+  /// [sessionId] Session to detach.
+  Future detachFromTarget({
+    SessionID sessionId,
+    @deprecated TargetID targetId,
+  }) async {
+    Map parameters = {};
+    if (sessionId != null) {
+      parameters['sessionId'] = sessionId.toJson();
+    }
+    // ignore: deprecated_member_use
+    if (targetId != null) {
+      // ignore: deprecated_member_use
+      parameters['targetId'] = targetId.toJson();
+    }
+    await _client.send('Target.detachFromTarget', parameters);
+  }
+
+  /// Deletes a BrowserContext. All the belonging pages will be closed without calling their
+  /// beforeunload hooks.
+  Future disposeBrowserContext(
+    BrowserContextID browserContextId,
+  ) async {
+    Map parameters = {
+      'browserContextId': browserContextId.toJson(),
+    };
+    await _client.send('Target.disposeBrowserContext', parameters);
+  }
+
+  /// Returns information about a target.
+  Future<TargetInfo> getTargetInfo(
+    TargetID targetId,
+  ) async {
+    Map parameters = {
+      'targetId': targetId.toJson(),
+    };
+    Map result = await _client.send('Target.getTargetInfo', parameters);
+    return new TargetInfo.fromJson(result['targetInfo']);
+  }
+
   /// Retrieves a list of available targets.
   /// Returns: The list of targets.
   Future<List<TargetInfo>> getTargets() async {
@@ -248,6 +180,68 @@ class TargetManager {
     return (result['targetInfos'] as List)
         .map((e) => new TargetInfo.fromJson(e))
         .toList();
+  }
+
+  /// Sends protocol message over session with given id.
+  /// [sessionId] Identifier of the session.
+  Future sendMessageToTarget(
+    String message, {
+    SessionID sessionId,
+    @deprecated TargetID targetId,
+  }) async {
+    Map parameters = {
+      'message': message,
+    };
+    if (sessionId != null) {
+      parameters['sessionId'] = sessionId.toJson();
+    }
+    // ignore: deprecated_member_use
+    if (targetId != null) {
+      // ignore: deprecated_member_use
+      parameters['targetId'] = targetId.toJson();
+    }
+    await _client.send('Target.sendMessageToTarget', parameters);
+  }
+
+  /// Controls whether to automatically attach to new targets which are considered to be related to
+  /// this one. When turned on, attaches to all existing related targets as well. When turned off,
+  /// automatically detaches from all currently attached targets.
+  /// [autoAttach] Whether to auto-attach to related targets.
+  /// [waitForDebuggerOnStart] Whether to pause new targets when attaching to them. Use `Runtime.runIfWaitingForDebugger`
+  /// to run paused targets.
+  Future setAutoAttach(
+    bool autoAttach,
+    bool waitForDebuggerOnStart,
+  ) async {
+    Map parameters = {
+      'autoAttach': autoAttach,
+      'waitForDebuggerOnStart': waitForDebuggerOnStart,
+    };
+    await _client.send('Target.setAutoAttach', parameters);
+  }
+
+  /// Controls whether to discover available targets and notify via
+  /// `targetCreated/targetInfoChanged/targetDestroyed` events.
+  /// [discover] Whether to discover available targets.
+  Future setDiscoverTargets(
+    bool discover,
+  ) async {
+    Map parameters = {
+      'discover': discover,
+    };
+    await _client.send('Target.setDiscoverTargets', parameters);
+  }
+
+  /// Enables target discovery for the specified locations, when `setDiscoverTargets` was set to
+  /// `true`.
+  /// [locations] List of remote locations.
+  Future setRemoteLocations(
+    List<RemoteLocation> locations,
+  ) async {
+    Map parameters = {
+      'locations': locations.map((e) => e.toJson()).toList(),
+    };
+    await _client.send('Target.setRemoteLocations', parameters);
   }
 }
 
@@ -382,6 +376,8 @@ class TargetInfo {
   /// Opener target Id
   final TargetID openerId;
 
+  final BrowserContextID browserContextId;
+
   TargetInfo({
     @required this.targetId,
     @required this.type,
@@ -389,6 +385,7 @@ class TargetInfo {
     @required this.url,
     @required this.attached,
     this.openerId,
+    this.browserContextId,
   });
 
   factory TargetInfo.fromJson(Map json) {
@@ -400,6 +397,9 @@ class TargetInfo {
       attached: json['attached'],
       openerId: json.containsKey('openerId')
           ? new TargetID.fromJson(json['openerId'])
+          : null,
+      browserContextId: json.containsKey('browserContextId')
+          ? new BrowserContextID.fromJson(json['browserContextId'])
           : null,
     );
   }
@@ -414,6 +414,9 @@ class TargetInfo {
     };
     if (openerId != null) {
       json['openerId'] = openerId.toJson();
+    }
+    if (browserContextId != null) {
+      json['browserContextId'] = browserContextId.toJson();
     }
     return json;
   }

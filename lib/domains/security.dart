@@ -8,6 +8,15 @@ class SecurityManager {
 
   SecurityManager(this._client);
 
+  /// There is a certificate error. If overriding certificate errors is enabled, then it should be
+  /// handled with the `handleCertificateError` command. Note: this event does not fire if the
+  /// certificate error has been allowed internally. Only one client per target should override
+  /// certificate errors at the same time.
+  Stream<CertificateErrorEvent> get onCertificateError => _client.onEvent
+      .where((Event event) => event.name == 'Security.certificateError')
+      .map((Event event) =>
+          new CertificateErrorEvent.fromJson(event.parameters));
+
   /// The security state of the page changed.
   Stream<SecurityStateChangedEvent> get onSecurityStateChanged =>
       _client.onEvent
@@ -15,28 +24,31 @@ class SecurityManager {
           .map((Event event) =>
               new SecurityStateChangedEvent.fromJson(event.parameters));
 
-  /// There is a certificate error. If overriding certificate errors is enabled,
-  /// then it should be handled with the handleCertificateError command. Note:
-  /// this event does not fire if the certificate error has been allowed
-  /// internally.
-  Stream<CertificateErrorEvent> get onCertificateError => _client.onEvent
-      .where((Event event) => event.name == 'Security.certificateError')
-      .map((Event event) =>
-          new CertificateErrorEvent.fromJson(event.parameters));
+  /// Disables tracking security state changes.
+  Future disable() async {
+    await _client.send('Security.disable');
+  }
 
   /// Enables tracking security state changes.
   Future enable() async {
     await _client.send('Security.enable');
   }
 
-  /// Disables tracking security state changes.
-  Future disable() async {
-    await _client.send('Security.disable');
+  /// Enable/disable whether all certificate errors should be ignored.
+  /// [ignore] If true, all certificate errors will be ignored.
+  Future setIgnoreCertificateErrors(
+    bool ignore,
+  ) async {
+    Map parameters = {
+      'ignore': ignore,
+    };
+    await _client.send('Security.setIgnoreCertificateErrors', parameters);
   }
 
   /// Handles a certificate error that fired a certificateError event.
   /// [eventId] The ID of the event.
   /// [action] The action to take on the certificate error.
+  @deprecated
   Future handleCertificateError(
     int eventId,
     CertificateErrorAction action,
@@ -48,10 +60,10 @@ class SecurityManager {
     await _client.send('Security.handleCertificateError', parameters);
   }
 
-  /// Enable/disable overriding certificate errors. If enabled, all certificate
-  /// error events need to be handled by the DevTools client and should be
-  /// answered with handleCertificateError commands.
+  /// Enable/disable overriding certificate errors. If enabled, all certificate error events need to
+  /// be handled by the DevTools client and should be answered with `handleCertificateError` commands.
   /// [override] If true, certificate errors will be overridden.
+  @deprecated
   Future setOverrideCertificateErrors(
     bool override,
   ) async {
@@ -62,6 +74,31 @@ class SecurityManager {
   }
 }
 
+class CertificateErrorEvent {
+  /// The ID of the event.
+  final int eventId;
+
+  /// The type of the error.
+  final String errorType;
+
+  /// The url that was requested.
+  final String requestURL;
+
+  CertificateErrorEvent({
+    @required this.eventId,
+    @required this.errorType,
+    @required this.requestURL,
+  });
+
+  factory CertificateErrorEvent.fromJson(Map json) {
+    return new CertificateErrorEvent(
+      eventId: json['eventId'],
+      errorType: json['errorType'],
+      requestURL: json['requestURL'],
+    );
+  }
+}
+
 class SecurityStateChangedEvent {
   /// Security state.
   final SecurityState securityState;
@@ -69,9 +106,8 @@ class SecurityStateChangedEvent {
   /// True if the page was loaded over cryptographic transport such as HTTPS.
   final bool schemeIsCryptographic;
 
-  /// List of explanations for the security state. If the overall security state
-  /// is `insecure` or `warning`, at least one corresponding explanation should
-  /// be included.
+  /// List of explanations for the security state. If the overall security state is `insecure` or
+  /// `warning`, at least one corresponding explanation should be included.
   final List<SecurityStateExplanation> explanations;
 
   /// Information about insecure content on the page.
@@ -102,31 +138,6 @@ class SecurityStateChangedEvent {
   }
 }
 
-class CertificateErrorEvent {
-  /// The ID of the event.
-  final int eventId;
-
-  /// The type of the error.
-  final String errorType;
-
-  /// The url that was requested.
-  final String requestURL;
-
-  CertificateErrorEvent({
-    @required this.eventId,
-    @required this.errorType,
-    @required this.requestURL,
-  });
-
-  factory CertificateErrorEvent.fromJson(Map json) {
-    return new CertificateErrorEvent(
-      eventId: json['eventId'],
-      errorType: json['errorType'],
-      requestURL: json['requestURL'],
-    );
-  }
-}
-
 /// An internal certificate ID value.
 class CertificateId {
   final int value;
@@ -147,8 +158,8 @@ class CertificateId {
   String toString() => value.toString();
 }
 
-/// A description of mixed content (HTTP resources on HTTPS pages), as defined
-/// by https://www.w3.org/TR/mixed-content/#categories
+/// A description of mixed content (HTTP resources on HTTPS pages), as defined by
+/// https://www.w3.org/TR/mixed-content/#categories
 class MixedContentType {
   static const MixedContentType blockable =
       const MixedContentType._('blockable');
@@ -205,6 +216,9 @@ class SecurityStateExplanation {
   /// Security state representing the severity of the factor being explained.
   final SecurityState securityState;
 
+  /// Title describing the type of factor.
+  final String title;
+
   /// Short phrase describing the type of factor.
   final String summary;
 
@@ -219,6 +233,7 @@ class SecurityStateExplanation {
 
   SecurityStateExplanation({
     @required this.securityState,
+    @required this.title,
     @required this.summary,
     @required this.description,
     @required this.mixedContentType,
@@ -228,6 +243,7 @@ class SecurityStateExplanation {
   factory SecurityStateExplanation.fromJson(Map json) {
     return new SecurityStateExplanation(
       securityState: new SecurityState.fromJson(json['securityState']),
+      title: json['title'],
       summary: json['summary'],
       description: json['description'],
       mixedContentType: new MixedContentType.fromJson(json['mixedContentType']),
@@ -239,6 +255,7 @@ class SecurityStateExplanation {
   Map toJson() {
     Map json = {
       'securityState': securityState.toJson(),
+      'title': title,
       'summary': summary,
       'description': description,
       'mixedContentType': mixedContentType.toJson(),
@@ -250,24 +267,21 @@ class SecurityStateExplanation {
 
 /// Information about insecure content on the page.
 class InsecureContentStatus {
-  /// True if the page was loaded over HTTPS and ran mixed (HTTP) content such
-  /// as scripts.
+  /// True if the page was loaded over HTTPS and ran mixed (HTTP) content such as scripts.
   final bool ranMixedContent;
 
-  /// True if the page was loaded over HTTPS and displayed mixed (HTTP) content
-  /// such as images.
+  /// True if the page was loaded over HTTPS and displayed mixed (HTTP) content such as images.
   final bool displayedMixedContent;
 
-  /// True if the page was loaded over HTTPS and contained a form targeting an
-  /// insecure url.
+  /// True if the page was loaded over HTTPS and contained a form targeting an insecure url.
   final bool containedMixedForm;
 
-  /// True if the page was loaded over HTTPS without certificate errors, and ran
-  /// content such as scripts that were loaded with certificate errors.
+  /// True if the page was loaded over HTTPS without certificate errors, and ran content such as
+  /// scripts that were loaded with certificate errors.
   final bool ranContentWithCertErrors;
 
-  /// True if the page was loaded over HTTPS without certificate errors, and
-  /// displayed content such as images that were loaded with certificate errors.
+  /// True if the page was loaded over HTTPS without certificate errors, and displayed content
+  /// such as images that were loaded with certificate errors.
   final bool displayedContentWithCertErrors;
 
   /// Security state representing a page that ran insecure content.
@@ -314,8 +328,8 @@ class InsecureContentStatus {
   }
 }
 
-/// The action to take when a certificate error occurs. continue will continue
-/// processing the request and cancel will cancel the request.
+/// The action to take when a certificate error occurs. continue will continue processing the
+/// request and cancel will cancel the request.
 class CertificateErrorAction {
   static const CertificateErrorAction continue$ =
       const CertificateErrorAction._('continue');

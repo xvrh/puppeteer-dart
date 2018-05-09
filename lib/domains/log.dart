@@ -15,21 +15,20 @@ class LogManager {
       .where((Event event) => event.name == 'Log.entryAdded')
       .map((Event event) => new LogEntry.fromJson(event.parameters['entry']));
 
-  /// Enables log domain, sends the entries collected so far to the client by
-  /// means of the `entryAdded` notification.
-  Future enable() async {
-    await _client.send('Log.enable');
+  /// Clears the log.
+  Future clear() async {
+    await _client.send('Log.clear');
   }
 
-  /// Disables log domain, prevents further log entries from being reported to
-  /// the client.
+  /// Disables log domain, prevents further log entries from being reported to the client.
   Future disable() async {
     await _client.send('Log.disable');
   }
 
-  /// Clears the log.
-  Future clear() async {
-    await _client.send('Log.clear');
+  /// Enables log domain, sends the entries collected so far to the client by means of the
+  /// `entryAdded` notification.
+  Future enable() async {
+    await _client.send('Log.enable');
   }
 
   /// start violation reporting.

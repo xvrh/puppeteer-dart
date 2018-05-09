@@ -17,3 +17,5 @@ dependencies:
 dev_dependencies:
   test:
   dart_style: '^1.0.7'
+  shelf:
+  shelf_static:

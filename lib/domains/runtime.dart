@@ -2,14 +2,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-/// Runtime domain exposes JavaScript runtime by means of remote evaluation and
-/// mirror objects.
-/// Evaluation results are returned as mirror object that expose object type,
-/// string representation
-/// and unique identifier that can be used for further object reference.
-/// Original objects are
-/// maintained in memory unless they are either explicitly released or are
-/// released along with the
+/// Runtime domain exposes JavaScript runtime by means of remote evaluation and mirror objects.
+/// Evaluation results are returned as mirror object that expose object type, string representation
+/// and unique identifier that can be used for further object reference. Original objects are
+/// maintained in memory unless they are either explicitly released or are released along with the
 /// other objects in their object group.
 class RuntimeManager {
   final Client _client;
@@ -51,8 +47,7 @@ class RuntimeManager {
   Stream get onExecutionContextsCleared => _client.onEvent
       .where((Event event) => event.name == 'Runtime.executionContextsCleared');
 
-  /// Issued when object should be inspected (for example, as a result of
-  /// inspect() command line API
+  /// Issued when object should be inspected (for example, as a result of inspect() command line API
   /// call).
   Stream<InspectRequestedEvent> get onInspectRequested => _client.onEvent
       .where((Event event) => event.name == 'Runtime.inspectRequested')
@@ -61,8 +56,7 @@ class RuntimeManager {
 
   /// Add handler to promise with given promise object id.
   /// [promiseObjectId] Identifier of the promise.
-  /// [returnByValue] Whether the result is expected to be a JSON object that
-  /// should be sent by value.
+  /// [returnByValue] Whether the result is expected to be a JSON object that should be sent by value.
   /// [generatePreview] Whether preview should be generated for the result.
   Future<AwaitPromiseResult> awaitPromise(
     RemoteObjectId promiseObjectId, {
@@ -82,32 +76,23 @@ class RuntimeManager {
     return new AwaitPromiseResult.fromJson(result);
   }
 
-  /// Calls function with given declaration on the given object. Object group of
-  /// the result is
+  /// Calls function with given declaration on the given object. Object group of the result is
   /// inherited from the target object.
   /// [functionDeclaration] Declaration of the function to call.
-  /// [objectId] Identifier of the object to call function on. Either objectId
-  /// or executionContextId should
+  /// [objectId] Identifier of the object to call function on. Either objectId or executionContextId should
   /// be specified.
-  /// [arguments] Call arguments. All call arguments must belong to the same
-  /// JavaScript world as the target
+  /// [arguments] Call arguments. All call arguments must belong to the same JavaScript world as the target
   /// object.
-  /// [silent] In silent mode exceptions thrown during evaluation are not
-  /// reported and do not pause
+  /// [silent] In silent mode exceptions thrown during evaluation are not reported and do not pause
   /// execution. Overrides `setPauseOnException` state.
-  /// [returnByValue] Whether the result is expected to be a JSON object which
-  /// should be sent by value.
+  /// [returnByValue] Whether the result is expected to be a JSON object which should be sent by value.
   /// [generatePreview] Whether preview should be generated for the result.
-  /// [userGesture] Whether execution should be treated as initiated by user in
-  /// the UI.
-  /// [awaitPromise] Whether execution should `await` for resulting value and
-  /// return once awaited promise is
+  /// [userGesture] Whether execution should be treated as initiated by user in the UI.
+  /// [awaitPromise] Whether execution should `await` for resulting value and return once awaited promise is
   /// resolved.
-  /// [executionContextId] Specifies execution context which global object will
-  /// be used to call function on. Either
+  /// [executionContextId] Specifies execution context which global object will be used to call function on. Either
   /// executionContextId or objectId should be specified.
-  /// [objectGroup] Symbolic group name that can be used to release multiple
-  /// objects. If objectGroup is not
+  /// [objectGroup] Symbolic group name that can be used to release multiple objects. If objectGroup is not
   /// specified and objectId is, objectGroup will be inherited from object.
   Future<CallFunctionOnResult> callFunctionOn(
     String functionDeclaration, {
@@ -159,8 +144,7 @@ class RuntimeManager {
   /// [expression] Expression to compile.
   /// [sourceURL] Source url to be set for the script.
   /// [persistScript] Specifies whether the compiled script should be persisted.
-  /// [executionContextId] Specifies in which execution context to perform
-  /// script run. If the parameter is omitted the
+  /// [executionContextId] Specifies in which execution context to perform script run. If the parameter is omitted the
   /// evaluation will be performed in the context of the inspected page.
   Future<CompileScriptResult> compileScript(
     String expression,
@@ -190,10 +174,8 @@ class RuntimeManager {
     await _client.send('Runtime.discardConsoleEntries');
   }
 
-  /// Enables reporting of execution contexts creation by means of
-  /// `executionContextCreated` event.
-  /// When the reporting gets enabled the event will be sent immediately for
-  /// each existing execution
+  /// Enables reporting of execution contexts creation by means of `executionContextCreated` event.
+  /// When the reporting gets enabled the event will be sent immediately for each existing execution
   /// context.
   Future enable() async {
     await _client.send('Runtime.enable');
@@ -201,26 +183,18 @@ class RuntimeManager {
 
   /// Evaluates expression on global object.
   /// [expression] Expression to evaluate.
-  /// [objectGroup] Symbolic group name that can be used to release multiple
-  /// objects.
-  /// [includeCommandLineAPI] Determines whether Command Line API should be
-  /// available during the evaluation.
-  /// [silent] In silent mode exceptions thrown during evaluation are not
-  /// reported and do not pause
+  /// [objectGroup] Symbolic group name that can be used to release multiple objects.
+  /// [includeCommandLineAPI] Determines whether Command Line API should be available during the evaluation.
+  /// [silent] In silent mode exceptions thrown during evaluation are not reported and do not pause
   /// execution. Overrides `setPauseOnException` state.
-  /// [contextId] Specifies in which execution context to perform evaluation. If
-  /// the parameter is omitted the
+  /// [contextId] Specifies in which execution context to perform evaluation. If the parameter is omitted the
   /// evaluation will be performed in the context of the inspected page.
-  /// [returnByValue] Whether the result is expected to be a JSON object that
-  /// should be sent by value.
+  /// [returnByValue] Whether the result is expected to be a JSON object that should be sent by value.
   /// [generatePreview] Whether preview should be generated for the result.
-  /// [userGesture] Whether execution should be treated as initiated by user in
-  /// the UI.
-  /// [awaitPromise] Whether execution should `await` for resulting value and
-  /// return once awaited promise is
+  /// [userGesture] Whether execution should be treated as initiated by user in the UI.
+  /// [awaitPromise] Whether execution should `await` for resulting value and return once awaited promise is
   /// resolved.
-  /// [throwOnSideEffect] Whether to throw an exception if side effect cannot be
-  /// ruled out during evaluation.
+  /// [throwOnSideEffect] Whether to throw an exception if side effect cannot be ruled out during evaluation.
   /// [timeout] Terminate execution after timing out (number of milliseconds).
   Future<EvaluateResult> evaluate(
     String expression, {
@@ -280,22 +254,18 @@ class RuntimeManager {
   }
 
   /// Returns the JavaScript heap usage.
-  /// It is the total usage of the corresponding isolate not scoped to a
-  /// particular Runtime.
+  /// It is the total usage of the corresponding isolate not scoped to a particular Runtime.
   Future<GetHeapUsageResult> getHeapUsage() async {
     Map result = await _client.send('Runtime.getHeapUsage');
     return new GetHeapUsageResult.fromJson(result);
   }
 
-  /// Returns properties of a given object. Object group of the result is
-  /// inherited from the target
+  /// Returns properties of a given object. Object group of the result is inherited from the target
   /// object.
   /// [objectId] Identifier of the object to return properties for.
-  /// [ownProperties] If true, returns properties belonging only to the element
-  /// itself, not to its prototype
+  /// [ownProperties] If true, returns properties belonging only to the element itself, not to its prototype
   /// chain.
-  /// [accessorPropertiesOnly] If true, returns accessor properties (with
-  /// getter/setter) only; internal properties are not
+  /// [accessorPropertiesOnly] If true, returns accessor properties (with getter/setter) only; internal properties are not
   /// returned either.
   /// [generatePreview] Whether preview should be generated for the results.
   Future<GetPropertiesResult> getProperties(
@@ -321,8 +291,7 @@ class RuntimeManager {
   }
 
   /// Returns all let, const and class variables from global scope.
-  /// [executionContextId] Specifies in which execution context to lookup global
-  /// scope variables.
+  /// [executionContextId] Specifies in which execution context to lookup global scope variables.
   Future<List<String>> globalLexicalScopeNames({
     ExecutionContextId executionContextId,
   }) async {
@@ -381,21 +350,15 @@ class RuntimeManager {
 
   /// Runs script with given id in a given context.
   /// [scriptId] Id of the script to run.
-  /// [executionContextId] Specifies in which execution context to perform
-  /// script run. If the parameter is omitted the
+  /// [executionContextId] Specifies in which execution context to perform script run. If the parameter is omitted the
   /// evaluation will be performed in the context of the inspected page.
-  /// [objectGroup] Symbolic group name that can be used to release multiple
-  /// objects.
-  /// [silent] In silent mode exceptions thrown during evaluation are not
-  /// reported and do not pause
+  /// [objectGroup] Symbolic group name that can be used to release multiple objects.
+  /// [silent] In silent mode exceptions thrown during evaluation are not reported and do not pause
   /// execution. Overrides `setPauseOnException` state.
-  /// [includeCommandLineAPI] Determines whether Command Line API should be
-  /// available during the evaluation.
-  /// [returnByValue] Whether the result is expected to be a JSON object which
-  /// should be sent by value.
+  /// [includeCommandLineAPI] Determines whether Command Line API should be available during the evaluation.
+  /// [returnByValue] Whether the result is expected to be a JSON object which should be sent by value.
   /// [generatePreview] Whether preview should be generated for the result.
-  /// [awaitPromise] Whether execution should `await` for resulting value and
-  /// return once awaited promise is
+  /// [awaitPromise] Whether execution should `await` for resulting value and return once awaited promise is
   /// resolved.
   Future<RunScriptResult> runScript(
     ScriptId scriptId, {
@@ -467,10 +430,8 @@ class ConsoleAPICalledEvent {
   /// Stack trace captured when the call was made.
   final StackTrace stackTrace;
 
-  /// Console context descriptor for calls on non-default console context (not
-  /// console.*):
-  /// 'anonymous#unique-logger-id' for call on unnamed context,
-  /// 'name#unique-logger-id' for call
+  /// Console context descriptor for calls on non-default console context (not console.*):
+  /// 'anonymous#unique-logger-id' for call on unnamed context, 'name#unique-logger-id' for call
   /// on named context.
   final String context;
 
@@ -762,8 +723,7 @@ class RemoteObjectId {
   String toString() => value.toString();
 }
 
-/// Primitive value which cannot be JSON-stringified. Includes values `-0`,
-/// `NaN`, `Infinity`,
+/// Primitive value which cannot be JSON-stringified. Includes values `-0`, `NaN`, `Infinity`,
 /// `-Infinity`, and bigint literals.
 class UnserializableValue {
   final String value;
@@ -797,12 +757,10 @@ class RemoteObject {
   /// Object class (constructor) name. Specified for `object` type values only.
   final String className;
 
-  /// Remote object value in case of primitive values or JSON values (if it was
-  /// requested).
+  /// Remote object value in case of primitive values or JSON values (if it was requested).
   final dynamic value;
 
-  /// Primitive value which can not be JSON-stringified does not have `value`,
-  /// but gets this
+  /// Primitive value which can not be JSON-stringified does not have `value`, but gets this
   /// property.
   final UnserializableValue unserializableValue;
 
@@ -812,8 +770,7 @@ class RemoteObject {
   /// Unique object identifier (for non-primitive values).
   final RemoteObjectId objectId;
 
-  /// Preview containing abbreviated property values. Specified for `object`
-  /// type values only.
+  /// Preview containing abbreviated property values. Specified for `object` type values only.
   final ObjectPreview preview;
 
   final CustomPreview customPreview;
@@ -941,8 +898,7 @@ class ObjectPreview {
   /// String representation of the object.
   final String description;
 
-  /// True iff some of the properties or entries of the original object did not
-  /// fit.
+  /// True iff some of the properties or entries of the original object did not fit.
   final bool overflow;
 
   /// List of the properties.
@@ -1000,8 +956,7 @@ class PropertyPreview {
   /// Property name.
   final String name;
 
-  /// Object type. Accessor means that the property itself is an accessor
-  /// property.
+  /// Object type. Accessor means that the property itself is an accessor property.
   final String type;
 
   /// User-friendly property value string.
@@ -1091,27 +1046,22 @@ class PropertyDescriptor {
   /// The value associated with the property.
   final RemoteObject value;
 
-  /// True if the value associated with the property may be changed (data
-  /// descriptors only).
+  /// True if the value associated with the property may be changed (data descriptors only).
   final bool writable;
 
-  /// A function which serves as a getter for the property, or `undefined` if
-  /// there is no getter
+  /// A function which serves as a getter for the property, or `undefined` if there is no getter
   /// (accessor descriptors only).
   final RemoteObject get;
 
-  /// A function which serves as a setter for the property, or `undefined` if
-  /// there is no setter
+  /// A function which serves as a setter for the property, or `undefined` if there is no setter
   /// (accessor descriptors only).
   final RemoteObject set;
 
-  /// True if the type of this property descriptor may be changed and if the
-  /// property may be
+  /// True if the type of this property descriptor may be changed and if the property may be
   /// deleted from the corresponding object.
   final bool configurable;
 
-  /// True if this property shows up during enumeration of the properties on the
-  /// corresponding
+  /// True if this property shows up during enumeration of the properties on the corresponding
   /// object.
   final bool enumerable;
 
@@ -1191,8 +1141,7 @@ class PropertyDescriptor {
   }
 }
 
-/// Object internal property descriptor. This property isn't normally visible in
-/// JavaScript code.
+/// Object internal property descriptor. This property isn't normally visible in JavaScript code.
 class InternalPropertyDescriptor {
   /// Conventional property name.
   final String name;
@@ -1225,10 +1174,8 @@ class InternalPropertyDescriptor {
   }
 }
 
-/// Represents function call argument. Either remote object id `objectId`,
-/// primitive `value`,
-/// unserializable primitive value or neither of (for undefined) them should be
-/// specified.
+/// Represents function call argument. Either remote object id `objectId`, primitive `value`,
+/// unserializable primitive value or neither of (for undefined) them should be specified.
 class CallArgument {
   /// Primitive value or serializable javascript object.
   final dynamic value;
@@ -1296,8 +1243,7 @@ class ExecutionContextId {
 
 /// Description of an isolated world.
 class ExecutionContextDescription {
-  /// Unique id of the execution context. It can be used to specify in which
-  /// execution context
+  /// Unique id of the execution context. It can be used to specify in which execution context
   /// script evaluation should be performed.
   final ExecutionContextId id;
 
@@ -1339,15 +1285,13 @@ class ExecutionContextDescription {
   }
 }
 
-/// Detailed information about exception (or error) that was thrown during
-/// script compilation or
+/// Detailed information about exception (or error) that was thrown during script compilation or
 /// execution.
 class ExceptionDetails {
   /// Exception id.
   final int exceptionId;
 
-  /// Exception text, which should be used together with exception object when
-  /// available.
+  /// Exception text, which should be used together with exception object when available.
   final String text;
 
   /// Line number of the exception location (0-based).
@@ -1359,8 +1303,7 @@ class ExceptionDetails {
   /// Script ID of the exception location.
   final ScriptId scriptId;
 
-  /// URL of the exception location, to be used when the script was not
-  /// reported.
+  /// URL of the exception location, to be used when the script was not reported.
   final String url;
 
   /// JavaScript stack trace if available.
@@ -1521,20 +1464,17 @@ class CallFrame {
 
 /// Call frames for assertions or error messages.
 class StackTrace {
-  /// String label of this stack trace. For async traces this may be a name of
-  /// the function that
+  /// String label of this stack trace. For async traces this may be a name of the function that
   /// initiated the async call.
   final String description;
 
   /// JavaScript function name.
   final List<CallFrame> callFrames;
 
-  /// Asynchronous JavaScript stack trace that preceded this stack, if
-  /// available.
+  /// Asynchronous JavaScript stack trace that preceded this stack, if available.
   final StackTrace parent;
 
-  /// Asynchronous JavaScript stack trace that preceded this stack, if
-  /// available.
+  /// Asynchronous JavaScript stack trace that preceded this stack, if available.
   final StackTraceId parentId;
 
   StackTrace({
@@ -1597,10 +1537,8 @@ class UniqueDebuggerId {
   String toString() => value.toString();
 }
 
-/// If `debuggerId` is set stack trace comes from another debugger and can be
-/// resolved there. This
-/// allows to track cross-debugger calls. See `Runtime.StackTrace` and
-/// `Debugger.paused` for usages.
+/// If `debuggerId` is set stack trace comes from another debugger and can be resolved there. This
+/// allows to track cross-debugger calls. See `Runtime.StackTrace` and `Debugger.paused` for usages.
 class StackTraceId {
   final String id;
 

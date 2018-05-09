@@ -20,14 +20,12 @@ class ConsoleManager {
     await _client.send('Console.clearMessages');
   }
 
-  /// Disables console domain, prevents further console messages from being
-  /// reported to the client.
+  /// Disables console domain, prevents further console messages from being reported to the client.
   Future disable() async {
     await _client.send('Console.disable');
   }
 
-  /// Enables console domain, sends the messages collected so far to the client
-  /// by means of the
+  /// Enables console domain, sends the messages collected so far to the client by means of the
   /// `messageAdded` notification.
   Future enable() async {
     await _client.send('Console.enable');

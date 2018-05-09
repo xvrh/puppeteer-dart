@@ -5,7 +5,7 @@
 A Dart library to control Chrome over the DevTools Protocol.
 
 This is a simple 1:1 mapping with the [Chrome DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).  
-All the code in `lib/domains` are generated from the [browser_protocol.json](https://chromium.googlesource.com/chromium/src/+/master/third_party/blink/renderer/core/inspector/browser_protocol-1.3.json) and [js_protocol.json](https://chromium.googlesource.com/v8/v8/+/master/src/inspector/js_protocol.json).
+All the code in `lib/domains` are generated from the [browser_protocol.json]() and [js_protocol.json]().
 
 
 ## Usage

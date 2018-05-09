@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'model.dart';
+import 'update_protocol.dart' show protocols;
 import 'utils/split_words.dart';
 import 'utils/string_helpers.dart';
 import 'package:dart_style/dart_style.dart';
@@ -20,10 +21,8 @@ main() {
   }
   targetDir.createSync();
 
-  List<Domain> domains = [
-    readProtocol('browser_protocol.json').domains,
-    readProtocol('js_protocol.json').domains
-  ].expand((f) => f).toList();
+  List<Domain> domains =
+      protocols.keys.map(readProtocol).expand((f) => f.domains).toList();
 
   for (Domain domain in domains) {
     List<ComplexType> types = domain.types;
@@ -601,33 +600,13 @@ class _DomainContext {
 bool isRawType(String type) =>
     const ['int', 'num', 'String', 'bool', 'dynamic', 'Map'].contains(type);
 
-String toComment(String comment, {int indent: 0, int lineLength: 80}) {
+String toComment(String comment, {int indent: 0}) {
   if (comment != null && comment.isNotEmpty) {
-    List<String> commentLines = [];
-
     comment = comment.replaceAll('<code>', '`').replaceAll('</code>', '`');
 
     const String docStarter = '/// ';
-    int maxLineLength = lineLength - indent - docStarter.length;
 
-    for (String hardLine in LineSplitter.split(comment)) {
-      List<String> currentLine = [];
-      int currentLineLength = 0;
-      for (String word in hardLine.split(' ')) {
-        if (currentLine.isEmpty ||
-            currentLineLength + word.length < maxLineLength) {
-          currentLineLength += word.length + (currentLine.isEmpty ? 0 : 1);
-          currentLine.add(word);
-        } else {
-          commentLines.add(currentLine.join(' '));
-          currentLine = [word];
-          currentLineLength = word.length;
-        }
-      }
-      if (currentLine.isNotEmpty) {
-        commentLines.add(currentLine.join(' '));
-      }
-    }
+    List<String> commentLines = LineSplitter.split(comment).toList();
 
     return commentLines
         .map((line) => '${' ' * indent}$docStarter$line')

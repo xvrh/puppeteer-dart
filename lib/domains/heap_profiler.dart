@@ -12,20 +12,16 @@ class HeapProfilerManager {
       .where((Event event) => event.name == 'HeapProfiler.addHeapSnapshotChunk')
       .map((Event event) => event.parameters['chunk'] as String);
 
-  /// If heap objects tracking has been started then backend may send update for
-  /// one or more fragments
+  /// If heap objects tracking has been started then backend may send update for one or more fragments
   Stream<List<int>> get onHeapStatsUpdate => _client.onEvent
       .where((Event event) => event.name == 'HeapProfiler.heapStatsUpdate')
       .map((Event event) => (event.parameters['statsUpdate'] as List)
           .map((e) => e as int)
           .toList());
 
-  /// If heap objects tracking has been started then backend regularly sends a
-  /// current value for last
-  /// seen object id and corresponding timestamp. If the were changes in the
-  /// heap since last event
-  /// then one or more heapStatsUpdate events will be sent before a new
-  /// lastSeenObjectId event.
+  /// If heap objects tracking has been started then backend regularly sends a current value for last
+  /// seen object id and corresponding timestamp. If the were changes in the heap since last event
+  /// then one or more heapStatsUpdate events will be sent before a new lastSeenObjectId event.
   Stream<LastSeenObjectIdEvent> get onLastSeenObjectId => _client.onEvent
       .where((Event event) => event.name == 'HeapProfiler.lastSeenObjectId')
       .map((Event event) =>
@@ -41,11 +37,9 @@ class HeapProfilerManager {
   Stream get onResetProfiles => _client.onEvent
       .where((Event event) => event.name == 'HeapProfiler.resetProfiles');
 
-  /// Enables console to refer to the node with given id via $x (see Command
-  /// Line API for more details
+  /// Enables console to refer to the node with given id via $x (see Command Line API for more details
   /// $x functions).
-  /// [heapObjectId] Heap snapshot object id to be accessible by means of $x
-  /// command line API.
+  /// [heapObjectId] Heap snapshot object id to be accessible by means of $x command line API.
   Future addInspectedHeapObject(
     HeapSnapshotObjectId heapObjectId,
   ) async {
@@ -68,8 +62,7 @@ class HeapProfilerManager {
   }
 
   /// [objectId] Identifier of the object to get heap object id for.
-  /// Returns: Id of the heap snapshot object corresponding to the passed remote
-  /// object id.
+  /// Returns: Id of the heap snapshot object corresponding to the passed remote object id.
   Future<HeapSnapshotObjectId> getHeapObjectId(
     runtime.RemoteObjectId objectId,
   ) async {
@@ -80,8 +73,7 @@ class HeapProfilerManager {
     return new HeapSnapshotObjectId.fromJson(result['heapSnapshotObjectId']);
   }
 
-  /// [objectGroup] Symbolic group name that can be used to release multiple
-  /// objects.
+  /// [objectGroup] Symbolic group name that can be used to release multiple objects.
   /// Returns: Evaluation result.
   Future<runtime.RemoteObject> getObjectByHeapObjectId(
     HeapSnapshotObjectId objectId, {
@@ -104,8 +96,7 @@ class HeapProfilerManager {
     return new SamplingHeapProfile.fromJson(result['profile']);
   }
 
-  /// [samplingInterval] Average sample interval in bytes. Poisson distribution
-  /// is used for the intervals. The
+  /// [samplingInterval] Average sample interval in bytes. Poisson distribution is used for the intervals. The
   /// default value is 32768 bytes.
   Future startSampling({
     num samplingInterval,
@@ -133,8 +124,7 @@ class HeapProfilerManager {
     return new SamplingHeapProfile.fromJson(result['profile']);
   }
 
-  /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be
-  /// generated while snapshot is being taken
+  /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken
   /// when the tracking is stopped.
   Future stopTrackingHeapObjects({
     bool reportProgress,
@@ -146,8 +136,7 @@ class HeapProfilerManager {
     await _client.send('HeapProfiler.stopTrackingHeapObjects', parameters);
   }
 
-  /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be
-  /// generated while snapshot is being taken.
+  /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken.
   Future takeHeapSnapshot({
     bool reportProgress,
   }) async {
@@ -221,8 +210,7 @@ class HeapSnapshotObjectId {
   String toString() => value.toString();
 }
 
-/// Sampling Heap Profile node. Holds callsite information, allocation
-/// statistics and child nodes.
+/// Sampling Heap Profile node. Holds callsite information, allocation statistics and child nodes.
 class SamplingHeapProfileNode {
   /// Function location.
   final runtime.CallFrame callFrame;

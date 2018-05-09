@@ -8,8 +8,7 @@ class TetheringManager {
 
   TetheringManager(this._client);
 
-  /// Informs that port was successfully bound and got a specified connection
-  /// id.
+  /// Informs that port was successfully bound and got a specified connection id.
   Stream<AcceptedEvent> get onAccepted => _client.onEvent
       .where((Event event) => event.name == 'Tethering.accepted')
       .map((Event event) => new AcceptedEvent.fromJson(event.parameters));

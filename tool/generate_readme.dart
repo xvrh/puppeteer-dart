@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dart_style/dart_style.dart';
+import 'update_protocol.dart' show protocols;
 
 final RegExp _importRegex = new RegExp(r"import '([^']+)';\r?\n");
 final RegExp _ignoreForFileRegex =
@@ -25,5 +26,11 @@ String generateReadme() {
 
     return fileContent;
   });
+
+  for (String protocolName in protocols.keys) {
+    readme = readme.replaceAll(
+        '[$protocolName]()', '[$protocolName](${protocols[protocolName]})');
+  }
+
   return readme;
 }

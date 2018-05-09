@@ -5,30 +5,17 @@ import 'page.dart' as page;
 import 'runtime.dart' as runtime;
 import 'dom.dart' as dom;
 
-/// This domain exposes DOM read/write operations. Each DOM Node is represented
-/// with its mirror object that has an `id`. This `id` can be used to get
-/// additional information on the Node, resolve it into the JavaScript object
-/// wrapper, etc. It is important that client receives DOM events only for the
-/// nodes that are known to the client. Backend keeps track of the nodes that
-/// were sent to the client and never sends the same node twice. It is client's
-/// responsibility to collect information about the nodes that were sent to the
-/// client.<p>Note that `iframe` owner elements will return corresponding
-/// document elements as their child nodes.</p>
+/// This domain exposes DOM read/write operations. Each DOM Node is represented with its mirror object
+/// that has an `id`. This `id` can be used to get additional information on the Node, resolve it into
+/// the JavaScript object wrapper, etc. It is important that client receives DOM events only for the
+/// nodes that are known to the client. Backend keeps track of the nodes that were sent to the client
+/// and never sends the same node twice. It is client's responsibility to collect information about
+/// the nodes that were sent to the client.<p>Note that `iframe` owner elements will return
+/// corresponding document elements as their child nodes.</p>
 class DOMManager {
   final Client _client;
 
   DOMManager(this._client);
-
-  /// Fired when `Document` has been totally updated. Node ids are no longer
-  /// valid.
-  Stream get onDocumentUpdated => _client.onEvent
-      .where((Event event) => event.name == 'DOM.documentUpdated');
-
-  /// Fired when backend wants to provide client with the missing DOM structure.
-  /// This happens upon most of the calls requesting node ids.
-  Stream<SetChildNodesEvent> get onSetChildNodes => _client.onEvent
-      .where((Event event) => event.name == 'DOM.setChildNodes')
-      .map((Event event) => new SetChildNodesEvent.fromJson(event.parameters));
 
   /// Fired when `Element`'s attribute is modified.
   Stream<AttributeModifiedEvent> get onAttributeModified => _client.onEvent
@@ -41,14 +28,6 @@ class DOMManager {
       .where((Event event) => event.name == 'DOM.attributeRemoved')
       .map((Event event) =>
           new AttributeRemovedEvent.fromJson(event.parameters));
-
-  /// Fired when `Element`'s inline style is modified via a CSS property
-  /// modification.
-  Stream<List<NodeId>> get onInlineStyleInvalidated => _client.onEvent
-      .where((Event event) => event.name == 'DOM.inlineStyleInvalidated')
-      .map((Event event) => (event.parameters['nodeIds'] as List)
-          .map((e) => new NodeId.fromJson(e))
-          .toList());
 
   /// Mirrors `DOMCharacterDataModified` event.
   Stream<CharacterDataModifiedEvent> get onCharacterDataModified =>
@@ -76,17 +55,23 @@ class DOMManager {
       .map((Event event) =>
           new ChildNodeRemovedEvent.fromJson(event.parameters));
 
-  /// Called when shadow root is pushed into the element.
-  Stream<ShadowRootPushedEvent> get onShadowRootPushed => _client.onEvent
-      .where((Event event) => event.name == 'DOM.shadowRootPushed')
-      .map((Event event) =>
-          new ShadowRootPushedEvent.fromJson(event.parameters));
+  /// Called when distrubution is changed.
+  Stream<DistributedNodesUpdatedEvent> get onDistributedNodesUpdated =>
+      _client.onEvent
+          .where((Event event) => event.name == 'DOM.distributedNodesUpdated')
+          .map((Event event) =>
+              new DistributedNodesUpdatedEvent.fromJson(event.parameters));
 
-  /// Called when shadow root is popped from the element.
-  Stream<ShadowRootPoppedEvent> get onShadowRootPopped => _client.onEvent
-      .where((Event event) => event.name == 'DOM.shadowRootPopped')
-      .map((Event event) =>
-          new ShadowRootPoppedEvent.fromJson(event.parameters));
+  /// Fired when `Document` has been totally updated. Node ids are no longer valid.
+  Stream get onDocumentUpdated => _client.onEvent
+      .where((Event event) => event.name == 'DOM.documentUpdated');
+
+  /// Fired when `Element`'s inline style is modified via a CSS property modification.
+  Stream<List<NodeId>> get onInlineStyleInvalidated => _client.onEvent
+      .where((Event event) => event.name == 'DOM.inlineStyleInvalidated')
+      .map((Event event) => (event.parameters['nodeIds'] as List)
+          .map((e) => new NodeId.fromJson(e))
+          .toList());
 
   /// Called when a pseudo element is added to an element.
   Stream<PseudoElementAddedEvent> get onPseudoElementAdded => _client.onEvent
@@ -101,16 +86,96 @@ class DOMManager {
           .map((Event event) =>
               new PseudoElementRemovedEvent.fromJson(event.parameters));
 
-  /// Called when distrubution is changed.
-  Stream<DistributedNodesUpdatedEvent> get onDistributedNodesUpdated =>
-      _client.onEvent
-          .where((Event event) => event.name == 'DOM.distributedNodesUpdated')
-          .map((Event event) =>
-              new DistributedNodesUpdatedEvent.fromJson(event.parameters));
+  /// Fired when backend wants to provide client with the missing DOM structure. This happens upon
+  /// most of the calls requesting node ids.
+  Stream<SetChildNodesEvent> get onSetChildNodes => _client.onEvent
+      .where((Event event) => event.name == 'DOM.setChildNodes')
+      .map((Event event) => new SetChildNodesEvent.fromJson(event.parameters));
 
-  /// Enables DOM agent for the given page.
-  Future enable() async {
-    await _client.send('DOM.enable');
+  /// Called when shadow root is popped from the element.
+  Stream<ShadowRootPoppedEvent> get onShadowRootPopped => _client.onEvent
+      .where((Event event) => event.name == 'DOM.shadowRootPopped')
+      .map((Event event) =>
+          new ShadowRootPoppedEvent.fromJson(event.parameters));
+
+  /// Called when shadow root is pushed into the element.
+  Stream<ShadowRootPushedEvent> get onShadowRootPushed => _client.onEvent
+      .where((Event event) => event.name == 'DOM.shadowRootPushed')
+      .map((Event event) =>
+          new ShadowRootPushedEvent.fromJson(event.parameters));
+
+  /// Collects class names for the node with given id and all of it's child nodes.
+  /// [nodeId] Id of the node to collect class names.
+  /// Returns: Class name list.
+  Future<List<String>> collectClassNamesFromSubtree(
+    NodeId nodeId,
+  ) async {
+    Map parameters = {
+      'nodeId': nodeId.toJson(),
+    };
+    Map result =
+        await _client.send('DOM.collectClassNamesFromSubtree', parameters);
+    return (result['classNames'] as List).map((e) => e as String).toList();
+  }
+
+  /// Creates a deep copy of the specified node and places it into the target container before the
+  /// given anchor.
+  /// [nodeId] Id of the node to copy.
+  /// [targetNodeId] Id of the element to drop the copy into.
+  /// [insertBeforeNodeId] Drop the copy before this node (if absent, the copy becomes the last child of
+  /// `targetNodeId`).
+  /// Returns: Id of the node clone.
+  Future<NodeId> copyTo(
+    NodeId nodeId,
+    NodeId targetNodeId, {
+    NodeId insertBeforeNodeId,
+  }) async {
+    Map parameters = {
+      'nodeId': nodeId.toJson(),
+      'targetNodeId': targetNodeId.toJson(),
+    };
+    if (insertBeforeNodeId != null) {
+      parameters['insertBeforeNodeId'] = insertBeforeNodeId.toJson();
+    }
+    Map result = await _client.send('DOM.copyTo', parameters);
+    return new NodeId.fromJson(result['nodeId']);
+  }
+
+  /// Describes node given its id, does not require domain to be enabled. Does not start tracking any
+  /// objects, can be used for automation.
+  /// [nodeId] Identifier of the node.
+  /// [backendNodeId] Identifier of the backend node.
+  /// [objectId] JavaScript object id of the node wrapper.
+  /// [depth] The maximum depth at which children should be retrieved, defaults to 1. Use -1 for the
+  /// entire subtree or provide an integer larger than 0.
+  /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the subtree
+  /// (default is false).
+  /// Returns: Node description.
+  Future<Node> describeNode({
+    NodeId nodeId,
+    BackendNodeId backendNodeId,
+    runtime.RemoteObjectId objectId,
+    int depth,
+    bool pierce,
+  }) async {
+    Map parameters = {};
+    if (nodeId != null) {
+      parameters['nodeId'] = nodeId.toJson();
+    }
+    if (backendNodeId != null) {
+      parameters['backendNodeId'] = backendNodeId.toJson();
+    }
+    if (objectId != null) {
+      parameters['objectId'] = objectId.toJson();
+    }
+    if (depth != null) {
+      parameters['depth'] = depth;
+    }
+    if (pierce != null) {
+      parameters['pierce'] = pierce;
+    }
+    Map result = await _client.send('DOM.describeNode', parameters);
+    return new Node.fromJson(result['node']);
   }
 
   /// Disables DOM agent for the given page.
@@ -118,11 +183,87 @@ class DOMManager {
     await _client.send('DOM.disable');
   }
 
+  /// Discards search results from the session with the given id. `getSearchResults` should no longer
+  /// be called for that search.
+  /// [searchId] Unique search session identifier.
+  Future discardSearchResults(
+    String searchId,
+  ) async {
+    Map parameters = {
+      'searchId': searchId,
+    };
+    await _client.send('DOM.discardSearchResults', parameters);
+  }
+
+  /// Enables DOM agent for the given page.
+  Future enable() async {
+    await _client.send('DOM.enable');
+  }
+
+  /// Focuses the given element.
+  /// [nodeId] Identifier of the node.
+  /// [backendNodeId] Identifier of the backend node.
+  /// [objectId] JavaScript object id of the node wrapper.
+  Future focus({
+    NodeId nodeId,
+    BackendNodeId backendNodeId,
+    runtime.RemoteObjectId objectId,
+  }) async {
+    Map parameters = {};
+    if (nodeId != null) {
+      parameters['nodeId'] = nodeId.toJson();
+    }
+    if (backendNodeId != null) {
+      parameters['backendNodeId'] = backendNodeId.toJson();
+    }
+    if (objectId != null) {
+      parameters['objectId'] = objectId.toJson();
+    }
+    await _client.send('DOM.focus', parameters);
+  }
+
+  /// Returns attributes for the specified node.
+  /// [nodeId] Id of the node to retrieve attibutes for.
+  /// Returns: An interleaved array of node attribute names and values.
+  Future<List<String>> getAttributes(
+    NodeId nodeId,
+  ) async {
+    Map parameters = {
+      'nodeId': nodeId.toJson(),
+    };
+    Map result = await _client.send('DOM.getAttributes', parameters);
+    return (result['attributes'] as List).map((e) => e as String).toList();
+  }
+
+  /// Returns boxes for the given node.
+  /// [nodeId] Identifier of the node.
+  /// [backendNodeId] Identifier of the backend node.
+  /// [objectId] JavaScript object id of the node wrapper.
+  /// Returns: Box model for the node.
+  Future<BoxModel> getBoxModel({
+    NodeId nodeId,
+    BackendNodeId backendNodeId,
+    runtime.RemoteObjectId objectId,
+  }) async {
+    Map parameters = {};
+    if (nodeId != null) {
+      parameters['nodeId'] = nodeId.toJson();
+    }
+    if (backendNodeId != null) {
+      parameters['backendNodeId'] = backendNodeId.toJson();
+    }
+    if (objectId != null) {
+      parameters['objectId'] = objectId.toJson();
+    }
+    Map result = await _client.send('DOM.getBoxModel', parameters);
+    return new BoxModel.fromJson(result['model']);
+  }
+
   /// Returns the root DOM node (and optionally the subtree) to the caller.
-  /// [depth] The maximum depth at which children should be retrieved, defaults
-  /// to 1. Use -1 for the entire subtree or provide an integer larger than 0.
-  /// [pierce] Whether or not iframes and shadow roots should be traversed when
-  /// returning the subtree (default is false).
+  /// [depth] The maximum depth at which children should be retrieved, defaults to 1. Use -1 for the
+  /// entire subtree or provide an integer larger than 0.
+  /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the subtree
+  /// (default is false).
   /// Returns: Resulting node.
   Future<Node> getDocument({
     int depth,
@@ -140,10 +281,10 @@ class DOMManager {
   }
 
   /// Returns the root DOM node (and optionally the subtree) to the caller.
-  /// [depth] The maximum depth at which children should be retrieved, defaults
-  /// to 1. Use -1 for the entire subtree or provide an integer larger than 0.
-  /// [pierce] Whether or not iframes and shadow roots should be traversed when
-  /// returning the subtree (default is false).
+  /// [depth] The maximum depth at which children should be retrieved, defaults to 1. Use -1 for the
+  /// entire subtree or provide an integer larger than 0.
+  /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the subtree
+  /// (default is false).
   /// Returns: Resulting node.
   Future<List<Node>> getFlattenedDocument({
     int depth,
@@ -160,44 +301,174 @@ class DOMManager {
     return (result['nodes'] as List).map((e) => new Node.fromJson(e)).toList();
   }
 
-  /// Collects class names for the node with given id and all of it's child
-  /// nodes.
-  /// [nodeId] Id of the node to collect class names.
-  /// Returns: Class name list.
-  Future<List<String>> collectClassNamesFromSubtree(
+  /// Returns node id at given location.
+  /// [x] X coordinate.
+  /// [y] Y coordinate.
+  /// [includeUserAgentShadowDOM] False to skip to the nearest non-UA shadow root ancestor (default: false).
+  /// Returns: Id of the node at given coordinates.
+  Future<NodeId> getNodeForLocation(
+    int x,
+    int y, {
+    bool includeUserAgentShadowDOM,
+  }) async {
+    Map parameters = {
+      'x': x,
+      'y': y,
+    };
+    if (includeUserAgentShadowDOM != null) {
+      parameters['includeUserAgentShadowDOM'] = includeUserAgentShadowDOM;
+    }
+    Map result = await _client.send('DOM.getNodeForLocation', parameters);
+    return new NodeId.fromJson(result['nodeId']);
+  }
+
+  /// Returns node's HTML markup.
+  /// [nodeId] Identifier of the node.
+  /// [backendNodeId] Identifier of the backend node.
+  /// [objectId] JavaScript object id of the node wrapper.
+  /// Returns: Outer HTML markup.
+  Future<String> getOuterHTML({
+    NodeId nodeId,
+    BackendNodeId backendNodeId,
+    runtime.RemoteObjectId objectId,
+  }) async {
+    Map parameters = {};
+    if (nodeId != null) {
+      parameters['nodeId'] = nodeId.toJson();
+    }
+    if (backendNodeId != null) {
+      parameters['backendNodeId'] = backendNodeId.toJson();
+    }
+    if (objectId != null) {
+      parameters['objectId'] = objectId.toJson();
+    }
+    Map result = await _client.send('DOM.getOuterHTML', parameters);
+    return result['outerHTML'];
+  }
+
+  /// Returns the id of the nearest ancestor that is a relayout boundary.
+  /// [nodeId] Id of the node.
+  /// Returns: Relayout boundary node id for the given node.
+  Future<NodeId> getRelayoutBoundary(
     NodeId nodeId,
   ) async {
     Map parameters = {
       'nodeId': nodeId.toJson(),
     };
-    Map result =
-        await _client.send('DOM.collectClassNamesFromSubtree', parameters);
-    return (result['classNames'] as List).map((e) => e as String).toList();
+    Map result = await _client.send('DOM.getRelayoutBoundary', parameters);
+    return new NodeId.fromJson(result['nodeId']);
   }
 
-  /// Requests that children of the node with given id are returned to the
-  /// caller in form of `setChildNodes` events where not only immediate children
-  /// are retrieved, but all children down to the specified depth.
-  /// [nodeId] Id of the node to get children for.
-  /// [depth] The maximum depth at which children should be retrieved, defaults
-  /// to 1. Use -1 for the entire subtree or provide an integer larger than 0.
-  /// [pierce] Whether or not iframes and shadow roots should be traversed when
-  /// returning the sub-tree (default is false).
-  Future requestChildNodes(
-    NodeId nodeId, {
-    int depth,
-    bool pierce,
+  /// Returns search results from given `fromIndex` to given `toIndex` from the search with the given
+  /// identifier.
+  /// [searchId] Unique search session identifier.
+  /// [fromIndex] Start index of the search result to be returned.
+  /// [toIndex] End index of the search result to be returned.
+  /// Returns: Ids of the search result nodes.
+  Future<List<NodeId>> getSearchResults(
+    String searchId,
+    int fromIndex,
+    int toIndex,
+  ) async {
+    Map parameters = {
+      'searchId': searchId,
+      'fromIndex': fromIndex,
+      'toIndex': toIndex,
+    };
+    Map result = await _client.send('DOM.getSearchResults', parameters);
+    return (result['nodeIds'] as List)
+        .map((e) => new NodeId.fromJson(e))
+        .toList();
+  }
+
+  /// Hides any highlight.
+  Future hideHighlight() async {
+    await _client.send('DOM.hideHighlight');
+  }
+
+  /// Highlights DOM node.
+  Future highlightNode() async {
+    await _client.send('DOM.highlightNode');
+  }
+
+  /// Highlights given rectangle.
+  Future highlightRect() async {
+    await _client.send('DOM.highlightRect');
+  }
+
+  /// Marks last undoable state.
+  Future markUndoableState() async {
+    await _client.send('DOM.markUndoableState');
+  }
+
+  /// Moves node into the new container, places it before the given anchor.
+  /// [nodeId] Id of the node to move.
+  /// [targetNodeId] Id of the element to drop the moved node into.
+  /// [insertBeforeNodeId] Drop node before this one (if absent, the moved node becomes the last child of
+  /// `targetNodeId`).
+  /// Returns: New id of the moved node.
+  Future<NodeId> moveTo(
+    NodeId nodeId,
+    NodeId targetNodeId, {
+    NodeId insertBeforeNodeId,
   }) async {
     Map parameters = {
       'nodeId': nodeId.toJson(),
+      'targetNodeId': targetNodeId.toJson(),
     };
-    if (depth != null) {
-      parameters['depth'] = depth;
+    if (insertBeforeNodeId != null) {
+      parameters['insertBeforeNodeId'] = insertBeforeNodeId.toJson();
     }
-    if (pierce != null) {
-      parameters['pierce'] = pierce;
+    Map result = await _client.send('DOM.moveTo', parameters);
+    return new NodeId.fromJson(result['nodeId']);
+  }
+
+  /// Searches for a given string in the DOM tree. Use `getSearchResults` to access search results or
+  /// `cancelSearch` to end this search session.
+  /// [query] Plain text or query selector or XPath search query.
+  /// [includeUserAgentShadowDOM] True to search in user agent shadow DOM.
+  Future<PerformSearchResult> performSearch(
+    String query, {
+    bool includeUserAgentShadowDOM,
+  }) async {
+    Map parameters = {
+      'query': query,
+    };
+    if (includeUserAgentShadowDOM != null) {
+      parameters['includeUserAgentShadowDOM'] = includeUserAgentShadowDOM;
     }
-    await _client.send('DOM.requestChildNodes', parameters);
+    Map result = await _client.send('DOM.performSearch', parameters);
+    return new PerformSearchResult.fromJson(result);
+  }
+
+  /// Requests that the node is sent to the caller given its path. // FIXME, use XPath
+  /// [path] Path to node in the proprietary format.
+  /// Returns: Id of the node for given path.
+  Future<NodeId> pushNodeByPathToFrontend(
+    String path,
+  ) async {
+    Map parameters = {
+      'path': path,
+    };
+    Map result = await _client.send('DOM.pushNodeByPathToFrontend', parameters);
+    return new NodeId.fromJson(result['nodeId']);
+  }
+
+  /// Requests that a batch of nodes is sent to the caller given their backend node ids.
+  /// [backendNodeIds] The array of backend node ids.
+  /// Returns: The array of ids of pushed nodes that correspond to the backend ids specified in
+  /// backendNodeIds.
+  Future<List<NodeId>> pushNodesByBackendIdsToFrontend(
+    List<BackendNodeId> backendNodeIds,
+  ) async {
+    Map parameters = {
+      'backendNodeIds': backendNodeIds.map((e) => e.toJson()).toList(),
+    };
+    Map result =
+        await _client.send('DOM.pushNodesByBackendIdsToFrontend', parameters);
+    return (result['nodeIds'] as List)
+        .map((e) => new NodeId.fromJson(e))
+        .toList();
   }
 
   /// Executes `querySelector` on a given node.
@@ -234,6 +505,176 @@ class DOMManager {
         .toList();
   }
 
+  /// Re-does the last undone action.
+  Future redo() async {
+    await _client.send('DOM.redo');
+  }
+
+  /// Removes attribute with given name from an element with given id.
+  /// [nodeId] Id of the element to remove attribute from.
+  /// [name] Name of the attribute to remove.
+  Future removeAttribute(
+    NodeId nodeId,
+    String name,
+  ) async {
+    Map parameters = {
+      'nodeId': nodeId.toJson(),
+      'name': name,
+    };
+    await _client.send('DOM.removeAttribute', parameters);
+  }
+
+  /// Removes node with given id.
+  /// [nodeId] Id of the node to remove.
+  Future removeNode(
+    NodeId nodeId,
+  ) async {
+    Map parameters = {
+      'nodeId': nodeId.toJson(),
+    };
+    await _client.send('DOM.removeNode', parameters);
+  }
+
+  /// Requests that children of the node with given id are returned to the caller in form of
+  /// `setChildNodes` events where not only immediate children are retrieved, but all children down to
+  /// the specified depth.
+  /// [nodeId] Id of the node to get children for.
+  /// [depth] The maximum depth at which children should be retrieved, defaults to 1. Use -1 for the
+  /// entire subtree or provide an integer larger than 0.
+  /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the sub-tree
+  /// (default is false).
+  Future requestChildNodes(
+    NodeId nodeId, {
+    int depth,
+    bool pierce,
+  }) async {
+    Map parameters = {
+      'nodeId': nodeId.toJson(),
+    };
+    if (depth != null) {
+      parameters['depth'] = depth;
+    }
+    if (pierce != null) {
+      parameters['pierce'] = pierce;
+    }
+    await _client.send('DOM.requestChildNodes', parameters);
+  }
+
+  /// Requests that the node is sent to the caller given the JavaScript node object reference. All
+  /// nodes that form the path from the node to the root are also sent to the client as a series of
+  /// `setChildNodes` notifications.
+  /// [objectId] JavaScript object id to convert into node.
+  /// Returns: Node id for given object.
+  Future<NodeId> requestNode(
+    runtime.RemoteObjectId objectId,
+  ) async {
+    Map parameters = {
+      'objectId': objectId.toJson(),
+    };
+    Map result = await _client.send('DOM.requestNode', parameters);
+    return new NodeId.fromJson(result['nodeId']);
+  }
+
+  /// Resolves the JavaScript node object for a given NodeId or BackendNodeId.
+  /// [nodeId] Id of the node to resolve.
+  /// [backendNodeId] Backend identifier of the node to resolve.
+  /// [objectGroup] Symbolic group name that can be used to release multiple objects.
+  /// Returns: JavaScript object wrapper for given node.
+  Future<runtime.RemoteObject> resolveNode({
+    NodeId nodeId,
+    dom.BackendNodeId backendNodeId,
+    String objectGroup,
+  }) async {
+    Map parameters = {};
+    if (nodeId != null) {
+      parameters['nodeId'] = nodeId.toJson();
+    }
+    if (backendNodeId != null) {
+      parameters['backendNodeId'] = backendNodeId.toJson();
+    }
+    if (objectGroup != null) {
+      parameters['objectGroup'] = objectGroup;
+    }
+    Map result = await _client.send('DOM.resolveNode', parameters);
+    return new runtime.RemoteObject.fromJson(result['object']);
+  }
+
+  /// Sets attribute for an element with given id.
+  /// [nodeId] Id of the element to set attribute for.
+  /// [name] Attribute name.
+  /// [value] Attribute value.
+  Future setAttributeValue(
+    NodeId nodeId,
+    String name,
+    String value,
+  ) async {
+    Map parameters = {
+      'nodeId': nodeId.toJson(),
+      'name': name,
+      'value': value,
+    };
+    await _client.send('DOM.setAttributeValue', parameters);
+  }
+
+  /// Sets attributes on element with given id. This method is useful when user edits some existing
+  /// attribute value and types in several attribute name/value pairs.
+  /// [nodeId] Id of the element to set attributes for.
+  /// [text] Text with a number of attributes. Will parse this text using HTML parser.
+  /// [name] Attribute name to replace with new attributes derived from text in case text parsed
+  /// successfully.
+  Future setAttributesAsText(
+    NodeId nodeId,
+    String text, {
+    String name,
+  }) async {
+    Map parameters = {
+      'nodeId': nodeId.toJson(),
+      'text': text,
+    };
+    if (name != null) {
+      parameters['name'] = name;
+    }
+    await _client.send('DOM.setAttributesAsText', parameters);
+  }
+
+  /// Sets files for the given file input element.
+  /// [files] Array of file paths to set.
+  /// [nodeId] Identifier of the node.
+  /// [backendNodeId] Identifier of the backend node.
+  /// [objectId] JavaScript object id of the node wrapper.
+  Future setFileInputFiles(
+    List<String> files, {
+    NodeId nodeId,
+    BackendNodeId backendNodeId,
+    runtime.RemoteObjectId objectId,
+  }) async {
+    Map parameters = {
+      'files': files.map((e) => e).toList(),
+    };
+    if (nodeId != null) {
+      parameters['nodeId'] = nodeId.toJson();
+    }
+    if (backendNodeId != null) {
+      parameters['backendNodeId'] = backendNodeId.toJson();
+    }
+    if (objectId != null) {
+      parameters['objectId'] = objectId.toJson();
+    }
+    await _client.send('DOM.setFileInputFiles', parameters);
+  }
+
+  /// Enables console to refer to the node with given id via $x (see Command Line API for more details
+  /// $x functions).
+  /// [nodeId] DOM node id to be accessible by means of $x command line API.
+  Future setInspectedNode(
+    NodeId nodeId,
+  ) async {
+    Map parameters = {
+      'nodeId': nodeId.toJson(),
+    };
+    await _client.send('DOM.setInspectedNode', parameters);
+  }
+
   /// Sets node name for a node with given id.
   /// [nodeId] Id of the node to set name for.
   /// [name] New node's name.
@@ -264,95 +705,6 @@ class DOMManager {
     await _client.send('DOM.setNodeValue', parameters);
   }
 
-  /// Removes node with given id.
-  /// [nodeId] Id of the node to remove.
-  Future removeNode(
-    NodeId nodeId,
-  ) async {
-    Map parameters = {
-      'nodeId': nodeId.toJson(),
-    };
-    await _client.send('DOM.removeNode', parameters);
-  }
-
-  /// Sets attribute for an element with given id.
-  /// [nodeId] Id of the element to set attribute for.
-  /// [name] Attribute name.
-  /// [value] Attribute value.
-  Future setAttributeValue(
-    NodeId nodeId,
-    String name,
-    String value,
-  ) async {
-    Map parameters = {
-      'nodeId': nodeId.toJson(),
-      'name': name,
-      'value': value,
-    };
-    await _client.send('DOM.setAttributeValue', parameters);
-  }
-
-  /// Sets attributes on element with given id. This method is useful when user
-  /// edits some existing attribute value and types in several attribute
-  /// name/value pairs.
-  /// [nodeId] Id of the element to set attributes for.
-  /// [text] Text with a number of attributes. Will parse this text using HTML
-  /// parser.
-  /// [name] Attribute name to replace with new attributes derived from text in
-  /// case text parsed successfully.
-  Future setAttributesAsText(
-    NodeId nodeId,
-    String text, {
-    String name,
-  }) async {
-    Map parameters = {
-      'nodeId': nodeId.toJson(),
-      'text': text,
-    };
-    if (name != null) {
-      parameters['name'] = name;
-    }
-    await _client.send('DOM.setAttributesAsText', parameters);
-  }
-
-  /// Removes attribute with given name from an element with given id.
-  /// [nodeId] Id of the element to remove attribute from.
-  /// [name] Name of the attribute to remove.
-  Future removeAttribute(
-    NodeId nodeId,
-    String name,
-  ) async {
-    Map parameters = {
-      'nodeId': nodeId.toJson(),
-      'name': name,
-    };
-    await _client.send('DOM.removeAttribute', parameters);
-  }
-
-  /// Returns node's HTML markup.
-  /// [nodeId] Identifier of the node.
-  /// [backendNodeId] Identifier of the backend node.
-  /// [objectId] JavaScript object id of the node wrapper.
-  /// Returns: Outer HTML markup.
-  Future<String> getOuterHTML({
-    NodeId nodeId,
-    BackendNodeId backendNodeId,
-    runtime.RemoteObjectId objectId,
-  }) async {
-    Map parameters = {};
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
-    Map result = await _client.send('DOM.getOuterHTML', parameters);
-    return result['outerHTML'];
-  }
-
   /// Sets node HTML markup, returns new node id.
   /// [nodeId] Id of the node to set markup for.
   /// [outerHTML] Outer HTML markup to set.
@@ -367,392 +719,20 @@ class DOMManager {
     await _client.send('DOM.setOuterHTML', parameters);
   }
 
-  /// Searches for a given string in the DOM tree. Use `getSearchResults` to
-  /// access search results or `cancelSearch` to end this search session.
-  /// [query] Plain text or query selector or XPath search query.
-  /// [includeUserAgentShadowDOM] True to search in user agent shadow DOM.
-  Future<PerformSearchResult> performSearch(
-    String query, {
-    bool includeUserAgentShadowDOM,
-  }) async {
-    Map parameters = {
-      'query': query,
-    };
-    if (includeUserAgentShadowDOM != null) {
-      parameters['includeUserAgentShadowDOM'] = includeUserAgentShadowDOM;
-    }
-    Map result = await _client.send('DOM.performSearch', parameters);
-    return new PerformSearchResult.fromJson(result);
-  }
-
-  /// Returns search results from given `fromIndex` to given `toIndex` from the
-  /// search with the given identifier.
-  /// [searchId] Unique search session identifier.
-  /// [fromIndex] Start index of the search result to be returned.
-  /// [toIndex] End index of the search result to be returned.
-  /// Returns: Ids of the search result nodes.
-  Future<List<NodeId>> getSearchResults(
-    String searchId,
-    int fromIndex,
-    int toIndex,
-  ) async {
-    Map parameters = {
-      'searchId': searchId,
-      'fromIndex': fromIndex,
-      'toIndex': toIndex,
-    };
-    Map result = await _client.send('DOM.getSearchResults', parameters);
-    return (result['nodeIds'] as List)
-        .map((e) => new NodeId.fromJson(e))
-        .toList();
-  }
-
-  /// Discards search results from the session with the given id.
-  /// `getSearchResults` should no longer be called for that search.
-  /// [searchId] Unique search session identifier.
-  Future discardSearchResults(
-    String searchId,
-  ) async {
-    Map parameters = {
-      'searchId': searchId,
-    };
-    await _client.send('DOM.discardSearchResults', parameters);
-  }
-
-  /// Requests that the node is sent to the caller given the JavaScript node
-  /// object reference. All nodes that form the path from the node to the root
-  /// are also sent to the client as a series of `setChildNodes` notifications.
-  /// [objectId] JavaScript object id to convert into node.
-  /// Returns: Node id for given object.
-  Future<NodeId> requestNode(
-    runtime.RemoteObjectId objectId,
-  ) async {
-    Map parameters = {
-      'objectId': objectId.toJson(),
-    };
-    Map result = await _client.send('DOM.requestNode', parameters);
-    return new NodeId.fromJson(result['nodeId']);
-  }
-
-  /// Highlights given rectangle.
-  Future highlightRect() async {
-    await _client.send('DOM.highlightRect');
-  }
-
-  /// Highlights DOM node.
-  Future highlightNode() async {
-    await _client.send('DOM.highlightNode');
-  }
-
-  /// Hides any highlight.
-  Future hideHighlight() async {
-    await _client.send('DOM.hideHighlight');
-  }
-
-  /// Requests that the node is sent to the caller given its path. // FIXME, use
-  /// XPath
-  /// [path] Path to node in the proprietary format.
-  /// Returns: Id of the node for given path.
-  Future<NodeId> pushNodeByPathToFrontend(
-    String path,
-  ) async {
-    Map parameters = {
-      'path': path,
-    };
-    Map result = await _client.send('DOM.pushNodeByPathToFrontend', parameters);
-    return new NodeId.fromJson(result['nodeId']);
-  }
-
-  /// Requests that a batch of nodes is sent to the caller given their backend
-  /// node ids.
-  /// [backendNodeIds] The array of backend node ids.
-  /// Returns: The array of ids of pushed nodes that correspond to the backend
-  /// ids specified in backendNodeIds.
-  Future<List<NodeId>> pushNodesByBackendIdsToFrontend(
-    List<BackendNodeId> backendNodeIds,
-  ) async {
-    Map parameters = {
-      'backendNodeIds': backendNodeIds.map((e) => e.toJson()).toList(),
-    };
-    Map result =
-        await _client.send('DOM.pushNodesByBackendIdsToFrontend', parameters);
-    return (result['nodeIds'] as List)
-        .map((e) => new NodeId.fromJson(e))
-        .toList();
-  }
-
-  /// Enables console to refer to the node with given id via $x (see Command
-  /// Line API for more details $x functions).
-  /// [nodeId] DOM node id to be accessible by means of $x command line API.
-  Future setInspectedNode(
-    NodeId nodeId,
-  ) async {
-    Map parameters = {
-      'nodeId': nodeId.toJson(),
-    };
-    await _client.send('DOM.setInspectedNode', parameters);
-  }
-
-  /// Resolves the JavaScript node object for a given NodeId or BackendNodeId.
-  /// [nodeId] Id of the node to resolve.
-  /// [backendNodeId] Backend identifier of the node to resolve.
-  /// [objectGroup] Symbolic group name that can be used to release multiple
-  /// objects.
-  /// Returns: JavaScript object wrapper for given node.
-  Future<runtime.RemoteObject> resolveNode({
-    NodeId nodeId,
-    dom.BackendNodeId backendNodeId,
-    String objectGroup,
-  }) async {
-    Map parameters = {};
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectGroup != null) {
-      parameters['objectGroup'] = objectGroup;
-    }
-    Map result = await _client.send('DOM.resolveNode', parameters);
-    return new runtime.RemoteObject.fromJson(result['object']);
-  }
-
-  /// Returns attributes for the specified node.
-  /// [nodeId] Id of the node to retrieve attibutes for.
-  /// Returns: An interleaved array of node attribute names and values.
-  Future<List<String>> getAttributes(
-    NodeId nodeId,
-  ) async {
-    Map parameters = {
-      'nodeId': nodeId.toJson(),
-    };
-    Map result = await _client.send('DOM.getAttributes', parameters);
-    return (result['attributes'] as List).map((e) => e as String).toList();
-  }
-
-  /// Creates a deep copy of the specified node and places it into the target
-  /// container before the given anchor.
-  /// [nodeId] Id of the node to copy.
-  /// [targetNodeId] Id of the element to drop the copy into.
-  /// [insertBeforeNodeId] Drop the copy before this node (if absent, the copy
-  /// becomes the last child of `targetNodeId`).
-  /// Returns: Id of the node clone.
-  Future<NodeId> copyTo(
-    NodeId nodeId,
-    NodeId targetNodeId, {
-    NodeId insertBeforeNodeId,
-  }) async {
-    Map parameters = {
-      'nodeId': nodeId.toJson(),
-      'targetNodeId': targetNodeId.toJson(),
-    };
-    if (insertBeforeNodeId != null) {
-      parameters['insertBeforeNodeId'] = insertBeforeNodeId.toJson();
-    }
-    Map result = await _client.send('DOM.copyTo', parameters);
-    return new NodeId.fromJson(result['nodeId']);
-  }
-
-  /// Moves node into the new container, places it before the given anchor.
-  /// [nodeId] Id of the node to move.
-  /// [targetNodeId] Id of the element to drop the moved node into.
-  /// [insertBeforeNodeId] Drop node before this one (if absent, the moved node
-  /// becomes the last child of `targetNodeId`).
-  /// Returns: New id of the moved node.
-  Future<NodeId> moveTo(
-    NodeId nodeId,
-    NodeId targetNodeId, {
-    NodeId insertBeforeNodeId,
-  }) async {
-    Map parameters = {
-      'nodeId': nodeId.toJson(),
-      'targetNodeId': targetNodeId.toJson(),
-    };
-    if (insertBeforeNodeId != null) {
-      parameters['insertBeforeNodeId'] = insertBeforeNodeId.toJson();
-    }
-    Map result = await _client.send('DOM.moveTo', parameters);
-    return new NodeId.fromJson(result['nodeId']);
-  }
-
   /// Undoes the last performed action.
   Future undo() async {
     await _client.send('DOM.undo');
   }
 
-  /// Re-does the last undone action.
-  Future redo() async {
-    await _client.send('DOM.redo');
-  }
-
-  /// Marks last undoable state.
-  Future markUndoableState() async {
-    await _client.send('DOM.markUndoableState');
-  }
-
-  /// Focuses the given element.
-  /// [nodeId] Identifier of the node.
-  /// [backendNodeId] Identifier of the backend node.
-  /// [objectId] JavaScript object id of the node wrapper.
-  Future focus({
-    NodeId nodeId,
-    BackendNodeId backendNodeId,
-    runtime.RemoteObjectId objectId,
-  }) async {
-    Map parameters = {};
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
-    await _client.send('DOM.focus', parameters);
-  }
-
-  /// Sets files for the given file input element.
-  /// [files] Array of file paths to set.
-  /// [nodeId] Identifier of the node.
-  /// [backendNodeId] Identifier of the backend node.
-  /// [objectId] JavaScript object id of the node wrapper.
-  Future setFileInputFiles(
-    List<String> files, {
-    NodeId nodeId,
-    BackendNodeId backendNodeId,
-    runtime.RemoteObjectId objectId,
-  }) async {
-    Map parameters = {
-      'files': files.map((e) => e).toList(),
-    };
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
-    await _client.send('DOM.setFileInputFiles', parameters);
-  }
-
-  /// Returns boxes for the given node.
-  /// [nodeId] Identifier of the node.
-  /// [backendNodeId] Identifier of the backend node.
-  /// [objectId] JavaScript object id of the node wrapper.
-  /// Returns: Box model for the node.
-  Future<BoxModel> getBoxModel({
-    NodeId nodeId,
-    BackendNodeId backendNodeId,
-    runtime.RemoteObjectId objectId,
-  }) async {
-    Map parameters = {};
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
-    Map result = await _client.send('DOM.getBoxModel', parameters);
-    return new BoxModel.fromJson(result['model']);
-  }
-
-  /// Returns node id at given location.
-  /// [x] X coordinate.
-  /// [y] Y coordinate.
-  /// [includeUserAgentShadowDOM] False to skip to the nearest non-UA shadow
-  /// root ancestor (default: false).
-  /// Returns: Id of the node at given coordinates.
-  Future<NodeId> getNodeForLocation(
-    int x,
-    int y, {
-    bool includeUserAgentShadowDOM,
-  }) async {
-    Map parameters = {
-      'x': x,
-      'y': y,
-    };
-    if (includeUserAgentShadowDOM != null) {
-      parameters['includeUserAgentShadowDOM'] = includeUserAgentShadowDOM;
-    }
-    Map result = await _client.send('DOM.getNodeForLocation', parameters);
-    return new NodeId.fromJson(result['nodeId']);
-  }
-
-  /// Returns the id of the nearest ancestor that is a relayout boundary.
-  /// [nodeId] Id of the node.
-  /// Returns: Relayout boundary node id for the given node.
-  Future<NodeId> getRelayoutBoundary(
-    NodeId nodeId,
+  /// Returns iframe node that owns iframe with the given domain.
+  Future<NodeId> getFrameOwner(
+    page.FrameId frameId,
   ) async {
     Map parameters = {
-      'nodeId': nodeId.toJson(),
+      'frameId': frameId.toJson(),
     };
-    Map result = await _client.send('DOM.getRelayoutBoundary', parameters);
+    Map result = await _client.send('DOM.getFrameOwner', parameters);
     return new NodeId.fromJson(result['nodeId']);
-  }
-
-  /// Describes node given its id, does not require domain to be enabled. Does
-  /// not start tracking any objects, can be used for automation.
-  /// [nodeId] Identifier of the node.
-  /// [backendNodeId] Identifier of the backend node.
-  /// [objectId] JavaScript object id of the node wrapper.
-  /// [depth] The maximum depth at which children should be retrieved, defaults
-  /// to 1. Use -1 for the entire subtree or provide an integer larger than 0.
-  /// [pierce] Whether or not iframes and shadow roots should be traversed when
-  /// returning the subtree (default is false).
-  /// Returns: Node description.
-  Future<Node> describeNode({
-    NodeId nodeId,
-    BackendNodeId backendNodeId,
-    runtime.RemoteObjectId objectId,
-    int depth,
-    bool pierce,
-  }) async {
-    Map parameters = {};
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
-    if (depth != null) {
-      parameters['depth'] = depth;
-    }
-    if (pierce != null) {
-      parameters['pierce'] = pierce;
-    }
-    Map result = await _client.send('DOM.describeNode', parameters);
-    return new Node.fromJson(result['node']);
-  }
-}
-
-class SetChildNodesEvent {
-  /// Parent node id to populate with children.
-  final NodeId parentId;
-
-  /// Child nodes array.
-  final List<Node> nodes;
-
-  SetChildNodesEvent({
-    @required this.parentId,
-    @required this.nodes,
-  });
-
-  factory SetChildNodesEvent.fromJson(Map json) {
-    return new SetChildNodesEvent(
-      parentId: new NodeId.fromJson(json['parentId']),
-      nodes: (json['nodes'] as List).map((e) => new Node.fromJson(e)).toList(),
-    );
   }
 }
 
@@ -886,42 +866,24 @@ class ChildNodeRemovedEvent {
   }
 }
 
-class ShadowRootPushedEvent {
-  /// Host element id.
-  final NodeId hostId;
+class DistributedNodesUpdatedEvent {
+  /// Insertion point where distrubuted nodes were updated.
+  final NodeId insertionPointId;
 
-  /// Shadow root.
-  final Node root;
+  /// Distributed nodes for given insertion point.
+  final List<BackendNode> distributedNodes;
 
-  ShadowRootPushedEvent({
-    @required this.hostId,
-    @required this.root,
+  DistributedNodesUpdatedEvent({
+    @required this.insertionPointId,
+    @required this.distributedNodes,
   });
 
-  factory ShadowRootPushedEvent.fromJson(Map json) {
-    return new ShadowRootPushedEvent(
-      hostId: new NodeId.fromJson(json['hostId']),
-      root: new Node.fromJson(json['root']),
-    );
-  }
-}
-
-class ShadowRootPoppedEvent {
-  /// Host element id.
-  final NodeId hostId;
-
-  /// Shadow root id.
-  final NodeId rootId;
-
-  ShadowRootPoppedEvent({
-    @required this.hostId,
-    @required this.rootId,
-  });
-
-  factory ShadowRootPoppedEvent.fromJson(Map json) {
-    return new ShadowRootPoppedEvent(
-      hostId: new NodeId.fromJson(json['hostId']),
-      rootId: new NodeId.fromJson(json['rootId']),
+  factory DistributedNodesUpdatedEvent.fromJson(Map json) {
+    return new DistributedNodesUpdatedEvent(
+      insertionPointId: new NodeId.fromJson(json['insertionPointId']),
+      distributedNodes: (json['distributedNodes'] as List)
+          .map((e) => new BackendNode.fromJson(e))
+          .toList(),
     );
   }
 }
@@ -966,24 +928,62 @@ class PseudoElementRemovedEvent {
   }
 }
 
-class DistributedNodesUpdatedEvent {
-  /// Insertion point where distrubuted nodes were updated.
-  final NodeId insertionPointId;
+class SetChildNodesEvent {
+  /// Parent node id to populate with children.
+  final NodeId parentId;
 
-  /// Distributed nodes for given insertion point.
-  final List<BackendNode> distributedNodes;
+  /// Child nodes array.
+  final List<Node> nodes;
 
-  DistributedNodesUpdatedEvent({
-    @required this.insertionPointId,
-    @required this.distributedNodes,
+  SetChildNodesEvent({
+    @required this.parentId,
+    @required this.nodes,
   });
 
-  factory DistributedNodesUpdatedEvent.fromJson(Map json) {
-    return new DistributedNodesUpdatedEvent(
-      insertionPointId: new NodeId.fromJson(json['insertionPointId']),
-      distributedNodes: (json['distributedNodes'] as List)
-          .map((e) => new BackendNode.fromJson(e))
-          .toList(),
+  factory SetChildNodesEvent.fromJson(Map json) {
+    return new SetChildNodesEvent(
+      parentId: new NodeId.fromJson(json['parentId']),
+      nodes: (json['nodes'] as List).map((e) => new Node.fromJson(e)).toList(),
+    );
+  }
+}
+
+class ShadowRootPoppedEvent {
+  /// Host element id.
+  final NodeId hostId;
+
+  /// Shadow root id.
+  final NodeId rootId;
+
+  ShadowRootPoppedEvent({
+    @required this.hostId,
+    @required this.rootId,
+  });
+
+  factory ShadowRootPoppedEvent.fromJson(Map json) {
+    return new ShadowRootPoppedEvent(
+      hostId: new NodeId.fromJson(json['hostId']),
+      rootId: new NodeId.fromJson(json['rootId']),
+    );
+  }
+}
+
+class ShadowRootPushedEvent {
+  /// Host element id.
+  final NodeId hostId;
+
+  /// Shadow root.
+  final Node root;
+
+  ShadowRootPushedEvent({
+    @required this.hostId,
+    @required this.root,
+  });
+
+  factory ShadowRootPushedEvent.fromJson(Map json) {
+    return new ShadowRootPushedEvent(
+      hostId: new NodeId.fromJson(json['hostId']),
+      root: new Node.fromJson(json['root']),
     );
   }
 }
@@ -1028,8 +1028,8 @@ class NodeId {
   String toString() => value.toString();
 }
 
-/// Unique DOM node identifier used to reference a node that may not have been
-/// pushed to the front-end.
+/// Unique DOM node identifier used to reference a node that may not have been pushed to the
+/// front-end.
 class BackendNodeId {
   final int value;
 
@@ -1160,13 +1160,12 @@ class ShadowRootType {
   String toString() => value.toString();
 }
 
-/// DOM interaction is implemented in terms of mirror objects that represent the
-/// actual DOM nodes. DOMNode is a base node mirror type.
+/// DOM interaction is implemented in terms of mirror objects that represent the actual DOM nodes.
+/// DOMNode is a base node mirror type.
 class Node {
-  /// Node identifier that is passed into the rest of the DOM messages as the
-  /// `nodeId`. Backend will only push node with given `id` once. It is aware of
-  /// all requested nodes and will only fire DOM events for nodes known to the
-  /// client.
+  /// Node identifier that is passed into the rest of the DOM messages as the `nodeId`. Backend
+  /// will only push node with given `id` once. It is aware of all requested nodes and will only
+  /// fire DOM events for nodes known to the client.
   final NodeId nodeId;
 
   /// The id of the parent node if any.
@@ -1193,8 +1192,7 @@ class Node {
   /// Child nodes of this node when requested with children.
   final List<Node> children;
 
-  /// Attributes of the `Element` node in the form of flat array `[name1,
-  /// value1, name2, value2]`.
+  /// Attributes of the `Element` node in the form of flat array `[name1, value1, name2, value2]`.
   final List<String> attributes;
 
   /// Document URL that `Document` or `FrameOwner` node points to.
@@ -1470,8 +1468,7 @@ class RGBA {
   }
 }
 
-/// An array of quad vertices, x immediately followed by y for each point,
-/// points clock-wise.
+/// An array of quad vertices, x immediately followed by y for each point, points clock-wise.
 class Quad {
   final List<num> value;
 

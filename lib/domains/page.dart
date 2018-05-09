@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'network.dart' as network;
+import 'runtime.dart' as runtime;
+import 'dom.dart' as dom;
 import 'debugger.dart' as debugger;
 import 'emulation.dart' as emulation;
-import 'dom.dart' as dom;
-import 'runtime.dart' as runtime;
 
 /// Actions and events related to the inspected page belong to the page domain.
 class PageManager {
@@ -18,32 +18,36 @@ class PageManager {
       .map((Event event) =>
           new network.MonotonicTime.fromJson(event.parameters['timestamp']));
 
-  Stream<network.MonotonicTime> get onLoadEventFired => _client.onEvent
-      .where((Event event) => event.name == 'Page.loadEventFired')
-      .map((Event event) =>
-          new network.MonotonicTime.fromJson(event.parameters['timestamp']));
-
-  /// Fired for top level page lifecycle events such as navigation, load, paint,
-  /// etc.
-  Stream<LifecycleEventEvent> get onLifecycleEvent => _client.onEvent
-      .where((Event event) => event.name == 'Page.lifecycleEvent')
-      .map((Event event) => new LifecycleEventEvent.fromJson(event.parameters));
-
   /// Fired when frame has been attached to its parent.
   Stream<FrameAttachedEvent> get onFrameAttached => _client.onEvent
       .where((Event event) => event.name == 'Page.frameAttached')
       .map((Event event) => new FrameAttachedEvent.fromJson(event.parameters));
 
-  /// Fired once navigation of the frame has completed. Frame is now associated
-  /// with the new loader.
-  Stream<Frame> get onFrameNavigated => _client.onEvent
-      .where((Event event) => event.name == 'Page.frameNavigated')
-      .map((Event event) => new Frame.fromJson(event.parameters['frame']));
+  /// Fired when frame no longer has a scheduled navigation.
+  Stream<FrameId> get onFrameClearedScheduledNavigation => _client.onEvent
+      .where(
+          (Event event) => event.name == 'Page.frameClearedScheduledNavigation')
+      .map((Event event) => new FrameId.fromJson(event.parameters['frameId']));
 
   /// Fired when frame has been detached from its parent.
   Stream<FrameId> get onFrameDetached => _client.onEvent
       .where((Event event) => event.name == 'Page.frameDetached')
       .map((Event event) => new FrameId.fromJson(event.parameters['frameId']));
+
+  /// Fired once navigation of the frame has completed. Frame is now associated with the new loader.
+  Stream<Frame> get onFrameNavigated => _client.onEvent
+      .where((Event event) => event.name == 'Page.frameNavigated')
+      .map((Event event) => new Frame.fromJson(event.parameters['frame']));
+
+  Stream get onFrameResized =>
+      _client.onEvent.where((Event event) => event.name == 'Page.frameResized');
+
+  /// Fired when frame schedules a potential navigation.
+  Stream<FrameScheduledNavigationEvent> get onFrameScheduledNavigation =>
+      _client.onEvent
+          .where((Event event) => event.name == 'Page.frameScheduledNavigation')
+          .map((Event event) =>
+              new FrameScheduledNavigationEvent.fromJson(event.parameters));
 
   /// Fired when frame has started loading.
   Stream<FrameId> get onFrameStartedLoading => _client.onEvent
@@ -55,37 +59,46 @@ class PageManager {
       .where((Event event) => event.name == 'Page.frameStoppedLoading')
       .map((Event event) => new FrameId.fromJson(event.parameters['frameId']));
 
-  /// Fired when frame schedules a potential navigation.
-  Stream<FrameScheduledNavigationEvent> get onFrameScheduledNavigation =>
+  /// Fired when interstitial page was hidden
+  Stream get onInterstitialHidden => _client.onEvent
+      .where((Event event) => event.name == 'Page.interstitialHidden');
+
+  /// Fired when interstitial page was shown
+  Stream get onInterstitialShown => _client.onEvent
+      .where((Event event) => event.name == 'Page.interstitialShown');
+
+  /// Fired when a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload) has been
+  /// closed.
+  Stream<JavascriptDialogClosedEvent> get onJavascriptDialogClosed =>
       _client.onEvent
-          .where((Event event) => event.name == 'Page.frameScheduledNavigation')
+          .where((Event event) => event.name == 'Page.javascriptDialogClosed')
           .map((Event event) =>
-              new FrameScheduledNavigationEvent.fromJson(event.parameters));
+              new JavascriptDialogClosedEvent.fromJson(event.parameters));
 
-  /// Fired when frame no longer has a scheduled navigation.
-  Stream<FrameId> get onFrameClearedScheduledNavigation => _client.onEvent
-      .where(
-          (Event event) => event.name == 'Page.frameClearedScheduledNavigation')
-      .map((Event event) => new FrameId.fromJson(event.parameters['frameId']));
-
-  Stream get onFrameResized =>
-      _client.onEvent.where((Event event) => event.name == 'Page.frameResized');
-
-  /// Fired when a JavaScript initiated dialog (alert, confirm, prompt, or
-  /// onbeforeunload) is about to open.
+  /// Fired when a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload) is about to
+  /// open.
   Stream<JavascriptDialogOpeningEvent> get onJavascriptDialogOpening =>
       _client.onEvent
           .where((Event event) => event.name == 'Page.javascriptDialogOpening')
           .map((Event event) =>
               new JavascriptDialogOpeningEvent.fromJson(event.parameters));
 
-  /// Fired when a JavaScript initiated dialog (alert, confirm, prompt, or
-  /// onbeforeunload) has been closed.
-  Stream<JavascriptDialogClosedEvent> get onJavascriptDialogClosed =>
+  /// Fired for top level page lifecycle events such as navigation, load, paint, etc.
+  Stream<LifecycleEventEvent> get onLifecycleEvent => _client.onEvent
+      .where((Event event) => event.name == 'Page.lifecycleEvent')
+      .map((Event event) => new LifecycleEventEvent.fromJson(event.parameters));
+
+  Stream<network.MonotonicTime> get onLoadEventFired => _client.onEvent
+      .where((Event event) => event.name == 'Page.loadEventFired')
+      .map((Event event) =>
+          new network.MonotonicTime.fromJson(event.parameters['timestamp']));
+
+  /// Fired when same-document navigation happens, e.g. due to history API usage or anchor navigation.
+  Stream<NavigatedWithinDocumentEvent> get onNavigatedWithinDocument =>
       _client.onEvent
-          .where((Event event) => event.name == 'Page.javascriptDialogClosed')
+          .where((Event event) => event.name == 'Page.navigatedWithinDocument')
           .map((Event event) =>
-              new JavascriptDialogClosedEvent.fromJson(event.parameters));
+              new NavigatedWithinDocumentEvent.fromJson(event.parameters));
 
   /// Compressed image data requested by the `startScreencast`.
   Stream<ScreencastFrameEvent> get onScreencastFrame => _client.onEvent
@@ -93,35 +106,16 @@ class PageManager {
       .map(
           (Event event) => new ScreencastFrameEvent.fromJson(event.parameters));
 
-  /// Fired when the page with currently enabled screencast was shown or hidden
-  /// `.
+  /// Fired when the page with currently enabled screencast was shown or hidden `.
   Stream<bool> get onScreencastVisibilityChanged => _client.onEvent
       .where((Event event) => event.name == 'Page.screencastVisibilityChanged')
       .map((Event event) => event.parameters['visible'] as bool);
 
-  /// Fired when interstitial page was shown
-  Stream get onInterstitialShown => _client.onEvent
-      .where((Event event) => event.name == 'Page.interstitialShown');
-
-  /// Fired when interstitial page was hidden
-  Stream get onInterstitialHidden => _client.onEvent
-      .where((Event event) => event.name == 'Page.interstitialHidden');
-
-  /// Fired when a new window is going to be opened, via window.open(), link
-  /// click, form submission, etc.
+  /// Fired when a new window is going to be opened, via window.open(), link click, form submission,
+  /// etc.
   Stream<WindowOpenEvent> get onWindowOpen => _client.onEvent
       .where((Event event) => event.name == 'Page.windowOpen')
       .map((Event event) => new WindowOpenEvent.fromJson(event.parameters));
-
-  /// Enables page domain notifications.
-  Future enable() async {
-    await _client.send('Page.enable');
-  }
-
-  /// Disables page domain notifications.
-  Future disable() async {
-    await _client.send('Page.disable');
-  }
 
   /// Deprecated, please use addScriptToEvaluateOnNewDocument instead.
   /// Returns: Identifier of the added script.
@@ -137,19 +131,7 @@ class PageManager {
     return new ScriptIdentifier.fromJson(result['identifier']);
   }
 
-  /// Deprecated, please use removeScriptToEvaluateOnNewDocument instead.
-  @deprecated
-  Future removeScriptToEvaluateOnLoad(
-    ScriptIdentifier identifier,
-  ) async {
-    Map parameters = {
-      'identifier': identifier.toJson(),
-    };
-    await _client.send('Page.removeScriptToEvaluateOnLoad', parameters);
-  }
-
-  /// Evaluates given script in every frame upon creation (before loading
-  /// frame's scripts).
+  /// Evaluates given script in every frame upon creation (before loading frame's scripts).
   /// Returns: Identifier of the added script.
   Future<ScriptIdentifier> addScriptToEvaluateOnNewDocument(
     String source,
@@ -162,123 +144,81 @@ class PageManager {
     return new ScriptIdentifier.fromJson(result['identifier']);
   }
 
-  /// Removes given script from the list.
-  Future removeScriptToEvaluateOnNewDocument(
-    ScriptIdentifier identifier,
-  ) async {
-    Map parameters = {
-      'identifier': identifier.toJson(),
-    };
-    await _client.send('Page.removeScriptToEvaluateOnNewDocument', parameters);
+  /// Brings page to front (activates tab).
+  Future bringToFront() async {
+    await _client.send('Page.bringToFront');
   }
 
-  /// Controls whether browser will open a new inspector window for connected
-  /// pages.
-  /// [autoAttach] If true, browser will open a new inspector window for every
-  /// page created from this one.
-  Future setAutoAttachToCreatedPages(
-    bool autoAttach,
-  ) async {
-    Map parameters = {
-      'autoAttach': autoAttach,
-    };
-    await _client.send('Page.setAutoAttachToCreatedPages', parameters);
-  }
-
-  /// Controls whether page will emit lifecycle events.
-  /// [enabled] If true, starts emitting lifecycle events.
-  Future setLifecycleEventsEnabled(
-    bool enabled,
-  ) async {
-    Map parameters = {
-      'enabled': enabled,
-    };
-    await _client.send('Page.setLifecycleEventsEnabled', parameters);
-  }
-
-  /// Reloads given page optionally ignoring the cache.
-  /// [ignoreCache] If true, browser cache is ignored (as if the user pressed
-  /// Shift+refresh).
-  /// [scriptToEvaluateOnLoad] If set, the script will be injected into all
-  /// frames of the inspected page after reload.
-  Future reload({
-    bool ignoreCache,
-    String scriptToEvaluateOnLoad,
+  /// Capture page screenshot.
+  /// [format] Image compression format (defaults to png).
+  /// [quality] Compression quality from range [0..100] (jpeg only).
+  /// [clip] Capture the screenshot of a given region only.
+  /// [fromSurface] Capture the screenshot from the surface, rather than the view. Defaults to true.
+  /// Returns: Base64-encoded image data.
+  Future<String> captureScreenshot({
+    String format,
+    int quality,
+    Viewport clip,
+    bool fromSurface,
   }) async {
     Map parameters = {};
-    if (ignoreCache != null) {
-      parameters['ignoreCache'] = ignoreCache;
+    if (format != null) {
+      parameters['format'] = format;
     }
-    if (scriptToEvaluateOnLoad != null) {
-      parameters['scriptToEvaluateOnLoad'] = scriptToEvaluateOnLoad;
+    if (quality != null) {
+      parameters['quality'] = quality;
     }
-    await _client.send('Page.reload', parameters);
+    if (clip != null) {
+      parameters['clip'] = clip.toJson();
+    }
+    if (fromSurface != null) {
+      parameters['fromSurface'] = fromSurface;
+    }
+    Map result = await _client.send('Page.captureScreenshot', parameters);
+    return result['data'];
   }
 
-  /// Enable Chrome's experimental ad filter on all sites.
-  /// [enabled] Whether to block ads.
-  Future setAdBlockingEnabled(
-    bool enabled,
-  ) async {
-    Map parameters = {
-      'enabled': enabled,
-    };
-    await _client.send('Page.setAdBlockingEnabled', parameters);
+  /// Clears the overriden device metrics.
+  @deprecated
+  Future clearDeviceMetricsOverride() async {
+    await _client.send('Page.clearDeviceMetricsOverride');
   }
 
-  /// Navigates current page to the given URL.
-  /// [url] URL to navigate the page to.
-  /// [referrer] Referrer URL.
-  /// [transitionType] Intended transition type.
-  Future<NavigateResult> navigate(
-    String url, {
-    String referrer,
-    TransitionType transitionType,
+  /// Clears the overridden Device Orientation.
+  @deprecated
+  Future clearDeviceOrientationOverride() async {
+    await _client.send('Page.clearDeviceOrientationOverride');
+  }
+
+  /// Clears the overriden Geolocation Position and Error.
+  @deprecated
+  Future clearGeolocationOverride() async {
+    await _client.send('Page.clearGeolocationOverride');
+  }
+
+  /// Creates an isolated world for the given frame.
+  /// [frameId] Id of the frame in which the isolated world should be created.
+  /// [worldName] An optional name which is reported in the Execution Context.
+  /// [grantUniveralAccess] Whether or not universal access should be granted to the isolated world. This is a powerful
+  /// option, use with caution.
+  /// Returns: Execution context of the isolated world.
+  Future<runtime.ExecutionContextId> createIsolatedWorld(
+    FrameId frameId, {
+    String worldName,
+    bool grantUniveralAccess,
   }) async {
     Map parameters = {
-      'url': url,
+      'frameId': frameId.toJson(),
     };
-    if (referrer != null) {
-      parameters['referrer'] = referrer;
+    if (worldName != null) {
+      parameters['worldName'] = worldName;
     }
-    if (transitionType != null) {
-      parameters['transitionType'] = transitionType.toJson();
+    if (grantUniveralAccess != null) {
+      parameters['grantUniveralAccess'] = grantUniveralAccess;
     }
-    Map result = await _client.send('Page.navigate', parameters);
-    return new NavigateResult.fromJson(result);
-  }
-
-  /// Force the page stop all navigations and pending resource fetches.
-  Future stopLoading() async {
-    await _client.send('Page.stopLoading');
-  }
-
-  /// Returns navigation history for the current page.
-  Future<GetNavigationHistoryResult> getNavigationHistory() async {
-    Map result = await _client.send('Page.getNavigationHistory');
-    return new GetNavigationHistoryResult.fromJson(result);
-  }
-
-  /// Navigates current page to the given history entry.
-  /// [entryId] Unique id of the entry to navigate to.
-  Future navigateToHistoryEntry(
-    int entryId,
-  ) async {
-    Map parameters = {
-      'entryId': entryId,
-    };
-    await _client.send('Page.navigateToHistoryEntry', parameters);
-  }
-
-  /// Returns all browser cookies. Depending on the backend support, will return
-  /// detailed cookie information in the `cookies` field.
-  /// Returns: Array of cookie objects.
-  @deprecated
-  Future<List<network.Cookie>> getCookies() async {
-    Map result = await _client.send('Page.getCookies');
-    return (result['cookies'] as List)
-        .map((e) => new network.Cookie.fromJson(e))
-        .toList();
+    Map result = await _client.send('Page.createIsolatedWorld', parameters);
+    return new runtime.ExecutionContextId.fromJson(
+        result['executionContextId']);
   }
 
   /// Deletes browser cookie with given name, domain and path.
@@ -296,11 +236,30 @@ class PageManager {
     await _client.send('Page.deleteCookie', parameters);
   }
 
-  /// Returns present frame / resource tree structure.
-  /// Returns: Present frame / resource tree structure.
-  Future<FrameResourceTree> getResourceTree() async {
-    Map result = await _client.send('Page.getResourceTree');
-    return new FrameResourceTree.fromJson(result['frameTree']);
+  /// Disables page domain notifications.
+  Future disable() async {
+    await _client.send('Page.disable');
+  }
+
+  /// Enables page domain notifications.
+  Future enable() async {
+    await _client.send('Page.enable');
+  }
+
+  Future<GetAppManifestResult> getAppManifest() async {
+    Map result = await _client.send('Page.getAppManifest');
+    return new GetAppManifestResult.fromJson(result);
+  }
+
+  /// Returns all browser cookies. Depending on the backend support, will return detailed cookie
+  /// information in the `cookies` field.
+  /// Returns: Array of cookie objects.
+  @deprecated
+  Future<List<network.Cookie>> getCookies() async {
+    Map result = await _client.send('Page.getCookies');
+    return (result['cookies'] as List)
+        .map((e) => new network.Cookie.fromJson(e))
+        .toList();
   }
 
   /// Returns present frame tree structure.
@@ -308,6 +267,18 @@ class PageManager {
   Future<FrameTree> getFrameTree() async {
     Map result = await _client.send('Page.getFrameTree');
     return new FrameTree.fromJson(result['frameTree']);
+  }
+
+  /// Returns metrics relating to the layouting of the page, such as viewport bounds/scale.
+  Future<GetLayoutMetricsResult> getLayoutMetrics() async {
+    Map result = await _client.send('Page.getLayoutMetrics');
+    return new GetLayoutMetricsResult.fromJson(result);
+  }
+
+  /// Returns navigation history for the current page.
+  Future<GetNavigationHistoryResult> getNavigationHistory() async {
+    Map result = await _client.send('Page.getNavigationHistory');
+    return new GetNavigationHistoryResult.fromJson(result);
   }
 
   /// Returns content of the given resource.
@@ -323,6 +294,217 @@ class PageManager {
     };
     Map result = await _client.send('Page.getResourceContent', parameters);
     return new GetResourceContentResult.fromJson(result);
+  }
+
+  /// Returns present frame / resource tree structure.
+  /// Returns: Present frame / resource tree structure.
+  Future<FrameResourceTree> getResourceTree() async {
+    Map result = await _client.send('Page.getResourceTree');
+    return new FrameResourceTree.fromJson(result['frameTree']);
+  }
+
+  /// Accepts or dismisses a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload).
+  /// [accept] Whether to accept or dismiss the dialog.
+  /// [promptText] The text to enter into the dialog prompt before accepting. Used only if this is a prompt
+  /// dialog.
+  Future handleJavaScriptDialog(
+    bool accept, {
+    String promptText,
+  }) async {
+    Map parameters = {
+      'accept': accept,
+    };
+    if (promptText != null) {
+      parameters['promptText'] = promptText;
+    }
+    await _client.send('Page.handleJavaScriptDialog', parameters);
+  }
+
+  /// Navigates current page to the given URL.
+  /// [url] URL to navigate the page to.
+  /// [referrer] Referrer URL.
+  /// [transitionType] Intended transition type.
+  /// [frameId] Frame id to navigate, if not specified navigates the top frame.
+  Future<NavigateResult> navigate(
+    String url, {
+    String referrer,
+    TransitionType transitionType,
+    FrameId frameId,
+  }) async {
+    Map parameters = {
+      'url': url,
+    };
+    if (referrer != null) {
+      parameters['referrer'] = referrer;
+    }
+    if (transitionType != null) {
+      parameters['transitionType'] = transitionType.toJson();
+    }
+    if (frameId != null) {
+      parameters['frameId'] = frameId.toJson();
+    }
+    Map result = await _client.send('Page.navigate', parameters);
+    return new NavigateResult.fromJson(result);
+  }
+
+  /// Navigates current page to the given history entry.
+  /// [entryId] Unique id of the entry to navigate to.
+  Future navigateToHistoryEntry(
+    int entryId,
+  ) async {
+    Map parameters = {
+      'entryId': entryId,
+    };
+    await _client.send('Page.navigateToHistoryEntry', parameters);
+  }
+
+  /// Print page as PDF.
+  /// [landscape] Paper orientation. Defaults to false.
+  /// [displayHeaderFooter] Display header and footer. Defaults to false.
+  /// [printBackground] Print background graphics. Defaults to false.
+  /// [scale] Scale of the webpage rendering. Defaults to 1.
+  /// [paperWidth] Paper width in inches. Defaults to 8.5 inches.
+  /// [paperHeight] Paper height in inches. Defaults to 11 inches.
+  /// [marginTop] Top margin in inches. Defaults to 1cm (~0.4 inches).
+  /// [marginBottom] Bottom margin in inches. Defaults to 1cm (~0.4 inches).
+  /// [marginLeft] Left margin in inches. Defaults to 1cm (~0.4 inches).
+  /// [marginRight] Right margin in inches. Defaults to 1cm (~0.4 inches).
+  /// [pageRanges] Paper ranges to print, e.g., '1-5, 8, 11-13'. Defaults to the empty string, which means
+  /// print all pages.
+  /// [ignoreInvalidPageRanges] Whether to silently ignore invalid but successfully parsed page ranges, such as '3-2'.
+  /// Defaults to false.
+  /// [headerTemplate] HTML template for the print header. Should be valid HTML markup with following
+  /// classes used to inject printing values into them:
+  /// - `date`: formatted print date
+  /// - `title`: document title
+  /// - `url`: document location
+  /// - `pageNumber`: current page number
+  /// - `totalPages`: total pages in the document
+  ///
+  /// For example, `<span class=title></span>` would generate span containing the title.
+  /// [footerTemplate] HTML template for the print footer. Should use the same format as the `headerTemplate`.
+  /// [preferCSSPageSize] Whether or not to prefer page size as defined by css. Defaults to false,
+  /// in which case the content will be scaled to fit the paper size.
+  /// Returns: Base64-encoded pdf data.
+  Future<String> printToPDF({
+    bool landscape,
+    bool displayHeaderFooter,
+    bool printBackground,
+    num scale,
+    num paperWidth,
+    num paperHeight,
+    num marginTop,
+    num marginBottom,
+    num marginLeft,
+    num marginRight,
+    String pageRanges,
+    bool ignoreInvalidPageRanges,
+    String headerTemplate,
+    String footerTemplate,
+    bool preferCSSPageSize,
+  }) async {
+    Map parameters = {};
+    if (landscape != null) {
+      parameters['landscape'] = landscape;
+    }
+    if (displayHeaderFooter != null) {
+      parameters['displayHeaderFooter'] = displayHeaderFooter;
+    }
+    if (printBackground != null) {
+      parameters['printBackground'] = printBackground;
+    }
+    if (scale != null) {
+      parameters['scale'] = scale;
+    }
+    if (paperWidth != null) {
+      parameters['paperWidth'] = paperWidth;
+    }
+    if (paperHeight != null) {
+      parameters['paperHeight'] = paperHeight;
+    }
+    if (marginTop != null) {
+      parameters['marginTop'] = marginTop;
+    }
+    if (marginBottom != null) {
+      parameters['marginBottom'] = marginBottom;
+    }
+    if (marginLeft != null) {
+      parameters['marginLeft'] = marginLeft;
+    }
+    if (marginRight != null) {
+      parameters['marginRight'] = marginRight;
+    }
+    if (pageRanges != null) {
+      parameters['pageRanges'] = pageRanges;
+    }
+    if (ignoreInvalidPageRanges != null) {
+      parameters['ignoreInvalidPageRanges'] = ignoreInvalidPageRanges;
+    }
+    if (headerTemplate != null) {
+      parameters['headerTemplate'] = headerTemplate;
+    }
+    if (footerTemplate != null) {
+      parameters['footerTemplate'] = footerTemplate;
+    }
+    if (preferCSSPageSize != null) {
+      parameters['preferCSSPageSize'] = preferCSSPageSize;
+    }
+    Map result = await _client.send('Page.printToPDF', parameters);
+    return result['data'];
+  }
+
+  /// Reloads given page optionally ignoring the cache.
+  /// [ignoreCache] If true, browser cache is ignored (as if the user pressed Shift+refresh).
+  /// [scriptToEvaluateOnLoad] If set, the script will be injected into all frames of the inspected page after reload.
+  /// Argument will be ignored if reloading dataURL origin.
+  Future reload({
+    bool ignoreCache,
+    String scriptToEvaluateOnLoad,
+  }) async {
+    Map parameters = {};
+    if (ignoreCache != null) {
+      parameters['ignoreCache'] = ignoreCache;
+    }
+    if (scriptToEvaluateOnLoad != null) {
+      parameters['scriptToEvaluateOnLoad'] = scriptToEvaluateOnLoad;
+    }
+    await _client.send('Page.reload', parameters);
+  }
+
+  /// Deprecated, please use removeScriptToEvaluateOnNewDocument instead.
+  @deprecated
+  Future removeScriptToEvaluateOnLoad(
+    ScriptIdentifier identifier,
+  ) async {
+    Map parameters = {
+      'identifier': identifier.toJson(),
+    };
+    await _client.send('Page.removeScriptToEvaluateOnLoad', parameters);
+  }
+
+  /// Removes given script from the list.
+  Future removeScriptToEvaluateOnNewDocument(
+    ScriptIdentifier identifier,
+  ) async {
+    Map parameters = {
+      'identifier': identifier.toJson(),
+    };
+    await _client.send('Page.removeScriptToEvaluateOnNewDocument', parameters);
+  }
+
+  Future requestAppBanner() async {
+    await _client.send('Page.requestAppBanner');
+  }
+
+  /// Acknowledges that a screencast frame has been received by the frontend.
+  /// [sessionId] Frame number.
+  Future screencastFrameAck(
+    int sessionId,
+  ) async {
+    Map parameters = {
+      'sessionId': sessionId,
+    };
+    await _client.send('Page.screencastFrameAck', parameters);
   }
 
   /// Searches for given string in resource content.
@@ -356,45 +538,44 @@ class PageManager {
         .toList();
   }
 
-  /// Sets given markup as the document's HTML.
-  /// [frameId] Frame id to set HTML for.
-  /// [html] HTML content to set.
-  Future setDocumentContent(
-    FrameId frameId,
-    String html,
+  /// Enable Chrome's experimental ad filter on all sites.
+  /// [enabled] Whether to block ads.
+  Future setAdBlockingEnabled(
+    bool enabled,
   ) async {
     Map parameters = {
-      'frameId': frameId.toJson(),
-      'html': html,
+      'enabled': enabled,
     };
-    await _client.send('Page.setDocumentContent', parameters);
+    await _client.send('Page.setAdBlockingEnabled', parameters);
   }
 
-  /// Overrides the values of device screen dimensions (window.screen.width,
-  /// window.screen.height, window.innerWidth, window.innerHeight, and
-  /// "device-width"/"device-height"-related CSS media query results).
-  /// [width] Overriding width value in pixels (minimum 0, maximum 10000000). 0
-  /// disables the override.
-  /// [height] Overriding height value in pixels (minimum 0, maximum 10000000).
-  /// 0 disables the override.
-  /// [deviceScaleFactor] Overriding device scale factor value. 0 disables the
-  /// override.
-  /// [mobile] Whether to emulate mobile device. This includes viewport meta
-  /// tag, overlay scrollbars, text autosizing and more.
+  /// Enable page Content Security Policy by-passing.
+  /// [enabled] Whether to bypass page CSP.
+  Future setBypassCSP(
+    bool enabled,
+  ) async {
+    Map parameters = {
+      'enabled': enabled,
+    };
+    await _client.send('Page.setBypassCSP', parameters);
+  }
+
+  /// Overrides the values of device screen dimensions (window.screen.width, window.screen.height,
+  /// window.innerWidth, window.innerHeight, and "device-width"/"device-height"-related CSS media
+  /// query results).
+  /// [width] Overriding width value in pixels (minimum 0, maximum 10000000). 0 disables the override.
+  /// [height] Overriding height value in pixels (minimum 0, maximum 10000000). 0 disables the override.
+  /// [deviceScaleFactor] Overriding device scale factor value. 0 disables the override.
+  /// [mobile] Whether to emulate mobile device. This includes viewport meta tag, overlay scrollbars, text
+  /// autosizing and more.
   /// [scale] Scale to apply to resulting view image.
-  /// [screenWidth] Overriding screen width value in pixels (minimum 0, maximum
-  /// 10000000).
-  /// [screenHeight] Overriding screen height value in pixels (minimum 0,
-  /// maximum 10000000).
-  /// [positionX] Overriding view X position on screen in pixels (minimum 0,
-  /// maximum 10000000).
-  /// [positionY] Overriding view Y position on screen in pixels (minimum 0,
-  /// maximum 10000000).
-  /// [dontSetVisibleSize] Do not set visible view size, rely upon explicit
-  /// setVisibleSize call.
+  /// [screenWidth] Overriding screen width value in pixels (minimum 0, maximum 10000000).
+  /// [screenHeight] Overriding screen height value in pixels (minimum 0, maximum 10000000).
+  /// [positionX] Overriding view X position on screen in pixels (minimum 0, maximum 10000000).
+  /// [positionY] Overriding view Y position on screen in pixels (minimum 0, maximum 10000000).
+  /// [dontSetVisibleSize] Do not set visible view size, rely upon explicit setVisibleSize call.
   /// [screenOrientation] Screen orientation override.
-  /// [viewport] The viewport dimensions and scale. If not set, the override is
-  /// cleared.
+  /// [viewport] The viewport dimensions and scale. If not set, the override is cleared.
   @deprecated
   Future setDeviceMetricsOverride(
     int width,
@@ -443,14 +624,57 @@ class PageManager {
     await _client.send('Page.setDeviceMetricsOverride', parameters);
   }
 
-  /// Clears the overriden device metrics.
+  /// Overrides the Device Orientation.
+  /// [alpha] Mock alpha
+  /// [beta] Mock beta
+  /// [gamma] Mock gamma
   @deprecated
-  Future clearDeviceMetricsOverride() async {
-    await _client.send('Page.clearDeviceMetricsOverride');
+  Future setDeviceOrientationOverride(
+    num alpha,
+    num beta,
+    num gamma,
+  ) async {
+    Map parameters = {
+      'alpha': alpha,
+      'beta': beta,
+      'gamma': gamma,
+    };
+    await _client.send('Page.setDeviceOrientationOverride', parameters);
   }
 
-  /// Overrides the Geolocation Position or Error. Omitting any of the
-  /// parameters emulates position unavailable.
+  /// Sets given markup as the document's HTML.
+  /// [frameId] Frame id to set HTML for.
+  /// [html] HTML content to set.
+  Future setDocumentContent(
+    FrameId frameId,
+    String html,
+  ) async {
+    Map parameters = {
+      'frameId': frameId.toJson(),
+      'html': html,
+    };
+    await _client.send('Page.setDocumentContent', parameters);
+  }
+
+  /// Set the behavior when downloading a file.
+  /// [behavior] Whether to allow all or deny all download requests, or use default Chrome behavior if
+  /// available (otherwise deny).
+  /// [downloadPath] The default path to save downloaded files to. This is requred if behavior is set to 'allow'
+  Future setDownloadBehavior(
+    String behavior, {
+    String downloadPath,
+  }) async {
+    Map parameters = {
+      'behavior': behavior,
+    };
+    if (downloadPath != null) {
+      parameters['downloadPath'] = downloadPath;
+    }
+    await _client.send('Page.setDownloadBehavior', parameters);
+  }
+
+  /// Overrides the Geolocation Position or Error. Omitting any of the parameters emulates position
+  /// unavailable.
   /// [latitude] Mock latitude
   /// [longitude] Mock longitude
   /// [accuracy] Mock accuracy
@@ -473,40 +697,20 @@ class PageManager {
     await _client.send('Page.setGeolocationOverride', parameters);
   }
 
-  /// Clears the overriden Geolocation Position and Error.
-  @deprecated
-  Future clearGeolocationOverride() async {
-    await _client.send('Page.clearGeolocationOverride');
-  }
-
-  /// Overrides the Device Orientation.
-  /// [alpha] Mock alpha
-  /// [beta] Mock beta
-  /// [gamma] Mock gamma
-  @deprecated
-  Future setDeviceOrientationOverride(
-    num alpha,
-    num beta,
-    num gamma,
+  /// Controls whether page will emit lifecycle events.
+  /// [enabled] If true, starts emitting lifecycle events.
+  Future setLifecycleEventsEnabled(
+    bool enabled,
   ) async {
     Map parameters = {
-      'alpha': alpha,
-      'beta': beta,
-      'gamma': gamma,
+      'enabled': enabled,
     };
-    await _client.send('Page.setDeviceOrientationOverride', parameters);
-  }
-
-  /// Clears the overridden Device Orientation.
-  @deprecated
-  Future clearDeviceOrientationOverride() async {
-    await _client.send('Page.clearDeviceOrientationOverride');
+    await _client.send('Page.setLifecycleEventsEnabled', parameters);
   }
 
   /// Toggles mouse event-based touch event emulation.
   /// [enabled] Whether the touch event emulation should be enabled.
-  /// [configuration] Touch/gesture events configuration. Default: current
-  /// platform.
+  /// [configuration] Touch/gesture events configuration. Default: current platform.
   @deprecated
   Future setTouchEmulationEnabled(
     bool enabled, {
@@ -519,107 +723,6 @@ class PageManager {
       parameters['configuration'] = configuration;
     }
     await _client.send('Page.setTouchEmulationEnabled', parameters);
-  }
-
-  /// Capture page screenshot.
-  /// [format] Image compression format (defaults to png).
-  /// [quality] Compression quality from range [0..100] (jpeg only).
-  /// [clip] Capture the screenshot of a given region only.
-  /// [fromSurface] Capture the screenshot from the surface, rather than the
-  /// view. Defaults to true.
-  /// Returns: Base64-encoded image data.
-  Future<String> captureScreenshot({
-    String format,
-    int quality,
-    Viewport clip,
-    bool fromSurface,
-  }) async {
-    Map parameters = {};
-    if (format != null) {
-      parameters['format'] = format;
-    }
-    if (quality != null) {
-      parameters['quality'] = quality;
-    }
-    if (clip != null) {
-      parameters['clip'] = clip.toJson();
-    }
-    if (fromSurface != null) {
-      parameters['fromSurface'] = fromSurface;
-    }
-    Map result = await _client.send('Page.captureScreenshot', parameters);
-    return result['data'];
-  }
-
-  /// Print page as PDF.
-  /// [landscape] Paper orientation. Defaults to false.
-  /// [displayHeaderFooter] Display header and footer. Defaults to false.
-  /// [printBackground] Print background graphics. Defaults to false.
-  /// [scale] Scale of the webpage rendering. Defaults to 1.
-  /// [paperWidth] Paper width in inches. Defaults to 8.5 inches.
-  /// [paperHeight] Paper height in inches. Defaults to 11 inches.
-  /// [marginTop] Top margin in inches. Defaults to 1cm (~0.4 inches).
-  /// [marginBottom] Bottom margin in inches. Defaults to 1cm (~0.4 inches).
-  /// [marginLeft] Left margin in inches. Defaults to 1cm (~0.4 inches).
-  /// [marginRight] Right margin in inches. Defaults to 1cm (~0.4 inches).
-  /// [pageRanges] Paper ranges to print, e.g., '1-5, 8, 11-13'. Defaults to the
-  /// empty string, which means print all pages.
-  /// [ignoreInvalidPageRanges] Whether to silently ignore invalid but
-  /// successfully parsed page ranges, such as '3-2'. Defaults to false.
-  /// Returns: Base64-encoded pdf data.
-  Future<String> printToPDF({
-    bool landscape,
-    bool displayHeaderFooter,
-    bool printBackground,
-    num scale,
-    num paperWidth,
-    num paperHeight,
-    num marginTop,
-    num marginBottom,
-    num marginLeft,
-    num marginRight,
-    String pageRanges,
-    bool ignoreInvalidPageRanges,
-  }) async {
-    Map parameters = {};
-    if (landscape != null) {
-      parameters['landscape'] = landscape;
-    }
-    if (displayHeaderFooter != null) {
-      parameters['displayHeaderFooter'] = displayHeaderFooter;
-    }
-    if (printBackground != null) {
-      parameters['printBackground'] = printBackground;
-    }
-    if (scale != null) {
-      parameters['scale'] = scale;
-    }
-    if (paperWidth != null) {
-      parameters['paperWidth'] = paperWidth;
-    }
-    if (paperHeight != null) {
-      parameters['paperHeight'] = paperHeight;
-    }
-    if (marginTop != null) {
-      parameters['marginTop'] = marginTop;
-    }
-    if (marginBottom != null) {
-      parameters['marginBottom'] = marginBottom;
-    }
-    if (marginLeft != null) {
-      parameters['marginLeft'] = marginLeft;
-    }
-    if (marginRight != null) {
-      parameters['marginRight'] = marginRight;
-    }
-    if (pageRanges != null) {
-      parameters['pageRanges'] = pageRanges;
-    }
-    if (ignoreInvalidPageRanges != null) {
-      parameters['ignoreInvalidPageRanges'] = ignoreInvalidPageRanges;
-    }
-    Map result = await _client.send('Page.printToPDF', parameters);
-    return result['data'];
   }
 
   /// Starts sending each frame using the `screencastFrame` event.
@@ -654,102 +757,153 @@ class PageManager {
     await _client.send('Page.startScreencast', parameters);
   }
 
+  /// Force the page stop all navigations and pending resource fetches.
+  Future stopLoading() async {
+    await _client.send('Page.stopLoading');
+  }
+
+  /// Crashes renderer on the IO thread, generates minidumps.
+  Future crash() async {
+    await _client.send('Page.crash');
+  }
+
+  /// Tries to close page, running its beforeunload hooks, if any.
+  Future close() async {
+    await _client.send('Page.close');
+  }
+
+  /// Tries to update the web lifecycle state of the page.
+  /// It will transition the page to the given state according to:
+  /// https://github.com/WICG/web-lifecycle/
+  /// [state] Target lifecycle state
+  Future setWebLifecycleState(
+    String state,
+  ) async {
+    Map parameters = {
+      'state': state,
+    };
+    await _client.send('Page.setWebLifecycleState', parameters);
+  }
+
   /// Stops sending each frame in the `screencastFrame`.
   Future stopScreencast() async {
     await _client.send('Page.stopScreencast');
   }
+}
 
-  /// Acknowledges that a screencast frame has been received by the frontend.
-  /// [sessionId] Frame number.
-  Future screencastFrameAck(
-    int sessionId,
-  ) async {
-    Map parameters = {
-      'sessionId': sessionId,
-    };
-    await _client.send('Page.screencastFrameAck', parameters);
+class FrameAttachedEvent {
+  /// Id of the frame that has been attached.
+  final FrameId frameId;
+
+  /// Parent frame identifier.
+  final FrameId parentFrameId;
+
+  /// JavaScript stack trace of when frame was attached, only set if frame initiated from script.
+  final runtime.StackTrace stack;
+
+  FrameAttachedEvent({
+    @required this.frameId,
+    @required this.parentFrameId,
+    this.stack,
+  });
+
+  factory FrameAttachedEvent.fromJson(Map json) {
+    return new FrameAttachedEvent(
+      frameId: new FrameId.fromJson(json['frameId']),
+      parentFrameId: new FrameId.fromJson(json['parentFrameId']),
+      stack: json.containsKey('stack')
+          ? new runtime.StackTrace.fromJson(json['stack'])
+          : null,
+    );
   }
+}
 
-  /// Accepts or dismisses a JavaScript initiated dialog (alert, confirm,
-  /// prompt, or onbeforeunload).
-  /// [accept] Whether to accept or dismiss the dialog.
-  /// [promptText] The text to enter into the dialog prompt before accepting.
-  /// Used only if this is a prompt dialog.
-  Future handleJavaScriptDialog(
-    bool accept, {
-    String promptText,
-  }) async {
-    Map parameters = {
-      'accept': accept,
-    };
-    if (promptText != null) {
-      parameters['promptText'] = promptText;
-    }
-    await _client.send('Page.handleJavaScriptDialog', parameters);
+class FrameScheduledNavigationEvent {
+  /// Id of the frame that has scheduled a navigation.
+  final FrameId frameId;
+
+  /// Delay (in seconds) until the navigation is scheduled to begin. The navigation is not
+  /// guaranteed to start.
+  final num delay;
+
+  /// The reason for the navigation.
+  final String reason;
+
+  /// The destination URL for the scheduled navigation.
+  final String url;
+
+  FrameScheduledNavigationEvent({
+    @required this.frameId,
+    @required this.delay,
+    @required this.reason,
+    @required this.url,
+  });
+
+  factory FrameScheduledNavigationEvent.fromJson(Map json) {
+    return new FrameScheduledNavigationEvent(
+      frameId: new FrameId.fromJson(json['frameId']),
+      delay: json['delay'],
+      reason: json['reason'],
+      url: json['url'],
+    );
   }
+}
 
-  Future<GetAppManifestResult> getAppManifest() async {
-    Map result = await _client.send('Page.getAppManifest');
-    return new GetAppManifestResult.fromJson(result);
+class JavascriptDialogClosedEvent {
+  /// Whether dialog was confirmed.
+  final bool result;
+
+  /// User input in case of prompt.
+  final String userInput;
+
+  JavascriptDialogClosedEvent({
+    @required this.result,
+    @required this.userInput,
+  });
+
+  factory JavascriptDialogClosedEvent.fromJson(Map json) {
+    return new JavascriptDialogClosedEvent(
+      result: json['result'],
+      userInput: json['userInput'],
+    );
   }
+}
 
-  Future requestAppBanner() async {
-    await _client.send('Page.requestAppBanner');
-  }
+class JavascriptDialogOpeningEvent {
+  /// Frame url.
+  final String url;
 
-  /// Returns metrics relating to the layouting of the page, such as viewport
-  /// bounds/scale.
-  Future<GetLayoutMetricsResult> getLayoutMetrics() async {
-    Map result = await _client.send('Page.getLayoutMetrics');
-    return new GetLayoutMetricsResult.fromJson(result);
-  }
+  /// Message that will be displayed by the dialog.
+  final String message;
 
-  /// Creates an isolated world for the given frame.
-  /// [frameId] Id of the frame in which the isolated world should be created.
-  /// [worldName] An optional name which is reported in the Execution Context.
-  /// [grantUniveralAccess] Whether or not universal access should be granted to
-  /// the isolated world. This is a powerful option, use with caution.
-  /// Returns: Execution context of the isolated world.
-  Future<runtime.ExecutionContextId> createIsolatedWorld(
-    FrameId frameId, {
-    String worldName,
-    bool grantUniveralAccess,
-  }) async {
-    Map parameters = {
-      'frameId': frameId.toJson(),
-    };
-    if (worldName != null) {
-      parameters['worldName'] = worldName;
-    }
-    if (grantUniveralAccess != null) {
-      parameters['grantUniveralAccess'] = grantUniveralAccess;
-    }
-    Map result = await _client.send('Page.createIsolatedWorld', parameters);
-    return new runtime.ExecutionContextId.fromJson(
-        result['executionContextId']);
-  }
+  /// Dialog type.
+  final DialogType type;
 
-  /// Brings page to front (activates tab).
-  Future bringToFront() async {
-    await _client.send('Page.bringToFront');
-  }
+  /// True iff browser is capable showing or acting on the given dialog. When browser has no
+  /// dialog handler for given target, calling alert while Page domain is engaged will stall
+  /// the page execution. Execution can be resumed via calling Page.handleJavaScriptDialog.
+  final bool hasBrowserHandler;
 
-  /// Set the behavior when downloading a file.
-  /// [behavior] Whether to allow all or deny all download requests, or use
-  /// default Chrome behavior if available (otherwise deny).
-  /// [downloadPath] The default path to save downloaded files to. This is
-  /// requred if behavior is set to 'allow'
-  Future setDownloadBehavior(
-    String behavior, {
-    String downloadPath,
-  }) async {
-    Map parameters = {
-      'behavior': behavior,
-    };
-    if (downloadPath != null) {
-      parameters['downloadPath'] = downloadPath;
-    }
-    await _client.send('Page.setDownloadBehavior', parameters);
+  /// Default dialog prompt.
+  final String defaultPrompt;
+
+  JavascriptDialogOpeningEvent({
+    @required this.url,
+    @required this.message,
+    @required this.type,
+    @required this.hasBrowserHandler,
+    this.defaultPrompt,
+  });
+
+  factory JavascriptDialogOpeningEvent.fromJson(Map json) {
+    return new JavascriptDialogOpeningEvent(
+      url: json['url'],
+      message: json['message'],
+      type: new DialogType.fromJson(json['type']),
+      hasBrowserHandler: json['hasBrowserHandler'],
+      defaultPrompt:
+          json.containsKey('defaultPrompt') ? json['defaultPrompt'] : null,
+    );
   }
 }
 
@@ -781,112 +935,22 @@ class LifecycleEventEvent {
   }
 }
 
-class FrameAttachedEvent {
-  /// Id of the frame that has been attached.
+class NavigatedWithinDocumentEvent {
+  /// Id of the frame.
   final FrameId frameId;
 
-  /// Parent frame identifier.
-  final FrameId parentFrameId;
-
-  /// JavaScript stack trace of when frame was attached, only set if frame
-  /// initiated from script.
-  final runtime.StackTrace stack;
-
-  FrameAttachedEvent({
-    @required this.frameId,
-    @required this.parentFrameId,
-    this.stack,
-  });
-
-  factory FrameAttachedEvent.fromJson(Map json) {
-    return new FrameAttachedEvent(
-      frameId: new FrameId.fromJson(json['frameId']),
-      parentFrameId: new FrameId.fromJson(json['parentFrameId']),
-      stack: json.containsKey('stack')
-          ? new runtime.StackTrace.fromJson(json['stack'])
-          : null,
-    );
-  }
-}
-
-class FrameScheduledNavigationEvent {
-  /// Id of the frame that has scheduled a navigation.
-  final FrameId frameId;
-
-  /// Delay (in seconds) until the navigation is scheduled to begin. The
-  /// navigation is not guaranteed to start.
-  final num delay;
-
-  /// The reason for the navigation.
-  final String reason;
-
-  /// The destination URL for the scheduled navigation.
+  /// Frame's new url.
   final String url;
 
-  FrameScheduledNavigationEvent({
+  NavigatedWithinDocumentEvent({
     @required this.frameId,
-    @required this.delay,
-    @required this.reason,
     @required this.url,
   });
 
-  factory FrameScheduledNavigationEvent.fromJson(Map json) {
-    return new FrameScheduledNavigationEvent(
+  factory NavigatedWithinDocumentEvent.fromJson(Map json) {
+    return new NavigatedWithinDocumentEvent(
       frameId: new FrameId.fromJson(json['frameId']),
-      delay: json['delay'],
-      reason: json['reason'],
       url: json['url'],
-    );
-  }
-}
-
-class JavascriptDialogOpeningEvent {
-  /// Frame url.
-  final String url;
-
-  /// Message that will be displayed by the dialog.
-  final String message;
-
-  /// Dialog type.
-  final DialogType type;
-
-  /// Default dialog prompt.
-  final String defaultPrompt;
-
-  JavascriptDialogOpeningEvent({
-    @required this.url,
-    @required this.message,
-    @required this.type,
-    this.defaultPrompt,
-  });
-
-  factory JavascriptDialogOpeningEvent.fromJson(Map json) {
-    return new JavascriptDialogOpeningEvent(
-      url: json['url'],
-      message: json['message'],
-      type: new DialogType.fromJson(json['type']),
-      defaultPrompt:
-          json.containsKey('defaultPrompt') ? json['defaultPrompt'] : null,
-    );
-  }
-}
-
-class JavascriptDialogClosedEvent {
-  /// Whether dialog was confirmed.
-  final bool result;
-
-  /// User input in case of prompt.
-  final String userInput;
-
-  JavascriptDialogClosedEvent({
-    @required this.result,
-    @required this.userInput,
-  });
-
-  factory JavascriptDialogClosedEvent.fromJson(Map json) {
-    return new JavascriptDialogClosedEvent(
-      result: json['result'],
-      userInput: json['userInput'],
     );
   }
 }
@@ -947,75 +1011,6 @@ class WindowOpenEvent {
   }
 }
 
-class NavigateResult {
-  /// Frame id that has navigated (or failed to navigate)
-  final FrameId frameId;
-
-  /// Loader identifier.
-  final network.LoaderId loaderId;
-
-  /// User friendly error message, present if and only if navigation has failed.
-  final String errorText;
-
-  NavigateResult({
-    @required this.frameId,
-    this.loaderId,
-    this.errorText,
-  });
-
-  factory NavigateResult.fromJson(Map json) {
-    return new NavigateResult(
-      frameId: new FrameId.fromJson(json['frameId']),
-      loaderId: json.containsKey('loaderId')
-          ? new network.LoaderId.fromJson(json['loaderId'])
-          : null,
-      errorText: json.containsKey('errorText') ? json['errorText'] : null,
-    );
-  }
-}
-
-class GetNavigationHistoryResult {
-  /// Index of the current navigation history entry.
-  final int currentIndex;
-
-  /// Array of navigation history entries.
-  final List<NavigationEntry> entries;
-
-  GetNavigationHistoryResult({
-    @required this.currentIndex,
-    @required this.entries,
-  });
-
-  factory GetNavigationHistoryResult.fromJson(Map json) {
-    return new GetNavigationHistoryResult(
-      currentIndex: json['currentIndex'],
-      entries: (json['entries'] as List)
-          .map((e) => new NavigationEntry.fromJson(e))
-          .toList(),
-    );
-  }
-}
-
-class GetResourceContentResult {
-  /// Resource content.
-  final String content;
-
-  /// True, if content was served as base64.
-  final bool base64Encoded;
-
-  GetResourceContentResult({
-    @required this.content,
-    @required this.base64Encoded,
-  });
-
-  factory GetResourceContentResult.fromJson(Map json) {
-    return new GetResourceContentResult(
-      content: json['content'],
-      base64Encoded: json['base64Encoded'],
-    );
-  }
-}
-
 class GetAppManifestResult {
   /// Manifest location.
   final String url;
@@ -1063,6 +1058,75 @@ class GetLayoutMetricsResult {
       layoutViewport: new LayoutViewport.fromJson(json['layoutViewport']),
       visualViewport: new VisualViewport.fromJson(json['visualViewport']),
       contentSize: new dom.Rect.fromJson(json['contentSize']),
+    );
+  }
+}
+
+class GetNavigationHistoryResult {
+  /// Index of the current navigation history entry.
+  final int currentIndex;
+
+  /// Array of navigation history entries.
+  final List<NavigationEntry> entries;
+
+  GetNavigationHistoryResult({
+    @required this.currentIndex,
+    @required this.entries,
+  });
+
+  factory GetNavigationHistoryResult.fromJson(Map json) {
+    return new GetNavigationHistoryResult(
+      currentIndex: json['currentIndex'],
+      entries: (json['entries'] as List)
+          .map((e) => new NavigationEntry.fromJson(e))
+          .toList(),
+    );
+  }
+}
+
+class GetResourceContentResult {
+  /// Resource content.
+  final String content;
+
+  /// True, if content was served as base64.
+  final bool base64Encoded;
+
+  GetResourceContentResult({
+    @required this.content,
+    @required this.base64Encoded,
+  });
+
+  factory GetResourceContentResult.fromJson(Map json) {
+    return new GetResourceContentResult(
+      content: json['content'],
+      base64Encoded: json['base64Encoded'],
+    );
+  }
+}
+
+class NavigateResult {
+  /// Frame id that has navigated (or failed to navigate)
+  final FrameId frameId;
+
+  /// Loader identifier.
+  final network.LoaderId loaderId;
+
+  /// User friendly error message, present if and only if navigation has failed.
+  final String errorText;
+
+  NavigateResult({
+    @required this.frameId,
+    this.loaderId,
+    this.errorText,
+  });
+
+  factory NavigateResult.fromJson(Map json) {
+    return new NavigateResult(
+      frameId: new FrameId.fromJson(json['frameId']),
+      loaderId: json.containsKey('loaderId')
+          ? new network.LoaderId.fromJson(json['loaderId'])
+          : null,
+      errorText: json.containsKey('errorText') ? json['errorText'] : null,
     );
   }
 }
@@ -1153,8 +1217,7 @@ class Frame {
   /// Frame document's mimeType as determined by the browser.
   final String mimeType;
 
-  /// If the frame failed to load, this contains the URL that could not be
-  /// loaded.
+  /// If the frame failed to load, this contains the URL that could not be loaded.
   final String unreachableUrl;
 
   Frame({

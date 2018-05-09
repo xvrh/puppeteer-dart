@@ -3,34 +3,47 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'page.dart' as page;
+import 'dom_debugger.dart' as dom_debugger;
 
-/// This domain facilitates obtaining document snapshots with DOM, layout, and
-/// style information.
+/// This domain facilitates obtaining document snapshots with DOM, layout, and style information.
 class DOMSnapshotManager {
   final Client _client;
 
   DOMSnapshotManager(this._client);
 
-  /// Returns a document snapshot, including the full DOM tree of the root node
-  /// (including iframes, template contents, and imported documents) in a
-  /// flattened array, as well as layout and white-listed computed style
-  /// information for the nodes. Shadow DOM in the returned DOM tree is
+  /// Returns a document snapshot, including the full DOM tree of the root node (including iframes,
+  /// template contents, and imported documents) in a flattened array, as well as layout and
+  /// white-listed computed style information for the nodes. Shadow DOM in the returned DOM tree is
   /// flattened.
   /// [computedStyleWhitelist] Whitelist of computed styles to return.
+  /// [includeEventListeners] Whether or not to retrieve details of DOM listeners (default false).
+  /// [includePaintOrder] Whether to determine and include the paint order index of LayoutTreeNodes (default false).
+  /// [includeUserAgentShadowTree] Whether to include UA shadow tree in the snapshot (default false).
   Future<GetSnapshotResult> getSnapshot(
-    List<String> computedStyleWhitelist,
-  ) async {
+    List<String> computedStyleWhitelist, {
+    bool includeEventListeners,
+    bool includePaintOrder,
+    bool includeUserAgentShadowTree,
+  }) async {
     Map parameters = {
       'computedStyleWhitelist': computedStyleWhitelist.map((e) => e).toList(),
     };
+    if (includeEventListeners != null) {
+      parameters['includeEventListeners'] = includeEventListeners;
+    }
+    if (includePaintOrder != null) {
+      parameters['includePaintOrder'] = includePaintOrder;
+    }
+    if (includeUserAgentShadowTree != null) {
+      parameters['includeUserAgentShadowTree'] = includeUserAgentShadowTree;
+    }
     Map result = await _client.send('DOMSnapshot.getSnapshot', parameters);
     return new GetSnapshotResult.fromJson(result);
   }
 }
 
 class GetSnapshotResult {
-  /// The nodes in the DOM tree. The DOMNode at index 0 corresponds to the root
-  /// document.
+  /// The nodes in the DOM tree. The DOMNode at index 0 corresponds to the root document.
   final List<DOMNode> domNodes;
 
   /// The nodes in the layout tree.
@@ -77,8 +90,7 @@ class DOMNode {
   /// Only set for input elements, contains the input's associated text value.
   final String inputValue;
 
-  /// Only set for radio and checkbox input elements, indicates if the element
-  /// has been checked
+  /// Only set for radio and checkbox input elements, indicates if the element has been checked
   final bool inputChecked;
 
   /// Only set for option elements, indicates if the element has been selected
@@ -87,19 +99,19 @@ class DOMNode {
   /// `Node`'s id, corresponds to DOM.Node.backendNodeId.
   final dom.BackendNodeId backendNodeId;
 
-  /// The indexes of the node's child nodes in the `domNodes` array returned by
-  /// `getSnapshot`, if any.
+  /// The indexes of the node's child nodes in the `domNodes` array returned by `getSnapshot`, if
+  /// any.
   final List<int> childNodeIndexes;
 
   /// Attributes of an `Element` node.
   final List<NameValue> attributes;
 
-  /// Indexes of pseudo elements associated with this node in the `domNodes`
-  /// array returned by `getSnapshot`, if any.
+  /// Indexes of pseudo elements associated with this node in the `domNodes` array returned by
+  /// `getSnapshot`, if any.
   final List<int> pseudoElementIndexes;
 
-  /// The index of the node's related layout tree node in the `layoutTreeNodes`
-  /// array returned by `getSnapshot`, if any.
+  /// The index of the node's related layout tree node in the `layoutTreeNodes` array returned by
+  /// `getSnapshot`, if any.
   final int layoutNodeIndex;
 
   /// Document URL that `Document` or `FrameOwner` node points to.
@@ -123,25 +135,34 @@ class DOMNode {
   /// Frame ID for frame owner elements and also for the document node.
   final page.FrameId frameId;
 
-  /// The index of a frame owner element's content document in the `domNodes`
-  /// array returned by `getSnapshot`, if any.
+  /// The index of a frame owner element's content document in the `domNodes` array returned by
+  /// `getSnapshot`, if any.
   final int contentDocumentIndex;
 
-  /// Index of the imported document's node of a link element in the `domNodes`
-  /// array returned by `getSnapshot`, if any.
+  /// Index of the imported document's node of a link element in the `domNodes` array returned by
+  /// `getSnapshot`, if any.
   final int importedDocumentIndex;
 
-  /// Index of the content node of a template element in the `domNodes` array
-  /// returned by `getSnapshot`.
+  /// Index of the content node of a template element in the `domNodes` array returned by
+  /// `getSnapshot`.
   final int templateContentIndex;
 
   /// Type of a pseudo element node.
   final dom.PseudoType pseudoType;
 
-  /// Whether this DOM node responds to mouse clicks. This includes nodes that
-  /// have had click event listeners attached via JavaScript as well as anchor
-  /// tags that naturally navigate when clicked.
+  /// Shadow root type.
+  final dom.ShadowRootType shadowRootType;
+
+  /// Whether this DOM node responds to mouse clicks. This includes nodes that have had click
+  /// event listeners attached via JavaScript as well as anchor tags that naturally navigate when
+  /// clicked.
   final bool isClickable;
+
+  /// Details of the node's event listeners, if any.
+  final List<dom_debugger.EventListener> eventListeners;
+
+  /// The selected url for nodes with a srcset attribute.
+  final String currentSourceURL;
 
   DOMNode({
     @required this.nodeType,
@@ -167,7 +188,10 @@ class DOMNode {
     this.importedDocumentIndex,
     this.templateContentIndex,
     this.pseudoType,
+    this.shadowRootType,
     this.isClickable,
+    this.eventListeners,
+    this.currentSourceURL,
   });
 
   factory DOMNode.fromJson(Map json) {
@@ -219,7 +243,18 @@ class DOMNode {
       pseudoType: json.containsKey('pseudoType')
           ? new dom.PseudoType.fromJson(json['pseudoType'])
           : null,
+      shadowRootType: json.containsKey('shadowRootType')
+          ? new dom.ShadowRootType.fromJson(json['shadowRootType'])
+          : null,
       isClickable: json.containsKey('isClickable') ? json['isClickable'] : null,
+      eventListeners: json.containsKey('eventListeners')
+          ? (json['eventListeners'] as List)
+              .map((e) => new dom_debugger.EventListener.fromJson(e))
+              .toList()
+          : null,
+      currentSourceURL: json.containsKey('currentSourceURL')
+          ? json['currentSourceURL']
+          : null,
     );
   }
 
@@ -288,23 +323,34 @@ class DOMNode {
     if (pseudoType != null) {
       json['pseudoType'] = pseudoType.toJson();
     }
+    if (shadowRootType != null) {
+      json['shadowRootType'] = shadowRootType.toJson();
+    }
     if (isClickable != null) {
       json['isClickable'] = isClickable;
+    }
+    if (eventListeners != null) {
+      json['eventListeners'] = eventListeners.map((e) => e.toJson()).toList();
+    }
+    if (currentSourceURL != null) {
+      json['currentSourceURL'] = currentSourceURL;
     }
     return json;
   }
 }
 
-/// Details of post layout rendered text positions. The exact layout should not
-/// be regarded as stable and may change between versions.
+/// Details of post layout rendered text positions. The exact layout should not be regarded as
+/// stable and may change between versions.
 class InlineTextBox {
   /// The absolute position bounding box.
   final dom.Rect boundingBox;
 
-  /// The starting index in characters, for this post layout textbox substring.
+  /// The starting index in characters, for this post layout textbox substring. Characters that
+  /// would be represented as a surrogate pair in UTF-16 have length 2.
   final int startCharacterIndex;
 
-  /// The number of characters in this post layout textbox substring.
+  /// The number of characters in this post layout textbox substring. Characters that would be
+  /// represented as a surrogate pair in UTF-16 have length 2.
   final int numCharacters;
 
   InlineTextBox({
@@ -333,8 +379,7 @@ class InlineTextBox {
 
 /// Details of an element in the DOM tree with a LayoutObject.
 class LayoutTreeNode {
-  /// The index of the related DOM node in the `domNodes` array returned by
-  /// `getSnapshot`.
+  /// The index of the related DOM node in the `domNodes` array returned by `getSnapshot`.
   final int domNodeIndex;
 
   /// The absolute position bounding box.
@@ -349,12 +394,18 @@ class LayoutTreeNode {
   /// Index into the `computedStyles` array returned by `getSnapshot`.
   final int styleIndex;
 
+  /// Global paint order index, which is determined by the stacking order of the nodes. Nodes
+  /// that are painted together will have the same index. Only provided if includePaintOrder in
+  /// getSnapshot was true.
+  final int paintOrder;
+
   LayoutTreeNode({
     @required this.domNodeIndex,
     @required this.boundingBox,
     this.layoutText,
     this.inlineTextNodes,
     this.styleIndex,
+    this.paintOrder,
   });
 
   factory LayoutTreeNode.fromJson(Map json) {
@@ -368,6 +419,7 @@ class LayoutTreeNode {
               .toList()
           : null,
       styleIndex: json.containsKey('styleIndex') ? json['styleIndex'] : null,
+      paintOrder: json.containsKey('paintOrder') ? json['paintOrder'] : null,
     );
   }
 
@@ -384,6 +436,9 @@ class LayoutTreeNode {
     }
     if (styleIndex != null) {
       json['styleIndex'] = styleIndex;
+    }
+    if (paintOrder != null) {
+      json['paintOrder'] = paintOrder;
     }
     return json;
   }

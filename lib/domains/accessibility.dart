@@ -2,26 +2,36 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
+import 'runtime.dart' as runtime;
 
 class AccessibilityManager {
   final Client _client;
 
   AccessibilityManager(this._client);
 
-  /// Fetches the accessibility node and partial accessibility tree for this DOM
-  /// node, if it exists.
-  /// [nodeId] ID of node to get the partial accessibility tree for.
-  /// [fetchRelatives] Whether to fetch this nodes ancestors, siblings and
-  /// children. Defaults to true.
-  /// Returns: The `Accessibility.AXNode` for this DOM node, if it exists, plus
-  /// its ancestors, siblings and children, if requested.
-  Future<List<AXNode>> getPartialAXTree(
-    dom.NodeId nodeId, {
+  /// Fetches the accessibility node and partial accessibility tree for this DOM node, if it exists.
+  /// [nodeId] Identifier of the node to get the partial accessibility tree for.
+  /// [backendNodeId] Identifier of the backend node to get the partial accessibility tree for.
+  /// [objectId] JavaScript object id of the node wrapper to get the partial accessibility tree for.
+  /// [fetchRelatives] Whether to fetch this nodes ancestors, siblings and children. Defaults to true.
+  /// Returns: The `Accessibility.AXNode` for this DOM node, if it exists, plus its ancestors, siblings and
+  /// children, if requested.
+  Future<List<AXNode>> getPartialAXTree({
+    dom.NodeId nodeId,
+    dom.BackendNodeId backendNodeId,
+    runtime.RemoteObjectId objectId,
     bool fetchRelatives,
   }) async {
-    Map parameters = {
-      'nodeId': nodeId.toJson(),
-    };
+    Map parameters = {};
+    if (nodeId != null) {
+      parameters['nodeId'] = nodeId.toJson();
+    }
+    if (backendNodeId != null) {
+      parameters['backendNodeId'] = backendNodeId.toJson();
+    }
+    if (objectId != null) {
+      parameters['objectId'] = objectId.toJson();
+    }
     if (fetchRelatives != null) {
       parameters['fetchRelatives'] = fetchRelatives;
     }
@@ -141,8 +151,7 @@ class AXValueSourceType {
   String toString() => value.toString();
 }
 
-/// Enum of possible native property sources (as a subtype of a particular
-/// AXValueSourceType).
+/// Enum of possible native property sources (as a subtype of a particular AXValueSourceType).
 class AXValueNativeSourceType {
   static const AXValueNativeSourceType figcaption =
       const AXValueNativeSourceType._('figcaption');
@@ -401,12 +410,11 @@ class AXValue {
   }
 }
 
-/// Values of AXProperty name: from 'busy' to 'roledescription' - states which
-/// apply to every AX node, from 'live' to 'root' - attributes which apply to
-/// nodes in live regions, from 'autocomplete' to 'valuetext' - attributes which
-/// apply to widgets, from 'checked' to 'selected' - states which apply to
-/// widgets, from 'activedescendant' to 'owns' - relationships between elements
-/// other than parent/child/sibling.
+/// Values of AXProperty name: from 'busy' to 'roledescription' - states which apply to every AX
+/// node, from 'live' to 'root' - attributes which apply to nodes in live regions, from
+/// 'autocomplete' to 'valuetext' - attributes which apply to widgets, from 'checked' to 'selected'
+/// - states which apply to widgets, from 'activedescendant' to 'owns' - relationships between
+/// elements other than parent/child/sibling.
 class AXPropertyName {
   static const AXPropertyName busy = const AXPropertyName._('busy');
   static const AXPropertyName disabled = const AXPropertyName._('disabled');
@@ -423,7 +431,7 @@ class AXPropertyName {
   static const AXPropertyName root = const AXPropertyName._('root');
   static const AXPropertyName autocomplete =
       const AXPropertyName._('autocomplete');
-  static const AXPropertyName haspopup = const AXPropertyName._('haspopup');
+  static const AXPropertyName hasPopup = const AXPropertyName._('hasPopup');
   static const AXPropertyName level = const AXPropertyName._('level');
   static const AXPropertyName multiselectable =
       const AXPropertyName._('multiselectable');
@@ -464,7 +472,7 @@ class AXPropertyName {
     'relevant': relevant,
     'root': root,
     'autocomplete': autocomplete,
-    'haspopup': haspopup,
+    'hasPopup': hasPopup,
     'level': level,
     'multiselectable': multiselectable,
     'orientation': orientation,
