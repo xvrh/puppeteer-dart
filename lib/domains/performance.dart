@@ -12,14 +12,14 @@ class PerformanceManager {
       .where((Event event) => event.name == 'Performance.metrics')
       .map((Event event) => new MetricsEvent.fromJson(event.parameters));
 
-  /// Enable collecting and reporting metrics.
-  Future enable() async {
-    await _client.send('Performance.enable');
-  }
-
   /// Disable collecting and reporting metrics.
   Future disable() async {
     await _client.send('Performance.disable');
+  }
+
+  /// Enable collecting and reporting metrics.
+  Future enable() async {
+    await _client.send('Performance.enable');
   }
 
   /// Retrieve current values of run-time metrics.

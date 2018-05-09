@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
+import 'dom.dart' as dom;
 import 'page.dart' as page;
 import 'runtime.dart' as runtime;
-import 'dom.dart' as dom;
+import 'network.dart' as network;
 
 /// This domain emulates different environments for the page.
 class EmulationManager {
@@ -11,47 +12,85 @@ class EmulationManager {
 
   EmulationManager(this._client);
 
-  /// Notification sent after the virtual time budget for the current
-  /// VirtualTimePolicy has run out.
-  Stream get onVirtualTimeBudgetExpired => _client.onEvent.where(
-      (Event event) => event.name == 'Emulation.virtualTimeBudgetExpired');
-
   /// Notification sent after the virtual time has advanced.
   Stream<num> get onVirtualTimeAdvanced => _client.onEvent
       .where((Event event) => event.name == 'Emulation.virtualTimeAdvanced')
       .map((Event event) => event.parameters['virtualTimeElapsed'] as num);
+
+  /// Notification sent after the virtual time budget for the current VirtualTimePolicy has run out.
+  Stream get onVirtualTimeBudgetExpired => _client.onEvent.where(
+      (Event event) => event.name == 'Emulation.virtualTimeBudgetExpired');
 
   /// Notification sent after the virtual time has paused.
   Stream<num> get onVirtualTimePaused => _client.onEvent
       .where((Event event) => event.name == 'Emulation.virtualTimePaused')
       .map((Event event) => event.parameters['virtualTimeElapsed'] as num);
 
-  /// Overrides the values of device screen dimensions (window.screen.width,
-  /// window.screen.height, window.innerWidth, window.innerHeight, and
-  /// "device-width"/"device-height"-related CSS media query results).
-  /// [width] Overriding width value in pixels (minimum 0, maximum 10000000). 0
-  /// disables the override.
-  /// [height] Overriding height value in pixels (minimum 0, maximum 10000000).
-  /// 0 disables the override.
-  /// [deviceScaleFactor] Overriding device scale factor value. 0 disables the
-  /// override.
-  /// [mobile] Whether to emulate mobile device. This includes viewport meta
-  /// tag, overlay scrollbars, text autosizing and more.
+  /// Tells whether emulation is supported.
+  /// Returns: True if emulation is supported.
+  Future<bool> canEmulate() async {
+    Map result = await _client.send('Emulation.canEmulate');
+    return result['result'];
+  }
+
+  /// Clears the overriden device metrics.
+  Future clearDeviceMetricsOverride() async {
+    await _client.send('Emulation.clearDeviceMetricsOverride');
+  }
+
+  /// Clears the overriden Geolocation Position and Error.
+  Future clearGeolocationOverride() async {
+    await _client.send('Emulation.clearGeolocationOverride');
+  }
+
+  /// Requests that page scale factor is reset to initial values.
+  Future resetPageScaleFactor() async {
+    await _client.send('Emulation.resetPageScaleFactor');
+  }
+
+  /// Enables CPU throttling to emulate slow CPUs.
+  /// [rate] Throttling rate as a slowdown factor (1 is no throttle, 2 is 2x slowdown, etc).
+  Future setCPUThrottlingRate(
+    num rate,
+  ) async {
+    Map parameters = {
+      'rate': rate,
+    };
+    await _client.send('Emulation.setCPUThrottlingRate', parameters);
+  }
+
+  /// Sets or clears an override of the default background color of the frame. This override is used
+  /// if the content does not specify one.
+  /// [color] RGBA of the default background color. If not specified, any existing override will be
+  /// cleared.
+  Future setDefaultBackgroundColorOverride({
+    dom.RGBA color,
+  }) async {
+    Map parameters = {};
+    if (color != null) {
+      parameters['color'] = color.toJson();
+    }
+    await _client.send(
+        'Emulation.setDefaultBackgroundColorOverride', parameters);
+  }
+
+  /// Overrides the values of device screen dimensions (window.screen.width, window.screen.height,
+  /// window.innerWidth, window.innerHeight, and "device-width"/"device-height"-related CSS media
+  /// query results).
+  /// [width] Overriding width value in pixels (minimum 0, maximum 10000000). 0 disables the override.
+  /// [height] Overriding height value in pixels (minimum 0, maximum 10000000). 0 disables the override.
+  /// [deviceScaleFactor] Overriding device scale factor value. 0 disables the override.
+  /// [mobile] Whether to emulate mobile device. This includes viewport meta tag, overlay scrollbars, text
+  /// autosizing and more.
   /// [scale] Scale to apply to resulting view image.
-  /// [screenWidth] Overriding screen width value in pixels (minimum 0, maximum
-  /// 10000000).
-  /// [screenHeight] Overriding screen height value in pixels (minimum 0,
-  /// maximum 10000000).
-  /// [positionX] Overriding view X position on screen in pixels (minimum 0,
-  /// maximum 10000000).
-  /// [positionY] Overriding view Y position on screen in pixels (minimum 0,
-  /// maximum 10000000).
-  /// [dontSetVisibleSize] Do not set visible view size, rely upon explicit
-  /// setVisibleSize call.
+  /// [screenWidth] Overriding screen width value in pixels (minimum 0, maximum 10000000).
+  /// [screenHeight] Overriding screen height value in pixels (minimum 0, maximum 10000000).
+  /// [positionX] Overriding view X position on screen in pixels (minimum 0, maximum 10000000).
+  /// [positionY] Overriding view Y position on screen in pixels (minimum 0, maximum 10000000).
+  /// [dontSetVisibleSize] Do not set visible view size, rely upon explicit setVisibleSize call.
   /// [screenOrientation] Screen orientation override.
-  /// [viewport] If set, the visible area of the page will be overridden to this
-  /// viewport. This viewport change is not observed by the page, e.g.
-  /// viewport-relative elements do not change positions.
+  /// [viewport] If set, the visible area of the page will be overridden to this viewport. This viewport
+  /// change is not observed by the page, e.g. viewport-relative elements do not change positions.
   Future setDeviceMetricsOverride(
     int width,
     int height,
@@ -99,102 +138,8 @@ class EmulationManager {
     await _client.send('Emulation.setDeviceMetricsOverride', parameters);
   }
 
-  /// Clears the overriden device metrics.
-  Future clearDeviceMetricsOverride() async {
-    await _client.send('Emulation.clearDeviceMetricsOverride');
-  }
-
-  /// Requests that page scale factor is reset to initial values.
-  Future resetPageScaleFactor() async {
-    await _client.send('Emulation.resetPageScaleFactor');
-  }
-
-  /// Sets a specified page scale factor.
-  /// [pageScaleFactor] Page scale factor.
-  Future setPageScaleFactor(
-    num pageScaleFactor,
-  ) async {
-    Map parameters = {
-      'pageScaleFactor': pageScaleFactor,
-    };
-    await _client.send('Emulation.setPageScaleFactor', parameters);
-  }
-
-  /// Resizes the frame/viewport of the page. Note that this does not affect the
-  /// frame's container (e.g. browser window). Can be used to produce
-  /// screenshots of the specified size. Not supported on Android.
-  /// [width] Frame width (DIP).
-  /// [height] Frame height (DIP).
-  @deprecated
-  Future setVisibleSize(
-    int width,
-    int height,
-  ) async {
-    Map parameters = {
-      'width': width,
-      'height': height,
-    };
-    await _client.send('Emulation.setVisibleSize', parameters);
-  }
-
-  /// Switches script execution in the page.
-  /// [value] Whether script execution should be disabled in the page.
-  Future setScriptExecutionDisabled(
-    bool value,
-  ) async {
-    Map parameters = {
-      'value': value,
-    };
-    await _client.send('Emulation.setScriptExecutionDisabled', parameters);
-  }
-
-  /// Overrides the Geolocation Position or Error. Omitting any of the
-  /// parameters emulates position unavailable.
-  /// [latitude] Mock latitude
-  /// [longitude] Mock longitude
-  /// [accuracy] Mock accuracy
-  Future setGeolocationOverride({
-    num latitude,
-    num longitude,
-    num accuracy,
-  }) async {
-    Map parameters = {};
-    if (latitude != null) {
-      parameters['latitude'] = latitude;
-    }
-    if (longitude != null) {
-      parameters['longitude'] = longitude;
-    }
-    if (accuracy != null) {
-      parameters['accuracy'] = accuracy;
-    }
-    await _client.send('Emulation.setGeolocationOverride', parameters);
-  }
-
-  /// Clears the overriden Geolocation Position and Error.
-  Future clearGeolocationOverride() async {
-    await _client.send('Emulation.clearGeolocationOverride');
-  }
-
-  /// Enables touch on platforms which do not support them.
-  /// [enabled] Whether the touch event emulation should be enabled.
-  /// [maxTouchPoints] Maximum touch points supported. Defaults to one.
-  Future setTouchEmulationEnabled(
-    bool enabled, {
-    int maxTouchPoints,
-  }) async {
-    Map parameters = {
-      'enabled': enabled,
-    };
-    if (maxTouchPoints != null) {
-      parameters['maxTouchPoints'] = maxTouchPoints;
-    }
-    await _client.send('Emulation.setTouchEmulationEnabled', parameters);
-  }
-
   /// [enabled] Whether touch emulation based on mouse input should be enabled.
-  /// [configuration] Touch/gesture events configuration. Default: current
-  /// platform.
+  /// [configuration] Touch/gesture events configuration. Default: current platform.
   Future setEmitTouchEventsForMouse(
     bool enabled, {
     String configuration,
@@ -219,53 +164,27 @@ class EmulationManager {
     await _client.send('Emulation.setEmulatedMedia', parameters);
   }
 
-  /// Enables CPU throttling to emulate slow CPUs.
-  /// [rate] Throttling rate as a slowdown factor (1 is no throttle, 2 is 2x
-  /// slowdown, etc).
-  Future setCPUThrottlingRate(
-    num rate,
-  ) async {
-    Map parameters = {
-      'rate': rate,
-    };
-    await _client.send('Emulation.setCPUThrottlingRate', parameters);
-  }
-
-  /// Tells whether emulation is supported.
-  /// Returns: True if emulation is supported.
-  Future<bool> canEmulate() async {
-    Map result = await _client.send('Emulation.canEmulate');
-    return result['result'];
-  }
-
-  /// Turns on virtual time for all frames (replacing real-time with a synthetic
-  /// time source) and sets the current virtual time policy.  Note this
-  /// supersedes any previous time budget.
-  /// [budget] If set, after this many virtual milliseconds have elapsed virtual
-  /// time will be paused and a virtualTimeBudgetExpired event is sent.
-  /// [maxVirtualTimeTaskStarvationCount] If set this specifies the maximum
-  /// number of tasks that can be run before virtual is forced forwards to
-  /// prevent deadlock.
-  /// Returns: Absolute timestamp at which virtual time was first enabled
-  /// (milliseconds since epoch).
-  Future<runtime.Timestamp> setVirtualTimePolicy(
-    VirtualTimePolicy policy, {
-    num budget,
-    int maxVirtualTimeTaskStarvationCount,
+  /// Overrides the Geolocation Position or Error. Omitting any of the parameters emulates position
+  /// unavailable.
+  /// [latitude] Mock latitude
+  /// [longitude] Mock longitude
+  /// [accuracy] Mock accuracy
+  Future setGeolocationOverride({
+    num latitude,
+    num longitude,
+    num accuracy,
   }) async {
-    Map parameters = {
-      'policy': policy.toJson(),
-    };
-    if (budget != null) {
-      parameters['budget'] = budget;
+    Map parameters = {};
+    if (latitude != null) {
+      parameters['latitude'] = latitude;
     }
-    if (maxVirtualTimeTaskStarvationCount != null) {
-      parameters['maxVirtualTimeTaskStarvationCount'] =
-          maxVirtualTimeTaskStarvationCount;
+    if (longitude != null) {
+      parameters['longitude'] = longitude;
     }
-    Map result =
-        await _client.send('Emulation.setVirtualTimePolicy', parameters);
-    return new runtime.Timestamp.fromJson(result['virtualTimeBase']);
+    if (accuracy != null) {
+      parameters['accuracy'] = accuracy;
+    }
+    await _client.send('Emulation.setGeolocationOverride', parameters);
   }
 
   /// Overrides value returned by the javascript navigator object.
@@ -279,19 +198,116 @@ class EmulationManager {
     await _client.send('Emulation.setNavigatorOverrides', parameters);
   }
 
-  /// Sets or clears an override of the default background color of the frame.
-  /// This override is used if the content does not specify one.
-  /// [color] RGBA of the default background color. If not specified, any
-  /// existing override will be cleared.
-  Future setDefaultBackgroundColorOverride({
-    dom.RGBA color,
+  /// Sets a specified page scale factor.
+  /// [pageScaleFactor] Page scale factor.
+  Future setPageScaleFactor(
+    num pageScaleFactor,
+  ) async {
+    Map parameters = {
+      'pageScaleFactor': pageScaleFactor,
+    };
+    await _client.send('Emulation.setPageScaleFactor', parameters);
+  }
+
+  /// Switches script execution in the page.
+  /// [value] Whether script execution should be disabled in the page.
+  Future setScriptExecutionDisabled(
+    bool value,
+  ) async {
+    Map parameters = {
+      'value': value,
+    };
+    await _client.send('Emulation.setScriptExecutionDisabled', parameters);
+  }
+
+  /// Enables touch on platforms which do not support them.
+  /// [enabled] Whether the touch event emulation should be enabled.
+  /// [maxTouchPoints] Maximum touch points supported. Defaults to one.
+  Future setTouchEmulationEnabled(
+    bool enabled, {
+    int maxTouchPoints,
   }) async {
-    Map parameters = {};
-    if (color != null) {
-      parameters['color'] = color.toJson();
+    Map parameters = {
+      'enabled': enabled,
+    };
+    if (maxTouchPoints != null) {
+      parameters['maxTouchPoints'] = maxTouchPoints;
     }
-    await _client.send(
-        'Emulation.setDefaultBackgroundColorOverride', parameters);
+    await _client.send('Emulation.setTouchEmulationEnabled', parameters);
+  }
+
+  /// Turns on virtual time for all frames (replacing real-time with a synthetic time source) and sets
+  /// the current virtual time policy.  Note this supersedes any previous time budget.
+  /// [budget] If set, after this many virtual milliseconds have elapsed virtual time will be paused and a
+  /// virtualTimeBudgetExpired event is sent.
+  /// [maxVirtualTimeTaskStarvationCount] If set this specifies the maximum number of tasks that can be run before virtual is forced
+  /// forwards to prevent deadlock.
+  /// [waitForNavigation] If set the virtual time policy change should be deferred until any frame starts navigating.
+  /// Note any previous deferred policy change is superseded.
+  /// [initialVirtualTime] If set, base::Time::Now will be overriden to initially return this value.
+  Future<SetVirtualTimePolicyResult> setVirtualTimePolicy(
+    VirtualTimePolicy policy, {
+    num budget,
+    int maxVirtualTimeTaskStarvationCount,
+    bool waitForNavigation,
+    network.TimeSinceEpoch initialVirtualTime,
+  }) async {
+    Map parameters = {
+      'policy': policy.toJson(),
+    };
+    if (budget != null) {
+      parameters['budget'] = budget;
+    }
+    if (maxVirtualTimeTaskStarvationCount != null) {
+      parameters['maxVirtualTimeTaskStarvationCount'] =
+          maxVirtualTimeTaskStarvationCount;
+    }
+    if (waitForNavigation != null) {
+      parameters['waitForNavigation'] = waitForNavigation;
+    }
+    if (initialVirtualTime != null) {
+      parameters['initialVirtualTime'] = initialVirtualTime.toJson();
+    }
+    Map result =
+        await _client.send('Emulation.setVirtualTimePolicy', parameters);
+    return new SetVirtualTimePolicyResult.fromJson(result);
+  }
+
+  /// Resizes the frame/viewport of the page. Note that this does not affect the frame's container
+  /// (e.g. browser window). Can be used to produce screenshots of the specified size. Not supported
+  /// on Android.
+  /// [width] Frame width (DIP).
+  /// [height] Frame height (DIP).
+  @deprecated
+  Future setVisibleSize(
+    int width,
+    int height,
+  ) async {
+    Map parameters = {
+      'width': width,
+      'height': height,
+    };
+    await _client.send('Emulation.setVisibleSize', parameters);
+  }
+}
+
+class SetVirtualTimePolicyResult {
+  /// Absolute timestamp at which virtual time was first enabled (milliseconds since epoch).
+  final runtime.Timestamp virtualTimeBase;
+
+  /// Absolute timestamp at which virtual time was first enabled (up time in milliseconds).
+  final num virtualTimeTicksBase;
+
+  SetVirtualTimePolicyResult({
+    @required this.virtualTimeBase,
+    @required this.virtualTimeTicksBase,
+  });
+
+  factory SetVirtualTimePolicyResult.fromJson(Map json) {
+    return new SetVirtualTimePolicyResult(
+      virtualTimeBase: new runtime.Timestamp.fromJson(json['virtualTimeBase']),
+      virtualTimeTicksBase: json['virtualTimeTicksBase'],
+    );
   }
 }
 
@@ -324,10 +340,10 @@ class ScreenOrientation {
   }
 }
 
-/// advance: If the scheduler runs out of immediate work, the virtual time base
-/// may fast forward to allow the next delayed task (if any) to run; pause: The
-/// virtual time base may not advance; pauseIfNetworkFetchesPending: The virtual
-/// time base may not advance if there are any pending resource fetches.
+/// advance: If the scheduler runs out of immediate work, the virtual time base may fast forward to
+/// allow the next delayed task (if any) to run; pause: The virtual time base may not advance;
+/// pauseIfNetworkFetchesPending: The virtual time base may not advance if there are any pending
+/// resource fetches.
 class VirtualTimePolicy {
   static const VirtualTimePolicy advance = const VirtualTimePolicy._('advance');
   static const VirtualTimePolicy pause = const VirtualTimePolicy._('pause');

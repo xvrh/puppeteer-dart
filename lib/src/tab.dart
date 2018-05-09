@@ -24,5 +24,12 @@ class Tab extends Object with TabMixin {
   Future<dynamic> remoteObject(RemoteObject remoteObject) =>
       helper.remoteObject(runtime, remoteObject);
 
+  Future<dynamic> evaluate(String javascript) {
+    //TODO(xha): evaluer le javascript et essayer de retourner la valeur en Dart
+
+    //TODO(xha): faire des tests pour tester le comportement avec des valeurs primitives,
+    // des List, Map et des objets avec plusieurs niveaux.
+  }
+
   Future close() => session.close();
 }

@@ -8,35 +8,65 @@ class TracingManager {
 
   TracingManager(this._client);
 
-  /// Contains an bucket of collected trace events. When tracing is stopped
-  /// collected events will be send as a sequence of dataCollected events
-  /// followed by tracingComplete event.
+  Stream<BufferUsageEvent> get onBufferUsage => _client.onEvent
+      .where((Event event) => event.name == 'Tracing.bufferUsage')
+      .map((Event event) => new BufferUsageEvent.fromJson(event.parameters));
+
+  /// Contains an bucket of collected trace events. When tracing is stopped collected events will be
+  /// send as a sequence of dataCollected events followed by tracingComplete event.
   Stream<List<Map>> get onDataCollected => _client.onEvent
       .where((Event event) => event.name == 'Tracing.dataCollected')
       .map((Event event) =>
           (event.parameters['value'] as List).map((e) => e as Map).toList());
 
-  /// Signals that tracing is stopped and there is no trace buffers pending
-  /// flush, all data were delivered via dataCollected events.
-  Stream<io.StreamHandle> get onTracingComplete => _client.onEvent
+  /// Signals that tracing is stopped and there is no trace buffers pending flush, all data were
+  /// delivered via dataCollected events.
+  Stream<TracingCompleteEvent> get onTracingComplete => _client.onEvent
       .where((Event event) => event.name == 'Tracing.tracingComplete')
-      .map((Event event) =>
-          new io.StreamHandle.fromJson(event.parameters['stream']));
+      .map(
+          (Event event) => new TracingCompleteEvent.fromJson(event.parameters));
 
-  Stream<BufferUsageEvent> get onBufferUsage => _client.onEvent
-      .where((Event event) => event.name == 'Tracing.bufferUsage')
-      .map((Event event) => new BufferUsageEvent.fromJson(event.parameters));
+  /// Stop trace events collection.
+  Future end() async {
+    await _client.send('Tracing.end');
+  }
+
+  /// Gets supported tracing categories.
+  /// Returns: A list of supported tracing categories.
+  Future<List<String>> getCategories() async {
+    Map result = await _client.send('Tracing.getCategories');
+    return (result['categories'] as List).map((e) => e as String).toList();
+  }
+
+  /// Record a clock sync marker in the trace.
+  /// [syncId] The ID of this clock sync marker
+  Future recordClockSyncMarker(
+    String syncId,
+  ) async {
+    Map parameters = {
+      'syncId': syncId,
+    };
+    await _client.send('Tracing.recordClockSyncMarker', parameters);
+  }
+
+  /// Request a global memory dump.
+  Future<RequestMemoryDumpResult> requestMemoryDump() async {
+    Map result = await _client.send('Tracing.requestMemoryDump');
+    return new RequestMemoryDumpResult.fromJson(result);
+  }
 
   /// Start trace events collection.
-  /// [bufferUsageReportingInterval] If set, the agent will issue bufferUsage
-  /// events at this interval, specified in milliseconds
-  /// [transferMode] Whether to report trace events as series of dataCollected
-  /// events or to save trace to a stream (defaults to `ReportEvents`).
+  /// [bufferUsageReportingInterval] If set, the agent will issue bufferUsage events at this interval, specified in milliseconds
+  /// [transferMode] Whether to report trace events as series of dataCollected events or to save trace to a
+  /// stream (defaults to `ReportEvents`).
+  /// [streamCompression] Compression format to use. This only applies when using `ReturnAsStream`
+  /// transfer mode (defaults to `none`)
   Future start({
     @deprecated String categories,
     @deprecated String options,
     num bufferUsageReportingInterval,
     String transferMode,
+    StreamCompression streamCompression,
     TraceConfig traceConfig,
   }) async {
     Map parameters = {};
@@ -56,52 +86,26 @@ class TracingManager {
     if (transferMode != null) {
       parameters['transferMode'] = transferMode;
     }
+    if (streamCompression != null) {
+      parameters['streamCompression'] = streamCompression.toJson();
+    }
     if (traceConfig != null) {
       parameters['traceConfig'] = traceConfig.toJson();
     }
     await _client.send('Tracing.start', parameters);
   }
-
-  /// Stop trace events collection.
-  Future end() async {
-    await _client.send('Tracing.end');
-  }
-
-  /// Gets supported tracing categories.
-  /// Returns: A list of supported tracing categories.
-  Future<List<String>> getCategories() async {
-    Map result = await _client.send('Tracing.getCategories');
-    return (result['categories'] as List).map((e) => e as String).toList();
-  }
-
-  /// Request a global memory dump.
-  Future<RequestMemoryDumpResult> requestMemoryDump() async {
-    Map result = await _client.send('Tracing.requestMemoryDump');
-    return new RequestMemoryDumpResult.fromJson(result);
-  }
-
-  /// Record a clock sync marker in the trace.
-  /// [syncId] The ID of this clock sync marker
-  Future recordClockSyncMarker(
-    String syncId,
-  ) async {
-    Map parameters = {
-      'syncId': syncId,
-    };
-    await _client.send('Tracing.recordClockSyncMarker', parameters);
-  }
 }
 
 class BufferUsageEvent {
-  /// A number in range [0..1] that indicates the used size of event buffer as a
-  /// fraction of its total size.
+  /// A number in range [0..1] that indicates the used size of event buffer as a fraction of its
+  /// total size.
   final num percentFull;
 
   /// An approximate number of events in the trace log.
   final num eventCount;
 
-  /// A number in range [0..1] that indicates the used size of event buffer as a
-  /// fraction of its total size.
+  /// A number in range [0..1] that indicates the used size of event buffer as a fraction of its
+  /// total size.
   final num value;
 
   BufferUsageEvent({
@@ -115,6 +119,30 @@ class BufferUsageEvent {
       percentFull: json.containsKey('percentFull') ? json['percentFull'] : null,
       eventCount: json.containsKey('eventCount') ? json['eventCount'] : null,
       value: json.containsKey('value') ? json['value'] : null,
+    );
+  }
+}
+
+class TracingCompleteEvent {
+  /// A handle of the stream that holds resulting trace data.
+  final io.StreamHandle stream;
+
+  /// Compression format of returned stream.
+  final StreamCompression streamCompression;
+
+  TracingCompleteEvent({
+    this.stream,
+    this.streamCompression,
+  });
+
+  factory TracingCompleteEvent.fromJson(Map json) {
+    return new TracingCompleteEvent(
+      stream: json.containsKey('stream')
+          ? new io.StreamHandle.fromJson(json['stream'])
+          : null,
+      streamCompression: json.containsKey('streamCompression')
+          ? new StreamCompression.fromJson(json['streamCompression'])
+          : null,
     );
   }
 }
@@ -139,8 +167,7 @@ class RequestMemoryDumpResult {
   }
 }
 
-/// Configuration for memory dump. Used only when "memory-infra" category is
-/// enabled.
+/// Configuration for memory dump. Used only when "memory-infra" category is enabled.
 class MemoryDumpConfig {
   final Map value;
 
@@ -182,8 +209,7 @@ class TraceConfig {
   /// Configuration to synthesize the delays in tracing.
   final List<String> syntheticDelays;
 
-  /// Configuration for memory dump triggers. Used only when "memory-infra"
-  /// category is enabled.
+  /// Configuration for memory dump triggers. Used only when "memory-infra" category is enabled.
   final MemoryDumpConfig memoryDumpConfig;
 
   TraceConfig({
@@ -254,4 +280,25 @@ class TraceConfig {
     }
     return json;
   }
+}
+
+/// Compression type to use for traces returned via streams.
+class StreamCompression {
+  static const StreamCompression none = const StreamCompression._('none');
+  static const StreamCompression gzip = const StreamCompression._('gzip');
+  static const values = const {
+    'none': none,
+    'gzip': gzip,
+  };
+
+  final String value;
+
+  const StreamCompression._(this.value);
+
+  factory StreamCompression.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }

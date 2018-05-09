@@ -8,10 +8,10 @@ class DOMStorageManager {
 
   DOMStorageManager(this._client);
 
-  Stream<StorageId> get onDomStorageItemsCleared => _client.onEvent
-      .where((Event event) => event.name == 'DOMStorage.domStorageItemsCleared')
+  Stream<DomStorageItemAddedEvent> get onDomStorageItemAdded => _client.onEvent
+      .where((Event event) => event.name == 'DOMStorage.domStorageItemAdded')
       .map((Event event) =>
-          new StorageId.fromJson(event.parameters['storageId']));
+          new DomStorageItemAddedEvent.fromJson(event.parameters));
 
   Stream<DomStorageItemRemovedEvent> get onDomStorageItemRemoved => _client
       .onEvent
@@ -19,28 +19,16 @@ class DOMStorageManager {
       .map((Event event) =>
           new DomStorageItemRemovedEvent.fromJson(event.parameters));
 
-  Stream<DomStorageItemAddedEvent> get onDomStorageItemAdded => _client.onEvent
-      .where((Event event) => event.name == 'DOMStorage.domStorageItemAdded')
-      .map((Event event) =>
-          new DomStorageItemAddedEvent.fromJson(event.parameters));
-
   Stream<DomStorageItemUpdatedEvent> get onDomStorageItemUpdated => _client
       .onEvent
       .where((Event event) => event.name == 'DOMStorage.domStorageItemUpdated')
       .map((Event event) =>
           new DomStorageItemUpdatedEvent.fromJson(event.parameters));
 
-  /// Enables storage tracking, storage events will now be delivered to the
-  /// client.
-  Future enable() async {
-    await _client.send('DOMStorage.enable');
-  }
-
-  /// Disables storage tracking, prevents storage events from being sent to the
-  /// client.
-  Future disable() async {
-    await _client.send('DOMStorage.disable');
-  }
+  Stream<StorageId> get onDomStorageItemsCleared => _client.onEvent
+      .where((Event event) => event.name == 'DOMStorage.domStorageItemsCleared')
+      .map((Event event) =>
+          new StorageId.fromJson(event.parameters['storageId']));
 
   Future clear(
     StorageId storageId,
@@ -49,6 +37,16 @@ class DOMStorageManager {
       'storageId': storageId.toJson(),
     };
     await _client.send('DOMStorage.clear', parameters);
+  }
+
+  /// Disables storage tracking, prevents storage events from being sent to the client.
+  Future disable() async {
+    await _client.send('DOMStorage.disable');
+  }
+
+  /// Enables storage tracking, storage events will now be delivered to the client.
+  Future enable() async {
+    await _client.send('DOMStorage.enable');
   }
 
   Future<List<Item>> getDOMStorageItems(
@@ -64,6 +62,17 @@ class DOMStorageManager {
         .toList();
   }
 
+  Future removeDOMStorageItem(
+    StorageId storageId,
+    String key,
+  ) async {
+    Map parameters = {
+      'storageId': storageId.toJson(),
+      'key': key,
+    };
+    await _client.send('DOMStorage.removeDOMStorageItem', parameters);
+  }
+
   Future setDOMStorageItem(
     StorageId storageId,
     String key,
@@ -75,35 +84,6 @@ class DOMStorageManager {
       'value': value,
     };
     await _client.send('DOMStorage.setDOMStorageItem', parameters);
-  }
-
-  Future removeDOMStorageItem(
-    StorageId storageId,
-    String key,
-  ) async {
-    Map parameters = {
-      'storageId': storageId.toJson(),
-      'key': key,
-    };
-    await _client.send('DOMStorage.removeDOMStorageItem', parameters);
-  }
-}
-
-class DomStorageItemRemovedEvent {
-  final StorageId storageId;
-
-  final String key;
-
-  DomStorageItemRemovedEvent({
-    @required this.storageId,
-    @required this.key,
-  });
-
-  factory DomStorageItemRemovedEvent.fromJson(Map json) {
-    return new DomStorageItemRemovedEvent(
-      storageId: new StorageId.fromJson(json['storageId']),
-      key: json['key'],
-    );
   }
 }
 
@@ -125,6 +105,24 @@ class DomStorageItemAddedEvent {
       storageId: new StorageId.fromJson(json['storageId']),
       key: json['key'],
       newValue: json['newValue'],
+    );
+  }
+}
+
+class DomStorageItemRemovedEvent {
+  final StorageId storageId;
+
+  final String key;
+
+  DomStorageItemRemovedEvent({
+    @required this.storageId,
+    @required this.key,
+  });
+
+  factory DomStorageItemRemovedEvent.fromJson(Map json) {
+    return new DomStorageItemRemovedEvent(
+      storageId: new StorageId.fromJson(json['storageId']),
+      key: json['key'],
     );
   }
 }

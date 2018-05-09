@@ -9,12 +9,22 @@ class IOManager {
 
   IOManager(this._client);
 
+  /// Close the stream, discard any temporary backing storage.
+  /// [handle] Handle of the stream to close.
+  Future close(
+    StreamHandle handle,
+  ) async {
+    Map parameters = {
+      'handle': handle.toJson(),
+    };
+    await _client.send('IO.close', parameters);
+  }
+
   /// Read a chunk of the stream
   /// [handle] Handle of the stream to read.
-  /// [offset] Seek to the specified offset before reading (if not specificed,
-  /// proceed with offset following the last read).
-  /// [size] Maximum number of bytes to read (left upon the agent discretion if
-  /// not specified).
+  /// [offset] Seek to the specified offset before reading (if not specificed, proceed with offset
+  /// following the last read). Some types of streams may only support sequential reads.
+  /// [size] Maximum number of bytes to read (left upon the agent discretion if not specified).
   Future<ReadResult> read(
     StreamHandle handle, {
     int offset,
@@ -31,17 +41,6 @@ class IOManager {
     }
     Map result = await _client.send('IO.read', parameters);
     return new ReadResult.fromJson(result);
-  }
-
-  /// Close the stream, discard any temporary backing storage.
-  /// [handle] Handle of the stream to close.
-  Future close(
-    StreamHandle handle,
-  ) async {
-    Map parameters = {
-      'handle': handle.toJson(),
-    };
-    await _client.send('IO.close', parameters);
   }
 
   /// Return UUID of Blob object specified by a remote object id.
@@ -84,8 +83,8 @@ class ReadResult {
   }
 }
 
-/// This is either obtained from another method or specifed as
-/// `blob:&lt;uuid&gt;` where `&lt;uuid&gt` is an UUID of a Blob.
+/// This is either obtained from another method or specifed as `blob:&lt;uuid&gt;` where
+/// `&lt;uuid&gt` is an UUID of a Blob.
 class StreamHandle {
   final String value;
 
