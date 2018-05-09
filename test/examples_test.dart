@@ -18,8 +18,8 @@ main() {
 
     if (fileContent.contains('main()')) {
       test('Text example/${p.basename(exampleFile.path)}', () {
-        var result = Process.runSync(
-            Platform.resolvedExecutable, [exampleFile.absolute.path],
+        var result = Process.runSync(Platform.resolvedExecutable,
+            ['--checked', exampleFile.absolute.path],
             environment: envVariables);
         if (result.exitCode != 0) {
           print(result.stdout);
