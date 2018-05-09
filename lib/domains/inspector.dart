@@ -1,10 +1,10 @@
 import 'dart:async';
 import '../src/connection.dart';
 
-class InspectorManager {
+class InspectorApi {
   final Client _client;
 
-  InspectorManager(this._client);
+  InspectorApi(this._client);
 
   /// Fired when remote debugging connection is about to be terminated. Contains detach reason.
   Stream<String> get onDetached => _client.onEvent

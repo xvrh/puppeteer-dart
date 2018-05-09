@@ -3,10 +3,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'io.dart' as io;
 
-class TracingManager {
+class TracingApi {
   final Client _client;
 
-  TracingManager(this._client);
+  TracingApi(this._client);
 
   Stream<BufferUsageEvent> get onBufferUsage => _client.onEvent
       .where((Event event) => event.name == 'Tracing.bufferUsage')

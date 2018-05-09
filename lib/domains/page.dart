@@ -8,10 +8,10 @@ import 'debugger.dart' as debugger;
 import 'emulation.dart' as emulation;
 
 /// Actions and events related to the inspected page belong to the page domain.
-class PageManager {
+class PageApi {
   final Client _client;
 
-  PageManager(this._client);
+  PageApi(this._client);
 
   Stream<network.MonotonicTime> get onDomContentEventFired => _client.onEvent
       .where((Event event) => event.name == 'Page.domContentEventFired')

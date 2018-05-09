@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class DatabaseManager {
+class DatabaseApi {
   final Client _client;
 
-  DatabaseManager(this._client);
+  DatabaseApi(this._client);
 
   Stream<Database> get onAddDatabase => _client.onEvent
       .where((Event event) => event.name == 'Database.addDatabase')

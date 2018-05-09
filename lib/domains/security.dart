@@ -3,10 +3,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// Security
-class SecurityManager {
+class SecurityApi {
   final Client _client;
 
-  SecurityManager(this._client);
+  SecurityApi(this._client);
 
   /// There is a certificate error. If overriding certificate errors is enabled, then it should be
   /// handled with the `handleCertificateError` command. Note: this event does not fire if the

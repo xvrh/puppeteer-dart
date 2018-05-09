@@ -7,10 +7,10 @@ import '../src/connection.dart';
 /// and unique identifier that can be used for further object reference. Original objects are
 /// maintained in memory unless they are either explicitly released or are released along with the
 /// other objects in their object group.
-class RuntimeManager {
+class RuntimeApi {
   final Client _client;
 
-  RuntimeManager(this._client);
+  RuntimeApi(this._client);
 
   /// Issued when console API was called.
   Stream<ConsoleAPICalledEvent> get onConsoleAPICalled => _client.onEvent

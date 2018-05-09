@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class InputManager {
+class InputApi {
   final Client _client;
 
-  InputManager(this._client);
+  InputApi(this._client);
 
   /// Dispatches a key event to the page.
   /// [type] Type of the key event.

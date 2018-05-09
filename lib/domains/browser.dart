@@ -4,10 +4,10 @@ import '../src/connection.dart';
 import 'target.dart' as target;
 
 /// The Browser domain defines methods and events for browser managing.
-class BrowserManager {
+class BrowserApi {
   final Client _client;
 
-  BrowserManager(this._client);
+  BrowserApi(this._client);
 
   /// Close browser gracefully.
   Future close() async {

@@ -7,10 +7,10 @@ import 'runtime.dart' as runtime;
 import 'network.dart' as network;
 
 /// This domain emulates different environments for the page.
-class EmulationManager {
+class EmulationApi {
   final Client _client;
 
-  EmulationManager(this._client);
+  EmulationApi(this._client);
 
   /// Notification sent after the virtual time has advanced.
   Stream<num> get onVirtualTimeAdvanced => _client.onEvent

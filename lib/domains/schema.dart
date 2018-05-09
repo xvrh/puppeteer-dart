@@ -4,10 +4,10 @@ import '../src/connection.dart';
 
 /// This domain is deprecated.
 @deprecated
-class SchemaManager {
+class SchemaApi {
   final Client _client;
 
-  SchemaManager(this._client);
+  SchemaApi(this._client);
 
   /// Returns supported domains.
   /// Returns: List of supported domains.

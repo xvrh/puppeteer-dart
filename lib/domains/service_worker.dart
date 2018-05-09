@@ -3,10 +3,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'target.dart' as target;
 
-class ServiceWorkerManager {
+class ServiceWorkerApi {
   final Client _client;
 
-  ServiceWorkerManager(this._client);
+  ServiceWorkerApi(this._client);
 
   Stream<ServiceWorkerErrorMessage> get onWorkerErrorReported => _client.onEvent
       .where((Event event) => event.name == 'ServiceWorker.workerErrorReported')

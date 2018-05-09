@@ -9,10 +9,10 @@ import 'debugger.dart' as debugger;
 
 /// Network domain allows tracking network activities of the page. It exposes information about http,
 /// file, data and other requests and responses, their headers, bodies, timing, etc.
-class NetworkManager {
+class NetworkApi {
   final Client _client;
 
-  NetworkManager(this._client);
+  NetworkApi(this._client);
 
   /// Fired when data chunk was received over the network.
   Stream<DataReceivedEvent> get onDataReceived => _client.onEvent

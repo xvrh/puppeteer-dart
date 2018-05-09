@@ -4,10 +4,10 @@ import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
 /// Input/Output operations for streams produced by DevTools.
-class IOManager {
+class IOApi {
   final Client _client;
 
-  IOManager(this._client);
+  IOApi(this._client);
 
   /// Close the stream, discard any temporary backing storage.
   /// [handle] Handle of the stream to close.

@@ -3,10 +3,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// Query and modify DOM storage.
-class DOMStorageManager {
+class DOMStorageApi {
   final Client _client;
 
-  DOMStorageManager(this._client);
+  DOMStorageApi(this._client);
 
   Stream<DomStorageItemAddedEvent> get onDomStorageItemAdded => _client.onEvent
       .where((Event event) => event.name == 'DOMStorage.domStorageItemAdded')

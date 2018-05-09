@@ -3,10 +3,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// The SystemInfo domain defines methods and events for querying low-level system information.
-class SystemInfoManager {
+class SystemInfoApi {
   final Client _client;
 
-  SystemInfoManager(this._client);
+  SystemInfoApi(this._client);
 
   /// Returns information about the system.
   Future<GetInfoResult> getInfo() async {

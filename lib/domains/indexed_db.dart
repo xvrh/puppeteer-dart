@@ -3,10 +3,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
-class IndexedDBManager {
+class IndexedDBApi {
   final Client _client;
 
-  IndexedDBManager(this._client);
+  IndexedDBApi(this._client);
 
   /// Clears all entries from an object store.
   /// [securityOrigin] Security origin.

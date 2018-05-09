@@ -4,10 +4,10 @@ import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'runtime.dart' as runtime;
 
-class AnimationManager {
+class AnimationApi {
   final Client _client;
 
-  AnimationManager(this._client);
+  AnimationApi(this._client);
 
   /// Event for when an animation has been cancelled.
   Stream<String> get onAnimationCanceled => _client.onEvent

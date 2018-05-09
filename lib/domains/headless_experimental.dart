@@ -4,10 +4,10 @@ import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
 /// This domain provides experimental commands only supported in headless mode.
-class HeadlessExperimentalManager {
+class HeadlessExperimentalApi {
   final Client _client;
 
-  HeadlessExperimentalManager(this._client);
+  HeadlessExperimentalApi(this._client);
 
   /// Issued when the target starts or stops needing BeginFrames.
   Stream<bool> get onNeedsBeginFramesChanged => _client.onEvent

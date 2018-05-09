@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class StorageManager {
+class StorageApi {
   final Client _client;
 
-  StorageManager(this._client);
+  StorageApi(this._client);
 
   /// A cache's contents have been modified.
   Stream<CacheStorageContentUpdatedEvent> get onCacheStorageContentUpdated =>

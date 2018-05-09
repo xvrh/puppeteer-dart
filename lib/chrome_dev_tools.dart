@@ -104,7 +104,7 @@ class Chrome {
     }
   }
 
-  TargetManager get targets => connection.targets;
+  TargetApi get targets => connection.targets;
 
   Future<Tab> newTab(String url, {bool incognito: false}) async {
     BrowserContextID contextID;

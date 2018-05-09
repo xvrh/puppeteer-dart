@@ -1,7 +1,7 @@
 import 'dart:async';
 import '../domains/runtime.dart';
 
-Future remoteObject(RuntimeManager runtime, RemoteObject remoteObject) async {
+Future remoteObject(RuntimeApi runtime, RemoteObject remoteObject) async {
   if (remoteObject.subtype == 'error')
     throw 'RemoteObject has error: ${remoteObject.description}';
 
@@ -39,7 +39,7 @@ Future remoteObject(RuntimeManager runtime, RemoteObject remoteObject) async {
 }
 
 Future<Map<String, dynamic>> remoteObjectProperties(
-    RuntimeManager runtime, RemoteObject remoteObject) async {
+    RuntimeApi runtime, RemoteObject remoteObject) async {
   var properties = await runtime.getProperties(remoteObject.objectId);
 
   Map<String, dynamic> result = {};
@@ -54,7 +54,7 @@ Future<Map<String, dynamic>> remoteObjectProperties(
   return result;
 }
 
-Future releaseObject(RuntimeManager runtime, RemoteObject remoteObject) async {
+Future releaseObject(RuntimeApi runtime, RemoteObject remoteObject) async {
   if (remoteObject.objectId == null) return;
   try {
     await runtime.releaseObject(remoteObject.objectId);

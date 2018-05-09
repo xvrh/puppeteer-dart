@@ -3,10 +3,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// Supports additional targets discovery and allows to attach to them.
-class TargetManager {
+class TargetApi {
   final Client _client;
 
-  TargetManager(this._client);
+  TargetApi(this._client);
 
   /// Issued when attached to target because of auto-attach or `attachToTarget` command.
   Stream<AttachedToTargetEvent> get onAttachedToTarget => _client.onEvent

@@ -1,7 +1,7 @@
 import 'dart:async';
 import '../domains/network.dart';
 
-Future waitUntilNetworkIdle(NetworkManager network,
+Future waitUntilNetworkIdle(NetworkApi network,
     {Duration idleDuration: const Duration(milliseconds: 1000),
     int idleInFlight: 0}) async {
   await network.enable();

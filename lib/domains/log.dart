@@ -5,10 +5,10 @@ import 'runtime.dart' as runtime;
 import 'network.dart' as network;
 
 /// Provides access to log entries.
-class LogManager {
+class LogApi {
   final Client _client;
 
-  LogManager(this._client);
+  LogApi(this._client);
 
   /// Issued when new message was logged.
   Stream<LogEntry> get onEntryAdded => _client.onEvent
