@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:chrome_dev_tools/domains/log.dart';
+
 import '../domains/network.dart';
 
 Future waitUntilNetworkIdle(NetworkApi network,
@@ -43,4 +45,13 @@ Future waitUntilNetworkIdle(NetworkApi network,
   }));
 
   await completer.future;
+}
+
+Future waitUntilConsoleContains(LogApi log, String text) async {
+  await log.enable();
+  await for (LogEntry logEntry in log.onEntryAdded) {
+    if (logEntry.text.contains(text)) {
+      return;
+    }
+  }
 }

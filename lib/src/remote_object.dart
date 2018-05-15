@@ -2,8 +2,17 @@ import 'dart:async';
 import '../domains/runtime.dart';
 
 Future remoteObject(RuntimeApi runtime, RemoteObject remoteObject) async {
-  if (remoteObject.subtype == 'error')
+  if (remoteObject.subtype == 'error') {
     throw 'RemoteObject has error: ${remoteObject.description}';
+  }
+
+  if (remoteObject.type == 'undefined') {
+    return null;
+  }
+
+  if (remoteObject.value != null) {
+    return remoteObject.value;
+  }
 
   if (remoteObject.unserializableValue != null) {
     switch (remoteObject.unserializableValue.value) {

@@ -7556,13 +7556,13 @@
                     "description": "The reason why request was blocked.",
                     "type": "string",
                     "enum": [
+                        "other",
                         "csp",
                         "mixed-content",
                         "origin",
                         "inspector",
                         "subresource-filter",
-                        "content-type",
-                        "other"
+                        "content-type"
                     ]
                 },
                 {
@@ -8028,6 +8028,19 @@
                             "description": "Stage at wich to begin intercepting requests. Default is Request.",
                             "optional": true,
                             "$ref": "InterceptionStage"
+                        }
+                    ]
+                },
+                {
+                    "id": "SignedExchangeInfo",
+                    "description": "Information about a signed exchange response.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "outerResponse",
+                            "description": "The outer response of signed HTTP exchange which was received from network.",
+                            "$ref": "Response"
                         }
                     ]
                 }
@@ -8875,6 +8888,23 @@
                     ]
                 },
                 {
+                    "name": "signedExchangeReceived",
+                    "description": "Fired when a signed exchange was received over the network",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "description": "Request identifier.",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "info",
+                            "description": "Information about the signed exchange response.",
+                            "$ref": "SignedExchangeInfo"
+                        }
+                    ]
+                },
+                {
                     "name": "responseReceived",
                     "description": "Fired when HTTP response is available.",
                     "parameters": [
@@ -9464,6 +9494,7 @@
                         "EventSource",
                         "WebSocket",
                         "Manifest",
+                        "SignedExchange",
                         "Other"
                     ]
                 },

@@ -64,6 +64,13 @@ class NetworkApi {
       .map((Event event) =>
           new ResourceChangedPriorityEvent.fromJson(event.parameters));
 
+  /// Fired when a signed exchange was received over the network
+  Stream<SignedExchangeReceivedEvent> get onSignedExchangeReceived => _client
+      .onEvent
+      .where((Event event) => event.name == 'Network.signedExchangeReceived')
+      .map((Event event) =>
+          new SignedExchangeReceivedEvent.fromJson(event.parameters));
+
   /// Fired when HTTP response is available.
   Stream<ResponseReceivedEvent> get onResponseReceived => _client.onEvent
       .where((Event event) => event.name == 'Network.responseReceived')
@@ -875,6 +882,26 @@ class ResourceChangedPriorityEvent {
       requestId: new RequestId.fromJson(json['requestId']),
       newPriority: new ResourcePriority.fromJson(json['newPriority']),
       timestamp: new MonotonicTime.fromJson(json['timestamp']),
+    );
+  }
+}
+
+class SignedExchangeReceivedEvent {
+  /// Request identifier.
+  final RequestId requestId;
+
+  /// Information about the signed exchange response.
+  final SignedExchangeInfo info;
+
+  SignedExchangeReceivedEvent({
+    @required this.requestId,
+    @required this.info,
+  });
+
+  factory SignedExchangeReceivedEvent.fromJson(Map json) {
+    return new SignedExchangeReceivedEvent(
+      requestId: new RequestId.fromJson(json['requestId']),
+      info: new SignedExchangeInfo.fromJson(json['info']),
     );
   }
 }
@@ -1789,6 +1816,7 @@ class CertificateTransparencyCompliance {
 
 /// The reason why request was blocked.
 class BlockedReason {
+  static const BlockedReason other = const BlockedReason._('other');
   static const BlockedReason csp = const BlockedReason._('csp');
   static const BlockedReason mixedContent =
       const BlockedReason._('mixed-content');
@@ -1798,15 +1826,14 @@ class BlockedReason {
       const BlockedReason._('subresource-filter');
   static const BlockedReason contentType =
       const BlockedReason._('content-type');
-  static const BlockedReason other = const BlockedReason._('other');
   static const values = const {
+    'other': other,
     'csp': csp,
     'mixed-content': mixedContent,
     'origin': origin,
     'inspector': inspector,
     'subresource-filter': subresourceFilter,
     'content-type': contentType,
-    'other': other,
   };
 
   final String value;
@@ -2521,6 +2548,29 @@ class RequestPattern {
     if (interceptionStage != null) {
       json['interceptionStage'] = interceptionStage.toJson();
     }
+    return json;
+  }
+}
+
+/// Information about a signed exchange response.
+class SignedExchangeInfo {
+  /// The outer response of signed HTTP exchange which was received from network.
+  final Response outerResponse;
+
+  SignedExchangeInfo({
+    @required this.outerResponse,
+  });
+
+  factory SignedExchangeInfo.fromJson(Map json) {
+    return new SignedExchangeInfo(
+      outerResponse: new Response.fromJson(json['outerResponse']),
+    );
+  }
+
+  Map toJson() {
+    Map json = {
+      'outerResponse': outerResponse.toJson(),
+    };
     return json;
   }
 }
