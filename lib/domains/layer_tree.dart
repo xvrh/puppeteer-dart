@@ -3,10 +3,10 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 
-class LayerTreeManager {
+class LayerTreeApi {
   final Client _client;
 
-  LayerTreeManager(this._client);
+  LayerTreeApi(this._client);
 
   Stream<LayerPaintedEvent> get onLayerPainted => _client.onEvent
       .where((Event event) => event.name == 'LayerTree.layerPainted')

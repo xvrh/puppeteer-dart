@@ -56,7 +56,7 @@ main() {
 
     code.writeln();
 
-    String className = '${domain.name}Manager';
+    String className = '${domain.name}Api';
     code.writeln(toComment(domain.description));
     if (domain.deprecated) {
       code.writeln('@deprecated');
@@ -119,9 +119,9 @@ abstract class TabMixin {
         .join());
 
     tabBuffer.writeln(toComment(domain.description, indent: 2));
-    tabBuffer.writeln('${domain.name}Manager get $camelizedName =>  '
-        '_$camelizedName ??= new ${domain.name}Manager(session);');
-    tabBuffer.writeln('${domain.name}Manager _$camelizedName;');
+    tabBuffer.writeln('${domain.name}Api get $camelizedName =>  '
+        '_$camelizedName ??= new ${domain.name}Api(session);');
+    tabBuffer.writeln('${domain.name}Api _$camelizedName;');
     tabBuffer.writeln('');
   }
   tabBuffer.writeln('}');

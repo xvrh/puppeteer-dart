@@ -4,10 +4,10 @@ import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 import 'debugger.dart' as debugger;
 
-class ProfilerManager {
+class ProfilerApi {
   final Client _client;
 
-  ProfilerManager(this._client);
+  ProfilerApi(this._client);
 
   Stream<ConsoleProfileFinishedEvent> get onConsoleProfileFinished => _client
       .onEvent

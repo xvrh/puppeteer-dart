@@ -4,10 +4,10 @@ import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
 /// This domain provides experimental commands only supported in headless mode.
-class HeadlessExperimentalManager {
+class HeadlessExperimentalApi {
   final Client _client;
 
-  HeadlessExperimentalManager(this._client);
+  HeadlessExperimentalApi(this._client);
 
   /// Issued when the target starts or stops needing BeginFrames.
   Stream<bool> get onNeedsBeginFramesChanged => _client.onEvent
@@ -69,20 +69,6 @@ class HeadlessExperimentalManager {
     Map result =
         await _client.send('HeadlessExperimental.beginFrame', parameters);
     return new BeginFrameResult.fromJson(result);
-  }
-
-  /// Puts the browser into deterministic mode.  Only effective for subsequently created web contents.
-  /// Only supported in headless mode.  Once set there's no way of leaving deterministic mode.
-  /// [initialDate] Number of seconds since the Epoch
-  Future enterDeterministicMode({
-    num initialDate,
-  }) async {
-    Map parameters = {};
-    if (initialDate != null) {
-      parameters['initialDate'] = initialDate;
-    }
-    await _client.send(
-        'HeadlessExperimental.enterDeterministicMode', parameters);
   }
 
   /// Disables headless events for the target.

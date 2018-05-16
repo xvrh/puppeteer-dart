@@ -4,10 +4,10 @@ import '../src/connection.dart';
 
 /// This domain is deprecated - use Runtime or Log instead.
 @deprecated
-class ConsoleManager {
+class ConsoleApi {
   final Client _client;
 
-  ConsoleManager(this._client);
+  ConsoleApi(this._client);
 
   /// Issued when new console message is added.
   Stream<ConsoleMessage> get onMessageAdded => _client.onEvent

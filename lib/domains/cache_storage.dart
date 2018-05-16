@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
-class CacheStorageManager {
+class CacheStorageApi {
   final Client _client;
 
-  CacheStorageManager(this._client);
+  CacheStorageApi(this._client);
 
   /// Deletes a cache.
   /// [cacheId] Id of cache for deletion.

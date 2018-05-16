@@ -9,13 +9,19 @@ dart:
  - dev
 
 dart_task:
-# TODO(xha): remove --concurrency=1 whe we have a proper locking mecanism
+# TODO(xha): remove --concurrency=1 once we have a proper locking mecanism
  - test: --platform vm --concurrency=1
- - dartanalyzer: --fatal-warnings lib
+# TODO(xha): add --fatal-infos once we are on Dart2
+ - dartanalyzer: --fatal-warnings .
  - dartfmt
 
 branches:
   only: [master]
+
+env:
+  global:
+    #In travis/docker we need the --no-sandbox flag in chrome
+    - CHROME_FORCE_NO_SANDBOX=true
 
 cache:
   directories:

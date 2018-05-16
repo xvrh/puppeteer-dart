@@ -1,9 +1,19 @@
 import 'dart:async';
 import '../domains/runtime.dart';
 
-Future remoteObject(RuntimeManager runtime, RemoteObject remoteObject) async {
-  if (remoteObject.subtype == 'error')
+Future<dynamic> remoteObject(
+    RuntimeApi runtime, RemoteObject remoteObject) async {
+  if (remoteObject.subtype == 'error') {
     throw 'RemoteObject has error: ${remoteObject.description}';
+  }
+
+  if (remoteObject.type == 'undefined') {
+    return null;
+  }
+
+  if (remoteObject.value != null) {
+    return remoteObject.value;
+  }
 
   if (remoteObject.unserializableValue != null) {
     switch (remoteObject.unserializableValue.value) {
@@ -30,7 +40,7 @@ Future remoteObject(RuntimeManager runtime, RemoteObject remoteObject) async {
     final response = await runtime.callFunctionOn('function() { return this; }',
         objectId: remoteObject.objectId, returnByValue: true);
     return response.result.value;
-  } catch (e) {
+  } catch (_) {
     // Return description for unserializable object, e.g. 'window'.
     return remoteObject.description;
   } finally {
@@ -39,7 +49,7 @@ Future remoteObject(RuntimeManager runtime, RemoteObject remoteObject) async {
 }
 
 Future<Map<String, dynamic>> remoteObjectProperties(
-    RuntimeManager runtime, RemoteObject remoteObject) async {
+    RuntimeApi runtime, RemoteObject remoteObject) async {
   var properties = await runtime.getProperties(remoteObject.objectId);
 
   Map<String, dynamic> result = {};
@@ -54,11 +64,11 @@ Future<Map<String, dynamic>> remoteObjectProperties(
   return result;
 }
 
-Future releaseObject(RuntimeManager runtime, RemoteObject remoteObject) async {
+Future releaseObject(RuntimeApi runtime, RemoteObject remoteObject) async {
   if (remoteObject.objectId == null) return;
   try {
     await runtime.releaseObject(remoteObject.objectId);
-  } catch (e) {
+  } catch (_) {
     // Exceptions might happen in case of a page been navigated or closed.
     // Swallow these since they are harmless and we don't leak anything in this case.
   }

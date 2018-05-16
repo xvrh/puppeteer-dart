@@ -6,10 +6,10 @@ import 'dom.dart' as dom;
 
 /// DOM debugging allows setting breakpoints on particular DOM operations and events. JavaScript
 /// execution will stop on these operations as if there was a regular breakpoint set.
-class DOMDebuggerManager {
+class DOMDebuggerApi {
   final Client _client;
 
-  DOMDebuggerManager(this._client);
+  DOMDebuggerApi(this._client);
 
   /// Returns event listeners of the given object.
   /// [objectId] Identifier of the object to return listeners for.

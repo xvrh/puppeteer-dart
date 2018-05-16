@@ -1,10 +1,10 @@
 import 'dart:async';
 import '../src/connection.dart';
 
-class DeviceOrientationManager {
+class DeviceOrientationApi {
   final Client _client;
 
-  DeviceOrientationManager(this._client);
+  DeviceOrientationApi(this._client);
 
   /// Clears the overridden Device Orientation.
   Future clearDeviceOrientationOverride() async {

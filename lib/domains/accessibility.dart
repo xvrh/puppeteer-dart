@@ -4,10 +4,10 @@ import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'runtime.dart' as runtime;
 
-class AccessibilityManager {
+class AccessibilityApi {
   final Client _client;
 
-  AccessibilityManager(this._client);
+  AccessibilityApi(this._client);
 
   /// Fetches the accessibility node and partial accessibility tree for this DOM node, if it exists.
   /// [nodeId] Identifier of the node to get the partial accessibility tree for.

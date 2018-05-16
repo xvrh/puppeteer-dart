@@ -5,10 +5,10 @@ import 'page.dart' as page;
 import 'runtime.dart' as runtime;
 
 /// This domain provides various functionality related to drawing atop the inspected page.
-class OverlayManager {
+class OverlayApi {
   final Client _client;
 
-  OverlayManager(this._client);
+  OverlayApi(this._client);
 
   /// Fired when the node should be inspected. This happens after call to `setInspectMode` or when
   /// user manually inspects an element.

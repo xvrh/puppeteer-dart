@@ -17,6 +17,9 @@ class Tab extends Object with TabMixin {
       helper.waitUntilNetworkIdle(network,
           idleDuration: idleDuration, idleInFlight: idleInFlight);
 
+  Future waitUntilConsoleContains(String text) =>
+      helper.waitUntilConsoleContains(log, text);
+
   Future<Map<String, dynamic>> remoteObjectProperties(
           RemoteObject remoteObject) =>
       helper.remoteObjectProperties(runtime, remoteObject);
@@ -24,12 +27,16 @@ class Tab extends Object with TabMixin {
   Future<dynamic> remoteObject(RemoteObject remoteObject) =>
       helper.remoteObject(runtime, remoteObject);
 
-  Future<dynamic> evaluate(String javascript) {
-    //TODO(xha): evaluer le javascript et essayer de retourner la valeur en Dart
-
-    //TODO(xha): faire des tests pour tester le comportement avec des valeurs primitives,
-    // des List, Map et des objets avec plusieurs niveaux.
-  }
-
   Future close() => session.close();
+
+  Future<dynamic> evaluate(String javascriptExpression) async {
+    String javascriptFunction = '($javascriptExpression)';
+
+    EvaluateResult result = await runtime.evaluate(javascriptFunction,
+        returnByValue: true, userGesture: true, awaitPromise: true);
+    RemoteObject object = result.result;
+
+    dynamic value = await remoteObject(object);
+    return value;
+  }
 }

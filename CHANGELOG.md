@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.4
+- Upgrade chrome to 557152
+- Update protocol
+- Add a simple helper for "evaluate" Javascript
+- Rename classes *Manager to *Api
+
 ## 0.0.3+1
 - Upgrade chrome
 - Add an incognito mode

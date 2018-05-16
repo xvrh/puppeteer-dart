@@ -12,10 +12,10 @@ import 'dom.dart' as dom;
 /// and never sends the same node twice. It is client's responsibility to collect information about
 /// the nodes that were sent to the client.<p>Note that `iframe` owner elements will return
 /// corresponding document elements as their child nodes.</p>
-class DOMManager {
+class DOMApi {
   final Client _client;
 
-  DOMManager(this._client);
+  DOMApi(this._client);
 
   /// Fired when `Element`'s attribute is modified.
   Stream<AttributeModifiedEvent> get onAttributeModified => _client.onEvent

@@ -8,10 +8,10 @@ import 'debugger.dart' as debugger;
 import 'emulation.dart' as emulation;
 
 /// Actions and events related to the inspected page belong to the page domain.
-class PageManager {
+class PageApi {
   final Client _client;
 
-  PageManager(this._client);
+  PageApi(this._client);
 
   Stream<network.MonotonicTime> get onDomContentEventFired => _client.onEvent
       .where((Event event) => event.name == 'Page.domContentEventFired')
@@ -1145,6 +1145,8 @@ class ResourceType {
   static const ResourceType eventSource = const ResourceType._('EventSource');
   static const ResourceType webSocket = const ResourceType._('WebSocket');
   static const ResourceType manifest = const ResourceType._('Manifest');
+  static const ResourceType signedExchange =
+      const ResourceType._('SignedExchange');
   static const ResourceType other = const ResourceType._('Other');
   static const values = const {
     'Document': document,
@@ -1159,6 +1161,7 @@ class ResourceType {
     'EventSource': eventSource,
     'WebSocket': webSocket,
     'Manifest': manifest,
+    'SignedExchange': signedExchange,
     'Other': other,
   };
 

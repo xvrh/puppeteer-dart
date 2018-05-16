@@ -10,10 +10,10 @@ import 'page.dart' as page;
 /// CSS objects can be loaded using the `get*ForNode()` calls (which accept a DOM node id). A client
 /// can also keep track of stylesheets via the `styleSheetAdded`/`styleSheetRemoved` events and
 /// subsequently load the required stylesheet contents using the `getStyleSheet[Text]()` methods.
-class CSSManager {
+class CSSApi {
   final Client _client;
 
-  CSSManager(this._client);
+  CSSApi(this._client);
 
   /// Fires whenever a web font is updated.  A non-empty font parameter indicates a successfully loaded
   /// web font

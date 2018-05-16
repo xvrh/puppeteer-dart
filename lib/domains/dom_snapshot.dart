@@ -6,10 +6,10 @@ import 'page.dart' as page;
 import 'dom_debugger.dart' as dom_debugger;
 
 /// This domain facilitates obtaining document snapshots with DOM, layout, and style information.
-class DOMSnapshotManager {
+class DOMSnapshotApi {
   final Client _client;
 
-  DOMSnapshotManager(this._client);
+  DOMSnapshotApi(this._client);
 
   /// Returns a document snapshot, including the full DOM tree of the root node (including iframes,
   /// template contents, and imported documents) in a flattened array, as well as layout and
