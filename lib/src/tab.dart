@@ -29,14 +29,14 @@ class Tab extends Object with TabMixin {
 
   Future close() => session.close();
 
-  Future evaluate(String javascriptExpression) async {
+  Future<dynamic> evaluate(String javascriptExpression) async {
     String javascriptFunction = '($javascriptExpression)';
 
     EvaluateResult result = await runtime.evaluate(javascriptFunction,
         returnByValue: true, userGesture: true, awaitPromise: true);
     RemoteObject object = result.result;
 
-    var value = await remoteObject(object);
+    dynamic value = await remoteObject(object);
     return value;
   }
 }

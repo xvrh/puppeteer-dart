@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:chrome_dev_tools/domains/log.dart';
 
 import '../domains/network.dart';
+import '../domains/log.dart';
 
 Future waitUntilNetworkIdle(NetworkApi network,
     {Duration idleDuration: const Duration(milliseconds: 1000),

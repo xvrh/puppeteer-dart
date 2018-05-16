@@ -1,7 +1,8 @@
 import 'dart:async';
 import '../domains/runtime.dart';
 
-Future remoteObject(RuntimeApi runtime, RemoteObject remoteObject) async {
+Future<dynamic> remoteObject(
+    RuntimeApi runtime, RemoteObject remoteObject) async {
   if (remoteObject.subtype == 'error') {
     throw 'RemoteObject has error: ${remoteObject.description}';
   }
@@ -39,7 +40,7 @@ Future remoteObject(RuntimeApi runtime, RemoteObject remoteObject) async {
     final response = await runtime.callFunctionOn('function() { return this; }',
         objectId: remoteObject.objectId, returnByValue: true);
     return response.result.value;
-  } catch (e) {
+  } catch (_) {
     // Return description for unserializable object, e.g. 'window'.
     return remoteObject.description;
   } finally {
@@ -67,7 +68,7 @@ Future releaseObject(RuntimeApi runtime, RemoteObject remoteObject) async {
   if (remoteObject.objectId == null) return;
   try {
     await runtime.releaseObject(remoteObject.objectId);
-  } catch (e) {
+  } catch (_) {
     // Exceptions might happen in case of a page been navigated or closed.
     // Swallow these since they are harmless and we don't leak anything in this case.
   }

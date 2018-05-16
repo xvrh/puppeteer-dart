@@ -71,20 +71,6 @@ class HeadlessExperimentalApi {
     return new BeginFrameResult.fromJson(result);
   }
 
-  /// Puts the browser into deterministic mode.  Only effective for subsequently created web contents.
-  /// Only supported in headless mode.  Once set there's no way of leaving deterministic mode.
-  /// [initialDate] Number of seconds since the Epoch
-  Future enterDeterministicMode({
-    num initialDate,
-  }) async {
-    Map parameters = {};
-    if (initialDate != null) {
-      parameters['initialDate'] = initialDate;
-    }
-    await _client.send(
-        'HeadlessExperimental.enterDeterministicMode', parameters);
-  }
-
   /// Disables headless events for the target.
   Future disable() async {
     await _client.send('HeadlessExperimental.disable');

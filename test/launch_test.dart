@@ -3,8 +3,6 @@ import 'package:chrome_dev_tools/chrome_downloader.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
-import 'utils.dart';
-
 main() {
   Logger.root
     ..level = Level.ALL
@@ -13,8 +11,7 @@ main() {
   test('Can download and start chrome', () async {
     String chromeExecutable = (await downloadChrome()).executablePath;
 
-    Chrome chrome =
-        await Chrome.start(chromeExecutable, noSandboxFlag: forceNoSandboxFlag);
+    Chrome chrome = await Chrome.start(chromeExecutable);
     try {
       //TODO(xha): replace with a local page to minimize external dependencies
       Tab tab = await chrome.newTab('https://www.github.com');

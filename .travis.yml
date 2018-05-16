@@ -17,6 +17,10 @@ dart_task:
 branches:
   only: [master]
 
+env:
+  #In travis/docker we need the --no-sandbox flag in chrome
+  - CHROME_FORCE_NO_SANDBOX=true
+
 cache:
   directories:
     - $HOME/.pub-cache
