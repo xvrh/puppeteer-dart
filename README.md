@@ -193,10 +193,9 @@ main() {
     await tab.waitUntilNetworkIdle();
 
     // Execute some javascript to serialize the document
-    var result = await tab.runtime
-        .evaluate('document.documentElement.outerHTML;', returnByValue: true);
+    String pageContent =
+        await tab.evaluate('document.documentElement.outerHTML');
 
-    String pageContent = result.result.value;
     print(pageContent);
   });
 }
