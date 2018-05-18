@@ -1247,6 +1247,10 @@ class ErrorReason {
       const ErrorReason._('InternetDisconnected');
   static const ErrorReason addressUnreachable =
       const ErrorReason._('AddressUnreachable');
+  static const ErrorReason blockedByClient =
+      const ErrorReason._('BlockedByClient');
+  static const ErrorReason blockedByResponse =
+      const ErrorReason._('BlockedByResponse');
   static const values = const {
     'Failed': failed,
     'Aborted': aborted,
@@ -1260,6 +1264,8 @@ class ErrorReason {
     'NameNotResolved': nameNotResolved,
     'InternetDisconnected': internetDisconnected,
     'AddressUnreachable': addressUnreachable,
+    'BlockedByClient': blockedByClient,
+    'BlockedByResponse': blockedByResponse,
   };
 
   final String value;
@@ -2552,18 +2558,143 @@ class RequestPattern {
   }
 }
 
+/// Information about a signed exchange signature.
+/// https://wicg.github.io/webpackage/draft-yasskin-httpbis-origin-signed-exchanges-impl.html#rfc.section.3.1
+class SignedExchangeSignature {
+  /// Signed exchange signature label.
+  final String label;
+
+  /// Signed exchange signature integrity.
+  final String integrity;
+
+  /// Signed exchange signature cert Url.
+  final String certUrl;
+
+  /// Signed exchange signature validity Url.
+  final String validityUrl;
+
+  /// Signed exchange signature date.
+  final int date;
+
+  /// Signed exchange signature expires.
+  final int expires;
+
+  SignedExchangeSignature({
+    @required this.label,
+    @required this.integrity,
+    @required this.certUrl,
+    @required this.validityUrl,
+    @required this.date,
+    @required this.expires,
+  });
+
+  factory SignedExchangeSignature.fromJson(Map json) {
+    return new SignedExchangeSignature(
+      label: json['label'],
+      integrity: json['integrity'],
+      certUrl: json['certUrl'],
+      validityUrl: json['validityUrl'],
+      date: json['date'],
+      expires: json['expires'],
+    );
+  }
+
+  Map toJson() {
+    Map json = {
+      'label': label,
+      'integrity': integrity,
+      'certUrl': certUrl,
+      'validityUrl': validityUrl,
+      'date': date,
+      'expires': expires,
+    };
+    return json;
+  }
+}
+
+/// Information about a signed exchange header.
+/// https://wicg.github.io/webpackage/draft-yasskin-httpbis-origin-signed-exchanges-impl.html#cbor-representation
+class SignedExchangeHeader {
+  /// Signed exchange request URL.
+  final String requestUrl;
+
+  /// Signed exchange request method.
+  final String requestMethod;
+
+  /// Signed exchange response code.
+  final int responseCode;
+
+  /// Signed exchange response headers.
+  final Headers responseHeaders;
+
+  /// Signed exchange response signature.
+  final List<SignedExchangeSignature> signatures;
+
+  SignedExchangeHeader({
+    @required this.requestUrl,
+    @required this.requestMethod,
+    @required this.responseCode,
+    @required this.responseHeaders,
+    @required this.signatures,
+  });
+
+  factory SignedExchangeHeader.fromJson(Map json) {
+    return new SignedExchangeHeader(
+      requestUrl: json['requestUrl'],
+      requestMethod: json['requestMethod'],
+      responseCode: json['responseCode'],
+      responseHeaders: new Headers.fromJson(json['responseHeaders']),
+      signatures: (json['signatures'] as List)
+          .map((e) => new SignedExchangeSignature.fromJson(e))
+          .toList(),
+    );
+  }
+
+  Map toJson() {
+    Map json = {
+      'requestUrl': requestUrl,
+      'requestMethod': requestMethod,
+      'responseCode': responseCode,
+      'responseHeaders': responseHeaders.toJson(),
+      'signatures': signatures.map((e) => e.toJson()).toList(),
+    };
+    return json;
+  }
+}
+
 /// Information about a signed exchange response.
 class SignedExchangeInfo {
   /// The outer response of signed HTTP exchange which was received from network.
   final Response outerResponse;
 
+  /// Information about the signed exchange header.
+  final SignedExchangeHeader header;
+
+  /// Security details for the signed exchange header.
+  final SecurityDetails securityDetails;
+
+  /// Errors occurred while handling the signed exchagne.
+  final List<String> errors;
+
   SignedExchangeInfo({
     @required this.outerResponse,
+    this.header,
+    this.securityDetails,
+    this.errors,
   });
 
   factory SignedExchangeInfo.fromJson(Map json) {
     return new SignedExchangeInfo(
       outerResponse: new Response.fromJson(json['outerResponse']),
+      header: json.containsKey('header')
+          ? new SignedExchangeHeader.fromJson(json['header'])
+          : null,
+      securityDetails: json.containsKey('securityDetails')
+          ? new SecurityDetails.fromJson(json['securityDetails'])
+          : null,
+      errors: json.containsKey('errors')
+          ? (json['errors'] as List).map((e) => e as String).toList()
+          : null,
     );
   }
 
@@ -2571,6 +2702,15 @@ class SignedExchangeInfo {
     Map json = {
       'outerResponse': outerResponse.toJson(),
     };
+    if (header != null) {
+      json['header'] = header.toJson();
+    }
+    if (securityDetails != null) {
+      json['securityDetails'] = securityDetails.toJson();
+    }
+    if (errors != null) {
+      json['errors'] = errors.map((e) => e).toList();
+    }
     return json;
   }
 }

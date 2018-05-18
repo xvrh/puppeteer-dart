@@ -3,7 +3,6 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'page.dart' as page;
-import 'runtime.dart' as runtime;
 import 'network.dart' as network;
 
 /// This domain emulates different environments for the page.
@@ -245,7 +244,8 @@ class EmulationApi {
   /// [waitForNavigation] If set the virtual time policy change should be deferred until any frame starts navigating.
   /// Note any previous deferred policy change is superseded.
   /// [initialVirtualTime] If set, base::Time::Now will be overriden to initially return this value.
-  Future<SetVirtualTimePolicyResult> setVirtualTimePolicy(
+  /// Returns: Absolute timestamp at which virtual time was first enabled (up time in milliseconds).
+  Future<num> setVirtualTimePolicy(
     VirtualTimePolicy policy, {
     num budget,
     int maxVirtualTimeTaskStarvationCount,
@@ -270,7 +270,7 @@ class EmulationApi {
     }
     Map result =
         await _client.send('Emulation.setVirtualTimePolicy', parameters);
-    return new SetVirtualTimePolicyResult.fromJson(result);
+    return result['virtualTimeTicksBase'];
   }
 
   /// Resizes the frame/viewport of the page. Note that this does not affect the frame's container
@@ -288,26 +288,6 @@ class EmulationApi {
       'height': height,
     };
     await _client.send('Emulation.setVisibleSize', parameters);
-  }
-}
-
-class SetVirtualTimePolicyResult {
-  /// Absolute timestamp at which virtual time was first enabled (milliseconds since epoch).
-  final runtime.Timestamp virtualTimeBase;
-
-  /// Absolute timestamp at which virtual time was first enabled (up time in milliseconds).
-  final num virtualTimeTicksBase;
-
-  SetVirtualTimePolicyResult({
-    @required this.virtualTimeBase,
-    @required this.virtualTimeTicksBase,
-  });
-
-  factory SetVirtualTimePolicyResult.fromJson(Map json) {
-    return new SetVirtualTimePolicyResult(
-      virtualTimeBase: new runtime.Timestamp.fromJson(json['virtualTimeBase']),
-      virtualTimeTicksBase: json['virtualTimeTicksBase'],
-    );
   }
 }
 
