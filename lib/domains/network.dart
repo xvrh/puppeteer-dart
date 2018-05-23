@@ -2191,7 +2191,7 @@ class Initiator {
   /// Initiator JavaScript stack trace, set for Script only.
   final runtime.StackTrace stack;
 
-  /// Initiator URL, set for Parser type or for Script type (when script is importing module).
+  /// Initiator URL, set for Parser type or for Script type (when script is importing module) or for SignedExchange type.
   final String url;
 
   /// Initiator line number, set for Parser type or for Script type (when script is importing
