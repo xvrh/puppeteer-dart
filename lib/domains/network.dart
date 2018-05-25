@@ -2564,11 +2564,17 @@ class SignedExchangeSignature {
   /// Signed exchange signature label.
   final String label;
 
+  /// The hex string of signed exchange signature.
+  final String signature;
+
   /// Signed exchange signature integrity.
   final String integrity;
 
   /// Signed exchange signature cert Url.
   final String certUrl;
+
+  /// The hex string of signed exchange signature cert sha256.
+  final String certSha256;
 
   /// Signed exchange signature validity Url.
   final String validityUrl;
@@ -2579,35 +2585,55 @@ class SignedExchangeSignature {
   /// Signed exchange signature expires.
   final int expires;
 
+  /// The encoded certificates.
+  final List<String> certificates;
+
   SignedExchangeSignature({
     @required this.label,
+    @required this.signature,
     @required this.integrity,
-    @required this.certUrl,
+    this.certUrl,
+    this.certSha256,
     @required this.validityUrl,
     @required this.date,
     @required this.expires,
+    this.certificates,
   });
 
   factory SignedExchangeSignature.fromJson(Map json) {
     return new SignedExchangeSignature(
       label: json['label'],
+      signature: json['signature'],
       integrity: json['integrity'],
-      certUrl: json['certUrl'],
+      certUrl: json.containsKey('certUrl') ? json['certUrl'] : null,
+      certSha256: json.containsKey('certSha256') ? json['certSha256'] : null,
       validityUrl: json['validityUrl'],
       date: json['date'],
       expires: json['expires'],
+      certificates: json.containsKey('certificates')
+          ? (json['certificates'] as List).map((e) => e as String).toList()
+          : null,
     );
   }
 
   Map toJson() {
     Map json = {
       'label': label,
+      'signature': signature,
       'integrity': integrity,
-      'certUrl': certUrl,
       'validityUrl': validityUrl,
       'date': date,
       'expires': expires,
     };
+    if (certUrl != null) {
+      json['certUrl'] = certUrl;
+    }
+    if (certSha256 != null) {
+      json['certSha256'] = certSha256;
+    }
+    if (certificates != null) {
+      json['certificates'] = certificates.map((e) => e).toList();
+    }
     return json;
   }
 }
