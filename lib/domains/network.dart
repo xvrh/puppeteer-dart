@@ -561,12 +561,22 @@ class NetworkApi {
 
   /// Allows overriding user agent with the given string.
   /// [userAgent] User agent to use.
+  /// [acceptLanguage] Browser langugage to emulate.
+  /// [platform] The platform navigator.platform should return.
   Future setUserAgentOverride(
-    String userAgent,
-  ) async {
+    String userAgent, {
+    String acceptLanguage,
+    String platform,
+  }) async {
     Map parameters = {
       'userAgent': userAgent,
     };
+    if (acceptLanguage != null) {
+      parameters['acceptLanguage'] = acceptLanguage;
+    }
+    if (platform != null) {
+      parameters['platform'] = platform;
+    }
     await _client.send('Network.setUserAgentOverride', parameters);
   }
 }

@@ -137,6 +137,16 @@ class EmulationApi {
     await _client.send('Emulation.setDeviceMetricsOverride', parameters);
   }
 
+  /// [hidden] Whether scrollbars should be always hidden.
+  Future setScrollbarsHidden(
+    bool hidden,
+  ) async {
+    Map parameters = {
+      'hidden': hidden,
+    };
+    await _client.send('Emulation.setScrollbarsHidden', parameters);
+  }
+
   /// [enabled] Whether touch emulation based on mouse input should be enabled.
   /// [configuration] Touch/gesture events configuration. Default: current platform.
   Future setEmitTouchEventsForMouse(
@@ -188,6 +198,7 @@ class EmulationApi {
 
   /// Overrides value returned by the javascript navigator object.
   /// [platform] The platform navigator.platform should return.
+  @deprecated
   Future setNavigatorOverrides(
     String platform,
   ) async {
@@ -288,6 +299,27 @@ class EmulationApi {
       'height': height,
     };
     await _client.send('Emulation.setVisibleSize', parameters);
+  }
+
+  /// Allows overriding user agent with the given string.
+  /// [userAgent] User agent to use.
+  /// [acceptLanguage] Browser langugage to emulate.
+  /// [platform] The platform navigator.platform should return.
+  Future setUserAgentOverride(
+    String userAgent, {
+    String acceptLanguage,
+    String platform,
+  }) async {
+    Map parameters = {
+      'userAgent': userAgent,
+    };
+    if (acceptLanguage != null) {
+      parameters['acceptLanguage'] = acceptLanguage;
+    }
+    if (platform != null) {
+      parameters['platform'] = platform;
+    }
+    await _client.send('Emulation.setUserAgentOverride', parameters);
   }
 }
 
