@@ -147,6 +147,16 @@ class EmulationApi {
     await _client.send('Emulation.setScrollbarsHidden', parameters);
   }
 
+  /// [disabled] Whether document.coookie API should be disabled.
+  Future setDocumentCookieDisabled(
+    bool disabled,
+  ) async {
+    Map parameters = {
+      'disabled': disabled,
+    };
+    await _client.send('Emulation.setDocumentCookieDisabled', parameters);
+  }
+
   /// [enabled] Whether touch emulation based on mouse input should be enabled.
   /// [configuration] Touch/gesture events configuration. Default: current platform.
   Future setEmitTouchEventsForMouse(

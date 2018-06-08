@@ -13,9 +13,9 @@ main() {
         new File.fromUri(Platform.script.resolve(fileName)).readAsStringSync());
   }
 
-  Uri libUri = Platform.script.resolve('../lib');
+  String libPath = Platform.script.resolve('../lib').toFilePath();
 
-  Directory targetDir = new Directory(p.join(libUri.path, 'domains'));
+  Directory targetDir = new Directory(p.join(libPath, 'domains'));
   if (targetDir.existsSync()) {
     targetDir.deleteSync(recursive: true);
   }
@@ -127,7 +127,7 @@ abstract class TabMixin {
   tabBuffer.writeln('}');
 
   _writeDartFile(
-      p.join(libUri.path, 'src', 'tab_mixin.dart'), tabBuffer.toString());
+      p.join(libPath, 'src', 'tab_mixin.dart'), tabBuffer.toString());
 }
 
 final DartFormatter _dartFormatter =

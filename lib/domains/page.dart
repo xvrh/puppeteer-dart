@@ -642,6 +642,28 @@ class PageApi {
     await _client.send('Page.setDeviceOrientationOverride', parameters);
   }
 
+  /// Set generic font families.
+  /// [fontFamilies] Specifies font families to set. If a font family is not specified, it won't be changed.
+  Future setFontFamilies(
+    FontFamilies fontFamilies,
+  ) async {
+    Map parameters = {
+      'fontFamilies': fontFamilies.toJson(),
+    };
+    await _client.send('Page.setFontFamilies', parameters);
+  }
+
+  /// Set default font sizes.
+  /// [fontSizes] Specifies font sizes to set. If a font size is not specified, it won't be changed.
+  Future setFontSizes(
+    FontSizes fontSizes,
+  ) async {
+    Map parameters = {
+      'fontSizes': fontSizes.toJson(),
+    };
+    await _client.send('Page.setFontSizes', parameters);
+  }
+
   /// Sets given markup as the document's HTML.
   /// [frameId] Frame id to set HTML for.
   /// [html] HTML content to set.
@@ -1803,6 +1825,110 @@ class Viewport {
       'height': height,
       'scale': scale,
     };
+    return json;
+  }
+}
+
+/// Generic font families collection.
+class FontFamilies {
+  /// The standard font-family.
+  final String standard;
+
+  /// The fixed font-family.
+  final String fixed;
+
+  /// The serif font-family.
+  final String serif;
+
+  /// The sansSerif font-family.
+  final String sansSerif;
+
+  /// The cursive font-family.
+  final String cursive;
+
+  /// The fantasy font-family.
+  final String fantasy;
+
+  /// The pictograph font-family.
+  final String pictograph;
+
+  FontFamilies({
+    this.standard,
+    this.fixed,
+    this.serif,
+    this.sansSerif,
+    this.cursive,
+    this.fantasy,
+    this.pictograph,
+  });
+
+  factory FontFamilies.fromJson(Map json) {
+    return new FontFamilies(
+      standard: json.containsKey('standard') ? json['standard'] : null,
+      fixed: json.containsKey('fixed') ? json['fixed'] : null,
+      serif: json.containsKey('serif') ? json['serif'] : null,
+      sansSerif: json.containsKey('sansSerif') ? json['sansSerif'] : null,
+      cursive: json.containsKey('cursive') ? json['cursive'] : null,
+      fantasy: json.containsKey('fantasy') ? json['fantasy'] : null,
+      pictograph: json.containsKey('pictograph') ? json['pictograph'] : null,
+    );
+  }
+
+  Map toJson() {
+    Map json = {};
+    if (standard != null) {
+      json['standard'] = standard;
+    }
+    if (fixed != null) {
+      json['fixed'] = fixed;
+    }
+    if (serif != null) {
+      json['serif'] = serif;
+    }
+    if (sansSerif != null) {
+      json['sansSerif'] = sansSerif;
+    }
+    if (cursive != null) {
+      json['cursive'] = cursive;
+    }
+    if (fantasy != null) {
+      json['fantasy'] = fantasy;
+    }
+    if (pictograph != null) {
+      json['pictograph'] = pictograph;
+    }
+    return json;
+  }
+}
+
+/// Default font sizes.
+class FontSizes {
+  /// Default standard font size.
+  final int standard;
+
+  /// Default fixed font size.
+  final int fixed;
+
+  FontSizes({
+    this.standard,
+    this.fixed,
+  });
+
+  factory FontSizes.fromJson(Map json) {
+    return new FontSizes(
+      standard: json.containsKey('standard') ? json['standard'] : null,
+      fixed: json.containsKey('fixed') ? json['fixed'] : null,
+    );
+  }
+
+  Map toJson() {
+    Map json = {};
+    if (standard != null) {
+      json['standard'] = standard;
+    }
+    if (fixed != null) {
+      json['fixed'] = fixed;
+    }
     return json;
   }
 }

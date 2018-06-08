@@ -698,14 +698,15 @@ class LoadingFinishedEvent {
   /// Total number of bytes received for this request.
   final num encodedDataLength;
 
-  /// Set when response was blocked due to being cross-site document response.
-  final bool blockedCrossSiteDocument;
+  /// Set when 1) response was blocked by Cross-Origin Read Blocking and also
+  /// 2) this needs to be reported to the DevTools console.
+  final bool shouldReportCorbBlocking;
 
   LoadingFinishedEvent({
     @required this.requestId,
     @required this.timestamp,
     @required this.encodedDataLength,
-    this.blockedCrossSiteDocument,
+    this.shouldReportCorbBlocking,
   });
 
   factory LoadingFinishedEvent.fromJson(Map json) {
@@ -713,8 +714,8 @@ class LoadingFinishedEvent {
       requestId: new RequestId.fromJson(json['requestId']),
       timestamp: new MonotonicTime.fromJson(json['timestamp']),
       encodedDataLength: json['encodedDataLength'],
-      blockedCrossSiteDocument: json.containsKey('blockedCrossSiteDocument')
-          ? json['blockedCrossSiteDocument']
+      shouldReportCorbBlocking: json.containsKey('shouldReportCorbBlocking')
+          ? json['shouldReportCorbBlocking']
           : null,
     );
   }
@@ -2698,6 +2699,83 @@ class SignedExchangeHeader {
   }
 }
 
+/// Field type for a signed exchange related error.
+class SignedExchangeErrorField {
+  static const SignedExchangeErrorField signatureSig =
+      const SignedExchangeErrorField._('signatureSig');
+  static const SignedExchangeErrorField signatureIntegrity =
+      const SignedExchangeErrorField._('signatureIntegrity');
+  static const SignedExchangeErrorField signatureCertUrl =
+      const SignedExchangeErrorField._('signatureCertUrl');
+  static const SignedExchangeErrorField signatureCertSha256 =
+      const SignedExchangeErrorField._('signatureCertSha256');
+  static const SignedExchangeErrorField signatureValidityUrl =
+      const SignedExchangeErrorField._('signatureValidityUrl');
+  static const SignedExchangeErrorField signatureTimestamps =
+      const SignedExchangeErrorField._('signatureTimestamps');
+  static const values = const {
+    'signatureSig': signatureSig,
+    'signatureIntegrity': signatureIntegrity,
+    'signatureCertUrl': signatureCertUrl,
+    'signatureCertSha256': signatureCertSha256,
+    'signatureValidityUrl': signatureValidityUrl,
+    'signatureTimestamps': signatureTimestamps,
+  };
+
+  final String value;
+
+  const SignedExchangeErrorField._(this.value);
+
+  factory SignedExchangeErrorField.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Information about a signed exchange response.
+class SignedExchangeError {
+  /// Error message.
+  final String message;
+
+  /// The index of the signature which caused the error.
+  final int signatureIndex;
+
+  /// The field which caused the error.
+  final SignedExchangeErrorField errorField;
+
+  SignedExchangeError({
+    @required this.message,
+    this.signatureIndex,
+    this.errorField,
+  });
+
+  factory SignedExchangeError.fromJson(Map json) {
+    return new SignedExchangeError(
+      message: json['message'],
+      signatureIndex:
+          json.containsKey('signatureIndex') ? json['signatureIndex'] : null,
+      errorField: json.containsKey('errorField')
+          ? new SignedExchangeErrorField.fromJson(json['errorField'])
+          : null,
+    );
+  }
+
+  Map toJson() {
+    Map json = {
+      'message': message,
+    };
+    if (signatureIndex != null) {
+      json['signatureIndex'] = signatureIndex;
+    }
+    if (errorField != null) {
+      json['errorField'] = errorField.toJson();
+    }
+    return json;
+  }
+}
+
 /// Information about a signed exchange response.
 class SignedExchangeInfo {
   /// The outer response of signed HTTP exchange which was received from network.
@@ -2710,7 +2788,7 @@ class SignedExchangeInfo {
   final SecurityDetails securityDetails;
 
   /// Errors occurred while handling the signed exchagne.
-  final List<String> errors;
+  final List<SignedExchangeError> errors;
 
   SignedExchangeInfo({
     @required this.outerResponse,
@@ -2729,7 +2807,9 @@ class SignedExchangeInfo {
           ? new SecurityDetails.fromJson(json['securityDetails'])
           : null,
       errors: json.containsKey('errors')
-          ? (json['errors'] as List).map((e) => e as String).toList()
+          ? (json['errors'] as List)
+              .map((e) => new SignedExchangeError.fromJson(e))
+              .toList()
           : null,
     );
   }
@@ -2745,7 +2825,7 @@ class SignedExchangeInfo {
       json['securityDetails'] = securityDetails.toJson();
     }
     if (errors != null) {
-      json['errors'] = errors.map((e) => e).toList();
+      json['errors'] = errors.map((e) => e.toJson()).toList();
     }
     return json;
   }
