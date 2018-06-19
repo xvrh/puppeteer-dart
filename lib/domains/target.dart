@@ -87,6 +87,28 @@ class TargetApi {
     return result['success'];
   }
 
+  /// Inject object to the target's main frame that provides a communication
+  /// channel with browser target.
+  ///
+  /// Injected object will be available as `window[bindingName]`.
+  ///
+  /// The object has the follwing API:
+  /// - `binding.send(json)` - a method to send messages over the remote debugging protocol
+  /// - `binding.onmessage = json => handleMessage(json)` - a callback that will be called for the protocol notifications and command responses.
+  /// [bindingName] Binding name, 'cdp' if not specified.
+  Future exposeDevToolsProtocol(
+    TargetID targetId, {
+    String bindingName,
+  }) async {
+    Map parameters = {
+      'targetId': targetId.toJson(),
+    };
+    if (bindingName != null) {
+      parameters['bindingName'] = bindingName;
+    }
+    await _client.send('Target.exposeDevToolsProtocol', parameters);
+  }
+
   /// Creates a new empty BrowserContext. Similar to an incognito profile but you can have more than
   /// one.
   /// Returns: The id of the context created.

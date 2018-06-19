@@ -1551,8 +1551,11 @@ class ResourcePriority {
 
 /// HTTP request data.
 class Request {
-  /// Request URL.
+  /// Request URL (without fragment).
   final String url;
+
+  /// Fragment of the requested URL starting with hash, if present.
+  final String urlFragment;
 
   /// HTTP request method.
   final String method;
@@ -1580,6 +1583,7 @@ class Request {
 
   Request({
     @required this.url,
+    this.urlFragment,
     @required this.method,
     @required this.headers,
     this.postData,
@@ -1593,6 +1597,7 @@ class Request {
   factory Request.fromJson(Map json) {
     return new Request(
       url: json['url'],
+      urlFragment: json.containsKey('urlFragment') ? json['urlFragment'] : null,
       method: json['method'],
       headers: new Headers.fromJson(json['headers']),
       postData: json.containsKey('postData') ? json['postData'] : null,
@@ -1615,6 +1620,9 @@ class Request {
       'initialPriority': initialPriority.toJson(),
       'referrerPolicy': referrerPolicy,
     };
+    if (urlFragment != null) {
+      json['urlFragment'] = urlFragment;
+    }
     if (postData != null) {
       json['postData'] = postData;
     }
@@ -1843,6 +1851,8 @@ class BlockedReason {
       const BlockedReason._('subresource-filter');
   static const BlockedReason contentType =
       const BlockedReason._('content-type');
+  static const BlockedReason collapsedByClient =
+      const BlockedReason._('collapsed-by-client');
   static const values = const {
     'other': other,
     'csp': csp,
@@ -1851,6 +1861,7 @@ class BlockedReason {
     'inspector': inspector,
     'subresource-filter': subresourceFilter,
     'content-type': contentType,
+    'collapsed-by-client': collapsedByClient,
   };
 
   final String value;

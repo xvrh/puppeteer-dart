@@ -1169,6 +1169,9 @@ class ResourceType {
   static const ResourceType manifest = const ResourceType._('Manifest');
   static const ResourceType signedExchange =
       const ResourceType._('SignedExchange');
+  static const ResourceType ping = const ResourceType._('Ping');
+  static const ResourceType cSPViolationReport =
+      const ResourceType._('CSPViolationReport');
   static const ResourceType other = const ResourceType._('Other');
   static const values = const {
     'Document': document,
@@ -1184,6 +1187,8 @@ class ResourceType {
     'WebSocket': webSocket,
     'Manifest': manifest,
     'SignedExchange': signedExchange,
+    'Ping': ping,
+    'CSPViolationReport': cSPViolationReport,
     'Other': other,
   };
 
