@@ -11,6 +11,16 @@ class DOMSnapshotApi {
 
   DOMSnapshotApi(this._client);
 
+  /// Disables DOM snapshot agent for the given page.
+  Future disable() async {
+    await _client.send('DOMSnapshot.disable');
+  }
+
+  /// Enables DOM snapshot agent for the given page.
+  Future enable() async {
+    await _client.send('DOMSnapshot.enable');
+  }
+
   /// Returns a document snapshot, including the full DOM tree of the root node (including iframes,
   /// template contents, and imported documents) in a flattened array, as well as layout and
   /// white-listed computed style information for the nodes. Shadow DOM in the returned DOM tree is
@@ -164,6 +174,9 @@ class DOMNode {
   /// The selected url for nodes with a srcset attribute.
   final String currentSourceURL;
 
+  /// The url of the script (if any) that generates this node.
+  final String originURL;
+
   DOMNode({
     @required this.nodeType,
     @required this.nodeName,
@@ -192,6 +205,7 @@ class DOMNode {
     this.isClickable,
     this.eventListeners,
     this.currentSourceURL,
+    this.originURL,
   });
 
   factory DOMNode.fromJson(Map json) {
@@ -255,6 +269,7 @@ class DOMNode {
       currentSourceURL: json.containsKey('currentSourceURL')
           ? json['currentSourceURL']
           : null,
+      originURL: json.containsKey('originURL') ? json['originURL'] : null,
     );
   }
 
@@ -334,6 +349,9 @@ class DOMNode {
     }
     if (currentSourceURL != null) {
       json['currentSourceURL'] = currentSourceURL;
+    }
+    if (originURL != null) {
+      json['originURL'] = originURL;
     }
     return json;
   }

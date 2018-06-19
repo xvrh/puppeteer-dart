@@ -42,6 +42,11 @@ class TargetApi {
       .map(
           (Event event) => new TargetID.fromJson(event.parameters['targetId']));
 
+  /// Issued when a target has crashed.
+  Stream<TargetCrashedEvent> get onTargetCrashed => _client.onEvent
+      .where((Event event) => event.name == 'Target.targetCrashed')
+      .map((Event event) => new TargetCrashedEvent.fromJson(event.parameters));
+
   /// Issued when some information about a target has changed. This only happens between
   /// `targetCreated` and `targetDestroyed`.
   Stream<TargetInfo> get onTargetInfoChanged => _client.onEvent
@@ -80,6 +85,28 @@ class TargetApi {
     };
     Map result = await _client.send('Target.closeTarget', parameters);
     return result['success'];
+  }
+
+  /// Inject object to the target's main frame that provides a communication
+  /// channel with browser target.
+  ///
+  /// Injected object will be available as `window[bindingName]`.
+  ///
+  /// The object has the follwing API:
+  /// - `binding.send(json)` - a method to send messages over the remote debugging protocol
+  /// - `binding.onmessage = json => handleMessage(json)` - a callback that will be called for the protocol notifications and command responses.
+  /// [bindingName] Binding name, 'cdp' if not specified.
+  Future exposeDevToolsProtocol(
+    TargetID targetId, {
+    String bindingName,
+  }) async {
+    Map parameters = {
+      'targetId': targetId.toJson(),
+    };
+    if (bindingName != null) {
+      parameters['bindingName'] = bindingName;
+    }
+    await _client.send('Target.exposeDevToolsProtocol', parameters);
   }
 
   /// Creates a new empty BrowserContext. Similar to an incognito profile but you can have more than
@@ -298,6 +325,30 @@ class ReceivedMessageFromTargetEvent {
     return new ReceivedMessageFromTargetEvent(
       sessionId: new SessionID.fromJson(json['sessionId']),
       message: json['message'],
+    );
+  }
+}
+
+class TargetCrashedEvent {
+  final TargetID targetId;
+
+  /// Termination status type.
+  final String status;
+
+  /// Termination error code.
+  final int errorCode;
+
+  TargetCrashedEvent({
+    @required this.targetId,
+    @required this.status,
+    @required this.errorCode,
+  });
+
+  factory TargetCrashedEvent.fromJson(Map json) {
+    return new TargetCrashedEvent(
+      targetId: new TargetID.fromJson(json['targetId']),
+      status: json['status'],
+      errorCode: json['errorCode'],
     );
   }
 }

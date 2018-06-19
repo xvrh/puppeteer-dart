@@ -12,6 +12,11 @@ class RuntimeApi {
 
   RuntimeApi(this._client);
 
+  /// Notification is issued every time when binding is called.
+  Stream<BindingCalledEvent> get onBindingCalled => _client.onEvent
+      .where((Event event) => event.name == 'Runtime.bindingCalled')
+      .map((Event event) => new BindingCalledEvent.fromJson(event.parameters));
+
   /// Issued when console API was called.
   Stream<ConsoleAPICalledEvent> get onConsoleAPICalled => _client.onEvent
       .where((Event event) => event.name == 'Runtime.consoleAPICalled')
@@ -398,6 +403,18 @@ class RuntimeApi {
     return new RunScriptResult.fromJson(result);
   }
 
+  /// Enables or disables async call stacks tracking.
+  /// [maxDepth] Maximum depth of async call stacks. Setting to `0` will effectively disable collecting async
+  /// call stacks (default).
+  Future setAsyncCallStackDepth(
+    int maxDepth,
+  ) async {
+    Map parameters = {
+      'maxDepth': maxDepth,
+    };
+    await _client.send('Runtime.setAsyncCallStackDepth', parameters);
+  }
+
   Future setCustomObjectFormatterEnabled(
     bool enabled,
   ) async {
@@ -407,10 +424,75 @@ class RuntimeApi {
     await _client.send('Runtime.setCustomObjectFormatterEnabled', parameters);
   }
 
+  Future setMaxCallStackSizeToCapture(
+    int size,
+  ) async {
+    Map parameters = {
+      'size': size,
+    };
+    await _client.send('Runtime.setMaxCallStackSizeToCapture', parameters);
+  }
+
   /// Terminate current or next JavaScript execution.
   /// Will cancel the termination when the outer-most script execution ends.
   Future terminateExecution() async {
     await _client.send('Runtime.terminateExecution');
+  }
+
+  /// If executionContextId is empty, adds binding with the given name on the
+  /// global objects of all inspected contexts, including those created later,
+  /// bindings survive reloads.
+  /// If executionContextId is specified, adds binding only on global object of
+  /// given execution context.
+  /// Binding function takes exactly one argument, this argument should be string,
+  /// in case of any other input, function throws an exception.
+  /// Each binding function call produces Runtime.bindingCalled notification.
+  Future addBinding(
+    String name, {
+    ExecutionContextId executionContextId,
+  }) async {
+    Map parameters = {
+      'name': name,
+    };
+    if (executionContextId != null) {
+      parameters['executionContextId'] = executionContextId.toJson();
+    }
+    await _client.send('Runtime.addBinding', parameters);
+  }
+
+  /// This method does not remove binding function from global object but
+  /// unsubscribes current runtime agent from Runtime.bindingCalled notifications.
+  Future removeBinding(
+    String name,
+  ) async {
+    Map parameters = {
+      'name': name,
+    };
+    await _client.send('Runtime.removeBinding', parameters);
+  }
+}
+
+class BindingCalledEvent {
+  final String name;
+
+  final String payload;
+
+  /// Identifier of the context where the call was made.
+  final ExecutionContextId executionContextId;
+
+  BindingCalledEvent({
+    @required this.name,
+    @required this.payload,
+    @required this.executionContextId,
+  });
+
+  factory BindingCalledEvent.fromJson(Map json) {
+    return new BindingCalledEvent(
+      name: json['name'],
+      payload: json['payload'],
+      executionContextId:
+          new ExecutionContextId.fromJson(json['executionContextId']),
+    );
   }
 }
 
