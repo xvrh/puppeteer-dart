@@ -164,11 +164,8 @@ class SamplingProfileNode {
 class SamplingProfile {
   final List<SamplingProfileNode> samples;
 
-  final List<Module> modules;
-
   SamplingProfile({
     @required this.samples,
-    @required this.modules,
   });
 
   factory SamplingProfile.fromJson(Map json) {
@@ -176,57 +173,12 @@ class SamplingProfile {
       samples: (json['samples'] as List)
           .map((e) => new SamplingProfileNode.fromJson(e))
           .toList(),
-      modules:
-          (json['modules'] as List).map((e) => new Module.fromJson(e)).toList(),
     );
   }
 
   Map toJson() {
     Map json = {
       'samples': samples.map((e) => e.toJson()).toList(),
-      'modules': modules.map((e) => e.toJson()).toList(),
-    };
-    return json;
-  }
-}
-
-/// Executable module information
-class Module {
-  /// Name of the module.
-  final String name;
-
-  /// UUID of the module.
-  final String uuid;
-
-  /// Base address where the module is loaded into memory. Encoded as a decimal
-  /// or hexadecimal (0x prefixed) string.
-  final String baseAddress;
-
-  /// Size of the module in bytes.
-  final num size;
-
-  Module({
-    @required this.name,
-    @required this.uuid,
-    @required this.baseAddress,
-    @required this.size,
-  });
-
-  factory Module.fromJson(Map json) {
-    return new Module(
-      name: json['name'],
-      uuid: json['uuid'],
-      baseAddress: json['baseAddress'],
-      size: json['size'],
-    );
-  }
-
-  Map toJson() {
-    Map json = {
-      'name': name,
-      'uuid': uuid,
-      'baseAddress': baseAddress,
-      'size': size,
     };
     return json;
   }

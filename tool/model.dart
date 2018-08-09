@@ -9,7 +9,7 @@ class Protocol {
             .toList();
 
   factory Protocol.fromString(String protocol) =>
-      new Protocol.fromJson(jsonDecode(protocol));
+      new Protocol.fromJson(JSON.decode(protocol));
 }
 
 class Domain {
@@ -66,7 +66,7 @@ class ComplexType {
                 .map((j) => new Parameter.fromJson(j))
                 .toList()
             : const [],
-        enums = (json['enum'] as List)?.cast<String>(),
+        enums = json['enum'],
         items = json.containsKey('items')
             ? new ListItems.fromJson(json['items'])
             : null;

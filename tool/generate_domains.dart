@@ -13,9 +13,9 @@ main() {
         new File.fromUri(Platform.script.resolve(fileName)).readAsStringSync());
   }
 
-  String libPath = Platform.script.resolve('../lib').toFilePath();
+  Uri libUri = Platform.script.resolve('../lib');
 
-  Directory targetDir = new Directory(p.join(libPath, 'domains'));
+  Directory targetDir = new Directory(p.join(libUri.path, 'domains'));
   if (targetDir.existsSync()) {
     targetDir.deleteSync(recursive: true);
   }
@@ -126,7 +126,8 @@ abstract class TabMixin {
   }
   tabBuffer.writeln('}');
 
-  _writeDartFile(p.join(libPath, 'src', 'tab_mixin.dart'), tabBuffer.toString());
+  _writeDartFile(
+      p.join(libUri.path, 'src', 'tab_mixin.dart'), tabBuffer.toString());
 }
 
 final DartFormatter _dartFormatter =
@@ -194,7 +195,7 @@ class _Command {
     }
 
     code.writeln(
-        'Future${returnTypeName != null ? '<$returnTypeName>' : ''} $name(');
+        'Future${returnTypeName != null ? '<$returnTypeName>':''} $name(');
     List<Parameter> optionals = parameters.where((p) => p.optional).toList();
     List<Parameter> requireds =
         parameters.where((p) => !optionals.contains(p)).toList();
@@ -315,7 +316,7 @@ class _Event {
 
     String streamName = 'on${firstLetterUpper(name)}';
     code.writeln(
-        'Stream${streamTypeName != null ? '<$streamTypeName>' : ''} get $streamName => '
+        'Stream${streamTypeName != null ? '<$streamTypeName>':''} get $streamName => '
         "_client.onEvent.where((Event event) => event.name == '${context.domain.name}.$name')");
 
     if (parameters.isNotEmpty) {

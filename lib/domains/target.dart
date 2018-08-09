@@ -42,11 +42,6 @@ class TargetApi {
       .map(
           (Event event) => new TargetID.fromJson(event.parameters['targetId']));
 
-  /// Issued when a target has crashed.
-  Stream<TargetCrashedEvent> get onTargetCrashed => _client.onEvent
-      .where((Event event) => event.name == 'Target.targetCrashed')
-      .map((Event event) => new TargetCrashedEvent.fromJson(event.parameters));
-
   /// Issued when some information about a target has changed. This only happens between
   /// `targetCreated` and `targetDestroyed`.
   Stream<TargetInfo> get onTargetInfoChanged => _client.onEvent
@@ -65,26 +60,14 @@ class TargetApi {
   }
 
   /// Attaches to the target with given id.
-  /// [flatten] Enables "flat" access to the session via specifying sessionId attribute in the commands.
   /// Returns: Id assigned to the session.
   Future<SessionID> attachToTarget(
-    TargetID targetId, {
-    bool flatten,
-  }) async {
+    TargetID targetId,
+  ) async {
     Map parameters = {
       'targetId': targetId.toJson(),
     };
-    if (flatten != null) {
-      parameters['flatten'] = flatten;
-    }
     Map result = await _client.send('Target.attachToTarget', parameters);
-    return new SessionID.fromJson(result['sessionId']);
-  }
-
-  /// Attaches to the browser target, only uses flat sessionId mode.
-  /// Returns: Id assigned to the session.
-  Future<SessionID> attachToBrowserTarget() async {
-    Map result = await _client.send('Target.attachToBrowserTarget');
     return new SessionID.fromJson(result['sessionId']);
   }
 
@@ -97,28 +80,6 @@ class TargetApi {
     };
     Map result = await _client.send('Target.closeTarget', parameters);
     return result['success'];
-  }
-
-  /// Inject object to the target's main frame that provides a communication
-  /// channel with browser target.
-  ///
-  /// Injected object will be available as `window[bindingName]`.
-  ///
-  /// The object has the follwing API:
-  /// - `binding.send(json)` - a method to send messages over the remote debugging protocol
-  /// - `binding.onmessage = json => handleMessage(json)` - a callback that will be called for the protocol notifications and command responses.
-  /// [bindingName] Binding name, 'cdp' if not specified.
-  Future exposeDevToolsProtocol(
-    TargetID targetId, {
-    String bindingName,
-  }) async {
-    Map parameters = {
-      'targetId': targetId.toJson(),
-    };
-    if (bindingName != null) {
-      parameters['bindingName'] = bindingName;
-    }
-    await _client.send('Target.exposeDevToolsProtocol', parameters);
   }
 
   /// Creates a new empty BrowserContext. Similar to an incognito profile but you can have more than
@@ -202,13 +163,12 @@ class TargetApi {
   }
 
   /// Returns information about a target.
-  Future<TargetInfo> getTargetInfo({
+  Future<TargetInfo> getTargetInfo(
     TargetID targetId,
-  }) async {
-    Map parameters = {};
-    if (targetId != null) {
-      parameters['targetId'] = targetId.toJson();
-    }
+  ) async {
+    Map parameters = {
+      'targetId': targetId.toJson(),
+    };
     Map result = await _client.send('Target.getTargetInfo', parameters);
     return new TargetInfo.fromJson(result['targetInfo']);
   }
@@ -249,19 +209,14 @@ class TargetApi {
   /// [autoAttach] Whether to auto-attach to related targets.
   /// [waitForDebuggerOnStart] Whether to pause new targets when attaching to them. Use `Runtime.runIfWaitingForDebugger`
   /// to run paused targets.
-  /// [flatten] Enables "flat" access to the session via specifying sessionId attribute in the commands.
   Future setAutoAttach(
     bool autoAttach,
-    bool waitForDebuggerOnStart, {
-    bool flatten,
-  }) async {
+    bool waitForDebuggerOnStart,
+  ) async {
     Map parameters = {
       'autoAttach': autoAttach,
       'waitForDebuggerOnStart': waitForDebuggerOnStart,
     };
-    if (flatten != null) {
-      parameters['flatten'] = flatten;
-    }
     await _client.send('Target.setAutoAttach', parameters);
   }
 
@@ -343,30 +298,6 @@ class ReceivedMessageFromTargetEvent {
     return new ReceivedMessageFromTargetEvent(
       sessionId: new SessionID.fromJson(json['sessionId']),
       message: json['message'],
-    );
-  }
-}
-
-class TargetCrashedEvent {
-  final TargetID targetId;
-
-  /// Termination status type.
-  final String status;
-
-  /// Termination error code.
-  final int errorCode;
-
-  TargetCrashedEvent({
-    @required this.targetId,
-    @required this.status,
-    @required this.errorCode,
-  });
-
-  factory TargetCrashedEvent.fromJson(Map json) {
-    return new TargetCrashedEvent(
-      targetId: new TargetID.fromJson(json['targetId']),
-      status: json['status'],
-      errorCode: json['errorCode'],
     );
   }
 }

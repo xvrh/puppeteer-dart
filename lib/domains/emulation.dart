@@ -3,6 +3,7 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'page.dart' as page;
+import 'runtime.dart' as runtime;
 import 'network.dart' as network;
 
 /// This domain emulates different environments for the page.
@@ -137,26 +138,6 @@ class EmulationApi {
     await _client.send('Emulation.setDeviceMetricsOverride', parameters);
   }
 
-  /// [hidden] Whether scrollbars should be always hidden.
-  Future setScrollbarsHidden(
-    bool hidden,
-  ) async {
-    Map parameters = {
-      'hidden': hidden,
-    };
-    await _client.send('Emulation.setScrollbarsHidden', parameters);
-  }
-
-  /// [disabled] Whether document.coookie API should be disabled.
-  Future setDocumentCookieDisabled(
-    bool disabled,
-  ) async {
-    Map parameters = {
-      'disabled': disabled,
-    };
-    await _client.send('Emulation.setDocumentCookieDisabled', parameters);
-  }
-
   /// [enabled] Whether touch emulation based on mouse input should be enabled.
   /// [configuration] Touch/gesture events configuration. Default: current platform.
   Future setEmitTouchEventsForMouse(
@@ -208,7 +189,6 @@ class EmulationApi {
 
   /// Overrides value returned by the javascript navigator object.
   /// [platform] The platform navigator.platform should return.
-  @deprecated
   Future setNavigatorOverrides(
     String platform,
   ) async {
@@ -265,8 +245,7 @@ class EmulationApi {
   /// [waitForNavigation] If set the virtual time policy change should be deferred until any frame starts navigating.
   /// Note any previous deferred policy change is superseded.
   /// [initialVirtualTime] If set, base::Time::Now will be overriden to initially return this value.
-  /// Returns: Absolute timestamp at which virtual time was first enabled (up time in milliseconds).
-  Future<num> setVirtualTimePolicy(
+  Future<SetVirtualTimePolicyResult> setVirtualTimePolicy(
     VirtualTimePolicy policy, {
     num budget,
     int maxVirtualTimeTaskStarvationCount,
@@ -291,7 +270,7 @@ class EmulationApi {
     }
     Map result =
         await _client.send('Emulation.setVirtualTimePolicy', parameters);
-    return result['virtualTimeTicksBase'];
+    return new SetVirtualTimePolicyResult.fromJson(result);
   }
 
   /// Resizes the frame/viewport of the page. Note that this does not affect the frame's container
@@ -310,26 +289,25 @@ class EmulationApi {
     };
     await _client.send('Emulation.setVisibleSize', parameters);
   }
+}
 
-  /// Allows overriding user agent with the given string.
-  /// [userAgent] User agent to use.
-  /// [acceptLanguage] Browser langugage to emulate.
-  /// [platform] The platform navigator.platform should return.
-  Future setUserAgentOverride(
-    String userAgent, {
-    String acceptLanguage,
-    String platform,
-  }) async {
-    Map parameters = {
-      'userAgent': userAgent,
-    };
-    if (acceptLanguage != null) {
-      parameters['acceptLanguage'] = acceptLanguage;
-    }
-    if (platform != null) {
-      parameters['platform'] = platform;
-    }
-    await _client.send('Emulation.setUserAgentOverride', parameters);
+class SetVirtualTimePolicyResult {
+  /// Absolute timestamp at which virtual time was first enabled (milliseconds since epoch).
+  final runtime.Timestamp virtualTimeBase;
+
+  /// Absolute timestamp at which virtual time was first enabled (up time in milliseconds).
+  final num virtualTimeTicksBase;
+
+  SetVirtualTimePolicyResult({
+    @required this.virtualTimeBase,
+    @required this.virtualTimeTicksBase,
+  });
+
+  factory SetVirtualTimePolicyResult.fromJson(Map json) {
+    return new SetVirtualTimePolicyResult(
+      virtualTimeBase: new runtime.Timestamp.fromJson(json['virtualTimeBase']),
+      virtualTimeTicksBase: json['virtualTimeTicksBase'],
+    );
   }
 }
 

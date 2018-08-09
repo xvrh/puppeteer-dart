@@ -1,10 +1,5 @@
 # Changelog
 
-## 0.0.5
-- Dart 2
-- Upgrade chrome to 579032
-- Update protocol
-
 ## 0.0.4
 - Upgrade chrome to 557152
 - Update protocol

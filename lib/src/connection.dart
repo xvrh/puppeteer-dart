@@ -66,7 +66,7 @@ class Connection implements Client {
 
     _logger.fine('SEND ► $message');
 
-    var completer = new Completer<Map>();
+    Completer completer = new Completer();
     _completers[id] = completer;
     _webSocket.add(message);
 
@@ -83,9 +83,8 @@ class Connection implements Client {
     return session;
   }
 
-  _onMessage(messageArg) {
-    String message = messageArg;
-    Map object = jsonDecode(message);
+  _onMessage(String message) {
+    Map object = JSON.decode(message);
     int id = object['id'];
     if (id != null) {
       _logger.fine('◀ RECV $message');
@@ -129,7 +128,7 @@ class Connection implements Client {
 }
 
 String _encodeMessage(int id, String method, Map parameters) {
-  return jsonEncode({
+  return JSON.encode({
     'id': id,
     'method': method,
     'params': parameters,
@@ -158,7 +157,7 @@ class Session implements Client {
     int id = ++_lastId;
     String message = _encodeMessage(id, method, parameters);
 
-    var completer = new Completer<Map>();
+    Completer completer = new Completer();
     _completers[id] = completer;
 
     _targetApi.sendMessageToTarget(message, sessionId: sessionId);
@@ -170,7 +169,7 @@ class Session implements Client {
   Stream<Event> get onEvent => _eventController.stream;
 
   _onMessage(String message) {
-    Map object = jsonDecode(message);
+    Map object = JSON.decode(message);
 
     int id = object['id'];
     if (id != null) {

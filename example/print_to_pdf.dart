@@ -12,7 +12,7 @@ main() {
     await tab.waitUntilNetworkIdle();
 
     // Capture the PDF and convert it to a List of bytes.
-    List<int> pdf = base64.decode(await tab.page.printToPDF(
+    List<int> pdf = BASE64.decode(await tab.page.printToPDF(
         pageRanges: '1',
         landscape: true,
         printBackground: true,
