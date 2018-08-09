@@ -32,13 +32,18 @@ class BrowserApi {
   /// [query] Requested substring in name. Only histograms which have query as a
   /// substring in their name are extracted. An empty or absent query returns
   /// all histograms.
+  /// [delta] If true, retrieve delta since last call.
   /// Returns: Histograms.
   Future<List<Histogram>> getHistograms({
     String query,
+    bool delta,
   }) async {
     Map parameters = {};
     if (query != null) {
       parameters['query'] = query;
+    }
+    if (delta != null) {
+      parameters['delta'] = delta;
     }
     Map result = await _client.send('Browser.getHistograms', parameters);
     return (result['histograms'] as List)
@@ -48,13 +53,18 @@ class BrowserApi {
 
   /// Get a Chrome histogram by name.
   /// [name] Requested histogram name.
+  /// [delta] If true, retrieve delta since last call.
   /// Returns: Histogram.
   Future<Histogram> getHistogram(
-    String name,
-  ) async {
+    String name, {
+    bool delta,
+  }) async {
     Map parameters = {
       'name': name,
     };
+    if (delta != null) {
+      parameters['delta'] = delta;
+    }
     Map result = await _client.send('Browser.getHistogram', parameters);
     return new Histogram.fromJson(result['histogram']);
   }

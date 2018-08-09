@@ -132,7 +132,7 @@ class Chrome {
       // With `process.kill`, it seems that chrome retain a lock on the user-data directory
       Process.runSync('taskkill', ['/pid', process.pid.toString(), '/T', '/F']);
     } else {
-      process.kill(ProcessSignal.SIGINT);
+      process.kill(ProcessSignal.sigint);
     }
 
     return process.exitCode;

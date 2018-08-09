@@ -259,6 +259,31 @@ class DOMApi {
     return new BoxModel.fromJson(result['model']);
   }
 
+  /// Returns quads that describe node position on the page. This method
+  /// might return multiple quads for inline nodes.
+  /// [nodeId] Identifier of the node.
+  /// [backendNodeId] Identifier of the backend node.
+  /// [objectId] JavaScript object id of the node wrapper.
+  /// Returns: Quads that describe node layout relative to viewport.
+  Future<List<Quad>> getContentQuads({
+    NodeId nodeId,
+    BackendNodeId backendNodeId,
+    runtime.RemoteObjectId objectId,
+  }) async {
+    Map parameters = {};
+    if (nodeId != null) {
+      parameters['nodeId'] = nodeId.toJson();
+    }
+    if (backendNodeId != null) {
+      parameters['backendNodeId'] = backendNodeId.toJson();
+    }
+    if (objectId != null) {
+      parameters['objectId'] = objectId.toJson();
+    }
+    Map result = await _client.send('DOM.getContentQuads', parameters);
+    return (result['quads'] as List).map((e) => new Quad.fromJson(e)).toList();
+  }
+
   /// Returns the root DOM node (and optionally the subtree) to the caller.
   /// [depth] The maximum depth at which children should be retrieved, defaults to 1. Use -1 for the
   /// entire subtree or provide an integer larger than 0.
