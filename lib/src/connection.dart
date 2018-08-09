@@ -5,8 +5,8 @@ import 'package:logging/logging.dart';
 import '../domains/target.dart';
 
 abstract class Client {
-  Future<Map<String, dynamic>> send(String method,
-      [Map<String, dynamic> parameters]);
+  Future<Map> send(String method,
+      [Map parameters]);
   Stream<Event> get onEvent;
 }
 
@@ -61,8 +61,8 @@ class Connection implements Client {
   Stream<Event> get onEvent => _eventController.stream;
 
   @override
-  Future<Map<String, dynamic>> send(String method,
-      [Map<String, dynamic> parameters]) {
+  Future<Map> send(String method,
+      [Map parameters]) {
     int id = ++_lastId;
     String message = _encodeMessage(id, method, parameters);
 
@@ -153,8 +153,8 @@ class Session implements Client {
       : _browserContextID = browserContextID;
 
   @override
-  Future<Map<String, dynamic>> send(String method,
-      [Map<String, dynamic> parameters]) {
+  Future<Map> send(String method,
+      [Map parameters]) {
     if (_eventController.isClosed) {
       throw new Exception('Session closed');
     }

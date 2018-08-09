@@ -71,7 +71,7 @@ main() {
     await tab.waitUntilNetworkIdle();
 
     // Capture the PDF and convert it to a List of bytes.
-    List<int> pdf = BASE64.decode(await tab.page.printToPDF(
+    List<int> pdf = base64.decode(await tab.page.printToPDF(
         pageRanges: '1',
         landscape: true,
         printBackground: true,
@@ -111,7 +111,7 @@ main() {
 
     // Save it to a file
     await new File.fromUri(Platform.script.resolve('_github.png'))
-        .writeAsBytes(BASE64.decode(screenshot));
+        .writeAsBytes(base64.decode(screenshot));
   });
 }
 ```
@@ -149,7 +149,7 @@ main() {
 
     // Save it to a file
     await new File.fromUri(Platform.script.resolve('_github_form.png'))
-        .writeAsBytes(BASE64.decode(screenshot));
+        .writeAsBytes(base64.decode(screenshot));
   });
 }
 ```
