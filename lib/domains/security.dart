@@ -14,15 +14,14 @@ class SecurityApi {
   /// certificate errors at the same time.
   Stream<CertificateErrorEvent> get onCertificateError => _client.onEvent
       .where((Event event) => event.name == 'Security.certificateError')
-      .map((Event event) =>
-          new CertificateErrorEvent.fromJson(event.parameters));
+      .map((Event event) => CertificateErrorEvent.fromJson(event.parameters));
 
   /// The security state of the page changed.
   Stream<SecurityStateChangedEvent> get onSecurityStateChanged =>
       _client.onEvent
           .where((Event event) => event.name == 'Security.securityStateChanged')
           .map((Event event) =>
-              new SecurityStateChangedEvent.fromJson(event.parameters));
+              SecurityStateChangedEvent.fromJson(event.parameters));
 
   /// Disables tracking security state changes.
   Future disable() async {
@@ -91,7 +90,7 @@ class CertificateErrorEvent {
   });
 
   factory CertificateErrorEvent.fromJson(Map<String, dynamic> json) {
-    return new CertificateErrorEvent(
+    return CertificateErrorEvent(
       eventId: json['eventId'],
       errorType: json['errorType'],
       requestURL: json['requestURL'],
@@ -125,14 +124,14 @@ class SecurityStateChangedEvent {
   });
 
   factory SecurityStateChangedEvent.fromJson(Map<String, dynamic> json) {
-    return new SecurityStateChangedEvent(
-      securityState: new SecurityState.fromJson(json['securityState']),
+    return SecurityStateChangedEvent(
+      securityState: SecurityState.fromJson(json['securityState']),
       schemeIsCryptographic: json['schemeIsCryptographic'],
       explanations: (json['explanations'] as List)
-          .map((e) => new SecurityStateExplanation.fromJson(e))
+          .map((e) => SecurityStateExplanation.fromJson(e))
           .toList(),
       insecureContentStatus:
-          new InsecureContentStatus.fromJson(json['insecureContentStatus']),
+          InsecureContentStatus.fromJson(json['insecureContentStatus']),
       summary: json.containsKey('summary') ? json['summary'] : null,
     );
   }
@@ -144,7 +143,7 @@ class CertificateId {
 
   CertificateId(this.value);
 
-  factory CertificateId.fromJson(int value) => new CertificateId(value);
+  factory CertificateId.fromJson(int value) => CertificateId(value);
 
   int toJson() => value;
 
@@ -241,12 +240,12 @@ class SecurityStateExplanation {
   });
 
   factory SecurityStateExplanation.fromJson(Map<String, dynamic> json) {
-    return new SecurityStateExplanation(
-      securityState: new SecurityState.fromJson(json['securityState']),
+    return SecurityStateExplanation(
+      securityState: SecurityState.fromJson(json['securityState']),
       title: json['title'],
       summary: json['summary'],
       description: json['description'],
-      mixedContentType: new MixedContentType.fromJson(json['mixedContentType']),
+      mixedContentType: MixedContentType.fromJson(json['mixedContentType']),
       certificate:
           (json['certificate'] as List).map((e) => e as String).toList(),
     );
@@ -301,16 +300,16 @@ class InsecureContentStatus {
   });
 
   factory InsecureContentStatus.fromJson(Map<String, dynamic> json) {
-    return new InsecureContentStatus(
+    return InsecureContentStatus(
       ranMixedContent: json['ranMixedContent'],
       displayedMixedContent: json['displayedMixedContent'],
       containedMixedForm: json['containedMixedForm'],
       ranContentWithCertErrors: json['ranContentWithCertErrors'],
       displayedContentWithCertErrors: json['displayedContentWithCertErrors'],
       ranInsecureContentStyle:
-          new SecurityState.fromJson(json['ranInsecureContentStyle']),
+          SecurityState.fromJson(json['ranInsecureContentStyle']),
       displayedInsecureContentStyle:
-          new SecurityState.fromJson(json['displayedInsecureContentStyle']),
+          SecurityState.fromJson(json['displayedInsecureContentStyle']),
     );
   }
 

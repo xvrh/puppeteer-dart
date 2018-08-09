@@ -13,14 +13,14 @@ class ProfilerApi {
       .onEvent
       .where((Event event) => event.name == 'Profiler.consoleProfileFinished')
       .map((Event event) =>
-          new ConsoleProfileFinishedEvent.fromJson(event.parameters));
+          ConsoleProfileFinishedEvent.fromJson(event.parameters));
 
   /// Sent when new profile recording is started using console.profile() call.
   Stream<ConsoleProfileStartedEvent> get onConsoleProfileStarted => _client
       .onEvent
       .where((Event event) => event.name == 'Profiler.consoleProfileStarted')
       .map((Event event) =>
-          new ConsoleProfileStartedEvent.fromJson(event.parameters));
+          ConsoleProfileStartedEvent.fromJson(event.parameters));
 
   Future disable() async {
     await _client.send('Profiler.disable');
@@ -36,7 +36,7 @@ class ProfilerApi {
   Future<List<ScriptCoverage>> getBestEffortCoverage() async {
     var result = await _client.send('Profiler.getBestEffortCoverage');
     return (result['result'] as List)
-        .map((e) => new ScriptCoverage.fromJson(e))
+        .map((e) => ScriptCoverage.fromJson(e))
         .toList();
   }
 
@@ -82,7 +82,7 @@ class ProfilerApi {
   /// Returns: Recorded profile.
   Future<Profile> stop() async {
     var result = await _client.send('Profiler.stop');
-    return new Profile.fromJson(result['profile']);
+    return Profile.fromJson(result['profile']);
   }
 
   /// Disable precise code coverage. Disabling releases unnecessary execution count records and allows
@@ -102,7 +102,7 @@ class ProfilerApi {
   Future<List<ScriptCoverage>> takePreciseCoverage() async {
     var result = await _client.send('Profiler.takePreciseCoverage');
     return (result['result'] as List)
-        .map((e) => new ScriptCoverage.fromJson(e))
+        .map((e) => ScriptCoverage.fromJson(e))
         .toList();
   }
 
@@ -111,7 +111,7 @@ class ProfilerApi {
   Future<List<ScriptTypeProfile>> takeTypeProfile() async {
     var result = await _client.send('Profiler.takeTypeProfile');
     return (result['result'] as List)
-        .map((e) => new ScriptTypeProfile.fromJson(e))
+        .map((e) => ScriptTypeProfile.fromJson(e))
         .toList();
   }
 }
@@ -135,10 +135,10 @@ class ConsoleProfileFinishedEvent {
   });
 
   factory ConsoleProfileFinishedEvent.fromJson(Map<String, dynamic> json) {
-    return new ConsoleProfileFinishedEvent(
+    return ConsoleProfileFinishedEvent(
       id: json['id'],
-      location: new debugger.Location.fromJson(json['location']),
-      profile: new Profile.fromJson(json['profile']),
+      location: debugger.Location.fromJson(json['location']),
+      profile: Profile.fromJson(json['profile']),
       title: json.containsKey('title') ? json['title'] : null,
     );
   }
@@ -160,9 +160,9 @@ class ConsoleProfileStartedEvent {
   });
 
   factory ConsoleProfileStartedEvent.fromJson(Map<String, dynamic> json) {
-    return new ConsoleProfileStartedEvent(
+    return ConsoleProfileStartedEvent(
       id: json['id'],
-      location: new debugger.Location.fromJson(json['location']),
+      location: debugger.Location.fromJson(json['location']),
       title: json.containsKey('title') ? json['title'] : null,
     );
   }
@@ -199,9 +199,9 @@ class ProfileNode {
   });
 
   factory ProfileNode.fromJson(Map<String, dynamic> json) {
-    return new ProfileNode(
+    return ProfileNode(
       id: json['id'],
-      callFrame: new runtime.CallFrame.fromJson(json['callFrame']),
+      callFrame: runtime.CallFrame.fromJson(json['callFrame']),
       hitCount: json.containsKey('hitCount') ? json['hitCount'] : null,
       children: json.containsKey('children')
           ? (json['children'] as List).map((e) => e as int).toList()
@@ -209,7 +209,7 @@ class ProfileNode {
       deoptReason: json.containsKey('deoptReason') ? json['deoptReason'] : null,
       positionTicks: json.containsKey('positionTicks')
           ? (json['positionTicks'] as List)
-              .map((e) => new PositionTickInfo.fromJson(e))
+              .map((e) => PositionTickInfo.fromJson(e))
               .toList()
           : null,
     );
@@ -263,10 +263,9 @@ class Profile {
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) {
-    return new Profile(
-      nodes: (json['nodes'] as List)
-          .map((e) => new ProfileNode.fromJson(e))
-          .toList(),
+    return Profile(
+      nodes:
+          (json['nodes'] as List).map((e) => ProfileNode.fromJson(e)).toList(),
       startTime: json['startTime'],
       endTime: json['endTime'],
       samples: json.containsKey('samples')
@@ -308,7 +307,7 @@ class PositionTickInfo {
   });
 
   factory PositionTickInfo.fromJson(Map<String, dynamic> json) {
-    return new PositionTickInfo(
+    return PositionTickInfo(
       line: json['line'],
       ticks: json['ticks'],
     );
@@ -341,7 +340,7 @@ class CoverageRange {
   });
 
   factory CoverageRange.fromJson(Map<String, dynamic> json) {
-    return new CoverageRange(
+    return CoverageRange(
       startOffset: json['startOffset'],
       endOffset: json['endOffset'],
       count: json['count'],
@@ -376,10 +375,10 @@ class FunctionCoverage {
   });
 
   factory FunctionCoverage.fromJson(Map<String, dynamic> json) {
-    return new FunctionCoverage(
+    return FunctionCoverage(
       functionName: json['functionName'],
       ranges: (json['ranges'] as List)
-          .map((e) => new CoverageRange.fromJson(e))
+          .map((e) => CoverageRange.fromJson(e))
           .toList(),
       isBlockCoverage: json['isBlockCoverage'],
     );
@@ -413,11 +412,11 @@ class ScriptCoverage {
   });
 
   factory ScriptCoverage.fromJson(Map<String, dynamic> json) {
-    return new ScriptCoverage(
-      scriptId: new runtime.ScriptId.fromJson(json['scriptId']),
+    return ScriptCoverage(
+      scriptId: runtime.ScriptId.fromJson(json['scriptId']),
       url: json['url'],
       functions: (json['functions'] as List)
-          .map((e) => new FunctionCoverage.fromJson(e))
+          .map((e) => FunctionCoverage.fromJson(e))
           .toList(),
     );
   }
@@ -442,7 +441,7 @@ class TypeObject {
   });
 
   factory TypeObject.fromJson(Map<String, dynamic> json) {
-    return new TypeObject(
+    return TypeObject(
       name: json['name'],
     );
   }
@@ -469,11 +468,10 @@ class TypeProfileEntry {
   });
 
   factory TypeProfileEntry.fromJson(Map<String, dynamic> json) {
-    return new TypeProfileEntry(
+    return TypeProfileEntry(
       offset: json['offset'],
-      types: (json['types'] as List)
-          .map((e) => new TypeObject.fromJson(e))
-          .toList(),
+      types:
+          (json['types'] as List).map((e) => TypeObject.fromJson(e)).toList(),
     );
   }
 
@@ -504,11 +502,11 @@ class ScriptTypeProfile {
   });
 
   factory ScriptTypeProfile.fromJson(Map<String, dynamic> json) {
-    return new ScriptTypeProfile(
-      scriptId: new runtime.ScriptId.fromJson(json['scriptId']),
+    return ScriptTypeProfile(
+      scriptId: runtime.ScriptId.fromJson(json['scriptId']),
       url: json['url'],
       entries: (json['entries'] as List)
-          .map((e) => new TypeProfileEntry.fromJson(e))
+          .map((e) => TypeProfileEntry.fromJson(e))
           .toList(),
     );
   }

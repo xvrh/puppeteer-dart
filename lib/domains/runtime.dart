@@ -15,38 +15,35 @@ class RuntimeApi {
   /// Notification is issued every time when binding is called.
   Stream<BindingCalledEvent> get onBindingCalled => _client.onEvent
       .where((Event event) => event.name == 'Runtime.bindingCalled')
-      .map((Event event) => new BindingCalledEvent.fromJson(event.parameters));
+      .map((Event event) => BindingCalledEvent.fromJson(event.parameters));
 
   /// Issued when console API was called.
   Stream<ConsoleAPICalledEvent> get onConsoleAPICalled => _client.onEvent
       .where((Event event) => event.name == 'Runtime.consoleAPICalled')
-      .map((Event event) =>
-          new ConsoleAPICalledEvent.fromJson(event.parameters));
+      .map((Event event) => ConsoleAPICalledEvent.fromJson(event.parameters));
 
   /// Issued when unhandled exception was revoked.
   Stream<ExceptionRevokedEvent> get onExceptionRevoked => _client.onEvent
       .where((Event event) => event.name == 'Runtime.exceptionRevoked')
-      .map((Event event) =>
-          new ExceptionRevokedEvent.fromJson(event.parameters));
+      .map((Event event) => ExceptionRevokedEvent.fromJson(event.parameters));
 
   /// Issued when exception was thrown and unhandled.
   Stream<ExceptionThrownEvent> get onExceptionThrown => _client.onEvent
       .where((Event event) => event.name == 'Runtime.exceptionThrown')
-      .map(
-          (Event event) => new ExceptionThrownEvent.fromJson(event.parameters));
+      .map((Event event) => ExceptionThrownEvent.fromJson(event.parameters));
 
   /// Issued when new execution context is created.
   Stream<ExecutionContextDescription> get onExecutionContextCreated => _client
       .onEvent
       .where((Event event) => event.name == 'Runtime.executionContextCreated')
-      .map((Event event) => new ExecutionContextDescription.fromJson(
-          event.parameters['context']));
+      .map((Event event) =>
+          ExecutionContextDescription.fromJson(event.parameters['context']));
 
   /// Issued when execution context is destroyed.
   Stream<ExecutionContextId> get onExecutionContextDestroyed => _client.onEvent
       .where((Event event) => event.name == 'Runtime.executionContextDestroyed')
-      .map((Event event) => new ExecutionContextId.fromJson(
-          event.parameters['executionContextId']));
+      .map((Event event) =>
+          ExecutionContextId.fromJson(event.parameters['executionContextId']));
 
   /// Issued when all executionContexts were cleared in browser
   Stream get onExecutionContextsCleared => _client.onEvent
@@ -56,8 +53,7 @@ class RuntimeApi {
   /// call).
   Stream<InspectRequestedEvent> get onInspectRequested => _client.onEvent
       .where((Event event) => event.name == 'Runtime.inspectRequested')
-      .map((Event event) =>
-          new InspectRequestedEvent.fromJson(event.parameters));
+      .map((Event event) => InspectRequestedEvent.fromJson(event.parameters));
 
   /// Add handler to promise with given promise object id.
   /// [promiseObjectId] Identifier of the promise.
@@ -78,7 +74,7 @@ class RuntimeApi {
       parameters['generatePreview'] = generatePreview;
     }
     var result = await _client.send('Runtime.awaitPromise', parameters);
-    return new AwaitPromiseResult.fromJson(result);
+    return AwaitPromiseResult.fromJson(result);
   }
 
   /// Calls function with given declaration on the given object. Object group of the result is
@@ -142,7 +138,7 @@ class RuntimeApi {
       parameters['objectGroup'] = objectGroup;
     }
     var result = await _client.send('Runtime.callFunctionOn', parameters);
-    return new CallFunctionOnResult.fromJson(result);
+    return CallFunctionOnResult.fromJson(result);
   }
 
   /// Compiles expression.
@@ -166,7 +162,7 @@ class RuntimeApi {
       parameters['executionContextId'] = executionContextId.toJson();
     }
     var result = await _client.send('Runtime.compileScript', parameters);
-    return new CompileScriptResult.fromJson(result);
+    return CompileScriptResult.fromJson(result);
   }
 
   /// Disables reporting of execution contexts creation.
@@ -248,7 +244,7 @@ class RuntimeApi {
       parameters['timeout'] = timeout.toJson();
     }
     var result = await _client.send('Runtime.evaluate', parameters);
-    return new EvaluateResult.fromJson(result);
+    return EvaluateResult.fromJson(result);
   }
 
   /// Returns the isolate id.
@@ -262,7 +258,7 @@ class RuntimeApi {
   /// It is the total usage of the corresponding isolate not scoped to a particular Runtime.
   Future<GetHeapUsageResult> getHeapUsage() async {
     var result = await _client.send('Runtime.getHeapUsage');
-    return new GetHeapUsageResult.fromJson(result);
+    return GetHeapUsageResult.fromJson(result);
   }
 
   /// Returns properties of a given object. Object group of the result is inherited from the target
@@ -292,7 +288,7 @@ class RuntimeApi {
       parameters['generatePreview'] = generatePreview;
     }
     var result = await _client.send('Runtime.getProperties', parameters);
-    return new GetPropertiesResult.fromJson(result);
+    return GetPropertiesResult.fromJson(result);
   }
 
   /// Returns all let, const and class variables from global scope.
@@ -323,7 +319,7 @@ class RuntimeApi {
       parameters['objectGroup'] = objectGroup;
     }
     var result = await _client.send('Runtime.queryObjects', parameters);
-    return new RemoteObject.fromJson(result['objects']);
+    return RemoteObject.fromJson(result['objects']);
   }
 
   /// Releases remote object with given id.
@@ -400,7 +396,7 @@ class RuntimeApi {
       parameters['awaitPromise'] = awaitPromise;
     }
     var result = await _client.send('Runtime.runScript', parameters);
-    return new RunScriptResult.fromJson(result);
+    return RunScriptResult.fromJson(result);
   }
 
   /// Enables or disables async call stacks tracking.
@@ -487,11 +483,11 @@ class BindingCalledEvent {
   });
 
   factory BindingCalledEvent.fromJson(Map<String, dynamic> json) {
-    return new BindingCalledEvent(
+    return BindingCalledEvent(
       name: json['name'],
       payload: json['payload'],
       executionContextId:
-          new ExecutionContextId.fromJson(json['executionContextId']),
+          ExecutionContextId.fromJson(json['executionContextId']),
     );
   }
 }
@@ -527,16 +523,15 @@ class ConsoleAPICalledEvent {
   });
 
   factory ConsoleAPICalledEvent.fromJson(Map<String, dynamic> json) {
-    return new ConsoleAPICalledEvent(
+    return ConsoleAPICalledEvent(
       type: json['type'],
-      args: (json['args'] as List)
-          .map((e) => new RemoteObject.fromJson(e))
-          .toList(),
+      args:
+          (json['args'] as List).map((e) => RemoteObject.fromJson(e)).toList(),
       executionContextId:
-          new ExecutionContextId.fromJson(json['executionContextId']),
-      timestamp: new Timestamp.fromJson(json['timestamp']),
+          ExecutionContextId.fromJson(json['executionContextId']),
+      timestamp: Timestamp.fromJson(json['timestamp']),
       stackTrace: json.containsKey('stackTrace')
-          ? new StackTrace.fromJson(json['stackTrace'])
+          ? StackTrace.fromJson(json['stackTrace'])
           : null,
       context: json.containsKey('context') ? json['context'] : null,
     );
@@ -556,7 +551,7 @@ class ExceptionRevokedEvent {
   });
 
   factory ExceptionRevokedEvent.fromJson(Map<String, dynamic> json) {
-    return new ExceptionRevokedEvent(
+    return ExceptionRevokedEvent(
       reason: json['reason'],
       exceptionId: json['exceptionId'],
     );
@@ -575,9 +570,9 @@ class ExceptionThrownEvent {
   });
 
   factory ExceptionThrownEvent.fromJson(Map<String, dynamic> json) {
-    return new ExceptionThrownEvent(
-      timestamp: new Timestamp.fromJson(json['timestamp']),
-      exceptionDetails: new ExceptionDetails.fromJson(json['exceptionDetails']),
+    return ExceptionThrownEvent(
+      timestamp: Timestamp.fromJson(json['timestamp']),
+      exceptionDetails: ExceptionDetails.fromJson(json['exceptionDetails']),
     );
   }
 }
@@ -593,8 +588,8 @@ class InspectRequestedEvent {
   });
 
   factory InspectRequestedEvent.fromJson(Map<String, dynamic> json) {
-    return new InspectRequestedEvent(
-      object: new RemoteObject.fromJson(json['object']),
+    return InspectRequestedEvent(
+      object: RemoteObject.fromJson(json['object']),
       hints: json['hints'],
     );
   }
@@ -613,10 +608,10 @@ class AwaitPromiseResult {
   });
 
   factory AwaitPromiseResult.fromJson(Map<String, dynamic> json) {
-    return new AwaitPromiseResult(
-      result: new RemoteObject.fromJson(json['result']),
+    return AwaitPromiseResult(
+      result: RemoteObject.fromJson(json['result']),
       exceptionDetails: json.containsKey('exceptionDetails')
-          ? new ExceptionDetails.fromJson(json['exceptionDetails'])
+          ? ExceptionDetails.fromJson(json['exceptionDetails'])
           : null,
     );
   }
@@ -635,10 +630,10 @@ class CallFunctionOnResult {
   });
 
   factory CallFunctionOnResult.fromJson(Map<String, dynamic> json) {
-    return new CallFunctionOnResult(
-      result: new RemoteObject.fromJson(json['result']),
+    return CallFunctionOnResult(
+      result: RemoteObject.fromJson(json['result']),
       exceptionDetails: json.containsKey('exceptionDetails')
-          ? new ExceptionDetails.fromJson(json['exceptionDetails'])
+          ? ExceptionDetails.fromJson(json['exceptionDetails'])
           : null,
     );
   }
@@ -657,12 +652,12 @@ class CompileScriptResult {
   });
 
   factory CompileScriptResult.fromJson(Map<String, dynamic> json) {
-    return new CompileScriptResult(
+    return CompileScriptResult(
       scriptId: json.containsKey('scriptId')
-          ? new ScriptId.fromJson(json['scriptId'])
+          ? ScriptId.fromJson(json['scriptId'])
           : null,
       exceptionDetails: json.containsKey('exceptionDetails')
-          ? new ExceptionDetails.fromJson(json['exceptionDetails'])
+          ? ExceptionDetails.fromJson(json['exceptionDetails'])
           : null,
     );
   }
@@ -681,10 +676,10 @@ class EvaluateResult {
   });
 
   factory EvaluateResult.fromJson(Map<String, dynamic> json) {
-    return new EvaluateResult(
-      result: new RemoteObject.fromJson(json['result']),
+    return EvaluateResult(
+      result: RemoteObject.fromJson(json['result']),
       exceptionDetails: json.containsKey('exceptionDetails')
-          ? new ExceptionDetails.fromJson(json['exceptionDetails'])
+          ? ExceptionDetails.fromJson(json['exceptionDetails'])
           : null,
     );
   }
@@ -703,7 +698,7 @@ class GetHeapUsageResult {
   });
 
   factory GetHeapUsageResult.fromJson(Map<String, dynamic> json) {
-    return new GetHeapUsageResult(
+    return GetHeapUsageResult(
       usedSize: json['usedSize'],
       totalSize: json['totalSize'],
     );
@@ -727,17 +722,17 @@ class GetPropertiesResult {
   });
 
   factory GetPropertiesResult.fromJson(Map<String, dynamic> json) {
-    return new GetPropertiesResult(
+    return GetPropertiesResult(
       result: (json['result'] as List)
-          .map((e) => new PropertyDescriptor.fromJson(e))
+          .map((e) => PropertyDescriptor.fromJson(e))
           .toList(),
       internalProperties: json.containsKey('internalProperties')
           ? (json['internalProperties'] as List)
-              .map((e) => new InternalPropertyDescriptor.fromJson(e))
+              .map((e) => InternalPropertyDescriptor.fromJson(e))
               .toList()
           : null,
       exceptionDetails: json.containsKey('exceptionDetails')
-          ? new ExceptionDetails.fromJson(json['exceptionDetails'])
+          ? ExceptionDetails.fromJson(json['exceptionDetails'])
           : null,
     );
   }
@@ -756,10 +751,10 @@ class RunScriptResult {
   });
 
   factory RunScriptResult.fromJson(Map<String, dynamic> json) {
-    return new RunScriptResult(
-      result: new RemoteObject.fromJson(json['result']),
+    return RunScriptResult(
+      result: RemoteObject.fromJson(json['result']),
       exceptionDetails: json.containsKey('exceptionDetails')
-          ? new ExceptionDetails.fromJson(json['exceptionDetails'])
+          ? ExceptionDetails.fromJson(json['exceptionDetails'])
           : null,
     );
   }
@@ -771,7 +766,7 @@ class ScriptId {
 
   ScriptId(this.value);
 
-  factory ScriptId.fromJson(String value) => new ScriptId(value);
+  factory ScriptId.fromJson(String value) => ScriptId(value);
 
   String toJson() => value;
 
@@ -791,7 +786,7 @@ class RemoteObjectId {
 
   RemoteObjectId(this.value);
 
-  factory RemoteObjectId.fromJson(String value) => new RemoteObjectId(value);
+  factory RemoteObjectId.fromJson(String value) => RemoteObjectId(value);
 
   String toJson() => value;
 
@@ -813,7 +808,7 @@ class UnserializableValue {
   UnserializableValue(this.value);
 
   factory UnserializableValue.fromJson(String value) =>
-      new UnserializableValue(value);
+      UnserializableValue(value);
 
   String toJson() => value;
 
@@ -870,23 +865,23 @@ class RemoteObject {
   });
 
   factory RemoteObject.fromJson(Map<String, dynamic> json) {
-    return new RemoteObject(
+    return RemoteObject(
       type: json['type'],
       subtype: json.containsKey('subtype') ? json['subtype'] : null,
       className: json.containsKey('className') ? json['className'] : null,
       value: json.containsKey('value') ? json['value'] : null,
       unserializableValue: json.containsKey('unserializableValue')
-          ? new UnserializableValue.fromJson(json['unserializableValue'])
+          ? UnserializableValue.fromJson(json['unserializableValue'])
           : null,
       description: json.containsKey('description') ? json['description'] : null,
       objectId: json.containsKey('objectId')
-          ? new RemoteObjectId.fromJson(json['objectId'])
+          ? RemoteObjectId.fromJson(json['objectId'])
           : null,
       preview: json.containsKey('preview')
-          ? new ObjectPreview.fromJson(json['preview'])
+          ? ObjectPreview.fromJson(json['preview'])
           : null,
       customPreview: json.containsKey('customPreview')
-          ? new CustomPreview.fromJson(json['customPreview'])
+          ? CustomPreview.fromJson(json['customPreview'])
           : null,
     );
   }
@@ -943,14 +938,14 @@ class CustomPreview {
   });
 
   factory CustomPreview.fromJson(Map<String, dynamic> json) {
-    return new CustomPreview(
+    return CustomPreview(
       header: json['header'],
       hasBody: json['hasBody'],
-      formatterObjectId: new RemoteObjectId.fromJson(json['formatterObjectId']),
+      formatterObjectId: RemoteObjectId.fromJson(json['formatterObjectId']),
       bindRemoteObjectFunctionId:
-          new RemoteObjectId.fromJson(json['bindRemoteObjectFunctionId']),
+          RemoteObjectId.fromJson(json['bindRemoteObjectFunctionId']),
       configObjectId: json.containsKey('configObjectId')
-          ? new RemoteObjectId.fromJson(json['configObjectId'])
+          ? RemoteObjectId.fromJson(json['configObjectId'])
           : null,
     );
   }
@@ -999,17 +994,17 @@ class ObjectPreview {
   });
 
   factory ObjectPreview.fromJson(Map<String, dynamic> json) {
-    return new ObjectPreview(
+    return ObjectPreview(
       type: json['type'],
       subtype: json.containsKey('subtype') ? json['subtype'] : null,
       description: json.containsKey('description') ? json['description'] : null,
       overflow: json['overflow'],
       properties: (json['properties'] as List)
-          .map((e) => new PropertyPreview.fromJson(e))
+          .map((e) => PropertyPreview.fromJson(e))
           .toList(),
       entries: json.containsKey('entries')
           ? (json['entries'] as List)
-              .map((e) => new EntryPreview.fromJson(e))
+              .map((e) => EntryPreview.fromJson(e))
               .toList()
           : null,
     );
@@ -1059,12 +1054,12 @@ class PropertyPreview {
   });
 
   factory PropertyPreview.fromJson(Map<String, dynamic> json) {
-    return new PropertyPreview(
+    return PropertyPreview(
       name: json['name'],
       type: json['type'],
       value: json.containsKey('value') ? json['value'] : null,
       valuePreview: json.containsKey('valuePreview')
-          ? new ObjectPreview.fromJson(json['valuePreview'])
+          ? ObjectPreview.fromJson(json['valuePreview'])
           : null,
       subtype: json.containsKey('subtype') ? json['subtype'] : null,
     );
@@ -1101,11 +1096,9 @@ class EntryPreview {
   });
 
   factory EntryPreview.fromJson(Map<String, dynamic> json) {
-    return new EntryPreview(
-      key: json.containsKey('key')
-          ? new ObjectPreview.fromJson(json['key'])
-          : null,
-      value: new ObjectPreview.fromJson(json['value']),
+    return EntryPreview(
+      key: json.containsKey('key') ? ObjectPreview.fromJson(json['key']) : null,
+      value: ObjectPreview.fromJson(json['value']),
     );
   }
 
@@ -1170,24 +1163,20 @@ class PropertyDescriptor {
   });
 
   factory PropertyDescriptor.fromJson(Map<String, dynamic> json) {
-    return new PropertyDescriptor(
+    return PropertyDescriptor(
       name: json['name'],
       value: json.containsKey('value')
-          ? new RemoteObject.fromJson(json['value'])
+          ? RemoteObject.fromJson(json['value'])
           : null,
       writable: json.containsKey('writable') ? json['writable'] : null,
-      get: json.containsKey('get')
-          ? new RemoteObject.fromJson(json['get'])
-          : null,
-      set: json.containsKey('set')
-          ? new RemoteObject.fromJson(json['set'])
-          : null,
+      get: json.containsKey('get') ? RemoteObject.fromJson(json['get']) : null,
+      set: json.containsKey('set') ? RemoteObject.fromJson(json['set']) : null,
       configurable: json['configurable'],
       enumerable: json['enumerable'],
       wasThrown: json.containsKey('wasThrown') ? json['wasThrown'] : null,
       isOwn: json.containsKey('isOwn') ? json['isOwn'] : null,
       symbol: json.containsKey('symbol')
-          ? new RemoteObject.fromJson(json['symbol'])
+          ? RemoteObject.fromJson(json['symbol'])
           : null,
     );
   }
@@ -1237,10 +1226,10 @@ class InternalPropertyDescriptor {
   });
 
   factory InternalPropertyDescriptor.fromJson(Map<String, dynamic> json) {
-    return new InternalPropertyDescriptor(
+    return InternalPropertyDescriptor(
       name: json['name'],
       value: json.containsKey('value')
-          ? new RemoteObject.fromJson(json['value'])
+          ? RemoteObject.fromJson(json['value'])
           : null,
     );
   }
@@ -1275,13 +1264,13 @@ class CallArgument {
   });
 
   factory CallArgument.fromJson(Map<String, dynamic> json) {
-    return new CallArgument(
+    return CallArgument(
       value: json.containsKey('value') ? json['value'] : null,
       unserializableValue: json.containsKey('unserializableValue')
-          ? new UnserializableValue.fromJson(json['unserializableValue'])
+          ? UnserializableValue.fromJson(json['unserializableValue'])
           : null,
       objectId: json.containsKey('objectId')
-          ? new RemoteObjectId.fromJson(json['objectId'])
+          ? RemoteObjectId.fromJson(json['objectId'])
           : null,
     );
   }
@@ -1307,8 +1296,7 @@ class ExecutionContextId {
 
   ExecutionContextId(this.value);
 
-  factory ExecutionContextId.fromJson(int value) =>
-      new ExecutionContextId(value);
+  factory ExecutionContextId.fromJson(int value) => ExecutionContextId(value);
 
   int toJson() => value;
 
@@ -1346,8 +1334,8 @@ class ExecutionContextDescription {
   });
 
   factory ExecutionContextDescription.fromJson(Map<String, dynamic> json) {
-    return new ExecutionContextDescription(
-      id: new ExecutionContextId.fromJson(json['id']),
+    return ExecutionContextDescription(
+      id: ExecutionContextId.fromJson(json['id']),
       origin: json['origin'],
       name: json['name'],
       auxData: json.containsKey('auxData') ? json['auxData'] : null,
@@ -1410,23 +1398,23 @@ class ExceptionDetails {
   });
 
   factory ExceptionDetails.fromJson(Map<String, dynamic> json) {
-    return new ExceptionDetails(
+    return ExceptionDetails(
       exceptionId: json['exceptionId'],
       text: json['text'],
       lineNumber: json['lineNumber'],
       columnNumber: json['columnNumber'],
       scriptId: json.containsKey('scriptId')
-          ? new ScriptId.fromJson(json['scriptId'])
+          ? ScriptId.fromJson(json['scriptId'])
           : null,
       url: json.containsKey('url') ? json['url'] : null,
       stackTrace: json.containsKey('stackTrace')
-          ? new StackTrace.fromJson(json['stackTrace'])
+          ? StackTrace.fromJson(json['stackTrace'])
           : null,
       exception: json.containsKey('exception')
-          ? new RemoteObject.fromJson(json['exception'])
+          ? RemoteObject.fromJson(json['exception'])
           : null,
       executionContextId: json.containsKey('executionContextId')
-          ? new ExecutionContextId.fromJson(json['executionContextId'])
+          ? ExecutionContextId.fromJson(json['executionContextId'])
           : null,
     );
   }
@@ -1463,7 +1451,7 @@ class Timestamp {
 
   Timestamp(this.value);
 
-  factory Timestamp.fromJson(num value) => new Timestamp(value);
+  factory Timestamp.fromJson(num value) => Timestamp(value);
 
   num toJson() => value;
 
@@ -1483,7 +1471,7 @@ class TimeDelta {
 
   TimeDelta(this.value);
 
-  factory TimeDelta.fromJson(num value) => new TimeDelta(value);
+  factory TimeDelta.fromJson(num value) => TimeDelta(value);
 
   num toJson() => value;
 
@@ -1523,9 +1511,9 @@ class CallFrame {
   });
 
   factory CallFrame.fromJson(Map<String, dynamic> json) {
-    return new CallFrame(
+    return CallFrame(
       functionName: json['functionName'],
-      scriptId: new ScriptId.fromJson(json['scriptId']),
+      scriptId: ScriptId.fromJson(json['scriptId']),
       url: json['url'],
       lineNumber: json['lineNumber'],
       columnNumber: json['columnNumber'],
@@ -1567,16 +1555,16 @@ class StackTrace {
   });
 
   factory StackTrace.fromJson(Map<String, dynamic> json) {
-    return new StackTrace(
+    return StackTrace(
       description: json.containsKey('description') ? json['description'] : null,
       callFrames: (json['callFrames'] as List)
-          .map((e) => new CallFrame.fromJson(e))
+          .map((e) => CallFrame.fromJson(e))
           .toList(),
       parent: json.containsKey('parent')
-          ? new StackTrace.fromJson(json['parent'])
+          ? StackTrace.fromJson(json['parent'])
           : null,
       parentId: json.containsKey('parentId')
-          ? new StackTraceId.fromJson(json['parentId'])
+          ? StackTraceId.fromJson(json['parentId'])
           : null,
     );
   }
@@ -1604,8 +1592,7 @@ class UniqueDebuggerId {
 
   UniqueDebuggerId(this.value);
 
-  factory UniqueDebuggerId.fromJson(String value) =>
-      new UniqueDebuggerId(value);
+  factory UniqueDebuggerId.fromJson(String value) => UniqueDebuggerId(value);
 
   String toJson() => value;
 
@@ -1632,10 +1619,10 @@ class StackTraceId {
   });
 
   factory StackTraceId.fromJson(Map<String, dynamic> json) {
-    return new StackTraceId(
+    return StackTraceId(
       id: json['id'],
       debuggerId: json.containsKey('debuggerId')
-          ? new UniqueDebuggerId.fromJson(json['debuggerId'])
+          ? UniqueDebuggerId.fromJson(json['debuggerId'])
           : null,
     );
   }

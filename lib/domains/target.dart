@@ -11,15 +11,13 @@ class TargetApi {
   /// Issued when attached to target because of auto-attach or `attachToTarget` command.
   Stream<AttachedToTargetEvent> get onAttachedToTarget => _client.onEvent
       .where((Event event) => event.name == 'Target.attachedToTarget')
-      .map((Event event) =>
-          new AttachedToTargetEvent.fromJson(event.parameters));
+      .map((Event event) => AttachedToTargetEvent.fromJson(event.parameters));
 
   /// Issued when detached from target for any reason (including `detachFromTarget` command). Can be
   /// issued multiple times per target if multiple sessions have been attached to it.
   Stream<DetachedFromTargetEvent> get onDetachedFromTarget => _client.onEvent
       .where((Event event) => event.name == 'Target.detachedFromTarget')
-      .map((Event event) =>
-          new DetachedFromTargetEvent.fromJson(event.parameters));
+      .map((Event event) => DetachedFromTargetEvent.fromJson(event.parameters));
 
   /// Notifies about a new protocol message received from the session (as reported in
   /// `attachedToTarget` event).
@@ -28,31 +26,30 @@ class TargetApi {
           .where(
               (Event event) => event.name == 'Target.receivedMessageFromTarget')
           .map((Event event) =>
-              new ReceivedMessageFromTargetEvent.fromJson(event.parameters));
+              ReceivedMessageFromTargetEvent.fromJson(event.parameters));
 
   /// Issued when a possible inspection target is created.
   Stream<TargetInfo> get onTargetCreated => _client.onEvent
       .where((Event event) => event.name == 'Target.targetCreated')
-      .map((Event event) =>
-          new TargetInfo.fromJson(event.parameters['targetInfo']));
+      .map(
+          (Event event) => TargetInfo.fromJson(event.parameters['targetInfo']));
 
   /// Issued when a target is destroyed.
   Stream<TargetID> get onTargetDestroyed => _client.onEvent
       .where((Event event) => event.name == 'Target.targetDestroyed')
-      .map(
-          (Event event) => new TargetID.fromJson(event.parameters['targetId']));
+      .map((Event event) => TargetID.fromJson(event.parameters['targetId']));
 
   /// Issued when a target has crashed.
   Stream<TargetCrashedEvent> get onTargetCrashed => _client.onEvent
       .where((Event event) => event.name == 'Target.targetCrashed')
-      .map((Event event) => new TargetCrashedEvent.fromJson(event.parameters));
+      .map((Event event) => TargetCrashedEvent.fromJson(event.parameters));
 
   /// Issued when some information about a target has changed. This only happens between
   /// `targetCreated` and `targetDestroyed`.
   Stream<TargetInfo> get onTargetInfoChanged => _client.onEvent
       .where((Event event) => event.name == 'Target.targetInfoChanged')
-      .map((Event event) =>
-          new TargetInfo.fromJson(event.parameters['targetInfo']));
+      .map(
+          (Event event) => TargetInfo.fromJson(event.parameters['targetInfo']));
 
   /// Activates (focuses) the target.
   Future activateTarget(
@@ -78,14 +75,14 @@ class TargetApi {
       parameters['flatten'] = flatten;
     }
     var result = await _client.send('Target.attachToTarget', parameters);
-    return new SessionID.fromJson(result['sessionId']);
+    return SessionID.fromJson(result['sessionId']);
   }
 
   /// Attaches to the browser target, only uses flat sessionId mode.
   /// Returns: Id assigned to the session.
   Future<SessionID> attachToBrowserTarget() async {
     var result = await _client.send('Target.attachToBrowserTarget');
-    return new SessionID.fromJson(result['sessionId']);
+    return SessionID.fromJson(result['sessionId']);
   }
 
   /// Closes the target. If the target is a page that gets closed too.
@@ -126,7 +123,7 @@ class TargetApi {
   /// Returns: The id of the context created.
   Future<BrowserContextID> createBrowserContext() async {
     var result = await _client.send('Target.createBrowserContext');
-    return new BrowserContextID.fromJson(result['browserContextId']);
+    return BrowserContextID.fromJson(result['browserContextId']);
   }
 
   /// Returns all browser contexts created with `Target.createBrowserContext` method.
@@ -134,7 +131,7 @@ class TargetApi {
   Future<List<BrowserContextID>> getBrowserContexts() async {
     var result = await _client.send('Target.getBrowserContexts');
     return (result['browserContextIds'] as List)
-        .map((e) => new BrowserContextID.fromJson(e))
+        .map((e) => BrowserContextID.fromJson(e))
         .toList();
   }
 
@@ -169,7 +166,7 @@ class TargetApi {
       parameters['enableBeginFrameControl'] = enableBeginFrameControl;
     }
     var result = await _client.send('Target.createTarget', parameters);
-    return new TargetID.fromJson(result['targetId']);
+    return TargetID.fromJson(result['targetId']);
   }
 
   /// Detaches session with given id.
@@ -210,7 +207,7 @@ class TargetApi {
       parameters['targetId'] = targetId.toJson();
     }
     var result = await _client.send('Target.getTargetInfo', parameters);
-    return new TargetInfo.fromJson(result['targetInfo']);
+    return TargetInfo.fromJson(result['targetInfo']);
   }
 
   /// Retrieves a list of available targets.
@@ -218,7 +215,7 @@ class TargetApi {
   Future<List<TargetInfo>> getTargets() async {
     var result = await _client.send('Target.getTargets');
     return (result['targetInfos'] as List)
-        .map((e) => new TargetInfo.fromJson(e))
+        .map((e) => TargetInfo.fromJson(e))
         .toList();
   }
 
@@ -305,9 +302,9 @@ class AttachedToTargetEvent {
   });
 
   factory AttachedToTargetEvent.fromJson(Map<String, dynamic> json) {
-    return new AttachedToTargetEvent(
-      sessionId: new SessionID.fromJson(json['sessionId']),
-      targetInfo: new TargetInfo.fromJson(json['targetInfo']),
+    return AttachedToTargetEvent(
+      sessionId: SessionID.fromJson(json['sessionId']),
+      targetInfo: TargetInfo.fromJson(json['targetInfo']),
       waitingForDebugger: json['waitingForDebugger'],
     );
   }
@@ -322,8 +319,8 @@ class DetachedFromTargetEvent {
   });
 
   factory DetachedFromTargetEvent.fromJson(Map<String, dynamic> json) {
-    return new DetachedFromTargetEvent(
-      sessionId: new SessionID.fromJson(json['sessionId']),
+    return DetachedFromTargetEvent(
+      sessionId: SessionID.fromJson(json['sessionId']),
     );
   }
 }
@@ -340,8 +337,8 @@ class ReceivedMessageFromTargetEvent {
   });
 
   factory ReceivedMessageFromTargetEvent.fromJson(Map<String, dynamic> json) {
-    return new ReceivedMessageFromTargetEvent(
-      sessionId: new SessionID.fromJson(json['sessionId']),
+    return ReceivedMessageFromTargetEvent(
+      sessionId: SessionID.fromJson(json['sessionId']),
       message: json['message'],
     );
   }
@@ -363,8 +360,8 @@ class TargetCrashedEvent {
   });
 
   factory TargetCrashedEvent.fromJson(Map<String, dynamic> json) {
-    return new TargetCrashedEvent(
-      targetId: new TargetID.fromJson(json['targetId']),
+    return TargetCrashedEvent(
+      targetId: TargetID.fromJson(json['targetId']),
       status: json['status'],
       errorCode: json['errorCode'],
     );
@@ -376,7 +373,7 @@ class TargetID {
 
   TargetID(this.value);
 
-  factory TargetID.fromJson(String value) => new TargetID(value);
+  factory TargetID.fromJson(String value) => TargetID(value);
 
   String toJson() => value;
 
@@ -396,7 +393,7 @@ class SessionID {
 
   SessionID(this.value);
 
-  factory SessionID.fromJson(String value) => new SessionID(value);
+  factory SessionID.fromJson(String value) => SessionID(value);
 
   String toJson() => value;
 
@@ -415,8 +412,7 @@ class BrowserContextID {
 
   BrowserContextID(this.value);
 
-  factory BrowserContextID.fromJson(String value) =>
-      new BrowserContextID(value);
+  factory BrowserContextID.fromJson(String value) => BrowserContextID(value);
 
   String toJson() => value;
 
@@ -458,17 +454,17 @@ class TargetInfo {
   });
 
   factory TargetInfo.fromJson(Map<String, dynamic> json) {
-    return new TargetInfo(
-      targetId: new TargetID.fromJson(json['targetId']),
+    return TargetInfo(
+      targetId: TargetID.fromJson(json['targetId']),
       type: json['type'],
       title: json['title'],
       url: json['url'],
       attached: json['attached'],
       openerId: json.containsKey('openerId')
-          ? new TargetID.fromJson(json['openerId'])
+          ? TargetID.fromJson(json['openerId'])
           : null,
       browserContextId: json.containsKey('browserContextId')
-          ? new BrowserContextID.fromJson(json['browserContextId'])
+          ? BrowserContextID.fromJson(json['browserContextId'])
           : null,
     );
   }
@@ -502,7 +498,7 @@ class RemoteLocation {
   });
 
   factory RemoteLocation.fromJson(Map<String, dynamic> json) {
-    return new RemoteLocation(
+    return RemoteLocation(
       host: json['host'],
       port: json['port'],
     );

@@ -26,7 +26,7 @@ Future<dynamic> remoteObject(
       case '-Infinity':
         return double.negativeInfinity;
       default:
-        throw new Exception(
+        throw Exception(
             'Unsupported unserializable value: ${remoteObject.unserializableValue}');
     }
   }

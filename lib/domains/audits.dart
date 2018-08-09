@@ -32,7 +32,7 @@ class AuditsApi {
       parameters['sizeOnly'] = sizeOnly;
     }
     var result = await _client.send('Audits.getEncodedResponse', parameters);
-    return new GetEncodedResponseResult.fromJson(result);
+    return GetEncodedResponseResult.fromJson(result);
   }
 }
 
@@ -53,7 +53,7 @@ class GetEncodedResponseResult {
   });
 
   factory GetEncodedResponseResult.fromJson(Map<String, dynamic> json) {
-    return new GetEncodedResponseResult(
+    return GetEncodedResponseResult(
       body: json.containsKey('body') ? json['body'] : null,
       originalSize: json['originalSize'],
       encodedSize: json['encodedSize'],

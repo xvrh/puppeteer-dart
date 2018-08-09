@@ -81,7 +81,7 @@ main() {
         marginTop: 0));
 
     // Save the bytes in a file
-    await new File.fromUri(Platform.script.resolve('_github.pdf'))
+    await File.fromUri(Platform.script.resolve('_github.pdf'))
         .writeAsBytes(pdf);
   });
 }
@@ -110,7 +110,7 @@ main() {
     String screenshot = await tab.page.captureScreenshot();
 
     // Save it to a file
-    await new File.fromUri(Platform.script.resolve('_github.png'))
+    await File.fromUri(Platform.script.resolve('_github.png'))
         .writeAsBytes(base64.decode(screenshot));
   });
 }
@@ -137,7 +137,7 @@ main() {
     // Convert the `EvaluateResult` to a Map with all the javascript properties
     Map rect = await tab.remoteObjectProperties(result.result);
 
-    Viewport clip = new Viewport(
+    Viewport clip = Viewport(
         x: rect['x'],
         y: rect['y'],
         width: rect['width'],
@@ -148,7 +148,7 @@ main() {
     String screenshot = await tab.page.captureScreenshot(clip: clip);
 
     // Save it to a file
-    await new File.fromUri(Platform.script.resolve('_github_form.png'))
+    await File.fromUri(Platform.script.resolve('_github_form.png'))
         .writeAsBytes(base64.decode(screenshot));
   });
 }
@@ -166,6 +166,7 @@ main() {
     await tab.waitUntilNetworkIdle();
 
     // Take a snapshot of the DOM of the current page
+    // ignore: deprecated_member_use
     GetSnapshotResult result = await tab.domSnapshot.getSnapshot([]);
 
     // Iterate the nodes and output some HTML.

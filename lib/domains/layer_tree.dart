@@ -10,12 +10,12 @@ class LayerTreeApi {
 
   Stream<LayerPaintedEvent> get onLayerPainted => _client.onEvent
       .where((Event event) => event.name == 'LayerTree.layerPainted')
-      .map((Event event) => new LayerPaintedEvent.fromJson(event.parameters));
+      .map((Event event) => LayerPaintedEvent.fromJson(event.parameters));
 
   Stream<List<Layer>> get onLayerTreeDidChange => _client.onEvent
       .where((Event event) => event.name == 'LayerTree.layerTreeDidChange')
       .map((Event event) => (event.parameters['layers'] as List)
-          .map((e) => new Layer.fromJson(e))
+          .map((e) => Layer.fromJson(e))
           .toList());
 
   /// Provides the reasons why the given layer was composited.
@@ -53,7 +53,7 @@ class LayerTreeApi {
       'tiles': tiles.map((e) => e.toJson()).toList(),
     };
     var result = await _client.send('LayerTree.loadSnapshot', parameters);
-    return new SnapshotId.fromJson(result['snapshotId']);
+    return SnapshotId.fromJson(result['snapshotId']);
   }
 
   /// Returns the layer snapshot identifier.
@@ -66,7 +66,7 @@ class LayerTreeApi {
       'layerId': layerId.toJson(),
     };
     var result = await _client.send('LayerTree.makeSnapshot', parameters);
-    return new SnapshotId.fromJson(result['snapshotId']);
+    return SnapshotId.fromJson(result['snapshotId']);
   }
 
   /// [snapshotId] The id of the layer snapshot.
@@ -94,7 +94,7 @@ class LayerTreeApi {
     }
     var result = await _client.send('LayerTree.profileSnapshot', parameters);
     return (result['timings'] as List)
-        .map((e) => new PaintProfile.fromJson(e))
+        .map((e) => PaintProfile.fromJson(e))
         .toList();
   }
 
@@ -164,9 +164,9 @@ class LayerPaintedEvent {
   });
 
   factory LayerPaintedEvent.fromJson(Map<String, dynamic> json) {
-    return new LayerPaintedEvent(
-      layerId: new LayerId.fromJson(json['layerId']),
-      clip: new dom.Rect.fromJson(json['clip']),
+    return LayerPaintedEvent(
+      layerId: LayerId.fromJson(json['layerId']),
+      clip: dom.Rect.fromJson(json['clip']),
     );
   }
 }
@@ -177,7 +177,7 @@ class LayerId {
 
   LayerId(this.value);
 
-  factory LayerId.fromJson(String value) => new LayerId(value);
+  factory LayerId.fromJson(String value) => LayerId(value);
 
   String toJson() => value;
 
@@ -197,7 +197,7 @@ class SnapshotId {
 
   SnapshotId(this.value);
 
-  factory SnapshotId.fromJson(String value) => new SnapshotId(value);
+  factory SnapshotId.fromJson(String value) => SnapshotId(value);
 
   String toJson() => value;
 
@@ -225,8 +225,8 @@ class ScrollRect {
   });
 
   factory ScrollRect.fromJson(Map<String, dynamic> json) {
-    return new ScrollRect(
-      rect: new dom.Rect.fromJson(json['rect']),
+    return ScrollRect(
+      rect: dom.Rect.fromJson(json['rect']),
       type: json['type'],
     );
   }
@@ -262,17 +262,17 @@ class StickyPositionConstraint {
   });
 
   factory StickyPositionConstraint.fromJson(Map<String, dynamic> json) {
-    return new StickyPositionConstraint(
-      stickyBoxRect: new dom.Rect.fromJson(json['stickyBoxRect']),
-      containingBlockRect: new dom.Rect.fromJson(json['containingBlockRect']),
+    return StickyPositionConstraint(
+      stickyBoxRect: dom.Rect.fromJson(json['stickyBoxRect']),
+      containingBlockRect: dom.Rect.fromJson(json['containingBlockRect']),
       nearestLayerShiftingStickyBox:
           json.containsKey('nearestLayerShiftingStickyBox')
-              ? new LayerId.fromJson(json['nearestLayerShiftingStickyBox'])
+              ? LayerId.fromJson(json['nearestLayerShiftingStickyBox'])
               : null,
-      nearestLayerShiftingContainingBlock: json
-              .containsKey('nearestLayerShiftingContainingBlock')
-          ? new LayerId.fromJson(json['nearestLayerShiftingContainingBlock'])
-          : null,
+      nearestLayerShiftingContainingBlock:
+          json.containsKey('nearestLayerShiftingContainingBlock')
+              ? LayerId.fromJson(json['nearestLayerShiftingContainingBlock'])
+              : null,
     );
   }
 
@@ -311,7 +311,7 @@ class PictureTile {
   });
 
   factory PictureTile.fromJson(Map<String, dynamic> json) {
-    return new PictureTile(
+    return PictureTile(
       x: json['x'],
       y: json['y'],
       picture: json['picture'],
@@ -399,13 +399,13 @@ class Layer {
   });
 
   factory Layer.fromJson(Map<String, dynamic> json) {
-    return new Layer(
-      layerId: new LayerId.fromJson(json['layerId']),
+    return Layer(
+      layerId: LayerId.fromJson(json['layerId']),
       parentLayerId: json.containsKey('parentLayerId')
-          ? new LayerId.fromJson(json['parentLayerId'])
+          ? LayerId.fromJson(json['parentLayerId'])
           : null,
       backendNodeId: json.containsKey('backendNodeId')
-          ? new dom.BackendNodeId.fromJson(json['backendNodeId'])
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'])
           : null,
       offsetX: json['offsetX'],
       offsetY: json['offsetY'],
@@ -422,12 +422,11 @@ class Layer {
       invisible: json.containsKey('invisible') ? json['invisible'] : null,
       scrollRects: json.containsKey('scrollRects')
           ? (json['scrollRects'] as List)
-              .map((e) => new ScrollRect.fromJson(e))
+              .map((e) => ScrollRect.fromJson(e))
               .toList()
           : null,
       stickyPositionConstraint: json.containsKey('stickyPositionConstraint')
-          ? new StickyPositionConstraint.fromJson(
-              json['stickyPositionConstraint'])
+          ? StickyPositionConstraint.fromJson(json['stickyPositionConstraint'])
           : null,
     );
   }
@@ -479,7 +478,7 @@ class PaintProfile {
 
   PaintProfile(this.value);
 
-  factory PaintProfile.fromJson(List<num> value) => new PaintProfile(value);
+  factory PaintProfile.fromJson(List<num> value) => PaintProfile(value);
 
   List<num> toJson() => value;
 

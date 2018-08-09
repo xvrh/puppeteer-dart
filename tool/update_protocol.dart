@@ -17,5 +17,5 @@ main() async {
 
 Future _download(String url, String fileName) async {
   String json = await read(url);
-  await new File.fromUri(Platform.script.resolve(fileName)).writeAsString(json);
+  await File.fromUri(Platform.script.resolve(fileName)).writeAsString(json);
 }

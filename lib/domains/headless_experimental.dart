@@ -49,7 +49,7 @@ class HeadlessExperimentalApi {
     }
     var result =
         await _client.send('HeadlessExperimental.beginFrame', parameters);
-    return new BeginFrameResult.fromJson(result);
+    return BeginFrameResult.fromJson(result);
   }
 
   /// Disables headless events for the target.
@@ -77,7 +77,7 @@ class BeginFrameResult {
   });
 
   factory BeginFrameResult.fromJson(Map<String, dynamic> json) {
-    return new BeginFrameResult(
+    return BeginFrameResult(
       hasDamage: json['hasDamage'],
       screenshotData:
           json.containsKey('screenshotData') ? json['screenshotData'] : null,
@@ -99,7 +99,7 @@ class ScreenshotParams {
   });
 
   factory ScreenshotParams.fromJson(Map<String, dynamic> json) {
-    return new ScreenshotParams(
+    return ScreenshotParams(
       format: json.containsKey('format') ? json['format'] : null,
       quality: json.containsKey('quality') ? json['quality'] : null,
     );

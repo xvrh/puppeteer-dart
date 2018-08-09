@@ -43,9 +43,7 @@ class CacheStorageApi {
     };
     var result =
         await _client.send('CacheStorage.requestCacheNames', parameters);
-    return (result['caches'] as List)
-        .map((e) => new Cache.fromJson(e))
-        .toList();
+    return (result['caches'] as List).map((e) => Cache.fromJson(e)).toList();
   }
 
   /// Fetches cache entry.
@@ -62,7 +60,7 @@ class CacheStorageApi {
     };
     var result =
         await _client.send('CacheStorage.requestCachedResponse', parameters);
-    return new CachedResponse.fromJson(result['response']);
+    return CachedResponse.fromJson(result['response']);
   }
 
   /// Requests data from cache.
@@ -80,7 +78,7 @@ class CacheStorageApi {
       'pageSize': pageSize,
     };
     var result = await _client.send('CacheStorage.requestEntries', parameters);
-    return new RequestEntriesResult.fromJson(result);
+    return RequestEntriesResult.fromJson(result);
   }
 }
 
@@ -97,9 +95,9 @@ class RequestEntriesResult {
   });
 
   factory RequestEntriesResult.fromJson(Map<String, dynamic> json) {
-    return new RequestEntriesResult(
+    return RequestEntriesResult(
       cacheDataEntries: (json['cacheDataEntries'] as List)
-          .map((e) => new DataEntry.fromJson(e))
+          .map((e) => DataEntry.fromJson(e))
           .toList(),
       hasMore: json['hasMore'],
     );
@@ -112,7 +110,7 @@ class CacheId {
 
   CacheId(this.value);
 
-  factory CacheId.fromJson(String value) => new CacheId(value);
+  factory CacheId.fromJson(String value) => CacheId(value);
 
   String toJson() => value;
 
@@ -160,17 +158,17 @@ class DataEntry {
   });
 
   factory DataEntry.fromJson(Map<String, dynamic> json) {
-    return new DataEntry(
+    return DataEntry(
       requestURL: json['requestURL'],
       requestMethod: json['requestMethod'],
       requestHeaders: (json['requestHeaders'] as List)
-          .map((e) => new Header.fromJson(e))
+          .map((e) => Header.fromJson(e))
           .toList(),
       responseTime: json['responseTime'],
       responseStatus: json['responseStatus'],
       responseStatusText: json['responseStatusText'],
       responseHeaders: (json['responseHeaders'] as List)
-          .map((e) => new Header.fromJson(e))
+          .map((e) => Header.fromJson(e))
           .toList(),
     );
   }
@@ -207,8 +205,8 @@ class Cache {
   });
 
   factory Cache.fromJson(Map<String, dynamic> json) {
-    return new Cache(
-      cacheId: new CacheId.fromJson(json['cacheId']),
+    return Cache(
+      cacheId: CacheId.fromJson(json['cacheId']),
       securityOrigin: json['securityOrigin'],
       cacheName: json['cacheName'],
     );
@@ -235,7 +233,7 @@ class Header {
   });
 
   factory Header.fromJson(Map<String, dynamic> json) {
-    return new Header(
+    return Header(
       name: json['name'],
       value: json['value'],
     );
@@ -260,7 +258,7 @@ class CachedResponse {
   });
 
   factory CachedResponse.fromJson(Map<String, dynamic> json) {
-    return new CachedResponse(
+    return CachedResponse(
       body: json['body'],
     );
   }

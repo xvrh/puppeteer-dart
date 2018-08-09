@@ -4,13 +4,13 @@ import '../domains/network.dart';
 import '../domains/log.dart';
 
 Future waitUntilNetworkIdle(NetworkApi network,
-    {Duration idleDuration: const Duration(milliseconds: 1000),
-    int idleInFlight: 0}) async {
+    {Duration idleDuration = const Duration(milliseconds: 1000),
+    int idleInFlight = 0}) async {
   await network.enable();
 
   List<String> requestIds = [];
 
-  Completer completer = new Completer();
+  Completer completer = Completer();
   List<StreamSubscription> subscriptions = [];
   complete() {
     for (StreamSubscription subscription in subscriptions) {
@@ -19,7 +19,7 @@ Future waitUntilNetworkIdle(NetworkApi network,
     completer.complete();
   }
 
-  Timer idleTimer = new Timer(idleDuration, complete);
+  Timer idleTimer = Timer(idleDuration, complete);
 
   subscriptions
       .add(network.onRequestWillBeSent.listen((RequestWillBeSentEvent e) {
@@ -33,7 +33,7 @@ Future waitUntilNetworkIdle(NetworkApi network,
   remove(RequestId id) {
     requestIds.remove(id.value);
     if (requestIds.length <= idleInFlight && idleTimer == null) {
-      idleTimer = new Timer(idleDuration, complete);
+      idleTimer = Timer(idleDuration, complete);
     }
   }
 

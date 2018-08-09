@@ -95,7 +95,7 @@ class IndexedDBApi {
       parameters['keyRange'] = keyRange.toJson();
     }
     var result = await _client.send('IndexedDB.requestData', parameters);
-    return new RequestDataResult.fromJson(result);
+    return RequestDataResult.fromJson(result);
   }
 
   /// Requests database with given name in given frame.
@@ -111,7 +111,7 @@ class IndexedDBApi {
       'databaseName': databaseName,
     };
     var result = await _client.send('IndexedDB.requestDatabase', parameters);
-    return new DatabaseWithObjectStores.fromJson(
+    return DatabaseWithObjectStores.fromJson(
         result['databaseWithObjectStores']);
   }
 
@@ -143,9 +143,9 @@ class RequestDataResult {
   });
 
   factory RequestDataResult.fromJson(Map<String, dynamic> json) {
-    return new RequestDataResult(
+    return RequestDataResult(
       objectStoreDataEntries: (json['objectStoreDataEntries'] as List)
-          .map((e) => new DataEntry.fromJson(e))
+          .map((e) => DataEntry.fromJson(e))
           .toList(),
       hasMore: json['hasMore'],
     );
@@ -170,11 +170,11 @@ class DatabaseWithObjectStores {
   });
 
   factory DatabaseWithObjectStores.fromJson(Map<String, dynamic> json) {
-    return new DatabaseWithObjectStores(
+    return DatabaseWithObjectStores(
       name: json['name'],
       version: json['version'],
       objectStores: (json['objectStores'] as List)
-          .map((e) => new ObjectStore.fromJson(e))
+          .map((e) => ObjectStore.fromJson(e))
           .toList(),
     );
   }
@@ -211,12 +211,12 @@ class ObjectStore {
   });
 
   factory ObjectStore.fromJson(Map<String, dynamic> json) {
-    return new ObjectStore(
+    return ObjectStore(
       name: json['name'],
-      keyPath: new KeyPath.fromJson(json['keyPath']),
+      keyPath: KeyPath.fromJson(json['keyPath']),
       autoIncrement: json['autoIncrement'],
       indexes: (json['indexes'] as List)
-          .map((e) => new ObjectStoreIndex.fromJson(e))
+          .map((e) => ObjectStoreIndex.fromJson(e))
           .toList(),
     );
   }
@@ -254,9 +254,9 @@ class ObjectStoreIndex {
   });
 
   factory ObjectStoreIndex.fromJson(Map<String, dynamic> json) {
-    return new ObjectStoreIndex(
+    return ObjectStoreIndex(
       name: json['name'],
-      keyPath: new KeyPath.fromJson(json['keyPath']),
+      keyPath: KeyPath.fromJson(json['keyPath']),
       unique: json['unique'],
       multiEntry: json['multiEntry'],
     );
@@ -299,13 +299,13 @@ class Key {
   });
 
   factory Key.fromJson(Map<String, dynamic> json) {
-    return new Key(
+    return Key(
       type: json['type'],
       number: json.containsKey('number') ? json['number'] : null,
       string: json.containsKey('string') ? json['string'] : null,
       date: json.containsKey('date') ? json['date'] : null,
       array: json.containsKey('array')
-          ? (json['array'] as List).map((e) => new Key.fromJson(e)).toList()
+          ? (json['array'] as List).map((e) => Key.fromJson(e)).toList()
           : null,
     );
   }
@@ -352,9 +352,9 @@ class KeyRange {
   });
 
   factory KeyRange.fromJson(Map<String, dynamic> json) {
-    return new KeyRange(
-      lower: json.containsKey('lower') ? new Key.fromJson(json['lower']) : null,
-      upper: json.containsKey('upper') ? new Key.fromJson(json['upper']) : null,
+    return KeyRange(
+      lower: json.containsKey('lower') ? Key.fromJson(json['lower']) : null,
+      upper: json.containsKey('upper') ? Key.fromJson(json['upper']) : null,
       lowerOpen: json['lowerOpen'],
       upperOpen: json['upperOpen'],
     );
@@ -393,10 +393,10 @@ class DataEntry {
   });
 
   factory DataEntry.fromJson(Map<String, dynamic> json) {
-    return new DataEntry(
-      key: new runtime.RemoteObject.fromJson(json['key']),
-      primaryKey: new runtime.RemoteObject.fromJson(json['primaryKey']),
-      value: new runtime.RemoteObject.fromJson(json['value']),
+    return DataEntry(
+      key: runtime.RemoteObject.fromJson(json['key']),
+      primaryKey: runtime.RemoteObject.fromJson(json['primaryKey']),
+      value: runtime.RemoteObject.fromJson(json['value']),
     );
   }
 
@@ -428,7 +428,7 @@ class KeyPath {
   });
 
   factory KeyPath.fromJson(Map<String, dynamic> json) {
-    return new KeyPath(
+    return KeyPath(
       type: json['type'],
       string: json.containsKey('string') ? json['string'] : null,
       array: json.containsKey('array')

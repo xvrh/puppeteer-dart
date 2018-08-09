@@ -22,8 +22,7 @@ class AnimationApi {
   /// Event for animation that has been started.
   Stream<Animation> get onAnimationStarted => _client.onEvent
       .where((Event event) => event.name == 'Animation.animationStarted')
-      .map((Event event) =>
-          new Animation.fromJson(event.parameters['animation']));
+      .map((Event event) => Animation.fromJson(event.parameters['animation']));
 
   /// Disables animation domain notifications.
   Future disable() async {
@@ -76,7 +75,7 @@ class AnimationApi {
       'animationId': animationId,
     };
     var result = await _client.send('Animation.resolveAnimation', parameters);
-    return new runtime.RemoteObject.fromJson(result['remoteObject']);
+    return runtime.RemoteObject.fromJson(result['remoteObject']);
   }
 
   /// Seek a set of animations to a particular time within each animation.
@@ -183,7 +182,7 @@ class Animation {
   });
 
   factory Animation.fromJson(Map<String, dynamic> json) {
-    return new Animation(
+    return Animation(
       id: json['id'],
       name: json['name'],
       pausedState: json['pausedState'],
@@ -193,7 +192,7 @@ class Animation {
       currentTime: json['currentTime'],
       type: json['type'],
       source: json.containsKey('source')
-          ? new AnimationEffect.fromJson(json['source'])
+          ? AnimationEffect.fromJson(json['source'])
           : null,
       cssId: json.containsKey('cssId') ? json['cssId'] : null,
     );
@@ -266,7 +265,7 @@ class AnimationEffect {
   });
 
   factory AnimationEffect.fromJson(Map<String, dynamic> json) {
-    return new AnimationEffect(
+    return AnimationEffect(
       delay: json['delay'],
       endDelay: json['endDelay'],
       iterationStart: json['iterationStart'],
@@ -275,10 +274,10 @@ class AnimationEffect {
       direction: json['direction'],
       fill: json['fill'],
       backendNodeId: json.containsKey('backendNodeId')
-          ? new dom.BackendNodeId.fromJson(json['backendNodeId'])
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'])
           : null,
       keyframesRule: json.containsKey('keyframesRule')
-          ? new KeyframesRule.fromJson(json['keyframesRule'])
+          ? KeyframesRule.fromJson(json['keyframesRule'])
           : null,
       easing: json['easing'],
     );
@@ -319,10 +318,10 @@ class KeyframesRule {
   });
 
   factory KeyframesRule.fromJson(Map<String, dynamic> json) {
-    return new KeyframesRule(
+    return KeyframesRule(
       name: json.containsKey('name') ? json['name'] : null,
       keyframes: (json['keyframes'] as List)
-          .map((e) => new KeyframeStyle.fromJson(e))
+          .map((e) => KeyframeStyle.fromJson(e))
           .toList(),
     );
   }
@@ -352,7 +351,7 @@ class KeyframeStyle {
   });
 
   factory KeyframeStyle.fromJson(Map<String, dynamic> json) {
-    return new KeyframeStyle(
+    return KeyframeStyle(
       offset: json['offset'],
       easing: json['easing'],
     );

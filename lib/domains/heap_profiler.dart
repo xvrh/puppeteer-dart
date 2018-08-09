@@ -24,15 +24,14 @@ class HeapProfilerApi {
   /// then one or more heapStatsUpdate events will be sent before a new lastSeenObjectId event.
   Stream<LastSeenObjectIdEvent> get onLastSeenObjectId => _client.onEvent
       .where((Event event) => event.name == 'HeapProfiler.lastSeenObjectId')
-      .map((Event event) =>
-          new LastSeenObjectIdEvent.fromJson(event.parameters));
+      .map((Event event) => LastSeenObjectIdEvent.fromJson(event.parameters));
 
   Stream<ReportHeapSnapshotProgressEvent> get onReportHeapSnapshotProgress =>
       _client.onEvent
           .where((Event event) =>
               event.name == 'HeapProfiler.reportHeapSnapshotProgress')
           .map((Event event) =>
-              new ReportHeapSnapshotProgressEvent.fromJson(event.parameters));
+              ReportHeapSnapshotProgressEvent.fromJson(event.parameters));
 
   Stream get onResetProfiles => _client.onEvent
       .where((Event event) => event.name == 'HeapProfiler.resetProfiles');
@@ -70,7 +69,7 @@ class HeapProfilerApi {
       'objectId': objectId.toJson(),
     };
     var result = await _client.send('HeapProfiler.getHeapObjectId', parameters);
-    return new HeapSnapshotObjectId.fromJson(result['heapSnapshotObjectId']);
+    return HeapSnapshotObjectId.fromJson(result['heapSnapshotObjectId']);
   }
 
   /// [objectGroup] Symbolic group name that can be used to release multiple objects.
@@ -87,13 +86,13 @@ class HeapProfilerApi {
     }
     var result =
         await _client.send('HeapProfiler.getObjectByHeapObjectId', parameters);
-    return new runtime.RemoteObject.fromJson(result['result']);
+    return runtime.RemoteObject.fromJson(result['result']);
   }
 
   /// Returns: Return the sampling profile being collected.
   Future<SamplingHeapProfile> getSamplingProfile() async {
     var result = await _client.send('HeapProfiler.getSamplingProfile');
-    return new SamplingHeapProfile.fromJson(result['profile']);
+    return SamplingHeapProfile.fromJson(result['profile']);
   }
 
   /// [samplingInterval] Average sample interval in bytes. Poisson distribution is used for the intervals. The
@@ -121,7 +120,7 @@ class HeapProfilerApi {
   /// Returns: Recorded sampling heap profile.
   Future<SamplingHeapProfile> stopSampling() async {
     var result = await _client.send('HeapProfiler.stopSampling');
-    return new SamplingHeapProfile.fromJson(result['profile']);
+    return SamplingHeapProfile.fromJson(result['profile']);
   }
 
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken
@@ -159,7 +158,7 @@ class LastSeenObjectIdEvent {
   });
 
   factory LastSeenObjectIdEvent.fromJson(Map<String, dynamic> json) {
-    return new LastSeenObjectIdEvent(
+    return LastSeenObjectIdEvent(
       lastSeenObjectId: json['lastSeenObjectId'],
       timestamp: json['timestamp'],
     );
@@ -180,7 +179,7 @@ class ReportHeapSnapshotProgressEvent {
   });
 
   factory ReportHeapSnapshotProgressEvent.fromJson(Map<String, dynamic> json) {
-    return new ReportHeapSnapshotProgressEvent(
+    return ReportHeapSnapshotProgressEvent(
       done: json['done'],
       total: json['total'],
       finished: json.containsKey('finished') ? json['finished'] : null,
@@ -195,7 +194,7 @@ class HeapSnapshotObjectId {
   HeapSnapshotObjectId(this.value);
 
   factory HeapSnapshotObjectId.fromJson(String value) =>
-      new HeapSnapshotObjectId(value);
+      HeapSnapshotObjectId(value);
 
   String toJson() => value;
 
@@ -228,11 +227,11 @@ class SamplingHeapProfileNode {
   });
 
   factory SamplingHeapProfileNode.fromJson(Map<String, dynamic> json) {
-    return new SamplingHeapProfileNode(
-      callFrame: new runtime.CallFrame.fromJson(json['callFrame']),
+    return SamplingHeapProfileNode(
+      callFrame: runtime.CallFrame.fromJson(json['callFrame']),
       selfSize: json['selfSize'],
       children: (json['children'] as List)
-          .map((e) => new SamplingHeapProfileNode.fromJson(e))
+          .map((e) => SamplingHeapProfileNode.fromJson(e))
           .toList(),
     );
   }
@@ -256,8 +255,8 @@ class SamplingHeapProfile {
   });
 
   factory SamplingHeapProfile.fromJson(Map<String, dynamic> json) {
-    return new SamplingHeapProfile(
-      head: new SamplingHeapProfileNode.fromJson(json['head']),
+    return SamplingHeapProfile(
+      head: SamplingHeapProfileNode.fromJson(json['head']),
     );
   }
 

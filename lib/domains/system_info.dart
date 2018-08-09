@@ -11,7 +11,7 @@ class SystemInfoApi {
   /// Returns information about the system.
   Future<GetInfoResult> getInfo() async {
     var result = await _client.send('SystemInfo.getInfo');
-    return new GetInfoResult.fromJson(result);
+    return GetInfoResult.fromJson(result);
   }
 }
 
@@ -39,8 +39,8 @@ class GetInfoResult {
   });
 
   factory GetInfoResult.fromJson(Map<String, dynamic> json) {
-    return new GetInfoResult(
-      gpu: new GPUInfo.fromJson(json['gpu']),
+    return GetInfoResult(
+      gpu: GPUInfo.fromJson(json['gpu']),
       modelName: json['modelName'],
       modelVersion: json['modelVersion'],
       commandLine: json['commandLine'],
@@ -70,7 +70,7 @@ class GPUDevice {
   });
 
   factory GPUDevice.fromJson(Map<String, dynamic> json) {
-    return new GPUDevice(
+    return GPUDevice(
       vendorId: json['vendorId'],
       deviceId: json['deviceId'],
       vendorString: json['vendorString'],
@@ -111,10 +111,9 @@ class GPUInfo {
   });
 
   factory GPUInfo.fromJson(Map<String, dynamic> json) {
-    return new GPUInfo(
-      devices: (json['devices'] as List)
-          .map((e) => new GPUDevice.fromJson(e))
-          .toList(),
+    return GPUInfo(
+      devices:
+          (json['devices'] as List).map((e) => GPUDevice.fromJson(e)).toList(),
       auxAttributes:
           json.containsKey('auxAttributes') ? json['auxAttributes'] : null,
       featureStatus:

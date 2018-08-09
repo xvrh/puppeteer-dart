@@ -22,7 +22,7 @@ main() {
         marginTop: 0));
 
     // Save the bytes in a file
-    await new File.fromUri(Platform.script.resolve('_github.pdf'))
+    await File.fromUri(Platform.script.resolve('_github.pdf'))
         .writeAsBytes(pdf);
   });
 }

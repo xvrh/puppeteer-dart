@@ -40,7 +40,7 @@ class IOApi {
       parameters['size'] = size;
     }
     var result = await _client.send('IO.read', parameters);
-    return new ReadResult.fromJson(result);
+    return ReadResult.fromJson(result);
   }
 
   /// Return UUID of Blob object specified by a remote object id.
@@ -74,7 +74,7 @@ class ReadResult {
   });
 
   factory ReadResult.fromJson(Map<String, dynamic> json) {
-    return new ReadResult(
+    return ReadResult(
       base64Encoded:
           json.containsKey('base64Encoded') ? json['base64Encoded'] : null,
       data: json['data'],
@@ -90,7 +90,7 @@ class StreamHandle {
 
   StreamHandle(this.value);
 
-  factory StreamHandle.fromJson(String value) => new StreamHandle(value);
+  factory StreamHandle.fromJson(String value) => StreamHandle(value);
 
   String toJson() => value;
 

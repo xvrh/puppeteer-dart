@@ -13,7 +13,7 @@ class StorageApi {
           .where((Event event) =>
               event.name == 'Storage.cacheStorageContentUpdated')
           .map((Event event) =>
-              new CacheStorageContentUpdatedEvent.fromJson(event.parameters));
+              CacheStorageContentUpdatedEvent.fromJson(event.parameters));
 
   /// A cache has been added/deleted.
   Stream<String> get onCacheStorageListUpdated => _client.onEvent
@@ -25,7 +25,7 @@ class StorageApi {
       .onEvent
       .where((Event event) => event.name == 'Storage.indexedDBContentUpdated')
       .map((Event event) =>
-          new IndexedDBContentUpdatedEvent.fromJson(event.parameters));
+          IndexedDBContentUpdatedEvent.fromJson(event.parameters));
 
   /// The origin's IndexedDB database list has been modified.
   Stream<String> get onIndexedDBListUpdated => _client.onEvent
@@ -55,7 +55,7 @@ class StorageApi {
       'origin': origin,
     };
     var result = await _client.send('Storage.getUsageAndQuota', parameters);
-    return new GetUsageAndQuotaResult.fromJson(result);
+    return GetUsageAndQuotaResult.fromJson(result);
   }
 
   /// Registers origin to be notified when an update occurs to its cache storage list.
@@ -116,7 +116,7 @@ class CacheStorageContentUpdatedEvent {
   });
 
   factory CacheStorageContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
-    return new CacheStorageContentUpdatedEvent(
+    return CacheStorageContentUpdatedEvent(
       origin: json['origin'],
       cacheName: json['cacheName'],
     );
@@ -140,7 +140,7 @@ class IndexedDBContentUpdatedEvent {
   });
 
   factory IndexedDBContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
-    return new IndexedDBContentUpdatedEvent(
+    return IndexedDBContentUpdatedEvent(
       origin: json['origin'],
       databaseName: json['databaseName'],
       objectStoreName: json['objectStoreName'],
@@ -165,11 +165,11 @@ class GetUsageAndQuotaResult {
   });
 
   factory GetUsageAndQuotaResult.fromJson(Map<String, dynamic> json) {
-    return new GetUsageAndQuotaResult(
+    return GetUsageAndQuotaResult(
       usage: json['usage'],
       quota: json['quota'],
       usageBreakdown: (json['usageBreakdown'] as List)
-          .map((e) => new UsageForType.fromJson(e))
+          .map((e) => UsageForType.fromJson(e))
           .toList(),
     );
   }
@@ -229,8 +229,8 @@ class UsageForType {
   });
 
   factory UsageForType.fromJson(Map<String, dynamic> json) {
-    return new UsageForType(
-      storageType: new StorageType.fromJson(json['storageType']),
+    return UsageForType(
+      storageType: StorageType.fromJson(json['storageType']),
       usage: json['usage'],
     );
   }

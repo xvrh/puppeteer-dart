@@ -16,28 +16,28 @@ class PageApi {
   Stream<network.MonotonicTime> get onDomContentEventFired => _client.onEvent
       .where((Event event) => event.name == 'Page.domContentEventFired')
       .map((Event event) =>
-          new network.MonotonicTime.fromJson(event.parameters['timestamp']));
+          network.MonotonicTime.fromJson(event.parameters['timestamp']));
 
   /// Fired when frame has been attached to its parent.
   Stream<FrameAttachedEvent> get onFrameAttached => _client.onEvent
       .where((Event event) => event.name == 'Page.frameAttached')
-      .map((Event event) => new FrameAttachedEvent.fromJson(event.parameters));
+      .map((Event event) => FrameAttachedEvent.fromJson(event.parameters));
 
   /// Fired when frame no longer has a scheduled navigation.
   Stream<FrameId> get onFrameClearedScheduledNavigation => _client.onEvent
       .where(
           (Event event) => event.name == 'Page.frameClearedScheduledNavigation')
-      .map((Event event) => new FrameId.fromJson(event.parameters['frameId']));
+      .map((Event event) => FrameId.fromJson(event.parameters['frameId']));
 
   /// Fired when frame has been detached from its parent.
   Stream<FrameId> get onFrameDetached => _client.onEvent
       .where((Event event) => event.name == 'Page.frameDetached')
-      .map((Event event) => new FrameId.fromJson(event.parameters['frameId']));
+      .map((Event event) => FrameId.fromJson(event.parameters['frameId']));
 
   /// Fired once navigation of the frame has completed. Frame is now associated with the new loader.
   Stream<Frame> get onFrameNavigated => _client.onEvent
       .where((Event event) => event.name == 'Page.frameNavigated')
-      .map((Event event) => new Frame.fromJson(event.parameters['frame']));
+      .map((Event event) => Frame.fromJson(event.parameters['frame']));
 
   Stream get onFrameResized =>
       _client.onEvent.where((Event event) => event.name == 'Page.frameResized');
@@ -47,17 +47,17 @@ class PageApi {
       _client.onEvent
           .where((Event event) => event.name == 'Page.frameScheduledNavigation')
           .map((Event event) =>
-              new FrameScheduledNavigationEvent.fromJson(event.parameters));
+              FrameScheduledNavigationEvent.fromJson(event.parameters));
 
   /// Fired when frame has started loading.
   Stream<FrameId> get onFrameStartedLoading => _client.onEvent
       .where((Event event) => event.name == 'Page.frameStartedLoading')
-      .map((Event event) => new FrameId.fromJson(event.parameters['frameId']));
+      .map((Event event) => FrameId.fromJson(event.parameters['frameId']));
 
   /// Fired when frame has stopped loading.
   Stream<FrameId> get onFrameStoppedLoading => _client.onEvent
       .where((Event event) => event.name == 'Page.frameStoppedLoading')
-      .map((Event event) => new FrameId.fromJson(event.parameters['frameId']));
+      .map((Event event) => FrameId.fromJson(event.parameters['frameId']));
 
   /// Fired when interstitial page was hidden
   Stream get onInterstitialHidden => _client.onEvent
@@ -73,7 +73,7 @@ class PageApi {
       _client.onEvent
           .where((Event event) => event.name == 'Page.javascriptDialogClosed')
           .map((Event event) =>
-              new JavascriptDialogClosedEvent.fromJson(event.parameters));
+              JavascriptDialogClosedEvent.fromJson(event.parameters));
 
   /// Fired when a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload) is about to
   /// open.
@@ -81,30 +81,29 @@ class PageApi {
       _client.onEvent
           .where((Event event) => event.name == 'Page.javascriptDialogOpening')
           .map((Event event) =>
-              new JavascriptDialogOpeningEvent.fromJson(event.parameters));
+              JavascriptDialogOpeningEvent.fromJson(event.parameters));
 
   /// Fired for top level page lifecycle events such as navigation, load, paint, etc.
   Stream<LifecycleEventEvent> get onLifecycleEvent => _client.onEvent
       .where((Event event) => event.name == 'Page.lifecycleEvent')
-      .map((Event event) => new LifecycleEventEvent.fromJson(event.parameters));
+      .map((Event event) => LifecycleEventEvent.fromJson(event.parameters));
 
   Stream<network.MonotonicTime> get onLoadEventFired => _client.onEvent
       .where((Event event) => event.name == 'Page.loadEventFired')
       .map((Event event) =>
-          new network.MonotonicTime.fromJson(event.parameters['timestamp']));
+          network.MonotonicTime.fromJson(event.parameters['timestamp']));
 
   /// Fired when same-document navigation happens, e.g. due to history API usage or anchor navigation.
   Stream<NavigatedWithinDocumentEvent> get onNavigatedWithinDocument =>
       _client.onEvent
           .where((Event event) => event.name == 'Page.navigatedWithinDocument')
           .map((Event event) =>
-              new NavigatedWithinDocumentEvent.fromJson(event.parameters));
+              NavigatedWithinDocumentEvent.fromJson(event.parameters));
 
   /// Compressed image data requested by the `startScreencast`.
   Stream<ScreencastFrameEvent> get onScreencastFrame => _client.onEvent
       .where((Event event) => event.name == 'Page.screencastFrame')
-      .map(
-          (Event event) => new ScreencastFrameEvent.fromJson(event.parameters));
+      .map((Event event) => ScreencastFrameEvent.fromJson(event.parameters));
 
   /// Fired when the page with currently enabled screencast was shown or hidden `.
   Stream<bool> get onScreencastVisibilityChanged => _client.onEvent
@@ -115,7 +114,7 @@ class PageApi {
   /// etc.
   Stream<WindowOpenEvent> get onWindowOpen => _client.onEvent
       .where((Event event) => event.name == 'Page.windowOpen')
-      .map((Event event) => new WindowOpenEvent.fromJson(event.parameters));
+      .map((Event event) => WindowOpenEvent.fromJson(event.parameters));
 
   /// Issued for every compilation cache generated. Is only available
   /// if Page.setGenerateCompilationCache is enabled.
@@ -123,7 +122,7 @@ class PageApi {
       _client.onEvent
           .where((Event event) => event.name == 'Page.compilationCacheProduced')
           .map((Event event) =>
-              new CompilationCacheProducedEvent.fromJson(event.parameters));
+              CompilationCacheProducedEvent.fromJson(event.parameters));
 
   /// Deprecated, please use addScriptToEvaluateOnNewDocument instead.
   /// Returns: Identifier of the added script.
@@ -136,7 +135,7 @@ class PageApi {
     };
     var result =
         await _client.send('Page.addScriptToEvaluateOnLoad', parameters);
-    return new ScriptIdentifier.fromJson(result['identifier']);
+    return ScriptIdentifier.fromJson(result['identifier']);
   }
 
   /// Evaluates given script in every frame upon creation (before loading frame's scripts).
@@ -149,7 +148,7 @@ class PageApi {
     };
     var result =
         await _client.send('Page.addScriptToEvaluateOnNewDocument', parameters);
-    return new ScriptIdentifier.fromJson(result['identifier']);
+    return ScriptIdentifier.fromJson(result['identifier']);
   }
 
   /// Brings page to front (activates tab).
@@ -225,8 +224,7 @@ class PageApi {
       parameters['grantUniveralAccess'] = grantUniveralAccess;
     }
     var result = await _client.send('Page.createIsolatedWorld', parameters);
-    return new runtime.ExecutionContextId.fromJson(
-        result['executionContextId']);
+    return runtime.ExecutionContextId.fromJson(result['executionContextId']);
   }
 
   /// Deletes browser cookie with given name, domain and path.
@@ -256,7 +254,7 @@ class PageApi {
 
   Future<GetAppManifestResult> getAppManifest() async {
     var result = await _client.send('Page.getAppManifest');
-    return new GetAppManifestResult.fromJson(result);
+    return GetAppManifestResult.fromJson(result);
   }
 
   /// Returns all browser cookies. Depending on the backend support, will return detailed cookie
@@ -266,7 +264,7 @@ class PageApi {
   Future<List<network.Cookie>> getCookies() async {
     var result = await _client.send('Page.getCookies');
     return (result['cookies'] as List)
-        .map((e) => new network.Cookie.fromJson(e))
+        .map((e) => network.Cookie.fromJson(e))
         .toList();
   }
 
@@ -274,19 +272,19 @@ class PageApi {
   /// Returns: Present frame tree structure.
   Future<FrameTree> getFrameTree() async {
     var result = await _client.send('Page.getFrameTree');
-    return new FrameTree.fromJson(result['frameTree']);
+    return FrameTree.fromJson(result['frameTree']);
   }
 
   /// Returns metrics relating to the layouting of the page, such as viewport bounds/scale.
   Future<GetLayoutMetricsResult> getLayoutMetrics() async {
     var result = await _client.send('Page.getLayoutMetrics');
-    return new GetLayoutMetricsResult.fromJson(result);
+    return GetLayoutMetricsResult.fromJson(result);
   }
 
   /// Returns navigation history for the current page.
   Future<GetNavigationHistoryResult> getNavigationHistory() async {
     var result = await _client.send('Page.getNavigationHistory');
-    return new GetNavigationHistoryResult.fromJson(result);
+    return GetNavigationHistoryResult.fromJson(result);
   }
 
   /// Returns content of the given resource.
@@ -301,14 +299,14 @@ class PageApi {
       'url': url,
     };
     var result = await _client.send('Page.getResourceContent', parameters);
-    return new GetResourceContentResult.fromJson(result);
+    return GetResourceContentResult.fromJson(result);
   }
 
   /// Returns present frame / resource tree structure.
   /// Returns: Present frame / resource tree structure.
   Future<FrameResourceTree> getResourceTree() async {
     var result = await _client.send('Page.getResourceTree');
-    return new FrameResourceTree.fromJson(result['frameTree']);
+    return FrameResourceTree.fromJson(result['frameTree']);
   }
 
   /// Accepts or dismisses a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload).
@@ -352,7 +350,7 @@ class PageApi {
       parameters['frameId'] = frameId.toJson();
     }
     var result = await _client.send('Page.navigate', parameters);
-    return new NavigateResult.fromJson(result);
+    return NavigateResult.fromJson(result);
   }
 
   /// Navigates current page to the given history entry.
@@ -542,7 +540,7 @@ class PageApi {
     }
     var result = await _client.send('Page.searchInResource', parameters);
     return (result['result'] as List)
-        .map((e) => new debugger.SearchMatch.fromJson(e))
+        .map((e) => debugger.SearchMatch.fromJson(e))
         .toList();
   }
 
@@ -867,11 +865,11 @@ class FrameAttachedEvent {
   });
 
   factory FrameAttachedEvent.fromJson(Map<String, dynamic> json) {
-    return new FrameAttachedEvent(
-      frameId: new FrameId.fromJson(json['frameId']),
-      parentFrameId: new FrameId.fromJson(json['parentFrameId']),
+    return FrameAttachedEvent(
+      frameId: FrameId.fromJson(json['frameId']),
+      parentFrameId: FrameId.fromJson(json['parentFrameId']),
       stack: json.containsKey('stack')
-          ? new runtime.StackTrace.fromJson(json['stack'])
+          ? runtime.StackTrace.fromJson(json['stack'])
           : null,
     );
   }
@@ -899,8 +897,8 @@ class FrameScheduledNavigationEvent {
   });
 
   factory FrameScheduledNavigationEvent.fromJson(Map<String, dynamic> json) {
-    return new FrameScheduledNavigationEvent(
-      frameId: new FrameId.fromJson(json['frameId']),
+    return FrameScheduledNavigationEvent(
+      frameId: FrameId.fromJson(json['frameId']),
       delay: json['delay'],
       reason: json['reason'],
       url: json['url'],
@@ -921,7 +919,7 @@ class JavascriptDialogClosedEvent {
   });
 
   factory JavascriptDialogClosedEvent.fromJson(Map<String, dynamic> json) {
-    return new JavascriptDialogClosedEvent(
+    return JavascriptDialogClosedEvent(
       result: json['result'],
       userInput: json['userInput'],
     );
@@ -955,10 +953,10 @@ class JavascriptDialogOpeningEvent {
   });
 
   factory JavascriptDialogOpeningEvent.fromJson(Map<String, dynamic> json) {
-    return new JavascriptDialogOpeningEvent(
+    return JavascriptDialogOpeningEvent(
       url: json['url'],
       message: json['message'],
-      type: new DialogType.fromJson(json['type']),
+      type: DialogType.fromJson(json['type']),
       hasBrowserHandler: json['hasBrowserHandler'],
       defaultPrompt:
           json.containsKey('defaultPrompt') ? json['defaultPrompt'] : null,
@@ -985,11 +983,11 @@ class LifecycleEventEvent {
   });
 
   factory LifecycleEventEvent.fromJson(Map<String, dynamic> json) {
-    return new LifecycleEventEvent(
-      frameId: new FrameId.fromJson(json['frameId']),
-      loaderId: new network.LoaderId.fromJson(json['loaderId']),
+    return LifecycleEventEvent(
+      frameId: FrameId.fromJson(json['frameId']),
+      loaderId: network.LoaderId.fromJson(json['loaderId']),
       name: json['name'],
-      timestamp: new network.MonotonicTime.fromJson(json['timestamp']),
+      timestamp: network.MonotonicTime.fromJson(json['timestamp']),
     );
   }
 }
@@ -1007,8 +1005,8 @@ class NavigatedWithinDocumentEvent {
   });
 
   factory NavigatedWithinDocumentEvent.fromJson(Map<String, dynamic> json) {
-    return new NavigatedWithinDocumentEvent(
-      frameId: new FrameId.fromJson(json['frameId']),
+    return NavigatedWithinDocumentEvent(
+      frameId: FrameId.fromJson(json['frameId']),
       url: json['url'],
     );
   }
@@ -1031,9 +1029,9 @@ class ScreencastFrameEvent {
   });
 
   factory ScreencastFrameEvent.fromJson(Map<String, dynamic> json) {
-    return new ScreencastFrameEvent(
+    return ScreencastFrameEvent(
       data: json['data'],
-      metadata: new ScreencastFrameMetadata.fromJson(json['metadata']),
+      metadata: ScreencastFrameMetadata.fromJson(json['metadata']),
       sessionId: json['sessionId'],
     );
   }
@@ -1060,7 +1058,7 @@ class WindowOpenEvent {
   });
 
   factory WindowOpenEvent.fromJson(Map<String, dynamic> json) {
-    return new WindowOpenEvent(
+    return WindowOpenEvent(
       url: json['url'],
       windowName: json['windowName'],
       windowFeatures:
@@ -1082,7 +1080,7 @@ class CompilationCacheProducedEvent {
   });
 
   factory CompilationCacheProducedEvent.fromJson(Map<String, dynamic> json) {
-    return new CompilationCacheProducedEvent(
+    return CompilationCacheProducedEvent(
       url: json['url'],
       data: json['data'],
     );
@@ -1105,10 +1103,10 @@ class GetAppManifestResult {
   });
 
   factory GetAppManifestResult.fromJson(Map<String, dynamic> json) {
-    return new GetAppManifestResult(
+    return GetAppManifestResult(
       url: json['url'],
       errors: (json['errors'] as List)
-          .map((e) => new AppManifestError.fromJson(e))
+          .map((e) => AppManifestError.fromJson(e))
           .toList(),
       data: json.containsKey('data') ? json['data'] : null,
     );
@@ -1132,10 +1130,10 @@ class GetLayoutMetricsResult {
   });
 
   factory GetLayoutMetricsResult.fromJson(Map<String, dynamic> json) {
-    return new GetLayoutMetricsResult(
-      layoutViewport: new LayoutViewport.fromJson(json['layoutViewport']),
-      visualViewport: new VisualViewport.fromJson(json['visualViewport']),
-      contentSize: new dom.Rect.fromJson(json['contentSize']),
+    return GetLayoutMetricsResult(
+      layoutViewport: LayoutViewport.fromJson(json['layoutViewport']),
+      visualViewport: VisualViewport.fromJson(json['visualViewport']),
+      contentSize: dom.Rect.fromJson(json['contentSize']),
     );
   }
 }
@@ -1153,10 +1151,10 @@ class GetNavigationHistoryResult {
   });
 
   factory GetNavigationHistoryResult.fromJson(Map<String, dynamic> json) {
-    return new GetNavigationHistoryResult(
+    return GetNavigationHistoryResult(
       currentIndex: json['currentIndex'],
       entries: (json['entries'] as List)
-          .map((e) => new NavigationEntry.fromJson(e))
+          .map((e) => NavigationEntry.fromJson(e))
           .toList(),
     );
   }
@@ -1175,7 +1173,7 @@ class GetResourceContentResult {
   });
 
   factory GetResourceContentResult.fromJson(Map<String, dynamic> json) {
-    return new GetResourceContentResult(
+    return GetResourceContentResult(
       content: json['content'],
       base64Encoded: json['base64Encoded'],
     );
@@ -1199,10 +1197,10 @@ class NavigateResult {
   });
 
   factory NavigateResult.fromJson(Map<String, dynamic> json) {
-    return new NavigateResult(
-      frameId: new FrameId.fromJson(json['frameId']),
+    return NavigateResult(
+      frameId: FrameId.fromJson(json['frameId']),
       loaderId: json.containsKey('loaderId')
-          ? new network.LoaderId.fromJson(json['loaderId'])
+          ? network.LoaderId.fromJson(json['loaderId'])
           : null,
       errorText: json.containsKey('errorText') ? json['errorText'] : null,
     );
@@ -1266,7 +1264,7 @@ class FrameId {
 
   FrameId(this.value);
 
-  factory FrameId.fromJson(String value) => new FrameId(value);
+  factory FrameId.fromJson(String value) => FrameId(value);
 
   String toJson() => value;
 
@@ -1318,10 +1316,10 @@ class Frame {
   });
 
   factory Frame.fromJson(Map<String, dynamic> json) {
-    return new Frame(
+    return Frame(
       id: json['id'],
       parentId: json.containsKey('parentId') ? json['parentId'] : null,
-      loaderId: new network.LoaderId.fromJson(json['loaderId']),
+      loaderId: network.LoaderId.fromJson(json['loaderId']),
       name: json.containsKey('name') ? json['name'] : null,
       url: json['url'],
       securityOrigin: json['securityOrigin'],
@@ -1386,12 +1384,12 @@ class FrameResource {
   });
 
   factory FrameResource.fromJson(Map<String, dynamic> json) {
-    return new FrameResource(
+    return FrameResource(
       url: json['url'],
-      type: new ResourceType.fromJson(json['type']),
+      type: ResourceType.fromJson(json['type']),
       mimeType: json['mimeType'],
       lastModified: json.containsKey('lastModified')
-          ? new network.TimeSinceEpoch.fromJson(json['lastModified'])
+          ? network.TimeSinceEpoch.fromJson(json['lastModified'])
           : null,
       contentSize: json.containsKey('contentSize') ? json['contentSize'] : null,
       failed: json.containsKey('failed') ? json['failed'] : null,
@@ -1439,15 +1437,15 @@ class FrameResourceTree {
   });
 
   factory FrameResourceTree.fromJson(Map<String, dynamic> json) {
-    return new FrameResourceTree(
-      frame: new Frame.fromJson(json['frame']),
+    return FrameResourceTree(
+      frame: Frame.fromJson(json['frame']),
       childFrames: json.containsKey('childFrames')
           ? (json['childFrames'] as List)
-              .map((e) => new FrameResourceTree.fromJson(e))
+              .map((e) => FrameResourceTree.fromJson(e))
               .toList()
           : null,
       resources: (json['resources'] as List)
-          .map((e) => new FrameResource.fromJson(e))
+          .map((e) => FrameResource.fromJson(e))
           .toList(),
     );
   }
@@ -1478,11 +1476,11 @@ class FrameTree {
   });
 
   factory FrameTree.fromJson(Map<String, dynamic> json) {
-    return new FrameTree(
-      frame: new Frame.fromJson(json['frame']),
+    return FrameTree(
+      frame: Frame.fromJson(json['frame']),
       childFrames: json.containsKey('childFrames')
           ? (json['childFrames'] as List)
-              .map((e) => new FrameTree.fromJson(e))
+              .map((e) => FrameTree.fromJson(e))
               .toList()
           : null,
     );
@@ -1505,8 +1503,7 @@ class ScriptIdentifier {
 
   ScriptIdentifier(this.value);
 
-  factory ScriptIdentifier.fromJson(String value) =>
-      new ScriptIdentifier(value);
+  factory ScriptIdentifier.fromJson(String value) => ScriptIdentifier(value);
 
   String toJson() => value;
 
@@ -1593,12 +1590,12 @@ class NavigationEntry {
   });
 
   factory NavigationEntry.fromJson(Map<String, dynamic> json) {
-    return new NavigationEntry(
+    return NavigationEntry(
       id: json['id'],
       url: json['url'],
       userTypedURL: json['userTypedURL'],
       title: json['title'],
-      transitionType: new TransitionType.fromJson(json['transitionType']),
+      transitionType: TransitionType.fromJson(json['transitionType']),
     );
   }
 
@@ -1648,7 +1645,7 @@ class ScreencastFrameMetadata {
   });
 
   factory ScreencastFrameMetadata.fromJson(Map<String, dynamic> json) {
-    return new ScreencastFrameMetadata(
+    return ScreencastFrameMetadata(
       offsetTop: json['offsetTop'],
       pageScaleFactor: json['pageScaleFactor'],
       deviceWidth: json['deviceWidth'],
@@ -1656,7 +1653,7 @@ class ScreencastFrameMetadata {
       scrollOffsetX: json['scrollOffsetX'],
       scrollOffsetY: json['scrollOffsetY'],
       timestamp: json.containsKey('timestamp')
-          ? new network.TimeSinceEpoch.fromJson(json['timestamp'])
+          ? network.TimeSinceEpoch.fromJson(json['timestamp'])
           : null,
     );
   }
@@ -1724,7 +1721,7 @@ class AppManifestError {
   });
 
   factory AppManifestError.fromJson(Map<String, dynamic> json) {
-    return new AppManifestError(
+    return AppManifestError(
       message: json['message'],
       critical: json['critical'],
       line: json['line'],
@@ -1765,7 +1762,7 @@ class LayoutViewport {
   });
 
   factory LayoutViewport.fromJson(Map<String, dynamic> json) {
-    return new LayoutViewport(
+    return LayoutViewport(
       pageX: json['pageX'],
       pageY: json['pageY'],
       clientWidth: json['clientWidth'],
@@ -1818,7 +1815,7 @@ class VisualViewport {
   });
 
   factory VisualViewport.fromJson(Map<String, dynamic> json) {
-    return new VisualViewport(
+    return VisualViewport(
       offsetX: json['offsetX'],
       offsetY: json['offsetY'],
       pageX: json['pageX'],
@@ -1869,7 +1866,7 @@ class Viewport {
   });
 
   factory Viewport.fromJson(Map<String, dynamic> json) {
-    return new Viewport(
+    return Viewport(
       x: json['x'],
       y: json['y'],
       width: json['width'],
@@ -1924,7 +1921,7 @@ class FontFamilies {
   });
 
   factory FontFamilies.fromJson(Map<String, dynamic> json) {
-    return new FontFamilies(
+    return FontFamilies(
       standard: json.containsKey('standard') ? json['standard'] : null,
       fixed: json.containsKey('fixed') ? json['fixed'] : null,
       serif: json.containsKey('serif') ? json['serif'] : null,
@@ -1976,7 +1973,7 @@ class FontSizes {
   });
 
   factory FontSizes.fromJson(Map<String, dynamic> json) {
-    return new FontSizes(
+    return FontSizes(
       standard: json.containsKey('standard') ? json['standard'] : null,
       fixed: json.containsKey('fixed') ? json['fixed'] : null,
     );

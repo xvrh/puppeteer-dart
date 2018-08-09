@@ -12,8 +12,8 @@ class ApplicationCacheApi {
       get onApplicationCacheStatusUpdated => _client.onEvent
           .where((Event event) =>
               event.name == 'ApplicationCache.applicationCacheStatusUpdated')
-          .map((Event event) => new ApplicationCacheStatusUpdatedEvent.fromJson(
-              event.parameters));
+          .map((Event event) =>
+              ApplicationCacheStatusUpdatedEvent.fromJson(event.parameters));
 
   Stream<bool> get onNetworkStateUpdated => _client.onEvent
       .where(
@@ -36,7 +36,7 @@ class ApplicationCacheApi {
     };
     var result = await _client.send(
         'ApplicationCache.getApplicationCacheForFrame', parameters);
-    return new ApplicationCache.fromJson(result['applicationCache']);
+    return ApplicationCache.fromJson(result['applicationCache']);
   }
 
   /// Returns array of frame identifiers with manifest urls for each frame containing a document
@@ -46,7 +46,7 @@ class ApplicationCacheApi {
   Future<List<FrameWithManifest>> getFramesWithManifests() async {
     var result = await _client.send('ApplicationCache.getFramesWithManifests');
     return (result['frameIds'] as List)
-        .map((e) => new FrameWithManifest.fromJson(e))
+        .map((e) => FrameWithManifest.fromJson(e))
         .toList();
   }
 
@@ -83,8 +83,8 @@ class ApplicationCacheStatusUpdatedEvent {
 
   factory ApplicationCacheStatusUpdatedEvent.fromJson(
       Map<String, dynamic> json) {
-    return new ApplicationCacheStatusUpdatedEvent(
-      frameId: new page.FrameId.fromJson(json['frameId']),
+    return ApplicationCacheStatusUpdatedEvent(
+      frameId: page.FrameId.fromJson(json['frameId']),
       manifestURL: json['manifestURL'],
       status: json['status'],
     );
@@ -109,7 +109,7 @@ class ApplicationCacheResource {
   });
 
   factory ApplicationCacheResource.fromJson(Map<String, dynamic> json) {
-    return new ApplicationCacheResource(
+    return ApplicationCacheResource(
       url: json['url'],
       size: json['size'],
       type: json['type'],
@@ -152,13 +152,13 @@ class ApplicationCache {
   });
 
   factory ApplicationCache.fromJson(Map<String, dynamic> json) {
-    return new ApplicationCache(
+    return ApplicationCache(
       manifestURL: json['manifestURL'],
       size: json['size'],
       creationTime: json['creationTime'],
       updateTime: json['updateTime'],
       resources: (json['resources'] as List)
-          .map((e) => new ApplicationCacheResource.fromJson(e))
+          .map((e) => ApplicationCacheResource.fromJson(e))
           .toList(),
     );
   }
@@ -193,8 +193,8 @@ class FrameWithManifest {
   });
 
   factory FrameWithManifest.fromJson(Map<String, dynamic> json) {
-    return new FrameWithManifest(
-      frameId: new page.FrameId.fromJson(json['frameId']),
+    return FrameWithManifest(
+      frameId: page.FrameId.fromJson(json['frameId']),
       manifestURL: json['manifestURL'],
       status: json['status'],
     );

@@ -347,7 +347,7 @@ class ScreenOrientation {
   });
 
   factory ScreenOrientation.fromJson(Map<String, dynamic> json) {
-    return new ScreenOrientation(
+    return ScreenOrientation(
       type: json['type'],
       angle: json['angle'],
     );

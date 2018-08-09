@@ -17,7 +17,7 @@ class BrowserApi {
   /// Returns version information.
   Future<GetVersionResult> getVersion() async {
     var result = await _client.send('Browser.getVersion');
-    return new GetVersionResult.fromJson(result);
+    return GetVersionResult.fromJson(result);
   }
 
   /// Returns the command line switches for the browser process if, and only if
@@ -47,7 +47,7 @@ class BrowserApi {
     }
     var result = await _client.send('Browser.getHistograms', parameters);
     return (result['histograms'] as List)
-        .map((e) => new Histogram.fromJson(e))
+        .map((e) => Histogram.fromJson(e))
         .toList();
   }
 
@@ -66,7 +66,7 @@ class BrowserApi {
       parameters['delta'] = delta;
     }
     var result = await _client.send('Browser.getHistogram', parameters);
-    return new Histogram.fromJson(result['histogram']);
+    return Histogram.fromJson(result['histogram']);
   }
 
   /// Get position and size of the browser window.
@@ -80,7 +80,7 @@ class BrowserApi {
       'windowId': windowId.toJson(),
     };
     var result = await _client.send('Browser.getWindowBounds', parameters);
-    return new Bounds.fromJson(result['bounds']);
+    return Bounds.fromJson(result['bounds']);
   }
 
   /// Get the browser window that contains the devtools target.
@@ -92,7 +92,7 @@ class BrowserApi {
       'targetId': targetId.toJson(),
     };
     var result = await _client.send('Browser.getWindowForTarget', parameters);
-    return new GetWindowForTargetResult.fromJson(result);
+    return GetWindowForTargetResult.fromJson(result);
   }
 
   /// Set position and/or size of the browser window.
@@ -136,7 +136,7 @@ class GetVersionResult {
   });
 
   factory GetVersionResult.fromJson(Map<String, dynamic> json) {
-    return new GetVersionResult(
+    return GetVersionResult(
       protocolVersion: json['protocolVersion'],
       product: json['product'],
       revision: json['revision'],
@@ -160,9 +160,9 @@ class GetWindowForTargetResult {
   });
 
   factory GetWindowForTargetResult.fromJson(Map<String, dynamic> json) {
-    return new GetWindowForTargetResult(
-      windowId: new WindowID.fromJson(json['windowId']),
-      bounds: new Bounds.fromJson(json['bounds']),
+    return GetWindowForTargetResult(
+      windowId: WindowID.fromJson(json['windowId']),
+      bounds: Bounds.fromJson(json['bounds']),
     );
   }
 }
@@ -172,7 +172,7 @@ class WindowID {
 
   WindowID(this.value);
 
-  factory WindowID.fromJson(int value) => new WindowID(value);
+  factory WindowID.fromJson(int value) => WindowID(value);
 
   int toJson() => value;
 
@@ -237,13 +237,13 @@ class Bounds {
   });
 
   factory Bounds.fromJson(Map<String, dynamic> json) {
-    return new Bounds(
+    return Bounds(
       left: json.containsKey('left') ? json['left'] : null,
       top: json.containsKey('top') ? json['top'] : null,
       width: json.containsKey('width') ? json['width'] : null,
       height: json.containsKey('height') ? json['height'] : null,
       windowState: json.containsKey('windowState')
-          ? new WindowState.fromJson(json['windowState'])
+          ? WindowState.fromJson(json['windowState'])
           : null,
     );
   }
@@ -287,7 +287,7 @@ class Bucket {
   });
 
   factory Bucket.fromJson(Map<String, dynamic> json) {
-    return new Bucket(
+    return Bucket(
       low: json['low'],
       high: json['high'],
       count: json['count'],
@@ -326,12 +326,12 @@ class Histogram {
   });
 
   factory Histogram.fromJson(Map<String, dynamic> json) {
-    return new Histogram(
+    return Histogram(
       name: json['name'],
       sum: json['sum'],
       count: json['count'],
       buckets:
-          (json['buckets'] as List).map((e) => new Bucket.fromJson(e)).toList(),
+          (json['buckets'] as List).map((e) => Bucket.fromJson(e)).toList(),
     );
   }
 

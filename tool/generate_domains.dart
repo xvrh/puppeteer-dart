@@ -9,13 +9,13 @@ import 'package:path/path.dart' as p;
 
 main() {
   Protocol readProtocol(String fileName) {
-    return new Protocol.fromString(
-        new File.fromUri(Platform.script.resolve(fileName)).readAsStringSync());
+    return Protocol.fromString(
+        File.fromUri(Platform.script.resolve(fileName)).readAsStringSync());
   }
 
   String libPath = Platform.script.resolve('../lib').toFilePath();
 
-  Directory targetDir = new Directory(p.join(libPath, 'domains'));
+  Directory targetDir = Directory(p.join(libPath, 'domains'));
   if (targetDir.existsSync()) {
     targetDir.deleteSync(recursive: true);
   }
@@ -27,20 +27,19 @@ main() {
   for (Domain domain in domains) {
     List<ComplexType> types = domain.types;
     List<Command> commandsJson = domain.commands;
-    _DomainContext context = new _DomainContext(domain);
+    _DomainContext context = _DomainContext(domain);
 
     String fileName = '${_underscoreize(domain.name)}.dart';
 
     List<_InternalType> internalTypes =
-        types.map((json) => new _InternalType(context, json)).toList();
+        types.map((json) => _InternalType(context, json)).toList();
 
     List<_Command> commands =
-        commandsJson.map((json) => new _Command(context, json)).toList();
+        commandsJson.map((json) => _Command(context, json)).toList();
 
-    List<_Event> events =
-        domain.events.map((e) => new _Event(context, e)).toList();
+    List<_Event> events = domain.events.map((e) => _Event(context, e)).toList();
 
-    StringBuffer code = new StringBuffer();
+    StringBuffer code = StringBuffer();
 
     //TODO(xha): sort imports
     code.writeln("import 'dart:async';");
@@ -93,7 +92,7 @@ main() {
     _writeDartFile(p.join(targetDir.path, fileName), code.toString());
   }
 
-  StringBuffer tabBuffer = new StringBuffer();
+  StringBuffer tabBuffer = StringBuffer();
 
   List<Domain> tabDomains = domains
       .where((d) =>
@@ -120,23 +119,24 @@ abstract class TabMixin {
 
     tabBuffer.writeln(toComment(domain.description, indent: 2));
     tabBuffer.writeln('${domain.name}Api get $camelizedName =>  '
-        '_$camelizedName ??= new ${domain.name}Api(session);');
+        '_$camelizedName ??= ${domain.name}Api(session);');
     tabBuffer.writeln('${domain.name}Api _$camelizedName;');
     tabBuffer.writeln('');
   }
   tabBuffer.writeln('}');
 
-  _writeDartFile(p.join(libPath, 'src', 'tab_mixin.dart'), tabBuffer.toString());
+  _writeDartFile(
+      p.join(libPath, 'src', 'tab_mixin.dart'), tabBuffer.toString());
 }
 
 final DartFormatter _dartFormatter =
-    new DartFormatter(lineEnding: Platform.isWindows ? '\r\n' : '\n');
+    DartFormatter(lineEnding: Platform.isWindows ? '\r\n' : '\n');
 
 _writeDartFile(String target, String code) {
   try {
     String formattedCode = _dartFormatter.format(code);
 
-    new File(target).writeAsStringSync(formattedCode);
+    File(target).writeAsStringSync(formattedCode);
   } catch (_) {
     print('Error with code\n$code');
     rethrow;
@@ -158,7 +158,7 @@ class _Command {
     List<Parameter> parameters = command.parameters;
     List<Parameter> returns = command.returns;
 
-    StringBuffer code = new StringBuffer();
+    StringBuffer code = StringBuffer();
 
     //TODO(xha): create a CommentBuilder to simplify and better manage the spacings between groups.
     code.writeln(toComment(command.description, indent: 2));
@@ -187,9 +187,8 @@ class _Command {
       } else {
         returnTypeName = '${firstLetterUpper(name)}Result';
         ComplexType returnJson =
-            new ComplexType(id: returnTypeName, properties: returns);
-        _returnType =
-            new _InternalType(context, returnJson, generateToJson: false);
+            ComplexType(id: returnTypeName, properties: returns);
+        _returnType = _InternalType(context, returnJson, generateToJson: false);
       }
     }
 
@@ -249,7 +248,7 @@ class _Command {
         if (isRawType(returnTypeName)) {
           sendCode += "return result['${returnParameter.name}'];";
         } else if (returnParameter.type == 'array') {
-          Parameter elementParameter = new Parameter(
+          Parameter elementParameter = Parameter(
               name: 'e',
               type: returnParameter.items.type,
               ref: returnParameter.items.ref);
@@ -259,17 +258,17 @@ class _Command {
             mapCode = 'e as $paramType';
           } else {
             mapCode =
-                'new ${context.getPropertyType(elementParameter)}.fromJson(e)';
+                '${context.getPropertyType(elementParameter)}.fromJson(e)';
           }
 
           sendCode +=
               "return (result['${returnParameter.name}'] as List).map((e) => $mapCode).toList();";
         } else {
           sendCode +=
-              "return new $returnTypeName.fromJson(result['${returnParameter.name}']);";
+              "return $returnTypeName.fromJson(result['${returnParameter.name}']);";
         }
       } else {
-        sendCode += 'return new $returnTypeName.fromJson(result);';
+        sendCode += 'return $returnTypeName.fromJson(result);';
       }
     }
 
@@ -295,7 +294,7 @@ class _Event {
     String name = event.name;
     List<Parameter> parameters = event.parameters;
 
-    StringBuffer code = new StringBuffer();
+    StringBuffer code = StringBuffer();
 
     String streamTypeName;
     if (parameters.isNotEmpty) {
@@ -305,9 +304,9 @@ class _Event {
       } else {
         streamTypeName = '${firstLetterUpper(name)}Event';
         ComplexType returnJson =
-            new ComplexType(id: streamTypeName, properties: parameters);
+            ComplexType(id: streamTypeName, properties: parameters);
         _complexType =
-            new _InternalType(context, returnJson, generateToJson: false);
+            _InternalType(context, returnJson, generateToJson: false);
       }
     }
 
@@ -325,7 +324,7 @@ class _Event {
         if (isRawType(streamTypeName)) {
           mapCode = "event.parameters['${parameter.name}'] as $streamTypeName";
         } else if (parameter.type == 'array') {
-          Parameter elementParameter = new Parameter(
+          Parameter elementParameter = Parameter(
               name: 'e', type: parameter.items.type, ref: parameter.items.ref);
           String paramType = context.getPropertyType(elementParameter);
           String insideCode;
@@ -333,17 +332,17 @@ class _Event {
             insideCode = 'e as $paramType';
           } else {
             insideCode =
-                'new ${context.getPropertyType(elementParameter)}.fromJson(e)';
+                '${context.getPropertyType(elementParameter)}.fromJson(e)';
           }
 
           mapCode =
               "(event.parameters['${parameter.name}'] as List).map((e) => $insideCode).toList()";
         } else {
           mapCode =
-              "new $streamTypeName.fromJson(event.parameters['${parameter.name}'])";
+              "$streamTypeName.fromJson(event.parameters['${parameter.name}'])";
         }
       } else {
-        mapCode = 'new $streamTypeName.fromJson(event.parameters)';
+        mapCode = '$streamTypeName.fromJson(event.parameters)';
       }
       assert(mapCode != null);
       code.writeln('.map((Event event) => $mapCode)');
@@ -368,7 +367,7 @@ String _toJsonCode(Parameter parameter) {
           .contains(type)) {
     return name;
   } else if (type == 'array') {
-    Parameter elementParameter = new Parameter(
+    Parameter elementParameter = Parameter(
         name: 'e', type: parameter.items.type, ref: parameter.items.ref);
     return '$name.map((e) => ${_toJsonCode(elementParameter)}).toList()';
   }
@@ -381,10 +380,10 @@ class _InternalType {
   final bool generateToJson;
   String _code;
 
-  _InternalType(this.context, this.type, {this.generateToJson: true}) {
+  _InternalType(this.context, this.type, {this.generateToJson = true}) {
     String id = type.id;
 
-    StringBuffer code = new StringBuffer();
+    StringBuffer code = StringBuffer();
 
     code.writeln(toComment(type.description));
     code.writeln('class $id {');
@@ -397,8 +396,8 @@ class _InternalType {
     if (hasProperties) {
       properties.addAll(jsonProperties);
     } else {
-      properties.add(
-          new Parameter(name: 'value', type: type.type, items: type.items));
+      properties
+          .add(Parameter(name: 'value', type: type.type, items: type.items));
 
       if (enumValues != null) {
         isEnum = true;
@@ -449,7 +448,7 @@ class _InternalType {
     code.writeln();
     if (hasProperties) {
       code.writeln('factory $id.fromJson(Map<String, dynamic> json) {');
-      code.writeln('return new $id(');
+      code.writeln('return $id(');
       for (Parameter property in properties.where((p) => !p.deprecated)) {
         String propertyName = property.name;
         String instantiateCode =
@@ -467,7 +466,7 @@ class _InternalType {
       code.writeln('factory $id.fromJson(String value) => values[value];');
     } else {
       code.writeln(
-          'factory $id.fromJson(${context.getPropertyType(properties.first)} value) => new $id(value);');
+          'factory $id.fromJson(${context.getPropertyType(properties.first)} value) => $id(value);');
     }
 
     if (generateToJson) {
@@ -525,7 +524,7 @@ class _InternalType {
   }
 
   String _fromJsonCode(Parameter parameter, String jsonParameter,
-      {bool withAs: false}) {
+      {bool withAs = false}) {
     String type = parameter.type;
 
     if (type != null &&
@@ -537,11 +536,11 @@ class _InternalType {
         return jsonParameter;
       }
     } else if (type == 'array') {
-      Parameter elementParameter = new Parameter(
+      Parameter elementParameter = Parameter(
           name: 'e', type: parameter.items.type, ref: parameter.items.ref);
       return "($jsonParameter as List).map((e) => ${_fromJsonCode(elementParameter, 'e', withAs: true)}).toList()";
     }
-    return "new ${context.getPropertyType(parameter)}.fromJson($jsonParameter)";
+    return "${context.getPropertyType(parameter)}.fromJson($jsonParameter)";
   }
 
   String get code => _code;
@@ -549,7 +548,7 @@ class _InternalType {
 
 class _DomainContext {
   final Domain domain;
-  final Set<String> dependencies = new Set();
+  final Set<String> dependencies = Set();
   bool _useMetaPackage = false;
 
   _DomainContext(this.domain);
@@ -599,7 +598,7 @@ class _DomainContext {
 bool isRawType(String type) =>
     const ['int', 'num', 'String', 'bool', 'dynamic', 'Map'].contains(type);
 
-String toComment(String comment, {int indent: 0}) {
+String toComment(String comment, {int indent = 0}) {
   if (comment != null && comment.isNotEmpty) {
     comment = comment.replaceAll('<code>', '`').replaceAll('</code>', '`');
 

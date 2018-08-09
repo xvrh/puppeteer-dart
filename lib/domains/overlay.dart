@@ -15,19 +15,18 @@ class OverlayApi {
   Stream<dom.BackendNodeId> get onInspectNodeRequested => _client.onEvent
       .where((Event event) => event.name == 'Overlay.inspectNodeRequested')
       .map((Event event) =>
-          new dom.BackendNodeId.fromJson(event.parameters['backendNodeId']));
+          dom.BackendNodeId.fromJson(event.parameters['backendNodeId']));
 
   /// Fired when the node should be highlighted. This happens after call to `setInspectMode`.
   Stream<dom.NodeId> get onNodeHighlightRequested => _client.onEvent
       .where((Event event) => event.name == 'Overlay.nodeHighlightRequested')
-      .map(
-          (Event event) => new dom.NodeId.fromJson(event.parameters['nodeId']));
+      .map((Event event) => dom.NodeId.fromJson(event.parameters['nodeId']));
 
   /// Fired when user asks to capture screenshot of some area on the page.
   Stream<page.Viewport> get onScreenshotRequested => _client.onEvent
       .where((Event event) => event.name == 'Overlay.screenshotRequested')
       .map((Event event) =>
-          new page.Viewport.fromJson(event.parameters['viewport']));
+          page.Viewport.fromJson(event.parameters['viewport']));
 
   /// Disables domain notifications.
   Future disable() async {
@@ -309,7 +308,7 @@ class HighlightConfig {
   });
 
   factory HighlightConfig.fromJson(Map<String, dynamic> json) {
-    return new HighlightConfig(
+    return HighlightConfig(
       showInfo: json.containsKey('showInfo') ? json['showInfo'] : null,
       showRulers: json.containsKey('showRulers') ? json['showRulers'] : null,
       showExtensionLines: json.containsKey('showExtensionLines')
@@ -319,30 +318,30 @@ class HighlightConfig {
           ? json['displayAsMaterial']
           : null,
       contentColor: json.containsKey('contentColor')
-          ? new dom.RGBA.fromJson(json['contentColor'])
+          ? dom.RGBA.fromJson(json['contentColor'])
           : null,
       paddingColor: json.containsKey('paddingColor')
-          ? new dom.RGBA.fromJson(json['paddingColor'])
+          ? dom.RGBA.fromJson(json['paddingColor'])
           : null,
       borderColor: json.containsKey('borderColor')
-          ? new dom.RGBA.fromJson(json['borderColor'])
+          ? dom.RGBA.fromJson(json['borderColor'])
           : null,
       marginColor: json.containsKey('marginColor')
-          ? new dom.RGBA.fromJson(json['marginColor'])
+          ? dom.RGBA.fromJson(json['marginColor'])
           : null,
       eventTargetColor: json.containsKey('eventTargetColor')
-          ? new dom.RGBA.fromJson(json['eventTargetColor'])
+          ? dom.RGBA.fromJson(json['eventTargetColor'])
           : null,
       shapeColor: json.containsKey('shapeColor')
-          ? new dom.RGBA.fromJson(json['shapeColor'])
+          ? dom.RGBA.fromJson(json['shapeColor'])
           : null,
       shapeMarginColor: json.containsKey('shapeMarginColor')
-          ? new dom.RGBA.fromJson(json['shapeMarginColor'])
+          ? dom.RGBA.fromJson(json['shapeMarginColor'])
           : null,
       selectorList:
           json.containsKey('selectorList') ? json['selectorList'] : null,
       cssGridColor: json.containsKey('cssGridColor')
-          ? new dom.RGBA.fromJson(json['cssGridColor'])
+          ? dom.RGBA.fromJson(json['cssGridColor'])
           : null,
     );
   }

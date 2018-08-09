@@ -394,7 +394,7 @@ class TouchPoint {
   });
 
   factory TouchPoint.fromJson(Map<String, dynamic> json) {
-    return new TouchPoint(
+    return TouchPoint(
       x: json['x'],
       y: json['y'],
       radiusX: json.containsKey('radiusX') ? json['radiusX'] : null,
@@ -459,7 +459,7 @@ class TimeSinceEpoch {
 
   TimeSinceEpoch(this.value);
 
-  factory TimeSinceEpoch.fromJson(num value) => new TimeSinceEpoch(value);
+  factory TimeSinceEpoch.fromJson(num value) => TimeSinceEpoch(value);
 
   num toJson() => value;
 

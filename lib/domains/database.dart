@@ -9,8 +9,7 @@ class DatabaseApi {
 
   Stream<Database> get onAddDatabase => _client.onEvent
       .where((Event event) => event.name == 'Database.addDatabase')
-      .map(
-          (Event event) => new Database.fromJson(event.parameters['database']));
+      .map((Event event) => Database.fromJson(event.parameters['database']));
 
   /// Disables database tracking, prevents database events from being sent to the client.
   Future disable() async {
@@ -31,7 +30,7 @@ class DatabaseApi {
       'query': query,
     };
     var result = await _client.send('Database.executeSQL', parameters);
-    return new ExecuteSQLResult.fromJson(result);
+    return ExecuteSQLResult.fromJson(result);
   }
 
   Future<List<String>> getDatabaseTableNames(
@@ -60,7 +59,7 @@ class ExecuteSQLResult {
   });
 
   factory ExecuteSQLResult.fromJson(Map<String, dynamic> json) {
-    return new ExecuteSQLResult(
+    return ExecuteSQLResult(
       columnNames: json.containsKey('columnNames')
           ? (json['columnNames'] as List).map((e) => e as String).toList()
           : null,
@@ -68,7 +67,7 @@ class ExecuteSQLResult {
           ? (json['values'] as List).map((e) => e as dynamic).toList()
           : null,
       sqlError: json.containsKey('sqlError')
-          ? new Error.fromJson(json['sqlError'])
+          ? Error.fromJson(json['sqlError'])
           : null,
     );
   }
@@ -80,7 +79,7 @@ class DatabaseId {
 
   DatabaseId(this.value);
 
-  factory DatabaseId.fromJson(String value) => new DatabaseId(value);
+  factory DatabaseId.fromJson(String value) => DatabaseId(value);
 
   String toJson() => value;
 
@@ -116,8 +115,8 @@ class Database {
   });
 
   factory Database.fromJson(Map<String, dynamic> json) {
-    return new Database(
-      id: new DatabaseId.fromJson(json['id']),
+    return Database(
+      id: DatabaseId.fromJson(json['id']),
       domain: json['domain'],
       name: json['name'],
       version: json['version'],
@@ -149,7 +148,7 @@ class Error {
   });
 
   factory Error.fromJson(Map<String, dynamic> json) {
-    return new Error(
+    return Error(
       message: json['message'],
       code: json['code'],
     );

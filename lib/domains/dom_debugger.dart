@@ -35,7 +35,7 @@ class DOMDebuggerApi {
     var result =
         await _client.send('DOMDebugger.getEventListeners', parameters);
     return (result['listeners'] as List)
-        .map((e) => new EventListener.fromJson(e))
+        .map((e) => EventListener.fromJson(e))
         .toList();
   }
 
@@ -218,22 +218,22 @@ class EventListener {
   });
 
   factory EventListener.fromJson(Map<String, dynamic> json) {
-    return new EventListener(
+    return EventListener(
       type: json['type'],
       useCapture: json['useCapture'],
       passive: json['passive'],
       once: json['once'],
-      scriptId: new runtime.ScriptId.fromJson(json['scriptId']),
+      scriptId: runtime.ScriptId.fromJson(json['scriptId']),
       lineNumber: json['lineNumber'],
       columnNumber: json['columnNumber'],
       handler: json.containsKey('handler')
-          ? new runtime.RemoteObject.fromJson(json['handler'])
+          ? runtime.RemoteObject.fromJson(json['handler'])
           : null,
       originalHandler: json.containsKey('originalHandler')
-          ? new runtime.RemoteObject.fromJson(json['originalHandler'])
+          ? runtime.RemoteObject.fromJson(json['originalHandler'])
           : null,
       backendNodeId: json.containsKey('backendNodeId')
-          ? new dom.BackendNodeId.fromJson(json['backendNodeId'])
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'])
           : null,
     );
   }

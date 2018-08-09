@@ -19,24 +19,24 @@ class ChromePath {
 const int _lastRevision = 579032;
 
 Future<ChromePath> downloadChrome(
-    {int revision: _lastRevision, String cachePath}) async {
+    {int revision = _lastRevision, String cachePath}) async {
   cachePath ??= p.join(Directory.systemTemp.path, 'local-chrome');
 
-  Directory revisionDirectory = new Directory(p.join(cachePath, '$revision'));
+  Directory revisionDirectory = Directory(p.join(cachePath, '$revision'));
   if (!revisionDirectory.existsSync()) {
     revisionDirectory.createSync(recursive: true);
   }
 
   String executablePath = _executablePath(revisionDirectory.path);
 
-  File executableFile = new File(executablePath);
+  File executableFile = File(executablePath);
 
   if (!executableFile.existsSync()) {
     String url = _downloadUrl(revision);
     String zipPath = p.join(cachePath, '${revision}_${p.url.basename(url)}');
     await _downloadFile(url, zipPath);
     _unzip(zipPath, revisionDirectory.path);
-    new File(zipPath).deleteSync();
+    File(zipPath).deleteSync();
   }
 
   if (!executableFile.existsSync()) {
@@ -47,17 +47,17 @@ Future<ChromePath> downloadChrome(
     Process.runSync("chmod", ["+x", executableFile.absolute.path]);
   }
 
-  return new ChromePath(
+  return ChromePath(
       folderPath: revisionDirectory.path,
       executablePath: executableFile.path,
       revision: revision);
 }
 
 Future _downloadFile(String url, String output) async {
-  http.Client client = new http.Client();
+  http.Client client = http.Client();
   http.StreamedResponse response =
-      await client.send(new http.Request('get', Uri.parse(url)));
-  File ouputFile = new File(output);
+      await client.send(http.Request('get', Uri.parse(url)));
+  File ouputFile = File(output);
   await response.stream.pipe(ouputFile.openWrite());
   client.close();
 
@@ -78,19 +78,19 @@ void _unzip(String path, String targetPath) {
 //TODO(xha): implement a more complete unzip
 //https://github.com/maxogden/extract-zip/blob/master/index.js
 void _simpleUnzip(String path, String targetPath) {
-  Directory targetDirectory = new Directory(targetPath);
+  Directory targetDirectory = Directory(targetPath);
   if (targetDirectory.existsSync()) {
     targetDirectory.deleteSync(recursive: true);
   }
 
-  List<int> bytes = new File(path).readAsBytesSync();
-  Archive archive = new ZipDecoder().decodeBytes(bytes);
+  List<int> bytes = File(path).readAsBytesSync();
+  Archive archive = ZipDecoder().decodeBytes(bytes);
 
   for (ArchiveFile file in archive) {
     String filename = file.name;
     List<int> data = file.content;
     if (data.isNotEmpty) {
-      new File(p.join(targetPath, filename))
+      File(p.join(targetPath, filename))
         ..createSync(recursive: true)
         ..writeAsBytesSync(data);
     }
@@ -107,7 +107,7 @@ String _downloadUrl(int revision) {
   } else if (Platform.isMacOS) {
     return '$_baseUrl/Mac/$revision/chrome-mac.zip';
   } else {
-    throw new UnsupportedError(
+    throw UnsupportedError(
         "Can't download chrome for platform ${Platform.operatingSystem}");
   }
 }
@@ -121,6 +121,6 @@ String _executablePath(String revisionPath) {
     return p.join(revisionPath, 'chrome-mac', 'Chromium.app', 'Contents',
         'MacOS', 'Chromium');
   } else {
-    throw new UnsupportedError('Unknown platform ${Platform.operatingSystem}');
+    throw UnsupportedError('Unknown platform ${Platform.operatingSystem}');
   }
 }

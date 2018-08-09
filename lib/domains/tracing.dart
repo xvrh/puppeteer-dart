@@ -10,7 +10,7 @@ class TracingApi {
 
   Stream<BufferUsageEvent> get onBufferUsage => _client.onEvent
       .where((Event event) => event.name == 'Tracing.bufferUsage')
-      .map((Event event) => new BufferUsageEvent.fromJson(event.parameters));
+      .map((Event event) => BufferUsageEvent.fromJson(event.parameters));
 
   /// Contains an bucket of collected trace events. When tracing is stopped collected events will be
   /// send as a sequence of dataCollected events followed by tracingComplete event.
@@ -23,8 +23,7 @@ class TracingApi {
   /// delivered via dataCollected events.
   Stream<TracingCompleteEvent> get onTracingComplete => _client.onEvent
       .where((Event event) => event.name == 'Tracing.tracingComplete')
-      .map(
-          (Event event) => new TracingCompleteEvent.fromJson(event.parameters));
+      .map((Event event) => TracingCompleteEvent.fromJson(event.parameters));
 
   /// Stop trace events collection.
   Future end() async {
@@ -52,7 +51,7 @@ class TracingApi {
   /// Request a global memory dump.
   Future<RequestMemoryDumpResult> requestMemoryDump() async {
     var result = await _client.send('Tracing.requestMemoryDump');
-    return new RequestMemoryDumpResult.fromJson(result);
+    return RequestMemoryDumpResult.fromJson(result);
   }
 
   /// Start trace events collection.
@@ -115,7 +114,7 @@ class BufferUsageEvent {
   });
 
   factory BufferUsageEvent.fromJson(Map<String, dynamic> json) {
-    return new BufferUsageEvent(
+    return BufferUsageEvent(
       percentFull: json.containsKey('percentFull') ? json['percentFull'] : null,
       eventCount: json.containsKey('eventCount') ? json['eventCount'] : null,
       value: json.containsKey('value') ? json['value'] : null,
@@ -136,12 +135,12 @@ class TracingCompleteEvent {
   });
 
   factory TracingCompleteEvent.fromJson(Map<String, dynamic> json) {
-    return new TracingCompleteEvent(
+    return TracingCompleteEvent(
       stream: json.containsKey('stream')
-          ? new io.StreamHandle.fromJson(json['stream'])
+          ? io.StreamHandle.fromJson(json['stream'])
           : null,
       streamCompression: json.containsKey('streamCompression')
-          ? new StreamCompression.fromJson(json['streamCompression'])
+          ? StreamCompression.fromJson(json['streamCompression'])
           : null,
     );
   }
@@ -160,7 +159,7 @@ class RequestMemoryDumpResult {
   });
 
   factory RequestMemoryDumpResult.fromJson(Map<String, dynamic> json) {
-    return new RequestMemoryDumpResult(
+    return RequestMemoryDumpResult(
       dumpGuid: json['dumpGuid'],
       success: json['success'],
     );
@@ -173,7 +172,7 @@ class MemoryDumpConfig {
 
   MemoryDumpConfig(this.value);
 
-  factory MemoryDumpConfig.fromJson(Map value) => new MemoryDumpConfig(value);
+  factory MemoryDumpConfig.fromJson(Map value) => MemoryDumpConfig(value);
 
   Map toJson() => value;
 
@@ -224,7 +223,7 @@ class TraceConfig {
   });
 
   factory TraceConfig.fromJson(Map<String, dynamic> json) {
-    return new TraceConfig(
+    return TraceConfig(
       recordMode: json.containsKey('recordMode') ? json['recordMode'] : null,
       enableSampling:
           json.containsKey('enableSampling') ? json['enableSampling'] : null,
@@ -247,7 +246,7 @@ class TraceConfig {
           ? (json['syntheticDelays'] as List).map((e) => e as String).toList()
           : null,
       memoryDumpConfig: json.containsKey('memoryDumpConfig')
-          ? new MemoryDumpConfig.fromJson(json['memoryDumpConfig'])
+          ? MemoryDumpConfig.fromJson(json['memoryDumpConfig'])
           : null,
     );
   }

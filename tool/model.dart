@@ -4,12 +4,11 @@ class Protocol {
   final List<Domain> domains;
 
   Protocol.fromJson(Map json)
-      : domains = (json['domains'] as List)
-            .map((j) => new Domain.fromJson(j))
-            .toList();
+      : domains =
+            (json['domains'] as List).map((j) => Domain.fromJson(j)).toList();
 
   factory Protocol.fromString(String protocol) =>
-      new Protocol.fromJson(jsonDecode(protocol));
+      Protocol.fromJson(jsonDecode(protocol));
 }
 
 class Domain {
@@ -25,18 +24,16 @@ class Domain {
         description = json['description'],
         types = json.containsKey('types')
             ? (json['types'] as List)
-                .map((j) => new ComplexType.fromJson(j))
+                .map((j) => ComplexType.fromJson(j))
                 .toList()
             : const [],
         commands = json.containsKey('commands')
             ? (json['commands'] as List)
-                .map((j) => new Command.fromJson(j))
+                .map((j) => Command.fromJson(j))
                 .toList()
             : const [],
         events = json.containsKey('events')
-            ? (json['events'] as List)
-                .map((j) => new Event.fromJson(j))
-                .toList()
+            ? (json['events'] as List).map((j) => Event.fromJson(j)).toList()
             : const [],
         deprecated = json['deprecated'] ?? false;
 }
@@ -51,7 +48,7 @@ class ComplexType {
 
   ComplexType(
       {this.id,
-      this.properties: const [],
+      this.properties = const [],
       this.description,
       this.type,
       this.enums,
@@ -63,12 +60,12 @@ class ComplexType {
         type = json['type'],
         properties = json.containsKey('properties')
             ? (json['properties'] as List)
-                .map((j) => new Parameter.fromJson(j))
+                .map((j) => Parameter.fromJson(j))
                 .toList()
             : const [],
         enums = (json['enum'] as List)?.cast<String>(),
         items = json.containsKey('items')
-            ? new ListItems.fromJson(json['items'])
+            ? ListItems.fromJson(json['items'])
             : null;
 }
 
@@ -85,12 +82,12 @@ class Command {
         deprecated = json['deprecated'] ?? false,
         parameters = json.containsKey('parameters')
             ? (json['parameters'] as List)
-                .map((j) => new Parameter.fromJson(j))
+                .map((j) => Parameter.fromJson(j))
                 .toList()
             : const [],
         returns = json.containsKey('returns')
             ? (json['returns'] as List)
-                .map((j) => new Parameter.fromJson(j))
+                .map((j) => Parameter.fromJson(j))
                 .toList()
             : const [];
 }
@@ -105,7 +102,7 @@ class Event {
         description = json['description'],
         parameters = json.containsKey('parameters')
             ? (json['parameters'] as List)
-                .map((j) => new Parameter.fromJson(j))
+                .map((j) => Parameter.fromJson(j))
                 .toList()
             : const [];
 }
@@ -128,8 +125,8 @@ class Parameter implements Typed {
       this.description,
       this.type,
       this.ref,
-      this.optional: false,
-      this.deprecated: false,
+      this.optional = false,
+      this.deprecated = false,
       this.items});
 
   Parameter.fromJson(Map json)
@@ -140,7 +137,7 @@ class Parameter implements Typed {
         optional = json['optional'] ?? false,
         deprecated = json['deprecated'] ?? false,
         items = json.containsKey('items')
-            ? new ListItems.fromJson(json['items'])
+            ? ListItems.fromJson(json['items'])
             : null;
 
   String get normalizedName => preventKeywords(name);

@@ -18,7 +18,7 @@ main() {
     String screenshot = await tab.page.captureScreenshot();
 
     // Save it to a file
-    await new File.fromUri(Platform.script.resolve('_github.png'))
+    await File.fromUri(Platform.script.resolve('_github.png'))
         .writeAsBytes(base64.decode(screenshot));
   });
 }

@@ -10,15 +10,15 @@ class ServiceWorkerApi {
 
   Stream<ServiceWorkerErrorMessage> get onWorkerErrorReported => _client.onEvent
       .where((Event event) => event.name == 'ServiceWorker.workerErrorReported')
-      .map((Event event) => new ServiceWorkerErrorMessage.fromJson(
-          event.parameters['errorMessage']));
+      .map((Event event) =>
+          ServiceWorkerErrorMessage.fromJson(event.parameters['errorMessage']));
 
   Stream<List<ServiceWorkerRegistration>> get onWorkerRegistrationUpdated =>
       _client.onEvent
           .where((Event event) =>
               event.name == 'ServiceWorker.workerRegistrationUpdated')
           .map((Event event) => (event.parameters['registrations'] as List)
-              .map((e) => new ServiceWorkerRegistration.fromJson(e))
+              .map((e) => ServiceWorkerRegistration.fromJson(e))
               .toList());
 
   Stream<List<ServiceWorkerVersion>> get onWorkerVersionUpdated => _client
@@ -26,7 +26,7 @@ class ServiceWorkerApi {
       .where(
           (Event event) => event.name == 'ServiceWorker.workerVersionUpdated')
       .map((Event event) => (event.parameters['versions'] as List)
-          .map((e) => new ServiceWorkerVersion.fromJson(e))
+          .map((e) => ServiceWorkerVersion.fromJson(e))
           .toList());
 
   Future deliverPushMessage(
@@ -148,7 +148,7 @@ class ServiceWorkerRegistration {
   });
 
   factory ServiceWorkerRegistration.fromJson(Map<String, dynamic> json) {
-    return new ServiceWorkerRegistration(
+    return ServiceWorkerRegistration(
       registrationId: json['registrationId'],
       scopeURL: json['scopeURL'],
       isDeleted: json['isDeleted'],
@@ -264,13 +264,13 @@ class ServiceWorkerVersion {
   });
 
   factory ServiceWorkerVersion.fromJson(Map<String, dynamic> json) {
-    return new ServiceWorkerVersion(
+    return ServiceWorkerVersion(
       versionId: json['versionId'],
       registrationId: json['registrationId'],
       scriptURL: json['scriptURL'],
       runningStatus:
-          new ServiceWorkerVersionRunningStatus.fromJson(json['runningStatus']),
-      status: new ServiceWorkerVersionStatus.fromJson(json['status']),
+          ServiceWorkerVersionRunningStatus.fromJson(json['runningStatus']),
+      status: ServiceWorkerVersionStatus.fromJson(json['status']),
       scriptLastModified: json.containsKey('scriptLastModified')
           ? json['scriptLastModified']
           : null,
@@ -279,11 +279,11 @@ class ServiceWorkerVersion {
           : null,
       controlledClients: json.containsKey('controlledClients')
           ? (json['controlledClients'] as List)
-              .map((e) => new target.TargetID.fromJson(e))
+              .map((e) => target.TargetID.fromJson(e))
               .toList()
           : null,
       targetId: json.containsKey('targetId')
-          ? new target.TargetID.fromJson(json['targetId'])
+          ? target.TargetID.fromJson(json['targetId'])
           : null,
     );
   }
@@ -337,7 +337,7 @@ class ServiceWorkerErrorMessage {
   });
 
   factory ServiceWorkerErrorMessage.fromJson(Map<String, dynamic> json) {
-    return new ServiceWorkerErrorMessage(
+    return ServiceWorkerErrorMessage(
       errorMessage: json['errorMessage'],
       registrationId: json['registrationId'],
       versionId: json['versionId'],
