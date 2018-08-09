@@ -29,6 +29,6 @@ main() {
 
     // Save it to a file
     await new File.fromUri(Platform.script.resolve('_github_form.png'))
-        .writeAsBytes(BASE64.decode(screenshot));
+        .writeAsBytes(base64.decode(screenshot));
   });
 }

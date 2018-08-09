@@ -88,6 +88,18 @@ class InputApi {
     await _client.send('Input.dispatchKeyEvent', parameters);
   }
 
+  /// This method emulates inserting text that doesn't come from a key press,
+  /// for example an emoji keyboard or an IME.
+  /// [text] The text to insert.
+  Future insertText(
+    String text,
+  ) async {
+    Map parameters = {
+      'text': text,
+    };
+    await _client.send('Input.insertText', parameters);
+  }
+
   /// Dispatches a mouse event to the page.
   /// [type] Type of the mouse event.
   /// [x] X coordinate of the event relative to the main frame's viewport in CSS pixels.
