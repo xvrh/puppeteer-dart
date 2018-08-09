@@ -21,7 +21,7 @@ class AuditsApi {
     num quality,
     bool sizeOnly,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'requestId': requestId.toJson(),
       'encoding': encoding,
     };
@@ -31,7 +31,7 @@ class AuditsApi {
     if (sizeOnly != null) {
       parameters['sizeOnly'] = sizeOnly;
     }
-    Map result = await _client.send('Audits.getEncodedResponse', parameters);
+    var result = await _client.send('Audits.getEncodedResponse', parameters);
     return new GetEncodedResponseResult.fromJson(result);
   }
 }
@@ -52,7 +52,7 @@ class GetEncodedResponseResult {
     @required this.encodedSize,
   });
 
-  factory GetEncodedResponseResult.fromJson(Map json) {
+  factory GetEncodedResponseResult.fromJson(Map<String, dynamic> json) {
     return new GetEncodedResponseResult(
       body: json.containsKey('body') ? json['body'] : null,
       originalSize: json['originalSize'],

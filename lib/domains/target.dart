@@ -58,7 +58,7 @@ class TargetApi {
   Future activateTarget(
     TargetID targetId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'targetId': targetId.toJson(),
     };
     await _client.send('Target.activateTarget', parameters);
@@ -71,20 +71,20 @@ class TargetApi {
     TargetID targetId, {
     bool flatten,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'targetId': targetId.toJson(),
     };
     if (flatten != null) {
       parameters['flatten'] = flatten;
     }
-    Map result = await _client.send('Target.attachToTarget', parameters);
+    var result = await _client.send('Target.attachToTarget', parameters);
     return new SessionID.fromJson(result['sessionId']);
   }
 
   /// Attaches to the browser target, only uses flat sessionId mode.
   /// Returns: Id assigned to the session.
   Future<SessionID> attachToBrowserTarget() async {
-    Map result = await _client.send('Target.attachToBrowserTarget');
+    var result = await _client.send('Target.attachToBrowserTarget');
     return new SessionID.fromJson(result['sessionId']);
   }
 
@@ -92,10 +92,10 @@ class TargetApi {
   Future<bool> closeTarget(
     TargetID targetId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'targetId': targetId.toJson(),
     };
-    Map result = await _client.send('Target.closeTarget', parameters);
+    var result = await _client.send('Target.closeTarget', parameters);
     return result['success'];
   }
 
@@ -112,7 +112,7 @@ class TargetApi {
     TargetID targetId, {
     String bindingName,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'targetId': targetId.toJson(),
     };
     if (bindingName != null) {
@@ -125,14 +125,14 @@ class TargetApi {
   /// one.
   /// Returns: The id of the context created.
   Future<BrowserContextID> createBrowserContext() async {
-    Map result = await _client.send('Target.createBrowserContext');
+    var result = await _client.send('Target.createBrowserContext');
     return new BrowserContextID.fromJson(result['browserContextId']);
   }
 
   /// Returns all browser contexts created with `Target.createBrowserContext` method.
   /// Returns: An array of browser context ids.
   Future<List<BrowserContextID>> getBrowserContexts() async {
-    Map result = await _client.send('Target.getBrowserContexts');
+    var result = await _client.send('Target.getBrowserContexts');
     return (result['browserContextIds'] as List)
         .map((e) => new BrowserContextID.fromJson(e))
         .toList();
@@ -153,7 +153,7 @@ class TargetApi {
     BrowserContextID browserContextId,
     bool enableBeginFrameControl,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'url': url,
     };
     if (width != null) {
@@ -168,7 +168,7 @@ class TargetApi {
     if (enableBeginFrameControl != null) {
       parameters['enableBeginFrameControl'] = enableBeginFrameControl;
     }
-    Map result = await _client.send('Target.createTarget', parameters);
+    var result = await _client.send('Target.createTarget', parameters);
     return new TargetID.fromJson(result['targetId']);
   }
 
@@ -178,7 +178,7 @@ class TargetApi {
     SessionID sessionId,
     @deprecated TargetID targetId,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (sessionId != null) {
       parameters['sessionId'] = sessionId.toJson();
     }
@@ -195,7 +195,7 @@ class TargetApi {
   Future disposeBrowserContext(
     BrowserContextID browserContextId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'browserContextId': browserContextId.toJson(),
     };
     await _client.send('Target.disposeBrowserContext', parameters);
@@ -205,18 +205,18 @@ class TargetApi {
   Future<TargetInfo> getTargetInfo({
     TargetID targetId,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (targetId != null) {
       parameters['targetId'] = targetId.toJson();
     }
-    Map result = await _client.send('Target.getTargetInfo', parameters);
+    var result = await _client.send('Target.getTargetInfo', parameters);
     return new TargetInfo.fromJson(result['targetInfo']);
   }
 
   /// Retrieves a list of available targets.
   /// Returns: The list of targets.
   Future<List<TargetInfo>> getTargets() async {
-    Map result = await _client.send('Target.getTargets');
+    var result = await _client.send('Target.getTargets');
     return (result['targetInfos'] as List)
         .map((e) => new TargetInfo.fromJson(e))
         .toList();
@@ -229,7 +229,7 @@ class TargetApi {
     SessionID sessionId,
     @deprecated TargetID targetId,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'message': message,
     };
     if (sessionId != null) {
@@ -255,7 +255,7 @@ class TargetApi {
     bool waitForDebuggerOnStart, {
     bool flatten,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'autoAttach': autoAttach,
       'waitForDebuggerOnStart': waitForDebuggerOnStart,
     };
@@ -271,7 +271,7 @@ class TargetApi {
   Future setDiscoverTargets(
     bool discover,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'discover': discover,
     };
     await _client.send('Target.setDiscoverTargets', parameters);
@@ -283,7 +283,7 @@ class TargetApi {
   Future setRemoteLocations(
     List<RemoteLocation> locations,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'locations': locations.map((e) => e.toJson()).toList(),
     };
     await _client.send('Target.setRemoteLocations', parameters);
@@ -304,7 +304,7 @@ class AttachedToTargetEvent {
     @required this.waitingForDebugger,
   });
 
-  factory AttachedToTargetEvent.fromJson(Map json) {
+  factory AttachedToTargetEvent.fromJson(Map<String, dynamic> json) {
     return new AttachedToTargetEvent(
       sessionId: new SessionID.fromJson(json['sessionId']),
       targetInfo: new TargetInfo.fromJson(json['targetInfo']),
@@ -321,7 +321,7 @@ class DetachedFromTargetEvent {
     @required this.sessionId,
   });
 
-  factory DetachedFromTargetEvent.fromJson(Map json) {
+  factory DetachedFromTargetEvent.fromJson(Map<String, dynamic> json) {
     return new DetachedFromTargetEvent(
       sessionId: new SessionID.fromJson(json['sessionId']),
     );
@@ -339,7 +339,7 @@ class ReceivedMessageFromTargetEvent {
     @required this.message,
   });
 
-  factory ReceivedMessageFromTargetEvent.fromJson(Map json) {
+  factory ReceivedMessageFromTargetEvent.fromJson(Map<String, dynamic> json) {
     return new ReceivedMessageFromTargetEvent(
       sessionId: new SessionID.fromJson(json['sessionId']),
       message: json['message'],
@@ -362,7 +362,7 @@ class TargetCrashedEvent {
     @required this.errorCode,
   });
 
-  factory TargetCrashedEvent.fromJson(Map json) {
+  factory TargetCrashedEvent.fromJson(Map<String, dynamic> json) {
     return new TargetCrashedEvent(
       targetId: new TargetID.fromJson(json['targetId']),
       status: json['status'],
@@ -457,7 +457,7 @@ class TargetInfo {
     this.browserContextId,
   });
 
-  factory TargetInfo.fromJson(Map json) {
+  factory TargetInfo.fromJson(Map<String, dynamic> json) {
     return new TargetInfo(
       targetId: new TargetID.fromJson(json['targetId']),
       type: json['type'],
@@ -473,8 +473,8 @@ class TargetInfo {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'targetId': targetId.toJson(),
       'type': type,
       'title': title,
@@ -501,15 +501,15 @@ class RemoteLocation {
     @required this.port,
   });
 
-  factory RemoteLocation.fromJson(Map json) {
+  factory RemoteLocation.fromJson(Map<String, dynamic> json) {
     return new RemoteLocation(
       host: json['host'],
       port: json['port'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'host': host,
       'port': port,
     };

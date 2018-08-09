@@ -43,7 +43,7 @@ class HeapProfilerApi {
   Future addInspectedHeapObject(
     HeapSnapshotObjectId heapObjectId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'heapObjectId': heapObjectId.toJson(),
     };
     await _client.send('HeapProfiler.addInspectedHeapObject', parameters);
@@ -66,10 +66,10 @@ class HeapProfilerApi {
   Future<HeapSnapshotObjectId> getHeapObjectId(
     runtime.RemoteObjectId objectId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'objectId': objectId.toJson(),
     };
-    Map result = await _client.send('HeapProfiler.getHeapObjectId', parameters);
+    var result = await _client.send('HeapProfiler.getHeapObjectId', parameters);
     return new HeapSnapshotObjectId.fromJson(result['heapSnapshotObjectId']);
   }
 
@@ -79,20 +79,20 @@ class HeapProfilerApi {
     HeapSnapshotObjectId objectId, {
     String objectGroup,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'objectId': objectId.toJson(),
     };
     if (objectGroup != null) {
       parameters['objectGroup'] = objectGroup;
     }
-    Map result =
+    var result =
         await _client.send('HeapProfiler.getObjectByHeapObjectId', parameters);
     return new runtime.RemoteObject.fromJson(result['result']);
   }
 
   /// Returns: Return the sampling profile being collected.
   Future<SamplingHeapProfile> getSamplingProfile() async {
-    Map result = await _client.send('HeapProfiler.getSamplingProfile');
+    var result = await _client.send('HeapProfiler.getSamplingProfile');
     return new SamplingHeapProfile.fromJson(result['profile']);
   }
 
@@ -101,7 +101,7 @@ class HeapProfilerApi {
   Future startSampling({
     num samplingInterval,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (samplingInterval != null) {
       parameters['samplingInterval'] = samplingInterval;
     }
@@ -111,7 +111,7 @@ class HeapProfilerApi {
   Future startTrackingHeapObjects({
     bool trackAllocations,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (trackAllocations != null) {
       parameters['trackAllocations'] = trackAllocations;
     }
@@ -120,7 +120,7 @@ class HeapProfilerApi {
 
   /// Returns: Recorded sampling heap profile.
   Future<SamplingHeapProfile> stopSampling() async {
-    Map result = await _client.send('HeapProfiler.stopSampling');
+    var result = await _client.send('HeapProfiler.stopSampling');
     return new SamplingHeapProfile.fromJson(result['profile']);
   }
 
@@ -129,7 +129,7 @@ class HeapProfilerApi {
   Future stopTrackingHeapObjects({
     bool reportProgress,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (reportProgress != null) {
       parameters['reportProgress'] = reportProgress;
     }
@@ -140,7 +140,7 @@ class HeapProfilerApi {
   Future takeHeapSnapshot({
     bool reportProgress,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (reportProgress != null) {
       parameters['reportProgress'] = reportProgress;
     }
@@ -158,7 +158,7 @@ class LastSeenObjectIdEvent {
     @required this.timestamp,
   });
 
-  factory LastSeenObjectIdEvent.fromJson(Map json) {
+  factory LastSeenObjectIdEvent.fromJson(Map<String, dynamic> json) {
     return new LastSeenObjectIdEvent(
       lastSeenObjectId: json['lastSeenObjectId'],
       timestamp: json['timestamp'],
@@ -179,7 +179,7 @@ class ReportHeapSnapshotProgressEvent {
     this.finished,
   });
 
-  factory ReportHeapSnapshotProgressEvent.fromJson(Map json) {
+  factory ReportHeapSnapshotProgressEvent.fromJson(Map<String, dynamic> json) {
     return new ReportHeapSnapshotProgressEvent(
       done: json['done'],
       total: json['total'],
@@ -227,7 +227,7 @@ class SamplingHeapProfileNode {
     @required this.children,
   });
 
-  factory SamplingHeapProfileNode.fromJson(Map json) {
+  factory SamplingHeapProfileNode.fromJson(Map<String, dynamic> json) {
     return new SamplingHeapProfileNode(
       callFrame: new runtime.CallFrame.fromJson(json['callFrame']),
       selfSize: json['selfSize'],
@@ -237,8 +237,8 @@ class SamplingHeapProfileNode {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'callFrame': callFrame.toJson(),
       'selfSize': selfSize,
       'children': children.map((e) => e.toJson()).toList(),
@@ -255,14 +255,14 @@ class SamplingHeapProfile {
     @required this.head,
   });
 
-  factory SamplingHeapProfile.fromJson(Map json) {
+  factory SamplingHeapProfile.fromJson(Map<String, dynamic> json) {
     return new SamplingHeapProfile(
       head: new SamplingHeapProfileNode.fromJson(json['head']),
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'head': head.toJson(),
     };
     return json;

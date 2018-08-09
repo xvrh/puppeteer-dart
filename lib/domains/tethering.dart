@@ -18,7 +18,7 @@ class TetheringApi {
   Future bind(
     int port,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'port': port,
     };
     await _client.send('Tethering.bind', parameters);
@@ -29,7 +29,7 @@ class TetheringApi {
   Future unbind(
     int port,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'port': port,
     };
     await _client.send('Tethering.unbind', parameters);
@@ -48,7 +48,7 @@ class AcceptedEvent {
     @required this.connectionId,
   });
 
-  factory AcceptedEvent.fromJson(Map json) {
+  factory AcceptedEvent.fromJson(Map<String, dynamic> json) {
     return new AcceptedEvent(
       port: json['port'],
       connectionId: json['connectionId'],

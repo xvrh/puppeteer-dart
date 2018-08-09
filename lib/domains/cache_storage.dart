@@ -12,7 +12,7 @@ class CacheStorageApi {
   Future deleteCache(
     CacheId cacheId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'cacheId': cacheId.toJson(),
     };
     await _client.send('CacheStorage.deleteCache', parameters);
@@ -25,7 +25,7 @@ class CacheStorageApi {
     CacheId cacheId,
     String request,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'cacheId': cacheId.toJson(),
       'request': request,
     };
@@ -38,10 +38,10 @@ class CacheStorageApi {
   Future<List<Cache>> requestCacheNames(
     String securityOrigin,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
     };
-    Map result =
+    var result =
         await _client.send('CacheStorage.requestCacheNames', parameters);
     return (result['caches'] as List)
         .map((e) => new Cache.fromJson(e))
@@ -56,11 +56,11 @@ class CacheStorageApi {
     CacheId cacheId,
     String requestURL,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'cacheId': cacheId.toJson(),
       'requestURL': requestURL,
     };
-    Map result =
+    var result =
         await _client.send('CacheStorage.requestCachedResponse', parameters);
     return new CachedResponse.fromJson(result['response']);
   }
@@ -74,12 +74,12 @@ class CacheStorageApi {
     int skipCount,
     int pageSize,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'cacheId': cacheId.toJson(),
       'skipCount': skipCount,
       'pageSize': pageSize,
     };
-    Map result = await _client.send('CacheStorage.requestEntries', parameters);
+    var result = await _client.send('CacheStorage.requestEntries', parameters);
     return new RequestEntriesResult.fromJson(result);
   }
 }
@@ -96,7 +96,7 @@ class RequestEntriesResult {
     @required this.hasMore,
   });
 
-  factory RequestEntriesResult.fromJson(Map json) {
+  factory RequestEntriesResult.fromJson(Map<String, dynamic> json) {
     return new RequestEntriesResult(
       cacheDataEntries: (json['cacheDataEntries'] as List)
           .map((e) => new DataEntry.fromJson(e))
@@ -159,7 +159,7 @@ class DataEntry {
     @required this.responseHeaders,
   });
 
-  factory DataEntry.fromJson(Map json) {
+  factory DataEntry.fromJson(Map<String, dynamic> json) {
     return new DataEntry(
       requestURL: json['requestURL'],
       requestMethod: json['requestMethod'],
@@ -175,8 +175,8 @@ class DataEntry {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'requestURL': requestURL,
       'requestMethod': requestMethod,
       'requestHeaders': requestHeaders.map((e) => e.toJson()).toList(),
@@ -206,7 +206,7 @@ class Cache {
     @required this.cacheName,
   });
 
-  factory Cache.fromJson(Map json) {
+  factory Cache.fromJson(Map<String, dynamic> json) {
     return new Cache(
       cacheId: new CacheId.fromJson(json['cacheId']),
       securityOrigin: json['securityOrigin'],
@@ -214,8 +214,8 @@ class Cache {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'cacheId': cacheId.toJson(),
       'securityOrigin': securityOrigin,
       'cacheName': cacheName,
@@ -234,15 +234,15 @@ class Header {
     @required this.value,
   });
 
-  factory Header.fromJson(Map json) {
+  factory Header.fromJson(Map<String, dynamic> json) {
     return new Header(
       name: json['name'],
       value: json['value'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
       'value': value,
     };
@@ -259,14 +259,14 @@ class CachedResponse {
     @required this.body,
   });
 
-  factory CachedResponse.fromJson(Map json) {
+  factory CachedResponse.fromJson(Map<String, dynamic> json) {
     return new CachedResponse(
       body: json['body'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'body': body,
     };
     return json;

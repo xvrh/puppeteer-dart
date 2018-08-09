@@ -10,7 +10,7 @@ class SystemInfoApi {
 
   /// Returns information about the system.
   Future<GetInfoResult> getInfo() async {
-    Map result = await _client.send('SystemInfo.getInfo');
+    var result = await _client.send('SystemInfo.getInfo');
     return new GetInfoResult.fromJson(result);
   }
 }
@@ -38,7 +38,7 @@ class GetInfoResult {
     @required this.commandLine,
   });
 
-  factory GetInfoResult.fromJson(Map json) {
+  factory GetInfoResult.fromJson(Map<String, dynamic> json) {
     return new GetInfoResult(
       gpu: new GPUInfo.fromJson(json['gpu']),
       modelName: json['modelName'],
@@ -69,7 +69,7 @@ class GPUDevice {
     @required this.deviceString,
   });
 
-  factory GPUDevice.fromJson(Map json) {
+  factory GPUDevice.fromJson(Map<String, dynamic> json) {
     return new GPUDevice(
       vendorId: json['vendorId'],
       deviceId: json['deviceId'],
@@ -78,8 +78,8 @@ class GPUDevice {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'vendorId': vendorId,
       'deviceId': deviceId,
       'vendorString': vendorString,
@@ -110,7 +110,7 @@ class GPUInfo {
     @required this.driverBugWorkarounds,
   });
 
-  factory GPUInfo.fromJson(Map json) {
+  factory GPUInfo.fromJson(Map<String, dynamic> json) {
     return new GPUInfo(
       devices: (json['devices'] as List)
           .map((e) => new GPUDevice.fromJson(e))
@@ -125,8 +125,8 @@ class GPUInfo {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'devices': devices.map((e) => e.toJson()).toList(),
       'driverBugWorkarounds': driverBugWorkarounds.map((e) => e).toList(),
     };

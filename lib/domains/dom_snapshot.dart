@@ -36,7 +36,7 @@ class DOMSnapshotApi {
     bool includePaintOrder,
     bool includeUserAgentShadowTree,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'computedStyleWhitelist': computedStyleWhitelist.map((e) => e).toList(),
     };
     if (includeEventListeners != null) {
@@ -48,7 +48,7 @@ class DOMSnapshotApi {
     if (includeUserAgentShadowTree != null) {
       parameters['includeUserAgentShadowTree'] = includeUserAgentShadowTree;
     }
-    Map result = await _client.send('DOMSnapshot.getSnapshot', parameters);
+    var result = await _client.send('DOMSnapshot.getSnapshot', parameters);
     return new GetSnapshotResult.fromJson(result);
   }
 
@@ -60,10 +60,10 @@ class DOMSnapshotApi {
   Future<CaptureSnapshotResult> captureSnapshot(
     List<String> computedStyles,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'computedStyles': computedStyles.map((e) => e).toList(),
     };
-    Map result = await _client.send('DOMSnapshot.captureSnapshot', parameters);
+    var result = await _client.send('DOMSnapshot.captureSnapshot', parameters);
     return new CaptureSnapshotResult.fromJson(result);
   }
 }
@@ -84,7 +84,7 @@ class GetSnapshotResult {
     @required this.computedStyles,
   });
 
-  factory GetSnapshotResult.fromJson(Map json) {
+  factory GetSnapshotResult.fromJson(Map<String, dynamic> json) {
     return new GetSnapshotResult(
       domNodes: (json['domNodes'] as List)
           .map((e) => new DOMNode.fromJson(e))
@@ -111,7 +111,7 @@ class CaptureSnapshotResult {
     @required this.strings,
   });
 
-  factory CaptureSnapshotResult.fromJson(Map json) {
+  factory CaptureSnapshotResult.fromJson(Map<String, dynamic> json) {
     return new CaptureSnapshotResult(
       documents: (json['documents'] as List)
           .map((e) => new DocumentSnapshot.fromJson(e))
@@ -236,7 +236,7 @@ class DOMNode {
     this.originURL,
   });
 
-  factory DOMNode.fromJson(Map json) {
+  factory DOMNode.fromJson(Map<String, dynamic> json) {
     return new DOMNode(
       nodeType: json['nodeType'],
       nodeName: json['nodeName'],
@@ -295,8 +295,8 @@ class DOMNode {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'nodeType': nodeType,
       'nodeName': nodeName,
       'nodeValue': nodeValue,
@@ -393,7 +393,7 @@ class InlineTextBox {
     @required this.numCharacters,
   });
 
-  factory InlineTextBox.fromJson(Map json) {
+  factory InlineTextBox.fromJson(Map<String, dynamic> json) {
     return new InlineTextBox(
       boundingBox: new dom.Rect.fromJson(json['boundingBox']),
       startCharacterIndex: json['startCharacterIndex'],
@@ -401,8 +401,8 @@ class InlineTextBox {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'boundingBox': boundingBox.toJson(),
       'startCharacterIndex': startCharacterIndex,
       'numCharacters': numCharacters,
@@ -442,7 +442,7 @@ class LayoutTreeNode {
     this.paintOrder,
   });
 
-  factory LayoutTreeNode.fromJson(Map json) {
+  factory LayoutTreeNode.fromJson(Map<String, dynamic> json) {
     return new LayoutTreeNode(
       domNodeIndex: json['domNodeIndex'],
       boundingBox: new dom.Rect.fromJson(json['boundingBox']),
@@ -457,8 +457,8 @@ class LayoutTreeNode {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'domNodeIndex': domNodeIndex,
       'boundingBox': boundingBox.toJson(),
     };
@@ -487,7 +487,7 @@ class ComputedStyle {
     @required this.properties,
   });
 
-  factory ComputedStyle.fromJson(Map json) {
+  factory ComputedStyle.fromJson(Map<String, dynamic> json) {
     return new ComputedStyle(
       properties: (json['properties'] as List)
           .map((e) => new NameValue.fromJson(e))
@@ -495,8 +495,8 @@ class ComputedStyle {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'properties': properties.map((e) => e.toJson()).toList(),
     };
     return json;
@@ -516,15 +516,15 @@ class NameValue {
     @required this.value,
   });
 
-  factory NameValue.fromJson(Map json) {
+  factory NameValue.fromJson(Map<String, dynamic> json) {
     return new NameValue(
       name: json['name'],
       value: json['value'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
       'value': value,
     };
@@ -584,7 +584,7 @@ class RareStringData {
     @required this.value,
   });
 
-  factory RareStringData.fromJson(Map json) {
+  factory RareStringData.fromJson(Map<String, dynamic> json) {
     return new RareStringData(
       index: (json['index'] as List).map((e) => e as int).toList(),
       value: (json['value'] as List)
@@ -593,8 +593,8 @@ class RareStringData {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'index': index.map((e) => e).toList(),
       'value': value.map((e) => e.toJson()).toList(),
     };
@@ -609,14 +609,14 @@ class RareBooleanData {
     @required this.index,
   });
 
-  factory RareBooleanData.fromJson(Map json) {
+  factory RareBooleanData.fromJson(Map<String, dynamic> json) {
     return new RareBooleanData(
       index: (json['index'] as List).map((e) => e as int).toList(),
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'index': index.map((e) => e).toList(),
     };
     return json;
@@ -633,15 +633,15 @@ class RareIntegerData {
     @required this.value,
   });
 
-  factory RareIntegerData.fromJson(Map json) {
+  factory RareIntegerData.fromJson(Map<String, dynamic> json) {
     return new RareIntegerData(
       index: (json['index'] as List).map((e) => e as int).toList(),
       value: (json['value'] as List).map((e) => e as int).toList(),
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'index': index.map((e) => e).toList(),
       'value': value.map((e) => e).toList(),
     };
@@ -713,7 +713,7 @@ class DocumentSnapshot {
     @required this.textBoxes,
   });
 
-  factory DocumentSnapshot.fromJson(Map json) {
+  factory DocumentSnapshot.fromJson(Map<String, dynamic> json) {
     return new DocumentSnapshot(
       documentURL: new StringIndex.fromJson(json['documentURL']),
       baseURL: new StringIndex.fromJson(json['baseURL']),
@@ -728,8 +728,8 @@ class DocumentSnapshot {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'documentURL': documentURL.toJson(),
       'baseURL': baseURL.toJson(),
       'contentLanguage': contentLanguage.toJson(),
@@ -812,7 +812,7 @@ class NodeTreeSnapshot {
     this.originURL,
   });
 
-  factory NodeTreeSnapshot.fromJson(Map json) {
+  factory NodeTreeSnapshot.fromJson(Map<String, dynamic> json) {
     return new NodeTreeSnapshot(
       parentIndex: json.containsKey('parentIndex')
           ? (json['parentIndex'] as List).map((e) => e as int).toList()
@@ -870,8 +870,8 @@ class NodeTreeSnapshot {
     );
   }
 
-  Map toJson() {
-    Map json = {};
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{};
     if (parentIndex != null) {
       json['parentIndex'] = parentIndex.map((e) => e).toList();
     }
@@ -942,7 +942,7 @@ class LayoutTreeSnapshot {
     @required this.text,
   });
 
-  factory LayoutTreeSnapshot.fromJson(Map json) {
+  factory LayoutTreeSnapshot.fromJson(Map<String, dynamic> json) {
     return new LayoutTreeSnapshot(
       nodeIndex: (json['nodeIndex'] as List).map((e) => e as int).toList(),
       styles: (json['styles'] as List)
@@ -957,8 +957,8 @@ class LayoutTreeSnapshot {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'nodeIndex': nodeIndex.map((e) => e).toList(),
       'styles': styles.map((e) => e.toJson()).toList(),
       'bounds': bounds.map((e) => e.toJson()).toList(),
@@ -992,7 +992,7 @@ class TextBoxSnapshot {
     @required this.length,
   });
 
-  factory TextBoxSnapshot.fromJson(Map json) {
+  factory TextBoxSnapshot.fromJson(Map<String, dynamic> json) {
     return new TextBoxSnapshot(
       layoutIndex: (json['layoutIndex'] as List).map((e) => e as int).toList(),
       bounds: (json['bounds'] as List)
@@ -1003,8 +1003,8 @@ class TextBoxSnapshot {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'layoutIndex': layoutIndex.map((e) => e).toList(),
       'bounds': bounds.map((e) => e.toJson()).toList(),
       'start': start.map((e) => e).toList(),

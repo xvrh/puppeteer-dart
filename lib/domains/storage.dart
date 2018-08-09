@@ -39,7 +39,7 @@ class StorageApi {
     String origin,
     String storageTypes,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'origin': origin,
       'storageTypes': storageTypes,
     };
@@ -51,10 +51,10 @@ class StorageApi {
   Future<GetUsageAndQuotaResult> getUsageAndQuota(
     String origin,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'origin': origin,
     };
-    Map result = await _client.send('Storage.getUsageAndQuota', parameters);
+    var result = await _client.send('Storage.getUsageAndQuota', parameters);
     return new GetUsageAndQuotaResult.fromJson(result);
   }
 
@@ -63,7 +63,7 @@ class StorageApi {
   Future trackCacheStorageForOrigin(
     String origin,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'origin': origin,
     };
     await _client.send('Storage.trackCacheStorageForOrigin', parameters);
@@ -74,7 +74,7 @@ class StorageApi {
   Future trackIndexedDBForOrigin(
     String origin,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'origin': origin,
     };
     await _client.send('Storage.trackIndexedDBForOrigin', parameters);
@@ -85,7 +85,7 @@ class StorageApi {
   Future untrackCacheStorageForOrigin(
     String origin,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'origin': origin,
     };
     await _client.send('Storage.untrackCacheStorageForOrigin', parameters);
@@ -96,7 +96,7 @@ class StorageApi {
   Future untrackIndexedDBForOrigin(
     String origin,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'origin': origin,
     };
     await _client.send('Storage.untrackIndexedDBForOrigin', parameters);
@@ -115,7 +115,7 @@ class CacheStorageContentUpdatedEvent {
     @required this.cacheName,
   });
 
-  factory CacheStorageContentUpdatedEvent.fromJson(Map json) {
+  factory CacheStorageContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return new CacheStorageContentUpdatedEvent(
       origin: json['origin'],
       cacheName: json['cacheName'],
@@ -139,7 +139,7 @@ class IndexedDBContentUpdatedEvent {
     @required this.objectStoreName,
   });
 
-  factory IndexedDBContentUpdatedEvent.fromJson(Map json) {
+  factory IndexedDBContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return new IndexedDBContentUpdatedEvent(
       origin: json['origin'],
       databaseName: json['databaseName'],
@@ -164,7 +164,7 @@ class GetUsageAndQuotaResult {
     @required this.usageBreakdown,
   });
 
-  factory GetUsageAndQuotaResult.fromJson(Map json) {
+  factory GetUsageAndQuotaResult.fromJson(Map<String, dynamic> json) {
     return new GetUsageAndQuotaResult(
       usage: json['usage'],
       quota: json['quota'],
@@ -228,15 +228,15 @@ class UsageForType {
     @required this.usage,
   });
 
-  factory UsageForType.fromJson(Map json) {
+  factory UsageForType.fromJson(Map<String, dynamic> json) {
     return new UsageForType(
       storageType: new StorageType.fromJson(json['storageType']),
       usage: json['usage'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'storageType': storageType.toJson(),
       'usage': usage,
     };

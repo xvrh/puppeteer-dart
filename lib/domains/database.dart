@@ -26,21 +26,21 @@ class DatabaseApi {
     DatabaseId databaseId,
     String query,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'databaseId': databaseId.toJson(),
       'query': query,
     };
-    Map result = await _client.send('Database.executeSQL', parameters);
+    var result = await _client.send('Database.executeSQL', parameters);
     return new ExecuteSQLResult.fromJson(result);
   }
 
   Future<List<String>> getDatabaseTableNames(
     DatabaseId databaseId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'databaseId': databaseId.toJson(),
     };
-    Map result =
+    var result =
         await _client.send('Database.getDatabaseTableNames', parameters);
     return (result['tableNames'] as List).map((e) => e as String).toList();
   }
@@ -59,7 +59,7 @@ class ExecuteSQLResult {
     this.sqlError,
   });
 
-  factory ExecuteSQLResult.fromJson(Map json) {
+  factory ExecuteSQLResult.fromJson(Map<String, dynamic> json) {
     return new ExecuteSQLResult(
       columnNames: json.containsKey('columnNames')
           ? (json['columnNames'] as List).map((e) => e as String).toList()
@@ -115,7 +115,7 @@ class Database {
     @required this.version,
   });
 
-  factory Database.fromJson(Map json) {
+  factory Database.fromJson(Map<String, dynamic> json) {
     return new Database(
       id: new DatabaseId.fromJson(json['id']),
       domain: json['domain'],
@@ -124,8 +124,8 @@ class Database {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'id': id.toJson(),
       'domain': domain,
       'name': name,
@@ -148,15 +148,15 @@ class Error {
     @required this.code,
   });
 
-  factory Error.fromJson(Map json) {
+  factory Error.fromJson(Map<String, dynamic> json) {
     return new Error(
       message: json['message'],
       code: json['code'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'message': message,
       'code': code,
     };

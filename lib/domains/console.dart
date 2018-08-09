@@ -61,7 +61,7 @@ class ConsoleMessage {
     this.column,
   });
 
-  factory ConsoleMessage.fromJson(Map json) {
+  factory ConsoleMessage.fromJson(Map<String, dynamic> json) {
     return new ConsoleMessage(
       source: json['source'],
       level: json['level'],
@@ -72,8 +72,8 @@ class ConsoleMessage {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'source': source,
       'level': level,
       'text': text,

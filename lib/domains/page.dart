@@ -131,10 +131,10 @@ class PageApi {
   Future<ScriptIdentifier> addScriptToEvaluateOnLoad(
     String scriptSource,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'scriptSource': scriptSource,
     };
-    Map result =
+    var result =
         await _client.send('Page.addScriptToEvaluateOnLoad', parameters);
     return new ScriptIdentifier.fromJson(result['identifier']);
   }
@@ -144,10 +144,10 @@ class PageApi {
   Future<ScriptIdentifier> addScriptToEvaluateOnNewDocument(
     String source,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'source': source,
     };
-    Map result =
+    var result =
         await _client.send('Page.addScriptToEvaluateOnNewDocument', parameters);
     return new ScriptIdentifier.fromJson(result['identifier']);
   }
@@ -169,7 +169,7 @@ class PageApi {
     Viewport clip,
     bool fromSurface,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (format != null) {
       parameters['format'] = format;
     }
@@ -182,7 +182,7 @@ class PageApi {
     if (fromSurface != null) {
       parameters['fromSurface'] = fromSurface;
     }
-    Map result = await _client.send('Page.captureScreenshot', parameters);
+    var result = await _client.send('Page.captureScreenshot', parameters);
     return result['data'];
   }
 
@@ -215,7 +215,7 @@ class PageApi {
     String worldName,
     bool grantUniveralAccess,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
     };
     if (worldName != null) {
@@ -224,7 +224,7 @@ class PageApi {
     if (grantUniveralAccess != null) {
       parameters['grantUniveralAccess'] = grantUniveralAccess;
     }
-    Map result = await _client.send('Page.createIsolatedWorld', parameters);
+    var result = await _client.send('Page.createIsolatedWorld', parameters);
     return new runtime.ExecutionContextId.fromJson(
         result['executionContextId']);
   }
@@ -237,7 +237,7 @@ class PageApi {
     String cookieName,
     String url,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'cookieName': cookieName,
       'url': url,
     };
@@ -255,7 +255,7 @@ class PageApi {
   }
 
   Future<GetAppManifestResult> getAppManifest() async {
-    Map result = await _client.send('Page.getAppManifest');
+    var result = await _client.send('Page.getAppManifest');
     return new GetAppManifestResult.fromJson(result);
   }
 
@@ -264,7 +264,7 @@ class PageApi {
   /// Returns: Array of cookie objects.
   @deprecated
   Future<List<network.Cookie>> getCookies() async {
-    Map result = await _client.send('Page.getCookies');
+    var result = await _client.send('Page.getCookies');
     return (result['cookies'] as List)
         .map((e) => new network.Cookie.fromJson(e))
         .toList();
@@ -273,19 +273,19 @@ class PageApi {
   /// Returns present frame tree structure.
   /// Returns: Present frame tree structure.
   Future<FrameTree> getFrameTree() async {
-    Map result = await _client.send('Page.getFrameTree');
+    var result = await _client.send('Page.getFrameTree');
     return new FrameTree.fromJson(result['frameTree']);
   }
 
   /// Returns metrics relating to the layouting of the page, such as viewport bounds/scale.
   Future<GetLayoutMetricsResult> getLayoutMetrics() async {
-    Map result = await _client.send('Page.getLayoutMetrics');
+    var result = await _client.send('Page.getLayoutMetrics');
     return new GetLayoutMetricsResult.fromJson(result);
   }
 
   /// Returns navigation history for the current page.
   Future<GetNavigationHistoryResult> getNavigationHistory() async {
-    Map result = await _client.send('Page.getNavigationHistory');
+    var result = await _client.send('Page.getNavigationHistory');
     return new GetNavigationHistoryResult.fromJson(result);
   }
 
@@ -296,18 +296,18 @@ class PageApi {
     FrameId frameId,
     String url,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
       'url': url,
     };
-    Map result = await _client.send('Page.getResourceContent', parameters);
+    var result = await _client.send('Page.getResourceContent', parameters);
     return new GetResourceContentResult.fromJson(result);
   }
 
   /// Returns present frame / resource tree structure.
   /// Returns: Present frame / resource tree structure.
   Future<FrameResourceTree> getResourceTree() async {
-    Map result = await _client.send('Page.getResourceTree');
+    var result = await _client.send('Page.getResourceTree');
     return new FrameResourceTree.fromJson(result['frameTree']);
   }
 
@@ -319,7 +319,7 @@ class PageApi {
     bool accept, {
     String promptText,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'accept': accept,
     };
     if (promptText != null) {
@@ -339,7 +339,7 @@ class PageApi {
     TransitionType transitionType,
     FrameId frameId,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'url': url,
     };
     if (referrer != null) {
@@ -351,7 +351,7 @@ class PageApi {
     if (frameId != null) {
       parameters['frameId'] = frameId.toJson();
     }
-    Map result = await _client.send('Page.navigate', parameters);
+    var result = await _client.send('Page.navigate', parameters);
     return new NavigateResult.fromJson(result);
   }
 
@@ -360,7 +360,7 @@ class PageApi {
   Future navigateToHistoryEntry(
     int entryId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'entryId': entryId,
     };
     await _client.send('Page.navigateToHistoryEntry', parameters);
@@ -411,7 +411,7 @@ class PageApi {
     String footerTemplate,
     bool preferCSSPageSize,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (landscape != null) {
       parameters['landscape'] = landscape;
     }
@@ -457,7 +457,7 @@ class PageApi {
     if (preferCSSPageSize != null) {
       parameters['preferCSSPageSize'] = preferCSSPageSize;
     }
-    Map result = await _client.send('Page.printToPDF', parameters);
+    var result = await _client.send('Page.printToPDF', parameters);
     return result['data'];
   }
 
@@ -469,7 +469,7 @@ class PageApi {
     bool ignoreCache,
     String scriptToEvaluateOnLoad,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (ignoreCache != null) {
       parameters['ignoreCache'] = ignoreCache;
     }
@@ -484,7 +484,7 @@ class PageApi {
   Future removeScriptToEvaluateOnLoad(
     ScriptIdentifier identifier,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'identifier': identifier.toJson(),
     };
     await _client.send('Page.removeScriptToEvaluateOnLoad', parameters);
@@ -494,7 +494,7 @@ class PageApi {
   Future removeScriptToEvaluateOnNewDocument(
     ScriptIdentifier identifier,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'identifier': identifier.toJson(),
     };
     await _client.send('Page.removeScriptToEvaluateOnNewDocument', parameters);
@@ -509,7 +509,7 @@ class PageApi {
   Future screencastFrameAck(
     int sessionId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'sessionId': sessionId,
     };
     await _client.send('Page.screencastFrameAck', parameters);
@@ -529,7 +529,7 @@ class PageApi {
     bool caseSensitive,
     bool isRegex,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
       'url': url,
       'query': query,
@@ -540,7 +540,7 @@ class PageApi {
     if (isRegex != null) {
       parameters['isRegex'] = isRegex;
     }
-    Map result = await _client.send('Page.searchInResource', parameters);
+    var result = await _client.send('Page.searchInResource', parameters);
     return (result['result'] as List)
         .map((e) => new debugger.SearchMatch.fromJson(e))
         .toList();
@@ -551,7 +551,7 @@ class PageApi {
   Future setAdBlockingEnabled(
     bool enabled,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'enabled': enabled,
     };
     await _client.send('Page.setAdBlockingEnabled', parameters);
@@ -562,7 +562,7 @@ class PageApi {
   Future setBypassCSP(
     bool enabled,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'enabled': enabled,
     };
     await _client.send('Page.setBypassCSP', parameters);
@@ -599,7 +599,7 @@ class PageApi {
     emulation.ScreenOrientation screenOrientation,
     Viewport viewport,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'width': width,
       'height': height,
       'deviceScaleFactor': deviceScaleFactor,
@@ -642,7 +642,7 @@ class PageApi {
     num beta,
     num gamma,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'alpha': alpha,
       'beta': beta,
       'gamma': gamma,
@@ -655,7 +655,7 @@ class PageApi {
   Future setFontFamilies(
     FontFamilies fontFamilies,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'fontFamilies': fontFamilies.toJson(),
     };
     await _client.send('Page.setFontFamilies', parameters);
@@ -666,7 +666,7 @@ class PageApi {
   Future setFontSizes(
     FontSizes fontSizes,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'fontSizes': fontSizes.toJson(),
     };
     await _client.send('Page.setFontSizes', parameters);
@@ -679,7 +679,7 @@ class PageApi {
     FrameId frameId,
     String html,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
       'html': html,
     };
@@ -694,7 +694,7 @@ class PageApi {
     String behavior, {
     String downloadPath,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'behavior': behavior,
     };
     if (downloadPath != null) {
@@ -714,7 +714,7 @@ class PageApi {
     num longitude,
     num accuracy,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (latitude != null) {
       parameters['latitude'] = latitude;
     }
@@ -732,7 +732,7 @@ class PageApi {
   Future setLifecycleEventsEnabled(
     bool enabled,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'enabled': enabled,
     };
     await _client.send('Page.setLifecycleEventsEnabled', parameters);
@@ -746,7 +746,7 @@ class PageApi {
     bool enabled, {
     String configuration,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'enabled': enabled,
     };
     if (configuration != null) {
@@ -768,7 +768,7 @@ class PageApi {
     int maxHeight,
     int everyNthFrame,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (format != null) {
       parameters['format'] = format;
     }
@@ -809,7 +809,7 @@ class PageApi {
   Future setWebLifecycleState(
     String state,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'state': state,
     };
     await _client.send('Page.setWebLifecycleState', parameters);
@@ -824,7 +824,7 @@ class PageApi {
   Future setProduceCompilationCache(
     bool enabled,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'enabled': enabled,
     };
     await _client.send('Page.setProduceCompilationCache', parameters);
@@ -837,7 +837,7 @@ class PageApi {
     String url,
     String data,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'url': url,
       'data': data,
     };
@@ -866,7 +866,7 @@ class FrameAttachedEvent {
     this.stack,
   });
 
-  factory FrameAttachedEvent.fromJson(Map json) {
+  factory FrameAttachedEvent.fromJson(Map<String, dynamic> json) {
     return new FrameAttachedEvent(
       frameId: new FrameId.fromJson(json['frameId']),
       parentFrameId: new FrameId.fromJson(json['parentFrameId']),
@@ -898,7 +898,7 @@ class FrameScheduledNavigationEvent {
     @required this.url,
   });
 
-  factory FrameScheduledNavigationEvent.fromJson(Map json) {
+  factory FrameScheduledNavigationEvent.fromJson(Map<String, dynamic> json) {
     return new FrameScheduledNavigationEvent(
       frameId: new FrameId.fromJson(json['frameId']),
       delay: json['delay'],
@@ -920,7 +920,7 @@ class JavascriptDialogClosedEvent {
     @required this.userInput,
   });
 
-  factory JavascriptDialogClosedEvent.fromJson(Map json) {
+  factory JavascriptDialogClosedEvent.fromJson(Map<String, dynamic> json) {
     return new JavascriptDialogClosedEvent(
       result: json['result'],
       userInput: json['userInput'],
@@ -954,7 +954,7 @@ class JavascriptDialogOpeningEvent {
     this.defaultPrompt,
   });
 
-  factory JavascriptDialogOpeningEvent.fromJson(Map json) {
+  factory JavascriptDialogOpeningEvent.fromJson(Map<String, dynamic> json) {
     return new JavascriptDialogOpeningEvent(
       url: json['url'],
       message: json['message'],
@@ -984,7 +984,7 @@ class LifecycleEventEvent {
     @required this.timestamp,
   });
 
-  factory LifecycleEventEvent.fromJson(Map json) {
+  factory LifecycleEventEvent.fromJson(Map<String, dynamic> json) {
     return new LifecycleEventEvent(
       frameId: new FrameId.fromJson(json['frameId']),
       loaderId: new network.LoaderId.fromJson(json['loaderId']),
@@ -1006,7 +1006,7 @@ class NavigatedWithinDocumentEvent {
     @required this.url,
   });
 
-  factory NavigatedWithinDocumentEvent.fromJson(Map json) {
+  factory NavigatedWithinDocumentEvent.fromJson(Map<String, dynamic> json) {
     return new NavigatedWithinDocumentEvent(
       frameId: new FrameId.fromJson(json['frameId']),
       url: json['url'],
@@ -1030,7 +1030,7 @@ class ScreencastFrameEvent {
     @required this.sessionId,
   });
 
-  factory ScreencastFrameEvent.fromJson(Map json) {
+  factory ScreencastFrameEvent.fromJson(Map<String, dynamic> json) {
     return new ScreencastFrameEvent(
       data: json['data'],
       metadata: new ScreencastFrameMetadata.fromJson(json['metadata']),
@@ -1059,7 +1059,7 @@ class WindowOpenEvent {
     @required this.userGesture,
   });
 
-  factory WindowOpenEvent.fromJson(Map json) {
+  factory WindowOpenEvent.fromJson(Map<String, dynamic> json) {
     return new WindowOpenEvent(
       url: json['url'],
       windowName: json['windowName'],
@@ -1081,7 +1081,7 @@ class CompilationCacheProducedEvent {
     @required this.data,
   });
 
-  factory CompilationCacheProducedEvent.fromJson(Map json) {
+  factory CompilationCacheProducedEvent.fromJson(Map<String, dynamic> json) {
     return new CompilationCacheProducedEvent(
       url: json['url'],
       data: json['data'],
@@ -1104,7 +1104,7 @@ class GetAppManifestResult {
     this.data,
   });
 
-  factory GetAppManifestResult.fromJson(Map json) {
+  factory GetAppManifestResult.fromJson(Map<String, dynamic> json) {
     return new GetAppManifestResult(
       url: json['url'],
       errors: (json['errors'] as List)
@@ -1131,7 +1131,7 @@ class GetLayoutMetricsResult {
     @required this.contentSize,
   });
 
-  factory GetLayoutMetricsResult.fromJson(Map json) {
+  factory GetLayoutMetricsResult.fromJson(Map<String, dynamic> json) {
     return new GetLayoutMetricsResult(
       layoutViewport: new LayoutViewport.fromJson(json['layoutViewport']),
       visualViewport: new VisualViewport.fromJson(json['visualViewport']),
@@ -1152,7 +1152,7 @@ class GetNavigationHistoryResult {
     @required this.entries,
   });
 
-  factory GetNavigationHistoryResult.fromJson(Map json) {
+  factory GetNavigationHistoryResult.fromJson(Map<String, dynamic> json) {
     return new GetNavigationHistoryResult(
       currentIndex: json['currentIndex'],
       entries: (json['entries'] as List)
@@ -1174,7 +1174,7 @@ class GetResourceContentResult {
     @required this.base64Encoded,
   });
 
-  factory GetResourceContentResult.fromJson(Map json) {
+  factory GetResourceContentResult.fromJson(Map<String, dynamic> json) {
     return new GetResourceContentResult(
       content: json['content'],
       base64Encoded: json['base64Encoded'],
@@ -1198,7 +1198,7 @@ class NavigateResult {
     this.errorText,
   });
 
-  factory NavigateResult.fromJson(Map json) {
+  factory NavigateResult.fromJson(Map<String, dynamic> json) {
     return new NavigateResult(
       frameId: new FrameId.fromJson(json['frameId']),
       loaderId: json.containsKey('loaderId')
@@ -1317,7 +1317,7 @@ class Frame {
     this.unreachableUrl,
   });
 
-  factory Frame.fromJson(Map json) {
+  factory Frame.fromJson(Map<String, dynamic> json) {
     return new Frame(
       id: json['id'],
       parentId: json.containsKey('parentId') ? json['parentId'] : null,
@@ -1331,8 +1331,8 @@ class Frame {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'id': id,
       'loaderId': loaderId.toJson(),
       'url': url,
@@ -1385,7 +1385,7 @@ class FrameResource {
     this.canceled,
   });
 
-  factory FrameResource.fromJson(Map json) {
+  factory FrameResource.fromJson(Map<String, dynamic> json) {
     return new FrameResource(
       url: json['url'],
       type: new ResourceType.fromJson(json['type']),
@@ -1399,8 +1399,8 @@ class FrameResource {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'url': url,
       'type': type.toJson(),
       'mimeType': mimeType,
@@ -1438,7 +1438,7 @@ class FrameResourceTree {
     @required this.resources,
   });
 
-  factory FrameResourceTree.fromJson(Map json) {
+  factory FrameResourceTree.fromJson(Map<String, dynamic> json) {
     return new FrameResourceTree(
       frame: new Frame.fromJson(json['frame']),
       childFrames: json.containsKey('childFrames')
@@ -1452,8 +1452,8 @@ class FrameResourceTree {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'frame': frame.toJson(),
       'resources': resources.map((e) => e.toJson()).toList(),
     };
@@ -1477,7 +1477,7 @@ class FrameTree {
     this.childFrames,
   });
 
-  factory FrameTree.fromJson(Map json) {
+  factory FrameTree.fromJson(Map<String, dynamic> json) {
     return new FrameTree(
       frame: new Frame.fromJson(json['frame']),
       childFrames: json.containsKey('childFrames')
@@ -1488,8 +1488,8 @@ class FrameTree {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'frame': frame.toJson(),
     };
     if (childFrames != null) {
@@ -1592,7 +1592,7 @@ class NavigationEntry {
     @required this.transitionType,
   });
 
-  factory NavigationEntry.fromJson(Map json) {
+  factory NavigationEntry.fromJson(Map<String, dynamic> json) {
     return new NavigationEntry(
       id: json['id'],
       url: json['url'],
@@ -1602,8 +1602,8 @@ class NavigationEntry {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'id': id,
       'url': url,
       'userTypedURL': userTypedURL,
@@ -1647,7 +1647,7 @@ class ScreencastFrameMetadata {
     this.timestamp,
   });
 
-  factory ScreencastFrameMetadata.fromJson(Map json) {
+  factory ScreencastFrameMetadata.fromJson(Map<String, dynamic> json) {
     return new ScreencastFrameMetadata(
       offsetTop: json['offsetTop'],
       pageScaleFactor: json['pageScaleFactor'],
@@ -1661,8 +1661,8 @@ class ScreencastFrameMetadata {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'offsetTop': offsetTop,
       'pageScaleFactor': pageScaleFactor,
       'deviceWidth': deviceWidth,
@@ -1723,7 +1723,7 @@ class AppManifestError {
     @required this.column,
   });
 
-  factory AppManifestError.fromJson(Map json) {
+  factory AppManifestError.fromJson(Map<String, dynamic> json) {
     return new AppManifestError(
       message: json['message'],
       critical: json['critical'],
@@ -1732,8 +1732,8 @@ class AppManifestError {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'message': message,
       'critical': critical,
       'line': line,
@@ -1764,7 +1764,7 @@ class LayoutViewport {
     @required this.clientHeight,
   });
 
-  factory LayoutViewport.fromJson(Map json) {
+  factory LayoutViewport.fromJson(Map<String, dynamic> json) {
     return new LayoutViewport(
       pageX: json['pageX'],
       pageY: json['pageY'],
@@ -1773,8 +1773,8 @@ class LayoutViewport {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'pageX': pageX,
       'pageY': pageY,
       'clientWidth': clientWidth,
@@ -1817,7 +1817,7 @@ class VisualViewport {
     @required this.scale,
   });
 
-  factory VisualViewport.fromJson(Map json) {
+  factory VisualViewport.fromJson(Map<String, dynamic> json) {
     return new VisualViewport(
       offsetX: json['offsetX'],
       offsetY: json['offsetY'],
@@ -1829,8 +1829,8 @@ class VisualViewport {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'offsetX': offsetX,
       'offsetY': offsetY,
       'pageX': pageX,
@@ -1868,7 +1868,7 @@ class Viewport {
     @required this.scale,
   });
 
-  factory Viewport.fromJson(Map json) {
+  factory Viewport.fromJson(Map<String, dynamic> json) {
     return new Viewport(
       x: json['x'],
       y: json['y'],
@@ -1878,8 +1878,8 @@ class Viewport {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'x': x,
       'y': y,
       'width': width,
@@ -1923,7 +1923,7 @@ class FontFamilies {
     this.pictograph,
   });
 
-  factory FontFamilies.fromJson(Map json) {
+  factory FontFamilies.fromJson(Map<String, dynamic> json) {
     return new FontFamilies(
       standard: json.containsKey('standard') ? json['standard'] : null,
       fixed: json.containsKey('fixed') ? json['fixed'] : null,
@@ -1935,8 +1935,8 @@ class FontFamilies {
     );
   }
 
-  Map toJson() {
-    Map json = {};
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{};
     if (standard != null) {
       json['standard'] = standard;
     }
@@ -1975,15 +1975,15 @@ class FontSizes {
     this.fixed,
   });
 
-  factory FontSizes.fromJson(Map json) {
+  factory FontSizes.fromJson(Map<String, dynamic> json) {
     return new FontSizes(
       standard: json.containsKey('standard') ? json['standard'] : null,
       fixed: json.containsKey('fixed') ? json['fixed'] : null,
     );
   }
 
-  Map toJson() {
-    Map json = {};
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{};
     if (standard != null) {
       json['standard'] = standard;
     }

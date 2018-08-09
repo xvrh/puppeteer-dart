@@ -5,7 +5,8 @@ import 'package:logging/logging.dart';
 import '../domains/target.dart';
 
 abstract class Client {
-  Future<Map> send(String method, [Map parameters]);
+  Future<Map<String, dynamic>> send(String method,
+      [Map<String, dynamic> parameters]);
   Stream<Event> get onEvent;
 }
 
@@ -60,7 +61,8 @@ class Connection implements Client {
   Stream<Event> get onEvent => _eventController.stream;
 
   @override
-  Future<Map> send(String method, [Map parameters]) {
+  Future<Map<String, dynamic>> send(String method,
+      [Map<String, dynamic> parameters]) {
     int id = ++_lastId;
     String message = _encodeMessage(id, method, parameters);
 
@@ -128,7 +130,7 @@ class Connection implements Client {
   }
 }
 
-String _encodeMessage(int id, String method, Map parameters) {
+String _encodeMessage(int id, String method, Map<String, dynamic> parameters) {
   return jsonEncode({
     'id': id,
     'method': method,
@@ -151,7 +153,8 @@ class Session implements Client {
       : _browserContextID = browserContextID;
 
   @override
-  Future<Map> send(String method, [Map parameters]) {
+  Future<Map<String, dynamic>> send(String method,
+      [Map<String, dynamic> parameters]) {
     if (_eventController.isClosed) {
       throw new Exception('Session closed');
     }

@@ -34,7 +34,7 @@ class TracingApi {
   /// Gets supported tracing categories.
   /// Returns: A list of supported tracing categories.
   Future<List<String>> getCategories() async {
-    Map result = await _client.send('Tracing.getCategories');
+    var result = await _client.send('Tracing.getCategories');
     return (result['categories'] as List).map((e) => e as String).toList();
   }
 
@@ -43,7 +43,7 @@ class TracingApi {
   Future recordClockSyncMarker(
     String syncId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'syncId': syncId,
     };
     await _client.send('Tracing.recordClockSyncMarker', parameters);
@@ -51,7 +51,7 @@ class TracingApi {
 
   /// Request a global memory dump.
   Future<RequestMemoryDumpResult> requestMemoryDump() async {
-    Map result = await _client.send('Tracing.requestMemoryDump');
+    var result = await _client.send('Tracing.requestMemoryDump');
     return new RequestMemoryDumpResult.fromJson(result);
   }
 
@@ -69,7 +69,7 @@ class TracingApi {
     StreamCompression streamCompression,
     TraceConfig traceConfig,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     // ignore: deprecated_member_use
     if (categories != null) {
       // ignore: deprecated_member_use
@@ -114,7 +114,7 @@ class BufferUsageEvent {
     this.value,
   });
 
-  factory BufferUsageEvent.fromJson(Map json) {
+  factory BufferUsageEvent.fromJson(Map<String, dynamic> json) {
     return new BufferUsageEvent(
       percentFull: json.containsKey('percentFull') ? json['percentFull'] : null,
       eventCount: json.containsKey('eventCount') ? json['eventCount'] : null,
@@ -135,7 +135,7 @@ class TracingCompleteEvent {
     this.streamCompression,
   });
 
-  factory TracingCompleteEvent.fromJson(Map json) {
+  factory TracingCompleteEvent.fromJson(Map<String, dynamic> json) {
     return new TracingCompleteEvent(
       stream: json.containsKey('stream')
           ? new io.StreamHandle.fromJson(json['stream'])
@@ -159,7 +159,7 @@ class RequestMemoryDumpResult {
     @required this.success,
   });
 
-  factory RequestMemoryDumpResult.fromJson(Map json) {
+  factory RequestMemoryDumpResult.fromJson(Map<String, dynamic> json) {
     return new RequestMemoryDumpResult(
       dumpGuid: json['dumpGuid'],
       success: json['success'],
@@ -223,7 +223,7 @@ class TraceConfig {
     this.memoryDumpConfig,
   });
 
-  factory TraceConfig.fromJson(Map json) {
+  factory TraceConfig.fromJson(Map<String, dynamic> json) {
     return new TraceConfig(
       recordMode: json.containsKey('recordMode') ? json['recordMode'] : null,
       enableSampling:
@@ -252,8 +252,8 @@ class TraceConfig {
     );
   }
 
-  Map toJson() {
-    Map json = {};
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{};
     if (recordMode != null) {
       json['recordMode'] = recordMode;
     }

@@ -130,7 +130,7 @@ class NetworkApi {
   /// Returns: True if browser cache can be cleared.
   @deprecated
   Future<bool> canClearBrowserCache() async {
-    Map result = await _client.send('Network.canClearBrowserCache');
+    var result = await _client.send('Network.canClearBrowserCache');
     return result['result'];
   }
 
@@ -138,7 +138,7 @@ class NetworkApi {
   /// Returns: True if browser cookies can be cleared.
   @deprecated
   Future<bool> canClearBrowserCookies() async {
-    Map result = await _client.send('Network.canClearBrowserCookies');
+    var result = await _client.send('Network.canClearBrowserCookies');
     return result['result'];
   }
 
@@ -146,7 +146,7 @@ class NetworkApi {
   /// Returns: True if emulation of network conditions is supported.
   @deprecated
   Future<bool> canEmulateNetworkConditions() async {
-    Map result = await _client.send('Network.canEmulateNetworkConditions');
+    var result = await _client.send('Network.canEmulateNetworkConditions');
     return result['result'];
   }
 
@@ -187,7 +187,7 @@ class NetworkApi {
     Headers headers,
     AuthChallengeResponse authChallengeResponse,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'interceptionId': interceptionId.toJson(),
     };
     if (errorReason != null) {
@@ -226,7 +226,7 @@ class NetworkApi {
     String domain,
     String path,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'name': name,
     };
     if (url != null) {
@@ -259,7 +259,7 @@ class NetworkApi {
     num uploadThroughput, {
     ConnectionType connectionType,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'offline': offline,
       'latency': latency,
       'downloadThroughput': downloadThroughput,
@@ -280,7 +280,7 @@ class NetworkApi {
     int maxResourceBufferSize,
     int maxPostDataSize,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (maxTotalBufferSize != null) {
       parameters['maxTotalBufferSize'] = maxTotalBufferSize;
     }
@@ -297,7 +297,7 @@ class NetworkApi {
   /// information in the `cookies` field.
   /// Returns: Array of cookie objects.
   Future<List<Cookie>> getAllCookies() async {
-    Map result = await _client.send('Network.getAllCookies');
+    var result = await _client.send('Network.getAllCookies');
     return (result['cookies'] as List)
         .map((e) => new Cookie.fromJson(e))
         .toList();
@@ -308,10 +308,10 @@ class NetworkApi {
   Future<List<String>> getCertificate(
     String origin,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'origin': origin,
     };
-    Map result = await _client.send('Network.getCertificate', parameters);
+    var result = await _client.send('Network.getCertificate', parameters);
     return (result['tableNames'] as List).map((e) => e as String).toList();
   }
 
@@ -322,11 +322,11 @@ class NetworkApi {
   Future<List<Cookie>> getCookies({
     List<String> urls,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (urls != null) {
       parameters['urls'] = urls.map((e) => e).toList();
     }
-    Map result = await _client.send('Network.getCookies', parameters);
+    var result = await _client.send('Network.getCookies', parameters);
     return (result['cookies'] as List)
         .map((e) => new Cookie.fromJson(e))
         .toList();
@@ -337,10 +337,10 @@ class NetworkApi {
   Future<GetResponseBodyResult> getResponseBody(
     RequestId requestId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'requestId': requestId.toJson(),
     };
-    Map result = await _client.send('Network.getResponseBody', parameters);
+    var result = await _client.send('Network.getResponseBody', parameters);
     return new GetResponseBodyResult.fromJson(result);
   }
 
@@ -350,10 +350,10 @@ class NetworkApi {
   Future<String> getRequestPostData(
     RequestId requestId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'requestId': requestId.toJson(),
     };
-    Map result = await _client.send('Network.getRequestPostData', parameters);
+    var result = await _client.send('Network.getRequestPostData', parameters);
     return result['postData'];
   }
 
@@ -362,10 +362,10 @@ class NetworkApi {
   Future<GetResponseBodyForInterceptionResult> getResponseBodyForInterception(
     InterceptionId interceptionId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'interceptionId': interceptionId.toJson(),
     };
-    Map result = await _client.send(
+    var result = await _client.send(
         'Network.getResponseBodyForInterception', parameters);
     return new GetResponseBodyForInterceptionResult.fromJson(result);
   }
@@ -377,10 +377,10 @@ class NetworkApi {
   Future<io.StreamHandle> takeResponseBodyForInterceptionAsStream(
     InterceptionId interceptionId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'interceptionId': interceptionId.toJson(),
     };
-    Map result = await _client.send(
+    var result = await _client.send(
         'Network.takeResponseBodyForInterceptionAsStream', parameters);
     return new io.StreamHandle.fromJson(result['stream']);
   }
@@ -392,7 +392,7 @@ class NetworkApi {
   Future replayXHR(
     RequestId requestId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'requestId': requestId.toJson(),
     };
     await _client.send('Network.replayXHR', parameters);
@@ -410,7 +410,7 @@ class NetworkApi {
     bool caseSensitive,
     bool isRegex,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'requestId': requestId.toJson(),
       'query': query,
     };
@@ -420,7 +420,7 @@ class NetworkApi {
     if (isRegex != null) {
       parameters['isRegex'] = isRegex;
     }
-    Map result = await _client.send('Network.searchInResponseBody', parameters);
+    var result = await _client.send('Network.searchInResponseBody', parameters);
     return (result['result'] as List)
         .map((e) => new debugger.SearchMatch.fromJson(e))
         .toList();
@@ -431,7 +431,7 @@ class NetworkApi {
   Future setBlockedURLs(
     List<String> urls,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'urls': urls.map((e) => e).toList(),
     };
     await _client.send('Network.setBlockedURLs', parameters);
@@ -442,7 +442,7 @@ class NetworkApi {
   Future setBypassServiceWorker(
     bool bypass,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'bypass': bypass,
     };
     await _client.send('Network.setBypassServiceWorker', parameters);
@@ -453,7 +453,7 @@ class NetworkApi {
   Future setCacheDisabled(
     bool cacheDisabled,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'cacheDisabled': cacheDisabled,
     };
     await _client.send('Network.setCacheDisabled', parameters);
@@ -482,7 +482,7 @@ class NetworkApi {
     CookieSameSite sameSite,
     TimeSinceEpoch expires,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'name': name,
       'value': value,
     };
@@ -507,7 +507,7 @@ class NetworkApi {
     if (expires != null) {
       parameters['expires'] = expires.toJson();
     }
-    Map result = await _client.send('Network.setCookie', parameters);
+    var result = await _client.send('Network.setCookie', parameters);
     return result['success'];
   }
 
@@ -516,7 +516,7 @@ class NetworkApi {
   Future setCookies(
     List<CookieParam> cookies,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'cookies': cookies.map((e) => e.toJson()).toList(),
     };
     await _client.send('Network.setCookies', parameters);
@@ -529,7 +529,7 @@ class NetworkApi {
     int maxTotalSize,
     int maxResourceSize,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'maxTotalSize': maxTotalSize,
       'maxResourceSize': maxResourceSize,
     };
@@ -541,7 +541,7 @@ class NetworkApi {
   Future setExtraHTTPHeaders(
     Headers headers,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'headers': headers.toJson(),
     };
     await _client.send('Network.setExtraHTTPHeaders', parameters);
@@ -553,7 +553,7 @@ class NetworkApi {
   Future setRequestInterception(
     List<RequestPattern> patterns,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'patterns': patterns.map((e) => e.toJson()).toList(),
     };
     await _client.send('Network.setRequestInterception', parameters);
@@ -568,7 +568,7 @@ class NetworkApi {
     String acceptLanguage,
     String platform,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'userAgent': userAgent,
     };
     if (acceptLanguage != null) {
@@ -601,7 +601,7 @@ class DataReceivedEvent {
     @required this.encodedDataLength,
   });
 
-  factory DataReceivedEvent.fromJson(Map json) {
+  factory DataReceivedEvent.fromJson(Map<String, dynamic> json) {
     return new DataReceivedEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       timestamp: new MonotonicTime.fromJson(json['timestamp']),
@@ -635,7 +635,7 @@ class EventSourceMessageReceivedEvent {
     @required this.data,
   });
 
-  factory EventSourceMessageReceivedEvent.fromJson(Map json) {
+  factory EventSourceMessageReceivedEvent.fromJson(Map<String, dynamic> json) {
     return new EventSourceMessageReceivedEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       timestamp: new MonotonicTime.fromJson(json['timestamp']),
@@ -674,7 +674,7 @@ class LoadingFailedEvent {
     this.blockedReason,
   });
 
-  factory LoadingFailedEvent.fromJson(Map json) {
+  factory LoadingFailedEvent.fromJson(Map<String, dynamic> json) {
     return new LoadingFailedEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       timestamp: new MonotonicTime.fromJson(json['timestamp']),
@@ -709,7 +709,7 @@ class LoadingFinishedEvent {
     this.shouldReportCorbBlocking,
   });
 
-  factory LoadingFinishedEvent.fromJson(Map json) {
+  factory LoadingFinishedEvent.fromJson(Map<String, dynamic> json) {
     return new LoadingFinishedEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       timestamp: new MonotonicTime.fromJson(json['timestamp']),
@@ -775,7 +775,7 @@ class RequestInterceptedEvent {
     this.responseHeaders,
   });
 
-  factory RequestInterceptedEvent.fromJson(Map json) {
+  factory RequestInterceptedEvent.fromJson(Map<String, dynamic> json) {
     return new RequestInterceptedEvent(
       interceptionId: new InterceptionId.fromJson(json['interceptionId']),
       request: new Request.fromJson(json['request']),
@@ -848,7 +848,7 @@ class RequestWillBeSentEvent {
     this.hasUserGesture,
   });
 
-  factory RequestWillBeSentEvent.fromJson(Map json) {
+  factory RequestWillBeSentEvent.fromJson(Map<String, dynamic> json) {
     return new RequestWillBeSentEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       loaderId: new LoaderId.fromJson(json['loaderId']),
@@ -888,7 +888,7 @@ class ResourceChangedPriorityEvent {
     @required this.timestamp,
   });
 
-  factory ResourceChangedPriorityEvent.fromJson(Map json) {
+  factory ResourceChangedPriorityEvent.fromJson(Map<String, dynamic> json) {
     return new ResourceChangedPriorityEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       newPriority: new ResourcePriority.fromJson(json['newPriority']),
@@ -909,7 +909,7 @@ class SignedExchangeReceivedEvent {
     @required this.info,
   });
 
-  factory SignedExchangeReceivedEvent.fromJson(Map json) {
+  factory SignedExchangeReceivedEvent.fromJson(Map<String, dynamic> json) {
     return new SignedExchangeReceivedEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       info: new SignedExchangeInfo.fromJson(json['info']),
@@ -945,7 +945,7 @@ class ResponseReceivedEvent {
     this.frameId,
   });
 
-  factory ResponseReceivedEvent.fromJson(Map json) {
+  factory ResponseReceivedEvent.fromJson(Map<String, dynamic> json) {
     return new ResponseReceivedEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       loaderId: new LoaderId.fromJson(json['loaderId']),
@@ -971,7 +971,7 @@ class WebSocketClosedEvent {
     @required this.timestamp,
   });
 
-  factory WebSocketClosedEvent.fromJson(Map json) {
+  factory WebSocketClosedEvent.fromJson(Map<String, dynamic> json) {
     return new WebSocketClosedEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       timestamp: new MonotonicTime.fromJson(json['timestamp']),
@@ -995,7 +995,7 @@ class WebSocketCreatedEvent {
     this.initiator,
   });
 
-  factory WebSocketCreatedEvent.fromJson(Map json) {
+  factory WebSocketCreatedEvent.fromJson(Map<String, dynamic> json) {
     return new WebSocketCreatedEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       url: json['url'],
@@ -1022,7 +1022,7 @@ class WebSocketFrameErrorEvent {
     @required this.errorMessage,
   });
 
-  factory WebSocketFrameErrorEvent.fromJson(Map json) {
+  factory WebSocketFrameErrorEvent.fromJson(Map<String, dynamic> json) {
     return new WebSocketFrameErrorEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       timestamp: new MonotonicTime.fromJson(json['timestamp']),
@@ -1047,7 +1047,7 @@ class WebSocketFrameReceivedEvent {
     @required this.response,
   });
 
-  factory WebSocketFrameReceivedEvent.fromJson(Map json) {
+  factory WebSocketFrameReceivedEvent.fromJson(Map<String, dynamic> json) {
     return new WebSocketFrameReceivedEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       timestamp: new MonotonicTime.fromJson(json['timestamp']),
@@ -1072,7 +1072,7 @@ class WebSocketFrameSentEvent {
     @required this.response,
   });
 
-  factory WebSocketFrameSentEvent.fromJson(Map json) {
+  factory WebSocketFrameSentEvent.fromJson(Map<String, dynamic> json) {
     return new WebSocketFrameSentEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       timestamp: new MonotonicTime.fromJson(json['timestamp']),
@@ -1097,7 +1097,8 @@ class WebSocketHandshakeResponseReceivedEvent {
     @required this.response,
   });
 
-  factory WebSocketHandshakeResponseReceivedEvent.fromJson(Map json) {
+  factory WebSocketHandshakeResponseReceivedEvent.fromJson(
+      Map<String, dynamic> json) {
     return new WebSocketHandshakeResponseReceivedEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       timestamp: new MonotonicTime.fromJson(json['timestamp']),
@@ -1126,7 +1127,8 @@ class WebSocketWillSendHandshakeRequestEvent {
     @required this.request,
   });
 
-  factory WebSocketWillSendHandshakeRequestEvent.fromJson(Map json) {
+  factory WebSocketWillSendHandshakeRequestEvent.fromJson(
+      Map<String, dynamic> json) {
     return new WebSocketWillSendHandshakeRequestEvent(
       requestId: new RequestId.fromJson(json['requestId']),
       timestamp: new MonotonicTime.fromJson(json['timestamp']),
@@ -1148,7 +1150,7 @@ class GetResponseBodyResult {
     @required this.base64Encoded,
   });
 
-  factory GetResponseBodyResult.fromJson(Map json) {
+  factory GetResponseBodyResult.fromJson(Map<String, dynamic> json) {
     return new GetResponseBodyResult(
       body: json['body'],
       base64Encoded: json['base64Encoded'],
@@ -1168,7 +1170,8 @@ class GetResponseBodyForInterceptionResult {
     @required this.base64Encoded,
   });
 
-  factory GetResponseBodyForInterceptionResult.fromJson(Map json) {
+  factory GetResponseBodyForInterceptionResult.fromJson(
+      Map<String, dynamic> json) {
     return new GetResponseBodyForInterceptionResult(
       body: json['body'],
       base64Encoded: json['base64Encoded'],
@@ -1478,7 +1481,7 @@ class ResourceTiming {
     @required this.receiveHeadersEnd,
   });
 
-  factory ResourceTiming.fromJson(Map json) {
+  factory ResourceTiming.fromJson(Map<String, dynamic> json) {
     return new ResourceTiming(
       requestTime: json['requestTime'],
       proxyStart: json['proxyStart'],
@@ -1499,8 +1502,8 @@ class ResourceTiming {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'requestTime': requestTime,
       'proxyStart': proxyStart,
       'proxyEnd': proxyEnd,
@@ -1594,7 +1597,7 @@ class Request {
     this.isLinkPreload,
   });
 
-  factory Request.fromJson(Map json) {
+  factory Request.fromJson(Map<String, dynamic> json) {
     return new Request(
       url: json['url'],
       urlFragment: json.containsKey('urlFragment') ? json['urlFragment'] : null,
@@ -1612,8 +1615,8 @@ class Request {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'url': url,
       'method': method,
       'headers': headers.toJson(),
@@ -1676,7 +1679,7 @@ class SignedCertificateTimestamp {
     @required this.signatureData,
   });
 
-  factory SignedCertificateTimestamp.fromJson(Map json) {
+  factory SignedCertificateTimestamp.fromJson(Map<String, dynamic> json) {
     return new SignedCertificateTimestamp(
       status: json['status'],
       origin: json['origin'],
@@ -1689,8 +1692,8 @@ class SignedCertificateTimestamp {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'status': status,
       'origin': origin,
       'logDescription': logDescription,
@@ -1761,7 +1764,7 @@ class SecurityDetails {
     @required this.certificateTransparencyCompliance,
   });
 
-  factory SecurityDetails.fromJson(Map json) {
+  factory SecurityDetails.fromJson(Map<String, dynamic> json) {
     return new SecurityDetails(
       protocol: json['protocol'],
       keyExchange: json['keyExchange'],
@@ -1786,8 +1789,8 @@ class SecurityDetails {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'protocol': protocol,
       'keyExchange': keyExchange,
       'cipher': cipher,
@@ -1957,7 +1960,7 @@ class Response {
     this.securityDetails,
   });
 
-  factory Response.fromJson(Map json) {
+  factory Response.fromJson(Map<String, dynamic> json) {
     return new Response(
       url: json['url'],
       status: json['status'],
@@ -1993,8 +1996,8 @@ class Response {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'url': url,
       'status': status,
       'statusText': statusText,
@@ -2048,14 +2051,14 @@ class WebSocketRequest {
     @required this.headers,
   });
 
-  factory WebSocketRequest.fromJson(Map json) {
+  factory WebSocketRequest.fromJson(Map<String, dynamic> json) {
     return new WebSocketRequest(
       headers: new Headers.fromJson(json['headers']),
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'headers': headers.toJson(),
     };
     return json;
@@ -2091,7 +2094,7 @@ class WebSocketResponse {
     this.requestHeadersText,
   });
 
-  factory WebSocketResponse.fromJson(Map json) {
+  factory WebSocketResponse.fromJson(Map<String, dynamic> json) {
     return new WebSocketResponse(
       status: json['status'],
       statusText: json['statusText'],
@@ -2106,8 +2109,8 @@ class WebSocketResponse {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'status': status,
       'statusText': statusText,
       'headers': headers.toJson(),
@@ -2142,7 +2145,7 @@ class WebSocketFrame {
     @required this.payloadData,
   });
 
-  factory WebSocketFrame.fromJson(Map json) {
+  factory WebSocketFrame.fromJson(Map<String, dynamic> json) {
     return new WebSocketFrame(
       opcode: json['opcode'],
       mask: json['mask'],
@@ -2150,8 +2153,8 @@ class WebSocketFrame {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'opcode': opcode,
       'mask': mask,
       'payloadData': payloadData,
@@ -2181,7 +2184,7 @@ class CachedResource {
     @required this.bodySize,
   });
 
-  factory CachedResource.fromJson(Map json) {
+  factory CachedResource.fromJson(Map<String, dynamic> json) {
     return new CachedResource(
       url: json['url'],
       type: new page.ResourceType.fromJson(json['type']),
@@ -2192,8 +2195,8 @@ class CachedResource {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'url': url,
       'type': type.toJson(),
       'bodySize': bodySize,
@@ -2227,7 +2230,7 @@ class Initiator {
     this.lineNumber,
   });
 
-  factory Initiator.fromJson(Map json) {
+  factory Initiator.fromJson(Map<String, dynamic> json) {
     return new Initiator(
       type: json['type'],
       stack: json.containsKey('stack')
@@ -2238,8 +2241,8 @@ class Initiator {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'type': type,
     };
     if (stack != null) {
@@ -2300,7 +2303,7 @@ class Cookie {
     this.sameSite,
   });
 
-  factory Cookie.fromJson(Map json) {
+  factory Cookie.fromJson(Map<String, dynamic> json) {
     return new Cookie(
       name: json['name'],
       value: json['value'],
@@ -2317,8 +2320,8 @@ class Cookie {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
       'value': value,
       'domain': domain,
@@ -2378,7 +2381,7 @@ class CookieParam {
     this.expires,
   });
 
-  factory CookieParam.fromJson(Map json) {
+  factory CookieParam.fromJson(Map<String, dynamic> json) {
     return new CookieParam(
       name: json['name'],
       value: json['value'],
@@ -2396,8 +2399,8 @@ class CookieParam {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
       'value': value,
     };
@@ -2447,7 +2450,7 @@ class AuthChallenge {
     @required this.realm,
   });
 
-  factory AuthChallenge.fromJson(Map json) {
+  factory AuthChallenge.fromJson(Map<String, dynamic> json) {
     return new AuthChallenge(
       source: json.containsKey('source') ? json['source'] : null,
       origin: json['origin'],
@@ -2456,8 +2459,8 @@ class AuthChallenge {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'origin': origin,
       'scheme': scheme,
       'realm': realm,
@@ -2490,7 +2493,7 @@ class AuthChallengeResponse {
     this.password,
   });
 
-  factory AuthChallengeResponse.fromJson(Map json) {
+  factory AuthChallengeResponse.fromJson(Map<String, dynamic> json) {
     return new AuthChallengeResponse(
       response: json['response'],
       username: json.containsKey('username') ? json['username'] : null,
@@ -2498,8 +2501,8 @@ class AuthChallengeResponse {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'response': response,
     };
     if (username != null) {
@@ -2553,7 +2556,7 @@ class RequestPattern {
     this.interceptionStage,
   });
 
-  factory RequestPattern.fromJson(Map json) {
+  factory RequestPattern.fromJson(Map<String, dynamic> json) {
     return new RequestPattern(
       urlPattern: json.containsKey('urlPattern') ? json['urlPattern'] : null,
       resourceType: json.containsKey('resourceType')
@@ -2565,8 +2568,8 @@ class RequestPattern {
     );
   }
 
-  Map toJson() {
-    Map json = {};
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{};
     if (urlPattern != null) {
       json['urlPattern'] = urlPattern;
     }
@@ -2622,7 +2625,7 @@ class SignedExchangeSignature {
     this.certificates,
   });
 
-  factory SignedExchangeSignature.fromJson(Map json) {
+  factory SignedExchangeSignature.fromJson(Map<String, dynamic> json) {
     return new SignedExchangeSignature(
       label: json['label'],
       signature: json['signature'],
@@ -2638,8 +2641,8 @@ class SignedExchangeSignature {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'label': label,
       'signature': signature,
       'integrity': integrity,
@@ -2686,7 +2689,7 @@ class SignedExchangeHeader {
     @required this.signatures,
   });
 
-  factory SignedExchangeHeader.fromJson(Map json) {
+  factory SignedExchangeHeader.fromJson(Map<String, dynamic> json) {
     return new SignedExchangeHeader(
       requestUrl: json['requestUrl'],
       requestMethod: json['requestMethod'],
@@ -2698,8 +2701,8 @@ class SignedExchangeHeader {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'requestUrl': requestUrl,
       'requestMethod': requestMethod,
       'responseCode': responseCode,
@@ -2762,7 +2765,7 @@ class SignedExchangeError {
     this.errorField,
   });
 
-  factory SignedExchangeError.fromJson(Map json) {
+  factory SignedExchangeError.fromJson(Map<String, dynamic> json) {
     return new SignedExchangeError(
       message: json['message'],
       signatureIndex:
@@ -2773,8 +2776,8 @@ class SignedExchangeError {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'message': message,
     };
     if (signatureIndex != null) {
@@ -2808,7 +2811,7 @@ class SignedExchangeInfo {
     this.errors,
   });
 
-  factory SignedExchangeInfo.fromJson(Map json) {
+  factory SignedExchangeInfo.fromJson(Map<String, dynamic> json) {
     return new SignedExchangeInfo(
       outerResponse: new Response.fromJson(json['outerResponse']),
       header: json.containsKey('header')
@@ -2825,8 +2828,8 @@ class SignedExchangeInfo {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'outerResponse': outerResponse.toJson(),
     };
     if (header != null) {

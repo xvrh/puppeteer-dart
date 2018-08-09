@@ -28,7 +28,7 @@ class EmulationApi {
   /// Tells whether emulation is supported.
   /// Returns: True if emulation is supported.
   Future<bool> canEmulate() async {
-    Map result = await _client.send('Emulation.canEmulate');
+    var result = await _client.send('Emulation.canEmulate');
     return result['result'];
   }
 
@@ -52,7 +52,7 @@ class EmulationApi {
   Future setCPUThrottlingRate(
     num rate,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'rate': rate,
     };
     await _client.send('Emulation.setCPUThrottlingRate', parameters);
@@ -65,7 +65,7 @@ class EmulationApi {
   Future setDefaultBackgroundColorOverride({
     dom.RGBA color,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (color != null) {
       parameters['color'] = color.toJson();
     }
@@ -104,7 +104,7 @@ class EmulationApi {
     ScreenOrientation screenOrientation,
     page.Viewport viewport,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'width': width,
       'height': height,
       'deviceScaleFactor': deviceScaleFactor,
@@ -141,7 +141,7 @@ class EmulationApi {
   Future setScrollbarsHidden(
     bool hidden,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'hidden': hidden,
     };
     await _client.send('Emulation.setScrollbarsHidden', parameters);
@@ -151,7 +151,7 @@ class EmulationApi {
   Future setDocumentCookieDisabled(
     bool disabled,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'disabled': disabled,
     };
     await _client.send('Emulation.setDocumentCookieDisabled', parameters);
@@ -163,7 +163,7 @@ class EmulationApi {
     bool enabled, {
     String configuration,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'enabled': enabled,
     };
     if (configuration != null) {
@@ -177,7 +177,7 @@ class EmulationApi {
   Future setEmulatedMedia(
     String media,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'media': media,
     };
     await _client.send('Emulation.setEmulatedMedia', parameters);
@@ -193,7 +193,7 @@ class EmulationApi {
     num longitude,
     num accuracy,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (latitude != null) {
       parameters['latitude'] = latitude;
     }
@@ -212,7 +212,7 @@ class EmulationApi {
   Future setNavigatorOverrides(
     String platform,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'platform': platform,
     };
     await _client.send('Emulation.setNavigatorOverrides', parameters);
@@ -223,7 +223,7 @@ class EmulationApi {
   Future setPageScaleFactor(
     num pageScaleFactor,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'pageScaleFactor': pageScaleFactor,
     };
     await _client.send('Emulation.setPageScaleFactor', parameters);
@@ -234,7 +234,7 @@ class EmulationApi {
   Future setScriptExecutionDisabled(
     bool value,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'value': value,
     };
     await _client.send('Emulation.setScriptExecutionDisabled', parameters);
@@ -247,7 +247,7 @@ class EmulationApi {
     bool enabled, {
     int maxTouchPoints,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'enabled': enabled,
     };
     if (maxTouchPoints != null) {
@@ -273,7 +273,7 @@ class EmulationApi {
     bool waitForNavigation,
     network.TimeSinceEpoch initialVirtualTime,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'policy': policy.toJson(),
     };
     if (budget != null) {
@@ -289,7 +289,7 @@ class EmulationApi {
     if (initialVirtualTime != null) {
       parameters['initialVirtualTime'] = initialVirtualTime.toJson();
     }
-    Map result =
+    var result =
         await _client.send('Emulation.setVirtualTimePolicy', parameters);
     return result['virtualTimeTicksBase'];
   }
@@ -304,7 +304,7 @@ class EmulationApi {
     int width,
     int height,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'width': width,
       'height': height,
     };
@@ -320,7 +320,7 @@ class EmulationApi {
     String acceptLanguage,
     String platform,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'userAgent': userAgent,
     };
     if (acceptLanguage != null) {
@@ -346,15 +346,15 @@ class ScreenOrientation {
     @required this.angle,
   });
 
-  factory ScreenOrientation.fromJson(Map json) {
+  factory ScreenOrientation.fromJson(Map<String, dynamic> json) {
     return new ScreenOrientation(
       type: json['type'],
       angle: json['angle'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'type': type,
       'angle': angle,
     };

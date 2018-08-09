@@ -34,7 +34,7 @@ class HeadlessExperimentalApi {
     bool noDisplayUpdates,
     ScreenshotParams screenshot,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (frameTimeTicks != null) {
       parameters['frameTimeTicks'] = frameTimeTicks;
     }
@@ -47,7 +47,7 @@ class HeadlessExperimentalApi {
     if (screenshot != null) {
       parameters['screenshot'] = screenshot.toJson();
     }
-    Map result =
+    var result =
         await _client.send('HeadlessExperimental.beginFrame', parameters);
     return new BeginFrameResult.fromJson(result);
   }
@@ -76,7 +76,7 @@ class BeginFrameResult {
     this.screenshotData,
   });
 
-  factory BeginFrameResult.fromJson(Map json) {
+  factory BeginFrameResult.fromJson(Map<String, dynamic> json) {
     return new BeginFrameResult(
       hasDamage: json['hasDamage'],
       screenshotData:
@@ -98,15 +98,15 @@ class ScreenshotParams {
     this.quality,
   });
 
-  factory ScreenshotParams.fromJson(Map json) {
+  factory ScreenshotParams.fromJson(Map<String, dynamic> json) {
     return new ScreenshotParams(
       format: json.containsKey('format') ? json['format'] : null,
       quality: json.containsKey('quality') ? json['quality'] : null,
     );
   }
 
-  Map toJson() {
-    Map json = {};
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{};
     if (format != null) {
       json['format'] = format;
     }

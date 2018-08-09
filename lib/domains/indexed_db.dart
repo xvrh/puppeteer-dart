@@ -17,7 +17,7 @@ class IndexedDBApi {
     String databaseName,
     String objectStoreName,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
@@ -32,7 +32,7 @@ class IndexedDBApi {
     String securityOrigin,
     String databaseName,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
     };
@@ -47,7 +47,7 @@ class IndexedDBApi {
     String objectStoreName,
     KeyRange keyRange,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
@@ -83,7 +83,7 @@ class IndexedDBApi {
     int pageSize, {
     KeyRange keyRange,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
@@ -94,7 +94,7 @@ class IndexedDBApi {
     if (keyRange != null) {
       parameters['keyRange'] = keyRange.toJson();
     }
-    Map result = await _client.send('IndexedDB.requestData', parameters);
+    var result = await _client.send('IndexedDB.requestData', parameters);
     return new RequestDataResult.fromJson(result);
   }
 
@@ -106,11 +106,11 @@ class IndexedDBApi {
     String securityOrigin,
     String databaseName,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
     };
-    Map result = await _client.send('IndexedDB.requestDatabase', parameters);
+    var result = await _client.send('IndexedDB.requestDatabase', parameters);
     return new DatabaseWithObjectStores.fromJson(
         result['databaseWithObjectStores']);
   }
@@ -121,10 +121,10 @@ class IndexedDBApi {
   Future<List<String>> requestDatabaseNames(
     String securityOrigin,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
     };
-    Map result =
+    var result =
         await _client.send('IndexedDB.requestDatabaseNames', parameters);
     return (result['databaseNames'] as List).map((e) => e as String).toList();
   }
@@ -142,7 +142,7 @@ class RequestDataResult {
     @required this.hasMore,
   });
 
-  factory RequestDataResult.fromJson(Map json) {
+  factory RequestDataResult.fromJson(Map<String, dynamic> json) {
     return new RequestDataResult(
       objectStoreDataEntries: (json['objectStoreDataEntries'] as List)
           .map((e) => new DataEntry.fromJson(e))
@@ -169,7 +169,7 @@ class DatabaseWithObjectStores {
     @required this.objectStores,
   });
 
-  factory DatabaseWithObjectStores.fromJson(Map json) {
+  factory DatabaseWithObjectStores.fromJson(Map<String, dynamic> json) {
     return new DatabaseWithObjectStores(
       name: json['name'],
       version: json['version'],
@@ -179,8 +179,8 @@ class DatabaseWithObjectStores {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
       'version': version,
       'objectStores': objectStores.map((e) => e.toJson()).toList(),
@@ -210,7 +210,7 @@ class ObjectStore {
     @required this.indexes,
   });
 
-  factory ObjectStore.fromJson(Map json) {
+  factory ObjectStore.fromJson(Map<String, dynamic> json) {
     return new ObjectStore(
       name: json['name'],
       keyPath: new KeyPath.fromJson(json['keyPath']),
@@ -221,8 +221,8 @@ class ObjectStore {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
       'keyPath': keyPath.toJson(),
       'autoIncrement': autoIncrement,
@@ -253,7 +253,7 @@ class ObjectStoreIndex {
     @required this.multiEntry,
   });
 
-  factory ObjectStoreIndex.fromJson(Map json) {
+  factory ObjectStoreIndex.fromJson(Map<String, dynamic> json) {
     return new ObjectStoreIndex(
       name: json['name'],
       keyPath: new KeyPath.fromJson(json['keyPath']),
@@ -262,8 +262,8 @@ class ObjectStoreIndex {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
       'keyPath': keyPath.toJson(),
       'unique': unique,
@@ -298,7 +298,7 @@ class Key {
     this.array,
   });
 
-  factory Key.fromJson(Map json) {
+  factory Key.fromJson(Map<String, dynamic> json) {
     return new Key(
       type: json['type'],
       number: json.containsKey('number') ? json['number'] : null,
@@ -310,8 +310,8 @@ class Key {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'type': type,
     };
     if (number != null) {
@@ -351,7 +351,7 @@ class KeyRange {
     @required this.upperOpen,
   });
 
-  factory KeyRange.fromJson(Map json) {
+  factory KeyRange.fromJson(Map<String, dynamic> json) {
     return new KeyRange(
       lower: json.containsKey('lower') ? new Key.fromJson(json['lower']) : null,
       upper: json.containsKey('upper') ? new Key.fromJson(json['upper']) : null,
@@ -360,8 +360,8 @@ class KeyRange {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'lowerOpen': lowerOpen,
       'upperOpen': upperOpen,
     };
@@ -392,7 +392,7 @@ class DataEntry {
     @required this.value,
   });
 
-  factory DataEntry.fromJson(Map json) {
+  factory DataEntry.fromJson(Map<String, dynamic> json) {
     return new DataEntry(
       key: new runtime.RemoteObject.fromJson(json['key']),
       primaryKey: new runtime.RemoteObject.fromJson(json['primaryKey']),
@@ -400,8 +400,8 @@ class DataEntry {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'key': key.toJson(),
       'primaryKey': primaryKey.toJson(),
       'value': value.toJson(),
@@ -427,7 +427,7 @@ class KeyPath {
     this.array,
   });
 
-  factory KeyPath.fromJson(Map json) {
+  factory KeyPath.fromJson(Map<String, dynamic> json) {
     return new KeyPath(
       type: json['type'],
       string: json.containsKey('string') ? json['string'] : null,
@@ -437,8 +437,8 @@ class KeyPath {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'type': type,
     };
     if (string != null) {

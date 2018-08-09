@@ -34,7 +34,7 @@ class ServiceWorkerApi {
     String registrationId,
     String data,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'origin': origin,
       'registrationId': registrationId,
       'data': data,
@@ -52,7 +52,7 @@ class ServiceWorkerApi {
     String tag,
     bool lastChance,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'origin': origin,
       'registrationId': registrationId,
       'tag': tag,
@@ -68,7 +68,7 @@ class ServiceWorkerApi {
   Future inspectWorker(
     String versionId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'versionId': versionId,
     };
     await _client.send('ServiceWorker.inspectWorker', parameters);
@@ -77,7 +77,7 @@ class ServiceWorkerApi {
   Future setForceUpdateOnPageLoad(
     bool forceUpdateOnPageLoad,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'forceUpdateOnPageLoad': forceUpdateOnPageLoad,
     };
     await _client.send('ServiceWorker.setForceUpdateOnPageLoad', parameters);
@@ -86,7 +86,7 @@ class ServiceWorkerApi {
   Future skipWaiting(
     String scopeURL,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'scopeURL': scopeURL,
     };
     await _client.send('ServiceWorker.skipWaiting', parameters);
@@ -95,7 +95,7 @@ class ServiceWorkerApi {
   Future startWorker(
     String scopeURL,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'scopeURL': scopeURL,
     };
     await _client.send('ServiceWorker.startWorker', parameters);
@@ -108,7 +108,7 @@ class ServiceWorkerApi {
   Future stopWorker(
     String versionId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'versionId': versionId,
     };
     await _client.send('ServiceWorker.stopWorker', parameters);
@@ -117,7 +117,7 @@ class ServiceWorkerApi {
   Future unregister(
     String scopeURL,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'scopeURL': scopeURL,
     };
     await _client.send('ServiceWorker.unregister', parameters);
@@ -126,7 +126,7 @@ class ServiceWorkerApi {
   Future updateRegistration(
     String scopeURL,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'scopeURL': scopeURL,
     };
     await _client.send('ServiceWorker.updateRegistration', parameters);
@@ -147,7 +147,7 @@ class ServiceWorkerRegistration {
     @required this.isDeleted,
   });
 
-  factory ServiceWorkerRegistration.fromJson(Map json) {
+  factory ServiceWorkerRegistration.fromJson(Map<String, dynamic> json) {
     return new ServiceWorkerRegistration(
       registrationId: json['registrationId'],
       scopeURL: json['scopeURL'],
@@ -155,8 +155,8 @@ class ServiceWorkerRegistration {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'registrationId': registrationId,
       'scopeURL': scopeURL,
       'isDeleted': isDeleted,
@@ -263,7 +263,7 @@ class ServiceWorkerVersion {
     this.targetId,
   });
 
-  factory ServiceWorkerVersion.fromJson(Map json) {
+  factory ServiceWorkerVersion.fromJson(Map<String, dynamic> json) {
     return new ServiceWorkerVersion(
       versionId: json['versionId'],
       registrationId: json['registrationId'],
@@ -288,8 +288,8 @@ class ServiceWorkerVersion {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'versionId': versionId,
       'registrationId': registrationId,
       'scriptURL': scriptURL,
@@ -336,7 +336,7 @@ class ServiceWorkerErrorMessage {
     @required this.columnNumber,
   });
 
-  factory ServiceWorkerErrorMessage.fromJson(Map json) {
+  factory ServiceWorkerErrorMessage.fromJson(Map<String, dynamic> json) {
     return new ServiceWorkerErrorMessage(
       errorMessage: json['errorMessage'],
       registrationId: json['registrationId'],
@@ -347,8 +347,8 @@ class ServiceWorkerErrorMessage {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'errorMessage': errorMessage,
       'registrationId': registrationId,
       'versionId': versionId,

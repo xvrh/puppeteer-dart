@@ -43,7 +43,7 @@ class DebuggerApi {
     Location location, {
     String targetCallFrames,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'location': location.toJson(),
     };
     if (targetCallFrames != null) {
@@ -61,7 +61,7 @@ class DebuggerApi {
   /// enabled until the result for this command is received.
   /// Returns: Unique identifier of the debugger.
   Future<runtime.UniqueDebuggerId> enable() async {
-    Map result = await _client.send('Debugger.enable');
+    var result = await _client.send('Debugger.enable');
     return new runtime.UniqueDebuggerId.fromJson(result['debuggerId']);
   }
 
@@ -89,7 +89,7 @@ class DebuggerApi {
     bool throwOnSideEffect,
     runtime.TimeDelta timeout,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'callFrameId': callFrameId.toJson(),
       'expression': expression,
     };
@@ -114,7 +114,7 @@ class DebuggerApi {
     if (timeout != null) {
       parameters['timeout'] = timeout.toJson();
     }
-    Map result = await _client.send('Debugger.evaluateOnCallFrame', parameters);
+    var result = await _client.send('Debugger.evaluateOnCallFrame', parameters);
     return new EvaluateOnCallFrameResult.fromJson(result);
   }
 
@@ -130,7 +130,7 @@ class DebuggerApi {
     Location end,
     bool restrictToFunction,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'start': start.toJson(),
     };
     if (end != null) {
@@ -139,7 +139,7 @@ class DebuggerApi {
     if (restrictToFunction != null) {
       parameters['restrictToFunction'] = restrictToFunction;
     }
-    Map result =
+    var result =
         await _client.send('Debugger.getPossibleBreakpoints', parameters);
     return (result['locations'] as List)
         .map((e) => new BreakLocation.fromJson(e))
@@ -152,10 +152,10 @@ class DebuggerApi {
   Future<String> getScriptSource(
     runtime.ScriptId scriptId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'scriptId': scriptId.toJson(),
     };
-    Map result = await _client.send('Debugger.getScriptSource', parameters);
+    var result = await _client.send('Debugger.getScriptSource', parameters);
     return result['scriptSource'];
   }
 
@@ -163,10 +163,10 @@ class DebuggerApi {
   Future<runtime.StackTrace> getStackTrace(
     runtime.StackTraceId stackTraceId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'stackTraceId': stackTraceId.toJson(),
     };
-    Map result = await _client.send('Debugger.getStackTrace', parameters);
+    var result = await _client.send('Debugger.getStackTrace', parameters);
     return new runtime.StackTrace.fromJson(result['stackTrace']);
   }
 
@@ -179,7 +179,7 @@ class DebuggerApi {
   Future pauseOnAsyncCall(
     runtime.StackTraceId parentStackTraceId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'parentStackTraceId': parentStackTraceId.toJson(),
     };
     await _client.send('Debugger.pauseOnAsyncCall', parameters);
@@ -189,7 +189,7 @@ class DebuggerApi {
   Future removeBreakpoint(
     BreakpointId breakpointId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'breakpointId': breakpointId.toJson(),
     };
     await _client.send('Debugger.removeBreakpoint', parameters);
@@ -200,10 +200,10 @@ class DebuggerApi {
   Future<RestartFrameResult> restartFrame(
     CallFrameId callFrameId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'callFrameId': callFrameId.toJson(),
     };
-    Map result = await _client.send('Debugger.restartFrame', parameters);
+    var result = await _client.send('Debugger.restartFrame', parameters);
     return new RestartFrameResult.fromJson(result);
   }
 
@@ -232,7 +232,7 @@ class DebuggerApi {
     bool caseSensitive,
     bool isRegex,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'scriptId': scriptId.toJson(),
       'query': query,
     };
@@ -242,7 +242,7 @@ class DebuggerApi {
     if (isRegex != null) {
       parameters['isRegex'] = isRegex;
     }
-    Map result = await _client.send('Debugger.searchInContent', parameters);
+    var result = await _client.send('Debugger.searchInContent', parameters);
     return (result['result'] as List)
         .map((e) => new SearchMatch.fromJson(e))
         .toList();
@@ -254,7 +254,7 @@ class DebuggerApi {
   Future setAsyncCallStackDepth(
     int maxDepth,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'maxDepth': maxDepth,
     };
     await _client.send('Debugger.setAsyncCallStackDepth', parameters);
@@ -267,7 +267,7 @@ class DebuggerApi {
   Future setBlackboxPatterns(
     List<String> patterns,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'patterns': patterns.map((e) => e).toList(),
     };
     await _client.send('Debugger.setBlackboxPatterns', parameters);
@@ -282,7 +282,7 @@ class DebuggerApi {
     runtime.ScriptId scriptId,
     List<ScriptPosition> positions,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'scriptId': scriptId.toJson(),
       'positions': positions.map((e) => e.toJson()).toList(),
     };
@@ -297,13 +297,13 @@ class DebuggerApi {
     Location location, {
     String condition,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'location': location.toJson(),
     };
     if (condition != null) {
       parameters['condition'] = condition;
     }
-    Map result = await _client.send('Debugger.setBreakpoint', parameters);
+    var result = await _client.send('Debugger.setBreakpoint', parameters);
     return new SetBreakpointResult.fromJson(result);
   }
 
@@ -327,7 +327,7 @@ class DebuggerApi {
     int columnNumber,
     String condition,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'lineNumber': lineNumber,
     };
     if (url != null) {
@@ -345,7 +345,7 @@ class DebuggerApi {
     if (condition != null) {
       parameters['condition'] = condition;
     }
-    Map result = await _client.send('Debugger.setBreakpointByUrl', parameters);
+    var result = await _client.send('Debugger.setBreakpointByUrl', parameters);
     return new SetBreakpointByUrlResult.fromJson(result);
   }
 
@@ -360,13 +360,13 @@ class DebuggerApi {
     runtime.RemoteObjectId objectId, {
     String condition,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'objectId': objectId.toJson(),
     };
     if (condition != null) {
       parameters['condition'] = condition;
     }
-    Map result =
+    var result =
         await _client.send('Debugger.setBreakpointOnFunctionCall', parameters);
     return new BreakpointId.fromJson(result['breakpointId']);
   }
@@ -376,7 +376,7 @@ class DebuggerApi {
   Future setBreakpointsActive(
     bool active,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'active': active,
     };
     await _client.send('Debugger.setBreakpointsActive', parameters);
@@ -388,7 +388,7 @@ class DebuggerApi {
   Future setPauseOnExceptions(
     String state,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'state': state,
     };
     await _client.send('Debugger.setPauseOnExceptions', parameters);
@@ -399,7 +399,7 @@ class DebuggerApi {
   Future setReturnValue(
     runtime.CallArgument newValue,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'newValue': newValue.toJson(),
     };
     await _client.send('Debugger.setReturnValue', parameters);
@@ -415,14 +415,14 @@ class DebuggerApi {
     String scriptSource, {
     bool dryRun,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'scriptId': scriptId.toJson(),
       'scriptSource': scriptSource,
     };
     if (dryRun != null) {
       parameters['dryRun'] = dryRun;
     }
-    Map result = await _client.send('Debugger.setScriptSource', parameters);
+    var result = await _client.send('Debugger.setScriptSource', parameters);
     return new SetScriptSourceResult.fromJson(result);
   }
 
@@ -431,7 +431,7 @@ class DebuggerApi {
   Future setSkipAllPauses(
     bool skip,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'skip': skip,
     };
     await _client.send('Debugger.setSkipAllPauses', parameters);
@@ -450,7 +450,7 @@ class DebuggerApi {
     runtime.CallArgument newValue,
     CallFrameId callFrameId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'scopeNumber': scopeNumber,
       'variableName': variableName,
       'newValue': newValue.toJson(),
@@ -465,7 +465,7 @@ class DebuggerApi {
   Future stepInto({
     bool breakOnAsyncCall,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (breakOnAsyncCall != null) {
       parameters['breakOnAsyncCall'] = breakOnAsyncCall;
     }
@@ -495,7 +495,7 @@ class BreakpointResolvedEvent {
     @required this.location,
   });
 
-  factory BreakpointResolvedEvent.fromJson(Map json) {
+  factory BreakpointResolvedEvent.fromJson(Map<String, dynamic> json) {
     return new BreakpointResolvedEvent(
       breakpointId: new BreakpointId.fromJson(json['breakpointId']),
       location: new Location.fromJson(json['location']),
@@ -536,7 +536,7 @@ class PausedEvent {
     this.asyncCallStackTraceId,
   });
 
-  factory PausedEvent.fromJson(Map json) {
+  factory PausedEvent.fromJson(Map<String, dynamic> json) {
     return new PausedEvent(
       callFrames: (json['callFrames'] as List)
           .map((e) => new CallFrame.fromJson(e))
@@ -619,7 +619,7 @@ class ScriptFailedToParseEvent {
     this.stackTrace,
   });
 
-  factory ScriptFailedToParseEvent.fromJson(Map json) {
+  factory ScriptFailedToParseEvent.fromJson(Map<String, dynamic> json) {
     return new ScriptFailedToParseEvent(
       scriptId: new runtime.ScriptId.fromJson(json['scriptId']),
       url: json['url'],
@@ -710,7 +710,7 @@ class ScriptParsedEvent {
     this.stackTrace,
   });
 
-  factory ScriptParsedEvent.fromJson(Map json) {
+  factory ScriptParsedEvent.fromJson(Map<String, dynamic> json) {
     return new ScriptParsedEvent(
       scriptId: new runtime.ScriptId.fromJson(json['scriptId']),
       url: json['url'],
@@ -750,7 +750,7 @@ class EvaluateOnCallFrameResult {
     this.exceptionDetails,
   });
 
-  factory EvaluateOnCallFrameResult.fromJson(Map json) {
+  factory EvaluateOnCallFrameResult.fromJson(Map<String, dynamic> json) {
     return new EvaluateOnCallFrameResult(
       result: new runtime.RemoteObject.fromJson(json['result']),
       exceptionDetails: json.containsKey('exceptionDetails')
@@ -776,7 +776,7 @@ class RestartFrameResult {
     this.asyncStackTraceId,
   });
 
-  factory RestartFrameResult.fromJson(Map json) {
+  factory RestartFrameResult.fromJson(Map<String, dynamic> json) {
     return new RestartFrameResult(
       callFrames: (json['callFrames'] as List)
           .map((e) => new CallFrame.fromJson(e))
@@ -803,7 +803,7 @@ class SetBreakpointResult {
     @required this.actualLocation,
   });
 
-  factory SetBreakpointResult.fromJson(Map json) {
+  factory SetBreakpointResult.fromJson(Map<String, dynamic> json) {
     return new SetBreakpointResult(
       breakpointId: new BreakpointId.fromJson(json['breakpointId']),
       actualLocation: new Location.fromJson(json['actualLocation']),
@@ -823,7 +823,7 @@ class SetBreakpointByUrlResult {
     @required this.locations,
   });
 
-  factory SetBreakpointByUrlResult.fromJson(Map json) {
+  factory SetBreakpointByUrlResult.fromJson(Map<String, dynamic> json) {
     return new SetBreakpointByUrlResult(
       breakpointId: new BreakpointId.fromJson(json['breakpointId']),
       locations: (json['locations'] as List)
@@ -857,7 +857,7 @@ class SetScriptSourceResult {
     this.exceptionDetails,
   });
 
-  factory SetScriptSourceResult.fromJson(Map json) {
+  factory SetScriptSourceResult.fromJson(Map<String, dynamic> json) {
     return new SetScriptSourceResult(
       callFrames: json.containsKey('callFrames')
           ? (json['callFrames'] as List)
@@ -936,7 +936,7 @@ class Location {
     this.columnNumber,
   });
 
-  factory Location.fromJson(Map json) {
+  factory Location.fromJson(Map<String, dynamic> json) {
     return new Location(
       scriptId: new runtime.ScriptId.fromJson(json['scriptId']),
       lineNumber: json['lineNumber'],
@@ -945,8 +945,8 @@ class Location {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'scriptId': scriptId.toJson(),
       'lineNumber': lineNumber,
     };
@@ -968,15 +968,15 @@ class ScriptPosition {
     @required this.columnNumber,
   });
 
-  factory ScriptPosition.fromJson(Map json) {
+  factory ScriptPosition.fromJson(Map<String, dynamic> json) {
     return new ScriptPosition(
       lineNumber: json['lineNumber'],
       columnNumber: json['columnNumber'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'lineNumber': lineNumber,
       'columnNumber': columnNumber,
     };
@@ -1021,7 +1021,7 @@ class CallFrame {
     this.returnValue,
   });
 
-  factory CallFrame.fromJson(Map json) {
+  factory CallFrame.fromJson(Map<String, dynamic> json) {
     return new CallFrame(
       callFrameId: new CallFrameId.fromJson(json['callFrameId']),
       functionName: json['functionName'],
@@ -1040,8 +1040,8 @@ class CallFrame {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'callFrameId': callFrameId.toJson(),
       'functionName': functionName,
       'location': location.toJson(),
@@ -1085,7 +1085,7 @@ class Scope {
     this.endLocation,
   });
 
-  factory Scope.fromJson(Map json) {
+  factory Scope.fromJson(Map<String, dynamic> json) {
     return new Scope(
       type: json['type'],
       object: new runtime.RemoteObject.fromJson(json['object']),
@@ -1099,8 +1099,8 @@ class Scope {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'type': type,
       'object': object.toJson(),
     };
@@ -1130,15 +1130,15 @@ class SearchMatch {
     @required this.lineContent,
   });
 
-  factory SearchMatch.fromJson(Map json) {
+  factory SearchMatch.fromJson(Map<String, dynamic> json) {
     return new SearchMatch(
       lineNumber: json['lineNumber'],
       lineContent: json['lineContent'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'lineNumber': lineNumber,
       'lineContent': lineContent,
     };
@@ -1165,7 +1165,7 @@ class BreakLocation {
     this.type,
   });
 
-  factory BreakLocation.fromJson(Map json) {
+  factory BreakLocation.fromJson(Map<String, dynamic> json) {
     return new BreakLocation(
       scriptId: new runtime.ScriptId.fromJson(json['scriptId']),
       lineNumber: json['lineNumber'],
@@ -1175,8 +1175,8 @@ class BreakLocation {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'scriptId': scriptId.toJson(),
       'lineNumber': lineNumber,
     };

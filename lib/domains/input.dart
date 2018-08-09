@@ -43,7 +43,7 @@ class InputApi {
     bool isSystemKey,
     int location,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'type': type,
     };
     if (modifiers != null) {
@@ -94,7 +94,7 @@ class InputApi {
   Future insertText(
     String text,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'text': text,
     };
     await _client.send('Input.insertText', parameters);
@@ -123,7 +123,7 @@ class InputApi {
     num deltaX,
     num deltaY,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'type': type,
       'x': x,
       'y': y,
@@ -164,7 +164,7 @@ class InputApi {
     int modifiers,
     TimeSinceEpoch timestamp,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'type': type,
       'touchPoints': touchPoints.map((e) => e.toJson()).toList(),
     };
@@ -199,7 +199,7 @@ class InputApi {
     int modifiers,
     int clickCount,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'type': type,
       'x': x,
       'y': y,
@@ -228,7 +228,7 @@ class InputApi {
   Future setIgnoreInputEvents(
     bool ignore,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'ignore': ignore,
     };
     await _client.send('Input.setIgnoreInputEvents', parameters);
@@ -248,7 +248,7 @@ class InputApi {
     int relativeSpeed,
     GestureSourceType gestureSourceType,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'x': x,
       'y': y,
       'scaleFactor': scaleFactor,
@@ -292,7 +292,7 @@ class InputApi {
     int repeatDelayMs,
     String interactionMarkerName,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'x': x,
       'y': y,
     };
@@ -343,7 +343,7 @@ class InputApi {
     int tapCount,
     GestureSourceType gestureSourceType,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'x': x,
       'y': y,
     };
@@ -393,7 +393,7 @@ class TouchPoint {
     this.id,
   });
 
-  factory TouchPoint.fromJson(Map json) {
+  factory TouchPoint.fromJson(Map<String, dynamic> json) {
     return new TouchPoint(
       x: json['x'],
       y: json['y'],
@@ -406,8 +406,8 @@ class TouchPoint {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'x': x,
       'y': y,
     };

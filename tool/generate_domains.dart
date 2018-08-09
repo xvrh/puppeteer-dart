@@ -214,7 +214,7 @@ class _Command {
     code.writeln(') async {');
 
     if (parameters.isNotEmpty) {
-      code.writeln('Map parameters = {');
+      code.writeln('var parameters = <String, dynamic>{');
       for (Parameter parameter in requireds) {
         code.writeln("'${parameter.name}' : ${_toJsonCode(parameter)},");
       }
@@ -243,7 +243,7 @@ class _Command {
     sendCode += ');';
 
     if (returns.isNotEmpty) {
-      sendCode = 'Map result = $sendCode\n';
+      sendCode = 'var result = $sendCode\n';
       if (returns.length == 1) {
         Parameter returnParameter = returns.first;
         if (isRawType(returnTypeName)) {
@@ -448,7 +448,7 @@ class _InternalType {
 
     code.writeln();
     if (hasProperties) {
-      code.writeln('factory $id.fromJson(Map json) {');
+      code.writeln('factory $id.fromJson(Map<String, dynamic> json) {');
       code.writeln('return new $id(');
       for (Parameter property in properties.where((p) => !p.deprecated)) {
         String propertyName = property.name;
@@ -473,8 +473,8 @@ class _InternalType {
     if (generateToJson) {
       code.writeln('');
       if (hasProperties) {
-        code.writeln('Map toJson() {');
-        code.writeln('Map json = {');
+        code.writeln('Map<String, dynamic> toJson() {');
+        code.writeln('var json = <String, dynamic>{');
         for (Parameter property in requireds) {
           code.writeln("'${property.name}': ${_toJsonCode(property)},");
         }

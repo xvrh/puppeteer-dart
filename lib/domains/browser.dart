@@ -16,7 +16,7 @@ class BrowserApi {
 
   /// Returns version information.
   Future<GetVersionResult> getVersion() async {
-    Map result = await _client.send('Browser.getVersion');
+    var result = await _client.send('Browser.getVersion');
     return new GetVersionResult.fromJson(result);
   }
 
@@ -24,7 +24,7 @@ class BrowserApi {
   /// --enable-automation is on the commandline.
   /// Returns: Commandline parameters
   Future<List<String>> getBrowserCommandLine() async {
-    Map result = await _client.send('Browser.getBrowserCommandLine');
+    var result = await _client.send('Browser.getBrowserCommandLine');
     return (result['arguments'] as List).map((e) => e as String).toList();
   }
 
@@ -38,14 +38,14 @@ class BrowserApi {
     String query,
     bool delta,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (query != null) {
       parameters['query'] = query;
     }
     if (delta != null) {
       parameters['delta'] = delta;
     }
-    Map result = await _client.send('Browser.getHistograms', parameters);
+    var result = await _client.send('Browser.getHistograms', parameters);
     return (result['histograms'] as List)
         .map((e) => new Histogram.fromJson(e))
         .toList();
@@ -59,13 +59,13 @@ class BrowserApi {
     String name, {
     bool delta,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'name': name,
     };
     if (delta != null) {
       parameters['delta'] = delta;
     }
-    Map result = await _client.send('Browser.getHistogram', parameters);
+    var result = await _client.send('Browser.getHistogram', parameters);
     return new Histogram.fromJson(result['histogram']);
   }
 
@@ -76,10 +76,10 @@ class BrowserApi {
   Future<Bounds> getWindowBounds(
     WindowID windowId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'windowId': windowId.toJson(),
     };
-    Map result = await _client.send('Browser.getWindowBounds', parameters);
+    var result = await _client.send('Browser.getWindowBounds', parameters);
     return new Bounds.fromJson(result['bounds']);
   }
 
@@ -88,10 +88,10 @@ class BrowserApi {
   Future<GetWindowForTargetResult> getWindowForTarget(
     target.TargetID targetId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'targetId': targetId.toJson(),
     };
-    Map result = await _client.send('Browser.getWindowForTarget', parameters);
+    var result = await _client.send('Browser.getWindowForTarget', parameters);
     return new GetWindowForTargetResult.fromJson(result);
   }
 
@@ -103,7 +103,7 @@ class BrowserApi {
     WindowID windowId,
     Bounds bounds,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'windowId': windowId.toJson(),
       'bounds': bounds.toJson(),
     };
@@ -135,7 +135,7 @@ class GetVersionResult {
     @required this.jsVersion,
   });
 
-  factory GetVersionResult.fromJson(Map json) {
+  factory GetVersionResult.fromJson(Map<String, dynamic> json) {
     return new GetVersionResult(
       protocolVersion: json['protocolVersion'],
       product: json['product'],
@@ -159,7 +159,7 @@ class GetWindowForTargetResult {
     @required this.bounds,
   });
 
-  factory GetWindowForTargetResult.fromJson(Map json) {
+  factory GetWindowForTargetResult.fromJson(Map<String, dynamic> json) {
     return new GetWindowForTargetResult(
       windowId: new WindowID.fromJson(json['windowId']),
       bounds: new Bounds.fromJson(json['bounds']),
@@ -236,7 +236,7 @@ class Bounds {
     this.windowState,
   });
 
-  factory Bounds.fromJson(Map json) {
+  factory Bounds.fromJson(Map<String, dynamic> json) {
     return new Bounds(
       left: json.containsKey('left') ? json['left'] : null,
       top: json.containsKey('top') ? json['top'] : null,
@@ -248,8 +248,8 @@ class Bounds {
     );
   }
 
-  Map toJson() {
-    Map json = {};
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{};
     if (left != null) {
       json['left'] = left;
     }
@@ -286,7 +286,7 @@ class Bucket {
     @required this.count,
   });
 
-  factory Bucket.fromJson(Map json) {
+  factory Bucket.fromJson(Map<String, dynamic> json) {
     return new Bucket(
       low: json['low'],
       high: json['high'],
@@ -294,8 +294,8 @@ class Bucket {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'low': low,
       'high': high,
       'count': count,
@@ -325,7 +325,7 @@ class Histogram {
     @required this.buckets,
   });
 
-  factory Histogram.fromJson(Map json) {
+  factory Histogram.fromJson(Map<String, dynamic> json) {
     return new Histogram(
       name: json['name'],
       sum: json['sum'],
@@ -335,8 +335,8 @@ class Histogram {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
       'sum': sum,
       'count': count,

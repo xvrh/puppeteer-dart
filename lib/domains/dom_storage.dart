@@ -33,7 +33,7 @@ class DOMStorageApi {
   Future clear(
     StorageId storageId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'storageId': storageId.toJson(),
     };
     await _client.send('DOMStorage.clear', parameters);
@@ -52,10 +52,10 @@ class DOMStorageApi {
   Future<List<Item>> getDOMStorageItems(
     StorageId storageId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'storageId': storageId.toJson(),
     };
-    Map result =
+    var result =
         await _client.send('DOMStorage.getDOMStorageItems', parameters);
     return (result['entries'] as List)
         .map((e) => new Item.fromJson(e))
@@ -66,7 +66,7 @@ class DOMStorageApi {
     StorageId storageId,
     String key,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'storageId': storageId.toJson(),
       'key': key,
     };
@@ -78,7 +78,7 @@ class DOMStorageApi {
     String key,
     String value,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'storageId': storageId.toJson(),
       'key': key,
       'value': value,
@@ -100,7 +100,7 @@ class DomStorageItemAddedEvent {
     @required this.newValue,
   });
 
-  factory DomStorageItemAddedEvent.fromJson(Map json) {
+  factory DomStorageItemAddedEvent.fromJson(Map<String, dynamic> json) {
     return new DomStorageItemAddedEvent(
       storageId: new StorageId.fromJson(json['storageId']),
       key: json['key'],
@@ -119,7 +119,7 @@ class DomStorageItemRemovedEvent {
     @required this.key,
   });
 
-  factory DomStorageItemRemovedEvent.fromJson(Map json) {
+  factory DomStorageItemRemovedEvent.fromJson(Map<String, dynamic> json) {
     return new DomStorageItemRemovedEvent(
       storageId: new StorageId.fromJson(json['storageId']),
       key: json['key'],
@@ -143,7 +143,7 @@ class DomStorageItemUpdatedEvent {
     @required this.newValue,
   });
 
-  factory DomStorageItemUpdatedEvent.fromJson(Map json) {
+  factory DomStorageItemUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return new DomStorageItemUpdatedEvent(
       storageId: new StorageId.fromJson(json['storageId']),
       key: json['key'],
@@ -166,15 +166,15 @@ class StorageId {
     @required this.isLocalStorage,
   });
 
-  factory StorageId.fromJson(Map json) {
+  factory StorageId.fromJson(Map<String, dynamic> json) {
     return new StorageId(
       securityOrigin: json['securityOrigin'],
       isLocalStorage: json['isLocalStorage'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'securityOrigin': securityOrigin,
       'isLocalStorage': isLocalStorage,
     };

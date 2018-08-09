@@ -25,7 +25,7 @@ class PerformanceApi {
   /// Retrieve current values of run-time metrics.
   /// Returns: Current values for run-time metrics.
   Future<List<Metric>> getMetrics() async {
-    Map result = await _client.send('Performance.getMetrics');
+    var result = await _client.send('Performance.getMetrics');
     return (result['metrics'] as List)
         .map((e) => new Metric.fromJson(e))
         .toList();
@@ -44,7 +44,7 @@ class MetricsEvent {
     @required this.title,
   });
 
-  factory MetricsEvent.fromJson(Map json) {
+  factory MetricsEvent.fromJson(Map<String, dynamic> json) {
     return new MetricsEvent(
       metrics:
           (json['metrics'] as List).map((e) => new Metric.fromJson(e)).toList(),
@@ -66,15 +66,15 @@ class Metric {
     @required this.value,
   });
 
-  factory Metric.fromJson(Map json) {
+  factory Metric.fromJson(Map<String, dynamic> json) {
     return new Metric(
       name: json['name'],
       value: json['value'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
       'value': value,
     };

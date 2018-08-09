@@ -39,7 +39,7 @@ class SecurityApi {
   Future setIgnoreCertificateErrors(
     bool ignore,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'ignore': ignore,
     };
     await _client.send('Security.setIgnoreCertificateErrors', parameters);
@@ -53,7 +53,7 @@ class SecurityApi {
     int eventId,
     CertificateErrorAction action,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'eventId': eventId,
       'action': action.toJson(),
     };
@@ -67,7 +67,7 @@ class SecurityApi {
   Future setOverrideCertificateErrors(
     bool override,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'override': override,
     };
     await _client.send('Security.setOverrideCertificateErrors', parameters);
@@ -90,7 +90,7 @@ class CertificateErrorEvent {
     @required this.requestURL,
   });
 
-  factory CertificateErrorEvent.fromJson(Map json) {
+  factory CertificateErrorEvent.fromJson(Map<String, dynamic> json) {
     return new CertificateErrorEvent(
       eventId: json['eventId'],
       errorType: json['errorType'],
@@ -124,7 +124,7 @@ class SecurityStateChangedEvent {
     this.summary,
   });
 
-  factory SecurityStateChangedEvent.fromJson(Map json) {
+  factory SecurityStateChangedEvent.fromJson(Map<String, dynamic> json) {
     return new SecurityStateChangedEvent(
       securityState: new SecurityState.fromJson(json['securityState']),
       schemeIsCryptographic: json['schemeIsCryptographic'],
@@ -240,7 +240,7 @@ class SecurityStateExplanation {
     @required this.certificate,
   });
 
-  factory SecurityStateExplanation.fromJson(Map json) {
+  factory SecurityStateExplanation.fromJson(Map<String, dynamic> json) {
     return new SecurityStateExplanation(
       securityState: new SecurityState.fromJson(json['securityState']),
       title: json['title'],
@@ -252,8 +252,8 @@ class SecurityStateExplanation {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'securityState': securityState.toJson(),
       'title': title,
       'summary': summary,
@@ -300,7 +300,7 @@ class InsecureContentStatus {
     @required this.displayedInsecureContentStyle,
   });
 
-  factory InsecureContentStatus.fromJson(Map json) {
+  factory InsecureContentStatus.fromJson(Map<String, dynamic> json) {
     return new InsecureContentStatus(
       ranMixedContent: json['ranMixedContent'],
       displayedMixedContent: json['displayedMixedContent'],
@@ -314,8 +314,8 @@ class InsecureContentStatus {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'ranMixedContent': ranMixedContent,
       'displayedMixedContent': displayedMixedContent,
       'containedMixedForm': containedMixedForm,

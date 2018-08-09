@@ -12,7 +12,7 @@ class SchemaApi {
   /// Returns supported domains.
   /// Returns: List of supported domains.
   Future<List<Domain>> getDomains() async {
-    Map result = await _client.send('Schema.getDomains');
+    var result = await _client.send('Schema.getDomains');
     return (result['domains'] as List)
         .map((e) => new Domain.fromJson(e))
         .toList();
@@ -32,15 +32,15 @@ class Domain {
     @required this.version,
   });
 
-  factory Domain.fromJson(Map json) {
+  factory Domain.fromJson(Map<String, dynamic> json) {
     return new Domain(
       name: json['name'],
       version: json['version'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
       'version': version,
     };

@@ -36,7 +36,7 @@ class LogApi {
   Future startViolationsReport(
     List<ViolationSetting> config,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'config': config.map((e) => e.toJson()).toList(),
     };
     await _client.send('Log.startViolationsReport', parameters);
@@ -93,7 +93,7 @@ class LogEntry {
     this.args,
   });
 
-  factory LogEntry.fromJson(Map json) {
+  factory LogEntry.fromJson(Map<String, dynamic> json) {
     return new LogEntry(
       source: json['source'],
       level: json['level'],
@@ -116,8 +116,8 @@ class LogEntry {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'source': source,
       'level': level,
       'text': text,
@@ -158,15 +158,15 @@ class ViolationSetting {
     @required this.threshold,
   });
 
-  factory ViolationSetting.fromJson(Map json) {
+  factory ViolationSetting.fromJson(Map<String, dynamic> json) {
     return new ViolationSetting(
       name: json['name'],
       threshold: json['threshold'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
       'threshold': threshold,
     };
