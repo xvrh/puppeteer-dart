@@ -168,16 +168,14 @@ class NetworkApi {
   /// [headers] If set this allows the request headers to be changed. Must not be set in response to an
   /// authChallenge.
   /// [authChallengeResponse] Response to a requestIntercepted with an authChallenge. Must not be set otherwise.
-  Future continueInterceptedRequest(
-    InterceptionId interceptionId, {
-    ErrorReason errorReason,
-    String rawResponse,
-    String url,
-    String method,
-    String postData,
-    Headers headers,
-    AuthChallengeResponse authChallengeResponse,
-  }) async {
+  Future continueInterceptedRequest(InterceptionId interceptionId,
+      {ErrorReason errorReason,
+      String rawResponse,
+      String url,
+      String method,
+      String postData,
+      Headers headers,
+      AuthChallengeResponse authChallengeResponse}) async {
     var parameters = <String, dynamic>{
       'interceptionId': interceptionId.toJson(),
     };
@@ -211,12 +209,8 @@ class NetworkApi {
   /// provided URL.
   /// [domain] If specified, deletes only cookies with the exact domain.
   /// [path] If specified, deletes only cookies with the exact path.
-  Future deleteCookies(
-    String name, {
-    String url,
-    String domain,
-    String path,
-  }) async {
+  Future deleteCookies(String name,
+      {String url, String domain, String path}) async {
     var parameters = <String, dynamic>{
       'name': name,
     };
@@ -244,12 +238,8 @@ class NetworkApi {
   /// [uploadThroughput] Maximal aggregated upload throughput (bytes/sec).  -1 disables upload throttling.
   /// [connectionType] Connection type if known.
   Future emulateNetworkConditions(
-    bool offline,
-    num latency,
-    num downloadThroughput,
-    num uploadThroughput, {
-    ConnectionType connectionType,
-  }) async {
+      bool offline, num latency, num downloadThroughput, num uploadThroughput,
+      {ConnectionType connectionType}) async {
     var parameters = <String, dynamic>{
       'offline': offline,
       'latency': latency,
@@ -266,11 +256,10 @@ class NetworkApi {
   /// [maxTotalBufferSize] Buffer size in bytes to use when preserving network payloads (XHRs, etc).
   /// [maxResourceBufferSize] Per-resource buffer size in bytes to use when preserving network payloads (XHRs, etc).
   /// [maxPostDataSize] Longest post body size (in bytes) that would be included in requestWillBeSent notification
-  Future enable({
-    int maxTotalBufferSize,
-    int maxResourceBufferSize,
-    int maxPostDataSize,
-  }) async {
+  Future enable(
+      {int maxTotalBufferSize,
+      int maxResourceBufferSize,
+      int maxPostDataSize}) async {
     var parameters = <String, dynamic>{};
     if (maxTotalBufferSize != null) {
       parameters['maxTotalBufferSize'] = maxTotalBufferSize;
@@ -294,9 +283,7 @@ class NetworkApi {
 
   /// Returns the DER-encoded certificate.
   /// [origin] Origin to get certificate for.
-  Future<List<String>> getCertificate(
-    String origin,
-  ) async {
+  Future<List<String>> getCertificate(String origin) async {
     var parameters = <String, dynamic>{
       'origin': origin,
     };
@@ -308,9 +295,7 @@ class NetworkApi {
   /// detailed cookie information in the `cookies` field.
   /// [urls] The list of URLs for which applicable cookies will be fetched
   /// Returns: Array of cookie objects.
-  Future<List<Cookie>> getCookies({
-    List<String> urls,
-  }) async {
+  Future<List<Cookie>> getCookies({List<String> urls}) async {
     var parameters = <String, dynamic>{};
     if (urls != null) {
       parameters['urls'] = urls.map((e) => e).toList();
@@ -321,9 +306,7 @@ class NetworkApi {
 
   /// Returns content served for the given request.
   /// [requestId] Identifier of the network request to get content for.
-  Future<GetResponseBodyResult> getResponseBody(
-    RequestId requestId,
-  ) async {
+  Future<GetResponseBodyResult> getResponseBody(RequestId requestId) async {
     var parameters = <String, dynamic>{
       'requestId': requestId.toJson(),
     };
@@ -334,9 +317,7 @@ class NetworkApi {
   /// Returns post data sent with the request. Returns an error when no data was sent with the request.
   /// [requestId] Identifier of the network request to get content for.
   /// Returns: Base64-encoded request body.
-  Future<String> getRequestPostData(
-    RequestId requestId,
-  ) async {
+  Future<String> getRequestPostData(RequestId requestId) async {
     var parameters = <String, dynamic>{
       'requestId': requestId.toJson(),
     };
@@ -347,8 +328,7 @@ class NetworkApi {
   /// Returns content served for the given currently intercepted request.
   /// [interceptionId] Identifier for the intercepted request to get body for.
   Future<GetResponseBodyForInterceptionResult> getResponseBodyForInterception(
-    InterceptionId interceptionId,
-  ) async {
+      InterceptionId interceptionId) async {
     var parameters = <String, dynamic>{
       'interceptionId': interceptionId.toJson(),
     };
@@ -362,8 +342,7 @@ class NetworkApi {
   /// the response body. The stream only supports sequential read, IO.read will fail if the position
   /// is specified.
   Future<io.StreamHandle> takeResponseBodyForInterceptionAsStream(
-    InterceptionId interceptionId,
-  ) async {
+      InterceptionId interceptionId) async {
     var parameters = <String, dynamic>{
       'interceptionId': interceptionId.toJson(),
     };
@@ -376,9 +355,7 @@ class NetworkApi {
   /// parameters should be identical: method, url, async, request body, extra headers, withCredentials
   /// attribute, user, password.
   /// [requestId] Identifier of XHR to replay.
-  Future replayXHR(
-    RequestId requestId,
-  ) async {
+  Future replayXHR(RequestId requestId) async {
     var parameters = <String, dynamic>{
       'requestId': requestId.toJson(),
     };
@@ -392,11 +369,8 @@ class NetworkApi {
   /// [isRegex] If true, treats string parameter as regex.
   /// Returns: List of search matches.
   Future<List<debugger.SearchMatch>> searchInResponseBody(
-    RequestId requestId,
-    String query, {
-    bool caseSensitive,
-    bool isRegex,
-  }) async {
+      RequestId requestId, String query,
+      {bool caseSensitive, bool isRegex}) async {
     var parameters = <String, dynamic>{
       'requestId': requestId.toJson(),
       'query': query,
@@ -415,9 +389,7 @@ class NetworkApi {
 
   /// Blocks URLs from loading.
   /// [urls] URL patterns to block. Wildcards ('*') are allowed.
-  Future setBlockedURLs(
-    List<String> urls,
-  ) async {
+  Future setBlockedURLs(List<String> urls) async {
     var parameters = <String, dynamic>{
       'urls': urls.map((e) => e).toList(),
     };
@@ -426,9 +398,7 @@ class NetworkApi {
 
   /// Toggles ignoring of service worker for each request.
   /// [bypass] Bypass service worker and load from network.
-  Future setBypassServiceWorker(
-    bool bypass,
-  ) async {
+  Future setBypassServiceWorker(bool bypass) async {
     var parameters = <String, dynamic>{
       'bypass': bypass,
     };
@@ -437,9 +407,7 @@ class NetworkApi {
 
   /// Toggles ignoring cache for each request. If `true`, cache will not be used.
   /// [cacheDisabled] Cache disabled state.
-  Future setCacheDisabled(
-    bool cacheDisabled,
-  ) async {
+  Future setCacheDisabled(bool cacheDisabled) async {
     var parameters = <String, dynamic>{
       'cacheDisabled': cacheDisabled,
     };
@@ -458,17 +426,14 @@ class NetworkApi {
   /// [sameSite] Cookie SameSite type.
   /// [expires] Cookie expiration date, session cookie if not set
   /// Returns: True if successfully set cookie.
-  Future<bool> setCookie(
-    String name,
-    String value, {
-    String url,
-    String domain,
-    String path,
-    bool secure,
-    bool httpOnly,
-    CookieSameSite sameSite,
-    TimeSinceEpoch expires,
-  }) async {
+  Future<bool> setCookie(String name, String value,
+      {String url,
+      String domain,
+      String path,
+      bool secure,
+      bool httpOnly,
+      CookieSameSite sameSite,
+      TimeSinceEpoch expires}) async {
     var parameters = <String, dynamic>{
       'name': name,
       'value': value,
@@ -500,9 +465,7 @@ class NetworkApi {
 
   /// Sets given cookies.
   /// [cookies] Cookies to be set.
-  Future setCookies(
-    List<CookieParam> cookies,
-  ) async {
+  Future setCookies(List<CookieParam> cookies) async {
     var parameters = <String, dynamic>{
       'cookies': cookies.map((e) => e.toJson()).toList(),
     };
@@ -512,10 +475,7 @@ class NetworkApi {
   /// For testing.
   /// [maxTotalSize] Maximum total buffer size.
   /// [maxResourceSize] Maximum per-resource size.
-  Future setDataSizeLimitsForTest(
-    int maxTotalSize,
-    int maxResourceSize,
-  ) async {
+  Future setDataSizeLimitsForTest(int maxTotalSize, int maxResourceSize) async {
     var parameters = <String, dynamic>{
       'maxTotalSize': maxTotalSize,
       'maxResourceSize': maxResourceSize,
@@ -525,9 +485,7 @@ class NetworkApi {
 
   /// Specifies whether to always send extra HTTP headers with the requests from this page.
   /// [headers] Map with extra HTTP headers.
-  Future setExtraHTTPHeaders(
-    Headers headers,
-  ) async {
+  Future setExtraHTTPHeaders(Headers headers) async {
     var parameters = <String, dynamic>{
       'headers': headers.toJson(),
     };
@@ -537,9 +495,7 @@ class NetworkApi {
   /// Sets the requests to intercept that match a the provided patterns and optionally resource types.
   /// [patterns] Requests matching any of these patterns will be forwarded and wait for the corresponding
   /// continueInterceptedRequest call.
-  Future setRequestInterception(
-    List<RequestPattern> patterns,
-  ) async {
+  Future setRequestInterception(List<RequestPattern> patterns) async {
     var parameters = <String, dynamic>{
       'patterns': patterns.map((e) => e.toJson()).toList(),
     };
@@ -550,11 +506,8 @@ class NetworkApi {
   /// [userAgent] User agent to use.
   /// [acceptLanguage] Browser langugage to emulate.
   /// [platform] The platform navigator.platform should return.
-  Future setUserAgentOverride(
-    String userAgent, {
-    String acceptLanguage,
-    String platform,
-  }) async {
+  Future setUserAgentOverride(String userAgent,
+      {String acceptLanguage, String platform}) async {
     var parameters = <String, dynamic>{
       'userAgent': userAgent,
     };
@@ -581,12 +534,11 @@ class DataReceivedEvent {
   /// Actual bytes received (might be less than dataLength for compressed encodings).
   final int encodedDataLength;
 
-  DataReceivedEvent({
-    @required this.requestId,
-    @required this.timestamp,
-    @required this.dataLength,
-    @required this.encodedDataLength,
-  });
+  DataReceivedEvent(
+      {@required this.requestId,
+      @required this.timestamp,
+      @required this.dataLength,
+      @required this.encodedDataLength});
 
   factory DataReceivedEvent.fromJson(Map<String, dynamic> json) {
     return DataReceivedEvent(
@@ -614,13 +566,12 @@ class EventSourceMessageReceivedEvent {
   /// Message content.
   final String data;
 
-  EventSourceMessageReceivedEvent({
-    @required this.requestId,
-    @required this.timestamp,
-    @required this.eventName,
-    @required this.eventId,
-    @required this.data,
-  });
+  EventSourceMessageReceivedEvent(
+      {@required this.requestId,
+      @required this.timestamp,
+      @required this.eventName,
+      @required this.eventId,
+      @required this.data});
 
   factory EventSourceMessageReceivedEvent.fromJson(Map<String, dynamic> json) {
     return EventSourceMessageReceivedEvent(
@@ -652,14 +603,13 @@ class LoadingFailedEvent {
   /// The reason why loading was blocked, if any.
   final BlockedReason blockedReason;
 
-  LoadingFailedEvent({
-    @required this.requestId,
-    @required this.timestamp,
-    @required this.type,
-    @required this.errorText,
-    this.canceled,
-    this.blockedReason,
-  });
+  LoadingFailedEvent(
+      {@required this.requestId,
+      @required this.timestamp,
+      @required this.type,
+      @required this.errorText,
+      this.canceled,
+      this.blockedReason});
 
   factory LoadingFailedEvent.fromJson(Map<String, dynamic> json) {
     return LoadingFailedEvent(
@@ -689,12 +639,11 @@ class LoadingFinishedEvent {
   /// 2) this needs to be reported to the DevTools console.
   final bool shouldReportCorbBlocking;
 
-  LoadingFinishedEvent({
-    @required this.requestId,
-    @required this.timestamp,
-    @required this.encodedDataLength,
-    this.shouldReportCorbBlocking,
-  });
+  LoadingFinishedEvent(
+      {@required this.requestId,
+      @required this.timestamp,
+      @required this.encodedDataLength,
+      this.shouldReportCorbBlocking});
 
   factory LoadingFinishedEvent.fromJson(Map<String, dynamic> json) {
     return LoadingFinishedEvent(
@@ -748,19 +697,18 @@ class RequestInterceptedEvent {
   /// intercepting request or auth retry occurred.
   final Headers responseHeaders;
 
-  RequestInterceptedEvent({
-    @required this.interceptionId,
-    @required this.request,
-    @required this.frameId,
-    @required this.resourceType,
-    @required this.isNavigationRequest,
-    this.isDownload,
-    this.redirectUrl,
-    this.authChallenge,
-    this.responseErrorReason,
-    this.responseStatusCode,
-    this.responseHeaders,
-  });
+  RequestInterceptedEvent(
+      {@required this.interceptionId,
+      @required this.request,
+      @required this.frameId,
+      @required this.resourceType,
+      @required this.isNavigationRequest,
+      this.isDownload,
+      this.redirectUrl,
+      this.authChallenge,
+      this.responseErrorReason,
+      this.responseStatusCode,
+      this.responseHeaders});
 
   factory RequestInterceptedEvent.fromJson(Map<String, dynamic> json) {
     return RequestInterceptedEvent(
@@ -821,19 +769,18 @@ class RequestWillBeSentEvent {
   /// Whether the request is initiated by a user gesture. Defaults to false.
   final bool hasUserGesture;
 
-  RequestWillBeSentEvent({
-    @required this.requestId,
-    @required this.loaderId,
-    @required this.documentURL,
-    @required this.request,
-    @required this.timestamp,
-    @required this.wallTime,
-    @required this.initiator,
-    this.redirectResponse,
-    this.type,
-    this.frameId,
-    this.hasUserGesture,
-  });
+  RequestWillBeSentEvent(
+      {@required this.requestId,
+      @required this.loaderId,
+      @required this.documentURL,
+      @required this.request,
+      @required this.timestamp,
+      @required this.wallTime,
+      @required this.initiator,
+      this.redirectResponse,
+      this.type,
+      this.frameId,
+      this.hasUserGesture});
 
   factory RequestWillBeSentEvent.fromJson(Map<String, dynamic> json) {
     return RequestWillBeSentEvent(
@@ -869,11 +816,10 @@ class ResourceChangedPriorityEvent {
   /// Timestamp.
   final MonotonicTime timestamp;
 
-  ResourceChangedPriorityEvent({
-    @required this.requestId,
-    @required this.newPriority,
-    @required this.timestamp,
-  });
+  ResourceChangedPriorityEvent(
+      {@required this.requestId,
+      @required this.newPriority,
+      @required this.timestamp});
 
   factory ResourceChangedPriorityEvent.fromJson(Map<String, dynamic> json) {
     return ResourceChangedPriorityEvent(
@@ -891,10 +837,7 @@ class SignedExchangeReceivedEvent {
   /// Information about the signed exchange response.
   final SignedExchangeInfo info;
 
-  SignedExchangeReceivedEvent({
-    @required this.requestId,
-    @required this.info,
-  });
+  SignedExchangeReceivedEvent({@required this.requestId, @required this.info});
 
   factory SignedExchangeReceivedEvent.fromJson(Map<String, dynamic> json) {
     return SignedExchangeReceivedEvent(
@@ -923,14 +866,13 @@ class ResponseReceivedEvent {
   /// Frame identifier.
   final page.FrameId frameId;
 
-  ResponseReceivedEvent({
-    @required this.requestId,
-    @required this.loaderId,
-    @required this.timestamp,
-    @required this.type,
-    @required this.response,
-    this.frameId,
-  });
+  ResponseReceivedEvent(
+      {@required this.requestId,
+      @required this.loaderId,
+      @required this.timestamp,
+      @required this.type,
+      @required this.response,
+      this.frameId});
 
   factory ResponseReceivedEvent.fromJson(Map<String, dynamic> json) {
     return ResponseReceivedEvent(
@@ -953,10 +895,7 @@ class WebSocketClosedEvent {
   /// Timestamp.
   final MonotonicTime timestamp;
 
-  WebSocketClosedEvent({
-    @required this.requestId,
-    @required this.timestamp,
-  });
+  WebSocketClosedEvent({@required this.requestId, @required this.timestamp});
 
   factory WebSocketClosedEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketClosedEvent(
@@ -976,11 +915,8 @@ class WebSocketCreatedEvent {
   /// Request initiator.
   final Initiator initiator;
 
-  WebSocketCreatedEvent({
-    @required this.requestId,
-    @required this.url,
-    this.initiator,
-  });
+  WebSocketCreatedEvent(
+      {@required this.requestId, @required this.url, this.initiator});
 
   factory WebSocketCreatedEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketCreatedEvent(
@@ -1003,11 +939,10 @@ class WebSocketFrameErrorEvent {
   /// WebSocket frame error message.
   final String errorMessage;
 
-  WebSocketFrameErrorEvent({
-    @required this.requestId,
-    @required this.timestamp,
-    @required this.errorMessage,
-  });
+  WebSocketFrameErrorEvent(
+      {@required this.requestId,
+      @required this.timestamp,
+      @required this.errorMessage});
 
   factory WebSocketFrameErrorEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketFrameErrorEvent(
@@ -1028,11 +963,10 @@ class WebSocketFrameReceivedEvent {
   /// WebSocket response data.
   final WebSocketFrame response;
 
-  WebSocketFrameReceivedEvent({
-    @required this.requestId,
-    @required this.timestamp,
-    @required this.response,
-  });
+  WebSocketFrameReceivedEvent(
+      {@required this.requestId,
+      @required this.timestamp,
+      @required this.response});
 
   factory WebSocketFrameReceivedEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketFrameReceivedEvent(
@@ -1053,11 +987,10 @@ class WebSocketFrameSentEvent {
   /// WebSocket response data.
   final WebSocketFrame response;
 
-  WebSocketFrameSentEvent({
-    @required this.requestId,
-    @required this.timestamp,
-    @required this.response,
-  });
+  WebSocketFrameSentEvent(
+      {@required this.requestId,
+      @required this.timestamp,
+      @required this.response});
 
   factory WebSocketFrameSentEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketFrameSentEvent(
@@ -1078,11 +1011,10 @@ class WebSocketHandshakeResponseReceivedEvent {
   /// WebSocket response data.
   final WebSocketResponse response;
 
-  WebSocketHandshakeResponseReceivedEvent({
-    @required this.requestId,
-    @required this.timestamp,
-    @required this.response,
-  });
+  WebSocketHandshakeResponseReceivedEvent(
+      {@required this.requestId,
+      @required this.timestamp,
+      @required this.response});
 
   factory WebSocketHandshakeResponseReceivedEvent.fromJson(
       Map<String, dynamic> json) {
@@ -1107,12 +1039,11 @@ class WebSocketWillSendHandshakeRequestEvent {
   /// WebSocket request data.
   final WebSocketRequest request;
 
-  WebSocketWillSendHandshakeRequestEvent({
-    @required this.requestId,
-    @required this.timestamp,
-    @required this.wallTime,
-    @required this.request,
-  });
+  WebSocketWillSendHandshakeRequestEvent(
+      {@required this.requestId,
+      @required this.timestamp,
+      @required this.wallTime,
+      @required this.request});
 
   factory WebSocketWillSendHandshakeRequestEvent.fromJson(
       Map<String, dynamic> json) {
@@ -1132,10 +1063,7 @@ class GetResponseBodyResult {
   /// True, if content was sent as base64.
   final bool base64Encoded;
 
-  GetResponseBodyResult({
-    @required this.body,
-    @required this.base64Encoded,
-  });
+  GetResponseBodyResult({@required this.body, @required this.base64Encoded});
 
   factory GetResponseBodyResult.fromJson(Map<String, dynamic> json) {
     return GetResponseBodyResult(
@@ -1152,10 +1080,8 @@ class GetResponseBodyForInterceptionResult {
   /// True, if content was sent as base64.
   final bool base64Encoded;
 
-  GetResponseBodyForInterceptionResult({
-    @required this.body,
-    @required this.base64Encoded,
-  });
+  GetResponseBodyForInterceptionResult(
+      {@required this.body, @required this.base64Encoded});
 
   factory GetResponseBodyForInterceptionResult.fromJson(
       Map<String, dynamic> json) {
@@ -1449,24 +1375,23 @@ class ResourceTiming {
   /// Finished receiving response headers.
   final num receiveHeadersEnd;
 
-  ResourceTiming({
-    @required this.requestTime,
-    @required this.proxyStart,
-    @required this.proxyEnd,
-    @required this.dnsStart,
-    @required this.dnsEnd,
-    @required this.connectStart,
-    @required this.connectEnd,
-    @required this.sslStart,
-    @required this.sslEnd,
-    @required this.workerStart,
-    @required this.workerReady,
-    @required this.sendStart,
-    @required this.sendEnd,
-    @required this.pushStart,
-    @required this.pushEnd,
-    @required this.receiveHeadersEnd,
-  });
+  ResourceTiming(
+      {@required this.requestTime,
+      @required this.proxyStart,
+      @required this.proxyEnd,
+      @required this.dnsStart,
+      @required this.dnsEnd,
+      @required this.connectStart,
+      @required this.connectEnd,
+      @required this.sslStart,
+      @required this.sslEnd,
+      @required this.workerStart,
+      @required this.workerReady,
+      @required this.sendStart,
+      @required this.sendEnd,
+      @required this.pushStart,
+      @required this.pushEnd,
+      @required this.receiveHeadersEnd});
 
   factory ResourceTiming.fromJson(Map<String, dynamic> json) {
     return ResourceTiming(
@@ -1571,18 +1496,17 @@ class Request {
   /// Whether is loaded via link preload.
   final bool isLinkPreload;
 
-  Request({
-    @required this.url,
-    this.urlFragment,
-    @required this.method,
-    @required this.headers,
-    this.postData,
-    this.hasPostData,
-    this.mixedContentType,
-    @required this.initialPriority,
-    @required this.referrerPolicy,
-    this.isLinkPreload,
-  });
+  Request(
+      {@required this.url,
+      this.urlFragment,
+      @required this.method,
+      @required this.headers,
+      this.postData,
+      this.hasPostData,
+      this.mixedContentType,
+      @required this.initialPriority,
+      @required this.referrerPolicy,
+      this.isLinkPreload});
 
   factory Request.fromJson(Map<String, dynamic> json) {
     return Request(
@@ -1655,16 +1579,15 @@ class SignedCertificateTimestamp {
   /// Signature data.
   final String signatureData;
 
-  SignedCertificateTimestamp({
-    @required this.status,
-    @required this.origin,
-    @required this.logDescription,
-    @required this.logId,
-    @required this.timestamp,
-    @required this.hashAlgorithm,
-    @required this.signatureAlgorithm,
-    @required this.signatureData,
-  });
+  SignedCertificateTimestamp(
+      {@required this.status,
+      @required this.origin,
+      @required this.logDescription,
+      @required this.logId,
+      @required this.timestamp,
+      @required this.hashAlgorithm,
+      @required this.signatureAlgorithm,
+      @required this.signatureData});
 
   factory SignedCertificateTimestamp.fromJson(Map<String, dynamic> json) {
     return SignedCertificateTimestamp(
@@ -1735,21 +1658,20 @@ class SecurityDetails {
   /// Whether the request complied with Certificate Transparency policy
   final CertificateTransparencyCompliance certificateTransparencyCompliance;
 
-  SecurityDetails({
-    @required this.protocol,
-    @required this.keyExchange,
-    this.keyExchangeGroup,
-    @required this.cipher,
-    this.mac,
-    @required this.certificateId,
-    @required this.subjectName,
-    @required this.sanList,
-    @required this.issuer,
-    @required this.validFrom,
-    @required this.validTo,
-    @required this.signedCertificateTimestampList,
-    @required this.certificateTransparencyCompliance,
-  });
+  SecurityDetails(
+      {@required this.protocol,
+      @required this.keyExchange,
+      this.keyExchangeGroup,
+      @required this.cipher,
+      this.mac,
+      @required this.certificateId,
+      @required this.subjectName,
+      @required this.sanList,
+      @required this.issuer,
+      @required this.validFrom,
+      @required this.validTo,
+      @required this.signedCertificateTimestampList,
+      @required this.certificateTransparencyCompliance});
 
   factory SecurityDetails.fromJson(Map<String, dynamic> json) {
     return SecurityDetails(
@@ -1925,27 +1847,26 @@ class Response {
   /// Security details for the request.
   final SecurityDetails securityDetails;
 
-  Response({
-    @required this.url,
-    @required this.status,
-    @required this.statusText,
-    @required this.headers,
-    this.headersText,
-    @required this.mimeType,
-    this.requestHeaders,
-    this.requestHeadersText,
-    @required this.connectionReused,
-    @required this.connectionId,
-    this.remoteIPAddress,
-    this.remotePort,
-    this.fromDiskCache,
-    this.fromServiceWorker,
-    @required this.encodedDataLength,
-    this.timing,
-    this.protocol,
-    @required this.securityState,
-    this.securityDetails,
-  });
+  Response(
+      {@required this.url,
+      @required this.status,
+      @required this.statusText,
+      @required this.headers,
+      this.headersText,
+      @required this.mimeType,
+      this.requestHeaders,
+      this.requestHeadersText,
+      @required this.connectionReused,
+      @required this.connectionId,
+      this.remoteIPAddress,
+      this.remotePort,
+      this.fromDiskCache,
+      this.fromServiceWorker,
+      @required this.encodedDataLength,
+      this.timing,
+      this.protocol,
+      @required this.securityState,
+      this.securityDetails});
 
   factory Response.fromJson(Map<String, dynamic> json) {
     return Response(
@@ -2034,9 +1955,7 @@ class WebSocketRequest {
   /// HTTP request headers.
   final Headers headers;
 
-  WebSocketRequest({
-    @required this.headers,
-  });
+  WebSocketRequest({@required this.headers});
 
   factory WebSocketRequest.fromJson(Map<String, dynamic> json) {
     return WebSocketRequest(
@@ -2072,14 +1991,13 @@ class WebSocketResponse {
   /// HTTP request headers text.
   final String requestHeadersText;
 
-  WebSocketResponse({
-    @required this.status,
-    @required this.statusText,
-    @required this.headers,
-    this.headersText,
-    this.requestHeaders,
-    this.requestHeadersText,
-  });
+  WebSocketResponse(
+      {@required this.status,
+      @required this.statusText,
+      @required this.headers,
+      this.headersText,
+      this.requestHeaders,
+      this.requestHeadersText});
 
   factory WebSocketResponse.fromJson(Map<String, dynamic> json) {
     return WebSocketResponse(
@@ -2126,11 +2044,8 @@ class WebSocketFrame {
   /// WebSocke frame payload data.
   final String payloadData;
 
-  WebSocketFrame({
-    @required this.opcode,
-    @required this.mask,
-    @required this.payloadData,
-  });
+  WebSocketFrame(
+      {@required this.opcode, @required this.mask, @required this.payloadData});
 
   factory WebSocketFrame.fromJson(Map<String, dynamic> json) {
     return WebSocketFrame(
@@ -2164,12 +2079,11 @@ class CachedResource {
   /// Cached response body size.
   final num bodySize;
 
-  CachedResource({
-    @required this.url,
-    @required this.type,
-    this.response,
-    @required this.bodySize,
-  });
+  CachedResource(
+      {@required this.url,
+      @required this.type,
+      this.response,
+      @required this.bodySize});
 
   factory CachedResource.fromJson(Map<String, dynamic> json) {
     return CachedResource(
@@ -2210,12 +2124,7 @@ class Initiator {
   /// module) (0-based).
   final num lineNumber;
 
-  Initiator({
-    @required this.type,
-    this.stack,
-    this.url,
-    this.lineNumber,
-  });
+  Initiator({@required this.type, this.stack, this.url, this.lineNumber});
 
   factory Initiator.fromJson(Map<String, dynamic> json) {
     return Initiator(
@@ -2277,18 +2186,17 @@ class Cookie {
   /// Cookie SameSite type.
   final CookieSameSite sameSite;
 
-  Cookie({
-    @required this.name,
-    @required this.value,
-    @required this.domain,
-    @required this.path,
-    @required this.expires,
-    @required this.size,
-    @required this.httpOnly,
-    @required this.secure,
-    @required this.session,
-    this.sameSite,
-  });
+  Cookie(
+      {@required this.name,
+      @required this.value,
+      @required this.domain,
+      @required this.path,
+      @required this.expires,
+      @required this.size,
+      @required this.httpOnly,
+      @required this.secure,
+      @required this.session,
+      this.sameSite});
 
   factory Cookie.fromJson(Map<String, dynamic> json) {
     return Cookie(
@@ -2356,17 +2264,16 @@ class CookieParam {
   /// Cookie expiration date, session cookie if not set
   final TimeSinceEpoch expires;
 
-  CookieParam({
-    @required this.name,
-    @required this.value,
-    this.url,
-    this.domain,
-    this.path,
-    this.secure,
-    this.httpOnly,
-    this.sameSite,
-    this.expires,
-  });
+  CookieParam(
+      {@required this.name,
+      @required this.value,
+      this.url,
+      this.domain,
+      this.path,
+      this.secure,
+      this.httpOnly,
+      this.sameSite,
+      this.expires});
 
   factory CookieParam.fromJson(Map<String, dynamic> json) {
     return CookieParam(
@@ -2430,12 +2337,11 @@ class AuthChallenge {
   /// The realm of the challenge. May be empty.
   final String realm;
 
-  AuthChallenge({
-    this.source,
-    @required this.origin,
-    @required this.scheme,
-    @required this.realm,
-  });
+  AuthChallenge(
+      {this.source,
+      @required this.origin,
+      @required this.scheme,
+      @required this.realm});
 
   factory AuthChallenge.fromJson(Map<String, dynamic> json) {
     return AuthChallenge(
@@ -2474,11 +2380,8 @@ class AuthChallengeResponse {
   /// ProvideCredentials.
   final String password;
 
-  AuthChallengeResponse({
-    @required this.response,
-    this.username,
-    this.password,
-  });
+  AuthChallengeResponse(
+      {@required this.response, this.username, this.password});
 
   factory AuthChallengeResponse.fromJson(Map<String, dynamic> json) {
     return AuthChallengeResponse(
@@ -2537,11 +2440,7 @@ class RequestPattern {
   /// Stage at wich to begin intercepting requests. Default is Request.
   final InterceptionStage interceptionStage;
 
-  RequestPattern({
-    this.urlPattern,
-    this.resourceType,
-    this.interceptionStage,
-  });
+  RequestPattern({this.urlPattern, this.resourceType, this.interceptionStage});
 
   factory RequestPattern.fromJson(Map<String, dynamic> json) {
     return RequestPattern(
@@ -2600,17 +2499,16 @@ class SignedExchangeSignature {
   /// The encoded certificates.
   final List<String> certificates;
 
-  SignedExchangeSignature({
-    @required this.label,
-    @required this.signature,
-    @required this.integrity,
-    this.certUrl,
-    this.certSha256,
-    @required this.validityUrl,
-    @required this.date,
-    @required this.expires,
-    this.certificates,
-  });
+  SignedExchangeSignature(
+      {@required this.label,
+      @required this.signature,
+      @required this.integrity,
+      this.certUrl,
+      this.certSha256,
+      @required this.validityUrl,
+      @required this.date,
+      @required this.expires,
+      this.certificates});
 
   factory SignedExchangeSignature.fromJson(Map<String, dynamic> json) {
     return SignedExchangeSignature(
@@ -2668,13 +2566,12 @@ class SignedExchangeHeader {
   /// Signed exchange response signature.
   final List<SignedExchangeSignature> signatures;
 
-  SignedExchangeHeader({
-    @required this.requestUrl,
-    @required this.requestMethod,
-    @required this.responseCode,
-    @required this.responseHeaders,
-    @required this.signatures,
-  });
+  SignedExchangeHeader(
+      {@required this.requestUrl,
+      @required this.requestMethod,
+      @required this.responseCode,
+      @required this.responseHeaders,
+      @required this.signatures});
 
   factory SignedExchangeHeader.fromJson(Map<String, dynamic> json) {
     return SignedExchangeHeader(
@@ -2746,11 +2643,8 @@ class SignedExchangeError {
   /// The field which caused the error.
   final SignedExchangeErrorField errorField;
 
-  SignedExchangeError({
-    @required this.message,
-    this.signatureIndex,
-    this.errorField,
-  });
+  SignedExchangeError(
+      {@required this.message, this.signatureIndex, this.errorField});
 
   factory SignedExchangeError.fromJson(Map<String, dynamic> json) {
     return SignedExchangeError(
@@ -2791,12 +2685,11 @@ class SignedExchangeInfo {
   /// Errors occurred while handling the signed exchagne.
   final List<SignedExchangeError> errors;
 
-  SignedExchangeInfo({
-    @required this.outerResponse,
-    this.header,
-    this.securityDetails,
-    this.errors,
-  });
+  SignedExchangeInfo(
+      {@required this.outerResponse,
+      this.header,
+      this.securityDetails,
+      this.errors});
 
   factory SignedExchangeInfo.fromJson(Map<String, dynamic> json) {
     return SignedExchangeInfo(

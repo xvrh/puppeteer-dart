@@ -16,11 +16,8 @@ class AuditsApi {
   /// [quality] The quality of the encoding (0-1). (defaults to 1)
   /// [sizeOnly] Whether to only return the size information (defaults to false).
   Future<GetEncodedResponseResult> getEncodedResponse(
-    network.RequestId requestId,
-    String encoding, {
-    num quality,
-    bool sizeOnly,
-  }) async {
+      network.RequestId requestId, String encoding,
+      {num quality, bool sizeOnly}) async {
     var parameters = <String, dynamic>{
       'requestId': requestId.toJson(),
       'encoding': encoding,
@@ -46,11 +43,8 @@ class GetEncodedResponseResult {
   /// Size after re-encoding.
   final int encodedSize;
 
-  GetEncodedResponseResult({
-    this.body,
-    @required this.originalSize,
-    @required this.encodedSize,
-  });
+  GetEncodedResponseResult(
+      {this.body, @required this.originalSize, @required this.encodedSize});
 
   factory GetEncodedResponseResult.fromJson(Map<String, dynamic> json) {
     return GetEncodedResponseResult(

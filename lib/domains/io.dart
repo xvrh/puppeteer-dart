@@ -11,9 +11,7 @@ class IOApi {
 
   /// Close the stream, discard any temporary backing storage.
   /// [handle] Handle of the stream to close.
-  Future close(
-    StreamHandle handle,
-  ) async {
+  Future close(StreamHandle handle) async {
     var parameters = <String, dynamic>{
       'handle': handle.toJson(),
     };
@@ -25,11 +23,7 @@ class IOApi {
   /// [offset] Seek to the specified offset before reading (if not specificed, proceed with offset
   /// following the last read). Some types of streams may only support sequential reads.
   /// [size] Maximum number of bytes to read (left upon the agent discretion if not specified).
-  Future<ReadResult> read(
-    StreamHandle handle, {
-    int offset,
-    int size,
-  }) async {
+  Future<ReadResult> read(StreamHandle handle, {int offset, int size}) async {
     var parameters = <String, dynamic>{
       'handle': handle.toJson(),
     };
@@ -46,9 +40,7 @@ class IOApi {
   /// Return UUID of Blob object specified by a remote object id.
   /// [objectId] Object id of a Blob object wrapper.
   /// Returns: UUID of the specified Blob.
-  Future<String> resolveBlob(
-    runtime.RemoteObjectId objectId,
-  ) async {
+  Future<String> resolveBlob(runtime.RemoteObjectId objectId) async {
     var parameters = <String, dynamic>{
       'objectId': objectId.toJson(),
     };
@@ -67,11 +59,7 @@ class ReadResult {
   /// Set if the end-of-file condition occured while reading.
   final bool eof;
 
-  ReadResult({
-    this.base64Encoded,
-    @required this.data,
-    @required this.eof,
-  });
+  ReadResult({this.base64Encoded, @required this.data, @required this.eof});
 
   factory ReadResult.fromJson(Map<String, dynamic> json) {
     return ReadResult(

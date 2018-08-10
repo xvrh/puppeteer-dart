@@ -18,11 +18,8 @@ class DOMDebuggerApi {
   /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the subtree
   /// (default is false). Reports listeners for all contexts if pierce is enabled.
   /// Returns: Array of relevant listeners.
-  Future<List<EventListener>> getEventListeners(
-    runtime.RemoteObjectId objectId, {
-    int depth,
-    bool pierce,
-  }) async {
+  Future<List<EventListener>> getEventListeners(runtime.RemoteObjectId objectId,
+      {int depth, bool pierce}) async {
     var parameters = <String, dynamic>{
       'objectId': objectId.toJson(),
     };
@@ -42,10 +39,7 @@ class DOMDebuggerApi {
   /// Removes DOM breakpoint that was set using `setDOMBreakpoint`.
   /// [nodeId] Identifier of the node to remove breakpoint from.
   /// [type] Type of the breakpoint to remove.
-  Future removeDOMBreakpoint(
-    dom.NodeId nodeId,
-    DOMBreakpointType type,
-  ) async {
+  Future removeDOMBreakpoint(dom.NodeId nodeId, DOMBreakpointType type) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'type': type.toJson(),
@@ -56,10 +50,8 @@ class DOMDebuggerApi {
   /// Removes breakpoint on particular DOM event.
   /// [eventName] Event name.
   /// [targetName] EventTarget interface name.
-  Future removeEventListenerBreakpoint(
-    String eventName, {
-    String targetName,
-  }) async {
+  Future removeEventListenerBreakpoint(String eventName,
+      {String targetName}) async {
     var parameters = <String, dynamic>{
       'eventName': eventName,
     };
@@ -71,9 +63,7 @@ class DOMDebuggerApi {
 
   /// Removes breakpoint on particular native event.
   /// [eventName] Instrumentation name to stop on.
-  Future removeInstrumentationBreakpoint(
-    String eventName,
-  ) async {
+  Future removeInstrumentationBreakpoint(String eventName) async {
     var parameters = <String, dynamic>{
       'eventName': eventName,
     };
@@ -83,9 +73,7 @@ class DOMDebuggerApi {
 
   /// Removes breakpoint from XMLHttpRequest.
   /// [url] Resource URL substring.
-  Future removeXHRBreakpoint(
-    String url,
-  ) async {
+  Future removeXHRBreakpoint(String url) async {
     var parameters = <String, dynamic>{
       'url': url,
     };
@@ -95,10 +83,7 @@ class DOMDebuggerApi {
   /// Sets breakpoint on particular operation with DOM.
   /// [nodeId] Identifier of the node to set breakpoint on.
   /// [type] Type of the operation to stop upon.
-  Future setDOMBreakpoint(
-    dom.NodeId nodeId,
-    DOMBreakpointType type,
-  ) async {
+  Future setDOMBreakpoint(dom.NodeId nodeId, DOMBreakpointType type) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'type': type.toJson(),
@@ -110,10 +95,8 @@ class DOMDebuggerApi {
   /// [eventName] DOM Event name to stop on (any DOM event will do).
   /// [targetName] EventTarget interface name to stop on. If equal to `"*"` or not provided, will stop on any
   /// EventTarget.
-  Future setEventListenerBreakpoint(
-    String eventName, {
-    String targetName,
-  }) async {
+  Future setEventListenerBreakpoint(String eventName,
+      {String targetName}) async {
     var parameters = <String, dynamic>{
       'eventName': eventName,
     };
@@ -125,9 +108,7 @@ class DOMDebuggerApi {
 
   /// Sets breakpoint on particular native event.
   /// [eventName] Instrumentation name to stop on.
-  Future setInstrumentationBreakpoint(
-    String eventName,
-  ) async {
+  Future setInstrumentationBreakpoint(String eventName) async {
     var parameters = <String, dynamic>{
       'eventName': eventName,
     };
@@ -136,9 +117,7 @@ class DOMDebuggerApi {
 
   /// Sets breakpoint on XMLHttpRequest.
   /// [url] Resource URL substring. All XHRs having this substring in the URL will get stopped upon.
-  Future setXHRBreakpoint(
-    String url,
-  ) async {
+  Future setXHRBreakpoint(String url) async {
     var parameters = <String, dynamic>{
       'url': url,
     };
@@ -204,18 +183,17 @@ class EventListener {
   /// Node the listener is added to (if any).
   final dom.BackendNodeId backendNodeId;
 
-  EventListener({
-    @required this.type,
-    @required this.useCapture,
-    @required this.passive,
-    @required this.once,
-    @required this.scriptId,
-    @required this.lineNumber,
-    @required this.columnNumber,
-    this.handler,
-    this.originalHandler,
-    this.backendNodeId,
-  });
+  EventListener(
+      {@required this.type,
+      @required this.useCapture,
+      @required this.passive,
+      @required this.once,
+      @required this.scriptId,
+      @required this.lineNumber,
+      @required this.columnNumber,
+      this.handler,
+      this.originalHandler,
+      this.backendNodeId});
 
   factory EventListener.fromJson(Map<String, dynamic> json) {
     return EventListener(

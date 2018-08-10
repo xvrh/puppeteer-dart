@@ -30,12 +30,10 @@ class DOMSnapshotApi {
   /// [includePaintOrder] Whether to determine and include the paint order index of LayoutTreeNodes (default false).
   /// [includeUserAgentShadowTree] Whether to include UA shadow tree in the snapshot (default false).
   @deprecated
-  Future<GetSnapshotResult> getSnapshot(
-    List<String> computedStyleWhitelist, {
-    bool includeEventListeners,
-    bool includePaintOrder,
-    bool includeUserAgentShadowTree,
-  }) async {
+  Future<GetSnapshotResult> getSnapshot(List<String> computedStyleWhitelist,
+      {bool includeEventListeners,
+      bool includePaintOrder,
+      bool includeUserAgentShadowTree}) async {
     var parameters = <String, dynamic>{
       'computedStyleWhitelist': computedStyleWhitelist.map((e) => e).toList(),
     };
@@ -58,8 +56,7 @@ class DOMSnapshotApi {
   /// flattened.
   /// [computedStyles] Whitelist of computed styles to return.
   Future<CaptureSnapshotResult> captureSnapshot(
-    List<String> computedStyles,
-  ) async {
+      List<String> computedStyles) async {
     var parameters = <String, dynamic>{
       'computedStyles': computedStyles.map((e) => e).toList(),
     };
@@ -78,11 +75,10 @@ class GetSnapshotResult {
   /// Whitelisted ComputedStyle properties for each node in the layout tree.
   final List<ComputedStyle> computedStyles;
 
-  GetSnapshotResult({
-    @required this.domNodes,
-    @required this.layoutTreeNodes,
-    @required this.computedStyles,
-  });
+  GetSnapshotResult(
+      {@required this.domNodes,
+      @required this.layoutTreeNodes,
+      @required this.computedStyles});
 
   factory GetSnapshotResult.fromJson(Map<String, dynamic> json) {
     return GetSnapshotResult(
@@ -105,10 +101,7 @@ class CaptureSnapshotResult {
   /// Shared string table that all string properties refer to with indexes.
   final List<String> strings;
 
-  CaptureSnapshotResult({
-    @required this.documents,
-    @required this.strings,
-  });
+  CaptureSnapshotResult({@required this.documents, @required this.strings});
 
   factory CaptureSnapshotResult.fromJson(Map<String, dynamic> json) {
     return CaptureSnapshotResult(
@@ -206,34 +199,33 @@ class DOMNode {
   /// The url of the script (if any) that generates this node.
   final String originURL;
 
-  DOMNode({
-    @required this.nodeType,
-    @required this.nodeName,
-    @required this.nodeValue,
-    this.textValue,
-    this.inputValue,
-    this.inputChecked,
-    this.optionSelected,
-    @required this.backendNodeId,
-    this.childNodeIndexes,
-    this.attributes,
-    this.pseudoElementIndexes,
-    this.layoutNodeIndex,
-    this.documentURL,
-    this.baseURL,
-    this.contentLanguage,
-    this.documentEncoding,
-    this.publicId,
-    this.systemId,
-    this.frameId,
-    this.contentDocumentIndex,
-    this.pseudoType,
-    this.shadowRootType,
-    this.isClickable,
-    this.eventListeners,
-    this.currentSourceURL,
-    this.originURL,
-  });
+  DOMNode(
+      {@required this.nodeType,
+      @required this.nodeName,
+      @required this.nodeValue,
+      this.textValue,
+      this.inputValue,
+      this.inputChecked,
+      this.optionSelected,
+      @required this.backendNodeId,
+      this.childNodeIndexes,
+      this.attributes,
+      this.pseudoElementIndexes,
+      this.layoutNodeIndex,
+      this.documentURL,
+      this.baseURL,
+      this.contentLanguage,
+      this.documentEncoding,
+      this.publicId,
+      this.systemId,
+      this.frameId,
+      this.contentDocumentIndex,
+      this.pseudoType,
+      this.shadowRootType,
+      this.isClickable,
+      this.eventListeners,
+      this.currentSourceURL,
+      this.originURL});
 
   factory DOMNode.fromJson(Map<String, dynamic> json) {
     return DOMNode(
@@ -386,11 +378,10 @@ class InlineTextBox {
   /// represented as a surrogate pair in UTF-16 have length 2.
   final int numCharacters;
 
-  InlineTextBox({
-    @required this.boundingBox,
-    @required this.startCharacterIndex,
-    @required this.numCharacters,
-  });
+  InlineTextBox(
+      {@required this.boundingBox,
+      @required this.startCharacterIndex,
+      @required this.numCharacters});
 
   factory InlineTextBox.fromJson(Map<String, dynamic> json) {
     return InlineTextBox(
@@ -432,14 +423,13 @@ class LayoutTreeNode {
   /// getSnapshot was true.
   final int paintOrder;
 
-  LayoutTreeNode({
-    @required this.domNodeIndex,
-    @required this.boundingBox,
-    this.layoutText,
-    this.inlineTextNodes,
-    this.styleIndex,
-    this.paintOrder,
-  });
+  LayoutTreeNode(
+      {@required this.domNodeIndex,
+      @required this.boundingBox,
+      this.layoutText,
+      this.inlineTextNodes,
+      this.styleIndex,
+      this.paintOrder});
 
   factory LayoutTreeNode.fromJson(Map<String, dynamic> json) {
     return LayoutTreeNode(
@@ -482,9 +472,7 @@ class ComputedStyle {
   /// Name/value pairs of computed style properties.
   final List<NameValue> properties;
 
-  ComputedStyle({
-    @required this.properties,
-  });
+  ComputedStyle({@required this.properties});
 
   factory ComputedStyle.fromJson(Map<String, dynamic> json) {
     return ComputedStyle(
@@ -510,10 +498,7 @@ class NameValue {
   /// Attribute/property value.
   final String value;
 
-  NameValue({
-    @required this.name,
-    @required this.value,
-  });
+  NameValue({@required this.name, @required this.value});
 
   factory NameValue.fromJson(Map<String, dynamic> json) {
     return NameValue(
@@ -578,10 +563,7 @@ class RareStringData {
 
   final List<StringIndex> value;
 
-  RareStringData({
-    @required this.index,
-    @required this.value,
-  });
+  RareStringData({@required this.index, @required this.value});
 
   factory RareStringData.fromJson(Map<String, dynamic> json) {
     return RareStringData(
@@ -603,9 +585,7 @@ class RareStringData {
 class RareBooleanData {
   final List<int> index;
 
-  RareBooleanData({
-    @required this.index,
-  });
+  RareBooleanData({@required this.index});
 
   factory RareBooleanData.fromJson(Map<String, dynamic> json) {
     return RareBooleanData(
@@ -626,10 +606,7 @@ class RareIntegerData {
 
   final List<int> value;
 
-  RareIntegerData({
-    @required this.index,
-    @required this.value,
-  });
+  RareIntegerData({@required this.index, @required this.value});
 
   factory RareIntegerData.fromJson(Map<String, dynamic> json) {
     return RareIntegerData(
@@ -698,18 +675,17 @@ class DocumentSnapshot {
   /// The post-layout inline text nodes.
   final TextBoxSnapshot textBoxes;
 
-  DocumentSnapshot({
-    @required this.documentURL,
-    @required this.baseURL,
-    @required this.contentLanguage,
-    @required this.encodingName,
-    @required this.publicId,
-    @required this.systemId,
-    @required this.frameId,
-    @required this.nodes,
-    @required this.layout,
-    @required this.textBoxes,
-  });
+  DocumentSnapshot(
+      {@required this.documentURL,
+      @required this.baseURL,
+      @required this.contentLanguage,
+      @required this.encodingName,
+      @required this.publicId,
+      @required this.systemId,
+      @required this.frameId,
+      @required this.nodes,
+      @required this.layout,
+      @required this.textBoxes});
 
   factory DocumentSnapshot.fromJson(Map<String, dynamic> json) {
     return DocumentSnapshot(
@@ -792,23 +768,22 @@ class NodeTreeSnapshot {
   /// The url of the script (if any) that generates this node.
   final RareStringData originURL;
 
-  NodeTreeSnapshot({
-    this.parentIndex,
-    this.nodeType,
-    this.nodeName,
-    this.nodeValue,
-    this.backendNodeId,
-    this.attributes,
-    this.textValue,
-    this.inputValue,
-    this.inputChecked,
-    this.optionSelected,
-    this.contentDocumentIndex,
-    this.pseudoType,
-    this.isClickable,
-    this.currentSourceURL,
-    this.originURL,
-  });
+  NodeTreeSnapshot(
+      {this.parentIndex,
+      this.nodeType,
+      this.nodeName,
+      this.nodeValue,
+      this.backendNodeId,
+      this.attributes,
+      this.textValue,
+      this.inputValue,
+      this.inputChecked,
+      this.optionSelected,
+      this.contentDocumentIndex,
+      this.pseudoType,
+      this.isClickable,
+      this.currentSourceURL,
+      this.originURL});
 
   factory NodeTreeSnapshot.fromJson(Map<String, dynamic> json) {
     return NodeTreeSnapshot(
@@ -933,12 +908,11 @@ class LayoutTreeSnapshot {
   /// Contents of the LayoutText, if any.
   final List<StringIndex> text;
 
-  LayoutTreeSnapshot({
-    @required this.nodeIndex,
-    @required this.styles,
-    @required this.bounds,
-    @required this.text,
-  });
+  LayoutTreeSnapshot(
+      {@required this.nodeIndex,
+      @required this.styles,
+      @required this.bounds,
+      @required this.text});
 
   factory LayoutTreeSnapshot.fromJson(Map<String, dynamic> json) {
     return LayoutTreeSnapshot(
@@ -980,12 +954,11 @@ class TextBoxSnapshot {
   /// represented as a surrogate pair in UTF-16 have length 2.
   final List<int> length;
 
-  TextBoxSnapshot({
-    @required this.layoutIndex,
-    @required this.bounds,
-    @required this.start,
-    @required this.length,
-  });
+  TextBoxSnapshot(
+      {@required this.layoutIndex,
+      @required this.bounds,
+      @required this.start,
+      @required this.length});
 
   factory TextBoxSnapshot.fromJson(Map<String, dynamic> json) {
     return TextBoxSnapshot(

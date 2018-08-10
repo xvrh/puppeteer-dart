@@ -42,9 +42,7 @@ class ProfilerApi {
 
   /// Changes CPU profiler sampling interval. Must be called before CPU profiles recording started.
   /// [interval] New sampling interval in microseconds.
-  Future setSamplingInterval(
-    int interval,
-  ) async {
+  Future setSamplingInterval(int interval) async {
     var parameters = <String, dynamic>{
       'interval': interval,
     };
@@ -60,10 +58,7 @@ class ProfilerApi {
   /// counters.
   /// [callCount] Collect accurate call counts beyond simple 'covered' or 'not covered'.
   /// [detailed] Collect block-based coverage.
-  Future startPreciseCoverage({
-    bool callCount,
-    bool detailed,
-  }) async {
+  Future startPreciseCoverage({bool callCount, bool detailed}) async {
     var parameters = <String, dynamic>{};
     if (callCount != null) {
       parameters['callCount'] = callCount;
@@ -127,12 +122,11 @@ class ConsoleProfileFinishedEvent {
   /// Profile title passed as an argument to console.profile().
   final String title;
 
-  ConsoleProfileFinishedEvent({
-    @required this.id,
-    @required this.location,
-    @required this.profile,
-    this.title,
-  });
+  ConsoleProfileFinishedEvent(
+      {@required this.id,
+      @required this.location,
+      @required this.profile,
+      this.title});
 
   factory ConsoleProfileFinishedEvent.fromJson(Map<String, dynamic> json) {
     return ConsoleProfileFinishedEvent(
@@ -153,11 +147,8 @@ class ConsoleProfileStartedEvent {
   /// Profile title passed as an argument to console.profile().
   final String title;
 
-  ConsoleProfileStartedEvent({
-    @required this.id,
-    @required this.location,
-    this.title,
-  });
+  ConsoleProfileStartedEvent(
+      {@required this.id, @required this.location, this.title});
 
   factory ConsoleProfileStartedEvent.fromJson(Map<String, dynamic> json) {
     return ConsoleProfileStartedEvent(
@@ -189,14 +180,13 @@ class ProfileNode {
   /// An array of source position ticks.
   final List<PositionTickInfo> positionTicks;
 
-  ProfileNode({
-    @required this.id,
-    @required this.callFrame,
-    this.hitCount,
-    this.children,
-    this.deoptReason,
-    this.positionTicks,
-  });
+  ProfileNode(
+      {@required this.id,
+      @required this.callFrame,
+      this.hitCount,
+      this.children,
+      this.deoptReason,
+      this.positionTicks});
 
   factory ProfileNode.fromJson(Map<String, dynamic> json) {
     return ProfileNode(
@@ -254,13 +244,12 @@ class Profile {
   /// profile startTime.
   final List<int> timeDeltas;
 
-  Profile({
-    @required this.nodes,
-    @required this.startTime,
-    @required this.endTime,
-    this.samples,
-    this.timeDeltas,
-  });
+  Profile(
+      {@required this.nodes,
+      @required this.startTime,
+      @required this.endTime,
+      this.samples,
+      this.timeDeltas});
 
   factory Profile.fromJson(Map<String, dynamic> json) {
     return Profile(
@@ -301,10 +290,7 @@ class PositionTickInfo {
   /// Number of samples attributed to the source line.
   final int ticks;
 
-  PositionTickInfo({
-    @required this.line,
-    @required this.ticks,
-  });
+  PositionTickInfo({@required this.line, @required this.ticks});
 
   factory PositionTickInfo.fromJson(Map<String, dynamic> json) {
     return PositionTickInfo(
@@ -333,11 +319,10 @@ class CoverageRange {
   /// Collected execution count of the source range.
   final int count;
 
-  CoverageRange({
-    @required this.startOffset,
-    @required this.endOffset,
-    @required this.count,
-  });
+  CoverageRange(
+      {@required this.startOffset,
+      @required this.endOffset,
+      @required this.count});
 
   factory CoverageRange.fromJson(Map<String, dynamic> json) {
     return CoverageRange(
@@ -368,11 +353,10 @@ class FunctionCoverage {
   /// Whether coverage data for this function has block granularity.
   final bool isBlockCoverage;
 
-  FunctionCoverage({
-    @required this.functionName,
-    @required this.ranges,
-    @required this.isBlockCoverage,
-  });
+  FunctionCoverage(
+      {@required this.functionName,
+      @required this.ranges,
+      @required this.isBlockCoverage});
 
   factory FunctionCoverage.fromJson(Map<String, dynamic> json) {
     return FunctionCoverage(
@@ -405,11 +389,8 @@ class ScriptCoverage {
   /// Functions contained in the script that has coverage data.
   final List<FunctionCoverage> functions;
 
-  ScriptCoverage({
-    @required this.scriptId,
-    @required this.url,
-    @required this.functions,
-  });
+  ScriptCoverage(
+      {@required this.scriptId, @required this.url, @required this.functions});
 
   factory ScriptCoverage.fromJson(Map<String, dynamic> json) {
     return ScriptCoverage(
@@ -436,9 +417,7 @@ class TypeObject {
   /// Name of a type collected with type profiling.
   final String name;
 
-  TypeObject({
-    @required this.name,
-  });
+  TypeObject({@required this.name});
 
   factory TypeObject.fromJson(Map<String, dynamic> json) {
     return TypeObject(
@@ -462,10 +441,7 @@ class TypeProfileEntry {
   /// The types for this parameter or return value.
   final List<TypeObject> types;
 
-  TypeProfileEntry({
-    @required this.offset,
-    @required this.types,
-  });
+  TypeProfileEntry({@required this.offset, @required this.types});
 
   factory TypeProfileEntry.fromJson(Map<String, dynamic> json) {
     return TypeProfileEntry(
@@ -495,11 +471,8 @@ class ScriptTypeProfile {
   /// Type profile entries for parameters and return values of the functions in the script.
   final List<TypeProfileEntry> entries;
 
-  ScriptTypeProfile({
-    @required this.scriptId,
-    @required this.url,
-    @required this.entries,
-  });
+  ScriptTypeProfile(
+      {@required this.scriptId, @required this.url, @required this.entries});
 
   factory ScriptTypeProfile.fromJson(Map<String, dynamic> json) {
     return ScriptTypeProfile(

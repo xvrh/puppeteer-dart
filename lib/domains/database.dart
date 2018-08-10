@@ -22,9 +22,7 @@ class DatabaseApi {
   }
 
   Future<ExecuteSQLResult> executeSQL(
-    DatabaseId databaseId,
-    String query,
-  ) async {
+      DatabaseId databaseId, String query) async {
     var parameters = <String, dynamic>{
       'databaseId': databaseId.toJson(),
       'query': query,
@@ -33,9 +31,7 @@ class DatabaseApi {
     return ExecuteSQLResult.fromJson(result);
   }
 
-  Future<List<String>> getDatabaseTableNames(
-    DatabaseId databaseId,
-  ) async {
+  Future<List<String>> getDatabaseTableNames(DatabaseId databaseId) async {
     var parameters = <String, dynamic>{
       'databaseId': databaseId.toJson(),
     };
@@ -52,11 +48,7 @@ class ExecuteSQLResult {
 
   final Error sqlError;
 
-  ExecuteSQLResult({
-    this.columnNames,
-    this.values,
-    this.sqlError,
-  });
+  ExecuteSQLResult({this.columnNames, this.values, this.sqlError});
 
   factory ExecuteSQLResult.fromJson(Map<String, dynamic> json) {
     return ExecuteSQLResult(
@@ -107,12 +99,11 @@ class Database {
   /// Database version.
   final String version;
 
-  Database({
-    @required this.id,
-    @required this.domain,
-    @required this.name,
-    @required this.version,
-  });
+  Database(
+      {@required this.id,
+      @required this.domain,
+      @required this.name,
+      @required this.version});
 
   factory Database.fromJson(Map<String, dynamic> json) {
     return Database(
@@ -142,10 +133,7 @@ class Error {
   /// Error code.
   final int code;
 
-  Error({
-    @required this.message,
-    @required this.code,
-  });
+  Error({@required this.message, @required this.code});
 
   factory Error.fromJson(Map<String, dynamic> json) {
     return Error(

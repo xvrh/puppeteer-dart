@@ -30,10 +30,7 @@ class ServiceWorkerApi {
           .toList());
 
   Future deliverPushMessage(
-    String origin,
-    String registrationId,
-    String data,
-  ) async {
+      String origin, String registrationId, String data) async {
     var parameters = <String, dynamic>{
       'origin': origin,
       'registrationId': registrationId,
@@ -47,11 +44,7 @@ class ServiceWorkerApi {
   }
 
   Future dispatchSyncEvent(
-    String origin,
-    String registrationId,
-    String tag,
-    bool lastChance,
-  ) async {
+      String origin, String registrationId, String tag, bool lastChance) async {
     var parameters = <String, dynamic>{
       'origin': origin,
       'registrationId': registrationId,
@@ -65,36 +58,28 @@ class ServiceWorkerApi {
     await _client.send('ServiceWorker.enable');
   }
 
-  Future inspectWorker(
-    String versionId,
-  ) async {
+  Future inspectWorker(String versionId) async {
     var parameters = <String, dynamic>{
       'versionId': versionId,
     };
     await _client.send('ServiceWorker.inspectWorker', parameters);
   }
 
-  Future setForceUpdateOnPageLoad(
-    bool forceUpdateOnPageLoad,
-  ) async {
+  Future setForceUpdateOnPageLoad(bool forceUpdateOnPageLoad) async {
     var parameters = <String, dynamic>{
       'forceUpdateOnPageLoad': forceUpdateOnPageLoad,
     };
     await _client.send('ServiceWorker.setForceUpdateOnPageLoad', parameters);
   }
 
-  Future skipWaiting(
-    String scopeURL,
-  ) async {
+  Future skipWaiting(String scopeURL) async {
     var parameters = <String, dynamic>{
       'scopeURL': scopeURL,
     };
     await _client.send('ServiceWorker.skipWaiting', parameters);
   }
 
-  Future startWorker(
-    String scopeURL,
-  ) async {
+  Future startWorker(String scopeURL) async {
     var parameters = <String, dynamic>{
       'scopeURL': scopeURL,
     };
@@ -105,27 +90,21 @@ class ServiceWorkerApi {
     await _client.send('ServiceWorker.stopAllWorkers');
   }
 
-  Future stopWorker(
-    String versionId,
-  ) async {
+  Future stopWorker(String versionId) async {
     var parameters = <String, dynamic>{
       'versionId': versionId,
     };
     await _client.send('ServiceWorker.stopWorker', parameters);
   }
 
-  Future unregister(
-    String scopeURL,
-  ) async {
+  Future unregister(String scopeURL) async {
     var parameters = <String, dynamic>{
       'scopeURL': scopeURL,
     };
     await _client.send('ServiceWorker.unregister', parameters);
   }
 
-  Future updateRegistration(
-    String scopeURL,
-  ) async {
+  Future updateRegistration(String scopeURL) async {
     var parameters = <String, dynamic>{
       'scopeURL': scopeURL,
     };
@@ -141,11 +120,10 @@ class ServiceWorkerRegistration {
 
   final bool isDeleted;
 
-  ServiceWorkerRegistration({
-    @required this.registrationId,
-    @required this.scopeURL,
-    @required this.isDeleted,
-  });
+  ServiceWorkerRegistration(
+      {@required this.registrationId,
+      @required this.scopeURL,
+      @required this.isDeleted});
 
   factory ServiceWorkerRegistration.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerRegistration(
@@ -251,17 +229,16 @@ class ServiceWorkerVersion {
 
   final target.TargetID targetId;
 
-  ServiceWorkerVersion({
-    @required this.versionId,
-    @required this.registrationId,
-    @required this.scriptURL,
-    @required this.runningStatus,
-    @required this.status,
-    this.scriptLastModified,
-    this.scriptResponseTime,
-    this.controlledClients,
-    this.targetId,
-  });
+  ServiceWorkerVersion(
+      {@required this.versionId,
+      @required this.registrationId,
+      @required this.scriptURL,
+      @required this.runningStatus,
+      @required this.status,
+      this.scriptLastModified,
+      this.scriptResponseTime,
+      this.controlledClients,
+      this.targetId});
 
   factory ServiceWorkerVersion.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerVersion(
@@ -327,14 +304,13 @@ class ServiceWorkerErrorMessage {
 
   final int columnNumber;
 
-  ServiceWorkerErrorMessage({
-    @required this.errorMessage,
-    @required this.registrationId,
-    @required this.versionId,
-    @required this.sourceURL,
-    @required this.lineNumber,
-    @required this.columnNumber,
-  });
+  ServiceWorkerErrorMessage(
+      {@required this.errorMessage,
+      @required this.registrationId,
+      @required this.versionId,
+      @required this.sourceURL,
+      @required this.lineNumber,
+      @required this.columnNumber});
 
   factory ServiceWorkerErrorMessage.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerErrorMessage(

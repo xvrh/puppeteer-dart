@@ -28,12 +28,11 @@ class HeadlessExperimentalApi {
   /// [screenshot] If set, a screenshot of the frame will be captured and returned in the response. Otherwise,
   /// no screenshot will be captured. Note that capturing a screenshot can fail, for example,
   /// during renderer initialization. In such a case, no screenshot data will be returned.
-  Future<BeginFrameResult> beginFrame({
-    num frameTimeTicks,
-    num interval,
-    bool noDisplayUpdates,
-    ScreenshotParams screenshot,
-  }) async {
+  Future<BeginFrameResult> beginFrame(
+      {num frameTimeTicks,
+      num interval,
+      bool noDisplayUpdates,
+      ScreenshotParams screenshot}) async {
     var parameters = <String, dynamic>{};
     if (frameTimeTicks != null) {
       parameters['frameTimeTicks'] = frameTimeTicks;
@@ -71,10 +70,7 @@ class BeginFrameResult {
   /// Base64-encoded image data of the screenshot, if one was requested and successfully taken.
   final String screenshotData;
 
-  BeginFrameResult({
-    @required this.hasDamage,
-    this.screenshotData,
-  });
+  BeginFrameResult({@required this.hasDamage, this.screenshotData});
 
   factory BeginFrameResult.fromJson(Map<String, dynamic> json) {
     return BeginFrameResult(
@@ -93,10 +89,7 @@ class ScreenshotParams {
   /// Compression quality from range [0..100] (jpeg only).
   final int quality;
 
-  ScreenshotParams({
-    this.format,
-    this.quality,
-  });
+  ScreenshotParams({this.format, this.quality});
 
   factory ScreenshotParams.fromJson(Map<String, dynamic> json) {
     return ScreenshotParams(

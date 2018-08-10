@@ -39,9 +39,7 @@ class TracingApi {
 
   /// Record a clock sync marker in the trace.
   /// [syncId] The ID of this clock sync marker
-  Future recordClockSyncMarker(
-    String syncId,
-  ) async {
+  Future recordClockSyncMarker(String syncId) async {
     var parameters = <String, dynamic>{
       'syncId': syncId,
     };
@@ -60,14 +58,13 @@ class TracingApi {
   /// stream (defaults to `ReportEvents`).
   /// [streamCompression] Compression format to use. This only applies when using `ReturnAsStream`
   /// transfer mode (defaults to `none`)
-  Future start({
-    @deprecated String categories,
-    @deprecated String options,
-    num bufferUsageReportingInterval,
-    String transferMode,
-    StreamCompression streamCompression,
-    TraceConfig traceConfig,
-  }) async {
+  Future start(
+      {@deprecated String categories,
+      @deprecated String options,
+      num bufferUsageReportingInterval,
+      String transferMode,
+      StreamCompression streamCompression,
+      TraceConfig traceConfig}) async {
     var parameters = <String, dynamic>{};
     // ignore: deprecated_member_use
     if (categories != null) {
@@ -107,11 +104,7 @@ class BufferUsageEvent {
   /// total size.
   final num value;
 
-  BufferUsageEvent({
-    this.percentFull,
-    this.eventCount,
-    this.value,
-  });
+  BufferUsageEvent({this.percentFull, this.eventCount, this.value});
 
   factory BufferUsageEvent.fromJson(Map<String, dynamic> json) {
     return BufferUsageEvent(
@@ -129,10 +122,7 @@ class TracingCompleteEvent {
   /// Compression format of returned stream.
   final StreamCompression streamCompression;
 
-  TracingCompleteEvent({
-    this.stream,
-    this.streamCompression,
-  });
+  TracingCompleteEvent({this.stream, this.streamCompression});
 
   factory TracingCompleteEvent.fromJson(Map<String, dynamic> json) {
     return TracingCompleteEvent(
@@ -153,10 +143,7 @@ class RequestMemoryDumpResult {
   /// True iff the global memory dump succeeded.
   final bool success;
 
-  RequestMemoryDumpResult({
-    @required this.dumpGuid,
-    @required this.success,
-  });
+  RequestMemoryDumpResult({@required this.dumpGuid, @required this.success});
 
   factory RequestMemoryDumpResult.fromJson(Map<String, dynamic> json) {
     return RequestMemoryDumpResult(
@@ -211,16 +198,15 @@ class TraceConfig {
   /// Configuration for memory dump triggers. Used only when "memory-infra" category is enabled.
   final MemoryDumpConfig memoryDumpConfig;
 
-  TraceConfig({
-    this.recordMode,
-    this.enableSampling,
-    this.enableSystrace,
-    this.enableArgumentFilter,
-    this.includedCategories,
-    this.excludedCategories,
-    this.syntheticDelays,
-    this.memoryDumpConfig,
-  });
+  TraceConfig(
+      {this.recordMode,
+      this.enableSampling,
+      this.enableSystrace,
+      this.enableArgumentFilter,
+      this.includedCategories,
+      this.excludedCategories,
+      this.syntheticDelays,
+      this.memoryDumpConfig});
 
   factory TraceConfig.fromJson(Map<String, dynamic> json) {
     return TraceConfig(

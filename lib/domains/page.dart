@@ -128,8 +128,7 @@ class PageApi {
   /// Returns: Identifier of the added script.
   @deprecated
   Future<ScriptIdentifier> addScriptToEvaluateOnLoad(
-    String scriptSource,
-  ) async {
+      String scriptSource) async {
     var parameters = <String, dynamic>{
       'scriptSource': scriptSource,
     };
@@ -141,8 +140,7 @@ class PageApi {
   /// Evaluates given script in every frame upon creation (before loading frame's scripts).
   /// Returns: Identifier of the added script.
   Future<ScriptIdentifier> addScriptToEvaluateOnNewDocument(
-    String source,
-  ) async {
+      String source) async {
     var parameters = <String, dynamic>{
       'source': source,
     };
@@ -162,12 +160,8 @@ class PageApi {
   /// [clip] Capture the screenshot of a given region only.
   /// [fromSurface] Capture the screenshot from the surface, rather than the view. Defaults to true.
   /// Returns: Base64-encoded image data.
-  Future<String> captureScreenshot({
-    String format,
-    int quality,
-    Viewport clip,
-    bool fromSurface,
-  }) async {
+  Future<String> captureScreenshot(
+      {String format, int quality, Viewport clip, bool fromSurface}) async {
     var parameters = <String, dynamic>{};
     if (format != null) {
       parameters['format'] = format;
@@ -209,11 +203,8 @@ class PageApi {
   /// [grantUniveralAccess] Whether or not universal access should be granted to the isolated world. This is a powerful
   /// option, use with caution.
   /// Returns: Execution context of the isolated world.
-  Future<runtime.ExecutionContextId> createIsolatedWorld(
-    FrameId frameId, {
-    String worldName,
-    bool grantUniveralAccess,
-  }) async {
+  Future<runtime.ExecutionContextId> createIsolatedWorld(FrameId frameId,
+      {String worldName, bool grantUniveralAccess}) async {
     var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
     };
@@ -231,10 +222,7 @@ class PageApi {
   /// [cookieName] Name of the cookie to remove.
   /// [url] URL to match cooke domain and path.
   @deprecated
-  Future deleteCookie(
-    String cookieName,
-    String url,
-  ) async {
+  Future deleteCookie(String cookieName, String url) async {
     var parameters = <String, dynamic>{
       'cookieName': cookieName,
       'url': url,
@@ -291,9 +279,7 @@ class PageApi {
   /// [frameId] Frame id to get resource for.
   /// [url] URL of the resource to get content for.
   Future<GetResourceContentResult> getResourceContent(
-    FrameId frameId,
-    String url,
-  ) async {
+      FrameId frameId, String url) async {
     var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
       'url': url,
@@ -313,10 +299,7 @@ class PageApi {
   /// [accept] Whether to accept or dismiss the dialog.
   /// [promptText] The text to enter into the dialog prompt before accepting. Used only if this is a prompt
   /// dialog.
-  Future handleJavaScriptDialog(
-    bool accept, {
-    String promptText,
-  }) async {
+  Future handleJavaScriptDialog(bool accept, {String promptText}) async {
     var parameters = <String, dynamic>{
       'accept': accept,
     };
@@ -331,12 +314,8 @@ class PageApi {
   /// [referrer] Referrer URL.
   /// [transitionType] Intended transition type.
   /// [frameId] Frame id to navigate, if not specified navigates the top frame.
-  Future<NavigateResult> navigate(
-    String url, {
-    String referrer,
-    TransitionType transitionType,
-    FrameId frameId,
-  }) async {
+  Future<NavigateResult> navigate(String url,
+      {String referrer, TransitionType transitionType, FrameId frameId}) async {
     var parameters = <String, dynamic>{
       'url': url,
     };
@@ -355,9 +334,7 @@ class PageApi {
 
   /// Navigates current page to the given history entry.
   /// [entryId] Unique id of the entry to navigate to.
-  Future navigateToHistoryEntry(
-    int entryId,
-  ) async {
+  Future navigateToHistoryEntry(int entryId) async {
     var parameters = <String, dynamic>{
       'entryId': entryId,
     };
@@ -392,23 +369,22 @@ class PageApi {
   /// [preferCSSPageSize] Whether or not to prefer page size as defined by css. Defaults to false,
   /// in which case the content will be scaled to fit the paper size.
   /// Returns: Base64-encoded pdf data.
-  Future<String> printToPDF({
-    bool landscape,
-    bool displayHeaderFooter,
-    bool printBackground,
-    num scale,
-    num paperWidth,
-    num paperHeight,
-    num marginTop,
-    num marginBottom,
-    num marginLeft,
-    num marginRight,
-    String pageRanges,
-    bool ignoreInvalidPageRanges,
-    String headerTemplate,
-    String footerTemplate,
-    bool preferCSSPageSize,
-  }) async {
+  Future<String> printToPDF(
+      {bool landscape,
+      bool displayHeaderFooter,
+      bool printBackground,
+      num scale,
+      num paperWidth,
+      num paperHeight,
+      num marginTop,
+      num marginBottom,
+      num marginLeft,
+      num marginRight,
+      String pageRanges,
+      bool ignoreInvalidPageRanges,
+      String headerTemplate,
+      String footerTemplate,
+      bool preferCSSPageSize}) async {
     var parameters = <String, dynamic>{};
     if (landscape != null) {
       parameters['landscape'] = landscape;
@@ -463,10 +439,7 @@ class PageApi {
   /// [ignoreCache] If true, browser cache is ignored (as if the user pressed Shift+refresh).
   /// [scriptToEvaluateOnLoad] If set, the script will be injected into all frames of the inspected page after reload.
   /// Argument will be ignored if reloading dataURL origin.
-  Future reload({
-    bool ignoreCache,
-    String scriptToEvaluateOnLoad,
-  }) async {
+  Future reload({bool ignoreCache, String scriptToEvaluateOnLoad}) async {
     var parameters = <String, dynamic>{};
     if (ignoreCache != null) {
       parameters['ignoreCache'] = ignoreCache;
@@ -479,9 +452,7 @@ class PageApi {
 
   /// Deprecated, please use removeScriptToEvaluateOnNewDocument instead.
   @deprecated
-  Future removeScriptToEvaluateOnLoad(
-    ScriptIdentifier identifier,
-  ) async {
+  Future removeScriptToEvaluateOnLoad(ScriptIdentifier identifier) async {
     var parameters = <String, dynamic>{
       'identifier': identifier.toJson(),
     };
@@ -490,8 +461,7 @@ class PageApi {
 
   /// Removes given script from the list.
   Future removeScriptToEvaluateOnNewDocument(
-    ScriptIdentifier identifier,
-  ) async {
+      ScriptIdentifier identifier) async {
     var parameters = <String, dynamic>{
       'identifier': identifier.toJson(),
     };
@@ -504,9 +474,7 @@ class PageApi {
 
   /// Acknowledges that a screencast frame has been received by the frontend.
   /// [sessionId] Frame number.
-  Future screencastFrameAck(
-    int sessionId,
-  ) async {
+  Future screencastFrameAck(int sessionId) async {
     var parameters = <String, dynamic>{
       'sessionId': sessionId,
     };
@@ -521,12 +489,8 @@ class PageApi {
   /// [isRegex] If true, treats string parameter as regex.
   /// Returns: List of search matches.
   Future<List<debugger.SearchMatch>> searchInResource(
-    FrameId frameId,
-    String url,
-    String query, {
-    bool caseSensitive,
-    bool isRegex,
-  }) async {
+      FrameId frameId, String url, String query,
+      {bool caseSensitive, bool isRegex}) async {
     var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
       'url': url,
@@ -546,9 +510,7 @@ class PageApi {
 
   /// Enable Chrome's experimental ad filter on all sites.
   /// [enabled] Whether to block ads.
-  Future setAdBlockingEnabled(
-    bool enabled,
-  ) async {
+  Future setAdBlockingEnabled(bool enabled) async {
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
@@ -557,9 +519,7 @@ class PageApi {
 
   /// Enable page Content Security Policy by-passing.
   /// [enabled] Whether to bypass page CSP.
-  Future setBypassCSP(
-    bool enabled,
-  ) async {
+  Future setBypassCSP(bool enabled) async {
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
@@ -584,19 +544,15 @@ class PageApi {
   /// [viewport] The viewport dimensions and scale. If not set, the override is cleared.
   @deprecated
   Future setDeviceMetricsOverride(
-    int width,
-    int height,
-    num deviceScaleFactor,
-    bool mobile, {
-    num scale,
-    int screenWidth,
-    int screenHeight,
-    int positionX,
-    int positionY,
-    bool dontSetVisibleSize,
-    emulation.ScreenOrientation screenOrientation,
-    Viewport viewport,
-  }) async {
+      int width, int height, num deviceScaleFactor, bool mobile,
+      {num scale,
+      int screenWidth,
+      int screenHeight,
+      int positionX,
+      int positionY,
+      bool dontSetVisibleSize,
+      emulation.ScreenOrientation screenOrientation,
+      Viewport viewport}) async {
     var parameters = <String, dynamic>{
       'width': width,
       'height': height,
@@ -635,11 +591,7 @@ class PageApi {
   /// [beta] Mock beta
   /// [gamma] Mock gamma
   @deprecated
-  Future setDeviceOrientationOverride(
-    num alpha,
-    num beta,
-    num gamma,
-  ) async {
+  Future setDeviceOrientationOverride(num alpha, num beta, num gamma) async {
     var parameters = <String, dynamic>{
       'alpha': alpha,
       'beta': beta,
@@ -650,9 +602,7 @@ class PageApi {
 
   /// Set generic font families.
   /// [fontFamilies] Specifies font families to set. If a font family is not specified, it won't be changed.
-  Future setFontFamilies(
-    FontFamilies fontFamilies,
-  ) async {
+  Future setFontFamilies(FontFamilies fontFamilies) async {
     var parameters = <String, dynamic>{
       'fontFamilies': fontFamilies.toJson(),
     };
@@ -661,9 +611,7 @@ class PageApi {
 
   /// Set default font sizes.
   /// [fontSizes] Specifies font sizes to set. If a font size is not specified, it won't be changed.
-  Future setFontSizes(
-    FontSizes fontSizes,
-  ) async {
+  Future setFontSizes(FontSizes fontSizes) async {
     var parameters = <String, dynamic>{
       'fontSizes': fontSizes.toJson(),
     };
@@ -673,10 +621,7 @@ class PageApi {
   /// Sets given markup as the document's HTML.
   /// [frameId] Frame id to set HTML for.
   /// [html] HTML content to set.
-  Future setDocumentContent(
-    FrameId frameId,
-    String html,
-  ) async {
+  Future setDocumentContent(FrameId frameId, String html) async {
     var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
       'html': html,
@@ -688,10 +633,7 @@ class PageApi {
   /// [behavior] Whether to allow all or deny all download requests, or use default Chrome behavior if
   /// available (otherwise deny).
   /// [downloadPath] The default path to save downloaded files to. This is requred if behavior is set to 'allow'
-  Future setDownloadBehavior(
-    String behavior, {
-    String downloadPath,
-  }) async {
+  Future setDownloadBehavior(String behavior, {String downloadPath}) async {
     var parameters = <String, dynamic>{
       'behavior': behavior,
     };
@@ -707,11 +649,8 @@ class PageApi {
   /// [longitude] Mock longitude
   /// [accuracy] Mock accuracy
   @deprecated
-  Future setGeolocationOverride({
-    num latitude,
-    num longitude,
-    num accuracy,
-  }) async {
+  Future setGeolocationOverride(
+      {num latitude, num longitude, num accuracy}) async {
     var parameters = <String, dynamic>{};
     if (latitude != null) {
       parameters['latitude'] = latitude;
@@ -727,9 +666,7 @@ class PageApi {
 
   /// Controls whether page will emit lifecycle events.
   /// [enabled] If true, starts emitting lifecycle events.
-  Future setLifecycleEventsEnabled(
-    bool enabled,
-  ) async {
+  Future setLifecycleEventsEnabled(bool enabled) async {
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
@@ -740,10 +677,7 @@ class PageApi {
   /// [enabled] Whether the touch event emulation should be enabled.
   /// [configuration] Touch/gesture events configuration. Default: current platform.
   @deprecated
-  Future setTouchEmulationEnabled(
-    bool enabled, {
-    String configuration,
-  }) async {
+  Future setTouchEmulationEnabled(bool enabled, {String configuration}) async {
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
@@ -759,13 +693,12 @@ class PageApi {
   /// [maxWidth] Maximum screenshot width.
   /// [maxHeight] Maximum screenshot height.
   /// [everyNthFrame] Send every n-th frame.
-  Future startScreencast({
-    String format,
-    int quality,
-    int maxWidth,
-    int maxHeight,
-    int everyNthFrame,
-  }) async {
+  Future startScreencast(
+      {String format,
+      int quality,
+      int maxWidth,
+      int maxHeight,
+      int everyNthFrame}) async {
     var parameters = <String, dynamic>{};
     if (format != null) {
       parameters['format'] = format;
@@ -804,9 +737,7 @@ class PageApi {
   /// It will transition the page to the given state according to:
   /// https://github.com/WICG/web-lifecycle/
   /// [state] Target lifecycle state
-  Future setWebLifecycleState(
-    String state,
-  ) async {
+  Future setWebLifecycleState(String state) async {
     var parameters = <String, dynamic>{
       'state': state,
     };
@@ -819,9 +750,7 @@ class PageApi {
   }
 
   /// Forces compilation cache to be generated for every subresource script.
-  Future setProduceCompilationCache(
-    bool enabled,
-  ) async {
+  Future setProduceCompilationCache(bool enabled) async {
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
@@ -831,10 +760,7 @@ class PageApi {
   /// Seeds compilation cache for given url. Compilation cache does not survive
   /// cross-process navigation.
   /// [data] Base64-encoded data
-  Future addCompilationCache(
-    String url,
-    String data,
-  ) async {
+  Future addCompilationCache(String url, String data) async {
     var parameters = <String, dynamic>{
       'url': url,
       'data': data,
@@ -858,11 +784,8 @@ class FrameAttachedEvent {
   /// JavaScript stack trace of when frame was attached, only set if frame initiated from script.
   final runtime.StackTrace stack;
 
-  FrameAttachedEvent({
-    @required this.frameId,
-    @required this.parentFrameId,
-    this.stack,
-  });
+  FrameAttachedEvent(
+      {@required this.frameId, @required this.parentFrameId, this.stack});
 
   factory FrameAttachedEvent.fromJson(Map<String, dynamic> json) {
     return FrameAttachedEvent(
@@ -889,12 +812,11 @@ class FrameScheduledNavigationEvent {
   /// The destination URL for the scheduled navigation.
   final String url;
 
-  FrameScheduledNavigationEvent({
-    @required this.frameId,
-    @required this.delay,
-    @required this.reason,
-    @required this.url,
-  });
+  FrameScheduledNavigationEvent(
+      {@required this.frameId,
+      @required this.delay,
+      @required this.reason,
+      @required this.url});
 
   factory FrameScheduledNavigationEvent.fromJson(Map<String, dynamic> json) {
     return FrameScheduledNavigationEvent(
@@ -913,10 +835,8 @@ class JavascriptDialogClosedEvent {
   /// User input in case of prompt.
   final String userInput;
 
-  JavascriptDialogClosedEvent({
-    @required this.result,
-    @required this.userInput,
-  });
+  JavascriptDialogClosedEvent(
+      {@required this.result, @required this.userInput});
 
   factory JavascriptDialogClosedEvent.fromJson(Map<String, dynamic> json) {
     return JavascriptDialogClosedEvent(
@@ -944,13 +864,12 @@ class JavascriptDialogOpeningEvent {
   /// Default dialog prompt.
   final String defaultPrompt;
 
-  JavascriptDialogOpeningEvent({
-    @required this.url,
-    @required this.message,
-    @required this.type,
-    @required this.hasBrowserHandler,
-    this.defaultPrompt,
-  });
+  JavascriptDialogOpeningEvent(
+      {@required this.url,
+      @required this.message,
+      @required this.type,
+      @required this.hasBrowserHandler,
+      this.defaultPrompt});
 
   factory JavascriptDialogOpeningEvent.fromJson(Map<String, dynamic> json) {
     return JavascriptDialogOpeningEvent(
@@ -975,12 +894,11 @@ class LifecycleEventEvent {
 
   final network.MonotonicTime timestamp;
 
-  LifecycleEventEvent({
-    @required this.frameId,
-    @required this.loaderId,
-    @required this.name,
-    @required this.timestamp,
-  });
+  LifecycleEventEvent(
+      {@required this.frameId,
+      @required this.loaderId,
+      @required this.name,
+      @required this.timestamp});
 
   factory LifecycleEventEvent.fromJson(Map<String, dynamic> json) {
     return LifecycleEventEvent(
@@ -999,10 +917,7 @@ class NavigatedWithinDocumentEvent {
   /// Frame's new url.
   final String url;
 
-  NavigatedWithinDocumentEvent({
-    @required this.frameId,
-    @required this.url,
-  });
+  NavigatedWithinDocumentEvent({@required this.frameId, @required this.url});
 
   factory NavigatedWithinDocumentEvent.fromJson(Map<String, dynamic> json) {
     return NavigatedWithinDocumentEvent(
@@ -1022,11 +937,8 @@ class ScreencastFrameEvent {
   /// Frame number.
   final int sessionId;
 
-  ScreencastFrameEvent({
-    @required this.data,
-    @required this.metadata,
-    @required this.sessionId,
-  });
+  ScreencastFrameEvent(
+      {@required this.data, @required this.metadata, @required this.sessionId});
 
   factory ScreencastFrameEvent.fromJson(Map<String, dynamic> json) {
     return ScreencastFrameEvent(
@@ -1050,12 +962,11 @@ class WindowOpenEvent {
   /// Whether or not it was triggered by user gesture.
   final bool userGesture;
 
-  WindowOpenEvent({
-    @required this.url,
-    @required this.windowName,
-    @required this.windowFeatures,
-    @required this.userGesture,
-  });
+  WindowOpenEvent(
+      {@required this.url,
+      @required this.windowName,
+      @required this.windowFeatures,
+      @required this.userGesture});
 
   factory WindowOpenEvent.fromJson(Map<String, dynamic> json) {
     return WindowOpenEvent(
@@ -1074,10 +985,7 @@ class CompilationCacheProducedEvent {
   /// Base64-encoded data
   final String data;
 
-  CompilationCacheProducedEvent({
-    @required this.url,
-    @required this.data,
-  });
+  CompilationCacheProducedEvent({@required this.url, @required this.data});
 
   factory CompilationCacheProducedEvent.fromJson(Map<String, dynamic> json) {
     return CompilationCacheProducedEvent(
@@ -1096,11 +1004,7 @@ class GetAppManifestResult {
   /// Manifest content.
   final String data;
 
-  GetAppManifestResult({
-    @required this.url,
-    @required this.errors,
-    this.data,
-  });
+  GetAppManifestResult({@required this.url, @required this.errors, this.data});
 
   factory GetAppManifestResult.fromJson(Map<String, dynamic> json) {
     return GetAppManifestResult(
@@ -1123,11 +1027,10 @@ class GetLayoutMetricsResult {
   /// Size of scrollable area.
   final dom.Rect contentSize;
 
-  GetLayoutMetricsResult({
-    @required this.layoutViewport,
-    @required this.visualViewport,
-    @required this.contentSize,
-  });
+  GetLayoutMetricsResult(
+      {@required this.layoutViewport,
+      @required this.visualViewport,
+      @required this.contentSize});
 
   factory GetLayoutMetricsResult.fromJson(Map<String, dynamic> json) {
     return GetLayoutMetricsResult(
@@ -1145,10 +1048,8 @@ class GetNavigationHistoryResult {
   /// Array of navigation history entries.
   final List<NavigationEntry> entries;
 
-  GetNavigationHistoryResult({
-    @required this.currentIndex,
-    @required this.entries,
-  });
+  GetNavigationHistoryResult(
+      {@required this.currentIndex, @required this.entries});
 
   factory GetNavigationHistoryResult.fromJson(Map<String, dynamic> json) {
     return GetNavigationHistoryResult(
@@ -1167,10 +1068,8 @@ class GetResourceContentResult {
   /// True, if content was served as base64.
   final bool base64Encoded;
 
-  GetResourceContentResult({
-    @required this.content,
-    @required this.base64Encoded,
-  });
+  GetResourceContentResult(
+      {@required this.content, @required this.base64Encoded});
 
   factory GetResourceContentResult.fromJson(Map<String, dynamic> json) {
     return GetResourceContentResult(
@@ -1190,11 +1089,7 @@ class NavigateResult {
   /// User friendly error message, present if and only if navigation has failed.
   final String errorText;
 
-  NavigateResult({
-    @required this.frameId,
-    this.loaderId,
-    this.errorText,
-  });
+  NavigateResult({@required this.frameId, this.loaderId, this.errorText});
 
   factory NavigateResult.fromJson(Map<String, dynamic> json) {
     return NavigateResult(
@@ -1304,16 +1199,15 @@ class Frame {
   /// If the frame failed to load, this contains the URL that could not be loaded.
   final String unreachableUrl;
 
-  Frame({
-    @required this.id,
-    this.parentId,
-    @required this.loaderId,
-    this.name,
-    @required this.url,
-    @required this.securityOrigin,
-    @required this.mimeType,
-    this.unreachableUrl,
-  });
+  Frame(
+      {@required this.id,
+      this.parentId,
+      @required this.loaderId,
+      this.name,
+      @required this.url,
+      @required this.securityOrigin,
+      @required this.mimeType,
+      this.unreachableUrl});
 
   factory Frame.fromJson(Map<String, dynamic> json) {
     return Frame(
@@ -1373,15 +1267,14 @@ class FrameResource {
   /// True if the resource was canceled during loading.
   final bool canceled;
 
-  FrameResource({
-    @required this.url,
-    @required this.type,
-    @required this.mimeType,
-    this.lastModified,
-    this.contentSize,
-    this.failed,
-    this.canceled,
-  });
+  FrameResource(
+      {@required this.url,
+      @required this.type,
+      @required this.mimeType,
+      this.lastModified,
+      this.contentSize,
+      this.failed,
+      this.canceled});
 
   factory FrameResource.fromJson(Map<String, dynamic> json) {
     return FrameResource(
@@ -1430,11 +1323,8 @@ class FrameResourceTree {
   /// Information about frame resources.
   final List<FrameResource> resources;
 
-  FrameResourceTree({
-    @required this.frame,
-    this.childFrames,
-    @required this.resources,
-  });
+  FrameResourceTree(
+      {@required this.frame, this.childFrames, @required this.resources});
 
   factory FrameResourceTree.fromJson(Map<String, dynamic> json) {
     return FrameResourceTree(
@@ -1470,10 +1360,7 @@ class FrameTree {
   /// Child frames.
   final List<FrameTree> childFrames;
 
-  FrameTree({
-    @required this.frame,
-    this.childFrames,
-  });
+  FrameTree({@required this.frame, this.childFrames});
 
   factory FrameTree.fromJson(Map<String, dynamic> json) {
     return FrameTree(
@@ -1581,13 +1468,12 @@ class NavigationEntry {
   /// Transition type.
   final TransitionType transitionType;
 
-  NavigationEntry({
-    @required this.id,
-    @required this.url,
-    @required this.userTypedURL,
-    @required this.title,
-    @required this.transitionType,
-  });
+  NavigationEntry(
+      {@required this.id,
+      @required this.url,
+      @required this.userTypedURL,
+      @required this.title,
+      @required this.transitionType});
 
   factory NavigationEntry.fromJson(Map<String, dynamic> json) {
     return NavigationEntry(
@@ -1634,15 +1520,14 @@ class ScreencastFrameMetadata {
   /// Frame swap timestamp.
   final network.TimeSinceEpoch timestamp;
 
-  ScreencastFrameMetadata({
-    @required this.offsetTop,
-    @required this.pageScaleFactor,
-    @required this.deviceWidth,
-    @required this.deviceHeight,
-    @required this.scrollOffsetX,
-    @required this.scrollOffsetY,
-    this.timestamp,
-  });
+  ScreencastFrameMetadata(
+      {@required this.offsetTop,
+      @required this.pageScaleFactor,
+      @required this.deviceWidth,
+      @required this.deviceHeight,
+      @required this.scrollOffsetX,
+      @required this.scrollOffsetY,
+      this.timestamp});
 
   factory ScreencastFrameMetadata.fromJson(Map<String, dynamic> json) {
     return ScreencastFrameMetadata(
@@ -1713,12 +1598,11 @@ class AppManifestError {
   /// Error column.
   final int column;
 
-  AppManifestError({
-    @required this.message,
-    @required this.critical,
-    @required this.line,
-    @required this.column,
-  });
+  AppManifestError(
+      {@required this.message,
+      @required this.critical,
+      @required this.line,
+      @required this.column});
 
   factory AppManifestError.fromJson(Map<String, dynamic> json) {
     return AppManifestError(
@@ -1754,12 +1638,11 @@ class LayoutViewport {
   /// Height (CSS pixels), excludes scrollbar if present.
   final int clientHeight;
 
-  LayoutViewport({
-    @required this.pageX,
-    @required this.pageY,
-    @required this.clientWidth,
-    @required this.clientHeight,
-  });
+  LayoutViewport(
+      {@required this.pageX,
+      @required this.pageY,
+      @required this.clientWidth,
+      @required this.clientHeight});
 
   factory LayoutViewport.fromJson(Map<String, dynamic> json) {
     return LayoutViewport(
@@ -1804,15 +1687,14 @@ class VisualViewport {
   /// Scale relative to the ideal viewport (size at width=device-width).
   final num scale;
 
-  VisualViewport({
-    @required this.offsetX,
-    @required this.offsetY,
-    @required this.pageX,
-    @required this.pageY,
-    @required this.clientWidth,
-    @required this.clientHeight,
-    @required this.scale,
-  });
+  VisualViewport(
+      {@required this.offsetX,
+      @required this.offsetY,
+      @required this.pageX,
+      @required this.pageY,
+      @required this.clientWidth,
+      @required this.clientHeight,
+      @required this.scale});
 
   factory VisualViewport.fromJson(Map<String, dynamic> json) {
     return VisualViewport(
@@ -1857,13 +1739,12 @@ class Viewport {
   /// Page scale factor.
   final num scale;
 
-  Viewport({
-    @required this.x,
-    @required this.y,
-    @required this.width,
-    @required this.height,
-    @required this.scale,
-  });
+  Viewport(
+      {@required this.x,
+      @required this.y,
+      @required this.width,
+      @required this.height,
+      @required this.scale});
 
   factory Viewport.fromJson(Map<String, dynamic> json) {
     return Viewport(
@@ -1910,15 +1791,14 @@ class FontFamilies {
   /// The pictograph font-family.
   final String pictograph;
 
-  FontFamilies({
-    this.standard,
-    this.fixed,
-    this.serif,
-    this.sansSerif,
-    this.cursive,
-    this.fantasy,
-    this.pictograph,
-  });
+  FontFamilies(
+      {this.standard,
+      this.fixed,
+      this.serif,
+      this.sansSerif,
+      this.cursive,
+      this.fantasy,
+      this.pictograph});
 
   factory FontFamilies.fromJson(Map<String, dynamic> json) {
     return FontFamilies(
@@ -1967,10 +1847,7 @@ class FontSizes {
   /// Default fixed font size.
   final int fixed;
 
-  FontSizes({
-    this.standard,
-    this.fixed,
-  });
+  FontSizes({this.standard, this.fixed});
 
   factory FontSizes.fromJson(Map<String, dynamic> json) {
     return FontSizes(

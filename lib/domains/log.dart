@@ -33,9 +33,7 @@ class LogApi {
 
   /// start violation reporting.
   /// [config] Configuration for violations.
-  Future startViolationsReport(
-    List<ViolationSetting> config,
-  ) async {
+  Future startViolationsReport(List<ViolationSetting> config) async {
     var parameters = <String, dynamic>{
       'config': config.map((e) => e.toJson()).toList(),
     };
@@ -80,18 +78,17 @@ class LogEntry {
   /// Call arguments.
   final List<runtime.RemoteObject> args;
 
-  LogEntry({
-    @required this.source,
-    @required this.level,
-    @required this.text,
-    @required this.timestamp,
-    this.url,
-    this.lineNumber,
-    this.stackTrace,
-    this.networkRequestId,
-    this.workerId,
-    this.args,
-  });
+  LogEntry(
+      {@required this.source,
+      @required this.level,
+      @required this.text,
+      @required this.timestamp,
+      this.url,
+      this.lineNumber,
+      this.stackTrace,
+      this.networkRequestId,
+      this.workerId,
+      this.args});
 
   factory LogEntry.fromJson(Map<String, dynamic> json) {
     return LogEntry(
@@ -153,10 +150,7 @@ class ViolationSetting {
   /// Time threshold to trigger upon.
   final num threshold;
 
-  ViolationSetting({
-    @required this.name,
-    @required this.threshold,
-  });
+  ViolationSetting({@required this.name, @required this.threshold});
 
   factory ViolationSetting.fromJson(Map<String, dynamic> json) {
     return ViolationSetting(

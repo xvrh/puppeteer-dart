@@ -51,10 +51,7 @@ class CSSApi {
   /// [location] Text position of a new rule in the target style sheet.
   /// Returns: The newly created rule.
   Future<CSSRule> addRule(
-    StyleSheetId styleSheetId,
-    String ruleText,
-    SourceRange location,
-  ) async {
+      StyleSheetId styleSheetId, String ruleText, SourceRange location) async {
     var parameters = <String, dynamic>{
       'styleSheetId': styleSheetId.toJson(),
       'ruleText': ruleText,
@@ -66,9 +63,7 @@ class CSSApi {
 
   /// Returns all class names from specified stylesheet.
   /// Returns: Class name list.
-  Future<List<String>> collectClassNames(
-    StyleSheetId styleSheetId,
-  ) async {
+  Future<List<String>> collectClassNames(StyleSheetId styleSheetId) async {
     var parameters = <String, dynamic>{
       'styleSheetId': styleSheetId.toJson(),
     };
@@ -79,9 +74,7 @@ class CSSApi {
   /// Creates a new special "via-inspector" stylesheet in the frame with given `frameId`.
   /// [frameId] Identifier of the frame where "via-inspector" stylesheet should be created.
   /// Returns: Identifier of the created "via-inspector" stylesheet.
-  Future<StyleSheetId> createStyleSheet(
-    page.FrameId frameId,
-  ) async {
+  Future<StyleSheetId> createStyleSheet(page.FrameId frameId) async {
     var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
     };
@@ -105,9 +98,7 @@ class CSSApi {
   /// [nodeId] The element id for which to force the pseudo state.
   /// [forcedPseudoClasses] Element pseudo classes to force when computing the element's style.
   Future forcePseudoState(
-    dom.NodeId nodeId,
-    List<String> forcedPseudoClasses,
-  ) async {
+      dom.NodeId nodeId, List<String> forcedPseudoClasses) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'forcedPseudoClasses': forcedPseudoClasses.map((e) => e).toList(),
@@ -117,8 +108,7 @@ class CSSApi {
 
   /// [nodeId] Id of the node to get background colors for.
   Future<GetBackgroundColorsResult> getBackgroundColors(
-    dom.NodeId nodeId,
-  ) async {
+      dom.NodeId nodeId) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
@@ -129,8 +119,7 @@ class CSSApi {
   /// Returns the computed style for a DOM node identified by `nodeId`.
   /// Returns: Computed style for the specified DOM node.
   Future<List<CSSComputedStyleProperty>> getComputedStyleForNode(
-    dom.NodeId nodeId,
-  ) async {
+      dom.NodeId nodeId) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
@@ -143,8 +132,7 @@ class CSSApi {
   /// Returns the styles defined inline (explicitly in the "style" attribute and implicitly, using DOM
   /// attributes) for a DOM node identified by `nodeId`.
   Future<GetInlineStylesForNodeResult> getInlineStylesForNode(
-    dom.NodeId nodeId,
-  ) async {
+      dom.NodeId nodeId) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
@@ -154,8 +142,7 @@ class CSSApi {
 
   /// Returns requested styles for a DOM node identified by `nodeId`.
   Future<GetMatchedStylesForNodeResult> getMatchedStylesForNode(
-    dom.NodeId nodeId,
-  ) async {
+      dom.NodeId nodeId) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
@@ -173,8 +160,7 @@ class CSSApi {
   /// node.
   /// Returns: Usage statistics for every employed platform font.
   Future<List<PlatformFontUsage>> getPlatformFontsForNode(
-    dom.NodeId nodeId,
-  ) async {
+      dom.NodeId nodeId) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
@@ -186,9 +172,7 @@ class CSSApi {
 
   /// Returns the current textual content for a stylesheet.
   /// Returns: The stylesheet text.
-  Future<String> getStyleSheetText(
-    StyleSheetId styleSheetId,
-  ) async {
+  Future<String> getStyleSheetText(StyleSheetId styleSheetId) async {
     var parameters = <String, dynamic>{
       'styleSheetId': styleSheetId.toJson(),
     };
@@ -200,10 +184,7 @@ class CSSApi {
   /// property
   /// [nodeId] The element id for which to set property.
   Future setEffectivePropertyValueForNode(
-    dom.NodeId nodeId,
-    String propertyName,
-    String value,
-  ) async {
+      dom.NodeId nodeId, String propertyName, String value) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'propertyName': propertyName,
@@ -215,10 +196,7 @@ class CSSApi {
   /// Modifies the keyframe rule key text.
   /// Returns: The resulting key text after modification.
   Future<Value> setKeyframeKey(
-    StyleSheetId styleSheetId,
-    SourceRange range,
-    String keyText,
-  ) async {
+      StyleSheetId styleSheetId, SourceRange range, String keyText) async {
     var parameters = <String, dynamic>{
       'styleSheetId': styleSheetId.toJson(),
       'range': range.toJson(),
@@ -231,10 +209,7 @@ class CSSApi {
   /// Modifies the rule selector.
   /// Returns: The resulting CSS media rule after modification.
   Future<CSSMedia> setMediaText(
-    StyleSheetId styleSheetId,
-    SourceRange range,
-    String text,
-  ) async {
+      StyleSheetId styleSheetId, SourceRange range, String text) async {
     var parameters = <String, dynamic>{
       'styleSheetId': styleSheetId.toJson(),
       'range': range.toJson(),
@@ -247,10 +222,7 @@ class CSSApi {
   /// Modifies the rule selector.
   /// Returns: The resulting selector list after modification.
   Future<SelectorList> setRuleSelector(
-    StyleSheetId styleSheetId,
-    SourceRange range,
-    String selector,
-  ) async {
+      StyleSheetId styleSheetId, SourceRange range, String selector) async {
     var parameters = <String, dynamic>{
       'styleSheetId': styleSheetId.toJson(),
       'range': range.toJson(),
@@ -263,9 +235,7 @@ class CSSApi {
   /// Sets the new stylesheet text.
   /// Returns: URL of source map associated with script (if any).
   Future<String> setStyleSheetText(
-    StyleSheetId styleSheetId,
-    String text,
-  ) async {
+      StyleSheetId styleSheetId, String text) async {
     var parameters = <String, dynamic>{
       'styleSheetId': styleSheetId.toJson(),
       'text': text,
@@ -276,9 +246,7 @@ class CSSApi {
 
   /// Applies specified style edits one after another in the given order.
   /// Returns: The resulting styles after modification.
-  Future<List<CSSStyle>> setStyleTexts(
-    List<StyleDeclarationEdit> edits,
-  ) async {
+  Future<List<CSSStyle>> setStyleTexts(List<StyleDeclarationEdit> edits) async {
     var parameters = <String, dynamic>{
       'edits': edits.map((e) => e.toJson()).toList(),
     };
@@ -328,12 +296,11 @@ class GetBackgroundColorsResult {
   /// The computed font size for the document body, as a computed CSS value string (e.g. '16px').
   final String computedBodyFontSize;
 
-  GetBackgroundColorsResult({
-    this.backgroundColors,
-    this.computedFontSize,
-    this.computedFontWeight,
-    this.computedBodyFontSize,
-  });
+  GetBackgroundColorsResult(
+      {this.backgroundColors,
+      this.computedFontSize,
+      this.computedFontWeight,
+      this.computedBodyFontSize});
 
   factory GetBackgroundColorsResult.fromJson(Map<String, dynamic> json) {
     return GetBackgroundColorsResult(
@@ -360,10 +327,7 @@ class GetInlineStylesForNodeResult {
   /// Attribute-defined element style (e.g. resulting from "width=20 height=100%").
   final CSSStyle attributesStyle;
 
-  GetInlineStylesForNodeResult({
-    this.inlineStyle,
-    this.attributesStyle,
-  });
+  GetInlineStylesForNodeResult({this.inlineStyle, this.attributesStyle});
 
   factory GetInlineStylesForNodeResult.fromJson(Map<String, dynamic> json) {
     return GetInlineStylesForNodeResult(
@@ -396,14 +360,13 @@ class GetMatchedStylesForNodeResult {
   /// A list of CSS keyframed animations matching this node.
   final List<CSSKeyframesRule> cssKeyframesRules;
 
-  GetMatchedStylesForNodeResult({
-    this.inlineStyle,
-    this.attributesStyle,
-    this.matchedCSSRules,
-    this.pseudoElements,
-    this.inherited,
-    this.cssKeyframesRules,
-  });
+  GetMatchedStylesForNodeResult(
+      {this.inlineStyle,
+      this.attributesStyle,
+      this.matchedCSSRules,
+      this.pseudoElements,
+      this.inherited,
+      this.cssKeyframesRules});
 
   factory GetMatchedStylesForNodeResult.fromJson(Map<String, dynamic> json) {
     return GetMatchedStylesForNodeResult(
@@ -493,10 +456,7 @@ class PseudoElementMatches {
   /// Matches of CSS rules applicable to the pseudo style.
   final List<RuleMatch> matches;
 
-  PseudoElementMatches({
-    @required this.pseudoType,
-    @required this.matches,
-  });
+  PseudoElementMatches({@required this.pseudoType, @required this.matches});
 
   factory PseudoElementMatches.fromJson(Map<String, dynamic> json) {
     return PseudoElementMatches(
@@ -523,10 +483,7 @@ class InheritedStyleEntry {
   /// Matches of CSS rules matching the ancestor node in the style inheritance chain.
   final List<RuleMatch> matchedCSSRules;
 
-  InheritedStyleEntry({
-    this.inlineStyle,
-    @required this.matchedCSSRules,
-  });
+  InheritedStyleEntry({this.inlineStyle, @required this.matchedCSSRules});
 
   factory InheritedStyleEntry.fromJson(Map<String, dynamic> json) {
     return InheritedStyleEntry(
@@ -558,10 +515,7 @@ class RuleMatch {
   /// Matching selector indices in the rule's selectorList selectors (0-based).
   final List<int> matchingSelectors;
 
-  RuleMatch({
-    @required this.rule,
-    @required this.matchingSelectors,
-  });
+  RuleMatch({@required this.rule, @required this.matchingSelectors});
 
   factory RuleMatch.fromJson(Map<String, dynamic> json) {
     return RuleMatch(
@@ -588,10 +542,7 @@ class Value {
   /// Value range in the underlying resource (if available).
   final SourceRange range;
 
-  Value({
-    @required this.text,
-    this.range,
-  });
+  Value({@required this.text, this.range});
 
   factory Value.fromJson(Map<String, dynamic> json) {
     return Value(
@@ -621,10 +572,7 @@ class SelectorList {
   /// Rule selector text.
   final String text;
 
-  SelectorList({
-    @required this.selectors,
-    @required this.text,
-  });
+  SelectorList({@required this.selectors, @required this.text});
 
   factory SelectorList.fromJson(Map<String, dynamic> json) {
     return SelectorList(
@@ -685,21 +633,20 @@ class CSSStyleSheetHeader {
   /// Size of the content (in characters).
   final num length;
 
-  CSSStyleSheetHeader({
-    @required this.styleSheetId,
-    @required this.frameId,
-    @required this.sourceURL,
-    this.sourceMapURL,
-    @required this.origin,
-    @required this.title,
-    this.ownerNode,
-    @required this.disabled,
-    this.hasSourceURL,
-    @required this.isInline,
-    @required this.startLine,
-    @required this.startColumn,
-    @required this.length,
-  });
+  CSSStyleSheetHeader(
+      {@required this.styleSheetId,
+      @required this.frameId,
+      @required this.sourceURL,
+      this.sourceMapURL,
+      @required this.origin,
+      @required this.title,
+      this.ownerNode,
+      @required this.disabled,
+      this.hasSourceURL,
+      @required this.isInline,
+      @required this.startLine,
+      @required this.startColumn,
+      @required this.length});
 
   factory CSSStyleSheetHeader.fromJson(Map<String, dynamic> json) {
     return CSSStyleSheetHeader(
@@ -768,13 +715,12 @@ class CSSRule {
   /// starting with the innermost one, going outwards.
   final List<CSSMedia> media;
 
-  CSSRule({
-    this.styleSheetId,
-    @required this.selectorList,
-    @required this.origin,
-    @required this.style,
-    this.media,
-  });
+  CSSRule(
+      {this.styleSheetId,
+      @required this.selectorList,
+      @required this.origin,
+      @required this.style,
+      this.media});
 
   factory CSSRule.fromJson(Map<String, dynamic> json) {
     return CSSRule(
@@ -821,12 +767,11 @@ class RuleUsage {
   /// Indicates whether the rule was actually used by some element in the page.
   final bool used;
 
-  RuleUsage({
-    @required this.styleSheetId,
-    @required this.startOffset,
-    @required this.endOffset,
-    @required this.used,
-  });
+  RuleUsage(
+      {@required this.styleSheetId,
+      @required this.startOffset,
+      @required this.endOffset,
+      @required this.used});
 
   factory RuleUsage.fromJson(Map<String, dynamic> json) {
     return RuleUsage(
@@ -862,12 +807,11 @@ class SourceRange {
   /// End column of range (exclusive).
   final int endColumn;
 
-  SourceRange({
-    @required this.startLine,
-    @required this.startColumn,
-    @required this.endLine,
-    @required this.endColumn,
-  });
+  SourceRange(
+      {@required this.startLine,
+      @required this.startColumn,
+      @required this.endLine,
+      @required this.endColumn});
 
   factory SourceRange.fromJson(Map<String, dynamic> json) {
     return SourceRange(
@@ -899,11 +843,7 @@ class ShorthandEntry {
   /// Whether the property has "!important" annotation (implies `false` if absent).
   final bool important;
 
-  ShorthandEntry({
-    @required this.name,
-    @required this.value,
-    this.important,
-  });
+  ShorthandEntry({@required this.name, @required this.value, this.important});
 
   factory ShorthandEntry.fromJson(Map<String, dynamic> json) {
     return ShorthandEntry(
@@ -932,10 +872,7 @@ class CSSComputedStyleProperty {
   /// Computed style property value.
   final String value;
 
-  CSSComputedStyleProperty({
-    @required this.name,
-    @required this.value,
-  });
+  CSSComputedStyleProperty({@required this.name, @required this.value});
 
   factory CSSComputedStyleProperty.fromJson(Map<String, dynamic> json) {
     return CSSComputedStyleProperty(
@@ -971,13 +908,12 @@ class CSSStyle {
   /// Style declaration range in the enclosing stylesheet (if available).
   final SourceRange range;
 
-  CSSStyle({
-    this.styleSheetId,
-    @required this.cssProperties,
-    @required this.shorthandEntries,
-    this.cssText,
-    this.range,
-  });
+  CSSStyle(
+      {this.styleSheetId,
+      @required this.cssProperties,
+      @required this.shorthandEntries,
+      this.cssText,
+      this.range});
 
   factory CSSStyle.fromJson(Map<String, dynamic> json) {
     return CSSStyle(
@@ -1041,16 +977,15 @@ class CSSProperty {
   /// The entire property range in the enclosing style declaration (if available).
   final SourceRange range;
 
-  CSSProperty({
-    @required this.name,
-    @required this.value,
-    this.important,
-    this.implicit,
-    this.text,
-    this.parsedOk,
-    this.disabled,
-    this.range,
-  });
+  CSSProperty(
+      {@required this.name,
+      @required this.value,
+      this.important,
+      this.implicit,
+      this.text,
+      this.parsedOk,
+      this.disabled,
+      this.range});
 
   factory CSSProperty.fromJson(Map<String, dynamic> json) {
     return CSSProperty(
@@ -1118,14 +1053,13 @@ class CSSMedia {
   /// Array of media queries.
   final List<MediaQuery> mediaList;
 
-  CSSMedia({
-    @required this.text,
-    @required this.source,
-    this.sourceURL,
-    this.range,
-    this.styleSheetId,
-    this.mediaList,
-  });
+  CSSMedia(
+      {@required this.text,
+      @required this.source,
+      this.sourceURL,
+      this.range,
+      this.styleSheetId,
+      this.mediaList});
 
   factory CSSMedia.fromJson(Map<String, dynamic> json) {
     return CSSMedia(
@@ -1175,10 +1109,7 @@ class MediaQuery {
   /// Whether the media query condition is satisfied.
   final bool active;
 
-  MediaQuery({
-    @required this.expressions,
-    @required this.active,
-  });
+  MediaQuery({@required this.expressions, @required this.active});
 
   factory MediaQuery.fromJson(Map<String, dynamic> json) {
     return MediaQuery(
@@ -1215,13 +1146,12 @@ class MediaQueryExpression {
   /// Computed length of media query expression (if applicable).
   final num computedLength;
 
-  MediaQueryExpression({
-    @required this.value,
-    @required this.unit,
-    @required this.feature,
-    this.valueRange,
-    this.computedLength,
-  });
+  MediaQueryExpression(
+      {@required this.value,
+      @required this.unit,
+      @required this.feature,
+      this.valueRange,
+      this.computedLength});
 
   factory MediaQueryExpression.fromJson(Map<String, dynamic> json) {
     return MediaQueryExpression(
@@ -1263,11 +1193,10 @@ class PlatformFontUsage {
   /// Amount of glyphs that were rendered with this font.
   final num glyphCount;
 
-  PlatformFontUsage({
-    @required this.familyName,
-    @required this.isCustomFont,
-    @required this.glyphCount,
-  });
+  PlatformFontUsage(
+      {@required this.familyName,
+      @required this.isCustomFont,
+      @required this.glyphCount});
 
   factory PlatformFontUsage.fromJson(Map<String, dynamic> json) {
     return PlatformFontUsage(
@@ -1313,16 +1242,15 @@ class FontFace {
   /// The resolved platform font family
   final String platformFontFamily;
 
-  FontFace({
-    @required this.fontFamily,
-    @required this.fontStyle,
-    @required this.fontVariant,
-    @required this.fontWeight,
-    @required this.fontStretch,
-    @required this.unicodeRange,
-    @required this.src,
-    @required this.platformFontFamily,
-  });
+  FontFace(
+      {@required this.fontFamily,
+      @required this.fontStyle,
+      @required this.fontVariant,
+      @required this.fontWeight,
+      @required this.fontStretch,
+      @required this.unicodeRange,
+      @required this.src,
+      @required this.platformFontFamily});
 
   factory FontFace.fromJson(Map<String, dynamic> json) {
     return FontFace(
@@ -1360,10 +1288,7 @@ class CSSKeyframesRule {
   /// List of keyframes.
   final List<CSSKeyframeRule> keyframes;
 
-  CSSKeyframesRule({
-    @required this.animationName,
-    @required this.keyframes,
-  });
+  CSSKeyframesRule({@required this.animationName, @required this.keyframes});
 
   factory CSSKeyframesRule.fromJson(Map<String, dynamic> json) {
     return CSSKeyframesRule(
@@ -1398,12 +1323,11 @@ class CSSKeyframeRule {
   /// Associated style declaration.
   final CSSStyle style;
 
-  CSSKeyframeRule({
-    this.styleSheetId,
-    @required this.origin,
-    @required this.keyText,
-    @required this.style,
-  });
+  CSSKeyframeRule(
+      {this.styleSheetId,
+      @required this.origin,
+      @required this.keyText,
+      @required this.style});
 
   factory CSSKeyframeRule.fromJson(Map<String, dynamic> json) {
     return CSSKeyframeRule(
@@ -1440,11 +1364,8 @@ class StyleDeclarationEdit {
   /// New style text.
   final String text;
 
-  StyleDeclarationEdit({
-    @required this.styleSheetId,
-    @required this.range,
-    @required this.text,
-  });
+  StyleDeclarationEdit(
+      {@required this.styleSheetId, @required this.range, @required this.text});
 
   factory StyleDeclarationEdit.fromJson(Map<String, dynamic> json) {
     return StyleDeclarationEdit(

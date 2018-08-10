@@ -41,9 +41,7 @@ class OverlayApi {
   /// For testing.
   /// [nodeId] Id of the node to get highlight object for.
   /// Returns: Highlight data for the node.
-  Future<Map> getHighlightObjectForTest(
-    dom.NodeId nodeId,
-  ) async {
+  Future<Map> getHighlightObjectForTest(dom.NodeId nodeId) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
@@ -61,11 +59,8 @@ class OverlayApi {
   /// [frameId] Identifier of the frame to highlight.
   /// [contentColor] The content box highlight fill color (default: transparent).
   /// [contentOutlineColor] The content box highlight outline color (default: transparent).
-  Future highlightFrame(
-    page.FrameId frameId, {
-    dom.RGBA contentColor,
-    dom.RGBA contentOutlineColor,
-  }) async {
+  Future highlightFrame(page.FrameId frameId,
+      {dom.RGBA contentColor, dom.RGBA contentOutlineColor}) async {
     var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
     };
@@ -84,12 +79,10 @@ class OverlayApi {
   /// [nodeId] Identifier of the node to highlight.
   /// [backendNodeId] Identifier of the backend node to highlight.
   /// [objectId] JavaScript object id of the node to be highlighted.
-  Future highlightNode(
-    HighlightConfig highlightConfig, {
-    dom.NodeId nodeId,
-    dom.BackendNodeId backendNodeId,
-    runtime.RemoteObjectId objectId,
-  }) async {
+  Future highlightNode(HighlightConfig highlightConfig,
+      {dom.NodeId nodeId,
+      dom.BackendNodeId backendNodeId,
+      runtime.RemoteObjectId objectId}) async {
     var parameters = <String, dynamic>{
       'highlightConfig': highlightConfig.toJson(),
     };
@@ -109,11 +102,8 @@ class OverlayApi {
   /// [quad] Quad to highlight
   /// [color] The highlight fill color (default: transparent).
   /// [outlineColor] The highlight outline color (default: transparent).
-  Future highlightQuad(
-    dom.Quad quad, {
-    dom.RGBA color,
-    dom.RGBA outlineColor,
-  }) async {
+  Future highlightQuad(dom.Quad quad,
+      {dom.RGBA color, dom.RGBA outlineColor}) async {
     var parameters = <String, dynamic>{
       'quad': quad.toJson(),
     };
@@ -133,14 +123,8 @@ class OverlayApi {
   /// [height] Rectangle height
   /// [color] The highlight fill color (default: transparent).
   /// [outlineColor] The highlight outline color (default: transparent).
-  Future highlightRect(
-    int x,
-    int y,
-    int width,
-    int height, {
-    dom.RGBA color,
-    dom.RGBA outlineColor,
-  }) async {
+  Future highlightRect(int x, int y, int width, int height,
+      {dom.RGBA color, dom.RGBA outlineColor}) async {
     var parameters = <String, dynamic>{
       'x': x,
       'y': y,
@@ -161,10 +145,8 @@ class OverlayApi {
   /// [mode] Set an inspection mode.
   /// [highlightConfig] A descriptor for the highlight appearance of hovered-over nodes. May be omitted if `enabled
   /// == false`.
-  Future setInspectMode(
-    InspectMode mode, {
-    HighlightConfig highlightConfig,
-  }) async {
+  Future setInspectMode(InspectMode mode,
+      {HighlightConfig highlightConfig}) async {
     var parameters = <String, dynamic>{
       'mode': mode.toJson(),
     };
@@ -175,9 +157,7 @@ class OverlayApi {
   }
 
   /// [message] The message to display, also triggers resume and step over controls.
-  Future setPausedInDebuggerMessage({
-    String message,
-  }) async {
+  Future setPausedInDebuggerMessage({String message}) async {
     var parameters = <String, dynamic>{};
     if (message != null) {
       parameters['message'] = message;
@@ -187,9 +167,7 @@ class OverlayApi {
 
   /// Requests that backend shows debug borders on layers
   /// [show] True for showing debug borders
-  Future setShowDebugBorders(
-    bool show,
-  ) async {
+  Future setShowDebugBorders(bool show) async {
     var parameters = <String, dynamic>{
       'show': show,
     };
@@ -198,9 +176,7 @@ class OverlayApi {
 
   /// Requests that backend shows the FPS counter
   /// [show] True for showing the FPS counter
-  Future setShowFPSCounter(
-    bool show,
-  ) async {
+  Future setShowFPSCounter(bool show) async {
     var parameters = <String, dynamic>{
       'show': show,
     };
@@ -209,9 +185,7 @@ class OverlayApi {
 
   /// Requests that backend shows paint rectangles
   /// [result] True for showing paint rectangles
-  Future setShowPaintRects(
-    bool result,
-  ) async {
+  Future setShowPaintRects(bool result) async {
     var parameters = <String, dynamic>{
       'result': result,
     };
@@ -220,9 +194,7 @@ class OverlayApi {
 
   /// Requests that backend shows scroll bottleneck rects
   /// [show] True for showing scroll bottleneck rects
-  Future setShowScrollBottleneckRects(
-    bool show,
-  ) async {
+  Future setShowScrollBottleneckRects(bool show) async {
     var parameters = <String, dynamic>{
       'show': show,
     };
@@ -231,9 +203,7 @@ class OverlayApi {
 
   /// Paints viewport size upon main frame resize.
   /// [show] Whether to paint size or not.
-  Future setShowViewportSizeOnResize(
-    bool show,
-  ) async {
+  Future setShowViewportSizeOnResize(bool show) async {
     var parameters = <String, dynamic>{
       'show': show,
     };
@@ -241,9 +211,7 @@ class OverlayApi {
   }
 
   /// [suspended] Whether overlay should be suspended and not consume any resources until resumed.
-  Future setSuspended(
-    bool suspended,
-  ) async {
+  Future setSuspended(bool suspended) async {
     var parameters = <String, dynamic>{
       'suspended': suspended,
     };
@@ -291,21 +259,20 @@ class HighlightConfig {
   /// The grid layout color (default: transparent).
   final dom.RGBA cssGridColor;
 
-  HighlightConfig({
-    this.showInfo,
-    this.showRulers,
-    this.showExtensionLines,
-    this.displayAsMaterial,
-    this.contentColor,
-    this.paddingColor,
-    this.borderColor,
-    this.marginColor,
-    this.eventTargetColor,
-    this.shapeColor,
-    this.shapeMarginColor,
-    this.selectorList,
-    this.cssGridColor,
-  });
+  HighlightConfig(
+      {this.showInfo,
+      this.showRulers,
+      this.showExtensionLines,
+      this.displayAsMaterial,
+      this.contentColor,
+      this.paddingColor,
+      this.borderColor,
+      this.marginColor,
+      this.eventTargetColor,
+      this.shapeColor,
+      this.shapeMarginColor,
+      this.selectorList,
+      this.cssGridColor});
 
   factory HighlightConfig.fromJson(Map<String, dynamic> json) {
     return HighlightConfig(

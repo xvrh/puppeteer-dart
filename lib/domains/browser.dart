@@ -34,10 +34,7 @@ class BrowserApi {
   /// all histograms.
   /// [delta] If true, retrieve delta since last call.
   /// Returns: Histograms.
-  Future<List<Histogram>> getHistograms({
-    String query,
-    bool delta,
-  }) async {
+  Future<List<Histogram>> getHistograms({String query, bool delta}) async {
     var parameters = <String, dynamic>{};
     if (query != null) {
       parameters['query'] = query;
@@ -55,10 +52,7 @@ class BrowserApi {
   /// [name] Requested histogram name.
   /// [delta] If true, retrieve delta since last call.
   /// Returns: Histogram.
-  Future<Histogram> getHistogram(
-    String name, {
-    bool delta,
-  }) async {
+  Future<Histogram> getHistogram(String name, {bool delta}) async {
     var parameters = <String, dynamic>{
       'name': name,
     };
@@ -73,9 +67,7 @@ class BrowserApi {
   /// [windowId] Browser window id.
   /// Returns: Bounds information of the window. When window state is 'minimized', the restored window
   /// position and size are returned.
-  Future<Bounds> getWindowBounds(
-    WindowID windowId,
-  ) async {
+  Future<Bounds> getWindowBounds(WindowID windowId) async {
     var parameters = <String, dynamic>{
       'windowId': windowId.toJson(),
     };
@@ -86,8 +78,7 @@ class BrowserApi {
   /// Get the browser window that contains the devtools target.
   /// [targetId] Devtools agent host id.
   Future<GetWindowForTargetResult> getWindowForTarget(
-    target.TargetID targetId,
-  ) async {
+      target.TargetID targetId) async {
     var parameters = <String, dynamic>{
       'targetId': targetId.toJson(),
     };
@@ -99,10 +90,7 @@ class BrowserApi {
   /// [windowId] Browser window id.
   /// [bounds] New window bounds. The 'minimized', 'maximized' and 'fullscreen' states cannot be combined
   /// with 'left', 'top', 'width' or 'height'. Leaves unspecified fields unchanged.
-  Future setWindowBounds(
-    WindowID windowId,
-    Bounds bounds,
-  ) async {
+  Future setWindowBounds(WindowID windowId, Bounds bounds) async {
     var parameters = <String, dynamic>{
       'windowId': windowId.toJson(),
       'bounds': bounds.toJson(),
@@ -127,13 +115,12 @@ class GetVersionResult {
   /// V8 version.
   final String jsVersion;
 
-  GetVersionResult({
-    @required this.protocolVersion,
-    @required this.product,
-    @required this.revision,
-    @required this.userAgent,
-    @required this.jsVersion,
-  });
+  GetVersionResult(
+      {@required this.protocolVersion,
+      @required this.product,
+      @required this.revision,
+      @required this.userAgent,
+      @required this.jsVersion});
 
   factory GetVersionResult.fromJson(Map<String, dynamic> json) {
     return GetVersionResult(
@@ -154,10 +141,7 @@ class GetWindowForTargetResult {
   /// position and size are returned.
   final Bounds bounds;
 
-  GetWindowForTargetResult({
-    @required this.windowId,
-    @required this.bounds,
-  });
+  GetWindowForTargetResult({@required this.windowId, @required this.bounds});
 
   factory GetWindowForTargetResult.fromJson(Map<String, dynamic> json) {
     return GetWindowForTargetResult(
@@ -228,13 +212,7 @@ class Bounds {
   /// The window state. Default to normal.
   final WindowState windowState;
 
-  Bounds({
-    this.left,
-    this.top,
-    this.width,
-    this.height,
-    this.windowState,
-  });
+  Bounds({this.left, this.top, this.width, this.height, this.windowState});
 
   factory Bounds.fromJson(Map<String, dynamic> json) {
     return Bounds(
@@ -280,11 +258,7 @@ class Bucket {
   /// Number of samples.
   final int count;
 
-  Bucket({
-    @required this.low,
-    @required this.high,
-    @required this.count,
-  });
+  Bucket({@required this.low, @required this.high, @required this.count});
 
   factory Bucket.fromJson(Map<String, dynamic> json) {
     return Bucket(
@@ -318,12 +292,11 @@ class Histogram {
   /// Buckets.
   final List<Bucket> buckets;
 
-  Histogram({
-    @required this.name,
-    @required this.sum,
-    @required this.count,
-    @required this.buckets,
-  });
+  Histogram(
+      {@required this.name,
+      @required this.sum,
+      @required this.count,
+      @required this.buckets});
 
   factory Histogram.fromJson(Map<String, dynamic> json) {
     return Histogram(
