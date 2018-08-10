@@ -13,7 +13,7 @@ class StorageApi {
           .where((Event event) =>
               event.name == 'Storage.cacheStorageContentUpdated')
           .map((Event event) =>
-              new CacheStorageContentUpdatedEvent.fromJson(event.parameters));
+              CacheStorageContentUpdatedEvent.fromJson(event.parameters));
 
   /// A cache has been added/deleted.
   Stream<String> get onCacheStorageListUpdated => _client.onEvent
@@ -25,7 +25,7 @@ class StorageApi {
       .onEvent
       .where((Event event) => event.name == 'Storage.indexedDBContentUpdated')
       .map((Event event) =>
-          new IndexedDBContentUpdatedEvent.fromJson(event.parameters));
+          IndexedDBContentUpdatedEvent.fromJson(event.parameters));
 
   /// The origin's IndexedDB database list has been modified.
   Stream<String> get onIndexedDBListUpdated => _client.onEvent
@@ -39,7 +39,7 @@ class StorageApi {
     String origin,
     String storageTypes,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'origin': origin,
       'storageTypes': storageTypes,
     };
@@ -51,11 +51,11 @@ class StorageApi {
   Future<GetUsageAndQuotaResult> getUsageAndQuota(
     String origin,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'origin': origin,
     };
-    Map result = await _client.send('Storage.getUsageAndQuota', parameters);
-    return new GetUsageAndQuotaResult.fromJson(result);
+    var result = await _client.send('Storage.getUsageAndQuota', parameters);
+    return GetUsageAndQuotaResult.fromJson(result);
   }
 
   /// Registers origin to be notified when an update occurs to its cache storage list.
@@ -63,7 +63,7 @@ class StorageApi {
   Future trackCacheStorageForOrigin(
     String origin,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'origin': origin,
     };
     await _client.send('Storage.trackCacheStorageForOrigin', parameters);
@@ -74,7 +74,7 @@ class StorageApi {
   Future trackIndexedDBForOrigin(
     String origin,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'origin': origin,
     };
     await _client.send('Storage.trackIndexedDBForOrigin', parameters);
@@ -85,7 +85,7 @@ class StorageApi {
   Future untrackCacheStorageForOrigin(
     String origin,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'origin': origin,
     };
     await _client.send('Storage.untrackCacheStorageForOrigin', parameters);
@@ -96,7 +96,7 @@ class StorageApi {
   Future untrackIndexedDBForOrigin(
     String origin,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'origin': origin,
     };
     await _client.send('Storage.untrackIndexedDBForOrigin', parameters);
@@ -115,8 +115,8 @@ class CacheStorageContentUpdatedEvent {
     @required this.cacheName,
   });
 
-  factory CacheStorageContentUpdatedEvent.fromJson(Map json) {
-    return new CacheStorageContentUpdatedEvent(
+  factory CacheStorageContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
+    return CacheStorageContentUpdatedEvent(
       origin: json['origin'],
       cacheName: json['cacheName'],
     );
@@ -139,8 +139,8 @@ class IndexedDBContentUpdatedEvent {
     @required this.objectStoreName,
   });
 
-  factory IndexedDBContentUpdatedEvent.fromJson(Map json) {
-    return new IndexedDBContentUpdatedEvent(
+  factory IndexedDBContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
+    return IndexedDBContentUpdatedEvent(
       origin: json['origin'],
       databaseName: json['databaseName'],
       objectStoreName: json['objectStoreName'],
@@ -164,12 +164,12 @@ class GetUsageAndQuotaResult {
     @required this.usageBreakdown,
   });
 
-  factory GetUsageAndQuotaResult.fromJson(Map json) {
-    return new GetUsageAndQuotaResult(
+  factory GetUsageAndQuotaResult.fromJson(Map<String, dynamic> json) {
+    return GetUsageAndQuotaResult(
       usage: json['usage'],
       quota: json['quota'],
       usageBreakdown: (json['usageBreakdown'] as List)
-          .map((e) => new UsageForType.fromJson(e))
+          .map((e) => UsageForType.fromJson(e))
           .toList(),
     );
   }
@@ -228,15 +228,15 @@ class UsageForType {
     @required this.usage,
   });
 
-  factory UsageForType.fromJson(Map json) {
-    return new UsageForType(
-      storageType: new StorageType.fromJson(json['storageType']),
+  factory UsageForType.fromJson(Map<String, dynamic> json) {
+    return UsageForType(
+      storageType: StorageType.fromJson(json['storageType']),
       usage: json['usage'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'storageType': storageType.toJson(),
       'usage': usage,
     };

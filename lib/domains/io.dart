@@ -14,7 +14,7 @@ class IOApi {
   Future close(
     StreamHandle handle,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'handle': handle.toJson(),
     };
     await _client.send('IO.close', parameters);
@@ -30,7 +30,7 @@ class IOApi {
     int offset,
     int size,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'handle': handle.toJson(),
     };
     if (offset != null) {
@@ -39,8 +39,8 @@ class IOApi {
     if (size != null) {
       parameters['size'] = size;
     }
-    Map result = await _client.send('IO.read', parameters);
-    return new ReadResult.fromJson(result);
+    var result = await _client.send('IO.read', parameters);
+    return ReadResult.fromJson(result);
   }
 
   /// Return UUID of Blob object specified by a remote object id.
@@ -49,10 +49,10 @@ class IOApi {
   Future<String> resolveBlob(
     runtime.RemoteObjectId objectId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'objectId': objectId.toJson(),
     };
-    Map result = await _client.send('IO.resolveBlob', parameters);
+    var result = await _client.send('IO.resolveBlob', parameters);
     return result['uuid'];
   }
 }
@@ -73,8 +73,8 @@ class ReadResult {
     @required this.eof,
   });
 
-  factory ReadResult.fromJson(Map json) {
-    return new ReadResult(
+  factory ReadResult.fromJson(Map<String, dynamic> json) {
+    return ReadResult(
       base64Encoded:
           json.containsKey('base64Encoded') ? json['base64Encoded'] : null,
       data: json['data'],
@@ -90,7 +90,7 @@ class StreamHandle {
 
   StreamHandle(this.value);
 
-  factory StreamHandle.fromJson(String value) => new StreamHandle(value);
+  factory StreamHandle.fromJson(String value) => StreamHandle(value);
 
   String toJson() => value;
 

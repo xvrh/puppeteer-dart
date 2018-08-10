@@ -12,36 +12,38 @@ class RuntimeApi {
 
   RuntimeApi(this._client);
 
+  /// Notification is issued every time when binding is called.
+  Stream<BindingCalledEvent> get onBindingCalled => _client.onEvent
+      .where((Event event) => event.name == 'Runtime.bindingCalled')
+      .map((Event event) => BindingCalledEvent.fromJson(event.parameters));
+
   /// Issued when console API was called.
   Stream<ConsoleAPICalledEvent> get onConsoleAPICalled => _client.onEvent
       .where((Event event) => event.name == 'Runtime.consoleAPICalled')
-      .map((Event event) =>
-          new ConsoleAPICalledEvent.fromJson(event.parameters));
+      .map((Event event) => ConsoleAPICalledEvent.fromJson(event.parameters));
 
   /// Issued when unhandled exception was revoked.
   Stream<ExceptionRevokedEvent> get onExceptionRevoked => _client.onEvent
       .where((Event event) => event.name == 'Runtime.exceptionRevoked')
-      .map((Event event) =>
-          new ExceptionRevokedEvent.fromJson(event.parameters));
+      .map((Event event) => ExceptionRevokedEvent.fromJson(event.parameters));
 
   /// Issued when exception was thrown and unhandled.
   Stream<ExceptionThrownEvent> get onExceptionThrown => _client.onEvent
       .where((Event event) => event.name == 'Runtime.exceptionThrown')
-      .map(
-          (Event event) => new ExceptionThrownEvent.fromJson(event.parameters));
+      .map((Event event) => ExceptionThrownEvent.fromJson(event.parameters));
 
   /// Issued when new execution context is created.
   Stream<ExecutionContextDescription> get onExecutionContextCreated => _client
       .onEvent
       .where((Event event) => event.name == 'Runtime.executionContextCreated')
-      .map((Event event) => new ExecutionContextDescription.fromJson(
-          event.parameters['context']));
+      .map((Event event) =>
+          ExecutionContextDescription.fromJson(event.parameters['context']));
 
   /// Issued when execution context is destroyed.
   Stream<ExecutionContextId> get onExecutionContextDestroyed => _client.onEvent
       .where((Event event) => event.name == 'Runtime.executionContextDestroyed')
-      .map((Event event) => new ExecutionContextId.fromJson(
-          event.parameters['executionContextId']));
+      .map((Event event) =>
+          ExecutionContextId.fromJson(event.parameters['executionContextId']));
 
   /// Issued when all executionContexts were cleared in browser
   Stream get onExecutionContextsCleared => _client.onEvent
@@ -51,8 +53,7 @@ class RuntimeApi {
   /// call).
   Stream<InspectRequestedEvent> get onInspectRequested => _client.onEvent
       .where((Event event) => event.name == 'Runtime.inspectRequested')
-      .map((Event event) =>
-          new InspectRequestedEvent.fromJson(event.parameters));
+      .map((Event event) => InspectRequestedEvent.fromJson(event.parameters));
 
   /// Add handler to promise with given promise object id.
   /// [promiseObjectId] Identifier of the promise.
@@ -63,7 +64,7 @@ class RuntimeApi {
     bool returnByValue,
     bool generatePreview,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'promiseObjectId': promiseObjectId.toJson(),
     };
     if (returnByValue != null) {
@@ -72,8 +73,8 @@ class RuntimeApi {
     if (generatePreview != null) {
       parameters['generatePreview'] = generatePreview;
     }
-    Map result = await _client.send('Runtime.awaitPromise', parameters);
-    return new AwaitPromiseResult.fromJson(result);
+    var result = await _client.send('Runtime.awaitPromise', parameters);
+    return AwaitPromiseResult.fromJson(result);
   }
 
   /// Calls function with given declaration on the given object. Object group of the result is
@@ -106,7 +107,7 @@ class RuntimeApi {
     ExecutionContextId executionContextId,
     String objectGroup,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'functionDeclaration': functionDeclaration,
     };
     if (objectId != null) {
@@ -136,8 +137,8 @@ class RuntimeApi {
     if (objectGroup != null) {
       parameters['objectGroup'] = objectGroup;
     }
-    Map result = await _client.send('Runtime.callFunctionOn', parameters);
-    return new CallFunctionOnResult.fromJson(result);
+    var result = await _client.send('Runtime.callFunctionOn', parameters);
+    return CallFunctionOnResult.fromJson(result);
   }
 
   /// Compiles expression.
@@ -152,7 +153,7 @@ class RuntimeApi {
     bool persistScript, {
     ExecutionContextId executionContextId,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'expression': expression,
       'sourceURL': sourceURL,
       'persistScript': persistScript,
@@ -160,8 +161,8 @@ class RuntimeApi {
     if (executionContextId != null) {
       parameters['executionContextId'] = executionContextId.toJson();
     }
-    Map result = await _client.send('Runtime.compileScript', parameters);
-    return new CompileScriptResult.fromJson(result);
+    var result = await _client.send('Runtime.compileScript', parameters);
+    return CompileScriptResult.fromJson(result);
   }
 
   /// Disables reporting of execution contexts creation.
@@ -209,7 +210,7 @@ class RuntimeApi {
     bool throwOnSideEffect,
     TimeDelta timeout,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'expression': expression,
     };
     if (objectGroup != null) {
@@ -242,22 +243,22 @@ class RuntimeApi {
     if (timeout != null) {
       parameters['timeout'] = timeout.toJson();
     }
-    Map result = await _client.send('Runtime.evaluate', parameters);
-    return new EvaluateResult.fromJson(result);
+    var result = await _client.send('Runtime.evaluate', parameters);
+    return EvaluateResult.fromJson(result);
   }
 
   /// Returns the isolate id.
   /// Returns: The isolate id.
   Future<String> getIsolateId() async {
-    Map result = await _client.send('Runtime.getIsolateId');
+    var result = await _client.send('Runtime.getIsolateId');
     return result['id'];
   }
 
   /// Returns the JavaScript heap usage.
   /// It is the total usage of the corresponding isolate not scoped to a particular Runtime.
   Future<GetHeapUsageResult> getHeapUsage() async {
-    Map result = await _client.send('Runtime.getHeapUsage');
-    return new GetHeapUsageResult.fromJson(result);
+    var result = await _client.send('Runtime.getHeapUsage');
+    return GetHeapUsageResult.fromJson(result);
   }
 
   /// Returns properties of a given object. Object group of the result is inherited from the target
@@ -274,7 +275,7 @@ class RuntimeApi {
     bool accessorPropertiesOnly,
     bool generatePreview,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'objectId': objectId.toJson(),
     };
     if (ownProperties != null) {
@@ -286,8 +287,8 @@ class RuntimeApi {
     if (generatePreview != null) {
       parameters['generatePreview'] = generatePreview;
     }
-    Map result = await _client.send('Runtime.getProperties', parameters);
-    return new GetPropertiesResult.fromJson(result);
+    var result = await _client.send('Runtime.getProperties', parameters);
+    return GetPropertiesResult.fromJson(result);
   }
 
   /// Returns all let, const and class variables from global scope.
@@ -295,11 +296,11 @@ class RuntimeApi {
   Future<List<String>> globalLexicalScopeNames({
     ExecutionContextId executionContextId,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (executionContextId != null) {
       parameters['executionContextId'] = executionContextId.toJson();
     }
-    Map result =
+    var result =
         await _client.send('Runtime.globalLexicalScopeNames', parameters);
     return (result['names'] as List).map((e) => e as String).toList();
   }
@@ -311,14 +312,14 @@ class RuntimeApi {
     RemoteObjectId prototypeObjectId, {
     String objectGroup,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'prototypeObjectId': prototypeObjectId.toJson(),
     };
     if (objectGroup != null) {
       parameters['objectGroup'] = objectGroup;
     }
-    Map result = await _client.send('Runtime.queryObjects', parameters);
-    return new RemoteObject.fromJson(result['objects']);
+    var result = await _client.send('Runtime.queryObjects', parameters);
+    return RemoteObject.fromJson(result['objects']);
   }
 
   /// Releases remote object with given id.
@@ -326,7 +327,7 @@ class RuntimeApi {
   Future releaseObject(
     RemoteObjectId objectId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'objectId': objectId.toJson(),
     };
     await _client.send('Runtime.releaseObject', parameters);
@@ -337,7 +338,7 @@ class RuntimeApi {
   Future releaseObjectGroup(
     String objectGroup,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'objectGroup': objectGroup,
     };
     await _client.send('Runtime.releaseObjectGroup', parameters);
@@ -370,7 +371,7 @@ class RuntimeApi {
     bool generatePreview,
     bool awaitPromise,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'scriptId': scriptId.toJson(),
     };
     if (executionContextId != null) {
@@ -394,23 +395,100 @@ class RuntimeApi {
     if (awaitPromise != null) {
       parameters['awaitPromise'] = awaitPromise;
     }
-    Map result = await _client.send('Runtime.runScript', parameters);
-    return new RunScriptResult.fromJson(result);
+    var result = await _client.send('Runtime.runScript', parameters);
+    return RunScriptResult.fromJson(result);
+  }
+
+  /// Enables or disables async call stacks tracking.
+  /// [maxDepth] Maximum depth of async call stacks. Setting to `0` will effectively disable collecting async
+  /// call stacks (default).
+  Future setAsyncCallStackDepth(
+    int maxDepth,
+  ) async {
+    var parameters = <String, dynamic>{
+      'maxDepth': maxDepth,
+    };
+    await _client.send('Runtime.setAsyncCallStackDepth', parameters);
   }
 
   Future setCustomObjectFormatterEnabled(
     bool enabled,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'enabled': enabled,
     };
     await _client.send('Runtime.setCustomObjectFormatterEnabled', parameters);
+  }
+
+  Future setMaxCallStackSizeToCapture(
+    int size,
+  ) async {
+    var parameters = <String, dynamic>{
+      'size': size,
+    };
+    await _client.send('Runtime.setMaxCallStackSizeToCapture', parameters);
   }
 
   /// Terminate current or next JavaScript execution.
   /// Will cancel the termination when the outer-most script execution ends.
   Future terminateExecution() async {
     await _client.send('Runtime.terminateExecution');
+  }
+
+  /// If executionContextId is empty, adds binding with the given name on the
+  /// global objects of all inspected contexts, including those created later,
+  /// bindings survive reloads.
+  /// If executionContextId is specified, adds binding only on global object of
+  /// given execution context.
+  /// Binding function takes exactly one argument, this argument should be string,
+  /// in case of any other input, function throws an exception.
+  /// Each binding function call produces Runtime.bindingCalled notification.
+  Future addBinding(
+    String name, {
+    ExecutionContextId executionContextId,
+  }) async {
+    var parameters = <String, dynamic>{
+      'name': name,
+    };
+    if (executionContextId != null) {
+      parameters['executionContextId'] = executionContextId.toJson();
+    }
+    await _client.send('Runtime.addBinding', parameters);
+  }
+
+  /// This method does not remove binding function from global object but
+  /// unsubscribes current runtime agent from Runtime.bindingCalled notifications.
+  Future removeBinding(
+    String name,
+  ) async {
+    var parameters = <String, dynamic>{
+      'name': name,
+    };
+    await _client.send('Runtime.removeBinding', parameters);
+  }
+}
+
+class BindingCalledEvent {
+  final String name;
+
+  final String payload;
+
+  /// Identifier of the context where the call was made.
+  final ExecutionContextId executionContextId;
+
+  BindingCalledEvent({
+    @required this.name,
+    @required this.payload,
+    @required this.executionContextId,
+  });
+
+  factory BindingCalledEvent.fromJson(Map<String, dynamic> json) {
+    return BindingCalledEvent(
+      name: json['name'],
+      payload: json['payload'],
+      executionContextId:
+          ExecutionContextId.fromJson(json['executionContextId']),
+    );
   }
 }
 
@@ -444,17 +522,16 @@ class ConsoleAPICalledEvent {
     this.context,
   });
 
-  factory ConsoleAPICalledEvent.fromJson(Map json) {
-    return new ConsoleAPICalledEvent(
+  factory ConsoleAPICalledEvent.fromJson(Map<String, dynamic> json) {
+    return ConsoleAPICalledEvent(
       type: json['type'],
-      args: (json['args'] as List)
-          .map((e) => new RemoteObject.fromJson(e))
-          .toList(),
+      args:
+          (json['args'] as List).map((e) => RemoteObject.fromJson(e)).toList(),
       executionContextId:
-          new ExecutionContextId.fromJson(json['executionContextId']),
-      timestamp: new Timestamp.fromJson(json['timestamp']),
+          ExecutionContextId.fromJson(json['executionContextId']),
+      timestamp: Timestamp.fromJson(json['timestamp']),
       stackTrace: json.containsKey('stackTrace')
-          ? new StackTrace.fromJson(json['stackTrace'])
+          ? StackTrace.fromJson(json['stackTrace'])
           : null,
       context: json.containsKey('context') ? json['context'] : null,
     );
@@ -473,8 +550,8 @@ class ExceptionRevokedEvent {
     @required this.exceptionId,
   });
 
-  factory ExceptionRevokedEvent.fromJson(Map json) {
-    return new ExceptionRevokedEvent(
+  factory ExceptionRevokedEvent.fromJson(Map<String, dynamic> json) {
+    return ExceptionRevokedEvent(
       reason: json['reason'],
       exceptionId: json['exceptionId'],
     );
@@ -492,10 +569,10 @@ class ExceptionThrownEvent {
     @required this.exceptionDetails,
   });
 
-  factory ExceptionThrownEvent.fromJson(Map json) {
-    return new ExceptionThrownEvent(
-      timestamp: new Timestamp.fromJson(json['timestamp']),
-      exceptionDetails: new ExceptionDetails.fromJson(json['exceptionDetails']),
+  factory ExceptionThrownEvent.fromJson(Map<String, dynamic> json) {
+    return ExceptionThrownEvent(
+      timestamp: Timestamp.fromJson(json['timestamp']),
+      exceptionDetails: ExceptionDetails.fromJson(json['exceptionDetails']),
     );
   }
 }
@@ -510,9 +587,9 @@ class InspectRequestedEvent {
     @required this.hints,
   });
 
-  factory InspectRequestedEvent.fromJson(Map json) {
-    return new InspectRequestedEvent(
-      object: new RemoteObject.fromJson(json['object']),
+  factory InspectRequestedEvent.fromJson(Map<String, dynamic> json) {
+    return InspectRequestedEvent(
+      object: RemoteObject.fromJson(json['object']),
       hints: json['hints'],
     );
   }
@@ -530,11 +607,11 @@ class AwaitPromiseResult {
     this.exceptionDetails,
   });
 
-  factory AwaitPromiseResult.fromJson(Map json) {
-    return new AwaitPromiseResult(
-      result: new RemoteObject.fromJson(json['result']),
+  factory AwaitPromiseResult.fromJson(Map<String, dynamic> json) {
+    return AwaitPromiseResult(
+      result: RemoteObject.fromJson(json['result']),
       exceptionDetails: json.containsKey('exceptionDetails')
-          ? new ExceptionDetails.fromJson(json['exceptionDetails'])
+          ? ExceptionDetails.fromJson(json['exceptionDetails'])
           : null,
     );
   }
@@ -552,11 +629,11 @@ class CallFunctionOnResult {
     this.exceptionDetails,
   });
 
-  factory CallFunctionOnResult.fromJson(Map json) {
-    return new CallFunctionOnResult(
-      result: new RemoteObject.fromJson(json['result']),
+  factory CallFunctionOnResult.fromJson(Map<String, dynamic> json) {
+    return CallFunctionOnResult(
+      result: RemoteObject.fromJson(json['result']),
       exceptionDetails: json.containsKey('exceptionDetails')
-          ? new ExceptionDetails.fromJson(json['exceptionDetails'])
+          ? ExceptionDetails.fromJson(json['exceptionDetails'])
           : null,
     );
   }
@@ -574,13 +651,13 @@ class CompileScriptResult {
     this.exceptionDetails,
   });
 
-  factory CompileScriptResult.fromJson(Map json) {
-    return new CompileScriptResult(
+  factory CompileScriptResult.fromJson(Map<String, dynamic> json) {
+    return CompileScriptResult(
       scriptId: json.containsKey('scriptId')
-          ? new ScriptId.fromJson(json['scriptId'])
+          ? ScriptId.fromJson(json['scriptId'])
           : null,
       exceptionDetails: json.containsKey('exceptionDetails')
-          ? new ExceptionDetails.fromJson(json['exceptionDetails'])
+          ? ExceptionDetails.fromJson(json['exceptionDetails'])
           : null,
     );
   }
@@ -598,11 +675,11 @@ class EvaluateResult {
     this.exceptionDetails,
   });
 
-  factory EvaluateResult.fromJson(Map json) {
-    return new EvaluateResult(
-      result: new RemoteObject.fromJson(json['result']),
+  factory EvaluateResult.fromJson(Map<String, dynamic> json) {
+    return EvaluateResult(
+      result: RemoteObject.fromJson(json['result']),
       exceptionDetails: json.containsKey('exceptionDetails')
-          ? new ExceptionDetails.fromJson(json['exceptionDetails'])
+          ? ExceptionDetails.fromJson(json['exceptionDetails'])
           : null,
     );
   }
@@ -620,8 +697,8 @@ class GetHeapUsageResult {
     @required this.totalSize,
   });
 
-  factory GetHeapUsageResult.fromJson(Map json) {
-    return new GetHeapUsageResult(
+  factory GetHeapUsageResult.fromJson(Map<String, dynamic> json) {
+    return GetHeapUsageResult(
       usedSize: json['usedSize'],
       totalSize: json['totalSize'],
     );
@@ -644,18 +721,18 @@ class GetPropertiesResult {
     this.exceptionDetails,
   });
 
-  factory GetPropertiesResult.fromJson(Map json) {
-    return new GetPropertiesResult(
+  factory GetPropertiesResult.fromJson(Map<String, dynamic> json) {
+    return GetPropertiesResult(
       result: (json['result'] as List)
-          .map((e) => new PropertyDescriptor.fromJson(e))
+          .map((e) => PropertyDescriptor.fromJson(e))
           .toList(),
       internalProperties: json.containsKey('internalProperties')
           ? (json['internalProperties'] as List)
-              .map((e) => new InternalPropertyDescriptor.fromJson(e))
+              .map((e) => InternalPropertyDescriptor.fromJson(e))
               .toList()
           : null,
       exceptionDetails: json.containsKey('exceptionDetails')
-          ? new ExceptionDetails.fromJson(json['exceptionDetails'])
+          ? ExceptionDetails.fromJson(json['exceptionDetails'])
           : null,
     );
   }
@@ -673,11 +750,11 @@ class RunScriptResult {
     this.exceptionDetails,
   });
 
-  factory RunScriptResult.fromJson(Map json) {
-    return new RunScriptResult(
-      result: new RemoteObject.fromJson(json['result']),
+  factory RunScriptResult.fromJson(Map<String, dynamic> json) {
+    return RunScriptResult(
+      result: RemoteObject.fromJson(json['result']),
       exceptionDetails: json.containsKey('exceptionDetails')
-          ? new ExceptionDetails.fromJson(json['exceptionDetails'])
+          ? ExceptionDetails.fromJson(json['exceptionDetails'])
           : null,
     );
   }
@@ -689,7 +766,7 @@ class ScriptId {
 
   ScriptId(this.value);
 
-  factory ScriptId.fromJson(String value) => new ScriptId(value);
+  factory ScriptId.fromJson(String value) => ScriptId(value);
 
   String toJson() => value;
 
@@ -709,7 +786,7 @@ class RemoteObjectId {
 
   RemoteObjectId(this.value);
 
-  factory RemoteObjectId.fromJson(String value) => new RemoteObjectId(value);
+  factory RemoteObjectId.fromJson(String value) => RemoteObjectId(value);
 
   String toJson() => value;
 
@@ -731,7 +808,7 @@ class UnserializableValue {
   UnserializableValue(this.value);
 
   factory UnserializableValue.fromJson(String value) =>
-      new UnserializableValue(value);
+      UnserializableValue(value);
 
   String toJson() => value;
 
@@ -787,30 +864,30 @@ class RemoteObject {
     this.customPreview,
   });
 
-  factory RemoteObject.fromJson(Map json) {
-    return new RemoteObject(
+  factory RemoteObject.fromJson(Map<String, dynamic> json) {
+    return RemoteObject(
       type: json['type'],
       subtype: json.containsKey('subtype') ? json['subtype'] : null,
       className: json.containsKey('className') ? json['className'] : null,
       value: json.containsKey('value') ? json['value'] : null,
       unserializableValue: json.containsKey('unserializableValue')
-          ? new UnserializableValue.fromJson(json['unserializableValue'])
+          ? UnserializableValue.fromJson(json['unserializableValue'])
           : null,
       description: json.containsKey('description') ? json['description'] : null,
       objectId: json.containsKey('objectId')
-          ? new RemoteObjectId.fromJson(json['objectId'])
+          ? RemoteObjectId.fromJson(json['objectId'])
           : null,
       preview: json.containsKey('preview')
-          ? new ObjectPreview.fromJson(json['preview'])
+          ? ObjectPreview.fromJson(json['preview'])
           : null,
       customPreview: json.containsKey('customPreview')
-          ? new CustomPreview.fromJson(json['customPreview'])
+          ? CustomPreview.fromJson(json['customPreview'])
           : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'type': type,
     };
     if (subtype != null) {
@@ -860,21 +937,21 @@ class CustomPreview {
     this.configObjectId,
   });
 
-  factory CustomPreview.fromJson(Map json) {
-    return new CustomPreview(
+  factory CustomPreview.fromJson(Map<String, dynamic> json) {
+    return CustomPreview(
       header: json['header'],
       hasBody: json['hasBody'],
-      formatterObjectId: new RemoteObjectId.fromJson(json['formatterObjectId']),
+      formatterObjectId: RemoteObjectId.fromJson(json['formatterObjectId']),
       bindRemoteObjectFunctionId:
-          new RemoteObjectId.fromJson(json['bindRemoteObjectFunctionId']),
+          RemoteObjectId.fromJson(json['bindRemoteObjectFunctionId']),
       configObjectId: json.containsKey('configObjectId')
-          ? new RemoteObjectId.fromJson(json['configObjectId'])
+          ? RemoteObjectId.fromJson(json['configObjectId'])
           : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'header': header,
       'hasBody': hasBody,
       'formatterObjectId': formatterObjectId.toJson(),
@@ -916,25 +993,25 @@ class ObjectPreview {
     this.entries,
   });
 
-  factory ObjectPreview.fromJson(Map json) {
-    return new ObjectPreview(
+  factory ObjectPreview.fromJson(Map<String, dynamic> json) {
+    return ObjectPreview(
       type: json['type'],
       subtype: json.containsKey('subtype') ? json['subtype'] : null,
       description: json.containsKey('description') ? json['description'] : null,
       overflow: json['overflow'],
       properties: (json['properties'] as List)
-          .map((e) => new PropertyPreview.fromJson(e))
+          .map((e) => PropertyPreview.fromJson(e))
           .toList(),
       entries: json.containsKey('entries')
           ? (json['entries'] as List)
-              .map((e) => new EntryPreview.fromJson(e))
+              .map((e) => EntryPreview.fromJson(e))
               .toList()
           : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'type': type,
       'overflow': overflow,
       'properties': properties.map((e) => e.toJson()).toList(),
@@ -976,20 +1053,20 @@ class PropertyPreview {
     this.subtype,
   });
 
-  factory PropertyPreview.fromJson(Map json) {
-    return new PropertyPreview(
+  factory PropertyPreview.fromJson(Map<String, dynamic> json) {
+    return PropertyPreview(
       name: json['name'],
       type: json['type'],
       value: json.containsKey('value') ? json['value'] : null,
       valuePreview: json.containsKey('valuePreview')
-          ? new ObjectPreview.fromJson(json['valuePreview'])
+          ? ObjectPreview.fromJson(json['valuePreview'])
           : null,
       subtype: json.containsKey('subtype') ? json['subtype'] : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
       'type': type,
     };
@@ -1018,17 +1095,15 @@ class EntryPreview {
     @required this.value,
   });
 
-  factory EntryPreview.fromJson(Map json) {
-    return new EntryPreview(
-      key: json.containsKey('key')
-          ? new ObjectPreview.fromJson(json['key'])
-          : null,
-      value: new ObjectPreview.fromJson(json['value']),
+  factory EntryPreview.fromJson(Map<String, dynamic> json) {
+    return EntryPreview(
+      key: json.containsKey('key') ? ObjectPreview.fromJson(json['key']) : null,
+      value: ObjectPreview.fromJson(json['value']),
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'value': value.toJson(),
     };
     if (key != null) {
@@ -1087,31 +1162,27 @@ class PropertyDescriptor {
     this.symbol,
   });
 
-  factory PropertyDescriptor.fromJson(Map json) {
-    return new PropertyDescriptor(
+  factory PropertyDescriptor.fromJson(Map<String, dynamic> json) {
+    return PropertyDescriptor(
       name: json['name'],
       value: json.containsKey('value')
-          ? new RemoteObject.fromJson(json['value'])
+          ? RemoteObject.fromJson(json['value'])
           : null,
       writable: json.containsKey('writable') ? json['writable'] : null,
-      get: json.containsKey('get')
-          ? new RemoteObject.fromJson(json['get'])
-          : null,
-      set: json.containsKey('set')
-          ? new RemoteObject.fromJson(json['set'])
-          : null,
+      get: json.containsKey('get') ? RemoteObject.fromJson(json['get']) : null,
+      set: json.containsKey('set') ? RemoteObject.fromJson(json['set']) : null,
       configurable: json['configurable'],
       enumerable: json['enumerable'],
       wasThrown: json.containsKey('wasThrown') ? json['wasThrown'] : null,
       isOwn: json.containsKey('isOwn') ? json['isOwn'] : null,
       symbol: json.containsKey('symbol')
-          ? new RemoteObject.fromJson(json['symbol'])
+          ? RemoteObject.fromJson(json['symbol'])
           : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
       'configurable': configurable,
       'enumerable': enumerable,
@@ -1154,17 +1225,17 @@ class InternalPropertyDescriptor {
     this.value,
   });
 
-  factory InternalPropertyDescriptor.fromJson(Map json) {
-    return new InternalPropertyDescriptor(
+  factory InternalPropertyDescriptor.fromJson(Map<String, dynamic> json) {
+    return InternalPropertyDescriptor(
       name: json['name'],
       value: json.containsKey('value')
-          ? new RemoteObject.fromJson(json['value'])
+          ? RemoteObject.fromJson(json['value'])
           : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
     };
     if (value != null) {
@@ -1192,20 +1263,20 @@ class CallArgument {
     this.objectId,
   });
 
-  factory CallArgument.fromJson(Map json) {
-    return new CallArgument(
+  factory CallArgument.fromJson(Map<String, dynamic> json) {
+    return CallArgument(
       value: json.containsKey('value') ? json['value'] : null,
       unserializableValue: json.containsKey('unserializableValue')
-          ? new UnserializableValue.fromJson(json['unserializableValue'])
+          ? UnserializableValue.fromJson(json['unserializableValue'])
           : null,
       objectId: json.containsKey('objectId')
-          ? new RemoteObjectId.fromJson(json['objectId'])
+          ? RemoteObjectId.fromJson(json['objectId'])
           : null,
     );
   }
 
-  Map toJson() {
-    Map json = {};
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{};
     if (value != null) {
       json['value'] = value.toJson();
     }
@@ -1225,8 +1296,7 @@ class ExecutionContextId {
 
   ExecutionContextId(this.value);
 
-  factory ExecutionContextId.fromJson(int value) =>
-      new ExecutionContextId(value);
+  factory ExecutionContextId.fromJson(int value) => ExecutionContextId(value);
 
   int toJson() => value;
 
@@ -1263,17 +1333,17 @@ class ExecutionContextDescription {
     this.auxData,
   });
 
-  factory ExecutionContextDescription.fromJson(Map json) {
-    return new ExecutionContextDescription(
-      id: new ExecutionContextId.fromJson(json['id']),
+  factory ExecutionContextDescription.fromJson(Map<String, dynamic> json) {
+    return ExecutionContextDescription(
+      id: ExecutionContextId.fromJson(json['id']),
       origin: json['origin'],
       name: json['name'],
       auxData: json.containsKey('auxData') ? json['auxData'] : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'id': id.toJson(),
       'origin': origin,
       'name': name,
@@ -1327,30 +1397,30 @@ class ExceptionDetails {
     this.executionContextId,
   });
 
-  factory ExceptionDetails.fromJson(Map json) {
-    return new ExceptionDetails(
+  factory ExceptionDetails.fromJson(Map<String, dynamic> json) {
+    return ExceptionDetails(
       exceptionId: json['exceptionId'],
       text: json['text'],
       lineNumber: json['lineNumber'],
       columnNumber: json['columnNumber'],
       scriptId: json.containsKey('scriptId')
-          ? new ScriptId.fromJson(json['scriptId'])
+          ? ScriptId.fromJson(json['scriptId'])
           : null,
       url: json.containsKey('url') ? json['url'] : null,
       stackTrace: json.containsKey('stackTrace')
-          ? new StackTrace.fromJson(json['stackTrace'])
+          ? StackTrace.fromJson(json['stackTrace'])
           : null,
       exception: json.containsKey('exception')
-          ? new RemoteObject.fromJson(json['exception'])
+          ? RemoteObject.fromJson(json['exception'])
           : null,
       executionContextId: json.containsKey('executionContextId')
-          ? new ExecutionContextId.fromJson(json['executionContextId'])
+          ? ExecutionContextId.fromJson(json['executionContextId'])
           : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'exceptionId': exceptionId,
       'text': text,
       'lineNumber': lineNumber,
@@ -1381,7 +1451,7 @@ class Timestamp {
 
   Timestamp(this.value);
 
-  factory Timestamp.fromJson(num value) => new Timestamp(value);
+  factory Timestamp.fromJson(num value) => Timestamp(value);
 
   num toJson() => value;
 
@@ -1401,7 +1471,7 @@ class TimeDelta {
 
   TimeDelta(this.value);
 
-  factory TimeDelta.fromJson(num value) => new TimeDelta(value);
+  factory TimeDelta.fromJson(num value) => TimeDelta(value);
 
   num toJson() => value;
 
@@ -1440,18 +1510,18 @@ class CallFrame {
     @required this.columnNumber,
   });
 
-  factory CallFrame.fromJson(Map json) {
-    return new CallFrame(
+  factory CallFrame.fromJson(Map<String, dynamic> json) {
+    return CallFrame(
       functionName: json['functionName'],
-      scriptId: new ScriptId.fromJson(json['scriptId']),
+      scriptId: ScriptId.fromJson(json['scriptId']),
       url: json['url'],
       lineNumber: json['lineNumber'],
       columnNumber: json['columnNumber'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'functionName': functionName,
       'scriptId': scriptId.toJson(),
       'url': url,
@@ -1484,23 +1554,23 @@ class StackTrace {
     this.parentId,
   });
 
-  factory StackTrace.fromJson(Map json) {
-    return new StackTrace(
+  factory StackTrace.fromJson(Map<String, dynamic> json) {
+    return StackTrace(
       description: json.containsKey('description') ? json['description'] : null,
       callFrames: (json['callFrames'] as List)
-          .map((e) => new CallFrame.fromJson(e))
+          .map((e) => CallFrame.fromJson(e))
           .toList(),
       parent: json.containsKey('parent')
-          ? new StackTrace.fromJson(json['parent'])
+          ? StackTrace.fromJson(json['parent'])
           : null,
       parentId: json.containsKey('parentId')
-          ? new StackTraceId.fromJson(json['parentId'])
+          ? StackTraceId.fromJson(json['parentId'])
           : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'callFrames': callFrames.map((e) => e.toJson()).toList(),
     };
     if (description != null) {
@@ -1522,8 +1592,7 @@ class UniqueDebuggerId {
 
   UniqueDebuggerId(this.value);
 
-  factory UniqueDebuggerId.fromJson(String value) =>
-      new UniqueDebuggerId(value);
+  factory UniqueDebuggerId.fromJson(String value) => UniqueDebuggerId(value);
 
   String toJson() => value;
 
@@ -1549,17 +1618,17 @@ class StackTraceId {
     this.debuggerId,
   });
 
-  factory StackTraceId.fromJson(Map json) {
-    return new StackTraceId(
+  factory StackTraceId.fromJson(Map<String, dynamic> json) {
+    return StackTraceId(
       id: json['id'],
       debuggerId: json.containsKey('debuggerId')
-          ? new UniqueDebuggerId.fromJson(json['debuggerId'])
+          ? UniqueDebuggerId.fromJson(json['debuggerId'])
           : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'id': id,
     };
     if (debuggerId != null) {

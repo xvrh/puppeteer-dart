@@ -17,20 +17,20 @@ class Event {
 }
 
 class Connection implements Client {
-  final Logger _logger = new Logger('connection');
+  final Logger _logger = Logger('connection');
   static int _lastId = 0;
   final WebSocket _webSocket;
   final Map<int, Completer> _completers = {};
   final List<Session> _sessions = [];
   final StreamController<Event> _eventController =
-      new StreamController<Event>.broadcast();
+      StreamController<Event>.broadcast();
   TargetApi _targets;
   final List<StreamSubscription> _subscriptions = [];
 
   Connection._(this._webSocket) {
     _subscriptions.add(_webSocket.listen(_onMessage));
 
-    _targets = new TargetApi(this);
+    _targets = TargetApi(this);
 
     _subscriptions.add(_targets.onReceivedMessageFromTarget
         .listen((ReceivedMessageFromTargetEvent e) {
@@ -53,7 +53,7 @@ class Connection implements Client {
   static Future<Connection> create(String url) async {
     WebSocket webSocket = await WebSocket.connect(url);
 
-    return new Connection._(webSocket);
+    return Connection._(webSocket);
   }
 
   @override
@@ -66,7 +66,7 @@ class Connection implements Client {
 
     _logger.fine('SEND ► $message');
 
-    Completer completer = new Completer();
+    var completer = Completer<Map>();
     _completers[id] = completer;
     _webSocket.add(message);
 
@@ -76,15 +76,16 @@ class Connection implements Client {
   Future<Session> createSession(TargetID targetId,
       {BrowserContextID browserContextID}) async {
     SessionID sessionId = await _targets.attachToTarget(targetId);
-    Session session = new Session._(_targets, targetId, sessionId,
+    Session session = Session._(_targets, targetId, sessionId,
         browserContextID: browserContextID);
     _sessions.add(session);
 
     return session;
   }
 
-  _onMessage(String message) {
-    Map object = JSON.decode(message);
+  _onMessage(messageArg) {
+    String message = messageArg;
+    Map object = jsonDecode(message);
     int id = object['id'];
     if (id != null) {
       _logger.fine('◀ RECV $message');
@@ -94,7 +95,7 @@ class Connection implements Client {
 
       Map error = object['error'];
       if (error != null) {
-        completer.completeError(new Exception(error['message']));
+        completer.completeError(Exception(error['message']));
       } else {
         completer.complete(object['result']);
       }
@@ -104,14 +105,14 @@ class Connection implements Client {
 
       _logger.fine('◀ EVENT $message');
 
-      _eventController.add(new Event._(method, params));
+      _eventController.add(Event._(method, params));
     }
   }
 
   Future dispose() async {
     await _eventController.close();
     for (Completer completer in _completers.values) {
-      completer.completeError(new Exception('Target closed'));
+      completer.completeError(Exception('Target closed'));
     }
     _completers.clear();
 
@@ -127,8 +128,8 @@ class Connection implements Client {
   }
 }
 
-String _encodeMessage(int id, String method, Map parameters) {
-  return JSON.encode({
+String _encodeMessage(int id, String method, Map<String, dynamic> parameters) {
+  return jsonEncode({
     'id': id,
     'method': method,
     'params': parameters,
@@ -143,7 +144,7 @@ class Session implements Client {
   final BrowserContextID _browserContextID;
   final Map<int, Completer> _completers = {};
   final StreamController<Event> _eventController =
-      new StreamController<Event>.broadcast();
+      StreamController<Event>.broadcast();
 
   Session._(this._targetApi, this.targetID, this.sessionId,
       {BrowserContextID browserContextID})
@@ -152,12 +153,12 @@ class Session implements Client {
   @override
   Future<Map> send(String method, [Map parameters]) {
     if (_eventController.isClosed) {
-      throw new Exception('Session closed');
+      throw Exception('Session closed');
     }
     int id = ++_lastId;
     String message = _encodeMessage(id, method, parameters);
 
-    Completer completer = new Completer();
+    var completer = Completer<Map>();
     _completers[id] = completer;
 
     _targetApi.sendMessageToTarget(message, sessionId: sessionId);
@@ -169,26 +170,26 @@ class Session implements Client {
   Stream<Event> get onEvent => _eventController.stream;
 
   _onMessage(String message) {
-    Map object = JSON.decode(message);
+    Map object = jsonDecode(message);
 
     int id = object['id'];
     if (id != null) {
       Completer completer = _completers.remove(id);
       Map error = object['error'];
       if (error != null) {
-        completer.completeError(new Exception(error['message']));
+        completer.completeError(Exception(error['message']));
       } else {
         completer.complete(object['result']);
       }
     } else {
-      _eventController.add(new Event._(object['method'], object['params']));
+      _eventController.add(Event._(object['method'], object['params']));
     }
   }
 
   _onClosed() {
     _eventController.close();
     for (Completer completer in _completers.values) {
-      completer.completeError(new Exception('Target closed'));
+      completer.completeError(Exception('Target closed'));
     }
     _completers.clear();
   }

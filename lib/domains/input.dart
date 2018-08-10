@@ -43,7 +43,7 @@ class InputApi {
     bool isSystemKey,
     int location,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'type': type,
     };
     if (modifiers != null) {
@@ -88,6 +88,18 @@ class InputApi {
     await _client.send('Input.dispatchKeyEvent', parameters);
   }
 
+  /// This method emulates inserting text that doesn't come from a key press,
+  /// for example an emoji keyboard or an IME.
+  /// [text] The text to insert.
+  Future insertText(
+    String text,
+  ) async {
+    var parameters = <String, dynamic>{
+      'text': text,
+    };
+    await _client.send('Input.insertText', parameters);
+  }
+
   /// Dispatches a mouse event to the page.
   /// [type] Type of the mouse event.
   /// [x] X coordinate of the event relative to the main frame's viewport in CSS pixels.
@@ -111,7 +123,7 @@ class InputApi {
     num deltaX,
     num deltaY,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'type': type,
       'x': x,
       'y': y,
@@ -152,7 +164,7 @@ class InputApi {
     int modifiers,
     TimeSinceEpoch timestamp,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'type': type,
       'touchPoints': touchPoints.map((e) => e.toJson()).toList(),
     };
@@ -187,7 +199,7 @@ class InputApi {
     int modifiers,
     int clickCount,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'type': type,
       'x': x,
       'y': y,
@@ -216,7 +228,7 @@ class InputApi {
   Future setIgnoreInputEvents(
     bool ignore,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'ignore': ignore,
     };
     await _client.send('Input.setIgnoreInputEvents', parameters);
@@ -236,7 +248,7 @@ class InputApi {
     int relativeSpeed,
     GestureSourceType gestureSourceType,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'x': x,
       'y': y,
       'scaleFactor': scaleFactor,
@@ -280,7 +292,7 @@ class InputApi {
     int repeatDelayMs,
     String interactionMarkerName,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'x': x,
       'y': y,
     };
@@ -331,7 +343,7 @@ class InputApi {
     int tapCount,
     GestureSourceType gestureSourceType,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'x': x,
       'y': y,
     };
@@ -381,8 +393,8 @@ class TouchPoint {
     this.id,
   });
 
-  factory TouchPoint.fromJson(Map json) {
-    return new TouchPoint(
+  factory TouchPoint.fromJson(Map<String, dynamic> json) {
+    return TouchPoint(
       x: json['x'],
       y: json['y'],
       radiusX: json.containsKey('radiusX') ? json['radiusX'] : null,
@@ -394,8 +406,8 @@ class TouchPoint {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'x': x,
       'y': y,
     };
@@ -447,7 +459,7 @@ class TimeSinceEpoch {
 
   TimeSinceEpoch(this.value);
 
-  factory TimeSinceEpoch.fromJson(num value) => new TimeSinceEpoch(value);
+  factory TimeSinceEpoch.fromJson(num value) => TimeSinceEpoch(value);
 
   num toJson() => value;
 

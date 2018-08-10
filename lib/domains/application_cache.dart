@@ -12,8 +12,8 @@ class ApplicationCacheApi {
       get onApplicationCacheStatusUpdated => _client.onEvent
           .where((Event event) =>
               event.name == 'ApplicationCache.applicationCacheStatusUpdated')
-          .map((Event event) => new ApplicationCacheStatusUpdatedEvent.fromJson(
-              event.parameters));
+          .map((Event event) =>
+              ApplicationCacheStatusUpdatedEvent.fromJson(event.parameters));
 
   Stream<bool> get onNetworkStateUpdated => _client.onEvent
       .where(
@@ -31,12 +31,12 @@ class ApplicationCacheApi {
   Future<ApplicationCache> getApplicationCacheForFrame(
     page.FrameId frameId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
     };
-    Map result = await _client.send(
+    var result = await _client.send(
         'ApplicationCache.getApplicationCacheForFrame', parameters);
-    return new ApplicationCache.fromJson(result['applicationCache']);
+    return ApplicationCache.fromJson(result['applicationCache']);
   }
 
   /// Returns array of frame identifiers with manifest urls for each frame containing a document
@@ -44,9 +44,9 @@ class ApplicationCacheApi {
   /// Returns: Array of frame identifiers with manifest urls for each frame containing a document
   /// associated with some application cache.
   Future<List<FrameWithManifest>> getFramesWithManifests() async {
-    Map result = await _client.send('ApplicationCache.getFramesWithManifests');
+    var result = await _client.send('ApplicationCache.getFramesWithManifests');
     return (result['frameIds'] as List)
-        .map((e) => new FrameWithManifest.fromJson(e))
+        .map((e) => FrameWithManifest.fromJson(e))
         .toList();
   }
 
@@ -56,10 +56,10 @@ class ApplicationCacheApi {
   Future<String> getManifestForFrame(
     page.FrameId frameId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
     };
-    Map result =
+    var result =
         await _client.send('ApplicationCache.getManifestForFrame', parameters);
     return result['manifestURL'];
   }
@@ -81,9 +81,10 @@ class ApplicationCacheStatusUpdatedEvent {
     @required this.status,
   });
 
-  factory ApplicationCacheStatusUpdatedEvent.fromJson(Map json) {
-    return new ApplicationCacheStatusUpdatedEvent(
-      frameId: new page.FrameId.fromJson(json['frameId']),
+  factory ApplicationCacheStatusUpdatedEvent.fromJson(
+      Map<String, dynamic> json) {
+    return ApplicationCacheStatusUpdatedEvent(
+      frameId: page.FrameId.fromJson(json['frameId']),
       manifestURL: json['manifestURL'],
       status: json['status'],
     );
@@ -107,16 +108,16 @@ class ApplicationCacheResource {
     @required this.type,
   });
 
-  factory ApplicationCacheResource.fromJson(Map json) {
-    return new ApplicationCacheResource(
+  factory ApplicationCacheResource.fromJson(Map<String, dynamic> json) {
+    return ApplicationCacheResource(
       url: json['url'],
       size: json['size'],
       type: json['type'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'url': url,
       'size': size,
       'type': type,
@@ -150,20 +151,20 @@ class ApplicationCache {
     @required this.resources,
   });
 
-  factory ApplicationCache.fromJson(Map json) {
-    return new ApplicationCache(
+  factory ApplicationCache.fromJson(Map<String, dynamic> json) {
+    return ApplicationCache(
       manifestURL: json['manifestURL'],
       size: json['size'],
       creationTime: json['creationTime'],
       updateTime: json['updateTime'],
       resources: (json['resources'] as List)
-          .map((e) => new ApplicationCacheResource.fromJson(e))
+          .map((e) => ApplicationCacheResource.fromJson(e))
           .toList(),
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'manifestURL': manifestURL,
       'size': size,
       'creationTime': creationTime,
@@ -191,16 +192,16 @@ class FrameWithManifest {
     @required this.status,
   });
 
-  factory FrameWithManifest.fromJson(Map json) {
-    return new FrameWithManifest(
-      frameId: new page.FrameId.fromJson(json['frameId']),
+  factory FrameWithManifest.fromJson(Map<String, dynamic> json) {
+    return FrameWithManifest(
+      frameId: page.FrameId.fromJson(json['frameId']),
       manifestURL: json['manifestURL'],
       status: json['status'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'frameId': frameId.toJson(),
       'manifestURL': manifestURL,
       'status': status,

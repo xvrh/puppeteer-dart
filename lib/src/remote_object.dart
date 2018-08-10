@@ -20,13 +20,13 @@ Future<dynamic> remoteObject(
       case '-0':
         return -0;
       case 'NaN':
-        return double.NAN;
+        return double.nan;
       case 'Infinity':
-        return double.INFINITY;
+        return double.infinity;
       case '-Infinity':
-        return double.NEGATIVE_INFINITY;
+        return double.negativeInfinity;
       default:
-        throw new Exception(
+        throw Exception(
             'Unsupported unserializable value: ${remoteObject.unserializableValue}');
     }
   }

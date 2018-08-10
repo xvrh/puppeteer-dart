@@ -15,19 +15,18 @@ class OverlayApi {
   Stream<dom.BackendNodeId> get onInspectNodeRequested => _client.onEvent
       .where((Event event) => event.name == 'Overlay.inspectNodeRequested')
       .map((Event event) =>
-          new dom.BackendNodeId.fromJson(event.parameters['backendNodeId']));
+          dom.BackendNodeId.fromJson(event.parameters['backendNodeId']));
 
   /// Fired when the node should be highlighted. This happens after call to `setInspectMode`.
   Stream<dom.NodeId> get onNodeHighlightRequested => _client.onEvent
       .where((Event event) => event.name == 'Overlay.nodeHighlightRequested')
-      .map(
-          (Event event) => new dom.NodeId.fromJson(event.parameters['nodeId']));
+      .map((Event event) => dom.NodeId.fromJson(event.parameters['nodeId']));
 
   /// Fired when user asks to capture screenshot of some area on the page.
   Stream<page.Viewport> get onScreenshotRequested => _client.onEvent
       .where((Event event) => event.name == 'Overlay.screenshotRequested')
       .map((Event event) =>
-          new page.Viewport.fromJson(event.parameters['viewport']));
+          page.Viewport.fromJson(event.parameters['viewport']));
 
   /// Disables domain notifications.
   Future disable() async {
@@ -45,10 +44,10 @@ class OverlayApi {
   Future<Map> getHighlightObjectForTest(
     dom.NodeId nodeId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
-    Map result =
+    var result =
         await _client.send('Overlay.getHighlightObjectForTest', parameters);
     return result['highlight'];
   }
@@ -67,7 +66,7 @@ class OverlayApi {
     dom.RGBA contentColor,
     dom.RGBA contentOutlineColor,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
     };
     if (contentColor != null) {
@@ -91,7 +90,7 @@ class OverlayApi {
     dom.BackendNodeId backendNodeId,
     runtime.RemoteObjectId objectId,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'highlightConfig': highlightConfig.toJson(),
     };
     if (nodeId != null) {
@@ -115,7 +114,7 @@ class OverlayApi {
     dom.RGBA color,
     dom.RGBA outlineColor,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'quad': quad.toJson(),
     };
     if (color != null) {
@@ -142,7 +141,7 @@ class OverlayApi {
     dom.RGBA color,
     dom.RGBA outlineColor,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'x': x,
       'y': y,
       'width': width,
@@ -166,7 +165,7 @@ class OverlayApi {
     InspectMode mode, {
     HighlightConfig highlightConfig,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'mode': mode.toJson(),
     };
     if (highlightConfig != null) {
@@ -179,7 +178,7 @@ class OverlayApi {
   Future setPausedInDebuggerMessage({
     String message,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (message != null) {
       parameters['message'] = message;
     }
@@ -191,7 +190,7 @@ class OverlayApi {
   Future setShowDebugBorders(
     bool show,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'show': show,
     };
     await _client.send('Overlay.setShowDebugBorders', parameters);
@@ -202,7 +201,7 @@ class OverlayApi {
   Future setShowFPSCounter(
     bool show,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'show': show,
     };
     await _client.send('Overlay.setShowFPSCounter', parameters);
@@ -213,7 +212,7 @@ class OverlayApi {
   Future setShowPaintRects(
     bool result,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'result': result,
     };
     await _client.send('Overlay.setShowPaintRects', parameters);
@@ -224,7 +223,7 @@ class OverlayApi {
   Future setShowScrollBottleneckRects(
     bool show,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'show': show,
     };
     await _client.send('Overlay.setShowScrollBottleneckRects', parameters);
@@ -235,7 +234,7 @@ class OverlayApi {
   Future setShowViewportSizeOnResize(
     bool show,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'show': show,
     };
     await _client.send('Overlay.setShowViewportSizeOnResize', parameters);
@@ -245,7 +244,7 @@ class OverlayApi {
   Future setSuspended(
     bool suspended,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'suspended': suspended,
     };
     await _client.send('Overlay.setSuspended', parameters);
@@ -308,8 +307,8 @@ class HighlightConfig {
     this.cssGridColor,
   });
 
-  factory HighlightConfig.fromJson(Map json) {
-    return new HighlightConfig(
+  factory HighlightConfig.fromJson(Map<String, dynamic> json) {
+    return HighlightConfig(
       showInfo: json.containsKey('showInfo') ? json['showInfo'] : null,
       showRulers: json.containsKey('showRulers') ? json['showRulers'] : null,
       showExtensionLines: json.containsKey('showExtensionLines')
@@ -319,36 +318,36 @@ class HighlightConfig {
           ? json['displayAsMaterial']
           : null,
       contentColor: json.containsKey('contentColor')
-          ? new dom.RGBA.fromJson(json['contentColor'])
+          ? dom.RGBA.fromJson(json['contentColor'])
           : null,
       paddingColor: json.containsKey('paddingColor')
-          ? new dom.RGBA.fromJson(json['paddingColor'])
+          ? dom.RGBA.fromJson(json['paddingColor'])
           : null,
       borderColor: json.containsKey('borderColor')
-          ? new dom.RGBA.fromJson(json['borderColor'])
+          ? dom.RGBA.fromJson(json['borderColor'])
           : null,
       marginColor: json.containsKey('marginColor')
-          ? new dom.RGBA.fromJson(json['marginColor'])
+          ? dom.RGBA.fromJson(json['marginColor'])
           : null,
       eventTargetColor: json.containsKey('eventTargetColor')
-          ? new dom.RGBA.fromJson(json['eventTargetColor'])
+          ? dom.RGBA.fromJson(json['eventTargetColor'])
           : null,
       shapeColor: json.containsKey('shapeColor')
-          ? new dom.RGBA.fromJson(json['shapeColor'])
+          ? dom.RGBA.fromJson(json['shapeColor'])
           : null,
       shapeMarginColor: json.containsKey('shapeMarginColor')
-          ? new dom.RGBA.fromJson(json['shapeMarginColor'])
+          ? dom.RGBA.fromJson(json['shapeMarginColor'])
           : null,
       selectorList:
           json.containsKey('selectorList') ? json['selectorList'] : null,
       cssGridColor: json.containsKey('cssGridColor')
-          ? new dom.RGBA.fromJson(json['cssGridColor'])
+          ? dom.RGBA.fromJson(json['cssGridColor'])
           : null,
     );
   }
 
-  Map toJson() {
-    Map json = {};
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{};
     if (showInfo != null) {
       json['showInfo'] = showInfo;
     }

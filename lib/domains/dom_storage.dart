@@ -10,30 +10,29 @@ class DOMStorageApi {
 
   Stream<DomStorageItemAddedEvent> get onDomStorageItemAdded => _client.onEvent
       .where((Event event) => event.name == 'DOMStorage.domStorageItemAdded')
-      .map((Event event) =>
-          new DomStorageItemAddedEvent.fromJson(event.parameters));
+      .map(
+          (Event event) => DomStorageItemAddedEvent.fromJson(event.parameters));
 
   Stream<DomStorageItemRemovedEvent> get onDomStorageItemRemoved => _client
       .onEvent
       .where((Event event) => event.name == 'DOMStorage.domStorageItemRemoved')
       .map((Event event) =>
-          new DomStorageItemRemovedEvent.fromJson(event.parameters));
+          DomStorageItemRemovedEvent.fromJson(event.parameters));
 
   Stream<DomStorageItemUpdatedEvent> get onDomStorageItemUpdated => _client
       .onEvent
       .where((Event event) => event.name == 'DOMStorage.domStorageItemUpdated')
       .map((Event event) =>
-          new DomStorageItemUpdatedEvent.fromJson(event.parameters));
+          DomStorageItemUpdatedEvent.fromJson(event.parameters));
 
   Stream<StorageId> get onDomStorageItemsCleared => _client.onEvent
       .where((Event event) => event.name == 'DOMStorage.domStorageItemsCleared')
-      .map((Event event) =>
-          new StorageId.fromJson(event.parameters['storageId']));
+      .map((Event event) => StorageId.fromJson(event.parameters['storageId']));
 
   Future clear(
     StorageId storageId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'storageId': storageId.toJson(),
     };
     await _client.send('DOMStorage.clear', parameters);
@@ -52,21 +51,19 @@ class DOMStorageApi {
   Future<List<Item>> getDOMStorageItems(
     StorageId storageId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'storageId': storageId.toJson(),
     };
-    Map result =
+    var result =
         await _client.send('DOMStorage.getDOMStorageItems', parameters);
-    return (result['entries'] as List)
-        .map((e) => new Item.fromJson(e))
-        .toList();
+    return (result['entries'] as List).map((e) => Item.fromJson(e)).toList();
   }
 
   Future removeDOMStorageItem(
     StorageId storageId,
     String key,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'storageId': storageId.toJson(),
       'key': key,
     };
@@ -78,7 +75,7 @@ class DOMStorageApi {
     String key,
     String value,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'storageId': storageId.toJson(),
       'key': key,
       'value': value,
@@ -100,9 +97,9 @@ class DomStorageItemAddedEvent {
     @required this.newValue,
   });
 
-  factory DomStorageItemAddedEvent.fromJson(Map json) {
-    return new DomStorageItemAddedEvent(
-      storageId: new StorageId.fromJson(json['storageId']),
+  factory DomStorageItemAddedEvent.fromJson(Map<String, dynamic> json) {
+    return DomStorageItemAddedEvent(
+      storageId: StorageId.fromJson(json['storageId']),
       key: json['key'],
       newValue: json['newValue'],
     );
@@ -119,9 +116,9 @@ class DomStorageItemRemovedEvent {
     @required this.key,
   });
 
-  factory DomStorageItemRemovedEvent.fromJson(Map json) {
-    return new DomStorageItemRemovedEvent(
-      storageId: new StorageId.fromJson(json['storageId']),
+  factory DomStorageItemRemovedEvent.fromJson(Map<String, dynamic> json) {
+    return DomStorageItemRemovedEvent(
+      storageId: StorageId.fromJson(json['storageId']),
       key: json['key'],
     );
   }
@@ -143,9 +140,9 @@ class DomStorageItemUpdatedEvent {
     @required this.newValue,
   });
 
-  factory DomStorageItemUpdatedEvent.fromJson(Map json) {
-    return new DomStorageItemUpdatedEvent(
-      storageId: new StorageId.fromJson(json['storageId']),
+  factory DomStorageItemUpdatedEvent.fromJson(Map<String, dynamic> json) {
+    return DomStorageItemUpdatedEvent(
+      storageId: StorageId.fromJson(json['storageId']),
       key: json['key'],
       oldValue: json['oldValue'],
       newValue: json['newValue'],
@@ -166,15 +163,15 @@ class StorageId {
     @required this.isLocalStorage,
   });
 
-  factory StorageId.fromJson(Map json) {
-    return new StorageId(
+  factory StorageId.fromJson(Map<String, dynamic> json) {
+    return StorageId(
       securityOrigin: json['securityOrigin'],
       isLocalStorage: json['isLocalStorage'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'securityOrigin': securityOrigin,
       'isLocalStorage': isLocalStorage,
     };
@@ -188,7 +185,7 @@ class Item {
 
   Item(this.value);
 
-  factory Item.fromJson(List<String> value) => new Item(value);
+  factory Item.fromJson(List<String> value) => Item(value);
 
   List<String> toJson() => value;
 

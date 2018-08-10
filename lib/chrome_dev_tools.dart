@@ -8,9 +8,9 @@ import 'package:logging/logging.dart';
 
 export 'src/tab.dart';
 
-final Logger _logger = new Logger('chrome_dev_tools');
+final Logger _logger = Logger('chrome_dev_tools');
 
-const List<String> _defaultArgs = const <String>[
+const List<String> _defaultArgs = <String>[
   '--disable-background-networking',
   '--disable-background-timer-throttling',
   '--disable-client-side-phishing-detection',
@@ -31,7 +31,7 @@ const List<String> _defaultArgs = const <String>[
   '--remote-debugging-port=0',
 ];
 
-const List<String> _headlessArgs = const [
+const List<String> _headlessArgs = [
   '--headless',
   '--disable-gpu',
   '--hide-scrollbars',
@@ -45,8 +45,8 @@ class Chrome {
   Chrome._(this.process, this.connection);
 
   static Future<Chrome> start(String chromeExecutable,
-      {bool headless: true,
-      bool useTemporaryUserData: false,
+      {bool headless = true,
+      bool useTemporaryUserData = false,
       bool noSandboxFlag}) async {
     // In docker environment we want to force the '--no-sandbox' flag automatically
     noSandboxFlag ??= Platform.environment['CHROME_FORCE_NO_SANDBOX'] == 'true';
@@ -84,18 +84,18 @@ class Chrome {
     if (webSocketUrl != null) {
       Connection connection = await Connection.create(webSocketUrl);
 
-      return new Chrome._(chromeProcess, connection);
+      return Chrome._(chromeProcess, connection);
     } else {
-      throw new Exception('Not able to connect to Chrome DevTools');
+      throw Exception('Not able to connect to Chrome DevTools');
     }
   }
 
   static final RegExp _devToolRegExp =
-      new RegExp(r'^DevTools listening on (ws:\/\/.*)$');
+      RegExp(r'^DevTools listening on (ws:\/\/.*)$');
   static Future _waitForWebSocketUrl(Process chromeProcess) async {
     await for (String line in chromeProcess.stderr
-        .transform(new Utf8Decoder())
-        .transform(new LineSplitter())) {
+        .transform(Utf8Decoder())
+        .transform(LineSplitter())) {
       _logger.warning('[Chrome stderr]: $line');
       Match match = _devToolRegExp.firstMatch(line);
       if (match != null) {
@@ -106,7 +106,7 @@ class Chrome {
 
   TargetApi get targets => connection.targets;
 
-  Future<Tab> newTab(String url, {bool incognito: false}) async {
+  Future<Tab> newTab(String url, {bool incognito = false}) async {
     BrowserContextID contextID;
     if (incognito) {
       contextID = await targets.createBrowserContext();
@@ -117,7 +117,7 @@ class Chrome {
     Session session =
         await connection.createSession(targetId, browserContextID: contextID);
 
-    return new Tab(session);
+    return Tab(session);
   }
 
   Future closeAllTabs() async {
@@ -132,7 +132,7 @@ class Chrome {
       // With `process.kill`, it seems that chrome retain a lock on the user-data directory
       Process.runSync('taskkill', ['/pid', process.pid.toString(), '/T', '/F']);
     } else {
-      process.kill(ProcessSignal.SIGINT);
+      process.kill(ProcessSignal.sigint);
     }
 
     return process.exitCode;

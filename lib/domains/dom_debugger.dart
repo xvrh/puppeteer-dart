@@ -23,7 +23,7 @@ class DOMDebuggerApi {
     int depth,
     bool pierce,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'objectId': objectId.toJson(),
     };
     if (depth != null) {
@@ -32,10 +32,10 @@ class DOMDebuggerApi {
     if (pierce != null) {
       parameters['pierce'] = pierce;
     }
-    Map result =
+    var result =
         await _client.send('DOMDebugger.getEventListeners', parameters);
     return (result['listeners'] as List)
-        .map((e) => new EventListener.fromJson(e))
+        .map((e) => EventListener.fromJson(e))
         .toList();
   }
 
@@ -46,7 +46,7 @@ class DOMDebuggerApi {
     dom.NodeId nodeId,
     DOMBreakpointType type,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'type': type.toJson(),
     };
@@ -60,7 +60,7 @@ class DOMDebuggerApi {
     String eventName, {
     String targetName,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'eventName': eventName,
     };
     if (targetName != null) {
@@ -74,7 +74,7 @@ class DOMDebuggerApi {
   Future removeInstrumentationBreakpoint(
     String eventName,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'eventName': eventName,
     };
     await _client.send(
@@ -86,7 +86,7 @@ class DOMDebuggerApi {
   Future removeXHRBreakpoint(
     String url,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'url': url,
     };
     await _client.send('DOMDebugger.removeXHRBreakpoint', parameters);
@@ -99,7 +99,7 @@ class DOMDebuggerApi {
     dom.NodeId nodeId,
     DOMBreakpointType type,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'type': type.toJson(),
     };
@@ -114,7 +114,7 @@ class DOMDebuggerApi {
     String eventName, {
     String targetName,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'eventName': eventName,
     };
     if (targetName != null) {
@@ -128,7 +128,7 @@ class DOMDebuggerApi {
   Future setInstrumentationBreakpoint(
     String eventName,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'eventName': eventName,
     };
     await _client.send('DOMDebugger.setInstrumentationBreakpoint', parameters);
@@ -139,7 +139,7 @@ class DOMDebuggerApi {
   Future setXHRBreakpoint(
     String url,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'url': url,
     };
     await _client.send('DOMDebugger.setXHRBreakpoint', parameters);
@@ -217,29 +217,29 @@ class EventListener {
     this.backendNodeId,
   });
 
-  factory EventListener.fromJson(Map json) {
-    return new EventListener(
+  factory EventListener.fromJson(Map<String, dynamic> json) {
+    return EventListener(
       type: json['type'],
       useCapture: json['useCapture'],
       passive: json['passive'],
       once: json['once'],
-      scriptId: new runtime.ScriptId.fromJson(json['scriptId']),
+      scriptId: runtime.ScriptId.fromJson(json['scriptId']),
       lineNumber: json['lineNumber'],
       columnNumber: json['columnNumber'],
       handler: json.containsKey('handler')
-          ? new runtime.RemoteObject.fromJson(json['handler'])
+          ? runtime.RemoteObject.fromJson(json['handler'])
           : null,
       originalHandler: json.containsKey('originalHandler')
-          ? new runtime.RemoteObject.fromJson(json['originalHandler'])
+          ? runtime.RemoteObject.fromJson(json['originalHandler'])
           : null,
       backendNodeId: json.containsKey('backendNodeId')
-          ? new dom.BackendNodeId.fromJson(json['backendNodeId'])
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'])
           : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'type': type,
       'useCapture': useCapture,
       'passive': passive,

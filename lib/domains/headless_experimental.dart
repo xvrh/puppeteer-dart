@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
-import 'runtime.dart' as runtime;
 
 /// This domain provides experimental commands only supported in headless mode.
 class HeadlessExperimentalApi {
@@ -19,14 +18,8 @@ class HeadlessExperimentalApi {
   /// screenshot from the resulting frame. Requires that the target was created with enabled
   /// BeginFrameControl. Designed for use with --run-all-compositor-stages-before-draw, see also
   /// https://goo.gl/3zHXhB for more background.
-  /// [frameTime] Timestamp of this BeginFrame (milliseconds since epoch). If not set, the current time will
-  /// be used unless frameTicks is specified.
   /// [frameTimeTicks] Timestamp of this BeginFrame in Renderer TimeTicks (milliseconds of uptime). If not set,
-  /// the current time will be used unless frameTime is specified.
-  /// [deadline] Deadline of this BeginFrame (milliseconds since epoch). If not set, the deadline will be
-  /// calculated from the frameTime and interval unless deadlineTicks is specified.
-  /// [deadlineTicks] Deadline of this BeginFrame in Renderer TimeTicks  (milliseconds of uptime). If not set,
-  /// the deadline will be calculated from the frameTime and interval unless deadline is specified.
+  /// the current time will be used.
   /// [interval] The interval between BeginFrames that is reported to the compositor, in milliseconds.
   /// Defaults to a 60 frames/second interval, i.e. about 16.666 milliseconds.
   /// [noDisplayUpdates] Whether updates should not be committed and drawn onto the display. False by default. If
@@ -36,26 +29,14 @@ class HeadlessExperimentalApi {
   /// no screenshot will be captured. Note that capturing a screenshot can fail, for example,
   /// during renderer initialization. In such a case, no screenshot data will be returned.
   Future<BeginFrameResult> beginFrame({
-    runtime.Timestamp frameTime,
     num frameTimeTicks,
-    runtime.Timestamp deadline,
-    num deadlineTicks,
     num interval,
     bool noDisplayUpdates,
     ScreenshotParams screenshot,
   }) async {
-    Map parameters = {};
-    if (frameTime != null) {
-      parameters['frameTime'] = frameTime.toJson();
-    }
+    var parameters = <String, dynamic>{};
     if (frameTimeTicks != null) {
       parameters['frameTimeTicks'] = frameTimeTicks;
-    }
-    if (deadline != null) {
-      parameters['deadline'] = deadline.toJson();
-    }
-    if (deadlineTicks != null) {
-      parameters['deadlineTicks'] = deadlineTicks;
     }
     if (interval != null) {
       parameters['interval'] = interval;
@@ -66,9 +47,9 @@ class HeadlessExperimentalApi {
     if (screenshot != null) {
       parameters['screenshot'] = screenshot.toJson();
     }
-    Map result =
+    var result =
         await _client.send('HeadlessExperimental.beginFrame', parameters);
-    return new BeginFrameResult.fromJson(result);
+    return BeginFrameResult.fromJson(result);
   }
 
   /// Disables headless events for the target.
@@ -95,8 +76,8 @@ class BeginFrameResult {
     this.screenshotData,
   });
 
-  factory BeginFrameResult.fromJson(Map json) {
-    return new BeginFrameResult(
+  factory BeginFrameResult.fromJson(Map<String, dynamic> json) {
+    return BeginFrameResult(
       hasDamage: json['hasDamage'],
       screenshotData:
           json.containsKey('screenshotData') ? json['screenshotData'] : null,
@@ -117,15 +98,15 @@ class ScreenshotParams {
     this.quality,
   });
 
-  factory ScreenshotParams.fromJson(Map json) {
-    return new ScreenshotParams(
+  factory ScreenshotParams.fromJson(Map<String, dynamic> json) {
+    return ScreenshotParams(
       format: json.containsKey('format') ? json['format'] : null,
       quality: json.containsKey('quality') ? json['quality'] : null,
     );
   }
 
-  Map toJson() {
-    Map json = {};
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{};
     if (format != null) {
       json['format'] = format;
     }

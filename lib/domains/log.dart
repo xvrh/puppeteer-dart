@@ -13,7 +13,7 @@ class LogApi {
   /// Issued when new message was logged.
   Stream<LogEntry> get onEntryAdded => _client.onEvent
       .where((Event event) => event.name == 'Log.entryAdded')
-      .map((Event event) => new LogEntry.fromJson(event.parameters['entry']));
+      .map((Event event) => LogEntry.fromJson(event.parameters['entry']));
 
   /// Clears the log.
   Future clear() async {
@@ -36,7 +36,7 @@ class LogApi {
   Future startViolationsReport(
     List<ViolationSetting> config,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'config': config.map((e) => e.toJson()).toList(),
     };
     await _client.send('Log.startViolationsReport', parameters);
@@ -93,31 +93,31 @@ class LogEntry {
     this.args,
   });
 
-  factory LogEntry.fromJson(Map json) {
-    return new LogEntry(
+  factory LogEntry.fromJson(Map<String, dynamic> json) {
+    return LogEntry(
       source: json['source'],
       level: json['level'],
       text: json['text'],
-      timestamp: new runtime.Timestamp.fromJson(json['timestamp']),
+      timestamp: runtime.Timestamp.fromJson(json['timestamp']),
       url: json.containsKey('url') ? json['url'] : null,
       lineNumber: json.containsKey('lineNumber') ? json['lineNumber'] : null,
       stackTrace: json.containsKey('stackTrace')
-          ? new runtime.StackTrace.fromJson(json['stackTrace'])
+          ? runtime.StackTrace.fromJson(json['stackTrace'])
           : null,
       networkRequestId: json.containsKey('networkRequestId')
-          ? new network.RequestId.fromJson(json['networkRequestId'])
+          ? network.RequestId.fromJson(json['networkRequestId'])
           : null,
       workerId: json.containsKey('workerId') ? json['workerId'] : null,
       args: json.containsKey('args')
           ? (json['args'] as List)
-              .map((e) => new runtime.RemoteObject.fromJson(e))
+              .map((e) => runtime.RemoteObject.fromJson(e))
               .toList()
           : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'source': source,
       'level': level,
       'text': text,
@@ -158,15 +158,15 @@ class ViolationSetting {
     @required this.threshold,
   });
 
-  factory ViolationSetting.fromJson(Map json) {
-    return new ViolationSetting(
+  factory ViolationSetting.fromJson(Map<String, dynamic> json) {
+    return ViolationSetting(
       name: json['name'],
       threshold: json['threshold'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
       'threshold': threshold,
     };

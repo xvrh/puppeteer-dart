@@ -17,7 +17,7 @@ main() {
     // Convert the `EvaluateResult` to a Map with all the javascript properties
     Map rect = await tab.remoteObjectProperties(result.result);
 
-    Viewport clip = new Viewport(
+    Viewport clip = Viewport(
         x: rect['x'],
         y: rect['y'],
         width: rect['width'],
@@ -28,7 +28,7 @@ main() {
     String screenshot = await tab.page.captureScreenshot(clip: clip);
 
     // Save it to a file
-    await new File.fromUri(Platform.script.resolve('_github_form.png'))
-        .writeAsBytes(BASE64.decode(screenshot));
+    await File.fromUri(Platform.script.resolve('_github_form.png'))
+        .writeAsBytes(base64.decode(screenshot));
   });
 }

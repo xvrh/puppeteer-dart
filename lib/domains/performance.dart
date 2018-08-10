@@ -10,7 +10,7 @@ class PerformanceApi {
   /// Current values of the metrics.
   Stream<MetricsEvent> get onMetrics => _client.onEvent
       .where((Event event) => event.name == 'Performance.metrics')
-      .map((Event event) => new MetricsEvent.fromJson(event.parameters));
+      .map((Event event) => MetricsEvent.fromJson(event.parameters));
 
   /// Disable collecting and reporting metrics.
   Future disable() async {
@@ -25,10 +25,8 @@ class PerformanceApi {
   /// Retrieve current values of run-time metrics.
   /// Returns: Current values for run-time metrics.
   Future<List<Metric>> getMetrics() async {
-    Map result = await _client.send('Performance.getMetrics');
-    return (result['metrics'] as List)
-        .map((e) => new Metric.fromJson(e))
-        .toList();
+    var result = await _client.send('Performance.getMetrics');
+    return (result['metrics'] as List).map((e) => Metric.fromJson(e)).toList();
   }
 }
 
@@ -44,10 +42,10 @@ class MetricsEvent {
     @required this.title,
   });
 
-  factory MetricsEvent.fromJson(Map json) {
-    return new MetricsEvent(
+  factory MetricsEvent.fromJson(Map<String, dynamic> json) {
+    return MetricsEvent(
       metrics:
-          (json['metrics'] as List).map((e) => new Metric.fromJson(e)).toList(),
+          (json['metrics'] as List).map((e) => Metric.fromJson(e)).toList(),
       title: json['title'],
     );
   }
@@ -66,15 +64,15 @@ class Metric {
     @required this.value,
   });
 
-  factory Metric.fromJson(Map json) {
-    return new Metric(
+  factory Metric.fromJson(Map<String, dynamic> json) {
+    return Metric(
       name: json['name'],
       value: json['value'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
       'value': value,
     };

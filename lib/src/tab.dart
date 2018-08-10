@@ -12,8 +12,8 @@ class Tab extends Object with TabMixin {
   Tab(this.session);
 
   Future waitUntilNetworkIdle(
-          {Duration idleDuration: const Duration(milliseconds: 1000),
-          int idleInFlight: 0}) =>
+          {Duration idleDuration = const Duration(milliseconds: 1000),
+          int idleInFlight = 0}) =>
       helper.waitUntilNetworkIdle(network,
           idleDuration: idleDuration, idleInFlight: idleInFlight);
 

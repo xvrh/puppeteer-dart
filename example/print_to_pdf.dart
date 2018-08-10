@@ -12,7 +12,7 @@ main() {
     await tab.waitUntilNetworkIdle();
 
     // Capture the PDF and convert it to a List of bytes.
-    List<int> pdf = BASE64.decode(await tab.page.printToPDF(
+    List<int> pdf = base64.decode(await tab.page.printToPDF(
         pageRanges: '1',
         landscape: true,
         printBackground: true,
@@ -22,7 +22,7 @@ main() {
         marginTop: 0));
 
     // Save the bytes in a file
-    await new File.fromUri(Platform.script.resolve('_github.pdf'))
+    await File.fromUri(Platform.script.resolve('_github.pdf'))
         .writeAsBytes(pdf);
   });
 }

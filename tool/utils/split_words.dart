@@ -8,7 +8,7 @@ List<String> splitWords(String input) {
 
   List<int> runes = input.runes.toList();
   for (int i = 0; i < runes.length; i++) {
-    String char = new String.fromCharCode(runes[i]);
+    String char = String.fromCharCode(runes[i]);
 
     if (!_isLower(char) && !_isUpper(char) && !_isNum(char)) {
       currentWord += lastChar;
@@ -53,9 +53,9 @@ List<String> splitWords(String input) {
   return words;
 }
 
-final RegExp _num = new RegExp(r'[0-9]');
-final RegExp _lower = new RegExp(r'[a-zà-ú]');
-final RegExp _upper = new RegExp(r'[A-ZÀ-Ú]');
+final RegExp _num = RegExp(r'[0-9]');
+final RegExp _lower = RegExp(r'[a-zà-ú]');
+final RegExp _upper = RegExp(r'[A-ZÀ-Ú]');
 
 bool _isNum(String char) => _num.hasMatch(char);
 bool _isUpper(String char) => _upper.hasMatch(char);

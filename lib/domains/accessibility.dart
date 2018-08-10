@@ -22,7 +22,7 @@ class AccessibilityApi {
     runtime.RemoteObjectId objectId,
     bool fetchRelatives,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (nodeId != null) {
       parameters['nodeId'] = nodeId.toJson();
     }
@@ -35,11 +35,9 @@ class AccessibilityApi {
     if (fetchRelatives != null) {
       parameters['fetchRelatives'] = fetchRelatives;
     }
-    Map result =
+    var result =
         await _client.send('Accessibility.getPartialAXTree', parameters);
-    return (result['nodes'] as List)
-        .map((e) => new AXNode.fromJson(e))
-        .toList();
+    return (result['nodes'] as List).map((e) => AXNode.fromJson(e)).toList();
   }
 }
 
@@ -49,7 +47,7 @@ class AXNodeId {
 
   AXNodeId(this.value);
 
-  factory AXNodeId.fromJson(String value) => new AXNodeId(value);
+  factory AXNodeId.fromJson(String value) => AXNodeId(value);
 
   String toJson() => value;
 
@@ -233,22 +231,20 @@ class AXValueSource {
     this.invalidReason,
   });
 
-  factory AXValueSource.fromJson(Map json) {
-    return new AXValueSource(
-      type: new AXValueSourceType.fromJson(json['type']),
-      value: json.containsKey('value')
-          ? new AXValue.fromJson(json['value'])
-          : null,
+  factory AXValueSource.fromJson(Map<String, dynamic> json) {
+    return AXValueSource(
+      type: AXValueSourceType.fromJson(json['type']),
+      value: json.containsKey('value') ? AXValue.fromJson(json['value']) : null,
       attribute: json.containsKey('attribute') ? json['attribute'] : null,
       attributeValue: json.containsKey('attributeValue')
-          ? new AXValue.fromJson(json['attributeValue'])
+          ? AXValue.fromJson(json['attributeValue'])
           : null,
       superseded: json.containsKey('superseded') ? json['superseded'] : null,
       nativeSource: json.containsKey('nativeSource')
-          ? new AXValueNativeSourceType.fromJson(json['nativeSource'])
+          ? AXValueNativeSourceType.fromJson(json['nativeSource'])
           : null,
       nativeSourceValue: json.containsKey('nativeSourceValue')
-          ? new AXValue.fromJson(json['nativeSourceValue'])
+          ? AXValue.fromJson(json['nativeSourceValue'])
           : null,
       invalid: json.containsKey('invalid') ? json['invalid'] : null,
       invalidReason:
@@ -256,8 +252,8 @@ class AXValueSource {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'type': type.toJson(),
     };
     if (value != null) {
@@ -304,17 +300,16 @@ class AXRelatedNode {
     this.text,
   });
 
-  factory AXRelatedNode.fromJson(Map json) {
-    return new AXRelatedNode(
-      backendDOMNodeId:
-          new dom.BackendNodeId.fromJson(json['backendDOMNodeId']),
+  factory AXRelatedNode.fromJson(Map<String, dynamic> json) {
+    return AXRelatedNode(
+      backendDOMNodeId: dom.BackendNodeId.fromJson(json['backendDOMNodeId']),
       idref: json.containsKey('idref') ? json['idref'] : null,
       text: json.containsKey('text') ? json['text'] : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'backendDOMNodeId': backendDOMNodeId.toJson(),
     };
     if (idref != null) {
@@ -339,15 +334,15 @@ class AXProperty {
     @required this.value,
   });
 
-  factory AXProperty.fromJson(Map json) {
-    return new AXProperty(
-      name: new AXPropertyName.fromJson(json['name']),
-      value: new AXValue.fromJson(json['value']),
+  factory AXProperty.fromJson(Map<String, dynamic> json) {
+    return AXProperty(
+      name: AXPropertyName.fromJson(json['name']),
+      value: AXValue.fromJson(json['value']),
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name.toJson(),
       'value': value.toJson(),
     };
@@ -376,25 +371,25 @@ class AXValue {
     this.sources,
   });
 
-  factory AXValue.fromJson(Map json) {
-    return new AXValue(
-      type: new AXValueType.fromJson(json['type']),
+  factory AXValue.fromJson(Map<String, dynamic> json) {
+    return AXValue(
+      type: AXValueType.fromJson(json['type']),
       value: json.containsKey('value') ? json['value'] : null,
       relatedNodes: json.containsKey('relatedNodes')
           ? (json['relatedNodes'] as List)
-              .map((e) => new AXRelatedNode.fromJson(e))
+              .map((e) => AXRelatedNode.fromJson(e))
               .toList()
           : null,
       sources: json.containsKey('sources')
           ? (json['sources'] as List)
-              .map((e) => new AXValueSource.fromJson(e))
+              .map((e) => AXValueSource.fromJson(e))
               .toList()
           : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'type': type.toJson(),
     };
     if (value != null) {
@@ -554,43 +549,37 @@ class AXNode {
     this.backendDOMNodeId,
   });
 
-  factory AXNode.fromJson(Map json) {
-    return new AXNode(
-      nodeId: new AXNodeId.fromJson(json['nodeId']),
+  factory AXNode.fromJson(Map<String, dynamic> json) {
+    return AXNode(
+      nodeId: AXNodeId.fromJson(json['nodeId']),
       ignored: json['ignored'],
       ignoredReasons: json.containsKey('ignoredReasons')
           ? (json['ignoredReasons'] as List)
-              .map((e) => new AXProperty.fromJson(e))
+              .map((e) => AXProperty.fromJson(e))
               .toList()
           : null,
-      role:
-          json.containsKey('role') ? new AXValue.fromJson(json['role']) : null,
-      name:
-          json.containsKey('name') ? new AXValue.fromJson(json['name']) : null,
+      role: json.containsKey('role') ? AXValue.fromJson(json['role']) : null,
+      name: json.containsKey('name') ? AXValue.fromJson(json['name']) : null,
       description: json.containsKey('description')
-          ? new AXValue.fromJson(json['description'])
+          ? AXValue.fromJson(json['description'])
           : null,
-      value: json.containsKey('value')
-          ? new AXValue.fromJson(json['value'])
-          : null,
+      value: json.containsKey('value') ? AXValue.fromJson(json['value']) : null,
       properties: json.containsKey('properties')
           ? (json['properties'] as List)
-              .map((e) => new AXProperty.fromJson(e))
+              .map((e) => AXProperty.fromJson(e))
               .toList()
           : null,
       childIds: json.containsKey('childIds')
-          ? (json['childIds'] as List)
-              .map((e) => new AXNodeId.fromJson(e))
-              .toList()
+          ? (json['childIds'] as List).map((e) => AXNodeId.fromJson(e)).toList()
           : null,
       backendDOMNodeId: json.containsKey('backendDOMNodeId')
-          ? new dom.BackendNodeId.fromJson(json['backendDOMNodeId'])
+          ? dom.BackendNodeId.fromJson(json['backendDOMNodeId'])
           : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'ignored': ignored,
     };

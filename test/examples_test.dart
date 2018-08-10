@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 // Test all the dart scripts in the example/ folder.
 main() {
-  for (File exampleFile in new Directory('example').listSync().where((f) =>
+  for (File exampleFile in Directory('example').listSync().where((f) =>
       f is File &&
       f.path.endsWith('.dart') &&
       !p.basename(f.path).startsWith('_'))) {

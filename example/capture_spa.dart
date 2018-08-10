@@ -8,6 +8,7 @@ main() {
     await tab.waitUntilNetworkIdle();
 
     // Take a snapshot of the DOM of the current page
+    // ignore: deprecated_member_use
     GetSnapshotResult result = await tab.domSnapshot.getSnapshot([]);
 
     // Iterate the nodes and output some HTML.

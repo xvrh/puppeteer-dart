@@ -3,7 +3,6 @@ import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'page.dart' as page;
-import 'runtime.dart' as runtime;
 import 'network.dart' as network;
 
 /// This domain emulates different environments for the page.
@@ -29,7 +28,7 @@ class EmulationApi {
   /// Tells whether emulation is supported.
   /// Returns: True if emulation is supported.
   Future<bool> canEmulate() async {
-    Map result = await _client.send('Emulation.canEmulate');
+    var result = await _client.send('Emulation.canEmulate');
     return result['result'];
   }
 
@@ -53,7 +52,7 @@ class EmulationApi {
   Future setCPUThrottlingRate(
     num rate,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'rate': rate,
     };
     await _client.send('Emulation.setCPUThrottlingRate', parameters);
@@ -66,7 +65,7 @@ class EmulationApi {
   Future setDefaultBackgroundColorOverride({
     dom.RGBA color,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (color != null) {
       parameters['color'] = color.toJson();
     }
@@ -105,7 +104,7 @@ class EmulationApi {
     ScreenOrientation screenOrientation,
     page.Viewport viewport,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'width': width,
       'height': height,
       'deviceScaleFactor': deviceScaleFactor,
@@ -138,13 +137,33 @@ class EmulationApi {
     await _client.send('Emulation.setDeviceMetricsOverride', parameters);
   }
 
+  /// [hidden] Whether scrollbars should be always hidden.
+  Future setScrollbarsHidden(
+    bool hidden,
+  ) async {
+    var parameters = <String, dynamic>{
+      'hidden': hidden,
+    };
+    await _client.send('Emulation.setScrollbarsHidden', parameters);
+  }
+
+  /// [disabled] Whether document.coookie API should be disabled.
+  Future setDocumentCookieDisabled(
+    bool disabled,
+  ) async {
+    var parameters = <String, dynamic>{
+      'disabled': disabled,
+    };
+    await _client.send('Emulation.setDocumentCookieDisabled', parameters);
+  }
+
   /// [enabled] Whether touch emulation based on mouse input should be enabled.
   /// [configuration] Touch/gesture events configuration. Default: current platform.
   Future setEmitTouchEventsForMouse(
     bool enabled, {
     String configuration,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'enabled': enabled,
     };
     if (configuration != null) {
@@ -158,7 +177,7 @@ class EmulationApi {
   Future setEmulatedMedia(
     String media,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'media': media,
     };
     await _client.send('Emulation.setEmulatedMedia', parameters);
@@ -174,7 +193,7 @@ class EmulationApi {
     num longitude,
     num accuracy,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (latitude != null) {
       parameters['latitude'] = latitude;
     }
@@ -189,10 +208,11 @@ class EmulationApi {
 
   /// Overrides value returned by the javascript navigator object.
   /// [platform] The platform navigator.platform should return.
+  @deprecated
   Future setNavigatorOverrides(
     String platform,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'platform': platform,
     };
     await _client.send('Emulation.setNavigatorOverrides', parameters);
@@ -203,7 +223,7 @@ class EmulationApi {
   Future setPageScaleFactor(
     num pageScaleFactor,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'pageScaleFactor': pageScaleFactor,
     };
     await _client.send('Emulation.setPageScaleFactor', parameters);
@@ -214,7 +234,7 @@ class EmulationApi {
   Future setScriptExecutionDisabled(
     bool value,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'value': value,
     };
     await _client.send('Emulation.setScriptExecutionDisabled', parameters);
@@ -227,7 +247,7 @@ class EmulationApi {
     bool enabled, {
     int maxTouchPoints,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'enabled': enabled,
     };
     if (maxTouchPoints != null) {
@@ -245,14 +265,15 @@ class EmulationApi {
   /// [waitForNavigation] If set the virtual time policy change should be deferred until any frame starts navigating.
   /// Note any previous deferred policy change is superseded.
   /// [initialVirtualTime] If set, base::Time::Now will be overriden to initially return this value.
-  Future<SetVirtualTimePolicyResult> setVirtualTimePolicy(
+  /// Returns: Absolute timestamp at which virtual time was first enabled (up time in milliseconds).
+  Future<num> setVirtualTimePolicy(
     VirtualTimePolicy policy, {
     num budget,
     int maxVirtualTimeTaskStarvationCount,
     bool waitForNavigation,
     network.TimeSinceEpoch initialVirtualTime,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'policy': policy.toJson(),
     };
     if (budget != null) {
@@ -268,9 +289,9 @@ class EmulationApi {
     if (initialVirtualTime != null) {
       parameters['initialVirtualTime'] = initialVirtualTime.toJson();
     }
-    Map result =
+    var result =
         await _client.send('Emulation.setVirtualTimePolicy', parameters);
-    return new SetVirtualTimePolicyResult.fromJson(result);
+    return result['virtualTimeTicksBase'];
   }
 
   /// Resizes the frame/viewport of the page. Note that this does not affect the frame's container
@@ -283,31 +304,32 @@ class EmulationApi {
     int width,
     int height,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'width': width,
       'height': height,
     };
     await _client.send('Emulation.setVisibleSize', parameters);
   }
-}
 
-class SetVirtualTimePolicyResult {
-  /// Absolute timestamp at which virtual time was first enabled (milliseconds since epoch).
-  final runtime.Timestamp virtualTimeBase;
-
-  /// Absolute timestamp at which virtual time was first enabled (up time in milliseconds).
-  final num virtualTimeTicksBase;
-
-  SetVirtualTimePolicyResult({
-    @required this.virtualTimeBase,
-    @required this.virtualTimeTicksBase,
-  });
-
-  factory SetVirtualTimePolicyResult.fromJson(Map json) {
-    return new SetVirtualTimePolicyResult(
-      virtualTimeBase: new runtime.Timestamp.fromJson(json['virtualTimeBase']),
-      virtualTimeTicksBase: json['virtualTimeTicksBase'],
-    );
+  /// Allows overriding user agent with the given string.
+  /// [userAgent] User agent to use.
+  /// [acceptLanguage] Browser langugage to emulate.
+  /// [platform] The platform navigator.platform should return.
+  Future setUserAgentOverride(
+    String userAgent, {
+    String acceptLanguage,
+    String platform,
+  }) async {
+    var parameters = <String, dynamic>{
+      'userAgent': userAgent,
+    };
+    if (acceptLanguage != null) {
+      parameters['acceptLanguage'] = acceptLanguage;
+    }
+    if (platform != null) {
+      parameters['platform'] = platform;
+    }
+    await _client.send('Emulation.setUserAgentOverride', parameters);
   }
 }
 
@@ -324,15 +346,15 @@ class ScreenOrientation {
     @required this.angle,
   });
 
-  factory ScreenOrientation.fromJson(Map json) {
-    return new ScreenOrientation(
+  factory ScreenOrientation.fromJson(Map<String, dynamic> json) {
+    return ScreenOrientation(
       type: json['type'],
       angle: json['angle'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'type': type,
       'angle': angle,
     };

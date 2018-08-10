@@ -13,7 +13,7 @@ class ConsoleApi {
   Stream<ConsoleMessage> get onMessageAdded => _client.onEvent
       .where((Event event) => event.name == 'Console.messageAdded')
       .map((Event event) =>
-          new ConsoleMessage.fromJson(event.parameters['message']));
+          ConsoleMessage.fromJson(event.parameters['message']));
 
   /// Does nothing.
   Future clearMessages() async {
@@ -61,8 +61,8 @@ class ConsoleMessage {
     this.column,
   });
 
-  factory ConsoleMessage.fromJson(Map json) {
-    return new ConsoleMessage(
+  factory ConsoleMessage.fromJson(Map<String, dynamic> json) {
+    return ConsoleMessage(
       source: json['source'],
       level: json['level'],
       text: json['text'],
@@ -72,8 +72,8 @@ class ConsoleMessage {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'source': source,
       'level': level,
       'text': text,

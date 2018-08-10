@@ -13,14 +13,14 @@ class ProfilerApi {
       .onEvent
       .where((Event event) => event.name == 'Profiler.consoleProfileFinished')
       .map((Event event) =>
-          new ConsoleProfileFinishedEvent.fromJson(event.parameters));
+          ConsoleProfileFinishedEvent.fromJson(event.parameters));
 
   /// Sent when new profile recording is started using console.profile() call.
   Stream<ConsoleProfileStartedEvent> get onConsoleProfileStarted => _client
       .onEvent
       .where((Event event) => event.name == 'Profiler.consoleProfileStarted')
       .map((Event event) =>
-          new ConsoleProfileStartedEvent.fromJson(event.parameters));
+          ConsoleProfileStartedEvent.fromJson(event.parameters));
 
   Future disable() async {
     await _client.send('Profiler.disable');
@@ -34,9 +34,9 @@ class ProfilerApi {
   /// garbage collection.
   /// Returns: Coverage data for the current isolate.
   Future<List<ScriptCoverage>> getBestEffortCoverage() async {
-    Map result = await _client.send('Profiler.getBestEffortCoverage');
+    var result = await _client.send('Profiler.getBestEffortCoverage');
     return (result['result'] as List)
-        .map((e) => new ScriptCoverage.fromJson(e))
+        .map((e) => ScriptCoverage.fromJson(e))
         .toList();
   }
 
@@ -45,7 +45,7 @@ class ProfilerApi {
   Future setSamplingInterval(
     int interval,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'interval': interval,
     };
     await _client.send('Profiler.setSamplingInterval', parameters);
@@ -64,7 +64,7 @@ class ProfilerApi {
     bool callCount,
     bool detailed,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (callCount != null) {
       parameters['callCount'] = callCount;
     }
@@ -81,8 +81,8 @@ class ProfilerApi {
 
   /// Returns: Recorded profile.
   Future<Profile> stop() async {
-    Map result = await _client.send('Profiler.stop');
-    return new Profile.fromJson(result['profile']);
+    var result = await _client.send('Profiler.stop');
+    return Profile.fromJson(result['profile']);
   }
 
   /// Disable precise code coverage. Disabling releases unnecessary execution count records and allows
@@ -100,18 +100,18 @@ class ProfilerApi {
   /// coverage needs to have started.
   /// Returns: Coverage data for the current isolate.
   Future<List<ScriptCoverage>> takePreciseCoverage() async {
-    Map result = await _client.send('Profiler.takePreciseCoverage');
+    var result = await _client.send('Profiler.takePreciseCoverage');
     return (result['result'] as List)
-        .map((e) => new ScriptCoverage.fromJson(e))
+        .map((e) => ScriptCoverage.fromJson(e))
         .toList();
   }
 
   /// Collect type profile.
   /// Returns: Type profile for all scripts since startTypeProfile() was turned on.
   Future<List<ScriptTypeProfile>> takeTypeProfile() async {
-    Map result = await _client.send('Profiler.takeTypeProfile');
+    var result = await _client.send('Profiler.takeTypeProfile');
     return (result['result'] as List)
-        .map((e) => new ScriptTypeProfile.fromJson(e))
+        .map((e) => ScriptTypeProfile.fromJson(e))
         .toList();
   }
 }
@@ -134,11 +134,11 @@ class ConsoleProfileFinishedEvent {
     this.title,
   });
 
-  factory ConsoleProfileFinishedEvent.fromJson(Map json) {
-    return new ConsoleProfileFinishedEvent(
+  factory ConsoleProfileFinishedEvent.fromJson(Map<String, dynamic> json) {
+    return ConsoleProfileFinishedEvent(
       id: json['id'],
-      location: new debugger.Location.fromJson(json['location']),
-      profile: new Profile.fromJson(json['profile']),
+      location: debugger.Location.fromJson(json['location']),
+      profile: Profile.fromJson(json['profile']),
       title: json.containsKey('title') ? json['title'] : null,
     );
   }
@@ -159,10 +159,10 @@ class ConsoleProfileStartedEvent {
     this.title,
   });
 
-  factory ConsoleProfileStartedEvent.fromJson(Map json) {
-    return new ConsoleProfileStartedEvent(
+  factory ConsoleProfileStartedEvent.fromJson(Map<String, dynamic> json) {
+    return ConsoleProfileStartedEvent(
       id: json['id'],
-      location: new debugger.Location.fromJson(json['location']),
+      location: debugger.Location.fromJson(json['location']),
       title: json.containsKey('title') ? json['title'] : null,
     );
   }
@@ -198,10 +198,10 @@ class ProfileNode {
     this.positionTicks,
   });
 
-  factory ProfileNode.fromJson(Map json) {
-    return new ProfileNode(
+  factory ProfileNode.fromJson(Map<String, dynamic> json) {
+    return ProfileNode(
       id: json['id'],
-      callFrame: new runtime.CallFrame.fromJson(json['callFrame']),
+      callFrame: runtime.CallFrame.fromJson(json['callFrame']),
       hitCount: json.containsKey('hitCount') ? json['hitCount'] : null,
       children: json.containsKey('children')
           ? (json['children'] as List).map((e) => e as int).toList()
@@ -209,14 +209,14 @@ class ProfileNode {
       deoptReason: json.containsKey('deoptReason') ? json['deoptReason'] : null,
       positionTicks: json.containsKey('positionTicks')
           ? (json['positionTicks'] as List)
-              .map((e) => new PositionTickInfo.fromJson(e))
+              .map((e) => PositionTickInfo.fromJson(e))
               .toList()
           : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'id': id,
       'callFrame': callFrame.toJson(),
     };
@@ -262,11 +262,10 @@ class Profile {
     this.timeDeltas,
   });
 
-  factory Profile.fromJson(Map json) {
-    return new Profile(
-      nodes: (json['nodes'] as List)
-          .map((e) => new ProfileNode.fromJson(e))
-          .toList(),
+  factory Profile.fromJson(Map<String, dynamic> json) {
+    return Profile(
+      nodes:
+          (json['nodes'] as List).map((e) => ProfileNode.fromJson(e)).toList(),
       startTime: json['startTime'],
       endTime: json['endTime'],
       samples: json.containsKey('samples')
@@ -278,8 +277,8 @@ class Profile {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'nodes': nodes.map((e) => e.toJson()).toList(),
       'startTime': startTime,
       'endTime': endTime,
@@ -307,15 +306,15 @@ class PositionTickInfo {
     @required this.ticks,
   });
 
-  factory PositionTickInfo.fromJson(Map json) {
-    return new PositionTickInfo(
+  factory PositionTickInfo.fromJson(Map<String, dynamic> json) {
+    return PositionTickInfo(
       line: json['line'],
       ticks: json['ticks'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'line': line,
       'ticks': ticks,
     };
@@ -340,16 +339,16 @@ class CoverageRange {
     @required this.count,
   });
 
-  factory CoverageRange.fromJson(Map json) {
-    return new CoverageRange(
+  factory CoverageRange.fromJson(Map<String, dynamic> json) {
+    return CoverageRange(
       startOffset: json['startOffset'],
       endOffset: json['endOffset'],
       count: json['count'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'startOffset': startOffset,
       'endOffset': endOffset,
       'count': count,
@@ -375,18 +374,18 @@ class FunctionCoverage {
     @required this.isBlockCoverage,
   });
 
-  factory FunctionCoverage.fromJson(Map json) {
-    return new FunctionCoverage(
+  factory FunctionCoverage.fromJson(Map<String, dynamic> json) {
+    return FunctionCoverage(
       functionName: json['functionName'],
       ranges: (json['ranges'] as List)
-          .map((e) => new CoverageRange.fromJson(e))
+          .map((e) => CoverageRange.fromJson(e))
           .toList(),
       isBlockCoverage: json['isBlockCoverage'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'functionName': functionName,
       'ranges': ranges.map((e) => e.toJson()).toList(),
       'isBlockCoverage': isBlockCoverage,
@@ -412,18 +411,18 @@ class ScriptCoverage {
     @required this.functions,
   });
 
-  factory ScriptCoverage.fromJson(Map json) {
-    return new ScriptCoverage(
-      scriptId: new runtime.ScriptId.fromJson(json['scriptId']),
+  factory ScriptCoverage.fromJson(Map<String, dynamic> json) {
+    return ScriptCoverage(
+      scriptId: runtime.ScriptId.fromJson(json['scriptId']),
       url: json['url'],
       functions: (json['functions'] as List)
-          .map((e) => new FunctionCoverage.fromJson(e))
+          .map((e) => FunctionCoverage.fromJson(e))
           .toList(),
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'scriptId': scriptId.toJson(),
       'url': url,
       'functions': functions.map((e) => e.toJson()).toList(),
@@ -441,14 +440,14 @@ class TypeObject {
     @required this.name,
   });
 
-  factory TypeObject.fromJson(Map json) {
-    return new TypeObject(
+  factory TypeObject.fromJson(Map<String, dynamic> json) {
+    return TypeObject(
       name: json['name'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'name': name,
     };
     return json;
@@ -468,17 +467,16 @@ class TypeProfileEntry {
     @required this.types,
   });
 
-  factory TypeProfileEntry.fromJson(Map json) {
-    return new TypeProfileEntry(
+  factory TypeProfileEntry.fromJson(Map<String, dynamic> json) {
+    return TypeProfileEntry(
       offset: json['offset'],
-      types: (json['types'] as List)
-          .map((e) => new TypeObject.fromJson(e))
-          .toList(),
+      types:
+          (json['types'] as List).map((e) => TypeObject.fromJson(e)).toList(),
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'offset': offset,
       'types': types.map((e) => e.toJson()).toList(),
     };
@@ -503,18 +501,18 @@ class ScriptTypeProfile {
     @required this.entries,
   });
 
-  factory ScriptTypeProfile.fromJson(Map json) {
-    return new ScriptTypeProfile(
-      scriptId: new runtime.ScriptId.fromJson(json['scriptId']),
+  factory ScriptTypeProfile.fromJson(Map<String, dynamic> json) {
+    return ScriptTypeProfile(
+      scriptId: runtime.ScriptId.fromJson(json['scriptId']),
       url: json['url'],
       entries: (json['entries'] as List)
-          .map((e) => new TypeProfileEntry.fromJson(e))
+          .map((e) => TypeProfileEntry.fromJson(e))
           .toList(),
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'scriptId': scriptId.toJson(),
       'url': url,
       'entries': entries.map((e) => e.toJson()).toList(),

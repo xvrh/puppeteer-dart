@@ -20,7 +20,7 @@ class DeviceOrientationApi {
     num beta,
     num gamma,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'alpha': alpha,
       'beta': beta,
       'gamma': gamma,

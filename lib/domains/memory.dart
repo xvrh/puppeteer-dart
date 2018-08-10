@@ -8,8 +8,8 @@ class MemoryApi {
   MemoryApi(this._client);
 
   Future<GetDOMCountersResult> getDOMCounters() async {
-    Map result = await _client.send('Memory.getDOMCounters');
-    return new GetDOMCountersResult.fromJson(result);
+    var result = await _client.send('Memory.getDOMCounters');
+    return GetDOMCountersResult.fromJson(result);
   }
 
   Future prepareForLeakDetection() async {
@@ -21,7 +21,7 @@ class MemoryApi {
   Future setPressureNotificationsSuppressed(
     bool suppressed,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'suppressed': suppressed,
     };
     await _client.send('Memory.setPressureNotificationsSuppressed', parameters);
@@ -32,7 +32,7 @@ class MemoryApi {
   Future simulatePressureNotification(
     PressureLevel level,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'level': level.toJson(),
     };
     await _client.send('Memory.simulatePressureNotification', parameters);
@@ -45,7 +45,7 @@ class MemoryApi {
     int samplingInterval,
     bool suppressRandomness,
   }) async {
-    Map parameters = {};
+    var parameters = <String, dynamic>{};
     if (samplingInterval != null) {
       parameters['samplingInterval'] = samplingInterval;
     }
@@ -63,22 +63,22 @@ class MemoryApi {
   /// Retrieve native memory allocations profile
   /// collected since renderer process startup.
   Future<SamplingProfile> getAllTimeSamplingProfile() async {
-    Map result = await _client.send('Memory.getAllTimeSamplingProfile');
-    return new SamplingProfile.fromJson(result['profile']);
+    var result = await _client.send('Memory.getAllTimeSamplingProfile');
+    return SamplingProfile.fromJson(result['profile']);
   }
 
   /// Retrieve native memory allocations profile
   /// collected since browser process startup.
   Future<SamplingProfile> getBrowserSamplingProfile() async {
-    Map result = await _client.send('Memory.getBrowserSamplingProfile');
-    return new SamplingProfile.fromJson(result['profile']);
+    var result = await _client.send('Memory.getBrowserSamplingProfile');
+    return SamplingProfile.fromJson(result['profile']);
   }
 
   /// Retrieve native memory allocations profile collected since last
   /// `startSampling` call.
   Future<SamplingProfile> getSamplingProfile() async {
-    Map result = await _client.send('Memory.getSamplingProfile');
-    return new SamplingProfile.fromJson(result['profile']);
+    var result = await _client.send('Memory.getSamplingProfile');
+    return SamplingProfile.fromJson(result['profile']);
   }
 }
 
@@ -95,8 +95,8 @@ class GetDOMCountersResult {
     @required this.jsEventListeners,
   });
 
-  factory GetDOMCountersResult.fromJson(Map json) {
-    return new GetDOMCountersResult(
+  factory GetDOMCountersResult.fromJson(Map<String, dynamic> json) {
+    return GetDOMCountersResult(
       documents: json['documents'],
       nodes: json['nodes'],
       jsEventListeners: json['jsEventListeners'],
@@ -142,16 +142,16 @@ class SamplingProfileNode {
     @required this.stack,
   });
 
-  factory SamplingProfileNode.fromJson(Map json) {
-    return new SamplingProfileNode(
+  factory SamplingProfileNode.fromJson(Map<String, dynamic> json) {
+    return SamplingProfileNode(
       size: json['size'],
       total: json['total'],
       stack: (json['stack'] as List).map((e) => e as String).toList(),
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'size': size,
       'total': total,
       'stack': stack.map((e) => e).toList(),
@@ -164,21 +164,69 @@ class SamplingProfileNode {
 class SamplingProfile {
   final List<SamplingProfileNode> samples;
 
+  final List<Module> modules;
+
   SamplingProfile({
     @required this.samples,
+    @required this.modules,
   });
 
-  factory SamplingProfile.fromJson(Map json) {
-    return new SamplingProfile(
+  factory SamplingProfile.fromJson(Map<String, dynamic> json) {
+    return SamplingProfile(
       samples: (json['samples'] as List)
-          .map((e) => new SamplingProfileNode.fromJson(e))
+          .map((e) => SamplingProfileNode.fromJson(e))
           .toList(),
+      modules:
+          (json['modules'] as List).map((e) => Module.fromJson(e)).toList(),
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'samples': samples.map((e) => e.toJson()).toList(),
+      'modules': modules.map((e) => e.toJson()).toList(),
+    };
+    return json;
+  }
+}
+
+/// Executable module information
+class Module {
+  /// Name of the module.
+  final String name;
+
+  /// UUID of the module.
+  final String uuid;
+
+  /// Base address where the module is loaded into memory. Encoded as a decimal
+  /// or hexadecimal (0x prefixed) string.
+  final String baseAddress;
+
+  /// Size of the module in bytes.
+  final num size;
+
+  Module({
+    @required this.name,
+    @required this.uuid,
+    @required this.baseAddress,
+    @required this.size,
+  });
+
+  factory Module.fromJson(Map<String, dynamic> json) {
+    return Module(
+      name: json['name'],
+      uuid: json['uuid'],
+      baseAddress: json['baseAddress'],
+      size: json['size'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
+      'name': name,
+      'uuid': uuid,
+      'baseAddress': baseAddress,
+      'size': size,
     };
     return json;
   }

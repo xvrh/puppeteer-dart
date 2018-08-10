@@ -10,12 +10,12 @@ class LayerTreeApi {
 
   Stream<LayerPaintedEvent> get onLayerPainted => _client.onEvent
       .where((Event event) => event.name == 'LayerTree.layerPainted')
-      .map((Event event) => new LayerPaintedEvent.fromJson(event.parameters));
+      .map((Event event) => LayerPaintedEvent.fromJson(event.parameters));
 
   Stream<List<Layer>> get onLayerTreeDidChange => _client.onEvent
       .where((Event event) => event.name == 'LayerTree.layerTreeDidChange')
       .map((Event event) => (event.parameters['layers'] as List)
-          .map((e) => new Layer.fromJson(e))
+          .map((e) => Layer.fromJson(e))
           .toList());
 
   /// Provides the reasons why the given layer was composited.
@@ -24,10 +24,10 @@ class LayerTreeApi {
   Future<List<String>> compositingReasons(
     LayerId layerId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'layerId': layerId.toJson(),
     };
-    Map result = await _client.send('LayerTree.compositingReasons', parameters);
+    var result = await _client.send('LayerTree.compositingReasons', parameters);
     return (result['compositingReasons'] as List)
         .map((e) => e as String)
         .toList();
@@ -49,11 +49,11 @@ class LayerTreeApi {
   Future<SnapshotId> loadSnapshot(
     List<PictureTile> tiles,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'tiles': tiles.map((e) => e.toJson()).toList(),
     };
-    Map result = await _client.send('LayerTree.loadSnapshot', parameters);
-    return new SnapshotId.fromJson(result['snapshotId']);
+    var result = await _client.send('LayerTree.loadSnapshot', parameters);
+    return SnapshotId.fromJson(result['snapshotId']);
   }
 
   /// Returns the layer snapshot identifier.
@@ -62,11 +62,11 @@ class LayerTreeApi {
   Future<SnapshotId> makeSnapshot(
     LayerId layerId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'layerId': layerId.toJson(),
     };
-    Map result = await _client.send('LayerTree.makeSnapshot', parameters);
-    return new SnapshotId.fromJson(result['snapshotId']);
+    var result = await _client.send('LayerTree.makeSnapshot', parameters);
+    return SnapshotId.fromJson(result['snapshotId']);
   }
 
   /// [snapshotId] The id of the layer snapshot.
@@ -80,7 +80,7 @@ class LayerTreeApi {
     num minDuration,
     dom.Rect clipRect,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'snapshotId': snapshotId.toJson(),
     };
     if (minRepeatCount != null) {
@@ -92,9 +92,9 @@ class LayerTreeApi {
     if (clipRect != null) {
       parameters['clipRect'] = clipRect.toJson();
     }
-    Map result = await _client.send('LayerTree.profileSnapshot', parameters);
+    var result = await _client.send('LayerTree.profileSnapshot', parameters);
     return (result['timings'] as List)
-        .map((e) => new PaintProfile.fromJson(e))
+        .map((e) => PaintProfile.fromJson(e))
         .toList();
   }
 
@@ -103,7 +103,7 @@ class LayerTreeApi {
   Future releaseSnapshot(
     SnapshotId snapshotId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'snapshotId': snapshotId.toJson(),
     };
     await _client.send('LayerTree.releaseSnapshot', parameters);
@@ -121,7 +121,7 @@ class LayerTreeApi {
     int toStep,
     num scale,
   }) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'snapshotId': snapshotId.toJson(),
     };
     if (fromStep != null) {
@@ -133,7 +133,7 @@ class LayerTreeApi {
     if (scale != null) {
       parameters['scale'] = scale;
     }
-    Map result = await _client.send('LayerTree.replaySnapshot', parameters);
+    var result = await _client.send('LayerTree.replaySnapshot', parameters);
     return result['dataURL'];
   }
 
@@ -143,10 +143,10 @@ class LayerTreeApi {
   Future<List<Map>> snapshotCommandLog(
     SnapshotId snapshotId,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'snapshotId': snapshotId.toJson(),
     };
-    Map result = await _client.send('LayerTree.snapshotCommandLog', parameters);
+    var result = await _client.send('LayerTree.snapshotCommandLog', parameters);
     return (result['commandLog'] as List).map((e) => e as Map).toList();
   }
 }
@@ -163,10 +163,10 @@ class LayerPaintedEvent {
     @required this.clip,
   });
 
-  factory LayerPaintedEvent.fromJson(Map json) {
-    return new LayerPaintedEvent(
-      layerId: new LayerId.fromJson(json['layerId']),
-      clip: new dom.Rect.fromJson(json['clip']),
+  factory LayerPaintedEvent.fromJson(Map<String, dynamic> json) {
+    return LayerPaintedEvent(
+      layerId: LayerId.fromJson(json['layerId']),
+      clip: dom.Rect.fromJson(json['clip']),
     );
   }
 }
@@ -177,7 +177,7 @@ class LayerId {
 
   LayerId(this.value);
 
-  factory LayerId.fromJson(String value) => new LayerId(value);
+  factory LayerId.fromJson(String value) => LayerId(value);
 
   String toJson() => value;
 
@@ -197,7 +197,7 @@ class SnapshotId {
 
   SnapshotId(this.value);
 
-  factory SnapshotId.fromJson(String value) => new SnapshotId(value);
+  factory SnapshotId.fromJson(String value) => SnapshotId(value);
 
   String toJson() => value;
 
@@ -224,15 +224,15 @@ class ScrollRect {
     @required this.type,
   });
 
-  factory ScrollRect.fromJson(Map json) {
-    return new ScrollRect(
-      rect: new dom.Rect.fromJson(json['rect']),
+  factory ScrollRect.fromJson(Map<String, dynamic> json) {
+    return ScrollRect(
+      rect: dom.Rect.fromJson(json['rect']),
       type: json['type'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'rect': rect.toJson(),
       'type': type,
     };
@@ -261,23 +261,23 @@ class StickyPositionConstraint {
     this.nearestLayerShiftingContainingBlock,
   });
 
-  factory StickyPositionConstraint.fromJson(Map json) {
-    return new StickyPositionConstraint(
-      stickyBoxRect: new dom.Rect.fromJson(json['stickyBoxRect']),
-      containingBlockRect: new dom.Rect.fromJson(json['containingBlockRect']),
+  factory StickyPositionConstraint.fromJson(Map<String, dynamic> json) {
+    return StickyPositionConstraint(
+      stickyBoxRect: dom.Rect.fromJson(json['stickyBoxRect']),
+      containingBlockRect: dom.Rect.fromJson(json['containingBlockRect']),
       nearestLayerShiftingStickyBox:
           json.containsKey('nearestLayerShiftingStickyBox')
-              ? new LayerId.fromJson(json['nearestLayerShiftingStickyBox'])
+              ? LayerId.fromJson(json['nearestLayerShiftingStickyBox'])
               : null,
-      nearestLayerShiftingContainingBlock: json
-              .containsKey('nearestLayerShiftingContainingBlock')
-          ? new LayerId.fromJson(json['nearestLayerShiftingContainingBlock'])
-          : null,
+      nearestLayerShiftingContainingBlock:
+          json.containsKey('nearestLayerShiftingContainingBlock')
+              ? LayerId.fromJson(json['nearestLayerShiftingContainingBlock'])
+              : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'stickyBoxRect': stickyBoxRect.toJson(),
       'containingBlockRect': containingBlockRect.toJson(),
     };
@@ -310,16 +310,16 @@ class PictureTile {
     @required this.picture,
   });
 
-  factory PictureTile.fromJson(Map json) {
-    return new PictureTile(
+  factory PictureTile.fromJson(Map<String, dynamic> json) {
+    return PictureTile(
       x: json['x'],
       y: json['y'],
       picture: json['picture'],
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'x': x,
       'y': y,
       'picture': picture,
@@ -398,14 +398,14 @@ class Layer {
     this.stickyPositionConstraint,
   });
 
-  factory Layer.fromJson(Map json) {
-    return new Layer(
-      layerId: new LayerId.fromJson(json['layerId']),
+  factory Layer.fromJson(Map<String, dynamic> json) {
+    return Layer(
+      layerId: LayerId.fromJson(json['layerId']),
       parentLayerId: json.containsKey('parentLayerId')
-          ? new LayerId.fromJson(json['parentLayerId'])
+          ? LayerId.fromJson(json['parentLayerId'])
           : null,
       backendNodeId: json.containsKey('backendNodeId')
-          ? new dom.BackendNodeId.fromJson(json['backendNodeId'])
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'])
           : null,
       offsetX: json['offsetX'],
       offsetY: json['offsetY'],
@@ -422,18 +422,17 @@ class Layer {
       invisible: json.containsKey('invisible') ? json['invisible'] : null,
       scrollRects: json.containsKey('scrollRects')
           ? (json['scrollRects'] as List)
-              .map((e) => new ScrollRect.fromJson(e))
+              .map((e) => ScrollRect.fromJson(e))
               .toList()
           : null,
       stickyPositionConstraint: json.containsKey('stickyPositionConstraint')
-          ? new StickyPositionConstraint.fromJson(
-              json['stickyPositionConstraint'])
+          ? StickyPositionConstraint.fromJson(json['stickyPositionConstraint'])
           : null,
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'layerId': layerId.toJson(),
       'offsetX': offsetX,
       'offsetY': offsetY,
@@ -479,7 +478,7 @@ class PaintProfile {
 
   PaintProfile(this.value);
 
-  factory PaintProfile.fromJson(List<num> value) => new PaintProfile(value);
+  factory PaintProfile.fromJson(List<num> value) => PaintProfile(value);
 
   List<num> toJson() => value;
 

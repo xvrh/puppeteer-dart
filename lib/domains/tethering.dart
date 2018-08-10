@@ -11,14 +11,14 @@ class TetheringApi {
   /// Informs that port was successfully bound and got a specified connection id.
   Stream<AcceptedEvent> get onAccepted => _client.onEvent
       .where((Event event) => event.name == 'Tethering.accepted')
-      .map((Event event) => new AcceptedEvent.fromJson(event.parameters));
+      .map((Event event) => AcceptedEvent.fromJson(event.parameters));
 
   /// Request browser port binding.
   /// [port] Port number to bind.
   Future bind(
     int port,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'port': port,
     };
     await _client.send('Tethering.bind', parameters);
@@ -29,7 +29,7 @@ class TetheringApi {
   Future unbind(
     int port,
   ) async {
-    Map parameters = {
+    var parameters = <String, dynamic>{
       'port': port,
     };
     await _client.send('Tethering.unbind', parameters);
@@ -48,8 +48,8 @@ class AcceptedEvent {
     @required this.connectionId,
   });
 
-  factory AcceptedEvent.fromJson(Map json) {
-    return new AcceptedEvent(
+  factory AcceptedEvent.fromJson(Map<String, dynamic> json) {
+    return AcceptedEvent(
       port: json['port'],
       connectionId: json['connectionId'],
     );

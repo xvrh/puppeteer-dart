@@ -10,8 +10,8 @@ class SystemInfoApi {
 
   /// Returns information about the system.
   Future<GetInfoResult> getInfo() async {
-    Map result = await _client.send('SystemInfo.getInfo');
-    return new GetInfoResult.fromJson(result);
+    var result = await _client.send('SystemInfo.getInfo');
+    return GetInfoResult.fromJson(result);
   }
 }
 
@@ -38,9 +38,9 @@ class GetInfoResult {
     @required this.commandLine,
   });
 
-  factory GetInfoResult.fromJson(Map json) {
-    return new GetInfoResult(
-      gpu: new GPUInfo.fromJson(json['gpu']),
+  factory GetInfoResult.fromJson(Map<String, dynamic> json) {
+    return GetInfoResult(
+      gpu: GPUInfo.fromJson(json['gpu']),
       modelName: json['modelName'],
       modelVersion: json['modelVersion'],
       commandLine: json['commandLine'],
@@ -69,8 +69,8 @@ class GPUDevice {
     @required this.deviceString,
   });
 
-  factory GPUDevice.fromJson(Map json) {
-    return new GPUDevice(
+  factory GPUDevice.fromJson(Map<String, dynamic> json) {
+    return GPUDevice(
       vendorId: json['vendorId'],
       deviceId: json['deviceId'],
       vendorString: json['vendorString'],
@@ -78,8 +78,8 @@ class GPUDevice {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'vendorId': vendorId,
       'deviceId': deviceId,
       'vendorString': vendorString,
@@ -110,11 +110,10 @@ class GPUInfo {
     @required this.driverBugWorkarounds,
   });
 
-  factory GPUInfo.fromJson(Map json) {
-    return new GPUInfo(
-      devices: (json['devices'] as List)
-          .map((e) => new GPUDevice.fromJson(e))
-          .toList(),
+  factory GPUInfo.fromJson(Map<String, dynamic> json) {
+    return GPUInfo(
+      devices:
+          (json['devices'] as List).map((e) => GPUDevice.fromJson(e)).toList(),
       auxAttributes:
           json.containsKey('auxAttributes') ? json['auxAttributes'] : null,
       featureStatus:
@@ -125,8 +124,8 @@ class GPUInfo {
     );
   }
 
-  Map toJson() {
-    Map json = {
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
       'devices': devices.map((e) => e.toJson()).toList(),
       'driverBugWorkarounds': driverBugWorkarounds.map((e) => e).toList(),
     };
