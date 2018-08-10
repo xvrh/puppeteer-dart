@@ -9,9 +9,7 @@ class CacheStorageApi {
 
   /// Deletes a cache.
   /// [cacheId] Id of cache for deletion.
-  Future deleteCache(
-    CacheId cacheId,
-  ) async {
+  Future deleteCache(CacheId cacheId) async {
     var parameters = <String, dynamic>{
       'cacheId': cacheId.toJson(),
     };
@@ -21,10 +19,7 @@ class CacheStorageApi {
   /// Deletes a cache entry.
   /// [cacheId] Id of cache where the entry will be deleted.
   /// [request] URL spec of the request.
-  Future deleteEntry(
-    CacheId cacheId,
-    String request,
-  ) async {
+  Future deleteEntry(CacheId cacheId, String request) async {
     var parameters = <String, dynamic>{
       'cacheId': cacheId.toJson(),
       'request': request,
@@ -35,9 +30,7 @@ class CacheStorageApi {
   /// Requests cache names.
   /// [securityOrigin] Security origin.
   /// Returns: Caches for the security origin.
-  Future<List<Cache>> requestCacheNames(
-    String securityOrigin,
-  ) async {
+  Future<List<Cache>> requestCacheNames(String securityOrigin) async {
     var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
     };
@@ -51,9 +44,7 @@ class CacheStorageApi {
   /// [requestURL] URL spec of the request.
   /// Returns: Response read from the cache.
   Future<CachedResponse> requestCachedResponse(
-    CacheId cacheId,
-    String requestURL,
-  ) async {
+      CacheId cacheId, String requestURL) async {
     var parameters = <String, dynamic>{
       'cacheId': cacheId.toJson(),
       'requestURL': requestURL,
@@ -68,10 +59,7 @@ class CacheStorageApi {
   /// [skipCount] Number of records to skip.
   /// [pageSize] Number of records to fetch.
   Future<RequestEntriesResult> requestEntries(
-    CacheId cacheId,
-    int skipCount,
-    int pageSize,
-  ) async {
+      CacheId cacheId, int skipCount, int pageSize) async {
     var parameters = <String, dynamic>{
       'cacheId': cacheId.toJson(),
       'skipCount': skipCount,
@@ -89,10 +77,8 @@ class RequestEntriesResult {
   /// If true, there are more entries to fetch in the given range.
   final bool hasMore;
 
-  RequestEntriesResult({
-    @required this.cacheDataEntries,
-    @required this.hasMore,
-  });
+  RequestEntriesResult(
+      {@required this.cacheDataEntries, @required this.hasMore});
 
   factory RequestEntriesResult.fromJson(Map<String, dynamic> json) {
     return RequestEntriesResult(
@@ -147,15 +133,14 @@ class DataEntry {
   /// Response headers
   final List<Header> responseHeaders;
 
-  DataEntry({
-    @required this.requestURL,
-    @required this.requestMethod,
-    @required this.requestHeaders,
-    @required this.responseTime,
-    @required this.responseStatus,
-    @required this.responseStatusText,
-    @required this.responseHeaders,
-  });
+  DataEntry(
+      {@required this.requestURL,
+      @required this.requestMethod,
+      @required this.requestHeaders,
+      @required this.responseTime,
+      @required this.responseStatus,
+      @required this.responseStatusText,
+      @required this.responseHeaders});
 
   factory DataEntry.fromJson(Map<String, dynamic> json) {
     return DataEntry(
@@ -198,11 +183,10 @@ class Cache {
   /// The name of the cache.
   final String cacheName;
 
-  Cache({
-    @required this.cacheId,
-    @required this.securityOrigin,
-    @required this.cacheName,
-  });
+  Cache(
+      {@required this.cacheId,
+      @required this.securityOrigin,
+      @required this.cacheName});
 
   factory Cache.fromJson(Map<String, dynamic> json) {
     return Cache(
@@ -227,10 +211,7 @@ class Header {
 
   final String value;
 
-  Header({
-    @required this.name,
-    @required this.value,
-  });
+  Header({@required this.name, @required this.value});
 
   factory Header.fromJson(Map<String, dynamic> json) {
     return Header(
@@ -253,9 +234,7 @@ class CachedResponse {
   /// Entry content, base64-encoded.
   final String body;
 
-  CachedResponse({
-    @required this.body,
-  });
+  CachedResponse({@required this.body});
 
   factory CachedResponse.fromJson(Map<String, dynamic> json) {
     return CachedResponse(

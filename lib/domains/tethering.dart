@@ -15,9 +15,7 @@ class TetheringApi {
 
   /// Request browser port binding.
   /// [port] Port number to bind.
-  Future bind(
-    int port,
-  ) async {
+  Future bind(int port) async {
     var parameters = <String, dynamic>{
       'port': port,
     };
@@ -26,9 +24,7 @@ class TetheringApi {
 
   /// Request browser port unbinding.
   /// [port] Port number to unbind.
-  Future unbind(
-    int port,
-  ) async {
+  Future unbind(int port) async {
     var parameters = <String, dynamic>{
       'port': port,
     };
@@ -43,10 +39,7 @@ class AcceptedEvent {
   /// Connection id to be used.
   final String connectionId;
 
-  AcceptedEvent({
-    @required this.port,
-    @required this.connectionId,
-  });
+  AcceptedEvent({@required this.port, @required this.connectionId});
 
   factory AcceptedEvent.fromJson(Map<String, dynamic> json) {
     return AcceptedEvent(

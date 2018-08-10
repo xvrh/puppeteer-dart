@@ -35,10 +35,7 @@ class StorageApi {
   /// Clears storage for origin.
   /// [origin] Security origin.
   /// [storageTypes] Comma separated origin names.
-  Future clearDataForOrigin(
-    String origin,
-    String storageTypes,
-  ) async {
+  Future clearDataForOrigin(String origin, String storageTypes) async {
     var parameters = <String, dynamic>{
       'origin': origin,
       'storageTypes': storageTypes,
@@ -48,9 +45,7 @@ class StorageApi {
 
   /// Returns usage and quota in bytes.
   /// [origin] Security origin.
-  Future<GetUsageAndQuotaResult> getUsageAndQuota(
-    String origin,
-  ) async {
+  Future<GetUsageAndQuotaResult> getUsageAndQuota(String origin) async {
     var parameters = <String, dynamic>{
       'origin': origin,
     };
@@ -60,9 +55,7 @@ class StorageApi {
 
   /// Registers origin to be notified when an update occurs to its cache storage list.
   /// [origin] Security origin.
-  Future trackCacheStorageForOrigin(
-    String origin,
-  ) async {
+  Future trackCacheStorageForOrigin(String origin) async {
     var parameters = <String, dynamic>{
       'origin': origin,
     };
@@ -71,9 +64,7 @@ class StorageApi {
 
   /// Registers origin to be notified when an update occurs to its IndexedDB.
   /// [origin] Security origin.
-  Future trackIndexedDBForOrigin(
-    String origin,
-  ) async {
+  Future trackIndexedDBForOrigin(String origin) async {
     var parameters = <String, dynamic>{
       'origin': origin,
     };
@@ -82,9 +73,7 @@ class StorageApi {
 
   /// Unregisters origin from receiving notifications for cache storage.
   /// [origin] Security origin.
-  Future untrackCacheStorageForOrigin(
-    String origin,
-  ) async {
+  Future untrackCacheStorageForOrigin(String origin) async {
     var parameters = <String, dynamic>{
       'origin': origin,
     };
@@ -93,9 +82,7 @@ class StorageApi {
 
   /// Unregisters origin from receiving notifications for IndexedDB.
   /// [origin] Security origin.
-  Future untrackIndexedDBForOrigin(
-    String origin,
-  ) async {
+  Future untrackIndexedDBForOrigin(String origin) async {
     var parameters = <String, dynamic>{
       'origin': origin,
     };
@@ -110,10 +97,8 @@ class CacheStorageContentUpdatedEvent {
   /// Name of cache in origin.
   final String cacheName;
 
-  CacheStorageContentUpdatedEvent({
-    @required this.origin,
-    @required this.cacheName,
-  });
+  CacheStorageContentUpdatedEvent(
+      {@required this.origin, @required this.cacheName});
 
   factory CacheStorageContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return CacheStorageContentUpdatedEvent(
@@ -133,11 +118,10 @@ class IndexedDBContentUpdatedEvent {
   /// ObjectStore to update.
   final String objectStoreName;
 
-  IndexedDBContentUpdatedEvent({
-    @required this.origin,
-    @required this.databaseName,
-    @required this.objectStoreName,
-  });
+  IndexedDBContentUpdatedEvent(
+      {@required this.origin,
+      @required this.databaseName,
+      @required this.objectStoreName});
 
   factory IndexedDBContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return IndexedDBContentUpdatedEvent(
@@ -158,11 +142,10 @@ class GetUsageAndQuotaResult {
   /// Storage usage per type (bytes).
   final List<UsageForType> usageBreakdown;
 
-  GetUsageAndQuotaResult({
-    @required this.usage,
-    @required this.quota,
-    @required this.usageBreakdown,
-  });
+  GetUsageAndQuotaResult(
+      {@required this.usage,
+      @required this.quota,
+      @required this.usageBreakdown});
 
   factory GetUsageAndQuotaResult.fromJson(Map<String, dynamic> json) {
     return GetUsageAndQuotaResult(
@@ -223,10 +206,7 @@ class UsageForType {
   /// Storage usage (bytes).
   final num usage;
 
-  UsageForType({
-    @required this.storageType,
-    @required this.usage,
-  });
+  UsageForType({@required this.storageType, @required this.usage});
 
   factory UsageForType.fromJson(Map<String, dynamic> json) {
     return UsageForType(

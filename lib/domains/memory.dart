@@ -18,9 +18,7 @@ class MemoryApi {
 
   /// Enable/disable suppressing memory pressure notifications in all processes.
   /// [suppressed] If true, memory pressure notifications will be suppressed.
-  Future setPressureNotificationsSuppressed(
-    bool suppressed,
-  ) async {
+  Future setPressureNotificationsSuppressed(bool suppressed) async {
     var parameters = <String, dynamic>{
       'suppressed': suppressed,
     };
@@ -29,9 +27,7 @@ class MemoryApi {
 
   /// Simulate a memory pressure notification in all processes.
   /// [level] Memory pressure level of the notification.
-  Future simulatePressureNotification(
-    PressureLevel level,
-  ) async {
+  Future simulatePressureNotification(PressureLevel level) async {
     var parameters = <String, dynamic>{
       'level': level.toJson(),
     };
@@ -41,10 +37,7 @@ class MemoryApi {
   /// Start collecting native memory profile.
   /// [samplingInterval] Average number of bytes between samples.
   /// [suppressRandomness] Do not randomize intervals between samples.
-  Future startSampling({
-    int samplingInterval,
-    bool suppressRandomness,
-  }) async {
+  Future startSampling({int samplingInterval, bool suppressRandomness}) async {
     var parameters = <String, dynamic>{};
     if (samplingInterval != null) {
       parameters['samplingInterval'] = samplingInterval;
@@ -89,11 +82,10 @@ class GetDOMCountersResult {
 
   final int jsEventListeners;
 
-  GetDOMCountersResult({
-    @required this.documents,
-    @required this.nodes,
-    @required this.jsEventListeners,
-  });
+  GetDOMCountersResult(
+      {@required this.documents,
+      @required this.nodes,
+      @required this.jsEventListeners});
 
   factory GetDOMCountersResult.fromJson(Map<String, dynamic> json) {
     return GetDOMCountersResult(
@@ -136,11 +128,8 @@ class SamplingProfileNode {
   /// Execution stack at the point of allocation.
   final List<String> stack;
 
-  SamplingProfileNode({
-    @required this.size,
-    @required this.total,
-    @required this.stack,
-  });
+  SamplingProfileNode(
+      {@required this.size, @required this.total, @required this.stack});
 
   factory SamplingProfileNode.fromJson(Map<String, dynamic> json) {
     return SamplingProfileNode(
@@ -166,10 +155,7 @@ class SamplingProfile {
 
   final List<Module> modules;
 
-  SamplingProfile({
-    @required this.samples,
-    @required this.modules,
-  });
+  SamplingProfile({@required this.samples, @required this.modules});
 
   factory SamplingProfile.fromJson(Map<String, dynamic> json) {
     return SamplingProfile(
@@ -205,12 +191,11 @@ class Module {
   /// Size of the module in bytes.
   final num size;
 
-  Module({
-    @required this.name,
-    @required this.uuid,
-    @required this.baseAddress,
-    @required this.size,
-  });
+  Module(
+      {@required this.name,
+      @required this.uuid,
+      @required this.baseAddress,
+      @required this.size});
 
   factory Module.fromJson(Map<String, dynamic> json) {
     return Module(

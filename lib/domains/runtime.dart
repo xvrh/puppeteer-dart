@@ -59,11 +59,8 @@ class RuntimeApi {
   /// [promiseObjectId] Identifier of the promise.
   /// [returnByValue] Whether the result is expected to be a JSON object that should be sent by value.
   /// [generatePreview] Whether preview should be generated for the result.
-  Future<AwaitPromiseResult> awaitPromise(
-    RemoteObjectId promiseObjectId, {
-    bool returnByValue,
-    bool generatePreview,
-  }) async {
+  Future<AwaitPromiseResult> awaitPromise(RemoteObjectId promiseObjectId,
+      {bool returnByValue, bool generatePreview}) async {
     var parameters = <String, dynamic>{
       'promiseObjectId': promiseObjectId.toJson(),
     };
@@ -95,18 +92,16 @@ class RuntimeApi {
   /// executionContextId or objectId should be specified.
   /// [objectGroup] Symbolic group name that can be used to release multiple objects. If objectGroup is not
   /// specified and objectId is, objectGroup will be inherited from object.
-  Future<CallFunctionOnResult> callFunctionOn(
-    String functionDeclaration, {
-    RemoteObjectId objectId,
-    List<CallArgument> arguments,
-    bool silent,
-    bool returnByValue,
-    bool generatePreview,
-    bool userGesture,
-    bool awaitPromise,
-    ExecutionContextId executionContextId,
-    String objectGroup,
-  }) async {
+  Future<CallFunctionOnResult> callFunctionOn(String functionDeclaration,
+      {RemoteObjectId objectId,
+      List<CallArgument> arguments,
+      bool silent,
+      bool returnByValue,
+      bool generatePreview,
+      bool userGesture,
+      bool awaitPromise,
+      ExecutionContextId executionContextId,
+      String objectGroup}) async {
     var parameters = <String, dynamic>{
       'functionDeclaration': functionDeclaration,
     };
@@ -148,11 +143,8 @@ class RuntimeApi {
   /// [executionContextId] Specifies in which execution context to perform script run. If the parameter is omitted the
   /// evaluation will be performed in the context of the inspected page.
   Future<CompileScriptResult> compileScript(
-    String expression,
-    String sourceURL,
-    bool persistScript, {
-    ExecutionContextId executionContextId,
-  }) async {
+      String expression, String sourceURL, bool persistScript,
+      {ExecutionContextId executionContextId}) async {
     var parameters = <String, dynamic>{
       'expression': expression,
       'sourceURL': sourceURL,
@@ -197,19 +189,17 @@ class RuntimeApi {
   /// resolved.
   /// [throwOnSideEffect] Whether to throw an exception if side effect cannot be ruled out during evaluation.
   /// [timeout] Terminate execution after timing out (number of milliseconds).
-  Future<EvaluateResult> evaluate(
-    String expression, {
-    String objectGroup,
-    bool includeCommandLineAPI,
-    bool silent,
-    ExecutionContextId contextId,
-    bool returnByValue,
-    bool generatePreview,
-    bool userGesture,
-    bool awaitPromise,
-    bool throwOnSideEffect,
-    TimeDelta timeout,
-  }) async {
+  Future<EvaluateResult> evaluate(String expression,
+      {String objectGroup,
+      bool includeCommandLineAPI,
+      bool silent,
+      ExecutionContextId contextId,
+      bool returnByValue,
+      bool generatePreview,
+      bool userGesture,
+      bool awaitPromise,
+      bool throwOnSideEffect,
+      TimeDelta timeout}) async {
     var parameters = <String, dynamic>{
       'expression': expression,
     };
@@ -269,12 +259,10 @@ class RuntimeApi {
   /// [accessorPropertiesOnly] If true, returns accessor properties (with getter/setter) only; internal properties are not
   /// returned either.
   /// [generatePreview] Whether preview should be generated for the results.
-  Future<GetPropertiesResult> getProperties(
-    RemoteObjectId objectId, {
-    bool ownProperties,
-    bool accessorPropertiesOnly,
-    bool generatePreview,
-  }) async {
+  Future<GetPropertiesResult> getProperties(RemoteObjectId objectId,
+      {bool ownProperties,
+      bool accessorPropertiesOnly,
+      bool generatePreview}) async {
     var parameters = <String, dynamic>{
       'objectId': objectId.toJson(),
     };
@@ -293,9 +281,8 @@ class RuntimeApi {
 
   /// Returns all let, const and class variables from global scope.
   /// [executionContextId] Specifies in which execution context to lookup global scope variables.
-  Future<List<String>> globalLexicalScopeNames({
-    ExecutionContextId executionContextId,
-  }) async {
+  Future<List<String>> globalLexicalScopeNames(
+      {ExecutionContextId executionContextId}) async {
     var parameters = <String, dynamic>{};
     if (executionContextId != null) {
       parameters['executionContextId'] = executionContextId.toJson();
@@ -308,10 +295,8 @@ class RuntimeApi {
   /// [prototypeObjectId] Identifier of the prototype to return objects for.
   /// [objectGroup] Symbolic group name that can be used to release the results.
   /// Returns: Array with objects.
-  Future<RemoteObject> queryObjects(
-    RemoteObjectId prototypeObjectId, {
-    String objectGroup,
-  }) async {
+  Future<RemoteObject> queryObjects(RemoteObjectId prototypeObjectId,
+      {String objectGroup}) async {
     var parameters = <String, dynamic>{
       'prototypeObjectId': prototypeObjectId.toJson(),
     };
@@ -324,9 +309,7 @@ class RuntimeApi {
 
   /// Releases remote object with given id.
   /// [objectId] Identifier of the object to release.
-  Future releaseObject(
-    RemoteObjectId objectId,
-  ) async {
+  Future releaseObject(RemoteObjectId objectId) async {
     var parameters = <String, dynamic>{
       'objectId': objectId.toJson(),
     };
@@ -335,9 +318,7 @@ class RuntimeApi {
 
   /// Releases all remote objects that belong to a given group.
   /// [objectGroup] Symbolic object group name.
-  Future releaseObjectGroup(
-    String objectGroup,
-  ) async {
+  Future releaseObjectGroup(String objectGroup) async {
     var parameters = <String, dynamic>{
       'objectGroup': objectGroup,
     };
@@ -361,16 +342,14 @@ class RuntimeApi {
   /// [generatePreview] Whether preview should be generated for the result.
   /// [awaitPromise] Whether execution should `await` for resulting value and return once awaited promise is
   /// resolved.
-  Future<RunScriptResult> runScript(
-    ScriptId scriptId, {
-    ExecutionContextId executionContextId,
-    String objectGroup,
-    bool silent,
-    bool includeCommandLineAPI,
-    bool returnByValue,
-    bool generatePreview,
-    bool awaitPromise,
-  }) async {
+  Future<RunScriptResult> runScript(ScriptId scriptId,
+      {ExecutionContextId executionContextId,
+      String objectGroup,
+      bool silent,
+      bool includeCommandLineAPI,
+      bool returnByValue,
+      bool generatePreview,
+      bool awaitPromise}) async {
     var parameters = <String, dynamic>{
       'scriptId': scriptId.toJson(),
     };
@@ -402,27 +381,21 @@ class RuntimeApi {
   /// Enables or disables async call stacks tracking.
   /// [maxDepth] Maximum depth of async call stacks. Setting to `0` will effectively disable collecting async
   /// call stacks (default).
-  Future setAsyncCallStackDepth(
-    int maxDepth,
-  ) async {
+  Future setAsyncCallStackDepth(int maxDepth) async {
     var parameters = <String, dynamic>{
       'maxDepth': maxDepth,
     };
     await _client.send('Runtime.setAsyncCallStackDepth', parameters);
   }
 
-  Future setCustomObjectFormatterEnabled(
-    bool enabled,
-  ) async {
+  Future setCustomObjectFormatterEnabled(bool enabled) async {
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
     await _client.send('Runtime.setCustomObjectFormatterEnabled', parameters);
   }
 
-  Future setMaxCallStackSizeToCapture(
-    int size,
-  ) async {
+  Future setMaxCallStackSizeToCapture(int size) async {
     var parameters = <String, dynamic>{
       'size': size,
     };
@@ -443,10 +416,8 @@ class RuntimeApi {
   /// Binding function takes exactly one argument, this argument should be string,
   /// in case of any other input, function throws an exception.
   /// Each binding function call produces Runtime.bindingCalled notification.
-  Future addBinding(
-    String name, {
-    ExecutionContextId executionContextId,
-  }) async {
+  Future addBinding(String name,
+      {ExecutionContextId executionContextId}) async {
     var parameters = <String, dynamic>{
       'name': name,
     };
@@ -458,9 +429,7 @@ class RuntimeApi {
 
   /// This method does not remove binding function from global object but
   /// unsubscribes current runtime agent from Runtime.bindingCalled notifications.
-  Future removeBinding(
-    String name,
-  ) async {
+  Future removeBinding(String name) async {
     var parameters = <String, dynamic>{
       'name': name,
     };
@@ -476,11 +445,10 @@ class BindingCalledEvent {
   /// Identifier of the context where the call was made.
   final ExecutionContextId executionContextId;
 
-  BindingCalledEvent({
-    @required this.name,
-    @required this.payload,
-    @required this.executionContextId,
-  });
+  BindingCalledEvent(
+      {@required this.name,
+      @required this.payload,
+      @required this.executionContextId});
 
   factory BindingCalledEvent.fromJson(Map<String, dynamic> json) {
     return BindingCalledEvent(
@@ -513,14 +481,13 @@ class ConsoleAPICalledEvent {
   /// on named context.
   final String context;
 
-  ConsoleAPICalledEvent({
-    @required this.type,
-    @required this.args,
-    @required this.executionContextId,
-    @required this.timestamp,
-    this.stackTrace,
-    this.context,
-  });
+  ConsoleAPICalledEvent(
+      {@required this.type,
+      @required this.args,
+      @required this.executionContextId,
+      @required this.timestamp,
+      this.stackTrace,
+      this.context});
 
   factory ConsoleAPICalledEvent.fromJson(Map<String, dynamic> json) {
     return ConsoleAPICalledEvent(
@@ -545,10 +512,7 @@ class ExceptionRevokedEvent {
   /// The id of revoked exception, as reported in `exceptionThrown`.
   final int exceptionId;
 
-  ExceptionRevokedEvent({
-    @required this.reason,
-    @required this.exceptionId,
-  });
+  ExceptionRevokedEvent({@required this.reason, @required this.exceptionId});
 
   factory ExceptionRevokedEvent.fromJson(Map<String, dynamic> json) {
     return ExceptionRevokedEvent(
@@ -564,10 +528,8 @@ class ExceptionThrownEvent {
 
   final ExceptionDetails exceptionDetails;
 
-  ExceptionThrownEvent({
-    @required this.timestamp,
-    @required this.exceptionDetails,
-  });
+  ExceptionThrownEvent(
+      {@required this.timestamp, @required this.exceptionDetails});
 
   factory ExceptionThrownEvent.fromJson(Map<String, dynamic> json) {
     return ExceptionThrownEvent(
@@ -582,10 +544,7 @@ class InspectRequestedEvent {
 
   final Map hints;
 
-  InspectRequestedEvent({
-    @required this.object,
-    @required this.hints,
-  });
+  InspectRequestedEvent({@required this.object, @required this.hints});
 
   factory InspectRequestedEvent.fromJson(Map<String, dynamic> json) {
     return InspectRequestedEvent(
@@ -602,10 +561,7 @@ class AwaitPromiseResult {
   /// Exception details if stack strace is available.
   final ExceptionDetails exceptionDetails;
 
-  AwaitPromiseResult({
-    @required this.result,
-    this.exceptionDetails,
-  });
+  AwaitPromiseResult({@required this.result, this.exceptionDetails});
 
   factory AwaitPromiseResult.fromJson(Map<String, dynamic> json) {
     return AwaitPromiseResult(
@@ -624,10 +580,7 @@ class CallFunctionOnResult {
   /// Exception details.
   final ExceptionDetails exceptionDetails;
 
-  CallFunctionOnResult({
-    @required this.result,
-    this.exceptionDetails,
-  });
+  CallFunctionOnResult({@required this.result, this.exceptionDetails});
 
   factory CallFunctionOnResult.fromJson(Map<String, dynamic> json) {
     return CallFunctionOnResult(
@@ -646,10 +599,7 @@ class CompileScriptResult {
   /// Exception details.
   final ExceptionDetails exceptionDetails;
 
-  CompileScriptResult({
-    this.scriptId,
-    this.exceptionDetails,
-  });
+  CompileScriptResult({this.scriptId, this.exceptionDetails});
 
   factory CompileScriptResult.fromJson(Map<String, dynamic> json) {
     return CompileScriptResult(
@@ -670,10 +620,7 @@ class EvaluateResult {
   /// Exception details.
   final ExceptionDetails exceptionDetails;
 
-  EvaluateResult({
-    @required this.result,
-    this.exceptionDetails,
-  });
+  EvaluateResult({@required this.result, this.exceptionDetails});
 
   factory EvaluateResult.fromJson(Map<String, dynamic> json) {
     return EvaluateResult(
@@ -692,10 +639,7 @@ class GetHeapUsageResult {
   /// Allocated heap size in bytes.
   final num totalSize;
 
-  GetHeapUsageResult({
-    @required this.usedSize,
-    @required this.totalSize,
-  });
+  GetHeapUsageResult({@required this.usedSize, @required this.totalSize});
 
   factory GetHeapUsageResult.fromJson(Map<String, dynamic> json) {
     return GetHeapUsageResult(
@@ -715,11 +659,8 @@ class GetPropertiesResult {
   /// Exception details.
   final ExceptionDetails exceptionDetails;
 
-  GetPropertiesResult({
-    @required this.result,
-    this.internalProperties,
-    this.exceptionDetails,
-  });
+  GetPropertiesResult(
+      {@required this.result, this.internalProperties, this.exceptionDetails});
 
   factory GetPropertiesResult.fromJson(Map<String, dynamic> json) {
     return GetPropertiesResult(
@@ -745,10 +686,7 @@ class RunScriptResult {
   /// Exception details.
   final ExceptionDetails exceptionDetails;
 
-  RunScriptResult({
-    @required this.result,
-    this.exceptionDetails,
-  });
+  RunScriptResult({@required this.result, this.exceptionDetails});
 
   factory RunScriptResult.fromJson(Map<String, dynamic> json) {
     return RunScriptResult(
@@ -852,17 +790,16 @@ class RemoteObject {
 
   final CustomPreview customPreview;
 
-  RemoteObject({
-    @required this.type,
-    this.subtype,
-    this.className,
-    this.value,
-    this.unserializableValue,
-    this.description,
-    this.objectId,
-    this.preview,
-    this.customPreview,
-  });
+  RemoteObject(
+      {@required this.type,
+      this.subtype,
+      this.className,
+      this.value,
+      this.unserializableValue,
+      this.description,
+      this.objectId,
+      this.preview,
+      this.customPreview});
 
   factory RemoteObject.fromJson(Map<String, dynamic> json) {
     return RemoteObject(
@@ -929,13 +866,12 @@ class CustomPreview {
 
   final RemoteObjectId configObjectId;
 
-  CustomPreview({
-    @required this.header,
-    @required this.hasBody,
-    @required this.formatterObjectId,
-    @required this.bindRemoteObjectFunctionId,
-    this.configObjectId,
-  });
+  CustomPreview(
+      {@required this.header,
+      @required this.hasBody,
+      @required this.formatterObjectId,
+      @required this.bindRemoteObjectFunctionId,
+      this.configObjectId});
 
   factory CustomPreview.fromJson(Map<String, dynamic> json) {
     return CustomPreview(
@@ -984,14 +920,13 @@ class ObjectPreview {
   /// List of the entries. Specified for `map` and `set` subtype values only.
   final List<EntryPreview> entries;
 
-  ObjectPreview({
-    @required this.type,
-    this.subtype,
-    this.description,
-    @required this.overflow,
-    @required this.properties,
-    this.entries,
-  });
+  ObjectPreview(
+      {@required this.type,
+      this.subtype,
+      this.description,
+      @required this.overflow,
+      @required this.properties,
+      this.entries});
 
   factory ObjectPreview.fromJson(Map<String, dynamic> json) {
     return ObjectPreview(
@@ -1045,13 +980,12 @@ class PropertyPreview {
   /// Object subtype hint. Specified for `object` type values only.
   final String subtype;
 
-  PropertyPreview({
-    @required this.name,
-    @required this.type,
-    this.value,
-    this.valuePreview,
-    this.subtype,
-  });
+  PropertyPreview(
+      {@required this.name,
+      @required this.type,
+      this.value,
+      this.valuePreview,
+      this.subtype});
 
   factory PropertyPreview.fromJson(Map<String, dynamic> json) {
     return PropertyPreview(
@@ -1090,10 +1024,7 @@ class EntryPreview {
   /// Preview of the value.
   final ObjectPreview value;
 
-  EntryPreview({
-    this.key,
-    @required this.value,
-  });
+  EntryPreview({this.key, @required this.value});
 
   factory EntryPreview.fromJson(Map<String, dynamic> json) {
     return EntryPreview(
@@ -1149,18 +1080,17 @@ class PropertyDescriptor {
   /// Property symbol object, if the property is of the `symbol` type.
   final RemoteObject symbol;
 
-  PropertyDescriptor({
-    @required this.name,
-    this.value,
-    this.writable,
-    this.get,
-    this.set,
-    @required this.configurable,
-    @required this.enumerable,
-    this.wasThrown,
-    this.isOwn,
-    this.symbol,
-  });
+  PropertyDescriptor(
+      {@required this.name,
+      this.value,
+      this.writable,
+      this.get,
+      this.set,
+      @required this.configurable,
+      @required this.enumerable,
+      this.wasThrown,
+      this.isOwn,
+      this.symbol});
 
   factory PropertyDescriptor.fromJson(Map<String, dynamic> json) {
     return PropertyDescriptor(
@@ -1220,10 +1150,7 @@ class InternalPropertyDescriptor {
   /// The value associated with the property.
   final RemoteObject value;
 
-  InternalPropertyDescriptor({
-    @required this.name,
-    this.value,
-  });
+  InternalPropertyDescriptor({@required this.name, this.value});
 
   factory InternalPropertyDescriptor.fromJson(Map<String, dynamic> json) {
     return InternalPropertyDescriptor(
@@ -1257,11 +1184,7 @@ class CallArgument {
   /// Remote object handle.
   final RemoteObjectId objectId;
 
-  CallArgument({
-    this.value,
-    this.unserializableValue,
-    this.objectId,
-  });
+  CallArgument({this.value, this.unserializableValue, this.objectId});
 
   factory CallArgument.fromJson(Map<String, dynamic> json) {
     return CallArgument(
@@ -1326,12 +1249,11 @@ class ExecutionContextDescription {
   /// Embedder-specific auxiliary data.
   final Map auxData;
 
-  ExecutionContextDescription({
-    @required this.id,
-    @required this.origin,
-    @required this.name,
-    this.auxData,
-  });
+  ExecutionContextDescription(
+      {@required this.id,
+      @required this.origin,
+      @required this.name,
+      this.auxData});
 
   factory ExecutionContextDescription.fromJson(Map<String, dynamic> json) {
     return ExecutionContextDescription(
@@ -1385,17 +1307,16 @@ class ExceptionDetails {
   /// Identifier of the context where exception happened.
   final ExecutionContextId executionContextId;
 
-  ExceptionDetails({
-    @required this.exceptionId,
-    @required this.text,
-    @required this.lineNumber,
-    @required this.columnNumber,
-    this.scriptId,
-    this.url,
-    this.stackTrace,
-    this.exception,
-    this.executionContextId,
-  });
+  ExceptionDetails(
+      {@required this.exceptionId,
+      @required this.text,
+      @required this.lineNumber,
+      @required this.columnNumber,
+      this.scriptId,
+      this.url,
+      this.stackTrace,
+      this.exception,
+      this.executionContextId});
 
   factory ExceptionDetails.fromJson(Map<String, dynamic> json) {
     return ExceptionDetails(
@@ -1502,13 +1423,12 @@ class CallFrame {
   /// JavaScript script column number (0-based).
   final int columnNumber;
 
-  CallFrame({
-    @required this.functionName,
-    @required this.scriptId,
-    @required this.url,
-    @required this.lineNumber,
-    @required this.columnNumber,
-  });
+  CallFrame(
+      {@required this.functionName,
+      @required this.scriptId,
+      @required this.url,
+      @required this.lineNumber,
+      @required this.columnNumber});
 
   factory CallFrame.fromJson(Map<String, dynamic> json) {
     return CallFrame(
@@ -1547,12 +1467,11 @@ class StackTrace {
   /// Asynchronous JavaScript stack trace that preceded this stack, if available.
   final StackTraceId parentId;
 
-  StackTrace({
-    this.description,
-    @required this.callFrames,
-    this.parent,
-    this.parentId,
-  });
+  StackTrace(
+      {this.description,
+      @required this.callFrames,
+      this.parent,
+      this.parentId});
 
   factory StackTrace.fromJson(Map<String, dynamic> json) {
     return StackTrace(
@@ -1613,10 +1532,7 @@ class StackTraceId {
 
   final UniqueDebuggerId debuggerId;
 
-  StackTraceId({
-    @required this.id,
-    this.debuggerId,
-  });
+  StackTraceId({@required this.id, this.debuggerId});
 
   factory StackTraceId.fromJson(Map<String, dynamic> json) {
     return StackTraceId(

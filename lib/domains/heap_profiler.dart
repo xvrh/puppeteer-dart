@@ -39,9 +39,7 @@ class HeapProfilerApi {
   /// Enables console to refer to the node with given id via $x (see Command Line API for more details
   /// $x functions).
   /// [heapObjectId] Heap snapshot object id to be accessible by means of $x command line API.
-  Future addInspectedHeapObject(
-    HeapSnapshotObjectId heapObjectId,
-  ) async {
+  Future addInspectedHeapObject(HeapSnapshotObjectId heapObjectId) async {
     var parameters = <String, dynamic>{
       'heapObjectId': heapObjectId.toJson(),
     };
@@ -63,8 +61,7 @@ class HeapProfilerApi {
   /// [objectId] Identifier of the object to get heap object id for.
   /// Returns: Id of the heap snapshot object corresponding to the passed remote object id.
   Future<HeapSnapshotObjectId> getHeapObjectId(
-    runtime.RemoteObjectId objectId,
-  ) async {
+      runtime.RemoteObjectId objectId) async {
     var parameters = <String, dynamic>{
       'objectId': objectId.toJson(),
     };
@@ -75,9 +72,8 @@ class HeapProfilerApi {
   /// [objectGroup] Symbolic group name that can be used to release multiple objects.
   /// Returns: Evaluation result.
   Future<runtime.RemoteObject> getObjectByHeapObjectId(
-    HeapSnapshotObjectId objectId, {
-    String objectGroup,
-  }) async {
+      HeapSnapshotObjectId objectId,
+      {String objectGroup}) async {
     var parameters = <String, dynamic>{
       'objectId': objectId.toJson(),
     };
@@ -97,9 +93,7 @@ class HeapProfilerApi {
 
   /// [samplingInterval] Average sample interval in bytes. Poisson distribution is used for the intervals. The
   /// default value is 32768 bytes.
-  Future startSampling({
-    num samplingInterval,
-  }) async {
+  Future startSampling({num samplingInterval}) async {
     var parameters = <String, dynamic>{};
     if (samplingInterval != null) {
       parameters['samplingInterval'] = samplingInterval;
@@ -107,9 +101,7 @@ class HeapProfilerApi {
     await _client.send('HeapProfiler.startSampling', parameters);
   }
 
-  Future startTrackingHeapObjects({
-    bool trackAllocations,
-  }) async {
+  Future startTrackingHeapObjects({bool trackAllocations}) async {
     var parameters = <String, dynamic>{};
     if (trackAllocations != null) {
       parameters['trackAllocations'] = trackAllocations;
@@ -125,9 +117,7 @@ class HeapProfilerApi {
 
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken
   /// when the tracking is stopped.
-  Future stopTrackingHeapObjects({
-    bool reportProgress,
-  }) async {
+  Future stopTrackingHeapObjects({bool reportProgress}) async {
     var parameters = <String, dynamic>{};
     if (reportProgress != null) {
       parameters['reportProgress'] = reportProgress;
@@ -136,9 +126,7 @@ class HeapProfilerApi {
   }
 
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken.
-  Future takeHeapSnapshot({
-    bool reportProgress,
-  }) async {
+  Future takeHeapSnapshot({bool reportProgress}) async {
     var parameters = <String, dynamic>{};
     if (reportProgress != null) {
       parameters['reportProgress'] = reportProgress;
@@ -152,10 +140,8 @@ class LastSeenObjectIdEvent {
 
   final num timestamp;
 
-  LastSeenObjectIdEvent({
-    @required this.lastSeenObjectId,
-    @required this.timestamp,
-  });
+  LastSeenObjectIdEvent(
+      {@required this.lastSeenObjectId, @required this.timestamp});
 
   factory LastSeenObjectIdEvent.fromJson(Map<String, dynamic> json) {
     return LastSeenObjectIdEvent(
@@ -172,11 +158,8 @@ class ReportHeapSnapshotProgressEvent {
 
   final bool finished;
 
-  ReportHeapSnapshotProgressEvent({
-    @required this.done,
-    @required this.total,
-    this.finished,
-  });
+  ReportHeapSnapshotProgressEvent(
+      {@required this.done, @required this.total, this.finished});
 
   factory ReportHeapSnapshotProgressEvent.fromJson(Map<String, dynamic> json) {
     return ReportHeapSnapshotProgressEvent(
@@ -220,11 +203,10 @@ class SamplingHeapProfileNode {
   /// Child nodes.
   final List<SamplingHeapProfileNode> children;
 
-  SamplingHeapProfileNode({
-    @required this.callFrame,
-    @required this.selfSize,
-    @required this.children,
-  });
+  SamplingHeapProfileNode(
+      {@required this.callFrame,
+      @required this.selfSize,
+      @required this.children});
 
   factory SamplingHeapProfileNode.fromJson(Map<String, dynamic> json) {
     return SamplingHeapProfileNode(
@@ -250,9 +232,7 @@ class SamplingHeapProfileNode {
 class SamplingHeapProfile {
   final SamplingHeapProfileNode head;
 
-  SamplingHeapProfile({
-    @required this.head,
-  });
+  SamplingHeapProfile({@required this.head});
 
   factory SamplingHeapProfile.fromJson(Map<String, dynamic> json) {
     return SamplingHeapProfile(

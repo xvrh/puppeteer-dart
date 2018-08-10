@@ -29,8 +29,7 @@ class ApplicationCacheApi {
   /// [frameId] Identifier of the frame containing document whose application cache is retrieved.
   /// Returns: Relevant application cache data for the document in given frame.
   Future<ApplicationCache> getApplicationCacheForFrame(
-    page.FrameId frameId,
-  ) async {
+      page.FrameId frameId) async {
     var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
     };
@@ -53,9 +52,7 @@ class ApplicationCacheApi {
   /// Returns manifest URL for document in the given frame.
   /// [frameId] Identifier of the frame containing document whose manifest is retrieved.
   /// Returns: Manifest URL for document in the given frame.
-  Future<String> getManifestForFrame(
-    page.FrameId frameId,
-  ) async {
+  Future<String> getManifestForFrame(page.FrameId frameId) async {
     var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
     };
@@ -75,11 +72,10 @@ class ApplicationCacheStatusUpdatedEvent {
   /// Updated application cache status.
   final int status;
 
-  ApplicationCacheStatusUpdatedEvent({
-    @required this.frameId,
-    @required this.manifestURL,
-    @required this.status,
-  });
+  ApplicationCacheStatusUpdatedEvent(
+      {@required this.frameId,
+      @required this.manifestURL,
+      @required this.status});
 
   factory ApplicationCacheStatusUpdatedEvent.fromJson(
       Map<String, dynamic> json) {
@@ -102,11 +98,8 @@ class ApplicationCacheResource {
   /// Resource type.
   final String type;
 
-  ApplicationCacheResource({
-    @required this.url,
-    @required this.size,
-    @required this.type,
-  });
+  ApplicationCacheResource(
+      {@required this.url, @required this.size, @required this.type});
 
   factory ApplicationCacheResource.fromJson(Map<String, dynamic> json) {
     return ApplicationCacheResource(
@@ -143,13 +136,12 @@ class ApplicationCache {
   /// Application cache resources.
   final List<ApplicationCacheResource> resources;
 
-  ApplicationCache({
-    @required this.manifestURL,
-    @required this.size,
-    @required this.creationTime,
-    @required this.updateTime,
-    @required this.resources,
-  });
+  ApplicationCache(
+      {@required this.manifestURL,
+      @required this.size,
+      @required this.creationTime,
+      @required this.updateTime,
+      @required this.resources});
 
   factory ApplicationCache.fromJson(Map<String, dynamic> json) {
     return ApplicationCache(
@@ -186,11 +178,10 @@ class FrameWithManifest {
   /// Application cache status.
   final int status;
 
-  FrameWithManifest({
-    @required this.frameId,
-    @required this.manifestURL,
-    @required this.status,
-  });
+  FrameWithManifest(
+      {@required this.frameId,
+      @required this.manifestURL,
+      @required this.status});
 
   factory FrameWithManifest.fromJson(Map<String, dynamic> json) {
     return FrameWithManifest(

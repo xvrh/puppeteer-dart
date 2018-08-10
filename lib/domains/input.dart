@@ -27,22 +27,20 @@ class InputApi {
   /// [isSystemKey] Whether the event was a system key event (default: false).
   /// [location] Whether the event was from the left or right side of the keyboard. 1=Left, 2=Right (default:
   /// 0).
-  Future dispatchKeyEvent(
-    String type, {
-    int modifiers,
-    TimeSinceEpoch timestamp,
-    String text,
-    String unmodifiedText,
-    String keyIdentifier,
-    String code,
-    String key,
-    int windowsVirtualKeyCode,
-    int nativeVirtualKeyCode,
-    bool autoRepeat,
-    bool isKeypad,
-    bool isSystemKey,
-    int location,
-  }) async {
+  Future dispatchKeyEvent(String type,
+      {int modifiers,
+      TimeSinceEpoch timestamp,
+      String text,
+      String unmodifiedText,
+      String keyIdentifier,
+      String code,
+      String key,
+      int windowsVirtualKeyCode,
+      int nativeVirtualKeyCode,
+      bool autoRepeat,
+      bool isKeypad,
+      bool isSystemKey,
+      int location}) async {
     var parameters = <String, dynamic>{
       'type': type,
     };
@@ -91,9 +89,7 @@ class InputApi {
   /// This method emulates inserting text that doesn't come from a key press,
   /// for example an emoji keyboard or an IME.
   /// [text] The text to insert.
-  Future insertText(
-    String text,
-  ) async {
+  Future insertText(String text) async {
     var parameters = <String, dynamic>{
       'text': text,
     };
@@ -112,17 +108,13 @@ class InputApi {
   /// [clickCount] Number of times the mouse button was clicked (default: 0).
   /// [deltaX] X delta in CSS pixels for mouse wheel event (default: 0).
   /// [deltaY] Y delta in CSS pixels for mouse wheel event (default: 0).
-  Future dispatchMouseEvent(
-    String type,
-    num x,
-    num y, {
-    int modifiers,
-    TimeSinceEpoch timestamp,
-    String button,
-    int clickCount,
-    num deltaX,
-    num deltaY,
-  }) async {
+  Future dispatchMouseEvent(String type, num x, num y,
+      {int modifiers,
+      TimeSinceEpoch timestamp,
+      String button,
+      int clickCount,
+      num deltaX,
+      num deltaY}) async {
     var parameters = <String, dynamic>{
       'type': type,
       'x': x,
@@ -158,12 +150,8 @@ class InputApi {
   /// [modifiers] Bit field representing pressed modifier keys. Alt=1, Ctrl=2, Meta/Command=4, Shift=8
   /// (default: 0).
   /// [timestamp] Time at which the event occurred.
-  Future dispatchTouchEvent(
-    String type,
-    List<TouchPoint> touchPoints, {
-    int modifiers,
-    TimeSinceEpoch timestamp,
-  }) async {
+  Future dispatchTouchEvent(String type, List<TouchPoint> touchPoints,
+      {int modifiers, TimeSinceEpoch timestamp}) async {
     var parameters = <String, dynamic>{
       'type': type,
       'touchPoints': touchPoints.map((e) => e.toJson()).toList(),
@@ -188,17 +176,12 @@ class InputApi {
   /// [modifiers] Bit field representing pressed modifier keys. Alt=1, Ctrl=2, Meta/Command=4, Shift=8
   /// (default: 0).
   /// [clickCount] Number of times the mouse button was clicked (default: 0).
-  Future emulateTouchFromMouseEvent(
-    String type,
-    int x,
-    int y,
-    String button, {
-    TimeSinceEpoch timestamp,
-    num deltaX,
-    num deltaY,
-    int modifiers,
-    int clickCount,
-  }) async {
+  Future emulateTouchFromMouseEvent(String type, int x, int y, String button,
+      {TimeSinceEpoch timestamp,
+      num deltaX,
+      num deltaY,
+      int modifiers,
+      int clickCount}) async {
     var parameters = <String, dynamic>{
       'type': type,
       'x': x,
@@ -225,9 +208,7 @@ class InputApi {
 
   /// Ignores input events (useful while auditing page).
   /// [ignore] Ignores input events processing when set to true.
-  Future setIgnoreInputEvents(
-    bool ignore,
-  ) async {
+  Future setIgnoreInputEvents(bool ignore) async {
     var parameters = <String, dynamic>{
       'ignore': ignore,
     };
@@ -241,13 +222,8 @@ class InputApi {
   /// [relativeSpeed] Relative pointer speed in pixels per second (default: 800).
   /// [gestureSourceType] Which type of input events to be generated (default: 'default', which queries the platform
   /// for the preferred input type).
-  Future synthesizePinchGesture(
-    num x,
-    num y,
-    num scaleFactor, {
-    int relativeSpeed,
-    GestureSourceType gestureSourceType,
-  }) async {
+  Future synthesizePinchGesture(num x, num y, num scaleFactor,
+      {int relativeSpeed, GestureSourceType gestureSourceType}) async {
     var parameters = <String, dynamic>{
       'x': x,
       'y': y,
@@ -278,20 +254,17 @@ class InputApi {
   /// [repeatCount] The number of times to repeat the gesture (default: 0).
   /// [repeatDelayMs] The number of milliseconds delay between each repeat. (default: 250).
   /// [interactionMarkerName] The name of the interaction markers to generate, if not empty (default: "").
-  Future synthesizeScrollGesture(
-    num x,
-    num y, {
-    num xDistance,
-    num yDistance,
-    num xOverscroll,
-    num yOverscroll,
-    bool preventFling,
-    int speed,
-    GestureSourceType gestureSourceType,
-    int repeatCount,
-    int repeatDelayMs,
-    String interactionMarkerName,
-  }) async {
+  Future synthesizeScrollGesture(num x, num y,
+      {num xDistance,
+      num yDistance,
+      num xOverscroll,
+      num yOverscroll,
+      bool preventFling,
+      int speed,
+      GestureSourceType gestureSourceType,
+      int repeatCount,
+      int repeatDelayMs,
+      String interactionMarkerName}) async {
     var parameters = <String, dynamic>{
       'x': x,
       'y': y,
@@ -336,13 +309,8 @@ class InputApi {
   /// [tapCount] Number of times to perform the tap (e.g. 2 for double tap, default: 1).
   /// [gestureSourceType] Which type of input events to be generated (default: 'default', which queries the platform
   /// for the preferred input type).
-  Future synthesizeTapGesture(
-    num x,
-    num y, {
-    int duration,
-    int tapCount,
-    GestureSourceType gestureSourceType,
-  }) async {
+  Future synthesizeTapGesture(num x, num y,
+      {int duration, int tapCount, GestureSourceType gestureSourceType}) async {
     var parameters = <String, dynamic>{
       'x': x,
       'y': y,
@@ -383,15 +351,14 @@ class TouchPoint {
   /// Identifier used to track touch sources between events, must be unique within an event.
   final num id;
 
-  TouchPoint({
-    @required this.x,
-    @required this.y,
-    this.radiusX,
-    this.radiusY,
-    this.rotationAngle,
-    this.force,
-    this.id,
-  });
+  TouchPoint(
+      {@required this.x,
+      @required this.y,
+      this.radiusX,
+      this.radiusY,
+      this.rotationAngle,
+      this.force,
+      this.id});
 
   factory TouchPoint.fromJson(Map<String, dynamic> json) {
     return TouchPoint(

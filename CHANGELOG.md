@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0
+- First stable version
+- Tweak generated code to look better
+
 ## 0.0.5
 - Dart 2
 - Upgrade chrome to 579032

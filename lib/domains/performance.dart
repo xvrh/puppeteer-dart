@@ -37,10 +37,7 @@ class MetricsEvent {
   /// Timestamp title.
   final String title;
 
-  MetricsEvent({
-    @required this.metrics,
-    @required this.title,
-  });
+  MetricsEvent({@required this.metrics, @required this.title});
 
   factory MetricsEvent.fromJson(Map<String, dynamic> json) {
     return MetricsEvent(
@@ -59,10 +56,7 @@ class Metric {
   /// Metric value.
   final num value;
 
-  Metric({
-    @required this.name,
-    @required this.value,
-  });
+  Metric({@required this.name, @required this.value});
 
   factory Metric.fromJson(Map<String, dynamic> json) {
     return Metric(

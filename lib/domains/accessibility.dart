@@ -16,12 +16,11 @@ class AccessibilityApi {
   /// [fetchRelatives] Whether to fetch this nodes ancestors, siblings and children. Defaults to true.
   /// Returns: The `Accessibility.AXNode` for this DOM node, if it exists, plus its ancestors, siblings and
   /// children, if requested.
-  Future<List<AXNode>> getPartialAXTree({
-    dom.NodeId nodeId,
-    dom.BackendNodeId backendNodeId,
-    runtime.RemoteObjectId objectId,
-    bool fetchRelatives,
-  }) async {
+  Future<List<AXNode>> getPartialAXTree(
+      {dom.NodeId nodeId,
+      dom.BackendNodeId backendNodeId,
+      runtime.RemoteObjectId objectId,
+      bool fetchRelatives}) async {
     var parameters = <String, dynamic>{};
     if (nodeId != null) {
       parameters['nodeId'] = nodeId.toJson();
@@ -219,17 +218,16 @@ class AXValueSource {
   /// Reason for the value being invalid, if it is.
   final String invalidReason;
 
-  AXValueSource({
-    @required this.type,
-    this.value,
-    this.attribute,
-    this.attributeValue,
-    this.superseded,
-    this.nativeSource,
-    this.nativeSourceValue,
-    this.invalid,
-    this.invalidReason,
-  });
+  AXValueSource(
+      {@required this.type,
+      this.value,
+      this.attribute,
+      this.attributeValue,
+      this.superseded,
+      this.nativeSource,
+      this.nativeSourceValue,
+      this.invalid,
+      this.invalidReason});
 
   factory AXValueSource.fromJson(Map<String, dynamic> json) {
     return AXValueSource(
@@ -294,11 +292,7 @@ class AXRelatedNode {
   /// The text alternative of this node in the current context.
   final String text;
 
-  AXRelatedNode({
-    @required this.backendDOMNodeId,
-    this.idref,
-    this.text,
-  });
+  AXRelatedNode({@required this.backendDOMNodeId, this.idref, this.text});
 
   factory AXRelatedNode.fromJson(Map<String, dynamic> json) {
     return AXRelatedNode(
@@ -329,10 +323,7 @@ class AXProperty {
   /// The value of this property.
   final AXValue value;
 
-  AXProperty({
-    @required this.name,
-    @required this.value,
-  });
+  AXProperty({@required this.name, @required this.value});
 
   factory AXProperty.fromJson(Map<String, dynamic> json) {
     return AXProperty(
@@ -364,12 +355,7 @@ class AXValue {
   /// The sources which contributed to the computation of this property.
   final List<AXValueSource> sources;
 
-  AXValue({
-    @required this.type,
-    this.value,
-    this.relatedNodes,
-    this.sources,
-  });
+  AXValue({@required this.type, this.value, this.relatedNodes, this.sources});
 
   factory AXValue.fromJson(Map<String, dynamic> json) {
     return AXValue(
@@ -536,18 +522,17 @@ class AXNode {
   /// The backend ID for the associated DOM node, if any.
   final dom.BackendNodeId backendDOMNodeId;
 
-  AXNode({
-    @required this.nodeId,
-    @required this.ignored,
-    this.ignoredReasons,
-    this.role,
-    this.name,
-    this.description,
-    this.value,
-    this.properties,
-    this.childIds,
-    this.backendDOMNodeId,
-  });
+  AXNode(
+      {@required this.nodeId,
+      @required this.ignored,
+      this.ignoredReasons,
+      this.role,
+      this.name,
+      this.description,
+      this.value,
+      this.properties,
+      this.childIds,
+      this.backendDOMNodeId});
 
   factory AXNode.fromJson(Map<String, dynamic> json) {
     return AXNode(

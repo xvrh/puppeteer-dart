@@ -12,11 +12,8 @@ class IndexedDBApi {
   /// [securityOrigin] Security origin.
   /// [databaseName] Database name.
   /// [objectStoreName] Object store name.
-  Future clearObjectStore(
-    String securityOrigin,
-    String databaseName,
-    String objectStoreName,
-  ) async {
+  Future clearObjectStore(String securityOrigin, String databaseName,
+      String objectStoreName) async {
     var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
@@ -28,10 +25,7 @@ class IndexedDBApi {
   /// Deletes a database.
   /// [securityOrigin] Security origin.
   /// [databaseName] Database name.
-  Future deleteDatabase(
-    String securityOrigin,
-    String databaseName,
-  ) async {
+  Future deleteDatabase(String securityOrigin, String databaseName) async {
     var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
@@ -41,12 +35,8 @@ class IndexedDBApi {
 
   /// Delete a range of entries from an object store
   /// [keyRange] Range of entry keys to delete
-  Future deleteObjectStoreEntries(
-    String securityOrigin,
-    String databaseName,
-    String objectStoreName,
-    KeyRange keyRange,
-  ) async {
+  Future deleteObjectStoreEntries(String securityOrigin, String databaseName,
+      String objectStoreName, KeyRange keyRange) async {
     var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
@@ -75,14 +65,13 @@ class IndexedDBApi {
   /// [pageSize] Number of records to fetch.
   /// [keyRange] Key range.
   Future<RequestDataResult> requestData(
-    String securityOrigin,
-    String databaseName,
-    String objectStoreName,
-    String indexName,
-    int skipCount,
-    int pageSize, {
-    KeyRange keyRange,
-  }) async {
+      String securityOrigin,
+      String databaseName,
+      String objectStoreName,
+      String indexName,
+      int skipCount,
+      int pageSize,
+      {KeyRange keyRange}) async {
     var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
@@ -103,9 +92,7 @@ class IndexedDBApi {
   /// [databaseName] Database name.
   /// Returns: Database with an array of object stores.
   Future<DatabaseWithObjectStores> requestDatabase(
-    String securityOrigin,
-    String databaseName,
-  ) async {
+      String securityOrigin, String databaseName) async {
     var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
@@ -118,9 +105,7 @@ class IndexedDBApi {
   /// Requests database names for given security origin.
   /// [securityOrigin] Security origin.
   /// Returns: Database names for origin.
-  Future<List<String>> requestDatabaseNames(
-    String securityOrigin,
-  ) async {
+  Future<List<String>> requestDatabaseNames(String securityOrigin) async {
     var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
     };
@@ -137,10 +122,8 @@ class RequestDataResult {
   /// If true, there are more entries to fetch in the given range.
   final bool hasMore;
 
-  RequestDataResult({
-    @required this.objectStoreDataEntries,
-    @required this.hasMore,
-  });
+  RequestDataResult(
+      {@required this.objectStoreDataEntries, @required this.hasMore});
 
   factory RequestDataResult.fromJson(Map<String, dynamic> json) {
     return RequestDataResult(
@@ -163,11 +146,10 @@ class DatabaseWithObjectStores {
   /// Object stores in this database.
   final List<ObjectStore> objectStores;
 
-  DatabaseWithObjectStores({
-    @required this.name,
-    @required this.version,
-    @required this.objectStores,
-  });
+  DatabaseWithObjectStores(
+      {@required this.name,
+      @required this.version,
+      @required this.objectStores});
 
   factory DatabaseWithObjectStores.fromJson(Map<String, dynamic> json) {
     return DatabaseWithObjectStores(
@@ -203,12 +185,11 @@ class ObjectStore {
   /// Indexes in this object store.
   final List<ObjectStoreIndex> indexes;
 
-  ObjectStore({
-    @required this.name,
-    @required this.keyPath,
-    @required this.autoIncrement,
-    @required this.indexes,
-  });
+  ObjectStore(
+      {@required this.name,
+      @required this.keyPath,
+      @required this.autoIncrement,
+      @required this.indexes});
 
   factory ObjectStore.fromJson(Map<String, dynamic> json) {
     return ObjectStore(
@@ -246,12 +227,11 @@ class ObjectStoreIndex {
   /// If true, index allows multiple entries for a key.
   final bool multiEntry;
 
-  ObjectStoreIndex({
-    @required this.name,
-    @required this.keyPath,
-    @required this.unique,
-    @required this.multiEntry,
-  });
+  ObjectStoreIndex(
+      {@required this.name,
+      @required this.keyPath,
+      @required this.unique,
+      @required this.multiEntry});
 
   factory ObjectStoreIndex.fromJson(Map<String, dynamic> json) {
     return ObjectStoreIndex(
@@ -290,13 +270,7 @@ class Key {
   /// Array value.
   final List<Key> array;
 
-  Key({
-    @required this.type,
-    this.number,
-    this.string,
-    this.date,
-    this.array,
-  });
+  Key({@required this.type, this.number, this.string, this.date, this.array});
 
   factory Key.fromJson(Map<String, dynamic> json) {
     return Key(
@@ -344,12 +318,11 @@ class KeyRange {
   /// If true upper bound is open.
   final bool upperOpen;
 
-  KeyRange({
-    this.lower,
-    this.upper,
-    @required this.lowerOpen,
-    @required this.upperOpen,
-  });
+  KeyRange(
+      {this.lower,
+      this.upper,
+      @required this.lowerOpen,
+      @required this.upperOpen});
 
   factory KeyRange.fromJson(Map<String, dynamic> json) {
     return KeyRange(
@@ -386,11 +359,8 @@ class DataEntry {
   /// Value object.
   final runtime.RemoteObject value;
 
-  DataEntry({
-    @required this.key,
-    @required this.primaryKey,
-    @required this.value,
-  });
+  DataEntry(
+      {@required this.key, @required this.primaryKey, @required this.value});
 
   factory DataEntry.fromJson(Map<String, dynamic> json) {
     return DataEntry(
@@ -421,11 +391,7 @@ class KeyPath {
   /// Array value.
   final List<String> array;
 
-  KeyPath({
-    @required this.type,
-    this.string,
-    this.array,
-  });
+  KeyPath({@required this.type, this.string, this.array});
 
   factory KeyPath.fromJson(Map<String, dynamic> json) {
     return KeyPath(

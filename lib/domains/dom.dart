@@ -100,9 +100,7 @@ class DOMApi {
   /// Collects class names for the node with given id and all of it's child nodes.
   /// [nodeId] Id of the node to collect class names.
   /// Returns: Class name list.
-  Future<List<String>> collectClassNamesFromSubtree(
-    NodeId nodeId,
-  ) async {
+  Future<List<String>> collectClassNamesFromSubtree(NodeId nodeId) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
@@ -118,11 +116,8 @@ class DOMApi {
   /// [insertBeforeNodeId] Drop the copy before this node (if absent, the copy becomes the last child of
   /// `targetNodeId`).
   /// Returns: Id of the node clone.
-  Future<NodeId> copyTo(
-    NodeId nodeId,
-    NodeId targetNodeId, {
-    NodeId insertBeforeNodeId,
-  }) async {
+  Future<NodeId> copyTo(NodeId nodeId, NodeId targetNodeId,
+      {NodeId insertBeforeNodeId}) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'targetNodeId': targetNodeId.toJson(),
@@ -144,13 +139,12 @@ class DOMApi {
   /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the subtree
   /// (default is false).
   /// Returns: Node description.
-  Future<Node> describeNode({
-    NodeId nodeId,
-    BackendNodeId backendNodeId,
-    runtime.RemoteObjectId objectId,
-    int depth,
-    bool pierce,
-  }) async {
+  Future<Node> describeNode(
+      {NodeId nodeId,
+      BackendNodeId backendNodeId,
+      runtime.RemoteObjectId objectId,
+      int depth,
+      bool pierce}) async {
     var parameters = <String, dynamic>{};
     if (nodeId != null) {
       parameters['nodeId'] = nodeId.toJson();
@@ -179,9 +173,7 @@ class DOMApi {
   /// Discards search results from the session with the given id. `getSearchResults` should no longer
   /// be called for that search.
   /// [searchId] Unique search session identifier.
-  Future discardSearchResults(
-    String searchId,
-  ) async {
+  Future discardSearchResults(String searchId) async {
     var parameters = <String, dynamic>{
       'searchId': searchId,
     };
@@ -197,11 +189,10 @@ class DOMApi {
   /// [nodeId] Identifier of the node.
   /// [backendNodeId] Identifier of the backend node.
   /// [objectId] JavaScript object id of the node wrapper.
-  Future focus({
-    NodeId nodeId,
-    BackendNodeId backendNodeId,
-    runtime.RemoteObjectId objectId,
-  }) async {
+  Future focus(
+      {NodeId nodeId,
+      BackendNodeId backendNodeId,
+      runtime.RemoteObjectId objectId}) async {
     var parameters = <String, dynamic>{};
     if (nodeId != null) {
       parameters['nodeId'] = nodeId.toJson();
@@ -218,9 +209,7 @@ class DOMApi {
   /// Returns attributes for the specified node.
   /// [nodeId] Id of the node to retrieve attibutes for.
   /// Returns: An interleaved array of node attribute names and values.
-  Future<List<String>> getAttributes(
-    NodeId nodeId,
-  ) async {
+  Future<List<String>> getAttributes(NodeId nodeId) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
@@ -233,11 +222,10 @@ class DOMApi {
   /// [backendNodeId] Identifier of the backend node.
   /// [objectId] JavaScript object id of the node wrapper.
   /// Returns: Box model for the node.
-  Future<BoxModel> getBoxModel({
-    NodeId nodeId,
-    BackendNodeId backendNodeId,
-    runtime.RemoteObjectId objectId,
-  }) async {
+  Future<BoxModel> getBoxModel(
+      {NodeId nodeId,
+      BackendNodeId backendNodeId,
+      runtime.RemoteObjectId objectId}) async {
     var parameters = <String, dynamic>{};
     if (nodeId != null) {
       parameters['nodeId'] = nodeId.toJson();
@@ -258,11 +246,10 @@ class DOMApi {
   /// [backendNodeId] Identifier of the backend node.
   /// [objectId] JavaScript object id of the node wrapper.
   /// Returns: Quads that describe node layout relative to viewport.
-  Future<List<Quad>> getContentQuads({
-    NodeId nodeId,
-    BackendNodeId backendNodeId,
-    runtime.RemoteObjectId objectId,
-  }) async {
+  Future<List<Quad>> getContentQuads(
+      {NodeId nodeId,
+      BackendNodeId backendNodeId,
+      runtime.RemoteObjectId objectId}) async {
     var parameters = <String, dynamic>{};
     if (nodeId != null) {
       parameters['nodeId'] = nodeId.toJson();
@@ -283,10 +270,7 @@ class DOMApi {
   /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the subtree
   /// (default is false).
   /// Returns: Resulting node.
-  Future<Node> getDocument({
-    int depth,
-    bool pierce,
-  }) async {
+  Future<Node> getDocument({int depth, bool pierce}) async {
     var parameters = <String, dynamic>{};
     if (depth != null) {
       parameters['depth'] = depth;
@@ -304,10 +288,7 @@ class DOMApi {
   /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the subtree
   /// (default is false).
   /// Returns: Resulting node.
-  Future<List<Node>> getFlattenedDocument({
-    int depth,
-    bool pierce,
-  }) async {
+  Future<List<Node>> getFlattenedDocument({int depth, bool pierce}) async {
     var parameters = <String, dynamic>{};
     if (depth != null) {
       parameters['depth'] = depth;
@@ -324,11 +305,8 @@ class DOMApi {
   /// [y] Y coordinate.
   /// [includeUserAgentShadowDOM] False to skip to the nearest non-UA shadow root ancestor (default: false).
   /// Returns: Id of the node at given coordinates.
-  Future<NodeId> getNodeForLocation(
-    int x,
-    int y, {
-    bool includeUserAgentShadowDOM,
-  }) async {
+  Future<NodeId> getNodeForLocation(int x, int y,
+      {bool includeUserAgentShadowDOM}) async {
     var parameters = <String, dynamic>{
       'x': x,
       'y': y,
@@ -345,11 +323,10 @@ class DOMApi {
   /// [backendNodeId] Identifier of the backend node.
   /// [objectId] JavaScript object id of the node wrapper.
   /// Returns: Outer HTML markup.
-  Future<String> getOuterHTML({
-    NodeId nodeId,
-    BackendNodeId backendNodeId,
-    runtime.RemoteObjectId objectId,
-  }) async {
+  Future<String> getOuterHTML(
+      {NodeId nodeId,
+      BackendNodeId backendNodeId,
+      runtime.RemoteObjectId objectId}) async {
     var parameters = <String, dynamic>{};
     if (nodeId != null) {
       parameters['nodeId'] = nodeId.toJson();
@@ -367,9 +344,7 @@ class DOMApi {
   /// Returns the id of the nearest ancestor that is a relayout boundary.
   /// [nodeId] Id of the node.
   /// Returns: Relayout boundary node id for the given node.
-  Future<NodeId> getRelayoutBoundary(
-    NodeId nodeId,
-  ) async {
+  Future<NodeId> getRelayoutBoundary(NodeId nodeId) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
@@ -384,10 +359,7 @@ class DOMApi {
   /// [toIndex] End index of the search result to be returned.
   /// Returns: Ids of the search result nodes.
   Future<List<NodeId>> getSearchResults(
-    String searchId,
-    int fromIndex,
-    int toIndex,
-  ) async {
+      String searchId, int fromIndex, int toIndex) async {
     var parameters = <String, dynamic>{
       'searchId': searchId,
       'fromIndex': fromIndex,
@@ -423,11 +395,8 @@ class DOMApi {
   /// [insertBeforeNodeId] Drop node before this one (if absent, the moved node becomes the last child of
   /// `targetNodeId`).
   /// Returns: New id of the moved node.
-  Future<NodeId> moveTo(
-    NodeId nodeId,
-    NodeId targetNodeId, {
-    NodeId insertBeforeNodeId,
-  }) async {
+  Future<NodeId> moveTo(NodeId nodeId, NodeId targetNodeId,
+      {NodeId insertBeforeNodeId}) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'targetNodeId': targetNodeId.toJson(),
@@ -443,10 +412,8 @@ class DOMApi {
   /// `cancelSearch` to end this search session.
   /// [query] Plain text or query selector or XPath search query.
   /// [includeUserAgentShadowDOM] True to search in user agent shadow DOM.
-  Future<PerformSearchResult> performSearch(
-    String query, {
-    bool includeUserAgentShadowDOM,
-  }) async {
+  Future<PerformSearchResult> performSearch(String query,
+      {bool includeUserAgentShadowDOM}) async {
     var parameters = <String, dynamic>{
       'query': query,
     };
@@ -460,9 +427,7 @@ class DOMApi {
   /// Requests that the node is sent to the caller given its path. // FIXME, use XPath
   /// [path] Path to node in the proprietary format.
   /// Returns: Id of the node for given path.
-  Future<NodeId> pushNodeByPathToFrontend(
-    String path,
-  ) async {
+  Future<NodeId> pushNodeByPathToFrontend(String path) async {
     var parameters = <String, dynamic>{
       'path': path,
     };
@@ -475,8 +440,7 @@ class DOMApi {
   /// Returns: The array of ids of pushed nodes that correspond to the backend ids specified in
   /// backendNodeIds.
   Future<List<NodeId>> pushNodesByBackendIdsToFrontend(
-    List<BackendNodeId> backendNodeIds,
-  ) async {
+      List<BackendNodeId> backendNodeIds) async {
     var parameters = <String, dynamic>{
       'backendNodeIds': backendNodeIds.map((e) => e.toJson()).toList(),
     };
@@ -489,10 +453,7 @@ class DOMApi {
   /// [nodeId] Id of the node to query upon.
   /// [selector] Selector string.
   /// Returns: Query selector result.
-  Future<NodeId> querySelector(
-    NodeId nodeId,
-    String selector,
-  ) async {
+  Future<NodeId> querySelector(NodeId nodeId, String selector) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'selector': selector,
@@ -505,10 +466,7 @@ class DOMApi {
   /// [nodeId] Id of the node to query upon.
   /// [selector] Selector string.
   /// Returns: Query selector result.
-  Future<List<NodeId>> querySelectorAll(
-    NodeId nodeId,
-    String selector,
-  ) async {
+  Future<List<NodeId>> querySelectorAll(NodeId nodeId, String selector) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'selector': selector,
@@ -525,10 +483,7 @@ class DOMApi {
   /// Removes attribute with given name from an element with given id.
   /// [nodeId] Id of the element to remove attribute from.
   /// [name] Name of the attribute to remove.
-  Future removeAttribute(
-    NodeId nodeId,
-    String name,
-  ) async {
+  Future removeAttribute(NodeId nodeId, String name) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'name': name,
@@ -538,9 +493,7 @@ class DOMApi {
 
   /// Removes node with given id.
   /// [nodeId] Id of the node to remove.
-  Future removeNode(
-    NodeId nodeId,
-  ) async {
+  Future removeNode(NodeId nodeId) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
@@ -555,11 +508,7 @@ class DOMApi {
   /// entire subtree or provide an integer larger than 0.
   /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the sub-tree
   /// (default is false).
-  Future requestChildNodes(
-    NodeId nodeId, {
-    int depth,
-    bool pierce,
-  }) async {
+  Future requestChildNodes(NodeId nodeId, {int depth, bool pierce}) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
@@ -577,9 +526,7 @@ class DOMApi {
   /// `setChildNodes` notifications.
   /// [objectId] JavaScript object id to convert into node.
   /// Returns: Node id for given object.
-  Future<NodeId> requestNode(
-    runtime.RemoteObjectId objectId,
-  ) async {
+  Future<NodeId> requestNode(runtime.RemoteObjectId objectId) async {
     var parameters = <String, dynamic>{
       'objectId': objectId.toJson(),
     };
@@ -592,11 +539,10 @@ class DOMApi {
   /// [backendNodeId] Backend identifier of the node to resolve.
   /// [objectGroup] Symbolic group name that can be used to release multiple objects.
   /// Returns: JavaScript object wrapper for given node.
-  Future<runtime.RemoteObject> resolveNode({
-    NodeId nodeId,
-    dom.BackendNodeId backendNodeId,
-    String objectGroup,
-  }) async {
+  Future<runtime.RemoteObject> resolveNode(
+      {NodeId nodeId,
+      dom.BackendNodeId backendNodeId,
+      String objectGroup}) async {
     var parameters = <String, dynamic>{};
     if (nodeId != null) {
       parameters['nodeId'] = nodeId.toJson();
@@ -615,11 +561,7 @@ class DOMApi {
   /// [nodeId] Id of the element to set attribute for.
   /// [name] Attribute name.
   /// [value] Attribute value.
-  Future setAttributeValue(
-    NodeId nodeId,
-    String name,
-    String value,
-  ) async {
+  Future setAttributeValue(NodeId nodeId, String name, String value) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'name': name,
@@ -634,11 +576,7 @@ class DOMApi {
   /// [text] Text with a number of attributes. Will parse this text using HTML parser.
   /// [name] Attribute name to replace with new attributes derived from text in case text parsed
   /// successfully.
-  Future setAttributesAsText(
-    NodeId nodeId,
-    String text, {
-    String name,
-  }) async {
+  Future setAttributesAsText(NodeId nodeId, String text, {String name}) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'text': text,
@@ -654,12 +592,10 @@ class DOMApi {
   /// [nodeId] Identifier of the node.
   /// [backendNodeId] Identifier of the backend node.
   /// [objectId] JavaScript object id of the node wrapper.
-  Future setFileInputFiles(
-    List<String> files, {
-    NodeId nodeId,
-    BackendNodeId backendNodeId,
-    runtime.RemoteObjectId objectId,
-  }) async {
+  Future setFileInputFiles(List<String> files,
+      {NodeId nodeId,
+      BackendNodeId backendNodeId,
+      runtime.RemoteObjectId objectId}) async {
     var parameters = <String, dynamic>{
       'files': files.map((e) => e).toList(),
     };
@@ -678,9 +614,7 @@ class DOMApi {
   /// Enables console to refer to the node with given id via $x (see Command Line API for more details
   /// $x functions).
   /// [nodeId] DOM node id to be accessible by means of $x command line API.
-  Future setInspectedNode(
-    NodeId nodeId,
-  ) async {
+  Future setInspectedNode(NodeId nodeId) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
@@ -691,10 +625,7 @@ class DOMApi {
   /// [nodeId] Id of the node to set name for.
   /// [name] New node's name.
   /// Returns: New node's id.
-  Future<NodeId> setNodeName(
-    NodeId nodeId,
-    String name,
-  ) async {
+  Future<NodeId> setNodeName(NodeId nodeId, String name) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'name': name,
@@ -706,10 +637,7 @@ class DOMApi {
   /// Sets node value for a node with given id.
   /// [nodeId] Id of the node to set value for.
   /// [value] New node's value.
-  Future setNodeValue(
-    NodeId nodeId,
-    String value,
-  ) async {
+  Future setNodeValue(NodeId nodeId, String value) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'value': value,
@@ -720,10 +648,7 @@ class DOMApi {
   /// Sets node HTML markup, returns new node id.
   /// [nodeId] Id of the node to set markup for.
   /// [outerHTML] Outer HTML markup to set.
-  Future setOuterHTML(
-    NodeId nodeId,
-    String outerHTML,
-  ) async {
+  Future setOuterHTML(NodeId nodeId, String outerHTML) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'outerHTML': outerHTML,
@@ -737,9 +662,7 @@ class DOMApi {
   }
 
   /// Returns iframe node that owns iframe with the given domain.
-  Future<NodeId> getFrameOwner(
-    page.FrameId frameId,
-  ) async {
+  Future<NodeId> getFrameOwner(page.FrameId frameId) async {
     var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
     };
@@ -758,11 +681,8 @@ class AttributeModifiedEvent {
   /// Attribute value.
   final String value;
 
-  AttributeModifiedEvent({
-    @required this.nodeId,
-    @required this.name,
-    @required this.value,
-  });
+  AttributeModifiedEvent(
+      {@required this.nodeId, @required this.name, @required this.value});
 
   factory AttributeModifiedEvent.fromJson(Map<String, dynamic> json) {
     return AttributeModifiedEvent(
@@ -780,10 +700,7 @@ class AttributeRemovedEvent {
   /// A ttribute name.
   final String name;
 
-  AttributeRemovedEvent({
-    @required this.nodeId,
-    @required this.name,
-  });
+  AttributeRemovedEvent({@required this.nodeId, @required this.name});
 
   factory AttributeRemovedEvent.fromJson(Map<String, dynamic> json) {
     return AttributeRemovedEvent(
@@ -800,10 +717,8 @@ class CharacterDataModifiedEvent {
   /// New text value.
   final String characterData;
 
-  CharacterDataModifiedEvent({
-    @required this.nodeId,
-    @required this.characterData,
-  });
+  CharacterDataModifiedEvent(
+      {@required this.nodeId, @required this.characterData});
 
   factory CharacterDataModifiedEvent.fromJson(Map<String, dynamic> json) {
     return CharacterDataModifiedEvent(
@@ -820,10 +735,8 @@ class ChildNodeCountUpdatedEvent {
   /// New node count.
   final int childNodeCount;
 
-  ChildNodeCountUpdatedEvent({
-    @required this.nodeId,
-    @required this.childNodeCount,
-  });
+  ChildNodeCountUpdatedEvent(
+      {@required this.nodeId, @required this.childNodeCount});
 
   factory ChildNodeCountUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return ChildNodeCountUpdatedEvent(
@@ -843,11 +756,10 @@ class ChildNodeInsertedEvent {
   /// Inserted node data.
   final Node node;
 
-  ChildNodeInsertedEvent({
-    @required this.parentNodeId,
-    @required this.previousNodeId,
-    @required this.node,
-  });
+  ChildNodeInsertedEvent(
+      {@required this.parentNodeId,
+      @required this.previousNodeId,
+      @required this.node});
 
   factory ChildNodeInsertedEvent.fromJson(Map<String, dynamic> json) {
     return ChildNodeInsertedEvent(
@@ -865,10 +777,7 @@ class ChildNodeRemovedEvent {
   /// Id of the node that has been removed.
   final NodeId nodeId;
 
-  ChildNodeRemovedEvent({
-    @required this.parentNodeId,
-    @required this.nodeId,
-  });
+  ChildNodeRemovedEvent({@required this.parentNodeId, @required this.nodeId});
 
   factory ChildNodeRemovedEvent.fromJson(Map<String, dynamic> json) {
     return ChildNodeRemovedEvent(
@@ -885,10 +794,8 @@ class DistributedNodesUpdatedEvent {
   /// Distributed nodes for given insertion point.
   final List<BackendNode> distributedNodes;
 
-  DistributedNodesUpdatedEvent({
-    @required this.insertionPointId,
-    @required this.distributedNodes,
-  });
+  DistributedNodesUpdatedEvent(
+      {@required this.insertionPointId, @required this.distributedNodes});
 
   factory DistributedNodesUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return DistributedNodesUpdatedEvent(
@@ -907,10 +814,8 @@ class PseudoElementAddedEvent {
   /// The added pseudo element.
   final Node pseudoElement;
 
-  PseudoElementAddedEvent({
-    @required this.parentId,
-    @required this.pseudoElement,
-  });
+  PseudoElementAddedEvent(
+      {@required this.parentId, @required this.pseudoElement});
 
   factory PseudoElementAddedEvent.fromJson(Map<String, dynamic> json) {
     return PseudoElementAddedEvent(
@@ -927,10 +832,8 @@ class PseudoElementRemovedEvent {
   /// The removed pseudo element id.
   final NodeId pseudoElementId;
 
-  PseudoElementRemovedEvent({
-    @required this.parentId,
-    @required this.pseudoElementId,
-  });
+  PseudoElementRemovedEvent(
+      {@required this.parentId, @required this.pseudoElementId});
 
   factory PseudoElementRemovedEvent.fromJson(Map<String, dynamic> json) {
     return PseudoElementRemovedEvent(
@@ -947,10 +850,7 @@ class SetChildNodesEvent {
   /// Child nodes array.
   final List<Node> nodes;
 
-  SetChildNodesEvent({
-    @required this.parentId,
-    @required this.nodes,
-  });
+  SetChildNodesEvent({@required this.parentId, @required this.nodes});
 
   factory SetChildNodesEvent.fromJson(Map<String, dynamic> json) {
     return SetChildNodesEvent(
@@ -967,10 +867,7 @@ class ShadowRootPoppedEvent {
   /// Shadow root id.
   final NodeId rootId;
 
-  ShadowRootPoppedEvent({
-    @required this.hostId,
-    @required this.rootId,
-  });
+  ShadowRootPoppedEvent({@required this.hostId, @required this.rootId});
 
   factory ShadowRootPoppedEvent.fromJson(Map<String, dynamic> json) {
     return ShadowRootPoppedEvent(
@@ -987,10 +884,7 @@ class ShadowRootPushedEvent {
   /// Shadow root.
   final Node root;
 
-  ShadowRootPushedEvent({
-    @required this.hostId,
-    @required this.root,
-  });
+  ShadowRootPushedEvent({@required this.hostId, @required this.root});
 
   factory ShadowRootPushedEvent.fromJson(Map<String, dynamic> json) {
     return ShadowRootPushedEvent(
@@ -1007,10 +901,7 @@ class PerformSearchResult {
   /// Number of search results.
   final int resultCount;
 
-  PerformSearchResult({
-    @required this.searchId,
-    @required this.resultCount,
-  });
+  PerformSearchResult({@required this.searchId, @required this.resultCount});
 
   factory PerformSearchResult.fromJson(Map<String, dynamic> json) {
     return PerformSearchResult(
@@ -1071,11 +962,10 @@ class BackendNode {
 
   final BackendNodeId backendNodeId;
 
-  BackendNode({
-    @required this.nodeType,
-    @required this.nodeName,
-    @required this.backendNodeId,
-  });
+  BackendNode(
+      {@required this.nodeType,
+      @required this.nodeName,
+      @required this.backendNodeId});
 
   factory BackendNode.fromJson(Map<String, dynamic> json) {
     return BackendNode(
@@ -1261,36 +1151,35 @@ class Node {
   /// Whether the node is SVG.
   final bool isSVG;
 
-  Node({
-    @required this.nodeId,
-    this.parentId,
-    @required this.backendNodeId,
-    @required this.nodeType,
-    @required this.nodeName,
-    @required this.localName,
-    @required this.nodeValue,
-    this.childNodeCount,
-    this.children,
-    this.attributes,
-    this.documentURL,
-    this.baseURL,
-    this.publicId,
-    this.systemId,
-    this.internalSubset,
-    this.xmlVersion,
-    this.name,
-    this.value,
-    this.pseudoType,
-    this.shadowRootType,
-    this.frameId,
-    this.contentDocument,
-    this.shadowRoots,
-    this.templateContent,
-    this.pseudoElements,
-    this.importedDocument,
-    this.distributedNodes,
-    this.isSVG,
-  });
+  Node(
+      {@required this.nodeId,
+      this.parentId,
+      @required this.backendNodeId,
+      @required this.nodeType,
+      @required this.nodeName,
+      @required this.localName,
+      @required this.nodeValue,
+      this.childNodeCount,
+      this.children,
+      this.attributes,
+      this.documentURL,
+      this.baseURL,
+      this.publicId,
+      this.systemId,
+      this.internalSubset,
+      this.xmlVersion,
+      this.name,
+      this.value,
+      this.pseudoType,
+      this.shadowRootType,
+      this.frameId,
+      this.contentDocument,
+      this.shadowRoots,
+      this.templateContent,
+      this.pseudoElements,
+      this.importedDocument,
+      this.distributedNodes,
+      this.isSVG});
 
   factory Node.fromJson(Map<String, dynamic> json) {
     return Node(
@@ -1449,12 +1338,7 @@ class RGBA {
   /// The alpha component, in the [0-1] range (default: 1).
   final num a;
 
-  RGBA({
-    @required this.r,
-    @required this.g,
-    @required this.b,
-    this.a,
-  });
+  RGBA({@required this.r, @required this.g, @required this.b, this.a});
 
   factory RGBA.fromJson(Map<String, dynamic> json) {
     return RGBA(
@@ -1521,15 +1405,14 @@ class BoxModel {
   /// Shape outside coordinates
   final ShapeOutsideInfo shapeOutside;
 
-  BoxModel({
-    @required this.content,
-    @required this.padding,
-    @required this.border,
-    @required this.margin,
-    @required this.width,
-    @required this.height,
-    this.shapeOutside,
-  });
+  BoxModel(
+      {@required this.content,
+      @required this.padding,
+      @required this.border,
+      @required this.margin,
+      @required this.width,
+      @required this.height,
+      this.shapeOutside});
 
   factory BoxModel.fromJson(Map<String, dynamic> json) {
     return BoxModel(
@@ -1572,11 +1455,10 @@ class ShapeOutsideInfo {
   /// Margin shape bounds
   final List<dynamic> marginShape;
 
-  ShapeOutsideInfo({
-    @required this.bounds,
-    @required this.shape,
-    @required this.marginShape,
-  });
+  ShapeOutsideInfo(
+      {@required this.bounds,
+      @required this.shape,
+      @required this.marginShape});
 
   factory ShapeOutsideInfo.fromJson(Map<String, dynamic> json) {
     return ShapeOutsideInfo(
@@ -1611,12 +1493,11 @@ class Rect {
   /// Rectangle height
   final num height;
 
-  Rect({
-    @required this.x,
-    @required this.y,
-    @required this.width,
-    @required this.height,
-  });
+  Rect(
+      {@required this.x,
+      @required this.y,
+      @required this.width,
+      @required this.height});
 
   factory Rect.fromJson(Map<String, dynamic> json) {
     return Rect(

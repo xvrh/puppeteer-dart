@@ -1,11 +1,11 @@
 name: chrome_dev_tools
 description: A client of the DevTools Protocol to automate a Headless Chrome browser.
-version: 0.0.5
+version: 1.0.0
 homepage: https://github.com/xavierhainaux/chrome_dev_tools
 author: Xavier Hainaux <xavier.hainaux@gmail.com>
 
 environment:
-  sdk: '>=2.0.0 <3.0.0'
+  sdk: '>=2.0.0-dev.69 <3.0.0'
 
 dependencies:
   path: ^1.4.1

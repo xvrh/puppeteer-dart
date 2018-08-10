@@ -38,10 +38,8 @@ class DebuggerApi {
 
   /// Continues execution until specific location is reached.
   /// [location] Location to continue to.
-  Future continueToLocation(
-    Location location, {
-    String targetCallFrames,
-  }) async {
+  Future continueToLocation(Location location,
+      {String targetCallFrames}) async {
     var parameters = <String, dynamic>{
       'location': location.toJson(),
     };
@@ -78,16 +76,14 @@ class DebuggerApi {
   /// [throwOnSideEffect] Whether to throw an exception if side effect cannot be ruled out during evaluation.
   /// [timeout] Terminate execution after timing out (number of milliseconds).
   Future<EvaluateOnCallFrameResult> evaluateOnCallFrame(
-    CallFrameId callFrameId,
-    String expression, {
-    String objectGroup,
-    bool includeCommandLineAPI,
-    bool silent,
-    bool returnByValue,
-    bool generatePreview,
-    bool throwOnSideEffect,
-    runtime.TimeDelta timeout,
-  }) async {
+      CallFrameId callFrameId, String expression,
+      {String objectGroup,
+      bool includeCommandLineAPI,
+      bool silent,
+      bool returnByValue,
+      bool generatePreview,
+      bool throwOnSideEffect,
+      runtime.TimeDelta timeout}) async {
     var parameters = <String, dynamic>{
       'callFrameId': callFrameId.toJson(),
       'expression': expression,
@@ -124,11 +120,8 @@ class DebuggerApi {
   /// of scripts is used as end of range.
   /// [restrictToFunction] Only consider locations which are in the same (non-nested) function as start.
   /// Returns: List of the possible breakpoint locations.
-  Future<List<BreakLocation>> getPossibleBreakpoints(
-    Location start, {
-    Location end,
-    bool restrictToFunction,
-  }) async {
+  Future<List<BreakLocation>> getPossibleBreakpoints(Location start,
+      {Location end, bool restrictToFunction}) async {
     var parameters = <String, dynamic>{
       'start': start.toJson(),
     };
@@ -148,9 +141,7 @@ class DebuggerApi {
   /// Returns source for the script with given id.
   /// [scriptId] Id of the script to get source for.
   /// Returns: Script source.
-  Future<String> getScriptSource(
-    runtime.ScriptId scriptId,
-  ) async {
+  Future<String> getScriptSource(runtime.ScriptId scriptId) async {
     var parameters = <String, dynamic>{
       'scriptId': scriptId.toJson(),
     };
@@ -160,8 +151,7 @@ class DebuggerApi {
 
   /// Returns stack trace with given `stackTraceId`.
   Future<runtime.StackTrace> getStackTrace(
-    runtime.StackTraceId stackTraceId,
-  ) async {
+      runtime.StackTraceId stackTraceId) async {
     var parameters = <String, dynamic>{
       'stackTraceId': stackTraceId.toJson(),
     };
@@ -175,9 +165,7 @@ class DebuggerApi {
   }
 
   /// [parentStackTraceId] Debugger will pause when async call with given stack trace is started.
-  Future pauseOnAsyncCall(
-    runtime.StackTraceId parentStackTraceId,
-  ) async {
+  Future pauseOnAsyncCall(runtime.StackTraceId parentStackTraceId) async {
     var parameters = <String, dynamic>{
       'parentStackTraceId': parentStackTraceId.toJson(),
     };
@@ -185,9 +173,7 @@ class DebuggerApi {
   }
 
   /// Removes JavaScript breakpoint.
-  Future removeBreakpoint(
-    BreakpointId breakpointId,
-  ) async {
+  Future removeBreakpoint(BreakpointId breakpointId) async {
     var parameters = <String, dynamic>{
       'breakpointId': breakpointId.toJson(),
     };
@@ -196,9 +182,7 @@ class DebuggerApi {
 
   /// Restarts particular call frame from the beginning.
   /// [callFrameId] Call frame identifier to evaluate on.
-  Future<RestartFrameResult> restartFrame(
-    CallFrameId callFrameId,
-  ) async {
+  Future<RestartFrameResult> restartFrame(CallFrameId callFrameId) async {
     var parameters = <String, dynamic>{
       'callFrameId': callFrameId.toJson(),
     };
@@ -226,11 +210,8 @@ class DebuggerApi {
   /// [isRegex] If true, treats string parameter as regex.
   /// Returns: List of search matches.
   Future<List<SearchMatch>> searchInContent(
-    runtime.ScriptId scriptId,
-    String query, {
-    bool caseSensitive,
-    bool isRegex,
-  }) async {
+      runtime.ScriptId scriptId, String query,
+      {bool caseSensitive, bool isRegex}) async {
     var parameters = <String, dynamic>{
       'scriptId': scriptId.toJson(),
       'query': query,
@@ -250,9 +231,7 @@ class DebuggerApi {
   /// Enables or disables async call stacks tracking.
   /// [maxDepth] Maximum depth of async call stacks. Setting to `0` will effectively disable collecting async
   /// call stacks (default).
-  Future setAsyncCallStackDepth(
-    int maxDepth,
-  ) async {
+  Future setAsyncCallStackDepth(int maxDepth) async {
     var parameters = <String, dynamic>{
       'maxDepth': maxDepth,
     };
@@ -263,9 +242,7 @@ class DebuggerApi {
   /// scripts with url matching one of the patterns. VM will try to leave blackboxed script by
   /// performing 'step in' several times, finally resorting to 'step out' if unsuccessful.
   /// [patterns] Array of regexps that will be used to check script url for blackbox state.
-  Future setBlackboxPatterns(
-    List<String> patterns,
-  ) async {
+  Future setBlackboxPatterns(List<String> patterns) async {
     var parameters = <String, dynamic>{
       'patterns': patterns.map((e) => e).toList(),
     };
@@ -278,9 +255,7 @@ class DebuggerApi {
   /// blackboxed. Array should be sorted.
   /// [scriptId] Id of the script.
   Future setBlackboxedRanges(
-    runtime.ScriptId scriptId,
-    List<ScriptPosition> positions,
-  ) async {
+      runtime.ScriptId scriptId, List<ScriptPosition> positions) async {
     var parameters = <String, dynamic>{
       'scriptId': scriptId.toJson(),
       'positions': positions.map((e) => e.toJson()).toList(),
@@ -292,10 +267,8 @@ class DebuggerApi {
   /// [location] Location to set breakpoint in.
   /// [condition] Expression to use as a breakpoint condition. When specified, debugger will only stop on the
   /// breakpoint if this expression evaluates to true.
-  Future<SetBreakpointResult> setBreakpoint(
-    Location location, {
-    String condition,
-  }) async {
+  Future<SetBreakpointResult> setBreakpoint(Location location,
+      {String condition}) async {
     var parameters = <String, dynamic>{
       'location': location.toJson(),
     };
@@ -318,14 +291,12 @@ class DebuggerApi {
   /// [columnNumber] Offset in the line to set breakpoint at.
   /// [condition] Expression to use as a breakpoint condition. When specified, debugger will only stop on the
   /// breakpoint if this expression evaluates to true.
-  Future<SetBreakpointByUrlResult> setBreakpointByUrl(
-    int lineNumber, {
-    String url,
-    String urlRegex,
-    String scriptHash,
-    int columnNumber,
-    String condition,
-  }) async {
+  Future<SetBreakpointByUrlResult> setBreakpointByUrl(int lineNumber,
+      {String url,
+      String urlRegex,
+      String scriptHash,
+      int columnNumber,
+      String condition}) async {
     var parameters = <String, dynamic>{
       'lineNumber': lineNumber,
     };
@@ -356,9 +327,8 @@ class DebuggerApi {
   /// stop on the breakpoint if this expression evaluates to true.
   /// Returns: Id of the created breakpoint for further reference.
   Future<BreakpointId> setBreakpointOnFunctionCall(
-    runtime.RemoteObjectId objectId, {
-    String condition,
-  }) async {
+      runtime.RemoteObjectId objectId,
+      {String condition}) async {
     var parameters = <String, dynamic>{
       'objectId': objectId.toJson(),
     };
@@ -372,9 +342,7 @@ class DebuggerApi {
 
   /// Activates / deactivates all breakpoints on the page.
   /// [active] New value for breakpoints active state.
-  Future setBreakpointsActive(
-    bool active,
-  ) async {
+  Future setBreakpointsActive(bool active) async {
     var parameters = <String, dynamic>{
       'active': active,
     };
@@ -384,9 +352,7 @@ class DebuggerApi {
   /// Defines pause on exceptions state. Can be set to stop on all exceptions, uncaught exceptions or
   /// no exceptions. Initial pause on exceptions state is `none`.
   /// [state] Pause on exceptions mode.
-  Future setPauseOnExceptions(
-    String state,
-  ) async {
+  Future setPauseOnExceptions(String state) async {
     var parameters = <String, dynamic>{
       'state': state,
     };
@@ -395,9 +361,7 @@ class DebuggerApi {
 
   /// Changes return value in top frame. Available only at return break position.
   /// [newValue] New return value.
-  Future setReturnValue(
-    runtime.CallArgument newValue,
-  ) async {
+  Future setReturnValue(runtime.CallArgument newValue) async {
     var parameters = <String, dynamic>{
       'newValue': newValue.toJson(),
     };
@@ -410,10 +374,8 @@ class DebuggerApi {
   /// [dryRun] If true the change will not actually be applied. Dry run may be used to get result
   /// description without actually modifying the code.
   Future<SetScriptSourceResult> setScriptSource(
-    runtime.ScriptId scriptId,
-    String scriptSource, {
-    bool dryRun,
-  }) async {
+      runtime.ScriptId scriptId, String scriptSource,
+      {bool dryRun}) async {
     var parameters = <String, dynamic>{
       'scriptId': scriptId.toJson(),
       'scriptSource': scriptSource,
@@ -427,9 +389,7 @@ class DebuggerApi {
 
   /// Makes page not interrupt on any pauses (breakpoint, exception, dom exception etc).
   /// [skip] New value for skip pauses state.
-  Future setSkipAllPauses(
-    bool skip,
-  ) async {
+  Future setSkipAllPauses(bool skip) async {
     var parameters = <String, dynamic>{
       'skip': skip,
     };
@@ -443,12 +403,8 @@ class DebuggerApi {
   /// [variableName] Variable name.
   /// [newValue] New variable value.
   /// [callFrameId] Id of callframe that holds variable.
-  Future setVariableValue(
-    int scopeNumber,
-    String variableName,
-    runtime.CallArgument newValue,
-    CallFrameId callFrameId,
-  ) async {
+  Future setVariableValue(int scopeNumber, String variableName,
+      runtime.CallArgument newValue, CallFrameId callFrameId) async {
     var parameters = <String, dynamic>{
       'scopeNumber': scopeNumber,
       'variableName': variableName,
@@ -461,9 +417,7 @@ class DebuggerApi {
   /// Steps into the function call.
   /// [breakOnAsyncCall] Debugger will issue additional Debugger.paused notification if any async task is scheduled
   /// before next pause.
-  Future stepInto({
-    bool breakOnAsyncCall,
-  }) async {
+  Future stepInto({bool breakOnAsyncCall}) async {
     var parameters = <String, dynamic>{};
     if (breakOnAsyncCall != null) {
       parameters['breakOnAsyncCall'] = breakOnAsyncCall;
@@ -489,10 +443,8 @@ class BreakpointResolvedEvent {
   /// Actual breakpoint location.
   final Location location;
 
-  BreakpointResolvedEvent({
-    @required this.breakpointId,
-    @required this.location,
-  });
+  BreakpointResolvedEvent(
+      {@required this.breakpointId, @required this.location});
 
   factory BreakpointResolvedEvent.fromJson(Map<String, dynamic> json) {
     return BreakpointResolvedEvent(
@@ -525,15 +477,14 @@ class PausedEvent {
   /// This field is available only after `Debugger.stepInto` call with `breakOnAsynCall` flag.
   final runtime.StackTraceId asyncCallStackTraceId;
 
-  PausedEvent({
-    @required this.callFrames,
-    @required this.reason,
-    this.data,
-    this.hitBreakpoints,
-    this.asyncStackTrace,
-    this.asyncStackTraceId,
-    this.asyncCallStackTraceId,
-  });
+  PausedEvent(
+      {@required this.callFrames,
+      @required this.reason,
+      this.data,
+      this.hitBreakpoints,
+      this.asyncStackTrace,
+      this.asyncStackTraceId,
+      this.asyncCallStackTraceId});
 
   factory PausedEvent.fromJson(Map<String, dynamic> json) {
     return PausedEvent(
@@ -601,22 +552,21 @@ class ScriptFailedToParseEvent {
   /// JavaScript top stack frame of where the script parsed event was triggered if available.
   final runtime.StackTrace stackTrace;
 
-  ScriptFailedToParseEvent({
-    @required this.scriptId,
-    @required this.url,
-    @required this.startLine,
-    @required this.startColumn,
-    @required this.endLine,
-    @required this.endColumn,
-    @required this.executionContextId,
-    @required this.hash,
-    this.executionContextAuxData,
-    this.sourceMapURL,
-    this.hasSourceURL,
-    this.isModule,
-    this.length,
-    this.stackTrace,
-  });
+  ScriptFailedToParseEvent(
+      {@required this.scriptId,
+      @required this.url,
+      @required this.startLine,
+      @required this.startColumn,
+      @required this.endLine,
+      @required this.endColumn,
+      @required this.executionContextId,
+      @required this.hash,
+      this.executionContextAuxData,
+      this.sourceMapURL,
+      this.hasSourceURL,
+      this.isModule,
+      this.length,
+      this.stackTrace});
 
   factory ScriptFailedToParseEvent.fromJson(Map<String, dynamic> json) {
     return ScriptFailedToParseEvent(
@@ -691,23 +641,22 @@ class ScriptParsedEvent {
   /// JavaScript top stack frame of where the script parsed event was triggered if available.
   final runtime.StackTrace stackTrace;
 
-  ScriptParsedEvent({
-    @required this.scriptId,
-    @required this.url,
-    @required this.startLine,
-    @required this.startColumn,
-    @required this.endLine,
-    @required this.endColumn,
-    @required this.executionContextId,
-    @required this.hash,
-    this.executionContextAuxData,
-    this.isLiveEdit,
-    this.sourceMapURL,
-    this.hasSourceURL,
-    this.isModule,
-    this.length,
-    this.stackTrace,
-  });
+  ScriptParsedEvent(
+      {@required this.scriptId,
+      @required this.url,
+      @required this.startLine,
+      @required this.startColumn,
+      @required this.endLine,
+      @required this.endColumn,
+      @required this.executionContextId,
+      @required this.hash,
+      this.executionContextAuxData,
+      this.isLiveEdit,
+      this.sourceMapURL,
+      this.hasSourceURL,
+      this.isModule,
+      this.length,
+      this.stackTrace});
 
   factory ScriptParsedEvent.fromJson(Map<String, dynamic> json) {
     return ScriptParsedEvent(
@@ -744,10 +693,7 @@ class EvaluateOnCallFrameResult {
   /// Exception details.
   final runtime.ExceptionDetails exceptionDetails;
 
-  EvaluateOnCallFrameResult({
-    @required this.result,
-    this.exceptionDetails,
-  });
+  EvaluateOnCallFrameResult({@required this.result, this.exceptionDetails});
 
   factory EvaluateOnCallFrameResult.fromJson(Map<String, dynamic> json) {
     return EvaluateOnCallFrameResult(
@@ -769,11 +715,10 @@ class RestartFrameResult {
   /// Async stack trace, if any.
   final runtime.StackTraceId asyncStackTraceId;
 
-  RestartFrameResult({
-    @required this.callFrames,
-    this.asyncStackTrace,
-    this.asyncStackTraceId,
-  });
+  RestartFrameResult(
+      {@required this.callFrames,
+      this.asyncStackTrace,
+      this.asyncStackTraceId});
 
   factory RestartFrameResult.fromJson(Map<String, dynamic> json) {
     return RestartFrameResult(
@@ -797,10 +742,8 @@ class SetBreakpointResult {
   /// Location this breakpoint resolved into.
   final Location actualLocation;
 
-  SetBreakpointResult({
-    @required this.breakpointId,
-    @required this.actualLocation,
-  });
+  SetBreakpointResult(
+      {@required this.breakpointId, @required this.actualLocation});
 
   factory SetBreakpointResult.fromJson(Map<String, dynamic> json) {
     return SetBreakpointResult(
@@ -817,10 +760,8 @@ class SetBreakpointByUrlResult {
   /// List of the locations this breakpoint resolved into upon addition.
   final List<Location> locations;
 
-  SetBreakpointByUrlResult({
-    @required this.breakpointId,
-    @required this.locations,
-  });
+  SetBreakpointByUrlResult(
+      {@required this.breakpointId, @required this.locations});
 
   factory SetBreakpointByUrlResult.fromJson(Map<String, dynamic> json) {
     return SetBreakpointByUrlResult(
@@ -847,13 +788,12 @@ class SetScriptSourceResult {
   /// Exception details if any.
   final runtime.ExceptionDetails exceptionDetails;
 
-  SetScriptSourceResult({
-    this.callFrames,
-    this.stackChanged,
-    this.asyncStackTrace,
-    this.asyncStackTraceId,
-    this.exceptionDetails,
-  });
+  SetScriptSourceResult(
+      {this.callFrames,
+      this.stackChanged,
+      this.asyncStackTrace,
+      this.asyncStackTraceId,
+      this.exceptionDetails});
 
   factory SetScriptSourceResult.fromJson(Map<String, dynamic> json) {
     return SetScriptSourceResult(
@@ -928,11 +868,8 @@ class Location {
   /// Column number in the script (0-based).
   final int columnNumber;
 
-  Location({
-    @required this.scriptId,
-    @required this.lineNumber,
-    this.columnNumber,
-  });
+  Location(
+      {@required this.scriptId, @required this.lineNumber, this.columnNumber});
 
   factory Location.fromJson(Map<String, dynamic> json) {
     return Location(
@@ -961,10 +898,7 @@ class ScriptPosition {
 
   final int columnNumber;
 
-  ScriptPosition({
-    @required this.lineNumber,
-    @required this.columnNumber,
-  });
+  ScriptPosition({@required this.lineNumber, @required this.columnNumber});
 
   factory ScriptPosition.fromJson(Map<String, dynamic> json) {
     return ScriptPosition(
@@ -1008,16 +942,15 @@ class CallFrame {
   /// The value being returned, if the function is at return point.
   final runtime.RemoteObject returnValue;
 
-  CallFrame({
-    @required this.callFrameId,
-    @required this.functionName,
-    this.functionLocation,
-    @required this.location,
-    @required this.url,
-    @required this.scopeChain,
-    @required this.this$,
-    this.returnValue,
-  });
+  CallFrame(
+      {@required this.callFrameId,
+      @required this.functionName,
+      this.functionLocation,
+      @required this.location,
+      @required this.url,
+      @required this.scopeChain,
+      @required this.this$,
+      this.returnValue});
 
   factory CallFrame.fromJson(Map<String, dynamic> json) {
     return CallFrame(
@@ -1074,13 +1007,12 @@ class Scope {
   /// Location in the source code where scope ends
   final Location endLocation;
 
-  Scope({
-    @required this.type,
-    @required this.object,
-    this.name,
-    this.startLocation,
-    this.endLocation,
-  });
+  Scope(
+      {@required this.type,
+      @required this.object,
+      this.name,
+      this.startLocation,
+      this.endLocation});
 
   factory Scope.fromJson(Map<String, dynamic> json) {
     return Scope(
@@ -1122,10 +1054,7 @@ class SearchMatch {
   /// Line with match content.
   final String lineContent;
 
-  SearchMatch({
-    @required this.lineNumber,
-    @required this.lineContent,
-  });
+  SearchMatch({@required this.lineNumber, @required this.lineContent});
 
   factory SearchMatch.fromJson(Map<String, dynamic> json) {
     return SearchMatch(
@@ -1155,12 +1084,11 @@ class BreakLocation {
 
   final String type;
 
-  BreakLocation({
-    @required this.scriptId,
-    @required this.lineNumber,
-    this.columnNumber,
-    this.type,
-  });
+  BreakLocation(
+      {@required this.scriptId,
+      @required this.lineNumber,
+      this.columnNumber,
+      this.type});
 
   factory BreakLocation.fromJson(Map<String, dynamic> json) {
     return BreakLocation(

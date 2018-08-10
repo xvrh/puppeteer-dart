@@ -52,9 +52,7 @@ class TargetApi {
           (Event event) => TargetInfo.fromJson(event.parameters['targetInfo']));
 
   /// Activates (focuses) the target.
-  Future activateTarget(
-    TargetID targetId,
-  ) async {
+  Future activateTarget(TargetID targetId) async {
     var parameters = <String, dynamic>{
       'targetId': targetId.toJson(),
     };
@@ -64,10 +62,7 @@ class TargetApi {
   /// Attaches to the target with given id.
   /// [flatten] Enables "flat" access to the session via specifying sessionId attribute in the commands.
   /// Returns: Id assigned to the session.
-  Future<SessionID> attachToTarget(
-    TargetID targetId, {
-    bool flatten,
-  }) async {
+  Future<SessionID> attachToTarget(TargetID targetId, {bool flatten}) async {
     var parameters = <String, dynamic>{
       'targetId': targetId.toJson(),
     };
@@ -86,9 +81,7 @@ class TargetApi {
   }
 
   /// Closes the target. If the target is a page that gets closed too.
-  Future<bool> closeTarget(
-    TargetID targetId,
-  ) async {
+  Future<bool> closeTarget(TargetID targetId) async {
     var parameters = <String, dynamic>{
       'targetId': targetId.toJson(),
     };
@@ -105,10 +98,7 @@ class TargetApi {
   /// - `binding.send(json)` - a method to send messages over the remote debugging protocol
   /// - `binding.onmessage = json => handleMessage(json)` - a callback that will be called for the protocol notifications and command responses.
   /// [bindingName] Binding name, 'cdp' if not specified.
-  Future exposeDevToolsProtocol(
-    TargetID targetId, {
-    String bindingName,
-  }) async {
+  Future exposeDevToolsProtocol(TargetID targetId, {String bindingName}) async {
     var parameters = <String, dynamic>{
       'targetId': targetId.toJson(),
     };
@@ -143,13 +133,11 @@ class TargetApi {
   /// [enableBeginFrameControl] Whether BeginFrames for this target will be controlled via DevTools (headless chrome only,
   /// not supported on MacOS yet, false by default).
   /// Returns: The id of the page opened.
-  Future<TargetID> createTarget(
-    String url, {
-    int width,
-    int height,
-    BrowserContextID browserContextId,
-    bool enableBeginFrameControl,
-  }) async {
+  Future<TargetID> createTarget(String url,
+      {int width,
+      int height,
+      BrowserContextID browserContextId,
+      bool enableBeginFrameControl}) async {
     var parameters = <String, dynamic>{
       'url': url,
     };
@@ -171,10 +159,8 @@ class TargetApi {
 
   /// Detaches session with given id.
   /// [sessionId] Session to detach.
-  Future detachFromTarget({
-    SessionID sessionId,
-    @deprecated TargetID targetId,
-  }) async {
+  Future detachFromTarget(
+      {SessionID sessionId, @deprecated TargetID targetId}) async {
     var parameters = <String, dynamic>{};
     if (sessionId != null) {
       parameters['sessionId'] = sessionId.toJson();
@@ -189,9 +175,7 @@ class TargetApi {
 
   /// Deletes a BrowserContext. All the belonging pages will be closed without calling their
   /// beforeunload hooks.
-  Future disposeBrowserContext(
-    BrowserContextID browserContextId,
-  ) async {
+  Future disposeBrowserContext(BrowserContextID browserContextId) async {
     var parameters = <String, dynamic>{
       'browserContextId': browserContextId.toJson(),
     };
@@ -199,9 +183,7 @@ class TargetApi {
   }
 
   /// Returns information about a target.
-  Future<TargetInfo> getTargetInfo({
-    TargetID targetId,
-  }) async {
+  Future<TargetInfo> getTargetInfo({TargetID targetId}) async {
     var parameters = <String, dynamic>{};
     if (targetId != null) {
       parameters['targetId'] = targetId.toJson();
@@ -221,11 +203,8 @@ class TargetApi {
 
   /// Sends protocol message over session with given id.
   /// [sessionId] Identifier of the session.
-  Future sendMessageToTarget(
-    String message, {
-    SessionID sessionId,
-    @deprecated TargetID targetId,
-  }) async {
+  Future sendMessageToTarget(String message,
+      {SessionID sessionId, @deprecated TargetID targetId}) async {
     var parameters = <String, dynamic>{
       'message': message,
     };
@@ -247,11 +226,8 @@ class TargetApi {
   /// [waitForDebuggerOnStart] Whether to pause new targets when attaching to them. Use `Runtime.runIfWaitingForDebugger`
   /// to run paused targets.
   /// [flatten] Enables "flat" access to the session via specifying sessionId attribute in the commands.
-  Future setAutoAttach(
-    bool autoAttach,
-    bool waitForDebuggerOnStart, {
-    bool flatten,
-  }) async {
+  Future setAutoAttach(bool autoAttach, bool waitForDebuggerOnStart,
+      {bool flatten}) async {
     var parameters = <String, dynamic>{
       'autoAttach': autoAttach,
       'waitForDebuggerOnStart': waitForDebuggerOnStart,
@@ -265,9 +241,7 @@ class TargetApi {
   /// Controls whether to discover available targets and notify via
   /// `targetCreated/targetInfoChanged/targetDestroyed` events.
   /// [discover] Whether to discover available targets.
-  Future setDiscoverTargets(
-    bool discover,
-  ) async {
+  Future setDiscoverTargets(bool discover) async {
     var parameters = <String, dynamic>{
       'discover': discover,
     };
@@ -277,9 +251,7 @@ class TargetApi {
   /// Enables target discovery for the specified locations, when `setDiscoverTargets` was set to
   /// `true`.
   /// [locations] List of remote locations.
-  Future setRemoteLocations(
-    List<RemoteLocation> locations,
-  ) async {
+  Future setRemoteLocations(List<RemoteLocation> locations) async {
     var parameters = <String, dynamic>{
       'locations': locations.map((e) => e.toJson()).toList(),
     };
@@ -295,11 +267,10 @@ class AttachedToTargetEvent {
 
   final bool waitingForDebugger;
 
-  AttachedToTargetEvent({
-    @required this.sessionId,
-    @required this.targetInfo,
-    @required this.waitingForDebugger,
-  });
+  AttachedToTargetEvent(
+      {@required this.sessionId,
+      @required this.targetInfo,
+      @required this.waitingForDebugger});
 
   factory AttachedToTargetEvent.fromJson(Map<String, dynamic> json) {
     return AttachedToTargetEvent(
@@ -314,9 +285,7 @@ class DetachedFromTargetEvent {
   /// Detached session identifier.
   final SessionID sessionId;
 
-  DetachedFromTargetEvent({
-    @required this.sessionId,
-  });
+  DetachedFromTargetEvent({@required this.sessionId});
 
   factory DetachedFromTargetEvent.fromJson(Map<String, dynamic> json) {
     return DetachedFromTargetEvent(
@@ -331,10 +300,8 @@ class ReceivedMessageFromTargetEvent {
 
   final String message;
 
-  ReceivedMessageFromTargetEvent({
-    @required this.sessionId,
-    @required this.message,
-  });
+  ReceivedMessageFromTargetEvent(
+      {@required this.sessionId, @required this.message});
 
   factory ReceivedMessageFromTargetEvent.fromJson(Map<String, dynamic> json) {
     return ReceivedMessageFromTargetEvent(
@@ -353,11 +320,10 @@ class TargetCrashedEvent {
   /// Termination error code.
   final int errorCode;
 
-  TargetCrashedEvent({
-    @required this.targetId,
-    @required this.status,
-    @required this.errorCode,
-  });
+  TargetCrashedEvent(
+      {@required this.targetId,
+      @required this.status,
+      @required this.errorCode});
 
   factory TargetCrashedEvent.fromJson(Map<String, dynamic> json) {
     return TargetCrashedEvent(
@@ -443,15 +409,14 @@ class TargetInfo {
 
   final BrowserContextID browserContextId;
 
-  TargetInfo({
-    @required this.targetId,
-    @required this.type,
-    @required this.title,
-    @required this.url,
-    @required this.attached,
-    this.openerId,
-    this.browserContextId,
-  });
+  TargetInfo(
+      {@required this.targetId,
+      @required this.type,
+      @required this.title,
+      @required this.url,
+      @required this.attached,
+      this.openerId,
+      this.browserContextId});
 
   factory TargetInfo.fromJson(Map<String, dynamic> json) {
     return TargetInfo(
@@ -492,10 +457,7 @@ class RemoteLocation {
 
   final int port;
 
-  RemoteLocation({
-    @required this.host,
-    @required this.port,
-  });
+  RemoteLocation({@required this.host, @required this.port});
 
   factory RemoteLocation.fromJson(Map<String, dynamic> json) {
     return RemoteLocation(

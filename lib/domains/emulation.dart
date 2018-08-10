@@ -49,9 +49,7 @@ class EmulationApi {
 
   /// Enables CPU throttling to emulate slow CPUs.
   /// [rate] Throttling rate as a slowdown factor (1 is no throttle, 2 is 2x slowdown, etc).
-  Future setCPUThrottlingRate(
-    num rate,
-  ) async {
+  Future setCPUThrottlingRate(num rate) async {
     var parameters = <String, dynamic>{
       'rate': rate,
     };
@@ -62,9 +60,7 @@ class EmulationApi {
   /// if the content does not specify one.
   /// [color] RGBA of the default background color. If not specified, any existing override will be
   /// cleared.
-  Future setDefaultBackgroundColorOverride({
-    dom.RGBA color,
-  }) async {
+  Future setDefaultBackgroundColorOverride({dom.RGBA color}) async {
     var parameters = <String, dynamic>{};
     if (color != null) {
       parameters['color'] = color.toJson();
@@ -91,19 +87,15 @@ class EmulationApi {
   /// [viewport] If set, the visible area of the page will be overridden to this viewport. This viewport
   /// change is not observed by the page, e.g. viewport-relative elements do not change positions.
   Future setDeviceMetricsOverride(
-    int width,
-    int height,
-    num deviceScaleFactor,
-    bool mobile, {
-    num scale,
-    int screenWidth,
-    int screenHeight,
-    int positionX,
-    int positionY,
-    bool dontSetVisibleSize,
-    ScreenOrientation screenOrientation,
-    page.Viewport viewport,
-  }) async {
+      int width, int height, num deviceScaleFactor, bool mobile,
+      {num scale,
+      int screenWidth,
+      int screenHeight,
+      int positionX,
+      int positionY,
+      bool dontSetVisibleSize,
+      ScreenOrientation screenOrientation,
+      page.Viewport viewport}) async {
     var parameters = <String, dynamic>{
       'width': width,
       'height': height,
@@ -138,9 +130,7 @@ class EmulationApi {
   }
 
   /// [hidden] Whether scrollbars should be always hidden.
-  Future setScrollbarsHidden(
-    bool hidden,
-  ) async {
+  Future setScrollbarsHidden(bool hidden) async {
     var parameters = <String, dynamic>{
       'hidden': hidden,
     };
@@ -148,9 +138,7 @@ class EmulationApi {
   }
 
   /// [disabled] Whether document.coookie API should be disabled.
-  Future setDocumentCookieDisabled(
-    bool disabled,
-  ) async {
+  Future setDocumentCookieDisabled(bool disabled) async {
     var parameters = <String, dynamic>{
       'disabled': disabled,
     };
@@ -159,10 +147,8 @@ class EmulationApi {
 
   /// [enabled] Whether touch emulation based on mouse input should be enabled.
   /// [configuration] Touch/gesture events configuration. Default: current platform.
-  Future setEmitTouchEventsForMouse(
-    bool enabled, {
-    String configuration,
-  }) async {
+  Future setEmitTouchEventsForMouse(bool enabled,
+      {String configuration}) async {
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
@@ -174,9 +160,7 @@ class EmulationApi {
 
   /// Emulates the given media for CSS media queries.
   /// [media] Media type to emulate. Empty string disables the override.
-  Future setEmulatedMedia(
-    String media,
-  ) async {
+  Future setEmulatedMedia(String media) async {
     var parameters = <String, dynamic>{
       'media': media,
     };
@@ -188,11 +172,8 @@ class EmulationApi {
   /// [latitude] Mock latitude
   /// [longitude] Mock longitude
   /// [accuracy] Mock accuracy
-  Future setGeolocationOverride({
-    num latitude,
-    num longitude,
-    num accuracy,
-  }) async {
+  Future setGeolocationOverride(
+      {num latitude, num longitude, num accuracy}) async {
     var parameters = <String, dynamic>{};
     if (latitude != null) {
       parameters['latitude'] = latitude;
@@ -209,9 +190,7 @@ class EmulationApi {
   /// Overrides value returned by the javascript navigator object.
   /// [platform] The platform navigator.platform should return.
   @deprecated
-  Future setNavigatorOverrides(
-    String platform,
-  ) async {
+  Future setNavigatorOverrides(String platform) async {
     var parameters = <String, dynamic>{
       'platform': platform,
     };
@@ -220,9 +199,7 @@ class EmulationApi {
 
   /// Sets a specified page scale factor.
   /// [pageScaleFactor] Page scale factor.
-  Future setPageScaleFactor(
-    num pageScaleFactor,
-  ) async {
+  Future setPageScaleFactor(num pageScaleFactor) async {
     var parameters = <String, dynamic>{
       'pageScaleFactor': pageScaleFactor,
     };
@@ -231,9 +208,7 @@ class EmulationApi {
 
   /// Switches script execution in the page.
   /// [value] Whether script execution should be disabled in the page.
-  Future setScriptExecutionDisabled(
-    bool value,
-  ) async {
+  Future setScriptExecutionDisabled(bool value) async {
     var parameters = <String, dynamic>{
       'value': value,
     };
@@ -243,10 +218,7 @@ class EmulationApi {
   /// Enables touch on platforms which do not support them.
   /// [enabled] Whether the touch event emulation should be enabled.
   /// [maxTouchPoints] Maximum touch points supported. Defaults to one.
-  Future setTouchEmulationEnabled(
-    bool enabled, {
-    int maxTouchPoints,
-  }) async {
+  Future setTouchEmulationEnabled(bool enabled, {int maxTouchPoints}) async {
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
@@ -266,13 +238,11 @@ class EmulationApi {
   /// Note any previous deferred policy change is superseded.
   /// [initialVirtualTime] If set, base::Time::Now will be overriden to initially return this value.
   /// Returns: Absolute timestamp at which virtual time was first enabled (up time in milliseconds).
-  Future<num> setVirtualTimePolicy(
-    VirtualTimePolicy policy, {
-    num budget,
-    int maxVirtualTimeTaskStarvationCount,
-    bool waitForNavigation,
-    network.TimeSinceEpoch initialVirtualTime,
-  }) async {
+  Future<num> setVirtualTimePolicy(VirtualTimePolicy policy,
+      {num budget,
+      int maxVirtualTimeTaskStarvationCount,
+      bool waitForNavigation,
+      network.TimeSinceEpoch initialVirtualTime}) async {
     var parameters = <String, dynamic>{
       'policy': policy.toJson(),
     };
@@ -300,10 +270,7 @@ class EmulationApi {
   /// [width] Frame width (DIP).
   /// [height] Frame height (DIP).
   @deprecated
-  Future setVisibleSize(
-    int width,
-    int height,
-  ) async {
+  Future setVisibleSize(int width, int height) async {
     var parameters = <String, dynamic>{
       'width': width,
       'height': height,
@@ -315,11 +282,8 @@ class EmulationApi {
   /// [userAgent] User agent to use.
   /// [acceptLanguage] Browser langugage to emulate.
   /// [platform] The platform navigator.platform should return.
-  Future setUserAgentOverride(
-    String userAgent, {
-    String acceptLanguage,
-    String platform,
-  }) async {
+  Future setUserAgentOverride(String userAgent,
+      {String acceptLanguage, String platform}) async {
     var parameters = <String, dynamic>{
       'userAgent': userAgent,
     };
@@ -341,10 +305,7 @@ class ScreenOrientation {
   /// Orientation angle.
   final int angle;
 
-  ScreenOrientation({
-    @required this.type,
-    @required this.angle,
-  });
+  ScreenOrientation({@required this.type, @required this.angle});
 
   factory ScreenOrientation.fromJson(Map<String, dynamic> json) {
     return ScreenOrientation(

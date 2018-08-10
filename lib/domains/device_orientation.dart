@@ -15,11 +15,7 @@ class DeviceOrientationApi {
   /// [alpha] Mock alpha
   /// [beta] Mock beta
   /// [gamma] Mock gamma
-  Future setDeviceOrientationOverride(
-    num alpha,
-    num beta,
-    num gamma,
-  ) async {
+  Future setDeviceOrientationOverride(num alpha, num beta, num gamma) async {
     var parameters = <String, dynamic>{
       'alpha': alpha,
       'beta': beta,

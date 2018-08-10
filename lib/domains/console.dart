@@ -52,14 +52,13 @@ class ConsoleMessage {
   /// Column number in the resource that generated this message (1-based).
   final int column;
 
-  ConsoleMessage({
-    @required this.source,
-    @required this.level,
-    @required this.text,
-    this.url,
-    this.line,
-    this.column,
-  });
+  ConsoleMessage(
+      {@required this.source,
+      @required this.level,
+      @required this.text,
+      this.url,
+      this.line,
+      this.column});
 
   factory ConsoleMessage.fromJson(Map<String, dynamic> json) {
     return ConsoleMessage(

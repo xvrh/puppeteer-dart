@@ -35,9 +35,7 @@ class SecurityApi {
 
   /// Enable/disable whether all certificate errors should be ignored.
   /// [ignore] If true, all certificate errors will be ignored.
-  Future setIgnoreCertificateErrors(
-    bool ignore,
-  ) async {
+  Future setIgnoreCertificateErrors(bool ignore) async {
     var parameters = <String, dynamic>{
       'ignore': ignore,
     };
@@ -49,9 +47,7 @@ class SecurityApi {
   /// [action] The action to take on the certificate error.
   @deprecated
   Future handleCertificateError(
-    int eventId,
-    CertificateErrorAction action,
-  ) async {
+      int eventId, CertificateErrorAction action) async {
     var parameters = <String, dynamic>{
       'eventId': eventId,
       'action': action.toJson(),
@@ -63,9 +59,7 @@ class SecurityApi {
   /// be handled by the DevTools client and should be answered with `handleCertificateError` commands.
   /// [override] If true, certificate errors will be overridden.
   @deprecated
-  Future setOverrideCertificateErrors(
-    bool override,
-  ) async {
+  Future setOverrideCertificateErrors(bool override) async {
     var parameters = <String, dynamic>{
       'override': override,
     };
@@ -83,11 +77,10 @@ class CertificateErrorEvent {
   /// The url that was requested.
   final String requestURL;
 
-  CertificateErrorEvent({
-    @required this.eventId,
-    @required this.errorType,
-    @required this.requestURL,
-  });
+  CertificateErrorEvent(
+      {@required this.eventId,
+      @required this.errorType,
+      @required this.requestURL});
 
   factory CertificateErrorEvent.fromJson(Map<String, dynamic> json) {
     return CertificateErrorEvent(
@@ -115,13 +108,12 @@ class SecurityStateChangedEvent {
   /// Overrides user-visible description of the state.
   final String summary;
 
-  SecurityStateChangedEvent({
-    @required this.securityState,
-    @required this.schemeIsCryptographic,
-    @required this.explanations,
-    @required this.insecureContentStatus,
-    this.summary,
-  });
+  SecurityStateChangedEvent(
+      {@required this.securityState,
+      @required this.schemeIsCryptographic,
+      @required this.explanations,
+      @required this.insecureContentStatus,
+      this.summary});
 
   factory SecurityStateChangedEvent.fromJson(Map<String, dynamic> json) {
     return SecurityStateChangedEvent(
@@ -230,14 +222,13 @@ class SecurityStateExplanation {
   /// Page certificate.
   final List<String> certificate;
 
-  SecurityStateExplanation({
-    @required this.securityState,
-    @required this.title,
-    @required this.summary,
-    @required this.description,
-    @required this.mixedContentType,
-    @required this.certificate,
-  });
+  SecurityStateExplanation(
+      {@required this.securityState,
+      @required this.title,
+      @required this.summary,
+      @required this.description,
+      @required this.mixedContentType,
+      @required this.certificate});
 
   factory SecurityStateExplanation.fromJson(Map<String, dynamic> json) {
     return SecurityStateExplanation(
@@ -289,15 +280,14 @@ class InsecureContentStatus {
   /// Security state representing a page that displayed insecure content.
   final SecurityState displayedInsecureContentStyle;
 
-  InsecureContentStatus({
-    @required this.ranMixedContent,
-    @required this.displayedMixedContent,
-    @required this.containedMixedForm,
-    @required this.ranContentWithCertErrors,
-    @required this.displayedContentWithCertErrors,
-    @required this.ranInsecureContentStyle,
-    @required this.displayedInsecureContentStyle,
-  });
+  InsecureContentStatus(
+      {@required this.ranMixedContent,
+      @required this.displayedMixedContent,
+      @required this.containedMixedForm,
+      @required this.ranContentWithCertErrors,
+      @required this.displayedContentWithCertErrors,
+      @required this.ranInsecureContentStyle,
+      @required this.displayedInsecureContentStyle});
 
   factory InsecureContentStatus.fromJson(Map<String, dynamic> json) {
     return InsecureContentStatus(

@@ -4,6 +4,7 @@ _*
 !.gitattributes
 !.travis.yml
 build/
+doc/
 pubspec.lock
 
 # Directory created by dartdoc

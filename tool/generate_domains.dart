@@ -198,17 +198,20 @@ class _Command {
     List<Parameter> requireds =
         parameters.where((p) => !optionals.contains(p)).toList();
 
+    var requiredParametersCode = <String>[];
     for (Parameter parameter in requireds) {
-      code.writeln(
-          '${parameter.deprecatedAttribute} ${context.getPropertyType(parameter)} ${parameter.normalizedName}, ');
+      requiredParametersCode.add(
+          '${parameter.deprecatedAttribute} ${context.getPropertyType(parameter)} ${parameter.normalizedName}');
     }
+    code.writeln(requiredParametersCode.join(','));
     if (optionals.isNotEmpty) {
-      code.writeln('{');
-      for (Parameter parameter in optionals) {
-        code.writeln(
-            '${parameter.deprecatedAttribute} ${context.getPropertyType(parameter)} ${parameter.normalizedName}, ');
+      var optionalParametersCode = optionals.map((p) =>
+          '${p.deprecatedAttribute} ${context.getPropertyType(p)} ${p.normalizedName}');
+
+      if (requiredParametersCode.isNotEmpty) {
+        code.writeln(',');
       }
-      code.writeln('}');
+      code.writeln('{${optionalParametersCode.join(',')}}');
     }
     code.writeln(') async {');
 
@@ -429,16 +432,16 @@ class _InternalType {
         properties.where((p) => !optionals.contains(p)).toList();
 
     if (hasProperties) {
-      code.writeln('$id({');
+      var parametersCode = <String>[];
       for (Parameter property in properties.where((p) => !p.deprecated)) {
         bool isOptional = property.optional;
-        code.writeln(
-            '${isOptional ? '' : '@required '}this.${property.normalizedName},');
+        parametersCode.add(
+            '${isOptional ? '' : '@required '}this.${property.normalizedName}');
         if (!isOptional) {
           context.useMetaPackage();
         }
       }
-      code.writeln('});');
+      code.writeln('$id({${parametersCode.join(',')}});');
     } else if (isEnum) {
       code.writeln('const $id._(this.value);');
     } else {

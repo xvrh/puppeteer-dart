@@ -31,12 +31,11 @@ class GetInfoResult {
   /// supported.
   final String commandLine;
 
-  GetInfoResult({
-    @required this.gpu,
-    @required this.modelName,
-    @required this.modelVersion,
-    @required this.commandLine,
-  });
+  GetInfoResult(
+      {@required this.gpu,
+      @required this.modelName,
+      @required this.modelVersion,
+      @required this.commandLine});
 
   factory GetInfoResult.fromJson(Map<String, dynamic> json) {
     return GetInfoResult(
@@ -62,12 +61,11 @@ class GPUDevice {
   /// String description of the GPU device, if the PCI ID is not available.
   final String deviceString;
 
-  GPUDevice({
-    @required this.vendorId,
-    @required this.deviceId,
-    @required this.vendorString,
-    @required this.deviceString,
-  });
+  GPUDevice(
+      {@required this.vendorId,
+      @required this.deviceId,
+      @required this.vendorString,
+      @required this.deviceString});
 
   factory GPUDevice.fromJson(Map<String, dynamic> json) {
     return GPUDevice(
@@ -103,12 +101,11 @@ class GPUInfo {
   /// An optional array of GPU driver bug workarounds.
   final List<String> driverBugWorkarounds;
 
-  GPUInfo({
-    @required this.devices,
-    this.auxAttributes,
-    this.featureStatus,
-    @required this.driverBugWorkarounds,
-  });
+  GPUInfo(
+      {@required this.devices,
+      this.auxAttributes,
+      this.featureStatus,
+      @required this.driverBugWorkarounds});
 
   factory GPUInfo.fromJson(Map<String, dynamic> json) {
     return GPUInfo(

@@ -37,9 +37,7 @@ class AnimationApi {
   /// Returns the current time of the an animation.
   /// [id] Id of animation.
   /// Returns: Current time of the page.
-  Future<num> getCurrentTime(
-    String id,
-  ) async {
+  Future<num> getCurrentTime(String id) async {
     var parameters = <String, dynamic>{
       'id': id,
     };
@@ -56,9 +54,7 @@ class AnimationApi {
 
   /// Releases a set of animations to no longer be manipulated.
   /// [animations] List of animation ids to seek.
-  Future releaseAnimations(
-    List<String> animations,
-  ) async {
+  Future releaseAnimations(List<String> animations) async {
     var parameters = <String, dynamic>{
       'animations': animations.map((e) => e).toList(),
     };
@@ -68,9 +64,7 @@ class AnimationApi {
   /// Gets the remote object of the Animation.
   /// [animationId] Animation id.
   /// Returns: Corresponding remote object.
-  Future<runtime.RemoteObject> resolveAnimation(
-    String animationId,
-  ) async {
+  Future<runtime.RemoteObject> resolveAnimation(String animationId) async {
     var parameters = <String, dynamic>{
       'animationId': animationId,
     };
@@ -81,10 +75,7 @@ class AnimationApi {
   /// Seek a set of animations to a particular time within each animation.
   /// [animations] List of animation ids to seek.
   /// [currentTime] Set the current time of each animation.
-  Future seekAnimations(
-    List<String> animations,
-    num currentTime,
-  ) async {
+  Future seekAnimations(List<String> animations, num currentTime) async {
     var parameters = <String, dynamic>{
       'animations': animations.map((e) => e).toList(),
       'currentTime': currentTime,
@@ -95,10 +86,7 @@ class AnimationApi {
   /// Sets the paused state of a set of animations.
   /// [animations] Animations to set the pause state of.
   /// [paused] Paused state to set to.
-  Future setPaused(
-    List<String> animations,
-    bool paused,
-  ) async {
+  Future setPaused(List<String> animations, bool paused) async {
     var parameters = <String, dynamic>{
       'animations': animations.map((e) => e).toList(),
       'paused': paused,
@@ -108,9 +96,7 @@ class AnimationApi {
 
   /// Sets the playback rate of the document timeline.
   /// [playbackRate] Playback rate for animations on page
-  Future setPlaybackRate(
-    num playbackRate,
-  ) async {
+  Future setPlaybackRate(num playbackRate) async {
     var parameters = <String, dynamic>{
       'playbackRate': playbackRate,
     };
@@ -121,11 +107,7 @@ class AnimationApi {
   /// [animationId] Animation id.
   /// [duration] Duration of the animation.
   /// [delay] Delay of the animation.
-  Future setTiming(
-    String animationId,
-    num duration,
-    num delay,
-  ) async {
+  Future setTiming(String animationId, num duration, num delay) async {
     var parameters = <String, dynamic>{
       'animationId': animationId,
       'duration': duration,
@@ -168,18 +150,17 @@ class Animation {
   /// animation/transition.
   final String cssId;
 
-  Animation({
-    @required this.id,
-    @required this.name,
-    @required this.pausedState,
-    @required this.playState,
-    @required this.playbackRate,
-    @required this.startTime,
-    @required this.currentTime,
-    @required this.type,
-    this.source,
-    this.cssId,
-  });
+  Animation(
+      {@required this.id,
+      @required this.name,
+      @required this.pausedState,
+      @required this.playState,
+      @required this.playbackRate,
+      @required this.startTime,
+      @required this.currentTime,
+      @required this.type,
+      this.source,
+      this.cssId});
 
   factory Animation.fromJson(Map<String, dynamic> json) {
     return Animation(
@@ -251,18 +232,17 @@ class AnimationEffect {
   /// `AnimationEffect`'s timing function.
   final String easing;
 
-  AnimationEffect({
-    @required this.delay,
-    @required this.endDelay,
-    @required this.iterationStart,
-    @required this.iterations,
-    @required this.duration,
-    @required this.direction,
-    @required this.fill,
-    this.backendNodeId,
-    this.keyframesRule,
-    @required this.easing,
-  });
+  AnimationEffect(
+      {@required this.delay,
+      @required this.endDelay,
+      @required this.iterationStart,
+      @required this.iterations,
+      @required this.duration,
+      @required this.direction,
+      @required this.fill,
+      this.backendNodeId,
+      this.keyframesRule,
+      @required this.easing});
 
   factory AnimationEffect.fromJson(Map<String, dynamic> json) {
     return AnimationEffect(
@@ -312,10 +292,7 @@ class KeyframesRule {
   /// List of animation keyframes.
   final List<KeyframeStyle> keyframes;
 
-  KeyframesRule({
-    this.name,
-    @required this.keyframes,
-  });
+  KeyframesRule({this.name, @required this.keyframes});
 
   factory KeyframesRule.fromJson(Map<String, dynamic> json) {
     return KeyframesRule(
@@ -345,10 +322,7 @@ class KeyframeStyle {
   /// `AnimationEffect`'s timing function.
   final String easing;
 
-  KeyframeStyle({
-    @required this.offset,
-    @required this.easing,
-  });
+  KeyframeStyle({@required this.offset, @required this.easing});
 
   factory KeyframeStyle.fromJson(Map<String, dynamic> json) {
     return KeyframeStyle(

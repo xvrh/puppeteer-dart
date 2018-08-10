@@ -25,10 +25,7 @@ class Domain {
   /// Domain version.
   final String version;
 
-  Domain({
-    @required this.name,
-    @required this.version,
-  });
+  Domain({@required this.name, @required this.version});
 
   factory Domain.fromJson(Map<String, dynamic> json) {
     return Domain(
