@@ -67,7 +67,7 @@ Future _downloadFile(String url, String output) async {
 }
 
 void _unzip(String path, String targetPath) {
-  if (Platform.isMacOS) {
+  if (!Platform.isWindows) {
     // The _simpleUnzip doesn't support symlinks so we prefer a native command
     Process.runSync('unzip', [path, '-d', targetPath]);
   } else {
