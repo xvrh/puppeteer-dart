@@ -26,6 +26,7 @@ import '../domains/service_worker.dart';
 import '../domains/storage.dart';
 import '../domains/tethering.dart';
 import '../domains/tracing.dart';
+import '../domains/testing.dart';
 import '../domains/debugger.dart';
 import '../domains/heap_profiler.dart';
 import '../domains/profiler.dart';
@@ -150,6 +151,11 @@ abstract class TabMixin {
 
   TracingApi get tracing => _tracing ??= TracingApi(session);
   TracingApi _tracing;
+
+  /// Testing domain is a dumping ground for the capabilities requires for browser or app testing that do not fit other
+  /// domains.
+  TestingApi get testing => _testing ??= TestingApi(session);
+  TestingApi _testing;
 
   /// Debugger domain exposes JavaScript debugging capabilities. It allows setting and removing
   /// breakpoints, stepping through execution, exploring stack traces, etc.

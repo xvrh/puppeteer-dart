@@ -772,6 +772,19 @@ class PageApi {
   Future clearCompilationCache() async {
     await _client.send('Page.clearCompilationCache');
   }
+
+  /// Generates a report for testing.
+  /// [message] Message to be displayed in the report.
+  /// [group] Specifies the endpoint group to deliver the report to.
+  Future generateTestReport(String message, {String group}) async {
+    var parameters = <String, dynamic>{
+      'message': message,
+    };
+    if (group != null) {
+      parameters['group'] = group;
+    }
+    await _client.send('Page.generateTestReport', parameters);
+  }
 }
 
 class FrameAttachedEvent {
@@ -1408,6 +1421,8 @@ class ScriptIdentifier {
 class TransitionType {
   static const TransitionType link = const TransitionType._('link');
   static const TransitionType typed = const TransitionType._('typed');
+  static const TransitionType addressBar =
+      const TransitionType._('address_bar');
   static const TransitionType autoBookmark =
       const TransitionType._('auto_bookmark');
   static const TransitionType autoSubframe =
@@ -1427,6 +1442,7 @@ class TransitionType {
   static const values = const {
     'link': link,
     'typed': typed,
+    'address_bar': addressBar,
     'auto_bookmark': autoBookmark,
     'auto_subframe': autoSubframe,
     'manual_subframe': manualSubframe,

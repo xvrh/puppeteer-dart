@@ -9,9 +9,38 @@ class BrowserApi {
 
   BrowserApi(this._client);
 
+  /// Grant specific permissions to the given origin and reject all others.
+  /// [browserContextId] BrowserContext to override permissions. When omitted, default browser context is used.
+  Future grantPermissions(String origin, List<PermissionType> permissions,
+      {target.BrowserContextID browserContextId}) async {
+    var parameters = <String, dynamic>{
+      'origin': origin,
+      'permissions': permissions.map((e) => e.toJson()).toList(),
+    };
+    if (browserContextId != null) {
+      parameters['browserContextId'] = browserContextId.toJson();
+    }
+    await _client.send('Browser.grantPermissions', parameters);
+  }
+
+  /// Reset all permission management for all origins.
+  /// [browserContextId] BrowserContext to reset permissions. When omitted, default browser context is used.
+  Future resetPermissions({target.BrowserContextID browserContextId}) async {
+    var parameters = <String, dynamic>{};
+    if (browserContextId != null) {
+      parameters['browserContextId'] = browserContextId.toJson();
+    }
+    await _client.send('Browser.resetPermissions', parameters);
+  }
+
   /// Close browser gracefully.
   Future close() async {
     await _client.send('Browser.close');
+  }
+
+  /// Crashes browser on the main thread.
+  Future crash() async {
+    await _client.send('Browser.crash');
   }
 
   /// Returns version information.
@@ -245,6 +274,63 @@ class Bounds {
     }
     return json;
   }
+}
+
+class PermissionType {
+  static const PermissionType accessibilityEvents =
+      const PermissionType._('accessibilityEvents');
+  static const PermissionType audioCapture =
+      const PermissionType._('audioCapture');
+  static const PermissionType backgroundSync =
+      const PermissionType._('backgroundSync');
+  static const PermissionType clipboardRead =
+      const PermissionType._('clipboardRead');
+  static const PermissionType clipboardWrite =
+      const PermissionType._('clipboardWrite');
+  static const PermissionType durableStorage =
+      const PermissionType._('durableStorage');
+  static const PermissionType flash = const PermissionType._('flash');
+  static const PermissionType geolocation =
+      const PermissionType._('geolocation');
+  static const PermissionType midi = const PermissionType._('midi');
+  static const PermissionType midiSysex = const PermissionType._('midiSysex');
+  static const PermissionType notifications =
+      const PermissionType._('notifications');
+  static const PermissionType paymentHandler =
+      const PermissionType._('paymentHandler');
+  static const PermissionType protectedMediaIdentifier =
+      const PermissionType._('protectedMediaIdentifier');
+  static const PermissionType sensors = const PermissionType._('sensors');
+  static const PermissionType videoCapture =
+      const PermissionType._('videoCapture');
+  static const values = const {
+    'accessibilityEvents': accessibilityEvents,
+    'audioCapture': audioCapture,
+    'backgroundSync': backgroundSync,
+    'clipboardRead': clipboardRead,
+    'clipboardWrite': clipboardWrite,
+    'durableStorage': durableStorage,
+    'flash': flash,
+    'geolocation': geolocation,
+    'midi': midi,
+    'midiSysex': midiSysex,
+    'notifications': notifications,
+    'paymentHandler': paymentHandler,
+    'protectedMediaIdentifier': protectedMediaIdentifier,
+    'sensors': sensors,
+    'videoCapture': videoCapture,
+  };
+
+  final String value;
+
+  const PermissionType._(this.value);
+
+  factory PermissionType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// Chrome histogram bucket.
