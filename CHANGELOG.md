@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+- Update protocol
+- Increase default chrome version (599821)
+
 ## 1.0.0
 - First stable version
 - Tweak generated code to look better
