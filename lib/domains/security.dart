@@ -222,13 +222,17 @@ class SecurityStateExplanation {
   /// Page certificate.
   final List<String> certificate;
 
+  /// Recommendations to fix any issues.
+  final List<String> recommendations;
+
   SecurityStateExplanation(
       {@required this.securityState,
       @required this.title,
       @required this.summary,
       @required this.description,
       @required this.mixedContentType,
-      @required this.certificate});
+      @required this.certificate,
+      this.recommendations});
 
   factory SecurityStateExplanation.fromJson(Map<String, dynamic> json) {
     return SecurityStateExplanation(
@@ -239,6 +243,9 @@ class SecurityStateExplanation {
       mixedContentType: MixedContentType.fromJson(json['mixedContentType']),
       certificate:
           (json['certificate'] as List).map((e) => e as String).toList(),
+      recommendations: json.containsKey('recommendations')
+          ? (json['recommendations'] as List).map((e) => e as String).toList()
+          : null,
     );
   }
 
@@ -251,6 +258,9 @@ class SecurityStateExplanation {
       'mixedContentType': mixedContentType.toJson(),
       'certificate': certificate.map((e) => e).toList(),
     };
+    if (recommendations != null) {
+      json['recommendations'] = recommendations.map((e) => e).toList();
+    }
     return json;
   }
 }

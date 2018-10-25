@@ -22,6 +22,17 @@ class PerformanceApi {
     await _client.send('Performance.enable');
   }
 
+  /// Sets time domain to use for collecting and reporting duration metrics.
+  /// Note that this must be called before enabling metrics collection. Calling
+  /// this method while metrics collection is enabled returns an error.
+  /// [timeDomain] Time domain
+  Future setTimeDomain(String timeDomain) async {
+    var parameters = <String, dynamic>{
+      'timeDomain': timeDomain,
+    };
+    await _client.send('Performance.setTimeDomain', parameters);
+  }
+
   /// Retrieve current values of run-time metrics.
   /// Returns: Current values for run-time metrics.
   Future<List<Metric>> getMetrics() async {

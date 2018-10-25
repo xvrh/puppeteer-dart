@@ -13,10 +13,12 @@ final Logger _logger = Logger('chrome_dev_tools');
 const List<String> _defaultArgs = <String>[
   '--disable-background-networking',
   '--disable-background-timer-throttling',
+  '--disable-breakpad',
   '--disable-client-side-phishing-detection',
   '--disable-default-apps',
   '--disable-dev-shm-usage',
   '--disable-extensions',
+  '--disable-features=site-per-process',
   '--disable-hang-monitor',
   '--disable-popup-blocking',
   '--disable-prompt-on-repost',

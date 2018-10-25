@@ -300,12 +300,12 @@ class DOMApi {
     return (result['nodes'] as List).map((e) => Node.fromJson(e)).toList();
   }
 
-  /// Returns node id at given location.
+  /// Returns node id at given location. Depending on whether DOM domain is enabled, nodeId is
+  /// either returned or not.
   /// [x] X coordinate.
   /// [y] Y coordinate.
   /// [includeUserAgentShadowDOM] False to skip to the nearest non-UA shadow root ancestor (default: false).
-  /// Returns: Id of the node at given coordinates.
-  Future<NodeId> getNodeForLocation(int x, int y,
+  Future<GetNodeForLocationResult> getNodeForLocation(int x, int y,
       {bool includeUserAgentShadowDOM}) async {
     var parameters = <String, dynamic>{
       'x': x,
@@ -315,7 +315,7 @@ class DOMApi {
       parameters['includeUserAgentShadowDOM'] = includeUserAgentShadowDOM;
     }
     var result = await _client.send('DOM.getNodeForLocation', parameters);
-    return NodeId.fromJson(result['nodeId']);
+    return GetNodeForLocationResult.fromJson(result);
   }
 
   /// Returns node's HTML markup.
@@ -662,12 +662,12 @@ class DOMApi {
   }
 
   /// Returns iframe node that owns iframe with the given domain.
-  Future<NodeId> getFrameOwner(page.FrameId frameId) async {
+  Future<GetFrameOwnerResult> getFrameOwner(page.FrameId frameId) async {
     var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
     };
     var result = await _client.send('DOM.getFrameOwner', parameters);
-    return NodeId.fromJson(result['nodeId']);
+    return GetFrameOwnerResult.fromJson(result);
   }
 }
 
@@ -894,6 +894,24 @@ class ShadowRootPushedEvent {
   }
 }
 
+class GetNodeForLocationResult {
+  /// Resulting node.
+  final BackendNodeId backendNodeId;
+
+  /// Id of the node at given coordinates, only when enabled.
+  final NodeId nodeId;
+
+  GetNodeForLocationResult({@required this.backendNodeId, this.nodeId});
+
+  factory GetNodeForLocationResult.fromJson(Map<String, dynamic> json) {
+    return GetNodeForLocationResult(
+      backendNodeId: BackendNodeId.fromJson(json['backendNodeId']),
+      nodeId:
+          json.containsKey('nodeId') ? NodeId.fromJson(json['nodeId']) : null,
+    );
+  }
+}
+
 class PerformSearchResult {
   /// Unique search session identifier.
   final String searchId;
@@ -907,6 +925,24 @@ class PerformSearchResult {
     return PerformSearchResult(
       searchId: json['searchId'],
       resultCount: json['resultCount'],
+    );
+  }
+}
+
+class GetFrameOwnerResult {
+  /// Resulting node.
+  final BackendNodeId backendNodeId;
+
+  /// Id of the node at given coordinates, only when enabled.
+  final NodeId nodeId;
+
+  GetFrameOwnerResult({@required this.backendNodeId, this.nodeId});
+
+  factory GetFrameOwnerResult.fromJson(Map<String, dynamic> json) {
+    return GetFrameOwnerResult(
+      backendNodeId: BackendNodeId.fromJson(json['backendNodeId']),
+      nodeId:
+          json.containsKey('nodeId') ? NodeId.fromJson(json['nodeId']) : null,
     );
   }
 }

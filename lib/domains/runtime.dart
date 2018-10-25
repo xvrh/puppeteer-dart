@@ -856,32 +856,22 @@ class RemoteObject {
 }
 
 class CustomPreview {
+  /// The JSON-stringified result of formatter.header(object, config) call.
+  /// It contains json ML array that represents RemoteObject.
   final String header;
 
-  final bool hasBody;
+  /// If formatter returns true as a result of formatter.hasBody call then bodyGetterId will
+  /// contain RemoteObjectId for the function that returns result of formatter.body(object, config) call.
+  /// The result value is json ML array.
+  final RemoteObjectId bodyGetterId;
 
-  final RemoteObjectId formatterObjectId;
-
-  final RemoteObjectId bindRemoteObjectFunctionId;
-
-  final RemoteObjectId configObjectId;
-
-  CustomPreview(
-      {@required this.header,
-      @required this.hasBody,
-      @required this.formatterObjectId,
-      @required this.bindRemoteObjectFunctionId,
-      this.configObjectId});
+  CustomPreview({@required this.header, this.bodyGetterId});
 
   factory CustomPreview.fromJson(Map<String, dynamic> json) {
     return CustomPreview(
       header: json['header'],
-      hasBody: json['hasBody'],
-      formatterObjectId: RemoteObjectId.fromJson(json['formatterObjectId']),
-      bindRemoteObjectFunctionId:
-          RemoteObjectId.fromJson(json['bindRemoteObjectFunctionId']),
-      configObjectId: json.containsKey('configObjectId')
-          ? RemoteObjectId.fromJson(json['configObjectId'])
+      bodyGetterId: json.containsKey('bodyGetterId')
+          ? RemoteObjectId.fromJson(json['bodyGetterId'])
           : null,
     );
   }
@@ -889,12 +879,9 @@ class CustomPreview {
   Map<String, dynamic> toJson() {
     var json = <String, dynamic>{
       'header': header,
-      'hasBody': hasBody,
-      'formatterObjectId': formatterObjectId.toJson(),
-      'bindRemoteObjectFunctionId': bindRemoteObjectFunctionId.toJson(),
     };
-    if (configObjectId != null) {
-      json['configObjectId'] = configObjectId.toJson();
+    if (bodyGetterId != null) {
+      json['bodyGetterId'] = bodyGetterId.toJson();
     }
     return json;
   }

@@ -199,6 +199,11 @@ class DOMNode {
   /// The url of the script (if any) that generates this node.
   final String originURL;
 
+  /// Scroll offsets, set when this node is a Document.
+  final num scrollOffsetX;
+
+  final num scrollOffsetY;
+
   DOMNode(
       {@required this.nodeType,
       @required this.nodeName,
@@ -225,7 +230,9 @@ class DOMNode {
       this.isClickable,
       this.eventListeners,
       this.currentSourceURL,
-      this.originURL});
+      this.originURL,
+      this.scrollOffsetX,
+      this.scrollOffsetY});
 
   factory DOMNode.fromJson(Map<String, dynamic> json) {
     return DOMNode(
@@ -283,6 +290,10 @@ class DOMNode {
           ? json['currentSourceURL']
           : null,
       originURL: json.containsKey('originURL') ? json['originURL'] : null,
+      scrollOffsetX:
+          json.containsKey('scrollOffsetX') ? json['scrollOffsetX'] : null,
+      scrollOffsetY:
+          json.containsKey('scrollOffsetY') ? json['scrollOffsetY'] : null,
     );
   }
 
@@ -360,6 +371,12 @@ class DOMNode {
     if (originURL != null) {
       json['originURL'] = originURL;
     }
+    if (scrollOffsetX != null) {
+      json['scrollOffsetX'] = scrollOffsetX;
+    }
+    if (scrollOffsetY != null) {
+      json['scrollOffsetY'] = scrollOffsetY;
+    }
     return json;
   }
 }
@@ -367,7 +384,7 @@ class DOMNode {
 /// Details of post layout rendered text positions. The exact layout should not be regarded as
 /// stable and may change between versions.
 class InlineTextBox {
-  /// The absolute position bounding box.
+  /// The bounding box in document coordinates. Note that scroll offset of the document is ignored.
   final dom.Rect boundingBox;
 
   /// The starting index in characters, for this post layout textbox substring. Characters that
@@ -406,7 +423,7 @@ class LayoutTreeNode {
   /// The index of the related DOM node in the `domNodes` array returned by `getSnapshot`.
   final int domNodeIndex;
 
-  /// The absolute position bounding box.
+  /// The bounding box in document coordinates. Note that scroll offset of the document is ignored.
   final dom.Rect boundingBox;
 
   /// Contents of the LayoutText, if any.
@@ -423,13 +440,17 @@ class LayoutTreeNode {
   /// getSnapshot was true.
   final int paintOrder;
 
+  /// Set to true to indicate the element begins a new stacking context.
+  final bool isStackingContext;
+
   LayoutTreeNode(
       {@required this.domNodeIndex,
       @required this.boundingBox,
       this.layoutText,
       this.inlineTextNodes,
       this.styleIndex,
-      this.paintOrder});
+      this.paintOrder,
+      this.isStackingContext});
 
   factory LayoutTreeNode.fromJson(Map<String, dynamic> json) {
     return LayoutTreeNode(
@@ -443,6 +464,9 @@ class LayoutTreeNode {
           : null,
       styleIndex: json.containsKey('styleIndex') ? json['styleIndex'] : null,
       paintOrder: json.containsKey('paintOrder') ? json['paintOrder'] : null,
+      isStackingContext: json.containsKey('isStackingContext')
+          ? json['isStackingContext']
+          : null,
     );
   }
 
@@ -462,6 +486,9 @@ class LayoutTreeNode {
     }
     if (paintOrder != null) {
       json['paintOrder'] = paintOrder;
+    }
+    if (isStackingContext != null) {
+      json['isStackingContext'] = isStackingContext;
     }
     return json;
   }
@@ -675,6 +702,11 @@ class DocumentSnapshot {
   /// The post-layout inline text nodes.
   final TextBoxSnapshot textBoxes;
 
+  /// Scroll offsets.
+  final num scrollOffsetX;
+
+  final num scrollOffsetY;
+
   DocumentSnapshot(
       {@required this.documentURL,
       @required this.baseURL,
@@ -685,7 +717,9 @@ class DocumentSnapshot {
       @required this.frameId,
       @required this.nodes,
       @required this.layout,
-      @required this.textBoxes});
+      @required this.textBoxes,
+      this.scrollOffsetX,
+      this.scrollOffsetY});
 
   factory DocumentSnapshot.fromJson(Map<String, dynamic> json) {
     return DocumentSnapshot(
@@ -699,6 +733,10 @@ class DocumentSnapshot {
       nodes: NodeTreeSnapshot.fromJson(json['nodes']),
       layout: LayoutTreeSnapshot.fromJson(json['layout']),
       textBoxes: TextBoxSnapshot.fromJson(json['textBoxes']),
+      scrollOffsetX:
+          json.containsKey('scrollOffsetX') ? json['scrollOffsetX'] : null,
+      scrollOffsetY:
+          json.containsKey('scrollOffsetY') ? json['scrollOffsetY'] : null,
     );
   }
 
@@ -715,6 +753,12 @@ class DocumentSnapshot {
       'layout': layout.toJson(),
       'textBoxes': textBoxes.toJson(),
     };
+    if (scrollOffsetX != null) {
+      json['scrollOffsetX'] = scrollOffsetX;
+    }
+    if (scrollOffsetY != null) {
+      json['scrollOffsetY'] = scrollOffsetY;
+    }
     return json;
   }
 }
@@ -908,11 +952,15 @@ class LayoutTreeSnapshot {
   /// Contents of the LayoutText, if any.
   final List<StringIndex> text;
 
+  /// Stacking context information.
+  final RareBooleanData stackingContexts;
+
   LayoutTreeSnapshot(
       {@required this.nodeIndex,
       @required this.styles,
       @required this.bounds,
-      @required this.text});
+      @required this.text,
+      @required this.stackingContexts});
 
   factory LayoutTreeSnapshot.fromJson(Map<String, dynamic> json) {
     return LayoutTreeSnapshot(
@@ -923,6 +971,7 @@ class LayoutTreeSnapshot {
       bounds:
           (json['bounds'] as List).map((e) => Rectangle.fromJson(e)).toList(),
       text: (json['text'] as List).map((e) => StringIndex.fromJson(e)).toList(),
+      stackingContexts: RareBooleanData.fromJson(json['stackingContexts']),
     );
   }
 
@@ -932,6 +981,7 @@ class LayoutTreeSnapshot {
       'styles': styles.map((e) => e.toJson()).toList(),
       'bounds': bounds.map((e) => e.toJson()).toList(),
       'text': text.map((e) => e.toJson()).toList(),
+      'stackingContexts': stackingContexts.toJson(),
     };
     return json;
   }

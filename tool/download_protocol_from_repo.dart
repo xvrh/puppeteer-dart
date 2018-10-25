@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:http/http.dart';
 import 'dart:io';
+import 'package:path/path.dart' as p;
 
 final Map<String, String> protocols = {
   'browser_protocol.json':
@@ -17,5 +18,6 @@ main() async {
 
 Future _download(String url, String fileName) async {
   String json = await read(url);
-  await File.fromUri(Platform.script.resolve(fileName)).writeAsString(json);
+  await File.fromUri(Platform.script.resolve(p.join('json', fileName)))
+      .writeAsString(json);
 }
