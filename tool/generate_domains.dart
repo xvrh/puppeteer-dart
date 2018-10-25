@@ -1,16 +1,27 @@
 import 'dart:convert';
 import 'dart:io';
 import 'model.dart';
-import 'update_protocol.dart' show protocols;
+import 'download_protocol_from_repo.dart' as protocols_from_repo;
+import 'download_protocol_from_chrome.dart' as protocols_from_chrome;
 import 'utils/split_words.dart';
 import 'utils/string_helpers.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as p;
 
+Protocol _readProtocol(String fileName) {
+  return Protocol.fromString(
+      File.fromUri(Platform.script.resolve(p.posix.join('json', fileName)))
+          .readAsStringSync());
+}
+
+const _useFromChrome = false;
+
 main() {
-  Protocol readProtocol(String fileName) {
-    return Protocol.fromString(
-        File.fromUri(Platform.script.resolve(fileName)).readAsStringSync());
+  List<String> protocolFiles;
+  if (_useFromChrome) {
+    protocolFiles = [protocols_from_chrome.protocolFile];
+  } else {
+    protocolFiles = protocols_from_repo.protocols.keys.toList();
   }
 
   String libPath = Platform.script.resolve('../lib').toFilePath();
@@ -22,7 +33,7 @@ main() {
   targetDir.createSync();
 
   List<Domain> domains =
-      protocols.keys.map(readProtocol).expand((f) => f.domains).toList();
+      protocolFiles.map(_readProtocol).expand((f) => f.domains).toList();
 
   for (Domain domain in domains) {
     List<ComplexType> types = domain.types;

@@ -283,6 +283,8 @@ class PermissionType {
       const PermissionType._('audioCapture');
   static const PermissionType backgroundSync =
       const PermissionType._('backgroundSync');
+  static const PermissionType backgroundFetch =
+      const PermissionType._('backgroundFetch');
   static const PermissionType clipboardRead =
       const PermissionType._('clipboardRead');
   static const PermissionType clipboardWrite =
@@ -307,6 +309,7 @@ class PermissionType {
     'accessibilityEvents': accessibilityEvents,
     'audioCapture': audioCapture,
     'backgroundSync': backgroundSync,
+    'backgroundFetch': backgroundFetch,
     'clipboardRead': clipboardRead,
     'clipboardWrite': clipboardWrite,
     'durableStorage': durableStorage,

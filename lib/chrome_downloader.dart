@@ -16,7 +16,7 @@ class ChromePath {
       @required this.revision});
 }
 
-const int _lastRevision = 588429;
+const int _lastRevision = 599821;
 
 Future<ChromePath> downloadChrome(
     {int revision = _lastRevision, String cachePath}) async {
@@ -27,7 +27,7 @@ Future<ChromePath> downloadChrome(
     revisionDirectory.createSync(recursive: true);
   }
 
-  String executablePath = _executablePath(revisionDirectory.path);
+  String executablePath = _executablePath(revisionDirectory.path, revision);
 
   File executableFile = File(executablePath);
 
@@ -99,9 +99,15 @@ void _simpleUnzip(String path, String targetPath) {
 
 const _baseUrl = 'https://storage.googleapis.com/chromium-browser-snapshots';
 
+String _windowZipName(int revision) {
+  // Windows archive name changed at r591479.
+  return revision > 591479 ? 'chrome-win' : 'chrome-win32';
+}
+
 String _downloadUrl(int revision) {
   if (Platform.isWindows) {
-    return '$_baseUrl/Win_x64/$revision/chrome-win32.zip';
+    String fileName = _windowZipName(revision);
+    return '$_baseUrl/Win_x64/$revision/$fileName.zip';
   } else if (Platform.isLinux) {
     return '$_baseUrl/Linux_x64/$revision/chrome-linux.zip';
   } else if (Platform.isMacOS) {
@@ -112,9 +118,10 @@ String _downloadUrl(int revision) {
   }
 }
 
-String _executablePath(String revisionPath) {
+String _executablePath(String revisionPath, int revision) {
   if (Platform.isWindows) {
-    return p.join(revisionPath, 'chrome-win32', 'chrome.exe');
+    String folderName = _windowZipName(revision);
+    return p.join(revisionPath, folderName, 'chrome.exe');
   } else if (Platform.isLinux) {
     return p.join(revisionPath, 'chrome-linux', 'chrome');
   } else if (Platform.isMacOS) {

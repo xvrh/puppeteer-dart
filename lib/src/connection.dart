@@ -20,6 +20,7 @@ class Connection implements Client {
   final Logger _logger = Logger('connection');
   static int _lastId = 0;
   final WebSocket _webSocket;
+  final String url;
   final Map<int, Completer> _completers = {};
   final List<Session> _sessions = [];
   final StreamController<Event> _eventController =
@@ -27,7 +28,7 @@ class Connection implements Client {
   TargetApi _targets;
   final List<StreamSubscription> _subscriptions = [];
 
-  Connection._(this._webSocket) {
+  Connection._(this._webSocket, this.url) {
     _subscriptions.add(_webSocket.listen(_onMessage));
 
     _targets = TargetApi(this);
@@ -53,7 +54,7 @@ class Connection implements Client {
   static Future<Connection> create(String url) async {
     WebSocket webSocket = await WebSocket.connect(url);
 
-    return Connection._(webSocket);
+    return Connection._(webSocket, url);
   }
 
   @override

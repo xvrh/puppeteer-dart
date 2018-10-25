@@ -9,6 +9,17 @@ class AccessibilityApi {
 
   AccessibilityApi(this._client);
 
+  /// Disables the accessibility domain.
+  Future disable() async {
+    await _client.send('Accessibility.disable');
+  }
+
+  /// Enables the accessibility domain which causes `AXNodeId`s to remain consistent between method calls.
+  /// This turns on accessibility for the page, which can impact performance until accessibility is disabled.
+  Future enable() async {
+    await _client.send('Accessibility.enable');
+  }
+
   /// Fetches the accessibility node and partial accessibility tree for this DOM node, if it exists.
   /// [nodeId] Identifier of the node to get the partial accessibility tree for.
   /// [backendNodeId] Identifier of the backend node to get the partial accessibility tree for.
@@ -36,6 +47,12 @@ class AccessibilityApi {
     }
     var result =
         await _client.send('Accessibility.getPartialAXTree', parameters);
+    return (result['nodes'] as List).map((e) => AXNode.fromJson(e)).toList();
+  }
+
+  /// Fetches the entire accessibility tree
+  Future<List<AXNode>> getFullAXTree() async {
+    var result = await _client.send('Accessibility.getFullAXTree');
     return (result['nodes'] as List).map((e) => AXNode.fromJson(e)).toList();
   }
 }
@@ -399,11 +416,15 @@ class AXValue {
 class AXPropertyName {
   static const AXPropertyName busy = const AXPropertyName._('busy');
   static const AXPropertyName disabled = const AXPropertyName._('disabled');
+  static const AXPropertyName editable = const AXPropertyName._('editable');
+  static const AXPropertyName focusable = const AXPropertyName._('focusable');
+  static const AXPropertyName focused = const AXPropertyName._('focused');
   static const AXPropertyName hidden = const AXPropertyName._('hidden');
   static const AXPropertyName hiddenRoot = const AXPropertyName._('hiddenRoot');
   static const AXPropertyName invalid = const AXPropertyName._('invalid');
   static const AXPropertyName keyshortcuts =
       const AXPropertyName._('keyshortcuts');
+  static const AXPropertyName settable = const AXPropertyName._('settable');
   static const AXPropertyName roledescription =
       const AXPropertyName._('roledescription');
   static const AXPropertyName live = const AXPropertyName._('live');
@@ -443,10 +464,14 @@ class AXPropertyName {
   static const values = const {
     'busy': busy,
     'disabled': disabled,
+    'editable': editable,
+    'focusable': focusable,
+    'focused': focused,
     'hidden': hidden,
     'hiddenRoot': hiddenRoot,
     'invalid': invalid,
     'keyshortcuts': keyshortcuts,
+    'settable': settable,
     'roledescription': roledescription,
     'live': live,
     'atomic': atomic,

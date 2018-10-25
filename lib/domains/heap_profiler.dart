@@ -200,18 +200,23 @@ class SamplingHeapProfileNode {
   /// Allocations size in bytes for the node excluding children.
   final num selfSize;
 
+  /// Node id. Ids are unique across all profiles collected between startSampling and stopSampling.
+  final int id;
+
   /// Child nodes.
   final List<SamplingHeapProfileNode> children;
 
   SamplingHeapProfileNode(
       {@required this.callFrame,
       @required this.selfSize,
+      @required this.id,
       @required this.children});
 
   factory SamplingHeapProfileNode.fromJson(Map<String, dynamic> json) {
     return SamplingHeapProfileNode(
       callFrame: runtime.CallFrame.fromJson(json['callFrame']),
       selfSize: json['selfSize'],
+      id: json['id'],
       children: (json['children'] as List)
           .map((e) => SamplingHeapProfileNode.fromJson(e))
           .toList(),
@@ -222,27 +227,67 @@ class SamplingHeapProfileNode {
     var json = <String, dynamic>{
       'callFrame': callFrame.toJson(),
       'selfSize': selfSize,
+      'id': id,
       'children': children.map((e) => e.toJson()).toList(),
     };
     return json;
   }
 }
 
-/// Profile.
+/// A single sample from a sampling profile.
+class SamplingHeapProfileSample {
+  /// Allocation size in bytes attributed to the sample.
+  final num size;
+
+  /// Id of the corresponding profile tree node.
+  final int nodeId;
+
+  /// Time-ordered sample ordinal number. It is unique across all profiles retrieved
+  /// between startSampling and stopSampling.
+  final num ordinal;
+
+  SamplingHeapProfileSample(
+      {@required this.size, @required this.nodeId, @required this.ordinal});
+
+  factory SamplingHeapProfileSample.fromJson(Map<String, dynamic> json) {
+    return SamplingHeapProfileSample(
+      size: json['size'],
+      nodeId: json['nodeId'],
+      ordinal: json['ordinal'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
+      'size': size,
+      'nodeId': nodeId,
+      'ordinal': ordinal,
+    };
+    return json;
+  }
+}
+
+/// Sampling profile.
 class SamplingHeapProfile {
   final SamplingHeapProfileNode head;
 
-  SamplingHeapProfile({@required this.head});
+  final List<SamplingHeapProfileSample> samples;
+
+  SamplingHeapProfile({@required this.head, @required this.samples});
 
   factory SamplingHeapProfile.fromJson(Map<String, dynamic> json) {
     return SamplingHeapProfile(
       head: SamplingHeapProfileNode.fromJson(json['head']),
+      samples: (json['samples'] as List)
+          .map((e) => SamplingHeapProfileSample.fromJson(e))
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     var json = <String, dynamic>{
       'head': head.toJson(),
+      'samples': samples.map((e) => e.toJson()).toList(),
     };
     return json;
   }

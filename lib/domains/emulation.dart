@@ -47,6 +47,15 @@ class EmulationApi {
     await _client.send('Emulation.resetPageScaleFactor');
   }
 
+  /// Enables or disables simulating a focused and active page.
+  /// [enabled] Whether to enable to disable focus emulation.
+  Future setFocusEmulationEnabled(bool enabled) async {
+    var parameters = <String, dynamic>{
+      'enabled': enabled,
+    };
+    await _client.send('Emulation.setFocusEmulationEnabled', parameters);
+  }
+
   /// Enables CPU throttling to emulate slow CPUs.
   /// [rate] Throttling rate as a slowdown factor (1 is no throttle, 2 is 2x slowdown, etc).
   Future setCPUThrottlingRate(num rate) async {

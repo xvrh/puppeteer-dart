@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'security.dart' as security;
-import 'page.dart' as page;
 import 'runtime.dart' as runtime;
 import 'io.dart' as io;
 import 'debugger.dart' as debugger;
+import 'page.dart' as page;
 
 /// Network domain allows tracking network activities of the page. It exposes information about http,
 /// file, data and other requests and responses, their headers, bodies, timing, etc.
@@ -592,7 +592,7 @@ class LoadingFailedEvent {
   final MonotonicTime timestamp;
 
   /// Resource type.
-  final page.ResourceType type;
+  final ResourceType type;
 
   /// User friendly error message.
   final String errorText;
@@ -615,7 +615,7 @@ class LoadingFailedEvent {
     return LoadingFailedEvent(
       requestId: RequestId.fromJson(json['requestId']),
       timestamp: MonotonicTime.fromJson(json['timestamp']),
-      type: page.ResourceType.fromJson(json['type']),
+      type: ResourceType.fromJson(json['type']),
       errorText: json['errorText'],
       canceled: json.containsKey('canceled') ? json['canceled'] : null,
       blockedReason: json.containsKey('blockedReason')
@@ -669,7 +669,7 @@ class RequestInterceptedEvent {
   final page.FrameId frameId;
 
   /// How the requested resource will be used.
-  final page.ResourceType resourceType;
+  final ResourceType resourceType;
 
   /// Whether this is a navigation request, which can abort the navigation completely.
   final bool isNavigationRequest;
@@ -715,7 +715,7 @@ class RequestInterceptedEvent {
       interceptionId: InterceptionId.fromJson(json['interceptionId']),
       request: Request.fromJson(json['request']),
       frameId: page.FrameId.fromJson(json['frameId']),
-      resourceType: page.ResourceType.fromJson(json['resourceType']),
+      resourceType: ResourceType.fromJson(json['resourceType']),
       isNavigationRequest: json['isNavigationRequest'],
       isDownload: json.containsKey('isDownload') ? json['isDownload'] : null,
       redirectUrl: json.containsKey('redirectUrl') ? json['redirectUrl'] : null,
@@ -761,7 +761,7 @@ class RequestWillBeSentEvent {
   final Response redirectResponse;
 
   /// Type of this resource.
-  final page.ResourceType type;
+  final ResourceType type;
 
   /// Frame identifier.
   final page.FrameId frameId;
@@ -794,9 +794,8 @@ class RequestWillBeSentEvent {
       redirectResponse: json.containsKey('redirectResponse')
           ? Response.fromJson(json['redirectResponse'])
           : null,
-      type: json.containsKey('type')
-          ? page.ResourceType.fromJson(json['type'])
-          : null,
+      type:
+          json.containsKey('type') ? ResourceType.fromJson(json['type']) : null,
       frameId: json.containsKey('frameId')
           ? page.FrameId.fromJson(json['frameId'])
           : null,
@@ -858,7 +857,7 @@ class ResponseReceivedEvent {
   final MonotonicTime timestamp;
 
   /// Resource type.
-  final page.ResourceType type;
+  final ResourceType type;
 
   /// Response data.
   final Response response;
@@ -879,7 +878,7 @@ class ResponseReceivedEvent {
       requestId: RequestId.fromJson(json['requestId']),
       loaderId: LoaderId.fromJson(json['loaderId']),
       timestamp: MonotonicTime.fromJson(json['timestamp']),
-      type: page.ResourceType.fromJson(json['type']),
+      type: ResourceType.fromJson(json['type']),
       response: Response.fromJson(json['response']),
       frameId: json.containsKey('frameId')
           ? page.FrameId.fromJson(json['frameId'])
@@ -1090,6 +1089,57 @@ class GetResponseBodyForInterceptionResult {
       base64Encoded: json['base64Encoded'],
     );
   }
+}
+
+/// Resource type as it was perceived by the rendering engine.
+class ResourceType {
+  static const ResourceType document = const ResourceType._('Document');
+  static const ResourceType stylesheet = const ResourceType._('Stylesheet');
+  static const ResourceType image = const ResourceType._('Image');
+  static const ResourceType media = const ResourceType._('Media');
+  static const ResourceType font = const ResourceType._('Font');
+  static const ResourceType script = const ResourceType._('Script');
+  static const ResourceType textTrack = const ResourceType._('TextTrack');
+  static const ResourceType xHR = const ResourceType._('XHR');
+  static const ResourceType fetch = const ResourceType._('Fetch');
+  static const ResourceType eventSource = const ResourceType._('EventSource');
+  static const ResourceType webSocket = const ResourceType._('WebSocket');
+  static const ResourceType manifest = const ResourceType._('Manifest');
+  static const ResourceType signedExchange =
+      const ResourceType._('SignedExchange');
+  static const ResourceType ping = const ResourceType._('Ping');
+  static const ResourceType cSPViolationReport =
+      const ResourceType._('CSPViolationReport');
+  static const ResourceType other = const ResourceType._('Other');
+  static const values = const {
+    'Document': document,
+    'Stylesheet': stylesheet,
+    'Image': image,
+    'Media': media,
+    'Font': font,
+    'Script': script,
+    'TextTrack': textTrack,
+    'XHR': xHR,
+    'Fetch': fetch,
+    'EventSource': eventSource,
+    'WebSocket': webSocket,
+    'Manifest': manifest,
+    'SignedExchange': signedExchange,
+    'Ping': ping,
+    'CSPViolationReport': cSPViolationReport,
+    'Other': other,
+  };
+
+  final String value;
+
+  const ResourceType._(this.value);
+
+  factory ResourceType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// Unique loader identifier.
@@ -2071,7 +2121,7 @@ class CachedResource {
   final String url;
 
   /// Type of this resource.
-  final page.ResourceType type;
+  final ResourceType type;
 
   /// Cached response data.
   final Response response;
@@ -2088,7 +2138,7 @@ class CachedResource {
   factory CachedResource.fromJson(Map<String, dynamic> json) {
     return CachedResource(
       url: json['url'],
-      type: page.ResourceType.fromJson(json['type']),
+      type: ResourceType.fromJson(json['type']),
       response: json.containsKey('response')
           ? Response.fromJson(json['response'])
           : null,
@@ -2435,7 +2485,7 @@ class RequestPattern {
   final String urlPattern;
 
   /// If set, only requests for matching resource types will be intercepted.
-  final page.ResourceType resourceType;
+  final ResourceType resourceType;
 
   /// Stage at wich to begin intercepting requests. Default is Request.
   final InterceptionStage interceptionStage;
@@ -2446,7 +2496,7 @@ class RequestPattern {
     return RequestPattern(
       urlPattern: json.containsKey('urlPattern') ? json['urlPattern'] : null,
       resourceType: json.containsKey('resourceType')
-          ? page.ResourceType.fromJson(json['resourceType'])
+          ? ResourceType.fromJson(json['resourceType'])
           : null,
       interceptionStage: json.containsKey('interceptionStage')
           ? InterceptionStage.fromJson(json['interceptionStage'])

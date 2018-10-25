@@ -138,12 +138,18 @@ class PageApi {
   }
 
   /// Evaluates given script in every frame upon creation (before loading frame's scripts).
+  /// [worldName] If specified, creates an isolated world with the given name and evaluates given script in it.
+  /// This world name will be used as the ExecutionContextDescription::name when the corresponding
+  /// event is emitted.
   /// Returns: Identifier of the added script.
-  Future<ScriptIdentifier> addScriptToEvaluateOnNewDocument(
-      String source) async {
+  Future<ScriptIdentifier> addScriptToEvaluateOnNewDocument(String source,
+      {String worldName}) async {
     var parameters = <String, dynamic>{
       'source': source,
     };
+    if (worldName != null) {
+      parameters['worldName'] = worldName;
+    }
     var result =
         await _client.send('Page.addScriptToEvaluateOnNewDocument', parameters);
     return ScriptIdentifier.fromJson(result['identifier']);
@@ -1115,57 +1121,6 @@ class NavigateResult {
   }
 }
 
-/// Resource type as it was perceived by the rendering engine.
-class ResourceType {
-  static const ResourceType document = const ResourceType._('Document');
-  static const ResourceType stylesheet = const ResourceType._('Stylesheet');
-  static const ResourceType image = const ResourceType._('Image');
-  static const ResourceType media = const ResourceType._('Media');
-  static const ResourceType font = const ResourceType._('Font');
-  static const ResourceType script = const ResourceType._('Script');
-  static const ResourceType textTrack = const ResourceType._('TextTrack');
-  static const ResourceType xHR = const ResourceType._('XHR');
-  static const ResourceType fetch = const ResourceType._('Fetch');
-  static const ResourceType eventSource = const ResourceType._('EventSource');
-  static const ResourceType webSocket = const ResourceType._('WebSocket');
-  static const ResourceType manifest = const ResourceType._('Manifest');
-  static const ResourceType signedExchange =
-      const ResourceType._('SignedExchange');
-  static const ResourceType ping = const ResourceType._('Ping');
-  static const ResourceType cSPViolationReport =
-      const ResourceType._('CSPViolationReport');
-  static const ResourceType other = const ResourceType._('Other');
-  static const values = const {
-    'Document': document,
-    'Stylesheet': stylesheet,
-    'Image': image,
-    'Media': media,
-    'Font': font,
-    'Script': script,
-    'TextTrack': textTrack,
-    'XHR': xHR,
-    'Fetch': fetch,
-    'EventSource': eventSource,
-    'WebSocket': webSocket,
-    'Manifest': manifest,
-    'SignedExchange': signedExchange,
-    'Ping': ping,
-    'CSPViolationReport': cSPViolationReport,
-    'Other': other,
-  };
-
-  final String value;
-
-  const ResourceType._(this.value);
-
-  factory ResourceType.fromJson(String value) => values[value];
-
-  String toJson() => value;
-
-  @override
-  String toString() => value.toString();
-}
-
 /// Unique frame identifier.
 class FrameId {
   final String value;
@@ -1263,7 +1218,7 @@ class FrameResource {
   final String url;
 
   /// Type of this resource.
-  final ResourceType type;
+  final network.ResourceType type;
 
   /// Resource mimeType as determined by the browser.
   final String mimeType;
@@ -1292,7 +1247,7 @@ class FrameResource {
   factory FrameResource.fromJson(Map<String, dynamic> json) {
     return FrameResource(
       url: json['url'],
-      type: ResourceType.fromJson(json['type']),
+      type: network.ResourceType.fromJson(json['type']),
       mimeType: json['mimeType'],
       lastModified: json.containsKey('lastModified')
           ? network.TimeSinceEpoch.fromJson(json['lastModified'])
