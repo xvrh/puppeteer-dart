@@ -13,6 +13,15 @@ class SystemInfoApi {
     var result = await _client.send('SystemInfo.getInfo');
     return GetInfoResult.fromJson(result);
   }
+
+  /// Returns information about all running processes.
+  /// Returns: An array of process info blocks.
+  Future<List<ProcessInfo>> getProcessInfo() async {
+    var result = await _client.send('SystemInfo.getProcessInfo');
+    return (result['processInfo'] as List)
+        .map((e) => ProcessInfo.fromJson(e))
+        .toList();
+  }
 }
 
 class GetInfoResult {
@@ -132,6 +141,38 @@ class GPUInfo {
     if (featureStatus != null) {
       json['featureStatus'] = featureStatus;
     }
+    return json;
+  }
+}
+
+/// Represents process info.
+class ProcessInfo {
+  /// Specifies process type.
+  final String type;
+
+  /// Specifies process id.
+  final int id;
+
+  /// Specifies cumulative CPU usage in seconds across all threads of the
+  /// process since the process start.
+  final num cpuTime;
+
+  ProcessInfo({@required this.type, @required this.id, @required this.cpuTime});
+
+  factory ProcessInfo.fromJson(Map<String, dynamic> json) {
+    return ProcessInfo(
+      type: json['type'],
+      id: json['id'],
+      cpuTime: json['cpuTime'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
+      'type': type,
+      'id': id,
+      'cpuTime': cpuTime,
+    };
     return json;
   }
 }

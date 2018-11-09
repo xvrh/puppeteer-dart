@@ -18,6 +18,6 @@ main() async {
 
 Future _download(String url, String fileName) async {
   String json = await read(url);
-  await File.fromUri(Platform.script.resolve(p.join('json', fileName)))
+  await File.fromUri(Platform.script.resolve(p.posix.join('json', fileName)))
       .writeAsString(json);
 }
