@@ -27,6 +27,7 @@ import '../domains/storage.dart';
 import '../domains/tethering.dart';
 import '../domains/tracing.dart';
 import '../domains/testing.dart';
+import '../domains/fetch.dart';
 import '../domains/debugger.dart';
 import '../domains/heap_profiler.dart';
 import '../domains/profiler.dart';
@@ -156,6 +157,10 @@ abstract class TabMixin {
   /// domains.
   TestingApi get testing => _testing ??= TestingApi(session);
   TestingApi _testing;
+
+  /// A domain for letting clients substitute browser's network layer with client code.
+  FetchApi get fetch => _fetch ??= FetchApi(session);
+  FetchApi _fetch;
 
   /// Debugger domain exposes JavaScript debugging capabilities. It allows setting and removing
   /// breakpoints, stepping through execution, exploring stack traces, etc.

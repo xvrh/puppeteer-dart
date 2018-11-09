@@ -110,6 +110,38 @@ class CacheId {
   String toString() => value.toString();
 }
 
+/// type of HTTP response cached
+class CachedResponseType {
+  static const CachedResponseType basic = const CachedResponseType._('basic');
+  static const CachedResponseType cors = const CachedResponseType._('cors');
+  static const CachedResponseType default$ =
+      const CachedResponseType._('default');
+  static const CachedResponseType error = const CachedResponseType._('error');
+  static const CachedResponseType opaqueResponse =
+      const CachedResponseType._('opaqueResponse');
+  static const CachedResponseType opaqueRedirect =
+      const CachedResponseType._('opaqueRedirect');
+  static const values = const {
+    'basic': basic,
+    'cors': cors,
+    'default': default$,
+    'error': error,
+    'opaqueResponse': opaqueResponse,
+    'opaqueRedirect': opaqueRedirect,
+  };
+
+  final String value;
+
+  const CachedResponseType._(this.value);
+
+  factory CachedResponseType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Data entry.
 class DataEntry {
   /// Request URL.
@@ -130,6 +162,9 @@ class DataEntry {
   /// HTTP response status text.
   final String responseStatusText;
 
+  /// HTTP response type
+  final CachedResponseType responseType;
+
   /// Response headers
   final List<Header> responseHeaders;
 
@@ -140,6 +175,7 @@ class DataEntry {
       @required this.responseTime,
       @required this.responseStatus,
       @required this.responseStatusText,
+      @required this.responseType,
       @required this.responseHeaders});
 
   factory DataEntry.fromJson(Map<String, dynamic> json) {
@@ -152,6 +188,7 @@ class DataEntry {
       responseTime: json['responseTime'],
       responseStatus: json['responseStatus'],
       responseStatusText: json['responseStatusText'],
+      responseType: CachedResponseType.fromJson(json['responseType']),
       responseHeaders: (json['responseHeaders'] as List)
           .map((e) => Header.fromJson(e))
           .toList(),
@@ -166,6 +203,7 @@ class DataEntry {
       'responseTime': responseTime,
       'responseStatus': responseStatus,
       'responseStatusText': responseStatusText,
+      'responseType': responseType.toJson(),
       'responseHeaders': responseHeaders.map((e) => e.toJson()).toList(),
     };
     return json;

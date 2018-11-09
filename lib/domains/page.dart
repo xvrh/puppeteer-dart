@@ -185,6 +185,19 @@ class PageApi {
     return result['data'];
   }
 
+  /// Returns a snapshot of the page as a string. For MHTML format, the serialization includes
+  /// iframes, shadow DOM, external resources, and element-inline styles.
+  /// [format] Format (defaults to mhtml).
+  /// Returns: Serialized page data.
+  Future<String> captureSnapshot({String format}) async {
+    var parameters = <String, dynamic>{};
+    if (format != null) {
+      parameters['format'] = format;
+    }
+    var result = await _client.send('Page.captureSnapshot', parameters);
+    return result['data'];
+  }
+
   /// Clears the overriden device metrics.
   @deprecated
   Future clearDeviceMetricsOverride() async {
