@@ -87,6 +87,25 @@ class IndexedDBApi {
     return RequestDataResult.fromJson(result);
   }
 
+  /// Gets the auto increment number of an object store. Only meaningful
+  /// when objectStore.autoIncrement is true.
+  /// [securityOrigin] Security origin.
+  /// [databaseName] Database name.
+  /// [objectStoreName] Object store name.
+  /// Returns: the current value of key generator, to become the next inserted
+  /// key into the object store.
+  Future<num> getKeyGeneratorCurrentNumber(String securityOrigin,
+      String databaseName, String objectStoreName) async {
+    var parameters = <String, dynamic>{
+      'securityOrigin': securityOrigin,
+      'databaseName': databaseName,
+      'objectStoreName': objectStoreName,
+    };
+    var result = await _client.send(
+        'IndexedDB.getKeyGeneratorCurrentNumber', parameters);
+    return result['currentNumber'];
+  }
+
   /// Requests database with given name in given frame.
   /// [securityOrigin] Security origin.
   /// [databaseName] Database name.
@@ -140,8 +159,9 @@ class DatabaseWithObjectStores {
   /// Database name.
   final String name;
 
-  /// Database version.
-  final int version;
+  /// Database version (type is not 'integer', as the standard
+  /// requires the version number to be 'unsigned long long')
+  final num version;
 
   /// Object stores in this database.
   final List<ObjectStore> objectStores;

@@ -293,14 +293,8 @@ class GetBackgroundColorsResult {
   /// '100').
   final String computedFontWeight;
 
-  /// The computed font size for the document body, as a computed CSS value string (e.g. '16px').
-  final String computedBodyFontSize;
-
   GetBackgroundColorsResult(
-      {this.backgroundColors,
-      this.computedFontSize,
-      this.computedFontWeight,
-      this.computedBodyFontSize});
+      {this.backgroundColors, this.computedFontSize, this.computedFontWeight});
 
   factory GetBackgroundColorsResult.fromJson(Map<String, dynamic> json) {
     return GetBackgroundColorsResult(
@@ -312,9 +306,6 @@ class GetBackgroundColorsResult {
           : null,
       computedFontWeight: json.containsKey('computedFontWeight')
           ? json['computedFontWeight']
-          : null,
-      computedBodyFontSize: json.containsKey('computedBodyFontSize')
-          ? json['computedBodyFontSize']
           : null,
     );
   }

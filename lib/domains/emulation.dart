@@ -11,19 +11,9 @@ class EmulationApi {
 
   EmulationApi(this._client);
 
-  /// Notification sent after the virtual time has advanced.
-  Stream<num> get onVirtualTimeAdvanced => _client.onEvent
-      .where((Event event) => event.name == 'Emulation.virtualTimeAdvanced')
-      .map((Event event) => event.parameters['virtualTimeElapsed'] as num);
-
   /// Notification sent after the virtual time budget for the current VirtualTimePolicy has run out.
   Stream get onVirtualTimeBudgetExpired => _client.onEvent.where(
       (Event event) => event.name == 'Emulation.virtualTimeBudgetExpired');
-
-  /// Notification sent after the virtual time has paused.
-  Stream<num> get onVirtualTimePaused => _client.onEvent
-      .where((Event event) => event.name == 'Emulation.virtualTimePaused')
-      .map((Event event) => event.parameters['virtualTimeElapsed'] as num);
 
   /// Tells whether emulation is supported.
   /// Returns: True if emulation is supported.

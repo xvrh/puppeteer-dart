@@ -43,6 +43,11 @@ class BrowserApi {
     await _client.send('Browser.crash');
   }
 
+  /// Crashes GPU process.
+  Future crashGpuProcess() async {
+    await _client.send('Browser.crashGpuProcess');
+  }
+
   /// Returns version information.
   Future<GetVersionResult> getVersion() async {
     var result = await _client.send('Browser.getVersion');
@@ -105,12 +110,13 @@ class BrowserApi {
   }
 
   /// Get the browser window that contains the devtools target.
-  /// [targetId] Devtools agent host id.
+  /// [targetId] Devtools agent host id. If called as a part of the session, associated targetId is used.
   Future<GetWindowForTargetResult> getWindowForTarget(
-      target.TargetID targetId) async {
-    var parameters = <String, dynamic>{
-      'targetId': targetId.toJson(),
-    };
+      {target.TargetID targetId}) async {
+    var parameters = <String, dynamic>{};
+    if (targetId != null) {
+      parameters['targetId'] = targetId.toJson();
+    }
     var result = await _client.send('Browser.getWindowForTarget', parameters);
     return GetWindowForTargetResult.fromJson(result);
   }
@@ -125,6 +131,19 @@ class BrowserApi {
       'bounds': bounds.toJson(),
     };
     await _client.send('Browser.setWindowBounds', parameters);
+  }
+
+  /// Set dock tile details, platform-specific.
+  /// [image] Png encoded image.
+  Future setDockTile({String badgeLabel, String image}) async {
+    var parameters = <String, dynamic>{};
+    if (badgeLabel != null) {
+      parameters['badgeLabel'] = badgeLabel;
+    }
+    if (image != null) {
+      parameters['image'] = image;
+    }
+    await _client.send('Browser.setDockTile', parameters);
   }
 }
 
@@ -305,6 +324,8 @@ class PermissionType {
   static const PermissionType sensors = const PermissionType._('sensors');
   static const PermissionType videoCapture =
       const PermissionType._('videoCapture');
+  static const PermissionType idleDetection =
+      const PermissionType._('idleDetection');
   static const values = const {
     'accessibilityEvents': accessibilityEvents,
     'audioCapture': audioCapture,
@@ -322,6 +343,7 @@ class PermissionType {
     'protectedMediaIdentifier': protectedMediaIdentifier,
     'sensors': sensors,
     'videoCapture': videoCapture,
+    'idleDetection': idleDetection,
   };
 
   final String value;

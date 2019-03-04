@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
-import 'model.dart';
-import 'download_protocol_from_repo.dart' as protocols_from_repo;
-import 'download_protocol_from_chrome.dart' as protocols_from_chrome;
-import 'utils/split_words.dart';
-import 'utils/string_helpers.dart';
+
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as p;
+
+import 'download_protocol_from_chrome.dart' as protocols_from_chrome;
+import 'download_protocol_from_repo.dart' as protocols_from_repo;
+import 'model.dart';
+import 'utils/split_words.dart';
+import 'utils/string_helpers.dart';
 
 Protocol _readProtocol(String fileName) {
   return Protocol.fromString(
@@ -479,8 +481,14 @@ class _InternalType {
     } else if (isEnum) {
       code.writeln('factory $id.fromJson(String value) => values[value];');
     } else {
-      code.writeln(
-          'factory $id.fromJson(${context.getPropertyType(properties.first)} value) => $id(value);');
+      Parameter singleParameter = properties.single;
+      if (context.isList(singleParameter)) {
+        code.writeln(
+            'factory $id.fromJson(List<dynamic> value) => $id(${context.getPropertyType(singleParameter)}.from(value));');
+      } else {
+        code.writeln(
+            'factory $id.fromJson(${context.getPropertyType(singleParameter)} value) => $id(value);');
+      }
     }
 
     if (generateToJson) {
@@ -603,7 +611,10 @@ class _DomainContext {
     return type;
   }
 
+  bool isList(Typed parameter) => parameter.type == 'array';
+
   bool get needsMetaPackage => _useMetaPackage;
+
   useMetaPackage() {
     _useMetaPackage = true;
   }

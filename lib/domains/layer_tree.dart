@@ -448,7 +448,8 @@ class PaintProfile {
 
   PaintProfile(this.value);
 
-  factory PaintProfile.fromJson(List<num> value) => PaintProfile(value);
+  factory PaintProfile.fromJson(List<dynamic> value) =>
+      PaintProfile(List<num>.from(value));
 
   List<num> toJson() => value;
 

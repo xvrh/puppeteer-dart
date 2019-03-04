@@ -105,16 +105,21 @@ class InputApi {
   /// (default: 0).
   /// [timestamp] Time at which the event occurred.
   /// [button] Mouse button (default: "none").
+  /// [buttons] A number indicating which buttons are pressed on the mouse when a mouse event is triggered.
+  /// Left=1, Right=2, Middle=4, Back=8, Forward=16, None=0.
   /// [clickCount] Number of times the mouse button was clicked (default: 0).
   /// [deltaX] X delta in CSS pixels for mouse wheel event (default: 0).
   /// [deltaY] Y delta in CSS pixels for mouse wheel event (default: 0).
+  /// [pointerType] Pointer type (default: "mouse").
   Future dispatchMouseEvent(String type, num x, num y,
       {int modifiers,
       TimeSinceEpoch timestamp,
       String button,
+      int buttons,
       int clickCount,
       num deltaX,
-      num deltaY}) async {
+      num deltaY,
+      String pointerType}) async {
     var parameters = <String, dynamic>{
       'type': type,
       'x': x,
@@ -129,6 +134,9 @@ class InputApi {
     if (button != null) {
       parameters['button'] = button;
     }
+    if (buttons != null) {
+      parameters['buttons'] = buttons;
+    }
     if (clickCount != null) {
       parameters['clickCount'] = clickCount;
     }
@@ -137,6 +145,9 @@ class InputApi {
     }
     if (deltaY != null) {
       parameters['deltaY'] = deltaY;
+    }
+    if (pointerType != null) {
+      parameters['pointerType'] = pointerType;
     }
     await _client.send('Input.dispatchMouseEvent', parameters);
   }
