@@ -1,6 +1,6 @@
 # chrome_dev_tools
 
-[![Build Status](https://travis-ci.org/xavierhainaux/chrome_dev_tools.svg?branch=master)](https://travis-ci.org/xavierhainaux/chrome_dev_tools)
+[![Build Status](https://travis-ci.org/xvrh/chrome_dev_tools.svg?branch=master)](https://travis-ci.org/xvrh/chrome_dev_tools)
 
 A Dart library to automate the Chrome browser over the DevTools Protocol.
 
