@@ -16,6 +16,11 @@ class MemoryApi {
     await _client.send('Memory.prepareForLeakDetection');
   }
 
+  /// Simulate OomIntervention by purging V8 memory.
+  Future forciblyPurgeJavaScriptMemory() async {
+    await _client.send('Memory.forciblyPurgeJavaScriptMemory');
+  }
+
   /// Enable/disable suppressing memory pressure notifications in all processes.
   /// [suppressed] If true, memory pressure notifications will be suppressed.
   Future setPressureNotificationsSuppressed(bool suppressed) async {

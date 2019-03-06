@@ -538,11 +538,13 @@ class DOMApi {
   /// [nodeId] Id of the node to resolve.
   /// [backendNodeId] Backend identifier of the node to resolve.
   /// [objectGroup] Symbolic group name that can be used to release multiple objects.
+  /// [executionContextId] Execution context in which to resolve the node.
   /// Returns: JavaScript object wrapper for given node.
   Future<runtime.RemoteObject> resolveNode(
       {NodeId nodeId,
       dom.BackendNodeId backendNodeId,
-      String objectGroup}) async {
+      String objectGroup,
+      runtime.ExecutionContextId executionContextId}) async {
     var parameters = <String, dynamic>{};
     if (nodeId != null) {
       parameters['nodeId'] = nodeId.toJson();
@@ -552,6 +554,9 @@ class DOMApi {
     }
     if (objectGroup != null) {
       parameters['objectGroup'] = objectGroup;
+    }
+    if (executionContextId != null) {
+      parameters['executionContextId'] = executionContextId.toJson();
     }
     var result = await _client.send('DOM.resolveNode', parameters);
     return runtime.RemoteObject.fromJson(result['object']);
@@ -609,6 +614,17 @@ class DOMApi {
       parameters['objectId'] = objectId.toJson();
     }
     await _client.send('DOM.setFileInputFiles', parameters);
+  }
+
+  /// Returns file information for the given
+  /// File wrapper.
+  /// [objectId] JavaScript object id of the node wrapper.
+  Future<String> getFileInfo(runtime.RemoteObjectId objectId) async {
+    var parameters = <String, dynamic>{
+      'objectId': objectId.toJson(),
+    };
+    var result = await _client.send('DOM.getFileInfo', parameters);
+    return result['path'];
   }
 
   /// Enables console to refer to the node with given id via $x (see Command Line API for more details
@@ -898,7 +914,7 @@ class GetNodeForLocationResult {
   /// Resulting node.
   final BackendNodeId backendNodeId;
 
-  /// Id of the node at given coordinates, only when enabled.
+  /// Id of the node at given coordinates, only when enabled and requested document.
   final NodeId nodeId;
 
   GetNodeForLocationResult({@required this.backendNodeId, this.nodeId});
@@ -933,7 +949,7 @@ class GetFrameOwnerResult {
   /// Resulting node.
   final BackendNodeId backendNodeId;
 
-  /// Id of the node at given coordinates, only when enabled.
+  /// Id of the node at given coordinates, only when enabled and requested document.
   final NodeId nodeId;
 
   GetFrameOwnerResult({@required this.backendNodeId, this.nodeId});
@@ -1404,7 +1420,7 @@ class Quad {
 
   Quad(this.value);
 
-  factory Quad.fromJson(List<num> value) => Quad(value);
+  factory Quad.fromJson(List<dynamic> value) => Quad(List<num>.from(value));
 
   List<num> toJson() => value;
 

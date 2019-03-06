@@ -165,7 +165,7 @@ class Item {
 
   Item(this.value);
 
-  factory Item.fromJson(List<String> value) => Item(value);
+  factory Item.fromJson(List<dynamic> value) => Item(List<String>.from(value));
 
   List<String> toJson() => value;
 

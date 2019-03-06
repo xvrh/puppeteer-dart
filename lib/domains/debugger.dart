@@ -195,14 +195,6 @@ class DebuggerApi {
     await _client.send('Debugger.resume');
   }
 
-  /// This method is deprecated - use Debugger.stepInto with breakOnAsyncCall and
-  /// Debugger.pauseOnAsyncTask instead. Steps into next scheduled async task if any is scheduled
-  /// before next pause. Returns success when async task is actually scheduled, returns error if no
-  /// task were scheduled or another scheduleStepIntoAsync was called.
-  Future scheduleStepIntoAsync() async {
-    await _client.send('Debugger.scheduleStepIntoAsync');
-  }
-
   /// Searches for given string in script content.
   /// [scriptId] Id of the script to search in.
   /// [query] String to search for.

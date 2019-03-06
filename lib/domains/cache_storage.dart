@@ -40,14 +40,16 @@ class CacheStorageApi {
   }
 
   /// Fetches cache entry.
-  /// [cacheId] Id of cache that contains the enty.
+  /// [cacheId] Id of cache that contains the entry.
   /// [requestURL] URL spec of the request.
+  /// [requestHeaders] headers of the request.
   /// Returns: Response read from the cache.
   Future<CachedResponse> requestCachedResponse(
-      CacheId cacheId, String requestURL) async {
+      CacheId cacheId, String requestURL, List<Header> requestHeaders) async {
     var parameters = <String, dynamic>{
       'cacheId': cacheId.toJson(),
       'requestURL': requestURL,
+      'requestHeaders': requestHeaders.map((e) => e.toJson()).toList(),
     };
     var result =
         await _client.send('CacheStorage.requestCachedResponse', parameters);
@@ -58,13 +60,18 @@ class CacheStorageApi {
   /// [cacheId] ID of cache to get entries from.
   /// [skipCount] Number of records to skip.
   /// [pageSize] Number of records to fetch.
+  /// [pathFilter] If present, only return the entries containing this substring in the path
   Future<RequestEntriesResult> requestEntries(
-      CacheId cacheId, int skipCount, int pageSize) async {
+      CacheId cacheId, int skipCount, int pageSize,
+      {String pathFilter}) async {
     var parameters = <String, dynamic>{
       'cacheId': cacheId.toJson(),
       'skipCount': skipCount,
       'pageSize': pageSize,
     };
+    if (pathFilter != null) {
+      parameters['pathFilter'] = pathFilter;
+    }
     var result = await _client.send('CacheStorage.requestEntries', parameters);
     return RequestEntriesResult.fromJson(result);
   }

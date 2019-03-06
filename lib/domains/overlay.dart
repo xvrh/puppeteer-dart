@@ -28,6 +28,10 @@ class OverlayApi {
       .map((Event event) =>
           page.Viewport.fromJson(event.parameters['viewport']));
 
+  /// Fired when user cancels the inspect mode.
+  Stream get onInspectModeCanceled => _client.onEvent
+      .where((Event event) => event.name == 'Overlay.inspectModeCanceled');
+
   /// Disables domain notifications.
   Future disable() async {
     await _client.send('Overlay.disable');
@@ -79,10 +83,12 @@ class OverlayApi {
   /// [nodeId] Identifier of the node to highlight.
   /// [backendNodeId] Identifier of the backend node to highlight.
   /// [objectId] JavaScript object id of the node to be highlighted.
+  /// [selector] Selectors to highlight relevant nodes.
   Future highlightNode(HighlightConfig highlightConfig,
       {dom.NodeId nodeId,
       dom.BackendNodeId backendNodeId,
-      runtime.RemoteObjectId objectId}) async {
+      runtime.RemoteObjectId objectId,
+      String selector}) async {
     var parameters = <String, dynamic>{
       'highlightConfig': highlightConfig.toJson(),
     };
@@ -94,6 +100,9 @@ class OverlayApi {
     }
     if (objectId != null) {
       parameters['objectId'] = objectId.toJson();
+    }
+    if (selector != null) {
+      parameters['selector'] = selector;
     }
     await _client.send('Overlay.highlightNode', parameters);
   }
@@ -156,6 +165,15 @@ class OverlayApi {
     await _client.send('Overlay.setInspectMode', parameters);
   }
 
+  /// Highlights owner element of all frames detected to be ads.
+  /// [show] True for showing ad highlights
+  Future setShowAdHighlights(bool show) async {
+    var parameters = <String, dynamic>{
+      'show': show,
+    };
+    await _client.send('Overlay.setShowAdHighlights', parameters);
+  }
+
   /// [message] The message to display, also triggers resume and step over controls.
   Future setPausedInDebuggerMessage({String message}) async {
     var parameters = <String, dynamic>{};
@@ -201,6 +219,15 @@ class OverlayApi {
     await _client.send('Overlay.setShowScrollBottleneckRects', parameters);
   }
 
+  /// Requests that backend shows hit-test borders on layers
+  /// [show] True for showing hit-test borders
+  Future setShowHitTestBorders(bool show) async {
+    var parameters = <String, dynamic>{
+      'show': show,
+    };
+    await _client.send('Overlay.setShowHitTestBorders', parameters);
+  }
+
   /// Paints viewport size upon main frame resize.
   /// [show] Whether to paint size or not.
   Future setShowViewportSizeOnResize(bool show) async {
@@ -224,13 +251,14 @@ class HighlightConfig {
   /// Whether the node info tooltip should be shown (default: false).
   final bool showInfo;
 
+  /// Whether the node styles in the tooltip (default: false).
+  final bool showStyles;
+
   /// Whether the rulers should be shown (default: false).
   final bool showRulers;
 
   /// Whether the extension lines from node to the rulers should be shown (default: false).
   final bool showExtensionLines;
-
-  final bool displayAsMaterial;
 
   /// The content box highlight fill color (default: transparent).
   final dom.RGBA contentColor;
@@ -253,17 +281,14 @@ class HighlightConfig {
   /// The shape margin fill color (default: transparent).
   final dom.RGBA shapeMarginColor;
 
-  /// Selectors to highlight relevant nodes.
-  final String selectorList;
-
   /// The grid layout color (default: transparent).
   final dom.RGBA cssGridColor;
 
   HighlightConfig(
       {this.showInfo,
+      this.showStyles,
       this.showRulers,
       this.showExtensionLines,
-      this.displayAsMaterial,
       this.contentColor,
       this.paddingColor,
       this.borderColor,
@@ -271,18 +296,15 @@ class HighlightConfig {
       this.eventTargetColor,
       this.shapeColor,
       this.shapeMarginColor,
-      this.selectorList,
       this.cssGridColor});
 
   factory HighlightConfig.fromJson(Map<String, dynamic> json) {
     return HighlightConfig(
       showInfo: json.containsKey('showInfo') ? json['showInfo'] : null,
+      showStyles: json.containsKey('showStyles') ? json['showStyles'] : null,
       showRulers: json.containsKey('showRulers') ? json['showRulers'] : null,
       showExtensionLines: json.containsKey('showExtensionLines')
           ? json['showExtensionLines']
-          : null,
-      displayAsMaterial: json.containsKey('displayAsMaterial')
-          ? json['displayAsMaterial']
           : null,
       contentColor: json.containsKey('contentColor')
           ? dom.RGBA.fromJson(json['contentColor'])
@@ -305,8 +327,6 @@ class HighlightConfig {
       shapeMarginColor: json.containsKey('shapeMarginColor')
           ? dom.RGBA.fromJson(json['shapeMarginColor'])
           : null,
-      selectorList:
-          json.containsKey('selectorList') ? json['selectorList'] : null,
       cssGridColor: json.containsKey('cssGridColor')
           ? dom.RGBA.fromJson(json['cssGridColor'])
           : null,
@@ -318,14 +338,14 @@ class HighlightConfig {
     if (showInfo != null) {
       json['showInfo'] = showInfo;
     }
+    if (showStyles != null) {
+      json['showStyles'] = showStyles;
+    }
     if (showRulers != null) {
       json['showRulers'] = showRulers;
     }
     if (showExtensionLines != null) {
       json['showExtensionLines'] = showExtensionLines;
-    }
-    if (displayAsMaterial != null) {
-      json['displayAsMaterial'] = displayAsMaterial;
     }
     if (contentColor != null) {
       json['contentColor'] = contentColor.toJson();
@@ -348,9 +368,6 @@ class HighlightConfig {
     if (shapeMarginColor != null) {
       json['shapeMarginColor'] = shapeMarginColor.toJson();
     }
-    if (selectorList != null) {
-      json['selectorList'] = selectorList;
-    }
     if (cssGridColor != null) {
       json['cssGridColor'] = cssGridColor.toJson();
     }
@@ -362,10 +379,13 @@ class InspectMode {
   static const InspectMode searchForNode = const InspectMode._('searchForNode');
   static const InspectMode searchForUAShadowDOM =
       const InspectMode._('searchForUAShadowDOM');
+  static const InspectMode captureAreaScreenshot =
+      const InspectMode._('captureAreaScreenshot');
   static const InspectMode none = const InspectMode._('none');
   static const values = const {
     'searchForNode': searchForNode,
     'searchForUAShadowDOM': searchForUAShadowDOM,
+    'captureAreaScreenshot': captureAreaScreenshot,
     'none': none,
   };
 

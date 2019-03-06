@@ -294,6 +294,11 @@ class PageApi {
     return GetNavigationHistoryResult.fromJson(result);
   }
 
+  /// Resets navigation history for the current page.
+  Future resetNavigationHistory() async {
+    await _client.send('Page.resetNavigationHistory');
+  }
+
   /// Returns content of the given resource.
   /// [frameId] Frame id to get resource for.
   /// [url] URL of the resource to get content for.
@@ -485,10 +490,6 @@ class PageApi {
       'identifier': identifier.toJson(),
     };
     await _client.send('Page.removeScriptToEvaluateOnNewDocument', parameters);
-  }
-
-  Future requestAppBanner() async {
-    await _client.send('Page.requestAppBanner');
   }
 
   /// Acknowledges that a screencast frame has been received by the frontend.
@@ -803,6 +804,11 @@ class PageApi {
       parameters['group'] = group;
     }
     await _client.send('Page.generateTestReport', parameters);
+  }
+
+  /// Pauses page execution. Can be resumed using generic Runtime.runIfWaitingForDebugger.
+  Future waitForDebugger() async {
+    await _client.send('Page.waitForDebugger');
   }
 }
 
@@ -1671,6 +1677,9 @@ class VisualViewport {
   /// Scale relative to the ideal viewport (size at width=device-width).
   final num scale;
 
+  /// Page zoom factor (CSS to device independent pixels ratio).
+  final num zoom;
+
   VisualViewport(
       {@required this.offsetX,
       @required this.offsetY,
@@ -1678,7 +1687,8 @@ class VisualViewport {
       @required this.pageY,
       @required this.clientWidth,
       @required this.clientHeight,
-      @required this.scale});
+      @required this.scale,
+      this.zoom});
 
   factory VisualViewport.fromJson(Map<String, dynamic> json) {
     return VisualViewport(
@@ -1689,6 +1699,7 @@ class VisualViewport {
       clientWidth: json['clientWidth'],
       clientHeight: json['clientHeight'],
       scale: json['scale'],
+      zoom: json.containsKey('zoom') ? json['zoom'] : null,
     );
   }
 
@@ -1702,22 +1713,25 @@ class VisualViewport {
       'clientHeight': clientHeight,
       'scale': scale,
     };
+    if (zoom != null) {
+      json['zoom'] = zoom;
+    }
     return json;
   }
 }
 
 /// Viewport for capturing screenshot.
 class Viewport {
-  /// X offset in CSS pixels.
+  /// X offset in device independent pixels (dip).
   final num x;
 
-  /// Y offset in CSS pixels
+  /// Y offset in device independent pixels (dip).
   final num y;
 
-  /// Rectangle width in CSS pixels
+  /// Rectangle width in device independent pixels (dip).
   final num width;
 
-  /// Rectangle height in CSS pixels
+  /// Rectangle height in device independent pixels (dip).
   final num height;
 
   /// Page scale factor.

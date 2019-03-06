@@ -3,6 +3,7 @@ import '../domains/animation.dart';
 import '../domains/application_cache.dart';
 import '../domains/css.dart';
 import '../domains/cache_storage.dart';
+import '../domains/cast.dart';
 import '../domains/dom.dart';
 import '../domains/dom_debugger.dart';
 import '../domains/dom_snapshot.dart';
@@ -60,6 +61,11 @@ abstract class TabMixin {
   CacheStorageApi get cacheStorage =>
       _cacheStorage ??= CacheStorageApi(session);
   CacheStorageApi _cacheStorage;
+
+  /// A domain for interacting with Cast, Presentation API, and Remote Playback API
+  /// functionalities.
+  CastApi get cast => _cast ??= CastApi(session);
+  CastApi _cast;
 
   /// This domain exposes DOM read/write operations. Each DOM Node is represented with its mirror object
   /// that has an `id`. This `id` can be used to get additional information on the Node, resolve it into

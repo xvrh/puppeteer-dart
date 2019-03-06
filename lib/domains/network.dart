@@ -82,20 +82,20 @@ class NetworkApi {
       .where((Event event) => event.name == 'Network.webSocketCreated')
       .map((Event event) => WebSocketCreatedEvent.fromJson(event.parameters));
 
-  /// Fired when WebSocket frame error occurs.
+  /// Fired when WebSocket message error occurs.
   Stream<WebSocketFrameErrorEvent> get onWebSocketFrameError => _client.onEvent
       .where((Event event) => event.name == 'Network.webSocketFrameError')
       .map(
           (Event event) => WebSocketFrameErrorEvent.fromJson(event.parameters));
 
-  /// Fired when WebSocket frame is received.
+  /// Fired when WebSocket message is received.
   Stream<WebSocketFrameReceivedEvent> get onWebSocketFrameReceived => _client
       .onEvent
       .where((Event event) => event.name == 'Network.webSocketFrameReceived')
       .map((Event event) =>
           WebSocketFrameReceivedEvent.fromJson(event.parameters));
 
-  /// Fired when WebSocket frame is sent.
+  /// Fired when WebSocket message is sent.
   Stream<WebSocketFrameSentEvent> get onWebSocketFrameSent => _client.onEvent
       .where((Event event) => event.name == 'Network.webSocketFrameSent')
       .map((Event event) => WebSocketFrameSentEvent.fromJson(event.parameters));
@@ -316,7 +316,7 @@ class NetworkApi {
 
   /// Returns post data sent with the request. Returns an error when no data was sent with the request.
   /// [requestId] Identifier of the network request to get content for.
-  /// Returns: Base64-encoded request body.
+  /// Returns: Request body string, omitting files from multipart requests
   Future<String> getRequestPostData(RequestId requestId) async {
     var parameters = <String, dynamic>{
       'requestId': requestId.toJson(),
@@ -935,7 +935,7 @@ class WebSocketFrameErrorEvent {
   /// Timestamp.
   final MonotonicTime timestamp;
 
-  /// WebSocket frame error message.
+  /// WebSocket error message.
   final String errorMessage;
 
   WebSocketFrameErrorEvent(
@@ -2083,15 +2083,17 @@ class WebSocketResponse {
   }
 }
 
-/// WebSocket frame data.
+/// WebSocket message data. This represents an entire WebSocket message, not just a fragmented frame as the name suggests.
 class WebSocketFrame {
-  /// WebSocket frame opcode.
+  /// WebSocket message opcode.
   final num opcode;
 
-  /// WebSocke frame mask.
+  /// WebSocket message mask.
   final bool mask;
 
-  /// WebSocke frame payload data.
+  /// WebSocket message payload data.
+  /// If the opcode is 1, this is a text message and payloadData is a UTF-8 string.
+  /// If the opcode isn't 1, then payloadData is a base64 encoded string representing binary data.
   final String payloadData;
 
   WebSocketFrame(
@@ -2604,9 +2606,6 @@ class SignedExchangeHeader {
   /// Signed exchange request URL.
   final String requestUrl;
 
-  /// Signed exchange request method.
-  final String requestMethod;
-
   /// Signed exchange response code.
   final int responseCode;
 
@@ -2618,7 +2617,6 @@ class SignedExchangeHeader {
 
   SignedExchangeHeader(
       {@required this.requestUrl,
-      @required this.requestMethod,
       @required this.responseCode,
       @required this.responseHeaders,
       @required this.signatures});
@@ -2626,7 +2624,6 @@ class SignedExchangeHeader {
   factory SignedExchangeHeader.fromJson(Map<String, dynamic> json) {
     return SignedExchangeHeader(
       requestUrl: json['requestUrl'],
-      requestMethod: json['requestMethod'],
       responseCode: json['responseCode'],
       responseHeaders: Headers.fromJson(json['responseHeaders']),
       signatures: (json['signatures'] as List)
@@ -2638,7 +2635,6 @@ class SignedExchangeHeader {
   Map<String, dynamic> toJson() {
     var json = <String, dynamic>{
       'requestUrl': requestUrl,
-      'requestMethod': requestMethod,
       'responseCode': responseCode,
       'responseHeaders': responseHeaders.toJson(),
       'signatures': signatures.map((e) => e.toJson()).toList(),

@@ -569,8 +569,8 @@ class ArrayOfStrings {
 
   ArrayOfStrings(this.value);
 
-  factory ArrayOfStrings.fromJson(List<StringIndex> value) =>
-      ArrayOfStrings(value);
+  factory ArrayOfStrings.fromJson(List<dynamic> value) =>
+      ArrayOfStrings(List<StringIndex>.from(value));
 
   List<StringIndex> toJson() => value;
 
@@ -656,7 +656,8 @@ class Rectangle {
 
   Rectangle(this.value);
 
-  factory Rectangle.fromJson(List<num> value) => Rectangle(value);
+  factory Rectangle.fromJson(List<dynamic> value) =>
+      Rectangle(List<num>.from(value));
 
   List<num> toJson() => value;
 

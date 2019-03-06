@@ -34,7 +34,7 @@ class StorageApi {
 
   /// Clears storage for origin.
   /// [origin] Security origin.
-  /// [storageTypes] Comma separated origin names.
+  /// [storageTypes] Comma separated list of StorageType to clear.
   Future clearDataForOrigin(String origin, String storageTypes) async {
     var parameters = <String, dynamic>{
       'origin': origin,
