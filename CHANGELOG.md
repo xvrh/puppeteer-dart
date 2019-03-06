@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+- Fix Dart2 cast error for value object
+- Increase default chrome version (630727)
+
 ## 1.1.0
 - Update protocol
 - Increase default chrome version (599821)
