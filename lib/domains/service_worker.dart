@@ -30,10 +30,10 @@ class ServiceWorkerApi {
           .toList());
 
   Future deliverPushMessage(
-      String origin, String registrationId, String data) async {
+      String origin, RegistrationID registrationId, String data) async {
     var parameters = <String, dynamic>{
       'origin': origin,
-      'registrationId': registrationId,
+      'registrationId': registrationId.toJson(),
       'data': data,
     };
     await _client.send('ServiceWorker.deliverPushMessage', parameters);
@@ -43,11 +43,11 @@ class ServiceWorkerApi {
     await _client.send('ServiceWorker.disable');
   }
 
-  Future dispatchSyncEvent(
-      String origin, String registrationId, String tag, bool lastChance) async {
+  Future dispatchSyncEvent(String origin, RegistrationID registrationId,
+      String tag, bool lastChance) async {
     var parameters = <String, dynamic>{
       'origin': origin,
-      'registrationId': registrationId,
+      'registrationId': registrationId.toJson(),
       'tag': tag,
       'lastChance': lastChance,
     };
@@ -112,9 +112,28 @@ class ServiceWorkerApi {
   }
 }
 
+class RegistrationID {
+  final String value;
+
+  RegistrationID(this.value);
+
+  factory RegistrationID.fromJson(String value) => RegistrationID(value);
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) => other is RegistrationID && other.value == value;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// ServiceWorker registration.
 class ServiceWorkerRegistration {
-  final String registrationId;
+  final RegistrationID registrationId;
 
   final String scopeURL;
 
@@ -127,7 +146,7 @@ class ServiceWorkerRegistration {
 
   factory ServiceWorkerRegistration.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerRegistration(
-      registrationId: json['registrationId'],
+      registrationId: RegistrationID.fromJson(json['registrationId']),
       scopeURL: json['scopeURL'],
       isDeleted: json['isDeleted'],
     );
@@ -135,7 +154,7 @@ class ServiceWorkerRegistration {
 
   Map<String, dynamic> toJson() {
     var json = <String, dynamic>{
-      'registrationId': registrationId,
+      'registrationId': registrationId.toJson(),
       'scopeURL': scopeURL,
       'isDeleted': isDeleted,
     };
@@ -210,7 +229,7 @@ class ServiceWorkerVersionStatus {
 class ServiceWorkerVersion {
   final String versionId;
 
-  final String registrationId;
+  final RegistrationID registrationId;
 
   final String scriptURL;
 
@@ -243,7 +262,7 @@ class ServiceWorkerVersion {
   factory ServiceWorkerVersion.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerVersion(
       versionId: json['versionId'],
-      registrationId: json['registrationId'],
+      registrationId: RegistrationID.fromJson(json['registrationId']),
       scriptURL: json['scriptURL'],
       runningStatus:
           ServiceWorkerVersionRunningStatus.fromJson(json['runningStatus']),
@@ -268,7 +287,7 @@ class ServiceWorkerVersion {
   Map<String, dynamic> toJson() {
     var json = <String, dynamic>{
       'versionId': versionId,
-      'registrationId': registrationId,
+      'registrationId': registrationId.toJson(),
       'scriptURL': scriptURL,
       'runningStatus': runningStatus.toJson(),
       'status': status.toJson(),
@@ -294,7 +313,7 @@ class ServiceWorkerVersion {
 class ServiceWorkerErrorMessage {
   final String errorMessage;
 
-  final String registrationId;
+  final RegistrationID registrationId;
 
   final String versionId;
 
@@ -315,7 +334,7 @@ class ServiceWorkerErrorMessage {
   factory ServiceWorkerErrorMessage.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerErrorMessage(
       errorMessage: json['errorMessage'],
-      registrationId: json['registrationId'],
+      registrationId: RegistrationID.fromJson(json['registrationId']),
       versionId: json['versionId'],
       sourceURL: json['sourceURL'],
       lineNumber: json['lineNumber'],
@@ -326,7 +345,7 @@ class ServiceWorkerErrorMessage {
   Map<String, dynamic> toJson() {
     var json = <String, dynamic>{
       'errorMessage': errorMessage,
-      'registrationId': registrationId,
+      'registrationId': registrationId.toJson(),
       'versionId': versionId,
       'sourceURL': sourceURL,
       'lineNumber': lineNumber,

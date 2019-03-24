@@ -7,20 +7,18 @@ import 'package:logging/logging.dart';
 import 'package:shelf_static/shelf_static.dart';
 import 'package:shelf/shelf_io.dart' as io;
 
-const _port = 8089;
-
 main() async {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen(print);
 
   var handler = createStaticHandler('example');
-  HttpServer server = await io.serve(handler, 'localhost', _port);
+  HttpServer server = await io.serve(handler, 'localhost', 0);
 
   try {
     String chromeExecutable = (await downloadChrome()).executablePath;
     Chrome chrome = await Chrome.start(chromeExecutable);
 
-    String pageUrl = 'http://localhost:$_port/html/incognito.html';
+    String pageUrl = 'http://localhost:${server.port}/html/incognito.html';
     try {
       Tab normalTab1 = await chrome.newTab(pageUrl);
       Tab normalTab2 = await chrome.newTab(pageUrl);

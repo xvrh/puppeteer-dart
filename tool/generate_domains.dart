@@ -570,7 +570,7 @@ class _InternalType {
 
 class _DomainContext {
   final Domain domain;
-  final Set<String> dependencies = Set();
+  final Set<String> dependencies = {};
   bool _useMetaPackage = false;
 
   _DomainContext(this.domain);

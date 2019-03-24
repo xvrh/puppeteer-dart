@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0
+- Update protocol
+- Increase chrome version (641577)
+- Update chrome flags list (same list as Puppeteer project)
+
 ## 1.2.0
 - Fix Dart2 cast error for value object
 - Increase default chrome version (630727)

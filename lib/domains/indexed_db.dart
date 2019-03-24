@@ -87,23 +87,19 @@ class IndexedDBApi {
     return RequestDataResult.fromJson(result);
   }
 
-  /// Gets the auto increment number of an object store. Only meaningful
-  /// when objectStore.autoIncrement is true.
+  /// Gets metadata of an object store
   /// [securityOrigin] Security origin.
   /// [databaseName] Database name.
   /// [objectStoreName] Object store name.
-  /// Returns: the current value of key generator, to become the next inserted
-  /// key into the object store.
-  Future<num> getKeyGeneratorCurrentNumber(String securityOrigin,
+  Future<GetMetadataResult> getMetadata(String securityOrigin,
       String databaseName, String objectStoreName) async {
     var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
     };
-    var result = await _client.send(
-        'IndexedDB.getKeyGeneratorCurrentNumber', parameters);
-    return result['currentNumber'];
+    var result = await _client.send('IndexedDB.getMetadata', parameters);
+    return GetMetadataResult.fromJson(result);
   }
 
   /// Requests database with given name in given frame.
@@ -150,6 +146,26 @@ class RequestDataResult {
           .map((e) => DataEntry.fromJson(e))
           .toList(),
       hasMore: json['hasMore'],
+    );
+  }
+}
+
+class GetMetadataResult {
+  /// the entries count
+  final num entriesCount;
+
+  /// the current value of key generator, to become the next inserted
+  /// key into the object store. Valid if objectStore.autoIncrement
+  /// is true.
+  final num keyGeneratorValue;
+
+  GetMetadataResult(
+      {@required this.entriesCount, @required this.keyGeneratorValue});
+
+  factory GetMetadataResult.fromJson(Map<String, dynamic> json) {
+    return GetMetadataResult(
+      entriesCount: json['entriesCount'],
+      keyGeneratorValue: json['keyGeneratorValue'],
     );
   }
 }
