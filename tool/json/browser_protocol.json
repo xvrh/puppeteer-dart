@@ -971,6 +971,153 @@
             ]
         },
         {
+            "domain": "BackgroundService",
+            "description": "Defines events for background web platform features.",
+            "experimental": true,
+            "types": [
+                {
+                    "id": "ServiceName",
+                    "description": "The Background Service that will be associated with the commands/events.\nEvery Background Service operates independently, but they share the same\nAPI.",
+                    "type": "string",
+                    "enum": [
+                        "backgroundFetch",
+                        "backgroundSync"
+                    ]
+                },
+                {
+                    "id": "EventMetadata",
+                    "description": "A key-value pair for additional event information to pass along.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "key",
+                            "type": "string"
+                        },
+                        {
+                            "name": "value",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "id": "BackgroundServiceEvent",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "timestamp",
+                            "description": "Timestamp of the event (in seconds).",
+                            "$ref": "Network.TimeSinceEpoch"
+                        },
+                        {
+                            "name": "origin",
+                            "description": "The origin this event belongs to.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "serviceWorkerRegistrationId",
+                            "description": "The Service Worker ID that initiated the event.",
+                            "$ref": "ServiceWorker.RegistrationID"
+                        },
+                        {
+                            "name": "service",
+                            "description": "The Background Service this event belongs to.",
+                            "$ref": "ServiceName"
+                        },
+                        {
+                            "name": "eventName",
+                            "description": "A description of the event.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "instanceId",
+                            "description": "An identifier that groups related events together.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "eventMetadata",
+                            "description": "A list of event-specific information.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "EventMetadata"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "commands": [
+                {
+                    "name": "startObserving",
+                    "description": "Enables event updates for the service.",
+                    "parameters": [
+                        {
+                            "name": "service",
+                            "$ref": "ServiceName"
+                        }
+                    ]
+                },
+                {
+                    "name": "stopObserving",
+                    "description": "Disables event updates for the service.",
+                    "parameters": [
+                        {
+                            "name": "service",
+                            "$ref": "ServiceName"
+                        }
+                    ]
+                },
+                {
+                    "name": "setRecording",
+                    "description": "Set the recording state for the service.",
+                    "parameters": [
+                        {
+                            "name": "shouldRecord",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "service",
+                            "$ref": "ServiceName"
+                        }
+                    ]
+                },
+                {
+                    "name": "clearEvents",
+                    "description": "Clears all stored data for the service.",
+                    "parameters": [
+                        {
+                            "name": "service",
+                            "$ref": "ServiceName"
+                        }
+                    ]
+                }
+            ],
+            "events": [
+                {
+                    "name": "recordingStateChanged",
+                    "description": "Called when the recording state for the service has been updated.",
+                    "parameters": [
+                        {
+                            "name": "isRecording",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "service",
+                            "$ref": "ServiceName"
+                        }
+                    ]
+                },
+                {
+                    "name": "backgroundServiceEventReceived",
+                    "description": "Called with all existing backgroundServiceEvents when enabled, and all new\nevents afterwards if enabled and recording.",
+                    "parameters": [
+                        {
+                            "name": "backgroundServiceEvent",
+                            "$ref": "BackgroundServiceEvent"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "domain": "Browser",
             "description": "The Browser domain defines methods and events for browser managing.",
             "types": [
@@ -6555,8 +6702,8 @@
                     ]
                 },
                 {
-                    "name": "getKeyGeneratorCurrentNumber",
-                    "description": "Gets the auto increment number of an object store. Only meaningful\nwhen objectStore.autoIncrement is true.",
+                    "name": "getMetadata",
+                    "description": "Gets metadata of an object store",
                     "parameters": [
                         {
                             "name": "securityOrigin",
@@ -6576,8 +6723,13 @@
                     ],
                     "returns": [
                         {
-                            "name": "currentNumber",
-                            "description": "the current value of key generator, to become the next inserted\nkey into the object store.",
+                            "name": "entriesCount",
+                            "description": "the entries count",
+                            "type": "number"
+                        },
+                        {
+                            "name": "keyGeneratorValue",
+                            "description": "the current value of key generator, to become the next inserted\nkey into the object store. Valid if objectStore.autoIncrement\nis true.",
                             "type": "number"
                         }
                     ]
@@ -10432,16 +10584,6 @@
                             "type": "boolean"
                         }
                     ]
-                },
-                {
-                    "name": "setSuspended",
-                    "parameters": [
-                        {
-                            "name": "suspended",
-                            "description": "Whether overlay should be suspended and not consume any resources until resumed.",
-                            "type": "boolean"
-                        }
-                    ]
                 }
             ],
             "events": [
@@ -12595,13 +12737,17 @@
             "experimental": true,
             "types": [
                 {
+                    "id": "RegistrationID",
+                    "type": "string"
+                },
+                {
                     "id": "ServiceWorkerRegistration",
                     "description": "ServiceWorker registration.",
                     "type": "object",
                     "properties": [
                         {
                             "name": "registrationId",
-                            "type": "string"
+                            "$ref": "RegistrationID"
                         },
                         {
                             "name": "scopeURL",
@@ -12646,7 +12792,7 @@
                         },
                         {
                             "name": "registrationId",
-                            "type": "string"
+                            "$ref": "RegistrationID"
                         },
                         {
                             "name": "scriptURL",
@@ -12698,7 +12844,7 @@
                         },
                         {
                             "name": "registrationId",
-                            "type": "string"
+                            "$ref": "RegistrationID"
                         },
                         {
                             "name": "versionId",
@@ -12729,7 +12875,7 @@
                         },
                         {
                             "name": "registrationId",
-                            "type": "string"
+                            "$ref": "RegistrationID"
                         },
                         {
                             "name": "data",
@@ -12749,7 +12895,7 @@
                         },
                         {
                             "name": "registrationId",
-                            "type": "string"
+                            "$ref": "RegistrationID"
                         },
                         {
                             "name": "tag",

@@ -656,11 +656,17 @@ class GetPropertiesResult {
   /// Internal object properties (only of the element itself).
   final List<InternalPropertyDescriptor> internalProperties;
 
+  /// Object private properties.
+  final List<PrivatePropertyDescriptor> privateProperties;
+
   /// Exception details.
   final ExceptionDetails exceptionDetails;
 
   GetPropertiesResult(
-      {@required this.result, this.internalProperties, this.exceptionDetails});
+      {@required this.result,
+      this.internalProperties,
+      this.privateProperties,
+      this.exceptionDetails});
 
   factory GetPropertiesResult.fromJson(Map<String, dynamic> json) {
     return GetPropertiesResult(
@@ -670,6 +676,11 @@ class GetPropertiesResult {
       internalProperties: json.containsKey('internalProperties')
           ? (json['internalProperties'] as List)
               .map((e) => InternalPropertyDescriptor.fromJson(e))
+              .toList()
+          : null,
+      privateProperties: json.containsKey('privateProperties')
+          ? (json['privateProperties'] as List)
+              .map((e) => PrivatePropertyDescriptor.fromJson(e))
               .toList()
           : null,
       exceptionDetails: json.containsKey('exceptionDetails')
@@ -1155,6 +1166,32 @@ class InternalPropertyDescriptor {
     if (value != null) {
       json['value'] = value.toJson();
     }
+    return json;
+  }
+}
+
+/// Object private field descriptor.
+class PrivatePropertyDescriptor {
+  /// Private property name.
+  final String name;
+
+  /// The value associated with the private property.
+  final RemoteObject value;
+
+  PrivatePropertyDescriptor({@required this.name, @required this.value});
+
+  factory PrivatePropertyDescriptor.fromJson(Map<String, dynamic> json) {
+    return PrivatePropertyDescriptor(
+      name: json['name'],
+      value: RemoteObject.fromJson(json['value']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
+      'name': name,
+      'value': value.toJson(),
+    };
     return json;
   }
 }

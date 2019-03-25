@@ -236,14 +236,6 @@ class OverlayApi {
     };
     await _client.send('Overlay.setShowViewportSizeOnResize', parameters);
   }
-
-  /// [suspended] Whether overlay should be suspended and not consume any resources until resumed.
-  Future setSuspended(bool suspended) async {
-    var parameters = <String, dynamic>{
-      'suspended': suspended,
-    };
-    await _client.send('Overlay.setSuspended', parameters);
-  }
 }
 
 /// Configuration data for the highlighting of page elements.

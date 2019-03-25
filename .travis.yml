@@ -11,8 +11,7 @@ dart:
 dart_task:
 # TODO(xha): remove --concurrency=1 once we have a proper locking mecanism
  - test: --platform vm --concurrency=1
-# TODO(xha): add --fatal-infos once we are on Dart2
- - dartanalyzer: --fatal-warnings .
+ - dartanalyzer: --fatal-infos --fatal-warnings .
  - dartfmt
 
 branches:

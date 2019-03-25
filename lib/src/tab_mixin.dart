@@ -1,6 +1,7 @@
 import '../domains/accessibility.dart';
 import '../domains/animation.dart';
 import '../domains/application_cache.dart';
+import '../domains/background_service.dart';
 import '../domains/css.dart';
 import '../domains/cache_storage.dart';
 import '../domains/cast.dart';
@@ -48,6 +49,11 @@ abstract class TabMixin {
   ApplicationCacheApi get applicationCache =>
       _applicationCache ??= ApplicationCacheApi(session);
   ApplicationCacheApi _applicationCache;
+
+  /// Defines events for background web platform features.
+  BackgroundServiceApi get backgroundService =>
+      _backgroundService ??= BackgroundServiceApi(session);
+  BackgroundServiceApi _backgroundService;
 
   /// This domain exposes CSS read/write operations. All CSS objects (stylesheets, rules, and styles)
   /// have an associated `id` used in subsequent operations on the related object. Each object type has

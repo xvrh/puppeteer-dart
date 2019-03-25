@@ -161,12 +161,12 @@ import 'package:chrome_dev_tools/domains/dom_snapshot.dart';
 import 'utils.dart';
 
 main() {
-  chromeTab('https://www.google.com', (Tab tab) async {
+  chromeTab('https://www.w3.org', (Tab tab) async {
     // A small helper to wait until the network is quiet
     await tab.waitUntilNetworkIdle();
 
     // Take a snapshot of the DOM of the current page
-    // ignore: deprecated_member_use
+    // ignore: deprecated_member_use_from_same_package
     GetSnapshotResult result = await tab.domSnapshot.getSnapshot([]);
 
     // Iterate the nodes and output some HTML.
@@ -189,7 +189,7 @@ import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'utils.dart';
 
 main() {
-  chromeTab('https://www.google.com', (Tab tab) async {
+  chromeTab('https://www.w3.org', (Tab tab) async {
     // A small helper to wait until the network is quiet
     await tab.waitUntilNetworkIdle();
 

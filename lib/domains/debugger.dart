@@ -56,9 +56,15 @@ class DebuggerApi {
 
   /// Enables debugger for the given page. Clients should not assume that the debugging has been
   /// enabled until the result for this command is received.
+  /// [maxScriptsCacheSize] The maximum size in bytes of collected scripts (not referenced by other heap objects)
+  /// the debugger can hold. Puts no limit if paramter is omitted.
   /// Returns: Unique identifier of the debugger.
-  Future<runtime.UniqueDebuggerId> enable() async {
-    var result = await _client.send('Debugger.enable');
+  Future<runtime.UniqueDebuggerId> enable({num maxScriptsCacheSize}) async {
+    var parameters = <String, dynamic>{};
+    if (maxScriptsCacheSize != null) {
+      parameters['maxScriptsCacheSize'] = maxScriptsCacheSize;
+    }
+    var result = await _client.send('Debugger.enable', parameters);
     return runtime.UniqueDebuggerId.fromJson(result['debuggerId']);
   }
 
