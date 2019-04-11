@@ -132,7 +132,7 @@ main() {
   List<Domain> tabDomains = domains
       .where((d) =>
           !d.deprecated &&
-          !const ['Target', 'SystemInfo', 'Browser', 'IO', 'Audits']
+          !const ['SystemInfo', 'Browser', 'IO', 'Audits']
               .contains(d.name))
       .toList();
 

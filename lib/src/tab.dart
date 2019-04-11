@@ -1,15 +1,21 @@
 import 'dart:async';
+import 'package:chrome_dev_tools/domains/target.dart';
+
 import '../domains/runtime.dart';
-import 'connection.dart';
+import 'package:chrome_dev_tools/src/connection.dart';
 import 'tab_mixin.dart';
 import 'wait_until.dart' as helper;
 import 'remote_object.dart' as helper;
 
 class Tab extends Object with TabMixin {
+  final TargetID targetID;
+  final BrowserContextID _browserContextID;
+
   @override
   final Session session;
 
-  Tab(this.session);
+  Tab(this.targetID, this.session, {BrowserContextID browserContextID})
+      : _browserContextID = browserContextID;
 
   Future waitUntilNetworkIdle(
           {Duration idleDuration = const Duration(milliseconds: 1000),
@@ -27,7 +33,12 @@ class Tab extends Object with TabMixin {
   Future<dynamic> remoteObject(RemoteObject remoteObject) =>
       helper.remoteObject(runtime, remoteObject);
 
-  Future close() => session.close();
+  Future close() async {
+    await session.targetApi.closeTarget(targetID);
+    if (_browserContextID != null) {
+      await session.targetApi.disposeBrowserContext(_browserContextID);
+    }
+  }
 
   Future<dynamic> evaluate(String javascriptExpression) async {
     String javascriptFunction = '($javascriptExpression)';

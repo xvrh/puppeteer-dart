@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'domains/target.dart';
-import 'src/connection.dart';
+import 'package:chrome_dev_tools/src/connection.dart';
 import 'src/tab.dart';
 import 'package:logging/logging.dart';
 
@@ -111,25 +111,25 @@ class Chrome {
     }
   }
 
-  TargetApi get targets => connection.targets;
+  TargetApi get targetApi => connection.targetApi;
 
   Future<Tab> newTab(String url, {bool incognito = false}) async {
     BrowserContextID contextID;
     if (incognito) {
-      contextID = await targets.createBrowserContext();
+      contextID = await targetApi.createBrowserContext();
     }
 
     TargetID targetId =
-        await targets.createTarget(url, browserContextId: contextID);
+        await targetApi.createTarget(url, browserContextId: contextID);
     Session session =
         await connection.createSession(targetId, browserContextID: contextID);
 
-    return Tab(session);
+    return Tab(targetId, session, browserContextID: contextID);
   }
 
   Future closeAllTabs() async {
-    for (TargetInfo target in await targets.getTargets()) {
-      await targets.closeTarget(target.targetId);
+    for (TargetInfo target in await targetApi.getTargets()) {
+      await targetApi.closeTarget(target.targetId);
     }
   }
 

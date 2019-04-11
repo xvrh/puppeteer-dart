@@ -26,6 +26,7 @@ import '../domains/performance.dart';
 import '../domains/security.dart';
 import '../domains/service_worker.dart';
 import '../domains/storage.dart';
+import '../domains/target.dart';
 import '../domains/tethering.dart';
 import '../domains/tracing.dart';
 import '../domains/fetch.dart';
@@ -156,6 +157,10 @@ abstract class TabMixin {
 
   StorageApi get storage => _storage ??= StorageApi(session);
   StorageApi _storage;
+
+  /// Supports additional targets discovery and allows to attach to them.
+  TargetApi get target => _target ??= TargetApi(session);
+  TargetApi _target;
 
   /// The Tethering domain defines methods and events for browser port binding.
   TetheringApi get tethering => _tethering ??= TetheringApi(session);

@@ -29,28 +29,28 @@ class Connection implements Client {
   final List<Session> _sessions = [];
   final StreamController<Event> _eventController =
       StreamController<Event>.broadcast();
-  TargetApi _targets;
+  TargetApi _targetApi;
   final List<StreamSubscription> _subscriptions = [];
 
   Connection._(this._webSocket, this.url) {
     _subscriptions.add(_webSocket.listen(_onMessage));
 
-    _targets = TargetApi(this);
+    _targetApi = TargetApi(this);
 
-    _subscriptions.add(_targets.onReceivedMessageFromTarget
+    _subscriptions.add(_targetApi.onReceivedMessageFromTarget
         .listen((ReceivedMessageFromTargetEvent e) {
       Session session = _getSession(e.sessionId);
       session._onMessage(e.message);
     }));
     _subscriptions
-        .add(_targets.onDetachedFromTarget.listen((DetachedFromTargetEvent e) {
+        .add(_targetApi.onDetachedFromTarget.listen((DetachedFromTargetEvent e) {
       Session session = _getSession(e.sessionId);
       session._onClosed();
       _sessions.remove(session);
     }));
   }
 
-  TargetApi get targets => _targets;
+  TargetApi get targetApi => _targetApi;
 
   Session _getSession(SessionID sessionId) =>
       _sessions.firstWhere((s) => s.sessionId.value == sessionId.value);
@@ -80,9 +80,8 @@ class Connection implements Client {
 
   Future<Session> createSession(TargetID targetId,
       {BrowserContextID browserContextID}) async {
-    SessionID sessionId = await _targets.attachToTarget(targetId);
-    Session session = Session._(_targets, targetId, sessionId,
-        browserContextID: browserContextID);
+    SessionID sessionId = await _targetApi.attachToTarget(targetId);
+    Session session = Session(_targetApi, sessionId);
     _sessions.add(session);
 
     return session;
@@ -143,17 +142,13 @@ String _encodeMessage(int id, String method, Map<String, dynamic> parameters) {
 
 class Session implements Client {
   static int _lastId = 0;
-  final TargetID targetID;
   final SessionID sessionId;
-  final TargetApi _targetApi;
-  final BrowserContextID _browserContextID;
+  final TargetApi targetApi;
   final Map<int, Completer> _completers = {};
   final StreamController<Event> _eventController =
       StreamController<Event>.broadcast();
 
-  Session._(this._targetApi, this.targetID, this.sessionId,
-      {BrowserContextID browserContextID})
-      : _browserContextID = browserContextID;
+  Session(this.targetApi, this.sessionId);
 
   @override
   Future<Map> send(String method, [Map parameters]) {
@@ -166,7 +161,7 @@ class Session implements Client {
     var completer = Completer<Map>();
     _completers[id] = completer;
 
-    _targetApi.sendMessageToTarget(message, sessionId: sessionId);
+    targetApi.sendMessageToTarget(message, sessionId: sessionId);
 
     return completer.future;
   }
@@ -197,12 +192,5 @@ class Session implements Client {
       completer.completeError(Exception('Target closed'));
     }
     _completers.clear();
-  }
-
-  Future close() async {
-    await _targetApi.closeTarget(targetID);
-    if (_browserContextID != null) {
-      await _targetApi.disposeBrowserContext(_browserContextID);
-    }
   }
 }
