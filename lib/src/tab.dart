@@ -17,6 +17,8 @@ class Tab extends Object with TabMixin {
   Tab(this.targetID, this.session, {BrowserContextID browserContextID})
       : _browserContextID = browserContextID;
 
+  Future get onClose => session.onClose;
+
   Future waitUntilNetworkIdle(
           {Duration idleDuration = const Duration(milliseconds: 1000),
           int idleInFlight = 0}) =>

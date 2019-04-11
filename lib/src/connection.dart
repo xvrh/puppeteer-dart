@@ -147,6 +147,7 @@ class Session implements Client {
   final Map<int, Completer> _completers = {};
   final StreamController<Event> _eventController =
       StreamController<Event>.broadcast();
+  final Completer _onClose = Completer();
 
   Session(this.targetApi, this.sessionId);
 
@@ -186,11 +187,16 @@ class Session implements Client {
     }
   }
 
+  Future get onClose => _onClose.future;
+
+  bool get isClosed => _onClose.isCompleted;
+
   _onClosed() {
     _eventController.close();
     for (Completer completer in _completers.values) {
       completer.completeError(Exception('Target closed'));
     }
     _completers.clear();
+    _onClose.complete();
   }
 }
