@@ -81,18 +81,19 @@ class RequestEntriesResult {
   /// Array of object store data entries.
   final List<DataEntry> cacheDataEntries;
 
-  /// If true, there are more entries to fetch in the given range.
-  final bool hasMore;
+  /// Count of returned entries from this storage. If pathFilter is empty, it
+  /// is the count of all entries from this storage.
+  final num returnCount;
 
   RequestEntriesResult(
-      {@required this.cacheDataEntries, @required this.hasMore});
+      {@required this.cacheDataEntries, @required this.returnCount});
 
   factory RequestEntriesResult.fromJson(Map<String, dynamic> json) {
     return RequestEntriesResult(
       cacheDataEntries: (json['cacheDataEntries'] as List)
           .map((e) => DataEntry.fromJson(e))
           .toList(),
-      hasMore: json['hasMore'],
+      returnCount: json['returnCount'],
     );
   }
 }

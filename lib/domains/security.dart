@@ -102,9 +102,6 @@ class SecurityStateChangedEvent {
   /// `warning`, at least one corresponding explanation should be included.
   final List<SecurityStateExplanation> explanations;
 
-  /// Information about insecure content on the page.
-  final InsecureContentStatus insecureContentStatus;
-
   /// Overrides user-visible description of the state.
   final String summary;
 
@@ -112,7 +109,6 @@ class SecurityStateChangedEvent {
       {@required this.securityState,
       @required this.schemeIsCryptographic,
       @required this.explanations,
-      @required this.insecureContentStatus,
       this.summary});
 
   factory SecurityStateChangedEvent.fromJson(Map<String, dynamic> json) {
@@ -122,8 +118,6 @@ class SecurityStateChangedEvent {
       explanations: (json['explanations'] as List)
           .map((e) => SecurityStateExplanation.fromJson(e))
           .toList(),
-      insecureContentStatus:
-          InsecureContentStatus.fromJson(json['insecureContentStatus']),
       summary: json.containsKey('summary') ? json['summary'] : null,
     );
   }

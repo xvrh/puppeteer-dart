@@ -492,7 +492,7 @@ class NetworkApi {
     await _client.send('Network.setExtraHTTPHeaders', parameters);
   }
 
-  /// Sets the requests to intercept that match a the provided patterns and optionally resource types.
+  /// Sets the requests to intercept that match the provided patterns and optionally resource types.
   /// [patterns] Requests matching any of these patterns will be forwarded and wait for the corresponding
   /// continueInterceptedRequest call.
   Future setRequestInterception(List<RequestPattern> patterns) async {
@@ -697,6 +697,10 @@ class RequestInterceptedEvent {
   /// intercepting request or auth retry occurred.
   final Headers responseHeaders;
 
+  /// If the intercepted request had a corresponding requestWillBeSent event fired for it, then
+  /// this requestId will be the same as the requestId present in the requestWillBeSent event.
+  final RequestId requestId;
+
   RequestInterceptedEvent(
       {@required this.interceptionId,
       @required this.request,
@@ -708,7 +712,8 @@ class RequestInterceptedEvent {
       this.authChallenge,
       this.responseErrorReason,
       this.responseStatusCode,
-      this.responseHeaders});
+      this.responseHeaders,
+      this.requestId});
 
   factory RequestInterceptedEvent.fromJson(Map<String, dynamic> json) {
     return RequestInterceptedEvent(
@@ -730,6 +735,9 @@ class RequestInterceptedEvent {
           : null,
       responseHeaders: json.containsKey('responseHeaders')
           ? Headers.fromJson(json['responseHeaders'])
+          : null,
+      requestId: json.containsKey('requestId')
+          ? RequestId.fromJson(json['requestId'])
           : null,
     );
   }

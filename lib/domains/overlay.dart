@@ -373,11 +373,13 @@ class InspectMode {
       const InspectMode._('searchForUAShadowDOM');
   static const InspectMode captureAreaScreenshot =
       const InspectMode._('captureAreaScreenshot');
+  static const InspectMode showDistances = const InspectMode._('showDistances');
   static const InspectMode none = const InspectMode._('none');
   static const values = const {
     'searchForNode': searchForNode,
     'searchForUAShadowDOM': searchForUAShadowDOM,
     'captureAreaScreenshot': captureAreaScreenshot,
+    'showDistances': showDistances,
     'none': none,
   };
 
