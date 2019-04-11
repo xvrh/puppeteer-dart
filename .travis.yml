@@ -6,7 +6,6 @@ os:
 
 dart:
  - stable
- - dev
 
 dart_task:
 # TODO(xha): remove --concurrency=1 once we have a proper locking mecanism

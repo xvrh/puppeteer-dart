@@ -56,6 +56,8 @@ class TracingApi {
   /// [bufferUsageReportingInterval] If set, the agent will issue bufferUsage events at this interval, specified in milliseconds
   /// [transferMode] Whether to report trace events as series of dataCollected events or to save trace to a
   /// stream (defaults to `ReportEvents`).
+  /// [streamFormat] Trace data format to use. This only applies when using `ReturnAsStream`
+  /// transfer mode (defaults to `json`).
   /// [streamCompression] Compression format to use. This only applies when using `ReturnAsStream`
   /// transfer mode (defaults to `none`)
   Future start(
@@ -63,6 +65,7 @@ class TracingApi {
       @deprecated String options,
       num bufferUsageReportingInterval,
       String transferMode,
+      StreamFormat streamFormat,
       StreamCompression streamCompression,
       TraceConfig traceConfig}) async {
     var parameters = <String, dynamic>{};
@@ -81,6 +84,9 @@ class TracingApi {
     }
     if (transferMode != null) {
       parameters['transferMode'] = transferMode;
+    }
+    if (streamFormat != null) {
+      parameters['streamFormat'] = streamFormat.toJson();
     }
     if (streamCompression != null) {
       parameters['streamCompression'] = streamCompression.toJson();
@@ -119,15 +125,21 @@ class TracingCompleteEvent {
   /// A handle of the stream that holds resulting trace data.
   final io.StreamHandle stream;
 
+  /// Trace data format of returned stream.
+  final StreamFormat traceFormat;
+
   /// Compression format of returned stream.
   final StreamCompression streamCompression;
 
-  TracingCompleteEvent({this.stream, this.streamCompression});
+  TracingCompleteEvent({this.stream, this.traceFormat, this.streamCompression});
 
   factory TracingCompleteEvent.fromJson(Map<String, dynamic> json) {
     return TracingCompleteEvent(
       stream: json.containsKey('stream')
           ? io.StreamHandle.fromJson(json['stream'])
+          : null,
+      traceFormat: json.containsKey('traceFormat')
+          ? StreamFormat.fromJson(json['traceFormat'])
           : null,
       streamCompression: json.containsKey('streamCompression')
           ? StreamCompression.fromJson(json['streamCompression'])
@@ -265,6 +277,28 @@ class TraceConfig {
     }
     return json;
   }
+}
+
+/// Data format of a trace. Can be either the legacy JSON format or the
+/// protocol buffer format. Note that the JSON format will be deprecated soon.
+class StreamFormat {
+  static const StreamFormat json = const StreamFormat._('json');
+  static const StreamFormat proto = const StreamFormat._('proto');
+  static const values = const {
+    'json': json,
+    'proto': proto,
+  };
+
+  final String value;
+
+  const StreamFormat._(this.value);
+
+  factory StreamFormat.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// Compression type to use for traces returned via streams.

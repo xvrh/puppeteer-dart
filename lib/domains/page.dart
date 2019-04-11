@@ -42,6 +42,14 @@ class PageApi {
   Stream get onFrameResized =>
       _client.onEvent.where((Event event) => event.name == 'Page.frameResized');
 
+  /// Fired when a renderer-initiated navigation is requested.
+  /// Navigation may still be cancelled after the event is issued.
+  Stream<FrameRequestedNavigationEvent> get onFrameRequestedNavigation =>
+      _client.onEvent
+          .where((Event event) => event.name == 'Page.frameRequestedNavigation')
+          .map((Event event) =>
+              FrameRequestedNavigationEvent.fromJson(event.parameters));
+
   /// Fired when frame schedules a potential navigation.
   Stream<FrameScheduledNavigationEvent> get onFrameScheduledNavigation =>
       _client.onEvent
@@ -262,6 +270,11 @@ class PageApi {
   Future<GetAppManifestResult> getAppManifest() async {
     var result = await _client.send('Page.getAppManifest');
     return GetAppManifestResult.fromJson(result);
+  }
+
+  Future<List<String>> getInstallabilityErrors() async {
+    var result = await _client.send('Page.getInstallabilityErrors');
+    return (result['errors'] as List).map((e) => e as String).toList();
   }
 
   /// Returns all browser cookies. Depending on the backend support, will return detailed cookie
@@ -832,6 +845,28 @@ class FrameAttachedEvent {
       stack: json.containsKey('stack')
           ? runtime.StackTrace.fromJson(json['stack'])
           : null,
+    );
+  }
+}
+
+class FrameRequestedNavigationEvent {
+  /// Id of the frame that has scheduled a navigation.
+  final FrameId frameId;
+
+  /// The reason for the navigation.
+  final ClientNavigationReason reason;
+
+  /// The destination URL for the requested navigation.
+  final String url;
+
+  FrameRequestedNavigationEvent(
+      {@required this.frameId, @required this.reason, @required this.url});
+
+  factory FrameRequestedNavigationEvent.fromJson(Map<String, dynamic> json) {
+    return FrameRequestedNavigationEvent(
+      frameId: FrameId.fromJson(json['frameId']),
+      reason: ClientNavigationReason.fromJson(json['reason']),
+      url: json['url'],
     );
   }
 }
@@ -1864,4 +1899,41 @@ class FontSizes {
     }
     return json;
   }
+}
+
+class ClientNavigationReason {
+  static const ClientNavigationReason formSubmissionGet =
+      const ClientNavigationReason._('formSubmissionGet');
+  static const ClientNavigationReason formSubmissionPost =
+      const ClientNavigationReason._('formSubmissionPost');
+  static const ClientNavigationReason httpHeaderRefresh =
+      const ClientNavigationReason._('httpHeaderRefresh');
+  static const ClientNavigationReason scriptInitiated =
+      const ClientNavigationReason._('scriptInitiated');
+  static const ClientNavigationReason metaTagRefresh =
+      const ClientNavigationReason._('metaTagRefresh');
+  static const ClientNavigationReason pageBlockInterstitial =
+      const ClientNavigationReason._('pageBlockInterstitial');
+  static const ClientNavigationReason reload =
+      const ClientNavigationReason._('reload');
+  static const values = const {
+    'formSubmissionGet': formSubmissionGet,
+    'formSubmissionPost': formSubmissionPost,
+    'httpHeaderRefresh': httpHeaderRefresh,
+    'scriptInitiated': scriptInitiated,
+    'metaTagRefresh': metaTagRefresh,
+    'pageBlockInterstitial': pageBlockInterstitial,
+    'reload': reload,
+  };
+
+  final String value;
+
+  const ClientNavigationReason._(this.value);
+
+  factory ClientNavigationReason.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }

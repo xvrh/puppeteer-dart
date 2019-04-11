@@ -185,6 +185,10 @@ class RequestPausedEvent {
   /// Response headers if intercepted at the response stage.
   final List<HeaderEntry> responseHeaders;
 
+  /// If the intercepted request had a corresponding Network.requestWillBeSent event fired for it,
+  /// then this networkId will be the same as the requestId present in the requestWillBeSent event.
+  final RequestId networkId;
+
   RequestPausedEvent(
       {@required this.requestId,
       @required this.request,
@@ -192,7 +196,8 @@ class RequestPausedEvent {
       @required this.resourceType,
       this.responseErrorReason,
       this.responseStatusCode,
-      this.responseHeaders});
+      this.responseHeaders,
+      this.networkId});
 
   factory RequestPausedEvent.fromJson(Map<String, dynamic> json) {
     return RequestPausedEvent(
@@ -210,6 +215,9 @@ class RequestPausedEvent {
           ? (json['responseHeaders'] as List)
               .map((e) => HeaderEntry.fromJson(e))
               .toList()
+          : null,
+      networkId: json.containsKey('networkId')
+          ? RequestId.fromJson(json['networkId'])
           : null,
     );
   }
