@@ -11,7 +11,7 @@ class LifecycleWatcher {
   final Duration timeout;
   List<StreamSubscription> _subscriptions;
   LoaderId _initialLoaderId;
-  Request _navigationRequest;
+  NetworkRequest _navigationRequest;
   final Completer _sameDocumentNavigationCompleter = Completer(),
       _lifecycleCompleter = Completer(),
       _terminationCompleter = Completer(),
@@ -20,25 +20,29 @@ class LifecycleWatcher {
   bool _hasSameDocumentNavigation = false;
   Timer _timeoutTimer;
 
-  LifecycleWatcher(this.frameManager, this.frame, {this.waitUntil, this.timeout}) {
+  LifecycleWatcher(this.frameManager, this.frame,
+      {WaitUntil waitUntil, this.timeout})
+      : waitUntil = waitUntil ?? WaitUntil.load {
     _initialLoaderId = frame.loaderId;
 
     _subscriptions = [
-    frameManager.onLifecycleEvent.listen(_checkLifecycleComplete),
-    frameManager.onFrameNavigatedWithinDocument.listen(_navigatedWithinDocument),
-    frameManager.onFrameDetached.listen(_onFrameDetached),
-    frameManager.networkManager.onRequest.listen(_onRequest),
+      frameManager.onLifecycleEvent.listen(_checkLifecycleComplete),
+      frameManager.onFrameNavigatedWithinDocument
+          .listen(_navigatedWithinDocument),
+      frameManager.onFrameDetached.listen(_onFrameDetached),
+      frameManager.networkManager.onRequest.listen(_onRequest),
     ];
 
     _timeoutFuture = _createTimeoutFuture();
     _checkLifecycleComplete();
-
   }
 
   Future get timeoutOrTermination {
-    return Future.any([_timeoutFuture,
-    _terminationCompleter.future,
-    frameManager.page.client.onEvent.last]);
+    return Future.any([
+      _timeoutFuture,
+      _terminationCompleter.future,
+      frameManager.page.client.onEvent.last
+    ]);
   }
 
   Future get newDocumentNavigation => _newDocumentNavigationCompleter.future;
@@ -47,7 +51,7 @@ class LifecycleWatcher {
 
   Future get lifecycle => _lifecycleCompleter.future;
 
-  Future<NetworkResponse> get navigationResponse {
+  NetworkResponse get navigationResponse {
     return _navigationRequest != null ? _navigationRequest.response : null;
   }
 
@@ -60,7 +64,8 @@ class LifecycleWatcher {
 
   void _onFrameDetached(PageFrame frame) {
     if (this.frame == frame) {
-      _terminationCompleter.complete(new Exception('Navigating frame was detached'));
+      _terminationCompleter
+          .complete(new Exception('Navigating frame was detached'));
       return;
     }
     _checkLifecycleComplete();
@@ -70,40 +75,43 @@ class LifecycleWatcher {
     if (timeout == null || timeout == Duration.zero) {
       return Completer().future;
     }
-    var errorMessage = 'Navigation Timeout Exceeded: ${timeout.inMilliseconds}ms exceeded';
+    var errorMessage =
+        'Navigation Timeout Exceeded: ${timeout.inMilliseconds}ms exceeded';
     var completer = Completer();
-    _timeoutTimer = Timer(timeout, completer.complete);
+    _timeoutTimer = Timer(timeout, () => completer.complete(errorMessage));
     return completer.future;
   }
 
   void _navigatedWithinDocument(PageFrame frame) {
-    if (frame != this.frame)
-      return;
+    if (frame != this.frame) return;
     _hasSameDocumentNavigation = true;
     _checkLifecycleComplete();
   }
 
   _checkLifecycleComplete([_]) {
     // We expect navigation to commit.
-    if (!_checkLifecycle(frame))
+    if (!_checkLifecycle(frame)) return;
+
+    if (!_lifecycleCompleter.isCompleted) {
+      _lifecycleCompleter.complete();
+    }
+    if (frame.loaderId == _initialLoaderId && !_hasSameDocumentNavigation) {
       return;
-    _lifecycleCompleter.complete();
-    if (frame.loaderId == _initialLoaderId && !_hasSameDocumentNavigation)
-      return;
-    if (_hasSameDocumentNavigation)
+    }
+    if (_hasSameDocumentNavigation) {
       _sameDocumentNavigationCompleter.complete();
-    if (frame.loaderId != _initialLoaderId)
+    }
+    if (frame.loaderId != _initialLoaderId) {
       _newDocumentNavigationCompleter.complete();
+    }
   }
 
   bool _checkLifecycle(PageFrame frame) {
     for (var event in waitUntil._events) {
-      if (!frame.lifecycleEvents.contains(event))
-        return false;
+      if (!frame.lifecycleEvents.contains(event)) return false;
     }
     for (var child in frame.children) {
-    if (!_checkLifecycle(child))
-    return false;
+      if (!_checkLifecycle(child)) return false;
     }
     return true;
   }
@@ -112,7 +120,7 @@ class LifecycleWatcher {
     for (var subscription in _subscriptions) {
       subscription.cancel();
     }
-    _timeoutTimer.cancel();
+    _timeoutTimer?.cancel();
   }
 }
 
@@ -134,4 +142,3 @@ class WaitUntil {
     }
   }
 }
-

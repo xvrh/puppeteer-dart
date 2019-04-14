@@ -44,7 +44,7 @@ class FrameManager {
   }
 
   PageApi get _pageApi => page.tab.page;
-  PageApi get _runtimeApi => page.tab.page;
+  RuntimeApi get _runtimeApi => page.tab.runtime;
 
   NetworkManager get networkManager => _networkManager;
 
@@ -80,7 +80,9 @@ class FrameManager {
     _ensureIsolatedWorld(_utilityWorldName);
   }
 
-  Future<Response> navigateFrame(PageFrame frame, String url,
+  PageFrame frame(FrameId frameId) => _frames[frameId];
+
+  Future<NetworkResponse> navigateFrame(PageFrame frame, String url,
       {String referrer, Duration timeout, WaitUntil waitUntil}) async {
     var watcher =
         LifecycleWatcher(this, frame, waitUntil: waitUntil, timeout: timeout);
@@ -108,7 +110,7 @@ class FrameManager {
     return watcher.navigationResponse;
   }
 
-  Future<Response> waitForFrameNavigation(PageFrame frame,
+  Future<NetworkResponse> waitForFrameNavigation(PageFrame frame,
       {WaitUntil waitUntil, Duration timeout}) async {
     var watcher =
         LifecycleWatcher(this, frame, waitUntil: waitUntil, timeout: timeout);
@@ -328,11 +330,11 @@ class PageFrame {
 
   LoaderId get loaderId => _loaderId;
 
-  Future<Response> goto(String url, {String referrer, Duration timeout, WaitUntil waitUntil}) {
+  Future<NetworkResponse> goto(String url, {String referrer, Duration timeout, WaitUntil waitUntil}) {
     return frameManager.navigateFrame(this, url, referrer: referrer, timeout: timeout, waitUntil: waitUntil);
   }
 
-  Future<Response> waitForNavigation({Duration timeout, WaitUntil waitUntil}) {
+  Future<NetworkResponse> waitForNavigation({Duration timeout, WaitUntil waitUntil}) {
     return frameManager.waitForFrameNavigation(this, timeout: timeout, waitUntil: waitUntil);
   }
 

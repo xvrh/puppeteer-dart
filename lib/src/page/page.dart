@@ -12,6 +12,7 @@ import 'package:chrome_dev_tools/src/page/frame_manager.dart';
 import 'package:chrome_dev_tools/src/page/helper.dart';
 import 'package:chrome_dev_tools/src/page/js_handle.dart';
 import 'package:chrome_dev_tools/src/page/lifecycle_watcher.dart';
+import 'package:chrome_dev_tools/src/page/network_manager.dart';
 import 'package:chrome_dev_tools/src/page/worker.dart';
 import 'package:chrome_dev_tools/src/tab.dart';
 import 'package:meta/meta.dart';
@@ -265,7 +266,7 @@ class Page {
         .setContent(html, timeout: timeout, waitUntil: waitUntil);
   }
 
-  Future<Response> goto(String url,
+  Future<NetworkResponse> goto(String url,
       {String referrer, Duration timeout, WaitUntil waitUntil}) {
     return _frameManager.mainFrame
         .goto(url, referrer: referrer, timeout: timeout, waitUntil: waitUntil);

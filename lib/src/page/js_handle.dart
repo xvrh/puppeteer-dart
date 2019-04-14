@@ -24,19 +24,19 @@ class JsHandle {
 
   bool get isDisposed => _disposed;
 
-  Future<JsHandle> getProperty(String propertyName) async {
+  Future<JsHandle> property(String propertyName) async {
     var objectHandle = await context.evaluateHandle('''
 const result = {__proto__: null};
 result[propertyName] = object[propertyName];
 return result;
 ''', {'object': this, 'propertyName': propertyName});
-    var properties = await objectHandle.getProperties();
+    var properties = await objectHandle.properties;
     var result = properties[propertyName];
     await objectHandle.dispose();
     return result;
   }
 
-  Future<Map<String, JsHandle>> getProperties() async {
+  Future<Map<String, JsHandle>> get properties async {
     var response = await context.runtimeApi.getProperties(
         remoteObject.objectId, ownProperties: true);
     var result = <String, JsHandle>{};
