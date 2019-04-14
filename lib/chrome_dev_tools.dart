@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:chrome_dev_tools/src/page.dart';
+
 import 'domains/target.dart';
 import 'package:chrome_dev_tools/src/connection.dart';
 import 'src/tab.dart';
@@ -124,7 +126,19 @@ class Chrome {
     Session session =
         await connection.createSession(targetId, browserContextID: contextID);
 
-    return Tab(targetId, session, browserContextID: contextID);
+    var tab = Tab(targetId, session, browserContextID: contextID);
+    await Future.wait([
+      tab.network.enable(),
+      tab.log.enable(),
+      tab.runtime.enable(),
+    ]);
+
+    return tab;
+  }
+
+  Future<Page> newPage(String url, {bool incognito = false}) async {
+    Tab tab = await newTab(url, incognito: incognito);
+    return Page.create(tab);
   }
 
   Future closeAllTabs() async {

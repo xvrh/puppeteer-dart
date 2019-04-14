@@ -7,7 +7,7 @@ linter:
    - avoid_empty_else
    #- avoid_slow_async_io
    - cancel_subscriptions
-#   - close_sinks
+   - close_sinks
 #   - comment_references
    - control_flow_in_finally
    - empty_statements

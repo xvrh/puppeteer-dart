@@ -40,6 +40,7 @@ class Tab extends Object with TabMixin {
     if (_browserContextID != null) {
       await session.targetApi.disposeBrowserContext(_browserContextID);
     }
+    await onClose;
   }
 
   Future<dynamic> evaluate(String javascriptExpression) async {
