@@ -3,6 +3,7 @@ language: dart
 os:
  - linux
  - osx
+ - windows
 
 dart:
  - stable
