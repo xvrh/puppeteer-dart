@@ -73,11 +73,11 @@ class LifecycleWatcher {
 
   Future _createTimeoutFuture() {
     if (timeout == null || timeout == Duration.zero) {
-      return Completer().future;
+      return Completer<Exception>().future;
     }
     var errorMessage =
         'Navigation Timeout Exceeded: ${timeout.inMilliseconds}ms exceeded';
-    var completer = Completer();
+    var completer = Completer<Exception>();
     _timeoutTimer = Timer(timeout, () => completer.complete(Exception(errorMessage)));
     return completer.future;
   }

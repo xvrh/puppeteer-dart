@@ -32,27 +32,34 @@ class ExecutionContext {
   }
 
   Future<JsHandle> evaluateHandle(Js pageFunction, {List args}) async {
-    if (pageFunction.isExpression) {
-      assert(args == null);
-      var response = await runtimeApi.evaluate(pageFunction.toString(),
-          contextId: context.id,
-          returnByValue: false,
-          awaitPromise: true,
-          userGesture: true);
+    try {
+      if (pageFunction.isExpression) {
+        assert(args == null);
+        var response = await runtimeApi.evaluate(pageFunction.toString(),
+            contextId: context.id,
+            returnByValue: false,
+            awaitPromise: true,
+            userGesture: true);
 
-      return _createJsHandle(response.result);
-    } else {
-      args ??= [];
-      assert(args.length == pageFunction.declaredArguments.length);
+        return _createJsHandle(response.result);
+      } else {
+        args ??= [];
 
-      var result = await runtimeApi.callFunctionOn(pageFunction.toString(),
-          executionContextId: context.id,
-          arguments: args.map(_convertArgument).toList(),
-          returnByValue: false,
-          awaitPromise: true,
-          userGesture: true);
+        var result = await runtimeApi.callFunctionOn(pageFunction.toString(),
+            executionContextId: context.id,
+            arguments: args.map(_convertArgument).toList(),
+            returnByValue: false,
+            awaitPromise: true,
+            userGesture: true);
 
-      return _createJsHandle(result.result);
+        return _createJsHandle(result.result);
+      }
+    } on ServerException catch (e) {
+      if (e.message.contains('Cannot find context with specified id') ||
+          e.message.contains('Execution context was destroyed')) {
+        throw ExecutionContextDestroyedException();
+      }
+      rethrow;
     }
   }
 
@@ -149,4 +156,10 @@ ${_async ? 'async ' : ''}function(${declaredArguments.join(', ')}) {
 }''';
     }
   }
+}
+
+class ExecutionContextDestroyedException implements Exception {
+  @override
+  toString() =>
+      'Execution context was destroyed, most likely because of a navigation.';
 }

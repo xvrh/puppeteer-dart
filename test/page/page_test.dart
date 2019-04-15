@@ -8,12 +8,10 @@ import 'package:shelf_static/shelf_static.dart';
 import 'package:test/test.dart';
 import 'package:shelf/shelf_io.dart' as io;
 
-
 main() {
   Logger.root
     ..level = Level.ALL
     ..onRecord.listen(print);
-
 
   HttpServer server;
   Chrome chrome;
@@ -36,7 +34,40 @@ main() {
   test('Go to', () async {
     await page.goto('${serverPrefix}simple.html');
     var input = await page.$('#one-input');
-    expect(await (await input.property('value')).jsonValue, equals('some text'));
+    expect(
+        await (await input.property('value')).jsonValue, equals('some text'));
     expect(await input.propertyValue('value'), equals('some text'));
+  });
+
+  test('Wait for selector', () async {
+    var found = false;
+    var waitFor = page.waitForSelector('div').then((_) => found = true);
+    await page.goto('${serverPrefix}empty.html');
+    expect(found, isFalse);
+    await page.goto('${serverPrefix}grid.html');
+    await waitFor;
+    expect(found, isTrue);
+  });
+
+  final Js addElement = Js.function(['tag'],
+      'return document.body.appendChild(document.createElement(tag));');
+
+  test('should immediately resolve promise if node exists', () async {
+    await page.goto('${serverPrefix}empty.html');
+    var frame = page.mainFrame;
+    await frame.waitForSelector('*');
+    await frame.evaluate(addElement, args: ['div']);
+    await frame.waitForSelector('div');
+  });
+
+  test('should resolve promise when node is added', () async {
+    await page.goto('${serverPrefix}empty.html');
+    var frame = page.mainFrame;
+    var watchdog = frame.waitForSelector('div');
+    await frame.evaluate(addElement, args: ['br']);
+    await frame.evaluate(addElement, args: ['div']);
+    var eHandle = await watchdog;
+    var tagName = await eHandle.propertyValue('tagName');
+    expect(tagName, equals('DIV'));
   });
 }

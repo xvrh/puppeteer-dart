@@ -99,7 +99,7 @@ class Connection implements Client {
 
       Map error = object['error'];
       if (error != null) {
-        completer.completeError(Exception(error['message']));
+        completer.completeError(ServerException(error['message']));
       } else {
         completer.complete(object['result']);
       }
@@ -116,7 +116,7 @@ class Connection implements Client {
   Future dispose() async {
     await _eventController.close();
     for (Completer completer in _completers.values) {
-      completer.completeError(Exception('Target closed'));
+      completer.completeError(TargetClosedException());
     }
     _completers.clear();
 
@@ -178,7 +178,7 @@ class Session implements Client {
       Completer completer = _completers.remove(id);
       Map error = object['error'];
       if (error != null) {
-        completer.completeError(Exception(error['message']));
+        completer.completeError(ServerException(error['message']));
       } else {
         completer.complete(object['result']);
       }
@@ -194,9 +194,21 @@ class Session implements Client {
   _onClosed() {
     _eventController.close();
     for (Completer completer in _completers.values) {
-      completer.completeError(Exception('Target closed'));
+      completer.completeError(TargetClosedException());
     }
     _completers.clear();
     _onClose.complete();
   }
+}
+
+class ServerException implements Exception {
+  final String message;
+
+  ServerException(this.message);
+
+  @override
+  toString() => message;
+}
+
+class TargetClosedException implements Exception {
 }

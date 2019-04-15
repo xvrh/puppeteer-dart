@@ -45,6 +45,7 @@ class FrameManager {
   }
 
   PageApi get _pageApi => page.tab.page;
+
   RuntimeApi get _runtimeApi => page.tab.runtime;
 
   NetworkManager get networkManager => _networkManager;
@@ -257,8 +258,9 @@ class FrameManager {
       }
     }
     if (contextPayload.auxData != null &&
-        contextPayload.auxData['type'] == 'isolated')
+        contextPayload.auxData['type'] == 'isolated') {
       _isolatedWorlds.add(contextPayload.name);
+    }
     var context = new ExecutionContext(page.client, contextPayload, world);
     if (world != null) {
       world.setContext(context);
@@ -331,12 +333,16 @@ class PageFrame {
 
   LoaderId get loaderId => _loaderId;
 
-  Future<NetworkResponse> goto(String url, {String referrer, Duration timeout, WaitUntil waitUntil}) {
-    return frameManager.navigateFrame(this, url, referrer: referrer, timeout: timeout, waitUntil: waitUntil);
+  Future<NetworkResponse> goto(String url,
+      {String referrer, Duration timeout, WaitUntil waitUntil}) {
+    return frameManager.navigateFrame(this, url,
+        referrer: referrer, timeout: timeout, waitUntil: waitUntil);
   }
 
-  Future<NetworkResponse> waitForNavigation({Duration timeout, WaitUntil waitUntil}) {
-    return frameManager.waitForFrameNavigation(this, timeout: timeout, waitUntil: waitUntil);
+  Future<NetworkResponse> waitForNavigation(
+      {Duration timeout, WaitUntil waitUntil}) {
+    return frameManager.waitForFrameNavigation(this,
+        timeout: timeout, waitUntil: waitUntil);
   }
 
   Future<ExecutionContext> get executionContext {
@@ -344,11 +350,11 @@ class PageFrame {
   }
 
   Future<JsHandle> evaluateHandle(Js pageFunction, {List args}) {
-  return _mainWorld.evaluateHandle(pageFunction, args: args);
+    return _mainWorld.evaluateHandle(pageFunction, args: args);
   }
 
   Future evaluate(Js pageFunction, {List args}) {
-  return _mainWorld.evaluate(pageFunction, args: args);
+    return _mainWorld.evaluate(pageFunction, args: args);
   }
 
   Future<ElementHandle> $(String selector) {
@@ -360,11 +366,11 @@ class PageFrame {
   }
 
   Future $eval(String selector, Js pageFunction, {List args}) {
-  return _mainWorld.$eval(selector, pageFunction, args: args);
+    return _mainWorld.$eval(selector, pageFunction, args: args);
   }
 
   Future $$eval(String selector, Js pageFunction, {List args}) {
-  return _mainWorld.$$eval(selector, pageFunction, args: args);
+    return _mainWorld.$$eval(selector, pageFunction, args: args);
   }
 
   Future<List<ElementHandle>> $$(String selector) {
@@ -376,19 +382,24 @@ class PageFrame {
   }
 
   Future setContent(String html, {Duration timeout, WaitUntil waitUntil}) {
-  return _secondaryWorld.setContent(html, timeout: timeout, waitUntil: waitUntil);
+    return _secondaryWorld.setContent(html,
+        timeout: timeout, waitUntil: waitUntil);
   }
 
-  Future<ElementHandle> addScriptTag({String url, File file, String content, String type}) {
-    return _mainWorld.addScriptTag(url: url, file: file, content: content, type: type);
+  Future<ElementHandle> addScriptTag(
+      {String url, File file, String content, String type}) {
+    return _mainWorld.addScriptTag(
+        url: url, file: file, content: content, type: type);
   }
 
   Future<ElementHandle> addStyleTag({String url, File file, String content}) {
     return _mainWorld.addStyleTag(url: url, file: file, content: content);
   }
 
-  Future click(String selector, {Duration delay, MouseButton button, int clickCount}) {
-    return _secondaryWorld.click(selector, delay: delay, button: button, clickCount: clickCount);
+  Future click(String selector,
+      {Duration delay, MouseButton button, int clickCount}) {
+    return _secondaryWorld.click(selector,
+        delay: delay, button: button, clickCount: clickCount);
   }
 
   Future focus(String selector) {
@@ -399,8 +410,8 @@ class PageFrame {
     return _secondaryWorld.hover(selector);
   }
 
-  Future<List<String>> select(selector, List<String> values){
-  return _secondaryWorld.select(selector, values);
+  Future<List<String>> select(selector, List<String> values) {
+    return _secondaryWorld.select(selector, values);
   }
 
   Future tap(String selector) {
@@ -411,8 +422,10 @@ class PageFrame {
     return _mainWorld.type(selector, text, delay: delay);
   }
 
-  Future<ElementHandle> waitForSelector(String selector, {bool visible, bool hidden, Duration timeout}) async {
-    var handle = await _secondaryWorld.waitForSelector(selector, visible: visible, hidden: hidden, timeout: timeout);
+  Future<ElementHandle> waitForSelector(String selector,
+      {bool visible, bool hidden, Duration timeout}) async {
+    var handle = await _secondaryWorld.waitForSelector(selector,
+        visible: visible, hidden: hidden, timeout: timeout);
     if (handle == null) {
       return null;
     }
@@ -422,9 +435,10 @@ class PageFrame {
     return result;
   }
 
-
-  Future<ElementHandle> waitForXPath(String xpath, {bool visible, bool hidden, Duration timeout}) async {
-    var handle = await _secondaryWorld.waitForXPath(xpath, visible: visible, hidden: hidden, timeout: timeout);
+  Future<ElementHandle> waitForXPath(String xpath,
+      {bool visible, bool hidden, Duration timeout}) async {
+    var handle = await _secondaryWorld.waitForXPath(xpath,
+        visible: visible, hidden: hidden, timeout: timeout);
     if (handle == null) {
       return null;
     }
@@ -434,8 +448,11 @@ class PageFrame {
     return result;
   }
 
-  Future<JsHandle> waitForFunction(String pageFunction, Map<String, dynamic> args, {Duration timeout, Polling polling}) {
-  return _mainWorld.waitForFunction(pageFunction, args, timeout: timeout, polling: polling);
+  Future<JsHandle> waitForFunction(
+      String pageFunction, Map<String, dynamic> args,
+      {Duration timeout, Polling polling}) {
+    return _mainWorld.waitForFunction(pageFunction, args,
+        timeout: timeout, polling: polling);
   }
 
   Future<String> get title {

@@ -474,7 +474,7 @@ class Page {
    * @return {!Promise<!Array<string>>}
    */
   Future select(selector, List<String> values) {
-    return this.mainFrame.select(selector, values);
+    return mainFrame.select(selector, values);
   }
 
   /**
@@ -493,11 +493,6 @@ class Page {
     return mainFrame.type(selector, text, delay: delay);
   }
 
-  /**
-   * @param {string} selector
-   * @param {!{visible?: boolean, hidden?: boolean, timeout?: number}=} options
-   * @return {!Promise<?Puppeteer.ElementHandle>}
-   */
   Future<ElementHandle> waitForSelector(String selector,
       {bool visible, bool hidden, Duration timeout}) {
     return mainFrame.waitForSelector(selector,

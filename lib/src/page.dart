@@ -5,3 +5,4 @@ export 'page/lifecycle_watcher.dart' show WaitUntil;
 export 'page/js_handle.dart' show JsHandle, ElementHandle;
 export 'page/frame_manager.dart' show PageFrame;
 export 'page/dom_world.dart' show Polling, MouseButton;
+export 'page/execution_context.dart' show Js;

@@ -5,6 +5,7 @@ import 'package:chrome_dev_tools/src/page/execution_context.dart';
 import 'package:chrome_dev_tools/src/page/frame_manager.dart';
 import 'package:chrome_dev_tools/src/page/js_handle.dart';
 import 'package:chrome_dev_tools/src/page/lifecycle_watcher.dart';
+import 'package:meta/meta.dart';
 
 class DomWorld {
   final FrameManager frameManager;
@@ -20,8 +21,6 @@ class DomWorld {
 
   void setContext(ExecutionContext context) {
     if (context != null) {
-      assert(_contextCompleter != null);
-
       _contextCompleter.complete(context);
 
       for (var waitTask in _waitTasks) {
@@ -296,31 +295,266 @@ return options.filter(option => option.selected).map(option => option.value);
 
   Future<ElementHandle> waitForSelector(String selector,
       {bool visible, bool hidden, Duration timeout}) {
-
+    return _waitForSelectorOrXPath(selector,
+        isXPath: false, visible: visible, hidden: hidden, timeout: timeout);
   }
 
   Future<ElementHandle> waitForXPath(String xpath,
-      {bool visible, bool hidden, Duration timeout}) {}
+      {bool visible, bool hidden, Duration timeout}) {
+    return _waitForSelectorOrXPath(xpath,
+        isXPath: true, visible: visible, hidden: hidden, timeout: timeout);
+  }
 
   Future<JsHandle> waitForFunction(
       String pageFunction, Map<String, dynamic> args,
       {Duration timeout, Polling polling}) {}
 
-  Future<String> get title => evaluate(Js.function([], 'return document.title;'));
+  static final Js _predicate = Js.function(
+      ['selectorOrXPath', 'isXPath', 'waitForVisible', 'waitForHidden'], '''
+const node = isXPath
+  ? document.evaluate(selectorOrXPath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
+  : document.querySelector(selectorOrXPath);
+if (!node)
+  return waitForHidden;
+if (!waitForVisible && !waitForHidden)
+  return node;
+const element = /** @type {Element} */ (node.nodeType === Node.TEXT_NODE ? node.parentElement : node);
+
+const style = window.getComputedStyle(element);
+const isVisible = style && style.visibility !== 'hidden' && hasVisibleBoundingBox();
+const success = (waitForVisible === isVisible || waitForHidden === !isVisible);
+return success ? node : null;
+
+/**
+ * @return {boolean}
+ */
+function hasVisibleBoundingBox() {
+  const rect = element.getBoundingClientRect();
+  return !!(rect.top || rect.bottom || rect.width || rect.height);
+}      
+''');
+
+  Future<ElementHandle> _waitForSelectorOrXPath(String selectorOrXPath,
+      {bool isXPath = false,
+      bool visible,
+      bool hidden,
+      Duration timeout}) async {
+    bool waitForVisible = visible ?? false;
+    bool waitForHidden = hidden ?? false;
+    timeout ??= frameManager.page.defaultTimeout;
+
+    var polling =
+        waitForVisible || waitForHidden ? Polling.raf() : Polling.mutation();
+    var title =
+        '${isXPath ? 'XPath' : 'selector'} "$selectorOrXPath"${waitForHidden ? ' to be hidden' : ''}';
+    var waitTask = new WaitTask(this, _predicate,
+        title: title,
+        polling: polling,
+        timeout: timeout,
+        predicateArgs: [
+          selectorOrXPath,
+          isXPath,
+          waitForVisible,
+          waitForHidden
+        ]);
+    var handle = await waitTask.future;
+    if (handle.asElement == null) {
+      await handle.dispose();
+      return null;
+    }
+    return handle.asElement;
+  }
+
+  Future<String> get title =>
+      evaluate(Js.function([], 'return document.title;'));
 }
 
 class WaitTask {
-  rerun() {}
+  final DomWorld domWorld;
+  final Js predicate;
+  final String title;
+  final Polling polling;
+  final Duration timeout;
+  final List predicateArgs;
+  final _completer = Completer<JsHandle>();
+  int _runCount = 0;
+  Timer _timeoutTimer;
+  bool _terminated = false;
 
-  terminate(Exception exception) {}
+  WaitTask(this.domWorld, this.predicate,
+      {@required this.title,
+      @required this.polling,
+      @required this.timeout,
+      @required this.predicateArgs})
+      : assert(polling != null) {
+    domWorld._waitTasks.add(this);
+
+    // Since page navigation requires us to re-install the pageScript, we should track
+    // timeout on our end.
+    if (timeout != null) {
+      var timeoutError = Exception(
+          'waiting for $title failed: timeout ${timeout.inMilliseconds}ms exceeded');
+      _timeoutTimer = Timer(timeout, () => terminate(timeoutError));
+    }
+    rerun();
+  }
+
+  Future<JsHandle> get future => _completer.future;
+
+  void terminate(Exception error) {
+    _terminated = true;
+    _completer.completeError(error);
+    _cleanup();
+  }
+
+  Future rerun() async {
+    var runCount = ++_runCount;
+    try {
+      List args = [
+        'return ($predicate)(...args)',
+        polling.value,
+        timeout.inMilliseconds
+      ];
+      if (predicateArgs != null) {
+        args.addAll(predicateArgs);
+      }
+      JsHandle success = await domWorld
+          .evaluateHandle(_waitForPredicatePageFunction, args: args);
+
+      if (_terminated || runCount != _runCount) {
+        if (success != null) {
+          await success.dispose();
+        }
+        return;
+      }
+
+      // Ignore timeouts in pageScript - we track timeouts ourselves.
+      // If the frame's execution context has already changed, `frame.evaluate` will
+      // throw an error - ignore this predicate run altogether.
+      if (await (domWorld.evaluate(Js.function(['s'], 'return !s'),
+          args: [success]).catchError((_) => true))) {
+        await success.dispose();
+        return;
+      }
+
+      _completer.complete(success);
+    } on Exception catch (error) {
+      // When the page is navigated, the promise is rejected.
+      // We will try again in the new execution context.
+      if (error is ExecutionContextDestroyedException) {
+        return;
+      }
+
+      _completer.completeError(error);
+    }
+
+    _cleanup();
+  }
+
+  _cleanup() {
+    _timeoutTimer.cancel();
+    domWorld._waitTasks.remove(this);
+  }
 }
 
+final Js _waitForPredicatePageFunction =
+    Js.function(['predicateBody', 'polling', 'timeout', '...args'], '''
+  const predicate = new Function('...args', predicateBody);
+  let timedOut = false;
+  if (timeout)
+    setTimeout(() => timedOut = true, timeout);
+  if (polling === 'raf')
+    return await pollRaf();
+  if (polling === 'mutation')
+    return await pollMutation();
+  if (typeof polling === 'number')
+    return await pollInterval(polling);
+
+  /**
+   * @return {!Promise<*>}
+   */
+  function pollMutation() {
+    const success = predicate.apply(null, args);
+    if (success)
+      return Promise.resolve(success);
+
+    let fulfill;
+    const result = new Promise(x => fulfill = x);
+    const observer = new MutationObserver(mutations => {
+      if (timedOut) {
+        observer.disconnect();
+        fulfill();
+      }
+      const success = predicate.apply(null, args);
+      if (success) {
+        observer.disconnect();
+        fulfill(success);
+      }
+    });
+    observer.observe(document, {
+      childList: true,
+      subtree: true,
+      attributes: true
+    });
+    return result;
+  }
+
+  /**
+   * @return {!Promise<*>}
+   */
+  function pollRaf() {
+    let fulfill;
+    const result = new Promise(x => fulfill = x);
+    onRaf();
+    return result;
+
+    function onRaf() {
+      if (timedOut) {
+        fulfill();
+        return;
+      }
+      const success = predicate.apply(null, args);
+      if (success)
+        fulfill(success);
+      else
+        requestAnimationFrame(onRaf);
+    }
+  }
+
+  /**
+   * @param {number} pollInterval
+   * @return {!Promise<*>}
+   */
+  function pollInterval(pollInterval) {
+    let fulfill;
+    const result = new Promise(x => fulfill = x);
+    onTimeout();
+    return result;
+
+    function onTimeout() {
+      if (timedOut) {
+        fulfill();
+        return;
+      }
+      const success = predicate.apply(null, args);
+      if (success)
+        fulfill(success);
+      else
+        setTimeout(onTimeout, pollInterval);
+    }
+  }
+''', isAsync: true);
+
 class Polling {
-  Polling.raf();
+  dynamic _value;
 
-  Polling.mutation();
+  Polling.raf() : _value = 'raf';
 
-  Polling.interval(Duration duration);
+  Polling.mutation() : _value = 'mutation';
+
+  Polling.interval(Duration duration) : _value = duration.inMilliseconds;
+
+  get value => _value;
 }
 
 enum MouseButton { left, right, middle }

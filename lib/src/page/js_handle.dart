@@ -88,7 +88,7 @@ return result;
   @override
   String toString() {
     if (remoteObject.objectId != null) {
-      var type = remoteObject.subtype ?? remoteObject.type;
+      String type = remoteObject.subtype?.value ?? remoteObject.type?.value;
       return 'JSHandle@' + type;
     }
     return 'JSHandle:' + valueFromRemoteObject(remoteObject);
