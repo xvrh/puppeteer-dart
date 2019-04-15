@@ -437,6 +437,13 @@ class StyleSheetOrigin {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is StyleSheetOrigin && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -1114,6 +1121,13 @@ class CSSMediaSource {
   factory CSSMediaSource.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is CSSMediaSource && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

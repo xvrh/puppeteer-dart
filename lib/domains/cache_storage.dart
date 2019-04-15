@@ -148,6 +148,13 @@ class CachedResponseType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is CachedResponseType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 

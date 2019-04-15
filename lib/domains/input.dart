@@ -456,6 +456,13 @@ class GestureSourceType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is GestureSourceType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 

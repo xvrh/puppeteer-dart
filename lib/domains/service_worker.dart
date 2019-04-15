@@ -189,6 +189,14 @@ class ServiceWorkerVersionRunningStatus {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is ServiceWorkerVersionRunningStatus && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -221,6 +229,14 @@ class ServiceWorkerVersionStatus {
   factory ServiceWorkerVersionStatus.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ServiceWorkerVersionStatus && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

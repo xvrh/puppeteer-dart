@@ -361,6 +361,13 @@ class KeyType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is KeyType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -494,6 +501,13 @@ class KeyPathType {
   factory KeyPathType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is KeyPathType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

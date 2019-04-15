@@ -1108,7 +1108,7 @@ class ResourceType {
   static const ResourceType font = const ResourceType._('Font');
   static const ResourceType script = const ResourceType._('Script');
   static const ResourceType textTrack = const ResourceType._('TextTrack');
-  static const ResourceType xHR = const ResourceType._('XHR');
+  static const ResourceType xhr = const ResourceType._('XHR');
   static const ResourceType fetch = const ResourceType._('Fetch');
   static const ResourceType eventSource = const ResourceType._('EventSource');
   static const ResourceType webSocket = const ResourceType._('WebSocket');
@@ -1116,7 +1116,7 @@ class ResourceType {
   static const ResourceType signedExchange =
       const ResourceType._('SignedExchange');
   static const ResourceType ping = const ResourceType._('Ping');
-  static const ResourceType cSPViolationReport =
+  static const ResourceType cspViolationReport =
       const ResourceType._('CSPViolationReport');
   static const ResourceType other = const ResourceType._('Other');
   static const values = const {
@@ -1127,14 +1127,14 @@ class ResourceType {
     'Font': font,
     'Script': script,
     'TextTrack': textTrack,
-    'XHR': xHR,
+    'XHR': xhr,
     'Fetch': fetch,
     'EventSource': eventSource,
     'WebSocket': webSocket,
     'Manifest': manifest,
     'SignedExchange': signedExchange,
     'Ping': ping,
-    'CSPViolationReport': cSPViolationReport,
+    'CSPViolationReport': cspViolationReport,
     'Other': other,
   };
 
@@ -1145,6 +1145,13 @@ class ResourceType {
   factory ResourceType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ResourceType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1265,6 +1272,13 @@ class ErrorReason {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is ErrorReason && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -1363,6 +1377,13 @@ class ConnectionType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is ConnectionType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -1383,6 +1404,13 @@ class CookieSameSite {
   factory CookieSameSite.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is CookieSameSite && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1525,6 +1553,13 @@ class ResourcePriority {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is ResourcePriority && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -1652,6 +1687,14 @@ class RequestReferrerPolicy {
   factory RequestReferrerPolicy.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is RequestReferrerPolicy && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1852,6 +1895,14 @@ class CertificateTransparencyCompliance {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is CertificateTransparencyCompliance && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -1887,6 +1938,13 @@ class BlockedReason {
   factory BlockedReason.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is BlockedReason && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -2284,6 +2342,13 @@ class InitiatorType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is InitiatorType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -2518,6 +2583,13 @@ class AuthChallengeSource {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is AuthChallengeSource && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -2583,6 +2655,14 @@ class AuthChallengeResponseResponse {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is AuthChallengeResponseResponse && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -2604,6 +2684,13 @@ class InterceptionStage {
   factory InterceptionStage.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is InterceptionStage && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -2802,6 +2889,14 @@ class SignedExchangeErrorField {
   factory SignedExchangeErrorField.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is SignedExchangeErrorField && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

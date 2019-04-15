@@ -1488,6 +1488,13 @@ class TransitionType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is TransitionType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -1619,6 +1626,13 @@ class DialogType {
   factory DialogType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is DialogType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1950,6 +1964,14 @@ class ClientNavigationReason {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is ClientNavigationReason && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -1986,6 +2008,14 @@ class FrameScheduledNavigationEventReason {
       values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is FrameScheduledNavigationEventReason && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

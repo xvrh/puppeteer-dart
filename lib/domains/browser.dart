@@ -241,6 +241,13 @@ class WindowState {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is WindowState && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -354,6 +361,13 @@ class PermissionType {
   factory PermissionType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is PermissionType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

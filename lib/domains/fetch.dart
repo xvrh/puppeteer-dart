@@ -317,6 +317,13 @@ class RequestStage {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is RequestStage && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -446,6 +453,13 @@ class AuthChallengeSource {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is AuthChallengeSource && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -509,6 +523,14 @@ class AuthChallengeResponseResponse {
   factory AuthChallengeResponseResponse.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is AuthChallengeResponseResponse && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

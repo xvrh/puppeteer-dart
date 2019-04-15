@@ -201,15 +201,15 @@ class Animation {
 }
 
 class AnimationType {
-  static const AnimationType cSSTransition =
+  static const AnimationType cssTransition =
       const AnimationType._('CSSTransition');
-  static const AnimationType cSSAnimation =
+  static const AnimationType cssAnimation =
       const AnimationType._('CSSAnimation');
   static const AnimationType webAnimation =
       const AnimationType._('WebAnimation');
   static const values = const {
-    'CSSTransition': cSSTransition,
-    'CSSAnimation': cSSAnimation,
+    'CSSTransition': cssTransition,
+    'CSSAnimation': cssAnimation,
     'WebAnimation': webAnimation,
   };
 
@@ -220,6 +220,13 @@ class AnimationType {
   factory AnimationType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is AnimationType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

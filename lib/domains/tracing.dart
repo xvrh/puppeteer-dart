@@ -309,6 +309,14 @@ class TraceConfigRecordMode {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is TraceConfigRecordMode && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -331,6 +339,13 @@ class StreamFormat {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is StreamFormat && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -350,6 +365,13 @@ class StreamCompression {
   factory StreamCompression.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is StreamCompression && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

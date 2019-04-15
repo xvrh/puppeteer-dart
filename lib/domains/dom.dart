@@ -1090,6 +1090,13 @@ class PseudoType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is PseudoType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -1111,6 +1118,13 @@ class ShadowRootType {
   factory ShadowRootType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ShadowRootType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

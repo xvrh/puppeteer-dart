@@ -135,6 +135,13 @@ class ConsoleMessageSource {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is ConsoleMessageSource && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -160,6 +167,13 @@ class ConsoleMessageLevel {
   factory ConsoleMessageLevel.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ConsoleMessageLevel && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

@@ -240,6 +240,13 @@ class ScrollRectType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is ScrollRectType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 

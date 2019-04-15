@@ -1081,6 +1081,13 @@ class ScopeType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is ScopeType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -1175,12 +1182,19 @@ class BreakLocationType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is BreakLocationType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
 class PausedEventReason {
-  static const PausedEventReason xHR = const PausedEventReason._('XHR');
-  static const PausedEventReason dOM = const PausedEventReason._('DOM');
+  static const PausedEventReason xhr = const PausedEventReason._('XHR');
+  static const PausedEventReason dom = const PausedEventReason._('DOM');
   static const PausedEventReason eventListener =
       const PausedEventReason._('EventListener');
   static const PausedEventReason exception =
@@ -1190,19 +1204,19 @@ class PausedEventReason {
       const PausedEventReason._('debugCommand');
   static const PausedEventReason promiseRejection =
       const PausedEventReason._('promiseRejection');
-  static const PausedEventReason oOM = const PausedEventReason._('OOM');
+  static const PausedEventReason oom = const PausedEventReason._('OOM');
   static const PausedEventReason other = const PausedEventReason._('other');
   static const PausedEventReason ambiguous =
       const PausedEventReason._('ambiguous');
   static const values = const {
-    'XHR': xHR,
-    'DOM': dOM,
+    'XHR': xhr,
+    'DOM': dom,
     'EventListener': eventListener,
     'exception': exception,
     'assert': assert$,
     'debugCommand': debugCommand,
     'promiseRejection': promiseRejection,
-    'OOM': oOM,
+    'OOM': oom,
     'other': other,
     'ambiguous': ambiguous,
   };
@@ -1214,6 +1228,13 @@ class PausedEventReason {
   factory PausedEventReason.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is PausedEventReason && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

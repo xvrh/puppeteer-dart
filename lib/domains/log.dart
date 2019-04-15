@@ -184,6 +184,13 @@ class LogEntrySource {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is LogEntrySource && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -206,6 +213,13 @@ class LogEntryLevel {
   factory LogEntryLevel.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is LogEntryLevel && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -246,7 +260,7 @@ class ViolationSettingName {
       const ViolationSettingName._('blockedEvent');
   static const ViolationSettingName blockedParser =
       const ViolationSettingName._('blockedParser');
-  static const ViolationSettingName discouragedAPIUse =
+  static const ViolationSettingName discouragedApiUse =
       const ViolationSettingName._('discouragedAPIUse');
   static const ViolationSettingName handler =
       const ViolationSettingName._('handler');
@@ -257,7 +271,7 @@ class ViolationSettingName {
     'longLayout': longLayout,
     'blockedEvent': blockedEvent,
     'blockedParser': blockedParser,
-    'discouragedAPIUse': discouragedAPIUse,
+    'discouragedAPIUse': discouragedApiUse,
     'handler': handler,
     'recurringHandler': recurringHandler,
   };
@@ -269,6 +283,13 @@ class ViolationSettingName {
   factory ViolationSettingName.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ViolationSettingName && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

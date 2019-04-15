@@ -902,6 +902,13 @@ class RemoteObjectType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is RemoteObjectType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -913,7 +920,7 @@ class RemoteObjectSubtype {
       const RemoteObjectSubtype._('regexp');
   static const RemoteObjectSubtype date = const RemoteObjectSubtype._('date');
   static const RemoteObjectSubtype map = const RemoteObjectSubtype._('map');
-  static const RemoteObjectSubtype set$ = const RemoteObjectSubtype._('set');
+  static const RemoteObjectSubtype set = const RemoteObjectSubtype._('set');
   static const RemoteObjectSubtype weakmap =
       const RemoteObjectSubtype._('weakmap');
   static const RemoteObjectSubtype weakset =
@@ -939,7 +946,7 @@ class RemoteObjectSubtype {
     'regexp': regexp,
     'date': date,
     'map': map,
-    'set': set$,
+    'set': set,
     'weakmap': weakmap,
     'weakset': weakset,
     'iterator': iterator,
@@ -959,6 +966,13 @@ class RemoteObjectSubtype {
   factory RemoteObjectSubtype.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is RemoteObjectSubtype && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1093,6 +1107,13 @@ class ObjectPreviewType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is ObjectPreviewType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -1106,7 +1127,7 @@ class ObjectPreviewSubtype {
       const ObjectPreviewSubtype._('regexp');
   static const ObjectPreviewSubtype date = const ObjectPreviewSubtype._('date');
   static const ObjectPreviewSubtype map = const ObjectPreviewSubtype._('map');
-  static const ObjectPreviewSubtype set$ = const ObjectPreviewSubtype._('set');
+  static const ObjectPreviewSubtype set = const ObjectPreviewSubtype._('set');
   static const ObjectPreviewSubtype weakmap =
       const ObjectPreviewSubtype._('weakmap');
   static const ObjectPreviewSubtype weakset =
@@ -1124,7 +1145,7 @@ class ObjectPreviewSubtype {
     'regexp': regexp,
     'date': date,
     'map': map,
-    'set': set$,
+    'set': set,
     'weakmap': weakmap,
     'weakset': weakset,
     'iterator': iterator,
@@ -1139,6 +1160,13 @@ class ObjectPreviewSubtype {
   factory ObjectPreviewSubtype.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ObjectPreviewSubtype && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1239,6 +1267,13 @@ class PropertyPreviewType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is PropertyPreviewType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -1255,7 +1290,7 @@ class PropertyPreviewSubtype {
       const PropertyPreviewSubtype._('date');
   static const PropertyPreviewSubtype map =
       const PropertyPreviewSubtype._('map');
-  static const PropertyPreviewSubtype set$ =
+  static const PropertyPreviewSubtype set =
       const PropertyPreviewSubtype._('set');
   static const PropertyPreviewSubtype weakmap =
       const PropertyPreviewSubtype._('weakmap');
@@ -1274,7 +1309,7 @@ class PropertyPreviewSubtype {
     'regexp': regexp,
     'date': date,
     'map': map,
-    'set': set$,
+    'set': set,
     'weakmap': weakmap,
     'weakset': weakset,
     'iterator': iterator,
@@ -1289,6 +1324,14 @@ class PropertyPreviewSubtype {
   factory PropertyPreviewSubtype.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is PropertyPreviewSubtype && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1925,6 +1968,14 @@ class ConsoleAPICalledEventType {
   factory ConsoleAPICalledEventType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ConsoleAPICalledEventType && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

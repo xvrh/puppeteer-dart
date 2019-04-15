@@ -349,6 +349,14 @@ class ScreenOrientationType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is ScreenOrientationType && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -374,6 +382,13 @@ class VirtualTimePolicy {
   factory VirtualTimePolicy.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is VirtualTimePolicy && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

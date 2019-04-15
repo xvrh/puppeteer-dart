@@ -148,6 +148,13 @@ class DOMBreakpointType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is DOMBreakpointType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 

@@ -129,6 +129,13 @@ class AXValueType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is AXValueType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -161,6 +168,13 @@ class AXValueSourceType {
   factory AXValueSourceType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is AXValueSourceType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -202,6 +216,14 @@ class AXValueNativeSourceType {
   factory AXValueNativeSourceType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is AXValueNativeSourceType && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -512,6 +534,13 @@ class AXPropertyName {
   factory AXPropertyName.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is AXPropertyName && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

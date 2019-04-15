@@ -148,9 +148,7 @@ abstract class TabMixin {
 ''');
 
   for (Domain domain in tabDomains) {
-    String camelizedName = firstLetterLower(splitWords(domain.name)
-        .map((w) => firstLetterUpper(w.toLowerCase()))
-        .join());
+    String camelizedName = firstLetterLower(_camelizeName(domain.name));
 
     tabBuffer.writeln(toComment(domain.description, indent: 2));
     tabBuffer.writeln('${domain.name}Api get $camelizedName =>  '
@@ -167,23 +165,6 @@ abstract class TabMixin {
 final DartFormatter _dartFormatter =
     DartFormatter(lineEnding: Platform.isWindows ? '\r\n' : '\n');
 
-const Set<String> _dartKeywords = const {
-  'abstract', 'deferred', 'if', 'super',
-  'as', 'do', 'implements', 'switch',
-  'assert', 'dynamic', 'import', 'sync',
-  'async', 'else', 'in', 'this',
-  'enum', 'is', 'throw',
-  'await', 'export', 'library', 'true',
-  'break', 'external', 'new', 'try',
-  'case', 'extends', 'null', 'typedef',
-  'catch', 'factory', 'operator', 'var',
-  'class', 'false', 'part', 'void',
-  'const', 'final', 'rethrow', 'while',
-  'continue', 'finally', 'return', 'with',
-  'covariant', 'for', 'set', 'yield',
-  'default', 'get', 'static' //
-};
-
 _writeDartFile(String target, String code) {
   try {
     String formattedCode = _dartFormatter.format(code);
@@ -195,8 +176,14 @@ _writeDartFile(String target, String code) {
   }
 }
 
-_underscoreize(String input) {
+String _underscoreize(String input) {
   return splitWords(input).map((String part) => part.toLowerCase()).join('_');
+}
+
+String _camelizeName(String input) {
+  return splitWords(input)
+      .map((w) => firstLetterUpper(w.toLowerCase()))
+      .join();
 }
 
 class _Command {
@@ -580,7 +567,7 @@ class _InternalType {
       }
     }
 
-    if (!hasProperties && enumValues == null) {
+    if (!hasProperties) {
       //TODO(xha): generate operator== and hashcode also for complex type?
       code.writeln();
       code.writeln('@override');
@@ -589,14 +576,12 @@ class _InternalType {
       code.writeln();
       code.writeln('@override');
       code.writeln('int get hashCode => value.hashCode;');
-    }
-
-    if (!hasProperties) {
       code.writeln();
+
+      //TODO(xha): generate a readable toString() method for the complex type
       code.writeln('@override');
       code.writeln('String toString() => value.toString();');
     }
-    //TODO(xha): generate a readable toString() method for the complex type
 
     code.writeln('}');
 
@@ -613,13 +598,8 @@ class _InternalType {
 
   static String _normalizeEnumValue(String input) {
     input = _sanitizeName(input);
-    String normalizedValue = splitWords(input).map(firstLetterUpper).join('');
-    normalizedValue = firstLetterLower(normalizedValue);
+    String normalizedValue = firstLetterLower(_camelizeName(input));
     normalizedValue = preventKeywords(normalizedValue);
-
-    if (_dartKeywords.contains(normalizedValue)) {
-      return '$normalizedValue\$';
-    }
 
     return normalizedValue;
   }
