@@ -175,7 +175,11 @@ class PageApi {
   /// [fromSurface] Capture the screenshot from the surface, rather than the view. Defaults to true.
   /// Returns: Base64-encoded image data.
   Future<String> captureScreenshot(
-      {String format, int quality, Viewport clip, bool fromSurface}) async {
+      {@Enum(['jpeg', 'png']) String format,
+      int quality,
+      Viewport clip,
+      bool fromSurface}) async {
+    assert(format == null || const ['jpeg', 'png'].contains(format));
     var parameters = <String, dynamic>{};
     if (format != null) {
       parameters['format'] = format;
@@ -197,7 +201,8 @@ class PageApi {
   /// iframes, shadow DOM, external resources, and element-inline styles.
   /// [format] Format (defaults to mhtml).
   /// Returns: Serialized page data.
-  Future<String> captureSnapshot({String format}) async {
+  Future<String> captureSnapshot({@Enum(['mhtml']) String format}) async {
+    assert(format == null || const ['mhtml'].contains(format));
     var parameters = <String, dynamic>{};
     if (format != null) {
       parameters['format'] = format;
@@ -666,7 +671,10 @@ class PageApi {
   /// [behavior] Whether to allow all or deny all download requests, or use default Chrome behavior if
   /// available (otherwise deny).
   /// [downloadPath] The default path to save downloaded files to. This is requred if behavior is set to 'allow'
-  Future setDownloadBehavior(String behavior, {String downloadPath}) async {
+  Future setDownloadBehavior(
+      @Enum(['deny', 'allow', 'default']) String behavior,
+      {String downloadPath}) async {
+    assert(const ['deny', 'allow', 'default'].contains(behavior));
     var parameters = <String, dynamic>{
       'behavior': behavior,
     };
@@ -710,7 +718,10 @@ class PageApi {
   /// [enabled] Whether the touch event emulation should be enabled.
   /// [configuration] Touch/gesture events configuration. Default: current platform.
   @deprecated
-  Future setTouchEmulationEnabled(bool enabled, {String configuration}) async {
+  Future setTouchEmulationEnabled(bool enabled,
+      {@Enum(['mobile', 'desktop']) String configuration}) async {
+    assert(configuration == null ||
+        const ['mobile', 'desktop'].contains(configuration));
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
@@ -727,11 +738,12 @@ class PageApi {
   /// [maxHeight] Maximum screenshot height.
   /// [everyNthFrame] Send every n-th frame.
   Future startScreencast(
-      {String format,
+      {@Enum(['jpeg', 'png']) String format,
       int quality,
       int maxWidth,
       int maxHeight,
       int everyNthFrame}) async {
+    assert(format == null || const ['jpeg', 'png'].contains(format));
     var parameters = <String, dynamic>{};
     if (format != null) {
       parameters['format'] = format;
@@ -770,7 +782,8 @@ class PageApi {
   /// It will transition the page to the given state according to:
   /// https://github.com/WICG/web-lifecycle/
   /// [state] Target lifecycle state
-  Future setWebLifecycleState(String state) async {
+  Future setWebLifecycleState(@Enum(['frozen', 'active']) String state) async {
+    assert(const ['frozen', 'active'].contains(state));
     var parameters = <String, dynamic>{
       'state': state,
     };
@@ -880,7 +893,7 @@ class FrameScheduledNavigationEvent {
   final num delay;
 
   /// The reason for the navigation.
-  final String reason;
+  final FrameScheduledNavigationEventReason reason;
 
   /// The destination URL for the scheduled navigation.
   final String url;
@@ -895,7 +908,7 @@ class FrameScheduledNavigationEvent {
     return FrameScheduledNavigationEvent(
       frameId: FrameId.fromJson(json['frameId']),
       delay: json['delay'],
-      reason: json['reason'],
+      reason: FrameScheduledNavigationEventReason.fromJson(json['reason']),
       url: json['url'],
     );
   }
@@ -1186,7 +1199,8 @@ class FrameId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is FrameId && other.value == value;
+  bool operator ==(other) =>
+      (other is FrameId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -1417,7 +1431,8 @@ class ScriptIdentifier {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is ScriptIdentifier && other.value == value;
+  bool operator ==(other) =>
+      (other is ScriptIdentifier && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -1471,6 +1486,13 @@ class TransitionType {
   factory TransitionType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is TransitionType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1604,6 +1626,13 @@ class DialogType {
   factory DialogType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is DialogType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1933,6 +1962,60 @@ class ClientNavigationReason {
   factory ClientNavigationReason.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ClientNavigationReason && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class FrameScheduledNavigationEventReason {
+  static const FrameScheduledNavigationEventReason formSubmissionGet =
+      const FrameScheduledNavigationEventReason._('formSubmissionGet');
+  static const FrameScheduledNavigationEventReason formSubmissionPost =
+      const FrameScheduledNavigationEventReason._('formSubmissionPost');
+  static const FrameScheduledNavigationEventReason httpHeaderRefresh =
+      const FrameScheduledNavigationEventReason._('httpHeaderRefresh');
+  static const FrameScheduledNavigationEventReason scriptInitiated =
+      const FrameScheduledNavigationEventReason._('scriptInitiated');
+  static const FrameScheduledNavigationEventReason metaTagRefresh =
+      const FrameScheduledNavigationEventReason._('metaTagRefresh');
+  static const FrameScheduledNavigationEventReason pageBlockInterstitial =
+      const FrameScheduledNavigationEventReason._('pageBlockInterstitial');
+  static const FrameScheduledNavigationEventReason reload =
+      const FrameScheduledNavigationEventReason._('reload');
+  static const values = const {
+    'formSubmissionGet': formSubmissionGet,
+    'formSubmissionPost': formSubmissionPost,
+    'httpHeaderRefresh': httpHeaderRefresh,
+    'scriptInitiated': scriptInitiated,
+    'metaTagRefresh': metaTagRefresh,
+    'pageBlockInterstitial': pageBlockInterstitial,
+    'reload': reload,
+  };
+
+  final String value;
+
+  const FrameScheduledNavigationEventReason._(this.value);
+
+  factory FrameScheduledNavigationEventReason.fromJson(String value) =>
+      values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is FrameScheduledNavigationEventReason && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

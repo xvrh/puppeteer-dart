@@ -64,10 +64,12 @@ class TracingApi {
       {@deprecated String categories,
       @deprecated String options,
       num bufferUsageReportingInterval,
-      String transferMode,
+      @Enum(['ReportEvents', 'ReturnAsStream']) String transferMode,
       StreamFormat streamFormat,
       StreamCompression streamCompression,
       TraceConfig traceConfig}) async {
+    assert(transferMode == null ||
+        const ['ReportEvents', 'ReturnAsStream'].contains(transferMode));
     var parameters = <String, dynamic>{};
     // ignore: deprecated_member_use
     if (categories != null) {
@@ -176,7 +178,8 @@ class MemoryDumpConfig {
   Map toJson() => value;
 
   @override
-  bool operator ==(other) => other is MemoryDumpConfig && other.value == value;
+  bool operator ==(other) =>
+      (other is MemoryDumpConfig && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -187,7 +190,7 @@ class MemoryDumpConfig {
 
 class TraceConfig {
   /// Controls how the trace buffer stores data.
-  final String recordMode;
+  final TraceConfigRecordMode recordMode;
 
   /// Turns on JavaScript stack sampling.
   final bool enableSampling;
@@ -222,7 +225,9 @@ class TraceConfig {
 
   factory TraceConfig.fromJson(Map<String, dynamic> json) {
     return TraceConfig(
-      recordMode: json.containsKey('recordMode') ? json['recordMode'] : null,
+      recordMode: json.containsKey('recordMode')
+          ? TraceConfigRecordMode.fromJson(json['recordMode'])
+          : null,
       enableSampling:
           json.containsKey('enableSampling') ? json['enableSampling'] : null,
       enableSystrace:
@@ -279,6 +284,42 @@ class TraceConfig {
   }
 }
 
+class TraceConfigRecordMode {
+  static const TraceConfigRecordMode recordUntilFull =
+      const TraceConfigRecordMode._('recordUntilFull');
+  static const TraceConfigRecordMode recordContinuously =
+      const TraceConfigRecordMode._('recordContinuously');
+  static const TraceConfigRecordMode recordAsMuchAsPossible =
+      const TraceConfigRecordMode._('recordAsMuchAsPossible');
+  static const TraceConfigRecordMode echoToConsole =
+      const TraceConfigRecordMode._('echoToConsole');
+  static const values = const {
+    'recordUntilFull': recordUntilFull,
+    'recordContinuously': recordContinuously,
+    'recordAsMuchAsPossible': recordAsMuchAsPossible,
+    'echoToConsole': echoToConsole,
+  };
+
+  final String value;
+
+  const TraceConfigRecordMode._(this.value);
+
+  factory TraceConfigRecordMode.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is TraceConfigRecordMode && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Data format of a trace. Can be either the legacy JSON format or the
 /// protocol buffer format. Note that the JSON format will be deprecated soon.
 class StreamFormat {
@@ -296,6 +337,13 @@ class StreamFormat {
   factory StreamFormat.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is StreamFormat && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -317,6 +365,13 @@ class StreamCompression {
   factory StreamCompression.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is StreamCompression && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

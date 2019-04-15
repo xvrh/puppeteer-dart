@@ -462,7 +462,7 @@ class BindingCalledEvent {
 
 class ConsoleAPICalledEvent {
   /// Type of the call.
-  final String type;
+  final ConsoleAPICalledEventType type;
 
   /// Call arguments.
   final List<RemoteObject> args;
@@ -493,7 +493,7 @@ class ConsoleAPICalledEvent {
 
   factory ConsoleAPICalledEvent.fromJson(Map<String, dynamic> json) {
     return ConsoleAPICalledEvent(
-      type: json['type'],
+      type: ConsoleAPICalledEventType.fromJson(json['type']),
       args:
           (json['args'] as List).map((e) => RemoteObject.fromJson(e)).toList(),
       executionContextId:
@@ -722,7 +722,8 @@ class ScriptId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is ScriptId && other.value == value;
+  bool operator ==(other) =>
+      (other is ScriptId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -742,7 +743,8 @@ class RemoteObjectId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is RemoteObjectId && other.value == value;
+  bool operator ==(other) =>
+      (other is RemoteObjectId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -765,7 +767,7 @@ class UnserializableValue {
 
   @override
   bool operator ==(other) =>
-      other is UnserializableValue && other.value == value;
+      (other is UnserializableValue && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -777,10 +779,10 @@ class UnserializableValue {
 /// Mirror object referencing original JavaScript object.
 class RemoteObject {
   /// Object type.
-  final String type;
+  final RemoteObjectType type;
 
   /// Object subtype hint. Specified for `object` type values only.
-  final String subtype;
+  final RemoteObjectSubtype subtype;
 
   /// Object class (constructor) name. Specified for `object` type values only.
   final String className;
@@ -816,8 +818,10 @@ class RemoteObject {
 
   factory RemoteObject.fromJson(Map<String, dynamic> json) {
     return RemoteObject(
-      type: json['type'],
-      subtype: json.containsKey('subtype') ? json['subtype'] : null,
+      type: RemoteObjectType.fromJson(json['type']),
+      subtype: json.containsKey('subtype')
+          ? RemoteObjectSubtype.fromJson(json['subtype'])
+          : null,
       className: json.containsKey('className') ? json['className'] : null,
       value: json.containsKey('value') ? json['value'] : null,
       unserializableValue: json.containsKey('unserializableValue')
@@ -847,7 +851,7 @@ class RemoteObject {
       json['className'] = className;
     }
     if (value != null) {
-      json['value'] = value.toJson();
+      json['value'] = value;
     }
     if (unserializableValue != null) {
       json['unserializableValue'] = unserializableValue.toJson();
@@ -866,6 +870,112 @@ class RemoteObject {
     }
     return json;
   }
+}
+
+class RemoteObjectType {
+  static const RemoteObjectType object = const RemoteObjectType._('object');
+  static const RemoteObjectType function = const RemoteObjectType._('function');
+  static const RemoteObjectType undefined =
+      const RemoteObjectType._('undefined');
+  static const RemoteObjectType string = const RemoteObjectType._('string');
+  static const RemoteObjectType number = const RemoteObjectType._('number');
+  static const RemoteObjectType boolean = const RemoteObjectType._('boolean');
+  static const RemoteObjectType symbol = const RemoteObjectType._('symbol');
+  static const RemoteObjectType bigint = const RemoteObjectType._('bigint');
+  static const values = const {
+    'object': object,
+    'function': function,
+    'undefined': undefined,
+    'string': string,
+    'number': number,
+    'boolean': boolean,
+    'symbol': symbol,
+    'bigint': bigint,
+  };
+
+  final String value;
+
+  const RemoteObjectType._(this.value);
+
+  factory RemoteObjectType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is RemoteObjectType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class RemoteObjectSubtype {
+  static const RemoteObjectSubtype array = const RemoteObjectSubtype._('array');
+  static const RemoteObjectSubtype null$ = const RemoteObjectSubtype._('null');
+  static const RemoteObjectSubtype node = const RemoteObjectSubtype._('node');
+  static const RemoteObjectSubtype regexp =
+      const RemoteObjectSubtype._('regexp');
+  static const RemoteObjectSubtype date = const RemoteObjectSubtype._('date');
+  static const RemoteObjectSubtype map = const RemoteObjectSubtype._('map');
+  static const RemoteObjectSubtype set = const RemoteObjectSubtype._('set');
+  static const RemoteObjectSubtype weakmap =
+      const RemoteObjectSubtype._('weakmap');
+  static const RemoteObjectSubtype weakset =
+      const RemoteObjectSubtype._('weakset');
+  static const RemoteObjectSubtype iterator =
+      const RemoteObjectSubtype._('iterator');
+  static const RemoteObjectSubtype generator =
+      const RemoteObjectSubtype._('generator');
+  static const RemoteObjectSubtype error = const RemoteObjectSubtype._('error');
+  static const RemoteObjectSubtype proxy = const RemoteObjectSubtype._('proxy');
+  static const RemoteObjectSubtype promise =
+      const RemoteObjectSubtype._('promise');
+  static const RemoteObjectSubtype typedarray =
+      const RemoteObjectSubtype._('typedarray');
+  static const RemoteObjectSubtype arraybuffer =
+      const RemoteObjectSubtype._('arraybuffer');
+  static const RemoteObjectSubtype dataview =
+      const RemoteObjectSubtype._('dataview');
+  static const values = const {
+    'array': array,
+    'null': null$,
+    'node': node,
+    'regexp': regexp,
+    'date': date,
+    'map': map,
+    'set': set,
+    'weakmap': weakmap,
+    'weakset': weakset,
+    'iterator': iterator,
+    'generator': generator,
+    'error': error,
+    'proxy': proxy,
+    'promise': promise,
+    'typedarray': typedarray,
+    'arraybuffer': arraybuffer,
+    'dataview': dataview,
+  };
+
+  final String value;
+
+  const RemoteObjectSubtype._(this.value);
+
+  factory RemoteObjectSubtype.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is RemoteObjectSubtype && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }
 
 class CustomPreview {
@@ -903,10 +1013,10 @@ class CustomPreview {
 /// Object containing abbreviated remote object value.
 class ObjectPreview {
   /// Object type.
-  final String type;
+  final ObjectPreviewType type;
 
   /// Object subtype hint. Specified for `object` type values only.
-  final String subtype;
+  final ObjectPreviewSubtype subtype;
 
   /// String representation of the object.
   final String description;
@@ -930,8 +1040,10 @@ class ObjectPreview {
 
   factory ObjectPreview.fromJson(Map<String, dynamic> json) {
     return ObjectPreview(
-      type: json['type'],
-      subtype: json.containsKey('subtype') ? json['subtype'] : null,
+      type: ObjectPreviewType.fromJson(json['type']),
+      subtype: json.containsKey('subtype')
+          ? ObjectPreviewSubtype.fromJson(json['subtype'])
+          : null,
       description: json.containsKey('description') ? json['description'] : null,
       overflow: json['overflow'],
       properties: (json['properties'] as List)
@@ -964,12 +1076,108 @@ class ObjectPreview {
   }
 }
 
+class ObjectPreviewType {
+  static const ObjectPreviewType object = const ObjectPreviewType._('object');
+  static const ObjectPreviewType function =
+      const ObjectPreviewType._('function');
+  static const ObjectPreviewType undefined =
+      const ObjectPreviewType._('undefined');
+  static const ObjectPreviewType string = const ObjectPreviewType._('string');
+  static const ObjectPreviewType number = const ObjectPreviewType._('number');
+  static const ObjectPreviewType boolean = const ObjectPreviewType._('boolean');
+  static const ObjectPreviewType symbol = const ObjectPreviewType._('symbol');
+  static const ObjectPreviewType bigint = const ObjectPreviewType._('bigint');
+  static const values = const {
+    'object': object,
+    'function': function,
+    'undefined': undefined,
+    'string': string,
+    'number': number,
+    'boolean': boolean,
+    'symbol': symbol,
+    'bigint': bigint,
+  };
+
+  final String value;
+
+  const ObjectPreviewType._(this.value);
+
+  factory ObjectPreviewType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ObjectPreviewType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class ObjectPreviewSubtype {
+  static const ObjectPreviewSubtype array =
+      const ObjectPreviewSubtype._('array');
+  static const ObjectPreviewSubtype null$ =
+      const ObjectPreviewSubtype._('null');
+  static const ObjectPreviewSubtype node = const ObjectPreviewSubtype._('node');
+  static const ObjectPreviewSubtype regexp =
+      const ObjectPreviewSubtype._('regexp');
+  static const ObjectPreviewSubtype date = const ObjectPreviewSubtype._('date');
+  static const ObjectPreviewSubtype map = const ObjectPreviewSubtype._('map');
+  static const ObjectPreviewSubtype set = const ObjectPreviewSubtype._('set');
+  static const ObjectPreviewSubtype weakmap =
+      const ObjectPreviewSubtype._('weakmap');
+  static const ObjectPreviewSubtype weakset =
+      const ObjectPreviewSubtype._('weakset');
+  static const ObjectPreviewSubtype iterator =
+      const ObjectPreviewSubtype._('iterator');
+  static const ObjectPreviewSubtype generator =
+      const ObjectPreviewSubtype._('generator');
+  static const ObjectPreviewSubtype error =
+      const ObjectPreviewSubtype._('error');
+  static const values = const {
+    'array': array,
+    'null': null$,
+    'node': node,
+    'regexp': regexp,
+    'date': date,
+    'map': map,
+    'set': set,
+    'weakmap': weakmap,
+    'weakset': weakset,
+    'iterator': iterator,
+    'generator': generator,
+    'error': error,
+  };
+
+  final String value;
+
+  const ObjectPreviewSubtype._(this.value);
+
+  factory ObjectPreviewSubtype.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ObjectPreviewSubtype && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 class PropertyPreview {
   /// Property name.
   final String name;
 
   /// Object type. Accessor means that the property itself is an accessor property.
-  final String type;
+  final PropertyPreviewType type;
 
   /// User-friendly property value string.
   final String value;
@@ -978,7 +1186,7 @@ class PropertyPreview {
   final ObjectPreview valuePreview;
 
   /// Object subtype hint. Specified for `object` type values only.
-  final String subtype;
+  final PropertyPreviewSubtype subtype;
 
   PropertyPreview(
       {@required this.name,
@@ -990,12 +1198,14 @@ class PropertyPreview {
   factory PropertyPreview.fromJson(Map<String, dynamic> json) {
     return PropertyPreview(
       name: json['name'],
-      type: json['type'],
+      type: PropertyPreviewType.fromJson(json['type']),
       value: json.containsKey('value') ? json['value'] : null,
       valuePreview: json.containsKey('valuePreview')
           ? ObjectPreview.fromJson(json['valuePreview'])
           : null,
-      subtype: json.containsKey('subtype') ? json['subtype'] : null,
+      subtype: json.containsKey('subtype')
+          ? PropertyPreviewSubtype.fromJson(json['subtype'])
+          : null,
     );
   }
 
@@ -1015,6 +1225,116 @@ class PropertyPreview {
     }
     return json;
   }
+}
+
+class PropertyPreviewType {
+  static const PropertyPreviewType object =
+      const PropertyPreviewType._('object');
+  static const PropertyPreviewType function =
+      const PropertyPreviewType._('function');
+  static const PropertyPreviewType undefined =
+      const PropertyPreviewType._('undefined');
+  static const PropertyPreviewType string =
+      const PropertyPreviewType._('string');
+  static const PropertyPreviewType number =
+      const PropertyPreviewType._('number');
+  static const PropertyPreviewType boolean =
+      const PropertyPreviewType._('boolean');
+  static const PropertyPreviewType symbol =
+      const PropertyPreviewType._('symbol');
+  static const PropertyPreviewType accessor =
+      const PropertyPreviewType._('accessor');
+  static const PropertyPreviewType bigint =
+      const PropertyPreviewType._('bigint');
+  static const values = const {
+    'object': object,
+    'function': function,
+    'undefined': undefined,
+    'string': string,
+    'number': number,
+    'boolean': boolean,
+    'symbol': symbol,
+    'accessor': accessor,
+    'bigint': bigint,
+  };
+
+  final String value;
+
+  const PropertyPreviewType._(this.value);
+
+  factory PropertyPreviewType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is PropertyPreviewType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class PropertyPreviewSubtype {
+  static const PropertyPreviewSubtype array =
+      const PropertyPreviewSubtype._('array');
+  static const PropertyPreviewSubtype null$ =
+      const PropertyPreviewSubtype._('null');
+  static const PropertyPreviewSubtype node =
+      const PropertyPreviewSubtype._('node');
+  static const PropertyPreviewSubtype regexp =
+      const PropertyPreviewSubtype._('regexp');
+  static const PropertyPreviewSubtype date =
+      const PropertyPreviewSubtype._('date');
+  static const PropertyPreviewSubtype map =
+      const PropertyPreviewSubtype._('map');
+  static const PropertyPreviewSubtype set =
+      const PropertyPreviewSubtype._('set');
+  static const PropertyPreviewSubtype weakmap =
+      const PropertyPreviewSubtype._('weakmap');
+  static const PropertyPreviewSubtype weakset =
+      const PropertyPreviewSubtype._('weakset');
+  static const PropertyPreviewSubtype iterator =
+      const PropertyPreviewSubtype._('iterator');
+  static const PropertyPreviewSubtype generator =
+      const PropertyPreviewSubtype._('generator');
+  static const PropertyPreviewSubtype error =
+      const PropertyPreviewSubtype._('error');
+  static const values = const {
+    'array': array,
+    'null': null$,
+    'node': node,
+    'regexp': regexp,
+    'date': date,
+    'map': map,
+    'set': set,
+    'weakmap': weakmap,
+    'weakset': weakset,
+    'iterator': iterator,
+    'generator': generator,
+    'error': error,
+  };
+
+  final String value;
+
+  const PropertyPreviewSubtype._(this.value);
+
+  factory PropertyPreviewSubtype.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is PropertyPreviewSubtype && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }
 
 class EntryPreview {
@@ -1227,7 +1547,7 @@ class CallArgument {
   Map<String, dynamic> toJson() {
     var json = <String, dynamic>{};
     if (value != null) {
-      json['value'] = value.toJson();
+      json['value'] = value;
     }
     if (unserializableValue != null) {
       json['unserializableValue'] = unserializableValue.toJson();
@@ -1251,7 +1571,7 @@ class ExecutionContextId {
 
   @override
   bool operator ==(other) =>
-      other is ExecutionContextId && other.value == value;
+      (other is ExecutionContextId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -1403,7 +1723,8 @@ class Timestamp {
   num toJson() => value;
 
   @override
-  bool operator ==(other) => other is Timestamp && other.value == value;
+  bool operator ==(other) =>
+      (other is Timestamp && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -1423,7 +1744,8 @@ class TimeDelta {
   num toJson() => value;
 
   @override
-  bool operator ==(other) => other is TimeDelta && other.value == value;
+  bool operator ==(other) =>
+      (other is TimeDelta && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -1542,7 +1864,8 @@ class UniqueDebuggerId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is UniqueDebuggerId && other.value == value;
+  bool operator ==(other) =>
+      (other is UniqueDebuggerId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -1578,4 +1901,82 @@ class StackTraceId {
     }
     return json;
   }
+}
+
+class ConsoleAPICalledEventType {
+  static const ConsoleAPICalledEventType log =
+      const ConsoleAPICalledEventType._('log');
+  static const ConsoleAPICalledEventType debug =
+      const ConsoleAPICalledEventType._('debug');
+  static const ConsoleAPICalledEventType info =
+      const ConsoleAPICalledEventType._('info');
+  static const ConsoleAPICalledEventType error =
+      const ConsoleAPICalledEventType._('error');
+  static const ConsoleAPICalledEventType warning =
+      const ConsoleAPICalledEventType._('warning');
+  static const ConsoleAPICalledEventType dir =
+      const ConsoleAPICalledEventType._('dir');
+  static const ConsoleAPICalledEventType dirxml =
+      const ConsoleAPICalledEventType._('dirxml');
+  static const ConsoleAPICalledEventType table =
+      const ConsoleAPICalledEventType._('table');
+  static const ConsoleAPICalledEventType trace =
+      const ConsoleAPICalledEventType._('trace');
+  static const ConsoleAPICalledEventType clear =
+      const ConsoleAPICalledEventType._('clear');
+  static const ConsoleAPICalledEventType startGroup =
+      const ConsoleAPICalledEventType._('startGroup');
+  static const ConsoleAPICalledEventType startGroupCollapsed =
+      const ConsoleAPICalledEventType._('startGroupCollapsed');
+  static const ConsoleAPICalledEventType endGroup =
+      const ConsoleAPICalledEventType._('endGroup');
+  static const ConsoleAPICalledEventType assert$ =
+      const ConsoleAPICalledEventType._('assert');
+  static const ConsoleAPICalledEventType profile =
+      const ConsoleAPICalledEventType._('profile');
+  static const ConsoleAPICalledEventType profileEnd =
+      const ConsoleAPICalledEventType._('profileEnd');
+  static const ConsoleAPICalledEventType count =
+      const ConsoleAPICalledEventType._('count');
+  static const ConsoleAPICalledEventType timeEnd =
+      const ConsoleAPICalledEventType._('timeEnd');
+  static const values = const {
+    'log': log,
+    'debug': debug,
+    'info': info,
+    'error': error,
+    'warning': warning,
+    'dir': dir,
+    'dirxml': dirxml,
+    'table': table,
+    'trace': trace,
+    'clear': clear,
+    'startGroup': startGroup,
+    'startGroupCollapsed': startGroupCollapsed,
+    'endGroup': endGroup,
+    'assert': assert$,
+    'profile': profile,
+    'profileEnd': profileEnd,
+    'count': count,
+    'timeEnd': timeEnd,
+  };
+
+  final String value;
+
+  const ConsoleAPICalledEventType._(this.value);
+
+  factory ConsoleAPICalledEventType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ConsoleAPICalledEventType && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }

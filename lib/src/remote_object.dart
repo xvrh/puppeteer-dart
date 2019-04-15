@@ -3,11 +3,11 @@ import '../domains/runtime.dart';
 
 Future<dynamic> remoteObject(
     RuntimeApi runtime, RemoteObject remoteObject) async {
-  if (remoteObject.subtype == 'error') {
+  if (remoteObject.subtype == RemoteObjectSubtype.error) {
     throw 'RemoteObject has error: ${remoteObject.description}';
   }
 
-  if (remoteObject.type == 'undefined') {
+  if (remoteObject.type == RemoteObjectType.undefined) {
     return null;
   }
 
@@ -33,7 +33,7 @@ Future<dynamic> remoteObject(
   if (remoteObject.objectId == null) {
     return remoteObject.value;
   }
-  if (remoteObject.subtype == 'promise') {
+  if (remoteObject.subtype == RemoteObjectSubtype.promise) {
     return remoteObject.description;
   }
   try {
@@ -57,7 +57,7 @@ Future<Map<String, dynamic>> remoteObjectProperties(
   for (PropertyDescriptor property in properties.result) {
     if (property.value != null &&
         property.enumerable &&
-        property.value.type != 'function') {
+        property.value.type != RemoteObjectType.function) {
       result[property.name] = property.value.value;
     }
   }

@@ -369,7 +369,7 @@ class HighlightConfig {
 
 class InspectMode {
   static const InspectMode searchForNode = const InspectMode._('searchForNode');
-  static const InspectMode searchForUAShadowDOM =
+  static const InspectMode searchForUaShadowDom =
       const InspectMode._('searchForUAShadowDOM');
   static const InspectMode captureAreaScreenshot =
       const InspectMode._('captureAreaScreenshot');
@@ -377,7 +377,7 @@ class InspectMode {
   static const InspectMode none = const InspectMode._('none');
   static const values = const {
     'searchForNode': searchForNode,
-    'searchForUAShadowDOM': searchForUAShadowDOM,
+    'searchForUAShadowDOM': searchForUaShadowDom,
     'captureAreaScreenshot': captureAreaScreenshot,
     'showDistances': showDistances,
     'none': none,
@@ -390,6 +390,13 @@ class InspectMode {
   factory InspectMode.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is InspectMode && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

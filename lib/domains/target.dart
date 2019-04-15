@@ -344,7 +344,8 @@ class TargetID {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is TargetID && other.value == value;
+  bool operator ==(other) =>
+      (other is TargetID && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -364,7 +365,8 @@ class SessionID {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is SessionID && other.value == value;
+  bool operator ==(other) =>
+      (other is SessionID && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -383,7 +385,8 @@ class BrowserContextID {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is BrowserContextID && other.value == value;
+  bool operator ==(other) =>
+      (other is BrowserContextID && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

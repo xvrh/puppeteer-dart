@@ -68,7 +68,8 @@ class AXNodeId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is AXNodeId && other.value == value;
+  bool operator ==(other) =>
+      (other is AXNodeId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -128,6 +129,13 @@ class AXValueType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is AXValueType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -160,6 +168,13 @@ class AXValueSourceType {
   factory AXValueSourceType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is AXValueSourceType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -201,6 +216,14 @@ class AXValueNativeSourceType {
   factory AXValueNativeSourceType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is AXValueNativeSourceType && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -396,7 +419,7 @@ class AXValue {
       'type': type.toJson(),
     };
     if (value != null) {
-      json['value'] = value.toJson();
+      json['value'] = value;
     }
     if (relatedNodes != null) {
       json['relatedNodes'] = relatedNodes.map((e) => e.toJson()).toList();
@@ -511,6 +534,13 @@ class AXPropertyName {
   factory AXPropertyName.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is AXPropertyName && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

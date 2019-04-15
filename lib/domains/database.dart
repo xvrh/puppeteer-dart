@@ -76,7 +76,8 @@ class DatabaseId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is DatabaseId && other.value == value;
+  bool operator ==(other) =>
+      (other is DatabaseId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

@@ -1108,7 +1108,7 @@ class ResourceType {
   static const ResourceType font = const ResourceType._('Font');
   static const ResourceType script = const ResourceType._('Script');
   static const ResourceType textTrack = const ResourceType._('TextTrack');
-  static const ResourceType xHR = const ResourceType._('XHR');
+  static const ResourceType xhr = const ResourceType._('XHR');
   static const ResourceType fetch = const ResourceType._('Fetch');
   static const ResourceType eventSource = const ResourceType._('EventSource');
   static const ResourceType webSocket = const ResourceType._('WebSocket');
@@ -1116,7 +1116,7 @@ class ResourceType {
   static const ResourceType signedExchange =
       const ResourceType._('SignedExchange');
   static const ResourceType ping = const ResourceType._('Ping');
-  static const ResourceType cSPViolationReport =
+  static const ResourceType cspViolationReport =
       const ResourceType._('CSPViolationReport');
   static const ResourceType other = const ResourceType._('Other');
   static const values = const {
@@ -1127,14 +1127,14 @@ class ResourceType {
     'Font': font,
     'Script': script,
     'TextTrack': textTrack,
-    'XHR': xHR,
+    'XHR': xhr,
     'Fetch': fetch,
     'EventSource': eventSource,
     'WebSocket': webSocket,
     'Manifest': manifest,
     'SignedExchange': signedExchange,
     'Ping': ping,
-    'CSPViolationReport': cSPViolationReport,
+    'CSPViolationReport': cspViolationReport,
     'Other': other,
   };
 
@@ -1145,6 +1145,13 @@ class ResourceType {
   factory ResourceType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ResourceType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1161,7 +1168,8 @@ class LoaderId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is LoaderId && other.value == value;
+  bool operator ==(other) =>
+      (other is LoaderId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -1181,7 +1189,8 @@ class RequestId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is RequestId && other.value == value;
+  bool operator ==(other) =>
+      (other is RequestId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -1201,7 +1210,8 @@ class InterceptionId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is InterceptionId && other.value == value;
+  bool operator ==(other) =>
+      (other is InterceptionId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -1262,6 +1272,13 @@ class ErrorReason {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is ErrorReason && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -1276,7 +1293,8 @@ class TimeSinceEpoch {
   num toJson() => value;
 
   @override
-  bool operator ==(other) => other is TimeSinceEpoch && other.value == value;
+  bool operator ==(other) =>
+      (other is TimeSinceEpoch && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -1296,7 +1314,8 @@ class MonotonicTime {
   num toJson() => value;
 
   @override
-  bool operator ==(other) => other is MonotonicTime && other.value == value;
+  bool operator ==(other) =>
+      (other is MonotonicTime && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -1316,7 +1335,8 @@ class Headers {
   Map toJson() => value;
 
   @override
-  bool operator ==(other) => other is Headers && other.value == value;
+  bool operator ==(other) =>
+      (other is Headers && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -1357,6 +1377,13 @@ class ConnectionType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is ConnectionType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -1377,6 +1404,13 @@ class CookieSameSite {
   factory CookieSameSite.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is CookieSameSite && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1519,6 +1553,13 @@ class ResourcePriority {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is ResourcePriority && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -1549,7 +1590,7 @@ class Request {
   final ResourcePriority initialPriority;
 
   /// The referrer policy of the request, as defined in https://www.w3.org/TR/referrer-policy/
-  final String referrerPolicy;
+  final RequestReferrerPolicy referrerPolicy;
 
   /// Whether is loaded via link preload.
   final bool isLinkPreload;
@@ -1578,7 +1619,7 @@ class Request {
           ? security.MixedContentType.fromJson(json['mixedContentType'])
           : null,
       initialPriority: ResourcePriority.fromJson(json['initialPriority']),
-      referrerPolicy: json['referrerPolicy'],
+      referrerPolicy: RequestReferrerPolicy.fromJson(json['referrerPolicy']),
       isLinkPreload:
           json.containsKey('isLinkPreload') ? json['isLinkPreload'] : null,
     );
@@ -1609,6 +1650,54 @@ class Request {
     }
     return json;
   }
+}
+
+class RequestReferrerPolicy {
+  static const RequestReferrerPolicy unsafeUrl =
+      const RequestReferrerPolicy._('unsafe-url');
+  static const RequestReferrerPolicy noReferrerWhenDowngrade =
+      const RequestReferrerPolicy._('no-referrer-when-downgrade');
+  static const RequestReferrerPolicy noReferrer =
+      const RequestReferrerPolicy._('no-referrer');
+  static const RequestReferrerPolicy origin =
+      const RequestReferrerPolicy._('origin');
+  static const RequestReferrerPolicy originWhenCrossOrigin =
+      const RequestReferrerPolicy._('origin-when-cross-origin');
+  static const RequestReferrerPolicy sameOrigin =
+      const RequestReferrerPolicy._('same-origin');
+  static const RequestReferrerPolicy strictOrigin =
+      const RequestReferrerPolicy._('strict-origin');
+  static const RequestReferrerPolicy strictOriginWhenCrossOrigin =
+      const RequestReferrerPolicy._('strict-origin-when-cross-origin');
+  static const values = const {
+    'unsafe-url': unsafeUrl,
+    'no-referrer-when-downgrade': noReferrerWhenDowngrade,
+    'no-referrer': noReferrer,
+    'origin': origin,
+    'origin-when-cross-origin': originWhenCrossOrigin,
+    'same-origin': sameOrigin,
+    'strict-origin': strictOrigin,
+    'strict-origin-when-cross-origin': strictOriginWhenCrossOrigin,
+  };
+
+  final String value;
+
+  const RequestReferrerPolicy._(this.value);
+
+  factory RequestReferrerPolicy.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is RequestReferrerPolicy && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// Details of a signed certificate timestamp (SCT).
@@ -1806,6 +1895,14 @@ class CertificateTransparencyCompliance {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is CertificateTransparencyCompliance && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -1841,6 +1938,13 @@ class BlockedReason {
   factory BlockedReason.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is BlockedReason && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -2172,7 +2276,7 @@ class CachedResource {
 /// Information about the request initiator.
 class Initiator {
   /// Type of this initiator.
-  final String type;
+  final InitiatorType type;
 
   /// Initiator JavaScript stack trace, set for Script only.
   final runtime.StackTrace stack;
@@ -2188,7 +2292,7 @@ class Initiator {
 
   factory Initiator.fromJson(Map<String, dynamic> json) {
     return Initiator(
-      type: json['type'],
+      type: InitiatorType.fromJson(json['type']),
       stack: json.containsKey('stack')
           ? runtime.StackTrace.fromJson(json['stack'])
           : null,
@@ -2212,6 +2316,40 @@ class Initiator {
     }
     return json;
   }
+}
+
+class InitiatorType {
+  static const InitiatorType parser = const InitiatorType._('parser');
+  static const InitiatorType script = const InitiatorType._('script');
+  static const InitiatorType preload = const InitiatorType._('preload');
+  static const InitiatorType signedExchange =
+      const InitiatorType._('SignedExchange');
+  static const InitiatorType other = const InitiatorType._('other');
+  static const values = const {
+    'parser': parser,
+    'script': script,
+    'preload': preload,
+    'SignedExchange': signedExchange,
+    'other': other,
+  };
+
+  final String value;
+
+  const InitiatorType._(this.value);
+
+  factory InitiatorType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is InitiatorType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// Cookie object
@@ -2386,7 +2524,7 @@ class CookieParam {
 /// Authorization challenge for HTTP status code 401 or 407.
 class AuthChallenge {
   /// Source of the authentication challenge.
-  final String source;
+  final AuthChallengeSource source;
 
   /// Origin of the challenger.
   final String origin;
@@ -2405,7 +2543,9 @@ class AuthChallenge {
 
   factory AuthChallenge.fromJson(Map<String, dynamic> json) {
     return AuthChallenge(
-      source: json.containsKey('source') ? json['source'] : null,
+      source: json.containsKey('source')
+          ? AuthChallengeSource.fromJson(json['source'])
+          : null,
       origin: json['origin'],
       scheme: json['scheme'],
       realm: json['realm'],
@@ -2425,12 +2565,40 @@ class AuthChallenge {
   }
 }
 
+class AuthChallengeSource {
+  static const AuthChallengeSource server =
+      const AuthChallengeSource._('Server');
+  static const AuthChallengeSource proxy = const AuthChallengeSource._('Proxy');
+  static const values = const {
+    'Server': server,
+    'Proxy': proxy,
+  };
+
+  final String value;
+
+  const AuthChallengeSource._(this.value);
+
+  factory AuthChallengeSource.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is AuthChallengeSource && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Response to an AuthChallenge.
 class AuthChallengeResponse {
   /// The decision on what to do in response to the authorization challenge.  Default means
   /// deferring to the default behavior of the net stack, which will likely either the Cancel
   /// authentication or display a popup dialog box.
-  final String response;
+  final AuthChallengeResponseResponse response;
 
   /// The username to provide, possibly empty. Should only be set if response is
   /// ProvideCredentials.
@@ -2445,7 +2613,7 @@ class AuthChallengeResponse {
 
   factory AuthChallengeResponse.fromJson(Map<String, dynamic> json) {
     return AuthChallengeResponse(
-      response: json['response'],
+      response: AuthChallengeResponseResponse.fromJson(json['response']),
       username: json.containsKey('username') ? json['username'] : null,
       password: json.containsKey('password') ? json['password'] : null,
     );
@@ -2463,6 +2631,39 @@ class AuthChallengeResponse {
     }
     return json;
   }
+}
+
+class AuthChallengeResponseResponse {
+  static const AuthChallengeResponseResponse default$ =
+      const AuthChallengeResponseResponse._('Default');
+  static const AuthChallengeResponseResponse cancelAuth =
+      const AuthChallengeResponseResponse._('CancelAuth');
+  static const AuthChallengeResponseResponse provideCredentials =
+      const AuthChallengeResponseResponse._('ProvideCredentials');
+  static const values = const {
+    'Default': default$,
+    'CancelAuth': cancelAuth,
+    'ProvideCredentials': provideCredentials,
+  };
+
+  final String value;
+
+  const AuthChallengeResponseResponse._(this.value);
+
+  factory AuthChallengeResponseResponse.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is AuthChallengeResponseResponse && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// Stages of the interception to begin intercepting. Request will intercept before the request is
@@ -2483,6 +2684,13 @@ class InterceptionStage {
   factory InterceptionStage.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is InterceptionStage && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -2681,6 +2889,14 @@ class SignedExchangeErrorField {
   factory SignedExchangeErrorField.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is SignedExchangeErrorField && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

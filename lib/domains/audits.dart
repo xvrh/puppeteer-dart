@@ -16,8 +16,11 @@ class AuditsApi {
   /// [quality] The quality of the encoding (0-1). (defaults to 1)
   /// [sizeOnly] Whether to only return the size information (defaults to false).
   Future<GetEncodedResponseResult> getEncodedResponse(
-      network.RequestId requestId, String encoding,
-      {num quality, bool sizeOnly}) async {
+      network.RequestId requestId,
+      @Enum(['webp', 'jpeg', 'png']) String encoding,
+      {num quality,
+      bool sizeOnly}) async {
+    assert(const ['webp', 'jpeg', 'png'].contains(encoding));
     var parameters = <String, dynamic>{
       'requestId': requestId.toJson(),
       'encoding': encoding,

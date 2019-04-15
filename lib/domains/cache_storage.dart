@@ -109,7 +109,8 @@ class CacheId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is CacheId && other.value == value;
+  bool operator ==(other) =>
+      (other is CacheId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -145,6 +146,13 @@ class CachedResponseType {
   factory CachedResponseType.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is CachedResponseType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

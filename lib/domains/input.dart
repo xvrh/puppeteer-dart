@@ -27,7 +27,8 @@ class InputApi {
   /// [isSystemKey] Whether the event was a system key event (default: false).
   /// [location] Whether the event was from the left or right side of the keyboard. 1=Left, 2=Right (default:
   /// 0).
-  Future dispatchKeyEvent(String type,
+  Future dispatchKeyEvent(
+      @Enum(['keyDown', 'keyUp', 'rawKeyDown', 'char']) String type,
       {int modifiers,
       TimeSinceEpoch timestamp,
       String text,
@@ -41,6 +42,7 @@ class InputApi {
       bool isKeypad,
       bool isSystemKey,
       int location}) async {
+    assert(const ['keyDown', 'keyUp', 'rawKeyDown', 'char'].contains(type));
     var parameters = <String, dynamic>{
       'type': type,
     };
@@ -111,15 +113,27 @@ class InputApi {
   /// [deltaX] X delta in CSS pixels for mouse wheel event (default: 0).
   /// [deltaY] Y delta in CSS pixels for mouse wheel event (default: 0).
   /// [pointerType] Pointer type (default: "mouse").
-  Future dispatchMouseEvent(String type, num x, num y,
+  Future dispatchMouseEvent(
+      @Enum(['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel'])
+          String type,
+      num x,
+      num y,
       {int modifiers,
       TimeSinceEpoch timestamp,
-      String button,
+      @Enum(['none', 'left', 'middle', 'right', 'back', 'forward'])
+          String button,
       int buttons,
       int clickCount,
       num deltaX,
       num deltaY,
-      String pointerType}) async {
+      @Enum(['mouse', 'pen'])
+          String pointerType}) async {
+    assert(const ['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel']
+        .contains(type));
+    assert(button == null ||
+        const ['none', 'left', 'middle', 'right', 'back', 'forward']
+            .contains(button));
+    assert(pointerType == null || const ['mouse', 'pen'].contains(pointerType));
     var parameters = <String, dynamic>{
       'type': type,
       'x': x,
@@ -161,8 +175,13 @@ class InputApi {
   /// [modifiers] Bit field representing pressed modifier keys. Alt=1, Ctrl=2, Meta/Command=4, Shift=8
   /// (default: 0).
   /// [timestamp] Time at which the event occurred.
-  Future dispatchTouchEvent(String type, List<TouchPoint> touchPoints,
-      {int modifiers, TimeSinceEpoch timestamp}) async {
+  Future dispatchTouchEvent(
+      @Enum(['touchStart', 'touchEnd', 'touchMove', 'touchCancel']) String type,
+      List<TouchPoint> touchPoints,
+      {int modifiers,
+      TimeSinceEpoch timestamp}) async {
+    assert(const ['touchStart', 'touchEnd', 'touchMove', 'touchCancel']
+        .contains(type));
     var parameters = <String, dynamic>{
       'type': type,
       'touchPoints': touchPoints.map((e) => e.toJson()).toList(),
@@ -187,12 +206,21 @@ class InputApi {
   /// [modifiers] Bit field representing pressed modifier keys. Alt=1, Ctrl=2, Meta/Command=4, Shift=8
   /// (default: 0).
   /// [clickCount] Number of times the mouse button was clicked (default: 0).
-  Future emulateTouchFromMouseEvent(String type, int x, int y, String button,
+  Future emulateTouchFromMouseEvent(
+      @Enum(['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel'])
+          String type,
+      int x,
+      int y,
+      @Enum(['none', 'left', 'middle', 'right'])
+          String button,
       {TimeSinceEpoch timestamp,
       num deltaX,
       num deltaY,
       int modifiers,
       int clickCount}) async {
+    assert(const ['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel']
+        .contains(type));
+    assert(const ['none', 'left', 'middle', 'right'].contains(button));
     var parameters = <String, dynamic>{
       'type': type,
       'x': x,
@@ -428,6 +456,13 @@ class GestureSourceType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is GestureSourceType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -442,7 +477,8 @@ class TimeSinceEpoch {
   num toJson() => value;
 
   @override
-  bool operator ==(other) => other is TimeSinceEpoch && other.value == value;
+  bool operator ==(other) =>
+      (other is TimeSinceEpoch && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

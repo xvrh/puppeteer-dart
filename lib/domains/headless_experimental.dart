@@ -84,7 +84,7 @@ class BeginFrameResult {
 /// Encoding options for a screenshot.
 class ScreenshotParams {
   /// Image compression format (defaults to png).
-  final String format;
+  final ScreenshotParamsFormat format;
 
   /// Compression quality from range [0..100] (jpeg only).
   final int quality;
@@ -93,7 +93,9 @@ class ScreenshotParams {
 
   factory ScreenshotParams.fromJson(Map<String, dynamic> json) {
     return ScreenshotParams(
-      format: json.containsKey('format') ? json['format'] : null,
+      format: json.containsKey('format')
+          ? ScreenshotParamsFormat.fromJson(json['format'])
+          : null,
       quality: json.containsKey('quality') ? json['quality'] : null,
     );
   }
@@ -108,4 +110,34 @@ class ScreenshotParams {
     }
     return json;
   }
+}
+
+class ScreenshotParamsFormat {
+  static const ScreenshotParamsFormat jpeg =
+      const ScreenshotParamsFormat._('jpeg');
+  static const ScreenshotParamsFormat png =
+      const ScreenshotParamsFormat._('png');
+  static const values = const {
+    'jpeg': jpeg,
+    'png': png,
+  };
+
+  final String value;
+
+  const ScreenshotParamsFormat._(this.value);
+
+  factory ScreenshotParamsFormat.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ScreenshotParamsFormat && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }

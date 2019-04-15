@@ -134,7 +134,8 @@ class CertificateId {
   int toJson() => value;
 
   @override
-  bool operator ==(other) => other is CertificateId && other.value == value;
+  bool operator ==(other) =>
+      (other is CertificateId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -166,6 +167,13 @@ class MixedContentType {
   String toJson() => value;
 
   @override
+  bool operator ==(other) =>
+      (other is MixedContentType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
   String toString() => value.toString();
 }
 
@@ -191,6 +199,13 @@ class SecurityState {
   factory SecurityState.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is SecurityState && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -340,6 +355,14 @@ class CertificateErrorAction {
   factory CertificateErrorAction.fromJson(String value) => values[value];
 
   String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is CertificateErrorAction && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

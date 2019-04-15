@@ -554,7 +554,8 @@ class StringIndex {
   int toJson() => value;
 
   @override
-  bool operator ==(other) => other is StringIndex && other.value == value;
+  bool operator ==(other) =>
+      (other is StringIndex && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -575,7 +576,8 @@ class ArrayOfStrings {
   List<StringIndex> toJson() => value;
 
   @override
-  bool operator ==(other) => other is ArrayOfStrings && other.value == value;
+  bool operator ==(other) =>
+      (other is ArrayOfStrings && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -662,7 +664,8 @@ class Rectangle {
   List<num> toJson() => value;
 
   @override
-  bool operator ==(other) => other is Rectangle && other.value == value;
+  bool operator ==(other) =>
+      (other is Rectangle && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

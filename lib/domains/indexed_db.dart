@@ -292,7 +292,7 @@ class ObjectStoreIndex {
 /// Key.
 class Key {
   /// Key type.
-  final String type;
+  final KeyType type;
 
   /// Number value.
   final num number;
@@ -310,7 +310,7 @@ class Key {
 
   factory Key.fromJson(Map<String, dynamic> json) {
     return Key(
-      type: json['type'],
+      type: KeyType.fromJson(json['type']),
       number: json.containsKey('number') ? json['number'] : null,
       string: json.containsKey('string') ? json['string'] : null,
       date: json.containsKey('date') ? json['date'] : null,
@@ -338,6 +338,37 @@ class Key {
     }
     return json;
   }
+}
+
+class KeyType {
+  static const KeyType number = const KeyType._('number');
+  static const KeyType string = const KeyType._('string');
+  static const KeyType date = const KeyType._('date');
+  static const KeyType array = const KeyType._('array');
+  static const values = const {
+    'number': number,
+    'string': string,
+    'date': date,
+    'array': array,
+  };
+
+  final String value;
+
+  const KeyType._(this.value);
+
+  factory KeyType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is KeyType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// Key range.
@@ -419,7 +450,7 @@ class DataEntry {
 /// Key path.
 class KeyPath {
   /// Key path type.
-  final String type;
+  final KeyPathType type;
 
   /// String value.
   final String string;
@@ -431,7 +462,7 @@ class KeyPath {
 
   factory KeyPath.fromJson(Map<String, dynamic> json) {
     return KeyPath(
-      type: json['type'],
+      type: KeyPathType.fromJson(json['type']),
       string: json.containsKey('string') ? json['string'] : null,
       array: json.containsKey('array')
           ? (json['array'] as List).map((e) => e as String).toList()
@@ -451,4 +482,33 @@ class KeyPath {
     }
     return json;
   }
+}
+
+class KeyPathType {
+  static const KeyPathType null$ = const KeyPathType._('null');
+  static const KeyPathType string = const KeyPathType._('string');
+  static const KeyPathType array = const KeyPathType._('array');
+  static const values = const {
+    'null': null$,
+    'string': string,
+    'array': array,
+  };
+
+  final String value;
+
+  const KeyPathType._(this.value);
+
+  factory KeyPathType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is KeyPathType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }

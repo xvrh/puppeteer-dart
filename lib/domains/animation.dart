@@ -141,7 +141,7 @@ class Animation {
   final num currentTime;
 
   /// Animation type of `Animation`.
-  final String type;
+  final AnimationType type;
 
   /// `Animation`'s source animation node.
   final AnimationEffect source;
@@ -171,7 +171,7 @@ class Animation {
       playbackRate: json['playbackRate'],
       startTime: json['startTime'],
       currentTime: json['currentTime'],
-      type: json['type'],
+      type: AnimationType.fromJson(json['type']),
       source: json.containsKey('source')
           ? AnimationEffect.fromJson(json['source'])
           : null,
@@ -198,6 +198,38 @@ class Animation {
     }
     return json;
   }
+}
+
+class AnimationType {
+  static const AnimationType cssTransition =
+      const AnimationType._('CSSTransition');
+  static const AnimationType cssAnimation =
+      const AnimationType._('CSSAnimation');
+  static const AnimationType webAnimation =
+      const AnimationType._('WebAnimation');
+  static const values = const {
+    'CSSTransition': cssTransition,
+    'CSSAnimation': cssAnimation,
+    'WebAnimation': webAnimation,
+  };
+
+  final String value;
+
+  const AnimationType._(this.value);
+
+  factory AnimationType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is AnimationType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// AnimationEffect instance

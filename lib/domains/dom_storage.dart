@@ -170,7 +170,8 @@ class Item {
   List<String> toJson() => value;
 
   @override
-  bool operator ==(other) => other is Item && other.value == value;
+  bool operator ==(other) =>
+      (other is Item && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

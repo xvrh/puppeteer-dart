@@ -39,7 +39,9 @@ class DebuggerApi {
   /// Continues execution until specific location is reached.
   /// [location] Location to continue to.
   Future continueToLocation(Location location,
-      {String targetCallFrames}) async {
+      {@Enum(['any', 'current']) String targetCallFrames}) async {
+    assert(targetCallFrames == null ||
+        const ['any', 'current'].contains(targetCallFrames));
     var parameters = <String, dynamic>{
       'location': location.toJson(),
     };
@@ -350,7 +352,9 @@ class DebuggerApi {
   /// Defines pause on exceptions state. Can be set to stop on all exceptions, uncaught exceptions or
   /// no exceptions. Initial pause on exceptions state is `none`.
   /// [state] Pause on exceptions mode.
-  Future setPauseOnExceptions(String state) async {
+  Future setPauseOnExceptions(
+      @Enum(['none', 'uncaught', 'all']) String state) async {
+    assert(const ['none', 'uncaught', 'all'].contains(state));
     var parameters = <String, dynamic>{
       'state': state,
     };
@@ -457,7 +461,7 @@ class PausedEvent {
   final List<CallFrame> callFrames;
 
   /// Pause reason.
-  final String reason;
+  final PausedEventReason reason;
 
   /// Object containing break-specific auxiliary properties.
   final Map data;
@@ -489,7 +493,7 @@ class PausedEvent {
       callFrames: (json['callFrames'] as List)
           .map((e) => CallFrame.fromJson(e))
           .toList(),
-      reason: json['reason'],
+      reason: PausedEventReason.fromJson(json['reason']),
       data: json.containsKey('data') ? json['data'] : null,
       hitBreakpoints: json.containsKey('hitBreakpoints')
           ? (json['hitBreakpoints'] as List).map((e) => e as String).toList()
@@ -826,7 +830,8 @@ class BreakpointId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is BreakpointId && other.value == value;
+  bool operator ==(other) =>
+      (other is BreakpointId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -846,7 +851,8 @@ class CallFrameId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is CallFrameId && other.value == value;
+  bool operator ==(other) =>
+      (other is CallFrameId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -990,7 +996,7 @@ class CallFrame {
 /// Scope description.
 class Scope {
   /// Scope type.
-  final String type;
+  final ScopeType type;
 
   /// Object representing the scope. For `global` and `with` scopes it represents the actual
   /// object; for the rest of the scopes, it is artificial transient object enumerating scope
@@ -1014,7 +1020,7 @@ class Scope {
 
   factory Scope.fromJson(Map<String, dynamic> json) {
     return Scope(
-      type: json['type'],
+      type: ScopeType.fromJson(json['type']),
       object: runtime.RemoteObject.fromJson(json['object']),
       name: json.containsKey('name') ? json['name'] : null,
       startLocation: json.containsKey('startLocation')
@@ -1042,6 +1048,47 @@ class Scope {
     }
     return json;
   }
+}
+
+class ScopeType {
+  static const ScopeType global = const ScopeType._('global');
+  static const ScopeType local = const ScopeType._('local');
+  static const ScopeType with$ = const ScopeType._('with');
+  static const ScopeType closure = const ScopeType._('closure');
+  static const ScopeType catch$ = const ScopeType._('catch');
+  static const ScopeType block = const ScopeType._('block');
+  static const ScopeType script = const ScopeType._('script');
+  static const ScopeType eval = const ScopeType._('eval');
+  static const ScopeType module = const ScopeType._('module');
+  static const values = const {
+    'global': global,
+    'local': local,
+    'with': with$,
+    'closure': closure,
+    'catch': catch$,
+    'block': block,
+    'script': script,
+    'eval': eval,
+    'module': module,
+  };
+
+  final String value;
+
+  const ScopeType._(this.value);
+
+  factory ScopeType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ScopeType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// Search match for resource.
@@ -1080,7 +1127,7 @@ class BreakLocation {
   /// Column number in the script (0-based).
   final int columnNumber;
 
-  final String type;
+  final BreakLocationType type;
 
   BreakLocation(
       {@required this.scriptId,
@@ -1094,7 +1141,9 @@ class BreakLocation {
       lineNumber: json['lineNumber'],
       columnNumber:
           json.containsKey('columnNumber') ? json['columnNumber'] : null,
-      type: json.containsKey('type') ? json['type'] : null,
+      type: json.containsKey('type')
+          ? BreakLocationType.fromJson(json['type'])
+          : null,
     );
   }
 
@@ -1111,4 +1160,82 @@ class BreakLocation {
     }
     return json;
   }
+}
+
+class BreakLocationType {
+  static const BreakLocationType debuggerStatement =
+      const BreakLocationType._('debuggerStatement');
+  static const BreakLocationType call = const BreakLocationType._('call');
+  static const BreakLocationType return$ = const BreakLocationType._('return');
+  static const values = const {
+    'debuggerStatement': debuggerStatement,
+    'call': call,
+    'return': return$,
+  };
+
+  final String value;
+
+  const BreakLocationType._(this.value);
+
+  factory BreakLocationType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is BreakLocationType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class PausedEventReason {
+  static const PausedEventReason xhr = const PausedEventReason._('XHR');
+  static const PausedEventReason dom = const PausedEventReason._('DOM');
+  static const PausedEventReason eventListener =
+      const PausedEventReason._('EventListener');
+  static const PausedEventReason exception =
+      const PausedEventReason._('exception');
+  static const PausedEventReason assert$ = const PausedEventReason._('assert');
+  static const PausedEventReason debugCommand =
+      const PausedEventReason._('debugCommand');
+  static const PausedEventReason promiseRejection =
+      const PausedEventReason._('promiseRejection');
+  static const PausedEventReason oom = const PausedEventReason._('OOM');
+  static const PausedEventReason other = const PausedEventReason._('other');
+  static const PausedEventReason ambiguous =
+      const PausedEventReason._('ambiguous');
+  static const values = const {
+    'XHR': xhr,
+    'DOM': dom,
+    'EventListener': eventListener,
+    'exception': exception,
+    'assert': assert$,
+    'debugCommand': debugCommand,
+    'promiseRejection': promiseRejection,
+    'OOM': oom,
+    'other': other,
+    'ambiguous': ambiguous,
+  };
+
+  final String value;
+
+  const PausedEventReason._(this.value);
+
+  factory PausedEventReason.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is PausedEventReason && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }

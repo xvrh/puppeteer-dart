@@ -183,7 +183,7 @@ class HeapSnapshotObjectId {
 
   @override
   bool operator ==(other) =>
-      other is HeapSnapshotObjectId && other.value == value;
+      (other is HeapSnapshotObjectId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
