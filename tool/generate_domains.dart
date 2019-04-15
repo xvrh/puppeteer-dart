@@ -67,11 +67,11 @@ main() {
       internalTypes.addAll(event.parameters
           .where((p) => p.enumValues != null)
           .map((p) => _InternalType(
-          context,
-          ComplexType(
-              id: eventType._typeName + firstLetterUpper(p.name),
-              type: p.type,
-              enums: p.enumValues))));
+              context,
+              ComplexType(
+                  id: eventType._typeName + firstLetterUpper(p.name),
+                  type: p.type,
+                  enums: p.enumValues))));
     }
 
     StringBuffer code = StringBuffer();
@@ -181,9 +181,7 @@ String _underscoreize(String input) {
 }
 
 String _camelizeName(String input) {
-  return splitWords(input)
-      .map((w) => firstLetterUpper(w.toLowerCase()))
-      .join();
+  return splitWords(input).map((w) => firstLetterUpper(w.toLowerCase())).join();
 }
 
 class _Command {
@@ -489,8 +487,7 @@ class _InternalType {
       code.writeln(toComment(property.description, indent: 2));
 
       String typeName = _propertyTypeName(property);
-      code.writeln(
-          'final $typeName ${property.normalizedName};');
+      code.writeln('final $typeName ${property.normalizedName};');
       code.writeln('');
     }
 
@@ -608,7 +605,9 @@ class _InternalType {
       {bool withAs = false}) {
     String type = parameter.type;
 
-    if (type != null && jsonTypes.contains(type) && parameter.enumValues == null) {
+    if (type != null &&
+        jsonTypes.contains(type) &&
+        parameter.enumValues == null) {
       if (withAs) {
         return '$jsonParameter as ${context.getPropertyType(parameter)}';
       } else {

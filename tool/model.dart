@@ -128,7 +128,8 @@ class Parameter implements Typed {
       this.ref,
       this.optional = false,
       this.deprecated = false,
-      this.items, this.enumValues});
+      this.items,
+      this.enumValues});
 
   Parameter.fromJson(Map json)
       : name = json['name'],
@@ -167,20 +168,20 @@ abstract class Typed {
 }
 
 const Set<String> _dartKeywords = const {
-'abstract', 'deferred', 'if', 'super',
-'as', 'do', 'implements', 'switch',
-'assert', 'dynamic', 'import', 'sync',
-'async', 'else', 'in', 'this',
-'enum', 'is', 'throw',
-'await', 'export', 'library', 'true',
-'break', 'external', 'new', 'try',
-'case', 'extends', 'null', 'typedef',
-'catch', 'factory', 'operator', 'var',
-'class', 'false', 'part', 'void',
-'const', 'final', 'rethrow', 'while',
-'continue', 'finally', 'return', 'with',
-'covariant', 'for', 'yield',
-'default', 'static' //
+  'abstract', 'deferred', 'if', 'super',
+  'as', 'do', 'implements', 'switch',
+  'assert', 'dynamic', 'import', 'sync',
+  'async', 'else', 'in', 'this',
+  'enum', 'is', 'throw',
+  'await', 'export', 'library', 'true',
+  'break', 'external', 'new', 'try',
+  'case', 'extends', 'null', 'typedef',
+  'catch', 'factory', 'operator', 'var',
+  'class', 'false', 'part', 'void',
+  'const', 'final', 'rethrow', 'while',
+  'continue', 'finally', 'return', 'with',
+  'covariant', 'for', 'yield',
+  'default', 'static' //
 };
 
 String preventKeywords(String input) {
