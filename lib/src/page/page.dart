@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:chrome_dev_tools/domains/log.dart';
 import 'package:chrome_dev_tools/domains/network.dart';
@@ -73,12 +74,16 @@ class Page {
   final StreamController _workerCreated = StreamController.broadcast(),
       _workerDestroyed = StreamController.broadcast();
   bool _javascriptEnabled = true;
+  Duration navigationTimeout;
+  Duration defaultTimeout = Duration(seconds: 30);
 
   void dispose() {
     _frameManager.dispose();
     _workerCreated.close();
     _workerDestroyed.close();
   }
+
+  Duration get navigationTimeoutOrDefault => navigationTimeout ?? defaultTimeout;
 
   Client get client => tab.session;
 
@@ -106,6 +111,10 @@ class Page {
   bool get isClosed => tab.session.isClosed;
 
   PageFrame get mainFrame => _frameManager.mainFrame;
+
+  get keyboard => null;
+
+  get touchscreen => null;
 
   _onLogEntryAdded(event) {
     //TODO(xha)
@@ -161,13 +170,13 @@ class Page {
   }
 
   Future<ElementHandle> addScriptTag(
-      {String url, String path, String content, String type}) {
+      {String url, File file, String content, String type}) {
     return mainFrame.addScriptTag(
-        url: url, path: path, content: content, type: type);
+        url: url, file: file, content: content, type: type);
   }
 
-  Future<ElementHandle> addStyleTag({String url, String path, String content}) {
-    return mainFrame.addStyleTag(url: url, path: path, content: content);
+  Future<ElementHandle> addStyleTag({String url, File file, String content}) {
+    return mainFrame.addStyleTag(url: url, file: file, content: content);
   }
 
   Future exposeFunction(String name, Function callbackFunction) async {

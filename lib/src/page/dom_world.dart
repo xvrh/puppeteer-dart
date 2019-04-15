@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:chrome_dev_tools/src/page/execution_context.dart';
 import 'package:chrome_dev_tools/src/page/frame_manager.dart';
@@ -87,7 +88,7 @@ class DomWorld {
     return value;
   }
 
-  Future $eval(String selector, Js js, {List  args}) async {
+  Future $eval(String selector, Js js, {List args}) async {
     var document = await _document;
     return document.$eval(selector, js, args: args);
   }
@@ -117,47 +118,195 @@ return retVal;
 '''));
   }
 
-  Future setContent(String html, {Duration timeout, WaitUntil waitUntil}) {}
+  Future setContent(String html,
+      {Duration timeout, WaitUntil waitUntil}) async {
+    timeout ??= frameManager.page.navigationTimeoutOrDefault;
+    waitUntil ??= WaitUntil.load;
 
-  addScriptTag({String url, String path, String content, String type}) {}
+    // We rely upon the fact that document.open() will reset frame lifecycle with "init"
+    // lifecycle event. @see https://crrev.com/608658
+    await evaluate(Js.function(['html'], '''
+document.open();
+document.write(html);
+document.close();
+'''), args: [html]);
+    var watcher = new LifecycleWatcher(frameManager, frame,
+        waitUntil: waitUntil, timeout: timeout);
+    var error = await Future.any([
+      watcher.timeoutOrTermination,
+      watcher.lifecycle,
+    ]);
+    watcher.dispose();
+    if (error != null) {
+      throw error;
+    }
+  }
 
-  Future<ElementHandle> addStyleTag({String url, String path, String content}) {}
+  addScriptTag({String url, File file, String content, String type}) async {
+    assert(url != null || file != null || content != null);
 
-  Future click(String selector, {Duration delay, MouseButton button, int clickCount}) {}
+    var context = await executionContext;
 
-  Future focus(String selector) {}
+    if (url != null) {
+      return (await context.evaluateHandle(Js.function(['url', 'type'], '''
+const script = document.createElement('script');
+script.src = url;
+if (type)
+  script.type = type;
+const promise = new Promise((res, rej) => {
+  script.onload = res;
+  script.onerror = rej;
+});
+document.head.appendChild(script);
+await promise;
+return script;
+''', isAsync: true), args: [url, type])).asElement;
+    }
 
-  Future hover(String selector) {}
+    var addScriptContent = Js.function(['content', 'type'], '''
+const script = document.createElement('script');
+script.type = type;
+script.text = content;
+let error = null;
+script.onerror = e => error = e;
+document.head.appendChild(script);
+if (error)
+  throw error;
+return script;
+''');
+
+    if (file != null) {
+      var contents = await file.readAsString();
+      contents += '//# sourceURL=' + file.absolute.path;
+      return (await context
+              .evaluateHandle(addScriptContent, args: [contents, type]))
+          .asElement;
+    }
+
+    if (content != null) {
+      return (await context
+              .evaluateHandle(addScriptContent, args: [content, type]))
+          .asElement;
+    }
+  }
+
+  Future<ElementHandle> addStyleTag(
+      {String url, File file, String content}) async {
+    assert(url != null || file != null || content != null);
+
+    var context = await executionContext;
+
+    if (url != null) {
+      return (await context.evaluateHandle(Js.function(['url'], '''
+const link = document.createElement('link');
+link.rel = 'stylesheet';
+link.href = url;
+const promise = new Promise((res, rej) => {
+  link.onload = res;
+  link.onerror = rej;
+});
+document.head.appendChild(link);
+await promise;
+return link;   
+''', isAsync: true), args: [url])).asElement;
+    }
+
+    var addStyleContent = Js.function(['content'], '''
+const style = document.createElement('style');
+style.type = 'text/css';
+style.appendChild(document.createTextNode(content));
+const promise = new Promise((res, rej) => {
+  style.onload = res;
+  style.onerror = rej;
+});
+document.head.appendChild(style);
+await promise;
+return style;
+''', isAsync: true);
+
+    if (file != null) {
+      var contents = await file.readAsString();
+      contents += '/*# sourceURL=' + file.absolute.path + '*/';
+      return (await context.evaluateHandle(addStyleContent, args: [contents]))
+          .asElement;
+    }
+
+    if (content != null) {
+      return (await context.evaluateHandle(addStyleContent, args: [content]))
+          .asElement;
+    }
+
+    throw StateError('');
+  }
+
+  Future click(String selector,
+      {Duration delay, MouseButton button, int clickCount}) async {
+    var handle = await $(selector);
+    assert(handle != null, 'No node found for selector: ' + selector);
+    await handle.click(delay: delay, button: button, clickCount: clickCount);
+    await handle.dispose();
+  }
+
+  Future focus(String selector) async {
+    var handle = await $(selector);
+    assert(handle != null, 'No node found for selector: ' + selector);
+    await handle.focus();
+    await handle.dispose();
+  }
+
+  Future hover(String selector) async {
+    var handle = await $(selector);
+    assert(handle != null, 'No node found for selector: ' + selector);
+    await handle.hover();
+    await handle.dispose();
+  }
 
   Future<List<String>> select(String selector, List<String> values) {
     return $eval(selector, Js.function(['element', 'values'], '''
-        if (element.nodeName.toLowerCase() !== 'select')
-    throw new Error('Element is not a <select> element.');
+if (element.nodeName.toLowerCase() !== 'select') {
+  throw new Error('Element is not a <select> element.');
+}
 
-    const options = Array.from(element.options);
-    element.value = undefined;
-    for (const option of options) {
-    option.selected = values.includes(option.value);
-    if (option.selected && !element.multiple)
+const options = Array.from(element.options);
+element.value = undefined;
+for (const option of options) {
+  option.selected = values.includes(option.value);
+  if (option.selected && !element.multiple)
     break;
-    }
-    element.dispatchEvent(new Event('input', { 'bubbles': true }));
-    element.dispatchEvent(new Event('change', { 'bubbles': true }));
-    return options.filter(option => option.selected).map(option => option.value);
-    '''), args: [values]);
+}
+element.dispatchEvent(new Event('input', { 'bubbles': true }));
+element.dispatchEvent(new Event('change', { 'bubbles': true }));
+return options.filter(option => option.selected).map(option => option.value);
+'''), args: [values]);
   }
 
-  Future tap(String selector) {}
+  Future tap(String selector) async {
+    var handle = await $(selector);
+    assert(handle != null, 'No node found for selector: ' + selector);
+    await handle.tap();
+    await handle.dispose();
+  }
 
-  Future type(String selector, String text, {Duration delay}) {}
+  Future type(String selector, String text, {Duration delay}) async {
+    var handle = await $(selector);
+    assert(handle != null, 'No node found for selector: ' + selector);
+    await handle.type(text, delay: delay);
+    await handle.dispose();
+  }
 
-  Future<ElementHandle> waitForSelector(String selector, {bool visible, bool hidden, Duration timeout}) {}
+  Future<ElementHandle> waitForSelector(String selector,
+      {bool visible, bool hidden, Duration timeout}) {
 
-  Future<ElementHandle> waitForXPath(String xpath, {bool visible, bool hidden, Duration timeout}) {}
+  }
 
-  Future<JsHandle> waitForFunction(String pageFunction, Map<String, dynamic> args, {Duration timeout, Polling polling}) {}
+  Future<ElementHandle> waitForXPath(String xpath,
+      {bool visible, bool hidden, Duration timeout}) {}
 
-  Future<String> get title => null;
+  Future<JsHandle> waitForFunction(
+      String pageFunction, Map<String, dynamic> args,
+      {Duration timeout, Polling polling}) {}
+
+  Future<String> get title => evaluate(Js.function([], 'return document.title;'));
 }
 
 class WaitTask {
@@ -168,10 +317,10 @@ class WaitTask {
 
 class Polling {
   Polling.raf();
+
   Polling.mutation();
+
   Polling.interval(Duration duration);
 }
 
-enum MouseButton {
-  left, right, middle
-}
+enum MouseButton { left, right, middle }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:chrome_dev_tools/domains/network.dart';
 import 'package:chrome_dev_tools/domains/page.dart';
@@ -378,12 +379,12 @@ class PageFrame {
   return _secondaryWorld.setContent(html, timeout: timeout, waitUntil: waitUntil);
   }
 
-  Future<ElementHandle> addScriptTag({String url, String path, String content, String type}) {
-    return _mainWorld.addScriptTag(url: url, path: path, content: content, type: type);
+  Future<ElementHandle> addScriptTag({String url, File file, String content, String type}) {
+    return _mainWorld.addScriptTag(url: url, file: file, content: content, type: type);
   }
 
-  Future<ElementHandle> addStyleTag({String url, String path, String content}) {
-    return _mainWorld.addStyleTag(url: url, path: path, content: content);
+  Future<ElementHandle> addStyleTag({String url, File file, String content}) {
+    return _mainWorld.addStyleTag(url: url, file: file, content: content);
   }
 
   Future click(String selector, {Duration delay, MouseButton button, int clickCount}) {

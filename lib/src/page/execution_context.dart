@@ -133,7 +133,7 @@ class Js {
         declaredArguments = null,
         _async = false;
 
-  Js.function(this.declaredArguments, this._body, {bool isAsync= false})
+  Js.function(this.declaredArguments, this._body, {bool isAsync = false})
       : isExpression = false,
         assert(declaredArguments != null),
         _async = isAsync;
@@ -143,8 +143,8 @@ class Js {
     if (isExpression) {
       return _body;
     } else {
-      return '''${_async ? 'async ' : ''}function(${declaredArguments.join(
-          ', ')}) {
+      return '''
+${_async ? 'async ' : ''}function(${declaredArguments.join(', ')}) {
   $_body 
 }''';
     }

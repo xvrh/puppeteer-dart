@@ -140,11 +140,11 @@ class NetworkManager {
   }
 
   void _onAuthRequired(AuthRequiredEvent event) {
-    var response = 'Default';
+    var response = fetch.AuthChallengeResponseResponse.default$;
     if (_attemptedAuthentications.contains(event.requestId.value)) {
-      response = 'CancelAuth';
+      response =  fetch.AuthChallengeResponseResponse.cancelAuth;
     } else if (_credentials != null) {
-      response = 'ProvideCredentials';
+      response = fetch.AuthChallengeResponseResponse.provideCredentials;
       _attemptedAuthentications.add(event.requestId.value);
     }
 

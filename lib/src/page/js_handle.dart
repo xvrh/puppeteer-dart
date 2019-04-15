@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:chrome_dev_tools/domains/runtime.dart';
+import 'package:chrome_dev_tools/src/page/dom_world.dart';
 import 'package:chrome_dev_tools/src/page/execution_context.dart';
 import 'package:chrome_dev_tools/src/page/frame_manager.dart';
 import 'package:chrome_dev_tools/src/page/helper.dart';
@@ -16,10 +17,10 @@ class JsHandle {
   factory JsHandle.fromRemoteObject(
       ExecutionContext context, RemoteObject remoteObject) {
     var frame = context.frame;
-    if (remoteObject.subtype == 'node' && frame != null) {
+    if (remoteObject.subtype == RemoteObjectSubtype.node && frame != null) {
       var frameManager = context.world.frameManager;
       return ElementHandle(
-          context, remoteObject, frameManager.page, frameManager);
+          context, remoteObject, context.frame, frameManager);
     }
     return JsHandle(context, remoteObject);
   }
@@ -95,33 +96,18 @@ return result;
 }
 
 class ElementHandle extends JsHandle {
-  final Page page;
+  final PageFrame frame;
   final FrameManager frameManager;
 
-  ElementHandle(ExecutionContext context, RemoteObject remoteObject, this.page,
+  ElementHandle(ExecutionContext context, RemoteObject remoteObject, this.frame,
       this.frameManager)
       : super(context, remoteObject);
+
+  Page get page => frameManager.page;
 
   @override
   ElementHandle get asElement => this;
 
-  /*Future<List<ElementHandle>> $x(String expression) async {
-    return null;
-  }
-
-  Future<ElementHandle> $(String selector) async {}
-
-  Future<List<ElementHandle>> $$(String selector) async {}
-
-  Future $eval(String selector, String pageFunction,
-      [Map<String, dynamic> args]) async {}
-
-  Future $$eval(String selector, String pageFunction,
-      [Map<String, dynamic> args]) async {}*/
-
-  /**
-   * @return {!Promise<?Puppeteer.Frame>}
-   */
   Future<PageFrame> get contentFrame async {
     var nodeInfo =
         await context.domApi.describeNode(objectId: remoteObject.objectId);
@@ -183,15 +169,16 @@ return false;
     //TODO(xha)
   }
 
-  Future hover() {
-    //TODO(xha)
+  Future hover() async {
+    await _scrollIntoViewIfNeeded();
+    var point = await _clickablePoint();
+    await page.mouse.move(point);
   }
 
-  /**
-   * @param {!{delay?: number, button?: "left"|"right"|"middle", clickCount?: number}=} options
-   */
-  Future click(options) {
-    //TODO(xha)
+  Future click({Duration delay, MouseButton button, int clickCount}) async {
+    await _scrollIntoViewIfNeeded();
+    var point = await _clickablePoint();
+    await page.mouse.click(point, delay: delay, button: button, clickCount: clickCount);
   }
 
   /**
@@ -201,28 +188,24 @@ return false;
 //TODO(xha)
   }
 
-  Future tap() {
-//TODO(xha)
+  Future tap() async {
+    await _scrollIntoViewIfNeeded();
+    var point = await _clickablePoint();
+    await page.touchscreen.tap(point);
   }
 
   Future focus() {
-//TODO(xha)
+    return frame.evaluate(Js.function(['element'], 'return element.focus();'), args: [this]);
   }
 
-  /**
-   * @param {string} text
-   * @param {{delay: (number|undefined)}=} options
-   */
-  Future type(text, options) {
-//TODO(xha)
+  Future type(String text, {Duration delay}) async {
+    await focus();
+    await page.keyboard.type(text, delay: delay);
   }
 
-  /**
-   * @param {string} key
-   * @param {!{delay?: number, text?: string}=} options
-   */
-  Future press(key, options) {
-//TODO(xha)
+  Future press(String key, {Duration delay, String text}) async {
+    await focus();
+    await page.keyboard.press(key, delay: delay, text: text);
   }
 
   /**

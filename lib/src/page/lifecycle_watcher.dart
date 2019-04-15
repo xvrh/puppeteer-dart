@@ -12,10 +12,10 @@ class LifecycleWatcher {
   List<StreamSubscription> _subscriptions;
   LoaderId _initialLoaderId;
   NetworkRequest _navigationRequest;
-  final Completer _sameDocumentNavigationCompleter = Completer(),
-      _lifecycleCompleter = Completer(),
-      _terminationCompleter = Completer(),
-      _newDocumentNavigationCompleter = Completer();
+  final _sameDocumentNavigationCompleter = Completer<Exception>(),
+      _lifecycleCompleter = Completer<Exception>(),
+      _terminationCompleter = Completer<Exception>(),
+      _newDocumentNavigationCompleter = Completer<Exception>();
   Future _timeoutFuture;
   bool _hasSameDocumentNavigation = false;
   Timer _timeoutTimer;
@@ -37,19 +37,19 @@ class LifecycleWatcher {
     _checkLifecycleComplete();
   }
 
-  Future get timeoutOrTermination {
+  Future<Exception> get timeoutOrTermination {
     return Future.any([
       _timeoutFuture,
       _terminationCompleter.future,
-      frameManager.page.client.onEvent.last
+      frameManager.page.client.onEvent.last.then((_) => Exception('Navigation failed because browser has disconnected!'))
     ]);
   }
 
-  Future get newDocumentNavigation => _newDocumentNavigationCompleter.future;
+  Future<Exception> get newDocumentNavigation => _newDocumentNavigationCompleter.future;
 
-  Future get sameDocumentNavigation => _sameDocumentNavigationCompleter.future;
+  Future<Exception> get sameDocumentNavigation => _sameDocumentNavigationCompleter.future;
 
-  Future get lifecycle => _lifecycleCompleter.future;
+  Future<Exception> get lifecycle => _lifecycleCompleter.future;
 
   NetworkResponse get navigationResponse {
     return _navigationRequest != null ? _navigationRequest.response : null;
@@ -78,7 +78,7 @@ class LifecycleWatcher {
     var errorMessage =
         'Navigation Timeout Exceeded: ${timeout.inMilliseconds}ms exceeded';
     var completer = Completer();
-    _timeoutTimer = Timer(timeout, () => completer.complete(errorMessage));
+    _timeoutTimer = Timer(timeout, () => completer.complete(Exception(errorMessage)));
     return completer.future;
   }
 
