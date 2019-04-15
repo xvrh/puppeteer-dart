@@ -83,7 +83,8 @@ class StreamHandle {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is StreamHandle && other.value == value;
+  bool operator ==(other) =>
+      (other is StreamHandle && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

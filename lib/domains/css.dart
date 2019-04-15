@@ -401,7 +401,8 @@ class StyleSheetId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is StyleSheetId && other.value == value;
+  bool operator ==(other) =>
+      (other is StyleSheetId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -1029,7 +1030,7 @@ class CSSMedia {
   /// specified by an @import rule, "linkedSheet" if specified by a "media" attribute in a linked
   /// stylesheet's LINK tag, "inlineSheet" if specified by a "media" attribute in an inline
   /// stylesheet's STYLE tag.
-  final String source;
+  final CSSMediaSource source;
 
   /// URL of the document containing the media query description.
   final String sourceURL;
@@ -1055,7 +1056,7 @@ class CSSMedia {
   factory CSSMedia.fromJson(Map<String, dynamic> json) {
     return CSSMedia(
       text: json['text'],
-      source: json['source'],
+      source: CSSMediaSource.fromJson(json['source']),
       sourceURL: json.containsKey('sourceURL') ? json['sourceURL'] : null,
       range: json.containsKey('range')
           ? SourceRange.fromJson(json['range'])
@@ -1090,6 +1091,32 @@ class CSSMedia {
     }
     return json;
   }
+}
+
+class CSSMediaSource {
+  static const CSSMediaSource mediaRule = const CSSMediaSource._('mediaRule');
+  static const CSSMediaSource importRule = const CSSMediaSource._('importRule');
+  static const CSSMediaSource linkedSheet =
+      const CSSMediaSource._('linkedSheet');
+  static const CSSMediaSource inlineSheet =
+      const CSSMediaSource._('inlineSheet');
+  static const values = const {
+    'mediaRule': mediaRule,
+    'importRule': importRule,
+    'linkedSheet': linkedSheet,
+    'inlineSheet': inlineSheet,
+  };
+
+  final String value;
+
+  const CSSMediaSource._(this.value);
+
+  factory CSSMediaSource.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// Media query descriptor.

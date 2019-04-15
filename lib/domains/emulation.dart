@@ -147,7 +147,9 @@ class EmulationApi {
   /// [enabled] Whether touch emulation based on mouse input should be enabled.
   /// [configuration] Touch/gesture events configuration. Default: current platform.
   Future setEmitTouchEventsForMouse(bool enabled,
-      {String configuration}) async {
+      {@Enum(['mobile', 'desktop']) String configuration}) async {
+    assert(configuration == null ||
+        const ['mobile', 'desktop'].contains(configuration));
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
@@ -299,7 +301,7 @@ class EmulationApi {
 /// Screen orientation.
 class ScreenOrientation {
   /// Orientation type.
-  final String type;
+  final ScreenOrientationType type;
 
   /// Orientation angle.
   final int angle;
@@ -308,7 +310,7 @@ class ScreenOrientation {
 
   factory ScreenOrientation.fromJson(Map<String, dynamic> json) {
     return ScreenOrientation(
-      type: json['type'],
+      type: ScreenOrientationType.fromJson(json['type']),
       angle: json['angle'],
     );
   }
@@ -320,6 +322,34 @@ class ScreenOrientation {
     };
     return json;
   }
+}
+
+class ScreenOrientationType {
+  static const ScreenOrientationType portraitPrimary =
+      const ScreenOrientationType._('portraitPrimary');
+  static const ScreenOrientationType portraitSecondary =
+      const ScreenOrientationType._('portraitSecondary');
+  static const ScreenOrientationType landscapePrimary =
+      const ScreenOrientationType._('landscapePrimary');
+  static const ScreenOrientationType landscapeSecondary =
+      const ScreenOrientationType._('landscapeSecondary');
+  static const values = const {
+    'portraitPrimary': portraitPrimary,
+    'portraitSecondary': portraitSecondary,
+    'landscapePrimary': landscapePrimary,
+    'landscapeSecondary': landscapeSecondary,
+  };
+
+  final String value;
+
+  const ScreenOrientationType._(this.value);
+
+  factory ScreenOrientationType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// advance: If the scheduler runs out of immediate work, the virtual time base may fast forward to

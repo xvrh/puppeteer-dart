@@ -68,7 +68,8 @@ class AXNodeId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is AXNodeId && other.value == value;
+  bool operator ==(other) =>
+      (other is AXNodeId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -396,7 +397,7 @@ class AXValue {
       'type': type.toJson(),
     };
     if (value != null) {
-      json['value'] = value.toJson();
+      json['value'] = value;
     }
     if (relatedNodes != null) {
       json['relatedNodes'] = relatedNodes.map((e) => e.toJson()).toList();

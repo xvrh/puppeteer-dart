@@ -287,7 +287,8 @@ class RequestId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is RequestId && other.value == value;
+  bool operator ==(other) =>
+      (other is RequestId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -386,7 +387,7 @@ class HeaderEntry {
 /// Authorization challenge for HTTP status code 401 or 407.
 class AuthChallenge {
   /// Source of the authentication challenge.
-  final String source;
+  final AuthChallengeSource source;
 
   /// Origin of the challenger.
   final String origin;
@@ -405,7 +406,9 @@ class AuthChallenge {
 
   factory AuthChallenge.fromJson(Map<String, dynamic> json) {
     return AuthChallenge(
-      source: json.containsKey('source') ? json['source'] : null,
+      source: json.containsKey('source')
+          ? AuthChallengeSource.fromJson(json['source'])
+          : null,
       origin: json['origin'],
       scheme: json['scheme'],
       realm: json['realm'],
@@ -425,12 +428,33 @@ class AuthChallenge {
   }
 }
 
+class AuthChallengeSource {
+  static const AuthChallengeSource server =
+      const AuthChallengeSource._('Server');
+  static const AuthChallengeSource proxy = const AuthChallengeSource._('Proxy');
+  static const values = const {
+    'Server': server,
+    'Proxy': proxy,
+  };
+
+  final String value;
+
+  const AuthChallengeSource._(this.value);
+
+  factory AuthChallengeSource.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Response to an AuthChallenge.
 class AuthChallengeResponse {
   /// The decision on what to do in response to the authorization challenge.  Default means
   /// deferring to the default behavior of the net stack, which will likely either the Cancel
   /// authentication or display a popup dialog box.
-  final String response;
+  final AuthChallengeResponseResponse response;
 
   /// The username to provide, possibly empty. Should only be set if response is
   /// ProvideCredentials.
@@ -445,7 +469,7 @@ class AuthChallengeResponse {
 
   factory AuthChallengeResponse.fromJson(Map<String, dynamic> json) {
     return AuthChallengeResponse(
-      response: json['response'],
+      response: AuthChallengeResponseResponse.fromJson(json['response']),
       username: json.containsKey('username') ? json['username'] : null,
       password: json.containsKey('password') ? json['password'] : null,
     );
@@ -463,4 +487,29 @@ class AuthChallengeResponse {
     }
     return json;
   }
+}
+
+class AuthChallengeResponseResponse {
+  static const AuthChallengeResponseResponse default$ =
+      const AuthChallengeResponseResponse._('Default');
+  static const AuthChallengeResponseResponse cancelAuth =
+      const AuthChallengeResponseResponse._('CancelAuth');
+  static const AuthChallengeResponseResponse provideCredentials =
+      const AuthChallengeResponseResponse._('ProvideCredentials');
+  static const values = const {
+    'Default': default$,
+    'CancelAuth': cancelAuth,
+    'ProvideCredentials': provideCredentials,
+  };
+
+  final String value;
+
+  const AuthChallengeResponseResponse._(this.value);
+
+  factory AuthChallengeResponseResponse.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }

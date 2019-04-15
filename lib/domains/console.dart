@@ -35,10 +35,10 @@ class ConsoleApi {
 /// Console message.
 class ConsoleMessage {
   /// Message source.
-  final String source;
+  final ConsoleMessageSource source;
 
   /// Message severity.
-  final String level;
+  final ConsoleMessageLevel level;
 
   /// Message text.
   final String text;
@@ -62,8 +62,8 @@ class ConsoleMessage {
 
   factory ConsoleMessage.fromJson(Map<String, dynamic> json) {
     return ConsoleMessage(
-      source: json['source'],
-      level: json['level'],
+      source: ConsoleMessageSource.fromJson(json['source']),
+      level: ConsoleMessageLevel.fromJson(json['level']),
       text: json['text'],
       url: json.containsKey('url') ? json['url'] : null,
       line: json.containsKey('line') ? json['line'] : null,
@@ -88,4 +88,79 @@ class ConsoleMessage {
     }
     return json;
   }
+}
+
+class ConsoleMessageSource {
+  static const ConsoleMessageSource xml = const ConsoleMessageSource._('xml');
+  static const ConsoleMessageSource javascript =
+      const ConsoleMessageSource._('javascript');
+  static const ConsoleMessageSource network =
+      const ConsoleMessageSource._('network');
+  static const ConsoleMessageSource consoleApi =
+      const ConsoleMessageSource._('console-api');
+  static const ConsoleMessageSource storage =
+      const ConsoleMessageSource._('storage');
+  static const ConsoleMessageSource appcache =
+      const ConsoleMessageSource._('appcache');
+  static const ConsoleMessageSource rendering =
+      const ConsoleMessageSource._('rendering');
+  static const ConsoleMessageSource security =
+      const ConsoleMessageSource._('security');
+  static const ConsoleMessageSource other =
+      const ConsoleMessageSource._('other');
+  static const ConsoleMessageSource deprecation =
+      const ConsoleMessageSource._('deprecation');
+  static const ConsoleMessageSource worker =
+      const ConsoleMessageSource._('worker');
+  static const values = const {
+    'xml': xml,
+    'javascript': javascript,
+    'network': network,
+    'console-api': consoleApi,
+    'storage': storage,
+    'appcache': appcache,
+    'rendering': rendering,
+    'security': security,
+    'other': other,
+    'deprecation': deprecation,
+    'worker': worker,
+  };
+
+  final String value;
+
+  const ConsoleMessageSource._(this.value);
+
+  factory ConsoleMessageSource.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+class ConsoleMessageLevel {
+  static const ConsoleMessageLevel log = const ConsoleMessageLevel._('log');
+  static const ConsoleMessageLevel warning =
+      const ConsoleMessageLevel._('warning');
+  static const ConsoleMessageLevel error = const ConsoleMessageLevel._('error');
+  static const ConsoleMessageLevel debug = const ConsoleMessageLevel._('debug');
+  static const ConsoleMessageLevel info = const ConsoleMessageLevel._('info');
+  static const values = const {
+    'log': log,
+    'warning': warning,
+    'error': error,
+    'debug': debug,
+    'info': info,
+  };
+
+  final String value;
+
+  const ConsoleMessageLevel._(this.value);
+
+  factory ConsoleMessageLevel.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }

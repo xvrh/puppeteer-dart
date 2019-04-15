@@ -49,10 +49,10 @@ class LogApi {
 /// Log entry.
 class LogEntry {
   /// Log entry source.
-  final String source;
+  final LogEntrySource source;
 
   /// Log entry severity.
-  final String level;
+  final LogEntryLevel level;
 
   /// Logged text.
   final String text;
@@ -92,8 +92,8 @@ class LogEntry {
 
   factory LogEntry.fromJson(Map<String, dynamic> json) {
     return LogEntry(
-      source: json['source'],
-      level: json['level'],
+      source: LogEntrySource.fromJson(json['source']),
+      level: LogEntryLevel.fromJson(json['level']),
       text: json['text'],
       timestamp: runtime.Timestamp.fromJson(json['timestamp']),
       url: json.containsKey('url') ? json['url'] : null,
@@ -142,10 +142,79 @@ class LogEntry {
   }
 }
 
+class LogEntrySource {
+  static const LogEntrySource xml = const LogEntrySource._('xml');
+  static const LogEntrySource javascript = const LogEntrySource._('javascript');
+  static const LogEntrySource network = const LogEntrySource._('network');
+  static const LogEntrySource storage = const LogEntrySource._('storage');
+  static const LogEntrySource appcache = const LogEntrySource._('appcache');
+  static const LogEntrySource rendering = const LogEntrySource._('rendering');
+  static const LogEntrySource security = const LogEntrySource._('security');
+  static const LogEntrySource deprecation =
+      const LogEntrySource._('deprecation');
+  static const LogEntrySource worker = const LogEntrySource._('worker');
+  static const LogEntrySource violation = const LogEntrySource._('violation');
+  static const LogEntrySource intervention =
+      const LogEntrySource._('intervention');
+  static const LogEntrySource recommendation =
+      const LogEntrySource._('recommendation');
+  static const LogEntrySource other = const LogEntrySource._('other');
+  static const values = const {
+    'xml': xml,
+    'javascript': javascript,
+    'network': network,
+    'storage': storage,
+    'appcache': appcache,
+    'rendering': rendering,
+    'security': security,
+    'deprecation': deprecation,
+    'worker': worker,
+    'violation': violation,
+    'intervention': intervention,
+    'recommendation': recommendation,
+    'other': other,
+  };
+
+  final String value;
+
+  const LogEntrySource._(this.value);
+
+  factory LogEntrySource.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+class LogEntryLevel {
+  static const LogEntryLevel verbose = const LogEntryLevel._('verbose');
+  static const LogEntryLevel info = const LogEntryLevel._('info');
+  static const LogEntryLevel warning = const LogEntryLevel._('warning');
+  static const LogEntryLevel error = const LogEntryLevel._('error');
+  static const values = const {
+    'verbose': verbose,
+    'info': info,
+    'warning': warning,
+    'error': error,
+  };
+
+  final String value;
+
+  const LogEntryLevel._(this.value);
+
+  factory LogEntryLevel.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Violation configuration setting.
 class ViolationSetting {
   /// Violation type.
-  final String name;
+  final ViolationSettingName name;
 
   /// Time threshold to trigger upon.
   final num threshold;
@@ -154,7 +223,7 @@ class ViolationSetting {
 
   factory ViolationSetting.fromJson(Map<String, dynamic> json) {
     return ViolationSetting(
-      name: json['name'],
+      name: ViolationSettingName.fromJson(json['name']),
       threshold: json['threshold'],
     );
   }
@@ -166,4 +235,41 @@ class ViolationSetting {
     };
     return json;
   }
+}
+
+class ViolationSettingName {
+  static const ViolationSettingName longTask =
+      const ViolationSettingName._('longTask');
+  static const ViolationSettingName longLayout =
+      const ViolationSettingName._('longLayout');
+  static const ViolationSettingName blockedEvent =
+      const ViolationSettingName._('blockedEvent');
+  static const ViolationSettingName blockedParser =
+      const ViolationSettingName._('blockedParser');
+  static const ViolationSettingName discouragedAPIUse =
+      const ViolationSettingName._('discouragedAPIUse');
+  static const ViolationSettingName handler =
+      const ViolationSettingName._('handler');
+  static const ViolationSettingName recurringHandler =
+      const ViolationSettingName._('recurringHandler');
+  static const values = const {
+    'longTask': longTask,
+    'longLayout': longLayout,
+    'blockedEvent': blockedEvent,
+    'blockedParser': blockedParser,
+    'discouragedAPIUse': discouragedAPIUse,
+    'handler': handler,
+    'recurringHandler': recurringHandler,
+  };
+
+  final String value;
+
+  const ViolationSettingName._(this.value);
+
+  factory ViolationSettingName.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }

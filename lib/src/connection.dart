@@ -16,6 +16,10 @@ class Event {
   Event._(this.name, this.parameters);
 }
 
+class Enum {
+  const Enum(List<String> values);
+}
+
 class Connection implements Client {
   final Logger _logger = Logger('connection');
   static int _lastId = 0;

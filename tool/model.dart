@@ -113,6 +113,7 @@ class Parameter implements Typed {
   final bool optional;
   final bool deprecated;
   final ListItems items;
+  final List<String> enumValues;
 
   @override
   final String type;
@@ -127,7 +128,7 @@ class Parameter implements Typed {
       this.ref,
       this.optional = false,
       this.deprecated = false,
-      this.items});
+      this.items, this.enumValues});
 
   Parameter.fromJson(Map json)
       : name = json['name'],
@@ -138,6 +139,9 @@ class Parameter implements Typed {
         deprecated = json['deprecated'] ?? false,
         items = json.containsKey('items')
             ? ListItems.fromJson(json['items'])
+            : null,
+        enumValues = json.containsKey('enum')
+            ? (json['enum'] as List).cast<String>()
             : null;
 
   String get normalizedName => preventKeywords(name);

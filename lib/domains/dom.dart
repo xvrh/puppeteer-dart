@@ -974,7 +974,8 @@ class NodeId {
   int toJson() => value;
 
   @override
-  bool operator ==(other) => other is NodeId && other.value == value;
+  bool operator ==(other) =>
+      (other is NodeId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -995,7 +996,8 @@ class BackendNodeId {
   int toJson() => value;
 
   @override
-  bool operator ==(other) => other is BackendNodeId && other.value == value;
+  bool operator ==(other) =>
+      (other is BackendNodeId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -1425,7 +1427,8 @@ class Quad {
   List<num> toJson() => value;
 
   @override
-  bool operator ==(other) => other is Quad && other.value == value;
+  bool operator ==(other) =>
+      (other is Quad && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -1524,8 +1527,8 @@ class ShapeOutsideInfo {
   Map<String, dynamic> toJson() {
     var json = <String, dynamic>{
       'bounds': bounds.toJson(),
-      'shape': shape.map((e) => e.toJson()).toList(),
-      'marginShape': marginShape.map((e) => e.toJson()).toList(),
+      'shape': shape.map((e) => e).toList(),
+      'marginShape': marginShape.map((e) => e).toList(),
     };
     return json;
   }

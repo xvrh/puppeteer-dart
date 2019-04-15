@@ -109,7 +109,8 @@ class CacheId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is CacheId && other.value == value;
+  bool operator ==(other) =>
+      (other is CacheId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

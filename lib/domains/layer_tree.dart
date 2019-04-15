@@ -161,7 +161,8 @@ class LayerId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is LayerId && other.value == value;
+  bool operator ==(other) =>
+      (other is LayerId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -181,7 +182,8 @@ class SnapshotId {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is SnapshotId && other.value == value;
+  bool operator ==(other) =>
+      (other is SnapshotId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -196,14 +198,14 @@ class ScrollRect {
   final dom.Rect rect;
 
   /// Reason for rectangle to force scrolling on the main thread
-  final String type;
+  final ScrollRectType type;
 
   ScrollRect({@required this.rect, @required this.type});
 
   factory ScrollRect.fromJson(Map<String, dynamic> json) {
     return ScrollRect(
       rect: dom.Rect.fromJson(json['rect']),
-      type: json['type'],
+      type: ScrollRectType.fromJson(json['type']),
     );
   }
 
@@ -214,6 +216,31 @@ class ScrollRect {
     };
     return json;
   }
+}
+
+class ScrollRectType {
+  static const ScrollRectType repaintsOnScroll =
+      const ScrollRectType._('RepaintsOnScroll');
+  static const ScrollRectType touchEventHandler =
+      const ScrollRectType._('TouchEventHandler');
+  static const ScrollRectType wheelEventHandler =
+      const ScrollRectType._('WheelEventHandler');
+  static const values = const {
+    'RepaintsOnScroll': repaintsOnScroll,
+    'TouchEventHandler': touchEventHandler,
+    'WheelEventHandler': wheelEventHandler,
+  };
+
+  final String value;
+
+  const ScrollRectType._(this.value);
+
+  factory ScrollRectType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// Sticky position constraints.
@@ -454,7 +481,8 @@ class PaintProfile {
   List<num> toJson() => value;
 
   @override
-  bool operator ==(other) => other is PaintProfile && other.value == value;
+  bool operator ==(other) =>
+      (other is PaintProfile && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

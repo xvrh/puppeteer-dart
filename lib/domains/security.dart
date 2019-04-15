@@ -134,7 +134,8 @@ class CertificateId {
   int toJson() => value;
 
   @override
-  bool operator ==(other) => other is CertificateId && other.value == value;
+  bool operator ==(other) =>
+      (other is CertificateId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

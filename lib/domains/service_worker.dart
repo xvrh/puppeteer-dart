@@ -122,7 +122,8 @@ class RegistrationID {
   String toJson() => value;
 
   @override
-  bool operator ==(other) => other is RegistrationID && other.value == value;
+  bool operator ==(other) =>
+      (other is RegistrationID && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

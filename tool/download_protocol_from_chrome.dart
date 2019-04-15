@@ -5,7 +5,7 @@ import 'package:chrome_dev_tools/chrome_downloader.dart';
 import 'package:http/http.dart';
 import 'package:path/path.dart' as p;
 
-const protocolFile = 'protocol_from_chrome.json';
+import 'generate_domains.dart';
 
 /// Download the Chrome Dev Tools protocol (json file) directly from a running Chrome instance.
 main() async {
@@ -17,7 +17,7 @@ main() async {
     String url = chrome.connection.url.replaceAll('ws://', 'http://');
     String response = await read(p.url.join(url, '/json/protocol'));
 
-    new File('tool/json/$protocolFile').writeAsStringSync(response);
+    new File('tool/json/$protocolFromChromeFile').writeAsStringSync(response);
   } finally {
     await chrome.close();
   }

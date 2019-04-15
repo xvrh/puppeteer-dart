@@ -209,7 +209,8 @@ class WindowID {
   int toJson() => value;
 
   @override
-  bool operator ==(other) => other is WindowID && other.value == value;
+  bool operator ==(other) =>
+      (other is WindowID && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
