@@ -8,6 +8,7 @@ import 'package:chrome_dev_tools/domains/runtime.dart';
 import 'package:chrome_dev_tools/domains/target.dart';
 import 'package:chrome_dev_tools/src/connection.dart';
 import 'package:chrome_dev_tools/src/page/dom_world.dart';
+import 'package:chrome_dev_tools/src/page/execution_context.dart';
 import 'package:chrome_dev_tools/src/page/frame_manager.dart';
 import 'package:chrome_dev_tools/src/page/helper.dart';
 import 'package:chrome_dev_tools/src/page/js_handle.dart';
@@ -71,6 +72,7 @@ class Page {
   FrameManager _frameManager;
   final StreamController _workerCreated = StreamController.broadcast(),
       _workerDestroyed = StreamController.broadcast();
+  bool _javascriptEnabled = true;
 
   void dispose() {
     _frameManager.dispose();
@@ -113,10 +115,10 @@ class Page {
     return mainFrame.$(selector);
   }
 
-  Future<JsHandle> evaluateHandle(String pageFunction,
-      [Map<String, dynamic> args]) async {
+  Future<JsHandle> evaluateHandle(Js pageFunction,
+  {List args}) async {
     var context = await mainFrame.executionContext;
-    return context.evaluateHandle(pageFunction, args);
+    return context.evaluateHandle(pageFunction, args: args);
   }
 
   Future<JsHandle> queryObjects(JsHandle prototypeHandle) async {
@@ -124,14 +126,12 @@ class Page {
     return context.queryObjects(prototypeHandle);
   }
 
-  Future $eval(String selector, String pageFunction,
-      [Map<String, dynamic> args]) {
-    return mainFrame.$eval(selector, pageFunction, args);
+  Future $eval(String selector, Js pageFunction, {List args}) {
+    return mainFrame.$eval(selector, pageFunction, args:args);
   }
 
-  Future $$eval(String selector, String pageFunction,
-      [Map<String, dynamic> args]) {
-    return mainFrame.$$eval(selector, pageFunction, args);
+  Future $$eval(String selector, Js pageFunction, {List args}) {
+    return mainFrame.$$eval(selector, pageFunction, args: args);
   }
 
   Future<List<ElementHandle>> $$(String selector) {
@@ -341,10 +341,13 @@ class Page {
     //TODO(xha)
   }
 
+
+  bool get javascriptEnabled => _javascriptEnabled;
   /**
    * @param {boolean} enabled
    */
   Future setJavaScriptEnabled(enabled) {
+    _javascriptEnabled = enabled;
     //TODO(xha)
   }
 
@@ -376,12 +379,11 @@ class Page {
     //TODO(xha)
   }
 
-  Future evaluate(String pageFunction, [Map<String, dynamic> args]) {
-    return _frameManager.mainFrame.evaluate(pageFunction, args);
+  Future evaluate(Js pageFunction, {List args}) {
+    return _frameManager.mainFrame.evaluate(pageFunction, args: args);
   }
 
-  Future evaluateOnNewDocument(pageFunction,
-      [Map<String, dynamic> args]) async {
+  Future evaluateOnNewDocument(String pageFunction, [Map<String, dynamic> args]) async {
     var source = evaluationString(pageFunction, args);
     await tab.page.addScriptToEvaluateOnNewDocument(source);
   }

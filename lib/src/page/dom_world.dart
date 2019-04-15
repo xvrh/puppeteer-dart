@@ -54,14 +54,14 @@ class DomWorld {
     return _contextCompleter.future;
   }
 
-  Future<JsHandle> evaluateHandle(String pageFunction, [Map<String, dynamic>  args]) async {
+  Future<JsHandle> evaluateHandle(Js js, {List args}) async {
     var context = await executionContext;
-    return context.evaluateHandle(pageFunction, args);
+    return context.evaluateHandle(js, args: args);
   }
 
-  Future evaluate(String pageFunction, [Map<String, dynamic> args]) async {
+  Future evaluate(Js pageFunction, {List args}) async {
     var context = await executionContext;
-    return context.evaluate(pageFunction, args);
+    return context.evaluate(pageFunction, args: args);
   }
 
   Future<ElementHandle> $(String selector) async {
@@ -75,7 +75,7 @@ class DomWorld {
       return _documentFuture;
     }
     _documentFuture = executionContext.then((context) async {
-      var document = await context.evaluateHandle('document');
+      var document = await context.evaluateHandle(Js.expression('document'));
       return document.asElement;
     });
     return _documentFuture;
@@ -87,14 +87,14 @@ class DomWorld {
     return value;
   }
 
-  Future $eval(String selector, String pageFunction, [Map<String, dynamic>  args]) async {
+  Future $eval(String selector, Js js, {List  args}) async {
     var document = await _document;
-    return document.$eval(selector, pageFunction, args);
+    return document.$eval(selector, js, args: args);
   }
 
-  Future $$eval(String selector, String pageFunction, [Map<String, dynamic>  args]) async {
+  Future $$eval(String selector, Js pageFunction, {List args}) async {
     var document = await _document;
-    var value = await document.$$eval(selector, pageFunction, args);
+    var value = await document.$$eval(selector, pageFunction, args: args);
     return value;
   }
 
@@ -105,7 +105,7 @@ class DomWorld {
   }
 
   Future<String> get content async {
-    return await evaluate('''
+    return await evaluate(Js.function([], '''
 let retVal = '';
 if (document.doctype) {
   retVal = new XMLSerializer().serializeToString(document.doctype);
@@ -114,7 +114,7 @@ if (document.documentElement) {
   retVal += document.documentElement.outerHTML;
 }
 return retVal;
-''');
+'''));
   }
 
   Future setContent(String html, {Duration timeout, WaitUntil waitUntil}) {}
@@ -129,7 +129,23 @@ return retVal;
 
   Future hover(String selector) {}
 
-  Future<List<String>> select(String selector, List<String> values) {}
+  Future<List<String>> select(String selector, List<String> values) {
+    return $eval(selector, Js.function(['element', 'values'], '''
+        if (element.nodeName.toLowerCase() !== 'select')
+    throw new Error('Element is not a <select> element.');
+
+    const options = Array.from(element.options);
+    element.value = undefined;
+    for (const option of options) {
+    option.selected = values.includes(option.value);
+    if (option.selected && !element.multiple)
+    break;
+    }
+    element.dispatchEvent(new Event('input', { 'bubbles': true }));
+    element.dispatchEvent(new Event('change', { 'bubbles': true }));
+    return options.filter(option => option.selected).map(option => option.value);
+    '''), args: [values]);
+  }
 
   Future tap(String selector) {}
 

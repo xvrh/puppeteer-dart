@@ -238,10 +238,10 @@ class FrameManager {
   }
 
   void _onExecutionContextCreated(ExecutionContextDescription contextPayload) {
-    var frameId = contextPayload.auxData != null
+    String frameId = contextPayload.auxData != null
         ? contextPayload.auxData['frameId']
         : null;
-    var frame = _frames[frameId];
+    var frame = _frames[FrameId(frameId)];
     DomWorld world;
     if (frame != null) {
       if (contextPayload.auxData != null &&
@@ -342,12 +342,12 @@ class PageFrame {
     return _mainWorld.executionContext;
   }
 
-  Future<JsHandle> evaluateHandle(String pageFunction, [Map<String, dynamic> args]) {
-  return _mainWorld.evaluateHandle(pageFunction, args);
+  Future<JsHandle> evaluateHandle(Js pageFunction, {List args}) {
+  return _mainWorld.evaluateHandle(pageFunction, args: args);
   }
 
-  Future evaluate(String pageFunction, [Map<String, dynamic> args]) {
-  return _mainWorld.evaluate(pageFunction, args);
+  Future evaluate(Js pageFunction, {List args}) {
+  return _mainWorld.evaluate(pageFunction, args: args);
   }
 
   Future<ElementHandle> $(String selector) {
@@ -358,12 +358,12 @@ class PageFrame {
     return _mainWorld.$x(expression);
   }
 
-  Future $eval(String selector, String pageFunction, [Map<String, dynamic> args]) {
-  return _mainWorld.$eval(selector, pageFunction, args);
+  Future $eval(String selector, Js pageFunction, {List args}) {
+  return _mainWorld.$eval(selector, pageFunction, args: args);
   }
 
-  Future $$eval(String selector, String pageFunction, [Map<String, dynamic> args]) {
-  return _mainWorld.$$eval(selector, pageFunction, args);
+  Future $$eval(String selector, Js pageFunction, {List args}) {
+  return _mainWorld.$$eval(selector, pageFunction, args: args);
   }
 
   Future<List<ElementHandle>> $$(String selector) {

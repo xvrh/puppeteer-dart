@@ -2521,8 +2521,17 @@ class CookieParam {
   }
 }
 
+class AuthChallengeSource {
+  static const server = 'Server';
+  static const proxy = 'Proxy';
+}
+
 /// Authorization challenge for HTTP status code 401 or 407.
 class AuthChallenge {
+  static const sourceServer = 'Server';
+  static const sourceProxy = 'Proxy';
+  static const sourceValues = [sourceServer, sourceProxy];
+
   /// Source of the authentication challenge.
   final AuthChallengeSource source;
 

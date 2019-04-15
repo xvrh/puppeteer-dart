@@ -36,6 +36,7 @@ main() {
   test('Go to', () async {
     await page.goto('${serverPrefix}simple.html');
     var input = await page.$('#one-input');
-    expect(await input.property('value'), equals('some text'));
+    expect(await (await input.property('value')).jsonValue, equals('some text'));
+    expect(await input.propertyValue('value'), equals('some text'));
   });
 }
