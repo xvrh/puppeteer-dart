@@ -158,19 +158,63 @@ async function _(element, pageJavascriptEnabled) {
     }
   }
 
-  /**
-   * @return {!Promise<!{x: number, y: number}>}
-   */
   Future<Point> _clickablePoint() async {
-    //TODO(xha)
+    var quads =
+        await context.domApi.getContentQuads(objectId: remoteObject.objectId);
+    var layoutMetrics = await context.pageApi.getLayoutMetrics();
+
+    if (quads == null || quads.isEmpty) {
+      throw Exception('Node is either not visible or not an HTMLElement');
+    }
+
+    var layoutViewport = layoutMetrics.layoutViewport;
+
+    // Filter out quads that have too small area to click into.
+    var pointsList = quads
+        .map((quad) => _fromProtocolQuad(quad))
+        .map((quad) => _intersectQuadWithViewport(
+            quad, layoutViewport.clientWidth, layoutViewport.clientHeight))
+        .where((quad) => computeQuadArea(quad) > 1)
+        .toList();
+    if (pointsList.isEmpty) {
+      throw Exception('Node is either not visible or not an HTMLElement');
+    }
+    // Return the middle point of the first quad.
+    var points = pointsList[0];
+    var x = 0;
+    var y = 0;
+    for (var point in points) {
+      x += point.x;
+      y += point.y;
+    }
+    return Point(x / 4, y / 4);
   }
 
-  /**
-   * @param {!Array<number>} quad
-   * @return {!Array<{x: number, y: number}>}
-   */
-  _fromProtocolQuad(quad) {
-    //TODO(xha)
+  List<Point> _fromProtocolQuad(Quad quad) {
+    return [
+      Point(quad.value[0], quad.value[1]),
+      Point(quad.value[2], quad.value[3]),
+      Point(quad.value[4], quad.value[5]),
+      Point(quad.value[6], quad.value[7])
+    ];
+  }
+
+  Iterable<Point> _intersectQuadWithViewport(
+      List<Point> quad, num width, num height) {
+    return quad.map((point) =>
+        Point(min(max(point.x, 0), width), min(max(point.y, 0), height)));
+  }
+
+  static computeQuadArea(List<Point> quad) {
+    // Compute sum of all directed areas of adjacent triangles
+    // https://en.wikipedia.org/wiki/Polygon#Simple_polygons
+    num area = 0;
+    for (var i = 0; i < quad.length; ++i) {
+      var p1 = quad[i];
+      var p2 = quad[(i + 1) % quad.length];
+      area += (p1.x * p2.y - p2.x * p1.y) / 2;
+    }
+    return area.abs();
   }
 
   Future<void> hover() async {
@@ -220,8 +264,7 @@ async function _(element, pageJavascriptEnabled) {
   Future<Rectangle> boundingBox() async {
     var result = await boxModel();
 
-    if (result == null)
-      return null;
+    if (result == null) return null;
 
     var quad = result.border;
     var x = [0, 2, 4, 6].map((i) => quad.value[i]).reduce(min);
@@ -331,10 +374,19 @@ function _(element, expression) {
     return result;
   }
 
-  /**
-   * @returns {!Promise<boolean>}
-   */
-  isIntersectingViewport() {
-//TODO(xha)
+  Future<bool> get isIntersectingViewport {
+    return context.evaluate(Js.function(
+        //language=js
+        '''
+async function _(element) {
+  const visibleRatio = await new Promise(resolve => {
+    const observer = new IntersectionObserver(entries => {
+      resolve(entries[0].intersectionRatio);
+      observer.disconnect();
+    });
+    observer.observe(element);
+  });
+  return visibleRatio > 0;
+}'''), args: [this]);
   }
 }

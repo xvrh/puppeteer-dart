@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chrome_dev_tools/domains/dom.dart';
+import 'package:chrome_dev_tools/domains/page.dart';
 import 'package:chrome_dev_tools/domains/runtime.dart';
 import 'package:chrome_dev_tools/src/connection.dart';
 import 'package:chrome_dev_tools/src/page/dom_world.dart';
@@ -15,12 +16,13 @@ class ExecutionContext {
   final Client client;
   final RuntimeApi runtimeApi;
   final DOMApi domApi;
+  final PageApi pageApi;
   final ExecutionContextDescription context;
   final DomWorld world;
 
   ExecutionContext(this.client, this.context, this.world)
       : runtimeApi = RuntimeApi(client),
-        domApi = DOMApi(client);
+        domApi = DOMApi(client), pageApi = PageApi(client);
 
   PageFrame get frame => world?.frame;
 
