@@ -6,8 +6,6 @@ import '../domains/log.dart';
 Future waitUntilNetworkIdle(NetworkApi network,
     {Duration idleDuration = const Duration(milliseconds: 1000),
     int idleInFlight = 0}) async {
-  await network.enable();
-
   List<String> requestIds = [];
 
   Completer completer = Completer();
@@ -48,7 +46,6 @@ Future waitUntilNetworkIdle(NetworkApi network,
 }
 
 Future waitUntilConsoleContains(LogApi log, String text) async {
-  await log.enable();
   await for (LogEntry logEntry in log.onEntryAdded) {
     if (logEntry.text.contains(text)) {
       return;

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:chrome_dev_tools/chrome_downloader.dart';
 import 'package:chrome_dev_tools/src/page.dart';
+import 'package:chrome_dev_tools/src/page/emulation_manager.dart';
 import 'package:logging/logging.dart';
 import 'package:shelf_static/shelf_static.dart';
 import 'package:test/test.dart';
@@ -41,7 +42,21 @@ main() {
 
   test('Wait for selector', () async {
     var found = false;
-    var waitFor = page.waitForSelector('div').then((_) => found = true);
+    var waitFor = page.waitForSelector('div').then((handle) {
+      found = true;
+      return handle;
+    });
+    await page.goto('${serverPrefix}empty.html');
+    expect(found, isFalse);
+    await page.goto('${serverPrefix}grid.html');
+    var handle = await waitFor;
+    expect(found, isTrue);
+    expect(await handle.propertyValue('className'), equals('box'));
+  });
+
+  test('should wait for an xpath', () async {
+    var found = false;
+    var waitFor = page.waitForXPath('//div').then((handle) => found = true);
     await page.goto('${serverPrefix}empty.html');
     expect(found, isFalse);
     await page.goto('${serverPrefix}grid.html');
@@ -54,20 +69,33 @@ main() {
 
   test('should immediately resolve promise if node exists', () async {
     await page.goto('${serverPrefix}empty.html');
-    var frame = page.mainFrame;
-    await frame.waitForSelector('*');
-    await frame.evaluate(addElement, args: ['div']);
-    await frame.waitForSelector('div');
+    await page.waitForSelector('*');
+    await page.evaluate(addElement, args: ['div']);
+    await page.waitForSelector('div');
   });
 
   test('should resolve promise when node is added', () async {
     await page.goto('${serverPrefix}empty.html');
-    var frame = page.mainFrame;
-    var watchdog = frame.waitForSelector('div');
-    await frame.evaluate(addElement, args: ['br']);
-    await frame.evaluate(addElement, args: ['div']);
+    var watchdog = page.waitForSelector('div');
+    await page.evaluate(addElement, args: ['br']);
+    await page.evaluate(addElement, args: ['div']);
     var eHandle = await watchdog;
     var tagName = await eHandle.propertyValue('tagName');
     expect(tagName, equals('DIV'));
+  });
+
+  test('should work with multiline body', () async {
+    var result = await page.waitForFunction(Js.function([], '''
+  return (() => true)();
+'''), []);
+    expect(await result.jsonValue, isTrue);
+  });
+
+  test('should wait for predicate', () async {
+    await Future.wait([
+      page.waitForFunction(
+          Js.function([], 'return window.innerWidth < 100'), []),
+      page.setViewport(DeviceViewport(width: 10, height: 10)),
+    ]);
   });
 }

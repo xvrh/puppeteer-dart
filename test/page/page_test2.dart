@@ -25,13 +25,11 @@ main() async {
   page = await chrome.newPage('${serverPrefix}empty.html');
 
   try {
-    var found = false;
-    var waitFor = page.waitForSelector('div').then((_) => found = true);
-    await page.goto('${serverPrefix}empty.html');
-    await page.goto('${serverPrefix}grid.html');
-    await waitFor;
-    assert(found);
+    var result = await page.waitForFunction(Js.expression('true'), []);
+    //expect(await result.jsonValue, isTrue);
+    //var watchdog = await page.waitForSelector('body');
     print('Yes');
+    //print(await page.title);
   } finally {
     await chrome.close();
     await server.close(force: true);

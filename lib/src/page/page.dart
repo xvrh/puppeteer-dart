@@ -3,12 +3,13 @@ import 'dart:io';
 
 import 'package:chrome_dev_tools/domains/log.dart';
 import 'package:chrome_dev_tools/domains/network.dart';
-import 'package:chrome_dev_tools/domains/page.dart' hide Frame;
+import 'package:chrome_dev_tools/domains/page.dart' hide Frame, Viewport;
 import 'package:chrome_dev_tools/domains/performance.dart';
 import 'package:chrome_dev_tools/domains/runtime.dart';
 import 'package:chrome_dev_tools/domains/target.dart';
 import 'package:chrome_dev_tools/src/connection.dart';
 import 'package:chrome_dev_tools/src/page/dom_world.dart';
+import 'package:chrome_dev_tools/src/page/emulation_manager.dart';
 import 'package:chrome_dev_tools/src/page/execution_context.dart';
 import 'package:chrome_dev_tools/src/page/frame_manager.dart';
 import 'package:chrome_dev_tools/src/page/helper.dart';
@@ -21,7 +22,7 @@ import 'package:meta/meta.dart';
 import '../connection.dart' show Session;
 
 class Page {
-  static Future<Page> create(Tab tab) async {
+  static Future<Page> create(Tab tab, {DeviceViewport viewport}) async {
     var page = Page._(tab);
 
     await Future.wait([
@@ -30,10 +31,14 @@ class Page {
       tab.performance.enable(),
     ]);
 
+    if (viewport != null) {
+      await page.setViewport(viewport);
+    }
+
     return page;
   }
 
-  Page._(this.tab) {
+  Page._(this.tab): _emulationManager = EmulationManager(tab) {
     _frameManager = FrameManager(this);
 
     tab.target.onAttachedToTarget.listen((e) {
@@ -76,6 +81,8 @@ class Page {
   bool _javascriptEnabled = true;
   Duration navigationTimeout;
   Duration defaultTimeout = Duration(seconds: 30);
+  DeviceViewport _viewport;
+  final EmulationManager _emulationManager;
 
   void dispose() {
     _frameManager.dispose();
@@ -116,6 +123,8 @@ class Page {
 
   get touchscreen => null;
 
+  get mouse => null;
+
   _onLogEntryAdded(event) {
     //TODO(xha)
   }
@@ -135,12 +144,12 @@ class Page {
     return context.queryObjects(prototypeHandle);
   }
 
-  Future $eval(String selector, Js pageFunction, {List args}) {
-    return mainFrame.$eval(selector, pageFunction, args:args);
+  Future<T> $eval<T>(String selector, Js pageFunction, {List args}) {
+    return mainFrame.$eval<T>(selector, pageFunction, args:args);
   }
 
-  Future $$eval(String selector, Js pageFunction, {List args}) {
-    return mainFrame.$$eval(selector, pageFunction, args: args);
+  Future<T> $$eval<T>(String selector, Js pageFunction, {List args}) {
+    return mainFrame.$$eval<T>(selector, pageFunction, args: args);
   }
 
   Future<List<ElementHandle>> $$(String selector) {
@@ -155,7 +164,7 @@ class Page {
     return tab.network.getCookies(urls: urls);
   }
 
-  Future deleteCookie(List<Cookie> cookies) async {
+  Future<void> deleteCookie(List<Cookie> cookies) async {
     var pageUrl = url;
     for (var cookie in cookies) {
       await tab.network.deleteCookies(cookie.name,
@@ -270,7 +279,7 @@ class Page {
     return _frameManager.mainFrame.content;
   }
 
-  Future setContent(String html, {Duration timeout, WaitUntil waitUntil}) {
+  Future<void> setContent(String html, {Duration timeout, WaitUntil waitUntil}) {
     return _frameManager.mainFrame
         .setContent(html, timeout: timeout, waitUntil: waitUntil);
   }
@@ -281,20 +290,15 @@ class Page {
         .goto(url, referrer: referrer, timeout: timeout, waitUntil: waitUntil);
   }
 
-  /**
-   * @param {!{timeout?: number, waitUntil?: string|!Array<string>}=} options
-   * @return {!Promise<?Puppeteer.Response>}
-   */
-  Future reload(options) {
-//TODO(xha)
+  Future<NetworkResponse> reload({Duration timeout, WaitUntil waitUntil}) async {
+    var responseFuture = waitForNavigation(timeout: timeout, waitUntil: waitUntil);
+
+    await tab.page.reload();
+    return await responseFuture;
   }
 
-  /**
-   * @param {!{timeout?: number, waitUntil?: string|!Array<string>}=} options
-   * @return {!Promise<?Puppeteer.Response>}
-   */
-  Future waitForNavigation(options) {
-//TODO(xha)
+  Future<NetworkResponse> waitForNavigation({Duration timeout, WaitUntil waitUntil}) {
+    return _frameManager.mainFrame.waitForNavigation(timeout: timeout, waitUntil: waitUntil);
   }
 
   /**
@@ -374,19 +378,15 @@ class Page {
     //TODO(xha)
   }
 
-  /**
-   * @param {!Puppeteer.Viewport} viewport
-   */
-  Future setViewport(viewport) {
-    //TODO(xha)
+  Future setViewport(DeviceViewport viewport) async {
+    var needsReload = await _emulationManager.emulateViewport(viewport);
+    _viewport = viewport;
+    if (needsReload) {
+      await reload();
+    }
   }
 
-  /**
-   * @return {?Puppeteer.Viewport}
-   */
-  Viewport get viewport {
-    //TODO(xha)
-  }
+  DeviceViewport get viewport => _viewport;
 
   Future evaluate(Js pageFunction, {List args}) {
     return _frameManager.mainFrame.evaluate(pageFunction, args: args);
@@ -421,14 +421,11 @@ class Page {
    */
   Future pdf() {}
 
-  Future<String> title() {
+  Future<String> get title {
     return mainFrame.title;
   }
 
-  /**
-   * @param {!{runBeforeUnload: (boolean|undefined)}=} options
-   */
-  Future close({bool runBeforeUnload}) async {
+  Future<void> close({bool runBeforeUnload}) async {
     runBeforeUnload ??= false;
     if (runBeforeUnload) {
       await tab.page.close();
@@ -437,59 +434,29 @@ class Page {
     }
   }
 
-  /**
-   * @return {!Mouse}
-   */
-  get mouse {
-    //TODO(xha)
-  }
-
-  /**
-   * @param {string} selector
-   * @param {!{delay?: number, button?: "left"|"right"|"middle", clickCount?: number}=} options
-   */
-  Future click(String selector,
+  Future<void> click(String selector,
       {Duration delay, MouseButton button, int clickCount}) {
     return mainFrame.click(selector,
         delay: delay, button: button, clickCount: clickCount);
   }
 
-  /**
-   * @param {string} selector
-   */
-  Future focus(selector) {
+  Future<void> focus(String selector) {
     return mainFrame.focus(selector);
   }
 
-  /**
-   * @param {string} selector
-   */
-  Future hover(selector) {
+  Future<void> hover(String selector) {
     return mainFrame.hover(selector);
   }
 
-  /**
-   * @param {string} selector
-   * @param {!Array<string>} values
-   * @return {!Promise<!Array<string>>}
-   */
-  Future select(selector, List<String> values) {
+  Future<List<String>> select(String selector, List<String> values) {
     return mainFrame.select(selector, values);
   }
 
-  /**
-   * @param {string} selector
-   */
-  Future tap(selector) {
+  Future<void> tap(String selector) {
     return mainFrame.tap(selector);
   }
 
-  /**
-   * @param {string} selector
-   * @param {string} text
-   * @param {{delay: (number|undefined)}=} options
-   */
-  Future type(String selector, String text, {Duration delay}) {
+  Future<void> type(String selector, String text, {Duration delay}) {
     return mainFrame.type(selector, text, delay: delay);
   }
 
@@ -499,17 +466,12 @@ class Page {
         visible: visible, hidden: hidden, timeout: timeout);
   }
 
-  /**
-   * @param {string} xpath
-   * @param {!{visible?: boolean, hidden?: boolean, timeout?: number}=} options
-   * @return {!Promise<?Puppeteer.ElementHandle>}
-   */
-  Future waitForXPath(xpath, options) {
-    return mainFrame.waitForXPath(xpath);
+  Future<ElementHandle> waitForXPath(String xpath, {bool visible, bool hidden, Duration timeout}) {
+    return mainFrame.waitForXPath(xpath, visible: visible, hidden: hidden, timeout: timeout);
   }
 
   Future<JsHandle> waitForFunction(
-      String pageFunction, Map<String, dynamic> args,
+      Js pageFunction, List args,
       {Duration timeout, Polling polling}) {
     return mainFrame.waitForFunction(pageFunction, args,
         timeout: timeout, polling: polling);

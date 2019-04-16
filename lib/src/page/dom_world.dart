@@ -59,9 +59,9 @@ class DomWorld {
     return context.evaluateHandle(js, args: args);
   }
 
-  Future evaluate(Js pageFunction, {List args}) async {
+  Future<T> evaluate<T>(Js pageFunction, {List args}) async {
     var context = await executionContext;
-    return context.evaluate(pageFunction, args: args);
+    return context.evaluate<T>(pageFunction, args: args);
   }
 
   Future<ElementHandle> $(String selector) async {
@@ -87,15 +87,14 @@ class DomWorld {
     return value;
   }
 
-  Future $eval(String selector, Js js, {List args}) async {
+  Future<T> $eval<T>(String selector, Js js, {List args}) async {
     var document = await _document;
-    return document.$eval(selector, js, args: args);
+    return document.$eval<T>(selector, js, args: args);
   }
 
-  Future $$eval(String selector, Js pageFunction, {List args}) async {
+  Future<T> $$eval<T>(String selector, Js pageFunction, {List args}) async {
     var document = await _document;
-    var value = await document.$$eval(selector, pageFunction, args: args);
-    return value;
+    return document.$$eval<T>(selector, pageFunction, args: args);
   }
 
   Future<List<ElementHandle>> $$(String selector) async {
@@ -117,7 +116,7 @@ return retVal;
 '''));
   }
 
-  Future setContent(String html,
+  Future<void> setContent(String html,
       {Duration timeout, WaitUntil waitUntil}) async {
     timeout ??= frameManager.page.navigationTimeoutOrDefault;
     waitUntil ??= WaitUntil.load;
@@ -141,7 +140,7 @@ document.close();
     }
   }
 
-  addScriptTag({String url, File file, String content, String type}) async {
+  Future<ElementHandle> addScriptTag({String url, File file, String content, String type}) async {
     assert(url != null || file != null || content != null);
 
     var context = await executionContext;
@@ -187,6 +186,8 @@ return script;
               .evaluateHandle(addScriptContent, args: [content, type]))
           .asElement;
     }
+
+    throw StateError('');
   }
 
   Future<ElementHandle> addStyleTag(
@@ -238,7 +239,7 @@ return style;
     throw StateError('');
   }
 
-  Future click(String selector,
+  Future<void> click(String selector,
       {Duration delay, MouseButton button, int clickCount}) async {
     var handle = await $(selector);
     assert(handle != null, 'No node found for selector: ' + selector);
@@ -246,14 +247,14 @@ return style;
     await handle.dispose();
   }
 
-  Future focus(String selector) async {
+  Future<void> focus(String selector) async {
     var handle = await $(selector);
     assert(handle != null, 'No node found for selector: ' + selector);
     await handle.focus();
     await handle.dispose();
   }
 
-  Future hover(String selector) async {
+  Future<void> hover(String selector) async {
     var handle = await $(selector);
     assert(handle != null, 'No node found for selector: ' + selector);
     await handle.hover();
@@ -279,14 +280,14 @@ return options.filter(option => option.selected).map(option => option.value);
 '''), args: [values]);
   }
 
-  Future tap(String selector) async {
+  Future<void> tap(String selector) async {
     var handle = await $(selector);
     assert(handle != null, 'No node found for selector: ' + selector);
     await handle.tap();
     await handle.dispose();
   }
 
-  Future type(String selector, String text, {Duration delay}) async {
+  Future<void> type(String selector, String text, {Duration delay}) async {
     var handle = await $(selector);
     assert(handle != null, 'No node found for selector: ' + selector);
     await handle.type(text, delay: delay);
@@ -305,9 +306,19 @@ return options.filter(option => option.selected).map(option => option.value);
         isXPath: true, visible: visible, hidden: hidden, timeout: timeout);
   }
 
-  Future<JsHandle> waitForFunction(
-      String pageFunction, Map<String, dynamic> args,
-      {Duration timeout, Polling polling}) {}
+  Future<JsHandle> waitForFunction(Js pageFunction, List args,
+      {Duration timeout, Polling polling}) async {
+    if (pageFunction.isExpression) {
+      pageFunction = Js.function([], 'return $pageFunction');
+    }
+
+    return await WaitTask(this, pageFunction,
+            title: 'function',
+            polling: polling ?? Polling.raf(),
+            timeout: timeout ?? frameManager.page.defaultTimeout,
+            predicateArgs: args)
+        .future;
+  }
 
   static final Js _predicate = Js.function(
       ['selectorOrXPath', 'isXPath', 'waitForVisible', 'waitForHidden'], '''
@@ -341,7 +352,6 @@ function hasVisibleBoundingBox() {
       Duration timeout}) async {
     bool waitForVisible = visible ?? false;
     bool waitForHidden = hidden ?? false;
-    timeout ??= frameManager.page.defaultTimeout;
 
     var polling =
         waitForVisible || waitForHidden ? Polling.raf() : Polling.mutation();
@@ -350,7 +360,7 @@ function hasVisibleBoundingBox() {
     var waitTask = new WaitTask(this, _predicate,
         title: title,
         polling: polling,
-        timeout: timeout,
+        timeout: timeout ?? frameManager.page.defaultTimeout,
         predicateArgs: [
           selectorOrXPath,
           isXPath,

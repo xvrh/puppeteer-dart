@@ -24,9 +24,9 @@ class ExecutionContext {
 
   PageFrame get frame => world?.frame;
 
-  Future evaluate(Js pageFunction, {List args}) async {
+  Future<T> evaluate<T>(Js pageFunction, {List args}) async {
     var handle = await evaluateHandle(pageFunction, args: args);
-    var result = await handle.jsonValue;
+    T result = await handle.jsonValue;
     await handle.dispose();
     return result;
   }

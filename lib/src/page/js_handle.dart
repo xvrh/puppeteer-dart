@@ -169,13 +169,13 @@ return false;
     //TODO(xha)
   }
 
-  Future hover() async {
+  Future<void> hover() async {
     await _scrollIntoViewIfNeeded();
     var point = await _clickablePoint();
     await page.mouse.move(point);
   }
 
-  Future click({Duration delay, MouseButton button, int clickCount}) async {
+  Future<void> click({Duration delay, MouseButton button, int clickCount}) async {
     await _scrollIntoViewIfNeeded();
     var point = await _clickablePoint();
     await page.mouse.click(point, delay: delay, button: button, clickCount: clickCount);
@@ -188,22 +188,22 @@ return false;
 //TODO(xha)
   }
 
-  Future tap() async {
+  Future<void> tap() async {
     await _scrollIntoViewIfNeeded();
     var point = await _clickablePoint();
     await page.touchscreen.tap(point);
   }
 
-  Future focus() {
+  Future<void> focus() {
     return frame.evaluate(Js.function(['element'], 'return element.focus();'), args: [this]);
   }
 
-  Future type(String text, {Duration delay}) async {
+  Future<void> type(String text, {Duration delay}) async {
     await focus();
     await page.keyboard.type(text, delay: delay);
   }
 
-  Future press(String key, {Duration delay, String text}) async {
+  Future<void> press(String key, {Duration delay, String text}) async {
     await focus();
     await page.keyboard.press(key, delay: delay, text: text);
   }
@@ -257,7 +257,7 @@ return false;
     return result;
   }
 
-  Future $eval(String selector, Js pageFunction, {List args}) async {
+  Future<T> $eval<T>(String selector, Js pageFunction, {List args}) async {
     var elementHandle = await $(selector);
     if (elementHandle == null) {
       throw Exception(
@@ -269,12 +269,12 @@ return false;
       allArgs.addAll(args);
     }
 
-    var result = await context.evaluate(pageFunction, args: allArgs);
+    T result = await context.evaluate<T>(pageFunction, args: allArgs);
     await elementHandle.dispose();
     return result;
   }
 
-  Future $$eval(String selector, Js pageFunction, {List args}) async {
+  Future<T> $$eval<T>(String selector, Js pageFunction, {List args}) async {
     var arrayHandle = await context.evaluateHandle(
         Js.function(['element', 'selector'],
             'return Array.from(element.querySelectorAll(selector))'),
@@ -285,7 +285,7 @@ return false;
       allArgs.addAll(args);
     }
 
-    var result = await context.evaluate(pageFunction, args: allArgs);
+    T result = await context.evaluate<T>(pageFunction, args: allArgs);
     await arrayHandle.dispose();
     return result;
   }

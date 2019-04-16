@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:chrome_dev_tools/domains/browser.dart';
 import 'package:chrome_dev_tools/src/page.dart';
+import 'package:chrome_dev_tools/src/page/emulation_manager.dart';
 
 import 'domains/target.dart';
 import 'package:chrome_dev_tools/src/connection.dart';
@@ -50,8 +52,9 @@ const List<String> _headlessArgs = [
 class Chrome {
   final Process process;
   final Connection connection;
+  final BrowserApi browserApi;
 
-  Chrome._(this.process, this.connection);
+  Chrome._(this.process, this.connection): browserApi = BrowserApi(connection);
 
   static Future<Chrome> start(String chromeExecutable,
       {bool headless = true,
@@ -115,7 +118,7 @@ class Chrome {
 
   TargetApi get targetApi => connection.targetApi;
 
-  Future<Tab> newTab(String url, {bool incognito = false}) async {
+  Future<Tab> _createTab(String url, {bool incognito = false}) async {
     BrowserContextID contextID;
     if (incognito) {
       contextID = await targetApi.createBrowserContext();
@@ -126,19 +129,29 @@ class Chrome {
     Session session =
         await connection.createSession(targetId, browserContextID: contextID);
 
-    var tab = Tab(targetId, session, browserContextID: contextID);
-    await Future.wait([
+    return Tab(targetId, session, browserContextID: contextID);
+  }
+
+  Future _enableCommonDomains(Tab tab) {
+    return Future.wait([
       tab.network.enable(),
       tab.log.enable(),
       tab.runtime.enable(),
     ]);
+  }
 
+  Future<Tab> newTab(String url, {bool incognito = false}) async {
+    var tab = await _createTab(url, incognito: incognito);
+    await _enableCommonDomains(tab);
     return tab;
   }
 
-  Future<Page> newPage(String url, {bool incognito = false}) async {
-    Tab tab = await newTab(url, incognito: incognito);
-    return Page.create(tab);
+  Future<Page> newPage(String url, {bool incognito = false, DeviceViewport viewport}) async {
+    Tab tab = await _createTab(url, incognito: incognito);
+    var page = await Page.create(tab, viewport: viewport);
+    await _enableCommonDomains(tab);
+
+    return page;
   }
 
   Future closeAllTabs() async {

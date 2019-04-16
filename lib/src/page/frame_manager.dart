@@ -365,12 +365,12 @@ class PageFrame {
     return _mainWorld.$x(expression);
   }
 
-  Future $eval(String selector, Js pageFunction, {List args}) {
-    return _mainWorld.$eval(selector, pageFunction, args: args);
+  Future<T> $eval<T>(String selector, Js pageFunction, {List args}) {
+    return _mainWorld.$eval<T>(selector, pageFunction, args: args);
   }
 
-  Future $$eval(String selector, Js pageFunction, {List args}) {
-    return _mainWorld.$$eval(selector, pageFunction, args: args);
+  Future<T> $$eval<T>(String selector, Js pageFunction, {List args}) {
+    return _mainWorld.$$eval<T>(selector, pageFunction, args: args);
   }
 
   Future<List<ElementHandle>> $$(String selector) {
@@ -381,7 +381,7 @@ class PageFrame {
     return _secondaryWorld.content;
   }
 
-  Future setContent(String html, {Duration timeout, WaitUntil waitUntil}) {
+  Future<void> setContent(String html, {Duration timeout, WaitUntil waitUntil}) {
     return _secondaryWorld.setContent(html,
         timeout: timeout, waitUntil: waitUntil);
   }
@@ -396,17 +396,17 @@ class PageFrame {
     return _mainWorld.addStyleTag(url: url, file: file, content: content);
   }
 
-  Future click(String selector,
+  Future<void> click(String selector,
       {Duration delay, MouseButton button, int clickCount}) {
     return _secondaryWorld.click(selector,
         delay: delay, button: button, clickCount: clickCount);
   }
 
-  Future focus(String selector) {
+  Future<void> focus(String selector) {
     return _secondaryWorld.focus(selector);
   }
 
-  Future hover(String selector) {
+  Future<void> hover(String selector) {
     return _secondaryWorld.hover(selector);
   }
 
@@ -414,11 +414,11 @@ class PageFrame {
     return _secondaryWorld.select(selector, values);
   }
 
-  Future tap(String selector) {
+  Future<void> tap(String selector) {
     return _secondaryWorld.tap(selector);
   }
 
-  Future type(String selector, String text, {Duration delay}) {
+  Future<void> type(String selector, String text, {Duration delay}) {
     return _mainWorld.type(selector, text, delay: delay);
   }
 
@@ -448,8 +448,7 @@ class PageFrame {
     return result;
   }
 
-  Future<JsHandle> waitForFunction(
-      String pageFunction, Map<String, dynamic> args,
+  Future<JsHandle> waitForFunction(Js pageFunction, List args,
       {Duration timeout, Polling polling}) {
     return _mainWorld.waitForFunction(pageFunction, args,
         timeout: timeout, polling: polling);
