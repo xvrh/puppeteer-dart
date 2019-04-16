@@ -104,6 +104,7 @@ class Chrome {
 
   static final RegExp _devToolRegExp =
       RegExp(r'^DevTools listening on (ws:\/\/.*)$');
+
   static Future _waitForWebSocketUrl(Process chromeProcess) async {
     await for (String line in chromeProcess.stderr
         .transform(Utf8Decoder())

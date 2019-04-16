@@ -46,6 +46,6 @@ main() async {
       await chrome.close();
     }
   } finally {
-    await server.close();
+    await server.close(force: true);
   }
 }

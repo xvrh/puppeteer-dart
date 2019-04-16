@@ -6,19 +6,16 @@ import 'package:shelf_static/shelf_static.dart';
 import 'package:test/test.dart';
 import 'package:shelf/shelf_io.dart' as io;
 
-//TODO(xha): make a helper that search for an available port
-const _port = 8089;
-
 main() {
   HttpServer server;
   Tab tab;
   Chrome chrome;
   setUpAll(() async {
     var handler = createStaticHandler('test/data');
-    server = await io.serve(handler, 'localhost', _port);
+    server = await io.serve(handler, 'localhost', 0);
 
     chrome = await Chrome.start((await downloadChrome()).executablePath);
-    tab = await chrome.newTab('http://localhost:$_port/empty.html');
+    tab = await chrome.newTab('http://localhost:${server.port}/empty.html');
   });
 
   tearDownAll(() async {

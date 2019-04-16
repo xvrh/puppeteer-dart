@@ -14,6 +14,7 @@ import 'package:chrome_dev_tools/src/page/execution_context.dart';
 import 'package:chrome_dev_tools/src/page/frame_manager.dart';
 import 'package:chrome_dev_tools/src/page/helper.dart';
 import 'package:chrome_dev_tools/src/page/js_handle.dart';
+import 'package:chrome_dev_tools/src/page/keyboard.dart';
 import 'package:chrome_dev_tools/src/page/lifecycle_watcher.dart';
 import 'package:chrome_dev_tools/src/page/mouse.dart';
 import 'package:chrome_dev_tools/src/page/network_manager.dart';
@@ -37,11 +38,11 @@ class Page {
   final EmulationManager _emulationManager;
   Mouse _mouse;
   Touchscreen _touchscreen;
-  var _keyboard;
+  Keyboard _keyboard;
 
   Page._(this.tab): _emulationManager = EmulationManager(tab) {
     _frameManager = FrameManager(this);
-    _keyboard = null;
+    _keyboard = Keyboard(tab.input);
     _mouse = Mouse(tab.input, _keyboard);
     _touchscreen = Touchscreen(tab.runtime, tab.input, _keyboard);
 
@@ -128,7 +129,7 @@ class Page {
 
   PageFrame get mainFrame => _frameManager.mainFrame;
 
-  get keyboard => _keyboard;
+  Keyboard get keyboard => _keyboard;
 
   Touchscreen get touchscreen => _touchscreen;
 

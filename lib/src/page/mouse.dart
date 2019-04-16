@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:chrome_dev_tools/domains/input.dart';
+import 'package:chrome_dev_tools/src/page/keyboard.dart';
 
 class MouseButton {
   static const left = MouseButton._('left');
@@ -14,7 +15,7 @@ class MouseButton {
 
 class Mouse {
   final InputApi inputApi;
-  final keyboard;
+  final Keyboard keyboard;
   Point _position = Point(0, 0);
   MouseButton _button;
 

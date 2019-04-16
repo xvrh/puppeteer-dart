@@ -2,11 +2,12 @@ import 'dart:math';
 
 import 'package:chrome_dev_tools/domains/input.dart';
 import 'package:chrome_dev_tools/domains/runtime.dart';
+import 'package:chrome_dev_tools/src/page/keyboard.dart';
 
 class Touchscreen {
   final RuntimeApi runtimeApi;
   final InputApi inputApi;
-  final keyboard;
+  final Keyboard keyboard;
 
   Touchscreen(this.runtimeApi, this.inputApi, this.keyboard);
 

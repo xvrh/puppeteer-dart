@@ -6,6 +6,7 @@ import 'package:chrome_dev_tools/src/page/dom_world.dart';
 import 'package:chrome_dev_tools/src/page/execution_context.dart';
 import 'package:chrome_dev_tools/src/page/frame_manager.dart';
 import 'package:chrome_dev_tools/src/page/helper.dart';
+import 'package:chrome_dev_tools/src/page/keyboard.dart';
 import 'package:chrome_dev_tools/src/page/mouse.dart';
 import 'package:chrome_dev_tools/src/page/page.dart';
 
@@ -211,7 +212,7 @@ async function _(element, pageJavascriptEnabled) {
     await page.keyboard.type(text, delay: delay);
   }
 
-  Future<void> press(String key, {Duration delay, String text}) async {
+  Future<void> press(Key key, {Duration delay, String text}) async {
     await focus();
     await page.keyboard.press(key, delay: delay, text: text);
   }

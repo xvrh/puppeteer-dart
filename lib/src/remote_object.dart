@@ -2,7 +2,7 @@ import 'dart:async';
 import '../domains/runtime.dart';
 
 Future<dynamic> remoteObject(
-    RuntimeApi runtime, RemoteObject remoteObject) async {
+    RuntimeApi runtime, RemoteObject remoteObject, {ExecutionContextId executionContextId}) async {
   if (remoteObject.subtype == RemoteObjectSubtype.error) {
     throw 'RemoteObject has error: ${remoteObject.description}';
   }
@@ -38,7 +38,7 @@ Future<dynamic> remoteObject(
   }
   try {
     final response = await runtime.callFunctionOn('function() { return this; }',
-        objectId: remoteObject.objectId, returnByValue: true);
+        objectId: remoteObject.objectId, returnByValue: true, executionContextId: executionContextId);
     return response.result.value;
   } catch (_) {
     // Return description for unserializable object, e.g. 'window'.
