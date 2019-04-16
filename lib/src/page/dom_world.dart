@@ -314,7 +314,7 @@ return options.filter(option => option.selected).map(option => option.value);
 
     return await WaitTask(this, pageFunction,
             title: 'function',
-            polling: polling ?? Polling.raf(),
+            polling: polling ?? Polling.everyFrame,
             timeout: timeout ?? frameManager.page.defaultTimeout,
             predicateArgs: args)
         .future;
@@ -354,7 +354,7 @@ function hasVisibleBoundingBox() {
     bool waitForHidden = hidden ?? false;
 
     var polling =
-        waitForVisible || waitForHidden ? Polling.raf() : Polling.mutation();
+        waitForVisible || waitForHidden ? Polling.everyFrame : Polling.mutation;
     var title =
         '${isXPath ? 'XPath' : 'selector'} "$selectorOrXPath"${waitForHidden ? ' to be hidden' : ''}';
     var waitTask = new WaitTask(this, _predicate,
@@ -417,7 +417,7 @@ class WaitTask {
     _cleanup();
   }
 
-  Future rerun() async {
+  Future<void> rerun() async {
     var runCount = ++_runCount;
     try {
       List args = [
@@ -461,7 +461,7 @@ class WaitTask {
     _cleanup();
   }
 
-  _cleanup() {
+  void _cleanup() {
     _timeoutTimer.cancel();
     domWorld._waitTasks.remove(this);
   }
@@ -556,11 +556,14 @@ final Js _waitForPredicatePageFunction =
 ''', isAsync: true);
 
 class Polling {
-  dynamic _value;
+  static const everyFrame = Polling._raf();
+  static const mutation = Polling._mutation();
 
-  Polling.raf() : _value = 'raf';
+  final dynamic _value;
 
-  Polling.mutation() : _value = 'mutation';
+  const Polling._raf() : _value = 'raf';
+
+  const Polling._mutation() : _value = 'mutation';
 
   Polling.interval(Duration duration) : _value = duration.inMilliseconds;
 

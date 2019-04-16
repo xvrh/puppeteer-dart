@@ -40,8 +40,9 @@ return result;
     return result;
   }
 
-  Future propertyValue(String propertyName) async {
-    return (await property(propertyName)).jsonValue;
+  Future<T> propertyValue<T>(String propertyName) async {
+    T value = await (await property(propertyName)).jsonValue;
+    return value;
   }
 
   Future<Map<String, JsHandle>> get properties async {
@@ -56,7 +57,7 @@ return result;
     return result;
   }
 
-  Future get jsonValue async {
+  Future<dynamic> get jsonValue async {
     if (remoteObject.objectId != null) {
       var response = await context.runtimeApi.callFunctionOn(
           'function() { return this; }',
@@ -71,7 +72,7 @@ return result;
 
   ElementHandle get asElement => null;
 
-  Future dispose() async {
+  Future<void> dispose() async {
     if (_disposed) return;
     _disposed = true;
 
