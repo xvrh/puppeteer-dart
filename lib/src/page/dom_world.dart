@@ -104,15 +104,19 @@ class DomWorld {
   }
 
   Future<String> get content async {
-    return await evaluate(Js.function([], '''
-let retVal = '';
-if (document.doctype) {
-  retVal = new XMLSerializer().serializeToString(document.doctype);
+    return await evaluate(Js.function(
+        //language=js
+        '''
+function _() {
+  let retVal = '';
+  if (document.doctype) {
+    retVal = new XMLSerializer().serializeToString(document.doctype);
+  }
+  if (document.documentElement) {
+    retVal += document.documentElement.outerHTML;
+  }
+  return retVal;
 }
-if (document.documentElement) {
-  retVal += document.documentElement.outerHTML;
-}
-return retVal;
 '''));
   }
 
@@ -123,10 +127,14 @@ return retVal;
 
     // We rely upon the fact that document.open() will reset frame lifecycle with "init"
     // lifecycle event. @see https://crrev.com/608658
-    await evaluate(Js.function(['html'], '''
-document.open();
-document.write(html);
-document.close();
+    await evaluate(Js.function(
+        //language=js
+        '''
+function _(html) {
+  document.open();
+  document.write(html);
+  document.close();
+}
 '''), args: [html]);
     var watcher = new LifecycleWatcher(frameManager, frame,
         waitUntil: waitUntil, timeout: timeout);
@@ -146,31 +154,39 @@ document.close();
     var context = await executionContext;
 
     if (url != null) {
-      return (await context.evaluateHandle(Js.function(['url', 'type'], '''
-const script = document.createElement('script');
-script.src = url;
-if (type)
-  script.type = type;
-const promise = new Promise((res, rej) => {
-  script.onload = res;
-  script.onerror = rej;
-});
-document.head.appendChild(script);
-await promise;
-return script;
-''', isAsync: true), args: [url, type])).asElement;
+      return (await context.evaluateHandle(Js.function(
+          //language=js
+          '''
+async function _(url, type) {
+  const script = document.createElement('script');
+  script.src = url;
+  if (type)
+    script.type = type;
+  const promise = new Promise((res, rej) => {
+    script.onload = res;
+    script.onerror = rej;
+  });
+  document.head.appendChild(script);
+  await promise;
+  return script;
+}
+'''), args: [url, type])).asElement;
     }
 
-    var addScriptContent = Js.function(['content', 'type'], '''
-const script = document.createElement('script');
-script.type = type;
-script.text = content;
-let error = null;
-script.onerror = e => error = e;
-document.head.appendChild(script);
-if (error)
-  throw error;
-return script;
+    var addScriptContent = Js.function(
+        //language=js
+        '''
+function _(content, type) {
+  const script = document.createElement('script');
+  script.type = type;
+  script.text = content;
+  let error = null;
+  script.onerror = e => error = e;
+  document.head.appendChild(script);
+  if (error)
+    throw error;
+  return script;
+}
 ''');
 
     if (file != null) {
@@ -197,32 +213,40 @@ return script;
     var context = await executionContext;
 
     if (url != null) {
-      return (await context.evaluateHandle(Js.function(['url'], '''
-const link = document.createElement('link');
-link.rel = 'stylesheet';
-link.href = url;
-const promise = new Promise((res, rej) => {
-  link.onload = res;
-  link.onerror = rej;
-});
-document.head.appendChild(link);
-await promise;
-return link;   
-''', isAsync: true), args: [url])).asElement;
+      return (await context.evaluateHandle(Js.function(
+          //language=js
+          '''
+async function _(url) {
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = url;
+  const promise = new Promise((res, rej) => {
+    link.onload = res;
+    link.onerror = rej;
+  });
+  document.head.appendChild(link);
+  await promise;
+  return link;   
+}
+'''), args: [url])).asElement;
     }
 
-    var addStyleContent = Js.function(['content'], '''
-const style = document.createElement('style');
-style.type = 'text/css';
-style.appendChild(document.createTextNode(content));
-const promise = new Promise((res, rej) => {
-  style.onload = res;
-  style.onerror = rej;
-});
-document.head.appendChild(style);
-await promise;
-return style;
-''', isAsync: true);
+    var addStyleContent = Js.function(
+        //language=js
+        '''
+async function _(content) {
+  const style = document.createElement('style');
+  style.type = 'text/css';
+  style.appendChild(document.createTextNode(content));
+  const promise = new Promise((res, rej) => {
+    style.onload = res;
+    style.onerror = rej;
+  });
+  document.head.appendChild(style);
+  await promise;
+  return style;
+}
+''');
 
     if (file != null) {
       var contents = await file.readAsString();
@@ -262,21 +286,25 @@ return style;
   }
 
   Future<List<String>> select(String selector, List<String> values) {
-    return $eval(selector, Js.function(['element', 'values'], '''
-if (element.nodeName.toLowerCase() !== 'select') {
-  throw new Error('Element is not a <select> element.');
+    return $eval(selector, Js.function(
+        //language=js
+        '''
+function _(element, values) {
+  if (element.nodeName.toLowerCase() !== 'select') {
+    throw new Error('Element is not a <select> element.');
+  }
+  
+  const options = Array.from(element.options);
+  element.value = undefined;
+  for (const option of options) {
+    option.selected = values.includes(option.value);
+    if (option.selected && !element.multiple)
+      break;
+  }
+  element.dispatchEvent(new Event('input', { 'bubbles': true }));
+  element.dispatchEvent(new Event('change', { 'bubbles': true }));
+  return options.filter(option => option.selected).map(option => option.value);
 }
-
-const options = Array.from(element.options);
-element.value = undefined;
-for (const option of options) {
-  option.selected = values.includes(option.value);
-  if (option.selected && !element.multiple)
-    break;
-}
-element.dispatchEvent(new Event('input', { 'bubbles': true }));
-element.dispatchEvent(new Event('change', { 'bubbles': true }));
-return options.filter(option => option.selected).map(option => option.value);
 '''), args: [values]);
   }
 
@@ -309,7 +337,7 @@ return options.filter(option => option.selected).map(option => option.value);
   Future<JsHandle> waitForFunction(Js pageFunction, List args,
       {Duration timeout, Polling polling}) async {
     if (pageFunction.isExpression) {
-      pageFunction = Js.function([], 'return $pageFunction');
+      pageFunction = Js.function('function _() { return $pageFunction; }');
     }
 
     return await WaitTask(this, pageFunction,
@@ -321,28 +349,31 @@ return options.filter(option => option.selected).map(option => option.value);
   }
 
   static final Js _predicate = Js.function(
-      ['selectorOrXPath', 'isXPath', 'waitForVisible', 'waitForHidden'], '''
-const node = isXPath
-  ? document.evaluate(selectorOrXPath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
-  : document.querySelector(selectorOrXPath);
-if (!node)
-  return waitForHidden;
-if (!waitForVisible && !waitForHidden)
-  return node;
-const element = /** @type {Element} */ (node.nodeType === Node.TEXT_NODE ? node.parentElement : node);
-
-const style = window.getComputedStyle(element);
-const isVisible = style && style.visibility !== 'hidden' && hasVisibleBoundingBox();
-const success = (waitForVisible === isVisible || waitForHidden === !isVisible);
-return success ? node : null;
-
-/**
- * @return {boolean}
- */
-function hasVisibleBoundingBox() {
-  const rect = element.getBoundingClientRect();
-  return !!(rect.top || rect.bottom || rect.width || rect.height);
-}      
+      //language=js
+      '''
+function _(selectorOrXPath, isXPath, waitForVisible, waitForHidden) {
+  const node = isXPath
+    ? document.evaluate(selectorOrXPath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
+    : document.querySelector(selectorOrXPath);
+  if (!node)
+    return waitForHidden;
+  if (!waitForVisible && !waitForHidden)
+    return node;
+  const element = /** @type {Element} */ (node.nodeType === Node.TEXT_NODE ? node.parentElement : node);
+  
+  const style = window.getComputedStyle(element);
+  const isVisible = style && style.visibility !== 'hidden' && hasVisibleBoundingBox();
+  const success = (waitForVisible === isVisible || waitForHidden === !isVisible);
+  return success ? node : null;
+  
+  /**
+   * @return {boolean}
+   */
+  function hasVisibleBoundingBox() {
+    const rect = element.getBoundingClientRect();
+    return !!(rect.top || rect.bottom || rect.width || rect.height);
+  }      
+}
 ''');
 
   Future<ElementHandle> _waitForSelectorOrXPath(String selectorOrXPath,
@@ -376,7 +407,7 @@ function hasVisibleBoundingBox() {
   }
 
   Future<String> get title =>
-      evaluate(Js.function([], 'return document.title;'));
+      evaluate(Js.expression('document.title'));
 }
 
 class WaitTask {
@@ -441,7 +472,7 @@ class WaitTask {
       // Ignore timeouts in pageScript - we track timeouts ourselves.
       // If the frame's execution context has already changed, `frame.evaluate` will
       // throw an error - ignore this predicate run altogether.
-      if (await (domWorld.evaluate(Js.function(['s'], 'return !s'),
+      if (await (domWorld.evaluate(Js.function('function(s) { return !s; }'),
           args: [success]).catchError((_) => true))) {
         await success.dispose();
         return;
@@ -468,7 +499,10 @@ class WaitTask {
 }
 
 final Js _waitForPredicatePageFunction =
-    Js.function(['predicateBody', 'polling', 'timeout', '...args'], '''
+    Js.function(
+        //language=js
+        '''
+async function _(predicateBody, polling, timeout, ...args) {
   const predicate = new Function('...args', predicateBody);
   let timedOut = false;
   if (timeout)
@@ -553,7 +587,8 @@ final Js _waitForPredicatePageFunction =
         setTimeout(onTimeout, pollInterval);
     }
   }
-''', isAsync: true);
+}
+''');
 
 class Polling {
   static const everyFrame = Polling._raf();

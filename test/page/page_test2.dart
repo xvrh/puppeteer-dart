@@ -29,7 +29,7 @@ main() async {
     //expect(await result.jsonValue, isTrue);
     //var watchdog = await page.waitForSelector('body');
     print('Yes');
-    //print(await page.title);
+    print(await page.title);
   } finally {
     await chrome.close();
     await server.close(force: true);

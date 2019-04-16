@@ -131,31 +131,16 @@ class ExecutionContext {
 class Js {
   final bool isExpression;
   final String _body;
-  final List<String> declaredArguments;
-  final bool _async;
 
   Js.expression(String expression)
       : isExpression = true,
-        _body = expression,
-        declaredArguments = null,
-        _async = false;
+        _body = expression;
 
-  Js.function(this.declaredArguments, this._body, {bool isAsync = false})
-      : isExpression = false,
-        assert(declaredArguments != null),
-        _async = isAsync;
+  Js.function(this._body)
+      : isExpression = false;
 
   @override
-  String toString() {
-    if (isExpression) {
-      return _body;
-    } else {
-      return '''
-${_async ? 'async ' : ''}function(${declaredArguments.join(', ')}) {
-  $_body 
-}''';
-    }
-  }
+  String toString() => _body;
 }
 
 class ExecutionContextDestroyedException implements Exception {

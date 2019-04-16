@@ -64,8 +64,9 @@ main() {
     expect(found, isTrue);
   });
 
-  final Js addElement = Js.function(['tag'],
-      'return document.body.appendChild(document.createElement(tag));');
+  final Js addElement = Js.function(
+      //language=js
+      'function _(tag) {return document.body.appendChild(document.createElement(tag));}');
 
   test('should immediately resolve promise if node exists', () async {
     await page.goto('${serverPrefix}empty.html');
@@ -85,8 +86,12 @@ main() {
   });
 
   test('should work with multiline body', () async {
-    var result = await page.waitForFunction(Js.function([], '''
+    var result = await page.waitForFunction(Js.function(
+        //language=js
+        '''
+function _() {
   return (() => true)();
+}
 '''), []);
     expect(await result.jsonValue, isTrue);
   });
@@ -94,7 +99,8 @@ main() {
   test('should wait for predicate', () async {
     await Future.wait([
       page.waitForFunction(
-          Js.function([], 'return window.innerWidth < 100'), []),
+          //language=js
+          Js.function('function _() {return window.innerWidth < 100;}'), []),
       page.setViewport(DeviceViewport(width: 10, height: 10)),
     ]);
   });
