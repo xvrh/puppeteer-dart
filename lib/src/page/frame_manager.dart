@@ -9,6 +9,7 @@ import 'package:chrome_dev_tools/src/page/dom_world.dart';
 import 'package:chrome_dev_tools/src/page/execution_context.dart';
 import 'package:chrome_dev_tools/src/page/js_handle.dart';
 import 'package:chrome_dev_tools/src/page/lifecycle_watcher.dart';
+import 'package:chrome_dev_tools/src/page/mouse.dart';
 import 'package:chrome_dev_tools/src/page/network_manager.dart';
 import 'package:chrome_dev_tools/src/page/page.dart';
 

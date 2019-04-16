@@ -1,11 +1,15 @@
 import 'dart:math';
 
+import 'package:chrome_dev_tools/domains/dom.dart';
 import 'package:chrome_dev_tools/domains/runtime.dart';
 import 'package:chrome_dev_tools/src/page/dom_world.dart';
 import 'package:chrome_dev_tools/src/page/execution_context.dart';
 import 'package:chrome_dev_tools/src/page/frame_manager.dart';
 import 'package:chrome_dev_tools/src/page/helper.dart';
+import 'package:chrome_dev_tools/src/page/mouse.dart';
 import 'package:chrome_dev_tools/src/page/page.dart';
+
+export 'package:chrome_dev_tools/domains/dom.dart' show BoxModel;
 
 class JsHandle {
   final ExecutionContext context;
@@ -161,13 +165,6 @@ async function _(element, pageJavascriptEnabled) {
   }
 
   /**
-   * @return {!Promise<void|Protocol.DOM.getBoxModelReturnValue>}
-   */
-  _getBoxModel() {
-    //TODO(xha)
-  }
-
-  /**
    * @param {!Array<number>} quad
    * @return {!Array<{x: number, y: number}>}
    */
@@ -219,18 +216,23 @@ async function _(element, pageJavascriptEnabled) {
     await page.keyboard.press(key, delay: delay, text: text);
   }
 
-  /**
-   * @return {!Promise<?{x: number, y: number, width: number, height: number}>}
-   */
-  Future boundingBox() {
-//TODO(xha)
+  Future<Rectangle> boundingBox() async {
+    var result = await boxModel();
+
+    if (result == null)
+      return null;
+
+    var quad = result.border;
+    var x = [0, 2, 4, 6].map((i) => quad.value[i]).reduce(min);
+    var y = [1, 3, 5, 7].map((i) => quad.value[i]).reduce(min);
+    var width = [0, 2, 4, 6].map((i) => quad.value[i]).reduce(max) - x;
+    var height = [1, 3, 5, 7].map((i) => quad.value[i]).reduce(max) - y;
+
+    return Rectangle(x, y, width, height);
   }
 
-  /**
-   * @return {!Promise<?BoxModel>}
-   */
-  Future boxModel() {
-//TODO(xha)
+  Future<BoxModel> boxModel() {
+    return context.domApi.getBoxModel(objectId: remoteObject.objectId);
   }
 
   /**

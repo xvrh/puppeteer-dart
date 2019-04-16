@@ -5,6 +5,7 @@ import 'package:chrome_dev_tools/src/page/execution_context.dart';
 import 'package:chrome_dev_tools/src/page/frame_manager.dart';
 import 'package:chrome_dev_tools/src/page/js_handle.dart';
 import 'package:chrome_dev_tools/src/page/lifecycle_watcher.dart';
+import 'package:chrome_dev_tools/src/page/mouse.dart';
 import 'package:meta/meta.dart';
 
 class DomWorld {
@@ -605,4 +606,3 @@ class Polling {
   get value => _value;
 }
 
-enum MouseButton { left, right, middle }

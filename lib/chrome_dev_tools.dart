@@ -118,40 +118,23 @@ class Chrome {
 
   TargetApi get targetApi => connection.targetApi;
 
-  Future<Tab> _createTab(String url, {bool incognito = false}) async {
+  Future<Tab> newTab(String url, {bool incognito = false}) async {
     BrowserContextID contextID;
     if (incognito) {
       contextID = await targetApi.createBrowserContext();
     }
 
     TargetID targetId =
-        await targetApi.createTarget(url, browserContextId: contextID);
+    await targetApi.createTarget(url, browserContextId: contextID);
     Session session =
-        await connection.createSession(targetId, browserContextID: contextID);
+    await connection.createSession(targetId, browserContextID: contextID);
 
     return Tab(targetId, session, browserContextID: contextID);
   }
 
-  Future _enableCommonDomains(Tab tab) {
-    return Future.wait([
-      tab.network.enable(),
-      tab.log.enable(),
-      tab.runtime.enable(),
-    ]);
-  }
-
-  Future<Tab> newTab(String url, {bool incognito = false}) async {
-    var tab = await _createTab(url, incognito: incognito);
-    await _enableCommonDomains(tab);
-    return tab;
-  }
-
   Future<Page> newPage(String url, {bool incognito = false, DeviceViewport viewport}) async {
-    Tab tab = await _createTab(url, incognito: incognito);
-    var page = await Page.create(tab, viewport: viewport);
-    await _enableCommonDomains(tab);
-
-    return page;
+    Tab tab = await newTab(url, incognito: incognito);
+    return Page.create(tab, viewport: viewport);
   }
 
   Future closeAllTabs() async {

@@ -15,31 +15,35 @@ import 'package:chrome_dev_tools/src/page/frame_manager.dart';
 import 'package:chrome_dev_tools/src/page/helper.dart';
 import 'package:chrome_dev_tools/src/page/js_handle.dart';
 import 'package:chrome_dev_tools/src/page/lifecycle_watcher.dart';
+import 'package:chrome_dev_tools/src/page/mouse.dart';
 import 'package:chrome_dev_tools/src/page/network_manager.dart';
+import 'package:chrome_dev_tools/src/page/touchscreen.dart';
 import 'package:chrome_dev_tools/src/page/worker.dart';
 import 'package:chrome_dev_tools/src/tab.dart';
 import 'package:meta/meta.dart';
 import '../connection.dart' show Session;
 
 class Page {
-  static Future<Page> create(Tab tab, {DeviceViewport viewport}) async {
-    var page = Page._(tab);
-
-    await Future.wait([
-      page._frameManager.initialize(),
-      tab.target.setAutoAttach(true, false, flatten: true),
-      tab.performance.enable(),
-    ]);
-
-    if (viewport != null) {
-      await page.setViewport(viewport);
-    }
-
-    return page;
-  }
+  final Tab tab;
+  final _pageBindings = <String, Function>{};
+  final _workers = <SessionID, Worker>{};
+  FrameManager _frameManager;
+  final StreamController _workerCreated = StreamController.broadcast(),
+      _workerDestroyed = StreamController.broadcast();
+  bool _javascriptEnabled = true;
+  Duration navigationTimeout;
+  Duration defaultTimeout = Duration(seconds: 30);
+  DeviceViewport _viewport;
+  final EmulationManager _emulationManager;
+  Mouse _mouse;
+  Touchscreen _touchscreen;
+  var _keyboard;
 
   Page._(this.tab): _emulationManager = EmulationManager(tab) {
     _frameManager = FrameManager(this);
+    _keyboard = null;
+    _mouse = Mouse(tab.input, _keyboard);
+    _touchscreen = Touchscreen(tab.runtime, tab.input, _keyboard);
 
     tab.target.onAttachedToTarget.listen((e) {
       if (e.targetInfo.type != 'worker') {
@@ -72,17 +76,22 @@ class Page {
     tab.log.onEntryAdded.listen(_onLogEntryAdded);
   }
 
-  final Tab tab;
-  final _pageBindings = <String, Function>{};
-  final _workers = <SessionID, Worker>{};
-  FrameManager _frameManager;
-  final StreamController _workerCreated = StreamController.broadcast(),
-      _workerDestroyed = StreamController.broadcast();
-  bool _javascriptEnabled = true;
-  Duration navigationTimeout;
-  Duration defaultTimeout = Duration(seconds: 30);
-  DeviceViewport _viewport;
-  final EmulationManager _emulationManager;
+  static Future<Page> create(Tab tab, {DeviceViewport viewport}) async {
+    var page = Page._(tab);
+
+    await Future.wait([
+      page._frameManager.initialize(),
+      tab.target.setAutoAttach(true, false, flatten: true),
+      tab.performance.enable(),
+      tab.log.enable(),
+    ]);
+
+    if (viewport != null) {
+      await page.setViewport(viewport);
+    }
+
+    return page;
+  }
 
   void dispose() {
     _frameManager.dispose();
@@ -119,11 +128,11 @@ class Page {
 
   PageFrame get mainFrame => _frameManager.mainFrame;
 
-  get keyboard => null;
+  get keyboard => _keyboard;
 
-  get touchscreen => null;
+  Touchscreen get touchscreen => _touchscreen;
 
-  get mouse => null;
+  Mouse get mouse => _mouse;
 
   _onLogEntryAdded(event) {
     //TODO(xha)
