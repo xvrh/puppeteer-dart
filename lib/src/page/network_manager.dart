@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
+import 'package:chrome_dev_tools/src/tab.dart';
 import 'package:chrome_dev_tools/domains/fetch.dart';
 import 'package:chrome_dev_tools/domains/fetch.dart' as fetch;
 import 'package:chrome_dev_tools/domains/network.dart';

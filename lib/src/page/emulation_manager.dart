@@ -33,22 +33,40 @@ class DeviceViewport {
       this.hasTouch: false})
       : assert(width != null),
         assert(height != null);
+
+  DeviceViewport copyWith(
+      {int width,
+      int height,
+      num deviceScaleFactor,
+      bool isMobile,
+      bool isLandscape,
+      bool hasTouch}) {
+    return DeviceViewport(
+      width: width ?? this.width,
+      height: height ?? this.height,
+      deviceScaleFactor: deviceScaleFactor ?? this.deviceScaleFactor,
+      isMobile: isMobile ?? this.isMobile,
+      isLandscape: isLandscape ?? this.isLandscape,
+      hasTouch: hasTouch ?? this.hasTouch,
+    );
+  }
 }
 
-final _portrait =
-    ScreenOrientation(angle: 0, type: ScreenOrientationType.portraitPrimary);
-final _landscape =
-    ScreenOrientation(angle: 90, type: ScreenOrientationType.landscapePrimary);
-
 class EmulationManager {
+  static final portrait =
+  ScreenOrientation(angle: 0, type: ScreenOrientationType.portraitPrimary);
+  static final landscape = ScreenOrientation(
+      angle: 90, type: ScreenOrientationType.landscapePrimary);
+
   final Tab tab;
   bool _emulatingMobile = false;
   bool _hasTouch = false;
 
+
   EmulationManager(this.tab);
 
   Future<bool> emulateViewport(DeviceViewport viewport) async {
-    var screenOrientation = viewport.isLandscape ? _landscape : _portrait;
+    var screenOrientation = viewport.isLandscape ? landscape : portrait;
 
     await Future.wait([
       tab.emulation.setDeviceMetricsOverride(viewport.width, viewport.height,

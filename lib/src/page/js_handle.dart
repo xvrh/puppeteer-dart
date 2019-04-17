@@ -174,7 +174,7 @@ async function _(element, pageJavascriptEnabled) {
         .map((quad) => _fromProtocolQuad(quad))
         .map((quad) => _intersectQuadWithViewport(
             quad, layoutViewport.clientWidth, layoutViewport.clientHeight))
-        .where((quad) => computeQuadArea(quad) > 1)
+        .where((quad) => _computeQuadArea(quad) > 1)
         .toList();
     if (pointsList.isEmpty) {
       throw Exception('Node is either not visible or not an HTMLElement');
@@ -205,7 +205,7 @@ async function _(element, pageJavascriptEnabled) {
         Point(min(max(point.x, 0), width), min(max(point.y, 0), height)));
   }
 
-  static computeQuadArea(List<Point> quad) {
+  static num _computeQuadArea(List<Point> quad) {
     // Compute sum of all directed areas of adjacent triangles
     // https://en.wikipedia.org/wiki/Polygon#Simple_polygons
     num area = 0;
@@ -279,13 +279,54 @@ async function _(element, pageJavascriptEnabled) {
     return context.domApi.getBoxModel(objectId: remoteObject.objectId);
   }
 
-  /**
-   *
-   * @param {!Object=} options
-   * @returns {!Promise<string|!Buffer>}
-   */
-  Future screenshot(options) {
-//TODO(xha)
+  Future<List<int>> screenshot(
+      {ScreenshotFormat format, num quality, bool omitBackground}) async {
+    var needsViewportReset = false;
+
+    var boundingBox = await this.boundingBox();
+    assert(boundingBox != null,
+        'Node is either not visible or not an HTMLElement');
+
+    var viewport = page.viewport;
+
+    if (viewport != null &&
+        (boundingBox.width > viewport.width ||
+            boundingBox.height > viewport.height)) {
+      await page.setViewport(viewport.copyWith(
+          width: max(viewport.width, boundingBox.width.ceil()),
+          height: max(viewport.height, boundingBox.height.ceil())));
+
+      needsViewportReset = true;
+    }
+
+    await _scrollIntoViewIfNeeded();
+
+    boundingBox = await this.boundingBox();
+    assert(boundingBox != null,
+        'Node is either not visible or not an HTMLElement');
+    assert(boundingBox.width != 0, 'Node has 0 width.');
+    assert(boundingBox.height != 0, 'Node has 0 height.');
+
+    var layoutViewPort =
+        (await context.pageApi.getLayoutMetrics()).layoutViewport;
+
+    var clip = Rectangle(
+        boundingBox.left + layoutViewPort.pageX,
+        boundingBox.top + layoutViewPort.pageY,
+        boundingBox.width,
+        boundingBox.height);
+
+    var imageData = await page.screenshot(
+        format: format,
+        clip: clip,
+        quality: quality,
+        omitBackground: omitBackground);
+
+    if (needsViewportReset) {
+      await page.setViewport(viewport);
+    }
+
+    return imageData;
   }
 
   Future<ElementHandle> $(String selector) async {

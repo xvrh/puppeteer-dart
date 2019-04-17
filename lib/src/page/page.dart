@@ -1,12 +1,18 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
+import 'dart:typed_data';
 
+import 'package:chrome_dev_tools/domains/dom.dart';
 import 'package:chrome_dev_tools/domains/log.dart';
 import 'package:chrome_dev_tools/domains/network.dart';
 import 'package:chrome_dev_tools/domains/page.dart' hide Frame, Viewport;
+import 'package:chrome_dev_tools/domains/page.dart';
 import 'package:chrome_dev_tools/domains/performance.dart';
 import 'package:chrome_dev_tools/domains/runtime.dart';
 import 'package:chrome_dev_tools/domains/target.dart';
+import 'package:chrome_dev_tools/src/chrome.dart';
 import 'package:chrome_dev_tools/src/connection.dart';
 import 'package:chrome_dev_tools/src/page/dom_world.dart';
 import 'package:chrome_dev_tools/src/page/emulation_manager.dart';
@@ -40,7 +46,7 @@ class Page {
   Touchscreen _touchscreen;
   Keyboard _keyboard;
 
-  Page._(this.tab): _emulationManager = EmulationManager(tab) {
+  Page._(this.tab) : _emulationManager = EmulationManager(tab) {
     _frameManager = FrameManager(this);
     _keyboard = Keyboard(tab.input);
     _mouse = Mouse(tab.input, _keyboard);
@@ -100,7 +106,8 @@ class Page {
     _workerDestroyed.close();
   }
 
-  Duration get navigationTimeoutOrDefault => navigationTimeout ?? defaultTimeout;
+  Duration get navigationTimeoutOrDefault =>
+      navigationTimeout ?? defaultTimeout;
 
   Client get client => tab.session;
 
@@ -143,8 +150,7 @@ class Page {
     return mainFrame.$(selector);
   }
 
-  Future<JsHandle> evaluateHandle(Js pageFunction,
-  {List args}) async {
+  Future<JsHandle> evaluateHandle(Js pageFunction, {List args}) async {
     var context = await mainFrame.executionContext;
     return context.evaluateHandle(pageFunction, args: args);
   }
@@ -155,7 +161,7 @@ class Page {
   }
 
   Future<T> $eval<T>(String selector, Js pageFunction, {List args}) {
-    return mainFrame.$eval<T>(selector, pageFunction, args:args);
+    return mainFrame.$eval<T>(selector, pageFunction, args: args);
   }
 
   Future<T> $$eval<T>(String selector, Js pageFunction, {List args}) {
@@ -289,7 +295,8 @@ class Page {
     return _frameManager.mainFrame.content;
   }
 
-  Future<void> setContent(String html, {Duration timeout, WaitUntil waitUntil}) {
+  Future<void> setContent(String html,
+      {Duration timeout, WaitUntil waitUntil}) {
     return _frameManager.mainFrame
         .setContent(html, timeout: timeout, waitUntil: waitUntil);
   }
@@ -300,15 +307,19 @@ class Page {
         .goto(url, referrer: referrer, timeout: timeout, waitUntil: waitUntil);
   }
 
-  Future<NetworkResponse> reload({Duration timeout, WaitUntil waitUntil}) async {
-    var responseFuture = waitForNavigation(timeout: timeout, waitUntil: waitUntil);
+  Future<NetworkResponse> reload(
+      {Duration timeout, WaitUntil waitUntil}) async {
+    var responseFuture =
+        waitForNavigation(timeout: timeout, waitUntil: waitUntil);
 
     await tab.page.reload();
     return await responseFuture;
   }
 
-  Future<NetworkResponse> waitForNavigation({Duration timeout, WaitUntil waitUntil}) {
-    return _frameManager.mainFrame.waitForNavigation(timeout: timeout, waitUntil: waitUntil);
+  Future<NetworkResponse> waitForNavigation(
+      {Duration timeout, WaitUntil waitUntil}) {
+    return _frameManager.mainFrame
+        .waitForNavigation(timeout: timeout, waitUntil: waitUntil);
   }
 
   /**
@@ -364,8 +375,8 @@ class Page {
     //TODO(xha)
   }
 
-
   bool get javascriptEnabled => _javascriptEnabled;
+
   /**
    * @param {boolean} enabled
    */
@@ -402,7 +413,8 @@ class Page {
     return _frameManager.mainFrame.evaluate(pageFunction, args: args);
   }
 
-  Future evaluateOnNewDocument(String pageFunction, [Map<String, dynamic> args]) async {
+  Future evaluateOnNewDocument(String pageFunction,
+      [Map<String, dynamic> args]) async {
     var source = evaluationString(pageFunction, args);
     await tab.page.addScriptToEvaluateOnNewDocument(source);
   }
@@ -412,24 +424,113 @@ class Page {
    */
   Future setCacheEnabled(enabled) {}
 
-  /**
-   * @param {!ScreenshotOptions=} options
-   * @return {!Promise<!Buffer|!String>}
-   */
-  Future screenshot(options) {}
+  Future<Uint8List> screenshot(
+      {ScreenshotFormat format,
+      bool fullPage,
+      Rectangle clip,
+      num quality,
+      bool omitBackground}) {
+    format ??= ScreenshotFormat.png;
+    fullPage ??= false;
+    omitBackground ??= false;
 
-  /**
-   * @param {"png"|"jpeg"} format
-   * @param {!ScreenshotOptions=} options
-   * @return {!Promise<!Buffer|!String>}
-   */
-  Future _screenshotTask(format, options) {}
+    assert(quality == null || format == ScreenshotFormat.jpeg,
+        'Quality is only supported for the jpeg screenshots');
+    assert(clip == null || !fullPage, "clip and fullPage are exclusive");
 
-  /**
-   * @param {!PDFOptions=} options
-   * @return {!Promise<!Buffer>}
-   */
-  Future pdf() {}
+    return screenshotPool(tab.browser).withResource(() async {
+      await tab.target.activateTarget(tab.targetID);
+
+      Viewport roundedClip;
+      if (clip != null) {
+        roundedClip = Viewport(
+            x: clip.left.round(),
+            y: clip.top.round(),
+            width: (clip.width + clip.left - clip.left.round()).round(),
+            height: (clip.height + clip.top - clip.top.round()).round(),
+            scale: 1);
+      }
+
+      if (fullPage) {
+        var metrics = await tab.page.getLayoutMetrics();
+
+        // Overwrite clip for full page at all times.
+        roundedClip = Viewport(
+            x: 0,
+            y: 0,
+            width: metrics.contentSize.width.ceil(),
+            height: metrics.contentSize.height.ceil(),
+            scale: 1);
+
+        DeviceViewport viewport = this.viewport ?? DeviceViewport();
+
+        var screenOrientation = viewport.isLandscape
+            ? EmulationManager.landscape
+            : EmulationManager.portrait;
+        await tab.emulation.setDeviceMetricsOverride(roundedClip.width,
+            roundedClip.height, viewport.deviceScaleFactor, viewport.isMobile,
+            screenOrientation: screenOrientation);
+      }
+      var shouldSetDefaultBackground =
+          omitBackground && format == ScreenshotFormat.png;
+      if (shouldSetDefaultBackground) {
+        await tab.emulation.setDefaultBackgroundColorOverride(
+            color: RGBA(r: 0, g: 0, b: 0, a: 0));
+      }
+      var result = await tab.page.captureScreenshot(
+          format: format.name, quality: quality, clip: roundedClip);
+      if (shouldSetDefaultBackground) {
+        await tab.emulation.setDefaultBackgroundColorOverride();
+      }
+
+      if (fullPage && _viewport != null) {
+        await setViewport(_viewport);
+      }
+
+      return base64Decode(result);
+    });
+  }
+
+  Future<Uint8List> pdf(
+      {PaperFormat format,
+      num scale,
+      bool displayHeaderFooter,
+      String headerTemplate,
+      String footerTemplate,
+      bool printBackground,
+      bool landscape,
+      String pageRanges,
+      bool preferCssPageSize,
+      PdfMargins margins}) async {
+    scale ??= 1;
+    displayHeaderFooter ??= false;
+    headerTemplate ??= '';
+    footerTemplate ??= '';
+    printBackground ??= false;
+    landscape ??= false;
+    pageRanges ??= '';
+    preferCssPageSize ??= false;
+    format ??= PaperFormat.letter;
+    margins ??= PdfMargins.zero;
+
+    var result = await tab.page.printToPDF(
+        landscape: landscape,
+        displayHeaderFooter: displayHeaderFooter,
+        headerTemplate: headerTemplate,
+        footerTemplate: footerTemplate,
+        printBackground: printBackground,
+        scale: scale,
+        paperWidth: format.width,
+        paperHeight: format.height,
+        marginTop: margins.top,
+        marginBottom: margins.bottom,
+        marginLeft: margins.left,
+        marginRight: margins.right,
+        pageRanges: pageRanges,
+        preferCSSPageSize: preferCssPageSize);
+
+    return base64Decode(result);
+  }
 
   Future<String> get title {
     return mainFrame.title;
@@ -476,12 +577,13 @@ class Page {
         visible: visible, hidden: hidden, timeout: timeout);
   }
 
-  Future<ElementHandle> waitForXPath(String xpath, {bool visible, bool hidden, Duration timeout}) {
-    return mainFrame.waitForXPath(xpath, visible: visible, hidden: hidden, timeout: timeout);
+  Future<ElementHandle> waitForXPath(String xpath,
+      {bool visible, bool hidden, Duration timeout}) {
+    return mainFrame.waitForXPath(xpath,
+        visible: visible, hidden: hidden, timeout: timeout);
   }
 
-  Future<JsHandle> waitForFunction(
-      Js pageFunction, List args,
+  Future<JsHandle> waitForFunction(Js pageFunction, List args,
       {Duration timeout, Polling polling}) {
     return mainFrame.waitForFunction(pageFunction, args,
         timeout: timeout, polling: polling);
@@ -507,4 +609,87 @@ class ConsoleMessageLocation {
 
   ConsoleMessageLocation(this.url,
       {@required this.lineNumber, @required this.columnNumber});
+}
+
+class ScreenshotFormat {
+  static const jpeg = ScreenshotFormat._('jpeg');
+  static const png = ScreenshotFormat._('png');
+  final String name;
+
+  const ScreenshotFormat._(this.name);
+}
+
+class PaperFormat {
+  static const letter = PaperFormat.inches(width: 8.5, height: 11);
+  static const legal = PaperFormat.inches(width: 8.5, height: 14);
+  static const tabloid = PaperFormat.inches(width: 11, height: 17);
+  static const ledger = PaperFormat.inches(width: 17, height: 11);
+  static const a0 = PaperFormat.inches(width: 33.1, height: 46.8);
+  static const a1 = PaperFormat.inches(width: 23.4, height: 33.1);
+  static const a2 = PaperFormat.inches(width: 16.5, height: 23.4);
+  static const a3 = PaperFormat.inches(width: 11.7, height: 16.5);
+  static const a4 = PaperFormat.inches(width: 8.27, height: 11.7);
+  static const a5 = PaperFormat.inches(width: 5.83, height: 8.27);
+  static const a6 = PaperFormat.inches(width: 4.13, height: 5.83);
+
+  final num width, height;
+
+  const PaperFormat.inches({@required this.width, @required this.height});
+
+  PaperFormat.px({@required int width, @required int height})
+      : width = _pxToInches(width),
+        height = _pxToInches(height);
+
+  PaperFormat.cm({@required num width, @required num height})
+      : width = _cmToInches(width),
+        height = _cmToInches(height);
+
+  PaperFormat.mm({@required num width, @required num height})
+      : width = _mmToInches(width),
+        height = _mmToInches(height);
+}
+
+num _pxToInches(num px) => px / 96;
+
+num _cmToInches(num cm) => _pxToInches(cm / 37.8);
+
+num _mmToInches(num mm) => _cmToInches(mm / 10);
+
+class PdfMargins {
+  final num top, bottom, left, right;
+
+  static final zero = PdfMargins.inches();
+
+  PdfMargins.inches({num top, num bottom, num left, num right})
+      : top = top ?? 0,
+        bottom = bottom ?? 0,
+        left = left ?? 0,
+        right = right ?? 0;
+
+  factory PdfMargins.px({int top, int bottom, int left, int right}) {
+    return PdfMargins.inches(
+      top: top != null ? _pxToInches(top) : null,
+      bottom: bottom != null ? _pxToInches(bottom) : null,
+      left: left != null ? _pxToInches(left) : null,
+      right: right != null ? _pxToInches(right) : null,
+    );
+  }
+
+  factory PdfMargins.cm({num top, num bottom, num left, num right}) {
+    return PdfMargins.inches(
+      top: top != null ? _cmToInches(top) : null,
+      bottom: bottom != null ? _cmToInches(bottom) : null,
+      left: left != null ? _cmToInches(left) : null,
+      right: right != null ? _cmToInches(right) : null,
+    );
+  }
+
+  factory PdfMargins.mm({num top, num bottom, num left, num right}) {
+    return PdfMargins.inches(
+      top: top != null ? _mmToInches(top) : null,
+      bottom: bottom != null ? _mmToInches(bottom) : null,
+      left: left != null ? _mmToInches(left) : null,
+      right: right != null ? _mmToInches(right) : null,
+    );
+  }
 }

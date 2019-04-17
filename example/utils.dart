@@ -18,7 +18,7 @@ Future chromeTab(String url, Function(Tab) callback,
 
   String chromeExecutable = (await downloadChrome()).executablePath;
   Chrome chrome = await Chrome.start(chromeExecutable);
-  Tab tab = await chrome.newTab(url);
+  Tab tab = await chrome.newTab();
 
   try {
     await callback(tab);
@@ -27,7 +27,7 @@ Future chromeTab(String url, Function(Tab) callback,
   }
 }
 
-Future chromePage(String url, Function(Page) callback,
+Future chromePage(Function(Page) callback,
     {bool setupLogger = true}) async {
   if (setupLogger) {
     Logger.root.level = Level.ALL;
@@ -36,7 +36,7 @@ Future chromePage(String url, Function(Page) callback,
 
   String chromeExecutable = (await downloadChrome()).executablePath;
   Chrome chrome = await Chrome.start(chromeExecutable);
-  Page page = await chrome.newPage(url);
+  Page page = await chrome.newPage();
 
   try {
     await callback(page);

@@ -7,10 +7,13 @@ A Dart library to automate the Chrome browser over the DevTools Protocol.
 This package exposes 2 main APIs: the raw DevTools protocol and a high-level Puppeteer-like API.
 
 #### Low-level raw API
-The low level API is a simple 1:1 mapping with the [Chrome DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).  
+The low-level API is a simple one-to-one mapping with the [Chrome DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).  
 The code is generated from the [JSON Schema](https://github.com/ChromeDevTools/devtools-protocol) provided by Chrome.
 
-This is the API exposed on the `Tab` class. With this API you have the whole power of the ChromeDevTools.
+With this API you have entire control to automate Chrome in a fully typed environment.
+However this API can be a bit hard to use and require to write some helper functions for common tasks.
+
+You access this API through the `Tab` class. 
 ```dart
  // Create a chrome's tab
  var tab = chrome.newTab();
@@ -31,10 +34,19 @@ This is the API exposed on the `Tab` class. With this API you have the whole pow
 You can find more example of using this API in `example/protocol`. The generated code is in `lib/domains`.
 
 #### High-level API
-This API is built on top of the raw protocol and exposes an easier-to-use API to automate common browser tasks.
+This API is built on top of the raw protocol and exposes an easy-to-use API.
 This is the API exposed on the `Page` class.
 
 The API is a Dart port of the Node.JS library: [Puppeteer](https://pptr.dev/).
+
+```dart
+- go to page
+- type in element
+- click button
+- capture screenshot
+- save pdf
+- go back
+```
 
 You can find more example of using this API in the `example` folder.
 
