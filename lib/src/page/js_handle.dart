@@ -1,8 +1,8 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:chrome_dev_tools/domains/dom.dart';
 import 'package:chrome_dev_tools/domains/runtime.dart';
-import 'package:chrome_dev_tools/src/page/dom_world.dart';
 import 'package:chrome_dev_tools/src/page/execution_context.dart';
 import 'package:chrome_dev_tools/src/page/frame_manager.dart';
 import 'package:chrome_dev_tools/src/page/helper.dart';
@@ -231,11 +231,10 @@ async function _(element, pageJavascriptEnabled) {
         .click(point, delay: delay, button: button, clickCount: clickCount);
   }
 
-  /**
-   * @param {!Array<string>} filePaths
-   */
-  Future uploadFile(List<String> filePaths) {
-//TODO(xha)
+  Future<void> uploadFile(List<File> files) async {
+    await context.domApi.setFileInputFiles(
+        files.map((file) => file.absolute.path).toList(),
+        objectId: remoteObject.objectId);
   }
 
   Future<void> tap() async {

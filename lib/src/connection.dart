@@ -16,6 +16,9 @@ class Event {
   Event._(this.name, this.parameters);
 }
 
+/// An annotation to tag some API parameters with the accepted values.
+/// This is purely for documentation purpose until Dart support something like
+/// "String Literal Types" from TypeScript.
 class Enum {
   const Enum(List<String> values);
 }
@@ -48,6 +51,8 @@ class Connection implements Client {
       session._onClosed();
       _sessions.remove(session);
     }));
+
+    _webSocket.done.then((_) => dispose());
   }
 
   TargetApi get targetApi => _targetApi;
@@ -78,9 +83,8 @@ class Connection implements Client {
     return completer.future;
   }
 
-  Future<Session> createSession(TargetID targetId,
-      {BrowserContextID browserContextID}) async {
-    SessionID sessionId = await _targetApi.attachToTarget(targetId);
+  Future<Session> createSession(TargetInfo targetInfo) async {
+    SessionID sessionId = await _targetApi.attachToTarget(targetInfo.targetId, flatten: true);
     Session session = Session(_targetApi, sessionId);
     _sessions.add(session);
 
@@ -113,8 +117,8 @@ class Connection implements Client {
     }
   }
 
-  Future dispose() async {
-    await _eventController.close();
+  void dispose() {
+    _eventController.close();
     for (Completer completer in _completers.values) {
       completer.completeError(TargetClosedException());
     }
@@ -126,10 +130,13 @@ class Connection implements Client {
     _sessions.clear();
 
     for (StreamSubscription subscription in _subscriptions) {
-      await subscription.cancel();
+      subscription.cancel();
     }
-    await _webSocket.close();
+
+    _webSocket.close();
   }
+
+  Future get disconnected => _webSocket.done;
 }
 
 String _encodeMessage(int id, String method, Map<String, dynamic> parameters) {
@@ -187,9 +194,11 @@ class Session implements Client {
     }
   }
 
-  Future get onClose => _onClose.future;
-
   bool get isClosed => _onClose.isCompleted;
+
+  Future<void> detach() async {
+    await targetApi.detachFromTarget(sessionId: sessionId);
+  }
 
   _onClosed() {
     _eventController.close();

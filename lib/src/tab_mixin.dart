@@ -38,7 +38,7 @@ import '../domains/profiler.dart';
 import '../domains/runtime.dart';
 import 'connection.dart';
 
-abstract class TabMixin {
+mixin TabMixin {
   Session get session;
 
   AccessibilityApi get accessibility =>

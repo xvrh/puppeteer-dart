@@ -4,15 +4,29 @@ import 'dart:io';
 
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 
+import 'utils.dart';
+
 main() async {
+
+  //setupLogger();
   Chrome chrome = await Chrome.start();
 
-  Page page = await chrome.newPage();
+  print((await chrome.browser.getVersion()).product.split('/').last);
 
-  await page.goto('https://google.com');
+  var page =await chrome.newPage();
 
-  var s = await page.screenshot();
-  await File('example/_f.png').writeAsBytes(s);
-
-  await chrome.close();
+  page.onError.listen((_) {}, onDone: () {
+    print('Closed');
+  });
+  //await Future.delayed(Duration(milliseconds: 100));
+  try {
+    List results = await Future.wait([
+      chrome.close(),
+    ]);
+    print(results.length);
+    print('End');
+  } catch (e) {
+    print('Error $e');
+  }
+  await Future.delayed(Duration(milliseconds: 100));
 }

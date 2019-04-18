@@ -62,46 +62,46 @@ class NetworkManager {
     _onRequestFailedController.close();
   }
 
-  Future initialize() async {
+  Future<void> initialize() async {
     await _tab.network.enable();
     if (ignoreHttpsErrors) {
       await _tab.security.setIgnoreCertificateErrors(true);
     }
   }
 
-  Future authenticate(Credentials credentials) async {
+  Future<void> authenticate(Credentials credentials) async {
     _credentials = credentials;
     await _updateProtocolRequestInterception();
   }
 
-  Future setExtraHTTPHeaders(Map<String, String> extraHttpHeaders) async {
+  Future<void> setExtraHTTPHeaders(Map<String, String> extraHttpHeaders) async {
     _extraHTTPHeaders.clear();
     _extraHTTPHeaders.addAll(new Map.fromIterable(extraHttpHeaders.entries,
         key: (e) => e.key.toLowercase(), value: (e) => e.value));
     await _network.setExtraHTTPHeaders(Headers(_extraHTTPHeaders));
   }
 
-  Future setOfflineMode(bool value) async {
+  Future<void> setOfflineMode(bool value) async {
     if (_offline == value) return;
     _offline = value;
     await _network.emulateNetworkConditions(_offline, 0, -1, -1);
   }
 
-  Future setUserAgent(String userAgent) {
+  Future<void> setUserAgent(String userAgent) {
     return _network.setUserAgentOverride(userAgent);
   }
 
-  Future setCacheEnabled(bool enabled) {
+  Future<void> setCacheEnabled(bool enabled) {
     _userCacheDisabled = !enabled;
     return _updateProtocolCacheDisabled();
   }
 
-  Future setRequestInterception(value) {
+  Future<void> setRequestInterception(value) {
     _userRequestInterceptionEnabled = value;
     return _updateProtocolRequestInterception();
   }
 
-  Future _updateProtocolRequestInterception() async {
+  Future<void> _updateProtocolRequestInterception() async {
     var enabled = _userRequestInterceptionEnabled || _credentials != null;
     if (enabled == _protocolRequestInterceptionEnabled) return;
     _protocolRequestInterceptionEnabled = enabled;
@@ -120,7 +120,7 @@ class NetworkManager {
     }
   }
 
-  Future _updateProtocolCacheDisabled() {
+  Future <void>_updateProtocolCacheDisabled() {
     return _network.setCacheDisabled(
         _userCacheDisabled || _protocolRequestInterceptionEnabled);
   }
@@ -292,7 +292,7 @@ class NetworkRequest {
 
   String get failure => _failureText;
 
-  Future continueRequest(
+  Future<void> continueRequest(
       {String url, String method, String postData, Map headers}) async {
     // Request interception is not supported for data: urls.
     if (this.url.startsWith('data:')) return;
@@ -310,7 +310,7 @@ class NetworkRequest {
             .toList());
   }
 
-  Future respond(
+  Future<void> respond(
       {int status,
       Map<String, String> headers,
       String contentType,
@@ -338,7 +338,7 @@ class NetworkRequest {
             .toList());
   }
 
-  Future abort({ErrorReason error}) async {
+  Future<void> abort({ErrorReason error}) async {
     error ??= ErrorReason.failed;
     // Request interception is not supported for data: urls.
     if (url.startsWith('data:')) return;

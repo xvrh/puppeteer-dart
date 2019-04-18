@@ -71,7 +71,7 @@ class LifecycleWatcher {
     _checkLifecycleComplete();
   }
 
-  Future _createTimeoutFuture() {
+  Future<Exception> _createTimeoutFuture() {
     if (timeout == null || timeout == Duration.zero) {
       return Completer<Exception>().future;
     }
@@ -88,7 +88,7 @@ class LifecycleWatcher {
     _checkLifecycleComplete();
   }
 
-  _checkLifecycleComplete([_]) {
+  void _checkLifecycleComplete([_]) {
     // We expect navigation to commit.
     if (!_checkLifecycle(frame)) return;
 
@@ -116,7 +116,7 @@ class LifecycleWatcher {
     return true;
   }
 
-  dispose() {
+  void dispose() {
     for (var subscription in _subscriptions) {
       subscription.cancel();
     }

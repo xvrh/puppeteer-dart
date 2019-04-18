@@ -5,11 +5,8 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:chrome_dev_tools/domains/dom.dart';
-import 'package:chrome_dev_tools/domains/log.dart';
 import 'package:chrome_dev_tools/domains/network.dart';
-import 'package:chrome_dev_tools/domains/page.dart' hide Frame, Viewport;
 import 'package:chrome_dev_tools/domains/page.dart';
-import 'package:chrome_dev_tools/domains/performance.dart';
 import 'package:chrome_dev_tools/domains/runtime.dart';
 import 'package:chrome_dev_tools/domains/target.dart';
 import 'package:chrome_dev_tools/src/chrome.dart';
@@ -35,8 +32,9 @@ class Page {
   final _pageBindings = <String, Function>{};
   final _workers = <SessionID, Worker>{};
   FrameManager _frameManager;
-  final StreamController _workerCreated = StreamController.broadcast(),
-      _workerDestroyed = StreamController.broadcast();
+  final StreamController _workerCreated = StreamController<Worker>.broadcast(),
+      _workerDestroyed = StreamController<Worker>.broadcast(),
+      _onErrorController = StreamController<ClientError>.broadcast();
   bool _javascriptEnabled = true;
   Duration navigationTimeout;
   Duration defaultTimeout = Duration(seconds: 30);
@@ -79,7 +77,6 @@ class Page {
     tab.runtime.onBindingCalled.listen(_onBindingCalled);
     tab.page.onJavascriptDialogOpening.listen(_onDialog);
     tab.runtime.onExceptionThrown.listen(_handleException);
-    tab.performance.onMetrics.listen(_emitMetrics);
     tab.log.onEntryAdded.listen(_onLogEntryAdded);
   }
 
@@ -104,6 +101,7 @@ class Page {
     _frameManager.dispose();
     _workerCreated.close();
     _workerDestroyed.close();
+    _onErrorController.close();
   }
 
   Duration get navigationTimeoutOrDefault =>
@@ -128,7 +126,9 @@ class Page {
 
   Stream<MonotonicTime> get onLoad => tab.page.onLoadEventFired;
 
-  FrameManager get frames => _frameManager;
+  Stream<ClientError> get onError => _onErrorController.stream;
+
+  FrameManager get frameManager => _frameManager;
 
   Future get onClose => tab.onClose;
 
@@ -180,7 +180,7 @@ class Page {
     return tab.network.getCookies(urls: urls);
   }
 
-  Future<void> deleteCookie(List<Cookie> cookies) async {
+  Future<void> deleteCookies(List<Cookie> cookies) async {
     var pageUrl = url;
     for (var cookie in cookies) {
       await tab.network.deleteCookies(cookie.name,
@@ -190,8 +190,8 @@ class Page {
     }
   }
 
-  Future setCookie(List<Cookie> cookies) {
-    //TODO(xha)
+  Future<void> setCookies(List<CookieParam> cookies) async {
+    await tab.network.setCookies(cookies);
   }
 
   Future<ElementHandle> addScriptTag(
@@ -204,60 +204,56 @@ class Page {
     return mainFrame.addStyleTag(url: url, file: file, content: content);
   }
 
-  Future exposeFunction(String name, Function callbackFunction) async {
-    if (_pageBindings.containsKey(name))
+  static final _addPageBinding =
+      //language=js
+      '''
+function addPageBinding(bindingName) {
+  const binding = window[bindingName];
+  window[bindingName] = (...args) => {
+    const me = window[bindingName];
+    let callbacks = me['callbacks'];
+    if (!callbacks) {
+      callbacks = new Map();
+      me['callbacks'] = callbacks;
+    }
+    const seq = (me['lastSeq'] || 0) + 1;
+    me['lastSeq'] = seq;
+    const promise = new Promise((resolve, reject) => callbacks.set(seq, {resolve, reject}));
+    binding(JSON.stringify({name: bindingName, seq, args}));
+    return promise;
+  };
+}
+''';
+
+  Future<void> exposeFunction(String name, Function callbackFunction) async {
+    if (_pageBindings.containsKey(name)) {
       throw Exception(
           'Failed to add page binding with name $name: window["$name"] already exists!');
+    }
     _pageBindings[name] = callbackFunction;
 
-    //TODO(xha)
+    var expression = evaluationString(_addPageBinding, [name]);
+    await tab.runtime.addBinding(name);
+    await tab.page.addScriptToEvaluateOnNewDocument(expression);
+    await Future.wait(frameManager.frames
+        .map((frame) => frame.evaluate(Js.expression(expression))));
   }
 
-  Future authenticate({String username, String password}) {
-    //TODO(xha)
+  Future<void> authenticate({String userName, String password}) {
+    return _frameManager.networkManager
+        .authenticate(Credentials(userName, password));
   }
 
-  /**
-   * @param {!Object<string, string>} headers
-   */
-  Future setExtraHTTPHeaders(headers) {
-//TODO(xha)
+  Future<void> setExtraHTTPHeaders(Map<String, String> headers) async {
+    await _frameManager.networkManager.setExtraHTTPHeaders(headers);
   }
 
-  /**
-   * @param {string} userAgent
-   */
-  Future setUserAgent(userAgent) {
-//TODO(xha)
+  Future<void> setUserAgent(String userAgent) async {
+    await _frameManager.networkManager.setUserAgent(userAgent);
   }
 
-  /**
-   * @return {!Promise<!Metrics>}
-   */
-  Future metrics() {
-//TODO(xha)
-  }
-
-  /**
-   * @param {!Protocol.Performance.metricsPayload} event
-   */
-  _emitMetrics(event) {
-//TODO(xha)
-  }
-
-  /**
-   * @param {?Array<!Protocol.Performance.Metric>} metrics
-   * @return {!Metrics}
-   */
-  _buildMetricsObject(metrics) {
-//TODO(xha)
-  }
-
-  /**
-   * @param {!Protocol.Runtime.ExceptionDetails} exceptionDetails
-   */
-  _handleException(exceptionDetails) {
-//TODO(xha)
+  void _handleException(ExceptionThrownEvent event) {
+    _onErrorController.add(ClientError(event.exceptionDetails));
   }
 
   /**
@@ -267,12 +263,39 @@ class Page {
 //TODO(xha)
   }
 
-  /**
-   * @param {!Protocol.Runtime.bindingCalledPayload} event
-   */
-  Future _onBindingCalled(event) {
-//TODO(xha)
+  Future _onBindingCalled(BindingCalledEvent event) async {
+    Map<String, dynamic> payload = jsonDecode(event.payload);
+    String name = payload['name'];
+    int seq = payload['seq'];
+    List args = payload['args'];
+
+    String expression;
+    try {
+      Function callback = _pageBindings[name];
+      var result = await Function.apply(callback, args);
+      expression = evaluationString(_deliverResult, [name, seq, result]);
+    } catch (error, stackTrace) {
+      expression = evaluationString(
+          _deliverError, [name, seq, error.toString(), stackTrace.toString()]);
+    }
+    await tab.runtime.evaluate(expression, contextId: event.executionContextId);
   }
+
+  static final _deliverResult = '''
+function deliverResult(name, seq, result) {
+  window[name]['callbacks'].get(seq).resolve(result);
+  window[name]['callbacks'].delete(seq);
+}  
+''';
+
+  static final _deliverError = '''
+function deliverError(name, seq, message, stack) {
+  const error = new Error(message);
+  error.stack = stack;
+  window[name]['callbacks'].get(seq).reject(error);
+  window[name]['callbacks'].delete(seq);
+}
+''';
 
   /**
    * @param {string} type
@@ -322,81 +345,75 @@ class Page {
         .waitForNavigation(timeout: timeout, waitUntil: waitUntil);
   }
 
-  /**
-   * @param {(string|Function)} urlOrPredicate
-   * @param {!{timeout?: number}=} options
-   * @return {!Promise<!Puppeteer.Request>}
-   */
-  Future waitForRequest(urlOrPredicate, options) {
-    //TODO(xha)
+  Future<NetworkRequest> waitForRequest(String url, {Duration timeout}) async {
+    timeout ??= defaultTimeout;
+
+    return frameManager.networkManager.onRequest
+        .where((request) => request.url == url)
+        .first
+        .timeout(timeout);
   }
 
-  /**
-   * @param {(string|Function)} urlOrPredicate
-   * @param {!{timeout?: number}=} options
-   * @return {!Promise<!Puppeteer.Response>}
-   */
-  Future waitForResponse(urlOrPredicate, options) {
-    //TODO(xha)
+  Future<NetworkResponse> waitForResponse(String url, {Duration timeout}) {
+    timeout ??= defaultTimeout;
+
+    return frameManager.networkManager.onResponse
+        .where((response) => response.url == url)
+        .first
+        .timeout(timeout);
   }
 
-  /**
-   * @param {!{timeout?: number, waitUntil?: string|!Array<string>}=} options
-   * @return {!Promise<?Puppeteer.Response>}
-   */
-  Future goBack(options) {
-    //TODO(xha)
+  Future<NetworkResponse> goBack({Duration timeout, WaitUntil waitUntil}) {
+    return _go(-1, timeout: timeout, waitUntil: waitUntil);
   }
 
-  /**
-   * @param {!{timeout?: number, waitUntil?: string|!Array<string>}=} options
-   * @return {!Promise<?Puppeteer.Response>}
-   */
-  Future goForward(options) {
-    //TODO(xha)
+  Future<NetworkResponse> goForward({Duration timeout, WaitUntil waitUntil}) {
+    return _go(1, timeout: timeout, waitUntil: waitUntil);
   }
 
-  /**
-   * @param {!{timeout?: number, waitUntil?: string|!Array<string>}=} options
-   * @return {!Promise<?Puppeteer.Response>}
-   */
-  Future _go(delta, options) {
-    //TODO(xha)
+  Future<NetworkResponse> _go(int delta,
+      {Duration timeout, WaitUntil waitUntil}) async {
+    var history = await tab.page.getNavigationHistory();
+    int index = history.currentIndex + delta;
+    if (index < 0 || index >= history.entries.length) {
+      return null;
+    }
+    var entry = history.entries[index];
+    var navigationFuture =
+        waitForNavigation(timeout: timeout, waitUntil: waitUntil);
+    await tab.page.navigateToHistoryEntry(entry.id);
+    return await navigationFuture;
   }
 
   Future<void> bringToFront() async {
     await tab.page.bringToFront();
   }
 
-  /**
-   * @param {!{viewport: !Puppeteer.Viewport, userAgent: string}} options
-   */
-  Future emulate(options) {
-    //TODO(xha)
+  Future<void> emulate(Device device) async {
+    await setViewport(device.viewport);
+    await setUserAgent(device.userAgent(
+        (await tab.browser.browser.getVersion()).product.split('/').last));
   }
 
   bool get javascriptEnabled => _javascriptEnabled;
 
-  /**
-   * @param {boolean} enabled
-   */
-  Future setJavaScriptEnabled(enabled) {
+  Future<void> setJavaScriptEnabled(enabled) async {
+    if (_javascriptEnabled == enabled) {
+      return;
+    }
     _javascriptEnabled = enabled;
-    //TODO(xha)
+
+    await tab.emulation.setScriptExecutionDisabled(!enabled);
   }
 
-  /**
-   * @param {boolean} enabled
-   */
-  Future setBypassCSP(enabled) {
-    //TODO(xha)
+  Future<void> setBypassCSP(bool enabled) {
+    return tab.page.setBypassCSP(enabled);
   }
 
-  /**
-   * @param {?string} mediaType
-   */
-  Future emulateMedia(mediaType) {
-    //TODO(xha)
+  Future<void> emulateMedia(String mediaType) {
+    assert(mediaType == 'screen' || mediaType == 'print' || mediaType == null,
+        'Unsupported media type: ' + mediaType);
+    return tab.emulation.setEmulatedMedia(mediaType);
   }
 
   Future setViewport(DeviceViewport viewport) async {
@@ -413,16 +430,14 @@ class Page {
     return _frameManager.mainFrame.evaluate(pageFunction, args: args);
   }
 
-  Future evaluateOnNewDocument(String pageFunction,
-      [Map<String, dynamic> args]) async {
+  Future evaluateOnNewDocument(String pageFunction, {List args}) async {
     var source = evaluationString(pageFunction, args);
     await tab.page.addScriptToEvaluateOnNewDocument(source);
   }
 
-  /**
-   * @param {boolean} enabled
-   */
-  Future setCacheEnabled(enabled) {}
+  Future<void> setCacheEnabled(enabled) {
+    return _frameManager.networkManager.setCacheEnabled(enabled);
+  }
 
   Future<Uint8List> screenshot(
       {ScreenshotFormat format,
@@ -691,5 +706,29 @@ class PdfMargins {
       left: left != null ? _mmToInches(left) : null,
       right: right != null ? _mmToInches(right) : null,
     );
+  }
+}
+
+class ClientError {
+  final ExceptionDetails details;
+  final String message;
+
+  ClientError(this.details) : message = _message(details);
+
+  static String _message(ExceptionDetails details) {
+    if (details.exception != null) {
+      return details.exception.description ?? details.exception.value;
+    } else {
+      var message = details.text;
+      if (details.stackTrace != null) {
+        for (var callFrame in details.stackTrace.callFrames) {
+          var location =
+              '${callFrame.url}:${callFrame.lineNumber}:${callFrame.columnNumber}';
+          var functionName = callFrame.functionName ?? '<anonymous>';
+          message += '\n    at $functionName ($location)';
+        }
+      }
+      return message;
+    }
   }
 }

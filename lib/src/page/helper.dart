@@ -2,14 +2,11 @@ import 'dart:convert';
 
 import 'package:chrome_dev_tools/domains/runtime.dart';
 
-String evaluationString(String function, Map<String, dynamic> args) {
+String evaluationString(String function, List args) {
   if (args == null || args.isEmpty) {
     return function;
   } else {
-    return '''
-(function(${args.keys.join(', ')}) {
-  $function
-})(${args.values.map(jsonEncode).join(', ')})''';
+    return '($function)(${args.map(jsonEncode).join(', ')})';
   }
 }
 

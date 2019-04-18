@@ -354,8 +354,8 @@ class PageFrame {
     return _mainWorld.evaluateHandle(pageFunction, args: args);
   }
 
-  Future evaluate(Js pageFunction, {List args}) {
-    return _mainWorld.evaluate(pageFunction, args: args);
+  Future<T> evaluate<T>(Js pageFunction, {List args}) {
+    return _mainWorld.evaluate<T>(pageFunction, args: args);
   }
 
   Future<ElementHandle> $(String selector) {

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/chrome_downloader.dart';
 import 'package:http/http.dart';
 import 'package:path/path.dart' as p;
 

@@ -143,7 +143,7 @@ main() {
   tabBuffer.writeln("import 'connection.dart';");
   tabBuffer.writeln();
   tabBuffer.writeln('''
-abstract class TabMixin {
+mixin TabMixin {
   Session get session;
 ''');
 
