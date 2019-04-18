@@ -49,7 +49,7 @@ Future<Browser> launch(
     bool headless = true,
     bool useTemporaryUserData = false,
     bool noSandboxFlag,
-    DeviceViewport defaultViewport}) async {
+    DeviceViewport defaultViewport, bool ignoreHttpsErrors}) async {
   // In docker environment we want to force the '--no-sandbox' flag automatically
   noSandboxFlag ??= Platform.environment['CHROME_FORCE_NO_SANDBOX'] == 'true';
 
@@ -90,7 +90,7 @@ Future<Browser> launch(
 
     Browser browser = createBrowser(connection,
         defaultViewport: defaultViewport,
-        closeCallback: () => _gracefullyClose(chromeProcess));
+        closeCallback: () => _gracefullyClose(chromeProcess), ignoreHttpsErrors: ignoreHttpsErrors);
     await browser.waitForTarget((target) => target.type == 'page');
     return browser;
   } else {

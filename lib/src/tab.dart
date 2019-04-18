@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:chrome_dev_tools/domains/target.dart';
 import 'package:chrome_dev_tools/src/chrome.dart';
+import 'package:chrome_dev_tools/src/target.dart';
+import 'package:chrome_dev_tools/src/target.dart';
 
 import '../domains/runtime.dart';
 import 'package:chrome_dev_tools/src/connection.dart';
@@ -9,16 +11,24 @@ import 'wait_until.dart' as helper;
 import 'remote_object.dart' as helper;
 
 class Tab with TabMixin {
-  final Browser browser;
-  final TargetID targetID;
-  final BrowserContextID _browserContextID;
+  final Target _target;
+  final _onPopupController = StreamController<Tab>.broadcast();
 
   @override
   final Session session;
 
-  Target(this.browser, this._info, this.session, {BrowserContextID browserContextID})
-      : _browserContextID = browserContextID, targetID = _info.targetId;
+  Tab(this._target, this.session);
 
+  Browser get browser => _target.browser;
+  BrowserContext get browserContext => _target.browserContext;
+  TargetID get targetId => _target.targetID;
+
+  bool get hasPopupListener => _onPopupController.hasListener;
+  void emitPopup(Tab popup) {
+    _onPopupController.add(popup);
+  }
+
+/*
   Future get onClose => session.onClose;
 
   Future waitUntilNetworkIdle(
@@ -54,5 +64,5 @@ class Tab with TabMixin {
 
     dynamic value = await remoteObject(object);
     return value;
-  }
+  }*/
 }

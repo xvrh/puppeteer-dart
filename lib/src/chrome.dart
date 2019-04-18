@@ -10,6 +10,7 @@ import 'package:chrome_dev_tools/src/page/emulation_manager.dart';
 import 'package:chrome_dev_tools/src/target.dart';
 import 'package:meta/meta.dart';
 import 'package:pool/pool.dart';
+import 'package:async/async.dart';
 
 import '../domains/target.dart';
 import 'package:chrome_dev_tools/src/connection.dart';
@@ -23,16 +24,21 @@ class Browser {
   final BrowserApi browser;
   final SystemInfoApi systemInfo;
   final Pool _screenshotsPool = Pool(1);
+  final bool ignoreHttpsErrors;
   final DeviceViewport defaultViewport;
   final Future Function() _closeCallback;
   final _contexts = <BrowserContextID, BrowserContext>{};
   final _targets = <TargetID, Target>{};
   BrowserContext _defaultContext;
+  final _onTargetCreatedController = StreamController<Target>.broadcast(),
+      _onTargetDestroyedController = StreamController<Target>.broadcast(),
+      _onTargetChangedController = StreamController<Target>.broadcast();
 
-  Browser._(this.connection, {@required this.defaultViewport,
+  Browser._(this.connection, {@required this.defaultViewport, @required bool ignoreHttpsErrors,
     @required Future Function() closeCallback})
       :
         _closeCallback = closeCallback,
+        ignoreHttpsErrors = ignoreHttpsErrors ?? false,
         browser = BrowserApi(connection),
         systemInfo = SystemInfoApi(connection) {
     _defaultContext = BrowserContext(connection, this, null);
@@ -66,6 +72,16 @@ class Browser {
         defaultViewport: defaultViewport);
   }
 
+  void dispose() {
+    _onTargetCreatedController.close();
+    _onTargetDestroyedController.close();
+    _onTargetChangedController.close();
+  }
+
+  Stream<Target> get onTargetCreated => _onTargetCreatedController.stream;
+  Stream<Target> get onTargetDestroyed => _onTargetDestroyedController.stream;
+  Stream<Target> get onTargetChanged => _onTargetChangedController.stream;
+
   Future get disconnected => connection.disconnected;
 
   Future<BrowserContext> createIncognitoBrowserContext() async {
@@ -85,48 +101,64 @@ class Browser {
   }
 
   TargetApi get targetApi => connection.targetApi;
-  
+
   Future<void> _targetCreated(TargetInfo event) async {
     BrowserContext context = _contexts[event.browserContextId] ?? _defaultContext;
 
-    Target target = new Target(this, event, () => connection.createSession(event), ignoreHttpsErrors: ignoreHttpsErrors, viewport: defaultViewport);
+    Target target = new Target(this, event, () => connection.createSession(event), browserContext: context);
     _targets[event.targetId] = target;
 
-    if (await target.initialize()) {
+    if (await target.initialized) {
       _onTargetCreatedController.add(target);
-      context._onTargetCreatedController.add(target);
     }
   }
 
-  /**
-   * @param {{targetId: string}} event
-   */
-  async _targetDestroyed(event) {
-    const target = this._targets.get(event.targetId);
-    target._initializedCallback(false);
-    this._targets.delete(event.targetId);
-    target._closedCallback();
-    if (await target._initializedPromise) {
-      this.emit(Events.Browser.TargetDestroyed, target);
-      target.browserContext().emit(Events.BrowserContext.TargetDestroyed, target);
+  Future<void> _targetDestroyed(TargetID targetId) async {
+    var target = _targets[targetId];
+    _targets.remove(targetId);
+    target.onDestroyed();
+    if (await target.initialized) {
+      _onTargetDestroyedController.add(target);
     }
   }
 
-  /**
-   * @param {!Protocol.Target.targetInfoChangedPayload} event
-   */
-  _targetInfoChanged(event) {
-    const target = this._targets.get(event.targetInfo.targetId);
-    assert(target, 'target should exist before targetInfoChanged');
-    const previousURL = target.url();
-    const wasInitialized = target._isInitialized;
-    target._targetInfoChanged(event.targetInfo);
-    if (wasInitialized && previousURL !== target.url()) {
-    this.emit(Events.Browser.TargetChanged, target);
-    target.browserContext().emit(Events.BrowserContext.TargetChanged, target);
+  void _targetInfoChanged(TargetInfo event) {
+    var target = _targets[event.targetId];
+    assert(target != null, 'target should exist before targetInfoChanged');
+    var previousURL = target.url;
+    var wasInitialized = target.isInitialized;
+    target.changeInfo(event);
+    if (wasInitialized && previousURL != target.url) {
+      _onTargetChangedController.add(target);
     }
   }
 
+  Future<Tab> newTab() async {
+    return _defaultContext.newTab();
+  }
+
+  Future<Tab> _createTabInContext(BrowserContextID contextId) async {
+    var targetId = await targetApi.createTarget('about:blank', browserContextId: contextId);
+    var target = _targets[targetId];
+    assert(await target.initialized, 'Failed to create target for page');
+    var tab = await target.tab;
+    return tab;
+  }
+
+  List<Target> get targets => _targets.values.where((target) => target.isInitialized).toList();
+  Target get target => _targets.values.firstWhere((t) => t.type == 'browser', orElse: () => null);
+
+  Future<Target> waitForTarget(bool Function(Target) predicate, {Duration timeout}) {
+    timeout ??= const Duration(seconds: 30);
+    return StreamGroup.merge([onTargetCreated, onTargetChanged]).where(predicate).first.timeout(timeout);
+  }
+
+  Future _disposeContext(BrowserContextID contextId) async {
+    await targetApi.disposeBrowserContext(contextId);
+    _contexts.remove(contextId);
+  }
+
+  /*
   Future<Tab> newTab({bool incognito = false}) async {
     BrowserContextID contextID;
     if (incognito) {
@@ -152,16 +184,18 @@ class Browser {
       await targetApi.closeTarget(target.targetId);
     }
   }
-
+*/
   Future close() async {
     await _closeCallback();
     connection.dispose();
   }
+
+  Target targetById(TargetID targetId) => _targets[targetId];
 }
 
 Browser createBrowser(Connection connection,
-        {@required DeviceViewport defaultViewport, @required Future Function() closeCallback}) =>
-    Browser._(connection, defaultViewport: defaultViewport, closeCallback: closeCallback);
+        {@required DeviceViewport defaultViewport, @required Future Function() closeCallback, @required bool ignoreHttpsErrors}) =>
+    Browser._(connection, defaultViewport: defaultViewport, closeCallback: closeCallback, ignoreHttpsErrors: ignoreHttpsErrors);
 
 Pool screenshotPool(Browser browser) => browser._screenshotsPool;
 
@@ -172,29 +206,19 @@ class BrowserContext {
 
   BrowserContext(this.connection, this.browser, this.id);
 
-  /**
-   * @return {!Array<!Target>} target
-   */
-  targets() {
-    return this._browser.targets().filter(target => target.browserContext() === this);
+  Stream<Target> get onTargetCreated => browser.onTargetCreated.where((t) => t.browserContext == this);
+  Stream<Target> get onTargetDestroyed => browser.onTargetDestroyed.where((t) => t.browserContext == this);
+  Stream<Target> get onTargetChanged => browser.onTargetChanged.where((t) => t.browserContext == this);
+
+
+  List<Target> get targets {
+    return browser.targets.where((target) => target.browserContext == this).toList();
   }
 
-  /**
-   * @param {function(!Target):boolean} predicate
-   * @param {{timeout?: number}=} options
-   * @return {!Promise<!Target>}
-   */
-  waitForTarget(predicate, options) {
-    return this._browser.waitForTarget(target => target.browserContext() === this && predicate(target), options);
-  }
-
-  Future<List<Page>> get pages {
-    const pages = await Promise.all(
-        this.targets()
-            .filter(target => target.type() === 'page')
-        .map(target => target.page())
+  Future<List<Tab>> get tabs async {
+    return await Future.wait(
+        targets.where((target) => target.type == 'page').map((target) => target.tab).where((tabFuture) => tabFuture != null)
     );
-    return pages.filter(page => !!page);
   }
 
   bool get isIncognito {
@@ -238,12 +262,12 @@ class BrowserContext {
     await this._connection.send('Browser.resetPermissions', {browserContextId: this._id || undefined});
   }
 
-  Future<Page> newPage() {
-    return browser._createPageInContext(id);
+  Future<Tab> newTab() {
+    return browser._createTabInContext(id);
   }
 
   Future close() async {
     assert(id != null, 'Non-incognito profiles cannot be closed!');
-    await this._browser._disposeContext(id);
+    await browser._disposeContext(id);
   }
 }

@@ -12,7 +12,6 @@ import 'package:chrome_dev_tools/src/page/frame_manager.dart';
 class NetworkManager {
   final Client client;
   final FrameManager frameManager;
-  final bool ignoreHttpsErrors;
   final _requestIdToRequest = <String, NetworkRequest>{};
   final _requestIdToRequestWillBeSentEvent = <String, RequestWillBeSentEvent>{};
   final _extraHTTPHeaders = <String, String>{};
@@ -29,8 +28,7 @@ class NetworkManager {
       _onResponseController = StreamController<NetworkResponse>.broadcast(),
       _onRequestFailedController = StreamController<NetworkRequest>.broadcast();
 
-  NetworkManager(this.client, this.frameManager,
-      {this.ignoreHttpsErrors = false}) {
+  NetworkManager(this.client, this.frameManager) {
     _fetch.onRequestPaused.listen(_onRequestPaused);
     _fetch.onAuthRequired.listen(_onAuthRequired);
     _network.onRequestWillBeSent.listen(_onRequestWillBeSent);
@@ -64,7 +62,7 @@ class NetworkManager {
 
   Future<void> initialize() async {
     await _tab.network.enable();
-    if (ignoreHttpsErrors) {
+    if (frameManager.page.tab.browser.ignoreHttpsErrors) {
       await _tab.security.setIgnoreCertificateErrors(true);
     }
   }

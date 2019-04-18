@@ -454,7 +454,7 @@ function deliverError(name, seq, message, stack) {
     assert(clip == null || !fullPage, "clip and fullPage are exclusive");
 
     return screenshotPool(tab.browser).withResource(() async {
-      await tab.target.activateTarget(tab.targetID);
+      await tab.target.activateTarget(tab.targetId);
 
       Viewport roundedClip;
       if (clip != null) {
