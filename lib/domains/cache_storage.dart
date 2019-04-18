@@ -9,7 +9,7 @@ class CacheStorageApi {
 
   /// Deletes a cache.
   /// [cacheId] Id of cache for deletion.
-  Future deleteCache(CacheId cacheId) async {
+  Future<void> deleteCache(CacheId cacheId) async {
     var parameters = <String, dynamic>{
       'cacheId': cacheId.toJson(),
     };
@@ -19,7 +19,7 @@ class CacheStorageApi {
   /// Deletes a cache entry.
   /// [cacheId] Id of cache where the entry will be deleted.
   /// [request] URL spec of the request.
-  Future deleteEntry(CacheId cacheId, String request) async {
+  Future<void> deleteEntry(CacheId cacheId, String request) async {
     var parameters = <String, dynamic>{
       'cacheId': cacheId.toJson(),
       'request': request,

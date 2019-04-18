@@ -29,7 +29,7 @@ class ServiceWorkerApi {
           .map((e) => ServiceWorkerVersion.fromJson(e))
           .toList());
 
-  Future deliverPushMessage(
+  Future<void> deliverPushMessage(
       String origin, RegistrationID registrationId, String data) async {
     var parameters = <String, dynamic>{
       'origin': origin,
@@ -39,11 +39,11 @@ class ServiceWorkerApi {
     await _client.send('ServiceWorker.deliverPushMessage', parameters);
   }
 
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('ServiceWorker.disable');
   }
 
-  Future dispatchSyncEvent(String origin, RegistrationID registrationId,
+  Future<void> dispatchSyncEvent(String origin, RegistrationID registrationId,
       String tag, bool lastChance) async {
     var parameters = <String, dynamic>{
       'origin': origin,
@@ -54,57 +54,57 @@ class ServiceWorkerApi {
     await _client.send('ServiceWorker.dispatchSyncEvent', parameters);
   }
 
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('ServiceWorker.enable');
   }
 
-  Future inspectWorker(String versionId) async {
+  Future<void> inspectWorker(String versionId) async {
     var parameters = <String, dynamic>{
       'versionId': versionId,
     };
     await _client.send('ServiceWorker.inspectWorker', parameters);
   }
 
-  Future setForceUpdateOnPageLoad(bool forceUpdateOnPageLoad) async {
+  Future<void> setForceUpdateOnPageLoad(bool forceUpdateOnPageLoad) async {
     var parameters = <String, dynamic>{
       'forceUpdateOnPageLoad': forceUpdateOnPageLoad,
     };
     await _client.send('ServiceWorker.setForceUpdateOnPageLoad', parameters);
   }
 
-  Future skipWaiting(String scopeURL) async {
+  Future<void> skipWaiting(String scopeURL) async {
     var parameters = <String, dynamic>{
       'scopeURL': scopeURL,
     };
     await _client.send('ServiceWorker.skipWaiting', parameters);
   }
 
-  Future startWorker(String scopeURL) async {
+  Future<void> startWorker(String scopeURL) async {
     var parameters = <String, dynamic>{
       'scopeURL': scopeURL,
     };
     await _client.send('ServiceWorker.startWorker', parameters);
   }
 
-  Future stopAllWorkers() async {
+  Future<void> stopAllWorkers() async {
     await _client.send('ServiceWorker.stopAllWorkers');
   }
 
-  Future stopWorker(String versionId) async {
+  Future<void> stopWorker(String versionId) async {
     var parameters = <String, dynamic>{
       'versionId': versionId,
     };
     await _client.send('ServiceWorker.stopWorker', parameters);
   }
 
-  Future unregister(String scopeURL) async {
+  Future<void> unregister(String scopeURL) async {
     var parameters = <String, dynamic>{
       'scopeURL': scopeURL,
     };
     await _client.send('ServiceWorker.unregister', parameters);
   }
 
-  Future updateRegistration(String scopeURL) async {
+  Future<void> updateRegistration(String scopeURL) async {
     var parameters = <String, dynamic>{
       'scopeURL': scopeURL,
     };

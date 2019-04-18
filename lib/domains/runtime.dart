@@ -158,19 +158,19 @@ class RuntimeApi {
   }
 
   /// Disables reporting of execution contexts creation.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('Runtime.disable');
   }
 
   /// Discards collected exceptions and console API calls.
-  Future discardConsoleEntries() async {
+  Future<void> discardConsoleEntries() async {
     await _client.send('Runtime.discardConsoleEntries');
   }
 
   /// Enables reporting of execution contexts creation by means of `executionContextCreated` event.
   /// When the reporting gets enabled the event will be sent immediately for each existing execution
   /// context.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('Runtime.enable');
   }
 
@@ -309,7 +309,7 @@ class RuntimeApi {
 
   /// Releases remote object with given id.
   /// [objectId] Identifier of the object to release.
-  Future releaseObject(RemoteObjectId objectId) async {
+  Future<void> releaseObject(RemoteObjectId objectId) async {
     var parameters = <String, dynamic>{
       'objectId': objectId.toJson(),
     };
@@ -318,7 +318,7 @@ class RuntimeApi {
 
   /// Releases all remote objects that belong to a given group.
   /// [objectGroup] Symbolic object group name.
-  Future releaseObjectGroup(String objectGroup) async {
+  Future<void> releaseObjectGroup(String objectGroup) async {
     var parameters = <String, dynamic>{
       'objectGroup': objectGroup,
     };
@@ -326,7 +326,7 @@ class RuntimeApi {
   }
 
   /// Tells inspected instance to run if it was waiting for debugger to attach.
-  Future runIfWaitingForDebugger() async {
+  Future<void> runIfWaitingForDebugger() async {
     await _client.send('Runtime.runIfWaitingForDebugger');
   }
 
@@ -381,21 +381,21 @@ class RuntimeApi {
   /// Enables or disables async call stacks tracking.
   /// [maxDepth] Maximum depth of async call stacks. Setting to `0` will effectively disable collecting async
   /// call stacks (default).
-  Future setAsyncCallStackDepth(int maxDepth) async {
+  Future<void> setAsyncCallStackDepth(int maxDepth) async {
     var parameters = <String, dynamic>{
       'maxDepth': maxDepth,
     };
     await _client.send('Runtime.setAsyncCallStackDepth', parameters);
   }
 
-  Future setCustomObjectFormatterEnabled(bool enabled) async {
+  Future<void> setCustomObjectFormatterEnabled(bool enabled) async {
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
     await _client.send('Runtime.setCustomObjectFormatterEnabled', parameters);
   }
 
-  Future setMaxCallStackSizeToCapture(int size) async {
+  Future<void> setMaxCallStackSizeToCapture(int size) async {
     var parameters = <String, dynamic>{
       'size': size,
     };
@@ -404,7 +404,7 @@ class RuntimeApi {
 
   /// Terminate current or next JavaScript execution.
   /// Will cancel the termination when the outer-most script execution ends.
-  Future terminateExecution() async {
+  Future<void> terminateExecution() async {
     await _client.send('Runtime.terminateExecution');
   }
 
@@ -416,7 +416,7 @@ class RuntimeApi {
   /// Binding function takes exactly one argument, this argument should be string,
   /// in case of any other input, function throws an exception.
   /// Each binding function call produces Runtime.bindingCalled notification.
-  Future addBinding(String name,
+  Future<void> addBinding(String name,
       {ExecutionContextId executionContextId}) async {
     var parameters = <String, dynamic>{
       'name': name,
@@ -429,7 +429,7 @@ class RuntimeApi {
 
   /// This method does not remove binding function from global object but
   /// unsubscribes current runtime agent from Runtime.bindingCalled notifications.
-  Future removeBinding(String name) async {
+  Future<void> removeBinding(String name) async {
     var parameters = <String, dynamic>{
       'name': name,
     };

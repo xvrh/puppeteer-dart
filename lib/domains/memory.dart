@@ -12,18 +12,18 @@ class MemoryApi {
     return GetDOMCountersResult.fromJson(result);
   }
 
-  Future prepareForLeakDetection() async {
+  Future<void> prepareForLeakDetection() async {
     await _client.send('Memory.prepareForLeakDetection');
   }
 
   /// Simulate OomIntervention by purging V8 memory.
-  Future forciblyPurgeJavaScriptMemory() async {
+  Future<void> forciblyPurgeJavaScriptMemory() async {
     await _client.send('Memory.forciblyPurgeJavaScriptMemory');
   }
 
   /// Enable/disable suppressing memory pressure notifications in all processes.
   /// [suppressed] If true, memory pressure notifications will be suppressed.
-  Future setPressureNotificationsSuppressed(bool suppressed) async {
+  Future<void> setPressureNotificationsSuppressed(bool suppressed) async {
     var parameters = <String, dynamic>{
       'suppressed': suppressed,
     };
@@ -32,7 +32,7 @@ class MemoryApi {
 
   /// Simulate a memory pressure notification in all processes.
   /// [level] Memory pressure level of the notification.
-  Future simulatePressureNotification(PressureLevel level) async {
+  Future<void> simulatePressureNotification(PressureLevel level) async {
     var parameters = <String, dynamic>{
       'level': level.toJson(),
     };
@@ -42,7 +42,8 @@ class MemoryApi {
   /// Start collecting native memory profile.
   /// [samplingInterval] Average number of bytes between samples.
   /// [suppressRandomness] Do not randomize intervals between samples.
-  Future startSampling({int samplingInterval, bool suppressRandomness}) async {
+  Future<void> startSampling(
+      {int samplingInterval, bool suppressRandomness}) async {
     var parameters = <String, dynamic>{};
     if (samplingInterval != null) {
       parameters['samplingInterval'] = samplingInterval;
@@ -54,7 +55,7 @@ class MemoryApi {
   }
 
   /// Stop collecting native memory profile.
-  Future stopSampling() async {
+  Future<void> stopSampling() async {
     await _client.send('Memory.stopSampling');
   }
 

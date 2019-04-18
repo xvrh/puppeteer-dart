@@ -9,9 +9,7 @@ import 'generate_domains.dart';
 
 /// Download the Chrome Dev Tools protocol (json file) directly from a running Chrome instance.
 main() async {
-  String chromePath =
-      (await downloadChrome(cachePath: '_chrome')).executablePath;
-  Chrome chrome = await Chrome.start(chromePath);
+  Chrome chrome = await Chrome.start();
 
   try {
     String url = chrome.connection.url.replaceAll('ws://', 'http://');

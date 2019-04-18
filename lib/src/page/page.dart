@@ -364,8 +364,8 @@ class Page {
     //TODO(xha)
   }
 
-  Future bringToFront() {
-    //TODO(xha)
+  Future<void> bringToFront() async {
+    await tab.page.bringToFront();
   }
 
   /**

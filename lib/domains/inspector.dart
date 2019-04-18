@@ -20,12 +20,12 @@ class InspectorApi {
       (Event event) => event.name == 'Inspector.targetReloadedAfterCrash');
 
   /// Disables inspector domain notifications.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('Inspector.disable');
   }
 
   /// Enables inspector domain notifications.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('Inspector.enable');
   }
 }

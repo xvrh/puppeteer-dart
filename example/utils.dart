@@ -3,21 +3,18 @@ import 'dart:io';
 
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:chrome_dev_tools/chrome_downloader.dart';
-import 'package:chrome_dev_tools/src/page.dart';
 import 'package:logging/logging.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_static/shelf_static.dart';
 import 'package:path/path.dart' as p;
 
-Future chromeTab(String url, Function(Tab) callback,
-    {bool setupLogger = true}) async {
-  if (setupLogger) {
-    Logger.root.level = Level.ALL;
-    Logger.root.onRecord.listen(print);
-  }
+void setupLogger() {
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen(print);
+}
 
-  String chromeExecutable = (await downloadChrome()).executablePath;
-  Chrome chrome = await Chrome.start(chromeExecutable);
+Future chromeTab(Function(Tab) callback) async {
+  Chrome chrome = await Chrome.start();
   Tab tab = await chrome.newTab();
 
   try {
@@ -27,15 +24,8 @@ Future chromeTab(String url, Function(Tab) callback,
   }
 }
 
-Future chromePage(Function(Page) callback,
-    {bool setupLogger = true}) async {
-  if (setupLogger) {
-    Logger.root.level = Level.ALL;
-    Logger.root.onRecord.listen(print);
-  }
-
-  String chromeExecutable = (await downloadChrome()).executablePath;
-  Chrome chrome = await Chrome.start(chromeExecutable);
+Future chromePage(Function(Page) callback) async {
+  Chrome chrome = await Chrome.start();
   Page page = await chrome.newPage();
 
   try {
@@ -57,24 +47,10 @@ Future server(Function(String) callback) async {
   }
 }
 
-Future tabOnPage(String path, Function(Tab) callback) async {
-  Logger.root.level = Level.ALL;
-  Logger.root.onRecord.listen(print);
-
+Future page(Function(Page, String hostUrl) callback) async {
   await server((String url) async {
-    await chromeTab(p.url.join(url, path), (Tab tab) async {
-      await callback(tab);
-    });
-  });
-}
-
-Future page(String path, Function(Page) callback) async {
-  Logger.root.level = Level.ALL;
-  Logger.root.onRecord.listen(print);
-
-  await server((String url) async {
-    await chromePage(p.url.join(url, path), (Page page) async {
-      await callback(page);
+    await chromePage((Page page) async {
+      await callback(page, url);
     });
   });
 }

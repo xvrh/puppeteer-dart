@@ -1,6 +1,7 @@
 import '../domains/accessibility.dart';
 import '../domains/animation.dart';
 import '../domains/application_cache.dart';
+import '../domains/audits.dart';
 import '../domains/background_service.dart';
 import '../domains/css.dart';
 import '../domains/cache_storage.dart';
@@ -13,6 +14,7 @@ import '../domains/database.dart';
 import '../domains/device_orientation.dart';
 import '../domains/emulation.dart';
 import '../domains/headless_experimental.dart';
+import '../domains/io.dart';
 import '../domains/indexed_db.dart';
 import '../domains/input.dart';
 import '../domains/inspector.dart';
@@ -49,6 +51,10 @@ abstract class TabMixin {
   ApplicationCacheApi get applicationCache =>
       _applicationCache ??= ApplicationCacheApi(session);
   ApplicationCacheApi _applicationCache;
+
+  /// Audits domain allows investigation of page violations and possible improvements.
+  AuditsApi get audits => _audits ??= AuditsApi(session);
+  AuditsApi _audits;
 
   /// Defines events for background web platform features.
   BackgroundServiceApi get backgroundService =>
@@ -111,6 +117,10 @@ abstract class TabMixin {
   HeadlessExperimentalApi get headlessExperimental =>
       _headlessExperimental ??= HeadlessExperimentalApi(session);
   HeadlessExperimentalApi _headlessExperimental;
+
+  /// Input/Output operations for streams produced by DevTools.
+  IOApi get io => _io ??= IOApi(session);
+  IOApi _io;
 
   IndexedDBApi get indexedDb => _indexedDb ??= IndexedDBApi(session);
   IndexedDBApi _indexedDb;

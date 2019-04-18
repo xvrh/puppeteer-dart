@@ -28,7 +28,7 @@ class BackgroundServiceApi {
           event.parameters['backgroundServiceEvent']));
 
   /// Enables event updates for the service.
-  Future startObserving(ServiceName service) async {
+  Future<void> startObserving(ServiceName service) async {
     var parameters = <String, dynamic>{
       'service': service.toJson(),
     };
@@ -36,7 +36,7 @@ class BackgroundServiceApi {
   }
 
   /// Disables event updates for the service.
-  Future stopObserving(ServiceName service) async {
+  Future<void> stopObserving(ServiceName service) async {
     var parameters = <String, dynamic>{
       'service': service.toJson(),
     };
@@ -44,7 +44,7 @@ class BackgroundServiceApi {
   }
 
   /// Set the recording state for the service.
-  Future setRecording(bool shouldRecord, ServiceName service) async {
+  Future<void> setRecording(bool shouldRecord, ServiceName service) async {
     var parameters = <String, dynamic>{
       'shouldRecord': shouldRecord,
       'service': service.toJson(),
@@ -53,7 +53,7 @@ class BackgroundServiceApi {
   }
 
   /// Clears all stored data for the service.
-  Future clearEvents(ServiceName service) async {
+  Future<void> clearEvents(ServiceName service) async {
     var parameters = <String, dynamic>{
       'service': service.toJson(),
     };

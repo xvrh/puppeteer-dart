@@ -39,22 +39,22 @@ class HeapProfilerApi {
   /// Enables console to refer to the node with given id via $x (see Command Line API for more details
   /// $x functions).
   /// [heapObjectId] Heap snapshot object id to be accessible by means of $x command line API.
-  Future addInspectedHeapObject(HeapSnapshotObjectId heapObjectId) async {
+  Future<void> addInspectedHeapObject(HeapSnapshotObjectId heapObjectId) async {
     var parameters = <String, dynamic>{
       'heapObjectId': heapObjectId.toJson(),
     };
     await _client.send('HeapProfiler.addInspectedHeapObject', parameters);
   }
 
-  Future collectGarbage() async {
+  Future<void> collectGarbage() async {
     await _client.send('HeapProfiler.collectGarbage');
   }
 
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('HeapProfiler.disable');
   }
 
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('HeapProfiler.enable');
   }
 
@@ -93,7 +93,7 @@ class HeapProfilerApi {
 
   /// [samplingInterval] Average sample interval in bytes. Poisson distribution is used for the intervals. The
   /// default value is 32768 bytes.
-  Future startSampling({num samplingInterval}) async {
+  Future<void> startSampling({num samplingInterval}) async {
     var parameters = <String, dynamic>{};
     if (samplingInterval != null) {
       parameters['samplingInterval'] = samplingInterval;
@@ -101,7 +101,7 @@ class HeapProfilerApi {
     await _client.send('HeapProfiler.startSampling', parameters);
   }
 
-  Future startTrackingHeapObjects({bool trackAllocations}) async {
+  Future<void> startTrackingHeapObjects({bool trackAllocations}) async {
     var parameters = <String, dynamic>{};
     if (trackAllocations != null) {
       parameters['trackAllocations'] = trackAllocations;
@@ -117,7 +117,7 @@ class HeapProfilerApi {
 
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken
   /// when the tracking is stopped.
-  Future stopTrackingHeapObjects({bool reportProgress}) async {
+  Future<void> stopTrackingHeapObjects({bool reportProgress}) async {
     var parameters = <String, dynamic>{};
     if (reportProgress != null) {
       parameters['reportProgress'] = reportProgress;
@@ -126,7 +126,7 @@ class HeapProfilerApi {
   }
 
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken.
-  Future takeHeapSnapshot({bool reportProgress}) async {
+  Future<void> takeHeapSnapshot({bool reportProgress}) async {
     var parameters = <String, dynamic>{};
     if (reportProgress != null) {
       parameters['reportProgress'] = reportProgress;

@@ -22,11 +22,11 @@ class ProfilerApi {
       .map((Event event) =>
           ConsoleProfileStartedEvent.fromJson(event.parameters));
 
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('Profiler.disable');
   }
 
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('Profiler.enable');
   }
 
@@ -42,14 +42,14 @@ class ProfilerApi {
 
   /// Changes CPU profiler sampling interval. Must be called before CPU profiles recording started.
   /// [interval] New sampling interval in microseconds.
-  Future setSamplingInterval(int interval) async {
+  Future<void> setSamplingInterval(int interval) async {
     var parameters = <String, dynamic>{
       'interval': interval,
     };
     await _client.send('Profiler.setSamplingInterval', parameters);
   }
 
-  Future start() async {
+  Future<void> start() async {
     await _client.send('Profiler.start');
   }
 
@@ -58,7 +58,7 @@ class ProfilerApi {
   /// counters.
   /// [callCount] Collect accurate call counts beyond simple 'covered' or 'not covered'.
   /// [detailed] Collect block-based coverage.
-  Future startPreciseCoverage({bool callCount, bool detailed}) async {
+  Future<void> startPreciseCoverage({bool callCount, bool detailed}) async {
     var parameters = <String, dynamic>{};
     if (callCount != null) {
       parameters['callCount'] = callCount;
@@ -70,7 +70,7 @@ class ProfilerApi {
   }
 
   /// Enable type profile.
-  Future startTypeProfile() async {
+  Future<void> startTypeProfile() async {
     await _client.send('Profiler.startTypeProfile');
   }
 
@@ -82,12 +82,12 @@ class ProfilerApi {
 
   /// Disable precise code coverage. Disabling releases unnecessary execution count records and allows
   /// executing optimized code.
-  Future stopPreciseCoverage() async {
+  Future<void> stopPreciseCoverage() async {
     await _client.send('Profiler.stopPreciseCoverage');
   }
 
   /// Disable type profile. Disabling releases type profile data collected so far.
-  Future stopTypeProfile() async {
+  Future<void> stopTypeProfile() async {
     await _client.send('Profiler.stopTypeProfile');
   }
 

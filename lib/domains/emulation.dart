@@ -23,23 +23,23 @@ class EmulationApi {
   }
 
   /// Clears the overriden device metrics.
-  Future clearDeviceMetricsOverride() async {
+  Future<void> clearDeviceMetricsOverride() async {
     await _client.send('Emulation.clearDeviceMetricsOverride');
   }
 
   /// Clears the overriden Geolocation Position and Error.
-  Future clearGeolocationOverride() async {
+  Future<void> clearGeolocationOverride() async {
     await _client.send('Emulation.clearGeolocationOverride');
   }
 
   /// Requests that page scale factor is reset to initial values.
-  Future resetPageScaleFactor() async {
+  Future<void> resetPageScaleFactor() async {
     await _client.send('Emulation.resetPageScaleFactor');
   }
 
   /// Enables or disables simulating a focused and active page.
   /// [enabled] Whether to enable to disable focus emulation.
-  Future setFocusEmulationEnabled(bool enabled) async {
+  Future<void> setFocusEmulationEnabled(bool enabled) async {
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
@@ -48,7 +48,7 @@ class EmulationApi {
 
   /// Enables CPU throttling to emulate slow CPUs.
   /// [rate] Throttling rate as a slowdown factor (1 is no throttle, 2 is 2x slowdown, etc).
-  Future setCPUThrottlingRate(num rate) async {
+  Future<void> setCPUThrottlingRate(num rate) async {
     var parameters = <String, dynamic>{
       'rate': rate,
     };
@@ -59,7 +59,7 @@ class EmulationApi {
   /// if the content does not specify one.
   /// [color] RGBA of the default background color. If not specified, any existing override will be
   /// cleared.
-  Future setDefaultBackgroundColorOverride({dom.RGBA color}) async {
+  Future<void> setDefaultBackgroundColorOverride({dom.RGBA color}) async {
     var parameters = <String, dynamic>{};
     if (color != null) {
       parameters['color'] = color.toJson();
@@ -85,7 +85,7 @@ class EmulationApi {
   /// [screenOrientation] Screen orientation override.
   /// [viewport] If set, the visible area of the page will be overridden to this viewport. This viewport
   /// change is not observed by the page, e.g. viewport-relative elements do not change positions.
-  Future setDeviceMetricsOverride(
+  Future<void> setDeviceMetricsOverride(
       int width, int height, num deviceScaleFactor, bool mobile,
       {num scale,
       int screenWidth,
@@ -129,7 +129,7 @@ class EmulationApi {
   }
 
   /// [hidden] Whether scrollbars should be always hidden.
-  Future setScrollbarsHidden(bool hidden) async {
+  Future<void> setScrollbarsHidden(bool hidden) async {
     var parameters = <String, dynamic>{
       'hidden': hidden,
     };
@@ -137,7 +137,7 @@ class EmulationApi {
   }
 
   /// [disabled] Whether document.coookie API should be disabled.
-  Future setDocumentCookieDisabled(bool disabled) async {
+  Future<void> setDocumentCookieDisabled(bool disabled) async {
     var parameters = <String, dynamic>{
       'disabled': disabled,
     };
@@ -146,7 +146,7 @@ class EmulationApi {
 
   /// [enabled] Whether touch emulation based on mouse input should be enabled.
   /// [configuration] Touch/gesture events configuration. Default: current platform.
-  Future setEmitTouchEventsForMouse(bool enabled,
+  Future<void> setEmitTouchEventsForMouse(bool enabled,
       {@Enum(['mobile', 'desktop']) String configuration}) async {
     assert(configuration == null ||
         const ['mobile', 'desktop'].contains(configuration));
@@ -161,7 +161,7 @@ class EmulationApi {
 
   /// Emulates the given media for CSS media queries.
   /// [media] Media type to emulate. Empty string disables the override.
-  Future setEmulatedMedia(String media) async {
+  Future<void> setEmulatedMedia(String media) async {
     var parameters = <String, dynamic>{
       'media': media,
     };
@@ -173,7 +173,7 @@ class EmulationApi {
   /// [latitude] Mock latitude
   /// [longitude] Mock longitude
   /// [accuracy] Mock accuracy
-  Future setGeolocationOverride(
+  Future<void> setGeolocationOverride(
       {num latitude, num longitude, num accuracy}) async {
     var parameters = <String, dynamic>{};
     if (latitude != null) {
@@ -191,7 +191,7 @@ class EmulationApi {
   /// Overrides value returned by the javascript navigator object.
   /// [platform] The platform navigator.platform should return.
   @deprecated
-  Future setNavigatorOverrides(String platform) async {
+  Future<void> setNavigatorOverrides(String platform) async {
     var parameters = <String, dynamic>{
       'platform': platform,
     };
@@ -200,7 +200,7 @@ class EmulationApi {
 
   /// Sets a specified page scale factor.
   /// [pageScaleFactor] Page scale factor.
-  Future setPageScaleFactor(num pageScaleFactor) async {
+  Future<void> setPageScaleFactor(num pageScaleFactor) async {
     var parameters = <String, dynamic>{
       'pageScaleFactor': pageScaleFactor,
     };
@@ -209,7 +209,7 @@ class EmulationApi {
 
   /// Switches script execution in the page.
   /// [value] Whether script execution should be disabled in the page.
-  Future setScriptExecutionDisabled(bool value) async {
+  Future<void> setScriptExecutionDisabled(bool value) async {
     var parameters = <String, dynamic>{
       'value': value,
     };
@@ -219,7 +219,8 @@ class EmulationApi {
   /// Enables touch on platforms which do not support them.
   /// [enabled] Whether the touch event emulation should be enabled.
   /// [maxTouchPoints] Maximum touch points supported. Defaults to one.
-  Future setTouchEmulationEnabled(bool enabled, {int maxTouchPoints}) async {
+  Future<void> setTouchEmulationEnabled(bool enabled,
+      {int maxTouchPoints}) async {
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
@@ -271,7 +272,7 @@ class EmulationApi {
   /// [width] Frame width (DIP).
   /// [height] Frame height (DIP).
   @deprecated
-  Future setVisibleSize(int width, int height) async {
+  Future<void> setVisibleSize(int width, int height) async {
     var parameters = <String, dynamic>{
       'width': width,
       'height': height,
@@ -283,7 +284,7 @@ class EmulationApi {
   /// [userAgent] User agent to use.
   /// [acceptLanguage] Browser langugage to emulate.
   /// [platform] The platform navigator.platform should return.
-  Future setUserAgentOverride(String userAgent,
+  Future<void> setUserAgentOverride(String userAgent,
       {String acceptLanguage, String platform}) async {
     var parameters = <String, dynamic>{
       'userAgent': userAgent,

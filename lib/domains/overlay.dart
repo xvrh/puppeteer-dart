@@ -33,12 +33,12 @@ class OverlayApi {
       .where((Event event) => event.name == 'Overlay.inspectModeCanceled');
 
   /// Disables domain notifications.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('Overlay.disable');
   }
 
   /// Enables domain notifications.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('Overlay.enable');
   }
 
@@ -55,7 +55,7 @@ class OverlayApi {
   }
 
   /// Hides any highlight.
-  Future hideHighlight() async {
+  Future<void> hideHighlight() async {
     await _client.send('Overlay.hideHighlight');
   }
 
@@ -63,7 +63,7 @@ class OverlayApi {
   /// [frameId] Identifier of the frame to highlight.
   /// [contentColor] The content box highlight fill color (default: transparent).
   /// [contentOutlineColor] The content box highlight outline color (default: transparent).
-  Future highlightFrame(page.FrameId frameId,
+  Future<void> highlightFrame(page.FrameId frameId,
       {dom.RGBA contentColor, dom.RGBA contentOutlineColor}) async {
     var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
@@ -84,7 +84,7 @@ class OverlayApi {
   /// [backendNodeId] Identifier of the backend node to highlight.
   /// [objectId] JavaScript object id of the node to be highlighted.
   /// [selector] Selectors to highlight relevant nodes.
-  Future highlightNode(HighlightConfig highlightConfig,
+  Future<void> highlightNode(HighlightConfig highlightConfig,
       {dom.NodeId nodeId,
       dom.BackendNodeId backendNodeId,
       runtime.RemoteObjectId objectId,
@@ -111,7 +111,7 @@ class OverlayApi {
   /// [quad] Quad to highlight
   /// [color] The highlight fill color (default: transparent).
   /// [outlineColor] The highlight outline color (default: transparent).
-  Future highlightQuad(dom.Quad quad,
+  Future<void> highlightQuad(dom.Quad quad,
       {dom.RGBA color, dom.RGBA outlineColor}) async {
     var parameters = <String, dynamic>{
       'quad': quad.toJson(),
@@ -132,7 +132,7 @@ class OverlayApi {
   /// [height] Rectangle height
   /// [color] The highlight fill color (default: transparent).
   /// [outlineColor] The highlight outline color (default: transparent).
-  Future highlightRect(int x, int y, int width, int height,
+  Future<void> highlightRect(int x, int y, int width, int height,
       {dom.RGBA color, dom.RGBA outlineColor}) async {
     var parameters = <String, dynamic>{
       'x': x,
@@ -154,7 +154,7 @@ class OverlayApi {
   /// [mode] Set an inspection mode.
   /// [highlightConfig] A descriptor for the highlight appearance of hovered-over nodes. May be omitted if `enabled
   /// == false`.
-  Future setInspectMode(InspectMode mode,
+  Future<void> setInspectMode(InspectMode mode,
       {HighlightConfig highlightConfig}) async {
     var parameters = <String, dynamic>{
       'mode': mode.toJson(),
@@ -167,7 +167,7 @@ class OverlayApi {
 
   /// Highlights owner element of all frames detected to be ads.
   /// [show] True for showing ad highlights
-  Future setShowAdHighlights(bool show) async {
+  Future<void> setShowAdHighlights(bool show) async {
     var parameters = <String, dynamic>{
       'show': show,
     };
@@ -175,7 +175,7 @@ class OverlayApi {
   }
 
   /// [message] The message to display, also triggers resume and step over controls.
-  Future setPausedInDebuggerMessage({String message}) async {
+  Future<void> setPausedInDebuggerMessage({String message}) async {
     var parameters = <String, dynamic>{};
     if (message != null) {
       parameters['message'] = message;
@@ -185,7 +185,7 @@ class OverlayApi {
 
   /// Requests that backend shows debug borders on layers
   /// [show] True for showing debug borders
-  Future setShowDebugBorders(bool show) async {
+  Future<void> setShowDebugBorders(bool show) async {
     var parameters = <String, dynamic>{
       'show': show,
     };
@@ -194,7 +194,7 @@ class OverlayApi {
 
   /// Requests that backend shows the FPS counter
   /// [show] True for showing the FPS counter
-  Future setShowFPSCounter(bool show) async {
+  Future<void> setShowFPSCounter(bool show) async {
     var parameters = <String, dynamic>{
       'show': show,
     };
@@ -203,7 +203,7 @@ class OverlayApi {
 
   /// Requests that backend shows paint rectangles
   /// [result] True for showing paint rectangles
-  Future setShowPaintRects(bool result) async {
+  Future<void> setShowPaintRects(bool result) async {
     var parameters = <String, dynamic>{
       'result': result,
     };
@@ -212,7 +212,7 @@ class OverlayApi {
 
   /// Requests that backend shows scroll bottleneck rects
   /// [show] True for showing scroll bottleneck rects
-  Future setShowScrollBottleneckRects(bool show) async {
+  Future<void> setShowScrollBottleneckRects(bool show) async {
     var parameters = <String, dynamic>{
       'show': show,
     };
@@ -221,7 +221,7 @@ class OverlayApi {
 
   /// Requests that backend shows hit-test borders on layers
   /// [show] True for showing hit-test borders
-  Future setShowHitTestBorders(bool show) async {
+  Future<void> setShowHitTestBorders(bool show) async {
     var parameters = <String, dynamic>{
       'show': show,
     };
@@ -230,7 +230,7 @@ class OverlayApi {
 
   /// Paints viewport size upon main frame resize.
   /// [show] Whether to paint size or not.
-  Future setShowViewportSizeOnResize(bool show) async {
+  Future<void> setShowViewportSizeOnResize(bool show) async {
     var parameters = <String, dynamic>{
       'show': show,
     };

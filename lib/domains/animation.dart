@@ -25,12 +25,12 @@ class AnimationApi {
       .map((Event event) => Animation.fromJson(event.parameters['animation']));
 
   /// Disables animation domain notifications.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('Animation.disable');
   }
 
   /// Enables animation domain notifications.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('Animation.enable');
   }
 
@@ -54,7 +54,7 @@ class AnimationApi {
 
   /// Releases a set of animations to no longer be manipulated.
   /// [animations] List of animation ids to seek.
-  Future releaseAnimations(List<String> animations) async {
+  Future<void> releaseAnimations(List<String> animations) async {
     var parameters = <String, dynamic>{
       'animations': animations.map((e) => e).toList(),
     };
@@ -75,7 +75,7 @@ class AnimationApi {
   /// Seek a set of animations to a particular time within each animation.
   /// [animations] List of animation ids to seek.
   /// [currentTime] Set the current time of each animation.
-  Future seekAnimations(List<String> animations, num currentTime) async {
+  Future<void> seekAnimations(List<String> animations, num currentTime) async {
     var parameters = <String, dynamic>{
       'animations': animations.map((e) => e).toList(),
       'currentTime': currentTime,
@@ -86,7 +86,7 @@ class AnimationApi {
   /// Sets the paused state of a set of animations.
   /// [animations] Animations to set the pause state of.
   /// [paused] Paused state to set to.
-  Future setPaused(List<String> animations, bool paused) async {
+  Future<void> setPaused(List<String> animations, bool paused) async {
     var parameters = <String, dynamic>{
       'animations': animations.map((e) => e).toList(),
       'paused': paused,
@@ -96,7 +96,7 @@ class AnimationApi {
 
   /// Sets the playback rate of the document timeline.
   /// [playbackRate] Playback rate for animations on page
-  Future setPlaybackRate(num playbackRate) async {
+  Future<void> setPlaybackRate(num playbackRate) async {
     var parameters = <String, dynamic>{
       'playbackRate': playbackRate,
     };
@@ -107,7 +107,7 @@ class AnimationApi {
   /// [animationId] Animation id.
   /// [duration] Duration of the animation.
   /// [delay] Delay of the animation.
-  Future setTiming(String animationId, num duration, num delay) async {
+  Future<void> setTiming(String animationId, num duration, num delay) async {
     var parameters = <String, dynamic>{
       'animationId': animationId,
       'duration': duration,

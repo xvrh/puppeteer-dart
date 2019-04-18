@@ -24,18 +24,18 @@ class SecurityApi {
               SecurityStateChangedEvent.fromJson(event.parameters));
 
   /// Disables tracking security state changes.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('Security.disable');
   }
 
   /// Enables tracking security state changes.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('Security.enable');
   }
 
   /// Enable/disable whether all certificate errors should be ignored.
   /// [ignore] If true, all certificate errors will be ignored.
-  Future setIgnoreCertificateErrors(bool ignore) async {
+  Future<void> setIgnoreCertificateErrors(bool ignore) async {
     var parameters = <String, dynamic>{
       'ignore': ignore,
     };
@@ -46,7 +46,7 @@ class SecurityApi {
   /// [eventId] The ID of the event.
   /// [action] The action to take on the certificate error.
   @deprecated
-  Future handleCertificateError(
+  Future<void> handleCertificateError(
       int eventId, CertificateErrorAction action) async {
     var parameters = <String, dynamic>{
       'eventId': eventId,
@@ -59,7 +59,7 @@ class SecurityApi {
   /// be handled by the DevTools client and should be answered with `handleCertificateError` commands.
   /// [override] If true, certificate errors will be overridden.
   @deprecated
-  Future setOverrideCertificateErrors(bool override) async {
+  Future<void> setOverrideCertificateErrors(bool override) async {
     var parameters = <String, dynamic>{
       'override': override,
     };

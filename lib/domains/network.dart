@@ -142,12 +142,12 @@ class NetworkApi {
   }
 
   /// Clears browser cache.
-  Future clearBrowserCache() async {
+  Future<void> clearBrowserCache() async {
     await _client.send('Network.clearBrowserCache');
   }
 
   /// Clears browser cookies.
-  Future clearBrowserCookies() async {
+  Future<void> clearBrowserCookies() async {
     await _client.send('Network.clearBrowserCookies');
   }
 
@@ -168,7 +168,7 @@ class NetworkApi {
   /// [headers] If set this allows the request headers to be changed. Must not be set in response to an
   /// authChallenge.
   /// [authChallengeResponse] Response to a requestIntercepted with an authChallenge. Must not be set otherwise.
-  Future continueInterceptedRequest(InterceptionId interceptionId,
+  Future<void> continueInterceptedRequest(InterceptionId interceptionId,
       {ErrorReason errorReason,
       String rawResponse,
       String url,
@@ -209,7 +209,7 @@ class NetworkApi {
   /// provided URL.
   /// [domain] If specified, deletes only cookies with the exact domain.
   /// [path] If specified, deletes only cookies with the exact path.
-  Future deleteCookies(String name,
+  Future<void> deleteCookies(String name,
       {String url, String domain, String path}) async {
     var parameters = <String, dynamic>{
       'name': name,
@@ -227,7 +227,7 @@ class NetworkApi {
   }
 
   /// Disables network tracking, prevents network events from being sent to the client.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('Network.disable');
   }
 
@@ -237,7 +237,7 @@ class NetworkApi {
   /// [downloadThroughput] Maximal aggregated download throughput (bytes/sec). -1 disables download throttling.
   /// [uploadThroughput] Maximal aggregated upload throughput (bytes/sec).  -1 disables upload throttling.
   /// [connectionType] Connection type if known.
-  Future emulateNetworkConditions(
+  Future<void> emulateNetworkConditions(
       bool offline, num latency, num downloadThroughput, num uploadThroughput,
       {ConnectionType connectionType}) async {
     var parameters = <String, dynamic>{
@@ -256,7 +256,7 @@ class NetworkApi {
   /// [maxTotalBufferSize] Buffer size in bytes to use when preserving network payloads (XHRs, etc).
   /// [maxResourceBufferSize] Per-resource buffer size in bytes to use when preserving network payloads (XHRs, etc).
   /// [maxPostDataSize] Longest post body size (in bytes) that would be included in requestWillBeSent notification
-  Future enable(
+  Future<void> enable(
       {int maxTotalBufferSize,
       int maxResourceBufferSize,
       int maxPostDataSize}) async {
@@ -355,7 +355,7 @@ class NetworkApi {
   /// parameters should be identical: method, url, async, request body, extra headers, withCredentials
   /// attribute, user, password.
   /// [requestId] Identifier of XHR to replay.
-  Future replayXHR(RequestId requestId) async {
+  Future<void> replayXHR(RequestId requestId) async {
     var parameters = <String, dynamic>{
       'requestId': requestId.toJson(),
     };
@@ -389,7 +389,7 @@ class NetworkApi {
 
   /// Blocks URLs from loading.
   /// [urls] URL patterns to block. Wildcards ('*') are allowed.
-  Future setBlockedURLs(List<String> urls) async {
+  Future<void> setBlockedURLs(List<String> urls) async {
     var parameters = <String, dynamic>{
       'urls': urls.map((e) => e).toList(),
     };
@@ -398,7 +398,7 @@ class NetworkApi {
 
   /// Toggles ignoring of service worker for each request.
   /// [bypass] Bypass service worker and load from network.
-  Future setBypassServiceWorker(bool bypass) async {
+  Future<void> setBypassServiceWorker(bool bypass) async {
     var parameters = <String, dynamic>{
       'bypass': bypass,
     };
@@ -407,7 +407,7 @@ class NetworkApi {
 
   /// Toggles ignoring cache for each request. If `true`, cache will not be used.
   /// [cacheDisabled] Cache disabled state.
-  Future setCacheDisabled(bool cacheDisabled) async {
+  Future<void> setCacheDisabled(bool cacheDisabled) async {
     var parameters = <String, dynamic>{
       'cacheDisabled': cacheDisabled,
     };
@@ -465,7 +465,7 @@ class NetworkApi {
 
   /// Sets given cookies.
   /// [cookies] Cookies to be set.
-  Future setCookies(List<CookieParam> cookies) async {
+  Future<void> setCookies(List<CookieParam> cookies) async {
     var parameters = <String, dynamic>{
       'cookies': cookies.map((e) => e.toJson()).toList(),
     };
@@ -475,7 +475,8 @@ class NetworkApi {
   /// For testing.
   /// [maxTotalSize] Maximum total buffer size.
   /// [maxResourceSize] Maximum per-resource size.
-  Future setDataSizeLimitsForTest(int maxTotalSize, int maxResourceSize) async {
+  Future<void> setDataSizeLimitsForTest(
+      int maxTotalSize, int maxResourceSize) async {
     var parameters = <String, dynamic>{
       'maxTotalSize': maxTotalSize,
       'maxResourceSize': maxResourceSize,
@@ -485,7 +486,7 @@ class NetworkApi {
 
   /// Specifies whether to always send extra HTTP headers with the requests from this page.
   /// [headers] Map with extra HTTP headers.
-  Future setExtraHTTPHeaders(Headers headers) async {
+  Future<void> setExtraHTTPHeaders(Headers headers) async {
     var parameters = <String, dynamic>{
       'headers': headers.toJson(),
     };
@@ -495,7 +496,7 @@ class NetworkApi {
   /// Sets the requests to intercept that match the provided patterns and optionally resource types.
   /// [patterns] Requests matching any of these patterns will be forwarded and wait for the corresponding
   /// continueInterceptedRequest call.
-  Future setRequestInterception(List<RequestPattern> patterns) async {
+  Future<void> setRequestInterception(List<RequestPattern> patterns) async {
     var parameters = <String, dynamic>{
       'patterns': patterns.map((e) => e.toJson()).toList(),
     };
@@ -506,7 +507,7 @@ class NetworkApi {
   /// [userAgent] User agent to use.
   /// [acceptLanguage] Browser langugage to emulate.
   /// [platform] The platform navigator.platform should return.
-  Future setUserAgentOverride(String userAgent,
+  Future<void> setUserAgentOverride(String userAgent,
       {String acceptLanguage, String platform}) async {
     var parameters = <String, dynamic>{
       'userAgent': userAgent,

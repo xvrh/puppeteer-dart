@@ -38,7 +38,7 @@ class DebuggerApi {
 
   /// Continues execution until specific location is reached.
   /// [location] Location to continue to.
-  Future continueToLocation(Location location,
+  Future<void> continueToLocation(Location location,
       {@Enum(['any', 'current']) String targetCallFrames}) async {
     assert(targetCallFrames == null ||
         const ['any', 'current'].contains(targetCallFrames));
@@ -52,7 +52,7 @@ class DebuggerApi {
   }
 
   /// Disables debugger for given page.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('Debugger.disable');
   }
 
@@ -168,12 +168,12 @@ class DebuggerApi {
   }
 
   /// Stops on the next JavaScript statement.
-  Future pause() async {
+  Future<void> pause() async {
     await _client.send('Debugger.pause');
   }
 
   /// [parentStackTraceId] Debugger will pause when async call with given stack trace is started.
-  Future pauseOnAsyncCall(runtime.StackTraceId parentStackTraceId) async {
+  Future<void> pauseOnAsyncCall(runtime.StackTraceId parentStackTraceId) async {
     var parameters = <String, dynamic>{
       'parentStackTraceId': parentStackTraceId.toJson(),
     };
@@ -181,7 +181,7 @@ class DebuggerApi {
   }
 
   /// Removes JavaScript breakpoint.
-  Future removeBreakpoint(BreakpointId breakpointId) async {
+  Future<void> removeBreakpoint(BreakpointId breakpointId) async {
     var parameters = <String, dynamic>{
       'breakpointId': breakpointId.toJson(),
     };
@@ -199,7 +199,7 @@ class DebuggerApi {
   }
 
   /// Resumes JavaScript execution.
-  Future resume() async {
+  Future<void> resume() async {
     await _client.send('Debugger.resume');
   }
 
@@ -231,7 +231,7 @@ class DebuggerApi {
   /// Enables or disables async call stacks tracking.
   /// [maxDepth] Maximum depth of async call stacks. Setting to `0` will effectively disable collecting async
   /// call stacks (default).
-  Future setAsyncCallStackDepth(int maxDepth) async {
+  Future<void> setAsyncCallStackDepth(int maxDepth) async {
     var parameters = <String, dynamic>{
       'maxDepth': maxDepth,
     };
@@ -242,7 +242,7 @@ class DebuggerApi {
   /// scripts with url matching one of the patterns. VM will try to leave blackboxed script by
   /// performing 'step in' several times, finally resorting to 'step out' if unsuccessful.
   /// [patterns] Array of regexps that will be used to check script url for blackbox state.
-  Future setBlackboxPatterns(List<String> patterns) async {
+  Future<void> setBlackboxPatterns(List<String> patterns) async {
     var parameters = <String, dynamic>{
       'patterns': patterns.map((e) => e).toList(),
     };
@@ -254,7 +254,7 @@ class DebuggerApi {
   /// Positions array contains positions where blackbox state is changed. First interval isn't
   /// blackboxed. Array should be sorted.
   /// [scriptId] Id of the script.
-  Future setBlackboxedRanges(
+  Future<void> setBlackboxedRanges(
       runtime.ScriptId scriptId, List<ScriptPosition> positions) async {
     var parameters = <String, dynamic>{
       'scriptId': scriptId.toJson(),
@@ -342,7 +342,7 @@ class DebuggerApi {
 
   /// Activates / deactivates all breakpoints on the page.
   /// [active] New value for breakpoints active state.
-  Future setBreakpointsActive(bool active) async {
+  Future<void> setBreakpointsActive(bool active) async {
     var parameters = <String, dynamic>{
       'active': active,
     };
@@ -352,7 +352,7 @@ class DebuggerApi {
   /// Defines pause on exceptions state. Can be set to stop on all exceptions, uncaught exceptions or
   /// no exceptions. Initial pause on exceptions state is `none`.
   /// [state] Pause on exceptions mode.
-  Future setPauseOnExceptions(
+  Future<void> setPauseOnExceptions(
       @Enum(['none', 'uncaught', 'all']) String state) async {
     assert(const ['none', 'uncaught', 'all'].contains(state));
     var parameters = <String, dynamic>{
@@ -363,7 +363,7 @@ class DebuggerApi {
 
   /// Changes return value in top frame. Available only at return break position.
   /// [newValue] New return value.
-  Future setReturnValue(runtime.CallArgument newValue) async {
+  Future<void> setReturnValue(runtime.CallArgument newValue) async {
     var parameters = <String, dynamic>{
       'newValue': newValue.toJson(),
     };
@@ -391,7 +391,7 @@ class DebuggerApi {
 
   /// Makes page not interrupt on any pauses (breakpoint, exception, dom exception etc).
   /// [skip] New value for skip pauses state.
-  Future setSkipAllPauses(bool skip) async {
+  Future<void> setSkipAllPauses(bool skip) async {
     var parameters = <String, dynamic>{
       'skip': skip,
     };
@@ -405,7 +405,7 @@ class DebuggerApi {
   /// [variableName] Variable name.
   /// [newValue] New variable value.
   /// [callFrameId] Id of callframe that holds variable.
-  Future setVariableValue(int scopeNumber, String variableName,
+  Future<void> setVariableValue(int scopeNumber, String variableName,
       runtime.CallArgument newValue, CallFrameId callFrameId) async {
     var parameters = <String, dynamic>{
       'scopeNumber': scopeNumber,
@@ -419,7 +419,7 @@ class DebuggerApi {
   /// Steps into the function call.
   /// [breakOnAsyncCall] Debugger will issue additional Debugger.paused notification if any async task is scheduled
   /// before next pause.
-  Future stepInto({bool breakOnAsyncCall}) async {
+  Future<void> stepInto({bool breakOnAsyncCall}) async {
     var parameters = <String, dynamic>{};
     if (breakOnAsyncCall != null) {
       parameters['breakOnAsyncCall'] = breakOnAsyncCall;
@@ -428,12 +428,12 @@ class DebuggerApi {
   }
 
   /// Steps out of the function call.
-  Future stepOut() async {
+  Future<void> stepOut() async {
     await _client.send('Debugger.stepOut');
   }
 
   /// Steps over the statement.
-  Future stepOver() async {
+  Future<void> stepOver() async {
     await _client.send('Debugger.stepOver');
   }
 }

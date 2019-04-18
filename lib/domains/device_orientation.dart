@@ -7,7 +7,7 @@ class DeviceOrientationApi {
   DeviceOrientationApi(this._client);
 
   /// Clears the overridden Device Orientation.
-  Future clearDeviceOrientationOverride() async {
+  Future<void> clearDeviceOrientationOverride() async {
     await _client.send('DeviceOrientation.clearDeviceOrientationOverride');
   }
 
@@ -15,7 +15,8 @@ class DeviceOrientationApi {
   /// [alpha] Mock alpha
   /// [beta] Mock beta
   /// [gamma] Mock gamma
-  Future setDeviceOrientationOverride(num alpha, num beta, num gamma) async {
+  Future<void> setDeviceOrientationOverride(
+      num alpha, num beta, num gamma) async {
     var parameters = <String, dynamic>{
       'alpha': alpha,
       'beta': beta,

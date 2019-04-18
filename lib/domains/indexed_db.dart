@@ -12,7 +12,7 @@ class IndexedDBApi {
   /// [securityOrigin] Security origin.
   /// [databaseName] Database name.
   /// [objectStoreName] Object store name.
-  Future clearObjectStore(String securityOrigin, String databaseName,
+  Future<void> clearObjectStore(String securityOrigin, String databaseName,
       String objectStoreName) async {
     var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
@@ -25,7 +25,8 @@ class IndexedDBApi {
   /// Deletes a database.
   /// [securityOrigin] Security origin.
   /// [databaseName] Database name.
-  Future deleteDatabase(String securityOrigin, String databaseName) async {
+  Future<void> deleteDatabase(
+      String securityOrigin, String databaseName) async {
     var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
@@ -35,8 +36,8 @@ class IndexedDBApi {
 
   /// Delete a range of entries from an object store
   /// [keyRange] Range of entry keys to delete
-  Future deleteObjectStoreEntries(String securityOrigin, String databaseName,
-      String objectStoreName, KeyRange keyRange) async {
+  Future<void> deleteObjectStoreEntries(String securityOrigin,
+      String databaseName, String objectStoreName, KeyRange keyRange) async {
     var parameters = <String, dynamic>{
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
@@ -47,12 +48,12 @@ class IndexedDBApi {
   }
 
   /// Disables events from backend.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('IndexedDB.disable');
   }
 
   /// Enables events from backend.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('IndexedDB.enable');
   }
 

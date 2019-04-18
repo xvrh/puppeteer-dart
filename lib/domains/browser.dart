@@ -11,7 +11,7 @@ class BrowserApi {
 
   /// Grant specific permissions to the given origin and reject all others.
   /// [browserContextId] BrowserContext to override permissions. When omitted, default browser context is used.
-  Future grantPermissions(String origin, List<PermissionType> permissions,
+  Future<void> grantPermissions(String origin, List<PermissionType> permissions,
       {target.BrowserContextID browserContextId}) async {
     var parameters = <String, dynamic>{
       'origin': origin,
@@ -25,7 +25,8 @@ class BrowserApi {
 
   /// Reset all permission management for all origins.
   /// [browserContextId] BrowserContext to reset permissions. When omitted, default browser context is used.
-  Future resetPermissions({target.BrowserContextID browserContextId}) async {
+  Future<void> resetPermissions(
+      {target.BrowserContextID browserContextId}) async {
     var parameters = <String, dynamic>{};
     if (browserContextId != null) {
       parameters['browserContextId'] = browserContextId.toJson();
@@ -34,17 +35,17 @@ class BrowserApi {
   }
 
   /// Close browser gracefully.
-  Future close() async {
+  Future<void> close() async {
     await _client.send('Browser.close');
   }
 
   /// Crashes browser on the main thread.
-  Future crash() async {
+  Future<void> crash() async {
     await _client.send('Browser.crash');
   }
 
   /// Crashes GPU process.
-  Future crashGpuProcess() async {
+  Future<void> crashGpuProcess() async {
     await _client.send('Browser.crashGpuProcess');
   }
 
@@ -125,7 +126,7 @@ class BrowserApi {
   /// [windowId] Browser window id.
   /// [bounds] New window bounds. The 'minimized', 'maximized' and 'fullscreen' states cannot be combined
   /// with 'left', 'top', 'width' or 'height'. Leaves unspecified fields unchanged.
-  Future setWindowBounds(WindowID windowId, Bounds bounds) async {
+  Future<void> setWindowBounds(WindowID windowId, Bounds bounds) async {
     var parameters = <String, dynamic>{
       'windowId': windowId.toJson(),
       'bounds': bounds.toJson(),
@@ -135,7 +136,7 @@ class BrowserApi {
 
   /// Set dock tile details, platform-specific.
   /// [image] Png encoded image.
-  Future setDockTile({String badgeLabel, String image}) async {
+  Future<void> setDockTile({String badgeLabel, String image}) async {
     var parameters = <String, dynamic>{};
     if (badgeLabel != null) {
       parameters['badgeLabel'] = badgeLabel;

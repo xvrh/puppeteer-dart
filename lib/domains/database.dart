@@ -12,12 +12,12 @@ class DatabaseApi {
       .map((Event event) => Database.fromJson(event.parameters['database']));
 
   /// Disables database tracking, prevents database events from being sent to the client.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('Database.disable');
   }
 
   /// Enables database tracking, database events will now be delivered to the client.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('Database.enable');
   }
 

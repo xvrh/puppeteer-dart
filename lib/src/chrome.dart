@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:chrome_dev_tools/domains/browser.dart';
 import 'package:chrome_dev_tools/domains/system_info.dart';
+import 'package:chrome_dev_tools/src/downloader.dart';
 import 'package:chrome_dev_tools/src/page/page.dart';
 import 'package:chrome_dev_tools/src/page/emulation_manager.dart';
 import 'package:pool/pool.dart';
@@ -61,13 +62,27 @@ class Chrome {
       : browser = BrowserApi(connection),
         systemInfo = SystemInfoApi(connection);
 
-  static Future<Chrome> start(String chromeExecutable,
-      {bool headless = true,
+  /// Start a Chrome instance and connect to the DevTools endpoint.
+  ///
+  /// If [executablePath] is not provided and no environment variable
+  /// `CHROME_DEV_TOOLS_PATH` is present, it will download the Chromium binaries
+  /// in a local folder (.local-chromium by default).
+  ///
+  /// ```
+  /// main() {
+  ///   Chrome.start();
+  /// }
+  /// ```
+  static Future<Chrome> start(
+      {String executablePath,
+      bool headless = true,
       bool useTemporaryUserData = false,
       bool noSandboxFlag,
       DeviceViewport defaultViewport}) async {
     // In docker environment we want to force the '--no-sandbox' flag automatically
     noSandboxFlag ??= Platform.environment['CHROME_FORCE_NO_SANDBOX'] == 'true';
+
+    executablePath = await _inferExecutablePath();
 
     Directory userDataDir;
     if (useTemporaryUserData) {
@@ -86,8 +101,8 @@ class Chrome {
       chromeArgs.add('--no-sandbox');
     }
 
-    _logger.info('Start $chromeExecutable with $chromeArgs');
-    Process chromeProcess = await Process.start(chromeExecutable, chromeArgs);
+    _logger.info('Start $executablePath with $chromeArgs');
+    Process chromeProcess = await Process.start(executablePath, chromeArgs);
 
     // ignore: unawaited_futures
     chromeProcess.exitCode.then((int exitCode) {
@@ -162,6 +177,25 @@ class Chrome {
     }
 
     return process.exitCode;
+  }
+}
+
+Future<String> _inferExecutablePath() async {
+  String executablePath = Platform.environment['CHROME_DEV_TOOLS_PATH'];
+  if (executablePath != null) {
+    File file = File(executablePath);
+    if (!file.existsSync()) {
+      executablePath = getExecutablePath(executablePath);
+      if (!File(executablePath).existsSync()) {
+        throw 'The environment variable contains CHROME_DEV_TOOLS_PATH with '
+            'value (${Platform.environment['CHROME_DEV_TOOLS_PATH']}) but we cannot '
+            'find the Chrome executable';
+      }
+    }
+    return executablePath;
+  } else {
+    // We download locally a version of chromium and use it.
+    return (await downloadChrome()).executablePath;
   }
 }
 

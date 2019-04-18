@@ -20,16 +20,16 @@ const int _lastRevision = 650583;
 
 Future<ChromePath> downloadChrome(
     {int revision = _lastRevision, String cachePath}) async {
-  cachePath ??= p.join(Directory.systemTemp.path, 'local-chrome');
+  cachePath ??= '.local-chromium';
 
   Directory revisionDirectory = Directory(p.join(cachePath, '$revision'));
   if (!revisionDirectory.existsSync()) {
     revisionDirectory.createSync(recursive: true);
   }
 
-  String executablePath = _executablePath(revisionDirectory.path, revision);
+  String exePath = getExecutablePath(revisionDirectory.path);
 
-  File executableFile = File(executablePath);
+  File executableFile = File(exePath);
 
   if (!executableFile.existsSync()) {
     String url = _downloadUrl(revision);
@@ -40,7 +40,7 @@ Future<ChromePath> downloadChrome(
   }
 
   if (!executableFile.existsSync()) {
-    throw "$executablePath doesn't exist";
+    throw "$exePath doesn't exist";
   }
 
   if (!Platform.isWindows) {
@@ -99,15 +99,9 @@ void _simpleUnzip(String path, String targetPath) {
 
 const _baseUrl = 'https://storage.googleapis.com/chromium-browser-snapshots';
 
-String _windowZipName(int revision) {
-  // Windows archive name changed at r591479.
-  return revision > 591479 ? 'chrome-win' : 'chrome-win32';
-}
-
 String _downloadUrl(int revision) {
   if (Platform.isWindows) {
-    String fileName = _windowZipName(revision);
-    return '$_baseUrl/Win_x64/$revision/$fileName.zip';
+    return '$_baseUrl/Win_x64/$revision/chrome-win.zip';
   } else if (Platform.isLinux) {
     return '$_baseUrl/Linux_x64/$revision/chrome-linux.zip';
   } else if (Platform.isMacOS) {
@@ -118,10 +112,9 @@ String _downloadUrl(int revision) {
   }
 }
 
-String _executablePath(String revisionPath, int revision) {
+String getExecutablePath(String revisionPath) {
   if (Platform.isWindows) {
-    String folderName = _windowZipName(revision);
-    return p.join(revisionPath, folderName, 'chrome.exe');
+    return p.join(revisionPath, 'chrome-win', 'chrome.exe');
   } else if (Platform.isLinux) {
     return p.join(revisionPath, 'chrome-linux', 'chrome');
   } else if (Platform.isMacOS) {

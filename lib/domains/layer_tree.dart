@@ -32,12 +32,12 @@ class LayerTreeApi {
   }
 
   /// Disables compositing tree inspection.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('LayerTree.disable');
   }
 
   /// Enables compositing tree inspection.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('LayerTree.enable');
   }
 
@@ -90,7 +90,7 @@ class LayerTreeApi {
 
   /// Releases layer snapshot captured by the back-end.
   /// [snapshotId] The id of the layer snapshot.
-  Future releaseSnapshot(SnapshotId snapshotId) async {
+  Future<void> releaseSnapshot(SnapshotId snapshotId) async {
     var parameters = <String, dynamic>{
       'snapshotId': snapshotId.toJson(),
     };

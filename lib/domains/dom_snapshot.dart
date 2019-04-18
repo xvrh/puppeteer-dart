@@ -12,12 +12,12 @@ class DOMSnapshotApi {
   DOMSnapshotApi(this._client);
 
   /// Disables DOM snapshot agent for the given page.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('DOMSnapshot.disable');
   }
 
   /// Enables DOM snapshot agent for the given page.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('DOMSnapshot.enable');
   }
 

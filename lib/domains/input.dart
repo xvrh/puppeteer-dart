@@ -27,7 +27,7 @@ class InputApi {
   /// [isSystemKey] Whether the event was a system key event (default: false).
   /// [location] Whether the event was from the left or right side of the keyboard. 1=Left, 2=Right (default:
   /// 0).
-  Future dispatchKeyEvent(
+  Future<void> dispatchKeyEvent(
       @Enum(['keyDown', 'keyUp', 'rawKeyDown', 'char']) String type,
       {int modifiers,
       TimeSinceEpoch timestamp,
@@ -91,7 +91,7 @@ class InputApi {
   /// This method emulates inserting text that doesn't come from a key press,
   /// for example an emoji keyboard or an IME.
   /// [text] The text to insert.
-  Future insertText(String text) async {
+  Future<void> insertText(String text) async {
     var parameters = <String, dynamic>{
       'text': text,
     };
@@ -113,7 +113,7 @@ class InputApi {
   /// [deltaX] X delta in CSS pixels for mouse wheel event (default: 0).
   /// [deltaY] Y delta in CSS pixels for mouse wheel event (default: 0).
   /// [pointerType] Pointer type (default: "mouse").
-  Future dispatchMouseEvent(
+  Future<void> dispatchMouseEvent(
       @Enum(['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel'])
           String type,
       num x,
@@ -175,7 +175,7 @@ class InputApi {
   /// [modifiers] Bit field representing pressed modifier keys. Alt=1, Ctrl=2, Meta/Command=4, Shift=8
   /// (default: 0).
   /// [timestamp] Time at which the event occurred.
-  Future dispatchTouchEvent(
+  Future<void> dispatchTouchEvent(
       @Enum(['touchStart', 'touchEnd', 'touchMove', 'touchCancel']) String type,
       List<TouchPoint> touchPoints,
       {int modifiers,
@@ -206,7 +206,7 @@ class InputApi {
   /// [modifiers] Bit field representing pressed modifier keys. Alt=1, Ctrl=2, Meta/Command=4, Shift=8
   /// (default: 0).
   /// [clickCount] Number of times the mouse button was clicked (default: 0).
-  Future emulateTouchFromMouseEvent(
+  Future<void> emulateTouchFromMouseEvent(
       @Enum(['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel'])
           String type,
       int x,
@@ -247,7 +247,7 @@ class InputApi {
 
   /// Ignores input events (useful while auditing page).
   /// [ignore] Ignores input events processing when set to true.
-  Future setIgnoreInputEvents(bool ignore) async {
+  Future<void> setIgnoreInputEvents(bool ignore) async {
     var parameters = <String, dynamic>{
       'ignore': ignore,
     };
@@ -261,7 +261,7 @@ class InputApi {
   /// [relativeSpeed] Relative pointer speed in pixels per second (default: 800).
   /// [gestureSourceType] Which type of input events to be generated (default: 'default', which queries the platform
   /// for the preferred input type).
-  Future synthesizePinchGesture(num x, num y, num scaleFactor,
+  Future<void> synthesizePinchGesture(num x, num y, num scaleFactor,
       {int relativeSpeed, GestureSourceType gestureSourceType}) async {
     var parameters = <String, dynamic>{
       'x': x,
@@ -293,7 +293,7 @@ class InputApi {
   /// [repeatCount] The number of times to repeat the gesture (default: 0).
   /// [repeatDelayMs] The number of milliseconds delay between each repeat. (default: 250).
   /// [interactionMarkerName] The name of the interaction markers to generate, if not empty (default: "").
-  Future synthesizeScrollGesture(num x, num y,
+  Future<void> synthesizeScrollGesture(num x, num y,
       {num xDistance,
       num yDistance,
       num xOverscroll,
@@ -348,7 +348,7 @@ class InputApi {
   /// [tapCount] Number of times to perform the tap (e.g. 2 for double tap, default: 1).
   /// [gestureSourceType] Which type of input events to be generated (default: 'default', which queries the platform
   /// for the preferred input type).
-  Future synthesizeTapGesture(num x, num y,
+  Future<void> synthesizeTapGesture(num x, num y,
       {int duration, int tapCount, GestureSourceType gestureSourceType}) async {
     var parameters = <String, dynamic>{
       'x': x,

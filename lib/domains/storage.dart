@@ -35,7 +35,7 @@ class StorageApi {
   /// Clears storage for origin.
   /// [origin] Security origin.
   /// [storageTypes] Comma separated list of StorageType to clear.
-  Future clearDataForOrigin(String origin, String storageTypes) async {
+  Future<void> clearDataForOrigin(String origin, String storageTypes) async {
     var parameters = <String, dynamic>{
       'origin': origin,
       'storageTypes': storageTypes,
@@ -55,7 +55,7 @@ class StorageApi {
 
   /// Registers origin to be notified when an update occurs to its cache storage list.
   /// [origin] Security origin.
-  Future trackCacheStorageForOrigin(String origin) async {
+  Future<void> trackCacheStorageForOrigin(String origin) async {
     var parameters = <String, dynamic>{
       'origin': origin,
     };
@@ -64,7 +64,7 @@ class StorageApi {
 
   /// Registers origin to be notified when an update occurs to its IndexedDB.
   /// [origin] Security origin.
-  Future trackIndexedDBForOrigin(String origin) async {
+  Future<void> trackIndexedDBForOrigin(String origin) async {
     var parameters = <String, dynamic>{
       'origin': origin,
     };
@@ -73,7 +73,7 @@ class StorageApi {
 
   /// Unregisters origin from receiving notifications for cache storage.
   /// [origin] Security origin.
-  Future untrackCacheStorageForOrigin(String origin) async {
+  Future<void> untrackCacheStorageForOrigin(String origin) async {
     var parameters = <String, dynamic>{
       'origin': origin,
     };
@@ -82,7 +82,7 @@ class StorageApi {
 
   /// Unregisters origin from receiving notifications for IndexedDB.
   /// [origin] Security origin.
-  Future untrackIndexedDBForOrigin(String origin) async {
+  Future<void> untrackIndexedDBForOrigin(String origin) async {
     var parameters = <String, dynamic>{
       'origin': origin,
     };

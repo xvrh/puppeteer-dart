@@ -28,7 +28,7 @@ class FetchApi {
       .map((Event event) => AuthRequiredEvent.fromJson(event.parameters));
 
   /// Disables the fetch domain.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('Fetch.disable');
   }
 
@@ -39,7 +39,7 @@ class FetchApi {
   /// all requests will be affected.
   /// [handleAuthRequests] If true, authRequired events will be issued and requests will be paused
   /// expecting a call to continueWithAuth.
-  Future enable(
+  Future<void> enable(
       {List<RequestPattern> patterns, bool handleAuthRequests}) async {
     var parameters = <String, dynamic>{};
     if (patterns != null) {
@@ -54,7 +54,7 @@ class FetchApi {
   /// Causes the request to fail with specified reason.
   /// [requestId] An id the client received in requestPaused event.
   /// [errorReason] Causes the request to fail with the given reason.
-  Future failRequest(
+  Future<void> failRequest(
       RequestId requestId, network.ErrorReason errorReason) async {
     var parameters = <String, dynamic>{
       'requestId': requestId.toJson(),
@@ -70,7 +70,7 @@ class FetchApi {
   /// [body] A response body.
   /// [responsePhrase] A textual representation of responseCode.
   /// If absent, a standard phrase mathcing responseCode is used.
-  Future fulfillRequest(
+  Future<void> fulfillRequest(
       RequestId requestId, int responseCode, List<HeaderEntry> responseHeaders,
       {String body, String responsePhrase}) async {
     var parameters = <String, dynamic>{
@@ -93,7 +93,7 @@ class FetchApi {
   /// [method] If set, the request method is overridden.
   /// [postData] If set, overrides the post data in the request.
   /// [headers] If set, overrides the request headrts.
-  Future continueRequest(RequestId requestId,
+  Future<void> continueRequest(RequestId requestId,
       {String url,
       String method,
       String postData,
@@ -119,7 +119,7 @@ class FetchApi {
   /// Continues a request supplying authChallengeResponse following authRequired event.
   /// [requestId] An id the client received in authRequired event.
   /// [authChallengeResponse] Response to  with an authChallenge.
-  Future continueWithAuth(
+  Future<void> continueWithAuth(
       RequestId requestId, AuthChallengeResponse authChallengeResponse) async {
     var parameters = <String, dynamic>{
       'requestId': requestId.toJson(),

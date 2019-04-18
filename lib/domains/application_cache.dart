@@ -21,7 +21,7 @@ class ApplicationCacheApi {
       .map((Event event) => event.parameters['isNowOnline'] as bool);
 
   /// Enables application cache domain notifications.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('ApplicationCache.enable');
   }
 

@@ -23,7 +23,7 @@ main() async {
 
   // Start the `Chrome` process and connect to the DevTools
   // By default it is start in `headless` mode
-  Chrome chrome = await Chrome.start(chromePath);
+  Chrome chrome = await Chrome.start(executablePath: chromePath);
 
   // Open a new tab
   Tab myTab = await chrome.newTab('https://www.github.com');

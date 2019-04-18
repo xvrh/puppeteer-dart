@@ -27,7 +27,7 @@ class CastApi {
   /// |sinksUpdated| event is fired.
   /// Also starts observing for issue messages. When an issue is added or removed,
   /// an |issueUpdated| event is fired.
-  Future enable({String presentationUrl}) async {
+  Future<void> enable({String presentationUrl}) async {
     var parameters = <String, dynamic>{};
     if (presentationUrl != null) {
       parameters['presentationUrl'] = presentationUrl;
@@ -36,13 +36,13 @@ class CastApi {
   }
 
   /// Stops observing for sinks and issues.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('Cast.disable');
   }
 
   /// Sets a sink to be used when the web page requests the browser to choose a
   /// sink via Presentation API, Remote Playback API, or Cast SDK.
-  Future setSinkToUse(String sinkName) async {
+  Future<void> setSinkToUse(String sinkName) async {
     var parameters = <String, dynamic>{
       'sinkName': sinkName,
     };
@@ -50,7 +50,7 @@ class CastApi {
   }
 
   /// Starts mirroring the tab to the sink.
-  Future startTabMirroring(String sinkName) async {
+  Future<void> startTabMirroring(String sinkName) async {
     var parameters = <String, dynamic>{
       'sinkName': sinkName,
     };
@@ -58,7 +58,7 @@ class CastApi {
   }
 
   /// Stops the active Cast session on the sink.
-  Future stopCasting(String sinkName) async {
+  Future<void> stopCasting(String sinkName) async {
     var parameters = <String, dynamic>{
       'sinkName': sinkName,
     };

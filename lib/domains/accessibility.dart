@@ -10,13 +10,13 @@ class AccessibilityApi {
   AccessibilityApi(this._client);
 
   /// Disables the accessibility domain.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('Accessibility.disable');
   }
 
   /// Enables the accessibility domain which causes `AXNodeId`s to remain consistent between method calls.
   /// This turns on accessibility for the page, which can impact performance until accessibility is disabled.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('Accessibility.enable');
   }
 

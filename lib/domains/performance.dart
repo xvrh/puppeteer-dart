@@ -13,12 +13,12 @@ class PerformanceApi {
       .map((Event event) => MetricsEvent.fromJson(event.parameters));
 
   /// Disable collecting and reporting metrics.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('Performance.disable');
   }
 
   /// Enable collecting and reporting metrics.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('Performance.enable');
   }
 
@@ -26,7 +26,7 @@ class PerformanceApi {
   /// Note that this must be called before enabling metrics collection. Calling
   /// this method while metrics collection is enabled returns an error.
   /// [timeDomain] Time domain
-  Future setTimeDomain(
+  Future<void> setTimeDomain(
       @Enum(['timeTicks', 'threadTicks']) String timeDomain) async {
     assert(const ['timeTicks', 'threadTicks'].contains(timeDomain));
     var parameters = <String, dynamic>{

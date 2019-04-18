@@ -52,12 +52,12 @@ class HeadlessExperimentalApi {
   }
 
   /// Disables headless events for the target.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('HeadlessExperimental.disable');
   }
 
   /// Enables headless events for the target.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('HeadlessExperimental.enable');
   }
 }

@@ -11,7 +11,7 @@ class IOApi {
 
   /// Close the stream, discard any temporary backing storage.
   /// [handle] Handle of the stream to close.
-  Future close(StreamHandle handle) async {
+  Future<void> close(StreamHandle handle) async {
     var parameters = <String, dynamic>{
       'handle': handle.toJson(),
     };

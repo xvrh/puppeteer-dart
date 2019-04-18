@@ -29,7 +29,7 @@ class DOMStorageApi {
       .where((Event event) => event.name == 'DOMStorage.domStorageItemsCleared')
       .map((Event event) => StorageId.fromJson(event.parameters['storageId']));
 
-  Future clear(StorageId storageId) async {
+  Future<void> clear(StorageId storageId) async {
     var parameters = <String, dynamic>{
       'storageId': storageId.toJson(),
     };
@@ -37,12 +37,12 @@ class DOMStorageApi {
   }
 
   /// Disables storage tracking, prevents storage events from being sent to the client.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('DOMStorage.disable');
   }
 
   /// Enables storage tracking, storage events will now be delivered to the client.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('DOMStorage.enable');
   }
 
@@ -55,7 +55,7 @@ class DOMStorageApi {
     return (result['entries'] as List).map((e) => Item.fromJson(e)).toList();
   }
 
-  Future removeDOMStorageItem(StorageId storageId, String key) async {
+  Future<void> removeDOMStorageItem(StorageId storageId, String key) async {
     var parameters = <String, dynamic>{
       'storageId': storageId.toJson(),
       'key': key,
@@ -63,7 +63,7 @@ class DOMStorageApi {
     await _client.send('DOMStorage.removeDOMStorageItem', parameters);
   }
 
-  Future setDOMStorageItem(
+  Future<void> setDOMStorageItem(
       StorageId storageId, String key, String value) async {
     var parameters = <String, dynamic>{
       'storageId': storageId.toJson(),

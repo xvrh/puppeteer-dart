@@ -230,7 +230,7 @@ class _Command {
     }
 
     code.writeln(
-        'Future${returnTypeName != null ? '<$returnTypeName>' : ''} $name(');
+        'Future${returnTypeName != null ? '<$returnTypeName>' : '<void>'} $name(');
     List<Parameter> optionals = parameters.where((p) => p.optional).toList();
     List<Parameter> requireds =
         parameters.where((p) => !optionals.contains(p)).toList();

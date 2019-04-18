@@ -52,7 +52,7 @@ class TargetApi {
           (Event event) => TargetInfo.fromJson(event.parameters['targetInfo']));
 
   /// Activates (focuses) the target.
-  Future activateTarget(TargetID targetId) async {
+  Future<void> activateTarget(TargetID targetId) async {
     var parameters = <String, dynamic>{
       'targetId': targetId.toJson(),
     };
@@ -98,7 +98,8 @@ class TargetApi {
   /// - `binding.send(json)` - a method to send messages over the remote debugging protocol
   /// - `binding.onmessage = json => handleMessage(json)` - a callback that will be called for the protocol notifications and command responses.
   /// [bindingName] Binding name, 'cdp' if not specified.
-  Future exposeDevToolsProtocol(TargetID targetId, {String bindingName}) async {
+  Future<void> exposeDevToolsProtocol(TargetID targetId,
+      {String bindingName}) async {
     var parameters = <String, dynamic>{
       'targetId': targetId.toJson(),
     };
@@ -159,7 +160,7 @@ class TargetApi {
 
   /// Detaches session with given id.
   /// [sessionId] Session to detach.
-  Future detachFromTarget(
+  Future<void> detachFromTarget(
       {SessionID sessionId, @deprecated TargetID targetId}) async {
     var parameters = <String, dynamic>{};
     if (sessionId != null) {
@@ -175,7 +176,7 @@ class TargetApi {
 
   /// Deletes a BrowserContext. All the belonging pages will be closed without calling their
   /// beforeunload hooks.
-  Future disposeBrowserContext(BrowserContextID browserContextId) async {
+  Future<void> disposeBrowserContext(BrowserContextID browserContextId) async {
     var parameters = <String, dynamic>{
       'browserContextId': browserContextId.toJson(),
     };
@@ -203,7 +204,7 @@ class TargetApi {
 
   /// Sends protocol message over session with given id.
   /// [sessionId] Identifier of the session.
-  Future sendMessageToTarget(String message,
+  Future<void> sendMessageToTarget(String message,
       {SessionID sessionId, @deprecated TargetID targetId}) async {
     var parameters = <String, dynamic>{
       'message': message,
@@ -226,7 +227,7 @@ class TargetApi {
   /// [waitForDebuggerOnStart] Whether to pause new targets when attaching to them. Use `Runtime.runIfWaitingForDebugger`
   /// to run paused targets.
   /// [flatten] Enables "flat" access to the session via specifying sessionId attribute in the commands.
-  Future setAutoAttach(bool autoAttach, bool waitForDebuggerOnStart,
+  Future<void> setAutoAttach(bool autoAttach, bool waitForDebuggerOnStart,
       {bool flatten}) async {
     var parameters = <String, dynamic>{
       'autoAttach': autoAttach,
@@ -241,7 +242,7 @@ class TargetApi {
   /// Controls whether to discover available targets and notify via
   /// `targetCreated/targetInfoChanged/targetDestroyed` events.
   /// [discover] Whether to discover available targets.
-  Future setDiscoverTargets(bool discover) async {
+  Future<void> setDiscoverTargets(bool discover) async {
     var parameters = <String, dynamic>{
       'discover': discover,
     };
@@ -251,7 +252,7 @@ class TargetApi {
   /// Enables target discovery for the specified locations, when `setDiscoverTargets` was set to
   /// `true`.
   /// [locations] List of remote locations.
-  Future setRemoteLocations(List<RemoteLocation> locations) async {
+  Future<void> setRemoteLocations(List<RemoteLocation> locations) async {
     var parameters = <String, dynamic>{
       'locations': locations.map((e) => e.toJson()).toList(),
     };

@@ -26,7 +26,7 @@ class TracingApi {
       .map((Event event) => TracingCompleteEvent.fromJson(event.parameters));
 
   /// Stop trace events collection.
-  Future end() async {
+  Future<void> end() async {
     await _client.send('Tracing.end');
   }
 
@@ -39,7 +39,7 @@ class TracingApi {
 
   /// Record a clock sync marker in the trace.
   /// [syncId] The ID of this clock sync marker
-  Future recordClockSyncMarker(String syncId) async {
+  Future<void> recordClockSyncMarker(String syncId) async {
     var parameters = <String, dynamic>{
       'syncId': syncId,
     };
@@ -60,7 +60,7 @@ class TracingApi {
   /// transfer mode (defaults to `json`).
   /// [streamCompression] Compression format to use. This only applies when using `ReturnAsStream`
   /// transfer mode (defaults to `none`)
-  Future start(
+  Future<void> start(
       {@deprecated String categories,
       @deprecated String options,
       num bufferUsageReportingInterval,

@@ -83,13 +83,13 @@ class CSSApi {
   }
 
   /// Disables the CSS agent for the given page.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('CSS.disable');
   }
 
   /// Enables the CSS agent for the given page. Clients should not assume that the CSS agent has been
   /// enabled until the result of this command is received.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('CSS.enable');
   }
 
@@ -97,7 +97,7 @@ class CSSApi {
   /// the browser.
   /// [nodeId] The element id for which to force the pseudo state.
   /// [forcedPseudoClasses] Element pseudo classes to force when computing the element's style.
-  Future forcePseudoState(
+  Future<void> forcePseudoState(
       dom.NodeId nodeId, List<String> forcedPseudoClasses) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
@@ -183,7 +183,7 @@ class CSSApi {
   /// Find a rule with the given active property for the given node and set the new value for this
   /// property
   /// [nodeId] The element id for which to set property.
-  Future setEffectivePropertyValueForNode(
+  Future<void> setEffectivePropertyValueForNode(
       dom.NodeId nodeId, String propertyName, String value) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
@@ -255,7 +255,7 @@ class CSSApi {
   }
 
   /// Enables the selector recording.
-  Future startRuleUsageTracking() async {
+  Future<void> startRuleUsageTracking() async {
     await _client.send('CSS.startRuleUsageTracking');
   }
 

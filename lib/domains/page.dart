@@ -164,7 +164,7 @@ class PageApi {
   }
 
   /// Brings page to front (activates tab).
-  Future bringToFront() async {
+  Future<void> bringToFront() async {
     await _client.send('Page.bringToFront');
   }
 
@@ -213,19 +213,19 @@ class PageApi {
 
   /// Clears the overriden device metrics.
   @deprecated
-  Future clearDeviceMetricsOverride() async {
+  Future<void> clearDeviceMetricsOverride() async {
     await _client.send('Page.clearDeviceMetricsOverride');
   }
 
   /// Clears the overridden Device Orientation.
   @deprecated
-  Future clearDeviceOrientationOverride() async {
+  Future<void> clearDeviceOrientationOverride() async {
     await _client.send('Page.clearDeviceOrientationOverride');
   }
 
   /// Clears the overriden Geolocation Position and Error.
   @deprecated
-  Future clearGeolocationOverride() async {
+  Future<void> clearGeolocationOverride() async {
     await _client.send('Page.clearGeolocationOverride');
   }
 
@@ -254,7 +254,7 @@ class PageApi {
   /// [cookieName] Name of the cookie to remove.
   /// [url] URL to match cooke domain and path.
   @deprecated
-  Future deleteCookie(String cookieName, String url) async {
+  Future<void> deleteCookie(String cookieName, String url) async {
     var parameters = <String, dynamic>{
       'cookieName': cookieName,
       'url': url,
@@ -263,12 +263,12 @@ class PageApi {
   }
 
   /// Disables page domain notifications.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('Page.disable');
   }
 
   /// Enables page domain notifications.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('Page.enable');
   }
 
@@ -313,7 +313,7 @@ class PageApi {
   }
 
   /// Resets navigation history for the current page.
-  Future resetNavigationHistory() async {
+  Future<void> resetNavigationHistory() async {
     await _client.send('Page.resetNavigationHistory');
   }
 
@@ -341,7 +341,7 @@ class PageApi {
   /// [accept] Whether to accept or dismiss the dialog.
   /// [promptText] The text to enter into the dialog prompt before accepting. Used only if this is a prompt
   /// dialog.
-  Future handleJavaScriptDialog(bool accept, {String promptText}) async {
+  Future<void> handleJavaScriptDialog(bool accept, {String promptText}) async {
     var parameters = <String, dynamic>{
       'accept': accept,
     };
@@ -376,7 +376,7 @@ class PageApi {
 
   /// Navigates current page to the given history entry.
   /// [entryId] Unique id of the entry to navigate to.
-  Future navigateToHistoryEntry(int entryId) async {
+  Future<void> navigateToHistoryEntry(int entryId) async {
     var parameters = <String, dynamic>{
       'entryId': entryId,
     };
@@ -481,7 +481,7 @@ class PageApi {
   /// [ignoreCache] If true, browser cache is ignored (as if the user pressed Shift+refresh).
   /// [scriptToEvaluateOnLoad] If set, the script will be injected into all frames of the inspected page after reload.
   /// Argument will be ignored if reloading dataURL origin.
-  Future reload({bool ignoreCache, String scriptToEvaluateOnLoad}) async {
+  Future<void> reload({bool ignoreCache, String scriptToEvaluateOnLoad}) async {
     var parameters = <String, dynamic>{};
     if (ignoreCache != null) {
       parameters['ignoreCache'] = ignoreCache;
@@ -494,7 +494,7 @@ class PageApi {
 
   /// Deprecated, please use removeScriptToEvaluateOnNewDocument instead.
   @deprecated
-  Future removeScriptToEvaluateOnLoad(ScriptIdentifier identifier) async {
+  Future<void> removeScriptToEvaluateOnLoad(ScriptIdentifier identifier) async {
     var parameters = <String, dynamic>{
       'identifier': identifier.toJson(),
     };
@@ -502,7 +502,7 @@ class PageApi {
   }
 
   /// Removes given script from the list.
-  Future removeScriptToEvaluateOnNewDocument(
+  Future<void> removeScriptToEvaluateOnNewDocument(
       ScriptIdentifier identifier) async {
     var parameters = <String, dynamic>{
       'identifier': identifier.toJson(),
@@ -512,7 +512,7 @@ class PageApi {
 
   /// Acknowledges that a screencast frame has been received by the frontend.
   /// [sessionId] Frame number.
-  Future screencastFrameAck(int sessionId) async {
+  Future<void> screencastFrameAck(int sessionId) async {
     var parameters = <String, dynamic>{
       'sessionId': sessionId,
     };
@@ -548,7 +548,7 @@ class PageApi {
 
   /// Enable Chrome's experimental ad filter on all sites.
   /// [enabled] Whether to block ads.
-  Future setAdBlockingEnabled(bool enabled) async {
+  Future<void> setAdBlockingEnabled(bool enabled) async {
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
@@ -557,7 +557,7 @@ class PageApi {
 
   /// Enable page Content Security Policy by-passing.
   /// [enabled] Whether to bypass page CSP.
-  Future setBypassCSP(bool enabled) async {
+  Future<void> setBypassCSP(bool enabled) async {
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
@@ -581,7 +581,7 @@ class PageApi {
   /// [screenOrientation] Screen orientation override.
   /// [viewport] The viewport dimensions and scale. If not set, the override is cleared.
   @deprecated
-  Future setDeviceMetricsOverride(
+  Future<void> setDeviceMetricsOverride(
       int width, int height, num deviceScaleFactor, bool mobile,
       {num scale,
       int screenWidth,
@@ -629,7 +629,8 @@ class PageApi {
   /// [beta] Mock beta
   /// [gamma] Mock gamma
   @deprecated
-  Future setDeviceOrientationOverride(num alpha, num beta, num gamma) async {
+  Future<void> setDeviceOrientationOverride(
+      num alpha, num beta, num gamma) async {
     var parameters = <String, dynamic>{
       'alpha': alpha,
       'beta': beta,
@@ -640,7 +641,7 @@ class PageApi {
 
   /// Set generic font families.
   /// [fontFamilies] Specifies font families to set. If a font family is not specified, it won't be changed.
-  Future setFontFamilies(FontFamilies fontFamilies) async {
+  Future<void> setFontFamilies(FontFamilies fontFamilies) async {
     var parameters = <String, dynamic>{
       'fontFamilies': fontFamilies.toJson(),
     };
@@ -649,7 +650,7 @@ class PageApi {
 
   /// Set default font sizes.
   /// [fontSizes] Specifies font sizes to set. If a font size is not specified, it won't be changed.
-  Future setFontSizes(FontSizes fontSizes) async {
+  Future<void> setFontSizes(FontSizes fontSizes) async {
     var parameters = <String, dynamic>{
       'fontSizes': fontSizes.toJson(),
     };
@@ -659,7 +660,7 @@ class PageApi {
   /// Sets given markup as the document's HTML.
   /// [frameId] Frame id to set HTML for.
   /// [html] HTML content to set.
-  Future setDocumentContent(FrameId frameId, String html) async {
+  Future<void> setDocumentContent(FrameId frameId, String html) async {
     var parameters = <String, dynamic>{
       'frameId': frameId.toJson(),
       'html': html,
@@ -671,7 +672,7 @@ class PageApi {
   /// [behavior] Whether to allow all or deny all download requests, or use default Chrome behavior if
   /// available (otherwise deny).
   /// [downloadPath] The default path to save downloaded files to. This is requred if behavior is set to 'allow'
-  Future setDownloadBehavior(
+  Future<void> setDownloadBehavior(
       @Enum(['deny', 'allow', 'default']) String behavior,
       {String downloadPath}) async {
     assert(const ['deny', 'allow', 'default'].contains(behavior));
@@ -690,7 +691,7 @@ class PageApi {
   /// [longitude] Mock longitude
   /// [accuracy] Mock accuracy
   @deprecated
-  Future setGeolocationOverride(
+  Future<void> setGeolocationOverride(
       {num latitude, num longitude, num accuracy}) async {
     var parameters = <String, dynamic>{};
     if (latitude != null) {
@@ -707,7 +708,7 @@ class PageApi {
 
   /// Controls whether page will emit lifecycle events.
   /// [enabled] If true, starts emitting lifecycle events.
-  Future setLifecycleEventsEnabled(bool enabled) async {
+  Future<void> setLifecycleEventsEnabled(bool enabled) async {
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
@@ -718,7 +719,7 @@ class PageApi {
   /// [enabled] Whether the touch event emulation should be enabled.
   /// [configuration] Touch/gesture events configuration. Default: current platform.
   @deprecated
-  Future setTouchEmulationEnabled(bool enabled,
+  Future<void> setTouchEmulationEnabled(bool enabled,
       {@Enum(['mobile', 'desktop']) String configuration}) async {
     assert(configuration == null ||
         const ['mobile', 'desktop'].contains(configuration));
@@ -737,7 +738,7 @@ class PageApi {
   /// [maxWidth] Maximum screenshot width.
   /// [maxHeight] Maximum screenshot height.
   /// [everyNthFrame] Send every n-th frame.
-  Future startScreencast(
+  Future<void> startScreencast(
       {@Enum(['jpeg', 'png']) String format,
       int quality,
       int maxWidth,
@@ -764,17 +765,17 @@ class PageApi {
   }
 
   /// Force the page stop all navigations and pending resource fetches.
-  Future stopLoading() async {
+  Future<void> stopLoading() async {
     await _client.send('Page.stopLoading');
   }
 
   /// Crashes renderer on the IO thread, generates minidumps.
-  Future crash() async {
+  Future<void> crash() async {
     await _client.send('Page.crash');
   }
 
   /// Tries to close page, running its beforeunload hooks, if any.
-  Future close() async {
+  Future<void> close() async {
     await _client.send('Page.close');
   }
 
@@ -782,7 +783,8 @@ class PageApi {
   /// It will transition the page to the given state according to:
   /// https://github.com/WICG/web-lifecycle/
   /// [state] Target lifecycle state
-  Future setWebLifecycleState(@Enum(['frozen', 'active']) String state) async {
+  Future<void> setWebLifecycleState(
+      @Enum(['frozen', 'active']) String state) async {
     assert(const ['frozen', 'active'].contains(state));
     var parameters = <String, dynamic>{
       'state': state,
@@ -791,12 +793,12 @@ class PageApi {
   }
 
   /// Stops sending each frame in the `screencastFrame`.
-  Future stopScreencast() async {
+  Future<void> stopScreencast() async {
     await _client.send('Page.stopScreencast');
   }
 
   /// Forces compilation cache to be generated for every subresource script.
-  Future setProduceCompilationCache(bool enabled) async {
+  Future<void> setProduceCompilationCache(bool enabled) async {
     var parameters = <String, dynamic>{
       'enabled': enabled,
     };
@@ -806,7 +808,7 @@ class PageApi {
   /// Seeds compilation cache for given url. Compilation cache does not survive
   /// cross-process navigation.
   /// [data] Base64-encoded data
-  Future addCompilationCache(String url, String data) async {
+  Future<void> addCompilationCache(String url, String data) async {
     var parameters = <String, dynamic>{
       'url': url,
       'data': data,
@@ -815,14 +817,14 @@ class PageApi {
   }
 
   /// Clears seeded compilation cache.
-  Future clearCompilationCache() async {
+  Future<void> clearCompilationCache() async {
     await _client.send('Page.clearCompilationCache');
   }
 
   /// Generates a report for testing.
   /// [message] Message to be displayed in the report.
   /// [group] Specifies the endpoint group to deliver the report to.
-  Future generateTestReport(String message, {String group}) async {
+  Future<void> generateTestReport(String message, {String group}) async {
     var parameters = <String, dynamic>{
       'message': message,
     };
@@ -833,7 +835,7 @@ class PageApi {
   }
 
   /// Pauses page execution. Can be resumed using generic Runtime.runIfWaitingForDebugger.
-  Future waitForDebugger() async {
+  Future<void> waitForDebugger() async {
     await _client.send('Page.waitForDebugger');
   }
 }

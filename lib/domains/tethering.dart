@@ -15,7 +15,7 @@ class TetheringApi {
 
   /// Request browser port binding.
   /// [port] Port number to bind.
-  Future bind(int port) async {
+  Future<void> bind(int port) async {
     var parameters = <String, dynamic>{
       'port': port,
     };
@@ -24,7 +24,7 @@ class TetheringApi {
 
   /// Request browser port unbinding.
   /// [port] Port number to unbind.
-  Future unbind(int port) async {
+  Future<void> unbind(int port) async {
     var parameters = <String, dynamic>{
       'port': port,
     };

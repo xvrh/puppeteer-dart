@@ -166,14 +166,14 @@ class DOMApi {
   }
 
   /// Disables DOM agent for the given page.
-  Future disable() async {
+  Future<void> disable() async {
     await _client.send('DOM.disable');
   }
 
   /// Discards search results from the session with the given id. `getSearchResults` should no longer
   /// be called for that search.
   /// [searchId] Unique search session identifier.
-  Future discardSearchResults(String searchId) async {
+  Future<void> discardSearchResults(String searchId) async {
     var parameters = <String, dynamic>{
       'searchId': searchId,
     };
@@ -181,7 +181,7 @@ class DOMApi {
   }
 
   /// Enables DOM agent for the given page.
-  Future enable() async {
+  Future<void> enable() async {
     await _client.send('DOM.enable');
   }
 
@@ -189,7 +189,7 @@ class DOMApi {
   /// [nodeId] Identifier of the node.
   /// [backendNodeId] Identifier of the backend node.
   /// [objectId] JavaScript object id of the node wrapper.
-  Future focus(
+  Future<void> focus(
       {NodeId nodeId,
       BackendNodeId backendNodeId,
       runtime.RemoteObjectId objectId}) async {
@@ -370,22 +370,22 @@ class DOMApi {
   }
 
   /// Hides any highlight.
-  Future hideHighlight() async {
+  Future<void> hideHighlight() async {
     await _client.send('DOM.hideHighlight');
   }
 
   /// Highlights DOM node.
-  Future highlightNode() async {
+  Future<void> highlightNode() async {
     await _client.send('DOM.highlightNode');
   }
 
   /// Highlights given rectangle.
-  Future highlightRect() async {
+  Future<void> highlightRect() async {
     await _client.send('DOM.highlightRect');
   }
 
   /// Marks last undoable state.
-  Future markUndoableState() async {
+  Future<void> markUndoableState() async {
     await _client.send('DOM.markUndoableState');
   }
 
@@ -476,14 +476,14 @@ class DOMApi {
   }
 
   /// Re-does the last undone action.
-  Future redo() async {
+  Future<void> redo() async {
     await _client.send('DOM.redo');
   }
 
   /// Removes attribute with given name from an element with given id.
   /// [nodeId] Id of the element to remove attribute from.
   /// [name] Name of the attribute to remove.
-  Future removeAttribute(NodeId nodeId, String name) async {
+  Future<void> removeAttribute(NodeId nodeId, String name) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'name': name,
@@ -493,7 +493,7 @@ class DOMApi {
 
   /// Removes node with given id.
   /// [nodeId] Id of the node to remove.
-  Future removeNode(NodeId nodeId) async {
+  Future<void> removeNode(NodeId nodeId) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
@@ -508,7 +508,8 @@ class DOMApi {
   /// entire subtree or provide an integer larger than 0.
   /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the sub-tree
   /// (default is false).
-  Future requestChildNodes(NodeId nodeId, {int depth, bool pierce}) async {
+  Future<void> requestChildNodes(NodeId nodeId,
+      {int depth, bool pierce}) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
@@ -566,7 +567,8 @@ class DOMApi {
   /// [nodeId] Id of the element to set attribute for.
   /// [name] Attribute name.
   /// [value] Attribute value.
-  Future setAttributeValue(NodeId nodeId, String name, String value) async {
+  Future<void> setAttributeValue(
+      NodeId nodeId, String name, String value) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'name': name,
@@ -581,7 +583,8 @@ class DOMApi {
   /// [text] Text with a number of attributes. Will parse this text using HTML parser.
   /// [name] Attribute name to replace with new attributes derived from text in case text parsed
   /// successfully.
-  Future setAttributesAsText(NodeId nodeId, String text, {String name}) async {
+  Future<void> setAttributesAsText(NodeId nodeId, String text,
+      {String name}) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'text': text,
@@ -597,7 +600,7 @@ class DOMApi {
   /// [nodeId] Identifier of the node.
   /// [backendNodeId] Identifier of the backend node.
   /// [objectId] JavaScript object id of the node wrapper.
-  Future setFileInputFiles(List<String> files,
+  Future<void> setFileInputFiles(List<String> files,
       {NodeId nodeId,
       BackendNodeId backendNodeId,
       runtime.RemoteObjectId objectId}) async {
@@ -630,7 +633,7 @@ class DOMApi {
   /// Enables console to refer to the node with given id via $x (see Command Line API for more details
   /// $x functions).
   /// [nodeId] DOM node id to be accessible by means of $x command line API.
-  Future setInspectedNode(NodeId nodeId) async {
+  Future<void> setInspectedNode(NodeId nodeId) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
@@ -653,7 +656,7 @@ class DOMApi {
   /// Sets node value for a node with given id.
   /// [nodeId] Id of the node to set value for.
   /// [value] New node's value.
-  Future setNodeValue(NodeId nodeId, String value) async {
+  Future<void> setNodeValue(NodeId nodeId, String value) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'value': value,
@@ -664,7 +667,7 @@ class DOMApi {
   /// Sets node HTML markup, returns new node id.
   /// [nodeId] Id of the node to set markup for.
   /// [outerHTML] Outer HTML markup to set.
-  Future setOuterHTML(NodeId nodeId, String outerHTML) async {
+  Future<void> setOuterHTML(NodeId nodeId, String outerHTML) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
       'outerHTML': outerHTML,
@@ -673,7 +676,7 @@ class DOMApi {
   }
 
   /// Undoes the last performed action.
-  Future undo() async {
+  Future<void> undo() async {
     await _client.send('DOM.undo');
   }
 
