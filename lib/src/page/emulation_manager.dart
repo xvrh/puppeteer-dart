@@ -1,3 +1,4 @@
+import 'package:chrome_dev_tools/domains/domains.dart';
 import 'package:chrome_dev_tools/src/tab.dart';
 import 'package:chrome_dev_tools/domains/emulation.dart';
 import 'package:meta/meta.dart';
@@ -58,21 +59,21 @@ class EmulationManager {
   static final landscape = ScreenOrientation(
       angle: 90, type: ScreenOrientationType.landscapePrimary);
 
-  final Tab tab;
+  final Domains domains;
   bool _emulatingMobile = false;
   bool _hasTouch = false;
 
 
-  EmulationManager(this.tab);
+  EmulationManager(this.domains);
 
   Future<bool> emulateViewport(DeviceViewport viewport) async {
     var screenOrientation = viewport.isLandscape ? landscape : portrait;
 
     await Future.wait([
-      tab.emulation.setDeviceMetricsOverride(viewport.width, viewport.height,
+      domains.emulation.setDeviceMetricsOverride(viewport.width, viewport.height,
           viewport.deviceScaleFactor, viewport.isMobile,
           screenOrientation: screenOrientation),
-      tab.emulation.setTouchEmulationEnabled(viewport.hasTouch),
+      domains.emulation.setTouchEmulationEnabled(viewport.hasTouch),
     ]);
 
     var reloadNeeded =

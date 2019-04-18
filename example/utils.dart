@@ -1,4 +1,4 @@
-import 'dart:async';
+/*import 'dart:async';
 import 'dart:io';
 
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
@@ -11,17 +11,6 @@ import 'package:path/path.dart' as p;
 void setupLogger() {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen(print);
-}
-
-Future chromeTab(Function(Tab) callback) async {
-  Chrome chrome = await Chrome.start();
-  Tab tab = await chrome.newTab();
-
-  try {
-    await callback(tab);
-  } finally {
-    await chrome.close();
-  }
 }
 
 Future chromePage(Function(Page) callback) async {
@@ -54,3 +43,4 @@ Future page(Function(Page, String hostUrl) callback) async {
     });
   });
 }
+*/

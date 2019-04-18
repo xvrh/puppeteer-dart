@@ -1,4 +1,4 @@
-import 'dart:async';
+/*import 'dart:async';
 import 'package:chrome_dev_tools/domains/target.dart';
 import 'package:chrome_dev_tools/src/chrome.dart';
 import 'package:chrome_dev_tools/src/target.dart';
@@ -66,3 +66,4 @@ class Tab with TabMixin {
     return value;
   }*/
 }
+*/

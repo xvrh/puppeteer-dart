@@ -30,7 +30,7 @@ class FrameManager {
   PageFrame _mainFrame;
 
   FrameManager(this.page) {
-    _networkManager = NetworkManager(page.client, this);
+    _networkManager = NetworkManager(page.session, this);
 
     _pageApi.onFrameAttached.listen(
         (event) => _onFrameAttached(event.frameId, event.parentFrameId));
@@ -45,9 +45,9 @@ class FrameManager {
     _pageApi.onLifecycleEvent.listen(_onLifecycleEvent);
   }
 
-  PageApi get _pageApi => page.tab.page;
+  PageApi get _pageApi => page.domains.page;
 
-  RuntimeApi get _runtimeApi => page.tab.runtime;
+  RuntimeApi get _runtimeApi => page.domains.runtime;
 
   NetworkManager get networkManager => _networkManager;
 
@@ -171,7 +171,7 @@ class FrameManager {
     if (_frames.containsKey(frameId)) return;
     assert(parentFrameId != null);
     var parentFrame = _frames[parentFrameId];
-    var frame = new PageFrame(this, page.client, parentFrame, frameId);
+    var frame = new PageFrame(this, page.session, parentFrame, frameId);
     _frames[frameId] = frame;
     _frameAttachedController.add(frame);
   }
@@ -195,7 +195,7 @@ class FrameManager {
         frame._id = FrameId(framePayload.id);
       } else {
         // Initial main frame navigation.
-        frame = PageFrame(this, page.client, null, FrameId(framePayload.id));
+        frame = PageFrame(this, page.session, null, FrameId(framePayload.id));
       }
       _frames[FrameId(framePayload.id)] = frame;
       _mainFrame = frame;
@@ -262,7 +262,7 @@ class FrameManager {
         contextPayload.auxData['type'] == 'isolated') {
       _isolatedWorlds.add(contextPayload.name);
     }
-    var context = new ExecutionContext(page.client, contextPayload, world);
+    var context = new ExecutionContext(page.session, contextPayload, world);
     if (world != null) {
       world.setContext(context);
     }

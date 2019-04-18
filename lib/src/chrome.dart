@@ -1,9 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 import 'package:chrome_dev_tools/domains/browser.dart';
 import 'package:chrome_dev_tools/domains/system_info.dart';
-import 'package:chrome_dev_tools/src/downloader.dart';
 import 'package:chrome_dev_tools/src/launcher.dart';
 import 'package:chrome_dev_tools/src/page/page.dart';
 import 'package:chrome_dev_tools/src/page/emulation_manager.dart';
@@ -14,7 +11,6 @@ import 'package:async/async.dart';
 
 import '../domains/target.dart';
 import 'package:chrome_dev_tools/src/connection.dart';
-import 'tab.dart';
 import 'package:logging/logging.dart';
 
 final Logger _logger = Logger('chrome_dev_tools');
@@ -30,13 +26,12 @@ class Browser {
   final _contexts = <BrowserContextID, BrowserContext>{};
   final _targets = <TargetID, Target>{};
   BrowserContext _defaultContext;
-  final _onTargetCreatedController = StreamController<Target>.broadcast(),
-      _onTargetDestroyedController = StreamController<Target>.broadcast(),
-      _onTargetChangedController = StreamController<Target>.broadcast();
+  final _onTargetCreatedController = StreamController<Target>(),
+      _onTargetDestroyedController = StreamController<Target>(),
+      _onTargetChangedController = StreamController<Target>();
 
   Browser._(this.connection, {@required this.defaultViewport, @required bool ignoreHttpsErrors,
-    @required Future Function() closeCallback})
-      :
+    @required Future Function() closeCallback}):
         _closeCallback = closeCallback,
         ignoreHttpsErrors = ignoreHttpsErrors ?? false,
         browser = BrowserApi(connection),
@@ -133,16 +128,16 @@ class Browser {
     }
   }
 
-  Future<Tab> newTab() async {
-    return _defaultContext.newTab();
+  Future<Page> newPage() async {
+    return _defaultContext.newPage();
   }
 
-  Future<Tab> _createTabInContext(BrowserContextID contextId) async {
+  Future<Page> _createPageInContext(BrowserContextID contextId) async {
     var targetId = await targetApi.createTarget('about:blank', browserContextId: contextId);
     var target = _targets[targetId];
     assert(await target.initialized, 'Failed to create target for page');
-    var tab = await target.tab;
-    return tab;
+    var page = await target.page;
+    return page;
   }
 
   List<Target> get targets => _targets.values.where((target) => target.isInitialized).toList();
@@ -215,9 +210,9 @@ class BrowserContext {
     return browser.targets.where((target) => target.browserContext == this).toList();
   }
 
-  Future<List<Tab>> get tabs async {
+  Future<List<Page>> get pages async {
     return await Future.wait(
-        targets.where((target) => target.type == 'page').map((target) => target.tab).where((tabFuture) => tabFuture != null)
+        targets.where((target) => target.type == 'page').map((target) => target.page).where((pageFuture) => pageFuture != null)
     );
   }
 
@@ -225,45 +220,16 @@ class BrowserContext {
     return id != null;
   }
 
-  /**
-   * @param {string} origin
-   * @param {!Array<string>} permissions
-   */
-  async overridePermissions(origin, permissions) {
-    const webPermissionToProtocol = new Map([
-      ['geolocation', 'geolocation'],
-      ['midi', 'midi'],
-      ['notifications', 'notifications'],
-      ['push', 'push'],
-      ['camera', 'videoCapture'],
-      ['microphone', 'audioCapture'],
-      ['background-sync', 'backgroundSync'],
-      ['ambient-light-sensor', 'sensors'],
-      ['accelerometer', 'sensors'],
-      ['gyroscope', 'sensors'],
-      ['magnetometer', 'sensors'],
-      ['accessibility-events', 'accessibilityEvents'],
-      ['clipboard-read', 'clipboardRead'],
-      ['clipboard-write', 'clipboardWrite'],
-      ['payment-handler', 'paymentHandler'],
-      // chrome-specific permissions we have.
-      ['midi-sysex', 'midiSysex'],
-    ]);
-    permissions = permissions.map(permission => {
-    const protocolPermission = webPermissionToProtocol.get(permission);
-    if (!protocolPermission)
-    throw new Error('Unknown permission: ' + permission);
-    return protocolPermission;
-    });
-    await this._connection.send('Browser.grantPermissions', {origin, browserContextId: this._id || undefined, permissions});
+  Future<void> overridePermissions(String origin, List<PermissionType> permissions)async {
+    await browser.browser.grantPermissions(origin, permissions, browserContextId: id);
   }
 
-  async clearPermissionOverrides() {
-    await this._connection.send('Browser.resetPermissions', {browserContextId: this._id || undefined});
+  Future<void> clearPermissionOverrides() {
+    return browser.browser.resetPermissions(browserContextId: id);
   }
 
-  Future<Tab> newTab() {
-    return browser._createTabInContext(id);
+  Future<Page> newPage() {
+    return browser._createPageInContext(id);
   }
 
   Future close() async {

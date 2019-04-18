@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:chrome_dev_tools/src/tab.dart';
+import 'package:chrome_dev_tools/domains/domains.dart';
 import 'package:chrome_dev_tools/domains/fetch.dart';
 import 'package:chrome_dev_tools/domains/fetch.dart' as fetch;
 import 'package:chrome_dev_tools/domains/network.dart';
@@ -38,10 +38,11 @@ class NetworkManager {
     _network.onLoadingFailed.listen(_onLoadingFailed);
   }
 
-  Tab get _tab =>  frameManager.page.tab;
-  FetchApi get _fetch => _tab.fetch;
+  Domains get _domains =>  frameManager.page.domains;
 
-  NetworkApi get _network => frameManager.page.tab.network;
+  FetchApi get _fetch => _domains.fetch;
+
+  NetworkApi get _network => _domains.network;
 
   Stream<NetworkRequest> get onRequest => _onRequestController.stream;
 
@@ -61,9 +62,9 @@ class NetworkManager {
   }
 
   Future<void> initialize() async {
-    await _tab.network.enable();
-    if (frameManager.page.tab.browser.ignoreHttpsErrors) {
-      await _tab.security.setIgnoreCertificateErrors(true);
+    await _domains.network.enable();
+    if (frameManager.page.browser.ignoreHttpsErrors) {
+      await _domains.security.setIgnoreCertificateErrors(true);
     }
   }
 

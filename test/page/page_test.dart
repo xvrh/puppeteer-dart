@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/chrome_downloader.dart';
-import 'package:chrome_dev_tools/src/page.dart';
 import 'package:chrome_dev_tools/src/page/emulation_manager.dart';
 import 'package:logging/logging.dart';
 import 'package:shelf_static/shelf_static.dart';
@@ -15,16 +13,16 @@ main() {
     ..onRecord.listen(print);
 
   HttpServer server;
-  Chrome chrome;
+  Browser chrome;
   Page page;
   String serverPrefix;
   setUpAll(() async {
-    var handler = createStaticHandler('test/data');
+    var handler = createStaticHandler('test/assets');
     server = await io.serve(handler, 'localhost', 0);
 
-    chrome = await Chrome.start((await downloadChrome()).executablePath);
+    chrome = await Browser.start();
     serverPrefix = 'http://localhost:${server.port}/';
-    page = await chrome.newPage('${serverPrefix}empty.html');
+    page = await chrome.newPage();
   });
 
   tearDownAll(() async {

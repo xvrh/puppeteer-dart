@@ -1,5 +1,4 @@
-export 'src/chrome.dart' show Chrome;
-export 'src/tab.dart' show Tab;
+export 'src/chrome.dart' show Browser;
 export 'src/page/page.dart' show Page, PdfMargins, PaperFormat, ScreenshotFormat;
 export 'src/page/lifecycle_watcher.dart' show WaitUntil;
 export 'src/page/js_handle.dart' show JsHandle, ElementHandle;

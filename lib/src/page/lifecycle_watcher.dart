@@ -41,7 +41,7 @@ class LifecycleWatcher {
     return Future.any([
       _timeoutFuture,
       _terminationCompleter.future,
-      frameManager.page.client.onEvent.last.then((_) => Exception('Navigation failed because browser has disconnected!'))
+      frameManager.page.session.closed.then((_) => Exception('Navigation failed because browser has disconnected!'))
     ]);
   }
 

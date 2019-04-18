@@ -5,6 +5,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:chrome_dev_tools/domains/dom.dart';
+import 'package:chrome_dev_tools/domains/domains.dart';
 import 'package:chrome_dev_tools/domains/network.dart';
 import 'package:chrome_dev_tools/domains/page.dart';
 import 'package:chrome_dev_tools/domains/runtime.dart';
@@ -23,18 +24,20 @@ import 'package:chrome_dev_tools/src/page/mouse.dart';
 import 'package:chrome_dev_tools/src/page/network_manager.dart';
 import 'package:chrome_dev_tools/src/page/touchscreen.dart';
 import 'package:chrome_dev_tools/src/page/worker.dart';
-import 'package:chrome_dev_tools/src/tab.dart';
+import 'package:chrome_dev_tools/src/target.dart';
 import 'package:meta/meta.dart';
 import '../connection.dart' show Session;
 
 class Page {
-  final Tab tab;
+  final Target target;
+  final Domains domains;
   final _pageBindings = <String, Function>{};
   final _workers = <SessionID, Worker>{};
   FrameManager _frameManager;
   final StreamController _workerCreated = StreamController<Worker>.broadcast(),
       _workerDestroyed = StreamController<Worker>.broadcast(),
-      _onErrorController = StreamController<ClientError>.broadcast();
+      _onErrorController = StreamController<ClientError>.broadcast(),
+     _onPopupController = StreamController<Page>.broadcast();
   bool _javascriptEnabled = true;
   Duration navigationTimeout;
   Duration defaultTimeout = Duration(seconds: 30);
@@ -44,24 +47,25 @@ class Page {
   Touchscreen _touchscreen;
   Keyboard _keyboard;
 
-  Page._(this.tab) : _emulationManager = EmulationManager(tab) {
+  Page._(this.target, this.domains) : _emulationManager = EmulationManager(domains) {
     _frameManager = FrameManager(this);
-    _keyboard = Keyboard(tab.input);
-    _mouse = Mouse(tab.input, _keyboard);
-    _touchscreen = Touchscreen(tab.runtime, tab.input, _keyboard);
+    _keyboard = Keyboard(domains.input);
+    _mouse = Mouse(domains.input, _keyboard);
+    _touchscreen = Touchscreen(domains.runtime, domains.input, _keyboard);
 
-    tab.target.onAttachedToTarget.listen((e) {
+    domains.target.onAttachedToTarget.listen((e) {
       if (e.targetInfo.type != 'worker') {
         // If we don't detach from service workers, they will never die.
-        tab.target.detachFromTarget(sessionId: e.sessionId);
+        domains.target.detachFromTarget(sessionId: e.sessionId);
       } else {
-        var session = Session(tab.target, e.sessionId);
+        var session = target.browser.connection.sessions[e.sessionId.value];
+        assert(session != null);
         var worker = new Worker(session, e.targetInfo.url);
         _workers[e.sessionId] = worker;
         _workerCreated.add(worker);
       }
     });
-    tab.target.onDetachedFromTarget.listen((e) {
+    domains.target.onDetachedFromTarget.listen((e) {
       var worker = _workers[e.sessionId];
       if (worker != null) {
         _workerDestroyed.add(worker);
@@ -70,24 +74,25 @@ class Page {
     });
 
     // TODO(xha): onConsoleAPI: récupérer tous les arguments du console.xx et les convertir en string
-    tab.runtime.onConsoleAPICalled.listen((e) {
+    domains.runtime.onConsoleAPICalled.listen((e) {
       //If I recall correctly Log.entryAdded() shows errors and warning from Chrome (e.g., XSS violations and such), not necessarily coming from the console.* API.
     });
 
-    tab.runtime.onBindingCalled.listen(_onBindingCalled);
-    tab.page.onJavascriptDialogOpening.listen(_onDialog);
-    tab.runtime.onExceptionThrown.listen(_handleException);
-    tab.log.onEntryAdded.listen(_onLogEntryAdded);
+    domains.runtime.onBindingCalled.listen(_onBindingCalled);
+    domains.page.onJavascriptDialogOpening.listen(_onDialog);
+    domains.runtime.onExceptionThrown.listen(_handleException);
+    domains.log.onEntryAdded.listen(_onLogEntryAdded);
   }
 
-  static Future<Page> create(Tab tab, {DeviceViewport viewport}) async {
-    var page = Page._(tab);
+  static Future<Page> create(Target target, Session session, {DeviceViewport viewport}) async {
+    var domains = Domains(session);
+    var page = Page._(target, domains);
 
     await Future.wait([
       page._frameManager.initialize(),
-      tab.target.setAutoAttach(true, false, flatten: true),
-      tab.performance.enable(),
-      tab.log.enable(),
+      domains.target.setAutoAttach(true, false, flatten: true),
+      domains.performance.enable(),
+      domains.log.enable(),
     ]);
 
     if (viewport != null) {
@@ -97,23 +102,26 @@ class Page {
     return page;
   }
 
+  Session get session => domains.session;
+
+  Browser get browser => target.browser;
+
   void dispose() {
     _frameManager.dispose();
     _workerCreated.close();
     _workerDestroyed.close();
     _onErrorController.close();
+    _onPopupController.close();
   }
 
   Duration get navigationTimeoutOrDefault =>
       navigationTimeout ?? defaultTimeout;
 
-  Client get client => tab.session;
-
   Stream<Worker> get onWorkerCreated => _workerCreated.stream;
 
   Stream<Worker> get onWorkerDestroyed => _workerDestroyed.stream;
 
-  Stream get onPageCrashed => tab.inspector.onTargetCrashed;
+  Stream get onPageCrashed => domains.inspector.onTargetCrashed;
 
   Stream<PageFrame> get onFrameAttached => _frameManager.onFrameAttached;
 
@@ -122,17 +130,17 @@ class Page {
   Stream<PageFrame> get onFrameNavigated => _frameManager.onFrameNavigated;
 
   Stream<MonotonicTime> get onDomContentLoaded =>
-      tab.page.onDomContentEventFired;
+      domains.page.onDomContentEventFired;
 
-  Stream<MonotonicTime> get onLoad => tab.page.onLoadEventFired;
+  Stream<MonotonicTime> get onLoad => domains.page.onLoadEventFired;
 
   Stream<ClientError> get onError => _onErrorController.stream;
 
   FrameManager get frameManager => _frameManager;
 
-  Future get onClose => tab.onClose;
+  Future get onClose => target.onClose;
 
-  bool get isClosed => tab.session.isClosed;
+  bool get isClosed => domains.session.isClosed;
 
   PageFrame get mainFrame => _frameManager.mainFrame;
 
@@ -177,13 +185,13 @@ class Page {
   }
 
   Future<List<Cookie>> cookies(List<String> urls) {
-    return tab.network.getCookies(urls: urls);
+    return domains.network.getCookies(urls: urls);
   }
 
   Future<void> deleteCookies(List<Cookie> cookies) async {
     var pageUrl = url;
     for (var cookie in cookies) {
-      await tab.network.deleteCookies(cookie.name,
+      await domains.network.deleteCookies(cookie.name,
           url: pageUrl.startsWith('http') ? pageUrl : null,
           domain: cookie.domain,
           path: cookie.path);
@@ -191,7 +199,7 @@ class Page {
   }
 
   Future<void> setCookies(List<CookieParam> cookies) async {
-    await tab.network.setCookies(cookies);
+    await domains.network.setCookies(cookies);
   }
 
   Future<ElementHandle> addScriptTag(
@@ -233,8 +241,8 @@ function addPageBinding(bindingName) {
     _pageBindings[name] = callbackFunction;
 
     var expression = evaluationString(_addPageBinding, [name]);
-    await tab.runtime.addBinding(name);
-    await tab.page.addScriptToEvaluateOnNewDocument(expression);
+    await domains.runtime.addBinding(name);
+    await domains.page.addScriptToEvaluateOnNewDocument(expression);
     await Future.wait(frameManager.frames
         .map((frame) => frame.evaluate(Js.expression(expression))));
   }
@@ -278,7 +286,7 @@ function addPageBinding(bindingName) {
       expression = evaluationString(
           _deliverError, [name, seq, error.toString(), stackTrace.toString()]);
     }
-    await tab.runtime.evaluate(expression, contextId: event.executionContextId);
+    await domains.runtime.evaluate(expression, contextId: event.executionContextId);
   }
 
   static final _deliverResult = '''
@@ -335,7 +343,7 @@ function deliverError(name, seq, message, stack) {
     var responseFuture =
         waitForNavigation(timeout: timeout, waitUntil: waitUntil);
 
-    await tab.page.reload();
+    await domains.page.reload();
     return await responseFuture;
   }
 
@@ -373,7 +381,7 @@ function deliverError(name, seq, message, stack) {
 
   Future<NetworkResponse> _go(int delta,
       {Duration timeout, WaitUntil waitUntil}) async {
-    var history = await tab.page.getNavigationHistory();
+    var history = await domains.page.getNavigationHistory();
     int index = history.currentIndex + delta;
     if (index < 0 || index >= history.entries.length) {
       return null;
@@ -381,18 +389,18 @@ function deliverError(name, seq, message, stack) {
     var entry = history.entries[index];
     var navigationFuture =
         waitForNavigation(timeout: timeout, waitUntil: waitUntil);
-    await tab.page.navigateToHistoryEntry(entry.id);
+    await domains.page.navigateToHistoryEntry(entry.id);
     return await navigationFuture;
   }
 
   Future<void> bringToFront() async {
-    await tab.page.bringToFront();
+    await domains.page.bringToFront();
   }
 
   Future<void> emulate(Device device) async {
     await setViewport(device.viewport);
     await setUserAgent(device.userAgent(
-        (await tab.browser.browser.getVersion()).product.split('/').last));
+        (await domains.browser.getVersion()).product.split('/').last));
   }
 
   bool get javascriptEnabled => _javascriptEnabled;
@@ -403,17 +411,17 @@ function deliverError(name, seq, message, stack) {
     }
     _javascriptEnabled = enabled;
 
-    await tab.emulation.setScriptExecutionDisabled(!enabled);
+    await domains.emulation.setScriptExecutionDisabled(!enabled);
   }
 
   Future<void> setBypassCSP(bool enabled) {
-    return tab.page.setBypassCSP(enabled);
+    return domains.page.setBypassCSP(enabled);
   }
 
   Future<void> emulateMedia(String mediaType) {
     assert(mediaType == 'screen' || mediaType == 'print' || mediaType == null,
         'Unsupported media type: ' + mediaType);
-    return tab.emulation.setEmulatedMedia(mediaType);
+    return domains.emulation.setEmulatedMedia(mediaType);
   }
 
   Future setViewport(DeviceViewport viewport) async {
@@ -432,7 +440,7 @@ function deliverError(name, seq, message, stack) {
 
   Future evaluateOnNewDocument(String pageFunction, {List args}) async {
     var source = evaluationString(pageFunction, args);
-    await tab.page.addScriptToEvaluateOnNewDocument(source);
+    await domains.page.addScriptToEvaluateOnNewDocument(source);
   }
 
   Future<void> setCacheEnabled(enabled) {
@@ -453,8 +461,8 @@ function deliverError(name, seq, message, stack) {
         'Quality is only supported for the jpeg screenshots');
     assert(clip == null || !fullPage, "clip and fullPage are exclusive");
 
-    return screenshotPool(tab.browser).withResource(() async {
-      await tab.target.activateTarget(tab.targetId);
+    return screenshotPool(target.browser).withResource(() async {
+      await domains.target.activateTarget(target.targetID);
 
       Viewport roundedClip;
       if (clip != null) {
@@ -467,7 +475,7 @@ function deliverError(name, seq, message, stack) {
       }
 
       if (fullPage) {
-        var metrics = await tab.page.getLayoutMetrics();
+        var metrics = await domains.page.getLayoutMetrics();
 
         // Overwrite clip for full page at all times.
         roundedClip = Viewport(
@@ -482,20 +490,20 @@ function deliverError(name, seq, message, stack) {
         var screenOrientation = viewport.isLandscape
             ? EmulationManager.landscape
             : EmulationManager.portrait;
-        await tab.emulation.setDeviceMetricsOverride(roundedClip.width,
+        await domains.emulation.setDeviceMetricsOverride(roundedClip.width,
             roundedClip.height, viewport.deviceScaleFactor, viewport.isMobile,
             screenOrientation: screenOrientation);
       }
       var shouldSetDefaultBackground =
           omitBackground && format == ScreenshotFormat.png;
       if (shouldSetDefaultBackground) {
-        await tab.emulation.setDefaultBackgroundColorOverride(
+        await domains.emulation.setDefaultBackgroundColorOverride(
             color: RGBA(r: 0, g: 0, b: 0, a: 0));
       }
-      var result = await tab.page.captureScreenshot(
+      var result = await domains.page.captureScreenshot(
           format: format.name, quality: quality, clip: roundedClip);
       if (shouldSetDefaultBackground) {
-        await tab.emulation.setDefaultBackgroundColorOverride();
+        await domains.emulation.setDefaultBackgroundColorOverride();
       }
 
       if (fullPage && _viewport != null) {
@@ -528,7 +536,7 @@ function deliverError(name, seq, message, stack) {
     format ??= PaperFormat.letter;
     margins ??= PdfMargins.zero;
 
-    var result = await tab.page.printToPDF(
+    var result = await domains.page.printToPDF(
         landscape: landscape,
         displayHeaderFooter: displayHeaderFooter,
         headerTemplate: headerTemplate,
@@ -554,9 +562,10 @@ function deliverError(name, seq, message, stack) {
   Future<void> close({bool runBeforeUnload}) async {
     runBeforeUnload ??= false;
     if (runBeforeUnload) {
-      await tab.page.close();
+      await domains.page.close();
     } else {
-      await tab.close();
+      await target.browser.targetApi.closeTarget(target.targetID);
+      await target.onClose;
     }
   }
 
@@ -602,6 +611,11 @@ function deliverError(name, seq, message, stack) {
       {Duration timeout, Polling polling}) {
     return mainFrame.waitForFunction(pageFunction, args,
         timeout: timeout, polling: polling);
+  }
+
+  bool get hasPopupListener => _onPopupController.hasListener;
+  void emitPopup(Page popup) {
+    _onPopupController.add(popup);
   }
 }
 

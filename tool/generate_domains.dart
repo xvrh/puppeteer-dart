@@ -129,22 +129,19 @@ main() {
 
   StringBuffer tabBuffer = StringBuffer();
 
-  List<Domain> tabDomains = domains
-      .where((d) =>
-          !d.deprecated &&
-          !const ['SystemInfo', 'Browser']
-              .contains(d.name))
-      .toList();
+  List<Domain> tabDomains = domains.where((d) => !d.deprecated).toList();
 
   for (Domain domain in tabDomains) {
     tabBuffer
         .writeln("import '../domains/${_underscoreize(domain.name)}.dart';");
   }
-  tabBuffer.writeln("import 'connection.dart';");
+  tabBuffer.writeln("import '../src/connection.dart';");
   tabBuffer.writeln();
   tabBuffer.writeln('''
-mixin TabMixin {
-  Session get session;
+class Domains {
+  final Session session;
+  
+  Domains(this.session);
 ''');
 
   for (Domain domain in tabDomains) {
@@ -159,7 +156,7 @@ mixin TabMixin {
   tabBuffer.writeln('}');
 
   _writeDartFile(
-      p.join(libPath, 'src', 'tab_mixin.dart'), tabBuffer.toString());
+      p.join(libPath, 'domains', 'domains.dart'), tabBuffer.toString());
 }
 
 final DartFormatter _dartFormatter =

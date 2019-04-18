@@ -1,51 +1,43 @@
 import 'dart:io';
 
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/domains/dom.dart';
-import 'package:chrome_dev_tools/domains/runtime.dart';
-import 'package:chrome_dev_tools/src/page/keyboard.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
+import 'package:shelf_static/shelf_static.dart';
+import 'package:shelf/shelf_io.dart' as io;
 
-import 'utils.dart';
-
-//http://w3c.github.io/uievents/tools/key-event-viewer
 main() async {
-  await page((Page page, String url) async {
-    await page.goto(p.url.join(url, 'html/keyboard.html'));
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen(print);
 
-    Node document = await page.tab.dom.getDocument();
+  var handler = createStaticHandler('example');
+  var server = await io.serve(handler, 'localhost', 0);
 
-    NodeId input = await page.tab.dom.querySelector(document.nodeId, 'input');
-    RemoteObject element = await page.tab.dom.resolveNode(nodeId: input);
+  var browser = await Browser.start();
+  var page = await browser.newPage();
 
-    await page.tab.dom.focus(nodeId: input);
+  await page.goto(p.url.join('http://${server.address.host}:${server.port}', 'html/keyboard.html'));
 
-    await page.bringToFront();
+  var input = await page.$('input');
 
-    await page.keyboard.type("éèà Hello");
+  await input.focus();
 
-    await page.keyboard.down(Key.shift);
-    await page.keyboard.press(Key.arrowLeft);
-    await page.keyboard.press(Key.arrowLeft);
-    await page.keyboard.press(Key.backspace);
-    await page.keyboard.up(Key.shift);
-    await page.keyboard.press(Key.arrowLeft);
-    await page.keyboard.press(Key.arrowLeft);
+  await page.bringToFront();
 
-    var properties = await page.tab.remoteObjectProperties(element);
-    print(properties['value']);
+  await page.keyboard.type("éèà Hello");
 
-    print(properties);
+  await page.keyboard.down(Key.shift);
+  await page.keyboard.press(Key.arrowLeft);
+  await page.keyboard.press(Key.arrowLeft);
+  await page.keyboard.press(Key.backspace);
+  await page.keyboard.up(Key.shift);
+  await page.keyboard.press(Key.arrowLeft);
+  await page.keyboard.press(Key.arrowLeft);
 
-    var screenshot = await (await page.$('input')).screenshot();
-    File('example/_input.png').writeAsBytesSync(screenshot);
+  var screenshot = await input.screenshot();
+  File('example/_input.png').writeAsBytesSync(screenshot);
 
-    // - Ecrire du texte
-    // - revenir en arrière et effacer certains mot (flèches + backspace)
-    // - Gérer la selection (flèche, ctrl, backspace)
-    // - faire les raccourcit clavier
-
-
-    // Tester les events sur la page: http://w3c.github.io/uievents/tools/key-event-viewer?
-  });
+  await browser.close();
+  await server.close();
+  // Tester les events sur la page: http://w3c.github.io/uievents/tools/key-event-viewer?
 }

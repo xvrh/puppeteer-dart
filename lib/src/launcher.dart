@@ -88,10 +88,12 @@ Future<Browser> launch(
   if (webSocketUrl != null) {
     Connection connection = await Connection.create(webSocketUrl);
 
-    Browser browser = createBrowser(connection,
+    Browser browser = await createBrowser(connection,
         defaultViewport: defaultViewport,
         closeCallback: () => _gracefullyClose(chromeProcess), ignoreHttpsErrors: ignoreHttpsErrors);
-    await browser.waitForTarget((target) => target.type == 'page');
+    Future targetFuture = browser.waitForTarget((target) => target.type == 'page');
+    await browser.targetApi.setDiscoverTargets(true);
+    await targetFuture;
     return browser;
   } else {
     throw Exception('Not able to connect to Chrome DevTools');

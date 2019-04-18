@@ -1,14 +1,9 @@
 import 'dart:async';
 import 'package:chrome_dev_tools/domains/target.dart';
 import 'package:chrome_dev_tools/src/chrome.dart';
-import 'package:chrome_dev_tools/src/tab.dart';
+import 'package:chrome_dev_tools/src/page/page.dart';
 import 'package:meta/meta.dart';
-
-import '../domains/runtime.dart';
 import 'package:chrome_dev_tools/src/connection.dart';
-import 'tab_mixin.dart';
-import 'wait_until.dart' as helper;
-import 'remote_object.dart' as helper;
 
 class Target {
   final Browser browser;
@@ -17,7 +12,7 @@ class Target {
   final Future<Session> Function() _sessionFactory;
   TargetInfo _info;
   final _initializeCompleter = Completer<bool>();
-  Future<Tab> _tabFuture;
+  Future<Page> _pageFuture;
   Future<bool> _initialized;
   final _closedCompleter = Completer();
   bool _isInitialized = false;
@@ -28,13 +23,13 @@ class Target {
       if (!success)
         return false;
       var opener = this.opener;
-      if (opener == null || opener._tabFuture == null || type != 'page')
+      if (opener == null || opener._pageFuture == null || type != 'page')
         return true;
 
-      var openerPage = await opener._tabFuture;
+      var openerPage = await opener._pageFuture;
 
       if (openerPage.hasPopupListener) {
-        openerPage.emitPopup(await tab);
+        openerPage.emitPopup(await page);
       }
       return true;
     });
@@ -59,12 +54,12 @@ class Target {
     return _info.openerId != null ? browser.targetById(_info.openerId) : null;
   }
 
-  Future<Tab> get tab {
-    if ((_info.type == 'page' || _info.type == 'background_page') && _tabFuture == null) {
-      _tabFuture = this._sessionFactory()
-          .then((session) => new Tab(this, session));
+  Future<Page> get page {
+    if ((_info.type == 'page' || _info.type == 'background_page') && _pageFuture == null) {
+      _pageFuture = this._sessionFactory()
+          .then((session) => Page.create(this, session));
   }
-    return _tabFuture;
+    return _pageFuture;
   }
 
   void changeInfo(TargetInfo info) {
