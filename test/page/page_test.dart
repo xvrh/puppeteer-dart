@@ -1,37 +1,28 @@
-import 'dart:io';
-
 import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/src/page/emulation_manager.dart';
 import 'package:logging/logging.dart';
-import 'package:shelf_static/shelf_static.dart';
 import 'package:test/test.dart';
-import 'package:shelf/shelf_io.dart' as io;
+
+import '../utils.dart';
 
 main() {
-  Logger.root
-    ..level = Level.ALL
-    ..onRecord.listen(print);
+  Logger.root.onRecord.listen(print);
 
-  HttpServer server;
-  Browser chrome;
+  Server server;
+  Browser browser;
   Page page;
-  String serverPrefix;
   setUpAll(() async {
-    var handler = createStaticHandler('test/assets');
-    server = await io.serve(handler, 'localhost', 0);
-
-    chrome = await Browser.start();
-    serverPrefix = 'http://localhost:${server.port}/';
-    page = await chrome.newPage();
+    server = await Server.create();
+    browser = await Browser.start();
+    page = await browser.newPage();
   });
 
   tearDownAll(() async {
-    await chrome.close();
-    await server.close(force: true);
+    await browser.close();
+    await server.close();
   });
 
   test('Go to', () async {
-    await page.goto('${serverPrefix}simple.html');
+    await page.goto(server.assetUrl('simple.html'));
     var input = await page.$('#one-input');
     expect(
         await (await input.property('value')).jsonValue, equals('some text'));
@@ -44,9 +35,9 @@ main() {
       found = true;
       return handle;
     });
-    await page.goto('${serverPrefix}empty.html');
+    await page.goto(server.emptyPage);
     expect(found, isFalse);
-    await page.goto('${serverPrefix}grid.html');
+    await page.goto(server.assetUrl('grid.html'));
     var handle = await waitFor;
     expect(found, isTrue);
     expect(await handle.propertyValue('className'), equals('box'));
@@ -55,26 +46,26 @@ main() {
   test('should wait for an xpath', () async {
     var found = false;
     var waitFor = page.waitForXPath('//div').then((handle) => found = true);
-    await page.goto('${serverPrefix}empty.html');
+    await page.goto(server.emptyPage);
     expect(found, isFalse);
-    await page.goto('${serverPrefix}grid.html');
+    await page.goto(server.assetUrl('grid.html'));
     await waitFor;
     expect(found, isTrue);
   });
 
-  final Js addElement = Js.function(
+  final addElement =
       //language=js
-      'function _(tag) {return document.body.appendChild(document.createElement(tag));}');
+      'function _(tag) {return document.body.appendChild(document.createElement(tag));}';
 
   test('should immediately resolve promise if node exists', () async {
-    await page.goto('${serverPrefix}empty.html');
+    await page.goto(server.emptyPage);
     await page.waitForSelector('*');
     await page.evaluate(addElement, args: ['div']);
     await page.waitForSelector('div');
   });
 
   test('should resolve promise when node is added', () async {
-    await page.goto('${serverPrefix}empty.html');
+    await page.goto(server.emptyPage);
     var watchdog = page.waitForSelector('div');
     await page.evaluate(addElement, args: ['br']);
     await page.evaluate(addElement, args: ['div']);
@@ -84,13 +75,13 @@ main() {
   });
 
   test('should work with multiline body', () async {
-    var result = await page.waitForFunction(Js.function(
+    var result = await page.waitForFunction(
         //language=js
         '''
 function _() {
   return (() => true)();
 }
-'''), []);
+''', []);
     expect(await result.jsonValue, isTrue);
   });
 
@@ -98,7 +89,7 @@ function _() {
     await Future.wait([
       page.waitForFunction(
           //language=js
-          Js.function('function _() {return window.innerWidth < 100;}'), []),
+          '() => window.innerWidth < 100', []),
       page.setViewport(DeviceViewport(width: 10, height: 10)),
     ]);
   });

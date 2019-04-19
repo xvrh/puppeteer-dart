@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:chrome_dev_tools/domains/dom.dart';
 import 'package:chrome_dev_tools/domains/runtime.dart';
+import 'package:chrome_dev_tools/src/connection.dart';
 import 'package:chrome_dev_tools/src/page/execution_context.dart';
 import 'package:chrome_dev_tools/src/page/frame_manager.dart';
 import 'package:chrome_dev_tools/src/page/helper.dart';
@@ -19,8 +20,8 @@ class JsHandle {
 
   JsHandle(this.context, this.remoteObject);
 
-  factory JsHandle.fromRemoteObject(
-      ExecutionContext context, RemoteObject remoteObject) {
+  factory JsHandle.fromRemoteObject(ExecutionContext context,
+      RemoteObject remoteObject) {
     var frame = context.frame;
     if (remoteObject.subtype == RemoteObjectSubtype.node && frame != null) {
       var frameManager = context.world.frameManager;
@@ -32,15 +33,15 @@ class JsHandle {
   bool get isDisposed => _disposed;
 
   Future<JsHandle> property(String propertyName) async {
-    var objectHandle = await context.evaluateHandle(Js.function(
-        //language=js
+    var objectHandle = await context.evaluateHandle(
+      //language=js
         '''
 function _(object, propertyName) {
   const result = {__proto__: null};
   result[propertyName] = object[propertyName];
   return result;
 }
-'''), args: [this, propertyName]);
+''', args: [this, propertyName]);
     var properties = await objectHandle.properties;
     var result = properties[propertyName];
     await objectHandle.dispose();
@@ -118,15 +119,15 @@ class ElementHandle extends JsHandle {
 
   Future<PageFrame> get contentFrame async {
     var nodeInfo =
-        await context.domApi.describeNode(objectId: remoteObject.objectId);
+    await context.domApi.describeNode(objectId: remoteObject.objectId);
 
     if (nodeInfo.frameId == null) return null;
     return frameManager.frame(nodeInfo.frameId);
   }
 
   Future _scrollIntoViewIfNeeded() async {
-    var error = await context.evaluate(Js.function(
-        //language=js
+    var error = await context.evaluate(
+      //language=js
         '''
 async function _(element, pageJavascriptEnabled) {
   if (!element.isConnected) {
@@ -152,7 +153,7 @@ async function _(element, pageJavascriptEnabled) {
   }
   return false;
 }
-'''), args: [this, page.javascriptEnabled]);
+''', args: [this, page.javascriptEnabled]);
     if (error != null && error != false) {
       throw Exception(error);
     }
@@ -160,29 +161,32 @@ async function _(element, pageJavascriptEnabled) {
 
   Future<Point> _clickablePoint() async {
     var quads =
-        await context.domApi.getContentQuads(objectId: remoteObject.objectId);
-    var layoutMetrics = await context.pageApi.getLayoutMetrics();
+    await context.domApi.getContentQuads(objectId: remoteObject.objectId)
+        .catchError((_) => null,
+        test: ServerException.matcher('Could not compute content quads.'));
+        var layoutMetrics = await context.pageApi.getLayoutMetrics();
 
     if (quads == null || quads.isEmpty) {
-      throw Exception('Node is either not visible or not an HTMLElement');
+      throw NodeIsNotVisibleException();
     }
 
     var layoutViewport = layoutMetrics.layoutViewport;
 
     // Filter out quads that have too small area to click into.
     var pointsList = quads
-        .map((quad) => _fromProtocolQuad(quad))
-        .map((quad) => _intersectQuadWithViewport(
+        .map(quadToPoints)
+        .map((quad) =>
+        _intersectQuadWithViewport(
             quad, layoutViewport.clientWidth, layoutViewport.clientHeight))
         .where((quad) => _computeQuadArea(quad) > 1)
         .toList();
     if (pointsList.isEmpty) {
-      throw Exception('Node is either not visible or not an HTMLElement');
+      throw NodeIsNotVisibleException();
     }
     // Return the middle point of the first quad.
     var points = pointsList[0];
-    var x = 0;
-    var y = 0;
+    num x = 0;
+    num y = 0;
     for (var point in points) {
       x += point.x;
       y += point.y;
@@ -190,7 +194,7 @@ async function _(element, pageJavascriptEnabled) {
     return Point(x / 4, y / 4);
   }
 
-  List<Point> _fromProtocolQuad(Quad quad) {
+  static List<Point> quadToPoints(Quad quad) {
     return [
       Point(quad.value[0], quad.value[1]),
       Point(quad.value[2], quad.value[3]),
@@ -199,10 +203,12 @@ async function _(element, pageJavascriptEnabled) {
     ];
   }
 
-  Iterable<Point> _intersectQuadWithViewport(
-      List<Point> quad, num width, num height) {
-    return quad.map((point) =>
-        Point(min(max(point.x, 0), width), min(max(point.y, 0), height)));
+  List<Point> _intersectQuadWithViewport(List<Point> quad, num width,
+      num height) {
+    return quad
+        .map((point) =>
+        Point(min(max(point.x, 0), width), min(max(point.y, 0), height)))
+        .toList();
   }
 
   static num _computeQuadArea(List<Point> quad) {
@@ -244,9 +250,9 @@ async function _(element, pageJavascriptEnabled) {
   }
 
   Future<void> focus() {
-    return frame.evaluate(
-        //language=js
-        Js.function('function _(element) {return element.focus();}'),
+    return context.evaluate(
+      //language=js
+        'function _(element) {return element.focus();}',
         args: [this]);
   }
 
@@ -275,7 +281,10 @@ async function _(element, pageJavascriptEnabled) {
   }
 
   Future<BoxModel> boxModel() {
-    return context.domApi.getBoxModel(objectId: remoteObject.objectId);
+    return context.domApi
+        .getBoxModel(objectId: remoteObject.objectId)
+        .catchError((_) => null,
+        test: ServerException.matcher('Could not compute box model.'));
   }
 
   Future<List<int>> screenshot(
@@ -284,7 +293,7 @@ async function _(element, pageJavascriptEnabled) {
 
     var boundingBox = await this.boundingBox();
     assert(boundingBox != null,
-        'Node is either not visible or not an HTMLElement');
+    'Node is either not visible or not an HTMLElement');
 
     var viewport = page.viewport;
 
@@ -302,7 +311,7 @@ async function _(element, pageJavascriptEnabled) {
 
     boundingBox = await this.boundingBox();
     assert(boundingBox != null,
-        'Node is either not visible or not an HTMLElement');
+    'Node is either not visible or not an HTMLElement');
     assert(boundingBox.width != 0, 'Node has 0 width.');
     assert(boundingBox.height != 0, 'Node has 0 height.');
 
@@ -330,9 +339,8 @@ async function _(element, pageJavascriptEnabled) {
 
   Future<ElementHandle> $(String selector) async {
     var handle = await context.evaluateHandle(
-        //language=js
-        Js.function(
-            'function _(element, selector) {return element.querySelector(selector);}'),
+      //language=js
+        '(element, selector) => element.querySelector(selector);',
         args: [this, selector]);
     var element = handle.asElement;
     if (element != null) return element;
@@ -342,9 +350,8 @@ async function _(element, pageJavascriptEnabled) {
 
   Future<List<ElementHandle>> $$(String selector) async {
     var arrayHandle = await context.evaluateHandle(
-        //language=js
-        Js.function(
-            'function _(element, selector) {return element.querySelectorAll(selector);}'),
+      //language=js
+        'function _(element, selector) {return element.querySelectorAll(selector);}',
         args: [this, selector]);
     var properties = await arrayHandle.properties;
     await arrayHandle.dispose();
@@ -356,7 +363,8 @@ async function _(element, pageJavascriptEnabled) {
     return result;
   }
 
-  Future<T> $eval<T>(String selector, Js pageFunction, {List args}) async {
+  Future<T> $eval<T>(String selector, @javascript String pageFunction,
+      {List args}) async {
     var elementHandle = await $(selector);
     if (elementHandle == null) {
       throw Exception(
@@ -373,11 +381,11 @@ async function _(element, pageJavascriptEnabled) {
     return result;
   }
 
-  Future<T> $$eval<T>(String selector, Js pageFunction, {List args}) async {
+  Future<T> $$eval<T>(String selector, @javascript String pageFunction,
+      {List args}) async {
     var arrayHandle = await context.evaluateHandle(
-        //language=js
-        Js.function(
-            'function _(element, selector) {return Array.from(element.querySelectorAll(selector));}'),
+      //language=js
+        'function _(element, selector) {return Array.from(element.querySelectorAll(selector));}',
         args: [this, selector]);
 
     List allArgs = [arrayHandle];
@@ -391,8 +399,8 @@ async function _(element, pageJavascriptEnabled) {
   }
 
   Future<List<ElementHandle>> $x(String expression) async {
-    var arrayHandle = await context.evaluateHandle(Js.function(
-        //language=js
+    var arrayHandle = await context.evaluateHandle(
+      //language=js
         '''
 function _(element, expression) {
   const document = element.ownerDocument || element;
@@ -403,7 +411,7 @@ function _(element, expression) {
     array.push(item);
   return array;
 }
-'''), args: [this, expression]);
+''', args: [this, expression]);
     var properties = await arrayHandle.properties;
     await arrayHandle.dispose();
     var result = <ElementHandle>[];
@@ -415,8 +423,8 @@ function _(element, expression) {
   }
 
   Future<bool> get isIntersectingViewport {
-    return context.evaluate(Js.function(
-        //language=js
+    return context.evaluate(
+      //language=js
         '''
 async function _(element) {
   const visibleRatio = await new Promise(resolve => {
@@ -427,6 +435,10 @@ async function _(element) {
     observer.observe(element);
   });
   return visibleRatio > 0;
-}'''), args: [this]);
+}''', args: [this]);
   }
+}
+
+class NodeIsNotVisibleException {
+  String toString() => 'Node is either not visible or not an HTMLElement';
 }

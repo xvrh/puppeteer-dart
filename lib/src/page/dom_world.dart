@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:chrome_dev_tools/src/javascript_function_parser.dart';
 import 'package:chrome_dev_tools/src/page/execution_context.dart';
 import 'package:chrome_dev_tools/src/page/frame_manager.dart';
 import 'package:chrome_dev_tools/src/page/js_handle.dart';
@@ -55,12 +56,12 @@ class DomWorld {
     return _contextCompleter.future;
   }
 
-  Future<JsHandle> evaluateHandle(Js js, {List args}) async {
+  Future<JsHandle> evaluateHandle(@javascript String pageFunction, {List args}) async {
     var context = await executionContext;
-    return context.evaluateHandle(js, args: args);
+    return context.evaluateHandle(pageFunction, args: args);
   }
 
-  Future<T> evaluate<T>(Js pageFunction, {List args}) async {
+  Future<T> evaluate<T>(@javascript String pageFunction, {List args}) async {
     var context = await executionContext;
     return context.evaluate<T>(pageFunction, args: args);
   }
@@ -76,7 +77,7 @@ class DomWorld {
       return _documentFuture;
     }
     _documentFuture = executionContext.then((context) async {
-      var document = await context.evaluateHandle(Js.expression('document'));
+      var document = await context.evaluateHandle('document');
       return document.asElement;
     });
     return _documentFuture;
@@ -88,12 +89,12 @@ class DomWorld {
     return value;
   }
 
-  Future<T> $eval<T>(String selector, Js js, {List args}) async {
+  Future<T> $eval<T>(String selector, @javascript String pageFunction, {List args}) async {
     var document = await _document;
-    return document.$eval<T>(selector, js, args: args);
+    return document.$eval<T>(selector, pageFunction, args: args);
   }
 
-  Future<T> $$eval<T>(String selector, Js pageFunction, {List args}) async {
+  Future<T> $$eval<T>(String selector, @javascript String pageFunction, {List args}) async {
     var document = await _document;
     return document.$$eval<T>(selector, pageFunction, args: args);
   }
@@ -105,7 +106,7 @@ class DomWorld {
   }
 
   Future<String> get content async {
-    return await evaluate(Js.function(
+    return await evaluate(
         //language=js
         '''
 function _() {
@@ -118,7 +119,7 @@ function _() {
   }
   return retVal;
 }
-'''));
+''');
   }
 
   Future<void> setContent(String html,
@@ -128,7 +129,7 @@ function _() {
 
     // We rely upon the fact that document.open() will reset frame lifecycle with "init"
     // lifecycle event. @see https://crrev.com/608658
-    await evaluate(Js.function(
+    await evaluate(
         //language=js
         '''
 function _(html) {
@@ -136,7 +137,7 @@ function _(html) {
   document.write(html);
   document.close();
 }
-'''), args: [html]);
+''', args: [html]);
     var watcher = new LifecycleWatcher(frameManager, frame,
         waitUntil: waitUntil, timeout: timeout);
     var error = await Future.any([
@@ -155,7 +156,7 @@ function _(html) {
     var context = await executionContext;
 
     if (url != null) {
-      return (await context.evaluateHandle(Js.function(
+      return (await context.evaluateHandle(
           //language=js
           '''
 async function _(url, type) {
@@ -171,10 +172,10 @@ async function _(url, type) {
   await promise;
   return script;
 }
-'''), args: [url, type])).asElement;
+''', args: [url, type])).asElement;
     }
 
-    var addScriptContent = Js.function(
+    var addScriptContent =
         //language=js
         '''
 function _(content, type) {
@@ -188,7 +189,7 @@ function _(content, type) {
     throw error;
   return script;
 }
-''');
+''';
 
     if (file != null) {
       var contents = await file.readAsString();
@@ -214,7 +215,7 @@ function _(content, type) {
     var context = await executionContext;
 
     if (url != null) {
-      return (await context.evaluateHandle(Js.function(
+      return (await context.evaluateHandle(
           //language=js
           '''
 async function _(url) {
@@ -229,10 +230,10 @@ async function _(url) {
   await promise;
   return link;   
 }
-'''), args: [url])).asElement;
+''', args: [url])).asElement;
     }
 
-    var addStyleContent = Js.function(
+    var addStyleContent =
         //language=js
         '''
 async function _(content) {
@@ -247,7 +248,7 @@ async function _(content) {
   await promise;
   return style;
 }
-''');
+''';
 
     if (file != null) {
       var contents = await file.readAsString();
@@ -287,7 +288,7 @@ async function _(content) {
   }
 
   Future<List<String>> select(String selector, List<String> values) {
-    return $eval(selector, Js.function(
+    return $eval(selector,
         //language=js
         '''
 function _(element, values) {
@@ -306,7 +307,7 @@ function _(element, values) {
   element.dispatchEvent(new Event('change', { 'bubbles': true }));
   return options.filter(option => option.selected).map(option => option.value);
 }
-'''), args: [values]);
+''', args: [values]);
   }
 
   Future<void> tap(String selector) async {
@@ -335,10 +336,11 @@ function _(element, values) {
         isXPath: true, visible: visible, hidden: hidden, timeout: timeout);
   }
 
-  Future<JsHandle> waitForFunction(Js pageFunction, List args,
+  Future<JsHandle> waitForFunction(@javascript String pageFunction, List args,
       {Duration timeout, Polling polling}) async {
-    if (pageFunction.isExpression) {
-      pageFunction = Js.function('function _() { return $pageFunction; }');
+    String functionDeclaration = convertToFunctionDeclaration(pageFunction);
+    if (functionDeclaration == null) {
+      pageFunction = 'function _() { return $functionDeclaration; }';
     }
 
     return await WaitTask(this, pageFunction,
@@ -349,7 +351,7 @@ function _(element, values) {
         .future;
   }
 
-  static final Js _predicate = Js.function(
+  static final _predicate =
       //language=js
       '''
 function _(selectorOrXPath, isXPath, waitForVisible, waitForHidden) {
@@ -375,7 +377,7 @@ function _(selectorOrXPath, isXPath, waitForVisible, waitForHidden) {
     return !!(rect.top || rect.bottom || rect.width || rect.height);
   }      
 }
-''');
+''';
 
   Future<ElementHandle> _waitForSelectorOrXPath(String selectorOrXPath,
       {bool isXPath = false,
@@ -408,12 +410,12 @@ function _(selectorOrXPath, isXPath, waitForVisible, waitForHidden) {
   }
 
   Future<String> get title =>
-      evaluate(Js.expression('document.title'));
+      evaluate('document.title');
 }
 
 class WaitTask {
   final DomWorld domWorld;
-  final Js predicate;
+  @javascript final String predicate;
   final String title;
   final Polling polling;
   final Duration timeout;
@@ -423,7 +425,7 @@ class WaitTask {
   Timer _timeoutTimer;
   bool _terminated = false;
 
-  WaitTask(this.domWorld, this.predicate,
+  WaitTask(this.domWorld, @javascript this.predicate,
       {@required this.title,
       @required this.polling,
       @required this.timeout,
@@ -473,7 +475,7 @@ class WaitTask {
       // Ignore timeouts in pageScript - we track timeouts ourselves.
       // If the frame's execution context has already changed, `frame.evaluate` will
       // throw an error - ignore this predicate run altogether.
-      if (await (domWorld.evaluate(Js.function('function(s) { return !s; }'),
+      if (await (domWorld.evaluate('function(s) { return !s; }',
           args: [success]).catchError((_) => true))) {
         await success.dispose();
         return;
@@ -499,8 +501,7 @@ class WaitTask {
   }
 }
 
-final Js _waitForPredicatePageFunction =
-    Js.function(
+final _waitForPredicatePageFunction =
         //language=js
         '''
 async function _(predicateBody, polling, timeout, ...args) {
@@ -589,7 +590,7 @@ async function _(predicateBody, polling, timeout, ...args) {
     }
   }
 }
-''');
+''';
 
 class Polling {
   static const everyFrame = Polling._raf();

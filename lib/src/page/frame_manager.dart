@@ -309,7 +309,7 @@ class PageFrame {
   PageFrame _parent;
   FrameId _id;
   final lifecycleEvents = <String>{};
-  final children = <PageFrame>{};
+  final children = <PageFrame>[];
   String _url, _name;
   bool _detached = false;
   LoaderId _loaderId;
@@ -350,27 +350,53 @@ class PageFrame {
     return _mainWorld.executionContext;
   }
 
-  Future<JsHandle> evaluateHandle(Js pageFunction, {List args}) {
+  Future<JsHandle> evaluateHandle(@javascript String pageFunction, {List args}) {
     return _mainWorld.evaluateHandle(pageFunction, args: args);
   }
 
-  Future<T> evaluate<T>(Js pageFunction, {List args}) {
+  Future<T> evaluate<T>(@javascript String pageFunction, {List args}) {
     return _mainWorld.evaluate<T>(pageFunction, args: args);
   }
 
+  /// The method queries frame for the selector. If there's no such element
+  /// within the frame, the method will resolve to null.
+  ///
+  /// [selector]: A selector to query frame for
+  /// Returns a Future which resolves to ElementHandle pointing to the frame
+  /// element.
   Future<ElementHandle> $(String selector) {
     return _mainWorld.$(selector);
   }
 
+  /// Evaluates the XPath expression.
   Future<List<ElementHandle>> $x(String expression) {
     return _mainWorld.$x(expression);
   }
 
-  Future<T> $eval<T>(String selector, Js pageFunction, {List args}) {
+  /// This method runs document.querySelector within the frame and passes it as
+  /// the first argument to pageFunction. If there's no element matching
+  /// selector, the method throws an error.
+  ///
+  ///  If pageFunction returns a Promise, then frame.$eval would wait for the
+  ///  promise to resolve and return its value.
+  ///
+  /// Examples:
+  ///
+  /// ```dart
+  /// var searchValue = await frame.$eval('#search', Js.function('function (el) { return el.value; }'));
+  /// var preloadHref = await frame.$eval('link[rel=preload]', Js.function('function (el) { return el.href; }'));
+  /// var html = await frame.$eval('.main-container', , Js.function('function (e) { return e.outerHTML; }'));
+  /// ```
+  ///
+  /// [selector]: A selector to query frame for
+  /// [pageFunction]: Function to be evaluated in browser context
+  /// [args]: Arguments to pass to pageFunction
+  /// Returns a Future which resolves to the return value of pageFunction
+  Future<T> $eval<T>(String selector, @javascript String pageFunction, {List args}) {
     return _mainWorld.$eval<T>(selector, pageFunction, args: args);
   }
 
-  Future<T> $$eval<T>(String selector, Js pageFunction, {List args}) {
+  Future<T> $$eval<T>(String selector, @javascript String pageFunction, {List args}) {
     return _mainWorld.$$eval<T>(selector, pageFunction, args: args);
   }
 
@@ -449,7 +475,7 @@ class PageFrame {
     return result;
   }
 
-  Future<JsHandle> waitForFunction(Js pageFunction, List args,
+  Future<JsHandle> waitForFunction(@javascript String pageFunction, List args,
       {Duration timeout, Polling polling}) {
     return _mainWorld.waitForFunction(pageFunction, args,
         timeout: timeout, polling: polling);

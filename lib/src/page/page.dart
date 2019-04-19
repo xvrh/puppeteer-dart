@@ -150,6 +150,8 @@ class Page {
 
   Mouse get mouse => _mouse;
 
+  List<PageFrame> get frames => frameManager.frames;
+
   _onLogEntryAdded(event) {
     //TODO(xha)
   }
@@ -158,7 +160,7 @@ class Page {
     return mainFrame.$(selector);
   }
 
-  Future<JsHandle> evaluateHandle(Js pageFunction, {List args}) async {
+  Future<JsHandle> evaluateHandle(@javascript String pageFunction, {List args}) async {
     var context = await mainFrame.executionContext;
     return context.evaluateHandle(pageFunction, args: args);
   }
@@ -168,11 +170,11 @@ class Page {
     return context.queryObjects(prototypeHandle);
   }
 
-  Future<T> $eval<T>(String selector, Js pageFunction, {List args}) {
+  Future<T> $eval<T>(String selector, @javascript String pageFunction, {List args}) {
     return mainFrame.$eval<T>(selector, pageFunction, args: args);
   }
 
-  Future<T> $$eval<T>(String selector, Js pageFunction, {List args}) {
+  Future<T> $$eval<T>(String selector, @javascript String pageFunction, {List args}) {
     return mainFrame.$$eval<T>(selector, pageFunction, args: args);
   }
 
@@ -244,7 +246,7 @@ function addPageBinding(bindingName) {
     await domains.runtime.addBinding(name);
     await domains.page.addScriptToEvaluateOnNewDocument(expression);
     await Future.wait(frameManager.frames
-        .map((frame) => frame.evaluate(Js.expression(expression))));
+        .map((frame) => frame.evaluate(expression)));
   }
 
   Future<void> authenticate({String userName, String password}) {
@@ -434,7 +436,7 @@ function deliverError(name, seq, message, stack) {
 
   DeviceViewport get viewport => _viewport;
 
-  Future evaluate(Js pageFunction, {List args}) {
+  Future evaluate(@javascript String pageFunction, {List args}) {
     return _frameManager.mainFrame.evaluate(pageFunction, args: args);
   }
 
@@ -607,7 +609,7 @@ function deliverError(name, seq, message, stack) {
         visible: visible, hidden: hidden, timeout: timeout);
   }
 
-  Future<JsHandle> waitForFunction(Js pageFunction, List args,
+  Future<JsHandle> waitForFunction(@javascript String pageFunction, List args,
       {Duration timeout, Polling polling}) {
     return mainFrame.waitForFunction(pageFunction, args,
         timeout: timeout, polling: polling);

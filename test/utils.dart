@@ -19,54 +19,57 @@ Future server(String location, Function(String) callback) async {
   }
 }
 
-class TestUtils {
-  Chrome chrome;
-  String _hostUrl;
-  HttpServer server;
+class Server {
+  static const _assetFolder = 'assets';
+  HttpServer _httpServer;
 
-  TestUtils._();
+  Server._();
 
-  static TestUtils create() {
-    TestUtils utils = TestUtils._();
-    utils._setup();
-    return utils;
+  static Future<Server> create() async {
+    Server server = Server._();
+    await server._setup();
+    return server;
   }
 
-  _setup() {
-    setUpAll(() async {
-      chrome = await Chrome.start();
-
-      var staticHandler = createStaticHandler('test/assets');
-      var host = 'localhost';
-      server = await io.serve((request) {
-        if (request.url.path.startsWith('assets/')) {
-          return staticHandler(request.change(path: 'assets'));
-        } else {
-          // TODO(xha): tests can add custom handler.
-
-          throw UnimplementedError();
-        }
-      }, host, 0);
-      _hostUrl = 'http://$host:${server.port}';
-    });
-
-    tearDownAll(() async {
-      await chrome.close();
-      await server.close(force: true);
-    });
+  Future _setup() async {
+    var staticHandler = createStaticHandler('test/$_assetFolder');
+    var host = 'localhost';
+    _httpServer = await io.serve((request) {
+      if (request.url.path.startsWith('$_assetFolder/')) {
+        return staticHandler(request.change(path: _assetFolder));
+      } else {
+        // TODO(xha): tests can add custom handler.
+        throw UnimplementedError();
+      }
+    }, host, 0);
   }
 
-  String get hostUrl => _hostUrl;
+  String get hostUrl => 'http://${_httpServer.address.host}:${_httpServer.port}';
+
+  String get prefix => p.url.join(hostUrl, _assetFolder);
+
+  String get emptyPage => assetUrl('empty.html');
 
   String assetUrl(String page) {
-    return p.url.join(_hostUrl, 'assets', page);
+    assert(!page.startsWith('/'));
+    return p.url.join(hostUrl, _assetFolder, page);
   }
 
-  Future<Tab> newTab(String page) {
-    return chrome.newTab();
-  }
+  Future close() => _httpServer.close(force: true);
+}
 
-  Future<Page> newPage(String page) {
-    return chrome.newPage();
-  }
+Future attachFrame(Page page, String frameId, String url) async {
+  var handle = await page.evaluateHandle(
+      //language=js
+      '''
+async function attachFrame(frameId, url) {
+    const frame = document.createElement('iframe');
+    frame.src = url;
+    frame.id = frameId;
+    document.body.appendChild(frame);
+    await new Promise(x => frame.onload = x);
+    return frame;
+  }  
+''',args: [frameId, url]);
+  return await handle.asElement.contentFrame;
 }

@@ -60,7 +60,7 @@ class Keyboard {
   Future<void> type(String text, {Duration delay}) async {
     for (int rune in text.runes) {
       String char = String.fromCharCode(rune);
-
+      
       Key keyForChar = _characters[char];
 
       if (keyForChar != null) {
@@ -478,7 +478,7 @@ final _characters = const {
   '8': Key._(keyCode: 56, key: '8', code: 'Digit8', text: '8'),
   '9': Key._(keyCode: 57, key: '9', code: 'Digit9', text: '9'),
   '\r': Key._(keyCode: 13, key: 'Enter', code: 'Enter', text: '\r'),
-  '\n': Key._(keyCode: 13, key: 'Enter', code: 'Enter', text: '\n'),
+  '\n': Key._(keyCode: 13, key: 'Enter', code: 'Enter', text: '\r'),
   ' ': Key._(keyCode: 32, key: ' ', code: 'Space', text: ' '),
   '\u0000': Key._(
       keyCode: 46,

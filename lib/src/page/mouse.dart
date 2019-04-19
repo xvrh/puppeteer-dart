@@ -21,7 +21,7 @@ class Mouse {
 
   Mouse(this.inputApi, this.keyboard);
 
-  String get _buttonName => _button?.name ?? 'none';
+  static String _buttonName(MouseButton button) => button?.name ?? 'none';
 
   Future<void> move(Point position, {int steps}) async {
     steps ??= 1;
@@ -31,7 +31,7 @@ class Mouse {
       await inputApi.dispatchMouseEvent('mouseMoved',
           from.x + (position.x - from.x) * (i / steps),
           from.y + (position.y - from.y) * (i / steps),
-          button: _buttonName,
+          button: _buttonName(_button),
           modifiers: keyboard.modifiers);
     }
   }
@@ -50,7 +50,7 @@ class Mouse {
     clickCount ??= 1;
     _button = button;
     await inputApi.dispatchMouseEvent(
-        'mousePressed', _position.x, _position.y, button: _buttonName,
+        'mousePressed', _position.x, _position.y, button: _buttonName(button),
         modifiers: keyboard.modifiers,
         clickCount: clickCount);
   }
@@ -60,7 +60,7 @@ class Mouse {
     clickCount ??= 1;
     _button = null;
     await inputApi.dispatchMouseEvent(
-        'mouseReleased', _position.x, _position.y, button: _buttonName,
+        'mouseReleased', _position.x, _position.y, button: _buttonName(button),
         modifiers: keyboard.modifiers,
         clickCount: clickCount);
   }

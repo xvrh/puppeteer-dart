@@ -26,9 +26,9 @@ class Browser {
   final _contexts = <BrowserContextID, BrowserContext>{};
   final _targets = <TargetID, Target>{};
   BrowserContext _defaultContext;
-  final _onTargetCreatedController = StreamController<Target>(),
-      _onTargetDestroyedController = StreamController<Target>(),
-      _onTargetChangedController = StreamController<Target>();
+  final _onTargetCreatedController = StreamController<Target>.broadcast(),
+      _onTargetDestroyedController = StreamController<Target>.broadcast(),
+      _onTargetChangedController = StreamController<Target>.broadcast();
 
   Browser._(this.connection, {@required this.defaultViewport, @required bool ignoreHttpsErrors,
     @required Future Function() closeCallback}):

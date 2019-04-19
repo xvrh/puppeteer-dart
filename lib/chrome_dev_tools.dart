@@ -1,12 +1,13 @@
 export 'src/chrome.dart' show Browser;
 export 'src/page/page.dart' show Page, PdfMargins, PaperFormat, ScreenshotFormat;
 export 'src/page/lifecycle_watcher.dart' show WaitUntil;
-export 'src/page/js_handle.dart' show JsHandle, ElementHandle;
+export 'src/page/js_handle.dart' show JsHandle, ElementHandle, NodeIsNotVisibleException;
 export 'src/page/frame_manager.dart' show PageFrame;
 export 'src/page/dom_world.dart' show Polling;
 export 'src/page/keyboard.dart' show Key;
 export 'src/page/mouse.dart' show MouseButton;
-export 'src/page/execution_context.dart' show Js;
 export 'src/page/network_manager.dart' show NetworkRequest, NetworkResponse;
 export 'src/page/emulation_manager.dart' show DeviceViewport, Device;
 export 'dart:math' show Point, Rectangle;
+export 'src/connection.dart' show ServerException;
+export 'domains/dom.dart' show BoxModel;

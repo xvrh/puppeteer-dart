@@ -240,6 +240,8 @@ class ServerException implements Exception {
 
   @override
   toString() => message;
+
+  static matcher(String message) => (e) => e is ServerException && e.message == message;
 }
 
 class TargetClosedException implements Exception {

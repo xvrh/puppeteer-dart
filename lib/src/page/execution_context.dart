@@ -4,6 +4,7 @@ import 'package:chrome_dev_tools/domains/dom.dart';
 import 'package:chrome_dev_tools/domains/page.dart';
 import 'package:chrome_dev_tools/domains/runtime.dart';
 import 'package:chrome_dev_tools/src/connection.dart';
+import 'package:chrome_dev_tools/src/javascript_function_parser.dart';
 import 'package:chrome_dev_tools/src/page/dom_world.dart';
 import 'package:chrome_dev_tools/src/page/frame_manager.dart';
 import 'package:chrome_dev_tools/src/page/js_handle.dart';
@@ -26,18 +27,25 @@ class ExecutionContext {
 
   PageFrame get frame => world?.frame;
 
-  Future<T> evaluate<T>(Js pageFunction, {List args}) async {
+  Future<T> evaluate<T>(@javascript String pageFunction, {List args}) async {
     var handle = await evaluateHandle(pageFunction, args: args);
     T result = await handle.jsonValue;
     await handle.dispose();
     return result;
   }
 
-  Future<JsHandle> evaluateHandle(Js pageFunction, {List args}) async {
+  Future<JsHandle> evaluateHandle(@javascript String pageFunction, {List args}) async {
+
+    // Try to convert a function shorthand (ie: '(el) => el.value;' to a full
+    // function declaration (function(el) { return el.value; })
+    // If it can't parse the shorthand function, it considers it as a
+    // JavaScript expression.
+    String functionDeclaration = convertToFunctionDeclaration(pageFunction);
+
     try {
-      if (pageFunction.isExpression) {
-        assert(args == null);
-        var response = await runtimeApi.evaluate(pageFunction.toString(),
+      if (functionDeclaration == null) {
+        assert(args == null || args.isEmpty, "Javascript expression can't have arguments (${pageFunction})");
+        var response = await runtimeApi.evaluate(pageFunction,
             contextId: context.id,
             returnByValue: false,
             awaitPromise: true,
@@ -47,7 +55,7 @@ class ExecutionContext {
       } else {
         args ??= [];
 
-        var result = await runtimeApi.callFunctionOn(pageFunction.toString(),
+        var result = await runtimeApi.callFunctionOn(functionDeclaration,
             executionContextId: context.id,
             arguments: args.map(_convertArgument).toList(),
             returnByValue: false,
@@ -130,23 +138,14 @@ class ExecutionContext {
       JsHandle.fromRemoteObject(this, remoteObject);
 }
 
-class Js {
-  final bool isExpression;
-  final String _body;
-
-  Js.expression(String expression)
-      : isExpression = true,
-        _body = expression;
-
-  Js.function(this._body)
-      : isExpression = false;
-
-  @override
-  String toString() => _body;
-}
-
 class ExecutionContextDestroyedException implements Exception {
   @override
   toString() =>
       'Execution context was destroyed, most likely because of a navigation.';
+}
+
+const _Language javascript = _Language('js');
+
+class _Language {
+  const _Language(String language);
 }

@@ -13,6 +13,7 @@ dependencies:
   logging: ^0.11.3
   meta: ^1.1.1
   path: '>=1.0.0 <2.0.0'
+  petitparser: ^2.2.1
   pool: ^1.4.0
 
 dev_dependencies:
