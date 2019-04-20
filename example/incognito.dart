@@ -1,51 +1,44 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/chrome_downloader.dart';
 import 'package:logging/logging.dart';
-import 'package:shelf_static/shelf_static.dart';
+import 'package:puppeteer/puppeteer.dart';
 import 'package:shelf/shelf_io.dart' as io;
+import 'package:shelf_static/shelf_static.dart';
 
 main() async {
-  Logger.root.level = Level.ALL;
-  Logger.root.onRecord.listen(print);
+  Logger.root
+    ..level = Level.ALL
+    ..onRecord.listen(print);
 
   var handler = createStaticHandler('example');
-  HttpServer server = await io.serve(handler, 'localhost', 0);
+  var server = await io.serve(handler, 'localhost', 0);
 
-  try {
-    String chromeExecutable = (await downloadChrome()).executablePath;
-    Chrome chrome = await Chrome.start(chromeExecutable);
+  var chrome = await Browser.start();
 
-    String pageUrl = 'http://localhost:${server.port}/html/incognito.html';
-    try {
-      Tab normalTab1 = await chrome.newTab(pageUrl);
-      Tab normalTab2 = await chrome.newTab(pageUrl);
-      Tab incognitoTab1 = await chrome.newTab(pageUrl, incognito: true);
+  var pageUrl = 'http://localhost:${server.port}/html/incognito.html';
+  var normalTab1 = await chrome.newPage();
+  var normalTab2 = await chrome.newPage();
+  var incognitoContext = await chrome.createIncognitoBrowserContext();
+  var incognitoTab1 = await incognitoContext.newPage();
 
-      await Future.wait([
-        normalTab1.waitUntilNetworkIdle(),
-        normalTab2.waitUntilNetworkIdle(),
-        incognitoTab1.waitUntilNetworkIdle(),
-      ]);
+  await Future.wait([
+    normalTab1.goto(pageUrl, waitUntil: WaitUntil.networkIdle),
+    normalTab2.goto(pageUrl, waitUntil: WaitUntil.networkIdle),
+    incognitoTab1.goto(pageUrl, waitUntil: WaitUntil.networkIdle),
+  ]);
 
-      await normalTab1.runtime
-          .evaluate('window.localStorage.setItem("name", "xavier")');
+  await normalTab1.evaluate('window.localStorage.setItem("name", "xavier")');
 
-      var itemValue = await normalTab2.runtime
-          .evaluate('window.localStorage.getItem("name")', returnByValue: true);
-      assert(itemValue.result.value == 'xavier');
+  String itemValue =
+      await normalTab2.evaluate('window.localStorage.getItem("name")');
+  assert(itemValue == 'xavier');
 
-      var incognitoValue = await incognitoTab1.runtime
-          .evaluate('window.localStorage.getItem("name")', returnByValue: true);
-      assert(incognitoValue.result.value == null);
+  String incognitoValue =
+      await incognitoTab1.evaluate('window.localStorage.getItem("name")');
+  assert(incognitoValue == null);
 
-      print('${itemValue.result.value} vs ${incognitoValue.result.value}');
-    } finally {
-      await chrome.close();
-    }
-  } finally {
-    await server.close(force: true);
-  }
+  print('$itemValue vs $incognitoValue');
+  await chrome.close();
+
+  await server.close(force: true);
 }

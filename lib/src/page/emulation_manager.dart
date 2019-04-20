@@ -1,7 +1,6 @@
-import 'package:chrome_dev_tools/domains/domains.dart';
-import 'package:chrome_dev_tools/src/tab.dart';
-import 'package:chrome_dev_tools/domains/emulation.dart';
 import 'package:meta/meta.dart';
+import 'package:puppeteer/protocol/dev_tools.dart';
+import 'package:puppeteer/protocol/emulation.dart';
 
 class Device {
   final String name;
@@ -55,25 +54,24 @@ class DeviceViewport {
 
 class EmulationManager {
   static final portrait =
-  ScreenOrientation(angle: 0, type: ScreenOrientationType.portraitPrimary);
+      ScreenOrientation(angle: 0, type: ScreenOrientationType.portraitPrimary);
   static final landscape = ScreenOrientation(
       angle: 90, type: ScreenOrientationType.landscapePrimary);
 
-  final Domains domains;
+  final DevTools devTools;
   bool _emulatingMobile = false;
   bool _hasTouch = false;
 
-
-  EmulationManager(this.domains);
+  EmulationManager(this.devTools);
 
   Future<bool> emulateViewport(DeviceViewport viewport) async {
     var screenOrientation = viewport.isLandscape ? landscape : portrait;
 
     await Future.wait([
-      domains.emulation.setDeviceMetricsOverride(viewport.width, viewport.height,
-          viewport.deviceScaleFactor, viewport.isMobile,
+      devTools.emulation.setDeviceMetricsOverride(viewport.width,
+          viewport.height, viewport.deviceScaleFactor, viewport.isMobile,
           screenOrientation: screenOrientation),
-      domains.emulation.setTouchEmulationEnabled(viewport.hasTouch),
+      devTools.emulation.setTouchEmulationEnabled(viewport.hasTouch),
     ]);
 
     var reloadNeeded =

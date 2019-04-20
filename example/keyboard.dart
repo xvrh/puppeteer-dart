@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
-import 'package:shelf_static/shelf_static.dart';
+import 'package:puppeteer/puppeteer.dart';
 import 'package:shelf/shelf_io.dart' as io;
+import 'package:shelf_static/shelf_static.dart';
 
 main() async {
   Logger.root.level = Level.ALL;
@@ -16,7 +16,8 @@ main() async {
   var browser = await Browser.start();
   var page = await browser.newPage();
 
-  await page.goto(p.url.join('http://${server.address.host}:${server.port}', 'html/keyboard.html'));
+  await page.goto(p.url.join(
+      'http://${server.address.host}:${server.port}', 'html/keyboard.html'));
 
   var input = await page.$('input');
 

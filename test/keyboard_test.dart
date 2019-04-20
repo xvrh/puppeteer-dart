@@ -1,5 +1,5 @@
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:logging/logging.dart';
+import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 
 import 'utils.dart';

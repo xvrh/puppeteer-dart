@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'package:chrome_dev_tools/domains/target.dart';
-import 'package:chrome_dev_tools/src/chrome.dart';
-import 'package:chrome_dev_tools/src/page/page.dart';
+
 import 'package:meta/meta.dart';
-import 'package:chrome_dev_tools/src/connection.dart';
+import 'package:puppeteer/protocol/target.dart';
+import 'package:puppeteer/src/browser.dart';
+import 'package:puppeteer/src/connection.dart';
+import 'package:puppeteer/src/page/page.dart';
 
 class Target {
   final Browser browser;
@@ -17,11 +18,11 @@ class Target {
   final _closedCompleter = Completer();
   bool _isInitialized = false;
 
-  Target(this.browser, this._info, this._sessionFactory, {@required this.browserContext})
+  Target(this.browser, this._info, this._sessionFactory,
+      {@required this.browserContext})
       : targetID = _info.targetId {
     _initialized = _initializeCompleter.future.then((success) async {
-      if (!success)
-        return false;
+      if (!success) return false;
       var opener = this.opener;
       if (opener == null || opener._pageFuture == null || type != 'page')
         return true;
@@ -45,8 +46,10 @@ class Target {
 
   String get type {
     var type = _info.type;
-    if (type == 'page' || type == 'background_page' || type == 'service_worker' || type == 'browser')
-      return type;
+    if (type == 'page' ||
+        type == 'background_page' ||
+        type == 'service_worker' ||
+        type == 'browser') return type;
     return 'other';
   }
 
@@ -55,10 +58,11 @@ class Target {
   }
 
   Future<Page> get page {
-    if ((_info.type == 'page' || _info.type == 'background_page') && _pageFuture == null) {
-      _pageFuture = this._sessionFactory()
-          .then((session) => Page.create(this, session));
-  }
+    if ((_info.type == 'page' || _info.type == 'background_page') &&
+        _pageFuture == null) {
+      _pageFuture =
+          this._sessionFactory().then((session) => Page.create(this, session));
+    }
     return _pageFuture;
   }
 
@@ -67,7 +71,8 @@ class Target {
 
     _info = info;
 
-    if (!_initializeCompleter.isCompleted && (_info.type != 'page' || _info.url != '')) {
+    if (!_initializeCompleter.isCompleted &&
+        (_info.type != 'page' || _info.url != '')) {
       _isInitialized = true;
       _initializeCompleter.complete(true);
     }

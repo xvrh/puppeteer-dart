@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:chrome_dev_tools/domains/input.dart';
 import 'package:meta/meta.dart';
+import 'package:puppeteer/protocol/input.dart';
 
 class Keyboard {
   final InputApi _inputApi;
@@ -60,7 +60,7 @@ class Keyboard {
   Future<void> type(String text, {Duration delay}) async {
     for (int rune in text.runes) {
       String char = String.fromCharCode(rune);
-      
+
       Key keyForChar = _characters[char];
 
       if (keyForChar != null) {

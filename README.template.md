@@ -1,61 +1,26 @@
-# chrome_dev_tools
+# Puppeteer in Dart
 
-[![Build Status](https://travis-ci.org/xvrh/chrome_dev_tools.svg?branch=master)](https://travis-ci.org/xvrh/chrome_dev_tools)
+[![Build Status](https://travis-ci.org/xvrh/puppeteer.svg?branch=master)](https://travis-ci.org/xvrh/puppeteer)
 
 A Dart library to automate the Chrome browser over the DevTools Protocol.
 
-This package exposes 2 main APIs: the raw DevTools protocol and a high-level Puppeteer-like API.
+This is a port of the [Puppeteer](https://pptr.dev/) Node.JS library in the Dart language.
 
-#### Low-level raw API
-The low-level API is a simple one-to-one mapping with the [Chrome DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).  
-The code is generated from the [JSON Schema](https://github.com/ChromeDevTools/devtools-protocol) provided by Chrome.
+###### What can I do?
 
-With this API you have entire control to automate Chrome in a fully typed environment.
-However this API can be a bit hard to use and require to write some helper functions for common tasks.
+Most things that you can do manually in the browser can be done using Puppeteer! Here are a few examples to get you started:
 
-You access this API through the `Tab` class. 
-```dart
- // Create a chrome's tab
- var tab = chrome.newTab();
- // You can access the entire information from ChromeDevTools protocol
- // This is a low level/complex API
- 
- // Manage network
- tab.network.enable();
- tab.network.onRequest.listen((resquest) {
-   
- });
- 
- // Start recording screen-cast
- // Get memory informations
- // Manage the JavaScript debugger
-```
-
-You can find more example of using this API in `example/protocol`. The generated code is in `lib/domains`.
-
-#### High-level API
-This API is built on top of the raw protocol and exposes an easy-to-use API.
-This is the API exposed on the `Page` class.
-
-The API is a Dart port of the Node.JS library: [Puppeteer](https://pptr.dev/).
-
-```dart
-- go to page
-- type in element
-- click button
-- capture screenshot
-- save pdf
-- go back
-```
-
-You can find more example of using this API in the `example` folder.
+* Generate screenshots and PDFs of pages.
+* Crawl a SPA (Single-Page Application) and generate pre-rendered content (i.e. "SSR" (Server-Side Rendering)).
+* Automate form submission, UI testing, keyboard input, etc.
+* Create an up-to-date, automated testing environment. Run your tests directly in the latest version of Chrome using the latest JavaScript and browser features.
 
 ## Usage
-* [Launch chrome](#launch-chrome)  
-* [Generate a PDF from an HTML page](#generate-a-pdf-from-a-page)  
-* [Take a screenshot of a page](#take-a-screenshot-of-a-complete-html-page)  
-* [Take a screenshot of an element in a page](#take-a-screenshot-of-a-specific-node-in-the-page)  
-* [Create a static version of a Single Page Application](#create-a-static-version-of-a-single-page-application)  
+* [Launch chrome](#launch-chrome)
+* [Generate a PDF from an HTML page](#generate-a-pdf-from-a-page)
+* [Take a screenshot of a page](#take-a-screenshot-of-a-complete-html-page)
+* [Take a screenshot of an element in a page](#take-a-screenshot-of-a-specific-node-in-the-page)
+* [Create a static version of a Single Page Application](#create-a-static-version-of-a-single-page-application)
 
 ### Launch Chrome
 
@@ -85,10 +50,37 @@ import 'example/screenshot_element.dart';
 ```dart
 import 'example/capture_spa.dart';
 ```
-Or more simply
+
+### Low-level raw DevTools protocol
+This package contains a fully typed API of the [Chrome DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).
+The code is generated from the [JSON Schema](https://github.com/ChromeDevTools/devtools-protocol) provided by Chrome.
+
+With this API you have access to the entire capabilities of Chrome DevTools.
+
+You access this API is located in `lib/protocol`
 ```dart
-import 'example/capture_spa_with_javascript.dart';
+ // Create a chrome's tab
+ var page = chrome.newPage();
+
+ // You access the entire information from ChromeDevTools protocol.
+ // This is important to access information not exposed by the Puppeteer API
+ // Be aware that this is a low-level, complex API.
+
+ // Example domains
+
+ // Manage network
+ page.devTools.network.enable();
+ page.devTools.network.onRequest.listen((resquest) {
+    // handle
+ });
+
+ // Start recording screen-cast
+ // Get memory informations
+ // Manage the JavaScript debugger
 ```
+
+You can find more example of using this API in `example/protocol`. The generated code is in `lib/domains`.
+
 
 ## Related work
  * [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface)

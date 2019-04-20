@@ -4,40 +4,41 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:chrome_dev_tools/domains/dom.dart';
-import 'package:chrome_dev_tools/domains/domains.dart';
-import 'package:chrome_dev_tools/domains/network.dart';
-import 'package:chrome_dev_tools/domains/page.dart';
-import 'package:chrome_dev_tools/domains/runtime.dart';
-import 'package:chrome_dev_tools/domains/target.dart';
-import 'package:chrome_dev_tools/src/chrome.dart';
-import 'package:chrome_dev_tools/src/connection.dart';
-import 'package:chrome_dev_tools/src/page/dom_world.dart';
-import 'package:chrome_dev_tools/src/page/emulation_manager.dart';
-import 'package:chrome_dev_tools/src/page/execution_context.dart';
-import 'package:chrome_dev_tools/src/page/frame_manager.dart';
-import 'package:chrome_dev_tools/src/page/helper.dart';
-import 'package:chrome_dev_tools/src/page/js_handle.dart';
-import 'package:chrome_dev_tools/src/page/keyboard.dart';
-import 'package:chrome_dev_tools/src/page/lifecycle_watcher.dart';
-import 'package:chrome_dev_tools/src/page/mouse.dart';
-import 'package:chrome_dev_tools/src/page/network_manager.dart';
-import 'package:chrome_dev_tools/src/page/touchscreen.dart';
-import 'package:chrome_dev_tools/src/page/worker.dart';
-import 'package:chrome_dev_tools/src/target.dart';
 import 'package:meta/meta.dart';
+import 'package:puppeteer/protocol/dev_tools.dart';
+import 'package:puppeteer/protocol/dom.dart';
+import 'package:puppeteer/protocol/network.dart';
+import 'package:puppeteer/protocol/page.dart';
+import 'package:puppeteer/protocol/runtime.dart';
+import 'package:puppeteer/protocol/target.dart';
+import 'package:puppeteer/src/browser.dart';
+import 'package:puppeteer/src/connection.dart';
+import 'package:puppeteer/src/page/dom_world.dart';
+import 'package:puppeteer/src/page/emulation_manager.dart';
+import 'package:puppeteer/src/page/execution_context.dart';
+import 'package:puppeteer/src/page/frame_manager.dart';
+import 'package:puppeteer/src/page/helper.dart';
+import 'package:puppeteer/src/page/js_handle.dart';
+import 'package:puppeteer/src/page/keyboard.dart';
+import 'package:puppeteer/src/page/lifecycle_watcher.dart';
+import 'package:puppeteer/src/page/mouse.dart';
+import 'package:puppeteer/src/page/network_manager.dart';
+import 'package:puppeteer/src/page/touchscreen.dart';
+import 'package:puppeteer/src/page/worker.dart';
+import 'package:puppeteer/src/target.dart';
+
 import '../connection.dart' show Session;
 
 class Page {
   final Target target;
-  final Domains domains;
+  final DevTools devTools;
   final _pageBindings = <String, Function>{};
   final _workers = <SessionID, Worker>{};
   FrameManager _frameManager;
   final StreamController _workerCreated = StreamController<Worker>.broadcast(),
       _workerDestroyed = StreamController<Worker>.broadcast(),
       _onErrorController = StreamController<ClientError>.broadcast(),
-     _onPopupController = StreamController<Page>.broadcast();
+      _onPopupController = StreamController<Page>.broadcast();
   bool _javascriptEnabled = true;
   Duration navigationTimeout;
   Duration defaultTimeout = Duration(seconds: 30);
@@ -47,16 +48,17 @@ class Page {
   Touchscreen _touchscreen;
   Keyboard _keyboard;
 
-  Page._(this.target, this.domains) : _emulationManager = EmulationManager(domains) {
+  Page._(this.target, this.devTools)
+      : _emulationManager = EmulationManager(devTools) {
     _frameManager = FrameManager(this);
-    _keyboard = Keyboard(domains.input);
-    _mouse = Mouse(domains.input, _keyboard);
-    _touchscreen = Touchscreen(domains.runtime, domains.input, _keyboard);
+    _keyboard = Keyboard(devTools.input);
+    _mouse = Mouse(devTools.input, _keyboard);
+    _touchscreen = Touchscreen(devTools.runtime, devTools.input, _keyboard);
 
-    domains.target.onAttachedToTarget.listen((e) {
+    devTools.target.onAttachedToTarget.listen((e) {
       if (e.targetInfo.type != 'worker') {
         // If we don't detach from service workers, they will never die.
-        domains.target.detachFromTarget(sessionId: e.sessionId);
+        devTools.target.detachFromTarget(sessionId: e.sessionId);
       } else {
         var session = target.browser.connection.sessions[e.sessionId.value];
         assert(session != null);
@@ -65,7 +67,7 @@ class Page {
         _workerCreated.add(worker);
       }
     });
-    domains.target.onDetachedFromTarget.listen((e) {
+    devTools.target.onDetachedFromTarget.listen((e) {
       var worker = _workers[e.sessionId];
       if (worker != null) {
         _workerDestroyed.add(worker);
@@ -74,25 +76,26 @@ class Page {
     });
 
     // TODO(xha): onConsoleAPI: récupérer tous les arguments du console.xx et les convertir en string
-    domains.runtime.onConsoleAPICalled.listen((e) {
+    devTools.runtime.onConsoleAPICalled.listen((e) {
       //If I recall correctly Log.entryAdded() shows errors and warning from Chrome (e.g., XSS violations and such), not necessarily coming from the console.* API.
     });
 
-    domains.runtime.onBindingCalled.listen(_onBindingCalled);
-    domains.page.onJavascriptDialogOpening.listen(_onDialog);
-    domains.runtime.onExceptionThrown.listen(_handleException);
-    domains.log.onEntryAdded.listen(_onLogEntryAdded);
+    devTools.runtime.onBindingCalled.listen(_onBindingCalled);
+    devTools.page.onJavascriptDialogOpening.listen(_onDialog);
+    devTools.runtime.onExceptionThrown.listen(_handleException);
+    devTools.log.onEntryAdded.listen(_onLogEntryAdded);
   }
 
-  static Future<Page> create(Target target, Session session, {DeviceViewport viewport}) async {
-    var domains = Domains(session);
-    var page = Page._(target, domains);
+  static Future<Page> create(Target target, Session session,
+      {DeviceViewport viewport}) async {
+    var devTools = DevTools(session);
+    var page = Page._(target, devTools);
 
     await Future.wait([
       page._frameManager.initialize(),
-      domains.target.setAutoAttach(true, false, flatten: true),
-      domains.performance.enable(),
-      domains.log.enable(),
+      devTools.target.setAutoAttach(true, false, flatten: true),
+      devTools.performance.enable(),
+      devTools.log.enable(),
     ]);
 
     if (viewport != null) {
@@ -102,7 +105,7 @@ class Page {
     return page;
   }
 
-  Session get session => domains.session;
+  Session get session => devTools.client;
 
   Browser get browser => target.browser;
 
@@ -121,7 +124,7 @@ class Page {
 
   Stream<Worker> get onWorkerDestroyed => _workerDestroyed.stream;
 
-  Stream get onPageCrashed => domains.inspector.onTargetCrashed;
+  Stream get onPageCrashed => devTools.inspector.onTargetCrashed;
 
   Stream<PageFrame> get onFrameAttached => _frameManager.onFrameAttached;
 
@@ -130,9 +133,9 @@ class Page {
   Stream<PageFrame> get onFrameNavigated => _frameManager.onFrameNavigated;
 
   Stream<MonotonicTime> get onDomContentLoaded =>
-      domains.page.onDomContentEventFired;
+      devTools.page.onDomContentEventFired;
 
-  Stream<MonotonicTime> get onLoad => domains.page.onLoadEventFired;
+  Stream<MonotonicTime> get onLoad => devTools.page.onLoadEventFired;
 
   Stream<ClientError> get onError => _onErrorController.stream;
 
@@ -140,7 +143,7 @@ class Page {
 
   Future get onClose => target.onClose;
 
-  bool get isClosed => domains.session.isClosed;
+  bool get isClosed => session.isClosed;
 
   PageFrame get mainFrame => _frameManager.mainFrame;
 
@@ -160,7 +163,8 @@ class Page {
     return mainFrame.$(selector);
   }
 
-  Future<JsHandle> evaluateHandle(@javascript String pageFunction, {List args}) async {
+  Future<JsHandle> evaluateHandle(@javascript String pageFunction,
+      {List args}) async {
     var context = await mainFrame.executionContext;
     return context.evaluateHandle(pageFunction, args: args);
   }
@@ -170,11 +174,13 @@ class Page {
     return context.queryObjects(prototypeHandle);
   }
 
-  Future<T> $eval<T>(String selector, @javascript String pageFunction, {List args}) {
+  Future<T> $eval<T>(String selector, @javascript String pageFunction,
+      {List args}) {
     return mainFrame.$eval<T>(selector, pageFunction, args: args);
   }
 
-  Future<T> $$eval<T>(String selector, @javascript String pageFunction, {List args}) {
+  Future<T> $$eval<T>(String selector, @javascript String pageFunction,
+      {List args}) {
     return mainFrame.$$eval<T>(selector, pageFunction, args: args);
   }
 
@@ -187,13 +193,13 @@ class Page {
   }
 
   Future<List<Cookie>> cookies(List<String> urls) {
-    return domains.network.getCookies(urls: urls);
+    return devTools.network.getCookies(urls: urls);
   }
 
   Future<void> deleteCookies(List<Cookie> cookies) async {
     var pageUrl = url;
     for (var cookie in cookies) {
-      await domains.network.deleteCookies(cookie.name,
+      await devTools.network.deleteCookies(cookie.name,
           url: pageUrl.startsWith('http') ? pageUrl : null,
           domain: cookie.domain,
           path: cookie.path);
@@ -201,7 +207,7 @@ class Page {
   }
 
   Future<void> setCookies(List<CookieParam> cookies) async {
-    await domains.network.setCookies(cookies);
+    await devTools.network.setCookies(cookies);
   }
 
   Future<ElementHandle> addScriptTag(
@@ -243,10 +249,10 @@ function addPageBinding(bindingName) {
     _pageBindings[name] = callbackFunction;
 
     var expression = evaluationString(_addPageBinding, [name]);
-    await domains.runtime.addBinding(name);
-    await domains.page.addScriptToEvaluateOnNewDocument(expression);
-    await Future.wait(frameManager.frames
-        .map((frame) => frame.evaluate(expression)));
+    await devTools.runtime.addBinding(name);
+    await devTools.page.addScriptToEvaluateOnNewDocument(expression);
+    await Future.wait(
+        frameManager.frames.map((frame) => frame.evaluate(expression)));
   }
 
   Future<void> authenticate({String userName, String password}) {
@@ -266,13 +272,6 @@ function addPageBinding(bindingName) {
     _onErrorController.add(ClientError(event.exceptionDetails));
   }
 
-  /**
-   * @param {!Protocol.Runtime.consoleAPICalledPayload} event
-   */
-  Future _onConsoleAPI(event) {
-//TODO(xha)
-  }
-
   Future _onBindingCalled(BindingCalledEvent event) async {
     Map<String, dynamic> payload = jsonDecode(event.payload);
     String name = payload['name'];
@@ -288,7 +287,8 @@ function addPageBinding(bindingName) {
       expression = evaluationString(
           _deliverError, [name, seq, error.toString(), stackTrace.toString()]);
     }
-    await domains.runtime.evaluate(expression, contextId: event.executionContextId);
+    await devTools.runtime
+        .evaluate(expression, contextId: event.executionContextId);
   }
 
   static final _deliverResult = '''
@@ -306,15 +306,6 @@ function deliverError(name, seq, message, stack) {
   window[name]['callbacks'].delete(seq);
 }
 ''';
-
-  /**
-   * @param {string} type
-   * @param {!Array<!Puppeteer.JSHandle>} args
-   * @param {Protocol.Runtime.StackTrace=} stackTrace
-   */
-  void _addConsoleMessage(type, args, stackTrace) {
-    //TODO(xha)
-  }
 
   _onDialog(event) {
     //TODO(xha)
@@ -345,7 +336,7 @@ function deliverError(name, seq, message, stack) {
     var responseFuture =
         waitForNavigation(timeout: timeout, waitUntil: waitUntil);
 
-    await domains.page.reload();
+    await devTools.page.reload();
     return await responseFuture;
   }
 
@@ -383,7 +374,7 @@ function deliverError(name, seq, message, stack) {
 
   Future<NetworkResponse> _go(int delta,
       {Duration timeout, WaitUntil waitUntil}) async {
-    var history = await domains.page.getNavigationHistory();
+    var history = await devTools.page.getNavigationHistory();
     int index = history.currentIndex + delta;
     if (index < 0 || index >= history.entries.length) {
       return null;
@@ -391,18 +382,18 @@ function deliverError(name, seq, message, stack) {
     var entry = history.entries[index];
     var navigationFuture =
         waitForNavigation(timeout: timeout, waitUntil: waitUntil);
-    await domains.page.navigateToHistoryEntry(entry.id);
+    await devTools.page.navigateToHistoryEntry(entry.id);
     return await navigationFuture;
   }
 
   Future<void> bringToFront() async {
-    await domains.page.bringToFront();
+    await devTools.page.bringToFront();
   }
 
   Future<void> emulate(Device device) async {
     await setViewport(device.viewport);
     await setUserAgent(device.userAgent(
-        (await domains.browser.getVersion()).product.split('/').last));
+        (await devTools.browser.getVersion()).product.split('/').last));
   }
 
   bool get javascriptEnabled => _javascriptEnabled;
@@ -413,17 +404,17 @@ function deliverError(name, seq, message, stack) {
     }
     _javascriptEnabled = enabled;
 
-    await domains.emulation.setScriptExecutionDisabled(!enabled);
+    await devTools.emulation.setScriptExecutionDisabled(!enabled);
   }
 
   Future<void> setBypassCSP(bool enabled) {
-    return domains.page.setBypassCSP(enabled);
+    return devTools.page.setBypassCSP(enabled);
   }
 
   Future<void> emulateMedia(String mediaType) {
     assert(mediaType == 'screen' || mediaType == 'print' || mediaType == null,
         'Unsupported media type: ' + mediaType);
-    return domains.emulation.setEmulatedMedia(mediaType);
+    return devTools.emulation.setEmulatedMedia(mediaType);
   }
 
   Future setViewport(DeviceViewport viewport) async {
@@ -442,7 +433,7 @@ function deliverError(name, seq, message, stack) {
 
   Future evaluateOnNewDocument(String pageFunction, {List args}) async {
     var source = evaluationString(pageFunction, args);
-    await domains.page.addScriptToEvaluateOnNewDocument(source);
+    await devTools.page.addScriptToEvaluateOnNewDocument(source);
   }
 
   Future<void> setCacheEnabled(enabled) {
@@ -464,7 +455,7 @@ function deliverError(name, seq, message, stack) {
     assert(clip == null || !fullPage, "clip and fullPage are exclusive");
 
     return screenshotPool(target.browser).withResource(() async {
-      await domains.target.activateTarget(target.targetID);
+      await devTools.target.activateTarget(target.targetID);
 
       Viewport roundedClip;
       if (clip != null) {
@@ -477,7 +468,7 @@ function deliverError(name, seq, message, stack) {
       }
 
       if (fullPage) {
-        var metrics = await domains.page.getLayoutMetrics();
+        var metrics = await devTools.page.getLayoutMetrics();
 
         // Overwrite clip for full page at all times.
         roundedClip = Viewport(
@@ -492,20 +483,20 @@ function deliverError(name, seq, message, stack) {
         var screenOrientation = viewport.isLandscape
             ? EmulationManager.landscape
             : EmulationManager.portrait;
-        await domains.emulation.setDeviceMetricsOverride(roundedClip.width,
+        await devTools.emulation.setDeviceMetricsOverride(roundedClip.width,
             roundedClip.height, viewport.deviceScaleFactor, viewport.isMobile,
             screenOrientation: screenOrientation);
       }
       var shouldSetDefaultBackground =
           omitBackground && format == ScreenshotFormat.png;
       if (shouldSetDefaultBackground) {
-        await domains.emulation.setDefaultBackgroundColorOverride(
+        await devTools.emulation.setDefaultBackgroundColorOverride(
             color: RGBA(r: 0, g: 0, b: 0, a: 0));
       }
-      var result = await domains.page.captureScreenshot(
+      var result = await devTools.page.captureScreenshot(
           format: format.name, quality: quality, clip: roundedClip);
       if (shouldSetDefaultBackground) {
-        await domains.emulation.setDefaultBackgroundColorOverride();
+        await devTools.emulation.setDefaultBackgroundColorOverride();
       }
 
       if (fullPage && _viewport != null) {
@@ -538,7 +529,7 @@ function deliverError(name, seq, message, stack) {
     format ??= PaperFormat.letter;
     margins ??= PdfMargins.zero;
 
-    var result = await domains.page.printToPDF(
+    var result = await devTools.page.printToPDF(
         landscape: landscape,
         displayHeaderFooter: displayHeaderFooter,
         headerTemplate: headerTemplate,
@@ -564,7 +555,7 @@ function deliverError(name, seq, message, stack) {
   Future<void> close({bool runBeforeUnload}) async {
     runBeforeUnload ??= false;
     if (runBeforeUnload) {
-      await domains.page.close();
+      await devTools.page.close();
     } else {
       await target.browser.targetApi.closeTarget(target.targetID);
       await target.onClose;

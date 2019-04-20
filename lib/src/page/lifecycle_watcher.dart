@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:chrome_dev_tools/domains/network.dart';
-import 'package:chrome_dev_tools/src/page/frame_manager.dart';
-import 'package:chrome_dev_tools/src/page/network_manager.dart';
+import 'package:puppeteer/protocol/network.dart';
+import 'package:puppeteer/src/page/frame_manager.dart';
+import 'package:puppeteer/src/page/network_manager.dart';
 
 class LifecycleWatcher {
   final FrameManager frameManager;
@@ -41,13 +41,16 @@ class LifecycleWatcher {
     return Future.any([
       _timeoutFuture,
       _terminationCompleter.future,
-      frameManager.page.session.closed.then((_) => Exception('Navigation failed because browser has disconnected!'))
+      frameManager.page.session.closed.then((_) =>
+          Exception('Navigation failed because browser has disconnected!'))
     ]);
   }
 
-  Future<Exception> get newDocumentNavigation => _newDocumentNavigationCompleter.future;
+  Future<Exception> get newDocumentNavigation =>
+      _newDocumentNavigationCompleter.future;
 
-  Future<Exception> get sameDocumentNavigation => _sameDocumentNavigationCompleter.future;
+  Future<Exception> get sameDocumentNavigation =>
+      _sameDocumentNavigationCompleter.future;
 
   Future<Exception> get lifecycle => _lifecycleCompleter.future;
 
@@ -78,7 +81,8 @@ class LifecycleWatcher {
     var errorMessage =
         'Navigation Timeout Exceeded: ${timeout.inMilliseconds}ms exceeded';
     var completer = Completer<Exception>();
-    _timeoutTimer = Timer(timeout, () => completer.complete(Exception(errorMessage)));
+    _timeoutTimer =
+        Timer(timeout, () => completer.complete(Exception(errorMessage)));
     return completer.future;
   }
 

@@ -1,5 +1,5 @@
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:logging/logging.dart';
+import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 
 import '../utils.dart';
@@ -89,7 +89,8 @@ function _() {
     await Future.wait([
       page.waitForFunction(
           //language=js
-          '() => window.innerWidth < 100', []),
+          '() => window.innerWidth < 100',
+          []),
       page.setViewport(DeviceViewport(width: 10, height: 10)),
     ]);
   });

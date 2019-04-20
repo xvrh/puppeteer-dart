@@ -1,27 +1,34 @@
-# chrome_dev_tools
+# Puppeteer in Dart
 
-[![Build Status](https://travis-ci.org/xvrh/chrome_dev_tools.svg?branch=master)](https://travis-ci.org/xvrh/chrome_dev_tools)
+[![Build Status](https://travis-ci.org/xvrh/puppeteer.svg?branch=master)](https://travis-ci.org/xvrh/puppeteer)
 
 A Dart library to automate the Chrome browser over the DevTools Protocol.
 
-This is a simple 1:1 mapping with the [Chrome DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).  
-All the code in `lib/domains` are generated from the [browser_protocol.json](https://raw.githubusercontent.com/ChromeDevTools/devtools-protocol/master/json/browser_protocol.json) and [js_protocol.json](https://raw.githubusercontent.com/ChromeDevTools/devtools-protocol/master/json/js_protocol.json).
+This is a port of the [Puppeteer](https://pptr.dev/) Node.JS library in the Dart language.
 
+###### What can I do?
+
+Most things that you can do manually in the browser can be done using Puppeteer! Here are a few examples to get you started:
+
+* Generate screenshots and PDFs of pages.
+* Crawl a SPA (Single-Page Application) and generate pre-rendered content (i.e. "SSR" (Server-Side Rendering)).
+* Automate form submission, UI testing, keyboard input, etc.
+* Create an up-to-date, automated testing environment. Run your tests directly in the latest version of Chrome using the latest JavaScript and browser features.
 
 ## Usage
-* [Launch chrome](#launch-chrome)  
-* [Generate a PDF from an HTML page](#generate-a-pdf-from-a-page)  
-* [Take a screenshot of a page](#take-a-screenshot-of-a-complete-html-page)  
-* [Take a screenshot of an element in a page](#take-a-screenshot-of-a-specific-node-in-the-page)  
-* [Create a static version of a Single Page Application](#create-a-static-version-of-a-single-page-application)  
+* [Launch chrome](#launch-chrome)
+* [Generate a PDF from an HTML page](#generate-a-pdf-from-a-page)
+* [Take a screenshot of a page](#take-a-screenshot-of-a-complete-html-page)
+* [Take a screenshot of an element in a page](#take-a-screenshot-of-a-specific-node-in-the-page)
+* [Create a static version of a Single Page Application](#create-a-static-version-of-a-single-page-application)
 
 ### Launch Chrome
 
 Download the last revision of chrome and launch it.
 ```dart
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/chrome_downloader.dart';
 import 'package:logging/logging.dart';
+import 'package:puppeteer/chrome_downloader.dart';
+import 'package:puppeteer/puppeteer.dart';
 
 main() async {
   // Setup a logger if you want to see the raw chrome protocol
@@ -30,24 +37,29 @@ main() async {
     ..onRecord.listen(print);
 
   // Download a version of Chrome in a cache folder.
-  String chromePath = (await downloadChrome()).executablePath;
+  // This is done by default when we don't provide a [executablePath] to
+  // [Browser.start]
+  var chromePath = (await downloadChrome()).executablePath;
 
   // You can specify the cache location and a specific version of chrome
   var chromePath2 =
       await downloadChrome(cachePath: '.chrome', revision: 497674);
 
   // Or just use an absolute path to an existing version of Chrome
-  String chromePath3 =
+  var chromePath3 =
       r'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
   // Start the `Chrome` process and connect to the DevTools
   // By default it is start in `headless` mode
-  Chrome chrome = await Chrome.start(chromePath);
+  var chrome = await Browser.start(executablePath: chromePath);
 
   // Open a new tab
-  Tab myTab = await chrome.newTab('https://www.github.com');
+  var myPage = await chrome.newPage();
 
-  // Do something (see example/ folder).
+  // Go to a page and wait to be fully loaded
+  await myPage.goto('https://www.github.com', waitUntil: WaitUntil.networkIdle);
+
+  // Do something... See other examples
 
   // Kill the process
   await chrome.close();
@@ -57,152 +69,132 @@ main() async {
 ### Generate a PDF from a page
 
 ```dart
-import 'dart:convert';
 import 'dart:io';
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'utils.dart';
 
-main() {
-  chromeTab('https://www.github.com', (Tab tab) async {
-    // Force the "screen" media or some CSS @media print can change the look
-    await tab.emulation.setEmulatedMedia('screen');
+import 'package:puppeteer/puppeteer.dart';
 
-    // A small helper to wait until the network is quiet
-    await tab.waitUntilNetworkIdle();
+main() async {
+  // Start the browser and go to a web page
+  var browser = await Browser.start();
+  var page = await browser.newPage();
+  await page.goto('https://www.github.com', waitUntil: WaitUntil.networkIdle);
 
-    // Capture the PDF and convert it to a List of bytes.
-    List<int> pdf = base64.decode(await tab.page.printToPDF(
-        pageRanges: '1',
-        landscape: true,
-        printBackground: true,
-        marginBottom: 0,
-        marginLeft: 0,
-        marginRight: 0,
-        marginTop: 0));
+  // Force the "screen" media or some CSS @media print can change the look
+  await page.emulateMedia('screen');
 
-    // Save the bytes in a file
-    await File.fromUri(Platform.script.resolve('_github.pdf'))
-        .writeAsBytes(pdf);
-  });
+  // Capture the PDF and convert it to a List of bytes.
+  var pdf = await page.pdf(
+      format: PaperFormat.a4, printBackground: true, pageRanges: '1');
+
+  // Save the bytes in a file
+  await File('example/_github.pdf').writeAsBytes(pdf);
+
+  await browser.close();
 }
 ```
 
 ### Take a screenshot of a complete HTML page
 
 ```dart
-import 'dart:convert';
 import 'dart:io';
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'utils.dart';
 
-main() {
-  chromeTab('https://www.github.com', (Tab tab) async {
-    // A small helper to wait until the network is quiet
-    await tab.waitUntilNetworkIdle();
+import 'package:puppeteer/puppeteer.dart';
 
-    var pageMetrics = await tab.page.getLayoutMetrics();
+main() async {
+  // Start the browser and go to a web page
+  var browser = await Browser.start();
+  var page = await browser.newPage();
+  await page.goto('https://www.github.com', waitUntil: WaitUntil.networkIdle);
 
-    // Set page size to the content size
-    await tab.emulation.setDeviceMetricsOverride(pageMetrics.contentSize.width,
-        pageMetrics.contentSize.height, 1, false);
+  // Take a screenshot of the page
+  var screenshot = await page.screenshot();
 
-    // Capture the screenshot
-    String screenshot = await tab.page.captureScreenshot();
+  // Save it to a file
+  await File('example/_github_form.png').writeAsBytes(screenshot);
 
-    // Save it to a file
-    await File.fromUri(Platform.script.resolve('_github.png'))
-        .writeAsBytes(base64.decode(screenshot));
-  });
+  await browser.close();
 }
 ```
 
 ### Take a screenshot of a specific node in the page
 ```dart
-import 'dart:convert';
 import 'dart:io';
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/domains/page.dart';
-import 'package:chrome_dev_tools/domains/runtime.dart';
-import 'utils.dart';
 
-main() {
-  chromeTab('https://www.github.com', (Tab tab) async {
-    // A small helper to wait until the network is quiet
-    await tab.waitUntilNetworkIdle();
+import 'package:puppeteer/puppeteer.dart';
 
-    // Execute some Javascript to get the rectangle that we want to capture
-    EvaluateResult result = await tab.runtime.evaluate(
-        '''document.querySelector('form[action="/join"]').getBoundingClientRect();''');
+main() async {
+  // Start the browser and go to a web page
+  var browser = await Browser.start();
+  var page = await browser.newPage();
+  await page.goto('https://www.github.com', waitUntil: WaitUntil.networkIdle);
 
-    // Convert the `EvaluateResult` to a Map with all the javascript properties
-    Map rect = await tab.remoteObjectProperties(result.result);
+  // Select an element on the page
+  var form = await page.$('form[action="/join"]');
 
-    Viewport clip = Viewport(
-        x: rect['x'],
-        y: rect['y'],
-        width: rect['width'],
-        height: rect['height'],
-        scale: 1);
+  // Take a screenshot of the element
+  var screenshot = await form.screenshot();
 
-    // Capture the screenshot with the clip region
-    String screenshot = await tab.page.captureScreenshot(clip: clip);
+  // Save it to a file
+  await File('example/_github_form.png').writeAsBytes(screenshot);
 
-    // Save it to a file
-    await File.fromUri(Platform.script.resolve('_github_form.png'))
-        .writeAsBytes(base64.decode(screenshot));
-  });
+  await browser.close();
 }
 ```
 
 ### Create a static version of a Single Page Application
 ```dart
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/domains/dom_snapshot.dart';
-import 'utils.dart';
+import 'package:puppeteer/puppeteer.dart';
 
-main() {
-  chromeTab('https://www.w3.org', (Tab tab) async {
-    // A small helper to wait until the network is quiet
-    await tab.waitUntilNetworkIdle();
+main() async {
+  var browser = await Browser.start();
+  var page = await browser.newPage();
+  await page.goto('https://www.w3.org');
 
-    // Take a snapshot of the DOM of the current page
-    // ignore: deprecated_member_use_from_same_package
-    GetSnapshotResult result = await tab.domSnapshot.getSnapshot([]);
+  // Either use the helper to get the content
+  var pageContent = await page.content;
+  print(pageContent);
 
-    // Iterate the nodes and output some HTML.
-    for (DOMNode node in result.domNodes) {
-      String nodeString = '<${node.nodeName}';
-      if (node.attributes != null) {
-        nodeString +=
-            ' ${node.attributes.map((n) => '${n.name}="${n.value}"').join(' ')}';
-      }
-      nodeString += '>';
-      //This example needs a lot more work to output correct HTML
-      print(nodeString);
-    }
-  });
+  // Or get the content directly by executing some Javascript
+  var pageContent2 = await page.evaluate('document.documentElement.outerHTML');
+  print(pageContent2);
+
+  await browser.close();
 }
 ```
-Or more simply
+
+### Low-level raw DevTools protocol
+This package contains a fully typed API of the [Chrome DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).
+The code is generated from the [JSON Schema](https://github.com/ChromeDevTools/devtools-protocol) provided by Chrome.
+
+With this API you have access to the entire capabilities of Chrome DevTools.
+
+You access this API is located in `lib/protocol`
 ```dart
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'utils.dart';
+ // Create a chrome's tab
+ var page = chrome.newPage();
 
-main() {
-  chromeTab('https://www.w3.org', (Tab tab) async {
-    // A small helper to wait until the network is quiet
-    await tab.waitUntilNetworkIdle();
+ // You access the entire information from ChromeDevTools protocol.
+ // This is important to access information not exposed by the Puppeteer API
+ // Be aware that this is a low-level, complex API.
 
-    // Execute some javascript to serialize the document
-    String pageContent =
-        await tab.evaluate('document.documentElement.outerHTML');
+ // Example domains
 
-    print(pageContent);
-  });
-}
+ // Manage network
+ page.devTools.network.enable();
+ page.devTools.network.onRequest.listen((resquest) {
+    // handle
+ });
+
+ // Start recording screen-cast
+ // Get memory informations
+ // Manage the JavaScript debugger
 ```
+
+You can find more example of using this API in `example/protocol`. The generated code is in `lib/domains`.
+
 
 ## Related work
  * [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface)
  * [puppeteer](https://github.com/GoogleChrome/puppeteer)
  * [webkit_inspection_protocol](https://github.com/google/webkit_inspection_protocol.dart)
+ * [dart webdriver](https://github.com/google/webdriver.dart)

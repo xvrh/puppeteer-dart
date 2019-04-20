@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:chrome_dev_tools/domains/input.dart';
-import 'package:chrome_dev_tools/domains/runtime.dart';
-import 'package:chrome_dev_tools/src/page/keyboard.dart';
+import 'package:puppeteer/protocol/input.dart';
+import 'package:puppeteer/protocol/runtime.dart';
+import 'package:puppeteer/src/page/keyboard.dart';
 
 class Touchscreen {
   final RuntimeApi runtimeApi;

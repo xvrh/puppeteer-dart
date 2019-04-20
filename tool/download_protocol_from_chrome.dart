@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:http/http.dart';
 import 'package:path/path.dart' as p;
+import 'package:puppeteer/puppeteer.dart';
 
 import 'generate_domains.dart';
 

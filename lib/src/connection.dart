@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:logging/logging.dart';
-import '../domains/target.dart';
+
+import '../protocol/target.dart';
 
 abstract class Client {
   Future<Map> send(String method, [Map parameters]);
@@ -77,7 +79,8 @@ class Connection implements Client {
 
   int _rawSend(String method, Map parameters, {SessionID sessionId}) {
     int id = ++_lastId;
-    String message = _encodeMessage(id, method, parameters, sessionId: sessionId);
+    String message =
+        _encodeMessage(id, method, parameters, sessionId: sessionId);
 
     _logger.fine('SEND ► $message');
     _webSocket.add(message);
@@ -85,8 +88,9 @@ class Connection implements Client {
     return id;
   }
 
- Future<Session> createSession(TargetInfo targetInfo) async {
-    SessionID sessionId = await _targetApi.attachToTarget(targetInfo.targetId, flatten: true);
+  Future<Session> createSession(TargetInfo targetInfo) async {
+    SessionID sessionId =
+        await _targetApi.attachToTarget(targetInfo.targetId, flatten: true);
 
     Session session = sessions[sessionId.value];
     assert(session != null);
@@ -161,7 +165,8 @@ class Connection implements Client {
   Future get disconnected => _webSocket.done;
 }
 
-String _encodeMessage(int id, String method, Map<String, dynamic> parameters, {SessionID sessionId}) {
+String _encodeMessage(int id, String method, Map<String, dynamic> parameters,
+    {SessionID sessionId}) {
   var message = {
     'id': id,
     'method': method,
@@ -174,7 +179,6 @@ String _encodeMessage(int id, String method, Map<String, dynamic> parameters, {S
 }
 
 class Session implements Client {
-  static int _lastId = 0;
   final SessionID sessionId;
   final Connection connection;
   final Map<int, Completer> _completers = {};
@@ -241,8 +245,8 @@ class ServerException implements Exception {
   @override
   toString() => message;
 
-  static matcher(String message) => (e) => e is ServerException && e.message == message;
+  static matcher(String message) =>
+      (e) => e is ServerException && e.message == message;
 }
 
-class TargetClosedException implements Exception {
-}
+class TargetClosedException implements Exception {}

@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:chrome_dev_tools/src/javascript_function_parser.dart';
-import 'package:chrome_dev_tools/src/page/execution_context.dart';
-import 'package:chrome_dev_tools/src/page/frame_manager.dart';
-import 'package:chrome_dev_tools/src/page/js_handle.dart';
-import 'package:chrome_dev_tools/src/page/lifecycle_watcher.dart';
-import 'package:chrome_dev_tools/src/page/mouse.dart';
 import 'package:meta/meta.dart';
+import 'package:puppeteer/src/javascript_function_parser.dart';
+import 'package:puppeteer/src/page/execution_context.dart';
+import 'package:puppeteer/src/page/frame_manager.dart';
+import 'package:puppeteer/src/page/js_handle.dart';
+import 'package:puppeteer/src/page/lifecycle_watcher.dart';
+import 'package:puppeteer/src/page/mouse.dart';
 
 class DomWorld {
   final FrameManager frameManager;
@@ -56,7 +56,8 @@ class DomWorld {
     return _contextCompleter.future;
   }
 
-  Future<JsHandle> evaluateHandle(@javascript String pageFunction, {List args}) async {
+  Future<JsHandle> evaluateHandle(@javascript String pageFunction,
+      {List args}) async {
     var context = await executionContext;
     return context.evaluateHandle(pageFunction, args: args);
   }
@@ -89,12 +90,14 @@ class DomWorld {
     return value;
   }
 
-  Future<T> $eval<T>(String selector, @javascript String pageFunction, {List args}) async {
+  Future<T> $eval<T>(String selector, @javascript String pageFunction,
+      {List args}) async {
     var document = await _document;
     return document.$eval<T>(selector, pageFunction, args: args);
   }
 
-  Future<T> $$eval<T>(String selector, @javascript String pageFunction, {List args}) async {
+  Future<T> $$eval<T>(String selector, @javascript String pageFunction,
+      {List args}) async {
     var document = await _document;
     return document.$$eval<T>(selector, pageFunction, args: args);
   }
@@ -150,7 +153,8 @@ function _(html) {
     }
   }
 
-  Future<ElementHandle> addScriptTag({String url, File file, String content, String type}) async {
+  Future<ElementHandle> addScriptTag(
+      {String url, File file, String content, String type}) async {
     assert(url != null || file != null || content != null);
 
     var context = await executionContext;
@@ -409,13 +413,13 @@ function _(selectorOrXPath, isXPath, waitForVisible, waitForHidden) {
     return handle.asElement;
   }
 
-  Future<String> get title =>
-      evaluate('document.title');
+  Future<String> get title => evaluate('document.title');
 }
 
 class WaitTask {
   final DomWorld domWorld;
-  @javascript final String predicate;
+  @javascript
+  final String predicate;
   final String title;
   final Polling polling;
   final Duration timeout;
@@ -502,8 +506,8 @@ class WaitTask {
 }
 
 final _waitForPredicatePageFunction =
-        //language=js
-        '''
+    //language=js
+    '''
 async function _(predicateBody, polling, timeout, ...args) {
   const predicate = new Function('...args', predicateBody);
   let timedOut = false;
@@ -606,4 +610,3 @@ class Polling {
 
   get value => _value;
 }
-

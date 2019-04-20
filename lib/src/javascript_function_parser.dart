@@ -18,9 +18,12 @@ String convertToFunctionDeclaration(String javascript) {
     } else {
       bool hasBodyStatement = tokens.contains(_hasBodyStatements);
       _Arguments arguments = tokens.singleWhere((t) => t is _Arguments);
-      _FunctionBody functionBody = tokens.singleWhere((t) => t is _FunctionBody);
+      _FunctionBody functionBody =
+          tokens.singleWhere((t) => t is _FunctionBody);
 
-      String body = hasBodyStatement ? '{ ' + functionBody.value : '{ return ${functionBody.value} }';
+      String body = hasBodyStatement
+          ? '{ ' + functionBody.value
+          : '{ return ${functionBody.value} }';
 
       String argumentString = arguments.arguments;
       if (!argumentString.startsWith('(')) {
@@ -69,7 +72,9 @@ class JsGrammarDefinition extends GrammarDefinition {
       ref(token, 'async').optional() &
       ref(functionShorthandArguments).flatten().map((t) => _Arguments(t)) &
       ref(token, '=>') &
-      ref(token, '{').optional().map((v) => v != null ? _hasBodyStatements : null) &
+      ref(token, '{')
+          .optional()
+          .map((v) => v != null ? _hasBodyStatements : null) &
       ref(body);
 
   functionShorthandArguments() => ref(arguments) | ref(identifier);
@@ -79,9 +84,10 @@ class JsGrammarDefinition extends GrammarDefinition {
 
   argumentList() => ref(argument).separatedBy(ref(token, ','));
 
-  argument() =>  ref(token, '...').optional() & ref(identifier);
+  argument() => ref(token, '...').optional() & ref(identifier);
 
-  identifier() => ref(token, ref(IDENTIFIER)).map((v) => v.value[0] + v.value[1].join(''));
+  identifier() =>
+      ref(token, ref(IDENTIFIER)).map((v) => v.value[0] + v.value[1].join(''));
 
   body() => ref(any).star().map((v) => _FunctionBody(v.join('')));
 
@@ -133,7 +139,4 @@ class _Arguments {
   final String arguments;
 
   _Arguments(this.arguments);
-
-  @override
-  toString() => 'args(${arguments})';
 }

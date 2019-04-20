@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:chrome_dev_tools/domains/input.dart';
-import 'package:chrome_dev_tools/src/page/keyboard.dart';
+import 'package:puppeteer/protocol/input.dart';
+import 'package:puppeteer/src/page/keyboard.dart';
 
 class MouseButton {
   static const left = MouseButton._('left');
@@ -28,7 +28,8 @@ class Mouse {
     var from = _position;
     _position = position;
     for (var i = 1; i <= steps; i++) {
-      await inputApi.dispatchMouseEvent('mouseMoved',
+      await inputApi.dispatchMouseEvent(
+          'mouseMoved',
           from.x + (position.x - from.x) * (i / steps),
           from.y + (position.y - from.y) * (i / steps),
           button: _buttonName(_button),
@@ -40,8 +41,7 @@ class Mouse {
       {Duration delay, MouseButton button, int clickCount}) async {
     await move(position);
     await down(button: button, clickCount: clickCount);
-    if (delay != null)
-      await Future.delayed(delay);
+    if (delay != null) await Future.delayed(delay);
     await up(button: button, clickCount: clickCount);
   }
 
@@ -49,8 +49,8 @@ class Mouse {
     button ??= MouseButton.left;
     clickCount ??= 1;
     _button = button;
-    await inputApi.dispatchMouseEvent(
-        'mousePressed', _position.x, _position.y, button: _buttonName(button),
+    await inputApi.dispatchMouseEvent('mousePressed', _position.x, _position.y,
+        button: _buttonName(button),
         modifiers: keyboard.modifiers,
         clickCount: clickCount);
   }
@@ -59,8 +59,8 @@ class Mouse {
     button ??= MouseButton.left;
     clickCount ??= 1;
     _button = null;
-    await inputApi.dispatchMouseEvent(
-        'mouseReleased', _position.x, _position.y, button: _buttonName(button),
+    await inputApi.dispatchMouseEvent('mouseReleased', _position.x, _position.y,
+        button: _buttonName(button),
         modifiers: keyboard.modifiers,
         clickCount: clickCount);
   }

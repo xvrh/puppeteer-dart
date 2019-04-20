@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:chrome_dev_tools/domains/runtime.dart';
+import 'package:puppeteer/protocol/runtime.dart';
 
 String evaluationString(String function, List args) {
   if (args == null || args.isEmpty) {

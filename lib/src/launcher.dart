@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:chrome_dev_tools/src/chrome.dart';
-import 'package:chrome_dev_tools/src/connection.dart';
-import 'package:chrome_dev_tools/src/downloader.dart';
-import 'package:chrome_dev_tools/src/page/emulation_manager.dart';
 import 'package:logging/logging.dart';
+import 'package:puppeteer/src/browser.dart';
+import 'package:puppeteer/src/connection.dart';
+import 'package:puppeteer/src/downloader.dart';
+import 'package:puppeteer/src/page/emulation_manager.dart';
 
-final Logger _logger = Logger('chrome_dev_tools.launcher');
+final Logger _logger = Logger('puppeteer.launcher');
 
 const List<String> _defaultArgs = <String>[
   '--disable-background-networking',
@@ -30,7 +30,6 @@ const List<String> _defaultArgs = <String>[
   '--disable-translate',
   '--metrics-recording-only',
   '--no-first-run',
-  '--safebrowsing-disable-auto-update',
   '--enable-automation',
   '--password-store=basic',
   '--use-mock-keychain',
@@ -49,7 +48,8 @@ Future<Browser> launch(
     bool headless = true,
     bool useTemporaryUserData = false,
     bool noSandboxFlag,
-    DeviceViewport defaultViewport, bool ignoreHttpsErrors}) async {
+    DeviceViewport defaultViewport,
+    bool ignoreHttpsErrors}) async {
   // In docker environment we want to force the '--no-sandbox' flag automatically
   noSandboxFlag ??= Platform.environment['CHROME_FORCE_NO_SANDBOX'] == 'true';
 
@@ -88,10 +88,12 @@ Future<Browser> launch(
   if (webSocketUrl != null) {
     Connection connection = await Connection.create(webSocketUrl);
 
-    Browser browser = await createBrowser(connection,
+    Browser browser = createBrowser(connection,
         defaultViewport: defaultViewport,
-        closeCallback: () => _gracefullyClose(chromeProcess), ignoreHttpsErrors: ignoreHttpsErrors);
-    Future targetFuture = browser.waitForTarget((target) => target.type == 'page');
+        closeCallback: () => _gracefullyClose(chromeProcess),
+        ignoreHttpsErrors: ignoreHttpsErrors);
+    Future targetFuture =
+        browser.waitForTarget((target) => target.type == 'page');
     await browser.targetApi.setDiscoverTargets(true);
     await targetFuture;
     return browser;
@@ -127,14 +129,14 @@ Future _waitForWebSocketUrl(Process chromeProcess) async {
 }
 
 Future<String> _inferExecutablePath() async {
-  String executablePath = Platform.environment['CHROME_DEV_TOOLS_PATH'];
+  String executablePath = Platform.environment['puppeteer_PATH'];
   if (executablePath != null) {
     File file = File(executablePath);
     if (!file.existsSync()) {
       executablePath = getExecutablePath(executablePath);
       if (!File(executablePath).existsSync()) {
-        throw 'The environment variable contains CHROME_DEV_TOOLS_PATH with '
-            'value (${Platform.environment['CHROME_DEV_TOOLS_PATH']}) but we cannot '
+        throw 'The environment variable contains puppeteer_PATH with '
+            'value (${Platform.environment['puppeteer_PATH']}) but we cannot '
             'find the Chrome executable';
       }
     }

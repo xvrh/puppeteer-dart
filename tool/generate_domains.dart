@@ -28,7 +28,7 @@ main() {
 
   String libPath = Platform.script.resolve('../lib').toFilePath();
 
-  Directory targetDir = Directory(p.join(libPath, 'domains'));
+  Directory targetDir = Directory(p.join(libPath, 'protocol'));
   if (targetDir.existsSync()) {
     targetDir.deleteSync(recursive: true);
   }
@@ -132,16 +132,15 @@ main() {
   List<Domain> tabDomains = domains.where((d) => !d.deprecated).toList();
 
   for (Domain domain in tabDomains) {
-    tabBuffer
-        .writeln("import '../domains/${_underscoreize(domain.name)}.dart';");
+    tabBuffer.writeln("import '${_underscoreize(domain.name)}.dart';");
   }
   tabBuffer.writeln("import '../src/connection.dart';");
   tabBuffer.writeln();
   tabBuffer.writeln('''
-class Domains {
-  final Session session;
+class DevTools {
+  final Client client;
   
-  Domains(this.session);
+  DevTools(this.client);
 ''');
 
   for (Domain domain in tabDomains) {
@@ -149,14 +148,14 @@ class Domains {
 
     tabBuffer.writeln(toComment(domain.description, indent: 2));
     tabBuffer.writeln('${domain.name}Api get $camelizedName =>  '
-        '_$camelizedName ??= ${domain.name}Api(session);');
+        '_$camelizedName ??= ${domain.name}Api(client);');
     tabBuffer.writeln('${domain.name}Api _$camelizedName;');
     tabBuffer.writeln('');
   }
   tabBuffer.writeln('}');
 
   _writeDartFile(
-      p.join(libPath, 'domains', 'domains.dart'), tabBuffer.toString());
+      p.join(libPath, 'protocol', 'dev_tools.dart'), tabBuffer.toString());
 }
 
 final DartFormatter _dartFormatter =

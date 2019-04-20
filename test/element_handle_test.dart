@@ -1,5 +1,5 @@
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:logging/logging.dart';
+import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 
 import 'utils.dart';
@@ -182,21 +182,26 @@ main() {
       ElementHandle buttonTextNode = await page
           .evaluateHandle("() => document.querySelector('button').firstChild");
 
-      expect(buttonTextNode.click, throwsA(predicate((e) => '$e' == 'Exception: Node is not of type HTMLElement')));
+      expect(
+          buttonTextNode.click,
+          throwsA(predicate(
+              (e) => '$e' == 'Exception: Node is not of type HTMLElement')));
     });
     test('should throw for detached nodes', () async {
       await page.goto(server.prefix + '/input/button.html');
       var button = await page.$('button');
       await page.evaluate('button => button.remove()', args: [button]);
-      expect(button.click, throwsA(predicate((e) => '$e' == 'Exception: Node is detached from document')));
+      expect(
+          button.click,
+          throwsA(predicate(
+              (e) => '$e' == 'Exception: Node is detached from document')));
     });
     test('should throw for hidden nodes', () async {
       await page.goto(server.prefix + '/input/button.html');
       var button = await page.$('button');
       await page
           .evaluate("button => button.style.display = 'none'", args: [button]);
-      expect(button.click,
-          throwsA(TypeMatcher<NodeIsNotVisibleException>()));
+      expect(button.click, throwsA(TypeMatcher<NodeIsNotVisibleException>()));
     });
     test('should throw for recursively hidden nodes', () async {
       await page.goto(server.prefix + '/input/button.html');
@@ -204,8 +209,7 @@ main() {
       await page.evaluate(
           "button => button.parentElement.style.display = 'none'",
           args: [button]);
-      expect(button.click,
-          throwsA(TypeMatcher<NodeIsNotVisibleException>()));
+      expect(button.click, throwsA(TypeMatcher<NodeIsNotVisibleException>()));
     });
     test('should throw for <br> elements', () async {
       await page.setContent('hello<br>goodbye');

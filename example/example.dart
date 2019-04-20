@@ -1,6 +1,6 @@
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/chrome_downloader.dart';
 import 'package:logging/logging.dart';
+import 'package:puppeteer/chrome_downloader.dart';
+import 'package:puppeteer/puppeteer.dart';
 
 // ignore_for_file: unused_local_variable
 
@@ -11,24 +11,29 @@ main() async {
     ..onRecord.listen(print);
 
   // Download a version of Chrome in a cache folder.
-  String chromePath = (await downloadChrome()).executablePath;
+  // This is done by default when we don't provide a [executablePath] to
+  // [Browser.start]
+  var chromePath = (await downloadChrome()).executablePath;
 
   // You can specify the cache location and a specific version of chrome
   var chromePath2 =
       await downloadChrome(cachePath: '.chrome', revision: 497674);
 
   // Or just use an absolute path to an existing version of Chrome
-  String chromePath3 =
+  var chromePath3 =
       r'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
   // Start the `Chrome` process and connect to the DevTools
   // By default it is start in `headless` mode
-  Chrome chrome = await Chrome.start(executablePath: chromePath);
+  var chrome = await Browser.start(executablePath: chromePath);
 
   // Open a new tab
-  Tab myTab = await chrome.newTab('https://www.github.com');
+  var myPage = await chrome.newPage();
 
-  // Do something (see example/ folder).
+  // Go to a page and wait to be fully loaded
+  await myPage.goto('https://www.github.com', waitUntil: WaitUntil.networkIdle);
+
+  // Do something... See other examples
 
   // Kill the process
   await chrome.close();

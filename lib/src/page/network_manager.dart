@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:chrome_dev_tools/domains/domains.dart';
-import 'package:chrome_dev_tools/domains/fetch.dart';
-import 'package:chrome_dev_tools/domains/fetch.dart' as fetch;
-import 'package:chrome_dev_tools/domains/network.dart';
-import 'package:chrome_dev_tools/domains/network.dart' as network;
-import 'package:chrome_dev_tools/src/connection.dart';
-import 'package:chrome_dev_tools/src/page/frame_manager.dart';
+import 'package:puppeteer/protocol/dev_tools.dart';
+import 'package:puppeteer/protocol/fetch.dart';
+import 'package:puppeteer/protocol/fetch.dart' as fetch;
+import 'package:puppeteer/protocol/network.dart';
+import 'package:puppeteer/protocol/network.dart' as network;
+import 'package:puppeteer/src/connection.dart';
+import 'package:puppeteer/src/page/frame_manager.dart';
 
 class NetworkManager {
   final Client client;
@@ -38,7 +38,7 @@ class NetworkManager {
     _network.onLoadingFailed.listen(_onLoadingFailed);
   }
 
-  Domains get _domains =>  frameManager.page.domains;
+  DevTools get _domains => frameManager.page.devTools;
 
   FetchApi get _fetch => _domains.fetch;
 
@@ -119,7 +119,7 @@ class NetworkManager {
     }
   }
 
-  Future <void>_updateProtocolCacheDisabled() {
+  Future<void> _updateProtocolCacheDisabled() {
     return _network.setCacheDisabled(
         _userCacheDisabled || _protocolRequestInterceptionEnabled);
   }
@@ -144,7 +144,7 @@ class NetworkManager {
   void _onAuthRequired(AuthRequiredEvent event) {
     var response = fetch.AuthChallengeResponseResponse.default$;
     if (_attemptedAuthentications.contains(event.requestId.value)) {
-      response =  fetch.AuthChallengeResponseResponse.cancelAuth;
+      response = fetch.AuthChallengeResponseResponse.cancelAuth;
     } else if (_credentials != null) {
       response = fetch.AuthChallengeResponseResponse.provideCredentials;
       _attemptedAuthentications.add(event.requestId.value);

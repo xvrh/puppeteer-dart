@@ -1,5 +1,4 @@
-
-import 'package:chrome_dev_tools/src/javascript_function_parser.dart';
+import 'package:puppeteer/src/javascript_function_parser.dart';
 import 'package:test/test.dart';
 
 main() {
@@ -40,7 +39,8 @@ function() {
       '() => true;': 'function() { return true; }',
       '(a) => 2;': 'function(a) { return 2; }',
       '(a, bcc, cddd) => true;': 'function(a, bcc, cddd) { return true; }',
-      '(a, bcc, cddd, ...args) => true;': 'function(a, bcc, cddd) { return true; }',
+      '(a, bcc, cddd, ...args) => true;':
+          'function(a, bcc, cddd) { return true; }',
       'a => true;': 'function(a ){ return true; }',
       '(a) => { /**/ return  false; }': 'function(a) { return  false; }',
       '''(a) => { 
@@ -53,7 +53,8 @@ return  false;
 ''',
     };
     for (var declaration in declarations.entries) {
-      expect(convertToFunctionDeclaration(declaration.key), equals(declaration.value));
+      expect(convertToFunctionDeclaration(declaration.key),
+          equals(declaration.value));
     }
   });
 }

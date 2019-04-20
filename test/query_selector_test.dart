@@ -1,5 +1,5 @@
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 import 'package:logging/logging.dart';
+import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 
 import 'utils.dart';
@@ -38,7 +38,8 @@ main() {
     test('should accept arguments', () async {
       await page.setContent('<section>hello</section>');
       var text = await page.$eval(
-          'section', "(e, suffix) => e.textContent + suffix", args: [' world!']);
+          'section', "(e, suffix) => e.textContent + suffix",
+          args: [' world!']);
       expect(text, equals('hello world!'));
     });
     test('should accept ElementHandles as arguments', () async {
@@ -159,7 +160,8 @@ main() {
       expect(
           () => elementHandle.$eval('.a', 'node => node.innerText'),
           throwsA(predicate((e) =>
-              '$e' == 'Exception: Error: failed to find element matching selector ".a"')));
+              '$e' ==
+              'Exception: Error: failed to find element matching selector ".a"')));
     });
   });
   group(r'ElementHandle.$$eval', () {

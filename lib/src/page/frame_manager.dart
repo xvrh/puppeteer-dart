@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:chrome_dev_tools/domains/network.dart';
-import 'package:chrome_dev_tools/domains/page.dart';
-import 'package:chrome_dev_tools/domains/runtime.dart';
-import 'package:chrome_dev_tools/src/connection.dart';
-import 'package:chrome_dev_tools/src/page/dom_world.dart';
-import 'package:chrome_dev_tools/src/page/execution_context.dart';
-import 'package:chrome_dev_tools/src/page/js_handle.dart';
-import 'package:chrome_dev_tools/src/page/lifecycle_watcher.dart';
-import 'package:chrome_dev_tools/src/page/mouse.dart';
-import 'package:chrome_dev_tools/src/page/network_manager.dart';
-import 'package:chrome_dev_tools/src/page/page.dart';
+import 'package:puppeteer/protocol/network.dart';
+import 'package:puppeteer/protocol/page.dart';
+import 'package:puppeteer/protocol/runtime.dart';
+import 'package:puppeteer/src/connection.dart';
+import 'package:puppeteer/src/page/dom_world.dart';
+import 'package:puppeteer/src/page/execution_context.dart';
+import 'package:puppeteer/src/page/js_handle.dart';
+import 'package:puppeteer/src/page/lifecycle_watcher.dart';
+import 'package:puppeteer/src/page/mouse.dart';
+import 'package:puppeteer/src/page/network_manager.dart';
+import 'package:puppeteer/src/page/page.dart';
 
 const _utilityWorldName = '__cdt_utility_world__';
 
@@ -45,9 +45,9 @@ class FrameManager {
     _pageApi.onLifecycleEvent.listen(_onLifecycleEvent);
   }
 
-  PageApi get _pageApi => page.domains.page;
+  PageApi get _pageApi => page.devTools.page;
 
-  RuntimeApi get _runtimeApi => page.domains.runtime;
+  RuntimeApi get _runtimeApi => page.devTools.runtime;
 
   NetworkManager get networkManager => _networkManager;
 
@@ -350,7 +350,8 @@ class PageFrame {
     return _mainWorld.executionContext;
   }
 
-  Future<JsHandle> evaluateHandle(@javascript String pageFunction, {List args}) {
+  Future<JsHandle> evaluateHandle(@javascript String pageFunction,
+      {List args}) {
     return _mainWorld.evaluateHandle(pageFunction, args: args);
   }
 
@@ -392,11 +393,13 @@ class PageFrame {
   /// [pageFunction]: Function to be evaluated in browser context
   /// [args]: Arguments to pass to pageFunction
   /// Returns a Future which resolves to the return value of pageFunction
-  Future<T> $eval<T>(String selector, @javascript String pageFunction, {List args}) {
+  Future<T> $eval<T>(String selector, @javascript String pageFunction,
+      {List args}) {
     return _mainWorld.$eval<T>(selector, pageFunction, args: args);
   }
 
-  Future<T> $$eval<T>(String selector, @javascript String pageFunction, {List args}) {
+  Future<T> $$eval<T>(String selector, @javascript String pageFunction,
+      {List args}) {
     return _mainWorld.$$eval<T>(selector, pageFunction, args: args);
   }
 
@@ -408,7 +411,8 @@ class PageFrame {
     return _secondaryWorld.content;
   }
 
-  Future<void> setContent(String html, {Duration timeout, WaitUntil waitUntil}) {
+  Future<void> setContent(String html,
+      {Duration timeout, WaitUntil waitUntil}) {
     return _secondaryWorld.setContent(html,
         timeout: timeout, waitUntil: waitUntil);
   }

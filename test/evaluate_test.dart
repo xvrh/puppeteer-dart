@@ -1,26 +1,33 @@
 import 'dart:io';
 
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/chrome_downloader.dart';
+import 'package:puppeteer/puppeteer.dart';
+import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_static/shelf_static.dart';
 import 'package:test/test.dart';
-import 'package:shelf/shelf_io.dart' as io;
 
 main() {
   HttpServer server;
-  Tab tab;
-  Chrome chrome;
+  Page tab;
+  Browser chrome;
   setUpAll(() async {
     var handler = createStaticHandler('test/data');
     server = await io.serve(handler, 'localhost', 0);
 
-    chrome = await Chrome.start((await downloadChrome()).executablePath);
-    tab = await chrome.newTab('http://localhost:${server.port}/empty.html');
+    chrome = await Browser.start();
   });
 
   tearDownAll(() async {
     await chrome.close();
     await server.close(force: true);
+  });
+
+  setUp(() async {
+    tab = await chrome.newPage();
+    await tab.goto('http://localhost:${server.port}/empty.html');
+  });
+
+  tearDown(() async {
+    await tab.close();
   });
 
   test('Evaluate simple value', () async {

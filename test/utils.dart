@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:shelf_static/shelf_static.dart';
-import 'package:shelf/shelf_io.dart' as io;
 import 'package:path/path.dart' as p;
-import 'package:test/test.dart';
+import 'package:puppeteer/puppeteer.dart';
+import 'package:shelf/shelf_io.dart' as io;
+import 'package:shelf_static/shelf_static.dart';
 
 Future server(String location, Function(String) callback) async {
   var handler = createStaticHandler(location);
@@ -44,7 +43,8 @@ class Server {
     }, host, 0);
   }
 
-  String get hostUrl => 'http://${_httpServer.address.host}:${_httpServer.port}';
+  String get hostUrl =>
+      'http://${_httpServer.address.host}:${_httpServer.port}';
 
   String get prefix => p.url.join(hostUrl, _assetFolder);
 
@@ -70,6 +70,6 @@ async function attachFrame(frameId, url) {
     await new Promise(x => frame.onload = x);
     return frame;
   }  
-''',args: [frameId, url]);
+''', args: [frameId, url]);
   return await handle.asElement.contentFrame;
 }

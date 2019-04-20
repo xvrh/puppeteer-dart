@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:archive/archive.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
@@ -12,8 +13,8 @@ class ChromePath {
 
   ChromePath(
       {@required this.executablePath,
-        @required this.folderPath,
-        @required this.revision});
+      @required this.folderPath,
+      @required this.revision});
 }
 
 const int _lastRevision = 650583;
@@ -56,7 +57,7 @@ Future<ChromePath> downloadChrome(
 Future _downloadFile(String url, String output) async {
   http.Client client = http.Client();
   http.StreamedResponse response =
-  await client.send(http.Request('get', Uri.parse(url)));
+      await client.send(http.Request('get', Uri.parse(url)));
   File ouputFile = File(output);
   await response.stream.pipe(ouputFile.openWrite());
   client.close();

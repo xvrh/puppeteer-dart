@@ -1,11 +1,11 @@
 /*import 'dart:async';
-import 'package:chrome_dev_tools/domains/target.dart';
-import 'package:chrome_dev_tools/src/chrome.dart';
-import 'package:chrome_dev_tools/src/target.dart';
-import 'package:chrome_dev_tools/src/target.dart';
+import 'package:puppeteer/domains/target.dart';
+import 'package:puppeteer/src/chrome.dart';
+import 'package:puppeteer/src/target.dart';
+import 'package:puppeteer/src/target.dart';
 
 import '../domains/runtime.dart';
-import 'package:chrome_dev_tools/src/connection.dart';
+import 'package:puppeteer/src/connection.dart';
 import 'tab_mixin.dart';
 import 'wait_until.dart' as helper;
 import 'remote_object.dart' as helper;

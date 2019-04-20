@@ -1,17 +1,17 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:chrome_dev_tools/domains/dom.dart';
-import 'package:chrome_dev_tools/domains/runtime.dart';
-import 'package:chrome_dev_tools/src/connection.dart';
-import 'package:chrome_dev_tools/src/page/execution_context.dart';
-import 'package:chrome_dev_tools/src/page/frame_manager.dart';
-import 'package:chrome_dev_tools/src/page/helper.dart';
-import 'package:chrome_dev_tools/src/page/keyboard.dart';
-import 'package:chrome_dev_tools/src/page/mouse.dart';
-import 'package:chrome_dev_tools/src/page/page.dart';
+import 'package:puppeteer/protocol/dom.dart';
+import 'package:puppeteer/protocol/runtime.dart';
+import 'package:puppeteer/src/connection.dart';
+import 'package:puppeteer/src/page/execution_context.dart';
+import 'package:puppeteer/src/page/frame_manager.dart';
+import 'package:puppeteer/src/page/helper.dart';
+import 'package:puppeteer/src/page/keyboard.dart';
+import 'package:puppeteer/src/page/mouse.dart';
+import 'package:puppeteer/src/page/page.dart';
 
-export 'package:chrome_dev_tools/domains/dom.dart' show BoxModel;
+export 'package:puppeteer/protocol/dom.dart' show BoxModel;
 
 class JsHandle {
   final ExecutionContext context;
@@ -20,8 +20,8 @@ class JsHandle {
 
   JsHandle(this.context, this.remoteObject);
 
-  factory JsHandle.fromRemoteObject(ExecutionContext context,
-      RemoteObject remoteObject) {
+  factory JsHandle.fromRemoteObject(
+      ExecutionContext context, RemoteObject remoteObject) {
     var frame = context.frame;
     if (remoteObject.subtype == RemoteObjectSubtype.node && frame != null) {
       var frameManager = context.world.frameManager;
@@ -34,7 +34,7 @@ class JsHandle {
 
   Future<JsHandle> property(String propertyName) async {
     var objectHandle = await context.evaluateHandle(
-      //language=js
+        //language=js
         '''
 function _(object, propertyName) {
   const result = {__proto__: null};
@@ -119,7 +119,7 @@ class ElementHandle extends JsHandle {
 
   Future<PageFrame> get contentFrame async {
     var nodeInfo =
-    await context.domApi.describeNode(objectId: remoteObject.objectId);
+        await context.domApi.describeNode(objectId: remoteObject.objectId);
 
     if (nodeInfo.frameId == null) return null;
     return frameManager.frame(nodeInfo.frameId);
@@ -127,7 +127,7 @@ class ElementHandle extends JsHandle {
 
   Future _scrollIntoViewIfNeeded() async {
     var error = await context.evaluate(
-      //language=js
+        //language=js
         '''
 async function _(element, pageJavascriptEnabled) {
   if (!element.isConnected) {
@@ -160,11 +160,11 @@ async function _(element, pageJavascriptEnabled) {
   }
 
   Future<Point> _clickablePoint() async {
-    var quads =
-    await context.domApi.getContentQuads(objectId: remoteObject.objectId)
+    var quads = await context.domApi
+        .getContentQuads(objectId: remoteObject.objectId)
         .catchError((_) => null,
-        test: ServerException.matcher('Could not compute content quads.'));
-        var layoutMetrics = await context.pageApi.getLayoutMetrics();
+            test: ServerException.matcher('Could not compute content quads.'));
+    var layoutMetrics = await context.pageApi.getLayoutMetrics();
 
     if (quads == null || quads.isEmpty) {
       throw NodeIsNotVisibleException();
@@ -175,8 +175,7 @@ async function _(element, pageJavascriptEnabled) {
     // Filter out quads that have too small area to click into.
     var pointsList = quads
         .map(quadToPoints)
-        .map((quad) =>
-        _intersectQuadWithViewport(
+        .map((quad) => _intersectQuadWithViewport(
             quad, layoutViewport.clientWidth, layoutViewport.clientHeight))
         .where((quad) => _computeQuadArea(quad) > 1)
         .toList();
@@ -203,11 +202,11 @@ async function _(element, pageJavascriptEnabled) {
     ];
   }
 
-  List<Point> _intersectQuadWithViewport(List<Point> quad, num width,
-      num height) {
+  List<Point> _intersectQuadWithViewport(
+      List<Point> quad, num width, num height) {
     return quad
         .map((point) =>
-        Point(min(max(point.x, 0), width), min(max(point.y, 0), height)))
+            Point(min(max(point.x, 0), width), min(max(point.y, 0), height)))
         .toList();
   }
 
@@ -251,7 +250,7 @@ async function _(element, pageJavascriptEnabled) {
 
   Future<void> focus() {
     return context.evaluate(
-      //language=js
+        //language=js
         'function _(element) {return element.focus();}',
         args: [this]);
   }
@@ -284,7 +283,7 @@ async function _(element, pageJavascriptEnabled) {
     return context.domApi
         .getBoxModel(objectId: remoteObject.objectId)
         .catchError((_) => null,
-        test: ServerException.matcher('Could not compute box model.'));
+            test: ServerException.matcher('Could not compute box model.'));
   }
 
   Future<List<int>> screenshot(
@@ -293,7 +292,7 @@ async function _(element, pageJavascriptEnabled) {
 
     var boundingBox = await this.boundingBox();
     assert(boundingBox != null,
-    'Node is either not visible or not an HTMLElement');
+        'Node is either not visible or not an HTMLElement');
 
     var viewport = page.viewport;
 
@@ -311,7 +310,7 @@ async function _(element, pageJavascriptEnabled) {
 
     boundingBox = await this.boundingBox();
     assert(boundingBox != null,
-    'Node is either not visible or not an HTMLElement');
+        'Node is either not visible or not an HTMLElement');
     assert(boundingBox.width != 0, 'Node has 0 width.');
     assert(boundingBox.height != 0, 'Node has 0 height.');
 
@@ -339,7 +338,7 @@ async function _(element, pageJavascriptEnabled) {
 
   Future<ElementHandle> $(String selector) async {
     var handle = await context.evaluateHandle(
-      //language=js
+        //language=js
         '(element, selector) => element.querySelector(selector);',
         args: [this, selector]);
     var element = handle.asElement;
@@ -350,7 +349,7 @@ async function _(element, pageJavascriptEnabled) {
 
   Future<List<ElementHandle>> $$(String selector) async {
     var arrayHandle = await context.evaluateHandle(
-      //language=js
+        //language=js
         'function _(element, selector) {return element.querySelectorAll(selector);}',
         args: [this, selector]);
     var properties = await arrayHandle.properties;
@@ -384,7 +383,7 @@ async function _(element, pageJavascriptEnabled) {
   Future<T> $$eval<T>(String selector, @javascript String pageFunction,
       {List args}) async {
     var arrayHandle = await context.evaluateHandle(
-      //language=js
+        //language=js
         'function _(element, selector) {return Array.from(element.querySelectorAll(selector));}',
         args: [this, selector]);
 
@@ -400,7 +399,7 @@ async function _(element, pageJavascriptEnabled) {
 
   Future<List<ElementHandle>> $x(String expression) async {
     var arrayHandle = await context.evaluateHandle(
-      //language=js
+        //language=js
         '''
 function _(element, expression) {
   const document = element.ownerDocument || element;
@@ -424,7 +423,7 @@ function _(element, expression) {
 
   Future<bool> get isIntersectingViewport {
     return context.evaluate(
-      //language=js
+        //language=js
         '''
 async function _(element) {
   const visibleRatio = await new Promise(resolve => {
@@ -440,5 +439,6 @@ async function _(element) {
 }
 
 class NodeIsNotVisibleException {
+  @override
   String toString() => 'Node is either not visible or not an HTMLElement';
 }

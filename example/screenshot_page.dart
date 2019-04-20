@@ -1,24 +1,18 @@
-import 'dart:convert';
 import 'dart:io';
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'utils.dart';
 
-main() {
-  chromeTab('https://www.github.com', (Tab tab) async {
-    // A small helper to wait until the network is quiet
-    await tab.waitUntilNetworkIdle();
+import 'package:puppeteer/puppeteer.dart';
 
-    var pageMetrics = await tab.page.getLayoutMetrics();
+main() async {
+  // Start the browser and go to a web page
+  var browser = await Browser.start();
+  var page = await browser.newPage();
+  await page.goto('https://www.github.com', waitUntil: WaitUntil.networkIdle);
 
-    // Set page size to the content size
-    await tab.emulation.setDeviceMetricsOverride(pageMetrics.contentSize.width,
-        pageMetrics.contentSize.height, 1, false);
+  // Take a screenshot of the page
+  var screenshot = await page.screenshot();
 
-    // Capture the screenshot
-    String screenshot = await tab.page.captureScreenshot();
+  // Save it to a file
+  await File('example/_github_form.png').writeAsBytes(screenshot);
 
-    // Save it to a file
-    await File.fromUri(Platform.script.resolve('_github.png'))
-        .writeAsBytes(base64.decode(screenshot));
-  });
+  await browser.close();
 }
