@@ -34,7 +34,7 @@ class Target {
       }
       return true;
     });
-    changeInfo(_info);
+    changeInfo(info);
   }
 
   Future<bool> get initialized => _initialized;
@@ -68,8 +68,6 @@ class Target {
   }
 
   void changeInfo(TargetInfo info) {
-    assert(targetID == info.targetId);
-
     _info = info;
 
     if (!_initializeCompleter.isCompleted &&
