@@ -288,14 +288,14 @@ class TraceConfig {
 
 class TraceConfigRecordMode {
   static const TraceConfigRecordMode recordUntilFull =
-      const TraceConfigRecordMode._('recordUntilFull');
+      TraceConfigRecordMode._('recordUntilFull');
   static const TraceConfigRecordMode recordContinuously =
-      const TraceConfigRecordMode._('recordContinuously');
+      TraceConfigRecordMode._('recordContinuously');
   static const TraceConfigRecordMode recordAsMuchAsPossible =
-      const TraceConfigRecordMode._('recordAsMuchAsPossible');
+      TraceConfigRecordMode._('recordAsMuchAsPossible');
   static const TraceConfigRecordMode echoToConsole =
-      const TraceConfigRecordMode._('echoToConsole');
-  static const values = const {
+      TraceConfigRecordMode._('echoToConsole');
+  static const values = {
     'recordUntilFull': recordUntilFull,
     'recordContinuously': recordContinuously,
     'recordAsMuchAsPossible': recordAsMuchAsPossible,
@@ -325,9 +325,9 @@ class TraceConfigRecordMode {
 /// Data format of a trace. Can be either the legacy JSON format or the
 /// protocol buffer format. Note that the JSON format will be deprecated soon.
 class StreamFormat {
-  static const StreamFormat json = const StreamFormat._('json');
-  static const StreamFormat proto = const StreamFormat._('proto');
-  static const values = const {
+  static const StreamFormat json = StreamFormat._('json');
+  static const StreamFormat proto = StreamFormat._('proto');
+  static const values = {
     'json': json,
     'proto': proto,
   };
@@ -353,9 +353,9 @@ class StreamFormat {
 
 /// Compression type to use for traces returned via streams.
 class StreamCompression {
-  static const StreamCompression none = const StreamCompression._('none');
-  static const StreamCompression gzip = const StreamCompression._('gzip');
-  static const values = const {
+  static const StreamCompression none = StreamCompression._('none');
+  static const StreamCompression gzip = StreamCompression._('gzip');
+  static const values = {
     'none': none,
     'gzip': gzip,
   };

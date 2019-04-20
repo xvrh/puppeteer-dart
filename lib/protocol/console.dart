@@ -93,28 +93,24 @@ class ConsoleMessage {
 }
 
 class ConsoleMessageSource {
-  static const ConsoleMessageSource xml = const ConsoleMessageSource._('xml');
+  static const ConsoleMessageSource xml = ConsoleMessageSource._('xml');
   static const ConsoleMessageSource javascript =
-      const ConsoleMessageSource._('javascript');
-  static const ConsoleMessageSource network =
-      const ConsoleMessageSource._('network');
+      ConsoleMessageSource._('javascript');
+  static const ConsoleMessageSource network = ConsoleMessageSource._('network');
   static const ConsoleMessageSource consoleApi =
-      const ConsoleMessageSource._('console-api');
-  static const ConsoleMessageSource storage =
-      const ConsoleMessageSource._('storage');
+      ConsoleMessageSource._('console-api');
+  static const ConsoleMessageSource storage = ConsoleMessageSource._('storage');
   static const ConsoleMessageSource appcache =
-      const ConsoleMessageSource._('appcache');
+      ConsoleMessageSource._('appcache');
   static const ConsoleMessageSource rendering =
-      const ConsoleMessageSource._('rendering');
+      ConsoleMessageSource._('rendering');
   static const ConsoleMessageSource security =
-      const ConsoleMessageSource._('security');
-  static const ConsoleMessageSource other =
-      const ConsoleMessageSource._('other');
+      ConsoleMessageSource._('security');
+  static const ConsoleMessageSource other = ConsoleMessageSource._('other');
   static const ConsoleMessageSource deprecation =
-      const ConsoleMessageSource._('deprecation');
-  static const ConsoleMessageSource worker =
-      const ConsoleMessageSource._('worker');
-  static const values = const {
+      ConsoleMessageSource._('deprecation');
+  static const ConsoleMessageSource worker = ConsoleMessageSource._('worker');
+  static const values = {
     'xml': xml,
     'javascript': javascript,
     'network': network,
@@ -148,13 +144,12 @@ class ConsoleMessageSource {
 }
 
 class ConsoleMessageLevel {
-  static const ConsoleMessageLevel log = const ConsoleMessageLevel._('log');
-  static const ConsoleMessageLevel warning =
-      const ConsoleMessageLevel._('warning');
-  static const ConsoleMessageLevel error = const ConsoleMessageLevel._('error');
-  static const ConsoleMessageLevel debug = const ConsoleMessageLevel._('debug');
-  static const ConsoleMessageLevel info = const ConsoleMessageLevel._('info');
-  static const values = const {
+  static const ConsoleMessageLevel log = ConsoleMessageLevel._('log');
+  static const ConsoleMessageLevel warning = ConsoleMessageLevel._('warning');
+  static const ConsoleMessageLevel error = ConsoleMessageLevel._('error');
+  static const ConsoleMessageLevel debug = ConsoleMessageLevel._('debug');
+  static const ConsoleMessageLevel info = ConsoleMessageLevel._('info');
+  static const values = {
     'log': log,
     'warning': warning,
     'error': error,

@@ -1447,27 +1447,22 @@ class ScriptIdentifier {
 
 /// Transition type.
 class TransitionType {
-  static const TransitionType link = const TransitionType._('link');
-  static const TransitionType typed = const TransitionType._('typed');
-  static const TransitionType addressBar =
-      const TransitionType._('address_bar');
-  static const TransitionType autoBookmark =
-      const TransitionType._('auto_bookmark');
-  static const TransitionType autoSubframe =
-      const TransitionType._('auto_subframe');
+  static const TransitionType link = TransitionType._('link');
+  static const TransitionType typed = TransitionType._('typed');
+  static const TransitionType addressBar = TransitionType._('address_bar');
+  static const TransitionType autoBookmark = TransitionType._('auto_bookmark');
+  static const TransitionType autoSubframe = TransitionType._('auto_subframe');
   static const TransitionType manualSubframe =
-      const TransitionType._('manual_subframe');
-  static const TransitionType generated = const TransitionType._('generated');
-  static const TransitionType autoToplevel =
-      const TransitionType._('auto_toplevel');
-  static const TransitionType formSubmit =
-      const TransitionType._('form_submit');
-  static const TransitionType reload = const TransitionType._('reload');
-  static const TransitionType keyword = const TransitionType._('keyword');
+      TransitionType._('manual_subframe');
+  static const TransitionType generated = TransitionType._('generated');
+  static const TransitionType autoToplevel = TransitionType._('auto_toplevel');
+  static const TransitionType formSubmit = TransitionType._('form_submit');
+  static const TransitionType reload = TransitionType._('reload');
+  static const TransitionType keyword = TransitionType._('keyword');
   static const TransitionType keywordGenerated =
-      const TransitionType._('keyword_generated');
-  static const TransitionType other = const TransitionType._('other');
-  static const values = const {
+      TransitionType._('keyword_generated');
+  static const TransitionType other = TransitionType._('other');
+  static const values = {
     'link': link,
     'typed': typed,
     'address_bar': addressBar,
@@ -1612,11 +1607,11 @@ class ScreencastFrameMetadata {
 
 /// Javascript dialog type.
 class DialogType {
-  static const DialogType alert = const DialogType._('alert');
-  static const DialogType confirm = const DialogType._('confirm');
-  static const DialogType prompt = const DialogType._('prompt');
-  static const DialogType beforeunload = const DialogType._('beforeunload');
-  static const values = const {
+  static const DialogType alert = DialogType._('alert');
+  static const DialogType confirm = DialogType._('confirm');
+  static const DialogType prompt = DialogType._('prompt');
+  static const DialogType beforeunload = DialogType._('beforeunload');
+  static const values = {
     'alert': alert,
     'confirm': confirm,
     'prompt': prompt,
@@ -1936,20 +1931,20 @@ class FontSizes {
 
 class ClientNavigationReason {
   static const ClientNavigationReason formSubmissionGet =
-      const ClientNavigationReason._('formSubmissionGet');
+      ClientNavigationReason._('formSubmissionGet');
   static const ClientNavigationReason formSubmissionPost =
-      const ClientNavigationReason._('formSubmissionPost');
+      ClientNavigationReason._('formSubmissionPost');
   static const ClientNavigationReason httpHeaderRefresh =
-      const ClientNavigationReason._('httpHeaderRefresh');
+      ClientNavigationReason._('httpHeaderRefresh');
   static const ClientNavigationReason scriptInitiated =
-      const ClientNavigationReason._('scriptInitiated');
+      ClientNavigationReason._('scriptInitiated');
   static const ClientNavigationReason metaTagRefresh =
-      const ClientNavigationReason._('metaTagRefresh');
+      ClientNavigationReason._('metaTagRefresh');
   static const ClientNavigationReason pageBlockInterstitial =
-      const ClientNavigationReason._('pageBlockInterstitial');
+      ClientNavigationReason._('pageBlockInterstitial');
   static const ClientNavigationReason reload =
-      const ClientNavigationReason._('reload');
-  static const values = const {
+      ClientNavigationReason._('reload');
+  static const values = {
     'formSubmissionGet': formSubmissionGet,
     'formSubmissionPost': formSubmissionPost,
     'httpHeaderRefresh': httpHeaderRefresh,
@@ -1981,20 +1976,20 @@ class ClientNavigationReason {
 
 class FrameScheduledNavigationEventReason {
   static const FrameScheduledNavigationEventReason formSubmissionGet =
-      const FrameScheduledNavigationEventReason._('formSubmissionGet');
+      FrameScheduledNavigationEventReason._('formSubmissionGet');
   static const FrameScheduledNavigationEventReason formSubmissionPost =
-      const FrameScheduledNavigationEventReason._('formSubmissionPost');
+      FrameScheduledNavigationEventReason._('formSubmissionPost');
   static const FrameScheduledNavigationEventReason httpHeaderRefresh =
-      const FrameScheduledNavigationEventReason._('httpHeaderRefresh');
+      FrameScheduledNavigationEventReason._('httpHeaderRefresh');
   static const FrameScheduledNavigationEventReason scriptInitiated =
-      const FrameScheduledNavigationEventReason._('scriptInitiated');
+      FrameScheduledNavigationEventReason._('scriptInitiated');
   static const FrameScheduledNavigationEventReason metaTagRefresh =
-      const FrameScheduledNavigationEventReason._('metaTagRefresh');
+      FrameScheduledNavigationEventReason._('metaTagRefresh');
   static const FrameScheduledNavigationEventReason pageBlockInterstitial =
-      const FrameScheduledNavigationEventReason._('pageBlockInterstitial');
+      FrameScheduledNavigationEventReason._('pageBlockInterstitial');
   static const FrameScheduledNavigationEventReason reload =
-      const FrameScheduledNavigationEventReason._('reload');
-  static const values = const {
+      FrameScheduledNavigationEventReason._('reload');
+  static const values = {
     'formSubmissionGet': formSubmissionGet,
     'formSubmissionPost': formSubmissionPost,
     'httpHeaderRefresh': httpHeaderRefresh,

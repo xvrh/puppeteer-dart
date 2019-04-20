@@ -344,11 +344,11 @@ class Key {
 }
 
 class KeyType {
-  static const KeyType number = const KeyType._('number');
-  static const KeyType string = const KeyType._('string');
-  static const KeyType date = const KeyType._('date');
-  static const KeyType array = const KeyType._('array');
-  static const values = const {
+  static const KeyType number = KeyType._('number');
+  static const KeyType string = KeyType._('string');
+  static const KeyType date = KeyType._('date');
+  static const KeyType array = KeyType._('array');
+  static const values = {
     'number': number,
     'string': string,
     'date': date,
@@ -488,10 +488,10 @@ class KeyPath {
 }
 
 class KeyPathType {
-  static const KeyPathType null$ = const KeyPathType._('null');
-  static const KeyPathType string = const KeyPathType._('string');
-  static const KeyPathType array = const KeyPathType._('array');
-  static const values = const {
+  static const KeyPathType null$ = KeyPathType._('null');
+  static const KeyPathType string = KeyPathType._('string');
+  static const KeyPathType array = KeyPathType._('array');
+  static const values = {
     'null': null$,
     'string': string,
     'array': array,

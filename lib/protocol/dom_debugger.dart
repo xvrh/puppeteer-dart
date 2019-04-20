@@ -132,12 +132,12 @@ class DOMDebuggerApi {
 /// DOM breakpoint type.
 class DOMBreakpointType {
   static const DOMBreakpointType subtreeModified =
-      const DOMBreakpointType._('subtree-modified');
+      DOMBreakpointType._('subtree-modified');
   static const DOMBreakpointType attributeModified =
-      const DOMBreakpointType._('attribute-modified');
+      DOMBreakpointType._('attribute-modified');
   static const DOMBreakpointType nodeRemoved =
-      const DOMBreakpointType._('node-removed');
-  static const values = const {
+      DOMBreakpointType._('node-removed');
+  static const values = {
     'subtree-modified': subtreeModified,
     'attribute-modified': attributeModified,
     'node-removed': nodeRemoved,

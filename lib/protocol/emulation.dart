@@ -329,14 +329,14 @@ class ScreenOrientation {
 
 class ScreenOrientationType {
   static const ScreenOrientationType portraitPrimary =
-      const ScreenOrientationType._('portraitPrimary');
+      ScreenOrientationType._('portraitPrimary');
   static const ScreenOrientationType portraitSecondary =
-      const ScreenOrientationType._('portraitSecondary');
+      ScreenOrientationType._('portraitSecondary');
   static const ScreenOrientationType landscapePrimary =
-      const ScreenOrientationType._('landscapePrimary');
+      ScreenOrientationType._('landscapePrimary');
   static const ScreenOrientationType landscapeSecondary =
-      const ScreenOrientationType._('landscapeSecondary');
-  static const values = const {
+      ScreenOrientationType._('landscapeSecondary');
+  static const values = {
     'portraitPrimary': portraitPrimary,
     'portraitSecondary': portraitSecondary,
     'landscapePrimary': landscapePrimary,
@@ -368,11 +368,11 @@ class ScreenOrientationType {
 /// pauseIfNetworkFetchesPending: The virtual time base may not advance if there are any pending
 /// resource fetches.
 class VirtualTimePolicy {
-  static const VirtualTimePolicy advance = const VirtualTimePolicy._('advance');
-  static const VirtualTimePolicy pause = const VirtualTimePolicy._('pause');
+  static const VirtualTimePolicy advance = VirtualTimePolicy._('advance');
+  static const VirtualTimePolicy pause = VirtualTimePolicy._('pause');
   static const VirtualTimePolicy pauseIfNetworkFetchesPending =
-      const VirtualTimePolicy._('pauseIfNetworkFetchesPending');
-  static const values = const {
+      VirtualTimePolicy._('pauseIfNetworkFetchesPending');
+  static const values = {
     'advance': advance,
     'pause': pause,
     'pauseIfNetworkFetchesPending': pauseIfNetworkFetchesPending,

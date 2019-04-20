@@ -43,8 +43,8 @@ class DomWorld {
   void detach() {
     _detached = true;
     for (var waitTask in _waitTasks) {
-      waitTask.terminate(
-          new Exception('waitForFunction failed: frame got detached.'));
+      waitTask
+          .terminate(Exception('waitForFunction failed: frame got detached.'));
     }
   }
 
@@ -141,7 +141,7 @@ function _(html) {
   document.close();
 }
 ''', args: [html]);
-    var watcher = new LifecycleWatcher(frameManager, frame,
+    var watcher = LifecycleWatcher(frameManager, frame,
         waitUntil: waitUntil, timeout: timeout);
     var error = await Future.any([
       watcher.timeoutOrTermination,
@@ -395,7 +395,7 @@ function _(selectorOrXPath, isXPath, waitForVisible, waitForHidden) {
         waitForVisible || waitForHidden ? Polling.everyFrame : Polling.mutation;
     var title =
         '${isXPath ? 'XPath' : 'selector'} "$selectorOrXPath"${waitForHidden ? ' to be hidden' : ''}';
-    var waitTask = new WaitTask(this, _predicate,
+    var waitTask = WaitTask(this, _predicate,
         title: title,
         polling: polling,
         timeout: timeout ?? frameManager.page.defaultTimeout,

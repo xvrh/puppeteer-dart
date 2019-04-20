@@ -102,8 +102,7 @@ class Browser {
     BrowserContext context =
         _contexts[event.browserContextId] ?? _defaultContext;
 
-    Target target = new Target(
-        this, event, () => connection.createSession(event),
+    Target target = Target(this, event, () => connection.createSession(event),
         browserContext: context);
     _targets[event.targetId] = target;
 

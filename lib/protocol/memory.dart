@@ -106,9 +106,9 @@ class GetDOMCountersResult {
 
 /// Memory pressure level.
 class PressureLevel {
-  static const PressureLevel moderate = const PressureLevel._('moderate');
-  static const PressureLevel critical = const PressureLevel._('critical');
-  static const values = const {
+  static const PressureLevel moderate = PressureLevel._('moderate');
+  static const PressureLevel critical = PressureLevel._('critical');
+  static const values = {
     'moderate': moderate,
     'critical': critical,
   };

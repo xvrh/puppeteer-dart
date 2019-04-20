@@ -162,19 +162,18 @@ class GetUsageAndQuotaResult {
 
 /// Enum of possible storage types.
 class StorageType {
-  static const StorageType appcache = const StorageType._('appcache');
-  static const StorageType cookies = const StorageType._('cookies');
-  static const StorageType fileSystems = const StorageType._('file_systems');
-  static const StorageType indexeddb = const StorageType._('indexeddb');
-  static const StorageType localStorage = const StorageType._('local_storage');
-  static const StorageType shaderCache = const StorageType._('shader_cache');
-  static const StorageType websql = const StorageType._('websql');
-  static const StorageType serviceWorkers =
-      const StorageType._('service_workers');
-  static const StorageType cacheStorage = const StorageType._('cache_storage');
-  static const StorageType all = const StorageType._('all');
-  static const StorageType other = const StorageType._('other');
-  static const values = const {
+  static const StorageType appcache = StorageType._('appcache');
+  static const StorageType cookies = StorageType._('cookies');
+  static const StorageType fileSystems = StorageType._('file_systems');
+  static const StorageType indexeddb = StorageType._('indexeddb');
+  static const StorageType localStorage = StorageType._('local_storage');
+  static const StorageType shaderCache = StorageType._('shader_cache');
+  static const StorageType websql = StorageType._('websql');
+  static const StorageType serviceWorkers = StorageType._('service_workers');
+  static const StorageType cacheStorage = StorageType._('cache_storage');
+  static const StorageType all = StorageType._('all');
+  static const StorageType other = StorageType._('other');
+  static const values = {
     'appcache': appcache,
     'cookies': cookies,
     'file_systems': fileSystems,

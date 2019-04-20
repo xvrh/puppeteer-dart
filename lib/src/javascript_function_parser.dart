@@ -123,8 +123,8 @@ class JsGrammarDefinition extends GrammarDefinition {
       string('*/');
 }
 
-final _isFunction = new Object();
-final _hasBodyStatements = new Object();
+final _isFunction = Object();
+final _hasBodyStatements = Object();
 
 class _FunctionBody {
   final String value;

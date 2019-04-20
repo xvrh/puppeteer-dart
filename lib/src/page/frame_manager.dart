@@ -171,7 +171,7 @@ class FrameManager {
     if (_frames.containsKey(frameId)) return;
     assert(parentFrameId != null);
     var parentFrame = _frames[parentFrameId];
-    var frame = new PageFrame(this, page.session, parentFrame, frameId);
+    var frame = PageFrame(this, page.session, parentFrame, frameId);
     _frames[frameId] = frame;
     _frameAttachedController.add(frame);
   }
@@ -262,7 +262,7 @@ class FrameManager {
         contextPayload.auxData['type'] == 'isolated') {
       _isolatedWorlds.add(contextPayload.name);
     }
-    var context = new ExecutionContext(page.session, contextPayload, world);
+    var context = ExecutionContext(page.session, contextPayload, world);
     if (world != null) {
       world.setContext(context);
     }
@@ -316,8 +316,8 @@ class PageFrame {
   DomWorld _mainWorld, _secondaryWorld;
 
   PageFrame(this.frameManager, this.client, this._parent, this._id) {
-    _mainWorld = new DomWorld(frameManager, this);
-    _secondaryWorld = new DomWorld(frameManager, this);
+    _mainWorld = DomWorld(frameManager, this);
+    _secondaryWorld = DomWorld(frameManager, this);
 
     if (_parent != null) {
       _parent.children.add(this);

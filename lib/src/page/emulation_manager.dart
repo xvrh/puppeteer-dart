@@ -25,12 +25,12 @@ class DeviceViewport {
   final bool hasTouch;
 
   const DeviceViewport(
-      {this.width: 800,
-      this.height: 600,
-      this.deviceScaleFactor: 1,
-      this.isMobile: false,
-      this.isLandscape: false,
-      this.hasTouch: false})
+      {this.width = 800,
+      this.height = 600,
+      this.deviceScaleFactor = 1,
+      this.isMobile = false,
+      this.isLandscape = false,
+      this.hasTouch = false})
       : assert(width != null),
         assert(height != null);
 

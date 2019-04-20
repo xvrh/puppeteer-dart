@@ -1104,25 +1104,24 @@ class GetResponseBodyForInterceptionResult {
 
 /// Resource type as it was perceived by the rendering engine.
 class ResourceType {
-  static const ResourceType document = const ResourceType._('Document');
-  static const ResourceType stylesheet = const ResourceType._('Stylesheet');
-  static const ResourceType image = const ResourceType._('Image');
-  static const ResourceType media = const ResourceType._('Media');
-  static const ResourceType font = const ResourceType._('Font');
-  static const ResourceType script = const ResourceType._('Script');
-  static const ResourceType textTrack = const ResourceType._('TextTrack');
-  static const ResourceType xhr = const ResourceType._('XHR');
-  static const ResourceType fetch = const ResourceType._('Fetch');
-  static const ResourceType eventSource = const ResourceType._('EventSource');
-  static const ResourceType webSocket = const ResourceType._('WebSocket');
-  static const ResourceType manifest = const ResourceType._('Manifest');
-  static const ResourceType signedExchange =
-      const ResourceType._('SignedExchange');
-  static const ResourceType ping = const ResourceType._('Ping');
+  static const ResourceType document = ResourceType._('Document');
+  static const ResourceType stylesheet = ResourceType._('Stylesheet');
+  static const ResourceType image = ResourceType._('Image');
+  static const ResourceType media = ResourceType._('Media');
+  static const ResourceType font = ResourceType._('Font');
+  static const ResourceType script = ResourceType._('Script');
+  static const ResourceType textTrack = ResourceType._('TextTrack');
+  static const ResourceType xhr = ResourceType._('XHR');
+  static const ResourceType fetch = ResourceType._('Fetch');
+  static const ResourceType eventSource = ResourceType._('EventSource');
+  static const ResourceType webSocket = ResourceType._('WebSocket');
+  static const ResourceType manifest = ResourceType._('Manifest');
+  static const ResourceType signedExchange = ResourceType._('SignedExchange');
+  static const ResourceType ping = ResourceType._('Ping');
   static const ResourceType cspViolationReport =
-      const ResourceType._('CSPViolationReport');
-  static const ResourceType other = const ResourceType._('Other');
-  static const values = const {
+      ResourceType._('CSPViolationReport');
+  static const ResourceType other = ResourceType._('Other');
+  static const values = {
     'Document': document,
     'Stylesheet': stylesheet,
     'Image': image,
@@ -1225,31 +1224,26 @@ class InterceptionId {
 
 /// Network level fetch failure reason.
 class ErrorReason {
-  static const ErrorReason failed = const ErrorReason._('Failed');
-  static const ErrorReason aborted = const ErrorReason._('Aborted');
-  static const ErrorReason timedOut = const ErrorReason._('TimedOut');
-  static const ErrorReason accessDenied = const ErrorReason._('AccessDenied');
-  static const ErrorReason connectionClosed =
-      const ErrorReason._('ConnectionClosed');
-  static const ErrorReason connectionReset =
-      const ErrorReason._('ConnectionReset');
+  static const ErrorReason failed = ErrorReason._('Failed');
+  static const ErrorReason aborted = ErrorReason._('Aborted');
+  static const ErrorReason timedOut = ErrorReason._('TimedOut');
+  static const ErrorReason accessDenied = ErrorReason._('AccessDenied');
+  static const ErrorReason connectionClosed = ErrorReason._('ConnectionClosed');
+  static const ErrorReason connectionReset = ErrorReason._('ConnectionReset');
   static const ErrorReason connectionRefused =
-      const ErrorReason._('ConnectionRefused');
+      ErrorReason._('ConnectionRefused');
   static const ErrorReason connectionAborted =
-      const ErrorReason._('ConnectionAborted');
-  static const ErrorReason connectionFailed =
-      const ErrorReason._('ConnectionFailed');
-  static const ErrorReason nameNotResolved =
-      const ErrorReason._('NameNotResolved');
+      ErrorReason._('ConnectionAborted');
+  static const ErrorReason connectionFailed = ErrorReason._('ConnectionFailed');
+  static const ErrorReason nameNotResolved = ErrorReason._('NameNotResolved');
   static const ErrorReason internetDisconnected =
-      const ErrorReason._('InternetDisconnected');
+      ErrorReason._('InternetDisconnected');
   static const ErrorReason addressUnreachable =
-      const ErrorReason._('AddressUnreachable');
-  static const ErrorReason blockedByClient =
-      const ErrorReason._('BlockedByClient');
+      ErrorReason._('AddressUnreachable');
+  static const ErrorReason blockedByClient = ErrorReason._('BlockedByClient');
   static const ErrorReason blockedByResponse =
-      const ErrorReason._('BlockedByResponse');
-  static const values = const {
+      ErrorReason._('BlockedByResponse');
+  static const values = {
     'Failed': failed,
     'Aborted': aborted,
     'TimedOut': timedOut,
@@ -1350,16 +1344,16 @@ class Headers {
 
 /// The underlying connection technology that the browser is supposedly using.
 class ConnectionType {
-  static const ConnectionType none = const ConnectionType._('none');
-  static const ConnectionType cellular2g = const ConnectionType._('cellular2g');
-  static const ConnectionType cellular3g = const ConnectionType._('cellular3g');
-  static const ConnectionType cellular4g = const ConnectionType._('cellular4g');
-  static const ConnectionType bluetooth = const ConnectionType._('bluetooth');
-  static const ConnectionType ethernet = const ConnectionType._('ethernet');
-  static const ConnectionType wifi = const ConnectionType._('wifi');
-  static const ConnectionType wimax = const ConnectionType._('wimax');
-  static const ConnectionType other = const ConnectionType._('other');
-  static const values = const {
+  static const ConnectionType none = ConnectionType._('none');
+  static const ConnectionType cellular2g = ConnectionType._('cellular2g');
+  static const ConnectionType cellular3g = ConnectionType._('cellular3g');
+  static const ConnectionType cellular4g = ConnectionType._('cellular4g');
+  static const ConnectionType bluetooth = ConnectionType._('bluetooth');
+  static const ConnectionType ethernet = ConnectionType._('ethernet');
+  static const ConnectionType wifi = ConnectionType._('wifi');
+  static const ConnectionType wimax = ConnectionType._('wimax');
+  static const ConnectionType other = ConnectionType._('other');
+  static const values = {
     'none': none,
     'cellular2g': cellular2g,
     'cellular3g': cellular3g,
@@ -1393,9 +1387,9 @@ class ConnectionType {
 /// Represents the cookie's 'SameSite' status:
 /// https://tools.ietf.org/html/draft-west-first-party-cookies
 class CookieSameSite {
-  static const CookieSameSite strict = const CookieSameSite._('Strict');
-  static const CookieSameSite lax = const CookieSameSite._('Lax');
-  static const values = const {
+  static const CookieSameSite strict = CookieSameSite._('Strict');
+  static const CookieSameSite lax = CookieSameSite._('Lax');
+  static const values = {
     'Strict': strict,
     'Lax': lax,
   };
@@ -1534,12 +1528,12 @@ class ResourceTiming {
 
 /// Loading priority of a resource request.
 class ResourcePriority {
-  static const ResourcePriority veryLow = const ResourcePriority._('VeryLow');
-  static const ResourcePriority low = const ResourcePriority._('Low');
-  static const ResourcePriority medium = const ResourcePriority._('Medium');
-  static const ResourcePriority high = const ResourcePriority._('High');
-  static const ResourcePriority veryHigh = const ResourcePriority._('VeryHigh');
-  static const values = const {
+  static const ResourcePriority veryLow = ResourcePriority._('VeryLow');
+  static const ResourcePriority low = ResourcePriority._('Low');
+  static const ResourcePriority medium = ResourcePriority._('Medium');
+  static const ResourcePriority high = ResourcePriority._('High');
+  static const ResourcePriority veryHigh = ResourcePriority._('VeryHigh');
+  static const values = {
     'VeryLow': veryLow,
     'Low': low,
     'Medium': medium,
@@ -1657,22 +1651,21 @@ class Request {
 
 class RequestReferrerPolicy {
   static const RequestReferrerPolicy unsafeUrl =
-      const RequestReferrerPolicy._('unsafe-url');
+      RequestReferrerPolicy._('unsafe-url');
   static const RequestReferrerPolicy noReferrerWhenDowngrade =
-      const RequestReferrerPolicy._('no-referrer-when-downgrade');
+      RequestReferrerPolicy._('no-referrer-when-downgrade');
   static const RequestReferrerPolicy noReferrer =
-      const RequestReferrerPolicy._('no-referrer');
-  static const RequestReferrerPolicy origin =
-      const RequestReferrerPolicy._('origin');
+      RequestReferrerPolicy._('no-referrer');
+  static const RequestReferrerPolicy origin = RequestReferrerPolicy._('origin');
   static const RequestReferrerPolicy originWhenCrossOrigin =
-      const RequestReferrerPolicy._('origin-when-cross-origin');
+      RequestReferrerPolicy._('origin-when-cross-origin');
   static const RequestReferrerPolicy sameOrigin =
-      const RequestReferrerPolicy._('same-origin');
+      RequestReferrerPolicy._('same-origin');
   static const RequestReferrerPolicy strictOrigin =
-      const RequestReferrerPolicy._('strict-origin');
+      RequestReferrerPolicy._('strict-origin');
   static const RequestReferrerPolicy strictOriginWhenCrossOrigin =
-      const RequestReferrerPolicy._('strict-origin-when-cross-origin');
-  static const values = const {
+      RequestReferrerPolicy._('strict-origin-when-cross-origin');
+  static const values = {
     'unsafe-url': unsafeUrl,
     'no-referrer-when-downgrade': noReferrerWhenDowngrade,
     'no-referrer': noReferrer,
@@ -1877,12 +1870,12 @@ class SecurityDetails {
 /// Whether the request complied with Certificate Transparency policy.
 class CertificateTransparencyCompliance {
   static const CertificateTransparencyCompliance unknown =
-      const CertificateTransparencyCompliance._('unknown');
+      CertificateTransparencyCompliance._('unknown');
   static const CertificateTransparencyCompliance notCompliant =
-      const CertificateTransparencyCompliance._('not-compliant');
+      CertificateTransparencyCompliance._('not-compliant');
   static const CertificateTransparencyCompliance compliant =
-      const CertificateTransparencyCompliance._('compliant');
-  static const values = const {
+      CertificateTransparencyCompliance._('compliant');
+  static const values = {
     'unknown': unknown,
     'not-compliant': notCompliant,
     'compliant': compliant,
@@ -1911,19 +1904,17 @@ class CertificateTransparencyCompliance {
 
 /// The reason why request was blocked.
 class BlockedReason {
-  static const BlockedReason other = const BlockedReason._('other');
-  static const BlockedReason csp = const BlockedReason._('csp');
-  static const BlockedReason mixedContent =
-      const BlockedReason._('mixed-content');
-  static const BlockedReason origin = const BlockedReason._('origin');
-  static const BlockedReason inspector = const BlockedReason._('inspector');
+  static const BlockedReason other = BlockedReason._('other');
+  static const BlockedReason csp = BlockedReason._('csp');
+  static const BlockedReason mixedContent = BlockedReason._('mixed-content');
+  static const BlockedReason origin = BlockedReason._('origin');
+  static const BlockedReason inspector = BlockedReason._('inspector');
   static const BlockedReason subresourceFilter =
-      const BlockedReason._('subresource-filter');
-  static const BlockedReason contentType =
-      const BlockedReason._('content-type');
+      BlockedReason._('subresource-filter');
+  static const BlockedReason contentType = BlockedReason._('content-type');
   static const BlockedReason collapsedByClient =
-      const BlockedReason._('collapsed-by-client');
-  static const values = const {
+      BlockedReason._('collapsed-by-client');
+  static const values = {
     'other': other,
     'csp': csp,
     'mixed-content': mixedContent,
@@ -2322,13 +2313,12 @@ class Initiator {
 }
 
 class InitiatorType {
-  static const InitiatorType parser = const InitiatorType._('parser');
-  static const InitiatorType script = const InitiatorType._('script');
-  static const InitiatorType preload = const InitiatorType._('preload');
-  static const InitiatorType signedExchange =
-      const InitiatorType._('SignedExchange');
-  static const InitiatorType other = const InitiatorType._('other');
-  static const values = const {
+  static const InitiatorType parser = InitiatorType._('parser');
+  static const InitiatorType script = InitiatorType._('script');
+  static const InitiatorType preload = InitiatorType._('preload');
+  static const InitiatorType signedExchange = InitiatorType._('SignedExchange');
+  static const InitiatorType other = InitiatorType._('other');
+  static const values = {
     'parser': parser,
     'script': script,
     'preload': preload,
@@ -2569,10 +2559,9 @@ class AuthChallenge {
 }
 
 class AuthChallengeSource {
-  static const AuthChallengeSource server =
-      const AuthChallengeSource._('Server');
-  static const AuthChallengeSource proxy = const AuthChallengeSource._('Proxy');
-  static const values = const {
+  static const AuthChallengeSource server = AuthChallengeSource._('Server');
+  static const AuthChallengeSource proxy = AuthChallengeSource._('Proxy');
+  static const values = {
     'Server': server,
     'Proxy': proxy,
   };
@@ -2638,12 +2627,12 @@ class AuthChallengeResponse {
 
 class AuthChallengeResponseResponse {
   static const AuthChallengeResponseResponse default$ =
-      const AuthChallengeResponseResponse._('Default');
+      AuthChallengeResponseResponse._('Default');
   static const AuthChallengeResponseResponse cancelAuth =
-      const AuthChallengeResponseResponse._('CancelAuth');
+      AuthChallengeResponseResponse._('CancelAuth');
   static const AuthChallengeResponseResponse provideCredentials =
-      const AuthChallengeResponseResponse._('ProvideCredentials');
-  static const values = const {
+      AuthChallengeResponseResponse._('ProvideCredentials');
+  static const values = {
     'Default': default$,
     'CancelAuth': cancelAuth,
     'ProvideCredentials': provideCredentials,
@@ -2672,10 +2661,10 @@ class AuthChallengeResponseResponse {
 /// Stages of the interception to begin intercepting. Request will intercept before the request is
 /// sent. Response will intercept after the response is received.
 class InterceptionStage {
-  static const InterceptionStage request = const InterceptionStage._('Request');
+  static const InterceptionStage request = InterceptionStage._('Request');
   static const InterceptionStage headersReceived =
-      const InterceptionStage._('HeadersReceived');
-  static const values = const {
+      InterceptionStage._('HeadersReceived');
+  static const values = {
     'Request': request,
     'HeadersReceived': headersReceived,
   };
@@ -2865,18 +2854,18 @@ class SignedExchangeHeader {
 /// Field type for a signed exchange related error.
 class SignedExchangeErrorField {
   static const SignedExchangeErrorField signatureSig =
-      const SignedExchangeErrorField._('signatureSig');
+      SignedExchangeErrorField._('signatureSig');
   static const SignedExchangeErrorField signatureIntegrity =
-      const SignedExchangeErrorField._('signatureIntegrity');
+      SignedExchangeErrorField._('signatureIntegrity');
   static const SignedExchangeErrorField signatureCertUrl =
-      const SignedExchangeErrorField._('signatureCertUrl');
+      SignedExchangeErrorField._('signatureCertUrl');
   static const SignedExchangeErrorField signatureCertSha256 =
-      const SignedExchangeErrorField._('signatureCertSha256');
+      SignedExchangeErrorField._('signatureCertSha256');
   static const SignedExchangeErrorField signatureValidityUrl =
-      const SignedExchangeErrorField._('signatureValidityUrl');
+      SignedExchangeErrorField._('signatureValidityUrl');
   static const SignedExchangeErrorField signatureTimestamps =
-      const SignedExchangeErrorField._('signatureTimestamps');
-  static const values = const {
+      SignedExchangeErrorField._('signatureTimestamps');
+  static const values = {
     'signatureSig': signatureSig,
     'signatureIntegrity': signatureIntegrity,
     'signatureCertUrl': signatureCertUrl,

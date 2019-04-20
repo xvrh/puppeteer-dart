@@ -115,11 +115,9 @@ class ScreenshotParams {
 }
 
 class ScreenshotParamsFormat {
-  static const ScreenshotParamsFormat jpeg =
-      const ScreenshotParamsFormat._('jpeg');
-  static const ScreenshotParamsFormat png =
-      const ScreenshotParamsFormat._('png');
-  static const values = const {
+  static const ScreenshotParamsFormat jpeg = ScreenshotParamsFormat._('jpeg');
+  static const ScreenshotParamsFormat png = ScreenshotParamsFormat._('png');
+  static const values = {
     'jpeg': jpeg,
     'png': png,
   };

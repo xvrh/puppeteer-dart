@@ -413,7 +413,7 @@ class _Event {
   String get complexTypeCode => _complexType?.code;
 }
 
-const List<String> jsonTypes = const [
+const List<String> jsonTypes = [
   'string',
   'boolean',
   'number',

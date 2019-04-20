@@ -167,7 +167,7 @@ abstract class Typed {
   String get ref;
 }
 
-const Set<String> _dartKeywords = const {
+const Set<String> _dartKeywords = {
   'abstract', 'deferred', 'if', 'super',
   'as', 'do', 'implements', 'switch',
   'assert', 'dynamic', 'import', 'sync',

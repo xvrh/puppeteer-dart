@@ -417,13 +417,11 @@ class StyleSheetId {
 /// stylesheets, "inspector" for stylesheets created by the inspector (i.e. those holding the "via
 /// inspector" rules), "regular" for regular stylesheets.
 class StyleSheetOrigin {
-  static const StyleSheetOrigin injected = const StyleSheetOrigin._('injected');
-  static const StyleSheetOrigin userAgent =
-      const StyleSheetOrigin._('user-agent');
-  static const StyleSheetOrigin inspector =
-      const StyleSheetOrigin._('inspector');
-  static const StyleSheetOrigin regular = const StyleSheetOrigin._('regular');
-  static const values = const {
+  static const StyleSheetOrigin injected = StyleSheetOrigin._('injected');
+  static const StyleSheetOrigin userAgent = StyleSheetOrigin._('user-agent');
+  static const StyleSheetOrigin inspector = StyleSheetOrigin._('inspector');
+  static const StyleSheetOrigin regular = StyleSheetOrigin._('regular');
+  static const values = {
     'injected': injected,
     'user-agent': userAgent,
     'inspector': inspector,
@@ -1103,13 +1101,11 @@ class CSSMedia {
 }
 
 class CSSMediaSource {
-  static const CSSMediaSource mediaRule = const CSSMediaSource._('mediaRule');
-  static const CSSMediaSource importRule = const CSSMediaSource._('importRule');
-  static const CSSMediaSource linkedSheet =
-      const CSSMediaSource._('linkedSheet');
-  static const CSSMediaSource inlineSheet =
-      const CSSMediaSource._('inlineSheet');
-  static const values = const {
+  static const CSSMediaSource mediaRule = CSSMediaSource._('mediaRule');
+  static const CSSMediaSource importRule = CSSMediaSource._('importRule');
+  static const CSSMediaSource linkedSheet = CSSMediaSource._('linkedSheet');
+  static const CSSMediaSource inlineSheet = CSSMediaSource._('inlineSheet');
+  static const values = {
     'mediaRule': mediaRule,
     'importRule': importRule,
     'linkedSheet': linkedSheet,

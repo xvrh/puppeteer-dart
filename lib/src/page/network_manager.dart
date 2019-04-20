@@ -75,7 +75,7 @@ class NetworkManager {
 
   Future<void> setExtraHTTPHeaders(Map<String, String> extraHttpHeaders) async {
     _extraHTTPHeaders.clear();
-    _extraHTTPHeaders.addAll(new Map.fromIterable(extraHttpHeaders.entries,
+    _extraHTTPHeaders.addAll(Map.fromIterable(extraHttpHeaders.entries,
         key: (e) => e.key.toLowercase(), value: (e) => e.value));
     await _network.setExtraHTTPHeaders(Headers(_extraHTTPHeaders));
   }
@@ -203,11 +203,11 @@ class NetworkManager {
 
   void _handleRequestRedirect(
       NetworkRequest request, Response responsePayload) {
-    var response = new NetworkResponse(client, request, responsePayload);
+    var response = NetworkResponse(client, request, responsePayload);
     request._response = response;
     request.redirectChain.add(request);
     response._bodyLoadedCompleter.complete(
-        new Exception('Response body is unavailable for redirect responses'));
+        Exception('Response body is unavailable for redirect responses'));
     _requestIdToRequest.remove(request.requestId);
     _attemptedAuthentications.remove(request.interceptionId);
     _onResponseController.add(response);
@@ -218,7 +218,7 @@ class NetworkManager {
     var request = _requestIdToRequest[event.requestId.value];
     // FileUpload sends a response without a matching request.
     if (request == null) return;
-    var response = new NetworkResponse(client, request, event.response);
+    var response = NetworkResponse(client, request, event.response);
     request._response = response;
     _onResponseController.add(response);
   }

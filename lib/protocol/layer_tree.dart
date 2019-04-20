@@ -222,12 +222,12 @@ class ScrollRect {
 
 class ScrollRectType {
   static const ScrollRectType repaintsOnScroll =
-      const ScrollRectType._('RepaintsOnScroll');
+      ScrollRectType._('RepaintsOnScroll');
   static const ScrollRectType touchEventHandler =
-      const ScrollRectType._('TouchEventHandler');
+      ScrollRectType._('TouchEventHandler');
   static const ScrollRectType wheelEventHandler =
-      const ScrollRectType._('WheelEventHandler');
-  static const values = const {
+      ScrollRectType._('WheelEventHandler');
+  static const values = {
     'RepaintsOnScroll': repaintsOnScroll,
     'TouchEventHandler': touchEventHandler,
     'WheelEventHandler': wheelEventHandler,

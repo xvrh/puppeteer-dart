@@ -62,7 +62,7 @@ class Page {
       } else {
         var session = target.browser.connection.sessions[e.sessionId.value];
         assert(session != null);
-        var worker = new Worker(session, e.targetInfo.url);
+        var worker = Worker(session, e.targetInfo.url);
         _workers[e.sessionId] = worker;
         _workerCreated.add(worker);
       }

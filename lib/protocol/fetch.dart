@@ -303,9 +303,9 @@ class RequestId {
 /// sent. Response will intercept after the response is received (but before response
 /// body is received.
 class RequestStage {
-  static const RequestStage request = const RequestStage._('Request');
-  static const RequestStage response = const RequestStage._('Response');
-  static const values = const {
+  static const RequestStage request = RequestStage._('Request');
+  static const RequestStage response = RequestStage._('Response');
+  static const values = {
     'Request': request,
     'Response': response,
   };
@@ -438,10 +438,9 @@ class AuthChallenge {
 }
 
 class AuthChallengeSource {
-  static const AuthChallengeSource server =
-      const AuthChallengeSource._('Server');
-  static const AuthChallengeSource proxy = const AuthChallengeSource._('Proxy');
-  static const values = const {
+  static const AuthChallengeSource server = AuthChallengeSource._('Server');
+  static const AuthChallengeSource proxy = AuthChallengeSource._('Proxy');
+  static const values = {
     'Server': server,
     'Proxy': proxy,
   };
@@ -507,12 +506,12 @@ class AuthChallengeResponse {
 
 class AuthChallengeResponseResponse {
   static const AuthChallengeResponseResponse default$ =
-      const AuthChallengeResponseResponse._('Default');
+      AuthChallengeResponseResponse._('Default');
   static const AuthChallengeResponseResponse cancelAuth =
-      const AuthChallengeResponseResponse._('CancelAuth');
+      AuthChallengeResponseResponse._('CancelAuth');
   static const AuthChallengeResponseResponse provideCredentials =
-      const AuthChallengeResponseResponse._('ProvideCredentials');
-  static const values = const {
+      AuthChallengeResponseResponse._('ProvideCredentials');
+  static const values = {
     'Default': default$,
     'CancelAuth': cancelAuth,
     'ProvideCredentials': provideCredentials,

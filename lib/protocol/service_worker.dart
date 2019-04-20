@@ -167,14 +167,14 @@ class ServiceWorkerRegistration {
 
 class ServiceWorkerVersionRunningStatus {
   static const ServiceWorkerVersionRunningStatus stopped =
-      const ServiceWorkerVersionRunningStatus._('stopped');
+      ServiceWorkerVersionRunningStatus._('stopped');
   static const ServiceWorkerVersionRunningStatus starting =
-      const ServiceWorkerVersionRunningStatus._('starting');
+      ServiceWorkerVersionRunningStatus._('starting');
   static const ServiceWorkerVersionRunningStatus running =
-      const ServiceWorkerVersionRunningStatus._('running');
+      ServiceWorkerVersionRunningStatus._('running');
   static const ServiceWorkerVersionRunningStatus stopping =
-      const ServiceWorkerVersionRunningStatus._('stopping');
-  static const values = const {
+      ServiceWorkerVersionRunningStatus._('stopping');
+  static const values = {
     'stopped': stopped,
     'starting': starting,
     'running': running,
@@ -204,18 +204,18 @@ class ServiceWorkerVersionRunningStatus {
 
 class ServiceWorkerVersionStatus {
   static const ServiceWorkerVersionStatus new$ =
-      const ServiceWorkerVersionStatus._('new');
+      ServiceWorkerVersionStatus._('new');
   static const ServiceWorkerVersionStatus installing =
-      const ServiceWorkerVersionStatus._('installing');
+      ServiceWorkerVersionStatus._('installing');
   static const ServiceWorkerVersionStatus installed =
-      const ServiceWorkerVersionStatus._('installed');
+      ServiceWorkerVersionStatus._('installed');
   static const ServiceWorkerVersionStatus activating =
-      const ServiceWorkerVersionStatus._('activating');
+      ServiceWorkerVersionStatus._('activating');
   static const ServiceWorkerVersionStatus activated =
-      const ServiceWorkerVersionStatus._('activated');
+      ServiceWorkerVersionStatus._('activated');
   static const ServiceWorkerVersionStatus redundant =
-      const ServiceWorkerVersionStatus._('redundant');
-  static const values = const {
+      ServiceWorkerVersionStatus._('redundant');
+  static const values = {
     'new': new$,
     'installing': installing,
     'installed': installed,

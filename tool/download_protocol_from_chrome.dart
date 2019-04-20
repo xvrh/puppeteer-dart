@@ -14,7 +14,7 @@ main() async {
     String url = chrome.connection.url.replaceAll('ws://', 'http://');
     String response = await read(p.url.join(url, '/json/protocol'));
 
-    new File('tool/json/$protocolFromChromeFile').writeAsStringSync(response);
+    File('tool/json/$protocolFromChromeFile').writeAsStringSync(response);
   } finally {
     await chrome.close();
   }

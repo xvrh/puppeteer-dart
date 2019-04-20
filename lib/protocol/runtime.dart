@@ -875,16 +875,15 @@ class RemoteObject {
 }
 
 class RemoteObjectType {
-  static const RemoteObjectType object = const RemoteObjectType._('object');
-  static const RemoteObjectType function = const RemoteObjectType._('function');
-  static const RemoteObjectType undefined =
-      const RemoteObjectType._('undefined');
-  static const RemoteObjectType string = const RemoteObjectType._('string');
-  static const RemoteObjectType number = const RemoteObjectType._('number');
-  static const RemoteObjectType boolean = const RemoteObjectType._('boolean');
-  static const RemoteObjectType symbol = const RemoteObjectType._('symbol');
-  static const RemoteObjectType bigint = const RemoteObjectType._('bigint');
-  static const values = const {
+  static const RemoteObjectType object = RemoteObjectType._('object');
+  static const RemoteObjectType function = RemoteObjectType._('function');
+  static const RemoteObjectType undefined = RemoteObjectType._('undefined');
+  static const RemoteObjectType string = RemoteObjectType._('string');
+  static const RemoteObjectType number = RemoteObjectType._('number');
+  static const RemoteObjectType boolean = RemoteObjectType._('boolean');
+  static const RemoteObjectType symbol = RemoteObjectType._('symbol');
+  static const RemoteObjectType bigint = RemoteObjectType._('bigint');
+  static const values = {
     'object': object,
     'function': function,
     'undefined': undefined,
@@ -915,33 +914,27 @@ class RemoteObjectType {
 }
 
 class RemoteObjectSubtype {
-  static const RemoteObjectSubtype array = const RemoteObjectSubtype._('array');
-  static const RemoteObjectSubtype null$ = const RemoteObjectSubtype._('null');
-  static const RemoteObjectSubtype node = const RemoteObjectSubtype._('node');
-  static const RemoteObjectSubtype regexp =
-      const RemoteObjectSubtype._('regexp');
-  static const RemoteObjectSubtype date = const RemoteObjectSubtype._('date');
-  static const RemoteObjectSubtype map = const RemoteObjectSubtype._('map');
-  static const RemoteObjectSubtype set = const RemoteObjectSubtype._('set');
-  static const RemoteObjectSubtype weakmap =
-      const RemoteObjectSubtype._('weakmap');
-  static const RemoteObjectSubtype weakset =
-      const RemoteObjectSubtype._('weakset');
-  static const RemoteObjectSubtype iterator =
-      const RemoteObjectSubtype._('iterator');
+  static const RemoteObjectSubtype array = RemoteObjectSubtype._('array');
+  static const RemoteObjectSubtype null$ = RemoteObjectSubtype._('null');
+  static const RemoteObjectSubtype node = RemoteObjectSubtype._('node');
+  static const RemoteObjectSubtype regexp = RemoteObjectSubtype._('regexp');
+  static const RemoteObjectSubtype date = RemoteObjectSubtype._('date');
+  static const RemoteObjectSubtype map = RemoteObjectSubtype._('map');
+  static const RemoteObjectSubtype set = RemoteObjectSubtype._('set');
+  static const RemoteObjectSubtype weakmap = RemoteObjectSubtype._('weakmap');
+  static const RemoteObjectSubtype weakset = RemoteObjectSubtype._('weakset');
+  static const RemoteObjectSubtype iterator = RemoteObjectSubtype._('iterator');
   static const RemoteObjectSubtype generator =
-      const RemoteObjectSubtype._('generator');
-  static const RemoteObjectSubtype error = const RemoteObjectSubtype._('error');
-  static const RemoteObjectSubtype proxy = const RemoteObjectSubtype._('proxy');
-  static const RemoteObjectSubtype promise =
-      const RemoteObjectSubtype._('promise');
+      RemoteObjectSubtype._('generator');
+  static const RemoteObjectSubtype error = RemoteObjectSubtype._('error');
+  static const RemoteObjectSubtype proxy = RemoteObjectSubtype._('proxy');
+  static const RemoteObjectSubtype promise = RemoteObjectSubtype._('promise');
   static const RemoteObjectSubtype typedarray =
-      const RemoteObjectSubtype._('typedarray');
+      RemoteObjectSubtype._('typedarray');
   static const RemoteObjectSubtype arraybuffer =
-      const RemoteObjectSubtype._('arraybuffer');
-  static const RemoteObjectSubtype dataview =
-      const RemoteObjectSubtype._('dataview');
-  static const values = const {
+      RemoteObjectSubtype._('arraybuffer');
+  static const RemoteObjectSubtype dataview = RemoteObjectSubtype._('dataview');
+  static const values = {
     'array': array,
     'null': null$,
     'node': node,
@@ -1079,17 +1072,15 @@ class ObjectPreview {
 }
 
 class ObjectPreviewType {
-  static const ObjectPreviewType object = const ObjectPreviewType._('object');
-  static const ObjectPreviewType function =
-      const ObjectPreviewType._('function');
-  static const ObjectPreviewType undefined =
-      const ObjectPreviewType._('undefined');
-  static const ObjectPreviewType string = const ObjectPreviewType._('string');
-  static const ObjectPreviewType number = const ObjectPreviewType._('number');
-  static const ObjectPreviewType boolean = const ObjectPreviewType._('boolean');
-  static const ObjectPreviewType symbol = const ObjectPreviewType._('symbol');
-  static const ObjectPreviewType bigint = const ObjectPreviewType._('bigint');
-  static const values = const {
+  static const ObjectPreviewType object = ObjectPreviewType._('object');
+  static const ObjectPreviewType function = ObjectPreviewType._('function');
+  static const ObjectPreviewType undefined = ObjectPreviewType._('undefined');
+  static const ObjectPreviewType string = ObjectPreviewType._('string');
+  static const ObjectPreviewType number = ObjectPreviewType._('number');
+  static const ObjectPreviewType boolean = ObjectPreviewType._('boolean');
+  static const ObjectPreviewType symbol = ObjectPreviewType._('symbol');
+  static const ObjectPreviewType bigint = ObjectPreviewType._('bigint');
+  static const values = {
     'object': object,
     'function': function,
     'undefined': undefined,
@@ -1120,27 +1111,21 @@ class ObjectPreviewType {
 }
 
 class ObjectPreviewSubtype {
-  static const ObjectPreviewSubtype array =
-      const ObjectPreviewSubtype._('array');
-  static const ObjectPreviewSubtype null$ =
-      const ObjectPreviewSubtype._('null');
-  static const ObjectPreviewSubtype node = const ObjectPreviewSubtype._('node');
-  static const ObjectPreviewSubtype regexp =
-      const ObjectPreviewSubtype._('regexp');
-  static const ObjectPreviewSubtype date = const ObjectPreviewSubtype._('date');
-  static const ObjectPreviewSubtype map = const ObjectPreviewSubtype._('map');
-  static const ObjectPreviewSubtype set = const ObjectPreviewSubtype._('set');
-  static const ObjectPreviewSubtype weakmap =
-      const ObjectPreviewSubtype._('weakmap');
-  static const ObjectPreviewSubtype weakset =
-      const ObjectPreviewSubtype._('weakset');
+  static const ObjectPreviewSubtype array = ObjectPreviewSubtype._('array');
+  static const ObjectPreviewSubtype null$ = ObjectPreviewSubtype._('null');
+  static const ObjectPreviewSubtype node = ObjectPreviewSubtype._('node');
+  static const ObjectPreviewSubtype regexp = ObjectPreviewSubtype._('regexp');
+  static const ObjectPreviewSubtype date = ObjectPreviewSubtype._('date');
+  static const ObjectPreviewSubtype map = ObjectPreviewSubtype._('map');
+  static const ObjectPreviewSubtype set = ObjectPreviewSubtype._('set');
+  static const ObjectPreviewSubtype weakmap = ObjectPreviewSubtype._('weakmap');
+  static const ObjectPreviewSubtype weakset = ObjectPreviewSubtype._('weakset');
   static const ObjectPreviewSubtype iterator =
-      const ObjectPreviewSubtype._('iterator');
+      ObjectPreviewSubtype._('iterator');
   static const ObjectPreviewSubtype generator =
-      const ObjectPreviewSubtype._('generator');
-  static const ObjectPreviewSubtype error =
-      const ObjectPreviewSubtype._('error');
-  static const values = const {
+      ObjectPreviewSubtype._('generator');
+  static const ObjectPreviewSubtype error = ObjectPreviewSubtype._('error');
+  static const values = {
     'array': array,
     'null': null$,
     'node': node,
@@ -1230,25 +1215,17 @@ class PropertyPreview {
 }
 
 class PropertyPreviewType {
-  static const PropertyPreviewType object =
-      const PropertyPreviewType._('object');
-  static const PropertyPreviewType function =
-      const PropertyPreviewType._('function');
+  static const PropertyPreviewType object = PropertyPreviewType._('object');
+  static const PropertyPreviewType function = PropertyPreviewType._('function');
   static const PropertyPreviewType undefined =
-      const PropertyPreviewType._('undefined');
-  static const PropertyPreviewType string =
-      const PropertyPreviewType._('string');
-  static const PropertyPreviewType number =
-      const PropertyPreviewType._('number');
-  static const PropertyPreviewType boolean =
-      const PropertyPreviewType._('boolean');
-  static const PropertyPreviewType symbol =
-      const PropertyPreviewType._('symbol');
-  static const PropertyPreviewType accessor =
-      const PropertyPreviewType._('accessor');
-  static const PropertyPreviewType bigint =
-      const PropertyPreviewType._('bigint');
-  static const values = const {
+      PropertyPreviewType._('undefined');
+  static const PropertyPreviewType string = PropertyPreviewType._('string');
+  static const PropertyPreviewType number = PropertyPreviewType._('number');
+  static const PropertyPreviewType boolean = PropertyPreviewType._('boolean');
+  static const PropertyPreviewType symbol = PropertyPreviewType._('symbol');
+  static const PropertyPreviewType accessor = PropertyPreviewType._('accessor');
+  static const PropertyPreviewType bigint = PropertyPreviewType._('bigint');
+  static const values = {
     'object': object,
     'function': function,
     'undefined': undefined,
@@ -1280,31 +1257,24 @@ class PropertyPreviewType {
 }
 
 class PropertyPreviewSubtype {
-  static const PropertyPreviewSubtype array =
-      const PropertyPreviewSubtype._('array');
-  static const PropertyPreviewSubtype null$ =
-      const PropertyPreviewSubtype._('null');
-  static const PropertyPreviewSubtype node =
-      const PropertyPreviewSubtype._('node');
+  static const PropertyPreviewSubtype array = PropertyPreviewSubtype._('array');
+  static const PropertyPreviewSubtype null$ = PropertyPreviewSubtype._('null');
+  static const PropertyPreviewSubtype node = PropertyPreviewSubtype._('node');
   static const PropertyPreviewSubtype regexp =
-      const PropertyPreviewSubtype._('regexp');
-  static const PropertyPreviewSubtype date =
-      const PropertyPreviewSubtype._('date');
-  static const PropertyPreviewSubtype map =
-      const PropertyPreviewSubtype._('map');
-  static const PropertyPreviewSubtype set =
-      const PropertyPreviewSubtype._('set');
+      PropertyPreviewSubtype._('regexp');
+  static const PropertyPreviewSubtype date = PropertyPreviewSubtype._('date');
+  static const PropertyPreviewSubtype map = PropertyPreviewSubtype._('map');
+  static const PropertyPreviewSubtype set = PropertyPreviewSubtype._('set');
   static const PropertyPreviewSubtype weakmap =
-      const PropertyPreviewSubtype._('weakmap');
+      PropertyPreviewSubtype._('weakmap');
   static const PropertyPreviewSubtype weakset =
-      const PropertyPreviewSubtype._('weakset');
+      PropertyPreviewSubtype._('weakset');
   static const PropertyPreviewSubtype iterator =
-      const PropertyPreviewSubtype._('iterator');
+      PropertyPreviewSubtype._('iterator');
   static const PropertyPreviewSubtype generator =
-      const PropertyPreviewSubtype._('generator');
-  static const PropertyPreviewSubtype error =
-      const PropertyPreviewSubtype._('error');
-  static const values = const {
+      PropertyPreviewSubtype._('generator');
+  static const PropertyPreviewSubtype error = PropertyPreviewSubtype._('error');
+  static const values = {
     'array': array,
     'null': null$,
     'node': node,
@@ -1907,42 +1877,42 @@ class StackTraceId {
 
 class ConsoleAPICalledEventType {
   static const ConsoleAPICalledEventType log =
-      const ConsoleAPICalledEventType._('log');
+      ConsoleAPICalledEventType._('log');
   static const ConsoleAPICalledEventType debug =
-      const ConsoleAPICalledEventType._('debug');
+      ConsoleAPICalledEventType._('debug');
   static const ConsoleAPICalledEventType info =
-      const ConsoleAPICalledEventType._('info');
+      ConsoleAPICalledEventType._('info');
   static const ConsoleAPICalledEventType error =
-      const ConsoleAPICalledEventType._('error');
+      ConsoleAPICalledEventType._('error');
   static const ConsoleAPICalledEventType warning =
-      const ConsoleAPICalledEventType._('warning');
+      ConsoleAPICalledEventType._('warning');
   static const ConsoleAPICalledEventType dir =
-      const ConsoleAPICalledEventType._('dir');
+      ConsoleAPICalledEventType._('dir');
   static const ConsoleAPICalledEventType dirxml =
-      const ConsoleAPICalledEventType._('dirxml');
+      ConsoleAPICalledEventType._('dirxml');
   static const ConsoleAPICalledEventType table =
-      const ConsoleAPICalledEventType._('table');
+      ConsoleAPICalledEventType._('table');
   static const ConsoleAPICalledEventType trace =
-      const ConsoleAPICalledEventType._('trace');
+      ConsoleAPICalledEventType._('trace');
   static const ConsoleAPICalledEventType clear =
-      const ConsoleAPICalledEventType._('clear');
+      ConsoleAPICalledEventType._('clear');
   static const ConsoleAPICalledEventType startGroup =
-      const ConsoleAPICalledEventType._('startGroup');
+      ConsoleAPICalledEventType._('startGroup');
   static const ConsoleAPICalledEventType startGroupCollapsed =
-      const ConsoleAPICalledEventType._('startGroupCollapsed');
+      ConsoleAPICalledEventType._('startGroupCollapsed');
   static const ConsoleAPICalledEventType endGroup =
-      const ConsoleAPICalledEventType._('endGroup');
+      ConsoleAPICalledEventType._('endGroup');
   static const ConsoleAPICalledEventType assert$ =
-      const ConsoleAPICalledEventType._('assert');
+      ConsoleAPICalledEventType._('assert');
   static const ConsoleAPICalledEventType profile =
-      const ConsoleAPICalledEventType._('profile');
+      ConsoleAPICalledEventType._('profile');
   static const ConsoleAPICalledEventType profileEnd =
-      const ConsoleAPICalledEventType._('profileEnd');
+      ConsoleAPICalledEventType._('profileEnd');
   static const ConsoleAPICalledEventType count =
-      const ConsoleAPICalledEventType._('count');
+      ConsoleAPICalledEventType._('count');
   static const ConsoleAPICalledEventType timeEnd =
-      const ConsoleAPICalledEventType._('timeEnd');
-  static const values = const {
+      ConsoleAPICalledEventType._('timeEnd');
+  static const values = {
     'log': log,
     'debug': debug,
     'info': info,

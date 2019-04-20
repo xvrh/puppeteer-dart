@@ -68,7 +68,7 @@ class LifecycleWatcher {
   void _onFrameDetached(PageFrame frame) {
     if (this.frame == frame) {
       _terminationCompleter
-          .complete(new Exception('Navigating frame was detached'));
+          .complete(Exception('Navigating frame was detached'));
       return;
     }
     _checkLifecycleComplete();

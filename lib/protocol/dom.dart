@@ -1046,29 +1046,24 @@ class BackendNode {
 
 /// Pseudo element type.
 class PseudoType {
-  static const PseudoType firstLine = const PseudoType._('first-line');
-  static const PseudoType firstLetter = const PseudoType._('first-letter');
-  static const PseudoType before = const PseudoType._('before');
-  static const PseudoType after = const PseudoType._('after');
-  static const PseudoType backdrop = const PseudoType._('backdrop');
-  static const PseudoType selection = const PseudoType._('selection');
+  static const PseudoType firstLine = PseudoType._('first-line');
+  static const PseudoType firstLetter = PseudoType._('first-letter');
+  static const PseudoType before = PseudoType._('before');
+  static const PseudoType after = PseudoType._('after');
+  static const PseudoType backdrop = PseudoType._('backdrop');
+  static const PseudoType selection = PseudoType._('selection');
   static const PseudoType firstLineInherited =
-      const PseudoType._('first-line-inherited');
-  static const PseudoType scrollbar = const PseudoType._('scrollbar');
-  static const PseudoType scrollbarThumb =
-      const PseudoType._('scrollbar-thumb');
-  static const PseudoType scrollbarButton =
-      const PseudoType._('scrollbar-button');
-  static const PseudoType scrollbarTrack =
-      const PseudoType._('scrollbar-track');
+      PseudoType._('first-line-inherited');
+  static const PseudoType scrollbar = PseudoType._('scrollbar');
+  static const PseudoType scrollbarThumb = PseudoType._('scrollbar-thumb');
+  static const PseudoType scrollbarButton = PseudoType._('scrollbar-button');
+  static const PseudoType scrollbarTrack = PseudoType._('scrollbar-track');
   static const PseudoType scrollbarTrackPiece =
-      const PseudoType._('scrollbar-track-piece');
-  static const PseudoType scrollbarCorner =
-      const PseudoType._('scrollbar-corner');
-  static const PseudoType resizer = const PseudoType._('resizer');
-  static const PseudoType inputListButton =
-      const PseudoType._('input-list-button');
-  static const values = const {
+      PseudoType._('scrollbar-track-piece');
+  static const PseudoType scrollbarCorner = PseudoType._('scrollbar-corner');
+  static const PseudoType resizer = PseudoType._('resizer');
+  static const PseudoType inputListButton = PseudoType._('input-list-button');
+  static const values = {
     'first-line': firstLine,
     'first-letter': firstLetter,
     'before': before,
@@ -1107,10 +1102,10 @@ class PseudoType {
 
 /// Shadow root type.
 class ShadowRootType {
-  static const ShadowRootType userAgent = const ShadowRootType._('user-agent');
-  static const ShadowRootType open = const ShadowRootType._('open');
-  static const ShadowRootType closed = const ShadowRootType._('closed');
-  static const values = const {
+  static const ShadowRootType userAgent = ShadowRootType._('user-agent');
+  static const ShadowRootType open = ShadowRootType._('open');
+  static const ShadowRootType closed = ShadowRootType._('closed');
+  static const values = {
     'user-agent': userAgent,
     'open': open,
     'closed': closed,

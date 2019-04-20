@@ -224,11 +224,11 @@ class WindowID {
 
 /// The state of the browser window.
 class WindowState {
-  static const WindowState normal = const WindowState._('normal');
-  static const WindowState minimized = const WindowState._('minimized');
-  static const WindowState maximized = const WindowState._('maximized');
-  static const WindowState fullscreen = const WindowState._('fullscreen');
-  static const values = const {
+  static const WindowState normal = WindowState._('normal');
+  static const WindowState minimized = WindowState._('minimized');
+  static const WindowState maximized = WindowState._('maximized');
+  static const WindowState fullscreen = WindowState._('fullscreen');
+  static const values = {
     'normal': normal,
     'minimized': minimized,
     'maximized': maximized,
@@ -308,36 +308,30 @@ class Bounds {
 
 class PermissionType {
   static const PermissionType accessibilityEvents =
-      const PermissionType._('accessibilityEvents');
-  static const PermissionType audioCapture =
-      const PermissionType._('audioCapture');
+      PermissionType._('accessibilityEvents');
+  static const PermissionType audioCapture = PermissionType._('audioCapture');
   static const PermissionType backgroundSync =
-      const PermissionType._('backgroundSync');
+      PermissionType._('backgroundSync');
   static const PermissionType backgroundFetch =
-      const PermissionType._('backgroundFetch');
-  static const PermissionType clipboardRead =
-      const PermissionType._('clipboardRead');
+      PermissionType._('backgroundFetch');
+  static const PermissionType clipboardRead = PermissionType._('clipboardRead');
   static const PermissionType clipboardWrite =
-      const PermissionType._('clipboardWrite');
+      PermissionType._('clipboardWrite');
   static const PermissionType durableStorage =
-      const PermissionType._('durableStorage');
-  static const PermissionType flash = const PermissionType._('flash');
-  static const PermissionType geolocation =
-      const PermissionType._('geolocation');
-  static const PermissionType midi = const PermissionType._('midi');
-  static const PermissionType midiSysex = const PermissionType._('midiSysex');
-  static const PermissionType notifications =
-      const PermissionType._('notifications');
+      PermissionType._('durableStorage');
+  static const PermissionType flash = PermissionType._('flash');
+  static const PermissionType geolocation = PermissionType._('geolocation');
+  static const PermissionType midi = PermissionType._('midi');
+  static const PermissionType midiSysex = PermissionType._('midiSysex');
+  static const PermissionType notifications = PermissionType._('notifications');
   static const PermissionType paymentHandler =
-      const PermissionType._('paymentHandler');
+      PermissionType._('paymentHandler');
   static const PermissionType protectedMediaIdentifier =
-      const PermissionType._('protectedMediaIdentifier');
-  static const PermissionType sensors = const PermissionType._('sensors');
-  static const PermissionType videoCapture =
-      const PermissionType._('videoCapture');
-  static const PermissionType idleDetection =
-      const PermissionType._('idleDetection');
-  static const values = const {
+      PermissionType._('protectedMediaIdentifier');
+  static const PermissionType sensors = PermissionType._('sensors');
+  static const PermissionType videoCapture = PermissionType._('videoCapture');
+  static const PermissionType idleDetection = PermissionType._('idleDetection');
+  static const values = {
     'accessibilityEvents': accessibilityEvents,
     'audioCapture': audioCapture,
     'backgroundSync': backgroundSync,
