@@ -40,7 +40,7 @@ function() {
       '(a) => 2;': 'function(a) { return 2; }',
       '(a, bcc, cddd) => true;': 'function(a, bcc, cddd) { return true; }',
       '(a, bcc, cddd, ...args) => true;':
-          'function(a, bcc, cddd) { return true; }',
+          'function(a, bcc, cddd, ...args) { return true; }',
       'a => true;': 'function(a ){ return true; }',
       '(a) => { /**/ return  false; }': 'function(a) { return  false; }',
       '''(a) => { 

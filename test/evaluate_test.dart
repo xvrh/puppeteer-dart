@@ -45,5 +45,4 @@ main() {
         await tab.evaluate('[true, false, undefined, null, 1, 1.5, "Hello"]'),
         equals([true, false, null, null, 1, 1.5, "Hello"]));
   });
-
 }
