@@ -13,12 +13,20 @@ main() {
   setUpAll(() async {
     server = await Server.create();
     browser = await Browser.start();
-    page = await browser.newPage();
   });
 
   tearDownAll(() async {
     await browser.close();
     await server.close();
+  });
+
+  setUp(() async {
+    page = await browser.newPage();
+    await page.goto(server.emptyPage);
+  });
+
+  tearDown(() async {
+    await page.close();
   });
 
   test('Go to', () async {

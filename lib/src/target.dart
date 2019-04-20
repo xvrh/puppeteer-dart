@@ -18,9 +18,9 @@ class Target {
   final _closedCompleter = Completer();
   bool _isInitialized = false;
 
-  Target(this.browser, this._info, this._sessionFactory,
+  Target(this.browser, TargetInfo info, this._sessionFactory,
       {@required this.browserContext})
-      : targetID = _info.targetId {
+      : targetID = info.targetId {
     _initialized = _initializeCompleter.future.then((success) async {
       if (!success) return false;
       var opener = this.opener;
@@ -34,6 +34,7 @@ class Target {
       }
       return true;
     });
+    changeInfo(_info);
   }
 
   Future<bool> get initialized => _initialized;
