@@ -10,7 +10,7 @@ main() {
   Page tab;
   Browser chrome;
   setUpAll(() async {
-    var handler = createStaticHandler('test/data');
+    var handler = createStaticHandler('test/assets');
     server = await io.serve(handler, 'localhost', 0);
 
     chrome = await Browser.start();
@@ -46,30 +46,4 @@ main() {
         equals([true, false, null, null, 1, 1.5, "Hello"]));
   });
 
-  test('Evaluate Map', () async {
-    expect(await tab.evaluate('{ "a": 1 }'), equals({"a": 1}));
-    expect(
-        await tab.evaluate(
-            '{ "a": 1, "b": true, "c": false, "d" : null, "e": 1.5, "f": "Hello" }'),
-        equals({
-          "a": 1,
-          "b": true,
-          "c": false,
-          "d": null,
-          "e": 1.5,
-          "f": "Hello"
-        }));
-  });
-
-  test('Evaluate deep object', () async {
-    expect(
-        await tab.evaluate('{ "a": {"b": 1} }'),
-        equals({
-          "a": {"b": 1}
-        }));
-  });
-
-  test('Get document title', () async {
-    expect(await tab.evaluate('document.title'), equals('The title'));
-  });
 }
