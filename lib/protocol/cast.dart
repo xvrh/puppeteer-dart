@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import '../src/connection.dart';
 
 /// A domain for interacting with Cast, Presentation API, and Remote Playback API

@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:meta/meta.dart' show required;
-
 import '../src/connection.dart';
 
 /// This domain provides experimental commands only supported in headless mode.

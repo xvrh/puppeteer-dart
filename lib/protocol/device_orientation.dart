@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import '../src/connection.dart';
 
 class DeviceOrientationApi {

@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'page.dart' as page;

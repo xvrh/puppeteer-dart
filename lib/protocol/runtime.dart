@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:meta/meta.dart' show required;
-
 import '../src/connection.dart';
 
 /// Runtime domain exposes JavaScript runtime by means of remote evaluation and mirror objects.

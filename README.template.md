@@ -1,6 +1,6 @@
 # Puppeteer in Dart
 
-[![Build Status](https://travis-ci.org/xvrh/puppeteer.svg?branch=master)](https://travis-ci.org/xvrh/puppeteer)
+[![Build Status](https://travis-ci.org/xvrh/puppeteer.svg?branch=master)](https://travis-ci.org/xvrh/puppeteer-dart)
 
 A Dart library to automate the Chrome browser over the DevTools Protocol.
 

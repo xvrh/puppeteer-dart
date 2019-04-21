@@ -1,10 +1,8 @@
 import 'dart:async';
-
 import 'package:meta/meta.dart' show required;
-
 import '../src/connection.dart';
-import 'debugger.dart' as debugger;
 import 'runtime.dart' as runtime;
+import 'debugger.dart' as debugger;
 
 class ProfilerApi {
   final Client _client;

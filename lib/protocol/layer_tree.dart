@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:meta/meta.dart' show required;
-
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 
