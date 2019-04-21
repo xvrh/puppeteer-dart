@@ -125,10 +125,9 @@ function _() {
 ''');
   }
 
-  Future<void> setContent(String html,
-      {Duration timeout, WaitUntil waitUntil}) async {
+  Future<void> setContent(String html, {Duration timeout, Until wait}) async {
     timeout ??= frameManager.page.navigationTimeoutOrDefault;
-    waitUntil ??= WaitUntil.load;
+    wait ??= Until.load;
 
     // We rely upon the fact that document.open() will reset frame lifecycle with "init"
     // lifecycle event. @see https://crrev.com/608658
@@ -141,8 +140,8 @@ function _(html) {
   document.close();
 }
 ''', args: [html]);
-    var watcher = LifecycleWatcher(frameManager, frame,
-        waitUntil: waitUntil, timeout: timeout);
+    var watcher =
+        LifecycleWatcher(frameManager, frame, wait: wait, timeout: timeout);
     var error = await Future.any([
       watcher.timeoutOrTermination,
       watcher.lifecycle,

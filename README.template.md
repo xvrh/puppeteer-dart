@@ -51,13 +51,13 @@ import 'example/screenshot_element.dart';
 import 'example/capture_spa.dart';
 ```
 
-### Low-level raw DevTools protocol
+### Low-level DevTools protocol
 This package contains a fully typed API of the [Chrome DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).
 The code is generated from the [JSON Schema](https://github.com/ChromeDevTools/devtools-protocol) provided by Chrome.
 
 With this API you have access to the entire capabilities of Chrome DevTools.
 
-You access this API is located in `lib/protocol`
+The code is in `lib/protocol`
 ```dart
  // Create a chrome's tab
  var page = chrome.newPage();
@@ -66,20 +66,12 @@ You access this API is located in `lib/protocol`
  // This is important to access information not exposed by the Puppeteer API
  // Be aware that this is a low-level, complex API.
 
- // Example domains
-
- // Manage network
- page.devTools.network.enable();
- page.devTools.network.onRequest.listen((resquest) {
-    // handle
- });
+ page.devTools.memory.simulatePressureNotification(PressureLevel.critical);
 
  // Start recording screen-cast
  // Get memory informations
  // Manage the JavaScript debugger
 ```
-
-You can find more example of using this API in `example/protocol`. The generated code is in `lib/domains`.
 
 
 ## Related work

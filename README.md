@@ -26,43 +26,26 @@ Most things that you can do manually in the browser can be done using Puppeteer!
 
 Download the last revision of chrome and launch it.
 ```dart
-import 'package:logging/logging.dart';
-import 'package:puppeteer/chrome_downloader.dart';
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
-  // Setup a logger if you want to see the raw chrome protocol
-  Logger.root
-    ..level = Level.ALL
-    ..onRecord.listen(print);
-
-  // Download a version of Chrome in a cache folder.
-  // This is done by default when we don't provide a [executablePath] to
-  // [Browser.start]
-  var chromePath = (await downloadChrome()).executablePath;
-
-  // You can specify the cache location and a specific version of chrome
-  var chromePath2 =
-      await downloadChrome(cachePath: '.chrome', revision: 650583);
-
-  // Or just use an absolute path to an existing version of Chrome
-  var chromePath3 =
-      r'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-
   // Start the `Chrome` process and connect to the DevTools
   // By default it is start in `headless` mode
-  var chrome = await Browser.start(executablePath: chromePath);
+  var browser = await Browser.start();
 
   // Open a new tab
-  var myPage = await chrome.newPage();
+  var myPage = await browser.newPage();
 
   // Go to a page and wait to be fully loaded
-  await myPage.goto('https://www.github.com', waitUntil: WaitUntil.networkIdle);
+  await myPage.goto('https://www.github.com', wait: Until.networkIdle);
 
   // Do something... See other examples
+  await myPage.screenshot();
+  await myPage.pdf();
+  await myPage.evaluate('() => document.title');
 
   // Kill the process
-  await chrome.close();
+  await browser.close();
 }
 ```
 
@@ -77,7 +60,7 @@ main() async {
   // Start the browser and go to a web page
   var browser = await Browser.start();
   var page = await browser.newPage();
-  await page.goto('https://www.github.com', waitUntil: WaitUntil.networkIdle);
+  await page.goto('https://www.github.com', wait: Until.networkIdle);
 
   // Force the "screen" media or some CSS @media print can change the look
   await page.emulateMedia('screen');
@@ -104,7 +87,7 @@ main() async {
   // Start the browser and go to a web page
   var browser = await Browser.start();
   var page = await browser.newPage();
-  await page.goto('https://www.github.com', waitUntil: WaitUntil.networkIdle);
+  await page.goto('https://www.github.com', wait: Until.networkIdle);
 
   // Take a screenshot of the page
   var screenshot = await page.screenshot();
@@ -126,7 +109,7 @@ main() async {
   // Start the browser and go to a web page
   var browser = await Browser.start();
   var page = await browser.newPage();
-  await page.goto('https://www.github.com', waitUntil: WaitUntil.networkIdle);
+  await page.goto('https://www.github.com', wait: Until.networkIdle);
 
   // Select an element on the page
   var form = await page.$('form[action="/join"]');
@@ -162,13 +145,13 @@ main() async {
 }
 ```
 
-### Low-level raw DevTools protocol
+### Low-level DevTools protocol
 This package contains a fully typed API of the [Chrome DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).
 The code is generated from the [JSON Schema](https://github.com/ChromeDevTools/devtools-protocol) provided by Chrome.
 
 With this API you have access to the entire capabilities of Chrome DevTools.
 
-You access this API is located in `lib/protocol`
+The code is in `lib/protocol`
 ```dart
  // Create a chrome's tab
  var page = chrome.newPage();
@@ -177,20 +160,12 @@ You access this API is located in `lib/protocol`
  // This is important to access information not exposed by the Puppeteer API
  // Be aware that this is a low-level, complex API.
 
- // Example domains
-
- // Manage network
- page.devTools.network.enable();
- page.devTools.network.onRequest.listen((resquest) {
-    // handle
- });
+ page.devTools.memory.simulatePressureNotification(PressureLevel.critical);
 
  // Start recording screen-cast
  // Get memory informations
  // Manage the JavaScript debugger
 ```
-
-You can find more example of using this API in `example/protocol`. The generated code is in `lib/domains`.
 
 
 ## Related work

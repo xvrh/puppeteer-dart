@@ -319,31 +319,27 @@ function deliverError(name, seq, message, stack) {
     return _frameManager.mainFrame.content;
   }
 
-  Future<void> setContent(String html,
-      {Duration timeout, WaitUntil waitUntil}) {
+  Future<void> setContent(String html, {Duration timeout, Until wait}) {
     return _frameManager.mainFrame
-        .setContent(html, timeout: timeout, waitUntil: waitUntil);
+        .setContent(html, timeout: timeout, wait: wait);
   }
 
   Future<NetworkResponse> goto(String url,
-      {String referrer, Duration timeout, WaitUntil waitUntil}) {
+      {String referrer, Duration timeout, Until wait}) {
     return _frameManager.mainFrame
-        .goto(url, referrer: referrer, timeout: timeout, waitUntil: waitUntil);
+        .goto(url, referrer: referrer, timeout: timeout, wait: wait);
   }
 
-  Future<NetworkResponse> reload(
-      {Duration timeout, WaitUntil waitUntil}) async {
-    var responseFuture =
-        waitForNavigation(timeout: timeout, waitUntil: waitUntil);
+  Future<NetworkResponse> reload({Duration timeout, Until wait}) async {
+    var responseFuture = waitForNavigation(timeout: timeout, wait: wait);
 
     await devTools.page.reload();
     return await responseFuture;
   }
 
-  Future<NetworkResponse> waitForNavigation(
-      {Duration timeout, WaitUntil waitUntil}) {
+  Future<NetworkResponse> waitForNavigation({Duration timeout, Until wait}) {
     return _frameManager.mainFrame
-        .waitForNavigation(timeout: timeout, waitUntil: waitUntil);
+        .waitForNavigation(timeout: timeout, wait: wait);
   }
 
   Future<NetworkRequest> waitForRequest(String url, {Duration timeout}) async {
@@ -364,24 +360,22 @@ function deliverError(name, seq, message, stack) {
         .timeout(timeout);
   }
 
-  Future<NetworkResponse> goBack({Duration timeout, WaitUntil waitUntil}) {
-    return _go(-1, timeout: timeout, waitUntil: waitUntil);
+  Future<NetworkResponse> goBack({Duration timeout, Until wait}) {
+    return _go(-1, timeout: timeout, wait: wait);
   }
 
-  Future<NetworkResponse> goForward({Duration timeout, WaitUntil waitUntil}) {
-    return _go(1, timeout: timeout, waitUntil: waitUntil);
+  Future<NetworkResponse> goForward({Duration timeout, Until wait}) {
+    return _go(1, timeout: timeout, wait: wait);
   }
 
-  Future<NetworkResponse> _go(int delta,
-      {Duration timeout, WaitUntil waitUntil}) async {
+  Future<NetworkResponse> _go(int delta, {Duration timeout, Until wait}) async {
     var history = await devTools.page.getNavigationHistory();
     int index = history.currentIndex + delta;
     if (index < 0 || index >= history.entries.length) {
       return null;
     }
     var entry = history.entries[index];
-    var navigationFuture =
-        waitForNavigation(timeout: timeout, waitUntil: waitUntil);
+    var navigationFuture = waitForNavigation(timeout: timeout, wait: wait);
     await devTools.page.navigateToHistoryEntry(entry.id);
     return await navigationFuture;
   }

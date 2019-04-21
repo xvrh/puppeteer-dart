@@ -9,7 +9,7 @@ export 'src/page/frame_manager.dart' show PageFrame;
 export 'src/page/js_handle.dart'
     show JsHandle, ElementHandle, NodeIsNotVisibleException;
 export 'src/page/keyboard.dart' show Key;
-export 'src/page/lifecycle_watcher.dart' show WaitUntil;
+export 'src/page/lifecycle_watcher.dart' show Until;
 export 'src/page/mouse.dart' show MouseButton;
 export 'src/page/network_manager.dart' show NetworkRequest, NetworkResponse;
 export 'src/page/page.dart'

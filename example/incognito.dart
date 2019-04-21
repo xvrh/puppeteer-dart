@@ -22,9 +22,9 @@ main() async {
   var incognitoTab1 = await incognitoContext.newPage();
 
   await Future.wait([
-    normalTab1.goto(pageUrl, waitUntil: WaitUntil.networkIdle),
-    normalTab2.goto(pageUrl, waitUntil: WaitUntil.networkIdle),
-    incognitoTab1.goto(pageUrl, waitUntil: WaitUntil.networkIdle),
+    normalTab1.goto(pageUrl, wait: Until.networkIdle),
+    normalTab2.goto(pageUrl, wait: Until.networkIdle),
+    incognitoTab1.goto(pageUrl, wait: Until.networkIdle),
   ]);
 
   await normalTab1.evaluate('window.localStorage.setItem("name", "xavier")');
