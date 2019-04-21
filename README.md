@@ -153,18 +153,30 @@ With this API you have access to the entire capabilities of Chrome DevTools.
 
 The code is in `lib/protocol`
 ```dart
- // Create a chrome's tab
- var page = chrome.newPage();
+import 'package:puppeteer/puppeteer.dart';
 
- // You access the entire information from ChromeDevTools protocol.
- // This is important to access information not exposed by the Puppeteer API
- // Be aware that this is a low-level, complex API.
+main() async {
+  var browser = await Browser.start();
+  // Create a chrome's tab
+  var page = await browser.newPage();
 
- page.devTools.memory.simulatePressureNotification(PressureLevel.critical);
+  // You can access the entire Chrome DevTools protocol.
+  // This is useful to access information not exposed by the Puppeteer API
+  // Be aware that this is a low-level, complex API.
+  // Documentation of the protocol: https://chromedevtools.github.io/devtools-protocol/
 
- // Start recording screen-cast
- // Get memory informations
- // Manage the JavaScript debugger
+  // Examples:
+
+  // Access the Animation domain
+  await page.devTools.animation.setPlaybackRate(10);
+
+  // Access the Cast domain
+  await page.devTools.cast.enable();
+  await page.devTools.cast.startTabMirroring('');
+
+  // Access the Memory domain
+  await page.devTools.memory.getDOMCounters();
+}
 ```
 
 
