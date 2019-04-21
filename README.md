@@ -43,7 +43,7 @@ main() async {
 
   // You can specify the cache location and a specific version of chrome
   var chromePath2 =
-      await downloadChrome(cachePath: '.chrome', revision: 497674);
+      await downloadChrome(cachePath: '.chrome', revision: 650583);
 
   // Or just use an absolute path to an existing version of Chrome
   var chromePath3 =
