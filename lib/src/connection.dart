@@ -113,7 +113,7 @@ class Connection implements Client {
       String sessionId = params['sessionId'];
       var session = sessions[sessionId];
       if (session != null) {
-        session._onClosed();
+        session.dispose();
         sessions.remove(sessionId);
       }
     } else if (sessionId != null) {
@@ -151,7 +151,7 @@ class Connection implements Client {
     _completers.clear();
 
     for (Session session in sessions.values) {
-      session._onClosed();
+      session.dispose();
     }
     sessions.clear();
 
@@ -183,7 +183,7 @@ class Session implements Client {
   final Connection connection;
   final Map<int, Completer> _completers = {};
   final StreamController<Event> _eventController =
-      StreamController<Event>.broadcast();
+      StreamController<Event>.broadcast(sync: true);
   final Completer _onClose = Completer();
 
   Session(this.connection, this.sessionId);
@@ -227,7 +227,9 @@ class Session implements Client {
     await connection.targetApi.detachFromTarget(sessionId: sessionId);
   }
 
-  _onClosed() {
+  void dispose() {
+    if (_eventController.isClosed) return;
+
     _eventController.close();
     for (Completer completer in _completers.values) {
       completer.completeError(TargetClosedException());
@@ -235,6 +237,8 @@ class Session implements Client {
     _completers.clear();
     _onClose.complete();
   }
+
+
 }
 
 class ServerException implements Exception {

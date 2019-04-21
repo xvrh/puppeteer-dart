@@ -47,6 +47,7 @@ class Server {
       'http://${_httpServer.address.host}:${_httpServer.port}';
 
   String get prefix => p.url.join(hostUrl, _assetFolder);
+  String get crossProcessPrefix => p.url.join('http://127.0.0.1:${_httpServer.port}', _assetFolder);
 
   String get emptyPage => assetUrl('empty.html');
 

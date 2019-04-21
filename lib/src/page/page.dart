@@ -7,6 +7,7 @@ import 'dart:typed_data';
 import 'package:meta/meta.dart';
 import 'package:puppeteer/protocol/dev_tools.dart';
 import 'package:puppeteer/protocol/dom.dart';
+import 'package:puppeteer/protocol/log.dart';
 import 'package:puppeteer/protocol/network.dart';
 import 'package:puppeteer/protocol/page.dart';
 import 'package:puppeteer/protocol/runtime.dart';
@@ -38,7 +39,8 @@ class Page {
   final StreamController _workerCreated = StreamController<Worker>.broadcast(),
       _workerDestroyed = StreamController<Worker>.broadcast(),
       _onErrorController = StreamController<ClientError>.broadcast(),
-      _onPopupController = StreamController<Page>.broadcast();
+      _onPopupController = StreamController<Page>.broadcast(),
+      _onConsoleController = StreamController<ConsoleMessage>.broadcast();
   bool _javascriptEnabled = true;
   Duration navigationTimeout;
   Duration defaultTimeout = Duration(seconds: 30);
@@ -83,6 +85,7 @@ class Page {
     devTools.runtime.onBindingCalled.listen(_onBindingCalled);
     devTools.page.onJavascriptDialogOpening.listen(_onDialog);
     devTools.runtime.onExceptionThrown.listen(_handleException);
+    devTools.runtime.onConsoleAPICalled.listen(_onConsoleApi);
     devTools.log.onEntryAdded.listen(_onLogEntryAdded);
     onClose.then((_) {
       _dispose();
@@ -113,11 +116,14 @@ class Page {
   Browser get browser => target.browser;
 
   void _dispose() {
+    session.dispose();
+
     _frameManager.dispose();
     _workerCreated.close();
     _workerDestroyed.close();
     _onErrorController.close();
     _onPopupController.close();
+    _onConsoleController.close();
   }
 
   Duration get navigationTimeoutOrDefault =>
@@ -134,6 +140,8 @@ class Page {
   Stream<PageFrame> get onFrameDetached => _frameManager.onFrameDetached;
 
   Stream<PageFrame> get onFrameNavigated => _frameManager.onFrameNavigated;
+
+  Stream<ConsoleMessage> get onConsole => _onConsoleController.stream;
 
   Stream<MonotonicTime> get onDomContentLoaded =>
       devTools.page.onDomContentEventFired;
@@ -158,8 +166,65 @@ class Page {
 
   List<PageFrame> get frames => frameManager.frames;
 
-  _onLogEntryAdded(event) {
-    //TODO(xha)
+  void _onConsoleApi(ConsoleAPICalledEvent event) {
+    if (event.executionContextId == 0) {
+      // DevTools protocol stores the last 1000 console messages. These
+      // messages are always reported even for removed execution contexts. In
+      // this case, they are marked with executionContextId = 0 and are
+      // reported upon enabling Runtime agent.
+      //
+      // Ignore these messages since:
+      // - there's no execution context we can use to operate with message
+      //   arguments
+      // - these messages are reported before Puppeteer clients can subscribe
+      //   to the 'console'
+      //   page event.
+      //
+      // @see https://github.com/GoogleChrome/puppeteer/issues/3865
+      return;
+    }
+    var context = frameManager.executionContextById(event.executionContextId);
+    var values =
+        event.args.map((arg) => JsHandle.fromRemoteObject(context, arg)).toList();
+    _addConsoleMessage(event.type, values, event.stackTrace);
+  }
+
+  void _addConsoleMessage(ConsoleAPICalledEventType type, List<JsHandle> args,
+      StackTrace stackTrace) {
+    if (!_onConsoleController.hasListener) {
+      args.forEach((arg) => arg.dispose());
+      return;
+    }
+    var textTokens = [];
+    for (var arg in args) {
+      var remoteObject = arg.remoteObject;
+      if (remoteObject.objectId != null)
+        textTokens.add(arg.toString());
+      else
+        textTokens.add(valueFromRemoteObject(remoteObject));
+    }
+
+    String url;
+    int lineNumber, columnNumber;
+    if (stackTrace != null && stackTrace.callFrames.isNotEmpty) {
+      url = stackTrace.callFrames[0].url;
+      lineNumber = stackTrace.callFrames[0].lineNumber;
+      columnNumber = stackTrace.callFrames[0].columnNumber;
+    }
+    var message = ConsoleMessage(type.toString(), textTokens.join(' '), args,
+        url: url, lineNumber: lineNumber, columnNumber: columnNumber);
+    _onConsoleController.add(message);
+  }
+
+  void _onLogEntryAdded(LogEntry event) {
+    if (event.args != null && event.args.isNotEmpty) {
+      event.args.map((arg) => releaseObject(devTools.runtime, arg));
+    }
+    if (event.source != LogEntrySource.worker) {
+      _onConsoleController.add(ConsoleMessage(
+          event.level.toString(), event.text, [],
+          url: url, lineNumber: event.lineNumber));
+    }
   }
 
   Future<ElementHandle> $(String selector) {
@@ -604,30 +669,29 @@ function deliverError(name, seq, message, stack) {
   }
 
   bool get hasPopupListener => _onPopupController.hasListener;
+
   void emitPopup(Page popup) {
     _onPopupController.add(popup);
   }
 }
 
 class ConsoleMessage {
-  final String type, text;
+  final String type;
+  final String text;
   final List args;
-  final ConsoleMessageLocation location;
-
-  ConsoleMessage(this.type, this.text, this.args, {@required this.location}) {
-    assert(type != null);
-    assert(text != null);
-    assert(args != null);
-    assert(location != null);
-  }
-}
-
-class ConsoleMessageLocation {
   final String url;
   final int lineNumber, columnNumber;
 
-  ConsoleMessageLocation(this.url,
-      {@required this.lineNumber, @required this.columnNumber});
+  ConsoleMessage(this.type, this.text, this.args,
+      {@required this.url,
+      @required this.lineNumber,
+      @required this.columnNumber}) {
+    assert(type != null);
+    assert(text != null);
+    assert(args != null);
+  }
+
+//TODO(xha): add toString()
 }
 
 class ScreenshotFormat {
@@ -666,6 +730,8 @@ class PaperFormat {
   PaperFormat.mm({@required num width, @required num height})
       : width = _mmToInches(width),
         height = _mmToInches(height);
+
+//TODO(xha): add toString()
 }
 
 num _pxToInches(num px) => px / 96;
@@ -711,6 +777,8 @@ class PdfMargins {
       right: right != null ? _mmToInches(right) : null,
     );
   }
+
+//TODO(xha): add toString()
 }
 
 class ClientError {
