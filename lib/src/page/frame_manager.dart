@@ -86,9 +86,8 @@ class FrameManager {
   PageFrame frame(FrameId frameId) => _frames[frameId];
 
   Future<NetworkResponse> navigateFrame(PageFrame frame, String url,
-      {String referrer, Duration timeout, WaitUntil waitUntil}) async {
-    var watcher =
-        LifecycleWatcher(this, frame, waitUntil: waitUntil, timeout: timeout);
+      {String referrer, Duration timeout, Until wait}) async {
+    var watcher = LifecycleWatcher(this, frame, wait: wait, timeout: timeout);
 
     Future navigate() async {
       var response =
@@ -114,9 +113,8 @@ class FrameManager {
   }
 
   Future<NetworkResponse> waitForFrameNavigation(PageFrame frame,
-      {WaitUntil waitUntil, Duration timeout}) async {
-    var watcher =
-        LifecycleWatcher(this, frame, waitUntil: waitUntil, timeout: timeout);
+      {Until wait, Duration timeout}) async {
+    var watcher = LifecycleWatcher(this, frame, wait: wait, timeout: timeout);
     try {
       await Future.any([
         watcher.timeoutOrTermination,
@@ -335,15 +333,14 @@ class PageFrame {
   LoaderId get loaderId => _loaderId;
 
   Future<NetworkResponse> goto(String url,
-      {String referrer, Duration timeout, WaitUntil waitUntil}) {
+      {String referrer, Duration timeout, Until wait}) {
     return frameManager.navigateFrame(this, url,
-        referrer: referrer, timeout: timeout, waitUntil: waitUntil);
+        referrer: referrer, timeout: timeout, wait: wait);
   }
 
-  Future<NetworkResponse> waitForNavigation(
-      {Duration timeout, WaitUntil waitUntil}) {
+  Future<NetworkResponse> waitForNavigation({Duration timeout, Until wait}) {
     return frameManager.waitForFrameNavigation(this,
-        timeout: timeout, waitUntil: waitUntil);
+        timeout: timeout, wait: wait);
   }
 
   Future<ExecutionContext> get executionContext {
@@ -411,10 +408,8 @@ class PageFrame {
     return _secondaryWorld.content;
   }
 
-  Future<void> setContent(String html,
-      {Duration timeout, WaitUntil waitUntil}) {
-    return _secondaryWorld.setContent(html,
-        timeout: timeout, waitUntil: waitUntil);
+  Future<void> setContent(String html, {Duration timeout, Until wait}) {
+    return _secondaryWorld.setContent(html, timeout: timeout, wait: wait);
   }
 
   Future<ElementHandle> addScriptTag(

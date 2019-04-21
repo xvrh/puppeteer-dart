@@ -6,7 +6,7 @@ main() async {
   // Start the browser and go to a web page
   var browser = await Browser.start();
   var page = await browser.newPage();
-  await page.goto('https://www.github.com', waitUntil: WaitUntil.networkIdle);
+  await page.goto('https://www.github.com', wait: Until.networkIdle);
 
   // Select an element on the page
   var form = await page.$('form[action="/join"]');

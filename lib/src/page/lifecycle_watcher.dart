@@ -7,7 +7,7 @@ import 'package:puppeteer/src/page/network_manager.dart';
 class LifecycleWatcher {
   final FrameManager frameManager;
   final PageFrame frame;
-  final WaitUntil waitUntil;
+  final Until wait;
   final Duration timeout;
   List<StreamSubscription> _subscriptions;
   LoaderId _initialLoaderId;
@@ -20,9 +20,8 @@ class LifecycleWatcher {
   bool _hasSameDocumentNavigation = false;
   Timer _timeoutTimer;
 
-  LifecycleWatcher(this.frameManager, this.frame,
-      {WaitUntil waitUntil, this.timeout})
-      : waitUntil = waitUntil ?? WaitUntil.load {
+  LifecycleWatcher(this.frameManager, this.frame, {Until wait, this.timeout})
+      : wait = wait ?? Until.load {
     _initialLoaderId = frame.loaderId;
 
     _subscriptions = [
@@ -111,7 +110,7 @@ class LifecycleWatcher {
   }
 
   bool _checkLifecycle(PageFrame frame) {
-    for (var event in waitUntil._events) {
+    for (var event in wait._events) {
       if (!frame.lifecycleEvents.contains(event)) return false;
     }
     for (var child in frame.children) {
@@ -128,21 +127,21 @@ class LifecycleWatcher {
   }
 }
 
-class WaitUntil {
-  static final load = WaitUntil._('load');
-  static final domContentLoaded = WaitUntil._('DOMContentLoaded');
-  static final networkIdle = WaitUntil._('networkIdle');
-  static final networkAlmostIdle = WaitUntil._('networkAlmostIdle');
+class Until {
+  static final load = Until._('load');
+  static final domContentLoaded = Until._('DOMContentLoaded');
+  static final networkIdle = Until._('networkIdle');
+  static final networkAlmostIdle = Until._('networkAlmostIdle');
 
   final List<String> _events = [];
 
-  WaitUntil._(String event) {
+  Until._(String event) {
     _events.add(event);
   }
 
-  WaitUntil.multi(List<WaitUntil> waitUntils) {
-    for (WaitUntil waitUntil in waitUntils) {
-      _events.addAll(waitUntil._events);
+  Until._multi(List<Until> waits) {
+    for (Until wait in waits) {
+      _events.addAll(wait._events);
     }
   }
 }
