@@ -19,8 +19,7 @@ class ChromePath {
 
 const int _lastRevision = 650583;
 
-Future<ChromePath> downloadChrome(
-    {int revision, String cachePath}) async {
+Future<ChromePath> downloadChrome({int revision, String cachePath}) async {
   revision ??= _lastRevision;
   cachePath ??= '.local-chromium';
 
