@@ -8,9 +8,11 @@ os:
 dart:
  - stable
 
+install:
+ - dart example/download_chromium.dart
+
 dart_task:
-# TODO(xha): remove --concurrency=1 once we have a proper locking mecanism
- - test: --platform vm --concurrency=1
+ - test: --platform vm
  - dartanalyzer: --fatal-infos --fatal-warnings .
  - dartfmt
 
