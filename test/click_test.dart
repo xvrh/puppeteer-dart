@@ -1,4 +1,3 @@
-
 import 'package:logging/logging.dart';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:puppeteer/devices.dart' as devices;
@@ -173,8 +172,8 @@ main() {
       await page.goto(server.prefix + '/input/button.html');
       expect(
           () => page.click('button.does-not-exist'),
-          throwsA(predicate((e) =>
-              '$e'.contains('No node found for selector: button.does-not-exist'))));
+          throwsA(predicate((e) => '$e'
+              .contains('No node found for selector: button.does-not-exist'))));
     });
     // @see https://github.com/GoogleChrome/puppeteer/issues/161
     test('should not hang with touch-enabled viewports', () async {
@@ -252,16 +251,20 @@ main() {
       expect(await frame.evaluate('() => window.result'), equals('Clicked'));
     });
     // @see https://github.com/GoogleChrome/puppeteer/issues/4110
-    test('should click the button with fixed position inside an iframe', () async {
-  await page.goto(server.emptyPage);
-  await page.setViewport(DeviceViewport(width: 500, height: 500));
-  await page.setContent('<div style="width:100px;height:2000px">spacer</div>');
-  await attachFrame(page, 'button-test', server.crossProcessPrefix + '/input/button.html');
-  var frame = page.frames[1];
-  await frame.$eval('button', "button => button.style.setProperty('position', 'fixed')");
-  await frame.click('button');
-  expect(await frame.evaluate('() => window.result'), equals('Clicked'));
-  }, skip: true);
+    test('should click the button with fixed position inside an iframe',
+        () async {
+      await page.goto(server.emptyPage);
+      await page.setViewport(DeviceViewport(width: 500, height: 500));
+      await page
+          .setContent('<div style="width:100px;height:2000px">spacer</div>');
+      await attachFrame(page, 'button-test',
+          server.crossProcessPrefix + '/input/button.html');
+      var frame = page.frames[1];
+      await frame.$eval(
+          'button', "button => button.style.setProperty('position', 'fixed')");
+      await frame.click('button');
+      expect(await frame.evaluate('() => window.result'), equals('Clicked'));
+    }, skip: true);
     test('should click the button with deviceScaleFactor set', () async {
       await page.setViewport(
           DeviceViewport(width: 400, height: 400, deviceScaleFactor: 5));

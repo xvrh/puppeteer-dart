@@ -237,8 +237,6 @@ class Session implements Client {
     _completers.clear();
     _onClose.complete();
   }
-
-
 }
 
 class ServerException implements Exception {

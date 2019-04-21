@@ -143,7 +143,6 @@ class FrameManager {
       return;
     }
     frame._onLoadingStopped();
-    if (!_lifecycleEventController.isClosed)
     _lifecycleEventController.add(frame);
   }
 

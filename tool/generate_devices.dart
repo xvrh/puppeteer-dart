@@ -24,7 +24,8 @@ main() async {
   for (var emulatedDevice
       in module.extensions.where((e) => e.type == 'emulated-device')) {
     var device = emulatedDevice.device;
-    var deviceName = firstLetterLower(splitWords(device.title).map(firstLetterUpper).join(''));
+    var deviceName = firstLetterLower(
+        splitWords(device.title).map(firstLetterUpper).join(''));
 
     buffer.writeln(
         'const $deviceName = ${device.toCode(viewportCode(device, device.screen.vertical))};');
@@ -37,7 +38,8 @@ main() async {
       buffer.writeln();
     }
   }
-  File('lib/devices.dart').writeAsStringSync(DartFormatter().format(buffer.toString()));
+  File('lib/devices.dart')
+      .writeAsStringSync(DartFormatter().format(buffer.toString()));
 }
 
 @JsonSerializable(generateToJsonFunction: false)

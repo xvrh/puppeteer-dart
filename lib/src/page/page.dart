@@ -184,8 +184,9 @@ class Page {
       return;
     }
     var context = frameManager.executionContextById(event.executionContextId);
-    var values =
-        event.args.map((arg) => JsHandle.fromRemoteObject(context, arg)).toList();
+    var values = event.args
+        .map((arg) => JsHandle.fromRemoteObject(context, arg))
+        .toList();
     _addConsoleMessage(event.type, values, event.stackTrace);
   }
 
