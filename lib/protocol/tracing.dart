@@ -71,14 +71,10 @@ class TracingApi {
     assert(transferMode == null ||
         const ['ReportEvents', 'ReturnAsStream'].contains(transferMode));
     var parameters = <String, dynamic>{};
-    // ignore: deprecated_member_use
     if (categories != null) {
-      // ignore: deprecated_member_use
       parameters['categories'] = categories;
     }
-    // ignore: deprecated_member_use
     if (options != null) {
-      // ignore: deprecated_member_use
       parameters['options'] = options;
     }
     if (bufferUsageReportingInterval != null) {

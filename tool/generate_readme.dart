@@ -34,7 +34,5 @@ String generateReadme() {
         '[$protocolName]()', '[$protocolName](${protocols[protocolName]})');
   }
 
-  //TODO(xha): generate TableOfContent
-
   return readme;
 }

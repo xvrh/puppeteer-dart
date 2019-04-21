@@ -30,7 +30,6 @@ class DomWorld {
       }
     } else {
       if (_contextCompleter != null && !_contextCompleter.isCompleted) {
-        // TODO(xha): see if this is the behavior we want
         _contextCompleter.completeError('Context is disposed');
       }
       _contextCompleter = Completer<ExecutionContext>();

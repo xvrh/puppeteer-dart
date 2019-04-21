@@ -90,7 +90,7 @@ Future<Browser> launch(
 
     Browser browser = createBrowser(connection,
         defaultViewport: defaultViewport,
-        closeCallback: () => _gracefullyClose(chromeProcess),
+        closeCallback: () => _killChrome(chromeProcess),
         ignoreHttpsErrors: ignoreHttpsErrors);
     Future targetFuture =
         browser.waitForTarget((target) => target.type == 'page');
@@ -102,7 +102,7 @@ Future<Browser> launch(
   }
 }
 
-Future _gracefullyClose(Process process) {
+Future _killChrome(Process process) {
   if (Platform.isWindows) {
     // Allow a clean exit on Windows.
     // With `process.kill`, it seems that chrome retain a lock on the user-data directory
