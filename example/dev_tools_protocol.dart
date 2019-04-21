@@ -15,10 +15,11 @@ main() async {
   // Access the Animation domain
   await page.devTools.animation.setPlaybackRate(10);
 
-  // Access the Cast domain
-  await page.devTools.cast.enable();
-  await page.devTools.cast.startTabMirroring('');
+  // Access the CSS domain
+  page.devTools.css.onFontsUpdated.listen((_) {});
 
-  // Access the Memory domain
+  // Access the Memory domaina
   await page.devTools.memory.getDOMCounters();
+
+  await browser.close();
 }
