@@ -1,26 +1,17 @@
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'package:chrome_dev_tools/domains/dom_snapshot.dart';
-import 'utils.dart';
+import 'package:puppeteer/puppeteer.dart';
 
-main() {
-  chromeTab('https://www.w3.org', (Tab tab) async {
-    // A small helper to wait until the network is quiet
-    await tab.waitUntilNetworkIdle();
+main() async {
+  var browser = await Browser.start();
+  var page = await browser.newPage();
+  await page.goto('https://www.w3.org');
 
-    // Take a snapshot of the DOM of the current page
-    // ignore: deprecated_member_use_from_same_package
-    GetSnapshotResult result = await tab.domSnapshot.getSnapshot([]);
+  // Either use the helper to get the content
+  var pageContent = await page.content;
+  print(pageContent);
 
-    // Iterate the nodes and output some HTML.
-    for (DOMNode node in result.domNodes) {
-      String nodeString = '<${node.nodeName}';
-      if (node.attributes != null) {
-        nodeString +=
-            ' ${node.attributes.map((n) => '${n.name}="${n.value}"').join(' ')}';
-      }
-      nodeString += '>';
-      //This example needs a lot more work to output correct HTML
-      print(nodeString);
-    }
-  });
+  // Or get the content directly by executing some Javascript
+  var pageContent2 = await page.evaluate('document.documentElement.outerHTML');
+  print(pageContent2);
+
+  await browser.close();
 }

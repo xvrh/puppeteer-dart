@@ -1,28 +1,22 @@
-import 'dart:convert';
 import 'dart:io';
-import 'package:chrome_dev_tools/chrome_dev_tools.dart';
-import 'utils.dart';
 
-main() {
-  chromeTab('https://www.github.com', (Tab tab) async {
-    // Force the "screen" media or some CSS @media print can change the look
-    await tab.emulation.setEmulatedMedia('screen');
+import 'package:puppeteer/puppeteer.dart';
 
-    // A small helper to wait until the network is quiet
-    await tab.waitUntilNetworkIdle();
+main() async {
+  // Start the browser and go to a web page
+  var browser = await Browser.start();
+  var page = await browser.newPage();
+  await page.goto('https://www.github.com', waitUntil: WaitUntil.networkIdle);
 
-    // Capture the PDF and convert it to a List of bytes.
-    List<int> pdf = base64.decode(await tab.page.printToPDF(
-        pageRanges: '1',
-        landscape: true,
-        printBackground: true,
-        marginBottom: 0,
-        marginLeft: 0,
-        marginRight: 0,
-        marginTop: 0));
+  // Force the "screen" media or some CSS @media print can change the look
+  await page.emulateMedia('screen');
 
-    // Save the bytes in a file
-    await File.fromUri(Platform.script.resolve('_github.pdf'))
-        .writeAsBytes(pdf);
-  });
+  // Capture the PDF and convert it to a List of bytes.
+  var pdf = await page.pdf(
+      format: PaperFormat.a4, printBackground: true, pageRanges: '1');
+
+  // Save the bytes in a file
+  await File('example/_github.pdf').writeAsBytes(pdf);
+
+  await browser.close();
 }

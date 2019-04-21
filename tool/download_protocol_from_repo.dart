@@ -1,6 +1,7 @@
 import 'dart:async';
-import 'package:http/http.dart';
 import 'dart:io';
+
+import 'package:http/http.dart';
 import 'package:path/path.dart' as p;
 
 final Map<String, String> protocols = {

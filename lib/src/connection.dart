@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:logging/logging.dart';
-import '../domains/target.dart';
+
+import '../protocol/target.dart';
 
 abstract class Client {
   Future<Map> send(String method, [Map parameters]);
@@ -16,6 +18,9 @@ class Event {
   Event._(this.name, this.parameters);
 }
 
+/// An annotation to tag some API parameters with the accepted values.
+/// This is purely for documentation purpose until Dart support something like
+/// "String Literal Types" from TypeScript.
 class Enum {
   const Enum(List<String> values);
 }
@@ -26,34 +31,33 @@ class Connection implements Client {
   final WebSocket _webSocket;
   final String url;
   final Map<int, Completer> _completers = {};
-  final List<Session> _sessions = [];
+  final Map<String, Session> sessions = {};
   final StreamController<Event> _eventController =
       StreamController<Event>.broadcast();
-  TargetApi _targets;
+  TargetApi _targetApi;
   final List<StreamSubscription> _subscriptions = [];
 
   Connection._(this._webSocket, this.url) {
     _subscriptions.add(_webSocket.listen(_onMessage));
 
-    _targets = TargetApi(this);
+    _targetApi = TargetApi(this);
 
-    _subscriptions.add(_targets.onReceivedMessageFromTarget
+    /*_subscriptions.add(_targetApi.onReceivedMessageFromTarget
         .listen((ReceivedMessageFromTargetEvent e) {
       Session session = _getSession(e.sessionId);
       session._onMessage(e.message);
     }));
     _subscriptions
-        .add(_targets.onDetachedFromTarget.listen((DetachedFromTargetEvent e) {
+        .add(_targetApi.onDetachedFromTarget.listen((DetachedFromTargetEvent e) {
       Session session = _getSession(e.sessionId);
       session._onClosed();
       _sessions.remove(session);
-    }));
+    }));*/
+
+    _webSocket.done.then((_) => dispose());
   }
 
-  TargetApi get targets => _targets;
-
-  Session _getSession(SessionID sessionId) =>
-      _sessions.firstWhere((s) => s.sessionId.value == sessionId.value);
+  TargetApi get targetApi => _targetApi;
 
   static Future<Connection> create(String url) async {
     WebSocket webSocket = await WebSocket.connect(url);
@@ -66,25 +70,30 @@ class Connection implements Client {
 
   @override
   Future<Map> send(String method, [Map parameters]) {
-    int id = ++_lastId;
-    String message = _encodeMessage(id, method, parameters);
-
-    _logger.fine('SEND ► $message');
-
+    var id = _rawSend(method, parameters);
     var completer = Completer<Map>();
     _completers[id] = completer;
-    _webSocket.add(message);
 
     return completer.future;
   }
 
-  Future<Session> createSession(TargetID targetId,
-      {BrowserContextID browserContextID}) async {
-    SessionID sessionId = await _targets.attachToTarget(targetId);
-    Session session = Session._(_targets, targetId, sessionId,
-        browserContextID: browserContextID);
-    _sessions.add(session);
+  int _rawSend(String method, Map parameters, {SessionID sessionId}) {
+    int id = ++_lastId;
+    String message =
+        _encodeMessage(id, method, parameters, sessionId: sessionId);
 
+    _logger.fine('SEND ► $message');
+    _webSocket.add(message);
+
+    return id;
+  }
+
+  Future<Session> createSession(TargetInfo targetInfo) async {
+    SessionID sessionId =
+        await _targetApi.attachToTarget(targetInfo.targetId, flatten: true);
+
+    Session session = sessions[sessionId.value];
+    assert(session != null);
     return session;
   }
 
@@ -92,7 +101,27 @@ class Connection implements Client {
     String message = messageArg;
     Map object = jsonDecode(message);
     int id = object['id'];
-    if (id != null) {
+    String method = object['method'];
+    String sessionId = object['sessionId'];
+    if (method == 'Target.attachedToTarget') {
+      Map params = object['params'];
+      String sessionId = params['sessionId'];
+      var session = Session(this, SessionID(sessionId));
+      sessions[sessionId] = session;
+    } else if (method == 'Target.detachedFromTarget') {
+      Map params = object['params'];
+      String sessionId = params['sessionId'];
+      var session = sessions[sessionId];
+      if (session != null) {
+        session._onClosed();
+        sessions.remove(sessionId);
+      }
+    } else if (sessionId != null) {
+      var session = sessions[sessionId];
+      if (session != null) {
+        session._onMessage(object);
+      }
+    } else if (id != null) {
       _logger.fine('◀ RECV $message');
 
       Completer completer = _completers.remove(id);
@@ -100,7 +129,7 @@ class Connection implements Client {
 
       Map error = object['error'];
       if (error != null) {
-        completer.completeError(Exception(error['message']));
+        completer.completeError(ServerException(error['message']));
       } else {
         completer.complete(object['result']);
       }
@@ -114,59 +143,60 @@ class Connection implements Client {
     }
   }
 
-  Future dispose() async {
-    await _eventController.close();
+  void dispose() {
+    _eventController.close();
     for (Completer completer in _completers.values) {
-      completer.completeError(Exception('Target closed'));
+      completer.completeError(TargetClosedException());
     }
     _completers.clear();
 
-    for (Session session in _sessions) {
+    for (Session session in sessions.values) {
       session._onClosed();
     }
-    _sessions.clear();
+    sessions.clear();
 
     for (StreamSubscription subscription in _subscriptions) {
-      await subscription.cancel();
+      subscription.cancel();
     }
-    await _webSocket.close();
+
+    _webSocket.close();
   }
+
+  Future get disconnected => _webSocket.done;
 }
 
-String _encodeMessage(int id, String method, Map<String, dynamic> parameters) {
-  return jsonEncode({
+String _encodeMessage(int id, String method, Map<String, dynamic> parameters,
+    {SessionID sessionId}) {
+  var message = {
     'id': id,
     'method': method,
     'params': parameters,
-  });
+  };
+  if (sessionId != null) {
+    message['sessionId'] = sessionId.value;
+  }
+  return jsonEncode(message);
 }
 
 class Session implements Client {
-  static int _lastId = 0;
-  final TargetID targetID;
   final SessionID sessionId;
-  final TargetApi _targetApi;
-  final BrowserContextID _browserContextID;
+  final Connection connection;
   final Map<int, Completer> _completers = {};
   final StreamController<Event> _eventController =
       StreamController<Event>.broadcast();
+  final Completer _onClose = Completer();
 
-  Session._(this._targetApi, this.targetID, this.sessionId,
-      {BrowserContextID browserContextID})
-      : _browserContextID = browserContextID;
+  Session(this.connection, this.sessionId);
 
   @override
   Future<Map> send(String method, [Map parameters]) {
     if (_eventController.isClosed) {
       throw Exception('Session closed');
     }
-    int id = ++_lastId;
-    String message = _encodeMessage(id, method, parameters);
+    int id = connection._rawSend(method, parameters, sessionId: sessionId);
 
     var completer = Completer<Map>();
     _completers[id] = completer;
-
-    _targetApi.sendMessageToTarget(message, sessionId: sessionId);
 
     return completer.future;
   }
@@ -174,15 +204,15 @@ class Session implements Client {
   @override
   Stream<Event> get onEvent => _eventController.stream;
 
-  _onMessage(String message) {
-    Map object = jsonDecode(message);
+  Future get closed => _onClose.future;
 
+  _onMessage(Map object) {
     int id = object['id'];
     if (id != null) {
       Completer completer = _completers.remove(id);
       Map error = object['error'];
       if (error != null) {
-        completer.completeError(Exception(error['message']));
+        completer.completeError(ServerException(error['message']));
       } else {
         completer.complete(object['result']);
       }
@@ -191,18 +221,32 @@ class Session implements Client {
     }
   }
 
+  bool get isClosed => _onClose.isCompleted;
+
+  Future<void> detach() async {
+    await connection.targetApi.detachFromTarget(sessionId: sessionId);
+  }
+
   _onClosed() {
     _eventController.close();
     for (Completer completer in _completers.values) {
-      completer.completeError(Exception('Target closed'));
+      completer.completeError(TargetClosedException());
     }
     _completers.clear();
-  }
-
-  Future close() async {
-    await _targetApi.closeTarget(targetID);
-    if (_browserContextID != null) {
-      await _targetApi.disposeBrowserContext(_browserContextID);
-    }
+    _onClose.complete();
   }
 }
+
+class ServerException implements Exception {
+  final String message;
+
+  ServerException(this.message);
+
+  @override
+  toString() => message;
+
+  static matcher(String message) =>
+      (e) => e is ServerException && e.message == message;
+}
+
+class TargetClosedException implements Exception {}

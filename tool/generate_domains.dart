@@ -28,7 +28,7 @@ main() {
 
   String libPath = Platform.script.resolve('../lib').toFilePath();
 
-  Directory targetDir = Directory(p.join(libPath, 'domains'));
+  Directory targetDir = Directory(p.join(libPath, 'protocol'));
   if (targetDir.existsSync()) {
     targetDir.deleteSync(recursive: true);
   }
@@ -129,22 +129,18 @@ main() {
 
   StringBuffer tabBuffer = StringBuffer();
 
-  List<Domain> tabDomains = domains
-      .where((d) =>
-          !d.deprecated &&
-          !const ['Target', 'SystemInfo', 'Browser', 'IO', 'Audits']
-              .contains(d.name))
-      .toList();
+  List<Domain> tabDomains = domains.where((d) => !d.deprecated).toList();
 
   for (Domain domain in tabDomains) {
-    tabBuffer
-        .writeln("import '../domains/${_underscoreize(domain.name)}.dart';");
+    tabBuffer.writeln("import '${_underscoreize(domain.name)}.dart';");
   }
-  tabBuffer.writeln("import 'connection.dart';");
+  tabBuffer.writeln("import '../src/connection.dart';");
   tabBuffer.writeln();
   tabBuffer.writeln('''
-abstract class TabMixin {
-  Session get session;
+class DevTools {
+  final Client client;
+  
+  DevTools(this.client);
 ''');
 
   for (Domain domain in tabDomains) {
@@ -152,14 +148,14 @@ abstract class TabMixin {
 
     tabBuffer.writeln(toComment(domain.description, indent: 2));
     tabBuffer.writeln('${domain.name}Api get $camelizedName =>  '
-        '_$camelizedName ??= ${domain.name}Api(session);');
+        '_$camelizedName ??= ${domain.name}Api(client);');
     tabBuffer.writeln('${domain.name}Api _$camelizedName;');
     tabBuffer.writeln('');
   }
   tabBuffer.writeln('}');
 
   _writeDartFile(
-      p.join(libPath, 'src', 'tab_mixin.dart'), tabBuffer.toString());
+      p.join(libPath, 'protocol', 'dev_tools.dart'), tabBuffer.toString());
 }
 
 final DartFormatter _dartFormatter =
@@ -230,7 +226,7 @@ class _Command {
     }
 
     code.writeln(
-        'Future${returnTypeName != null ? '<$returnTypeName>' : ''} $name(');
+        'Future${returnTypeName != null ? '<$returnTypeName>' : '<void>'} $name(');
     List<Parameter> optionals = parameters.where((p) => p.optional).toList();
     List<Parameter> requireds =
         parameters.where((p) => !optionals.contains(p)).toList();
@@ -417,7 +413,7 @@ class _Event {
   String get complexTypeCode => _complexType?.code;
 }
 
-const List<String> jsonTypes = const [
+const List<String> jsonTypes = [
   'string',
   'boolean',
   'number',

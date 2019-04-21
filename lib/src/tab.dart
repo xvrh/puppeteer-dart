@@ -1,15 +1,35 @@
-import 'dart:async';
+/*import 'dart:async';
+import 'package:puppeteer/domains/target.dart';
+import 'package:puppeteer/src/chrome.dart';
+import 'package:puppeteer/src/target.dart';
+import 'package:puppeteer/src/target.dart';
+
 import '../domains/runtime.dart';
-import 'connection.dart';
+import 'package:puppeteer/src/connection.dart';
 import 'tab_mixin.dart';
 import 'wait_until.dart' as helper;
 import 'remote_object.dart' as helper;
 
-class Tab extends Object with TabMixin {
+class Tab with TabMixin {
+  final Target _target;
+  final _onPopupController = StreamController<Tab>.broadcast();
+
   @override
   final Session session;
 
-  Tab(this.session);
+  Tab(this._target, this.session);
+
+  Browser get browser => _target.browser;
+  BrowserContext get browserContext => _target.browserContext;
+  TargetID get targetId => _target.targetID;
+
+  bool get hasPopupListener => _onPopupController.hasListener;
+  void emitPopup(Tab popup) {
+    _onPopupController.add(popup);
+  }
+
+/*
+  Future get onClose => session.onClose;
 
   Future waitUntilNetworkIdle(
           {Duration idleDuration = const Duration(milliseconds: 1000),
@@ -27,7 +47,13 @@ class Tab extends Object with TabMixin {
   Future<dynamic> remoteObject(RemoteObject remoteObject) =>
       helper.remoteObject(runtime, remoteObject);
 
-  Future close() => session.close();
+  Future close() async {
+    await session.targetApi.closeTarget(targetID);
+    if (_browserContextID != null) {
+      await session.targetApi.disposeBrowserContext(_browserContextID);
+    }
+    await onClose;
+  }
 
   Future<dynamic> evaluate(String javascriptExpression) async {
     String javascriptFunction = '($javascriptExpression)';
@@ -38,5 +64,6 @@ class Tab extends Object with TabMixin {
 
     dynamic value = await remoteObject(object);
     return value;
-  }
+  }*/
 }
+*/

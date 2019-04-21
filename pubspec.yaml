@@ -1,21 +1,24 @@
-name: chrome_dev_tools
-description: A client of the DevTools Protocol to automate a Headless Chrome browser. This is an alternative to Puppeteer in Dart.
-version: 1.2.0+2
-homepage: https://github.com/xavierhainaux/chrome_dev_tools
+name: puppeteer
+description: A high-level API to control headless Chrome over the DevTools Protocol. This is a port of Puppeteer in Dart.
+version: 1.0.1+1
+homepage: https://github.com/xavierhainaux/puppeteer-dart
 author: Xavier Hainaux <xavier.hainaux@gmail.com>
 
 environment:
-  sdk: '>=2.0.0 <3.0.0'
+  sdk: '>=2.2.0 <3.0.0'
 
 dependencies:
-  path: '>=1.0.0 <2.0.0'
-  meta: ^1.1.1
-  logging: ^0.11.3
   archive: ^2.0.0
+  async: ^2.2.0
   http: '>=0.9.0 <0.13.0'
+  logging: ^0.11.3
+  meta: ^1.1.1
+  path: '>=1.0.0 <2.0.0'
+  petitparser: ^2.2.1
+  pool: ^1.4.0
 
 dev_dependencies:
-  test:
   dart_style: ^1.1.0
   shelf: ^0.7.2
   shelf_static: ^0.2.7
+  test:
