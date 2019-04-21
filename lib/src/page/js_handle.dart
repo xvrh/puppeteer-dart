@@ -98,9 +98,9 @@ function _(object, propertyName) {
   String toString() {
     if (remoteObject.objectId != null) {
       String type = remoteObject.subtype?.value ?? remoteObject.type?.value;
-      return 'JSHandle@' + type;
+      return 'JSHandle@$type';
     }
-    return 'JSHandle:' + valueFromRemoteObject(remoteObject);
+    return 'JSHandle:${valueFromRemoteObject(remoteObject)}';
   }
 }
 
