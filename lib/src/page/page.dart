@@ -167,7 +167,7 @@ class Page {
   List<PageFrame> get frames => frameManager.frames;
 
   void _onConsoleApi(ConsoleAPICalledEvent event) {
-    if (event.executionContextId == 0) {
+    if (event.executionContextId.value == 0) {
       // DevTools protocol stores the last 1000 console messages. These
       // messages are always reported even for removed execution contexts. In
       // this case, they are marked with executionContextId = 0 and are
@@ -684,9 +684,7 @@ class ConsoleMessage {
   final int lineNumber, columnNumber;
 
   ConsoleMessage(this.type, this.text, this.args,
-      {@required this.url,
-      @required this.lineNumber,
-      @required this.columnNumber}) {
+      {this.url, this.lineNumber, this.columnNumber}) {
     assert(type != null);
     assert(text != null);
     assert(args != null);
