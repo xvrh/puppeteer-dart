@@ -84,6 +84,9 @@ class Page {
     devTools.page.onJavascriptDialogOpening.listen(_onDialog);
     devTools.runtime.onExceptionThrown.listen(_handleException);
     devTools.log.onEntryAdded.listen(_onLogEntryAdded);
+    onClose.then((_) {
+      _dispose();
+    });
   }
 
   static Future<Page> create(Target target, Session session,
@@ -109,7 +112,7 @@ class Page {
 
   Browser get browser => target.browser;
 
-  void dispose() {
+  void _dispose() {
     _frameManager.dispose();
     _workerCreated.close();
     _workerDestroyed.close();

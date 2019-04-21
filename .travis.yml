@@ -8,7 +8,7 @@ os:
 dart:
  - stable
 
-install:
+before_script:
  - dart example/download_chromium.dart
 
 dart_task:

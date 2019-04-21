@@ -67,7 +67,7 @@ class Browser {
         defaultViewport: defaultViewport);
   }
 
-  void dispose() {
+  void _dispose() {
     _onTargetCreatedController.close();
     _onTargetDestroyedController.close();
     _onTargetChangedController.close();
@@ -163,35 +163,9 @@ class Browser {
     _contexts.remove(contextId);
   }
 
-  /*
-  Future<Tab> newTab({bool incognito = false}) async {
-    BrowserContextID contextID;
-    if (incognito) {
-      contextID = await targetApi.createBrowserContext();
-    }
-
-    TargetID targetId = await targetApi.createTarget('about:blank',
-        browserContextId: contextID);
-    Session session =
-        await connection.createSession(targetId, browserContextID: contextID);
-
-    return Tab(this, targetId, session, browserContextID: contextID);
-  }
-
-  Future<Page> newPage(
-      {bool incognito = false, DeviceViewport viewport}) async {
-    Tab tab = await newTab(incognito: incognito);
-    return Page.create(tab, viewport: viewport ?? defaultViewport);
-  }
-
-  Future closeAllTabs() async {
-    for (TargetInfo target in await targetApi.getTargets()) {
-      await targetApi.closeTarget(target.targetId);
-    }
-  }
-*/
   Future close() async {
     await _closeCallback();
+    _dispose();
     connection.dispose();
   }
 
