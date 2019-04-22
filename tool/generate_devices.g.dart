@@ -14,10 +14,8 @@ Module _$ModuleFromJson(Map<String, dynamic> json) {
         ?.toList();
 }
 
-abstract class _$ModuleSerializerMixin {
-  List<Extension> get extensions;
-  Map<String, dynamic> toJson() => <String, dynamic>{'extensions': extensions};
-}
+Map<String, dynamic> _$ModuleToJson(Module instance) =>
+    <String, dynamic>{'extensions': instance.extensions};
 
 Extension _$ExtensionFromJson(Map<String, dynamic> json) {
   return Extension()
@@ -28,13 +26,11 @@ Extension _$ExtensionFromJson(Map<String, dynamic> json) {
         : Device.fromJson(json['device'] as Map<String, dynamic>);
 }
 
-abstract class _$ExtensionSerializerMixin {
-  String get type;
-  int get order;
-  Device get device;
-  Map<String, dynamic> toJson() =>
-      <String, dynamic>{'type': type, 'order': order, 'device': device};
-}
+Map<String, dynamic> _$ExtensionToJson(Extension instance) => <String, dynamic>{
+      'type': instance.type,
+      'order': instance.order,
+      'device': instance.device
+    };
 
 Device _$DeviceFromJson(Map<String, dynamic> json) {
   return Device()
@@ -48,20 +44,13 @@ Device _$DeviceFromJson(Map<String, dynamic> json) {
         : Screen.fromJson(json['screen'] as Map<String, dynamic>);
 }
 
-abstract class _$DeviceSerializerMixin {
-  String get title;
-  List<String> get capabilities;
-  String get userAgent;
-  String get type;
-  Screen get screen;
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'title': title,
-        'capabilities': capabilities,
-        'user-agent': userAgent,
-        'type': type,
-        'screen': screen
-      };
-}
+Map<String, dynamic> _$DeviceToJson(Device instance) => <String, dynamic>{
+      'title': instance.title,
+      'capabilities': instance.capabilities,
+      'user-agent': instance.userAgent,
+      'type': instance.type,
+      'screen': instance.screen
+    };
 
 Screen _$ScreenFromJson(Map<String, dynamic> json) {
   return Screen()
@@ -74,16 +63,11 @@ Screen _$ScreenFromJson(Map<String, dynamic> json) {
         : ScreenOrientation.fromJson(json['vertical'] as Map<String, dynamic>);
 }
 
-abstract class _$ScreenSerializerMixin {
-  num get devicePixelRatio;
-  ScreenOrientation get horizontal;
-  ScreenOrientation get vertical;
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'device-pixel-ratio': devicePixelRatio,
-        'horizontal': horizontal,
-        'vertical': vertical
-      };
-}
+Map<String, dynamic> _$ScreenToJson(Screen instance) => <String, dynamic>{
+      'device-pixel-ratio': instance.devicePixelRatio,
+      'horizontal': instance.horizontal,
+      'vertical': instance.vertical
+    };
 
 ScreenOrientation _$ScreenOrientationFromJson(Map<String, dynamic> json) {
   return ScreenOrientation()
@@ -91,9 +75,5 @@ ScreenOrientation _$ScreenOrientationFromJson(Map<String, dynamic> json) {
     ..height = json['height'] as num;
 }
 
-abstract class _$ScreenOrientationSerializerMixin {
-  num get width;
-  num get height;
-  Map<String, dynamic> toJson() =>
-      <String, dynamic>{'width': width, 'height': height};
-}
+Map<String, dynamic> _$ScreenOrientationToJson(ScreenOrientation instance) =>
+    <String, dynamic>{'width': instance.width, 'height': instance.height};

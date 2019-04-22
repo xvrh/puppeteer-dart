@@ -42,16 +42,18 @@ main() async {
       .writeAsStringSync(DartFormatter().format(buffer.toString()));
 }
 
-@JsonSerializable(generateToJsonFunction: false)
+@JsonSerializable()
 class Module {
   List<Extension> extensions;
 
   Module();
 
   factory Module.fromJson(Map<String, dynamic> json) => _$ModuleFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ModuleToJson(this);
 }
 
-@JsonSerializable(generateToJsonFunction: false)
+@JsonSerializable()
 class Extension {
   String type;
   int order;
@@ -61,9 +63,11 @@ class Extension {
 
   factory Extension.fromJson(Map<String, dynamic> json) =>
       _$ExtensionFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ExtensionToJson(this);
 }
 
-@JsonSerializable(generateToJsonFunction: false)
+@JsonSerializable()
 class Device {
   String title;
   List<String> capabilities;
@@ -79,9 +83,11 @@ class Device {
   String toCode(String viewportCode) {
     return "Device('$title', userAgent: '$userAgent', viewport: $viewportCode)";
   }
+
+  Map<String, dynamic> toJson() => _$DeviceToJson(this);
 }
 
-@JsonSerializable(generateToJsonFunction: false)
+@JsonSerializable()
 class Screen {
   @JsonKey(name: 'device-pixel-ratio')
   num devicePixelRatio;
@@ -90,9 +96,11 @@ class Screen {
   Screen();
 
   factory Screen.fromJson(Map<String, dynamic> json) => _$ScreenFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ScreenToJson(this);
 }
 
-@JsonSerializable(generateToJsonFunction: false)
+@JsonSerializable()
 class ScreenOrientation {
   num width, height;
 
@@ -100,6 +108,8 @@ class ScreenOrientation {
 
   factory ScreenOrientation.fromJson(Map<String, dynamic> json) =>
       _$ScreenOrientationFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ScreenOrientationToJson(this);
 }
 
 String viewportCode(Device device, ScreenOrientation orientation,
