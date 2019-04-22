@@ -1,5 +1,4 @@
 import 'package:logging/logging.dart';
-import 'package:puppeteer/chrome_downloader.dart';
 import 'package:puppeteer/puppeteer.dart';
 
 // ignore_for_file: unused_local_variable

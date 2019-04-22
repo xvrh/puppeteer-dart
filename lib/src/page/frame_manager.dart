@@ -80,7 +80,7 @@ class FrameManager {
       _networkManager.initialize()
     ]);
 
-    _ensureIsolatedWorld(_utilityWorldName);
+    await _ensureIsolatedWorld(_utilityWorldName);
   }
 
   PageFrame frame(FrameId frameId) => _frames[frameId];
@@ -205,7 +205,7 @@ class FrameManager {
     _frameNavigatedController.add(frame);
   }
 
-  void _ensureIsolatedWorld(String name) async {
+  Future<void> _ensureIsolatedWorld(String name) async {
     if (_isolatedWorlds.contains(name)) {
       return;
     }

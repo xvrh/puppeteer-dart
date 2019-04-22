@@ -1,4 +1,4 @@
-import 'package:puppeteer/chrome_downloader.dart';
+import 'package:puppeteer/puppeteer.dart';
 
 main() async {
   ChromePath chromePath = await downloadChrome(

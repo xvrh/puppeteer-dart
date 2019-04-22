@@ -30,3 +30,9 @@ dynamic valueFromRemoteObject(RemoteObject remoteObject) {
   }
   return remoteObject.value;
 }
+
+Future<void> releaseObject(
+    RuntimeApi runtimeApi, RemoteObject remoteObject) async {
+  if (remoteObject.objectId == null) return;
+  await runtimeApi.releaseObject(remoteObject.objectId);
+}

@@ -23,6 +23,7 @@ class DomWorld {
 
   void setContext(ExecutionContext context) {
     if (context != null) {
+      _documentFuture = null;
       _contextCompleter.complete(context);
 
       for (var waitTask in _waitTasks) {
