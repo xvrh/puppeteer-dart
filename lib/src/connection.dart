@@ -42,18 +42,6 @@ class Connection implements Client {
 
     _targetApi = TargetApi(this);
 
-    /*_subscriptions.add(_targetApi.onReceivedMessageFromTarget
-        .listen((ReceivedMessageFromTargetEvent e) {
-      Session session = _getSession(e.sessionId);
-      session._onMessage(e.message);
-    }));
-    _subscriptions
-        .add(_targetApi.onDetachedFromTarget.listen((DetachedFromTargetEvent e) {
-      Session session = _getSession(e.sessionId);
-      session._onClosed();
-      _sessions.remove(session);
-    }));*/
-
     _webSocket.done.then((_) => dispose());
   }
 

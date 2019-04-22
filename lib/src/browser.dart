@@ -74,7 +74,9 @@ class Browser {
   }
 
   Stream<Target> get onTargetCreated => _onTargetCreatedController.stream;
+
   Stream<Target> get onTargetDestroyed => _onTargetDestroyedController.stream;
+
   Stream<Target> get onTargetChanged => _onTargetChangedController.stream;
 
   Future get disconnected => connection.disconnected;
@@ -90,11 +92,6 @@ class Browser {
       [_defaultContext]..addAll(_contexts.values);
 
   BrowserContext get defaultBrowserContext => _defaultContext;
-
-  Future<void> disposeContext(BrowserContextID contextId) async {
-    await targetApi.disposeBrowserContext(contextId);
-    _contexts.remove(contextId);
-  }
 
   TargetApi get targetApi => connection.targetApi;
 
@@ -146,8 +143,15 @@ class Browser {
 
   List<Target> get targets =>
       _targets.values.where((target) => target.isInitialized).toList();
+
   Target get target => _targets.values
       .firstWhere((t) => t.type == 'browser', orElse: () => null);
+
+  Future<List<Page>> get pages async {
+    var contextPages =
+        await Future.wait(browserContexts.map((context) => context.pages));
+    return contextPages.expand((l) => l).toList();
+  }
 
   Future<Target> waitForTarget(bool Function(Target) predicate,
       {Duration timeout}) {
@@ -156,6 +160,16 @@ class Browser {
         .where(predicate)
         .first
         .timeout(timeout);
+  }
+
+  Future<String> get version async {
+    var version = await browser.getVersion();
+    return version.product;
+  }
+
+  Future<String> get userAgent async {
+    var version = await browser.getVersion();
+    return version.userAgent;
   }
 
   Future _disposeContext(BrowserContextID contextId) async {
@@ -192,8 +206,10 @@ class BrowserContext {
 
   Stream<Target> get onTargetCreated =>
       browser.onTargetCreated.where((t) => t.browserContext == this);
+
   Stream<Target> get onTargetDestroyed =>
       browser.onTargetDestroyed.where((t) => t.browserContext == this);
+
   Stream<Target> get onTargetChanged =>
       browser.onTargetChanged.where((t) => t.browserContext == this);
 
@@ -226,6 +242,12 @@ class BrowserContext {
 
   Future<Page> newPage() {
     return browser._createPageInContext(id);
+  }
+
+  Future<Target> waitForTarget(Function(Target) predicate, {Duration timeout}) {
+    return browser.waitForTarget(
+        (target) => target.browserContext == this && predicate(target),
+        timeout: timeout);
   }
 
   Future close() async {

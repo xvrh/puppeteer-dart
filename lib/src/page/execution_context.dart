@@ -30,7 +30,11 @@ class ExecutionContext {
 
   Future<T> evaluate<T>(@javascript String pageFunction, {List args}) async {
     var handle = await evaluateHandle(pageFunction, args: args);
-    T result = await handle.jsonValue;
+    T result = await handle.jsonValue.catchError((_) => null, test: (error) {
+      return error is ServerException &&
+          (error.message.contains('Object reference chain is too long') ||
+              error.message.contains('Object couldn\'t be returned by value'));
+    });
     await handle.dispose();
     return result;
   }
