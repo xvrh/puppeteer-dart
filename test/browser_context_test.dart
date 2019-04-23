@@ -80,7 +80,9 @@ main() {
           .listen((target) => events.add(('DESTROYED: ' + target.url)));
       var page = await context.newPage();
       await page.goto(server.emptyPage);
+      Future targetDestroyFuture = context.onTargetDestroyed.first;
       await page.close();
+      await targetDestroyFuture;
       expect(
           events,
           equals([
@@ -89,9 +91,6 @@ main() {
             'DESTROYED: ${server.emptyPage}'
           ]));
       await context.close();
-    }, onPlatform: {
-      // TODO(XaHa): debug on windows (destroyed not called on time)
-      "windows": Skip(),
     });
     test('should wait for a target', () async {
       var context = await browser.createIncognitoBrowserContext();
