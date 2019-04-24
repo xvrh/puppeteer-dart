@@ -105,7 +105,8 @@ main() {
       await page.emulate(devices.iPhone6);
       await page.goto(server.prefix + '/input/button.html');
       var button = await page.$('button');
-      await page.evaluate("button => button.style.marginTop = '200px', button");
+      await page.evaluate("button => button.style.marginTop = '200px'",
+          args: [button]);
       await button.click();
       expect(await page.evaluate('() => result'), equals('Clicked'));
     });

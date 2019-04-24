@@ -506,6 +506,7 @@ function deliverError(name, seq, message, stack) {
   Future<void> emulateMedia(String mediaType) {
     assert(mediaType == 'screen' || mediaType == 'print' || mediaType == null,
         'Unsupported media type: ' + mediaType);
+    mediaType ??= '';
     return devTools.emulation.setEmulatedMedia(mediaType);
   }
 

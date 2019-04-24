@@ -250,13 +250,13 @@ main() {
   group('Page.setGeolocation', () {
     test('should work', () async {
       await context
-          .overridePermissions(server.prefix, [PermissionType.geolocation]);
+          .overridePermissions(server.hostUrl, [PermissionType.geolocation]);
       await page.goto(server.emptyPage);
       await page.setGeolocation(longitude: 10, latitude: 10);
-      var geolocation = await page.evaluate(
-          '''() => new Promise(resolve => navigator.geolocation.getCurrentPosition(position => {
+      Map geolocation = await page.evaluate(
+          '''() => new Promise((resolve, failure) => navigator.geolocation.getCurrentPosition(position => {
       resolve({latitude: position.coords.latitude, longitude: position.coords.longitude});
-      }))''');
+      }, error => failure(error.message)))''');
       expect(geolocation, equals({'latitude': 10, 'longitude': 10}));
     });
     test('should throw when invalid longitude', () async {

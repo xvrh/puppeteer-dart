@@ -56,8 +56,7 @@ class Server {
     }, InternetAddress.anyIPv4, 0);
   }
 
-  String get hostUrl =>
-      'http://${_httpServer.address.host}:${_httpServer.port}';
+  String get hostUrl => 'http://localhost:${_httpServer.port}';
 
   String get prefix => p.url.join(hostUrl, _assetFolder);
 

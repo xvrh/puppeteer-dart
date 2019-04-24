@@ -104,7 +104,9 @@ class LifecycleWatcher {
       _sameDocumentNavigationCompleter.complete();
     }
     if (frame.loaderId != _initialLoaderId) {
-      _newDocumentNavigationCompleter.complete();
+      if (!_newDocumentNavigationCompleter.isCompleted) {
+        _newDocumentNavigationCompleter.complete();
+      }
     }
   }
 
