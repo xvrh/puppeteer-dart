@@ -350,6 +350,8 @@ main() {
       console.error('calling console.error');
       console.log(Promise.resolve('should not wait until resolved!'));
       }''');
+      // Gives time for the logs to arrive on Windows
+      await Future.delayed(Duration(milliseconds: 1));
       expect(messages.map((msg) => msg.type),
           equals(['timeEnd', 'trace', 'dir', 'warning', 'error', 'log']));
       expect(messages[0].text, contains('calling console.time'));

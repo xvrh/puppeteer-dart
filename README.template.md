@@ -46,6 +46,11 @@ import 'example/screenshot_page.dart';
 import 'example/screenshot_element.dart';
 ```
 
+### Interact with the page and scrap content
+```dart
+import 'example/search.dart';
+```
+
 ### Create a static version of a Single Page Application
 ```dart
 import 'example/capture_spa.dart';
@@ -65,7 +70,7 @@ import 'example/dev_tools_protocol.dart';
 ### Execute JavaScript code
 A lot of the Puppeteer API exposes functions to run some javascript code in the browser.
 
-Example:
+Example in Node.JS:
 ```js
 test(async () => {
   const result = await page.evaluate(x => {
