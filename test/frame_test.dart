@@ -154,6 +154,8 @@ main() {
       detachedFrames = [];
       navigatedFrames = [];
       await page.goto(server.emptyPage);
+      // Gives some time for the events to fire on Windows.
+      await Future.delayed(Duration(milliseconds: 1));
       expect(attachedFrames.length, equals(0));
       expect(detachedFrames.length, equals(4));
       expect(navigatedFrames.length, equals(1));
