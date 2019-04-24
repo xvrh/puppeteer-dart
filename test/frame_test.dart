@@ -157,10 +157,9 @@ main() {
       expect(attachedFrames.length, equals(0));
       expect(detachedFrames.length, equals(4));
       expect(navigatedFrames.length, equals(1));
-    }, onPlatform: {
-      // TODO(xha): debug on windows
-      'windows': Skip('Flaky on windows')
-    });
+    },
+        // TODO(xha): Deflake
+        skip: false);
     test('should support framesets', () async {
       var attachedFrames = <PageFrame>[];
       var detachedFrames = <PageFrame>[];
