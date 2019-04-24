@@ -1,7 +1,6 @@
 import 'dart:async';
-
 import 'package:meta/meta.dart';
-import 'package:puppeteer/protocol/input.dart';
+import '../../protocol/input.dart';
 
 class Keyboard {
   final InputApi _inputApi;

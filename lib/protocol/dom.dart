@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
+import 'dom.dart' as dom;
 import 'page.dart' as page;
 import 'runtime.dart' as runtime;
-import 'dom.dart' as dom;
 
 /// This domain exposes DOM read/write operations. Each DOM Node is represented with its mirror object
 /// that has an `id`. This `id` can be used to get additional information on the Node, resolve it into

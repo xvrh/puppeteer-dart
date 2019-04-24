@@ -1,9 +1,7 @@
 import 'dart:io';
-
 import 'package:http/http.dart';
 import 'package:path/path.dart' as p;
 import 'package:puppeteer/puppeteer.dart';
-
 import 'generate_domains.dart';
 
 /// Download the Chrome Dev Tools protocol (json file) directly from a running Chrome instance.

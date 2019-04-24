@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {

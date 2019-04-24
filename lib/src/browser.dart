@@ -1,17 +1,17 @@
 import 'dart:async';
-
 import 'package:async/async.dart';
 import 'package:meta/meta.dart';
 import 'package:pool/pool.dart';
-import 'package:puppeteer/protocol/browser.dart';
-import 'package:puppeteer/protocol/system_info.dart';
-import 'package:puppeteer/src/connection.dart';
-import 'package:puppeteer/src/launcher.dart';
-import 'package:puppeteer/src/page/emulation_manager.dart';
-import 'package:puppeteer/src/page/page.dart';
-import 'package:puppeteer/src/target.dart';
-
+import '../protocol/browser.dart';
+import '../protocol/system_info.dart';
 import '../protocol/target.dart';
+import 'connection.dart';
+import 'launcher.dart';
+import 'page/emulation_manager.dart';
+import 'page/page.dart';
+import 'target.dart';
+
+export '../protocol/browser.dart' show PermissionType;
 
 class Browser {
   final Connection connection;

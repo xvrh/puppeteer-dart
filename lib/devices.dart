@@ -22,7 +22,7 @@ final iPhone4Landscape = Device('iPhone 4',
         hasTouch: true,
         isLandscape: true));
 
-const iPhone5SE = Device('iPhone 5/SE',
+const iPhone5 = Device('iPhone 5',
     userAgent:
         'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1',
     viewport: DeviceViewport(
@@ -33,7 +33,7 @@ const iPhone5SE = Device('iPhone 5/SE',
         hasTouch: true,
         isLandscape: false));
 
-final iPhone5SELandscape = Device('iPhone 5/SE',
+final iPhone5Landscape = Device('iPhone 5',
     userAgent:
         'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1',
     viewport: DeviceViewport(
@@ -44,7 +44,29 @@ final iPhone5SELandscape = Device('iPhone 5/SE',
         hasTouch: true,
         isLandscape: true));
 
-const iPhone678 = Device('iPhone 6/7/8',
+const iPhoneSE = Device('iPhone SE',
+    userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1',
+    viewport: DeviceViewport(
+        width: 320,
+        height: 568,
+        deviceScaleFactor: 2,
+        isMobile: true,
+        hasTouch: true,
+        isLandscape: false));
+
+final iPhoneSELandscape = Device('iPhone SE',
+    userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1',
+    viewport: DeviceViewport(
+        width: 568,
+        height: 320,
+        deviceScaleFactor: 2,
+        isMobile: true,
+        hasTouch: true,
+        isLandscape: true));
+
+const iPhone6 = Device('iPhone 6',
     userAgent:
         'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
     viewport: DeviceViewport(
@@ -55,7 +77,51 @@ const iPhone678 = Device('iPhone 6/7/8',
         hasTouch: true,
         isLandscape: false));
 
-final iPhone678Landscape = Device('iPhone 6/7/8',
+final iPhone6Landscape = Device('iPhone 6',
+    userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+    viewport: DeviceViewport(
+        width: 667,
+        height: 375,
+        deviceScaleFactor: 2,
+        isMobile: true,
+        hasTouch: true,
+        isLandscape: true));
+
+const iPhone7 = Device('iPhone 7',
+    userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+    viewport: DeviceViewport(
+        width: 375,
+        height: 667,
+        deviceScaleFactor: 2,
+        isMobile: true,
+        hasTouch: true,
+        isLandscape: false));
+
+final iPhone7Landscape = Device('iPhone 7',
+    userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+    viewport: DeviceViewport(
+        width: 667,
+        height: 375,
+        deviceScaleFactor: 2,
+        isMobile: true,
+        hasTouch: true,
+        isLandscape: true));
+
+const iPhone8 = Device('iPhone 8',
+    userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+    viewport: DeviceViewport(
+        width: 375,
+        height: 667,
+        deviceScaleFactor: 2,
+        isMobile: true,
+        hasTouch: true,
+        isLandscape: false));
+
+final iPhone8Landscape = Device('iPhone 8',
     userAgent:
         'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
     viewport: DeviceViewport(

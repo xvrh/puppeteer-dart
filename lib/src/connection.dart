@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:logging/logging.dart';
-
 import '../protocol/target.dart';
 
 abstract class Client {

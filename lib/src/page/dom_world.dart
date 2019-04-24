@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:meta/meta.dart';
-import 'package:puppeteer/src/javascript_function_parser.dart';
-import 'package:puppeteer/src/page/execution_context.dart';
-import 'package:puppeteer/src/page/frame_manager.dart';
-import 'package:puppeteer/src/page/js_handle.dart';
-import 'package:puppeteer/src/page/lifecycle_watcher.dart';
-import 'package:puppeteer/src/page/mouse.dart';
+import '../javascript_function_parser.dart';
+import 'execution_context.dart';
+import 'frame_manager.dart';
+import 'js_handle.dart';
+import 'lifecycle_watcher.dart';
+import 'mouse.dart';
 
 class DomWorld {
   final FrameManager frameManager;
@@ -42,7 +41,7 @@ class DomWorld {
 
   void detach() {
     _detached = true;
-    for (var waitTask in _waitTasks) {
+    for (var waitTask in _waitTasks.toList()) {
       waitTask
           .terminate(Exception('waitForFunction failed: frame got detached.'));
     }
@@ -56,13 +55,14 @@ class DomWorld {
     return _contextCompleter.future;
   }
 
-  Future<JsHandle> evaluateHandle(@javascript String pageFunction,
+  Future<JsHandle> evaluateHandle(@Language('js') String pageFunction,
       {List args}) async {
     var context = await executionContext;
     return context.evaluateHandle(pageFunction, args: args);
   }
 
-  Future<T> evaluate<T>(@javascript String pageFunction, {List args}) async {
+  Future<T> evaluate<T>(@Language('js') String pageFunction,
+      {List args}) async {
     var context = await executionContext;
     return context.evaluate<T>(pageFunction, args: args);
   }
@@ -90,13 +90,13 @@ class DomWorld {
     return value;
   }
 
-  Future<T> $eval<T>(String selector, @javascript String pageFunction,
+  Future<T> $eval<T>(String selector, @Language('js') String pageFunction,
       {List args}) async {
     var document = await _document;
     return document.$eval<T>(selector, pageFunction, args: args);
   }
 
-  Future<T> $$eval<T>(String selector, @javascript String pageFunction,
+  Future<T> $$eval<T>(String selector, @Language('js') String pageFunction,
       {List args}) async {
     var document = await _document;
     return document.$$eval<T>(selector, pageFunction, args: args);
@@ -155,6 +155,7 @@ function _(html) {
   Future<ElementHandle> addScriptTag(
       {String url, File file, String content, String type}) async {
     assert(url != null || file != null || content != null);
+    type ??= '';
 
     var context = await executionContext;
 
@@ -291,7 +292,7 @@ async function _(content) {
   }
 
   Future<List<String>> select(String selector, List<String> values) {
-    return $eval(selector,
+    return $eval<List>(selector,
         //language=js
         '''
 function _(element, values) {
@@ -310,7 +311,7 @@ function _(element, values) {
   element.dispatchEvent(new Event('change', { 'bubbles': true }));
   return options.filter(option => option.selected).map(option => option.value);
 }
-''', args: [values]);
+''', args: [values]).then((result) => result.cast<String>());
   }
 
   Future<void> tap(String selector) async {
@@ -339,11 +340,12 @@ function _(element, values) {
         isXPath: true, visible: visible, hidden: hidden, timeout: timeout);
   }
 
-  Future<JsHandle> waitForFunction(@javascript String pageFunction, List args,
+  Future<JsHandle> waitForFunction(
+      @Language('js') String pageFunction, List args,
       {Duration timeout, Polling polling}) async {
     String functionDeclaration = convertToFunctionDeclaration(pageFunction);
     if (functionDeclaration == null) {
-      pageFunction = 'function _() { return $functionDeclaration; }';
+      pageFunction = 'function _() { return $pageFunction; }';
     }
 
     return await WaitTask(this, pageFunction,
@@ -417,7 +419,7 @@ function _(selectorOrXPath, isXPath, waitForVisible, waitForHidden) {
 
 class WaitTask {
   final DomWorld domWorld;
-  @javascript
+  @Language('js')
   final String predicate;
   final String title;
   final Polling polling;
@@ -428,7 +430,7 @@ class WaitTask {
   Timer _timeoutTimer;
   bool _terminated = false;
 
-  WaitTask(this.domWorld, @javascript this.predicate,
+  WaitTask(this.domWorld, @Language('js') this.predicate,
       {@required this.title,
       @required this.polling,
       @required this.timeout,
@@ -439,7 +441,7 @@ class WaitTask {
     // Since page navigation requires us to re-install the pageScript, we should track
     // timeout on our end.
     if (timeout != null) {
-      var timeoutError = Exception(
+      var timeoutError = TimeoutException(
           'waiting for $title failed: timeout ${timeout.inMilliseconds}ms exceeded');
       _timeoutTimer = Timer(timeout, () => terminate(timeoutError));
     }
@@ -492,7 +494,9 @@ class WaitTask {
         return;
       }
 
-      _completer.completeError(error);
+      if (!_completer.isCompleted) {
+        _completer.completeError(error);
+      }
     }
 
     _cleanup();
@@ -605,7 +609,9 @@ class Polling {
 
   const Polling._mutation() : _value = 'mutation';
 
-  Polling.interval(Duration duration) : _value = duration.inMilliseconds;
+  Polling.interval(Duration duration) : _value = duration.inMilliseconds {
+    assert(duration.inMilliseconds > 0);
+  }
 
   get value => _value;
 }

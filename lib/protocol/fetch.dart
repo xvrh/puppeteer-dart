@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
-import 'network.dart' as network;
 import 'io.dart' as io;
+import 'network.dart' as network;
 import 'page.dart' as page;
 
 /// A domain for letting clients substitute browser's network layer with client code.

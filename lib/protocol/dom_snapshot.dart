@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
-import 'page.dart' as page;
 import 'dom_debugger.dart' as dom_debugger;
+import 'page.dart' as page;
 
 /// This domain facilitates obtaining document snapshots with DOM, layout, and style information.
 class DOMSnapshotApi {

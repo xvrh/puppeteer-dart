@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as p;
-
+import 'code_style/fix_import_order.dart';
 import 'download_protocol_from_repo.dart' as protocols_from_repo;
 import 'model.dart';
 import 'utils/split_words.dart';
@@ -158,13 +156,9 @@ class DevTools {
       p.join(libPath, 'protocol', 'dev_tools.dart'), tabBuffer.toString());
 }
 
-final DartFormatter _dartFormatter =
-    DartFormatter(lineEnding: Platform.isWindows ? '\r\n' : '\n');
-
 _writeDartFile(String target, String code) {
   try {
-    String formattedCode = _dartFormatter.format(code);
-
+    String formattedCode = reorderImports(code);
     File(target).writeAsStringSync(formattedCode);
   } catch (_) {
     print('Error with code\n$code');

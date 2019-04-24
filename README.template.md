@@ -62,6 +62,52 @@ The code is in `lib/protocol`
 import 'example/dev_tools_protocol.dart';
 ```
 
+### Execute JavaScript code
+A lot of the Puppeteer API exposes functions to run some javascript code in the browser.
+
+Example:
+```js
+test(async () => {
+  const result = await page.evaluate(x => {
+    return Promise.resolve(8 * x);
+  }, 7);
+});
+```
+
+As of now, in the Dart port, you have to pass the JavaScript code as a string.
+The example above is written as:
+```dart
+main() async {
+  var result = await page.evaluate('''x => {
+    return Promise.resolve(8 * x);
+  }''', args: [7]);
+}
+```
+
+The javascript code can be:
+- A function declaration (in the classical form with the `function` keyword
+ or with the shorthand format (`() => `))
+- An expression. In which case you cannot pass any arguments to the `evaluate` method.
+
+```dart
+import 'example/execute_javascript.dart';
+```
+
+If you are using IntellJ (or Webstorm), you can enable syntax highlighting and code-analyzer
+for the Javascript snippet with a comment like `// language=js` before the string.
+
+```dart
+main() {
+  page.evaluate(
+  //language=js
+  '''function _(x) {
+    return x > 0;
+  }''', args: [7]);
+}
+```
+
+Note: In a future version, we can image to compile the dart code to javascript on the fly before 
+sending it to the browser (with ddc or dart2js). 
 
 ## Related work
  * [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface)

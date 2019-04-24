@@ -1,5 +1,5 @@
-import 'package:puppeteer/protocol/runtime.dart';
-import 'package:puppeteer/src/connection.dart';
+import '../../protocol/runtime.dart';
+import '../connection.dart';
 
 class Worker {
   final Client client;

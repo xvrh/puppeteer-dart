@@ -1,7 +1,5 @@
 import 'dart:io';
-
 import 'package:dart_style/dart_style.dart';
-
 import 'download_protocol_from_repo.dart' show protocols;
 
 final RegExp _importRegex = RegExp(r"import '([^']+)';\r?\n");

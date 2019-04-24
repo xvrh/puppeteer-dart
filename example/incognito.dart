@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:logging/logging.dart';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:shelf/shelf_io.dart' as io;

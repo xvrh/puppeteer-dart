@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
-import 'runtime.dart' as runtime;
 import 'network.dart' as network;
+import 'runtime.dart' as runtime;
 
 /// Provides access to log entries.
 class LogApi {

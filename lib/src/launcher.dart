@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:logging/logging.dart';
-import 'package:puppeteer/src/browser.dart';
-import 'package:puppeteer/src/connection.dart';
-import 'package:puppeteer/src/downloader.dart';
-import 'package:puppeteer/src/page/emulation_manager.dart';
+import 'browser.dart';
+import 'connection.dart';
+import 'downloader.dart';
+import 'page/emulation_manager.dart';
 
 final Logger _logger = Logger('puppeteer.launcher');
 

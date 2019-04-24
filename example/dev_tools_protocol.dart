@@ -18,7 +18,7 @@ main() async {
   // Access the CSS domain
   page.devTools.css.onFontsUpdated.listen((_) {});
 
-  // Access the Memory domaina
+  // Access the Memory domain
   await page.devTools.memory.getDOMCounters();
 
   await browser.close();
