@@ -20,6 +20,7 @@ String convertToFunctionDeclaration(String javascript) {
       _Arguments arguments = tokens.singleWhere((t) => t is _Arguments);
       _FunctionBody functionBody =
           tokens.singleWhere((t) => t is _FunctionBody);
+      bool isAsync = tokens.contains(_isAsync);
 
       String body = hasBodyStatement
           ? '{ ' + functionBody.value
@@ -30,7 +31,7 @@ String convertToFunctionDeclaration(String javascript) {
         argumentString = '($argumentString)';
       }
 
-      return 'function$argumentString$body';
+      return '${isAsync ? 'async ' : ''}function$argumentString$body';
     }
   } else {
     return null;
@@ -69,7 +70,7 @@ class JsGrammarDefinition extends GrammarDefinition {
       ref(body);
 
   functionShorthand() =>
-      ref(token, 'async').optional() &
+      ref(token, 'async').optional().map((t) => t != null ? _isAsync : null) &
       ref(functionShorthandArguments).flatten().map((t) => _Arguments(t)) &
       ref(token, '=>') &
       ref(token, '{')
@@ -125,6 +126,7 @@ class JsGrammarDefinition extends GrammarDefinition {
 
 final _isFunction = Object();
 final _hasBodyStatements = Object();
+final _isAsync = Object();
 
 class _FunctionBody {
   final String value;

@@ -1,10 +1,9 @@
 import 'dart:async';
-
 import 'package:meta/meta.dart';
-import 'package:puppeteer/protocol/target.dart';
-import 'package:puppeteer/src/browser.dart';
-import 'package:puppeteer/src/connection.dart';
-import 'package:puppeteer/src/page/page.dart';
+import '../protocol/target.dart';
+import 'browser.dart';
+import 'connection.dart';
+import 'page/page.dart';
 
 class Target {
   final Browser browser;
@@ -41,7 +40,7 @@ class Target {
 
   bool get isInitialized => _isInitialized;
 
-  Future get onClose => _closedCompleter.future;
+  Future<void> get onClose => _closedCompleter.future;
 
   String get url => _info.url;
 
@@ -61,8 +60,8 @@ class Target {
   Future<Page> get page {
     if ((_info.type == 'page' || _info.type == 'background_page') &&
         _pageFuture == null) {
-      _pageFuture =
-          this._sessionFactory().then((session) => Page.create(this, session));
+      _pageFuture = this._sessionFactory().then((session) =>
+          Page.create(this, session, viewport: browser.defaultViewport));
     }
     return _pageFuture;
   }

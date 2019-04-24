@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0 (2019-04-24)
+
+- Start a browser with `puppeteer.launch` instead of
+`Browser.start` to align with the puppeteer API
+- Add a list of all the devices from chrome:
+Accessible with: `page.emulate(puppeteer.devices.iPhone6)`
+- Add tests
+
 ## 1.1.0 (2019-04-22)
 
 - Add some unit tests from the Puppeteer/Node.JS project and fix some bugs.

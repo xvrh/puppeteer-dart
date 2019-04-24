@@ -1,8 +1,6 @@
 import 'package:logging/logging.dart';
 import 'package:puppeteer/puppeteer.dart';
-import 'package:puppeteer/devices.dart' as devices;
 import 'package:test/test.dart';
-
 import 'utils.dart';
 
 main() {
@@ -13,7 +11,7 @@ main() {
   Page page;
   setUpAll(() async {
     server = await Server.create();
-    browser = await Browser.start();
+    browser = await puppeteer.launch();
   });
 
   tearDownAll(() async {
@@ -177,7 +175,7 @@ main() {
     });
     // @see https://github.com/GoogleChrome/puppeteer/issues/161
     test('should not hang with touch-enabled viewports', () async {
-      await page.setViewport(devices.iPhone678.viewport);
+      await page.setViewport(puppeteer.devices.iPhone6.viewport);
       await page.mouse.down();
       await page.mouse.move(Point(100, 10));
       await page.mouse.up();

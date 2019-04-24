@@ -1,17 +1,16 @@
 import 'dart:async';
 import 'dart:io';
-
-import 'package:puppeteer/protocol/network.dart';
-import 'package:puppeteer/protocol/page.dart';
-import 'package:puppeteer/protocol/runtime.dart';
-import 'package:puppeteer/src/connection.dart';
-import 'package:puppeteer/src/page/dom_world.dart';
-import 'package:puppeteer/src/page/execution_context.dart';
-import 'package:puppeteer/src/page/js_handle.dart';
-import 'package:puppeteer/src/page/lifecycle_watcher.dart';
-import 'package:puppeteer/src/page/mouse.dart';
-import 'package:puppeteer/src/page/network_manager.dart';
-import 'package:puppeteer/src/page/page.dart';
+import '../../protocol/network.dart';
+import '../../protocol/page.dart';
+import '../../protocol/runtime.dart';
+import '../connection.dart';
+import 'dom_world.dart';
+import 'execution_context.dart';
+import 'js_handle.dart';
+import 'lifecycle_watcher.dart';
+import 'mouse.dart';
+import 'network_manager.dart';
+import 'page.dart';
 
 const _utilityWorldName = '__cdt_utility_world__';
 
@@ -332,6 +331,8 @@ class PageFrame {
 
   LoaderId get loaderId => _loaderId;
 
+  PageFrame get parentFrame => _parent;
+
   Future<NetworkResponse> goto(String url,
       {String referrer, Duration timeout, Until wait}) {
     return frameManager.navigateFrame(this, url,
@@ -347,12 +348,12 @@ class PageFrame {
     return _mainWorld.executionContext;
   }
 
-  Future<JsHandle> evaluateHandle(@javascript String pageFunction,
+  Future<JsHandle> evaluateHandle(@Language('js') String pageFunction,
       {List args}) {
     return _mainWorld.evaluateHandle(pageFunction, args: args);
   }
 
-  Future<T> evaluate<T>(@javascript String pageFunction, {List args}) {
+  Future<T> evaluate<T>(@Language('js') String pageFunction, {List args}) {
     return _mainWorld.evaluate<T>(pageFunction, args: args);
   }
 
@@ -390,12 +391,12 @@ class PageFrame {
   /// [pageFunction]: Function to be evaluated in browser context
   /// [args]: Arguments to pass to pageFunction
   /// Returns a Future which resolves to the return value of pageFunction
-  Future<T> $eval<T>(String selector, @javascript String pageFunction,
+  Future<T> $eval<T>(String selector, @Language('js') String pageFunction,
       {List args}) {
     return _mainWorld.$eval<T>(selector, pageFunction, args: args);
   }
 
-  Future<T> $$eval<T>(String selector, @javascript String pageFunction,
+  Future<T> $$eval<T>(String selector, @Language('js') String pageFunction,
       {List args}) {
     return _mainWorld.$$eval<T>(selector, pageFunction, args: args);
   }
@@ -474,7 +475,8 @@ class PageFrame {
     return result;
   }
 
-  Future<JsHandle> waitForFunction(@javascript String pageFunction, List args,
+  Future<JsHandle> waitForFunction(
+      @Language('js') String pageFunction, List args,
       {Duration timeout, Polling polling}) {
     return _mainWorld.waitForFunction(pageFunction, args,
         timeout: timeout, polling: polling);

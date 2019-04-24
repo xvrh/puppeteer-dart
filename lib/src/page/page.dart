@@ -3,32 +3,31 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
-
 import 'package:meta/meta.dart';
-import 'package:puppeteer/protocol/dev_tools.dart';
-import 'package:puppeteer/protocol/dom.dart';
-import 'package:puppeteer/protocol/log.dart';
-import 'package:puppeteer/protocol/network.dart';
-import 'package:puppeteer/protocol/page.dart';
-import 'package:puppeteer/protocol/runtime.dart';
-import 'package:puppeteer/protocol/target.dart';
-import 'package:puppeteer/src/browser.dart';
-import 'package:puppeteer/src/connection.dart';
-import 'package:puppeteer/src/page/dom_world.dart';
-import 'package:puppeteer/src/page/emulation_manager.dart';
-import 'package:puppeteer/src/page/execution_context.dart';
-import 'package:puppeteer/src/page/frame_manager.dart';
-import 'package:puppeteer/src/page/helper.dart';
-import 'package:puppeteer/src/page/js_handle.dart';
-import 'package:puppeteer/src/page/keyboard.dart';
-import 'package:puppeteer/src/page/lifecycle_watcher.dart';
-import 'package:puppeteer/src/page/mouse.dart';
-import 'package:puppeteer/src/page/network_manager.dart';
-import 'package:puppeteer/src/page/touchscreen.dart';
-import 'package:puppeteer/src/page/worker.dart';
-import 'package:puppeteer/src/target.dart';
-
+import '../../protocol/dev_tools.dart';
+import '../../protocol/dom.dart';
+import '../../protocol/log.dart';
+import '../../protocol/network.dart';
+import '../../protocol/page.dart';
+import '../../protocol/runtime.dart';
+import '../../protocol/target.dart';
+import '../browser.dart';
+import '../connection.dart';
 import '../connection.dart' show Session;
+import '../target.dart';
+import 'dialog.dart';
+import 'dom_world.dart';
+import 'emulation_manager.dart';
+import 'execution_context.dart';
+import 'frame_manager.dart';
+import 'helper.dart';
+import 'js_handle.dart';
+import 'keyboard.dart';
+import 'lifecycle_watcher.dart';
+import 'mouse.dart';
+import 'network_manager.dart';
+import 'touchscreen.dart';
+import 'worker.dart';
 
 class Page {
   final Target target;
@@ -40,7 +39,8 @@ class Page {
       _workerDestroyed = StreamController<Worker>.broadcast(),
       _onErrorController = StreamController<ClientError>.broadcast(),
       _onPopupController = StreamController<Page>.broadcast(),
-      _onConsoleController = StreamController<ConsoleMessage>.broadcast();
+      _onConsoleController = StreamController<ConsoleMessage>.broadcast(),
+      _onDialogController = StreamController<Dialog>.broadcast();
   bool _javascriptEnabled = true;
   Duration navigationTimeout;
   Duration defaultTimeout = Duration(seconds: 30);
@@ -77,14 +77,10 @@ class Page {
       }
     });
 
-    // TODO(xha): onConsoleAPI: récupérer tous les arguments du console.xx et les convertir en string
-    devTools.runtime.onConsoleAPICalled.listen((e) {
-      //If I recall correctly Log.entryAdded() shows errors and warning from Chrome (e.g., XSS violations and such), not necessarily coming from the console.* API.
-    });
-
     devTools.runtime.onBindingCalled.listen(_onBindingCalled);
     devTools.page.onJavascriptDialogOpening.listen(_onDialog);
     devTools.runtime.onExceptionThrown.listen(_handleException);
+    devTools.inspector.onTargetCrashed.listen(_handleTargetCrashed);
     devTools.runtime.onConsoleAPICalled.listen(_onConsoleApi);
     devTools.log.onEntryAdded.listen(_onLogEntryAdded);
     onClose.then((_) {
@@ -115,6 +111,8 @@ class Page {
 
   Browser get browser => target.browser;
 
+  BrowserContext get browserContext => target.browserContext;
+
   void _dispose() {
     session.dispose();
 
@@ -124,6 +122,7 @@ class Page {
     _onErrorController.close();
     _onPopupController.close();
     _onConsoleController.close();
+    _onDialogController.close();
   }
 
   Duration get navigationTimeoutOrDefault =>
@@ -141,6 +140,8 @@ class Page {
 
   Stream<PageFrame> get onFrameNavigated => _frameManager.onFrameNavigated;
 
+  Stream<Page> get onPopup => _onPopupController.stream;
+
   Stream<ConsoleMessage> get onConsole => _onConsoleController.stream;
 
   Stream<MonotonicTime> get onDomContentLoaded =>
@@ -150,9 +151,11 @@ class Page {
 
   Stream<ClientError> get onError => _onErrorController.stream;
 
+  Stream<Dialog> get onDialog => _onDialogController.stream;
+
   FrameManager get frameManager => _frameManager;
 
-  Future get onClose => target.onClose;
+  Future<void> get onClose => target.onClose;
 
   bool get isClosed => session.isClosed;
 
@@ -165,6 +168,11 @@ class Page {
   Mouse get mouse => _mouse;
 
   List<PageFrame> get frames => frameManager.frames;
+
+  void _onDialog(JavascriptDialogOpeningEvent event) {
+    var dialog = Dialog(this, event);
+    _onDialogController.add(dialog);
+  }
 
   void _onConsoleApi(ConsoleAPICalledEvent event) {
     if (event.executionContextId.value == 0) {
@@ -224,15 +232,23 @@ class Page {
     if (event.source != LogEntrySource.worker) {
       _onConsoleController.add(ConsoleMessage(
           event.level.toString(), event.text, [],
-          url: url, lineNumber: event.lineNumber));
+          url: event.url, lineNumber: event.lineNumber));
     }
+  }
+
+  Future<void> setRequestInterception(bool value) {
+    return _frameManager.networkManager.setRequestInterception(value);
+  }
+
+  Future<void> setOfflineMode(bool enabled) {
+    return _frameManager.networkManager.setOfflineMode(enabled);
   }
 
   Future<ElementHandle> $(String selector) {
     return mainFrame.$(selector);
   }
 
-  Future<JsHandle> evaluateHandle(@javascript String pageFunction,
+  Future<JsHandle> evaluateHandle(@Language('js') String pageFunction,
       {List args}) async {
     var context = await mainFrame.executionContext;
     return context.evaluateHandle(pageFunction, args: args);
@@ -243,12 +259,12 @@ class Page {
     return context.queryObjects(prototypeHandle);
   }
 
-  Future<T> $eval<T>(String selector, @javascript String pageFunction,
+  Future<T> $eval<T>(String selector, @Language('js') String pageFunction,
       {List args}) {
     return mainFrame.$eval<T>(selector, pageFunction, args: args);
   }
 
-  Future<T> $$eval<T>(String selector, @javascript String pageFunction,
+  Future<T> $$eval<T>(String selector, @Language('js') String pageFunction,
       {List args}) {
     return mainFrame.$$eval<T>(selector, pageFunction, args: args);
   }
@@ -277,6 +293,19 @@ class Page {
 
   Future<void> setCookies(List<CookieParam> cookies) async {
     await devTools.network.setCookies(cookies);
+  }
+
+  Future<void> setGeolocation(
+      {num latitude, num longitude, num accuracy}) async {
+    accuracy ??= 0;
+    assert(longitude >= -180 && longitude <= 180,
+        'Invalid longitude "$longitude": precondition -180 <= LONGITUDE <= 180 failed.');
+    assert(latitude >= -90 && latitude <= 90,
+        'Invalid latitude "$latitude": precondition -90 <= LATITUDE <= 90 failed.');
+    assert(accuracy >= 0,
+        'Invalid accuracy "$accuracy": precondition 0 <= ACCURACY failed.');
+    await devTools.emulation.setGeolocationOverride(
+        latitude: latitude, longitude: longitude, accuracy: accuracy);
   }
 
   Future<ElementHandle> addScriptTag(
@@ -341,6 +370,10 @@ function addPageBinding(bindingName) {
     _onErrorController.add(ClientError(event.exceptionDetails));
   }
 
+  void _handleTargetCrashed(_) {
+    _onErrorController.add(ClientError.pageCrashed());
+  }
+
   Future _onBindingCalled(BindingCalledEvent event) async {
     Map<String, dynamic> payload = jsonDecode(event.payload);
     String name = payload['name'];
@@ -375,10 +408,6 @@ function deliverError(name, seq, message, stack) {
   window[name]['callbacks'].delete(seq);
 }
 ''';
-
-  _onDialog(event) {
-    //TODO(xha)
-  }
 
   String get url {
     return mainFrame.url;
@@ -477,10 +506,11 @@ function deliverError(name, seq, message, stack) {
   Future<void> emulateMedia(String mediaType) {
     assert(mediaType == 'screen' || mediaType == 'print' || mediaType == null,
         'Unsupported media type: ' + mediaType);
+    mediaType ??= '';
     return devTools.emulation.setEmulatedMedia(mediaType);
   }
 
-  Future setViewport(DeviceViewport viewport) async {
+  Future<void> setViewport(DeviceViewport viewport) async {
     var needsReload = await _emulationManager.emulateViewport(viewport);
     _viewport = viewport;
     if (needsReload) {
@@ -490,11 +520,11 @@ function deliverError(name, seq, message, stack) {
 
   DeviceViewport get viewport => _viewport;
 
-  Future evaluate(@javascript String pageFunction, {List args}) {
-    return _frameManager.mainFrame.evaluate(pageFunction, args: args);
+  Future<T> evaluate<T>(@Language('js') String pageFunction, {List args}) {
+    return _frameManager.mainFrame.evaluate<T>(pageFunction, args: args);
   }
 
-  Future evaluateOnNewDocument(String pageFunction, {List args}) async {
+  Future<void> evaluateOnNewDocument(String pageFunction, {List args}) async {
     var source = evaluationString(pageFunction, args);
     await devTools.page.addScriptToEvaluateOnNewDocument(source);
   }
@@ -663,8 +693,8 @@ function deliverError(name, seq, message, stack) {
         visible: visible, hidden: hidden, timeout: timeout);
   }
 
-  Future<JsHandle> waitForFunction(@javascript String pageFunction, List args,
-      {Duration timeout, Polling polling}) {
+  Future<JsHandle> waitForFunction(@Language('js') String pageFunction,
+      {List args, Duration timeout, Polling polling}) {
     return mainFrame.waitForFunction(pageFunction, args,
         timeout: timeout, polling: polling);
   }
@@ -785,6 +815,13 @@ class ClientError {
   final String message;
 
   ClientError(this.details) : message = _message(details);
+
+  ClientError.pageCrashed()
+      : message = 'Page crashed!',
+        details = null;
+
+  @override
+  String toString() => 'Evaluation failed: $message';
 
   static String _message(ExceptionDetails details) {
     if (details.exception != null) {

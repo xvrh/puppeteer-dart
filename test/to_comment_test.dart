@@ -1,5 +1,4 @@
 import 'package:test/test.dart';
-
 import '../tool/generate_domains.dart';
 
 main() {

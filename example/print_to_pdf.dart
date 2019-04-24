@@ -1,10 +1,9 @@
 import 'dart:io';
-
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
   // Start the browser and go to a web page
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
   var page = await browser.newPage();
   await page.goto('https://www.github.com', wait: Until.networkIdle);
 

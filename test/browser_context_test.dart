@@ -1,9 +1,7 @@
 import 'dart:async';
-
 import 'package:logging/logging.dart';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
-
 import 'utils.dart';
 
 main() {
@@ -20,7 +18,7 @@ main() {
   });
 
   setUp(() async {
-    browser = await Browser.start();
+    browser = await puppeteer.launch();
   });
 
   tearDown(() async {

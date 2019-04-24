@@ -1,12 +1,15 @@
 import 'dart:convert';
-
-import 'package:puppeteer/protocol/runtime.dart';
+import '../../protocol/runtime.dart';
+import '../javascript_function_parser.dart';
 
 String evaluationString(String function, List args) {
-  if (args == null || args.isEmpty) {
+  String functionDeclaration = convertToFunctionDeclaration(function);
+
+  if (functionDeclaration == null) {
     return function;
   } else {
-    return '($function)(${args.map(jsonEncode).join(', ')})';
+    args ??= [];
+    return '($functionDeclaration)(${args.map(jsonEncode).join(', ')})';
   }
 }
 
@@ -14,6 +17,9 @@ dynamic valueFromRemoteObject(RemoteObject remoteObject) {
   assert(remoteObject.objectId == null,
       'Cannot extract value when objectId is given');
   if (remoteObject.unserializableValue != null) {
+    if (remoteObject.type == RemoteObjectType.bigint)
+      return BigInt.tryParse(
+          remoteObject.unserializableValue.value.replaceAll('n', ''));
     switch (remoteObject.unserializableValue.value) {
       case '-0':
         return -0;

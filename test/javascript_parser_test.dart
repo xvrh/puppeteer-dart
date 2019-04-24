@@ -43,14 +43,23 @@ function() {
           'function(a, bcc, cddd, ...args) { return true; }',
       'a => true;': 'function(a ){ return true; }',
       '(a) => { /**/ return  false; }': 'function(a) { return  false; }',
-      '''(a) => { 
+      '''(a) => {
 document.query();
-return  false; 
+return  false;
 }
 ''': '''function(a) { document.query();
-return  false; 
+return  false;
 }
 ''',
+      '''
+async () => {
+      return await compute(9, 4);
+      }''': '''
+async function() { return await compute(9, 4);
+      }''',
+      '''
+async () => await compute(9, 4);''': '''
+async function() { return await compute(9, 4); }'''
     };
     for (var declaration in declarations.entries) {
       expect(convertToFunctionDeclaration(declaration.key),

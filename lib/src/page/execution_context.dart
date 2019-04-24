@@ -1,13 +1,13 @@
 import 'dart:async';
-
-import 'package:puppeteer/protocol/dom.dart';
-import 'package:puppeteer/protocol/page.dart';
-import 'package:puppeteer/protocol/runtime.dart';
-import 'package:puppeteer/src/connection.dart';
-import 'package:puppeteer/src/javascript_function_parser.dart';
-import 'package:puppeteer/src/page/dom_world.dart';
-import 'package:puppeteer/src/page/frame_manager.dart';
-import 'package:puppeteer/src/page/js_handle.dart';
+import '../../protocol/dom.dart';
+import '../../protocol/page.dart';
+import '../../protocol/runtime.dart';
+import '../connection.dart';
+import '../javascript_function_parser.dart';
+import 'dom_world.dart';
+import 'frame_manager.dart';
+import 'js_handle.dart';
+import 'page.dart';
 
 const evaluationScriptUrl = '__puppeteer_evaluation_script__';
 final RegExp sourceUrlRegExp =
@@ -28,18 +28,20 @@ class ExecutionContext {
 
   PageFrame get frame => world?.frame;
 
-  Future<T> evaluate<T>(@javascript String pageFunction, {List args}) async {
+  Future<T> evaluate<T>(@Language('js') String pageFunction,
+      {List args}) async {
     var handle = await evaluateHandle(pageFunction, args: args);
     T result = await handle.jsonValue.catchError((_) => null, test: (error) {
       return error is ServerException &&
           (error.message.contains('Object reference chain is too long') ||
               error.message.contains('Object couldn\'t be returned by value'));
     });
+
     await handle.dispose();
     return result;
   }
 
-  Future<JsHandle> evaluateHandle(@javascript String pageFunction,
+  Future<JsHandle> evaluateHandle(@Language('js') String pageFunction,
       {List args}) async {
     // Try to convert a function shorthand (ie: '(el) => el.value;' to a full
     // function declaration (function(el) { return el.value; })
@@ -57,6 +59,10 @@ class ExecutionContext {
             awaitPromise: true,
             userGesture: true);
 
+        if (response.exceptionDetails != null) {
+          throw ClientError(response.exceptionDetails);
+        }
+
         return _createJsHandle(response.result);
       } else {
         args ??= [];
@@ -67,6 +73,10 @@ class ExecutionContext {
             returnByValue: false,
             awaitPromise: true,
             userGesture: true);
+
+        if (result.exceptionDetails != null) {
+          throw ClientError(result.exceptionDetails);
+        }
 
         return _createJsHandle(result.result);
       }
@@ -81,7 +91,7 @@ class ExecutionContext {
 
   CallArgument _convertArgument(arg) {
     if (arg is BigInt) {
-      return CallArgument(unserializableValue: UnserializableValue('$arg'));
+      return CallArgument(unserializableValue: UnserializableValue('${arg}n'));
     }
     if (arg is double) {
       if (arg == 0 && arg.isNegative) {
@@ -118,9 +128,13 @@ class ExecutionContext {
   }
 
   Future<JsHandle> queryObjects(JsHandle prototypeHandle) async {
-    assert(!prototypeHandle.isDisposed, 'Prototype JSHandle is disposed!');
-    assert(prototypeHandle.remoteObject.objectId != null,
-        'Prototype JSHandle must not be referencing primitive value');
+    if (prototypeHandle.isDisposed) {
+      throw Exception('Prototype JSHandle is disposed!');
+    }
+    if (prototypeHandle.remoteObject.objectId == null) {
+      throw Exception(
+          'Prototype JSHandle must not be referencing primitive value');
+    }
     var response =
         await runtimeApi.queryObjects(prototypeHandle.remoteObject.objectId);
 
@@ -150,8 +164,6 @@ class ExecutionContextDestroyedException implements Exception {
       'Execution context was destroyed, most likely because of a navigation.';
 }
 
-const _Language javascript = _Language('js');
-
-class _Language {
-  const _Language(String language);
+class Language {
+  const Language(String language);
 }

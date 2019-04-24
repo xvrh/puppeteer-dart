@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
+import 'debugger.dart' as debugger;
+import 'dom.dart' as dom;
+import 'emulation.dart' as emulation;
 import 'network.dart' as network;
 import 'runtime.dart' as runtime;
-import 'dom.dart' as dom;
-import 'debugger.dart' as debugger;
-import 'emulation.dart' as emulation;
 
 /// Actions and events related to the inspected page belong to the page domain.
 class PageApi {

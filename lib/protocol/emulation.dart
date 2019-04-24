@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
-import 'page.dart' as page;
 import 'network.dart' as network;
+import 'page.dart' as page;
 
 /// This domain emulates different environments for the page.
 class EmulationApi {

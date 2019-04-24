@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
-import 'security.dart' as security;
-import 'runtime.dart' as runtime;
-import 'io.dart' as io;
 import 'debugger.dart' as debugger;
+import 'io.dart' as io;
 import 'page.dart' as page;
+import 'runtime.dart' as runtime;
+import 'security.dart' as security;
 
 /// Network domain allows tracking network activities of the page. It exposes information about http,
 /// file, data and other requests and responses, their headers, bodies, timing, etc.

@@ -1,8 +1,7 @@
 import 'dart:async';
-
-import 'package:puppeteer/protocol/network.dart';
-import 'package:puppeteer/src/page/frame_manager.dart';
-import 'package:puppeteer/src/page/network_manager.dart';
+import '../../protocol/network.dart';
+import 'frame_manager.dart';
+import 'network_manager.dart';
 
 class LifecycleWatcher {
   final FrameManager frameManager;
@@ -80,8 +79,8 @@ class LifecycleWatcher {
     var errorMessage =
         'Navigation Timeout Exceeded: ${timeout.inMilliseconds}ms exceeded';
     var completer = Completer<Exception>();
-    _timeoutTimer =
-        Timer(timeout, () => completer.complete(Exception(errorMessage)));
+    _timeoutTimer = Timer(
+        timeout, () => completer.complete(TimeoutException(errorMessage)));
     return completer.future;
   }
 
@@ -105,7 +104,9 @@ class LifecycleWatcher {
       _sameDocumentNavigationCompleter.complete();
     }
     if (frame.loaderId != _initialLoaderId) {
-      _newDocumentNavigationCompleter.complete();
+      if (!_newDocumentNavigationCompleter.isCompleted) {
+        _newDocumentNavigationCompleter.complete();
+      }
     }
   }
 

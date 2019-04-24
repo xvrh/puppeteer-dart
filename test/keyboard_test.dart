@@ -1,7 +1,6 @@
 import 'package:logging/logging.dart';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
-
 import 'utils.dart';
 
 main() async {
@@ -12,7 +11,7 @@ main() async {
   Page page;
   setUpAll(() async {
     server = await Server.create();
-    browser = await Browser.start();
+    browser = await puppeteer.launch();
   });
 
   tearDownAll(() async {

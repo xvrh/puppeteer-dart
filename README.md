@@ -31,7 +31,7 @@ import 'package:puppeteer/puppeteer.dart';
 main() async {
   // Start the `Chrome` process and connect to the DevTools
   // By default it is start in `headless` mode
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
 
   // Open a new tab
   var myPage = await browser.newPage();
@@ -53,12 +53,11 @@ main() async {
 
 ```dart
 import 'dart:io';
-
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
   // Start the browser and go to a web page
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
   var page = await browser.newPage();
   await page.goto('https://www.github.com', wait: Until.networkIdle);
 
@@ -80,20 +79,23 @@ main() async {
 
 ```dart
 import 'dart:io';
-
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
   // Start the browser and go to a web page
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
   var page = await browser.newPage();
+
+  // Setup the dimensions and user-agent of a particular phone
+  await page.emulate(puppeteer.devices.pixel2XL);
+
   await page.goto('https://www.github.com', wait: Until.networkIdle);
 
   // Take a screenshot of the page
   var screenshot = await page.screenshot();
 
   // Save it to a file
-  await File('example/_github_form.png').writeAsBytes(screenshot);
+  await File('example/_github.png').writeAsBytes(screenshot);
 
   await browser.close();
 }
@@ -102,12 +104,11 @@ main() async {
 ### Take a screenshot of a specific node in the page
 ```dart
 import 'dart:io';
-
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
   // Start the browser and go to a web page
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
   var page = await browser.newPage();
   await page.goto('https://www.github.com', wait: Until.networkIdle);
 
@@ -124,12 +125,48 @@ main() async {
 }
 ```
 
+### Interact with the page and scrap content
+```dart
+import 'package:puppeteer/puppeteer.dart';
+
+main() async {
+  var browser = await puppeteer.launch();
+  var page = await browser.newPage();
+
+  await page.goto('https://developers.google.com/web/');
+
+  // Type into search box.
+  await page.type('#searchbox input', 'Headless Chrome');
+
+  // Wait for suggest overlay to appear and click "show all results".
+  var allResultsSelector = '.devsite-suggest-all-results';
+  await page.waitForSelector(allResultsSelector);
+  await page.click(allResultsSelector);
+
+  // Wait for the results page to load and display the results.
+  const resultsSelector = '.gsc-results .gsc-thumbnail-inside a.gs-title';
+  await page.waitForSelector(resultsSelector);
+
+  // Extract the results from the page.
+  var links = await page.evaluate(r'''resultsSelector => {
+  const anchors = Array.from(document.querySelectorAll(resultsSelector));
+  return anchors.map(anchor => {
+    const title = anchor.textContent.split('|')[0].trim();
+    return `${title} - ${anchor.href}`;
+  });
+}''', args: [resultsSelector]);
+  print(links.join('\n'));
+
+  await browser.close();
+}
+```
+
 ### Create a static version of a Single Page Application
 ```dart
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
   var page = await browser.newPage();
   await page.goto('https://www.w3.org');
 
@@ -156,7 +193,7 @@ The code is in `lib/protocol`
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
   // Create a chrome's tab
   var page = await browser.newPage();
 
@@ -173,13 +210,85 @@ main() async {
   // Access the CSS domain
   page.devTools.css.onFontsUpdated.listen((_) {});
 
-  // Access the Memory domaina
+  // Access the Memory domain
   await page.devTools.memory.getDOMCounters();
 
   await browser.close();
 }
 ```
 
+### Execute JavaScript code
+A lot of the Puppeteer API exposes functions to run some javascript code in the browser.
+
+Example in Node.JS:
+```js
+test(async () => {
+  const result = await page.evaluate(x => {
+    return Promise.resolve(8 * x);
+  }, 7);
+});
+```
+
+As of now, in the Dart port, you have to pass the JavaScript code as a string.
+The example above is written as:
+```dart
+main() async {
+  var result = await page.evaluate('''x => {
+    return Promise.resolve(8 * x);
+  }''', args: [7]);
+}
+```
+
+The javascript code can be:
+- A function declaration (in the classical form with the `function` keyword
+ or with the shorthand format (`() => `))
+- An expression. In which case you cannot pass any arguments to the `evaluate` method.
+
+```dart
+import 'package:puppeteer/puppeteer.dart';
+
+main() async {
+  var browser = await puppeteer.launch();
+  var page = await browser.newPage();
+
+  // function declaration syntax
+  await page.evaluate('function(x) { return x > 0; }', args: [7]);
+
+  // shorthand syntax
+  await page.evaluate('(x) => x > 0', args: [7]);
+
+  // Multi line shorthand syntax
+  await page.evaluate('''(x) => {  
+    return x > 0;
+  }''', args: [7]);
+
+  // shorthand syntax with async
+  await page.evaluate('''async (x) => {
+    return await x;
+  }''', args: [7]);
+
+  // An expression.
+  await page.evaluate('document.body');
+
+  await browser.close();
+}
+```
+
+If you are using IntellJ (or Webstorm), you can enable syntax highlighting and code-analyzer
+for the Javascript snippet with a comment like `// language=js` before the string.
+
+```dart
+main() {
+  page.evaluate(
+  //language=js
+  '''function _(x) {
+    return x > 0;
+  }''', args: [7]);
+}
+```
+
+Note: In a future version, we can image to compile the dart code to javascript on the fly before 
+sending it to the browser (with ddc or dart2js). 
 
 ## Related work
  * [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface)

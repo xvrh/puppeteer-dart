@@ -1,7 +1,6 @@
 import 'dart:math';
-
-import 'package:puppeteer/protocol/input.dart';
-import 'package:puppeteer/src/page/keyboard.dart';
+import '../../protocol/input.dart';
+import 'keyboard.dart';
 
 class MouseButton {
   static const left = MouseButton._('left');

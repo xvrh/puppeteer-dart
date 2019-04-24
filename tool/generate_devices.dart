@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:dart_style/dart_style.dart';
 import 'package:http/http.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:dart_style/dart_style.dart';
-
 import 'utils/split_words.dart';
 import 'utils/string_helpers.dart';
 
@@ -19,26 +17,53 @@ main() async {
   var module = Module.fromJson(jsonDecode(content));
 
   var buffer = StringBuffer();
+  buffer.writeln("import 'package:collection/collection.dart';");
   buffer.writeln(
-      "import 'src/page/emulation_manager.dart' show Device, DeviceViewport;");
+      "import 'page/emulation_manager.dart' show Device, DeviceViewport;");
+  buffer.writeln('class Devices {');
+  var allNames = <String, String>{};
   for (var emulatedDevice
       in module.extensions.where((e) => e.type == 'emulated-device')) {
     var device = emulatedDevice.device;
-    var deviceName = firstLetterLower(
-        splitWords(device.title).map(firstLetterUpper).join(''));
 
-    buffer.writeln(
-        'const $deviceName = ${device.toCode(viewportCode(device, device.screen.vertical))};');
-    buffer.writeln();
+    const deviceSplits = {
+      'iPhone 6/7/8': ['iPhone 6', 'iPhone 7', 'iPhone 8'],
+      'iPhone 6 Plus': ['iPhone 6 Plus', 'iPhone 7 Plus', 'iPhone 8 Plus'],
+      'iPhone 5/SE': ['iPhone 5', 'iPhone SE'],
+    };
+    var names = deviceSplits[device.title] ?? [device.title];
 
-    var landscape = device.screen.horizontal;
-    if (landscape != null) {
+    for (String name in names) {
+      var deviceName =
+          firstLetterLower(splitWords(name).map(firstLetterUpper).join(''));
+      allNames[name] = deviceName;
+
       buffer.writeln(
-          'final ${deviceName}Landscape = ${device.toCode(viewportCode(device, landscape, isLandscape: true))};');
+          'final $deviceName = ${device.toCode(name, viewportCode(device, device.screen.vertical))};');
       buffer.writeln();
+
+      var landscape = device.screen.horizontal;
+      if (landscape != null) {
+        allNames['$name Landscape'] = '${deviceName}Landscape';
+        buffer.writeln(
+            'final ${deviceName}Landscape = ${device.toCode(name, viewportCode(device, landscape, isLandscape: true))};');
+        buffer.writeln();
+      }
     }
   }
-  File('lib/devices.dart')
+  var allNamesMap =
+      allNames.entries.map((e) => "'${e.key}': ${e.value}").join(', ');
+  buffer.writeln('Map<String, Device> _all;');
+  buffer.writeln('Devices._() {');
+  buffer.writeln(
+      '_all = CanonicalizedMap<String, String, Device>.from({$allNamesMap}, '
+      '(key) => key.toLowerCase(), isValidKey: (key) => key != null);');
+  buffer.writeln('}');
+  buffer.writeln();
+  buffer.writeln('Device operator[](String name) => _all[name];');
+  buffer.writeln('}');
+  buffer.writeln('final devices = Devices._();');
+  File('lib/src/devices.dart')
       .writeAsStringSync(DartFormatter().format(buffer.toString()));
 }
 
@@ -80,8 +105,8 @@ class Device {
 
   factory Device.fromJson(Map<String, dynamic> json) => _$DeviceFromJson(json);
 
-  String toCode(String viewportCode) {
-    return "Device('$title', userAgent: '$userAgent', viewport: $viewportCode)";
+  String toCode(String name, String viewportCode) {
+    return "Device('$name', userAgent: '$userAgent', viewport: $viewportCode)";
   }
 
   Map<String, dynamic> toJson() => _$DeviceToJson(this);

@@ -1,17 +1,16 @@
 import 'dart:io';
 import 'dart:math';
+import '../../protocol/dom.dart';
+import '../../protocol/runtime.dart';
+import '../connection.dart';
+import 'execution_context.dart';
+import 'frame_manager.dart';
+import 'helper.dart';
+import 'keyboard.dart';
+import 'mouse.dart';
+import 'page.dart';
 
-import 'package:puppeteer/protocol/dom.dart';
-import 'package:puppeteer/protocol/runtime.dart';
-import 'package:puppeteer/src/connection.dart';
-import 'package:puppeteer/src/page/execution_context.dart';
-import 'package:puppeteer/src/page/frame_manager.dart';
-import 'package:puppeteer/src/page/helper.dart';
-import 'package:puppeteer/src/page/keyboard.dart';
-import 'package:puppeteer/src/page/mouse.dart';
-import 'package:puppeteer/src/page/page.dart';
-
-export 'package:puppeteer/protocol/dom.dart' show BoxModel;
+export '../../protocol/dom.dart' show BoxModel;
 
 class JsHandle {
   final ExecutionContext context;
@@ -125,7 +124,7 @@ class ElementHandle extends JsHandle {
     return frameManager.frame(nodeInfo.frameId);
   }
 
-  Future _scrollIntoViewIfNeeded() async {
+  Future<void> _scrollIntoViewIfNeeded() async {
     var error = await context.evaluate(
         //language=js
         '''
@@ -362,7 +361,7 @@ async function _(element, pageJavascriptEnabled) {
     return result;
   }
 
-  Future<T> $eval<T>(String selector, @javascript String pageFunction,
+  Future<T> $eval<T>(String selector, @Language('js') String pageFunction,
       {List args}) async {
     var elementHandle = await $(selector);
     if (elementHandle == null) {
@@ -380,7 +379,7 @@ async function _(element, pageJavascriptEnabled) {
     return result;
   }
 
-  Future<T> $$eval<T>(String selector, @javascript String pageFunction,
+  Future<T> $$eval<T>(String selector, @Language('js') String pageFunction,
       {List args}) async {
     var arrayHandle = await context.evaluateHandle(
         //language=js

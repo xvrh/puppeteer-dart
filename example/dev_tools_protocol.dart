@@ -1,7 +1,7 @@
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
   // Create a chrome's tab
   var page = await browser.newPage();
 
@@ -18,7 +18,7 @@ main() async {
   // Access the CSS domain
   page.devTools.css.onFontsUpdated.listen((_) {});
 
-  // Access the Memory domaina
+  // Access the Memory domain
   await page.devTools.memory.getDOMCounters();
 
   await browser.close();

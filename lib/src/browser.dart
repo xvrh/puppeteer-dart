@@ -1,17 +1,16 @@
 import 'dart:async';
-
 import 'package:async/async.dart';
 import 'package:meta/meta.dart';
 import 'package:pool/pool.dart';
-import 'package:puppeteer/protocol/browser.dart';
-import 'package:puppeteer/protocol/system_info.dart';
-import 'package:puppeteer/src/connection.dart';
-import 'package:puppeteer/src/launcher.dart';
-import 'package:puppeteer/src/page/emulation_manager.dart';
-import 'package:puppeteer/src/page/page.dart';
-import 'package:puppeteer/src/target.dart';
-
+import '../protocol/browser.dart';
+import '../protocol/system_info.dart';
 import '../protocol/target.dart';
+import 'connection.dart';
+import 'page/emulation_manager.dart';
+import 'page/page.dart';
+import 'target.dart';
+
+export '../protocol/browser.dart' show PermissionType;
 
 class Browser {
   final Connection connection;
@@ -41,30 +40,6 @@ class Browser {
     targetApi.onTargetCreated.listen(_targetCreated);
     targetApi.onTargetDestroyed.listen(_targetDestroyed);
     targetApi.onTargetInfoChanged.listen(_targetInfoChanged);
-  }
-
-  /// Start a Chrome instance and connect to the DevTools endpoint.
-  ///
-  /// If [executablePath] is not provided and no environment variable
-  /// `puppeteer_PATH` is present, it will download the Chromium binaries
-  /// in a local folder (.local-chromium by default).
-  ///
-  /// ```
-  /// main() {
-  ///   Chrome.start();
-  /// }
-  /// ```
-  static Future<Browser> start(
-      {String executablePath,
-      bool headless = true,
-      bool useTemporaryUserData = false,
-      bool noSandboxFlag,
-      DeviceViewport defaultViewport}) async {
-    return launch(
-        executablePath: executablePath,
-        useTemporaryUserData: useTemporaryUserData,
-        noSandboxFlag: noSandboxFlag,
-        defaultViewport: defaultViewport);
   }
 
   void _dispose() {

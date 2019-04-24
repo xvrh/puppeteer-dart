@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
-import 'package:puppeteer/protocol/dev_tools.dart';
-import 'package:puppeteer/protocol/emulation.dart';
+import '../../protocol/dev_tools.dart';
+import '../../protocol/emulation.dart';
 
 class Device {
   final String name;
@@ -15,6 +15,17 @@ class Device {
 
   String userAgent(String chromeVersion) =>
       _userAgentTemplate.replaceAll('%s', chromeVersion);
+
+  @override
+  bool operator ==(other) =>
+      other is Device &&
+      other.name == name &&
+      other._userAgentTemplate == _userAgentTemplate &&
+      other.viewport == viewport;
+
+  @override
+  int get hashCode =>
+      name.hashCode + _userAgentTemplate.hashCode + viewport.hashCode;
 }
 
 class DeviceViewport {
@@ -50,6 +61,25 @@ class DeviceViewport {
       hasTouch: hasTouch ?? this.hasTouch,
     );
   }
+
+  @override
+  bool operator ==(other) =>
+      other is DeviceViewport &&
+      other.width == width &&
+      other.height == height &&
+      other.deviceScaleFactor == deviceScaleFactor &&
+      other.isMobile == isMobile &&
+      other.isLandscape == isLandscape &&
+      other.hasTouch == hasTouch;
+
+  @override
+  int get hashCode =>
+      width.hashCode +
+      height.hashCode +
+      deviceScaleFactor.hashCode +
+      isMobile.hashCode +
+      isLandscape.hashCode +
+      hasTouch.hashCode;
 }
 
 class EmulationManager {

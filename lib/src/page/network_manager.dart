@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
-
-import 'package:puppeteer/protocol/dev_tools.dart';
-import 'package:puppeteer/protocol/fetch.dart';
-import 'package:puppeteer/protocol/fetch.dart' as fetch;
-import 'package:puppeteer/protocol/network.dart';
-import 'package:puppeteer/protocol/network.dart' as network;
-import 'package:puppeteer/src/connection.dart';
-import 'package:puppeteer/src/page/frame_manager.dart';
+import '../../protocol/dev_tools.dart';
+import '../../protocol/fetch.dart';
+import '../../protocol/fetch.dart' as fetch;
+import '../../protocol/network.dart';
+import '../../protocol/network.dart' as network;
+import '../connection.dart';
+import 'frame_manager.dart';
 
 class NetworkManager {
   final Client client;
@@ -358,7 +357,9 @@ class NetworkResponse {
   final NetworkApi _networkApi;
 
   NetworkResponse(this.client, this.request, this.response)
-      : _networkApi = NetworkApi(client);
+      : _networkApi = NetworkApi(client) {
+    assert(response != null);
+  }
 
   String get ip => response.remoteIPAddress;
 
