@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:logging/logging.dart';
-import 'package:puppeteer/devices.dart' as devices;
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils.dart';
@@ -22,7 +21,7 @@ main() {
   });
 
   setUp(() async {
-    browser = await Browser.start();
+    browser = await puppeteer.launch();
     context = await browser.createIncognitoBrowserContext();
     page = await context.newPage();
   });
@@ -587,7 +586,7 @@ main() {
       await page.goto(server.prefix + '/mobile.html');
       expect(await page.evaluate('() => navigator.userAgent'),
           isNot(contains('iPhone')));
-      await page.setUserAgent(devices.iPhone6.userAgent('75'));
+      await page.setUserAgent(puppeteer.devices.iPhone6.userAgent('75'));
       expect(
           await page.evaluate('() => navigator.userAgent'), contains('iPhone'));
     });

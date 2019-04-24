@@ -17,8 +17,11 @@ main() async {
   var module = Module.fromJson(jsonDecode(content));
 
   var buffer = StringBuffer();
+  buffer.writeln("import 'package:collection/collection.dart';");
   buffer.writeln(
-      "import 'src/page/emulation_manager.dart' show Device, DeviceViewport;");
+      "import 'page/emulation_manager.dart' show Device, DeviceViewport;");
+  buffer.writeln('class Devices {');
+  var allNames = <String, String>{};
   for (var emulatedDevice
       in module.extensions.where((e) => e.type == 'emulated-device')) {
     var device = emulatedDevice.device;
@@ -33,20 +36,34 @@ main() async {
     for (String name in names) {
       var deviceName =
           firstLetterLower(splitWords(name).map(firstLetterUpper).join(''));
+      allNames[name] = deviceName;
 
       buffer.writeln(
-          'const $deviceName = ${device.toCode(name, viewportCode(device, device.screen.vertical))};');
+          'final $deviceName = ${device.toCode(name, viewportCode(device, device.screen.vertical))};');
       buffer.writeln();
 
       var landscape = device.screen.horizontal;
       if (landscape != null) {
+        allNames['$name Landscape'] = '${deviceName}Landscape';
         buffer.writeln(
             'final ${deviceName}Landscape = ${device.toCode(name, viewportCode(device, landscape, isLandscape: true))};');
         buffer.writeln();
       }
     }
   }
-  File('lib/devices.dart')
+  var allNamesMap =
+      allNames.entries.map((e) => "'${e.key}': ${e.value}").join(', ');
+  buffer.writeln('Map<String, Device> _all;');
+  buffer.writeln('Devices._() {');
+  buffer.writeln(
+      '_all = CanonicalizedMap<String, String, Device>.from({$allNamesMap}, '
+      '(key) => key.toLowerCase(), isValidKey: (key) => key != null);');
+  buffer.writeln('}');
+  buffer.writeln();
+  buffer.writeln('Device operator[](String name) => _all[name];');
+  buffer.writeln('}');
+  buffer.writeln('final devices = Devices._();');
+  File('lib/src/devices.dart')
       .writeAsStringSync(DartFormatter().format(buffer.toString()));
 }
 

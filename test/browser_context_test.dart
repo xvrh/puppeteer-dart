@@ -18,7 +18,7 @@ main() {
   });
 
   setUp(() async {
-    browser = await Browser.start();
+    browser = await puppeteer.launch();
   });
 
   tearDown(() async {

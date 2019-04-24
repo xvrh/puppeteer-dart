@@ -16,3 +16,4 @@ export 'src/page/mouse.dart' show MouseButton;
 export 'src/page/network_manager.dart' show NetworkRequest, NetworkResponse;
 export 'src/page/page.dart'
     show Page, PdfMargins, PaperFormat, ScreenshotFormat, ConsoleMessage;
+export 'src/puppeteer.dart' show puppeteer;

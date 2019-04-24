@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:logging/logging.dart';
 import 'browser.dart';
 import 'connection.dart';
+import 'devices.dart';
+import 'devices.dart' as devices_lib;
 import 'downloader.dart';
 import 'page/emulation_manager.dart';
 
@@ -42,63 +44,82 @@ const List<String> _headlessArgs = [
   '--mute-audio'
 ];
 
-Future<Browser> launch(
-    {String executablePath,
-    bool headless = true,
-    bool useTemporaryUserData = false,
-    bool noSandboxFlag,
-    DeviceViewport defaultViewport,
-    bool ignoreHttpsErrors}) async {
-  // In docker environment we want to force the '--no-sandbox' flag automatically
-  noSandboxFlag ??= Platform.environment['CHROME_FORCE_NO_SANDBOX'] == 'true';
+final puppeteer = Puppeteer._();
 
-  executablePath = await _inferExecutablePath();
+class Puppeteer {
+  Puppeteer._();
 
-  Directory userDataDir;
-  if (useTemporaryUserData) {
-    userDataDir = await Directory.systemTemp.createTemp('chrome_');
-  }
+  /// Start a Chrome instance and connect to the DevTools endpoint.
+  ///
+  /// If [executablePath] is not provided and no environment variable
+  /// `puppeteer_PATH` is present, it will download the Chromium binaries
+  /// in a local folder (.local-chromium by default).
+  ///
+  /// ```
+  /// main() {
+  ///   puppeteer.launch();
+  /// }
+  /// ```
+  Future<Browser> launch(
+      {String executablePath,
+      bool headless = true,
+      bool useTemporaryUserData = false,
+      bool noSandboxFlag,
+      DeviceViewport defaultViewport,
+      bool ignoreHttpsErrors}) async {
+    // In docker environment we want to force the '--no-sandbox' flag automatically
+    noSandboxFlag ??= Platform.environment['CHROME_FORCE_NO_SANDBOX'] == 'true';
 
-  List<String> chromeArgs = _defaultArgs.toList();
-  if (userDataDir != null) {
-    chromeArgs.add('--user-data-dir=${userDataDir.path}');
-  }
+    executablePath = await _inferExecutablePath();
 
-  if (headless) {
-    chromeArgs.addAll(_headlessArgs);
-  }
-  if (noSandboxFlag) {
-    chromeArgs.add('--no-sandbox');
-  }
-
-  _logger.info('Start $executablePath with $chromeArgs');
-  Process chromeProcess = await Process.start(executablePath, chromeArgs);
-
-  // ignore: unawaited_futures
-  chromeProcess.exitCode.then((int exitCode) {
-    _logger.info('Chrome exit with $exitCode.');
-    if (userDataDir != null) {
-      _logger.info('Clean ${userDataDir.path}');
-      userDataDir.deleteSync(recursive: true);
+    Directory userDataDir;
+    if (useTemporaryUserData) {
+      userDataDir = await Directory.systemTemp.createTemp('chrome_');
     }
-  });
 
-  String webSocketUrl = await _waitForWebSocketUrl(chromeProcess);
-  if (webSocketUrl != null) {
-    Connection connection = await Connection.create(webSocketUrl);
+    List<String> chromeArgs = _defaultArgs.toList();
+    if (userDataDir != null) {
+      chromeArgs.add('--user-data-dir=${userDataDir.path}');
+    }
 
-    Browser browser = createBrowser(connection,
-        defaultViewport: defaultViewport,
-        closeCallback: () => _killChrome(chromeProcess),
-        ignoreHttpsErrors: ignoreHttpsErrors);
-    Future targetFuture =
-        browser.waitForTarget((target) => target.type == 'page');
-    await browser.targetApi.setDiscoverTargets(true);
-    await targetFuture;
-    return browser;
-  } else {
-    throw Exception('Not able to connect to Chrome DevTools');
+    if (headless) {
+      chromeArgs.addAll(_headlessArgs);
+    }
+    if (noSandboxFlag) {
+      chromeArgs.add('--no-sandbox');
+    }
+
+    _logger.info('Start $executablePath with $chromeArgs');
+    Process chromeProcess = await Process.start(executablePath, chromeArgs);
+
+    // ignore: unawaited_futures
+    chromeProcess.exitCode.then((int exitCode) {
+      _logger.info('Chrome exit with $exitCode.');
+      if (userDataDir != null) {
+        _logger.info('Clean ${userDataDir.path}');
+        userDataDir.deleteSync(recursive: true);
+      }
+    });
+
+    String webSocketUrl = await _waitForWebSocketUrl(chromeProcess);
+    if (webSocketUrl != null) {
+      Connection connection = await Connection.create(webSocketUrl);
+
+      Browser browser = createBrowser(connection,
+          defaultViewport: defaultViewport,
+          closeCallback: () => _killChrome(chromeProcess),
+          ignoreHttpsErrors: ignoreHttpsErrors);
+      Future targetFuture =
+          browser.waitForTarget((target) => target.type == 'page');
+      await browser.targetApi.setDiscoverTargets(true);
+      await targetFuture;
+      return browser;
+    } else {
+      throw Exception('Not able to connect to Chrome DevTools');
+    }
   }
+
+  Devices get devices => devices_lib.devices;
 }
 
 Future _killChrome(Process process) {

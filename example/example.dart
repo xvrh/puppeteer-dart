@@ -3,7 +3,7 @@ import 'package:puppeteer/puppeteer.dart';
 main() async {
   // Start the `Chrome` process and connect to the DevTools
   // By default it is start in `headless` mode
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
 
   // Open a new tab
   var myPage = await browser.newPage();

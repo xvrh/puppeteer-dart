@@ -12,7 +12,7 @@ main() async {
   var handler = createStaticHandler('example');
   var server = await io.serve(handler, 'localhost', 0);
 
-  var chrome = await Browser.start();
+  var chrome = await puppeteer.launch();
 
   var pageUrl = 'http://localhost:${server.port}/html/incognito.html';
   var normalTab1 = await chrome.newPage();

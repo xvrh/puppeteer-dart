@@ -13,8 +13,7 @@ main() {
   Page page;
   setUpAll(() async {
     server = await Server.create();
-    browser = await Browser.start(
-        defaultViewport: DeviceViewport(width: 800, height: 600));
+    browser = await puppeteer.launch();
     context = browser.defaultBrowserContext;
   });
 

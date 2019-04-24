@@ -31,7 +31,7 @@ import 'package:puppeteer/puppeteer.dart';
 main() async {
   // Start the `Chrome` process and connect to the DevTools
   // By default it is start in `headless` mode
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
 
   // Open a new tab
   var myPage = await browser.newPage();
@@ -57,7 +57,7 @@ import 'package:puppeteer/puppeteer.dart';
 
 main() async {
   // Start the browser and go to a web page
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
   var page = await browser.newPage();
   await page.goto('https://www.github.com', wait: Until.networkIdle);
 
@@ -83,15 +83,19 @@ import 'package:puppeteer/puppeteer.dart';
 
 main() async {
   // Start the browser and go to a web page
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
   var page = await browser.newPage();
+
+  // Setup the dimensions and user-agent of a particular phone
+  await page.emulate(puppeteer.devices.pixel2XL);
+
   await page.goto('https://www.github.com', wait: Until.networkIdle);
 
   // Take a screenshot of the page
   var screenshot = await page.screenshot();
 
   // Save it to a file
-  await File('example/_github_form.png').writeAsBytes(screenshot);
+  await File('example/_github.png').writeAsBytes(screenshot);
 
   await browser.close();
 }
@@ -104,7 +108,7 @@ import 'package:puppeteer/puppeteer.dart';
 
 main() async {
   // Start the browser and go to a web page
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
   var page = await browser.newPage();
   await page.goto('https://www.github.com', wait: Until.networkIdle);
 
@@ -126,7 +130,7 @@ main() async {
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
   var page = await browser.newPage();
 
   await page.goto('https://developers.google.com/web/');
@@ -162,7 +166,7 @@ main() async {
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
   var page = await browser.newPage();
   await page.goto('https://www.w3.org');
 
@@ -189,7 +193,7 @@ The code is in `lib/protocol`
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
   // Create a chrome's tab
   var page = await browser.newPage();
 
@@ -244,7 +248,7 @@ The javascript code can be:
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
   var page = await browser.newPage();
 
   // function declaration syntax

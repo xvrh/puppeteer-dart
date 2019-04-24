@@ -24,7 +24,7 @@ main() async {
 
   // Start the `Chrome` process and connect to the DevTools
   // By default it is start in `headless` mode
-  var chrome = await Browser.start(executablePath: chromePath);
+  var chrome = await puppeteer.launch(executablePath: chromePath);
 
   // Open a new tab
   var myPage = await chrome.newPage();

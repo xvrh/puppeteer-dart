@@ -1,5 +1,4 @@
 import 'package:logging/logging.dart';
-import 'package:puppeteer/devices.dart';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils.dart';
@@ -12,7 +11,7 @@ main() {
   Page page;
   setUpAll(() async {
     server = await Server.create();
-    browser = await Browser.start();
+    browser = await puppeteer.launch();
   });
 
   tearDownAll(() async {
@@ -32,13 +31,13 @@ main() {
 
   group('Touchscreen', () {
     test('should tap the button', () async {
-      await page.emulate(iPhone6);
+      await page.emulate(puppeteer.devices.iPhone6);
       await page.goto(server.prefix + '/input/button.html');
       await page.tap('button');
       expect(await page.evaluate('() => result'), equals('Clicked'));
     });
     test('should report touches', () async {
-      await page.emulate(iPhone6);
+      await page.emulate(puppeteer.devices.iPhone6);
       await page.goto(server.prefix + '/input/touches.html');
       var button = await page.$('button');
       await button.tap();

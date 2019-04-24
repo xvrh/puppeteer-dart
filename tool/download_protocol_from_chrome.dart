@@ -6,11 +6,11 @@ import 'generate_domains.dart';
 
 /// Download the Chrome Dev Tools protocol (json file) directly from a running Chrome instance.
 main() async {
-  Browser chrome = await Browser.start();
+  var chrome = await puppeteer.launch();
 
   try {
-    String url = chrome.connection.url.replaceAll('ws://', 'http://');
-    String response = await read(p.url.join(url, '/json/protocol'));
+    var url = chrome.connection.url.replaceAll('ws://', 'http://');
+    var response = await read(p.url.join(url, '/json/protocol'));
 
     File('tool/json/$protocolFromChromeFile').writeAsStringSync(response);
   } finally {

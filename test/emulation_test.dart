@@ -1,5 +1,4 @@
 import 'package:logging/logging.dart';
-import 'package:puppeteer/devices.dart' as devices;
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils.dart';
@@ -12,7 +11,7 @@ main() {
   Page page;
   setUpAll(() async {
     server = await Server.create();
-    browser = await Browser.start(
+    browser = await puppeteer.launch(
         defaultViewport: DeviceViewport(width: 800, height: 600));
   });
 
@@ -40,7 +39,7 @@ main() {
     test('should support mobile emulation', () async {
       await page.goto(server.prefix + '/mobile.html');
       expect(await page.evaluate('() => window.innerWidth'), equals(800));
-      await page.setViewport(devices.iPhone6.viewport);
+      await page.setViewport(puppeteer.devices.iPhone6.viewport);
       expect(await page.evaluate('() => window.innerWidth'), equals(375));
       await page.setViewport(DeviceViewport(width: 400, height: 300));
       expect(await page.evaluate('() => window.innerWidth'), equals(400));
@@ -61,7 +60,7 @@ main() {
 
       await page.goto(server.prefix + '/mobile.html');
       expect(await page.evaluate("() => 'ontouchstart' in window"), isFalse);
-      await page.setViewport(devices.iPhone6.viewport);
+      await page.setViewport(puppeteer.devices.iPhone6.viewport);
       expect(await page.evaluate("() => 'ontouchstart' in window"), isTrue);
       expect(await page.evaluate(dispatchTouch), equals('Received touch'));
       await page.setViewport(DeviceViewport(width: 100, height: 100));
@@ -71,7 +70,7 @@ main() {
       await page.goto(server.prefix + '/detect-touch.html');
       expect(await page.evaluate('() => document.body.textContent.trim()'),
           equals('NO'));
-      await page.setViewport(devices.iPhone6.viewport);
+      await page.setViewport(puppeteer.devices.iPhone6.viewport);
       await page.goto(server.prefix + '/detect-touch.html');
       expect(await page.evaluate('() => document.body.textContent.trim()'),
           equals('YES'));
@@ -84,7 +83,7 @@ main() {
     });
     test('should support landscape emulation', () async {
       await page.goto(server.prefix + '/mobile.html');
-      await page.setViewport(devices.iPhone6Landscape.viewport);
+      await page.setViewport(puppeteer.devices.iPhone6Landscape.viewport);
       expect(await page.evaluate('() => screen.orientation.type'),
           equals('landscape-primary'));
       await page.setViewport(DeviceViewport(width: 100, height: 100));
@@ -96,13 +95,13 @@ main() {
   group('Page.emulate', () {
     test('should work', () async {
       await page.goto(server.prefix + '/mobile.html');
-      await page.emulate(devices.iPhone6);
+      await page.emulate(puppeteer.devices.iPhone6);
       expect(await page.evaluate('() => window.innerWidth'), equals(375));
       expect(
           await page.evaluate('() => navigator.userAgent'), contains('iPhone'));
     });
     test('should support clicking', () async {
-      await page.emulate(devices.iPhone6);
+      await page.emulate(puppeteer.devices.iPhone6);
       await page.goto(server.prefix + '/input/button.html');
       var button = await page.$('button');
       await page.evaluate("button => button.style.marginTop = '200px'",

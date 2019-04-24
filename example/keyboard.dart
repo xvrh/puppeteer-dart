@@ -12,7 +12,7 @@ main() async {
   var handler = createStaticHandler('example');
   var server = await io.serve(handler, 'localhost', 0);
 
-  var browser = await Browser.start();
+  var browser = await puppeteer.launch();
   var page = await browser.newPage();
 
   await page.goto(p.url.join(
