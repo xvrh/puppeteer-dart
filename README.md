@@ -53,7 +53,6 @@ main() async {
 
 ```dart
 import 'dart:io';
-
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
@@ -80,7 +79,6 @@ main() async {
 
 ```dart
 import 'dart:io';
-
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
@@ -102,7 +100,6 @@ main() async {
 ### Take a screenshot of a specific node in the page
 ```dart
 import 'dart:io';
-
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
