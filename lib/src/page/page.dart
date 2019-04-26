@@ -231,8 +231,8 @@ class Page {
       lineNumber = stackTrace.callFrames[0].lineNumber;
       columnNumber = stackTrace.callFrames[0].columnNumber;
     }
-    var message = ConsoleMessage(
-        ConsoleMessageType._fromEventType(type), textTokens.join(' '), args,
+    var message = ConsoleMessage(ConsoleMessageType._fromEventType(type),
+        type.value, textTokens.join(' '), args,
         url: url, lineNumber: lineNumber, columnNumber: columnNumber);
     _onConsoleController.add(message);
   }
@@ -243,8 +243,12 @@ class Page {
     }
     if (event.source != LogEntrySource.worker) {
       _onConsoleController.add(ConsoleMessage(
-          ConsoleMessageType._fromLogLevel(event.level), event.text, [],
-          url: event.url, lineNumber: event.lineNumber));
+          ConsoleMessageType._fromLogLevel(event.level),
+          event.level.value,
+          event.text,
+          [],
+          url: event.url,
+          lineNumber: event.lineNumber));
     }
   }
 
@@ -734,12 +738,13 @@ function deliverError(name, seq, message, stack) {
 
 class ConsoleMessage {
   final ConsoleMessageType type;
+  final String typeName;
   final String text;
   final List args;
   final String url;
   final int lineNumber, columnNumber;
 
-  ConsoleMessage(this.type, this.text, this.args,
+  ConsoleMessage(this.type, this.typeName, this.text, this.args,
       {this.url, this.lineNumber, this.columnNumber}) {
     assert(type != null);
     assert(text != null);
