@@ -384,9 +384,12 @@ class PageFrame {
   /// Examples:
   ///
   /// ```dart
-  /// var searchValue = await frame.$eval('#search', Js.function('function (el) { return el.value; }'));
-  /// var preloadHref = await frame.$eval('link[rel=preload]', Js.function('function (el) { return el.href; }'));
-  /// var html = await frame.$eval('.main-container', , Js.function('function (e) { return e.outerHTML; }'));
+  /// var searchValue =
+  ///     await frame.$eval('#search', 'function (el) { return el.value; }');
+  /// var preloadHref = await frame.$eval(
+  ///     'link[rel=preload]', 'function (el) { return el.href; }');
+  /// var html = await frame.$eval(
+  ///     '.main-container', 'function (e) { return e.outerHTML; }');
   /// ```
   ///
   /// [selector]: A selector to query frame for
