@@ -86,9 +86,10 @@ class FrameManager {
 
   Future<NetworkResponse> navigateFrame(PageFrame frame, String url,
       {String referrer, Duration timeout, Until wait}) async {
-    var watcher = LifecycleWatcher(this, frame, wait: wait, timeout: timeout);
+    var watcher = LifecycleWatcher(this, frame,
+        wait: wait, timeout: timeout ?? page.navigationTimeoutOrDefault);
 
-    Future navigate() async {
+    Future<void> navigate() async {
       var response =
           await _pageApi.navigate(url, referrer: referrer, frameId: frame.id);
       if (response.errorText != null) {
@@ -113,7 +114,8 @@ class FrameManager {
 
   Future<NetworkResponse> waitForFrameNavigation(PageFrame frame,
       {Until wait, Duration timeout}) async {
-    var watcher = LifecycleWatcher(this, frame, wait: wait, timeout: timeout);
+    var watcher = LifecycleWatcher(this, frame,
+        wait: wait, timeout: timeout ?? page.navigationTimeoutOrDefault);
     try {
       await Future.any([
         watcher.timeoutOrTermination,

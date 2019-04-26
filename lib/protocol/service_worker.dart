@@ -164,14 +164,10 @@ class ServiceWorkerRegistration {
 }
 
 class ServiceWorkerVersionRunningStatus {
-  static const ServiceWorkerVersionRunningStatus stopped =
-      ServiceWorkerVersionRunningStatus._('stopped');
-  static const ServiceWorkerVersionRunningStatus starting =
-      ServiceWorkerVersionRunningStatus._('starting');
-  static const ServiceWorkerVersionRunningStatus running =
-      ServiceWorkerVersionRunningStatus._('running');
-  static const ServiceWorkerVersionRunningStatus stopping =
-      ServiceWorkerVersionRunningStatus._('stopping');
+  static const stopped = ServiceWorkerVersionRunningStatus._('stopped');
+  static const starting = ServiceWorkerVersionRunningStatus._('starting');
+  static const running = ServiceWorkerVersionRunningStatus._('running');
+  static const stopping = ServiceWorkerVersionRunningStatus._('stopping');
   static const values = {
     'stopped': stopped,
     'starting': starting,
@@ -201,18 +197,12 @@ class ServiceWorkerVersionRunningStatus {
 }
 
 class ServiceWorkerVersionStatus {
-  static const ServiceWorkerVersionStatus new$ =
-      ServiceWorkerVersionStatus._('new');
-  static const ServiceWorkerVersionStatus installing =
-      ServiceWorkerVersionStatus._('installing');
-  static const ServiceWorkerVersionStatus installed =
-      ServiceWorkerVersionStatus._('installed');
-  static const ServiceWorkerVersionStatus activating =
-      ServiceWorkerVersionStatus._('activating');
-  static const ServiceWorkerVersionStatus activated =
-      ServiceWorkerVersionStatus._('activated');
-  static const ServiceWorkerVersionStatus redundant =
-      ServiceWorkerVersionStatus._('redundant');
+  static const new$ = ServiceWorkerVersionStatus._('new');
+  static const installing = ServiceWorkerVersionStatus._('installing');
+  static const installed = ServiceWorkerVersionStatus._('installed');
+  static const activating = ServiceWorkerVersionStatus._('activating');
+  static const activated = ServiceWorkerVersionStatus._('activated');
+  static const redundant = ServiceWorkerVersionStatus._('redundant');
   static const values = {
     'new': new$,
     'installing': installing,

@@ -201,9 +201,9 @@ class Animation {
 }
 
 class AnimationType {
-  static const AnimationType cssTransition = AnimationType._('CSSTransition');
-  static const AnimationType cssAnimation = AnimationType._('CSSAnimation');
-  static const AnimationType webAnimation = AnimationType._('WebAnimation');
+  static const cssTransition = AnimationType._('CSSTransition');
+  static const cssAnimation = AnimationType._('CSSAnimation');
+  static const webAnimation = AnimationType._('WebAnimation');
   static const values = {
     'CSSTransition': cssTransition,
     'CSSAnimation': cssAnimation,

@@ -452,8 +452,7 @@ class _InternalType {
         for (String enumValue in enumValues) {
           String normalizedValue = _normalizeEnumValue(enumValue);
 
-          code.writeln(
-              "static const $id $normalizedValue = $id._('$enumValue');");
+          code.writeln("static const $normalizedValue = $id._('$enumValue');");
         }
 
         code.writeln('static const values = {');

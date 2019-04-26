@@ -125,6 +125,8 @@ class Page {
     _onDialogController.close();
   }
 
+  NetworkManager get _networkManager => _frameManager.networkManager;
+
   Duration get navigationTimeoutOrDefault =>
       navigationTimeout ?? defaultTimeout;
 
@@ -139,6 +141,15 @@ class Page {
   Stream<PageFrame> get onFrameDetached => _frameManager.onFrameDetached;
 
   Stream<PageFrame> get onFrameNavigated => _frameManager.onFrameNavigated;
+
+  Stream<NetworkRequest> get onRequest => _networkManager.onRequest;
+
+  Stream<NetworkResponse> get onResponse => _networkManager.onResponse;
+
+  Stream<NetworkRequest> get onRequestFailed => _networkManager.onRequestFailed;
+
+  Stream<NetworkRequest> get onRequestFinished =>
+      _networkManager.onRequestFinished;
 
   Stream<Page> get onPopup => _onPopupController.stream;
 
@@ -220,7 +231,8 @@ class Page {
       lineNumber = stackTrace.callFrames[0].lineNumber;
       columnNumber = stackTrace.callFrames[0].columnNumber;
     }
-    var message = ConsoleMessage(type.toString(), textTokens.join(' '), args,
+    var message = ConsoleMessage(
+        ConsoleMessageType._fromEventType(type), textTokens.join(' '), args,
         url: url, lineNumber: lineNumber, columnNumber: columnNumber);
     _onConsoleController.add(message);
   }
@@ -231,7 +243,7 @@ class Page {
     }
     if (event.source != LogEntrySource.worker) {
       _onConsoleController.add(ConsoleMessage(
-          event.level.toString(), event.text, [],
+          ConsoleMessageType._fromLogLevel(event.level), event.text, [],
           url: event.url, lineNumber: event.lineNumber));
     }
   }
@@ -538,6 +550,20 @@ function deliverError(name, seq, message, stack) {
       bool fullPage,
       Rectangle clip,
       num quality,
+      bool omitBackground}) async {
+    return base64Decode(await screenshotBase64(
+        format: format,
+        fullPage: fullPage,
+        clip: clip,
+        quality: quality,
+        omitBackground: omitBackground));
+  }
+
+  Future<String> screenshotBase64(
+      {ScreenshotFormat format,
+      bool fullPage,
+      Rectangle clip,
+      num quality,
       bool omitBackground}) {
     format ??= ScreenshotFormat.png;
     fullPage ??= false;
@@ -596,7 +622,7 @@ function deliverError(name, seq, message, stack) {
         await setViewport(_viewport);
       }
 
-      return base64Decode(result);
+      return result;
     });
   }
 
@@ -707,7 +733,7 @@ function deliverError(name, seq, message, stack) {
 }
 
 class ConsoleMessage {
-  final String type;
+  final ConsoleMessageType type;
   final String text;
   final List args;
   final String url;
@@ -721,6 +747,42 @@ class ConsoleMessage {
   }
 
 //TODO(xha): add toString()
+}
+
+class ConsoleMessageType {
+  static const log = ConsoleMessageType._('log');
+  static const debug = ConsoleMessageType._('debug');
+  static const info = ConsoleMessageType._('info');
+  static const error = ConsoleMessageType._('error');
+  static const warning = ConsoleMessageType._('warning');
+  static const other = ConsoleMessageType._('other');
+  static const values = {
+    'log': log,
+    'debug': debug,
+    'info': info,
+    'error': error,
+    'warning': warning,
+    'other': other,
+  };
+
+  final String name;
+
+  const ConsoleMessageType._(this.name);
+
+  factory ConsoleMessageType._fromEventType(ConsoleAPICalledEventType type) {
+    return values[type.value] ?? other;
+  }
+
+  factory ConsoleMessageType._fromLogLevel(LogEntryLevel level) {
+    return {
+          LogEntryLevel.verbose: ConsoleMessageType.debug,
+        }[level] ??
+        values[level.value] ??
+        other;
+  }
+
+  @override
+  String toString() => name;
 }
 
 class ScreenshotFormat {

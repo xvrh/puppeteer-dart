@@ -1051,15 +1051,15 @@ class Scope {
 }
 
 class ScopeType {
-  static const ScopeType global = ScopeType._('global');
-  static const ScopeType local = ScopeType._('local');
-  static const ScopeType with$ = ScopeType._('with');
-  static const ScopeType closure = ScopeType._('closure');
-  static const ScopeType catch$ = ScopeType._('catch');
-  static const ScopeType block = ScopeType._('block');
-  static const ScopeType script = ScopeType._('script');
-  static const ScopeType eval = ScopeType._('eval');
-  static const ScopeType module = ScopeType._('module');
+  static const global = ScopeType._('global');
+  static const local = ScopeType._('local');
+  static const with$ = ScopeType._('with');
+  static const closure = ScopeType._('closure');
+  static const catch$ = ScopeType._('catch');
+  static const block = ScopeType._('block');
+  static const script = ScopeType._('script');
+  static const eval = ScopeType._('eval');
+  static const module = ScopeType._('module');
   static const values = {
     'global': global,
     'local': local,
@@ -1163,10 +1163,9 @@ class BreakLocation {
 }
 
 class BreakLocationType {
-  static const BreakLocationType debuggerStatement =
-      BreakLocationType._('debuggerStatement');
-  static const BreakLocationType call = BreakLocationType._('call');
-  static const BreakLocationType return$ = BreakLocationType._('return');
+  static const debuggerStatement = BreakLocationType._('debuggerStatement');
+  static const call = BreakLocationType._('call');
+  static const return$ = BreakLocationType._('return');
   static const values = {
     'debuggerStatement': debuggerStatement,
     'call': call,
@@ -1193,19 +1192,16 @@ class BreakLocationType {
 }
 
 class PausedEventReason {
-  static const PausedEventReason xhr = PausedEventReason._('XHR');
-  static const PausedEventReason dom = PausedEventReason._('DOM');
-  static const PausedEventReason eventListener =
-      PausedEventReason._('EventListener');
-  static const PausedEventReason exception = PausedEventReason._('exception');
-  static const PausedEventReason assert$ = PausedEventReason._('assert');
-  static const PausedEventReason debugCommand =
-      PausedEventReason._('debugCommand');
-  static const PausedEventReason promiseRejection =
-      PausedEventReason._('promiseRejection');
-  static const PausedEventReason oom = PausedEventReason._('OOM');
-  static const PausedEventReason other = PausedEventReason._('other');
-  static const PausedEventReason ambiguous = PausedEventReason._('ambiguous');
+  static const xhr = PausedEventReason._('XHR');
+  static const dom = PausedEventReason._('DOM');
+  static const eventListener = PausedEventReason._('EventListener');
+  static const exception = PausedEventReason._('exception');
+  static const assert$ = PausedEventReason._('assert');
+  static const debugCommand = PausedEventReason._('debugCommand');
+  static const promiseRejection = PausedEventReason._('promiseRejection');
+  static const oom = PausedEventReason._('OOM');
+  static const other = PausedEventReason._('other');
+  static const ambiguous = PausedEventReason._('ambiguous');
   static const values = {
     'XHR': xhr,
     'DOM': dom,

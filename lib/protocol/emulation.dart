@@ -326,13 +326,10 @@ class ScreenOrientation {
 }
 
 class ScreenOrientationType {
-  static const ScreenOrientationType portraitPrimary =
-      ScreenOrientationType._('portraitPrimary');
-  static const ScreenOrientationType portraitSecondary =
-      ScreenOrientationType._('portraitSecondary');
-  static const ScreenOrientationType landscapePrimary =
-      ScreenOrientationType._('landscapePrimary');
-  static const ScreenOrientationType landscapeSecondary =
+  static const portraitPrimary = ScreenOrientationType._('portraitPrimary');
+  static const portraitSecondary = ScreenOrientationType._('portraitSecondary');
+  static const landscapePrimary = ScreenOrientationType._('landscapePrimary');
+  static const landscapeSecondary =
       ScreenOrientationType._('landscapeSecondary');
   static const values = {
     'portraitPrimary': portraitPrimary,
@@ -366,9 +363,9 @@ class ScreenOrientationType {
 /// pauseIfNetworkFetchesPending: The virtual time base may not advance if there are any pending
 /// resource fetches.
 class VirtualTimePolicy {
-  static const VirtualTimePolicy advance = VirtualTimePolicy._('advance');
-  static const VirtualTimePolicy pause = VirtualTimePolicy._('pause');
-  static const VirtualTimePolicy pauseIfNetworkFetchesPending =
+  static const advance = VirtualTimePolicy._('advance');
+  static const pause = VirtualTimePolicy._('pause');
+  static const pauseIfNetworkFetchesPending =
       VirtualTimePolicy._('pauseIfNetworkFetchesPending');
   static const values = {
     'advance': advance,

@@ -167,10 +167,9 @@ String _encodeMessage(int id, String method, Map<String, dynamic> parameters,
 class Session implements Client {
   final SessionID sessionId;
   final Connection connection;
-  final Map<int, Completer> _completers = {};
-  final StreamController<Event> _eventController =
-      StreamController<Event>.broadcast(sync: true);
-  final Completer _onClose = Completer();
+  final _completers = <int, Completer>{};
+  final _eventController = StreamController<Event>.broadcast(sync: true);
+  final _onClose = Completer<void>();
 
   Session(this.connection, this.sessionId);
 
@@ -190,7 +189,7 @@ class Session implements Client {
   @override
   Stream<Event> get onEvent => _eventController.stream;
 
-  Future get closed => _onClose.future;
+  Future<void> get closed => _onClose.future;
 
   _onMessage(Map object) {
     int id = object['id'];

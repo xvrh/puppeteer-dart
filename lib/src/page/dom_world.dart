@@ -316,14 +316,14 @@ function _(element, values) {
 
   Future<void> tap(String selector) async {
     var handle = await $(selector);
-    assert(handle != null, 'No node found for selector: ' + selector);
+    assert(handle != null, 'No node found for selector: $selector');
     await handle.tap();
     await handle.dispose();
   }
 
   Future<void> type(String selector, String text, {Duration delay}) async {
     var handle = await $(selector);
-    assert(handle != null, 'No node found for selector: ' + selector);
+    assert(handle != null, 'No node found for selector: $selector');
     await handle.type(text, delay: delay);
     await handle.dispose();
   }

@@ -80,24 +80,23 @@ class AXNodeId {
 
 /// Enum of possible property types.
 class AXValueType {
-  static const AXValueType boolean = AXValueType._('boolean');
-  static const AXValueType tristate = AXValueType._('tristate');
-  static const AXValueType booleanOrUndefined =
-      AXValueType._('booleanOrUndefined');
-  static const AXValueType idref = AXValueType._('idref');
-  static const AXValueType idrefList = AXValueType._('idrefList');
-  static const AXValueType integer = AXValueType._('integer');
-  static const AXValueType node = AXValueType._('node');
-  static const AXValueType nodeList = AXValueType._('nodeList');
-  static const AXValueType number = AXValueType._('number');
-  static const AXValueType string = AXValueType._('string');
-  static const AXValueType computedString = AXValueType._('computedString');
-  static const AXValueType token = AXValueType._('token');
-  static const AXValueType tokenList = AXValueType._('tokenList');
-  static const AXValueType domRelation = AXValueType._('domRelation');
-  static const AXValueType role = AXValueType._('role');
-  static const AXValueType internalRole = AXValueType._('internalRole');
-  static const AXValueType valueUndefined = AXValueType._('valueUndefined');
+  static const boolean = AXValueType._('boolean');
+  static const tristate = AXValueType._('tristate');
+  static const booleanOrUndefined = AXValueType._('booleanOrUndefined');
+  static const idref = AXValueType._('idref');
+  static const idrefList = AXValueType._('idrefList');
+  static const integer = AXValueType._('integer');
+  static const node = AXValueType._('node');
+  static const nodeList = AXValueType._('nodeList');
+  static const number = AXValueType._('number');
+  static const string = AXValueType._('string');
+  static const computedString = AXValueType._('computedString');
+  static const token = AXValueType._('token');
+  static const tokenList = AXValueType._('tokenList');
+  static const domRelation = AXValueType._('domRelation');
+  static const role = AXValueType._('role');
+  static const internalRole = AXValueType._('internalRole');
+  static const valueUndefined = AXValueType._('valueUndefined');
   static const values = {
     'boolean': boolean,
     'tristate': tristate,
@@ -139,14 +138,12 @@ class AXValueType {
 
 /// Enum of possible property sources.
 class AXValueSourceType {
-  static const AXValueSourceType attribute = AXValueSourceType._('attribute');
-  static const AXValueSourceType implicit = AXValueSourceType._('implicit');
-  static const AXValueSourceType style = AXValueSourceType._('style');
-  static const AXValueSourceType contents = AXValueSourceType._('contents');
-  static const AXValueSourceType placeholder =
-      AXValueSourceType._('placeholder');
-  static const AXValueSourceType relatedElement =
-      AXValueSourceType._('relatedElement');
+  static const attribute = AXValueSourceType._('attribute');
+  static const implicit = AXValueSourceType._('implicit');
+  static const style = AXValueSourceType._('style');
+  static const contents = AXValueSourceType._('contents');
+  static const placeholder = AXValueSourceType._('placeholder');
+  static const relatedElement = AXValueSourceType._('relatedElement');
   static const values = {
     'attribute': attribute,
     'implicit': implicit,
@@ -177,22 +174,14 @@ class AXValueSourceType {
 
 /// Enum of possible native property sources (as a subtype of a particular AXValueSourceType).
 class AXValueNativeSourceType {
-  static const AXValueNativeSourceType figcaption =
-      AXValueNativeSourceType._('figcaption');
-  static const AXValueNativeSourceType label =
-      AXValueNativeSourceType._('label');
-  static const AXValueNativeSourceType labelfor =
-      AXValueNativeSourceType._('labelfor');
-  static const AXValueNativeSourceType labelwrapped =
-      AXValueNativeSourceType._('labelwrapped');
-  static const AXValueNativeSourceType legend =
-      AXValueNativeSourceType._('legend');
-  static const AXValueNativeSourceType tablecaption =
-      AXValueNativeSourceType._('tablecaption');
-  static const AXValueNativeSourceType title =
-      AXValueNativeSourceType._('title');
-  static const AXValueNativeSourceType other =
-      AXValueNativeSourceType._('other');
+  static const figcaption = AXValueNativeSourceType._('figcaption');
+  static const label = AXValueNativeSourceType._('label');
+  static const labelfor = AXValueNativeSourceType._('labelfor');
+  static const labelwrapped = AXValueNativeSourceType._('labelwrapped');
+  static const legend = AXValueNativeSourceType._('legend');
+  static const tablecaption = AXValueNativeSourceType._('tablecaption');
+  static const title = AXValueNativeSourceType._('title');
+  static const other = AXValueNativeSourceType._('other');
   static const values = {
     'figcaption': figcaption,
     'label': label,
@@ -433,48 +422,45 @@ class AXValue {
 /// - from 'checked' to 'selected': states which apply to widgets
 /// - from 'activedescendant' to 'owns' - relationships between elements other than parent/child/sibling.
 class AXPropertyName {
-  static const AXPropertyName busy = AXPropertyName._('busy');
-  static const AXPropertyName disabled = AXPropertyName._('disabled');
-  static const AXPropertyName editable = AXPropertyName._('editable');
-  static const AXPropertyName focusable = AXPropertyName._('focusable');
-  static const AXPropertyName focused = AXPropertyName._('focused');
-  static const AXPropertyName hidden = AXPropertyName._('hidden');
-  static const AXPropertyName hiddenRoot = AXPropertyName._('hiddenRoot');
-  static const AXPropertyName invalid = AXPropertyName._('invalid');
-  static const AXPropertyName keyshortcuts = AXPropertyName._('keyshortcuts');
-  static const AXPropertyName settable = AXPropertyName._('settable');
-  static const AXPropertyName roledescription =
-      AXPropertyName._('roledescription');
-  static const AXPropertyName live = AXPropertyName._('live');
-  static const AXPropertyName atomic = AXPropertyName._('atomic');
-  static const AXPropertyName relevant = AXPropertyName._('relevant');
-  static const AXPropertyName root = AXPropertyName._('root');
-  static const AXPropertyName autocomplete = AXPropertyName._('autocomplete');
-  static const AXPropertyName hasPopup = AXPropertyName._('hasPopup');
-  static const AXPropertyName level = AXPropertyName._('level');
-  static const AXPropertyName multiselectable =
-      AXPropertyName._('multiselectable');
-  static const AXPropertyName orientation = AXPropertyName._('orientation');
-  static const AXPropertyName multiline = AXPropertyName._('multiline');
-  static const AXPropertyName readonly = AXPropertyName._('readonly');
-  static const AXPropertyName required = AXPropertyName._('required');
-  static const AXPropertyName valuemin = AXPropertyName._('valuemin');
-  static const AXPropertyName valuemax = AXPropertyName._('valuemax');
-  static const AXPropertyName valuetext = AXPropertyName._('valuetext');
-  static const AXPropertyName checked = AXPropertyName._('checked');
-  static const AXPropertyName expanded = AXPropertyName._('expanded');
-  static const AXPropertyName modal = AXPropertyName._('modal');
-  static const AXPropertyName pressed = AXPropertyName._('pressed');
-  static const AXPropertyName selected = AXPropertyName._('selected');
-  static const AXPropertyName activedescendant =
-      AXPropertyName._('activedescendant');
-  static const AXPropertyName controls = AXPropertyName._('controls');
-  static const AXPropertyName describedby = AXPropertyName._('describedby');
-  static const AXPropertyName details = AXPropertyName._('details');
-  static const AXPropertyName errormessage = AXPropertyName._('errormessage');
-  static const AXPropertyName flowto = AXPropertyName._('flowto');
-  static const AXPropertyName labelledby = AXPropertyName._('labelledby');
-  static const AXPropertyName owns = AXPropertyName._('owns');
+  static const busy = AXPropertyName._('busy');
+  static const disabled = AXPropertyName._('disabled');
+  static const editable = AXPropertyName._('editable');
+  static const focusable = AXPropertyName._('focusable');
+  static const focused = AXPropertyName._('focused');
+  static const hidden = AXPropertyName._('hidden');
+  static const hiddenRoot = AXPropertyName._('hiddenRoot');
+  static const invalid = AXPropertyName._('invalid');
+  static const keyshortcuts = AXPropertyName._('keyshortcuts');
+  static const settable = AXPropertyName._('settable');
+  static const roledescription = AXPropertyName._('roledescription');
+  static const live = AXPropertyName._('live');
+  static const atomic = AXPropertyName._('atomic');
+  static const relevant = AXPropertyName._('relevant');
+  static const root = AXPropertyName._('root');
+  static const autocomplete = AXPropertyName._('autocomplete');
+  static const hasPopup = AXPropertyName._('hasPopup');
+  static const level = AXPropertyName._('level');
+  static const multiselectable = AXPropertyName._('multiselectable');
+  static const orientation = AXPropertyName._('orientation');
+  static const multiline = AXPropertyName._('multiline');
+  static const readonly = AXPropertyName._('readonly');
+  static const required = AXPropertyName._('required');
+  static const valuemin = AXPropertyName._('valuemin');
+  static const valuemax = AXPropertyName._('valuemax');
+  static const valuetext = AXPropertyName._('valuetext');
+  static const checked = AXPropertyName._('checked');
+  static const expanded = AXPropertyName._('expanded');
+  static const modal = AXPropertyName._('modal');
+  static const pressed = AXPropertyName._('pressed');
+  static const selected = AXPropertyName._('selected');
+  static const activedescendant = AXPropertyName._('activedescendant');
+  static const controls = AXPropertyName._('controls');
+  static const describedby = AXPropertyName._('describedby');
+  static const details = AXPropertyName._('details');
+  static const errormessage = AXPropertyName._('errormessage');
+  static const flowto = AXPropertyName._('flowto');
+  static const labelledby = AXPropertyName._('labelledby');
+  static const owns = AXPropertyName._('owns');
   static const values = {
     'busy': busy,
     'disabled': disabled,

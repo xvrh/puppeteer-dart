@@ -147,10 +147,9 @@ class CertificateId {
 /// A description of mixed content (HTTP resources on HTTPS pages), as defined by
 /// https://www.w3.org/TR/mixed-content/#categories
 class MixedContentType {
-  static const MixedContentType blockable = MixedContentType._('blockable');
-  static const MixedContentType optionallyBlockable =
-      MixedContentType._('optionally-blockable');
-  static const MixedContentType none = MixedContentType._('none');
+  static const blockable = MixedContentType._('blockable');
+  static const optionallyBlockable = MixedContentType._('optionally-blockable');
+  static const none = MixedContentType._('none');
   static const values = {
     'blockable': blockable,
     'optionally-blockable': optionallyBlockable,
@@ -178,11 +177,11 @@ class MixedContentType {
 
 /// The security level of a page or resource.
 class SecurityState {
-  static const SecurityState unknown = SecurityState._('unknown');
-  static const SecurityState neutral = SecurityState._('neutral');
-  static const SecurityState insecure = SecurityState._('insecure');
-  static const SecurityState secure = SecurityState._('secure');
-  static const SecurityState info = SecurityState._('info');
+  static const unknown = SecurityState._('unknown');
+  static const neutral = SecurityState._('neutral');
+  static const insecure = SecurityState._('insecure');
+  static const secure = SecurityState._('secure');
+  static const info = SecurityState._('info');
   static const values = {
     'unknown': unknown,
     'neutral': neutral,
@@ -338,10 +337,8 @@ class InsecureContentStatus {
 /// The action to take when a certificate error occurs. continue will continue processing the
 /// request and cancel will cancel the request.
 class CertificateErrorAction {
-  static const CertificateErrorAction continue$ =
-      CertificateErrorAction._('continue');
-  static const CertificateErrorAction cancel =
-      CertificateErrorAction._('cancel');
+  static const continue$ = CertificateErrorAction._('continue');
+  static const cancel = CertificateErrorAction._('cancel');
   static const values = {
     'continue': continue$,
     'cancel': cancel,

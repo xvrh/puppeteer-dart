@@ -77,7 +77,7 @@ class Puppeteer {
       userDataDir = await Directory.systemTemp.createTemp('chrome_');
     }
 
-    List<String> chromeArgs = _defaultArgs.toList();
+    var chromeArgs = _defaultArgs.toList();
     if (userDataDir != null) {
       chromeArgs.add('--user-data-dir=${userDataDir.path}');
     }
@@ -90,7 +90,7 @@ class Puppeteer {
     }
 
     _logger.info('Start $executablePath with $chromeArgs');
-    Process chromeProcess = await Process.start(executablePath, chromeArgs);
+    var chromeProcess = await Process.start(executablePath, chromeArgs);
 
     // ignore: unawaited_futures
     chromeProcess.exitCode.then((int exitCode) {
@@ -101,15 +101,15 @@ class Puppeteer {
       }
     });
 
-    String webSocketUrl = await _waitForWebSocketUrl(chromeProcess);
+    var webSocketUrl = await _waitForWebSocketUrl(chromeProcess);
     if (webSocketUrl != null) {
-      Connection connection = await Connection.create(webSocketUrl);
+      var connection = await Connection.create(webSocketUrl);
 
-      Browser browser = createBrowser(connection,
+      var browser = createBrowser(connection,
           defaultViewport: defaultViewport,
           closeCallback: () => _killChrome(chromeProcess),
           ignoreHttpsErrors: ignoreHttpsErrors);
-      Future targetFuture =
+      var targetFuture =
           browser.waitForTarget((target) => target.type == 'page');
       await browser.targetApi.setDiscoverTargets(true);
       await targetFuture;
@@ -134,24 +134,25 @@ Future _killChrome(Process process) {
   return process.exitCode;
 }
 
-final RegExp _devToolRegExp = RegExp(r'^DevTools listening on (ws:\/\/.*)$');
+final _devToolRegExp = RegExp(r'^DevTools listening on (ws:\/\/.*)$');
 
-Future _waitForWebSocketUrl(Process chromeProcess) async {
+Future<String> _waitForWebSocketUrl(Process chromeProcess) async {
   await for (String line in chromeProcess.stderr
       .transform(Utf8Decoder())
       .transform(LineSplitter())) {
     _logger.warning('[Chrome stderr]: $line');
-    Match match = _devToolRegExp.firstMatch(line);
+    var match = _devToolRegExp.firstMatch(line);
     if (match != null) {
       return match.group(1);
     }
   }
+  throw 'Websocket url not found';
 }
 
 Future<String> _inferExecutablePath() async {
-  String executablePath = Platform.environment['puppeteer_PATH'];
+  var executablePath = Platform.environment['puppeteer_PATH'];
   if (executablePath != null) {
-    File file = File(executablePath);
+    var file = File(executablePath);
     if (!file.existsSync()) {
       executablePath = getExecutablePath(executablePath);
       if (!File(executablePath).existsSync()) {

@@ -1102,23 +1102,22 @@ class GetResponseBodyForInterceptionResult {
 
 /// Resource type as it was perceived by the rendering engine.
 class ResourceType {
-  static const ResourceType document = ResourceType._('Document');
-  static const ResourceType stylesheet = ResourceType._('Stylesheet');
-  static const ResourceType image = ResourceType._('Image');
-  static const ResourceType media = ResourceType._('Media');
-  static const ResourceType font = ResourceType._('Font');
-  static const ResourceType script = ResourceType._('Script');
-  static const ResourceType textTrack = ResourceType._('TextTrack');
-  static const ResourceType xhr = ResourceType._('XHR');
-  static const ResourceType fetch = ResourceType._('Fetch');
-  static const ResourceType eventSource = ResourceType._('EventSource');
-  static const ResourceType webSocket = ResourceType._('WebSocket');
-  static const ResourceType manifest = ResourceType._('Manifest');
-  static const ResourceType signedExchange = ResourceType._('SignedExchange');
-  static const ResourceType ping = ResourceType._('Ping');
-  static const ResourceType cspViolationReport =
-      ResourceType._('CSPViolationReport');
-  static const ResourceType other = ResourceType._('Other');
+  static const document = ResourceType._('Document');
+  static const stylesheet = ResourceType._('Stylesheet');
+  static const image = ResourceType._('Image');
+  static const media = ResourceType._('Media');
+  static const font = ResourceType._('Font');
+  static const script = ResourceType._('Script');
+  static const textTrack = ResourceType._('TextTrack');
+  static const xhr = ResourceType._('XHR');
+  static const fetch = ResourceType._('Fetch');
+  static const eventSource = ResourceType._('EventSource');
+  static const webSocket = ResourceType._('WebSocket');
+  static const manifest = ResourceType._('Manifest');
+  static const signedExchange = ResourceType._('SignedExchange');
+  static const ping = ResourceType._('Ping');
+  static const cspViolationReport = ResourceType._('CSPViolationReport');
+  static const other = ResourceType._('Other');
   static const values = {
     'Document': document,
     'Stylesheet': stylesheet,
@@ -1222,25 +1221,20 @@ class InterceptionId {
 
 /// Network level fetch failure reason.
 class ErrorReason {
-  static const ErrorReason failed = ErrorReason._('Failed');
-  static const ErrorReason aborted = ErrorReason._('Aborted');
-  static const ErrorReason timedOut = ErrorReason._('TimedOut');
-  static const ErrorReason accessDenied = ErrorReason._('AccessDenied');
-  static const ErrorReason connectionClosed = ErrorReason._('ConnectionClosed');
-  static const ErrorReason connectionReset = ErrorReason._('ConnectionReset');
-  static const ErrorReason connectionRefused =
-      ErrorReason._('ConnectionRefused');
-  static const ErrorReason connectionAborted =
-      ErrorReason._('ConnectionAborted');
-  static const ErrorReason connectionFailed = ErrorReason._('ConnectionFailed');
-  static const ErrorReason nameNotResolved = ErrorReason._('NameNotResolved');
-  static const ErrorReason internetDisconnected =
-      ErrorReason._('InternetDisconnected');
-  static const ErrorReason addressUnreachable =
-      ErrorReason._('AddressUnreachable');
-  static const ErrorReason blockedByClient = ErrorReason._('BlockedByClient');
-  static const ErrorReason blockedByResponse =
-      ErrorReason._('BlockedByResponse');
+  static const failed = ErrorReason._('Failed');
+  static const aborted = ErrorReason._('Aborted');
+  static const timedOut = ErrorReason._('TimedOut');
+  static const accessDenied = ErrorReason._('AccessDenied');
+  static const connectionClosed = ErrorReason._('ConnectionClosed');
+  static const connectionReset = ErrorReason._('ConnectionReset');
+  static const connectionRefused = ErrorReason._('ConnectionRefused');
+  static const connectionAborted = ErrorReason._('ConnectionAborted');
+  static const connectionFailed = ErrorReason._('ConnectionFailed');
+  static const nameNotResolved = ErrorReason._('NameNotResolved');
+  static const internetDisconnected = ErrorReason._('InternetDisconnected');
+  static const addressUnreachable = ErrorReason._('AddressUnreachable');
+  static const blockedByClient = ErrorReason._('BlockedByClient');
+  static const blockedByResponse = ErrorReason._('BlockedByResponse');
   static const values = {
     'Failed': failed,
     'Aborted': aborted,
@@ -1342,15 +1336,15 @@ class Headers {
 
 /// The underlying connection technology that the browser is supposedly using.
 class ConnectionType {
-  static const ConnectionType none = ConnectionType._('none');
-  static const ConnectionType cellular2g = ConnectionType._('cellular2g');
-  static const ConnectionType cellular3g = ConnectionType._('cellular3g');
-  static const ConnectionType cellular4g = ConnectionType._('cellular4g');
-  static const ConnectionType bluetooth = ConnectionType._('bluetooth');
-  static const ConnectionType ethernet = ConnectionType._('ethernet');
-  static const ConnectionType wifi = ConnectionType._('wifi');
-  static const ConnectionType wimax = ConnectionType._('wimax');
-  static const ConnectionType other = ConnectionType._('other');
+  static const none = ConnectionType._('none');
+  static const cellular2g = ConnectionType._('cellular2g');
+  static const cellular3g = ConnectionType._('cellular3g');
+  static const cellular4g = ConnectionType._('cellular4g');
+  static const bluetooth = ConnectionType._('bluetooth');
+  static const ethernet = ConnectionType._('ethernet');
+  static const wifi = ConnectionType._('wifi');
+  static const wimax = ConnectionType._('wimax');
+  static const other = ConnectionType._('other');
   static const values = {
     'none': none,
     'cellular2g': cellular2g,
@@ -1385,8 +1379,8 @@ class ConnectionType {
 /// Represents the cookie's 'SameSite' status:
 /// https://tools.ietf.org/html/draft-west-first-party-cookies
 class CookieSameSite {
-  static const CookieSameSite strict = CookieSameSite._('Strict');
-  static const CookieSameSite lax = CookieSameSite._('Lax');
+  static const strict = CookieSameSite._('Strict');
+  static const lax = CookieSameSite._('Lax');
   static const values = {
     'Strict': strict,
     'Lax': lax,
@@ -1526,11 +1520,11 @@ class ResourceTiming {
 
 /// Loading priority of a resource request.
 class ResourcePriority {
-  static const ResourcePriority veryLow = ResourcePriority._('VeryLow');
-  static const ResourcePriority low = ResourcePriority._('Low');
-  static const ResourcePriority medium = ResourcePriority._('Medium');
-  static const ResourcePriority high = ResourcePriority._('High');
-  static const ResourcePriority veryHigh = ResourcePriority._('VeryHigh');
+  static const veryLow = ResourcePriority._('VeryLow');
+  static const low = ResourcePriority._('Low');
+  static const medium = ResourcePriority._('Medium');
+  static const high = ResourcePriority._('High');
+  static const veryHigh = ResourcePriority._('VeryHigh');
   static const values = {
     'VeryLow': veryLow,
     'Low': low,
@@ -1648,20 +1642,16 @@ class Request {
 }
 
 class RequestReferrerPolicy {
-  static const RequestReferrerPolicy unsafeUrl =
-      RequestReferrerPolicy._('unsafe-url');
-  static const RequestReferrerPolicy noReferrerWhenDowngrade =
+  static const unsafeUrl = RequestReferrerPolicy._('unsafe-url');
+  static const noReferrerWhenDowngrade =
       RequestReferrerPolicy._('no-referrer-when-downgrade');
-  static const RequestReferrerPolicy noReferrer =
-      RequestReferrerPolicy._('no-referrer');
-  static const RequestReferrerPolicy origin = RequestReferrerPolicy._('origin');
-  static const RequestReferrerPolicy originWhenCrossOrigin =
+  static const noReferrer = RequestReferrerPolicy._('no-referrer');
+  static const origin = RequestReferrerPolicy._('origin');
+  static const originWhenCrossOrigin =
       RequestReferrerPolicy._('origin-when-cross-origin');
-  static const RequestReferrerPolicy sameOrigin =
-      RequestReferrerPolicy._('same-origin');
-  static const RequestReferrerPolicy strictOrigin =
-      RequestReferrerPolicy._('strict-origin');
-  static const RequestReferrerPolicy strictOriginWhenCrossOrigin =
+  static const sameOrigin = RequestReferrerPolicy._('same-origin');
+  static const strictOrigin = RequestReferrerPolicy._('strict-origin');
+  static const strictOriginWhenCrossOrigin =
       RequestReferrerPolicy._('strict-origin-when-cross-origin');
   static const values = {
     'unsafe-url': unsafeUrl,
@@ -1867,12 +1857,10 @@ class SecurityDetails {
 
 /// Whether the request complied with Certificate Transparency policy.
 class CertificateTransparencyCompliance {
-  static const CertificateTransparencyCompliance unknown =
-      CertificateTransparencyCompliance._('unknown');
-  static const CertificateTransparencyCompliance notCompliant =
+  static const unknown = CertificateTransparencyCompliance._('unknown');
+  static const notCompliant =
       CertificateTransparencyCompliance._('not-compliant');
-  static const CertificateTransparencyCompliance compliant =
-      CertificateTransparencyCompliance._('compliant');
+  static const compliant = CertificateTransparencyCompliance._('compliant');
   static const values = {
     'unknown': unknown,
     'not-compliant': notCompliant,
@@ -1902,16 +1890,14 @@ class CertificateTransparencyCompliance {
 
 /// The reason why request was blocked.
 class BlockedReason {
-  static const BlockedReason other = BlockedReason._('other');
-  static const BlockedReason csp = BlockedReason._('csp');
-  static const BlockedReason mixedContent = BlockedReason._('mixed-content');
-  static const BlockedReason origin = BlockedReason._('origin');
-  static const BlockedReason inspector = BlockedReason._('inspector');
-  static const BlockedReason subresourceFilter =
-      BlockedReason._('subresource-filter');
-  static const BlockedReason contentType = BlockedReason._('content-type');
-  static const BlockedReason collapsedByClient =
-      BlockedReason._('collapsed-by-client');
+  static const other = BlockedReason._('other');
+  static const csp = BlockedReason._('csp');
+  static const mixedContent = BlockedReason._('mixed-content');
+  static const origin = BlockedReason._('origin');
+  static const inspector = BlockedReason._('inspector');
+  static const subresourceFilter = BlockedReason._('subresource-filter');
+  static const contentType = BlockedReason._('content-type');
+  static const collapsedByClient = BlockedReason._('collapsed-by-client');
   static const values = {
     'other': other,
     'csp': csp,
@@ -2311,11 +2297,11 @@ class Initiator {
 }
 
 class InitiatorType {
-  static const InitiatorType parser = InitiatorType._('parser');
-  static const InitiatorType script = InitiatorType._('script');
-  static const InitiatorType preload = InitiatorType._('preload');
-  static const InitiatorType signedExchange = InitiatorType._('SignedExchange');
-  static const InitiatorType other = InitiatorType._('other');
+  static const parser = InitiatorType._('parser');
+  static const script = InitiatorType._('script');
+  static const preload = InitiatorType._('preload');
+  static const signedExchange = InitiatorType._('SignedExchange');
+  static const other = InitiatorType._('other');
   static const values = {
     'parser': parser,
     'script': script,
@@ -2557,8 +2543,8 @@ class AuthChallenge {
 }
 
 class AuthChallengeSource {
-  static const AuthChallengeSource server = AuthChallengeSource._('Server');
-  static const AuthChallengeSource proxy = AuthChallengeSource._('Proxy');
+  static const server = AuthChallengeSource._('Server');
+  static const proxy = AuthChallengeSource._('Proxy');
   static const values = {
     'Server': server,
     'Proxy': proxy,
@@ -2624,11 +2610,9 @@ class AuthChallengeResponse {
 }
 
 class AuthChallengeResponseResponse {
-  static const AuthChallengeResponseResponse default$ =
-      AuthChallengeResponseResponse._('Default');
-  static const AuthChallengeResponseResponse cancelAuth =
-      AuthChallengeResponseResponse._('CancelAuth');
-  static const AuthChallengeResponseResponse provideCredentials =
+  static const default$ = AuthChallengeResponseResponse._('Default');
+  static const cancelAuth = AuthChallengeResponseResponse._('CancelAuth');
+  static const provideCredentials =
       AuthChallengeResponseResponse._('ProvideCredentials');
   static const values = {
     'Default': default$,
@@ -2659,9 +2643,8 @@ class AuthChallengeResponseResponse {
 /// Stages of the interception to begin intercepting. Request will intercept before the request is
 /// sent. Response will intercept after the response is received.
 class InterceptionStage {
-  static const InterceptionStage request = InterceptionStage._('Request');
-  static const InterceptionStage headersReceived =
-      InterceptionStage._('HeadersReceived');
+  static const request = InterceptionStage._('Request');
+  static const headersReceived = InterceptionStage._('HeadersReceived');
   static const values = {
     'Request': request,
     'HeadersReceived': headersReceived,
@@ -2851,17 +2834,16 @@ class SignedExchangeHeader {
 
 /// Field type for a signed exchange related error.
 class SignedExchangeErrorField {
-  static const SignedExchangeErrorField signatureSig =
-      SignedExchangeErrorField._('signatureSig');
-  static const SignedExchangeErrorField signatureIntegrity =
+  static const signatureSig = SignedExchangeErrorField._('signatureSig');
+  static const signatureIntegrity =
       SignedExchangeErrorField._('signatureIntegrity');
-  static const SignedExchangeErrorField signatureCertUrl =
+  static const signatureCertUrl =
       SignedExchangeErrorField._('signatureCertUrl');
-  static const SignedExchangeErrorField signatureCertSha256 =
+  static const signatureCertSha256 =
       SignedExchangeErrorField._('signatureCertSha256');
-  static const SignedExchangeErrorField signatureValidityUrl =
+  static const signatureValidityUrl =
       SignedExchangeErrorField._('signatureValidityUrl');
-  static const SignedExchangeErrorField signatureTimestamps =
+  static const signatureTimestamps =
       SignedExchangeErrorField._('signatureTimestamps');
   static const values = {
     'signatureSig': signatureSig,

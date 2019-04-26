@@ -147,7 +147,7 @@ class Browser {
     return version.userAgent;
   }
 
-  Future _disposeContext(BrowserContextID contextId) async {
+  Future<void> _disposeContext(BrowserContextID contextId) async {
     await targetApi.disposeBrowserContext(contextId);
     _contexts.remove(contextId);
   }
@@ -225,7 +225,7 @@ class BrowserContext {
         timeout: timeout);
   }
 
-  Future close() async {
+  Future<void> close() async {
     assert(id != null, 'Non-incognito profiles cannot be closed!');
     await browser._disposeContext(id);
   }

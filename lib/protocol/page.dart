@@ -1445,21 +1445,19 @@ class ScriptIdentifier {
 
 /// Transition type.
 class TransitionType {
-  static const TransitionType link = TransitionType._('link');
-  static const TransitionType typed = TransitionType._('typed');
-  static const TransitionType addressBar = TransitionType._('address_bar');
-  static const TransitionType autoBookmark = TransitionType._('auto_bookmark');
-  static const TransitionType autoSubframe = TransitionType._('auto_subframe');
-  static const TransitionType manualSubframe =
-      TransitionType._('manual_subframe');
-  static const TransitionType generated = TransitionType._('generated');
-  static const TransitionType autoToplevel = TransitionType._('auto_toplevel');
-  static const TransitionType formSubmit = TransitionType._('form_submit');
-  static const TransitionType reload = TransitionType._('reload');
-  static const TransitionType keyword = TransitionType._('keyword');
-  static const TransitionType keywordGenerated =
-      TransitionType._('keyword_generated');
-  static const TransitionType other = TransitionType._('other');
+  static const link = TransitionType._('link');
+  static const typed = TransitionType._('typed');
+  static const addressBar = TransitionType._('address_bar');
+  static const autoBookmark = TransitionType._('auto_bookmark');
+  static const autoSubframe = TransitionType._('auto_subframe');
+  static const manualSubframe = TransitionType._('manual_subframe');
+  static const generated = TransitionType._('generated');
+  static const autoToplevel = TransitionType._('auto_toplevel');
+  static const formSubmit = TransitionType._('form_submit');
+  static const reload = TransitionType._('reload');
+  static const keyword = TransitionType._('keyword');
+  static const keywordGenerated = TransitionType._('keyword_generated');
+  static const other = TransitionType._('other');
   static const values = {
     'link': link,
     'typed': typed,
@@ -1605,10 +1603,10 @@ class ScreencastFrameMetadata {
 
 /// Javascript dialog type.
 class DialogType {
-  static const DialogType alert = DialogType._('alert');
-  static const DialogType confirm = DialogType._('confirm');
-  static const DialogType prompt = DialogType._('prompt');
-  static const DialogType beforeunload = DialogType._('beforeunload');
+  static const alert = DialogType._('alert');
+  static const confirm = DialogType._('confirm');
+  static const prompt = DialogType._('prompt');
+  static const beforeunload = DialogType._('beforeunload');
   static const values = {
     'alert': alert,
     'confirm': confirm,
@@ -1928,20 +1926,17 @@ class FontSizes {
 }
 
 class ClientNavigationReason {
-  static const ClientNavigationReason formSubmissionGet =
+  static const formSubmissionGet =
       ClientNavigationReason._('formSubmissionGet');
-  static const ClientNavigationReason formSubmissionPost =
+  static const formSubmissionPost =
       ClientNavigationReason._('formSubmissionPost');
-  static const ClientNavigationReason httpHeaderRefresh =
+  static const httpHeaderRefresh =
       ClientNavigationReason._('httpHeaderRefresh');
-  static const ClientNavigationReason scriptInitiated =
-      ClientNavigationReason._('scriptInitiated');
-  static const ClientNavigationReason metaTagRefresh =
-      ClientNavigationReason._('metaTagRefresh');
-  static const ClientNavigationReason pageBlockInterstitial =
+  static const scriptInitiated = ClientNavigationReason._('scriptInitiated');
+  static const metaTagRefresh = ClientNavigationReason._('metaTagRefresh');
+  static const pageBlockInterstitial =
       ClientNavigationReason._('pageBlockInterstitial');
-  static const ClientNavigationReason reload =
-      ClientNavigationReason._('reload');
+  static const reload = ClientNavigationReason._('reload');
   static const values = {
     'formSubmissionGet': formSubmissionGet,
     'formSubmissionPost': formSubmissionPost,
@@ -1973,20 +1968,19 @@ class ClientNavigationReason {
 }
 
 class FrameScheduledNavigationEventReason {
-  static const FrameScheduledNavigationEventReason formSubmissionGet =
+  static const formSubmissionGet =
       FrameScheduledNavigationEventReason._('formSubmissionGet');
-  static const FrameScheduledNavigationEventReason formSubmissionPost =
+  static const formSubmissionPost =
       FrameScheduledNavigationEventReason._('formSubmissionPost');
-  static const FrameScheduledNavigationEventReason httpHeaderRefresh =
+  static const httpHeaderRefresh =
       FrameScheduledNavigationEventReason._('httpHeaderRefresh');
-  static const FrameScheduledNavigationEventReason scriptInitiated =
+  static const scriptInitiated =
       FrameScheduledNavigationEventReason._('scriptInitiated');
-  static const FrameScheduledNavigationEventReason metaTagRefresh =
+  static const metaTagRefresh =
       FrameScheduledNavigationEventReason._('metaTagRefresh');
-  static const FrameScheduledNavigationEventReason pageBlockInterstitial =
+  static const pageBlockInterstitial =
       FrameScheduledNavigationEventReason._('pageBlockInterstitial');
-  static const FrameScheduledNavigationEventReason reload =
-      FrameScheduledNavigationEventReason._('reload');
+  static const reload = FrameScheduledNavigationEventReason._('reload');
   static const values = {
     'formSubmissionGet': formSubmissionGet,
     'formSubmissionPost': formSubmissionPost,
