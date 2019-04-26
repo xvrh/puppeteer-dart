@@ -405,7 +405,7 @@ class NetworkResponse {
   Future<String> get text => content.then((content) =>
       content is String ? content : utf8.decode((content as List<int>)));
 
-  Future get json => text.then(jsonDecode);
+  Future<dynamic> get json => text.then(jsonDecode);
 }
 
 class Credentials {

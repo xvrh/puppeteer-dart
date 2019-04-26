@@ -28,6 +28,28 @@ main() {
     page = null;
   });
 
+  group('ElementHandle.properties', () {
+    test('propertyValue', () async {
+      await page.goto(server.assetUrl('simple.html'));
+      var input = await page.$('input');
+      var value = await input.propertyValue('value');
+      expect(value, equals('some text'));
+    });
+
+    test('non existent property returns null', () async {
+      await page.goto(server.assetUrl('simple.html'));
+      var input = await page.$('input');
+      var value = await input.propertyValue('noexist');
+      expect(value, isNull);
+    });
+
+    test('null handle', () async {
+      await page.goto(server.assetUrl('simple.html'));
+      var input = await page.$('no exist');
+      expect(input, isNull);
+    });
+  });
+
   group('ElementHandle.boundingBox', () {
     test('should work', () async {
       await page.setViewport(DeviceViewport(width: 500, height: 500));

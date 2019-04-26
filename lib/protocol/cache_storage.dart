@@ -121,14 +121,12 @@ class CacheId {
 
 /// type of HTTP response cached
 class CachedResponseType {
-  static const CachedResponseType basic = CachedResponseType._('basic');
-  static const CachedResponseType cors = CachedResponseType._('cors');
-  static const CachedResponseType default$ = CachedResponseType._('default');
-  static const CachedResponseType error = CachedResponseType._('error');
-  static const CachedResponseType opaqueResponse =
-      CachedResponseType._('opaqueResponse');
-  static const CachedResponseType opaqueRedirect =
-      CachedResponseType._('opaqueRedirect');
+  static const basic = CachedResponseType._('basic');
+  static const cors = CachedResponseType._('cors');
+  static const default$ = CachedResponseType._('default');
+  static const error = CachedResponseType._('error');
+  static const opaqueResponse = CachedResponseType._('opaqueResponse');
+  static const opaqueRedirect = CachedResponseType._('opaqueRedirect');
   static const values = {
     'basic': basic,
     'cors': cors,

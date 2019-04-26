@@ -81,8 +81,8 @@ class RecordingStateChangedEvent {
 /// Every Background Service operates independently, but they share the same
 /// API.
 class ServiceName {
-  static const ServiceName backgroundFetch = ServiceName._('backgroundFetch');
-  static const ServiceName backgroundSync = ServiceName._('backgroundSync');
+  static const backgroundFetch = ServiceName._('backgroundFetch');
+  static const backgroundSync = ServiceName._('backgroundSync');
   static const values = {
     'backgroundFetch': backgroundFetch,
     'backgroundSync': backgroundSync,

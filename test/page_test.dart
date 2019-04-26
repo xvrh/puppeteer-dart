@@ -329,7 +329,7 @@ main() {
       var message = await waitFutures(page.onConsole.first,
           [page.evaluate("() => console.log('hello', 5, {foo: 'bar'})")]);
       expect(message.text, equals('hello 5 JSHandle@object'));
-      expect(message.type, equals('log'));
+      expect(message.type, equals(ConsoleMessageType.log));
       expect(await message.args[0].jsonValue, equals('hello'));
       expect(await message.args[1].jsonValue, equals(5));
       expect(await message.args[2].jsonValue, equals({'foo': 'bar'}));
@@ -351,7 +351,7 @@ main() {
       }''');
       // Gives time for the logs to arrive on Windows
       await Future.delayed(Duration(milliseconds: 1));
-      expect(messages.map((msg) => msg.type),
+      expect(messages.map((msg) => msg.typeName),
           equals(['timeEnd', 'trace', 'dir', 'warning', 'error', 'log']));
       expect(messages[0].text, contains('calling console.time'));
       expect(
@@ -376,7 +376,7 @@ main() {
             args: [server.emptyPage])
       ]);
       expect(message.text, contains('Access-Control-Allow-Origin'));
-      expect(message.type, equals('error'));
+      expect(message.type, equals(ConsoleMessageType.error));
     });
     test('should have location when fetch fails', () async {
       // The point of this test is to make sure that we report console messages from
@@ -385,7 +385,7 @@ main() {
       var message = await waitFutures(page.onConsole.first,
           [page.setContent("<script>fetch('http://wat');</script>")]);
       expect(message.text, contains('ERR_NAME_NOT_RESOLVED'));
-      expect(message.type, equals('error'));
+      expect(message.type, equals(ConsoleMessageType.error));
       expect(message.url, equals('http://wat/'));
       expect(message.lineNumber, isNull);
     });
@@ -394,7 +394,7 @@ main() {
       var message = await waitFutures(page.onConsole.first,
           [page.goto(server.prefix + '/consolelog.html')]);
       expect(message.text, equals('yellow'));
-      expect(message.type, equals('log'));
+      expect(message.type, equals(ConsoleMessageType.log));
       expect(message.url, equals(server.prefix + '/consolelog.html'));
       expect(message.lineNumber, equals(7));
       expect(message.columnNumber, equals(14));

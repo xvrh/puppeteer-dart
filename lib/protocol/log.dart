@@ -143,20 +143,19 @@ class LogEntry {
 }
 
 class LogEntrySource {
-  static const LogEntrySource xml = LogEntrySource._('xml');
-  static const LogEntrySource javascript = LogEntrySource._('javascript');
-  static const LogEntrySource network = LogEntrySource._('network');
-  static const LogEntrySource storage = LogEntrySource._('storage');
-  static const LogEntrySource appcache = LogEntrySource._('appcache');
-  static const LogEntrySource rendering = LogEntrySource._('rendering');
-  static const LogEntrySource security = LogEntrySource._('security');
-  static const LogEntrySource deprecation = LogEntrySource._('deprecation');
-  static const LogEntrySource worker = LogEntrySource._('worker');
-  static const LogEntrySource violation = LogEntrySource._('violation');
-  static const LogEntrySource intervention = LogEntrySource._('intervention');
-  static const LogEntrySource recommendation =
-      LogEntrySource._('recommendation');
-  static const LogEntrySource other = LogEntrySource._('other');
+  static const xml = LogEntrySource._('xml');
+  static const javascript = LogEntrySource._('javascript');
+  static const network = LogEntrySource._('network');
+  static const storage = LogEntrySource._('storage');
+  static const appcache = LogEntrySource._('appcache');
+  static const rendering = LogEntrySource._('rendering');
+  static const security = LogEntrySource._('security');
+  static const deprecation = LogEntrySource._('deprecation');
+  static const worker = LogEntrySource._('worker');
+  static const violation = LogEntrySource._('violation');
+  static const intervention = LogEntrySource._('intervention');
+  static const recommendation = LogEntrySource._('recommendation');
+  static const other = LogEntrySource._('other');
   static const values = {
     'xml': xml,
     'javascript': javascript,
@@ -193,10 +192,10 @@ class LogEntrySource {
 }
 
 class LogEntryLevel {
-  static const LogEntryLevel verbose = LogEntryLevel._('verbose');
-  static const LogEntryLevel info = LogEntryLevel._('info');
-  static const LogEntryLevel warning = LogEntryLevel._('warning');
-  static const LogEntryLevel error = LogEntryLevel._('error');
+  static const verbose = LogEntryLevel._('verbose');
+  static const info = LogEntryLevel._('info');
+  static const warning = LogEntryLevel._('warning');
+  static const error = LogEntryLevel._('error');
   static const values = {
     'verbose': verbose,
     'info': info,
@@ -250,19 +249,13 @@ class ViolationSetting {
 }
 
 class ViolationSettingName {
-  static const ViolationSettingName longTask =
-      ViolationSettingName._('longTask');
-  static const ViolationSettingName longLayout =
-      ViolationSettingName._('longLayout');
-  static const ViolationSettingName blockedEvent =
-      ViolationSettingName._('blockedEvent');
-  static const ViolationSettingName blockedParser =
-      ViolationSettingName._('blockedParser');
-  static const ViolationSettingName discouragedApiUse =
-      ViolationSettingName._('discouragedAPIUse');
-  static const ViolationSettingName handler = ViolationSettingName._('handler');
-  static const ViolationSettingName recurringHandler =
-      ViolationSettingName._('recurringHandler');
+  static const longTask = ViolationSettingName._('longTask');
+  static const longLayout = ViolationSettingName._('longLayout');
+  static const blockedEvent = ViolationSettingName._('blockedEvent');
+  static const blockedParser = ViolationSettingName._('blockedParser');
+  static const discouragedApiUse = ViolationSettingName._('discouragedAPIUse');
+  static const handler = ViolationSettingName._('handler');
+  static const recurringHandler = ViolationSettingName._('recurringHandler');
   static const values = {
     'longTask': longTask,
     'longLayout': longLayout,

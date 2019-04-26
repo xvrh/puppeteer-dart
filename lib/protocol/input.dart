@@ -437,9 +437,9 @@ class TouchPoint {
 }
 
 class GestureSourceType {
-  static const GestureSourceType default$ = GestureSourceType._('default');
-  static const GestureSourceType touch = GestureSourceType._('touch');
-  static const GestureSourceType mouse = GestureSourceType._('mouse');
+  static const default$ = GestureSourceType._('default');
+  static const touch = GestureSourceType._('touch');
+  static const mouse = GestureSourceType._('mouse');
   static const values = {
     'default': default$,
     'touch': touch,

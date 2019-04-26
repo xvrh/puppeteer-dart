@@ -15,5 +15,11 @@ export 'src/page/lifecycle_watcher.dart' show Until;
 export 'src/page/mouse.dart' show MouseButton;
 export 'src/page/network_manager.dart' show NetworkRequest, NetworkResponse;
 export 'src/page/page.dart'
-    show Page, PdfMargins, PaperFormat, ScreenshotFormat, ConsoleMessage;
+    show
+        Page,
+        PdfMargins,
+        PaperFormat,
+        ScreenshotFormat,
+        ConsoleMessage,
+        ConsoleMessageType;
 export 'src/puppeteer.dart' show puppeteer;

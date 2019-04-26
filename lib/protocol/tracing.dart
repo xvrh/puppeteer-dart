@@ -281,14 +281,12 @@ class TraceConfig {
 }
 
 class TraceConfigRecordMode {
-  static const TraceConfigRecordMode recordUntilFull =
-      TraceConfigRecordMode._('recordUntilFull');
-  static const TraceConfigRecordMode recordContinuously =
+  static const recordUntilFull = TraceConfigRecordMode._('recordUntilFull');
+  static const recordContinuously =
       TraceConfigRecordMode._('recordContinuously');
-  static const TraceConfigRecordMode recordAsMuchAsPossible =
+  static const recordAsMuchAsPossible =
       TraceConfigRecordMode._('recordAsMuchAsPossible');
-  static const TraceConfigRecordMode echoToConsole =
-      TraceConfigRecordMode._('echoToConsole');
+  static const echoToConsole = TraceConfigRecordMode._('echoToConsole');
   static const values = {
     'recordUntilFull': recordUntilFull,
     'recordContinuously': recordContinuously,
@@ -319,8 +317,8 @@ class TraceConfigRecordMode {
 /// Data format of a trace. Can be either the legacy JSON format or the
 /// protocol buffer format. Note that the JSON format will be deprecated soon.
 class StreamFormat {
-  static const StreamFormat json = StreamFormat._('json');
-  static const StreamFormat proto = StreamFormat._('proto');
+  static const json = StreamFormat._('json');
+  static const proto = StreamFormat._('proto');
   static const values = {
     'json': json,
     'proto': proto,
@@ -347,8 +345,8 @@ class StreamFormat {
 
 /// Compression type to use for traces returned via streams.
 class StreamCompression {
-  static const StreamCompression none = StreamCompression._('none');
-  static const StreamCompression gzip = StreamCompression._('gzip');
+  static const none = StreamCompression._('none');
+  static const gzip = StreamCompression._('gzip');
   static const values = {
     'none': none,
     'gzip': gzip,

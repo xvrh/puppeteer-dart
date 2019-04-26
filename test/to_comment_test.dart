@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import '../tool/generate_domains.dart';
+import '../tool/generate_protocol.dart';
 
 main() {
   test('toComment should replace <code> to quote', () {

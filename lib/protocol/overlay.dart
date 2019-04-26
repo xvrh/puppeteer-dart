@@ -368,13 +368,11 @@ class HighlightConfig {
 }
 
 class InspectMode {
-  static const InspectMode searchForNode = InspectMode._('searchForNode');
-  static const InspectMode searchForUaShadowDom =
-      InspectMode._('searchForUAShadowDOM');
-  static const InspectMode captureAreaScreenshot =
-      InspectMode._('captureAreaScreenshot');
-  static const InspectMode showDistances = InspectMode._('showDistances');
-  static const InspectMode none = InspectMode._('none');
+  static const searchForNode = InspectMode._('searchForNode');
+  static const searchForUaShadowDom = InspectMode._('searchForUAShadowDOM');
+  static const captureAreaScreenshot = InspectMode._('captureAreaScreenshot');
+  static const showDistances = InspectMode._('showDistances');
+  static const none = InspectMode._('none');
   static const values = {
     'searchForNode': searchForNode,
     'searchForUAShadowDOM': searchForUaShadowDom,
