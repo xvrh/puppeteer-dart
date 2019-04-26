@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-
 // ignore: deprecated_member_use
 import 'package:analyzer/analyzer.dart';
 import 'package:dart_style/dart_style.dart';
@@ -192,12 +191,9 @@ $code
     var lines = LineSplitter.split(code).skip(1);
     lines = lines.take(lines.length - 1);
 
-
     lines = lines.join('\n').trimRight().split('\n');
 
-    code = lines
-        .map((line) => line.substring(min(line.length, 2)))
-        .join('\n');
+    code = lines.map((line) => line.substring(min(line.length, 2))).join('\n');
 
     return code.replaceAll('//+', '');
   }

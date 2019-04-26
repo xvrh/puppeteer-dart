@@ -1,8 +1,6 @@
 import 'dart:io';
-
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
-
 import 'utils.dart';
 
 // The tests in this file are extracted by the script `tool/inject_examples_to_doc.dart`
@@ -96,20 +94,20 @@ main() {
   group('Page', () {
     group('class', () {
       test(0, () async {
-      //---
-      //+ import 'dart:io';
-      //+ import 'package:puppeteer/puppeteer.dart';
+        //---
+        //+ import 'dart:io';
+        //+ import 'package:puppeteer/puppeteer.dart';
 
-      main() async {
-      var browser = await puppeteer.launch();
-      var page = await browser.newPage();
-      await page.goto('https://example.com');
-      await File('screenshot.png').writeAsBytes(await page.screenshot());
-      await browser.close();
-      }
+        main() async {
+          var browser = await puppeteer.launch();
+          var page = await browser.newPage();
+          await page.goto('https://example.com');
+          await File('screenshot.png').writeAsBytes(await page.screenshot());
+          await browser.close();
+        }
 
-      //---
-      await main();
+        //---
+        await main();
       });
       test(1, () async {
         page.onLoad.listen((_) => print('Page loaded!'));
@@ -118,6 +116,7 @@ main() {
         logRequest(NetworkRequest interceptedRequest) {
           print('A request was made: ${interceptedRequest.url}');
         }
+
         var subscription = page.onRequest.listen(logRequest);
         await subscription.cancel();
       });

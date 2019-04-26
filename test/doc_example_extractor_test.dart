@@ -1,11 +1,7 @@
-
-
 import 'package:test/test.dart';
-
 import '../tool/inject_examples_to_doc.dart';
 
 main() {
-
   test('Extract snippets', () {
     var snippets = extractSnippets(_testFileCode);
 
@@ -45,7 +41,8 @@ main() async {
 
     expect(snippets[5].target, equals('Page.class'));
     expect(snippets[5].index, equals(1));
-    expect(snippets[5].code, equals("page.onLoad.listen((_) => print('Page loaded!'));"));
+    expect(snippets[5].code,
+        equals("page.onLoad.listen((_) => print('Page loaded!'));"));
 
     expect(snippets[8].target, equals('PageFrame.Seval'));
     expect(snippets[8].code, equals(r'''
@@ -63,7 +60,6 @@ var html = await frame.$eval(
     String results = replaceExamples(_libCode, snippets);
 
     expect(results, equals(_expectedLibCode));
-
   });
 }
 
