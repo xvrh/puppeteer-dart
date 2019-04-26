@@ -159,7 +159,7 @@ main() {
       expect(navigatedFrames.length, equals(1));
     },
         // TODO(xha): Deflake
-        skip: false);
+        skip: true);
     test('should support framesets', () async {
       var attachedFrames = <PageFrame>[];
       var detachedFrames = <PageFrame>[];
