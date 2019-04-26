@@ -188,9 +188,10 @@ class Browser {
   ///
   /// An example of finding a target for a page opened via window.open:
   /// ```dart
-  /// await page.evaluate("() => window.open('https://www.example.com/')");
-  /// var newWindowTarget = await browser
+  /// var newWindowTarget = browser
   ///     .waitForTarget((target) => target.url == 'https://www.example.com/');
+  /// await page.evaluate("() => window.open('https://www.example.com/')");
+  /// await newWindowTarget;
   /// ```
   Future<Target> waitForTarget(bool Function(Target) predicate,
       {Duration timeout}) {

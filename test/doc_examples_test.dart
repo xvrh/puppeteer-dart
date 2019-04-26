@@ -58,9 +58,10 @@ main() {
     });
     test('waitForTarget', () async {
       //---
-      await page.evaluate("() => window.open('https://www.example.com/')");
-      var newWindowTarget = await browser
+      var newWindowTarget = browser
           .waitForTarget((target) => target.url == 'https://www.example.com/');
+      await page.evaluate("() => window.open('https://www.example.com/')");
+      await newWindowTarget;
       //---
       newWindowTarget.toString();
     });
@@ -81,6 +82,7 @@ main() {
   });
   group('Dialog', () {
     test('class', () async {
+      //----
       var browser = await puppeteer.launch();
       var page = await browser.newPage();
       page.onDialog.listen((dialog) async {
@@ -89,6 +91,8 @@ main() {
         await browser.close();
       });
       await page.evaluate("() => alert('1')");
+      //---
+      await browser.close();
     });
   });
   group('Page', () {
@@ -102,7 +106,7 @@ main() {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           await page.goto('https://example.com');
-          await File('screenshot.png').writeAsBytes(await page.screenshot());
+          await File('_screenshot.png').writeAsBytes(await page.screenshot());
           await browser.close();
         }
 

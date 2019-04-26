@@ -43,7 +43,7 @@ import 'worker.dart';
 ///   var browser = await puppeteer.launch();
 ///   var page = await browser.newPage();
 ///   await page.goto('https://example.com');
-///   await File('screenshot.png').writeAsBytes(await page.screenshot());
+///   await File('_screenshot.png').writeAsBytes(await page.screenshot());
 ///   await browser.close();
 /// }
 /// ```
