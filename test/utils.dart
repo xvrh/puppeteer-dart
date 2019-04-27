@@ -58,6 +58,8 @@ class Server {
 
   String get hostUrl => 'http://localhost:${_httpServer.port}';
 
+  String get docExamplesUrl => assetUrl('doc_examples.html');
+
   String get prefix => p.url.join(hostUrl, _assetFolder);
 
   String get crossProcessPrefix =>

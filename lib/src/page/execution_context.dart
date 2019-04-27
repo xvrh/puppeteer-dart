@@ -107,7 +107,7 @@ class ExecutionContext {
       }
     }
     if (arg is JsHandle) {
-      if (arg.context != this) {
+      if (arg.executionContext != this) {
         throw Exception(
             'JSHandles can be evaluated only in the context they were created!');
       }
@@ -142,7 +142,7 @@ class ExecutionContext {
   }
 
   Future<ElementHandle> adoptElementHandle(ElementHandle elementHandle) async {
-    assert(elementHandle.context != this,
+    assert(elementHandle.executionContext != this,
         'Cannot adopt handle that already belongs to this execution context');
     assert(world != null, 'Cannot adopt handle without DOMWorld');
 

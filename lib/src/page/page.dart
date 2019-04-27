@@ -353,6 +353,36 @@ class Page {
     return mainFrame.$(selector);
   }
 
+  /// The only difference between `page.evaluate` and `page.evaluateHandle` is
+  /// that `page.evaluateHandle` returns in-page object (JSHandle).
+  ///
+  /// If the function passed to the `page.evaluateHandle` returns a [Promise],
+  /// then `page.evaluateHandle` would wait for the promise to resolve and
+  /// return its value.
+  ///
+  /// A string can also be passed in instead of a function:
+  /// ```dart
+  /// // Get an handle for the 'document'
+  /// var aHandle = await page.evaluateHandle('document');
+  /// ```
+  ///
+  /// [JSHandle] instances can be passed as arguments to the `page.evaluateHandle`:
+  /// ```dart
+  /// var aHandle = await page.evaluateHandle('() => document.body');
+  /// var resultHandle =
+  ///     await page.evaluateHandle('body => body.innerHTML', args: [aHandle]);
+  /// print(await resultHandle.jsonValue);
+  /// await resultHandle.dispose();
+  /// ```
+  ///
+  /// Shortcut for [Page.mainFrame.executionContext.evaluateHandle].
+  ///
+  /// Arguments:
+  /// - [pageFunction] Function to be evaluated in the page context
+  /// - [args] Arguments to pass to [pageFunction]
+  ///
+  /// returns: Future which resolves to the return value of `pageFunction` as
+  /// in-page object (JSHandle)
   Future<JsHandle> evaluateHandle(@Language('js') String pageFunction,
       {List args}) async {
     var context = await mainFrame.executionContext;
@@ -426,7 +456,9 @@ class Page {
     return mainFrame.$x(expression);
   }
 
-  Future<List<Cookie>> cookies(List<String> urls) {
+  /// If no URLs are specified, this method returns cookies for the current page URL.
+  /// If URLs are specified, only cookies for those URLs are returned.
+  Future<List<Cookie>> cookies({List<String> urls}) {
     return devTools.network.getCookies(urls: urls);
   }
 
@@ -662,6 +694,28 @@ function deliverError(name, seq, message, stack) {
     await devTools.page.bringToFront();
   }
 
+  /// Emulates given device metrics and user agent. This method is a shortcut
+  /// for calling two methods:
+  /// - [Page.setUserAgent]
+  /// - [Page.setViewport]
+  ///
+  /// To aid emulation, puppeteer provides a list of device descriptors which can
+  ///  be obtained via the [puppeteer.devices].
+  /// Below is an example of emulating an iPhone 6 in puppeteer:
+  ///
+  /// ```dart
+  /// var iPhone = puppeteer.devices.iPhone6;
+  ///
+  /// var browser = await puppeteer.launch();
+  /// var page = await browser.newPage();
+  /// await page.emulate(iPhone);
+  /// await page.goto('https://example.com');
+  /// // other actions...
+  /// await browser.close();
+  /// ```
+  ///
+  /// List of all available devices is available in the source code:
+  /// [devices.dart](https://github.com/xvrh/puppeteer-dart/blob/master/lib/src/devices.dart).
   Future<void> emulate(Device device) async {
     await setViewport(device.viewport);
     await setUserAgent(device.userAgent(
@@ -683,6 +737,9 @@ function deliverError(name, seq, message, stack) {
     return devTools.page.setBypassCSP(enabled);
   }
 
+  /// Changes the CSS media type of the page.
+  /// The only allowed values are `'screen'`, `'print'` and `null`.
+  /// Passing `null` disables media emulation.
   Future<void> emulateMedia(String mediaType) {
     assert(mediaType == 'screen' || mediaType == 'print' || mediaType == null,
         'Unsupported media type: ' + mediaType);
@@ -700,6 +757,44 @@ function deliverError(name, seq, message, stack) {
 
   DeviceViewport get viewport => _viewport;
 
+  /// If the function passed to the [Page.evaluate] returns a [Promise], then
+  /// [Page.evaluate] would wait for the promise to resolve and return its value.
+  ///
+  /// If the function passed to the [page.evaluate] returns a non-[Serializable]
+  /// value, then `page.evaluate` resolves to null.
+  /// DevTools Protocol also supports transferring some additional values that
+  /// are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and
+  /// bigint literals.
+  ///
+  /// Passing arguments to `pageFunction`:
+  /// ```dart
+  /// int result = await page.evaluate('''x => {
+  ///         return Promise.resolve(8 * x);
+  ///       }''', args: [7]);
+  /// print(result); // prints "56"
+  /// ```
+  ///
+  /// An expression can also be passed in instead of a function:
+  /// ```dart
+  /// print(await page.evaluate('1 + 2')); // prints "3"
+  /// var x = 10;
+  /// print(await page.evaluate('1 + $x')); // prints "11"
+  /// ```
+  ///
+  /// [ElementHandle] instances can be passed as arguments to the [Page.evaluate]:
+  /// ```dart
+  /// var bodyHandle = await page.$('body');
+  /// var html = await page.evaluate('body => body.innerHTML', args: [bodyHandle]);
+  /// await bodyHandle.dispose();
+  /// print(html);
+  /// ```
+  ///
+  /// Shortcut for [Page.mainFrame.evaluate].
+  ///
+  /// Arguments:
+  /// - [pageFunction] Function to be evaluated in the page context
+  /// - [args] Arguments to pass to `pageFunction`
+  /// - Returns: Future which resolves to the return value of `pageFunction`
   Future<T> evaluate<T>(@Language('js') String pageFunction, {List args}) {
     return _frameManager.mainFrame.evaluate<T>(pageFunction, args: args);
   }

@@ -187,6 +187,51 @@ main() {
         ]);
       });
     });
+    test('emulate', () async {
+      var iPhone = puppeteer.devices.iPhone6;
+
+      var browser = await puppeteer.launch();
+      var page = await browser.newPage();
+      await page.emulate(iPhone);
+      await page.goto(server.docExamplesUrl);
+      // other actions...
+      await browser.close();
+    });
+    group('evaluate', () {
+      test(0, () async {
+        int result = await page.evaluate('''x => {
+          return Promise.resolve(8 * x);
+        }''', args: [7]);
+        print(result); // prints "56"
+      });
+      test(1, () async {
+        print(await page.evaluate('1 + 2')); // prints "3"
+        var x = 10;
+        print(await page.evaluate('1 + $x')); // prints "11"
+      });
+      test(2, () async {
+        var bodyHandle = await page.$('body');
+        var html =
+            await page.evaluate('body => body.innerHTML', args: [bodyHandle]);
+        await bodyHandle.dispose();
+        print(html);
+      });
+    });
+    group('evaluateHandle', () {
+      test(0, () async {
+        //----
+        // Get an handle for the 'document'
+        var aHandle = await page.evaluateHandle('document');
+        //----
+        aHandle.toString();
+      });
+      test(1, () async {
+        var aHandle = await page.evaluateHandle('() => document.body');
+        var resultHandle = await page.evaluateHandle('body => body.innerHTML', args: [aHandle]);
+        print(await resultHandle.jsonValue);
+        await resultHandle.dispose();
+      });
+    });
   });
   group('PageFrame', () {
     test('Seval', () async {

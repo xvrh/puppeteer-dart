@@ -184,7 +184,9 @@ class CodeSnippet {
     code = code
         .replaceAll('_screenshot.png', 'screenshot.png')
         .replaceAll(r'${server.hostUrl}', 'https://example.com')
-        .replaceAll('server.hostUrl', "'https://example.com'");
+        .replaceAll('server.hostUrl', "'https://example.com'")
+        .replaceAll('server.docExamplesUrl', "'https://example.com'")
+        .replaceAll(r'${server.docExamplesUrl}', "'https://example.com'");
     code = _formatter.format('''
 main() async {
 $code

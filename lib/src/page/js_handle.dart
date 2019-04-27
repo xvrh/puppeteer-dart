@@ -13,11 +13,11 @@ import 'page.dart';
 export '../../protocol/dom.dart' show BoxModel;
 
 class JsHandle {
-  final ExecutionContext context;
+  final ExecutionContext executionContext;
   final RemoteObject remoteObject;
   bool _disposed = false;
 
-  JsHandle(this.context, this.remoteObject);
+  JsHandle(this.executionContext, this.remoteObject);
 
   factory JsHandle.fromRemoteObject(
       ExecutionContext context, RemoteObject remoteObject) {
@@ -32,7 +32,7 @@ class JsHandle {
   bool get isDisposed => _disposed;
 
   Future<JsHandle> property(String propertyName) async {
-    var objectHandle = await context.evaluateHandle(
+    var objectHandle = await executionContext.evaluateHandle(
         //language=js
         '''
 function _(object, propertyName) {
@@ -53,20 +53,20 @@ function _(object, propertyName) {
   }
 
   Future<Map<String, JsHandle>> get properties async {
-    var response = await context.runtimeApi
+    var response = await executionContext.runtimeApi
         .getProperties(remoteObject.objectId, ownProperties: true);
     var result = <String, JsHandle>{};
     for (var property in response.result) {
       if (!property.enumerable) continue;
       result[property.name] =
-          JsHandle.fromRemoteObject(context, property.value);
+          JsHandle.fromRemoteObject(executionContext, property.value);
     }
     return result;
   }
 
   Future<dynamic> get jsonValue async {
     if (remoteObject.objectId != null) {
-      var response = await context.runtimeApi.callFunctionOn(
+      var response = await executionContext.runtimeApi.callFunctionOn(
           'function() { return this; }',
           objectId: remoteObject.objectId,
           returnByValue: true,
@@ -84,7 +84,7 @@ function _(object, propertyName) {
     _disposed = true;
 
     if (remoteObject.objectId != null) {
-      await context.runtimeApi
+      await executionContext.runtimeApi
           .releaseObject(remoteObject.objectId)
           .catchError((_) {
         // Exceptions might happen in case of a page been navigated or closed.
@@ -117,15 +117,15 @@ class ElementHandle extends JsHandle {
   ElementHandle get asElement => this;
 
   Future<PageFrame> get contentFrame async {
-    var nodeInfo =
-        await context.domApi.describeNode(objectId: remoteObject.objectId);
+    var nodeInfo = await executionContext.domApi
+        .describeNode(objectId: remoteObject.objectId);
 
     if (nodeInfo.frameId == null) return null;
     return frameManager.frame(nodeInfo.frameId);
   }
 
   Future<void> _scrollIntoViewIfNeeded() async {
-    var error = await context.evaluate(
+    var error = await executionContext.evaluate(
         //language=js
         '''
 async function _(element, pageJavascriptEnabled) {
@@ -159,11 +159,11 @@ async function _(element, pageJavascriptEnabled) {
   }
 
   Future<Point> _clickablePoint() async {
-    var quads = await context.domApi
+    var quads = await executionContext.domApi
         .getContentQuads(objectId: remoteObject.objectId)
         .catchError((_) => null,
             test: ServerException.matcher('Could not compute content quads.'));
-    var layoutMetrics = await context.pageApi.getLayoutMetrics();
+    var layoutMetrics = await executionContext.pageApi.getLayoutMetrics();
 
     if (quads == null || quads.isEmpty) {
       throw NodeIsNotVisibleException();
@@ -236,7 +236,7 @@ async function _(element, pageJavascriptEnabled) {
   }
 
   Future<void> uploadFile(List<File> files) async {
-    await context.domApi.setFileInputFiles(
+    await executionContext.domApi.setFileInputFiles(
         files.map((file) => file.absolute.path).toList(),
         objectId: remoteObject.objectId);
   }
@@ -248,7 +248,7 @@ async function _(element, pageJavascriptEnabled) {
   }
 
   Future<void> focus() {
-    return context.evaluate(
+    return executionContext.evaluate(
         //language=js
         'function _(element) {return element.focus();}',
         args: [this]);
@@ -279,7 +279,7 @@ async function _(element, pageJavascriptEnabled) {
   }
 
   Future<BoxModel> boxModel() {
-    return context.domApi
+    return executionContext.domApi
         .getBoxModel(objectId: remoteObject.objectId)
         .catchError((_) => null,
             test: ServerException.matcher('Could not compute box model.'));
@@ -314,7 +314,7 @@ async function _(element, pageJavascriptEnabled) {
     assert(boundingBox.height != 0, 'Node has 0 height.');
 
     var layoutViewPort =
-        (await context.pageApi.getLayoutMetrics()).layoutViewport;
+        (await executionContext.pageApi.getLayoutMetrics()).layoutViewport;
 
     var clip = Rectangle(
         boundingBox.left + layoutViewPort.pageX,
@@ -336,7 +336,7 @@ async function _(element, pageJavascriptEnabled) {
   }
 
   Future<ElementHandle> $(String selector) async {
-    var handle = await context.evaluateHandle(
+    var handle = await executionContext.evaluateHandle(
         //language=js
         '(element, selector) => element.querySelector(selector);',
         args: [this, selector]);
@@ -347,7 +347,7 @@ async function _(element, pageJavascriptEnabled) {
   }
 
   Future<List<ElementHandle>> $$(String selector) async {
-    var arrayHandle = await context.evaluateHandle(
+    var arrayHandle = await executionContext.evaluateHandle(
         //language=js
         'function _(element, selector) {return element.querySelectorAll(selector);}',
         args: [this, selector]);
@@ -374,14 +374,14 @@ async function _(element, pageJavascriptEnabled) {
       allArgs.addAll(args);
     }
 
-    T result = await context.evaluate<T>(pageFunction, args: allArgs);
+    T result = await executionContext.evaluate<T>(pageFunction, args: allArgs);
     await elementHandle.dispose();
     return result;
   }
 
   Future<T> $$eval<T>(String selector, @Language('js') String pageFunction,
       {List args}) async {
-    var arrayHandle = await context.evaluateHandle(
+    var arrayHandle = await executionContext.evaluateHandle(
         //language=js
         'function _(element, selector) {return Array.from(element.querySelectorAll(selector));}',
         args: [this, selector]);
@@ -391,13 +391,13 @@ async function _(element, pageJavascriptEnabled) {
       allArgs.addAll(args);
     }
 
-    T result = await context.evaluate<T>(pageFunction, args: allArgs);
+    T result = await executionContext.evaluate<T>(pageFunction, args: allArgs);
     await arrayHandle.dispose();
     return result;
   }
 
   Future<List<ElementHandle>> $x(String expression) async {
-    var arrayHandle = await context.evaluateHandle(
+    var arrayHandle = await executionContext.evaluateHandle(
         //language=js
         '''
 function _(element, expression) {
@@ -421,7 +421,7 @@ function _(element, expression) {
   }
 
   Future<bool> get isIntersectingViewport {
-    return context.evaluate(
+    return executionContext.evaluate(
         //language=js
         '''
 async function _(element) {
