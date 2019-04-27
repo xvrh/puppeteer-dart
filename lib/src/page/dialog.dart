@@ -13,9 +13,9 @@ export '../../protocol/page.dart' show DialogType;
 /// page.onDialog.listen((dialog) async {
 ///   print(dialog.message);
 ///   await dialog.dismiss();
-///   await browser.close();
 /// });
 /// await page.evaluate("() => alert('1')");
+/// await browser.close();
 /// ```
 class Dialog {
   final Page page;

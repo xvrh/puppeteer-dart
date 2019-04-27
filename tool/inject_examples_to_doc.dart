@@ -181,9 +181,10 @@ class CodeSnippet {
       : code = _fixCode(code);
 
   static String _fixCode(String code) {
-    //TODO(xha): formatter le code: le mettre dans une fausse méthode main(),
-    // faire le formattage, réextaire le contenu (sans le main)
-    // donc en skippant la première et dernière ligne.
+    code = code
+        .replaceAll('_screenshot.png', 'screenshot.png')
+        .replaceAll(r'${server.hostUrl}', 'https://example.com')
+        .replaceAll('server.hostUrl', "'https://example.com'");
     code = _formatter.format('''
 main() async {
 $code

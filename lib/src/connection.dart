@@ -28,7 +28,7 @@ class Connection implements Client {
   static int _lastId = 0;
   final WebSocket _webSocket;
   final String url;
-  final Map<int, Completer> _completers = {};
+  final Map<int, _Message> _messagesInFly = {};
   final Map<String, Session> sessions = {};
   final StreamController<Event> _eventController =
       StreamController<Event>.broadcast();
@@ -57,10 +57,10 @@ class Connection implements Client {
   @override
   Future<Map> send(String method, [Map parameters]) {
     var id = _rawSend(method, parameters);
-    var completer = Completer<Map>();
-    _completers[id] = completer;
+    var message = _Message(method);
+    _messagesInFly[id] = message;
 
-    return completer.future;
+    return message.completer.future;
   }
 
   int _rawSend(String method, Map parameters, {SessionID sessionId}) {
@@ -105,19 +105,21 @@ class Connection implements Client {
     } else if (sessionId != null) {
       var session = sessions[sessionId];
       if (session != null) {
+        _logger.fine('◀ RECV $message');
+
         session._onMessage(object);
       }
     } else if (id != null) {
-      _logger.fine('◀ RECV $message');
+      _logger.fine('◀ RECV $id $message');
 
-      Completer completer = _completers.remove(id);
-      assert(completer != null);
+      _Message messageInFly = _messagesInFly.remove(id);
+      assert(messageInFly != null);
 
       Map error = object['error'];
       if (error != null) {
-        completer.completeError(ServerException(error['message']));
+        messageInFly.completer.completeError(ServerException(error['message']));
       } else {
-        completer.complete(object['result']);
+        messageInFly.completer.complete(object['result']);
       }
     } else {
       String method = object['method'];
@@ -131,10 +133,10 @@ class Connection implements Client {
 
   void dispose() {
     _eventController.close();
-    for (Completer completer in _completers.values) {
-      completer.completeError(TargetClosedException());
+    for (var message in _messagesInFly.values) {
+      message.completer.completeError(TargetClosedException(message.method));
     }
-    _completers.clear();
+    _messagesInFly.clear();
 
     for (Session session in sessions.values) {
       session.dispose();
@@ -167,7 +169,7 @@ String _encodeMessage(int id, String method, Map<String, dynamic> parameters,
 class Session implements Client {
   final SessionID sessionId;
   final Connection connection;
-  final _completers = <int, Completer>{};
+  final _messagesInFly = <int, _Message>{};
   final _eventController = StreamController<Event>.broadcast(sync: true);
   final _onClose = Completer<void>();
 
@@ -180,10 +182,10 @@ class Session implements Client {
     }
     int id = connection._rawSend(method, parameters, sessionId: sessionId);
 
-    var completer = Completer<Map>();
-    _completers[id] = completer;
+    var message = _Message(method);
+    _messagesInFly[id] = message;
 
-    return completer.future;
+    return message.completer.future;
   }
 
   @override
@@ -194,12 +196,12 @@ class Session implements Client {
   _onMessage(Map object) {
     int id = object['id'];
     if (id != null) {
-      Completer completer = _completers.remove(id);
+      var message = _messagesInFly.remove(id);
       Map error = object['error'];
       if (error != null) {
-        completer.completeError(ServerException(error['message']));
+        message.completer.completeError(ServerException(error['message']));
       } else {
-        completer.complete(object['result']);
+        message.completer.complete(object['result']);
       }
     } else {
       _eventController.add(Event._(object['method'], object['params']));
@@ -216,10 +218,10 @@ class Session implements Client {
     if (_eventController.isClosed) return;
 
     _eventController.close();
-    for (Completer completer in _completers.values) {
-      completer.completeError(TargetClosedException());
+    for (var message in _messagesInFly.values) {
+      message.completer.completeError(TargetClosedException(message.method));
     }
-    _completers.clear();
+    _messagesInFly.clear();
     _onClose.complete();
   }
 }
@@ -236,4 +238,18 @@ class ServerException implements Exception {
       (e) => e is ServerException && e.message == message;
 }
 
-class TargetClosedException implements Exception {}
+class _Message {
+  final completer = Completer<Map>();
+  final String method;
+
+  _Message(this.method);
+}
+
+class TargetClosedException implements Exception {
+  final String method;
+
+  TargetClosedException(this.method);
+
+  @override
+  String toString() => 'TargetClosedException(method: $method)';
+}

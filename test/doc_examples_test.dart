@@ -33,7 +33,7 @@ main() {
       main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
-        await page.goto('https://example.com');
+        await page.goto(server.hostUrl);
         await browser.close();
       }
       //---
@@ -49,7 +49,7 @@ main() {
         // Create a new page in a pristine context.
         var page = await context.newPage();
         // Do stuff
-        await page.goto('https://example.com');
+        await page.goto(server.hostUrl);
         await browser.close();
       }
       //---
@@ -58,9 +58,9 @@ main() {
     });
     test('waitForTarget', () async {
       //---
-      var newWindowTarget = browser
-          .waitForTarget((target) => target.url == 'https://www.example.com/');
-      await page.evaluate("() => window.open('https://www.example.com/')");
+      var newWindowTarget =
+          browser.waitForTarget((target) => target.url == '${server.hostUrl}/');
+      await page.evaluate("() => window.open('${server.hostUrl}/')");
       await newWindowTarget;
       //---
       newWindowTarget.toString();
@@ -74,8 +74,8 @@ main() {
     });
     test('clearPermissionOverrides', () async {
       var context = browser.defaultBrowserContext;
-      await context.overridePermissions(
-          'https://example.com', [PermissionType.clipboardRead]);
+      await context
+          .overridePermissions(server.hostUrl, [PermissionType.clipboardRead]);
       // do stuff ..
       await context.clearPermissionOverrides();
     });
@@ -88,11 +88,10 @@ main() {
       page.onDialog.listen((dialog) async {
         print(dialog.message);
         await dialog.dismiss();
-        await browser.close();
       });
       await page.evaluate("() => alert('1')");
-      //---
       await browser.close();
+      //---
     });
   });
   group('Page', () {
@@ -105,7 +104,7 @@ main() {
         main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
-          await page.goto('https://example.com');
+          await page.goto(server.hostUrl);
           await File('_screenshot.png').writeAsBytes(await page.screenshot());
           await browser.close();
         }

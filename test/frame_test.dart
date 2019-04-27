@@ -142,7 +142,17 @@ main() {
       page.onFrameAttached.listen((frame) => attachedFrames.add(frame));
       page.onFrameDetached.listen((frame) => detachedFrames.add(frame));
       page.onFrameNavigated.listen((frame) => navigatedFrames.add(frame));
+
+      var eventsFuture = Future.wait([
+        page.onFrameAttached.take(4).toList(),
+        page.onFrameNavigated.take(5).toList()
+      ]);
+
       await page.goto(server.prefix + '/frames/nested-frames.html');
+
+      // Give a bit of time for the events to fire
+      await eventsFuture.timeout(Duration(milliseconds: 1000));
+
       expect(attachedFrames.length, equals(4));
       expect(detachedFrames.length, equals(0));
       expect(navigatedFrames.length, equals(5));
@@ -150,13 +160,21 @@ main() {
       attachedFrames.clear();
       detachedFrames.clear();
       navigatedFrames.clear();
+
+      eventsFuture = Future.wait([
+        page.onFrameDetached.take(4).toList(),
+        page.onFrameNavigated.take(1).toList()
+      ]);
+
       await page.goto(server.emptyPage);
+
+      // Give a bit of time for the events to fire
+      await eventsFuture.timeout(Duration(milliseconds: 1000));
+
       expect(attachedFrames.length, equals(0));
       expect(detachedFrames.length, equals(4));
       expect(navigatedFrames.length, equals(1));
-    },
-        // TODO(xha): Deflake
-        skip: true);
+    });
     test('should support framesets', () async {
       var attachedFrames = <PageFrame>[];
       var detachedFrames = <PageFrame>[];
@@ -164,7 +182,17 @@ main() {
       page.onFrameAttached.listen((frame) => attachedFrames.add(frame));
       page.onFrameDetached.listen((frame) => detachedFrames.add(frame));
       page.onFrameNavigated.listen((frame) => navigatedFrames.add(frame));
+
+      var eventsFuture = Future.wait([
+        page.onFrameAttached.take(4).toList(),
+        page.onFrameNavigated.take(5).toList()
+      ]);
+
       await page.goto(server.prefix + '/frames/frameset.html');
+
+      // Give a bit of time for the events to fire
+      await eventsFuture.timeout(Duration(milliseconds: 1000));
+
       expect(attachedFrames.length, equals(4));
       expect(detachedFrames.length, equals(0));
       expect(navigatedFrames.length, equals(5));
@@ -172,13 +200,21 @@ main() {
       attachedFrames.clear();
       detachedFrames.clear();
       navigatedFrames.clear();
+
+      eventsFuture = Future.wait([
+        page.onFrameDetached.take(4).toList(),
+        page.onFrameNavigated.take(1).toList()
+      ]);
+
       await page.goto(server.emptyPage);
+
+      // Give a bit of time for the events to fire
+      await eventsFuture.timeout(Duration(milliseconds: 1000));
+
       expect(attachedFrames.length, equals(0));
       expect(detachedFrames.length, equals(4));
       expect(navigatedFrames.length, equals(1));
-    },
-        // TODO(xha): Deflake
-        skip: true);
+    });
     test('should report frame from-inside shadow DOM', () async {
       await page.goto(server.prefix + '/shadow.html');
       await page.evaluate('''async url => {

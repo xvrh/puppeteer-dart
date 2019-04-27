@@ -188,9 +188,9 @@ class Browser {
   ///
   /// An example of finding a target for a page opened via window.open:
   /// ```dart
-  /// var newWindowTarget = browser
-  ///     .waitForTarget((target) => target.url == 'https://www.example.com/');
-  /// await page.evaluate("() => window.open('https://www.example.com/')");
+  /// var newWindowTarget =
+  ///     browser.waitForTarget((target) => target.url == 'https://example.com/');
+  /// await page.evaluate("() => window.open('https://example.com/')");
   /// await newWindowTarget;
   /// ```
   Future<Target> waitForTarget(bool Function(Target) predicate,
@@ -225,7 +225,11 @@ class Browser {
   /// Closes Chromium and all of its pages (if any were opened). The Browser
   /// object itself is considered to be disposed and cannot be used anymore.
   Future close() async {
+    // Try to give a chance to other message to arrive before we complete the future
+    // with an error
+    await Future.delayed(Duration.zero);
     await _closeCallback();
+
     _dispose();
     connection.dispose();
   }
