@@ -29,6 +29,41 @@ import 'network_manager.dart';
 import 'touchscreen.dart';
 import 'worker.dart';
 
+/// Page provides methods to interact with a single tab or extension background
+/// page in Chromium. One Browser instance might have multiple Page instances.
+///
+/// This example creates a page, navigates it to a URL, and then saves a
+/// screenshot:
+///
+/// ```dart
+///  import 'dart:io';
+///  import 'package:puppeteer/puppeteer.dart';
+///
+/// main() async {
+///   var browser = await puppeteer.launch();
+///   var page = await browser.newPage();
+///   await page.goto('https://example.com');
+///   await File('screenshot.png').writeAsBytes(await page.screenshot());
+///   await browser.close();
+/// }
+/// ```
+///
+/// The Page class emits various events which can be handled using any of Dart'
+/// native Stream methods, such as listen, first, map, where...
+///
+/// ```dart
+/// page.onLoad.listen((_) => print('Page loaded!'));
+/// ```
+///
+/// To unsubscribe from events use the [StreamSubscription.cancel] method:
+/// ```dart
+/// logRequest(NetworkRequest interceptedRequest) {
+///   print('A request was made: ${interceptedRequest.url}');
+/// }
+///
+/// var subscription = page.onRequest.listen(logRequest);
+/// await subscription.cancel();
+/// ```
 class Page {
   final Target target;
   final DevTools devTools;
@@ -153,6 +188,26 @@ class Page {
 
   Stream<Page> get onPopup => _onPopupController.stream;
 
+  /// Complete when the page closes.
+  Future<void> get onClose => target.onClose;
+
+  /// Emitted when JavaScript within the page calls one of console API methods,
+  /// e.g. console.log or console.dir. Also emitted if the page throws an error
+  /// or a warning.
+  ///
+  /// The arguments passed into console.log appear as arguments on the event
+  /// handler.
+  ///
+  /// An example of handling console event:
+  ///
+  /// ```dart
+  /// page.onConsole.listen((msg) {
+  ///   for (var i = 0; i < msg.args.length; ++i) {
+  ///     print('$i: ${msg.args[i]}');
+  ///   }
+  /// });
+  /// await page.evaluate("() => console.log('hello', 5, {foo: 'bar'})");
+  /// ```
   Stream<ConsoleMessage> get onConsole => _onConsoleController.stream;
 
   Stream<MonotonicTime> get onDomContentLoaded =>
@@ -165,8 +220,6 @@ class Page {
   Stream<Dialog> get onDialog => _onDialogController.stream;
 
   FrameManager get frameManager => _frameManager;
-
-  Future<void> get onClose => target.onClose;
 
   bool get isClosed => session.isClosed;
 

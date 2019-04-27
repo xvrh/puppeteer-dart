@@ -1,11 +1,8 @@
-import 'package:logging/logging.dart';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils.dart';
 
 main() {
-  Logger.root.onRecord.listen(print);
-
   Server server;
   Browser browser;
   Page page;

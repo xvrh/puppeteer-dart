@@ -3,6 +3,20 @@ import 'page.dart';
 
 export '../../protocol/page.dart' show DialogType;
 
+/// Dialog objects are dispatched by page via the 'onDialog' event.
+///
+/// An example of using Dialog class:
+///
+/// ```dart
+/// var browser = await puppeteer.launch();
+/// var page = await browser.newPage();
+/// page.onDialog.listen((dialog) async {
+///   print(dialog.message);
+///   await dialog.dismiss();
+/// });
+/// await page.evaluate("() => alert('1')");
+/// await browser.close();
+/// ```
 class Dialog {
   final Page page;
   final JavascriptDialogOpeningEvent _openingEvent;

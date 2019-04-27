@@ -52,12 +52,13 @@ class Puppeteer {
   /// Start a Chrome instance and connect to the DevTools endpoint.
   ///
   /// If [executablePath] is not provided and no environment variable
-  /// `puppeteer_PATH` is present, it will download the Chromium binaries
+  /// `PUPPETEER_EXECUTABLE_PATH` is present, it will download the Chromium binaries
   /// in a local folder (.local-chromium by default).
   ///
   /// ```
-  /// main() {
-  ///   puppeteer.launch();
+  /// main() async {
+  ///   var browser = await puppeteer.launch();
+  ///   await browser.close();
   /// }
   /// ```
   Future<Browser> launch(
@@ -150,14 +151,14 @@ Future<String> _waitForWebSocketUrl(Process chromeProcess) async {
 }
 
 Future<String> _inferExecutablePath() async {
-  var executablePath = Platform.environment['puppeteer_PATH'];
+  String executablePath = Platform.environment['PUPPETEER_EXECUTABLE_PATH'];
   if (executablePath != null) {
     var file = File(executablePath);
     if (!file.existsSync()) {
       executablePath = getExecutablePath(executablePath);
       if (!File(executablePath).existsSync()) {
-        throw 'The environment variable contains puppeteer_PATH with '
-            'value (${Platform.environment['puppeteer_PATH']}) but we cannot '
+        throw 'The environment variable contains PUPPETEER_EXECUTABLE_PATH with '
+            'value (${Platform.environment['PUPPETEER_EXECUTABLE_PATH']}) but we cannot '
             'find the Chrome executable';
       }
     }
