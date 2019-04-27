@@ -21,6 +21,7 @@ main() {
   setUp(() async {
     browser = await puppeteer.launch();
     page = await browser.newPage();
+    await page.goto(server.assetUrl('doc_examples.html'));
   });
 
   tearDown(() async {
@@ -133,10 +134,62 @@ main() {
       });
       await page.evaluate("() => console.log('hello', 5, {foo: 'bar'})");
     });
+    group('onPopup', () {
+      test(0, () async {
+        //----
+        var popupFuture = page.onPopup.first;
+        await page.click('a[target=_blank]');
+        Page popup = await popupFuture;
+        //----
+        popup.toString();
+      });
+      test(1, () async {
+        //----
+        var popupFuture = page.onPopup.first;
+        await page.evaluate("() => window.open('${server.hostUrl}')");
+        Page popup = await popupFuture;
+        //----
+        popup.toString();
+      });
+    });
+    test('SSeval', () async {
+      //---
+      var divsCounts = await page.$$eval('div', 'divs => divs.length');
+      //---
+      print(divsCounts);
+    });
+    test('Seval', () async {
+      //---
+      var searchValue =
+          await page.$eval('#search', 'function (el) { return el.value; }');
+      var preloadHref = await page.$eval(
+          'link[rel=preload]', 'function (el) { return el.href; }');
+      var html = await page.$eval(
+          '.main-container', 'function (e) { return e.outerHTML; }');
+      //---
+      searchValue.toString();
+      preloadHref.toString();
+      html.toString();
+    });
+    group('click', () {
+      test(0, () async {
+        //---
+        var responseFuture = page.waitForNavigation();
+        await page.click('a');
+        var response = await responseFuture;
+        //---
+        print(response);
+      });
+      test(1, () async {
+        await Future.wait([
+          page.waitForNavigation(),
+          page.click('a'),
+        ]);
+      });
+    });
   });
   group('PageFrame', () {
     test('Seval', () async {
-      await page.goto(server.assetUrl('doc_examples.html'));
       var frame = page.mainFrame;
       //---
       var searchValue =

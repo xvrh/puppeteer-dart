@@ -144,8 +144,10 @@ class Page {
 
   Session get session => devTools.client;
 
+  /// Get the browser the page belongs to.
   Browser get browser => target.browser;
 
+  /// Get the browser context that the page belongs to.
   BrowserContext get browserContext => target.browserContext;
 
   void _dispose() {
@@ -169,23 +171,44 @@ class Page {
 
   Stream<Worker> get onWorkerDestroyed => _workerDestroyed.stream;
 
+  /// Emitted when the page crashes.
   Stream get onPageCrashed => devTools.inspector.onTargetCrashed;
 
+  /// Emitted when a frame is attached.
   Stream<PageFrame> get onFrameAttached => _frameManager.onFrameAttached;
 
+  /// Emitted when a frame is detached.
   Stream<PageFrame> get onFrameDetached => _frameManager.onFrameDetached;
 
+  /// Emitted when a frame is navigated to a new url.
   Stream<PageFrame> get onFrameNavigated => _frameManager.onFrameNavigated;
 
+  /// Emitted when a page issues a request.
+  /// In order to intercept and mutate requests, see [Page.setRequestInterception].
   Stream<NetworkRequest> get onRequest => _networkManager.onRequest;
 
+  /// Emitted when a [response] is received.
   Stream<NetworkResponse> get onResponse => _networkManager.onResponse;
 
+  /// Emitted when a request fails, for example by timing out.
   Stream<NetworkRequest> get onRequestFailed => _networkManager.onRequestFailed;
 
+  /// Emitted when a request finishes successfully.
   Stream<NetworkRequest> get onRequestFinished =>
       _networkManager.onRequestFinished;
 
+  /// Emitted when the page opens a new tab or window.
+  /// ```dart
+  /// var popupFuture = page.onPopup.first;
+  /// await page.click('a[target=_blank]');
+  /// Page popup = await popupFuture;
+  /// ```
+  ///
+  /// ```dart
+  /// var popupFuture = page.onPopup.first;
+  /// await page.evaluate("() => window.open('https://example.com')");
+  /// Page popup = await popupFuture;
+  /// ```
   Stream<Page> get onPopup => _onPopupController.stream;
 
   /// Complete when the page closes.
@@ -210,13 +233,21 @@ class Page {
   /// ```
   Stream<ConsoleMessage> get onConsole => _onConsoleController.stream;
 
+  /// Emitted when the JavaScript [`DOMContentLoaded`](https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded)
+  /// event is dispatched.
   Stream<MonotonicTime> get onDomContentLoaded =>
       devTools.page.onDomContentEventFired;
 
+  /// Emitted when the JavaScript [`load`](https://developer.mozilla.org/en-US/docs/Web/Events/load)
+  /// event is dispatched.
   Stream<MonotonicTime> get onLoad => devTools.page.onLoadEventFired;
 
+  /// Emitted when an uncaught exception happens within the page.
   Stream<ClientError> get onError => _onErrorController.stream;
 
+  /// Emitted when a JavaScript dialog appears, such as `alert`, `prompt`,
+  /// `confirm` or `beforeunload`. Puppeteer can respond to the dialog via
+  /// [Dialog.accept] or [Dialog.dismiss] methods.
   Stream<Dialog> get onDialog => _onDialogController.stream;
 
   FrameManager get frameManager => _frameManager;
@@ -313,6 +344,11 @@ class Page {
     return _frameManager.networkManager.setOfflineMode(enabled);
   }
 
+  /// The method runs `document.querySelector` within the page. If no element matches the selector, the return value resolves to `null`.
+  ///
+  /// Shortcut for [Page.mainFrame.$(selector)].
+  ///
+  /// A [selector] to query page for
   Future<ElementHandle> $(String selector) {
     return mainFrame.$(selector);
   }
@@ -328,20 +364,64 @@ class Page {
     return context.queryObjects(prototypeHandle);
   }
 
+  /// This method runs `document.querySelector` within the page and passes it as
+  /// the first argument to `pageFunction`. If there's no element matching
+  /// `selector`, the method throws an error.
+  ///
+  /// If `pageFunction` returns a [Promise], then `page.$eval` would wait for
+  /// the promise to resolve and return its value.
+  ///
+  /// Examples:
+  /// ```dart
+  /// var searchValue =
+  ///     await page.$eval('#search', 'function (el) { return el.value; }');
+  /// var preloadHref = await page.$eval(
+  ///     'link[rel=preload]', 'function (el) { return el.href; }');
+  /// var html = await page.$eval(
+  ///     '.main-container', 'function (e) { return e.outerHTML; }');
+  /// ```
+  ///
+  /// Shortcut for [Page.mainFrame.$eval(selector, pageFunction)].
   Future<T> $eval<T>(String selector, @Language('js') String pageFunction,
       {List args}) {
     return mainFrame.$eval<T>(selector, pageFunction, args: args);
   }
 
+  /// This method runs `Array.from(document.querySelectorAll(selector))` within
+  /// the page and passes it as the first argument to `pageFunction`.
+  ///
+  /// If `pageFunction` returns a [Promise], then `page.$$eval` would wait for
+  /// the promise to resolve and return its value.
+  ///
+  /// Examples:
+  /// ```dart
+  /// var divsCounts = await page.$$eval('div', 'divs => divs.length');
+  /// ```
+  ///
+  /// Arguments:
+  /// A [selector] to query page for
+  /// [pageFunction] Function to be evaluated in browser context
+  /// [args] Arguments to pass to `pageFunction`
+  /// Returns a [Future] which resolves to the return value of `pageFunction`
   Future<T> $$eval<T>(String selector, @Language('js') String pageFunction,
       {List args}) {
     return mainFrame.$$eval<T>(selector, pageFunction, args: args);
   }
 
+  /// The method runs `document.querySelectorAll` within the page.
+  /// If no elements match the selector, the return value resolves to `[]`.
+  ///
+  /// Shortcut for [Page.mainFrame.$$(selector)].
   Future<List<ElementHandle>> $$(String selector) {
     return mainFrame.$$(selector);
   }
 
+  /// The method evaluates the XPath expression.
+  ///
+  /// Shortcut for [Page.mainFrame.$x(expression)]
+  ///
+  /// Arguments:
+  /// [expression]: Expression to [evaluate](https://developer.mozilla.org/en-US/docs/Web/API/Document/evaluate)
   Future<List<ElementHandle>> $x(String expression) {
     return mainFrame.$x(expression);
   }
@@ -377,12 +457,38 @@ class Page {
         latitude: latitude, longitude: longitude, accuracy: accuracy);
   }
 
+  /// Adds a `<script>` tag into the page with the desired url or content.
+  ///
+  /// Shortcut for [Page.mainFrame.addScriptTag].
+  ///
+  /// Arguments:
+  /// [url]: URL of a script to be added.
+  /// [file]: JavaScript file to be injected into frame
+  /// [content]: Raw JavaScript content to be injected into frame.
+  /// [type]: Script type. Use 'module' in order to load a Javascript ES6 module.
+  /// See [script](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script)
+  /// for more details.
+  ///
+  /// Returns a [Future<ElementHandle>] which resolves to the added tag when the
+  /// script's onload fires or when the script content was injected into frame.
   Future<ElementHandle> addScriptTag(
       {String url, File file, String content, String type}) {
     return mainFrame.addScriptTag(
         url: url, file: file, content: content, type: type);
   }
 
+  /// Adds a `<link rel="stylesheet">` tag into the page with the desired url or
+  /// a `<style type="text/css">` tag with the content.
+  ///
+  /// Shortcut for [Page.mainFrame.addStyleTag].
+  ///
+  /// Arguments:
+  /// [url]: URL of the `<link>` tag.
+  /// [file]: CSS file to be injected into frame.
+  /// [content]: Raw CSS content to be injected into frame.
+  ///
+  /// Returns a [Future<ElementHandle>] which resolves to the added tag when the
+  /// stylesheet's onload fires or when the CSS content was injected into frame.
   Future<ElementHandle> addStyleTag({String url, File file, String content}) {
     return mainFrame.addStyleTag(url: url, file: file, content: content);
   }
@@ -422,9 +528,12 @@ function addPageBinding(bindingName) {
         frameManager.frames.map((frame) => frame.evaluate(expression)));
   }
 
+  /// Provide credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
+  ///
+  /// To disable authentication, pass `null`.
   Future<void> authenticate({String userName, String password}) {
-    return _frameManager.networkManager
-        .authenticate(Credentials(userName, password));
+    return _frameManager.networkManager.authenticate(
+        userName == null ? null : Credentials(userName, password));
   }
 
   Future<void> setExtraHTTPHeaders(Map<String, String> headers) async {
@@ -482,6 +591,7 @@ function deliverError(name, seq, message, stack) {
     return mainFrame.url;
   }
 
+  /// Gets the full HTML contents of the page, including the doctype.
   Future<String> get content {
     return _frameManager.mainFrame.content;
   }
@@ -547,6 +657,7 @@ function deliverError(name, seq, message, stack) {
     return await navigationFuture;
   }
 
+  /// Brings page to front (activates tab).
   Future<void> bringToFront() async {
     await devTools.page.bringToFront();
   }
@@ -728,6 +839,14 @@ function deliverError(name, seq, message, stack) {
     return mainFrame.title;
   }
 
+  /// By default, [page.close] **does not** run beforeunload handlers.
+  ///
+  /// **NOTE** if `runBeforeUnload` is passed as true, a `beforeunload` dialog
+  /// might be summoned and should be handled manually via page's ['dialog'](#event-dialog) event.
+  ///
+  /// Arguments:
+  /// [runBeforeUnload]: Whether to run the
+  ///    [before unload](https://developer.mozilla.org/en-US/docs/Web/Events/beforeunload)
   Future<void> close({bool runBeforeUnload}) async {
     runBeforeUnload ??= false;
     if (runBeforeUnload) {
@@ -738,6 +857,40 @@ function deliverError(name, seq, message, stack) {
     }
   }
 
+  /// This method fetches an element with `selector`, scrolls it into view if
+  /// needed, and then uses [Page.mouse] to click in the center of the element.
+  /// If there's no element matching `selector`, the method throws an error.
+  ///
+  /// Bear in mind that if `click()` triggers a navigation event and there's a
+  /// separate `page.waitForNavigation()` promise to be resolved, you may end
+  /// up with a race condition that yields unexpected results. The correct
+  /// pattern for click and wait for navigation is the following:
+  ///
+  /// ```dart
+  /// var responseFuture = page.waitForNavigation();
+  /// await page.click('a');
+  /// var response = await responseFuture;
+  /// ```
+  ///
+  /// Or simpler, if you don't need the [NetworkResponse]
+  /// ```dart
+  /// await Future.wait([
+  ///   page.waitForNavigation(),
+  ///   page.click('a'),
+  /// ]);
+  /// ```
+  ///
+  /// Shortcut for [Page.mainFrame.click]
+  ///
+  /// Arguments:
+  /// [selector]: A [selector] to search for element to click. If there are
+  /// multiple elements satisfying the selector, the first will be clicked.
+  ///
+  /// [button]: <"left"|"right"|"middle"> Defaults to `left`
+  ///
+  /// [clickCount]: defaults to 1
+  ///
+  /// [delay]: Time to wait between `mousedown` and `mouseup`. Default to zero.
   Future<void> click(String selector,
       {Duration delay, MouseButton button, int clickCount}) {
     return mainFrame.click(selector,

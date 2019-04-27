@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1 (2019-04-27)
+
+- Add some documentation and examples in the source code (still work in
+progress: not all classes are documented yet).
+
 ## 1.2.0 (2019-04-24)
 
 - Start a browser with `puppeteer.launch` instead of

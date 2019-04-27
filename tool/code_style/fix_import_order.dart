@@ -60,8 +60,13 @@ String _reorderImports(String content, CompilationUnit unit) {
         Token token = directive.metadata?.beginToken ??
             directive.firstTokenAfterCommentAndMetadata;
 
-        bool hasTestMeta = _testContains(directive.metadata.toString(),
-            ['@TestOn', '@Skip', '@Timeout', '@OnPlatform', '@Tags']);
+        bool hasTestMeta = const [
+          '@TestOn',
+          '@Skip',
+          '@Timeout',
+          '@OnPlatform',
+          '@Tags'
+        ].any((tag) => directive.metadata.toList().contains(tag));
         if (hasTestMeta) {
           token = directive.firstTokenAfterCommentAndMetadata;
         }
@@ -129,13 +134,6 @@ String _reorderImports(String content, CompilationUnit unit) {
   newContent = _dartFormatter.format(newContent);
 
   return newContent;
-}
-
-bool _testContains(String stringToTest, List<String> searchs) {
-  for (String s in searchs) {
-    if (stringToTest.contains(s)) return true;
-  }
-  return false;
 }
 
 String _removeBlankLines(String content) {
