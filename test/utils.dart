@@ -60,6 +60,8 @@ class Server {
 
   String get docExamplesUrl => assetUrl('doc_examples.html');
 
+  String get docExamples2Url => assetUrl('doc_examples_2.html');
+
   String get prefix => p.url.join(hostUrl, _assetFolder);
 
   String get crossProcessPrefix =>

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:meta/meta.dart';
+import 'package:path/path.dart' as path;
 import '../../protocol/dev_tools.dart';
 import '../../protocol/dom.dart';
 import '../../protocol/log.dart';
@@ -65,7 +66,9 @@ import 'worker.dart';
 /// await subscription.cancel();
 /// ```
 class Page {
+  /// A target this page was created from.
   final Target target;
+
   final DevTools devTools;
   final _pageBindings = <String, Function>{};
   final _workers = <SessionID, Worker>{};
@@ -77,7 +80,37 @@ class Page {
       _onConsoleController = StreamController<ConsoleMessage>.broadcast(),
       _onDialogController = StreamController<Dialog>.broadcast();
   bool _javascriptEnabled = true;
-  Duration navigationTimeout;
+
+  /// Maximum navigation time in milliseconds
+  /// This setting will change the default maximum navigation time for the
+  /// following methods and related shortcuts:
+  /// - [Page.goBack]
+  /// - [Page.goForward]
+  /// - [Page.goto]
+  /// - [Page.reload]
+  /// - [Page.setContent]
+  /// - [Page.waitForNavigation]
+  ///
+  /// > **NOTE** [page.defaultNavigationTimeout] takes priority over [page.defaultTimeout]
+  Duration defaultNavigationTimeout;
+
+  /// Maximum time in milliseconds
+  ///
+  /// This setting will change the default maximum time for the following methods
+  /// and related shortcuts:
+  /// - [Page.goBack]
+  /// - [Page.goForward]
+  /// - [Page.goto]
+  /// - [Page.reload]
+  /// - [Page.setContent]
+  /// - [Page.waitForFunction]
+  /// - [Page.waitForNavigation]
+  /// - [Page.waitForRequest]
+  /// - [Page.waitForResponse]
+  /// - [Page.waitForSelector]
+  /// - [Page.waitForXPath]
+  ///
+  /// > **NOTE** [`page.defaultNavigationTimeout`] takes priority over [`page.defaultTimeout`]
   Duration defaultTimeout = Duration(seconds: 30);
   DeviceViewport _viewport;
   final EmulationManager _emulationManager;
@@ -165,7 +198,7 @@ class Page {
   NetworkManager get _networkManager => _frameManager.networkManager;
 
   Duration get navigationTimeoutOrDefault =>
-      navigationTimeout ?? defaultTimeout;
+      defaultNavigationTimeout ?? defaultTimeout;
 
   Stream<Worker> get onWorkerCreated => _workerCreated.stream;
 
@@ -252,8 +285,12 @@ class Page {
 
   FrameManager get frameManager => _frameManager;
 
+  /// Indicates that the page has been closed.
   bool get isClosed => session.isClosed;
 
+  /// The page's main frame.
+  ///
+  /// Page is guaranteed to have a main frame which persists during navigations.
   PageFrame get mainFrame => _frameManager.mainFrame;
 
   Keyboard get keyboard => _keyboard;
@@ -262,6 +299,7 @@ class Page {
 
   Mouse get mouse => _mouse;
 
+  /// An array of all frames attached to the page.
   List<PageFrame> get frames => frameManager.frames;
 
   void _onDialog(JavascriptDialogOpeningEvent event) {
@@ -336,10 +374,38 @@ class Page {
     }
   }
 
+  /// Whether to enable request interception.
+  ///
+  /// Activating request interception enables `request.abort`, `request.continue`
+  /// and `request.respond` methods. This provides the capability to modify
+  /// network requests that are made by a page.
+  ///
+  /// Once request interception is enabled, every request will stall unless it's
+  /// continued, responded or aborted.
+  /// An example of a naïve request interceptor that aborts all image requests:
+  ///
+  /// ```dart
+  /// var browser = await puppeteer.launch();
+  /// var page = await browser.newPage();
+  /// await page.setRequestInterception(true);
+  /// page.onRequest.listen((interceptedRequest) {
+  ///   if (interceptedRequest.url.endsWith('.png') ||
+  ///       interceptedRequest.url.endsWith('.jpg')) {
+  ///     interceptedRequest.abort();
+  ///   } else {
+  ///     interceptedRequest.continueRequest();
+  ///   }
+  /// });
+  /// await page.goto('https://example.com');
+  /// await browser.close();
+  /// ```
+  ///
+  /// > **NOTE** Enabling request interception disables page caching.
   Future<void> setRequestInterception(bool value) {
     return _frameManager.networkManager.setRequestInterception(value);
   }
 
+  /// When `true`, enables offline mode for the page.
   Future<void> setOfflineMode(bool enabled) {
     return _frameManager.networkManager.setOfflineMode(enabled);
   }
@@ -353,20 +419,20 @@ class Page {
     return mainFrame.$(selector);
   }
 
-  /// The only difference between `page.evaluate` and `page.evaluateHandle` is
-  /// that `page.evaluateHandle` returns in-page object (JSHandle).
+  /// The only difference between [Page.evaluate] and [Page.evaluateHandle] is
+  /// that [Page.evaluateHandle] returns in-page object (JSHandle).
   ///
-  /// If the function passed to the `page.evaluateHandle` returns a [Promise],
-  /// then `page.evaluateHandle` would wait for the promise to resolve and
+  /// If the function passed to the [Page.evaluateHandle] returns a [Promise],
+  /// then [Page.evaluateHandle] would wait for the promise to resolve and
   /// return its value.
   ///
-  /// A string can also be passed in instead of a function:
+  /// A JavaScript expression can also be passed in instead of a function:
   /// ```dart
   /// // Get an handle for the 'document'
   /// var aHandle = await page.evaluateHandle('document');
   /// ```
   ///
-  /// [JSHandle] instances can be passed as arguments to the `page.evaluateHandle`:
+  /// [JSHandle] instances can be passed as arguments to the [Page.evaluateHandle]:
   /// ```dart
   /// var aHandle = await page.evaluateHandle('() => document.body');
   /// var resultHandle =
@@ -377,7 +443,7 @@ class Page {
   ///
   /// Shortcut for [Page.mainFrame.executionContext.evaluateHandle].
   ///
-  /// Arguments:
+  /// Parameters:
   /// - [pageFunction] Function to be evaluated in the page context
   /// - [args] Arguments to pass to [pageFunction]
   ///
@@ -389,6 +455,29 @@ class Page {
     return context.evaluateHandle(pageFunction, args: args);
   }
 
+  /// The method iterates the JavaScript heap and finds all the objects with the
+  /// given prototype.
+  ///
+  /// ```dart
+  /// // Create a Map object
+  /// await page.evaluate('() => window.map = new Map()');
+  /// // Get a handle to the Map object prototype
+  /// var mapPrototype = await page.evaluateHandle('() => Map.prototype');
+  /// // Query all map instances into an array
+  /// var mapInstances = await page.queryObjects(mapPrototype);
+  /// // Count amount of map objects in heap
+  /// var count = await page.evaluate('maps => maps.length', args: [mapInstances]);
+  /// await mapInstances.dispose();
+  /// await mapPrototype.dispose();
+  /// ```
+  ///
+  /// Shortcut for [Page.mainFrame.executionContext.queryObjects].
+  ///
+  /// Parameters:
+  /// [prototypeHandle]: A handle to the object prototype.
+  ///
+  /// Returns a [Future] which completes to a handle to an array of objects with
+  /// this prototype.
   Future<JsHandle> queryObjects(JsHandle prototypeHandle) async {
     var context = await mainFrame.executionContext;
     return context.queryObjects(prototypeHandle);
@@ -428,7 +517,7 @@ class Page {
   /// var divsCounts = await page.$$eval('div', 'divs => divs.length');
   /// ```
   ///
-  /// Arguments:
+  /// Parameters:
   /// A [selector] to query page for
   /// [pageFunction] Function to be evaluated in browser context
   /// [args] Arguments to pass to `pageFunction`
@@ -450,7 +539,7 @@ class Page {
   ///
   /// Shortcut for [Page.mainFrame.$x(expression)]
   ///
-  /// Arguments:
+  /// Parameters:
   /// [expression]: Expression to [evaluate](https://developer.mozilla.org/en-US/docs/Web/API/Document/evaluate)
   Future<List<ElementHandle>> $x(String expression) {
     return mainFrame.$x(expression);
@@ -476,6 +565,14 @@ class Page {
     await devTools.network.setCookies(cookies);
   }
 
+  /// Sets the page's geolocation.
+  ///
+  /// ```dart
+  /// await page.setGeolocation(latitude: 59.95, longitude: 30.31667);
+  /// ```
+  ///
+  /// > **NOTE** Consider using [BrowserContext.overridePermissions] to grant
+  /// permissions for the page to read its geolocation.
   Future<void> setGeolocation(
       {num latitude, num longitude, num accuracy}) async {
     accuracy ??= 0;
@@ -493,7 +590,7 @@ class Page {
   ///
   /// Shortcut for [Page.mainFrame.addScriptTag].
   ///
-  /// Arguments:
+  /// Parameters:
   /// [url]: URL of a script to be added.
   /// [file]: JavaScript file to be injected into frame
   /// [content]: Raw JavaScript content to be injected into frame.
@@ -514,7 +611,7 @@ class Page {
   ///
   /// Shortcut for [Page.mainFrame.addStyleTag].
   ///
-  /// Arguments:
+  /// Parameters:
   /// [url]: URL of the `<link>` tag.
   /// [file]: CSS file to be injected into frame.
   /// [content]: Raw CSS content to be injected into frame.
@@ -546,6 +643,61 @@ function addPageBinding(bindingName) {
 }
 ''';
 
+  /// The method adds a function called `name` on the page's `window` object.
+  /// When called, the function executes `puppeteerFunction` in Dart and
+  /// returns a [Promise] which resolves to the return value of `puppeteerFunction`.
+  ///
+  /// If the `puppeteerFunction` returns a [Future], it will be awaited.
+  ///
+  /// > **NOTE** Functions installed via `page.exposeFunction` survive navigations.
+  ///
+  /// An example of adding an `md5` function into the page:
+  /// ```dart
+  /// import 'dart:convert';
+  /// import 'package:puppeteer/puppeteer.dart';
+  /// import 'package:crypto/crypto.dart' as crypto;
+  ///
+  /// main() async {
+  ///   var browser = await puppeteer.launch();
+  ///   var page = await browser.newPage();
+  ///   page.onConsole.listen((msg) => print(msg.text));
+  ///   await page.exposeFunction(
+  ///       'md5', (text) => crypto.md5.convert(utf8.encode(text)).toString());
+  ///   await page.evaluate(r'''async () => {
+  ///           // use window.md5 to compute hashes
+  ///           const myString = 'PUPPETEER';
+  ///           const myHash = await window.md5(myString);
+  ///           console.log(`md5 of ${myString} is ${myHash}`);
+  ///         }''');
+  ///   await browser.close();
+  /// }
+  /// ```
+  ///
+  /// An example of adding a `window.readfile` function into the page:
+  ///
+  /// ```dart
+  /// import 'dart:io';
+  /// import 'package:puppeteer/puppeteer.dart';
+  ///
+  /// main() async {
+  ///   var browser = await puppeteer.launch();
+  ///   var page = await browser.newPage();
+  ///   page.onConsole.listen((msg) => print(msg.text));
+  ///   await page.exposeFunction('readfile', (String path) async {
+  ///     return File(path).readAsString();
+  ///   });
+  ///   await page.evaluate('''async () => {
+  ///           // use window.readfile to read contents of a file
+  ///           const content = await window.readfile('test/assets/simple.json');
+  ///           console.log(content);
+  ///         }''');
+  ///   await browser.close();
+  /// }
+  /// ```
+  ///
+  /// Parameters:
+  /// - [name]: Name of the function on the window object
+  //- [puppeteerFunction]: Callback function which will be called in Dart's context.
   Future<void> exposeFunction(String name, Function callbackFunction) async {
     if (_pageBindings.containsKey(name)) {
       throw Exception(
@@ -568,10 +720,15 @@ function addPageBinding(bindingName) {
         userName == null ? null : Credentials(userName, password));
   }
 
+  /// The extra HTTP headers will be sent with every request the page initiates.
+  ///
+  /// > **NOTE** page.setExtraHTTPHeaders does not guarantee the order of headers
+  ///  in the outgoing requests.
   Future<void> setExtraHTTPHeaders(Map<String, String> headers) async {
     await _frameManager.networkManager.setExtraHTTPHeaders(headers);
   }
 
+  /// Specific user agent to use in this page
   Future<void> setUserAgent(String userAgent) async {
     await _frameManager.networkManager.setUserAgent(userAgent);
   }
@@ -582,6 +739,7 @@ function addPageBinding(bindingName) {
 
   void _handleTargetCrashed(_) {
     _onErrorController.add(ClientError.pageCrashed());
+    Future(() => _dispose());
   }
 
   Future _onBindingCalled(BindingCalledEvent event) async {
@@ -619,6 +777,7 @@ function deliverError(name, seq, message, stack) {
 }
 ''';
 
+  /// This is a shortcut for [page.mainFrame.url]
   String get url {
     return mainFrame.url;
   }
@@ -628,17 +787,79 @@ function deliverError(name, seq, message, stack) {
     return _frameManager.mainFrame.content;
   }
 
+  /// Parameters:
+  /// [html]: HTML markup to assign to the page.
   Future<void> setContent(String html, {Duration timeout, Until wait}) {
     return _frameManager.mainFrame
         .setContent(html, timeout: timeout, wait: wait);
   }
 
+  /// The [Page.goto] will throw an error if:
+  /// - there's an SSL error (e.g. in case of self-signed certificates).
+  /// - target URL is invalid.
+  /// - the `timeout` is exceeded during navigation.
+  /// - the main resource failed to load.
+  ///
+  /// > **NOTE** [Page.goto] either throw or return a main resource response.
+  /// The only exceptions are navigation to `about:blank` or navigation to the
+  /// same URL with a different hash, which would succeed and return `null`.
+  ///
+  /// > **NOTE** Headless mode doesn't support navigation to a PDF document. See
+  /// the [upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=761295).
+  ///
+  /// Shortcut for [Page.mainFrame.goto]
+  ///
+  /// Parameters:
+  /// - [url]: URL to navigate page to. The url should include scheme, e.g. `https://`.
+  /// - [timeout] Maximum navigation time in milliseconds, defaults
+  ///     to 30 seconds, pass [Duration.zero] to disable timeout. The default value
+  ///     can be changed by using the [Page.defaultNavigationTimeout] or
+  ///     [Page.defaultTimeout] properties.
+  /// - [wait] When to consider navigation succeeded, defaults to [Until.load].
+  ///     Given an array of event strings, navigation is considered to be
+  ///     successful after all events have been fired. Events can be either:
+  ///   - [Until.load] - consider navigation to be finished when the `load`
+  ///     event is fired.
+  ///   - [Until.domContentLoaded] - consider navigation to be finished when the
+  ///     `DOMContentLoaded` event is fired.
+  ///   - [Until.networkIdle] - consider navigation to be finished when there
+  ///     are no more than 0 network connections for at least `500` ms.
+  ///   - [Until.networkAlmostIdle] - consider navigation to be finished when
+  ///     there are no more than 2 network connections for at least `500` ms.
+  /// - [referrer] Referer header value. If provided it will take preference
+  ///   over the referer header value set by [Page.setExtraHTTPHeaders].
+  ///
+  /// Returns: [Future] which resolves to the main resource response. In case
+  /// of multiple redirects, the navigation will resolve with the response of
+  /// the last redirect.
   Future<NetworkResponse> goto(String url,
       {String referrer, Duration timeout, Until wait}) {
     return _frameManager.mainFrame
         .goto(url, referrer: referrer, timeout: timeout, wait: wait);
   }
 
+  /// Parameters:
+  /// - [timeout] Maximum navigation time in milliseconds, defaults
+  ///     to 30 seconds, pass [Duration.zero] to disable timeout. The default value
+  ///     can be changed by using the [Page.defaultNavigationTimeout] or
+  ///     [Page.defaultTimeout] properties.
+  /// - [wait] When to consider navigation succeeded, defaults to [Until.load].
+  ///     Given an array of event strings, navigation is considered to be
+  ///     successful after all events have been fired. Events can be either:
+  ///   - [Until.load] - consider navigation to be finished when the `load`
+  ///     event is fired.
+  ///   - [Until.domContentLoaded] - consider navigation to be finished when the
+  ///     `DOMContentLoaded` event is fired.
+  ///   - [Until.networkIdle] - consider navigation to be finished when there
+  ///     are no more than 0 network connections for at least `500` ms.
+  ///   - [Until.networkAlmostIdle] - consider navigation to be finished when
+  ///     there are no more than 2 network connections for at least `500` ms.
+  /// - [referrer] Referer header value. If provided it will take preference
+  ///   over the referer header value set by [Page.setExtraHTTPHeaders].
+  ///
+  /// Returns: [Future] which resolves to the main resource response. In case
+  /// of multiple redirects, the navigation will resolve with the response of
+  /// the last redirect.
   Future<NetworkResponse> reload({Duration timeout, Until wait}) async {
     var responseFuture = waitForNavigation(timeout: timeout, wait: wait);
 
@@ -646,16 +867,73 @@ function deliverError(name, seq, message, stack) {
     return await responseFuture;
   }
 
+  /// This resolves when the page navigates to a new URL or reloads. It is useful
+  /// for when you run code which will indirectly cause the page to navigate.
+  /// Consider this example:
+  ///
+  /// ```dart
+  /// await Future.wait([
+  ///   // The future completes after navigation has finished
+  ///   page.waitForNavigation(),
+  ///   // Clicking the link will indirectly cause a navigation
+  ///   page.click('a.my-link'),
+  /// ]);
+  /// ```
+  ///
+  /// **NOTE** Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)
+  /// to change the URL is considered a navigation.
+  ///
+  /// Shortcut for [page.mainFrame.waitForNavigation].
+  ///
+  /// Parameters:
+  /// - [timeout] Maximum navigation time in milliseconds, defaults
+  ///     to 30 seconds, pass [Duration.zero] to disable timeout. The default value
+  ///     can be changed by using the [Page.defaultNavigationTimeout] or
+  ///     [Page.defaultTimeout] properties.
+  /// - [wait] When to consider navigation succeeded, defaults to [Until.load].
+  ///     Given an array of event strings, navigation is considered to be
+  ///     successful after all events have been fired. Events can be either:
+  ///   - [Until.load] - consider navigation to be finished when the `load`
+  ///     event is fired.
+  ///   - [Until.domContentLoaded] - consider navigation to be finished when the
+  ///     `DOMContentLoaded` event is fired.
+  ///   - [Until.networkIdle] - consider navigation to be finished when there
+  ///     are no more than 0 network connections for at least `500` ms.
+  ///   - [Until.networkAlmostIdle] - consider navigation to be finished when
+  ///     there are no more than 2 network connections for at least `500` ms.
+  ///
+  /// Returns: [Future] which resolves to the main resource response. In case
+  /// of multiple redirects, the navigation will resolve with the response of
+  /// the last redirect.
+  /// In case of navigation to a different anchor or navigation due to History
+  /// API usage, the navigation will resolve with `null`.
   Future<NetworkResponse> waitForNavigation({Duration timeout, Until wait}) {
     return _frameManager.mainFrame
         .waitForNavigation(timeout: timeout, wait: wait);
   }
 
+  /// Example:
+  /// ```dart
+  /// var firstRequest = page.waitForRequest('https://example.com');
+  ///
+  /// // You can achieve the same effect (and more powerful) with the `onRequest`
+  /// // stream.
+  /// var finalRequest = page.onRequest
+  ///     .where((request) =>
+  ///         request.url.startsWith('https://example.com') &&
+  ///         request.method == 'GET')
+  ///     .first
+  ///     .timeout(Duration(seconds: 30));
+  ///
+  /// await page.goto('https://example.com');
+  /// await Future.wait([firstRequest, finalRequest]);
+  /// ```
   Future<NetworkRequest> waitForRequest(String url, {Duration timeout}) async {
     timeout ??= defaultTimeout;
 
-    return frameManager.networkManager.onRequest
-        .where((request) => request.url == url)
+    return onRequest
+        .where((request) =>
+            path.url.normalize(request.url) == path.url.normalize(url))
         .first
         .timeout(timeout);
   }
@@ -664,15 +942,60 @@ function deliverError(name, seq, message, stack) {
     timeout ??= defaultTimeout;
 
     return frameManager.networkManager.onResponse
-        .where((response) => response.url == url)
+        .where((response) =>
+            path.url.normalize(response.url) == path.url.normalize(url))
         .first
         .timeout(timeout);
   }
 
+  /// Navigate to the previous page in history.
+  ///
+  /// Parameters:
+  /// - [timeout] Maximum navigation time in milliseconds, defaults
+  ///     to 30 seconds, pass [Duration.zero] to disable timeout. The default value
+  ///     can be changed by using the [Page.defaultNavigationTimeout] or
+  ///     [Page.defaultTimeout] properties.
+  /// - [wait] When to consider navigation succeeded, defaults to [Until.load].
+  ///     Given an array of event strings, navigation is considered to be
+  ///     successful after all events have been fired. Events can be either:
+  ///   - [Until.load] - consider navigation to be finished when the `load`
+  ///     event is fired.
+  ///   - [Until.domContentLoaded] - consider navigation to be finished when the
+  ///     `DOMContentLoaded` event is fired.
+  ///   - [Until.networkIdle] - consider navigation to be finished when there
+  ///     are no more than 0 network connections for at least `500` ms.
+  ///   - [Until.networkAlmostIdle] - consider navigation to be finished when
+  ///     there are no more than 2 network connections for at least `500` ms.
+  ///
+  /// Returns: [Future<NetworkResponse>] which resolves to the main resource
+  /// response. In case of multiple redirects, the navigation will resolve with
+  /// the response of the last redirect. If can not go back, resolves to `null`.
   Future<NetworkResponse> goBack({Duration timeout, Until wait}) {
     return _go(-1, timeout: timeout, wait: wait);
   }
 
+  /// Navigate to the next page in history.
+  ///
+  /// Parameters:
+  /// - [timeout] Maximum navigation time in milliseconds, defaults
+  ///     to 30 seconds, pass [Duration.zero] to disable timeout. The default value
+  ///     can be changed by using the [Page.defaultNavigationTimeout] or
+  ///     [Page.defaultTimeout] properties.
+  /// - [wait] When to consider navigation succeeded, defaults to [Until.load].
+  ///     Given an array of event strings, navigation is considered to be
+  ///     successful after all events have been fired. Events can be either:
+  ///   - [Until.load] - consider navigation to be finished when the `load`
+  ///     event is fired.
+  ///   - [Until.domContentLoaded] - consider navigation to be finished when the
+  ///     `DOMContentLoaded` event is fired.
+  ///   - [Until.networkIdle] - consider navigation to be finished when there
+  ///     are no more than 0 network connections for at least `500` ms.
+  ///   - [Until.networkAlmostIdle] - consider navigation to be finished when
+  ///     there are no more than 2 network connections for at least `500` ms.
+  ///
+  /// Returns: [Future<NetworkResponse>] which resolves to the main resource
+  /// response. In case of multiple redirects, the navigation will resolve with
+  /// the response of the last redirect. If can not go back, resolves to `null`.
   Future<NetworkResponse> goForward({Duration timeout, Until wait}) {
     return _go(1, timeout: timeout, wait: wait);
   }
@@ -724,6 +1047,10 @@ function deliverError(name, seq, message, stack) {
 
   bool get javascriptEnabled => _javascriptEnabled;
 
+  /// Whether or not to enable JavaScript on the page.
+  ///
+  /// > **NOTE** changing this value won't affect scripts that have already been
+  /// run. It will take full effect on the next [navigation].
   Future<void> setJavaScriptEnabled(enabled) async {
     if (_javascriptEnabled == enabled) {
       return;
@@ -733,6 +1060,11 @@ function deliverError(name, seq, message, stack) {
     await devTools.emulation.setScriptExecutionDisabled(!enabled);
   }
 
+  /// Toggles bypassing page's Content-Security-Policy.
+  ///
+  /// > **NOTE** CSP bypassing happens at the moment of CSP initialization rather
+  /// then evaluation. Usually this means that `page.setBypassCSP` should be called
+  /// before navigating to the domain.
   Future<void> setBypassCSP(bool enabled) {
     return devTools.page.setBypassCSP(enabled);
   }
@@ -747,6 +1079,11 @@ function deliverError(name, seq, message, stack) {
     return devTools.emulation.setEmulatedMedia(mediaType);
   }
 
+  /// > **NOTE** in certain cases, setting viewport will reload the page in order
+  /// to set the `isMobile` or `hasTouch` properties.
+  ///
+  /// In the case of multiple pages in a single browser, each page can have its
+  /// own viewport size.
   Future<void> setViewport(DeviceViewport viewport) async {
     var needsReload = await _emulationManager.emulateViewport(viewport);
     _viewport = viewport;
@@ -791,7 +1128,7 @@ function deliverError(name, seq, message, stack) {
   ///
   /// Shortcut for [Page.mainFrame.evaluate].
   ///
-  /// Arguments:
+  /// Parameters:
   /// - [pageFunction] Function to be evaluated in the page context
   /// - [args] Arguments to pass to `pageFunction`
   /// - Returns: Future which resolves to the return value of `pageFunction`
@@ -799,15 +1136,64 @@ function deliverError(name, seq, message, stack) {
     return _frameManager.mainFrame.evaluate<T>(pageFunction, args: args);
   }
 
+  /// Adds a function which would be invoked in one of the following scenarios:
+  /// - whenever the page is navigated
+  /// - whenever the child frame is attached or navigated. In this case, the
+  /// function is invoked in the context of the newly attached frame
+  ///
+  /// The function is invoked after the document was created but before any of
+  /// its scripts were run. This is useful to amend the JavaScript environment,
+  /// e.g. to seed `Math.random`.
+  ///
+  /// An example of overriding the navigator.languages property before the page
+  /// loads:
+  ///
+  /// ```javascript
+  /// // preload.js
+  ///
+  /// // overwrite the `languages` property to use a custom getter
+  /// Object.defineProperty(navigator, "languages", {
+  ///   get: function() {
+  ///     return ["en-US", "en", "bn"];
+  ///   }
+  /// });
+  /// ```
+  ///
+  /// ```dart
+  /// var preloadFile = File('test/assets/preload.js').readAsStringSync();
+  /// await page.evaluateOnNewDocument(preloadFile);
+  /// ```
+  ///
+  /// Parameters:
+  /// - [pageFunction] Function to be evaluated in browser context
+  /// - [args] Arguments to pass to [pageFunction]
   Future<void> evaluateOnNewDocument(String pageFunction, {List args}) async {
     var source = evaluationString(pageFunction, args);
     await devTools.page.addScriptToEvaluateOnNewDocument(source);
   }
 
+  /// Toggles ignoring cache for each request based on the enabled state. By
+  /// default, caching is enabled.
   Future<void> setCacheEnabled(enabled) {
     return _frameManager.networkManager.setCacheEnabled(enabled);
   }
 
+  /// Parameters:
+  /// - [format]: Specify screenshot type, can be either `ScreenshotFormat.jpeg`
+  ///   or `ScreenshotFormat.png`. Defaults to 'png'.
+  /// - [quality]: The quality of the image, between 0-100. Not applicable to
+  ///   `png` images.
+  /// - [fullPage]: When true, takes a screenshot of the full scrollable page.
+  ///   Defaults to `false`.
+  /// - [clip]: a [Rectangle] which specifies clipping region of the page.
+  /// - [omitBackground]: Hides default white background and allows capturing
+  ///   screenshots with transparency. Defaults to `false`.
+  ///
+  /// Returns:
+  /// [Future] which resolves to a list of bytes with captured screenshot.
+  ///
+  /// > **NOTE** Screenshots take at least 1/6 second on OS X. See
+  /// https://crbug.com/741689 for discussion.
   Future<Uint8List> screenshot(
       {ScreenshotFormat format,
       bool fullPage,
@@ -822,6 +1208,22 @@ function deliverError(name, seq, message, stack) {
         omitBackground: omitBackground));
   }
 
+  /// Parameters:
+  /// - [format]: Specify screenshot type, can be either `ScreenshotFormat.jpeg`
+  ///   or `ScreenshotFormat.png`. Defaults to 'png'.
+  /// - [quality]: The quality of the image, between 0-100. Not applicable to
+  ///   `png` images.
+  /// - [fullPage]: When true, takes a screenshot of the full scrollable page.
+  ///   Defaults to `false`.
+  /// - [clip]: a [Rectangle] which specifies clipping region of the page.
+  /// - [omitBackground]: Hides default white background and allows capturing
+  ///   screenshots with transparency. Defaults to `false`.
+  ///
+  /// Returns:
+  /// [Future<String>] which resolves to the captured screenshot encoded in `base64`.
+  ///
+  /// > **NOTE** Screenshots take at least 1/6 second on OS X. See
+  /// https://crbug.com/741689 for discussion.
   Future<String> screenshotBase64(
       {ScreenshotFormat format,
       bool fullPage,
@@ -889,6 +1291,50 @@ function deliverError(name, seq, message, stack) {
     });
   }
 
+  /// Generates a pdf of the page with `print` css media. To generate a pdf with
+  /// `screen` media, call [Page.emulateMedia('screen')] before calling `page.pdf()`:
+  ///
+  /// > **NOTE** Generating a pdf is currently only supported in Chrome headless.
+  /// > **NOTE** By default, `page.pdf()` generates a pdf with modified colors
+  /// for printing. Use the [`-webkit-print-color-adjust`](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-print-color-adjust)
+  /// property to force rendering of exact colors.
+  ///
+  /// ```dart
+  /// // Generates a PDF with 'screen' media type.
+  /// await page.emulateMedia('screen');
+  /// var pdfBytes = await page.pdf();
+  /// await File('page.pdf').writeAsBytes(pdfBytes);
+  /// ```
+  ///
+  /// Parameters:
+  /// - [scale]: Scale of the webpage rendering. Defaults to `1`. Scale amount
+  ///   must be between 0.1 and 2.
+  /// - [displayHeaderFooter]: Display header and footer. Defaults to `false`.
+  /// - [headerTemplate]: HTML template for the print header. Should be valid
+  ///   HTML markup with following classes used to inject printing values into them:
+  ///    - `date` formatted print date
+  ///    - `title` document title
+  ///    - `url` document location
+  ///    - `pageNumber` current page number
+  ///    - `totalPages` total pages in the document
+  /// - [footerTemplate]: HTML template for the print footer. Should use the
+  ///    same format as the [headerTemplate].
+  /// - [printBackground]: Print background graphics. Defaults to `false`.
+  /// - [landscape]: Paper orientation. Defaults to `false`.
+  /// - [pageRanges]: Paper ranges to print, e.g., '1-5, 8, 11-13'. Defaults to
+  ///   the empty string, which means print all pages.
+  /// - [format]: Paper format. Defaults to [PageFormat.letter] (8.5 inches x 11 inches).
+  /// - [margins]: Paper margins, defaults to none.
+  /// - [preferCssPageSize]: Give any CSS `@page` size declared in the page
+  ///   priority over what is declared in [format]. Defaults to `false`,
+  ///   which will scale the content to fit the paper size.
+  ///
+  /// Returns: [Future<Uint8List>] which resolves with PDF bytes.
+  ///
+  /// > **NOTE** `headerTemplate` and `footerTemplate` markup have the following
+  /// limitations:
+  /// > 1. Script tags inside templates are not evaluated.
+  /// > 2. Page styles are not visible inside templates.
   Future<Uint8List> pdf(
       {PaperFormat format,
       num scale,
@@ -930,16 +1376,19 @@ function deliverError(name, seq, message, stack) {
     return base64Decode(result);
   }
 
+  /// The page's title.
+  ///
+  /// Shortcut for [Page.mainFrame.title].
   Future<String> get title {
     return mainFrame.title;
   }
 
-  /// By default, [page.close] **does not** run beforeunload handlers.
+  /// By default, [Page.close] **does not** run beforeunload handlers.
   ///
   /// **NOTE** if `runBeforeUnload` is passed as true, a `beforeunload` dialog
   /// might be summoned and should be handled manually via page's ['dialog'](#event-dialog) event.
   ///
-  /// Arguments:
+  /// Parameters:
   /// [runBeforeUnload]: Whether to run the
   ///    [before unload](https://developer.mozilla.org/en-US/docs/Web/Events/beforeunload)
   Future<void> close({bool runBeforeUnload}) async {
@@ -977,7 +1426,7 @@ function deliverError(name, seq, message, stack) {
   ///
   /// Shortcut for [Page.mainFrame.click]
   ///
-  /// Arguments:
+  /// Parameters:
   /// [selector]: A [selector] to search for element to click. If there are
   /// multiple elements satisfying the selector, the first will be clicked.
   ///
@@ -996,34 +1445,200 @@ function deliverError(name, seq, message, stack) {
     return mainFrame.focus(selector);
   }
 
+  /// This method fetches an element with [selector], scrolls it into view if
+  /// needed, and then uses [Page.mouse] to hover over the center of
+  /// the element.
+  /// If there's no element matching [selector], the method throws an error.
+  ///
+  /// Shortcut for [Page.mainFrame.hover].
+  ///
+  /// Parameters:
+  /// A [selector] to search for element to hover. If there are multiple elements
+  /// satisfying the selector, the first will be hovered.
+  ///
+  /// Returns: [Future] which resolves when the element matching [selector] is
+  /// successfully hovered. Future gets rejected if there's no element matching
+  /// [selector].
   Future<void> hover(String selector) {
     return mainFrame.hover(selector);
   }
 
+  /// Triggers a `change` and `input` event once all the provided options have
+  /// been selected.
+  /// If there's no `<select>` element matching `selector`, the method throws an
+  /// error.
+  ///
+  /// ```dart
+  /// await page.select('select#colors', ['blue']); // single selection
+  /// await page
+  ///     .select('select#colors', ['red', 'green', 'blue']); // multiple selections
+  /// ```
+  ///
+  /// Shortcut for [Page.mainFrame.select]
+  ///
+  /// Parameters:
+  /// - [selector]: A [selector] to query page for
+  /// - [values]: Values of options to select. If the `<select>` has the
+  ///   `multiple` attribute, all values are considered, otherwise only the
+  ///   first one is taken into account.
+  ///
+  /// Returns an array of option values that have been successfully selected.
   Future<List<String>> select(String selector, List<String> values) {
     return mainFrame.select(selector, values);
   }
 
+  /// This method fetches an element with `selector`, scrolls it into view if
+  /// needed, and then uses [page.touchscreen] to tap in the center of the element.
+  /// If there's no element matching `selector`, the method throws an error.
+  ///
+  /// Shortcut for [page.mainFrame.tap].
+  ///
+  /// Parameters:
+  /// A [selector] to search for element to tap. If there are multiple
+  /// elements satisfying the selector, the first will be tapped.
   Future<void> tap(String selector) {
     return mainFrame.tap(selector);
   }
 
+  /// Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character
+  /// in the text.
+  ///
+  /// To press a special key, like `Control` or `ArrowDown`, use [`keyboard.press`].
+  ///
+  /// ```dart
+  /// // Types instantly
+  /// await page.type('#mytextarea', 'Hello');
+  ///
+  /// // Types slower, like a user
+  /// await page.type('#mytextarea', 'World', delay: Duration(milliseconds: 100));
+  /// ```
+  ///
+  /// Shortcut for [page.mainFrame.type].
   Future<void> type(String selector, String text, {Duration delay}) {
     return mainFrame.type(selector, text, delay: delay);
   }
 
+  /// Wait for the `selector` to appear in page. If at the moment of calling
+  /// the method the `selector` already exists, the method will return
+  /// immediately. If the selector doesn't appear after the `timeout` of waiting,
+  /// the function will throw.
+  ///
+  /// This method works across navigations:
+  /// ```dart
+  /// import 'package:puppeteer/puppeteer.dart';
+  ///
+  /// main() async {
+  ///   var browser = await puppeteer.launch();
+  ///   var page = await browser.newPage();
+  ///   var watchImg = page.waitForSelector('img');
+  ///   await page.goto('https://example.com');
+  ///   var image = await watchImg;
+  ///   print(await image.propertyValue('src'));
+  ///   await browser.close();
+  /// }
+  /// ```
+  /// Shortcut for [page.mainFrame.waitForSelector].
+  ///
+  /// Parameters:
+  /// - A [selector] of an element to wait for
+  /// - [visible]: wait for element to be present in DOM and to be visible,
+  ///   i.e. to not have `display: none` or `visibility: hidden` CSS properties.
+  ///   Defaults to `false`.
+  /// - [hidden]: wait for element to not be found in the DOM or to be hidden,
+  ///   i.e. have `display: none` or `visibility: hidden` CSS properties.
+  ///   Defaults to `false`.
+  /// - [timeout]:  maximum time to wait for. Pass [Duration.zero]
+  ///   to disable timeout. The default value can be changed by using the
+  ///   [page.defaultTimeout] property.
+  ///
+  /// Returns a [Future] which resolves when element specified by selector string
+  /// is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
+  /// is not found in DOM.
   Future<ElementHandle> waitForSelector(String selector,
       {bool visible, bool hidden, Duration timeout}) {
     return mainFrame.waitForSelector(selector,
         visible: visible, hidden: hidden, timeout: timeout);
   }
 
+  /// Wait for the `xpath` to appear in page. If at the moment of calling
+  /// the method the `xpath` already exists, the method will return
+  /// immediately. If the xpath doesn't appear after the `timeout` of waiting,
+  /// the function will throw.
+  ///
+  /// This method works across navigations:
+  /// ```dart
+  /// import 'package:puppeteer/puppeteer.dart';
+  ///
+  /// main() async {
+  ///   var browser = await puppeteer.launch();
+  ///   var page = await browser.newPage();
+  ///   var watchImg = page.waitForXPath('//img');
+  ///   await page.goto('https://example.com');
+  ///   var image = await watchImg;
+  ///   print(await image.propertyValue('src'));
+  ///   await browser.close();
+  /// }
+  /// ```
+  /// Shortcut for [page.mainFrame.waitForXPath].
+  ///
+  /// Parameters:
+  /// - A [xpath] of an element to wait for
+  /// - [visible]: wait for element to be present in DOM and to be visible,
+  ///   i.e. to not have `display: none` or `visibility: hidden` CSS properties.
+  ///   Defaults to `false`.
+  /// - [hidden]: wait for element to not be found in the DOM or to be hidden,
+  ///   i.e. have `display: none` or `visibility: hidden` CSS properties.
+  ///   Defaults to `false`.
+  /// - [timeout]:  maximum time to wait for. Pass [Duration.zero]
+  ///   to disable timeout. The default value can be changed by using the
+  ///   [page.defaultTimeout] property.
+  ///
+  /// Returns a [Future] which resolves when element specified by xpath string
+  /// is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
+  /// is not found in DOM.
   Future<ElementHandle> waitForXPath(String xpath,
       {bool visible, bool hidden, Duration timeout}) {
     return mainFrame.waitForXPath(xpath,
         visible: visible, hidden: hidden, timeout: timeout);
   }
 
+  /// Parameters:
+  /// - [pageFunction]: Function to be evaluated in browser context
+  /// - [polling]: An interval at which the `pageFunction` is executed, defaults
+  ///   to `everyFrame`.
+  ///   - [Polling.everyFrame]: to constantly execute `pageFunction` in
+  ///     `requestAnimationFrame` callback. This is the tightest polling mode
+  ///     which is suitable to observe styling changes.
+  ///   - [Polling.mutation]: to execute `pageFunction` on every DOM mutation.
+  ///   - [Polling.interval]: An interval at which the function would be executed
+  /// - [args]: Arguments to pass to  `pageFunction`
+  ///
+  /// Returns a [Future] which resolves when the `pageFunction` returns a truthy
+  /// value. It resolves to a JSHandle of the truthy value.
+  ///
+  /// The `waitForFunction` can be used to observe viewport size change:
+  /// ```dart
+  /// import 'package:puppeteer/puppeteer.dart';
+  ///
+  /// main() async {
+  ///   var browser = await puppeteer.launch();
+  ///   var page = await browser.newPage();
+  ///   var watchDog = page.waitForFunction('window.innerWidth < 100');
+  ///   await page.setViewport(DeviceViewport(width: 50, height: 50));
+  ///   await watchDog;
+  ///   await browser.close();
+  /// }
+  /// ```
+  ///
+  /// To pass arguments from node.js to the predicate of `page.waitForFunction` function:
+  ///
+  /// ```dart
+  /// var selector = '.foo';
+  /// await page.waitForFunction('selector => !!document.querySelector(selector)',
+  ///     args: [selector]);
+  /// ```
+  ///
+  /// Shortcut for [page.mainFrame().waitForFunction(pageFunction[, options[, ...args]])](#framewaitforfunctionpagefunction-options-args).
   Future<JsHandle> waitForFunction(@Language('js') String pageFunction,
       {List args, Duration timeout, Polling polling}) {
     return mainFrame.waitForFunction(pageFunction, args,
