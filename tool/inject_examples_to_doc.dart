@@ -73,7 +73,7 @@ String replaceExamples(String sourceFile, List<CodeSnippet> snippets) {
   return sourceFile;
 }
 
-final _dartExampleExtractor = RegExp(r'```dart[^`]*```');
+final _dartExampleExtractor = RegExp(r'\`\`\`dart[\s\S]*?\`\`\`');
 
 String _newComment(
     String target, Comment comment, List<CodeSnippet> allSnippets) {
@@ -183,8 +183,13 @@ class CodeSnippet {
   static String _fixCode(String code) {
     code = code
         .replaceAll('_screenshot.png', 'screenshot.png')
+        .replaceAll('_page.pdf', 'page.pdf')
         .replaceAll(r'${server.hostUrl}', 'https://example.com')
-        .replaceAll('server.hostUrl', "'https://example.com'");
+        .replaceAll('server.hostUrl', "'https://example.com'")
+        .replaceAll('server.docExamplesUrl', "'https://example.com'")
+        .replaceAll('server.docExamples2Url', "'https://example.com'")
+        .replaceAll(r'${server.docExamplesUrl}', "'https://example.com'")
+        .replaceAll(r'${server.docExamples2Url}', "'https://example.com'");
     code = _formatter.format('''
 main() async {
 $code

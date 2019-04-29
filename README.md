@@ -1,6 +1,7 @@
 # Puppeteer in Dart
 
 [![Build Status](https://travis-ci.org/xvrh/puppeteer-dart.svg?branch=master)](https://travis-ci.org/xvrh/puppeteer-dart)
+[![pub package](https://img.shields.io/pub/v/puppeteer.svg)](https://pub.dartlang.org/packages/puppeteer)
 
 A Dart library to automate the Chrome browser over the DevTools Protocol.
 
@@ -287,8 +288,8 @@ main() {
 }
 ```
 
-Note: In a future version, we can image to compile the dart code to javascript on the fly before 
-sending it to the browser (with ddc or dart2js). 
+Note: In a future version, we can image to compile the dart code to javascript on the fly before
+sending it to the browser (with ddc or dart2js).
 
 ## Related work
  * [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface)

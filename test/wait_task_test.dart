@@ -219,7 +219,7 @@ main() {
       await otherFrame.evaluate(addElement, args: ['div']);
       await page.evaluate(addElement, args: ['div']);
       var eHandle = await watchdog;
-      expect(eHandle.context.frame, equals(page.mainFrame));
+      expect(eHandle.executionContext.frame, equals(page.mainFrame));
     });
 
     test('should run in specified frame', () async {
@@ -231,7 +231,7 @@ main() {
       await frame1.evaluate(addElement, args: ['div']);
       await frame2.evaluate(addElement, args: ['div']);
       var eHandle = await waitForSelectorPromise;
-      expect(eHandle.context.frame, equals(frame2));
+      expect(eHandle.executionContext.frame, equals(frame2));
     });
 
     test('should throw when frame is detached', () async {
@@ -392,7 +392,7 @@ main() {
       await frame1.evaluate(addElement, args: ['div']);
       await frame2.evaluate(addElement, args: ['div']);
       var eHandle = await waitForXPathPromise;
-      expect(eHandle.context.frame, equals(frame2));
+      expect(eHandle.executionContext.frame, equals(frame2));
     });
     test('should throw when frame is detached', () async {
       await attachFrame(page, 'frame1', server.emptyPage);
