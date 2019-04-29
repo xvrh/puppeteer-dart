@@ -135,7 +135,8 @@ class Connection implements Client {
   void dispose(String reason) {
     _eventController.close();
     for (var message in _messagesInFly.values) {
-      message.completer.completeError(TargetClosedException(message.method, reason: reason));
+      message.completer
+          .completeError(TargetClosedException(message.method, reason: reason));
     }
     _messagesInFly.clear();
 
@@ -220,7 +221,8 @@ class Session implements Client {
 
     _eventController.close();
     for (var message in _messagesInFly.values) {
-      message.completer.completeError(TargetClosedException(message.method, reason: reason));
+      message.completer
+          .completeError(TargetClosedException(message.method, reason: reason));
     }
     _messagesInFly.clear();
     _onClose.complete();
@@ -253,5 +255,6 @@ class TargetClosedException implements Exception {
   TargetClosedException(this.method, {@required this.reason});
 
   @override
-  String toString() => 'TargetClosedException(method: $method, reason: $reason)';
+  String toString() =>
+      'TargetClosedException(method: $method, reason: $reason)';
 }
