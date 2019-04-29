@@ -7,6 +7,7 @@ import '../protocol/target.dart';
 
 abstract class Client {
   Future<Map> send(String method, [Map parameters]);
+
   Stream<Event> get onEvent;
 }
 
@@ -41,7 +42,8 @@ class Connection implements Client {
 
     _targetApi = TargetApi(this);
 
-    _webSocket.done.then((_) => dispose('Websocket.done'));
+    _webSocket.done.then((_) => dispose(
+        'Websocket.done(code: ${_webSocket.closeCode}, reason: ${_webSocket.closeReason})'));
   }
 
   TargetApi get targetApi => _targetApi;
@@ -149,7 +151,7 @@ class Connection implements Client {
       subscription.cancel();
     }
 
-    _webSocket.close();
+    _webSocket.close(1, 'Connection.dispose');
   }
 
   Future get disconnected => _webSocket.done;
