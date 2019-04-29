@@ -67,6 +67,11 @@ class PageApi {
       .where((Event event) => event.name == 'Page.frameStoppedLoading')
       .map((Event event) => FrameId.fromJson(event.parameters['frameId']));
 
+  /// Fired when page is about to start a download.
+  Stream<DownloadWillBeginEvent> get onDownloadWillBegin => _client.onEvent
+      .where((Event event) => event.name == 'Page.downloadWillBegin')
+      .map((Event event) => DownloadWillBeginEvent.fromJson(event.parameters));
+
   /// Fired when interstitial page was hidden
   Stream get onInterstitialHidden => _client.onEvent
       .where((Event event) => event.name == 'Page.interstitialHidden');
@@ -865,7 +870,7 @@ class FrameAttachedEvent {
 }
 
 class FrameRequestedNavigationEvent {
-  /// Id of the frame that has scheduled a navigation.
+  /// Id of the frame that is being navigated.
   final FrameId frameId;
 
   /// The reason for the navigation.
@@ -911,6 +916,23 @@ class FrameScheduledNavigationEvent {
       frameId: FrameId.fromJson(json['frameId']),
       delay: json['delay'],
       reason: FrameScheduledNavigationEventReason.fromJson(json['reason']),
+      url: json['url'],
+    );
+  }
+}
+
+class DownloadWillBeginEvent {
+  /// Id of the frame that caused download to begin.
+  final FrameId frameId;
+
+  /// URL of the resource being downloaded.
+  final String url;
+
+  DownloadWillBeginEvent({@required this.frameId, @required this.url});
+
+  factory DownloadWillBeginEvent.fromJson(Map<String, dynamic> json) {
+    return DownloadWillBeginEvent(
+      frameId: FrameId.fromJson(json['frameId']),
       url: json['url'],
     );
   }

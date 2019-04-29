@@ -1381,9 +1381,13 @@ class ConnectionType {
 class CookieSameSite {
   static const strict = CookieSameSite._('Strict');
   static const lax = CookieSameSite._('Lax');
+  static const extended = CookieSameSite._('Extended');
+  static const none = CookieSameSite._('None');
   static const values = {
     'Strict': strict,
     'Lax': lax,
+    'Extended': extended,
+    'None': none,
   };
 
   final String value;

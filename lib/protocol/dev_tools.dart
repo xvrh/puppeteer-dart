@@ -39,6 +39,7 @@ import 'system_info.dart';
 import 'target.dart';
 import 'tethering.dart';
 import 'tracing.dart';
+import 'web_audio.dart';
 
 class DevTools {
   final Client client;
@@ -193,6 +194,11 @@ class DevTools {
   /// A domain for letting clients substitute browser's network layer with client code.
   FetchApi get fetch => _fetch ??= FetchApi(client);
   FetchApi _fetch;
+
+  /// This domain allows inspection of Web Audio API.
+  /// https://webaudio.github.io/web-audio-api/
+  WebAudioApi get webAudio => _webAudio ??= WebAudioApi(client);
+  WebAudioApi _webAudio;
 
   /// Debugger domain exposes JavaScript debugging capabilities. It allows setting and removing
   /// breakpoints, stepping through execution, exploring stack traces, etc.

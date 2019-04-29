@@ -274,27 +274,25 @@ class SecurityStateExplanation {
 
 /// Information about insecure content on the page.
 class InsecureContentStatus {
-  /// True if the page was loaded over HTTPS and ran mixed (HTTP) content such as scripts.
+  /// Always false.
   final bool ranMixedContent;
 
-  /// True if the page was loaded over HTTPS and displayed mixed (HTTP) content such as images.
+  /// Always false.
   final bool displayedMixedContent;
 
-  /// True if the page was loaded over HTTPS and contained a form targeting an insecure url.
+  /// Always false.
   final bool containedMixedForm;
 
-  /// True if the page was loaded over HTTPS without certificate errors, and ran content such as
-  /// scripts that were loaded with certificate errors.
+  /// Always false.
   final bool ranContentWithCertErrors;
 
-  /// True if the page was loaded over HTTPS without certificate errors, and displayed content
-  /// such as images that were loaded with certificate errors.
+  /// Always false.
   final bool displayedContentWithCertErrors;
 
-  /// Security state representing a page that ran insecure content.
+  /// Always set to unknown.
   final SecurityState ranInsecureContentStyle;
 
-  /// Security state representing a page that displayed insecure content.
+  /// Always set to unknown.
   final SecurityState displayedInsecureContentStyle;
 
   InsecureContentStatus(
