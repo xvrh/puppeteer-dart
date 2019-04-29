@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:logging/logging.dart';
+import 'package:meta/meta.dart';
 import '../protocol/target.dart';
 
 abstract class Client {
@@ -40,7 +41,7 @@ class Connection implements Client {
 
     _targetApi = TargetApi(this);
 
-    _webSocket.done.then((_) => dispose());
+    _webSocket.done.then((_) => dispose('Websocket.done'));
   }
 
   TargetApi get targetApi => _targetApi;
@@ -99,7 +100,7 @@ class Connection implements Client {
       String sessionId = params['sessionId'];
       var session = sessions[sessionId];
       if (session != null) {
-        session.dispose();
+        session.dispose(reason: 'Target.detachedFromTarget');
         sessions.remove(sessionId);
       }
     } else if (sessionId != null) {
@@ -131,15 +132,15 @@ class Connection implements Client {
     }
   }
 
-  void dispose() {
+  void dispose(String reason) {
     _eventController.close();
     for (var message in _messagesInFly.values) {
-      message.completer.completeError(TargetClosedException(message.method));
+      message.completer.completeError(TargetClosedException(message.method, reason: reason));
     }
     _messagesInFly.clear();
 
     for (Session session in sessions.values) {
-      session.dispose();
+      session.dispose(reason: 'Connection.dispose(reason: $reason)');
     }
     sessions.clear();
 
@@ -214,12 +215,12 @@ class Session implements Client {
     await connection.targetApi.detachFromTarget(sessionId: sessionId);
   }
 
-  void dispose() {
+  void dispose({@required String reason}) {
     if (_eventController.isClosed) return;
 
     _eventController.close();
     for (var message in _messagesInFly.values) {
-      message.completer.completeError(TargetClosedException(message.method));
+      message.completer.completeError(TargetClosedException(message.method, reason: reason));
     }
     _messagesInFly.clear();
     _onClose.complete();
@@ -247,9 +248,10 @@ class _Message {
 
 class TargetClosedException implements Exception {
   final String method;
+  final String reason;
 
-  TargetClosedException(this.method);
+  TargetClosedException(this.method, {@required this.reason});
 
   @override
-  String toString() => 'TargetClosedException(method: $method)';
+  String toString() => 'TargetClosedException(method: $method, reason: $reason)';
 }

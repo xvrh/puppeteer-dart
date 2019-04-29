@@ -231,7 +231,7 @@ class Browser {
     await _closeCallback();
 
     _dispose();
-    connection.dispose();
+    connection.dispose('Browser.close');
   }
 
   Target targetById(TargetID targetId) => _targets[targetId];

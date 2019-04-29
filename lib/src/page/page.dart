@@ -152,7 +152,7 @@ class Page {
     devTools.runtime.onConsoleAPICalled.listen(_onConsoleApi);
     devTools.log.onEntryAdded.listen(_onLogEntryAdded);
     onClose.then((_) {
-      _dispose();
+      _dispose('Page.onClose completed');
     });
   }
 
@@ -183,8 +183,8 @@ class Page {
   /// Get the browser context that the page belongs to.
   BrowserContext get browserContext => target.browserContext;
 
-  void _dispose() {
-    session.dispose();
+  void _dispose(String reason) {
+    session.dispose(reason: reason);
 
     _frameManager.dispose();
     _workerCreated.close();
@@ -739,7 +739,7 @@ function addPageBinding(bindingName) {
 
   void _handleTargetCrashed(_) {
     _onErrorController.add(ClientError.pageCrashed());
-    Future(() => _dispose());
+    Future(() => _dispose('Target crashed'));
   }
 
   Future _onBindingCalled(BindingCalledEvent event) async {
