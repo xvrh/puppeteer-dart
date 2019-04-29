@@ -33,7 +33,7 @@ class Connection implements Client {
   final Map<int, _Message> _messagesInFly = {};
   final Map<String, Session> sessions = {};
   final StreamController<Event> _eventController =
-      StreamController<Event>.broadcast();
+      StreamController<Event>.broadcast(sync: true);
   TargetApi _targetApi;
   final List<StreamSubscription> _subscriptions = [];
 
