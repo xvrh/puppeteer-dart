@@ -151,7 +151,7 @@ class Connection implements Client {
       subscription.cancel();
     }
 
-    _webSocket.close(1, 'Connection.dispose');
+    _webSocket.close(WebSocketStatus.normalClosure, 'Connection.dispose');
   }
 
   Future get disconnected => _webSocket.done;
