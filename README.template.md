@@ -22,6 +22,7 @@ Most things that you can do manually in the browser can be done using Puppeteer!
 * [Take a screenshot of a page](#take-a-screenshot-of-a-complete-html-page)
 * [Take a screenshot of an element in a page](#take-a-screenshot-of-a-specific-node-in-the-page)
 * [Create a static version of a Single Page Application](#create-a-static-version-of-a-single-page-application)
+* [Capture a screencast of the page](#capture-a-screencast-of-the-page)
 
 ### Launch Chrome
 
@@ -57,6 +58,14 @@ import 'example/search.dart';
 import 'example/capture_spa.dart';
 ```
 
+### Capture a screencast of the page
+The screencast feature is not part of the Puppeteer API. 
+This example uses the low-level protocol API to send the commands to the browser.
+
+```dart
+import 'example/screencast.dart';
+```
+
 ### Low-level DevTools protocol
 This package contains a fully typed API of the [Chrome DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).
 The code is generated from the [JSON Schema](https://github.com/ChromeDevTools/devtools-protocol) provided by Chrome.
@@ -69,9 +78,9 @@ import 'example/dev_tools_protocol.dart';
 ```
 
 ### Execute JavaScript code
-A lot of the Puppeteer API exposes functions to run some javascript code in the browser.
+The Puppeteer API exposes several functions to run some Javascript code in the browser.
 
-Example in Node.JS:
+Like in this example from the official Node.JS library:
 ```js
 test(async () => {
   const result = await page.evaluate(x => {
@@ -80,8 +89,8 @@ test(async () => {
 });
 ```
 
-As of now, in the Dart port, you have to pass the JavaScript code as a string.
-The example above is written as:
+In the Dart port, you have to pass the JavaScript code as a string.
+The example above will be written as:
 ```dart
 main() async {
   var result = await page.evaluate('''x => {
@@ -99,7 +108,7 @@ The javascript code can be:
 import 'example/execute_javascript.dart';
 ```
 
-If you are using IntellJ (or Webstorm), you can enable syntax highlighting and code-analyzer
+If you are using IntellJ (or Webstorm), you can enable the syntax highlighter and the code-analyzer
 for the Javascript snippet with a comment like `// language=js` before the string.
 
 ```dart

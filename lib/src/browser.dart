@@ -113,7 +113,7 @@ class Browser {
 
   TargetApi get targetApi => connection.targetApi;
 
-  Future<void> _targetCreated(TargetInfo event) async {
+  void _targetCreated(TargetInfo event) {
     BrowserContext context =
         _contexts[event.browserContextId] ?? _defaultContext;
 
@@ -121,9 +121,11 @@ class Browser {
         browserContext: context);
     _targets[event.targetId] = target;
 
-    if (await target.initialized) {
-      _onTargetCreatedController.add(target);
-    }
+    target.initialized.then((initialized) {
+      if (initialized) {
+        _onTargetCreatedController.add(target);
+      }
+    });
   }
 
   Future<void> _targetDestroyed(TargetID targetId) async {
@@ -231,7 +233,7 @@ class Browser {
     await _closeCallback();
 
     _dispose();
-    connection.dispose();
+    connection.dispose('Browser.close');
   }
 
   Target targetById(TargetID targetId) => _targets[targetId];

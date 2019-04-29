@@ -12,14 +12,17 @@ main() async {
 
   // Examples:
 
-  // Access the Animation domain
+  // Start a screencast
+  await page.devTools.page.startScreencast();
+
+  // Change the animation speed for the document
   await page.devTools.animation.setPlaybackRate(10);
 
-  // Access the CSS domain
-  page.devTools.css.onFontsUpdated.listen((_) {});
-
-  // Access the Memory domain
+  // Access the memory information for the page
   await page.devTools.memory.getDOMCounters();
+
+  // Go to https://chromedevtools.github.io/devtools-protocol/ to read more about
+  // the protocol and use the code in `lib/protocol`.
 
   await browser.close();
 }

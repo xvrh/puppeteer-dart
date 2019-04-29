@@ -2,10 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:logging/logging.dart';
+import 'package:meta/meta.dart';
 import '../protocol/target.dart';
 
 abstract class Client {
   Future<Map> send(String method, [Map parameters]);
+
   Stream<Event> get onEvent;
 }
 
@@ -31,7 +33,7 @@ class Connection implements Client {
   final Map<int, _Message> _messagesInFly = {};
   final Map<String, Session> sessions = {};
   final StreamController<Event> _eventController =
-      StreamController<Event>.broadcast();
+      StreamController<Event>.broadcast(sync: true);
   TargetApi _targetApi;
   final List<StreamSubscription> _subscriptions = [];
 
@@ -40,7 +42,8 @@ class Connection implements Client {
 
     _targetApi = TargetApi(this);
 
-    _webSocket.done.then((_) => dispose());
+    _webSocket.done.then((_) => dispose(
+        'Websocket.done(code: ${_webSocket.closeCode}, reason: ${_webSocket.closeReason})'));
   }
 
   TargetApi get targetApi => _targetApi;
@@ -99,7 +102,7 @@ class Connection implements Client {
       String sessionId = params['sessionId'];
       var session = sessions[sessionId];
       if (session != null) {
-        session.dispose();
+        session.dispose(reason: 'Target.detachedFromTarget');
         sessions.remove(sessionId);
       }
     } else if (sessionId != null) {
@@ -131,15 +134,16 @@ class Connection implements Client {
     }
   }
 
-  void dispose() {
+  void dispose(String reason) {
     _eventController.close();
     for (var message in _messagesInFly.values) {
-      message.completer.completeError(TargetClosedException(message.method));
+      message.completer
+          .completeError(TargetClosedException(message.method, reason: reason));
     }
     _messagesInFly.clear();
 
     for (Session session in sessions.values) {
-      session.dispose();
+      session.dispose(reason: 'Connection.dispose(reason: $reason)');
     }
     sessions.clear();
 
@@ -147,7 +151,7 @@ class Connection implements Client {
       subscription.cancel();
     }
 
-    _webSocket.close();
+    _webSocket.close(WebSocketStatus.normalClosure, 'Connection.dispose');
   }
 
   Future get disconnected => _webSocket.done;
@@ -214,12 +218,13 @@ class Session implements Client {
     await connection.targetApi.detachFromTarget(sessionId: sessionId);
   }
 
-  void dispose() {
+  void dispose({@required String reason}) {
     if (_eventController.isClosed) return;
 
     _eventController.close();
     for (var message in _messagesInFly.values) {
-      message.completer.completeError(TargetClosedException(message.method));
+      message.completer
+          .completeError(TargetClosedException(message.method, reason: reason));
     }
     _messagesInFly.clear();
     _onClose.complete();
@@ -247,9 +252,11 @@ class _Message {
 
 class TargetClosedException implements Exception {
   final String method;
+  final String reason;
 
-  TargetClosedException(this.method);
+  TargetClosedException(this.method, {@required this.reason});
 
   @override
-  String toString() => 'TargetClosedException(method: $method)';
+  String toString() =>
+      'TargetClosedException(method: $method, reason: $reason)';
 }

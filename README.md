@@ -22,6 +22,7 @@ Most things that you can do manually in the browser can be done using Puppeteer!
 * [Take a screenshot of a page](#take-a-screenshot-of-a-complete-html-page)
 * [Take a screenshot of an element in a page](#take-a-screenshot-of-a-specific-node-in-the-page)
 * [Create a static version of a Single Page Application](#create-a-static-version-of-a-single-page-application)
+* [Capture a screencast of the page](#capture-a-screencast-of-the-page)
 
 ### Launch Chrome
 
@@ -183,6 +184,55 @@ main() async {
 }
 ```
 
+### Capture a screencast of the page
+The screencast feature is not part of the Puppeteer API. 
+This example uses the low-level protocol API to send the commands to the browser.
+
+```dart
+import 'dart:convert';
+import 'dart:io';
+import 'package:image/image.dart' as image;
+import 'package:puppeteer/puppeteer.dart';
+import 'package:shelf/shelf_io.dart' as io;
+import 'package:shelf_static/shelf_static.dart';
+
+main() async {
+  // Start a local web server and open the page
+  var server =
+      await io.serve(createStaticHandler('example/html'), 'localhost', 0);
+  var browser = await puppeteer.launch();
+  var page = await browser.newPage();
+  await page.goto('http://localhost:${server.port}/rubiks_cube/index.html');
+
+  // On each frame, decode the image and use the "image" package to create an
+  // animated gif.
+  var animation = image.Animation();
+  page.devTools.page.onScreencastFrame.listen((event) {
+    animation.addFrame(image.decodePng(base64.decode(event.data)));
+  });
+
+  // Change the CSS animations speed to accelerate it.
+  await page.devTools.animation.setPlaybackRate(240);
+
+  // Start the screencast
+  await page.devTools.page.startScreencast(maxWidth: 150, maxHeight: 150);
+
+  // Wait a few seconds and stop the screencast.
+  await Future.delayed(Duration(seconds: 3));
+  await page.devTools.page.stopScreencast();
+
+  // Encode the frame in Gif and save it to a file.
+  File('example/_rubkis_cube.gif')
+      .writeAsBytesSync(image.GifEncoder().encodeAnimation(animation));
+
+  // Alternatively, save all the frames on disk and use ffmpeg to convert it to
+  // video file. (like: ffmpeg -i frames/%3d.png -r 10 output.mp4)
+
+  await browser.close();
+  await server.close(force: true);
+}
+```
+
 ### Low-level DevTools protocol
 This package contains a fully typed API of the [Chrome DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).
 The code is generated from the [JSON Schema](https://github.com/ChromeDevTools/devtools-protocol) provided by Chrome.
@@ -205,23 +255,26 @@ main() async {
 
   // Examples:
 
-  // Access the Animation domain
+  // Start a screencast
+  await page.devTools.page.startScreencast();
+
+  // Change the animation speed for the document
   await page.devTools.animation.setPlaybackRate(10);
 
-  // Access the CSS domain
-  page.devTools.css.onFontsUpdated.listen((_) {});
-
-  // Access the Memory domain
+  // Access the memory information for the page
   await page.devTools.memory.getDOMCounters();
+
+  // Go to https://chromedevtools.github.io/devtools-protocol/ to read more about
+  // the protocol and use the code in `lib/protocol`.
 
   await browser.close();
 }
 ```
 
 ### Execute JavaScript code
-A lot of the Puppeteer API exposes functions to run some javascript code in the browser.
+The Puppeteer API exposes several functions to run some Javascript code in the browser.
 
-Example in Node.JS:
+Like in this example from the official Node.JS library:
 ```js
 test(async () => {
   const result = await page.evaluate(x => {
@@ -230,8 +283,8 @@ test(async () => {
 });
 ```
 
-As of now, in the Dart port, you have to pass the JavaScript code as a string.
-The example above is written as:
+In the Dart port, you have to pass the JavaScript code as a string.
+The example above will be written as:
 ```dart
 main() async {
   var result = await page.evaluate('''x => {
@@ -275,7 +328,7 @@ main() async {
 }
 ```
 
-If you are using IntellJ (or Webstorm), you can enable syntax highlighting and code-analyzer
+If you are using IntellJ (or Webstorm), you can enable the syntax highlighter and the code-analyzer
 for the Javascript snippet with a comment like `// language=js` before the string.
 
 ```dart

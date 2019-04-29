@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
 import 'package:puppeteer/puppeteer.dart';
 import 'package:shelf/shelf.dart';
@@ -25,8 +26,10 @@ typedef _RouteCallback = FutureOr<Response> Function(Request);
 class Server {
   static const _assetFolder = 'assets';
   HttpServer _httpServer;
-  final Map<String, _RouteCallback> _routes = {};
-  final Map<String, Completer<Request>> _requestCallbacks = {};
+  final _routes = <String, _RouteCallback>{};
+  final _requestCallbacks =
+      CanonicalizedMap<String, String, Completer<Request>>(
+          (key) => p.url.normalize(key));
 
   Server._();
 
