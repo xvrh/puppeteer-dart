@@ -8,6 +8,9 @@ os:
 dart:
  - stable
 
+install:
+ - gem install coveralls-lcov
+
 before_script:
  - dart example/download_chromium.dart
 
@@ -20,11 +23,11 @@ jobs:
  include:
   - stage: coverage
     script:
-     # Ne pas utiliser dart_coveralls mais simplement "coverage" et utiliser
-     # un gem coveralls plus stable (https://github.com/dart-lang/coverage/blob/master/.travis.yml)
-     - pub global activate dart_coveralls
-     - dart tool/generate_all_tests_file.dart
-     - dart_coveralls report test/_all_tests.dart
+     - pub global activate coverage
+     - tool/coverage.sh
+
+after_success:
+ - coveralls-lcov var/lcov.info
 
 branches:
   only: [master]

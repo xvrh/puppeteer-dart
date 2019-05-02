@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:path/path.dart' as p;
 import 'package:dart_style/dart_style.dart';
+import 'package:path/path.dart' as p;
 
 main() {
   var allFiles = Directory('test')
@@ -23,6 +23,6 @@ main() {
   }
   buffer.writeln('}');
 
-  File('test/_all_tests.dart')
+  File('test/test_all.dart')
       .writeAsStringSync(DartFormatter().format(buffer.toString()));
 }
