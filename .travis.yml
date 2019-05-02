@@ -16,6 +16,14 @@ dart_task:
  - dartanalyzer: --fatal-infos --fatal-warnings .
  - dartfmt
 
+jobs:
+ include:
+  - stage: coverage
+    script:
+     - pub global activate dart_coveralls
+     - dart tool/generate_all_tests_file.dart
+     - dart_coveralls report test/_all_tests.dart
+
 branches:
   only: [master]
 
