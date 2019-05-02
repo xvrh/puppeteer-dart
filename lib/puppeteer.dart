@@ -7,6 +7,7 @@ export 'src/downloader.dart' show downloadChrome, ChromePath;
 export 'src/page/dialog.dart' show Dialog, DialogType;
 export 'src/page/dom_world.dart' show Polling;
 export 'src/page/emulation_manager.dart' show DeviceViewport, Device;
+export 'src/page/execution_context.dart' show ExecutionContext;
 export 'src/page/frame_manager.dart' show PageFrame;
 export 'src/page/js_handle.dart'
     show JsHandle, ElementHandle, NodeIsNotVisibleException;

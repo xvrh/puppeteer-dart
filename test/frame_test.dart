@@ -23,6 +23,7 @@ main() {
   });
 
   tearDown(() async {
+    server.clearRoutes();
     await page.close();
     page = null;
   });
@@ -82,11 +83,11 @@ main() {
       expect(
           dumpFrames(page.mainFrame),
           equals([
-            'http://<host>/assets/frames/nested-frames.html',
-            '    http://<host>/assets/frames/two-frames.html (2frames)',
-            '        http://<host>/assets/frames/frame.html (uno)',
-            '        http://<host>/assets/frames/frame.html (dos)',
-            '    http://<host>/assets/frames/frame.html (aframe)'
+            'http://<host>/frames/nested-frames.html',
+            '    http://<host>/frames/two-frames.html (2frames)',
+            '        http://<host>/frames/frame.html (uno)',
+            '        http://<host>/frames/frame.html (dos)',
+            '    http://<host>/frames/frame.html (aframe)'
           ]));
     });
     test('should send events when frames are manipulated dynamically',
@@ -95,9 +96,9 @@ main() {
       // validate frameattached events
       var attachedFrames = <PageFrame>[];
       page.onFrameAttached.listen((frame) => attachedFrames.add(frame));
-      await attachFrame(page, 'frame1', './assets/frame.html');
+      await attachFrame(page, 'frame1', './frame.html');
       expect(attachedFrames.length, equals(1));
-      expect(attachedFrames[0].url, contains('/assets/frame.html'));
+      expect(attachedFrames[0].url, contains('/frame.html'));
 
       // validate framenavigated events
       var navigatedFrames = <PageFrame>[];

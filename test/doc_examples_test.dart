@@ -31,6 +31,7 @@ main() {
 
   tearDown(() async {
     await page.close();
+    server.clearRoutes();
   });
 
   group('Browser', () {
@@ -539,6 +540,140 @@ main() {
       await page.mouse.move(Point(100, 0));
       await page.mouse.move(Point(0, 0));
       await page.mouse.up();
+    });
+  });
+  group('ExecutionContext', () {
+    group('evaluate', () {
+      test(0, () async {
+        var executionContext = await page.mainFrame.executionContext;
+        var result =
+            await executionContext.evaluate('() => Promise.resolve(8 * 7)');
+        print(result); // prints "56"
+      });
+      test(1, () async {
+        var executionContext = await page.mainFrame.executionContext;
+        //----
+        print(await executionContext.evaluate('1 + 2')); // prints "3"
+        //---
+      });
+    });
+    group('evaluateHandle', () {
+      test(0, () async {
+        var context = await page.mainFrame.executionContext;
+        var aHandle =
+            await context.evaluateHandle('() => Promise.resolve(self)');
+        aHandle; // Handle for the global object.
+      });
+      test(1, () async {
+        var context = await page.mainFrame.executionContext;
+        //---
+        var aHandle =
+            await context.evaluateHandle('1 + 2'); // Handle for the '3' object.
+        //----
+        expect(aHandle, isNotNull);
+      });
+      test(2, () async {
+        var context = await page.mainFrame.executionContext;
+        //---
+        var aHandle = await context.evaluateHandle('() => document.body');
+        var resultHandle = await context
+            .evaluateHandle('body => body.innerHTML', args: [aHandle]);
+        print(await resultHandle.jsonValue); // prints body's innerHTML
+        await aHandle.dispose();
+        await resultHandle.dispose();
+      });
+    });
+  });
+  group('JsHandle', () {
+    test('class', () async {
+      //---
+      var windowHandle = await page.evaluateHandle('() => window');
+      //---
+      expect(windowHandle, isNotNull);
+    });
+    test('properties', () async {
+      //----
+      var handle = await page.evaluateHandle('() => ({window, document})');
+      var properties = await handle.properties;
+      JsHandle windowHandle = properties['window'];
+      ElementHandle documentHandle = properties['document'];
+      await handle.dispose();
+      //----
+      expect(windowHandle, isNotNull);
+      expect(documentHandle, isNotNull);
+    });
+  });
+  group('ElementHandle', () {
+    test('class', () async {
+      //---
+      //+import 'package:puppeteer/puppeteer.dart';
+
+      main() async {
+        var browser = await puppeteer.launch();
+
+        var page = await browser.newPage();
+        await page.goto(server.docExamplesUrl);
+        var hrefElement = await page.$('a');
+        await hrefElement.click();
+
+        await browser.close();
+      }
+      //---
+
+      await main();
+    });
+    test('SSeval', () async {
+      server.setRoute('feed.html', (request) {
+        return Response(404, body: '''
+<div class="feed">
+  <div class="tweet">Hello!</div>
+  <div class="tweet">Hi!</div>
+</div>
+        ''', headers: {'content-type': 'text/html'});
+      });
+      await page.goto(server.assetUrl('feed.html'));
+      //---
+      var feedHandle = await page.$('.feed');
+      expect(
+          await feedHandle.$$eval(
+              '.tweet', 'nodes => nodes.map(n => n.innerText)'),
+          equals(['Hello!', 'Hi!']));
+      //---
+    });
+    test('Seval', () async {
+      server.setRoute('feed.html', (request) {
+        return Response(404, body: '''
+<div class="tweet">
+  <div class="like">100</div>
+  <div class="retweets">10</div>
+</div>
+        ''', headers: {'content-type': 'text/html'});
+      });
+      await page.goto(server.assetUrl('feed.html'));
+      //---
+      var tweetHandle = await page.$('.tweet');
+      expect(await tweetHandle.$eval('.like', 'node => node.innerText'),
+          equals('100'));
+      expect(await tweetHandle.$eval('.retweets', 'node => node.innerText'),
+          equals('10'));
+      //--
+    });
+    group('type', () {
+      test(0, () async {
+        var elementHandle = await page.$('input');
+        //---
+        await elementHandle.type('Hello'); // Types instantly
+
+        // Types slower, like a user
+        await elementHandle.type('World', delay: Duration(milliseconds: 100));
+
+        ///---
+      });
+      test(1, () async {
+        var elementHandle = await page.$('input');
+        await elementHandle.type('some text');
+        await elementHandle.press(Key.enter);
+      });
     });
   });
 }

@@ -15,6 +15,10 @@ main() {
     await server.close();
   });
 
+  tearDown(() {
+    server.clearRoutes();
+  });
+
   group('Browser.version', () {
     test('should return whether we are in headless', () async {
       var version = await browser.version;

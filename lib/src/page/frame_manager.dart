@@ -89,7 +89,7 @@ class FrameManager {
     var watcher = LifecycleWatcher(this, frame,
         wait: wait, timeout: timeout ?? page.navigationTimeoutOrDefault);
 
-    Future<void> navigate() async {
+    Future<Null> navigate() async {
       var response =
           await _pageApi.navigate(url, referrer: referrer, frameId: frame.id);
       if (response.errorText != null) {
@@ -101,10 +101,14 @@ class FrameManager {
     }
 
     try {
-      await Future.any([
+      var error = await Future.any([
         navigate(),
         watcher.timeoutOrTermination,
       ]);
+
+      if (error != null) {
+        return Future.error(error);
+      }
     } finally {
       watcher.dispose();
     }
@@ -117,11 +121,15 @@ class FrameManager {
     var watcher = LifecycleWatcher(this, frame,
         wait: wait, timeout: timeout ?? page.navigationTimeoutOrDefault);
     try {
-      await Future.any([
+      var error = await Future.any([
         watcher.timeoutOrTermination,
         watcher.sameDocumentNavigation,
         watcher.newDocumentNavigation,
       ]);
+
+      if (error != null) {
+        return Future.error(error);
+      }
     } finally {
       watcher.dispose();
     }
