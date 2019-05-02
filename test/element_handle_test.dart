@@ -58,7 +58,7 @@ main() {
     test('should handle nested frames', () async {
       await page.setViewport(DeviceViewport(width: 500, height: 500));
       await page.goto(server.assetUrl('frames/nested-frames.html'));
-      var nestedFrame = page.frames[1].children[1];
+      var nestedFrame = page.frames[1].childFrames[1];
       var elementHandle = await nestedFrame.$('div');
       var box = await elementHandle.boundingBox();
       expect(box, equals(Rectangle(28, 260, 264, 18)));

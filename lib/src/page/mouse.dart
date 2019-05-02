@@ -12,6 +12,21 @@ class MouseButton {
   const MouseButton._(this.name);
 }
 
+/// The Mouse class operates in main-frame CSS pixels relative to the top-left
+/// corner of the viewport.
+///
+/// Every `page` object has its own Mouse, accessible with [page.mouse].
+///
+/// ```dart
+/// // Using ‘page.mouse’ to trace a 100x100 square.
+/// await page.mouse.move(Point(0, 0));
+/// await page.mouse.down();
+/// await page.mouse.move(Point(0, 100));
+/// await page.mouse.move(Point(100, 100));
+/// await page.mouse.move(Point(100, 0));
+/// await page.mouse.move(Point(0, 0));
+/// await page.mouse.up();
+/// ```
 class Mouse {
   final InputApi inputApi;
   final Keyboard keyboard;
@@ -22,6 +37,7 @@ class Mouse {
 
   static String _buttonName(MouseButton button) => button?.name ?? 'none';
 
+  /// Dispatches a `mousemove` event.
   Future<void> move(Point position, {int steps}) async {
     steps ??= 1;
     var from = _position;
@@ -36,6 +52,9 @@ class Mouse {
     }
   }
 
+  /// Shortcut for [mouse.move], [mouse.down] and [mouse.up].
+  ///
+  /// [delay]: Time to wait between `mousedown` and `mouseup`. Defaults to 0.
   Future<void> click(Point position,
       {Duration delay, MouseButton button, int clickCount}) async {
     await move(position);
@@ -44,6 +63,7 @@ class Mouse {
     await up(button: button, clickCount: clickCount);
   }
 
+  /// Dispatches a `mousedown` event.
   Future<void> down({MouseButton button, int clickCount}) async {
     button ??= MouseButton.left;
     clickCount ??= 1;
@@ -54,6 +74,7 @@ class Mouse {
         clickCount: clickCount);
   }
 
+  /// Dispatches a `mouseup` event.
   Future<void> up({MouseButton button, int clickCount}) async {
     button ??= MouseButton.left;
     clickCount ??= 1;

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:async/async.dart';
 import 'package:meta/meta.dart';
 import 'package:pool/pool.dart';
@@ -26,6 +27,7 @@ export '../protocol/browser.dart' show PermissionType;
 /// }
 /// ```
 class Browser {
+  final Process process;
   final Connection connection;
   final BrowserApi browser;
   final SystemInfoApi systemInfo;
@@ -40,7 +42,7 @@ class Browser {
       _onTargetDestroyedController = StreamController<Target>.broadcast(),
       _onTargetChangedController = StreamController<Target>.broadcast();
 
-  Browser._(this.connection,
+  Browser._(this.process, this.connection,
       {@required this.defaultViewport,
       @required bool ignoreHttpsErrors,
       @required Future Function() closeCallback})
@@ -239,11 +241,11 @@ class Browser {
   Target targetById(TargetID targetId) => _targets[targetId];
 }
 
-Browser createBrowser(Connection connection,
+Browser createBrowser(Process process, Connection connection,
         {@required DeviceViewport defaultViewport,
         @required Future Function() closeCallback,
         @required bool ignoreHttpsErrors}) =>
-    Browser._(connection,
+    Browser._(process, connection,
         defaultViewport: defaultViewport,
         closeCallback: closeCallback,
         ignoreHttpsErrors: ignoreHttpsErrors);

@@ -12,22 +12,25 @@ main() {
   Server server;
   Browser browser;
   Page page;
+  PageFrame frame;
   setUpAll(() async {
     server = await Server.create();
+    browser = await puppeteer.launch();
   });
 
   tearDownAll(() async {
     await server.close();
+    await browser.close();
   });
 
   setUp(() async {
-    browser = await puppeteer.launch();
     page = await browser.newPage();
     await page.goto(server.assetUrl('doc_examples.html'));
+    frame = page.mainFrame;
   });
 
   tearDown(() async {
-    await browser.close();
+    await page.close();
   });
 
   group('Browser', () {
@@ -435,8 +438,28 @@ main() {
     });
   });
   group('PageFrame', () {
+    group('class', () {
+      test(0, () async {
+        dumpFrameTree(PageFrame frame, String indent) {
+          print(indent + frame.url);
+          for (var child in frame.childFrames) {
+            dumpFrameTree(child, indent + '  ');
+          }
+        }
+
+        var browser = await puppeteer.launch();
+        var page = await browser.newPage();
+        await page.goto(server.hostUrl);
+        dumpFrameTree(page.mainFrame, '');
+        await browser.close();
+      });
+      test(1, () async {
+        var frame = page.frames.firstWhere((frame) => frame.name == 'myframe');
+        var text = await frame.$eval('.selector', 'el => el.textContent');
+        print(text);
+      });
+    });
     test('Seval', () async {
-      var frame = page.mainFrame;
       //---
       var searchValue =
           await frame.$eval('#search', 'function (el) { return el.value; }');
@@ -448,6 +471,74 @@ main() {
       searchValue.toString();
       preloadHref.toString();
       html.toString();
+    });
+    test('SSeval', () async {
+      //---
+      var divsCounts = await frame.$$eval('div', 'divs => divs.length');
+      //---
+      print(divsCounts);
+    });
+  });
+  group('Keyboard', () {
+    group('class', () {
+      test(0, () async {
+        var input = await page.$('input');
+        await input.focus();
+        //----
+        await page.keyboard.type('Hello World!');
+        await page.keyboard.press(Key.arrowLeft);
+        await page.keyboard.down(Key.shift);
+        for (var i = 0; i < ' World'.length; i++) {
+          await page.keyboard.press(Key.arrowLeft);
+        }
+        await page.keyboard.up(Key.shift);
+        await page.keyboard.press(Key.backspace);
+        // Result text will end up saying 'Hello!'
+        //----
+        expect(await input.propertyValue('value'), equals('Hello!'));
+      });
+      test(1, () async {
+        var input = await page.$('input');
+        await input.focus();
+        //----
+        await page.keyboard.down(Key.shift);
+        await page.keyboard.press(Key.keyA, text: 'A');
+        await page.keyboard.up(Key.shift);
+        //----
+        expect(await input.propertyValue('value'), equals('A'));
+      });
+    });
+    test('sendCharacter', () async {
+      var input = await page.$('input');
+      await input.focus();
+      //----
+      await page.keyboard.sendCharacter('嗨');
+      //----
+      expect(await input.propertyValue('value'), equals('嗨'));
+    });
+    test('type', () async {
+      var input = await page.$('input');
+      await input.focus();
+      //----
+      // Types instantly
+      await page.keyboard.type('Hello');
+
+      // Types slower, like a user
+      await page.keyboard.type('World', delay: Duration(milliseconds: 10));
+      //----
+      expect(await input.propertyValue('value'), equals('HelloWorld'));
+    });
+  });
+  group('Mouse', () {
+    test('class', () async {
+      // Using ‘page.mouse’ to trace a 100x100 square.
+      await page.mouse.move(Point(0, 0));
+      await page.mouse.down();
+      await page.mouse.move(Point(0, 100));
+      await page.mouse.move(Point(100, 100));
+      await page.mouse.move(Point(100, 0));
+      await page.mouse.move(Point(0, 0));
+      await page.mouse.up();
     });
   });
 }

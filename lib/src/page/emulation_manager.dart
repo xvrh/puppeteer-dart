@@ -36,8 +36,8 @@ class DeviceViewport {
   final bool hasTouch;
 
   const DeviceViewport(
-      {this.width = 800,
-      this.height = 600,
+      {this.width = 1280,
+      this.height = 1024,
       this.deviceScaleFactor = 1,
       this.isMobile = false,
       this.isLandscape = false,

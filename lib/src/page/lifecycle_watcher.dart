@@ -114,7 +114,7 @@ class LifecycleWatcher {
     for (var event in wait._events) {
       if (!frame.lifecycleEvents.contains(event)) return false;
     }
-    for (var child in frame.children) {
+    for (var child in frame.childFrames) {
       if (!_checkLifecycle(child)) return false;
     }
     return true;

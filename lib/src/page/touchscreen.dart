@@ -10,6 +10,7 @@ class Touchscreen {
 
   Touchscreen(this.runtimeApi, this.inputApi, this.keyboard);
 
+  /// Dispatches a `touchstart` and `touchend` event.
   Future<void> tap(Point position) async {
     // Touches appear to be lost during the first frame after navigation.
     // This waits a frame before sending the tap.
