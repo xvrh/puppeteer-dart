@@ -26,7 +26,7 @@ typedef _RouteCallback = FutureOr<Response> Function(Request);
 class Server {
   HttpServer _httpServer;
   final _routes = CanonicalizedMap<String, String, _RouteCallback>(
-          (key) => p.url.normalize(_removeLeadingSlash(key)));
+      (key) => p.url.normalize(_removeLeadingSlash(key)));
   final _requestCallbacks =
       CanonicalizedMap<String, String, Completer<Request>>(
           (key) => p.url.normalize(_removeLeadingSlash(key)));
@@ -51,7 +51,7 @@ class Server {
       var callback = _routes[request.url.path];
       if (callback != null) {
         return callback(request);
-      } else  {
+      } else {
         return staticHandler(request);
       }
     }, InternetAddress.anyIPv4, 0);
@@ -97,6 +97,7 @@ class Server {
 
   void clearRoutes() {
     _routes.clear();
+    _requestCallbacks.clear();
   }
 
   Future<Request> waitForRequest(String path) {

@@ -13,6 +13,15 @@ const evaluationScriptUrl = '__puppeteer_evaluation_script__';
 final RegExp sourceUrlRegExp =
     RegExp(r'^[\040\t]*\/\/[@#] sourceURL=\s*(\S*?)\s*$', multiLine: true);
 
+/// The class represents a context for JavaScript execution. A [Page] might have
+/// many execution contexts:
+/// - each [frame](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe)
+///   has "default" execution context that is always created after frame is attached
+///   to DOM. This context is returned by the [frame.executionContext] method.
+/// - [Extensions](https://developer.chrome.com/extensions)'s content scripts
+///   create additional execution contexts.
+///
+/// Besides pages, execution contexts can be found in [workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API).
 class ExecutionContext {
   final Client client;
   final RuntimeApi runtimeApi;
@@ -26,8 +35,40 @@ class ExecutionContext {
         domApi = DOMApi(client),
         pageApi = PageApi(client);
 
+  /// Frame associated with this execution context.
+  ///
+  /// > **NOTE** Not every execution context is associated with a frame. For
+  /// example, workers and extensions have execution contexts that are not
+  /// associated with frames.
   PageFrame get frame => world?.frame;
 
+  /// If the function passed to the `executionContext.evaluate` returns a [Promise],
+  /// then `executionContext.evaluate` would wait for the promise to resolve and
+  /// return its value.
+  ///
+  /// If the function passed to the `executionContext.evaluate` returns a
+  /// non-[Serializable] value, then `executionContext.evaluate` resolves to `null`.
+  /// DevTools Protocol also supports transferring some additional values that
+  /// are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and
+  /// bigint literals.
+  ///
+  /// ```dart
+  /// var executionContext = await page.mainFrame.executionContext;
+  /// var result = await executionContext.evaluate('() => Promise.resolve(8 * 7)');
+  /// print(result); // prints "56"
+  /// ```
+  ///
+  /// An expression can also be passed in instead of a function.
+  ///
+  /// ```dart
+  /// print(await executionContext.evaluate('1 + 2')); // prints "3"
+  /// ```
+  ///
+  /// Parameters:
+  /// - `pageFunction`:  Function to be evaluated in `executionContext`
+  /// - [args]:  Arguments to pass to `pageFunction`
+  ///
+  /// Returns [Future] which resolves to the return value of `pageFunction`
   Future<T> evaluate<T>(@Language('js') String pageFunction,
       {List args}) async {
     var handle = await evaluateHandle(pageFunction, args: args);
@@ -41,6 +82,36 @@ class ExecutionContext {
     return result;
   }
 
+  /// The only difference between `executionContext.evaluate` and
+  /// `executionContext.evaluateHandle` is that `executionContext.evaluateHandle`
+  /// returns in-page object (JSHandle).
+  ///
+  /// If the function passed to the `executionContext.evaluateHandle` returns a
+  /// [Promise], then `executionContext.evaluateHandle` would wait for the promise
+  /// to resolve and return its value.
+  ///
+  /// ```dart
+  /// var context = await page.mainFrame.executionContext;
+  /// var aHandle = await context.evaluateHandle('() => Promise.resolve(self)');
+  /// aHandle; // Handle for the global object.
+  /// ```
+  ///
+  /// A string can also be passed in instead of a function.
+  ///
+  /// ```dart
+  /// var aHandle =
+  ///     await context.evaluateHandle('1 + 2'); // Handle for the '3' object.
+  /// ```
+  ///
+  /// [JSHandle] instances can be passed as arguments to the `executionContext.evaluateHandle`:
+  /// ```dart
+  /// var aHandle = await context.evaluateHandle('() => document.body');
+  /// var resultHandle =
+  ///     await context.evaluateHandle('body => body.innerHTML', args: [aHandle]);
+  /// print(await resultHandle.jsonValue); // prints body's innerHTML
+  /// await aHandle.dispose();
+  /// await resultHandle.dispose();
+  /// ```
   Future<JsHandle> evaluateHandle(@Language('js') String pageFunction,
       {List args}) async {
     // Try to convert a function shorthand (ie: '(el) => el.value;' to a full
@@ -127,6 +198,8 @@ class ExecutionContext {
     return CallArgument(value: arg);
   }
 
+  /// The method iterates the JavaScript heap and finds all the objects with the
+  /// given prototype.
   Future<JsHandle> queryObjects(JsHandle prototypeHandle) async {
     if (prototypeHandle.isDisposed) {
       throw Exception('Prototype JSHandle is disposed!');

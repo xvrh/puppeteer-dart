@@ -12,7 +12,21 @@ import 'page.dart';
 
 export '../../protocol/dom.dart' show BoxModel;
 
+/// JSHandle represents an in-page JavaScript object. JSHandles can be created
+/// with the [page.evaluateHandle] method.
+///
+/// ```dart
+/// var windowHandle = await page.evaluateHandle('() => window');
+/// ```
+///
+/// JSHandle prevents the referenced JavaScript object being garbage collected
+/// unless the handle is [disposed]. JSHandles are auto-disposed when their
+/// origin frame gets navigated or the parent context gets destroyed.
+///
+/// JSHandle instances can be used as arguments in [page.$eval], [page.evaluate]
+/// and [page.evaluateHandle] methods.
 class JsHandle {
+  /// Returns execution context the handle belongs to.
   final ExecutionContext executionContext;
   final RemoteObject remoteObject;
   bool _disposed = false;
@@ -31,6 +45,7 @@ class JsHandle {
 
   bool get isDisposed => _disposed;
 
+  /// Fetches a single property from the referenced object.
   Future<JsHandle> property(String propertyName) async {
     var objectHandle = await executionContext.evaluateHandle(
         //language=js
@@ -47,11 +62,22 @@ function _(object, propertyName) {
     return result;
   }
 
+  /// Fetches the jsonValue of a single property from the referenced object.
   Future<T> propertyValue<T>(String propertyName) async {
     T value = await (await property(propertyName)).jsonValue;
     return value;
   }
 
+  /// The method returns a map with property names as keys and JSHandle instances
+  /// for the property values.
+  ///
+  /// ```dart
+  /// var handle = await page.evaluateHandle('() => ({window, document})');
+  /// var properties = await handle.properties;
+  /// JsHandle windowHandle = properties['window'];
+  /// ElementHandle documentHandle = properties['document'];
+  /// await handle.dispose();
+  /// ```
   Future<Map<String, JsHandle>> get properties async {
     var response = await executionContext.runtimeApi
         .getProperties(remoteObject.objectId, ownProperties: true);
@@ -64,6 +90,13 @@ function _(object, propertyName) {
     return result;
   }
 
+  /// Returns a JSON representation of the object. If the object has a
+  /// [`toJSON`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#toJSON()_behavior)
+  /// function, it **will not be called**.
+  ///
+  /// > **NOTE** The method will return an empty JSON object if the referenced
+  /// object is not stringifiable.
+  /// It will throw an error if the object has circular references.
   Future<dynamic> get jsonValue async {
     if (remoteObject.objectId != null) {
       var response = await executionContext.runtimeApi.callFunctionOn(
@@ -77,8 +110,14 @@ function _(object, propertyName) {
     return valueFromRemoteObject(remoteObject);
   }
 
+  /// Returns either `null` or the object handle itself, if the object handle is
+  /// an instance of [ElementHandle].
   ElementHandle get asElement => null;
 
+  /// Stops referencing the element handle.
+  ///
+  /// Returns a Future which completes when the object handle is successfully
+  /// disposed.
   Future<void> dispose() async {
     if (_disposed) return;
     _disposed = true;
@@ -103,6 +142,30 @@ function _(object, propertyName) {
   }
 }
 
+/// ElementHandle represents an in-page DOM element. ElementHandles can be
+/// created with the [page.$] method.
+///
+/// ```dart
+/// import 'package:puppeteer/puppeteer.dart';
+///
+/// main() async {
+///   var browser = await puppeteer.launch();
+///
+///   var page = await browser.newPage();
+///   await page.goto('https://example.com');
+///   var hrefElement = await page.$('a');
+///   await hrefElement.click();
+///
+///   await browser.close();
+/// }
+/// ```
+///
+/// ElementHandle prevents DOM element from garbage collection unless the handle
+///  is [disposed]. ElementHandles are auto-disposed when their origin frame gets
+///  navigated.
+///
+/// ElementHandle instances can be used as arguments in [page.$eval] and
+/// [page.evaluate] methods.
 class ElementHandle extends JsHandle {
   final PageFrame frame;
   final FrameManager frameManager;
@@ -116,6 +179,8 @@ class ElementHandle extends JsHandle {
   @override
   ElementHandle get asElement => this;
 
+  /// Resolves to the content frame for element handles referencing iframe nodes,
+  /// or null otherwise
   Future<PageFrame> get contentFrame async {
     var nodeInfo = await executionContext.domApi
         .describeNode(objectId: remoteObject.objectId);
@@ -227,6 +292,17 @@ async function _(element, pageJavascriptEnabled) {
     await page.mouse.move(point);
   }
 
+  /// This method scrolls element into view if needed, and then uses [page.mouse]
+  /// to click in the center of the element.
+  /// If the element is detached from DOM, the method throws an error.
+  ///
+  /// Parameters:
+  /// - [button]: Defaults to [MouseButton.left]
+  /// - [clickCount]: Defaults to 1
+  /// - [delay]: Time to wait between `mousedown` and `mouseup`. Defaults to 0.
+  ///
+  /// Returns [Future] which resolves when the element is successfully clicked.
+  /// [Future] gets rejected if the element is detached from DOM.
   Future<void> click(
       {Duration delay, MouseButton button, int clickCount}) async {
     await _scrollIntoViewIfNeeded();
@@ -235,18 +311,26 @@ async function _(element, pageJavascriptEnabled) {
         .click(point, delay: delay, button: button, clickCount: clickCount);
   }
 
+  /// This method expects `elementHandle` to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input).
+  ///
+  /// Sets the value of the file input these paths.
   Future<void> uploadFile(List<File> files) async {
     await executionContext.domApi.setFileInputFiles(
         files.map((file) => file.absolute.path).toList(),
         objectId: remoteObject.objectId);
   }
 
+  /// This method scrolls element into view if needed, and then uses [touchscreen.tap]
+  /// to tap in the center of the element.
+  /// If the element is detached from DOM, the method throws an error.
   Future<void> tap() async {
     await _scrollIntoViewIfNeeded();
     var point = await _clickablePoint();
     await page.touchscreen.tap(point);
   }
 
+  /// Calls [focus](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus)
+  /// on the element.
   Future<void> focus() {
     return executionContext.evaluate(
         //language=js
@@ -254,18 +338,52 @@ async function _(element, pageJavascriptEnabled) {
         args: [this]);
   }
 
+  /// Focuses the element, and then sends a `keydown`, `keypress`/`input`, and
+  /// `keyup` event for each character in the text.
+  ///
+  /// To press a special key, like `Control` or `ArrowDown`, use [`elementHandle.press`].
+  ///
+  /// ```dart
+  /// await elementHandle.type('Hello'); // Types instantly
+  ///
+  /// // Types slower, like a user
+  /// await elementHandle.type('World', delay: Duration(milliseconds: 100));
+  ///
+  /// ///---
+  /// ```
+  ///
+  /// An example of typing into a text field and then submitting the form:
+  /// ```dart
+  /// var elementHandle = await page.$('input');
+  /// await elementHandle.type('some text');
+  /// await elementHandle.press(Key.enter);
+  /// ```
   Future<void> type(String text, {Duration delay}) async {
     await focus();
     await page.keyboard.type(text, delay: delay);
   }
 
+  /// Focuses the element, and then uses [`keyboard.down`] and [`keyboard.up`].
+  ///
+  /// If `key` is a single character and no modifier keys besides `Shift` are
+  /// being held down, a `keypress`/`input` event will also be generated. The
+  /// `text` option can be specified to force an input event to be generated.
+  ///
+  /// > **NOTE** Modifier keys DO effect `elementHandle.press`. Holding down
+  /// `Shift` will type the text in upper case.
+  ///
+  /// Parameters:
+  /// - [text]: If specified, generates an input event with this text.
+  /// - [delay]: Time to wait between `keydown` and `keyup`. Defaults to 0.
   Future<void> press(Key key, {Duration delay, String text}) async {
     await focus();
     await page.keyboard.press(key, delay: delay, text: text);
   }
 
-  Future<Rectangle> boundingBox() async {
-    var result = await boxModel();
+  /// This method returns the bounding box of the element (relative to the main
+  /// frame), or `null` if the element is not visible.
+  Future<Rectangle> get boundingBox async {
+    var result = await boxModel;
 
     if (result == null) return null;
 
@@ -278,18 +396,27 @@ async function _(element, pageJavascriptEnabled) {
     return Rectangle(x, y, width, height);
   }
 
-  Future<BoxModel> boxModel() {
+  /// This method returns boxes of the element, or `null` if the element is not
+  /// visible.
+  /// Boxes are represented as an array of points;
+  /// Box points are sorted clock-wise.
+  Future<BoxModel> get boxModel {
     return executionContext.domApi
         .getBoxModel(objectId: remoteObject.objectId)
         .catchError((_) => null,
             test: ServerException.matcher('Could not compute box model.'));
   }
 
+  /// This method scrolls element into view if needed, and then uses [page.screenshot]
+  /// to take a screenshot of the element.
+  /// If the element is detached from DOM, the method throws an error.
+  ///
+  /// See [Page.screenshot] for more info.
   Future<List<int>> screenshot(
       {ScreenshotFormat format, num quality, bool omitBackground}) async {
     var needsViewportReset = false;
 
-    var boundingBox = await this.boundingBox();
+    var boundingBox = await this.boundingBox;
     assert(boundingBox != null,
         'Node is either not visible or not an HTMLElement');
 
@@ -307,7 +434,7 @@ async function _(element, pageJavascriptEnabled) {
 
     await _scrollIntoViewIfNeeded();
 
-    boundingBox = await this.boundingBox();
+    boundingBox = await this.boundingBox;
     assert(boundingBox != null,
         'Node is either not visible or not an HTMLElement');
     assert(boundingBox.width != 0, 'Node has 0 width.');
@@ -335,6 +462,8 @@ async function _(element, pageJavascriptEnabled) {
     return imageData;
   }
 
+  /// The method runs `element.querySelector` within the page. If no element
+  /// matches the selector, the return value resolves to `null`.
   Future<ElementHandle> $(String selector) async {
     var handle = await executionContext.evaluateHandle(
         //language=js
@@ -346,6 +475,8 @@ async function _(element, pageJavascriptEnabled) {
     return null;
   }
 
+  /// The method runs `element.querySelectorAll` within the page. If no elements
+  /// match the selector, the return value resolves to `[]`.
   Future<List<ElementHandle>> $$(String selector) async {
     var arrayHandle = await executionContext.evaluateHandle(
         //language=js
@@ -361,6 +492,28 @@ async function _(element, pageJavascriptEnabled) {
     return result;
   }
 
+  /// This method runs `document.querySelector` within the element and passes it
+  /// as the first argument to `pageFunction`. If there's no element matching
+  /// `selector`, the method throws an error.
+  ///
+  /// If `pageFunction` returns a [Promise], then `frame.$eval` would wait for
+  /// the promise to resolve and return its value.
+  ///
+  /// Examples:
+  /// ```dart
+  /// var tweetHandle = await page.$('.tweet');
+  /// expect(await tweetHandle.$eval('.like', 'node => node.innerText'),
+  ///     equals('100'));
+  /// expect(await tweetHandle.$eval('.retweets', 'node => node.innerText'),
+  ///     equals('10'));
+  /// ```
+  ///
+  /// Parameters:
+  /// - A [selector] to query page for
+  /// - [pageFunction]: Function to be evaluated in browser context
+  /// - [args]: Arguments to pass to `pageFunction`
+  ///
+  /// Returns [Future] which resolves to the return value of `pageFunction`.
   Future<T> $eval<T>(String selector, @Language('js') String pageFunction,
       {List args}) async {
     var elementHandle = await $(selector);
@@ -379,6 +532,33 @@ async function _(element, pageJavascriptEnabled) {
     return result;
   }
 
+  /// This method runs `document.querySelectorAll` within the element and passes
+  /// it as the first argument to `pageFunction`. If there's no element matching
+  /// `selector`, the method throws an error.
+  ///
+  /// If `pageFunction` returns a [Promise], then `frame.$$eval` would wait for
+  /// the promise to resolve and return its value.
+  ///
+  /// Examples:
+  /// ```html
+  /// <div class="feed">
+  ///   <div class="tweet">Hello!</div>
+  ///   <div class="tweet">Hi!</div>
+  /// </div>
+  /// ```
+  /// ```dart
+  /// var feedHandle = await page.$('.feed');
+  /// expect(
+  ///     await feedHandle.$$eval('.tweet', 'nodes => nodes.map(n => n.innerText)'),
+  ///     equals(['Hello!', 'Hi!']));
+  /// ```
+  ///
+  /// Parameters:
+  /// - A [selector] to query page for
+  /// - [pageFunction]: Function to be evaluated in browser context
+  /// - [args]: Arguments to pass to `pageFunction`
+  ///
+  /// Returns: [Future] which resolves to the return value of `pageFunction`
   Future<T> $$eval<T>(String selector, @Language('js') String pageFunction,
       {List args}) async {
     var arrayHandle = await executionContext.evaluateHandle(
@@ -396,6 +576,8 @@ async function _(element, pageJavascriptEnabled) {
     return result;
   }
 
+  /// The method evaluates the XPath expression relative to the elementHandle.
+  /// If there are no such elements, the method will resolve to an empty array.
   Future<List<ElementHandle>> $x(String expression) async {
     var arrayHandle = await executionContext.evaluateHandle(
         //language=js
@@ -420,6 +602,7 @@ function _(element, expression) {
     return result;
   }
 
+  /// Resolves to true if the element is visible in the current viewport.
   Future<bool> get isIntersectingViewport {
     return executionContext.evaluate(
         //language=js

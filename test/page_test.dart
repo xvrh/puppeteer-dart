@@ -563,8 +563,7 @@ main() {
       expect(await page.evaluate('() => navigator.userAgent'),
           contains('Mozilla'));
       await page.setUserAgent('foobar');
-      var request =
-          await waitFutures(server.waitForRequest('simple.html'), [
+      var request = await waitFutures(server.waitForRequest('simple.html'), [
         page.goto(server.assetUrl('simple.html')),
       ]);
       expect(request.headers['user-agent'], equals('foobar'));
@@ -578,8 +577,7 @@ main() {
         expect(await page.evaluate('() => navigator.userAgent'),
             contains('Mozilla'));
         await page.setUserAgent('foobar');
-        var request =
-            await waitFutures(server.waitForRequest('simple.html'), [
+        var request = await waitFutures(server.waitForRequest('simple.html'), [
           attachFrame(page, 'frame1', server.assetUrl('simple.html')),
         ]);
         expect(request.headers['user-agent'], equals('foobar'));

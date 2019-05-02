@@ -52,7 +52,7 @@ main() {
       await page.setViewport(DeviceViewport(width: 500, height: 500));
       await page.goto(server.assetUrl('grid.html'));
       var elementHandle = await page.$('.box:nth-of-type(13)');
-      var box = await elementHandle.boundingBox();
+      var box = await elementHandle.boundingBox;
       expect(box, equals(Rectangle(100, 50, 50, 50)));
     });
     test('should handle nested frames', () async {
@@ -60,13 +60,13 @@ main() {
       await page.goto(server.assetUrl('frames/nested-frames.html'));
       var nestedFrame = page.frames[1].childFrames[1];
       var elementHandle = await nestedFrame.$('div');
-      var box = await elementHandle.boundingBox();
+      var box = await elementHandle.boundingBox;
       expect(box, equals(Rectangle(28, 260, 264, 18)));
     });
     test('should return null for invisible elements', () async {
       await page.setContent('<div style="display:none">hi</div>');
       var element = await page.$('div');
-      expect(await element.boundingBox(), isNull);
+      expect(await element.boundingBox, isNull);
     });
     test('should force a layout', () async {
       await page.setViewport(DeviceViewport(width: 500, height: 500));
@@ -75,7 +75,7 @@ main() {
       var elementHandle = await page.$('div');
       await page.evaluate("element => element.style.height = '200px'",
           args: [elementHandle]);
-      var box = await elementHandle.boundingBox();
+      var box = await elementHandle.boundingBox;
       expect(box, equals(Rectangle(8, 8, 100, 200)));
     });
     test('should work with SVG nodes', () async {
@@ -85,7 +85,7 @@ main() {
   </svg>
   ''');
       var element = await page.$('#therect');
-      var pptrBoundingBox = await element.boundingBox();
+      var pptrBoundingBox = await element.boundingBox;
       var webBoundingBox = await page.evaluate('''e => {
   var rect = e.getBoundingClientRect();
   return {x: rect.x, y: rect.y, width: rect.width, height: rect.height};
@@ -134,7 +134,7 @@ main() {
   }''')).asElement;
 
       // Step 3: query div's boxModel and assert box values.
-      var box = await divHandle.boxModel();
+      var box = await divHandle.boxModel;
       expect(box.width, equals(6));
       expect(box.height, equals(7));
       expect(
@@ -168,7 +168,7 @@ main() {
     test('should return null for invisible elements', () async {
       await page.setContent('<div style="display:none">hi</div>');
       var element = await page.$('div');
-      expect(await element.boxModel(), isNull);
+      expect(await element.boxModel, isNull);
     });
   });
 

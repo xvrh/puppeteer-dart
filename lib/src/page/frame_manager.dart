@@ -121,11 +121,15 @@ class FrameManager {
     var watcher = LifecycleWatcher(this, frame,
         wait: wait, timeout: timeout ?? page.navigationTimeoutOrDefault);
     try {
-      await Future.any([
+      var error = await Future.any([
         watcher.timeoutOrTermination,
         watcher.sameDocumentNavigation,
         watcher.newDocumentNavigation,
       ]);
+
+      if (error != null) {
+        throw error;
+      }
     } finally {
       watcher.dispose();
     }
