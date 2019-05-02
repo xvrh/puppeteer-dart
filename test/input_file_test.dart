@@ -23,6 +23,7 @@ main() {
   });
 
   tearDown(() async {
+    server.clearRoutes();
     await page.close();
     page = null;
   });
@@ -30,7 +31,7 @@ main() {
   group('input', () {
     test('should upload the file', () async {
       await page.goto(server.prefix + '/input/fileupload.html');
-      var filePath = File('test/file-to-upload.txt');
+      var filePath = File('test/assets/file-to-upload.txt');
       var input = await page.$('input');
       await input.uploadFile([filePath]);
       expect(await page.evaluate('e => e.files[0].name', args: [input]),

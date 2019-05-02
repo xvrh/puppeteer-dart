@@ -1,2 +1,0 @@
-# Some test are slow (ie: download dartium). Increase the timeout.
-timeout: 4x

@@ -41,7 +41,7 @@ class Server {
 
   Future _setup() async {
     var staticHandler = createStaticHandler('test/assets');
-    _httpServer = await io.serve((request) {
+    _httpServer = await io.serve((request) async {
       var notificationCompleter = _requestCallbacks[request.url.toString()];
       if (notificationCompleter != null) {
         notificationCompleter.complete(request);
@@ -52,7 +52,10 @@ class Server {
       if (callback != null) {
         return callback(request);
       } else {
-        return staticHandler(request);
+        Response staticResponse = await staticHandler(request);
+        staticResponse
+            .change(headers: {HttpHeaders.cacheControlHeader: 'no-cache'});
+        return staticResponse;
       }
     }, InternetAddress.anyIPv4, 0);
   }
@@ -101,7 +104,9 @@ class Server {
   }
 
   Future<Request> waitForRequest(String path) {
-    return (_requestCallbacks[path] ??= Completer<Request>()).future;
+    return (_requestCallbacks[_removeLeadingSlash(path)] ??=
+            Completer<Request>())
+        .future;
   }
 
   Future close() => _httpServer.close(force: true);

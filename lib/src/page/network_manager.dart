@@ -37,11 +37,11 @@ class NetworkManager {
     _network.onLoadingFailed.listen(_onLoadingFailed);
   }
 
-  DevTools get _domains => frameManager.page.devTools;
+  DevTools get _devTools => frameManager.page.devTools;
 
-  FetchApi get _fetch => _domains.fetch;
+  FetchApi get _fetch => _devTools.fetch;
 
-  NetworkApi get _network => _domains.network;
+  NetworkApi get _network => _devTools.network;
 
   Stream<NetworkRequest> get onRequest => _onRequestController.stream;
 
@@ -61,9 +61,9 @@ class NetworkManager {
   }
 
   Future<void> initialize() async {
-    await _domains.network.enable();
+    await _devTools.network.enable();
     if (frameManager.page.browser.ignoreHttpsErrors) {
-      await _domains.security.setIgnoreCertificateErrors(true);
+      await _devTools.security.setIgnoreCertificateErrors(true);
     }
   }
 

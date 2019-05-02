@@ -12,7 +12,6 @@ main() {
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
-    context = await browser.createIncognitoBrowserContext();
   });
 
   tearDownAll(() async {
@@ -22,13 +21,14 @@ main() {
   });
 
   setUp(() async {
+    context = await browser.createIncognitoBrowserContext();
     page = await context.newPage();
   });
 
   tearDown(() async {
-    await page.close();
-    page = null;
     server.clearRoutes();
+    await context.close();
+    page = null;
   });
 
   group('Page.close', () {
@@ -267,9 +267,7 @@ main() {
       await page.setOfflineMode(false);
       var response = await page.reload();
       expect(response.status, equals(200));
-    },
-        //TODO(xha): test is flaky when running the whole suite
-        skip: true);
+    }, skip: 'Flaky when running the whole suite');
     test('should emulate navigator.onLine', () async {
       expect(await page.evaluate('() => window.navigator.onLine'), isTrue);
       await page.setOfflineMode(true);
@@ -277,7 +275,7 @@ main() {
       await page.setOfflineMode(false);
       expect(await page.evaluate('() => window.navigator.onLine'), isTrue);
     });
-  }, skip: true);
+  });
 
   group('ExecutionContext.queryObjects', () {
     test('should work', () async {
@@ -569,21 +567,13 @@ main() {
       expect(request.headers['user-agent'], equals('foobar'));
     });
     test('should work for subframes', () async {
-      // TODO(xha):
-      //  This test is flaky when using the shared browser. Need to investigate
-      var browser = await puppeteer.launch();
-      try {
-        var page = await browser.newPage();
-        expect(await page.evaluate('() => navigator.userAgent'),
-            contains('Mozilla'));
-        await page.setUserAgent('foobar');
-        var request = await waitFutures(server.waitForRequest('simple.html'), [
-          attachFrame(page, 'frame1', server.assetUrl('simple.html')),
-        ]);
-        expect(request.headers['user-agent'], equals('foobar'));
-      } finally {
-        await browser.close();
-      }
+      expect(await page.evaluate('() => navigator.userAgent'),
+          contains('Mozilla'));
+      await page.setUserAgent('foobar');
+      var request = await waitFutures(server.waitForRequest('simple.html'), [
+        attachFrame(page, 'frame1', server.assetUrl('simple.html')),
+      ]);
+      expect(request.headers['user-agent'], equals('foobar'));
     });
     test('should emulate device user-agent', () async {
       await page.goto(server.prefix + '/mobile.html');
@@ -713,14 +703,14 @@ main() {
     test('should work with a path', () async {
       await page.goto(server.emptyPage);
       var scriptHandle =
-          await page.addScriptTag(file: File('test/injectedfile.js'));
+          await page.addScriptTag(file: File('test/assets/injectedfile.js'));
       expect(scriptHandle.asElement, isNotNull);
       expect(await page.evaluate('() => __injected'), equals(42));
     });
 
     test('should include sourcemap when path is provided', () async {
       await page.goto(server.emptyPage);
-      await page.addScriptTag(file: File('test/injectedfile.js'));
+      await page.addScriptTag(file: File('test/assets/injectedfile.js'));
       var result = await page.evaluate('() => __injectedError.stack');
       expect(result, contains('injectedfile.js'));
     });

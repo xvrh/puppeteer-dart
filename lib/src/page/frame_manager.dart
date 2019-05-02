@@ -107,7 +107,7 @@ class FrameManager {
       ]);
 
       if (error != null) {
-        throw error;
+        return Future.error(error);
       }
     } finally {
       watcher.dispose();
@@ -128,7 +128,7 @@ class FrameManager {
       ]);
 
       if (error != null) {
-        throw error;
+        return Future.error(error);
       }
     } finally {
       watcher.dispose();

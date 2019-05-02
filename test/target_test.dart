@@ -27,6 +27,7 @@ main() {
   });
 
   tearDown(() async {
+    server.clearRoutes();
     await page.close();
   });
 
