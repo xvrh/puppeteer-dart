@@ -8,9 +8,6 @@ os:
 dart:
  - stable
 
-install:
- - gem install coveralls-lcov
-
 before_script:
  - dart example/download_chromium.dart
 
@@ -27,6 +24,7 @@ jobs:
      - tool/coverage.sh
 
 after_success:
+ - gem install coveralls-lcov
  - coveralls-lcov var/lcov.info
 
 branches:
