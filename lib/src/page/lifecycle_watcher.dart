@@ -101,7 +101,9 @@ class LifecycleWatcher {
       return;
     }
     if (_hasSameDocumentNavigation) {
-      _sameDocumentNavigationCompleter.complete();
+      if (!_sameDocumentNavigationCompleter.isCompleted) {
+        _sameDocumentNavigationCompleter.complete();
+      }
     }
     if (frame.loaderId != _initialLoaderId) {
       if (!_newDocumentNavigationCompleter.isCompleted) {
@@ -140,7 +142,7 @@ class Until {
     _events.add(event);
   }
 
-  Until._multi(List<Until> waits) {
+  Until.all(List<Until> waits) {
     for (Until wait in waits) {
       _events.addAll(wait._events);
     }

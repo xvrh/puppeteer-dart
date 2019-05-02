@@ -758,7 +758,10 @@ function addPageBinding(bindingName) {
           _deliverError, [name, seq, error.toString(), stackTrace.toString()]);
     }
     await devTools.runtime
-        .evaluate(expression, contextId: event.executionContextId);
+        .evaluate(expression, contextId: event.executionContextId)
+        // It is possible to have a data race, so we don't care if we don't
+        // receive the response here.
+        .catchError((_) => null, test: (e) => e is TargetClosedException);
   }
 
   static final _deliverResult = '''

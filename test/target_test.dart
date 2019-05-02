@@ -142,7 +142,7 @@ main() {
     test('should not crash while redirecting if original request was missed',
         () async {
       Completer<Response> serverResponse;
-      server.setRoute('assets/one-style.css', (req) {
+      server.setRoute('one-style.css', (req) {
         serverResponse = Completer<Response>();
         return serverResponse.future;
       });
@@ -153,13 +153,13 @@ main() {
       await Future.wait([
         page.evaluate('url => window.open(url)',
             args: [server.prefix + '/one-style.html']),
-        server.waitForRequest('assets/one-style.css')
+        server.waitForRequest('one-style.css')
       ]);
       // Connect to the opened page.
       var target = await targetFuture;
       var newPage = await target.page;
       // Issue a redirect.
-      serverResponse.complete(Response.found('/assets/injectedstyle.css'));
+      serverResponse.complete(Response.found('/injectedstyle.css'));
       // Wait for the new page to load.
       await newPage.onLoad.first;
       // Cleanup.

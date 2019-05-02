@@ -24,12 +24,12 @@ Future server(String location, Function(String) callback) async {
 typedef _RouteCallback = FutureOr<Response> Function(Request);
 
 class Server {
-  static const _assetFolder = 'assets';
   HttpServer _httpServer;
-  final _routes = <String, _RouteCallback>{};
+  final _routes = CanonicalizedMap<String, String, _RouteCallback>(
+          (key) => p.url.normalize(_removeLeadingSlash(key)));
   final _requestCallbacks =
       CanonicalizedMap<String, String, Completer<Request>>(
-          (key) => p.url.normalize(key));
+          (key) => p.url.normalize(_removeLeadingSlash(key)));
 
   Server._();
 
@@ -40,7 +40,7 @@ class Server {
   }
 
   Future _setup() async {
-    var staticHandler = createStaticHandler('test/$_assetFolder');
+    var staticHandler = createStaticHandler('test/assets');
     _httpServer = await io.serve((request) {
       var notificationCompleter = _requestCallbacks[request.url.toString()];
       if (notificationCompleter != null) {
@@ -51,10 +51,8 @@ class Server {
       var callback = _routes[request.url.path];
       if (callback != null) {
         return callback(request);
-      } else if (request.url.path.startsWith('$_assetFolder/')) {
-        return staticHandler(request.change(path: _assetFolder));
-      } else {
-        return Response.notFound('${request.url.path} not found');
+      } else  {
+        return staticHandler(request);
       }
     }, InternetAddress.anyIPv4, 0);
   }
@@ -65,21 +63,36 @@ class Server {
 
   String get docExamples2Url => assetUrl('doc_examples_2.html');
 
-  String get prefix => p.url.join(hostUrl, _assetFolder);
+  String get prefix => hostUrl;
 
-  String get crossProcessPrefix =>
-      p.url.join('http://127.0.0.1:${_httpServer.port}', _assetFolder);
+  String get crossProcessPrefix => 'http://127.0.0.1:${_httpServer.port}';
 
   String get emptyPage => assetUrl('empty.html');
 
   String assetUrl(String page) {
-    assert(!page.startsWith('/'));
-    return p.url.join(hostUrl, _assetFolder, page);
+    page = _removeLeadingSlash(page);
+    return p.url.join(hostUrl, page);
+  }
+
+  static String _removeLeadingSlash(String path) {
+    if (path.startsWith('/')) {
+      return path.substring(1);
+    }
+    return path;
   }
 
   void setRoute(
       String url, FutureOr<Response> Function(Request request) callback) {
     _routes[url] = callback;
+  }
+
+  void setRedirect(String from, String to) {
+    setRoute(from, (request) {
+      if (!to.contains('://')) {
+        to = assetUrl(to);
+      }
+      return Response.found(to);
+    });
   }
 
   void clearRoutes() {

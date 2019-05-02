@@ -564,7 +564,7 @@ main() {
           contains('Mozilla'));
       await page.setUserAgent('foobar');
       var request =
-          await waitFutures(server.waitForRequest('assets/simple.html'), [
+          await waitFutures(server.waitForRequest('simple.html'), [
         page.goto(server.assetUrl('simple.html')),
       ]);
       expect(request.headers['user-agent'], equals('foobar'));
@@ -579,7 +579,7 @@ main() {
             contains('Mozilla'));
         await page.setUserAgent('foobar');
         var request =
-            await waitFutures(server.waitForRequest('assets/simple.html'), [
+            await waitFutures(server.waitForRequest('simple.html'), [
           attachFrame(page, 'frame1', server.assetUrl('simple.html')),
         ]);
         expect(request.headers['user-agent'], equals('foobar'));
@@ -687,7 +687,7 @@ main() {
     test('should work with a path and type=module', () async {
       await page.goto(server.emptyPage);
       await page.addScriptTag(
-          file: File('test/assets/es6/es6pathimport.js'), type: 'module');
+          file: File('test/es6/es6pathimport.js'), type: 'module');
       await page.waitForFunction('window.__es6injected');
       expect(await page.evaluate('() => __es6injected'), equals(42));
     },
@@ -698,7 +698,7 @@ main() {
       await page.goto(server.emptyPage);
       await page.addScriptTag(
           content:
-              "import num from '/assets/es6/es6module.js';window.__es6injected = num;",
+              "import num from '/es6/es6module.js';window.__es6injected = num;",
           type: 'module');
       await page.waitForFunction('window.__es6injected');
       expect(await page.evaluate('() => __es6injected'), equals(42));
@@ -715,16 +715,16 @@ main() {
     test('should work with a path', () async {
       await page.goto(server.emptyPage);
       var scriptHandle =
-          await page.addScriptTag(file: File('test/assets/injectedfile.js'));
+          await page.addScriptTag(file: File('test/injectedfile.js'));
       expect(scriptHandle.asElement, isNotNull);
       expect(await page.evaluate('() => __injected'), equals(42));
     });
 
     test('should include sourcemap when path is provided', () async {
       await page.goto(server.emptyPage);
-      await page.addScriptTag(file: File('test/assets/injectedfile.js'));
+      await page.addScriptTag(file: File('test/injectedfile.js'));
       var result = await page.evaluate('() => __injectedError.stack');
-      expect(result, contains('assets/injectedfile.js'));
+      expect(result, contains('injectedfile.js'));
     });
 
     test('should work with content', () async {

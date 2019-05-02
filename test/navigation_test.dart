@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils.dart';
@@ -27,11 +29,11 @@ main() {
   });
 
   group('Page.goto', () {
-    test('should work', () async  {
+    test('should work', () async {
       await page.goto(server.emptyPage);
       expect(page.url, equals(server.emptyPage));
     });
-    test('should work with anchor navigation', () async  {
+    test('should work with anchor navigation', () async {
       await page.goto(server.emptyPage);
       expect(page.url, equals(server.emptyPage));
       await page.goto(server.emptyPage + '#foo');
@@ -39,190 +41,187 @@ main() {
       await page.goto(server.emptyPage + '#bar');
       expect(page.url, equals(server.emptyPage + '#bar'));
     });
-    test('should work with redirects', () async  {
+    test('should work with redirects', () async {
       server.setRedirect('/redirect/1.html', '/redirect/2.html');
-      server.setRedirect('/redirect/2.html', '/empty.html');
+      server.setRedirect('/redirect/2.html', '/simple.html');
       await page.goto(server.prefix + '/redirect/1.html');
-      expect(page.url, equals(server.emptyPage));
+      expect(page.url, equals(server.assetUrl('simple.html')));
     });
-    test('should navigate to about:blank', () async  {
+    test('should navigate to about:blank', () async {
       var response = await page.goto('about:blank');
       expect(response, equals(null));
     });
-    test('should return response when page changes its URL after load', () async  {
+    test('should return response when page changes its URL after load',
+        () async {
       var response = await page.goto(server.prefix + '/historyapi.html');
       expect(response.status, equals(200));
     });
-    test('should work with subframes return 204', () async  {
-      server.setRoute('/frames/frame.html', (req)  {
-      return Response(204);
-    });
+    test('should work with subframes return 204', () async {
+      server.setRoute('/frames/frame.html', (req) {
+        return Response(204);
+      });
       await page.goto(server.prefix + '/frames/one-frame.html');
     });
-    test('should fail when server returns 204', () async  {
-      server.setRoute('/empty.html', (req) => Response(204));
-      let error = null;
-      await page.goto(server.emptyPage).catch(e => error = e);
-      expect(error).not.toBe(null);
-      if (CHROME)
-      expect(error.message, contains('net::ERR_ABORTED'));
-      else
-      expect(error.message, contains('NS_BINDING_ABORTED'));
+    test('should fail when server returns 204', () async {
+      server.setRoute('/204.html', (req) => Response(204));
+      expect(() => page.goto(server.assetUrl('204.html')),
+          throwsA(predicate((e) => '$e'.contains('net::ERR_ABORTED'))));
     });
-    test('should navigate to empty page with domcontentloaded', () async  {
-      var response = await page.goto(server.emptyPage, {waitUntil: 'domcontentloaded'});
+    test('should navigate to empty page with domcontentloaded', () async {
+      var response =
+          await page.goto(server.emptyPage, wait: Until.domContentLoaded);
       expect(response.status, equals(200));
     });
-    test('should work when page calls history API in beforeunload', () async  {
+    test('should work when page calls history API in beforeunload', () async {
       await page.goto(server.emptyPage);
-      await page.evaluate(() => {
+      await page.evaluate('''() => {
       window.addEventListener('beforeunload', () => history.replaceState(null, 'initial', window.location.href), false);
-      });
+      }''');
       var response = await page.goto(server.prefix + '/grid.html');
       expect(response.status, equals(200));
     });
-    test('should navigate to empty page with networkidle0', () async  {
-      var response = await page.goto(server.emptyPage, {waitUntil: 'networkidle0'});
+    test('should navigate to empty page with networkidle0', () async {
+      var response = await page.goto(server.emptyPage, wait: Until.networkIdle);
       expect(response.status, equals(200));
     });
-    test('should navigate to empty page with networkidle2', () async  {
-      var response = await page.goto(server.emptyPage, {waitUntil: 'networkidle2'});
+    test('should navigate to empty page with networkidle2', () async {
+      var response =
+          await page.goto(server.emptyPage, wait: Until.networkAlmostIdle);
       expect(response.status, equals(200));
     });
-    test('should fail when navigating to bad url', () async  {
-      let error = null;
-      await page.goto('asdfasdf').catch(e => error = e);
-      if (CHROME)
-      expect(error.message, contains('Cannot navigate to invalid URL'));
-      else
-      expect(error.message, contains('Invalid url'));
+    test('should fail when navigating to bad url', () async {
+      expect(
+          () => page.goto('asdfasdf'),
+          throwsA(predicate(
+              (e) => '$e'.contains('Cannot navigate to invalid URL'))));
     });
-    test('should fail when navigating to bad SSL', async({page, httpsServer}) => {
-    // Make sure that network events do not emit 'undefined'.
-    // @see https://crbug.com/750469
-    page.on('request', (request) => expect(request, isNotNull));
-    page.on('requestfinished', request => expect(request, isNotNull));
-    page.on('requestfailed', request => expect(request, isNotNull));
-    let error = null;
-    await page.goto(httpsServer.emptyPage).catch(e => error = e);
-    if (CHROME)
-    expect(error.message, contains('net::ERR_CERT_AUTHORITY_INVALID'));
-    else
-    expect(error.message, contains('SSL_ERROR_UNKNOWN'));
+    test('should fail when navigating to bad SSL', () async {
+      // Make sure that network events do not emit 'undefined'.
+      // @see https://crbug.com/750469
+      page.onRequest.listen((request) => expect(request, isNotNull));
+      page.onRequestFinished.listen((request) => expect(request, isNotNull));
+      page.onRequestFailed.listen((request) => expect(request, isNotNull));
+
+      //expect(() => page.goto(httpsServer.emptyPage), throwsA(predicate((e) => '$e'.contains('net::ERR_CERT_AUTHORITY_INVALID'))));
+    }, skip: "Test server doesn't support https yet");
+    test('should fail when navigating to bad SSL after redirects', () async {
+      server.setRedirect('/redirect/1.html', '/redirect/2.html');
+      server.setRedirect('/redirect/2.html', '/empty.html');
+
+      //expect(() => page.goto(httpsServer.prefix + '/redirect/1.html'), throwsA(predicate((e) => '$e'.contains('net::ERR_CERT_AUTHORITY_INVALID'))));
+    }, skip: "Test server doesn't support https yet");
+    test('should fail when main resources failed to load', () async {
+      expect(
+          () => page.goto('http://localhost:44123/non-existing-url'),
+          throwsA(
+              predicate((e) => '$e'.contains('net::ERR_CONNECTION_REFUSED'))));
     });
-    test('should fail when navigating to bad SSL after redirects', async({page, server, httpsServer}) => {
-    server.setRedirect('/redirect/1.html', '/redirect/2.html');
-    server.setRedirect('/redirect/2.html', '/empty.html');
-    let error = null;
-    await page.goto(httpsServer.prefix + '/redirect/1.html').catch(e => error = e);
-    if (CHROME)
-    expect(error.message, contains('net::ERR_CERT_AUTHORITY_INVALID'));
-    else
-    expect(error.message, contains('SSL_ERROR_UNKNOWN'));
+    test('should fail when exceeding maximum navigation timeout', () async {
+      // Hang for request to the infinite.html
+      server.setRoute(
+          '/infinite.html', (request) => Completer<Response>().future);
+      expect(
+          () => page.goto(server.prefix + '/infinite.html',
+              timeout: Duration(milliseconds: 1)),
+          throwsA(TypeMatcher<TimeoutException>()));
     });
-    test('should throw if networkidle is passed as an option', () async  {
-      let error = null;
-      await page.goto(server.emptyPage, {waitUntil: 'networkidle'}).catch(err => error = err);
-      expect(error.message, contains('"networkidle" option is no longer supported'));
+    test('should fail when exceeding default maximum navigation timeout',
+        () async {
+      // Hang for request to the infinite.html
+      server.setRoute(
+          '/infinite.html', (request) => Completer<Response>().future);
+      page.defaultNavigationTimeout = Duration(milliseconds: 1);
+      expect(() => page.goto(server.prefix + '/infinite.html'),
+          throwsA(TypeMatcher<TimeoutException>()));
     });
-    test('should fail when main resources failed to load', () async  {
-      let error = null;
-      await page.goto('http://localhost:44123/non-existing-url').catch(e => error = e);
-      if (CHROME)
-      expect(error.message, contains('net::ERR_CONNECTION_REFUSED'));
-      else
-      expect(error.message, contains('NS_ERROR_CONNECTION_REFUSED'));
+    test('should fail when exceeding default maximum timeout', () async {
+      // Hang for request to the infinite.html
+      server.setRoute(
+          '/infinite.html', (request) => Completer<Response>().future);
+      page.defaultTimeout = Duration(milliseconds: 1);
+      expect(() => page.goto(server.prefix + '/infinite.html'),
+          throwsA(TypeMatcher<TimeoutException>()));
     });
-    test('should fail when exceeding maximum navigation timeout', () async  {
-      // Hang for request to the empty.html
-      server.setRoute('/empty.html', (req, res) => { });
-      let error = null;
-      await page.goto(server.prefix + '/empty.html', {timeout: 1}).catch(e => error = e);
-      expect(error.message, contains('Navigation Timeout Exceeded: 1ms'));
-      expect(error).toBeInstanceOf(puppeteer.errors.TimeoutError);
+    test('should prioritize default navigation timeout over default timeout',
+        () async {
+      // Hang for request to the infinite.html
+      server.setRoute(
+          '/infinite.html', (request) => Completer<Response>().future);
+      page.defaultTimeout = Duration.zero;
+      page.defaultTimeout = Duration(milliseconds: 1);
+      expect(() => page.goto(server.prefix + '/infinite.html'),
+          throwsA(TypeMatcher<TimeoutException>()));
     });
-    test('should fail when exceeding default maximum navigation timeout', () async  {
-      // Hang for request to the empty.html
-      server.setRoute('/empty.html', (req, res) => { });
-      let error = null;
-      page.setDefaultNavigationTimeout(1);
-      await page.goto(server.prefix + '/empty.html').catch(e => error = e);
-      expect(error.message, contains('Navigation Timeout Exceeded: 1ms'));
-      expect(error).toBeInstanceOf(puppeteer.errors.TimeoutError);
-    });
-    test('should fail when exceeding default maximum timeout', () async  {
-      // Hang for request to the empty.html
-      server.setRoute('/empty.html', (req, res) => { });
-      let error = null;
-      page.setDefaultTimeout(1);
-      await page.goto(server.prefix + '/empty.html').catch(e => error = e);
-      expect(error.message, contains('Navigation Timeout Exceeded: 1ms'));
-      expect(error).toBeInstanceOf(puppeteer.errors.TimeoutError);
-    });
-    test('should prioritize default navigation timeout over default timeout', () async  {
-      // Hang for request to the empty.html
-      server.setRoute('/empty.html', (req, res) => { });
-      let error = null;
-      page.setDefaultTimeout(0);
-      page.setDefaultNavigationTimeout(1);
-      await page.goto(server.prefix + '/empty.html').catch(e => error = e);
-      expect(error.message, contains('Navigation Timeout Exceeded: 1ms'));
-      expect(error).toBeInstanceOf(puppeteer.errors.TimeoutError);
-    });
-    test('should disable timeout when its set to 0', () async  {
-      let error = null;
-      let loaded = false;
-      page.once('load', () => loaded = true);
-      await page.goto(server.prefix + '/grid.html', {timeout: 0, waitUntil: ['load']}).catch(e => error = e);
-      expect(error, equals(null));
+    test('should disable timeout when its set to 0', () async {
+      var loaded = false;
+      page.onLoad.listen((_) {
+        loaded = true;
+      });
+      await page.goto(server.prefix + '/grid.html',
+          timeout: Duration.zero, wait: Until.load);
       expect(loaded, isTrue);
     });
-    test('should work when navigating to valid url', () async  {
-      var response = await page.goto(server.emptyPage);
-      expect(response.ok(), isTrue);
+    test('should work when navigating to valid url', () async {
+      var response = await page.goto(server.assetUrl('simple.html'));
+      expect(response.ok, isTrue);
     });
-    test('should work when navigating to data url', () async  {
+    test('should work when navigating to data url', () async {
       var response = await page.goto('data:text/html,hello');
-      expect(response.ok(), isTrue);
+      expect(response.ok, isTrue);
     });
-    test('should work when navigating to 404', () async  {
+    test('should work when navigating to 404', () async {
       var response = await page.goto(server.prefix + '/not-found');
-      expect(response.ok(), isFalse);
-      expect(response.status(), equals(404));
+      expect(response.ok, isFalse);
+      expect(response.status, equals(404));
     });
-    test('should return last response in redirect chain', () async  {
+    test('should return last response in redirect chain', () async {
       server.setRedirect('/redirect/1.html', '/redirect/2.html');
       server.setRedirect('/redirect/2.html', '/redirect/3.html');
       server.setRedirect('/redirect/3.html', server.emptyPage);
       var response = await page.goto(server.prefix + '/redirect/1.html');
-      expect(response.ok(), isTrue);
+      expect(response.ok, isTrue);
       expect(response.url, equals(server.emptyPage));
     });
-    test('should wait for network idle to succeed navigation', () async  {
-      let responses = [];
+    test('should wait for network idle to succeed navigation', () async {
+      var responses = <Completer<Response>>[];
+      Future<Response> addResponse() {
+        var response = Completer<Response>();
+        responses.add(response);
+        return response.future;
+      }
+
       // Hold on to a bunch of requests without answering.
-      server.setRoute('/fetch-request-a.js', (req, res) => responses.add(res));
-      server.setRoute('/fetch-request-b.js', (req, res) => responses.add(res));
-      server.setRoute('/fetch-request-c.js', (req, res) => responses.add(res));
-      server.setRoute('/fetch-request-d.js', (req, res) => responses.add(res));
+      server.setRoute('/fetch-request-a.js', (req) {
+        return addResponse();
+      });
+      server.setRoute('/fetch-request-b.js', (req) {
+        return addResponse();
+      });
+      server.setRoute('/fetch-request-c.js', (req) {
+        return addResponse();
+      });
+      server.setRoute('/fetch-request-d.js', (req) {
+        return addResponse();
+      });
       var initialFetchResourcesRequested = Future.wait([
         server.waitForRequest('/fetch-request-a.js'),
         server.waitForRequest('/fetch-request-b.js'),
         server.waitForRequest('/fetch-request-c.js'),
       ]);
-      var secondFetchResourceRequested = server.waitForRequest('/fetch-request-d.js');
+      var secondFetchResourceRequested =
+          server.waitForRequest('/fetch-request-d.js');
 
       // Navigate to a page which loads immediately and then does a bunch of
       // requests via javascript's fetch method.
-      var navigationPromise = page.goto(server.prefix + '/networkidle.html', {
-        waitUntil: 'networkidle0',
-      });
+      var navigationPromise = page.goto(server.prefix + '/networkidle.html',
+          wait: Until.networkIdle);
       // Track when the navigation gets completed.
-      let navigationFinished = false;
-      navigationPromise.then(() => navigationFinished = true);
+      var navigationFinished = false;
+      // ignore: unawaited_futures
+      navigationPromise.then((_) => navigationFinished = true);
 
       // Wait for the page's 'load' event.
-      await new Promise(fulfill => page.once('load', fulfill));
+      await page.onLoad.first;
       expect(navigationFinished, isFalse);
 
       // Wait for the initial three resources to be requested.
@@ -232,9 +231,8 @@ main() {
       expect(navigationFinished, isFalse);
 
       // Respond to initial requests.
-      for (var response of responses) {
-      response.statusCode = 404;
-      response.end(`File not found`);
+      for (var response in responses) {
+        response.complete(Response.notFound('File not found'));
       }
 
       // Reset responses array
@@ -246,14 +244,13 @@ main() {
       expect(navigationFinished, isFalse);
 
       // Respond to requests.
-      for (var response of responses) {
-      response.statusCode = 404;
-      response.end(`File not found`);
+      for (var response in responses) {
+        response.complete(Response.notFound('File not found'));
       }
 
       var response = await navigationPromise;
       // Expect navigation to succeed.
-      expect(response.ok(), isTrue);
+      expect(response.ok, isTrue);
     });
     test('should not leak listeners during navigation', () async  {
       let warning = null;
@@ -264,7 +261,7 @@ main() {
       process.removeListener('warning', warningHandler);
       expect(warning, equals(null));
     });
-    test('should not leak listeners during bad navigation', () async  {
+    /*test('should not leak listeners during bad navigation', () async  {
       let warning = null;
       var warningHandler = w => warning = w;
       process.on('warning', warningHandler);
@@ -308,7 +305,7 @@ main() {
       expect(response.status(), equals(200));
       expect(response.url, contains('self-request.html'));
     });
-    test('should fail when navigating and show the url at the error message', async function({page, server, httpsServer}) {
+    test('should fail when navigating and show the url at the error message', () async {
       var url = httpsServer.prefix + '/redirect/1.html';
       let error = null;
       try {
@@ -329,9 +326,9 @@ main() {
     expect(request1.headers['referer'], equals('http://google.com/'));
     // Make sure subresources do not inherit referer.
     expect(request2.headers['referer'], equals(server.prefix + '/grid.html'));
-    });
+    });*/
   });
-
+/*
   group('Page.waitForNavigation', () {
     test('should work', () async  {
       await page.goto(server.emptyPage);
@@ -346,13 +343,13 @@ main() {
       let response = null;
       server.setRoute('/one-style.css', (req, res) => response = res);
       var navigationPromise = page.goto(server.prefix + '/one-style.html');
-      var domContentLoadedPromise = page.waitForNavigation({
-        waitUntil: 'domcontentloaded'
-      });
+      var domContentLoadedPromise = page.waitForNavigation(
+        wait: Until.domContentLoaded
+      );
 
       let bothFired = false;
       var bothFiredPromise = page.waitForNavigation({
-        waitUntil: ['load', 'domcontentloaded']
+        waitUntil: Until.all([Until.load, Until.domContentLoaded])
       }).then(() => bothFired = true);
 
       await server.waitForRequest('/one-style.css');
@@ -364,7 +361,7 @@ main() {
     });
     test('should work with clicking on anchor links', () async  {
       await page.goto(server.emptyPage);
-      await page.setContent(`<a href='#foobar'>foobar</a>`);
+      await page.setContent("<a href='#foobar'>foobar</a>");
       var [response] = await Future.wait([
       page.waitForNavigation(),
       page.click('a'),
@@ -374,12 +371,12 @@ main() {
     });
     test('should work with history.pushState()', () async  {
       await page.goto(server.emptyPage);
-      await page.setContent(`
+      await page.setContent('''
       <a onclick='javascript:pushState()'>SPA</a>
       <script>
       function pushState() { history.pushState({}, '', 'wow.html') }
       </script>
-      `);
+      ''');
       var [response] = await Future.wait([
       page.waitForNavigation(),
       page.click('a'),
@@ -389,12 +386,12 @@ main() {
     });
     test('should work with history.replaceState()', () async  {
       await page.goto(server.emptyPage);
-      await page.setContent(`
+      await page.setContent('''
       <a onclick='javascript:replaceState()'>SPA</a>
       <script>
       function replaceState() { history.replaceState({}, '', '/replaced.html') }
       </script>
-      `);
+      ''');
       var [response] = await Future.wait([
       page.waitForNavigation(),
       page.click('a'),
@@ -404,7 +401,7 @@ main() {
     });
     test('should work with DOM history.back()/history.forward()', () async  {
       await page.goto(server.emptyPage);
-      await page.setContent(`
+      await page.setContent('''
       <a id=back onclick='javascript:goBack()'>back</a>
       <a id=forward onclick='javascript:goForward()'>forward</a>
       <script>
@@ -413,7 +410,7 @@ main() {
       history.pushState({}, '', '/first.html');
       history.pushState({}, '', '/second.html');
       </script>
-      `);
+      ''');
       expect(page.url, equals(server.prefix + '/second.html'));
       var [backResponse] = await Future.wait([
       page.waitForNavigation(),
@@ -434,12 +431,12 @@ main() {
       var frame = await utils.waitEvent(page, 'frameattached');
       await new Promise(fulfill => {
       page.on('framenavigated', f => {
-      if (f === frame)
+      if (f == frame)
       fulfill();
       });
       });
       await Future.wait([
-        frame.evaluate(() => window.stop()),
+        frame.evaluate('() => window.stop()'),
         navigationPromise
       ]);
     });
@@ -463,10 +460,10 @@ main() {
     });
     test('should work with HistoryAPI', () async  {
       await page.goto(server.emptyPage);
-      await page.evaluate(() => {
+      await page.evaluate('''() => {
       history.pushState({}, '', '/first.html');
           history.pushState({}, '', '/second.html');
-    });
+    }''');
       expect(page.url, equals(server.prefix + '/second.html'));
 
       await page.goBack();
@@ -552,18 +549,18 @@ main() {
       server.waitForRequest('/empty.html'),
       frame.evaluate("() => window.location = '/empty.html'")
       ]);
-      await page.$eval('iframe', frame => frame.remove());
+      await page.$eval('iframe', 'frame => frame.remove()');
       await navigationPromise;
       expect(error.message, equals('Navigating frame was detached'));
     });
   });
-
+*/
   group('Page.reload', () {
-    test('should work', () async  {
+    test('should work', () async {
       await page.goto(server.emptyPage);
       await page.evaluate('() => window._foo = 10');
       await page.reload();
-      expect(await page.evaluate('() => window._foo'), equals(undefined));
+      expect(await page.evaluate('() => window._foo'), isNull);
     });
   });
 }
