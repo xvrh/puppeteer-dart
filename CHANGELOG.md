@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0 (2019-05-02)
+- Add more unit tests and more documentation
+- Update default chromium
+- Add example for screencast
+- Fix bugs
+
 ## 1.2.1 (2019-04-27)
 
 - Add some documentation and examples in the source code (still work in
