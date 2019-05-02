@@ -106,7 +106,7 @@ class Puppeteer {
     if (webSocketUrl != null) {
       var connection = await Connection.create(webSocketUrl);
 
-      var browser = createBrowser(connection,
+      var browser = createBrowser(chromeProcess, connection,
           defaultViewport: defaultViewport,
           closeCallback: () => _killChrome(chromeProcess),
           ignoreHttpsErrors: ignoreHttpsErrors);
@@ -129,7 +129,7 @@ Future _killChrome(Process process) {
     // With `process.kill`, it seems that chrome retain a lock on the user-data directory
     Process.runSync('taskkill', ['/pid', process.pid.toString(), '/T', '/F']);
   } else {
-    process.kill(ProcessSignal.sigint);
+    process.kill(ProcessSignal.sigkill);
   }
 
   return process.exitCode;

@@ -1652,6 +1652,7 @@ function deliverError(name, seq, message, stack) {
   }
 }
 
+/// [ConsoleMessage] objects are dispatched by page via the [console] event.
 class ConsoleMessage {
   final ConsoleMessageType type;
   final String typeName;

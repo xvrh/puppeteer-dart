@@ -183,7 +183,7 @@ class FrameManager {
 
     // Detach all child frames first.
     if (frame != null) {
-      frame.children.forEach(_removeFramesRecursively);
+      frame.childFrames.forEach(_removeFramesRecursively);
     }
 
     // Update or create main frame.
@@ -294,7 +294,7 @@ class FrameManager {
   }
 
   void _removeFramesRecursively(PageFrame frame) {
-    frame.children.forEach(_removeFramesRecursively);
+    frame.childFrames.forEach(_removeFramesRecursively);
 
     frame._detach();
     _frames.remove(frame.id);
@@ -302,13 +302,49 @@ class FrameManager {
   }
 }
 
+/// At every point of time, page exposes its current frame tree via the
+/// [page.mainFrame] and [frame.childFrames] methods.
+///
+/// [Frame] object's lifecycle is controlled by three events, dispatched on the
+/// page object:
+/// - [Page.onFrameAttached] - fired when the frame gets attached to the page.
+///   A Frame can be attached to the page only once.
+/// - [Page.onFrameNavigated] - fired when the frame commits navigation to a
+///   different URL.
+/// - [Page.onFrameDetached] - fired when the frame gets detached from the page.
+///   A Frame can be detached from the page only once.
+///
+/// An example of dumping frame tree:
+///
+/// ```dart
+/// dumpFrameTree(PageFrame frame, String indent) {
+///   print(indent + frame.url);
+///   for (var child in frame.childFrames) {
+///     dumpFrameTree(child, indent + '  ');
+///   }
+/// }
+///
+/// var browser = await puppeteer.launch();
+/// var page = await browser.newPage();
+/// await page.goto('https://example.com');
+/// dumpFrameTree(page.mainFrame, '');
+/// await browser.close();
+/// ```
+///
+/// An example of getting text from an iframe element:
+///
+/// ```dart
+/// var frame = page.frames.firstWhere((frame) => frame.name == 'myframe');
+/// var text = await frame.$eval('.selector', 'el => el.textContent');
+/// print(text);
+/// ```
 class PageFrame {
   final FrameManager frameManager;
   final Client client;
   PageFrame _parent;
   FrameId _id;
   final lifecycleEvents = <String>{};
-  final children = <PageFrame>[];
+  final childFrames = <PageFrame>[];
   String _url, _name;
   bool _detached = false;
   LoaderId _loaderId;
@@ -319,7 +355,7 @@ class PageFrame {
     _secondaryWorld = DomWorld(frameManager, this);
 
     if (_parent != null) {
-      _parent.children.add(this);
+      _parent.childFrames.add(this);
     }
   }
 
@@ -327,6 +363,12 @@ class PageFrame {
 
   String get url => _url;
 
+  /// Returns frame's name attribute as specified in the tag.
+  ///
+  /// If the name is empty, returns the id attribute instead.
+  ///
+  /// > **NOTE** This value is calculated once when the frame is created, and
+  /// will not update if the attribute is changed later.
   String get name => _name;
 
   bool get isDetached => _detached;
@@ -401,11 +443,29 @@ class PageFrame {
     return _mainWorld.$eval<T>(selector, pageFunction, args: args);
   }
 
+  /// This method runs `Array.from(document.querySelectorAll(selector))` within
+  /// the frame and passes it as the first argument to `pageFunction`.
+  ///
+  /// If `pageFunction` returns a [Promise], then `frame.$$eval` would wait for
+  /// the promise to resolve and return its value.
+  ///
+  /// Examples:
+  /// ```dart
+  /// var divsCounts = await frame.$$eval('div', 'divs => divs.length');
+  /// ```
   Future<T> $$eval<T>(String selector, @Language('js') String pageFunction,
       {List args}) {
     return _mainWorld.$$eval<T>(selector, pageFunction, args: args);
   }
 
+  /// The method runs `document.querySelectorAll` within the frame. If no
+  /// elements match the selector, the return value resolves to `[]`.
+  ///
+  /// Parameters:
+  /// A [selector] to query frame for
+  ///
+  /// Returns a [Future] which resolves to ElementHandles pointing to the frame
+  /// elements.
   Future<List<ElementHandle>> $$(String selector) {
     return _mainWorld.$$(selector);
   }
@@ -518,7 +578,7 @@ class PageFrame {
     _mainWorld.detach();
     _secondaryWorld.detach();
     if (_parent != null) {
-      _parent.children.remove(this);
+      _parent.childFrames.remove(this);
     }
     _parent = null;
   }

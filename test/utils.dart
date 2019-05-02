@@ -138,7 +138,7 @@ dumpFrames(PageFrame frame, [String indentation]) {
   var description = frame.url.replaceAll(RegExp(r'//[^/]+/'), '//<host>/');
   if (frame.name != null) description += ' (' + frame.name + ')';
   var result = [indentation + description];
-  for (var child in frame.children)
+  for (var child in frame.childFrames)
     result.addAll(dumpFrames(child, '    ' + indentation));
   return result;
 }

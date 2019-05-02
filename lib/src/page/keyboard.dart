@@ -2,6 +2,35 @@ import 'dart:async';
 import 'package:meta/meta.dart';
 import '../../protocol/input.dart';
 
+/// Keyboard provides an api for managing a virtual keyboard. The high level api
+/// is [Keyboard.type], which takes raw characters and generates proper keydown,
+/// keypress/input, and keyup events on your page.
+///
+/// For finer control, you can use [Keyboard.down], [keyboard.up], and
+/// [keyboard.sendCharacter] to manually fire events as if they were generated
+/// from a real keyboard.
+///
+/// An example of holding down `Shift` in order to select and delete some text:
+/// ```dart
+/// await page.keyboard.type('Hello World!');
+/// await page.keyboard.press(Key.arrowLeft);
+/// await page.keyboard.down(Key.shift);
+/// for (var i = 0; i < ' World'.length; i++) {
+///   await page.keyboard.press(Key.arrowLeft);
+/// }
+/// await page.keyboard.up(Key.shift);
+/// await page.keyboard.press(Key.backspace);
+/// // Result text will end up saying 'Hello!'
+/// ```
+///
+/// An example of pressing `A`
+/// ```dart
+/// await page.keyboard.down(Key.shift);
+/// await page.keyboard.press(Key.keyA, text: 'A');
+/// await page.keyboard.up(Key.shift);
+/// ```
+///
+/// > **NOTE** On MacOS, keyboard shortcuts like `⌘ A` -> Select All do not work. See [#1313](https://github.com/GoogleChrome/puppeteer/issues/1313)
 class Keyboard {
   final InputApi _inputApi;
   final Set<String> _pressedKeys = {};
@@ -11,6 +40,21 @@ class Keyboard {
 
   int get modifiers => _modifiers;
 
+  /// Dispatches a `keydown` event.
+  ///
+  /// If `key` is a modifier key, `Shift`, `Meta`, `Control`, or `Alt`,
+  /// subsequent key presses will be sent with that modifier active. To release
+  /// the modifier key, use [keyboard.up].
+  ///
+  /// After the key is pressed once, subsequent calls to [keyboard.down] will
+  /// have [repeat](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/repeat)
+  /// set to true. To release the key, use [keyboard.up].
+  ///
+  /// > **NOTE** Modifier keys DO influence `keyboard.down`. Holding down `Shift`
+  /// will type the text in upper case.
+  ///
+  /// Parameters:
+  /// [text]: If specified, generates an input event with this text.
   Future<void> down(Key key, {String text}) async {
     _KeyDescription description = _keyDescription(key);
 
@@ -32,6 +76,7 @@ class Keyboard {
         isKeypad: description.location == KeyLocation.numpad);
   }
 
+  /// Dispatches a `keyup` event.
   Future<void> up(Key key) async {
     _KeyDescription description = _keyDescription(key);
 
@@ -50,12 +95,27 @@ class Keyboard {
   ///
   /// NOTE Modifier keys DO NOT effect keyboard.sendCharacter. Holding down
   /// Shift will not type the text in upper case.
+  ///
+  /// ```dart
+  /// await page.keyboard.sendCharacter('嗨');
+  /// ```
   Future<void> sendCharacter(String text) async {
     await _inputApi.insertText(text);
   }
 
   /// Sends a keydown, keypress/input, and keyup event for each character in the
   /// text.
+  ///
+  /// [text]: A text to type into a focused element.
+  /// [delay]: Time to wait between key presses. Defaults to 0.
+  ///
+  /// ```dart
+  /// // Types instantly
+  /// await page.keyboard.type('Hello');
+  ///
+  /// // Types slower, like a user
+  /// await page.keyboard.type('World', delay: Duration(milliseconds: 10));
+  /// ```
   Future<void> type(String text, {Duration delay}) async {
     for (int rune in text.runes) {
       String char = String.fromCharCode(rune);
@@ -73,6 +133,13 @@ class Keyboard {
     }
   }
 
+  /// Shortcut for [Keyboard.down] and [Keyboard.up].
+  ///
+  /// > **NOTE** Modifier keys DO effect `keyboard.press`. Holding down `Shift`
+  /// will type the text in upper case.
+  ///
+  /// [text]: If specified, generates an input event with this text.
+  /// [delay]: Time to wait between `keydown` and `keyup`. Defaults to 0.
   Future<void> press(Key key, {Duration delay, String text}) async {
     await down(key, text: text);
     if (delay != null) {

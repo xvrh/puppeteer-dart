@@ -38,7 +38,9 @@ class Connection implements Client {
   final List<StreamSubscription> _subscriptions = [];
 
   Connection._(this._webSocket, this.url) {
-    _subscriptions.add(_webSocket.listen(_onMessage));
+    _subscriptions.add(_webSocket.listen(_onMessage, onError: (error) {
+      print('Websocket error: $error');
+    }));
 
     _targetApi = TargetApi(this);
 

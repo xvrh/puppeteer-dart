@@ -25,15 +25,19 @@ main() async {
   // Start the `Chrome` process and connect to the DevTools
   // By default it is start in `headless` mode
   var chrome = await puppeteer.launch(executablePath: chromePath);
+  try {
+    // Open a new tab
+    var myPage = await chrome.newPage();
 
-  // Open a new tab
-  var myPage = await chrome.newPage();
+    // Go to a page and wait to be fully loaded
+    await myPage.goto('https://www.github.com', wait: Until.networkIdle);
 
-  // Go to a page and wait to be fully loaded
-  await myPage.goto('https://www.github.com', wait: Until.networkIdle);
+    // Do something... See other examples
 
-  // Do something... See other examples
-
-  // Kill the process
-  await chrome.close();
+  } finally {
+    // Close the browser process
+    // You should always ensure that your script close the process even in case
+    // of error. Here, we wrap it in a try/finally block.
+    await chrome.close();
+  }
 }
