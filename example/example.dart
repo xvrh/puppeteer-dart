@@ -1,8 +1,7 @@
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
-  // Start the `Chrome` process and connect to the DevTools
-  // By default it is start in `headless` mode
+  // Download the Chromium binaries, launch it and connect to the "DevTools"
   var browser = await puppeteer.launch();
 
   // Open a new tab
@@ -16,6 +15,6 @@ main() async {
   await myPage.pdf();
   await myPage.evaluate('() => document.title');
 
-  // Kill the process
+  // Gracefully close the browser's process
   await browser.close();
 }

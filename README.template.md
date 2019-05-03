@@ -24,13 +24,20 @@ Most things that you can do manually in the browser can be done using Puppeteer!
 * See the Dart Doc for this package: [API reference](https://pub.dartlang.org/documentation/puppeteer/latest/puppeteer/puppeteer-library.html)
 
 ## Examples
+* [Launch chrome](#launch-chrome)
 * [Generate a PDF from an HTML page](#generate-a-pdf-from-a-page)
 * [Take a screenshot of a page](#take-a-screenshot-of-a-complete-html-page)
 * [Take a screenshot of an element in a page](#take-a-screenshot-of-a-specific-node-in-the-page)
 * [Create a static version of a Single Page Application](#create-a-static-version-of-a-single-page-application)
 * [Capture a screencast of the page](#capture-a-screencast-of-the-page)
 * [Execute JavaScript code](#execute-javascript-code)
-* [Launch chrome](#launch-a-specific-chrome-version)
+
+### Launch Chrome
+
+Download the last revision of chrome and launch it.
+```dart
+import 'example/example.dart';
+```
 
 ### Generate a PDF from a page
 
@@ -124,13 +131,6 @@ main() {
 
 Note: In a future version, we can image to compile the dart code to javascript on the fly before
 sending it to the browser (with ddc or dart2js).
-
-### Launch a specific Chrome version
-
-Download the last revision of chrome and launch it.
-```dart
-import 'example/example.dart';
-```
 
 ## Related work
  * [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface)
