@@ -18,13 +18,19 @@ Most things that you can do manually in the browser can be done using Puppeteer!
 * Automate form submission, UI testing, keyboard input, etc.
 * Create an up-to-date, automated testing environment. Run your tests directly in the latest version of Chrome using the latest JavaScript and browser features.
 
-## Usage
+## Api
+
+* See the full API in a single-page document: [docs/api.md](docs/api.md)
+* See the Dart Doc for this package: [API reference](https://pub.dartlang.org/documentation/puppeteer/latest/puppeteer/puppeteer-library.html)
+
+## Examples
 * [Launch chrome](#launch-chrome)
 * [Generate a PDF from an HTML page](#generate-a-pdf-from-a-page)
 * [Take a screenshot of a page](#take-a-screenshot-of-a-complete-html-page)
 * [Take a screenshot of an element in a page](#take-a-screenshot-of-a-specific-node-in-the-page)
 * [Create a static version of a Single Page Application](#create-a-static-version-of-a-single-page-application)
 * [Capture a screencast of the page](#capture-a-screencast-of-the-page)
+* [Execute JavaScript code](#execute-javascript-code)
 
 ### Launch Chrome
 
@@ -33,8 +39,7 @@ Download the last revision of chrome and launch it.
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
-  // Start the `Chrome` process and connect to the DevTools
-  // By default it is start in `headless` mode
+  // Download the Chromium binaries, launch it and connect to the "DevTools"
   var browser = await puppeteer.launch();
 
   // Open a new tab
@@ -48,7 +53,7 @@ main() async {
   await myPage.pdf();
   await myPage.evaluate('() => document.title');
 
-  // Kill the process
+  // Gracefully close the browser's process
   await browser.close();
 }
 ```
@@ -187,7 +192,7 @@ main() async {
 ```
 
 ### Capture a screencast of the page
-The screencast feature is not part of the Puppeteer API. 
+The screencast feature is not part of the Puppeteer API.
 This example uses the low-level protocol API to send the commands to the browser.
 
 ```dart

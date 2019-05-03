@@ -5,12 +5,12 @@ import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
-class ChromePath {
+class RevisionInfo {
   final String executablePath;
   final String folderPath;
   final int revision;
 
-  ChromePath(
+  RevisionInfo(
       {@required this.executablePath,
       @required this.folderPath,
       @required this.revision});
@@ -18,7 +18,7 @@ class ChromePath {
 
 const int _lastRevision = 654752;
 
-Future<ChromePath> downloadChrome({int revision, String cachePath}) async {
+Future<RevisionInfo> downloadChrome({int revision, String cachePath}) async {
   revision ??= _lastRevision;
   cachePath ??= '.local-chromium';
 
@@ -47,7 +47,7 @@ Future<ChromePath> downloadChrome({int revision, String cachePath}) async {
     Process.runSync("chmod", ["+x", executableFile.absolute.path]);
   }
 
-  return ChromePath(
+  return RevisionInfo(
       folderPath: revisionDirectory.path,
       executablePath: executableFile.path,
       revision: revision);

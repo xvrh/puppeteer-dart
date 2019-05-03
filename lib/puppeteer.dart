@@ -3,7 +3,7 @@ export 'protocol/dom.dart' show BoxModel;
 export 'src/browser.dart' show Browser, BrowserContext, PermissionType;
 export 'src/connection.dart' show ServerException;
 export 'src/connection.dart' show TargetClosedException;
-export 'src/downloader.dart' show downloadChrome, ChromePath;
+export 'src/downloader.dart' show downloadChrome, RevisionInfo;
 export 'src/page/dialog.dart' show Dialog, DialogType;
 export 'src/page/dom_world.dart' show Polling;
 export 'src/page/emulation_manager.dart' show DeviceViewport, Device;
@@ -23,4 +23,4 @@ export 'src/page/page.dart'
         ScreenshotFormat,
         ConsoleMessage,
         ConsoleMessageType;
-export 'src/puppeteer.dart' show puppeteer;
+export 'src/puppeteer.dart' show puppeteer, Puppeteer;
