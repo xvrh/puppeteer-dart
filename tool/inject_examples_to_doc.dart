@@ -185,10 +185,13 @@ class CodeSnippet {
         .replaceAll('_page.pdf', 'page.pdf')
         .replaceAll(r'${server.hostUrl}', 'https://example.com')
         .replaceAll('server.hostUrl', "'https://example.com'")
-        .replaceAll('server.docExamplesUrl', "'https://example.com'")
-        .replaceAll('server.docExamples2Url', "'https://example.com'")
+        .replaceAll('server.emptyPage', "'https://example.com'")
+        .replaceAll('server.empty2Page', "'http://example.com'")
+        .replaceAll('server.hostUrl', "'https://example.com'")
         .replaceAll(r'${server.docExamplesUrl}', "'https://example.com'")
-        .replaceAll(r'${server.docExamples2Url}', "'https://example.com'");
+        .replaceAll(r'${server.docExamples2Url}', "'https://example.com'")
+        .replaceAll('server.docExamplesUrl', "'https://example.com'")
+        .replaceAll('server.docExamples2Url', "'https://example.com'");
     code = _formatter.format('''
 main() async {
 $code

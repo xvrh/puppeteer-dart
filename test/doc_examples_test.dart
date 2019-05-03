@@ -676,4 +676,52 @@ main() {
       });
     });
   });
+  group('NetworkRequest', () {
+    test('continueRequest', () async {
+      //---
+      await page.setRequestInterception(true);
+      page.onRequest.listen((request) {
+        // Override headers
+        var headers = Map<String, String>.from(request.headers)
+          ..['foo'] = 'bar';
+        headers.remove('origin');
+        request.continueRequest(headers: headers);
+      });
+      //---
+      await page.goto(server.assetUrl('simple.html'));
+    });
+    test('failure', () async {
+      page.onRequestFailed.listen((request) {
+        print(request.url + ' ' + request.failure);
+      });
+    });
+    group('redirectChain', () {
+      test(0, () async {
+        server.setRoute('empty2.html', (request) {
+          return Response.found('empty.html');
+        });
+        server.setRoute('empty.html', (request) {
+          return Response.ok('');
+        });
+        //---
+        var response = await page.goto(server.empty2Page);
+        var chain = response.request.redirectChain;
+        expect(chain, hasLength(1));
+        expect(chain[0].url, equals(server.empty2Page));
+        //--
+      });
+      test(1, () async {
+        var response = await page.goto(server.docExamplesUrl);
+        var chain = response.request.redirectChain;
+        expect(chain, isEmpty);
+      });
+    });
+    test('respond', () async {
+      await page.setRequestInterception(true);
+      page.onRequest.listen((request) {
+        request.respond(
+            status: 404, contentType: 'text/plain', body: 'Not Found!');
+      });
+    });
+  });
 }

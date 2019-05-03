@@ -62,6 +62,8 @@ class Server {
 
   String get hostUrl => 'http://localhost:${_httpServer.port}';
 
+  int get port => _httpServer.port;
+
   String get docExamplesUrl => assetUrl('doc_examples.html');
 
   String get docExamples2Url => assetUrl('doc_examples_2.html');
@@ -71,6 +73,8 @@ class Server {
   String get crossProcessPrefix => 'http://127.0.0.1:${_httpServer.port}';
 
   String get emptyPage => assetUrl('empty.html');
+
+  String get empty2Page => assetUrl('empty2.html');
 
   String assetUrl(String page) {
     page = _removeLeadingSlash(page);

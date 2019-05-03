@@ -19,12 +19,14 @@ import 'navigation_test.dart' as navigation_test;
 import 'page_test.dart' as page_test;
 import 'query_selector_test.dart' as query_selector_test;
 import 'readme_test.dart' as readme_test;
+import 'request_interception_test.dart' as request_interception_test;
 import 'target_test.dart' as target_test;
 import 'to_comment_test.dart' as to_comment_test;
 import 'touchscreen_test.dart' as touchscreen_test;
 import 'wait_task_test.dart' as wait_task_test;
 
 main() {
+  group('request_interception_test', request_interception_test.main);
   group('touchscreen_test', touchscreen_test.main);
   group('examples_test', examples_test.main);
   group('click_test', click_test.main);
