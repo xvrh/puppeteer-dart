@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-// ignore: deprecated_member_use
-import 'package:analyzer/analyzer.dart';
+import 'package:analyzer/analyzer.dart'; // ignore: deprecated_member_use
 import 'package:dart_style/dart_style.dart';
 
 // Extrat the samples from the file test/doc_examples_test.dart and inject

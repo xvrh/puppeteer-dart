@@ -18,20 +18,19 @@ Most things that you can do manually in the browser can be done using Puppeteer!
 * Automate form submission, UI testing, keyboard input, etc.
 * Create an up-to-date, automated testing environment. Run your tests directly in the latest version of Chrome using the latest JavaScript and browser features.
 
-## Usage
-* [Launch chrome](#launch-chrome)
+## Api
+
+* See the full API in a single-page document: [docs/api.md](docs/api.md)
+* See the Dart Doc for this package: [API reference](https://pub.dartlang.org/documentation/puppeteer/latest/puppeteer/puppeteer-library.html)
+
+## Examples
 * [Generate a PDF from an HTML page](#generate-a-pdf-from-a-page)
 * [Take a screenshot of a page](#take-a-screenshot-of-a-complete-html-page)
 * [Take a screenshot of an element in a page](#take-a-screenshot-of-a-specific-node-in-the-page)
 * [Create a static version of a Single Page Application](#create-a-static-version-of-a-single-page-application)
 * [Capture a screencast of the page](#capture-a-screencast-of-the-page)
-
-### Launch Chrome
-
-Download the last revision of chrome and launch it.
-```dart
-import 'example/example.dart';
-```
+* [Execute JavaScript code](#execute-javascript-code)
+* [Launch chrome](#launch-a-specific-chrome-version)
 
 ### Generate a PDF from a page
 
@@ -61,7 +60,7 @@ import 'example/capture_spa.dart';
 ```
 
 ### Capture a screencast of the page
-The screencast feature is not part of the Puppeteer API. 
+The screencast feature is not part of the Puppeteer API.
 This example uses the low-level protocol API to send the commands to the browser.
 
 ```dart
@@ -125,6 +124,13 @@ main() {
 
 Note: In a future version, we can image to compile the dart code to javascript on the fly before
 sending it to the browser (with ddc or dart2js).
+
+### Launch a specific Chrome version
+
+Download the last revision of chrome and launch it.
+```dart
+import 'example/example.dart';
+```
 
 ## Related work
  * [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface)

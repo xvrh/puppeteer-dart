@@ -3,6 +3,7 @@ import '../../protocol/input.dart';
 import '../../protocol/runtime.dart';
 import 'keyboard.dart';
 
+/// [Touchscreen] provides an api for dispatching touch events.
 class Touchscreen {
   final RuntimeApi runtimeApi;
   final InputApi inputApi;
