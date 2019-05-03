@@ -16,6 +16,19 @@ dart_task:
  - dartanalyzer: --fatal-infos --fatal-warnings .
  - dartfmt
 
+jobs:
+ include:
+  - stage: coverage
+    script:
+     - pub global activate coverage
+     - dart --enable-vm-service=8111 --pause-isolates-on-exit test/test_all.dart &
+     - nohup pub global run coverage:collect_coverage --port=8111 --out=coverage.json --wait-paused --resume-isolates
+     - pub global run coverage:format_coverage --lcov --in=coverage.json --out=lcov.info --packages=.packages --report-on=lib/src
+
+after_success:
+ - gem install coveralls-lcov
+ - coveralls-lcov lcov.info
+
 branches:
   only: [master]
 
