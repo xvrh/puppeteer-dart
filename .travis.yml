@@ -21,7 +21,7 @@ jobs:
   - stage: coverage
     script:
      - pub global activate coverage
-     - tool/coverage.sh
+     - ./tool/coverage.sh
 
 after_success:
  - gem install coveralls-lcov
