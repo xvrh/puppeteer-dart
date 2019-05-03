@@ -1,11 +1,13 @@
 # Puppeteer in Dart
 
-[![Build Status](https://travis-ci.org/xvrh/puppeteer-dart.svg?branch=master)](https://travis-ci.org/xvrh/puppeteer-dart)
-[![pub package](https://img.shields.io/pub/v/puppeteer.svg)](https://pub.dartlang.org/packages/puppeteer)
-
 A Dart library to automate the Chrome browser over the DevTools Protocol.
 
-This is a port of the [Puppeteer](https://pptr.dev/) Node.JS library in the Dart language.
+This is a port of the [Puppeteer Node.JS library](https://pptr.dev/) in the [Dart language](https://www.dartlang.org/).
+
+[![pub package](https://img.shields.io/pub/v/puppeteer.svg)](https://pub.dartlang.org/packages/puppeteer)
+[![Build Status](https://travis-ci.org/xvrh/puppeteer-dart.svg?branch=master)](https://travis-ci.org/xvrh/puppeteer-dart)
+[![Coverage Status](https://coveralls.io/repos/github/xvrh/puppeteer-dart/badge.svg?branch=master)](https://coveralls.io/github/xvrh/puppeteer-dart?branch=master)
+
 
 ###### What can I do?
 
