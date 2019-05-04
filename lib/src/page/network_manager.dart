@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:collection/collection.dart';
+import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import '../../protocol/dev_tools.dart';
 import '../../protocol/fetch.dart';
@@ -9,6 +10,8 @@ import '../../protocol/network.dart';
 import '../../protocol/network.dart' as network;
 import '../connection.dart';
 import 'frame_manager.dart';
+
+final _logger = Logger('puppeteer.network_manager');
 
 class NetworkManager {
   final Client client;
@@ -407,6 +410,7 @@ class NetworkRequest {
         .catchError((error) {
       // In certain cases, protocol will return error if the request was already canceled
       // or the page was closed. We should tolerate these errors.
+      _logger.fine('[NetworkRequest.continueRequest] swallow error: $error');
     });
   }
 
@@ -469,10 +473,11 @@ class NetworkRequest {
                     name: e.key.toLowerCase(), value: e.value))
                 .toList(),
             body: body != null ? base64.encode(bodyBytes) : null)
-        .catchError((error) => {
-              // In certain cases, protocol will return error if the request was already canceled
-              // or the page was closed. We should tolerate these errors.
-            });
+        .catchError((error) {
+      // In certain cases, protocol will return error if the request was already canceled
+      // or the page was closed. We should tolerate these errors.
+      _logger.fine('[NetworkRequest.respond] swallow error: $error');
+    });
   }
 
   /// Aborts request. To use this, request interception should be enabled with
@@ -491,10 +496,11 @@ class NetworkRequest {
     _interceptionHandled = true;
     await _fetchApi
         .failRequest(fetch.RequestId(interceptionId), error)
-        .catchError((error) => {
-              // In certain cases, protocol will return error if the request was already canceled
-              // or the page was closed. We should tolerate these errors.
-            });
+        .catchError((error) {
+      // In certain cases, protocol will return error if the request was already canceled
+      // or the page was closed. We should tolerate these errors.
+      _logger.fine('[NetworkRequest.abort] swallow error: $error');
+    });
   }
 }
 
