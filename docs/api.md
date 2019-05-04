@@ -3,192 +3,192 @@
 ##### Table of Contents
 
 - [class: Browser](#class-browser)
-  * [browser.browserContexts](#browsercontexts)
-  * [browser.close](#close)
-  * [browser.createIncognitoBrowserContext](#createincognitobrowsercontext)
-  * [browser.defaultBrowserContext](#defaultbrowsercontext)
-  * [browser.newPage](#newpage)
-  * [browser.onTargetChanged](#ontargetchanged)
-  * [browser.onTargetCreated](#ontargetcreated)
-  * [browser.onTargetDestroyed](#ontargetdestroyed)
-  * [browser.pages](#pages)
-  * [browser.target](#target)
-  * [browser.targets](#targets)
-  * [browser.userAgent](#useragent)
-  * [browser.version](#version)
-  * [browser.waitForTarget](#waitfortargetbool-functiontarget-predicate-duration-timeout)
+  * [browser.browserContexts](#browserbrowsercontexts)
+  * [browser.close](#browserclose)
+  * [browser.createIncognitoBrowserContext](#browsercreateincognitobrowsercontext)
+  * [browser.defaultBrowserContext](#browserdefaultbrowsercontext)
+  * [browser.newPage](#browsernewpage)
+  * [browser.onTargetChanged](#browserontargetchanged)
+  * [browser.onTargetCreated](#browserontargetcreated)
+  * [browser.onTargetDestroyed](#browserontargetdestroyed)
+  * [browser.pages](#browserpages)
+  * [browser.target](#browsertarget)
+  * [browser.targets](#browsertargets)
+  * [browser.userAgent](#browseruseragent)
+  * [browser.version](#browserversion)
+  * [browser.waitForTarget](#browserwaitfortargetbool-functiontarget-predicate-duration-timeout)
 - [class: BrowserContext](#class-browsercontext)
-  * [browserContext.browser](#browser)
-  * [browserContext.clearPermissionOverrides](#clearpermissionoverrides)
-  * [browserContext.close](#close)
-  * [browserContext.isIncognito](#isincognito)
-  * [browserContext.newPage](#newpage)
-  * [browserContext.onTargetChanged](#ontargetchanged)
-  * [browserContext.onTargetCreated](#ontargetcreated)
-  * [browserContext.onTargetDestroyed](#ontargetdestroyed)
-  * [browserContext.overridePermissions](#overridepermissionsstring-origin-listpermissiontype-permissions)
-  * [browserContext.pages](#pages)
-  * [browserContext.targets](#targets)
-  * [browserContext.waitForTarget](#waitfortarget-functiontarget-predicate-duration-timeout)
+  * [browserContext.browser](#browsercontextbrowser)
+  * [browserContext.clearPermissionOverrides](#browsercontextclearpermissionoverrides)
+  * [browserContext.close](#browsercontextclose)
+  * [browserContext.isIncognito](#browsercontextisincognito)
+  * [browserContext.newPage](#browsercontextnewpage)
+  * [browserContext.onTargetChanged](#browsercontextontargetchanged)
+  * [browserContext.onTargetCreated](#browsercontextontargetcreated)
+  * [browserContext.onTargetDestroyed](#browsercontextontargetdestroyed)
+  * [browserContext.overridePermissions](#browsercontextoverridepermissionsstring-origin-listpermissiontype-permissions)
+  * [browserContext.pages](#browsercontextpages)
+  * [browserContext.targets](#browsercontexttargets)
+  * [browserContext.waitForTarget](#browsercontextwaitfortarget-functiontarget-predicate-duration-timeout)
 - [class: Page](#class-page)
-  * [page.$](#string-selector)
-  * [page.$$](#string-selector)
-  * [page.$$eval](#evalstring-selector-languagejs-string-pagefunction-list-args)
-  * [page.$eval](#evalstring-selector-languagejs-string-pagefunction-list-args)
-  * [page.$x](#xstring-expression)
-  * [page.addScriptTag](#addscripttagstring-url-file-file-string-content-string-type)
-  * [page.addStyleTag](#addstyletagstring-url-file-file-string-content)
-  * [page.authenticate](#authenticatestring-username-string-password)
-  * [page.bringToFront](#bringtofront)
-  * [page.browser](#browser)
-  * [page.browserContext](#browsercontext)
-  * [page.click](#clickstring-selector-duration-delay-mousebutton-button-int-clickcount)
-  * [page.close](#closebool-runbeforeunload)
-  * [page.content](#content)
-  * [page.cookies](#cookiesliststring-urls)
-  * [page.defaultNavigationTimeout](#defaultnavigationtimeout)
-  * [page.defaultTimeout](#defaulttimeout)
-  * [page.emulate](#emulatedevice-device)
-  * [page.emulateMedia](#emulatemediastring-mediatype)
-  * [page.evaluate](#evaluatelanguagejs-string-pagefunction-list-args)
-  * [page.evaluateHandle](#evaluatehandlelanguagejs-string-pagefunction-list-args)
-  * [page.evaluateOnNewDocument](#evaluateonnewdocumentstring-pagefunction-list-args)
-  * [page.exposeFunction](#exposefunctionstring-name-function-callbackfunction)
-  * [page.frames](#frames)
-  * [page.goBack](#gobackduration-timeout-until-wait)
-  * [page.goForward](#goforwardduration-timeout-until-wait)
-  * [page.goto](#gotostring-url-string-referrer-duration-timeout-until-wait)
-  * [page.hover](#hoverstring-selector)
-  * [page.isClosed](#isclosed)
-  * [page.mainFrame](#mainframe)
-  * [page.onClose](#onclose)
-  * [page.onConsole](#onconsole)
-  * [page.onDialog](#ondialog)
-  * [page.onDomContentLoaded](#ondomcontentloaded)
-  * [page.onError](#onerror)
-  * [page.onFrameAttached](#onframeattached)
-  * [page.onFrameDetached](#onframedetached)
-  * [page.onFrameNavigated](#onframenavigated)
-  * [page.onLoad](#onload)
-  * [page.onPageCrashed](#onpagecrashed)
-  * [page.onPopup](#onpopup)
-  * [page.onRequest](#onrequest)
-  * [page.onRequestFailed](#onrequestfailed)
-  * [page.onRequestFinished](#onrequestfinished)
-  * [page.onResponse](#onresponse)
-  * [page.pdf](#pdfpaperformat-format-num-scale-bool-displayheaderfooter-string-headertemplate-string-footertemplate-bool-printbackground-bool-landscape-string-pageranges-bool-prefercsspagesize-pdfmargins-margins)
-  * [page.queryObjects](#queryobjectsjshandle-prototypehandle)
-  * [page.reload](#reloadduration-timeout-until-wait)
-  * [page.screenshot](#screenshotscreenshotformat-format-bool-fullpage-rectangle-clip-num-quality-bool-omitbackground)
-  * [page.screenshotBase64](#screenshotbase64screenshotformat-format-bool-fullpage-rectangle-clip-num-quality-bool-omitbackground)
-  * [page.select](#selectstring-selector-liststring-values)
-  * [page.setBypassCSP](#setbypasscspbool-enabled)
-  * [page.setCacheEnabled](#setcacheenabledenabled)
-  * [page.setContent](#setcontentstring-html-duration-timeout-until-wait)
-  * [page.setExtraHTTPHeaders](#setextrahttpheadersmapstring-string-headers)
-  * [page.setGeolocation](#setgeolocationnum-latitude-num-longitude-num-accuracy)
-  * [page.setJavaScriptEnabled](#setjavascriptenabledenabled)
-  * [page.setOfflineMode](#setofflinemodebool-enabled)
-  * [page.setRequestInterception](#setrequestinterceptionbool-value)
-  * [page.setUserAgent](#setuseragentstring-useragent)
-  * [page.setViewport](#setviewportdeviceviewport-viewport)
-  * [page.tap](#tapstring-selector)
-  * [page.target](#target)
-  * [page.title](#title)
-  * [page.type](#typestring-selector-string-text-duration-delay)
-  * [page.url](#url)
-  * [page.waitForFunction](#waitforfunctionlanguagejs-string-pagefunction-list-args-duration-timeout-polling-polling)
-  * [page.waitForNavigation](#waitfornavigationduration-timeout-until-wait)
-  * [page.waitForRequest](#waitforrequeststring-url-duration-timeout)
-  * [page.waitForSelector](#waitforselectorstring-selector-bool-visible-bool-hidden-duration-timeout)
-  * [page.waitForXPath](#waitforxpathstring-xpath-bool-visible-bool-hidden-duration-timeout)
+  * [page.$](#pagestring-selector)
+  * [page.$$](#pagestring-selector)
+  * [page.$$eval](#pageevalstring-selector-languagejs-string-pagefunction-list-args)
+  * [page.$eval](#pageevalstring-selector-languagejs-string-pagefunction-list-args)
+  * [page.$x](#pagexstring-expression)
+  * [page.addScriptTag](#pageaddscripttagstring-url-file-file-string-content-string-type)
+  * [page.addStyleTag](#pageaddstyletagstring-url-file-file-string-content)
+  * [page.authenticate](#pageauthenticatestring-username-string-password)
+  * [page.bringToFront](#pagebringtofront)
+  * [page.browser](#pagebrowser)
+  * [page.browserContext](#pagebrowsercontext)
+  * [page.click](#pageclickstring-selector-duration-delay-mousebutton-button-int-clickcount)
+  * [page.close](#pageclosebool-runbeforeunload)
+  * [page.content](#pagecontent)
+  * [page.cookies](#pagecookiesliststring-urls)
+  * [page.defaultNavigationTimeout](#pagedefaultnavigationtimeout)
+  * [page.defaultTimeout](#pagedefaulttimeout)
+  * [page.emulate](#pageemulatedevice-device)
+  * [page.emulateMedia](#pageemulatemediastring-mediatype)
+  * [page.evaluate](#pageevaluatelanguagejs-string-pagefunction-list-args)
+  * [page.evaluateHandle](#pageevaluatehandlelanguagejs-string-pagefunction-list-args)
+  * [page.evaluateOnNewDocument](#pageevaluateonnewdocumentstring-pagefunction-list-args)
+  * [page.exposeFunction](#pageexposefunctionstring-name-function-callbackfunction)
+  * [page.frames](#pageframes)
+  * [page.goBack](#pagegobackduration-timeout-until-wait)
+  * [page.goForward](#pagegoforwardduration-timeout-until-wait)
+  * [page.goto](#pagegotostring-url-string-referrer-duration-timeout-until-wait)
+  * [page.hover](#pagehoverstring-selector)
+  * [page.isClosed](#pageisclosed)
+  * [page.mainFrame](#pagemainframe)
+  * [page.onClose](#pageonclose)
+  * [page.onConsole](#pageonconsole)
+  * [page.onDialog](#pageondialog)
+  * [page.onDomContentLoaded](#pageondomcontentloaded)
+  * [page.onError](#pageonerror)
+  * [page.onFrameAttached](#pageonframeattached)
+  * [page.onFrameDetached](#pageonframedetached)
+  * [page.onFrameNavigated](#pageonframenavigated)
+  * [page.onLoad](#pageonload)
+  * [page.onPageCrashed](#pageonpagecrashed)
+  * [page.onPopup](#pageonpopup)
+  * [page.onRequest](#pageonrequest)
+  * [page.onRequestFailed](#pageonrequestfailed)
+  * [page.onRequestFinished](#pageonrequestfinished)
+  * [page.onResponse](#pageonresponse)
+  * [page.pdf](#pagepdfpaperformat-format-num-scale-bool-displayheaderfooter-string-headertemplate-string-footertemplate-bool-printbackground-bool-landscape-string-pageranges-bool-prefercsspagesize-pdfmargins-margins)
+  * [page.queryObjects](#pagequeryobjectsjshandle-prototypehandle)
+  * [page.reload](#pagereloadduration-timeout-until-wait)
+  * [page.screenshot](#pagescreenshotscreenshotformat-format-bool-fullpage-rectangle-clip-num-quality-bool-omitbackground)
+  * [page.screenshotBase64](#pagescreenshotbase64screenshotformat-format-bool-fullpage-rectangle-clip-num-quality-bool-omitbackground)
+  * [page.select](#pageselectstring-selector-liststring-values)
+  * [page.setBypassCSP](#pagesetbypasscspbool-enabled)
+  * [page.setCacheEnabled](#pagesetcacheenabledenabled)
+  * [page.setContent](#pagesetcontentstring-html-duration-timeout-until-wait)
+  * [page.setExtraHTTPHeaders](#pagesetextrahttpheadersmapstring-string-headers)
+  * [page.setGeolocation](#pagesetgeolocationnum-latitude-num-longitude-num-accuracy)
+  * [page.setJavaScriptEnabled](#pagesetjavascriptenabledenabled)
+  * [page.setOfflineMode](#pagesetofflinemodebool-enabled)
+  * [page.setRequestInterception](#pagesetrequestinterceptionbool-value)
+  * [page.setUserAgent](#pagesetuseragentstring-useragent)
+  * [page.setViewport](#pagesetviewportdeviceviewport-viewport)
+  * [page.tap](#pagetapstring-selector)
+  * [page.target](#pagetarget)
+  * [page.title](#pagetitle)
+  * [page.type](#pagetypestring-selector-string-text-duration-delay)
+  * [page.url](#pageurl)
+  * [page.waitForFunction](#pagewaitforfunctionlanguagejs-string-pagefunction-list-args-duration-timeout-polling-polling)
+  * [page.waitForNavigation](#pagewaitfornavigationduration-timeout-until-wait)
+  * [page.waitForRequest](#pagewaitforrequeststring-url-duration-timeout)
+  * [page.waitForSelector](#pagewaitforselectorstring-selector-bool-visible-bool-hidden-duration-timeout)
+  * [page.waitForXPath](#pagewaitforxpathstring-xpath-bool-visible-bool-hidden-duration-timeout)
 - [class: Keyboard](#class-keyboard)
-  * [keyboard.down](#downkey-key-string-text)
-  * [keyboard.press](#presskey-key-duration-delay-string-text)
-  * [keyboard.sendCharacter](#sendcharacterstring-text)
-  * [keyboard.type](#typestring-text-duration-delay)
-  * [keyboard.up](#upkey-key)
+  * [keyboard.down](#keyboarddownkey-key-string-text)
+  * [keyboard.press](#keyboardpresskey-key-duration-delay-string-text)
+  * [keyboard.sendCharacter](#keyboardsendcharacterstring-text)
+  * [keyboard.type](#keyboardtypestring-text-duration-delay)
+  * [keyboard.up](#keyboardupkey-key)
 - [class: Mouse](#class-mouse)
-  * [mouse.click](#clickpoint-position-duration-delay-mousebutton-button-int-clickcount)
-  * [mouse.down](#downmousebutton-button-int-clickcount)
-  * [mouse.move](#movepoint-position-int-steps)
-  * [mouse.up](#upmousebutton-button-int-clickcount)
+  * [mouse.click](#mouseclickpoint-position-duration-delay-mousebutton-button-int-clickcount)
+  * [mouse.down](#mousedownmousebutton-button-int-clickcount)
+  * [mouse.move](#mousemovepoint-position-int-steps)
+  * [mouse.up](#mouseupmousebutton-button-int-clickcount)
 - [class: Touchscreen](#class-touchscreen)
-  * [touchscreen.tap](#tappoint-position)
+  * [touchscreen.tap](#touchscreentappoint-position)
 - [class: Dialog](#class-dialog)
-  * [dialog.accept](#acceptstring-prompttext)
-  * [dialog.defaultValue](#defaultvalue)
-  * [dialog.dismiss](#dismiss)
-  * [dialog.message](#message)
-  * [dialog.type](#type)
+  * [dialog.accept](#dialogacceptstring-prompttext)
+  * [dialog.defaultValue](#dialogdefaultvalue)
+  * [dialog.dismiss](#dialogdismiss)
+  * [dialog.message](#dialogmessage)
+  * [dialog.type](#dialogtype)
 - [class: ConsoleMessage](#class-consolemessage)
 - [class: PageFrame](#class-pageframe)
-  * [pageFrame.$](#string-selector)
-  * [pageFrame.$$](#string-selector)
-  * [pageFrame.$$eval](#evalstring-selector-languagejs-string-pagefunction-list-args)
-  * [pageFrame.$eval](#evalstring-selector-languagejs-string-pagefunction-list-args)
-  * [pageFrame.$x](#xstring-expression)
-  * [pageFrame.name](#name)
+  * [pageFrame.$](#pageframestring-selector)
+  * [pageFrame.$$](#pageframestring-selector)
+  * [pageFrame.$$eval](#pageframeevalstring-selector-languagejs-string-pagefunction-list-args)
+  * [pageFrame.$eval](#pageframeevalstring-selector-languagejs-string-pagefunction-list-args)
+  * [pageFrame.$x](#pageframexstring-expression)
+  * [pageFrame.name](#pageframename)
 - [class: ExecutionContext](#class-executioncontext)
-  * [executionContext.evaluate](#evaluatelanguagejs-string-pagefunction-list-args)
-  * [executionContext.evaluateHandle](#evaluatehandlelanguagejs-string-pagefunction-list-args)
-  * [executionContext.frame](#frame)
-  * [executionContext.queryObjects](#queryobjectsjshandle-prototypehandle)
+  * [executionContext.evaluate](#executioncontextevaluatelanguagejs-string-pagefunction-list-args)
+  * [executionContext.evaluateHandle](#executioncontextevaluatehandlelanguagejs-string-pagefunction-list-args)
+  * [executionContext.frame](#executioncontextframe)
+  * [executionContext.queryObjects](#executioncontextqueryobjectsjshandle-prototypehandle)
 - [class: JsHandle](#class-jshandle)
-  * [jsHandle.asElement](#aselement)
-  * [jsHandle.dispose](#dispose)
-  * [jsHandle.executionContext](#executioncontext)
-  * [jsHandle.jsonValue](#jsonvalue)
-  * [jsHandle.properties](#properties)
-  * [jsHandle.property](#propertystring-propertyname)
-  * [jsHandle.propertyValue](#propertyvaluestring-propertyname)
+  * [jsHandle.asElement](#jshandleaselement)
+  * [jsHandle.dispose](#jshandledispose)
+  * [jsHandle.executionContext](#jshandleexecutioncontext)
+  * [jsHandle.jsonValue](#jshandlejsonvalue)
+  * [jsHandle.properties](#jshandleproperties)
+  * [jsHandle.property](#jshandlepropertystring-propertyname)
+  * [jsHandle.propertyValue](#jshandlepropertyvaluestring-propertyname)
 - [class: ElementHandle](#class-elementhandle)
-  * [elementHandle.$](#string-selector)
-  * [elementHandle.$$](#string-selector)
-  * [elementHandle.$$eval](#evalstring-selector-languagejs-string-pagefunction-list-args)
-  * [elementHandle.$eval](#evalstring-selector-languagejs-string-pagefunction-list-args)
-  * [elementHandle.$x](#xstring-expression)
-  * [elementHandle.boundingBox](#boundingbox)
-  * [elementHandle.boxModel](#boxmodel)
-  * [elementHandle.click](#clickduration-delay-mousebutton-button-int-clickcount)
-  * [elementHandle.contentFrame](#contentframe)
-  * [elementHandle.focus](#focus)
-  * [elementHandle.isIntersectingViewport](#isintersectingviewport)
-  * [elementHandle.press](#presskey-key-duration-delay-string-text)
-  * [elementHandle.screenshot](#screenshotscreenshotformat-format-num-quality-bool-omitbackground)
-  * [elementHandle.tap](#tap)
-  * [elementHandle.type](#typestring-text-duration-delay)
-  * [elementHandle.uploadFile](#uploadfilelistfile-files)
+  * [elementHandle.$](#elementhandlestring-selector)
+  * [elementHandle.$$](#elementhandlestring-selector)
+  * [elementHandle.$$eval](#elementhandleevalstring-selector-languagejs-string-pagefunction-list-args)
+  * [elementHandle.$eval](#elementhandleevalstring-selector-languagejs-string-pagefunction-list-args)
+  * [elementHandle.$x](#elementhandlexstring-expression)
+  * [elementHandle.boundingBox](#elementhandleboundingbox)
+  * [elementHandle.boxModel](#elementhandleboxmodel)
+  * [elementHandle.click](#elementhandleclickduration-delay-mousebutton-button-int-clickcount)
+  * [elementHandle.contentFrame](#elementhandlecontentframe)
+  * [elementHandle.focus](#elementhandlefocus)
+  * [elementHandle.isIntersectingViewport](#elementhandleisintersectingviewport)
+  * [elementHandle.press](#elementhandlepresskey-key-duration-delay-string-text)
+  * [elementHandle.screenshot](#elementhandlescreenshotscreenshotformat-format-num-quality-bool-omitbackground)
+  * [elementHandle.tap](#elementhandletap)
+  * [elementHandle.type](#elementhandletypestring-text-duration-delay)
+  * [elementHandle.uploadFile](#elementhandleuploadfilelistfile-files)
 - [class: NetworkRequest](#class-networkrequest)
-  * [networkRequest.abort](#aborterrorreason-error)
-  * [networkRequest.continueRequest](#continuerequeststring-url-string-method-string-postdata-map-headers)
-  * [networkRequest.failure](#failure)
-  * [networkRequest.frame](#frame)
-  * [networkRequest.headers](#headers)
-  * [networkRequest.isNavigationRequest](#isnavigationrequest)
-  * [networkRequest.method](#method)
-  * [networkRequest.postData](#postdata)
-  * [networkRequest.redirectChain](#redirectchain)
-  * [networkRequest.resourceType](#resourcetype)
-  * [networkRequest.respond](#respondint-status-mapstring-string-headers-string-contenttype-body)
-  * [networkRequest.response](#response)
-  * [networkRequest.url](#url)
+  * [networkRequest.abort](#networkrequestaborterrorreason-error)
+  * [networkRequest.continueRequest](#networkrequestcontinuerequeststring-url-string-method-string-postdata-map-headers)
+  * [networkRequest.failure](#networkrequestfailure)
+  * [networkRequest.frame](#networkrequestframe)
+  * [networkRequest.headers](#networkrequestheaders)
+  * [networkRequest.isNavigationRequest](#networkrequestisnavigationrequest)
+  * [networkRequest.method](#networkrequestmethod)
+  * [networkRequest.postData](#networkrequestpostdata)
+  * [networkRequest.redirectChain](#networkrequestredirectchain)
+  * [networkRequest.resourceType](#networkrequestresourcetype)
+  * [networkRequest.respond](#networkrequestrespondint-status-mapstring-string-headers-string-contenttype-body)
+  * [networkRequest.response](#networkrequestresponse)
+  * [networkRequest.url](#networkrequesturl)
 - [class: NetworkResponse](#class-networkresponse)
-  * [networkResponse.bytes](#bytes)
-  * [networkResponse.frame](#frame)
-  * [networkResponse.fromCache](#fromcache)
-  * [networkResponse.fromServiceWorker](#fromserviceworker)
-  * [networkResponse.headers](#headers)
-  * [networkResponse.json](#json)
-  * [networkResponse.ok](#ok)
-  * [networkResponse.remoteIPAddress](#remoteipaddress)
-  * [networkResponse.remotePort](#remoteport)
-  * [networkResponse.request](#request)
-  * [networkResponse.securityDetails](#securitydetails)
-  * [networkResponse.status](#status)
-  * [networkResponse.statusText](#statustext)
-  * [networkResponse.text](#text)
-  * [networkResponse.url](#url)
+  * [networkResponse.bytes](#networkresponsebytes)
+  * [networkResponse.frame](#networkresponseframe)
+  * [networkResponse.fromCache](#networkresponsefromcache)
+  * [networkResponse.fromServiceWorker](#networkresponsefromserviceworker)
+  * [networkResponse.headers](#networkresponseheaders)
+  * [networkResponse.json](#networkresponsejson)
+  * [networkResponse.ok](#networkresponseok)
+  * [networkResponse.remoteIPAddress](#networkresponseremoteipaddress)
+  * [networkResponse.remotePort](#networkresponseremoteport)
+  * [networkResponse.request](#networkresponserequest)
+  * [networkResponse.securityDetails](#networkresponsesecuritydetails)
+  * [networkResponse.status](#networkresponsestatus)
+  * [networkResponse.statusText](#networkresponsestatustext)
+  * [networkResponse.text](#networkresponsetext)
+  * [networkResponse.url](#networkresponseurl)
 
 ### class: Browser
 A Browser is created when Puppeteer connects to a Chromium instance, either
@@ -205,7 +205,7 @@ main() async {
 }
 ```
 
-#### browserContexts
+#### browser.browserContexts
 Returns a list of all open browser contexts. In a newly created browser,
 this will return a single instance of BrowserContext.
 
@@ -213,7 +213,7 @@ this will return a single instance of BrowserContext.
 browser.browserContexts → List<BrowserContext>
 ```
 
-#### close()
+#### browser.close()
 Closes Chromium and all of its pages (if any were opened). The Browser
 object itself is considered to be disposed and cannot be used anymore.
 
@@ -221,7 +221,7 @@ object itself is considered to be disposed and cannot be used anymore.
 browser.close() → Future 
 ```
 
-#### createIncognitoBrowserContext()
+#### browser.createIncognitoBrowserContext()
 Creates a new incognito browser context. This won't share cookies/cache
 with other browser contexts.
 
@@ -242,7 +242,7 @@ main() async {
 browser.createIncognitoBrowserContext() → Future<BrowserContext> 
 ```
 
-#### defaultBrowserContext
+#### browser.defaultBrowserContext
 Returns the default browser context. The default browser context can not
 be closed.
 
@@ -250,7 +250,7 @@ be closed.
 browser.defaultBrowserContext → BrowserContext
 ```
 
-#### newPage()
+#### browser.newPage()
 Future which resolves to a new Page object. The Page is created in a
 default browser context.
 
@@ -258,7 +258,7 @@ default browser context.
 browser.newPage() → Future<Page> 
 ```
 
-#### onTargetChanged
+#### browser.onTargetChanged
 Emitted when the url of a target changes.
 
 NOTE This includes target changes in incognito browser contexts.
@@ -267,7 +267,7 @@ NOTE This includes target changes in incognito browser contexts.
 browser.onTargetChanged → Stream<Target>
 ```
 
-#### onTargetCreated
+#### browser.onTargetCreated
 Emitted when a target is created, for example when a new page is opened by
 [window.open](https://developer.mozilla.org/en-US/docs/Web/API/Window/open)
 or [Browser.newPage].
@@ -278,7 +278,7 @@ NOTE This includes target creations in incognito browser contexts.
 browser.onTargetCreated → Stream<Target>
 ```
 
-#### onTargetDestroyed
+#### browser.onTargetDestroyed
 Emitted when a target is destroyed, for example when a page is closed.
 
 NOTE This includes target destructions in incognito browser contexts.
@@ -287,7 +287,7 @@ NOTE This includes target destructions in incognito browser contexts.
 browser.onTargetDestroyed → Stream<Target>
 ```
 
-#### pages
+#### browser.pages
 Future which resolves to a list of all open pages. Non visible pages,
 such as "background_page", will not be listed here. You can find them
 using [Target.page].
@@ -300,14 +300,14 @@ browser contexts.
 browser.pages → Future<List<Page>>
 ```
 
-#### target
+#### browser.target
 A target associated with the browser.
 
 ```dart
 browser.target → Target
 ```
 
-#### targets
+#### browser.targets
 A list of all active targets inside the Browser. In case of multiple
 browser contexts, the method will return an array with all the targets in
 all browser contexts.
@@ -316,7 +316,7 @@ all browser contexts.
 browser.targets → List<Target>
 ```
 
-#### userAgent
+#### browser.userAgent
 Future which resolves to the browser's original user agent.
 
 NOTE Pages can override browser user agent with [Page.setUserAgent]
@@ -325,7 +325,7 @@ NOTE Pages can override browser user agent with [Page.setUserAgent]
 browser.userAgent → Future<String>
 ```
 
-#### version
+#### browser.version
 For headless Chromium, this is similar to HeadlessChrome/61.0.3153.0. For
 non-headless, this is similar to Chrome/61.0.3153.0.
 
@@ -333,7 +333,7 @@ non-headless, this is similar to Chrome/61.0.3153.0.
 browser.version → Future<String>
 ```
 
-#### waitForTarget(bool Function(Target) predicate, {Duration timeout})
+#### browser.waitForTarget(bool Function(Target) predicate, {Duration timeout})
 This searches for a target in all browser contexts.
 
 An example of finding a target for a page opened via window.open:
@@ -361,14 +361,14 @@ Puppeteer allows creation of "incognito" browser contexts with
 [Browser.createIncognitoBrowserContext] method. "Incognito" browser contexts
 don't write any browsing data to disk.
 
-#### browser
+#### browserContext.browser
 The browser this browser context belongs to.
 
 ```dart
 browserContext.browser → Browser
 ```
 
-#### clearPermissionOverrides()
+#### browserContext.clearPermissionOverrides()
 Clears all permission overrides for the browser context.
 
 ```dart
@@ -383,7 +383,7 @@ await context.clearPermissionOverrides();
 browserContext.clearPermissionOverrides() → Future<void> 
 ```
 
-#### close()
+#### browserContext.close()
 Closes the browser context. All the targets that belong to the browser
 context will be closed.
 
@@ -393,7 +393,7 @@ OTE only incognito browser contexts can be closed.
 browserContext.close() → Future<void> 
 ```
 
-#### isIncognito
+#### browserContext.isIncognito
 Returns whether BrowserContext is incognito. The default browser context
 is the only non-incognito browser context.
 
@@ -401,21 +401,21 @@ is the only non-incognito browser context.
 browserContext.isIncognito → bool
 ```
 
-#### newPage()
+#### browserContext.newPage()
 Creates a new page in the browser context.
 
 ```dart
 browserContext.newPage() → Future<Page> 
 ```
 
-#### onTargetChanged
+#### browserContext.onTargetChanged
 Emitted when the url of a target inside the browser context changes.
 
 ```dart
 browserContext.onTargetChanged → Stream<Target>
 ```
 
-#### onTargetCreated
+#### browserContext.onTargetCreated
 Emitted when a new target is created inside the browser context, for
 example when a new page is opened by window.open or browserContext.newPage.
 
@@ -423,7 +423,7 @@ example when a new page is opened by window.open or browserContext.newPage.
 browserContext.onTargetCreated → Stream<Target>
 ```
 
-#### onTargetDestroyed
+#### browserContext.onTargetDestroyed
 Emitted when a target inside the browser context is destroyed, for example
 when a page is closed.
 
@@ -431,7 +431,7 @@ when a page is closed.
 browserContext.onTargetDestroyed → Stream<Target>
 ```
 
-#### overridePermissions(String origin, List\<PermissionType> permissions)
+#### browserContext.overridePermissions(String origin, List\<PermissionType> permissions)
 origin <string> The origin to grant permissions to, e.g. "https://example.com".
 permissions <Array<string>> An array of permissions to grant. All
 permissions that are not listed here will be automatically denied.
@@ -446,21 +446,21 @@ await context.overridePermissions(
 browserContext.overridePermissions(String origin, List<PermissionType> permissions) → Future<void> 
 ```
 
-#### pages
+#### browserContext.pages
 An array of all pages inside the browser context.
 
 ```dart
 browserContext.pages → Future<List<Page>>
 ```
 
-#### targets
+#### browserContext.targets
 An array of all active targets inside the browser context.
 
 ```dart
 browserContext.targets → List<Target>
 ```
 
-#### waitForTarget( Function(Target) predicate, {Duration timeout})
+#### browserContext.waitForTarget( Function(Target) predicate, {Duration timeout})
 This searches for a target in this specific browser context.
 
 ```dart
@@ -504,7 +504,7 @@ var subscription = page.onRequest.listen(logRequest);
 await subscription.cancel();
 ```
 
-#### $(String selector)
+#### page.$(String selector)
 The method runs `document.querySelector` within the page. If no element matches the selector, the return value resolves to `null`.
 
 Shortcut for [Page.mainFrame.$(selector)].
@@ -515,7 +515,7 @@ A [selector] to query page for
 page.$(String selector) → Future<ElementHandle> 
 ```
 
-#### $$(String selector)
+#### page.$$(String selector)
 The method runs `document.querySelectorAll` within the page.
 If no elements match the selector, the return value resolves to `[]`.
 
@@ -525,7 +525,7 @@ Shortcut for [Page.mainFrame.$$(selector)].
 page.$$(String selector) → Future<List<ElementHandle>> 
 ```
 
-#### $$eval(String selector, @Language('js') String pageFunction, {List args})
+#### page.$$eval(String selector, @Language('js') String pageFunction, {List args})
 This method runs `Array.from(document.querySelectorAll(selector))` within
 the page and passes it as the first argument to `pageFunction`.
 
@@ -547,7 +547,7 @@ Returns a [Future] which resolves to the return value of `pageFunction`
 page.$$eval(String selector, @Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
-#### $eval(String selector, @Language('js') String pageFunction, {List args})
+#### page.$eval(String selector, @Language('js') String pageFunction, {List args})
 This method runs `document.querySelector` within the page and passes it as
 the first argument to `pageFunction`. If there's no element matching
 `selector`, the method throws an error.
@@ -571,7 +571,7 @@ Shortcut for [Page.mainFrame.$eval(selector, pageFunction)].
 page.$eval(String selector, @Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
-#### $x(String expression)
+#### page.$x(String expression)
 The method evaluates the XPath expression.
 
 Shortcut for [Page.mainFrame.$x(expression)]
@@ -583,7 +583,7 @@ Parameters:
 page.$x(String expression) → Future<List<ElementHandle>> 
 ```
 
-#### addScriptTag({String url, File file, String content, String type})
+#### page.addScriptTag({String url, File file, String content, String type})
 Adds a `<script>` tag into the page with the desired url or content.
 
 Shortcut for [Page.mainFrame.addScriptTag].
@@ -603,7 +603,7 @@ script's onload fires or when the script content was injected into frame.
 page.addScriptTag({String url, File file, String content, String type}) → Future<ElementHandle> 
 ```
 
-#### addStyleTag({String url, File file, String content})
+#### page.addStyleTag({String url, File file, String content})
 Adds a `<link rel="stylesheet">` tag into the page with the desired url or
 a `<style type="text/css">` tag with the content.
 
@@ -621,7 +621,7 @@ stylesheet's onload fires or when the CSS content was injected into frame.
 page.addStyleTag({String url, File file, String content}) → Future<ElementHandle> 
 ```
 
-#### authenticate({String userName, String password})
+#### page.authenticate({String userName, String password})
 Provide credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
 
 To disable authentication, pass `null`.
@@ -630,28 +630,28 @@ To disable authentication, pass `null`.
 page.authenticate({String userName, String password}) → Future<void> 
 ```
 
-#### bringToFront()
+#### page.bringToFront()
 Brings page to front (activates tab).
 
 ```dart
 page.bringToFront() → Future<void> 
 ```
 
-#### browser
+#### page.browser
 Get the browser the page belongs to.
 
 ```dart
 page.browser → Browser
 ```
 
-#### browserContext
+#### page.browserContext
 Get the browser context that the page belongs to.
 
 ```dart
 page.browserContext → BrowserContext
 ```
 
-#### click(String selector, {Duration delay, MouseButton button, int clickCount})
+#### page.click(String selector, {Duration delay, MouseButton button, int clickCount})
 This method fetches an element with `selector`, scrolls it into view if
 needed, and then uses [Page.mouse] to click in the center of the element.
 If there's no element matching `selector`, the method throws an error.
@@ -691,7 +691,7 @@ multiple elements satisfying the selector, the first will be clicked.
 page.click(String selector, {Duration delay, MouseButton button, int clickCount}) → Future<void> 
 ```
 
-#### close({bool runBeforeUnload})
+#### page.close({bool runBeforeUnload})
 By default, [Page.close] **does not** run beforeunload handlers.
 
 **NOTE** if `runBeforeUnload` is passed as true, a `beforeunload` dialog
@@ -705,14 +705,14 @@ Parameters:
 page.close({bool runBeforeUnload}) → Future<void> 
 ```
 
-#### content
+#### page.content
 Gets the full HTML contents of the page, including the doctype.
 
 ```dart
 page.content → Future<String>
 ```
 
-#### cookies({List\<String> urls})
+#### page.cookies({List\<String> urls})
 If no URLs are specified, this method returns cookies for the current page URL.
 If URLs are specified, only cookies for those URLs are returned.
 
@@ -720,7 +720,7 @@ If URLs are specified, only cookies for those URLs are returned.
 page.cookies({List<String> urls}) → Future<List<Cookie>> 
 ```
 
-#### defaultNavigationTimeout
+#### page.defaultNavigationTimeout
 Maximum navigation time in milliseconds
 This setting will change the default maximum navigation time for the
 following methods and related shortcuts:
@@ -737,7 +737,7 @@ following methods and related shortcuts:
 page.defaultNavigationTimeout → Duration
 ```
 
-#### defaultTimeout
+#### page.defaultTimeout
 Maximum time in milliseconds
 
 This setting will change the default maximum time for the following methods
@@ -760,7 +760,7 @@ and related shortcuts:
 page.defaultTimeout → Duration
 ```
 
-#### emulate(Device device)
+#### page.emulate(Device device)
 Emulates given device metrics and user agent. This method is a shortcut
 for calling two methods:
 - [Page.setUserAgent]
@@ -788,7 +788,7 @@ List of all available devices is available in the source code:
 page.emulate(Device device) → Future<void> 
 ```
 
-#### emulateMedia(String mediaType)
+#### page.emulateMedia(String mediaType)
 Changes the CSS media type of the page.
 The only allowed values are `'screen'`, `'print'` and `null`.
 Passing `null` disables media emulation.
@@ -797,7 +797,7 @@ Passing `null` disables media emulation.
 page.emulateMedia(String mediaType) → Future<void> 
 ```
 
-#### evaluate(@Language('js') String pageFunction, {List args})
+#### page.evaluate(@Language('js') String pageFunction, {List args})
 If the function passed to the [Page.evaluate] returns a [Promise], then
 [Page.evaluate] would wait for the promise to resolve and return its value.
 
@@ -841,7 +841,7 @@ Parameters:
 page.evaluate(@Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
-#### evaluateHandle(@Language('js') String pageFunction, {List args})
+#### page.evaluateHandle(@Language('js') String pageFunction, {List args})
 The only difference between [Page.evaluate] and [Page.evaluateHandle] is
 that [Page.evaluateHandle] returns in-page object (JSHandle).
 
@@ -877,7 +877,7 @@ in-page object (JSHandle)
 page.evaluateHandle(@Language('js') String pageFunction, {List args}) → Future<JsHandle> 
 ```
 
-#### evaluateOnNewDocument(String pageFunction, {List args})
+#### page.evaluateOnNewDocument(String pageFunction, {List args})
 Adds a function which would be invoked in one of the following scenarios:
 - whenever the page is navigated
 - whenever the child frame is attached or navigated. In this case, the
@@ -914,7 +914,7 @@ Parameters:
 page.evaluateOnNewDocument(String pageFunction, {List args}) → Future<void> 
 ```
 
-#### exposeFunction(String name, Function callbackFunction)
+#### page.exposeFunction(String name, Function callbackFunction)
 The method adds a function called `name` on the page's `window` object.
 When called, the function executes `puppeteerFunction` in Dart and
 returns a [Promise] which resolves to the return value of `puppeteerFunction`.
@@ -974,14 +974,14 @@ Parameters:
 page.exposeFunction(String name, Function callbackFunction) → Future<void> 
 ```
 
-#### frames
+#### page.frames
 An array of all frames attached to the page.
 
 ```dart
 page.frames → List<PageFrame>
 ```
 
-#### goBack({Duration timeout, Until wait})
+#### page.goBack({Duration timeout, Until wait})
 Navigate to the previous page in history.
 
 Parameters:
@@ -1009,7 +1009,7 @@ the response of the last redirect. If can not go back, resolves to `null`.
 page.goBack({Duration timeout, Until wait}) → Future<NetworkResponse> 
 ```
 
-#### goForward({Duration timeout, Until wait})
+#### page.goForward({Duration timeout, Until wait})
 Navigate to the next page in history.
 
 Parameters:
@@ -1037,7 +1037,7 @@ the response of the last redirect. If can not go back, resolves to `null`.
 page.goForward({Duration timeout, Until wait}) → Future<NetworkResponse> 
 ```
 
-#### goto(String url, {String referrer, Duration timeout, Until wait})
+#### page.goto(String url, {String referrer, Duration timeout, Until wait})
 The [Page.goto] will throw an error if:
 - there's an SSL error (e.g. in case of self-signed certificates).
 - target URL is invalid.
@@ -1081,7 +1081,7 @@ the last redirect.
 page.goto(String url, {String referrer, Duration timeout, Until wait}) → Future<NetworkResponse> 
 ```
 
-#### hover(String selector)
+#### page.hover(String selector)
 This method fetches an element with [selector], scrolls it into view if
 needed, and then uses [Page.mouse] to hover over the center of
 the element.
@@ -1101,14 +1101,14 @@ successfully hovered. Future gets rejected if there's no element matching
 page.hover(String selector) → Future<void> 
 ```
 
-#### isClosed
+#### page.isClosed
 Indicates that the page has been closed.
 
 ```dart
 page.isClosed → bool
 ```
 
-#### mainFrame
+#### page.mainFrame
 The page's main frame.
 
 Page is guaranteed to have a main frame which persists during navigations.
@@ -1117,14 +1117,14 @@ Page is guaranteed to have a main frame which persists during navigations.
 page.mainFrame → PageFrame
 ```
 
-#### onClose
+#### page.onClose
 Complete when the page closes.
 
 ```dart
 page.onClose → Future<void>
 ```
 
-#### onConsole
+#### page.onConsole
 Emitted when JavaScript within the page calls one of console API methods,
 e.g. console.log or console.dir. Also emitted if the page throws an error
 or a warning.
@@ -1147,7 +1147,7 @@ await page.evaluate("() => console.log('hello', 5, {foo: 'bar'})");
 page.onConsole → Stream<ConsoleMessage>
 ```
 
-#### onDialog
+#### page.onDialog
 Emitted when a JavaScript dialog appears, such as `alert`, `prompt`,
 `confirm` or `beforeunload`. Puppeteer can respond to the dialog via
 [Dialog.accept] or [Dialog.dismiss] methods.
@@ -1156,7 +1156,7 @@ Emitted when a JavaScript dialog appears, such as `alert`, `prompt`,
 page.onDialog → Stream<Dialog>
 ```
 
-#### onDomContentLoaded
+#### page.onDomContentLoaded
 Emitted when the JavaScript [`DOMContentLoaded`](https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded)
 event is dispatched.
 
@@ -1164,35 +1164,35 @@ event is dispatched.
 page.onDomContentLoaded → Stream<MonotonicTime>
 ```
 
-#### onError
+#### page.onError
 Emitted when an uncaught exception happens within the page.
 
 ```dart
 page.onError → Stream<ClientError>
 ```
 
-#### onFrameAttached
+#### page.onFrameAttached
 Emitted when a frame is attached.
 
 ```dart
 page.onFrameAttached → Stream<PageFrame>
 ```
 
-#### onFrameDetached
+#### page.onFrameDetached
 Emitted when a frame is detached.
 
 ```dart
 page.onFrameDetached → Stream<PageFrame>
 ```
 
-#### onFrameNavigated
+#### page.onFrameNavigated
 Emitted when a frame is navigated to a new url.
 
 ```dart
 page.onFrameNavigated → Stream<PageFrame>
 ```
 
-#### onLoad
+#### page.onLoad
 Emitted when the JavaScript [`load`](https://developer.mozilla.org/en-US/docs/Web/Events/load)
 event is dispatched.
 
@@ -1200,14 +1200,14 @@ event is dispatched.
 page.onLoad → Stream<MonotonicTime>
 ```
 
-#### onPageCrashed
+#### page.onPageCrashed
 Emitted when the page crashes.
 
 ```dart
 page.onPageCrashed → Stream
 ```
 
-#### onPopup
+#### page.onPopup
 Emitted when the page opens a new tab or window.
 ```dart
 var popupFuture = page.onPopup.first;
@@ -1225,7 +1225,7 @@ Page popup = await popupFuture;
 page.onPopup → Stream<Page>
 ```
 
-#### onRequest
+#### page.onRequest
 Emitted when a page issues a request.
 In order to intercept and mutate requests, see [Page.setRequestInterception].
 
@@ -1233,28 +1233,28 @@ In order to intercept and mutate requests, see [Page.setRequestInterception].
 page.onRequest → Stream<NetworkRequest>
 ```
 
-#### onRequestFailed
+#### page.onRequestFailed
 Emitted when a request fails, for example by timing out.
 
 ```dart
 page.onRequestFailed → Stream<NetworkRequest>
 ```
 
-#### onRequestFinished
+#### page.onRequestFinished
 Emitted when a request finishes successfully.
 
 ```dart
 page.onRequestFinished → Stream<NetworkRequest>
 ```
 
-#### onResponse
+#### page.onResponse
 Emitted when a [response] is received.
 
 ```dart
 page.onResponse → Stream<NetworkResponse>
 ```
 
-#### pdf({PaperFormat format, num scale, bool displayHeaderFooter, String headerTemplate, String footerTemplate, bool printBackground, bool landscape, String pageRanges, bool preferCssPageSize, PdfMargins margins})
+#### page.pdf({PaperFormat format, num scale, bool displayHeaderFooter, String headerTemplate, String footerTemplate, bool printBackground, bool landscape, String pageRanges, bool preferCssPageSize, PdfMargins margins})
 Generates a pdf of the page with `print` css media. To generate a pdf with
 `screen` media, call [Page.emulateMedia('screen')] before calling `page.pdf()`:
 
@@ -1304,7 +1304,7 @@ limitations:
 page.pdf({PaperFormat format, num scale, bool displayHeaderFooter, String headerTemplate, String footerTemplate, bool printBackground, bool landscape, String pageRanges, bool preferCssPageSize, PdfMargins margins}) → Future<Uint8List> 
 ```
 
-#### queryObjects(JsHandle prototypeHandle)
+#### page.queryObjects(JsHandle prototypeHandle)
 The method iterates the JavaScript heap and finds all the objects with the
 given prototype.
 
@@ -1333,7 +1333,7 @@ this prototype.
 page.queryObjects(JsHandle prototypeHandle) → Future<JsHandle> 
 ```
 
-#### reload({Duration timeout, Until wait})
+#### page.reload({Duration timeout, Until wait})
 Parameters:
 - [timeout] Maximum navigation time in milliseconds, defaults
     to 30 seconds, pass [Duration.zero] to disable timeout. The default value
@@ -1361,7 +1361,7 @@ the last redirect.
 page.reload({Duration timeout, Until wait}) → Future<NetworkResponse> 
 ```
 
-#### screenshot({ScreenshotFormat format, bool fullPage, Rectangle clip, num quality, bool omitBackground})
+#### page.screenshot({ScreenshotFormat format, bool fullPage, Rectangle clip, num quality, bool omitBackground})
 Parameters:
 - [format]: Specify screenshot type, can be either `ScreenshotFormat.jpeg`
   or `ScreenshotFormat.png`. Defaults to 'png'.
@@ -1383,7 +1383,7 @@ https://crbug.com/741689 for discussion.
 page.screenshot({ScreenshotFormat format, bool fullPage, Rectangle clip, num quality, bool omitBackground}) → Future<Uint8List> 
 ```
 
-#### screenshotBase64({ScreenshotFormat format, bool fullPage, Rectangle clip, num quality, bool omitBackground})
+#### page.screenshotBase64({ScreenshotFormat format, bool fullPage, Rectangle clip, num quality, bool omitBackground})
 Parameters:
 - [format]: Specify screenshot type, can be either `ScreenshotFormat.jpeg`
   or `ScreenshotFormat.png`. Defaults to 'png'.
@@ -1405,7 +1405,7 @@ https://crbug.com/741689 for discussion.
 page.screenshotBase64({ScreenshotFormat format, bool fullPage, Rectangle clip, num quality, bool omitBackground}) → Future<String> 
 ```
 
-#### select(String selector, List\<String> values)
+#### page.select(String selector, List\<String> values)
 Triggers a `change` and `input` event once all the provided options have
 been selected.
 If there's no `<select>` element matching `selector`, the method throws an
@@ -1431,7 +1431,7 @@ Returns an array of option values that have been successfully selected.
 page.select(String selector, List<String> values) → Future<List<String>> 
 ```
 
-#### setBypassCSP(bool enabled)
+#### page.setBypassCSP(bool enabled)
 Toggles bypassing page's Content-Security-Policy.
 
 > **NOTE** CSP bypassing happens at the moment of CSP initialization rather
@@ -1442,7 +1442,7 @@ before navigating to the domain.
 page.setBypassCSP(bool enabled) → Future<void> 
 ```
 
-#### setCacheEnabled(enabled)
+#### page.setCacheEnabled(enabled)
 Toggles ignoring cache for each request based on the enabled state. By
 default, caching is enabled.
 
@@ -1450,7 +1450,7 @@ default, caching is enabled.
 page.setCacheEnabled(enabled) → Future<void> 
 ```
 
-#### setContent(String html, {Duration timeout, Until wait})
+#### page.setContent(String html, {Duration timeout, Until wait})
 Parameters:
 [html]: HTML markup to assign to the page.
 
@@ -1458,7 +1458,7 @@ Parameters:
 page.setContent(String html, {Duration timeout, Until wait}) → Future<void> 
 ```
 
-#### setExtraHTTPHeaders(Map\<String, String> headers)
+#### page.setExtraHTTPHeaders(Map\<String, String> headers)
 The extra HTTP headers will be sent with every request the page initiates.
 
 > **NOTE** page.setExtraHTTPHeaders does not guarantee the order of headers
@@ -1468,7 +1468,7 @@ The extra HTTP headers will be sent with every request the page initiates.
 page.setExtraHTTPHeaders(Map<String, String> headers) → Future<void> 
 ```
 
-#### setGeolocation({num latitude, num longitude, num accuracy})
+#### page.setGeolocation({num latitude, num longitude, num accuracy})
 Sets the page's geolocation.
 
 ```dart
@@ -1482,7 +1482,7 @@ permissions for the page to read its geolocation.
 page.setGeolocation({num latitude, num longitude, num accuracy}) → Future<void> 
 ```
 
-#### setJavaScriptEnabled(enabled)
+#### page.setJavaScriptEnabled(enabled)
 Whether or not to enable JavaScript on the page.
 
 > **NOTE** changing this value won't affect scripts that have already been
@@ -1492,14 +1492,14 @@ run. It will take full effect on the next [navigation].
 page.setJavaScriptEnabled(enabled) → Future<void> 
 ```
 
-#### setOfflineMode(bool enabled)
+#### page.setOfflineMode(bool enabled)
 When `true`, enables offline mode for the page.
 
 ```dart
 page.setOfflineMode(bool enabled) → Future<void> 
 ```
 
-#### setRequestInterception(bool value)
+#### page.setRequestInterception(bool value)
 Whether to enable request interception.
 
 Activating request interception enables `request.abort`, `request.continue`
@@ -1532,14 +1532,14 @@ await browser.close();
 page.setRequestInterception(bool value) → Future<void> 
 ```
 
-#### setUserAgent(String userAgent)
+#### page.setUserAgent(String userAgent)
 Specific user agent to use in this page
 
 ```dart
 page.setUserAgent(String userAgent) → Future<void> 
 ```
 
-#### setViewport(DeviceViewport viewport)
+#### page.setViewport(DeviceViewport viewport)
 > **NOTE** in certain cases, setting viewport will reload the page in order
 to set the `isMobile` or `hasTouch` properties.
 
@@ -1550,7 +1550,7 @@ own viewport size.
 page.setViewport(DeviceViewport viewport) → Future<void> 
 ```
 
-#### tap(String selector)
+#### page.tap(String selector)
 This method fetches an element with `selector`, scrolls it into view if
 needed, and then uses [page.touchscreen] to tap in the center of the element.
 If there's no element matching `selector`, the method throws an error.
@@ -1565,14 +1565,14 @@ elements satisfying the selector, the first will be tapped.
 page.tap(String selector) → Future<void> 
 ```
 
-#### target
+#### page.target
 A target this page was created from.
 
 ```dart
 page.target → Target
 ```
 
-#### title
+#### page.title
 The page's title.
 
 Shortcut for [Page.mainFrame.title].
@@ -1581,7 +1581,7 @@ Shortcut for [Page.mainFrame.title].
 page.title → Future<String>
 ```
 
-#### type(String selector, String text, {Duration delay})
+#### page.type(String selector, String text, {Duration delay})
 Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character
 in the text.
 
@@ -1601,14 +1601,14 @@ Shortcut for [page.mainFrame.type].
 page.type(String selector, String text, {Duration delay}) → Future<void> 
 ```
 
-#### url
+#### page.url
 This is a shortcut for [page.mainFrame.url]
 
 ```dart
 page.url → String
 ```
 
-#### waitForFunction(@Language('js') String pageFunction, {List args, Duration timeout, Polling polling})
+#### page.waitForFunction(@Language('js') String pageFunction, {List args, Duration timeout, Polling polling})
 Parameters:
 - [pageFunction]: Function to be evaluated in browser context
 - [polling]: An interval at which the `pageFunction` is executed, defaults
@@ -1651,7 +1651,7 @@ Shortcut for [page.mainFrame().waitForFunction(pageFunction[, options[, ...args]
 page.waitForFunction(@Language('js') String pageFunction, {List args, Duration timeout, Polling polling}) → Future<JsHandle> 
 ```
 
-#### waitForNavigation({Duration timeout, Until wait})
+#### page.waitForNavigation({Duration timeout, Until wait})
 This resolves when the page navigates to a new URL or reloads. It is useful
 for when you run code which will indirectly cause the page to navigate.
 Consider this example:
@@ -1697,7 +1697,7 @@ API usage, the navigation will resolve with `null`.
 page.waitForNavigation({Duration timeout, Until wait}) → Future<NetworkResponse> 
 ```
 
-#### waitForRequest(String url, {Duration timeout})
+#### page.waitForRequest(String url, {Duration timeout})
 Example:
 ```dart
 var firstRequest = page.waitForRequest('https://example.com');
@@ -1719,7 +1719,7 @@ await Future.wait([firstRequest, finalRequest]);
 page.waitForRequest(String url, {Duration timeout}) → Future<NetworkRequest> 
 ```
 
-#### waitForSelector(String selector, {bool visible, bool hidden, Duration timeout})
+#### page.waitForSelector(String selector, {bool visible, bool hidden, Duration timeout})
 Wait for the `selector` to appear in page. If at the moment of calling
 the method the `selector` already exists, the method will return
 immediately. If the selector doesn't appear after the `timeout` of waiting,
@@ -1761,7 +1761,7 @@ is not found in DOM.
 page.waitForSelector(String selector, {bool visible, bool hidden, Duration timeout}) → Future<ElementHandle> 
 ```
 
-#### waitForXPath(String xpath, {bool visible, bool hidden, Duration timeout})
+#### page.waitForXPath(String xpath, {bool visible, bool hidden, Duration timeout})
 Wait for the `xpath` to appear in page. If at the moment of calling
 the method the `xpath` already exists, the method will return
 immediately. If the xpath doesn't appear after the `timeout` of waiting,
@@ -1834,7 +1834,7 @@ await page.keyboard.up(Key.shift);
 
 > **NOTE** On MacOS, keyboard shortcuts like `⌘ A` -> Select All do not work. See [#1313](https://github.com/GoogleChrome/puppeteer/issues/1313)
 
-#### down(Key key, {String text})
+#### keyboard.down(Key key, {String text})
 Dispatches a `keydown` event.
 
 If `key` is a modifier key, `Shift`, `Meta`, `Control`, or `Alt`,
@@ -1855,7 +1855,7 @@ Parameters:
 keyboard.down(Key key, {String text}) → Future<void> 
 ```
 
-#### press(Key key, {Duration delay, String text})
+#### keyboard.press(Key key, {Duration delay, String text})
 Shortcut for [Keyboard.down] and [Keyboard.up].
 
 > **NOTE** Modifier keys DO effect `keyboard.press`. Holding down `Shift`
@@ -1868,7 +1868,7 @@ will type the text in upper case.
 keyboard.press(Key key, {Duration delay, String text}) → Future<void> 
 ```
 
-#### sendCharacter(String text)
+#### keyboard.sendCharacter(String text)
 Dispatches a keypress and input event. This does not send a keydown or
 keyup event.
 
@@ -1883,7 +1883,7 @@ await page.keyboard.sendCharacter('嗨');
 keyboard.sendCharacter(String text) → Future<void> 
 ```
 
-#### type(String text, {Duration delay})
+#### keyboard.type(String text, {Duration delay})
 Sends a keydown, keypress/input, and keyup event for each character in the
 text.
 
@@ -1902,7 +1902,7 @@ await page.keyboard.type('World', delay: Duration(milliseconds: 10));
 keyboard.type(String text, {Duration delay}) → Future<void> 
 ```
 
-#### up(Key key)
+#### keyboard.up(Key key)
 Dispatches a `keyup` event.
 
 ```dart
@@ -1926,7 +1926,7 @@ await page.mouse.move(Point(0, 0));
 await page.mouse.up();
 ```
 
-#### click(Point position, {Duration delay, MouseButton button, int clickCount})
+#### mouse.click(Point position, {Duration delay, MouseButton button, int clickCount})
 Shortcut for [mouse.move], [mouse.down] and [mouse.up].
 
 [delay]: Time to wait between `mousedown` and `mouseup`. Defaults to 0.
@@ -1935,21 +1935,21 @@ Shortcut for [mouse.move], [mouse.down] and [mouse.up].
 mouse.click(Point position, {Duration delay, MouseButton button, int clickCount}) → Future<void> 
 ```
 
-#### down({MouseButton button, int clickCount})
+#### mouse.down({MouseButton button, int clickCount})
 Dispatches a `mousedown` event.
 
 ```dart
 mouse.down({MouseButton button, int clickCount}) → Future<void> 
 ```
 
-#### move(Point position, {int steps})
+#### mouse.move(Point position, {int steps})
 Dispatches a `mousemove` event.
 
 ```dart
 mouse.move(Point position, {int steps}) → Future<void> 
 ```
 
-#### up({MouseButton button, int clickCount})
+#### mouse.up({MouseButton button, int clickCount})
 Dispatches a `mouseup` event.
 
 ```dart
@@ -1959,7 +1959,7 @@ mouse.up({MouseButton button, int clickCount}) → Future<void>
 ### class: Touchscreen
 [Touchscreen] provides an api for dispatching touch events.
 
-#### tap(Point position)
+#### touchscreen.tap(Point position)
 Dispatches a `touchstart` and `touchend` event.
 
 ```dart
@@ -1982,7 +1982,7 @@ await page.evaluate("() => alert('1')");
 await browser.close();
 ```
 
-#### accept({String promptText})
+#### dialog.accept({String promptText})
 [promptText]: A text to enter in prompt. Does not cause any effects if
 the dialog's `type` is not prompt.
 
@@ -1992,7 +1992,7 @@ Returns [Future] which resolves when the dialog has been accepted.
 dialog.accept({String promptText}) → Future<void> 
 ```
 
-#### defaultValue
+#### dialog.defaultValue
 If dialog is prompt, returns default prompt value. Otherwise, returns
 empty string.
 
@@ -2000,21 +2000,21 @@ empty string.
 dialog.defaultValue → String
 ```
 
-#### dismiss()
+#### dialog.dismiss()
 Returns [Future] which resolves when the dialog has been dismissed.
 
 ```dart
 dialog.dismiss() → Future<void> 
 ```
 
-#### message
+#### dialog.message
 A message displayed in the dialog.
 
 ```dart
 dialog.message → String
 ```
 
-#### type
+#### dialog.type
 Dialog's type, can be one of `alert`, `beforeunload`, `confirm` or `prompt`.
 
 ```dart
@@ -2062,7 +2062,7 @@ var text = await frame.$eval('.selector', 'el => el.textContent');
 print(text);
 ```
 
-#### $(String selector)
+#### pageFrame.$(String selector)
 The method queries frame for the selector. If there's no such element
 within the frame, the method will resolve to null.
 
@@ -2074,7 +2074,7 @@ element.
 pageFrame.$(String selector) → Future<ElementHandle> 
 ```
 
-#### $$(String selector)
+#### pageFrame.$$(String selector)
 The method runs `document.querySelectorAll` within the frame. If no
 elements match the selector, the return value resolves to `[]`.
 
@@ -2088,7 +2088,7 @@ elements.
 pageFrame.$$(String selector) → Future<List<ElementHandle>> 
 ```
 
-#### $$eval(String selector, @Language('js') String pageFunction, {List args})
+#### pageFrame.$$eval(String selector, @Language('js') String pageFunction, {List args})
 This method runs `Array.from(document.querySelectorAll(selector))` within
 the frame and passes it as the first argument to `pageFunction`.
 
@@ -2104,7 +2104,7 @@ var divsCounts = await frame.$$eval('div', 'divs => divs.length');
 pageFrame.$$eval(String selector, @Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
-#### $eval(String selector, @Language('js') String pageFunction, {List args})
+#### pageFrame.$eval(String selector, @Language('js') String pageFunction, {List args})
 This method runs document.querySelector within the frame and passes it as
 the first argument to pageFunction. If there's no element matching
 selector, the method throws an error.
@@ -2132,14 +2132,14 @@ Returns a Future which resolves to the return value of pageFunction
 pageFrame.$eval(String selector, @Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
-#### $x(String expression)
+#### pageFrame.$x(String expression)
 Evaluates the XPath expression.
 
 ```dart
 pageFrame.$x(String expression) → Future<List<ElementHandle>> 
 ```
 
-#### name
+#### pageFrame.name
 Returns frame's name attribute as specified in the tag.
 
 If the name is empty, returns the id attribute instead.
@@ -2162,7 +2162,7 @@ many execution contexts:
 
 Besides pages, execution contexts can be found in [workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API).
 
-#### evaluate(@Language('js') String pageFunction, {List args})
+#### executionContext.evaluate(@Language('js') String pageFunction, {List args})
 If the function passed to the `executionContext.evaluate` returns a [Promise],
 then `executionContext.evaluate` would wait for the promise to resolve and
 return its value.
@@ -2195,7 +2195,7 @@ Returns [Future] which resolves to the return value of `pageFunction`
 executionContext.evaluate(@Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
-#### evaluateHandle(@Language('js') String pageFunction, {List args})
+#### executionContext.evaluateHandle(@Language('js') String pageFunction, {List args})
 The only difference between `executionContext.evaluate` and
 `executionContext.evaluateHandle` is that `executionContext.evaluateHandle`
 returns in-page object (JSHandle).
@@ -2231,7 +2231,7 @@ await resultHandle.dispose();
 executionContext.evaluateHandle(@Language('js') String pageFunction, {List args}) → Future<JsHandle> 
 ```
 
-#### frame
+#### executionContext.frame
 Frame associated with this execution context.
 
 > **NOTE** Not every execution context is associated with a frame. For
@@ -2242,7 +2242,7 @@ associated with frames.
 executionContext.frame → PageFrame
 ```
 
-#### queryObjects(JsHandle prototypeHandle)
+#### executionContext.queryObjects(JsHandle prototypeHandle)
 The method iterates the JavaScript heap and finds all the objects with the
 given prototype.
 
@@ -2265,7 +2265,7 @@ origin frame gets navigated or the parent context gets destroyed.
 JSHandle instances can be used as arguments in [page.$eval], [page.evaluate]
 and [page.evaluateHandle] methods.
 
-#### asElement
+#### jsHandle.asElement
 Returns either `null` or the object handle itself, if the object handle is
 an instance of [ElementHandle].
 
@@ -2273,7 +2273,7 @@ an instance of [ElementHandle].
 jsHandle.asElement → ElementHandle
 ```
 
-#### dispose()
+#### jsHandle.dispose()
 Stops referencing the element handle.
 
 Returns a Future which completes when the object handle is successfully
@@ -2283,14 +2283,14 @@ disposed.
 jsHandle.dispose() → Future<void> 
 ```
 
-#### executionContext
+#### jsHandle.executionContext
 Returns execution context the handle belongs to.
 
 ```dart
 jsHandle.executionContext → ExecutionContext
 ```
 
-#### jsonValue
+#### jsHandle.jsonValue
 Returns a JSON representation of the object. If the object has a
 [`toJSON`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#toJSON()_behavior)
 function, it **will not be called**.
@@ -2303,7 +2303,7 @@ It will throw an error if the object has circular references.
 jsHandle.jsonValue → Future<dynamic>
 ```
 
-#### properties
+#### jsHandle.properties
 The method returns a map with property names as keys and JSHandle instances
 for the property values.
 
@@ -2319,14 +2319,14 @@ await handle.dispose();
 jsHandle.properties → Future<Map<String, JsHandle>>
 ```
 
-#### property(String propertyName)
+#### jsHandle.property(String propertyName)
 Fetches a single property from the referenced object.
 
 ```dart
 jsHandle.property(String propertyName) → Future<JsHandle> 
 ```
 
-#### propertyValue(String propertyName)
+#### jsHandle.propertyValue(String propertyName)
 Fetches the jsonValue of a single property from the referenced object.
 
 ```dart
@@ -2359,7 +2359,7 @@ ElementHandle prevents DOM element from garbage collection unless the handle
 ElementHandle instances can be used as arguments in [page.$eval] and
 [page.evaluate] methods.
 
-#### $(String selector)
+#### elementHandle.$(String selector)
 The method runs `element.querySelector` within the page. If no element
 matches the selector, the return value resolves to `null`.
 
@@ -2367,7 +2367,7 @@ matches the selector, the return value resolves to `null`.
 elementHandle.$(String selector) → Future<ElementHandle> 
 ```
 
-#### $$(String selector)
+#### elementHandle.$$(String selector)
 The method runs `element.querySelectorAll` within the page. If no elements
 match the selector, the return value resolves to `[]`.
 
@@ -2375,7 +2375,7 @@ match the selector, the return value resolves to `[]`.
 elementHandle.$$(String selector) → Future<List<ElementHandle>> 
 ```
 
-#### $$eval(String selector, @Language('js') String pageFunction, {List args})
+#### elementHandle.$$eval(String selector, @Language('js') String pageFunction, {List args})
 This method runs `document.querySelectorAll` within the element and passes
 it as the first argument to `pageFunction`. If there's no element matching
 `selector`, the method throws an error.
@@ -2408,7 +2408,7 @@ Returns: [Future] which resolves to the return value of `pageFunction`
 elementHandle.$$eval(String selector, @Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
-#### $eval(String selector, @Language('js') String pageFunction, {List args})
+#### elementHandle.$eval(String selector, @Language('js') String pageFunction, {List args})
 This method runs `document.querySelector` within the element and passes it
 as the first argument to `pageFunction`. If there's no element matching
 `selector`, the method throws an error.
@@ -2436,7 +2436,7 @@ Returns [Future] which resolves to the return value of `pageFunction`.
 elementHandle.$eval(String selector, @Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
-#### $x(String expression)
+#### elementHandle.$x(String expression)
 The method evaluates the XPath expression relative to the elementHandle.
 If there are no such elements, the method will resolve to an empty array.
 
@@ -2444,7 +2444,7 @@ If there are no such elements, the method will resolve to an empty array.
 elementHandle.$x(String expression) → Future<List<ElementHandle>> 
 ```
 
-#### boundingBox
+#### elementHandle.boundingBox
 This method returns the bounding box of the element (relative to the main
 frame), or `null` if the element is not visible.
 
@@ -2452,7 +2452,7 @@ frame), or `null` if the element is not visible.
 elementHandle.boundingBox → Future<Rectangle>
 ```
 
-#### boxModel
+#### elementHandle.boxModel
 This method returns boxes of the element, or `null` if the element is not
 visible.
 Boxes are represented as an array of points;
@@ -2462,7 +2462,7 @@ Box points are sorted clock-wise.
 elementHandle.boxModel → Future<BoxModel>
 ```
 
-#### click({Duration delay, MouseButton button, int clickCount})
+#### elementHandle.click({Duration delay, MouseButton button, int clickCount})
 This method scrolls element into view if needed, and then uses [page.mouse]
 to click in the center of the element.
 If the element is detached from DOM, the method throws an error.
@@ -2479,7 +2479,7 @@ Returns [Future] which resolves when the element is successfully clicked.
 elementHandle.click({Duration delay, MouseButton button, int clickCount}) → Future<void> 
 ```
 
-#### contentFrame
+#### elementHandle.contentFrame
 Resolves to the content frame for element handles referencing iframe nodes,
 or null otherwise
 
@@ -2487,7 +2487,7 @@ or null otherwise
 elementHandle.contentFrame → Future<PageFrame>
 ```
 
-#### focus()
+#### elementHandle.focus()
 Calls [focus](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus)
 on the element.
 
@@ -2495,14 +2495,14 @@ on the element.
 elementHandle.focus() → Future<void> 
 ```
 
-#### isIntersectingViewport
+#### elementHandle.isIntersectingViewport
 Resolves to true if the element is visible in the current viewport.
 
 ```dart
 elementHandle.isIntersectingViewport → Future<bool>
 ```
 
-#### press(Key key, {Duration delay, String text})
+#### elementHandle.press(Key key, {Duration delay, String text})
 Focuses the element, and then uses [`keyboard.down`] and [`keyboard.up`].
 
 If `key` is a single character and no modifier keys besides `Shift` are
@@ -2520,7 +2520,7 @@ Parameters:
 elementHandle.press(Key key, {Duration delay, String text}) → Future<void> 
 ```
 
-#### screenshot({ScreenshotFormat format, num quality, bool omitBackground})
+#### elementHandle.screenshot({ScreenshotFormat format, num quality, bool omitBackground})
 This method scrolls element into view if needed, and then uses [page.screenshot]
 to take a screenshot of the element.
 If the element is detached from DOM, the method throws an error.
@@ -2531,7 +2531,7 @@ See [Page.screenshot] for more info.
 elementHandle.screenshot({ScreenshotFormat format, num quality, bool omitBackground}) → Future<List<int>> 
 ```
 
-#### tap()
+#### elementHandle.tap()
 This method scrolls element into view if needed, and then uses [touchscreen.tap]
 to tap in the center of the element.
 If the element is detached from DOM, the method throws an error.
@@ -2540,7 +2540,7 @@ If the element is detached from DOM, the method throws an error.
 elementHandle.tap() → Future<void> 
 ```
 
-#### type(String text, {Duration delay})
+#### elementHandle.type(String text, {Duration delay})
 Focuses the element, and then sends a `keydown`, `keypress`/`input`, and
 `keyup` event for each character in the text.
 
@@ -2566,7 +2566,7 @@ await elementHandle.press(Key.enter);
 elementHandle.type(String text, {Duration delay}) → Future<void> 
 ```
 
-#### uploadFile(List\<File> files)
+#### elementHandle.uploadFile(List\<File> files)
 This method expects `elementHandle` to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input).
 
 Sets the value of the file input these paths.
@@ -2591,7 +2591,7 @@ If request gets a 'redirect' response, the request is successfully finished
 with the 'onRequestFinished' event, and a new request is  issued to a
 redirected url.
 
-#### abort({ErrorReason error})
+#### networkRequest.abort({ErrorReason error})
 Aborts request. To use this, request interception should be enabled with
 `page.setRequestInterception`.
 Exception is immediately thrown if the request interception is not enabled.
@@ -2603,7 +2603,7 @@ Parameters:
 networkRequest.abort({ErrorReason error}) → Future<void> 
 ```
 
-#### continueRequest({String url, String method, String postData, Map headers})
+#### networkRequest.continueRequest({String url, String method, String postData, Map headers})
 Continues request with optional request overrides. To use this, request
 interception should be enabled with `page.setRequestInterception`.
 Exception is immediately thrown if the request interception is not enabled.
@@ -2630,7 +2630,7 @@ Parameters:
 networkRequest.continueRequest({String url, String method, String postData, Map headers}) → Future<void> 
 ```
 
-#### failure
+#### networkRequest.failure
 The method returns `null` unless this request was failed, as reported by
 `onRequestFailed` event.
 
@@ -2646,7 +2646,7 @@ page.onRequestFailed.listen((request) {
 networkRequest.failure → String
 ```
 
-#### frame
+#### networkRequest.frame
 A [PageFrame] that initiated this request, or `null` if navigating to
 error pages.
 
@@ -2654,7 +2654,7 @@ error pages.
 networkRequest.frame → PageFrame
 ```
 
-#### headers
+#### networkRequest.headers
 An object with HTTP headers associated with the request. All header names
 are lower-case.
 
@@ -2662,28 +2662,28 @@ are lower-case.
 networkRequest.headers → Map<String, String>
 ```
 
-#### isNavigationRequest
+#### networkRequest.isNavigationRequest
 Whether this request is driving frame's navigation.
 
 ```dart
 networkRequest.isNavigationRequest → bool
 ```
 
-#### method
+#### networkRequest.method
 Request's method (GET, POST, etc.)
 
 ```dart
 networkRequest.method → String
 ```
 
-#### postData
+#### networkRequest.postData
 Request's post body, if any.
 
 ```dart
 networkRequest.postData → String
 ```
 
-#### redirectChain
+#### networkRequest.redirectChain
 A `redirectChain` is a chain of requests initiated to fetch a resource.
 - If there are no redirects and the request was successful, the chain will
   be empty.
@@ -2714,7 +2714,7 @@ expect(chain, isEmpty);
 networkRequest.redirectChain → List<NetworkRequest>
 ```
 
-#### resourceType
+#### networkRequest.resourceType
 Contains the request's resource type as it was perceived by the rendering
 engine.
 
@@ -2722,7 +2722,7 @@ engine.
 networkRequest.resourceType → ResourceType
 ```
 
-#### respond({int status, Map\<String, String> headers, String contentType, body})
+#### networkRequest.respond({int status, Map\<String, String> headers, String contentType, body})
 Fulfills request with given response. To use this, request interception should
 be enabled with `page.setRequestInterception`. Exception is thrown if
 request interception is not enabled.
@@ -2749,7 +2749,7 @@ Parameters:
 networkRequest.respond({int status, Map<String, String> headers, String contentType, body}) → Future<void> 
 ```
 
-#### response
+#### networkRequest.response
 A matching [Response] object, or `null` if the response has not been
 received yet.
 
@@ -2757,7 +2757,7 @@ received yet.
 networkRequest.response → NetworkResponse
 ```
 
-#### url
+#### networkRequest.url
 URL of the request.
 
 ```dart
@@ -2767,14 +2767,14 @@ networkRequest.url → String
 ### class: NetworkResponse
 [NetworkResponse] class represents responses which are received by page.
 
-#### bytes
+#### networkResponse.bytes
 Promise which resolves to the bytes with response body.
 
 ```dart
 networkResponse.bytes → Future<List<int>>
 ```
 
-#### frame
+#### networkResponse.frame
 A [Frame] that initiated this response, or `null` if navigating to error
 pages.
 
@@ -2782,7 +2782,7 @@ pages.
 networkResponse.frame → PageFrame
 ```
 
-#### fromCache
+#### networkResponse.fromCache
 True if the response was served from either the browser's disk cache or
 memory cache.
 
@@ -2790,28 +2790,28 @@ memory cache.
 networkResponse.fromCache → bool
 ```
 
-#### fromServiceWorker
+#### networkResponse.fromServiceWorker
 True if the response was served by a service worker.
 
 ```dart
 networkResponse.fromServiceWorker → bool
 ```
 
-#### headers
+#### networkResponse.headers
 An object with HTTP headers associated with the response. All header names are lower-case.
 
 ```dart
 networkResponse.headers → Map
 ```
 
-#### json
+#### networkResponse.json
 This method will throw if the response body is not parsable via `jsonDecode`.
 
 ```dart
 networkResponse.json → Future<dynamic>
 ```
 
-#### ok
+#### networkResponse.ok
 Contains a boolean stating whether the response was successful (status in
 the range 200-299) or not.
 
@@ -2819,28 +2819,28 @@ the range 200-299) or not.
 networkResponse.ok → bool
 ```
 
-#### remoteIPAddress
+#### networkResponse.remoteIPAddress
 The IP address of the remote server
 
 ```dart
 networkResponse.remoteIPAddress → String
 ```
 
-#### remotePort
+#### networkResponse.remotePort
 The port used to connect to the remote server
 
 ```dart
 networkResponse.remotePort → int
 ```
 
-#### request
+#### networkResponse.request
 A matching [Request] object.
 
 ```dart
 networkResponse.request → NetworkRequest
 ```
 
-#### securityDetails
+#### networkResponse.securityDetails
 Security details if the response was received over the secure connection,
 or `null` otherwise.
 
@@ -2848,28 +2848,28 @@ or `null` otherwise.
 networkResponse.securityDetails → SecurityDetails
 ```
 
-#### status
+#### networkResponse.status
 Contains the status code of the response (e.g., 200 for a success).
 
 ```dart
 networkResponse.status → int
 ```
 
-#### statusText
+#### networkResponse.statusText
 Contains the status text of the response (e.g. usually an "OK" for a success).
 
 ```dart
 networkResponse.statusText → String
 ```
 
-#### text
+#### networkResponse.text
 Promise which resolves to a text representation of response body.
 
 ```dart
 networkResponse.text → Future<String>
 ```
 
-#### url
+#### networkResponse.url
 Contains the URL of the response.
 
 ```dart

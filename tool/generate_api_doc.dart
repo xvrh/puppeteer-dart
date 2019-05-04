@@ -132,18 +132,19 @@ class Method {
     if (member is MethodDeclaration) {
       name = member.name.name;
       if (member.isGetter) {
-        title = '$name';
+        title = '${firstLetterLower(parent.name)}.$name';
         fullSignature =
             '${firstLetterLower(parent.name)}.$name → ${member.returnType}';
       } else {
-        title = '$name${_escapeBracket(member.parameters.toString())}';
+        title =
+            '${firstLetterLower(parent.name)}.$name${_escapeBracket(member.parameters.toString())}';
         fullSignature =
             '${firstLetterLower(parent.name)}.$name${member.parameters} → ${member.returnType} ';
       }
       shortTitle = '${firstLetterLower(parent.name)}.$name';
     } else if (member is FieldDeclaration) {
       name = member.fields.variables.first.name.name;
-      title = '$name';
+      title = '${firstLetterLower(parent.name)}.$name';
       shortTitle = '${firstLetterLower(parent.name)}.$name';
       fullSignature =
           '${firstLetterLower(parent.name)}.$name → ${member.fields.type}';
