@@ -20,7 +20,7 @@ Most things that you can do manually in the browser can be done using Puppeteer!
 
 ## Api
 
-* See the full API in a single-page document: [docs/api.md](docs/api.md)
+* See the full API in a single-page document: [doc/api.md](doc/api.md)
 * See the Dart Doc for this package: [API reference](https://pub.dartlang.org/documentation/puppeteer/latest/puppeteer/puppeteer-library.html)
 
 ## Examples

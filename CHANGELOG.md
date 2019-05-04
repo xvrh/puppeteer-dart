@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.0 (2019-05-04)
+- Add more unit tests and more documentation
+- Fix bugs in request interception
+
 ## 1.3.0 (2019-05-02)
 - Add more unit tests and more documentation
 - Update default chromium

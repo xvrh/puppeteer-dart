@@ -73,7 +73,7 @@ main() {
   }
   print(buffer.toString());
 
-  File('docs/api.md').writeAsStringSync(buffer.toString());
+  File('doc/api.md').writeAsStringSync(buffer.toString());
 }
 
 String readComment(Comment comment) => comment.tokens
