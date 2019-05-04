@@ -21,6 +21,7 @@ import 'page_test.dart' as page_test;
 import 'query_selector_test.dart' as query_selector_test;
 import 'readme_test.dart' as readme_test;
 import 'request_interception_test.dart' as request_interception_test;
+import 'screenshot_test.dart' as screenshot_test;
 import 'target_test.dart' as target_test;
 import 'to_comment_test.dart' as to_comment_test;
 import 'touchscreen_test.dart' as touchscreen_test;
@@ -38,6 +39,7 @@ main() {
   group('emulation_test', emulation_test.main);
   group('to_comment_test', to_comment_test.main);
   group('frame_test', frame_test.main);
+  group('screenshot_test', screenshot_test.main);
   group('query_selector_test', query_selector_test.main);
   group('javascript_parser_test', javascript_parser_test.main);
   group('evaluation_test', evaluation_test.main);
