@@ -94,8 +94,6 @@ class JsGrammarDefinition extends GrammarDefinition {
 
   IDENTIFIER() => ref(IDENTIFIER_START) & ref(IDENTIFIER_PART).star();
 
-  HEX_DIGIT() => pattern('0-9a-fA-F');
-
   IDENTIFIER_START() => ref(IDENTIFIER_START_NO_DOLLAR) | char('\$');
 
   IDENTIFIER_START_NO_DOLLAR() => ref(LETTER) | char('_');
@@ -107,8 +105,6 @@ class JsGrammarDefinition extends GrammarDefinition {
   DIGIT() => digit();
 
   NEWLINE() => pattern('\n\r');
-
-  HIDDEN() => ref(HIDDEN_STUFF).plus();
 
   HIDDEN_STUFF() =>
       ref(WHITESPACE) | ref(SINGLE_LINE_COMMENT) | ref(MULTI_LINE_COMMENT);

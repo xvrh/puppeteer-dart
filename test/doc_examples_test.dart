@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
-import 'utils.dart';
+import 'utils/utils.dart';
 
 // The tests in this file are extracted by the script `tool/inject_examples_to_doc.dart`
 // and injected into the documentation in the source code.

@@ -4,8 +4,8 @@ import 'package:path/path.dart' as p;
 import 'package:puppeteer/protocol/network.dart' show ResourceType, ErrorReason;
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
-import 'utils.dart';
-import 'utils_golden.dart';
+import 'utils/utils.dart';
+import 'utils/utils_golden.dart';
 
 main() {
   Server server;
@@ -502,6 +502,7 @@ main() {
       expect(response.url, equals(server.emptyPage));
     });
     test('should allow mocking binary responses', () async {
+      await page.emulate(puppeteer.devices.laptopWithMDPIScreen);
       await page.setRequestInterception(true);
       page.onRequest.listen((request) {
         var imageBuffer =
