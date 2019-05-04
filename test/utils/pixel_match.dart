@@ -46,7 +46,7 @@ int pixelMatch(Uint8List img1, Uint8List img2,
       } else if (output != null) {
         // pixels are similar; draw background as grayscale image blended with white
         var val = _grayPixel(img1, pos, 0.1);
-        _drawPixel(output, pos, val, val, val);
+        _drawPixel(output, pos, val.truncate(), val.truncate(), val.truncate());
       }
     }
   }
@@ -66,8 +66,8 @@ bool _antialiased(
   var y2 = math.min(y1 + 1, height - 1);
   var pos = (y1 * width + x1) * 4;
   var zeroes = x1 == x0 || x1 == x2 || y1 == y0 || y1 == y2 ? 1 : 0;
-  var min = 0;
-  var max = 0;
+  num min = 0;
+  num max = 0;
   num minX, minY, maxX, maxY;
 
   // go through 8 adjacent pixels
