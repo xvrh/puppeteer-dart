@@ -218,7 +218,7 @@ main() async {
     animation.addFrame(image.decodePng(base64.decode(event.data)));
   });
 
-  // Change the CSS animations speed to accelerate it.
+  // For this example, we change the CSS animations speed.
   await page.devTools.animation.setPlaybackRate(240);
 
   // Start the screencast
@@ -228,12 +228,12 @@ main() async {
   await Future.delayed(Duration(seconds: 3));
   await page.devTools.page.stopScreencast();
 
-  // Encode the frame in Gif and save it to a file.
+  // Encode all the frames in an animated Gif file.
   File('example/_rubkis_cube.gif')
       .writeAsBytesSync(image.GifEncoder().encodeAnimation(animation));
 
-  // Alternatively, save all the frames on disk and use ffmpeg to convert it to
-  // video file. (like: ffmpeg -i frames/%3d.png -r 10 output.mp4)
+  // Alternatively, we can save all the frames on disk and use ffmpeg to convert
+  // it to a video file. (for example: ffmpeg -i frames/%3d.png -r 10 output.mp4)
 
   await browser.close();
   await server.close(force: true);
