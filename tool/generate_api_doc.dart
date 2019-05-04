@@ -16,7 +16,9 @@ final classesOrder = [
   'PageFrame',
   'ExecutionContext',
   'JsHandle',
-  'ElementHandle'
+  'ElementHandle',
+  'NetworkRequest',
+  'NetworkResponse',
 ];
 
 main() {
@@ -43,10 +45,10 @@ main() {
   for (var className in classesOrder) {
     var clas = classes.firstWhere((c) => c.name == className);
 
-    buffer.writeln('- [${clas.shortTitle}](${toLink(clas.title)})');
+    buffer.writeln('- [${clas.shortTitle}](#${toLink(clas.title)})');
 
     for (var method in clas.methods) {
-      buffer.writeln('  * [${method.shortTitle}](${toLink(method.title)})');
+      buffer.writeln('  * [${method.shortTitle}](#${toLink(method.title)})');
     }
   }
 

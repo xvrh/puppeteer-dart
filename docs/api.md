@@ -2,163 +2,193 @@
 
 ##### Table of Contents
 
-- [class: Browser](class-browser)
-  * [browser.browserContexts](browsercontexts)
-  * [browser.close](close)
-  * [browser.createIncognitoBrowserContext](createincognitobrowsercontext)
-  * [browser.defaultBrowserContext](defaultbrowsercontext)
-  * [browser.newPage](newpage)
-  * [browser.onTargetChanged](ontargetchanged)
-  * [browser.onTargetCreated](ontargetcreated)
-  * [browser.onTargetDestroyed](ontargetdestroyed)
-  * [browser.pages](pages)
-  * [browser.target](target)
-  * [browser.targets](targets)
-  * [browser.userAgent](useragent)
-  * [browser.version](version)
-  * [browser.waitForTarget](waitfortargetbool-functiontarget-predicate-duration-timeout)
-- [class: BrowserContext](class-browsercontext)
-  * [browserContext.browser](browser)
-  * [browserContext.clearPermissionOverrides](clearpermissionoverrides)
-  * [browserContext.close](close)
-  * [browserContext.isIncognito](isincognito)
-  * [browserContext.newPage](newpage)
-  * [browserContext.onTargetChanged](ontargetchanged)
-  * [browserContext.onTargetCreated](ontargetcreated)
-  * [browserContext.onTargetDestroyed](ontargetdestroyed)
-  * [browserContext.overridePermissions](overridepermissionsstring-origin-listpermissiontype-permissions)
-  * [browserContext.pages](pages)
-  * [browserContext.targets](targets)
-  * [browserContext.waitForTarget](waitfortarget-functiontarget-predicate-duration-timeout)
-- [class: Page](class-page)
-  * [page.$](string-selector)
-  * [page.$$](string-selector)
-  * [page.$$eval](evalstring-selector-languagejs-string-pagefunction-list-args)
-  * [page.$eval](evalstring-selector-languagejs-string-pagefunction-list-args)
-  * [page.$x](xstring-expression)
-  * [page.addScriptTag](addscripttagstring-url-file-file-string-content-string-type)
-  * [page.addStyleTag](addstyletagstring-url-file-file-string-content)
-  * [page.authenticate](authenticatestring-username-string-password)
-  * [page.bringToFront](bringtofront)
-  * [page.browser](browser)
-  * [page.browserContext](browsercontext)
-  * [page.click](clickstring-selector-duration-delay-mousebutton-button-int-clickcount)
-  * [page.close](closebool-runbeforeunload)
-  * [page.content](content)
-  * [page.cookies](cookiesliststring-urls)
-  * [page.defaultNavigationTimeout](defaultnavigationtimeout)
-  * [page.defaultTimeout](defaulttimeout)
-  * [page.emulate](emulatedevice-device)
-  * [page.emulateMedia](emulatemediastring-mediatype)
-  * [page.evaluate](evaluatelanguagejs-string-pagefunction-list-args)
-  * [page.evaluateHandle](evaluatehandlelanguagejs-string-pagefunction-list-args)
-  * [page.evaluateOnNewDocument](evaluateonnewdocumentstring-pagefunction-list-args)
-  * [page.exposeFunction](exposefunctionstring-name-function-callbackfunction)
-  * [page.frames](frames)
-  * [page.goBack](gobackduration-timeout-until-wait)
-  * [page.goForward](goforwardduration-timeout-until-wait)
-  * [page.goto](gotostring-url-string-referrer-duration-timeout-until-wait)
-  * [page.hover](hoverstring-selector)
-  * [page.isClosed](isclosed)
-  * [page.mainFrame](mainframe)
-  * [page.onClose](onclose)
-  * [page.onConsole](onconsole)
-  * [page.onDialog](ondialog)
-  * [page.onDomContentLoaded](ondomcontentloaded)
-  * [page.onError](onerror)
-  * [page.onFrameAttached](onframeattached)
-  * [page.onFrameDetached](onframedetached)
-  * [page.onFrameNavigated](onframenavigated)
-  * [page.onLoad](onload)
-  * [page.onPageCrashed](onpagecrashed)
-  * [page.onPopup](onpopup)
-  * [page.onRequest](onrequest)
-  * [page.onRequestFailed](onrequestfailed)
-  * [page.onRequestFinished](onrequestfinished)
-  * [page.onResponse](onresponse)
-  * [page.pdf](pdfpaperformat-format-num-scale-bool-displayheaderfooter-string-headertemplate-string-footertemplate-bool-printbackground-bool-landscape-string-pageranges-bool-prefercsspagesize-pdfmargins-margins)
-  * [page.queryObjects](queryobjectsjshandle-prototypehandle)
-  * [page.reload](reloadduration-timeout-until-wait)
-  * [page.screenshot](screenshotscreenshotformat-format-bool-fullpage-rectangle-clip-num-quality-bool-omitbackground)
-  * [page.screenshotBase64](screenshotbase64screenshotformat-format-bool-fullpage-rectangle-clip-num-quality-bool-omitbackground)
-  * [page.select](selectstring-selector-liststring-values)
-  * [page.setBypassCSP](setbypasscspbool-enabled)
-  * [page.setCacheEnabled](setcacheenabledenabled)
-  * [page.setContent](setcontentstring-html-duration-timeout-until-wait)
-  * [page.setExtraHTTPHeaders](setextrahttpheadersmapstring-string-headers)
-  * [page.setGeolocation](setgeolocationnum-latitude-num-longitude-num-accuracy)
-  * [page.setJavaScriptEnabled](setjavascriptenabledenabled)
-  * [page.setOfflineMode](setofflinemodebool-enabled)
-  * [page.setRequestInterception](setrequestinterceptionbool-value)
-  * [page.setUserAgent](setuseragentstring-useragent)
-  * [page.setViewport](setviewportdeviceviewport-viewport)
-  * [page.tap](tapstring-selector)
-  * [page.target](target)
-  * [page.title](title)
-  * [page.type](typestring-selector-string-text-duration-delay)
-  * [page.url](url)
-  * [page.waitForFunction](waitforfunctionlanguagejs-string-pagefunction-list-args-duration-timeout-polling-polling)
-  * [page.waitForNavigation](waitfornavigationduration-timeout-until-wait)
-  * [page.waitForRequest](waitforrequeststring-url-duration-timeout)
-  * [page.waitForSelector](waitforselectorstring-selector-bool-visible-bool-hidden-duration-timeout)
-  * [page.waitForXPath](waitforxpathstring-xpath-bool-visible-bool-hidden-duration-timeout)
-- [class: Keyboard](class-keyboard)
-  * [keyboard.down](downkey-key-string-text)
-  * [keyboard.press](presskey-key-duration-delay-string-text)
-  * [keyboard.sendCharacter](sendcharacterstring-text)
-  * [keyboard.type](typestring-text-duration-delay)
-  * [keyboard.up](upkey-key)
-- [class: Mouse](class-mouse)
-  * [mouse.click](clickpoint-position-duration-delay-mousebutton-button-int-clickcount)
-  * [mouse.down](downmousebutton-button-int-clickcount)
-  * [mouse.move](movepoint-position-int-steps)
-  * [mouse.up](upmousebutton-button-int-clickcount)
-- [class: Touchscreen](class-touchscreen)
-  * [touchscreen.tap](tappoint-position)
-- [class: Dialog](class-dialog)
-  * [dialog.accept](acceptstring-prompttext)
-  * [dialog.defaultValue](defaultvalue)
-  * [dialog.dismiss](dismiss)
-  * [dialog.message](message)
-  * [dialog.type](type)
-- [class: ConsoleMessage](class-consolemessage)
-- [class: PageFrame](class-pageframe)
-  * [pageFrame.$](string-selector)
-  * [pageFrame.$$](string-selector)
-  * [pageFrame.$$eval](evalstring-selector-languagejs-string-pagefunction-list-args)
-  * [pageFrame.$eval](evalstring-selector-languagejs-string-pagefunction-list-args)
-  * [pageFrame.$x](xstring-expression)
-  * [pageFrame.name](name)
-- [class: ExecutionContext](class-executioncontext)
-  * [executionContext.evaluate](evaluatelanguagejs-string-pagefunction-list-args)
-  * [executionContext.evaluateHandle](evaluatehandlelanguagejs-string-pagefunction-list-args)
-  * [executionContext.frame](frame)
-  * [executionContext.queryObjects](queryobjectsjshandle-prototypehandle)
-- [class: JsHandle](class-jshandle)
-  * [jsHandle.asElement](aselement)
-  * [jsHandle.dispose](dispose)
-  * [jsHandle.executionContext](executioncontext)
-  * [jsHandle.jsonValue](jsonvalue)
-  * [jsHandle.properties](properties)
-  * [jsHandle.property](propertystring-propertyname)
-  * [jsHandle.propertyValue](propertyvaluestring-propertyname)
-- [class: ElementHandle](class-elementhandle)
-  * [elementHandle.$](string-selector)
-  * [elementHandle.$$](string-selector)
-  * [elementHandle.$$eval](evalstring-selector-languagejs-string-pagefunction-list-args)
-  * [elementHandle.$eval](evalstring-selector-languagejs-string-pagefunction-list-args)
-  * [elementHandle.$x](xstring-expression)
-  * [elementHandle.boundingBox](boundingbox)
-  * [elementHandle.boxModel](boxmodel)
-  * [elementHandle.click](clickduration-delay-mousebutton-button-int-clickcount)
-  * [elementHandle.contentFrame](contentframe)
-  * [elementHandle.focus](focus)
-  * [elementHandle.isIntersectingViewport](isintersectingviewport)
-  * [elementHandle.press](presskey-key-duration-delay-string-text)
-  * [elementHandle.screenshot](screenshotscreenshotformat-format-num-quality-bool-omitbackground)
-  * [elementHandle.tap](tap)
-  * [elementHandle.type](typestring-text-duration-delay)
-  * [elementHandle.uploadFile](uploadfilelistfile-files)
+- [class: Browser](#class-browser)
+  * [browser.browserContexts](#browsercontexts)
+  * [browser.close](#close)
+  * [browser.createIncognitoBrowserContext](#createincognitobrowsercontext)
+  * [browser.defaultBrowserContext](#defaultbrowsercontext)
+  * [browser.newPage](#newpage)
+  * [browser.onTargetChanged](#ontargetchanged)
+  * [browser.onTargetCreated](#ontargetcreated)
+  * [browser.onTargetDestroyed](#ontargetdestroyed)
+  * [browser.pages](#pages)
+  * [browser.target](#target)
+  * [browser.targets](#targets)
+  * [browser.userAgent](#useragent)
+  * [browser.version](#version)
+  * [browser.waitForTarget](#waitfortargetbool-functiontarget-predicate-duration-timeout)
+- [class: BrowserContext](#class-browsercontext)
+  * [browserContext.browser](#browser)
+  * [browserContext.clearPermissionOverrides](#clearpermissionoverrides)
+  * [browserContext.close](#close)
+  * [browserContext.isIncognito](#isincognito)
+  * [browserContext.newPage](#newpage)
+  * [browserContext.onTargetChanged](#ontargetchanged)
+  * [browserContext.onTargetCreated](#ontargetcreated)
+  * [browserContext.onTargetDestroyed](#ontargetdestroyed)
+  * [browserContext.overridePermissions](#overridepermissionsstring-origin-listpermissiontype-permissions)
+  * [browserContext.pages](#pages)
+  * [browserContext.targets](#targets)
+  * [browserContext.waitForTarget](#waitfortarget-functiontarget-predicate-duration-timeout)
+- [class: Page](#class-page)
+  * [page.$](#string-selector)
+  * [page.$$](#string-selector)
+  * [page.$$eval](#evalstring-selector-languagejs-string-pagefunction-list-args)
+  * [page.$eval](#evalstring-selector-languagejs-string-pagefunction-list-args)
+  * [page.$x](#xstring-expression)
+  * [page.addScriptTag](#addscripttagstring-url-file-file-string-content-string-type)
+  * [page.addStyleTag](#addstyletagstring-url-file-file-string-content)
+  * [page.authenticate](#authenticatestring-username-string-password)
+  * [page.bringToFront](#bringtofront)
+  * [page.browser](#browser)
+  * [page.browserContext](#browsercontext)
+  * [page.click](#clickstring-selector-duration-delay-mousebutton-button-int-clickcount)
+  * [page.close](#closebool-runbeforeunload)
+  * [page.content](#content)
+  * [page.cookies](#cookiesliststring-urls)
+  * [page.defaultNavigationTimeout](#defaultnavigationtimeout)
+  * [page.defaultTimeout](#defaulttimeout)
+  * [page.emulate](#emulatedevice-device)
+  * [page.emulateMedia](#emulatemediastring-mediatype)
+  * [page.evaluate](#evaluatelanguagejs-string-pagefunction-list-args)
+  * [page.evaluateHandle](#evaluatehandlelanguagejs-string-pagefunction-list-args)
+  * [page.evaluateOnNewDocument](#evaluateonnewdocumentstring-pagefunction-list-args)
+  * [page.exposeFunction](#exposefunctionstring-name-function-callbackfunction)
+  * [page.frames](#frames)
+  * [page.goBack](#gobackduration-timeout-until-wait)
+  * [page.goForward](#goforwardduration-timeout-until-wait)
+  * [page.goto](#gotostring-url-string-referrer-duration-timeout-until-wait)
+  * [page.hover](#hoverstring-selector)
+  * [page.isClosed](#isclosed)
+  * [page.mainFrame](#mainframe)
+  * [page.onClose](#onclose)
+  * [page.onConsole](#onconsole)
+  * [page.onDialog](#ondialog)
+  * [page.onDomContentLoaded](#ondomcontentloaded)
+  * [page.onError](#onerror)
+  * [page.onFrameAttached](#onframeattached)
+  * [page.onFrameDetached](#onframedetached)
+  * [page.onFrameNavigated](#onframenavigated)
+  * [page.onLoad](#onload)
+  * [page.onPageCrashed](#onpagecrashed)
+  * [page.onPopup](#onpopup)
+  * [page.onRequest](#onrequest)
+  * [page.onRequestFailed](#onrequestfailed)
+  * [page.onRequestFinished](#onrequestfinished)
+  * [page.onResponse](#onresponse)
+  * [page.pdf](#pdfpaperformat-format-num-scale-bool-displayheaderfooter-string-headertemplate-string-footertemplate-bool-printbackground-bool-landscape-string-pageranges-bool-prefercsspagesize-pdfmargins-margins)
+  * [page.queryObjects](#queryobjectsjshandle-prototypehandle)
+  * [page.reload](#reloadduration-timeout-until-wait)
+  * [page.screenshot](#screenshotscreenshotformat-format-bool-fullpage-rectangle-clip-num-quality-bool-omitbackground)
+  * [page.screenshotBase64](#screenshotbase64screenshotformat-format-bool-fullpage-rectangle-clip-num-quality-bool-omitbackground)
+  * [page.select](#selectstring-selector-liststring-values)
+  * [page.setBypassCSP](#setbypasscspbool-enabled)
+  * [page.setCacheEnabled](#setcacheenabledenabled)
+  * [page.setContent](#setcontentstring-html-duration-timeout-until-wait)
+  * [page.setExtraHTTPHeaders](#setextrahttpheadersmapstring-string-headers)
+  * [page.setGeolocation](#setgeolocationnum-latitude-num-longitude-num-accuracy)
+  * [page.setJavaScriptEnabled](#setjavascriptenabledenabled)
+  * [page.setOfflineMode](#setofflinemodebool-enabled)
+  * [page.setRequestInterception](#setrequestinterceptionbool-value)
+  * [page.setUserAgent](#setuseragentstring-useragent)
+  * [page.setViewport](#setviewportdeviceviewport-viewport)
+  * [page.tap](#tapstring-selector)
+  * [page.target](#target)
+  * [page.title](#title)
+  * [page.type](#typestring-selector-string-text-duration-delay)
+  * [page.url](#url)
+  * [page.waitForFunction](#waitforfunctionlanguagejs-string-pagefunction-list-args-duration-timeout-polling-polling)
+  * [page.waitForNavigation](#waitfornavigationduration-timeout-until-wait)
+  * [page.waitForRequest](#waitforrequeststring-url-duration-timeout)
+  * [page.waitForSelector](#waitforselectorstring-selector-bool-visible-bool-hidden-duration-timeout)
+  * [page.waitForXPath](#waitforxpathstring-xpath-bool-visible-bool-hidden-duration-timeout)
+- [class: Keyboard](#class-keyboard)
+  * [keyboard.down](#downkey-key-string-text)
+  * [keyboard.press](#presskey-key-duration-delay-string-text)
+  * [keyboard.sendCharacter](#sendcharacterstring-text)
+  * [keyboard.type](#typestring-text-duration-delay)
+  * [keyboard.up](#upkey-key)
+- [class: Mouse](#class-mouse)
+  * [mouse.click](#clickpoint-position-duration-delay-mousebutton-button-int-clickcount)
+  * [mouse.down](#downmousebutton-button-int-clickcount)
+  * [mouse.move](#movepoint-position-int-steps)
+  * [mouse.up](#upmousebutton-button-int-clickcount)
+- [class: Touchscreen](#class-touchscreen)
+  * [touchscreen.tap](#tappoint-position)
+- [class: Dialog](#class-dialog)
+  * [dialog.accept](#acceptstring-prompttext)
+  * [dialog.defaultValue](#defaultvalue)
+  * [dialog.dismiss](#dismiss)
+  * [dialog.message](#message)
+  * [dialog.type](#type)
+- [class: ConsoleMessage](#class-consolemessage)
+- [class: PageFrame](#class-pageframe)
+  * [pageFrame.$](#string-selector)
+  * [pageFrame.$$](#string-selector)
+  * [pageFrame.$$eval](#evalstring-selector-languagejs-string-pagefunction-list-args)
+  * [pageFrame.$eval](#evalstring-selector-languagejs-string-pagefunction-list-args)
+  * [pageFrame.$x](#xstring-expression)
+  * [pageFrame.name](#name)
+- [class: ExecutionContext](#class-executioncontext)
+  * [executionContext.evaluate](#evaluatelanguagejs-string-pagefunction-list-args)
+  * [executionContext.evaluateHandle](#evaluatehandlelanguagejs-string-pagefunction-list-args)
+  * [executionContext.frame](#frame)
+  * [executionContext.queryObjects](#queryobjectsjshandle-prototypehandle)
+- [class: JsHandle](#class-jshandle)
+  * [jsHandle.asElement](#aselement)
+  * [jsHandle.dispose](#dispose)
+  * [jsHandle.executionContext](#executioncontext)
+  * [jsHandle.jsonValue](#jsonvalue)
+  * [jsHandle.properties](#properties)
+  * [jsHandle.property](#propertystring-propertyname)
+  * [jsHandle.propertyValue](#propertyvaluestring-propertyname)
+- [class: ElementHandle](#class-elementhandle)
+  * [elementHandle.$](#string-selector)
+  * [elementHandle.$$](#string-selector)
+  * [elementHandle.$$eval](#evalstring-selector-languagejs-string-pagefunction-list-args)
+  * [elementHandle.$eval](#evalstring-selector-languagejs-string-pagefunction-list-args)
+  * [elementHandle.$x](#xstring-expression)
+  * [elementHandle.boundingBox](#boundingbox)
+  * [elementHandle.boxModel](#boxmodel)
+  * [elementHandle.click](#clickduration-delay-mousebutton-button-int-clickcount)
+  * [elementHandle.contentFrame](#contentframe)
+  * [elementHandle.focus](#focus)
+  * [elementHandle.isIntersectingViewport](#isintersectingviewport)
+  * [elementHandle.press](#presskey-key-duration-delay-string-text)
+  * [elementHandle.screenshot](#screenshotscreenshotformat-format-num-quality-bool-omitbackground)
+  * [elementHandle.tap](#tap)
+  * [elementHandle.type](#typestring-text-duration-delay)
+  * [elementHandle.uploadFile](#uploadfilelistfile-files)
+- [class: NetworkRequest](#class-networkrequest)
+  * [networkRequest.abort](#aborterrorreason-error)
+  * [networkRequest.continueRequest](#continuerequeststring-url-string-method-string-postdata-map-headers)
+  * [networkRequest.failure](#failure)
+  * [networkRequest.frame](#frame)
+  * [networkRequest.headers](#headers)
+  * [networkRequest.isNavigationRequest](#isnavigationrequest)
+  * [networkRequest.method](#method)
+  * [networkRequest.postData](#postdata)
+  * [networkRequest.redirectChain](#redirectchain)
+  * [networkRequest.resourceType](#resourcetype)
+  * [networkRequest.respond](#respondint-status-mapstring-string-headers-string-contenttype-body)
+  * [networkRequest.response](#response)
+  * [networkRequest.url](#url)
+- [class: NetworkResponse](#class-networkresponse)
+  * [networkResponse.bytes](#bytes)
+  * [networkResponse.frame](#frame)
+  * [networkResponse.fromCache](#fromcache)
+  * [networkResponse.fromServiceWorker](#fromserviceworker)
+  * [networkResponse.headers](#headers)
+  * [networkResponse.json](#json)
+  * [networkResponse.ok](#ok)
+  * [networkResponse.remoteIPAddress](#remoteipaddress)
+  * [networkResponse.remotePort](#remoteport)
+  * [networkResponse.request](#request)
+  * [networkResponse.securityDetails](#securitydetails)
+  * [networkResponse.status](#status)
+  * [networkResponse.statusText](#statustext)
+  * [networkResponse.text](#text)
+  * [networkResponse.url](#url)
 
 ### class: Browser
 A Browser is created when Puppeteer connects to a Chromium instance, either
@@ -2543,5 +2573,306 @@ Sets the value of the file input these paths.
 
 ```dart
 elementHandle.uploadFile(List<File> files) → Future<void> 
+```
+
+### class: NetworkRequest
+Whenever the page sends a request, such as for a network resource, the
+following events are emitted by puppeteer's page:
+- [onRequest] emitted when the request is issued by the page.
+- [onResponse] emitted when/if the response is received for the request.
+- [onRequestFinished] emitted when the response body is downloaded and the
+   request is complete.
+
+If request fails at some point, then instead of 'onRequestFinished' event
+(and possibly instead of 'response' event), the  [onRequestFailed] event is
+emitted.
+
+If request gets a 'redirect' response, the request is successfully finished
+with the 'onRequestFinished' event, and a new request is  issued to a
+redirected url.
+
+#### abort({ErrorReason error})
+Aborts request. To use this, request interception should be enabled with
+`page.setRequestInterception`.
+Exception is immediately thrown if the request interception is not enabled.
+
+Parameters:
+[error]: Optional error code. Defaults to `failed`
+
+```dart
+networkRequest.abort({ErrorReason error}) → Future<void> 
+```
+
+#### continueRequest({String url, String method, String postData, Map headers})
+Continues request with optional request overrides. To use this, request
+interception should be enabled with `page.setRequestInterception`.
+Exception is immediately thrown if the request interception is not enabled.
+
+```dart
+await page.setRequestInterception(true);
+page.onRequest.listen((request) {
+  // Override headers
+  var headers = Map<String, String>.from(request.headers)..['foo'] = 'bar';
+  headers.remove('origin');
+  request.continueRequest(headers: headers);
+});
+```
+
+Parameters:
+- [url]: If set, the request url will be changed. This is not a redirect.
+  The request will be silently forwarded to the new url. For example, the
+  address bar will show the original url.
+- [method]: If set changes the request method (e.g. `GET` or `POST`)
+- [postData]: If set changes the post data of request
+- [headers]: If set changes the request HTTP headers
+
+```dart
+networkRequest.continueRequest({String url, String method, String postData, Map headers}) → Future<void> 
+```
+
+#### failure
+The method returns `null` unless this request was failed, as reported by
+`onRequestFailed` event.
+
+Example of logging all failed requests:
+
+```dart
+page.onRequestFailed.listen((request) {
+  print(request.url + ' ' + request.failure);
+});
+```
+
+```dart
+networkRequest.failure → String
+```
+
+#### frame
+A [PageFrame] that initiated this request, or `null` if navigating to
+error pages.
+
+```dart
+networkRequest.frame → PageFrame
+```
+
+#### headers
+An object with HTTP headers associated with the request. All header names
+are lower-case.
+
+```dart
+networkRequest.headers → Map<String, String>
+```
+
+#### isNavigationRequest
+Whether this request is driving frame's navigation.
+
+```dart
+networkRequest.isNavigationRequest → bool
+```
+
+#### method
+Request's method (GET, POST, etc.)
+
+```dart
+networkRequest.method → String
+```
+
+#### postData
+Request's post body, if any.
+
+```dart
+networkRequest.postData → String
+```
+
+#### redirectChain
+A `redirectChain` is a chain of requests initiated to fetch a resource.
+- If there are no redirects and the request was successful, the chain will
+  be empty.
+- If a server responds with at least a single redirect, then the chain will
+  contain all the requests that were redirected.
+
+`redirectChain` is shared between all the requests of the same chain.
+
+For example, if the website `http://example.com` has a single redirect to
+`https://example.com`, then the chain will contain one request:
+
+```dart
+var response = await page.goto('http://example.com');
+var chain = response.request.redirectChain;
+expect(chain, hasLength(1));
+expect(chain[0].url, equals('http://example.com'));
+```
+
+If the website `https://example.com` has no redirects, then the chain will
+be empty:
+```dart
+var response = await page.goto('https://example.com');
+var chain = response.request.redirectChain;
+expect(chain, isEmpty);
+```
+
+```dart
+networkRequest.redirectChain → List<NetworkRequest>
+```
+
+#### resourceType
+Contains the request's resource type as it was perceived by the rendering
+engine.
+
+```dart
+networkRequest.resourceType → ResourceType
+```
+
+#### respond({int status, Map\<String, String> headers, String contentType, body})
+Fulfills request with given response. To use this, request interception should
+be enabled with `page.setRequestInterception`. Exception is thrown if
+request interception is not enabled.
+
+An example of fulfilling all requests with 404 responses:
+
+```dart
+await page.setRequestInterception(true);
+page.onRequest.listen((request) {
+  request.respond(status: 404, contentType: 'text/plain', body: 'Not Found!');
+});
+```
+
+> **NOTE** Mocking responses for dataURL requests is not supported.
+> Calling `request.respond` for a dataURL request is a noop.
+
+Parameters:
+- [status]: Response status code, defaults to `200`.
+- [headers]: Optional response headers
+- [contentType]: If set, equals to setting `Content-Type` response header
+- [body]: Optional response body
+
+```dart
+networkRequest.respond({int status, Map<String, String> headers, String contentType, body}) → Future<void> 
+```
+
+#### response
+A matching [Response] object, or `null` if the response has not been
+received yet.
+
+```dart
+networkRequest.response → NetworkResponse
+```
+
+#### url
+URL of the request.
+
+```dart
+networkRequest.url → String
+```
+
+### class: NetworkResponse
+[NetworkResponse] class represents responses which are received by page.
+
+#### bytes
+Promise which resolves to the bytes with response body.
+
+```dart
+networkResponse.bytes → Future<List<int>>
+```
+
+#### frame
+A [Frame] that initiated this response, or `null` if navigating to error
+pages.
+
+```dart
+networkResponse.frame → PageFrame
+```
+
+#### fromCache
+True if the response was served from either the browser's disk cache or
+memory cache.
+
+```dart
+networkResponse.fromCache → bool
+```
+
+#### fromServiceWorker
+True if the response was served by a service worker.
+
+```dart
+networkResponse.fromServiceWorker → bool
+```
+
+#### headers
+An object with HTTP headers associated with the response. All header names are lower-case.
+
+```dart
+networkResponse.headers → Map
+```
+
+#### json
+This method will throw if the response body is not parsable via `jsonDecode`.
+
+```dart
+networkResponse.json → Future<dynamic>
+```
+
+#### ok
+Contains a boolean stating whether the response was successful (status in
+the range 200-299) or not.
+
+```dart
+networkResponse.ok → bool
+```
+
+#### remoteIPAddress
+The IP address of the remote server
+
+```dart
+networkResponse.remoteIPAddress → String
+```
+
+#### remotePort
+The port used to connect to the remote server
+
+```dart
+networkResponse.remotePort → int
+```
+
+#### request
+A matching [Request] object.
+
+```dart
+networkResponse.request → NetworkRequest
+```
+
+#### securityDetails
+Security details if the response was received over the secure connection,
+or `null` otherwise.
+
+```dart
+networkResponse.securityDetails → SecurityDetails
+```
+
+#### status
+Contains the status code of the response (e.g., 200 for a success).
+
+```dart
+networkResponse.status → int
+```
+
+#### statusText
+Contains the status text of the response (e.g. usually an "OK" for a success).
+
+```dart
+networkResponse.statusText → String
+```
+
+#### text
+Promise which resolves to a text representation of response body.
+
+```dart
+networkResponse.text → Future<String>
+```
+
+#### url
+Contains the URL of the response.
+
+```dart
+networkResponse.url → String
 ```
 
