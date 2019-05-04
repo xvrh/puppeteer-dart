@@ -40,548 +40,489 @@ main() {
 }
 
 final _input = r'''
-  describe('Page.goto', function() {
-    it('should work', async({page, server}) => {
-      await page.goto(server.EMPTY_PAGE);
-      expect(page.url()).toBe(server.EMPTY_PAGE);
-    });
-    it('should work with anchor navigation', async({page, server}) => {
-      await page.goto(server.EMPTY_PAGE);
-      expect(page.url()).toBe(server.EMPTY_PAGE);
-      await page.goto(server.EMPTY_PAGE + '#foo');
-      expect(page.url()).toBe(server.EMPTY_PAGE + '#foo');
-      await page.goto(server.EMPTY_PAGE + '#bar');
-      expect(page.url()).toBe(server.EMPTY_PAGE + '#bar');
-    });
-    it('should work with redirects', async({page, server}) => {
-      server.setRedirect('/redirect/1.html', '/redirect/2.html');
-      server.setRedirect('/redirect/2.html', '/empty.html');
-      await page.goto(server.PREFIX + '/redirect/1.html');
-      expect(page.url()).toBe(server.EMPTY_PAGE);
-    });
-    it('should navigate to about:blank', async({page, server}) => {
-      const response = await page.goto('about:blank');
-      expect(response).toBe(null);
-    });
-    it('should return response when page changes its URL after load', async({page, server}) => {
-      const response = await page.goto(server.PREFIX + '/historyapi.html');
-      expect(response.status()).toBe(200);
-    });
-    it('should work with subframes return 204', async({page, server}) => {
-      server.setRoute('/frames/frame.html', (req, res) => {
-        res.statusCode = 204;
-        res.end();
+  describe('Page.setRequestInterception', function() {
+    it('should intercept', async({page, server}) => {
+      await page.setRequestInterception(true);
+      page.on('request', request => {
+        if (utils.isFavicon(request)) {
+          request.continue();
+          return;
+        }
+        expect(request.url()).toContain('empty.html');
+        expect(request.headers()['user-agent']).toBeTruthy();
+        expect(request.method()).toBe('GET');
+        expect(request.postData()).toBe(undefined);
+        expect(request.isNavigationRequest()).toBe(true);
+        expect(request.resourceType()).toBe('document');
+        expect(request.frame() === page.mainFrame()).toBe(true);
+        expect(request.frame().url()).toBe('about:blank');
+        request.continue();
       });
-      await page.goto(server.PREFIX + '/frames/one-frame.html');
+      const response = await page.goto(server.EMPTY_PAGE);
+      expect(response.ok()).toBe(true);
+      expect(response.remoteAddress().port).toBe(server.PORT);
     });
-    it('should fail when server returns 204', async({page, server}) => {
-      server.setRoute('/empty.html', (req, res) => {
-        res.statusCode = 204;
-        res.end();
-      });
-      let error = null;
-      await page.goto(server.EMPTY_PAGE).catch(e => error = e);
-      expect(error).not.toBe(null);
-      if (CHROME)
-        expect(error.message).toContain('net::ERR_ABORTED');
-      else
-        expect(error.message).toContain('NS_BINDING_ABORTED');
-    });
-    it('should navigate to empty page with domcontentloaded', async({page, server}) => {
-      const response = await page.goto(server.EMPTY_PAGE, {waitUntil: 'domcontentloaded'});
-      expect(response.status()).toBe(200);
-    });
-    it('should work when page calls history API in beforeunload', async({page, server}) => {
+    it('should work when POST is redirected with 302', async({page, server}) => {
+      server.setRedirect('/rredirect', '/empty.html');
       await page.goto(server.EMPTY_PAGE);
-      await page.evaluate(() => {
-        window.addEventListener('beforeunload', () => history.replaceState(null, 'initial', window.location.href), false);
+      await page.setRequestInterception(true);
+      page.on('request', request => request.continue());
+      await page.setContent(`
+        <form action='/rredirect' method='post'>
+          <input type="hidden" id="foo" name="foo" value="FOOBAR">
+        </form>
+      `);
+      await Promise.all([
+        page.$eval('form', form => form.submit()),
+        page.waitForNavigation()
+      ]);
+    });
+    // @see https://github.com/GoogleChrome/puppeteer/issues/3973
+    it('should work when header manipulation headers with redirect', async({page, server}) => {
+      server.setRedirect('/rrredirect', '/empty.html');
+      await page.setRequestInterception(true);
+      page.on('request', request => {
+        const headers = Object.assign({}, request.headers(), {
+          foo: 'bar'
+        });
+        request.continue({ headers });
       });
-      const response = await page.goto(server.PREFIX + '/grid.html');
+      await page.goto(server.PREFIX + '/rrredirect');
+    });
+    it('should contain referer header', async({page, server}) => {
+      await page.setRequestInterception(true);
+      const requests = [];
+      page.on('request', request => {
+        if (!utils.isFavicon(request))
+          requests.push(request);
+        request.continue();
+      });
+      await page.goto(server.PREFIX + '/one-style.html');
+      expect(requests[1].url()).toContain('/one-style.css');
+      expect(requests[1].headers().referer).toContain('/one-style.html');
+    });
+    it('should properly return navigation response when URL has cookies', async({page, server}) => {
+      // Setup cookie.
+      await page.goto(server.EMPTY_PAGE);
+      await page.setCookie({ name: 'foo', value: 'bar'});
+
+      // Setup request interception.
+      await page.setRequestInterception(true);
+      page.on('request', request => request.continue());
+      const response = await page.reload();
       expect(response.status()).toBe(200);
     });
-    it_fails_ffox('should navigate to empty page with networkidle0', async({page, server}) => {
-      const response = await page.goto(server.EMPTY_PAGE, {waitUntil: 'networkidle0'});
-      expect(response.status()).toBe(200);
+    it('should stop intercepting', async({page, server}) => {
+      await page.setRequestInterception(true);
+      page.once('request', request => request.continue());
+      await page.goto(server.EMPTY_PAGE);
+      await page.setRequestInterception(false);
+      await page.goto(server.EMPTY_PAGE);
     });
-    it_fails_ffox('should navigate to empty page with networkidle2', async({page, server}) => {
-      const response = await page.goto(server.EMPTY_PAGE, {waitUntil: 'networkidle2'});
-      expect(response.status()).toBe(200);
-    });
-    it('should fail when navigating to bad url', async({page, server}) => {
-      let error = null;
-      await page.goto('asdfasdf').catch(e => error = e);
-      if (CHROME)
-        expect(error.message).toContain('Cannot navigate to invalid URL');
-      else
-        expect(error.message).toContain('Invalid url');
-    });
-    it('should fail when navigating to bad SSL', async({page, httpsServer}) => {
-      // Make sure that network events do not emit 'undefined'.
-      // @see https://crbug.com/750469
-      page.on('request', request => expect(request).toBeTruthy());
-      page.on('requestfinished', request => expect(request).toBeTruthy());
-      page.on('requestfailed', request => expect(request).toBeTruthy());
-      let error = null;
-      await page.goto(httpsServer.EMPTY_PAGE).catch(e => error = e);
-      if (CHROME)
-        expect(error.message).toContain('net::ERR_CERT_AUTHORITY_INVALID');
-      else
-        expect(error.message).toContain('SSL_ERROR_UNKNOWN');
-    });
-    it('should fail when navigating to bad SSL after redirects', async({page, server, httpsServer}) => {
-      server.setRedirect('/redirect/1.html', '/redirect/2.html');
-      server.setRedirect('/redirect/2.html', '/empty.html');
-      let error = null;
-      await page.goto(httpsServer.PREFIX + '/redirect/1.html').catch(e => error = e);
-      if (CHROME)
-        expect(error.message).toContain('net::ERR_CERT_AUTHORITY_INVALID');
-      else
-        expect(error.message).toContain('SSL_ERROR_UNKNOWN');
-    });
-    it_fails_ffox('should throw if networkidle is passed as an option', async({page, server}) => {
-      let error = null;
-      await page.goto(server.EMPTY_PAGE, {waitUntil: 'networkidle'}).catch(err => error = err);
-      expect(error.message).toContain('"networkidle" option is no longer supported');
-    });
-    it('should fail when main resources failed to load', async({page, server}) => {
-      let error = null;
-      await page.goto('http://localhost:44123/non-existing-url').catch(e => error = e);
-      if (CHROME)
-        expect(error.message).toContain('net::ERR_CONNECTION_REFUSED');
-      else
-        expect(error.message).toContain('NS_ERROR_CONNECTION_REFUSED');
-    });
-    it('should fail when exceeding maximum navigation timeout', async({page, server}) => {
-      // Hang for request to the empty.html
-      server.setRoute('/empty.html', (req, res) => { });
-      let error = null;
-      await page.goto(server.PREFIX + '/empty.html', {timeout: 1}).catch(e => error = e);
-      expect(error.message).toContain('Navigation Timeout Exceeded: 1ms');
-      expect(error).toBeInstanceOf(puppeteer.errors.TimeoutError);
-    });
-    it('should fail when exceeding default maximum navigation timeout', async({page, server}) => {
-      // Hang for request to the empty.html
-      server.setRoute('/empty.html', (req, res) => { });
-      let error = null;
-      page.setDefaultNavigationTimeout(1);
-      await page.goto(server.PREFIX + '/empty.html').catch(e => error = e);
-      expect(error.message).toContain('Navigation Timeout Exceeded: 1ms');
-      expect(error).toBeInstanceOf(puppeteer.errors.TimeoutError);
-    });
-    it('should fail when exceeding default maximum timeout', async({page, server}) => {
-      // Hang for request to the empty.html
-      server.setRoute('/empty.html', (req, res) => { });
-      let error = null;
-      page.setDefaultTimeout(1);
-      await page.goto(server.PREFIX + '/empty.html').catch(e => error = e);
-      expect(error.message).toContain('Navigation Timeout Exceeded: 1ms');
-      expect(error).toBeInstanceOf(puppeteer.errors.TimeoutError);
-    });
-    it('should prioritize default navigation timeout over default timeout', async({page, server}) => {
-      // Hang for request to the empty.html
-      server.setRoute('/empty.html', (req, res) => { });
-      let error = null;
-      page.setDefaultTimeout(0);
-      page.setDefaultNavigationTimeout(1);
-      await page.goto(server.PREFIX + '/empty.html').catch(e => error = e);
-      expect(error.message).toContain('Navigation Timeout Exceeded: 1ms');
-      expect(error).toBeInstanceOf(puppeteer.errors.TimeoutError);
-    });
-    it('should disable timeout when its set to 0', async({page, server}) => {
-      let error = null;
-      let loaded = false;
-      page.once('load', () => loaded = true);
-      await page.goto(server.PREFIX + '/grid.html', {timeout: 0, waitUntil: ['load']}).catch(e => error = e);
-      expect(error).toBe(null);
-      expect(loaded).toBe(true);
-    });
-    it('should work when navigating to valid url', async({page, server}) => {
+    it('should show custom HTTP headers', async({page, server}) => {
+      await page.setExtraHTTPHeaders({
+        foo: 'bar'
+      });
+      await page.setRequestInterception(true);
+      page.on('request', request => {
+        expect(request.headers()['foo']).toBe('bar');
+        request.continue();
+      });
       const response = await page.goto(server.EMPTY_PAGE);
       expect(response.ok()).toBe(true);
     });
-    it_fails_ffox('should work when navigating to data url', async({page, server}) => {
-      const response = await page.goto('data:text/html,hello');
-      expect(response.ok()).toBe(true);
-    });
-    it('should work when navigating to 404', async({page, server}) => {
-      const response = await page.goto(server.PREFIX + '/not-found');
-      expect(response.ok()).toBe(false);
-      expect(response.status()).toBe(404);
-    });
-    it('should return last response in redirect chain', async({page, server}) => {
-      server.setRedirect('/redirect/1.html', '/redirect/2.html');
-      server.setRedirect('/redirect/2.html', '/redirect/3.html');
-      server.setRedirect('/redirect/3.html', server.EMPTY_PAGE);
-      const response = await page.goto(server.PREFIX + '/redirect/1.html');
-      expect(response.ok()).toBe(true);
-      expect(response.url()).toBe(server.EMPTY_PAGE);
-    });
-    it_fails_ffox('should wait for network idle to succeed navigation', async({page, server}) => {
-      let responses = [];
-      // Hold on to a bunch of requests without answering.
-      server.setRoute('/fetch-request-a.js', (req, res) => responses.push(res));
-      server.setRoute('/fetch-request-b.js', (req, res) => responses.push(res));
-      server.setRoute('/fetch-request-c.js', (req, res) => responses.push(res));
-      server.setRoute('/fetch-request-d.js', (req, res) => responses.push(res));
-      const initialFetchResourcesRequested = Promise.all([
-        server.waitForRequest('/fetch-request-a.js'),
-        server.waitForRequest('/fetch-request-b.js'),
-        server.waitForRequest('/fetch-request-c.js'),
-      ]);
-      const secondFetchResourceRequested = server.waitForRequest('/fetch-request-d.js');
-
-      // Navigate to a page which loads immediately and then does a bunch of
-      // requests via javascript's fetch method.
-      const navigationPromise = page.goto(server.PREFIX + '/networkidle.html', {
-        waitUntil: 'networkidle0',
+    // @see https://github.com/GoogleChrome/puppeteer/issues/4337
+    xit('should work with redirect inside sync XHR', async({page, server}) => {
+      await page.goto(server.EMPTY_PAGE);
+      server.setRedirect('/logo.png', '/pptr.png');
+      await page.setRequestInterception(true);
+      page.on('request', request => request.continue());
+      const status = await page.evaluate(async() => {
+        const request = new XMLHttpRequest();
+        request.open('GET', '/logo.png', false);  // `false` makes the request synchronous
+        request.send(null);
+        return request.status;
       });
-      // Track when the navigation gets completed.
-      let navigationFinished = false;
-      navigationPromise.then(() => navigationFinished = true);
-
-      // Wait for the page's 'load' event.
-      await new Promise(fulfill => page.once('load', fulfill));
-      expect(navigationFinished).toBe(false);
-
-      // Wait for the initial three resources to be requested.
-      await initialFetchResourcesRequested;
-
-      // Expect navigation still to be not finished.
-      expect(navigationFinished).toBe(false);
-
-      // Respond to initial requests.
-      for (const response of responses) {
-        response.statusCode = 404;
-        response.end(`File not found`);
-      }
-
-      // Reset responses array
-      responses = [];
-
-      // Wait for the second round to be requested.
-      await secondFetchResourceRequested;
-      // Expect navigation still to be not finished.
-      expect(navigationFinished).toBe(false);
-
-      // Respond to requests.
-      for (const response of responses) {
-        response.statusCode = 404;
-        response.end(`File not found`);
-      }
-
-      const response = await navigationPromise;
-      // Expect navigation to succeed.
+      expect(status).toBe(200);
+    });
+    it('should works with customizing referer headers', async({page, server}) => {
+      await page.setExtraHTTPHeaders({ 'referer': server.EMPTY_PAGE });
+      await page.setRequestInterception(true);
+      page.on('request', request => {
+        expect(request.headers()['referer']).toBe(server.EMPTY_PAGE);
+        request.continue();
+      });
+      const response = await page.goto(server.EMPTY_PAGE);
       expect(response.ok()).toBe(true);
     });
-    it('should not leak listeners during navigation', async({page, server}) => {
-      let warning = null;
-      const warningHandler = w => warning = w;
-      process.on('warning', warningHandler);
-      for (let i = 0; i < 20; ++i)
-        await page.goto(server.EMPTY_PAGE);
-      process.removeListener('warning', warningHandler);
-      expect(warning).toBe(null);
+    it('should be abortable', async({page, server}) => {
+      await page.setRequestInterception(true);
+      page.on('request', request => {
+        if (request.url().endsWith('.css'))
+          request.abort();
+        else
+          request.continue();
+      });
+      let failedRequests = 0;
+      page.on('requestfailed', event => ++failedRequests);
+      const response = await page.goto(server.PREFIX + '/one-style.html');
+      expect(response.ok()).toBe(true);
+      expect(response.request().failure()).toBe(null);
+      expect(failedRequests).toBe(1);
     });
-    it('should not leak listeners during bad navigation', async({page, server}) => {
-      let warning = null;
-      const warningHandler = w => warning = w;
-      process.on('warning', warningHandler);
-      for (let i = 0; i < 20; ++i)
-        await page.goto('asdf').catch(e => {/* swallow navigation error */});
-      process.removeListener('warning', warningHandler);
-      expect(warning).toBe(null);
+    it_fails_ffox('should be abortable with custom error codes', async({page, server}) => {
+      await page.setRequestInterception(true);
+      page.on('request', request => {
+        request.abort('internetdisconnected');
+      });
+      let failedRequest = null;
+      page.on('requestfailed', request => failedRequest = request);
+      await page.goto(server.EMPTY_PAGE).catch(e => {});
+      expect(failedRequest).toBeTruthy();
+      expect(failedRequest.failure().errorText).toBe('net::ERR_INTERNET_DISCONNECTED');
     });
-    it('should not leak listeners during navigation of 11 pages', async({page, context, server}) => {
-      let warning = null;
-      const warningHandler = w => warning = w;
-      process.on('warning', warningHandler);
-      await Promise.all([...Array(20)].map(async() => {
-        const page = await context.newPage();
-        await page.goto(server.EMPTY_PAGE);
-        await page.close();
-      }));
-      process.removeListener('warning', warningHandler);
-      expect(warning).toBe(null);
+    it('should send referer', async({page, server}) => {
+      await page.setExtraHTTPHeaders({
+        referer: 'http://google.com/'
+      });
+      await page.setRequestInterception(true);
+      page.on('request', request => request.continue());
+      const [request] = await Promise.all([
+        server.waitForRequest('/grid.html'),
+        page.goto(server.PREFIX + '/grid.html'),
+      ]);
+      expect(request.headers['referer']).toBe('http://google.com/');
+    });
+    it('should fail navigation when aborting main resource', async({page, server}) => {
+      await page.setRequestInterception(true);
+      page.on('request', request => request.abort());
+      let error = null;
+      await page.goto(server.EMPTY_PAGE).catch(e => error = e);
+      expect(error).toBeTruthy();
+      if (CHROME)
+        expect(error.message).toContain('net::ERR_FAILED');
+      else
+        expect(error.message).toContain('NS_ERROR_FAILURE');
+    });
+    it('should work with redirects', async({page, server}) => {
+      await page.setRequestInterception(true);
+      const requests = [];
+      page.on('request', request => {
+        request.continue();
+        requests.push(request);
+      });
+      server.setRedirect('/non-existing-page.html', '/non-existing-page-2.html');
+      server.setRedirect('/non-existing-page-2.html', '/non-existing-page-3.html');
+      server.setRedirect('/non-existing-page-3.html', '/non-existing-page-4.html');
+      server.setRedirect('/non-existing-page-4.html', '/empty.html');
+      const response = await page.goto(server.PREFIX + '/non-existing-page.html');
+      expect(response.status()).toBe(200);
+      expect(response.url()).toContain('empty.html');
+      expect(requests.length).toBe(5);
+      expect(requests[2].resourceType()).toBe('document');
+      // Check redirect chain
+      const redirectChain = response.request().redirectChain();
+      expect(redirectChain.length).toBe(4);
+      expect(redirectChain[0].url()).toContain('/non-existing-page.html');
+      expect(redirectChain[2].url()).toContain('/non-existing-page-3.html');
+      for (let i = 0; i < redirectChain.length; ++i) {
+        const request = redirectChain[i];
+        expect(request.isNavigationRequest()).toBe(true);
+        expect(request.redirectChain().indexOf(request)).toBe(i);
+      }
+    });
+    it('should work with redirects for subresources', async({page, server}) => {
+      await page.setRequestInterception(true);
+      const requests = [];
+      page.on('request', request => {
+        request.continue();
+        if (!utils.isFavicon(request))
+          requests.push(request);
+      });
+      server.setRedirect('/one-style.css', '/two-style.css');
+      server.setRedirect('/two-style.css', '/three-style.css');
+      server.setRedirect('/three-style.css', '/four-style.css');
+      server.setRoute('/four-style.css', (req, res) => res.end('body {box-sizing: border-box; }'));
+
+      const response = await page.goto(server.PREFIX + '/one-style.html');
+      expect(response.status()).toBe(200);
+      expect(response.url()).toContain('one-style.html');
+      expect(requests.length).toBe(5);
+      expect(requests[0].resourceType()).toBe('document');
+      expect(requests[1].resourceType()).toBe('stylesheet');
+      // Check redirect chain
+      const redirectChain = requests[1].redirectChain();
+      expect(redirectChain.length).toBe(3);
+      expect(redirectChain[0].url()).toContain('/one-style.css');
+      expect(redirectChain[2].url()).toContain('/three-style.css');
+    });
+    it('should be able to abort redirects', async({page, server}) => {
+      await page.setRequestInterception(true);
+      server.setRedirect('/non-existing.json', '/non-existing-2.json');
+      server.setRedirect('/non-existing-2.json', '/simple.html');
+      page.on('request', request => {
+        if (request.url().includes('non-existing-2'))
+          request.abort();
+        else
+          request.continue();
+      });
+      await page.goto(server.EMPTY_PAGE);
+      const result = await page.evaluate(async() => {
+        try {
+          await fetch('/non-existing.json');
+        } catch (e) {
+          return e.message;
+        }
+      });
+      if (CHROME)
+        expect(result).toContain('Failed to fetch');
+      else
+        expect(result).toContain('NetworkError');
+    });
+    it('should work with equal requests', async({page, server}) => {
+      await page.goto(server.EMPTY_PAGE);
+      let responseCount = 1;
+      server.setRoute('/zzz', (req, res) => res.end((responseCount++) * 11 + ''));
+      await page.setRequestInterception(true);
+
+      let spinner = false;
+      // Cancel 2nd request.
+      page.on('request', request => {
+        if (utils.isFavicon(request)) {
+          request.continue();
+          return;
+        }
+        spinner ? request.abort() : request.continue();
+        spinner = !spinner;
+      });
+      const results = await page.evaluate(() => Promise.all([
+        fetch('/zzz').then(response => response.text()).catch(e => 'FAILED'),
+        fetch('/zzz').then(response => response.text()).catch(e => 'FAILED'),
+        fetch('/zzz').then(response => response.text()).catch(e => 'FAILED'),
+      ]));
+      expect(results).toEqual(['11', 'FAILED', '22']);
     });
     it_fails_ffox('should navigate to dataURL and fire dataURL requests', async({page, server}) => {
+      await page.setRequestInterception(true);
       const requests = [];
-      page.on('request', request => !utils.isFavicon(request) && requests.push(request));
+      page.on('request', request => {
+        requests.push(request);
+        request.continue();
+      });
       const dataURL = 'data:text/html,<div>yo</div>';
       const response = await page.goto(dataURL);
       expect(response.status()).toBe(200);
       expect(requests.length).toBe(1);
       expect(requests[0].url()).toBe(dataURL);
     });
-    it_fails_ffox('should navigate to URL with hash and fire requests without hash', async({page, server}) => {
+    it_fails_ffox('should navigate to URL with hash and and fire requests without hash', async({page, server}) => {
+      await page.setRequestInterception(true);
       const requests = [];
-      page.on('request', request => !utils.isFavicon(request) && requests.push(request));
+      page.on('request', request => {
+        requests.push(request);
+        request.continue();
+      });
       const response = await page.goto(server.EMPTY_PAGE + '#hash');
       expect(response.status()).toBe(200);
       expect(response.url()).toBe(server.EMPTY_PAGE);
       expect(requests.length).toBe(1);
       expect(requests[0].url()).toBe(server.EMPTY_PAGE);
     });
-    it('should work with self requesting page', async({page, server}) => {
-      const response = await page.goto(server.PREFIX + '/self-request.html');
+    it('should work with encoded server', async({page, server}) => {
+      // The requestWillBeSent will report encoded URL, whereas interception will
+      // report URL as-is. @see crbug.com/759388
+      await page.setRequestInterception(true);
+      page.on('request', request => request.continue());
+      const response = await page.goto(server.PREFIX + '/some nonexisting page');
+      expect(response.status()).toBe(404);
+    });
+    it('should work with badly encoded server', async({page, server}) => {
+      await page.setRequestInterception(true);
+      server.setRoute('/malformed?rnd=%911', (req, res) => res.end());
+      page.on('request', request => request.continue());
+      const response = await page.goto(server.PREFIX + '/malformed?rnd=%911');
       expect(response.status()).toBe(200);
-      expect(response.url()).toContain('self-request.html');
     });
-    it('should fail when navigating and show the url at the error message', async function({page, server, httpsServer}) {
-      const url = httpsServer.PREFIX + '/redirect/1.html';
+    it_fails_ffox('should work with encoded server - 2', async({page, server}) => {
+      // The requestWillBeSent will report URL as-is, whereas interception will
+      // report encoded URL for stylesheet. @see crbug.com/759388
+      await page.setRequestInterception(true);
+      const requests = [];
+      page.on('request', request => {
+        request.continue();
+        requests.push(request);
+      });
+      const response = await page.goto(`data:text/html,<link rel="stylesheet" href="${server.PREFIX}/fonts?helvetica|arial"/>`);
+      expect(response.status()).toBe(200);
+      expect(requests.length).toBe(2);
+      expect(requests[1].response().status()).toBe(404);
+    });
+    it_fails_ffox('should not throw "Invalid Interception Id" if the request was cancelled', async({page, server}) => {
+      await page.setContent('<iframe></iframe>');
+      await page.setRequestInterception(true);
+      let request = null;
+      page.on('request', async r => request = r);
+      page.$eval('iframe', (frame, url) => frame.src = url, server.EMPTY_PAGE),
+      // Wait for request interception.
+      await utils.waitEvent(page, 'request');
+      // Delete frame to cause request to be canceled.
+      await page.$eval('iframe', frame => frame.remove());
       let error = null;
-      try {
-        await page.goto(url);
-      } catch (e) {
-        error = e;
-      }
-      expect(error.message).toContain(url);
+      await request.continue().catch(e => error = e);
+      expect(error).toBe(null);
     });
-    it('should send referer', async({page, server}) => {
-      const [request1, request2] = await Promise.all([
-        server.waitForRequest('/grid.html'),
-        server.waitForRequest('/digits/1.png'),
-        page.goto(server.PREFIX + '/grid.html', {
-          referer: 'http://google.com/',
-        }),
-      ]);
-      expect(request1.headers['referer']).toBe('http://google.com/');
-      // Make sure subresources do not inherit referer.
-      expect(request2.headers['referer']).toBe(server.PREFIX + '/grid.html');
+    it('should throw if interception is not enabled', async({page, server}) => {
+      let error = null;
+      page.on('request', async request => {
+        try {
+          await request.continue();
+        } catch (e) {
+          error = e;
+        }
+      });
+      await page.goto(server.EMPTY_PAGE);
+      expect(error.message).toContain('Request Interception is not enabled');
+    });
+    it_fails_ffox('should work with file URLs', async({page, server}) => {
+      await page.setRequestInterception(true);
+      const urls = new Set();
+      page.on('request', request => {
+        urls.add(request.url().split('/').pop());
+        request.continue();
+      });
+      await page.goto(pathToFileURL(path.join(__dirname, 'assets', 'one-style.html')));
+      expect(urls.size).toBe(2);
+      expect(urls.has('one-style.html')).toBe(true);
+      expect(urls.has('one-style.css')).toBe(true);
     });
   });
 
-  describe('Page.waitForNavigation', function() {
+  describe('Request.continue', function() {
     it('should work', async({page, server}) => {
+      await page.setRequestInterception(true);
+      page.on('request', request => request.continue());
       await page.goto(server.EMPTY_PAGE);
-      const [response] = await Promise.all([
-        page.waitForNavigation(),
-        page.evaluate(url => window.location.href = url, server.PREFIX + '/grid.html')
-      ]);
-      expect(response.ok()).toBe(true);
-      expect(response.url()).toContain('grid.html');
     });
-    it('should work with both domcontentloaded and load', async({page, server}) => {
-      let response = null;
-      server.setRoute('/one-style.css', (req, res) => response = res);
-      const navigationPromise = page.goto(server.PREFIX + '/one-style.html');
-      const domContentLoadedPromise = page.waitForNavigation({
-        waitUntil: 'domcontentloaded'
+    it('should amend HTTP headers', async({page, server}) => {
+      await page.setRequestInterception(true);
+      page.on('request', request => {
+        const headers = Object.assign({}, request.headers());
+        headers['FOO'] = 'bar';
+        request.continue({ headers });
       });
+      await page.goto(server.EMPTY_PAGE);
+      const [request] = await Promise.all([
+        server.waitForRequest('/sleep.zzz'),
+        page.evaluate(() => fetch('/sleep.zzz'))
+      ]);
+      expect(request.headers['foo']).toBe('bar');
+    });
+    it_fails_ffox('should redirect in a way non-observable to page', async({page, server}) => {
+      await page.setRequestInterception(true);
+      page.on('request', request => {
+        const redirectURL = request.url().includes('/empty.html') ? server.PREFIX + '/consolelog.html' : undefined;
+        request.continue({ url: redirectURL });
+      });
+      let consoleMessage = null;
+      page.on('console', msg => consoleMessage = msg);
+      await page.goto(server.EMPTY_PAGE);
+      expect(page.url()).toBe(server.EMPTY_PAGE);
+      expect(consoleMessage.text()).toBe('yellow');
+    });
+    it_fails_ffox('should amend method', async({page, server}) => {
+      await page.goto(server.EMPTY_PAGE);
 
-      let bothFired = false;
-      const bothFiredPromise = page.waitForNavigation({
-        waitUntil: ['load', 'domcontentloaded']
-      }).then(() => bothFired = true);
+      await page.setRequestInterception(true);
+      page.on('request', request => {
+        request.continue({ method: 'POST' });
+      });
+      const [request] = await Promise.all([
+        server.waitForRequest('/sleep.zzz'),
+        page.evaluate(() => fetch('/sleep.zzz'))
+      ]);
+      expect(request.method).toBe('POST');
+    });
+    it_fails_ffox('should amend post data', async({page, server}) => {
+      await page.goto(server.EMPTY_PAGE);
 
-      await server.waitForRequest('/one-style.css');
-      await domContentLoadedPromise;
-      expect(bothFired).toBe(false);
-      response.end();
-      await bothFiredPromise;
-      await navigationPromise;
-    });
-    it('should work with clicking on anchor links', async({page, server}) => {
-      await page.goto(server.EMPTY_PAGE);
-      await page.setContent(`<a href='#foobar'>foobar</a>`);
-      const [response] = await Promise.all([
-        page.waitForNavigation(),
-        page.click('a'),
+      await page.setRequestInterception(true);
+      page.on('request', request => {
+        request.continue({ postData: 'doggo' });
+      });
+      const [serverRequest] = await Promise.all([
+        server.waitForRequest('/sleep.zzz'),
+        page.evaluate(() => fetch('/sleep.zzz', { method: 'POST', body: 'birdy' }))
       ]);
-      expect(response).toBe(null);
-      expect(page.url()).toBe(server.EMPTY_PAGE + '#foobar');
+      expect(await serverRequest.postBody).toBe('doggo');
     });
-    it('should work with history.pushState()', async({page, server}) => {
-      await page.goto(server.EMPTY_PAGE);
-      await page.setContent(`
-        <a onclick='javascript:pushState()'>SPA</a>
-        <script>
-          function pushState() { history.pushState({}, '', 'wow.html') }
-        </script>
-      `);
-      const [response] = await Promise.all([
-        page.waitForNavigation(),
-        page.click('a'),
+    it_fails_ffox('should amend both post data and method on navigation', async({page, server}) => {
+      await page.setRequestInterception(true);
+      page.on('request', request => {
+        request.continue({ method: 'POST', postData: 'doggo' });
+      });
+      const [serverRequest] = await Promise.all([
+        server.waitForRequest('/empty.html'),
+        page.goto(server.EMPTY_PAGE),
       ]);
-      expect(response).toBe(null);
-      expect(page.url()).toBe(server.PREFIX + '/wow.html');
+      expect(serverRequest.method).toBe('POST');
+      expect(await serverRequest.postBody).toBe('doggo');
     });
-    it('should work with history.replaceState()', async({page, server}) => {
-      await page.goto(server.EMPTY_PAGE);
-      await page.setContent(`
-        <a onclick='javascript:replaceState()'>SPA</a>
-        <script>
-          function replaceState() { history.replaceState({}, '', '/replaced.html') }
-        </script>
-      `);
-      const [response] = await Promise.all([
-        page.waitForNavigation(),
-        page.click('a'),
-      ]);
-      expect(response).toBe(null);
-      expect(page.url()).toBe(server.PREFIX + '/replaced.html');
-    });
-    it_fails_ffox('should work with DOM history.back()/history.forward()', async({page, server}) => {
-      await page.goto(server.EMPTY_PAGE);
-      await page.setContent(`
-        <a id=back onclick='javascript:goBack()'>back</a>
-        <a id=forward onclick='javascript:goForward()'>forward</a>
-        <script>
-          function goBack() { history.back(); }
-          function goForward() { history.forward(); }
-          history.pushState({}, '', '/first.html');
-          history.pushState({}, '', '/second.html');
-        </script>
-      `);
-      expect(page.url()).toBe(server.PREFIX + '/second.html');
-      const [backResponse] = await Promise.all([
-        page.waitForNavigation(),
-        page.click('a#back'),
-      ]);
-      expect(backResponse).toBe(null);
-      expect(page.url()).toBe(server.PREFIX + '/first.html');
-      const [forwardResponse] = await Promise.all([
-        page.waitForNavigation(),
-        page.click('a#forward'),
-      ]);
-      expect(forwardResponse).toBe(null);
-      expect(page.url()).toBe(server.PREFIX + '/second.html');
-    });
-    it('should work when subframe issues window.stop()', async({page, server}) => {
-      server.setRoute('/frames/style.css', (req, res) => {});
-      const navigationPromise = page.goto(server.PREFIX + '/frames/one-frame.html');
-      const frame = await utils.waitEvent(page, 'frameattached');
-      await new Promise(fulfill => {
-        page.on('framenavigated', f => {
-          if (f === frame)
-            fulfill();
+  });
+
+  describe_fails_ffox('Request.respond', function() {
+    it('should work', async({page, server}) => {
+      await page.setRequestInterception(true);
+      page.on('request', request => {
+        request.respond({
+          status: 201,
+          headers: {
+            foo: 'bar'
+          },
+          body: 'Yo, page!'
         });
       });
-      await Promise.all([
-        frame.evaluate(() => window.stop()),
-        navigationPromise
-      ]);
+      const response = await page.goto(server.EMPTY_PAGE);
+      expect(response.status()).toBe(201);
+      expect(response.headers().foo).toBe('bar');
+      expect(await page.evaluate(() => document.body.textContent)).toBe('Yo, page!');
     });
-  });
-
-  describe('Page.goBack', function() {
-    it('should work', async({page, server}) => {
-      await page.goto(server.EMPTY_PAGE);
-      await page.goto(server.PREFIX + '/grid.html');
-
-      let response = await page.goBack();
-      expect(response.ok()).toBe(true);
-      expect(response.url()).toContain(server.EMPTY_PAGE);
-
-      response = await page.goForward();
-      expect(response.ok()).toBe(true);
-      expect(response.url()).toContain('/grid.html');
-
-      response = await page.goForward();
-      expect(response).toBe(null);
-    });
-    it('should work with HistoryAPI', async({page, server}) => {
-      await page.goto(server.EMPTY_PAGE);
-      await page.evaluate(() => {
-        history.pushState({}, '', '/first.html');
-        history.pushState({}, '', '/second.html');
+    it('should redirect', async({page, server}) => {
+      await page.setRequestInterception(true);
+      page.on('request', request => {
+        if (!request.url().includes('rrredirect')) {
+          request.continue();
+          return;
+        }
+        request.respond({
+          status: 302,
+          headers: {
+            location: server.EMPTY_PAGE,
+          },
+        });
       });
-      expect(page.url()).toBe(server.PREFIX + '/second.html');
-
-      await page.goBack();
-      expect(page.url()).toBe(server.PREFIX + '/first.html');
-      await page.goBack();
-      expect(page.url()).toBe(server.EMPTY_PAGE);
-      await page.goForward();
-      expect(page.url()).toBe(server.PREFIX + '/first.html');
+      const response = await page.goto(server.PREFIX + '/rrredirect');
+      expect(response.request().redirectChain().length).toBe(1);
+      expect(response.request().redirectChain()[0].url()).toBe(server.PREFIX + '/rrredirect');
+      expect(response.url()).toBe(server.EMPTY_PAGE);
+    });
+    it('should allow mocking binary responses', async({page, server}) => {
+      await page.setRequestInterception(true);
+      page.on('request', request => {
+        const imageBuffer = fs.readFileSync(path.join(__dirname, 'assets', 'pptr.png'));
+        request.respond({
+          contentType: 'image/png',
+          body: imageBuffer
+        });
+      });
+      await page.evaluate(PREFIX => {
+        const img = document.createElement('img');
+        img.src = PREFIX + '/does-not-exist.png';
+        document.body.appendChild(img);
+        return new Promise(fulfill => img.onload = fulfill);
+      }, server.PREFIX);
+      const img = await page.$('img');
+      expect(await img.screenshot()).toBeGolden('mock-binary-response.png');
     });
   });
 
-  describe('Frame.goto', function() {
-    it('should navigate subframes', async({page, server}) => {
-      await page.goto(server.PREFIX + '/frames/one-frame.html');
-      expect(page.frames()[0].url()).toContain('/frames/one-frame.html');
-      expect(page.frames()[1].url()).toContain('/frames/frame.html');
-
-      const response = await page.frames()[1].goto(server.EMPTY_PAGE);
-      expect(response.ok()).toBe(true);
-      expect(response.frame()).toBe(page.frames()[1]);
-    });
-    it('should reject when frame detaches', async({page, server}) => {
-      await page.goto(server.PREFIX + '/frames/one-frame.html');
-
-      server.setRoute('/empty.html', () => {});
-      const navigationPromise = page.frames()[1].goto(server.EMPTY_PAGE).catch(e => e);
-      await server.waitForRequest('/empty.html');
-
-      await page.$eval('iframe', frame => frame.remove());
-      const error = await navigationPromise;
-      expect(error.message).toBe('Navigating frame was detached');
-    });
-    it('should return matching responses', async({page, server}) => {
-      // Disable cache: otherwise, chromium will cache similar requests.
-      await page.setCacheEnabled(false);
-      await page.goto(server.EMPTY_PAGE);
-      // Attach three frames.
-      const frames = await Promise.all([
-        utils.attachFrame(page, 'frame1', server.EMPTY_PAGE),
-        utils.attachFrame(page, 'frame2', server.EMPTY_PAGE),
-        utils.attachFrame(page, 'frame3', server.EMPTY_PAGE),
-      ]);
-      // Navigate all frames to the same URL.
-      const serverResponses = [];
-      server.setRoute('/one-style.html', (req, res) => serverResponses.push(res));
-      const navigations = [];
-      for (let i = 0; i < 3; ++i) {
-        navigations.push(frames[i].goto(server.PREFIX + '/one-style.html'));
-        await server.waitForRequest('/one-style.html');
-      }
-      // Respond from server out-of-order.
-      const serverResponseTexts = ['AAA', 'BBB', 'CCC'];
-      for (const i of [1, 2, 0]) {
-        serverResponses[i].end(serverResponseTexts[i]);
-        const response = await navigations[i];
-        expect(response.frame()).toBe(frames[i]);
-        expect(await response.text()).toBe(serverResponseTexts[i]);
-      }
-    });
-  });
-
-  describe('Frame.waitForNavigation', function() {
-    it('should work', async({page, server}) => {
-      await page.goto(server.PREFIX + '/frames/one-frame.html');
-      const frame = page.frames()[1];
-      const [response] = await Promise.all([
-        frame.waitForNavigation(),
-        frame.evaluate(url => window.location.href = url, server.PREFIX + '/grid.html')
-      ]);
-      expect(response.ok()).toBe(true);
-      expect(response.url()).toContain('grid.html');
-      expect(response.frame()).toBe(frame);
-      expect(page.url()).toContain('/frames/one-frame.html');
-    });
-    it('should fail when frame detaches', async({page, server}) => {
-      await page.goto(server.PREFIX + '/frames/one-frame.html');
-      const frame = page.frames()[1];
-
-      server.setRoute('/empty.html', () => {});
-      let error = null;
-      const navigationPromise = frame.waitForNavigation().catch(e => error = e);
-      await Promise.all([
-        server.waitForRequest('/empty.html'),
-        frame.evaluate(() => window.location = '/empty.html')
-      ]);
-      await page.$eval('iframe', frame => frame.remove());
-      await navigationPromise;
-      expect(error.message).toBe('Navigating frame was detached');
-    });
-  });
-
-  describe('Page.reload', function() {
-    it('should work', async({page, server}) => {
-      await page.goto(server.EMPTY_PAGE);
-      await page.evaluate(() => window._foo = 10);
-      await page.reload();
-      expect(await page.evaluate(() => window._foo)).toBe(undefined);
-    });
-  });
 ''';

@@ -86,6 +86,7 @@ class FrameManager {
 
   Future<NetworkResponse> navigateFrame(PageFrame frame, String url,
       {String referrer, Duration timeout, Until wait}) async {
+    referrer ??= _networkManager.extraHTTPHeaders['referer'];
     var watcher = LifecycleWatcher(this, frame,
         wait: wait, timeout: timeout ?? page.navigationTimeoutOrDefault);
 

@@ -551,18 +551,45 @@ class Page {
     return devTools.network.getCookies(urls: urls);
   }
 
-  Future<void> deleteCookies(List<Cookie> cookies) async {
+  Future<void> deleteCookie(String name, {String domain, String path}) async {
     var pageUrl = url;
-    for (var cookie in cookies) {
-      await devTools.network.deleteCookies(cookie.name,
-          url: pageUrl.startsWith('http') ? pageUrl : null,
-          domain: cookie.domain,
-          path: cookie.path);
-    }
+    await devTools.network.deleteCookies(name,
+        url: pageUrl.startsWith('http') ? pageUrl : null,
+        domain: domain,
+        path: path);
   }
 
   Future<void> setCookies(List<CookieParam> cookies) async {
-    await devTools.network.setCookies(cookies);
+    var pageURL = url;
+    var startsWithHTTP = pageURL.startsWith('http');
+    var items = cookies.map((cookie) {
+      String cookieUrl;
+      if (cookie.url == null && startsWithHTTP) {
+        cookieUrl = pageURL;
+      }
+      if (cookieUrl != null) {
+        assert(cookieUrl != 'about:blank',
+            'Blank page can not have cookie "${cookie.name}"');
+        assert(!cookieUrl.startsWith('data:'),
+            'Data URL page can not have cookie "${cookie.name}"');
+      }
+      return CookieParam(
+          name: cookie.name,
+          value: cookie.value,
+          url: cookieUrl,
+          domain: cookie.domain,
+          path: cookie.path,
+          secure: cookie.secure,
+          httpOnly: cookie.httpOnly,
+          sameSite: cookie.sameSite,
+          expires: cookie.expires);
+    }).toList();
+    for (var cookie in items) {
+      await deleteCookie(cookie.name, domain: cookie.domain, path: cookie.path);
+    }
+    if (items.isNotEmpty) {
+      await devTools.network.setCookies(items);
+    }
   }
 
   /// Sets the page's geolocation.

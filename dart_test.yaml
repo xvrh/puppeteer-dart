@@ -1,0 +1,7 @@
+tags:
+  golden:
+
+presets:
+  # Pass "-P ci" to run tests that don't open browser windows.
+  ci:
+    exclude_tags: golden
