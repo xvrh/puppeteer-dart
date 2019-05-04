@@ -89,7 +89,7 @@ class SizeDifference implements ImageDifference {
 
   @override
   String toString() =>
-      'Size is different: expected ${expectedWidth}x$expectedHeight, actual ${actualWidth}x$actualHeight)';
+      'Size is different: expected ${expectedWidth}x$expectedHeight, actual ${actualWidth}x$actualHeight';
 }
 
 class ContentDifference implements ImageDifference {

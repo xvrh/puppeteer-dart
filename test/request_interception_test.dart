@@ -502,6 +502,7 @@ main() {
       expect(response.url, equals(server.emptyPage));
     });
     test('should allow mocking binary responses', () async {
+      await page.emulate(puppeteer.devices.laptopWithMDPIScreen);
       await page.setRequestInterception(true);
       page.onRequest.listen((request) {
         var imageBuffer =
