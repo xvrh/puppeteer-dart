@@ -10,6 +10,7 @@ import 'emulation_test.dart' as emulation_test;
 import 'evaluation_test.dart' as evaluation_test;
 import 'examples_test.dart' as examples_test;
 import 'frame_test.dart' as frame_test;
+import 'golden_utils_test.dart' as golden_utils_test;
 import 'input_file_test.dart' as input_file_test;
 import 'javascript_parser_test.dart' as javascript_parser_test;
 import 'js_handle_test.dart' as js_handle_test;
@@ -42,6 +43,7 @@ main() {
   group('evaluation_test', evaluation_test.main);
   group('readme_test', readme_test.main);
   group('page_test', page_test.main);
+  group('golden_utils_test', golden_utils_test.main);
   group('wait_task_test', wait_task_test.main);
   group('browser_test', browser_test.main);
   group('mouse_test', mouse_test.main);

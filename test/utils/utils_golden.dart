@@ -1,5 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:image/image.dart';
 import 'package:test/test.dart';
+import 'pixel_match.dart';
 
 final bool _updateGolden =
     Platform.environment['PUPPETEER_UPDATE_GOLDEN'] ?? false;
@@ -27,7 +30,7 @@ class _GoldenMatcher extends Matcher {
     } else {
       if (!goldenFile.existsSync()) return false;
 
-      return _areListsEqual<int>(item, goldenFile.readAsBytesSync());
+      return _compareImages(item, goldenFile.readAsBytesSync());
     }
   }
 }
@@ -36,21 +39,15 @@ _GoldenMatcher equalsGolden(String goldenPath) {
   return _GoldenMatcher(goldenPath);
 }
 
-bool _areListsEqual<T>(List<T> list1, List<T> list2) {
-  if (identical(list1, list2)) {
-    return true;
-  }
-  if (list1 == null || list2 == null) {
+bool _compareImages(List<int> actualBytes, List<int> expectedBytes) {
+  var actual = decodeImage(actualBytes);
+  var expected = decodeImage(expectedBytes);
+
+  if (expected.width != actual.width || expected.height != actual.height) {
     return false;
   }
-  final int length = list1.length;
-  if (length != list2.length) {
-    return false;
-  }
-  for (int i = 0; i < length; i++) {
-    if (list1[i] != list2[i]) {
-      return false;
-    }
-  }
-  return true;
+  var count = pixelMatch(
+      Uint8List.view(expected.data.buffer), Uint8List.view(actual.data.buffer),
+      width: expected.width, height: expected.height, threshold: 0.1);
+  return count == 0;
 }
