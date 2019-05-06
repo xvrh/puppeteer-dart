@@ -1,0 +1,13 @@
+name: chrome_dev_tools
+description: A typed client for the Chrome DevTools Protocol. This serve as the low-level API for the Puppeteer Dart package.
+version: 1.0.0
+homepage: https://github.com/xavierhainaux/puppeteer-dart/chrome_dev_tools
+author: Xavier Hainaux <xavier.hainaux@gmail.com>
+
+environment:
+  sdk: '>=2.2.0 <3.0.0'
+
+dependencies:
+  meta: ^1.1.1
+
+dev_dependencies:

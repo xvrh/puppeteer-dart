@@ -1,0 +1,11 @@
+
+dart:
+  - stable
+
+stages:
+  # Register two jobs to run under the `analyze` stage.
+  - analyze:
+      - dartanalyzer
+      - dartfmt
+  - unit_test:
+      - test

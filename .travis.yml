@@ -1,43 +1,38 @@
+# Created with package:mono_repo v2.1.0
 language: dart
 
-os:
- - linux
- - osx
- - windows
-
-dart:
- - stable
-
-before_script:
- - dart example/download_chromium.dart
-
-dart_task:
- - test: -P ci --platform vm
- - dartanalyzer: --fatal-infos --fatal-warnings .
- - dartfmt
-
 jobs:
- include:
-  - stage: coverage
-    os: osx
-    script:
-     - pub global activate coverage
-     - dart --enable-vm-service=8111 --pause-isolates-on-exit test/test_all.dart &
-     - pub global run coverage:collect_coverage --port=8111 --out=coverage.json --wait-paused --resume-isolates
-     - pub global run coverage:format_coverage --lcov --in=coverage.json --out=lcov.info --packages=.packages --report-on=lib/src
+  include:
+    - stage: analyze
+      name: "SDK: stable; PKG: puppeteer; TASKS: `dartanalyzer .`"
+      dart: stable
+      env: PKGS="puppeteer"
+      script: ./tool/travis.sh dartanalyzer
+    - stage: analyze
+      name: "SDK: stable; PKG: puppeteer; TASKS: `dartfmt -n --set-exit-if-changed .`"
+      dart: stable
+      env: PKGS="puppeteer"
+      script: ./tool/travis.sh dartfmt
+    - stage: unit_test
+      name: "SDK: stable; PKG: chrome_dev_tools; TASKS: `pub run test`"
+      dart: stable
+      env: PKGS="chrome_dev_tools"
+      script: ./tool/travis.sh test
+    - stage: unit_test
+      name: "SDK: stable; PKG: puppeteer; TASKS: `pub run test`"
+      dart: stable
+      env: PKGS="puppeteer"
+      script: ./tool/travis.sh test
 
-after_success:
- - gem install coveralls-lcov
- - coveralls-lcov lcov.info
+stages:
+  - analyze
+  - unit_test
 
+# Only building master means that we don't run two builds for each pull request.
 branches:
-  only: [master]
-
-env:
-  global:
-    #In travis/docker we need the --no-sandbox flag in chrome
-    - CHROME_FORCE_NO_SANDBOX=true
+  only:
+    - master
 
 cache:
   directories:
-    - $HOME/.pub-cache
+    - "$HOME/.pub-cache"
