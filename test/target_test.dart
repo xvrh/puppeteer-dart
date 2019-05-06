@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:logging/logging.dart';
 import 'package:puppeteer/puppeteer.dart';
+import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
@@ -142,9 +143,9 @@ main() {
     });
     test('should not crash while redirecting if original request was missed',
         () async {
-      Completer<Response> serverResponse;
+      Completer<shelf.Response> serverResponse;
       server.setRoute('one-style.css', (req) {
-        serverResponse = Completer<Response>();
+        serverResponse = Completer<shelf.Response>();
         return serverResponse.future;
       });
 
@@ -160,7 +161,7 @@ main() {
       var target = await targetFuture;
       var newPage = await target.page;
       // Issue a redirect.
-      serverResponse.complete(Response.found('/injectedstyle.css'));
+      serverResponse.complete(shelf.Response.found('/injectedstyle.css'));
       // Wait for the new page to load.
       await newPage.onLoad.first;
       // Cleanup.

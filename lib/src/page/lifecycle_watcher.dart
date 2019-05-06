@@ -5,12 +5,12 @@ import 'network_manager.dart';
 
 class LifecycleWatcher {
   final FrameManager frameManager;
-  final PageFrame frame;
+  final Frame frame;
   final Until wait;
   final Duration timeout;
   List<StreamSubscription> _subscriptions;
   LoaderId _initialLoaderId;
-  NetworkRequest _navigationRequest;
+  Request _navigationRequest;
   final _sameDocumentNavigationCompleter = Completer<Exception>(),
       _lifecycleCompleter = Completer<Exception>(),
       _terminationCompleter = Completer<Exception>(),
@@ -52,18 +52,18 @@ class LifecycleWatcher {
 
   Future<Exception> get lifecycle => _lifecycleCompleter.future;
 
-  NetworkResponse get navigationResponse {
+  Response get navigationResponse {
     return _navigationRequest != null ? _navigationRequest.response : null;
   }
 
-  void _onRequest(NetworkRequest request) {
+  void _onRequest(Request request) {
     if (request.frame != frame || !request.isNavigationRequest) {
       return;
     }
     _navigationRequest = request;
   }
 
-  void _onFrameDetached(PageFrame frame) {
+  void _onFrameDetached(Frame frame) {
     if (this.frame == frame) {
       _terminationCompleter
           .complete(Exception('Navigating frame was detached'));
@@ -84,7 +84,7 @@ class LifecycleWatcher {
     return completer.future;
   }
 
-  void _navigatedWithinDocument(PageFrame frame) {
+  void _navigatedWithinDocument(Frame frame) {
     if (frame != this.frame) return;
     _hasSameDocumentNavigation = true;
     _checkLifecycleComplete();
@@ -112,7 +112,7 @@ class LifecycleWatcher {
     }
   }
 
-  bool _checkLifecycle(PageFrame frame) {
+  bool _checkLifecycle(Frame frame) {
     for (var event in wait._events) {
       if (!frame.lifecycleEvents.contains(event)) return false;
     }

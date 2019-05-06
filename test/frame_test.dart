@@ -94,21 +94,21 @@ main() {
         () async {
       await page.goto(server.emptyPage);
       // validate frameattached events
-      var attachedFrames = <PageFrame>[];
+      var attachedFrames = <Frame>[];
       page.onFrameAttached.listen((frame) => attachedFrames.add(frame));
       await attachFrame(page, 'frame1', './frame.html');
       expect(attachedFrames.length, equals(1));
       expect(attachedFrames[0].url, contains('/frame.html'));
 
       // validate framenavigated events
-      var navigatedFrames = <PageFrame>[];
+      var navigatedFrames = <Frame>[];
       page.onFrameNavigated.listen((frame) => navigatedFrames.add(frame));
       await navigateFrame(page, 'frame1', './empty.html');
       expect(navigatedFrames.length, equals(1));
       expect(navigatedFrames[0].url, equals(server.emptyPage));
 
       // validate framedetached events
-      var detachedFrames = <PageFrame>[];
+      var detachedFrames = <Frame>[];
       page.onFrameDetached.listen((frame) => detachedFrames.add(frame));
       await detachFrame(page, 'frame1');
       expect(detachedFrames.length, equals(1));
@@ -137,9 +137,9 @@ main() {
       expect(hasEvents, isFalse);
     });
     test('should detach child frames on navigation', () async {
-      var attachedFrames = <PageFrame>[];
-      var detachedFrames = <PageFrame>[];
-      var navigatedFrames = <PageFrame>[];
+      var attachedFrames = <Frame>[];
+      var detachedFrames = <Frame>[];
+      var navigatedFrames = <Frame>[];
       page.onFrameAttached.listen((frame) => attachedFrames.add(frame));
       page.onFrameDetached.listen((frame) => detachedFrames.add(frame));
       page.onFrameNavigated.listen((frame) => navigatedFrames.add(frame));
@@ -177,9 +177,9 @@ main() {
       expect(navigatedFrames.length, equals(1));
     });
     test('should support framesets', () async {
-      var attachedFrames = <PageFrame>[];
-      var detachedFrames = <PageFrame>[];
-      var navigatedFrames = <PageFrame>[];
+      var attachedFrames = <Frame>[];
+      var detachedFrames = <Frame>[];
+      var navigatedFrames = <Frame>[];
       page.onFrameAttached.listen((frame) => attachedFrames.add(frame));
       page.onFrameDetached.listen((frame) => detachedFrames.add(frame));
       page.onFrameNavigated.listen((frame) => navigatedFrames.add(frame));

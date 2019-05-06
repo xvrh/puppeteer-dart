@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:puppeteer/protocol/network.dart' show ResourceType, ErrorReason;
 import 'package:puppeteer/puppeteer.dart';
+import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 import 'utils/utils_golden.dart';
@@ -85,7 +86,7 @@ main() {
     });
     test('should contain referer header', () async {
       await page.setRequestInterception(true);
-      var requests = <NetworkRequest>[];
+      var requests = <Request>[];
       page.onRequest.listen((request) {
         if (!request.url.contains('favicon.ico')) requests.add(request);
         request.continueRequest();
@@ -171,7 +172,7 @@ main() {
       page.onRequest.listen((request) {
         request.abort(error: ErrorReason.internetDisconnected);
       });
-      NetworkRequest failedRequest;
+      Request failedRequest;
       page.onRequestFailed.listen((request) => failedRequest = request);
       await page.goto(server.emptyPage).catchError((e) => null);
       expect(failedRequest, isNotNull);
@@ -194,7 +195,7 @@ main() {
     });
     test('should work with redirects', () async {
       await page.setRequestInterception(true);
-      var requests = <NetworkRequest>[];
+      var requests = <Request>[];
       page.onRequest.listen((request) {
         request.continueRequest();
         requests.add(request);
@@ -224,7 +225,7 @@ main() {
     });
     test('should work with redirects for subresources', () async {
       await page.setRequestInterception(true);
-      var requests = <NetworkRequest>[];
+      var requests = <Request>[];
       page.onRequest.listen((request) {
         request.continueRequest();
         if (!request.url.contains('favicon.ico')) requests.add(request);
@@ -233,7 +234,7 @@ main() {
       server.setRedirect('/two-style.css', '/three-style.css');
       server.setRedirect('/three-style.css', '/four-style.css');
       server.setRoute('/four-style.css',
-          (req) => Response.ok('body {box-sizing: border-box; }'));
+          (req) => shelf.Response.ok('body {box-sizing: border-box; }'));
 
       var response = await page.goto(server.prefix + '/one-style.html');
       expect(response.status, equals(200));
@@ -271,7 +272,7 @@ main() {
       await page.goto(server.emptyPage);
       var responseCount = 1;
       server.setRoute(
-          '/zzz', (req) => Response.ok('${(responseCount++) * 11}'));
+          '/zzz', (req) => shelf.Response.ok('${(responseCount++) * 11}'));
       await page.setRequestInterception(true);
 
       var spinner = false;
@@ -328,7 +329,7 @@ main() {
     });
     test('should work with badly encoded server', () async {
       await page.setRequestInterception(true);
-      server.setRoute('/malformed', (req) => Response.ok(''));
+      server.setRoute('/malformed', (req) => shelf.Response.ok(''));
       page.onRequest.listen((request) => request.continueRequest());
       var response = await page.goto(server.prefix + '/malformed?rnd=%911');
       expect(response.status, equals(200));
@@ -337,7 +338,7 @@ main() {
       // The requestWillBeSent will report URL as-is, whereas interception will
       // report encoded URL for stylesheet. @see crbug.com/759388
       await page.setRequestInterception(true);
-      var requests = <NetworkRequest>[];
+      var requests = <Request>[];
       page.onRequest.listen((request) {
         request.continueRequest();
         requests.add(request);
@@ -353,7 +354,7 @@ main() {
         () async {
       await page.setContent('<iframe></iframe>');
       await page.setRequestInterception(true);
-      NetworkRequest request;
+      Request request;
       page.onRequest.listen((r) {
         request = r;
       });

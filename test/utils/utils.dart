@@ -3,11 +3,9 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
 import 'package:puppeteer/puppeteer.dart';
-import 'package:shelf/shelf.dart';
+import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_static/shelf_static.dart';
-
-export 'package:shelf/shelf.dart' show Request, Response;
 
 Future server(String location, Function(String) callback) async {
   var handler = createStaticHandler(location);
@@ -21,14 +19,14 @@ Future server(String location, Function(String) callback) async {
   }
 }
 
-typedef _RouteCallback = FutureOr<Response> Function(Request);
+typedef _RouteCallback = FutureOr<shelf.Response> Function(shelf.Request);
 
 class Server {
   HttpServer _httpServer;
   final _routes = CanonicalizedMap<String, String, _RouteCallback>(
       (key) => p.url.normalize(_removeLeadingSlash(key)));
   final _requestCallbacks =
-      CanonicalizedMap<String, String, Completer<Request>>(
+      CanonicalizedMap<String, String, Completer<shelf.Request>>(
           (key) => p.url.normalize(_removeLeadingSlash(key)));
 
   Server._();
@@ -52,7 +50,7 @@ class Server {
       if (callback != null) {
         return callback(request);
       } else {
-        Response staticResponse = await staticHandler(request);
+        shelf.Response staticResponse = await staticHandler(request);
         staticResponse
             .change(headers: {HttpHeaders.cacheControlHeader: 'no-cache'});
         return staticResponse;
@@ -64,17 +62,11 @@ class Server {
 
   int get port => _httpServer.port;
 
-  String get docExamplesUrl => assetUrl('doc_examples.html');
-
-  String get docExamples2Url => assetUrl('doc_examples_2.html');
-
   String get prefix => hostUrl;
 
   String get crossProcessPrefix => 'http://127.0.0.1:${_httpServer.port}';
 
   String get emptyPage => assetUrl('empty.html');
-
-  String get empty2Page => assetUrl('empty2.html');
 
   String assetUrl(String page) {
     page = _removeLeadingSlash(page);
@@ -88,8 +80,8 @@ class Server {
     return path;
   }
 
-  void setRoute(
-      String url, FutureOr<Response> Function(Request request) callback) {
+  void setRoute(String url,
+      FutureOr<shelf.Response> Function(shelf.Request request) callback) {
     _routes[url] = callback;
   }
 
@@ -98,7 +90,7 @@ class Server {
       if (!to.contains('://')) {
         to = assetUrl(to);
       }
-      return Response.found(to);
+      return shelf.Response.found(to);
     });
   }
 
@@ -107,16 +99,16 @@ class Server {
     _requestCallbacks.clear();
   }
 
-  Future<Request> waitForRequest(String path) {
+  Future<shelf.Request> waitForRequest(String path) {
     return (_requestCallbacks[_removeLeadingSlash(path)] ??=
-            Completer<Request>())
+            Completer<shelf.Request>())
         .future;
   }
 
   Future close() => _httpServer.close(force: true);
 }
 
-Future<PageFrame> attachFrame(Page page, String frameId, String url) async {
+Future<Frame> attachFrame(Page page, String frameId, String url) async {
   var handle = await page.evaluateHandle(
       //language=js
       '''
@@ -156,7 +148,7 @@ function navigateFrame(frameId, url) {
 ''', args: [frameId, url]);
 }
 
-dumpFrames(PageFrame frame, [String indentation]) {
+dumpFrames(Frame frame, [String indentation]) {
   indentation ??= '';
   var description = frame.url.replaceAll(RegExp(r'//[^/]+/'), '//<host>/');
   if (frame.name != null) description += ' (' + frame.name + ')';
@@ -167,3 +159,5 @@ dumpFrames(PageFrame frame, [String indentation]) {
 }
 
 bool isFavicon(String url) => url.contains('favicon.ico');
+
+T exampleValue<T>(T useInTest, T useInExample) => useInTest;

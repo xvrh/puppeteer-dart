@@ -1,8 +1,6 @@
 import 'dart:convert';
 
-import 'package:meta/meta.dart';
-
-final aliases = {
+final _aliases = {
   'Request': 'RequestData',
   'Response': 'ResponseData',
   'Frame': 'FrameInformation',
@@ -56,15 +54,17 @@ class ComplexType {
   final ListItems items;
 
   ComplexType(
-      {String id, @required String domain,
+      {String id,
       this.properties = const [],
       this.description,
       this.type,
       this.enums,
-      this.items}): id = aliases[id] ?? id, rawId = id;
+      this.items})
+      : id = _aliases[id] ?? id,
+        rawId = id;
 
   ComplexType.fromJson(Map json, String domain)
-      : id =  aliases[json['id']] ?? json['id'],
+      : id = _aliases[json['id']] ?? json['id'],
         rawId = json['id'],
         description = json['description'],
         type = json['type'],
@@ -120,7 +120,7 @@ class Event {
 String _ref(String ref) {
   if (ref == null) return null;
 
-  String alias = aliases[ref];
+  String alias = _aliases[ref];
   if (alias != null) {
     return alias;
   } else {
@@ -129,7 +129,7 @@ String _ref(String ref) {
       var domain = splits.first;
       var singleRef = splits.last;
 
-      var aliasedRef = aliases[singleRef];
+      var aliasedRef = _aliases[singleRef];
       if (aliasedRef != null) {
         return '$domain.$aliasedRef';
       }
@@ -161,7 +161,8 @@ class Parameter implements Typed {
       this.optional = false,
       this.deprecated = false,
       this.items,
-      this.enumValues}): ref = _ref(ref);
+      this.enumValues})
+      : ref = _ref(ref);
 
   Parameter.fromJson(Map json)
       : name = json['name'],

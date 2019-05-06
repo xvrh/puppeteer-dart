@@ -10,7 +10,7 @@ import 'mouse.dart';
 
 class DomWorld {
   final FrameManager frameManager;
-  final PageFrame frame;
+  final Frame frame;
   final _waitTasks = <WaitTask>{};
   Completer<ExecutionContext> _contextCompleter;
   Future<ElementHandle> _documentFuture;

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
+import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
@@ -32,7 +33,7 @@ main() {
 
   group('Page.Events.Request', () {
     test('should fire for navigation requests', () async {
-      var requests = <NetworkRequest>[];
+      var requests = <Request>[];
       page.onRequest.listen((request) {
         if (!isFavicon(request.url)) {
           requests.add(request);
@@ -42,7 +43,7 @@ main() {
       expect(requests.length, equals(1));
     });
     test('should fire for iframes', () async {
-      var requests = <NetworkRequest>[];
+      var requests = <Request>[];
       page.onRequest.listen((request) {
         if (!isFavicon(request.url)) {
           requests.add(request);
@@ -53,7 +54,7 @@ main() {
       expect(requests.length, equals(2));
     });
     test('should fire for fetches', () async {
-      var requests = <NetworkRequest>[];
+      var requests = <Request>[];
       page.onRequest.listen((request) {
         if (!isFavicon(request.url)) {
           requests.add(request);
@@ -67,7 +68,7 @@ main() {
 
   group('Request.frame', () {
     test('should work for main frame navigation request', () async {
-      var requests = <NetworkRequest>[];
+      var requests = <Request>[];
       page.onRequest.listen((request) {
         if (!isFavicon(request.url)) {
           requests.add(request);
@@ -79,7 +80,7 @@ main() {
     });
     test('should work for subframe navigation request', () async {
       await page.goto(server.emptyPage);
-      var requests = <NetworkRequest>[];
+      var requests = <Request>[];
       page.onRequest.listen((request) {
         if (!isFavicon(request.url)) {
           requests.add(request);
@@ -91,7 +92,7 @@ main() {
     });
     test('should work for fetch requests', () async {
       await page.goto(server.emptyPage);
-      var requests = <NetworkRequest>[];
+      var requests = <Request>[];
       page.onRequest.listen((request) {
         if (!isFavicon(request.url)) {
           requests.add(request);
@@ -116,7 +117,7 @@ main() {
   group('Response.headers', () {
     test('should work', () async {
       server.setRoute('/empty.html', (req) {
-        return Response.ok('', headers: {'foo': 'bar'});
+        return shelf.Response.ok('', headers: {'foo': 'bar'});
       });
       var response = await page.goto(server.emptyPage);
       expect(response.headers['foo'], equals('bar'));
@@ -130,7 +131,7 @@ main() {
     });
 
     test('should work', () async {
-      var responses = <String, NetworkResponse>{};
+      var responses = <String, Response>{};
       page.onResponse.listen((r) {
         if (!isFavicon(r.url)) {
           responses[r.url.split('/').last] = r;
@@ -156,7 +157,7 @@ main() {
     });
 
     test('Response.fromServiceWorker', () async {
-      var responses = <String, NetworkResponse>{};
+      var responses = <String, Response>{};
       page.onResponse.listen((r) {
         responses[r.url.split('/').last] = r;
       });
@@ -178,8 +179,8 @@ main() {
   group('Request.postData', () {
     test('should work', () async {
       await page.goto(server.emptyPage);
-      server.setRoute('/post', (req) => Response.ok(''));
-      NetworkRequest request;
+      server.setRoute('/post', (req) => shelf.Response.ok(''));
+      Request request;
       page.onRequest.listen((r) {
         request = r;
       });
@@ -229,7 +230,7 @@ main() {
 
         // In Firefox, |fetch| will be hanging until it receives |Content-Type| header
         // from server.
-        return Response.ok(responseStream.stream,
+        return shelf.Response.ok(responseStream.stream,
             headers: {'Content-Type': 'text/plain; charset=utf-8'});
       });
       // Setup page to trap response.
@@ -286,7 +287,7 @@ main() {
   group('Response.statusText', () {
     test('should work', () async {
       server.setRoute('/cool', (req) {
-        return Response(200);
+        return shelf.Response(200);
       });
       var response = await page.goto(server.prefix + '/cool');
       expect(response.statusText, equals('OK'));
@@ -295,7 +296,7 @@ main() {
 
   group('Network Events', () {
     test('Page.Events.Request', () async {
-      var requests = <NetworkRequest>[];
+      var requests = <Request>[];
       page.onRequest.listen(requests.add);
       await page.goto(server.emptyPage);
       expect(requests.length, equals(1));
@@ -307,7 +308,7 @@ main() {
       expect(requests[0].frame.url, equals(server.emptyPage));
     });
     test('Page.Events.Response', () async {
-      var responses = <NetworkResponse>[];
+      var responses = <Response>[];
       page.onResponse.listen(responses.add);
       await page.goto(server.emptyPage);
       expect(responses.length, equals(1));
@@ -331,7 +332,7 @@ main() {
         else
           request.continueRequest();
       });
-      var failedRequests = <NetworkRequest>[];
+      var failedRequests = <Request>[];
       page.onRequestFailed.listen((request) => failedRequests.add(request));
       await page.goto(server.prefix + '/one-style.html');
       expect(failedRequests.length, equals(1));
@@ -342,7 +343,7 @@ main() {
       expect(failedRequests[0].frame, isNotNull);
     });
     test('Page.Events.RequestFinished', () async {
-      var requests = <NetworkRequest>[];
+      var requests = <Request>[];
       page.onRequestFinished.listen(requests.add);
       await page.goto(server.emptyPage);
       expect(requests.length, equals(1));
@@ -393,7 +394,7 @@ main() {
 
   group('Request.isNavigationRequest', () {
     test('should work', () async {
-      var requests = <String, NetworkRequest>{};
+      var requests = <String, Request>{};
       page.onRequest
           .listen((request) => requests[request.url.split('/').last] = request);
       server.setRedirect('/rrredirect', '/frames/one-frame.html');
@@ -405,7 +406,7 @@ main() {
       expect(requests['style.css'].isNavigationRequest, isFalse);
     });
     test('should work with request interception', () async {
-      var requests = <String, NetworkRequest>{};
+      var requests = <String, Request>{};
       page.onRequest.listen((request) {
         requests[request.url.split('/').last] = request;
         request.continueRequest();
@@ -420,7 +421,7 @@ main() {
       expect(requests['style.css'].isNavigationRequest, isFalse);
     });
     test('should work when navigating to image', () async {
-      var requests = <NetworkRequest>[];
+      var requests = <Request>[];
       page.onRequest.listen(requests.add);
       await page.goto(server.prefix + '/pptr.png');
       expect(requests[0].isNavigationRequest, isTrue);

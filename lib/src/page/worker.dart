@@ -58,11 +58,11 @@ class Worker {
   Future<ExecutionContext> get executionContext =>
       _executionContextCompleter.future;
 
-  /// If the function passed to the [PageFrame.evaluate] returns a [Promise], then
-  /// [PageFrame.evaluate] would wait for the promise to resolve and return its value.
+  /// If the function passed to the [Frame.evaluate] returns a [Promise], then
+  /// [Frame.evaluate] would wait for the promise to resolve and return its value.
   ///
-  /// If the function passed to the [PageFrame.evaluate] returns a non-[Serializable]
-  /// value, then `PageFrame.evaluate` resolves to null.
+  /// If the function passed to the [Frame.evaluate] returns a non-[Serializable]
+  /// value, then `Frame.evaluate` resolves to null.
   /// DevTools Protocol also supports transferring some additional values that
   /// are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and
   /// bigint literals.

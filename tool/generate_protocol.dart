@@ -49,7 +49,7 @@ main() {
           .where((p) => p.enumValues != null)
           .map((p) => _InternalType(
               context,
-              ComplexType(domain: domain.name,
+              ComplexType(
                   id: type.rawId + firstLetterUpper(p.name),
                   type: p.type,
                   enums: p.enumValues))));
