@@ -300,7 +300,7 @@ main() {
       var count = await page
           .evaluate('objects => objects.length', args: [objectsHandle]);
       expect(count, equals(1));
-    }, skip: true);
+    });
     test('should fail for disposed handles', () async {
       var prototypeHandle =
           await page.evaluateHandle('() => HTMLBodyElement.prototype');

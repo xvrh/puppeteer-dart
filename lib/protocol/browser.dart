@@ -318,6 +318,8 @@ class PermissionType {
   static const midiSysex = PermissionType._('midiSysex');
   static const notifications = PermissionType._('notifications');
   static const paymentHandler = PermissionType._('paymentHandler');
+  static const periodicBackgroundSync =
+      PermissionType._('periodicBackgroundSync');
   static const protectedMediaIdentifier =
       PermissionType._('protectedMediaIdentifier');
   static const sensors = PermissionType._('sensors');
@@ -337,6 +339,7 @@ class PermissionType {
     'midiSysex': midiSysex,
     'notifications': notifications,
     'paymentHandler': paymentHandler,
+    'periodicBackgroundSync': periodicBackgroundSync,
     'protectedMediaIdentifier': protectedMediaIdentifier,
     'sensors': sensors,
     'videoCapture': videoCapture,

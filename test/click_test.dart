@@ -5,6 +5,7 @@ import 'utils/utils.dart';
 main() {
   Server server;
   Browser browser;
+  BrowserContext context;
   Page page;
   setUpAll(() async {
     server = await Server.create();
@@ -12,18 +13,19 @@ main() {
   });
 
   tearDownAll(() async {
-    await browser.close();
     await server.close();
+    await browser.close();
+    browser = null;
   });
 
   setUp(() async {
-    page = await browser.newPage();
-    await page.goto(server.emptyPage);
+    context = await browser.createIncognitoBrowserContext();
+    page = await context.newPage();
   });
 
   tearDown(() async {
     server.clearRoutes();
-    await page.close();
+    await context.close();
     page = null;
   });
 
@@ -262,6 +264,7 @@ main() {
       expect(await frame.evaluate('() => window.result'), equals('Clicked'));
     }, skip: true);
     test('should click the button with deviceScaleFactor set', () async {
+      await page.goto(server.emptyPage);
       await page.setViewport(
           DeviceViewport(width: 400, height: 400, deviceScaleFactor: 5));
       expect(await page.evaluate('() => window.devicePixelRatio'), equals(5));

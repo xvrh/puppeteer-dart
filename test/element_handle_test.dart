@@ -5,6 +5,7 @@ import 'utils/utils.dart';
 main() {
   Server server;
   Browser browser;
+  BrowserContext context;
   Page page;
   setUpAll(() async {
     server = await Server.create();
@@ -12,17 +13,19 @@ main() {
   });
 
   tearDownAll(() async {
-    await browser.close();
     await server.close();
+    await browser.close();
+    browser = null;
   });
 
   setUp(() async {
-    page = await browser.newPage();
+    context = await browser.createIncognitoBrowserContext();
+    page = await context.newPage();
   });
 
   tearDown(() async {
     server.clearRoutes();
-    await page.close();
+    await context.close();
     page = null;
   });
 

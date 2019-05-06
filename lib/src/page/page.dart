@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
+import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import '../../protocol/dev_tools.dart';
@@ -29,6 +30,8 @@ import 'mouse.dart';
 import 'network_manager.dart';
 import 'touchscreen.dart';
 import 'worker.dart';
+
+final _logger = Logger('puppeteer.page');
 
 /// Page provides methods to interact with a single tab or extension background
 /// page in Chromium. One Browser instance might have multiple Page instances.
@@ -128,11 +131,17 @@ class Page {
     devTools.target.onAttachedToTarget.listen((e) {
       if (e.targetInfo.type != 'worker') {
         // If we don't detach from service workers, they will never die.
-        devTools.target.detachFromTarget(sessionId: e.sessionId);
+        devTools.target
+            .detachFromTarget(sessionId: e.sessionId)
+            .catchError((e) {
+          _logger.fine('[devTools.target.detachFromTarget] swallow error', e);
+        });
       } else {
         var session = target.browser.connection.sessions[e.sessionId.value];
         assert(session != null);
-        var worker = Worker(session, e.targetInfo.url);
+        var worker = Worker(session, e.targetInfo.url,
+            onConsoleApiCalled: _addConsoleMessage,
+            onExceptionThrown: _handleException);
         _workers[e.sessionId] = worker;
         _workerCreated.add(worker);
       }
@@ -301,6 +310,12 @@ class Page {
 
   /// An array of all frames attached to the page.
   List<PageFrame> get frames => frameManager.frames;
+
+  /// This method returns all of the dedicated [WebWorkers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API)
+  /// associated with the page.
+  ///
+  /// > **NOTE** This does not contain ServiceWorkers
+  List<Worker> get workers => _workers.values.toList();
 
   void _onDialog(JavascriptDialogOpeningEvent event) {
     var dialog = Dialog(this, event);
@@ -742,9 +757,9 @@ function addPageBinding(bindingName) {
   /// Provide credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
   ///
   /// To disable authentication, pass `null`.
-  Future<void> authenticate({String userName, String password}) {
+  Future<void> authenticate({String username, String password}) {
     return _frameManager.networkManager.authenticate(
-        userName == null ? null : Credentials(userName, password));
+        username == null ? null : Credentials(username, password));
   }
 
   /// The extra HTTP headers will be sent with every request the page initiates.
@@ -818,7 +833,21 @@ function deliverError(name, seq, message, stack) {
   }
 
   /// Parameters:
-  /// [html]: HTML markup to assign to the page.
+  /// - [html]: HTML markup to assign to the page.
+  /// - [timeout]: Maximum time in milliseconds for resources to load, defaults
+  ///   to 30 seconds, pass `0` to disable timeout. The default value can be
+  ///   changed by using the [page.defaultNavigationTimeout] or [page.defaultTimeout].
+  /// - [wait] When to consider navigation succeeded, defaults to [Until.load].
+  ///     Given an array of event strings, navigation is considered to be
+  ///     successful after all events have been fired. Events can be either:
+  ///   - [Until.load] - consider navigation to be finished when the `load`
+  ///     event is fired.
+  ///   - [Until.domContentLoaded] - consider navigation to be finished when the
+  ///     `DOMContentLoaded` event is fired.
+  ///   - [Until.networkIdle] - consider navigation to be finished when there
+  ///     are no more than 0 network connections for at least `500` ms.
+  ///   - [Until.networkAlmostIdle] - consider navigation to be finished when
+  ///     there are no more than 2 network connections for at least `500` ms.
   Future<void> setContent(String html, {Duration timeout, Until wait}) {
     return _frameManager.mainFrame
         .setContent(html, timeout: timeout, wait: wait);
@@ -1471,6 +1500,16 @@ function deliverError(name, seq, message, stack) {
         delay: delay, button: button, clickCount: clickCount);
   }
 
+  /// This method fetches an element with `selector` and focuses it.
+  /// If there's no element matching `selector`, the method throws an error.
+  ///
+  /// Shortcut for [page.mainFrame.focus].
+  ///
+  /// Parameters:
+  /// - A [selector] of an element to focus. If there are multiple elements
+  ///   satisfying the selector, the first will be focused.
+  /// - Promise which resolves when the element matching `selector` is successfully
+  ///   focused. The promise will be rejected if there is no element matching `selector`.
   Future<void> focus(String selector) {
     return mainFrame.focus(selector);
   }
@@ -1671,8 +1710,8 @@ function deliverError(name, seq, message, stack) {
   /// Shortcut for [page.mainFrame().waitForFunction(pageFunction[, options[, ...args]])](#framewaitforfunctionpagefunction-options-args).
   Future<JsHandle> waitForFunction(@Language('js') String pageFunction,
       {List args, Duration timeout, Polling polling}) {
-    return mainFrame.waitForFunction(pageFunction, args,
-        timeout: timeout, polling: polling);
+    return mainFrame.waitForFunction(pageFunction,
+        args: args, timeout: timeout, polling: polling);
   }
 
   bool get hasPopupListener => _onPopupController.hasListener;
@@ -1687,7 +1726,7 @@ class ConsoleMessage {
   final ConsoleMessageType type;
   final String typeName;
   final String text;
-  final List args;
+  final List<JsHandle> args;
   final String url;
   final int lineNumber, columnNumber;
 

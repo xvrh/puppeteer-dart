@@ -6,8 +6,12 @@ import 'connection.dart';
 import 'page/page.dart';
 
 class Target {
+  /// Get the browser the target belongs to.
   final Browser browser;
+
+  /// The browser context the target belongs to.
   final BrowserContext browserContext;
+
   final TargetID targetID;
   final Future<Session> Function() _sessionFactory;
   TargetInfo _info;
@@ -44,6 +48,9 @@ class Target {
 
   String get url => _info.url;
 
+  /// Identifies what kind of target this is.
+  /// Can be `"page"`, [`"background_page"`](https://developer.chrome.com/extensions/background_pages),
+  /// `"service_worker"`, `"browser"` or `"other"`.
   String get type {
     var type = _info.type;
     if (type == 'page' ||
@@ -53,10 +60,12 @@ class Target {
     return 'other';
   }
 
+  /// Get the target that opened this target. Top-level targets return `null`.
   Target get opener {
     return _info.openerId != null ? browser.targetById(_info.openerId) : null;
   }
 
+  /// If the target is not of type `"page"` or `"background_page"`, returns `null`.
   Future<Page> get page {
     if ((_info.type == 'page' || _info.type == 'background_page') &&
         _pageFuture == null) {
