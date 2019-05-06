@@ -479,6 +479,125 @@ main() {
       //---
       print(divsCounts);
     });
+    test('click', () async {
+      var frame = page.mainFrame;
+      //---
+      var responseFuture = page.waitForNavigation();
+      await frame.click('a');
+      var response = await responseFuture;
+      //---
+      expect(response, isNotNull);
+    });
+    group('evaluate', () {
+      frame = page.mainFrame;
+
+      test(0, () async {
+        int result = await frame.evaluate('''x => {
+          return Promise.resolve(8 * x);
+        }''', args: [7]);
+        print(result); // prints "56"
+      });
+      test(1, () async {
+        print(await frame.evaluate('1 + 2')); // prints "3"
+        var x = 10;
+        print(await frame.evaluate('1 + $x')); // prints "11"
+      });
+      test(2, () async {
+        var bodyHandle = await frame.$('body');
+        var html =
+            await frame.evaluate('body => body.innerHTML', args: [bodyHandle]);
+        await bodyHandle.dispose();
+        print(html);
+      });
+    });
+    group('evaluateHandle', () {
+      test(0, () async {
+        //----
+        // Get an handle for the 'document'
+        var aHandle = await frame.evaluateHandle('document');
+        //----
+        aHandle.toString();
+      });
+      test(1, () async {
+        var aHandle = await frame.evaluateHandle('() => document.body');
+        var resultHandle = await frame
+            .evaluateHandle('body => body.innerHTML', args: [aHandle]);
+        print(await resultHandle.jsonValue);
+        await resultHandle.dispose();
+      });
+    });
+    test('select', () async {
+      await frame.select('select#colors', ['blue']); // single selection
+      await frame.select(
+          'select#colors', ['red', 'green', 'blue']); // multiple selections
+    });
+    test('type', () async {
+      // Types instantly
+      await frame.type('#mytextarea', 'Hello');
+
+      // Types slower, like a user
+      await frame.type('#mytextarea', 'World',
+          delay: Duration(milliseconds: 100));
+    });
+    group('waitForFunction', () {
+      test(0, () async {
+        //---
+        //+import 'package:puppeteer/puppeteer.dart';
+
+        main() async {
+          var browser = await puppeteer.launch();
+          var page = await browser.newPage();
+          var watchDog =
+              page.mainFrame.waitForFunction('window.innerWidth < 100');
+          await page.setViewport(DeviceViewport(width: 50, height: 50));
+          await watchDog;
+          await browser.close();
+        }
+        //---
+
+        await main();
+      });
+      test(1, () async {
+        var selector = '.foo';
+        await page.mainFrame.waitForFunction(
+            'selector => !!document.querySelector(selector)',
+            args: [selector]);
+      });
+    });
+    test('waitForSelector', () async {
+      //---
+      //+import 'package:puppeteer/puppeteer.dart';
+
+      main() async {
+        var browser = await puppeteer.launch();
+        var page = await browser.newPage();
+        var watchImg = page.mainFrame.waitForSelector('img');
+        await page.goto(server.docExamples2Url);
+        var image = await watchImg;
+        print(await image.propertyValue('src'));
+        await browser.close();
+      }
+      //---
+
+      await main();
+    });
+    test('waitForXPath', () async {
+      //---
+      //+import 'package:puppeteer/puppeteer.dart';
+
+      main() async {
+        var browser = await puppeteer.launch();
+        var page = await browser.newPage();
+        var watchImg = page.mainFrame.waitForXPath('//img');
+        await page.goto(server.docExamples2Url);
+        var image = await watchImg;
+        print(await image.propertyValue('src'));
+        await browser.close();
+      }
+      //---
+
+      await main();
+    });
   });
   group('Keyboard', () {
     group('class', () {
@@ -722,6 +841,18 @@ main() {
         request.respond(
             status: 404, contentType: 'text/plain', body: 'Not Found!');
       });
+    });
+  });
+  group('Worker', () {
+    test('class', () async {
+      page.onWorkerCreated
+          .listen((worker) => print('Worker created: ${worker.url}'));
+      page.onWorkerDestroyed
+          .listen((worker) => print('Worker destroyed: ${worker.url}'));
+      print('Current workers:');
+      for (var worker in page.workers) {
+        print('  ${worker.url}');
+      }
     });
   });
 }

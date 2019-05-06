@@ -95,19 +95,20 @@ class Connection implements Client {
     String method = object['method'];
     String sessionId = object['sessionId'];
     if (method == 'Target.attachedToTarget') {
-      Map params = object['params'];
-      String sessionId = params['sessionId'];
-      var session = Session(this, SessionID(sessionId));
-      sessions[sessionId] = session;
+      var params = AttachedToTargetEvent.fromJson(object['params']);
+      var sessionId = params.sessionId;
+      var session =
+          Session(this, sessionId, targetType: params.targetInfo.type);
+      sessions[sessionId.value] = session;
     } else if (method == 'Target.detachedFromTarget') {
-      Map params = object['params'];
-      String sessionId = params['sessionId'];
-      var session = sessions[sessionId];
+      var params = DetachedFromTargetEvent.fromJson(object['params']);
+      var session = sessions[params.sessionId.value];
       if (session != null) {
         session.dispose(reason: 'Target.detachedFromTarget');
-        sessions.remove(sessionId);
+        sessions.remove(params.sessionId.value);
       }
-    } else if (sessionId != null) {
+    }
+    if (sessionId != null) {
       var session = sessions[sessionId];
       if (session != null) {
         _logger.fine('◀ RECV $message');
@@ -175,16 +176,18 @@ String _encodeMessage(int id, String method, Map<String, dynamic> parameters,
 class Session implements Client {
   final SessionID sessionId;
   final Connection connection;
+  final String targetType;
   final _messagesInFly = <int, _Message>{};
   final _eventController = StreamController<Event>.broadcast(sync: true);
   final _onClose = Completer<void>();
 
-  Session(this.connection, this.sessionId);
+  Session(this.connection, this.sessionId, {@required this.targetType});
 
   @override
   Future<Map> send(String method, [Map parameters]) {
     if (_eventController.isClosed) {
-      throw Exception('Session closed');
+      throw Exception(
+          'Protocol error ($method): Session closed. Most likely the $targetType has been closed.');
     }
     int id = connection._rawSend(method, parameters, sessionId: sessionId);
 

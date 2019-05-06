@@ -165,3 +165,5 @@ dumpFrames(PageFrame frame, [String indentation]) {
     result.addAll(dumpFrames(child, '    ' + indentation));
   return result;
 }
+
+bool isFavicon(String url) => url.contains('favicon.ico');

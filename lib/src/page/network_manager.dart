@@ -162,7 +162,7 @@ class NetworkManager {
         event.requestId,
         fetch.AuthChallengeResponse(
             response: response,
-            username: _credentials?.userName,
+            username: _credentials?.username,
             password: _credentials?.password));
   }
 
@@ -586,7 +586,7 @@ class NetworkResponse {
 }
 
 class Credentials {
-  final String userName, password;
+  final String username, password;
 
-  Credentials(this.userName, this.password);
+  Credentials(this.username, this.password);
 }

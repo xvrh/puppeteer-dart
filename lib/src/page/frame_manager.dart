@@ -370,6 +370,7 @@ class PageFrame {
 
   FrameId get id => _id;
 
+  /// Returns frame's url.
   String get url => _url;
 
   /// Returns frame's name attribute as specified in the tag.
@@ -380,12 +381,50 @@ class PageFrame {
   /// will not update if the attribute is changed later.
   String get name => _name;
 
+  /// Returns `true` if the frame has been detached, or `false` otherwise.
   bool get isDetached => _detached;
 
   LoaderId get loaderId => _loaderId;
 
+  /// Parent frame, if any. Detached frames and main frames return `null`.
   PageFrame get parentFrame => _parent;
 
+  /// The [PageFrame.goto] will throw an error if:
+  /// - there's an SSL error (e.g. in case of self-signed certificates).
+  /// - target URL is invalid.
+  /// - the `timeout` is exceeded during navigation.
+  /// - the main resource failed to load.
+  ///
+  /// > **NOTE** [PageFrame.goto] either throw or return a main resource response.
+  /// The only exceptions are navigation to `about:blank` or navigation to the
+  /// same URL with a different hash, which would succeed and return `null`.
+  ///
+  /// > **NOTE** Headless mode doesn't support navigation to a PDF document. See
+  /// the [upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=761295).
+  ///
+  /// Parameters:
+  /// - [url]: URL to navigate page to. The url should include scheme, e.g. `https://`.
+  /// - [timeout] Maximum navigation time in milliseconds, defaults
+  ///     to 30 seconds, pass [Duration.zero] to disable timeout. The default value
+  ///     can be changed by using the [Page.defaultNavigationTimeout] or
+  ///     [Page.defaultTimeout] properties.
+  /// - [wait] When to consider navigation succeeded, defaults to [Until.load].
+  ///     Given an array of event strings, navigation is considered to be
+  ///     successful after all events have been fired. Events can be either:
+  ///   - [Until.load] - consider navigation to be finished when the `load`
+  ///     event is fired.
+  ///   - [Until.domContentLoaded] - consider navigation to be finished when the
+  ///     `DOMContentLoaded` event is fired.
+  ///   - [Until.networkIdle] - consider navigation to be finished when there
+  ///     are no more than 0 network connections for at least `500` ms.
+  ///   - [Until.networkAlmostIdle] - consider navigation to be finished when
+  ///     there are no more than 2 network connections for at least `500` ms.
+  /// - [referrer] Referer header value. If provided it will take preference
+  ///   over the referer header value set by [Page.setExtraHTTPHeaders].
+  ///
+  /// Returns: [Future] which resolves to the main resource response. In case
+  /// of multiple redirects, the navigation will resolve with the response of
+  /// the last redirect.
   Future<NetworkResponse> goto(String url,
       {String referrer, Duration timeout, Until wait}) {
     return frameManager.navigateFrame(this, url,
@@ -397,15 +436,80 @@ class PageFrame {
         timeout: timeout, wait: wait);
   }
 
+  /// Returns promise that resolves to the frame's default execution context.
   Future<ExecutionContext> get executionContext {
     return _mainWorld.executionContext;
   }
 
+  /// The only difference between [PageFrame.evaluate] and [PageFrame.evaluateHandle] is
+  /// that [PageFrame.evaluateHandle] returns in-page object (JSHandle).
+  ///
+  /// If the function passed to the [PageFrame.evaluateHandle] returns a [Promise],
+  /// then [PageFrame.evaluateHandle] would wait for the promise to resolve and
+  /// return its value.
+  ///
+  /// A JavaScript expression can also be passed in instead of a function:
+  /// ```dart
+  /// // Get an handle for the 'document'
+  /// var aHandle = await frame.evaluateHandle('document');
+  /// ```
+  ///
+  /// [JSHandle] instances can be passed as arguments to the [PageFrame.evaluateHandle]:
+  /// ```dart
+  /// var aHandle = await frame.evaluateHandle('() => document.body');
+  /// var resultHandle =
+  ///     await frame.evaluateHandle('body => body.innerHTML', args: [aHandle]);
+  /// print(await resultHandle.jsonValue);
+  /// await resultHandle.dispose();
+  /// ```
+  ///
+  /// Parameters:
+  /// - [pageFunction] Function to be evaluated in the page context
+  /// - [args] Arguments to pass to [pageFunction]
+  ///
+  /// returns: Future which resolves to the return value of `pageFunction` as
+  /// in-page object (JSHandle)
   Future<JsHandle> evaluateHandle(@Language('js') String pageFunction,
       {List args}) {
     return _mainWorld.evaluateHandle(pageFunction, args: args);
   }
 
+  /// If the function passed to the [PageFrame.evaluate] returns a [Promise], then
+  /// [PageFrame.evaluate] would wait for the promise to resolve and return its value.
+  ///
+  /// If the function passed to the [PageFrame.evaluate] returns a non-[Serializable]
+  /// value, then `PageFrame.evaluate` resolves to null.
+  /// DevTools Protocol also supports transferring some additional values that
+  /// are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and
+  /// bigint literals.
+  ///
+  /// Passing arguments to `pageFunction`:
+  /// ```dart
+  /// int result = await frame.evaluate('''x => {
+  ///         return Promise.resolve(8 * x);
+  ///       }''', args: [7]);
+  /// print(result); // prints "56"
+  /// ```
+  ///
+  /// An expression can also be passed in instead of a function:
+  /// ```dart
+  /// print(await frame.evaluate('1 + 2')); // prints "3"
+  /// var x = 10;
+  /// print(await frame.evaluate('1 + $x')); // prints "11"
+  /// ```
+  ///
+  /// [ElementHandle] instances can be passed as arguments to the [PageFrame.evaluate]:
+  /// ```dart
+  /// var bodyHandle = await frame.$('body');
+  /// var html = await frame.evaluate('body => body.innerHTML', args: [bodyHandle]);
+  /// await bodyHandle.dispose();
+  /// print(html);
+  /// ```
+  ///
+  /// Parameters:
+  /// - [pageFunction] Function to be evaluated in the page context
+  /// - [args] Arguments to pass to `pageFunction`
+  /// - Returns: Future which resolves to the return value of `pageFunction`
   Future<T> evaluate<T>(@Language('js') String pageFunction, {List args}) {
     return _mainWorld.evaluate<T>(pageFunction, args: args);
   }
@@ -479,50 +583,204 @@ class PageFrame {
     return _mainWorld.$$(selector);
   }
 
+  /// Gets the full HTML contents of the frame, including the doctype.
   Future<String> get content {
     return _secondaryWorld.content;
   }
 
+  /// Parameters:
+  /// - [html]: HTML markup to assign to the page.
+  /// - [timeout]: Maximum time in milliseconds for resources to load, defaults
+  ///   to 30 seconds, pass `0` to disable timeout. The default value can be
+  ///   changed by using the [page.defaultNavigationTimeout] or [page.defaultTimeout].
+  /// - [wait] When to consider navigation succeeded, defaults to [Until.load].
+  ///     Given an array of event strings, navigation is considered to be
+  ///     successful after all events have been fired. Events can be either:
+  ///   - [Until.load] - consider navigation to be finished when the `load`
+  ///     event is fired.
+  ///   - [Until.domContentLoaded] - consider navigation to be finished when the
+  ///     `DOMContentLoaded` event is fired.
+  ///   - [Until.networkIdle] - consider navigation to be finished when there
+  ///     are no more than 0 network connections for at least `500` ms.
+  ///   - [Until.networkAlmostIdle] - consider navigation to be finished when
+  ///     there are no more than 2 network connections for at least `500` ms.
   Future<void> setContent(String html, {Duration timeout, Until wait}) {
     return _secondaryWorld.setContent(html, timeout: timeout, wait: wait);
   }
 
+  /// Adds a `<script>` tag into the page with the desired url or content.
+  ///
+  /// Parameters:
+  /// - [url]: URL of a script to be added.
+  /// - [file]: JavaScript file to be injected into frame
+  /// - [content]: Raw JavaScript content to be injected into frame.
+  /// - [type]: Script type. Use 'module' in order to load a Javascript ES6 module.
+  ///   See [script](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script)
+  ///   for more details.
+  ///
+  /// Returns a [Future<ElementHandle>] which resolves to the added tag when the
+  /// script's onload fires or when the script content was injected into frame.
   Future<ElementHandle> addScriptTag(
       {String url, File file, String content, String type}) {
     return _mainWorld.addScriptTag(
         url: url, file: file, content: content, type: type);
   }
 
+  /// Adds a `<link rel="stylesheet">` tag into the page with the desired url or
+  /// a `<style type="text/css">` tag with the content.
+  ///
+  /// Parameters:
+  /// [url]: URL of the `<link>` tag.
+  /// [file]: CSS file to be injected into frame.
+  /// [content]: Raw CSS content to be injected into frame.
+  ///
+  /// Returns a [Future<ElementHandle>] which resolves to the added tag when the
+  /// stylesheet's onload fires or when the CSS content was injected into frame.
   Future<ElementHandle> addStyleTag({String url, File file, String content}) {
     return _mainWorld.addStyleTag(url: url, file: file, content: content);
   }
 
+  /// This method fetches an element with `selector`, scrolls it into view if
+  /// needed, and then uses [Page.mouse] to click in the center of the element.
+  /// If there's no element matching `selector`, the method throws an error.
+  ///
+  /// Bear in mind that if `click()` triggers a navigation event and there's a
+  /// separate `page.waitForNavigation()` promise to be resolved, you may end
+  /// up with a race condition that yields unexpected results. The correct
+  /// pattern for click and wait for navigation is the following:
+  ///
+  /// ```dart
+  /// var responseFuture = page.waitForNavigation();
+  /// await frame.click('a');
+  /// var response = await responseFuture;
+  /// ```
+  ///
+  /// Parameters:
+  /// - [selector]: A [selector] to search for element to click. If there are
+  ///   multiple elements satisfying the selector, the first will be clicked.
+  /// - [button]: <"left"|"right"|"middle"> Defaults to `left`
+  /// - [clickCount]: defaults to 1
+  /// - [delay]: Time to wait between `mousedown` and `mouseup`. Default to zero.
   Future<void> click(String selector,
       {Duration delay, MouseButton button, int clickCount}) {
     return _secondaryWorld.click(selector,
         delay: delay, button: button, clickCount: clickCount);
   }
 
+  /// This method fetches an element with `selector` and focuses it.
+  /// If there's no element matching `selector`, the method throws an error.
+  ///
+  /// Parameters:
+  /// - A [selector] of an element to focus. If there are multiple elements
+  ///   satisfying the selector, the first will be focused.
+  /// - Promise which resolves when the element matching `selector` is successfully
+  ///   focused. The promise will be rejected if there is no element matching `selector`.
   Future<void> focus(String selector) {
     return _secondaryWorld.focus(selector);
   }
 
+  /// This method fetches an element with [selector], scrolls it into view if
+  /// needed, and then uses [Page.mouse] to hover over the center of
+  /// the element.
+  /// If there's no element matching [selector], the method throws an error.
+  ///
+  /// Parameters:
+  /// A [selector] to search for element to hover. If there are multiple elements
+  /// satisfying the selector, the first will be hovered.
+  ///
+  /// Returns: [Future] which resolves when the element matching [selector] is
+  /// successfully hovered. Future gets rejected if there's no element matching
+  /// [selector].
   Future<void> hover(String selector) {
     return _secondaryWorld.hover(selector);
   }
 
+  /// Triggers a `change` and `input` event once all the provided options have
+  /// been selected.
+  /// If there's no `<select>` element matching `selector`, the method throws an
+  /// error.
+  ///
+  /// ```dart
+  /// await frame.select('select#colors', ['blue']); // single selection
+  /// await frame
+  ///     .select('select#colors', ['red', 'green', 'blue']); // multiple selections
+  /// ```
+  ///
+  /// Shortcut for [Page.mainFrame.select]
+  ///
+  /// Parameters:
+  /// - [selector]: A [selector] to query page for
+  /// - [values]: Values of options to select. If the `<select>` has the
+  ///   `multiple` attribute, all values are considered, otherwise only the
+  ///   first one is taken into account.
+  ///
+  /// Returns an array of option values that have been successfully selected.
   Future<List<String>> select(selector, List<String> values) {
     return _secondaryWorld.select(selector, values);
   }
 
+  /// This method fetches an element with `selector`, scrolls it into view if
+  /// needed, and then uses [page.touchscreen] to tap in the center of the element.
+  /// If there's no element matching `selector`, the method throws an error.
+  ///
+  /// Parameters:
+  /// A [selector] to search for element to tap. If there are multiple
+  /// elements satisfying the selector, the first will be tapped.
   Future<void> tap(String selector) {
     return _secondaryWorld.tap(selector);
   }
 
+  /// Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character
+  /// in the text.
+  ///
+  /// To press a special key, like `Control` or `ArrowDown`, use [`keyboard.press`].
+  ///
+  /// ```dart
+  /// // Types instantly
+  /// await frame.type('#mytextarea', 'Hello');
+  ///
+  /// // Types slower, like a user
+  /// await frame.type('#mytextarea', 'World', delay: Duration(milliseconds: 100));
+  /// ```
   Future<void> type(String selector, String text, {Duration delay}) {
     return _mainWorld.type(selector, text, delay: delay);
   }
 
+  /// Wait for the `selector` to appear in page. If at the moment of calling
+  /// the method the `selector` already exists, the method will return
+  /// immediately. If the selector doesn't appear after the `timeout` of waiting,
+  /// the function will throw.
+  ///
+  /// This method works across navigations:
+  /// ```dart
+  /// import 'package:puppeteer/puppeteer.dart';
+  ///
+  /// main() async {
+  ///   var browser = await puppeteer.launch();
+  ///   var page = await browser.newPage();
+  ///   var watchImg = page.mainFrame.waitForSelector('img');
+  ///   await page.goto('https://example.com');
+  ///   var image = await watchImg;
+  ///   print(await image.propertyValue('src'));
+  ///   await browser.close();
+  /// }
+  /// ```
+  ///
+  /// Parameters:
+  /// - A [selector] of an element to wait for
+  /// - [visible]: wait for element to be present in DOM and to be visible,
+  ///   i.e. to not have `display: none` or `visibility: hidden` CSS properties.
+  ///   Defaults to `false`.
+  /// - [hidden]: wait for element to not be found in the DOM or to be hidden,
+  ///   i.e. have `display: none` or `visibility: hidden` CSS properties.
+  ///   Defaults to `false`.
+  /// - [timeout]:  maximum time to wait for. Pass [Duration.zero]
+  ///   to disable timeout. The default value can be changed by using the
+  ///   [page.defaultTimeout] property.
+  ///
+  /// Returns a [Future] which resolves when element specified by selector string
+  /// is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
+  /// is not found in DOM.
   Future<ElementHandle> waitForSelector(String selector,
       {bool visible, bool hidden, Duration timeout}) async {
     var handle = await _secondaryWorld.waitForSelector(selector,
@@ -536,6 +794,41 @@ class PageFrame {
     return result;
   }
 
+  /// Wait for the `xpath` to appear in page. If at the moment of calling
+  /// the method the `xpath` already exists, the method will return
+  /// immediately. If the xpath doesn't appear after the `timeout` of waiting,
+  /// the function will throw.
+  ///
+  /// This method works across navigations:
+  /// ```dart
+  /// import 'package:puppeteer/puppeteer.dart';
+  ///
+  /// main() async {
+  ///   var browser = await puppeteer.launch();
+  ///   var page = await browser.newPage();
+  ///   var watchImg = page.mainFrame.waitForXPath('//img');
+  ///   await page.goto('https://example.com');
+  ///   var image = await watchImg;
+  ///   print(await image.propertyValue('src'));
+  ///   await browser.close();
+  /// }
+  /// ```
+  ///
+  /// Parameters:
+  /// - A [xpath] of an element to wait for
+  /// - [visible]: wait for element to be present in DOM and to be visible,
+  ///   i.e. to not have `display: none` or `visibility: hidden` CSS properties.
+  ///   Defaults to `false`.
+  /// - [hidden]: wait for element to not be found in the DOM or to be hidden,
+  ///   i.e. have `display: none` or `visibility: hidden` CSS properties.
+  ///   Defaults to `false`.
+  /// - [timeout]:  maximum time to wait for. Pass [Duration.zero]
+  ///   to disable timeout. The default value can be changed by using the
+  ///   [page.defaultTimeout] property.
+  ///
+  /// Returns a [Future] which resolves when element specified by xpath string
+  /// is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
+  /// is not found in DOM.
   Future<ElementHandle> waitForXPath(String xpath,
       {bool visible, bool hidden, Duration timeout}) async {
     var handle = await _secondaryWorld.waitForXPath(xpath,
@@ -549,13 +842,49 @@ class PageFrame {
     return result;
   }
 
-  Future<JsHandle> waitForFunction(
-      @Language('js') String pageFunction, List args,
-      {Duration timeout, Polling polling}) {
+  /// Parameters:
+  /// - [pageFunction]: Function to be evaluated in browser context
+  /// - [polling]: An interval at which the `pageFunction` is executed, defaults
+  ///   to `everyFrame`.
+  ///   - [Polling.everyFrame]: to constantly execute `pageFunction` in
+  ///     `requestAnimationFrame` callback. This is the tightest polling mode
+  ///     which is suitable to observe styling changes.
+  ///   - [Polling.mutation]: to execute `pageFunction` on every DOM mutation.
+  ///   - [Polling.interval]: An interval at which the function would be executed
+  /// - [args]: Arguments to pass to  `pageFunction`
+  ///
+  /// Returns a [Future] which resolves when the `pageFunction` returns a truthy
+  /// value. It resolves to a JSHandle of the truthy value.
+  ///
+  /// The `waitForFunction` can be used to observe viewport size change:
+  /// ```dart
+  /// import 'package:puppeteer/puppeteer.dart';
+  ///
+  /// main() async {
+  ///   var browser = await puppeteer.launch();
+  ///   var page = await browser.newPage();
+  ///   var watchDog = page.mainFrame.waitForFunction('window.innerWidth < 100');
+  ///   await page.setViewport(DeviceViewport(width: 50, height: 50));
+  ///   await watchDog;
+  ///   await browser.close();
+  /// }
+  /// ```
+  ///
+  /// To pass arguments from node.js to the predicate of `page.waitForFunction` function:
+  ///
+  /// ```dart
+  /// var selector = '.foo';
+  /// await page.mainFrame.waitForFunction(
+  ///     'selector => !!document.querySelector(selector)',
+  ///     args: [selector]);
+  /// ```
+  Future<JsHandle> waitForFunction(@Language('js') String pageFunction,
+      {List args, Duration timeout, Polling polling}) {
     return _mainWorld.waitForFunction(pageFunction, args,
         timeout: timeout, polling: polling);
   }
 
+  /// The page's title.
   Future<String> get title {
     return _secondaryWorld.title;
   }

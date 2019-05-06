@@ -8,6 +8,7 @@ final classesOrder = [
   'Browser',
   'BrowserContext',
   'Page',
+  'Worker',
   'Keyboard',
   'Mouse',
   'Touchscreen',

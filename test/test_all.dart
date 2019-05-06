@@ -17,6 +17,7 @@ import 'js_handle_test.dart' as js_handle_test;
 import 'keyboard_test.dart' as keyboard_test;
 import 'mouse_test.dart' as mouse_test;
 import 'navigation_test.dart' as navigation_test;
+import 'network_test.dart' as network_test;
 import 'page_test.dart' as page_test;
 import 'query_selector_test.dart' as query_selector_test;
 import 'readme_test.dart' as readme_test;
@@ -26,9 +27,12 @@ import 'target_test.dart' as target_test;
 import 'to_comment_test.dart' as to_comment_test;
 import 'touchscreen_test.dart' as touchscreen_test;
 import 'wait_task_test.dart' as wait_task_test;
+import 'worker_test.dart' as worker_test;
 
 main() {
+  group('worker_test', worker_test.main);
   group('request_interception_test', request_interception_test.main);
+  group('network_test', network_test.main);
   group('touchscreen_test', touchscreen_test.main);
   group('examples_test', examples_test.main);
   group('click_test', click_test.main);
