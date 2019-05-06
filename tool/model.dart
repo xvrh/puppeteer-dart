@@ -1,5 +1,13 @@
 import 'dart:convert';
 
+import 'package:meta/meta.dart';
+
+final aliases = {
+  'Request': 'RequestData',
+  'Response': 'ResponseData',
+  'Frame': 'FrameInformation',
+};
+
 class Protocol {
   final List<Domain> domains;
 
@@ -24,7 +32,7 @@ class Domain {
         description = json['description'],
         types = json.containsKey('types')
             ? (json['types'] as List)
-                .map((j) => ComplexType.fromJson(j))
+                .map((j) => ComplexType.fromJson(j, json['domain']))
                 .toList()
             : const [],
         commands = json.containsKey('commands')
@@ -40,6 +48,7 @@ class Domain {
 
 class ComplexType {
   final String id;
+  final String rawId;
   final String description;
   final String type;
   final List<Parameter> properties;
@@ -47,15 +56,16 @@ class ComplexType {
   final ListItems items;
 
   ComplexType(
-      {this.id,
+      {String id, @required String domain,
       this.properties = const [],
       this.description,
       this.type,
       this.enums,
-      this.items});
+      this.items}): id = aliases[id] ?? id, rawId = id;
 
-  ComplexType.fromJson(Map json)
-      : id = json['id'],
+  ComplexType.fromJson(Map json, String domain)
+      : id =  aliases[json['id']] ?? json['id'],
+        rawId = json['id'],
         description = json['description'],
         type = json['type'],
         properties = json.containsKey('properties')
@@ -107,6 +117,28 @@ class Event {
             : const [];
 }
 
+String _ref(String ref) {
+  if (ref == null) return null;
+
+  String alias = aliases[ref];
+  if (alias != null) {
+    return alias;
+  } else {
+    if (ref.contains('.')) {
+      var splits = ref.split('.');
+      var domain = splits.first;
+      var singleRef = splits.last;
+
+      var aliasedRef = aliases[singleRef];
+      if (aliasedRef != null) {
+        return '$domain.$aliasedRef';
+      }
+    }
+
+    return ref;
+  }
+}
+
 class Parameter implements Typed {
   final String name;
   final String description;
@@ -125,17 +157,17 @@ class Parameter implements Typed {
       {this.name,
       this.description,
       this.type,
-      this.ref,
+      String ref,
       this.optional = false,
       this.deprecated = false,
       this.items,
-      this.enumValues});
+      this.enumValues}): ref = _ref(ref);
 
   Parameter.fromJson(Map json)
       : name = json['name'],
         description = json['description'],
         type = json['type'],
-        ref = json[r'$ref'],
+        ref = _ref(json[r'$ref']),
         optional = json['optional'] ?? false,
         deprecated = json['deprecated'] ?? false,
         items = json.containsKey('items')
@@ -159,7 +191,7 @@ class ListItems implements Typed {
 
   ListItems.fromJson(Map json)
       : type = json['type'],
-        ref = json[r'$ref'];
+        ref = _ref(json[r'$ref']);
 }
 
 abstract class Typed {

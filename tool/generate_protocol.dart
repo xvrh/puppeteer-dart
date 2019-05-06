@@ -49,8 +49,8 @@ main() {
           .where((p) => p.enumValues != null)
           .map((p) => _InternalType(
               context,
-              ComplexType(
-                  id: type.id + firstLetterUpper(p.name),
+              ComplexType(domain: domain.name,
+                  id: type.rawId + firstLetterUpper(p.name),
                   type: p.type,
                   enums: p.enumValues))));
     }
@@ -74,7 +74,6 @@ main() {
 
     StringBuffer code = StringBuffer();
 
-    //TODO(xha): sort imports
     code.writeln("import 'dart:async';");
     if (context.needsMetaPackage) {
       code.writeln("import 'package:meta/meta.dart' show required;");
@@ -568,7 +567,7 @@ class _InternalType {
 
   String _propertyTypeName(Parameter property) {
     if (property.enumValues != null) {
-      return type.id + firstLetterUpper(property.name);
+      return type.rawId + firstLetterUpper(property.name);
     } else {
       return context.getPropertyType(property);
     }

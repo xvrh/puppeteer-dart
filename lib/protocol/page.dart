@@ -35,9 +35,10 @@ class PageApi {
       .map((Event event) => FrameId.fromJson(event.parameters['frameId']));
 
   /// Fired once navigation of the frame has completed. Frame is now associated with the new loader.
-  Stream<Frame> get onFrameNavigated => _client.onEvent
+  Stream<FrameInformation> get onFrameNavigated => _client.onEvent
       .where((Event event) => event.name == 'Page.frameNavigated')
-      .map((Event event) => Frame.fromJson(event.parameters['frame']));
+      .map((Event event) =>
+          FrameInformation.fromJson(event.parameters['frame']));
 
   Stream get onFrameResized =>
       _client.onEvent.where((Event event) => event.name == 'Page.frameResized');
@@ -1234,7 +1235,7 @@ class FrameId {
 }
 
 /// Information about the Frame on the page.
-class Frame {
+class FrameInformation {
   /// Frame unique identifier.
   final String id;
 
@@ -1259,7 +1260,7 @@ class Frame {
   /// If the frame failed to load, this contains the URL that could not be loaded.
   final String unreachableUrl;
 
-  Frame(
+  FrameInformation(
       {@required this.id,
       this.parentId,
       @required this.loaderId,
@@ -1269,8 +1270,8 @@ class Frame {
       @required this.mimeType,
       this.unreachableUrl});
 
-  factory Frame.fromJson(Map<String, dynamic> json) {
-    return Frame(
+  factory FrameInformation.fromJson(Map<String, dynamic> json) {
+    return FrameInformation(
       id: json['id'],
       parentId: json.containsKey('parentId') ? json['parentId'] : null,
       loaderId: network.LoaderId.fromJson(json['loaderId']),
@@ -1375,7 +1376,7 @@ class FrameResource {
 /// Information about the Frame hierarchy along with their cached resources.
 class FrameResourceTree {
   /// Frame information for this tree item.
-  final Frame frame;
+  final FrameInformation frame;
 
   /// Child frames.
   final List<FrameResourceTree> childFrames;
@@ -1388,7 +1389,7 @@ class FrameResourceTree {
 
   factory FrameResourceTree.fromJson(Map<String, dynamic> json) {
     return FrameResourceTree(
-      frame: Frame.fromJson(json['frame']),
+      frame: FrameInformation.fromJson(json['frame']),
       childFrames: json.containsKey('childFrames')
           ? (json['childFrames'] as List)
               .map((e) => FrameResourceTree.fromJson(e))
@@ -1415,7 +1416,7 @@ class FrameResourceTree {
 /// Information about the Frame hierarchy.
 class FrameTree {
   /// Frame information for this tree item.
-  final Frame frame;
+  final FrameInformation frame;
 
   /// Child frames.
   final List<FrameTree> childFrames;
@@ -1424,7 +1425,7 @@ class FrameTree {
 
   factory FrameTree.fromJson(Map<String, dynamic> json) {
     return FrameTree(
-      frame: Frame.fromJson(json['frame']),
+      frame: FrameInformation.fromJson(json['frame']),
       childFrames: json.containsKey('childFrames')
           ? (json['childFrames'] as List)
               .map((e) => FrameTree.fromJson(e))
