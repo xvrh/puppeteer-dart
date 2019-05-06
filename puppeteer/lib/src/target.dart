@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:meta/meta.dart';
-import '../protocol/target.dart';
+import 'package:chrome_dev_tools/target.dart';
 import 'browser.dart';
 import 'connection.dart';
 import 'page/page.dart';

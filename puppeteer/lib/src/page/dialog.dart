@@ -1,7 +1,7 @@
-import '../../protocol/page.dart';
+import 'package:chrome_dev_tools/page.dart';
 import 'page.dart';
 
-export '../../protocol/page.dart' show DialogType;
+export 'package:chrome_dev_tools/page.dart' show DialogType;
 
 /// Dialog objects are dispatched by page via the 'onDialog' event.
 ///

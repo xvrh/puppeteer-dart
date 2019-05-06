@@ -1,4 +1,4 @@
-import '../../protocol/runtime.dart';
+import 'package:chrome_dev_tools/runtime.dart';
 import '../connection.dart';
 
 class Worker {

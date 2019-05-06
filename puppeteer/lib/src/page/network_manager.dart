@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
-import '../../protocol/dev_tools.dart';
-import '../../protocol/fetch.dart';
-import '../../protocol/fetch.dart' as fetch;
-import '../../protocol/network.dart';
-import '../../protocol/network.dart' as network;
+import 'package:chrome_dev_tools/dev_tools.dart';
+import 'package:chrome_dev_tools/fetch.dart';
+import 'package:chrome_dev_tools/fetch.dart' as fetch;
+import 'package:chrome_dev_tools/network.dart';
+import 'package:chrome_dev_tools/network.dart' as network;
 import '../connection.dart';
 import 'frame_manager.dart';
 

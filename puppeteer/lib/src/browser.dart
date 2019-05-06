@@ -3,15 +3,15 @@ import 'dart:io';
 import 'package:async/async.dart';
 import 'package:meta/meta.dart';
 import 'package:pool/pool.dart';
-import '../protocol/browser.dart';
-import '../protocol/system_info.dart';
-import '../protocol/target.dart';
+import 'package:chrome_dev_tools/browser.dart';
+import 'package:chrome_dev_tools/system_info.dart';
+import 'package:chrome_dev_tools/target.dart';
 import 'connection.dart';
 import 'page/emulation_manager.dart';
 import 'page/page.dart';
 import 'target.dart';
 
-export '../protocol/browser.dart' show PermissionType;
+export 'package:chrome_dev_tools/browser.dart' show PermissionType;
 
 /// A Browser is created when Puppeteer connects to a Chromium instance, either
 /// through puppeteer.launch or puppeteer.connect.

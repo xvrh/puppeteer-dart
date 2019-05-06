@@ -1,6 +1,7 @@
 export 'dart:math' show Point, Rectangle;
-export 'protocol/dom.dart' show BoxModel;
-export 'protocol/network.dart' show CookieParam;
+export 'package:chrome_dev_tools/dom.dart' show BoxModel;
+export 'package:chrome_dev_tools/network.dart'
+    show CookieParam, ResourceType, ErrorReason;
 export 'src/browser.dart' show Browser, BrowserContext, PermissionType;
 export 'src/connection.dart' show ServerException;
 export 'src/connection.dart' show TargetClosedException;

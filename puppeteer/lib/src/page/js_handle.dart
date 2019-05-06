@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:math';
-import '../../protocol/dom.dart';
-import '../../protocol/runtime.dart';
+import 'package:chrome_dev_tools/dom.dart';
+import 'package:chrome_dev_tools/runtime.dart';
 import '../connection.dart';
 import 'execution_context.dart';
 import 'frame_manager.dart';
@@ -10,7 +10,7 @@ import 'keyboard.dart';
 import 'mouse.dart';
 import 'page.dart';
 
-export '../../protocol/dom.dart' show BoxModel;
+export 'package:chrome_dev_tools/dom.dart' show BoxModel;
 
 /// JSHandle represents an in-page JavaScript object. JSHandles can be created
 /// with the [page.evaluateHandle] method.

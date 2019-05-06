@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
-import '../../protocol/network.dart';
-import '../../protocol/page.dart';
-import '../../protocol/runtime.dart';
+import 'package:chrome_dev_tools/network.dart';
+import 'package:chrome_dev_tools/page.dart';
+import 'package:chrome_dev_tools/runtime.dart';
 import '../connection.dart';
 import 'dom_world.dart';
 import 'execution_context.dart';

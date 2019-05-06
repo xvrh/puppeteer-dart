@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
-import '../../protocol/dev_tools.dart';
-import '../../protocol/emulation.dart';
+import 'package:chrome_dev_tools/chrome_dev_tools.dart' show DevTools;
+import 'package:chrome_dev_tools/emulation.dart';
 
 class Device {
   final String name;

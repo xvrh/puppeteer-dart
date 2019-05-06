@@ -1,5 +1,5 @@
 import 'dart:convert';
-import '../../protocol/runtime.dart';
+import 'package:chrome_dev_tools/runtime.dart';
 import '../javascript_function_parser.dart';
 
 String evaluationString(String function, List args) {

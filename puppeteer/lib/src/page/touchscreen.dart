@@ -1,6 +1,6 @@
 import 'dart:math';
-import '../../protocol/input.dart';
-import '../../protocol/runtime.dart';
+import 'package:chrome_dev_tools/input.dart';
+import 'package:chrome_dev_tools/runtime.dart';
 import 'keyboard.dart';
 
 /// [Touchscreen] provides an api for dispatching touch events.

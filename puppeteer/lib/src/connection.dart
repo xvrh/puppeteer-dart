@@ -3,27 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
-import '../protocol/target.dart';
+import 'package:chrome_dev_tools/target.dart';
+import 'package:chrome_dev_tools/chrome_dev_tools.dart';
 
-abstract class Client {
-  Future<Map> send(String method, [Map parameters]);
-
-  Stream<Event> get onEvent;
-}
-
-class Event {
-  final String name;
-  final Map parameters;
-
-  Event._(this.name, this.parameters);
-}
-
-/// An annotation to tag some API parameters with the accepted values.
-/// This is purely for documentation purpose until Dart support something like
-/// "String Literal Types" from TypeScript.
-class Enum {
-  const Enum(List<String> values);
-}
+export 'package:chrome_dev_tools/chrome_dev_tools.dart' show Client;
 
 class Connection implements Client {
   final Logger _logger = Logger('connection');
@@ -132,7 +115,7 @@ class Connection implements Client {
 
       _logger.fine('◀ EVENT $message');
 
-      _eventController.add(Event._(method, params));
+      _eventController.add(Event(method, params));
     }
   }
 
@@ -210,7 +193,7 @@ class Session implements Client {
         message.completer.complete(object['result']);
       }
     } else {
-      _eventController.add(Event._(object['method'], object['params']));
+      _eventController.add(Event(object['method'], object['params']));
     }
   }
 

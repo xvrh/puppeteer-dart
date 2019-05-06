@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:meta/meta.dart';
-import '../../protocol/input.dart';
+import 'package:chrome_dev_tools/input.dart';
 
 /// Keyboard provides an api for managing a virtual keyboard. The high level api
 /// is [Keyboard.type], which takes raw characters and generates proper keydown,

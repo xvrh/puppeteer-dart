@@ -1,5 +1,5 @@
 import 'dart:math';
-import '../../protocol/input.dart';
+import 'package:chrome_dev_tools/input.dart';
 import 'keyboard.dart';
 
 class MouseButton {

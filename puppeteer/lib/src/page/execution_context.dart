@@ -1,7 +1,7 @@
 import 'dart:async';
-import '../../protocol/dom.dart';
-import '../../protocol/page.dart';
-import '../../protocol/runtime.dart';
+import 'package:chrome_dev_tools/dom.dart';
+import 'package:chrome_dev_tools/page.dart';
+import 'package:chrome_dev_tools/runtime.dart';
 import '../connection.dart';
 import '../javascript_function_parser.dart';
 import 'dom_world.dart';
