@@ -489,8 +489,6 @@ main() {
       expect(response, isNotNull);
     });
     group('evaluate', () {
-      frame = page.mainFrame;
-
       test(0, () async {
         int result = await frame.evaluate('''x => {
           return Promise.resolve(8 * x);

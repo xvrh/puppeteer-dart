@@ -264,6 +264,7 @@ main() {
       expect(await frame.evaluate('() => window.result'), equals('Clicked'));
     }, skip: true);
     test('should click the button with deviceScaleFactor set', () async {
+      await page.goto(server.emptyPage);
       await page.setViewport(
           DeviceViewport(width: 400, height: 400, deviceScaleFactor: 5));
       expect(await page.evaluate('() => window.devicePixelRatio'), equals(5));
