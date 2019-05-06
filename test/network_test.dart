@@ -197,7 +197,7 @@ main() {
   group('Response.text', () {
     test('should work', () async {
       var response = await page.goto(server.prefix + '/simple.json');
-      expect(await response.text, equals('{"foo": "bar"}\n'));
+      expect(await response.text, startsWith('{"foo": "bar"}'));
     });
     test('should return uncompressed text', () async {
       //TODO(xha): add feature to server and enable test
