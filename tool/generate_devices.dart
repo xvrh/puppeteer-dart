@@ -17,10 +17,11 @@ main() async {
   var module = Module.fromJson(jsonDecode(content));
 
   var buffer = StringBuffer();
+  buffer.writeln("import 'dart:collection';");
   buffer.writeln("import 'package:collection/collection.dart';");
   buffer.writeln(
       "import 'page/emulation_manager.dart' show Device, DeviceViewport;");
-  buffer.writeln('class Devices {');
+  buffer.writeln('class Devices with IterableMixin<Device> {');
   var allNames = <String, String>{};
   for (var emulatedDevice
       in module.extensions.where((e) => e.type == 'emulated-device')) {
@@ -57,10 +58,14 @@ main() async {
   buffer.writeln('Devices._() {');
   buffer.writeln(
       '_all = CanonicalizedMap<String, String, Device>.from({$allNamesMap}, '
-      '(key) => key.toLowerCase(), isValidKey: (key) => key != null);');
+      "(key) => key.replaceAll(' ', '').toLowerCase(), isValidKey: (key) => key != null);");
   buffer.writeln('}');
   buffer.writeln();
   buffer.writeln('Device operator[](String name) => _all[name];');
+  buffer.writeln();
+  buffer.writeln('@override');
+  buffer.writeln('Iterator<Device> get iterator => _all.values.iterator;');
+  buffer.writeln();
   buffer.writeln('}');
   buffer.writeln('final devices = Devices._();');
   File('lib/src/devices.dart')

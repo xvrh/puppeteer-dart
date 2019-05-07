@@ -28,6 +28,20 @@ main() {
     await context.close();
     page = null;
   });
+  test('Can find key', () {
+    expect(Key.allKeys['Meta'], equals(Key.meta));
+    expect(Key.allKeys['meta'], equals(Key.meta));
+    expect(Key.allKeys[' meta '], equals(Key.meta));
+    expect(Key.allKeys['Control'], equals(Key.control));
+    expect(Key.allKeys['notexist'], isNull);
+    expect(Key.allKeys[''], isNull);
+    expect(Key.allKeys[null], isNull);
+
+    for (var key in Key.allKeys.values) {
+      expect(key.toString(), isNotNull);
+    }
+  });
+
   test('Can type into a textarea', () async {
     await page.goto(server.emptyPage);
     await page.evaluate(
