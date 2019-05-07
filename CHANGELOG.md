@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.0 (2019-05-07)
+- Rename classes `Frame`, `Request` & `Response` to match the puppeteer API
+- Add Worker class
+- Add more test for the network API
+
 ## 1.4.0 (2019-05-04)
 - Add more unit tests and more documentation
 - Fix bugs in request interception
