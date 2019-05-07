@@ -14,12 +14,12 @@ final classesOrder = [
   'Touchscreen',
   'Dialog',
   'ConsoleMessage',
-  'PageFrame',
+  'Frame',
   'ExecutionContext',
   'JsHandle',
   'ElementHandle',
-  'NetworkRequest',
-  'NetworkResponse',
+  'Request',
+  'Response',
 ];
 
 main() {

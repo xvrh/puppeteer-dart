@@ -118,7 +118,7 @@ main() {
     });
     test('should work right after framenavigated', () async {
       var frameEvaluation;
-      page.onFrameNavigated.listen((PageFrame frame) {
+      page.onFrameNavigated.listen((Frame frame) {
         frameEvaluation = frame.evaluate('() => 6 * 7');
       });
       await page.goto(server.emptyPage);

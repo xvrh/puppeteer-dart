@@ -61,7 +61,7 @@ final _logger = Logger('puppeteer.page');
 ///
 /// To unsubscribe from events use the [StreamSubscription.cancel] method:
 /// ```dart
-/// logRequest(NetworkRequest interceptedRequest) {
+/// logRequest(Request interceptedRequest) {
 ///   print('A request was made: ${interceptedRequest.url}');
 /// }
 ///
@@ -217,27 +217,26 @@ class Page {
   Stream get onPageCrashed => devTools.inspector.onTargetCrashed;
 
   /// Emitted when a frame is attached.
-  Stream<PageFrame> get onFrameAttached => _frameManager.onFrameAttached;
+  Stream<Frame> get onFrameAttached => _frameManager.onFrameAttached;
 
   /// Emitted when a frame is detached.
-  Stream<PageFrame> get onFrameDetached => _frameManager.onFrameDetached;
+  Stream<Frame> get onFrameDetached => _frameManager.onFrameDetached;
 
   /// Emitted when a frame is navigated to a new url.
-  Stream<PageFrame> get onFrameNavigated => _frameManager.onFrameNavigated;
+  Stream<Frame> get onFrameNavigated => _frameManager.onFrameNavigated;
 
   /// Emitted when a page issues a request.
   /// In order to intercept and mutate requests, see [Page.setRequestInterception].
-  Stream<NetworkRequest> get onRequest => _networkManager.onRequest;
+  Stream<Request> get onRequest => _networkManager.onRequest;
 
   /// Emitted when a [response] is received.
-  Stream<NetworkResponse> get onResponse => _networkManager.onResponse;
+  Stream<Response> get onResponse => _networkManager.onResponse;
 
   /// Emitted when a request fails, for example by timing out.
-  Stream<NetworkRequest> get onRequestFailed => _networkManager.onRequestFailed;
+  Stream<Request> get onRequestFailed => _networkManager.onRequestFailed;
 
   /// Emitted when a request finishes successfully.
-  Stream<NetworkRequest> get onRequestFinished =>
-      _networkManager.onRequestFinished;
+  Stream<Request> get onRequestFinished => _networkManager.onRequestFinished;
 
   /// Emitted when the page opens a new tab or window.
   /// ```dart
@@ -300,7 +299,7 @@ class Page {
   /// The page's main frame.
   ///
   /// Page is guaranteed to have a main frame which persists during navigations.
-  PageFrame get mainFrame => _frameManager.mainFrame;
+  Frame get mainFrame => _frameManager.mainFrame;
 
   Keyboard get keyboard => _keyboard;
 
@@ -309,7 +308,7 @@ class Page {
   Mouse get mouse => _mouse;
 
   /// An array of all frames attached to the page.
-  List<PageFrame> get frames => frameManager.frames;
+  List<Frame> get frames => frameManager.frames;
 
   /// This method returns all of the dedicated [WebWorkers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API)
   /// associated with the page.
@@ -706,11 +705,11 @@ function addPageBinding(bindingName) {
   ///   await page.exposeFunction(
   ///       'md5', (text) => crypto.md5.convert(utf8.encode(text)).toString());
   ///   await page.evaluate(r'''async () => {
-  ///           // use window.md5 to compute hashes
-  ///           const myString = 'PUPPETEER';
-  ///           const myHash = await window.md5(myString);
-  ///           console.log(`md5 of ${myString} is ${myHash}`);
-  ///         }''');
+  ///             // use window.md5 to compute hashes
+  ///             const myString = 'PUPPETEER';
+  ///             const myHash = await window.md5(myString);
+  ///             console.log(`md5 of ${myString} is ${myHash}`);
+  ///           }''');
   ///   await browser.close();
   /// }
   /// ```
@@ -729,10 +728,10 @@ function addPageBinding(bindingName) {
   ///     return File(path).readAsString();
   ///   });
   ///   await page.evaluate('''async () => {
-  ///           // use window.readfile to read contents of a file
-  ///           const content = await window.readfile('test/assets/simple.json');
-  ///           console.log(content);
-  ///         }''');
+  ///             // use window.readfile to read contents of a file
+  ///             const content = await window.readfile('test/assets/simple.json');
+  ///             console.log(content);
+  ///           }''');
   ///   await browser.close();
   /// }
   /// ```
@@ -891,7 +890,7 @@ function deliverError(name, seq, message, stack) {
   /// Returns: [Future] which resolves to the main resource response. In case
   /// of multiple redirects, the navigation will resolve with the response of
   /// the last redirect.
-  Future<NetworkResponse> goto(String url,
+  Future<Response> goto(String url,
       {String referrer, Duration timeout, Until wait}) {
     return _frameManager.mainFrame
         .goto(url, referrer: referrer, timeout: timeout, wait: wait);
@@ -919,7 +918,7 @@ function deliverError(name, seq, message, stack) {
   /// Returns: [Future] which resolves to the main resource response. In case
   /// of multiple redirects, the navigation will resolve with the response of
   /// the last redirect.
-  Future<NetworkResponse> reload({Duration timeout, Until wait}) async {
+  Future<Response> reload({Duration timeout, Until wait}) async {
     var responseFuture = waitForNavigation(timeout: timeout, wait: wait);
 
     await devTools.page.reload();
@@ -966,7 +965,7 @@ function deliverError(name, seq, message, stack) {
   /// the last redirect.
   /// In case of navigation to a different anchor or navigation due to History
   /// API usage, the navigation will resolve with `null`.
-  Future<NetworkResponse> waitForNavigation({Duration timeout, Until wait}) {
+  Future<Response> waitForNavigation({Duration timeout, Until wait}) {
     return _frameManager.mainFrame
         .waitForNavigation(timeout: timeout, wait: wait);
   }
@@ -987,7 +986,7 @@ function deliverError(name, seq, message, stack) {
   /// await page.goto('https://example.com');
   /// await Future.wait([firstRequest, finalRequest]);
   /// ```
-  Future<NetworkRequest> waitForRequest(String url, {Duration timeout}) async {
+  Future<Request> waitForRequest(String url, {Duration timeout}) async {
     timeout ??= defaultTimeout;
 
     return onRequest
@@ -997,7 +996,7 @@ function deliverError(name, seq, message, stack) {
         .timeout(timeout);
   }
 
-  Future<NetworkResponse> waitForResponse(String url, {Duration timeout}) {
+  Future<Response> waitForResponse(String url, {Duration timeout}) {
     timeout ??= defaultTimeout;
 
     return frameManager.networkManager.onResponse
@@ -1026,10 +1025,10 @@ function deliverError(name, seq, message, stack) {
   ///   - [Until.networkAlmostIdle] - consider navigation to be finished when
   ///     there are no more than 2 network connections for at least `500` ms.
   ///
-  /// Returns: [Future<NetworkResponse>] which resolves to the main resource
+  /// Returns: [Future<Response>] which resolves to the main resource
   /// response. In case of multiple redirects, the navigation will resolve with
   /// the response of the last redirect. If can not go back, resolves to `null`.
-  Future<NetworkResponse> goBack({Duration timeout, Until wait}) {
+  Future<Response> goBack({Duration timeout, Until wait}) {
     return _go(-1, timeout: timeout, wait: wait);
   }
 
@@ -1052,14 +1051,14 @@ function deliverError(name, seq, message, stack) {
   ///   - [Until.networkAlmostIdle] - consider navigation to be finished when
   ///     there are no more than 2 network connections for at least `500` ms.
   ///
-  /// Returns: [Future<NetworkResponse>] which resolves to the main resource
+  /// Returns: [Future<Response>] which resolves to the main resource
   /// response. In case of multiple redirects, the navigation will resolve with
   /// the response of the last redirect. If can not go back, resolves to `null`.
-  Future<NetworkResponse> goForward({Duration timeout, Until wait}) {
+  Future<Response> goForward({Duration timeout, Until wait}) {
     return _go(1, timeout: timeout, wait: wait);
   }
 
-  Future<NetworkResponse> _go(int delta, {Duration timeout, Until wait}) async {
+  Future<Response> _go(int delta, {Duration timeout, Until wait}) async {
     var history = await devTools.page.getNavigationHistory();
     int index = history.currentIndex + delta;
     if (index < 0 || index >= history.entries.length) {
@@ -1165,8 +1164,8 @@ function deliverError(name, seq, message, stack) {
   /// Passing arguments to `pageFunction`:
   /// ```dart
   /// int result = await page.evaluate('''x => {
-  ///         return Promise.resolve(8 * x);
-  ///       }''', args: [7]);
+  ///           return Promise.resolve(8 * x);
+  ///         }''', args: [7]);
   /// print(result); // prints "56"
   /// ```
   ///
@@ -1475,7 +1474,7 @@ function deliverError(name, seq, message, stack) {
   /// var response = await responseFuture;
   /// ```
   ///
-  /// Or simpler, if you don't need the [NetworkResponse]
+  /// Or simpler, if you don't need the [Response]
   /// ```dart
   /// await Future.wait([
   ///   page.waitForNavigation(),

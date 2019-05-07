@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:puppeteer/puppeteer.dart';
+import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
@@ -59,12 +60,12 @@ main() {
     });
     test('should work with subframes return 204', () async {
       server.setRoute('/frames/frame.html', (req) {
-        return Response(204);
+        return shelf.Response(204);
       });
       await page.goto(server.prefix + '/frames/one-frame.html');
     });
     test('should fail when server returns 204', () async {
-      server.setRoute('/204.html', (req) => Response(204));
+      server.setRoute('/204.html', (req) => shelf.Response(204));
       expect(() => page.goto(server.assetUrl('204.html')),
           throwsA(predicate((e) => '$e'.contains('net::ERR_ABORTED'))));
     });
@@ -120,7 +121,7 @@ main() {
     test('should fail when exceeding maximum navigation timeout', () async {
       // Hang for request to the infinite.html
       server.setRoute(
-          '/infinite.html', (request) => Completer<Response>().future);
+          '/infinite.html', (request) => Completer<shelf.Response>().future);
       expect(
           () => page.goto(server.prefix + '/infinite.html',
               timeout: Duration(milliseconds: 1)),
@@ -130,7 +131,7 @@ main() {
         () async {
       // Hang for request to the infinite.html
       server.setRoute(
-          '/infinite.html', (request) => Completer<Response>().future);
+          '/infinite.html', (request) => Completer<shelf.Response>().future);
       page.defaultNavigationTimeout = Duration(milliseconds: 1);
       expect(() => page.goto(server.prefix + '/infinite.html'),
           throwsA(TypeMatcher<TimeoutException>()));
@@ -138,7 +139,7 @@ main() {
     test('should fail when exceeding default maximum timeout', () async {
       // Hang for request to the infinite.html
       server.setRoute(
-          '/infinite.html', (request) => Completer<Response>().future);
+          '/infinite.html', (request) => Completer<shelf.Response>().future);
       page.defaultTimeout = Duration(milliseconds: 1);
       expect(() => page.goto(server.prefix + '/infinite.html'),
           throwsA(TypeMatcher<TimeoutException>()));
@@ -147,7 +148,7 @@ main() {
         () async {
       // Hang for request to the infinite.html
       server.setRoute(
-          '/infinite.html', (request) => Completer<Response>().future);
+          '/infinite.html', (request) => Completer<shelf.Response>().future);
       page.defaultTimeout = Duration.zero;
       page.defaultTimeout = Duration(milliseconds: 1);
       expect(() => page.goto(server.prefix + '/infinite.html'),
@@ -184,9 +185,9 @@ main() {
       expect(response.url, equals(server.emptyPage));
     });
     test('should wait for network idle to succeed navigation', () async {
-      var responses = <Completer<Response>>[];
-      Future<Response> addResponse() {
-        var response = Completer<Response>();
+      var responses = <Completer<shelf.Response>>[];
+      Future<shelf.Response> addResponse() {
+        var response = Completer<shelf.Response>();
         responses.add(response);
         return response.future;
       }
@@ -233,7 +234,7 @@ main() {
 
       // Respond to initial requests.
       for (var response in responses) {
-        response.complete(Response.notFound('File not found'));
+        response.complete(shelf.Response.notFound('File not found'));
       }
 
       // Reset responses array
@@ -246,7 +247,7 @@ main() {
 
       // Respond to requests.
       for (var response in responses) {
-        response.complete(Response.notFound('File not found'));
+        response.complete(shelf.Response.notFound('File not found'));
       }
 
       var response = await navigationPromise;
@@ -263,7 +264,7 @@ main() {
       //TODO(xha): implement, the test uses a warning listener on the process
     });
     test('should navigate to dataURL and fire dataURL requests', () async {
-      var requests = <NetworkRequest>[];
+      var requests = <Request>[];
       page.onRequest.listen((request) {
         if (!request.url.contains('favicon.ico')) {
           requests.add(request);
@@ -327,9 +328,9 @@ main() {
       expect(response.url, contains('grid.html'));
     });
     test('should work with both domcontentloaded and load', () async {
-      Completer<Response> response;
+      Completer<shelf.Response> response;
       server.setRoute('/one-style.css', (req) {
-        response = Completer<Response>();
+        response = Completer<shelf.Response>();
         return response.future;
       });
       var navigationPromise = page.goto(server.prefix + '/one-style.html');
@@ -345,7 +346,7 @@ main() {
       await server.waitForRequest('/one-style.css');
       await domContentLoadedPromise;
       expect(bothFired, isFalse);
-      response.complete(Response.ok(''));
+      response.complete(shelf.Response.ok(''));
       await bothFiredPromise;
       await navigationPromise;
     });
@@ -412,9 +413,9 @@ main() {
     });
     test('should work when subframe issues window.stop()', () async {
       server.setRoute(
-          '/frames/style.css', (req) => Completer<Response>().future);
+          '/frames/style.css', (req) => Completer<shelf.Response>().future);
 
-      PageFrame frame;
+      Frame frame;
       // ignore: unawaited_futures
       var frameAttachedFuture = page.onFrameAttached.first.then((f) {
         frame = f;
@@ -474,7 +475,8 @@ main() {
     test('should reject when frame detaches', () async {
       await page.goto(server.prefix + '/frames/one-frame.html');
 
-      server.setRoute('/empty.html', (req) => Completer<Response>().future);
+      server.setRoute(
+          '/empty.html', (req) => Completer<shelf.Response>().future);
       var error;
       var navigationPromise =
           page.frames[1].goto(server.emptyPage).catchError((e) {
@@ -500,15 +502,15 @@ main() {
         attachFrame(page, 'frame3', server.emptyPage),
       ]);
       // Navigate all frames to the same URL.
-      var serverResponses = <Completer<Response>>[];
-      Future<Response> addResponse() {
-        var response = Completer<Response>();
+      var serverResponses = <Completer<shelf.Response>>[];
+      Future<shelf.Response> addResponse() {
+        var response = Completer<shelf.Response>();
         serverResponses.add(response);
         return response.future;
       }
 
       server.setRoute('/one-style.html', (req) => addResponse());
-      var navigations = <Future<NetworkResponse>>[];
+      var navigations = <Future<Response>>[];
       for (var i = 0; i < 3; ++i) {
         navigations.add(frames[i].goto(server.prefix + '/one-style.html'));
         await server.waitForRequest('/one-style.html');
@@ -516,7 +518,7 @@ main() {
       // Respond from server out-of-order.
       var serverResponseTexts = ['AAA', 'BBB', 'CCC'];
       for (var i in [1, 2, 0]) {
-        serverResponses[i].complete(Response.ok(serverResponseTexts[i]));
+        serverResponses[i].complete(shelf.Response.ok(serverResponseTexts[i]));
         var response = await navigations[i];
         expect(response.frame, equals(frames[i]));
         expect(await response.text, equals(serverResponseTexts[i]));
@@ -542,7 +544,7 @@ main() {
       var frame = page.frames[1];
 
       server.setRoute(
-          '/empty-for-frame.html', (req) => Completer<Response>().future);
+          '/empty-for-frame.html', (req) => Completer<shelf.Response>().future);
       var error;
       var navigationPromise = frame.waitForNavigation().catchError((e) {
         error = e;

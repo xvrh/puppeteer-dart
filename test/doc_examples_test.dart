@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:puppeteer/puppeteer.dart';
+import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
@@ -12,7 +13,7 @@ main() {
   Server server;
   Browser browser;
   Page page;
-  PageFrame frame;
+  Frame frame;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
@@ -40,7 +41,7 @@ main() {
       main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
-        await page.goto(server.hostUrl);
+        await page.goto(exampleValue(server.hostUrl, 'https://example.com'));
         await browser.close();
       }
       //---
@@ -56,7 +57,7 @@ main() {
         // Create a new page in a pristine context.
         var page = await context.newPage();
         // Do stuff
-        await page.goto(server.hostUrl);
+        await page.goto(exampleValue(server.hostUrl, 'https://example.com'));
         await browser.close();
       }
       //---
@@ -65,12 +66,14 @@ main() {
     });
     test('waitForTarget', () async {
       //---
-      var newWindowTarget =
-          browser.waitForTarget((target) => target.url == '${server.hostUrl}/');
-      await page.evaluate("() => window.open('${server.hostUrl}/')");
+      var newWindowTarget = browser.waitForTarget((target) =>
+          target.url ==
+          exampleValue('${server.hostUrl}/', 'https://example.com/'));
+      await page.evaluate(
+          "() => window.open('${exampleValue(server.hostUrl, 'https://example.com')}/')");
       await newWindowTarget;
       //---
-      newWindowTarget.toString();
+      expect(newWindowTarget, isNotNull);
     });
   });
   group('BrowserContext', () {
@@ -81,8 +84,9 @@ main() {
     });
     test('clearPermissionOverrides', () async {
       var context = browser.defaultBrowserContext;
-      await context
-          .overridePermissions(server.hostUrl, [PermissionType.clipboardRead]);
+      await context.overridePermissions(
+          exampleValue(server.hostUrl, 'https://example.com'),
+          [PermissionType.clipboardRead]);
       // do stuff ..
       await context.clearPermissionOverrides();
     });
@@ -111,8 +115,9 @@ main() {
         main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
-          await page.goto(server.hostUrl);
-          await File('_screenshot.png').writeAsBytes(await page.screenshot());
+          await page.goto(exampleValue(server.hostUrl, 'https://example.com'));
+          await File(exampleValue('_screenshot.png', 'screenshot.png'))
+              .writeAsBytes(await page.screenshot());
           await browser.close();
         }
 
@@ -123,7 +128,7 @@ main() {
         page.onLoad.listen((_) => print('Page loaded!'));
       });
       test(2, () async {
-        logRequest(NetworkRequest interceptedRequest) {
+        logRequest(Request interceptedRequest) {
           print('A request was made: ${interceptedRequest.url}');
         }
 
@@ -147,22 +152,23 @@ main() {
         await page.click('a[target=_blank]');
         Page popup = await popupFuture;
         //----
-        popup.toString();
+        expect(popup, isNotNull);
       });
       test(1, () async {
         //----
         var popupFuture = page.onPopup.first;
-        await page.evaluate("() => window.open('${server.hostUrl}')");
+        await page.evaluate(
+            "() => window.open('${exampleValue(server.hostUrl, 'https://example.com')}')");
         Page popup = await popupFuture;
         //----
-        popup.toString();
+        expect(popup, isNotNull);
       });
     });
     test('SSeval', () async {
       //---
       var divsCounts = await page.$$eval('div', 'divs => divs.length');
       //---
-      print(divsCounts);
+      expect(divsCounts, greaterThan(0));
     });
     test('Seval', () async {
       //---
@@ -173,9 +179,9 @@ main() {
       var html = await page.$eval(
           '.main-container', 'function (e) { return e.outerHTML; }');
       //---
-      searchValue.toString();
-      preloadHref.toString();
-      html.toString();
+      expect(searchValue, isNotNull);
+      expect(preloadHref, isNotNull);
+      expect(html, isNotNull);
     });
     group('click', () {
       test(0, () async {
@@ -199,7 +205,8 @@ main() {
       var browser = await puppeteer.launch();
       var page = await browser.newPage();
       await page.emulate(iPhone);
-      await page.goto(server.docExamplesUrl);
+      await page.goto(exampleValue(
+          server.assetUrl('doc_examples.html'), 'https://example.com'));
       // other actions...
       await browser.close();
     });
@@ -229,7 +236,7 @@ main() {
         // Get an handle for the 'document'
         var aHandle = await page.evaluateHandle('document');
         //----
-        aHandle.toString();
+        expect(aHandle, isNotNull);
       });
       test(1, () async {
         var aHandle = await page.evaluateHandle('() => document.body');
@@ -296,7 +303,7 @@ main() {
       // Generates a PDF with 'screen' media type.
       await page.emulateMedia('screen');
       var pdfBytes = await page.pdf();
-      await File('_page.pdf').writeAsBytes(pdfBytes);
+      await File(exampleValue('_page.pdf', 'page.pdf')).writeAsBytes(pdfBytes);
     });
     test('queryObjects', () async {
       // There is a bug currently with queryObjects if the page has navigated
@@ -344,7 +351,7 @@ main() {
           interceptedRequest.continueRequest();
         }
       });
-      await page.goto(server.hostUrl);
+      await page.goto(exampleValue(server.hostUrl, 'https://example.com'));
       await browser.close();
     });
     test('type', () async {
@@ -389,17 +396,20 @@ main() {
     });
     test('waitForRequest', () async {
       //---
-      var firstRequest = page.waitForRequest(server.hostUrl);
+      var firstRequest = page
+          .waitForRequest(exampleValue(server.hostUrl, 'https://example.com'));
 
       // You can achieve the same effect (and more powerful) with the `onRequest`
       // stream.
       var finalRequest = page.onRequest
           .where((request) =>
-              request.url.startsWith(server.hostUrl) && request.method == 'GET')
+              request.url.startsWith(
+                  exampleValue(server.hostUrl, 'https://example.com')) &&
+              request.method == 'GET')
           .first
           .timeout(Duration(seconds: 30));
 
-      await page.goto(server.hostUrl);
+      await page.goto(exampleValue(server.hostUrl, 'https://example.com'));
       await Future.wait([firstRequest, finalRequest]);
       //----
     });
@@ -411,7 +421,8 @@ main() {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.waitForSelector('img');
-        await page.goto(server.docExamples2Url);
+        await page.goto(exampleValue(
+            server.assetUrl('doc_examples_2.html'), 'https://example.com'));
         var image = await watchImg;
         print(await image.propertyValue('src'));
         await browser.close();
@@ -428,7 +439,8 @@ main() {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.waitForXPath('//img');
-        await page.goto(server.docExamples2Url);
+        await page.goto(exampleValue(
+            server.assetUrl('doc_examples_2.html'), 'https://example.com'));
         var image = await watchImg;
         print(await image.propertyValue('src'));
         await browser.close();
@@ -438,10 +450,10 @@ main() {
       await main();
     });
   });
-  group('PageFrame', () {
+  group('Frame', () {
     group('class', () {
       test(0, () async {
-        dumpFrameTree(PageFrame frame, String indent) {
+        dumpFrameTree(Frame frame, String indent) {
           print(indent + frame.url);
           for (var child in frame.childFrames) {
             dumpFrameTree(child, indent + '  ');
@@ -450,7 +462,7 @@ main() {
 
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
-        await page.goto(server.hostUrl);
+        await page.goto(exampleValue(server.hostUrl, 'https://example.com'));
         dumpFrameTree(page.mainFrame, '');
         await browser.close();
       });
@@ -469,15 +481,15 @@ main() {
       var html = await frame.$eval(
           '.main-container', 'function (e) { return e.outerHTML; }');
       //---
-      searchValue.toString();
-      preloadHref.toString();
-      html.toString();
+      expect(searchValue, isNotNull);
+      expect(preloadHref, isNotNull);
+      expect(html, isNotNull);
     });
     test('SSeval', () async {
       //---
       var divsCounts = await frame.$$eval('div', 'divs => divs.length');
       //---
-      print(divsCounts);
+      expect(divsCounts, greaterThan(0));
     });
     test('click', () async {
       var frame = page.mainFrame;
@@ -514,7 +526,7 @@ main() {
         // Get an handle for the 'document'
         var aHandle = await frame.evaluateHandle('document');
         //----
-        aHandle.toString();
+        expect(aHandle, isNotNull);
       });
       test(1, () async {
         var aHandle = await frame.evaluateHandle('() => document.body');
@@ -570,7 +582,8 @@ main() {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.mainFrame.waitForSelector('img');
-        await page.goto(server.docExamples2Url);
+        await page.goto(exampleValue(
+            server.assetUrl('doc_examples_2.html'), 'https://example.com'));
         var image = await watchImg;
         print(await image.propertyValue('src'));
         await browser.close();
@@ -587,7 +600,8 @@ main() {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.mainFrame.waitForXPath('//img');
-        await page.goto(server.docExamples2Url);
+        await page.goto(exampleValue(
+            server.assetUrl('doc_examples_2.html'), 'https://example.com'));
         var image = await watchImg;
         print(await image.propertyValue('src'));
         await browser.close();
@@ -729,7 +743,8 @@ main() {
         var browser = await puppeteer.launch();
 
         var page = await browser.newPage();
-        await page.goto(server.docExamplesUrl);
+        await page.goto(exampleValue(
+            server.assetUrl('doc_examples.html'), 'https://example.com'));
         var hrefElement = await page.$('a');
         await hrefElement.click();
 
@@ -741,7 +756,7 @@ main() {
     });
     test('SSeval', () async {
       server.setRoute('feed.html', (request) {
-        return Response(404, body: '''
+        return shelf.Response(404, body: '''
 <div class="feed">
   <div class="tweet">Hello!</div>
   <div class="tweet">Hi!</div>
@@ -759,7 +774,7 @@ main() {
     });
     test('Seval', () async {
       server.setRoute('feed.html', (request) {
-        return Response(404, body: '''
+        return shelf.Response(404, body: '''
 <div class="tweet">
   <div class="like">100</div>
   <div class="retweets">10</div>
@@ -793,7 +808,7 @@ main() {
       });
     });
   });
-  group('NetworkRequest', () {
+  group('Request', () {
     test('continueRequest', () async {
       //---
       await page.setRequestInterception(true);
@@ -815,20 +830,25 @@ main() {
     group('redirectChain', () {
       test(0, () async {
         server.setRoute('empty2.html', (request) {
-          return Response.found('empty.html');
+          return shelf.Response.found('empty.html');
         });
         server.setRoute('empty.html', (request) {
-          return Response.ok('');
+          return shelf.Response.ok('');
         });
         //---
-        var response = await page.goto(server.empty2Page);
+        var response = await page.goto(
+            exampleValue(server.assetUrl('empty2.html'), 'http://example.com'));
         var chain = response.request.redirectChain;
         expect(chain, hasLength(1));
-        expect(chain[0].url, equals(server.empty2Page));
+        expect(
+            chain[0].url,
+            equals(exampleValue(
+                server.assetUrl('empty2.html'), 'http://example.com')));
         //--
       });
       test(1, () async {
-        var response = await page.goto(server.docExamplesUrl);
+        var response = await page.goto(exampleValue(
+            server.assetUrl('doc_examples.html'), 'https://example.com'));
         var chain = response.request.redirectChain;
         expect(chain, isEmpty);
       });

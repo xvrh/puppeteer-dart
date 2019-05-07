@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
+import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
@@ -89,7 +90,7 @@ main() {
   group('Async stacks', () {
     test('should work', () async {
       server.setRoute('my-page', (request) {
-        return Response(204);
+        return shelf.Response(204);
       });
       Exception error;
       await page.goto(server.hostUrl + '/my-page').catchError((e, s) {
@@ -611,7 +612,7 @@ main() {
       // stall for image
       server.setRoute(imgPath, (req) {
         return Future.delayed(
-            Duration(seconds: 3000), () => Response.notFound(''));
+            Duration(seconds: 3000), () => shelf.Response.notFound(''));
       });
       expect(
           () => page.setContent(
@@ -633,7 +634,7 @@ main() {
     });
     test('should await resources to load', () async {
       var imgPath = 'img.png';
-      Completer<Response> imgResponse;
+      Completer<shelf.Response> imgResponse;
       server.setRoute(imgPath, (req) {
         imgResponse = Completer();
         return imgResponse.future;
@@ -646,7 +647,7 @@ main() {
       });
       await server.waitForRequest(imgPath);
       expect(loaded, isFalse);
-      imgResponse.complete(Response.found(''));
+      imgResponse.complete(shelf.Response.found(''));
       await contentPromise;
     });
     test('should work fast enough', () async {

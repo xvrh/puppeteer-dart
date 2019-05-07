@@ -40,7 +40,7 @@ class ExecutionContext {
   /// > **NOTE** Not every execution context is associated with a frame. For
   /// example, workers and extensions have execution contexts that are not
   /// associated with frames.
-  PageFrame get frame => world?.frame;
+  Frame get frame => world?.frame;
 
   /// If the function passed to the `executionContext.evaluate` returns a [Promise],
   /// then `executionContext.evaluate` would wait for the promise to resolve and

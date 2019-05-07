@@ -1,7 +1,8 @@
+import 'dart:collection';
 import 'package:collection/collection.dart';
 import 'page/emulation_manager.dart' show Device, DeviceViewport;
 
-class Devices {
+class Devices with IterableMixin<Device> {
   final iPhone4 = Device('iPhone 4',
       userAgent:
           'Mozilla/5.0 (iPhone; CPU iPhone OS 7_1_2 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Version/7.0 Mobile/11D257 Safari/9537.53',
@@ -863,10 +864,14 @@ class Devices {
       'Laptop with HiDPI screen Landscape': laptopWithHiDPIScreenLandscape,
       'Laptop with MDPI screen': laptopWithMDPIScreen,
       'Laptop with MDPI screen Landscape': laptopWithMDPIScreenLandscape
-    }, (key) => key.toLowerCase(), isValidKey: (key) => key != null);
+    }, (key) => key.replaceAll(' ', '').toLowerCase(),
+        isValidKey: (key) => key != null);
   }
 
   Device operator [](String name) => _all[name];
+
+  @override
+  Iterator<Device> get iterator => _all.values.iterator;
 }
 
 final devices = Devices._();

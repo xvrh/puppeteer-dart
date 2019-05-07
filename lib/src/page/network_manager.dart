@@ -16,7 +16,7 @@ final _logger = Logger('puppeteer.network_manager');
 class NetworkManager {
   final Client client;
   final FrameManager frameManager;
-  final _requestIdToRequest = <String, NetworkRequest>{};
+  final _requestIdToRequest = <String, Request>{};
   final _requestIdToRequestWillBeSentEvent = <String, RequestWillBeSentEvent>{};
   final _extraHTTPHeaders =
       CanonicalizedMap<String, String, String>((key) => key.toLowerCase());
@@ -27,11 +27,10 @@ class NetworkManager {
   bool _protocolRequestInterceptionEnabled = false;
   bool _userCacheDisabled = false;
   final _requestIdToInterceptionId = <String, String>{};
-  final _onRequestController = StreamController<NetworkRequest>.broadcast(),
-      _onRequestFinishedController =
-          StreamController<NetworkRequest>.broadcast(),
-      _onResponseController = StreamController<NetworkResponse>.broadcast(),
-      _onRequestFailedController = StreamController<NetworkRequest>.broadcast();
+  final _onRequestController = StreamController<Request>.broadcast(),
+      _onRequestFinishedController = StreamController<Request>.broadcast(),
+      _onResponseController = StreamController<Response>.broadcast(),
+      _onRequestFailedController = StreamController<Request>.broadcast();
 
   NetworkManager(this.client, this.frameManager) {
     _fetch.onRequestPaused.listen(_onRequestPaused);
@@ -49,15 +48,13 @@ class NetworkManager {
 
   NetworkApi get _network => _devTools.network;
 
-  Stream<NetworkRequest> get onRequest => _onRequestController.stream;
+  Stream<Request> get onRequest => _onRequestController.stream;
 
-  Stream<NetworkRequest> get onRequestFinished =>
-      _onRequestFinishedController.stream;
+  Stream<Request> get onRequestFinished => _onRequestFinishedController.stream;
 
-  Stream<NetworkResponse> get onResponse => _onResponseController.stream;
+  Stream<Response> get onResponse => _onResponseController.stream;
 
-  Stream<NetworkRequest> get onRequestFailed =>
-      _onRequestFailedController.stream;
+  Stream<Request> get onRequestFailed => _onRequestFailedController.stream;
 
   void dispose() {
     _onRequestController.close();
@@ -186,7 +183,7 @@ class NetworkManager {
   }
 
   void _onRequest(RequestWillBeSentEvent event, String interceptionId) {
-    var redirectChain = <NetworkRequest>[];
+    var redirectChain = <Request>[];
     if (event.redirectResponse != null) {
       var request = _requestIdToRequest[event.requestId.value];
       // If we connect late to the target, we could have missed the requestWillBeSent event.
@@ -197,7 +194,7 @@ class NetworkManager {
     }
     var frame =
         event.frameId != null ? frameManager.frame(event.frameId) : null;
-    var request = NetworkRequest(client, frame, interceptionId, event,
+    var request = Request(client, frame, interceptionId, event,
         allowInterception: _userRequestInterceptionEnabled,
         redirectChain: redirectChain);
     _requestIdToRequest[event.requestId.value] = request;
@@ -209,9 +206,8 @@ class NetworkManager {
     if (request != null) request._fromMemoryCache = true;
   }
 
-  void _handleRequestRedirect(
-      NetworkRequest request, Response responsePayload) {
-    var response = NetworkResponse(client, request, responsePayload);
+  void _handleRequestRedirect(Request request, ResponseData responsePayload) {
+    var response = Response(client, request, responsePayload);
     request._response = response;
     request.redirectChain.add(request);
     response._bodyLoadedCompleter.complete(
@@ -226,7 +222,7 @@ class NetworkManager {
     var request = _requestIdToRequest[event.requestId.value];
     // FileUpload sends a response without a matching request.
     if (request == null) return;
-    var response = NetworkResponse(client, request, event.response);
+    var response = Response(client, request, event.response);
     request._response = response;
     _onResponseController.add(response);
   }
@@ -275,12 +271,12 @@ class NetworkManager {
 /// If request gets a 'redirect' response, the request is successfully finished
 /// with the 'onRequestFinished' event, and a new request is  issued to a
 /// redirected url.
-class NetworkRequest {
+class Request {
   final Client client;
 
-  /// A [PageFrame] that initiated this request, or `null` if navigating to
+  /// A [Frame] that initiated this request, or `null` if navigating to
   /// error pages.
-  final PageFrame frame;
+  final Frame frame;
   final String interceptionId;
   final RequestWillBeSentEvent event;
 
@@ -309,18 +305,18 @@ class NetworkRequest {
   /// var chain = response.request.redirectChain;
   /// expect(chain, isEmpty);
   /// ```
-  final List<NetworkRequest> redirectChain;
+  final List<Request> redirectChain;
 
   final bool allowInterception;
   final _headers =
       CanonicalizedMap<String, String, String>((key) => key.toLowerCase());
-  NetworkResponse _response;
+  Response _response;
   String _failureText;
   bool _fromMemoryCache = false;
   bool _interceptionHandled = false;
   final FetchApi _fetchApi;
 
-  NetworkRequest(this.client, this.frame, this.interceptionId, this.event,
+  Request(this.client, this.frame, this.interceptionId, this.event,
       {this.redirectChain, @required bool allowInterception})
       : allowInterception = allowInterception ?? false,
         _fetchApi = FetchApi(client) {
@@ -355,7 +351,7 @@ class NetworkRequest {
 
   /// A matching [Response] object, or `null` if the response has not been
   /// received yet.
-  NetworkResponse get response => _response;
+  Response get response => _response;
 
   /// The method returns `null` unless this request was failed, as reported by
   /// `onRequestFailed` event.
@@ -410,7 +406,7 @@ class NetworkRequest {
         .catchError((error) {
       // In certain cases, protocol will return error if the request was already canceled
       // or the page was closed. We should tolerate these errors.
-      _logger.fine('[NetworkRequest.continueRequest] swallow error: $error');
+      _logger.fine('[Request.continueRequest] swallow error: $error');
     });
   }
 
@@ -476,7 +472,7 @@ class NetworkRequest {
         .catchError((error) {
       // In certain cases, protocol will return error if the request was already canceled
       // or the page was closed. We should tolerate these errors.
-      _logger.fine('[NetworkRequest.respond] swallow error: $error');
+      _logger.fine('[Request.respond] swallow error: $error');
     });
   }
 
@@ -499,61 +495,61 @@ class NetworkRequest {
         .catchError((error) {
       // In certain cases, protocol will return error if the request was already canceled
       // or the page was closed. We should tolerate these errors.
-      _logger.fine('[NetworkRequest.abort] swallow error: $error');
+      _logger.fine('[Request.abort] swallow error: $error');
     });
   }
 }
 
-/// [NetworkResponse] class represents responses which are received by page.
-class NetworkResponse {
+/// [Response] class represents responses which are received by page.
+class Response {
   final Client client;
 
   /// A matching [Request] object.
-  final NetworkRequest request;
-  final Response response;
+  final Request request;
+  final ResponseData data;
   final _bodyLoadedCompleter = Completer();
   Future _contentFuture;
   final NetworkApi _networkApi;
 
-  NetworkResponse(this.client, this.request, this.response)
+  Response(this.client, this.request, this.data)
       : _networkApi = NetworkApi(client) {
-    assert(response != null);
+    assert(data != null);
   }
 
   /// The IP address of the remote server
-  String get remoteIPAddress => response.remoteIPAddress;
+  String get remoteIPAddress => data.remoteIPAddress;
 
   /// The port used to connect to the remote server
-  int get remotePort => response.remotePort;
+  int get remotePort => data.remotePort;
 
   /// Contains the status code of the response (e.g., 200 for a success).
-  int get status => response.status;
+  int get status => data.status;
 
   /// Contains the status text of the response (e.g. usually an "OK" for a success).
-  String get statusText => response.statusText;
+  String get statusText => data.statusText;
 
   /// Contains the URL of the response.
   String get url => request.url;
 
-  bool get fromDiskCache => response.fromDiskCache;
+  bool get fromDiskCache => data.fromDiskCache;
 
   /// True if the response was served by a service worker.
-  bool get fromServiceWorker => response.fromServiceWorker;
+  bool get fromServiceWorker => data.fromServiceWorker;
 
   /// True if the response was served from either the browser's disk cache or
   /// memory cache.
   bool get fromCache => fromDiskCache || request._fromMemoryCache;
 
   /// An object with HTTP headers associated with the response. All header names are lower-case.
-  Map get headers => response.headers.value;
+  Map get headers => data.headers.value;
 
   /// Security details if the response was received over the secure connection,
   /// or `null` otherwise.
-  SecurityDetails get securityDetails => response.securityDetails;
+  SecurityDetails get securityDetails => data.securityDetails;
 
   /// A [Frame] that initiated this response, or `null` if navigating to error
   /// pages.
-  PageFrame get frame => request.frame;
+  Frame get frame => request.frame;
 
   /// Contains a boolean stating whether the response was successful (status in
   /// the range 200-299) or not.

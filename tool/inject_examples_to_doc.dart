@@ -177,25 +177,18 @@ class CodeSnippet {
   final int index;
 
   CodeSnippet(this.target, String code, {this.index = 0})
-      : code = _fixCode(code);
+      : code = fixCode(code);
 
-  static String _fixCode(String code) {
-    code = code
-        .replaceAll('_screenshot.png', 'screenshot.png')
-        .replaceAll('_page.pdf', 'page.pdf')
-        .replaceAll(r'${server.hostUrl}', 'https://example.com')
-        .replaceAll('server.hostUrl', "'https://example.com'")
-        .replaceAll('server.emptyPage', "'https://example.com'")
-        .replaceAll('server.empty2Page', "'http://example.com'")
-        .replaceAll('server.hostUrl', "'https://example.com'")
-        .replaceAll(r'${server.docExamplesUrl}', "'https://example.com'")
-        .replaceAll(r'${server.docExamples2Url}', "'https://example.com'")
-        .replaceAll('server.docExamplesUrl', "'https://example.com'")
-        .replaceAll('server.docExamples2Url', "'https://example.com'");
-    code = _formatter.format('''
+  static String fixCode(String code) {
+    code = '''
 main() async {
-$code
-}''');
+${LineSplitter.split(code).map((line) => '  $line').join('\n')}
+}''';
+    var compilation = parseCompilationUnit(code);
+    var replacerVisitor = _ExampleReplacerVisitor();
+    compilation.visitChildren(replacerVisitor);
+    code = replacerVisitor.replace(code);
+    code = _formatter.format(code);
     var lines = LineSplitter.split(code).skip(1);
     lines = lines.take(lines.length - 1);
 
@@ -208,4 +201,46 @@ $code
 
   @override
   String toString() => 'Snippet(target: $target, index: $index, code: \n$code)';
+}
+
+class _ExampleReplacerVisitor extends RecursiveAstVisitor {
+  final _nodesToReplace = <AstNode, String>{};
+  InterpolationExpression _stringInterpolation;
+
+  @override
+  visitInterpolationExpression(node) {
+    _stringInterpolation = node;
+    super.visitInterpolationExpression(node);
+    _stringInterpolation = null;
+  }
+
+  @override
+  visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'exampleValue') {
+      var argument = node.argumentList.arguments[1];
+
+      String targetValue;
+      if (_stringInterpolation != null) {
+        StringLiteral literal = argument;
+        targetValue = literal.stringValue;
+      } else {
+        targetValue = argument.toString();
+      }
+
+      _nodesToReplace[_stringInterpolation ?? node] = targetValue;
+    } else {
+      super.visitMethodInvocation(node);
+    }
+  }
+
+  String replace(String code) {
+    for (var node in _nodesToReplace.keys.toList().reversed) {
+      String before = code.substring(0, node.offset);
+      String after = code.substring(node.end);
+      String newValue = _nodesToReplace[node];
+
+      code = '$before$newValue$after';
+    }
+    return code;
+  }
 }

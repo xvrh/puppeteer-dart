@@ -17,16 +17,16 @@ const _utilityWorldName = '__cdt_utility_world__';
 class FrameManager {
   final Page page;
   NetworkManager _networkManager;
-  final _frames = <FrameId, PageFrame>{};
+  final _frames = <FrameId, Frame>{};
   final _contextIdToContext = <ExecutionContextId, ExecutionContext>{};
   final _isolatedWorlds = <String>{};
-  final _lifecycleEventController = StreamController<PageFrame>.broadcast(),
-      _frameAttachedController = StreamController<PageFrame>.broadcast(),
-      _frameNavigatedController = StreamController<PageFrame>.broadcast(),
+  final _lifecycleEventController = StreamController<Frame>.broadcast(),
+      _frameAttachedController = StreamController<Frame>.broadcast(),
+      _frameNavigatedController = StreamController<Frame>.broadcast(),
       _frameNavigatedWithinDocumentController =
-          StreamController<PageFrame>.broadcast(),
-      _frameDetachedController = StreamController<PageFrame>.broadcast();
-  PageFrame _mainFrame;
+          StreamController<Frame>.broadcast(),
+      _frameDetachedController = StreamController<Frame>.broadcast();
+  Frame _mainFrame;
 
   FrameManager(this.page) {
     _networkManager = NetworkManager(page.session, this);
@@ -50,16 +50,16 @@ class FrameManager {
 
   NetworkManager get networkManager => _networkManager;
 
-  Stream<PageFrame> get onLifecycleEvent => _lifecycleEventController.stream;
+  Stream<Frame> get onLifecycleEvent => _lifecycleEventController.stream;
 
-  Stream<PageFrame> get onFrameAttached => _frameAttachedController.stream;
+  Stream<Frame> get onFrameAttached => _frameAttachedController.stream;
 
-  Stream<PageFrame> get onFrameNavigated => _frameNavigatedController.stream;
+  Stream<Frame> get onFrameNavigated => _frameNavigatedController.stream;
 
-  Stream<PageFrame> get onFrameNavigatedWithinDocument =>
+  Stream<Frame> get onFrameNavigatedWithinDocument =>
       _frameNavigatedWithinDocumentController.stream;
 
-  Stream<PageFrame> get onFrameDetached => _frameDetachedController.stream;
+  Stream<Frame> get onFrameDetached => _frameDetachedController.stream;
 
   void dispose() {
     _networkManager.dispose();
@@ -82,9 +82,9 @@ class FrameManager {
     await _ensureIsolatedWorld(_utilityWorldName);
   }
 
-  PageFrame frame(FrameId frameId) => _frames[frameId];
+  Frame frame(FrameId frameId) => _frames[frameId];
 
-  Future<NetworkResponse> navigateFrame(PageFrame frame, String url,
+  Future<Response> navigateFrame(Frame frame, String url,
       {String referrer, Duration timeout, Until wait}) async {
     referrer ??= _networkManager.extraHTTPHeaders['referer'];
     var watcher = LifecycleWatcher(this, frame,
@@ -117,7 +117,7 @@ class FrameManager {
     return watcher.navigationResponse;
   }
 
-  Future<NetworkResponse> waitForFrameNavigation(PageFrame frame,
+  Future<Response> waitForFrameNavigation(Frame frame,
       {Until wait, Duration timeout}) async {
     var watcher = LifecycleWatcher(this, frame,
         wait: wait, timeout: timeout ?? page.navigationTimeoutOrDefault);
@@ -169,22 +169,22 @@ class FrameManager {
     frameTree.childFrames.forEach(_handleFrameTree);
   }
 
-  PageFrame get mainFrame => _mainFrame;
+  Frame get mainFrame => _mainFrame;
 
-  List<PageFrame> get frames => List.unmodifiable(_frames.values);
+  List<Frame> get frames => List.unmodifiable(_frames.values);
 
-  PageFrame frameById(FrameId frameId) => _frames[frameId];
+  Frame frameById(FrameId frameId) => _frames[frameId];
 
   void _onFrameAttached(FrameId frameId, FrameId parentFrameId) {
     if (_frames.containsKey(frameId)) return;
     assert(parentFrameId != null);
     var parentFrame = _frames[parentFrameId];
-    var frame = PageFrame(this, page.session, parentFrame, frameId);
+    var frame = Frame(this, page.session, parentFrame, frameId);
     _frames[frameId] = frame;
     _frameAttachedController.add(frame);
   }
 
-  void _onFrameNavigated(Frame framePayload) {
+  void _onFrameNavigated(FrameInfo framePayload) {
     var isMainFrame = framePayload.parentId == null;
     var frame = isMainFrame ? _mainFrame : _frames[FrameId(framePayload.id)];
     assert(isMainFrame || frame != null,
@@ -203,7 +203,7 @@ class FrameManager {
         frame._id = FrameId(framePayload.id);
       } else {
         // Initial main frame navigation.
-        frame = PageFrame(this, page.session, null, FrameId(framePayload.id));
+        frame = Frame(this, page.session, null, FrameId(framePayload.id));
       }
       _frames[FrameId(framePayload.id)] = frame;
       _mainFrame = frame;
@@ -302,7 +302,7 @@ class FrameManager {
     return context;
   }
 
-  void _removeFramesRecursively(PageFrame frame) {
+  void _removeFramesRecursively(Frame frame) {
     frame.childFrames.forEach(_removeFramesRecursively);
 
     frame._detach();
@@ -326,7 +326,7 @@ class FrameManager {
 /// An example of dumping frame tree:
 ///
 /// ```dart
-/// dumpFrameTree(PageFrame frame, String indent) {
+/// dumpFrameTree(Frame frame, String indent) {
 ///   print(indent + frame.url);
 ///   for (var child in frame.childFrames) {
 ///     dumpFrameTree(child, indent + '  ');
@@ -347,19 +347,19 @@ class FrameManager {
 /// var text = await frame.$eval('.selector', 'el => el.textContent');
 /// print(text);
 /// ```
-class PageFrame {
+class Frame {
   final FrameManager frameManager;
   final Client client;
-  PageFrame _parent;
+  Frame _parent;
   FrameId _id;
   final lifecycleEvents = <String>{};
-  final childFrames = <PageFrame>[];
+  final childFrames = <Frame>[];
   String _url, _name;
   bool _detached = false;
   LoaderId _loaderId;
   DomWorld _mainWorld, _secondaryWorld;
 
-  PageFrame(this.frameManager, this.client, this._parent, this._id) {
+  Frame(this.frameManager, this.client, this._parent, this._id) {
     _mainWorld = DomWorld(frameManager, this);
     _secondaryWorld = DomWorld(frameManager, this);
 
@@ -387,15 +387,15 @@ class PageFrame {
   LoaderId get loaderId => _loaderId;
 
   /// Parent frame, if any. Detached frames and main frames return `null`.
-  PageFrame get parentFrame => _parent;
+  Frame get parentFrame => _parent;
 
-  /// The [PageFrame.goto] will throw an error if:
+  /// The [Frame.goto] will throw an error if:
   /// - there's an SSL error (e.g. in case of self-signed certificates).
   /// - target URL is invalid.
   /// - the `timeout` is exceeded during navigation.
   /// - the main resource failed to load.
   ///
-  /// > **NOTE** [PageFrame.goto] either throw or return a main resource response.
+  /// > **NOTE** [Frame.goto] either throw or return a main resource response.
   /// The only exceptions are navigation to `about:blank` or navigation to the
   /// same URL with a different hash, which would succeed and return `null`.
   ///
@@ -425,13 +425,13 @@ class PageFrame {
   /// Returns: [Future] which resolves to the main resource response. In case
   /// of multiple redirects, the navigation will resolve with the response of
   /// the last redirect.
-  Future<NetworkResponse> goto(String url,
+  Future<Response> goto(String url,
       {String referrer, Duration timeout, Until wait}) {
     return frameManager.navigateFrame(this, url,
         referrer: referrer, timeout: timeout, wait: wait);
   }
 
-  Future<NetworkResponse> waitForNavigation({Duration timeout, Until wait}) {
+  Future<Response> waitForNavigation({Duration timeout, Until wait}) {
     return frameManager.waitForFrameNavigation(this,
         timeout: timeout, wait: wait);
   }
@@ -441,11 +441,11 @@ class PageFrame {
     return _mainWorld.executionContext;
   }
 
-  /// The only difference between [PageFrame.evaluate] and [PageFrame.evaluateHandle] is
-  /// that [PageFrame.evaluateHandle] returns in-page object (JSHandle).
+  /// The only difference between [Frame.evaluate] and [Frame.evaluateHandle] is
+  /// that [Frame.evaluateHandle] returns in-page object (JSHandle).
   ///
-  /// If the function passed to the [PageFrame.evaluateHandle] returns a [Promise],
-  /// then [PageFrame.evaluateHandle] would wait for the promise to resolve and
+  /// If the function passed to the [Frame.evaluateHandle] returns a [Promise],
+  /// then [Frame.evaluateHandle] would wait for the promise to resolve and
   /// return its value.
   ///
   /// A JavaScript expression can also be passed in instead of a function:
@@ -454,7 +454,7 @@ class PageFrame {
   /// var aHandle = await frame.evaluateHandle('document');
   /// ```
   ///
-  /// [JSHandle] instances can be passed as arguments to the [PageFrame.evaluateHandle]:
+  /// [JSHandle] instances can be passed as arguments to the [Frame.evaluateHandle]:
   /// ```dart
   /// var aHandle = await frame.evaluateHandle('() => document.body');
   /// var resultHandle =
@@ -474,11 +474,11 @@ class PageFrame {
     return _mainWorld.evaluateHandle(pageFunction, args: args);
   }
 
-  /// If the function passed to the [PageFrame.evaluate] returns a [Promise], then
-  /// [PageFrame.evaluate] would wait for the promise to resolve and return its value.
+  /// If the function passed to the [Frame.evaluate] returns a [Promise], then
+  /// [Frame.evaluate] would wait for the promise to resolve and return its value.
   ///
-  /// If the function passed to the [PageFrame.evaluate] returns a non-[Serializable]
-  /// value, then `PageFrame.evaluate` resolves to null.
+  /// If the function passed to the [Frame.evaluate] returns a non-[Serializable]
+  /// value, then `Frame.evaluate` resolves to null.
   /// DevTools Protocol also supports transferring some additional values that
   /// are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and
   /// bigint literals.
@@ -486,8 +486,8 @@ class PageFrame {
   /// Passing arguments to `pageFunction`:
   /// ```dart
   /// int result = await frame.evaluate('''x => {
-  ///         return Promise.resolve(8 * x);
-  ///       }''', args: [7]);
+  ///           return Promise.resolve(8 * x);
+  ///         }''', args: [7]);
   /// print(result); // prints "56"
   /// ```
   ///
@@ -498,7 +498,7 @@ class PageFrame {
   /// print(await frame.evaluate('1 + $x')); // prints "11"
   /// ```
   ///
-  /// [ElementHandle] instances can be passed as arguments to the [PageFrame.evaluate]:
+  /// [ElementHandle] instances can be passed as arguments to the [Frame.evaluate]:
   /// ```dart
   /// var bodyHandle = await frame.$('body');
   /// var html = await frame.evaluate('body => body.innerHTML', args: [bodyHandle]);
@@ -897,7 +897,7 @@ class PageFrame {
     lifecycleEvents.add(name);
   }
 
-  void _navigated(Frame framePayload) {
+  void _navigated(FrameInfo framePayload) {
     _name = framePayload.name;
     _url = framePayload.url;
   }

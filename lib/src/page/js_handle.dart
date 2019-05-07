@@ -167,7 +167,7 @@ function _(object, propertyName) {
 /// ElementHandle instances can be used as arguments in [page.$eval] and
 /// [page.evaluate] methods.
 class ElementHandle extends JsHandle {
-  final PageFrame frame;
+  final Frame frame;
   final FrameManager frameManager;
 
   ElementHandle(ExecutionContext context, RemoteObject remoteObject, this.frame,
@@ -181,7 +181,7 @@ class ElementHandle extends JsHandle {
 
   /// Resolves to the content frame for element handles referencing iframe nodes,
   /// or null otherwise
-  Future<PageFrame> get contentFrame async {
+  Future<Frame> get contentFrame async {
     var nodeInfo = await executionContext.domApi
         .describeNode(objectId: remoteObject.objectId);
 

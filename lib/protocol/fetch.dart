@@ -168,7 +168,7 @@ class RequestPausedEvent {
   final RequestId requestId;
 
   /// The details of the request.
-  final network.Request request;
+  final network.RequestData request;
 
   /// The id of the frame that initiated the request.
   final page.FrameId frameId;
@@ -202,7 +202,7 @@ class RequestPausedEvent {
   factory RequestPausedEvent.fromJson(Map<String, dynamic> json) {
     return RequestPausedEvent(
       requestId: RequestId.fromJson(json['requestId']),
-      request: network.Request.fromJson(json['request']),
+      request: network.RequestData.fromJson(json['request']),
       frameId: page.FrameId.fromJson(json['frameId']),
       resourceType: network.ResourceType.fromJson(json['resourceType']),
       responseErrorReason: json.containsKey('responseErrorReason')
@@ -228,7 +228,7 @@ class AuthRequiredEvent {
   final RequestId requestId;
 
   /// The details of the request.
-  final network.Request request;
+  final network.RequestData request;
 
   /// The id of the frame that initiated the request.
   final page.FrameId frameId;
@@ -251,7 +251,7 @@ class AuthRequiredEvent {
   factory AuthRequiredEvent.fromJson(Map<String, dynamic> json) {
     return AuthRequiredEvent(
       requestId: RequestId.fromJson(json['requestId']),
-      request: network.Request.fromJson(json['request']),
+      request: network.RequestData.fromJson(json['request']),
       frameId: page.FrameId.fromJson(json['frameId']),
       resourceType: network.ResourceType.fromJson(json['resourceType']),
       authChallenge: AuthChallenge.fromJson(json['authChallenge']),

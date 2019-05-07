@@ -664,7 +664,7 @@ class RequestInterceptedEvent {
   /// Likewise if HTTP authentication is needed then the same fetch id will be used.
   final InterceptionId interceptionId;
 
-  final Request request;
+  final RequestData request;
 
   /// The id of the frame that initiated the request.
   final page.FrameId frameId;
@@ -719,7 +719,7 @@ class RequestInterceptedEvent {
   factory RequestInterceptedEvent.fromJson(Map<String, dynamic> json) {
     return RequestInterceptedEvent(
       interceptionId: InterceptionId.fromJson(json['interceptionId']),
-      request: Request.fromJson(json['request']),
+      request: RequestData.fromJson(json['request']),
       frameId: page.FrameId.fromJson(json['frameId']),
       resourceType: ResourceType.fromJson(json['resourceType']),
       isNavigationRequest: json['isNavigationRequest'],
@@ -755,7 +755,7 @@ class RequestWillBeSentEvent {
   final String documentURL;
 
   /// Request data.
-  final Request request;
+  final RequestData request;
 
   /// Timestamp.
   final MonotonicTime timestamp;
@@ -767,7 +767,7 @@ class RequestWillBeSentEvent {
   final Initiator initiator;
 
   /// Redirect response data.
-  final Response redirectResponse;
+  final ResponseData redirectResponse;
 
   /// Type of this resource.
   final ResourceType type;
@@ -796,12 +796,12 @@ class RequestWillBeSentEvent {
       requestId: RequestId.fromJson(json['requestId']),
       loaderId: LoaderId.fromJson(json['loaderId']),
       documentURL: json['documentURL'],
-      request: Request.fromJson(json['request']),
+      request: RequestData.fromJson(json['request']),
       timestamp: MonotonicTime.fromJson(json['timestamp']),
       wallTime: TimeSinceEpoch.fromJson(json['wallTime']),
       initiator: Initiator.fromJson(json['initiator']),
       redirectResponse: json.containsKey('redirectResponse')
-          ? Response.fromJson(json['redirectResponse'])
+          ? ResponseData.fromJson(json['redirectResponse'])
           : null,
       type:
           json.containsKey('type') ? ResourceType.fromJson(json['type']) : null,
@@ -869,7 +869,7 @@ class ResponseReceivedEvent {
   final ResourceType type;
 
   /// Response data.
-  final Response response;
+  final ResponseData response;
 
   /// Frame identifier.
   final page.FrameId frameId;
@@ -888,7 +888,7 @@ class ResponseReceivedEvent {
       loaderId: LoaderId.fromJson(json['loaderId']),
       timestamp: MonotonicTime.fromJson(json['timestamp']),
       type: ResourceType.fromJson(json['type']),
-      response: Response.fromJson(json['response']),
+      response: ResponseData.fromJson(json['response']),
       frameId: json.containsKey('frameId')
           ? page.FrameId.fromJson(json['frameId'])
           : null,
@@ -1557,7 +1557,7 @@ class ResourcePriority {
 }
 
 /// HTTP request data.
-class Request {
+class RequestData {
   /// Request URL (without fragment).
   final String url;
 
@@ -1588,7 +1588,7 @@ class Request {
   /// Whether is loaded via link preload.
   final bool isLinkPreload;
 
-  Request(
+  RequestData(
       {@required this.url,
       this.urlFragment,
       @required this.method,
@@ -1600,8 +1600,8 @@ class Request {
       @required this.referrerPolicy,
       this.isLinkPreload});
 
-  factory Request.fromJson(Map<String, dynamic> json) {
-    return Request(
+  factory RequestData.fromJson(Map<String, dynamic> json) {
+    return RequestData(
       url: json['url'],
       urlFragment: json.containsKey('urlFragment') ? json['urlFragment'] : null,
       method: json['method'],
@@ -1933,7 +1933,7 @@ class BlockedReason {
 }
 
 /// HTTP response data.
-class Response {
+class ResponseData {
   /// Response URL. This URL can be different from CachedResource.url in case of redirect.
   final String url;
 
@@ -1991,7 +1991,7 @@ class Response {
   /// Security details for the request.
   final SecurityDetails securityDetails;
 
-  Response(
+  ResponseData(
       {@required this.url,
       @required this.status,
       @required this.statusText,
@@ -2012,8 +2012,8 @@ class Response {
       @required this.securityState,
       this.securityDetails});
 
-  factory Response.fromJson(Map<String, dynamic> json) {
-    return Response(
+  factory ResponseData.fromJson(Map<String, dynamic> json) {
+    return ResponseData(
       url: json['url'],
       status: json['status'],
       statusText: json['statusText'],
@@ -2220,7 +2220,7 @@ class CachedResource {
   final ResourceType type;
 
   /// Cached response data.
-  final Response response;
+  final ResponseData response;
 
   /// Cached response body size.
   final num bodySize;
@@ -2236,7 +2236,7 @@ class CachedResource {
       url: json['url'],
       type: ResourceType.fromJson(json['type']),
       response: json.containsKey('response')
-          ? Response.fromJson(json['response'])
+          ? ResponseData.fromJson(json['response'])
           : null,
       bodySize: json['bodySize'],
     );
@@ -2920,7 +2920,7 @@ class SignedExchangeError {
 /// Information about a signed exchange response.
 class SignedExchangeInfo {
   /// The outer response of signed HTTP exchange which was received from network.
-  final Response outerResponse;
+  final ResponseData outerResponse;
 
   /// Information about the signed exchange header.
   final SignedExchangeHeader header;
@@ -2939,7 +2939,7 @@ class SignedExchangeInfo {
 
   factory SignedExchangeInfo.fromJson(Map<String, dynamic> json) {
     return SignedExchangeInfo(
-      outerResponse: Response.fromJson(json['outerResponse']),
+      outerResponse: ResponseData.fromJson(json['outerResponse']),
       header: json.containsKey('header')
           ? SignedExchangeHeader.fromJson(json['header'])
           : null,
