@@ -73,8 +73,8 @@ await browser.close();'''));
 
   test('Replace import', () {
     expect(CodeSnippet.fixCode(r'''
-//+ import 'dart:io';
-//+ import 'package:puppeteer/puppeteer.dart';
+//+import 'dart:io';
+//+import 'package:puppeteer/puppeteer.dart';
 
 main() async {
   var browser = await puppeteer.launch();

@@ -184,7 +184,7 @@ class FrameManager {
     _frameAttachedController.add(frame);
   }
 
-  void _onFrameNavigated(FrameInformation framePayload) {
+  void _onFrameNavigated(FrameInfo framePayload) {
     var isMainFrame = framePayload.parentId == null;
     var frame = isMainFrame ? _mainFrame : _frames[FrameId(framePayload.id)];
     assert(isMainFrame || frame != null,
@@ -486,8 +486,8 @@ class Frame {
   /// Passing arguments to `pageFunction`:
   /// ```dart
   /// int result = await frame.evaluate('''x => {
-  ///         return Promise.resolve(8 * x);
-  ///       }''', args: [7]);
+  ///           return Promise.resolve(8 * x);
+  ///         }''', args: [7]);
   /// print(result); // prints "56"
   /// ```
   ///
@@ -897,7 +897,7 @@ class Frame {
     lifecycleEvents.add(name);
   }
 
-  void _navigated(FrameInformation framePayload) {
+  void _navigated(FrameInfo framePayload) {
     _name = framePayload.name;
     _url = framePayload.url;
   }

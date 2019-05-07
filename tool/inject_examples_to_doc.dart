@@ -182,7 +182,7 @@ class CodeSnippet {
   static String fixCode(String code) {
     code = '''
 main() async {
-$code
+${LineSplitter.split(code).map((line) => '  $line').join('\n')}
 }''';
     var compilation = parseCompilationUnit(code);
     var replacerVisitor = _ExampleReplacerVisitor();

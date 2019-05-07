@@ -3,7 +3,7 @@ import 'dart:convert';
 final _aliases = {
   'Request': 'RequestData',
   'Response': 'ResponseData',
-  'Frame': 'FrameInformation',
+  'Frame': 'FrameInfo',
 };
 
 class Protocol {

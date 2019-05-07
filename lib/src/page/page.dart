@@ -705,11 +705,11 @@ function addPageBinding(bindingName) {
   ///   await page.exposeFunction(
   ///       'md5', (text) => crypto.md5.convert(utf8.encode(text)).toString());
   ///   await page.evaluate(r'''async () => {
-  ///           // use window.md5 to compute hashes
-  ///           const myString = 'PUPPETEER';
-  ///           const myHash = await window.md5(myString);
-  ///           console.log(`md5 of ${myString} is ${myHash}`);
-  ///         }''');
+  ///             // use window.md5 to compute hashes
+  ///             const myString = 'PUPPETEER';
+  ///             const myHash = await window.md5(myString);
+  ///             console.log(`md5 of ${myString} is ${myHash}`);
+  ///           }''');
   ///   await browser.close();
   /// }
   /// ```
@@ -728,10 +728,10 @@ function addPageBinding(bindingName) {
   ///     return File(path).readAsString();
   ///   });
   ///   await page.evaluate('''async () => {
-  ///           // use window.readfile to read contents of a file
-  ///           const content = await window.readfile('test/assets/simple.json');
-  ///           console.log(content);
-  ///         }''');
+  ///             // use window.readfile to read contents of a file
+  ///             const content = await window.readfile('test/assets/simple.json');
+  ///             console.log(content);
+  ///           }''');
   ///   await browser.close();
   /// }
   /// ```
@@ -1164,8 +1164,8 @@ function deliverError(name, seq, message, stack) {
   /// Passing arguments to `pageFunction`:
   /// ```dart
   /// int result = await page.evaluate('''x => {
-  ///         return Promise.resolve(8 * x);
-  ///       }''', args: [7]);
+  ///           return Promise.resolve(8 * x);
+  ///         }''', args: [7]);
   /// print(result); // prints "56"
   /// ```
   ///
