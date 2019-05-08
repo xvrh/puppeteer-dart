@@ -13,7 +13,7 @@ main() {
     if (fileContent.contains('main()')) {
       test('Text example/${p.basename(exampleFile.path)}', () {
         var result = Process.runSync(Platform.resolvedExecutable,
-            ['--checked', exampleFile.absolute.path]);
+            ['--enable-asserts', exampleFile.absolute.path]);
         if (result.exitCode != 0) {
           print(result.stdout);
           print(result.stderr);
