@@ -41,4 +41,29 @@ main() {
       expect(target.type, equals('browser'));
     });
   });
+
+  group('Browser.process', () {
+    test('should return child_process instance', () async {
+      var process = browser.process;
+      expect(process.pid, greaterThan(0));
+    });
+    test('should not return child_process for remote browser', () async {
+      var browserWsEndpoint = browser.wsEndpoint;
+      var remoteBrowser =
+          await puppeteer.connect(browserWsEndpoint: browserWsEndpoint);
+      expect(remoteBrowser.process, isNull);
+      remoteBrowser.disconnect();
+    });
+  });
+
+  group('Browser.isConnected', () {
+    test('should set the browser connected state', () async {
+      var browserWSEndpoint = browser.wsEndpoint;
+      var newBrowser =
+          await puppeteer.connect(browserWsEndpoint: browserWSEndpoint);
+      expect(newBrowser.isConnected, isTrue);
+      newBrowser.disconnect();
+      expect(newBrowser.isConnected, isFalse);
+    });
+  });
 }

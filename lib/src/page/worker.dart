@@ -43,11 +43,15 @@ class Worker {
     });
 
     runtimeApi.onConsoleAPICalled.listen((event) {
-      onConsoleApiCalled(event.type, event.args.map(jsHandleFactory).toList(),
-          event.stackTrace);
+      if (onConsoleApiCalled != null) {
+        onConsoleApiCalled(event.type, event.args.map(jsHandleFactory).toList(),
+            event.stackTrace);
+      }
     });
     runtimeApi.onExceptionThrown.listen((event) {
-      onExceptionThrown(event);
+      if (onExceptionThrown != null) {
+        onExceptionThrown(event);
+      }
     });
 
     runtimeApi.enable().catchError((e) {

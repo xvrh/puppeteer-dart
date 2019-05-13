@@ -36,24 +36,26 @@ class Connection implements Client {
       StreamController<Event>.broadcast(sync: true);
   TargetApi _targetApi;
   final List<StreamSubscription> _subscriptions = [];
+  final Duration _delay;
 
-  Connection._(this._webSocket, this.url) {
+  Connection._(this._webSocket, this.url, {Duration delay}) : _delay = delay {
     _subscriptions.add(_webSocket.listen(_onMessage, onError: (error) {
       print('Websocket error: $error');
     }));
 
     _targetApi = TargetApi(this);
 
-    _webSocket.done.then((_) => dispose(
+    _webSocket.done.then((_) => _onClose(
         'Websocket.done(code: ${_webSocket.closeCode}, reason: ${_webSocket.closeReason})'));
   }
 
   TargetApi get targetApi => _targetApi;
 
-  static Future<Connection> create(String url) async {
+  static Future<Connection> create(String url,
+      {@required Duration delay}) async {
     WebSocket webSocket = await WebSocket.connect(url);
 
-    return Connection._(webSocket, url);
+    return Connection._(webSocket, url, delay: delay);
   }
 
   @override
@@ -88,7 +90,11 @@ class Connection implements Client {
     return session;
   }
 
-  _onMessage(messageArg) {
+  _onMessage(messageArg) async {
+    if (_delay != null) {
+      await Future.delayed(_delay);
+    }
+
     String message = messageArg;
     Map object = jsonDecode(message);
     int id = object['id'];
@@ -137,7 +143,9 @@ class Connection implements Client {
     }
   }
 
-  void dispose(String reason) {
+  void _onClose(String reason) {
+    if (_eventController.isClosed) return;
+
     _eventController.close();
     for (var message in _messagesInFly.values) {
       message.completer
@@ -153,9 +161,14 @@ class Connection implements Client {
     for (StreamSubscription subscription in _subscriptions) {
       subscription.cancel();
     }
-
-    _webSocket.close(WebSocketStatus.normalClosure, 'Connection.dispose');
   }
+
+  Future dispose(String reason) async {
+    _onClose(reason);
+    await _webSocket.close(WebSocketStatus.normalClosure, 'Connection.dispose');
+  }
+
+  bool get isClosed => _eventController.isClosed;
 
   Future get disconnected => _webSocket.done;
 }

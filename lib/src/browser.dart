@@ -44,6 +44,7 @@ class Browser {
 
   Browser._(this.process, this.connection,
       {@required this.defaultViewport,
+      @required List<BrowserContextID> browserContextIds,
       @required bool ignoreHttpsErrors,
       @required Future Function() closeCallback})
       : _closeCallback = closeCallback,
@@ -51,6 +52,12 @@ class Browser {
         browser = BrowserApi(connection),
         systemInfo = SystemInfoApi(connection) {
     _defaultContext = BrowserContext(connection, this, null);
+
+    if (browserContextIds != null) {
+      for (var contextId in browserContextIds) {
+        _contexts[contextId] = BrowserContext(connection, this, contextId);
+      }
+    }
 
     targetApi.onTargetCreated.listen(_targetCreated);
     targetApi.onTargetDestroyed.listen(_targetDestroyed);
@@ -150,6 +157,10 @@ class Browser {
     }
   }
 
+  String get wsEndpoint {
+    return connection.url;
+  }
+
   /// Future which resolves to a new Page object. The Page is created in a
   /// default browser context.
   Future<Page> newPage() async {
@@ -235,7 +246,15 @@ class Browser {
     await _closeCallback();
 
     _dispose();
-    connection.dispose('Browser.close');
+    await connection.dispose('Browser.close');
+  }
+
+  void disconnect() {
+    connection.dispose('Browser.disconnect');
+  }
+
+  bool get isConnected {
+    return !connection.isClosed;
   }
 
   Target targetById(TargetID targetId) => _targets[targetId];
@@ -243,10 +262,12 @@ class Browser {
 
 Browser createBrowser(Process process, Connection connection,
         {@required DeviceViewport defaultViewport,
+        List<BrowserContextID> browserContextIds,
         @required Future Function() closeCallback,
         @required bool ignoreHttpsErrors}) =>
     Browser._(process, connection,
         defaultViewport: defaultViewport,
+        browserContextIds: browserContextIds,
         closeCallback: closeCallback,
         ignoreHttpsErrors: ignoreHttpsErrors);
 

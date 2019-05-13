@@ -5,6 +5,7 @@ import 'package:meta/meta.dart';
 import 'utils/string_helpers.dart';
 
 final classesOrder = [
+  'Puppeteer',
   'Browser',
   'BrowserContext',
   'Page',

@@ -15,7 +15,6 @@ main() {
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
-    context = browser.defaultBrowserContext;
   });
 
   tearDownAll(() async {
@@ -24,12 +23,13 @@ main() {
   });
 
   setUp(() async {
-    page = await browser.newPage();
+    context = await browser.createIncognitoBrowserContext();
+    page = await context.newPage();
   });
 
   tearDown(() async {
     server.clearRoutes();
-    await page.close();
+    await context.close();
   });
 
   group('Target', () {
@@ -45,9 +45,9 @@ main() {
     test('Browser.pages should return all of the pages', () async {
       // The pages will be the testing page
       var allPages = await context.pages;
-      expect(allPages.length, equals(2));
+      expect(allPages.length, equals(1));
       expect(allPages, contains(page));
-      expect(allPages[0], isNot(equals(allPages[1])));
+      expect(allPages[0], isNotNull);
     });
     test('should contain browser target', () async {
       var targets = browser.targets;
@@ -106,9 +106,29 @@ main() {
       await page.evaluate(
           '() => window.registrationPromise.then(registration => registration.unregister())');
       expect(await destroyedTarget, equals(await createdTarget));
-    },
-        //TODO(xha): debug
-        skip: true);
+    });
+    test('should create a worker from a service worker', () async {
+      var targetFuture =
+          context.waitForTarget((target) => target.type == 'service_worker');
+      await page.goto(server.prefix + '/serviceworkers/empty/sw.html');
+
+      var target = await targetFuture;
+      var worker = await target.worker;
+      expect(await worker.evaluate('() => self.toString()'),
+          equals('[object ServiceWorkerGlobalScope]'));
+    });
+    test('should create a worker from a shared worker', () async {
+      await page.goto(server.emptyPage);
+      var targetFuture =
+          context.waitForTarget((target) => target.type == 'shared_worker');
+      await page.evaluate('''() => {
+    new SharedWorker('data:text/javascript,console.log("hi")');
+    }''');
+      var target = await targetFuture;
+      var worker = await target.worker;
+      expect(await worker.evaluate('() => self.toString()'),
+          equals('[object SharedWorkerGlobalScope]'));
+    });
     test('should report when a target url changes', () async {
       await page.goto(server.emptyPage);
       var changedTarget = context.onTargetChanged.first;
