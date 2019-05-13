@@ -133,6 +133,7 @@ class Screen {
 @JsonSerializable()
 class ScreenOrientation {
   num width, height;
+  Outline outline;
 
   ScreenOrientation();
 
@@ -140,6 +141,42 @@ class ScreenOrientation {
       _$ScreenOrientationFromJson(json);
 
   Map<String, dynamic> toJson() => _$ScreenOrientationToJson(this);
+}
+
+@JsonSerializable()
+class Outline {
+  final Inset insets;
+  final String image;
+  final Map<num, String> images;
+
+  Outline(this.insets, this.image) : images = _parseImage(image);
+
+  factory Outline.fromJson(Map<String, dynamic> json) =>
+      _$OutlineFromJson(json);
+
+  Map<String, dynamic> toJson() => _$OutlineToJson(this);
+
+  static final _imageExtractor = RegExp(r'\@url\(([^)]+)\)( (\d)x)?');
+  static Map<num, String> _parseImage(String image) {
+    var results = <num, String>{};
+    for (var match in _imageExtractor.allMatches(image)) {
+      var url = match.group(1);
+      var scale = num.parse(match.group(3));
+      results[scale] = url;
+    }
+    return results;
+  }
+}
+
+@JsonSerializable()
+class Inset {
+  final num left, top, right, bottom;
+
+  Inset(this.left, this.top, this.right, this.bottom);
+
+  factory Inset.fromJson(Map<String, dynamic> json) => _$InsetFromJson(json);
+
+  Map<String, dynamic> toJson() => _$InsetToJson(this);
 }
 
 String viewportCode(Device device, ScreenOrientation orientation,
@@ -152,3 +189,5 @@ String viewportCode(Device device, ScreenOrientation orientation,
       'isLandscape: $isLandscape'
       ')';
 }
+
+enum Orientation { horizontal, vertical }

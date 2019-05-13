@@ -72,8 +72,38 @@ Map<String, dynamic> _$ScreenToJson(Screen instance) => <String, dynamic>{
 ScreenOrientation _$ScreenOrientationFromJson(Map<String, dynamic> json) {
   return ScreenOrientation()
     ..width = json['width'] as num
-    ..height = json['height'] as num;
+    ..height = json['height'] as num
+    ..outline = json['outline'] == null
+        ? null
+        : Outline.fromJson(json['outline'] as Map<String, dynamic>);
 }
 
 Map<String, dynamic> _$ScreenOrientationToJson(ScreenOrientation instance) =>
-    <String, dynamic>{'width': instance.width, 'height': instance.height};
+    <String, dynamic>{
+      'width': instance.width,
+      'height': instance.height,
+      'outline': instance.outline
+    };
+
+Outline _$OutlineFromJson(Map<String, dynamic> json) {
+  return Outline(
+      json['insets'] == null
+          ? null
+          : Inset.fromJson(json['insets'] as Map<String, dynamic>),
+      json['image'] as String);
+}
+
+Map<String, dynamic> _$OutlineToJson(Outline instance) =>
+    <String, dynamic>{'insets': instance.insets, 'image': instance.image};
+
+Inset _$InsetFromJson(Map<String, dynamic> json) {
+  return Inset(json['left'] as num, json['top'] as num, json['right'] as num,
+      json['bottom'] as num);
+}
+
+Map<String, dynamic> _$InsetToJson(Inset instance) => <String, dynamic>{
+      'left': instance.left,
+      'top': instance.top,
+      'right': instance.right,
+      'bottom': instance.bottom
+    };
