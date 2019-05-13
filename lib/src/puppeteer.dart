@@ -7,6 +7,8 @@ import 'devices.dart';
 import 'devices.dart' as devices_lib;
 import 'downloader.dart';
 import 'page/emulation_manager.dart';
+import 'package:path/path.dart' as p;
+import 'package:http/http.dart';
 
 final Logger _logger = Logger('puppeteer.launcher');
 
@@ -61,15 +63,43 @@ class Puppeteer {
   ///   await browser.close();
   /// }
   /// ```
+  ///
+  /// Parameters:
+  ///  - `ignoreHTTPSErrors`: Whether to ignore HTTPS errors during navigation.
+  ///     Defaults to `false`.
+  ///  - `headless`: Whether to run browser in [headless mode](https://developers.google.com/web/updates/2017/04/headless-chrome).
+  ///     Defaults to `true` unless the `devtools` option is `true`.
+  ///  - `executablePath`: Path to a Chromium or Chrome executable to run instead
+  ///     of the bundled Chromium. . **BEWARE**: Puppeteer is only
+  ///     [guaranteed to work](https://github.com/GoogleChrome/puppeteer/#q-why-doesnt-puppeteer-vxxx-work-with-chromium-vyyy)
+  ///     with the bundled Chromium, use at your own risk.
+  ///  - `slowMo` Slows down Puppeteer operations by the specified duration.
+  ///     Useful so that you can see what is going on.
+  ///  - `defaultViewport` <?[Object]> Sets a consistent viewport for each page.
+  ///     Defaults to an 1280x1024 viewport.
+  ///  - `args` Additional arguments to pass to the browser instance. The list
+  ///    of Chromium flags can be found [here](http://peter.sh/experiments/chromium-command-line-switches/).
+  ///  - `environment` Specify environment variables that will be visible to the browser.
+  ///     Defaults to `Platform.environment`.
+  ///  - `devtools` Whether to auto-open a DevTools panel for each tab. If this
+  ///     option is `true`, the `headless` option will be set `false`.
   Future<Browser> launch(
       {String executablePath,
-      bool headless = true,
-      bool useTemporaryUserData = false,
+      bool headless,
+      bool devTools,
+      bool useTemporaryUserData,
       bool noSandboxFlag,
       DeviceViewport defaultViewport,
-      bool ignoreHttpsErrors}) async {
+      bool ignoreHttpsErrors,
+      Duration slowMo,
+      List<String> args,
+      Map<String, String> environment}) async {
+    useTemporaryUserData ??= true;
+    devTools ??= false;
+    headless ??= !devTools;
     // In docker environment we want to force the '--no-sandbox' flag automatically
     noSandboxFlag ??= Platform.environment['CHROME_FORCE_NO_SANDBOX'] == 'true';
+    defaultViewport ??= DeviceViewport();
 
     executablePath = await _inferExecutablePath();
 
@@ -79,6 +109,10 @@ class Puppeteer {
     }
 
     var chromeArgs = _defaultArgs.toList();
+    if (args != null) {
+      chromeArgs.addAll(args);
+    }
+
     if (userDataDir != null) {
       chromeArgs.add('--user-data-dir=${userDataDir.path}');
     }
@@ -89,9 +123,13 @@ class Puppeteer {
     if (noSandboxFlag) {
       chromeArgs.add('--no-sandbox');
     }
+    if (devTools) {
+      chromeArgs.add('--auto-open-devtools-for-tabs');
+    }
 
     _logger.info('Start $executablePath with $chromeArgs');
-    var chromeProcess = await Process.start(executablePath, chromeArgs);
+    var chromeProcess = await Process.start(executablePath, chromeArgs,
+        environment: environment);
 
     // ignore: unawaited_futures
     chromeProcess.exitCode.then((int exitCode) {
@@ -104,7 +142,7 @@ class Puppeteer {
 
     var webSocketUrl = await _waitForWebSocketUrl(chromeProcess);
     if (webSocketUrl != null) {
-      var connection = await Connection.create(webSocketUrl);
+      var connection = await Connection.create(webSocketUrl, delay: slowMo);
 
       var browser = createBrowser(chromeProcess, connection,
           defaultViewport: defaultViewport,
@@ -120,7 +158,55 @@ class Puppeteer {
     }
   }
 
+  //This methods attaches Puppeteer to an existing Chromium instance.
+  ///
+  /// Parameters:
+  ///  - `browserWSEndpoint`: a browser websocket endpoint to connect to.
+  ///  - `browserURL`:  a browser url to connect to, in format `http://${host}:${port}`.
+  ///     Use interchangeably with `browserWSEndpoint` to let Puppeteer fetch it
+  ///     from [metadata endpoint](https://chromedevtools.github.io/devtools-protocol/#how-do-i-access-the-browser-target).
+  ///  - `ignoreHTTPSErrors`: Whether to ignore HTTPS errors during navigation. Defaults to `false`.
+  ///  - `defaultViewport`: Sets a consistent viewport for each page. Defaults to an 1280x1024 viewport.
+  ///  - `slowMo`: Slows down Puppeteer operations by the specified amount of milliseconds.
+  ///     Useful so that you can see what is going on.
+  Future<Browser> connect(
+      {String browserWsEndpoint,
+      String browserUrl,
+      DeviceViewport defaultViewport,
+      bool ignoreHttpsErrors,
+      Duration slowMo}) async {
+    defaultViewport ??= DeviceViewport();
+
+    assert(
+        (browserWsEndpoint != null || browserUrl != null) &&
+            browserWsEndpoint != browserUrl,
+        'Exactly one of browserWSEndpoint, browserURL or transport must be passed to puppeteer.connect');
+
+    Connection connection;
+    if (browserWsEndpoint != null) {
+      connection = await Connection.create(browserWsEndpoint, delay: slowMo);
+    } else if (browserUrl != null) {
+      var connectionURL = await _wsEndpoint(browserUrl);
+      connection = await Connection.create(connectionURL, delay: slowMo);
+    }
+
+    var browserContextIds = await connection.targetApi.getBrowserContexts();
+    return createBrowser(null, connection,
+        browserContextIds: browserContextIds,
+        ignoreHttpsErrors: ignoreHttpsErrors,
+        defaultViewport: defaultViewport,
+        closeCallback: () =>
+            connection.send('Browser.close').catchError((e) => null));
+  }
+
   Devices get devices => devices_lib.devices;
+}
+
+Future<String> _wsEndpoint(String browserURL) async {
+  var response = await read(p.url.join(browserURL, 'json/version'));
+  Map decodedResponse = jsonDecode(response);
+
+  return decodedResponse['webSocketDebuggerUrl'];
 }
 
 Future _killChrome(Process process) {

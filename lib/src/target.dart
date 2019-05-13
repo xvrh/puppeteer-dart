@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:meta/meta.dart';
+import 'package:puppeteer/src/page/worker.dart';
 import '../protocol/target.dart';
 import 'browser.dart';
 import 'connection.dart';
@@ -17,6 +18,7 @@ class Target {
   TargetInfo _info;
   final _initializeCompleter = Completer<bool>();
   Future<Page> _pageFuture;
+  Future<Worker> _workerFuture;
   Future<bool> _initialized;
   final _closedCompleter = Completer();
   bool _isInitialized = false;
@@ -50,13 +52,16 @@ class Target {
 
   /// Identifies what kind of target this is.
   /// Can be `"page"`, [`"background_page"`](https://developer.chrome.com/extensions/background_pages),
-  /// `"service_worker"`, `"browser"` or `"other"`.
+  /// `"service_worker"`, `"shared_worker"`, `"browser"` or `"other"`.
   String get type {
     var type = _info.type;
-    if (type == 'page' ||
-        type == 'background_page' ||
-        type == 'service_worker' ||
-        type == 'browser') return type;
+    if (const [
+      'page',
+      'background_page',
+      'service_worker',
+      'shared_worker',
+      'browser'
+    ].contains(type)) return type;
     return 'other';
   }
 
@@ -73,6 +78,25 @@ class Target {
           Page.create(this, session, viewport: browser.defaultViewport));
     }
     return _pageFuture;
+  }
+
+  Future<Worker> get worker async {
+    if (_info.type != 'service_worker' && _info.type != 'shared_worker')
+      return null;
+    _workerFuture ??= this._sessionFactory().then((client) async {
+      TargetApi targetApi = TargetApi(client);
+
+      // Top level workers have a fake page wrapping the actual worker.
+      var targetAttachedFuture = targetApi.onAttachedToTarget.first;
+      await targetApi.setAutoAttach(true, false, flatten: true);
+
+      var targetAttached = await targetAttachedFuture;
+      var session = client.connection.sessions[targetAttached.sessionId.value];
+      // TODO Make workers send their console logs.
+      return Worker(session, _info.url,
+          onConsoleApiCalled: null, onExceptionThrown: null);
+    });
+    return _workerFuture;
   }
 
   void changeInfo(TargetInfo info) {

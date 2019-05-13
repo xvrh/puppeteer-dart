@@ -268,7 +268,7 @@ main() {
       await page.setOfflineMode(false);
       var response = await page.reload();
       expect(response.status, equals(200));
-    }, skip: 'Flaky when running the whole suite');
+    });
     test('should emulate navigator.onLine', () async {
       expect(await page.evaluate('() => window.navigator.onLine'), isTrue);
       await page.setOfflineMode(true);
@@ -546,6 +546,14 @@ main() {
       }''');
       expect(result, equals(15));
     });
+    test('should work with complex objects', () async {
+      await page.exposeFunction('complexObject', (Map a, Map b) {
+        return {'x': a['x'] + b['x']};
+      });
+      Map result =
+          await page.evaluate('async() => complexObject({x: 5}, {x: 2})');
+      expect(result['x'], equals(7));
+    });
   });
 
   group('Page.Events.PageError', () {
@@ -676,12 +684,10 @@ main() {
     test('should work with a path and type=module', () async {
       await page.goto(server.emptyPage);
       await page.addScriptTag(
-          file: File('test/es6/es6pathimport.js'), type: 'module');
+          file: File('test/assets/es6/es6pathimport.js'), type: 'module');
       await page.waitForFunction('window.__es6injected');
       expect(await page.evaluate('() => __es6injected'), equals(42));
-    },
-        //TODO(xha): debug
-        skip: true);
+    });
 
     test('should work with a content and type=module', () async {
       await page.goto(server.emptyPage);
@@ -691,9 +697,7 @@ main() {
           type: 'module');
       await page.waitForFunction('window.__es6injected');
       expect(await page.evaluate('() => __es6injected'), equals(42));
-    },
-        // TODO(xha): debug
-        skip: true);
+    });
 
     test('should throw an error if loading from url fail', () async {
       await page.goto(server.emptyPage);
