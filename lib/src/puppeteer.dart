@@ -48,6 +48,7 @@ const List<String> _headlessArgs = [
 
 final puppeteer = Puppeteer._();
 
+/// Launch or connect to a chrome instance
 class Puppeteer {
   Puppeteer._();
 
@@ -75,8 +76,8 @@ class Puppeteer {
   ///     with the bundled Chromium, use at your own risk.
   ///  - `slowMo` Slows down Puppeteer operations by the specified duration.
   ///     Useful so that you can see what is going on.
-  ///  - `defaultViewport` <?[Object]> Sets a consistent viewport for each page.
-  ///     Defaults to an 1280x1024 viewport.
+  ///  - `defaultViewport`: Sets a consistent viewport for each page.
+  ///     Defaults to an 1280x1024 viewport. `null` disables the default viewport.
   ///  - `args` Additional arguments to pass to the browser instance. The list
   ///    of Chromium flags can be found [here](http://peter.sh/experiments/chromium-command-line-switches/).
   ///  - `environment` Specify environment variables that will be visible to the browser.
@@ -89,7 +90,7 @@ class Puppeteer {
       bool devTools,
       bool useTemporaryUserData,
       bool noSandboxFlag,
-      DeviceViewport defaultViewport,
+      DeviceViewport defaultViewport = const DeviceViewport(),
       bool ignoreHttpsErrors,
       Duration slowMo,
       List<String> args,
@@ -99,7 +100,6 @@ class Puppeteer {
     headless ??= !devTools;
     // In docker environment we want to force the '--no-sandbox' flag automatically
     noSandboxFlag ??= Platform.environment['CHROME_FORCE_NO_SANDBOX'] == 'true';
-    defaultViewport ??= DeviceViewport();
 
     executablePath = await _inferExecutablePath();
 
@@ -166,17 +166,16 @@ class Puppeteer {
   ///     Use interchangeably with `browserWSEndpoint` to let Puppeteer fetch it
   ///     from [metadata endpoint](https://chromedevtools.github.io/devtools-protocol/#how-do-i-access-the-browser-target).
   ///  - `ignoreHTTPSErrors`: Whether to ignore HTTPS errors during navigation. Defaults to `false`.
-  ///  - `defaultViewport`: Sets a consistent viewport for each page. Defaults to an 1280x1024 viewport.
+  ///  - `defaultViewport`: Sets a consistent viewport for each page. Defaults to
+  ///     an 1280x1024 viewport.  `null` disables the default viewport.
   ///  - `slowMo`: Slows down Puppeteer operations by the specified amount of milliseconds.
   ///     Useful so that you can see what is going on.
   Future<Browser> connect(
       {String browserWsEndpoint,
       String browserUrl,
-      DeviceViewport defaultViewport,
+      DeviceViewport defaultViewport = const DeviceViewport(),
       bool ignoreHttpsErrors,
       Duration slowMo}) async {
-    defaultViewport ??= DeviceViewport();
-
     assert(
         (browserWsEndpoint != null || browserUrl != null) &&
             browserWsEndpoint != browserUrl,
