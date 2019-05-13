@@ -264,7 +264,8 @@ main() {
   group('Page.setOfflineMode', () {
     test('should work', () async {
       await page.setOfflineMode(true);
-      expect(() => page.goto(server.emptyPage), throwsA(anything));
+      expect(
+          () => page.goto(server.assetUrl('simple.html')), throwsA(anything));
       await page.setOfflineMode(false);
       var response = await page.reload();
       expect(response.status, equals(200));

@@ -119,11 +119,12 @@ main() {
     });
     test('should create a worker from a shared worker', () async {
       await page.goto(server.emptyPage);
+      var targetFuture =
+          context.waitForTarget((target) => target.type == 'shared_worker');
       await page.evaluate('''() => {
     new SharedWorker('data:text/javascript,console.log("hi")');
     }''');
-      var target = await context
-          .waitForTarget((target) => target.type == 'shared_worker');
+      var target = await targetFuture;
       var worker = await target.worker;
       expect(await worker.evaluate('() => self.toString()'),
           equals('[object SharedWorkerGlobalScope]'));
