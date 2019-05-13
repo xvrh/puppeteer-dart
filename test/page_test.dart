@@ -264,7 +264,7 @@ main() {
   group('Page.setOfflineMode', () {
     test('should work', () async {
       await page.setOfflineMode(true);
-      expect(
+      await expectLater(
           () => page.goto(server.assetUrl('simple.html')), throwsA(anything));
       await page.setOfflineMode(false);
       var response = await page.reload();
