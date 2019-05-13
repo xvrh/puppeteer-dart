@@ -55,7 +55,7 @@ class Browser {
 
     if (browserContextIds != null) {
       for (var contextId in browserContextIds) {
-        _contexts[contextId] = new BrowserContext(connection, this, contextId);
+        _contexts[contextId] = BrowserContext(connection, this, contextId);
       }
     }
 

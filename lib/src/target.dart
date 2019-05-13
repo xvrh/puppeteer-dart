@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:meta/meta.dart';
-import 'package:puppeteer/src/page/worker.dart';
 import '../protocol/target.dart';
 import 'browser.dart';
 import 'connection.dart';
 import 'page/page.dart';
+import 'page/worker.dart';
 
 class Target {
   /// Get the browser the target belongs to.
