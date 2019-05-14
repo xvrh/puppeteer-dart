@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart';
 import '../puppeteer.dart';
 import 'puppeteer.dart';
 
