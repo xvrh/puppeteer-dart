@@ -136,7 +136,7 @@ class Puppeteer {
     var launchOptions =
         LaunchOptions(args: chromeArgs, defaultViewport: defaultViewport);
 
-    var allPlugins = plugins.toList();
+    var allPlugins = this.plugins.toList();
     if (plugins != null) {
       allPlugins.addAll(plugins);
     }
@@ -200,7 +200,7 @@ class Puppeteer {
             browserWsEndpoint != browserUrl,
         'Exactly one of browserWSEndpoint, browserURL or transport must be passed to puppeteer.connect');
 
-    var allPlugins = plugins.toList();
+    var allPlugins = this.plugins.toList();
     if (plugins != null) {
       allPlugins.addAll(plugins);
     }
