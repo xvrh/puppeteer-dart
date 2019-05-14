@@ -18,6 +18,7 @@ import '../browser.dart';
 import '../connection.dart';
 import '../connection.dart' show Session;
 import '../target.dart';
+import 'coverage.dart';
 import 'dialog.dart';
 import 'dom_world.dart';
 import 'emulation_manager.dart';
@@ -76,6 +77,7 @@ class Page {
   final DevTools devTools;
   final _pageBindings = <String, Function>{};
   final _workers = <SessionID, Worker>{};
+  final Coverage coverage;
   FrameManager _frameManager;
   final StreamController _workerCreated = StreamController<Worker>.broadcast(),
       _workerDestroyed = StreamController<Worker>.broadcast(),
@@ -123,7 +125,8 @@ class Page {
   Keyboard _keyboard;
 
   Page._(this.target, this.devTools)
-      : _emulationManager = EmulationManager(devTools) {
+      : _emulationManager = EmulationManager(devTools),
+        coverage = Coverage(devTools) {
     _frameManager = FrameManager(this);
     _keyboard = Keyboard(devTools.input);
     _mouse = Mouse(devTools.input, _keyboard);

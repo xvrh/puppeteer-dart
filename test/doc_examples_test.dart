@@ -884,4 +884,31 @@ main() {
       }
     });
   });
+  group('Coverage', () {
+    test('class', () async {
+      //---
+      // Enable both JavaScript and CSS coverage
+      await Future.wait(
+          [page.coverage.startJSCoverage(), page.coverage.startCSSCoverage()]);
+      // Navigate to page
+      await page.goto(exampleValue(
+          server.assetUrl('doc_examples.html'), 'https://example.com'));
+      // Disable both JavaScript and CSS coverage
+      var jsCoverage = await page.coverage.stopJSCoverage();
+      var cssCoverage = await page.coverage.stopCSSCoverage();
+      var totalBytes = 0;
+      var usedBytes = 0;
+      var coverage = [...jsCoverage, ...cssCoverage];
+      for (var entry in coverage) {
+        totalBytes += entry.text.length;
+        for (var range in entry.ranges) {
+          usedBytes += range.end - range.start - 1;
+        }
+      }
+      print('Bytes used: ${usedBytes / totalBytes * 100}%');
+      //---
+      expect(usedBytes, greaterThan(0));
+      expect(totalBytes, greaterThan(0));
+    });
+  });
 }

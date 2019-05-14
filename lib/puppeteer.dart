@@ -25,3 +25,4 @@ export 'src/page/page.dart'
         ConsoleMessage,
         ConsoleMessageType;
 export 'src/puppeteer.dart' show puppeteer, Puppeteer;
+export 'src/page/coverage.dart' show Coverage, CoverageEntry, Range;

@@ -21,6 +21,7 @@ final classesOrder = [
   'ElementHandle',
   'Request',
   'Response',
+  'Coverage',
 ];
 
 main() {
