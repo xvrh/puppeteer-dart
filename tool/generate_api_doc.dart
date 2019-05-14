@@ -139,8 +139,11 @@ class Method {
         fullSignature =
             '${firstLetterLower(parent.name)}.$name → ${member.returnType}';
       } else {
-        title =
-            '${firstLetterLower(parent.name)}.$name${_escapeBracket(member.parameters.toString())}';
+        var parameters = _escapeBracket(member.parameters.toString());
+        if (parameters.length > 100) {
+          parameters = '(...)';
+        }
+        title = '${firstLetterLower(parent.name)}.$name$parameters';
         fullSignature =
             '${firstLetterLower(parent.name)}.$name${member.parameters} → ${member.returnType} ';
       }

@@ -3,8 +3,8 @@
 ##### Table of Contents
 
 - [class: Puppeteer](#class-puppeteer)
-  * [puppeteer.connect](#puppeteerconnectstring-browserwsendpoint-string-browserurl-deviceviewport-defaultviewport--launchoptionsviewportnotspecified-bool-ignorehttpserrors-duration-slowmo-listplugin-plugins)
-  * [puppeteer.launch](#puppeteerlaunchstring-executablepath-bool-headless-bool-devtools-bool-usetemporaryuserdata-bool-nosandboxflag-deviceviewport-defaultviewport--launchoptionsviewportnotspecified-bool-ignorehttpserrors-duration-slowmo-liststring-args-mapstring-string-environment-listplugin-plugins)
+  * [puppeteer.connect](#puppeteerconnect)
+  * [puppeteer.launch](#puppeteerlaunch)
 - [class: Browser](#class-browser)
   * [browser.browserContexts](#browserbrowsercontexts)
   * [browser.close](#browserclose)
@@ -81,7 +81,7 @@
   * [page.onRequestFailed](#pageonrequestfailed)
   * [page.onRequestFinished](#pageonrequestfinished)
   * [page.onResponse](#pageonresponse)
-  * [page.pdf](#pagepdfpaperformat-format-num-scale-bool-displayheaderfooter-string-headertemplate-string-footertemplate-bool-printbackground-bool-landscape-string-pageranges-bool-prefercsspagesize-pdfmargins-margins)
+  * [page.pdf](#pagepdf)
   * [page.queryObjects](#pagequeryobjectsjshandle-prototypehandle)
   * [page.reload](#pagereloadduration-timeout-until-wait)
   * [page.screenshot](#pagescreenshotscreenshotformat-format-bool-fullpage-rectangle-clip-num-quality-bool-omitbackground)
@@ -219,11 +219,12 @@
   * [response.statusText](#responsestatustext)
   * [response.text](#responsetext)
   * [response.url](#responseurl)
+- [class: Coverage](#class-coverage)
 
 ### class: Puppeteer
 Launch or connect to a chrome instance
 
-#### puppeteer.connect({String browserWsEndpoint, String browserUrl, DeviceViewport defaultViewport = LaunchOptions.viewportNotSpecified, bool ignoreHttpsErrors, Duration slowMo, List\<Plugin> plugins})
+#### puppeteer.connect(...)
 
 Parameters:
  - `browserWSEndpoint`: a browser websocket endpoint to connect to.
@@ -240,7 +241,7 @@ Parameters:
 puppeteer.connect({String browserWsEndpoint, String browserUrl, DeviceViewport defaultViewport = LaunchOptions.viewportNotSpecified, bool ignoreHttpsErrors, Duration slowMo, List<Plugin> plugins}) → Future<Browser> 
 ```
 
-#### puppeteer.launch({String executablePath, bool headless, bool devTools, bool useTemporaryUserData, bool noSandboxFlag, DeviceViewport defaultViewport = LaunchOptions.viewportNotSpecified, bool ignoreHttpsErrors, Duration slowMo, List\<String> args, Map\<String, String> environment, List\<Plugin> plugins})
+#### puppeteer.launch(...)
 Start a Chrome instance and connect to the DevTools endpoint.
 
 If [executablePath] is not provided and no environment variable
@@ -1381,7 +1382,7 @@ Emitted when a [response] is received.
 page.onResponse → Stream<Response>
 ```
 
-#### page.pdf({PaperFormat format, num scale, bool displayHeaderFooter, String headerTemplate, String footerTemplate, bool printBackground, bool landscape, String pageRanges, bool preferCssPageSize, PdfMargins margins})
+#### page.pdf(...)
 Generates a pdf of the page with `print` css media. To generate a pdf with
 `screen` media, call [Page.emulateMedia('screen')] before calling `page.pdf()`:
 
@@ -3539,5 +3540,35 @@ Contains the URL of the response.
 
 ```dart
 response.url → String
+```
+
+### class: Coverage
+Coverage gathers information about parts of JavaScript and CSS that were used by the page.
+
+An example of using JavaScript and CSS coverage to get percentage of initially
+executed code:
+
+```dart
+// Enable both JavaScript and CSS coverage
+await Promise.all([
+  page.coverage.startJSCoverage(),
+  page.coverage.startCSSCoverage()
+]);
+// Navigate to page
+await page.goto('https://example.com');
+// Disable both JavaScript and CSS coverage
+const [jsCoverage, cssCoverage] = await Promise.all([
+  page.coverage.stopJSCoverage(),
+  page.coverage.stopCSSCoverage(),
+]);
+let totalBytes = 0;
+let usedBytes = 0;
+const coverage = [...jsCoverage, ...cssCoverage];
+for (const entry of coverage) {
+  totalBytes += entry.text.length;
+  for (const range of entry.ranges)
+    usedBytes += range.end - range.start - 1;
+}
+console.log(`Bytes used: ${usedBytes / totalBytes * 100}%`);
 ```
 
