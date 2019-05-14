@@ -182,7 +182,7 @@ class Page {
       await page.setViewport(viewport);
     }
 
-    for (var plugin in puppeteer.plugins) {
+    for (var plugin in page.browser.plugins) {
       await plugin.pageCreated(page);
     }
 

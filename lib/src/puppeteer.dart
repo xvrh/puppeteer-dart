@@ -99,7 +99,8 @@ class Puppeteer {
       bool ignoreHttpsErrors,
       Duration slowMo,
       List<String> args,
-      Map<String, String> environment}) async {
+      Map<String, String> environment,
+      List<Plugin> plugins}) async {
     useTemporaryUserData ??= true;
     devTools ??= false;
     headless ??= !devTools;
@@ -132,10 +133,14 @@ class Puppeteer {
       chromeArgs.add('--auto-open-devtools-for-tabs');
     }
 
-    LaunchOptions launchOptions =
+    var launchOptions =
         LaunchOptions(args: chromeArgs, defaultViewport: defaultViewport);
 
-    for (var plugin in plugins) {
+    var allPlugins = plugins.toList();
+    if (plugins != null) {
+      allPlugins.addAll(plugins);
+    }
+    for (var plugin in allPlugins) {
       launchOptions = await plugin.willLaunchBrowser(launchOptions);
     }
 
@@ -159,7 +164,8 @@ class Puppeteer {
       var browser = createBrowser(chromeProcess, connection,
           defaultViewport: launchOptions.computedDefaultViewport,
           closeCallback: () => _killChrome(chromeProcess),
-          ignoreHttpsErrors: ignoreHttpsErrors);
+          ignoreHttpsErrors: ignoreHttpsErrors,
+          plugins: allPlugins);
       var targetFuture =
           browser.waitForTarget((target) => target.type == 'page');
       await browser.targetApi.setDiscoverTargets(true);
@@ -187,16 +193,22 @@ class Puppeteer {
       String browserUrl,
       DeviceViewport defaultViewport = LaunchOptions.viewportNotSpecified,
       bool ignoreHttpsErrors,
-      Duration slowMo}) async {
-    defaultViewport =
-        identical(defaultViewport, LaunchOptions.viewportNotSpecified)
-            ? DeviceViewport()
-            : defaultViewport;
-
+      Duration slowMo,
+      List<Plugin> plugins}) async {
     assert(
         (browserWsEndpoint != null || browserUrl != null) &&
             browserWsEndpoint != browserUrl,
         'Exactly one of browserWSEndpoint, browserURL or transport must be passed to puppeteer.connect');
+
+    var allPlugins = plugins.toList();
+    if (plugins != null) {
+      allPlugins.addAll(plugins);
+    }
+    var connectOptions =
+        LaunchOptions(args: null, defaultViewport: defaultViewport);
+    for (var plugin in allPlugins) {
+      connectOptions = await plugin.willLaunchBrowser(connectOptions);
+    }
 
     Connection connection;
     if (browserWsEndpoint != null) {
@@ -210,7 +222,8 @@ class Puppeteer {
     return createBrowser(null, connection,
         browserContextIds: browserContextIds,
         ignoreHttpsErrors: ignoreHttpsErrors,
-        defaultViewport: defaultViewport,
+        defaultViewport: connectOptions.computedDefaultViewport,
+        plugins: allPlugins,
         closeCallback: () =>
             connection.send('Browser.close').catchError((e) => null));
   }

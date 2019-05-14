@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:async/async.dart';
 import 'package:meta/meta.dart';
 import 'package:pool/pool.dart';
+import '../plugin.dart';
 import '../protocol/browser.dart';
 import '../protocol/system_info.dart';
 import '../protocol/target.dart';
@@ -41,17 +42,21 @@ class Browser {
   final _onTargetCreatedController = StreamController<Target>.broadcast(),
       _onTargetDestroyedController = StreamController<Target>.broadcast(),
       _onTargetChangedController = StreamController<Target>.broadcast();
+  final _plugins = <Plugin>[];
 
   Browser._(this.process, this.connection,
       {@required this.defaultViewport,
       @required List<BrowserContextID> browserContextIds,
       @required bool ignoreHttpsErrors,
-      @required Future Function() closeCallback})
+      @required Future Function() closeCallback,
+      @required List<Plugin> plugins})
       : _closeCallback = closeCallback,
         ignoreHttpsErrors = ignoreHttpsErrors ?? false,
         browser = BrowserApi(connection),
         systemInfo = SystemInfoApi(connection) {
     _defaultContext = BrowserContext(connection, this, null);
+
+    _plugins.addAll(plugins);
 
     if (browserContextIds != null) {
       for (var contextId in browserContextIds) {
@@ -69,6 +74,8 @@ class Browser {
     _onTargetDestroyedController.close();
     _onTargetChangedController.close();
   }
+
+  Iterable<Plugin> get plugins => List.unmodifiable(_plugins);
 
   /// Emitted when a target is created, for example when a new page is opened by
   /// [window.open](https://developer.mozilla.org/en-US/docs/Web/API/Window/open)
@@ -264,12 +271,14 @@ Browser createBrowser(Process process, Connection connection,
         {@required DeviceViewport defaultViewport,
         List<BrowserContextID> browserContextIds,
         @required Future Function() closeCallback,
-        @required bool ignoreHttpsErrors}) =>
+        @required bool ignoreHttpsErrors,
+        @required List<Plugin> plugins}) =>
     Browser._(process, connection,
         defaultViewport: defaultViewport,
         browserContextIds: browserContextIds,
         closeCallback: closeCallback,
-        ignoreHttpsErrors: ignoreHttpsErrors);
+        ignoreHttpsErrors: ignoreHttpsErrors,
+        plugins: plugins);
 
 Pool screenshotPool(Browser browser) => browser._screenshotsPool;
 
