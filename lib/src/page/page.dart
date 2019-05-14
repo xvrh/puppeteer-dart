@@ -13,6 +13,7 @@ import '../../protocol/network.dart';
 import '../../protocol/page.dart';
 import '../../protocol/runtime.dart';
 import '../../protocol/target.dart';
+import '../../puppeteer.dart';
 import '../browser.dart';
 import '../connection.dart';
 import '../connection.dart' show Session;
@@ -179,6 +180,10 @@ class Page {
 
     if (viewport != null) {
       await page.setViewport(viewport);
+    }
+
+    for (var plugin in puppeteer.plugins) {
+      await plugin.pageCreated(page);
     }
 
     return page;
@@ -1497,6 +1502,30 @@ function deliverError(name, seq, message, stack) {
       {Duration delay, MouseButton button, int clickCount}) {
     return mainFrame.click(selector,
         delay: delay, button: button, clickCount: clickCount);
+  }
+
+  /// Convenience function to wait for navigation to complete after clicking on an element.
+  ///
+  /// See this issue for more context: https://github.com/GoogleChrome/puppeteer/issues/1421
+  ///
+  /// > Note: Be wary of ajax powered pages where the navigation event is not triggered.
+  ///
+  /// ```dart
+  /// await page.clickAndWaitForNavigation('input#submitData');
+  /// ```
+  /// as opposed to:
+  ///
+  /// ```dart
+  /// await Future.wait([
+  ///   page.waitForNavigation(),
+  ///   page.click('input#submitData'),
+  /// ]);
+  /// ```
+  Future<Response> clickAndWaitForNavigation(String selector,
+      {Duration timeout, Until wait}) async {
+    var navigationFuture = waitForNavigation(timeout: timeout, wait: wait);
+    await click(selector);
+    return await navigationFuture;
   }
 
   /// This method fetches an element with `selector` and focuses it.

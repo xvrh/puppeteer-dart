@@ -2,13 +2,16 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart';
 import 'package:logging/logging.dart';
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
+import '../puppeteer.dart';
 import 'browser.dart';
 import 'connection.dart';
 import 'devices.dart';
 import 'devices.dart' as devices_lib;
 import 'downloader.dart';
 import 'page/emulation_manager.dart';
+import 'plugin.dart';
 
 final Logger _logger = Logger('puppeteer.launcher');
 
@@ -50,6 +53,8 @@ final puppeteer = Puppeteer._();
 
 /// Launch or connect to a chrome instance
 class Puppeteer {
+  final plugins = <Plugin>[];
+
   Puppeteer._();
 
   /// Start a Chrome instance and connect to the DevTools endpoint.
@@ -90,7 +95,7 @@ class Puppeteer {
       bool devTools,
       bool useTemporaryUserData,
       bool noSandboxFlag,
-      DeviceViewport defaultViewport = const DeviceViewport(),
+      DeviceViewport defaultViewport = LaunchOptions.viewportNotSpecified,
       bool ignoreHttpsErrors,
       Duration slowMo,
       List<String> args,
@@ -127,8 +132,15 @@ class Puppeteer {
       chromeArgs.add('--auto-open-devtools-for-tabs');
     }
 
+    LaunchOptions launchOptions =
+        LaunchOptions(args: chromeArgs, defaultViewport: defaultViewport);
+
+    for (var plugin in plugins) {
+      launchOptions = await plugin.willLaunchBrowser(launchOptions);
+    }
+
     _logger.info('Start $executablePath with $chromeArgs');
-    var chromeProcess = await Process.start(executablePath, chromeArgs,
+    var chromeProcess = await Process.start(executablePath, launchOptions.args,
         environment: environment);
 
     // ignore: unawaited_futures
@@ -145,7 +157,7 @@ class Puppeteer {
       var connection = await Connection.create(webSocketUrl, delay: slowMo);
 
       var browser = createBrowser(chromeProcess, connection,
-          defaultViewport: defaultViewport,
+          defaultViewport: launchOptions.computedDefaultViewport,
           closeCallback: () => _killChrome(chromeProcess),
           ignoreHttpsErrors: ignoreHttpsErrors);
       var targetFuture =
@@ -173,9 +185,14 @@ class Puppeteer {
   Future<Browser> connect(
       {String browserWsEndpoint,
       String browserUrl,
-      DeviceViewport defaultViewport = const DeviceViewport(),
+      DeviceViewport defaultViewport = LaunchOptions.viewportNotSpecified,
       bool ignoreHttpsErrors,
       Duration slowMo}) async {
+    defaultViewport =
+        identical(defaultViewport, LaunchOptions.viewportNotSpecified)
+            ? DeviceViewport()
+            : defaultViewport;
+
     assert(
         (browserWsEndpoint != null || browserUrl != null) &&
             browserWsEndpoint != browserUrl,
@@ -252,4 +269,28 @@ Future<String> _inferExecutablePath() async {
     // We download locally a version of chromium and use it.
     return (await downloadChrome()).executablePath;
   }
+}
+
+class LaunchOptions {
+  static const DeviceViewport viewportNotSpecified = DeviceViewport(width: -1);
+  static const DeviceViewport viewportNotOverride = DeviceViewport(width: -2);
+  final List<String> args;
+  final DeviceViewport defaultViewport;
+
+  LaunchOptions({@required this.args, @required this.defaultViewport});
+
+  LaunchOptions replace(
+      {List<String> args,
+      DeviceViewport defaultViewport = viewportNotOverride}) {
+    return LaunchOptions(
+        args: args ?? this.args,
+        defaultViewport: identical(defaultViewport, viewportNotOverride)
+            ? this.defaultViewport
+            : defaultViewport);
+  }
+
+  DeviceViewport get computedDefaultViewport =>
+      identical(defaultViewport, LaunchOptions.viewportNotSpecified)
+          ? DeviceViewport()
+          : defaultViewport;
 }

@@ -199,6 +199,17 @@ main() {
         ]);
       });
     });
+    group('clickAndWaitForNavigation', () {
+      test(0, () async {
+        await page.clickAndWaitForNavigation('input#submitData');
+      });
+      test(1, () async {
+        await Future.wait([
+          page.waitForNavigation(),
+          page.click('input#submitData'),
+        ]);
+      });
+    });
     test('emulate', () async {
       var iPhone = puppeteer.devices.iPhone6;
 
