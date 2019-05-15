@@ -30,6 +30,7 @@ import 'stealth_plugin_test.dart' as stealth_plugin_test;
 import 'target_test.dart' as target_test;
 import 'to_comment_test.dart' as to_comment_test;
 import 'touchscreen_test.dart' as touchscreen_test;
+import 'tracing_test.dart' as tracing_test;
 import 'wait_task_test.dart' as wait_task_test;
 import 'worker_test.dart' as worker_test;
 
@@ -56,6 +57,7 @@ main() {
   group('devices_test', devices_test.main);
   group('page_test', page_test.main);
   group('golden_utils_test', golden_utils_test.main);
+  group('tracing_test', tracing_test.main);
   group('downloader_test', downloader_test.main);
   group('wait_task_test', wait_task_test.main);
   group('browser_test', browser_test.main);

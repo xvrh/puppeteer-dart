@@ -8,8 +8,9 @@
 - Add a small "plugin" system
 - Add the `StealthPlugin` to automatically applies various techniques to make detection of headless puppeteer harder.
 - Add `Page.clickAndWaitForNavigation` for convenience.
-- Add `Page.coverage` feature.
-- Add `Page.metrics` feature.
+- Add `Page.coverage` feature
+- Add `Page.metrics` feature
+- Add `Page.tracing` feature
 
 ## 1.5.0 (2019-05-07)
 - Rename classes `Frame`, `Request` & `Response` to match the puppeteer API

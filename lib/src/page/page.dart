@@ -32,6 +32,7 @@ import 'metrics.dart';
 import 'mouse.dart';
 import 'network_manager.dart';
 import 'touchscreen.dart';
+import 'tracing.dart';
 import 'worker.dart';
 
 final _logger = Logger('puppeteer.page');
@@ -79,6 +80,7 @@ class Page {
   final _pageBindings = <String, Function>{};
   final _workers = <SessionID, Worker>{};
   final Coverage coverage;
+  final Tracing tracing;
   FrameManager _frameManager;
   final StreamController _workerCreated = StreamController<Worker>.broadcast(),
       _workerDestroyed = StreamController<Worker>.broadcast(),
@@ -127,7 +129,8 @@ class Page {
 
   Page._(this.target, this.devTools)
       : _emulationManager = EmulationManager(devTools),
-        coverage = Coverage(devTools) {
+        coverage = Coverage(devTools),
+        tracing = Tracing(devTools) {
     _frameManager = FrameManager(this);
     _keyboard = Keyboard(devTools.input);
     _mouse = Mouse(devTools.input, _keyboard);

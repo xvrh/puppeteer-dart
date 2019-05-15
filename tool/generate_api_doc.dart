@@ -13,6 +13,7 @@ final classesOrder = [
   'Keyboard',
   'Mouse',
   'Touchscreen',
+  'Tracing',
   'Dialog',
   'ConsoleMessage',
   'Frame',

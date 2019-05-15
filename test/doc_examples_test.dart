@@ -911,4 +911,16 @@ main() {
       expect(totalBytes, greaterThan(0));
     });
   });
+  group('Tracing', () {
+    test('class', () async {
+      //----
+      await page.tracing.start();
+      await page.goto(exampleValue(
+          server.assetUrl('doc_examples.html'), 'https://www.google.com'));
+      await page.tracing
+          .stop(File(exampleValue('_trace.json', 'trace.json')).openWrite());
+      //---
+      expect(File('_trace.json').existsSync(), isTrue);
+    });
+  });
 }

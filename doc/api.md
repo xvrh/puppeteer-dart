@@ -126,6 +126,9 @@
   * [mouse.up](#mouseupmousebutton-button-int-clickcount)
 - [class: Touchscreen](#class-touchscreen)
   * [touchscreen.tap](#touchscreentappoint-position)
+- [class: Tracing](#class-tracing)
+  * [tracing.start](#tracingstart)
+  * [tracing.stop](#tracingstopstringsink-output)
 - [class: Dialog](#class-dialog)
   * [dialog.accept](#dialogacceptstring-prompttext)
   * [dialog.defaultValue](#dialogdefaultvalue)
@@ -2215,6 +2218,33 @@ Dispatches a `touchstart` and `touchend` event.
 
 ```dart
 touchscreen.tap(Point position) → Future<void> 
+```
+
+### class: Tracing
+You can use [tracing.start] and [tracing.stop] to create a trace file which
+can be opened in Chrome DevTools or [timeline viewer](https://chromedevtools.github.io/timeline-viewer/).
+
+```dart
+await page.tracing.start();
+await page.goto('https://www.google.com');
+await page.tracing.stop(File('trace.json').openWrite());
+```
+
+#### tracing.start(...)
+Only one trace can be active at a time per browser.
+
+
+Parameters:
+
+```dart
+tracing.start({bool screenshots, List<String> categories}) → Future<void> 
+```
+
+#### tracing.stop(StringSink output)
+Promise which resolves to buffer with trace data.
+
+```dart
+tracing.stop(StringSink output) → Future<void> 
 ```
 
 ### class: Dialog

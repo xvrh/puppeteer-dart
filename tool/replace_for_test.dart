@@ -40,197 +40,72 @@ main() {
 }
 
 final _input = r'''
-  describe('JSCoverage', function() {
-    it('should work', async function({page, server}) {
-      await page.coverage.startJSCoverage();
-      await page.goto(server.PREFIX + '/jscoverage/simple.html', {waitUntil: 'networkidle0'});
-      const coverage = await page.coverage.stopJSCoverage();
-      expect(coverage.length).toBe(1);
-      expect(coverage[0].url).toContain('/jscoverage/simple.html');
-      expect(coverage[0].ranges).toEqual([
-        { start: 0, end: 17 },
-        { start: 35, end: 61 },
-      ]);
+  describe('Tracing', function() {
+    beforeEach(async function(state) {
+      state.outputFile = path.join(__dirname, 'assets', `trace-${state.parallelIndex}.json`);
+      state.browser = await puppeteer.launch(defaultBrowserOptions);
+      state.page = await state.browser.newPage();
     });
-    it('should report sourceURLs', async function({page, server}) {
-      await page.coverage.startJSCoverage();
-      await page.goto(server.PREFIX + '/jscoverage/sourceurl.html');
-      const coverage = await page.coverage.stopJSCoverage();
-      expect(coverage.length).toBe(1);
-      expect(coverage[0].url).toBe('nicename.js');
+    afterEach(async function(state) {
+      await state.browser.close();
+      state.browser = null;
+      state.page = null;
+      if (fs.existsSync(state.outputFile)) {
+        fs.unlinkSync(state.outputFile);
+        state.outputFile = null;
+      }
     });
-    it('should ignore eval() scripts by default', async function({page, server}) {
-      await page.coverage.startJSCoverage();
-      await page.goto(server.PREFIX + '/jscoverage/eval.html');
-      const coverage = await page.coverage.stopJSCoverage();
-      expect(coverage.length).toBe(1);
+    it('should output a trace', async({page, server, outputFile}) => {
+      await page.tracing.start({screenshots: true, path: outputFile});
+      await page.goto(server.PREFIX + '/grid.html');
+      await page.tracing.stop();
+      expect(fs.existsSync(outputFile)).toBe(true);
     });
-    it('shouldn\'t ignore eval() scripts if reportAnonymousScripts is true', async function({page, server}) {
-      await page.coverage.startJSCoverage({reportAnonymousScripts: true});
-      await page.goto(server.PREFIX + '/jscoverage/eval.html');
-      const coverage = await page.coverage.stopJSCoverage();
-      expect(coverage.find(entry => entry.url.startsWith('debugger://'))).not.toBe(null);
-      expect(coverage.length).toBe(2);
-    });
-    it('should ignore pptr internal scripts if reportAnonymousScripts is true', async function({page, server}) {
-      await page.coverage.startJSCoverage({reportAnonymousScripts: true});
-      await page.goto(server.EMPTY_PAGE);
-      await page.evaluate('console.log("foo")');
-      await page.evaluate(() => console.log('bar'));
-      const coverage = await page.coverage.stopJSCoverage();
-      expect(coverage.length).toBe(0);
-    });
-    it('should report multiple scripts', async function({page, server}) {
-      await page.coverage.startJSCoverage();
-      await page.goto(server.PREFIX + '/jscoverage/multiple.html');
-      const coverage = await page.coverage.stopJSCoverage();
-      expect(coverage.length).toBe(2);
-      coverage.sort((a, b) => a.url.localeCompare(b.url));
-      expect(coverage[0].url).toContain('/jscoverage/script1.js');
-      expect(coverage[1].url).toContain('/jscoverage/script2.js');
-    });
-    it('should report right ranges', async function({page, server}) {
-      await page.coverage.startJSCoverage();
-      await page.goto(server.PREFIX + '/jscoverage/ranges.html');
-      const coverage = await page.coverage.stopJSCoverage();
-      expect(coverage.length).toBe(1);
-      const entry = coverage[0];
-      expect(entry.ranges.length).toBe(1);
-      const range = entry.ranges[0];
-      expect(entry.text.substring(range.start, range.end)).toBe(`console.log('used!');`);
-    });
-    it('should report scripts that have no coverage', async function({page, server}) {
-      await page.coverage.startJSCoverage();
-      await page.goto(server.PREFIX + '/jscoverage/unused.html');
-      const coverage = await page.coverage.stopJSCoverage();
-      expect(coverage.length).toBe(1);
-      const entry = coverage[0];
-      expect(entry.url).toContain('unused.html');
-      expect(entry.ranges.length).toBe(0);
-    });
-    it('should work with conditionals', async function({page, server}) {
-      await page.coverage.startJSCoverage();
-      await page.goto(server.PREFIX + '/jscoverage/involved.html');
-      const coverage = await page.coverage.stopJSCoverage();
-      expect(JSON.stringify(coverage, null, 2).replace(/:\d{4}\//g, ':<PORT>/')).toBeGolden('jscoverage-involved.txt');
-    });
-    describe('resetOnNavigation', function() {
-      it('should report scripts across navigations when disabled', async function({page, server}) {
-        await page.coverage.startJSCoverage({resetOnNavigation: false});
-        await page.goto(server.PREFIX + '/jscoverage/multiple.html');
-        await page.goto(server.EMPTY_PAGE);
-        const coverage = await page.coverage.stopJSCoverage();
-        expect(coverage.length).toBe(2);
-      });
-      it('should NOT report scripts across navigations when enabled', async function({page, server}) {
-        await page.coverage.startJSCoverage(); // Enabled by default.
-        await page.goto(server.PREFIX + '/jscoverage/multiple.html');
-        await page.goto(server.EMPTY_PAGE);
-        const coverage = await page.coverage.stopJSCoverage();
-        expect(coverage.length).toBe(0);
-      });
-    });
-    xit('should not hang when there is a debugger statement', async function({page, server}) {
-      await page.coverage.startJSCoverage();
-      await page.goto(server.EMPTY_PAGE);
-      await page.evaluate(() => {
-        debugger; // eslint-disable-line no-debugger
-      });
-      await page.coverage.stopJSCoverage();
-    });
-  });
+    it('should run with custom categories if provided', async({page, outputFile}) => {
+      await page.tracing.start({path: outputFile, categories: ['disabled-by-default-v8.cpu_profiler.hires']});
+      await page.tracing.stop();
 
-  describe('CSSCoverage', function() {
-    it('should work', async function({page, server}) {
-      await page.coverage.startCSSCoverage();
-      await page.goto(server.PREFIX + '/csscoverage/simple.html');
-      const coverage = await page.coverage.stopCSSCoverage();
-      expect(coverage.length).toBe(1);
-      expect(coverage[0].url).toContain('/csscoverage/simple.html');
-      expect(coverage[0].ranges).toEqual([
-        {start: 1, end: 22}
-      ]);
-      const range = coverage[0].ranges[0];
-      expect(coverage[0].text.substring(range.start, range.end)).toBe('div { color: green; }');
+      const traceJson = JSON.parse(fs.readFileSync(outputFile));
+      expect(traceJson.metadata['trace-config']).toContain('disabled-by-default-v8.cpu_profiler.hires');
     });
-    it('should report sourceURLs', async function({page, server}) {
-      await page.coverage.startCSSCoverage();
-      await page.goto(server.PREFIX + '/csscoverage/sourceurl.html');
-      const coverage = await page.coverage.stopCSSCoverage();
-      expect(coverage.length).toBe(1);
-      expect(coverage[0].url).toBe('nicename.css');
+    it('should throw if tracing on two pages', async({page, server, browser, outputFile}) => {
+      await page.tracing.start({path: outputFile});
+      const newPage = await browser.newPage();
+      let error = null;
+      await newPage.tracing.start({path: outputFile}).catch(e => error = e);
+      await newPage.close();
+      expect(error).toBeTruthy();
+      await page.tracing.stop();
     });
-    it('should report multiple stylesheets', async function({page, server}) {
-      await page.coverage.startCSSCoverage();
-      await page.goto(server.PREFIX + '/csscoverage/multiple.html');
-      const coverage = await page.coverage.stopCSSCoverage();
-      expect(coverage.length).toBe(2);
-      coverage.sort((a, b) => a.url.localeCompare(b.url));
-      expect(coverage[0].url).toContain('/csscoverage/stylesheet1.css');
-      expect(coverage[1].url).toContain('/csscoverage/stylesheet2.css');
+    it('should return a buffer', async({page, server, outputFile}) => {
+      await page.tracing.start({screenshots: true, path: outputFile});
+      await page.goto(server.PREFIX + '/grid.html');
+      const trace = await page.tracing.stop();
+      const buf = fs.readFileSync(outputFile);
+      expect(trace.toString()).toEqual(buf.toString());
     });
-    it('should report stylesheets that have no coverage', async function({page, server}) {
-      await page.coverage.startCSSCoverage();
-      await page.goto(server.PREFIX + '/csscoverage/unused.html');
-      const coverage = await page.coverage.stopCSSCoverage();
-      expect(coverage.length).toBe(1);
-      expect(coverage[0].url).toBe('unused.css');
-      expect(coverage[0].ranges.length).toBe(0);
+    it('should work without options', async({page, server, outputFile}) => {
+      await page.tracing.start();
+      await page.goto(server.PREFIX + '/grid.html');
+      const trace = await page.tracing.stop();
+      expect(trace).toBeTruthy();
     });
-    it('should work with media queries', async function({page, server}) {
-      await page.coverage.startCSSCoverage();
-      await page.goto(server.PREFIX + '/csscoverage/media.html');
-      const coverage = await page.coverage.stopCSSCoverage();
-      expect(coverage.length).toBe(1);
-      expect(coverage[0].url).toContain('/csscoverage/media.html');
-      expect(coverage[0].ranges).toEqual([
-        {start: 17, end: 38}
-      ]);
+    it('should return null in case of Buffer error', async({page, server}) => {
+      await page.tracing.start({screenshots: true});
+      await page.goto(server.PREFIX + '/grid.html');
+      const oldBufferConcat = Buffer.concat;
+      Buffer.concat = bufs => {
+        throw 'error';
+      };
+      const trace = await page.tracing.stop();
+      expect(trace).toEqual(null);
+      Buffer.concat = oldBufferConcat;
     });
-    it('should work with complicated usecases', async function({page, server}) {
-      await page.coverage.startCSSCoverage();
-      await page.goto(server.PREFIX + '/csscoverage/involved.html');
-      const coverage = await page.coverage.stopCSSCoverage();
-      expect(JSON.stringify(coverage, null, 2).replace(/:\d{4}\//g, ':<PORT>/')).toBeGolden('csscoverage-involved.txt');
-    });
-    it('should ignore injected stylesheets', async function({page, server}) {
-      await page.coverage.startCSSCoverage();
-      await page.addStyleTag({content: 'body { margin: 10px;}'});
-      // trigger style recalc
-      const margin = await page.evaluate(() => window.getComputedStyle(document.body).margin);
-      expect(margin).toBe('10px');
-      const coverage = await page.coverage.stopCSSCoverage();
-      expect(coverage.length).toBe(0);
-    });
-    describe('resetOnNavigation', function() {
-      it('should report stylesheets across navigations', async function({page, server}) {
-        await page.coverage.startCSSCoverage({resetOnNavigation: false});
-        await page.goto(server.PREFIX + '/csscoverage/multiple.html');
-        await page.goto(server.EMPTY_PAGE);
-        const coverage = await page.coverage.stopCSSCoverage();
-        expect(coverage.length).toBe(2);
-      });
-      it('should NOT report scripts across navigations', async function({page, server}) {
-        await page.coverage.startCSSCoverage(); // Enabled by default.
-        await page.goto(server.PREFIX + '/csscoverage/multiple.html');
-        await page.goto(server.EMPTY_PAGE);
-        const coverage = await page.coverage.stopCSSCoverage();
-        expect(coverage.length).toBe(0);
-      });
-    });
-    it('should work with a recently loaded stylesheet', async function({page, server}) {
-      await page.coverage.startCSSCoverage();
-      await page.evaluate(async url => {
-        document.body.textContent = 'hello, world';
-
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = url;
-        document.head.appendChild(link);
-        await new Promise(x => link.onload = x);
-      }, server.PREFIX + '/csscoverage/stylesheet1.css');
-      const coverage = await page.coverage.stopCSSCoverage();
-      expect(coverage.length).toBe(1);
+    it('should support a buffer without a path', async({page, server}) => {
+      await page.tracing.start({screenshots: true});
+      await page.goto(server.PREFIX + '/grid.html');
+      const trace = await page.tracing.stop();
+      expect(trace.toString()).toContain('screenshot');
     });
   });
 ''';
