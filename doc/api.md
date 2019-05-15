@@ -66,6 +66,7 @@
   * [page.hover](#pagehoverstring-selector)
   * [page.isClosed](#pageisclosed)
   * [page.mainFrame](#pagemainframe)
+  * [page.metrics](#pagemetrics)
   * [page.onClose](#pageonclose)
   * [page.onConsole](#pageonconsole)
   * [page.onDialog](#pageondialog)
@@ -75,6 +76,7 @@
   * [page.onFrameDetached](#pageonframedetached)
   * [page.onFrameNavigated](#pageonframenavigated)
   * [page.onLoad](#pageonload)
+  * [page.onMetrics](#pageonmetrics)
   * [page.onPageCrashed](#pageonpagecrashed)
   * [page.onPopup](#pageonpopup)
   * [page.onRequest](#pageonrequest)
@@ -1249,6 +1251,29 @@ Page is guaranteed to have a main frame which persists during navigations.
 page.mainFrame → Frame
 ```
 
+#### page.metrics()
+Returns an object containing metrics of the page.
+  - `Timestamp` The timestamp when the metrics sample was taken.
+  - `Documents` Number of documents in the page.
+  - `Frames` Number of frames in the page.
+  - `JSEventListeners` Number of events in the page.
+  - `Nodes` Number of DOM nodes in the page.
+  - `LayoutCount` Total number of full or partial page layout.
+  - `RecalcStyleCount` Total number of page style recalculations.
+  - `LayoutDuration` Combined durations of all page layouts.
+  - `RecalcStyleDuration` Combined duration of all page style recalculations.
+  - `ScriptDuration` Combined duration of JavaScript execution.
+  - `TaskDuration` Combined duration of all tasks performed by the browser.
+  - `JSHeapUsedSize` Used JavaScript heap size.
+  - `JSHeapTotalSize` Total JavaScript heap size.
+
+> **NOTE** All timestamps are in monotonic time: monotonically increasing
+time in seconds since an arbitrary point in the past.
+
+```dart
+page.metrics() → Future<Metrics> 
+```
+
 #### page.onClose
 Complete when the page closes.
 
@@ -1330,6 +1355,18 @@ event is dispatched.
 
 ```dart
 page.onLoad → Stream<MonotonicTime>
+```
+
+#### page.onMetrics
+Emitted when the JavaScript code makes a call to `console.timeStamp`.
+For the list of metrics see `page.metrics`.
+
+Result:
+ - `title` The title passed to `console.timeStamp`.
+ - `metrics` Object containing the metrics.
+
+```dart
+page.onMetrics → Stream<MetricsEvent>
 ```
 
 #### page.onPageCrashed

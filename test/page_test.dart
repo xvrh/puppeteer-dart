@@ -424,6 +424,55 @@ main() {
       await blankFuture;
     });
   });
+  group('Page.metrics', () {
+    checkMetrics(Metrics metrics) {
+      var metricsToCheck = {
+        'Timestamp',
+        'Documents',
+        'Frames',
+        'JSEventListeners',
+        'Nodes',
+        'LayoutCount',
+        'RecalcStyleCount',
+        'LayoutDuration',
+        'RecalcStyleDuration',
+        'ScriptDuration',
+        'TaskDuration',
+        'JSHeapUsedSize',
+        'JSHeapTotalSize',
+      };
+      for (var name in metricsToCheck) {
+        expect(metrics.values, contains(name));
+        expect(metrics.values[name], greaterThanOrEqualTo(0));
+      }
+      expect(metrics.timestamp, greaterThanOrEqualTo(0));
+      expect(metrics.documents, greaterThanOrEqualTo(0));
+      expect(metrics.frames, greaterThanOrEqualTo(0));
+      expect(metrics.jsEventListeners, greaterThanOrEqualTo(0));
+      expect(metrics.nodes, greaterThanOrEqualTo(0));
+      expect(metrics.layoutCount, greaterThanOrEqualTo(0));
+      expect(metrics.recalcStyleCount, greaterThanOrEqualTo(0));
+      expect(metrics.layoutDuration, greaterThanOrEqualTo(0));
+      expect(metrics.recalcStyleDuration, greaterThanOrEqualTo(0));
+      expect(metrics.scriptDuration, greaterThanOrEqualTo(0));
+      expect(metrics.taskDuration, greaterThanOrEqualTo(0));
+      expect(metrics.jsHeapUsedSize, greaterThanOrEqualTo(0));
+      expect(metrics.jsHeapTotalSize, greaterThanOrEqualTo(0));
+    }
+
+    test('should get metrics from a page', () async {
+      await page.goto('about:blank');
+      var metrics = await page.metrics();
+      checkMetrics(metrics);
+    });
+    test('metrics event fired on console.timeStamp', () async {
+      var metricsPromise = page.onMetrics.first;
+      await page.evaluate("() => console.timeStamp('test42')");
+      var metrics = await metricsPromise;
+      expect(metrics.title, equals('test42'));
+      checkMetrics(metrics.metrics);
+    });
+  });
   group('Page.waitForRequest', () {
     test('should work', () async {
       await page.goto(server.emptyPage);

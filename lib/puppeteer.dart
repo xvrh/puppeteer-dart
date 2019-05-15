@@ -15,6 +15,7 @@ export 'src/page/js_handle.dart'
     show JsHandle, ElementHandle, NodeIsNotVisibleException;
 export 'src/page/keyboard.dart' show Key;
 export 'src/page/lifecycle_watcher.dart' show Until;
+export 'src/page/metrics.dart' show Metrics, MetricsEvent;
 export 'src/page/mouse.dart' show MouseButton;
 export 'src/page/network_manager.dart' show Request, Response;
 export 'src/page/page.dart'

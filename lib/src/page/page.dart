@@ -28,6 +28,7 @@ import 'helper.dart';
 import 'js_handle.dart';
 import 'keyboard.dart';
 import 'lifecycle_watcher.dart';
+import 'metrics.dart';
 import 'mouse.dart';
 import 'network_manager.dart';
 import 'touchscreen.dart';
@@ -298,6 +299,15 @@ class Page {
   /// `confirm` or `beforeunload`. Puppeteer can respond to the dialog via
   /// [Dialog.accept] or [Dialog.dismiss] methods.
   Stream<Dialog> get onDialog => _onDialogController.stream;
+
+  /// Emitted when the JavaScript code makes a call to `console.timeStamp`.
+  /// For the list of metrics see `page.metrics`.
+  ///
+  /// Result:
+  ///  - `title` The title passed to `console.timeStamp`.
+  ///  - `metrics` Object containing the metrics.
+  Stream<MetricsEvent> get onMetrics => devTools.performance.onMetrics
+      .map((e) => MetricsEvent(e.title, Metrics.fromBrowser(e.metrics)));
 
   FrameManager get frameManager => _frameManager;
 
@@ -780,6 +790,27 @@ function addPageBinding(bindingName) {
   /// Specific user agent to use in this page
   Future<void> setUserAgent(String userAgent) async {
     await _frameManager.networkManager.setUserAgent(userAgent);
+  }
+
+  /// Returns an object containing metrics of the page.
+  ///   - `Timestamp` The timestamp when the metrics sample was taken.
+  ///   - `Documents` Number of documents in the page.
+  ///   - `Frames` Number of frames in the page.
+  ///   - `JSEventListeners` Number of events in the page.
+  ///   - `Nodes` Number of DOM nodes in the page.
+  ///   - `LayoutCount` Total number of full or partial page layout.
+  ///   - `RecalcStyleCount` Total number of page style recalculations.
+  ///   - `LayoutDuration` Combined durations of all page layouts.
+  ///   - `RecalcStyleDuration` Combined duration of all page style recalculations.
+  ///   - `ScriptDuration` Combined duration of JavaScript execution.
+  ///   - `TaskDuration` Combined duration of all tasks performed by the browser.
+  ///   - `JSHeapUsedSize` Used JavaScript heap size.
+  ///   - `JSHeapTotalSize` Total JavaScript heap size.
+  ///
+  /// > **NOTE** All timestamps are in monotonic time: monotonically increasing
+  /// time in seconds since an arbitrary point in the past.
+  Future<Metrics> metrics() async {
+    return Metrics.fromBrowser(await devTools.performance.getMetrics());
   }
 
   void _handleException(ExceptionThrownEvent event) {
