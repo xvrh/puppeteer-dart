@@ -1,6 +1,6 @@
 # Changelog
 
-## Next
+## 1.6.0 (2019-05-15)
 - Add `puppeteer.connect` to connect to an existing Chromium instance
 - Add `slowMo` parameter for `puppeteer.launch` et `puppeteer.connect` to slow down communications with the browser.
 - Create `Worker` from service_worker and shared_worker.
