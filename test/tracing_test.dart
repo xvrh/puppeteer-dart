@@ -59,7 +59,7 @@ main() {
       await page.tracing.start();
       await page.goto(server.prefix + '/grid.html');
       var buffer = StringBuffer();
-      var trace = await page.tracing.stop(buffer);
+      await page.tracing.stop(buffer);
       expect(buffer.toString(), isNotNull);
     });
   });
