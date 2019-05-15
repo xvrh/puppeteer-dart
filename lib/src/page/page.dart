@@ -18,6 +18,7 @@ import '../browser.dart';
 import '../connection.dart';
 import '../connection.dart' show Session;
 import '../target.dart';
+import 'coverage.dart';
 import 'dialog.dart';
 import 'dom_world.dart';
 import 'emulation_manager.dart';
@@ -27,9 +28,11 @@ import 'helper.dart';
 import 'js_handle.dart';
 import 'keyboard.dart';
 import 'lifecycle_watcher.dart';
+import 'metrics.dart';
 import 'mouse.dart';
 import 'network_manager.dart';
 import 'touchscreen.dart';
+import 'tracing.dart';
 import 'worker.dart';
 
 final _logger = Logger('puppeteer.page');
@@ -76,6 +79,8 @@ class Page {
   final DevTools devTools;
   final _pageBindings = <String, Function>{};
   final _workers = <SessionID, Worker>{};
+  final Coverage coverage;
+  final Tracing tracing;
   FrameManager _frameManager;
   final StreamController _workerCreated = StreamController<Worker>.broadcast(),
       _workerDestroyed = StreamController<Worker>.broadcast(),
@@ -123,7 +128,9 @@ class Page {
   Keyboard _keyboard;
 
   Page._(this.target, this.devTools)
-      : _emulationManager = EmulationManager(devTools) {
+      : _emulationManager = EmulationManager(devTools),
+        coverage = Coverage(devTools),
+        tracing = Tracing(devTools) {
     _frameManager = FrameManager(this);
     _keyboard = Keyboard(devTools.input);
     _mouse = Mouse(devTools.input, _keyboard);
@@ -295,6 +302,15 @@ class Page {
   /// `confirm` or `beforeunload`. Puppeteer can respond to the dialog via
   /// [Dialog.accept] or [Dialog.dismiss] methods.
   Stream<Dialog> get onDialog => _onDialogController.stream;
+
+  /// Emitted when the JavaScript code makes a call to `console.timeStamp`.
+  /// For the list of metrics see `page.metrics`.
+  ///
+  /// Result:
+  ///  - `title` The title passed to `console.timeStamp`.
+  ///  - `metrics` Object containing the metrics.
+  Stream<MetricsEvent> get onMetrics => devTools.performance.onMetrics
+      .map((e) => MetricsEvent(e.title, Metrics.fromBrowser(e.metrics)));
 
   FrameManager get frameManager => _frameManager;
 
@@ -777,6 +793,27 @@ function addPageBinding(bindingName) {
   /// Specific user agent to use in this page
   Future<void> setUserAgent(String userAgent) async {
     await _frameManager.networkManager.setUserAgent(userAgent);
+  }
+
+  /// Returns an object containing metrics of the page.
+  ///   - `Timestamp` The timestamp when the metrics sample was taken.
+  ///   - `Documents` Number of documents in the page.
+  ///   - `Frames` Number of frames in the page.
+  ///   - `JSEventListeners` Number of events in the page.
+  ///   - `Nodes` Number of DOM nodes in the page.
+  ///   - `LayoutCount` Total number of full or partial page layout.
+  ///   - `RecalcStyleCount` Total number of page style recalculations.
+  ///   - `LayoutDuration` Combined durations of all page layouts.
+  ///   - `RecalcStyleDuration` Combined duration of all page style recalculations.
+  ///   - `ScriptDuration` Combined duration of JavaScript execution.
+  ///   - `TaskDuration` Combined duration of all tasks performed by the browser.
+  ///   - `JSHeapUsedSize` Used JavaScript heap size.
+  ///   - `JSHeapTotalSize` Total JavaScript heap size.
+  ///
+  /// > **NOTE** All timestamps are in monotonic time: monotonically increasing
+  /// time in seconds since an arbitrary point in the past.
+  Future<Metrics> metrics() async {
+    return Metrics.fromBrowser(await devTools.performance.getMetrics());
   }
 
   void _handleException(ExceptionThrownEvent event) {

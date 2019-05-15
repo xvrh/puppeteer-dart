@@ -2,6 +2,7 @@ import 'package:test/test.dart';
 import 'browser_context_test.dart' as browser_context_test;
 import 'browser_test.dart' as browser_test;
 import 'click_test.dart' as click_test;
+import 'coverage_test.dart' as coverage_test;
 import 'devices_test.dart' as devices_test;
 import 'dialog_test.dart' as dialog_test;
 import 'doc_example_extractor_test.dart' as doc_example_extractor_test;
@@ -29,6 +30,7 @@ import 'stealth_plugin_test.dart' as stealth_plugin_test;
 import 'target_test.dart' as target_test;
 import 'to_comment_test.dart' as to_comment_test;
 import 'touchscreen_test.dart' as touchscreen_test;
+import 'tracing_test.dart' as tracing_test;
 import 'wait_task_test.dart' as wait_task_test;
 import 'worker_test.dart' as worker_test;
 
@@ -50,10 +52,12 @@ main() {
   group('query_selector_test', query_selector_test.main);
   group('javascript_parser_test', javascript_parser_test.main);
   group('evaluation_test', evaluation_test.main);
+  group('coverage_test', coverage_test.main);
   group('readme_test', readme_test.main);
   group('devices_test', devices_test.main);
   group('page_test', page_test.main);
   group('golden_utils_test', golden_utils_test.main);
+  group('tracing_test', tracing_test.main);
   group('downloader_test', downloader_test.main);
   group('wait_task_test', wait_task_test.main);
   group('browser_test', browser_test.main);

@@ -13,6 +13,7 @@ final classesOrder = [
   'Keyboard',
   'Mouse',
   'Touchscreen',
+  'Tracing',
   'Dialog',
   'ConsoleMessage',
   'Frame',
@@ -21,6 +22,7 @@ final classesOrder = [
   'ElementHandle',
   'Request',
   'Response',
+  'Coverage',
 ];
 
 main() {
@@ -138,8 +140,11 @@ class Method {
         fullSignature =
             '${firstLetterLower(parent.name)}.$name → ${member.returnType}';
       } else {
-        title =
-            '${firstLetterLower(parent.name)}.$name${_escapeBracket(member.parameters.toString())}';
+        var parameters = _escapeBracket(member.parameters.toString());
+        if (parameters.length > 40) {
+          parameters = '(...)';
+        }
+        title = '${firstLetterLower(parent.name)}.$name$parameters';
         fullSignature =
             '${firstLetterLower(parent.name)}.$name${member.parameters} → ${member.returnType} ';
       }

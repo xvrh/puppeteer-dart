@@ -161,3 +161,6 @@ dumpFrames(Frame frame, [String indentation]) {
 bool isFavicon(String url) => url.contains('favicon.ico');
 
 T exampleValue<T>(T useInTest, T useInExample) => useInTest;
+
+String normalizeNewLines(String input) =>
+    input.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
