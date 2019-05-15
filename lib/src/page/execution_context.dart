@@ -120,11 +120,18 @@ class ExecutionContext {
     // JavaScript expression.
     String functionDeclaration = convertToFunctionDeclaration(pageFunction);
 
+    const suffix = '//# sourceURL=$evaluationScriptUrl';
+
     try {
       if (functionDeclaration == null) {
         assert(args == null || args.isEmpty,
             "Javascript expression can't have arguments ($pageFunction)");
-        var response = await runtimeApi.evaluate(pageFunction,
+
+        var pageFunctionWithSourceUrl = sourceUrlRegExp.hasMatch(pageFunction)
+            ? pageFunction
+            : pageFunction + '\n' + suffix;
+
+        var response = await runtimeApi.evaluate(pageFunctionWithSourceUrl,
             contextId: context.id,
             returnByValue: false,
             awaitPromise: true,
@@ -138,7 +145,8 @@ class ExecutionContext {
       } else {
         args ??= [];
 
-        var result = await runtimeApi.callFunctionOn(functionDeclaration,
+        var result = await runtimeApi.callFunctionOn(
+            functionDeclaration + '\n' + suffix + '\n',
             executionContextId: context.id,
             arguments: args.map(_convertArgument).toList(),
             returnByValue: false,

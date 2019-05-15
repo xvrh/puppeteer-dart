@@ -140,7 +140,7 @@ class Method {
             '${firstLetterLower(parent.name)}.$name → ${member.returnType}';
       } else {
         var parameters = _escapeBracket(member.parameters.toString());
-        if (parameters.length > 100) {
+        if (parameters.length > 40) {
           parameters = '(...)';
         }
         title = '${firstLetterLower(parent.name)}.$name$parameters';

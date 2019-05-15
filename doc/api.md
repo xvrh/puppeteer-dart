@@ -19,7 +19,7 @@
   * [browser.targets](#browsertargets)
   * [browser.userAgent](#browseruseragent)
   * [browser.version](#browserversion)
-  * [browser.waitForTarget](#browserwaitfortargetbool-functiontarget-predicate-duration-timeout)
+  * [browser.waitForTarget](#browserwaitfortarget)
 - [class: BrowserContext](#class-browsercontext)
   * [browserContext.browser](#browsercontextbrowser)
   * [browserContext.clearPermissionOverrides](#browsercontextclearpermissionoverrides)
@@ -29,24 +29,24 @@
   * [browserContext.onTargetChanged](#browsercontextontargetchanged)
   * [browserContext.onTargetCreated](#browsercontextontargetcreated)
   * [browserContext.onTargetDestroyed](#browsercontextontargetdestroyed)
-  * [browserContext.overridePermissions](#browsercontextoverridepermissionsstring-origin-listpermissiontype-permissions)
+  * [browserContext.overridePermissions](#browsercontextoverridepermissions)
   * [browserContext.pages](#browsercontextpages)
   * [browserContext.targets](#browsercontexttargets)
-  * [browserContext.waitForTarget](#browsercontextwaitfortarget-functiontarget-predicate-duration-timeout)
+  * [browserContext.waitForTarget](#browsercontextwaitfortarget)
 - [class: Page](#class-page)
   * [page.$](#pagestring-selector)
   * [page.$$](#pagestring-selector)
-  * [page.$$eval](#pageevalstring-selector-languagejs-string-pagefunction-list-args)
-  * [page.$eval](#pageevalstring-selector-languagejs-string-pagefunction-list-args)
+  * [page.$$eval](#pageeval)
+  * [page.$eval](#pageeval)
   * [page.$x](#pagexstring-expression)
-  * [page.addScriptTag](#pageaddscripttagstring-url-file-file-string-content-string-type)
-  * [page.addStyleTag](#pageaddstyletagstring-url-file-file-string-content)
+  * [page.addScriptTag](#pageaddscripttag)
+  * [page.addStyleTag](#pageaddstyletag)
   * [page.authenticate](#pageauthenticatestring-username-string-password)
   * [page.bringToFront](#pagebringtofront)
   * [page.browser](#pagebrowser)
   * [page.browserContext](#pagebrowsercontext)
-  * [page.click](#pageclickstring-selector-duration-delay-mousebutton-button-int-clickcount)
-  * [page.clickAndWaitForNavigation](#pageclickandwaitfornavigationstring-selector-duration-timeout-until-wait)
+  * [page.click](#pageclick)
+  * [page.clickAndWaitForNavigation](#pageclickandwaitfornavigation)
   * [page.close](#pageclosebool-runbeforeunload)
   * [page.content](#pagecontent)
   * [page.cookies](#pagecookiesliststring-urls)
@@ -54,15 +54,15 @@
   * [page.defaultTimeout](#pagedefaulttimeout)
   * [page.emulate](#pageemulatedevice-device)
   * [page.emulateMedia](#pageemulatemediastring-mediatype)
-  * [page.evaluate](#pageevaluatelanguagejs-string-pagefunction-list-args)
-  * [page.evaluateHandle](#pageevaluatehandlelanguagejs-string-pagefunction-list-args)
+  * [page.evaluate](#pageevaluate)
+  * [page.evaluateHandle](#pageevaluatehandle)
   * [page.evaluateOnNewDocument](#pageevaluateonnewdocumentstring-pagefunction-list-args)
   * [page.exposeFunction](#pageexposefunctionstring-name-function-callbackfunction)
   * [page.focus](#pagefocusstring-selector)
   * [page.frames](#pageframes)
   * [page.goBack](#pagegobackduration-timeout-until-wait)
   * [page.goForward](#pagegoforwardduration-timeout-until-wait)
-  * [page.goto](#pagegotostring-url-string-referrer-duration-timeout-until-wait)
+  * [page.goto](#pagegoto)
   * [page.hover](#pagehoverstring-selector)
   * [page.isClosed](#pageisclosed)
   * [page.mainFrame](#pagemainframe)
@@ -84,14 +84,14 @@
   * [page.pdf](#pagepdf)
   * [page.queryObjects](#pagequeryobjectsjshandle-prototypehandle)
   * [page.reload](#pagereloadduration-timeout-until-wait)
-  * [page.screenshot](#pagescreenshotscreenshotformat-format-bool-fullpage-rectangle-clip-num-quality-bool-omitbackground)
-  * [page.screenshotBase64](#pagescreenshotbase64screenshotformat-format-bool-fullpage-rectangle-clip-num-quality-bool-omitbackground)
+  * [page.screenshot](#pagescreenshot)
+  * [page.screenshotBase64](#pagescreenshotbase64)
   * [page.select](#pageselectstring-selector-liststring-values)
   * [page.setBypassCSP](#pagesetbypasscspbool-enabled)
   * [page.setCacheEnabled](#pagesetcacheenabledenabled)
-  * [page.setContent](#pagesetcontentstring-html-duration-timeout-until-wait)
+  * [page.setContent](#pagesetcontent)
   * [page.setExtraHTTPHeaders](#pagesetextrahttpheadersmapstring-string-headers)
-  * [page.setGeolocation](#pagesetgeolocationnum-latitude-num-longitude-num-accuracy)
+  * [page.setGeolocation](#pagesetgeolocation)
   * [page.setJavaScriptEnabled](#pagesetjavascriptenabledenabled)
   * [page.setOfflineMode](#pagesetofflinemodebool-enabled)
   * [page.setRequestInterception](#pagesetrequestinterceptionbool-value)
@@ -100,17 +100,17 @@
   * [page.tap](#pagetapstring-selector)
   * [page.target](#pagetarget)
   * [page.title](#pagetitle)
-  * [page.type](#pagetypestring-selector-string-text-duration-delay)
+  * [page.type](#pagetype)
   * [page.url](#pageurl)
-  * [page.waitForFunction](#pagewaitforfunctionlanguagejs-string-pagefunction-list-args-duration-timeout-polling-polling)
+  * [page.waitForFunction](#pagewaitforfunction)
   * [page.waitForNavigation](#pagewaitfornavigationduration-timeout-until-wait)
   * [page.waitForRequest](#pagewaitforrequeststring-url-duration-timeout)
-  * [page.waitForSelector](#pagewaitforselectorstring-selector-bool-visible-bool-hidden-duration-timeout)
-  * [page.waitForXPath](#pagewaitforxpathstring-xpath-bool-visible-bool-hidden-duration-timeout)
+  * [page.waitForSelector](#pagewaitforselector)
+  * [page.waitForXPath](#pagewaitforxpath)
   * [page.workers](#pageworkers)
 - [class: Worker](#class-worker)
-  * [worker.evaluate](#workerevaluatelanguagejs-string-pagefunction-list-args)
-  * [worker.evaluateHandle](#workerevaluatehandlelanguagejs-string-pagefunction-list-args)
+  * [worker.evaluate](#workerevaluate)
+  * [worker.evaluateHandle](#workerevaluatehandle)
 - [class: Keyboard](#class-keyboard)
   * [keyboard.down](#keyboarddownkey-key-string-text)
   * [keyboard.press](#keyboardpresskey-key-duration-delay-string-text)
@@ -118,7 +118,7 @@
   * [keyboard.type](#keyboardtypestring-text-duration-delay)
   * [keyboard.up](#keyboardupkey-key)
 - [class: Mouse](#class-mouse)
-  * [mouse.click](#mouseclickpoint-position-duration-delay-mousebutton-button-int-clickcount)
+  * [mouse.click](#mouseclick)
   * [mouse.down](#mousedownmousebutton-button-int-clickcount)
   * [mouse.move](#mousemovepoint-position-int-steps)
   * [mouse.up](#mouseupmousebutton-button-int-clickcount)
@@ -134,34 +134,34 @@
 - [class: Frame](#class-frame)
   * [frame.$](#framestring-selector)
   * [frame.$$](#framestring-selector)
-  * [frame.$$eval](#frameevalstring-selector-languagejs-string-pagefunction-list-args)
-  * [frame.$eval](#frameevalstring-selector-languagejs-string-pagefunction-list-args)
+  * [frame.$$eval](#frameeval)
+  * [frame.$eval](#frameeval)
   * [frame.$x](#framexstring-expression)
-  * [frame.addScriptTag](#frameaddscripttagstring-url-file-file-string-content-string-type)
-  * [frame.addStyleTag](#frameaddstyletagstring-url-file-file-string-content)
-  * [frame.click](#frameclickstring-selector-duration-delay-mousebutton-button-int-clickcount)
+  * [frame.addScriptTag](#frameaddscripttag)
+  * [frame.addStyleTag](#frameaddstyletag)
+  * [frame.click](#frameclick)
   * [frame.content](#framecontent)
-  * [frame.evaluate](#frameevaluatelanguagejs-string-pagefunction-list-args)
-  * [frame.evaluateHandle](#frameevaluatehandlelanguagejs-string-pagefunction-list-args)
+  * [frame.evaluate](#frameevaluate)
+  * [frame.evaluateHandle](#frameevaluatehandle)
   * [frame.executionContext](#frameexecutioncontext)
   * [frame.focus](#framefocusstring-selector)
-  * [frame.goto](#framegotostring-url-string-referrer-duration-timeout-until-wait)
+  * [frame.goto](#framegoto)
   * [frame.hover](#framehoverstring-selector)
   * [frame.isDetached](#frameisdetached)
   * [frame.name](#framename)
   * [frame.parentFrame](#frameparentframe)
   * [frame.select](#frameselectselector-liststring-values)
-  * [frame.setContent](#framesetcontentstring-html-duration-timeout-until-wait)
+  * [frame.setContent](#framesetcontent)
   * [frame.tap](#frametapstring-selector)
   * [frame.title](#frametitle)
-  * [frame.type](#frametypestring-selector-string-text-duration-delay)
+  * [frame.type](#frametype)
   * [frame.url](#frameurl)
-  * [frame.waitForFunction](#framewaitforfunctionlanguagejs-string-pagefunction-list-args-duration-timeout-polling-polling)
-  * [frame.waitForSelector](#framewaitforselectorstring-selector-bool-visible-bool-hidden-duration-timeout)
-  * [frame.waitForXPath](#framewaitforxpathstring-xpath-bool-visible-bool-hidden-duration-timeout)
+  * [frame.waitForFunction](#framewaitforfunction)
+  * [frame.waitForSelector](#framewaitforselector)
+  * [frame.waitForXPath](#framewaitforxpath)
 - [class: ExecutionContext](#class-executioncontext)
-  * [executionContext.evaluate](#executioncontextevaluatelanguagejs-string-pagefunction-list-args)
-  * [executionContext.evaluateHandle](#executioncontextevaluatehandlelanguagejs-string-pagefunction-list-args)
+  * [executionContext.evaluate](#executioncontextevaluate)
+  * [executionContext.evaluateHandle](#executioncontextevaluatehandle)
   * [executionContext.frame](#executioncontextframe)
   * [executionContext.queryObjects](#executioncontextqueryobjectsjshandle-prototypehandle)
 - [class: JsHandle](#class-jshandle)
@@ -175,23 +175,23 @@
 - [class: ElementHandle](#class-elementhandle)
   * [elementHandle.$](#elementhandlestring-selector)
   * [elementHandle.$$](#elementhandlestring-selector)
-  * [elementHandle.$$eval](#elementhandleevalstring-selector-languagejs-string-pagefunction-list-args)
-  * [elementHandle.$eval](#elementhandleevalstring-selector-languagejs-string-pagefunction-list-args)
+  * [elementHandle.$$eval](#elementhandleeval)
+  * [elementHandle.$eval](#elementhandleeval)
   * [elementHandle.$x](#elementhandlexstring-expression)
   * [elementHandle.boundingBox](#elementhandleboundingbox)
   * [elementHandle.boxModel](#elementhandleboxmodel)
-  * [elementHandle.click](#elementhandleclickduration-delay-mousebutton-button-int-clickcount)
+  * [elementHandle.click](#elementhandleclick)
   * [elementHandle.contentFrame](#elementhandlecontentframe)
   * [elementHandle.focus](#elementhandlefocus)
   * [elementHandle.isIntersectingViewport](#elementhandleisintersectingviewport)
   * [elementHandle.press](#elementhandlepresskey-key-duration-delay-string-text)
-  * [elementHandle.screenshot](#elementhandlescreenshotscreenshotformat-format-num-quality-bool-omitbackground)
+  * [elementHandle.screenshot](#elementhandlescreenshot)
   * [elementHandle.tap](#elementhandletap)
   * [elementHandle.type](#elementhandletypestring-text-duration-delay)
   * [elementHandle.uploadFile](#elementhandleuploadfilelistfile-files)
 - [class: Request](#class-request)
   * [request.abort](#requestaborterrorreason-error)
-  * [request.continueRequest](#requestcontinuerequeststring-url-string-method-string-postdata-map-headers)
+  * [request.continueRequest](#requestcontinuerequest)
   * [request.failure](#requestfailure)
   * [request.frame](#requestframe)
   * [request.headers](#requestheaders)
@@ -200,7 +200,7 @@
   * [request.postData](#requestpostdata)
   * [request.redirectChain](#requestredirectchain)
   * [request.resourceType](#requestresourcetype)
-  * [request.respond](#requestrespondint-status-mapstring-string-headers-string-contenttype-body)
+  * [request.respond](#requestrespond)
   * [request.response](#requestresponse)
   * [request.url](#requesturl)
 - [class: Response](#class-response)
@@ -220,6 +220,10 @@
   * [response.text](#responsetext)
   * [response.url](#responseurl)
 - [class: Coverage](#class-coverage)
+  * [coverage.startCSSCoverage](#coveragestartcsscoveragebool-resetonnavigation)
+  * [coverage.startJSCoverage](#coveragestartjscoverage)
+  * [coverage.stopCSSCoverage](#coveragestopcsscoverage)
+  * [coverage.stopJSCoverage](#coveragestopjscoverage)
 
 ### class: Puppeteer
 Launch or connect to a chrome instance
@@ -422,7 +426,7 @@ non-headless, this is similar to Chrome/61.0.3153.0.
 browser.version → Future<String>
 ```
 
-#### browser.waitForTarget(bool Function(Target) predicate, {Duration timeout})
+#### browser.waitForTarget(...)
 This searches for a target in all browser contexts.
 
 An example of finding a target for a page opened via window.open:
@@ -520,7 +524,7 @@ when a page is closed.
 browserContext.onTargetDestroyed → Stream<Target>
 ```
 
-#### browserContext.overridePermissions(String origin, List\<PermissionType> permissions)
+#### browserContext.overridePermissions(...)
 origin <string> The origin to grant permissions to, e.g. "https://example.com".
 permissions <Array<string>> An array of permissions to grant. All
 permissions that are not listed here will be automatically denied.
@@ -549,7 +553,7 @@ An array of all active targets inside the browser context.
 browserContext.targets → List<Target>
 ```
 
-#### browserContext.waitForTarget( Function(Target) predicate, {Duration timeout})
+#### browserContext.waitForTarget(...)
 This searches for a target in this specific browser context.
 
 ```dart
@@ -614,7 +618,7 @@ Shortcut for [Page.mainFrame.$$(selector)].
 page.$$(String selector) → Future<List<ElementHandle>> 
 ```
 
-#### page.$$eval(String selector, @Language('js') String pageFunction, {List args})
+#### page.$$eval(...)
 This method runs `Array.from(document.querySelectorAll(selector))` within
 the page and passes it as the first argument to `pageFunction`.
 
@@ -636,7 +640,7 @@ Returns a [Future] which resolves to the return value of `pageFunction`
 page.$$eval(String selector, @Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
-#### page.$eval(String selector, @Language('js') String pageFunction, {List args})
+#### page.$eval(...)
 This method runs `document.querySelector` within the page and passes it as
 the first argument to `pageFunction`. If there's no element matching
 `selector`, the method throws an error.
@@ -672,7 +676,7 @@ Parameters:
 page.$x(String expression) → Future<List<ElementHandle>> 
 ```
 
-#### page.addScriptTag({String url, File file, String content, String type})
+#### page.addScriptTag(...)
 Adds a `<script>` tag into the page with the desired url or content.
 
 Shortcut for [Page.mainFrame.addScriptTag].
@@ -692,7 +696,7 @@ script's onload fires or when the script content was injected into frame.
 page.addScriptTag({String url, File file, String content, String type}) → Future<ElementHandle> 
 ```
 
-#### page.addStyleTag({String url, File file, String content})
+#### page.addStyleTag(...)
 Adds a `<link rel="stylesheet">` tag into the page with the desired url or
 a `<style type="text/css">` tag with the content.
 
@@ -740,7 +744,7 @@ Get the browser context that the page belongs to.
 page.browserContext → BrowserContext
 ```
 
-#### page.click(String selector, {Duration delay, MouseButton button, int clickCount})
+#### page.click(...)
 This method fetches an element with `selector`, scrolls it into view if
 needed, and then uses [Page.mouse] to click in the center of the element.
 If there's no element matching `selector`, the method throws an error.
@@ -780,7 +784,7 @@ multiple elements satisfying the selector, the first will be clicked.
 page.click(String selector, {Duration delay, MouseButton button, int clickCount}) → Future<void> 
 ```
 
-#### page.clickAndWaitForNavigation(String selector, {Duration timeout, Until wait})
+#### page.clickAndWaitForNavigation(...)
 Convenience function to wait for navigation to complete after clicking on an element.
 
 See this issue for more context: https://github.com/GoogleChrome/puppeteer/issues/1421
@@ -909,7 +913,7 @@ Passing `null` disables media emulation.
 page.emulateMedia(String mediaType) → Future<void> 
 ```
 
-#### page.evaluate(@Language('js') String pageFunction, {List args})
+#### page.evaluate(...)
 If the function passed to the [Page.evaluate] returns a [Promise], then
 [Page.evaluate] would wait for the promise to resolve and return its value.
 
@@ -953,7 +957,7 @@ Parameters:
 page.evaluate(@Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
-#### page.evaluateHandle(@Language('js') String pageFunction, {List args})
+#### page.evaluateHandle(...)
 The only difference between [Page.evaluate] and [Page.evaluateHandle] is
 that [Page.evaluateHandle] returns in-page object (JSHandle).
 
@@ -1165,7 +1169,7 @@ the response of the last redirect. If can not go back, resolves to `null`.
 page.goForward({Duration timeout, Until wait}) → Future<Response> 
 ```
 
-#### page.goto(String url, {String referrer, Duration timeout, Until wait})
+#### page.goto(...)
 The [Page.goto] will throw an error if:
 - there's an SSL error (e.g. in case of self-signed certificates).
 - target URL is invalid.
@@ -1489,7 +1493,7 @@ the last redirect.
 page.reload({Duration timeout, Until wait}) → Future<Response> 
 ```
 
-#### page.screenshot({ScreenshotFormat format, bool fullPage, Rectangle clip, num quality, bool omitBackground})
+#### page.screenshot(...)
 Parameters:
 - [format]: Specify screenshot type, can be either `ScreenshotFormat.jpeg`
   or `ScreenshotFormat.png`. Defaults to 'png'.
@@ -1511,7 +1515,7 @@ https://crbug.com/741689 for discussion.
 page.screenshot({ScreenshotFormat format, bool fullPage, Rectangle clip, num quality, bool omitBackground}) → Future<Uint8List> 
 ```
 
-#### page.screenshotBase64({ScreenshotFormat format, bool fullPage, Rectangle clip, num quality, bool omitBackground})
+#### page.screenshotBase64(...)
 Parameters:
 - [format]: Specify screenshot type, can be either `ScreenshotFormat.jpeg`
   or `ScreenshotFormat.png`. Defaults to 'png'.
@@ -1578,7 +1582,7 @@ default, caching is enabled.
 page.setCacheEnabled(enabled) → Future<void> 
 ```
 
-#### page.setContent(String html, {Duration timeout, Until wait})
+#### page.setContent(...)
 Parameters:
 - [html]: HTML markup to assign to the page.
 - [timeout]: Maximum time in milliseconds for resources to load, defaults
@@ -1610,7 +1614,7 @@ The extra HTTP headers will be sent with every request the page initiates.
 page.setExtraHTTPHeaders(Map<String, String> headers) → Future<void> 
 ```
 
-#### page.setGeolocation({num latitude, num longitude, num accuracy})
+#### page.setGeolocation(...)
 Sets the page's geolocation.
 
 ```dart
@@ -1723,7 +1727,7 @@ Shortcut for [Page.mainFrame.title].
 page.title → Future<String>
 ```
 
-#### page.type(String selector, String text, {Duration delay})
+#### page.type(...)
 Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character
 in the text.
 
@@ -1750,7 +1754,7 @@ This is a shortcut for [page.mainFrame.url]
 page.url → String
 ```
 
-#### page.waitForFunction(@Language('js') String pageFunction, {List args, Duration timeout, Polling polling})
+#### page.waitForFunction(...)
 Parameters:
 - [pageFunction]: Function to be evaluated in browser context
 - [polling]: An interval at which the `pageFunction` is executed, defaults
@@ -1861,7 +1865,7 @@ await Future.wait([firstRequest, finalRequest]);
 page.waitForRequest(String url, {Duration timeout}) → Future<Request> 
 ```
 
-#### page.waitForSelector(String selector, {bool visible, bool hidden, Duration timeout})
+#### page.waitForSelector(...)
 Wait for the `selector` to appear in page. If at the moment of calling
 the method the `selector` already exists, the method will return
 immediately. If the selector doesn't appear after the `timeout` of waiting,
@@ -1903,7 +1907,7 @@ is not found in DOM.
 page.waitForSelector(String selector, {bool visible, bool hidden, Duration timeout}) → Future<ElementHandle> 
 ```
 
-#### page.waitForXPath(String xpath, {bool visible, bool hidden, Duration timeout})
+#### page.waitForXPath(...)
 Wait for the `xpath` to appear in page. If at the moment of calling
 the method the `xpath` already exists, the method will return
 immediately. If the xpath doesn't appear after the `timeout` of waiting,
@@ -1971,7 +1975,7 @@ for (var worker in page.workers) {
 }
 ```
 
-#### worker.evaluate(@Language('js') String pageFunction, {List args})
+#### worker.evaluate(...)
 If the function passed to the [Frame.evaluate] returns a [Promise], then
 [Frame.evaluate] would wait for the promise to resolve and return its value.
 
@@ -1992,7 +1996,7 @@ Parameters:
 worker.evaluate(@Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
-#### worker.evaluateHandle(@Language('js') String pageFunction, {List args})
+#### worker.evaluateHandle(...)
 The only difference between [Worker.evaluate] and [Worker.evaluateHandle] is
 that [Worker.evaluateHandle] returns in-page object (JSHandle).
 
@@ -2136,7 +2140,7 @@ await page.mouse.move(Point(0, 0));
 await page.mouse.up();
 ```
 
-#### mouse.click(Point position, {Duration delay, MouseButton button, int clickCount})
+#### mouse.click(...)
 Shortcut for [mouse.move], [mouse.down] and [mouse.up].
 
 [delay]: Time to wait between `mousedown` and `mouseup`. Defaults to 0.
@@ -2298,7 +2302,7 @@ elements.
 frame.$$(String selector) → Future<List<ElementHandle>> 
 ```
 
-#### frame.$$eval(String selector, @Language('js') String pageFunction, {List args})
+#### frame.$$eval(...)
 This method runs `Array.from(document.querySelectorAll(selector))` within
 the frame and passes it as the first argument to `pageFunction`.
 
@@ -2314,7 +2318,7 @@ var divsCounts = await frame.$$eval('div', 'divs => divs.length');
 frame.$$eval(String selector, @Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
-#### frame.$eval(String selector, @Language('js') String pageFunction, {List args})
+#### frame.$eval(...)
 This method runs document.querySelector within the frame and passes it as
 the first argument to pageFunction. If there's no element matching
 selector, the method throws an error.
@@ -2349,7 +2353,7 @@ Evaluates the XPath expression.
 frame.$x(String expression) → Future<List<ElementHandle>> 
 ```
 
-#### frame.addScriptTag({String url, File file, String content, String type})
+#### frame.addScriptTag(...)
 Adds a `<script>` tag into the page with the desired url or content.
 
 Parameters:
@@ -2367,7 +2371,7 @@ script's onload fires or when the script content was injected into frame.
 frame.addScriptTag({String url, File file, String content, String type}) → Future<ElementHandle> 
 ```
 
-#### frame.addStyleTag({String url, File file, String content})
+#### frame.addStyleTag(...)
 Adds a `<link rel="stylesheet">` tag into the page with the desired url or
 a `<style type="text/css">` tag with the content.
 
@@ -2383,7 +2387,7 @@ stylesheet's onload fires or when the CSS content was injected into frame.
 frame.addStyleTag({String url, File file, String content}) → Future<ElementHandle> 
 ```
 
-#### frame.click(String selector, {Duration delay, MouseButton button, int clickCount})
+#### frame.click(...)
 This method fetches an element with `selector`, scrolls it into view if
 needed, and then uses [Page.mouse] to click in the center of the element.
 If there's no element matching `selector`, the method throws an error.
@@ -2417,7 +2421,7 @@ Gets the full HTML contents of the frame, including the doctype.
 frame.content → Future<String>
 ```
 
-#### frame.evaluate(@Language('js') String pageFunction, {List args})
+#### frame.evaluate(...)
 If the function passed to the [Frame.evaluate] returns a [Promise], then
 [Frame.evaluate] would wait for the promise to resolve and return its value.
 
@@ -2459,7 +2463,7 @@ Parameters:
 frame.evaluate(@Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
-#### frame.evaluateHandle(@Language('js') String pageFunction, {List args})
+#### frame.evaluateHandle(...)
 The only difference between [Frame.evaluate] and [Frame.evaluateHandle] is
 that [Frame.evaluateHandle] returns in-page object (JSHandle).
 
@@ -2514,7 +2518,7 @@ Parameters:
 frame.focus(String selector) → Future<void> 
 ```
 
-#### frame.goto(String url, {String referrer, Duration timeout, Until wait})
+#### frame.goto(...)
 The [Frame.goto] will throw an error if:
 - there's an SSL error (e.g. in case of self-signed certificates).
 - target URL is invalid.
@@ -2626,7 +2630,7 @@ Returns an array of option values that have been successfully selected.
 frame.select(selector, List<String> values) → Future<List<String>> 
 ```
 
-#### frame.setContent(String html, {Duration timeout, Until wait})
+#### frame.setContent(...)
 Parameters:
 - [html]: HTML markup to assign to the page.
 - [timeout]: Maximum time in milliseconds for resources to load, defaults
@@ -2668,7 +2672,7 @@ The page's title.
 frame.title → Future<String>
 ```
 
-#### frame.type(String selector, String text, {Duration delay})
+#### frame.type(...)
 Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character
 in the text.
 
@@ -2693,7 +2697,7 @@ Returns frame's url.
 frame.url → String
 ```
 
-#### frame.waitForFunction(@Language('js') String pageFunction, {List args, Duration timeout, Polling polling})
+#### frame.waitForFunction(...)
 Parameters:
 - [pageFunction]: Function to be evaluated in browser context
 - [polling]: An interval at which the `pageFunction` is executed, defaults
@@ -2735,7 +2739,7 @@ await page.mainFrame.waitForFunction(
 frame.waitForFunction(@Language('js') String pageFunction, {List args, Duration timeout, Polling polling}) → Future<JsHandle> 
 ```
 
-#### frame.waitForSelector(String selector, {bool visible, bool hidden, Duration timeout})
+#### frame.waitForSelector(...)
 Wait for the `selector` to appear in page. If at the moment of calling
 the method the `selector` already exists, the method will return
 immediately. If the selector doesn't appear after the `timeout` of waiting,
@@ -2776,7 +2780,7 @@ is not found in DOM.
 frame.waitForSelector(String selector, {bool visible, bool hidden, Duration timeout}) → Future<ElementHandle> 
 ```
 
-#### frame.waitForXPath(String xpath, {bool visible, bool hidden, Duration timeout})
+#### frame.waitForXPath(...)
 Wait for the `xpath` to appear in page. If at the moment of calling
 the method the `xpath` already exists, the method will return
 immediately. If the xpath doesn't appear after the `timeout` of waiting,
@@ -2828,7 +2832,7 @@ many execution contexts:
 
 Besides pages, execution contexts can be found in [workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API).
 
-#### executionContext.evaluate(@Language('js') String pageFunction, {List args})
+#### executionContext.evaluate(...)
 If the function passed to the `executionContext.evaluate` returns a [Promise],
 then `executionContext.evaluate` would wait for the promise to resolve and
 return its value.
@@ -2861,7 +2865,7 @@ Returns [Future] which resolves to the return value of `pageFunction`
 executionContext.evaluate(@Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
-#### executionContext.evaluateHandle(@Language('js') String pageFunction, {List args})
+#### executionContext.evaluateHandle(...)
 The only difference between `executionContext.evaluate` and
 `executionContext.evaluateHandle` is that `executionContext.evaluateHandle`
 returns in-page object (JSHandle).
@@ -3041,7 +3045,7 @@ match the selector, the return value resolves to `[]`.
 elementHandle.$$(String selector) → Future<List<ElementHandle>> 
 ```
 
-#### elementHandle.$$eval(String selector, @Language('js') String pageFunction, {List args})
+#### elementHandle.$$eval(...)
 This method runs `document.querySelectorAll` within the element and passes
 it as the first argument to `pageFunction`. If there's no element matching
 `selector`, the method throws an error.
@@ -3074,7 +3078,7 @@ Returns: [Future] which resolves to the return value of `pageFunction`
 elementHandle.$$eval(String selector, @Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
-#### elementHandle.$eval(String selector, @Language('js') String pageFunction, {List args})
+#### elementHandle.$eval(...)
 This method runs `document.querySelector` within the element and passes it
 as the first argument to `pageFunction`. If there's no element matching
 `selector`, the method throws an error.
@@ -3128,7 +3132,7 @@ Box points are sorted clock-wise.
 elementHandle.boxModel → Future<BoxModel>
 ```
 
-#### elementHandle.click({Duration delay, MouseButton button, int clickCount})
+#### elementHandle.click(...)
 This method scrolls element into view if needed, and then uses [page.mouse]
 to click in the center of the element.
 If the element is detached from DOM, the method throws an error.
@@ -3186,7 +3190,7 @@ Parameters:
 elementHandle.press(Key key, {Duration delay, String text}) → Future<void> 
 ```
 
-#### elementHandle.screenshot({ScreenshotFormat format, num quality, bool omitBackground})
+#### elementHandle.screenshot(...)
 This method scrolls element into view if needed, and then uses [page.screenshot]
 to take a screenshot of the element.
 If the element is detached from DOM, the method throws an error.
@@ -3269,7 +3273,7 @@ Parameters:
 request.abort({ErrorReason error}) → Future<void> 
 ```
 
-#### request.continueRequest({String url, String method, String postData, Map headers})
+#### request.continueRequest(...)
 Continues request with optional request overrides. To use this, request
 interception should be enabled with `page.setRequestInterception`.
 Exception is immediately thrown if the request interception is not enabled.
@@ -3388,7 +3392,7 @@ engine.
 request.resourceType → ResourceType
 ```
 
-#### request.respond({int status, Map\<String, String> headers, String contentType, body})
+#### request.respond(...)
 Fulfills request with given response. To use this, request interception should
 be enabled with `page.setRequestInterception`. Exception is thrown if
 request interception is not enabled.
@@ -3550,25 +3554,74 @@ executed code:
 
 ```dart
 // Enable both JavaScript and CSS coverage
-await Promise.all([
-  page.coverage.startJSCoverage(),
-  page.coverage.startCSSCoverage()
-]);
+await Future.wait(
+    [page.coverage.startJSCoverage(), page.coverage.startCSSCoverage()]);
 // Navigate to page
 await page.goto('https://example.com');
 // Disable both JavaScript and CSS coverage
-const [jsCoverage, cssCoverage] = await Promise.all([
-  page.coverage.stopJSCoverage(),
-  page.coverage.stopCSSCoverage(),
-]);
-let totalBytes = 0;
-let usedBytes = 0;
-const coverage = [...jsCoverage, ...cssCoverage];
-for (const entry of coverage) {
+var jsCoverage = await page.coverage.stopJSCoverage();
+var cssCoverage = await page.coverage.stopCSSCoverage();
+var totalBytes = 0;
+var usedBytes = 0;
+var coverage = [...jsCoverage, ...cssCoverage];
+for (var entry in coverage) {
   totalBytes += entry.text.length;
-  for (const range of entry.ranges)
+  for (var range in entry.ranges) {
     usedBytes += range.end - range.start - 1;
+  }
 }
-console.log(`Bytes used: ${usedBytes / totalBytes * 100}%`);
+print('Bytes used: ${usedBytes / totalBytes * 100}%');
+```
+
+#### coverage.startCSSCoverage({bool resetOnNavigation})
+Parameters
+ - `resetOnNavigation`:  Whether to reset coverage on every navigation.
+   Defaults to `true`.
+
+ Returns: Future that resolves when coverage is started
+
+```dart
+coverage.startCSSCoverage({bool resetOnNavigation}) → Future<void> 
+```
+
+#### coverage.startJSCoverage(...)
+Parameters:
+  - `resetOnNavigation` Whether to reset coverage on every navigation.
+    Defaults to `true`.
+  - `reportAnonymousScripts`: Whether anonymous scripts generated by the
+    page should be reported. Defaults to `false`.
+
+Returns a Future that resolves when coverage is started
+
+> **NOTE** Anonymous scripts are ones that don't have an associated url.
+These are scripts that are dynamically created on the page using `eval` or
+`new Function`. If `reportAnonymousScripts` is set to `true`, anonymous
+scripts will have `__puppeteer_evaluation_script__` as their URL.
+
+```dart
+coverage.startJSCoverage({bool resetOnNavigation, bool reportAnonymousScripts}) → Future<void> 
+```
+
+#### coverage.stopCSSCoverage()
+Returns a Future that resolves to the array of coverage reports for all
+stylesheets
+
+```dart
+coverage.stopCSSCoverage() → Future<List<CoverageEntry>> 
+```
+
+#### coverage.stopJSCoverage()
+Returns a Future that resolves to the array of coverage reports for all scripts
+  - `url`: Script URL
+  - `text`: Script content
+  - `ranges`: Script ranges that were executed. Ranges are sorted and non-overlapping.
+    - `start`: A start offset in text, inclusive
+    - `end`: An end offset in text, exclusive
+
+> **NOTE** JavaScript Coverage doesn't include anonymous scripts by default.
+ However, scripts with sourceURLs are reported.
+
+```dart
+coverage.stopJSCoverage() → Future<List<CoverageEntry>> 
 ```
 
