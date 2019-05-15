@@ -112,12 +112,14 @@ main() {
       await page.coverage.startJSCoverage();
       await page.goto(server.prefix + '/jscoverage/involved.html');
       var coverage = await page.coverage.stopJSCoverage();
+
+      var formattedCoverage = JsonEncoder.withIndent('  ')
+          .convert(coverage)
+          .replaceAll(RegExp(r':\d+/'), ':<PORT>/');
       expect(
-          JsonEncoder.withIndent('  ')
-              .convert(coverage)
-              .replaceAll(RegExp(r':\d+/'), ':<PORT>/'),
-          equals(
-              File('test/golden/jscoverage-involved.txt').readAsStringSync()));
+          normalizeNewLines(formattedCoverage),
+          equals(normalizeNewLines(
+              File('test/golden/jscoverage-involved.txt').readAsStringSync())));
     });
     group('resetOnNavigation', () {
       test('should report scripts across navigations when disabled', () async {
@@ -186,12 +188,13 @@ main() {
       await page.coverage.startCSSCoverage();
       await page.goto(server.prefix + '/csscoverage/involved.html');
       var coverage = await page.coverage.stopCSSCoverage();
+      var formattedCoverage = JsonEncoder.withIndent('  ')
+          .convert(coverage)
+          .replaceAll(RegExp(r':\d+/'), ':<PORT>/');
       expect(
-          JsonEncoder.withIndent('  ')
-              .convert(coverage)
-              .replaceAll(RegExp(r':\d+/'), ':<PORT>/'),
-          equals(
-              File('test/golden/csscoverage-involved.txt').readAsStringSync()));
+          normalizeNewLines(formattedCoverage),
+          equals(normalizeNewLines(File('test/golden/csscoverage-involved.txt')
+              .readAsStringSync())));
     });
     test('should ignore injected stylesheets', () async {
       await page.coverage.startCSSCoverage();
