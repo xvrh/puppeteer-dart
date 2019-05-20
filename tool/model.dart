@@ -4,6 +4,7 @@ final _aliases = {
   'Request': 'RequestData',
   'Response': 'ResponseData',
   'Frame': 'FrameInfo',
+  'AXNode': 'AXNodeData',
 };
 
 class Protocol {

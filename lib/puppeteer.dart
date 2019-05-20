@@ -5,6 +5,7 @@ export 'src/browser.dart' show Browser, BrowserContext, PermissionType;
 export 'src/connection.dart' show ServerException;
 export 'src/connection.dart' show TargetClosedException;
 export 'src/downloader.dart' show downloadChrome, RevisionInfo;
+export 'src/page/accessibility.dart' show Accessibility, AXNode;
 export 'src/page/coverage.dart' show Coverage, CoverageEntry, Range;
 export 'src/page/dialog.dart' show Dialog, DialogType;
 export 'src/page/dom_world.dart' show Polling;

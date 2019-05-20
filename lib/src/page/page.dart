@@ -81,6 +81,7 @@ class Page {
   final _workers = <SessionID, Worker>{};
   final Coverage coverage;
   final Tracing tracing;
+  final Accessibility accessibility;
   FrameManager _frameManager;
   final StreamController _workerCreated = StreamController<Worker>.broadcast(),
       _workerDestroyed = StreamController<Worker>.broadcast(),
@@ -129,6 +130,7 @@ class Page {
 
   Page._(this.target, this.devTools)
       : _emulationManager = EmulationManager(devTools),
+        accessibility = Accessibility(devTools),
         coverage = Coverage(devTools),
         tracing = Tracing(devTools) {
     _frameManager = FrameManager(this);
@@ -1802,7 +1804,10 @@ class ConsoleMessage {
     assert(args != null);
   }
 
-//TODO(xha): add toString()
+  @override
+  String toString() =>
+      'ConsoleMessage(type: $typeName, text: $text, args: $args, url: $url, '
+      'lineNumber: $lineNumber, columnNumber: $columnNumber)';
 }
 
 class ConsoleMessageType {
@@ -1847,6 +1852,9 @@ class ScreenshotFormat {
   final String name;
 
   const ScreenshotFormat._(this.name);
+
+  @override
+  String toString() => name;
 }
 
 class PaperFormat {
@@ -1878,7 +1886,8 @@ class PaperFormat {
       : width = _mmToInches(width),
         height = _mmToInches(height);
 
-//TODO(xha): add toString()
+  @override
+  String toString() => 'PaperFormat.inches(width: $width, height: $height)';
 }
 
 num _pxToInches(num px) => px / 96;
@@ -1925,7 +1934,9 @@ class PdfMargins {
     );
   }
 
-//TODO(xha): add toString()
+  @override
+  String toString() =>
+      'PdfMargins.inches(top: $top, bottom: $bottom, left: $left, right: $right)';
 }
 
 class ClientError {
