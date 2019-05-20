@@ -1,4 +1,5 @@
 import 'package:test/test.dart';
+import 'accessibility_test.dart' as accessibility_test;
 import 'browser_context_test.dart' as browser_context_test;
 import 'browser_test.dart' as browser_test;
 import 'click_test.dart' as click_test;
@@ -60,6 +61,7 @@ main() {
   group('tracing_test', tracing_test.main);
   group('downloader_test', downloader_test.main);
   group('wait_task_test', wait_task_test.main);
+  group('accessibility_test', accessibility_test.main);
   group('browser_test', browser_test.main);
   group('mouse_test', mouse_test.main);
   group('keyboard_test', keyboard_test.main);

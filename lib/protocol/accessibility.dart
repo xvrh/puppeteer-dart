@@ -27,7 +27,7 @@ class AccessibilityApi {
   /// [fetchRelatives] Whether to fetch this nodes ancestors, siblings and children. Defaults to true.
   /// Returns: The `Accessibility.AXNode` for this DOM node, if it exists, plus its ancestors, siblings and
   /// children, if requested.
-  Future<List<AXNode>> getPartialAXTree(
+  Future<List<AXNodeData>> getPartialAXTree(
       {dom.NodeId nodeId,
       dom.BackendNodeId backendNodeId,
       runtime.RemoteObjectId objectId,
@@ -47,13 +47,17 @@ class AccessibilityApi {
     }
     var result =
         await _client.send('Accessibility.getPartialAXTree', parameters);
-    return (result['nodes'] as List).map((e) => AXNode.fromJson(e)).toList();
+    return (result['nodes'] as List)
+        .map((e) => AXNodeData.fromJson(e))
+        .toList();
   }
 
   /// Fetches the entire accessibility tree
-  Future<List<AXNode>> getFullAXTree() async {
+  Future<List<AXNodeData>> getFullAXTree() async {
     var result = await _client.send('Accessibility.getFullAXTree');
-    return (result['nodes'] as List).map((e) => AXNode.fromJson(e)).toList();
+    return (result['nodes'] as List)
+        .map((e) => AXNodeData.fromJson(e))
+        .toList();
   }
 }
 
@@ -523,7 +527,7 @@ class AXPropertyName {
 }
 
 /// A node in the accessibility tree.
-class AXNode {
+class AXNodeData {
   /// Unique identifier for this node.
   final AXNodeId nodeId;
 
@@ -554,7 +558,7 @@ class AXNode {
   /// The backend ID for the associated DOM node, if any.
   final dom.BackendNodeId backendDOMNodeId;
 
-  AXNode(
+  AXNodeData(
       {@required this.nodeId,
       @required this.ignored,
       this.ignoredReasons,
@@ -566,8 +570,8 @@ class AXNode {
       this.childIds,
       this.backendDOMNodeId});
 
-  factory AXNode.fromJson(Map<String, dynamic> json) {
-    return AXNode(
+  factory AXNodeData.fromJson(Map<String, dynamic> json) {
+    return AXNodeData(
       nodeId: AXNodeId.fromJson(json['nodeId']),
       ignored: json['ignored'],
       ignoredReasons: json.containsKey('ignoredReasons')

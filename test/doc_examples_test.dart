@@ -923,4 +923,26 @@ main() {
       expect(File('_trace.json').existsSync(), isTrue);
     });
   });
+  group('Accessibility', () {
+    group('snapshot', () {
+      test(0, () async {
+        var snapshot = await page.accessibility.snapshot();
+        print(snapshot);
+      });
+      test(1, () async {
+        AXNode findFocusedNode(AXNode node) {
+          if (node.focused) return node;
+          for (var child in node.children) {
+            var foundNode = findFocusedNode(child);
+            return foundNode;
+          }
+          return null;
+        }
+
+        var snapshot = await page.accessibility.snapshot();
+        var node = findFocusedNode(snapshot);
+        print(node?.name);
+      });
+    });
+  });
 }
