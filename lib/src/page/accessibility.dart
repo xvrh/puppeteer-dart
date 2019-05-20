@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:collection/equality.dart';
 import 'package:meta/meta.dart';
 import '../../protocol/accessibility.dart';
 import '../../protocol/dev_tools.dart';
