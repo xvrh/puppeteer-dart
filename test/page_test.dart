@@ -711,6 +711,24 @@ main() {
     test('should work fast enough', () async {
       for (var i = 0; i < 20; ++i) await page.setContent('<div>yo</div>');
     });
+    test('should work with tricky content', () async {
+      await page.setContent('<div>hello world</div>' '\x7F');
+      expect(await page.$eval('div', 'div => div.textContent'),
+          equals('hello world'));
+    });
+    test('should work with accents', () async {
+      await page.setContent('<div>aberración</div>');
+      expect(await page.$eval('div', 'div => div.textContent'),
+          equals('aberración'));
+    });
+    test('should work with emojis', () async {
+      await page.setContent('<div>🐥</div>');
+      expect(await page.$eval('div', 'div => div.textContent'), equals('🐥'));
+    });
+    test('should work with newline', () async {
+      await page.setContent('<div>\n</div>');
+      expect(await page.$eval('div', 'div => div.textContent'), equals('\n'));
+    });
   });
 
   group('Page.addScriptTag', () {

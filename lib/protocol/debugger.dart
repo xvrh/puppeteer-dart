@@ -279,6 +279,22 @@ class DebuggerApi {
     return SetBreakpointResult.fromJson(result);
   }
 
+  /// Sets instrumentation breakpoint.
+  /// [instrumentation] Instrumentation name.
+  /// Returns: Id of the created breakpoint for further reference.
+  Future<BreakpointId> setInstrumentationBreakpoint(
+      @Enum(['beforeScriptExecution', 'beforeScriptWithSourceMapExecution'])
+          String instrumentation) async {
+    assert(const ['beforeScriptExecution', 'beforeScriptWithSourceMapExecution']
+        .contains(instrumentation));
+    var parameters = <String, dynamic>{
+      'instrumentation': instrumentation,
+    };
+    var result =
+        await _client.send('Debugger.setInstrumentationBreakpoint', parameters);
+    return BreakpointId.fromJson(result['breakpointId']);
+  }
+
   /// Sets JavaScript breakpoint at given location specified either by URL or URL regex. Once this
   /// command is issued, all existing parsed scripts will have breakpoints resolved and returned in
   /// `locations` property. Further matching script parsing will result in subsequent
@@ -1192,27 +1208,29 @@ class BreakLocationType {
 }
 
 class PausedEventReason {
-  static const xhr = PausedEventReason._('XHR');
+  static const ambiguous = PausedEventReason._('ambiguous');
+  static const assert$ = PausedEventReason._('assert');
+  static const debugCommand = PausedEventReason._('debugCommand');
   static const dom = PausedEventReason._('DOM');
   static const eventListener = PausedEventReason._('EventListener');
   static const exception = PausedEventReason._('exception');
-  static const assert$ = PausedEventReason._('assert');
-  static const debugCommand = PausedEventReason._('debugCommand');
-  static const promiseRejection = PausedEventReason._('promiseRejection');
+  static const instrumentation = PausedEventReason._('instrumentation');
   static const oom = PausedEventReason._('OOM');
   static const other = PausedEventReason._('other');
-  static const ambiguous = PausedEventReason._('ambiguous');
+  static const promiseRejection = PausedEventReason._('promiseRejection');
+  static const xhr = PausedEventReason._('XHR');
   static const values = {
-    'XHR': xhr,
+    'ambiguous': ambiguous,
+    'assert': assert$,
+    'debugCommand': debugCommand,
     'DOM': dom,
     'EventListener': eventListener,
     'exception': exception,
-    'assert': assert$,
-    'debugCommand': debugCommand,
-    'promiseRejection': promiseRejection,
+    'instrumentation': instrumentation,
     'OOM': oom,
     'other': other,
-    'ambiguous': ambiguous,
+    'promiseRejection': promiseRejection,
+    'XHR': xhr,
   };
 
   final String value;

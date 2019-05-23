@@ -44,11 +44,16 @@ class OverlayApi {
 
   /// For testing.
   /// [nodeId] Id of the node to get highlight object for.
+  /// [includeDistance] Whether to include distance info.
   /// Returns: Highlight data for the node.
-  Future<Map> getHighlightObjectForTest(dom.NodeId nodeId) async {
+  Future<Map> getHighlightObjectForTest(dom.NodeId nodeId,
+      {bool includeDistance}) async {
     var parameters = <String, dynamic>{
       'nodeId': nodeId.toJson(),
     };
+    if (includeDistance != null) {
+      parameters['includeDistance'] = includeDistance;
+    }
     var result =
         await _client.send('Overlay.getHighlightObjectForTest', parameters);
     return result['highlight'];
