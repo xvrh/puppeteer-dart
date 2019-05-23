@@ -83,9 +83,13 @@ class RecordingStateChangedEvent {
 class ServiceName {
   static const backgroundFetch = ServiceName._('backgroundFetch');
   static const backgroundSync = ServiceName._('backgroundSync');
+  static const pushMessaging = ServiceName._('pushMessaging');
+  static const notifications = ServiceName._('notifications');
   static const values = {
     'backgroundFetch': backgroundFetch,
     'backgroundSync': backgroundSync,
+    'pushMessaging': pushMessaging,
+    'notifications': notifications,
   };
 
   final String value;

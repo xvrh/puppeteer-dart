@@ -70,11 +70,19 @@ class GPUDevice {
   /// String description of the GPU device, if the PCI ID is not available.
   final String deviceString;
 
+  /// String description of the GPU driver vendor.
+  final String driverVendor;
+
+  /// String description of the GPU driver version.
+  final String driverVersion;
+
   GPUDevice(
       {@required this.vendorId,
       @required this.deviceId,
       @required this.vendorString,
-      @required this.deviceString});
+      @required this.deviceString,
+      @required this.driverVendor,
+      @required this.driverVersion});
 
   factory GPUDevice.fromJson(Map<String, dynamic> json) {
     return GPUDevice(
@@ -82,6 +90,8 @@ class GPUDevice {
       deviceId: json['deviceId'],
       vendorString: json['vendorString'],
       deviceString: json['deviceString'],
+      driverVendor: json['driverVendor'],
+      driverVersion: json['driverVersion'],
     );
   }
 
@@ -91,6 +101,8 @@ class GPUDevice {
       'deviceId': deviceId,
       'vendorString': vendorString,
       'deviceString': deviceString,
+      'driverVendor': driverVendor,
+      'driverVersion': driverVersion,
     };
     return json;
   }

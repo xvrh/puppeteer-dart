@@ -977,7 +977,9 @@
                     "type": "string",
                     "enum": [
                         "backgroundFetch",
-                        "backgroundSync"
+                        "backgroundSync",
+                        "pushMessaging",
+                        "notifications"
                     ]
                 },
                 {
@@ -10353,6 +10355,12 @@
                             "name": "nodeId",
                             "description": "Id of the node to get highlight object for.",
                             "$ref": "DOM.NodeId"
+                        },
+                        {
+                            "name": "includeDistance",
+                            "description": "Whether to include distance info.",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ],
                     "returns": [
@@ -13311,6 +13319,16 @@
                             "name": "deviceString",
                             "description": "String description of the GPU device, if the PCI ID is not available.",
                             "type": "string"
+                        },
+                        {
+                            "name": "driverVendor",
+                            "description": "String description of the GPU driver vendor.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "driverVersion",
+                            "description": "String description of the GPU driver version.",
+                            "type": "string"
                         }
                     ]
                 },
@@ -15396,6 +15414,28 @@
                     ]
                 },
                 {
+                    "name": "setInstrumentationBreakpoint",
+                    "description": "Sets instrumentation breakpoint.",
+                    "parameters": [
+                        {
+                            "name": "instrumentation",
+                            "description": "Instrumentation name.",
+                            "type": "string",
+                            "enum": [
+                                "beforeScriptExecution",
+                                "beforeScriptWithSourceMapExecution"
+                            ]
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "breakpointId",
+                            "description": "Id of the created breakpoint for further reference.",
+                            "$ref": "BreakpointId"
+                        }
+                    ]
+                },
+                {
                     "name": "setBreakpointByUrl",
                     "description": "Sets JavaScript breakpoint at given location specified either by URL or URL regex. Once this\ncommand is issued, all existing parsed scripts will have breakpoints resolved and returned in\n`locations` property. Further matching script parsing will result in subsequent\n`breakpointResolved` events issued. This logical breakpoint will survive page reloads.",
                     "parameters": [
@@ -15666,16 +15706,17 @@
                             "description": "Pause reason.",
                             "type": "string",
                             "enum": [
-                                "XHR",
+                                "ambiguous",
+                                "assert",
+                                "debugCommand",
                                 "DOM",
                                 "EventListener",
                                 "exception",
-                                "assert",
-                                "debugCommand",
-                                "promiseRejection",
+                                "instrumentation",
                                 "OOM",
                                 "other",
-                                "ambiguous"
+                                "promiseRejection",
+                                "XHR"
                             ]
                         },
                         {

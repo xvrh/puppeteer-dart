@@ -102,6 +102,12 @@ main() {
               .evaluate('async (a, b) => { return a * b; }', args: [2, 4]),
           equals(8));
     });
+    test('should work with unicode chars', () async {
+      var result = await page.evaluate("a => a['中文字符']", args: [
+        {'中文字符': 42}
+      ]);
+      expect(result, equals(42));
+    });
     test('should throw when evaluation triggers reload', () async {
       expect(() => page.evaluate('''() => {
           location.reload();
