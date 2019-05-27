@@ -2,6 +2,8 @@ import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 main() {
   Server server;
   Browser browser;
@@ -119,8 +121,8 @@ main() {
       expect(result, equals(56));
     });
     test('should work right after framenavigated', () async {
-      var frameEvaluation;
-      page.onFrameNavigated.listen((Frame frame) {
+      Future<int> frameEvaluation;
+      page.onFrameNavigated.listen((frame) {
         frameEvaluation = frame.evaluate('() => 6 * 7');
       });
       await page.goto(server.emptyPage);

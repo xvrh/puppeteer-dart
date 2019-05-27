@@ -13,24 +13,23 @@ class OverlayApi {
   /// Fired when the node should be inspected. This happens after call to `setInspectMode` or when
   /// user manually inspects an element.
   Stream<dom.BackendNodeId> get onInspectNodeRequested => _client.onEvent
-      .where((Event event) => event.name == 'Overlay.inspectNodeRequested')
-      .map((Event event) =>
+      .where((event) => event.name == 'Overlay.inspectNodeRequested')
+      .map((event) =>
           dom.BackendNodeId.fromJson(event.parameters['backendNodeId']));
 
   /// Fired when the node should be highlighted. This happens after call to `setInspectMode`.
   Stream<dom.NodeId> get onNodeHighlightRequested => _client.onEvent
-      .where((Event event) => event.name == 'Overlay.nodeHighlightRequested')
-      .map((Event event) => dom.NodeId.fromJson(event.parameters['nodeId']));
+      .where((event) => event.name == 'Overlay.nodeHighlightRequested')
+      .map((event) => dom.NodeId.fromJson(event.parameters['nodeId']));
 
   /// Fired when user asks to capture screenshot of some area on the page.
   Stream<page.Viewport> get onScreenshotRequested => _client.onEvent
-      .where((Event event) => event.name == 'Overlay.screenshotRequested')
-      .map((Event event) =>
-          page.Viewport.fromJson(event.parameters['viewport']));
+      .where((event) => event.name == 'Overlay.screenshotRequested')
+      .map((event) => page.Viewport.fromJson(event.parameters['viewport']));
 
   /// Fired when user cancels the inspect mode.
   Stream get onInspectModeCanceled => _client.onEvent
-      .where((Event event) => event.name == 'Overlay.inspectModeCanceled');
+      .where((event) => event.name == 'Overlay.inspectModeCanceled');
 
   /// Disables domain notifications.
   Future<void> disable() async {

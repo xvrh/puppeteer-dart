@@ -34,7 +34,7 @@ main() async {
     };
     var names = deviceSplits[device.title] ?? [device.title];
 
-    for (String name in names) {
+    for (var name in names) {
       var deviceName =
           firstLetterLower(splitWords(name).map(firstLetterUpper).join(''));
       allNames[name] = deviceName;

@@ -18,14 +18,14 @@ class FetchApi {
   /// and responseStatusCode -- the request is at the response stage if either
   /// of these fields is present and in the request stage otherwise.
   Stream<RequestPausedEvent> get onRequestPaused => _client.onEvent
-      .where((Event event) => event.name == 'Fetch.requestPaused')
-      .map((Event event) => RequestPausedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Fetch.requestPaused')
+      .map((event) => RequestPausedEvent.fromJson(event.parameters));
 
   /// Issued when the domain is enabled with handleAuthRequests set to true.
   /// The request is paused until client responds with continueWithAuth.
   Stream<AuthRequiredEvent> get onAuthRequired => _client.onEvent
-      .where((Event event) => event.name == 'Fetch.authRequired')
-      .map((Event event) => AuthRequiredEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Fetch.authRequired')
+      .map((event) => AuthRequiredEvent.fromJson(event.parameters));
 
   /// Disables the fetch domain.
   Future<void> disable() async {

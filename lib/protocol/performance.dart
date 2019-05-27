@@ -9,8 +9,8 @@ class PerformanceApi {
 
   /// Current values of the metrics.
   Stream<MetricsEvent> get onMetrics => _client.onEvent
-      .where((Event event) => event.name == 'Performance.metrics')
-      .map((Event event) => MetricsEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Performance.metrics')
+      .map((event) => MetricsEvent.fromJson(event.parameters));
 
   /// Disable collecting and reporting metrics.
   Future<void> disable() async {

@@ -32,7 +32,7 @@ class Worker {
               onConsoleApiCalled,
       @required
           Function(ExceptionThrownEvent) onExceptionThrown}) {
-    RuntimeApi runtimeApi = RuntimeApi(client);
+    var runtimeApi = RuntimeApi(client);
 
     JsHandle Function(RemoteObject) jsHandleFactory;
     runtimeApi.onExecutionContextCreated.listen((event) {

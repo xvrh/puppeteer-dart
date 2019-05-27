@@ -13,15 +13,14 @@ class SecurityApi {
   /// certificate error has been allowed internally. Only one client per target should override
   /// certificate errors at the same time.
   Stream<CertificateErrorEvent> get onCertificateError => _client.onEvent
-      .where((Event event) => event.name == 'Security.certificateError')
-      .map((Event event) => CertificateErrorEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Security.certificateError')
+      .map((event) => CertificateErrorEvent.fromJson(event.parameters));
 
   /// The security state of the page changed.
   Stream<SecurityStateChangedEvent> get onSecurityStateChanged =>
       _client.onEvent
-          .where((Event event) => event.name == 'Security.securityStateChanged')
-          .map((Event event) =>
-              SecurityStateChangedEvent.fromJson(event.parameters));
+          .where((event) => event.name == 'Security.securityStateChanged')
+          .map((event) => SecurityStateChangedEvent.fromJson(event.parameters));
 
   /// Disables tracking security state changes.
   Future<void> disable() async {

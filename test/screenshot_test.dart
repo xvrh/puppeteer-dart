@@ -5,6 +5,8 @@ import 'package:test/test.dart';
 import 'utils/utils.dart';
 import 'utils/utils_golden.dart';
 
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 main() {
   Server server;
   Browser browser;
@@ -80,11 +82,13 @@ main() {
         return page;
       }));
       var promises = <Future>[];
-      for (var i = 0; i < N; ++i)
+      for (var i = 0; i < N; ++i) {
         promises.add(pages[i].screenshot(clip: Rectangle(50 * i, 0, 50, 50)));
+      }
       var screenshots = await Future.wait(promises);
-      for (var i = 0; i < N; ++i)
+      for (var i = 0; i < N; ++i) {
         expect(screenshots[i], equalsGolden('test/golden/grid-cell-$i.png'));
+      }
       await Future.wait(pages.map((page) => page.close()));
     });
     test('should allow transparency', () async {

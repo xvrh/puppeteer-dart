@@ -5,6 +5,8 @@ import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 main() {
   Server server;
   Browser browser;
@@ -35,7 +37,7 @@ main() {
   group('Page.close', () {
     test('should reject all promises when page is closed', () async {
       var newPage = await context.newPage();
-      var error;
+      TargetClosedException error;
       await Future.wait([
         newPage
             .evaluate('() => new Promise(r => {})')
@@ -709,7 +711,9 @@ main() {
       await contentPromise;
     });
     test('should work fast enough', () async {
-      for (var i = 0; i < 20; ++i) await page.setContent('<div>yo</div>');
+      for (var i = 0; i < 20; ++i) {
+        await page.setContent('<div>yo</div>');
+      }
     });
     test('should work with tricky content', () async {
       await page.setContent('<div>hello world</div>' '\x7F');

@@ -3,6 +3,8 @@ import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 main() {
   Server server;
   Browser browser;
@@ -68,11 +70,11 @@ main() {
       var context = await browser.createIncognitoBrowserContext();
       var events = [];
       context.onTargetCreated
-          .listen((target) => events.add(('CREATED: ' + target.url)));
+          .listen((target) => events.add('CREATED: ' + target.url));
       context.onTargetChanged
-          .listen((target) => events.add(('CHANGED: ' + target.url)));
+          .listen((target) => events.add('CHANGED: ' + target.url));
       context.onTargetDestroyed
-          .listen((target) => events.add(('DESTROYED: ' + target.url)));
+          .listen((target) => events.add('DESTROYED: ' + target.url));
       var page = await context.newPage();
       await page.goto(server.emptyPage);
       Future targetDestroyFuture = context.onTargetDestroyed.first;

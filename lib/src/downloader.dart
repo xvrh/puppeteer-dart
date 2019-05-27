@@ -22,25 +22,25 @@ Future<RevisionInfo> downloadChrome({int revision, String cachePath}) async {
   revision ??= _lastRevision;
   cachePath ??= '.local-chromium';
 
-  Directory revisionDirectory = Directory(p.join(cachePath, '$revision'));
+  var revisionDirectory = Directory(p.join(cachePath, '$revision'));
   if (!revisionDirectory.existsSync()) {
     revisionDirectory.createSync(recursive: true);
   }
 
-  String exePath = getExecutablePath(revisionDirectory.path);
+  var exePath = getExecutablePath(revisionDirectory.path);
 
-  File executableFile = File(exePath);
+  var executableFile = File(exePath);
 
   if (!executableFile.existsSync()) {
-    String url = _downloadUrl(revision);
-    String zipPath = p.join(cachePath, '${revision}_${p.url.basename(url)}');
+    var url = _downloadUrl(revision);
+    var zipPath = p.join(cachePath, '${revision}_${p.url.basename(url)}');
     await _downloadFile(url, zipPath);
     _unzip(zipPath, revisionDirectory.path);
     File(zipPath).deleteSync();
   }
 
   if (!executableFile.existsSync()) {
-    throw "$exePath doesn't exist";
+    throw Exception("$exePath doesn't exist");
   }
 
   if (!Platform.isWindows) {
@@ -54,15 +54,14 @@ Future<RevisionInfo> downloadChrome({int revision, String cachePath}) async {
 }
 
 Future _downloadFile(String url, String output) async {
-  http.Client client = http.Client();
-  http.StreamedResponse response =
-      await client.send(http.Request('get', Uri.parse(url)));
-  File ouputFile = File(output);
+  var client = http.Client();
+  var response = await client.send(http.Request('get', Uri.parse(url)));
+  var ouputFile = File(output);
   await response.stream.pipe(ouputFile.openWrite());
   client.close();
 
   if (!ouputFile.existsSync() || ouputFile.lengthSync() == 0) {
-    throw 'File was not downloaded from $url to $output';
+    throw Exception('File was not downloaded from $url to $output');
   }
 }
 
@@ -78,17 +77,17 @@ void _unzip(String path, String targetPath) {
 //TODO(xha): implement a more complete unzip
 //https://github.com/maxogden/extract-zip/blob/master/index.js
 void _simpleUnzip(String path, String targetPath) {
-  Directory targetDirectory = Directory(targetPath);
+  var targetDirectory = Directory(targetPath);
   if (targetDirectory.existsSync()) {
     targetDirectory.deleteSync(recursive: true);
   }
 
-  List<int> bytes = File(path).readAsBytesSync();
-  Archive archive = ZipDecoder().decodeBytes(bytes);
+  var bytes = File(path).readAsBytesSync();
+  var archive = ZipDecoder().decodeBytes(bytes);
 
-  for (ArchiveFile file in archive) {
-    String filename = file.name;
-    List<int> data = file.content;
+  for (var file in archive) {
+    var filename = file.name;
+    var data = file.content;
     if (data.isNotEmpty) {
       File(p.join(targetPath, filename))
         ..createSync(recursive: true)

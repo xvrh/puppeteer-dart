@@ -14,127 +14,123 @@ class PageApi {
   PageApi(this._client);
 
   Stream<network.MonotonicTime> get onDomContentEventFired => _client.onEvent
-      .where((Event event) => event.name == 'Page.domContentEventFired')
-      .map((Event event) =>
+      .where((event) => event.name == 'Page.domContentEventFired')
+      .map((event) =>
           network.MonotonicTime.fromJson(event.parameters['timestamp']));
 
   /// Fired when frame has been attached to its parent.
   Stream<FrameAttachedEvent> get onFrameAttached => _client.onEvent
-      .where((Event event) => event.name == 'Page.frameAttached')
-      .map((Event event) => FrameAttachedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Page.frameAttached')
+      .map((event) => FrameAttachedEvent.fromJson(event.parameters));
 
   /// Fired when frame no longer has a scheduled navigation.
   Stream<FrameId> get onFrameClearedScheduledNavigation => _client.onEvent
-      .where(
-          (Event event) => event.name == 'Page.frameClearedScheduledNavigation')
-      .map((Event event) => FrameId.fromJson(event.parameters['frameId']));
+      .where((event) => event.name == 'Page.frameClearedScheduledNavigation')
+      .map((event) => FrameId.fromJson(event.parameters['frameId']));
 
   /// Fired when frame has been detached from its parent.
   Stream<FrameId> get onFrameDetached => _client.onEvent
-      .where((Event event) => event.name == 'Page.frameDetached')
-      .map((Event event) => FrameId.fromJson(event.parameters['frameId']));
+      .where((event) => event.name == 'Page.frameDetached')
+      .map((event) => FrameId.fromJson(event.parameters['frameId']));
 
   /// Fired once navigation of the frame has completed. Frame is now associated with the new loader.
   Stream<FrameInfo> get onFrameNavigated => _client.onEvent
-      .where((Event event) => event.name == 'Page.frameNavigated')
-      .map((Event event) => FrameInfo.fromJson(event.parameters['frame']));
+      .where((event) => event.name == 'Page.frameNavigated')
+      .map((event) => FrameInfo.fromJson(event.parameters['frame']));
 
   Stream get onFrameResized =>
-      _client.onEvent.where((Event event) => event.name == 'Page.frameResized');
+      _client.onEvent.where((event) => event.name == 'Page.frameResized');
 
   /// Fired when a renderer-initiated navigation is requested.
   /// Navigation may still be cancelled after the event is issued.
   Stream<FrameRequestedNavigationEvent> get onFrameRequestedNavigation =>
       _client.onEvent
-          .where((Event event) => event.name == 'Page.frameRequestedNavigation')
-          .map((Event event) =>
+          .where((event) => event.name == 'Page.frameRequestedNavigation')
+          .map((event) =>
               FrameRequestedNavigationEvent.fromJson(event.parameters));
 
   /// Fired when frame schedules a potential navigation.
   Stream<FrameScheduledNavigationEvent> get onFrameScheduledNavigation =>
       _client.onEvent
-          .where((Event event) => event.name == 'Page.frameScheduledNavigation')
-          .map((Event event) =>
+          .where((event) => event.name == 'Page.frameScheduledNavigation')
+          .map((event) =>
               FrameScheduledNavigationEvent.fromJson(event.parameters));
 
   /// Fired when frame has started loading.
   Stream<FrameId> get onFrameStartedLoading => _client.onEvent
-      .where((Event event) => event.name == 'Page.frameStartedLoading')
-      .map((Event event) => FrameId.fromJson(event.parameters['frameId']));
+      .where((event) => event.name == 'Page.frameStartedLoading')
+      .map((event) => FrameId.fromJson(event.parameters['frameId']));
 
   /// Fired when frame has stopped loading.
   Stream<FrameId> get onFrameStoppedLoading => _client.onEvent
-      .where((Event event) => event.name == 'Page.frameStoppedLoading')
-      .map((Event event) => FrameId.fromJson(event.parameters['frameId']));
+      .where((event) => event.name == 'Page.frameStoppedLoading')
+      .map((event) => FrameId.fromJson(event.parameters['frameId']));
 
   /// Fired when page is about to start a download.
   Stream<DownloadWillBeginEvent> get onDownloadWillBegin => _client.onEvent
-      .where((Event event) => event.name == 'Page.downloadWillBegin')
-      .map((Event event) => DownloadWillBeginEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Page.downloadWillBegin')
+      .map((event) => DownloadWillBeginEvent.fromJson(event.parameters));
 
   /// Fired when interstitial page was hidden
-  Stream get onInterstitialHidden => _client.onEvent
-      .where((Event event) => event.name == 'Page.interstitialHidden');
+  Stream get onInterstitialHidden =>
+      _client.onEvent.where((event) => event.name == 'Page.interstitialHidden');
 
   /// Fired when interstitial page was shown
-  Stream get onInterstitialShown => _client.onEvent
-      .where((Event event) => event.name == 'Page.interstitialShown');
+  Stream get onInterstitialShown =>
+      _client.onEvent.where((event) => event.name == 'Page.interstitialShown');
 
   /// Fired when a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload) has been
   /// closed.
-  Stream<JavascriptDialogClosedEvent> get onJavascriptDialogClosed =>
-      _client.onEvent
-          .where((Event event) => event.name == 'Page.javascriptDialogClosed')
-          .map((Event event) =>
-              JavascriptDialogClosedEvent.fromJson(event.parameters));
+  Stream<JavascriptDialogClosedEvent> get onJavascriptDialogClosed => _client
+      .onEvent
+      .where((event) => event.name == 'Page.javascriptDialogClosed')
+      .map((event) => JavascriptDialogClosedEvent.fromJson(event.parameters));
 
   /// Fired when a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload) is about to
   /// open.
-  Stream<JavascriptDialogOpeningEvent> get onJavascriptDialogOpening =>
-      _client.onEvent
-          .where((Event event) => event.name == 'Page.javascriptDialogOpening')
-          .map((Event event) =>
-              JavascriptDialogOpeningEvent.fromJson(event.parameters));
+  Stream<JavascriptDialogOpeningEvent> get onJavascriptDialogOpening => _client
+      .onEvent
+      .where((event) => event.name == 'Page.javascriptDialogOpening')
+      .map((event) => JavascriptDialogOpeningEvent.fromJson(event.parameters));
 
   /// Fired for top level page lifecycle events such as navigation, load, paint, etc.
   Stream<LifecycleEventEvent> get onLifecycleEvent => _client.onEvent
-      .where((Event event) => event.name == 'Page.lifecycleEvent')
-      .map((Event event) => LifecycleEventEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Page.lifecycleEvent')
+      .map((event) => LifecycleEventEvent.fromJson(event.parameters));
 
   Stream<network.MonotonicTime> get onLoadEventFired => _client.onEvent
-      .where((Event event) => event.name == 'Page.loadEventFired')
-      .map((Event event) =>
+      .where((event) => event.name == 'Page.loadEventFired')
+      .map((event) =>
           network.MonotonicTime.fromJson(event.parameters['timestamp']));
 
   /// Fired when same-document navigation happens, e.g. due to history API usage or anchor navigation.
-  Stream<NavigatedWithinDocumentEvent> get onNavigatedWithinDocument =>
-      _client.onEvent
-          .where((Event event) => event.name == 'Page.navigatedWithinDocument')
-          .map((Event event) =>
-              NavigatedWithinDocumentEvent.fromJson(event.parameters));
+  Stream<NavigatedWithinDocumentEvent> get onNavigatedWithinDocument => _client
+      .onEvent
+      .where((event) => event.name == 'Page.navigatedWithinDocument')
+      .map((event) => NavigatedWithinDocumentEvent.fromJson(event.parameters));
 
   /// Compressed image data requested by the `startScreencast`.
   Stream<ScreencastFrameEvent> get onScreencastFrame => _client.onEvent
-      .where((Event event) => event.name == 'Page.screencastFrame')
-      .map((Event event) => ScreencastFrameEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Page.screencastFrame')
+      .map((event) => ScreencastFrameEvent.fromJson(event.parameters));
 
   /// Fired when the page with currently enabled screencast was shown or hidden `.
   Stream<bool> get onScreencastVisibilityChanged => _client.onEvent
-      .where((Event event) => event.name == 'Page.screencastVisibilityChanged')
-      .map((Event event) => event.parameters['visible'] as bool);
+      .where((event) => event.name == 'Page.screencastVisibilityChanged')
+      .map((event) => event.parameters['visible'] as bool);
 
   /// Fired when a new window is going to be opened, via window.open(), link click, form submission,
   /// etc.
   Stream<WindowOpenEvent> get onWindowOpen => _client.onEvent
-      .where((Event event) => event.name == 'Page.windowOpen')
-      .map((Event event) => WindowOpenEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Page.windowOpen')
+      .map((event) => WindowOpenEvent.fromJson(event.parameters));
 
   /// Issued for every compilation cache generated. Is only available
   /// if Page.setGenerateCompilationCache is enabled.
   Stream<CompilationCacheProducedEvent> get onCompilationCacheProduced =>
       _client.onEvent
-          .where((Event event) => event.name == 'Page.compilationCacheProduced')
-          .map((Event event) =>
+          .where((event) => event.name == 'Page.compilationCacheProduced')
+          .map((event) =>
               CompilationCacheProducedEvent.fromJson(event.parameters));
 
   /// Deprecated, please use addScriptToEvaluateOnNewDocument instead.

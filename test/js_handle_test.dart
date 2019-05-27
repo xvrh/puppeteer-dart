@@ -148,7 +148,7 @@ main() {
       expect(element, isNotNull);
     });
     test('should return null for non-elements', () async {
-      var aHandle = await page.evaluateHandle(('() => 2'));
+      var aHandle = await page.evaluateHandle('() => 2');
       var element = aHandle.asElement;
       expect(element, isNull);
     });

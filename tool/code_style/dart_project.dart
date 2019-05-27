@@ -4,14 +4,15 @@ import 'package:yaml/yaml.dart';
 import 'pubspec_helper.dart';
 
 List<DartProject> getDartProjects(String root) {
-  List<DartProject> paths = <DartProject>[];
+  var paths = <DartProject>[];
 
-  for (File file in findPubspecs(Directory(root))) {
-    String relativePath = p.relative(file.path, from: root);
+  for (var file in findPubspecs(Directory(root))) {
+    var relativePath = p.relative(file.path, from: root);
     if (p
         .split(relativePath)
-        .any((String part) => part.startsWith('_') || part.startsWith('.')))
+        .any((part) => part.startsWith('_') || part.startsWith('.'))) {
       continue;
+    }
 
     paths.add(DartProject(p.normalize(file.parent.absolute.path)));
   }
@@ -20,14 +21,14 @@ List<DartProject> getDartProjects(String root) {
 }
 
 DartProject getContainingProject(String currentPath) {
-  Directory dir = Directory(currentPath);
+  var dir = Directory(currentPath);
 
   while (true) {
     if (dir.listSync(followLinks: false).any((r) =>
         r is File && p.basename(r.path).toLowerCase() == 'pubspec.yaml')) {
       return DartProject(dir.path, listingPath: currentPath);
     }
-    Directory parent = dir.parent;
+    var parent = dir.parent;
     if (dir.path == parent.path) {
       return null;
     }
@@ -38,9 +39,9 @@ DartProject getContainingProject(String currentPath) {
 
 /// Retourne les sous-projets ou le projet qui contient le dossier cible.
 List<DartProject> getSubOrContainingProjects(String root) {
-  List<DartProject> projects = getDartProjects(root);
+  var projects = getDartProjects(root);
   if (projects.isEmpty) {
-    DartProject containingProject = getContainingProject(root);
+    var containingProject = getContainingProject(root);
     return [containingProject];
   } else {
     return projects;
@@ -74,7 +75,7 @@ class DartProject {
   }
 
   List<DartFile> getDartFiles() {
-    List<DartFile> files = <DartFile>[];
+    var files = <DartFile>[];
     _visitDirectory(Directory(_listingPath), files, isRoot: true);
     return files;
   }
@@ -88,10 +89,10 @@ class DartProject {
         directoryContent
             .any((f) => f is File && f.path.endsWith('pubspec.yaml'))) return;
 
-    for (FileSystemEntity entity in directoryContent) {
+    for (var entity in directoryContent) {
       if (entity is File && entity.path.endsWith('.dart')) {
-        File absoluteFile = entity.absolute;
-        String absolute = absoluteFile.path;
+        var absoluteFile = entity.absolute;
+        var absolute = absoluteFile.path;
 
         if (!isInHiddenDir(p.relative(absolute, from: rootDirectory))) {
           files.add(DartFile(this, absoluteFile));

@@ -7,6 +7,8 @@ import 'model.dart';
 import 'utils/split_words.dart';
 import 'utils/string_helpers.dart';
 
+// ignore_for_file:omit_local_variable_types
+
 Protocol _readProtocol(String fileName) {
   return Protocol.fromString(
       File.fromUri(Platform.script.resolve(p.posix.join('json', fileName)))
@@ -72,7 +74,7 @@ main() {
                   enums: p.enumValues))));
     }
 
-    StringBuffer code = StringBuffer();
+    var code = StringBuffer();
 
     code.writeln("import 'dart:async';");
     if (context.needsMetaPackage) {
@@ -80,55 +82,56 @@ main() {
     }
     code.writeln("import '../src/connection.dart';");
 
-    for (String dependency in context.dependencies) {
-      String normalizedDep = _underscoreize(dependency);
+    for (var dependency in context.dependencies) {
+      var normalizedDep = _underscoreize(dependency);
       code.writeln("import '$normalizedDep.dart' as $normalizedDep;");
     }
 
     code.writeln();
 
-    String className = '${domain.name}Api';
+    var className = '${domain.name}Api';
     code.writeln(toComment(domain.description));
     if (domain.deprecated) {
       code.writeln('@deprecated');
     }
-    code.writeln('class $className {');
-    code.writeln('final Client _client;');
-    code.writeln();
-    code.writeln('$className(this._client);');
-    code.writeln();
+    code
+      ..writeln('class $className {')
+      ..writeln('final Client _client;')
+      ..writeln()
+      ..writeln('$className(this._client);')
+      ..writeln();
 
-    for (_Event event in events) {
+    for (var event in events) {
       code.writeln(event.code);
       code.writeln();
     }
 
-    for (_Command command in commands) {
+    for (var command in commands) {
       code.writeln(command.code);
     }
 
     code.writeln('}');
 
-    for (_Event event in events.where((c) => c.complexTypeCode != null)) {
+    for (var event in events.where((c) => c.complexTypeCode != null)) {
       code.writeln(event.complexTypeCode);
     }
 
-    for (_Command command in commands.where((c) => c.returnTypeCode != null)) {
+    for (var command in commands.where((c) => c.returnTypeCode != null)) {
       code.writeln(command.returnTypeCode);
     }
 
-    for (_InternalType type in internalTypes) {
+    for (var type in internalTypes) {
       code.writeln(type.code);
     }
 
     _writeDartFile(p.join(targetDir.path, fileName), code.toString());
   }
 
-  StringBuffer tabBuffer = StringBuffer();
+  var tabBuffer = StringBuffer();
 
-  List<Domain> tabDomains = domains.where((d) => !d.deprecated).toList();
+  var tabDomains = domains.where((d) => !d.deprecated).toList();
 
-  for (Domain domain in tabDomains) {
+  for (var domain in tabDomains) {
     tabBuffer.writeln("import '${_underscoreize(domain.name)}.dart';");
   }
   tabBuffer.writeln("import '../src/connection.dart';");
@@ -140,8 +143,8 @@ class DevTools {
   DevTools(this.client);
 ''');
 
-  for (Domain domain in tabDomains) {
-    String camelizedName = firstLetterLower(_camelizeName(domain.name));
+  for (var domain in tabDomains) {
+    var camelizedName = firstLetterLower(_camelizeName(domain.name));
 
     tabBuffer.writeln(toComment(domain.description, indent: 2));
     tabBuffer.writeln('${domain.name}Api get $camelizedName =>  '
@@ -157,7 +160,7 @@ class DevTools {
 
 _writeDartFile(String target, String code) {
   try {
-    String formattedCode = reorderImports(code);
+    var formattedCode = reorderImports(code);
     File(target).writeAsStringSync(formattedCode);
   } catch (_) {
     print('Error with code\n$code');
@@ -166,7 +169,7 @@ _writeDartFile(String target, String code) {
 }
 
 String _underscoreize(String input) {
-  return splitWords(input).map((String part) => part.toLowerCase()).join('_');
+  return splitWords(input).map((part) => part.toLowerCase()).join('_');
 }
 
 String _camelizeName(String input) {
@@ -180,22 +183,22 @@ class _Command {
   _InternalType _returnType;
 
   _Command(this.context, this.command) {
-    String name = command.name;
-    List<Parameter> parameters = command.parameters;
-    List<Parameter> returns = command.returns;
+    var name = command.name;
+    var parameters = command.parameters;
+    var returns = command.returns;
 
-    StringBuffer code = StringBuffer();
+    var code = StringBuffer();
 
     //TODO(xha): create a CommentBuilder to simplify and better manage the spacings between groups.
     code.writeln(toComment(command.description, indent: 2));
-    for (Parameter parameter in parameters.where((p) => !p.deprecated)) {
-      String description = parameter.description;
+    for (var parameter in parameters.where((p) => !p.deprecated)) {
+      var description = parameter.description;
       if (description != null && description.isNotEmpty) {
         code.writeln(toComment('[${parameter.name}] $description', indent: 2));
       }
     }
     if (returns.length == 1) {
-      String description = returns[0].description;
+      var description = returns[0].description;
       if (description != null && description.isNotEmpty) {
         code.writeln(toComment('Returns: $description', indent: 2));
       }
@@ -208,12 +211,11 @@ class _Command {
     String returnTypeName;
     if (returns.isNotEmpty) {
       if (returns.length == 1) {
-        Parameter firstReturn = returns.first;
+        var firstReturn = returns.first;
         returnTypeName = context.getPropertyType(firstReturn);
       } else {
         returnTypeName = '${firstLetterUpper(name)}Result';
-        ComplexType returnJson =
-            ComplexType(id: returnTypeName, properties: returns);
+        var returnJson = ComplexType(id: returnTypeName, properties: returns);
         _returnType = _InternalType(context, returnJson, generateToJson: false);
       }
     }
@@ -225,7 +227,7 @@ class _Command {
         parameters.where((p) => !optionals.contains(p)).toList();
 
     String enumList(List<String> enumValues) =>
-        '[' + enumValues.map((e) => "'$e'").join(', ') + ']';
+        '[${enumValues.map((e) => "'$e'").join(', ')}]';
 
     String toParameter(Parameter parameter) {
       String enumAttribute = '';
@@ -355,7 +357,7 @@ class _Event {
     String streamName = 'on${firstLetterUpper(name)}';
     code.writeln(
         'Stream${_typeName != null ? '<$_typeName>' : ''} get $streamName => '
-        "_client.onEvent.where((Event event) => event.name == '${context.domain.name}.$name')");
+        "_client.onEvent.where((event) => event.name == '${context.domain.name}.$name')");
 
     if (parameters.isNotEmpty) {
       String mapCode;
@@ -385,7 +387,7 @@ class _Event {
         mapCode = '$_typeName.fromJson(event.parameters)';
       }
       assert(mapCode != null);
-      code.writeln('.map((Event event) => $mapCode)');
+      code.writeln('.map((event) => $mapCode)');
     }
 
     code.writeln(';');

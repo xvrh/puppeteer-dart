@@ -57,9 +57,9 @@ class Keyboard {
   /// Parameters:
   /// [text]: If specified, generates an input event with this text.
   Future<void> down(Key key, {String text}) async {
-    _KeyDescription description = _keyDescription(key);
+    var description = _keyDescription(key);
 
-    bool autoRepeat = _pressedKeys.contains(description.code);
+    var autoRepeat = _pressedKeys.contains(description.code);
     _pressedKeys.add(description.code);
     _modifiers |= _modifierBit(description.key);
 
@@ -79,7 +79,7 @@ class Keyboard {
 
   /// Dispatches a `keyup` event.
   Future<void> up(Key key) async {
-    _KeyDescription description = _keyDescription(key);
+    var description = _keyDescription(key);
 
     _modifiers &= ~_modifierBit(description.key);
     _pressedKeys.remove(description.code);
@@ -118,10 +118,10 @@ class Keyboard {
   /// await page.keyboard.type('World', delay: Duration(milliseconds: 10));
   /// ```
   Future<void> type(String text, {Duration delay}) async {
-    for (int rune in text.runes) {
-      String char = String.fromCharCode(rune);
+    for (var rune in text.runes) {
+      var char = String.fromCharCode(rune);
 
-      Key keyForChar = _characters[char];
+      var keyForChar = _characters[char];
 
       if (keyForChar != null) {
         await press(keyForChar, delay: delay);
@@ -158,7 +158,7 @@ class Keyboard {
   }
 
   _KeyDescription _keyDescription(Key key) {
-    bool shift = _modifiers & 8 != 0;
+    var shift = _modifiers & 8 != 0;
     var description = _KeyDescription()
       ..key = shift && key.shiftKey != null ? key.shiftKey : key.key
       ..keyCode =

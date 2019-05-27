@@ -9,25 +9,22 @@ class DOMStorageApi {
   DOMStorageApi(this._client);
 
   Stream<DomStorageItemAddedEvent> get onDomStorageItemAdded => _client.onEvent
-      .where((Event event) => event.name == 'DOMStorage.domStorageItemAdded')
-      .map(
-          (Event event) => DomStorageItemAddedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'DOMStorage.domStorageItemAdded')
+      .map((event) => DomStorageItemAddedEvent.fromJson(event.parameters));
 
   Stream<DomStorageItemRemovedEvent> get onDomStorageItemRemoved => _client
       .onEvent
-      .where((Event event) => event.name == 'DOMStorage.domStorageItemRemoved')
-      .map((Event event) =>
-          DomStorageItemRemovedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'DOMStorage.domStorageItemRemoved')
+      .map((event) => DomStorageItemRemovedEvent.fromJson(event.parameters));
 
   Stream<DomStorageItemUpdatedEvent> get onDomStorageItemUpdated => _client
       .onEvent
-      .where((Event event) => event.name == 'DOMStorage.domStorageItemUpdated')
-      .map((Event event) =>
-          DomStorageItemUpdatedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'DOMStorage.domStorageItemUpdated')
+      .map((event) => DomStorageItemUpdatedEvent.fromJson(event.parameters));
 
   Stream<StorageId> get onDomStorageItemsCleared => _client.onEvent
-      .where((Event event) => event.name == 'DOMStorage.domStorageItemsCleared')
-      .map((Event event) => StorageId.fromJson(event.parameters['storageId']));
+      .where((event) => event.name == 'DOMStorage.domStorageItemsCleared')
+      .map((event) => StorageId.fromJson(event.parameters['storageId']));
 
   Future<void> clear(StorageId storageId) async {
     var parameters = <String, dynamic>{

@@ -197,7 +197,7 @@ function _(content, type) {
 
     if (file != null) {
       var contents = await file.readAsString();
-      contents += '//# sourceURL=' + file.absolute.path;
+      contents += '//# sourceURL=${file.absolute.path}';
       return (await context
               .evaluateHandle(addScriptContent, args: [contents, type]))
           .asElement;
@@ -256,7 +256,7 @@ async function _(content) {
 
     if (file != null) {
       var contents = await file.readAsString();
-      contents += '/*# sourceURL=' + file.absolute.path + '*/';
+      contents += '/*# sourceURL=${file.absolute.path}*/';
       return (await context.evaluateHandle(addStyleContent, args: [contents]))
           .asElement;
     }
@@ -272,21 +272,21 @@ async function _(content) {
   Future<void> click(String selector,
       {Duration delay, MouseButton button, int clickCount}) async {
     var handle = await $(selector);
-    assert(handle != null, 'No node found for selector: ' + selector);
+    assert(handle != null, 'No node found for selector: $selector');
     await handle.click(delay: delay, button: button, clickCount: clickCount);
     await handle.dispose();
   }
 
   Future<void> focus(String selector) async {
     var handle = await $(selector);
-    assert(handle != null, 'No node found for selector: ' + selector);
+    assert(handle != null, 'No node found for selector: $selector');
     await handle.focus();
     await handle.dispose();
   }
 
   Future<void> hover(String selector) async {
     var handle = await $(selector);
-    assert(handle != null, 'No node found for selector: ' + selector);
+    assert(handle != null, 'No node found for selector: $selector');
     await handle.hover();
     await handle.dispose();
   }
@@ -343,7 +343,7 @@ function _(element, values) {
   Future<JsHandle> waitForFunction(
       @Language('js') String pageFunction, List args,
       {Duration timeout, Polling polling}) async {
-    String functionDeclaration = convertToFunctionDeclaration(pageFunction);
+    var functionDeclaration = convertToFunctionDeclaration(pageFunction);
     if (functionDeclaration == null) {
       pageFunction = 'function _() { return $pageFunction; }';
     }
@@ -459,7 +459,7 @@ class WaitTask {
   Future<void> rerun() async {
     var runCount = ++_runCount;
     try {
-      List args = [
+      var args = <dynamic>[
         'return ($predicate)(...args)',
         polling.value,
         timeout.inMilliseconds
@@ -467,8 +467,8 @@ class WaitTask {
       if (predicateArgs != null) {
         args.addAll(predicateArgs);
       }
-      JsHandle success = await domWorld
-          .evaluateHandle(_waitForPredicatePageFunction, args: args);
+      var success = await domWorld.evaluateHandle(_waitForPredicatePageFunction,
+          args: args);
 
       if (_terminated || runCount != _runCount) {
         if (success != null) {
@@ -480,8 +480,8 @@ class WaitTask {
       // Ignore timeouts in pageScript - we track timeouts ourselves.
       // If the frame's execution context has already changed, `frame.evaluate` will
       // throw an error - ignore this predicate run altogether.
-      if (await (domWorld.evaluate('function(s) { return !s; }',
-          args: [success]).catchError((_) => true))) {
+      if (await domWorld.evaluate('function(s) { return !s; }',
+          args: [success]).catchError((_) => true)) {
         await success.dispose();
         return;
       }

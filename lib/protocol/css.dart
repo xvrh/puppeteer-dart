@@ -18,31 +18,28 @@ class CSSApi {
   /// Fires whenever a web font is updated.  A non-empty font parameter indicates a successfully loaded
   /// web font
   Stream<FontFace> get onFontsUpdated => _client.onEvent
-      .where((Event event) => event.name == 'CSS.fontsUpdated')
-      .map((Event event) => FontFace.fromJson(event.parameters['font']));
+      .where((event) => event.name == 'CSS.fontsUpdated')
+      .map((event) => FontFace.fromJson(event.parameters['font']));
 
   /// Fires whenever a MediaQuery result changes (for example, after a browser window has been
   /// resized.) The current implementation considers only viewport-dependent media features.
   Stream get onMediaQueryResultChanged => _client.onEvent
-      .where((Event event) => event.name == 'CSS.mediaQueryResultChanged');
+      .where((event) => event.name == 'CSS.mediaQueryResultChanged');
 
   /// Fired whenever an active document stylesheet is added.
   Stream<CSSStyleSheetHeader> get onStyleSheetAdded => _client.onEvent
-      .where((Event event) => event.name == 'CSS.styleSheetAdded')
-      .map((Event event) =>
-          CSSStyleSheetHeader.fromJson(event.parameters['header']));
+      .where((event) => event.name == 'CSS.styleSheetAdded')
+      .map((event) => CSSStyleSheetHeader.fromJson(event.parameters['header']));
 
   /// Fired whenever a stylesheet is changed as a result of the client operation.
   Stream<StyleSheetId> get onStyleSheetChanged => _client.onEvent
-      .where((Event event) => event.name == 'CSS.styleSheetChanged')
-      .map((Event event) =>
-          StyleSheetId.fromJson(event.parameters['styleSheetId']));
+      .where((event) => event.name == 'CSS.styleSheetChanged')
+      .map((event) => StyleSheetId.fromJson(event.parameters['styleSheetId']));
 
   /// Fired whenever an active document stylesheet is removed.
   Stream<StyleSheetId> get onStyleSheetRemoved => _client.onEvent
-      .where((Event event) => event.name == 'CSS.styleSheetRemoved')
-      .map((Event event) =>
-          StyleSheetId.fromJson(event.parameters['styleSheetId']));
+      .where((event) => event.name == 'CSS.styleSheetRemoved')
+      .map((event) => StyleSheetId.fromJson(event.parameters['styleSheetId']));
 
   /// Inserts a new rule with the given `ruleText` in a stylesheet with given `styleSheetId`, at the
   /// position specified by `location`.

@@ -11,18 +11,18 @@ class AnimationApi {
 
   /// Event for when an animation has been cancelled.
   Stream<String> get onAnimationCanceled => _client.onEvent
-      .where((Event event) => event.name == 'Animation.animationCanceled')
-      .map((Event event) => event.parameters['id'] as String);
+      .where((event) => event.name == 'Animation.animationCanceled')
+      .map((event) => event.parameters['id'] as String);
 
   /// Event for each animation that has been created.
   Stream<String> get onAnimationCreated => _client.onEvent
-      .where((Event event) => event.name == 'Animation.animationCreated')
-      .map((Event event) => event.parameters['id'] as String);
+      .where((event) => event.name == 'Animation.animationCreated')
+      .map((event) => event.parameters['id'] as String);
 
   /// Event for animation that has been started.
   Stream<Animation> get onAnimationStarted => _client.onEvent
-      .where((Event event) => event.name == 'Animation.animationStarted')
-      .map((Event event) => Animation.fromJson(event.parameters['animation']));
+      .where((event) => event.name == 'Animation.animationStarted')
+      .map((event) => Animation.fromJson(event.parameters['animation']));
 
   /// Disables animation domain notifications.
   Future<void> disable() async {

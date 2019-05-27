@@ -5,6 +5,8 @@ import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 main() {
   Server server;
   Browser browser;
@@ -327,10 +329,11 @@ main() {
     test('Page.Events.RequestFailed', () async {
       await page.setRequestInterception(true);
       page.onRequest.listen((request) {
-        if (request.url.endsWith('css'))
+        if (request.url.endsWith('css')) {
           request.abort();
-        else
+        } else {
           request.continueRequest();
+        }
       });
       var failedRequests = <Request>[];
       page.onRequestFailed.listen((request) => failedRequests.add(request));

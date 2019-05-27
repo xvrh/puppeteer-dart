@@ -148,7 +148,7 @@ class Puppeteer {
         environment: environment);
 
     // ignore: unawaited_futures
-    chromeProcess.exitCode.then((int exitCode) {
+    chromeProcess.exitCode.then((exitCode) {
       _logger.info('Chrome exit with $exitCode.');
       if (userDataDir != null) {
         _logger.info('Clean ${userDataDir.path}');
@@ -261,19 +261,20 @@ Future<String> _waitForWebSocketUrl(Process chromeProcess) async {
       return match.group(1);
     }
   }
-  throw 'Websocket url not found';
+  throw Exception('Websocket url not found');
 }
 
 Future<String> _inferExecutablePath() async {
-  String executablePath = Platform.environment['PUPPETEER_EXECUTABLE_PATH'];
+  var executablePath = Platform.environment['PUPPETEER_EXECUTABLE_PATH'];
   if (executablePath != null) {
     var file = File(executablePath);
     if (!file.existsSync()) {
       executablePath = getExecutablePath(executablePath);
       if (!File(executablePath).existsSync()) {
-        throw 'The environment variable contains PUPPETEER_EXECUTABLE_PATH with '
+        throw Exception(
+            'The environment variable contains PUPPETEER_EXECUTABLE_PATH with '
             'value (${Platform.environment['PUPPETEER_EXECUTABLE_PATH']}) but we cannot '
-            'find the Chrome executable';
+            'find the Chrome executable');
       }
     }
     return executablePath;

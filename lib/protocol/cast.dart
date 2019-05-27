@@ -11,16 +11,16 @@ class CastApi {
   /// This is fired whenever the list of available sinks changes. A sink is a
   /// device or a software surface that you can cast to.
   Stream<List<String>> get onSinksUpdated => _client.onEvent
-      .where((Event event) => event.name == 'Cast.sinksUpdated')
-      .map((Event event) => (event.parameters['sinkNames'] as List)
+      .where((event) => event.name == 'Cast.sinksUpdated')
+      .map((event) => (event.parameters['sinkNames'] as List)
           .map((e) => e as String)
           .toList());
 
   /// This is fired whenever the outstanding issue/error message changes.
   /// |issueMessage| is empty if there is no issue.
   Stream<String> get onIssueUpdated => _client.onEvent
-      .where((Event event) => event.name == 'Cast.issueUpdated')
-      .map((Event event) => event.parameters['issueMessage'] as String);
+      .where((event) => event.name == 'Cast.issueUpdated')
+      .map((event) => event.parameters['issueMessage'] as String);
 
   /// Starts observing for sinks that can be used for tab mirroring, and if set,
   /// sinks compatible with |presentationUrl| as well. When sinks are found, a

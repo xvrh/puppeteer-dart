@@ -11,16 +11,14 @@ class ProfilerApi {
 
   Stream<ConsoleProfileFinishedEvent> get onConsoleProfileFinished => _client
       .onEvent
-      .where((Event event) => event.name == 'Profiler.consoleProfileFinished')
-      .map((Event event) =>
-          ConsoleProfileFinishedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Profiler.consoleProfileFinished')
+      .map((event) => ConsoleProfileFinishedEvent.fromJson(event.parameters));
 
   /// Sent when new profile recording is started using console.profile() call.
   Stream<ConsoleProfileStartedEvent> get onConsoleProfileStarted => _client
       .onEvent
-      .where((Event event) => event.name == 'Profiler.consoleProfileStarted')
-      .map((Event event) =>
-          ConsoleProfileStartedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Profiler.consoleProfileStarted')
+      .map((event) => ConsoleProfileStartedEvent.fromJson(event.parameters));
 
   Future<void> disable() async {
     await _client.send('Profiler.disable');

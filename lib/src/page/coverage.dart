@@ -219,12 +219,15 @@ class JsCoverage {
     var coverage = <CoverageEntry>[];
     for (var entry in profileResponse) {
       var url = _scriptUrls[entry.scriptId];
-      if (_isNullOrEmpty(url) && _reportAnonymousScripts)
+      if (_isNullOrEmpty(url) && _reportAnonymousScripts) {
         url = 'debugger://VM${entry.scriptId}';
+      }
       var text = _scriptSources[entry.scriptId];
       if (text == null || _isNullOrEmpty(url)) continue;
       var flattenRanges = <CoverageRange>[];
-      for (var func in entry.functions) flattenRanges.addAll(func.ranges);
+      for (var func in entry.functions) {
+        flattenRanges.addAll(func.ranges);
+      }
       var ranges = _convertToDisjointRanges(flattenRanges);
       coverage.add(CoverageEntry(url: url, text: text, ranges: ranges));
     }
@@ -356,16 +359,18 @@ List<Range> _convertToDisjointRanges(List<CoverageRange> nestedRanges) {
         lastOffset < point.offset &&
         hitCountStack[hitCountStack.length - 1] > 0) {
       var lastResult = results.isNotEmpty ? results[results.length - 1] : null;
-      if (lastResult != null && lastResult.end == lastOffset)
+      if (lastResult != null && lastResult.end == lastOffset) {
         lastResult._end = point.offset;
-      else
+      } else {
         results.add(Range(lastOffset, point.offset));
+      }
     }
     lastOffset = point.offset;
-    if (point.type == 0)
+    if (point.type == 0) {
       hitCountStack.add(point.range.count);
-    else
+    } else {
       hitCountStack.removeLast();
+    }
   }
   // Filter out empty ranges.
   return results.where((range) => range.end - range.start > 1).toList();

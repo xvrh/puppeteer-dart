@@ -2,6 +2,8 @@ import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 main() {
   Server server;
   Browser browser;
@@ -39,9 +41,12 @@ function dimensions() {
     height: rect.height
   };
 }
-''').then((Map
-          result) =>
-      Rectangle(result['x'], result['y'], result['width'], result['height']));
+''').then((result) => Rectangle(
+        result['x'],
+        result['y'],
+        result['width'],
+        result['height'],
+      ));
 
   group('Mouse', () {
     test('should click the document', () async {

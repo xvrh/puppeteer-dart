@@ -163,7 +163,7 @@ class NetworkManager {
             password: _credentials?.password));
   }
 
-  void _onRequestPaused(RequestPausedEvent event) async {
+  Future<void> _onRequestPaused(RequestPausedEvent event) async {
     if (!_userRequestInterceptionEnabled &&
         _protocolRequestInterceptionEnabled) {
       await _fetch.continueRequest(event.requestId);
@@ -373,8 +373,9 @@ class Request {
   /// await page.setRequestInterception(true);
   /// page.onRequest.listen((request) {
   ///   // Override headers
-  ///   var headers = Map<String, String>.from(request.headers)..['foo'] = 'bar';
-  ///   headers.remove('origin');
+  ///   var headers = Map<String, String>.from(request.headers)
+  ///     ..['foo'] = 'bar'
+  ///     ..remove('origin');
   ///   request.continueRequest(headers: headers);
   /// });
   /// ```
@@ -448,7 +449,7 @@ class Request {
       headers['content-type'] = contentType;
     }
 
-    var bodyBytes;
+    List<int> bodyBytes;
     if (body is String) {
       bodyBytes = utf8.encode(body);
     }
@@ -571,11 +572,11 @@ class Response {
 
   /// Promise which resolves to the bytes with response body.
   Future<List<int>> get bytes => content.then((content) =>
-      content is List<int> ? content : utf8.encode((content as String)));
+      content is List<int> ? content : utf8.encode(content as String));
 
   /// Promise which resolves to a text representation of response body.
   Future<String> get text => content.then((content) =>
-      content is String ? content : utf8.decode((content as List<int>)));
+      content is String ? content : utf8.decode(content as List<int>));
 
   /// This method will throw if the response body is not parsable via `jsonDecode`.
   Future<dynamic> get json => text.then(jsonDecode);

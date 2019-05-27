@@ -14,12 +14,12 @@ main() {
 }
 
 String generateReadme() {
-  String template = File('README.template.md').readAsStringSync();
+  var template = File('README.template.md').readAsStringSync();
 
-  String readme = template.replaceAllMapped(_importRegex, (Match match) {
-    String filePath = match.group(1);
+  var readme = template.replaceAllMapped(_importRegex, (match) {
+    var filePath = match.group(1);
 
-    String fileContent = File(filePath).readAsStringSync();
+    var fileContent = File(filePath).readAsStringSync();
     fileContent = fileContent.replaceAll(_ignoreForFileRegex, '');
 
     fileContent = _dartFormatter.format(fileContent);
@@ -27,7 +27,7 @@ String generateReadme() {
     return fileContent;
   });
 
-  for (String protocolName in protocols.keys) {
+  for (var protocolName in protocols.keys) {
     readme = readme.replaceAll(
         '[$protocolName]()', '[$protocolName](${protocols[protocolName]})');
   }

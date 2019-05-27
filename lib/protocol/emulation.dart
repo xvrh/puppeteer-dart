@@ -12,8 +12,8 @@ class EmulationApi {
   EmulationApi(this._client);
 
   /// Notification sent after the virtual time budget for the current VirtualTimePolicy has run out.
-  Stream get onVirtualTimeBudgetExpired => _client.onEvent.where(
-      (Event event) => event.name == 'Emulation.virtualTimeBudgetExpired');
+  Stream get onVirtualTimeBudgetExpired => _client.onEvent
+      .where((event) => event.name == 'Emulation.virtualTimeBudgetExpired');
 
   /// Tells whether emulation is supported.
   /// Returns: True if emulation is supported.

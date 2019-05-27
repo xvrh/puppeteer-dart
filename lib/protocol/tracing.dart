@@ -9,21 +9,21 @@ class TracingApi {
   TracingApi(this._client);
 
   Stream<BufferUsageEvent> get onBufferUsage => _client.onEvent
-      .where((Event event) => event.name == 'Tracing.bufferUsage')
-      .map((Event event) => BufferUsageEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Tracing.bufferUsage')
+      .map((event) => BufferUsageEvent.fromJson(event.parameters));
 
   /// Contains an bucket of collected trace events. When tracing is stopped collected events will be
   /// send as a sequence of dataCollected events followed by tracingComplete event.
   Stream<List<Map>> get onDataCollected => _client.onEvent
-      .where((Event event) => event.name == 'Tracing.dataCollected')
-      .map((Event event) =>
+      .where((event) => event.name == 'Tracing.dataCollected')
+      .map((event) =>
           (event.parameters['value'] as List).map((e) => e as Map).toList());
 
   /// Signals that tracing is stopped and there is no trace buffers pending flush, all data were
   /// delivered via dataCollected events.
   Stream<TracingCompleteEvent> get onTracingComplete => _client.onEvent
-      .where((Event event) => event.name == 'Tracing.tracingComplete')
-      .map((Event event) => TracingCompleteEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Tracing.tracingComplete')
+      .map((event) => TracingCompleteEvent.fromJson(event.parameters));
 
   /// Stop trace events collection.
   Future<void> end() async {

@@ -10,15 +10,14 @@ class ApplicationCacheApi {
 
   Stream<ApplicationCacheStatusUpdatedEvent>
       get onApplicationCacheStatusUpdated => _client.onEvent
-          .where((Event event) =>
+          .where((event) =>
               event.name == 'ApplicationCache.applicationCacheStatusUpdated')
-          .map((Event event) =>
+          .map((event) =>
               ApplicationCacheStatusUpdatedEvent.fromJson(event.parameters));
 
   Stream<bool> get onNetworkStateUpdated => _client.onEvent
-      .where(
-          (Event event) => event.name == 'ApplicationCache.networkStateUpdated')
-      .map((Event event) => event.parameters['isNowOnline'] as bool);
+      .where((event) => event.name == 'ApplicationCache.networkStateUpdated')
+      .map((event) => event.parameters['isNowOnline'] as bool);
 
   /// Enables application cache domain notifications.
   Future<void> enable() async {

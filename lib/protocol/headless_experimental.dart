@@ -10,9 +10,9 @@ class HeadlessExperimentalApi {
 
   /// Issued when the target starts or stops needing BeginFrames.
   Stream<bool> get onNeedsBeginFramesChanged => _client.onEvent
-      .where((Event event) =>
+      .where((event) =>
           event.name == 'HeadlessExperimental.needsBeginFramesChanged')
-      .map((Event event) => event.parameters['needsBeginFrames'] as bool);
+      .map((event) => event.parameters['needsBeginFrames'] as bool);
 
   /// Sends a BeginFrame to the target and returns when the frame was completed. Optionally captures a
   /// screenshot from the resulting frame. Requires that the target was created with enabled

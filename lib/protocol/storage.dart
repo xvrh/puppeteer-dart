@@ -10,27 +10,25 @@ class StorageApi {
   /// A cache's contents have been modified.
   Stream<CacheStorageContentUpdatedEvent> get onCacheStorageContentUpdated =>
       _client.onEvent
-          .where((Event event) =>
-              event.name == 'Storage.cacheStorageContentUpdated')
-          .map((Event event) =>
+          .where((event) => event.name == 'Storage.cacheStorageContentUpdated')
+          .map((event) =>
               CacheStorageContentUpdatedEvent.fromJson(event.parameters));
 
   /// A cache has been added/deleted.
   Stream<String> get onCacheStorageListUpdated => _client.onEvent
-      .where((Event event) => event.name == 'Storage.cacheStorageListUpdated')
-      .map((Event event) => event.parameters['origin'] as String);
+      .where((event) => event.name == 'Storage.cacheStorageListUpdated')
+      .map((event) => event.parameters['origin'] as String);
 
   /// The origin's IndexedDB object store has been modified.
   Stream<IndexedDBContentUpdatedEvent> get onIndexedDBContentUpdated => _client
       .onEvent
-      .where((Event event) => event.name == 'Storage.indexedDBContentUpdated')
-      .map((Event event) =>
-          IndexedDBContentUpdatedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Storage.indexedDBContentUpdated')
+      .map((event) => IndexedDBContentUpdatedEvent.fromJson(event.parameters));
 
   /// The origin's IndexedDB database list has been modified.
   Stream<String> get onIndexedDBListUpdated => _client.onEvent
-      .where((Event event) => event.name == 'Storage.indexedDBListUpdated')
-      .map((Event event) => event.parameters['origin'] as String);
+      .where((event) => event.name == 'Storage.indexedDBListUpdated')
+      .map((event) => event.parameters['origin'] as String);
 
   /// Clears storage for origin.
   /// [origin] Security origin.

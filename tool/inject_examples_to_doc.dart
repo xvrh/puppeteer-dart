@@ -10,10 +10,10 @@ main() {
   var snippets =
       extractSnippets(File('test/doc_examples_test.dart').readAsStringSync());
 
-  for (File dartFile
+  for (var dartFile
       in Directory('lib/src').listSync(recursive: true).whereType<File>()) {
-    String fileContent = dartFile.readAsStringSync();
-    String newContent = replaceExamples(fileContent, snippets);
+    var fileContent = dartFile.readAsStringSync();
+    var newContent = replaceExamples(fileContent, snippets);
 
     if (fileContent != newContent) {
       print('Change ${dartFile.path}');
@@ -25,7 +25,7 @@ main() {
     var remainingSnippets = snippets
         .map((snippet) => '${snippet.target}.${snippet.index}')
         .join(', ');
-    throw 'Remaining snippets: $remainingSnippets';
+    throw Exception('Remaining snippets: $remainingSnippets');
   }
 }
 
@@ -36,7 +36,7 @@ String replaceExamples(String sourceFile, List<CodeSnippet> snippets) {
 
   for (var aClass
       in unit.declarations.whereType<ClassDeclaration>().toList().reversed) {
-    String className = aClass.name.name;
+    var className = aClass.name.name;
 
     for (var member in aClass.members.reversed) {
       var comment = member.documentationComment;
@@ -76,20 +76,20 @@ final _dartExampleExtractor = RegExp(r'\`\`\`dart[\s\S]*?\`\`\`');
 
 String _newComment(
     String target, Comment comment, List<CodeSnippet> allSnippets) {
-  List<String> lines = comment.tokens.map((t) => t.toString()).toList();
+  var lines = comment.tokens.map((t) => t.toString()).toList();
 
-  int index = 0;
+  var index = 0;
   return lines.join('\n').replaceAllMapped(_dartExampleExtractor, (match) {
-    CodeSnippet snippet = allSnippets.firstWhere(
+    var snippet = allSnippets.firstWhere(
         (s) => s.target == target.replaceAll(r'$', 'S') && s.index == index,
         orElse: () => null);
     if (snippet == null) {
-      throw "Can't find snippet for [$target] at index $index";
+      throw Exception("Can't find snippet for [$target] at index $index");
     }
     ++index;
     allSnippets.remove(snippet);
 
-    String commentedCode =
+    var commentedCode =
         LineSplitter.split(snippet.code).map((line) => ' /// $line').join('\n');
 
     return '''
@@ -100,8 +100,8 @@ $commentedCode
 }
 
 String replaceComment(String file, Comment comment, String newComment) {
-  String before = file.substring(0, comment.offset);
-  String after = file.substring(comment.end);
+  var before = file.substring(0, comment.offset);
+  var after = file.substring(comment.end);
 
   return '$before$newComment$after';
 }
@@ -137,7 +137,7 @@ void findGroupAndTests(String fileCode, Block block, List<CodeSnippet> snippets,
     } else if (methodName == 'test') {
       FunctionExpression innerBlock = expression.argumentList.arguments[1];
       BlockFunctionBody innerBody = innerBlock.body;
-      String code = _extractCode(fileCode.substring(
+      var code = _extractCode(fileCode.substring(
           innerBody.block.offset + 1, innerBody.block.end - 1));
       Literal firstArgument = expression.argumentList.arguments[0];
       if (firstArgument is StringLiteral) {
@@ -235,9 +235,9 @@ class _ExampleReplacerVisitor extends RecursiveAstVisitor {
 
   String replace(String code) {
     for (var node in _nodesToReplace.keys.toList().reversed) {
-      String before = code.substring(0, node.offset);
-      String after = code.substring(node.end);
-      String newValue = _nodesToReplace[node];
+      var before = code.substring(0, node.offset);
+      var after = code.substring(node.end);
+      var newValue = _nodesToReplace[node];
 
       code = '$before$newValue$after';
     }

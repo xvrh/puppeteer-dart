@@ -89,14 +89,16 @@ void _collectInterestingNodes(Set<_AXNode> collection, _AXNode node,
   if (node.isInteresting(insideControl: insideControl)) collection.add(node);
   if (node.isLeafNode) return null;
   insideControl = insideControl || node.isControl;
-  for (var child in node._children)
+  for (var child in node._children) {
     _collectInterestingNodes(collection, child, insideControl: insideControl);
+  }
 }
 
 List<AXNode> _serializeTree(_AXNode node, {Set<_AXNode> whitelistedNodes}) {
   var children = <AXNode>[];
-  for (var child in node._children)
+  for (var child in node._children) {
     children.addAll(_serializeTree(child, whitelistedNodes: whitelistedNodes));
+  }
 
   if (whitelistedNodes != null &&
       whitelistedNodes.isNotEmpty &&
@@ -317,10 +319,12 @@ class _AXNode {
           _richlyEditable = property.value.value == 'richtext';
           _editable = true;
         }
-        if (property.name == AXPropertyName.focusable)
+        if (property.name == AXPropertyName.focusable) {
           _focusable = property.value.value;
-        if (property.name == AXPropertyName.expanded)
+        }
+        if (property.name == AXPropertyName.expanded) {
           _expanded = property.value.value;
+        }
       }
     }
   }
@@ -453,8 +457,9 @@ class _AXNode {
       if (property != null && property.value != null) {
         // WebArea's treat focus differently than other nodes. They report whether their frame  has focus,
         // not whether focus is specifically on the root node.
-        if (property.name == AXPropertyName.focused && _role == 'WebArea')
+        if (property.name == AXPropertyName.focused && _role == 'WebArea') {
           return null;
+        }
 
         if (property.value.value is bool && property.value.value) {
           return property.value.value;
@@ -484,7 +489,7 @@ class _AXNode {
       var property = findProperty(name);
       if (property != null) {
         if (property.value != null) {
-          dynamic rawValue = property.value.value;
+          var rawValue = property.value.value;
           if (rawValue != null && rawValue != false && rawValue != 'false') {
             return '$rawValue';
           }
@@ -524,12 +529,14 @@ class _AXNode {
 
   static _AXNode createTree(Iterable<AXNodeData> payloads) {
     var nodeById = <String, _AXNode>{};
-    for (var payload in payloads)
+    for (var payload in payloads) {
       nodeById[payload.nodeId.value] = _AXNode(payload);
+    }
     for (var node in nodeById.values) {
       if (node._payload.childIds != null) {
-        for (var childId in node._payload.childIds)
+        for (var childId in node._payload.childIds) {
           node._children.add(nodeById[childId]);
+        }
       }
     }
     return nodeById.values.first;

@@ -10,8 +10,8 @@ class TetheringApi {
 
   /// Informs that port was successfully bound and got a specified connection id.
   Stream<AcceptedEvent> get onAccepted => _client.onEvent
-      .where((Event event) => event.name == 'Tethering.accepted')
-      .map((Event event) => AcceptedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Tethering.accepted')
+      .map((event) => AcceptedEvent.fromJson(event.parameters));
 
   /// Request browser port binding.
   /// [port] Port number to bind.

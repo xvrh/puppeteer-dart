@@ -11,20 +11,18 @@ class BackgroundServiceApi {
   BackgroundServiceApi(this._client);
 
   /// Called when the recording state for the service has been updated.
-  Stream<RecordingStateChangedEvent> get onRecordingStateChanged =>
-      _client.onEvent
-          .where((Event event) =>
-              event.name == 'BackgroundService.recordingStateChanged')
-          .map((Event event) =>
-              RecordingStateChangedEvent.fromJson(event.parameters));
+  Stream<RecordingStateChangedEvent> get onRecordingStateChanged => _client
+      .onEvent
+      .where((event) => event.name == 'BackgroundService.recordingStateChanged')
+      .map((event) => RecordingStateChangedEvent.fromJson(event.parameters));
 
   /// Called with all existing backgroundServiceEvents when enabled, and all new
   /// events afterwards if enabled and recording.
   Stream<BackgroundServiceEvent> get onBackgroundServiceEventReceived => _client
       .onEvent
-      .where((Event event) =>
+      .where((event) =>
           event.name == 'BackgroundService.backgroundServiceEventReceived')
-      .map((Event event) => BackgroundServiceEvent.fromJson(
+      .map((event) => BackgroundServiceEvent.fromJson(
           event.parameters['backgroundServiceEvent']));
 
   /// Enables event updates for the service.
