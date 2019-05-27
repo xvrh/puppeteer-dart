@@ -110,14 +110,10 @@ main() {
     });
     test('should throw when evaluation triggers reload', () async {
       expect(() => page.evaluate('''() => {
-          location.reload();
-          return new Promise(resolve => {
-            setTimeout(() => resolve(1), 0);
-          });
-    }'''), throwsA(anything));
-    },
-        //TODO(xha): check why behavior is different
-        skip: true);
+        location.reload();
+        return new Promise(() => {});
+      }'''), throwsA(anything));
+    });
     test('should await promise', () async {
       var result = await page.evaluate('() => Promise.resolve(8 * 7)');
       expect(result, equals(56));

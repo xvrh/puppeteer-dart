@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.0 (2019-05-27)
+- Add `page.ccessibility` feature
+- Update default Chromium version to 662092
+
 ## 1.6.0 (2019-05-15)
 - Add `puppeteer.connect` to connect to an existing Chromium instance
 - Add `slowMo` parameter for `puppeteer.launch` et `puppeteer.connect` to slow down communications with the browser.
