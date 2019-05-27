@@ -445,27 +445,35 @@ main() {
       page.onRequest.listen((request) {
         request.continueRequest(postData: 'doggo');
       });
+      var body;
+      server.setRoute('sleep.zzz', (request) async {
+        body = await request.readAsString();
+        return shelf.Response.ok('ok');
+      });
       var serverRequest = await waitFutures(
           server.waitForRequest('/sleep.zzz'), [
         page.evaluate(
             "() => fetch('/sleep.zzz', { method: 'POST', body: 'birdy' })")
       ]);
-      //TODO(xha): how to read the body?
       expect(serverRequest, isNotNull);
-      //expect(await serverRequest.readAsString(), equals('doggo'));
+      expect(body, equals('doggo'));
     });
     test('should amend both post data and method on navigation', () async {
       await page.setRequestInterception(true);
       page.onRequest.listen((request) {
         request.continueRequest(method: 'POST', postData: 'doggo');
       });
+      var body;
+      server.setRoute('empty.html', (request) async {
+        body = await request.readAsString();
+        return shelf.Response.ok('ok');
+      });
       var serverRequest =
           await waitFutures(server.waitForRequest('/empty.html'), [
         page.goto(server.emptyPage),
       ]);
       expect(serverRequest.method, equals('POST'));
-      //TODO(xha): how to read the body?
-      //expect(await serverRequest.readAsString(), equals('doggo'));
+      expect(body, equals('doggo'));
     });
   });
 

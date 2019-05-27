@@ -15,7 +15,7 @@ import 'plugin.dart';
 
 final Logger _logger = Logger('puppeteer.launcher');
 
-const List<String> _defaultArgs = <String>[
+final List<String> _defaultArgs = <String>[
   '--disable-background-networking',
   '--enable-features=NetworkService,NetworkServiceInProcess',
   '--disable-background-timer-throttling',
@@ -25,7 +25,7 @@ const List<String> _defaultArgs = <String>[
   '--disable-default-apps',
   '--disable-dev-shm-usage',
   '--disable-extensions',
-  '--disable-features=site-per-process,TranslateUI',
+  '--disable-features=site-per-process,TranslateUI,BlinkGenPropertyTrees',
   '--disable-hang-monitor',
   '--disable-ipc-flooding-protection',
   '--disable-popup-blocking',
@@ -33,7 +33,6 @@ const List<String> _defaultArgs = <String>[
   '--disable-renderer-backgrounding',
   '--disable-sync',
   '--force-color-profile=srgb',
-  '--disable-translate',
   '--metrics-recording-only',
   '--no-first-run',
   '--enable-automation',
@@ -42,9 +41,9 @@ const List<String> _defaultArgs = <String>[
   '--remote-debugging-port=0',
 ];
 
-const List<String> _headlessArgs = [
+final List<String> _headlessArgs = [
   '--headless',
-  '--disable-gpu',
+  if (Platform.isWindows) '--disable-gpu',
   '--hide-scrollbars',
   '--mute-audio'
 ];
