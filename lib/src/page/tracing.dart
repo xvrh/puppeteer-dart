@@ -23,10 +23,10 @@ class Tracing {
   //  - `screenshots`: captures screenshots in the trace.
   //  - `categories`: specify custom categories to use instead of default.
   Future<void> start({bool screenshots, List<String> categories}) async {
-    if (_recording)
+    if (_recording) {
       throw Exception(
           'Cannot start recording trace while already recording trace.');
-
+    }
     screenshots ??= false;
 
     const defaultCategories = [

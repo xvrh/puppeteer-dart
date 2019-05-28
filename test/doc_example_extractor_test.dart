@@ -57,7 +57,7 @@ var html = await frame.$eval(
   test('Replace examples', () {
     var snippets = extractSnippets(_testFileCode);
 
-    String results = replaceExamples(_libCode, snippets);
+    var results = replaceExamples(_libCode, snippets);
 
     expect(results, equals(_expectedLibCode));
   });

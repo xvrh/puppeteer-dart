@@ -4,6 +4,8 @@ import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 main() {
   Server server;
   Browser browser;
@@ -477,7 +479,7 @@ main() {
 
       server.setRoute(
           '/empty.html', (req) => Completer<shelf.Response>().future);
-      var error;
+      Exception error;
       var navigationPromise =
           page.frames[1].goto(server.emptyPage).catchError((e) {
         error = e;
@@ -545,7 +547,7 @@ main() {
 
       server.setRoute(
           '/empty-for-frame.html', (req) => Completer<shelf.Response>().future);
-      var error;
+      Exception error;
       var navigationPromise = frame.waitForNavigation().catchError((e) {
         error = e;
       });

@@ -9,13 +9,13 @@ class HeapProfilerApi {
   HeapProfilerApi(this._client);
 
   Stream<String> get onAddHeapSnapshotChunk => _client.onEvent
-      .where((Event event) => event.name == 'HeapProfiler.addHeapSnapshotChunk')
-      .map((Event event) => event.parameters['chunk'] as String);
+      .where((event) => event.name == 'HeapProfiler.addHeapSnapshotChunk')
+      .map((event) => event.parameters['chunk'] as String);
 
   /// If heap objects tracking has been started then backend may send update for one or more fragments
   Stream<List<int>> get onHeapStatsUpdate => _client.onEvent
-      .where((Event event) => event.name == 'HeapProfiler.heapStatsUpdate')
-      .map((Event event) => (event.parameters['statsUpdate'] as List)
+      .where((event) => event.name == 'HeapProfiler.heapStatsUpdate')
+      .map((event) => (event.parameters['statsUpdate'] as List)
           .map((e) => e as int)
           .toList());
 
@@ -23,18 +23,18 @@ class HeapProfilerApi {
   /// seen object id and corresponding timestamp. If the were changes in the heap since last event
   /// then one or more heapStatsUpdate events will be sent before a new lastSeenObjectId event.
   Stream<LastSeenObjectIdEvent> get onLastSeenObjectId => _client.onEvent
-      .where((Event event) => event.name == 'HeapProfiler.lastSeenObjectId')
-      .map((Event event) => LastSeenObjectIdEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'HeapProfiler.lastSeenObjectId')
+      .map((event) => LastSeenObjectIdEvent.fromJson(event.parameters));
 
   Stream<ReportHeapSnapshotProgressEvent> get onReportHeapSnapshotProgress =>
       _client.onEvent
-          .where((Event event) =>
+          .where((event) =>
               event.name == 'HeapProfiler.reportHeapSnapshotProgress')
-          .map((Event event) =>
+          .map((event) =>
               ReportHeapSnapshotProgressEvent.fromJson(event.parameters));
 
   Stream get onResetProfiles => _client.onEvent
-      .where((Event event) => event.name == 'HeapProfiler.resetProfiles');
+      .where((event) => event.name == 'HeapProfiler.resetProfiles');
 
   /// Enables console to refer to the node with given id via $x (see Command Line API for more details
   /// $x functions).

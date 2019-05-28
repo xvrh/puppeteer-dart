@@ -1,14 +1,14 @@
 List<String> splitWords(String input) {
   if (input.isEmpty) return [''];
 
-  List<String> words = [];
+  var words = <String>[];
 
-  String currentWord = '';
-  String lastChar = '';
+  var currentWord = '';
+  var lastChar = '';
 
-  List<int> runes = input.runes.toList();
-  for (int i = 0; i < runes.length; i++) {
-    String char = String.fromCharCode(runes[i]);
+  var runes = input.runes.toList();
+  for (var i = 0; i < runes.length; i++) {
+    var char = String.fromCharCode(runes[i]);
 
     if (!_isLower(char) && !_isUpper(char) && !_isNum(char)) {
       currentWord += lastChar;
@@ -46,9 +46,9 @@ List<String> splitWords(String input) {
 
   currentWord += lastChar;
 
-  words.add(currentWord);
-
-  words.removeWhere((w) => w.isEmpty);
+  words
+    ..add(currentWord)
+    ..removeWhere((w) => w.isEmpty);
 
   return words;
 }

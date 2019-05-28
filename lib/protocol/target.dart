@@ -10,46 +10,43 @@ class TargetApi {
 
   /// Issued when attached to target because of auto-attach or `attachToTarget` command.
   Stream<AttachedToTargetEvent> get onAttachedToTarget => _client.onEvent
-      .where((Event event) => event.name == 'Target.attachedToTarget')
-      .map((Event event) => AttachedToTargetEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Target.attachedToTarget')
+      .map((event) => AttachedToTargetEvent.fromJson(event.parameters));
 
   /// Issued when detached from target for any reason (including `detachFromTarget` command). Can be
   /// issued multiple times per target if multiple sessions have been attached to it.
   Stream<DetachedFromTargetEvent> get onDetachedFromTarget => _client.onEvent
-      .where((Event event) => event.name == 'Target.detachedFromTarget')
-      .map((Event event) => DetachedFromTargetEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Target.detachedFromTarget')
+      .map((event) => DetachedFromTargetEvent.fromJson(event.parameters));
 
   /// Notifies about a new protocol message received from the session (as reported in
   /// `attachedToTarget` event).
   Stream<ReceivedMessageFromTargetEvent> get onReceivedMessageFromTarget =>
       _client.onEvent
-          .where(
-              (Event event) => event.name == 'Target.receivedMessageFromTarget')
-          .map((Event event) =>
+          .where((event) => event.name == 'Target.receivedMessageFromTarget')
+          .map((event) =>
               ReceivedMessageFromTargetEvent.fromJson(event.parameters));
 
   /// Issued when a possible inspection target is created.
   Stream<TargetInfo> get onTargetCreated => _client.onEvent
-      .where((Event event) => event.name == 'Target.targetCreated')
-      .map(
-          (Event event) => TargetInfo.fromJson(event.parameters['targetInfo']));
+      .where((event) => event.name == 'Target.targetCreated')
+      .map((event) => TargetInfo.fromJson(event.parameters['targetInfo']));
 
   /// Issued when a target is destroyed.
   Stream<TargetID> get onTargetDestroyed => _client.onEvent
-      .where((Event event) => event.name == 'Target.targetDestroyed')
-      .map((Event event) => TargetID.fromJson(event.parameters['targetId']));
+      .where((event) => event.name == 'Target.targetDestroyed')
+      .map((event) => TargetID.fromJson(event.parameters['targetId']));
 
   /// Issued when a target has crashed.
   Stream<TargetCrashedEvent> get onTargetCrashed => _client.onEvent
-      .where((Event event) => event.name == 'Target.targetCrashed')
-      .map((Event event) => TargetCrashedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Target.targetCrashed')
+      .map((event) => TargetCrashedEvent.fromJson(event.parameters));
 
   /// Issued when some information about a target has changed. This only happens between
   /// `targetCreated` and `targetDestroyed`.
   Stream<TargetInfo> get onTargetInfoChanged => _client.onEvent
-      .where((Event event) => event.name == 'Target.targetInfoChanged')
-      .map(
-          (Event event) => TargetInfo.fromJson(event.parameters['targetInfo']));
+      .where((event) => event.name == 'Target.targetInfoChanged')
+      .map((event) => TargetInfo.fromJson(event.parameters['targetInfo']));
 
   /// Activates (focuses) the target.
   Future<void> activateTarget(TargetID targetId) async {

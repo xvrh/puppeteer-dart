@@ -121,7 +121,7 @@ class Browser {
   /// Returns a list of all open browser contexts. In a newly created browser,
   /// this will return a single instance of BrowserContext.
   List<BrowserContext> get browserContexts =>
-      [_defaultContext]..addAll(_contexts.values);
+      [_defaultContext, ..._contexts.values];
 
   /// Returns the default browser context. The default browser context can not
   /// be closed.
@@ -130,10 +130,9 @@ class Browser {
   TargetApi get targetApi => connection.targetApi;
 
   void _targetCreated(TargetInfo event) {
-    BrowserContext context =
-        _contexts[event.browserContextId] ?? _defaultContext;
+    var context = _contexts[event.browserContextId] ?? _defaultContext;
 
-    Target target = Target(this, event, () => connection.createSession(event),
+    var target = Target(this, event, () => connection.createSession(event),
         browserContext: context);
     _targets[event.targetId] = target;
 

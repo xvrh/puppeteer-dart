@@ -121,7 +121,7 @@ class Event {
 String _ref(String ref) {
   if (ref == null) return null;
 
-  String alias = _aliases[ref];
+  var alias = _aliases[ref];
   if (alias != null) {
     return alias;
   } else {

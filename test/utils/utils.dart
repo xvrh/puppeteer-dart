@@ -11,7 +11,7 @@ Future server(String location, Function(String) callback) async {
   var handler = createStaticHandler(location);
 
   var host = 'localhost';
-  HttpServer server = await io.serve(handler, host, 0);
+  var server = await io.serve(handler, host, 0);
   try {
     await callback('http://$host:${server.port}');
   } finally {
@@ -32,7 +32,7 @@ class Server {
   Server._();
 
   static Future<Server> create() async {
-    Server server = Server._();
+    var server = Server._();
     await server._setup();
     return server;
   }
@@ -50,7 +50,7 @@ class Server {
       if (callback != null) {
         return callback(request);
       } else {
-        shelf.Response staticResponse = await staticHandler(request);
+        var staticResponse = await staticHandler(request);
         staticResponse
             .change(headers: {HttpHeaders.cacheControlHeader: 'no-cache'});
         return staticResponse;
@@ -134,7 +134,7 @@ function detachFrame(frameId) {
 }
 
 Future<T> waitFutures<T>(Future<T> firstFuture, List<Future> others) async {
-  List<Future> futures = [firstFuture]..addAll(others);
+  var futures = <Future>[firstFuture, ...others];
   return (await Future.wait(futures))[0];
 }
 
@@ -151,10 +151,13 @@ function navigateFrame(frameId, url) {
 dumpFrames(Frame frame, [String indentation]) {
   indentation ??= '';
   var description = frame.url.replaceAll(RegExp(r'//[^/]+/'), '//<host>/');
-  if (frame.name != null) description += ' (' + frame.name + ')';
+  if (frame.name != null) {
+    description += ' (${frame.name})';
+  }
   var result = [indentation + description];
-  for (var child in frame.childFrames)
-    result.addAll(dumpFrames(child, '    ' + indentation));
+  for (var child in frame.childFrames) {
+    result.addAll(dumpFrames(child, '    $indentation'));
+  }
   return result;
 }
 

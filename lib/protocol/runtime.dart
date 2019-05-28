@@ -14,46 +14,46 @@ class RuntimeApi {
 
   /// Notification is issued every time when binding is called.
   Stream<BindingCalledEvent> get onBindingCalled => _client.onEvent
-      .where((Event event) => event.name == 'Runtime.bindingCalled')
-      .map((Event event) => BindingCalledEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Runtime.bindingCalled')
+      .map((event) => BindingCalledEvent.fromJson(event.parameters));
 
   /// Issued when console API was called.
   Stream<ConsoleAPICalledEvent> get onConsoleAPICalled => _client.onEvent
-      .where((Event event) => event.name == 'Runtime.consoleAPICalled')
-      .map((Event event) => ConsoleAPICalledEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Runtime.consoleAPICalled')
+      .map((event) => ConsoleAPICalledEvent.fromJson(event.parameters));
 
   /// Issued when unhandled exception was revoked.
   Stream<ExceptionRevokedEvent> get onExceptionRevoked => _client.onEvent
-      .where((Event event) => event.name == 'Runtime.exceptionRevoked')
-      .map((Event event) => ExceptionRevokedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Runtime.exceptionRevoked')
+      .map((event) => ExceptionRevokedEvent.fromJson(event.parameters));
 
   /// Issued when exception was thrown and unhandled.
   Stream<ExceptionThrownEvent> get onExceptionThrown => _client.onEvent
-      .where((Event event) => event.name == 'Runtime.exceptionThrown')
-      .map((Event event) => ExceptionThrownEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Runtime.exceptionThrown')
+      .map((event) => ExceptionThrownEvent.fromJson(event.parameters));
 
   /// Issued when new execution context is created.
   Stream<ExecutionContextDescription> get onExecutionContextCreated => _client
       .onEvent
-      .where((Event event) => event.name == 'Runtime.executionContextCreated')
-      .map((Event event) =>
+      .where((event) => event.name == 'Runtime.executionContextCreated')
+      .map((event) =>
           ExecutionContextDescription.fromJson(event.parameters['context']));
 
   /// Issued when execution context is destroyed.
   Stream<ExecutionContextId> get onExecutionContextDestroyed => _client.onEvent
-      .where((Event event) => event.name == 'Runtime.executionContextDestroyed')
-      .map((Event event) =>
+      .where((event) => event.name == 'Runtime.executionContextDestroyed')
+      .map((event) =>
           ExecutionContextId.fromJson(event.parameters['executionContextId']));
 
   /// Issued when all executionContexts were cleared in browser
   Stream get onExecutionContextsCleared => _client.onEvent
-      .where((Event event) => event.name == 'Runtime.executionContextsCleared');
+      .where((event) => event.name == 'Runtime.executionContextsCleared');
 
   /// Issued when object should be inspected (for example, as a result of inspect() command line API
   /// call).
   Stream<InspectRequestedEvent> get onInspectRequested => _client.onEvent
-      .where((Event event) => event.name == 'Runtime.inspectRequested')
-      .map((Event event) => InspectRequestedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Runtime.inspectRequested')
+      .map((event) => InspectRequestedEvent.fromJson(event.parameters));
 
   /// Add handler to promise with given promise object id.
   /// [promiseObjectId] Identifier of the promise.

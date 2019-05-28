@@ -8,7 +8,7 @@ main() {
       f is File &&
       f.path.endsWith('.dart') &&
       !p.basename(f.path).startsWith('_'))) {
-    String fileContent = exampleFile.readAsStringSync();
+    var fileContent = exampleFile.readAsStringSync();
 
     if (fileContent.contains('main()')) {
       test('Text example/${p.basename(exampleFile.path)}', () {

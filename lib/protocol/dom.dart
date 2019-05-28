@@ -19,83 +19,79 @@ class DOMApi {
 
   /// Fired when `Element`'s attribute is modified.
   Stream<AttributeModifiedEvent> get onAttributeModified => _client.onEvent
-      .where((Event event) => event.name == 'DOM.attributeModified')
-      .map((Event event) => AttributeModifiedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'DOM.attributeModified')
+      .map((event) => AttributeModifiedEvent.fromJson(event.parameters));
 
   /// Fired when `Element`'s attribute is removed.
   Stream<AttributeRemovedEvent> get onAttributeRemoved => _client.onEvent
-      .where((Event event) => event.name == 'DOM.attributeRemoved')
-      .map((Event event) => AttributeRemovedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'DOM.attributeRemoved')
+      .map((event) => AttributeRemovedEvent.fromJson(event.parameters));
 
   /// Mirrors `DOMCharacterDataModified` event.
-  Stream<CharacterDataModifiedEvent> get onCharacterDataModified =>
-      _client.onEvent
-          .where((Event event) => event.name == 'DOM.characterDataModified')
-          .map((Event event) =>
-              CharacterDataModifiedEvent.fromJson(event.parameters));
+  Stream<CharacterDataModifiedEvent> get onCharacterDataModified => _client
+      .onEvent
+      .where((event) => event.name == 'DOM.characterDataModified')
+      .map((event) => CharacterDataModifiedEvent.fromJson(event.parameters));
 
   /// Fired when `Container`'s child node count has changed.
-  Stream<ChildNodeCountUpdatedEvent> get onChildNodeCountUpdated =>
-      _client.onEvent
-          .where((Event event) => event.name == 'DOM.childNodeCountUpdated')
-          .map((Event event) =>
-              ChildNodeCountUpdatedEvent.fromJson(event.parameters));
+  Stream<ChildNodeCountUpdatedEvent> get onChildNodeCountUpdated => _client
+      .onEvent
+      .where((event) => event.name == 'DOM.childNodeCountUpdated')
+      .map((event) => ChildNodeCountUpdatedEvent.fromJson(event.parameters));
 
   /// Mirrors `DOMNodeInserted` event.
   Stream<ChildNodeInsertedEvent> get onChildNodeInserted => _client.onEvent
-      .where((Event event) => event.name == 'DOM.childNodeInserted')
-      .map((Event event) => ChildNodeInsertedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'DOM.childNodeInserted')
+      .map((event) => ChildNodeInsertedEvent.fromJson(event.parameters));
 
   /// Mirrors `DOMNodeRemoved` event.
   Stream<ChildNodeRemovedEvent> get onChildNodeRemoved => _client.onEvent
-      .where((Event event) => event.name == 'DOM.childNodeRemoved')
-      .map((Event event) => ChildNodeRemovedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'DOM.childNodeRemoved')
+      .map((event) => ChildNodeRemovedEvent.fromJson(event.parameters));
 
   /// Called when distrubution is changed.
-  Stream<DistributedNodesUpdatedEvent> get onDistributedNodesUpdated =>
-      _client.onEvent
-          .where((Event event) => event.name == 'DOM.distributedNodesUpdated')
-          .map((Event event) =>
-              DistributedNodesUpdatedEvent.fromJson(event.parameters));
+  Stream<DistributedNodesUpdatedEvent> get onDistributedNodesUpdated => _client
+      .onEvent
+      .where((event) => event.name == 'DOM.distributedNodesUpdated')
+      .map((event) => DistributedNodesUpdatedEvent.fromJson(event.parameters));
 
   /// Fired when `Document` has been totally updated. Node ids are no longer valid.
-  Stream get onDocumentUpdated => _client.onEvent
-      .where((Event event) => event.name == 'DOM.documentUpdated');
+  Stream get onDocumentUpdated =>
+      _client.onEvent.where((event) => event.name == 'DOM.documentUpdated');
 
   /// Fired when `Element`'s inline style is modified via a CSS property modification.
   Stream<List<NodeId>> get onInlineStyleInvalidated => _client.onEvent
-      .where((Event event) => event.name == 'DOM.inlineStyleInvalidated')
-      .map((Event event) => (event.parameters['nodeIds'] as List)
+      .where((event) => event.name == 'DOM.inlineStyleInvalidated')
+      .map((event) => (event.parameters['nodeIds'] as List)
           .map((e) => NodeId.fromJson(e))
           .toList());
 
   /// Called when a pseudo element is added to an element.
   Stream<PseudoElementAddedEvent> get onPseudoElementAdded => _client.onEvent
-      .where((Event event) => event.name == 'DOM.pseudoElementAdded')
-      .map((Event event) => PseudoElementAddedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'DOM.pseudoElementAdded')
+      .map((event) => PseudoElementAddedEvent.fromJson(event.parameters));
 
   /// Called when a pseudo element is removed from an element.
   Stream<PseudoElementRemovedEvent> get onPseudoElementRemoved =>
       _client.onEvent
-          .where((Event event) => event.name == 'DOM.pseudoElementRemoved')
-          .map((Event event) =>
-              PseudoElementRemovedEvent.fromJson(event.parameters));
+          .where((event) => event.name == 'DOM.pseudoElementRemoved')
+          .map((event) => PseudoElementRemovedEvent.fromJson(event.parameters));
 
   /// Fired when backend wants to provide client with the missing DOM structure. This happens upon
   /// most of the calls requesting node ids.
   Stream<SetChildNodesEvent> get onSetChildNodes => _client.onEvent
-      .where((Event event) => event.name == 'DOM.setChildNodes')
-      .map((Event event) => SetChildNodesEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'DOM.setChildNodes')
+      .map((event) => SetChildNodesEvent.fromJson(event.parameters));
 
   /// Called when shadow root is popped from the element.
   Stream<ShadowRootPoppedEvent> get onShadowRootPopped => _client.onEvent
-      .where((Event event) => event.name == 'DOM.shadowRootPopped')
-      .map((Event event) => ShadowRootPoppedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'DOM.shadowRootPopped')
+      .map((event) => ShadowRootPoppedEvent.fromJson(event.parameters));
 
   /// Called when shadow root is pushed into the element.
   Stream<ShadowRootPushedEvent> get onShadowRootPushed => _client.onEvent
-      .where((Event event) => event.name == 'DOM.shadowRootPushed')
-      .map((Event event) => ShadowRootPushedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'DOM.shadowRootPushed')
+      .map((event) => ShadowRootPushedEvent.fromJson(event.parameters));
 
   /// Collects class names for the node with given id and all of it's child nodes.
   /// [nodeId] Id of the node to collect class names.

@@ -11,20 +11,18 @@ class WebAudioApi {
 
   /// Notifies that a new BaseAudioContext has been created.
   Stream<BaseAudioContext> get onContextCreated => _client.onEvent
-      .where((Event event) => event.name == 'WebAudio.contextCreated')
-      .map((Event event) =>
-          BaseAudioContext.fromJson(event.parameters['context']));
+      .where((event) => event.name == 'WebAudio.contextCreated')
+      .map((event) => BaseAudioContext.fromJson(event.parameters['context']));
 
   /// Notifies that existing BaseAudioContext has been destroyed.
   Stream<ContextId> get onContextDestroyed => _client.onEvent
-      .where((Event event) => event.name == 'WebAudio.contextDestroyed')
-      .map((Event event) => ContextId.fromJson(event.parameters['contextId']));
+      .where((event) => event.name == 'WebAudio.contextDestroyed')
+      .map((event) => ContextId.fromJson(event.parameters['contextId']));
 
   /// Notifies that existing BaseAudioContext has changed some properties (id stays the same)..
   Stream<BaseAudioContext> get onContextChanged => _client.onEvent
-      .where((Event event) => event.name == 'WebAudio.contextChanged')
-      .map((Event event) =>
-          BaseAudioContext.fromJson(event.parameters['context']));
+      .where((event) => event.name == 'WebAudio.contextChanged')
+      .map((event) => BaseAudioContext.fromJson(event.parameters['context']));
 
   /// Enables the WebAudio domain and starts sending context lifetime events.
   Future<void> enable() async {

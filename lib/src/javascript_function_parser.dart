@@ -7,7 +7,7 @@ import 'package:petitparser/petitparser.dart';
 /// Returns the string as it if this is already a classical function declaration
 /// Returns null if we cannot parse recognize the declaration
 String convertToFunctionDeclaration(String javascript) {
-  JsGrammar grammar = JsGrammar();
+  var grammar = JsGrammar();
   var result = grammar.parse(javascript);
 
   if (result.isSuccess) {
@@ -16,17 +16,17 @@ String convertToFunctionDeclaration(String javascript) {
     if (tokens.contains(_isFunction)) {
       return javascript;
     } else {
-      bool hasBodyStatement = tokens.contains(_hasBodyStatements);
+      var hasBodyStatement = tokens.contains(_hasBodyStatements);
       _Arguments arguments = tokens.singleWhere((t) => t is _Arguments);
       _FunctionBody functionBody =
           tokens.singleWhere((t) => t is _FunctionBody);
-      bool isAsync = tokens.contains(_isAsync);
+      var isAsync = tokens.contains(_isAsync);
 
-      String body = hasBodyStatement
-          ? '{ ' + functionBody.value
+      var body = hasBodyStatement
+          ? '{ ${functionBody.value}'
           : '{ return ${functionBody.value} }';
 
-      String argumentString = arguments.arguments;
+      var argumentString = arguments.arguments;
       if (!argumentString.startsWith('(')) {
         argumentString = '($argumentString)';
       }

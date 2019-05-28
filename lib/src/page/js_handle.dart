@@ -135,7 +135,7 @@ function _(object, propertyName) {
   @override
   String toString() {
     if (remoteObject.objectId != null) {
-      String type = remoteObject.subtype?.value ?? remoteObject.type?.value;
+      var type = remoteObject.subtype?.value ?? remoteObject.type?.value;
       return 'JSHandle@$type';
     }
     return 'JSHandle:${valueFromRemoteObject(remoteObject)}';
@@ -522,7 +522,7 @@ async function _(element, pageJavascriptEnabled) {
           'Error: failed to find element matching selector "$selector"');
     }
 
-    List allArgs = [elementHandle];
+    var allArgs = <dynamic>[elementHandle];
     if (args != null) {
       allArgs.addAll(args);
     }
@@ -566,7 +566,7 @@ async function _(element, pageJavascriptEnabled) {
         'function _(element, selector) {return Array.from(element.querySelectorAll(selector));}',
         args: [this, selector]);
 
-    List allArgs = [arrayHandle];
+    var allArgs = <dynamic>[arrayHandle];
     if (args != null) {
       allArgs.addAll(args);
     }
@@ -620,7 +620,7 @@ async function _(element) {
   }
 }
 
-class NodeIsNotVisibleException {
+class NodeIsNotVisibleException implements Exception {
   @override
   String toString() => 'Node is either not visible or not an HTMLElement';
 }

@@ -8,6 +8,8 @@ import 'package:test/test.dart';
 import 'utils/utils.dart';
 import 'utils/utils_golden.dart';
 
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 main() {
   Server server;
   Browser browser;
@@ -253,10 +255,11 @@ main() {
       server.setRedirect('/non-existing.json', '/non-existing-2.json');
       server.setRedirect('/non-existing-2.json', '/simple.html');
       page.onRequest.listen((request) {
-        if (request.url.contains('non-existing-2'))
+        if (request.url.contains('non-existing-2')) {
           request.abort();
-        else
+        } else {
           request.continueRequest();
+        }
       });
       await page.goto(server.emptyPage);
       var result = await page.evaluate('''async() => {
@@ -368,7 +371,7 @@ main() {
       await request.continueRequest();
     });
     test('should throw if interception is not enabled', () async {
-      var error;
+      AssertionError error;
       page.onRequest.listen((request) async {
         try {
           await request.continueRequest();
@@ -445,7 +448,7 @@ main() {
       page.onRequest.listen((request) {
         request.continueRequest(postData: 'doggo');
       });
-      var body;
+      String body;
       server.setRoute('sleep.zzz', (request) async {
         body = await request.readAsString();
         return shelf.Response.ok('ok');
@@ -463,7 +466,7 @@ main() {
       page.onRequest.listen((request) {
         request.continueRequest(method: 'POST', postData: 'doggo');
       });
-      var body;
+      String body;
       server.setRoute('empty.html', (request) async {
         body = await request.readAsString();
         return shelf.Response.ok('ok');

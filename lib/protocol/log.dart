@@ -12,8 +12,8 @@ class LogApi {
 
   /// Issued when new message was logged.
   Stream<LogEntry> get onEntryAdded => _client.onEvent
-      .where((Event event) => event.name == 'Log.entryAdded')
-      .map((Event event) => LogEntry.fromJson(event.parameters['entry']));
+      .where((event) => event.name == 'Log.entryAdded')
+      .map((event) => LogEntry.fromJson(event.parameters['entry']));
 
   /// Clears the log.
   Future<void> clear() async {

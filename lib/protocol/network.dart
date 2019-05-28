@@ -16,105 +16,99 @@ class NetworkApi {
 
   /// Fired when data chunk was received over the network.
   Stream<DataReceivedEvent> get onDataReceived => _client.onEvent
-      .where((Event event) => event.name == 'Network.dataReceived')
-      .map((Event event) => DataReceivedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Network.dataReceived')
+      .map((event) => DataReceivedEvent.fromJson(event.parameters));
 
   /// Fired when EventSource message is received.
   Stream<EventSourceMessageReceivedEvent> get onEventSourceMessageReceived =>
       _client.onEvent
-          .where((Event event) =>
-              event.name == 'Network.eventSourceMessageReceived')
-          .map((Event event) =>
+          .where((event) => event.name == 'Network.eventSourceMessageReceived')
+          .map((event) =>
               EventSourceMessageReceivedEvent.fromJson(event.parameters));
 
   /// Fired when HTTP request has failed to load.
   Stream<LoadingFailedEvent> get onLoadingFailed => _client.onEvent
-      .where((Event event) => event.name == 'Network.loadingFailed')
-      .map((Event event) => LoadingFailedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Network.loadingFailed')
+      .map((event) => LoadingFailedEvent.fromJson(event.parameters));
 
   /// Fired when HTTP request has finished loading.
   Stream<LoadingFinishedEvent> get onLoadingFinished => _client.onEvent
-      .where((Event event) => event.name == 'Network.loadingFinished')
-      .map((Event event) => LoadingFinishedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Network.loadingFinished')
+      .map((event) => LoadingFinishedEvent.fromJson(event.parameters));
 
   /// Details of an intercepted HTTP request, which must be either allowed, blocked, modified or
   /// mocked.
   Stream<RequestInterceptedEvent> get onRequestIntercepted => _client.onEvent
-      .where((Event event) => event.name == 'Network.requestIntercepted')
-      .map((Event event) => RequestInterceptedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Network.requestIntercepted')
+      .map((event) => RequestInterceptedEvent.fromJson(event.parameters));
 
   /// Fired if request ended up loading from cache.
   Stream<RequestId> get onRequestServedFromCache => _client.onEvent
-      .where((Event event) => event.name == 'Network.requestServedFromCache')
-      .map((Event event) => RequestId.fromJson(event.parameters['requestId']));
+      .where((event) => event.name == 'Network.requestServedFromCache')
+      .map((event) => RequestId.fromJson(event.parameters['requestId']));
 
   /// Fired when page is about to send HTTP request.
   Stream<RequestWillBeSentEvent> get onRequestWillBeSent => _client.onEvent
-      .where((Event event) => event.name == 'Network.requestWillBeSent')
-      .map((Event event) => RequestWillBeSentEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Network.requestWillBeSent')
+      .map((event) => RequestWillBeSentEvent.fromJson(event.parameters));
 
   /// Fired when resource loading priority is changed
   Stream<ResourceChangedPriorityEvent> get onResourceChangedPriority => _client
       .onEvent
-      .where((Event event) => event.name == 'Network.resourceChangedPriority')
-      .map((Event event) =>
-          ResourceChangedPriorityEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Network.resourceChangedPriority')
+      .map((event) => ResourceChangedPriorityEvent.fromJson(event.parameters));
 
   /// Fired when a signed exchange was received over the network
   Stream<SignedExchangeReceivedEvent> get onSignedExchangeReceived => _client
       .onEvent
-      .where((Event event) => event.name == 'Network.signedExchangeReceived')
-      .map((Event event) =>
-          SignedExchangeReceivedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Network.signedExchangeReceived')
+      .map((event) => SignedExchangeReceivedEvent.fromJson(event.parameters));
 
   /// Fired when HTTP response is available.
   Stream<ResponseReceivedEvent> get onResponseReceived => _client.onEvent
-      .where((Event event) => event.name == 'Network.responseReceived')
-      .map((Event event) => ResponseReceivedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Network.responseReceived')
+      .map((event) => ResponseReceivedEvent.fromJson(event.parameters));
 
   /// Fired when WebSocket is closed.
   Stream<WebSocketClosedEvent> get onWebSocketClosed => _client.onEvent
-      .where((Event event) => event.name == 'Network.webSocketClosed')
-      .map((Event event) => WebSocketClosedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Network.webSocketClosed')
+      .map((event) => WebSocketClosedEvent.fromJson(event.parameters));
 
   /// Fired upon WebSocket creation.
   Stream<WebSocketCreatedEvent> get onWebSocketCreated => _client.onEvent
-      .where((Event event) => event.name == 'Network.webSocketCreated')
-      .map((Event event) => WebSocketCreatedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Network.webSocketCreated')
+      .map((event) => WebSocketCreatedEvent.fromJson(event.parameters));
 
   /// Fired when WebSocket message error occurs.
   Stream<WebSocketFrameErrorEvent> get onWebSocketFrameError => _client.onEvent
-      .where((Event event) => event.name == 'Network.webSocketFrameError')
-      .map(
-          (Event event) => WebSocketFrameErrorEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Network.webSocketFrameError')
+      .map((event) => WebSocketFrameErrorEvent.fromJson(event.parameters));
 
   /// Fired when WebSocket message is received.
   Stream<WebSocketFrameReceivedEvent> get onWebSocketFrameReceived => _client
       .onEvent
-      .where((Event event) => event.name == 'Network.webSocketFrameReceived')
-      .map((Event event) =>
-          WebSocketFrameReceivedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Network.webSocketFrameReceived')
+      .map((event) => WebSocketFrameReceivedEvent.fromJson(event.parameters));
 
   /// Fired when WebSocket message is sent.
   Stream<WebSocketFrameSentEvent> get onWebSocketFrameSent => _client.onEvent
-      .where((Event event) => event.name == 'Network.webSocketFrameSent')
-      .map((Event event) => WebSocketFrameSentEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Network.webSocketFrameSent')
+      .map((event) => WebSocketFrameSentEvent.fromJson(event.parameters));
 
   /// Fired when WebSocket handshake response becomes available.
   Stream<WebSocketHandshakeResponseReceivedEvent>
       get onWebSocketHandshakeResponseReceived => _client.onEvent
-          .where((Event event) =>
+          .where((event) =>
               event.name == 'Network.webSocketHandshakeResponseReceived')
-          .map((Event event) =>
-              WebSocketHandshakeResponseReceivedEvent.fromJson(
-                  event.parameters));
+          .map((event) => WebSocketHandshakeResponseReceivedEvent.fromJson(
+              event.parameters));
 
   /// Fired when WebSocket is about to initiate handshake.
   Stream<WebSocketWillSendHandshakeRequestEvent>
       get onWebSocketWillSendHandshakeRequest => _client.onEvent
-          .where((Event event) =>
+          .where((event) =>
               event.name == 'Network.webSocketWillSendHandshakeRequest')
-          .map((Event event) => WebSocketWillSendHandshakeRequestEvent.fromJson(
+          .map((event) => WebSocketWillSendHandshakeRequestEvent.fromJson(
               event.parameters));
 
   /// Tells whether clearing browser cache is supported.

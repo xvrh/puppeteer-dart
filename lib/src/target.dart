@@ -29,9 +29,9 @@ class Target {
     _initialized = _initializeCompleter.future.then((success) async {
       if (!success) return false;
       var opener = this.opener;
-      if (opener == null || opener._pageFuture == null || type != 'page')
+      if (opener == null || opener._pageFuture == null || type != 'page') {
         return true;
-
+      }
       var openerPage = await opener._pageFuture;
 
       if (openerPage.hasPopupListener) {
@@ -81,10 +81,11 @@ class Target {
   }
 
   Future<Worker> get worker async {
-    if (_info.type != 'service_worker' && _info.type != 'shared_worker')
+    if (_info.type != 'service_worker' && _info.type != 'shared_worker') {
       return null;
+    }
     _workerFuture ??= this._sessionFactory().then((client) async {
-      TargetApi targetApi = TargetApi(client);
+      var targetApi = TargetApi(client);
 
       // Top level workers have a fake page wrapping the actual worker.
       var targetAttachedFuture = targetApi.onAttachedToTarget.first;

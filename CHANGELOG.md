@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.7.1 (2019-05-27)
+- Enable more Dart lints
+
 ## 1.7.0 (2019-05-27)
 - Add `page.ccessibility` feature
 - Update default Chromium version to 662092

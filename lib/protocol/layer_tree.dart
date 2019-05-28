@@ -9,12 +9,12 @@ class LayerTreeApi {
   LayerTreeApi(this._client);
 
   Stream<LayerPaintedEvent> get onLayerPainted => _client.onEvent
-      .where((Event event) => event.name == 'LayerTree.layerPainted')
-      .map((Event event) => LayerPaintedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'LayerTree.layerPainted')
+      .map((event) => LayerPaintedEvent.fromJson(event.parameters));
 
   Stream<List<Layer>> get onLayerTreeDidChange => _client.onEvent
-      .where((Event event) => event.name == 'LayerTree.layerTreeDidChange')
-      .map((Event event) => (event.parameters['layers'] as List)
+      .where((event) => event.name == 'LayerTree.layerTreeDidChange')
+      .map((event) => (event.parameters['layers'] as List)
           .map((e) => Layer.fromJson(e))
           .toList());
 

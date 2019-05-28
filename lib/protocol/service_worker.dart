@@ -9,25 +9,24 @@ class ServiceWorkerApi {
   ServiceWorkerApi(this._client);
 
   Stream<ServiceWorkerErrorMessage> get onWorkerErrorReported => _client.onEvent
-      .where((Event event) => event.name == 'ServiceWorker.workerErrorReported')
-      .map((Event event) =>
+      .where((event) => event.name == 'ServiceWorker.workerErrorReported')
+      .map((event) =>
           ServiceWorkerErrorMessage.fromJson(event.parameters['errorMessage']));
 
   Stream<List<ServiceWorkerRegistration>> get onWorkerRegistrationUpdated =>
       _client.onEvent
-          .where((Event event) =>
+          .where((event) =>
               event.name == 'ServiceWorker.workerRegistrationUpdated')
-          .map((Event event) => (event.parameters['registrations'] as List)
+          .map((event) => (event.parameters['registrations'] as List)
               .map((e) => ServiceWorkerRegistration.fromJson(e))
               .toList());
 
-  Stream<List<ServiceWorkerVersion>> get onWorkerVersionUpdated => _client
-      .onEvent
-      .where(
-          (Event event) => event.name == 'ServiceWorker.workerVersionUpdated')
-      .map((Event event) => (event.parameters['versions'] as List)
-          .map((e) => ServiceWorkerVersion.fromJson(e))
-          .toList());
+  Stream<List<ServiceWorkerVersion>> get onWorkerVersionUpdated =>
+      _client.onEvent
+          .where((event) => event.name == 'ServiceWorker.workerVersionUpdated')
+          .map((event) => (event.parameters['versions'] as List)
+              .map((e) => ServiceWorkerVersion.fromJson(e))
+              .toList());
 
   Future<void> deliverPushMessage(
       String origin, RegistrationID registrationId, String data) async {

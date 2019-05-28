@@ -256,13 +256,13 @@ class Page {
   /// ```dart
   /// var popupFuture = page.onPopup.first;
   /// await page.click('a[target=_blank]');
-  /// Page popup = await popupFuture;
+  /// var popup = await popupFuture;
   /// ```
   ///
   /// ```dart
   /// var popupFuture = page.onPopup.first;
   /// await page.evaluate("() => window.open('https://example.com')");
-  /// Page popup = await popupFuture;
+  /// var popup = await popupFuture;
   /// ```
   Stream<Page> get onPopup => _onPopupController.stream;
 
@@ -377,10 +377,11 @@ class Page {
     var textTokens = [];
     for (var arg in args) {
       var remoteObject = arg.remoteObject;
-      if (remoteObject.objectId != null)
+      if (remoteObject.objectId != null) {
         textTokens.add(arg.toString());
-      else
+      } else {
         textTokens.add(valueFromRemoteObject(remoteObject));
+      }
     }
 
     String url;
@@ -835,7 +836,7 @@ function addPageBinding(bindingName) {
 
     String expression;
     try {
-      Function callback = _pageBindings[name];
+      var callback = _pageBindings[name];
       var result = await Function.apply(callback, args);
       expression = evaluationString(_deliverResult, [name, seq, result]);
     } catch (error, stackTrace) {
@@ -1104,7 +1105,7 @@ function deliverError(name, seq, message, stack) {
 
   Future<Response> _go(int delta, {Duration timeout, Until wait}) async {
     var history = await devTools.page.getNavigationHistory();
-    int index = history.currentIndex + delta;
+    var index = history.currentIndex + delta;
     if (index < 0 || index >= history.entries.length) {
       return null;
     }
@@ -1176,7 +1177,7 @@ function deliverError(name, seq, message, stack) {
   /// Passing `null` disables media emulation.
   Future<void> emulateMedia(String mediaType) {
     assert(mediaType == 'screen' || mediaType == 'print' || mediaType == null,
-        'Unsupported media type: ' + mediaType);
+        'Unsupported media type: $mediaType');
     mediaType ??= '';
     return devTools.emulation.setEmulatedMedia(mediaType);
   }
@@ -1364,7 +1365,7 @@ function deliverError(name, seq, message, stack) {
             height: metrics.contentSize.height.ceil(),
             scale: 1);
 
-        DeviceViewport viewport = this.viewport ?? DeviceViewport();
+        var viewport = this.viewport ?? DeviceViewport();
 
         var screenOrientation = viewport.isLandscape
             ? EmulationManager.landscape
@@ -1939,7 +1940,7 @@ class PdfMargins {
       'PdfMargins.inches(top: $top, bottom: $bottom, left: $left, right: $right)';
 }
 
-class ClientError {
+class ClientError implements Exception {
   final ExceptionDetails details;
   final String message;
 

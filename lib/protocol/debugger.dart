@@ -12,29 +12,28 @@ class DebuggerApi {
 
   /// Fired when breakpoint is resolved to an actual script and location.
   Stream<BreakpointResolvedEvent> get onBreakpointResolved => _client.onEvent
-      .where((Event event) => event.name == 'Debugger.breakpointResolved')
-      .map((Event event) => BreakpointResolvedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Debugger.breakpointResolved')
+      .map((event) => BreakpointResolvedEvent.fromJson(event.parameters));
 
   /// Fired when the virtual machine stopped on breakpoint or exception or any other stop criteria.
   Stream<PausedEvent> get onPaused => _client.onEvent
-      .where((Event event) => event.name == 'Debugger.paused')
-      .map((Event event) => PausedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Debugger.paused')
+      .map((event) => PausedEvent.fromJson(event.parameters));
 
   /// Fired when the virtual machine resumed execution.
   Stream get onResumed =>
-      _client.onEvent.where((Event event) => event.name == 'Debugger.resumed');
+      _client.onEvent.where((event) => event.name == 'Debugger.resumed');
 
   /// Fired when virtual machine fails to parse the script.
   Stream<ScriptFailedToParseEvent> get onScriptFailedToParse => _client.onEvent
-      .where((Event event) => event.name == 'Debugger.scriptFailedToParse')
-      .map(
-          (Event event) => ScriptFailedToParseEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Debugger.scriptFailedToParse')
+      .map((event) => ScriptFailedToParseEvent.fromJson(event.parameters));
 
   /// Fired when virtual machine parses script. This event is also fired for all known and uncollected
   /// scripts upon enabling debugger.
   Stream<ScriptParsedEvent> get onScriptParsed => _client.onEvent
-      .where((Event event) => event.name == 'Debugger.scriptParsed')
-      .map((Event event) => ScriptParsedEvent.fromJson(event.parameters));
+      .where((event) => event.name == 'Debugger.scriptParsed')
+      .map((event) => ScriptParsedEvent.fromJson(event.parameters));
 
   /// Continues execution until specific location is reached.
   /// [location] Location to continue to.

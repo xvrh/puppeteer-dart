@@ -53,7 +53,7 @@ class Connection implements Client {
 
   static Future<Connection> create(String url,
       {@required Duration delay}) async {
-    WebSocket webSocket = await WebSocket.connect(url);
+    var webSocket = await WebSocket.connect(url);
 
     return Connection._(webSocket, url, delay: delay);
   }
@@ -71,9 +71,8 @@ class Connection implements Client {
   }
 
   int _rawSend(String method, Map parameters, {SessionID sessionId}) {
-    int id = ++_lastId;
-    String message =
-        _encodeMessage(id, method, parameters, sessionId: sessionId);
+    var id = ++_lastId;
+    var message = _encodeMessage(id, method, parameters, sessionId: sessionId);
 
     _logger.fine('SEND ► $message');
     _webSocket.add(message);
@@ -82,10 +81,10 @@ class Connection implements Client {
   }
 
   Future<Session> createSession(TargetInfo targetInfo) async {
-    SessionID sessionId =
+    var sessionId =
         await _targetApi.attachToTarget(targetInfo.targetId, flatten: true);
 
-    Session session = sessions[sessionId.value];
+    var session = sessions[sessionId.value];
     assert(session != null);
     return session;
   }
@@ -124,7 +123,7 @@ class Connection implements Client {
     } else if (id != null) {
       _logger.fine('◀ RECV $id $message');
 
-      _Message messageInFly = _messagesInFly.remove(id);
+      var messageInFly = _messagesInFly.remove(id);
       assert(messageInFly != null);
 
       Map error = object['error'];
@@ -153,12 +152,12 @@ class Connection implements Client {
     }
     _messagesInFly.clear();
 
-    for (Session session in sessions.values) {
+    for (var session in sessions.values) {
       session.dispose(reason: 'Connection.dispose(reason: $reason)');
     }
     sessions.clear();
 
-    for (StreamSubscription subscription in _subscriptions) {
+    for (var subscription in _subscriptions) {
       subscription.cancel();
     }
   }
@@ -202,7 +201,7 @@ class Session implements Client {
       throw Exception(
           'Protocol error ($method): Session closed. Most likely the $targetType has been closed.');
     }
-    int id = connection._rawSend(method, parameters, sessionId: sessionId);
+    var id = connection._rawSend(method, parameters, sessionId: sessionId);
 
     var message = _Message(method);
     _messagesInFly[id] = message;

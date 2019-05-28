@@ -2,6 +2,8 @@ import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 main() {
   Server server;
   Browser browser;

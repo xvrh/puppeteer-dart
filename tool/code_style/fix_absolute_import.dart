@@ -7,20 +7,19 @@ import 'dart_project.dart';
 // A script that replace all absolute imports to relative one
 // import 'package:slot/src/my_slot.dart' => 'import '../my_slot.dart';
 void main() {
-  String root = Directory.current.path;
+  var root = Directory.current.path;
 
-  for (DartProject project in getSubOrContainingProjects(root)) {
-    for (DartFile dartFile in project.getDartFiles().where(
-        (DartFile dartFile) =>
-            dartFile.normalizedRelativePath.startsWith('lib/'))) {
+  for (var project in getSubOrContainingProjects(root)) {
+    for (var dartFile in project.getDartFiles().where(
+        (dartFile) => dartFile.normalizedRelativePath.startsWith('lib/'))) {
       fixFile(dartFile);
     }
   }
 }
 
 bool fixFile(DartFile dartFile) {
-  String content = dartFile.file.readAsStringSync();
-  String newContent = fixCode(dartFile, content);
+  var content = dartFile.file.readAsStringSync();
+  var newContent = fixCode(dartFile, content);
 
   if (content != newContent) {
     dartFile.file.writeAsStringSync(newContent);
@@ -31,22 +30,22 @@ bool fixFile(DartFile dartFile) {
 
 String fixCode(DartFile dartFile, String content) {
   try {
-    String newContent = content;
+    var newContent = content;
 
-    CompilationUnit unit = parseCompilationUnit(content);
+    var unit = parseCompilationUnit(content);
 
-    for (NamespaceDirective directive in unit.directives.reversed
-        .where((Directive directive) => directive is NamespaceDirective)) {
-      String uriValue = directive.uri.stringValue;
-      String absolutePrefix = 'package:${dartFile.project.packageName}/';
+    for (var directive
+        in unit.directives.reversed.whereType<NamespaceDirective>()) {
+      var uriValue = directive.uri.stringValue;
+      var absolutePrefix = 'package:${dartFile.project.packageName}/';
       if (uriValue.startsWith(absolutePrefix)) {
-        String absoluteImportFromLib = uriValue.replaceAll(absolutePrefix, '');
-        String thisFilePath = dartFile.relativePath.substring('lib/'.length);
-        String relativePath = p
+        var absoluteImportFromLib = uriValue.replaceAll(absolutePrefix, '');
+        var thisFilePath = dartFile.relativePath.substring('lib/'.length);
+        var relativePath = p
             .relative(absoluteImportFromLib, from: p.dirname(thisFilePath))
             .replaceAll('\\', '/');
 
-        String directiveContent =
+        var directiveContent =
             directive.uri.toString().replaceAll(uriValue, relativePath);
 
         newContent = newContent.replaceRange(directive.uri.offset,

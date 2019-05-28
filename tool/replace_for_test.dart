@@ -7,7 +7,7 @@ main() {
       .replaceAll('.EMPTY_PAGE', '.emptyPage')
       .replaceAll('.CROSS_PROCESS_PREFIX', '.crossProcessPrefix')
       .replaceAll('const ', 'var ')
-      .replaceAllMapped(RegExp(r'.evaluate\((.*=>[^\(\),]+)\)'), (Match m) {
+      .replaceAllMapped(RegExp(r'.evaluate\((.*=>[^\(\),]+)\)'), (m) {
         var content = m.group(1);
         var quote = content.contains("'") ? '"' : "'";
         return '.evaluate($quote$content$quote)';

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 List<File> findPubspecs(Directory root, {bool pubspecLock = false}) {
-  return findPackages(root, 'pubspec' + (pubspecLock ? '.lock' : '.yaml'));
+  return findPackages(root, 'pubspec${pubspecLock ? '.lock' : '.yaml'}');
 }
 
 List<File> findPackages(Directory root, String fileName) {
@@ -10,19 +10,18 @@ List<File> findPackages(Directory root, String fileName) {
 }
 
 List<File> _findPubspecs(Directory root, String file) {
-  List<File> results = [];
-  List<FileSystemEntity> entities = root.listSync();
-  bool hasPubspec = false;
-  for (File entity in entities.where((FileSystemEntity f) => f is File)) {
+  var results = <File>[];
+  var entities = root.listSync();
+  var hasPubspec = false;
+  for (var entity in entities.whereType<File>()) {
     if (p.basename(entity.path) == file) {
       hasPubspec = true;
       results.add(entity);
     }
   }
 
-  for (Directory dir
-      in entities.where((FileSystemEntity f) => f is Directory)) {
-    String dirName = p.basename(dir.path);
+  for (var dir in entities.whereType<Directory>()) {
+    var dirName = p.basename(dir.path);
 
     if (!dirName.startsWith('.') &&
         !dirName.startsWith('_') &&

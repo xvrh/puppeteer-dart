@@ -3,6 +3,8 @@ import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 main() {
   Server server;
   Browser browser;
@@ -240,7 +242,7 @@ main() {
     test('should throw when frame is detached', () async {
       await attachFrame(page, 'frame1', server.emptyPage);
       var frame = page.frames[1];
-      var waitError;
+      Exception waitError;
       var waitPromise = frame.waitForSelector('.box').catchError((e) {
         waitError = e;
         return null;
@@ -248,7 +250,7 @@ main() {
       await detachFrame(page, 'frame1');
       await waitPromise;
       expect(waitError, isNotNull);
-      expect(waitError.message,
+      expect(waitError.toString(),
           contains('waitForFunction failed: frame got detached.'));
     });
     test('should survive cross-process navigation', () async {
@@ -400,7 +402,7 @@ main() {
     test('should throw when frame is detached', () async {
       await attachFrame(page, 'frame1', server.emptyPage);
       var frame = page.frames[1];
-      var waitError;
+      Exception waitError;
       var waitPromise = frame.waitForXPath('//*[@class="box"]').catchError((e) {
         waitError = e;
         return null;

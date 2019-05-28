@@ -6,6 +6,8 @@ import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 // The tests in this file are extracted by the script `tool/inject_examples_to_doc.dart`
 // and injected into the documentation in the source code.
 // This help to ensure that the examples provided in the code are correct.
@@ -150,7 +152,7 @@ main() {
         //----
         var popupFuture = page.onPopup.first;
         await page.click('a[target=_blank]');
-        Page popup = await popupFuture;
+        var popup = await popupFuture;
         //----
         expect(popup, isNotNull);
       });
@@ -159,7 +161,7 @@ main() {
         var popupFuture = page.onPopup.first;
         await page.evaluate(
             "() => window.open('${exampleValue(server.hostUrl, 'https://example.com')}')");
-        Page popup = await popupFuture;
+        var popup = await popupFuture;
         //----
         expect(popup, isNotNull);
       });
@@ -701,10 +703,13 @@ main() {
     });
     group('evaluateHandle', () {
       test(0, () async {
+        //---
         var context = await page.mainFrame.executionContext;
         var aHandle =
             await context.evaluateHandle('() => Promise.resolve(self)');
-        aHandle; // Handle for the global object.
+        print(aHandle); // Handle for the global object.
+        //---
+        expect(aHandle, isNotNull);
       });
       test(1, () async {
         var context = await page.mainFrame.executionContext;
@@ -826,8 +831,8 @@ main() {
       page.onRequest.listen((request) {
         // Override headers
         var headers = Map<String, String>.from(request.headers)
-          ..['foo'] = 'bar';
-        headers.remove('origin');
+          ..['foo'] = 'bar'
+          ..remove('origin');
         request.continueRequest(headers: headers);
       });
       //---

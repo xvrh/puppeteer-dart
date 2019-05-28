@@ -1386,13 +1386,13 @@ Emitted when the page opens a new tab or window.
 ```dart
 var popupFuture = page.onPopup.first;
 await page.click('a[target=_blank]');
-Page popup = await popupFuture;
+var popup = await popupFuture;
 ```
 
 ```dart
 var popupFuture = page.onPopup.first;
 await page.evaluate("() => window.open('https://example.com')");
-Page popup = await popupFuture;
+var popup = await popupFuture;
 ```
 
 ```dart
@@ -3002,7 +3002,7 @@ to resolve and return its value.
 ```dart
 var context = await page.mainFrame.executionContext;
 var aHandle = await context.evaluateHandle('() => Promise.resolve(self)');
-aHandle; // Handle for the global object.
+print(aHandle); // Handle for the global object.
 ```
 
 A string can also be passed in instead of a function.
@@ -3407,8 +3407,9 @@ Exception is immediately thrown if the request interception is not enabled.
 await page.setRequestInterception(true);
 page.onRequest.listen((request) {
   // Override headers
-  var headers = Map<String, String>.from(request.headers)..['foo'] = 'bar';
-  headers.remove('origin');
+  var headers = Map<String, String>.from(request.headers)
+    ..['foo'] = 'bar'
+    ..remove('origin');
   request.continueRequest(headers: headers);
 });
 ```

@@ -4,9 +4,9 @@ import '../tool/generate_readme.dart';
 
 main() {
   test('The readme has been generated', () {
-    String currentReadme = File('README.md').readAsStringSync();
+    var currentReadme = File('README.md').readAsStringSync();
 
-    String expectedReadme = generateReadme();
+    var expectedReadme = generateReadme();
 
     expect(currentReadme, equals(expectedReadme));
   });

@@ -93,7 +93,7 @@ class ExecutionContext {
   /// ```dart
   /// var context = await page.mainFrame.executionContext;
   /// var aHandle = await context.evaluateHandle('() => Promise.resolve(self)');
-  /// aHandle; // Handle for the global object.
+  /// print(aHandle); // Handle for the global object.
   /// ```
   ///
   /// A string can also be passed in instead of a function.
@@ -118,7 +118,7 @@ class ExecutionContext {
     // function declaration (function(el) { return el.value; })
     // If it can't parse the shorthand function, it considers it as a
     // JavaScript expression.
-    String functionDeclaration = convertToFunctionDeclaration(pageFunction);
+    var functionDeclaration = convertToFunctionDeclaration(pageFunction);
 
     const suffix = '//# sourceURL=$evaluationScriptUrl';
 
@@ -129,7 +129,7 @@ class ExecutionContext {
 
         var pageFunctionWithSourceUrl = sourceUrlRegExp.hasMatch(pageFunction)
             ? pageFunction
-            : pageFunction + '\n' + suffix;
+            : '$pageFunction\n$suffix';
 
         var response = await runtimeApi.evaluate(pageFunctionWithSourceUrl,
             contextId: context.id,
@@ -146,7 +146,7 @@ class ExecutionContext {
         args ??= [];
 
         var result = await runtimeApi.callFunctionOn(
-            functionDeclaration + '\n' + suffix + '\n',
+            '$functionDeclaration\n$suffix\n',
             executionContextId: context.id,
             arguments: args.map(_convertArgument).toList(),
             returnByValue: false,
@@ -179,7 +179,7 @@ class ExecutionContext {
       if (arg.isInfinite) {
         return CallArgument(
             unserializableValue:
-                UnserializableValue((arg.isNegative ? '-' : '') + 'Infinity'));
+                UnserializableValue("${arg.isNegative ? '-' : ''}Infinity"));
       }
       if (arg.isNaN) {
         return CallArgument(unserializableValue: UnserializableValue('NaN'));

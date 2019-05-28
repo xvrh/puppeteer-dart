@@ -143,7 +143,7 @@ class Until {
   }
 
   Until.all(List<Until> waits) {
-    for (Until wait in waits) {
+    for (var wait in waits) {
       _events.addAll(wait._events);
     }
   }
