@@ -123,8 +123,7 @@ class ContextState {
   String toString() => value.toString();
 }
 
-/// Fields in AudioContext that change in real-time. These are not updated
-/// on OfflineAudioContext.
+/// Fields in AudioContext that change in real-time.
 class ContextRealtimeData {
   /// The current context time in second in BaseAudioContext.
   final num currentTime;
@@ -134,24 +133,34 @@ class ContextRealtimeData {
   /// capacity and glitch may occur.
   final num renderCapacity;
 
-  ContextRealtimeData({this.currentTime, this.renderCapacity});
+  /// A running mean of callback interval.
+  final num callbackIntervalMean;
+
+  /// A running variance of callback interval.
+  final num callbackIntervalVariance;
+
+  ContextRealtimeData(
+      {@required this.currentTime,
+      @required this.renderCapacity,
+      @required this.callbackIntervalMean,
+      @required this.callbackIntervalVariance});
 
   factory ContextRealtimeData.fromJson(Map<String, dynamic> json) {
     return ContextRealtimeData(
-      currentTime: json.containsKey('currentTime') ? json['currentTime'] : null,
-      renderCapacity:
-          json.containsKey('renderCapacity') ? json['renderCapacity'] : null,
+      currentTime: json['currentTime'],
+      renderCapacity: json['renderCapacity'],
+      callbackIntervalMean: json['callbackIntervalMean'],
+      callbackIntervalVariance: json['callbackIntervalVariance'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{};
-    if (currentTime != null) {
-      json['currentTime'] = currentTime;
-    }
-    if (renderCapacity != null) {
-      json['renderCapacity'] = renderCapacity;
-    }
+    var json = <String, dynamic>{
+      'currentTime': currentTime,
+      'renderCapacity': renderCapacity,
+      'callbackIntervalMean': callbackIntervalMean,
+      'callbackIntervalVariance': callbackIntervalVariance,
+    };
     return json;
   }
 }

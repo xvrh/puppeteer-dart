@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// A domain for interacting with Cast, Presentation API, and Remote Playback API
@@ -63,5 +64,36 @@ class CastApi {
       'sinkName': sinkName,
     };
     await _client.send('Cast.stopCasting', parameters);
+  }
+}
+
+class Sink {
+  final String name;
+
+  final String id;
+
+  /// Text describing the current session. Present only if there is an active
+  /// session on the sink.
+  final String session;
+
+  Sink({@required this.name, @required this.id, this.session});
+
+  factory Sink.fromJson(Map<String, dynamic> json) {
+    return Sink(
+      name: json['name'],
+      id: json['id'],
+      session: json.containsKey('session') ? json['session'] : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
+      'name': name,
+      'id': id,
+    };
+    if (session != null) {
+      json['session'] = session;
+    }
+    return json;
   }
 }

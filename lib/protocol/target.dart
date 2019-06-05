@@ -130,12 +130,17 @@ class TargetApi {
   /// [browserContextId] The browser context to create the page in.
   /// [enableBeginFrameControl] Whether BeginFrames for this target will be controlled via DevTools (headless chrome only,
   /// not supported on MacOS yet, false by default).
+  /// [newWindow] Whether to create a new Window or Tab (chrome-only, false by default).
+  /// [background] Whether to create the target in background or foreground (chrome-only,
+  /// false by default).
   /// Returns: The id of the page opened.
   Future<TargetID> createTarget(String url,
       {int width,
       int height,
       BrowserContextID browserContextId,
-      bool enableBeginFrameControl}) async {
+      bool enableBeginFrameControl,
+      bool newWindow,
+      bool background}) async {
     var parameters = <String, dynamic>{
       'url': url,
     };
@@ -150,6 +155,12 @@ class TargetApi {
     }
     if (enableBeginFrameControl != null) {
       parameters['enableBeginFrameControl'] = enableBeginFrameControl;
+    }
+    if (newWindow != null) {
+      parameters['newWindow'] = newWindow;
+    }
+    if (background != null) {
+      parameters['background'] = background;
     }
     var result = await _client.send('Target.createTarget', parameters);
     return TargetID.fromJson(result['targetId']);

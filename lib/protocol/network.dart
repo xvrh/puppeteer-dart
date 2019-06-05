@@ -1970,6 +1970,9 @@ class ResponseData {
   /// Specifies that the request was served from the ServiceWorker.
   final bool fromServiceWorker;
 
+  /// Specifies that the request was served from the prefetch cache.
+  final bool fromPrefetchCache;
+
   /// Total number of bytes received for this request so far.
   final num encodedDataLength;
 
@@ -2000,6 +2003,7 @@ class ResponseData {
       this.remotePort,
       this.fromDiskCache,
       this.fromServiceWorker,
+      this.fromPrefetchCache,
       @required this.encodedDataLength,
       this.timing,
       this.protocol,
@@ -2029,6 +2033,9 @@ class ResponseData {
           json.containsKey('fromDiskCache') ? json['fromDiskCache'] : null,
       fromServiceWorker: json.containsKey('fromServiceWorker')
           ? json['fromServiceWorker']
+          : null,
+      fromPrefetchCache: json.containsKey('fromPrefetchCache')
+          ? json['fromPrefetchCache']
           : null,
       encodedDataLength: json['encodedDataLength'],
       timing: json.containsKey('timing')
@@ -2074,6 +2081,9 @@ class ResponseData {
     }
     if (fromServiceWorker != null) {
       json['fromServiceWorker'] = fromServiceWorker;
+    }
+    if (fromPrefetchCache != null) {
+      json['fromPrefetchCache'] = fromPrefetchCache;
     }
     if (timing != null) {
       json['timing'] = timing.toJson();

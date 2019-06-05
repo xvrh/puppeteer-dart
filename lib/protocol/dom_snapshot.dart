@@ -55,11 +55,15 @@ class DOMSnapshotApi {
   /// white-listed computed style information for the nodes. Shadow DOM in the returned DOM tree is
   /// flattened.
   /// [computedStyles] Whitelist of computed styles to return.
-  Future<CaptureSnapshotResult> captureSnapshot(
-      List<String> computedStyles) async {
+  /// [includeDOMRects] Whether to include DOM rectangles (offsetRects, clientRects, scrollRects) into the snapshot
+  Future<CaptureSnapshotResult> captureSnapshot(List<String> computedStyles,
+      {bool includeDOMRects}) async {
     var parameters = <String, dynamic>{
       'computedStyles': computedStyles.map((e) => e).toList(),
     };
+    if (includeDOMRects != null) {
+      parameters['includeDOMRects'] = includeDOMRects;
+    }
     var result = await _client.send('DOMSnapshot.captureSnapshot', parameters);
     return CaptureSnapshotResult.fromJson(result);
   }
@@ -706,9 +710,10 @@ class DocumentSnapshot {
   /// The post-layout inline text nodes.
   final TextBoxSnapshot textBoxes;
 
-  /// Scroll offsets.
+  /// Horizontal scroll offset.
   final num scrollOffsetX;
 
+  /// Vertical scroll offset.
   final num scrollOffsetY;
 
   DocumentSnapshot(
@@ -942,12 +947,12 @@ class NodeTreeSnapshot {
   }
 }
 
-/// Details of an element in the DOM tree with a LayoutObject.
+/// Table of details of an element in the DOM tree with a LayoutObject.
 class LayoutTreeSnapshot {
-  /// The index of the related DOM node in the `domNodes` array returned by `getSnapshot`.
+  /// Index of the corresponding node in the `NodeTreeSnapshot` array returned by `captureSnapshot`.
   final List<int> nodeIndex;
 
-  /// Index into the `computedStyles` array returned by `captureSnapshot`.
+  /// Array of indexes specifying computed style strings, filtered according to the `computedStyles` parameter passed to `captureSnapshot`.
   final List<ArrayOfStrings> styles;
 
   /// The absolute position bounding box.
@@ -959,12 +964,24 @@ class LayoutTreeSnapshot {
   /// Stacking context information.
   final RareBooleanData stackingContexts;
 
+  /// The offset rect of nodes. Only available when includeDOMRects is set to true
+  final List<Rectangle> offsetRects;
+
+  /// The scroll rect of nodes. Only available when includeDOMRects is set to true
+  final List<Rectangle> scrollRects;
+
+  /// The client rect of nodes. Only available when includeDOMRects is set to true
+  final List<Rectangle> clientRects;
+
   LayoutTreeSnapshot(
       {@required this.nodeIndex,
       @required this.styles,
       @required this.bounds,
       @required this.text,
-      @required this.stackingContexts});
+      @required this.stackingContexts,
+      this.offsetRects,
+      this.scrollRects,
+      this.clientRects});
 
   factory LayoutTreeSnapshot.fromJson(Map<String, dynamic> json) {
     return LayoutTreeSnapshot(
@@ -976,6 +993,21 @@ class LayoutTreeSnapshot {
           (json['bounds'] as List).map((e) => Rectangle.fromJson(e)).toList(),
       text: (json['text'] as List).map((e) => StringIndex.fromJson(e)).toList(),
       stackingContexts: RareBooleanData.fromJson(json['stackingContexts']),
+      offsetRects: json.containsKey('offsetRects')
+          ? (json['offsetRects'] as List)
+              .map((e) => Rectangle.fromJson(e))
+              .toList()
+          : null,
+      scrollRects: json.containsKey('scrollRects')
+          ? (json['scrollRects'] as List)
+              .map((e) => Rectangle.fromJson(e))
+              .toList()
+          : null,
+      clientRects: json.containsKey('clientRects')
+          ? (json['clientRects'] as List)
+              .map((e) => Rectangle.fromJson(e))
+              .toList()
+          : null,
     );
   }
 
@@ -987,14 +1019,23 @@ class LayoutTreeSnapshot {
       'text': text.map((e) => e.toJson()).toList(),
       'stackingContexts': stackingContexts.toJson(),
     };
+    if (offsetRects != null) {
+      json['offsetRects'] = offsetRects.map((e) => e.toJson()).toList();
+    }
+    if (scrollRects != null) {
+      json['scrollRects'] = scrollRects.map((e) => e.toJson()).toList();
+    }
+    if (clientRects != null) {
+      json['clientRects'] = clientRects.map((e) => e.toJson()).toList();
+    }
     return json;
   }
 }
 
-/// Details of post layout rendered text positions. The exact layout should not be regarded as
+/// Table of details of the post layout rendered text positions. The exact layout should not be regarded as
 /// stable and may change between versions.
 class TextBoxSnapshot {
-  /// Intex of th elayout tree node that owns this box collection.
+  /// Index of the layout tree node that owns this box collection.
   final List<int> layoutIndex;
 
   /// The absolute position bounding box.

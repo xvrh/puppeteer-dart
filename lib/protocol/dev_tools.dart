@@ -40,6 +40,7 @@ import 'target.dart';
 import 'tethering.dart';
 import 'tracing.dart';
 import 'web_audio.dart';
+import 'web_authn.dart';
 
 class DevTools {
   final Client client;
@@ -199,6 +200,11 @@ class DevTools {
   /// https://webaudio.github.io/web-audio-api/
   WebAudioApi get webAudio => _webAudio ??= WebAudioApi(client);
   WebAudioApi _webAudio;
+
+  /// This domain allows configuring virtual authenticators to test the WebAuthn
+  /// API.
+  WebAuthnApi get webAuthn => _webAuthn ??= WebAuthnApi(client);
+  WebAuthnApi _webAuthn;
 
   /// Debugger domain exposes JavaScript debugging capabilities. It allows setting and removing
   /// breakpoints, stepping through execution, exploring stack traces, etc.
