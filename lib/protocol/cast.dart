@@ -11,10 +11,10 @@ class CastApi {
 
   /// This is fired whenever the list of available sinks changes. A sink is a
   /// device or a software surface that you can cast to.
-  Stream<List<String>> get onSinksUpdated => _client.onEvent
+  Stream<List<Sink>> get onSinksUpdated => _client.onEvent
       .where((event) => event.name == 'Cast.sinksUpdated')
-      .map((event) => (event.parameters['sinkNames'] as List)
-          .map((e) => e as String)
+      .map((event) => (event.parameters['sinks'] as List)
+          .map((e) => Sink.fromJson(e))
           .toList());
 
   /// This is fired whenever the outstanding issue/error message changes.
