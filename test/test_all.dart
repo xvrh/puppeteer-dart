@@ -22,6 +22,7 @@ import 'keyboard_test.dart' as keyboard_test;
 import 'mouse_test.dart' as mouse_test;
 import 'navigation_test.dart' as navigation_test;
 import 'network_test.dart' as network_test;
+import 'oopif_test.dart' as oopif_test;
 import 'page_test.dart' as page_test;
 import 'query_selector_test.dart' as query_selector_test;
 import 'readme_test.dart' as readme_test;
@@ -49,6 +50,7 @@ main() {
   group('emulation_test', emulation_test.main);
   group('to_comment_test', to_comment_test.main);
   group('frame_test', frame_test.main);
+  group('oopif_test', oopif_test.main);
   group('screenshot_test', screenshot_test.main);
   group('query_selector_test', query_selector_test.main);
   group('javascript_parser_test', javascript_parser_test.main);

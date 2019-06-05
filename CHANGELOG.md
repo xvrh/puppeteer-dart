@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.7.2 (2019-06-05)
+- Update Chromium version to 662092
+
 ## 1.7.1 (2019-05-27)
 - Enable more Dart lints
 
