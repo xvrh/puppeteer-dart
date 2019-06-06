@@ -43,9 +43,8 @@ final List<String> _defaultArgs = <String>[
 
 final List<String> _headlessArgs = [
   '--headless',
-  if (Platform.isWindows) '--disable-gpu',
   '--hide-scrollbars',
-  '--mute-audio'
+  '--mute-audio',
 ];
 
 final puppeteer = Puppeteer._();

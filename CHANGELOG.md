@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.3 (2019-06-06)
+- Update Chromium version to 666595
+- Remove --disable-gpu flag passed to Chromium on Windows
+
 ## 1.7.2 (2019-06-05)
 - Update Chromium version to 662092
 
