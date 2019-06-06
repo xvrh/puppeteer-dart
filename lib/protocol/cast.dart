@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// A domain for interacting with Cast, Presentation API, and Remote Playback API
@@ -10,10 +11,10 @@ class CastApi {
 
   /// This is fired whenever the list of available sinks changes. A sink is a
   /// device or a software surface that you can cast to.
-  Stream<List<String>> get onSinksUpdated => _client.onEvent
+  Stream<List<Sink>> get onSinksUpdated => _client.onEvent
       .where((event) => event.name == 'Cast.sinksUpdated')
-      .map((event) => (event.parameters['sinkNames'] as List)
-          .map((e) => e as String)
+      .map((event) => (event.parameters['sinks'] as List)
+          .map((e) => Sink.fromJson(e))
           .toList());
 
   /// This is fired whenever the outstanding issue/error message changes.
@@ -63,5 +64,36 @@ class CastApi {
       'sinkName': sinkName,
     };
     await _client.send('Cast.stopCasting', parameters);
+  }
+}
+
+class Sink {
+  final String name;
+
+  final String id;
+
+  /// Text describing the current session. Present only if there is an active
+  /// session on the sink.
+  final String session;
+
+  Sink({@required this.name, @required this.id, this.session});
+
+  factory Sink.fromJson(Map<String, dynamic> json) {
+    return Sink(
+      name: json['name'],
+      id: json['id'],
+      session: json.containsKey('session') ? json['session'] : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
+      'name': name,
+      'id': id,
+    };
+    if (session != null) {
+      json['session'] = session;
+    }
+    return json;
   }
 }

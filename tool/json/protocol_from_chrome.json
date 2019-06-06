@@ -2905,6 +2905,28 @@
             "domain": "Cast",
             "description": "A domain for interacting with Cast, Presentation API, and Remote Playback API\nfunctionalities.",
             "experimental": true,
+            "types": [
+                {
+                    "id": "Sink",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "name": "id",
+                            "type": "string"
+                        },
+                        {
+                            "name": "session",
+                            "description": "Text describing the current session. Present only if there is an active\nsession on the sink.",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
             "commands": [
                 {
                     "name": "enable",
@@ -2958,10 +2980,10 @@
                     "description": "This is fired whenever the list of available sinks changes. A sink is a\ndevice or a software surface that you can cast to.",
                     "parameters": [
                         {
-                            "name": "sinkNames",
+                            "name": "sinks",
                             "type": "array",
                             "items": {
-                                "type": "string"
+                                "$ref": "Sink"
                             }
                         }
                     ]
@@ -5130,12 +5152,13 @@
                         },
                         {
                             "name": "scrollOffsetX",
-                            "description": "Scroll offsets.",
+                            "description": "Horizontal scroll offset.",
                             "optional": true,
                             "type": "number"
                         },
                         {
                             "name": "scrollOffsetY",
+                            "description": "Vertical scroll offset.",
                             "optional": true,
                             "type": "number"
                         }
@@ -5258,12 +5281,12 @@
                 },
                 {
                     "id": "LayoutTreeSnapshot",
-                    "description": "Details of an element in the DOM tree with a LayoutObject.",
+                    "description": "Table of details of an element in the DOM tree with a LayoutObject.",
                     "type": "object",
                     "properties": [
                         {
                             "name": "nodeIndex",
-                            "description": "The index of the related DOM node in the `domNodes` array returned by `getSnapshot`.",
+                            "description": "Index of the corresponding node in the `NodeTreeSnapshot` array returned by `captureSnapshot`.",
                             "type": "array",
                             "items": {
                                 "type": "integer"
@@ -5271,7 +5294,7 @@
                         },
                         {
                             "name": "styles",
-                            "description": "Index into the `computedStyles` array returned by `captureSnapshot`.",
+                            "description": "Array of indexes specifying computed style strings, filtered according to the `computedStyles` parameter passed to `captureSnapshot`.",
                             "type": "array",
                             "items": {
                                 "$ref": "ArrayOfStrings"
@@ -5302,12 +5325,12 @@
                 },
                 {
                     "id": "TextBoxSnapshot",
-                    "description": "Details of post layout rendered text positions. The exact layout should not be regarded as\nstable and may change between versions.",
+                    "description": "Table of details of the post layout rendered text positions. The exact layout should not be regarded as\nstable and may change between versions.",
                     "type": "object",
                     "properties": [
                         {
                             "name": "layoutIndex",
-                            "description": "Intex of th elayout tree node that owns this box collection.",
+                            "description": "Index of the layout tree node that owns this box collection.",
                             "type": "array",
                             "items": {
                                 "type": "integer"
@@ -6120,6 +6143,18 @@
                             "name": "virtualTimeTicksBase",
                             "description": "Absolute timestamp at which virtual time was first enabled (up time in milliseconds).",
                             "type": "number"
+                        }
+                    ]
+                },
+                {
+                    "name": "setTimezoneOverride",
+                    "description": "Overrides default host system timezone with the specified one.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "timezoneId",
+                            "description": "The timezone identifier. If empty, disables the override and\nrestores default host system timezone.",
+                            "type": "string"
                         }
                     ]
                 },
@@ -8620,6 +8655,12 @@
                         {
                             "name": "fromServiceWorker",
                             "description": "Specifies that the request was served from the ServiceWorker.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "fromPrefetchCache",
+                            "description": "Specifies that the request was served from the prefetch cache.",
                             "optional": true,
                             "type": "boolean"
                         },
@@ -13646,6 +13687,18 @@
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "newWindow",
+                            "description": "Whether to create a new Window or Tab (chrome-only, false by default).",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "background",
+                            "description": "Whether to create the target in background or foreground (chrome-only,\nfalse by default).",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ],
                     "returns": [
@@ -14748,6 +14801,21 @@
                             "$ref": "BaseAudioContext"
                         }
                     ]
+                }
+            ]
+        },
+        {
+            "domain": "WebAuthn",
+            "description": "This domain allows configuring virtual authenticators to test the WebAuthn\nAPI.",
+            "experimental": true,
+            "commands": [
+                {
+                    "name": "enable",
+                    "description": "Enable the WebAuthn domain and start intercepting credential storage and\nretrieval with a virtual authenticator."
+                },
+                {
+                    "name": "disable",
+                    "description": "Disable the WebAuthn domain."
                 }
             ]
         },

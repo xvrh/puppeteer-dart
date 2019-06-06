@@ -308,6 +308,21 @@ main() {
       expect(requests.length, equals(1));
       expect(requests[0].url, equals(dataURL));
     });
+    test('should be able to fetch dataURL and fire dataURL requests', () async {
+      await page.goto(server.emptyPage);
+      await page.setRequestInterception(true);
+      var requests = <Request>[];
+      page.onRequest.listen((request) {
+        requests.add(request);
+        request.continueRequest();
+      });
+      var dataURL = 'data:text/html,<div>yo</div>';
+      var text = await page
+          .evaluate('url => fetch(url).then(r => r.text())', args: [dataURL]);
+      expect(requests, hasLength(1));
+      expect(requests[0].url, equals(dataURL));
+      expect(text, equals('<div>yo</div>'));
+    });
     test('should navigate to URL with hash and and fire requests without hash',
         () async {
       await page.setRequestInterception(true);

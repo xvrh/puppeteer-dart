@@ -266,6 +266,16 @@ class EmulationApi {
     return result['virtualTimeTicksBase'];
   }
 
+  /// Overrides default host system timezone with the specified one.
+  /// [timezoneId] The timezone identifier. If empty, disables the override and
+  /// restores default host system timezone.
+  Future<void> setTimezoneOverride(String timezoneId) async {
+    var parameters = <String, dynamic>{
+      'timezoneId': timezoneId,
+    };
+    await _client.send('Emulation.setTimezoneOverride', parameters);
+  }
+
   /// Resizes the frame/viewport of the page. Note that this does not affect the frame's container
   /// (e.g. browser window). Can be used to produce screenshots of the specified size. Not supported
   /// on Android.

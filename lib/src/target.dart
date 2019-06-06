@@ -50,6 +50,8 @@ class Target {
 
   String get url => _info.url;
 
+  TargetInfo get targetInfo => _info;
+
   /// Identifies what kind of target this is.
   /// Can be `"page"`, [`"background_page"`](https://developer.chrome.com/extensions/background_pages),
   /// `"service_worker"`, `"shared_worker"`, `"browser"` or `"other"`.
