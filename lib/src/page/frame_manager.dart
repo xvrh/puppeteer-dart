@@ -395,9 +395,13 @@ class Frame {
   /// - the `timeout` is exceeded during navigation.
   /// - the main resource failed to load.
   ///
-  /// > **NOTE** [Frame.goto] either throw or return a main resource response.
-  /// The only exceptions are navigation to `about:blank` or navigation to the
-  /// same URL with a different hash, which would succeed and return `null`.
+  /// `page.goto` will not throw an error when any valid HTTP status code is
+  ///  returned by the remote server, including 404 "Not Found" and 500 "Internal Server Error".
+  ///  The status code for such responses can be retrieved by calling [response.status].
+  ///
+  /// > **NOTE** `page.goto` either throws an error or returns a main resource response.
+  ///  The only exceptions are navigation to `about:blank` or navigation to the
+  ///  same URL with a different hash, which would succeed and return `null`.
   ///
   /// > **NOTE** Headless mode doesn't support navigation to a PDF document. See
   /// the [upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=761295).

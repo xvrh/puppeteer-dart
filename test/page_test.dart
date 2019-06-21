@@ -934,6 +934,16 @@ main() {
       expect(await page.evaluate('() => result.onInput'), equals(['blue']));
       expect(await page.evaluate('() => result.onChange'), equals(['blue']));
     });
+    test('should not throw when select causes navigation', () async {
+      await page.goto(server.prefix + '/input/select.html');
+      await page.$eval('select',
+          " select => select.addEventListener('input', () => window.location = '/empty.html')");
+      await Future.wait([
+        page.select('select', ['blue']),
+        page.waitForNavigation(),
+      ]);
+      expect(page.url, contains('empty.html'));
+    });
     test('should select multiple options', () async {
       await page.goto(server.prefix + '/input/select.html');
       await page.evaluate('() => makeMultiple()');

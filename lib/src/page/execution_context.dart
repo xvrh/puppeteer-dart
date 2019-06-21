@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:meta/meta.dart';
+
 import '../../protocol/dom.dart';
 import '../../protocol/page.dart';
 import '../../protocol/runtime.dart';
@@ -6,6 +8,7 @@ import '../connection.dart';
 import '../javascript_function_parser.dart';
 import 'dom_world.dart';
 import 'frame_manager.dart';
+import 'helper.dart';
 import 'js_handle.dart';
 import 'page.dart';
 
@@ -71,15 +74,20 @@ class ExecutionContext {
   /// Returns [Future] which resolves to the return value of `pageFunction`
   Future<T> evaluate<T>(@Language('js') String pageFunction,
       {List args}) async {
-    var handle = await evaluateHandle(pageFunction, args: args);
-    T result = await handle.jsonValue.catchError((_) => null, test: (error) {
-      return error is ServerException &&
+    try {
+      T result = await _evaluateInternal(pageFunction,
+          args: args, returnByValue: true);
+      return result;
+    } catch (error) {
+      if (error is ServerException &&
           (error.message.contains('Object reference chain is too long') ||
-              error.message.contains('Object couldn\'t be returned by value'));
-    });
-
-    await handle.dispose();
-    return result;
+              error.message
+                  .contains('Object couldn\'t be returned by value'))) {
+        return null;
+      } else {
+        rethrow;
+      }
+    }
   }
 
   /// The only difference between `executionContext.evaluate` and
@@ -113,7 +121,11 @@ class ExecutionContext {
   /// await resultHandle.dispose();
   /// ```
   Future<JsHandle> evaluateHandle(@Language('js') String pageFunction,
-      {List args}) async {
+          {List args}) async =>
+      await _evaluateInternal(pageFunction, args: args, returnByValue: false);
+
+  Future<dynamic> _evaluateInternal(@Language('js') String pageFunction,
+      {List args, @required bool returnByValue}) async {
     // Try to convert a function shorthand (ie: '(el) => el.value;' to a full
     // function declaration (function(el) { return el.value; })
     // If it can't parse the shorthand function, it considers it as a
@@ -133,7 +145,7 @@ class ExecutionContext {
 
         var response = await runtimeApi.evaluate(pageFunctionWithSourceUrl,
             contextId: context.id,
-            returnByValue: false,
+            returnByValue: returnByValue,
             awaitPromise: true,
             userGesture: true);
 
@@ -141,7 +153,9 @@ class ExecutionContext {
           throw ClientError(response.exceptionDetails);
         }
 
-        return _createJsHandle(response.result);
+        return returnByValue
+            ? valueFromRemoteObject(response.result)
+            : _createJsHandle(response.result);
       } else {
         args ??= [];
 
@@ -149,7 +163,7 @@ class ExecutionContext {
             '$functionDeclaration\n$suffix\n',
             executionContextId: context.id,
             arguments: args.map(_convertArgument).toList(),
-            returnByValue: false,
+            returnByValue: returnByValue,
             awaitPromise: true,
             userGesture: true);
 
@@ -157,7 +171,9 @@ class ExecutionContext {
           throw ClientError(result.exceptionDetails);
         }
 
-        return _createJsHandle(result.result);
+        return returnByValue
+            ? valueFromRemoteObject(result.result)
+            : _createJsHandle(result.result);
       }
     } on ServerException catch (e) {
       if (e.message.contains('Cannot find context with specified id') ||

@@ -7,8 +7,6 @@ import 'model.dart';
 import 'utils/split_words.dart';
 import 'utils/string_helpers.dart';
 
-// ignore_for_file:omit_local_variable_types
-
 Protocol _readProtocol(String fileName) {
   return Protocol.fromString(
       File.fromUri(Platform.script.resolve(p.posix.join('json', fileName)))

@@ -39,6 +39,47 @@ class WebAuthnApi {
     };
     await _client.send('WebAuthn.removeVirtualAuthenticator', parameters);
   }
+
+  /// Adds the credential to the specified authenticator.
+  Future<void> addCredential(
+      AuthenticatorId authenticatorId, Credential credential) async {
+    var parameters = <String, dynamic>{
+      'authenticatorId': authenticatorId.toJson(),
+      'credential': credential.toJson(),
+    };
+    await _client.send('WebAuthn.addCredential', parameters);
+  }
+
+  /// Returns all the credentials stored in the given virtual authenticator.
+  Future<List<Credential>> getCredentials(
+      AuthenticatorId authenticatorId) async {
+    var parameters = <String, dynamic>{
+      'authenticatorId': authenticatorId.toJson(),
+    };
+    var result = await _client.send('WebAuthn.getCredentials', parameters);
+    return (result['credentials'] as List)
+        .map((e) => Credential.fromJson(e))
+        .toList();
+  }
+
+  /// Clears all the credentials from the specified device.
+  Future<void> clearCredentials(AuthenticatorId authenticatorId) async {
+    var parameters = <String, dynamic>{
+      'authenticatorId': authenticatorId.toJson(),
+    };
+    await _client.send('WebAuthn.clearCredentials', parameters);
+  }
+
+  /// Sets whether User Verification succeeds or fails for an authenticator.
+  /// The default is true.
+  Future<void> setUserVerified(
+      AuthenticatorId authenticatorId, bool isUserVerified) async {
+    var parameters = <String, dynamic>{
+      'authenticatorId': authenticatorId.toJson(),
+      'isUserVerified': isUserVerified,
+    };
+    await _client.send('WebAuthn.setUserVerified', parameters);
+  }
 }
 
 class AuthenticatorId {
@@ -132,11 +173,16 @@ class VirtualAuthenticatorOptions {
 
   final bool hasUserVerification;
 
+  /// If set to true, tests of user presence will succeed immediately.
+  /// Otherwise, they will not be resolved. Defaults to true.
+  final bool automaticPresenceSimulation;
+
   VirtualAuthenticatorOptions(
       {@required this.protocol,
       @required this.transport,
       @required this.hasResidentKey,
-      @required this.hasUserVerification});
+      @required this.hasUserVerification,
+      this.automaticPresenceSimulation});
 
   factory VirtualAuthenticatorOptions.fromJson(Map<String, dynamic> json) {
     return VirtualAuthenticatorOptions(
@@ -144,6 +190,10 @@ class VirtualAuthenticatorOptions {
       transport: AuthenticatorTransport.fromJson(json['transport']),
       hasResidentKey: json['hasResidentKey'],
       hasUserVerification: json['hasUserVerification'],
+      automaticPresenceSimulation:
+          json.containsKey('automaticPresenceSimulation')
+              ? json['automaticPresenceSimulation']
+              : null,
     );
   }
 
@@ -153,6 +203,51 @@ class VirtualAuthenticatorOptions {
       'transport': transport.toJson(),
       'hasResidentKey': hasResidentKey,
       'hasUserVerification': hasUserVerification,
+    };
+    if (automaticPresenceSimulation != null) {
+      json['automaticPresenceSimulation'] = automaticPresenceSimulation;
+    }
+    return json;
+  }
+}
+
+class Credential {
+  final String credentialId;
+
+  /// SHA-256 hash of the Relying Party ID the credential is scoped to. Must
+  /// be 32 bytes long.
+  /// See https://w3c.github.io/webauthn/#rpidhash
+  final String rpIdHash;
+
+  /// The private key in PKCS#8 format.
+  final String privateKey;
+
+  /// Signature counter. This is incremented by one for each successful
+  /// assertion.
+  /// See https://w3c.github.io/webauthn/#signature-counter
+  final int signCount;
+
+  Credential(
+      {@required this.credentialId,
+      @required this.rpIdHash,
+      @required this.privateKey,
+      @required this.signCount});
+
+  factory Credential.fromJson(Map<String, dynamic> json) {
+    return Credential(
+      credentialId: json['credentialId'],
+      rpIdHash: json['rpIdHash'],
+      privateKey: json['privateKey'],
+      signCount: json['signCount'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
+      'credentialId': credentialId,
+      'rpIdHash': rpIdHash,
+      'privateKey': privateKey,
+      'signCount': signCount,
     };
     return json;
   }

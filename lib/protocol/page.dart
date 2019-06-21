@@ -4,6 +4,7 @@ import '../src/connection.dart';
 import 'debugger.dart' as debugger;
 import 'dom.dart' as dom;
 import 'emulation.dart' as emulation;
+import 'io.dart' as io;
 import 'network.dart' as network;
 import 'runtime.dart' as runtime;
 
@@ -411,8 +412,8 @@ class PageApi {
   /// [footerTemplate] HTML template for the print footer. Should use the same format as the `headerTemplate`.
   /// [preferCSSPageSize] Whether or not to prefer page size as defined by css. Defaults to false,
   /// in which case the content will be scaled to fit the paper size.
-  /// Returns: Base64-encoded pdf data.
-  Future<String> printToPDF(
+  /// [transferMode] return as stream
+  Future<PrintToPDFResult> printToPDF(
       {bool landscape,
       bool displayHeaderFooter,
       bool printBackground,
@@ -427,7 +428,10 @@ class PageApi {
       bool ignoreInvalidPageRanges,
       String headerTemplate,
       String footerTemplate,
-      bool preferCSSPageSize}) async {
+      bool preferCSSPageSize,
+      @Enum(['ReturnAsBase64', 'ReturnAsStream']) String transferMode}) async {
+    assert(transferMode == null ||
+        const ['ReturnAsBase64', 'ReturnAsStream'].contains(transferMode));
     var parameters = <String, dynamic>{};
     if (landscape != null) {
       parameters['landscape'] = landscape;
@@ -474,8 +478,11 @@ class PageApi {
     if (preferCSSPageSize != null) {
       parameters['preferCSSPageSize'] = preferCSSPageSize;
     }
+    if (transferMode != null) {
+      parameters['transferMode'] = transferMode;
+    }
     var result = await _client.send('Page.printToPDF', parameters);
-    return result['data'];
+    return PrintToPDFResult.fromJson(result);
   }
 
   /// Reloads given page optionally ignoring the cache.
@@ -1208,6 +1215,25 @@ class NavigateResult {
   }
 }
 
+class PrintToPDFResult {
+  /// Base64-encoded pdf data. Empty if |returnAsStream| is specified.
+  final String data;
+
+  /// A handle of the stream that holds resulting PDF data.
+  final io.StreamHandle stream;
+
+  PrintToPDFResult({@required this.data, this.stream});
+
+  factory PrintToPDFResult.fromJson(Map<String, dynamic> json) {
+    return PrintToPDFResult(
+      data: json['data'],
+      stream: json.containsKey('stream')
+          ? io.StreamHandle.fromJson(json['stream'])
+          : null,
+    );
+  }
+}
+
 /// Unique frame identifier.
 class FrameId {
   final String value;
@@ -1243,8 +1269,11 @@ class FrameInfo {
   /// Frame's name as specified in the tag.
   final String name;
 
-  /// Frame document's URL.
+  /// Frame document's URL without fragment.
   final String url;
+
+  /// Frame document's URL fragment including the '#'.
+  final String urlFragment;
 
   /// Frame document's security origin.
   final String securityOrigin;
@@ -1252,7 +1281,7 @@ class FrameInfo {
   /// Frame document's mimeType as determined by the browser.
   final String mimeType;
 
-  /// If the frame failed to load, this contains the URL that could not be loaded.
+  /// If the frame failed to load, this contains the URL that could not be loaded. Note that unlike url above, this URL may contain a fragment.
   final String unreachableUrl;
 
   FrameInfo(
@@ -1261,6 +1290,7 @@ class FrameInfo {
       @required this.loaderId,
       this.name,
       @required this.url,
+      this.urlFragment,
       @required this.securityOrigin,
       @required this.mimeType,
       this.unreachableUrl});
@@ -1272,6 +1302,7 @@ class FrameInfo {
       loaderId: network.LoaderId.fromJson(json['loaderId']),
       name: json.containsKey('name') ? json['name'] : null,
       url: json['url'],
+      urlFragment: json.containsKey('urlFragment') ? json['urlFragment'] : null,
       securityOrigin: json['securityOrigin'],
       mimeType: json['mimeType'],
       unreachableUrl:
@@ -1292,6 +1323,9 @@ class FrameInfo {
     }
     if (name != null) {
       json['name'] = name;
+    }
+    if (urlFragment != null) {
+      json['urlFragment'] = urlFragment;
     }
     if (unreachableUrl != null) {
       json['unreachableUrl'] = unreachableUrl;
