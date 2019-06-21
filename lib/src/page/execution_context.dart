@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:meta/meta.dart';
-
 import '../../protocol/dom.dart';
 import '../../protocol/page.dart';
 import '../../protocol/runtime.dart';

@@ -469,8 +469,8 @@ class Request {
                 .map((e) => fetch.HeaderEntry(
                     name: e.key.toLowerCase(), value: e.value))
                 .toList(),
-        responsePhrase: _statusTexts[response.status ?? 200],
-        body: body != null ? base64.encode(bodyBytes) : null)
+            responsePhrase: _statusTexts[status ?? 200],
+            body: body != null ? base64.encode(bodyBytes) : null)
         .catchError((error) {
       // In certain cases, protocol will return error if the request was already canceled
       // or the page was closed. We should tolerate these errors.

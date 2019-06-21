@@ -1467,6 +1467,8 @@ function deliverError(name, seq, message, stack) {
     margins ??= PdfMargins.zero;
 
     var result = await devTools.page.printToPDF(
+        // TODO(xha): use ReturnAsStream
+        transferMode: 'ReturnAsBase64',
         landscape: landscape,
         displayHeaderFooter: displayHeaderFooter,
         headerTemplate: headerTemplate,
@@ -1481,8 +1483,8 @@ function deliverError(name, seq, message, stack) {
         marginRight: margins.right,
         pageRanges: pageRanges,
         preferCSSPageSize: preferCssPageSize);
-    return null;
-    //return base64Decode(result);
+
+    return base64Decode(result.data);
   }
 
   /// The page's title.
