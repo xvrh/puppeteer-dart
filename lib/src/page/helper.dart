@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import '../../protocol/io.dart';
 import '../../protocol/runtime.dart';
 import '../javascript_function_parser.dart';
 
@@ -42,4 +44,18 @@ Future<void> releaseObject(
     RuntimeApi runtimeApi, RemoteObject remoteObject) async {
   if (remoteObject.objectId == null) return;
   await runtimeApi.releaseObject(remoteObject.objectId);
+}
+
+Future<void> readStream(IOApi io, StreamHandle stream, IOSink output) async {
+  ReadResult response;
+  var base64Sink = Base64Decoder().startChunkedConversion(output);
+  do {
+    response = await io.read(stream);
+    if (response.base64Encoded) {
+      base64Sink.add(response.data);
+    } else {
+      output.write(response.data);
+    }
+  } while (!response.eof);
+  await io.close(stream);
 }

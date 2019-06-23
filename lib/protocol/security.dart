@@ -94,9 +94,6 @@ class SecurityStateChangedEvent {
   /// Security state.
   final SecurityState securityState;
 
-  /// True if the page was loaded over cryptographic transport such as HTTPS.
-  final bool schemeIsCryptographic;
-
   /// List of explanations for the security state. If the overall security state is `insecure` or
   /// `warning`, at least one corresponding explanation should be included.
   final List<SecurityStateExplanation> explanations;
@@ -106,14 +103,12 @@ class SecurityStateChangedEvent {
 
   SecurityStateChangedEvent(
       {@required this.securityState,
-      @required this.schemeIsCryptographic,
       @required this.explanations,
       this.summary});
 
   factory SecurityStateChangedEvent.fromJson(Map<String, dynamic> json) {
     return SecurityStateChangedEvent(
       securityState: SecurityState.fromJson(json['securityState']),
-      schemeIsCryptographic: json['schemeIsCryptographic'],
       explanations: (json['explanations'] as List)
           .map((e) => SecurityStateExplanation.fromJson(e))
           .toList(),

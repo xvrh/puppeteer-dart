@@ -69,13 +69,11 @@ class Tracing {
   }
 
   Future<void> _readStream(StreamHandle handle, StringSink output) async {
-    var eof = false;
-
-    while (!eof) {
-      var response = await _devTools.io.read(handle);
-      eof = response.eof;
-      output.write(response.data);
-    }
+    ReadResult result;
+    do {
+      result = await _devTools.io.read(handle);
+      output.write(result.data);
+    } while (!result.eof);
     await _devTools.io.close(handle);
   }
 }

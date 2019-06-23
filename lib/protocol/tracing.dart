@@ -120,6 +120,10 @@ class BufferUsageEvent {
 }
 
 class TracingCompleteEvent {
+  /// Indicates whether some trace data is known to have been lost, e.g. because the trace ring
+  /// buffer wrapped around.
+  final bool dataLossOccurred;
+
   /// A handle of the stream that holds resulting trace data.
   final io.StreamHandle stream;
 
@@ -129,10 +133,15 @@ class TracingCompleteEvent {
   /// Compression format of returned stream.
   final StreamCompression streamCompression;
 
-  TracingCompleteEvent({this.stream, this.traceFormat, this.streamCompression});
+  TracingCompleteEvent(
+      {@required this.dataLossOccurred,
+      this.stream,
+      this.traceFormat,
+      this.streamCompression});
 
   factory TracingCompleteEvent.fromJson(Map<String, dynamic> json) {
     return TracingCompleteEvent(
+      dataLossOccurred: json['dataLossOccurred'],
       stream: json.containsKey('stream')
           ? io.StreamHandle.fromJson(json['stream'])
           : null,

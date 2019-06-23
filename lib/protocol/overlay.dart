@@ -214,6 +214,15 @@ class OverlayApi {
     await _client.send('Overlay.setShowPaintRects', parameters);
   }
 
+  /// Requests that backend shows layout shift regions
+  /// [result] True for showing layout shift regions
+  Future<void> setShowLayoutShiftRegions(bool result) async {
+    var parameters = <String, dynamic>{
+      'result': result,
+    };
+    await _client.send('Overlay.setShowLayoutShiftRegions', parameters);
+  }
+
   /// Requests that backend shows scroll bottleneck rects
   /// [show] True for showing scroll bottleneck rects
   Future<void> setShowScrollBottleneckRects(bool show) async {

@@ -325,6 +325,8 @@ class PermissionType {
   static const sensors = PermissionType._('sensors');
   static const videoCapture = PermissionType._('videoCapture');
   static const idleDetection = PermissionType._('idleDetection');
+  static const wakeLockScreen = PermissionType._('wakeLockScreen');
+  static const wakeLockSystem = PermissionType._('wakeLockSystem');
   static const values = {
     'accessibilityEvents': accessibilityEvents,
     'audioCapture': audioCapture,
@@ -344,6 +346,8 @@ class PermissionType {
     'sensors': sensors,
     'videoCapture': videoCapture,
     'idleDetection': idleDetection,
+    'wakeLockScreen': wakeLockScreen,
+    'wakeLockSystem': wakeLockSystem,
   };
 
   final String value;

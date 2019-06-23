@@ -891,7 +891,9 @@ for calling two methods:
 
 To aid emulation, puppeteer provides a list of device descriptors which can
  be obtained via the [puppeteer.devices].
-Below is an example of emulating an iPhone 6 in puppeteer:
+
+`page.emulate` will resize the page. A lot of websites don't expect phones
+to change size, so you should emulate before navigating to the page.
 
 ```dart
 var iPhone = puppeteer.devices.iPhone6;
@@ -1183,9 +1185,13 @@ The [Page.goto] will throw an error if:
 - the `timeout` is exceeded during navigation.
 - the main resource failed to load.
 
-> **NOTE** [Page.goto] either throw or return a main resource response.
-The only exceptions are navigation to `about:blank` or navigation to the
-same URL with a different hash, which would succeed and return `null`.
+`page.goto` will not throw an error when any valid HTTP status code is
+ returned by the remote server, including 404 "Not Found" and 500 "Internal Server Error".
+ The status code for such responses can be retrieved by calling [response.status].
+
+> **NOTE** `page.goto` either throws an error or returns a main resource response.
+ The only exceptions are navigation to `about:blank` or navigation to the
+ same URL with a different hash, which would succeed and return `null`.
 
 > **NOTE** Headless mode doesn't support navigation to a PDF document. See
 the [upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=761295).
@@ -1440,8 +1446,7 @@ property to force rendering of exact colors.
 ```dart
 // Generates a PDF with 'screen' media type.
 await page.emulateMedia('screen');
-var pdfBytes = await page.pdf();
-await File('page.pdf').writeAsBytes(pdfBytes);
+await page.pdf(output: File('page.pdf').openWrite());
 ```
 
 Parameters:
@@ -1466,8 +1471,13 @@ Parameters:
 - [preferCssPageSize]: Give any CSS `@page` size declared in the page
   priority over what is declared in [format]. Defaults to `false`,
   which will scale the content to fit the paper size.
+- [output] an IOSink where to write the PDF bytes. This parameter is optional,
+  if it is not provided, the bytes are returned as an in-memory list of bytes
+  from the function.
 
-Returns: [Future<Uint8List>] which resolves with PDF bytes.
+If [output] parameter is null, this returns a [Future<Uint8List>]
+which resolves with PDF bytes. If [output] is not null, the method return null
+and the PDF bytes are written in the [output] sink.
 
 > **NOTE** `headerTemplate` and `footerTemplate` markup have the following
 limitations:
@@ -1475,7 +1485,7 @@ limitations:
 > 2. Page styles are not visible inside templates.
 
 ```dart
-page.pdf({PaperFormat format, num scale, bool displayHeaderFooter, String headerTemplate, String footerTemplate, bool printBackground, bool landscape, String pageRanges, bool preferCssPageSize, PdfMargins margins}) → Future<Uint8List> 
+page.pdf({PaperFormat format, num scale, bool displayHeaderFooter, String headerTemplate, String footerTemplate, bool printBackground, bool landscape, String pageRanges, bool preferCssPageSize, PdfMargins margins, IOSink output}) → Future<Uint8List> 
 ```
 
 #### page.queryObjects(JsHandle prototypeHandle)
@@ -2650,9 +2660,13 @@ The [Frame.goto] will throw an error if:
 - the `timeout` is exceeded during navigation.
 - the main resource failed to load.
 
-> **NOTE** [Frame.goto] either throw or return a main resource response.
-The only exceptions are navigation to `about:blank` or navigation to the
-same URL with a different hash, which would succeed and return `null`.
+`page.goto` will not throw an error when any valid HTTP status code is
+ returned by the remote server, including 404 "Not Found" and 500 "Internal Server Error".
+ The status code for such responses can be retrieved by calling [response.status].
+
+> **NOTE** `page.goto` either throws an error or returns a main resource response.
+ The only exceptions are navigation to `about:blank` or navigation to the
+ same URL with a different hash, which would succeed and return `null`.
 
 > **NOTE** Headless mode doesn't support navigation to a PDF document. See
 the [upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=761295).

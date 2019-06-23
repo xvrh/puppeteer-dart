@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.8.0+1 (2019-06-22)
+- Fix regression in `page.tracing`
+
+## 1.8.0 (2019-06-22)
+- Update Chromium version to 669486
+- Add an `IOSink` [output] parameter to [Page.pdf] as an alternative to returning the whole PDF bytes in memory.
+
 ## 1.7.3 (2019-06-06)
 - Update Chromium version to 666595
 - Remove --disable-gpu flag passed to Chromium on Windows

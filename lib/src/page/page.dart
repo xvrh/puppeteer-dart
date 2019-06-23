@@ -903,9 +903,13 @@ function deliverError(name, seq, message, stack) {
   /// - the `timeout` is exceeded during navigation.
   /// - the main resource failed to load.
   ///
-  /// > **NOTE** [Page.goto] either throw or return a main resource response.
-  /// The only exceptions are navigation to `about:blank` or navigation to the
-  /// same URL with a different hash, which would succeed and return `null`.
+  /// `page.goto` will not throw an error when any valid HTTP status code is
+  ///  returned by the remote server, including 404 "Not Found" and 500 "Internal Server Error".
+  ///  The status code for such responses can be retrieved by calling [response.status].
+  ///
+  /// > **NOTE** `page.goto` either throws an error or returns a main resource response.
+  ///  The only exceptions are navigation to `about:blank` or navigation to the
+  ///  same URL with a different hash, which would succeed and return `null`.
   ///
   /// > **NOTE** Headless mode doesn't support navigation to a PDF document. See
   /// the [upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=761295).
@@ -1127,7 +1131,9 @@ function deliverError(name, seq, message, stack) {
   ///
   /// To aid emulation, puppeteer provides a list of device descriptors which can
   ///  be obtained via the [puppeteer.devices].
-  /// Below is an example of emulating an iPhone 6 in puppeteer:
+  ///
+  /// `page.emulate` will resize the page. A lot of websites don't expect phones
+  /// to change size, so you should emulate before navigating to the page.
   ///
   /// ```dart
   /// var iPhone = puppeteer.devices.iPhone6;
@@ -1405,8 +1411,7 @@ function deliverError(name, seq, message, stack) {
   /// ```dart
   /// // Generates a PDF with 'screen' media type.
   /// await page.emulateMedia('screen');
-  /// var pdfBytes = await page.pdf();
-  /// await File('page.pdf').writeAsBytes(pdfBytes);
+  /// await page.pdf(output: File('page.pdf').openWrite());
   /// ```
   ///
   /// Parameters:
@@ -1431,8 +1436,13 @@ function deliverError(name, seq, message, stack) {
   /// - [preferCssPageSize]: Give any CSS `@page` size declared in the page
   ///   priority over what is declared in [format]. Defaults to `false`,
   ///   which will scale the content to fit the paper size.
+  /// - [output] an IOSink where to write the PDF bytes. This parameter is optional,
+  ///   if it is not provided, the bytes are returned as an in-memory list of bytes
+  ///   from the function.
   ///
-  /// Returns: [Future<Uint8List>] which resolves with PDF bytes.
+  /// If [output] parameter is null, this returns a [Future<Uint8List>]
+  /// which resolves with PDF bytes. If [output] is not null, the method return null
+  /// and the PDF bytes are written in the [output] sink.
   ///
   /// > **NOTE** `headerTemplate` and `footerTemplate` markup have the following
   /// limitations:
@@ -1448,7 +1458,8 @@ function deliverError(name, seq, message, stack) {
       bool landscape,
       String pageRanges,
       bool preferCssPageSize,
-      PdfMargins margins}) async {
+      PdfMargins margins,
+      IOSink output}) async {
     scale ??= 1;
     displayHeaderFooter ??= false;
     headerTemplate ??= '';
@@ -1461,6 +1472,7 @@ function deliverError(name, seq, message, stack) {
     margins ??= PdfMargins.zero;
 
     var result = await devTools.page.printToPDF(
+        transferMode: output == null ? 'ReturnAsBase64' : 'ReturnAsStream',
         landscape: landscape,
         displayHeaderFooter: displayHeaderFooter,
         headerTemplate: headerTemplate,
@@ -1476,7 +1488,13 @@ function deliverError(name, seq, message, stack) {
         pageRanges: pageRanges,
         preferCSSPageSize: preferCssPageSize);
 
-    return base64Decode(result);
+    if (output == null) {
+      return base64Decode(result.data);
+    } else {
+      await readStream(devTools.io, result.stream, output);
+      await output.close();
+      return null;
+    }
   }
 
   /// The page's title.
@@ -1865,8 +1883,8 @@ class PaperFormat {
   static const ledger = PaperFormat.inches(width: 17, height: 11);
   static const a0 = PaperFormat.inches(width: 33.1, height: 46.8);
   static const a1 = PaperFormat.inches(width: 23.4, height: 33.1);
-  static const a2 = PaperFormat.inches(width: 16.5, height: 23.4);
-  static const a3 = PaperFormat.inches(width: 11.7, height: 16.5);
+  static const a2 = PaperFormat.inches(width: 16.54, height: 23.4);
+  static const a3 = PaperFormat.inches(width: 11.7, height: 16.54);
   static const a4 = PaperFormat.inches(width: 8.27, height: 11.7);
   static const a5 = PaperFormat.inches(width: 5.83, height: 8.27);
   static const a6 = PaperFormat.inches(width: 4.13, height: 5.83);

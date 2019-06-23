@@ -496,7 +496,7 @@ main() {
   });
 
   group('Request.respond', () {
-    test('should workdddd', () async {
+    test('should work', () async {
       await page.setRequestInterception(true);
       page.onRequest.listen((request) {
         request.respond(
@@ -505,6 +505,17 @@ main() {
       var response = await page.goto(server.emptyPage);
       expect(response.status, equals(201));
       expect(response.headers['foo'], equals('bar'));
+      expect(await page.evaluate('() => document.body.textContent'),
+          equals('Yo, page!'));
+    });
+    test('should work with status code 422', () async {
+      await page.setRequestInterception(true);
+      page.onRequest.listen((request) {
+        request.respond(status: 422, body: 'Yo, page!');
+      });
+      var response = await page.goto(server.emptyPage);
+      expect(response.status, equals(422));
+      expect(response.statusText, equals('Unprocessable Entity'));
       expect(await page.evaluate('() => document.body.textContent'),
           equals('Yo, page!'));
     });

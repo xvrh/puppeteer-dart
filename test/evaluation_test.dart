@@ -250,6 +250,15 @@ main() {
       expect(() => executionContext.evaluate('() => null'),
           throwsA(predicate((e) => '$e'.contains('navigation'))));
     });
+    test('should not throw an error when evaluation does a navigation',
+        () async {
+      await page.goto(server.prefix + '/one-style.html');
+      var result = await page.evaluate('''() => {
+    window.location = '/empty.html';
+    return [42];
+    }''');
+      expect(result, equals([42]));
+    });
   });
 
   group('Page.evaluateOnNewDocument', () {
