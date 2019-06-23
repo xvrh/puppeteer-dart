@@ -1,7 +1,6 @@
 import 'dart:async';
 import '../../protocol/dev_tools.dart';
 import '../../protocol/io.dart';
-import 'helper.dart';
 
 /// You can use [tracing.start] and [tracing.stop] to create a trace file which
 /// can be opened in Chrome DevTools or [timeline viewer](https://chromedevtools.github.io/timeline-viewer/).
@@ -62,10 +61,19 @@ class Tracing {
   /// Promise which resolves to buffer with trace data.
   Future<void> stop(StringSink output) async {
     var contentFuture = _devTools.tracing.onTracingComplete.first
-        .then((e) => readStream(_devTools.io, e.stream, output));
+        .then((e) => _readStream(e.stream, output));
     await _devTools.tracing.end();
 
     _recording = false;
     return contentFuture;
+  }
+
+  Future<void> _readStream(StreamHandle handle, StringSink output) async {
+    ReadResult result;
+    do {
+      result = await _devTools.io.read(handle);
+      output.write(result.data);
+    } while (!result.eof);
+    await _devTools.io.close(handle);
   }
 }
