@@ -1411,8 +1411,7 @@ function deliverError(name, seq, message, stack) {
   /// ```dart
   /// // Generates a PDF with 'screen' media type.
   /// await page.emulateMedia('screen');
-  /// var pdfBytes = await page.pdf();
-  /// await File('page.pdf').writeAsBytes(pdfBytes);
+  /// await page.pdf(output: File('page.pdf').openWrite());
   /// ```
   ///
   /// Parameters:
@@ -1437,8 +1436,13 @@ function deliverError(name, seq, message, stack) {
   /// - [preferCssPageSize]: Give any CSS `@page` size declared in the page
   ///   priority over what is declared in [format]. Defaults to `false`,
   ///   which will scale the content to fit the paper size.
+  /// - [output] an IOSink where to write the PDF bytes. This parameter is optional,
+  ///   if it is not provided, the bytes are returned as an in-memory list of bytes
+  ///   from the function.
   ///
-  /// Returns: [Future<Uint8List>] which resolves with PDF bytes.
+  /// If [output] parameter is null, this returns a [Future<Uint8List>]
+  /// which resolves with PDF bytes. If [output] is not null, the method return null
+  /// and the PDF bytes are written in the [output] sink.
   ///
   /// > **NOTE** `headerTemplate` and `footerTemplate` markup have the following
   /// limitations:
@@ -1454,7 +1458,8 @@ function deliverError(name, seq, message, stack) {
       bool landscape,
       String pageRanges,
       bool preferCssPageSize,
-      PdfMargins margins}) async {
+      PdfMargins margins,
+      IOSink output}) async {
     scale ??= 1;
     displayHeaderFooter ??= false;
     headerTemplate ??= '';
@@ -1467,8 +1472,7 @@ function deliverError(name, seq, message, stack) {
     margins ??= PdfMargins.zero;
 
     var result = await devTools.page.printToPDF(
-        // TODO(xha): use ReturnAsStream
-        transferMode: 'ReturnAsBase64',
+        transferMode: output == null ? 'ReturnAsBase64' : 'ReturnAsStream',
         landscape: landscape,
         displayHeaderFooter: displayHeaderFooter,
         headerTemplate: headerTemplate,
@@ -1484,7 +1488,13 @@ function deliverError(name, seq, message, stack) {
         pageRanges: pageRanges,
         preferCSSPageSize: preferCssPageSize);
 
-    return base64Decode(result.data);
+    if (output == null) {
+      return base64Decode(result.data);
+    } else {
+      await readStream(devTools.io, result.stream, output);
+      await output.close();
+      return null;
+    }
   }
 
   /// The page's title.

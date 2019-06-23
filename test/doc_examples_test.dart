@@ -315,8 +315,8 @@ main() {
     test('pdf', () async {
       // Generates a PDF with 'screen' media type.
       await page.emulateMedia('screen');
-      var pdfBytes = await page.pdf();
-      await File(exampleValue('_page.pdf', 'page.pdf')).writeAsBytes(pdfBytes);
+      await page.pdf(
+          output: File(exampleValue('_page.pdf', 'page.pdf')).openWrite());
     });
     test('queryObjects', () async {
       // There is a bug currently with queryObjects if the page has navigated

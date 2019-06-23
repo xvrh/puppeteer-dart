@@ -10,12 +10,11 @@ main() async {
   // Force the "screen" media or some CSS @media print can change the look
   await page.emulateMedia('screen');
 
-  // Capture the PDF and convert it to a List of bytes.
-  var pdf = await page.pdf(
-      format: PaperFormat.a4, printBackground: true, pageRanges: '1');
-
-  // Save the bytes in a file
-  await File('example/_github.pdf').writeAsBytes(pdf);
-
+  // Capture the PDF and save it to a file.
+  await page.pdf(
+      format: PaperFormat.a4,
+      printBackground: true,
+      pageRanges: '1',
+      output: File('example/_github.pdf').openWrite());
   await browser.close();
 }

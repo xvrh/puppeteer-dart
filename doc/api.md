@@ -1446,8 +1446,7 @@ property to force rendering of exact colors.
 ```dart
 // Generates a PDF with 'screen' media type.
 await page.emulateMedia('screen');
-var pdfBytes = await page.pdf();
-await File('page.pdf').writeAsBytes(pdfBytes);
+await page.pdf(output: File('page.pdf').openWrite());
 ```
 
 Parameters:
@@ -1472,8 +1471,13 @@ Parameters:
 - [preferCssPageSize]: Give any CSS `@page` size declared in the page
   priority over what is declared in [format]. Defaults to `false`,
   which will scale the content to fit the paper size.
+- [output] an IOSink where to write the PDF bytes. This parameter is optional,
+  if it is not provided, the bytes are returned as an in-memory list of bytes
+  from the function.
 
-Returns: [Future<Uint8List>] which resolves with PDF bytes.
+If [output] parameter is null, this returns a [Future<Uint8List>]
+which resolves with PDF bytes. If [output] is not null, the method return null
+and the PDF bytes are written in the [output] sink.
 
 > **NOTE** `headerTemplate` and `footerTemplate` markup have the following
 limitations:
@@ -1481,7 +1485,7 @@ limitations:
 > 2. Page styles are not visible inside templates.
 
 ```dart
-page.pdf({PaperFormat format, num scale, bool displayHeaderFooter, String headerTemplate, String footerTemplate, bool printBackground, bool landscape, String pageRanges, bool preferCssPageSize, PdfMargins margins}) → Future<Uint8List> 
+page.pdf({PaperFormat format, num scale, bool displayHeaderFooter, String headerTemplate, String footerTemplate, bool printBackground, bool landscape, String pageRanges, bool preferCssPageSize, PdfMargins margins, IOSink output}) → Future<Uint8List> 
 ```
 
 #### page.queryObjects(JsHandle prototypeHandle)
