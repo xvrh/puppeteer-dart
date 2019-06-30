@@ -1,5 +1,10 @@
 # Changelog
 
+# 1.9.0 (2019-06-30)
+- Update Chromium version to 672088
+- Update dependencies
+- Fixes for Dart 2.4.0
+
 ## 1.8.0+1 (2019-06-22)
 - Fix regression in `page.tracing`
 
