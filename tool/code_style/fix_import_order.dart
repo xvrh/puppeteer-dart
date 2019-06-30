@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-// ignore: deprecated_member_use
-import 'package:analyzer/analyzer.dart';
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:dart_style/dart_style.dart';
 import 'dart_project.dart';
 
@@ -35,7 +35,7 @@ final DartFormatter _dartFormatter = DartFormatter(fixes: StyleFix.all);
 final String newLineChar = Platform.isWindows ? '\r\n' : '\n';
 
 String reorderImports(String source) {
-  return _reorderImports(source, parseCompilationUnit(source));
+  return _reorderImports(source, parseString(content: source).unit);
 }
 
 String _reorderImports(String content, CompilationUnit unit) {

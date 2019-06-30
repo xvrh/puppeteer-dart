@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:analyzer/analyzer.dart'; // ignore: deprecated_member_use
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:meta/meta.dart';
 import 'utils/string_helpers.dart';
 
@@ -34,7 +35,7 @@ main() {
       .where((file) => file.path.endsWith('.dart'))) {
     var fileContent = dartFile.readAsStringSync();
 
-    var unit = parseCompilationUnit(fileContent);
+    var unit = parseString(content: fileContent).unit;
 
     classes.addAll(unit.declarations
         .whereType<ClassDeclaration>()

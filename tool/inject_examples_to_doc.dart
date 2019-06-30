@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:analyzer/analyzer.dart'; // ignore: deprecated_member_use
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:dart_style/dart_style.dart';
 
 // Extrat the samples from the file test/doc_examples_test.dart and inject
@@ -32,7 +34,7 @@ main() {
 final _formatter = DartFormatter();
 
 String replaceExamples(String sourceFile, List<CodeSnippet> snippets) {
-  var unit = parseCompilationUnit(sourceFile);
+  var unit = parseString(content: sourceFile).unit;
 
   for (var aClass
       in unit.declarations.whereType<ClassDeclaration>().toList().reversed) {
@@ -107,7 +109,7 @@ String replaceComment(String file, Comment comment, String newComment) {
 }
 
 List<CodeSnippet> extractSnippets(String sourceCode) {
-  var compilationUnit = parseCompilationUnit(sourceCode);
+  var compilationUnit = parseString(content: sourceCode).unit;
   var main = compilationUnit.declarations
       .whereType<FunctionDeclaration>()
       .firstWhere((c) => c.name.name == 'main');
@@ -184,7 +186,7 @@ class CodeSnippet {
 main() async {
 ${LineSplitter.split(code).map((line) => '  $line').join('\n')}
 }''';
-    var compilation = parseCompilationUnit(code);
+    var compilation = parseString(content: code).unit;
     var replacerVisitor = _ExampleReplacerVisitor();
     compilation.visitChildren(replacerVisitor);
     code = replacerVisitor.replace(code);

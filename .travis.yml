@@ -14,7 +14,7 @@ before_script:
 dart_task:
  - test: -P ci --platform vm
  - dartanalyzer: --fatal-infos --fatal-warnings .
- - dartfmt
+ - dartfmt: true
 
 jobs:
  include:
