@@ -1,6 +1,6 @@
 import 'dart:io';
-// ignore: deprecated_member_use
-import 'package:analyzer/analyzer.dart';
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:path/path.dart' as p;
 import 'dart_project.dart';
 
@@ -32,7 +32,7 @@ String fixCode(DartFile dartFile, String content) {
   try {
     var newContent = content;
 
-    var unit = parseCompilationUnit(content);
+    var unit = parseString(content: content).unit;
 
     for (var directive
         in unit.directives.reversed.whereType<NamespaceDirective>()) {

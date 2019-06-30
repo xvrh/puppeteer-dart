@@ -53,7 +53,7 @@ class LifecycleWatcher {
   Future<Exception> get lifecycle => _lifecycleCompleter.future;
 
   Response get navigationResponse {
-    return _navigationRequest != null ? _navigationRequest.response : null;
+    return _navigationRequest?.response;
   }
 
   void _onRequest(Request request) {
