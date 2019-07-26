@@ -9,6 +9,7 @@ main() {
       .where((f) => f.path.endsWith('_test.dart'))
       .map((file) => p.relative(file.path, from: 'test'))
       .toList();
+  allFiles.sort();
 
   var buffer = StringBuffer();
   buffer.writeln("import 'package:test/test.dart';");

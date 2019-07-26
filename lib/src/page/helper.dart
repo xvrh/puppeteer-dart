@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:logging/logging.dart';
 import '../../protocol/io.dart';
 import '../../protocol/runtime.dart';
 import '../javascript_function_parser.dart';
+
+final _logger = Logger('puppeteer.helper');
 
 String evaluationString(String function, List args) {
   var functionDeclaration = convertToFunctionDeclaration(function);
@@ -43,7 +46,14 @@ dynamic valueFromRemoteObject(RemoteObject remoteObject) {
 Future<void> releaseObject(
     RuntimeApi runtimeApi, RemoteObject remoteObject) async {
   if (remoteObject.objectId == null) return;
-  await runtimeApi.releaseObject(remoteObject.objectId);
+
+  await runtimeApi
+      .releaseObject(remoteObject.objectId)
+      .catchError((e, stackTrace) {
+    // Exceptions might happen in case of a page been navigated or closed.
+    // Swallow these since they are harmless and we don't leak anything in this case.
+    _logger.fine(e, e, stackTrace);
+  });
 }
 
 Future<void> readStream(IOApi io, StreamHandle stream, IOSink output) async {
