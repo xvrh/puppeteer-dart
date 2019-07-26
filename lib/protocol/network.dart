@@ -38,6 +38,7 @@ class NetworkApi {
 
   /// Details of an intercepted HTTP request, which must be either allowed, blocked, modified or
   /// mocked.
+  /// Deprecated, use Fetch.requestPaused instead.
   Stream<RequestInterceptedEvent> get onRequestIntercepted => _client.onEvent
       .where((event) => event.name == 'Network.requestIntercepted')
       .map((event) => RequestInterceptedEvent.fromJson(event.parameters));
@@ -111,6 +112,25 @@ class NetworkApi {
           .map((event) => WebSocketWillSendHandshakeRequestEvent.fromJson(
               event.parameters));
 
+  /// Fired when additional information about a requestWillBeSent event is available from the
+  /// network stack. Not every requestWillBeSent event will have an additional
+  /// requestWillBeSentExtraInfo fired for it, and there is no guarantee whether requestWillBeSent
+  /// or requestWillBeSentExtraInfo will be fired first for the same request.
+  Stream<RequestWillBeSentExtraInfoEvent> get onRequestWillBeSentExtraInfo =>
+      _client.onEvent
+          .where((event) => event.name == 'Network.requestWillBeSentExtraInfo')
+          .map((event) =>
+              RequestWillBeSentExtraInfoEvent.fromJson(event.parameters));
+
+  /// Fired when additional information about a responseReceived event is available from the network
+  /// stack. Not every responseReceived event will have an additional responseReceivedExtraInfo for
+  /// it, and responseReceivedExtraInfo may be fired before or after responseReceived.
+  Stream<ResponseReceivedExtraInfoEvent> get onResponseReceivedExtraInfo =>
+      _client.onEvent
+          .where((event) => event.name == 'Network.responseReceivedExtraInfo')
+          .map((event) =>
+              ResponseReceivedExtraInfoEvent.fromJson(event.parameters));
+
   /// Tells whether clearing browser cache is supported.
   /// Returns: True if browser cache can be cleared.
   @deprecated
@@ -149,6 +169,7 @@ class NetworkApi {
   /// modifications, or blocks it, or completes it with the provided response bytes. If a network
   /// fetch occurs as a result which encounters a redirect an additional Network.requestIntercepted
   /// event will be sent with the same InterceptionId.
+  /// Deprecated, use Fetch.continueRequest, Fetch.fulfillRequest and Fetch.failRequest instead.
   /// [errorReason] If set this causes the request to fail with the given reason. Passing `Aborted` for requests
   /// marked with `isNavigationRequest` also cancels the navigation. Must not be set in response
   /// to an authChallenge.
@@ -162,6 +183,7 @@ class NetworkApi {
   /// [headers] If set this allows the request headers to be changed. Must not be set in response to an
   /// authChallenge.
   /// [authChallengeResponse] Response to a requestIntercepted with an authChallenge. Must not be set otherwise.
+  @deprecated
   Future<void> continueInterceptedRequest(InterceptionId interceptionId,
       {ErrorReason errorReason,
       String rawResponse,
@@ -488,8 +510,10 @@ class NetworkApi {
   }
 
   /// Sets the requests to intercept that match the provided patterns and optionally resource types.
+  /// Deprecated, please use Fetch.enable instead.
   /// [patterns] Requests matching any of these patterns will be forwarded and wait for the corresponding
   /// continueInterceptedRequest call.
+  @deprecated
   Future<void> setRequestInterception(List<RequestPattern> patterns) async {
     var parameters = <String, dynamic>{
       'patterns': patterns.map((e) => e.toJson()).toList(),
@@ -1054,6 +1078,67 @@ class WebSocketWillSendHandshakeRequestEvent {
       timestamp: MonotonicTime.fromJson(json['timestamp']),
       wallTime: TimeSinceEpoch.fromJson(json['wallTime']),
       request: WebSocketRequest.fromJson(json['request']),
+    );
+  }
+}
+
+class RequestWillBeSentExtraInfoEvent {
+  /// Request identifier. Used to match this information to an existing requestWillBeSent event.
+  final RequestId requestId;
+
+  /// A list of cookies which will not be sent with this request along with corresponding reasons
+  /// for blocking.
+  final List<BlockedCookieWithReason> blockedCookies;
+
+  /// Raw request headers as they will be sent over the wire.
+  final Headers headers;
+
+  RequestWillBeSentExtraInfoEvent(
+      {@required this.requestId,
+      @required this.blockedCookies,
+      @required this.headers});
+
+  factory RequestWillBeSentExtraInfoEvent.fromJson(Map<String, dynamic> json) {
+    return RequestWillBeSentExtraInfoEvent(
+      requestId: RequestId.fromJson(json['requestId']),
+      blockedCookies: (json['blockedCookies'] as List)
+          .map((e) => BlockedCookieWithReason.fromJson(e))
+          .toList(),
+      headers: Headers.fromJson(json['headers']),
+    );
+  }
+}
+
+class ResponseReceivedExtraInfoEvent {
+  /// Request identifier. Used to match this information to another responseReceived event.
+  final RequestId requestId;
+
+  /// A list of cookies which were not stored from the response along with the corresponding
+  /// reasons for blocking. The cookies here may not be valid due to syntax errors, which
+  /// are represented by the invalid cookie line string instead of a proper cookie.
+  final List<BlockedSetCookieWithReason> blockedCookies;
+
+  /// Raw response headers as they were received over the wire.
+  final Headers headers;
+
+  /// Raw response header text as it was received over the wire. The raw text may not always be
+  /// available, such as in the case of HTTP/2 or QUIC.
+  final String headersText;
+
+  ResponseReceivedExtraInfoEvent(
+      {@required this.requestId,
+      @required this.blockedCookies,
+      @required this.headers,
+      this.headersText});
+
+  factory ResponseReceivedExtraInfoEvent.fromJson(Map<String, dynamic> json) {
+    return ResponseReceivedExtraInfoEvent(
+      requestId: RequestId.fromJson(json['requestId']),
+      blockedCookies: (json['blockedCookies'] as List)
+          .map((e) => BlockedSetCookieWithReason.fromJson(e))
+          .toList(),
+      headers: Headers.fromJson(json['headers']),
+      headersText: json.containsKey('headersText') ? json['headersText'] : null,
     );
   }
 }
@@ -2417,6 +2502,171 @@ class Cookie {
   }
 }
 
+/// Types of reasons why a cookie may not be stored from a response.
+class SetCookieBlockedReason {
+  static const secureOnly = SetCookieBlockedReason._('SecureOnly');
+  static const sameSiteStrict = SetCookieBlockedReason._('SameSiteStrict');
+  static const sameSiteLax = SetCookieBlockedReason._('SameSiteLax');
+  static const sameSiteExtended = SetCookieBlockedReason._('SameSiteExtended');
+  static const sameSiteUnspecifiedTreatedAsLax =
+      SetCookieBlockedReason._('SameSiteUnspecifiedTreatedAsLax');
+  static const sameSiteNoneInsecure =
+      SetCookieBlockedReason._('SameSiteNoneInsecure');
+  static const userPreferences = SetCookieBlockedReason._('UserPreferences');
+  static const syntaxError = SetCookieBlockedReason._('SyntaxError');
+  static const schemeNotSupported =
+      SetCookieBlockedReason._('SchemeNotSupported');
+  static const overwriteSecure = SetCookieBlockedReason._('OverwriteSecure');
+  static const invalidDomain = SetCookieBlockedReason._('InvalidDomain');
+  static const invalidPrefix = SetCookieBlockedReason._('InvalidPrefix');
+  static const unknownError = SetCookieBlockedReason._('UnknownError');
+  static const values = {
+    'SecureOnly': secureOnly,
+    'SameSiteStrict': sameSiteStrict,
+    'SameSiteLax': sameSiteLax,
+    'SameSiteExtended': sameSiteExtended,
+    'SameSiteUnspecifiedTreatedAsLax': sameSiteUnspecifiedTreatedAsLax,
+    'SameSiteNoneInsecure': sameSiteNoneInsecure,
+    'UserPreferences': userPreferences,
+    'SyntaxError': syntaxError,
+    'SchemeNotSupported': schemeNotSupported,
+    'OverwriteSecure': overwriteSecure,
+    'InvalidDomain': invalidDomain,
+    'InvalidPrefix': invalidPrefix,
+    'UnknownError': unknownError,
+  };
+
+  final String value;
+
+  const SetCookieBlockedReason._(this.value);
+
+  factory SetCookieBlockedReason.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is SetCookieBlockedReason && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Types of reasons why a cookie may not be sent with a request.
+class CookieBlockedReason {
+  static const secureOnly = CookieBlockedReason._('SecureOnly');
+  static const notOnPath = CookieBlockedReason._('NotOnPath');
+  static const domainMismatch = CookieBlockedReason._('DomainMismatch');
+  static const sameSiteStrict = CookieBlockedReason._('SameSiteStrict');
+  static const sameSiteLax = CookieBlockedReason._('SameSiteLax');
+  static const sameSiteExtended = CookieBlockedReason._('SameSiteExtended');
+  static const sameSiteUnspecifiedTreatedAsLax =
+      CookieBlockedReason._('SameSiteUnspecifiedTreatedAsLax');
+  static const sameSiteNoneInsecure =
+      CookieBlockedReason._('SameSiteNoneInsecure');
+  static const userPreferences = CookieBlockedReason._('UserPreferences');
+  static const unknownError = CookieBlockedReason._('UnknownError');
+  static const values = {
+    'SecureOnly': secureOnly,
+    'NotOnPath': notOnPath,
+    'DomainMismatch': domainMismatch,
+    'SameSiteStrict': sameSiteStrict,
+    'SameSiteLax': sameSiteLax,
+    'SameSiteExtended': sameSiteExtended,
+    'SameSiteUnspecifiedTreatedAsLax': sameSiteUnspecifiedTreatedAsLax,
+    'SameSiteNoneInsecure': sameSiteNoneInsecure,
+    'UserPreferences': userPreferences,
+    'UnknownError': unknownError,
+  };
+
+  final String value;
+
+  const CookieBlockedReason._(this.value);
+
+  factory CookieBlockedReason.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is CookieBlockedReason && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// A cookie which was not stored from a response with the corresponding reason.
+class BlockedSetCookieWithReason {
+  /// The reason this cookie was blocked.
+  final SetCookieBlockedReason blockedReason;
+
+  /// The string representing this individual cookie as it would appear in the header.
+  /// This is not the entire "cookie" or "set-cookie" header which could have multiple cookies.
+  final String cookieLine;
+
+  /// The cookie object which represents the cookie which was not stored. It is optional because
+  /// sometimes complete cookie information is not available, such as in the case of parsing
+  /// errors.
+  final Cookie cookie;
+
+  BlockedSetCookieWithReason(
+      {@required this.blockedReason, @required this.cookieLine, this.cookie});
+
+  factory BlockedSetCookieWithReason.fromJson(Map<String, dynamic> json) {
+    return BlockedSetCookieWithReason(
+      blockedReason: SetCookieBlockedReason.fromJson(json['blockedReason']),
+      cookieLine: json['cookieLine'],
+      cookie:
+          json.containsKey('cookie') ? Cookie.fromJson(json['cookie']) : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
+      'blockedReason': blockedReason.toJson(),
+      'cookieLine': cookieLine,
+    };
+    if (cookie != null) {
+      json['cookie'] = cookie.toJson();
+    }
+    return json;
+  }
+}
+
+/// A cookie with was not sent with a request with the corresponding reason.
+class BlockedCookieWithReason {
+  /// The reason the cookie was blocked.
+  final CookieBlockedReason blockedReason;
+
+  /// The cookie object representing the cookie which was not sent.
+  final Cookie cookie;
+
+  BlockedCookieWithReason(
+      {@required this.blockedReason, @required this.cookie});
+
+  factory BlockedCookieWithReason.fromJson(Map<String, dynamic> json) {
+    return BlockedCookieWithReason(
+      blockedReason: CookieBlockedReason.fromJson(json['blockedReason']),
+      cookie: Cookie.fromJson(json['cookie']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
+      'blockedReason': blockedReason.toJson(),
+      'cookie': cookie.toJson(),
+    };
+    return json;
+  }
+}
+
 /// Cookie parameter object
 class CookieParam {
   /// Cookie name.
@@ -2812,11 +3062,15 @@ class SignedExchangeHeader {
   /// Signed exchange response signature.
   final List<SignedExchangeSignature> signatures;
 
+  /// Signed exchange header integrity hash in the form of "sha256-<base64-hash-value>".
+  final String headerIntegrity;
+
   SignedExchangeHeader(
       {@required this.requestUrl,
       @required this.responseCode,
       @required this.responseHeaders,
-      @required this.signatures});
+      @required this.signatures,
+      @required this.headerIntegrity});
 
   factory SignedExchangeHeader.fromJson(Map<String, dynamic> json) {
     return SignedExchangeHeader(
@@ -2826,6 +3080,7 @@ class SignedExchangeHeader {
       signatures: (json['signatures'] as List)
           .map((e) => SignedExchangeSignature.fromJson(e))
           .toList(),
+      headerIntegrity: json['headerIntegrity'],
     );
   }
 
@@ -2835,6 +3090,7 @@ class SignedExchangeHeader {
       'responseCode': responseCode,
       'responseHeaders': responseHeaders.toJson(),
       'signatures': signatures.map((e) => e.toJson()).toList(),
+      'headerIntegrity': headerIntegrity,
     };
     return json;
   }

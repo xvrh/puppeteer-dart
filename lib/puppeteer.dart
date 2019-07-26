@@ -26,6 +26,7 @@ export 'src/page/page.dart'
         PaperFormat,
         ScreenshotFormat,
         ConsoleMessage,
-        ConsoleMessageType;
+        ConsoleMessageType,
+        FileChooser;
 export 'src/page/tracing.dart' show Tracing;
 export 'src/puppeteer.dart' show puppeteer, Puppeteer;

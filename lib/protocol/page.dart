@@ -19,6 +19,11 @@ class PageApi {
       .map((event) =>
           network.MonotonicTime.fromJson(event.parameters['timestamp']));
 
+  /// Emitted only when `page.interceptFileChooser` is enabled.
+  Stream<String> get onFileChooserOpened => _client.onEvent
+      .where((event) => event.name == 'Page.fileChooserOpened')
+      .map((event) => event.parameters['mode'] as String);
+
   /// Fired when frame has been attached to its parent.
   Stream<FrameAttachedEvent> get onFrameAttached => _client.onEvent
       .where((event) => event.name == 'Page.frameAttached')
@@ -845,6 +850,32 @@ class PageApi {
   /// Pauses page execution. Can be resumed using generic Runtime.runIfWaitingForDebugger.
   Future<void> waitForDebugger() async {
     await _client.send('Page.waitForDebugger');
+  }
+
+  /// Intercept file chooser requests and transfer control to protocol clients.
+  /// When file chooser interception is enabled, native file chooser dialog is not shown.
+  /// Instead, a protocol event `Page.fileChooserOpened` is emitted.
+  /// File chooser can be handled with `page.handleFileChooser` command.
+  Future<void> setInterceptFileChooserDialog(bool enabled) async {
+    var parameters = <String, dynamic>{
+      'enabled': enabled,
+    };
+    await _client.send('Page.setInterceptFileChooserDialog', parameters);
+  }
+
+  /// Accepts or cancels an intercepted file chooser dialog.
+  /// [files] Array of absolute file paths to set, only respected with `accept` action.
+  Future<void> handleFileChooser(
+      @Enum(['accept', 'cancel', 'fallback']) String action,
+      {List<String> files}) async {
+    assert(const ['accept', 'cancel', 'fallback'].contains(action));
+    var parameters = <String, dynamic>{
+      'action': action,
+    };
+    if (files != null) {
+      parameters['files'] = files.map((e) => e).toList();
+    }
+    await _client.send('Page.handleFileChooser', parameters);
   }
 }
 
@@ -2011,6 +2042,33 @@ class ClientNavigationReason {
   bool operator ==(other) =>
       (other is ClientNavigationReason && other.value == value) ||
       value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class StringMode {
+  static const selectSingle = StringMode._('selectSingle');
+  static const selectMultiple = StringMode._('selectMultiple');
+  static const values = {
+    'selectSingle': selectSingle,
+    'selectMultiple': selectMultiple,
+  };
+
+  final String value;
+
+  const StringMode._(this.value);
+
+  factory StringMode.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is StringMode && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

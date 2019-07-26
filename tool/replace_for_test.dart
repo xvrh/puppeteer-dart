@@ -40,35 +40,186 @@ main() {
 }
 
 final _input = r'''
-  describe('OOPIF', function() {
-    beforeAll(async function(state) {
-      state.browser = await puppeteer.launch(Object.assign({}, defaultBrowserOptions, {
-        args: (defaultBrowserOptions.args || []).concat(['--site-per-process']),
-      }));
+  describe_fails_ffox('Page.waitForFileChooser', function() {
+    it('should work when file input is attached to DOM', async({page, server}) => {
+      await page.setContent(`<input type=file>`);
+      const [chooser] = await Promise.all([
+        page.waitForFileChooser(),
+        page.click('input'),
+      ]);
+      expect(chooser).toBeTruthy();
     });
-    beforeEach(async function(state) {
-      state.context = await state.browser.createIncognitoBrowserContext();
-      state.page = await state.context.newPage();
+    it('should work when file input is not attached to DOM', async({page, server}) => {
+      const [chooser] = await Promise.all([
+        page.waitForFileChooser(),
+        page.evaluate(() => {
+          const el = document.createElement('input');
+          el.type = 'file';
+          el.click();
+        }),
+      ]);
+      expect(chooser).toBeTruthy();
     });
-    afterEach(async function(state) {
-      await state.context.close();
-      state.page = null;
-      state.context = null;
+    it('should respect timeout', async({page, server}) => {
+      let error = null;
+      await page.waitForFileChooser({timeout: 1}).catch(e => error = e);
+      expect(error).toBeInstanceOf(puppeteer.errors.TimeoutError);
     });
-    afterAll(async function(state) {
-      await state.browser.close();
-      state.browser = null;
+    it('should respect default timeout when there is no custom timeout', async({page, server}) => {
+      page.setDefaultTimeout(1);
+      let error = null;
+      await page.waitForFileChooser().catch(e => error = e);
+      expect(error).toBeInstanceOf(puppeteer.errors.TimeoutError);
     });
-    xit('should report oopif frames', async function({page, server, context}) {
-      await page.goto(server.PREFIX + '/dynamic-oopif.html');
-      expect(oopifs(context).length).toBe(1);
-      expect(page.frames().length).toBe(2);
+    it('should prioritize exact timeout over default timeout', async({page, server}) => {
+      page.setDefaultTimeout(0);
+      let error = null;
+      await page.waitForFileChooser({timeout: 1}).catch(e => error = e);
+      expect(error).toBeInstanceOf(puppeteer.errors.TimeoutError);
     });
-    it('should load oopif iframes with subresources and request interception', async function({page, server, context}) {
-      await page.setRequestInterception(true);
-      page.on('request', request => request.continue());
-      await page.goto(server.PREFIX + '/dynamic-oopif.html');
-      expect(oopifs(context).length).toBe(1);
+    it('should work with no timeout', async({page, server}) => {
+      const [chooser] = await Promise.all([
+        page.waitForFileChooser({timeout: 0}),
+        page.evaluate(() => setTimeout(() => {
+          const el = document.createElement('input');
+          el.type = 'file';
+          el.click();
+        }, 50))
+      ]);
+      expect(chooser).toBeTruthy();
+    });
+    it('should return the same file chooser when there are many watchdogs simultaneously', async({page, server}) => {
+      await page.setContent(`<input type=file>`);
+      const [fileChooser1, fileChooser2] = await Promise.all([
+        page.waitForFileChooser(),
+        page.waitForFileChooser(),
+        page.$eval('input', input => input.click()),
+      ]);
+      expect(fileChooser1 === fileChooser2).toBe(true);
+    });
+  });
+
+  describe_fails_ffox('FileChooser.accept', function() {
+    it('should accept single file', async({page, server}) => {
+      await page.setContent(`<input type=file oninput='javascript:console.timeStamp()'>`);
+      const [chooser] = await Promise.all([
+        page.waitForFileChooser(),
+        page.click('input'),
+      ]);
+      await Promise.all([
+        chooser.accept([FILE_TO_UPLOAD]),
+        new Promise(x => page.once('metrics', x)),
+      ]);
+      expect(await page.$eval('input', input => input.files.length)).toBe(1);
+      expect(await page.$eval('input', input => input.files[0].name)).toBe('file-to-upload.txt');
+    });
+    it('should be able to read selected file', async({page, server}) => {
+      await page.setContent(`<input type=file>`);
+      page.waitForFileChooser().then(chooser => chooser.accept([FILE_TO_UPLOAD]));
+      expect(await page.$eval('input', async picker => {
+        picker.click();
+        await new Promise(x => picker.oninput = x);
+        const reader = new FileReader();
+        const promise = new Promise(fulfill => reader.onload = fulfill);
+        reader.readAsText(picker.files[0]);
+        return promise.then(() => reader.result);
+      })).toBe('contents of the file');
+    });
+    it('should be able to reset selected files with empty file list', async({page, server}) => {
+      await page.setContent(`<input type=file>`);
+      page.waitForFileChooser().then(chooser => chooser.accept([FILE_TO_UPLOAD]));
+      expect(await page.$eval('input', async picker => {
+        picker.click();
+        await new Promise(x => picker.oninput = x);
+        return picker.files.length;
+      })).toBe(1);
+      page.waitForFileChooser().then(chooser => chooser.accept([]));
+      expect(await page.$eval('input', async picker => {
+        picker.click();
+        await new Promise(x => picker.oninput = x);
+        return picker.files.length;
+      })).toBe(0);
+    });
+    it('should not accept multiple files for single-file input', async({page, server}) => {
+      await page.setContent(`<input type=file>`);
+      const [chooser] = await Promise.all([
+        page.waitForFileChooser(),
+        page.click('input'),
+      ]);
+      let error = null;
+      await chooser.accept([
+        path.relative(process.cwd(), __dirname + '/assets/file-to-upload.txt'),
+        path.relative(process.cwd(), __dirname + '/assets/pptr.png'),
+      ]).catch(e => error = e);
+      expect(error).not.toBe(null);
+    });
+    it('should fail when accepting file chooser twice', async({page, server}) => {
+      await page.setContent(`<input type=file>`);
+      const [fileChooser] = await Promise.all([
+        page.waitForFileChooser(),
+        page.$eval('input', input => input.click()),
+      ]);
+      await fileChooser.accept([]);
+      let error = null;
+      await fileChooser.accept([]).catch(e => error = e);
+      expect(error.message).toBe('Cannot accept FileChooser which is already handled!');
+    });
+  });
+
+  describe_fails_ffox('FileChooser.cancel', function() {
+    it('should cancel dialog', async({page, server}) => {
+      // Consider file chooser canceled if we can summon another one.
+      // There's no reliable way in WebPlatform to see that FileChooser was
+      // canceled.
+      await page.setContent(`<input type=file>`);
+      const [fileChooser1] = await Promise.all([
+        page.waitForFileChooser(),
+        page.$eval('input', input => input.click()),
+      ]);
+      await fileChooser1.cancel();
+      // If this resolves, than we successfully canceled file chooser.
+      await Promise.all([
+        page.waitForFileChooser(),
+        page.$eval('input', input => input.click()),
+      ]);
+    });
+    it('should fail when canceling file chooser twice', async({page, server}) => {
+      await page.setContent(`<input type=file>`);
+      const [fileChooser] = await Promise.all([
+        page.waitForFileChooser(),
+        page.$eval('input', input => input.click()),
+      ]);
+      await fileChooser.cancel();
+      let error = null;
+      await fileChooser.cancel().catch(e => error = e);
+      expect(error.message).toBe('Cannot cancel FileChooser which is already handled!');
+    });
+  });
+
+  describe_fails_ffox('FileChooser.isMultiple', () => {
+    it('should work for single file pick', async({page, server}) => {
+      await page.setContent(`<input type=file>`);
+      const [chooser] = await Promise.all([
+        page.waitForFileChooser(),
+        page.click('input'),
+      ]);
+      expect(chooser.isMultiple()).toBe(false);
+    });
+    it('should work for "multiple"', async({page, server}) => {
+      await page.setContent(`<input multiple type=file>`);
+      const [chooser] = await Promise.all([
+        page.waitForFileChooser(),
+        page.click('input'),
+      ]);
+      expect(chooser.isMultiple()).toBe(true);
+    });
+    it('should work for "webkitdirectory"', async({page, server}) => {
+      await page.setContent(`<input multiple webkitdirectory type=file>`);
+      const [chooser] = await Promise.all([
+        page.waitForFileChooser(),
+        page.click('input'),
+      ]);
+      expect(chooser.isMultiple()).toBe(true);
     });
   });
 ''';
