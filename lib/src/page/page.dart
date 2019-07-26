@@ -127,6 +127,8 @@ class Page {
   Mouse _mouse;
   Touchscreen _touchscreen;
   Keyboard _keyboard;
+  bool _fileChooserInterceptionIsDisabled = false;
+  final _fileChooserInterceptors = <Completer<FileChooser>>{};
 
   Page._(this.target, this.devTools)
       : _emulationManager = EmulationManager(devTools),
@@ -170,6 +172,7 @@ class Page {
     devTools.inspector.onTargetCrashed.listen(_handleTargetCrashed);
     devTools.runtime.onConsoleAPICalled.listen(_onConsoleApi);
     devTools.log.onEntryAdded.listen(_onLogEntryAdded);
+    devTools.page.onFileChooserOpened.listen(_onFileChooser);
     onClose.then((_) {
       _dispose('Page.onClose completed');
     });
@@ -180,12 +183,7 @@ class Page {
     var devTools = DevTools(session);
     var page = Page._(target, devTools);
 
-    await Future.wait([
-      page._frameManager.initialize(),
-      devTools.target.setAutoAttach(true, false, flatten: true),
-      devTools.performance.enable(),
-      devTools.log.enable(),
-    ]);
+    await page._initialize();
 
     if (viewport != null) {
       await page.setViewport(viewport);
@@ -196,6 +194,69 @@ class Page {
     }
 
     return page;
+  }
+
+  Future _initialize() async {
+    await Future.wait([
+      _frameManager.initialize(),
+      devTools.target.setAutoAttach(true, false, flatten: true),
+      devTools.performance.enable(),
+      devTools.log.enable(),
+      devTools.page.setInterceptFileChooserDialog(true).catchError((_) {
+        _fileChooserInterceptionIsDisabled = true;
+      }),
+    ]);
+  }
+
+  void _onFileChooser(String event) {
+    if (_fileChooserInterceptors.isEmpty) {
+      devTools.page.handleFileChooser('fallback').catchError((e) {
+        _logger.warning('Error handleFileChooser', e);
+      });
+      return;
+    }
+    var interceptors = _fileChooserInterceptors.toList();
+    _fileChooserInterceptors.clear();
+    var fileChooser = FileChooser(devTools, event);
+    for (var interceptor in interceptors) {
+      interceptor.complete(fileChooser);
+    }
+  }
+
+  /// > **NOTE** In non-headless Chromium, this method results in the native file picker dialog **not showing up** for the user.
+  ///
+  /// This method is typically coupled with an action that triggers file choosing.
+  /// The following example clicks a button that issues a file chooser, and then
+  /// responds with `/tmp/myfile.pdf` as if a user has selected this file.
+  ///
+  /// ```dart
+  /// var futureFileChooser = page.waitForFileChooser();
+  /// // some button that triggers file selection
+  /// await page.click('#upload-file-button');
+  /// var fileChooser = await futureFileChooser;
+  ///
+  /// await fileChooser.accept([File('myfile.pdf')]);
+  /// ```
+  ///
+  /// > **NOTE** This must be called *before* the file chooser is launched. It will not return a currently active file chooser.
+  ///
+  /// Parameters:
+  ///  - `timeout` Maximum wait time in milliseconds, defaults to 30
+  ///    seconds, pass `0` to disable the timeout. The default value can be
+  ///    changed by using the [page.defaultTimeout] property.
+  ///  - returns: [Future<FileChooser>] A promise that resolves after a page requests a file picker.
+  Future<FileChooser> waitForFileChooser({Duration timeout}) {
+    if (_fileChooserInterceptionIsDisabled) {
+      throw Exception(
+          'File chooser handling does not work with multiple connections to the same page');
+    }
+    timeout ??= defaultTimeout;
+    var callback = Completer<FileChooser>();
+    _fileChooserInterceptors.add(callback);
+
+    return callback.future.timeout(timeout).whenComplete(() {
+      _fileChooserInterceptors.remove(callback);
+    });
   }
 
   Session get session => devTools.client;
@@ -1986,5 +2047,48 @@ class ClientError implements Exception {
       }
       return message;
     }
+  }
+}
+
+/// [FileChooser] objects are returned via the ['page.waitForFileChooser'] method.
+///
+/// File choosers let you react to the page requesting for a file.
+///
+/// An example of using [FileChooser]:
+///
+/// ```dart
+/// var futureFileChooser = page.waitForFileChooser();
+/// // some button that triggers file selection
+/// await page.click('#upload-file-button');
+/// var fileChooser = await futureFileChooser;
+///
+/// await fileChooser.accept([File('myfile.pdf')]);
+/// ```
+///
+/// > **NOTE** In browsers, only one file chooser can be opened at a time.
+/// > All file choosers must be accepted or canceled. Not doing so will prevent subsequent file choosers from appearing.
+class FileChooser {
+  final DevTools devTools;
+
+  /// Whether file chooser allow for [multiple](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#attr-multiple)
+  /// file selection.
+  final bool isMultiple;
+  bool _handled = false;
+
+  FileChooser(this.devTools, String mode) : isMultiple = mode != 'selectSingle';
+
+  /// Accept the file chooser request with given files.
+  Future<void> accept(List<File> files) async {
+    assert(!_handled, 'Cannot accept FileChooser which is already handled!');
+    _handled = true;
+    await devTools.page.handleFileChooser('accept',
+        files: files.map((f) => f.absolute.path).toList());
+  }
+
+  /// Closes the file chooser without selecting any files.
+  Future<void> cancel() async {
+    assert(!_handled, 'Cannot cancel FileChooser which is already handled!');
+    _handled = true;
+    await devTools.page.handleFileChooser('cancel');
   }
 }

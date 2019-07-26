@@ -25,6 +25,7 @@ final classesOrder = [
   'Request',
   'Response',
   'Coverage',
+  'FileChooser',
 ];
 
 main() {

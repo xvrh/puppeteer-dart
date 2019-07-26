@@ -104,6 +104,7 @@
   * [page.title](#pagetitle)
   * [page.type](#pagetype)
   * [page.url](#pageurl)
+  * [page.waitForFileChooser](#pagewaitforfilechooserduration-timeout)
   * [page.waitForFunction](#pagewaitforfunction)
   * [page.waitForNavigation](#pagewaitfornavigationduration-timeout-until-wait)
   * [page.waitForRequest](#pagewaitforrequeststring-url-duration-timeout)
@@ -231,6 +232,10 @@
   * [coverage.startJSCoverage](#coveragestartjscoverage)
   * [coverage.stopCSSCoverage](#coveragestopcsscoverage)
   * [coverage.stopJSCoverage](#coveragestopjscoverage)
+- [class: FileChooser](#class-filechooser)
+  * [fileChooser.accept](#filechooseracceptlistfile-files)
+  * [fileChooser.cancel](#filechoosercancel)
+  * [fileChooser.isMultiple](#filechooserismultiple)
 
 ### class: Puppeteer
 Launch or connect to a chrome instance
@@ -1804,6 +1809,34 @@ This is a shortcut for [page.mainFrame.url]
 
 ```dart
 page.url → String
+```
+
+#### page.waitForFileChooser({Duration timeout})
+> **NOTE** In non-headless Chromium, this method results in the native file picker dialog **not showing up** for the user.
+
+This method is typically coupled with an action that triggers file choosing.
+The following example clicks a button that issues a file chooser, and then
+responds with `/tmp/myfile.pdf` as if a user has selected this file.
+
+```dart
+var futureFileChooser = page.waitForFileChooser();
+// some button that triggers file selection
+await page.click('#upload-file-button');
+var fileChooser = await futureFileChooser;
+
+await fileChooser.accept([File('myfile.pdf')]);
+```
+
+> **NOTE** This must be called *before* the file chooser is launched. It will not return a currently active file chooser.
+
+Parameters:
+ - `timeout` Maximum wait time in milliseconds, defaults to 30
+   seconds, pass `0` to disable the timeout. The default value can be
+   changed by using the [page.defaultTimeout] property.
+ - returns: [Future<FileChooser>] A promise that resolves after a page requests a file picker.
+
+```dart
+page.waitForFileChooser({Duration timeout}) → Future<FileChooser> 
 ```
 
 #### page.waitForFunction(...)
@@ -3763,5 +3796,46 @@ Returns a Future that resolves to the array of coverage reports for all scripts
 
 ```dart
 coverage.stopJSCoverage() → Future<List<CoverageEntry>> 
+```
+
+### class: FileChooser
+[FileChooser] objects are returned via the ['page.waitForFileChooser'] method.
+
+File choosers let you react to the page requesting for a file.
+
+An example of using [FileChooser]:
+
+```dart
+var futureFileChooser = page.waitForFileChooser();
+// some button that triggers file selection
+await page.click('#upload-file-button');
+var fileChooser = await futureFileChooser;
+
+await fileChooser.accept([File('myfile.pdf')]);
+```
+
+> **NOTE** In browsers, only one file chooser can be opened at a time.
+> All file choosers must be accepted or canceled. Not doing so will prevent subsequent file choosers from appearing.
+
+#### fileChooser.accept(List\<File> files)
+Accept the file chooser request with given files.
+
+```dart
+fileChooser.accept(List<File> files) → Future<void> 
+```
+
+#### fileChooser.cancel()
+Closes the file chooser without selecting any files.
+
+```dart
+fileChooser.cancel() → Future<void> 
+```
+
+#### fileChooser.isMultiple
+Whether file chooser allow for [multiple](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#attr-multiple)
+file selection.
+
+```dart
+fileChooser.isMultiple → bool
 ```
 

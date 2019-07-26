@@ -983,7 +983,9 @@
                         "backgroundFetch",
                         "backgroundSync",
                         "pushMessaging",
-                        "notifications"
+                        "notifications",
+                        "paymentHandler",
+                        "periodicBackgroundSync"
                     ]
                 },
                 {
@@ -8931,6 +8933,87 @@
                     ]
                 },
                 {
+                    "id": "SetCookieBlockedReason",
+                    "description": "Types of reasons why a cookie may not be stored from a response.",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "SecureOnly",
+                        "SameSiteStrict",
+                        "SameSiteLax",
+                        "SameSiteExtended",
+                        "SameSiteUnspecifiedTreatedAsLax",
+                        "SameSiteNoneInsecure",
+                        "UserPreferences",
+                        "SyntaxError",
+                        "SchemeNotSupported",
+                        "OverwriteSecure",
+                        "InvalidDomain",
+                        "InvalidPrefix",
+                        "UnknownError"
+                    ]
+                },
+                {
+                    "id": "CookieBlockedReason",
+                    "description": "Types of reasons why a cookie may not be sent with a request.",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "SecureOnly",
+                        "NotOnPath",
+                        "DomainMismatch",
+                        "SameSiteStrict",
+                        "SameSiteLax",
+                        "SameSiteExtended",
+                        "SameSiteUnspecifiedTreatedAsLax",
+                        "SameSiteNoneInsecure",
+                        "UserPreferences",
+                        "UnknownError"
+                    ]
+                },
+                {
+                    "id": "BlockedSetCookieWithReason",
+                    "description": "A cookie which was not stored from a response with the corresponding reason.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "blockedReason",
+                            "description": "The reason this cookie was blocked.",
+                            "$ref": "SetCookieBlockedReason"
+                        },
+                        {
+                            "name": "cookieLine",
+                            "description": "The string representing this individual cookie as it would appear in the header.\nThis is not the entire \"cookie\" or \"set-cookie\" header which could have multiple cookies.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "cookie",
+                            "description": "The cookie object which represents the cookie which was not stored. It is optional because\nsometimes complete cookie information is not available, such as in the case of parsing\nerrors.",
+                            "optional": true,
+                            "$ref": "Cookie"
+                        }
+                    ]
+                },
+                {
+                    "id": "BlockedCookieWithReason",
+                    "description": "A cookie with was not sent with a request with the corresponding reason.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "blockedReason",
+                            "description": "The reason the cookie was blocked.",
+                            "$ref": "CookieBlockedReason"
+                        },
+                        {
+                            "name": "cookie",
+                            "description": "The cookie object representing the cookie which was not sent.",
+                            "$ref": "Cookie"
+                        }
+                    ]
+                },
+                {
                     "id": "CookieParam",
                     "description": "Cookie parameter object",
                     "type": "object",
@@ -9175,6 +9258,11 @@
                             "items": {
                                 "$ref": "SignedExchangeSignature"
                             }
+                        },
+                        {
+                            "name": "headerIntegrity",
+                            "description": "Signed exchange header integrity hash in the form of \"sha256-<base64-hash-value>\".",
+                            "type": "string"
                         }
                     ]
                 },
@@ -9299,8 +9387,9 @@
                 },
                 {
                     "name": "continueInterceptedRequest",
-                    "description": "Response to Network.requestIntercepted which either modifies the request to continue with any\nmodifications, or blocks it, or completes it with the provided response bytes. If a network\nfetch occurs as a result which encounters a redirect an additional Network.requestIntercepted\nevent will be sent with the same InterceptionId.",
+                    "description": "Response to Network.requestIntercepted which either modifies the request to continue with any\nmodifications, or blocks it, or completes it with the provided response bytes. If a network\nfetch occurs as a result which encounters a redirect an additional Network.requestIntercepted\nevent will be sent with the same InterceptionId.\nDeprecated, use Fetch.continueRequest, Fetch.fulfillRequest and Fetch.failRequest instead.",
                     "experimental": true,
+                    "deprecated": true,
                     "parameters": [
                         {
                             "name": "interceptionId",
@@ -9781,8 +9870,9 @@
                 },
                 {
                     "name": "setRequestInterception",
-                    "description": "Sets the requests to intercept that match the provided patterns and optionally resource types.",
+                    "description": "Sets the requests to intercept that match the provided patterns and optionally resource types.\nDeprecated, please use Fetch.enable instead.",
                     "experimental": true,
+                    "deprecated": true,
                     "parameters": [
                         {
                             "name": "patterns",
@@ -9944,8 +10034,9 @@
                 },
                 {
                     "name": "requestIntercepted",
-                    "description": "Details of an intercepted HTTP request, which must be either allowed, blocked, modified or\nmocked.",
+                    "description": "Details of an intercepted HTTP request, which must be either allowed, blocked, modified or\nmocked.\nDeprecated, use Fetch.requestPaused instead.",
                     "experimental": true,
+                    "deprecated": true,
                     "parameters": [
                         {
                             "name": "interceptionId",
@@ -10314,6 +10405,62 @@
                             "$ref": "WebSocketRequest"
                         }
                     ]
+                },
+                {
+                    "name": "requestWillBeSentExtraInfo",
+                    "description": "Fired when additional information about a requestWillBeSent event is available from the\nnetwork stack. Not every requestWillBeSent event will have an additional\nrequestWillBeSentExtraInfo fired for it, and there is no guarantee whether requestWillBeSent\nor requestWillBeSentExtraInfo will be fired first for the same request.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "description": "Request identifier. Used to match this information to an existing requestWillBeSent event.",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "blockedCookies",
+                            "description": "A list of cookies which will not be sent with this request along with corresponding reasons\nfor blocking.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "BlockedCookieWithReason"
+                            }
+                        },
+                        {
+                            "name": "headers",
+                            "description": "Raw request headers as they will be sent over the wire.",
+                            "$ref": "Headers"
+                        }
+                    ]
+                },
+                {
+                    "name": "responseReceivedExtraInfo",
+                    "description": "Fired when additional information about a responseReceived event is available from the network\nstack. Not every responseReceived event will have an additional responseReceivedExtraInfo for\nit, and responseReceivedExtraInfo may be fired before or after responseReceived.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "requestId",
+                            "description": "Request identifier. Used to match this information to another responseReceived event.",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "blockedCookies",
+                            "description": "A list of cookies which were not stored from the response along with the corresponding\nreasons for blocking. The cookies here may not be valid due to syntax errors, which\nare represented by the invalid cookie line string instead of a proper cookie.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "BlockedSetCookieWithReason"
+                            }
+                        },
+                        {
+                            "name": "headers",
+                            "description": "Raw response headers as they were received over the wire.",
+                            "$ref": "Headers"
+                        },
+                        {
+                            "name": "headersText",
+                            "description": "Raw response header text as it was received over the wire. The raw text may not always be\navailable, such as in the case of HTTP/2 or QUIC.",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ]
                 }
             ]
         },
@@ -10439,6 +10586,12 @@
                         {
                             "name": "includeDistance",
                             "description": "Whether to include distance info.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "includeStyle",
+                            "description": "Whether to include style info.",
                             "optional": true,
                             "type": "boolean"
                         }
@@ -12245,6 +12398,42 @@
                     "name": "waitForDebugger",
                     "description": "Pauses page execution. Can be resumed using generic Runtime.runIfWaitingForDebugger.",
                     "experimental": true
+                },
+                {
+                    "name": "setInterceptFileChooserDialog",
+                    "description": "Intercept file chooser requests and transfer control to protocol clients.\nWhen file chooser interception is enabled, native file chooser dialog is not shown.\nInstead, a protocol event `Page.fileChooserOpened` is emitted.\nFile chooser can be handled with `page.handleFileChooser` command.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "enabled",
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "name": "handleFileChooser",
+                    "description": "Accepts or cancels an intercepted file chooser dialog.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "action",
+                            "type": "string",
+                            "enum": [
+                                "accept",
+                                "cancel",
+                                "fallback"
+                            ]
+                        },
+                        {
+                            "name": "files",
+                            "description": "Array of absolute file paths to set, only respected with `accept` action.",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ]
                 }
             ],
             "events": [
@@ -12254,6 +12443,20 @@
                         {
                             "name": "timestamp",
                             "$ref": "Network.MonotonicTime"
+                        }
+                    ]
+                },
+                {
+                    "name": "fileChooserOpened",
+                    "description": "Emitted only when `page.interceptFileChooser` is enabled.",
+                    "parameters": [
+                        {
+                            "name": "mode",
+                            "type": "string",
+                            "enum": [
+                                "selectSingle",
+                                "selectMultiple"
+                            ]
                         }
                     ]
                 },
@@ -13526,6 +13729,16 @@
                     ]
                 },
                 {
+                    "id": "ImageType",
+                    "description": "Image format of a given image.",
+                    "type": "string",
+                    "enum": [
+                        "jpeg",
+                        "webp",
+                        "unknown"
+                    ]
+                },
+                {
                     "id": "ImageDecodeAcceleratorCapability",
                     "description": "Describes a supported image decoding profile with its associated minimum and\nmaximum resolutions and subsampling.",
                     "type": "object",
@@ -13533,7 +13746,7 @@
                         {
                             "name": "imageType",
                             "description": "Image coded, e.g. Jpeg.",
-                            "type": "string"
+                            "$ref": "ImageType"
                         },
                         {
                             "name": "maxDimensions",

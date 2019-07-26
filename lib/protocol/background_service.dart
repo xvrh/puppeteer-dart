@@ -83,11 +83,15 @@ class ServiceName {
   static const backgroundSync = ServiceName._('backgroundSync');
   static const pushMessaging = ServiceName._('pushMessaging');
   static const notifications = ServiceName._('notifications');
+  static const paymentHandler = ServiceName._('paymentHandler');
+  static const periodicBackgroundSync = ServiceName._('periodicBackgroundSync');
   static const values = {
     'backgroundFetch': backgroundFetch,
     'backgroundSync': backgroundSync,
     'pushMessaging': pushMessaging,
     'notifications': notifications,
+    'paymentHandler': paymentHandler,
+    'periodicBackgroundSync': periodicBackgroundSync,
   };
 
   final String value;

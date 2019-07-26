@@ -462,6 +462,19 @@ main() {
 
       await main();
     });
+    test('waitForFileChooser', () async {
+      await page.goto(server.assetUrl('doc_examples_3.html'));
+      //------
+      var futureFileChooser = page.waitForFileChooser();
+      // some button that triggers file selection
+      await page.click('#upload-file-button');
+      var fileChooser = await futureFileChooser;
+
+      await fileChooser.accept([
+        File(exampleValue('/test/assets/file-to-upload.txt', 'myfile.pdf'))
+      ]);
+      //----
+    });
   });
   group('Frame', () {
     group('class', () {
@@ -948,6 +961,21 @@ main() {
         var node = findFocusedNode(snapshot);
         print(node?.name);
       });
+    });
+  });
+  group('FileChooser', () {
+    test('class', () async {
+      await page.goto(server.assetUrl('doc_examples_3.html'));
+      //------
+      var futureFileChooser = page.waitForFileChooser();
+      // some button that triggers file selection
+      await page.click('#upload-file-button');
+      var fileChooser = await futureFileChooser;
+
+      await fileChooser.accept([
+        File(exampleValue('/test/assets/file-to-upload.txt', 'myfile.pdf'))
+      ]);
+      //----
     });
   });
 }

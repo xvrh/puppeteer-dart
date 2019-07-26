@@ -241,11 +241,41 @@ class SubsamplingFormat {
   String toString() => value.toString();
 }
 
+/// Image format of a given image.
+class ImageType {
+  static const jpeg = ImageType._('jpeg');
+  static const webp = ImageType._('webp');
+  static const unknown = ImageType._('unknown');
+  static const values = {
+    'jpeg': jpeg,
+    'webp': webp,
+    'unknown': unknown,
+  };
+
+  final String value;
+
+  const ImageType._(this.value);
+
+  factory ImageType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ImageType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Describes a supported image decoding profile with its associated minimum and
 /// maximum resolutions and subsampling.
 class ImageDecodeAcceleratorCapability {
   /// Image coded, e.g. Jpeg.
-  final String imageType;
+  final ImageType imageType;
 
   /// Maximum supported dimensions of the image in pixels.
   final Size maxDimensions;
@@ -264,7 +294,7 @@ class ImageDecodeAcceleratorCapability {
 
   factory ImageDecodeAcceleratorCapability.fromJson(Map<String, dynamic> json) {
     return ImageDecodeAcceleratorCapability(
-      imageType: json['imageType'],
+      imageType: ImageType.fromJson(json['imageType']),
       maxDimensions: Size.fromJson(json['maxDimensions']),
       minDimensions: Size.fromJson(json['minDimensions']),
       subsamplings: (json['subsamplings'] as List)
@@ -275,7 +305,7 @@ class ImageDecodeAcceleratorCapability {
 
   Map<String, dynamic> toJson() {
     var json = <String, dynamic>{
-      'imageType': imageType,
+      'imageType': imageType.toJson(),
       'maxDimensions': maxDimensions.toJson(),
       'minDimensions': minDimensions.toJson(),
       'subsamplings': subsamplings.map((e) => e.toJson()).toList(),

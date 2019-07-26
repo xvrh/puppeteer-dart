@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<input type="file">
+
+<button id="upload-file-button">File upload</button>
+
+<script>
+    document.querySelector('#upload-file-button').addEventListener('click', function() {
+       document.querySelector('input[type=file]').click();
+    });
+</script>
+
+</body>
+</html>
