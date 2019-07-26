@@ -44,8 +44,8 @@ main() {
   group('coverage_test', coverage_test.main);
   group('devices_test', devices_test.main);
   group('dialog_test', dialog_test.main);
-  group('doc_examples_test', doc_examples_test.main);
   group('doc_example_extractor_test', doc_example_extractor_test.main);
+  group('doc_examples_test', doc_examples_test.main);
   group('downloader_test', downloader_test.main);
   group('element_handle_test', element_handle_test.main);
   group('emulation_test', emulation_test.main);
@@ -68,8 +68,8 @@ main() {
   group('screenshot_test', screenshot_test.main);
   group('stealth_plugin_test', stealth_plugin_test.main);
   group('target_test', target_test.main);
-  group('touchscreen_test', touchscreen_test.main);
   group('to_comment_test', to_comment_test.main);
+  group('touchscreen_test', touchscreen_test.main);
   group('tracing_test', tracing_test.main);
   group('wait_task_test', wait_task_test.main);
   group('worker_test', worker_test.main);

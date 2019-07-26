@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:logging/logging.dart';
-
 import '../../protocol/io.dart';
 import '../../protocol/runtime.dart';
 import '../javascript_function_parser.dart';

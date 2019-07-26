@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.10.0 (2019-07-26)
+- Introduce file chooser interception
+- Update Chromium version to 674921
+
 # 1.9.0 (2019-06-30)
 - Update Chromium version to 672088
 - Update dependencies
