@@ -1289,7 +1289,7 @@ class FrameId {
 /// Information about the Frame on the page.
 class FrameInfo {
   /// Frame unique identifier.
-  final String id;
+  final FrameId id;
 
   /// Parent frame identifier.
   final String parentId;
@@ -1328,7 +1328,7 @@ class FrameInfo {
 
   factory FrameInfo.fromJson(Map<String, dynamic> json) {
     return FrameInfo(
-      id: json['id'],
+      id: FrameId.fromJson(json['id']),
       parentId: json.containsKey('parentId') ? json['parentId'] : null,
       loaderId: network.LoaderId.fromJson(json['loaderId']),
       name: json.containsKey('name') ? json['name'] : null,
@@ -1343,7 +1343,7 @@ class FrameInfo {
 
   Map<String, dynamic> toJson() {
     var json = <String, dynamic>{
-      'id': id,
+      'id': id.toJson(),
       'loaderId': loaderId.toJson(),
       'url': url,
       'securityOrigin': securityOrigin,

@@ -55,12 +55,16 @@ class DOMSnapshotApi {
   /// white-listed computed style information for the nodes. Shadow DOM in the returned DOM tree is
   /// flattened.
   /// [computedStyles] Whitelist of computed styles to return.
+  /// [includePaintOrder] Whether to include layout object paint orders into the snapshot.
   /// [includeDOMRects] Whether to include DOM rectangles (offsetRects, clientRects, scrollRects) into the snapshot
   Future<CaptureSnapshotResult> captureSnapshot(List<String> computedStyles,
-      {bool includeDOMRects}) async {
+      {bool includePaintOrder, bool includeDOMRects}) async {
     var parameters = <String, dynamic>{
       'computedStyles': computedStyles.map((e) => e).toList(),
     };
+    if (includePaintOrder != null) {
+      parameters['includePaintOrder'] = includePaintOrder;
+    }
     if (includeDOMRects != null) {
       parameters['includeDOMRects'] = includeDOMRects;
     }
@@ -964,6 +968,11 @@ class LayoutTreeSnapshot {
   /// Stacking context information.
   final RareBooleanData stackingContexts;
 
+  /// Global paint order index, which is determined by the stacking order of the nodes. Nodes
+  /// that are painted together will have the same index. Only provided if includePaintOrder in
+  /// captureSnapshot was true.
+  final List<int> paintOrders;
+
   /// The offset rect of nodes. Only available when includeDOMRects is set to true
   final List<Rectangle> offsetRects;
 
@@ -979,6 +988,7 @@ class LayoutTreeSnapshot {
       @required this.bounds,
       @required this.text,
       @required this.stackingContexts,
+      this.paintOrders,
       this.offsetRects,
       this.scrollRects,
       this.clientRects});
@@ -993,6 +1003,9 @@ class LayoutTreeSnapshot {
           (json['bounds'] as List).map((e) => Rectangle.fromJson(e)).toList(),
       text: (json['text'] as List).map((e) => StringIndex.fromJson(e)).toList(),
       stackingContexts: RareBooleanData.fromJson(json['stackingContexts']),
+      paintOrders: json.containsKey('paintOrders')
+          ? (json['paintOrders'] as List).map((e) => e as int).toList()
+          : null,
       offsetRects: json.containsKey('offsetRects')
           ? (json['offsetRects'] as List)
               .map((e) => Rectangle.fromJson(e))
@@ -1019,6 +1032,9 @@ class LayoutTreeSnapshot {
       'text': text.map((e) => e.toJson()).toList(),
       'stackingContexts': stackingContexts.toJson(),
     };
+    if (paintOrders != null) {
+      json['paintOrders'] = paintOrders.map((e) => e).toList();
+    }
     if (offsetRects != null) {
       json['offsetRects'] = offsetRects.map((e) => e.toJson()).toList();
     }

@@ -14,15 +14,73 @@ class WebAudioApi {
       .where((event) => event.name == 'WebAudio.contextCreated')
       .map((event) => BaseAudioContext.fromJson(event.parameters['context']));
 
-  /// Notifies that existing BaseAudioContext has been destroyed.
-  Stream<ContextId> get onContextDestroyed => _client.onEvent
-      .where((event) => event.name == 'WebAudio.contextDestroyed')
-      .map((event) => ContextId.fromJson(event.parameters['contextId']));
+  /// Notifies that an existing BaseAudioContext will be destroyed.
+  Stream<GraphObjectId> get onContextWillBeDestroyed => _client.onEvent
+      .where((event) => event.name == 'WebAudio.contextWillBeDestroyed')
+      .map((event) => GraphObjectId.fromJson(event.parameters['contextId']));
 
   /// Notifies that existing BaseAudioContext has changed some properties (id stays the same)..
   Stream<BaseAudioContext> get onContextChanged => _client.onEvent
       .where((event) => event.name == 'WebAudio.contextChanged')
       .map((event) => BaseAudioContext.fromJson(event.parameters['context']));
+
+  /// Notifies that the construction of an AudioListener has finished.
+  Stream<AudioListener> get onAudioListenerCreated => _client.onEvent
+      .where((event) => event.name == 'WebAudio.audioListenerCreated')
+      .map((event) => AudioListener.fromJson(event.parameters['listener']));
+
+  /// Notifies that a new AudioListener has been created.
+  Stream<AudioListenerWillBeDestroyedEvent>
+      get onAudioListenerWillBeDestroyed => _client.onEvent
+          .where(
+              (event) => event.name == 'WebAudio.audioListenerWillBeDestroyed')
+          .map((event) =>
+              AudioListenerWillBeDestroyedEvent.fromJson(event.parameters));
+
+  /// Notifies that a new AudioNode has been created.
+  Stream<AudioNode> get onAudioNodeCreated => _client.onEvent
+      .where((event) => event.name == 'WebAudio.audioNodeCreated')
+      .map((event) => AudioNode.fromJson(event.parameters['node']));
+
+  /// Notifies that an existing AudioNode has been destroyed.
+  Stream<AudioNodeWillBeDestroyedEvent> get onAudioNodeWillBeDestroyed =>
+      _client.onEvent
+          .where((event) => event.name == 'WebAudio.audioNodeWillBeDestroyed')
+          .map((event) =>
+              AudioNodeWillBeDestroyedEvent.fromJson(event.parameters));
+
+  /// Notifies that a new AudioParam has been created.
+  Stream<AudioParam> get onAudioParamCreated => _client.onEvent
+      .where((event) => event.name == 'WebAudio.audioParamCreated')
+      .map((event) => AudioParam.fromJson(event.parameters['param']));
+
+  /// Notifies that an existing AudioParam has been destroyed.
+  Stream<AudioParamWillBeDestroyedEvent> get onAudioParamWillBeDestroyed =>
+      _client.onEvent
+          .where((event) => event.name == 'WebAudio.audioParamWillBeDestroyed')
+          .map((event) =>
+              AudioParamWillBeDestroyedEvent.fromJson(event.parameters));
+
+  /// Notifies that two AudioNodes are connected.
+  Stream<NodesConnectedEvent> get onNodesConnected => _client.onEvent
+      .where((event) => event.name == 'WebAudio.nodesConnected')
+      .map((event) => NodesConnectedEvent.fromJson(event.parameters));
+
+  /// Notifies that AudioNodes are disconnected. The destination can be null, and it means all the outgoing connections from the source are disconnected.
+  Stream<NodesDisconnectedEvent> get onNodesDisconnected => _client.onEvent
+      .where((event) => event.name == 'WebAudio.nodesDisconnected')
+      .map((event) => NodesDisconnectedEvent.fromJson(event.parameters));
+
+  /// Notifies that an AudioNode is connected to an AudioParam.
+  Stream<NodeParamConnectedEvent> get onNodeParamConnected => _client.onEvent
+      .where((event) => event.name == 'WebAudio.nodeParamConnected')
+      .map((event) => NodeParamConnectedEvent.fromJson(event.parameters));
+
+  /// Notifies that an AudioNode is disconnected to an AudioParam.
+  Stream<NodeParamDisconnectedEvent> get onNodeParamDisconnected => _client
+      .onEvent
+      .where((event) => event.name == 'WebAudio.nodeParamDisconnected')
+      .map((event) => NodeParamDisconnectedEvent.fromJson(event.parameters));
 
   /// Enables the WebAudio domain and starts sending context lifetime events.
   Future<void> enable() async {
@@ -35,7 +93,7 @@ class WebAudioApi {
   }
 
   /// Fetch the realtime data from the registered contexts.
-  Future<ContextRealtimeData> getRealtimeData(ContextId contextId) async {
+  Future<ContextRealtimeData> getRealtimeData(GraphObjectId contextId) async {
     var parameters = <String, dynamic>{
       'contextId': contextId.toJson(),
     };
@@ -44,19 +102,193 @@ class WebAudioApi {
   }
 }
 
-/// Context's UUID in string
-class ContextId {
+class AudioListenerWillBeDestroyedEvent {
+  final GraphObjectId contextId;
+
+  final GraphObjectId listenerId;
+
+  AudioListenerWillBeDestroyedEvent(
+      {@required this.contextId, @required this.listenerId});
+
+  factory AudioListenerWillBeDestroyedEvent.fromJson(
+      Map<String, dynamic> json) {
+    return AudioListenerWillBeDestroyedEvent(
+      contextId: GraphObjectId.fromJson(json['contextId']),
+      listenerId: GraphObjectId.fromJson(json['listenerId']),
+    );
+  }
+}
+
+class AudioNodeWillBeDestroyedEvent {
+  final GraphObjectId contextId;
+
+  final GraphObjectId nodeId;
+
+  AudioNodeWillBeDestroyedEvent(
+      {@required this.contextId, @required this.nodeId});
+
+  factory AudioNodeWillBeDestroyedEvent.fromJson(Map<String, dynamic> json) {
+    return AudioNodeWillBeDestroyedEvent(
+      contextId: GraphObjectId.fromJson(json['contextId']),
+      nodeId: GraphObjectId.fromJson(json['nodeId']),
+    );
+  }
+}
+
+class AudioParamWillBeDestroyedEvent {
+  final GraphObjectId contextId;
+
+  final GraphObjectId nodeId;
+
+  final GraphObjectId paramId;
+
+  AudioParamWillBeDestroyedEvent(
+      {@required this.contextId,
+      @required this.nodeId,
+      @required this.paramId});
+
+  factory AudioParamWillBeDestroyedEvent.fromJson(Map<String, dynamic> json) {
+    return AudioParamWillBeDestroyedEvent(
+      contextId: GraphObjectId.fromJson(json['contextId']),
+      nodeId: GraphObjectId.fromJson(json['nodeId']),
+      paramId: GraphObjectId.fromJson(json['paramId']),
+    );
+  }
+}
+
+class NodesConnectedEvent {
+  final GraphObjectId contextId;
+
+  final GraphObjectId sourceId;
+
+  final GraphObjectId destinationId;
+
+  final num sourceOutputIndex;
+
+  final num destinationInputIndex;
+
+  NodesConnectedEvent(
+      {@required this.contextId,
+      @required this.sourceId,
+      @required this.destinationId,
+      this.sourceOutputIndex,
+      this.destinationInputIndex});
+
+  factory NodesConnectedEvent.fromJson(Map<String, dynamic> json) {
+    return NodesConnectedEvent(
+      contextId: GraphObjectId.fromJson(json['contextId']),
+      sourceId: GraphObjectId.fromJson(json['sourceId']),
+      destinationId: GraphObjectId.fromJson(json['destinationId']),
+      sourceOutputIndex: json.containsKey('sourceOutputIndex')
+          ? json['sourceOutputIndex']
+          : null,
+      destinationInputIndex: json.containsKey('destinationInputIndex')
+          ? json['destinationInputIndex']
+          : null,
+    );
+  }
+}
+
+class NodesDisconnectedEvent {
+  final GraphObjectId contextId;
+
+  final GraphObjectId sourceId;
+
+  final GraphObjectId destinationId;
+
+  final num sourceOutputIndex;
+
+  final num destinationInputIndex;
+
+  NodesDisconnectedEvent(
+      {@required this.contextId,
+      @required this.sourceId,
+      @required this.destinationId,
+      this.sourceOutputIndex,
+      this.destinationInputIndex});
+
+  factory NodesDisconnectedEvent.fromJson(Map<String, dynamic> json) {
+    return NodesDisconnectedEvent(
+      contextId: GraphObjectId.fromJson(json['contextId']),
+      sourceId: GraphObjectId.fromJson(json['sourceId']),
+      destinationId: GraphObjectId.fromJson(json['destinationId']),
+      sourceOutputIndex: json.containsKey('sourceOutputIndex')
+          ? json['sourceOutputIndex']
+          : null,
+      destinationInputIndex: json.containsKey('destinationInputIndex')
+          ? json['destinationInputIndex']
+          : null,
+    );
+  }
+}
+
+class NodeParamConnectedEvent {
+  final GraphObjectId contextId;
+
+  final GraphObjectId sourceId;
+
+  final GraphObjectId destinationId;
+
+  final num sourceOutputIndex;
+
+  NodeParamConnectedEvent(
+      {@required this.contextId,
+      @required this.sourceId,
+      @required this.destinationId,
+      this.sourceOutputIndex});
+
+  factory NodeParamConnectedEvent.fromJson(Map<String, dynamic> json) {
+    return NodeParamConnectedEvent(
+      contextId: GraphObjectId.fromJson(json['contextId']),
+      sourceId: GraphObjectId.fromJson(json['sourceId']),
+      destinationId: GraphObjectId.fromJson(json['destinationId']),
+      sourceOutputIndex: json.containsKey('sourceOutputIndex')
+          ? json['sourceOutputIndex']
+          : null,
+    );
+  }
+}
+
+class NodeParamDisconnectedEvent {
+  final GraphObjectId contextId;
+
+  final GraphObjectId sourceId;
+
+  final GraphObjectId destinationId;
+
+  final num sourceOutputIndex;
+
+  NodeParamDisconnectedEvent(
+      {@required this.contextId,
+      @required this.sourceId,
+      @required this.destinationId,
+      this.sourceOutputIndex});
+
+  factory NodeParamDisconnectedEvent.fromJson(Map<String, dynamic> json) {
+    return NodeParamDisconnectedEvent(
+      contextId: GraphObjectId.fromJson(json['contextId']),
+      sourceId: GraphObjectId.fromJson(json['sourceId']),
+      destinationId: GraphObjectId.fromJson(json['destinationId']),
+      sourceOutputIndex: json.containsKey('sourceOutputIndex')
+          ? json['sourceOutputIndex']
+          : null,
+    );
+  }
+}
+
+/// An unique ID for a graph object (AudioContext, AudioNode, AudioParam) in Web Audio API
+class GraphObjectId {
   final String value;
 
-  ContextId(this.value);
+  GraphObjectId(this.value);
 
-  factory ContextId.fromJson(String value) => ContextId(value);
+  factory GraphObjectId.fromJson(String value) => GraphObjectId(value);
 
   String toJson() => value;
 
   @override
   bool operator ==(other) =>
-      (other is ContextId && other.value == value) || value == other;
+      (other is GraphObjectId && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -123,6 +355,135 @@ class ContextState {
   String toString() => value.toString();
 }
 
+/// Enum of AudioNode types
+class NodeType {
+  final String value;
+
+  NodeType(this.value);
+
+  factory NodeType.fromJson(String value) => NodeType(value);
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is NodeType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Enum of AudioNode::ChannelCountMode from the spec
+class ChannelCountMode {
+  static const clampedMax = ChannelCountMode._('clamped-max');
+  static const explicit = ChannelCountMode._('explicit');
+  static const max = ChannelCountMode._('max');
+  static const values = {
+    'clamped-max': clampedMax,
+    'explicit': explicit,
+    'max': max,
+  };
+
+  final String value;
+
+  const ChannelCountMode._(this.value);
+
+  factory ChannelCountMode.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ChannelCountMode && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Enum of AudioNode::ChannelInterpretation from the spec
+class ChannelInterpretation {
+  static const discrete = ChannelInterpretation._('discrete');
+  static const speakers = ChannelInterpretation._('speakers');
+  static const values = {
+    'discrete': discrete,
+    'speakers': speakers,
+  };
+
+  final String value;
+
+  const ChannelInterpretation._(this.value);
+
+  factory ChannelInterpretation.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ChannelInterpretation && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Enum of AudioParam types
+class ParamType {
+  final String value;
+
+  ParamType(this.value);
+
+  factory ParamType.fromJson(String value) => ParamType(value);
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ParamType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Enum of AudioParam::AutomationRate from the spec
+class AutomationRate {
+  static const aRate = AutomationRate._('a-rate');
+  static const kRate = AutomationRate._('k-rate');
+  static const values = {
+    'a-rate': aRate,
+    'k-rate': kRate,
+  };
+
+  final String value;
+
+  const AutomationRate._(this.value);
+
+  factory AutomationRate.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is AutomationRate && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Fields in AudioContext that change in real-time.
 class ContextRealtimeData {
   /// The current context time in second in BaseAudioContext.
@@ -167,7 +528,7 @@ class ContextRealtimeData {
 
 /// Protocol object for BaseAudioContext
 class BaseAudioContext {
-  final ContextId contextId;
+  final GraphObjectId contextId;
 
   final ContextType contextType;
 
@@ -195,7 +556,7 @@ class BaseAudioContext {
 
   factory BaseAudioContext.fromJson(Map<String, dynamic> json) {
     return BaseAudioContext(
-      contextId: ContextId.fromJson(json['contextId']),
+      contextId: GraphObjectId.fromJson(json['contextId']),
       contextType: ContextType.fromJson(json['contextType']),
       contextState: ContextState.fromJson(json['contextState']),
       realtimeData: json.containsKey('realtimeData')
@@ -219,6 +580,143 @@ class BaseAudioContext {
     if (realtimeData != null) {
       json['realtimeData'] = realtimeData.toJson();
     }
+    return json;
+  }
+}
+
+/// Protocol object for AudioListner
+class AudioListener {
+  final GraphObjectId listenerId;
+
+  final GraphObjectId contextId;
+
+  AudioListener({@required this.listenerId, @required this.contextId});
+
+  factory AudioListener.fromJson(Map<String, dynamic> json) {
+    return AudioListener(
+      listenerId: GraphObjectId.fromJson(json['listenerId']),
+      contextId: GraphObjectId.fromJson(json['contextId']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
+      'listenerId': listenerId.toJson(),
+      'contextId': contextId.toJson(),
+    };
+    return json;
+  }
+}
+
+/// Protocol object for AudioNode
+class AudioNode {
+  final GraphObjectId nodeId;
+
+  final GraphObjectId contextId;
+
+  final NodeType nodeType;
+
+  final num numberOfInputs;
+
+  final num numberOfOutputs;
+
+  final num channelCount;
+
+  final ChannelCountMode channelCountMode;
+
+  final ChannelInterpretation channelInterpretation;
+
+  AudioNode(
+      {@required this.nodeId,
+      @required this.contextId,
+      @required this.nodeType,
+      @required this.numberOfInputs,
+      @required this.numberOfOutputs,
+      @required this.channelCount,
+      @required this.channelCountMode,
+      @required this.channelInterpretation});
+
+  factory AudioNode.fromJson(Map<String, dynamic> json) {
+    return AudioNode(
+      nodeId: GraphObjectId.fromJson(json['nodeId']),
+      contextId: GraphObjectId.fromJson(json['contextId']),
+      nodeType: NodeType.fromJson(json['nodeType']),
+      numberOfInputs: json['numberOfInputs'],
+      numberOfOutputs: json['numberOfOutputs'],
+      channelCount: json['channelCount'],
+      channelCountMode: ChannelCountMode.fromJson(json['channelCountMode']),
+      channelInterpretation:
+          ChannelInterpretation.fromJson(json['channelInterpretation']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
+      'nodeId': nodeId.toJson(),
+      'contextId': contextId.toJson(),
+      'nodeType': nodeType.toJson(),
+      'numberOfInputs': numberOfInputs,
+      'numberOfOutputs': numberOfOutputs,
+      'channelCount': channelCount,
+      'channelCountMode': channelCountMode.toJson(),
+      'channelInterpretation': channelInterpretation.toJson(),
+    };
+    return json;
+  }
+}
+
+/// Protocol object for AudioParam
+class AudioParam {
+  final GraphObjectId paramId;
+
+  final GraphObjectId nodeId;
+
+  final GraphObjectId contextId;
+
+  final ParamType paramType;
+
+  final AutomationRate rate;
+
+  final num defaultValue;
+
+  final num minValue;
+
+  final num maxValue;
+
+  AudioParam(
+      {@required this.paramId,
+      @required this.nodeId,
+      @required this.contextId,
+      @required this.paramType,
+      @required this.rate,
+      @required this.defaultValue,
+      @required this.minValue,
+      @required this.maxValue});
+
+  factory AudioParam.fromJson(Map<String, dynamic> json) {
+    return AudioParam(
+      paramId: GraphObjectId.fromJson(json['paramId']),
+      nodeId: GraphObjectId.fromJson(json['nodeId']),
+      contextId: GraphObjectId.fromJson(json['contextId']),
+      paramType: ParamType.fromJson(json['paramType']),
+      rate: AutomationRate.fromJson(json['rate']),
+      defaultValue: json['defaultValue'],
+      minValue: json['minValue'],
+      maxValue: json['maxValue'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
+      'paramId': paramId.toJson(),
+      'nodeId': nodeId.toJson(),
+      'contextId': contextId.toJson(),
+      'paramType': paramType.toJson(),
+      'rate': rate.toJson(),
+      'defaultValue': defaultValue,
+      'minValue': minValue,
+      'maxValue': maxValue,
+    };
     return json;
   }
 }

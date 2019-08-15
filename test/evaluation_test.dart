@@ -139,21 +139,16 @@ main() {
       expect(result, equals(27));
     });
     test('should reject promise with exception', () async {
-      expect(
-          () => page.evaluate(
-              '() => not.existing.object.property).catch(e => error = e'),
-          throwsA(anything));
+      expect(() => page.evaluate('() => not_existing_object.property'),
+          throwsA(predicate((e) => '$e'.contains('not_existing_object'))));
     });
     test('should support thrown strings as error messages', () async {
-      expect(
-          () =>
-              page.evaluate("() => { throw 'qwerty'; }).catch(e => error = e"),
-          throwsA(anything));
+      expect(() => page.evaluate("() => { throw 'qwerty'; }"),
+          throwsA(predicate((e) => '$e'.contains('qwerty'))));
     });
     test('should support thrown numbers as error messages', () async {
-      expect(
-          () => page.evaluate('() => { throw 100500; }).catch(e => error = e'),
-          throwsA(anything));
+      expect(() => page.evaluate('() => { throw 100500; }'),
+          throwsA(predicate((e) => '$e'.contains('100500'))));
     });
     test('should return complex objects', () async {
       var object = {'foo': 'bar!'};
@@ -237,7 +232,11 @@ main() {
               'JSHandles can be evaluated only in the context they were created'))));
     });
     test('should simulate a user gesture', () async {
-      var result = await page.evaluate("() => document.execCommand('copy')");
+      var result = await page.evaluate('''() => {
+      document.body.appendChild(document.createTextNode('test'));
+          document.execCommand('selectAll');
+      return document.execCommand('copy');
+    }''');
       expect(result, isTrue);
     });
     test('should throw a nice error after a navigation', () async {
@@ -258,6 +257,13 @@ main() {
     return [42];
     }''');
       expect(result, equals([42]));
+    });
+    test(
+        'should throw error with detailed information on exception inside promise',
+        () {
+      expect(() => page.evaluate('''() => new Promise(() => {
+    throw new Error('Error in promise');
+    })'''), throwsA(predicate((e) => '$e'.contains('Error in promise'))));
     });
   });
 

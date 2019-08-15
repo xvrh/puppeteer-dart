@@ -76,7 +76,7 @@ class Target {
   Future<Page> get page {
     if ((_info.type == 'page' || _info.type == 'background_page') &&
         _pageFuture == null) {
-      _pageFuture = this._sessionFactory().then((session) =>
+      _pageFuture = _sessionFactory().then((session) =>
           Page.create(this, session, viewport: browser.defaultViewport));
     }
     return _pageFuture;
@@ -86,18 +86,9 @@ class Target {
     if (_info.type != 'service_worker' && _info.type != 'shared_worker') {
       return null;
     }
-    _workerFuture ??= this._sessionFactory().then((client) async {
-      var targetApi = TargetApi(client);
-
-      // Top level workers have a fake page wrapping the actual worker.
-      var targetAttachedFuture = targetApi.onAttachedToTarget.first;
-      await targetApi.setAutoAttach(true, false, flatten: true);
-
-      var targetAttached = await targetAttachedFuture;
-      var session = client.connection.sessions[targetAttached.sessionId.value];
-      // TODO Make workers send their console logs.
-      return Worker(session, _info.url,
-          onConsoleApiCalled: null, onExceptionThrown: null);
+    _workerFuture ??= _sessionFactory().then((client) async {
+      return _sessionFactory().then((client) => Worker(client, _info.url,
+          onConsoleApiCalled: null, onExceptionThrown: null));
     });
     return _workerFuture;
   }

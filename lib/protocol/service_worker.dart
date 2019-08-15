@@ -53,6 +53,16 @@ class ServiceWorkerApi {
     await _client.send('ServiceWorker.dispatchSyncEvent', parameters);
   }
 
+  Future<void> dispatchPeriodicSyncEvent(
+      String origin, RegistrationID registrationId, String tag) async {
+    var parameters = <String, dynamic>{
+      'origin': origin,
+      'registrationId': registrationId.toJson(),
+      'tag': tag,
+    };
+    await _client.send('ServiceWorker.dispatchPeriodicSyncEvent', parameters);
+  }
+
   Future<void> enable() async {
     await _client.send('ServiceWorker.enable');
   }
