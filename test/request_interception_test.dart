@@ -86,6 +86,22 @@ main() {
       });
       await page.goto(server.prefix + '/rrredirect');
     });
+    // @see https://github.com/GoogleChrome/puppeteer/issues/4743
+    test('should be able to remove headers', () async {
+      await page.setRequestInterception(true);
+      page.onRequest.listen((request) {
+        var headers = request.headers;
+        headers['foo'] = 'bar';
+        headers.remove('origin');
+        request.continueRequest(headers: headers);
+      });
+
+      var serverRequest = await waitFutures(
+          server.waitForRequest('/empty.html'),
+          [page.goto(server.prefix + '/empty.html')]);
+
+      expect(serverRequest.headers['origin'], isNull);
+    });
     test('should contain referer header', () async {
       await page.setRequestInterception(true);
       var requests = <Request>[];

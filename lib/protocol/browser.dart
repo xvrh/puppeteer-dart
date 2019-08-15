@@ -9,6 +9,25 @@ class BrowserApi {
 
   BrowserApi(this._client);
 
+  /// Set permission settings for given origin.
+  /// [origin] Origin the permission applies to.
+  /// [permission] Descriptor of permission to override.
+  /// [setting] Setting of the permission.
+  /// [browserContextId] Context to override. When omitted, default browser context is used.
+  Future<void> setPermission(
+      String origin, PermissionDescriptor permission, PermissionSetting setting,
+      {target.TargetID browserContextId}) async {
+    var parameters = <String, dynamic>{
+      'origin': origin,
+      'permission': permission.toJson(),
+      'setting': setting.toJson(),
+    };
+    if (browserContextId != null) {
+      parameters['browserContextId'] = browserContextId.toJson();
+    }
+    await _client.send('Browser.setPermission', parameters);
+  }
+
   /// Grant specific permissions to the given origin and reject all others.
   /// [browserContextId] BrowserContext to override permissions. When omitted, default browser context is used.
   Future<void> grantPermissions(String origin, List<PermissionType> permissions,
@@ -367,6 +386,82 @@ class PermissionType {
 
   @override
   String toString() => value.toString();
+}
+
+class PermissionSetting {
+  static const granted = PermissionSetting._('granted');
+  static const denied = PermissionSetting._('denied');
+  static const prompt = PermissionSetting._('prompt');
+  static const values = {
+    'granted': granted,
+    'denied': denied,
+    'prompt': prompt,
+  };
+
+  final String value;
+
+  const PermissionSetting._(this.value);
+
+  factory PermissionSetting.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is PermissionSetting && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Definition of PermissionDescriptor defined in the Permissions API:
+/// https://w3c.github.io/permissions/#dictdef-permissiondescriptor.
+class PermissionDescriptor {
+  /// Name of permission.
+  /// See https://cs.chromium.org/chromium/src/third_party/blink/renderer/modules/permissions/permission_descriptor.idl for valid permission names.
+  final String name;
+
+  /// For "midi" permission, may also specify sysex control.
+  final bool sysex;
+
+  /// For "push" permission, may specify userVisibleOnly.
+  /// Note that userVisibleOnly = true is the only currently supported type.
+  final bool userVisibleOnly;
+
+  /// For "wake-lock" permission, must specify type as either "screen" or "system".
+  final String type;
+
+  PermissionDescriptor(
+      {@required this.name, this.sysex, this.userVisibleOnly, this.type});
+
+  factory PermissionDescriptor.fromJson(Map<String, dynamic> json) {
+    return PermissionDescriptor(
+      name: json['name'],
+      sysex: json.containsKey('sysex') ? json['sysex'] : null,
+      userVisibleOnly:
+          json.containsKey('userVisibleOnly') ? json['userVisibleOnly'] : null,
+      type: json.containsKey('type') ? json['type'] : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    var json = <String, dynamic>{
+      'name': name,
+    };
+    if (sysex != null) {
+      json['sysex'] = sysex;
+    }
+    if (userVisibleOnly != null) {
+      json['userVisibleOnly'] = userVisibleOnly;
+    }
+    if (type != null) {
+      json['type'] = type;
+    }
+    return json;
+  }
 }
 
 /// Chrome histogram bucket.

@@ -158,8 +158,7 @@ class FrameManager {
 
   void _handleFrameTree(FrameTree frameTree) {
     if (frameTree.frame.parentId != null) {
-      _onFrameAttached(
-          FrameId(frameTree.frame.id), FrameId(frameTree.frame.parentId));
+      _onFrameAttached(frameTree.frame.id, FrameId(frameTree.frame.parentId));
     }
     _onFrameNavigated(frameTree.frame);
     if (frameTree.childFrames == null) {
@@ -186,7 +185,7 @@ class FrameManager {
 
   void _onFrameNavigated(FrameInfo framePayload) {
     var isMainFrame = framePayload.parentId == null;
-    var frame = isMainFrame ? _mainFrame : _frames[FrameId(framePayload.id)];
+    var frame = isMainFrame ? _mainFrame : _frames[framePayload.id];
     assert(isMainFrame || frame != null,
         'We either navigate top level or have old version of the navigated frame');
 
@@ -200,12 +199,12 @@ class FrameManager {
       if (frame != null) {
         // Update frame id to retain frame identity on cross-process navigation.
         _frames.remove(frame.id);
-        frame._id = FrameId(framePayload.id);
+        frame._id = framePayload.id;
       } else {
         // Initial main frame navigation.
-        frame = Frame(this, page.session, null, FrameId(framePayload.id));
+        frame = Frame(this, page.session, null, framePayload.id);
       }
-      _frames[FrameId(framePayload.id)] = frame;
+      _frames[framePayload.id] = frame;
       _mainFrame = frame;
     }
 

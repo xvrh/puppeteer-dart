@@ -615,6 +615,26 @@ class DOMApi {
     await _client.send('DOM.setFileInputFiles', parameters);
   }
 
+  /// Sets if stack traces should be captured for Nodes. See `Node.getNodeStackTraces`. Default is disabled.
+  /// [enable] Enable or disable.
+  Future<void> setNodeStackTracesEnabled(bool enable) async {
+    var parameters = <String, dynamic>{
+      'enable': enable,
+    };
+    await _client.send('DOM.setNodeStackTracesEnabled', parameters);
+  }
+
+  /// Gets stack traces associated with a Node. As of now, only provides stack trace for Node creation.
+  /// [nodeId] Id of the node to get stack traces for.
+  /// Returns: Creation stack trace, if available.
+  Future<runtime.StackTrace> getNodeStackTraces(NodeId nodeId) async {
+    var parameters = <String, dynamic>{
+      'nodeId': nodeId.toJson(),
+    };
+    var result = await _client.send('DOM.getNodeStackTraces', parameters);
+    return runtime.StackTrace.fromJson(result['creation']);
+  }
+
   /// Returns file information for the given
   /// File wrapper.
   /// [objectId] JavaScript object id of the node wrapper.

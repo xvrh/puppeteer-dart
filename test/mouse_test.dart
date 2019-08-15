@@ -183,7 +183,6 @@ function dimensions() {
             [200, 300]
           ]));
     });
-    // @see https://crbug.com/929806
     test('should work with mobile viewports and cross process navigations',
         () async {
       await page.goto(server.emptyPage);

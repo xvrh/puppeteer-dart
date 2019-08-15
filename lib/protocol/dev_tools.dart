@@ -25,6 +25,7 @@ import 'inspector.dart';
 import 'io.dart';
 import 'layer_tree.dart';
 import 'log.dart';
+import 'media.dart';
 import 'memory.dart';
 import 'network.dart';
 import 'overlay.dart';
@@ -205,6 +206,10 @@ class DevTools {
   /// API.
   WebAuthnApi get webAuthn => _webAuthn ??= WebAuthnApi(client);
   WebAuthnApi _webAuthn;
+
+  /// This domain allows detailed inspection of media elements
+  MediaApi get media => _media ??= MediaApi(client);
+  MediaApi _media;
 
   /// Debugger domain exposes JavaScript debugging capabilities. It allows setting and removing
   /// breakpoints, stepping through execution, exploring stack traces, etc.

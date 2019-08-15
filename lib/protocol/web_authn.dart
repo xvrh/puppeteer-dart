@@ -50,6 +50,18 @@ class WebAuthnApi {
     await _client.send('WebAuthn.addCredential', parameters);
   }
 
+  /// Returns a single credential stored in the given virtual authenticator that
+  /// matches the credential ID.
+  Future<Credential> getCredential(
+      AuthenticatorId authenticatorId, String credentialId) async {
+    var parameters = <String, dynamic>{
+      'authenticatorId': authenticatorId.toJson(),
+      'credentialId': credentialId,
+    };
+    var result = await _client.send('WebAuthn.getCredential', parameters);
+    return Credential.fromJson(result['credential']);
+  }
+
   /// Returns all the credentials stored in the given virtual authenticator.
   Future<List<Credential>> getCredentials(
       AuthenticatorId authenticatorId) async {
@@ -214,13 +226,18 @@ class VirtualAuthenticatorOptions {
 class Credential {
   final String credentialId;
 
-  /// SHA-256 hash of the Relying Party ID the credential is scoped to. Must
-  /// be 32 bytes long.
-  /// See https://w3c.github.io/webauthn/#rpidhash
-  final String rpIdHash;
+  final bool isResidentCredential;
 
-  /// The private key in PKCS#8 format.
+  /// Relying Party ID the credential is scoped to. Must be set when adding a
+  /// credential.
+  final String rpId;
+
+  /// The ECDSA P-256 private key in PKCS#8 format.
   final String privateKey;
+
+  /// An opaque byte sequence with a maximum size of 64 bytes mapping the
+  /// credential to a specific user.
+  final String userHandle;
 
   /// Signature counter. This is incremented by one for each successful
   /// assertion.
@@ -229,15 +246,19 @@ class Credential {
 
   Credential(
       {@required this.credentialId,
-      @required this.rpIdHash,
+      @required this.isResidentCredential,
+      this.rpId,
       @required this.privateKey,
+      this.userHandle,
       @required this.signCount});
 
   factory Credential.fromJson(Map<String, dynamic> json) {
     return Credential(
       credentialId: json['credentialId'],
-      rpIdHash: json['rpIdHash'],
+      isResidentCredential: json['isResidentCredential'],
+      rpId: json.containsKey('rpId') ? json['rpId'] : null,
       privateKey: json['privateKey'],
+      userHandle: json.containsKey('userHandle') ? json['userHandle'] : null,
       signCount: json['signCount'],
     );
   }
@@ -245,10 +266,16 @@ class Credential {
   Map<String, dynamic> toJson() {
     var json = <String, dynamic>{
       'credentialId': credentialId,
-      'rpIdHash': rpIdHash,
+      'isResidentCredential': isResidentCredential,
       'privateKey': privateKey,
       'signCount': signCount,
     };
+    if (rpId != null) {
+      json['rpId'] = rpId;
+    }
+    if (userHandle != null) {
+      json['userHandle'] = userHandle;
+    }
     return json;
   }
 }

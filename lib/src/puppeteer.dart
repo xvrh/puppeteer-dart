@@ -25,7 +25,8 @@ final List<String> _defaultArgs = <String>[
   '--disable-default-apps',
   '--disable-dev-shm-usage',
   '--disable-extensions',
-  '--disable-features=site-per-process,TranslateUI,BlinkGenPropertyTrees',
+  // BlinkGenPropertyTrees disabled due to crbug.com/937609
+  '--disable-features=TranslateUI,BlinkGenPropertyTrees',
   '--disable-hang-monitor',
   '--disable-ipc-flooding-protection',
   '--disable-popup-blocking',
