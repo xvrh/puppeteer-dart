@@ -166,6 +166,9 @@ main() {
         } finally {
           _tryDeleteDirectory(userDataDir);
         }
+      }, onPlatform: {
+        "windows": Skip(
+            'This mysteriously fails on Windows. See https://github.com/GoogleChrome/puppeteer/issues/4111')
       });
       test('should return the default arguments', () {
         expect(puppeteer.defaultArgs(), contains('--no-first-run'));
