@@ -98,10 +98,8 @@ main() {
         expect(error, isA<TargetClosedException>());
       });
       test('should reject if executable path is invalid', () {
-        expect(
-            () => puppeteer.launch(executablePath: 'random-invalid-path'),
-            throwsA(predicate((e) =>
-                '$e'.contains('ProcessException: No such file or directory'))));
+        expect(() => puppeteer.launch(executablePath: 'random-invalid-path'),
+            throwsA(predicate((e) => '$e'.contains('ProcessException: '))));
       });
       test('userDataDir option', () async {
         var userDataDir = Directory.systemTemp.createTempSync('chrome');
@@ -113,7 +111,7 @@ main() {
         await browser.close();
         expect(
             userDataDir.listSync(recursive: true), hasLength(greaterThan(0)));
-        userDataDir.deleteSync(recursive: true);
+        _tryDeleteDirectory(userDataDir);
       });
       test('userDataDir argument', () async {
         var userDataDir = Directory.systemTemp.createTempSync('chrome');
@@ -126,7 +124,7 @@ main() {
         await browser.close();
         expect(
             userDataDir.listSync(recursive: true), hasLength(greaterThan(0)));
-        userDataDir.deleteSync(recursive: true);
+        _tryDeleteDirectory(userDataDir);
       });
       test('userDataDir option should restore state', () async {
         var userDataDir = Directory.systemTemp.createTempSync('chrome');
@@ -146,7 +144,7 @@ main() {
               await page2.evaluate('() => localStorage.hey'), equals('hello'));
           await browser2.close();
         } finally {
-          await userDataDir.delete(recursive: true);
+          _tryDeleteDirectory(userDataDir);
         }
       });
       test('userDataDir option should restore cookies', () async {
@@ -166,7 +164,7 @@ main() {
               equals('doSomethingOnlyOnce=true'));
           await browser2.close();
         } finally {
-          userDataDir.deleteSync(recursive: true);
+          _tryDeleteDirectory(userDataDir);
         }
       });
       test('should return the default arguments', () {
@@ -353,4 +351,10 @@ main() {
       expect(disconnectedRemote2, equals(1));
     });
   });
+}
+
+void _tryDeleteDirectory(Directory directory) {
+  try {
+    directory.deleteSync(recursive: true);
+  } catch (_) {}
 }
