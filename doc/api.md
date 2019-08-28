@@ -292,7 +292,7 @@ Parameters:
     option is `true`, the `headless` option will be set `false`.
 
 ```dart
-puppeteer.launch({String executablePath, bool headless, bool devTools, bool useTemporaryUserData, bool noSandboxFlag, DeviceViewport defaultViewport = LaunchOptions.viewportNotSpecified, bool ignoreHttpsErrors, Duration slowMo, List<String> args, Map<String, String> environment, List<Plugin> plugins}) → Future<Browser> 
+puppeteer.launch({String executablePath, bool headless, bool devTools, String userDataDir, bool noSandboxFlag, DeviceViewport defaultViewport = LaunchOptions.viewportNotSpecified, bool ignoreHttpsErrors, Duration slowMo, List<String> args, dynamic ignoreDefaultArgs, Map<String, String> environment, List<Plugin> plugins}) → Future<Browser> 
 ```
 
 ### class: Browser

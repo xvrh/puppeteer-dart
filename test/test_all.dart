@@ -19,6 +19,7 @@ import 'input_file_test.dart' as input_file_test;
 import 'javascript_parser_test.dart' as javascript_parser_test;
 import 'js_handle_test.dart' as js_handle_test;
 import 'keyboard_test.dart' as keyboard_test;
+import 'launcher_test.dart' as launcher_test;
 import 'mouse_test.dart' as mouse_test;
 import 'navigation_test.dart' as navigation_test;
 import 'network_test.dart' as network_test;
@@ -57,6 +58,7 @@ main() {
   group('javascript_parser_test', javascript_parser_test.main);
   group('js_handle_test', js_handle_test.main);
   group('keyboard_test', keyboard_test.main);
+  group('launcher_test', launcher_test.main);
   group('mouse_test', mouse_test.main);
   group('navigation_test', navigation_test.main);
   group('network_test', network_test.main);

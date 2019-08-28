@@ -176,6 +176,9 @@ class Page {
     onClose.then((_) {
       _dispose('Page.onClose completed');
     });
+    browser.disconnected.then((_) {
+      _dispose('Browser.disconnected completed');
+    });
   }
 
   static Future<Page> create(Target target, Session session,

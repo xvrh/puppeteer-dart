@@ -80,6 +80,23 @@ main() {
       await newPage.close();
       expect(newPage.isClosed, isTrue);
     });
+    test('should terminate network waiters', () async {
+      var newPage = await context.newPage();
+      var results = await Future.wait<dynamic>([
+        newPage
+            .waitForRequest(server.emptyPage)
+            .then<dynamic>((e) => e)
+            .catchError((e) => e),
+        newPage
+            .waitForResponse(server.emptyPage)
+            .then<dynamic>((e) => e)
+            .catchError((e) => e),
+        newPage.close(),
+      ]);
+      for (var i = 0; i < 2; i++) {
+        expect(results[i], isA<StateError>());
+      }
+    });
   });
   group('Page.Events.Load', () {
     test('should fire when expected', () async {

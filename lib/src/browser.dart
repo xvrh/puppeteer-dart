@@ -256,6 +256,7 @@ class Browser {
   }
 
   void disconnect() {
+    _dispose();
     connection.dispose('Browser.disconnect');
   }
 
