@@ -70,7 +70,7 @@ class Puppeteer {
   /// ```
   ///
   /// Parameters:
-  ///  - `ignoreHTTPSErrors`: Whether to ignore HTTPS errors during navigation.
+  ///  - `ignoreHttpsErrors`: Whether to ignore HTTPS errors during navigation.
   ///     Defaults to `false`.
   ///  - `headless`: Whether to run browser in [headless mode](https://developers.google.com/web/updates/2017/04/headless-chrome).
   ///     Defaults to `true` unless the `devtools` option is `true`.
@@ -88,6 +88,11 @@ class Puppeteer {
   ///     Defaults to `Platform.environment`.
   ///  - `devtools` Whether to auto-open a DevTools panel for each tab. If this
   ///     option is `true`, the `headless` option will be set `false`.
+  ///  - `ignoreDefaultArgs` <[boolean]|[List]<[string]>> If `true`, then do not
+  ///     use [`puppeteer.defaultArgs()`]. If a list is given, then filter out
+  ///     the given default arguments. Dangerous option; use with care. Defaults to `false`.
+  ///  - `userDataDir` <[string]> Path to a [User Data Directory](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md).
+  ///  - `timeout` Maximum time to wait for the browser instance to start. Defaults to 30 seconds.
   Future<Browser> launch(
       {String executablePath,
       bool headless,
@@ -98,11 +103,13 @@ class Puppeteer {
       bool ignoreHttpsErrors,
       Duration slowMo,
       List<String> args,
-      dynamic ignoreDefaultArgs,
+      /* bool | List */ dynamic ignoreDefaultArgs,
       Map<String, String> environment,
-      List<Plugin> plugins}) async {
+      List<Plugin> plugins,
+      Duration timeout}) async {
     devTools ??= false;
     headless ??= !devTools;
+    timeout ??= Duration(seconds: 30);
 
     var chromeArgs = <String>[];
     var defaultArguments = defaultArgs(
@@ -113,7 +120,7 @@ class Puppeteer {
         noSandboxFlag: noSandboxFlag);
     if (ignoreDefaultArgs == null) {
       chromeArgs.addAll(defaultArguments);
-    } else if (ignoreDefaultArgs is List<String>) {
+    } else if (ignoreDefaultArgs is List) {
       chromeArgs.addAll(
           defaultArguments.where((arg) => !ignoreDefaultArgs.contains(arg)));
     } else if (args != null) {
@@ -161,7 +168,8 @@ class Puppeteer {
       }
     });
 
-    var webSocketUrl = await _waitForWebSocketUrl(chromeProcess);
+    var webSocketUrl = await _waitForWebSocketUrl(chromeProcess)
+        .timeout(timeout, onTimeout: () => null);
     if (webSocketUrl != null) {
       var connection = await Connection.create(webSocketUrl, delay: slowMo);
 

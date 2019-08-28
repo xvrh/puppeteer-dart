@@ -1,5 +1,12 @@
 # Changelog
 
+# 1.12.0 (2019-08-28)
+- Fix bug in `puppeteer.connect()`
+- Add the same capabilities that pupeeteer Node.JS to `puppeteer.launch` for the management of the flags passed to Chromium.
+- Add `userDataDir` to `puppeteer.launch` to allow managing the user data directory.
+  By default, we now use a temporary data directory in the system temp folder.
+- Add more tests for launching and connecting to chromium
+
 # 1.11.0 (2019-08-15)
 - Update Chromium version to 686378
 
