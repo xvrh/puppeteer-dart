@@ -40,10 +40,9 @@ class TracingApi {
   /// Record a clock sync marker in the trace.
   /// [syncId] The ID of this clock sync marker
   Future<void> recordClockSyncMarker(String syncId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Tracing.recordClockSyncMarker', {
       'syncId': syncId,
-    };
-    await _client.send('Tracing.recordClockSyncMarker', parameters);
+    });
   }
 
   /// Request a global memory dump.
@@ -70,29 +69,17 @@ class TracingApi {
       TraceConfig traceConfig}) async {
     assert(transferMode == null ||
         const ['ReportEvents', 'ReturnAsStream'].contains(transferMode));
-    var parameters = <String, dynamic>{};
-    if (categories != null) {
-      parameters['categories'] = categories;
-    }
-    if (options != null) {
-      parameters['options'] = options;
-    }
-    if (bufferUsageReportingInterval != null) {
-      parameters['bufferUsageReportingInterval'] = bufferUsageReportingInterval;
-    }
-    if (transferMode != null) {
-      parameters['transferMode'] = transferMode;
-    }
-    if (streamFormat != null) {
-      parameters['streamFormat'] = streamFormat.toJson();
-    }
-    if (streamCompression != null) {
-      parameters['streamCompression'] = streamCompression.toJson();
-    }
-    if (traceConfig != null) {
-      parameters['traceConfig'] = traceConfig.toJson();
-    }
-    await _client.send('Tracing.start', parameters);
+    await _client.send('Tracing.start', {
+      if (categories != null) 'categories': categories,
+      if (options != null) 'options': options,
+      if (bufferUsageReportingInterval != null)
+        'bufferUsageReportingInterval': bufferUsageReportingInterval,
+      if (transferMode != null) 'transferMode': transferMode,
+      if (streamFormat != null) 'streamFormat': streamFormat.toJson(),
+      if (streamCompression != null)
+        'streamCompression': streamCompression.toJson(),
+      if (traceConfig != null) 'traceConfig': traceConfig.toJson(),
+    });
   }
 }
 
@@ -260,32 +247,21 @@ class TraceConfig {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{};
-    if (recordMode != null) {
-      json['recordMode'] = recordMode;
-    }
-    if (enableSampling != null) {
-      json['enableSampling'] = enableSampling;
-    }
-    if (enableSystrace != null) {
-      json['enableSystrace'] = enableSystrace;
-    }
-    if (enableArgumentFilter != null) {
-      json['enableArgumentFilter'] = enableArgumentFilter;
-    }
-    if (includedCategories != null) {
-      json['includedCategories'] = includedCategories.map((e) => e).toList();
-    }
-    if (excludedCategories != null) {
-      json['excludedCategories'] = excludedCategories.map((e) => e).toList();
-    }
-    if (syntheticDelays != null) {
-      json['syntheticDelays'] = syntheticDelays.map((e) => e).toList();
-    }
-    if (memoryDumpConfig != null) {
-      json['memoryDumpConfig'] = memoryDumpConfig.toJson();
-    }
-    return json;
+    return {
+      if (recordMode != null) 'recordMode': recordMode,
+      if (enableSampling != null) 'enableSampling': enableSampling,
+      if (enableSystrace != null) 'enableSystrace': enableSystrace,
+      if (enableArgumentFilter != null)
+        'enableArgumentFilter': enableArgumentFilter,
+      if (includedCategories != null)
+        'includedCategories': includedCategories.map((e) => e).toList(),
+      if (excludedCategories != null)
+        'excludedCategories': excludedCategories.map((e) => e).toList(),
+      if (syntheticDelays != null)
+        'syntheticDelays': syntheticDelays.map((e) => e).toList(),
+      if (memoryDumpConfig != null)
+        'memoryDumpConfig': memoryDumpConfig.toJson(),
+    };
   }
 }
 

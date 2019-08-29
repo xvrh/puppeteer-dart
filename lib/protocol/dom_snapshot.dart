@@ -34,19 +34,14 @@ class DOMSnapshotApi {
       {bool includeEventListeners,
       bool includePaintOrder,
       bool includeUserAgentShadowTree}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOMSnapshot.getSnapshot', {
       'computedStyleWhitelist': computedStyleWhitelist.map((e) => e).toList(),
-    };
-    if (includeEventListeners != null) {
-      parameters['includeEventListeners'] = includeEventListeners;
-    }
-    if (includePaintOrder != null) {
-      parameters['includePaintOrder'] = includePaintOrder;
-    }
-    if (includeUserAgentShadowTree != null) {
-      parameters['includeUserAgentShadowTree'] = includeUserAgentShadowTree;
-    }
-    var result = await _client.send('DOMSnapshot.getSnapshot', parameters);
+      if (includeEventListeners != null)
+        'includeEventListeners': includeEventListeners,
+      if (includePaintOrder != null) 'includePaintOrder': includePaintOrder,
+      if (includeUserAgentShadowTree != null)
+        'includeUserAgentShadowTree': includeUserAgentShadowTree,
+    });
     return GetSnapshotResult.fromJson(result);
   }
 
@@ -59,16 +54,11 @@ class DOMSnapshotApi {
   /// [includeDOMRects] Whether to include DOM rectangles (offsetRects, clientRects, scrollRects) into the snapshot
   Future<CaptureSnapshotResult> captureSnapshot(List<String> computedStyles,
       {bool includePaintOrder, bool includeDOMRects}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOMSnapshot.captureSnapshot', {
       'computedStyles': computedStyles.map((e) => e).toList(),
-    };
-    if (includePaintOrder != null) {
-      parameters['includePaintOrder'] = includePaintOrder;
-    }
-    if (includeDOMRects != null) {
-      parameters['includeDOMRects'] = includeDOMRects;
-    }
-    var result = await _client.send('DOMSnapshot.captureSnapshot', parameters);
+      if (includePaintOrder != null) 'includePaintOrder': includePaintOrder,
+      if (includeDOMRects != null) 'includeDOMRects': includeDOMRects,
+    });
     return CaptureSnapshotResult.fromJson(result);
   }
 }
@@ -306,86 +296,41 @@ class DOMNode {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'nodeType': nodeType,
       'nodeName': nodeName,
       'nodeValue': nodeValue,
       'backendNodeId': backendNodeId.toJson(),
+      if (textValue != null) 'textValue': textValue,
+      if (inputValue != null) 'inputValue': inputValue,
+      if (inputChecked != null) 'inputChecked': inputChecked,
+      if (optionSelected != null) 'optionSelected': optionSelected,
+      if (childNodeIndexes != null)
+        'childNodeIndexes': childNodeIndexes.map((e) => e).toList(),
+      if (attributes != null)
+        'attributes': attributes.map((e) => e.toJson()).toList(),
+      if (pseudoElementIndexes != null)
+        'pseudoElementIndexes': pseudoElementIndexes.map((e) => e).toList(),
+      if (layoutNodeIndex != null) 'layoutNodeIndex': layoutNodeIndex,
+      if (documentURL != null) 'documentURL': documentURL,
+      if (baseURL != null) 'baseURL': baseURL,
+      if (contentLanguage != null) 'contentLanguage': contentLanguage,
+      if (documentEncoding != null) 'documentEncoding': documentEncoding,
+      if (publicId != null) 'publicId': publicId,
+      if (systemId != null) 'systemId': systemId,
+      if (frameId != null) 'frameId': frameId.toJson(),
+      if (contentDocumentIndex != null)
+        'contentDocumentIndex': contentDocumentIndex,
+      if (pseudoType != null) 'pseudoType': pseudoType.toJson(),
+      if (shadowRootType != null) 'shadowRootType': shadowRootType.toJson(),
+      if (isClickable != null) 'isClickable': isClickable,
+      if (eventListeners != null)
+        'eventListeners': eventListeners.map((e) => e.toJson()).toList(),
+      if (currentSourceURL != null) 'currentSourceURL': currentSourceURL,
+      if (originURL != null) 'originURL': originURL,
+      if (scrollOffsetX != null) 'scrollOffsetX': scrollOffsetX,
+      if (scrollOffsetY != null) 'scrollOffsetY': scrollOffsetY,
     };
-    if (textValue != null) {
-      json['textValue'] = textValue;
-    }
-    if (inputValue != null) {
-      json['inputValue'] = inputValue;
-    }
-    if (inputChecked != null) {
-      json['inputChecked'] = inputChecked;
-    }
-    if (optionSelected != null) {
-      json['optionSelected'] = optionSelected;
-    }
-    if (childNodeIndexes != null) {
-      json['childNodeIndexes'] = childNodeIndexes.map((e) => e).toList();
-    }
-    if (attributes != null) {
-      json['attributes'] = attributes.map((e) => e.toJson()).toList();
-    }
-    if (pseudoElementIndexes != null) {
-      json['pseudoElementIndexes'] =
-          pseudoElementIndexes.map((e) => e).toList();
-    }
-    if (layoutNodeIndex != null) {
-      json['layoutNodeIndex'] = layoutNodeIndex;
-    }
-    if (documentURL != null) {
-      json['documentURL'] = documentURL;
-    }
-    if (baseURL != null) {
-      json['baseURL'] = baseURL;
-    }
-    if (contentLanguage != null) {
-      json['contentLanguage'] = contentLanguage;
-    }
-    if (documentEncoding != null) {
-      json['documentEncoding'] = documentEncoding;
-    }
-    if (publicId != null) {
-      json['publicId'] = publicId;
-    }
-    if (systemId != null) {
-      json['systemId'] = systemId;
-    }
-    if (frameId != null) {
-      json['frameId'] = frameId.toJson();
-    }
-    if (contentDocumentIndex != null) {
-      json['contentDocumentIndex'] = contentDocumentIndex;
-    }
-    if (pseudoType != null) {
-      json['pseudoType'] = pseudoType.toJson();
-    }
-    if (shadowRootType != null) {
-      json['shadowRootType'] = shadowRootType.toJson();
-    }
-    if (isClickable != null) {
-      json['isClickable'] = isClickable;
-    }
-    if (eventListeners != null) {
-      json['eventListeners'] = eventListeners.map((e) => e.toJson()).toList();
-    }
-    if (currentSourceURL != null) {
-      json['currentSourceURL'] = currentSourceURL;
-    }
-    if (originURL != null) {
-      json['originURL'] = originURL;
-    }
-    if (scrollOffsetX != null) {
-      json['scrollOffsetX'] = scrollOffsetX;
-    }
-    if (scrollOffsetY != null) {
-      json['scrollOffsetY'] = scrollOffsetY;
-    }
-    return json;
   }
 }
 
@@ -417,12 +362,11 @@ class InlineTextBox {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'boundingBox': boundingBox.toJson(),
       'startCharacterIndex': startCharacterIndex,
       'numCharacters': numCharacters,
     };
-    return json;
   }
 }
 
@@ -479,26 +423,16 @@ class LayoutTreeNode {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'domNodeIndex': domNodeIndex,
       'boundingBox': boundingBox.toJson(),
+      if (layoutText != null) 'layoutText': layoutText,
+      if (inlineTextNodes != null)
+        'inlineTextNodes': inlineTextNodes.map((e) => e.toJson()).toList(),
+      if (styleIndex != null) 'styleIndex': styleIndex,
+      if (paintOrder != null) 'paintOrder': paintOrder,
+      if (isStackingContext != null) 'isStackingContext': isStackingContext,
     };
-    if (layoutText != null) {
-      json['layoutText'] = layoutText;
-    }
-    if (inlineTextNodes != null) {
-      json['inlineTextNodes'] = inlineTextNodes.map((e) => e.toJson()).toList();
-    }
-    if (styleIndex != null) {
-      json['styleIndex'] = styleIndex;
-    }
-    if (paintOrder != null) {
-      json['paintOrder'] = paintOrder;
-    }
-    if (isStackingContext != null) {
-      json['isStackingContext'] = isStackingContext;
-    }
-    return json;
   }
 }
 
@@ -518,10 +452,9 @@ class ComputedStyle {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'properties': properties.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -543,11 +476,10 @@ class NameValue {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'value': value,
     };
-    return json;
   }
 }
 
@@ -611,11 +543,10 @@ class RareStringData {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'index': index.map((e) => e).toList(),
       'value': value.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -631,10 +562,9 @@ class RareBooleanData {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'index': index.map((e) => e).toList(),
     };
-    return json;
   }
 }
 
@@ -653,11 +583,10 @@ class RareIntegerData {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'index': index.map((e) => e).toList(),
       'value': value.map((e) => e).toList(),
     };
-    return json;
   }
 }
 
@@ -754,7 +683,7 @@ class DocumentSnapshot {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'documentURL': documentURL.toJson(),
       'baseURL': baseURL.toJson(),
       'contentLanguage': contentLanguage.toJson(),
@@ -765,14 +694,9 @@ class DocumentSnapshot {
       'nodes': nodes.toJson(),
       'layout': layout.toJson(),
       'textBoxes': textBoxes.toJson(),
+      if (scrollOffsetX != null) 'scrollOffsetX': scrollOffsetX,
+      if (scrollOffsetY != null) 'scrollOffsetY': scrollOffsetY,
     };
-    if (scrollOffsetX != null) {
-      json['scrollOffsetX'] = scrollOffsetX;
-    }
-    if (scrollOffsetY != null) {
-      json['scrollOffsetY'] = scrollOffsetY;
-    }
-    return json;
   }
 }
 
@@ -901,53 +825,30 @@ class NodeTreeSnapshot {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{};
-    if (parentIndex != null) {
-      json['parentIndex'] = parentIndex.map((e) => e).toList();
-    }
-    if (nodeType != null) {
-      json['nodeType'] = nodeType.map((e) => e).toList();
-    }
-    if (nodeName != null) {
-      json['nodeName'] = nodeName.map((e) => e.toJson()).toList();
-    }
-    if (nodeValue != null) {
-      json['nodeValue'] = nodeValue.map((e) => e.toJson()).toList();
-    }
-    if (backendNodeId != null) {
-      json['backendNodeId'] = backendNodeId.map((e) => e.toJson()).toList();
-    }
-    if (attributes != null) {
-      json['attributes'] = attributes.map((e) => e.toJson()).toList();
-    }
-    if (textValue != null) {
-      json['textValue'] = textValue.toJson();
-    }
-    if (inputValue != null) {
-      json['inputValue'] = inputValue.toJson();
-    }
-    if (inputChecked != null) {
-      json['inputChecked'] = inputChecked.toJson();
-    }
-    if (optionSelected != null) {
-      json['optionSelected'] = optionSelected.toJson();
-    }
-    if (contentDocumentIndex != null) {
-      json['contentDocumentIndex'] = contentDocumentIndex.toJson();
-    }
-    if (pseudoType != null) {
-      json['pseudoType'] = pseudoType.toJson();
-    }
-    if (isClickable != null) {
-      json['isClickable'] = isClickable.toJson();
-    }
-    if (currentSourceURL != null) {
-      json['currentSourceURL'] = currentSourceURL.toJson();
-    }
-    if (originURL != null) {
-      json['originURL'] = originURL.toJson();
-    }
-    return json;
+    return {
+      if (parentIndex != null)
+        'parentIndex': parentIndex.map((e) => e).toList(),
+      if (nodeType != null) 'nodeType': nodeType.map((e) => e).toList(),
+      if (nodeName != null)
+        'nodeName': nodeName.map((e) => e.toJson()).toList(),
+      if (nodeValue != null)
+        'nodeValue': nodeValue.map((e) => e.toJson()).toList(),
+      if (backendNodeId != null)
+        'backendNodeId': backendNodeId.map((e) => e.toJson()).toList(),
+      if (attributes != null)
+        'attributes': attributes.map((e) => e.toJson()).toList(),
+      if (textValue != null) 'textValue': textValue.toJson(),
+      if (inputValue != null) 'inputValue': inputValue.toJson(),
+      if (inputChecked != null) 'inputChecked': inputChecked.toJson(),
+      if (optionSelected != null) 'optionSelected': optionSelected.toJson(),
+      if (contentDocumentIndex != null)
+        'contentDocumentIndex': contentDocumentIndex.toJson(),
+      if (pseudoType != null) 'pseudoType': pseudoType.toJson(),
+      if (isClickable != null) 'isClickable': isClickable.toJson(),
+      if (currentSourceURL != null)
+        'currentSourceURL': currentSourceURL.toJson(),
+      if (originURL != null) 'originURL': originURL.toJson(),
+    };
   }
 }
 
@@ -1025,26 +926,21 @@ class LayoutTreeSnapshot {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'nodeIndex': nodeIndex.map((e) => e).toList(),
       'styles': styles.map((e) => e.toJson()).toList(),
       'bounds': bounds.map((e) => e.toJson()).toList(),
       'text': text.map((e) => e.toJson()).toList(),
       'stackingContexts': stackingContexts.toJson(),
+      if (paintOrders != null)
+        'paintOrders': paintOrders.map((e) => e).toList(),
+      if (offsetRects != null)
+        'offsetRects': offsetRects.map((e) => e.toJson()).toList(),
+      if (scrollRects != null)
+        'scrollRects': scrollRects.map((e) => e.toJson()).toList(),
+      if (clientRects != null)
+        'clientRects': clientRects.map((e) => e.toJson()).toList(),
     };
-    if (paintOrders != null) {
-      json['paintOrders'] = paintOrders.map((e) => e).toList();
-    }
-    if (offsetRects != null) {
-      json['offsetRects'] = offsetRects.map((e) => e.toJson()).toList();
-    }
-    if (scrollRects != null) {
-      json['scrollRects'] = scrollRects.map((e) => e.toJson()).toList();
-    }
-    if (clientRects != null) {
-      json['clientRects'] = clientRects.map((e) => e.toJson()).toList();
-    }
-    return json;
   }
 }
 
@@ -1082,12 +978,11 @@ class TextBoxSnapshot {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'layoutIndex': layoutIndex.map((e) => e).toList(),
       'bounds': bounds.map((e) => e.toJson()).toList(),
       'start': start.map((e) => e).toList(),
       'length': length.map((e) => e).toList(),
     };
-    return json;
   }
 }

@@ -32,21 +32,12 @@ class AccessibilityApi {
       dom.BackendNodeId backendNodeId,
       runtime.RemoteObjectId objectId,
       bool fetchRelatives}) async {
-    var parameters = <String, dynamic>{};
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
-    if (fetchRelatives != null) {
-      parameters['fetchRelatives'] = fetchRelatives;
-    }
-    var result =
-        await _client.send('Accessibility.getPartialAXTree', parameters);
+    var result = await _client.send('Accessibility.getPartialAXTree', {
+      if (nodeId != null) 'nodeId': nodeId.toJson(),
+      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
+      if (objectId != null) 'objectId': objectId.toJson(),
+      if (fetchRelatives != null) 'fetchRelatives': fetchRelatives,
+    });
     return (result['nodes'] as List)
         .map((e) => AXNodeData.fromJson(e))
         .toList();
@@ -279,34 +270,18 @@ class AXValueSource {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type.toJson(),
+      if (value != null) 'value': value.toJson(),
+      if (attribute != null) 'attribute': attribute,
+      if (attributeValue != null) 'attributeValue': attributeValue.toJson(),
+      if (superseded != null) 'superseded': superseded,
+      if (nativeSource != null) 'nativeSource': nativeSource.toJson(),
+      if (nativeSourceValue != null)
+        'nativeSourceValue': nativeSourceValue.toJson(),
+      if (invalid != null) 'invalid': invalid,
+      if (invalidReason != null) 'invalidReason': invalidReason,
     };
-    if (value != null) {
-      json['value'] = value.toJson();
-    }
-    if (attribute != null) {
-      json['attribute'] = attribute;
-    }
-    if (attributeValue != null) {
-      json['attributeValue'] = attributeValue.toJson();
-    }
-    if (superseded != null) {
-      json['superseded'] = superseded;
-    }
-    if (nativeSource != null) {
-      json['nativeSource'] = nativeSource.toJson();
-    }
-    if (nativeSourceValue != null) {
-      json['nativeSourceValue'] = nativeSourceValue.toJson();
-    }
-    if (invalid != null) {
-      json['invalid'] = invalid;
-    }
-    if (invalidReason != null) {
-      json['invalidReason'] = invalidReason;
-    }
-    return json;
   }
 }
 
@@ -331,16 +306,11 @@ class AXRelatedNode {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'backendDOMNodeId': backendDOMNodeId.toJson(),
+      if (idref != null) 'idref': idref,
+      if (text != null) 'text': text,
     };
-    if (idref != null) {
-      json['idref'] = idref;
-    }
-    if (text != null) {
-      json['text'] = text;
-    }
-    return json;
   }
 }
 
@@ -361,11 +331,10 @@ class AXProperty {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name.toJson(),
       'value': value.toJson(),
     };
-    return json;
   }
 }
 
@@ -403,19 +372,13 @@ class AXValue {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type.toJson(),
+      if (value != null) 'value': value,
+      if (relatedNodes != null)
+        'relatedNodes': relatedNodes.map((e) => e.toJson()).toList(),
+      if (sources != null) 'sources': sources.map((e) => e.toJson()).toList(),
     };
-    if (value != null) {
-      json['value'] = value;
-    }
-    if (relatedNodes != null) {
-      json['relatedNodes'] = relatedNodes.map((e) => e.toJson()).toList();
-    }
-    if (sources != null) {
-      json['sources'] = sources.map((e) => e.toJson()).toList();
-    }
-    return json;
   }
 }
 
@@ -600,34 +563,21 @@ class AXNodeData {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'nodeId': nodeId.toJson(),
       'ignored': ignored,
+      if (ignoredReasons != null)
+        'ignoredReasons': ignoredReasons.map((e) => e.toJson()).toList(),
+      if (role != null) 'role': role.toJson(),
+      if (name != null) 'name': name.toJson(),
+      if (description != null) 'description': description.toJson(),
+      if (value != null) 'value': value.toJson(),
+      if (properties != null)
+        'properties': properties.map((e) => e.toJson()).toList(),
+      if (childIds != null)
+        'childIds': childIds.map((e) => e.toJson()).toList(),
+      if (backendDOMNodeId != null)
+        'backendDOMNodeId': backendDOMNodeId.toJson(),
     };
-    if (ignoredReasons != null) {
-      json['ignoredReasons'] = ignoredReasons.map((e) => e.toJson()).toList();
-    }
-    if (role != null) {
-      json['role'] = role.toJson();
-    }
-    if (name != null) {
-      json['name'] = name.toJson();
-    }
-    if (description != null) {
-      json['description'] = description.toJson();
-    }
-    if (value != null) {
-      json['value'] = value.toJson();
-    }
-    if (properties != null) {
-      json['properties'] = properties.map((e) => e.toJson()).toList();
-    }
-    if (childIds != null) {
-      json['childIds'] = childIds.map((e) => e.toJson()).toList();
-    }
-    if (backendDOMNodeId != null) {
-      json['backendDOMNodeId'] = backendDOMNodeId.toJson();
-    }
-    return json;
   }
 }

@@ -23,20 +23,17 @@ class DatabaseApi {
 
   Future<ExecuteSQLResult> executeSQL(
       DatabaseId databaseId, String query) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Database.executeSQL', {
       'databaseId': databaseId.toJson(),
       'query': query,
-    };
-    var result = await _client.send('Database.executeSQL', parameters);
+    });
     return ExecuteSQLResult.fromJson(result);
   }
 
   Future<List<String>> getDatabaseTableNames(DatabaseId databaseId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Database.getDatabaseTableNames', {
       'databaseId': databaseId.toJson(),
-    };
-    var result =
-        await _client.send('Database.getDatabaseTableNames', parameters);
+    });
     return (result['tableNames'] as List).map((e) => e as String).toList();
   }
 }
@@ -116,13 +113,12 @@ class Database {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'id': id.toJson(),
       'domain': domain,
       'name': name,
       'version': version,
     };
-    return json;
   }
 }
 
@@ -144,10 +140,9 @@ class Error {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'message': message,
       'code': code,
     };
-    return json;
   }
 }

@@ -144,11 +144,9 @@ class PageApi {
   @deprecated
   Future<ScriptIdentifier> addScriptToEvaluateOnLoad(
       String scriptSource) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Page.addScriptToEvaluateOnLoad', {
       'scriptSource': scriptSource,
-    };
-    var result =
-        await _client.send('Page.addScriptToEvaluateOnLoad', parameters);
+    });
     return ScriptIdentifier.fromJson(result['identifier']);
   }
 
@@ -159,14 +157,10 @@ class PageApi {
   /// Returns: Identifier of the added script.
   Future<ScriptIdentifier> addScriptToEvaluateOnNewDocument(String source,
       {String worldName}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Page.addScriptToEvaluateOnNewDocument', {
       'source': source,
-    };
-    if (worldName != null) {
-      parameters['worldName'] = worldName;
-    }
-    var result =
-        await _client.send('Page.addScriptToEvaluateOnNewDocument', parameters);
+      if (worldName != null) 'worldName': worldName,
+    });
     return ScriptIdentifier.fromJson(result['identifier']);
   }
 
@@ -187,20 +181,12 @@ class PageApi {
       Viewport clip,
       bool fromSurface}) async {
     assert(format == null || const ['jpeg', 'png'].contains(format));
-    var parameters = <String, dynamic>{};
-    if (format != null) {
-      parameters['format'] = format;
-    }
-    if (quality != null) {
-      parameters['quality'] = quality;
-    }
-    if (clip != null) {
-      parameters['clip'] = clip.toJson();
-    }
-    if (fromSurface != null) {
-      parameters['fromSurface'] = fromSurface;
-    }
-    var result = await _client.send('Page.captureScreenshot', parameters);
+    var result = await _client.send('Page.captureScreenshot', {
+      if (format != null) 'format': format,
+      if (quality != null) 'quality': quality,
+      if (clip != null) 'clip': clip.toJson(),
+      if (fromSurface != null) 'fromSurface': fromSurface,
+    });
     return result['data'];
   }
 
@@ -210,11 +196,9 @@ class PageApi {
   /// Returns: Serialized page data.
   Future<String> captureSnapshot({@Enum(['mhtml']) String format}) async {
     assert(format == null || const ['mhtml'].contains(format));
-    var parameters = <String, dynamic>{};
-    if (format != null) {
-      parameters['format'] = format;
-    }
-    var result = await _client.send('Page.captureSnapshot', parameters);
+    var result = await _client.send('Page.captureSnapshot', {
+      if (format != null) 'format': format,
+    });
     return result['data'];
   }
 
@@ -244,16 +228,12 @@ class PageApi {
   /// Returns: Execution context of the isolated world.
   Future<runtime.ExecutionContextId> createIsolatedWorld(FrameId frameId,
       {String worldName, bool grantUniveralAccess}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Page.createIsolatedWorld', {
       'frameId': frameId.toJson(),
-    };
-    if (worldName != null) {
-      parameters['worldName'] = worldName;
-    }
-    if (grantUniveralAccess != null) {
-      parameters['grantUniveralAccess'] = grantUniveralAccess;
-    }
-    var result = await _client.send('Page.createIsolatedWorld', parameters);
+      if (worldName != null) 'worldName': worldName,
+      if (grantUniveralAccess != null)
+        'grantUniveralAccess': grantUniveralAccess,
+    });
     return runtime.ExecutionContextId.fromJson(result['executionContextId']);
   }
 
@@ -262,11 +242,10 @@ class PageApi {
   /// [url] URL to match cooke domain and path.
   @deprecated
   Future<void> deleteCookie(String cookieName, String url) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.deleteCookie', {
       'cookieName': cookieName,
       'url': url,
-    };
-    await _client.send('Page.deleteCookie', parameters);
+    });
   }
 
   /// Disables page domain notifications.
@@ -329,11 +308,10 @@ class PageApi {
   /// [url] URL of the resource to get content for.
   Future<GetResourceContentResult> getResourceContent(
       FrameId frameId, String url) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Page.getResourceContent', {
       'frameId': frameId.toJson(),
       'url': url,
-    };
-    var result = await _client.send('Page.getResourceContent', parameters);
+    });
     return GetResourceContentResult.fromJson(result);
   }
 
@@ -349,13 +327,10 @@ class PageApi {
   /// [promptText] The text to enter into the dialog prompt before accepting. Used only if this is a prompt
   /// dialog.
   Future<void> handleJavaScriptDialog(bool accept, {String promptText}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.handleJavaScriptDialog', {
       'accept': accept,
-    };
-    if (promptText != null) {
-      parameters['promptText'] = promptText;
-    }
-    await _client.send('Page.handleJavaScriptDialog', parameters);
+      if (promptText != null) 'promptText': promptText,
+    });
   }
 
   /// Navigates current page to the given URL.
@@ -365,29 +340,21 @@ class PageApi {
   /// [frameId] Frame id to navigate, if not specified navigates the top frame.
   Future<NavigateResult> navigate(String url,
       {String referrer, TransitionType transitionType, FrameId frameId}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Page.navigate', {
       'url': url,
-    };
-    if (referrer != null) {
-      parameters['referrer'] = referrer;
-    }
-    if (transitionType != null) {
-      parameters['transitionType'] = transitionType.toJson();
-    }
-    if (frameId != null) {
-      parameters['frameId'] = frameId.toJson();
-    }
-    var result = await _client.send('Page.navigate', parameters);
+      if (referrer != null) 'referrer': referrer,
+      if (transitionType != null) 'transitionType': transitionType.toJson(),
+      if (frameId != null) 'frameId': frameId.toJson(),
+    });
     return NavigateResult.fromJson(result);
   }
 
   /// Navigates current page to the given history entry.
   /// [entryId] Unique id of the entry to navigate to.
   Future<void> navigateToHistoryEntry(int entryId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.navigateToHistoryEntry', {
       'entryId': entryId,
-    };
-    await _client.send('Page.navigateToHistoryEntry', parameters);
+    });
   }
 
   /// Print page as PDF.
@@ -437,56 +404,26 @@ class PageApi {
       @Enum(['ReturnAsBase64', 'ReturnAsStream']) String transferMode}) async {
     assert(transferMode == null ||
         const ['ReturnAsBase64', 'ReturnAsStream'].contains(transferMode));
-    var parameters = <String, dynamic>{};
-    if (landscape != null) {
-      parameters['landscape'] = landscape;
-    }
-    if (displayHeaderFooter != null) {
-      parameters['displayHeaderFooter'] = displayHeaderFooter;
-    }
-    if (printBackground != null) {
-      parameters['printBackground'] = printBackground;
-    }
-    if (scale != null) {
-      parameters['scale'] = scale;
-    }
-    if (paperWidth != null) {
-      parameters['paperWidth'] = paperWidth;
-    }
-    if (paperHeight != null) {
-      parameters['paperHeight'] = paperHeight;
-    }
-    if (marginTop != null) {
-      parameters['marginTop'] = marginTop;
-    }
-    if (marginBottom != null) {
-      parameters['marginBottom'] = marginBottom;
-    }
-    if (marginLeft != null) {
-      parameters['marginLeft'] = marginLeft;
-    }
-    if (marginRight != null) {
-      parameters['marginRight'] = marginRight;
-    }
-    if (pageRanges != null) {
-      parameters['pageRanges'] = pageRanges;
-    }
-    if (ignoreInvalidPageRanges != null) {
-      parameters['ignoreInvalidPageRanges'] = ignoreInvalidPageRanges;
-    }
-    if (headerTemplate != null) {
-      parameters['headerTemplate'] = headerTemplate;
-    }
-    if (footerTemplate != null) {
-      parameters['footerTemplate'] = footerTemplate;
-    }
-    if (preferCSSPageSize != null) {
-      parameters['preferCSSPageSize'] = preferCSSPageSize;
-    }
-    if (transferMode != null) {
-      parameters['transferMode'] = transferMode;
-    }
-    var result = await _client.send('Page.printToPDF', parameters);
+    var result = await _client.send('Page.printToPDF', {
+      if (landscape != null) 'landscape': landscape,
+      if (displayHeaderFooter != null)
+        'displayHeaderFooter': displayHeaderFooter,
+      if (printBackground != null) 'printBackground': printBackground,
+      if (scale != null) 'scale': scale,
+      if (paperWidth != null) 'paperWidth': paperWidth,
+      if (paperHeight != null) 'paperHeight': paperHeight,
+      if (marginTop != null) 'marginTop': marginTop,
+      if (marginBottom != null) 'marginBottom': marginBottom,
+      if (marginLeft != null) 'marginLeft': marginLeft,
+      if (marginRight != null) 'marginRight': marginRight,
+      if (pageRanges != null) 'pageRanges': pageRanges,
+      if (ignoreInvalidPageRanges != null)
+        'ignoreInvalidPageRanges': ignoreInvalidPageRanges,
+      if (headerTemplate != null) 'headerTemplate': headerTemplate,
+      if (footerTemplate != null) 'footerTemplate': footerTemplate,
+      if (preferCSSPageSize != null) 'preferCSSPageSize': preferCSSPageSize,
+      if (transferMode != null) 'transferMode': transferMode,
+    });
     return PrintToPDFResult.fromJson(result);
   }
 
@@ -495,41 +432,35 @@ class PageApi {
   /// [scriptToEvaluateOnLoad] If set, the script will be injected into all frames of the inspected page after reload.
   /// Argument will be ignored if reloading dataURL origin.
   Future<void> reload({bool ignoreCache, String scriptToEvaluateOnLoad}) async {
-    var parameters = <String, dynamic>{};
-    if (ignoreCache != null) {
-      parameters['ignoreCache'] = ignoreCache;
-    }
-    if (scriptToEvaluateOnLoad != null) {
-      parameters['scriptToEvaluateOnLoad'] = scriptToEvaluateOnLoad;
-    }
-    await _client.send('Page.reload', parameters);
+    await _client.send('Page.reload', {
+      if (ignoreCache != null) 'ignoreCache': ignoreCache,
+      if (scriptToEvaluateOnLoad != null)
+        'scriptToEvaluateOnLoad': scriptToEvaluateOnLoad,
+    });
   }
 
   /// Deprecated, please use removeScriptToEvaluateOnNewDocument instead.
   @deprecated
   Future<void> removeScriptToEvaluateOnLoad(ScriptIdentifier identifier) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.removeScriptToEvaluateOnLoad', {
       'identifier': identifier.toJson(),
-    };
-    await _client.send('Page.removeScriptToEvaluateOnLoad', parameters);
+    });
   }
 
   /// Removes given script from the list.
   Future<void> removeScriptToEvaluateOnNewDocument(
       ScriptIdentifier identifier) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.removeScriptToEvaluateOnNewDocument', {
       'identifier': identifier.toJson(),
-    };
-    await _client.send('Page.removeScriptToEvaluateOnNewDocument', parameters);
+    });
   }
 
   /// Acknowledges that a screencast frame has been received by the frontend.
   /// [sessionId] Frame number.
   Future<void> screencastFrameAck(int sessionId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.screencastFrameAck', {
       'sessionId': sessionId,
-    };
-    await _client.send('Page.screencastFrameAck', parameters);
+    });
   }
 
   /// Searches for given string in resource content.
@@ -542,18 +473,13 @@ class PageApi {
   Future<List<debugger.SearchMatch>> searchInResource(
       FrameId frameId, String url, String query,
       {bool caseSensitive, bool isRegex}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Page.searchInResource', {
       'frameId': frameId.toJson(),
       'url': url,
       'query': query,
-    };
-    if (caseSensitive != null) {
-      parameters['caseSensitive'] = caseSensitive;
-    }
-    if (isRegex != null) {
-      parameters['isRegex'] = isRegex;
-    }
-    var result = await _client.send('Page.searchInResource', parameters);
+      if (caseSensitive != null) 'caseSensitive': caseSensitive,
+      if (isRegex != null) 'isRegex': isRegex,
+    });
     return (result['result'] as List)
         .map((e) => debugger.SearchMatch.fromJson(e))
         .toList();
@@ -562,19 +488,17 @@ class PageApi {
   /// Enable Chrome's experimental ad filter on all sites.
   /// [enabled] Whether to block ads.
   Future<void> setAdBlockingEnabled(bool enabled) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.setAdBlockingEnabled', {
       'enabled': enabled,
-    };
-    await _client.send('Page.setAdBlockingEnabled', parameters);
+    });
   }
 
   /// Enable page Content Security Policy by-passing.
   /// [enabled] Whether to bypass page CSP.
   Future<void> setBypassCSP(bool enabled) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.setBypassCSP', {
       'enabled': enabled,
-    };
-    await _client.send('Page.setBypassCSP', parameters);
+    });
   }
 
   /// Overrides the values of device screen dimensions (window.screen.width, window.screen.height,
@@ -604,37 +528,21 @@ class PageApi {
       bool dontSetVisibleSize,
       emulation.ScreenOrientation screenOrientation,
       Viewport viewport}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.setDeviceMetricsOverride', {
       'width': width,
       'height': height,
       'deviceScaleFactor': deviceScaleFactor,
       'mobile': mobile,
-    };
-    if (scale != null) {
-      parameters['scale'] = scale;
-    }
-    if (screenWidth != null) {
-      parameters['screenWidth'] = screenWidth;
-    }
-    if (screenHeight != null) {
-      parameters['screenHeight'] = screenHeight;
-    }
-    if (positionX != null) {
-      parameters['positionX'] = positionX;
-    }
-    if (positionY != null) {
-      parameters['positionY'] = positionY;
-    }
-    if (dontSetVisibleSize != null) {
-      parameters['dontSetVisibleSize'] = dontSetVisibleSize;
-    }
-    if (screenOrientation != null) {
-      parameters['screenOrientation'] = screenOrientation.toJson();
-    }
-    if (viewport != null) {
-      parameters['viewport'] = viewport.toJson();
-    }
-    await _client.send('Page.setDeviceMetricsOverride', parameters);
+      if (scale != null) 'scale': scale,
+      if (screenWidth != null) 'screenWidth': screenWidth,
+      if (screenHeight != null) 'screenHeight': screenHeight,
+      if (positionX != null) 'positionX': positionX,
+      if (positionY != null) 'positionY': positionY,
+      if (dontSetVisibleSize != null) 'dontSetVisibleSize': dontSetVisibleSize,
+      if (screenOrientation != null)
+        'screenOrientation': screenOrientation.toJson(),
+      if (viewport != null) 'viewport': viewport.toJson(),
+    });
   }
 
   /// Overrides the Device Orientation.
@@ -644,41 +552,37 @@ class PageApi {
   @deprecated
   Future<void> setDeviceOrientationOverride(
       num alpha, num beta, num gamma) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.setDeviceOrientationOverride', {
       'alpha': alpha,
       'beta': beta,
       'gamma': gamma,
-    };
-    await _client.send('Page.setDeviceOrientationOverride', parameters);
+    });
   }
 
   /// Set generic font families.
   /// [fontFamilies] Specifies font families to set. If a font family is not specified, it won't be changed.
   Future<void> setFontFamilies(FontFamilies fontFamilies) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.setFontFamilies', {
       'fontFamilies': fontFamilies.toJson(),
-    };
-    await _client.send('Page.setFontFamilies', parameters);
+    });
   }
 
   /// Set default font sizes.
   /// [fontSizes] Specifies font sizes to set. If a font size is not specified, it won't be changed.
   Future<void> setFontSizes(FontSizes fontSizes) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.setFontSizes', {
       'fontSizes': fontSizes.toJson(),
-    };
-    await _client.send('Page.setFontSizes', parameters);
+    });
   }
 
   /// Sets given markup as the document's HTML.
   /// [frameId] Frame id to set HTML for.
   /// [html] HTML content to set.
   Future<void> setDocumentContent(FrameId frameId, String html) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.setDocumentContent', {
       'frameId': frameId.toJson(),
       'html': html,
-    };
-    await _client.send('Page.setDocumentContent', parameters);
+    });
   }
 
   /// Set the behavior when downloading a file.
@@ -689,13 +593,10 @@ class PageApi {
       @Enum(['deny', 'allow', 'default']) String behavior,
       {String downloadPath}) async {
     assert(const ['deny', 'allow', 'default'].contains(behavior));
-    var parameters = <String, dynamic>{
+    await _client.send('Page.setDownloadBehavior', {
       'behavior': behavior,
-    };
-    if (downloadPath != null) {
-      parameters['downloadPath'] = downloadPath;
-    }
-    await _client.send('Page.setDownloadBehavior', parameters);
+      if (downloadPath != null) 'downloadPath': downloadPath,
+    });
   }
 
   /// Overrides the Geolocation Position or Error. Omitting any of the parameters emulates position
@@ -706,26 +607,19 @@ class PageApi {
   @deprecated
   Future<void> setGeolocationOverride(
       {num latitude, num longitude, num accuracy}) async {
-    var parameters = <String, dynamic>{};
-    if (latitude != null) {
-      parameters['latitude'] = latitude;
-    }
-    if (longitude != null) {
-      parameters['longitude'] = longitude;
-    }
-    if (accuracy != null) {
-      parameters['accuracy'] = accuracy;
-    }
-    await _client.send('Page.setGeolocationOverride', parameters);
+    await _client.send('Page.setGeolocationOverride', {
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
+      if (accuracy != null) 'accuracy': accuracy,
+    });
   }
 
   /// Controls whether page will emit lifecycle events.
   /// [enabled] If true, starts emitting lifecycle events.
   Future<void> setLifecycleEventsEnabled(bool enabled) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.setLifecycleEventsEnabled', {
       'enabled': enabled,
-    };
-    await _client.send('Page.setLifecycleEventsEnabled', parameters);
+    });
   }
 
   /// Toggles mouse event-based touch event emulation.
@@ -736,13 +630,10 @@ class PageApi {
       {@Enum(['mobile', 'desktop']) String configuration}) async {
     assert(configuration == null ||
         const ['mobile', 'desktop'].contains(configuration));
-    var parameters = <String, dynamic>{
+    await _client.send('Page.setTouchEmulationEnabled', {
       'enabled': enabled,
-    };
-    if (configuration != null) {
-      parameters['configuration'] = configuration;
-    }
-    await _client.send('Page.setTouchEmulationEnabled', parameters);
+      if (configuration != null) 'configuration': configuration,
+    });
   }
 
   /// Starts sending each frame using the `screencastFrame` event.
@@ -758,23 +649,13 @@ class PageApi {
       int maxHeight,
       int everyNthFrame}) async {
     assert(format == null || const ['jpeg', 'png'].contains(format));
-    var parameters = <String, dynamic>{};
-    if (format != null) {
-      parameters['format'] = format;
-    }
-    if (quality != null) {
-      parameters['quality'] = quality;
-    }
-    if (maxWidth != null) {
-      parameters['maxWidth'] = maxWidth;
-    }
-    if (maxHeight != null) {
-      parameters['maxHeight'] = maxHeight;
-    }
-    if (everyNthFrame != null) {
-      parameters['everyNthFrame'] = everyNthFrame;
-    }
-    await _client.send('Page.startScreencast', parameters);
+    await _client.send('Page.startScreencast', {
+      if (format != null) 'format': format,
+      if (quality != null) 'quality': quality,
+      if (maxWidth != null) 'maxWidth': maxWidth,
+      if (maxHeight != null) 'maxHeight': maxHeight,
+      if (everyNthFrame != null) 'everyNthFrame': everyNthFrame,
+    });
   }
 
   /// Force the page stop all navigations and pending resource fetches.
@@ -799,10 +680,9 @@ class PageApi {
   Future<void> setWebLifecycleState(
       @Enum(['frozen', 'active']) String state) async {
     assert(const ['frozen', 'active'].contains(state));
-    var parameters = <String, dynamic>{
+    await _client.send('Page.setWebLifecycleState', {
       'state': state,
-    };
-    await _client.send('Page.setWebLifecycleState', parameters);
+    });
   }
 
   /// Stops sending each frame in the `screencastFrame`.
@@ -812,21 +692,19 @@ class PageApi {
 
   /// Forces compilation cache to be generated for every subresource script.
   Future<void> setProduceCompilationCache(bool enabled) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.setProduceCompilationCache', {
       'enabled': enabled,
-    };
-    await _client.send('Page.setProduceCompilationCache', parameters);
+    });
   }
 
   /// Seeds compilation cache for given url. Compilation cache does not survive
   /// cross-process navigation.
   /// [data] Base64-encoded data
   Future<void> addCompilationCache(String url, String data) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.addCompilationCache', {
       'url': url,
       'data': data,
-    };
-    await _client.send('Page.addCompilationCache', parameters);
+    });
   }
 
   /// Clears seeded compilation cache.
@@ -838,13 +716,10 @@ class PageApi {
   /// [message] Message to be displayed in the report.
   /// [group] Specifies the endpoint group to deliver the report to.
   Future<void> generateTestReport(String message, {String group}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.generateTestReport', {
       'message': message,
-    };
-    if (group != null) {
-      parameters['group'] = group;
-    }
-    await _client.send('Page.generateTestReport', parameters);
+      if (group != null) 'group': group,
+    });
   }
 
   /// Pauses page execution. Can be resumed using generic Runtime.runIfWaitingForDebugger.
@@ -857,10 +732,9 @@ class PageApi {
   /// Instead, a protocol event `Page.fileChooserOpened` is emitted.
   /// File chooser can be handled with `page.handleFileChooser` command.
   Future<void> setInterceptFileChooserDialog(bool enabled) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Page.setInterceptFileChooserDialog', {
       'enabled': enabled,
-    };
-    await _client.send('Page.setInterceptFileChooserDialog', parameters);
+    });
   }
 
   /// Accepts or cancels an intercepted file chooser dialog.
@@ -869,13 +743,10 @@ class PageApi {
       @Enum(['accept', 'cancel', 'fallback']) String action,
       {List<String> files}) async {
     assert(const ['accept', 'cancel', 'fallback'].contains(action));
-    var parameters = <String, dynamic>{
+    await _client.send('Page.handleFileChooser', {
       'action': action,
-    };
-    if (files != null) {
-      parameters['files'] = files.map((e) => e).toList();
-    }
-    await _client.send('Page.handleFileChooser', parameters);
+      if (files != null) 'files': files.map((e) => e).toList(),
+    });
   }
 }
 
@@ -1342,26 +1213,17 @@ class FrameInfo {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'id': id.toJson(),
       'loaderId': loaderId.toJson(),
       'url': url,
       'securityOrigin': securityOrigin,
       'mimeType': mimeType,
+      if (parentId != null) 'parentId': parentId,
+      if (name != null) 'name': name,
+      if (urlFragment != null) 'urlFragment': urlFragment,
+      if (unreachableUrl != null) 'unreachableUrl': unreachableUrl,
     };
-    if (parentId != null) {
-      json['parentId'] = parentId;
-    }
-    if (name != null) {
-      json['name'] = name;
-    }
-    if (urlFragment != null) {
-      json['urlFragment'] = urlFragment;
-    }
-    if (unreachableUrl != null) {
-      json['unreachableUrl'] = unreachableUrl;
-    }
-    return json;
   }
 }
 
@@ -1412,24 +1274,15 @@ class FrameResource {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'url': url,
       'type': type.toJson(),
       'mimeType': mimeType,
+      if (lastModified != null) 'lastModified': lastModified.toJson(),
+      if (contentSize != null) 'contentSize': contentSize,
+      if (failed != null) 'failed': failed,
+      if (canceled != null) 'canceled': canceled,
     };
-    if (lastModified != null) {
-      json['lastModified'] = lastModified.toJson();
-    }
-    if (contentSize != null) {
-      json['contentSize'] = contentSize;
-    }
-    if (failed != null) {
-      json['failed'] = failed;
-    }
-    if (canceled != null) {
-      json['canceled'] = canceled;
-    }
-    return json;
   }
 }
 
@@ -1462,14 +1315,12 @@ class FrameResourceTree {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'frame': frame.toJson(),
       'resources': resources.map((e) => e.toJson()).toList(),
+      if (childFrames != null)
+        'childFrames': childFrames.map((e) => e.toJson()).toList(),
     };
-    if (childFrames != null) {
-      json['childFrames'] = childFrames.map((e) => e.toJson()).toList();
-    }
-    return json;
   }
 }
 
@@ -1495,13 +1346,11 @@ class FrameTree {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'frame': frame.toJson(),
+      if (childFrames != null)
+        'childFrames': childFrames.map((e) => e.toJson()).toList(),
     };
-    if (childFrames != null) {
-      json['childFrames'] = childFrames.map((e) => e.toJson()).toList();
-    }
-    return json;
   }
 }
 
@@ -1611,14 +1460,13 @@ class NavigationEntry {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'id': id,
       'url': url,
       'userTypedURL': userTypedURL,
       'title': title,
       'transitionType': transitionType.toJson(),
     };
-    return json;
   }
 }
 
@@ -1669,18 +1517,15 @@ class ScreencastFrameMetadata {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'offsetTop': offsetTop,
       'pageScaleFactor': pageScaleFactor,
       'deviceWidth': deviceWidth,
       'deviceHeight': deviceHeight,
       'scrollOffsetX': scrollOffsetX,
       'scrollOffsetY': scrollOffsetY,
+      if (timestamp != null) 'timestamp': timestamp.toJson(),
     };
-    if (timestamp != null) {
-      json['timestamp'] = timestamp.toJson();
-    }
-    return json;
   }
 }
 
@@ -1746,13 +1591,12 @@ class AppManifestError {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'message': message,
       'critical': critical,
       'line': line,
       'column': column,
     };
-    return json;
   }
 }
 
@@ -1786,13 +1630,12 @@ class LayoutViewport {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'pageX': pageX,
       'pageY': pageY,
       'clientWidth': clientWidth,
       'clientHeight': clientHeight,
     };
-    return json;
   }
 }
 
@@ -1846,7 +1689,7 @@ class VisualViewport {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'offsetX': offsetX,
       'offsetY': offsetY,
       'pageX': pageX,
@@ -1854,11 +1697,8 @@ class VisualViewport {
       'clientWidth': clientWidth,
       'clientHeight': clientHeight,
       'scale': scale,
+      if (zoom != null) 'zoom': zoom,
     };
-    if (zoom != null) {
-      json['zoom'] = zoom;
-    }
-    return json;
   }
 }
 
@@ -1897,14 +1737,13 @@ class Viewport {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'x': x,
       'y': y,
       'width': width,
       'height': height,
       'scale': scale,
     };
-    return json;
   }
 }
 
@@ -1953,29 +1792,15 @@ class FontFamilies {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{};
-    if (standard != null) {
-      json['standard'] = standard;
-    }
-    if (fixed != null) {
-      json['fixed'] = fixed;
-    }
-    if (serif != null) {
-      json['serif'] = serif;
-    }
-    if (sansSerif != null) {
-      json['sansSerif'] = sansSerif;
-    }
-    if (cursive != null) {
-      json['cursive'] = cursive;
-    }
-    if (fantasy != null) {
-      json['fantasy'] = fantasy;
-    }
-    if (pictograph != null) {
-      json['pictograph'] = pictograph;
-    }
-    return json;
+    return {
+      if (standard != null) 'standard': standard,
+      if (fixed != null) 'fixed': fixed,
+      if (serif != null) 'serif': serif,
+      if (sansSerif != null) 'sansSerif': sansSerif,
+      if (cursive != null) 'cursive': cursive,
+      if (fantasy != null) 'fantasy': fantasy,
+      if (pictograph != null) 'pictograph': pictograph,
+    };
   }
 }
 
@@ -1997,14 +1822,10 @@ class FontSizes {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{};
-    if (standard != null) {
-      json['standard'] = standard;
-    }
-    if (fixed != null) {
-      json['fixed'] = fixed;
-    }
-    return json;
+    return {
+      if (standard != null) 'standard': standard,
+      if (fixed != null) 'fixed': fixed,
+    };
   }
 }
 

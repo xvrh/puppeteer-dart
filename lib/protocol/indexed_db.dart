@@ -14,12 +14,11 @@ class IndexedDBApi {
   /// [objectStoreName] Object store name.
   Future<void> clearObjectStore(String securityOrigin, String databaseName,
       String objectStoreName) async {
-    var parameters = <String, dynamic>{
+    await _client.send('IndexedDB.clearObjectStore', {
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
-    };
-    await _client.send('IndexedDB.clearObjectStore', parameters);
+    });
   }
 
   /// Deletes a database.
@@ -27,24 +26,22 @@ class IndexedDBApi {
   /// [databaseName] Database name.
   Future<void> deleteDatabase(
       String securityOrigin, String databaseName) async {
-    var parameters = <String, dynamic>{
+    await _client.send('IndexedDB.deleteDatabase', {
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
-    };
-    await _client.send('IndexedDB.deleteDatabase', parameters);
+    });
   }
 
   /// Delete a range of entries from an object store
   /// [keyRange] Range of entry keys to delete
   Future<void> deleteObjectStoreEntries(String securityOrigin,
       String databaseName, String objectStoreName, KeyRange keyRange) async {
-    var parameters = <String, dynamic>{
+    await _client.send('IndexedDB.deleteObjectStoreEntries', {
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
       'keyRange': keyRange.toJson(),
-    };
-    await _client.send('IndexedDB.deleteObjectStoreEntries', parameters);
+    });
   }
 
   /// Disables events from backend.
@@ -73,18 +70,15 @@ class IndexedDBApi {
       int skipCount,
       int pageSize,
       {KeyRange keyRange}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('IndexedDB.requestData', {
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
       'indexName': indexName,
       'skipCount': skipCount,
       'pageSize': pageSize,
-    };
-    if (keyRange != null) {
-      parameters['keyRange'] = keyRange.toJson();
-    }
-    var result = await _client.send('IndexedDB.requestData', parameters);
+      if (keyRange != null) 'keyRange': keyRange.toJson(),
+    });
     return RequestDataResult.fromJson(result);
   }
 
@@ -94,12 +88,11 @@ class IndexedDBApi {
   /// [objectStoreName] Object store name.
   Future<GetMetadataResult> getMetadata(String securityOrigin,
       String databaseName, String objectStoreName) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('IndexedDB.getMetadata', {
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
-    };
-    var result = await _client.send('IndexedDB.getMetadata', parameters);
+    });
     return GetMetadataResult.fromJson(result);
   }
 
@@ -109,11 +102,10 @@ class IndexedDBApi {
   /// Returns: Database with an array of object stores.
   Future<DatabaseWithObjectStores> requestDatabase(
       String securityOrigin, String databaseName) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('IndexedDB.requestDatabase', {
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
-    };
-    var result = await _client.send('IndexedDB.requestDatabase', parameters);
+    });
     return DatabaseWithObjectStores.fromJson(
         result['databaseWithObjectStores']);
   }
@@ -122,11 +114,9 @@ class IndexedDBApi {
   /// [securityOrigin] Security origin.
   /// Returns: Database names for origin.
   Future<List<String>> requestDatabaseNames(String securityOrigin) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('IndexedDB.requestDatabaseNames', {
       'securityOrigin': securityOrigin,
-    };
-    var result =
-        await _client.send('IndexedDB.requestDatabaseNames', parameters);
+    });
     return (result['databaseNames'] as List).map((e) => e as String).toList();
   }
 }
@@ -199,12 +189,11 @@ class DatabaseWithObjectStores {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'version': version,
       'objectStores': objectStores.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -240,13 +229,12 @@ class ObjectStore {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'keyPath': keyPath.toJson(),
       'autoIncrement': autoIncrement,
       'indexes': indexes.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -280,13 +268,12 @@ class ObjectStoreIndex {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'keyPath': keyPath.toJson(),
       'unique': unique,
       'multiEntry': multiEntry,
     };
-    return json;
   }
 }
 
@@ -322,22 +309,13 @@ class Key {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type,
+      if (number != null) 'number': number,
+      if (string != null) 'string': string,
+      if (date != null) 'date': date,
+      if (array != null) 'array': array.map((e) => e.toJson()).toList(),
     };
-    if (number != null) {
-      json['number'] = number;
-    }
-    if (string != null) {
-      json['string'] = string;
-    }
-    if (date != null) {
-      json['date'] = date;
-    }
-    if (array != null) {
-      json['array'] = array.map((e) => e.toJson()).toList();
-    }
-    return json;
   }
 }
 
@@ -402,17 +380,12 @@ class KeyRange {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'lowerOpen': lowerOpen,
       'upperOpen': upperOpen,
+      if (lower != null) 'lower': lower.toJson(),
+      if (upper != null) 'upper': upper.toJson(),
     };
-    if (lower != null) {
-      json['lower'] = lower.toJson();
-    }
-    if (upper != null) {
-      json['upper'] = upper.toJson();
-    }
-    return json;
   }
 }
 
@@ -439,12 +412,11 @@ class DataEntry {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'key': key.toJson(),
       'primaryKey': primaryKey.toJson(),
       'value': value.toJson(),
     };
-    return json;
   }
 }
 
@@ -472,16 +444,11 @@ class KeyPath {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type,
+      if (string != null) 'string': string,
+      if (array != null) 'array': array.map((e) => e).toList(),
     };
-    if (string != null) {
-      json['string'] = string;
-    }
-    if (array != null) {
-      json['array'] = array.map((e) => e).toList();
-    }
-    return json;
   }
 }
 

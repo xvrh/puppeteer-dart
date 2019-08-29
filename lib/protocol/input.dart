@@ -43,59 +43,33 @@ class InputApi {
       bool isSystemKey,
       int location}) async {
     assert(const ['keyDown', 'keyUp', 'rawKeyDown', 'char'].contains(type));
-    var parameters = <String, dynamic>{
+    await _client.send('Input.dispatchKeyEvent', {
       'type': type,
-    };
-    if (modifiers != null) {
-      parameters['modifiers'] = modifiers;
-    }
-    if (timestamp != null) {
-      parameters['timestamp'] = timestamp.toJson();
-    }
-    if (text != null) {
-      parameters['text'] = text;
-    }
-    if (unmodifiedText != null) {
-      parameters['unmodifiedText'] = unmodifiedText;
-    }
-    if (keyIdentifier != null) {
-      parameters['keyIdentifier'] = keyIdentifier;
-    }
-    if (code != null) {
-      parameters['code'] = code;
-    }
-    if (key != null) {
-      parameters['key'] = key;
-    }
-    if (windowsVirtualKeyCode != null) {
-      parameters['windowsVirtualKeyCode'] = windowsVirtualKeyCode;
-    }
-    if (nativeVirtualKeyCode != null) {
-      parameters['nativeVirtualKeyCode'] = nativeVirtualKeyCode;
-    }
-    if (autoRepeat != null) {
-      parameters['autoRepeat'] = autoRepeat;
-    }
-    if (isKeypad != null) {
-      parameters['isKeypad'] = isKeypad;
-    }
-    if (isSystemKey != null) {
-      parameters['isSystemKey'] = isSystemKey;
-    }
-    if (location != null) {
-      parameters['location'] = location;
-    }
-    await _client.send('Input.dispatchKeyEvent', parameters);
+      if (modifiers != null) 'modifiers': modifiers,
+      if (timestamp != null) 'timestamp': timestamp.toJson(),
+      if (text != null) 'text': text,
+      if (unmodifiedText != null) 'unmodifiedText': unmodifiedText,
+      if (keyIdentifier != null) 'keyIdentifier': keyIdentifier,
+      if (code != null) 'code': code,
+      if (key != null) 'key': key,
+      if (windowsVirtualKeyCode != null)
+        'windowsVirtualKeyCode': windowsVirtualKeyCode,
+      if (nativeVirtualKeyCode != null)
+        'nativeVirtualKeyCode': nativeVirtualKeyCode,
+      if (autoRepeat != null) 'autoRepeat': autoRepeat,
+      if (isKeypad != null) 'isKeypad': isKeypad,
+      if (isSystemKey != null) 'isSystemKey': isSystemKey,
+      if (location != null) 'location': location,
+    });
   }
 
   /// This method emulates inserting text that doesn't come from a key press,
   /// for example an emoji keyboard or an IME.
   /// [text] The text to insert.
   Future<void> insertText(String text) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Input.insertText', {
       'text': text,
-    };
-    await _client.send('Input.insertText', parameters);
+    });
   }
 
   /// Dispatches a mouse event to the page.
@@ -134,36 +108,19 @@ class InputApi {
         const ['none', 'left', 'middle', 'right', 'back', 'forward']
             .contains(button));
     assert(pointerType == null || const ['mouse', 'pen'].contains(pointerType));
-    var parameters = <String, dynamic>{
+    await _client.send('Input.dispatchMouseEvent', {
       'type': type,
       'x': x,
       'y': y,
-    };
-    if (modifiers != null) {
-      parameters['modifiers'] = modifiers;
-    }
-    if (timestamp != null) {
-      parameters['timestamp'] = timestamp.toJson();
-    }
-    if (button != null) {
-      parameters['button'] = button;
-    }
-    if (buttons != null) {
-      parameters['buttons'] = buttons;
-    }
-    if (clickCount != null) {
-      parameters['clickCount'] = clickCount;
-    }
-    if (deltaX != null) {
-      parameters['deltaX'] = deltaX;
-    }
-    if (deltaY != null) {
-      parameters['deltaY'] = deltaY;
-    }
-    if (pointerType != null) {
-      parameters['pointerType'] = pointerType;
-    }
-    await _client.send('Input.dispatchMouseEvent', parameters);
+      if (modifiers != null) 'modifiers': modifiers,
+      if (timestamp != null) 'timestamp': timestamp.toJson(),
+      if (button != null) 'button': button,
+      if (buttons != null) 'buttons': buttons,
+      if (clickCount != null) 'clickCount': clickCount,
+      if (deltaX != null) 'deltaX': deltaX,
+      if (deltaY != null) 'deltaY': deltaY,
+      if (pointerType != null) 'pointerType': pointerType,
+    });
   }
 
   /// Dispatches a touch event to the page.
@@ -182,17 +139,12 @@ class InputApi {
       TimeSinceEpoch timestamp}) async {
     assert(const ['touchStart', 'touchEnd', 'touchMove', 'touchCancel']
         .contains(type));
-    var parameters = <String, dynamic>{
+    await _client.send('Input.dispatchTouchEvent', {
       'type': type,
       'touchPoints': touchPoints.map((e) => e.toJson()).toList(),
-    };
-    if (modifiers != null) {
-      parameters['modifiers'] = modifiers;
-    }
-    if (timestamp != null) {
-      parameters['timestamp'] = timestamp.toJson();
-    }
-    await _client.send('Input.dispatchTouchEvent', parameters);
+      if (modifiers != null) 'modifiers': modifiers,
+      if (timestamp != null) 'timestamp': timestamp.toJson(),
+    });
   }
 
   /// Emulates touch event from the mouse event parameters.
@@ -221,37 +173,25 @@ class InputApi {
     assert(const ['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel']
         .contains(type));
     assert(const ['none', 'left', 'middle', 'right'].contains(button));
-    var parameters = <String, dynamic>{
+    await _client.send('Input.emulateTouchFromMouseEvent', {
       'type': type,
       'x': x,
       'y': y,
       'button': button,
-    };
-    if (timestamp != null) {
-      parameters['timestamp'] = timestamp.toJson();
-    }
-    if (deltaX != null) {
-      parameters['deltaX'] = deltaX;
-    }
-    if (deltaY != null) {
-      parameters['deltaY'] = deltaY;
-    }
-    if (modifiers != null) {
-      parameters['modifiers'] = modifiers;
-    }
-    if (clickCount != null) {
-      parameters['clickCount'] = clickCount;
-    }
-    await _client.send('Input.emulateTouchFromMouseEvent', parameters);
+      if (timestamp != null) 'timestamp': timestamp.toJson(),
+      if (deltaX != null) 'deltaX': deltaX,
+      if (deltaY != null) 'deltaY': deltaY,
+      if (modifiers != null) 'modifiers': modifiers,
+      if (clickCount != null) 'clickCount': clickCount,
+    });
   }
 
   /// Ignores input events (useful while auditing page).
   /// [ignore] Ignores input events processing when set to true.
   Future<void> setIgnoreInputEvents(bool ignore) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Input.setIgnoreInputEvents', {
       'ignore': ignore,
-    };
-    await _client.send('Input.setIgnoreInputEvents', parameters);
+    });
   }
 
   /// Synthesizes a pinch gesture over a time period by issuing appropriate touch events.
@@ -263,18 +203,14 @@ class InputApi {
   /// for the preferred input type).
   Future<void> synthesizePinchGesture(num x, num y, num scaleFactor,
       {int relativeSpeed, GestureSourceType gestureSourceType}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Input.synthesizePinchGesture', {
       'x': x,
       'y': y,
       'scaleFactor': scaleFactor,
-    };
-    if (relativeSpeed != null) {
-      parameters['relativeSpeed'] = relativeSpeed;
-    }
-    if (gestureSourceType != null) {
-      parameters['gestureSourceType'] = gestureSourceType.toJson();
-    }
-    await _client.send('Input.synthesizePinchGesture', parameters);
+      if (relativeSpeed != null) 'relativeSpeed': relativeSpeed,
+      if (gestureSourceType != null)
+        'gestureSourceType': gestureSourceType.toJson(),
+    });
   }
 
   /// Synthesizes a scroll gesture over a time period by issuing appropriate touch events.
@@ -304,41 +240,22 @@ class InputApi {
       int repeatCount,
       int repeatDelayMs,
       String interactionMarkerName}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Input.synthesizeScrollGesture', {
       'x': x,
       'y': y,
-    };
-    if (xDistance != null) {
-      parameters['xDistance'] = xDistance;
-    }
-    if (yDistance != null) {
-      parameters['yDistance'] = yDistance;
-    }
-    if (xOverscroll != null) {
-      parameters['xOverscroll'] = xOverscroll;
-    }
-    if (yOverscroll != null) {
-      parameters['yOverscroll'] = yOverscroll;
-    }
-    if (preventFling != null) {
-      parameters['preventFling'] = preventFling;
-    }
-    if (speed != null) {
-      parameters['speed'] = speed;
-    }
-    if (gestureSourceType != null) {
-      parameters['gestureSourceType'] = gestureSourceType.toJson();
-    }
-    if (repeatCount != null) {
-      parameters['repeatCount'] = repeatCount;
-    }
-    if (repeatDelayMs != null) {
-      parameters['repeatDelayMs'] = repeatDelayMs;
-    }
-    if (interactionMarkerName != null) {
-      parameters['interactionMarkerName'] = interactionMarkerName;
-    }
-    await _client.send('Input.synthesizeScrollGesture', parameters);
+      if (xDistance != null) 'xDistance': xDistance,
+      if (yDistance != null) 'yDistance': yDistance,
+      if (xOverscroll != null) 'xOverscroll': xOverscroll,
+      if (yOverscroll != null) 'yOverscroll': yOverscroll,
+      if (preventFling != null) 'preventFling': preventFling,
+      if (speed != null) 'speed': speed,
+      if (gestureSourceType != null)
+        'gestureSourceType': gestureSourceType.toJson(),
+      if (repeatCount != null) 'repeatCount': repeatCount,
+      if (repeatDelayMs != null) 'repeatDelayMs': repeatDelayMs,
+      if (interactionMarkerName != null)
+        'interactionMarkerName': interactionMarkerName,
+    });
   }
 
   /// Synthesizes a tap gesture over a time period by issuing appropriate touch events.
@@ -350,20 +267,14 @@ class InputApi {
   /// for the preferred input type).
   Future<void> synthesizeTapGesture(num x, num y,
       {int duration, int tapCount, GestureSourceType gestureSourceType}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Input.synthesizeTapGesture', {
       'x': x,
       'y': y,
-    };
-    if (duration != null) {
-      parameters['duration'] = duration;
-    }
-    if (tapCount != null) {
-      parameters['tapCount'] = tapCount;
-    }
-    if (gestureSourceType != null) {
-      parameters['gestureSourceType'] = gestureSourceType.toJson();
-    }
-    await _client.send('Input.synthesizeTapGesture', parameters);
+      if (duration != null) 'duration': duration,
+      if (tapCount != null) 'tapCount': tapCount,
+      if (gestureSourceType != null)
+        'gestureSourceType': gestureSourceType.toJson(),
+    });
   }
 }
 
@@ -413,26 +324,15 @@ class TouchPoint {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'x': x,
       'y': y,
+      if (radiusX != null) 'radiusX': radiusX,
+      if (radiusY != null) 'radiusY': radiusY,
+      if (rotationAngle != null) 'rotationAngle': rotationAngle,
+      if (force != null) 'force': force,
+      if (id != null) 'id': id,
     };
-    if (radiusX != null) {
-      json['radiusX'] = radiusX;
-    }
-    if (radiusY != null) {
-      json['radiusY'] = radiusY;
-    }
-    if (rotationAngle != null) {
-      json['rotationAngle'] = rotationAngle;
-    }
-    if (force != null) {
-      json['force'] = force;
-    }
-    if (id != null) {
-      json['id'] = id;
-    }
-    return json;
   }
 }
 

@@ -10,32 +10,28 @@ class CacheStorageApi {
   /// Deletes a cache.
   /// [cacheId] Id of cache for deletion.
   Future<void> deleteCache(CacheId cacheId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('CacheStorage.deleteCache', {
       'cacheId': cacheId.toJson(),
-    };
-    await _client.send('CacheStorage.deleteCache', parameters);
+    });
   }
 
   /// Deletes a cache entry.
   /// [cacheId] Id of cache where the entry will be deleted.
   /// [request] URL spec of the request.
   Future<void> deleteEntry(CacheId cacheId, String request) async {
-    var parameters = <String, dynamic>{
+    await _client.send('CacheStorage.deleteEntry', {
       'cacheId': cacheId.toJson(),
       'request': request,
-    };
-    await _client.send('CacheStorage.deleteEntry', parameters);
+    });
   }
 
   /// Requests cache names.
   /// [securityOrigin] Security origin.
   /// Returns: Caches for the security origin.
   Future<List<Cache>> requestCacheNames(String securityOrigin) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CacheStorage.requestCacheNames', {
       'securityOrigin': securityOrigin,
-    };
-    var result =
-        await _client.send('CacheStorage.requestCacheNames', parameters);
+    });
     return (result['caches'] as List).map((e) => Cache.fromJson(e)).toList();
   }
 
@@ -46,13 +42,11 @@ class CacheStorageApi {
   /// Returns: Response read from the cache.
   Future<CachedResponse> requestCachedResponse(
       CacheId cacheId, String requestURL, List<Header> requestHeaders) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CacheStorage.requestCachedResponse', {
       'cacheId': cacheId.toJson(),
       'requestURL': requestURL,
       'requestHeaders': requestHeaders.map((e) => e.toJson()).toList(),
-    };
-    var result =
-        await _client.send('CacheStorage.requestCachedResponse', parameters);
+    });
     return CachedResponse.fromJson(result['response']);
   }
 
@@ -64,15 +58,12 @@ class CacheStorageApi {
   Future<RequestEntriesResult> requestEntries(
       CacheId cacheId, int skipCount, int pageSize,
       {String pathFilter}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CacheStorage.requestEntries', {
       'cacheId': cacheId.toJson(),
       'skipCount': skipCount,
       'pageSize': pageSize,
-    };
-    if (pathFilter != null) {
-      parameters['pathFilter'] = pathFilter;
-    }
-    var result = await _client.send('CacheStorage.requestEntries', parameters);
+      if (pathFilter != null) 'pathFilter': pathFilter,
+    });
     return RequestEntriesResult.fromJson(result);
   }
 }
@@ -209,7 +200,7 @@ class DataEntry {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'requestURL': requestURL,
       'requestMethod': requestMethod,
       'requestHeaders': requestHeaders.map((e) => e.toJson()).toList(),
@@ -219,7 +210,6 @@ class DataEntry {
       'responseType': responseType.toJson(),
       'responseHeaders': responseHeaders.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -248,12 +238,11 @@ class Cache {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'cacheId': cacheId.toJson(),
       'securityOrigin': securityOrigin,
       'cacheName': cacheName,
     };
-    return json;
   }
 }
 
@@ -272,11 +261,10 @@ class Header {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'value': value,
     };
-    return json;
   }
 }
 
@@ -294,9 +282,8 @@ class CachedResponse {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'body': body,
     };
-    return json;
   }
 }

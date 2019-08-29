@@ -260,24 +260,18 @@ class _Command {
       }
     }
 
-    if (parameters.isNotEmpty) {
-      code.writeln('var parameters = <String, dynamic>{');
-      for (Parameter parameter in requireds) {
-        code.writeln("'${parameter.name}' : ${_toJsonCode(parameter)},");
-      }
-      code.writeln('};');
-
-      for (Parameter parameter in optionals) {
-        code.writeln('if (${parameter.normalizedName} != null) {');
-        code.writeln(
-            "parameters['${parameter.name}'] = ${_toJsonCode(parameter)};");
-        code.writeln('}');
-      }
-    }
-
     String sendCode = " await _client.send('${context.domain.name}.$name'";
     if (parameters.isNotEmpty) {
-      sendCode += ', parameters';
+      sendCode += ', {';
+      for (Parameter parameter in requireds) {
+        sendCode += "'${parameter.name}' : ${_toJsonCode(parameter)},";
+      }
+      for (Parameter parameter in optionals) {
+        sendCode += 'if (${parameter.normalizedName} != null)';
+        sendCode += "'${parameter.name}' : ${_toJsonCode(parameter)},";
+      }
+
+      sendCode += '}';
     }
     sendCode += ');';
 
@@ -526,18 +520,15 @@ class _InternalType {
       code.writeln('');
       if (hasProperties) {
         code.writeln('Map<String, dynamic> toJson() {');
-        code.writeln('var json = <String, dynamic>{');
+        code.writeln('return {');
         for (Parameter property in requireds) {
           code.writeln("'${property.name}': ${_toJsonCode(property)},");
         }
-        code.writeln('};');
         for (Parameter property in optionals) {
-          code.writeln('if (${property.normalizedName} != null) {');
-          code.writeln("json['${property.name}'] = ${_toJsonCode(property)};");
-          code.writeln('}');
+          code.writeln('if (${property.normalizedName} != null) ');
+          code.writeln("'${property.name}' : ${_toJsonCode(property)},");
         }
-        code.writeln('return json;');
-        code.writeln('}');
+        code.writeln('};}');
       } else {
         code.writeln(
             '${context.getPropertyType(properties.first)} toJson() => value;');

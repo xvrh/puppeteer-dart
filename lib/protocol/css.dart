@@ -49,22 +49,20 @@ class CSSApi {
   /// Returns: The newly created rule.
   Future<CSSRule> addRule(
       StyleSheetId styleSheetId, String ruleText, SourceRange location) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CSS.addRule', {
       'styleSheetId': styleSheetId.toJson(),
       'ruleText': ruleText,
       'location': location.toJson(),
-    };
-    var result = await _client.send('CSS.addRule', parameters);
+    });
     return CSSRule.fromJson(result['rule']);
   }
 
   /// Returns all class names from specified stylesheet.
   /// Returns: Class name list.
   Future<List<String>> collectClassNames(StyleSheetId styleSheetId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CSS.collectClassNames', {
       'styleSheetId': styleSheetId.toJson(),
-    };
-    var result = await _client.send('CSS.collectClassNames', parameters);
+    });
     return (result['classNames'] as List).map((e) => e as String).toList();
   }
 
@@ -72,10 +70,9 @@ class CSSApi {
   /// [frameId] Identifier of the frame where "via-inspector" stylesheet should be created.
   /// Returns: Identifier of the created "via-inspector" stylesheet.
   Future<StyleSheetId> createStyleSheet(page.FrameId frameId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CSS.createStyleSheet', {
       'frameId': frameId.toJson(),
-    };
-    var result = await _client.send('CSS.createStyleSheet', parameters);
+    });
     return StyleSheetId.fromJson(result['styleSheetId']);
   }
 
@@ -96,20 +93,18 @@ class CSSApi {
   /// [forcedPseudoClasses] Element pseudo classes to force when computing the element's style.
   Future<void> forcePseudoState(
       dom.NodeId nodeId, List<String> forcedPseudoClasses) async {
-    var parameters = <String, dynamic>{
+    await _client.send('CSS.forcePseudoState', {
       'nodeId': nodeId.toJson(),
       'forcedPseudoClasses': forcedPseudoClasses.map((e) => e).toList(),
-    };
-    await _client.send('CSS.forcePseudoState', parameters);
+    });
   }
 
   /// [nodeId] Id of the node to get background colors for.
   Future<GetBackgroundColorsResult> getBackgroundColors(
       dom.NodeId nodeId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CSS.getBackgroundColors', {
       'nodeId': nodeId.toJson(),
-    };
-    var result = await _client.send('CSS.getBackgroundColors', parameters);
+    });
     return GetBackgroundColorsResult.fromJson(result);
   }
 
@@ -117,10 +112,9 @@ class CSSApi {
   /// Returns: Computed style for the specified DOM node.
   Future<List<CSSComputedStyleProperty>> getComputedStyleForNode(
       dom.NodeId nodeId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CSS.getComputedStyleForNode', {
       'nodeId': nodeId.toJson(),
-    };
-    var result = await _client.send('CSS.getComputedStyleForNode', parameters);
+    });
     return (result['computedStyle'] as List)
         .map((e) => CSSComputedStyleProperty.fromJson(e))
         .toList();
@@ -130,20 +124,18 @@ class CSSApi {
   /// attributes) for a DOM node identified by `nodeId`.
   Future<GetInlineStylesForNodeResult> getInlineStylesForNode(
       dom.NodeId nodeId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CSS.getInlineStylesForNode', {
       'nodeId': nodeId.toJson(),
-    };
-    var result = await _client.send('CSS.getInlineStylesForNode', parameters);
+    });
     return GetInlineStylesForNodeResult.fromJson(result);
   }
 
   /// Returns requested styles for a DOM node identified by `nodeId`.
   Future<GetMatchedStylesForNodeResult> getMatchedStylesForNode(
       dom.NodeId nodeId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CSS.getMatchedStylesForNode', {
       'nodeId': nodeId.toJson(),
-    };
-    var result = await _client.send('CSS.getMatchedStylesForNode', parameters);
+    });
     return GetMatchedStylesForNodeResult.fromJson(result);
   }
 
@@ -158,10 +150,9 @@ class CSSApi {
   /// Returns: Usage statistics for every employed platform font.
   Future<List<PlatformFontUsage>> getPlatformFontsForNode(
       dom.NodeId nodeId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CSS.getPlatformFontsForNode', {
       'nodeId': nodeId.toJson(),
-    };
-    var result = await _client.send('CSS.getPlatformFontsForNode', parameters);
+    });
     return (result['fonts'] as List)
         .map((e) => PlatformFontUsage.fromJson(e))
         .toList();
@@ -170,10 +161,9 @@ class CSSApi {
   /// Returns the current textual content for a stylesheet.
   /// Returns: The stylesheet text.
   Future<String> getStyleSheetText(StyleSheetId styleSheetId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CSS.getStyleSheetText', {
       'styleSheetId': styleSheetId.toJson(),
-    };
-    var result = await _client.send('CSS.getStyleSheetText', parameters);
+    });
     return result['text'];
   }
 
@@ -182,24 +172,22 @@ class CSSApi {
   /// [nodeId] The element id for which to set property.
   Future<void> setEffectivePropertyValueForNode(
       dom.NodeId nodeId, String propertyName, String value) async {
-    var parameters = <String, dynamic>{
+    await _client.send('CSS.setEffectivePropertyValueForNode', {
       'nodeId': nodeId.toJson(),
       'propertyName': propertyName,
       'value': value,
-    };
-    await _client.send('CSS.setEffectivePropertyValueForNode', parameters);
+    });
   }
 
   /// Modifies the keyframe rule key text.
   /// Returns: The resulting key text after modification.
   Future<Value> setKeyframeKey(
       StyleSheetId styleSheetId, SourceRange range, String keyText) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CSS.setKeyframeKey', {
       'styleSheetId': styleSheetId.toJson(),
       'range': range.toJson(),
       'keyText': keyText,
-    };
-    var result = await _client.send('CSS.setKeyframeKey', parameters);
+    });
     return Value.fromJson(result['keyText']);
   }
 
@@ -207,12 +195,11 @@ class CSSApi {
   /// Returns: The resulting CSS media rule after modification.
   Future<CSSMedia> setMediaText(
       StyleSheetId styleSheetId, SourceRange range, String text) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CSS.setMediaText', {
       'styleSheetId': styleSheetId.toJson(),
       'range': range.toJson(),
       'text': text,
-    };
-    var result = await _client.send('CSS.setMediaText', parameters);
+    });
     return CSSMedia.fromJson(result['media']);
   }
 
@@ -220,12 +207,11 @@ class CSSApi {
   /// Returns: The resulting selector list after modification.
   Future<SelectorList> setRuleSelector(
       StyleSheetId styleSheetId, SourceRange range, String selector) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CSS.setRuleSelector', {
       'styleSheetId': styleSheetId.toJson(),
       'range': range.toJson(),
       'selector': selector,
-    };
-    var result = await _client.send('CSS.setRuleSelector', parameters);
+    });
     return SelectorList.fromJson(result['selectorList']);
   }
 
@@ -233,21 +219,19 @@ class CSSApi {
   /// Returns: URL of source map associated with script (if any).
   Future<String> setStyleSheetText(
       StyleSheetId styleSheetId, String text) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CSS.setStyleSheetText', {
       'styleSheetId': styleSheetId.toJson(),
       'text': text,
-    };
-    var result = await _client.send('CSS.setStyleSheetText', parameters);
+    });
     return result['sourceMapURL'];
   }
 
   /// Applies specified style edits one after another in the given order.
   /// Returns: The resulting styles after modification.
   Future<List<CSSStyle>> setStyleTexts(List<StyleDeclarationEdit> edits) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CSS.setStyleTexts', {
       'edits': edits.map((e) => e.toJson()).toList(),
-    };
-    var result = await _client.send('CSS.setStyleTexts', parameters);
+    });
     return (result['styles'] as List).map((e) => CSSStyle.fromJson(e)).toList();
   }
 
@@ -461,11 +445,10 @@ class PseudoElementMatches {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'pseudoType': pseudoType.toJson(),
       'matches': matches.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -491,13 +474,10 @@ class InheritedStyleEntry {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'matchedCSSRules': matchedCSSRules.map((e) => e.toJson()).toList(),
+      if (inlineStyle != null) 'inlineStyle': inlineStyle.toJson(),
     };
-    if (inlineStyle != null) {
-      json['inlineStyle'] = inlineStyle.toJson();
-    }
-    return json;
   }
 }
 
@@ -520,11 +500,10 @@ class RuleMatch {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'rule': rule.toJson(),
-      'matchingSelectors': matchingSelectors.map((e) => e).toList(),
+      'matchingSelectors': matchingSelectors.toList(),
     };
-    return json;
   }
 }
 
@@ -548,13 +527,10 @@ class Value {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'text': text,
+      if (range != null) 'range': range.toJson(),
     };
-    if (range != null) {
-      json['range'] = range.toJson();
-    }
-    return json;
   }
 }
 
@@ -577,11 +553,10 @@ class SelectorList {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'selectors': selectors.map((e) => e.toJson()).toList(),
       'text': text,
     };
-    return json;
   }
 }
 
@@ -665,7 +640,7 @@ class CSSStyleSheetHeader {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'styleSheetId': styleSheetId.toJson(),
       'frameId': frameId.toJson(),
       'sourceURL': sourceURL,
@@ -676,17 +651,10 @@ class CSSStyleSheetHeader {
       'startLine': startLine,
       'startColumn': startColumn,
       'length': length,
+      if (sourceMapURL != null) 'sourceMapURL': sourceMapURL,
+      if (ownerNode != null) 'ownerNode': ownerNode.toJson(),
+      if (hasSourceURL != null) 'hasSourceURL': hasSourceURL,
     };
-    if (sourceMapURL != null) {
-      json['sourceMapURL'] = sourceMapURL;
-    }
-    if (ownerNode != null) {
-      json['ownerNode'] = ownerNode.toJson();
-    }
-    if (hasSourceURL != null) {
-      json['hasSourceURL'] = hasSourceURL;
-    }
-    return json;
   }
 }
 
@@ -731,18 +699,13 @@ class CSSRule {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'selectorList': selectorList.toJson(),
       'origin': origin.toJson(),
       'style': style.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId.toJson(),
+      if (media != null) 'media': media.map((e) => e.toJson()).toList(),
     };
-    if (styleSheetId != null) {
-      json['styleSheetId'] = styleSheetId.toJson();
-    }
-    if (media != null) {
-      json['media'] = media.map((e) => e.toJson()).toList();
-    }
-    return json;
   }
 }
 
@@ -777,13 +740,12 @@ class RuleUsage {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'styleSheetId': styleSheetId.toJson(),
       'startOffset': startOffset,
       'endOffset': endOffset,
       'used': used,
     };
-    return json;
   }
 }
 
@@ -817,13 +779,12 @@ class SourceRange {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'startLine': startLine,
       'startColumn': startColumn,
       'endLine': endLine,
       'endColumn': endColumn,
     };
-    return json;
   }
 }
 
@@ -848,14 +809,11 @@ class ShorthandEntry {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'value': value,
+      if (important != null) 'important': important,
     };
-    if (important != null) {
-      json['important'] = important;
-    }
-    return json;
   }
 }
 
@@ -876,11 +834,10 @@ class CSSComputedStyleProperty {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'value': value,
     };
-    return json;
   }
 }
 
@@ -928,20 +885,13 @@ class CSSStyle {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'cssProperties': cssProperties.map((e) => e.toJson()).toList(),
       'shorthandEntries': shorthandEntries.map((e) => e.toJson()).toList(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId.toJson(),
+      if (cssText != null) 'cssText': cssText,
+      if (range != null) 'range': range.toJson(),
     };
-    if (styleSheetId != null) {
-      json['styleSheetId'] = styleSheetId.toJson();
-    }
-    if (cssText != null) {
-      json['cssText'] = cssText;
-    }
-    if (range != null) {
-      json['range'] = range.toJson();
-    }
-    return json;
   }
 }
 
@@ -997,29 +947,16 @@ class CSSProperty {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'value': value,
+      if (important != null) 'important': important,
+      if (implicit != null) 'implicit': implicit,
+      if (text != null) 'text': text,
+      if (parsedOk != null) 'parsedOk': parsedOk,
+      if (disabled != null) 'disabled': disabled,
+      if (range != null) 'range': range.toJson(),
     };
-    if (important != null) {
-      json['important'] = important;
-    }
-    if (implicit != null) {
-      json['implicit'] = implicit;
-    }
-    if (text != null) {
-      json['text'] = text;
-    }
-    if (parsedOk != null) {
-      json['parsedOk'] = parsedOk;
-    }
-    if (disabled != null) {
-      json['disabled'] = disabled;
-    }
-    if (range != null) {
-      json['range'] = range.toJson();
-    }
-    return json;
   }
 }
 
@@ -1075,23 +1012,15 @@ class CSSMedia {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'text': text,
       'source': source,
+      if (sourceURL != null) 'sourceURL': sourceURL,
+      if (range != null) 'range': range.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId.toJson(),
+      if (mediaList != null)
+        'mediaList': mediaList.map((e) => e.toJson()).toList(),
     };
-    if (sourceURL != null) {
-      json['sourceURL'] = sourceURL;
-    }
-    if (range != null) {
-      json['range'] = range.toJson();
-    }
-    if (styleSheetId != null) {
-      json['styleSheetId'] = styleSheetId.toJson();
-    }
-    if (mediaList != null) {
-      json['mediaList'] = mediaList.map((e) => e.toJson()).toList();
-    }
-    return json;
   }
 }
 
@@ -1146,11 +1075,10 @@ class MediaQuery {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'expressions': expressions.map((e) => e.toJson()).toList(),
       'active': active,
     };
-    return json;
   }
 }
 
@@ -1192,18 +1120,13 @@ class MediaQueryExpression {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'value': value,
       'unit': unit,
       'feature': feature,
+      if (valueRange != null) 'valueRange': valueRange.toJson(),
+      if (computedLength != null) 'computedLength': computedLength,
     };
-    if (valueRange != null) {
-      json['valueRange'] = valueRange.toJson();
-    }
-    if (computedLength != null) {
-      json['computedLength'] = computedLength;
-    }
-    return json;
   }
 }
 
@@ -1232,12 +1155,11 @@ class PlatformFontUsage {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'familyName': familyName,
       'isCustomFont': isCustomFont,
       'glyphCount': glyphCount,
     };
-    return json;
   }
 }
 
@@ -1291,7 +1213,7 @@ class FontFace {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'fontFamily': fontFamily,
       'fontStyle': fontStyle,
       'fontVariant': fontVariant,
@@ -1301,7 +1223,6 @@ class FontFace {
       'src': src,
       'platformFontFamily': platformFontFamily,
     };
-    return json;
   }
 }
 
@@ -1325,11 +1246,10 @@ class CSSKeyframesRule {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'animationName': animationName.toJson(),
       'keyframes': keyframes.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -1366,15 +1286,12 @@ class CSSKeyframeRule {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'origin': origin.toJson(),
       'keyText': keyText.toJson(),
       'style': style.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId.toJson(),
     };
-    if (styleSheetId != null) {
-      json['styleSheetId'] = styleSheetId.toJson();
-    }
-    return json;
   }
 }
 
@@ -1401,11 +1318,10 @@ class StyleDeclarationEdit {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'styleSheetId': styleSheetId.toJson(),
       'range': range.toJson(),
       'text': text,
     };
-    return json;
   }
 }

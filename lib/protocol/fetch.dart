@@ -41,14 +41,11 @@ class FetchApi {
   /// expecting a call to continueWithAuth.
   Future<void> enable(
       {List<RequestPattern> patterns, bool handleAuthRequests}) async {
-    var parameters = <String, dynamic>{};
-    if (patterns != null) {
-      parameters['patterns'] = patterns.map((e) => e.toJson()).toList();
-    }
-    if (handleAuthRequests != null) {
-      parameters['handleAuthRequests'] = handleAuthRequests;
-    }
-    await _client.send('Fetch.enable', parameters);
+    await _client.send('Fetch.enable', {
+      if (patterns != null)
+        'patterns': patterns.map((e) => e.toJson()).toList(),
+      if (handleAuthRequests != null) 'handleAuthRequests': handleAuthRequests,
+    });
   }
 
   /// Causes the request to fail with specified reason.
@@ -56,11 +53,10 @@ class FetchApi {
   /// [errorReason] Causes the request to fail with the given reason.
   Future<void> failRequest(
       RequestId requestId, network.ErrorReason errorReason) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Fetch.failRequest', {
       'requestId': requestId.toJson(),
       'errorReason': errorReason.toJson(),
-    };
-    await _client.send('Fetch.failRequest', parameters);
+    });
   }
 
   /// Provides response to the request.
@@ -73,18 +69,13 @@ class FetchApi {
   Future<void> fulfillRequest(
       RequestId requestId, int responseCode, List<HeaderEntry> responseHeaders,
       {String body, String responsePhrase}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Fetch.fulfillRequest', {
       'requestId': requestId.toJson(),
       'responseCode': responseCode,
       'responseHeaders': responseHeaders.map((e) => e.toJson()).toList(),
-    };
-    if (body != null) {
-      parameters['body'] = body;
-    }
-    if (responsePhrase != null) {
-      parameters['responsePhrase'] = responsePhrase;
-    }
-    await _client.send('Fetch.fulfillRequest', parameters);
+      if (body != null) 'body': body,
+      if (responsePhrase != null) 'responsePhrase': responsePhrase,
+    });
   }
 
   /// Continues the request, optionally modifying some of its parameters.
@@ -98,22 +89,13 @@ class FetchApi {
       String method,
       String postData,
       List<HeaderEntry> headers}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Fetch.continueRequest', {
       'requestId': requestId.toJson(),
-    };
-    if (url != null) {
-      parameters['url'] = url;
-    }
-    if (method != null) {
-      parameters['method'] = method;
-    }
-    if (postData != null) {
-      parameters['postData'] = postData;
-    }
-    if (headers != null) {
-      parameters['headers'] = headers.map((e) => e.toJson()).toList();
-    }
-    await _client.send('Fetch.continueRequest', parameters);
+      if (url != null) 'url': url,
+      if (method != null) 'method': method,
+      if (postData != null) 'postData': postData,
+      if (headers != null) 'headers': headers.map((e) => e.toJson()).toList(),
+    });
   }
 
   /// Continues a request supplying authChallengeResponse following authRequired event.
@@ -121,11 +103,10 @@ class FetchApi {
   /// [authChallengeResponse] Response to  with an authChallenge.
   Future<void> continueWithAuth(
       RequestId requestId, AuthChallengeResponse authChallengeResponse) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Fetch.continueWithAuth', {
       'requestId': requestId.toJson(),
       'authChallengeResponse': authChallengeResponse.toJson(),
-    };
-    await _client.send('Fetch.continueWithAuth', parameters);
+    });
   }
 
   /// Causes the body of the response to be received from the server and
@@ -136,10 +117,9 @@ class FetchApi {
   /// results in an undefined behavior.
   /// [requestId] Identifier for the intercepted request to get body for.
   Future<GetResponseBodyResult> getResponseBody(RequestId requestId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Fetch.getResponseBody', {
       'requestId': requestId.toJson(),
-    };
-    var result = await _client.send('Fetch.getResponseBody', parameters);
+    });
     return GetResponseBodyResult.fromJson(result);
   }
 
@@ -154,11 +134,9 @@ class FetchApi {
   /// Calling other methods that affect the request or disabling fetch
   /// domain before body is received results in an undefined behavior.
   Future<io.StreamHandle> takeResponseBodyAsStream(RequestId requestId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Fetch.takeResponseBodyAsStream', {
       'requestId': requestId.toJson(),
-    };
-    var result =
-        await _client.send('Fetch.takeResponseBodyAsStream', parameters);
+    });
     return io.StreamHandle.fromJson(result['stream']);
   }
 }
@@ -353,17 +331,11 @@ class RequestPattern {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{};
-    if (urlPattern != null) {
-      json['urlPattern'] = urlPattern;
-    }
-    if (resourceType != null) {
-      json['resourceType'] = resourceType.toJson();
-    }
-    if (requestStage != null) {
-      json['requestStage'] = requestStage.toJson();
-    }
-    return json;
+    return {
+      if (urlPattern != null) 'urlPattern': urlPattern,
+      if (resourceType != null) 'resourceType': resourceType.toJson(),
+      if (requestStage != null) 'requestStage': requestStage.toJson(),
+    };
   }
 }
 
@@ -383,11 +355,10 @@ class HeaderEntry {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'value': value,
     };
-    return json;
   }
 }
 
@@ -423,15 +394,12 @@ class AuthChallenge {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'origin': origin,
       'scheme': scheme,
       'realm': realm,
+      if (source != null) 'source': source,
     };
-    if (source != null) {
-      json['source'] = source;
-    }
-    return json;
   }
 }
 
@@ -489,16 +457,11 @@ class AuthChallengeResponse {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'response': response,
+      if (username != null) 'username': username,
+      if (password != null) 'password': password,
     };
-    if (username != null) {
-      json['username'] = username;
-    }
-    if (password != null) {
-      json['password'] = password;
-    }
-    return json;
   }
 }
 

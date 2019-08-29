@@ -35,10 +35,9 @@ class Domain {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'version': version,
     };
-    return json;
   }
 }

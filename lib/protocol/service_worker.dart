@@ -30,12 +30,11 @@ class ServiceWorkerApi {
 
   Future<void> deliverPushMessage(
       String origin, RegistrationID registrationId, String data) async {
-    var parameters = <String, dynamic>{
+    await _client.send('ServiceWorker.deliverPushMessage', {
       'origin': origin,
       'registrationId': registrationId.toJson(),
       'data': data,
-    };
-    await _client.send('ServiceWorker.deliverPushMessage', parameters);
+    });
   }
 
   Future<void> disable() async {
@@ -44,23 +43,21 @@ class ServiceWorkerApi {
 
   Future<void> dispatchSyncEvent(String origin, RegistrationID registrationId,
       String tag, bool lastChance) async {
-    var parameters = <String, dynamic>{
+    await _client.send('ServiceWorker.dispatchSyncEvent', {
       'origin': origin,
       'registrationId': registrationId.toJson(),
       'tag': tag,
       'lastChance': lastChance,
-    };
-    await _client.send('ServiceWorker.dispatchSyncEvent', parameters);
+    });
   }
 
   Future<void> dispatchPeriodicSyncEvent(
       String origin, RegistrationID registrationId, String tag) async {
-    var parameters = <String, dynamic>{
+    await _client.send('ServiceWorker.dispatchPeriodicSyncEvent', {
       'origin': origin,
       'registrationId': registrationId.toJson(),
       'tag': tag,
-    };
-    await _client.send('ServiceWorker.dispatchPeriodicSyncEvent', parameters);
+    });
   }
 
   Future<void> enable() async {
@@ -68,31 +65,27 @@ class ServiceWorkerApi {
   }
 
   Future<void> inspectWorker(String versionId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('ServiceWorker.inspectWorker', {
       'versionId': versionId,
-    };
-    await _client.send('ServiceWorker.inspectWorker', parameters);
+    });
   }
 
   Future<void> setForceUpdateOnPageLoad(bool forceUpdateOnPageLoad) async {
-    var parameters = <String, dynamic>{
+    await _client.send('ServiceWorker.setForceUpdateOnPageLoad', {
       'forceUpdateOnPageLoad': forceUpdateOnPageLoad,
-    };
-    await _client.send('ServiceWorker.setForceUpdateOnPageLoad', parameters);
+    });
   }
 
   Future<void> skipWaiting(String scopeURL) async {
-    var parameters = <String, dynamic>{
+    await _client.send('ServiceWorker.skipWaiting', {
       'scopeURL': scopeURL,
-    };
-    await _client.send('ServiceWorker.skipWaiting', parameters);
+    });
   }
 
   Future<void> startWorker(String scopeURL) async {
-    var parameters = <String, dynamic>{
+    await _client.send('ServiceWorker.startWorker', {
       'scopeURL': scopeURL,
-    };
-    await _client.send('ServiceWorker.startWorker', parameters);
+    });
   }
 
   Future<void> stopAllWorkers() async {
@@ -100,24 +93,21 @@ class ServiceWorkerApi {
   }
 
   Future<void> stopWorker(String versionId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('ServiceWorker.stopWorker', {
       'versionId': versionId,
-    };
-    await _client.send('ServiceWorker.stopWorker', parameters);
+    });
   }
 
   Future<void> unregister(String scopeURL) async {
-    var parameters = <String, dynamic>{
+    await _client.send('ServiceWorker.unregister', {
       'scopeURL': scopeURL,
-    };
-    await _client.send('ServiceWorker.unregister', parameters);
+    });
   }
 
   Future<void> updateRegistration(String scopeURL) async {
-    var parameters = <String, dynamic>{
+    await _client.send('ServiceWorker.updateRegistration', {
       'scopeURL': scopeURL,
-    };
-    await _client.send('ServiceWorker.updateRegistration', parameters);
+    });
   }
 }
 
@@ -163,12 +153,11 @@ class ServiceWorkerRegistration {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'registrationId': registrationId.toJson(),
       'scopeURL': scopeURL,
       'isDeleted': isDeleted,
     };
-    return json;
   }
 }
 
@@ -301,27 +290,18 @@ class ServiceWorkerVersion {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'versionId': versionId,
       'registrationId': registrationId.toJson(),
       'scriptURL': scriptURL,
       'runningStatus': runningStatus.toJson(),
       'status': status.toJson(),
+      if (scriptLastModified != null) 'scriptLastModified': scriptLastModified,
+      if (scriptResponseTime != null) 'scriptResponseTime': scriptResponseTime,
+      if (controlledClients != null)
+        'controlledClients': controlledClients.map((e) => e.toJson()).toList(),
+      if (targetId != null) 'targetId': targetId.toJson(),
     };
-    if (scriptLastModified != null) {
-      json['scriptLastModified'] = scriptLastModified;
-    }
-    if (scriptResponseTime != null) {
-      json['scriptResponseTime'] = scriptResponseTime;
-    }
-    if (controlledClients != null) {
-      json['controlledClients'] =
-          controlledClients.map((e) => e.toJson()).toList();
-    }
-    if (targetId != null) {
-      json['targetId'] = targetId.toJson();
-    }
-    return json;
   }
 }
 
@@ -359,7 +339,7 @@ class ServiceWorkerErrorMessage {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'errorMessage': errorMessage,
       'registrationId': registrationId.toJson(),
       'versionId': versionId,
@@ -367,6 +347,5 @@ class ServiceWorkerErrorMessage {
       'lineNumber': lineNumber,
       'columnNumber': columnNumber,
     };
-    return json;
   }
 }

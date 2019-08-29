@@ -41,13 +41,10 @@ class DebuggerApi {
       {@Enum(['any', 'current']) String targetCallFrames}) async {
     assert(targetCallFrames == null ||
         const ['any', 'current'].contains(targetCallFrames));
-    var parameters = <String, dynamic>{
+    await _client.send('Debugger.continueToLocation', {
       'location': location.toJson(),
-    };
-    if (targetCallFrames != null) {
-      parameters['targetCallFrames'] = targetCallFrames;
-    }
-    await _client.send('Debugger.continueToLocation', parameters);
+      if (targetCallFrames != null) 'targetCallFrames': targetCallFrames,
+    });
   }
 
   /// Disables debugger for given page.
@@ -61,11 +58,10 @@ class DebuggerApi {
   /// the debugger can hold. Puts no limit if paramter is omitted.
   /// Returns: Unique identifier of the debugger.
   Future<runtime.UniqueDebuggerId> enable({num maxScriptsCacheSize}) async {
-    var parameters = <String, dynamic>{};
-    if (maxScriptsCacheSize != null) {
-      parameters['maxScriptsCacheSize'] = maxScriptsCacheSize;
-    }
-    var result = await _client.send('Debugger.enable', parameters);
+    var result = await _client.send('Debugger.enable', {
+      if (maxScriptsCacheSize != null)
+        'maxScriptsCacheSize': maxScriptsCacheSize,
+    });
     return runtime.UniqueDebuggerId.fromJson(result['debuggerId']);
   }
 
@@ -91,32 +87,18 @@ class DebuggerApi {
       bool generatePreview,
       bool throwOnSideEffect,
       runtime.TimeDelta timeout}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Debugger.evaluateOnCallFrame', {
       'callFrameId': callFrameId.toJson(),
       'expression': expression,
-    };
-    if (objectGroup != null) {
-      parameters['objectGroup'] = objectGroup;
-    }
-    if (includeCommandLineAPI != null) {
-      parameters['includeCommandLineAPI'] = includeCommandLineAPI;
-    }
-    if (silent != null) {
-      parameters['silent'] = silent;
-    }
-    if (returnByValue != null) {
-      parameters['returnByValue'] = returnByValue;
-    }
-    if (generatePreview != null) {
-      parameters['generatePreview'] = generatePreview;
-    }
-    if (throwOnSideEffect != null) {
-      parameters['throwOnSideEffect'] = throwOnSideEffect;
-    }
-    if (timeout != null) {
-      parameters['timeout'] = timeout.toJson();
-    }
-    var result = await _client.send('Debugger.evaluateOnCallFrame', parameters);
+      if (objectGroup != null) 'objectGroup': objectGroup,
+      if (includeCommandLineAPI != null)
+        'includeCommandLineAPI': includeCommandLineAPI,
+      if (silent != null) 'silent': silent,
+      if (returnByValue != null) 'returnByValue': returnByValue,
+      if (generatePreview != null) 'generatePreview': generatePreview,
+      if (throwOnSideEffect != null) 'throwOnSideEffect': throwOnSideEffect,
+      if (timeout != null) 'timeout': timeout.toJson(),
+    });
     return EvaluateOnCallFrameResult.fromJson(result);
   }
 
@@ -129,17 +111,11 @@ class DebuggerApi {
   /// Returns: List of the possible breakpoint locations.
   Future<List<BreakLocation>> getPossibleBreakpoints(Location start,
       {Location end, bool restrictToFunction}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Debugger.getPossibleBreakpoints', {
       'start': start.toJson(),
-    };
-    if (end != null) {
-      parameters['end'] = end.toJson();
-    }
-    if (restrictToFunction != null) {
-      parameters['restrictToFunction'] = restrictToFunction;
-    }
-    var result =
-        await _client.send('Debugger.getPossibleBreakpoints', parameters);
+      if (end != null) 'end': end.toJson(),
+      if (restrictToFunction != null) 'restrictToFunction': restrictToFunction,
+    });
     return (result['locations'] as List)
         .map((e) => BreakLocation.fromJson(e))
         .toList();
@@ -149,20 +125,18 @@ class DebuggerApi {
   /// [scriptId] Id of the script to get source for.
   /// Returns: Script source.
   Future<String> getScriptSource(runtime.ScriptId scriptId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Debugger.getScriptSource', {
       'scriptId': scriptId.toJson(),
-    };
-    var result = await _client.send('Debugger.getScriptSource', parameters);
+    });
     return result['scriptSource'];
   }
 
   /// Returns stack trace with given `stackTraceId`.
   Future<runtime.StackTrace> getStackTrace(
       runtime.StackTraceId stackTraceId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Debugger.getStackTrace', {
       'stackTraceId': stackTraceId.toJson(),
-    };
-    var result = await _client.send('Debugger.getStackTrace', parameters);
+    });
     return runtime.StackTrace.fromJson(result['stackTrace']);
   }
 
@@ -173,27 +147,24 @@ class DebuggerApi {
 
   /// [parentStackTraceId] Debugger will pause when async call with given stack trace is started.
   Future<void> pauseOnAsyncCall(runtime.StackTraceId parentStackTraceId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Debugger.pauseOnAsyncCall', {
       'parentStackTraceId': parentStackTraceId.toJson(),
-    };
-    await _client.send('Debugger.pauseOnAsyncCall', parameters);
+    });
   }
 
   /// Removes JavaScript breakpoint.
   Future<void> removeBreakpoint(BreakpointId breakpointId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Debugger.removeBreakpoint', {
       'breakpointId': breakpointId.toJson(),
-    };
-    await _client.send('Debugger.removeBreakpoint', parameters);
+    });
   }
 
   /// Restarts particular call frame from the beginning.
   /// [callFrameId] Call frame identifier to evaluate on.
   Future<RestartFrameResult> restartFrame(CallFrameId callFrameId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Debugger.restartFrame', {
       'callFrameId': callFrameId.toJson(),
-    };
-    var result = await _client.send('Debugger.restartFrame', parameters);
+    });
     return RestartFrameResult.fromJson(result);
   }
 
@@ -211,17 +182,12 @@ class DebuggerApi {
   Future<List<SearchMatch>> searchInContent(
       runtime.ScriptId scriptId, String query,
       {bool caseSensitive, bool isRegex}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Debugger.searchInContent', {
       'scriptId': scriptId.toJson(),
       'query': query,
-    };
-    if (caseSensitive != null) {
-      parameters['caseSensitive'] = caseSensitive;
-    }
-    if (isRegex != null) {
-      parameters['isRegex'] = isRegex;
-    }
-    var result = await _client.send('Debugger.searchInContent', parameters);
+      if (caseSensitive != null) 'caseSensitive': caseSensitive,
+      if (isRegex != null) 'isRegex': isRegex,
+    });
     return (result['result'] as List)
         .map((e) => SearchMatch.fromJson(e))
         .toList();
@@ -231,10 +197,9 @@ class DebuggerApi {
   /// [maxDepth] Maximum depth of async call stacks. Setting to `0` will effectively disable collecting async
   /// call stacks (default).
   Future<void> setAsyncCallStackDepth(int maxDepth) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Debugger.setAsyncCallStackDepth', {
       'maxDepth': maxDepth,
-    };
-    await _client.send('Debugger.setAsyncCallStackDepth', parameters);
+    });
   }
 
   /// Replace previous blackbox patterns with passed ones. Forces backend to skip stepping/pausing in
@@ -242,10 +207,9 @@ class DebuggerApi {
   /// performing 'step in' several times, finally resorting to 'step out' if unsuccessful.
   /// [patterns] Array of regexps that will be used to check script url for blackbox state.
   Future<void> setBlackboxPatterns(List<String> patterns) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Debugger.setBlackboxPatterns', {
       'patterns': patterns.map((e) => e).toList(),
-    };
-    await _client.send('Debugger.setBlackboxPatterns', parameters);
+    });
   }
 
   /// Makes backend skip steps in the script in blackboxed ranges. VM will try leave blacklisted
@@ -255,11 +219,10 @@ class DebuggerApi {
   /// [scriptId] Id of the script.
   Future<void> setBlackboxedRanges(
       runtime.ScriptId scriptId, List<ScriptPosition> positions) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Debugger.setBlackboxedRanges', {
       'scriptId': scriptId.toJson(),
       'positions': positions.map((e) => e.toJson()).toList(),
-    };
-    await _client.send('Debugger.setBlackboxedRanges', parameters);
+    });
   }
 
   /// Sets JavaScript breakpoint at a given location.
@@ -268,13 +231,10 @@ class DebuggerApi {
   /// breakpoint if this expression evaluates to true.
   Future<SetBreakpointResult> setBreakpoint(Location location,
       {String condition}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Debugger.setBreakpoint', {
       'location': location.toJson(),
-    };
-    if (condition != null) {
-      parameters['condition'] = condition;
-    }
-    var result = await _client.send('Debugger.setBreakpoint', parameters);
+      if (condition != null) 'condition': condition,
+    });
     return SetBreakpointResult.fromJson(result);
   }
 
@@ -286,11 +246,9 @@ class DebuggerApi {
           String instrumentation) async {
     assert(const ['beforeScriptExecution', 'beforeScriptWithSourceMapExecution']
         .contains(instrumentation));
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Debugger.setInstrumentationBreakpoint', {
       'instrumentation': instrumentation,
-    };
-    var result =
-        await _client.send('Debugger.setInstrumentationBreakpoint', parameters);
+    });
     return BreakpointId.fromJson(result['breakpointId']);
   }
 
@@ -312,25 +270,14 @@ class DebuggerApi {
       String scriptHash,
       int columnNumber,
       String condition}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Debugger.setBreakpointByUrl', {
       'lineNumber': lineNumber,
-    };
-    if (url != null) {
-      parameters['url'] = url;
-    }
-    if (urlRegex != null) {
-      parameters['urlRegex'] = urlRegex;
-    }
-    if (scriptHash != null) {
-      parameters['scriptHash'] = scriptHash;
-    }
-    if (columnNumber != null) {
-      parameters['columnNumber'] = columnNumber;
-    }
-    if (condition != null) {
-      parameters['condition'] = condition;
-    }
-    var result = await _client.send('Debugger.setBreakpointByUrl', parameters);
+      if (url != null) 'url': url,
+      if (urlRegex != null) 'urlRegex': urlRegex,
+      if (scriptHash != null) 'scriptHash': scriptHash,
+      if (columnNumber != null) 'columnNumber': columnNumber,
+      if (condition != null) 'condition': condition,
+    });
     return SetBreakpointByUrlResult.fromJson(result);
   }
 
@@ -344,24 +291,19 @@ class DebuggerApi {
   Future<BreakpointId> setBreakpointOnFunctionCall(
       runtime.RemoteObjectId objectId,
       {String condition}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Debugger.setBreakpointOnFunctionCall', {
       'objectId': objectId.toJson(),
-    };
-    if (condition != null) {
-      parameters['condition'] = condition;
-    }
-    var result =
-        await _client.send('Debugger.setBreakpointOnFunctionCall', parameters);
+      if (condition != null) 'condition': condition,
+    });
     return BreakpointId.fromJson(result['breakpointId']);
   }
 
   /// Activates / deactivates all breakpoints on the page.
   /// [active] New value for breakpoints active state.
   Future<void> setBreakpointsActive(bool active) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Debugger.setBreakpointsActive', {
       'active': active,
-    };
-    await _client.send('Debugger.setBreakpointsActive', parameters);
+    });
   }
 
   /// Defines pause on exceptions state. Can be set to stop on all exceptions, uncaught exceptions or
@@ -370,19 +312,17 @@ class DebuggerApi {
   Future<void> setPauseOnExceptions(
       @Enum(['none', 'uncaught', 'all']) String state) async {
     assert(const ['none', 'uncaught', 'all'].contains(state));
-    var parameters = <String, dynamic>{
+    await _client.send('Debugger.setPauseOnExceptions', {
       'state': state,
-    };
-    await _client.send('Debugger.setPauseOnExceptions', parameters);
+    });
   }
 
   /// Changes return value in top frame. Available only at return break position.
   /// [newValue] New return value.
   Future<void> setReturnValue(runtime.CallArgument newValue) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Debugger.setReturnValue', {
       'newValue': newValue.toJson(),
-    };
-    await _client.send('Debugger.setReturnValue', parameters);
+    });
   }
 
   /// Edits JavaScript source live.
@@ -393,24 +333,20 @@ class DebuggerApi {
   Future<SetScriptSourceResult> setScriptSource(
       runtime.ScriptId scriptId, String scriptSource,
       {bool dryRun}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Debugger.setScriptSource', {
       'scriptId': scriptId.toJson(),
       'scriptSource': scriptSource,
-    };
-    if (dryRun != null) {
-      parameters['dryRun'] = dryRun;
-    }
-    var result = await _client.send('Debugger.setScriptSource', parameters);
+      if (dryRun != null) 'dryRun': dryRun,
+    });
     return SetScriptSourceResult.fromJson(result);
   }
 
   /// Makes page not interrupt on any pauses (breakpoint, exception, dom exception etc).
   /// [skip] New value for skip pauses state.
   Future<void> setSkipAllPauses(bool skip) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Debugger.setSkipAllPauses', {
       'skip': skip,
-    };
-    await _client.send('Debugger.setSkipAllPauses', parameters);
+    });
   }
 
   /// Changes value of variable in a callframe. Object-based scopes are not supported and must be
@@ -422,24 +358,21 @@ class DebuggerApi {
   /// [callFrameId] Id of callframe that holds variable.
   Future<void> setVariableValue(int scopeNumber, String variableName,
       runtime.CallArgument newValue, CallFrameId callFrameId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Debugger.setVariableValue', {
       'scopeNumber': scopeNumber,
       'variableName': variableName,
       'newValue': newValue.toJson(),
       'callFrameId': callFrameId.toJson(),
-    };
-    await _client.send('Debugger.setVariableValue', parameters);
+    });
   }
 
   /// Steps into the function call.
   /// [breakOnAsyncCall] Debugger will issue additional Debugger.paused notification if any async task is scheduled
   /// before next pause.
   Future<void> stepInto({bool breakOnAsyncCall}) async {
-    var parameters = <String, dynamic>{};
-    if (breakOnAsyncCall != null) {
-      parameters['breakOnAsyncCall'] = breakOnAsyncCall;
-    }
-    await _client.send('Debugger.stepInto', parameters);
+    await _client.send('Debugger.stepInto', {
+      if (breakOnAsyncCall != null) 'breakOnAsyncCall': breakOnAsyncCall,
+    });
   }
 
   /// Steps out of the function call.
@@ -900,14 +833,11 @@ class Location {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'scriptId': scriptId.toJson(),
       'lineNumber': lineNumber,
+      if (columnNumber != null) 'columnNumber': columnNumber,
     };
-    if (columnNumber != null) {
-      json['columnNumber'] = columnNumber;
-    }
-    return json;
   }
 }
 
@@ -927,11 +857,10 @@ class ScriptPosition {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'lineNumber': lineNumber,
       'columnNumber': columnNumber,
     };
-    return json;
   }
 }
 
@@ -990,21 +919,17 @@ class CallFrame {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'callFrameId': callFrameId.toJson(),
       'functionName': functionName,
       'location': location.toJson(),
       'url': url,
       'scopeChain': scopeChain.map((e) => e.toJson()).toList(),
       'this': this$.toJson(),
+      if (functionLocation != null)
+        'functionLocation': functionLocation.toJson(),
+      if (returnValue != null) 'returnValue': returnValue.toJson(),
     };
-    if (functionLocation != null) {
-      json['functionLocation'] = functionLocation.toJson();
-    }
-    if (returnValue != null) {
-      json['returnValue'] = returnValue.toJson();
-    }
-    return json;
   }
 }
 
@@ -1048,20 +973,13 @@ class Scope {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type,
       'object': object.toJson(),
+      if (name != null) 'name': name,
+      if (startLocation != null) 'startLocation': startLocation.toJson(),
+      if (endLocation != null) 'endLocation': endLocation.toJson(),
     };
-    if (name != null) {
-      json['name'] = name;
-    }
-    if (startLocation != null) {
-      json['startLocation'] = startLocation.toJson();
-    }
-    if (endLocation != null) {
-      json['endLocation'] = endLocation.toJson();
-    }
-    return json;
   }
 }
 
@@ -1124,11 +1042,10 @@ class SearchMatch {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'lineNumber': lineNumber,
       'lineContent': lineContent,
     };
-    return json;
   }
 }
 
@@ -1163,17 +1080,12 @@ class BreakLocation {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'scriptId': scriptId.toJson(),
       'lineNumber': lineNumber,
+      if (columnNumber != null) 'columnNumber': columnNumber,
+      if (type != null) 'type': type,
     };
-    if (columnNumber != null) {
-      json['columnNumber'] = columnNumber;
-    }
-    if (type != null) {
-      json['type'] = type;
-    }
-    return json;
   }
 }
 

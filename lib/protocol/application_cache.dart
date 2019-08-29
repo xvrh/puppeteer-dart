@@ -29,11 +29,10 @@ class ApplicationCacheApi {
   /// Returns: Relevant application cache data for the document in given frame.
   Future<ApplicationCache> getApplicationCacheForFrame(
       page.FrameId frameId) async {
-    var parameters = <String, dynamic>{
+    var result =
+        await _client.send('ApplicationCache.getApplicationCacheForFrame', {
       'frameId': frameId.toJson(),
-    };
-    var result = await _client.send(
-        'ApplicationCache.getApplicationCacheForFrame', parameters);
+    });
     return ApplicationCache.fromJson(result['applicationCache']);
   }
 
@@ -52,11 +51,9 @@ class ApplicationCacheApi {
   /// [frameId] Identifier of the frame containing document whose manifest is retrieved.
   /// Returns: Manifest URL for document in the given frame.
   Future<String> getManifestForFrame(page.FrameId frameId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('ApplicationCache.getManifestForFrame', {
       'frameId': frameId.toJson(),
-    };
-    var result =
-        await _client.send('ApplicationCache.getManifestForFrame', parameters);
+    });
     return result['manifestURL'];
   }
 }
@@ -109,12 +106,11 @@ class ApplicationCacheResource {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'url': url,
       'size': size,
       'type': type,
     };
-    return json;
   }
 }
 
@@ -155,14 +151,13 @@ class ApplicationCache {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'manifestURL': manifestURL,
       'size': size,
       'creationTime': creationTime,
       'updateTime': updateTime,
       'resources': resources.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -191,11 +186,10 @@ class FrameWithManifest {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'frameId': frameId.toJson(),
       'manifestURL': manifestURL,
       'status': status,
     };
-    return json;
   }
 }

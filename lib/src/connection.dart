@@ -6,7 +6,7 @@ import 'package:meta/meta.dart';
 import '../protocol/target.dart';
 
 abstract class Client {
-  Future<Map> send(String method, [Map parameters]);
+  Future<Map> send(String method, [Map<String, dynamic> parameters]);
 
   Stream<Event> get onEvent;
 }
@@ -62,7 +62,7 @@ class Connection implements Client {
   Stream<Event> get onEvent => _eventController.stream;
 
   @override
-  Future<Map> send(String method, [Map parameters]) {
+  Future<Map> send(String method, [Map<String, dynamic> parameters]) {
     var id = _rawSend(method, parameters);
     var message = _Message(method);
     _messagesInFly[id] = message;
@@ -70,7 +70,7 @@ class Connection implements Client {
     return message.completer.future;
   }
 
-  int _rawSend(String method, Map parameters, {SessionID sessionId}) {
+  int _rawSend(String method, Map<String, dynamic> parameters, {SessionID sessionId}) {
     var id = ++_lastId;
     var message = _encodeMessage(id, method, parameters, sessionId: sessionId);
 
@@ -95,7 +95,7 @@ class Connection implements Client {
     }
 
     String message = messageArg;
-    Map object = jsonDecode(message);
+    Map<String, dynamic> object = jsonDecode(message);
     int id = object['id'];
     String method = object['method'];
     String sessionId = object['sessionId'];
@@ -196,7 +196,7 @@ class Session implements Client {
   Session(this.connection, this.sessionId, {@required this.targetType});
 
   @override
-  Future<Map> send(String method, [Map parameters]) {
+  Future<Map> send(String method, [Map<String, dynamic> parameters]) {
     if (_eventController.isClosed) {
       throw Exception(
           'Protocol error ($method): Session closed. Most likely the $targetType has been closed.');

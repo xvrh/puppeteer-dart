@@ -34,10 +34,9 @@ class LogApi {
   /// start violation reporting.
   /// [config] Configuration for violations.
   Future<void> startViolationsReport(List<ViolationSetting> config) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Log.startViolationsReport', {
       'config': config.map((e) => e.toJson()).toList(),
-    };
-    await _client.send('Log.startViolationsReport', parameters);
+    });
   }
 
   /// Stop violation reporting.
@@ -114,31 +113,19 @@ class LogEntry {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'source': source,
       'level': level,
       'text': text,
       'timestamp': timestamp.toJson(),
+      if (url != null) 'url': url,
+      if (lineNumber != null) 'lineNumber': lineNumber,
+      if (stackTrace != null) 'stackTrace': stackTrace.toJson(),
+      if (networkRequestId != null)
+        'networkRequestId': networkRequestId.toJson(),
+      if (workerId != null) 'workerId': workerId,
+      if (args != null) 'args': args.map((e) => e.toJson()).toList(),
     };
-    if (url != null) {
-      json['url'] = url;
-    }
-    if (lineNumber != null) {
-      json['lineNumber'] = lineNumber;
-    }
-    if (stackTrace != null) {
-      json['stackTrace'] = stackTrace.toJson();
-    }
-    if (networkRequestId != null) {
-      json['networkRequestId'] = networkRequestId.toJson();
-    }
-    if (workerId != null) {
-      json['workerId'] = workerId;
-    }
-    if (args != null) {
-      json['args'] = args.map((e) => e.toJson()).toList();
-    }
-    return json;
   }
 }
 
@@ -240,11 +227,10 @@ class ViolationSetting {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'threshold': threshold,
     };
-    return json;
   }
 }
 

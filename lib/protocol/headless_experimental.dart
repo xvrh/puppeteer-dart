@@ -33,21 +33,12 @@ class HeadlessExperimentalApi {
       num interval,
       bool noDisplayUpdates,
       ScreenshotParams screenshot}) async {
-    var parameters = <String, dynamic>{};
-    if (frameTimeTicks != null) {
-      parameters['frameTimeTicks'] = frameTimeTicks;
-    }
-    if (interval != null) {
-      parameters['interval'] = interval;
-    }
-    if (noDisplayUpdates != null) {
-      parameters['noDisplayUpdates'] = noDisplayUpdates;
-    }
-    if (screenshot != null) {
-      parameters['screenshot'] = screenshot.toJson();
-    }
-    var result =
-        await _client.send('HeadlessExperimental.beginFrame', parameters);
+    var result = await _client.send('HeadlessExperimental.beginFrame', {
+      if (frameTimeTicks != null) 'frameTimeTicks': frameTimeTicks,
+      if (interval != null) 'interval': interval,
+      if (noDisplayUpdates != null) 'noDisplayUpdates': noDisplayUpdates,
+      if (screenshot != null) 'screenshot': screenshot.toJson(),
+    });
     return BeginFrameResult.fromJson(result);
   }
 
@@ -101,14 +92,10 @@ class ScreenshotParams {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{};
-    if (format != null) {
-      json['format'] = format;
-    }
-    if (quality != null) {
-      json['quality'] = quality;
-    }
-    return json;
+    return {
+      if (format != null) 'format': format,
+      if (quality != null) 'quality': quality,
+    };
   }
 }
 

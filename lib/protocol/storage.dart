@@ -34,57 +34,51 @@ class StorageApi {
   /// [origin] Security origin.
   /// [storageTypes] Comma separated list of StorageType to clear.
   Future<void> clearDataForOrigin(String origin, String storageTypes) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Storage.clearDataForOrigin', {
       'origin': origin,
       'storageTypes': storageTypes,
-    };
-    await _client.send('Storage.clearDataForOrigin', parameters);
+    });
   }
 
   /// Returns usage and quota in bytes.
   /// [origin] Security origin.
   Future<GetUsageAndQuotaResult> getUsageAndQuota(String origin) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Storage.getUsageAndQuota', {
       'origin': origin,
-    };
-    var result = await _client.send('Storage.getUsageAndQuota', parameters);
+    });
     return GetUsageAndQuotaResult.fromJson(result);
   }
 
   /// Registers origin to be notified when an update occurs to its cache storage list.
   /// [origin] Security origin.
   Future<void> trackCacheStorageForOrigin(String origin) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Storage.trackCacheStorageForOrigin', {
       'origin': origin,
-    };
-    await _client.send('Storage.trackCacheStorageForOrigin', parameters);
+    });
   }
 
   /// Registers origin to be notified when an update occurs to its IndexedDB.
   /// [origin] Security origin.
   Future<void> trackIndexedDBForOrigin(String origin) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Storage.trackIndexedDBForOrigin', {
       'origin': origin,
-    };
-    await _client.send('Storage.trackIndexedDBForOrigin', parameters);
+    });
   }
 
   /// Unregisters origin from receiving notifications for cache storage.
   /// [origin] Security origin.
   Future<void> untrackCacheStorageForOrigin(String origin) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Storage.untrackCacheStorageForOrigin', {
       'origin': origin,
-    };
-    await _client.send('Storage.untrackCacheStorageForOrigin', parameters);
+    });
   }
 
   /// Unregisters origin from receiving notifications for IndexedDB.
   /// [origin] Security origin.
   Future<void> untrackIndexedDBForOrigin(String origin) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Storage.untrackIndexedDBForOrigin', {
       'origin': origin,
-    };
-    await _client.send('Storage.untrackIndexedDBForOrigin', parameters);
+    });
   }
 }
 
@@ -220,10 +214,9 @@ class UsageForType {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'storageType': storageType.toJson(),
       'usage': usage,
     };
-    return json;
   }
 }

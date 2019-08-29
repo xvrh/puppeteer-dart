@@ -94,10 +94,9 @@ class WebAudioApi {
 
   /// Fetch the realtime data from the registered contexts.
   Future<ContextRealtimeData> getRealtimeData(GraphObjectId contextId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('WebAudio.getRealtimeData', {
       'contextId': contextId.toJson(),
-    };
-    var result = await _client.send('WebAudio.getRealtimeData', parameters);
+    });
     return ContextRealtimeData.fromJson(result['realtimeData']);
   }
 }
@@ -516,13 +515,12 @@ class ContextRealtimeData {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'currentTime': currentTime,
       'renderCapacity': renderCapacity,
       'callbackIntervalMean': callbackIntervalMean,
       'callbackIntervalVariance': callbackIntervalVariance,
     };
-    return json;
   }
 }
 
@@ -569,18 +567,15 @@ class BaseAudioContext {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'contextId': contextId.toJson(),
       'contextType': contextType.toJson(),
       'contextState': contextState.toJson(),
       'callbackBufferSize': callbackBufferSize,
       'maxOutputChannelCount': maxOutputChannelCount,
       'sampleRate': sampleRate,
+      if (realtimeData != null) 'realtimeData': realtimeData.toJson(),
     };
-    if (realtimeData != null) {
-      json['realtimeData'] = realtimeData.toJson();
-    }
-    return json;
   }
 }
 
@@ -600,11 +595,10 @@ class AudioListener {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'listenerId': listenerId.toJson(),
       'contextId': contextId.toJson(),
     };
-    return json;
   }
 }
 
@@ -651,7 +645,7 @@ class AudioNode {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'nodeId': nodeId.toJson(),
       'contextId': contextId.toJson(),
       'nodeType': nodeType.toJson(),
@@ -661,7 +655,6 @@ class AudioNode {
       'channelCountMode': channelCountMode.toJson(),
       'channelInterpretation': channelInterpretation.toJson(),
     };
-    return json;
   }
 }
 
@@ -707,7 +700,7 @@ class AudioParam {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'paramId': paramId.toJson(),
       'nodeId': nodeId.toJson(),
       'contextId': contextId.toJson(),
@@ -717,6 +710,5 @@ class AudioParam {
       'minValue': minValue,
       'maxValue': maxValue,
     };
-    return json;
   }
 }

@@ -23,74 +23,75 @@ class WebAuthnApi {
   /// Creates and adds a virtual authenticator.
   Future<AuthenticatorId> addVirtualAuthenticator(
       VirtualAuthenticatorOptions options) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('WebAuthn.addVirtualAuthenticator', {
       'options': options.toJson(),
-    };
-    var result =
-        await _client.send('WebAuthn.addVirtualAuthenticator', parameters);
+    });
     return AuthenticatorId.fromJson(result['authenticatorId']);
   }
 
   /// Removes the given authenticator.
   Future<void> removeVirtualAuthenticator(
       AuthenticatorId authenticatorId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('WebAuthn.removeVirtualAuthenticator', {
       'authenticatorId': authenticatorId.toJson(),
-    };
-    await _client.send('WebAuthn.removeVirtualAuthenticator', parameters);
+    });
   }
 
   /// Adds the credential to the specified authenticator.
   Future<void> addCredential(
       AuthenticatorId authenticatorId, Credential credential) async {
-    var parameters = <String, dynamic>{
+    await _client.send('WebAuthn.addCredential', {
       'authenticatorId': authenticatorId.toJson(),
       'credential': credential.toJson(),
-    };
-    await _client.send('WebAuthn.addCredential', parameters);
+    });
   }
 
   /// Returns a single credential stored in the given virtual authenticator that
   /// matches the credential ID.
   Future<Credential> getCredential(
       AuthenticatorId authenticatorId, String credentialId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('WebAuthn.getCredential', {
       'authenticatorId': authenticatorId.toJson(),
       'credentialId': credentialId,
-    };
-    var result = await _client.send('WebAuthn.getCredential', parameters);
+    });
     return Credential.fromJson(result['credential']);
   }
 
   /// Returns all the credentials stored in the given virtual authenticator.
   Future<List<Credential>> getCredentials(
       AuthenticatorId authenticatorId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('WebAuthn.getCredentials', {
       'authenticatorId': authenticatorId.toJson(),
-    };
-    var result = await _client.send('WebAuthn.getCredentials', parameters);
+    });
     return (result['credentials'] as List)
         .map((e) => Credential.fromJson(e))
         .toList();
   }
 
+  /// Removes a credential from the authenticator.
+  Future<void> removeCredential(
+      AuthenticatorId authenticatorId, String credentialId) async {
+    await _client.send('WebAuthn.removeCredential', {
+      'authenticatorId': authenticatorId.toJson(),
+      'credentialId': credentialId,
+    });
+  }
+
   /// Clears all the credentials from the specified device.
   Future<void> clearCredentials(AuthenticatorId authenticatorId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('WebAuthn.clearCredentials', {
       'authenticatorId': authenticatorId.toJson(),
-    };
-    await _client.send('WebAuthn.clearCredentials', parameters);
+    });
   }
 
   /// Sets whether User Verification succeeds or fails for an authenticator.
   /// The default is true.
   Future<void> setUserVerified(
       AuthenticatorId authenticatorId, bool isUserVerified) async {
-    var parameters = <String, dynamic>{
+    await _client.send('WebAuthn.setUserVerified', {
       'authenticatorId': authenticatorId.toJson(),
       'isUserVerified': isUserVerified,
-    };
-    await _client.send('WebAuthn.setUserVerified', parameters);
+    });
   }
 }
 
@@ -210,16 +211,14 @@ class VirtualAuthenticatorOptions {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'protocol': protocol.toJson(),
       'transport': transport.toJson(),
       'hasResidentKey': hasResidentKey,
       'hasUserVerification': hasUserVerification,
+      if (automaticPresenceSimulation != null)
+        'automaticPresenceSimulation': automaticPresenceSimulation,
     };
-    if (automaticPresenceSimulation != null) {
-      json['automaticPresenceSimulation'] = automaticPresenceSimulation;
-    }
-    return json;
   }
 }
 
@@ -264,18 +263,13 @@ class Credential {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'credentialId': credentialId,
       'isResidentCredential': isResidentCredential,
       'privateKey': privateKey,
       'signCount': signCount,
+      if (rpId != null) 'rpId': rpId,
+      if (userHandle != null) 'userHandle': userHandle,
     };
-    if (rpId != null) {
-      json['rpId'] = rpId;
-    }
-    if (userHandle != null) {
-      json['userHandle'] = userHandle;
-    }
-    return json;
   }
 }

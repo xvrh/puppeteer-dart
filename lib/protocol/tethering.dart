@@ -16,19 +16,17 @@ class TetheringApi {
   /// Request browser port binding.
   /// [port] Port number to bind.
   Future<void> bind(int port) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Tethering.bind', {
       'port': port,
-    };
-    await _client.send('Tethering.bind', parameters);
+    });
   }
 
   /// Request browser port unbinding.
   /// [port] Port number to unbind.
   Future<void> unbind(int port) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Tethering.unbind', {
       'port': port,
-    };
-    await _client.send('Tethering.unbind', parameters);
+    });
   }
 }
 

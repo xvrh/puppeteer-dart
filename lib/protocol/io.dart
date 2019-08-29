@@ -12,10 +12,9 @@ class IOApi {
   /// Close the stream, discard any temporary backing storage.
   /// [handle] Handle of the stream to close.
   Future<void> close(StreamHandle handle) async {
-    var parameters = <String, dynamic>{
+    await _client.send('IO.close', {
       'handle': handle.toJson(),
-    };
-    await _client.send('IO.close', parameters);
+    });
   }
 
   /// Read a chunk of the stream
@@ -24,16 +23,11 @@ class IOApi {
   /// following the last read). Some types of streams may only support sequential reads.
   /// [size] Maximum number of bytes to read (left upon the agent discretion if not specified).
   Future<ReadResult> read(StreamHandle handle, {int offset, int size}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('IO.read', {
       'handle': handle.toJson(),
-    };
-    if (offset != null) {
-      parameters['offset'] = offset;
-    }
-    if (size != null) {
-      parameters['size'] = size;
-    }
-    var result = await _client.send('IO.read', parameters);
+      if (offset != null) 'offset': offset,
+      if (size != null) 'size': size,
+    });
     return ReadResult.fromJson(result);
   }
 
@@ -41,10 +35,9 @@ class IOApi {
   /// [objectId] Object id of a Blob object wrapper.
   /// Returns: UUID of the specified Blob.
   Future<String> resolveBlob(runtime.RemoteObjectId objectId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('IO.resolveBlob', {
       'objectId': objectId.toJson(),
-    };
-    var result = await _client.send('IO.resolveBlob', parameters);
+    });
     return result['uuid'];
   }
 }

@@ -132,13 +132,10 @@ class PlayerProperty {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
+      if (value != null) 'value': value,
     };
-    if (value != null) {
-      json['value'] = value;
-    }
-    return json;
   }
 }
 
@@ -199,12 +196,11 @@ class PlayerEvent {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type.toJson(),
       'timestamp': timestamp.toJson(),
       'name': name,
       'value': value,
     };
-    return json;
   }
 }

@@ -96,7 +96,7 @@ class GPUDevice {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'vendorId': vendorId,
       'deviceId': deviceId,
       'vendorString': vendorString,
@@ -104,7 +104,6 @@ class GPUDevice {
       'driverVendor': driverVendor,
       'driverVersion': driverVersion,
     };
-    return json;
   }
 }
 
@@ -126,11 +125,10 @@ class Size {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'width': width,
       'height': height,
     };
-    return json;
   }
 }
 
@@ -160,12 +158,11 @@ class VideoDecodeAcceleratorCapability {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'profile': profile,
       'maxResolution': maxResolution.toJson(),
       'minResolution': minResolution.toJson(),
     };
-    return json;
   }
 }
 
@@ -201,13 +198,12 @@ class VideoEncodeAcceleratorCapability {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'profile': profile,
       'maxResolution': maxResolution.toJson(),
       'maxFramerateNumerator': maxFramerateNumerator,
       'maxFramerateDenominator': maxFramerateDenominator,
     };
-    return json;
   }
 }
 
@@ -304,13 +300,12 @@ class ImageDecodeAcceleratorCapability {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'imageType': imageType.toJson(),
       'maxDimensions': maxDimensions.toJson(),
       'minDimensions': minDimensions.toJson(),
       'subsamplings': subsamplings.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -370,20 +365,15 @@ class GPUInfo {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'devices': devices.map((e) => e.toJson()).toList(),
       'driverBugWorkarounds': driverBugWorkarounds.map((e) => e).toList(),
       'videoDecoding': videoDecoding.map((e) => e.toJson()).toList(),
       'videoEncoding': videoEncoding.map((e) => e.toJson()).toList(),
       'imageDecoding': imageDecoding.map((e) => e.toJson()).toList(),
+      if (auxAttributes != null) 'auxAttributes': auxAttributes,
+      if (featureStatus != null) 'featureStatus': featureStatus,
     };
-    if (auxAttributes != null) {
-      json['auxAttributes'] = auxAttributes;
-    }
-    if (featureStatus != null) {
-      json['featureStatus'] = featureStatus;
-    }
-    return json;
   }
 }
 
@@ -410,11 +400,10 @@ class ProcessInfo {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type,
       'id': id,
       'cpuTime': cpuTime,
     };
-    return json;
   }
 }

@@ -29,11 +29,9 @@ class CastApi {
   /// Also starts observing for issue messages. When an issue is added or removed,
   /// an |issueUpdated| event is fired.
   Future<void> enable({String presentationUrl}) async {
-    var parameters = <String, dynamic>{};
-    if (presentationUrl != null) {
-      parameters['presentationUrl'] = presentationUrl;
-    }
-    await _client.send('Cast.enable', parameters);
+    await _client.send('Cast.enable', {
+      if (presentationUrl != null) 'presentationUrl': presentationUrl,
+    });
   }
 
   /// Stops observing for sinks and issues.
@@ -44,26 +42,23 @@ class CastApi {
   /// Sets a sink to be used when the web page requests the browser to choose a
   /// sink via Presentation API, Remote Playback API, or Cast SDK.
   Future<void> setSinkToUse(String sinkName) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Cast.setSinkToUse', {
       'sinkName': sinkName,
-    };
-    await _client.send('Cast.setSinkToUse', parameters);
+    });
   }
 
   /// Starts mirroring the tab to the sink.
   Future<void> startTabMirroring(String sinkName) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Cast.startTabMirroring', {
       'sinkName': sinkName,
-    };
-    await _client.send('Cast.startTabMirroring', parameters);
+    });
   }
 
   /// Stops the active Cast session on the sink.
   Future<void> stopCasting(String sinkName) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Cast.stopCasting', {
       'sinkName': sinkName,
-    };
-    await _client.send('Cast.stopCasting', parameters);
+    });
   }
 }
 
@@ -87,13 +82,10 @@ class Sink {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'id': id,
+      if (session != null) 'session': session,
     };
-    if (session != null) {
-      json['session'] = session;
-    }
-    return json;
   }
 }

@@ -22,10 +22,9 @@ class LayerTreeApi {
   /// [layerId] The id of the layer for which we want to get the reasons it was composited.
   /// Returns: A list of strings specifying reasons for the given layer to become composited.
   Future<List<String>> compositingReasons(LayerId layerId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('LayerTree.compositingReasons', {
       'layerId': layerId.toJson(),
-    };
-    var result = await _client.send('LayerTree.compositingReasons', parameters);
+    });
     return (result['compositingReasons'] as List)
         .map((e) => e as String)
         .toList();
@@ -45,10 +44,9 @@ class LayerTreeApi {
   /// [tiles] An array of tiles composing the snapshot.
   /// Returns: The id of the snapshot.
   Future<SnapshotId> loadSnapshot(List<PictureTile> tiles) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('LayerTree.loadSnapshot', {
       'tiles': tiles.map((e) => e.toJson()).toList(),
-    };
-    var result = await _client.send('LayerTree.loadSnapshot', parameters);
+    });
     return SnapshotId.fromJson(result['snapshotId']);
   }
 
@@ -56,10 +54,9 @@ class LayerTreeApi {
   /// [layerId] The id of the layer.
   /// Returns: The id of the layer snapshot.
   Future<SnapshotId> makeSnapshot(LayerId layerId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('LayerTree.makeSnapshot', {
       'layerId': layerId.toJson(),
-    };
-    var result = await _client.send('LayerTree.makeSnapshot', parameters);
+    });
     return SnapshotId.fromJson(result['snapshotId']);
   }
 
@@ -70,19 +67,12 @@ class LayerTreeApi {
   /// Returns: The array of paint profiles, one per run.
   Future<List<PaintProfile>> profileSnapshot(SnapshotId snapshotId,
       {int minRepeatCount, num minDuration, dom.Rect clipRect}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('LayerTree.profileSnapshot', {
       'snapshotId': snapshotId.toJson(),
-    };
-    if (minRepeatCount != null) {
-      parameters['minRepeatCount'] = minRepeatCount;
-    }
-    if (minDuration != null) {
-      parameters['minDuration'] = minDuration;
-    }
-    if (clipRect != null) {
-      parameters['clipRect'] = clipRect.toJson();
-    }
-    var result = await _client.send('LayerTree.profileSnapshot', parameters);
+      if (minRepeatCount != null) 'minRepeatCount': minRepeatCount,
+      if (minDuration != null) 'minDuration': minDuration,
+      if (clipRect != null) 'clipRect': clipRect.toJson(),
+    });
     return (result['timings'] as List)
         .map((e) => PaintProfile.fromJson(e))
         .toList();
@@ -91,10 +81,9 @@ class LayerTreeApi {
   /// Releases layer snapshot captured by the back-end.
   /// [snapshotId] The id of the layer snapshot.
   Future<void> releaseSnapshot(SnapshotId snapshotId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('LayerTree.releaseSnapshot', {
       'snapshotId': snapshotId.toJson(),
-    };
-    await _client.send('LayerTree.releaseSnapshot', parameters);
+    });
   }
 
   /// Replays the layer snapshot and returns the resulting bitmap.
@@ -105,19 +94,12 @@ class LayerTreeApi {
   /// Returns: A data: URL for resulting image.
   Future<String> replaySnapshot(SnapshotId snapshotId,
       {int fromStep, int toStep, num scale}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('LayerTree.replaySnapshot', {
       'snapshotId': snapshotId.toJson(),
-    };
-    if (fromStep != null) {
-      parameters['fromStep'] = fromStep;
-    }
-    if (toStep != null) {
-      parameters['toStep'] = toStep;
-    }
-    if (scale != null) {
-      parameters['scale'] = scale;
-    }
-    var result = await _client.send('LayerTree.replaySnapshot', parameters);
+      if (fromStep != null) 'fromStep': fromStep,
+      if (toStep != null) 'toStep': toStep,
+      if (scale != null) 'scale': scale,
+    });
     return result['dataURL'];
   }
 
@@ -125,10 +107,9 @@ class LayerTreeApi {
   /// [snapshotId] The id of the layer snapshot.
   /// Returns: The array of canvas function calls.
   Future<List<Map>> snapshotCommandLog(SnapshotId snapshotId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('LayerTree.snapshotCommandLog', {
       'snapshotId': snapshotId.toJson(),
-    };
-    var result = await _client.send('LayerTree.snapshotCommandLog', parameters);
+    });
     return (result['commandLog'] as List).map((e) => e as Map).toList();
   }
 }
@@ -210,11 +191,10 @@ class ScrollRect {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'rect': rect.toJson(),
       'type': type,
     };
-    return json;
   }
 }
 
@@ -283,19 +263,15 @@ class StickyPositionConstraint {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'stickyBoxRect': stickyBoxRect.toJson(),
       'containingBlockRect': containingBlockRect.toJson(),
+      if (nearestLayerShiftingStickyBox != null)
+        'nearestLayerShiftingStickyBox': nearestLayerShiftingStickyBox.toJson(),
+      if (nearestLayerShiftingContainingBlock != null)
+        'nearestLayerShiftingContainingBlock':
+            nearestLayerShiftingContainingBlock.toJson(),
     };
-    if (nearestLayerShiftingStickyBox != null) {
-      json['nearestLayerShiftingStickyBox'] =
-          nearestLayerShiftingStickyBox.toJson();
-    }
-    if (nearestLayerShiftingContainingBlock != null) {
-      json['nearestLayerShiftingContainingBlock'] =
-          nearestLayerShiftingContainingBlock.toJson();
-    }
-    return json;
   }
 }
 
@@ -321,12 +297,11 @@ class PictureTile {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'x': x,
       'y': y,
       'picture': picture,
     };
-    return json;
   }
 }
 
@@ -433,7 +408,7 @@ class Layer {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'layerId': layerId.toJson(),
       'offsetX': offsetX,
       'offsetY': offsetY,
@@ -441,35 +416,18 @@ class Layer {
       'height': height,
       'paintCount': paintCount,
       'drawsContent': drawsContent,
+      if (parentLayerId != null) 'parentLayerId': parentLayerId.toJson(),
+      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
+      if (transform != null) 'transform': transform.map((e) => e).toList(),
+      if (anchorX != null) 'anchorX': anchorX,
+      if (anchorY != null) 'anchorY': anchorY,
+      if (anchorZ != null) 'anchorZ': anchorZ,
+      if (invisible != null) 'invisible': invisible,
+      if (scrollRects != null)
+        'scrollRects': scrollRects.map((e) => e.toJson()).toList(),
+      if (stickyPositionConstraint != null)
+        'stickyPositionConstraint': stickyPositionConstraint.toJson(),
     };
-    if (parentLayerId != null) {
-      json['parentLayerId'] = parentLayerId.toJson();
-    }
-    if (backendNodeId != null) {
-      json['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (transform != null) {
-      json['transform'] = transform.map((e) => e).toList();
-    }
-    if (anchorX != null) {
-      json['anchorX'] = anchorX;
-    }
-    if (anchorY != null) {
-      json['anchorY'] = anchorY;
-    }
-    if (anchorZ != null) {
-      json['anchorZ'] = anchorZ;
-    }
-    if (invisible != null) {
-      json['invisible'] = invisible;
-    }
-    if (scrollRects != null) {
-      json['scrollRects'] = scrollRects.map((e) => e.toJson()).toList();
-    }
-    if (stickyPositionConstraint != null) {
-      json['stickyPositionConstraint'] = stickyPositionConstraint.toJson();
-    }
-    return json;
   }
 }
 

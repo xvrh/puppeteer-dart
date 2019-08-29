@@ -21,17 +21,12 @@ class AuditsApi {
       {num quality,
       bool sizeOnly}) async {
     assert(const ['webp', 'jpeg', 'png'].contains(encoding));
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Audits.getEncodedResponse', {
       'requestId': requestId.toJson(),
       'encoding': encoding,
-    };
-    if (quality != null) {
-      parameters['quality'] = quality;
-    }
-    if (sizeOnly != null) {
-      parameters['sizeOnly'] = sizeOnly;
-    }
-    var result = await _client.send('Audits.getEncodedResponse', parameters);
+      if (quality != null) 'quality': quality,
+      if (sizeOnly != null) 'sizeOnly': sizeOnly,
+    });
     return GetEncodedResponseResult.fromJson(result);
   }
 }

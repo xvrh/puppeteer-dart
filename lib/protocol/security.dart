@@ -35,10 +35,9 @@ class SecurityApi {
   /// Enable/disable whether all certificate errors should be ignored.
   /// [ignore] If true, all certificate errors will be ignored.
   Future<void> setIgnoreCertificateErrors(bool ignore) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Security.setIgnoreCertificateErrors', {
       'ignore': ignore,
-    };
-    await _client.send('Security.setIgnoreCertificateErrors', parameters);
+    });
   }
 
   /// Handles a certificate error that fired a certificateError event.
@@ -47,11 +46,10 @@ class SecurityApi {
   @deprecated
   Future<void> handleCertificateError(
       int eventId, CertificateErrorAction action) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Security.handleCertificateError', {
       'eventId': eventId,
       'action': action.toJson(),
-    };
-    await _client.send('Security.handleCertificateError', parameters);
+    });
   }
 
   /// Enable/disable overriding certificate errors. If enabled, all certificate error events need to
@@ -59,10 +57,9 @@ class SecurityApi {
   /// [override] If true, certificate errors will be overridden.
   @deprecated
   Future<void> setOverrideCertificateErrors(bool override) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Security.setOverrideCertificateErrors', {
       'override': override,
-    };
-    await _client.send('Security.setOverrideCertificateErrors', parameters);
+    });
   }
 }
 
@@ -251,18 +248,16 @@ class SecurityStateExplanation {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'securityState': securityState.toJson(),
       'title': title,
       'summary': summary,
       'description': description,
       'mixedContentType': mixedContentType.toJson(),
       'certificate': certificate.map((e) => e).toList(),
+      if (recommendations != null)
+        'recommendations': recommendations.map((e) => e).toList(),
     };
-    if (recommendations != null) {
-      json['recommendations'] = recommendations.map((e) => e).toList();
-    }
-    return json;
   }
 }
 
@@ -313,7 +308,7 @@ class InsecureContentStatus {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'ranMixedContent': ranMixedContent,
       'displayedMixedContent': displayedMixedContent,
       'containedMixedForm': containedMixedForm,
@@ -322,7 +317,6 @@ class InsecureContentStatus {
       'ranInsecureContentStyle': ranInsecureContentStyle.toJson(),
       'displayedInsecureContentStyle': displayedInsecureContentStyle.toJson(),
     };
-    return json;
   }
 }
 

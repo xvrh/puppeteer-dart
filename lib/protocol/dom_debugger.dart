@@ -20,17 +20,11 @@ class DOMDebuggerApi {
   /// Returns: Array of relevant listeners.
   Future<List<EventListener>> getEventListeners(runtime.RemoteObjectId objectId,
       {int depth, bool pierce}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOMDebugger.getEventListeners', {
       'objectId': objectId.toJson(),
-    };
-    if (depth != null) {
-      parameters['depth'] = depth;
-    }
-    if (pierce != null) {
-      parameters['pierce'] = pierce;
-    }
-    var result =
-        await _client.send('DOMDebugger.getEventListeners', parameters);
+      if (depth != null) 'depth': depth,
+      if (pierce != null) 'pierce': pierce,
+    });
     return (result['listeners'] as List)
         .map((e) => EventListener.fromJson(e))
         .toList();
@@ -41,11 +35,10 @@ class DOMDebuggerApi {
   /// [type] Type of the breakpoint to remove.
   Future<void> removeDOMBreakpoint(
       dom.NodeId nodeId, DOMBreakpointType type) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOMDebugger.removeDOMBreakpoint', {
       'nodeId': nodeId.toJson(),
       'type': type.toJson(),
-    };
-    await _client.send('DOMDebugger.removeDOMBreakpoint', parameters);
+    });
   }
 
   /// Removes breakpoint on particular DOM event.
@@ -53,32 +46,26 @@ class DOMDebuggerApi {
   /// [targetName] EventTarget interface name.
   Future<void> removeEventListenerBreakpoint(String eventName,
       {String targetName}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOMDebugger.removeEventListenerBreakpoint', {
       'eventName': eventName,
-    };
-    if (targetName != null) {
-      parameters['targetName'] = targetName;
-    }
-    await _client.send('DOMDebugger.removeEventListenerBreakpoint', parameters);
+      if (targetName != null) 'targetName': targetName,
+    });
   }
 
   /// Removes breakpoint on particular native event.
   /// [eventName] Instrumentation name to stop on.
   Future<void> removeInstrumentationBreakpoint(String eventName) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOMDebugger.removeInstrumentationBreakpoint', {
       'eventName': eventName,
-    };
-    await _client.send(
-        'DOMDebugger.removeInstrumentationBreakpoint', parameters);
+    });
   }
 
   /// Removes breakpoint from XMLHttpRequest.
   /// [url] Resource URL substring.
   Future<void> removeXHRBreakpoint(String url) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOMDebugger.removeXHRBreakpoint', {
       'url': url,
-    };
-    await _client.send('DOMDebugger.removeXHRBreakpoint', parameters);
+    });
   }
 
   /// Sets breakpoint on particular operation with DOM.
@@ -86,11 +73,10 @@ class DOMDebuggerApi {
   /// [type] Type of the operation to stop upon.
   Future<void> setDOMBreakpoint(
       dom.NodeId nodeId, DOMBreakpointType type) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOMDebugger.setDOMBreakpoint', {
       'nodeId': nodeId.toJson(),
       'type': type.toJson(),
-    };
-    await _client.send('DOMDebugger.setDOMBreakpoint', parameters);
+    });
   }
 
   /// Sets breakpoint on particular DOM event.
@@ -99,31 +85,26 @@ class DOMDebuggerApi {
   /// EventTarget.
   Future<void> setEventListenerBreakpoint(String eventName,
       {String targetName}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOMDebugger.setEventListenerBreakpoint', {
       'eventName': eventName,
-    };
-    if (targetName != null) {
-      parameters['targetName'] = targetName;
-    }
-    await _client.send('DOMDebugger.setEventListenerBreakpoint', parameters);
+      if (targetName != null) 'targetName': targetName,
+    });
   }
 
   /// Sets breakpoint on particular native event.
   /// [eventName] Instrumentation name to stop on.
   Future<void> setInstrumentationBreakpoint(String eventName) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOMDebugger.setInstrumentationBreakpoint', {
       'eventName': eventName,
-    };
-    await _client.send('DOMDebugger.setInstrumentationBreakpoint', parameters);
+    });
   }
 
   /// Sets breakpoint on XMLHttpRequest.
   /// [url] Resource URL substring. All XHRs having this substring in the URL will get stopped upon.
   Future<void> setXHRBreakpoint(String url) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOMDebugger.setXHRBreakpoint', {
       'url': url,
-    };
-    await _client.send('DOMDebugger.setXHRBreakpoint', parameters);
+    });
   }
 }
 
@@ -223,7 +204,7 @@ class EventListener {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type,
       'useCapture': useCapture,
       'passive': passive,
@@ -231,16 +212,9 @@ class EventListener {
       'scriptId': scriptId.toJson(),
       'lineNumber': lineNumber,
       'columnNumber': columnNumber,
+      if (handler != null) 'handler': handler.toJson(),
+      if (originalHandler != null) 'originalHandler': originalHandler.toJson(),
+      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
     };
-    if (handler != null) {
-      json['handler'] = handler.toJson();
-    }
-    if (originalHandler != null) {
-      json['originalHandler'] = originalHandler.toJson();
-    }
-    if (backendNodeId != null) {
-      json['backendNodeId'] = backendNodeId.toJson();
-    }
-    return json;
   }
 }

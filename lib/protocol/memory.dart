@@ -24,19 +24,17 @@ class MemoryApi {
   /// Enable/disable suppressing memory pressure notifications in all processes.
   /// [suppressed] If true, memory pressure notifications will be suppressed.
   Future<void> setPressureNotificationsSuppressed(bool suppressed) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Memory.setPressureNotificationsSuppressed', {
       'suppressed': suppressed,
-    };
-    await _client.send('Memory.setPressureNotificationsSuppressed', parameters);
+    });
   }
 
   /// Simulate a memory pressure notification in all processes.
   /// [level] Memory pressure level of the notification.
   Future<void> simulatePressureNotification(PressureLevel level) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Memory.simulatePressureNotification', {
       'level': level.toJson(),
-    };
-    await _client.send('Memory.simulatePressureNotification', parameters);
+    });
   }
 
   /// Start collecting native memory profile.
@@ -44,14 +42,10 @@ class MemoryApi {
   /// [suppressRandomness] Do not randomize intervals between samples.
   Future<void> startSampling(
       {int samplingInterval, bool suppressRandomness}) async {
-    var parameters = <String, dynamic>{};
-    if (samplingInterval != null) {
-      parameters['samplingInterval'] = samplingInterval;
-    }
-    if (suppressRandomness != null) {
-      parameters['suppressRandomness'] = suppressRandomness;
-    }
-    await _client.send('Memory.startSampling', parameters);
+    await _client.send('Memory.startSampling', {
+      if (samplingInterval != null) 'samplingInterval': samplingInterval,
+      if (suppressRandomness != null) 'suppressRandomness': suppressRandomness,
+    });
   }
 
   /// Stop collecting native memory profile.
@@ -153,12 +147,11 @@ class SamplingProfileNode {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'size': size,
       'total': total,
       'stack': stack.map((e) => e).toList(),
     };
-    return json;
   }
 }
 
@@ -181,11 +174,10 @@ class SamplingProfile {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'samples': samples.map((e) => e.toJson()).toList(),
       'modules': modules.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -220,12 +212,11 @@ class Module {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'uuid': uuid,
       'baseAddress': baseAddress,
       'size': size,
     };
-    return json;
   }
 }

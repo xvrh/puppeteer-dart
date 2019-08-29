@@ -97,11 +97,9 @@ class DOMApi {
   /// [nodeId] Id of the node to collect class names.
   /// Returns: Class name list.
   Future<List<String>> collectClassNamesFromSubtree(NodeId nodeId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.collectClassNamesFromSubtree', {
       'nodeId': nodeId.toJson(),
-    };
-    var result =
-        await _client.send('DOM.collectClassNamesFromSubtree', parameters);
+    });
     return (result['classNames'] as List).map((e) => e as String).toList();
   }
 
@@ -114,14 +112,12 @@ class DOMApi {
   /// Returns: Id of the node clone.
   Future<NodeId> copyTo(NodeId nodeId, NodeId targetNodeId,
       {NodeId insertBeforeNodeId}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.copyTo', {
       'nodeId': nodeId.toJson(),
       'targetNodeId': targetNodeId.toJson(),
-    };
-    if (insertBeforeNodeId != null) {
-      parameters['insertBeforeNodeId'] = insertBeforeNodeId.toJson();
-    }
-    var result = await _client.send('DOM.copyTo', parameters);
+      if (insertBeforeNodeId != null)
+        'insertBeforeNodeId': insertBeforeNodeId.toJson(),
+    });
     return NodeId.fromJson(result['nodeId']);
   }
 
@@ -141,23 +137,13 @@ class DOMApi {
       runtime.RemoteObjectId objectId,
       int depth,
       bool pierce}) async {
-    var parameters = <String, dynamic>{};
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
-    if (depth != null) {
-      parameters['depth'] = depth;
-    }
-    if (pierce != null) {
-      parameters['pierce'] = pierce;
-    }
-    var result = await _client.send('DOM.describeNode', parameters);
+    var result = await _client.send('DOM.describeNode', {
+      if (nodeId != null) 'nodeId': nodeId.toJson(),
+      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
+      if (objectId != null) 'objectId': objectId.toJson(),
+      if (depth != null) 'depth': depth,
+      if (pierce != null) 'pierce': pierce,
+    });
     return Node.fromJson(result['node']);
   }
 
@@ -170,10 +156,9 @@ class DOMApi {
   /// be called for that search.
   /// [searchId] Unique search session identifier.
   Future<void> discardSearchResults(String searchId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOM.discardSearchResults', {
       'searchId': searchId,
-    };
-    await _client.send('DOM.discardSearchResults', parameters);
+    });
   }
 
   /// Enables DOM agent for the given page.
@@ -189,27 +174,20 @@ class DOMApi {
       {NodeId nodeId,
       BackendNodeId backendNodeId,
       runtime.RemoteObjectId objectId}) async {
-    var parameters = <String, dynamic>{};
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
-    await _client.send('DOM.focus', parameters);
+    await _client.send('DOM.focus', {
+      if (nodeId != null) 'nodeId': nodeId.toJson(),
+      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
+      if (objectId != null) 'objectId': objectId.toJson(),
+    });
   }
 
   /// Returns attributes for the specified node.
   /// [nodeId] Id of the node to retrieve attibutes for.
   /// Returns: An interleaved array of node attribute names and values.
   Future<List<String>> getAttributes(NodeId nodeId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.getAttributes', {
       'nodeId': nodeId.toJson(),
-    };
-    var result = await _client.send('DOM.getAttributes', parameters);
+    });
     return (result['attributes'] as List).map((e) => e as String).toList();
   }
 
@@ -222,17 +200,11 @@ class DOMApi {
       {NodeId nodeId,
       BackendNodeId backendNodeId,
       runtime.RemoteObjectId objectId}) async {
-    var parameters = <String, dynamic>{};
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
-    var result = await _client.send('DOM.getBoxModel', parameters);
+    var result = await _client.send('DOM.getBoxModel', {
+      if (nodeId != null) 'nodeId': nodeId.toJson(),
+      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
+      if (objectId != null) 'objectId': objectId.toJson(),
+    });
     return BoxModel.fromJson(result['model']);
   }
 
@@ -246,17 +218,11 @@ class DOMApi {
       {NodeId nodeId,
       BackendNodeId backendNodeId,
       runtime.RemoteObjectId objectId}) async {
-    var parameters = <String, dynamic>{};
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
-    var result = await _client.send('DOM.getContentQuads', parameters);
+    var result = await _client.send('DOM.getContentQuads', {
+      if (nodeId != null) 'nodeId': nodeId.toJson(),
+      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
+      if (objectId != null) 'objectId': objectId.toJson(),
+    });
     return (result['quads'] as List).map((e) => Quad.fromJson(e)).toList();
   }
 
@@ -267,14 +233,10 @@ class DOMApi {
   /// (default is false).
   /// Returns: Resulting node.
   Future<Node> getDocument({int depth, bool pierce}) async {
-    var parameters = <String, dynamic>{};
-    if (depth != null) {
-      parameters['depth'] = depth;
-    }
-    if (pierce != null) {
-      parameters['pierce'] = pierce;
-    }
-    var result = await _client.send('DOM.getDocument', parameters);
+    var result = await _client.send('DOM.getDocument', {
+      if (depth != null) 'depth': depth,
+      if (pierce != null) 'pierce': pierce,
+    });
     return Node.fromJson(result['root']);
   }
 
@@ -285,14 +247,10 @@ class DOMApi {
   /// (default is false).
   /// Returns: Resulting node.
   Future<List<Node>> getFlattenedDocument({int depth, bool pierce}) async {
-    var parameters = <String, dynamic>{};
-    if (depth != null) {
-      parameters['depth'] = depth;
-    }
-    if (pierce != null) {
-      parameters['pierce'] = pierce;
-    }
-    var result = await _client.send('DOM.getFlattenedDocument', parameters);
+    var result = await _client.send('DOM.getFlattenedDocument', {
+      if (depth != null) 'depth': depth,
+      if (pierce != null) 'pierce': pierce,
+    });
     return (result['nodes'] as List).map((e) => Node.fromJson(e)).toList();
   }
 
@@ -303,14 +261,12 @@ class DOMApi {
   /// [includeUserAgentShadowDOM] False to skip to the nearest non-UA shadow root ancestor (default: false).
   Future<GetNodeForLocationResult> getNodeForLocation(int x, int y,
       {bool includeUserAgentShadowDOM}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.getNodeForLocation', {
       'x': x,
       'y': y,
-    };
-    if (includeUserAgentShadowDOM != null) {
-      parameters['includeUserAgentShadowDOM'] = includeUserAgentShadowDOM;
-    }
-    var result = await _client.send('DOM.getNodeForLocation', parameters);
+      if (includeUserAgentShadowDOM != null)
+        'includeUserAgentShadowDOM': includeUserAgentShadowDOM,
+    });
     return GetNodeForLocationResult.fromJson(result);
   }
 
@@ -323,17 +279,11 @@ class DOMApi {
       {NodeId nodeId,
       BackendNodeId backendNodeId,
       runtime.RemoteObjectId objectId}) async {
-    var parameters = <String, dynamic>{};
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
-    var result = await _client.send('DOM.getOuterHTML', parameters);
+    var result = await _client.send('DOM.getOuterHTML', {
+      if (nodeId != null) 'nodeId': nodeId.toJson(),
+      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
+      if (objectId != null) 'objectId': objectId.toJson(),
+    });
     return result['outerHTML'];
   }
 
@@ -341,10 +291,9 @@ class DOMApi {
   /// [nodeId] Id of the node.
   /// Returns: Relayout boundary node id for the given node.
   Future<NodeId> getRelayoutBoundary(NodeId nodeId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.getRelayoutBoundary', {
       'nodeId': nodeId.toJson(),
-    };
-    var result = await _client.send('DOM.getRelayoutBoundary', parameters);
+    });
     return NodeId.fromJson(result['nodeId']);
   }
 
@@ -356,12 +305,11 @@ class DOMApi {
   /// Returns: Ids of the search result nodes.
   Future<List<NodeId>> getSearchResults(
       String searchId, int fromIndex, int toIndex) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.getSearchResults', {
       'searchId': searchId,
       'fromIndex': fromIndex,
       'toIndex': toIndex,
-    };
-    var result = await _client.send('DOM.getSearchResults', parameters);
+    });
     return (result['nodeIds'] as List).map((e) => NodeId.fromJson(e)).toList();
   }
 
@@ -393,14 +341,12 @@ class DOMApi {
   /// Returns: New id of the moved node.
   Future<NodeId> moveTo(NodeId nodeId, NodeId targetNodeId,
       {NodeId insertBeforeNodeId}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.moveTo', {
       'nodeId': nodeId.toJson(),
       'targetNodeId': targetNodeId.toJson(),
-    };
-    if (insertBeforeNodeId != null) {
-      parameters['insertBeforeNodeId'] = insertBeforeNodeId.toJson();
-    }
-    var result = await _client.send('DOM.moveTo', parameters);
+      if (insertBeforeNodeId != null)
+        'insertBeforeNodeId': insertBeforeNodeId.toJson(),
+    });
     return NodeId.fromJson(result['nodeId']);
   }
 
@@ -410,13 +356,11 @@ class DOMApi {
   /// [includeUserAgentShadowDOM] True to search in user agent shadow DOM.
   Future<PerformSearchResult> performSearch(String query,
       {bool includeUserAgentShadowDOM}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.performSearch', {
       'query': query,
-    };
-    if (includeUserAgentShadowDOM != null) {
-      parameters['includeUserAgentShadowDOM'] = includeUserAgentShadowDOM;
-    }
-    var result = await _client.send('DOM.performSearch', parameters);
+      if (includeUserAgentShadowDOM != null)
+        'includeUserAgentShadowDOM': includeUserAgentShadowDOM,
+    });
     return PerformSearchResult.fromJson(result);
   }
 
@@ -424,10 +368,9 @@ class DOMApi {
   /// [path] Path to node in the proprietary format.
   /// Returns: Id of the node for given path.
   Future<NodeId> pushNodeByPathToFrontend(String path) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.pushNodeByPathToFrontend', {
       'path': path,
-    };
-    var result = await _client.send('DOM.pushNodeByPathToFrontend', parameters);
+    });
     return NodeId.fromJson(result['nodeId']);
   }
 
@@ -437,11 +380,9 @@ class DOMApi {
   /// backendNodeIds.
   Future<List<NodeId>> pushNodesByBackendIdsToFrontend(
       List<BackendNodeId> backendNodeIds) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.pushNodesByBackendIdsToFrontend', {
       'backendNodeIds': backendNodeIds.map((e) => e.toJson()).toList(),
-    };
-    var result =
-        await _client.send('DOM.pushNodesByBackendIdsToFrontend', parameters);
+    });
     return (result['nodeIds'] as List).map((e) => NodeId.fromJson(e)).toList();
   }
 
@@ -450,11 +391,10 @@ class DOMApi {
   /// [selector] Selector string.
   /// Returns: Query selector result.
   Future<NodeId> querySelector(NodeId nodeId, String selector) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.querySelector', {
       'nodeId': nodeId.toJson(),
       'selector': selector,
-    };
-    var result = await _client.send('DOM.querySelector', parameters);
+    });
     return NodeId.fromJson(result['nodeId']);
   }
 
@@ -463,11 +403,10 @@ class DOMApi {
   /// [selector] Selector string.
   /// Returns: Query selector result.
   Future<List<NodeId>> querySelectorAll(NodeId nodeId, String selector) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.querySelectorAll', {
       'nodeId': nodeId.toJson(),
       'selector': selector,
-    };
-    var result = await _client.send('DOM.querySelectorAll', parameters);
+    });
     return (result['nodeIds'] as List).map((e) => NodeId.fromJson(e)).toList();
   }
 
@@ -480,20 +419,18 @@ class DOMApi {
   /// [nodeId] Id of the element to remove attribute from.
   /// [name] Name of the attribute to remove.
   Future<void> removeAttribute(NodeId nodeId, String name) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOM.removeAttribute', {
       'nodeId': nodeId.toJson(),
       'name': name,
-    };
-    await _client.send('DOM.removeAttribute', parameters);
+    });
   }
 
   /// Removes node with given id.
   /// [nodeId] Id of the node to remove.
   Future<void> removeNode(NodeId nodeId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOM.removeNode', {
       'nodeId': nodeId.toJson(),
-    };
-    await _client.send('DOM.removeNode', parameters);
+    });
   }
 
   /// Requests that children of the node with given id are returned to the caller in form of
@@ -506,16 +443,11 @@ class DOMApi {
   /// (default is false).
   Future<void> requestChildNodes(NodeId nodeId,
       {int depth, bool pierce}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOM.requestChildNodes', {
       'nodeId': nodeId.toJson(),
-    };
-    if (depth != null) {
-      parameters['depth'] = depth;
-    }
-    if (pierce != null) {
-      parameters['pierce'] = pierce;
-    }
-    await _client.send('DOM.requestChildNodes', parameters);
+      if (depth != null) 'depth': depth,
+      if (pierce != null) 'pierce': pierce,
+    });
   }
 
   /// Requests that the node is sent to the caller given the JavaScript node object reference. All
@@ -524,10 +456,9 @@ class DOMApi {
   /// [objectId] JavaScript object id to convert into node.
   /// Returns: Node id for given object.
   Future<NodeId> requestNode(runtime.RemoteObjectId objectId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.requestNode', {
       'objectId': objectId.toJson(),
-    };
-    var result = await _client.send('DOM.requestNode', parameters);
+    });
     return NodeId.fromJson(result['nodeId']);
   }
 
@@ -542,20 +473,13 @@ class DOMApi {
       dom.BackendNodeId backendNodeId,
       String objectGroup,
       runtime.ExecutionContextId executionContextId}) async {
-    var parameters = <String, dynamic>{};
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectGroup != null) {
-      parameters['objectGroup'] = objectGroup;
-    }
-    if (executionContextId != null) {
-      parameters['executionContextId'] = executionContextId.toJson();
-    }
-    var result = await _client.send('DOM.resolveNode', parameters);
+    var result = await _client.send('DOM.resolveNode', {
+      if (nodeId != null) 'nodeId': nodeId.toJson(),
+      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
+      if (objectGroup != null) 'objectGroup': objectGroup,
+      if (executionContextId != null)
+        'executionContextId': executionContextId.toJson(),
+    });
     return runtime.RemoteObject.fromJson(result['object']);
   }
 
@@ -565,12 +489,11 @@ class DOMApi {
   /// [value] Attribute value.
   Future<void> setAttributeValue(
       NodeId nodeId, String name, String value) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOM.setAttributeValue', {
       'nodeId': nodeId.toJson(),
       'name': name,
       'value': value,
-    };
-    await _client.send('DOM.setAttributeValue', parameters);
+    });
   }
 
   /// Sets attributes on element with given id. This method is useful when user edits some existing
@@ -581,14 +504,11 @@ class DOMApi {
   /// successfully.
   Future<void> setAttributesAsText(NodeId nodeId, String text,
       {String name}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOM.setAttributesAsText', {
       'nodeId': nodeId.toJson(),
       'text': text,
-    };
-    if (name != null) {
-      parameters['name'] = name;
-    }
-    await _client.send('DOM.setAttributesAsText', parameters);
+      if (name != null) 'name': name,
+    });
   }
 
   /// Sets files for the given file input element.
@@ -600,38 +520,29 @@ class DOMApi {
       {NodeId nodeId,
       BackendNodeId backendNodeId,
       runtime.RemoteObjectId objectId}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOM.setFileInputFiles', {
       'files': files.map((e) => e).toList(),
-    };
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
-    await _client.send('DOM.setFileInputFiles', parameters);
+      if (nodeId != null) 'nodeId': nodeId.toJson(),
+      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
+      if (objectId != null) 'objectId': objectId.toJson(),
+    });
   }
 
   /// Sets if stack traces should be captured for Nodes. See `Node.getNodeStackTraces`. Default is disabled.
   /// [enable] Enable or disable.
   Future<void> setNodeStackTracesEnabled(bool enable) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOM.setNodeStackTracesEnabled', {
       'enable': enable,
-    };
-    await _client.send('DOM.setNodeStackTracesEnabled', parameters);
+    });
   }
 
   /// Gets stack traces associated with a Node. As of now, only provides stack trace for Node creation.
   /// [nodeId] Id of the node to get stack traces for.
   /// Returns: Creation stack trace, if available.
   Future<runtime.StackTrace> getNodeStackTraces(NodeId nodeId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.getNodeStackTraces', {
       'nodeId': nodeId.toJson(),
-    };
-    var result = await _client.send('DOM.getNodeStackTraces', parameters);
+    });
     return runtime.StackTrace.fromJson(result['creation']);
   }
 
@@ -639,10 +550,9 @@ class DOMApi {
   /// File wrapper.
   /// [objectId] JavaScript object id of the node wrapper.
   Future<String> getFileInfo(runtime.RemoteObjectId objectId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.getFileInfo', {
       'objectId': objectId.toJson(),
-    };
-    var result = await _client.send('DOM.getFileInfo', parameters);
+    });
     return result['path'];
   }
 
@@ -650,10 +560,9 @@ class DOMApi {
   /// $x functions).
   /// [nodeId] DOM node id to be accessible by means of $x command line API.
   Future<void> setInspectedNode(NodeId nodeId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOM.setInspectedNode', {
       'nodeId': nodeId.toJson(),
-    };
-    await _client.send('DOM.setInspectedNode', parameters);
+    });
   }
 
   /// Sets node name for a node with given id.
@@ -661,11 +570,10 @@ class DOMApi {
   /// [name] New node's name.
   /// Returns: New node's id.
   Future<NodeId> setNodeName(NodeId nodeId, String name) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.setNodeName', {
       'nodeId': nodeId.toJson(),
       'name': name,
-    };
-    var result = await _client.send('DOM.setNodeName', parameters);
+    });
     return NodeId.fromJson(result['nodeId']);
   }
 
@@ -673,22 +581,20 @@ class DOMApi {
   /// [nodeId] Id of the node to set value for.
   /// [value] New node's value.
   Future<void> setNodeValue(NodeId nodeId, String value) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOM.setNodeValue', {
       'nodeId': nodeId.toJson(),
       'value': value,
-    };
-    await _client.send('DOM.setNodeValue', parameters);
+    });
   }
 
   /// Sets node HTML markup, returns new node id.
   /// [nodeId] Id of the node to set markup for.
   /// [outerHTML] Outer HTML markup to set.
   Future<void> setOuterHTML(NodeId nodeId, String outerHTML) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOM.setOuterHTML', {
       'nodeId': nodeId.toJson(),
       'outerHTML': outerHTML,
-    };
-    await _client.send('DOM.setOuterHTML', parameters);
+    });
   }
 
   /// Undoes the last performed action.
@@ -698,10 +604,9 @@ class DOMApi {
 
   /// Returns iframe node that owns iframe with the given domain.
   Future<GetFrameOwnerResult> getFrameOwner(page.FrameId frameId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOM.getFrameOwner', {
       'frameId': frameId.toJson(),
-    };
-    var result = await _client.send('DOM.getFrameOwner', parameters);
+    });
     return GetFrameOwnerResult.fromJson(result);
   }
 }
@@ -1049,12 +954,11 @@ class BackendNode {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'nodeType': nodeType,
       'nodeName': nodeName,
       'backendNodeId': backendNodeId.toJson(),
     };
-    return json;
   }
 }
 
@@ -1325,82 +1229,41 @@ class Node {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'nodeId': nodeId.toJson(),
       'backendNodeId': backendNodeId.toJson(),
       'nodeType': nodeType,
       'nodeName': nodeName,
       'localName': localName,
       'nodeValue': nodeValue,
+      if (parentId != null) 'parentId': parentId.toJson(),
+      if (childNodeCount != null) 'childNodeCount': childNodeCount,
+      if (children != null)
+        'children': children.map((e) => e.toJson()).toList(),
+      if (attributes != null) 'attributes': attributes.map((e) => e).toList(),
+      if (documentURL != null) 'documentURL': documentURL,
+      if (baseURL != null) 'baseURL': baseURL,
+      if (publicId != null) 'publicId': publicId,
+      if (systemId != null) 'systemId': systemId,
+      if (internalSubset != null) 'internalSubset': internalSubset,
+      if (xmlVersion != null) 'xmlVersion': xmlVersion,
+      if (name != null) 'name': name,
+      if (value != null) 'value': value,
+      if (pseudoType != null) 'pseudoType': pseudoType.toJson(),
+      if (shadowRootType != null) 'shadowRootType': shadowRootType.toJson(),
+      if (frameId != null) 'frameId': frameId.toJson(),
+      if (contentDocument != null) 'contentDocument': contentDocument.toJson(),
+      if (shadowRoots != null)
+        'shadowRoots': shadowRoots.map((e) => e.toJson()).toList(),
+      if (templateContent != null) 'templateContent': templateContent.toJson(),
+      if (pseudoElements != null)
+        'pseudoElements': pseudoElements.map((e) => e.toJson()).toList(),
+      if (importedDocument != null)
+        'importedDocument': importedDocument.toJson(),
+      if (distributedNodes != null)
+        'distributedNodes': distributedNodes.map((e) => e.toJson()).toList(),
+      if (isSVG != null) 'isSVG': isSVG,
     };
-    if (parentId != null) {
-      json['parentId'] = parentId.toJson();
-    }
-    if (childNodeCount != null) {
-      json['childNodeCount'] = childNodeCount;
-    }
-    if (children != null) {
-      json['children'] = children.map((e) => e.toJson()).toList();
-    }
-    if (attributes != null) {
-      json['attributes'] = attributes.map((e) => e).toList();
-    }
-    if (documentURL != null) {
-      json['documentURL'] = documentURL;
-    }
-    if (baseURL != null) {
-      json['baseURL'] = baseURL;
-    }
-    if (publicId != null) {
-      json['publicId'] = publicId;
-    }
-    if (systemId != null) {
-      json['systemId'] = systemId;
-    }
-    if (internalSubset != null) {
-      json['internalSubset'] = internalSubset;
-    }
-    if (xmlVersion != null) {
-      json['xmlVersion'] = xmlVersion;
-    }
-    if (name != null) {
-      json['name'] = name;
-    }
-    if (value != null) {
-      json['value'] = value;
-    }
-    if (pseudoType != null) {
-      json['pseudoType'] = pseudoType.toJson();
-    }
-    if (shadowRootType != null) {
-      json['shadowRootType'] = shadowRootType.toJson();
-    }
-    if (frameId != null) {
-      json['frameId'] = frameId.toJson();
-    }
-    if (contentDocument != null) {
-      json['contentDocument'] = contentDocument.toJson();
-    }
-    if (shadowRoots != null) {
-      json['shadowRoots'] = shadowRoots.map((e) => e.toJson()).toList();
-    }
-    if (templateContent != null) {
-      json['templateContent'] = templateContent.toJson();
-    }
-    if (pseudoElements != null) {
-      json['pseudoElements'] = pseudoElements.map((e) => e.toJson()).toList();
-    }
-    if (importedDocument != null) {
-      json['importedDocument'] = importedDocument.toJson();
-    }
-    if (distributedNodes != null) {
-      json['distributedNodes'] =
-          distributedNodes.map((e) => e.toJson()).toList();
-    }
-    if (isSVG != null) {
-      json['isSVG'] = isSVG;
-    }
-    return json;
   }
 }
 
@@ -1430,15 +1293,12 @@ class RGBA {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'r': r,
       'g': g,
       'b': b,
+      if (a != null) 'a': a,
     };
-    if (a != null) {
-      json['a'] = a;
-    }
-    return json;
   }
 }
 
@@ -1510,18 +1370,15 @@ class BoxModel {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'content': content.toJson(),
       'padding': padding.toJson(),
       'border': border.toJson(),
       'margin': margin.toJson(),
       'width': width,
       'height': height,
+      if (shapeOutside != null) 'shapeOutside': shapeOutside.toJson(),
     };
-    if (shapeOutside != null) {
-      json['shapeOutside'] = shapeOutside.toJson();
-    }
-    return json;
   }
 }
 
@@ -1551,12 +1408,11 @@ class ShapeOutsideInfo {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'bounds': bounds.toJson(),
       'shape': shape.map((e) => e).toList(),
       'marginShape': marginShape.map((e) => e).toList(),
     };
-    return json;
   }
 }
 
@@ -1590,12 +1446,11 @@ class Rect {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'x': x,
       'y': y,
       'width': width,
       'height': height,
     };
-    return json;
   }
 }

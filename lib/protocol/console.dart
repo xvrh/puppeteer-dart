@@ -71,21 +71,14 @@ class ConsoleMessage {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'source': source,
       'level': level,
       'text': text,
+      if (url != null) 'url': url,
+      if (line != null) 'line': line,
+      if (column != null) 'column': column,
     };
-    if (url != null) {
-      json['url'] = url;
-    }
-    if (line != null) {
-      json['line'] = line;
-    }
-    if (column != null) {
-      json['column'] = column;
-    }
-    return json;
   }
 }
 

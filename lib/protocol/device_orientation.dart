@@ -17,12 +17,10 @@ class DeviceOrientationApi {
   /// [gamma] Mock gamma
   Future<void> setDeviceOrientationOverride(
       num alpha, num beta, num gamma) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DeviceOrientation.setDeviceOrientationOverride', {
       'alpha': alpha,
       'beta': beta,
       'gamma': gamma,
-    };
-    await _client.send(
-        'DeviceOrientation.setDeviceOrientationOverride', parameters);
+    });
   }
 }

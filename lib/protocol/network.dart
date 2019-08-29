@@ -192,31 +192,17 @@ class NetworkApi {
       String postData,
       Headers headers,
       AuthChallengeResponse authChallengeResponse}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.continueInterceptedRequest', {
       'interceptionId': interceptionId.toJson(),
-    };
-    if (errorReason != null) {
-      parameters['errorReason'] = errorReason.toJson();
-    }
-    if (rawResponse != null) {
-      parameters['rawResponse'] = rawResponse;
-    }
-    if (url != null) {
-      parameters['url'] = url;
-    }
-    if (method != null) {
-      parameters['method'] = method;
-    }
-    if (postData != null) {
-      parameters['postData'] = postData;
-    }
-    if (headers != null) {
-      parameters['headers'] = headers.toJson();
-    }
-    if (authChallengeResponse != null) {
-      parameters['authChallengeResponse'] = authChallengeResponse.toJson();
-    }
-    await _client.send('Network.continueInterceptedRequest', parameters);
+      if (errorReason != null) 'errorReason': errorReason.toJson(),
+      if (rawResponse != null) 'rawResponse': rawResponse,
+      if (url != null) 'url': url,
+      if (method != null) 'method': method,
+      if (postData != null) 'postData': postData,
+      if (headers != null) 'headers': headers.toJson(),
+      if (authChallengeResponse != null)
+        'authChallengeResponse': authChallengeResponse.toJson(),
+    });
   }
 
   /// Deletes browser cookies with matching name and url or domain/path pair.
@@ -227,19 +213,12 @@ class NetworkApi {
   /// [path] If specified, deletes only cookies with the exact path.
   Future<void> deleteCookies(String name,
       {String url, String domain, String path}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.deleteCookies', {
       'name': name,
-    };
-    if (url != null) {
-      parameters['url'] = url;
-    }
-    if (domain != null) {
-      parameters['domain'] = domain;
-    }
-    if (path != null) {
-      parameters['path'] = path;
-    }
-    await _client.send('Network.deleteCookies', parameters);
+      if (url != null) 'url': url,
+      if (domain != null) 'domain': domain,
+      if (path != null) 'path': path,
+    });
   }
 
   /// Disables network tracking, prevents network events from being sent to the client.
@@ -256,16 +235,13 @@ class NetworkApi {
   Future<void> emulateNetworkConditions(
       bool offline, num latency, num downloadThroughput, num uploadThroughput,
       {ConnectionType connectionType}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.emulateNetworkConditions', {
       'offline': offline,
       'latency': latency,
       'downloadThroughput': downloadThroughput,
       'uploadThroughput': uploadThroughput,
-    };
-    if (connectionType != null) {
-      parameters['connectionType'] = connectionType.toJson();
-    }
-    await _client.send('Network.emulateNetworkConditions', parameters);
+      if (connectionType != null) 'connectionType': connectionType.toJson(),
+    });
   }
 
   /// Enables network tracking, network events will now be delivered to the client.
@@ -276,17 +252,12 @@ class NetworkApi {
       {int maxTotalBufferSize,
       int maxResourceBufferSize,
       int maxPostDataSize}) async {
-    var parameters = <String, dynamic>{};
-    if (maxTotalBufferSize != null) {
-      parameters['maxTotalBufferSize'] = maxTotalBufferSize;
-    }
-    if (maxResourceBufferSize != null) {
-      parameters['maxResourceBufferSize'] = maxResourceBufferSize;
-    }
-    if (maxPostDataSize != null) {
-      parameters['maxPostDataSize'] = maxPostDataSize;
-    }
-    await _client.send('Network.enable', parameters);
+    await _client.send('Network.enable', {
+      if (maxTotalBufferSize != null) 'maxTotalBufferSize': maxTotalBufferSize,
+      if (maxResourceBufferSize != null)
+        'maxResourceBufferSize': maxResourceBufferSize,
+      if (maxPostDataSize != null) 'maxPostDataSize': maxPostDataSize,
+    });
   }
 
   /// Returns all browser cookies. Depending on the backend support, will return detailed cookie
@@ -300,10 +271,9 @@ class NetworkApi {
   /// Returns the DER-encoded certificate.
   /// [origin] Origin to get certificate for.
   Future<List<String>> getCertificate(String origin) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Network.getCertificate', {
       'origin': origin,
-    };
-    var result = await _client.send('Network.getCertificate', parameters);
+    });
     return (result['tableNames'] as List).map((e) => e as String).toList();
   }
 
@@ -312,21 +282,18 @@ class NetworkApi {
   /// [urls] The list of URLs for which applicable cookies will be fetched
   /// Returns: Array of cookie objects.
   Future<List<Cookie>> getCookies({List<String> urls}) async {
-    var parameters = <String, dynamic>{};
-    if (urls != null) {
-      parameters['urls'] = urls.map((e) => e).toList();
-    }
-    var result = await _client.send('Network.getCookies', parameters);
+    var result = await _client.send('Network.getCookies', {
+      if (urls != null) 'urls': urls.map((e) => e).toList(),
+    });
     return (result['cookies'] as List).map((e) => Cookie.fromJson(e)).toList();
   }
 
   /// Returns content served for the given request.
   /// [requestId] Identifier of the network request to get content for.
   Future<GetResponseBodyResult> getResponseBody(RequestId requestId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Network.getResponseBody', {
       'requestId': requestId.toJson(),
-    };
-    var result = await _client.send('Network.getResponseBody', parameters);
+    });
     return GetResponseBodyResult.fromJson(result);
   }
 
@@ -334,10 +301,9 @@ class NetworkApi {
   /// [requestId] Identifier of the network request to get content for.
   /// Returns: Request body string, omitting files from multipart requests
   Future<String> getRequestPostData(RequestId requestId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Network.getRequestPostData', {
       'requestId': requestId.toJson(),
-    };
-    var result = await _client.send('Network.getRequestPostData', parameters);
+    });
     return result['postData'];
   }
 
@@ -345,11 +311,9 @@ class NetworkApi {
   /// [interceptionId] Identifier for the intercepted request to get body for.
   Future<GetResponseBodyForInterceptionResult> getResponseBodyForInterception(
       InterceptionId interceptionId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Network.getResponseBodyForInterception', {
       'interceptionId': interceptionId.toJson(),
-    };
-    var result = await _client.send(
-        'Network.getResponseBodyForInterception', parameters);
+    });
     return GetResponseBodyForInterceptionResult.fromJson(result);
   }
 
@@ -359,11 +323,10 @@ class NetworkApi {
   /// is specified.
   Future<io.StreamHandle> takeResponseBodyForInterceptionAsStream(
       InterceptionId interceptionId) async {
-    var parameters = <String, dynamic>{
+    var result =
+        await _client.send('Network.takeResponseBodyForInterceptionAsStream', {
       'interceptionId': interceptionId.toJson(),
-    };
-    var result = await _client.send(
-        'Network.takeResponseBodyForInterceptionAsStream', parameters);
+    });
     return io.StreamHandle.fromJson(result['stream']);
   }
 
@@ -372,10 +335,9 @@ class NetworkApi {
   /// attribute, user, password.
   /// [requestId] Identifier of XHR to replay.
   Future<void> replayXHR(RequestId requestId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.replayXHR', {
       'requestId': requestId.toJson(),
-    };
-    await _client.send('Network.replayXHR', parameters);
+    });
   }
 
   /// Searches for given string in response content.
@@ -387,17 +349,12 @@ class NetworkApi {
   Future<List<debugger.SearchMatch>> searchInResponseBody(
       RequestId requestId, String query,
       {bool caseSensitive, bool isRegex}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Network.searchInResponseBody', {
       'requestId': requestId.toJson(),
       'query': query,
-    };
-    if (caseSensitive != null) {
-      parameters['caseSensitive'] = caseSensitive;
-    }
-    if (isRegex != null) {
-      parameters['isRegex'] = isRegex;
-    }
-    var result = await _client.send('Network.searchInResponseBody', parameters);
+      if (caseSensitive != null) 'caseSensitive': caseSensitive,
+      if (isRegex != null) 'isRegex': isRegex,
+    });
     return (result['result'] as List)
         .map((e) => debugger.SearchMatch.fromJson(e))
         .toList();
@@ -406,28 +363,25 @@ class NetworkApi {
   /// Blocks URLs from loading.
   /// [urls] URL patterns to block. Wildcards ('*') are allowed.
   Future<void> setBlockedURLs(List<String> urls) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.setBlockedURLs', {
       'urls': urls.map((e) => e).toList(),
-    };
-    await _client.send('Network.setBlockedURLs', parameters);
+    });
   }
 
   /// Toggles ignoring of service worker for each request.
   /// [bypass] Bypass service worker and load from network.
   Future<void> setBypassServiceWorker(bool bypass) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.setBypassServiceWorker', {
       'bypass': bypass,
-    };
-    await _client.send('Network.setBypassServiceWorker', parameters);
+    });
   }
 
   /// Toggles ignoring cache for each request. If `true`, cache will not be used.
   /// [cacheDisabled] Cache disabled state.
   Future<void> setCacheDisabled(bool cacheDisabled) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.setCacheDisabled', {
       'cacheDisabled': cacheDisabled,
-    };
-    await _client.send('Network.setCacheDisabled', parameters);
+    });
   }
 
   /// Sets a cookie with the given cookie data; may overwrite equivalent cookies if they exist.
@@ -450,42 +404,26 @@ class NetworkApi {
       bool httpOnly,
       CookieSameSite sameSite,
       TimeSinceEpoch expires}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Network.setCookie', {
       'name': name,
       'value': value,
-    };
-    if (url != null) {
-      parameters['url'] = url;
-    }
-    if (domain != null) {
-      parameters['domain'] = domain;
-    }
-    if (path != null) {
-      parameters['path'] = path;
-    }
-    if (secure != null) {
-      parameters['secure'] = secure;
-    }
-    if (httpOnly != null) {
-      parameters['httpOnly'] = httpOnly;
-    }
-    if (sameSite != null) {
-      parameters['sameSite'] = sameSite.toJson();
-    }
-    if (expires != null) {
-      parameters['expires'] = expires.toJson();
-    }
-    var result = await _client.send('Network.setCookie', parameters);
+      if (url != null) 'url': url,
+      if (domain != null) 'domain': domain,
+      if (path != null) 'path': path,
+      if (secure != null) 'secure': secure,
+      if (httpOnly != null) 'httpOnly': httpOnly,
+      if (sameSite != null) 'sameSite': sameSite.toJson(),
+      if (expires != null) 'expires': expires.toJson(),
+    });
     return result['success'];
   }
 
   /// Sets given cookies.
   /// [cookies] Cookies to be set.
   Future<void> setCookies(List<CookieParam> cookies) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.setCookies', {
       'cookies': cookies.map((e) => e.toJson()).toList(),
-    };
-    await _client.send('Network.setCookies', parameters);
+    });
   }
 
   /// For testing.
@@ -493,20 +431,18 @@ class NetworkApi {
   /// [maxResourceSize] Maximum per-resource size.
   Future<void> setDataSizeLimitsForTest(
       int maxTotalSize, int maxResourceSize) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.setDataSizeLimitsForTest', {
       'maxTotalSize': maxTotalSize,
       'maxResourceSize': maxResourceSize,
-    };
-    await _client.send('Network.setDataSizeLimitsForTest', parameters);
+    });
   }
 
   /// Specifies whether to always send extra HTTP headers with the requests from this page.
   /// [headers] Map with extra HTTP headers.
   Future<void> setExtraHTTPHeaders(Headers headers) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.setExtraHTTPHeaders', {
       'headers': headers.toJson(),
-    };
-    await _client.send('Network.setExtraHTTPHeaders', parameters);
+    });
   }
 
   /// Sets the requests to intercept that match the provided patterns and optionally resource types.
@@ -515,10 +451,9 @@ class NetworkApi {
   /// continueInterceptedRequest call.
   @deprecated
   Future<void> setRequestInterception(List<RequestPattern> patterns) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.setRequestInterception', {
       'patterns': patterns.map((e) => e.toJson()).toList(),
-    };
-    await _client.send('Network.setRequestInterception', parameters);
+    });
   }
 
   /// Allows overriding user agent with the given string.
@@ -527,16 +462,11 @@ class NetworkApi {
   /// [platform] The platform navigator.platform should return.
   Future<void> setUserAgentOverride(String userAgent,
       {String acceptLanguage, String platform}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.setUserAgentOverride', {
       'userAgent': userAgent,
-    };
-    if (acceptLanguage != null) {
-      parameters['acceptLanguage'] = acceptLanguage;
-    }
-    if (platform != null) {
-      parameters['platform'] = platform;
-    }
-    await _client.send('Network.setUserAgentOverride', parameters);
+      if (acceptLanguage != null) 'acceptLanguage': acceptLanguage,
+      if (platform != null) 'platform': platform,
+    });
   }
 }
 
@@ -1579,7 +1509,7 @@ class ResourceTiming {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'requestTime': requestTime,
       'proxyStart': proxyStart,
       'proxyEnd': proxyEnd,
@@ -1597,7 +1527,6 @@ class ResourceTiming {
       'pushEnd': pushEnd,
       'receiveHeadersEnd': receiveHeadersEnd,
     };
-    return json;
   }
 }
 
@@ -1698,29 +1627,19 @@ class RequestData {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'url': url,
       'method': method,
       'headers': headers.toJson(),
       'initialPriority': initialPriority.toJson(),
       'referrerPolicy': referrerPolicy,
+      if (urlFragment != null) 'urlFragment': urlFragment,
+      if (postData != null) 'postData': postData,
+      if (hasPostData != null) 'hasPostData': hasPostData,
+      if (mixedContentType != null)
+        'mixedContentType': mixedContentType.toJson(),
+      if (isLinkPreload != null) 'isLinkPreload': isLinkPreload,
     };
-    if (urlFragment != null) {
-      json['urlFragment'] = urlFragment;
-    }
-    if (postData != null) {
-      json['postData'] = postData;
-    }
-    if (hasPostData != null) {
-      json['hasPostData'] = hasPostData;
-    }
-    if (mixedContentType != null) {
-      json['mixedContentType'] = mixedContentType.toJson();
-    }
-    if (isLinkPreload != null) {
-      json['isLinkPreload'] = isLinkPreload;
-    }
-    return json;
   }
 }
 
@@ -1817,7 +1736,7 @@ class SignedCertificateTimestamp {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'status': status,
       'origin': origin,
       'logDescription': logDescription,
@@ -1827,7 +1746,6 @@ class SignedCertificateTimestamp {
       'signatureAlgorithm': signatureAlgorithm,
       'signatureData': signatureData,
     };
-    return json;
   }
 }
 
@@ -1913,7 +1831,7 @@ class SecurityDetails {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'protocol': protocol,
       'keyExchange': keyExchange,
       'cipher': cipher,
@@ -1927,14 +1845,9 @@ class SecurityDetails {
           signedCertificateTimestampList.map((e) => e.toJson()).toList(),
       'certificateTransparencyCompliance':
           certificateTransparencyCompliance.toJson(),
+      if (keyExchangeGroup != null) 'keyExchangeGroup': keyExchangeGroup,
+      if (mac != null) 'mac': mac,
     };
-    if (keyExchangeGroup != null) {
-      json['keyExchangeGroup'] = keyExchangeGroup;
-    }
-    if (mac != null) {
-      json['mac'] = mac;
-    }
-    return json;
   }
 }
 
@@ -2135,7 +2048,7 @@ class ResponseData {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'url': url,
       'status': status,
       'statusText': statusText,
@@ -2145,41 +2058,18 @@ class ResponseData {
       'connectionId': connectionId,
       'encodedDataLength': encodedDataLength,
       'securityState': securityState.toJson(),
+      if (headersText != null) 'headersText': headersText,
+      if (requestHeaders != null) 'requestHeaders': requestHeaders.toJson(),
+      if (requestHeadersText != null) 'requestHeadersText': requestHeadersText,
+      if (remoteIPAddress != null) 'remoteIPAddress': remoteIPAddress,
+      if (remotePort != null) 'remotePort': remotePort,
+      if (fromDiskCache != null) 'fromDiskCache': fromDiskCache,
+      if (fromServiceWorker != null) 'fromServiceWorker': fromServiceWorker,
+      if (fromPrefetchCache != null) 'fromPrefetchCache': fromPrefetchCache,
+      if (timing != null) 'timing': timing.toJson(),
+      if (protocol != null) 'protocol': protocol,
+      if (securityDetails != null) 'securityDetails': securityDetails.toJson(),
     };
-    if (headersText != null) {
-      json['headersText'] = headersText;
-    }
-    if (requestHeaders != null) {
-      json['requestHeaders'] = requestHeaders.toJson();
-    }
-    if (requestHeadersText != null) {
-      json['requestHeadersText'] = requestHeadersText;
-    }
-    if (remoteIPAddress != null) {
-      json['remoteIPAddress'] = remoteIPAddress;
-    }
-    if (remotePort != null) {
-      json['remotePort'] = remotePort;
-    }
-    if (fromDiskCache != null) {
-      json['fromDiskCache'] = fromDiskCache;
-    }
-    if (fromServiceWorker != null) {
-      json['fromServiceWorker'] = fromServiceWorker;
-    }
-    if (fromPrefetchCache != null) {
-      json['fromPrefetchCache'] = fromPrefetchCache;
-    }
-    if (timing != null) {
-      json['timing'] = timing.toJson();
-    }
-    if (protocol != null) {
-      json['protocol'] = protocol;
-    }
-    if (securityDetails != null) {
-      json['securityDetails'] = securityDetails.toJson();
-    }
-    return json;
   }
 }
 
@@ -2197,10 +2087,9 @@ class WebSocketRequest {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'headers': headers.toJson(),
     };
-    return json;
   }
 }
 
@@ -2248,21 +2137,14 @@ class WebSocketResponse {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'status': status,
       'statusText': statusText,
       'headers': headers.toJson(),
+      if (headersText != null) 'headersText': headersText,
+      if (requestHeaders != null) 'requestHeaders': requestHeaders.toJson(),
+      if (requestHeadersText != null) 'requestHeadersText': requestHeadersText,
     };
-    if (headersText != null) {
-      json['headersText'] = headersText;
-    }
-    if (requestHeaders != null) {
-      json['requestHeaders'] = requestHeaders.toJson();
-    }
-    if (requestHeadersText != null) {
-      json['requestHeadersText'] = requestHeadersText;
-    }
-    return json;
   }
 }
 
@@ -2291,12 +2173,11 @@ class WebSocketFrame {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'opcode': opcode,
       'mask': mask,
       'payloadData': payloadData,
     };
-    return json;
   }
 }
 
@@ -2332,15 +2213,12 @@ class CachedResource {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'url': url,
       'type': type.toJson(),
       'bodySize': bodySize,
+      if (response != null) 'response': response.toJson(),
     };
-    if (response != null) {
-      json['response'] = response.toJson();
-    }
-    return json;
   }
 }
 
@@ -2373,19 +2251,12 @@ class Initiator {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type,
+      if (stack != null) 'stack': stack.toJson(),
+      if (url != null) 'url': url,
+      if (lineNumber != null) 'lineNumber': lineNumber,
     };
-    if (stack != null) {
-      json['stack'] = stack.toJson();
-    }
-    if (url != null) {
-      json['url'] = url;
-    }
-    if (lineNumber != null) {
-      json['lineNumber'] = lineNumber;
-    }
-    return json;
   }
 }
 
@@ -2484,7 +2355,7 @@ class Cookie {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'value': value,
       'domain': domain,
@@ -2494,11 +2365,8 @@ class Cookie {
       'httpOnly': httpOnly,
       'secure': secure,
       'session': session,
+      if (sameSite != null) 'sameSite': sameSite.toJson(),
     };
-    if (sameSite != null) {
-      json['sameSite'] = sameSite.toJson();
-    }
-    return json;
   }
 }
 
@@ -2629,14 +2497,11 @@ class BlockedSetCookieWithReason {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'blockedReason': blockedReason.toJson(),
       'cookieLine': cookieLine,
+      if (cookie != null) 'cookie': cookie.toJson(),
     };
-    if (cookie != null) {
-      json['cookie'] = cookie.toJson();
-    }
-    return json;
   }
 }
 
@@ -2659,11 +2524,10 @@ class BlockedCookieWithReason {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'blockedReason': blockedReason.toJson(),
       'cookie': cookie.toJson(),
     };
-    return json;
   }
 }
 
@@ -2727,32 +2591,17 @@ class CookieParam {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'value': value,
+      if (url != null) 'url': url,
+      if (domain != null) 'domain': domain,
+      if (path != null) 'path': path,
+      if (secure != null) 'secure': secure,
+      if (httpOnly != null) 'httpOnly': httpOnly,
+      if (sameSite != null) 'sameSite': sameSite.toJson(),
+      if (expires != null) 'expires': expires.toJson(),
     };
-    if (url != null) {
-      json['url'] = url;
-    }
-    if (domain != null) {
-      json['domain'] = domain;
-    }
-    if (path != null) {
-      json['path'] = path;
-    }
-    if (secure != null) {
-      json['secure'] = secure;
-    }
-    if (httpOnly != null) {
-      json['httpOnly'] = httpOnly;
-    }
-    if (sameSite != null) {
-      json['sameSite'] = sameSite.toJson();
-    }
-    if (expires != null) {
-      json['expires'] = expires.toJson();
-    }
-    return json;
   }
 }
 
@@ -2788,15 +2637,12 @@ class AuthChallenge {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'origin': origin,
       'scheme': scheme,
       'realm': realm,
+      if (source != null) 'source': source,
     };
-    if (source != null) {
-      json['source'] = source;
-    }
-    return json;
   }
 }
 
@@ -2854,16 +2700,11 @@ class AuthChallengeResponse {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'response': response,
+      if (username != null) 'username': username,
+      if (password != null) 'password': password,
     };
-    if (username != null) {
-      json['username'] = username;
-    }
-    if (password != null) {
-      json['password'] = password;
-    }
-    return json;
   }
 }
 
@@ -2954,17 +2795,12 @@ class RequestPattern {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{};
-    if (urlPattern != null) {
-      json['urlPattern'] = urlPattern;
-    }
-    if (resourceType != null) {
-      json['resourceType'] = resourceType.toJson();
-    }
-    if (interceptionStage != null) {
-      json['interceptionStage'] = interceptionStage.toJson();
-    }
-    return json;
+    return {
+      if (urlPattern != null) 'urlPattern': urlPattern,
+      if (resourceType != null) 'resourceType': resourceType.toJson(),
+      if (interceptionStage != null)
+        'interceptionStage': interceptionStage.toJson(),
+    };
   }
 }
 
@@ -3026,24 +2862,18 @@ class SignedExchangeSignature {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'label': label,
       'signature': signature,
       'integrity': integrity,
       'validityUrl': validityUrl,
       'date': date,
       'expires': expires,
+      if (certUrl != null) 'certUrl': certUrl,
+      if (certSha256 != null) 'certSha256': certSha256,
+      if (certificates != null)
+        'certificates': certificates.map((e) => e).toList(),
     };
-    if (certUrl != null) {
-      json['certUrl'] = certUrl;
-    }
-    if (certSha256 != null) {
-      json['certSha256'] = certSha256;
-    }
-    if (certificates != null) {
-      json['certificates'] = certificates.map((e) => e).toList();
-    }
-    return json;
   }
 }
 
@@ -3085,14 +2915,13 @@ class SignedExchangeHeader {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'requestUrl': requestUrl,
       'responseCode': responseCode,
       'responseHeaders': responseHeaders.toJson(),
       'signatures': signatures.map((e) => e.toJson()).toList(),
       'headerIntegrity': headerIntegrity,
     };
-    return json;
   }
 }
 
@@ -3164,16 +2993,11 @@ class SignedExchangeError {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'message': message,
+      if (signatureIndex != null) 'signatureIndex': signatureIndex,
+      if (errorField != null) 'errorField': errorField.toJson(),
     };
-    if (signatureIndex != null) {
-      json['signatureIndex'] = signatureIndex;
-    }
-    if (errorField != null) {
-      json['errorField'] = errorField.toJson();
-    }
-    return json;
   }
 }
 
@@ -3215,18 +3039,11 @@ class SignedExchangeInfo {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'outerResponse': outerResponse.toJson(),
+      if (header != null) 'header': header.toJson(),
+      if (securityDetails != null) 'securityDetails': securityDetails.toJson(),
+      if (errors != null) 'errors': errors.map((e) => e.toJson()).toList(),
     };
-    if (header != null) {
-      json['header'] = header.toJson();
-    }
-    if (securityDetails != null) {
-      json['securityDetails'] = securityDetails.toJson();
-    }
-    if (errors != null) {
-      json['errors'] = errors.map((e) => e.toJson()).toList();
-    }
-    return json;
   }
 }

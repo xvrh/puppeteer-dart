@@ -41,10 +41,9 @@ class ProfilerApi {
   /// Changes CPU profiler sampling interval. Must be called before CPU profiles recording started.
   /// [interval] New sampling interval in microseconds.
   Future<void> setSamplingInterval(int interval) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Profiler.setSamplingInterval', {
       'interval': interval,
-    };
-    await _client.send('Profiler.setSamplingInterval', parameters);
+    });
   }
 
   Future<void> start() async {
@@ -57,14 +56,10 @@ class ProfilerApi {
   /// [callCount] Collect accurate call counts beyond simple 'covered' or 'not covered'.
   /// [detailed] Collect block-based coverage.
   Future<void> startPreciseCoverage({bool callCount, bool detailed}) async {
-    var parameters = <String, dynamic>{};
-    if (callCount != null) {
-      parameters['callCount'] = callCount;
-    }
-    if (detailed != null) {
-      parameters['detailed'] = detailed;
-    }
-    await _client.send('Profiler.startPreciseCoverage', parameters);
+    await _client.send('Profiler.startPreciseCoverage', {
+      if (callCount != null) 'callCount': callCount,
+      if (detailed != null) 'detailed': detailed,
+    });
   }
 
   /// Enable type profile.
@@ -204,23 +199,15 @@ class ProfileNode {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'id': id,
       'callFrame': callFrame.toJson(),
+      if (hitCount != null) 'hitCount': hitCount,
+      if (children != null) 'children': children.map((e) => e).toList(),
+      if (deoptReason != null) 'deoptReason': deoptReason,
+      if (positionTicks != null)
+        'positionTicks': positionTicks.map((e) => e.toJson()).toList(),
     };
-    if (hitCount != null) {
-      json['hitCount'] = hitCount;
-    }
-    if (children != null) {
-      json['children'] = children.map((e) => e).toList();
-    }
-    if (deoptReason != null) {
-      json['deoptReason'] = deoptReason;
-    }
-    if (positionTicks != null) {
-      json['positionTicks'] = positionTicks.map((e) => e.toJson()).toList();
-    }
-    return json;
   }
 }
 
@@ -265,18 +252,13 @@ class Profile {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'nodes': nodes.map((e) => e.toJson()).toList(),
       'startTime': startTime,
       'endTime': endTime,
+      if (samples != null) 'samples': samples.map((e) => e).toList(),
+      if (timeDeltas != null) 'timeDeltas': timeDeltas.map((e) => e).toList(),
     };
-    if (samples != null) {
-      json['samples'] = samples.map((e) => e).toList();
-    }
-    if (timeDeltas != null) {
-      json['timeDeltas'] = timeDeltas.map((e) => e).toList();
-    }
-    return json;
   }
 }
 
@@ -298,11 +280,10 @@ class PositionTickInfo {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'line': line,
       'ticks': ticks,
     };
-    return json;
   }
 }
 
@@ -331,12 +312,11 @@ class CoverageRange {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'startOffset': startOffset,
       'endOffset': endOffset,
       'count': count,
     };
-    return json;
   }
 }
 
@@ -367,12 +347,11 @@ class FunctionCoverage {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'functionName': functionName,
       'ranges': ranges.map((e) => e.toJson()).toList(),
       'isBlockCoverage': isBlockCoverage,
     };
-    return json;
   }
 }
 
@@ -401,12 +380,11 @@ class ScriptCoverage {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'scriptId': scriptId.toJson(),
       'url': url,
       'functions': functions.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -424,10 +402,9 @@ class TypeObject {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
     };
-    return json;
   }
 }
 
@@ -450,11 +427,10 @@ class TypeProfileEntry {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'offset': offset,
       'types': types.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -483,11 +459,10 @@ class ScriptTypeProfile {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'scriptId': scriptId.toJson(),
       'url': url,
       'entries': entries.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }

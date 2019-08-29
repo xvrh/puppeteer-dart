@@ -17,40 +17,35 @@ class BrowserApi {
   Future<void> setPermission(
       String origin, PermissionDescriptor permission, PermissionSetting setting,
       {target.TargetID browserContextId}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Browser.setPermission', {
       'origin': origin,
       'permission': permission.toJson(),
       'setting': setting.toJson(),
-    };
-    if (browserContextId != null) {
-      parameters['browserContextId'] = browserContextId.toJson();
-    }
-    await _client.send('Browser.setPermission', parameters);
+      if (browserContextId != null)
+        'browserContextId': browserContextId.toJson(),
+    });
   }
 
   /// Grant specific permissions to the given origin and reject all others.
   /// [browserContextId] BrowserContext to override permissions. When omitted, default browser context is used.
   Future<void> grantPermissions(String origin, List<PermissionType> permissions,
       {target.BrowserContextID browserContextId}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Browser.grantPermissions', {
       'origin': origin,
       'permissions': permissions.map((e) => e.toJson()).toList(),
-    };
-    if (browserContextId != null) {
-      parameters['browserContextId'] = browserContextId.toJson();
-    }
-    await _client.send('Browser.grantPermissions', parameters);
+      if (browserContextId != null)
+        'browserContextId': browserContextId.toJson(),
+    });
   }
 
   /// Reset all permission management for all origins.
   /// [browserContextId] BrowserContext to reset permissions. When omitted, default browser context is used.
   Future<void> resetPermissions(
       {target.BrowserContextID browserContextId}) async {
-    var parameters = <String, dynamic>{};
-    if (browserContextId != null) {
-      parameters['browserContextId'] = browserContextId.toJson();
-    }
-    await _client.send('Browser.resetPermissions', parameters);
+    await _client.send('Browser.resetPermissions', {
+      if (browserContextId != null)
+        'browserContextId': browserContextId.toJson(),
+    });
   }
 
   /// Close browser gracefully.
@@ -89,14 +84,10 @@ class BrowserApi {
   /// [delta] If true, retrieve delta since last call.
   /// Returns: Histograms.
   Future<List<Histogram>> getHistograms({String query, bool delta}) async {
-    var parameters = <String, dynamic>{};
-    if (query != null) {
-      parameters['query'] = query;
-    }
-    if (delta != null) {
-      parameters['delta'] = delta;
-    }
-    var result = await _client.send('Browser.getHistograms', parameters);
+    var result = await _client.send('Browser.getHistograms', {
+      if (query != null) 'query': query,
+      if (delta != null) 'delta': delta,
+    });
     return (result['histograms'] as List)
         .map((e) => Histogram.fromJson(e))
         .toList();
@@ -107,13 +98,10 @@ class BrowserApi {
   /// [delta] If true, retrieve delta since last call.
   /// Returns: Histogram.
   Future<Histogram> getHistogram(String name, {bool delta}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Browser.getHistogram', {
       'name': name,
-    };
-    if (delta != null) {
-      parameters['delta'] = delta;
-    }
-    var result = await _client.send('Browser.getHistogram', parameters);
+      if (delta != null) 'delta': delta,
+    });
     return Histogram.fromJson(result['histogram']);
   }
 
@@ -122,10 +110,9 @@ class BrowserApi {
   /// Returns: Bounds information of the window. When window state is 'minimized', the restored window
   /// position and size are returned.
   Future<Bounds> getWindowBounds(WindowID windowId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Browser.getWindowBounds', {
       'windowId': windowId.toJson(),
-    };
-    var result = await _client.send('Browser.getWindowBounds', parameters);
+    });
     return Bounds.fromJson(result['bounds']);
   }
 
@@ -133,11 +120,9 @@ class BrowserApi {
   /// [targetId] Devtools agent host id. If called as a part of the session, associated targetId is used.
   Future<GetWindowForTargetResult> getWindowForTarget(
       {target.TargetID targetId}) async {
-    var parameters = <String, dynamic>{};
-    if (targetId != null) {
-      parameters['targetId'] = targetId.toJson();
-    }
-    var result = await _client.send('Browser.getWindowForTarget', parameters);
+    var result = await _client.send('Browser.getWindowForTarget', {
+      if (targetId != null) 'targetId': targetId.toJson(),
+    });
     return GetWindowForTargetResult.fromJson(result);
   }
 
@@ -146,24 +131,19 @@ class BrowserApi {
   /// [bounds] New window bounds. The 'minimized', 'maximized' and 'fullscreen' states cannot be combined
   /// with 'left', 'top', 'width' or 'height'. Leaves unspecified fields unchanged.
   Future<void> setWindowBounds(WindowID windowId, Bounds bounds) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Browser.setWindowBounds', {
       'windowId': windowId.toJson(),
       'bounds': bounds.toJson(),
-    };
-    await _client.send('Browser.setWindowBounds', parameters);
+    });
   }
 
   /// Set dock tile details, platform-specific.
   /// [image] Png encoded image.
   Future<void> setDockTile({String badgeLabel, String image}) async {
-    var parameters = <String, dynamic>{};
-    if (badgeLabel != null) {
-      parameters['badgeLabel'] = badgeLabel;
-    }
-    if (image != null) {
-      parameters['image'] = image;
-    }
-    await _client.send('Browser.setDockTile', parameters);
+    await _client.send('Browser.setDockTile', {
+      if (badgeLabel != null) 'badgeLabel': badgeLabel,
+      if (image != null) 'image': image,
+    });
   }
 }
 
@@ -303,23 +283,13 @@ class Bounds {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{};
-    if (left != null) {
-      json['left'] = left;
-    }
-    if (top != null) {
-      json['top'] = top;
-    }
-    if (width != null) {
-      json['width'] = width;
-    }
-    if (height != null) {
-      json['height'] = height;
-    }
-    if (windowState != null) {
-      json['windowState'] = windowState.toJson();
-    }
-    return json;
+    return {
+      if (left != null) 'left': left,
+      if (top != null) 'top': top,
+      if (width != null) 'width': width,
+      if (height != null) 'height': height,
+      if (windowState != null) 'windowState': windowState.toJson(),
+    };
   }
 }
 
@@ -448,19 +418,12 @@ class PermissionDescriptor {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
+      if (sysex != null) 'sysex': sysex,
+      if (userVisibleOnly != null) 'userVisibleOnly': userVisibleOnly,
+      if (type != null) 'type': type,
     };
-    if (sysex != null) {
-      json['sysex'] = sysex;
-    }
-    if (userVisibleOnly != null) {
-      json['userVisibleOnly'] = userVisibleOnly;
-    }
-    if (type != null) {
-      json['type'] = type;
-    }
-    return json;
   }
 }
 
@@ -486,12 +449,11 @@ class Bucket {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'low': low,
       'high': high,
       'count': count,
     };
-    return json;
   }
 }
 
@@ -526,12 +488,11 @@ class Histogram {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'sum': sum,
       'count': count,
       'buckets': buckets.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }

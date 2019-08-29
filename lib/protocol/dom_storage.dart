@@ -27,10 +27,9 @@ class DOMStorageApi {
       .map((event) => StorageId.fromJson(event.parameters['storageId']));
 
   Future<void> clear(StorageId storageId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOMStorage.clear', {
       'storageId': storageId.toJson(),
-    };
-    await _client.send('DOMStorage.clear', parameters);
+    });
   }
 
   /// Disables storage tracking, prevents storage events from being sent to the client.
@@ -44,30 +43,26 @@ class DOMStorageApi {
   }
 
   Future<List<Item>> getDOMStorageItems(StorageId storageId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('DOMStorage.getDOMStorageItems', {
       'storageId': storageId.toJson(),
-    };
-    var result =
-        await _client.send('DOMStorage.getDOMStorageItems', parameters);
+    });
     return (result['entries'] as List).map((e) => Item.fromJson(e)).toList();
   }
 
   Future<void> removeDOMStorageItem(StorageId storageId, String key) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOMStorage.removeDOMStorageItem', {
       'storageId': storageId.toJson(),
       'key': key,
-    };
-    await _client.send('DOMStorage.removeDOMStorageItem', parameters);
+    });
   }
 
   Future<void> setDOMStorageItem(
       StorageId storageId, String key, String value) async {
-    var parameters = <String, dynamic>{
+    await _client.send('DOMStorage.setDOMStorageItem', {
       'storageId': storageId.toJson(),
       'key': key,
       'value': value,
-    };
-    await _client.send('DOMStorage.setDOMStorageItem', parameters);
+    });
   }
 }
 
@@ -148,11 +143,10 @@ class StorageId {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'securityOrigin': securityOrigin,
       'isLocalStorage': isLocalStorage,
     };
-    return json;
   }
 }
 

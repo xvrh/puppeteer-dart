@@ -29,10 +29,9 @@ class PerformanceApi {
   Future<void> setTimeDomain(
       @Enum(['timeTicks', 'threadTicks']) String timeDomain) async {
     assert(const ['timeTicks', 'threadTicks'].contains(timeDomain));
-    var parameters = <String, dynamic>{
+    await _client.send('Performance.setTimeDomain', {
       'timeDomain': timeDomain,
-    };
-    await _client.send('Performance.setTimeDomain', parameters);
+    });
   }
 
   /// Retrieve current values of run-time metrics.
@@ -79,10 +78,9 @@ class Metric {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'value': value,
     };
-    return json;
   }
 }
