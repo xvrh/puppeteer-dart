@@ -176,7 +176,7 @@ import 'package:puppeteer/puppeteer.dart';
 main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
-  await page.goto('https://www.w3.org');
+  await page.goto('https://w3c.github.io/');
 
   // Either use the helper to get the content
   var pageContent = await page.content;
@@ -347,8 +347,8 @@ main() {
 }
 ```
 
-Note: In a future version, we can image to compile the dart code to javascript on the fly before
-sending it to the browser (with ddc or dart2js).
+Note: In a future version, we can imagine writing the code in Dart and it would be compiled to javascript transparently 
+ (with ddc or dart2js).
 
 ## Related work
  * [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface)

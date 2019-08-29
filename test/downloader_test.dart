@@ -9,8 +9,8 @@ main() {
     expect(revision.executablePath, contains('.local-chromium-test'));
     expect(File(revision.executablePath).existsSync(), isTrue);
 
-    var browser = await puppeteer.launch(
-        executablePath: revision.executablePath, useTemporaryUserData: true);
+    var browser =
+        await puppeteer.launch(executablePath: revision.executablePath);
     var page = await browser.newPage();
     await page.close();
     await browser.close();

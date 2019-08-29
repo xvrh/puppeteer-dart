@@ -22,6 +22,7 @@ final List<String> _defaultArgs = <String>[
   '--disable-backgrounding-occluded-windows',
   '--disable-breakpad',
   '--disable-client-side-phishing-detection',
+  '--disable-component-extensions-with-background-pages',
   '--disable-default-apps',
   '--disable-dev-shm-usage',
   '--disable-extensions',
@@ -39,7 +40,6 @@ final List<String> _defaultArgs = <String>[
   '--enable-automation',
   '--password-store=basic',
   '--use-mock-keychain',
-  '--remote-debugging-port=0',
 ];
 
 final List<String> _headlessArgs = [
@@ -70,7 +70,7 @@ class Puppeteer {
   /// ```
   ///
   /// Parameters:
-  ///  - `ignoreHTTPSErrors`: Whether to ignore HTTPS errors during navigation.
+  ///  - `ignoreHttpsErrors`: Whether to ignore HTTPS errors during navigation.
   ///     Defaults to `false`.
   ///  - `headless`: Whether to run browser in [headless mode](https://developers.google.com/web/updates/2017/04/headless-chrome).
   ///     Defaults to `true` unless the `devtools` option is `true`.
@@ -88,49 +88,57 @@ class Puppeteer {
   ///     Defaults to `Platform.environment`.
   ///  - `devtools` Whether to auto-open a DevTools panel for each tab. If this
   ///     option is `true`, the `headless` option will be set `false`.
+  ///  - `ignoreDefaultArgs` <[boolean]|[List]<[string]>> If `true`, then do not
+  ///     use [`puppeteer.defaultArgs()`]. If a list is given, then filter out
+  ///     the given default arguments. Dangerous option; use with care. Defaults to `false`.
+  ///  - `userDataDir` <[string]> Path to a [User Data Directory](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md).
+  ///  - `timeout` Maximum time to wait for the browser instance to start. Defaults to 30 seconds.
   Future<Browser> launch(
       {String executablePath,
       bool headless,
       bool devTools,
-      bool useTemporaryUserData,
+      String userDataDir,
       bool noSandboxFlag,
       DeviceViewport defaultViewport = LaunchOptions.viewportNotSpecified,
       bool ignoreHttpsErrors,
       Duration slowMo,
       List<String> args,
+      /* bool | List */ dynamic ignoreDefaultArgs,
       Map<String, String> environment,
-      List<Plugin> plugins}) async {
-    useTemporaryUserData ??= true;
+      List<Plugin> plugins,
+      Duration timeout}) async {
     devTools ??= false;
     headless ??= !devTools;
-    // In docker environment we want to force the '--no-sandbox' flag automatically
-    noSandboxFlag ??= Platform.environment['CHROME_FORCE_NO_SANDBOX'] == 'true';
+    timeout ??= Duration(seconds: 30);
 
-    executablePath = await _inferExecutablePath();
-
-    Directory userDataDir;
-    if (useTemporaryUserData) {
-      userDataDir = await Directory.systemTemp.createTemp('chrome_');
-    }
-
-    var chromeArgs = _defaultArgs.toList();
-    if (args != null) {
+    var chromeArgs = <String>[];
+    var defaultArguments = defaultArgs(
+        args: args,
+        userDataDir: userDataDir,
+        devTools: devTools,
+        headless: headless,
+        noSandboxFlag: noSandboxFlag);
+    if (ignoreDefaultArgs == null) {
+      chromeArgs.addAll(defaultArguments);
+    } else if (ignoreDefaultArgs is List) {
+      chromeArgs.addAll(
+          defaultArguments.where((arg) => !ignoreDefaultArgs.contains(arg)));
+    } else if (args != null) {
       chromeArgs.addAll(args);
     }
 
-    if (userDataDir != null) {
-      chromeArgs.add('--user-data-dir=${userDataDir.path}');
+    if (!chromeArgs.any((a) => a.startsWith('--remote-debugging-'))) {
+      chromeArgs.add('--remote-debugging-port=0');
     }
 
-    if (headless) {
-      chromeArgs.addAll(_headlessArgs);
+    Directory temporaryUserDataDir;
+    if (!chromeArgs.any((a) => a.startsWith('--user-data-dir'))) {
+      temporaryUserDataDir =
+          await Directory.systemTemp.createTemp('puppeteer_dev_profile-');
+      chromeArgs.add('--user-data-dir=${temporaryUserDataDir.path}');
     }
-    if (noSandboxFlag) {
-      chromeArgs.add('--no-sandbox');
-    }
-    if (devTools) {
-      chromeArgs.add('--auto-open-devtools-for-tabs');
-    }
+
+    executablePath ??= await _inferExecutablePath();
 
     var launchOptions =
         LaunchOptions(args: chromeArgs, defaultViewport: defaultViewport);
@@ -148,23 +156,39 @@ class Puppeteer {
         environment: environment);
 
     // ignore: unawaited_futures
-    chromeProcess.exitCode.then((exitCode) {
+    var chromeProcessExit = chromeProcess.exitCode.then((exitCode) {
       _logger.info('Chrome exit with $exitCode.');
-      if (userDataDir != null) {
-        _logger.info('Clean ${userDataDir.path}');
-        userDataDir.deleteSync(recursive: true);
+      if (temporaryUserDataDir != null) {
+        try {
+          _logger.info('Clean ${temporaryUserDataDir.path}');
+          temporaryUserDataDir.deleteSync(recursive: true);
+        } catch (error) {
+          _logger.info('Delete temporary file failed', error);
+        }
       }
     });
 
-    var webSocketUrl = await _waitForWebSocketUrl(chromeProcess);
+    var webSocketUrl = await _waitForWebSocketUrl(chromeProcess)
+        .timeout(timeout, onTimeout: () => null);
     if (webSocketUrl != null) {
       var connection = await Connection.create(webSocketUrl, delay: slowMo);
 
       var browser = createBrowser(chromeProcess, connection,
           defaultViewport: launchOptions.computedDefaultViewport,
-          closeCallback: () => _killChrome(chromeProcess),
-          ignoreHttpsErrors: ignoreHttpsErrors,
-          plugins: allPlugins);
+          closeCallback: () async {
+        if (temporaryUserDataDir != null) {
+          await _killChrome(chromeProcess);
+        } else {
+          // If there is a custom data-directory we need to give chrome a chance
+          // to save the last data
+          // Attempt to close chrome gracefully
+          await connection.send('Browser.close').catchError((error) async {
+            await _killChrome(chromeProcess);
+          });
+        }
+
+        return chromeProcessExit;
+      }, ignoreHttpsErrors: ignoreHttpsErrors, plugins: allPlugins);
       var targetFuture =
           browser.waitForTarget((target) => target.type == 'page');
       await browser.targetApi.setDiscoverTargets(true);
@@ -218,16 +242,40 @@ class Puppeteer {
     }
 
     var browserContextIds = await connection.targetApi.getBrowserContexts();
-    return createBrowser(null, connection,
+    var browser = createBrowser(null, connection,
         browserContextIds: browserContextIds,
         ignoreHttpsErrors: ignoreHttpsErrors,
         defaultViewport: connectOptions.computedDefaultViewport,
         plugins: allPlugins,
         closeCallback: () =>
             connection.send('Browser.close').catchError((e) => null));
+    await browser.targetApi.setDiscoverTargets(true);
+    return browser;
   }
 
   Devices get devices => devices_lib.devices;
+
+  List<String> defaultArgs(
+      {bool devTools,
+      bool headless,
+      List<String> args,
+      String userDataDir,
+      bool noSandboxFlag}) {
+    devTools ??= false;
+    headless ??= !devTools;
+    // In docker environment we want to force the '--no-sandbox' flag automatically
+    noSandboxFlag ??= Platform.environment['CHROME_FORCE_NO_SANDBOX'] == 'true';
+
+    return [
+      ..._defaultArgs,
+      if (userDataDir != null) '--user-data-dir=$userDataDir',
+      if (noSandboxFlag) '--no-sandbox',
+      if (devTools) '--auto-open-devtools-for-tabs',
+      if (headless) ..._headlessArgs,
+      if (args == null || args.every((a) => a.startsWith('-'))) 'about:blank',
+      ...?args
+    ];
+  }
 }
 
 Future<String> _wsEndpoint(String browserURL) async {

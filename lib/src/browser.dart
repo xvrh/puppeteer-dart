@@ -138,7 +138,9 @@ class Browser {
 
     target.initialized.then((initialized) {
       if (initialized) {
-        _onTargetCreatedController.add(target);
+        if (!_onTargetCreatedController.isClosed) {
+          _onTargetCreatedController.add(target);
+        }
       }
     });
   }
@@ -251,12 +253,13 @@ class Browser {
     await Future.delayed(Duration.zero);
     await _closeCallback();
 
-    _dispose();
     await connection.dispose('Browser.close');
+    _dispose();
   }
 
   void disconnect() {
     connection.dispose('Browser.disconnect');
+    _dispose();
   }
 
   bool get isConnected {

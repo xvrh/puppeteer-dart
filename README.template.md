@@ -129,8 +129,8 @@ main() {
 }
 ```
 
-Note: In a future version, we can image to compile the dart code to javascript on the fly before
-sending it to the browser (with ddc or dart2js).
+Note: In a future version, we can imagine writing the code in Dart and it would be compiled to javascript transparently 
+ (with ddc or dart2js).
 
 ## Related work
  * [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface)
