@@ -35,7 +35,7 @@ class DOMSnapshotApi {
       bool includePaintOrder,
       bool includeUserAgentShadowTree}) async {
     var result = await _client.send('DOMSnapshot.getSnapshot', {
-      'computedStyleWhitelist': computedStyleWhitelist.map((e) => e).toList(),
+      'computedStyleWhitelist': computedStyleWhitelist.toList(),
       if (includeEventListeners != null)
         'includeEventListeners': includeEventListeners,
       if (includePaintOrder != null) 'includePaintOrder': includePaintOrder,
@@ -55,7 +55,7 @@ class DOMSnapshotApi {
   Future<CaptureSnapshotResult> captureSnapshot(List<String> computedStyles,
       {bool includePaintOrder, bool includeDOMRects}) async {
     var result = await _client.send('DOMSnapshot.captureSnapshot', {
-      'computedStyles': computedStyles.map((e) => e).toList(),
+      'computedStyles': computedStyles.toList(),
       if (includePaintOrder != null) 'includePaintOrder': includePaintOrder,
       if (includeDOMRects != null) 'includeDOMRects': includeDOMRects,
     });
@@ -306,11 +306,11 @@ class DOMNode {
       if (inputChecked != null) 'inputChecked': inputChecked,
       if (optionSelected != null) 'optionSelected': optionSelected,
       if (childNodeIndexes != null)
-        'childNodeIndexes': childNodeIndexes.map((e) => e).toList(),
+        'childNodeIndexes': childNodeIndexes.toList(),
       if (attributes != null)
         'attributes': attributes.map((e) => e.toJson()).toList(),
       if (pseudoElementIndexes != null)
-        'pseudoElementIndexes': pseudoElementIndexes.map((e) => e).toList(),
+        'pseudoElementIndexes': pseudoElementIndexes.toList(),
       if (layoutNodeIndex != null) 'layoutNodeIndex': layoutNodeIndex,
       if (documentURL != null) 'documentURL': documentURL,
       if (baseURL != null) 'baseURL': baseURL,
@@ -544,7 +544,7 @@ class RareStringData {
 
   Map<String, dynamic> toJson() {
     return {
-      'index': index.map((e) => e).toList(),
+      'index': index.toList(),
       'value': value.map((e) => e.toJson()).toList(),
     };
   }
@@ -563,7 +563,7 @@ class RareBooleanData {
 
   Map<String, dynamic> toJson() {
     return {
-      'index': index.map((e) => e).toList(),
+      'index': index.toList(),
     };
   }
 }
@@ -584,8 +584,8 @@ class RareIntegerData {
 
   Map<String, dynamic> toJson() {
     return {
-      'index': index.map((e) => e).toList(),
-      'value': value.map((e) => e).toList(),
+      'index': index.toList(),
+      'value': value.toList(),
     };
   }
 }
@@ -826,9 +826,8 @@ class NodeTreeSnapshot {
 
   Map<String, dynamic> toJson() {
     return {
-      if (parentIndex != null)
-        'parentIndex': parentIndex.map((e) => e).toList(),
-      if (nodeType != null) 'nodeType': nodeType.map((e) => e).toList(),
+      if (parentIndex != null) 'parentIndex': parentIndex.toList(),
+      if (nodeType != null) 'nodeType': nodeType.toList(),
       if (nodeName != null)
         'nodeName': nodeName.map((e) => e.toJson()).toList(),
       if (nodeValue != null)
@@ -927,13 +926,12 @@ class LayoutTreeSnapshot {
 
   Map<String, dynamic> toJson() {
     return {
-      'nodeIndex': nodeIndex.map((e) => e).toList(),
+      'nodeIndex': nodeIndex.toList(),
       'styles': styles.map((e) => e.toJson()).toList(),
       'bounds': bounds.map((e) => e.toJson()).toList(),
       'text': text.map((e) => e.toJson()).toList(),
       'stackingContexts': stackingContexts.toJson(),
-      if (paintOrders != null)
-        'paintOrders': paintOrders.map((e) => e).toList(),
+      if (paintOrders != null) 'paintOrders': paintOrders.toList(),
       if (offsetRects != null)
         'offsetRects': offsetRects.map((e) => e.toJson()).toList(),
       if (scrollRects != null)
@@ -979,10 +977,10 @@ class TextBoxSnapshot {
 
   Map<String, dynamic> toJson() {
     return {
-      'layoutIndex': layoutIndex.map((e) => e).toList(),
+      'layoutIndex': layoutIndex.toList(),
       'bounds': bounds.map((e) => e.toJson()).toList(),
-      'start': start.map((e) => e).toList(),
-      'length': length.map((e) => e).toList(),
+      'start': start.toList(),
+      'length': length.toList(),
     };
   }
 }

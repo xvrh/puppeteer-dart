@@ -35,7 +35,7 @@ class LogApi {
   /// [config] Configuration for violations.
   Future<void> startViolationsReport(List<ViolationSetting> config) async {
     await _client.send('Log.startViolationsReport', {
-      'config': config.map((e) => e.toJson()).toList(),
+      'config': config.map((e) => e).toList(),
     });
   }
 

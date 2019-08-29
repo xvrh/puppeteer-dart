@@ -21,7 +21,7 @@ class DOMDebuggerApi {
   Future<List<EventListener>> getEventListeners(runtime.RemoteObjectId objectId,
       {int depth, bool pierce}) async {
     var result = await _client.send('DOMDebugger.getEventListeners', {
-      'objectId': objectId.toJson(),
+      'objectId': objectId,
       if (depth != null) 'depth': depth,
       if (pierce != null) 'pierce': pierce,
     });
@@ -36,8 +36,8 @@ class DOMDebuggerApi {
   Future<void> removeDOMBreakpoint(
       dom.NodeId nodeId, DOMBreakpointType type) async {
     await _client.send('DOMDebugger.removeDOMBreakpoint', {
-      'nodeId': nodeId.toJson(),
-      'type': type.toJson(),
+      'nodeId': nodeId,
+      'type': type,
     });
   }
 
@@ -74,8 +74,8 @@ class DOMDebuggerApi {
   Future<void> setDOMBreakpoint(
       dom.NodeId nodeId, DOMBreakpointType type) async {
     await _client.send('DOMDebugger.setDOMBreakpoint', {
-      'nodeId': nodeId.toJson(),
-      'type': type.toJson(),
+      'nodeId': nodeId,
+      'type': type,
     });
   }
 

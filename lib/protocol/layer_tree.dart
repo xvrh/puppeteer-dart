@@ -23,7 +23,7 @@ class LayerTreeApi {
   /// Returns: A list of strings specifying reasons for the given layer to become composited.
   Future<List<String>> compositingReasons(LayerId layerId) async {
     var result = await _client.send('LayerTree.compositingReasons', {
-      'layerId': layerId.toJson(),
+      'layerId': layerId,
     });
     return (result['compositingReasons'] as List)
         .map((e) => e as String)
@@ -45,7 +45,7 @@ class LayerTreeApi {
   /// Returns: The id of the snapshot.
   Future<SnapshotId> loadSnapshot(List<PictureTile> tiles) async {
     var result = await _client.send('LayerTree.loadSnapshot', {
-      'tiles': tiles.map((e) => e.toJson()).toList(),
+      'tiles': tiles.map((e) => e).toList(),
     });
     return SnapshotId.fromJson(result['snapshotId']);
   }
@@ -55,7 +55,7 @@ class LayerTreeApi {
   /// Returns: The id of the layer snapshot.
   Future<SnapshotId> makeSnapshot(LayerId layerId) async {
     var result = await _client.send('LayerTree.makeSnapshot', {
-      'layerId': layerId.toJson(),
+      'layerId': layerId,
     });
     return SnapshotId.fromJson(result['snapshotId']);
   }
@@ -68,10 +68,10 @@ class LayerTreeApi {
   Future<List<PaintProfile>> profileSnapshot(SnapshotId snapshotId,
       {int minRepeatCount, num minDuration, dom.Rect clipRect}) async {
     var result = await _client.send('LayerTree.profileSnapshot', {
-      'snapshotId': snapshotId.toJson(),
+      'snapshotId': snapshotId,
       if (minRepeatCount != null) 'minRepeatCount': minRepeatCount,
       if (minDuration != null) 'minDuration': minDuration,
-      if (clipRect != null) 'clipRect': clipRect.toJson(),
+      if (clipRect != null) 'clipRect': clipRect,
     });
     return (result['timings'] as List)
         .map((e) => PaintProfile.fromJson(e))
@@ -82,7 +82,7 @@ class LayerTreeApi {
   /// [snapshotId] The id of the layer snapshot.
   Future<void> releaseSnapshot(SnapshotId snapshotId) async {
     await _client.send('LayerTree.releaseSnapshot', {
-      'snapshotId': snapshotId.toJson(),
+      'snapshotId': snapshotId,
     });
   }
 
@@ -95,7 +95,7 @@ class LayerTreeApi {
   Future<String> replaySnapshot(SnapshotId snapshotId,
       {int fromStep, int toStep, num scale}) async {
     var result = await _client.send('LayerTree.replaySnapshot', {
-      'snapshotId': snapshotId.toJson(),
+      'snapshotId': snapshotId,
       if (fromStep != null) 'fromStep': fromStep,
       if (toStep != null) 'toStep': toStep,
       if (scale != null) 'scale': scale,
@@ -108,7 +108,7 @@ class LayerTreeApi {
   /// Returns: The array of canvas function calls.
   Future<List<Map>> snapshotCommandLog(SnapshotId snapshotId) async {
     var result = await _client.send('LayerTree.snapshotCommandLog', {
-      'snapshotId': snapshotId.toJson(),
+      'snapshotId': snapshotId,
     });
     return (result['commandLog'] as List).map((e) => e as Map).toList();
   }
@@ -418,7 +418,7 @@ class Layer {
       'drawsContent': drawsContent,
       if (parentLayerId != null) 'parentLayerId': parentLayerId.toJson(),
       if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
-      if (transform != null) 'transform': transform.map((e) => e).toList(),
+      if (transform != null) 'transform': transform.toList(),
       if (anchorX != null) 'anchorX': anchorX,
       if (anchorY != null) 'anchorY': anchorY,
       if (anchorZ != null) 'anchorZ': anchorZ,

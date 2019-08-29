@@ -19,10 +19,9 @@ class BrowserApi {
       {target.TargetID browserContextId}) async {
     await _client.send('Browser.setPermission', {
       'origin': origin,
-      'permission': permission.toJson(),
-      'setting': setting.toJson(),
-      if (browserContextId != null)
-        'browserContextId': browserContextId.toJson(),
+      'permission': permission,
+      'setting': setting,
+      if (browserContextId != null) 'browserContextId': browserContextId,
     });
   }
 
@@ -32,9 +31,8 @@ class BrowserApi {
       {target.BrowserContextID browserContextId}) async {
     await _client.send('Browser.grantPermissions', {
       'origin': origin,
-      'permissions': permissions.map((e) => e.toJson()).toList(),
-      if (browserContextId != null)
-        'browserContextId': browserContextId.toJson(),
+      'permissions': permissions.map((e) => e).toList(),
+      if (browserContextId != null) 'browserContextId': browserContextId,
     });
   }
 
@@ -43,8 +41,7 @@ class BrowserApi {
   Future<void> resetPermissions(
       {target.BrowserContextID browserContextId}) async {
     await _client.send('Browser.resetPermissions', {
-      if (browserContextId != null)
-        'browserContextId': browserContextId.toJson(),
+      if (browserContextId != null) 'browserContextId': browserContextId,
     });
   }
 
@@ -111,7 +108,7 @@ class BrowserApi {
   /// position and size are returned.
   Future<Bounds> getWindowBounds(WindowID windowId) async {
     var result = await _client.send('Browser.getWindowBounds', {
-      'windowId': windowId.toJson(),
+      'windowId': windowId,
     });
     return Bounds.fromJson(result['bounds']);
   }
@@ -121,7 +118,7 @@ class BrowserApi {
   Future<GetWindowForTargetResult> getWindowForTarget(
       {target.TargetID targetId}) async {
     var result = await _client.send('Browser.getWindowForTarget', {
-      if (targetId != null) 'targetId': targetId.toJson(),
+      if (targetId != null) 'targetId': targetId,
     });
     return GetWindowForTargetResult.fromJson(result);
   }
@@ -132,8 +129,8 @@ class BrowserApi {
   /// with 'left', 'top', 'width' or 'height'. Leaves unspecified fields unchanged.
   Future<void> setWindowBounds(WindowID windowId, Bounds bounds) async {
     await _client.send('Browser.setWindowBounds', {
-      'windowId': windowId.toJson(),
-      'bounds': bounds.toJson(),
+      'windowId': windowId,
+      'bounds': bounds,
     });
   }
 

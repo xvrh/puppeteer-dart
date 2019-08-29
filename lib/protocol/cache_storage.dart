@@ -11,7 +11,7 @@ class CacheStorageApi {
   /// [cacheId] Id of cache for deletion.
   Future<void> deleteCache(CacheId cacheId) async {
     await _client.send('CacheStorage.deleteCache', {
-      'cacheId': cacheId.toJson(),
+      'cacheId': cacheId,
     });
   }
 
@@ -20,7 +20,7 @@ class CacheStorageApi {
   /// [request] URL spec of the request.
   Future<void> deleteEntry(CacheId cacheId, String request) async {
     await _client.send('CacheStorage.deleteEntry', {
-      'cacheId': cacheId.toJson(),
+      'cacheId': cacheId,
       'request': request,
     });
   }
@@ -43,9 +43,9 @@ class CacheStorageApi {
   Future<CachedResponse> requestCachedResponse(
       CacheId cacheId, String requestURL, List<Header> requestHeaders) async {
     var result = await _client.send('CacheStorage.requestCachedResponse', {
-      'cacheId': cacheId.toJson(),
+      'cacheId': cacheId,
       'requestURL': requestURL,
-      'requestHeaders': requestHeaders.map((e) => e.toJson()).toList(),
+      'requestHeaders': requestHeaders.map((e) => e).toList(),
     });
     return CachedResponse.fromJson(result['response']);
   }
@@ -59,7 +59,7 @@ class CacheStorageApi {
       CacheId cacheId, int skipCount, int pageSize,
       {String pathFilter}) async {
     var result = await _client.send('CacheStorage.requestEntries', {
-      'cacheId': cacheId.toJson(),
+      'cacheId': cacheId,
       'skipCount': skipCount,
       'pageSize': pageSize,
       if (pathFilter != null) 'pathFilter': pathFilter,

@@ -42,7 +42,7 @@ class DebuggerApi {
     assert(targetCallFrames == null ||
         const ['any', 'current'].contains(targetCallFrames));
     await _client.send('Debugger.continueToLocation', {
-      'location': location.toJson(),
+      'location': location,
       if (targetCallFrames != null) 'targetCallFrames': targetCallFrames,
     });
   }
@@ -88,7 +88,7 @@ class DebuggerApi {
       bool throwOnSideEffect,
       runtime.TimeDelta timeout}) async {
     var result = await _client.send('Debugger.evaluateOnCallFrame', {
-      'callFrameId': callFrameId.toJson(),
+      'callFrameId': callFrameId,
       'expression': expression,
       if (objectGroup != null) 'objectGroup': objectGroup,
       if (includeCommandLineAPI != null)
@@ -97,7 +97,7 @@ class DebuggerApi {
       if (returnByValue != null) 'returnByValue': returnByValue,
       if (generatePreview != null) 'generatePreview': generatePreview,
       if (throwOnSideEffect != null) 'throwOnSideEffect': throwOnSideEffect,
-      if (timeout != null) 'timeout': timeout.toJson(),
+      if (timeout != null) 'timeout': timeout,
     });
     return EvaluateOnCallFrameResult.fromJson(result);
   }
@@ -112,8 +112,8 @@ class DebuggerApi {
   Future<List<BreakLocation>> getPossibleBreakpoints(Location start,
       {Location end, bool restrictToFunction}) async {
     var result = await _client.send('Debugger.getPossibleBreakpoints', {
-      'start': start.toJson(),
-      if (end != null) 'end': end.toJson(),
+      'start': start,
+      if (end != null) 'end': end,
       if (restrictToFunction != null) 'restrictToFunction': restrictToFunction,
     });
     return (result['locations'] as List)
@@ -126,7 +126,7 @@ class DebuggerApi {
   /// Returns: Script source.
   Future<String> getScriptSource(runtime.ScriptId scriptId) async {
     var result = await _client.send('Debugger.getScriptSource', {
-      'scriptId': scriptId.toJson(),
+      'scriptId': scriptId,
     });
     return result['scriptSource'];
   }
@@ -135,7 +135,7 @@ class DebuggerApi {
   Future<runtime.StackTrace> getStackTrace(
       runtime.StackTraceId stackTraceId) async {
     var result = await _client.send('Debugger.getStackTrace', {
-      'stackTraceId': stackTraceId.toJson(),
+      'stackTraceId': stackTraceId,
     });
     return runtime.StackTrace.fromJson(result['stackTrace']);
   }
@@ -148,14 +148,14 @@ class DebuggerApi {
   /// [parentStackTraceId] Debugger will pause when async call with given stack trace is started.
   Future<void> pauseOnAsyncCall(runtime.StackTraceId parentStackTraceId) async {
     await _client.send('Debugger.pauseOnAsyncCall', {
-      'parentStackTraceId': parentStackTraceId.toJson(),
+      'parentStackTraceId': parentStackTraceId,
     });
   }
 
   /// Removes JavaScript breakpoint.
   Future<void> removeBreakpoint(BreakpointId breakpointId) async {
     await _client.send('Debugger.removeBreakpoint', {
-      'breakpointId': breakpointId.toJson(),
+      'breakpointId': breakpointId,
     });
   }
 
@@ -163,7 +163,7 @@ class DebuggerApi {
   /// [callFrameId] Call frame identifier to evaluate on.
   Future<RestartFrameResult> restartFrame(CallFrameId callFrameId) async {
     var result = await _client.send('Debugger.restartFrame', {
-      'callFrameId': callFrameId.toJson(),
+      'callFrameId': callFrameId,
     });
     return RestartFrameResult.fromJson(result);
   }
@@ -183,7 +183,7 @@ class DebuggerApi {
       runtime.ScriptId scriptId, String query,
       {bool caseSensitive, bool isRegex}) async {
     var result = await _client.send('Debugger.searchInContent', {
-      'scriptId': scriptId.toJson(),
+      'scriptId': scriptId,
       'query': query,
       if (caseSensitive != null) 'caseSensitive': caseSensitive,
       if (isRegex != null) 'isRegex': isRegex,
@@ -208,7 +208,7 @@ class DebuggerApi {
   /// [patterns] Array of regexps that will be used to check script url for blackbox state.
   Future<void> setBlackboxPatterns(List<String> patterns) async {
     await _client.send('Debugger.setBlackboxPatterns', {
-      'patterns': patterns.map((e) => e).toList(),
+      'patterns': patterns.toList(),
     });
   }
 
@@ -220,8 +220,8 @@ class DebuggerApi {
   Future<void> setBlackboxedRanges(
       runtime.ScriptId scriptId, List<ScriptPosition> positions) async {
     await _client.send('Debugger.setBlackboxedRanges', {
-      'scriptId': scriptId.toJson(),
-      'positions': positions.map((e) => e.toJson()).toList(),
+      'scriptId': scriptId,
+      'positions': positions.map((e) => e).toList(),
     });
   }
 
@@ -232,7 +232,7 @@ class DebuggerApi {
   Future<SetBreakpointResult> setBreakpoint(Location location,
       {String condition}) async {
     var result = await _client.send('Debugger.setBreakpoint', {
-      'location': location.toJson(),
+      'location': location,
       if (condition != null) 'condition': condition,
     });
     return SetBreakpointResult.fromJson(result);
@@ -292,7 +292,7 @@ class DebuggerApi {
       runtime.RemoteObjectId objectId,
       {String condition}) async {
     var result = await _client.send('Debugger.setBreakpointOnFunctionCall', {
-      'objectId': objectId.toJson(),
+      'objectId': objectId,
       if (condition != null) 'condition': condition,
     });
     return BreakpointId.fromJson(result['breakpointId']);
@@ -321,7 +321,7 @@ class DebuggerApi {
   /// [newValue] New return value.
   Future<void> setReturnValue(runtime.CallArgument newValue) async {
     await _client.send('Debugger.setReturnValue', {
-      'newValue': newValue.toJson(),
+      'newValue': newValue,
     });
   }
 
@@ -334,7 +334,7 @@ class DebuggerApi {
       runtime.ScriptId scriptId, String scriptSource,
       {bool dryRun}) async {
     var result = await _client.send('Debugger.setScriptSource', {
-      'scriptId': scriptId.toJson(),
+      'scriptId': scriptId,
       'scriptSource': scriptSource,
       if (dryRun != null) 'dryRun': dryRun,
     });
@@ -361,8 +361,8 @@ class DebuggerApi {
     await _client.send('Debugger.setVariableValue', {
       'scopeNumber': scopeNumber,
       'variableName': variableName,
-      'newValue': newValue.toJson(),
-      'callFrameId': callFrameId.toJson(),
+      'newValue': newValue,
+      'callFrameId': callFrameId,
     });
   }
 

@@ -33,7 +33,7 @@ class MemoryApi {
   /// [level] Memory pressure level of the notification.
   Future<void> simulatePressureNotification(PressureLevel level) async {
     await _client.send('Memory.simulatePressureNotification', {
-      'level': level.toJson(),
+      'level': level,
     });
   }
 
@@ -150,7 +150,7 @@ class SamplingProfileNode {
     return {
       'size': size,
       'total': total,
-      'stack': stack.map((e) => e).toList(),
+      'stack': stack.toList(),
     };
   }
 }

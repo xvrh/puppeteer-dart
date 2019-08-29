@@ -203,7 +203,7 @@ class ProfileNode {
       'id': id,
       'callFrame': callFrame.toJson(),
       if (hitCount != null) 'hitCount': hitCount,
-      if (children != null) 'children': children.map((e) => e).toList(),
+      if (children != null) 'children': children.toList(),
       if (deoptReason != null) 'deoptReason': deoptReason,
       if (positionTicks != null)
         'positionTicks': positionTicks.map((e) => e.toJson()).toList(),
@@ -256,8 +256,8 @@ class Profile {
       'nodes': nodes.map((e) => e.toJson()).toList(),
       'startTime': startTime,
       'endTime': endTime,
-      if (samples != null) 'samples': samples.map((e) => e).toList(),
-      if (timeDeltas != null) 'timeDeltas': timeDeltas.map((e) => e).toList(),
+      if (samples != null) 'samples': samples.toList(),
+      if (timeDeltas != null) 'timeDeltas': timeDeltas.toList(),
     };
   }
 }

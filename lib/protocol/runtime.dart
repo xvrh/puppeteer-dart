@@ -62,7 +62,7 @@ class RuntimeApi {
   Future<AwaitPromiseResult> awaitPromise(RemoteObjectId promiseObjectId,
       {bool returnByValue, bool generatePreview}) async {
     var result = await _client.send('Runtime.awaitPromise', {
-      'promiseObjectId': promiseObjectId.toJson(),
+      'promiseObjectId': promiseObjectId,
       if (returnByValue != null) 'returnByValue': returnByValue,
       if (generatePreview != null) 'generatePreview': generatePreview,
     });
@@ -99,16 +99,14 @@ class RuntimeApi {
       String objectGroup}) async {
     var result = await _client.send('Runtime.callFunctionOn', {
       'functionDeclaration': functionDeclaration,
-      if (objectId != null) 'objectId': objectId.toJson(),
-      if (arguments != null)
-        'arguments': arguments.map((e) => e.toJson()).toList(),
+      if (objectId != null) 'objectId': objectId,
+      if (arguments != null) 'arguments': arguments.map((e) => e).toList(),
       if (silent != null) 'silent': silent,
       if (returnByValue != null) 'returnByValue': returnByValue,
       if (generatePreview != null) 'generatePreview': generatePreview,
       if (userGesture != null) 'userGesture': userGesture,
       if (awaitPromise != null) 'awaitPromise': awaitPromise,
-      if (executionContextId != null)
-        'executionContextId': executionContextId.toJson(),
+      if (executionContextId != null) 'executionContextId': executionContextId,
       if (objectGroup != null) 'objectGroup': objectGroup,
     });
     return CallFunctionOnResult.fromJson(result);
@@ -127,8 +125,7 @@ class RuntimeApi {
       'expression': expression,
       'sourceURL': sourceURL,
       'persistScript': persistScript,
-      if (executionContextId != null)
-        'executionContextId': executionContextId.toJson(),
+      if (executionContextId != null) 'executionContextId': executionContextId,
     });
     return CompileScriptResult.fromJson(result);
   }
@@ -182,13 +179,13 @@ class RuntimeApi {
       if (includeCommandLineAPI != null)
         'includeCommandLineAPI': includeCommandLineAPI,
       if (silent != null) 'silent': silent,
-      if (contextId != null) 'contextId': contextId.toJson(),
+      if (contextId != null) 'contextId': contextId,
       if (returnByValue != null) 'returnByValue': returnByValue,
       if (generatePreview != null) 'generatePreview': generatePreview,
       if (userGesture != null) 'userGesture': userGesture,
       if (awaitPromise != null) 'awaitPromise': awaitPromise,
       if (throwOnSideEffect != null) 'throwOnSideEffect': throwOnSideEffect,
-      if (timeout != null) 'timeout': timeout.toJson(),
+      if (timeout != null) 'timeout': timeout,
     });
     return EvaluateResult.fromJson(result);
   }
@@ -220,7 +217,7 @@ class RuntimeApi {
       bool accessorPropertiesOnly,
       bool generatePreview}) async {
     var result = await _client.send('Runtime.getProperties', {
-      'objectId': objectId.toJson(),
+      'objectId': objectId,
       if (ownProperties != null) 'ownProperties': ownProperties,
       if (accessorPropertiesOnly != null)
         'accessorPropertiesOnly': accessorPropertiesOnly,
@@ -234,8 +231,7 @@ class RuntimeApi {
   Future<List<String>> globalLexicalScopeNames(
       {ExecutionContextId executionContextId}) async {
     var result = await _client.send('Runtime.globalLexicalScopeNames', {
-      if (executionContextId != null)
-        'executionContextId': executionContextId.toJson(),
+      if (executionContextId != null) 'executionContextId': executionContextId,
     });
     return (result['names'] as List).map((e) => e as String).toList();
   }
@@ -246,7 +242,7 @@ class RuntimeApi {
   Future<RemoteObject> queryObjects(RemoteObjectId prototypeObjectId,
       {String objectGroup}) async {
     var result = await _client.send('Runtime.queryObjects', {
-      'prototypeObjectId': prototypeObjectId.toJson(),
+      'prototypeObjectId': prototypeObjectId,
       if (objectGroup != null) 'objectGroup': objectGroup,
     });
     return RemoteObject.fromJson(result['objects']);
@@ -256,7 +252,7 @@ class RuntimeApi {
   /// [objectId] Identifier of the object to release.
   Future<void> releaseObject(RemoteObjectId objectId) async {
     await _client.send('Runtime.releaseObject', {
-      'objectId': objectId.toJson(),
+      'objectId': objectId,
     });
   }
 
@@ -294,9 +290,8 @@ class RuntimeApi {
       bool generatePreview,
       bool awaitPromise}) async {
     var result = await _client.send('Runtime.runScript', {
-      'scriptId': scriptId.toJson(),
-      if (executionContextId != null)
-        'executionContextId': executionContextId.toJson(),
+      'scriptId': scriptId,
+      if (executionContextId != null) 'executionContextId': executionContextId,
       if (objectGroup != null) 'objectGroup': objectGroup,
       if (silent != null) 'silent': silent,
       if (includeCommandLineAPI != null)
@@ -347,8 +342,7 @@ class RuntimeApi {
       {ExecutionContextId executionContextId}) async {
     await _client.send('Runtime.addBinding', {
       'name': name,
-      if (executionContextId != null)
-        'executionContextId': executionContextId.toJson(),
+      if (executionContextId != null) 'executionContextId': executionContextId,
     });
   }
 

@@ -40,7 +40,7 @@ class IndexedDBApi {
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
-      'keyRange': keyRange.toJson(),
+      'keyRange': keyRange,
     });
   }
 
@@ -77,7 +77,7 @@ class IndexedDBApi {
       'indexName': indexName,
       'skipCount': skipCount,
       'pageSize': pageSize,
-      if (keyRange != null) 'keyRange': keyRange.toJson(),
+      if (keyRange != null) 'keyRange': keyRange,
     });
     return RequestDataResult.fromJson(result);
   }
@@ -447,7 +447,7 @@ class KeyPath {
     return {
       'type': type,
       if (string != null) 'string': string,
-      if (array != null) 'array': array.map((e) => e).toList(),
+      if (array != null) 'array': array.toList(),
     };
   }
 }

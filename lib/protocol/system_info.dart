@@ -367,7 +367,7 @@ class GPUInfo {
   Map<String, dynamic> toJson() {
     return {
       'devices': devices.map((e) => e.toJson()).toList(),
-      'driverBugWorkarounds': driverBugWorkarounds.map((e) => e).toList(),
+      'driverBugWorkarounds': driverBugWorkarounds.toList(),
       'videoDecoding': videoDecoding.map((e) => e.toJson()).toList(),
       'videoEncoding': videoEncoding.map((e) => e.toJson()).toList(),
       'imageDecoding': imageDecoding.map((e) => e.toJson()).toList(),

@@ -33,9 +33,9 @@ class AccessibilityApi {
       runtime.RemoteObjectId objectId,
       bool fetchRelatives}) async {
     var result = await _client.send('Accessibility.getPartialAXTree', {
-      if (nodeId != null) 'nodeId': nodeId.toJson(),
-      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
-      if (objectId != null) 'objectId': objectId.toJson(),
+      if (nodeId != null) 'nodeId': nodeId,
+      if (backendNodeId != null) 'backendNodeId': backendNodeId,
+      if (objectId != null) 'objectId': objectId,
       if (fetchRelatives != null) 'fetchRelatives': fetchRelatives,
     });
     return (result['nodes'] as List)

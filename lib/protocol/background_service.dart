@@ -28,14 +28,14 @@ class BackgroundServiceApi {
   /// Enables event updates for the service.
   Future<void> startObserving(ServiceName service) async {
     await _client.send('BackgroundService.startObserving', {
-      'service': service.toJson(),
+      'service': service,
     });
   }
 
   /// Disables event updates for the service.
   Future<void> stopObserving(ServiceName service) async {
     await _client.send('BackgroundService.stopObserving', {
-      'service': service.toJson(),
+      'service': service,
     });
   }
 
@@ -43,14 +43,14 @@ class BackgroundServiceApi {
   Future<void> setRecording(bool shouldRecord, ServiceName service) async {
     await _client.send('BackgroundService.setRecording', {
       'shouldRecord': shouldRecord,
-      'service': service.toJson(),
+      'service': service,
     });
   }
 
   /// Clears all stored data for the service.
   Future<void> clearEvents(ServiceName service) async {
     await _client.send('BackgroundService.clearEvents', {
-      'service': service.toJson(),
+      'service': service,
     });
   }
 }

@@ -24,7 +24,7 @@ class WebAuthnApi {
   Future<AuthenticatorId> addVirtualAuthenticator(
       VirtualAuthenticatorOptions options) async {
     var result = await _client.send('WebAuthn.addVirtualAuthenticator', {
-      'options': options.toJson(),
+      'options': options,
     });
     return AuthenticatorId.fromJson(result['authenticatorId']);
   }
@@ -33,7 +33,7 @@ class WebAuthnApi {
   Future<void> removeVirtualAuthenticator(
       AuthenticatorId authenticatorId) async {
     await _client.send('WebAuthn.removeVirtualAuthenticator', {
-      'authenticatorId': authenticatorId.toJson(),
+      'authenticatorId': authenticatorId,
     });
   }
 
@@ -41,8 +41,8 @@ class WebAuthnApi {
   Future<void> addCredential(
       AuthenticatorId authenticatorId, Credential credential) async {
     await _client.send('WebAuthn.addCredential', {
-      'authenticatorId': authenticatorId.toJson(),
-      'credential': credential.toJson(),
+      'authenticatorId': authenticatorId,
+      'credential': credential,
     });
   }
 
@@ -51,7 +51,7 @@ class WebAuthnApi {
   Future<Credential> getCredential(
       AuthenticatorId authenticatorId, String credentialId) async {
     var result = await _client.send('WebAuthn.getCredential', {
-      'authenticatorId': authenticatorId.toJson(),
+      'authenticatorId': authenticatorId,
       'credentialId': credentialId,
     });
     return Credential.fromJson(result['credential']);
@@ -61,7 +61,7 @@ class WebAuthnApi {
   Future<List<Credential>> getCredentials(
       AuthenticatorId authenticatorId) async {
     var result = await _client.send('WebAuthn.getCredentials', {
-      'authenticatorId': authenticatorId.toJson(),
+      'authenticatorId': authenticatorId,
     });
     return (result['credentials'] as List)
         .map((e) => Credential.fromJson(e))
@@ -72,7 +72,7 @@ class WebAuthnApi {
   Future<void> removeCredential(
       AuthenticatorId authenticatorId, String credentialId) async {
     await _client.send('WebAuthn.removeCredential', {
-      'authenticatorId': authenticatorId.toJson(),
+      'authenticatorId': authenticatorId,
       'credentialId': credentialId,
     });
   }
@@ -80,7 +80,7 @@ class WebAuthnApi {
   /// Clears all the credentials from the specified device.
   Future<void> clearCredentials(AuthenticatorId authenticatorId) async {
     await _client.send('WebAuthn.clearCredentials', {
-      'authenticatorId': authenticatorId.toJson(),
+      'authenticatorId': authenticatorId,
     });
   }
 
@@ -89,7 +89,7 @@ class WebAuthnApi {
   Future<void> setUserVerified(
       AuthenticatorId authenticatorId, bool isUserVerified) async {
     await _client.send('WebAuthn.setUserVerified', {
-      'authenticatorId': authenticatorId.toJson(),
+      'authenticatorId': authenticatorId,
       'isUserVerified': isUserVerified,
     });
   }

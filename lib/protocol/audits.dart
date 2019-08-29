@@ -22,7 +22,7 @@ class AuditsApi {
       bool sizeOnly}) async {
     assert(const ['webp', 'jpeg', 'png'].contains(encoding));
     var result = await _client.send('Audits.getEncodedResponse', {
-      'requestId': requestId.toJson(),
+      'requestId': requestId,
       'encoding': encoding,
       if (quality != null) 'quality': quality,
       if (sizeOnly != null) 'sizeOnly': sizeOnly,

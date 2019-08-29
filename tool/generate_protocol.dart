@@ -264,11 +264,13 @@ class _Command {
     if (parameters.isNotEmpty) {
       sendCode += ', {';
       for (Parameter parameter in requireds) {
-        sendCode += "'${parameter.name}' : ${_toJsonCode(parameter)},";
+        sendCode +=
+            "'${parameter.name}' : ${_toJsonCode(parameter, needsExplicitToJson: false)},";
       }
       for (Parameter parameter in optionals) {
         sendCode += 'if (${parameter.normalizedName} != null)';
-        sendCode += "'${parameter.name}' : ${_toJsonCode(parameter)},";
+        sendCode +=
+            "'${parameter.name}' : ${_toJsonCode(parameter, needsExplicitToJson: false)},";
       }
 
       sendCode += '}';
@@ -401,18 +403,26 @@ const List<String> jsonTypes = [
   'any'
 ];
 
-String _toJsonCode(Parameter parameter) {
+String _toJsonCode(Parameter parameter, {bool needsExplicitToJson = true}) {
   String name = parameter.normalizedName;
   String type = parameter.type;
 
   if (type != null && jsonTypes.contains(type)) {
     return name;
   } else if (type == 'array') {
-    Parameter elementParameter = Parameter(
-        name: 'e', type: parameter.items.type, ref: parameter.items.ref);
-    return '$name.map((e) => ${_toJsonCode(elementParameter)}).toList()';
+    if (parameter.items.ref != null) {
+      Parameter elementParameter = Parameter(
+          name: 'e', type: parameter.items.type, ref: parameter.items.ref);
+      return '$name.map((e) => ${_toJsonCode(elementParameter, needsExplicitToJson: needsExplicitToJson)}).toList()';
+    } else {
+      return '$name.toList()';
+    }
   }
-  return '$name.toJson()';
+  if (needsExplicitToJson) {
+    return '$name.toJson()';
+  } else {
+    return name;
+  }
 }
 
 class _InternalType {

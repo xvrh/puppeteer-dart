@@ -41,7 +41,7 @@ class HeapProfilerApi {
   /// [heapObjectId] Heap snapshot object id to be accessible by means of $x command line API.
   Future<void> addInspectedHeapObject(HeapSnapshotObjectId heapObjectId) async {
     await _client.send('HeapProfiler.addInspectedHeapObject', {
-      'heapObjectId': heapObjectId.toJson(),
+      'heapObjectId': heapObjectId,
     });
   }
 
@@ -62,7 +62,7 @@ class HeapProfilerApi {
   Future<HeapSnapshotObjectId> getHeapObjectId(
       runtime.RemoteObjectId objectId) async {
     var result = await _client.send('HeapProfiler.getHeapObjectId', {
-      'objectId': objectId.toJson(),
+      'objectId': objectId,
     });
     return HeapSnapshotObjectId.fromJson(result['heapSnapshotObjectId']);
   }
@@ -73,7 +73,7 @@ class HeapProfilerApi {
       HeapSnapshotObjectId objectId,
       {String objectGroup}) async {
     var result = await _client.send('HeapProfiler.getObjectByHeapObjectId', {
-      'objectId': objectId.toJson(),
+      'objectId': objectId,
       if (objectGroup != null) 'objectGroup': objectGroup,
     });
     return runtime.RemoteObject.fromJson(result['result']);

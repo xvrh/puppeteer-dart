@@ -184,7 +184,7 @@ class PageApi {
     var result = await _client.send('Page.captureScreenshot', {
       if (format != null) 'format': format,
       if (quality != null) 'quality': quality,
-      if (clip != null) 'clip': clip.toJson(),
+      if (clip != null) 'clip': clip,
       if (fromSurface != null) 'fromSurface': fromSurface,
     });
     return result['data'];
@@ -229,7 +229,7 @@ class PageApi {
   Future<runtime.ExecutionContextId> createIsolatedWorld(FrameId frameId,
       {String worldName, bool grantUniveralAccess}) async {
     var result = await _client.send('Page.createIsolatedWorld', {
-      'frameId': frameId.toJson(),
+      'frameId': frameId,
       if (worldName != null) 'worldName': worldName,
       if (grantUniveralAccess != null)
         'grantUniveralAccess': grantUniveralAccess,
@@ -309,7 +309,7 @@ class PageApi {
   Future<GetResourceContentResult> getResourceContent(
       FrameId frameId, String url) async {
     var result = await _client.send('Page.getResourceContent', {
-      'frameId': frameId.toJson(),
+      'frameId': frameId,
       'url': url,
     });
     return GetResourceContentResult.fromJson(result);
@@ -343,8 +343,8 @@ class PageApi {
     var result = await _client.send('Page.navigate', {
       'url': url,
       if (referrer != null) 'referrer': referrer,
-      if (transitionType != null) 'transitionType': transitionType.toJson(),
-      if (frameId != null) 'frameId': frameId.toJson(),
+      if (transitionType != null) 'transitionType': transitionType,
+      if (frameId != null) 'frameId': frameId,
     });
     return NavigateResult.fromJson(result);
   }
@@ -443,7 +443,7 @@ class PageApi {
   @deprecated
   Future<void> removeScriptToEvaluateOnLoad(ScriptIdentifier identifier) async {
     await _client.send('Page.removeScriptToEvaluateOnLoad', {
-      'identifier': identifier.toJson(),
+      'identifier': identifier,
     });
   }
 
@@ -451,7 +451,7 @@ class PageApi {
   Future<void> removeScriptToEvaluateOnNewDocument(
       ScriptIdentifier identifier) async {
     await _client.send('Page.removeScriptToEvaluateOnNewDocument', {
-      'identifier': identifier.toJson(),
+      'identifier': identifier,
     });
   }
 
@@ -474,7 +474,7 @@ class PageApi {
       FrameId frameId, String url, String query,
       {bool caseSensitive, bool isRegex}) async {
     var result = await _client.send('Page.searchInResource', {
-      'frameId': frameId.toJson(),
+      'frameId': frameId,
       'url': url,
       'query': query,
       if (caseSensitive != null) 'caseSensitive': caseSensitive,
@@ -539,9 +539,8 @@ class PageApi {
       if (positionX != null) 'positionX': positionX,
       if (positionY != null) 'positionY': positionY,
       if (dontSetVisibleSize != null) 'dontSetVisibleSize': dontSetVisibleSize,
-      if (screenOrientation != null)
-        'screenOrientation': screenOrientation.toJson(),
-      if (viewport != null) 'viewport': viewport.toJson(),
+      if (screenOrientation != null) 'screenOrientation': screenOrientation,
+      if (viewport != null) 'viewport': viewport,
     });
   }
 
@@ -563,7 +562,7 @@ class PageApi {
   /// [fontFamilies] Specifies font families to set. If a font family is not specified, it won't be changed.
   Future<void> setFontFamilies(FontFamilies fontFamilies) async {
     await _client.send('Page.setFontFamilies', {
-      'fontFamilies': fontFamilies.toJson(),
+      'fontFamilies': fontFamilies,
     });
   }
 
@@ -571,7 +570,7 @@ class PageApi {
   /// [fontSizes] Specifies font sizes to set. If a font size is not specified, it won't be changed.
   Future<void> setFontSizes(FontSizes fontSizes) async {
     await _client.send('Page.setFontSizes', {
-      'fontSizes': fontSizes.toJson(),
+      'fontSizes': fontSizes,
     });
   }
 
@@ -580,7 +579,7 @@ class PageApi {
   /// [html] HTML content to set.
   Future<void> setDocumentContent(FrameId frameId, String html) async {
     await _client.send('Page.setDocumentContent', {
-      'frameId': frameId.toJson(),
+      'frameId': frameId,
       'html': html,
     });
   }
@@ -745,7 +744,7 @@ class PageApi {
     assert(const ['accept', 'cancel', 'fallback'].contains(action));
     await _client.send('Page.handleFileChooser', {
       'action': action,
-      if (files != null) 'files': files.map((e) => e).toList(),
+      if (files != null) 'files': files.toList(),
     });
   }
 }

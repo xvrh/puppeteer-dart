@@ -59,7 +59,7 @@ class EmulationApi {
   /// cleared.
   Future<void> setDefaultBackgroundColorOverride({dom.RGBA color}) async {
     await _client.send('Emulation.setDefaultBackgroundColorOverride', {
-      if (color != null) 'color': color.toJson(),
+      if (color != null) 'color': color,
     });
   }
 
@@ -101,9 +101,8 @@ class EmulationApi {
       if (positionX != null) 'positionX': positionX,
       if (positionY != null) 'positionY': positionY,
       if (dontSetVisibleSize != null) 'dontSetVisibleSize': dontSetVisibleSize,
-      if (screenOrientation != null)
-        'screenOrientation': screenOrientation.toJson(),
-      if (viewport != null) 'viewport': viewport.toJson(),
+      if (screenOrientation != null) 'screenOrientation': screenOrientation,
+      if (viewport != null) 'viewport': viewport,
     });
   }
 
@@ -207,13 +206,12 @@ class EmulationApi {
       bool waitForNavigation,
       network.TimeSinceEpoch initialVirtualTime}) async {
     var result = await _client.send('Emulation.setVirtualTimePolicy', {
-      'policy': policy.toJson(),
+      'policy': policy,
       if (budget != null) 'budget': budget,
       if (maxVirtualTimeTaskStarvationCount != null)
         'maxVirtualTimeTaskStarvationCount': maxVirtualTimeTaskStarvationCount,
       if (waitForNavigation != null) 'waitForNavigation': waitForNavigation,
-      if (initialVirtualTime != null)
-        'initialVirtualTime': initialVirtualTime.toJson(),
+      if (initialVirtualTime != null) 'initialVirtualTime': initialVirtualTime,
     });
     return result['virtualTimeTicksBase'];
   }

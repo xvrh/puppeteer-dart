@@ -75,10 +75,9 @@ class TracingApi {
       if (bufferUsageReportingInterval != null)
         'bufferUsageReportingInterval': bufferUsageReportingInterval,
       if (transferMode != null) 'transferMode': transferMode,
-      if (streamFormat != null) 'streamFormat': streamFormat.toJson(),
-      if (streamCompression != null)
-        'streamCompression': streamCompression.toJson(),
-      if (traceConfig != null) 'traceConfig': traceConfig.toJson(),
+      if (streamFormat != null) 'streamFormat': streamFormat,
+      if (streamCompression != null) 'streamCompression': streamCompression,
+      if (traceConfig != null) 'traceConfig': traceConfig,
     });
   }
 }
@@ -254,11 +253,10 @@ class TraceConfig {
       if (enableArgumentFilter != null)
         'enableArgumentFilter': enableArgumentFilter,
       if (includedCategories != null)
-        'includedCategories': includedCategories.map((e) => e).toList(),
+        'includedCategories': includedCategories.toList(),
       if (excludedCategories != null)
-        'excludedCategories': excludedCategories.map((e) => e).toList(),
-      if (syntheticDelays != null)
-        'syntheticDelays': syntheticDelays.map((e) => e).toList(),
+        'excludedCategories': excludedCategories.toList(),
+      if (syntheticDelays != null) 'syntheticDelays': syntheticDelays.toList(),
       if (memoryDumpConfig != null)
         'memoryDumpConfig': memoryDumpConfig.toJson(),
     };

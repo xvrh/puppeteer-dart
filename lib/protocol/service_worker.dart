@@ -32,7 +32,7 @@ class ServiceWorkerApi {
       String origin, RegistrationID registrationId, String data) async {
     await _client.send('ServiceWorker.deliverPushMessage', {
       'origin': origin,
-      'registrationId': registrationId.toJson(),
+      'registrationId': registrationId,
       'data': data,
     });
   }
@@ -45,7 +45,7 @@ class ServiceWorkerApi {
       String tag, bool lastChance) async {
     await _client.send('ServiceWorker.dispatchSyncEvent', {
       'origin': origin,
-      'registrationId': registrationId.toJson(),
+      'registrationId': registrationId,
       'tag': tag,
       'lastChance': lastChance,
     });
@@ -55,7 +55,7 @@ class ServiceWorkerApi {
       String origin, RegistrationID registrationId, String tag) async {
     await _client.send('ServiceWorker.dispatchPeriodicSyncEvent', {
       'origin': origin,
-      'registrationId': registrationId.toJson(),
+      'registrationId': registrationId,
       'tag': tag,
     });
   }

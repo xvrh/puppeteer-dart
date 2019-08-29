@@ -28,7 +28,7 @@ class DOMStorageApi {
 
   Future<void> clear(StorageId storageId) async {
     await _client.send('DOMStorage.clear', {
-      'storageId': storageId.toJson(),
+      'storageId': storageId,
     });
   }
 
@@ -44,14 +44,14 @@ class DOMStorageApi {
 
   Future<List<Item>> getDOMStorageItems(StorageId storageId) async {
     var result = await _client.send('DOMStorage.getDOMStorageItems', {
-      'storageId': storageId.toJson(),
+      'storageId': storageId,
     });
     return (result['entries'] as List).map((e) => Item.fromJson(e)).toList();
   }
 
   Future<void> removeDOMStorageItem(StorageId storageId, String key) async {
     await _client.send('DOMStorage.removeDOMStorageItem', {
-      'storageId': storageId.toJson(),
+      'storageId': storageId,
       'key': key,
     });
   }
@@ -59,7 +59,7 @@ class DOMStorageApi {
   Future<void> setDOMStorageItem(
       StorageId storageId, String key, String value) async {
     await _client.send('DOMStorage.setDOMStorageItem', {
-      'storageId': storageId.toJson(),
+      'storageId': storageId,
       'key': key,
       'value': value,
     });

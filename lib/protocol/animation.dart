@@ -55,7 +55,7 @@ class AnimationApi {
   /// [animations] List of animation ids to seek.
   Future<void> releaseAnimations(List<String> animations) async {
     await _client.send('Animation.releaseAnimations', {
-      'animations': animations.map((e) => e).toList(),
+      'animations': animations.toList(),
     });
   }
 
@@ -74,7 +74,7 @@ class AnimationApi {
   /// [currentTime] Set the current time of each animation.
   Future<void> seekAnimations(List<String> animations, num currentTime) async {
     await _client.send('Animation.seekAnimations', {
-      'animations': animations.map((e) => e).toList(),
+      'animations': animations.toList(),
       'currentTime': currentTime,
     });
   }
@@ -84,7 +84,7 @@ class AnimationApi {
   /// [paused] Paused state to set to.
   Future<void> setPaused(List<String> animations, bool paused) async {
     await _client.send('Animation.setPaused', {
-      'animations': animations.map((e) => e).toList(),
+      'animations': animations.toList(),
       'paused': paused,
     });
   }

@@ -31,7 +31,7 @@ class ApplicationCacheApi {
       page.FrameId frameId) async {
     var result =
         await _client.send('ApplicationCache.getApplicationCacheForFrame', {
-      'frameId': frameId.toJson(),
+      'frameId': frameId,
     });
     return ApplicationCache.fromJson(result['applicationCache']);
   }
@@ -52,7 +52,7 @@ class ApplicationCacheApi {
   /// Returns: Manifest URL for document in the given frame.
   Future<String> getManifestForFrame(page.FrameId frameId) async {
     var result = await _client.send('ApplicationCache.getManifestForFrame', {
-      'frameId': frameId.toJson(),
+      'frameId': frameId,
     });
     return result['manifestURL'];
   }

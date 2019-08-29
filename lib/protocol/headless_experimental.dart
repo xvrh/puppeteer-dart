@@ -37,7 +37,7 @@ class HeadlessExperimentalApi {
       if (frameTimeTicks != null) 'frameTimeTicks': frameTimeTicks,
       if (interval != null) 'interval': interval,
       if (noDisplayUpdates != null) 'noDisplayUpdates': noDisplayUpdates,
-      if (screenshot != null) 'screenshot': screenshot.toJson(),
+      if (screenshot != null) 'screenshot': screenshot,
     });
     return BeginFrameResult.fromJson(result);
   }

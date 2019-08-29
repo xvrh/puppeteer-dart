@@ -24,7 +24,7 @@ class DatabaseApi {
   Future<ExecuteSQLResult> executeSQL(
       DatabaseId databaseId, String query) async {
     var result = await _client.send('Database.executeSQL', {
-      'databaseId': databaseId.toJson(),
+      'databaseId': databaseId,
       'query': query,
     });
     return ExecuteSQLResult.fromJson(result);
@@ -32,7 +32,7 @@ class DatabaseApi {
 
   Future<List<String>> getDatabaseTableNames(DatabaseId databaseId) async {
     var result = await _client.send('Database.getDatabaseTableNames', {
-      'databaseId': databaseId.toJson(),
+      'databaseId': databaseId,
     });
     return (result['tableNames'] as List).map((e) => e as String).toList();
   }

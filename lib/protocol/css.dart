@@ -50,9 +50,9 @@ class CSSApi {
   Future<CSSRule> addRule(
       StyleSheetId styleSheetId, String ruleText, SourceRange location) async {
     var result = await _client.send('CSS.addRule', {
-      'styleSheetId': styleSheetId.toJson(),
+      'styleSheetId': styleSheetId,
       'ruleText': ruleText,
-      'location': location.toJson(),
+      'location': location,
     });
     return CSSRule.fromJson(result['rule']);
   }
@@ -61,7 +61,7 @@ class CSSApi {
   /// Returns: Class name list.
   Future<List<String>> collectClassNames(StyleSheetId styleSheetId) async {
     var result = await _client.send('CSS.collectClassNames', {
-      'styleSheetId': styleSheetId.toJson(),
+      'styleSheetId': styleSheetId,
     });
     return (result['classNames'] as List).map((e) => e as String).toList();
   }
@@ -71,7 +71,7 @@ class CSSApi {
   /// Returns: Identifier of the created "via-inspector" stylesheet.
   Future<StyleSheetId> createStyleSheet(page.FrameId frameId) async {
     var result = await _client.send('CSS.createStyleSheet', {
-      'frameId': frameId.toJson(),
+      'frameId': frameId,
     });
     return StyleSheetId.fromJson(result['styleSheetId']);
   }
@@ -94,8 +94,8 @@ class CSSApi {
   Future<void> forcePseudoState(
       dom.NodeId nodeId, List<String> forcedPseudoClasses) async {
     await _client.send('CSS.forcePseudoState', {
-      'nodeId': nodeId.toJson(),
-      'forcedPseudoClasses': forcedPseudoClasses.map((e) => e).toList(),
+      'nodeId': nodeId,
+      'forcedPseudoClasses': forcedPseudoClasses.toList(),
     });
   }
 
@@ -103,7 +103,7 @@ class CSSApi {
   Future<GetBackgroundColorsResult> getBackgroundColors(
       dom.NodeId nodeId) async {
     var result = await _client.send('CSS.getBackgroundColors', {
-      'nodeId': nodeId.toJson(),
+      'nodeId': nodeId,
     });
     return GetBackgroundColorsResult.fromJson(result);
   }
@@ -113,7 +113,7 @@ class CSSApi {
   Future<List<CSSComputedStyleProperty>> getComputedStyleForNode(
       dom.NodeId nodeId) async {
     var result = await _client.send('CSS.getComputedStyleForNode', {
-      'nodeId': nodeId.toJson(),
+      'nodeId': nodeId,
     });
     return (result['computedStyle'] as List)
         .map((e) => CSSComputedStyleProperty.fromJson(e))
@@ -125,7 +125,7 @@ class CSSApi {
   Future<GetInlineStylesForNodeResult> getInlineStylesForNode(
       dom.NodeId nodeId) async {
     var result = await _client.send('CSS.getInlineStylesForNode', {
-      'nodeId': nodeId.toJson(),
+      'nodeId': nodeId,
     });
     return GetInlineStylesForNodeResult.fromJson(result);
   }
@@ -134,7 +134,7 @@ class CSSApi {
   Future<GetMatchedStylesForNodeResult> getMatchedStylesForNode(
       dom.NodeId nodeId) async {
     var result = await _client.send('CSS.getMatchedStylesForNode', {
-      'nodeId': nodeId.toJson(),
+      'nodeId': nodeId,
     });
     return GetMatchedStylesForNodeResult.fromJson(result);
   }
@@ -151,7 +151,7 @@ class CSSApi {
   Future<List<PlatformFontUsage>> getPlatformFontsForNode(
       dom.NodeId nodeId) async {
     var result = await _client.send('CSS.getPlatformFontsForNode', {
-      'nodeId': nodeId.toJson(),
+      'nodeId': nodeId,
     });
     return (result['fonts'] as List)
         .map((e) => PlatformFontUsage.fromJson(e))
@@ -162,7 +162,7 @@ class CSSApi {
   /// Returns: The stylesheet text.
   Future<String> getStyleSheetText(StyleSheetId styleSheetId) async {
     var result = await _client.send('CSS.getStyleSheetText', {
-      'styleSheetId': styleSheetId.toJson(),
+      'styleSheetId': styleSheetId,
     });
     return result['text'];
   }
@@ -173,7 +173,7 @@ class CSSApi {
   Future<void> setEffectivePropertyValueForNode(
       dom.NodeId nodeId, String propertyName, String value) async {
     await _client.send('CSS.setEffectivePropertyValueForNode', {
-      'nodeId': nodeId.toJson(),
+      'nodeId': nodeId,
       'propertyName': propertyName,
       'value': value,
     });
@@ -184,8 +184,8 @@ class CSSApi {
   Future<Value> setKeyframeKey(
       StyleSheetId styleSheetId, SourceRange range, String keyText) async {
     var result = await _client.send('CSS.setKeyframeKey', {
-      'styleSheetId': styleSheetId.toJson(),
-      'range': range.toJson(),
+      'styleSheetId': styleSheetId,
+      'range': range,
       'keyText': keyText,
     });
     return Value.fromJson(result['keyText']);
@@ -196,8 +196,8 @@ class CSSApi {
   Future<CSSMedia> setMediaText(
       StyleSheetId styleSheetId, SourceRange range, String text) async {
     var result = await _client.send('CSS.setMediaText', {
-      'styleSheetId': styleSheetId.toJson(),
-      'range': range.toJson(),
+      'styleSheetId': styleSheetId,
+      'range': range,
       'text': text,
     });
     return CSSMedia.fromJson(result['media']);
@@ -208,8 +208,8 @@ class CSSApi {
   Future<SelectorList> setRuleSelector(
       StyleSheetId styleSheetId, SourceRange range, String selector) async {
     var result = await _client.send('CSS.setRuleSelector', {
-      'styleSheetId': styleSheetId.toJson(),
-      'range': range.toJson(),
+      'styleSheetId': styleSheetId,
+      'range': range,
       'selector': selector,
     });
     return SelectorList.fromJson(result['selectorList']);
@@ -220,7 +220,7 @@ class CSSApi {
   Future<String> setStyleSheetText(
       StyleSheetId styleSheetId, String text) async {
     var result = await _client.send('CSS.setStyleSheetText', {
-      'styleSheetId': styleSheetId.toJson(),
+      'styleSheetId': styleSheetId,
       'text': text,
     });
     return result['sourceMapURL'];
@@ -230,7 +230,7 @@ class CSSApi {
   /// Returns: The resulting styles after modification.
   Future<List<CSSStyle>> setStyleTexts(List<StyleDeclarationEdit> edits) async {
     var result = await _client.send('CSS.setStyleTexts', {
-      'edits': edits.map((e) => e.toJson()).toList(),
+      'edits': edits.map((e) => e).toList(),
     });
     return (result['styles'] as List).map((e) => CSSStyle.fromJson(e)).toList();
   }

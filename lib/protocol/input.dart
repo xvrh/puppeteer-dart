@@ -46,7 +46,7 @@ class InputApi {
     await _client.send('Input.dispatchKeyEvent', {
       'type': type,
       if (modifiers != null) 'modifiers': modifiers,
-      if (timestamp != null) 'timestamp': timestamp.toJson(),
+      if (timestamp != null) 'timestamp': timestamp,
       if (text != null) 'text': text,
       if (unmodifiedText != null) 'unmodifiedText': unmodifiedText,
       if (keyIdentifier != null) 'keyIdentifier': keyIdentifier,
@@ -113,7 +113,7 @@ class InputApi {
       'x': x,
       'y': y,
       if (modifiers != null) 'modifiers': modifiers,
-      if (timestamp != null) 'timestamp': timestamp.toJson(),
+      if (timestamp != null) 'timestamp': timestamp,
       if (button != null) 'button': button,
       if (buttons != null) 'buttons': buttons,
       if (clickCount != null) 'clickCount': clickCount,
@@ -141,9 +141,9 @@ class InputApi {
         .contains(type));
     await _client.send('Input.dispatchTouchEvent', {
       'type': type,
-      'touchPoints': touchPoints.map((e) => e.toJson()).toList(),
+      'touchPoints': touchPoints.map((e) => e).toList(),
       if (modifiers != null) 'modifiers': modifiers,
-      if (timestamp != null) 'timestamp': timestamp.toJson(),
+      if (timestamp != null) 'timestamp': timestamp,
     });
   }
 
@@ -178,7 +178,7 @@ class InputApi {
       'x': x,
       'y': y,
       'button': button,
-      if (timestamp != null) 'timestamp': timestamp.toJson(),
+      if (timestamp != null) 'timestamp': timestamp,
       if (deltaX != null) 'deltaX': deltaX,
       if (deltaY != null) 'deltaY': deltaY,
       if (modifiers != null) 'modifiers': modifiers,
@@ -208,8 +208,7 @@ class InputApi {
       'y': y,
       'scaleFactor': scaleFactor,
       if (relativeSpeed != null) 'relativeSpeed': relativeSpeed,
-      if (gestureSourceType != null)
-        'gestureSourceType': gestureSourceType.toJson(),
+      if (gestureSourceType != null) 'gestureSourceType': gestureSourceType,
     });
   }
 
@@ -249,8 +248,7 @@ class InputApi {
       if (yOverscroll != null) 'yOverscroll': yOverscroll,
       if (preventFling != null) 'preventFling': preventFling,
       if (speed != null) 'speed': speed,
-      if (gestureSourceType != null)
-        'gestureSourceType': gestureSourceType.toJson(),
+      if (gestureSourceType != null) 'gestureSourceType': gestureSourceType,
       if (repeatCount != null) 'repeatCount': repeatCount,
       if (repeatDelayMs != null) 'repeatDelayMs': repeatDelayMs,
       if (interactionMarkerName != null)
@@ -272,8 +270,7 @@ class InputApi {
       'y': y,
       if (duration != null) 'duration': duration,
       if (tapCount != null) 'tapCount': tapCount,
-      if (gestureSourceType != null)
-        'gestureSourceType': gestureSourceType.toJson(),
+      if (gestureSourceType != null) 'gestureSourceType': gestureSourceType,
     });
   }
 }

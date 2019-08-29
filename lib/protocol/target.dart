@@ -51,7 +51,7 @@ class TargetApi {
   /// Activates (focuses) the target.
   Future<void> activateTarget(TargetID targetId) async {
     await _client.send('Target.activateTarget', {
-      'targetId': targetId.toJson(),
+      'targetId': targetId,
     });
   }
 
@@ -60,7 +60,7 @@ class TargetApi {
   /// Returns: Id assigned to the session.
   Future<SessionID> attachToTarget(TargetID targetId, {bool flatten}) async {
     var result = await _client.send('Target.attachToTarget', {
-      'targetId': targetId.toJson(),
+      'targetId': targetId,
       if (flatten != null) 'flatten': flatten,
     });
     return SessionID.fromJson(result['sessionId']);
@@ -76,7 +76,7 @@ class TargetApi {
   /// Closes the target. If the target is a page that gets closed too.
   Future<bool> closeTarget(TargetID targetId) async {
     var result = await _client.send('Target.closeTarget', {
-      'targetId': targetId.toJson(),
+      'targetId': targetId,
     });
     return result['success'];
   }
@@ -93,7 +93,7 @@ class TargetApi {
   Future<void> exposeDevToolsProtocol(TargetID targetId,
       {String bindingName}) async {
     await _client.send('Target.exposeDevToolsProtocol', {
-      'targetId': targetId.toJson(),
+      'targetId': targetId,
       if (bindingName != null) 'bindingName': bindingName,
     });
   }
@@ -137,8 +137,7 @@ class TargetApi {
       'url': url,
       if (width != null) 'width': width,
       if (height != null) 'height': height,
-      if (browserContextId != null)
-        'browserContextId': browserContextId.toJson(),
+      if (browserContextId != null) 'browserContextId': browserContextId,
       if (enableBeginFrameControl != null)
         'enableBeginFrameControl': enableBeginFrameControl,
       if (newWindow != null) 'newWindow': newWindow,
@@ -152,8 +151,8 @@ class TargetApi {
   Future<void> detachFromTarget(
       {SessionID sessionId, @deprecated TargetID targetId}) async {
     await _client.send('Target.detachFromTarget', {
-      if (sessionId != null) 'sessionId': sessionId.toJson(),
-      if (targetId != null) 'targetId': targetId.toJson(),
+      if (sessionId != null) 'sessionId': sessionId,
+      if (targetId != null) 'targetId': targetId,
     });
   }
 
@@ -161,14 +160,14 @@ class TargetApi {
   /// beforeunload hooks.
   Future<void> disposeBrowserContext(BrowserContextID browserContextId) async {
     await _client.send('Target.disposeBrowserContext', {
-      'browserContextId': browserContextId.toJson(),
+      'browserContextId': browserContextId,
     });
   }
 
   /// Returns information about a target.
   Future<TargetInfo> getTargetInfo({TargetID targetId}) async {
     var result = await _client.send('Target.getTargetInfo', {
-      if (targetId != null) 'targetId': targetId.toJson(),
+      if (targetId != null) 'targetId': targetId,
     });
     return TargetInfo.fromJson(result['targetInfo']);
   }
@@ -188,8 +187,8 @@ class TargetApi {
       {SessionID sessionId, @deprecated TargetID targetId}) async {
     await _client.send('Target.sendMessageToTarget', {
       'message': message,
-      if (sessionId != null) 'sessionId': sessionId.toJson(),
-      if (targetId != null) 'targetId': targetId.toJson(),
+      if (sessionId != null) 'sessionId': sessionId,
+      if (targetId != null) 'targetId': targetId,
     });
   }
 
@@ -223,7 +222,7 @@ class TargetApi {
   /// [locations] List of remote locations.
   Future<void> setRemoteLocations(List<RemoteLocation> locations) async {
     await _client.send('Target.setRemoteLocations', {
-      'locations': locations.map((e) => e.toJson()).toList(),
+      'locations': locations.map((e) => e).toList(),
     });
   }
 }

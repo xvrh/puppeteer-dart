@@ -13,7 +13,7 @@ class IOApi {
   /// [handle] Handle of the stream to close.
   Future<void> close(StreamHandle handle) async {
     await _client.send('IO.close', {
-      'handle': handle.toJson(),
+      'handle': handle,
     });
   }
 
@@ -24,7 +24,7 @@ class IOApi {
   /// [size] Maximum number of bytes to read (left upon the agent discretion if not specified).
   Future<ReadResult> read(StreamHandle handle, {int offset, int size}) async {
     var result = await _client.send('IO.read', {
-      'handle': handle.toJson(),
+      'handle': handle,
       if (offset != null) 'offset': offset,
       if (size != null) 'size': size,
     });
@@ -36,7 +36,7 @@ class IOApi {
   /// Returns: UUID of the specified Blob.
   Future<String> resolveBlob(runtime.RemoteObjectId objectId) async {
     var result = await _client.send('IO.resolveBlob', {
-      'objectId': objectId.toJson(),
+      'objectId': objectId,
     });
     return result['uuid'];
   }

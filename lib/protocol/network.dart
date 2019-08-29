@@ -193,15 +193,15 @@ class NetworkApi {
       Headers headers,
       AuthChallengeResponse authChallengeResponse}) async {
     await _client.send('Network.continueInterceptedRequest', {
-      'interceptionId': interceptionId.toJson(),
-      if (errorReason != null) 'errorReason': errorReason.toJson(),
+      'interceptionId': interceptionId,
+      if (errorReason != null) 'errorReason': errorReason,
       if (rawResponse != null) 'rawResponse': rawResponse,
       if (url != null) 'url': url,
       if (method != null) 'method': method,
       if (postData != null) 'postData': postData,
-      if (headers != null) 'headers': headers.toJson(),
+      if (headers != null) 'headers': headers,
       if (authChallengeResponse != null)
-        'authChallengeResponse': authChallengeResponse.toJson(),
+        'authChallengeResponse': authChallengeResponse,
     });
   }
 
@@ -240,7 +240,7 @@ class NetworkApi {
       'latency': latency,
       'downloadThroughput': downloadThroughput,
       'uploadThroughput': uploadThroughput,
-      if (connectionType != null) 'connectionType': connectionType.toJson(),
+      if (connectionType != null) 'connectionType': connectionType,
     });
   }
 
@@ -283,7 +283,7 @@ class NetworkApi {
   /// Returns: Array of cookie objects.
   Future<List<Cookie>> getCookies({List<String> urls}) async {
     var result = await _client.send('Network.getCookies', {
-      if (urls != null) 'urls': urls.map((e) => e).toList(),
+      if (urls != null) 'urls': urls.toList(),
     });
     return (result['cookies'] as List).map((e) => Cookie.fromJson(e)).toList();
   }
@@ -292,7 +292,7 @@ class NetworkApi {
   /// [requestId] Identifier of the network request to get content for.
   Future<GetResponseBodyResult> getResponseBody(RequestId requestId) async {
     var result = await _client.send('Network.getResponseBody', {
-      'requestId': requestId.toJson(),
+      'requestId': requestId,
     });
     return GetResponseBodyResult.fromJson(result);
   }
@@ -302,7 +302,7 @@ class NetworkApi {
   /// Returns: Request body string, omitting files from multipart requests
   Future<String> getRequestPostData(RequestId requestId) async {
     var result = await _client.send('Network.getRequestPostData', {
-      'requestId': requestId.toJson(),
+      'requestId': requestId,
     });
     return result['postData'];
   }
@@ -312,7 +312,7 @@ class NetworkApi {
   Future<GetResponseBodyForInterceptionResult> getResponseBodyForInterception(
       InterceptionId interceptionId) async {
     var result = await _client.send('Network.getResponseBodyForInterception', {
-      'interceptionId': interceptionId.toJson(),
+      'interceptionId': interceptionId,
     });
     return GetResponseBodyForInterceptionResult.fromJson(result);
   }
@@ -325,7 +325,7 @@ class NetworkApi {
       InterceptionId interceptionId) async {
     var result =
         await _client.send('Network.takeResponseBodyForInterceptionAsStream', {
-      'interceptionId': interceptionId.toJson(),
+      'interceptionId': interceptionId,
     });
     return io.StreamHandle.fromJson(result['stream']);
   }
@@ -336,7 +336,7 @@ class NetworkApi {
   /// [requestId] Identifier of XHR to replay.
   Future<void> replayXHR(RequestId requestId) async {
     await _client.send('Network.replayXHR', {
-      'requestId': requestId.toJson(),
+      'requestId': requestId,
     });
   }
 
@@ -350,7 +350,7 @@ class NetworkApi {
       RequestId requestId, String query,
       {bool caseSensitive, bool isRegex}) async {
     var result = await _client.send('Network.searchInResponseBody', {
-      'requestId': requestId.toJson(),
+      'requestId': requestId,
       'query': query,
       if (caseSensitive != null) 'caseSensitive': caseSensitive,
       if (isRegex != null) 'isRegex': isRegex,
@@ -364,7 +364,7 @@ class NetworkApi {
   /// [urls] URL patterns to block. Wildcards ('*') are allowed.
   Future<void> setBlockedURLs(List<String> urls) async {
     await _client.send('Network.setBlockedURLs', {
-      'urls': urls.map((e) => e).toList(),
+      'urls': urls.toList(),
     });
   }
 
@@ -412,8 +412,8 @@ class NetworkApi {
       if (path != null) 'path': path,
       if (secure != null) 'secure': secure,
       if (httpOnly != null) 'httpOnly': httpOnly,
-      if (sameSite != null) 'sameSite': sameSite.toJson(),
-      if (expires != null) 'expires': expires.toJson(),
+      if (sameSite != null) 'sameSite': sameSite,
+      if (expires != null) 'expires': expires,
     });
     return result['success'];
   }
@@ -422,7 +422,7 @@ class NetworkApi {
   /// [cookies] Cookies to be set.
   Future<void> setCookies(List<CookieParam> cookies) async {
     await _client.send('Network.setCookies', {
-      'cookies': cookies.map((e) => e.toJson()).toList(),
+      'cookies': cookies.map((e) => e).toList(),
     });
   }
 
@@ -441,7 +441,7 @@ class NetworkApi {
   /// [headers] Map with extra HTTP headers.
   Future<void> setExtraHTTPHeaders(Headers headers) async {
     await _client.send('Network.setExtraHTTPHeaders', {
-      'headers': headers.toJson(),
+      'headers': headers,
     });
   }
 
@@ -452,7 +452,7 @@ class NetworkApi {
   @deprecated
   Future<void> setRequestInterception(List<RequestPattern> patterns) async {
     await _client.send('Network.setRequestInterception', {
-      'patterns': patterns.map((e) => e.toJson()).toList(),
+      'patterns': patterns.map((e) => e).toList(),
     });
   }
 
@@ -1837,7 +1837,7 @@ class SecurityDetails {
       'cipher': cipher,
       'certificateId': certificateId.toJson(),
       'subjectName': subjectName,
-      'sanList': sanList.map((e) => e).toList(),
+      'sanList': sanList.toList(),
       'issuer': issuer,
       'validFrom': validFrom.toJson(),
       'validTo': validTo.toJson(),
@@ -2871,8 +2871,7 @@ class SignedExchangeSignature {
       'expires': expires,
       if (certUrl != null) 'certUrl': certUrl,
       if (certSha256 != null) 'certSha256': certSha256,
-      if (certificates != null)
-        'certificates': certificates.map((e) => e).toList(),
+      if (certificates != null) 'certificates': certificates.toList(),
     };
   }
 }

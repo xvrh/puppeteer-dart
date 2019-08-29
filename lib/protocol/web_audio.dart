@@ -95,7 +95,7 @@ class WebAudioApi {
   /// Fetch the realtime data from the registered contexts.
   Future<ContextRealtimeData> getRealtimeData(GraphObjectId contextId) async {
     var result = await _client.send('WebAudio.getRealtimeData', {
-      'contextId': contextId.toJson(),
+      'contextId': contextId,
     });
     return ContextRealtimeData.fromJson(result['realtimeData']);
   }

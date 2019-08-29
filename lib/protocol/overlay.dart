@@ -49,7 +49,7 @@ class OverlayApi {
   Future<Map> getHighlightObjectForTest(dom.NodeId nodeId,
       {bool includeDistance, bool includeStyle}) async {
     var result = await _client.send('Overlay.getHighlightObjectForTest', {
-      'nodeId': nodeId.toJson(),
+      'nodeId': nodeId,
       if (includeDistance != null) 'includeDistance': includeDistance,
       if (includeStyle != null) 'includeStyle': includeStyle,
     });
@@ -68,10 +68,10 @@ class OverlayApi {
   Future<void> highlightFrame(page.FrameId frameId,
       {dom.RGBA contentColor, dom.RGBA contentOutlineColor}) async {
     await _client.send('Overlay.highlightFrame', {
-      'frameId': frameId.toJson(),
-      if (contentColor != null) 'contentColor': contentColor.toJson(),
+      'frameId': frameId,
+      if (contentColor != null) 'contentColor': contentColor,
       if (contentOutlineColor != null)
-        'contentOutlineColor': contentOutlineColor.toJson(),
+        'contentOutlineColor': contentOutlineColor,
     });
   }
 
@@ -88,10 +88,10 @@ class OverlayApi {
       runtime.RemoteObjectId objectId,
       String selector}) async {
     await _client.send('Overlay.highlightNode', {
-      'highlightConfig': highlightConfig.toJson(),
-      if (nodeId != null) 'nodeId': nodeId.toJson(),
-      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
-      if (objectId != null) 'objectId': objectId.toJson(),
+      'highlightConfig': highlightConfig,
+      if (nodeId != null) 'nodeId': nodeId,
+      if (backendNodeId != null) 'backendNodeId': backendNodeId,
+      if (objectId != null) 'objectId': objectId,
       if (selector != null) 'selector': selector,
     });
   }
@@ -103,9 +103,9 @@ class OverlayApi {
   Future<void> highlightQuad(dom.Quad quad,
       {dom.RGBA color, dom.RGBA outlineColor}) async {
     await _client.send('Overlay.highlightQuad', {
-      'quad': quad.toJson(),
-      if (color != null) 'color': color.toJson(),
-      if (outlineColor != null) 'outlineColor': outlineColor.toJson(),
+      'quad': quad,
+      if (color != null) 'color': color,
+      if (outlineColor != null) 'outlineColor': outlineColor,
     });
   }
 
@@ -123,8 +123,8 @@ class OverlayApi {
       'y': y,
       'width': width,
       'height': height,
-      if (color != null) 'color': color.toJson(),
-      if (outlineColor != null) 'outlineColor': outlineColor.toJson(),
+      if (color != null) 'color': color,
+      if (outlineColor != null) 'outlineColor': outlineColor,
     });
   }
 
@@ -136,8 +136,8 @@ class OverlayApi {
   Future<void> setInspectMode(InspectMode mode,
       {HighlightConfig highlightConfig}) async {
     await _client.send('Overlay.setInspectMode', {
-      'mode': mode.toJson(),
-      if (highlightConfig != null) 'highlightConfig': highlightConfig.toJson(),
+      'mode': mode,
+      if (highlightConfig != null) 'highlightConfig': highlightConfig,
     });
   }
 

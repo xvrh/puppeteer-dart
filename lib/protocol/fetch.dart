@@ -42,8 +42,7 @@ class FetchApi {
   Future<void> enable(
       {List<RequestPattern> patterns, bool handleAuthRequests}) async {
     await _client.send('Fetch.enable', {
-      if (patterns != null)
-        'patterns': patterns.map((e) => e.toJson()).toList(),
+      if (patterns != null) 'patterns': patterns.map((e) => e).toList(),
       if (handleAuthRequests != null) 'handleAuthRequests': handleAuthRequests,
     });
   }
@@ -54,8 +53,8 @@ class FetchApi {
   Future<void> failRequest(
       RequestId requestId, network.ErrorReason errorReason) async {
     await _client.send('Fetch.failRequest', {
-      'requestId': requestId.toJson(),
-      'errorReason': errorReason.toJson(),
+      'requestId': requestId,
+      'errorReason': errorReason,
     });
   }
 
@@ -70,9 +69,9 @@ class FetchApi {
       RequestId requestId, int responseCode, List<HeaderEntry> responseHeaders,
       {String body, String responsePhrase}) async {
     await _client.send('Fetch.fulfillRequest', {
-      'requestId': requestId.toJson(),
+      'requestId': requestId,
       'responseCode': responseCode,
-      'responseHeaders': responseHeaders.map((e) => e.toJson()).toList(),
+      'responseHeaders': responseHeaders.map((e) => e).toList(),
       if (body != null) 'body': body,
       if (responsePhrase != null) 'responsePhrase': responsePhrase,
     });
@@ -90,11 +89,11 @@ class FetchApi {
       String postData,
       List<HeaderEntry> headers}) async {
     await _client.send('Fetch.continueRequest', {
-      'requestId': requestId.toJson(),
+      'requestId': requestId,
       if (url != null) 'url': url,
       if (method != null) 'method': method,
       if (postData != null) 'postData': postData,
-      if (headers != null) 'headers': headers.map((e) => e.toJson()).toList(),
+      if (headers != null) 'headers': headers.map((e) => e).toList(),
     });
   }
 
@@ -104,8 +103,8 @@ class FetchApi {
   Future<void> continueWithAuth(
       RequestId requestId, AuthChallengeResponse authChallengeResponse) async {
     await _client.send('Fetch.continueWithAuth', {
-      'requestId': requestId.toJson(),
-      'authChallengeResponse': authChallengeResponse.toJson(),
+      'requestId': requestId,
+      'authChallengeResponse': authChallengeResponse,
     });
   }
 
@@ -118,7 +117,7 @@ class FetchApi {
   /// [requestId] Identifier for the intercepted request to get body for.
   Future<GetResponseBodyResult> getResponseBody(RequestId requestId) async {
     var result = await _client.send('Fetch.getResponseBody', {
-      'requestId': requestId.toJson(),
+      'requestId': requestId,
     });
     return GetResponseBodyResult.fromJson(result);
   }
@@ -135,7 +134,7 @@ class FetchApi {
   /// domain before body is received results in an undefined behavior.
   Future<io.StreamHandle> takeResponseBodyAsStream(RequestId requestId) async {
     var result = await _client.send('Fetch.takeResponseBodyAsStream', {
-      'requestId': requestId.toJson(),
+      'requestId': requestId,
     });
     return io.StreamHandle.fromJson(result['stream']);
   }

@@ -48,7 +48,7 @@ class SecurityApi {
       int eventId, CertificateErrorAction action) async {
     await _client.send('Security.handleCertificateError', {
       'eventId': eventId,
-      'action': action.toJson(),
+      'action': action,
     });
   }
 
@@ -254,9 +254,8 @@ class SecurityStateExplanation {
       'summary': summary,
       'description': description,
       'mixedContentType': mixedContentType.toJson(),
-      'certificate': certificate.map((e) => e).toList(),
-      if (recommendations != null)
-        'recommendations': recommendations.map((e) => e).toList(),
+      'certificate': certificate.toList(),
+      if (recommendations != null) 'recommendations': recommendations.toList(),
     };
   }
 }
