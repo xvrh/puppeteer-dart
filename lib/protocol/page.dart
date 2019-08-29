@@ -187,7 +187,7 @@ class PageApi {
       if (clip != null) 'clip': clip,
       if (fromSurface != null) 'fromSurface': fromSurface,
     });
-    return result['data'];
+    return result['data'] as String;
   }
 
   /// Returns a snapshot of the page as a string. For MHTML format, the serialization includes
@@ -199,7 +199,7 @@ class PageApi {
     var result = await _client.send('Page.captureSnapshot', {
       if (format != null) 'format': format,
     });
-    return result['data'];
+    return result['data'] as String;
   }
 
   /// Clears the overriden device metrics.
@@ -744,7 +744,7 @@ class PageApi {
     assert(const ['accept', 'cancel', 'fallback'].contains(action));
     await _client.send('Page.handleFileChooser', {
       'action': action,
-      if (files != null) 'files': files.toList(),
+      if (files != null) 'files': [...files],
     });
   }
 }
@@ -757,17 +757,18 @@ class FrameAttachedEvent {
   final FrameId parentFrameId;
 
   /// JavaScript stack trace of when frame was attached, only set if frame initiated from script.
-  final runtime.StackTrace stack;
+  final runtime.StackTraceData stack;
 
   FrameAttachedEvent(
       {@required this.frameId, @required this.parentFrameId, this.stack});
 
   factory FrameAttachedEvent.fromJson(Map<String, dynamic> json) {
     return FrameAttachedEvent(
-      frameId: FrameId.fromJson(json['frameId']),
-      parentFrameId: FrameId.fromJson(json['parentFrameId']),
+      frameId: FrameId.fromJson(json['frameId'] as String),
+      parentFrameId: FrameId.fromJson(json['parentFrameId'] as String),
       stack: json.containsKey('stack')
-          ? runtime.StackTrace.fromJson(json['stack'])
+          ? runtime.StackTraceData.fromJson(
+              json['stack'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -788,9 +789,9 @@ class FrameRequestedNavigationEvent {
 
   factory FrameRequestedNavigationEvent.fromJson(Map<String, dynamic> json) {
     return FrameRequestedNavigationEvent(
-      frameId: FrameId.fromJson(json['frameId']),
-      reason: ClientNavigationReason.fromJson(json['reason']),
-      url: json['url'],
+      frameId: FrameId.fromJson(json['frameId'] as String),
+      reason: ClientNavigationReason.fromJson(json['reason'] as String),
+      url: json['url'] as String,
     );
   }
 }
@@ -817,10 +818,11 @@ class FrameScheduledNavigationEvent {
 
   factory FrameScheduledNavigationEvent.fromJson(Map<String, dynamic> json) {
     return FrameScheduledNavigationEvent(
-      frameId: FrameId.fromJson(json['frameId']),
-      delay: json['delay'],
-      reason: FrameScheduledNavigationEventReason.fromJson(json['reason']),
-      url: json['url'],
+      frameId: FrameId.fromJson(json['frameId'] as String),
+      delay: json['delay'] as num,
+      reason: FrameScheduledNavigationEventReason.fromJson(
+          json['reason'] as String),
+      url: json['url'] as String,
     );
   }
 }
@@ -836,8 +838,8 @@ class DownloadWillBeginEvent {
 
   factory DownloadWillBeginEvent.fromJson(Map<String, dynamic> json) {
     return DownloadWillBeginEvent(
-      frameId: FrameId.fromJson(json['frameId']),
-      url: json['url'],
+      frameId: FrameId.fromJson(json['frameId'] as String),
+      url: json['url'] as String,
     );
   }
 }
@@ -854,8 +856,8 @@ class JavascriptDialogClosedEvent {
 
   factory JavascriptDialogClosedEvent.fromJson(Map<String, dynamic> json) {
     return JavascriptDialogClosedEvent(
-      result: json['result'],
-      userInput: json['userInput'],
+      result: json['result'] as bool,
+      userInput: json['userInput'] as String,
     );
   }
 }
@@ -887,12 +889,13 @@ class JavascriptDialogOpeningEvent {
 
   factory JavascriptDialogOpeningEvent.fromJson(Map<String, dynamic> json) {
     return JavascriptDialogOpeningEvent(
-      url: json['url'],
-      message: json['message'],
-      type: DialogType.fromJson(json['type']),
-      hasBrowserHandler: json['hasBrowserHandler'],
-      defaultPrompt:
-          json.containsKey('defaultPrompt') ? json['defaultPrompt'] : null,
+      url: json['url'] as String,
+      message: json['message'] as String,
+      type: DialogType.fromJson(json['type'] as String),
+      hasBrowserHandler: json['hasBrowserHandler'] as bool,
+      defaultPrompt: json.containsKey('defaultPrompt')
+          ? json['defaultPrompt'] as String
+          : null,
     );
   }
 }
@@ -916,10 +919,10 @@ class LifecycleEventEvent {
 
   factory LifecycleEventEvent.fromJson(Map<String, dynamic> json) {
     return LifecycleEventEvent(
-      frameId: FrameId.fromJson(json['frameId']),
-      loaderId: network.LoaderId.fromJson(json['loaderId']),
-      name: json['name'],
-      timestamp: network.MonotonicTime.fromJson(json['timestamp']),
+      frameId: FrameId.fromJson(json['frameId'] as String),
+      loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
+      name: json['name'] as String,
+      timestamp: network.MonotonicTime.fromJson(json['timestamp'] as num),
     );
   }
 }
@@ -935,8 +938,8 @@ class NavigatedWithinDocumentEvent {
 
   factory NavigatedWithinDocumentEvent.fromJson(Map<String, dynamic> json) {
     return NavigatedWithinDocumentEvent(
-      frameId: FrameId.fromJson(json['frameId']),
-      url: json['url'],
+      frameId: FrameId.fromJson(json['frameId'] as String),
+      url: json['url'] as String,
     );
   }
 }
@@ -956,9 +959,10 @@ class ScreencastFrameEvent {
 
   factory ScreencastFrameEvent.fromJson(Map<String, dynamic> json) {
     return ScreencastFrameEvent(
-      data: json['data'],
-      metadata: ScreencastFrameMetadata.fromJson(json['metadata']),
-      sessionId: json['sessionId'],
+      data: json['data'] as String,
+      metadata: ScreencastFrameMetadata.fromJson(
+          json['metadata'] as Map<String, dynamic>),
+      sessionId: json['sessionId'] as int,
     );
   }
 }
@@ -984,11 +988,11 @@ class WindowOpenEvent {
 
   factory WindowOpenEvent.fromJson(Map<String, dynamic> json) {
     return WindowOpenEvent(
-      url: json['url'],
-      windowName: json['windowName'],
+      url: json['url'] as String,
+      windowName: json['windowName'] as String,
       windowFeatures:
           (json['windowFeatures'] as List).map((e) => e as String).toList(),
-      userGesture: json['userGesture'],
+      userGesture: json['userGesture'] as bool,
     );
   }
 }
@@ -1003,8 +1007,8 @@ class CompilationCacheProducedEvent {
 
   factory CompilationCacheProducedEvent.fromJson(Map<String, dynamic> json) {
     return CompilationCacheProducedEvent(
-      url: json['url'],
-      data: json['data'],
+      url: json['url'] as String,
+      data: json['data'] as String,
     );
   }
 }
@@ -1022,11 +1026,11 @@ class GetAppManifestResult {
 
   factory GetAppManifestResult.fromJson(Map<String, dynamic> json) {
     return GetAppManifestResult(
-      url: json['url'],
+      url: json['url'] as String,
       errors: (json['errors'] as List)
-          .map((e) => AppManifestError.fromJson(e))
+          .map((e) => AppManifestError.fromJson(e as Map<String, dynamic>))
           .toList(),
-      data: json.containsKey('data') ? json['data'] : null,
+      data: json.containsKey('data') ? json['data'] as String : null,
     );
   }
 }
@@ -1048,9 +1052,12 @@ class GetLayoutMetricsResult {
 
   factory GetLayoutMetricsResult.fromJson(Map<String, dynamic> json) {
     return GetLayoutMetricsResult(
-      layoutViewport: LayoutViewport.fromJson(json['layoutViewport']),
-      visualViewport: VisualViewport.fromJson(json['visualViewport']),
-      contentSize: dom.Rect.fromJson(json['contentSize']),
+      layoutViewport: LayoutViewport.fromJson(
+          json['layoutViewport'] as Map<String, dynamic>),
+      visualViewport: VisualViewport.fromJson(
+          json['visualViewport'] as Map<String, dynamic>),
+      contentSize:
+          dom.Rect.fromJson(json['contentSize'] as Map<String, dynamic>),
     );
   }
 }
@@ -1067,9 +1074,9 @@ class GetNavigationHistoryResult {
 
   factory GetNavigationHistoryResult.fromJson(Map<String, dynamic> json) {
     return GetNavigationHistoryResult(
-      currentIndex: json['currentIndex'],
+      currentIndex: json['currentIndex'] as int,
       entries: (json['entries'] as List)
-          .map((e) => NavigationEntry.fromJson(e))
+          .map((e) => NavigationEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -1087,8 +1094,8 @@ class GetResourceContentResult {
 
   factory GetResourceContentResult.fromJson(Map<String, dynamic> json) {
     return GetResourceContentResult(
-      content: json['content'],
-      base64Encoded: json['base64Encoded'],
+      content: json['content'] as String,
+      base64Encoded: json['base64Encoded'] as bool,
     );
   }
 }
@@ -1107,11 +1114,12 @@ class NavigateResult {
 
   factory NavigateResult.fromJson(Map<String, dynamic> json) {
     return NavigateResult(
-      frameId: FrameId.fromJson(json['frameId']),
+      frameId: FrameId.fromJson(json['frameId'] as String),
       loaderId: json.containsKey('loaderId')
-          ? network.LoaderId.fromJson(json['loaderId'])
+          ? network.LoaderId.fromJson(json['loaderId'] as String)
           : null,
-      errorText: json.containsKey('errorText') ? json['errorText'] : null,
+      errorText:
+          json.containsKey('errorText') ? json['errorText'] as String : null,
     );
   }
 }
@@ -1127,9 +1135,9 @@ class PrintToPDFResult {
 
   factory PrintToPDFResult.fromJson(Map<String, dynamic> json) {
     return PrintToPDFResult(
-      data: json['data'],
+      data: json['data'] as String,
       stream: json.containsKey('stream')
-          ? io.StreamHandle.fromJson(json['stream'])
+          ? io.StreamHandle.fromJson(json['stream'] as String)
           : null,
     );
   }
@@ -1198,16 +1206,20 @@ class FrameInfo {
 
   factory FrameInfo.fromJson(Map<String, dynamic> json) {
     return FrameInfo(
-      id: FrameId.fromJson(json['id']),
-      parentId: json.containsKey('parentId') ? json['parentId'] : null,
-      loaderId: network.LoaderId.fromJson(json['loaderId']),
-      name: json.containsKey('name') ? json['name'] : null,
-      url: json['url'],
-      urlFragment: json.containsKey('urlFragment') ? json['urlFragment'] : null,
-      securityOrigin: json['securityOrigin'],
-      mimeType: json['mimeType'],
-      unreachableUrl:
-          json.containsKey('unreachableUrl') ? json['unreachableUrl'] : null,
+      id: FrameId.fromJson(json['id'] as String),
+      parentId:
+          json.containsKey('parentId') ? json['parentId'] as String : null,
+      loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
+      name: json.containsKey('name') ? json['name'] as String : null,
+      url: json['url'] as String,
+      urlFragment: json.containsKey('urlFragment')
+          ? json['urlFragment'] as String
+          : null,
+      securityOrigin: json['securityOrigin'] as String,
+      mimeType: json['mimeType'] as String,
+      unreachableUrl: json.containsKey('unreachableUrl')
+          ? json['unreachableUrl'] as String
+          : null,
     );
   }
 
@@ -1260,15 +1272,16 @@ class FrameResource {
 
   factory FrameResource.fromJson(Map<String, dynamic> json) {
     return FrameResource(
-      url: json['url'],
-      type: network.ResourceType.fromJson(json['type']),
-      mimeType: json['mimeType'],
+      url: json['url'] as String,
+      type: network.ResourceType.fromJson(json['type'] as String),
+      mimeType: json['mimeType'] as String,
       lastModified: json.containsKey('lastModified')
-          ? network.TimeSinceEpoch.fromJson(json['lastModified'])
+          ? network.TimeSinceEpoch.fromJson(json['lastModified'] as num)
           : null,
-      contentSize: json.containsKey('contentSize') ? json['contentSize'] : null,
-      failed: json.containsKey('failed') ? json['failed'] : null,
-      canceled: json.containsKey('canceled') ? json['canceled'] : null,
+      contentSize:
+          json.containsKey('contentSize') ? json['contentSize'] as num : null,
+      failed: json.containsKey('failed') ? json['failed'] as bool : null,
+      canceled: json.containsKey('canceled') ? json['canceled'] as bool : null,
     );
   }
 
@@ -1301,14 +1314,14 @@ class FrameResourceTree {
 
   factory FrameResourceTree.fromJson(Map<String, dynamic> json) {
     return FrameResourceTree(
-      frame: FrameInfo.fromJson(json['frame']),
+      frame: FrameInfo.fromJson(json['frame'] as Map<String, dynamic>),
       childFrames: json.containsKey('childFrames')
           ? (json['childFrames'] as List)
-              .map((e) => FrameResourceTree.fromJson(e))
+              .map((e) => FrameResourceTree.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       resources: (json['resources'] as List)
-          .map((e) => FrameResource.fromJson(e))
+          .map((e) => FrameResource.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -1335,10 +1348,10 @@ class FrameTree {
 
   factory FrameTree.fromJson(Map<String, dynamic> json) {
     return FrameTree(
-      frame: FrameInfo.fromJson(json['frame']),
+      frame: FrameInfo.fromJson(json['frame'] as Map<String, dynamic>),
       childFrames: json.containsKey('childFrames')
           ? (json['childFrames'] as List)
-              .map((e) => FrameTree.fromJson(e))
+              .map((e) => FrameTree.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
     );
@@ -1450,11 +1463,11 @@ class NavigationEntry {
 
   factory NavigationEntry.fromJson(Map<String, dynamic> json) {
     return NavigationEntry(
-      id: json['id'],
-      url: json['url'],
-      userTypedURL: json['userTypedURL'],
-      title: json['title'],
-      transitionType: TransitionType.fromJson(json['transitionType']),
+      id: json['id'] as int,
+      url: json['url'] as String,
+      userTypedURL: json['userTypedURL'] as String,
+      title: json['title'] as String,
+      transitionType: TransitionType.fromJson(json['transitionType'] as String),
     );
   }
 
@@ -1503,14 +1516,14 @@ class ScreencastFrameMetadata {
 
   factory ScreencastFrameMetadata.fromJson(Map<String, dynamic> json) {
     return ScreencastFrameMetadata(
-      offsetTop: json['offsetTop'],
-      pageScaleFactor: json['pageScaleFactor'],
-      deviceWidth: json['deviceWidth'],
-      deviceHeight: json['deviceHeight'],
-      scrollOffsetX: json['scrollOffsetX'],
-      scrollOffsetY: json['scrollOffsetY'],
+      offsetTop: json['offsetTop'] as num,
+      pageScaleFactor: json['pageScaleFactor'] as num,
+      deviceWidth: json['deviceWidth'] as num,
+      deviceHeight: json['deviceHeight'] as num,
+      scrollOffsetX: json['scrollOffsetX'] as num,
+      scrollOffsetY: json['scrollOffsetY'] as num,
       timestamp: json.containsKey('timestamp')
-          ? network.TimeSinceEpoch.fromJson(json['timestamp'])
+          ? network.TimeSinceEpoch.fromJson(json['timestamp'] as num)
           : null,
     );
   }
@@ -1582,10 +1595,10 @@ class AppManifestError {
 
   factory AppManifestError.fromJson(Map<String, dynamic> json) {
     return AppManifestError(
-      message: json['message'],
-      critical: json['critical'],
-      line: json['line'],
-      column: json['column'],
+      message: json['message'] as String,
+      critical: json['critical'] as int,
+      line: json['line'] as int,
+      column: json['column'] as int,
     );
   }
 
@@ -1621,10 +1634,10 @@ class LayoutViewport {
 
   factory LayoutViewport.fromJson(Map<String, dynamic> json) {
     return LayoutViewport(
-      pageX: json['pageX'],
-      pageY: json['pageY'],
-      clientWidth: json['clientWidth'],
-      clientHeight: json['clientHeight'],
+      pageX: json['pageX'] as int,
+      pageY: json['pageY'] as int,
+      clientWidth: json['clientWidth'] as int,
+      clientHeight: json['clientHeight'] as int,
     );
   }
 
@@ -1676,14 +1689,14 @@ class VisualViewport {
 
   factory VisualViewport.fromJson(Map<String, dynamic> json) {
     return VisualViewport(
-      offsetX: json['offsetX'],
-      offsetY: json['offsetY'],
-      pageX: json['pageX'],
-      pageY: json['pageY'],
-      clientWidth: json['clientWidth'],
-      clientHeight: json['clientHeight'],
-      scale: json['scale'],
-      zoom: json.containsKey('zoom') ? json['zoom'] : null,
+      offsetX: json['offsetX'] as num,
+      offsetY: json['offsetY'] as num,
+      pageX: json['pageX'] as num,
+      pageY: json['pageY'] as num,
+      clientWidth: json['clientWidth'] as num,
+      clientHeight: json['clientHeight'] as num,
+      scale: json['scale'] as num,
+      zoom: json.containsKey('zoom') ? json['zoom'] as num : null,
     );
   }
 
@@ -1727,11 +1740,11 @@ class Viewport {
 
   factory Viewport.fromJson(Map<String, dynamic> json) {
     return Viewport(
-      x: json['x'],
-      y: json['y'],
-      width: json['width'],
-      height: json['height'],
-      scale: json['scale'],
+      x: json['x'] as num,
+      y: json['y'] as num,
+      width: json['width'] as num,
+      height: json['height'] as num,
+      scale: json['scale'] as num,
     );
   }
 
@@ -1780,13 +1793,16 @@ class FontFamilies {
 
   factory FontFamilies.fromJson(Map<String, dynamic> json) {
     return FontFamilies(
-      standard: json.containsKey('standard') ? json['standard'] : null,
-      fixed: json.containsKey('fixed') ? json['fixed'] : null,
-      serif: json.containsKey('serif') ? json['serif'] : null,
-      sansSerif: json.containsKey('sansSerif') ? json['sansSerif'] : null,
-      cursive: json.containsKey('cursive') ? json['cursive'] : null,
-      fantasy: json.containsKey('fantasy') ? json['fantasy'] : null,
-      pictograph: json.containsKey('pictograph') ? json['pictograph'] : null,
+      standard:
+          json.containsKey('standard') ? json['standard'] as String : null,
+      fixed: json.containsKey('fixed') ? json['fixed'] as String : null,
+      serif: json.containsKey('serif') ? json['serif'] as String : null,
+      sansSerif:
+          json.containsKey('sansSerif') ? json['sansSerif'] as String : null,
+      cursive: json.containsKey('cursive') ? json['cursive'] as String : null,
+      fantasy: json.containsKey('fantasy') ? json['fantasy'] as String : null,
+      pictograph:
+          json.containsKey('pictograph') ? json['pictograph'] as String : null,
     );
   }
 
@@ -1815,8 +1831,8 @@ class FontSizes {
 
   factory FontSizes.fromJson(Map<String, dynamic> json) {
     return FontSizes(
-      standard: json.containsKey('standard') ? json['standard'] : null,
-      fixed: json.containsKey('fixed') ? json['fixed'] : null,
+      standard: json.containsKey('standard') ? json['standard'] as int : null,
+      fixed: json.containsKey('fixed') ? json['fixed'] as int : null,
     );
   }
 

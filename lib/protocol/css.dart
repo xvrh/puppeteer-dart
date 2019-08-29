@@ -95,7 +95,7 @@ class CSSApi {
       dom.NodeId nodeId, List<String> forcedPseudoClasses) async {
     await _client.send('CSS.forcePseudoState', {
       'nodeId': nodeId,
-      'forcedPseudoClasses': forcedPseudoClasses.toList(),
+      'forcedPseudoClasses': [...forcedPseudoClasses],
     });
   }
 
@@ -164,7 +164,7 @@ class CSSApi {
     var result = await _client.send('CSS.getStyleSheetText', {
       'styleSheetId': styleSheetId,
     });
-    return result['text'];
+    return result['text'] as String;
   }
 
   /// Find a rule with the given active property for the given node and set the new value for this
@@ -223,14 +223,14 @@ class CSSApi {
       'styleSheetId': styleSheetId,
       'text': text,
     });
-    return result['sourceMapURL'];
+    return result['sourceMapURL'] as String;
   }
 
   /// Applies specified style edits one after another in the given order.
   /// Returns: The resulting styles after modification.
   Future<List<CSSStyle>> setStyleTexts(List<StyleDeclarationEdit> edits) async {
     var result = await _client.send('CSS.setStyleTexts', {
-      'edits': edits.map((e) => e).toList(),
+      'edits': [...edits],
     });
     return (result['styles'] as List).map((e) => CSSStyle.fromJson(e)).toList();
   }
@@ -283,10 +283,10 @@ class GetBackgroundColorsResult {
           ? (json['backgroundColors'] as List).map((e) => e as String).toList()
           : null,
       computedFontSize: json.containsKey('computedFontSize')
-          ? json['computedFontSize']
+          ? json['computedFontSize'] as String
           : null,
       computedFontWeight: json.containsKey('computedFontWeight')
-          ? json['computedFontWeight']
+          ? json['computedFontWeight'] as String
           : null,
     );
   }
@@ -304,10 +304,10 @@ class GetInlineStylesForNodeResult {
   factory GetInlineStylesForNodeResult.fromJson(Map<String, dynamic> json) {
     return GetInlineStylesForNodeResult(
       inlineStyle: json.containsKey('inlineStyle')
-          ? CSSStyle.fromJson(json['inlineStyle'])
+          ? CSSStyle.fromJson(json['inlineStyle'] as Map<String, dynamic>)
           : null,
       attributesStyle: json.containsKey('attributesStyle')
-          ? CSSStyle.fromJson(json['attributesStyle'])
+          ? CSSStyle.fromJson(json['attributesStyle'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -343,29 +343,31 @@ class GetMatchedStylesForNodeResult {
   factory GetMatchedStylesForNodeResult.fromJson(Map<String, dynamic> json) {
     return GetMatchedStylesForNodeResult(
       inlineStyle: json.containsKey('inlineStyle')
-          ? CSSStyle.fromJson(json['inlineStyle'])
+          ? CSSStyle.fromJson(json['inlineStyle'] as Map<String, dynamic>)
           : null,
       attributesStyle: json.containsKey('attributesStyle')
-          ? CSSStyle.fromJson(json['attributesStyle'])
+          ? CSSStyle.fromJson(json['attributesStyle'] as Map<String, dynamic>)
           : null,
       matchedCSSRules: json.containsKey('matchedCSSRules')
           ? (json['matchedCSSRules'] as List)
-              .map((e) => RuleMatch.fromJson(e))
+              .map((e) => RuleMatch.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       pseudoElements: json.containsKey('pseudoElements')
           ? (json['pseudoElements'] as List)
-              .map((e) => PseudoElementMatches.fromJson(e))
+              .map((e) =>
+                  PseudoElementMatches.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       inherited: json.containsKey('inherited')
           ? (json['inherited'] as List)
-              .map((e) => InheritedStyleEntry.fromJson(e))
+              .map((e) =>
+                  InheritedStyleEntry.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       cssKeyframesRules: json.containsKey('cssKeyframesRules')
           ? (json['cssKeyframesRules'] as List)
-              .map((e) => CSSKeyframesRule.fromJson(e))
+              .map((e) => CSSKeyframesRule.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
     );
@@ -438,9 +440,10 @@ class PseudoElementMatches {
 
   factory PseudoElementMatches.fromJson(Map<String, dynamic> json) {
     return PseudoElementMatches(
-      pseudoType: dom.PseudoType.fromJson(json['pseudoType']),
-      matches:
-          (json['matches'] as List).map((e) => RuleMatch.fromJson(e)).toList(),
+      pseudoType: dom.PseudoType.fromJson(json['pseudoType'] as String),
+      matches: (json['matches'] as List)
+          .map((e) => RuleMatch.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -465,10 +468,10 @@ class InheritedStyleEntry {
   factory InheritedStyleEntry.fromJson(Map<String, dynamic> json) {
     return InheritedStyleEntry(
       inlineStyle: json.containsKey('inlineStyle')
-          ? CSSStyle.fromJson(json['inlineStyle'])
+          ? CSSStyle.fromJson(json['inlineStyle'] as Map<String, dynamic>)
           : null,
       matchedCSSRules: (json['matchedCSSRules'] as List)
-          .map((e) => RuleMatch.fromJson(e))
+          .map((e) => RuleMatch.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -493,7 +496,7 @@ class RuleMatch {
 
   factory RuleMatch.fromJson(Map<String, dynamic> json) {
     return RuleMatch(
-      rule: CSSRule.fromJson(json['rule']),
+      rule: CSSRule.fromJson(json['rule'] as Map<String, dynamic>),
       matchingSelectors:
           (json['matchingSelectors'] as List).map((e) => e as int).toList(),
     );
@@ -502,7 +505,7 @@ class RuleMatch {
   Map<String, dynamic> toJson() {
     return {
       'rule': rule.toJson(),
-      'matchingSelectors': matchingSelectors.toList(),
+      'matchingSelectors': [...matchingSelectors],
     };
   }
 }
@@ -519,9 +522,9 @@ class Value {
 
   factory Value.fromJson(Map<String, dynamic> json) {
     return Value(
-      text: json['text'],
+      text: json['text'] as String,
       range: json.containsKey('range')
-          ? SourceRange.fromJson(json['range'])
+          ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -546,9 +549,10 @@ class SelectorList {
 
   factory SelectorList.fromJson(Map<String, dynamic> json) {
     return SelectorList(
-      selectors:
-          (json['selectors'] as List).map((e) => Value.fromJson(e)).toList(),
-      text: json['text'],
+      selectors: (json['selectors'] as List)
+          .map((e) => Value.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      text: json['text'] as String,
     );
   }
 
@@ -619,23 +623,25 @@ class CSSStyleSheetHeader {
 
   factory CSSStyleSheetHeader.fromJson(Map<String, dynamic> json) {
     return CSSStyleSheetHeader(
-      styleSheetId: StyleSheetId.fromJson(json['styleSheetId']),
-      frameId: page.FrameId.fromJson(json['frameId']),
-      sourceURL: json['sourceURL'],
-      sourceMapURL:
-          json.containsKey('sourceMapURL') ? json['sourceMapURL'] : null,
-      origin: StyleSheetOrigin.fromJson(json['origin']),
-      title: json['title'],
-      ownerNode: json.containsKey('ownerNode')
-          ? dom.BackendNodeId.fromJson(json['ownerNode'])
+      styleSheetId: StyleSheetId.fromJson(json['styleSheetId'] as String),
+      frameId: page.FrameId.fromJson(json['frameId'] as String),
+      sourceURL: json['sourceURL'] as String,
+      sourceMapURL: json.containsKey('sourceMapURL')
+          ? json['sourceMapURL'] as String
           : null,
-      disabled: json['disabled'],
-      hasSourceURL:
-          json.containsKey('hasSourceURL') ? json['hasSourceURL'] : null,
-      isInline: json['isInline'],
-      startLine: json['startLine'],
-      startColumn: json['startColumn'],
-      length: json['length'],
+      origin: StyleSheetOrigin.fromJson(json['origin'] as String),
+      title: json['title'] as String,
+      ownerNode: json.containsKey('ownerNode')
+          ? dom.BackendNodeId.fromJson(json['ownerNode'] as int)
+          : null,
+      disabled: json['disabled'] as bool,
+      hasSourceURL: json.containsKey('hasSourceURL')
+          ? json['hasSourceURL'] as bool
+          : null,
+      isInline: json['isInline'] as bool,
+      startLine: json['startLine'] as num,
+      startColumn: json['startColumn'] as num,
+      length: json['length'] as num,
     );
   }
 
@@ -687,13 +693,16 @@ class CSSRule {
   factory CSSRule.fromJson(Map<String, dynamic> json) {
     return CSSRule(
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'])
+          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
-      selectorList: SelectorList.fromJson(json['selectorList']),
-      origin: StyleSheetOrigin.fromJson(json['origin']),
-      style: CSSStyle.fromJson(json['style']),
+      selectorList:
+          SelectorList.fromJson(json['selectorList'] as Map<String, dynamic>),
+      origin: StyleSheetOrigin.fromJson(json['origin'] as String),
+      style: CSSStyle.fromJson(json['style'] as Map<String, dynamic>),
       media: json.containsKey('media')
-          ? (json['media'] as List).map((e) => CSSMedia.fromJson(e)).toList()
+          ? (json['media'] as List)
+              .map((e) => CSSMedia.fromJson(e as Map<String, dynamic>))
+              .toList()
           : null,
     );
   }
@@ -732,10 +741,10 @@ class RuleUsage {
 
   factory RuleUsage.fromJson(Map<String, dynamic> json) {
     return RuleUsage(
-      styleSheetId: StyleSheetId.fromJson(json['styleSheetId']),
-      startOffset: json['startOffset'],
-      endOffset: json['endOffset'],
-      used: json['used'],
+      styleSheetId: StyleSheetId.fromJson(json['styleSheetId'] as String),
+      startOffset: json['startOffset'] as num,
+      endOffset: json['endOffset'] as num,
+      used: json['used'] as bool,
     );
   }
 
@@ -771,10 +780,10 @@ class SourceRange {
 
   factory SourceRange.fromJson(Map<String, dynamic> json) {
     return SourceRange(
-      startLine: json['startLine'],
-      startColumn: json['startColumn'],
-      endLine: json['endLine'],
-      endColumn: json['endColumn'],
+      startLine: json['startLine'] as int,
+      startColumn: json['startColumn'] as int,
+      endLine: json['endLine'] as int,
+      endColumn: json['endColumn'] as int,
     );
   }
 
@@ -802,9 +811,10 @@ class ShorthandEntry {
 
   factory ShorthandEntry.fromJson(Map<String, dynamic> json) {
     return ShorthandEntry(
-      name: json['name'],
-      value: json['value'],
-      important: json.containsKey('important') ? json['important'] : null,
+      name: json['name'] as String,
+      value: json['value'] as String,
+      important:
+          json.containsKey('important') ? json['important'] as bool : null,
     );
   }
 
@@ -828,8 +838,8 @@ class CSSComputedStyleProperty {
 
   factory CSSComputedStyleProperty.fromJson(Map<String, dynamic> json) {
     return CSSComputedStyleProperty(
-      name: json['name'],
-      value: json['value'],
+      name: json['name'] as String,
+      value: json['value'] as String,
     );
   }
 
@@ -869,17 +879,17 @@ class CSSStyle {
   factory CSSStyle.fromJson(Map<String, dynamic> json) {
     return CSSStyle(
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'])
+          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
       cssProperties: (json['cssProperties'] as List)
-          .map((e) => CSSProperty.fromJson(e))
+          .map((e) => CSSProperty.fromJson(e as Map<String, dynamic>))
           .toList(),
       shorthandEntries: (json['shorthandEntries'] as List)
-          .map((e) => ShorthandEntry.fromJson(e))
+          .map((e) => ShorthandEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
-      cssText: json.containsKey('cssText') ? json['cssText'] : null,
+      cssText: json.containsKey('cssText') ? json['cssText'] as String : null,
       range: json.containsKey('range')
-          ? SourceRange.fromJson(json['range'])
+          ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -933,15 +943,16 @@ class CSSProperty {
 
   factory CSSProperty.fromJson(Map<String, dynamic> json) {
     return CSSProperty(
-      name: json['name'],
-      value: json['value'],
-      important: json.containsKey('important') ? json['important'] : null,
-      implicit: json.containsKey('implicit') ? json['implicit'] : null,
-      text: json.containsKey('text') ? json['text'] : null,
-      parsedOk: json.containsKey('parsedOk') ? json['parsedOk'] : null,
-      disabled: json.containsKey('disabled') ? json['disabled'] : null,
+      name: json['name'] as String,
+      value: json['value'] as String,
+      important:
+          json.containsKey('important') ? json['important'] as bool : null,
+      implicit: json.containsKey('implicit') ? json['implicit'] as bool : null,
+      text: json.containsKey('text') ? json['text'] as String : null,
+      parsedOk: json.containsKey('parsedOk') ? json['parsedOk'] as bool : null,
+      disabled: json.containsKey('disabled') ? json['disabled'] as bool : null,
       range: json.containsKey('range')
-          ? SourceRange.fromJson(json['range'])
+          ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -994,18 +1005,19 @@ class CSSMedia {
 
   factory CSSMedia.fromJson(Map<String, dynamic> json) {
     return CSSMedia(
-      text: json['text'],
-      source: CSSMediaSource.fromJson(json['source']),
-      sourceURL: json.containsKey('sourceURL') ? json['sourceURL'] : null,
+      text: json['text'] as String,
+      source: CSSMediaSource.fromJson(json['source'] as String),
+      sourceURL:
+          json.containsKey('sourceURL') ? json['sourceURL'] as String : null,
       range: json.containsKey('range')
-          ? SourceRange.fromJson(json['range'])
+          ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
           : null,
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'])
+          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
       mediaList: json.containsKey('mediaList')
           ? (json['mediaList'] as List)
-              .map((e) => MediaQuery.fromJson(e))
+              .map((e) => MediaQuery.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
     );
@@ -1068,9 +1080,9 @@ class MediaQuery {
   factory MediaQuery.fromJson(Map<String, dynamic> json) {
     return MediaQuery(
       expressions: (json['expressions'] as List)
-          .map((e) => MediaQueryExpression.fromJson(e))
+          .map((e) => MediaQueryExpression.fromJson(e as Map<String, dynamic>))
           .toList(),
-      active: json['active'],
+      active: json['active'] as bool,
     );
   }
 
@@ -1108,14 +1120,15 @@ class MediaQueryExpression {
 
   factory MediaQueryExpression.fromJson(Map<String, dynamic> json) {
     return MediaQueryExpression(
-      value: json['value'],
-      unit: json['unit'],
-      feature: json['feature'],
+      value: json['value'] as num,
+      unit: json['unit'] as String,
+      feature: json['feature'] as String,
       valueRange: json.containsKey('valueRange')
-          ? SourceRange.fromJson(json['valueRange'])
+          ? SourceRange.fromJson(json['valueRange'] as Map<String, dynamic>)
           : null,
-      computedLength:
-          json.containsKey('computedLength') ? json['computedLength'] : null,
+      computedLength: json.containsKey('computedLength')
+          ? json['computedLength'] as num
+          : null,
     );
   }
 
@@ -1148,9 +1161,9 @@ class PlatformFontUsage {
 
   factory PlatformFontUsage.fromJson(Map<String, dynamic> json) {
     return PlatformFontUsage(
-      familyName: json['familyName'],
-      isCustomFont: json['isCustomFont'],
-      glyphCount: json['glyphCount'],
+      familyName: json['familyName'] as String,
+      isCustomFont: json['isCustomFont'] as bool,
+      glyphCount: json['glyphCount'] as num,
     );
   }
 
@@ -1201,14 +1214,14 @@ class FontFace {
 
   factory FontFace.fromJson(Map<String, dynamic> json) {
     return FontFace(
-      fontFamily: json['fontFamily'],
-      fontStyle: json['fontStyle'],
-      fontVariant: json['fontVariant'],
-      fontWeight: json['fontWeight'],
-      fontStretch: json['fontStretch'],
-      unicodeRange: json['unicodeRange'],
-      src: json['src'],
-      platformFontFamily: json['platformFontFamily'],
+      fontFamily: json['fontFamily'] as String,
+      fontStyle: json['fontStyle'] as String,
+      fontVariant: json['fontVariant'] as String,
+      fontWeight: json['fontWeight'] as String,
+      fontStretch: json['fontStretch'] as String,
+      unicodeRange: json['unicodeRange'] as String,
+      src: json['src'] as String,
+      platformFontFamily: json['platformFontFamily'] as String,
     );
   }
 
@@ -1238,9 +1251,10 @@ class CSSKeyframesRule {
 
   factory CSSKeyframesRule.fromJson(Map<String, dynamic> json) {
     return CSSKeyframesRule(
-      animationName: Value.fromJson(json['animationName']),
+      animationName:
+          Value.fromJson(json['animationName'] as Map<String, dynamic>),
       keyframes: (json['keyframes'] as List)
-          .map((e) => CSSKeyframeRule.fromJson(e))
+          .map((e) => CSSKeyframeRule.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -1277,11 +1291,11 @@ class CSSKeyframeRule {
   factory CSSKeyframeRule.fromJson(Map<String, dynamic> json) {
     return CSSKeyframeRule(
       styleSheetId: json.containsKey('styleSheetId')
-          ? StyleSheetId.fromJson(json['styleSheetId'])
+          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
-      origin: StyleSheetOrigin.fromJson(json['origin']),
-      keyText: Value.fromJson(json['keyText']),
-      style: CSSStyle.fromJson(json['style']),
+      origin: StyleSheetOrigin.fromJson(json['origin'] as String),
+      keyText: Value.fromJson(json['keyText'] as Map<String, dynamic>),
+      style: CSSStyle.fromJson(json['style'] as Map<String, dynamic>),
     );
   }
 
@@ -1311,9 +1325,9 @@ class StyleDeclarationEdit {
 
   factory StyleDeclarationEdit.fromJson(Map<String, dynamic> json) {
     return StyleDeclarationEdit(
-      styleSheetId: StyleSheetId.fromJson(json['styleSheetId']),
-      range: SourceRange.fromJson(json['range']),
-      text: json['text'],
+      styleSheetId: StyleSheetId.fromJson(json['styleSheetId'] as String),
+      range: SourceRange.fromJson(json['range'] as Map<String, dynamic>),
+      text: json['text'] as String,
     );
   }
 

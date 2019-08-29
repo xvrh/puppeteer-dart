@@ -123,10 +123,11 @@ class ConsoleProfileFinishedEvent {
 
   factory ConsoleProfileFinishedEvent.fromJson(Map<String, dynamic> json) {
     return ConsoleProfileFinishedEvent(
-      id: json['id'],
-      location: debugger.Location.fromJson(json['location']),
-      profile: Profile.fromJson(json['profile']),
-      title: json.containsKey('title') ? json['title'] : null,
+      id: json['id'] as String,
+      location:
+          debugger.Location.fromJson(json['location'] as Map<String, dynamic>),
+      profile: Profile.fromJson(json['profile'] as Map<String, dynamic>),
+      title: json.containsKey('title') ? json['title'] as String : null,
     );
   }
 }
@@ -145,9 +146,10 @@ class ConsoleProfileStartedEvent {
 
   factory ConsoleProfileStartedEvent.fromJson(Map<String, dynamic> json) {
     return ConsoleProfileStartedEvent(
-      id: json['id'],
-      location: debugger.Location.fromJson(json['location']),
-      title: json.containsKey('title') ? json['title'] : null,
+      id: json['id'] as String,
+      location:
+          debugger.Location.fromJson(json['location'] as Map<String, dynamic>),
+      title: json.containsKey('title') ? json['title'] as String : null,
     );
   }
 }
@@ -183,16 +185,19 @@ class ProfileNode {
 
   factory ProfileNode.fromJson(Map<String, dynamic> json) {
     return ProfileNode(
-      id: json['id'],
-      callFrame: runtime.CallFrame.fromJson(json['callFrame']),
-      hitCount: json.containsKey('hitCount') ? json['hitCount'] : null,
+      id: json['id'] as int,
+      callFrame:
+          runtime.CallFrame.fromJson(json['callFrame'] as Map<String, dynamic>),
+      hitCount: json.containsKey('hitCount') ? json['hitCount'] as int : null,
       children: json.containsKey('children')
           ? (json['children'] as List).map((e) => e as int).toList()
           : null,
-      deoptReason: json.containsKey('deoptReason') ? json['deoptReason'] : null,
+      deoptReason: json.containsKey('deoptReason')
+          ? json['deoptReason'] as String
+          : null,
       positionTicks: json.containsKey('positionTicks')
           ? (json['positionTicks'] as List)
-              .map((e) => PositionTickInfo.fromJson(e))
+              .map((e) => PositionTickInfo.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
     );
@@ -203,7 +208,7 @@ class ProfileNode {
       'id': id,
       'callFrame': callFrame.toJson(),
       if (hitCount != null) 'hitCount': hitCount,
-      if (children != null) 'children': children.toList(),
+      if (children != null) 'children': [...children],
       if (deoptReason != null) 'deoptReason': deoptReason,
       if (positionTicks != null)
         'positionTicks': positionTicks.map((e) => e.toJson()).toList(),
@@ -238,10 +243,11 @@ class Profile {
 
   factory Profile.fromJson(Map<String, dynamic> json) {
     return Profile(
-      nodes:
-          (json['nodes'] as List).map((e) => ProfileNode.fromJson(e)).toList(),
-      startTime: json['startTime'],
-      endTime: json['endTime'],
+      nodes: (json['nodes'] as List)
+          .map((e) => ProfileNode.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      startTime: json['startTime'] as num,
+      endTime: json['endTime'] as num,
       samples: json.containsKey('samples')
           ? (json['samples'] as List).map((e) => e as int).toList()
           : null,
@@ -256,8 +262,8 @@ class Profile {
       'nodes': nodes.map((e) => e.toJson()).toList(),
       'startTime': startTime,
       'endTime': endTime,
-      if (samples != null) 'samples': samples.toList(),
-      if (timeDeltas != null) 'timeDeltas': timeDeltas.toList(),
+      if (samples != null) 'samples': [...samples],
+      if (timeDeltas != null) 'timeDeltas': [...timeDeltas],
     };
   }
 }
@@ -274,8 +280,8 @@ class PositionTickInfo {
 
   factory PositionTickInfo.fromJson(Map<String, dynamic> json) {
     return PositionTickInfo(
-      line: json['line'],
-      ticks: json['ticks'],
+      line: json['line'] as int,
+      ticks: json['ticks'] as int,
     );
   }
 
@@ -305,9 +311,9 @@ class CoverageRange {
 
   factory CoverageRange.fromJson(Map<String, dynamic> json) {
     return CoverageRange(
-      startOffset: json['startOffset'],
-      endOffset: json['endOffset'],
-      count: json['count'],
+      startOffset: json['startOffset'] as int,
+      endOffset: json['endOffset'] as int,
+      count: json['count'] as int,
     );
   }
 
@@ -338,11 +344,11 @@ class FunctionCoverage {
 
   factory FunctionCoverage.fromJson(Map<String, dynamic> json) {
     return FunctionCoverage(
-      functionName: json['functionName'],
+      functionName: json['functionName'] as String,
       ranges: (json['ranges'] as List)
-          .map((e) => CoverageRange.fromJson(e))
+          .map((e) => CoverageRange.fromJson(e as Map<String, dynamic>))
           .toList(),
-      isBlockCoverage: json['isBlockCoverage'],
+      isBlockCoverage: json['isBlockCoverage'] as bool,
     );
   }
 
@@ -371,10 +377,10 @@ class ScriptCoverage {
 
   factory ScriptCoverage.fromJson(Map<String, dynamic> json) {
     return ScriptCoverage(
-      scriptId: runtime.ScriptId.fromJson(json['scriptId']),
-      url: json['url'],
+      scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
+      url: json['url'] as String,
       functions: (json['functions'] as List)
-          .map((e) => FunctionCoverage.fromJson(e))
+          .map((e) => FunctionCoverage.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -397,7 +403,7 @@ class TypeObject {
 
   factory TypeObject.fromJson(Map<String, dynamic> json) {
     return TypeObject(
-      name: json['name'],
+      name: json['name'] as String,
     );
   }
 
@@ -420,9 +426,10 @@ class TypeProfileEntry {
 
   factory TypeProfileEntry.fromJson(Map<String, dynamic> json) {
     return TypeProfileEntry(
-      offset: json['offset'],
-      types:
-          (json['types'] as List).map((e) => TypeObject.fromJson(e)).toList(),
+      offset: json['offset'] as int,
+      types: (json['types'] as List)
+          .map((e) => TypeObject.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -450,10 +457,10 @@ class ScriptTypeProfile {
 
   factory ScriptTypeProfile.fromJson(Map<String, dynamic> json) {
     return ScriptTypeProfile(
-      scriptId: runtime.ScriptId.fromJson(json['scriptId']),
-      url: json['url'],
+      scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
+      url: json['url'] as String,
       entries: (json['entries'] as List)
-          .map((e) => TypeProfileEntry.fromJson(e))
+          .map((e) => TypeProfileEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }

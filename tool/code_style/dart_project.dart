@@ -66,12 +66,12 @@ class DartProject {
 
   String get absoluteRootDirectory => Directory(rootDirectory).absolute.path;
 
-  static _getPackageName(String projectRoot) {
+  static String _getPackageName(String projectRoot) {
     var pubspecContent =
         File(p.join(projectRoot, 'pubspec.yaml')).readAsStringSync();
     var loadedPubspec = loadYaml(pubspecContent);
 
-    return loadedPubspec['name'];
+    return loadedPubspec['name'] as String;
   }
 
   List<DartFile> getDartFiles() {

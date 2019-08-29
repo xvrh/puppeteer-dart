@@ -131,8 +131,8 @@ class LastSeenObjectIdEvent {
 
   factory LastSeenObjectIdEvent.fromJson(Map<String, dynamic> json) {
     return LastSeenObjectIdEvent(
-      lastSeenObjectId: json['lastSeenObjectId'],
-      timestamp: json['timestamp'],
+      lastSeenObjectId: json['lastSeenObjectId'] as int,
+      timestamp: json['timestamp'] as num,
     );
   }
 }
@@ -149,9 +149,9 @@ class ReportHeapSnapshotProgressEvent {
 
   factory ReportHeapSnapshotProgressEvent.fromJson(Map<String, dynamic> json) {
     return ReportHeapSnapshotProgressEvent(
-      done: json['done'],
-      total: json['total'],
-      finished: json.containsKey('finished') ? json['finished'] : null,
+      done: json['done'] as int,
+      total: json['total'] as int,
+      finished: json.containsKey('finished') ? json['finished'] as bool : null,
     );
   }
 }
@@ -200,11 +200,13 @@ class SamplingHeapProfileNode {
 
   factory SamplingHeapProfileNode.fromJson(Map<String, dynamic> json) {
     return SamplingHeapProfileNode(
-      callFrame: runtime.CallFrame.fromJson(json['callFrame']),
-      selfSize: json['selfSize'],
-      id: json['id'],
+      callFrame:
+          runtime.CallFrame.fromJson(json['callFrame'] as Map<String, dynamic>),
+      selfSize: json['selfSize'] as num,
+      id: json['id'] as int,
       children: (json['children'] as List)
-          .map((e) => SamplingHeapProfileNode.fromJson(e))
+          .map((e) =>
+              SamplingHeapProfileNode.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -236,9 +238,9 @@ class SamplingHeapProfileSample {
 
   factory SamplingHeapProfileSample.fromJson(Map<String, dynamic> json) {
     return SamplingHeapProfileSample(
-      size: json['size'],
-      nodeId: json['nodeId'],
-      ordinal: json['ordinal'],
+      size: json['size'] as num,
+      nodeId: json['nodeId'] as int,
+      ordinal: json['ordinal'] as num,
     );
   }
 
@@ -261,9 +263,11 @@ class SamplingHeapProfile {
 
   factory SamplingHeapProfile.fromJson(Map<String, dynamic> json) {
     return SamplingHeapProfile(
-      head: SamplingHeapProfileNode.fromJson(json['head']),
+      head: SamplingHeapProfileNode.fromJson(
+          json['head'] as Map<String, dynamic>),
       samples: (json['samples'] as List)
-          .map((e) => SamplingHeapProfileSample.fromJson(e))
+          .map((e) =>
+              SamplingHeapProfileSample.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }

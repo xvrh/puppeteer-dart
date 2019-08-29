@@ -184,21 +184,23 @@ class EventListener {
 
   factory EventListener.fromJson(Map<String, dynamic> json) {
     return EventListener(
-      type: json['type'],
-      useCapture: json['useCapture'],
-      passive: json['passive'],
-      once: json['once'],
-      scriptId: runtime.ScriptId.fromJson(json['scriptId']),
-      lineNumber: json['lineNumber'],
-      columnNumber: json['columnNumber'],
+      type: json['type'] as String,
+      useCapture: json['useCapture'] as bool,
+      passive: json['passive'] as bool,
+      once: json['once'] as bool,
+      scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
+      lineNumber: json['lineNumber'] as int,
+      columnNumber: json['columnNumber'] as int,
       handler: json.containsKey('handler')
-          ? runtime.RemoteObject.fromJson(json['handler'])
+          ? runtime.RemoteObject.fromJson(
+              json['handler'] as Map<String, dynamic>)
           : null,
       originalHandler: json.containsKey('originalHandler')
-          ? runtime.RemoteObject.fromJson(json['originalHandler'])
+          ? runtime.RemoteObject.fromJson(
+              json['originalHandler'] as Map<String, dynamic>)
           : null,
       backendNodeId: json.containsKey('backendNodeId')
-          ? dom.BackendNodeId.fromJson(json['backendNodeId'])
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
           : null,
     );
   }

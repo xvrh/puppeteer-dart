@@ -38,7 +38,7 @@ main() {
   for (Domain domain in domains) {
     List<ComplexType> types = domain.types;
     List<Command> commandsJson = domain.commands;
-    _DomainContext context = _DomainContext(domain);
+    _DomainContext context = _DomainContext(domain, domains);
 
     String fileName = '${_underscoreize(domain.name)}.dart';
 
@@ -282,7 +282,7 @@ class _Command {
       if (returns.length == 1) {
         Parameter returnParameter = returns.first;
         if (isRawType(returnTypeName)) {
-          sendCode += "return result['${returnParameter.name}'];";
+          sendCode += "return result['${returnParameter.name}'] as $returnTypeName;";
         } else if (returnParameter.type == 'array') {
           Parameter elementParameter = Parameter(
               name: 'e',
@@ -410,12 +410,14 @@ String _toJsonCode(Parameter parameter, {bool needsExplicitToJson = true}) {
   if (type != null && jsonTypes.contains(type)) {
     return name;
   } else if (type == 'array') {
-    if (parameter.items.ref != null) {
-      Parameter elementParameter = Parameter(
-          name: 'e', type: parameter.items.type, ref: parameter.items.ref);
-      return '$name.map((e) => ${_toJsonCode(elementParameter, needsExplicitToJson: needsExplicitToJson)}).toList()';
+    Parameter elementParameter = Parameter(
+        name: 'e', type: parameter.items.type, ref: parameter.items.ref);
+    String code =
+        '$name.map((e) => ${_toJsonCode(elementParameter, needsExplicitToJson: needsExplicitToJson)}).toList()';
+    if (code == '$name.map((e) => e).toList()') {
+      return '[...$name]';
     } else {
-      return '$name.toList()';
+      return code;
     }
   }
   if (needsExplicitToJson) {
@@ -503,7 +505,7 @@ class _InternalType {
       for (Parameter property in properties.where((p) => !p.deprecated)) {
         String propertyName = property.name;
         String instantiateCode =
-            _fromJsonCode(property, "json['$propertyName']");
+            _fromJsonCode(property, "json['$propertyName']", withAs: true);
         if (property.optional) {
           instantiateCode =
               "json.containsKey('$propertyName') ? $instantiateCode : null";
@@ -600,7 +602,21 @@ class _InternalType {
       return "($jsonParameter as List).map((e) => ${_fromJsonCode(elementParameter, 'e', withAs: true)}).toList()";
     }
     String typeName = _propertyTypeName(parameter);
-    return "$typeName.fromJson($jsonParameter)";
+    String cast = 'String';
+    if (parameter.enumValues != null) {
+      cast = 'String';
+    } else {
+      var complexType = context.findComplexType(parameter.ref);
+      if (complexType.enums != null) {
+        cast = 'String';
+      } else if (complexType.properties != null && complexType.properties.isNotEmpty) {
+        cast = 'Map<String, dynamic>';
+      } else {
+        var parameter = Parameter(name: 'value', type: complexType.type, items: complexType.items);
+        cast = _propertyTypeName(parameter);
+      }
+    }
+    return "$typeName.fromJson($jsonParameter as $cast)";
   }
 
   String get code => _code;
@@ -608,10 +624,27 @@ class _InternalType {
 
 class _DomainContext {
   final Domain domain;
+  final List<Domain> allDomains;
   final Set<String> dependencies = {};
   bool _useMetaPackage = false;
 
-  _DomainContext(this.domain);
+  _DomainContext(this.domain, this.allDomains);
+
+  ComplexType findComplexType(String type) {
+    String typeName;
+    Domain domain;
+    if (type.contains('.')) {
+      List<String> typeAndDomain = type.split('.');
+      String domainName = typeAndDomain[0];
+      domain = allDomains.singleWhere((d) => d.name == domainName);
+      typeName = typeAndDomain[1];
+    } else {
+      domain = this.domain;
+      typeName = type;
+    }
+    return domain.types.singleWhere((t) => t.id == typeName,
+        orElse: () => throw Exception('$type not found'));
+  }
 
   String getPropertyType(Typed parameter) {
     String type = parameter.type;
@@ -634,7 +667,7 @@ class _DomainContext {
     if (type == 'string') return 'String';
     if (type == 'boolean') return 'bool';
     if (type == 'any') return 'dynamic';
-    if (type == 'object') return 'Map';
+    if (type == 'object') return 'Map<String, dynamic>';
     if (type == 'array') {
       if (parameter is Parameter) {
         ListItems items = parameter.items;
@@ -658,8 +691,14 @@ class _DomainContext {
   }
 }
 
-bool isRawType(String type) =>
-    const ['int', 'num', 'String', 'bool', 'dynamic', 'Map'].contains(type);
+bool isRawType(String type) => const [
+      'int',
+      'num',
+      'String',
+      'bool',
+      'dynamic',
+      'Map<String, dynamic>'
+    ].contains(type);
 
 String toComment(String comment, {int indent = 0}) {
   if (comment != null && comment.isNotEmpty) {

@@ -35,7 +35,7 @@ class LogApi {
   /// [config] Configuration for violations.
   Future<void> startViolationsReport(List<ViolationSetting> config) async {
     await _client.send('Log.startViolationsReport', {
-      'config': config.map((e) => e).toList(),
+      'config': [...config],
     });
   }
 
@@ -66,7 +66,7 @@ class LogEntry {
   final int lineNumber;
 
   /// JavaScript stack trace.
-  final runtime.StackTrace stackTrace;
+  final runtime.StackTraceData stackTrace;
 
   /// Identifier of the network request associated with this entry.
   final network.RequestId networkRequestId;
@@ -91,22 +91,26 @@ class LogEntry {
 
   factory LogEntry.fromJson(Map<String, dynamic> json) {
     return LogEntry(
-      source: LogEntrySource.fromJson(json['source']),
-      level: LogEntryLevel.fromJson(json['level']),
-      text: json['text'],
-      timestamp: runtime.Timestamp.fromJson(json['timestamp']),
-      url: json.containsKey('url') ? json['url'] : null,
-      lineNumber: json.containsKey('lineNumber') ? json['lineNumber'] : null,
+      source: LogEntrySource.fromJson(json['source'] as String),
+      level: LogEntryLevel.fromJson(json['level'] as String),
+      text: json['text'] as String,
+      timestamp: runtime.Timestamp.fromJson(json['timestamp'] as num),
+      url: json.containsKey('url') ? json['url'] as String : null,
+      lineNumber:
+          json.containsKey('lineNumber') ? json['lineNumber'] as int : null,
       stackTrace: json.containsKey('stackTrace')
-          ? runtime.StackTrace.fromJson(json['stackTrace'])
+          ? runtime.StackTraceData.fromJson(
+              json['stackTrace'] as Map<String, dynamic>)
           : null,
       networkRequestId: json.containsKey('networkRequestId')
-          ? network.RequestId.fromJson(json['networkRequestId'])
+          ? network.RequestId.fromJson(json['networkRequestId'] as String)
           : null,
-      workerId: json.containsKey('workerId') ? json['workerId'] : null,
+      workerId:
+          json.containsKey('workerId') ? json['workerId'] as String : null,
       args: json.containsKey('args')
           ? (json['args'] as List)
-              .map((e) => runtime.RemoteObject.fromJson(e))
+              .map((e) =>
+                  runtime.RemoteObject.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
     );
@@ -221,8 +225,8 @@ class ViolationSetting {
 
   factory ViolationSetting.fromJson(Map<String, dynamic> json) {
     return ViolationSetting(
-      name: ViolationSettingName.fromJson(json['name']),
-      threshold: json['threshold'],
+      name: ViolationSettingName.fromJson(json['name'] as String),
+      threshold: json['threshold'] as num,
     );
   }
 

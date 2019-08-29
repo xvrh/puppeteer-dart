@@ -134,9 +134,9 @@ class RequestDataResult {
   factory RequestDataResult.fromJson(Map<String, dynamic> json) {
     return RequestDataResult(
       objectStoreDataEntries: (json['objectStoreDataEntries'] as List)
-          .map((e) => DataEntry.fromJson(e))
+          .map((e) => DataEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
-      hasMore: json['hasMore'],
+      hasMore: json['hasMore'] as bool,
     );
   }
 }
@@ -155,8 +155,8 @@ class GetMetadataResult {
 
   factory GetMetadataResult.fromJson(Map<String, dynamic> json) {
     return GetMetadataResult(
-      entriesCount: json['entriesCount'],
-      keyGeneratorValue: json['keyGeneratorValue'],
+      entriesCount: json['entriesCount'] as num,
+      keyGeneratorValue: json['keyGeneratorValue'] as num,
     );
   }
 }
@@ -180,10 +180,10 @@ class DatabaseWithObjectStores {
 
   factory DatabaseWithObjectStores.fromJson(Map<String, dynamic> json) {
     return DatabaseWithObjectStores(
-      name: json['name'],
-      version: json['version'],
+      name: json['name'] as String,
+      version: json['version'] as num,
       objectStores: (json['objectStores'] as List)
-          .map((e) => ObjectStore.fromJson(e))
+          .map((e) => ObjectStore.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -219,11 +219,11 @@ class ObjectStore {
 
   factory ObjectStore.fromJson(Map<String, dynamic> json) {
     return ObjectStore(
-      name: json['name'],
-      keyPath: KeyPath.fromJson(json['keyPath']),
-      autoIncrement: json['autoIncrement'],
+      name: json['name'] as String,
+      keyPath: KeyPath.fromJson(json['keyPath'] as Map<String, dynamic>),
+      autoIncrement: json['autoIncrement'] as bool,
       indexes: (json['indexes'] as List)
-          .map((e) => ObjectStoreIndex.fromJson(e))
+          .map((e) => ObjectStoreIndex.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -260,10 +260,10 @@ class ObjectStoreIndex {
 
   factory ObjectStoreIndex.fromJson(Map<String, dynamic> json) {
     return ObjectStoreIndex(
-      name: json['name'],
-      keyPath: KeyPath.fromJson(json['keyPath']),
-      unique: json['unique'],
-      multiEntry: json['multiEntry'],
+      name: json['name'] as String,
+      keyPath: KeyPath.fromJson(json['keyPath'] as Map<String, dynamic>),
+      unique: json['unique'] as bool,
+      multiEntry: json['multiEntry'] as bool,
     );
   }
 
@@ -298,12 +298,14 @@ class Key {
 
   factory Key.fromJson(Map<String, dynamic> json) {
     return Key(
-      type: KeyType.fromJson(json['type']),
-      number: json.containsKey('number') ? json['number'] : null,
-      string: json.containsKey('string') ? json['string'] : null,
-      date: json.containsKey('date') ? json['date'] : null,
+      type: KeyType.fromJson(json['type'] as String),
+      number: json.containsKey('number') ? json['number'] as num : null,
+      string: json.containsKey('string') ? json['string'] as String : null,
+      date: json.containsKey('date') ? json['date'] as num : null,
       array: json.containsKey('array')
-          ? (json['array'] as List).map((e) => Key.fromJson(e)).toList()
+          ? (json['array'] as List)
+              .map((e) => Key.fromJson(e as Map<String, dynamic>))
+              .toList()
           : null,
     );
   }
@@ -372,10 +374,14 @@ class KeyRange {
 
   factory KeyRange.fromJson(Map<String, dynamic> json) {
     return KeyRange(
-      lower: json.containsKey('lower') ? Key.fromJson(json['lower']) : null,
-      upper: json.containsKey('upper') ? Key.fromJson(json['upper']) : null,
-      lowerOpen: json['lowerOpen'],
-      upperOpen: json['upperOpen'],
+      lower: json.containsKey('lower')
+          ? Key.fromJson(json['lower'] as Map<String, dynamic>)
+          : null,
+      upper: json.containsKey('upper')
+          ? Key.fromJson(json['upper'] as Map<String, dynamic>)
+          : null,
+      lowerOpen: json['lowerOpen'] as bool,
+      upperOpen: json['upperOpen'] as bool,
     );
   }
 
@@ -405,9 +411,11 @@ class DataEntry {
 
   factory DataEntry.fromJson(Map<String, dynamic> json) {
     return DataEntry(
-      key: runtime.RemoteObject.fromJson(json['key']),
-      primaryKey: runtime.RemoteObject.fromJson(json['primaryKey']),
-      value: runtime.RemoteObject.fromJson(json['value']),
+      key: runtime.RemoteObject.fromJson(json['key'] as Map<String, dynamic>),
+      primaryKey: runtime.RemoteObject.fromJson(
+          json['primaryKey'] as Map<String, dynamic>),
+      value:
+          runtime.RemoteObject.fromJson(json['value'] as Map<String, dynamic>),
     );
   }
 
@@ -435,8 +443,8 @@ class KeyPath {
 
   factory KeyPath.fromJson(Map<String, dynamic> json) {
     return KeyPath(
-      type: KeyPathType.fromJson(json['type']),
-      string: json.containsKey('string') ? json['string'] : null,
+      type: KeyPathType.fromJson(json['type'] as String),
+      string: json.containsKey('string') ? json['string'] as String : null,
       array: json.containsKey('array')
           ? (json['array'] as List).map((e) => e as String).toList()
           : null,
@@ -447,7 +455,7 @@ class KeyPath {
     return {
       'type': type,
       if (string != null) 'string': string,
-      if (array != null) 'array': array.toList(),
+      if (array != null) 'array': [...array],
     };
   }
 }

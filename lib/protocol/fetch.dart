@@ -42,7 +42,7 @@ class FetchApi {
   Future<void> enable(
       {List<RequestPattern> patterns, bool handleAuthRequests}) async {
     await _client.send('Fetch.enable', {
-      if (patterns != null) 'patterns': patterns.map((e) => e).toList(),
+      if (patterns != null) 'patterns': [...patterns],
       if (handleAuthRequests != null) 'handleAuthRequests': handleAuthRequests,
     });
   }
@@ -71,7 +71,7 @@ class FetchApi {
     await _client.send('Fetch.fulfillRequest', {
       'requestId': requestId,
       'responseCode': responseCode,
-      'responseHeaders': responseHeaders.map((e) => e).toList(),
+      'responseHeaders': [...responseHeaders],
       if (body != null) 'body': body,
       if (responsePhrase != null) 'responsePhrase': responsePhrase,
     });
@@ -93,7 +93,7 @@ class FetchApi {
       if (url != null) 'url': url,
       if (method != null) 'method': method,
       if (postData != null) 'postData': postData,
-      if (headers != null) 'headers': headers.map((e) => e).toList(),
+      if (headers != null) 'headers': [...headers],
     });
   }
 
@@ -178,23 +178,25 @@ class RequestPausedEvent {
 
   factory RequestPausedEvent.fromJson(Map<String, dynamic> json) {
     return RequestPausedEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      request: network.RequestData.fromJson(json['request']),
-      frameId: page.FrameId.fromJson(json['frameId']),
-      resourceType: network.ResourceType.fromJson(json['resourceType']),
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      request:
+          network.RequestData.fromJson(json['request'] as Map<String, dynamic>),
+      frameId: page.FrameId.fromJson(json['frameId'] as String),
+      resourceType:
+          network.ResourceType.fromJson(json['resourceType'] as String),
       responseErrorReason: json.containsKey('responseErrorReason')
-          ? network.ErrorReason.fromJson(json['responseErrorReason'])
+          ? network.ErrorReason.fromJson(json['responseErrorReason'] as String)
           : null,
       responseStatusCode: json.containsKey('responseStatusCode')
-          ? json['responseStatusCode']
+          ? json['responseStatusCode'] as int
           : null,
       responseHeaders: json.containsKey('responseHeaders')
           ? (json['responseHeaders'] as List)
-              .map((e) => HeaderEntry.fromJson(e))
+              .map((e) => HeaderEntry.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       networkId: json.containsKey('networkId')
-          ? RequestId.fromJson(json['networkId'])
+          ? RequestId.fromJson(json['networkId'] as String)
           : null,
     );
   }
@@ -227,11 +229,14 @@ class AuthRequiredEvent {
 
   factory AuthRequiredEvent.fromJson(Map<String, dynamic> json) {
     return AuthRequiredEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      request: network.RequestData.fromJson(json['request']),
-      frameId: page.FrameId.fromJson(json['frameId']),
-      resourceType: network.ResourceType.fromJson(json['resourceType']),
-      authChallenge: AuthChallenge.fromJson(json['authChallenge']),
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      request:
+          network.RequestData.fromJson(json['request'] as Map<String, dynamic>),
+      frameId: page.FrameId.fromJson(json['frameId'] as String),
+      resourceType:
+          network.ResourceType.fromJson(json['resourceType'] as String),
+      authChallenge:
+          AuthChallenge.fromJson(json['authChallenge'] as Map<String, dynamic>),
     );
   }
 }
@@ -247,8 +252,8 @@ class GetResponseBodyResult {
 
   factory GetResponseBodyResult.fromJson(Map<String, dynamic> json) {
     return GetResponseBodyResult(
-      body: json['body'],
-      base64Encoded: json['base64Encoded'],
+      body: json['body'] as String,
+      base64Encoded: json['base64Encoded'] as bool,
     );
   }
 }
@@ -319,12 +324,13 @@ class RequestPattern {
 
   factory RequestPattern.fromJson(Map<String, dynamic> json) {
     return RequestPattern(
-      urlPattern: json.containsKey('urlPattern') ? json['urlPattern'] : null,
+      urlPattern:
+          json.containsKey('urlPattern') ? json['urlPattern'] as String : null,
       resourceType: json.containsKey('resourceType')
-          ? network.ResourceType.fromJson(json['resourceType'])
+          ? network.ResourceType.fromJson(json['resourceType'] as String)
           : null,
       requestStage: json.containsKey('requestStage')
-          ? RequestStage.fromJson(json['requestStage'])
+          ? RequestStage.fromJson(json['requestStage'] as String)
           : null,
     );
   }
@@ -348,8 +354,8 @@ class HeaderEntry {
 
   factory HeaderEntry.fromJson(Map<String, dynamic> json) {
     return HeaderEntry(
-      name: json['name'],
-      value: json['value'],
+      name: json['name'] as String,
+      value: json['value'] as String,
     );
   }
 
@@ -384,11 +390,11 @@ class AuthChallenge {
   factory AuthChallenge.fromJson(Map<String, dynamic> json) {
     return AuthChallenge(
       source: json.containsKey('source')
-          ? AuthChallengeSource.fromJson(json['source'])
+          ? AuthChallengeSource.fromJson(json['source'] as String)
           : null,
-      origin: json['origin'],
-      scheme: json['scheme'],
-      realm: json['realm'],
+      origin: json['origin'] as String,
+      scheme: json['scheme'] as String,
+      realm: json['realm'] as String,
     );
   }
 
@@ -449,9 +455,12 @@ class AuthChallengeResponse {
 
   factory AuthChallengeResponse.fromJson(Map<String, dynamic> json) {
     return AuthChallengeResponse(
-      response: AuthChallengeResponseResponse.fromJson(json['response']),
-      username: json.containsKey('username') ? json['username'] : null,
-      password: json.containsKey('password') ? json['password'] : null,
+      response:
+          AuthChallengeResponseResponse.fromJson(json['response'] as String),
+      username:
+          json.containsKey('username') ? json['username'] as String : null,
+      password:
+          json.containsKey('password') ? json['password'] as String : null,
     );
   }
 

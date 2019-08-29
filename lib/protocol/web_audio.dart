@@ -112,8 +112,8 @@ class AudioListenerWillBeDestroyedEvent {
   factory AudioListenerWillBeDestroyedEvent.fromJson(
       Map<String, dynamic> json) {
     return AudioListenerWillBeDestroyedEvent(
-      contextId: GraphObjectId.fromJson(json['contextId']),
-      listenerId: GraphObjectId.fromJson(json['listenerId']),
+      contextId: GraphObjectId.fromJson(json['contextId'] as String),
+      listenerId: GraphObjectId.fromJson(json['listenerId'] as String),
     );
   }
 }
@@ -128,8 +128,8 @@ class AudioNodeWillBeDestroyedEvent {
 
   factory AudioNodeWillBeDestroyedEvent.fromJson(Map<String, dynamic> json) {
     return AudioNodeWillBeDestroyedEvent(
-      contextId: GraphObjectId.fromJson(json['contextId']),
-      nodeId: GraphObjectId.fromJson(json['nodeId']),
+      contextId: GraphObjectId.fromJson(json['contextId'] as String),
+      nodeId: GraphObjectId.fromJson(json['nodeId'] as String),
     );
   }
 }
@@ -148,9 +148,9 @@ class AudioParamWillBeDestroyedEvent {
 
   factory AudioParamWillBeDestroyedEvent.fromJson(Map<String, dynamic> json) {
     return AudioParamWillBeDestroyedEvent(
-      contextId: GraphObjectId.fromJson(json['contextId']),
-      nodeId: GraphObjectId.fromJson(json['nodeId']),
-      paramId: GraphObjectId.fromJson(json['paramId']),
+      contextId: GraphObjectId.fromJson(json['contextId'] as String),
+      nodeId: GraphObjectId.fromJson(json['nodeId'] as String),
+      paramId: GraphObjectId.fromJson(json['paramId'] as String),
     );
   }
 }
@@ -175,14 +175,14 @@ class NodesConnectedEvent {
 
   factory NodesConnectedEvent.fromJson(Map<String, dynamic> json) {
     return NodesConnectedEvent(
-      contextId: GraphObjectId.fromJson(json['contextId']),
-      sourceId: GraphObjectId.fromJson(json['sourceId']),
-      destinationId: GraphObjectId.fromJson(json['destinationId']),
+      contextId: GraphObjectId.fromJson(json['contextId'] as String),
+      sourceId: GraphObjectId.fromJson(json['sourceId'] as String),
+      destinationId: GraphObjectId.fromJson(json['destinationId'] as String),
       sourceOutputIndex: json.containsKey('sourceOutputIndex')
-          ? json['sourceOutputIndex']
+          ? json['sourceOutputIndex'] as num
           : null,
       destinationInputIndex: json.containsKey('destinationInputIndex')
-          ? json['destinationInputIndex']
+          ? json['destinationInputIndex'] as num
           : null,
     );
   }
@@ -208,14 +208,14 @@ class NodesDisconnectedEvent {
 
   factory NodesDisconnectedEvent.fromJson(Map<String, dynamic> json) {
     return NodesDisconnectedEvent(
-      contextId: GraphObjectId.fromJson(json['contextId']),
-      sourceId: GraphObjectId.fromJson(json['sourceId']),
-      destinationId: GraphObjectId.fromJson(json['destinationId']),
+      contextId: GraphObjectId.fromJson(json['contextId'] as String),
+      sourceId: GraphObjectId.fromJson(json['sourceId'] as String),
+      destinationId: GraphObjectId.fromJson(json['destinationId'] as String),
       sourceOutputIndex: json.containsKey('sourceOutputIndex')
-          ? json['sourceOutputIndex']
+          ? json['sourceOutputIndex'] as num
           : null,
       destinationInputIndex: json.containsKey('destinationInputIndex')
-          ? json['destinationInputIndex']
+          ? json['destinationInputIndex'] as num
           : null,
     );
   }
@@ -238,11 +238,11 @@ class NodeParamConnectedEvent {
 
   factory NodeParamConnectedEvent.fromJson(Map<String, dynamic> json) {
     return NodeParamConnectedEvent(
-      contextId: GraphObjectId.fromJson(json['contextId']),
-      sourceId: GraphObjectId.fromJson(json['sourceId']),
-      destinationId: GraphObjectId.fromJson(json['destinationId']),
+      contextId: GraphObjectId.fromJson(json['contextId'] as String),
+      sourceId: GraphObjectId.fromJson(json['sourceId'] as String),
+      destinationId: GraphObjectId.fromJson(json['destinationId'] as String),
       sourceOutputIndex: json.containsKey('sourceOutputIndex')
-          ? json['sourceOutputIndex']
+          ? json['sourceOutputIndex'] as num
           : null,
     );
   }
@@ -265,11 +265,11 @@ class NodeParamDisconnectedEvent {
 
   factory NodeParamDisconnectedEvent.fromJson(Map<String, dynamic> json) {
     return NodeParamDisconnectedEvent(
-      contextId: GraphObjectId.fromJson(json['contextId']),
-      sourceId: GraphObjectId.fromJson(json['sourceId']),
-      destinationId: GraphObjectId.fromJson(json['destinationId']),
+      contextId: GraphObjectId.fromJson(json['contextId'] as String),
+      sourceId: GraphObjectId.fromJson(json['sourceId'] as String),
+      destinationId: GraphObjectId.fromJson(json['destinationId'] as String),
       sourceOutputIndex: json.containsKey('sourceOutputIndex')
-          ? json['sourceOutputIndex']
+          ? json['sourceOutputIndex'] as num
           : null,
     );
   }
@@ -507,10 +507,10 @@ class ContextRealtimeData {
 
   factory ContextRealtimeData.fromJson(Map<String, dynamic> json) {
     return ContextRealtimeData(
-      currentTime: json['currentTime'],
-      renderCapacity: json['renderCapacity'],
-      callbackIntervalMean: json['callbackIntervalMean'],
-      callbackIntervalVariance: json['callbackIntervalVariance'],
+      currentTime: json['currentTime'] as num,
+      renderCapacity: json['renderCapacity'] as num,
+      callbackIntervalMean: json['callbackIntervalMean'] as num,
+      callbackIntervalVariance: json['callbackIntervalVariance'] as num,
     );
   }
 
@@ -554,15 +554,16 @@ class BaseAudioContext {
 
   factory BaseAudioContext.fromJson(Map<String, dynamic> json) {
     return BaseAudioContext(
-      contextId: GraphObjectId.fromJson(json['contextId']),
-      contextType: ContextType.fromJson(json['contextType']),
-      contextState: ContextState.fromJson(json['contextState']),
+      contextId: GraphObjectId.fromJson(json['contextId'] as String),
+      contextType: ContextType.fromJson(json['contextType'] as String),
+      contextState: ContextState.fromJson(json['contextState'] as String),
       realtimeData: json.containsKey('realtimeData')
-          ? ContextRealtimeData.fromJson(json['realtimeData'])
+          ? ContextRealtimeData.fromJson(
+              json['realtimeData'] as Map<String, dynamic>)
           : null,
-      callbackBufferSize: json['callbackBufferSize'],
-      maxOutputChannelCount: json['maxOutputChannelCount'],
-      sampleRate: json['sampleRate'],
+      callbackBufferSize: json['callbackBufferSize'] as num,
+      maxOutputChannelCount: json['maxOutputChannelCount'] as num,
+      sampleRate: json['sampleRate'] as num,
     );
   }
 
@@ -589,8 +590,8 @@ class AudioListener {
 
   factory AudioListener.fromJson(Map<String, dynamic> json) {
     return AudioListener(
-      listenerId: GraphObjectId.fromJson(json['listenerId']),
-      contextId: GraphObjectId.fromJson(json['contextId']),
+      listenerId: GraphObjectId.fromJson(json['listenerId'] as String),
+      contextId: GraphObjectId.fromJson(json['contextId'] as String),
     );
   }
 
@@ -632,15 +633,16 @@ class AudioNode {
 
   factory AudioNode.fromJson(Map<String, dynamic> json) {
     return AudioNode(
-      nodeId: GraphObjectId.fromJson(json['nodeId']),
-      contextId: GraphObjectId.fromJson(json['contextId']),
-      nodeType: NodeType.fromJson(json['nodeType']),
-      numberOfInputs: json['numberOfInputs'],
-      numberOfOutputs: json['numberOfOutputs'],
-      channelCount: json['channelCount'],
-      channelCountMode: ChannelCountMode.fromJson(json['channelCountMode']),
-      channelInterpretation:
-          ChannelInterpretation.fromJson(json['channelInterpretation']),
+      nodeId: GraphObjectId.fromJson(json['nodeId'] as String),
+      contextId: GraphObjectId.fromJson(json['contextId'] as String),
+      nodeType: NodeType.fromJson(json['nodeType'] as String),
+      numberOfInputs: json['numberOfInputs'] as num,
+      numberOfOutputs: json['numberOfOutputs'] as num,
+      channelCount: json['channelCount'] as num,
+      channelCountMode:
+          ChannelCountMode.fromJson(json['channelCountMode'] as String),
+      channelInterpretation: ChannelInterpretation.fromJson(
+          json['channelInterpretation'] as String),
     );
   }
 
@@ -688,14 +690,14 @@ class AudioParam {
 
   factory AudioParam.fromJson(Map<String, dynamic> json) {
     return AudioParam(
-      paramId: GraphObjectId.fromJson(json['paramId']),
-      nodeId: GraphObjectId.fromJson(json['nodeId']),
-      contextId: GraphObjectId.fromJson(json['contextId']),
-      paramType: ParamType.fromJson(json['paramType']),
-      rate: AutomationRate.fromJson(json['rate']),
-      defaultValue: json['defaultValue'],
-      minValue: json['minValue'],
-      maxValue: json['maxValue'],
+      paramId: GraphObjectId.fromJson(json['paramId'] as String),
+      nodeId: GraphObjectId.fromJson(json['nodeId'] as String),
+      contextId: GraphObjectId.fromJson(json['contextId'] as String),
+      paramType: ParamType.fromJson(json['paramType'] as String),
+      rate: AutomationRate.fromJson(json['rate'] as String),
+      defaultValue: json['defaultValue'] as num,
+      minValue: json['minValue'] as num,
+      maxValue: json['maxValue'] as num,
     );
   }
 

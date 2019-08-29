@@ -94,8 +94,8 @@ class CacheStorageContentUpdatedEvent {
 
   factory CacheStorageContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return CacheStorageContentUpdatedEvent(
-      origin: json['origin'],
-      cacheName: json['cacheName'],
+      origin: json['origin'] as String,
+      cacheName: json['cacheName'] as String,
     );
   }
 }
@@ -117,9 +117,9 @@ class IndexedDBContentUpdatedEvent {
 
   factory IndexedDBContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return IndexedDBContentUpdatedEvent(
-      origin: json['origin'],
-      databaseName: json['databaseName'],
-      objectStoreName: json['objectStoreName'],
+      origin: json['origin'] as String,
+      databaseName: json['databaseName'] as String,
+      objectStoreName: json['objectStoreName'] as String,
     );
   }
 }
@@ -141,10 +141,10 @@ class GetUsageAndQuotaResult {
 
   factory GetUsageAndQuotaResult.fromJson(Map<String, dynamic> json) {
     return GetUsageAndQuotaResult(
-      usage: json['usage'],
-      quota: json['quota'],
+      usage: json['usage'] as num,
+      quota: json['quota'] as num,
       usageBreakdown: (json['usageBreakdown'] as List)
-          .map((e) => UsageForType.fromJson(e))
+          .map((e) => UsageForType.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -208,8 +208,8 @@ class UsageForType {
 
   factory UsageForType.fromJson(Map<String, dynamic> json) {
     return UsageForType(
-      storageType: StorageType.fromJson(json['storageType']),
-      usage: json['usage'],
+      storageType: StorageType.fromJson(json['storageType'] as String),
+      usage: json['usage'] as num,
     );
   }
 

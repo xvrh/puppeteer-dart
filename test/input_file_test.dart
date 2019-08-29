@@ -108,8 +108,8 @@ main() {
         page.waitForFileChooser(),
         page.$eval('input', 'input => input.click()'),
       ]);
-      FileChooser fileChooser1 = choosers[0];
-      FileChooser fileChooser2 = choosers[1];
+      var fileChooser1 = choosers[0] as FileChooser;
+      var fileChooser2 = choosers[1] as FileChooser;
       expect(fileChooser1, equals(fileChooser2));
     });
   });

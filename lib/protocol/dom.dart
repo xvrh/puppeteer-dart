@@ -283,7 +283,7 @@ class DOMApi {
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
       if (objectId != null) 'objectId': objectId,
     });
-    return result['outerHTML'];
+    return result['outerHTML'] as String;
   }
 
   /// Returns the id of the nearest ancestor that is a relayout boundary.
@@ -379,7 +379,7 @@ class DOMApi {
   Future<List<NodeId>> pushNodesByBackendIdsToFrontend(
       List<BackendNodeId> backendNodeIds) async {
     var result = await _client.send('DOM.pushNodesByBackendIdsToFrontend', {
-      'backendNodeIds': backendNodeIds.map((e) => e).toList(),
+      'backendNodeIds': [...backendNodeIds],
     });
     return (result['nodeIds'] as List).map((e) => NodeId.fromJson(e)).toList();
   }
@@ -518,7 +518,7 @@ class DOMApi {
       BackendNodeId backendNodeId,
       runtime.RemoteObjectId objectId}) async {
     await _client.send('DOM.setFileInputFiles', {
-      'files': files.toList(),
+      'files': [...files],
       if (nodeId != null) 'nodeId': nodeId,
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
       if (objectId != null) 'objectId': objectId,
@@ -536,11 +536,11 @@ class DOMApi {
   /// Gets stack traces associated with a Node. As of now, only provides stack trace for Node creation.
   /// [nodeId] Id of the node to get stack traces for.
   /// Returns: Creation stack trace, if available.
-  Future<runtime.StackTrace> getNodeStackTraces(NodeId nodeId) async {
+  Future<runtime.StackTraceData> getNodeStackTraces(NodeId nodeId) async {
     var result = await _client.send('DOM.getNodeStackTraces', {
       'nodeId': nodeId,
     });
-    return runtime.StackTrace.fromJson(result['creation']);
+    return runtime.StackTraceData.fromJson(result['creation']);
   }
 
   /// Returns file information for the given
@@ -550,7 +550,7 @@ class DOMApi {
     var result = await _client.send('DOM.getFileInfo', {
       'objectId': objectId,
     });
-    return result['path'];
+    return result['path'] as String;
   }
 
   /// Enables console to refer to the node with given id via $x (see Command Line API for more details
@@ -623,9 +623,9 @@ class AttributeModifiedEvent {
 
   factory AttributeModifiedEvent.fromJson(Map<String, dynamic> json) {
     return AttributeModifiedEvent(
-      nodeId: NodeId.fromJson(json['nodeId']),
-      name: json['name'],
-      value: json['value'],
+      nodeId: NodeId.fromJson(json['nodeId'] as int),
+      name: json['name'] as String,
+      value: json['value'] as String,
     );
   }
 }
@@ -641,8 +641,8 @@ class AttributeRemovedEvent {
 
   factory AttributeRemovedEvent.fromJson(Map<String, dynamic> json) {
     return AttributeRemovedEvent(
-      nodeId: NodeId.fromJson(json['nodeId']),
-      name: json['name'],
+      nodeId: NodeId.fromJson(json['nodeId'] as int),
+      name: json['name'] as String,
     );
   }
 }
@@ -659,8 +659,8 @@ class CharacterDataModifiedEvent {
 
   factory CharacterDataModifiedEvent.fromJson(Map<String, dynamic> json) {
     return CharacterDataModifiedEvent(
-      nodeId: NodeId.fromJson(json['nodeId']),
-      characterData: json['characterData'],
+      nodeId: NodeId.fromJson(json['nodeId'] as int),
+      characterData: json['characterData'] as String,
     );
   }
 }
@@ -677,8 +677,8 @@ class ChildNodeCountUpdatedEvent {
 
   factory ChildNodeCountUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return ChildNodeCountUpdatedEvent(
-      nodeId: NodeId.fromJson(json['nodeId']),
-      childNodeCount: json['childNodeCount'],
+      nodeId: NodeId.fromJson(json['nodeId'] as int),
+      childNodeCount: json['childNodeCount'] as int,
     );
   }
 }
@@ -700,9 +700,9 @@ class ChildNodeInsertedEvent {
 
   factory ChildNodeInsertedEvent.fromJson(Map<String, dynamic> json) {
     return ChildNodeInsertedEvent(
-      parentNodeId: NodeId.fromJson(json['parentNodeId']),
-      previousNodeId: NodeId.fromJson(json['previousNodeId']),
-      node: Node.fromJson(json['node']),
+      parentNodeId: NodeId.fromJson(json['parentNodeId'] as int),
+      previousNodeId: NodeId.fromJson(json['previousNodeId'] as int),
+      node: Node.fromJson(json['node'] as Map<String, dynamic>),
     );
   }
 }
@@ -718,8 +718,8 @@ class ChildNodeRemovedEvent {
 
   factory ChildNodeRemovedEvent.fromJson(Map<String, dynamic> json) {
     return ChildNodeRemovedEvent(
-      parentNodeId: NodeId.fromJson(json['parentNodeId']),
-      nodeId: NodeId.fromJson(json['nodeId']),
+      parentNodeId: NodeId.fromJson(json['parentNodeId'] as int),
+      nodeId: NodeId.fromJson(json['nodeId'] as int),
     );
   }
 }
@@ -736,9 +736,9 @@ class DistributedNodesUpdatedEvent {
 
   factory DistributedNodesUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return DistributedNodesUpdatedEvent(
-      insertionPointId: NodeId.fromJson(json['insertionPointId']),
+      insertionPointId: NodeId.fromJson(json['insertionPointId'] as int),
       distributedNodes: (json['distributedNodes'] as List)
-          .map((e) => BackendNode.fromJson(e))
+          .map((e) => BackendNode.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -756,8 +756,9 @@ class PseudoElementAddedEvent {
 
   factory PseudoElementAddedEvent.fromJson(Map<String, dynamic> json) {
     return PseudoElementAddedEvent(
-      parentId: NodeId.fromJson(json['parentId']),
-      pseudoElement: Node.fromJson(json['pseudoElement']),
+      parentId: NodeId.fromJson(json['parentId'] as int),
+      pseudoElement:
+          Node.fromJson(json['pseudoElement'] as Map<String, dynamic>),
     );
   }
 }
@@ -774,8 +775,8 @@ class PseudoElementRemovedEvent {
 
   factory PseudoElementRemovedEvent.fromJson(Map<String, dynamic> json) {
     return PseudoElementRemovedEvent(
-      parentId: NodeId.fromJson(json['parentId']),
-      pseudoElementId: NodeId.fromJson(json['pseudoElementId']),
+      parentId: NodeId.fromJson(json['parentId'] as int),
+      pseudoElementId: NodeId.fromJson(json['pseudoElementId'] as int),
     );
   }
 }
@@ -791,8 +792,10 @@ class SetChildNodesEvent {
 
   factory SetChildNodesEvent.fromJson(Map<String, dynamic> json) {
     return SetChildNodesEvent(
-      parentId: NodeId.fromJson(json['parentId']),
-      nodes: (json['nodes'] as List).map((e) => Node.fromJson(e)).toList(),
+      parentId: NodeId.fromJson(json['parentId'] as int),
+      nodes: (json['nodes'] as List)
+          .map((e) => Node.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -808,8 +811,8 @@ class ShadowRootPoppedEvent {
 
   factory ShadowRootPoppedEvent.fromJson(Map<String, dynamic> json) {
     return ShadowRootPoppedEvent(
-      hostId: NodeId.fromJson(json['hostId']),
-      rootId: NodeId.fromJson(json['rootId']),
+      hostId: NodeId.fromJson(json['hostId'] as int),
+      rootId: NodeId.fromJson(json['rootId'] as int),
     );
   }
 }
@@ -825,8 +828,8 @@ class ShadowRootPushedEvent {
 
   factory ShadowRootPushedEvent.fromJson(Map<String, dynamic> json) {
     return ShadowRootPushedEvent(
-      hostId: NodeId.fromJson(json['hostId']),
-      root: Node.fromJson(json['root']),
+      hostId: NodeId.fromJson(json['hostId'] as int),
+      root: Node.fromJson(json['root'] as Map<String, dynamic>),
     );
   }
 }
@@ -842,9 +845,10 @@ class GetNodeForLocationResult {
 
   factory GetNodeForLocationResult.fromJson(Map<String, dynamic> json) {
     return GetNodeForLocationResult(
-      backendNodeId: BackendNodeId.fromJson(json['backendNodeId']),
-      nodeId:
-          json.containsKey('nodeId') ? NodeId.fromJson(json['nodeId']) : null,
+      backendNodeId: BackendNodeId.fromJson(json['backendNodeId'] as int),
+      nodeId: json.containsKey('nodeId')
+          ? NodeId.fromJson(json['nodeId'] as int)
+          : null,
     );
   }
 }
@@ -860,8 +864,8 @@ class PerformSearchResult {
 
   factory PerformSearchResult.fromJson(Map<String, dynamic> json) {
     return PerformSearchResult(
-      searchId: json['searchId'],
-      resultCount: json['resultCount'],
+      searchId: json['searchId'] as String,
+      resultCount: json['resultCount'] as int,
     );
   }
 }
@@ -877,9 +881,10 @@ class GetFrameOwnerResult {
 
   factory GetFrameOwnerResult.fromJson(Map<String, dynamic> json) {
     return GetFrameOwnerResult(
-      backendNodeId: BackendNodeId.fromJson(json['backendNodeId']),
-      nodeId:
-          json.containsKey('nodeId') ? NodeId.fromJson(json['nodeId']) : null,
+      backendNodeId: BackendNodeId.fromJson(json['backendNodeId'] as int),
+      nodeId: json.containsKey('nodeId')
+          ? NodeId.fromJson(json['nodeId'] as int)
+          : null,
     );
   }
 }
@@ -944,9 +949,9 @@ class BackendNode {
 
   factory BackendNode.fromJson(Map<String, dynamic> json) {
     return BackendNode(
-      nodeType: json['nodeType'],
-      nodeName: json['nodeName'],
-      backendNodeId: BackendNodeId.fromJson(json['backendNodeId']),
+      nodeType: json['nodeType'] as int,
+      nodeName: json['nodeName'] as String,
+      backendNodeId: BackendNodeId.fromJson(json['backendNodeId'] as int),
     );
   }
 
@@ -1164,64 +1169,75 @@ class Node {
 
   factory Node.fromJson(Map<String, dynamic> json) {
     return Node(
-      nodeId: NodeId.fromJson(json['nodeId']),
+      nodeId: NodeId.fromJson(json['nodeId'] as int),
       parentId: json.containsKey('parentId')
-          ? NodeId.fromJson(json['parentId'])
+          ? NodeId.fromJson(json['parentId'] as int)
           : null,
-      backendNodeId: BackendNodeId.fromJson(json['backendNodeId']),
-      nodeType: json['nodeType'],
-      nodeName: json['nodeName'],
-      localName: json['localName'],
-      nodeValue: json['nodeValue'],
-      childNodeCount:
-          json.containsKey('childNodeCount') ? json['childNodeCount'] : null,
+      backendNodeId: BackendNodeId.fromJson(json['backendNodeId'] as int),
+      nodeType: json['nodeType'] as int,
+      nodeName: json['nodeName'] as String,
+      localName: json['localName'] as String,
+      nodeValue: json['nodeValue'] as String,
+      childNodeCount: json.containsKey('childNodeCount')
+          ? json['childNodeCount'] as int
+          : null,
       children: json.containsKey('children')
-          ? (json['children'] as List).map((e) => Node.fromJson(e)).toList()
+          ? (json['children'] as List)
+              .map((e) => Node.fromJson(e as Map<String, dynamic>))
+              .toList()
           : null,
       attributes: json.containsKey('attributes')
           ? (json['attributes'] as List).map((e) => e as String).toList()
           : null,
-      documentURL: json.containsKey('documentURL') ? json['documentURL'] : null,
-      baseURL: json.containsKey('baseURL') ? json['baseURL'] : null,
-      publicId: json.containsKey('publicId') ? json['publicId'] : null,
-      systemId: json.containsKey('systemId') ? json['systemId'] : null,
-      internalSubset:
-          json.containsKey('internalSubset') ? json['internalSubset'] : null,
-      xmlVersion: json.containsKey('xmlVersion') ? json['xmlVersion'] : null,
-      name: json.containsKey('name') ? json['name'] : null,
-      value: json.containsKey('value') ? json['value'] : null,
+      documentURL: json.containsKey('documentURL')
+          ? json['documentURL'] as String
+          : null,
+      baseURL: json.containsKey('baseURL') ? json['baseURL'] as String : null,
+      publicId:
+          json.containsKey('publicId') ? json['publicId'] as String : null,
+      systemId:
+          json.containsKey('systemId') ? json['systemId'] as String : null,
+      internalSubset: json.containsKey('internalSubset')
+          ? json['internalSubset'] as String
+          : null,
+      xmlVersion:
+          json.containsKey('xmlVersion') ? json['xmlVersion'] as String : null,
+      name: json.containsKey('name') ? json['name'] as String : null,
+      value: json.containsKey('value') ? json['value'] as String : null,
       pseudoType: json.containsKey('pseudoType')
-          ? PseudoType.fromJson(json['pseudoType'])
+          ? PseudoType.fromJson(json['pseudoType'] as String)
           : null,
       shadowRootType: json.containsKey('shadowRootType')
-          ? ShadowRootType.fromJson(json['shadowRootType'])
+          ? ShadowRootType.fromJson(json['shadowRootType'] as String)
           : null,
       frameId: json.containsKey('frameId')
-          ? page.FrameId.fromJson(json['frameId'])
+          ? page.FrameId.fromJson(json['frameId'] as String)
           : null,
       contentDocument: json.containsKey('contentDocument')
-          ? Node.fromJson(json['contentDocument'])
+          ? Node.fromJson(json['contentDocument'] as Map<String, dynamic>)
           : null,
       shadowRoots: json.containsKey('shadowRoots')
-          ? (json['shadowRoots'] as List).map((e) => Node.fromJson(e)).toList()
+          ? (json['shadowRoots'] as List)
+              .map((e) => Node.fromJson(e as Map<String, dynamic>))
+              .toList()
           : null,
       templateContent: json.containsKey('templateContent')
-          ? Node.fromJson(json['templateContent'])
+          ? Node.fromJson(json['templateContent'] as Map<String, dynamic>)
           : null,
       pseudoElements: json.containsKey('pseudoElements')
           ? (json['pseudoElements'] as List)
-              .map((e) => Node.fromJson(e))
+              .map((e) => Node.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       importedDocument: json.containsKey('importedDocument')
-          ? Node.fromJson(json['importedDocument'])
+          ? Node.fromJson(json['importedDocument'] as Map<String, dynamic>)
           : null,
       distributedNodes: json.containsKey('distributedNodes')
           ? (json['distributedNodes'] as List)
-              .map((e) => BackendNode.fromJson(e))
+              .map((e) => BackendNode.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
-      isSVG: json.containsKey('isSVG') ? json['isSVG'] : null,
+      isSVG: json.containsKey('isSVG') ? json['isSVG'] as bool : null,
     );
   }
 
@@ -1237,7 +1253,7 @@ class Node {
       if (childNodeCount != null) 'childNodeCount': childNodeCount,
       if (children != null)
         'children': children.map((e) => e.toJson()).toList(),
-      if (attributes != null) 'attributes': attributes.toList(),
+      if (attributes != null) 'attributes': [...attributes],
       if (documentURL != null) 'documentURL': documentURL,
       if (baseURL != null) 'baseURL': baseURL,
       if (publicId != null) 'publicId': publicId,
@@ -1282,10 +1298,10 @@ class RGBA {
 
   factory RGBA.fromJson(Map<String, dynamic> json) {
     return RGBA(
-      r: json['r'],
-      g: json['g'],
-      b: json['b'],
-      a: json.containsKey('a') ? json['a'] : null,
+      r: json['r'] as int,
+      g: json['g'] as int,
+      b: json['b'] as int,
+      a: json.containsKey('a') ? json['a'] as num : null,
     );
   }
 
@@ -1354,14 +1370,15 @@ class BoxModel {
 
   factory BoxModel.fromJson(Map<String, dynamic> json) {
     return BoxModel(
-      content: Quad.fromJson(json['content']),
-      padding: Quad.fromJson(json['padding']),
-      border: Quad.fromJson(json['border']),
-      margin: Quad.fromJson(json['margin']),
-      width: json['width'],
-      height: json['height'],
+      content: Quad.fromJson(json['content'] as List<num>),
+      padding: Quad.fromJson(json['padding'] as List<num>),
+      border: Quad.fromJson(json['border'] as List<num>),
+      margin: Quad.fromJson(json['margin'] as List<num>),
+      width: json['width'] as int,
+      height: json['height'] as int,
       shapeOutside: json.containsKey('shapeOutside')
-          ? ShapeOutsideInfo.fromJson(json['shapeOutside'])
+          ? ShapeOutsideInfo.fromJson(
+              json['shapeOutside'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -1397,7 +1414,7 @@ class ShapeOutsideInfo {
 
   factory ShapeOutsideInfo.fromJson(Map<String, dynamic> json) {
     return ShapeOutsideInfo(
-      bounds: Quad.fromJson(json['bounds']),
+      bounds: Quad.fromJson(json['bounds'] as List<num>),
       shape: (json['shape'] as List).map((e) => e as dynamic).toList(),
       marginShape:
           (json['marginShape'] as List).map((e) => e as dynamic).toList(),
@@ -1407,8 +1424,8 @@ class ShapeOutsideInfo {
   Map<String, dynamic> toJson() {
     return {
       'bounds': bounds.toJson(),
-      'shape': shape.toList(),
-      'marginShape': marginShape.toList(),
+      'shape': [...shape],
+      'marginShape': [...marginShape],
     };
   }
 }
@@ -1435,10 +1452,10 @@ class Rect {
 
   factory Rect.fromJson(Map<String, dynamic> json) {
     return Rect(
-      x: json['x'],
-      y: json['y'],
-      width: json['width'],
-      height: json['height'],
+      x: json['x'] as num,
+      y: json['y'] as num,
+      width: json['width'] as num,
+      height: json['height'] as num,
     );
   }
 

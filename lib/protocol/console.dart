@@ -61,12 +61,12 @@ class ConsoleMessage {
 
   factory ConsoleMessage.fromJson(Map<String, dynamic> json) {
     return ConsoleMessage(
-      source: ConsoleMessageSource.fromJson(json['source']),
-      level: ConsoleMessageLevel.fromJson(json['level']),
-      text: json['text'],
-      url: json.containsKey('url') ? json['url'] : null,
-      line: json.containsKey('line') ? json['line'] : null,
-      column: json.containsKey('column') ? json['column'] : null,
+      source: ConsoleMessageSource.fromJson(json['source'] as String),
+      level: ConsoleMessageLevel.fromJson(json['level'] as String),
+      text: json['text'] as String,
+      url: json.containsKey('url') ? json['url'] as String : null,
+      line: json.containsKey('line') ? json['line'] as int : null,
+      column: json.containsKey('column') ? json['column'] as int : null,
     );
   }
 

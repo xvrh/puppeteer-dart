@@ -6,14 +6,14 @@ import 'package:meta/meta.dart';
 import '../protocol/target.dart';
 
 abstract class Client {
-  Future<Map> send(String method, [Map<String, dynamic> parameters]);
+  Future<Map<String, dynamic>> send(String method, [Map<String, dynamic> parameters]);
 
   Stream<Event> get onEvent;
 }
 
 class Event {
   final String name;
-  final Map parameters;
+  final Map<String, dynamic> parameters;
 
   Event._(this.name, this.parameters);
 }
@@ -39,7 +39,7 @@ class Connection implements Client {
   final Duration _delay;
 
   Connection._(this._webSocket, this.url, {Duration delay}) : _delay = delay {
-    _subscriptions.add(_webSocket.listen(_onMessage, onError: (error) {
+    _subscriptions.add(_webSocket.cast<String>().listen(_onMessage, onError: (error) {
       print('Websocket error: $error');
     }));
 
@@ -62,7 +62,7 @@ class Connection implements Client {
   Stream<Event> get onEvent => _eventController.stream;
 
   @override
-  Future<Map> send(String method, [Map<String, dynamic> parameters]) {
+  Future<Map<String, dynamic>> send(String method, [Map<String, dynamic> parameters]) {
     var id = _rawSend(method, parameters);
     var message = _Message(method);
     _messagesInFly[id] = message;
@@ -89,24 +89,23 @@ class Connection implements Client {
     return session;
   }
 
-  _onMessage(messageArg) async {
+  _onMessage(String message) async {
     if (_delay != null) {
       await Future.delayed(_delay);
     }
 
-    String message = messageArg;
-    Map<String, dynamic> object = jsonDecode(message);
-    int id = object['id'];
-    String method = object['method'];
-    String sessionId = object['sessionId'];
+    Map<String, dynamic> object = jsonDecode(message) as Map<String, dynamic>;
+    int id = object['id'] as int;
+    var method = object['method'] as String;
+    var sessionId = object['sessionId'] as String;
     if (method == 'Target.attachedToTarget') {
-      var params = AttachedToTargetEvent.fromJson(object['params']);
+      var params = AttachedToTargetEvent.fromJson(object['params'] as Map<String, dynamic>);
       var sessionId = params.sessionId;
       var session =
           Session(this, sessionId, targetType: params.targetInfo.type);
       sessions[sessionId.value] = session;
     } else if (method == 'Target.detachedFromTarget') {
-      var params = DetachedFromTargetEvent.fromJson(object['params']);
+      var params = DetachedFromTargetEvent.fromJson(object['params'] as Map<String, dynamic>);
       var session = sessions[params.sessionId.value];
       if (session != null) {
         session.dispose(reason: 'Target.detachedFromTarget');
@@ -126,15 +125,15 @@ class Connection implements Client {
       var messageInFly = _messagesInFly.remove(id);
       assert(messageInFly != null);
 
-      Map error = object['error'];
+      var error = object['error'] as Map<String, dynamic>;
       if (error != null) {
-        messageInFly.completer.completeError(ServerException(error['message']));
+        messageInFly.completer.completeError(ServerException(error['message'] as String));
       } else {
-        messageInFly.completer.complete(object['result']);
+        messageInFly.completer.complete(object['result'] as Map<String, dynamic>);
       }
     } else {
-      String method = object['method'];
-      Map params = object['params'];
+      var method = object['method'] as String;
+      var params = object['params'] as Map<String, dynamic>;
 
       _logger.fine('◀ EVENT $message');
 
@@ -196,7 +195,7 @@ class Session implements Client {
   Session(this.connection, this.sessionId, {@required this.targetType});
 
   @override
-  Future<Map> send(String method, [Map<String, dynamic> parameters]) {
+  Future<Map<String, dynamic>> send(String method, [Map<String, dynamic> parameters]) {
     if (_eventController.isClosed) {
       throw Exception(
           'Protocol error ($method): Session closed. Most likely the $targetType has been closed.');
@@ -215,17 +214,17 @@ class Session implements Client {
   Future<void> get closed => _onClose.future;
 
   _onMessage(Map object) {
-    int id = object['id'];
+    int id = object['id'] as int;
     if (id != null) {
       var message = _messagesInFly.remove(id);
-      Map error = object['error'];
+      var error = object['error'] as Map<String, dynamic>;
       if (error != null) {
-        message.completer.completeError(ServerException(error['message']));
+        message.completer.completeError(ServerException(error['message'] as String));
       } else {
-        message.completer.complete(object['result']);
+        message.completer.complete(object['result'] as Map<String, dynamic>);
       }
     } else {
-      _eventController.add(Event._(object['method'], object['params']));
+      _eventController.add(Event._(object['method'] as String, object['params'] as Map<String, dynamic>));
     }
   }
 
@@ -256,12 +255,12 @@ class ServerException implements Exception {
   @override
   toString() => message;
 
-  static matcher(String message) =>
+  static bool Function(T) matcher<T>(String message) =>
       (e) => e is ServerException && e.message == message;
 }
 
 class _Message {
-  final completer = Completer<Map>();
+  final completer = Completer<Map<String, dynamic>>();
   final String method;
 
   _Message(this.method);

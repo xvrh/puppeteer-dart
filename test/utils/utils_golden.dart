@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 import 'pixel_match.dart';
 
 final bool _updateGolden =
-    Platform.environment['PUPPETEER_UPDATE_GOLDEN'] ?? false;
+    Platform.environment['PUPPETEER_UPDATE_GOLDEN'] != null;
 
 class _GoldenMatcher extends Matcher {
   final String goldenPath;
@@ -19,9 +19,7 @@ class _GoldenMatcher extends Matcher {
   }
 
   @override
-  bool matches(item, Map matchState) {
-    assert(item is List<int>);
-
+  bool matches(covariant List<int> item, Map matchState) {
     var goldenFile = File(goldenPath);
 
     if (_updateGolden) {
@@ -44,7 +42,7 @@ class _GoldenMatcher extends Matcher {
   @override
   Description describeMismatch(
       item, Description mismatchDescription, Map matchState, bool verbose) {
-    ImageDifference difference = matchState['comparison'];
+    var difference = matchState['comparison'] as ImageDifference;
     mismatchDescription.replace(difference.toString());
     return mismatchDescription;
   }

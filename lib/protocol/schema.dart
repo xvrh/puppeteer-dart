@@ -29,8 +29,8 @@ class Domain {
 
   factory Domain.fromJson(Map<String, dynamic> json) {
     return Domain(
-      name: json['name'],
-      version: json['version'],
+      name: json['name'] as String,
+      version: json['version'] as String,
     );
   }
 

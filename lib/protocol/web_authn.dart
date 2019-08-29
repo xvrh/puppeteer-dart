@@ -199,13 +199,13 @@ class VirtualAuthenticatorOptions {
 
   factory VirtualAuthenticatorOptions.fromJson(Map<String, dynamic> json) {
     return VirtualAuthenticatorOptions(
-      protocol: AuthenticatorProtocol.fromJson(json['protocol']),
-      transport: AuthenticatorTransport.fromJson(json['transport']),
-      hasResidentKey: json['hasResidentKey'],
-      hasUserVerification: json['hasUserVerification'],
+      protocol: AuthenticatorProtocol.fromJson(json['protocol'] as String),
+      transport: AuthenticatorTransport.fromJson(json['transport'] as String),
+      hasResidentKey: json['hasResidentKey'] as bool,
+      hasUserVerification: json['hasUserVerification'] as bool,
       automaticPresenceSimulation:
           json.containsKey('automaticPresenceSimulation')
-              ? json['automaticPresenceSimulation']
+              ? json['automaticPresenceSimulation'] as bool
               : null,
     );
   }
@@ -253,12 +253,13 @@ class Credential {
 
   factory Credential.fromJson(Map<String, dynamic> json) {
     return Credential(
-      credentialId: json['credentialId'],
-      isResidentCredential: json['isResidentCredential'],
-      rpId: json.containsKey('rpId') ? json['rpId'] : null,
-      privateKey: json['privateKey'],
-      userHandle: json.containsKey('userHandle') ? json['userHandle'] : null,
-      signCount: json['signCount'],
+      credentialId: json['credentialId'] as String,
+      isResidentCredential: json['isResidentCredential'] as bool,
+      rpId: json.containsKey('rpId') ? json['rpId'] as String : null,
+      privateKey: json['privateKey'] as String,
+      userHandle:
+          json.containsKey('userHandle') ? json['userHandle'] as String : null,
+      signCount: json['signCount'] as int,
     );
   }
 

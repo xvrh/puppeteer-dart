@@ -65,8 +65,8 @@ class RecordingStateChangedEvent {
 
   factory RecordingStateChangedEvent.fromJson(Map<String, dynamic> json) {
     return RecordingStateChangedEvent(
-      isRecording: json['isRecording'],
-      service: ServiceName.fromJson(json['service']),
+      isRecording: json['isRecording'] as bool,
+      service: ServiceName.fromJson(json['service'] as String),
     );
   }
 }
@@ -119,8 +119,8 @@ class EventMetadata {
 
   factory EventMetadata.fromJson(Map<String, dynamic> json) {
     return EventMetadata(
-      key: json['key'],
-      value: json['value'],
+      key: json['key'] as String,
+      value: json['value'] as String,
     );
   }
 
@@ -165,15 +165,15 @@ class BackgroundServiceEvent {
 
   factory BackgroundServiceEvent.fromJson(Map<String, dynamic> json) {
     return BackgroundServiceEvent(
-      timestamp: network.TimeSinceEpoch.fromJson(json['timestamp']),
-      origin: json['origin'],
+      timestamp: network.TimeSinceEpoch.fromJson(json['timestamp'] as num),
+      origin: json['origin'] as String,
       serviceWorkerRegistrationId: service_worker.RegistrationID.fromJson(
-          json['serviceWorkerRegistrationId']),
-      service: ServiceName.fromJson(json['service']),
-      eventName: json['eventName'],
-      instanceId: json['instanceId'],
+          json['serviceWorkerRegistrationId'] as String),
+      service: ServiceName.fromJson(json['service'] as String),
+      eventName: json['eventName'] as String,
+      instanceId: json['instanceId'] as String,
       eventMetadata: (json['eventMetadata'] as List)
-          .map((e) => EventMetadata.fromJson(e))
+          .map((e) => EventMetadata.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }

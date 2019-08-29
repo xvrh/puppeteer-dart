@@ -28,10 +28,10 @@ class Worker {
       this.client,
       this.url,
       {@required
-          Function(ConsoleAPICalledEventType, List<JsHandle>, StackTrace)
+          void Function(ConsoleAPICalledEventType, List<JsHandle>, StackTraceData)
               onConsoleApiCalled,
       @required
-          Function(ExceptionThrownEvent) onExceptionThrown}) {
+          void Function(ExceptionThrownEvent) onExceptionThrown}) {
     var runtimeApi = RuntimeApi(client);
 
     JsHandle Function(RemoteObject) jsHandleFactory;

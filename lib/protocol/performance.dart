@@ -53,9 +53,10 @@ class MetricsEvent {
 
   factory MetricsEvent.fromJson(Map<String, dynamic> json) {
     return MetricsEvent(
-      metrics:
-          (json['metrics'] as List).map((e) => Metric.fromJson(e)).toList(),
-      title: json['title'],
+      metrics: (json['metrics'] as List)
+          .map((e) => Metric.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      title: json['title'] as String,
     );
   }
 }
@@ -72,8 +73,8 @@ class Metric {
 
   factory Metric.fromJson(Map<String, dynamic> json) {
     return Metric(
-      name: json['name'],
-      value: json['value'],
+      name: json['name'] as String,
+      value: json['value'] as num,
     );
   }
 

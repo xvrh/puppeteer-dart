@@ -45,7 +45,7 @@ class LayerTreeApi {
   /// Returns: The id of the snapshot.
   Future<SnapshotId> loadSnapshot(List<PictureTile> tiles) async {
     var result = await _client.send('LayerTree.loadSnapshot', {
-      'tiles': tiles.map((e) => e).toList(),
+      'tiles': [...tiles],
     });
     return SnapshotId.fromJson(result['snapshotId']);
   }
@@ -100,17 +100,20 @@ class LayerTreeApi {
       if (toStep != null) 'toStep': toStep,
       if (scale != null) 'scale': scale,
     });
-    return result['dataURL'];
+    return result['dataURL'] as String;
   }
 
   /// Replays the layer snapshot and returns canvas log.
   /// [snapshotId] The id of the layer snapshot.
   /// Returns: The array of canvas function calls.
-  Future<List<Map>> snapshotCommandLog(SnapshotId snapshotId) async {
+  Future<List<Map<String, dynamic>>> snapshotCommandLog(
+      SnapshotId snapshotId) async {
     var result = await _client.send('LayerTree.snapshotCommandLog', {
       'snapshotId': snapshotId,
     });
-    return (result['commandLog'] as List).map((e) => e as Map).toList();
+    return (result['commandLog'] as List)
+        .map((e) => e as Map<String, dynamic>)
+        .toList();
   }
 }
 
@@ -125,8 +128,8 @@ class LayerPaintedEvent {
 
   factory LayerPaintedEvent.fromJson(Map<String, dynamic> json) {
     return LayerPaintedEvent(
-      layerId: LayerId.fromJson(json['layerId']),
-      clip: dom.Rect.fromJson(json['clip']),
+      layerId: LayerId.fromJson(json['layerId'] as String),
+      clip: dom.Rect.fromJson(json['clip'] as Map<String, dynamic>),
     );
   }
 }
@@ -185,8 +188,8 @@ class ScrollRect {
 
   factory ScrollRect.fromJson(Map<String, dynamic> json) {
     return ScrollRect(
-      rect: dom.Rect.fromJson(json['rect']),
-      type: ScrollRectType.fromJson(json['type']),
+      rect: dom.Rect.fromJson(json['rect'] as Map<String, dynamic>),
+      type: ScrollRectType.fromJson(json['type'] as String),
     );
   }
 
@@ -249,15 +252,18 @@ class StickyPositionConstraint {
 
   factory StickyPositionConstraint.fromJson(Map<String, dynamic> json) {
     return StickyPositionConstraint(
-      stickyBoxRect: dom.Rect.fromJson(json['stickyBoxRect']),
-      containingBlockRect: dom.Rect.fromJson(json['containingBlockRect']),
-      nearestLayerShiftingStickyBox:
-          json.containsKey('nearestLayerShiftingStickyBox')
-              ? LayerId.fromJson(json['nearestLayerShiftingStickyBox'])
-              : null,
+      stickyBoxRect:
+          dom.Rect.fromJson(json['stickyBoxRect'] as Map<String, dynamic>),
+      containingBlockRect: dom.Rect.fromJson(
+          json['containingBlockRect'] as Map<String, dynamic>),
+      nearestLayerShiftingStickyBox: json
+              .containsKey('nearestLayerShiftingStickyBox')
+          ? LayerId.fromJson(json['nearestLayerShiftingStickyBox'] as String)
+          : null,
       nearestLayerShiftingContainingBlock:
           json.containsKey('nearestLayerShiftingContainingBlock')
-              ? LayerId.fromJson(json['nearestLayerShiftingContainingBlock'])
+              ? LayerId.fromJson(
+                  json['nearestLayerShiftingContainingBlock'] as String)
               : null,
     );
   }
@@ -290,9 +296,9 @@ class PictureTile {
 
   factory PictureTile.fromJson(Map<String, dynamic> json) {
     return PictureTile(
-      x: json['x'],
-      y: json['y'],
-      picture: json['picture'],
+      x: json['x'] as num,
+      y: json['y'] as num,
+      picture: json['picture'] as String,
     );
   }
 
@@ -376,33 +382,35 @@ class Layer {
 
   factory Layer.fromJson(Map<String, dynamic> json) {
     return Layer(
-      layerId: LayerId.fromJson(json['layerId']),
+      layerId: LayerId.fromJson(json['layerId'] as String),
       parentLayerId: json.containsKey('parentLayerId')
-          ? LayerId.fromJson(json['parentLayerId'])
+          ? LayerId.fromJson(json['parentLayerId'] as String)
           : null,
       backendNodeId: json.containsKey('backendNodeId')
-          ? dom.BackendNodeId.fromJson(json['backendNodeId'])
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
           : null,
-      offsetX: json['offsetX'],
-      offsetY: json['offsetY'],
-      width: json['width'],
-      height: json['height'],
+      offsetX: json['offsetX'] as num,
+      offsetY: json['offsetY'] as num,
+      width: json['width'] as num,
+      height: json['height'] as num,
       transform: json.containsKey('transform')
           ? (json['transform'] as List).map((e) => e as num).toList()
           : null,
-      anchorX: json.containsKey('anchorX') ? json['anchorX'] : null,
-      anchorY: json.containsKey('anchorY') ? json['anchorY'] : null,
-      anchorZ: json.containsKey('anchorZ') ? json['anchorZ'] : null,
-      paintCount: json['paintCount'],
-      drawsContent: json['drawsContent'],
-      invisible: json.containsKey('invisible') ? json['invisible'] : null,
+      anchorX: json.containsKey('anchorX') ? json['anchorX'] as num : null,
+      anchorY: json.containsKey('anchorY') ? json['anchorY'] as num : null,
+      anchorZ: json.containsKey('anchorZ') ? json['anchorZ'] as num : null,
+      paintCount: json['paintCount'] as int,
+      drawsContent: json['drawsContent'] as bool,
+      invisible:
+          json.containsKey('invisible') ? json['invisible'] as bool : null,
       scrollRects: json.containsKey('scrollRects')
           ? (json['scrollRects'] as List)
-              .map((e) => ScrollRect.fromJson(e))
+              .map((e) => ScrollRect.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       stickyPositionConstraint: json.containsKey('stickyPositionConstraint')
-          ? StickyPositionConstraint.fromJson(json['stickyPositionConstraint'])
+          ? StickyPositionConstraint.fromJson(
+              json['stickyPositionConstraint'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -418,7 +426,7 @@ class Layer {
       'drawsContent': drawsContent,
       if (parentLayerId != null) 'parentLayerId': parentLayerId.toJson(),
       if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
-      if (transform != null) 'transform': transform.toList(),
+      if (transform != null) 'transform': [...transform],
       if (anchorX != null) 'anchorX': anchorX,
       if (anchorY != null) 'anchorY': anchorY,
       if (anchorZ != null) 'anchorZ': anchorZ,

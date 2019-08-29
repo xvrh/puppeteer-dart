@@ -300,7 +300,7 @@ main() {
     test('should fail when navigating and show the url at the error message',
         () async {
       var url = server.prefix + '/redirect/1.html';
-      expect(() => page.goto(url), throwsA(predicate((e) => e.contains(url))));
+      expect(() => page.goto(url), throwsA(predicate((e) => '$e'.contains(url))));
     }, skip: "Can't reproduce the original test");
     test('should send referer', () async {
       var request1Future = server.waitForRequest('/grid.html');
@@ -481,7 +481,7 @@ main() {
           '/empty.html', (req) => Completer<shelf.Response>().future);
       Exception error;
       var navigationPromise =
-          page.frames[1].goto(server.emptyPage).catchError((e) {
+          page.frames[1].goto(server.emptyPage).catchError((Exception e) {
         error = e;
       });
       await server.waitForRequest('/empty.html');
@@ -548,7 +548,7 @@ main() {
       server.setRoute(
           '/empty-for-frame.html', (req) => Completer<shelf.Response>().future);
       Exception error;
-      var navigationPromise = frame.waitForNavigation().catchError((e) {
+      var navigationPromise = frame.waitForNavigation().catchError((Exception e) {
         error = e;
       });
       await Future.wait([

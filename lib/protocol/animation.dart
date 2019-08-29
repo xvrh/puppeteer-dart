@@ -41,21 +41,21 @@ class AnimationApi {
     var result = await _client.send('Animation.getCurrentTime', {
       'id': id,
     });
-    return result['currentTime'];
+    return result['currentTime'] as num;
   }
 
   /// Gets the playback rate of the document timeline.
   /// Returns: Playback rate for animations on page.
   Future<num> getPlaybackRate() async {
     var result = await _client.send('Animation.getPlaybackRate');
-    return result['playbackRate'];
+    return result['playbackRate'] as num;
   }
 
   /// Releases a set of animations to no longer be manipulated.
   /// [animations] List of animation ids to seek.
   Future<void> releaseAnimations(List<String> animations) async {
     await _client.send('Animation.releaseAnimations', {
-      'animations': animations.toList(),
+      'animations': [...animations],
     });
   }
 
@@ -74,7 +74,7 @@ class AnimationApi {
   /// [currentTime] Set the current time of each animation.
   Future<void> seekAnimations(List<String> animations, num currentTime) async {
     await _client.send('Animation.seekAnimations', {
-      'animations': animations.toList(),
+      'animations': [...animations],
       'currentTime': currentTime,
     });
   }
@@ -84,7 +84,7 @@ class AnimationApi {
   /// [paused] Paused state to set to.
   Future<void> setPaused(List<String> animations, bool paused) async {
     await _client.send('Animation.setPaused', {
-      'animations': animations.toList(),
+      'animations': [...animations],
       'paused': paused,
     });
   }
@@ -157,18 +157,18 @@ class Animation {
 
   factory Animation.fromJson(Map<String, dynamic> json) {
     return Animation(
-      id: json['id'],
-      name: json['name'],
-      pausedState: json['pausedState'],
-      playState: json['playState'],
-      playbackRate: json['playbackRate'],
-      startTime: json['startTime'],
-      currentTime: json['currentTime'],
-      type: AnimationType.fromJson(json['type']),
+      id: json['id'] as String,
+      name: json['name'] as String,
+      pausedState: json['pausedState'] as bool,
+      playState: json['playState'] as String,
+      playbackRate: json['playbackRate'] as num,
+      startTime: json['startTime'] as num,
+      currentTime: json['currentTime'] as num,
+      type: AnimationType.fromJson(json['type'] as String),
       source: json.containsKey('source')
-          ? AnimationEffect.fromJson(json['source'])
+          ? AnimationEffect.fromJson(json['source'] as Map<String, dynamic>)
           : null,
-      cssId: json.containsKey('cssId') ? json['cssId'] : null,
+      cssId: json.containsKey('cssId') ? json['cssId'] as String : null,
     );
   }
 
@@ -263,20 +263,21 @@ class AnimationEffect {
 
   factory AnimationEffect.fromJson(Map<String, dynamic> json) {
     return AnimationEffect(
-      delay: json['delay'],
-      endDelay: json['endDelay'],
-      iterationStart: json['iterationStart'],
-      iterations: json['iterations'],
-      duration: json['duration'],
-      direction: json['direction'],
-      fill: json['fill'],
+      delay: json['delay'] as num,
+      endDelay: json['endDelay'] as num,
+      iterationStart: json['iterationStart'] as num,
+      iterations: json['iterations'] as num,
+      duration: json['duration'] as num,
+      direction: json['direction'] as String,
+      fill: json['fill'] as String,
       backendNodeId: json.containsKey('backendNodeId')
-          ? dom.BackendNodeId.fromJson(json['backendNodeId'])
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
           : null,
       keyframesRule: json.containsKey('keyframesRule')
-          ? KeyframesRule.fromJson(json['keyframesRule'])
+          ? KeyframesRule.fromJson(
+              json['keyframesRule'] as Map<String, dynamic>)
           : null,
-      easing: json['easing'],
+      easing: json['easing'] as String,
     );
   }
 
@@ -308,9 +309,9 @@ class KeyframesRule {
 
   factory KeyframesRule.fromJson(Map<String, dynamic> json) {
     return KeyframesRule(
-      name: json.containsKey('name') ? json['name'] : null,
+      name: json.containsKey('name') ? json['name'] as String : null,
       keyframes: (json['keyframes'] as List)
-          .map((e) => KeyframeStyle.fromJson(e))
+          .map((e) => KeyframeStyle.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -335,8 +336,8 @@ class KeyframeStyle {
 
   factory KeyframeStyle.fromJson(Map<String, dynamic> json) {
     return KeyframeStyle(
-      offset: json['offset'],
-      easing: json['easing'],
+      offset: json['offset'] as String,
+      easing: json['easing'] as String,
     );
   }
 

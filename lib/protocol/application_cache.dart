@@ -54,7 +54,7 @@ class ApplicationCacheApi {
     var result = await _client.send('ApplicationCache.getManifestForFrame', {
       'frameId': frameId,
     });
-    return result['manifestURL'];
+    return result['manifestURL'] as String;
   }
 }
 
@@ -76,9 +76,9 @@ class ApplicationCacheStatusUpdatedEvent {
   factory ApplicationCacheStatusUpdatedEvent.fromJson(
       Map<String, dynamic> json) {
     return ApplicationCacheStatusUpdatedEvent(
-      frameId: page.FrameId.fromJson(json['frameId']),
-      manifestURL: json['manifestURL'],
-      status: json['status'],
+      frameId: page.FrameId.fromJson(json['frameId'] as String),
+      manifestURL: json['manifestURL'] as String,
+      status: json['status'] as int,
     );
   }
 }
@@ -99,9 +99,9 @@ class ApplicationCacheResource {
 
   factory ApplicationCacheResource.fromJson(Map<String, dynamic> json) {
     return ApplicationCacheResource(
-      url: json['url'],
-      size: json['size'],
-      type: json['type'],
+      url: json['url'] as String,
+      size: json['size'] as int,
+      type: json['type'] as String,
     );
   }
 
@@ -140,12 +140,13 @@ class ApplicationCache {
 
   factory ApplicationCache.fromJson(Map<String, dynamic> json) {
     return ApplicationCache(
-      manifestURL: json['manifestURL'],
-      size: json['size'],
-      creationTime: json['creationTime'],
-      updateTime: json['updateTime'],
+      manifestURL: json['manifestURL'] as String,
+      size: json['size'] as num,
+      creationTime: json['creationTime'] as num,
+      updateTime: json['updateTime'] as num,
       resources: (json['resources'] as List)
-          .map((e) => ApplicationCacheResource.fromJson(e))
+          .map((e) =>
+              ApplicationCacheResource.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -179,9 +180,9 @@ class FrameWithManifest {
 
   factory FrameWithManifest.fromJson(Map<String, dynamic> json) {
     return FrameWithManifest(
-      frameId: page.FrameId.fromJson(json['frameId']),
-      manifestURL: json['manifestURL'],
-      status: json['status'],
+      frameId: page.FrameId.fromJson(json['frameId'] as String),
+      manifestURL: json['manifestURL'] as String,
+      status: json['status'] as int,
     );
   }
 

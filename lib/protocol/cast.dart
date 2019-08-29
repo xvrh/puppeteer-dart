@@ -75,9 +75,9 @@ class Sink {
 
   factory Sink.fromJson(Map<String, dynamic> json) {
     return Sink(
-      name: json['name'],
-      id: json['id'],
-      session: json.containsKey('session') ? json['session'] : null,
+      name: json['name'] as String,
+      id: json['id'] as String,
+      session: json.containsKey('session') ? json['session'] as String : null,
     );
   }
 

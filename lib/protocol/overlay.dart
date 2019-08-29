@@ -46,14 +46,14 @@ class OverlayApi {
   /// [includeDistance] Whether to include distance info.
   /// [includeStyle] Whether to include style info.
   /// Returns: Highlight data for the node.
-  Future<Map> getHighlightObjectForTest(dom.NodeId nodeId,
+  Future<Map<String, dynamic>> getHighlightObjectForTest(dom.NodeId nodeId,
       {bool includeDistance, bool includeStyle}) async {
     var result = await _client.send('Overlay.getHighlightObjectForTest', {
       'nodeId': nodeId,
       if (includeDistance != null) 'includeDistance': includeDistance,
       if (includeStyle != null) 'includeStyle': includeStyle,
     });
-    return result['highlight'];
+    return result['highlight'] as Map<String, dynamic>;
   }
 
   /// Hides any highlight.
@@ -267,35 +267,37 @@ class HighlightConfig {
 
   factory HighlightConfig.fromJson(Map<String, dynamic> json) {
     return HighlightConfig(
-      showInfo: json.containsKey('showInfo') ? json['showInfo'] : null,
-      showStyles: json.containsKey('showStyles') ? json['showStyles'] : null,
-      showRulers: json.containsKey('showRulers') ? json['showRulers'] : null,
+      showInfo: json.containsKey('showInfo') ? json['showInfo'] as bool : null,
+      showStyles:
+          json.containsKey('showStyles') ? json['showStyles'] as bool : null,
+      showRulers:
+          json.containsKey('showRulers') ? json['showRulers'] as bool : null,
       showExtensionLines: json.containsKey('showExtensionLines')
-          ? json['showExtensionLines']
+          ? json['showExtensionLines'] as bool
           : null,
       contentColor: json.containsKey('contentColor')
-          ? dom.RGBA.fromJson(json['contentColor'])
+          ? dom.RGBA.fromJson(json['contentColor'] as Map<String, dynamic>)
           : null,
       paddingColor: json.containsKey('paddingColor')
-          ? dom.RGBA.fromJson(json['paddingColor'])
+          ? dom.RGBA.fromJson(json['paddingColor'] as Map<String, dynamic>)
           : null,
       borderColor: json.containsKey('borderColor')
-          ? dom.RGBA.fromJson(json['borderColor'])
+          ? dom.RGBA.fromJson(json['borderColor'] as Map<String, dynamic>)
           : null,
       marginColor: json.containsKey('marginColor')
-          ? dom.RGBA.fromJson(json['marginColor'])
+          ? dom.RGBA.fromJson(json['marginColor'] as Map<String, dynamic>)
           : null,
       eventTargetColor: json.containsKey('eventTargetColor')
-          ? dom.RGBA.fromJson(json['eventTargetColor'])
+          ? dom.RGBA.fromJson(json['eventTargetColor'] as Map<String, dynamic>)
           : null,
       shapeColor: json.containsKey('shapeColor')
-          ? dom.RGBA.fromJson(json['shapeColor'])
+          ? dom.RGBA.fromJson(json['shapeColor'] as Map<String, dynamic>)
           : null,
       shapeMarginColor: json.containsKey('shapeMarginColor')
-          ? dom.RGBA.fromJson(json['shapeMarginColor'])
+          ? dom.RGBA.fromJson(json['shapeMarginColor'] as Map<String, dynamic>)
           : null,
       cssGridColor: json.containsKey('cssGridColor')
-          ? dom.RGBA.fromJson(json['cssGridColor'])
+          ? dom.RGBA.fromJson(json['cssGridColor'] as Map<String, dynamic>)
           : null,
     );
   }

@@ -46,9 +46,9 @@ class GetEncodedResponseResult {
 
   factory GetEncodedResponseResult.fromJson(Map<String, dynamic> json) {
     return GetEncodedResponseResult(
-      body: json.containsKey('body') ? json['body'] : null,
-      originalSize: json['originalSize'],
-      encodedSize: json['encodedSize'],
+      body: json.containsKey('body') ? json['body'] as String : null,
+      originalSize: json['originalSize'] as int,
+      encodedSize: json['encodedSize'] as int,
     );
   }
 }

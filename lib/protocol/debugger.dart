@@ -128,16 +128,16 @@ class DebuggerApi {
     var result = await _client.send('Debugger.getScriptSource', {
       'scriptId': scriptId,
     });
-    return result['scriptSource'];
+    return result['scriptSource'] as String;
   }
 
   /// Returns stack trace with given `stackTraceId`.
-  Future<runtime.StackTrace> getStackTrace(
+  Future<runtime.StackTraceData> getStackTrace(
       runtime.StackTraceId stackTraceId) async {
     var result = await _client.send('Debugger.getStackTrace', {
       'stackTraceId': stackTraceId,
     });
-    return runtime.StackTrace.fromJson(result['stackTrace']);
+    return runtime.StackTraceData.fromJson(result['stackTrace']);
   }
 
   /// Stops on the next JavaScript statement.
@@ -208,7 +208,7 @@ class DebuggerApi {
   /// [patterns] Array of regexps that will be used to check script url for blackbox state.
   Future<void> setBlackboxPatterns(List<String> patterns) async {
     await _client.send('Debugger.setBlackboxPatterns', {
-      'patterns': patterns.toList(),
+      'patterns': [...patterns],
     });
   }
 
@@ -221,7 +221,7 @@ class DebuggerApi {
       runtime.ScriptId scriptId, List<ScriptPosition> positions) async {
     await _client.send('Debugger.setBlackboxedRanges', {
       'scriptId': scriptId,
-      'positions': positions.map((e) => e).toList(),
+      'positions': [...positions],
     });
   }
 
@@ -398,8 +398,8 @@ class BreakpointResolvedEvent {
 
   factory BreakpointResolvedEvent.fromJson(Map<String, dynamic> json) {
     return BreakpointResolvedEvent(
-      breakpointId: BreakpointId.fromJson(json['breakpointId']),
-      location: Location.fromJson(json['location']),
+      breakpointId: BreakpointId.fromJson(json['breakpointId'] as String),
+      location: Location.fromJson(json['location'] as Map<String, dynamic>),
     );
   }
 }
@@ -412,13 +412,13 @@ class PausedEvent {
   final PausedEventReason reason;
 
   /// Object containing break-specific auxiliary properties.
-  final Map data;
+  final Map<String, dynamic> data;
 
   /// Hit breakpoints IDs
   final List<String> hitBreakpoints;
 
   /// Async stack trace, if any.
-  final runtime.StackTrace asyncStackTrace;
+  final runtime.StackTraceData asyncStackTrace;
 
   /// Async stack trace, if any.
   final runtime.StackTraceId asyncStackTraceId;
@@ -439,21 +439,26 @@ class PausedEvent {
   factory PausedEvent.fromJson(Map<String, dynamic> json) {
     return PausedEvent(
       callFrames: (json['callFrames'] as List)
-          .map((e) => CallFrame.fromJson(e))
+          .map((e) => CallFrame.fromJson(e as Map<String, dynamic>))
           .toList(),
-      reason: PausedEventReason.fromJson(json['reason']),
-      data: json.containsKey('data') ? json['data'] : null,
+      reason: PausedEventReason.fromJson(json['reason'] as String),
+      data: json.containsKey('data')
+          ? json['data'] as Map<String, dynamic>
+          : null,
       hitBreakpoints: json.containsKey('hitBreakpoints')
           ? (json['hitBreakpoints'] as List).map((e) => e as String).toList()
           : null,
       asyncStackTrace: json.containsKey('asyncStackTrace')
-          ? runtime.StackTrace.fromJson(json['asyncStackTrace'])
+          ? runtime.StackTraceData.fromJson(
+              json['asyncStackTrace'] as Map<String, dynamic>)
           : null,
       asyncStackTraceId: json.containsKey('asyncStackTraceId')
-          ? runtime.StackTraceId.fromJson(json['asyncStackTraceId'])
+          ? runtime.StackTraceId.fromJson(
+              json['asyncStackTraceId'] as Map<String, dynamic>)
           : null,
       asyncCallStackTraceId: json.containsKey('asyncCallStackTraceId')
-          ? runtime.StackTraceId.fromJson(json['asyncCallStackTraceId'])
+          ? runtime.StackTraceId.fromJson(
+              json['asyncCallStackTraceId'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -485,7 +490,7 @@ class ScriptFailedToParseEvent {
   final String hash;
 
   /// Embedder-specific auxiliary data.
-  final Map executionContextAuxData;
+  final Map<String, dynamic> executionContextAuxData;
 
   /// URL of source map associated with script (if any).
   final String sourceMapURL;
@@ -500,7 +505,7 @@ class ScriptFailedToParseEvent {
   final int length;
 
   /// JavaScript top stack frame of where the script parsed event was triggered if available.
-  final runtime.StackTrace stackTrace;
+  final runtime.StackTraceData stackTrace;
 
   ScriptFailedToParseEvent(
       {@required this.scriptId,
@@ -520,26 +525,29 @@ class ScriptFailedToParseEvent {
 
   factory ScriptFailedToParseEvent.fromJson(Map<String, dynamic> json) {
     return ScriptFailedToParseEvent(
-      scriptId: runtime.ScriptId.fromJson(json['scriptId']),
-      url: json['url'],
-      startLine: json['startLine'],
-      startColumn: json['startColumn'],
-      endLine: json['endLine'],
-      endColumn: json['endColumn'],
-      executionContextId:
-          runtime.ExecutionContextId.fromJson(json['executionContextId']),
-      hash: json['hash'],
+      scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
+      url: json['url'] as String,
+      startLine: json['startLine'] as int,
+      startColumn: json['startColumn'] as int,
+      endLine: json['endLine'] as int,
+      endColumn: json['endColumn'] as int,
+      executionContextId: runtime.ExecutionContextId.fromJson(
+          json['executionContextId'] as int),
+      hash: json['hash'] as String,
       executionContextAuxData: json.containsKey('executionContextAuxData')
-          ? json['executionContextAuxData']
+          ? json['executionContextAuxData'] as Map<String, dynamic>
           : null,
-      sourceMapURL:
-          json.containsKey('sourceMapURL') ? json['sourceMapURL'] : null,
-      hasSourceURL:
-          json.containsKey('hasSourceURL') ? json['hasSourceURL'] : null,
-      isModule: json.containsKey('isModule') ? json['isModule'] : null,
-      length: json.containsKey('length') ? json['length'] : null,
+      sourceMapURL: json.containsKey('sourceMapURL')
+          ? json['sourceMapURL'] as String
+          : null,
+      hasSourceURL: json.containsKey('hasSourceURL')
+          ? json['hasSourceURL'] as bool
+          : null,
+      isModule: json.containsKey('isModule') ? json['isModule'] as bool : null,
+      length: json.containsKey('length') ? json['length'] as int : null,
       stackTrace: json.containsKey('stackTrace')
-          ? runtime.StackTrace.fromJson(json['stackTrace'])
+          ? runtime.StackTraceData.fromJson(
+              json['stackTrace'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -571,7 +579,7 @@ class ScriptParsedEvent {
   final String hash;
 
   /// Embedder-specific auxiliary data.
-  final Map executionContextAuxData;
+  final Map<String, dynamic> executionContextAuxData;
 
   /// True, if this script is generated as a result of the live edit operation.
   final bool isLiveEdit;
@@ -589,7 +597,7 @@ class ScriptParsedEvent {
   final int length;
 
   /// JavaScript top stack frame of where the script parsed event was triggered if available.
-  final runtime.StackTrace stackTrace;
+  final runtime.StackTraceData stackTrace;
 
   ScriptParsedEvent(
       {@required this.scriptId,
@@ -610,27 +618,31 @@ class ScriptParsedEvent {
 
   factory ScriptParsedEvent.fromJson(Map<String, dynamic> json) {
     return ScriptParsedEvent(
-      scriptId: runtime.ScriptId.fromJson(json['scriptId']),
-      url: json['url'],
-      startLine: json['startLine'],
-      startColumn: json['startColumn'],
-      endLine: json['endLine'],
-      endColumn: json['endColumn'],
-      executionContextId:
-          runtime.ExecutionContextId.fromJson(json['executionContextId']),
-      hash: json['hash'],
+      scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
+      url: json['url'] as String,
+      startLine: json['startLine'] as int,
+      startColumn: json['startColumn'] as int,
+      endLine: json['endLine'] as int,
+      endColumn: json['endColumn'] as int,
+      executionContextId: runtime.ExecutionContextId.fromJson(
+          json['executionContextId'] as int),
+      hash: json['hash'] as String,
       executionContextAuxData: json.containsKey('executionContextAuxData')
-          ? json['executionContextAuxData']
+          ? json['executionContextAuxData'] as Map<String, dynamic>
           : null,
-      isLiveEdit: json.containsKey('isLiveEdit') ? json['isLiveEdit'] : null,
-      sourceMapURL:
-          json.containsKey('sourceMapURL') ? json['sourceMapURL'] : null,
-      hasSourceURL:
-          json.containsKey('hasSourceURL') ? json['hasSourceURL'] : null,
-      isModule: json.containsKey('isModule') ? json['isModule'] : null,
-      length: json.containsKey('length') ? json['length'] : null,
+      isLiveEdit:
+          json.containsKey('isLiveEdit') ? json['isLiveEdit'] as bool : null,
+      sourceMapURL: json.containsKey('sourceMapURL')
+          ? json['sourceMapURL'] as String
+          : null,
+      hasSourceURL: json.containsKey('hasSourceURL')
+          ? json['hasSourceURL'] as bool
+          : null,
+      isModule: json.containsKey('isModule') ? json['isModule'] as bool : null,
+      length: json.containsKey('length') ? json['length'] as int : null,
       stackTrace: json.containsKey('stackTrace')
-          ? runtime.StackTrace.fromJson(json['stackTrace'])
+          ? runtime.StackTraceData.fromJson(
+              json['stackTrace'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -647,9 +659,11 @@ class EvaluateOnCallFrameResult {
 
   factory EvaluateOnCallFrameResult.fromJson(Map<String, dynamic> json) {
     return EvaluateOnCallFrameResult(
-      result: runtime.RemoteObject.fromJson(json['result']),
+      result:
+          runtime.RemoteObject.fromJson(json['result'] as Map<String, dynamic>),
       exceptionDetails: json.containsKey('exceptionDetails')
-          ? runtime.ExceptionDetails.fromJson(json['exceptionDetails'])
+          ? runtime.ExceptionDetails.fromJson(
+              json['exceptionDetails'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -660,7 +674,7 @@ class RestartFrameResult {
   final List<CallFrame> callFrames;
 
   /// Async stack trace, if any.
-  final runtime.StackTrace asyncStackTrace;
+  final runtime.StackTraceData asyncStackTrace;
 
   /// Async stack trace, if any.
   final runtime.StackTraceId asyncStackTraceId;
@@ -673,13 +687,15 @@ class RestartFrameResult {
   factory RestartFrameResult.fromJson(Map<String, dynamic> json) {
     return RestartFrameResult(
       callFrames: (json['callFrames'] as List)
-          .map((e) => CallFrame.fromJson(e))
+          .map((e) => CallFrame.fromJson(e as Map<String, dynamic>))
           .toList(),
       asyncStackTrace: json.containsKey('asyncStackTrace')
-          ? runtime.StackTrace.fromJson(json['asyncStackTrace'])
+          ? runtime.StackTraceData.fromJson(
+              json['asyncStackTrace'] as Map<String, dynamic>)
           : null,
       asyncStackTraceId: json.containsKey('asyncStackTraceId')
-          ? runtime.StackTraceId.fromJson(json['asyncStackTraceId'])
+          ? runtime.StackTraceId.fromJson(
+              json['asyncStackTraceId'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -697,8 +713,9 @@ class SetBreakpointResult {
 
   factory SetBreakpointResult.fromJson(Map<String, dynamic> json) {
     return SetBreakpointResult(
-      breakpointId: BreakpointId.fromJson(json['breakpointId']),
-      actualLocation: Location.fromJson(json['actualLocation']),
+      breakpointId: BreakpointId.fromJson(json['breakpointId'] as String),
+      actualLocation:
+          Location.fromJson(json['actualLocation'] as Map<String, dynamic>),
     );
   }
 }
@@ -715,9 +732,10 @@ class SetBreakpointByUrlResult {
 
   factory SetBreakpointByUrlResult.fromJson(Map<String, dynamic> json) {
     return SetBreakpointByUrlResult(
-      breakpointId: BreakpointId.fromJson(json['breakpointId']),
-      locations:
-          (json['locations'] as List).map((e) => Location.fromJson(e)).toList(),
+      breakpointId: BreakpointId.fromJson(json['breakpointId'] as String),
+      locations: (json['locations'] as List)
+          .map((e) => Location.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -730,7 +748,7 @@ class SetScriptSourceResult {
   final bool stackChanged;
 
   /// Async stack trace, if any.
-  final runtime.StackTrace asyncStackTrace;
+  final runtime.StackTraceData asyncStackTrace;
 
   /// Async stack trace, if any.
   final runtime.StackTraceId asyncStackTraceId;
@@ -749,19 +767,23 @@ class SetScriptSourceResult {
     return SetScriptSourceResult(
       callFrames: json.containsKey('callFrames')
           ? (json['callFrames'] as List)
-              .map((e) => CallFrame.fromJson(e))
+              .map((e) => CallFrame.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
-      stackChanged:
-          json.containsKey('stackChanged') ? json['stackChanged'] : null,
+      stackChanged: json.containsKey('stackChanged')
+          ? json['stackChanged'] as bool
+          : null,
       asyncStackTrace: json.containsKey('asyncStackTrace')
-          ? runtime.StackTrace.fromJson(json['asyncStackTrace'])
+          ? runtime.StackTraceData.fromJson(
+              json['asyncStackTrace'] as Map<String, dynamic>)
           : null,
       asyncStackTraceId: json.containsKey('asyncStackTraceId')
-          ? runtime.StackTraceId.fromJson(json['asyncStackTraceId'])
+          ? runtime.StackTraceId.fromJson(
+              json['asyncStackTraceId'] as Map<String, dynamic>)
           : null,
       exceptionDetails: json.containsKey('exceptionDetails')
-          ? runtime.ExceptionDetails.fromJson(json['exceptionDetails'])
+          ? runtime.ExceptionDetails.fromJson(
+              json['exceptionDetails'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -825,10 +847,10 @@ class Location {
 
   factory Location.fromJson(Map<String, dynamic> json) {
     return Location(
-      scriptId: runtime.ScriptId.fromJson(json['scriptId']),
-      lineNumber: json['lineNumber'],
+      scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
+      lineNumber: json['lineNumber'] as int,
       columnNumber:
-          json.containsKey('columnNumber') ? json['columnNumber'] : null,
+          json.containsKey('columnNumber') ? json['columnNumber'] as int : null,
     );
   }
 
@@ -851,8 +873,8 @@ class ScriptPosition {
 
   factory ScriptPosition.fromJson(Map<String, dynamic> json) {
     return ScriptPosition(
-      lineNumber: json['lineNumber'],
-      columnNumber: json['columnNumber'],
+      lineNumber: json['lineNumber'] as int,
+      columnNumber: json['columnNumber'] as int,
     );
   }
 
@@ -902,18 +924,21 @@ class CallFrame {
 
   factory CallFrame.fromJson(Map<String, dynamic> json) {
     return CallFrame(
-      callFrameId: CallFrameId.fromJson(json['callFrameId']),
-      functionName: json['functionName'],
+      callFrameId: CallFrameId.fromJson(json['callFrameId'] as String),
+      functionName: json['functionName'] as String,
       functionLocation: json.containsKey('functionLocation')
-          ? Location.fromJson(json['functionLocation'])
+          ? Location.fromJson(json['functionLocation'] as Map<String, dynamic>)
           : null,
-      location: Location.fromJson(json['location']),
-      url: json['url'],
-      scopeChain:
-          (json['scopeChain'] as List).map((e) => Scope.fromJson(e)).toList(),
-      this$: runtime.RemoteObject.fromJson(json['this']),
+      location: Location.fromJson(json['location'] as Map<String, dynamic>),
+      url: json['url'] as String,
+      scopeChain: (json['scopeChain'] as List)
+          .map((e) => Scope.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      this$:
+          runtime.RemoteObject.fromJson(json['this'] as Map<String, dynamic>),
       returnValue: json.containsKey('returnValue')
-          ? runtime.RemoteObject.fromJson(json['returnValue'])
+          ? runtime.RemoteObject.fromJson(
+              json['returnValue'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -960,14 +985,15 @@ class Scope {
 
   factory Scope.fromJson(Map<String, dynamic> json) {
     return Scope(
-      type: ScopeType.fromJson(json['type']),
-      object: runtime.RemoteObject.fromJson(json['object']),
-      name: json.containsKey('name') ? json['name'] : null,
+      type: ScopeType.fromJson(json['type'] as String),
+      object:
+          runtime.RemoteObject.fromJson(json['object'] as Map<String, dynamic>),
+      name: json.containsKey('name') ? json['name'] as String : null,
       startLocation: json.containsKey('startLocation')
-          ? Location.fromJson(json['startLocation'])
+          ? Location.fromJson(json['startLocation'] as Map<String, dynamic>)
           : null,
       endLocation: json.containsKey('endLocation')
-          ? Location.fromJson(json['endLocation'])
+          ? Location.fromJson(json['endLocation'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -1036,8 +1062,8 @@ class SearchMatch {
 
   factory SearchMatch.fromJson(Map<String, dynamic> json) {
     return SearchMatch(
-      lineNumber: json['lineNumber'],
-      lineContent: json['lineContent'],
+      lineNumber: json['lineNumber'] as num,
+      lineContent: json['lineContent'] as String,
     );
   }
 
@@ -1069,12 +1095,12 @@ class BreakLocation {
 
   factory BreakLocation.fromJson(Map<String, dynamic> json) {
     return BreakLocation(
-      scriptId: runtime.ScriptId.fromJson(json['scriptId']),
-      lineNumber: json['lineNumber'],
+      scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
+      lineNumber: json['lineNumber'] as int,
       columnNumber:
-          json.containsKey('columnNumber') ? json['columnNumber'] : null,
+          json.containsKey('columnNumber') ? json['columnNumber'] as int : null,
       type: json.containsKey('type')
-          ? BreakLocationType.fromJson(json['type'])
+          ? BreakLocationType.fromJson(json['type'] as String)
           : null,
     );
   }

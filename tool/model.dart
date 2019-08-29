@@ -5,17 +5,18 @@ final _aliases = {
   'Response': 'ResponseData',
   'Frame': 'FrameInfo',
   'AXNode': 'AXNodeData',
+  'StackTrace': 'StackTraceData',
 };
 
 class Protocol {
   final List<Domain> domains;
 
-  Protocol.fromJson(Map json)
+  Protocol.fromJson(Map<String, dynamic> json)
       : domains =
-            (json['domains'] as List).map((j) => Domain.fromJson(j)).toList();
+            (json['domains'] as List).map((j) => Domain.fromJson(j as Map<String, dynamic>)).toList();
 
   factory Protocol.fromString(String protocol) =>
-      Protocol.fromJson(jsonDecode(protocol));
+      Protocol.fromJson(jsonDecode(protocol) as Map<String, dynamic>);
 }
 
 class Domain {
@@ -27,22 +28,22 @@ class Domain {
   final bool deprecated;
 
   Domain.fromJson(Map json)
-      : name = json['domain'],
-        description = json['description'],
+      : name = json['domain'] as String,
+        description = json['description'] as String,
         types = json.containsKey('types')
             ? (json['types'] as List)
-                .map((j) => ComplexType.fromJson(j, json['domain']))
+                .map((j) => ComplexType.fromJson(j as Map<String, dynamic>, json['domain'] as String))
                 .toList()
             : const [],
         commands = json.containsKey('commands')
             ? (json['commands'] as List)
-                .map((j) => Command.fromJson(j))
+                .map((j) => Command.fromJson(j as Map<String, dynamic>))
                 .toList()
             : const [],
         events = json.containsKey('events')
-            ? (json['events'] as List).map((j) => Event.fromJson(j)).toList()
+            ? (json['events'] as List).map((j) => Event.fromJson(j as Map<String, dynamic>)).toList()
             : const [],
-        deprecated = json['deprecated'] ?? false;
+        deprecated = json['deprecated'] as bool ?? false;
 }
 
 class ComplexType {
@@ -191,9 +192,9 @@ class ListItems implements Typed {
   @override
   final String ref;
 
-  ListItems.fromJson(Map json)
-      : type = json['type'],
-        ref = _ref(json[r'$ref']);
+  ListItems.fromJson(Map<String, dynamic> json)
+      : type = json['type'] as String,
+        ref = _ref(json[r'$ref'] as String);
 }
 
 abstract class Typed {

@@ -14,10 +14,11 @@ class TracingApi {
 
   /// Contains an bucket of collected trace events. When tracing is stopped collected events will be
   /// send as a sequence of dataCollected events followed by tracingComplete event.
-  Stream<List<Map>> get onDataCollected => _client.onEvent
+  Stream<List<Map<String, dynamic>>> get onDataCollected => _client.onEvent
       .where((event) => event.name == 'Tracing.dataCollected')
-      .map((event) =>
-          (event.parameters['value'] as List).map((e) => e as Map).toList());
+      .map((event) => (event.parameters['value'] as List)
+          .map((e) => e as Map<String, dynamic>)
+          .toList());
 
   /// Signals that tracing is stopped and there is no trace buffers pending flush, all data were
   /// delivered via dataCollected events.
@@ -98,9 +99,11 @@ class BufferUsageEvent {
 
   factory BufferUsageEvent.fromJson(Map<String, dynamic> json) {
     return BufferUsageEvent(
-      percentFull: json.containsKey('percentFull') ? json['percentFull'] : null,
-      eventCount: json.containsKey('eventCount') ? json['eventCount'] : null,
-      value: json.containsKey('value') ? json['value'] : null,
+      percentFull:
+          json.containsKey('percentFull') ? json['percentFull'] as num : null,
+      eventCount:
+          json.containsKey('eventCount') ? json['eventCount'] as num : null,
+      value: json.containsKey('value') ? json['value'] as num : null,
     );
   }
 }
@@ -127,15 +130,15 @@ class TracingCompleteEvent {
 
   factory TracingCompleteEvent.fromJson(Map<String, dynamic> json) {
     return TracingCompleteEvent(
-      dataLossOccurred: json['dataLossOccurred'],
+      dataLossOccurred: json['dataLossOccurred'] as bool,
       stream: json.containsKey('stream')
-          ? io.StreamHandle.fromJson(json['stream'])
+          ? io.StreamHandle.fromJson(json['stream'] as String)
           : null,
       traceFormat: json.containsKey('traceFormat')
-          ? StreamFormat.fromJson(json['traceFormat'])
+          ? StreamFormat.fromJson(json['traceFormat'] as String)
           : null,
       streamCompression: json.containsKey('streamCompression')
-          ? StreamCompression.fromJson(json['streamCompression'])
+          ? StreamCompression.fromJson(json['streamCompression'] as String)
           : null,
     );
   }
@@ -152,21 +155,22 @@ class RequestMemoryDumpResult {
 
   factory RequestMemoryDumpResult.fromJson(Map<String, dynamic> json) {
     return RequestMemoryDumpResult(
-      dumpGuid: json['dumpGuid'],
-      success: json['success'],
+      dumpGuid: json['dumpGuid'] as String,
+      success: json['success'] as bool,
     );
   }
 }
 
 /// Configuration for memory dump. Used only when "memory-infra" category is enabled.
 class MemoryDumpConfig {
-  final Map value;
+  final Map<String, dynamic> value;
 
   MemoryDumpConfig(this.value);
 
-  factory MemoryDumpConfig.fromJson(Map value) => MemoryDumpConfig(value);
+  factory MemoryDumpConfig.fromJson(Map<String, dynamic> value) =>
+      MemoryDumpConfig(value);
 
-  Map toJson() => value;
+  Map<String, dynamic> toJson() => value;
 
   @override
   bool operator ==(other) =>
@@ -217,14 +221,16 @@ class TraceConfig {
   factory TraceConfig.fromJson(Map<String, dynamic> json) {
     return TraceConfig(
       recordMode: json.containsKey('recordMode')
-          ? TraceConfigRecordMode.fromJson(json['recordMode'])
+          ? TraceConfigRecordMode.fromJson(json['recordMode'] as String)
           : null,
-      enableSampling:
-          json.containsKey('enableSampling') ? json['enableSampling'] : null,
-      enableSystrace:
-          json.containsKey('enableSystrace') ? json['enableSystrace'] : null,
+      enableSampling: json.containsKey('enableSampling')
+          ? json['enableSampling'] as bool
+          : null,
+      enableSystrace: json.containsKey('enableSystrace')
+          ? json['enableSystrace'] as bool
+          : null,
       enableArgumentFilter: json.containsKey('enableArgumentFilter')
-          ? json['enableArgumentFilter']
+          ? json['enableArgumentFilter'] as bool
           : null,
       includedCategories: json.containsKey('includedCategories')
           ? (json['includedCategories'] as List)
@@ -240,7 +246,8 @@ class TraceConfig {
           ? (json['syntheticDelays'] as List).map((e) => e as String).toList()
           : null,
       memoryDumpConfig: json.containsKey('memoryDumpConfig')
-          ? MemoryDumpConfig.fromJson(json['memoryDumpConfig'])
+          ? MemoryDumpConfig.fromJson(
+              json['memoryDumpConfig'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -253,10 +260,10 @@ class TraceConfig {
       if (enableArgumentFilter != null)
         'enableArgumentFilter': enableArgumentFilter,
       if (includedCategories != null)
-        'includedCategories': includedCategories.toList(),
+        'includedCategories': [...includedCategories],
       if (excludedCategories != null)
-        'excludedCategories': excludedCategories.toList(),
-      if (syntheticDelays != null) 'syntheticDelays': syntheticDelays.toList(),
+        'excludedCategories': [...excludedCategories],
+      if (syntheticDelays != null) 'syntheticDelays': [...syntheticDelays],
       if (memoryDumpConfig != null)
         'memoryDumpConfig': memoryDumpConfig.toJson(),
     };

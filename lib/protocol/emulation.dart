@@ -19,7 +19,7 @@ class EmulationApi {
   /// Returns: True if emulation is supported.
   Future<bool> canEmulate() async {
     var result = await _client.send('Emulation.canEmulate');
-    return result['result'];
+    return result['result'] as bool;
   }
 
   /// Clears the overriden device metrics.
@@ -213,7 +213,7 @@ class EmulationApi {
       if (waitForNavigation != null) 'waitForNavigation': waitForNavigation,
       if (initialVirtualTime != null) 'initialVirtualTime': initialVirtualTime,
     });
-    return result['virtualTimeTicksBase'];
+    return result['virtualTimeTicksBase'] as num;
   }
 
   /// Overrides default host system timezone with the specified one.
@@ -264,8 +264,8 @@ class ScreenOrientation {
 
   factory ScreenOrientation.fromJson(Map<String, dynamic> json) {
     return ScreenOrientation(
-      type: ScreenOrientationType.fromJson(json['type']),
-      angle: json['angle'],
+      type: ScreenOrientationType.fromJson(json['type'] as String),
+      angle: json['angle'] as int,
     );
   }
 

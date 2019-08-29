@@ -123,7 +123,7 @@ class ExecutionContext {
           {List args}) async =>
       await _evaluateInternal(pageFunction, args: args, returnByValue: false);
 
-  Future<dynamic> _evaluateInternal(@Language('js') String pageFunction,
+  Future<T> _evaluateInternal<T>(@Language('js') String pageFunction,
       {List args, @required bool returnByValue}) async {
     // Try to convert a function shorthand (ie: '(el) => el.value;' to a full
     // function declaration (function(el) { return el.value; })
@@ -152,9 +152,9 @@ class ExecutionContext {
           throw ClientError(response.exceptionDetails);
         }
 
-        return returnByValue
+        return (returnByValue
             ? valueFromRemoteObject(response.result)
-            : _createJsHandle(response.result);
+            : _createJsHandle(response.result)) as T;
       } else {
         args ??= [];
 
@@ -170,9 +170,9 @@ class ExecutionContext {
           throw ClientError(result.exceptionDetails);
         }
 
-        return returnByValue
+        return (returnByValue
             ? valueFromRemoteObject(result.result)
-            : _createJsHandle(result.result);
+            : _createJsHandle(result.result)) as T;
       }
     } on ServerException catch (e) {
       if (e.message.contains('Cannot find context with specified id') ||
@@ -247,7 +247,7 @@ class ExecutionContext {
     var object = await domApi.resolveNode(
         backendNodeId: nodeInfo.backendNodeId, executionContextId: context.id);
 
-    return _createJsHandle(object);
+    return _createJsHandle(object) as ElementHandle;
   }
 
   JsHandle _createJsHandle(RemoteObject remoteObject) =>

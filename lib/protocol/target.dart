@@ -78,7 +78,7 @@ class TargetApi {
     var result = await _client.send('Target.closeTarget', {
       'targetId': targetId,
     });
-    return result['success'];
+    return result['success'] as bool;
   }
 
   /// Inject object to the target's main frame that provides a communication
@@ -222,7 +222,7 @@ class TargetApi {
   /// [locations] List of remote locations.
   Future<void> setRemoteLocations(List<RemoteLocation> locations) async {
     await _client.send('Target.setRemoteLocations', {
-      'locations': locations.map((e) => e).toList(),
+      'locations': [...locations],
     });
   }
 }
@@ -242,9 +242,10 @@ class AttachedToTargetEvent {
 
   factory AttachedToTargetEvent.fromJson(Map<String, dynamic> json) {
     return AttachedToTargetEvent(
-      sessionId: SessionID.fromJson(json['sessionId']),
-      targetInfo: TargetInfo.fromJson(json['targetInfo']),
-      waitingForDebugger: json['waitingForDebugger'],
+      sessionId: SessionID.fromJson(json['sessionId'] as String),
+      targetInfo:
+          TargetInfo.fromJson(json['targetInfo'] as Map<String, dynamic>),
+      waitingForDebugger: json['waitingForDebugger'] as bool,
     );
   }
 }
@@ -257,7 +258,7 @@ class DetachedFromTargetEvent {
 
   factory DetachedFromTargetEvent.fromJson(Map<String, dynamic> json) {
     return DetachedFromTargetEvent(
-      sessionId: SessionID.fromJson(json['sessionId']),
+      sessionId: SessionID.fromJson(json['sessionId'] as String),
     );
   }
 }
@@ -273,8 +274,8 @@ class ReceivedMessageFromTargetEvent {
 
   factory ReceivedMessageFromTargetEvent.fromJson(Map<String, dynamic> json) {
     return ReceivedMessageFromTargetEvent(
-      sessionId: SessionID.fromJson(json['sessionId']),
-      message: json['message'],
+      sessionId: SessionID.fromJson(json['sessionId'] as String),
+      message: json['message'] as String,
     );
   }
 }
@@ -295,9 +296,9 @@ class TargetCrashedEvent {
 
   factory TargetCrashedEvent.fromJson(Map<String, dynamic> json) {
     return TargetCrashedEvent(
-      targetId: TargetID.fromJson(json['targetId']),
-      status: json['status'],
-      errorCode: json['errorCode'],
+      targetId: TargetID.fromJson(json['targetId'] as String),
+      status: json['status'] as String,
+      errorCode: json['errorCode'] as int,
     );
   }
 }
@@ -391,16 +392,16 @@ class TargetInfo {
 
   factory TargetInfo.fromJson(Map<String, dynamic> json) {
     return TargetInfo(
-      targetId: TargetID.fromJson(json['targetId']),
-      type: json['type'],
-      title: json['title'],
-      url: json['url'],
-      attached: json['attached'],
+      targetId: TargetID.fromJson(json['targetId'] as String),
+      type: json['type'] as String,
+      title: json['title'] as String,
+      url: json['url'] as String,
+      attached: json['attached'] as bool,
       openerId: json.containsKey('openerId')
-          ? TargetID.fromJson(json['openerId'])
+          ? TargetID.fromJson(json['openerId'] as String)
           : null,
       browserContextId: json.containsKey('browserContextId')
-          ? BrowserContextID.fromJson(json['browserContextId'])
+          ? BrowserContextID.fromJson(json['browserContextId'] as String)
           : null,
     );
   }
@@ -428,8 +429,8 @@ class RemoteLocation {
 
   factory RemoteLocation.fromJson(Map<String, dynamic> json) {
     return RemoteLocation(
-      host: json['host'],
-      port: json['port'],
+      host: json['host'] as String,
+      port: json['port'] as int,
     );
   }
 

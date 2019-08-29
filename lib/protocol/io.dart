@@ -38,7 +38,7 @@ class IOApi {
     var result = await _client.send('IO.resolveBlob', {
       'objectId': objectId,
     });
-    return result['uuid'];
+    return result['uuid'] as String;
   }
 }
 
@@ -56,10 +56,11 @@ class ReadResult {
 
   factory ReadResult.fromJson(Map<String, dynamic> json) {
     return ReadResult(
-      base64Encoded:
-          json.containsKey('base64Encoded') ? json['base64Encoded'] : null,
-      data: json['data'],
-      eof: json['eof'],
+      base64Encoded: json.containsKey('base64Encoded')
+          ? json['base64Encoded'] as bool
+          : null,
+      data: json['data'] as String,
+      eof: json['eof'] as bool,
     );
   }
 }

@@ -756,7 +756,7 @@ main() {
       var handle = await page.evaluateHandle('() => ({window, document})');
       var properties = await handle.properties;
       JsHandle windowHandle = properties['window'];
-      ElementHandle documentHandle = properties['document'];
+      var documentHandle = properties['document'] as ElementHandle;
       await handle.dispose();
       //----
       expect(windowHandle, isNotNull);

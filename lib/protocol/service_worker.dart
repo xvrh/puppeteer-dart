@@ -146,9 +146,9 @@ class ServiceWorkerRegistration {
 
   factory ServiceWorkerRegistration.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerRegistration(
-      registrationId: RegistrationID.fromJson(json['registrationId']),
-      scopeURL: json['scopeURL'],
-      isDeleted: json['isDeleted'],
+      registrationId: RegistrationID.fromJson(json['registrationId'] as String),
+      scopeURL: json['scopeURL'] as String,
+      isDeleted: json['isDeleted'] as bool,
     );
   }
 
@@ -266,25 +266,25 @@ class ServiceWorkerVersion {
 
   factory ServiceWorkerVersion.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerVersion(
-      versionId: json['versionId'],
-      registrationId: RegistrationID.fromJson(json['registrationId']),
-      scriptURL: json['scriptURL'],
-      runningStatus:
-          ServiceWorkerVersionRunningStatus.fromJson(json['runningStatus']),
-      status: ServiceWorkerVersionStatus.fromJson(json['status']),
+      versionId: json['versionId'] as String,
+      registrationId: RegistrationID.fromJson(json['registrationId'] as String),
+      scriptURL: json['scriptURL'] as String,
+      runningStatus: ServiceWorkerVersionRunningStatus.fromJson(
+          json['runningStatus'] as String),
+      status: ServiceWorkerVersionStatus.fromJson(json['status'] as String),
       scriptLastModified: json.containsKey('scriptLastModified')
-          ? json['scriptLastModified']
+          ? json['scriptLastModified'] as num
           : null,
       scriptResponseTime: json.containsKey('scriptResponseTime')
-          ? json['scriptResponseTime']
+          ? json['scriptResponseTime'] as num
           : null,
       controlledClients: json.containsKey('controlledClients')
           ? (json['controlledClients'] as List)
-              .map((e) => target.TargetID.fromJson(e))
+              .map((e) => target.TargetID.fromJson(e as String))
               .toList()
           : null,
       targetId: json.containsKey('targetId')
-          ? target.TargetID.fromJson(json['targetId'])
+          ? target.TargetID.fromJson(json['targetId'] as String)
           : null,
     );
   }
@@ -329,12 +329,12 @@ class ServiceWorkerErrorMessage {
 
   factory ServiceWorkerErrorMessage.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerErrorMessage(
-      errorMessage: json['errorMessage'],
-      registrationId: RegistrationID.fromJson(json['registrationId']),
-      versionId: json['versionId'],
-      sourceURL: json['sourceURL'],
-      lineNumber: json['lineNumber'],
-      columnNumber: json['columnNumber'],
+      errorMessage: json['errorMessage'] as String,
+      registrationId: RegistrationID.fromJson(json['registrationId'] as String),
+      versionId: json['versionId'] as String,
+      sourceURL: json['sourceURL'] as String,
+      lineNumber: json['lineNumber'] as int,
+      columnNumber: json['columnNumber'] as int,
     );
   }
 

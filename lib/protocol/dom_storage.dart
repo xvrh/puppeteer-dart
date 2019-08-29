@@ -78,9 +78,9 @@ class DomStorageItemAddedEvent {
 
   factory DomStorageItemAddedEvent.fromJson(Map<String, dynamic> json) {
     return DomStorageItemAddedEvent(
-      storageId: StorageId.fromJson(json['storageId']),
-      key: json['key'],
-      newValue: json['newValue'],
+      storageId: StorageId.fromJson(json['storageId'] as Map<String, dynamic>),
+      key: json['key'] as String,
+      newValue: json['newValue'] as String,
     );
   }
 }
@@ -94,8 +94,8 @@ class DomStorageItemRemovedEvent {
 
   factory DomStorageItemRemovedEvent.fromJson(Map<String, dynamic> json) {
     return DomStorageItemRemovedEvent(
-      storageId: StorageId.fromJson(json['storageId']),
-      key: json['key'],
+      storageId: StorageId.fromJson(json['storageId'] as Map<String, dynamic>),
+      key: json['key'] as String,
     );
   }
 }
@@ -117,10 +117,10 @@ class DomStorageItemUpdatedEvent {
 
   factory DomStorageItemUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return DomStorageItemUpdatedEvent(
-      storageId: StorageId.fromJson(json['storageId']),
-      key: json['key'],
-      oldValue: json['oldValue'],
-      newValue: json['newValue'],
+      storageId: StorageId.fromJson(json['storageId'] as Map<String, dynamic>),
+      key: json['key'] as String,
+      oldValue: json['oldValue'] as String,
+      newValue: json['newValue'] as String,
     );
   }
 }
@@ -137,8 +137,8 @@ class StorageId {
 
   factory StorageId.fromJson(Map<String, dynamic> json) {
     return StorageId(
-      securityOrigin: json['securityOrigin'],
-      isLocalStorage: json['isLocalStorage'],
+      securityOrigin: json['securityOrigin'] as String,
+      isLocalStorage: json['isLocalStorage'] as bool,
     );
   }
 

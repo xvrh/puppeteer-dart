@@ -135,7 +135,7 @@ function detachFrame(frameId) {
 
 Future<T> waitFutures<T>(Future<T> firstFuture, List<Future> others) async {
   var futures = <Future>[firstFuture, ...others];
-  return (await Future.wait(futures))[0];
+  return (await Future.wait(futures))[0] as T;
 }
 
 Future<void> navigateFrame(Page page, String frameId, String url) async {
@@ -148,7 +148,7 @@ function navigateFrame(frameId, url) {
 ''', args: [frameId, url]);
 }
 
-dumpFrames(Frame frame, [String indentation]) {
+List<String> dumpFrames(Frame frame, [String indentation]) {
   indentation ??= '';
   var description = frame.url.replaceAll(RegExp(r'//[^/]+/'), '//<host>/');
   if (frame.name != null) {

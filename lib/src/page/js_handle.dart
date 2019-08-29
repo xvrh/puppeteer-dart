@@ -64,7 +64,7 @@ function _(object, propertyName) {
 
   /// Fetches the jsonValue of a single property from the referenced object.
   Future<T> propertyValue<T>(String propertyName) async {
-    T value = await (await property(propertyName)).jsonValue;
+    T value = await (await property(propertyName)).jsonValue as T;
     return value;
   }
 
@@ -413,7 +413,7 @@ async function _(element, pageJavascriptEnabled) {
   ///
   /// See [Page.screenshot] for more info.
   Future<List<int>> screenshot(
-      {ScreenshotFormat format, num quality, bool omitBackground}) async {
+      {ScreenshotFormat format, int quality, bool omitBackground}) async {
     var needsViewportReset = false;
 
     var boundingBox = await this.boundingBox;

@@ -100,7 +100,7 @@ class NetworkManager {
     return _updateProtocolCacheDisabled();
   }
 
-  Future<void> setRequestInterception(value) {
+  Future<void> setRequestInterception(bool value) {
     _userRequestInterceptionEnabled = value;
     return _updateProtocolRequestInterception();
   }
@@ -321,7 +321,7 @@ class Request {
       : allowInterception = allowInterception ?? false,
         _fetchApi = FetchApi(client) {
     for (String header in event.request.headers.value.keys) {
-      _headers[header] = event.request.headers.value[header];
+      _headers[header] = event.request.headers.value[header] as String;
     }
   }
 
@@ -388,7 +388,7 @@ class Request {
   /// - [postData]: If set changes the post data of request
   /// - [headers]: If set changes the request HTTP headers
   Future<void> continueRequest(
-      {String url, String method, String postData, Map headers}) async {
+      {String url, String method, String postData, Map<String, String> headers}) async {
     // Request interception is not supported for data: urls.
     if (this.url.startsWith('data:')) return;
     assert(allowInterception, 'Request Interception is not enabled!');
@@ -512,10 +512,15 @@ class Response {
   final _bodyLoadedCompleter = Completer();
   Future _contentFuture;
   final NetworkApi _networkApi;
+  final _headers =
+    CanonicalizedMap<String, String, String>((key) => key.toLowerCase());
 
   Response(this.client, this.request, this.data)
       : _networkApi = NetworkApi(client) {
     assert(data != null);
+    for (String header in data.headers.value.keys) {
+      _headers[header] = data.headers.value[header] as String;
+    }
   }
 
   /// The IP address of the remote server
@@ -542,8 +547,8 @@ class Response {
   /// memory cache.
   bool get fromCache => fromDiskCache || request._fromMemoryCache;
 
-  /// An object with HTTP headers associated with the response. All header names are lower-case.
-  Map get headers => data.headers.value;
+  /// An object with HTTP headers associated with the response.
+  Map<String, String> get headers => _headers;
 
   /// Security details if the response was received over the secure connection,
   /// or `null` otherwise.

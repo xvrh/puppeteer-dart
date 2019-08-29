@@ -31,7 +31,7 @@ class BrowserApi {
       {target.BrowserContextID browserContextId}) async {
     await _client.send('Browser.grantPermissions', {
       'origin': origin,
-      'permissions': permissions.map((e) => e).toList(),
+      'permissions': [...permissions],
       if (browserContextId != null) 'browserContextId': browserContextId,
     });
   }
@@ -169,11 +169,11 @@ class GetVersionResult {
 
   factory GetVersionResult.fromJson(Map<String, dynamic> json) {
     return GetVersionResult(
-      protocolVersion: json['protocolVersion'],
-      product: json['product'],
-      revision: json['revision'],
-      userAgent: json['userAgent'],
-      jsVersion: json['jsVersion'],
+      protocolVersion: json['protocolVersion'] as String,
+      product: json['product'] as String,
+      revision: json['revision'] as String,
+      userAgent: json['userAgent'] as String,
+      jsVersion: json['jsVersion'] as String,
     );
   }
 }
@@ -190,8 +190,8 @@ class GetWindowForTargetResult {
 
   factory GetWindowForTargetResult.fromJson(Map<String, dynamic> json) {
     return GetWindowForTargetResult(
-      windowId: WindowID.fromJson(json['windowId']),
-      bounds: Bounds.fromJson(json['bounds']),
+      windowId: WindowID.fromJson(json['windowId'] as int),
+      bounds: Bounds.fromJson(json['bounds'] as Map<String, dynamic>),
     );
   }
 }
@@ -269,12 +269,12 @@ class Bounds {
 
   factory Bounds.fromJson(Map<String, dynamic> json) {
     return Bounds(
-      left: json.containsKey('left') ? json['left'] : null,
-      top: json.containsKey('top') ? json['top'] : null,
-      width: json.containsKey('width') ? json['width'] : null,
-      height: json.containsKey('height') ? json['height'] : null,
+      left: json.containsKey('left') ? json['left'] as int : null,
+      top: json.containsKey('top') ? json['top'] as int : null,
+      width: json.containsKey('width') ? json['width'] as int : null,
+      height: json.containsKey('height') ? json['height'] as int : null,
       windowState: json.containsKey('windowState')
-          ? WindowState.fromJson(json['windowState'])
+          ? WindowState.fromJson(json['windowState'] as String)
           : null,
     );
   }
@@ -406,11 +406,12 @@ class PermissionDescriptor {
 
   factory PermissionDescriptor.fromJson(Map<String, dynamic> json) {
     return PermissionDescriptor(
-      name: json['name'],
-      sysex: json.containsKey('sysex') ? json['sysex'] : null,
-      userVisibleOnly:
-          json.containsKey('userVisibleOnly') ? json['userVisibleOnly'] : null,
-      type: json.containsKey('type') ? json['type'] : null,
+      name: json['name'] as String,
+      sysex: json.containsKey('sysex') ? json['sysex'] as bool : null,
+      userVisibleOnly: json.containsKey('userVisibleOnly')
+          ? json['userVisibleOnly'] as bool
+          : null,
+      type: json.containsKey('type') ? json['type'] as String : null,
     );
   }
 
@@ -439,9 +440,9 @@ class Bucket {
 
   factory Bucket.fromJson(Map<String, dynamic> json) {
     return Bucket(
-      low: json['low'],
-      high: json['high'],
-      count: json['count'],
+      low: json['low'] as int,
+      high: json['high'] as int,
+      count: json['count'] as int,
     );
   }
 
@@ -476,11 +477,12 @@ class Histogram {
 
   factory Histogram.fromJson(Map<String, dynamic> json) {
     return Histogram(
-      name: json['name'],
-      sum: json['sum'],
-      count: json['count'],
-      buckets:
-          (json['buckets'] as List).map((e) => Bucket.fromJson(e)).toList(),
+      name: json['name'] as String,
+      sum: json['sum'] as int,
+      count: json['count'] as int,
+      buckets: (json['buckets'] as List)
+          .map((e) => Bucket.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 

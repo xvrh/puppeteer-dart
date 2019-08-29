@@ -13,22 +13,22 @@ class Metrics {
   num get timestamp => values['Timestamp'];
 
   /// Number of documents in the page.
-  int get documents => values['Documents'];
+  int get documents => values['Documents'] as int;
 
   /// Number of frames in the page.
-  int get frames => values['Frames'];
+  int get frames => values['Frames'] as int;
 
   /// Number of events in the page.
-  int get jsEventListeners => values['JSEventListeners'];
+  int get jsEventListeners => values['JSEventListeners'] as int;
 
   /// Number of DOM nodes in the page.
-  int get nodes => values['Nodes'];
+  int get nodes => values['Nodes'] as int;
 
   /// Total number of full or partial page layout.
-  int get layoutCount => values['LayoutCount'];
+  int get layoutCount => values['LayoutCount'] as int;
 
   /// Total number of page style recalculations.
-  int get recalcStyleCount => values['RecalcStyleCount'];
+  int get recalcStyleCount => values['RecalcStyleCount'] as int;
 
   /// Combined durations of all page layouts.
   num get layoutDuration => values['LayoutDuration'];
@@ -43,10 +43,10 @@ class Metrics {
   num get taskDuration => values['TaskDuration'];
 
   /// Used JavaScript heap size.
-  int get jsHeapUsedSize => values['JSHeapUsedSize'];
+  int get jsHeapUsedSize => values['JSHeapUsedSize'] as int;
 
   /// Total JavaScript heap size.
-  int get jsHeapTotalSize => values['JSHeapTotalSize'];
+  int get jsHeapTotalSize => values['JSHeapTotalSize'] as int;
 
   @override
   toString() => values.toString();

@@ -89,9 +89,9 @@ class GetDOMCountersResult {
 
   factory GetDOMCountersResult.fromJson(Map<String, dynamic> json) {
     return GetDOMCountersResult(
-      documents: json['documents'],
-      nodes: json['nodes'],
-      jsEventListeners: json['jsEventListeners'],
+      documents: json['documents'] as int,
+      nodes: json['nodes'] as int,
+      jsEventListeners: json['jsEventListeners'] as int,
     );
   }
 }
@@ -140,8 +140,8 @@ class SamplingProfileNode {
 
   factory SamplingProfileNode.fromJson(Map<String, dynamic> json) {
     return SamplingProfileNode(
-      size: json['size'],
-      total: json['total'],
+      size: json['size'] as num,
+      total: json['total'] as num,
       stack: (json['stack'] as List).map((e) => e as String).toList(),
     );
   }
@@ -150,7 +150,7 @@ class SamplingProfileNode {
     return {
       'size': size,
       'total': total,
-      'stack': stack.toList(),
+      'stack': [...stack],
     };
   }
 }
@@ -166,10 +166,11 @@ class SamplingProfile {
   factory SamplingProfile.fromJson(Map<String, dynamic> json) {
     return SamplingProfile(
       samples: (json['samples'] as List)
-          .map((e) => SamplingProfileNode.fromJson(e))
+          .map((e) => SamplingProfileNode.fromJson(e as Map<String, dynamic>))
           .toList(),
-      modules:
-          (json['modules'] as List).map((e) => Module.fromJson(e)).toList(),
+      modules: (json['modules'] as List)
+          .map((e) => Module.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -204,10 +205,10 @@ class Module {
 
   factory Module.fromJson(Map<String, dynamic> json) {
     return Module(
-      name: json['name'],
-      uuid: json['uuid'],
-      baseAddress: json['baseAddress'],
-      size: json['size'],
+      name: json['name'] as String,
+      uuid: json['uuid'] as String,
+      baseAddress: json['baseAddress'] as String,
+      size: json['size'] as num,
     );
   }
 

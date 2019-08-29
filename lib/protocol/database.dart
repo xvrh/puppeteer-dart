@@ -56,7 +56,7 @@ class ExecuteSQLResult {
           ? (json['values'] as List).map((e) => e as dynamic).toList()
           : null,
       sqlError: json.containsKey('sqlError')
-          ? Error.fromJson(json['sqlError'])
+          ? Error.fromJson(json['sqlError'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -105,10 +105,10 @@ class Database {
 
   factory Database.fromJson(Map<String, dynamic> json) {
     return Database(
-      id: DatabaseId.fromJson(json['id']),
-      domain: json['domain'],
-      name: json['name'],
-      version: json['version'],
+      id: DatabaseId.fromJson(json['id'] as String),
+      domain: json['domain'] as String,
+      name: json['name'] as String,
+      version: json['version'] as String,
     );
   }
 
@@ -134,8 +134,8 @@ class Error {
 
   factory Error.fromJson(Map<String, dynamic> json) {
     return Error(
-      message: json['message'],
-      code: json['code'],
+      message: json['message'] as String,
+      code: json['code'] as int,
     );
   }
 

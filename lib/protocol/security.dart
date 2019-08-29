@@ -80,9 +80,9 @@ class CertificateErrorEvent {
 
   factory CertificateErrorEvent.fromJson(Map<String, dynamic> json) {
     return CertificateErrorEvent(
-      eventId: json['eventId'],
-      errorType: json['errorType'],
-      requestURL: json['requestURL'],
+      eventId: json['eventId'] as int,
+      errorType: json['errorType'] as String,
+      requestURL: json['requestURL'] as String,
     );
   }
 }
@@ -105,11 +105,12 @@ class SecurityStateChangedEvent {
 
   factory SecurityStateChangedEvent.fromJson(Map<String, dynamic> json) {
     return SecurityStateChangedEvent(
-      securityState: SecurityState.fromJson(json['securityState']),
+      securityState: SecurityState.fromJson(json['securityState'] as String),
       explanations: (json['explanations'] as List)
-          .map((e) => SecurityStateExplanation.fromJson(e))
+          .map((e) =>
+              SecurityStateExplanation.fromJson(e as Map<String, dynamic>))
           .toList(),
-      summary: json.containsKey('summary') ? json['summary'] : null,
+      summary: json.containsKey('summary') ? json['summary'] as String : null,
     );
   }
 }
@@ -234,11 +235,12 @@ class SecurityStateExplanation {
 
   factory SecurityStateExplanation.fromJson(Map<String, dynamic> json) {
     return SecurityStateExplanation(
-      securityState: SecurityState.fromJson(json['securityState']),
-      title: json['title'],
-      summary: json['summary'],
-      description: json['description'],
-      mixedContentType: MixedContentType.fromJson(json['mixedContentType']),
+      securityState: SecurityState.fromJson(json['securityState'] as String),
+      title: json['title'] as String,
+      summary: json['summary'] as String,
+      description: json['description'] as String,
+      mixedContentType:
+          MixedContentType.fromJson(json['mixedContentType'] as String),
       certificate:
           (json['certificate'] as List).map((e) => e as String).toList(),
       recommendations: json.containsKey('recommendations')
@@ -254,8 +256,8 @@ class SecurityStateExplanation {
       'summary': summary,
       'description': description,
       'mixedContentType': mixedContentType.toJson(),
-      'certificate': certificate.toList(),
-      if (recommendations != null) 'recommendations': recommendations.toList(),
+      'certificate': [...certificate],
+      if (recommendations != null) 'recommendations': [...recommendations],
     };
   }
 }
@@ -294,15 +296,16 @@ class InsecureContentStatus {
 
   factory InsecureContentStatus.fromJson(Map<String, dynamic> json) {
     return InsecureContentStatus(
-      ranMixedContent: json['ranMixedContent'],
-      displayedMixedContent: json['displayedMixedContent'],
-      containedMixedForm: json['containedMixedForm'],
-      ranContentWithCertErrors: json['ranContentWithCertErrors'],
-      displayedContentWithCertErrors: json['displayedContentWithCertErrors'],
+      ranMixedContent: json['ranMixedContent'] as bool,
+      displayedMixedContent: json['displayedMixedContent'] as bool,
+      containedMixedForm: json['containedMixedForm'] as bool,
+      ranContentWithCertErrors: json['ranContentWithCertErrors'] as bool,
+      displayedContentWithCertErrors:
+          json['displayedContentWithCertErrors'] as bool,
       ranInsecureContentStyle:
-          SecurityState.fromJson(json['ranInsecureContentStyle']),
-      displayedInsecureContentStyle:
-          SecurityState.fromJson(json['displayedInsecureContentStyle']),
+          SecurityState.fromJson(json['ranInsecureContentStyle'] as String),
+      displayedInsecureContentStyle: SecurityState.fromJson(
+          json['displayedInsecureContentStyle'] as String),
     );
   }
 

@@ -41,8 +41,8 @@ class AcceptedEvent {
 
   factory AcceptedEvent.fromJson(Map<String, dynamic> json) {
     return AcceptedEvent(
-      port: json['port'],
-      connectionId: json['connectionId'],
+      port: json['port'] as int,
+      connectionId: json['connectionId'] as String,
     );
   }
 }

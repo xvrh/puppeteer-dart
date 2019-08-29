@@ -11,15 +11,15 @@ String convertToFunctionDeclaration(String javascript) {
   var result = grammar.parse(javascript);
 
   if (result.isSuccess) {
-    List tokens = result.value;
+    var tokens = result.value as List;
 
     if (tokens.contains(_isFunction)) {
       return javascript;
     } else {
       var hasBodyStatement = tokens.contains(_hasBodyStatements);
-      _Arguments arguments = tokens.singleWhere((t) => t is _Arguments);
+      _Arguments arguments = tokens.whereType<_Arguments>().single;
       _FunctionBody functionBody =
-          tokens.singleWhere((t) => t is _FunctionBody);
+          tokens.whereType<_FunctionBody>().single;
       var isAsync = tokens.contains(_isAsync);
 
       var body = hasBodyStatement
@@ -45,14 +45,14 @@ class JsGrammar extends GrammarParser {
 class JsGrammarDefinition extends GrammarDefinition {
   Parser token(input) {
     if (input is String) {
-      input = input.length == 1 ? char(input) : string(input);
+      input = input.length == 1 ? char(input) : string(input as String);
     } else if (input is Function) {
-      input = ref(input);
+      input = ref(input as Function);
     }
     if (input is! Parser || input is TrimmingParser || input is TokenParser) {
       throw ArgumentError('Invalid token parser: $input');
     }
-    return input.token().trim(ref(HIDDEN_STUFF));
+    return (input as Parser).token().trim(ref(HIDDEN_STUFF));
   }
 
   @override

@@ -141,7 +141,7 @@ class InputApi {
         .contains(type));
     await _client.send('Input.dispatchTouchEvent', {
       'type': type,
-      'touchPoints': touchPoints.map((e) => e).toList(),
+      'touchPoints': [...touchPoints],
       if (modifiers != null) 'modifiers': modifiers,
       if (timestamp != null) 'timestamp': timestamp,
     });
@@ -309,14 +309,15 @@ class TouchPoint {
 
   factory TouchPoint.fromJson(Map<String, dynamic> json) {
     return TouchPoint(
-      x: json['x'],
-      y: json['y'],
-      radiusX: json.containsKey('radiusX') ? json['radiusX'] : null,
-      radiusY: json.containsKey('radiusY') ? json['radiusY'] : null,
-      rotationAngle:
-          json.containsKey('rotationAngle') ? json['rotationAngle'] : null,
-      force: json.containsKey('force') ? json['force'] : null,
-      id: json.containsKey('id') ? json['id'] : null,
+      x: json['x'] as num,
+      y: json['y'] as num,
+      radiusX: json.containsKey('radiusX') ? json['radiusX'] as num : null,
+      radiusY: json.containsKey('radiusY') ? json['radiusY'] as num : null,
+      rotationAngle: json.containsKey('rotationAngle')
+          ? json['rotationAngle'] as num
+          : null,
+      force: json.containsKey('force') ? json['force'] as num : null,
+      id: json.containsKey('id') ? json['id'] as num : null,
     );
   }
 
