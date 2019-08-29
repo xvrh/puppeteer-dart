@@ -62,7 +62,7 @@ class DebuggerApi {
       if (maxScriptsCacheSize != null)
         'maxScriptsCacheSize': maxScriptsCacheSize,
     });
-    return runtime.UniqueDebuggerId.fromJson(result['debuggerId']);
+    return runtime.UniqueDebuggerId.fromJson(result['debuggerId'] as String);
   }
 
   /// Evaluates expression on a given call frame.
@@ -117,7 +117,7 @@ class DebuggerApi {
       if (restrictToFunction != null) 'restrictToFunction': restrictToFunction,
     });
     return (result['locations'] as List)
-        .map((e) => BreakLocation.fromJson(e))
+        .map((e) => BreakLocation.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
@@ -137,7 +137,8 @@ class DebuggerApi {
     var result = await _client.send('Debugger.getStackTrace', {
       'stackTraceId': stackTraceId,
     });
-    return runtime.StackTraceData.fromJson(result['stackTrace']);
+    return runtime.StackTraceData.fromJson(
+        result['stackTrace'] as Map<String, dynamic>);
   }
 
   /// Stops on the next JavaScript statement.
@@ -189,7 +190,7 @@ class DebuggerApi {
       if (isRegex != null) 'isRegex': isRegex,
     });
     return (result['result'] as List)
-        .map((e) => SearchMatch.fromJson(e))
+        .map((e) => SearchMatch.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
@@ -249,7 +250,7 @@ class DebuggerApi {
     var result = await _client.send('Debugger.setInstrumentationBreakpoint', {
       'instrumentation': instrumentation,
     });
-    return BreakpointId.fromJson(result['breakpointId']);
+    return BreakpointId.fromJson(result['breakpointId'] as String);
   }
 
   /// Sets JavaScript breakpoint at given location specified either by URL or URL regex. Once this
@@ -295,7 +296,7 @@ class DebuggerApi {
       'objectId': objectId,
       if (condition != null) 'condition': condition,
     });
-    return BreakpointId.fromJson(result['breakpointId']);
+    return BreakpointId.fromJson(result['breakpointId'] as String);
   }
 
   /// Activates / deactivates all breakpoints on the page.

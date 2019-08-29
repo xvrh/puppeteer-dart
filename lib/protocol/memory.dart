@@ -57,21 +57,21 @@ class MemoryApi {
   /// collected since renderer process startup.
   Future<SamplingProfile> getAllTimeSamplingProfile() async {
     var result = await _client.send('Memory.getAllTimeSamplingProfile');
-    return SamplingProfile.fromJson(result['profile']);
+    return SamplingProfile.fromJson(result['profile'] as Map<String, dynamic>);
   }
 
   /// Retrieve native memory allocations profile
   /// collected since browser process startup.
   Future<SamplingProfile> getBrowserSamplingProfile() async {
     var result = await _client.send('Memory.getBrowserSamplingProfile');
-    return SamplingProfile.fromJson(result['profile']);
+    return SamplingProfile.fromJson(result['profile'] as Map<String, dynamic>);
   }
 
   /// Retrieve native memory allocations profile collected since last
   /// `startSampling` call.
   Future<SamplingProfile> getSamplingProfile() async {
     var result = await _client.send('Memory.getSamplingProfile');
-    return SamplingProfile.fromJson(result['profile']);
+    return SamplingProfile.fromJson(result['profile'] as Map<String, dynamic>);
   }
 }
 

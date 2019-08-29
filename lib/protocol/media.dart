@@ -27,7 +27,7 @@ class MediaApi {
   Stream<List<PlayerId>> get onPlayersCreated => _client.onEvent
       .where((event) => event.name == 'Media.playersCreated')
       .map((event) => (event.parameters['players'] as List)
-          .map((e) => PlayerId.fromJson(e))
+          .map((e) => PlayerId.fromJson(e as String))
           .toList());
 
   /// Enables the Media domain

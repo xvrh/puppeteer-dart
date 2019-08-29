@@ -41,7 +41,7 @@ main() {
       await Future.wait([
         newPage
             .evaluate('() => new Promise(r => {})')
-            .catchError((e) => error = e),
+            .catchError((TargetClosedException e) => error = e),
         newPage.close(),
       ]);
       expect(error, TypeMatcher<TargetClosedException>());
@@ -112,7 +112,7 @@ main() {
         return shelf.Response(204);
       });
       Exception error;
-      await page.goto(server.hostUrl + '/my-page').catchError((e, s) {
+      await page.goto(server.hostUrl + '/my-page').catchError((Exception e, s) {
         error = e;
         return null;
       });

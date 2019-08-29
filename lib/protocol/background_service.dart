@@ -23,7 +23,7 @@ class BackgroundServiceApi {
       .where((event) =>
           event.name == 'BackgroundService.backgroundServiceEventReceived')
       .map((event) => BackgroundServiceEvent.fromJson(
-          event.parameters['backgroundServiceEvent']));
+          event.parameters['backgroundServiceEvent'] as Map<String, dynamic>));
 
   /// Enables event updates for the service.
   Future<void> startObserving(ServiceName service) async {

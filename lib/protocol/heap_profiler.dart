@@ -64,7 +64,8 @@ class HeapProfilerApi {
     var result = await _client.send('HeapProfiler.getHeapObjectId', {
       'objectId': objectId,
     });
-    return HeapSnapshotObjectId.fromJson(result['heapSnapshotObjectId']);
+    return HeapSnapshotObjectId.fromJson(
+        result['heapSnapshotObjectId'] as String);
   }
 
   /// [objectGroup] Symbolic group name that can be used to release multiple objects.
@@ -76,13 +77,15 @@ class HeapProfilerApi {
       'objectId': objectId,
       if (objectGroup != null) 'objectGroup': objectGroup,
     });
-    return runtime.RemoteObject.fromJson(result['result']);
+    return runtime.RemoteObject.fromJson(
+        result['result'] as Map<String, dynamic>);
   }
 
   /// Returns: Return the sampling profile being collected.
   Future<SamplingHeapProfile> getSamplingProfile() async {
     var result = await _client.send('HeapProfiler.getSamplingProfile');
-    return SamplingHeapProfile.fromJson(result['profile']);
+    return SamplingHeapProfile.fromJson(
+        result['profile'] as Map<String, dynamic>);
   }
 
   /// [samplingInterval] Average sample interval in bytes. Poisson distribution is used for the intervals. The
@@ -102,7 +105,8 @@ class HeapProfilerApi {
   /// Returns: Recorded sampling heap profile.
   Future<SamplingHeapProfile> stopSampling() async {
     var result = await _client.send('HeapProfiler.stopSampling');
-    return SamplingHeapProfile.fromJson(result['profile']);
+    return SamplingHeapProfile.fromJson(
+        result['profile'] as Map<String, dynamic>);
   }
 
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken

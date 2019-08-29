@@ -26,7 +26,7 @@ class WebAuthnApi {
     var result = await _client.send('WebAuthn.addVirtualAuthenticator', {
       'options': options,
     });
-    return AuthenticatorId.fromJson(result['authenticatorId']);
+    return AuthenticatorId.fromJson(result['authenticatorId'] as String);
   }
 
   /// Removes the given authenticator.
@@ -54,7 +54,7 @@ class WebAuthnApi {
       'authenticatorId': authenticatorId,
       'credentialId': credentialId,
     });
-    return Credential.fromJson(result['credential']);
+    return Credential.fromJson(result['credential'] as Map<String, dynamic>);
   }
 
   /// Returns all the credentials stored in the given virtual authenticator.
@@ -64,7 +64,7 @@ class WebAuthnApi {
       'authenticatorId': authenticatorId,
     });
     return (result['credentials'] as List)
-        .map((e) => Credential.fromJson(e))
+        .map((e) => Credential.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 

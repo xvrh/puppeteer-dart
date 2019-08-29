@@ -22,7 +22,8 @@ class AnimationApi {
   /// Event for animation that has been started.
   Stream<Animation> get onAnimationStarted => _client.onEvent
       .where((event) => event.name == 'Animation.animationStarted')
-      .map((event) => Animation.fromJson(event.parameters['animation']));
+      .map((event) => Animation.fromJson(
+          event.parameters['animation'] as Map<String, dynamic>));
 
   /// Disables animation domain notifications.
   Future<void> disable() async {
@@ -66,7 +67,8 @@ class AnimationApi {
     var result = await _client.send('Animation.resolveAnimation', {
       'animationId': animationId,
     });
-    return runtime.RemoteObject.fromJson(result['remoteObject']);
+    return runtime.RemoteObject.fromJson(
+        result['remoteObject'] as Map<String, dynamic>);
   }
 
   /// Seek a set of animations to a particular time within each animation.

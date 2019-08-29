@@ -275,7 +275,7 @@ main() {
           var page = await browser.newPage();
           page.onConsole.listen((msg) => print(msg.text));
           await page.exposeFunction('md5',
-              (text) => crypto.md5.convert(utf8.encode(text)).toString());
+              (String text) => crypto.md5.convert(utf8.encode(text)).toString());
           await page.evaluate(r'''async () => {
             // use window.md5 to compute hashes
             const myString = 'PUPPETEER';

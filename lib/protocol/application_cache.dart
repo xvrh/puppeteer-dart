@@ -33,7 +33,8 @@ class ApplicationCacheApi {
         await _client.send('ApplicationCache.getApplicationCacheForFrame', {
       'frameId': frameId,
     });
-    return ApplicationCache.fromJson(result['applicationCache']);
+    return ApplicationCache.fromJson(
+        result['applicationCache'] as Map<String, dynamic>);
   }
 
   /// Returns array of frame identifiers with manifest urls for each frame containing a document
@@ -43,7 +44,7 @@ class ApplicationCacheApi {
   Future<List<FrameWithManifest>> getFramesWithManifests() async {
     var result = await _client.send('ApplicationCache.getFramesWithManifests');
     return (result['frameIds'] as List)
-        .map((e) => FrameWithManifest.fromJson(e))
+        .map((e) => FrameWithManifest.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 

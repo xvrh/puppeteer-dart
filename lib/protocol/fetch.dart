@@ -136,7 +136,7 @@ class FetchApi {
     var result = await _client.send('Fetch.takeResponseBodyAsStream', {
       'requestId': requestId,
     });
-    return io.StreamHandle.fromJson(result['stream']);
+    return io.StreamHandle.fromJson(result['stream'] as String);
   }
 }
 

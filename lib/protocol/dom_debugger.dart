@@ -26,7 +26,7 @@ class DOMDebuggerApi {
       if (pierce != null) 'pierce': pierce,
     });
     return (result['listeners'] as List)
-        .map((e) => EventListener.fromJson(e))
+        .map((e) => EventListener.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 

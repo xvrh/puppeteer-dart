@@ -12,7 +12,8 @@ class ConsoleApi {
   /// Issued when new console message is added.
   Stream<ConsoleMessage> get onMessageAdded => _client.onEvent
       .where((event) => event.name == 'Console.messageAdded')
-      .map((event) => ConsoleMessage.fromJson(event.parameters['message']));
+      .map((event) => ConsoleMessage.fromJson(
+          event.parameters['message'] as Map<String, dynamic>));
 
   /// Does nothing.
   Future<void> clearMessages() async {

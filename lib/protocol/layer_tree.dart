@@ -15,7 +15,7 @@ class LayerTreeApi {
   Stream<List<Layer>> get onLayerTreeDidChange => _client.onEvent
       .where((event) => event.name == 'LayerTree.layerTreeDidChange')
       .map((event) => (event.parameters['layers'] as List)
-          .map((e) => Layer.fromJson(e))
+          .map((e) => Layer.fromJson(e as Map<String, dynamic>))
           .toList());
 
   /// Provides the reasons why the given layer was composited.
@@ -47,7 +47,7 @@ class LayerTreeApi {
     var result = await _client.send('LayerTree.loadSnapshot', {
       'tiles': [...tiles],
     });
-    return SnapshotId.fromJson(result['snapshotId']);
+    return SnapshotId.fromJson(result['snapshotId'] as String);
   }
 
   /// Returns the layer snapshot identifier.
@@ -57,7 +57,7 @@ class LayerTreeApi {
     var result = await _client.send('LayerTree.makeSnapshot', {
       'layerId': layerId,
     });
-    return SnapshotId.fromJson(result['snapshotId']);
+    return SnapshotId.fromJson(result['snapshotId'] as String);
   }
 
   /// [snapshotId] The id of the layer snapshot.
@@ -74,7 +74,7 @@ class LayerTreeApi {
       if (clipRect != null) 'clipRect': clipRect,
     });
     return (result['timings'] as List)
-        .map((e) => PaintProfile.fromJson(e))
+        .map((e) => PaintProfile.fromJson(e as List<num>))
         .toList();
   }
 

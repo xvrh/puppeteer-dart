@@ -30,12 +30,14 @@ class TargetApi {
   /// Issued when a possible inspection target is created.
   Stream<TargetInfo> get onTargetCreated => _client.onEvent
       .where((event) => event.name == 'Target.targetCreated')
-      .map((event) => TargetInfo.fromJson(event.parameters['targetInfo']));
+      .map((event) => TargetInfo.fromJson(
+          event.parameters['targetInfo'] as Map<String, dynamic>));
 
   /// Issued when a target is destroyed.
   Stream<TargetID> get onTargetDestroyed => _client.onEvent
       .where((event) => event.name == 'Target.targetDestroyed')
-      .map((event) => TargetID.fromJson(event.parameters['targetId']));
+      .map(
+          (event) => TargetID.fromJson(event.parameters['targetId'] as String));
 
   /// Issued when a target has crashed.
   Stream<TargetCrashedEvent> get onTargetCrashed => _client.onEvent
@@ -46,7 +48,8 @@ class TargetApi {
   /// `targetCreated` and `targetDestroyed`.
   Stream<TargetInfo> get onTargetInfoChanged => _client.onEvent
       .where((event) => event.name == 'Target.targetInfoChanged')
-      .map((event) => TargetInfo.fromJson(event.parameters['targetInfo']));
+      .map((event) => TargetInfo.fromJson(
+          event.parameters['targetInfo'] as Map<String, dynamic>));
 
   /// Activates (focuses) the target.
   Future<void> activateTarget(TargetID targetId) async {
@@ -63,14 +66,14 @@ class TargetApi {
       'targetId': targetId,
       if (flatten != null) 'flatten': flatten,
     });
-    return SessionID.fromJson(result['sessionId']);
+    return SessionID.fromJson(result['sessionId'] as String);
   }
 
   /// Attaches to the browser target, only uses flat sessionId mode.
   /// Returns: Id assigned to the session.
   Future<SessionID> attachToBrowserTarget() async {
     var result = await _client.send('Target.attachToBrowserTarget');
-    return SessionID.fromJson(result['sessionId']);
+    return SessionID.fromJson(result['sessionId'] as String);
   }
 
   /// Closes the target. If the target is a page that gets closed too.
@@ -103,7 +106,7 @@ class TargetApi {
   /// Returns: The id of the context created.
   Future<BrowserContextID> createBrowserContext() async {
     var result = await _client.send('Target.createBrowserContext');
-    return BrowserContextID.fromJson(result['browserContextId']);
+    return BrowserContextID.fromJson(result['browserContextId'] as String);
   }
 
   /// Returns all browser contexts created with `Target.createBrowserContext` method.
@@ -111,7 +114,7 @@ class TargetApi {
   Future<List<BrowserContextID>> getBrowserContexts() async {
     var result = await _client.send('Target.getBrowserContexts');
     return (result['browserContextIds'] as List)
-        .map((e) => BrowserContextID.fromJson(e))
+        .map((e) => BrowserContextID.fromJson(e as String))
         .toList();
   }
 
@@ -143,7 +146,7 @@ class TargetApi {
       if (newWindow != null) 'newWindow': newWindow,
       if (background != null) 'background': background,
     });
-    return TargetID.fromJson(result['targetId']);
+    return TargetID.fromJson(result['targetId'] as String);
   }
 
   /// Detaches session with given id.
@@ -169,7 +172,7 @@ class TargetApi {
     var result = await _client.send('Target.getTargetInfo', {
       if (targetId != null) 'targetId': targetId,
     });
-    return TargetInfo.fromJson(result['targetInfo']);
+    return TargetInfo.fromJson(result['targetInfo'] as Map<String, dynamic>);
   }
 
   /// Retrieves a list of available targets.
@@ -177,7 +180,7 @@ class TargetApi {
   Future<List<TargetInfo>> getTargets() async {
     var result = await _client.send('Target.getTargets');
     return (result['targetInfos'] as List)
-        .map((e) => TargetInfo.fromJson(e))
+        .map((e) => TargetInfo.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 

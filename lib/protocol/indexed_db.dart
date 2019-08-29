@@ -107,7 +107,7 @@ class IndexedDBApi {
       'databaseName': databaseName,
     });
     return DatabaseWithObjectStores.fromJson(
-        result['databaseWithObjectStores']);
+        result['databaseWithObjectStores'] as Map<String, dynamic>);
   }
 
   /// Requests database names for given security origin.

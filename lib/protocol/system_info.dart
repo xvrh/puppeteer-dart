@@ -19,7 +19,7 @@ class SystemInfoApi {
   Future<List<ProcessInfo>> getProcessInfo() async {
     var result = await _client.send('SystemInfo.getProcessInfo');
     return (result['processInfo'] as List)
-        .map((e) => ProcessInfo.fromJson(e))
+        .map((e) => ProcessInfo.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 }

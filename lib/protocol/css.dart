@@ -19,7 +19,8 @@ class CSSApi {
   /// web font
   Stream<FontFace> get onFontsUpdated => _client.onEvent
       .where((event) => event.name == 'CSS.fontsUpdated')
-      .map((event) => FontFace.fromJson(event.parameters['font']));
+      .map((event) =>
+          FontFace.fromJson(event.parameters['font'] as Map<String, dynamic>));
 
   /// Fires whenever a MediaQuery result changes (for example, after a browser window has been
   /// resized.) The current implementation considers only viewport-dependent media features.
@@ -29,17 +30,20 @@ class CSSApi {
   /// Fired whenever an active document stylesheet is added.
   Stream<CSSStyleSheetHeader> get onStyleSheetAdded => _client.onEvent
       .where((event) => event.name == 'CSS.styleSheetAdded')
-      .map((event) => CSSStyleSheetHeader.fromJson(event.parameters['header']));
+      .map((event) => CSSStyleSheetHeader.fromJson(
+          event.parameters['header'] as Map<String, dynamic>));
 
   /// Fired whenever a stylesheet is changed as a result of the client operation.
   Stream<StyleSheetId> get onStyleSheetChanged => _client.onEvent
       .where((event) => event.name == 'CSS.styleSheetChanged')
-      .map((event) => StyleSheetId.fromJson(event.parameters['styleSheetId']));
+      .map((event) =>
+          StyleSheetId.fromJson(event.parameters['styleSheetId'] as String));
 
   /// Fired whenever an active document stylesheet is removed.
   Stream<StyleSheetId> get onStyleSheetRemoved => _client.onEvent
       .where((event) => event.name == 'CSS.styleSheetRemoved')
-      .map((event) => StyleSheetId.fromJson(event.parameters['styleSheetId']));
+      .map((event) =>
+          StyleSheetId.fromJson(event.parameters['styleSheetId'] as String));
 
   /// Inserts a new rule with the given `ruleText` in a stylesheet with given `styleSheetId`, at the
   /// position specified by `location`.
@@ -54,7 +58,7 @@ class CSSApi {
       'ruleText': ruleText,
       'location': location,
     });
-    return CSSRule.fromJson(result['rule']);
+    return CSSRule.fromJson(result['rule'] as Map<String, dynamic>);
   }
 
   /// Returns all class names from specified stylesheet.
@@ -73,7 +77,7 @@ class CSSApi {
     var result = await _client.send('CSS.createStyleSheet', {
       'frameId': frameId,
     });
-    return StyleSheetId.fromJson(result['styleSheetId']);
+    return StyleSheetId.fromJson(result['styleSheetId'] as String);
   }
 
   /// Disables the CSS agent for the given page.
@@ -116,7 +120,8 @@ class CSSApi {
       'nodeId': nodeId,
     });
     return (result['computedStyle'] as List)
-        .map((e) => CSSComputedStyleProperty.fromJson(e))
+        .map(
+            (e) => CSSComputedStyleProperty.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
@@ -142,7 +147,9 @@ class CSSApi {
   /// Returns all media queries parsed by the rendering engine.
   Future<List<CSSMedia>> getMediaQueries() async {
     var result = await _client.send('CSS.getMediaQueries');
-    return (result['medias'] as List).map((e) => CSSMedia.fromJson(e)).toList();
+    return (result['medias'] as List)
+        .map((e) => CSSMedia.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// Requests information about platform fonts which we used to render child TextNodes in the given
@@ -154,7 +161,7 @@ class CSSApi {
       'nodeId': nodeId,
     });
     return (result['fonts'] as List)
-        .map((e) => PlatformFontUsage.fromJson(e))
+        .map((e) => PlatformFontUsage.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
@@ -188,7 +195,7 @@ class CSSApi {
       'range': range,
       'keyText': keyText,
     });
-    return Value.fromJson(result['keyText']);
+    return Value.fromJson(result['keyText'] as Map<String, dynamic>);
   }
 
   /// Modifies the rule selector.
@@ -200,7 +207,7 @@ class CSSApi {
       'range': range,
       'text': text,
     });
-    return CSSMedia.fromJson(result['media']);
+    return CSSMedia.fromJson(result['media'] as Map<String, dynamic>);
   }
 
   /// Modifies the rule selector.
@@ -212,7 +219,8 @@ class CSSApi {
       'range': range,
       'selector': selector,
     });
-    return SelectorList.fromJson(result['selectorList']);
+    return SelectorList.fromJson(
+        result['selectorList'] as Map<String, dynamic>);
   }
 
   /// Sets the new stylesheet text.
@@ -232,7 +240,9 @@ class CSSApi {
     var result = await _client.send('CSS.setStyleTexts', {
       'edits': [...edits],
     });
-    return (result['styles'] as List).map((e) => CSSStyle.fromJson(e)).toList();
+    return (result['styles'] as List)
+        .map((e) => CSSStyle.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// Enables the selector recording.
@@ -245,7 +255,7 @@ class CSSApi {
   Future<List<RuleUsage>> stopRuleUsageTracking() async {
     var result = await _client.send('CSS.stopRuleUsageTracking');
     return (result['ruleUsage'] as List)
-        .map((e) => RuleUsage.fromJson(e))
+        .map((e) => RuleUsage.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
@@ -254,7 +264,7 @@ class CSSApi {
   Future<List<RuleUsage>> takeCoverageDelta() async {
     var result = await _client.send('CSS.takeCoverageDelta');
     return (result['coverage'] as List)
-        .map((e) => RuleUsage.fromJson(e))
+        .map((e) => RuleUsage.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 }

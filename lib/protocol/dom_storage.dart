@@ -24,7 +24,8 @@ class DOMStorageApi {
 
   Stream<StorageId> get onDomStorageItemsCleared => _client.onEvent
       .where((event) => event.name == 'DOMStorage.domStorageItemsCleared')
-      .map((event) => StorageId.fromJson(event.parameters['storageId']));
+      .map((event) => StorageId.fromJson(
+          event.parameters['storageId'] as Map<String, dynamic>));
 
   Future<void> clear(StorageId storageId) async {
     await _client.send('DOMStorage.clear', {
@@ -46,7 +47,9 @@ class DOMStorageApi {
     var result = await _client.send('DOMStorage.getDOMStorageItems', {
       'storageId': storageId,
     });
-    return (result['entries'] as List).map((e) => Item.fromJson(e)).toList();
+    return (result['entries'] as List)
+        .map((e) => Item.fromJson(e as List<String>))
+        .toList();
   }
 
   Future<void> removeDOMStorageItem(StorageId storageId, String key) async {

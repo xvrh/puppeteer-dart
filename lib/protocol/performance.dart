@@ -38,7 +38,9 @@ class PerformanceApi {
   /// Returns: Current values for run-time metrics.
   Future<List<Metric>> getMetrics() async {
     var result = await _client.send('Performance.getMetrics');
-    return (result['metrics'] as List).map((e) => Metric.fromJson(e)).toList();
+    return (result['metrics'] as List)
+        .map((e) => Metric.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 }
 

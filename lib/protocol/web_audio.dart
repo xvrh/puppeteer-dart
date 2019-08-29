@@ -12,22 +12,26 @@ class WebAudioApi {
   /// Notifies that a new BaseAudioContext has been created.
   Stream<BaseAudioContext> get onContextCreated => _client.onEvent
       .where((event) => event.name == 'WebAudio.contextCreated')
-      .map((event) => BaseAudioContext.fromJson(event.parameters['context']));
+      .map((event) => BaseAudioContext.fromJson(
+          event.parameters['context'] as Map<String, dynamic>));
 
   /// Notifies that an existing BaseAudioContext will be destroyed.
   Stream<GraphObjectId> get onContextWillBeDestroyed => _client.onEvent
       .where((event) => event.name == 'WebAudio.contextWillBeDestroyed')
-      .map((event) => GraphObjectId.fromJson(event.parameters['contextId']));
+      .map((event) =>
+          GraphObjectId.fromJson(event.parameters['contextId'] as String));
 
   /// Notifies that existing BaseAudioContext has changed some properties (id stays the same)..
   Stream<BaseAudioContext> get onContextChanged => _client.onEvent
       .where((event) => event.name == 'WebAudio.contextChanged')
-      .map((event) => BaseAudioContext.fromJson(event.parameters['context']));
+      .map((event) => BaseAudioContext.fromJson(
+          event.parameters['context'] as Map<String, dynamic>));
 
   /// Notifies that the construction of an AudioListener has finished.
   Stream<AudioListener> get onAudioListenerCreated => _client.onEvent
       .where((event) => event.name == 'WebAudio.audioListenerCreated')
-      .map((event) => AudioListener.fromJson(event.parameters['listener']));
+      .map((event) => AudioListener.fromJson(
+          event.parameters['listener'] as Map<String, dynamic>));
 
   /// Notifies that a new AudioListener has been created.
   Stream<AudioListenerWillBeDestroyedEvent>
@@ -40,7 +44,8 @@ class WebAudioApi {
   /// Notifies that a new AudioNode has been created.
   Stream<AudioNode> get onAudioNodeCreated => _client.onEvent
       .where((event) => event.name == 'WebAudio.audioNodeCreated')
-      .map((event) => AudioNode.fromJson(event.parameters['node']));
+      .map((event) =>
+          AudioNode.fromJson(event.parameters['node'] as Map<String, dynamic>));
 
   /// Notifies that an existing AudioNode has been destroyed.
   Stream<AudioNodeWillBeDestroyedEvent> get onAudioNodeWillBeDestroyed =>
@@ -52,7 +57,8 @@ class WebAudioApi {
   /// Notifies that a new AudioParam has been created.
   Stream<AudioParam> get onAudioParamCreated => _client.onEvent
       .where((event) => event.name == 'WebAudio.audioParamCreated')
-      .map((event) => AudioParam.fromJson(event.parameters['param']));
+      .map((event) => AudioParam.fromJson(
+          event.parameters['param'] as Map<String, dynamic>));
 
   /// Notifies that an existing AudioParam has been destroyed.
   Stream<AudioParamWillBeDestroyedEvent> get onAudioParamWillBeDestroyed =>
@@ -97,7 +103,8 @@ class WebAudioApi {
     var result = await _client.send('WebAudio.getRealtimeData', {
       'contextId': contextId,
     });
-    return ContextRealtimeData.fromJson(result['realtimeData']);
+    return ContextRealtimeData.fromJson(
+        result['realtimeData'] as Map<String, dynamic>);
   }
 }
 

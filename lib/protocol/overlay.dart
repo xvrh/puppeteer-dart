@@ -15,17 +15,18 @@ class OverlayApi {
   Stream<dom.BackendNodeId> get onInspectNodeRequested => _client.onEvent
       .where((event) => event.name == 'Overlay.inspectNodeRequested')
       .map((event) =>
-          dom.BackendNodeId.fromJson(event.parameters['backendNodeId']));
+          dom.BackendNodeId.fromJson(event.parameters['backendNodeId'] as int));
 
   /// Fired when the node should be highlighted. This happens after call to `setInspectMode`.
   Stream<dom.NodeId> get onNodeHighlightRequested => _client.onEvent
       .where((event) => event.name == 'Overlay.nodeHighlightRequested')
-      .map((event) => dom.NodeId.fromJson(event.parameters['nodeId']));
+      .map((event) => dom.NodeId.fromJson(event.parameters['nodeId'] as int));
 
   /// Fired when user asks to capture screenshot of some area on the page.
   Stream<page.Viewport> get onScreenshotRequested => _client.onEvent
       .where((event) => event.name == 'Overlay.screenshotRequested')
-      .map((event) => page.Viewport.fromJson(event.parameters['viewport']));
+      .map((event) => page.Viewport.fromJson(
+          event.parameters['viewport'] as Map<String, dynamic>));
 
   /// Fired when user cancels the inspect mode.
   Stream get onInspectModeCanceled => _client.onEvent

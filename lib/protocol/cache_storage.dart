@@ -32,7 +32,9 @@ class CacheStorageApi {
     var result = await _client.send('CacheStorage.requestCacheNames', {
       'securityOrigin': securityOrigin,
     });
-    return (result['caches'] as List).map((e) => Cache.fromJson(e)).toList();
+    return (result['caches'] as List)
+        .map((e) => Cache.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// Fetches cache entry.
@@ -47,7 +49,7 @@ class CacheStorageApi {
       'requestURL': requestURL,
       'requestHeaders': [...requestHeaders],
     });
-    return CachedResponse.fromJson(result['response']);
+    return CachedResponse.fromJson(result['response'] as Map<String, dynamic>);
   }
 
   /// Requests data from cache.

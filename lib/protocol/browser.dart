@@ -86,7 +86,7 @@ class BrowserApi {
       if (delta != null) 'delta': delta,
     });
     return (result['histograms'] as List)
-        .map((e) => Histogram.fromJson(e))
+        .map((e) => Histogram.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
@@ -99,7 +99,7 @@ class BrowserApi {
       'name': name,
       if (delta != null) 'delta': delta,
     });
-    return Histogram.fromJson(result['histogram']);
+    return Histogram.fromJson(result['histogram'] as Map<String, dynamic>);
   }
 
   /// Get position and size of the browser window.
@@ -110,7 +110,7 @@ class BrowserApi {
     var result = await _client.send('Browser.getWindowBounds', {
       'windowId': windowId,
     });
-    return Bounds.fromJson(result['bounds']);
+    return Bounds.fromJson(result['bounds'] as Map<String, dynamic>);
   }
 
   /// Get the browser window that contains the devtools target.

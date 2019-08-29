@@ -33,17 +33,17 @@ class RuntimeApi {
       .map((event) => ExceptionThrownEvent.fromJson(event.parameters));
 
   /// Issued when new execution context is created.
-  Stream<ExecutionContextDescription> get onExecutionContextCreated => _client
-      .onEvent
-      .where((event) => event.name == 'Runtime.executionContextCreated')
-      .map((event) =>
-          ExecutionContextDescription.fromJson(event.parameters['context']));
+  Stream<ExecutionContextDescription> get onExecutionContextCreated =>
+      _client.onEvent
+          .where((event) => event.name == 'Runtime.executionContextCreated')
+          .map((event) => ExecutionContextDescription.fromJson(
+              event.parameters['context'] as Map<String, dynamic>));
 
   /// Issued when execution context is destroyed.
   Stream<ExecutionContextId> get onExecutionContextDestroyed => _client.onEvent
       .where((event) => event.name == 'Runtime.executionContextDestroyed')
-      .map((event) =>
-          ExecutionContextId.fromJson(event.parameters['executionContextId']));
+      .map((event) => ExecutionContextId.fromJson(
+          event.parameters['executionContextId'] as int));
 
   /// Issued when all executionContexts were cleared in browser
   Stream get onExecutionContextsCleared => _client.onEvent
@@ -245,7 +245,7 @@ class RuntimeApi {
       'prototypeObjectId': prototypeObjectId,
       if (objectGroup != null) 'objectGroup': objectGroup,
     });
-    return RemoteObject.fromJson(result['objects']);
+    return RemoteObject.fromJson(result['objects'] as Map<String, dynamic>);
   }
 
   /// Releases remote object with given id.

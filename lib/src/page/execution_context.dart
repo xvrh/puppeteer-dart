@@ -119,7 +119,7 @@ class ExecutionContext {
   /// await aHandle.dispose();
   /// await resultHandle.dispose();
   /// ```
-  Future<JsHandle> evaluateHandle(@Language('js') String pageFunction,
+  Future<T> evaluateHandle<T extends JsHandle>(@Language('js') String pageFunction,
           {List args}) async =>
       await _evaluateInternal(pageFunction, args: args, returnByValue: false);
 

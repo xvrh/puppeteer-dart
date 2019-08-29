@@ -551,7 +551,7 @@ class Page {
   ///
   /// returns: Future which resolves to the return value of `pageFunction` as
   /// in-page object (JSHandle)
-  Future<JsHandle> evaluateHandle(@Language('js') String pageFunction,
+  Future<T> evaluateHandle<T extends JsHandle>(@Language('js') String pageFunction,
       {List args}) async {
     var context = await mainFrame.executionContext;
     return context.evaluateHandle(pageFunction, args: args);

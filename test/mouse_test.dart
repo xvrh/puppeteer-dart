@@ -42,10 +42,10 @@ function dimensions() {
   };
 }
 ''').then((result) => Rectangle(
-        result['x'],
-        result['y'],
-        result['width'],
-        result['height'],
+        result['x'] as num,
+        result['y'] as num,
+        result['width'] as num,
+        result['height'] as num,
       ));
 
   group('Mouse', () {

@@ -39,7 +39,7 @@ class AccessibilityApi {
       if (fetchRelatives != null) 'fetchRelatives': fetchRelatives,
     });
     return (result['nodes'] as List)
-        .map((e) => AXNodeData.fromJson(e))
+        .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
@@ -47,7 +47,7 @@ class AccessibilityApi {
   Future<List<AXNodeData>> getFullAXTree() async {
     var result = await _client.send('Accessibility.getFullAXTree');
     return (result['nodes'] as List)
-        .map((e) => AXNodeData.fromJson(e))
+        .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 }

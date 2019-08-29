@@ -17,7 +17,7 @@ class PageApi {
   Stream<network.MonotonicTime> get onDomContentEventFired => _client.onEvent
       .where((event) => event.name == 'Page.domContentEventFired')
       .map((event) =>
-          network.MonotonicTime.fromJson(event.parameters['timestamp']));
+          network.MonotonicTime.fromJson(event.parameters['timestamp'] as num));
 
   /// Emitted only when `page.interceptFileChooser` is enabled.
   Stream<String> get onFileChooserOpened => _client.onEvent
@@ -32,17 +32,18 @@ class PageApi {
   /// Fired when frame no longer has a scheduled navigation.
   Stream<FrameId> get onFrameClearedScheduledNavigation => _client.onEvent
       .where((event) => event.name == 'Page.frameClearedScheduledNavigation')
-      .map((event) => FrameId.fromJson(event.parameters['frameId']));
+      .map((event) => FrameId.fromJson(event.parameters['frameId'] as String));
 
   /// Fired when frame has been detached from its parent.
   Stream<FrameId> get onFrameDetached => _client.onEvent
       .where((event) => event.name == 'Page.frameDetached')
-      .map((event) => FrameId.fromJson(event.parameters['frameId']));
+      .map((event) => FrameId.fromJson(event.parameters['frameId'] as String));
 
   /// Fired once navigation of the frame has completed. Frame is now associated with the new loader.
   Stream<FrameInfo> get onFrameNavigated => _client.onEvent
       .where((event) => event.name == 'Page.frameNavigated')
-      .map((event) => FrameInfo.fromJson(event.parameters['frame']));
+      .map((event) => FrameInfo.fromJson(
+          event.parameters['frame'] as Map<String, dynamic>));
 
   Stream get onFrameResized =>
       _client.onEvent.where((event) => event.name == 'Page.frameResized');
@@ -65,12 +66,12 @@ class PageApi {
   /// Fired when frame has started loading.
   Stream<FrameId> get onFrameStartedLoading => _client.onEvent
       .where((event) => event.name == 'Page.frameStartedLoading')
-      .map((event) => FrameId.fromJson(event.parameters['frameId']));
+      .map((event) => FrameId.fromJson(event.parameters['frameId'] as String));
 
   /// Fired when frame has stopped loading.
   Stream<FrameId> get onFrameStoppedLoading => _client.onEvent
       .where((event) => event.name == 'Page.frameStoppedLoading')
-      .map((event) => FrameId.fromJson(event.parameters['frameId']));
+      .map((event) => FrameId.fromJson(event.parameters['frameId'] as String));
 
   /// Fired when page is about to start a download.
   Stream<DownloadWillBeginEvent> get onDownloadWillBegin => _client.onEvent
@@ -107,7 +108,7 @@ class PageApi {
   Stream<network.MonotonicTime> get onLoadEventFired => _client.onEvent
       .where((event) => event.name == 'Page.loadEventFired')
       .map((event) =>
-          network.MonotonicTime.fromJson(event.parameters['timestamp']));
+          network.MonotonicTime.fromJson(event.parameters['timestamp'] as num));
 
   /// Fired when same-document navigation happens, e.g. due to history API usage or anchor navigation.
   Stream<NavigatedWithinDocumentEvent> get onNavigatedWithinDocument => _client
@@ -147,7 +148,7 @@ class PageApi {
     var result = await _client.send('Page.addScriptToEvaluateOnLoad', {
       'scriptSource': scriptSource,
     });
-    return ScriptIdentifier.fromJson(result['identifier']);
+    return ScriptIdentifier.fromJson(result['identifier'] as String);
   }
 
   /// Evaluates given script in every frame upon creation (before loading frame's scripts).
@@ -161,7 +162,7 @@ class PageApi {
       'source': source,
       if (worldName != null) 'worldName': worldName,
     });
-    return ScriptIdentifier.fromJson(result['identifier']);
+    return ScriptIdentifier.fromJson(result['identifier'] as String);
   }
 
   /// Brings page to front (activates tab).
@@ -234,7 +235,8 @@ class PageApi {
       if (grantUniveralAccess != null)
         'grantUniveralAccess': grantUniveralAccess,
     });
-    return runtime.ExecutionContextId.fromJson(result['executionContextId']);
+    return runtime.ExecutionContextId.fromJson(
+        result['executionContextId'] as int);
   }
 
   /// Deletes browser cookie with given name, domain and path.
@@ -275,7 +277,7 @@ class PageApi {
   Future<List<network.Cookie>> getCookies() async {
     var result = await _client.send('Page.getCookies');
     return (result['cookies'] as List)
-        .map((e) => network.Cookie.fromJson(e))
+        .map((e) => network.Cookie.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
@@ -283,7 +285,7 @@ class PageApi {
   /// Returns: Present frame tree structure.
   Future<FrameTree> getFrameTree() async {
     var result = await _client.send('Page.getFrameTree');
-    return FrameTree.fromJson(result['frameTree']);
+    return FrameTree.fromJson(result['frameTree'] as Map<String, dynamic>);
   }
 
   /// Returns metrics relating to the layouting of the page, such as viewport bounds/scale.
@@ -319,7 +321,8 @@ class PageApi {
   /// Returns: Present frame / resource tree structure.
   Future<FrameResourceTree> getResourceTree() async {
     var result = await _client.send('Page.getResourceTree');
-    return FrameResourceTree.fromJson(result['frameTree']);
+    return FrameResourceTree.fromJson(
+        result['frameTree'] as Map<String, dynamic>);
   }
 
   /// Accepts or dismisses a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload).
@@ -481,7 +484,7 @@ class PageApi {
       if (isRegex != null) 'isRegex': isRegex,
     });
     return (result['result'] as List)
-        .map((e) => debugger.SearchMatch.fromJson(e))
+        .map((e) => debugger.SearchMatch.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 

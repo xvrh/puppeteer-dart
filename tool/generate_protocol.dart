@@ -293,15 +293,17 @@ class _Command {
           if (isRawType(paramType)) {
             mapCode = 'e as $paramType';
           } else {
+            String cast = _castForParameter(context, elementParameter);
             mapCode =
-                '${context.getPropertyType(elementParameter)}.fromJson(e)';
+                '${context.getPropertyType(elementParameter)}.fromJson(e as $cast)';
           }
 
           sendCode +=
               "return (result['${returnParameter.name}'] as List).map((e) => $mapCode).toList();";
         } else {
+          String cast = _castForParameter(context, returnParameter);
           sendCode +=
-              "return $returnTypeName.fromJson(result['${returnParameter.name}']);";
+              "return $returnTypeName.fromJson(result['${returnParameter.name}'] as $cast);";
         }
       } else {
         sendCode += 'return $returnTypeName.fromJson(result);';
@@ -367,15 +369,17 @@ class _Event {
           if (isRawType(paramType)) {
             insideCode = 'e as $paramType';
           } else {
+            String cast = _castForParameter(context, elementParameter);
             insideCode =
-                '${context.getPropertyType(elementParameter)}.fromJson(e)';
+                '${context.getPropertyType(elementParameter)}.fromJson(e as $cast)';
           }
 
           mapCode =
               "(event.parameters['${parameter.name}'] as List).map((e) => $insideCode).toList()";
         } else {
+          String cast = _castForParameter(context, parameter);
           mapCode =
-              "$_typeName.fromJson(event.parameters['${parameter.name}'])";
+              "$_typeName.fromJson(event.parameters['${parameter.name}'] as $cast)";
         }
       } else {
         mapCode = '$_typeName.fromJson(event.parameters)';
@@ -602,20 +606,7 @@ class _InternalType {
       return "($jsonParameter as List).map((e) => ${_fromJsonCode(elementParameter, 'e', withAs: true)}).toList()";
     }
     String typeName = _propertyTypeName(parameter);
-    String cast = 'String';
-    if (parameter.enumValues != null) {
-      cast = 'String';
-    } else {
-      var complexType = context.findComplexType(parameter.ref);
-      if (complexType.enums != null) {
-        cast = 'String';
-      } else if (complexType.properties != null && complexType.properties.isNotEmpty) {
-        cast = 'Map<String, dynamic>';
-      } else {
-        var parameter = Parameter(name: 'value', type: complexType.type, items: complexType.items);
-        cast = _propertyTypeName(parameter);
-      }
-    }
+    String cast = _castForParameter(context, parameter);
     return "$typeName.fromJson($jsonParameter as $cast)";
   }
 
@@ -723,4 +714,20 @@ String _sanitizeName(String input) {
     return 'negativeInfinity';
   }
   return input;
+}
+
+String _castForParameter(_DomainContext context, Parameter parameter) {
+  if (parameter.enumValues != null) {
+    return 'String';
+  } else {
+    var complexType = context.findComplexType(parameter.ref);
+    if (complexType.enums != null) {
+      return 'String';
+    } else if (complexType.properties != null && complexType.properties.isNotEmpty) {
+      return 'Map<String, dynamic>';
+    } else {
+      var parameter = Parameter(name: 'value', type: complexType.type, items: complexType.items);
+      return context.getPropertyType(parameter);
+    }
+  }
 }

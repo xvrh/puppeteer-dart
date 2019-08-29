@@ -63,7 +63,7 @@ class DOMApi {
   Stream<List<NodeId>> get onInlineStyleInvalidated => _client.onEvent
       .where((event) => event.name == 'DOM.inlineStyleInvalidated')
       .map((event) => (event.parameters['nodeIds'] as List)
-          .map((e) => NodeId.fromJson(e))
+          .map((e) => NodeId.fromJson(e as int))
           .toList());
 
   /// Called when a pseudo element is added to an element.
@@ -117,7 +117,7 @@ class DOMApi {
       'targetNodeId': targetNodeId,
       if (insertBeforeNodeId != null) 'insertBeforeNodeId': insertBeforeNodeId,
     });
-    return NodeId.fromJson(result['nodeId']);
+    return NodeId.fromJson(result['nodeId'] as int);
   }
 
   /// Describes node given its id, does not require domain to be enabled. Does not start tracking any
@@ -143,7 +143,7 @@ class DOMApi {
       if (depth != null) 'depth': depth,
       if (pierce != null) 'pierce': pierce,
     });
-    return Node.fromJson(result['node']);
+    return Node.fromJson(result['node'] as Map<String, dynamic>);
   }
 
   /// Disables DOM agent for the given page.
@@ -204,7 +204,7 @@ class DOMApi {
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
       if (objectId != null) 'objectId': objectId,
     });
-    return BoxModel.fromJson(result['model']);
+    return BoxModel.fromJson(result['model'] as Map<String, dynamic>);
   }
 
   /// Returns quads that describe node position on the page. This method
@@ -222,7 +222,9 @@ class DOMApi {
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
       if (objectId != null) 'objectId': objectId,
     });
-    return (result['quads'] as List).map((e) => Quad.fromJson(e)).toList();
+    return (result['quads'] as List)
+        .map((e) => Quad.fromJson(e as List<num>))
+        .toList();
   }
 
   /// Returns the root DOM node (and optionally the subtree) to the caller.
@@ -236,7 +238,7 @@ class DOMApi {
       if (depth != null) 'depth': depth,
       if (pierce != null) 'pierce': pierce,
     });
-    return Node.fromJson(result['root']);
+    return Node.fromJson(result['root'] as Map<String, dynamic>);
   }
 
   /// Returns the root DOM node (and optionally the subtree) to the caller.
@@ -250,7 +252,9 @@ class DOMApi {
       if (depth != null) 'depth': depth,
       if (pierce != null) 'pierce': pierce,
     });
-    return (result['nodes'] as List).map((e) => Node.fromJson(e)).toList();
+    return (result['nodes'] as List)
+        .map((e) => Node.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// Returns node id at given location. Depending on whether DOM domain is enabled, nodeId is
@@ -293,7 +297,7 @@ class DOMApi {
     var result = await _client.send('DOM.getRelayoutBoundary', {
       'nodeId': nodeId,
     });
-    return NodeId.fromJson(result['nodeId']);
+    return NodeId.fromJson(result['nodeId'] as int);
   }
 
   /// Returns search results from given `fromIndex` to given `toIndex` from the search with the given
@@ -309,7 +313,9 @@ class DOMApi {
       'fromIndex': fromIndex,
       'toIndex': toIndex,
     });
-    return (result['nodeIds'] as List).map((e) => NodeId.fromJson(e)).toList();
+    return (result['nodeIds'] as List)
+        .map((e) => NodeId.fromJson(e as int))
+        .toList();
   }
 
   /// Hides any highlight.
@@ -345,7 +351,7 @@ class DOMApi {
       'targetNodeId': targetNodeId,
       if (insertBeforeNodeId != null) 'insertBeforeNodeId': insertBeforeNodeId,
     });
-    return NodeId.fromJson(result['nodeId']);
+    return NodeId.fromJson(result['nodeId'] as int);
   }
 
   /// Searches for a given string in the DOM tree. Use `getSearchResults` to access search results or
@@ -369,7 +375,7 @@ class DOMApi {
     var result = await _client.send('DOM.pushNodeByPathToFrontend', {
       'path': path,
     });
-    return NodeId.fromJson(result['nodeId']);
+    return NodeId.fromJson(result['nodeId'] as int);
   }
 
   /// Requests that a batch of nodes is sent to the caller given their backend node ids.
@@ -381,7 +387,9 @@ class DOMApi {
     var result = await _client.send('DOM.pushNodesByBackendIdsToFrontend', {
       'backendNodeIds': [...backendNodeIds],
     });
-    return (result['nodeIds'] as List).map((e) => NodeId.fromJson(e)).toList();
+    return (result['nodeIds'] as List)
+        .map((e) => NodeId.fromJson(e as int))
+        .toList();
   }
 
   /// Executes `querySelector` on a given node.
@@ -393,7 +401,7 @@ class DOMApi {
       'nodeId': nodeId,
       'selector': selector,
     });
-    return NodeId.fromJson(result['nodeId']);
+    return NodeId.fromJson(result['nodeId'] as int);
   }
 
   /// Executes `querySelectorAll` on a given node.
@@ -405,7 +413,9 @@ class DOMApi {
       'nodeId': nodeId,
       'selector': selector,
     });
-    return (result['nodeIds'] as List).map((e) => NodeId.fromJson(e)).toList();
+    return (result['nodeIds'] as List)
+        .map((e) => NodeId.fromJson(e as int))
+        .toList();
   }
 
   /// Re-does the last undone action.
@@ -457,7 +467,7 @@ class DOMApi {
     var result = await _client.send('DOM.requestNode', {
       'objectId': objectId,
     });
-    return NodeId.fromJson(result['nodeId']);
+    return NodeId.fromJson(result['nodeId'] as int);
   }
 
   /// Resolves the JavaScript node object for a given NodeId or BackendNodeId.
@@ -477,7 +487,8 @@ class DOMApi {
       if (objectGroup != null) 'objectGroup': objectGroup,
       if (executionContextId != null) 'executionContextId': executionContextId,
     });
-    return runtime.RemoteObject.fromJson(result['object']);
+    return runtime.RemoteObject.fromJson(
+        result['object'] as Map<String, dynamic>);
   }
 
   /// Sets attribute for an element with given id.
@@ -540,7 +551,8 @@ class DOMApi {
     var result = await _client.send('DOM.getNodeStackTraces', {
       'nodeId': nodeId,
     });
-    return runtime.StackTraceData.fromJson(result['creation']);
+    return runtime.StackTraceData.fromJson(
+        result['creation'] as Map<String, dynamic>);
   }
 
   /// Returns file information for the given
@@ -571,7 +583,7 @@ class DOMApi {
       'nodeId': nodeId,
       'name': name,
     });
-    return NodeId.fromJson(result['nodeId']);
+    return NodeId.fromJson(result['nodeId'] as int);
   }
 
   /// Sets node value for a node with given id.

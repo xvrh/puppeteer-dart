@@ -34,7 +34,7 @@ class ProfilerApi {
   Future<List<ScriptCoverage>> getBestEffortCoverage() async {
     var result = await _client.send('Profiler.getBestEffortCoverage');
     return (result['result'] as List)
-        .map((e) => ScriptCoverage.fromJson(e))
+        .map((e) => ScriptCoverage.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
@@ -70,7 +70,7 @@ class ProfilerApi {
   /// Returns: Recorded profile.
   Future<Profile> stop() async {
     var result = await _client.send('Profiler.stop');
-    return Profile.fromJson(result['profile']);
+    return Profile.fromJson(result['profile'] as Map<String, dynamic>);
   }
 
   /// Disable precise code coverage. Disabling releases unnecessary execution count records and allows
@@ -90,7 +90,7 @@ class ProfilerApi {
   Future<List<ScriptCoverage>> takePreciseCoverage() async {
     var result = await _client.send('Profiler.takePreciseCoverage');
     return (result['result'] as List)
-        .map((e) => ScriptCoverage.fromJson(e))
+        .map((e) => ScriptCoverage.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
@@ -99,7 +99,7 @@ class ProfilerApi {
   Future<List<ScriptTypeProfile>> takeTypeProfile() async {
     var result = await _client.send('Profiler.takeTypeProfile');
     return (result['result'] as List)
-        .map((e) => ScriptTypeProfile.fromJson(e))
+        .map((e) => ScriptTypeProfile.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 }

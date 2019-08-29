@@ -46,7 +46,8 @@ class NetworkApi {
   /// Fired if request ended up loading from cache.
   Stream<RequestId> get onRequestServedFromCache => _client.onEvent
       .where((event) => event.name == 'Network.requestServedFromCache')
-      .map((event) => RequestId.fromJson(event.parameters['requestId']));
+      .map((event) =>
+          RequestId.fromJson(event.parameters['requestId'] as String));
 
   /// Fired when page is about to send HTTP request.
   Stream<RequestWillBeSentEvent> get onRequestWillBeSent => _client.onEvent
@@ -265,7 +266,9 @@ class NetworkApi {
   /// Returns: Array of cookie objects.
   Future<List<Cookie>> getAllCookies() async {
     var result = await _client.send('Network.getAllCookies');
-    return (result['cookies'] as List).map((e) => Cookie.fromJson(e)).toList();
+    return (result['cookies'] as List)
+        .map((e) => Cookie.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// Returns the DER-encoded certificate.
@@ -285,7 +288,9 @@ class NetworkApi {
     var result = await _client.send('Network.getCookies', {
       if (urls != null) 'urls': [...urls],
     });
-    return (result['cookies'] as List).map((e) => Cookie.fromJson(e)).toList();
+    return (result['cookies'] as List)
+        .map((e) => Cookie.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// Returns content served for the given request.
@@ -327,7 +332,7 @@ class NetworkApi {
         await _client.send('Network.takeResponseBodyForInterceptionAsStream', {
       'interceptionId': interceptionId,
     });
-    return io.StreamHandle.fromJson(result['stream']);
+    return io.StreamHandle.fromJson(result['stream'] as String);
   }
 
   /// This method sends a new XMLHttpRequest which is identical to the original one. The following
@@ -356,7 +361,7 @@ class NetworkApi {
       if (isRegex != null) 'isRegex': isRegex,
     });
     return (result['result'] as List)
-        .map((e) => debugger.SearchMatch.fromJson(e))
+        .map((e) => debugger.SearchMatch.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 

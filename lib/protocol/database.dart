@@ -9,7 +9,8 @@ class DatabaseApi {
 
   Stream<Database> get onAddDatabase => _client.onEvent
       .where((event) => event.name == 'Database.addDatabase')
-      .map((event) => Database.fromJson(event.parameters['database']));
+      .map((event) => Database.fromJson(
+          event.parameters['database'] as Map<String, dynamic>));
 
   /// Disables database tracking, prevents database events from being sent to the client.
   Future<void> disable() async {
