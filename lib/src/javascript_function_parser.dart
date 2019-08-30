@@ -18,8 +18,7 @@ String convertToFunctionDeclaration(String javascript) {
     } else {
       var hasBodyStatement = tokens.contains(_hasBodyStatements);
       _Arguments arguments = tokens.whereType<_Arguments>().single;
-      _FunctionBody functionBody =
-          tokens.whereType<_FunctionBody>().single;
+      _FunctionBody functionBody = tokens.whereType<_FunctionBody>().single;
       var isAsync = tokens.contains(_isAsync);
 
       var body = hasBodyStatement

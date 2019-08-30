@@ -388,7 +388,10 @@ class Request {
   /// - [postData]: If set changes the post data of request
   /// - [headers]: If set changes the request HTTP headers
   Future<void> continueRequest(
-      {String url, String method, String postData, Map<String, String> headers}) async {
+      {String url,
+      String method,
+      String postData,
+      Map<String, String> headers}) async {
     // Request interception is not supported for data: urls.
     if (this.url.startsWith('data:')) return;
     assert(allowInterception, 'Request Interception is not enabled!');
@@ -513,7 +516,7 @@ class Response {
   Future _contentFuture;
   final NetworkApi _networkApi;
   final _headers =
-    CanonicalizedMap<String, String, String>((key) => key.toLowerCase());
+      CanonicalizedMap<String, String, String>((key) => key.toLowerCase());
 
   Response(this.client, this.request, this.data)
       : _networkApi = NetworkApi(client) {

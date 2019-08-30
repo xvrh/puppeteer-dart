@@ -282,7 +282,8 @@ class _Command {
       if (returns.length == 1) {
         Parameter returnParameter = returns.first;
         if (isRawType(returnTypeName)) {
-          sendCode += "return result['${returnParameter.name}'] as $returnTypeName;";
+          sendCode +=
+              "return result['${returnParameter.name}'] as $returnTypeName;";
         } else if (returnParameter.type == 'array') {
           Parameter elementParameter = Parameter(
               name: 'e',
@@ -723,10 +724,12 @@ String _castForParameter(_DomainContext context, Parameter parameter) {
     var complexType = context.findComplexType(parameter.ref);
     if (complexType.enums != null) {
       return 'String';
-    } else if (complexType.properties != null && complexType.properties.isNotEmpty) {
+    } else if (complexType.properties != null &&
+        complexType.properties.isNotEmpty) {
       return 'Map<String, dynamic>';
     } else {
-      var parameter = Parameter(name: 'value', type: complexType.type, items: complexType.items);
+      var parameter = Parameter(
+          name: 'value', type: complexType.type, items: complexType.items);
       return context.getPropertyType(parameter);
     }
   }

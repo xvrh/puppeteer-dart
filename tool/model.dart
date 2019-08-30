@@ -12,8 +12,9 @@ class Protocol {
   final List<Domain> domains;
 
   Protocol.fromJson(Map<String, dynamic> json)
-      : domains =
-            (json['domains'] as List).map((j) => Domain.fromJson(j as Map<String, dynamic>)).toList();
+      : domains = (json['domains'] as List)
+            .map((j) => Domain.fromJson(j as Map<String, dynamic>))
+            .toList();
 
   factory Protocol.fromString(String protocol) =>
       Protocol.fromJson(jsonDecode(protocol) as Map<String, dynamic>);
@@ -32,7 +33,8 @@ class Domain {
         description = json['description'] as String,
         types = json.containsKey('types')
             ? (json['types'] as List)
-                .map((j) => ComplexType.fromJson(j as Map<String, dynamic>, json['domain'] as String))
+                .map((j) => ComplexType.fromJson(
+                    j as Map<String, dynamic>, json['domain'] as String))
                 .toList()
             : const [],
         commands = json.containsKey('commands')
@@ -41,7 +43,9 @@ class Domain {
                 .toList()
             : const [],
         events = json.containsKey('events')
-            ? (json['events'] as List).map((j) => Event.fromJson(j as Map<String, dynamic>)).toList()
+            ? (json['events'] as List)
+                .map((j) => Event.fromJson(j as Map<String, dynamic>))
+                .toList()
             : const [],
         deprecated = json['deprecated'] as bool ?? false;
 }

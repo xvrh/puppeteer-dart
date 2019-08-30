@@ -46,7 +46,7 @@ class JsHandle {
   bool get isDisposed => _disposed;
 
   /// Fetches a single property from the referenced object.
-  Future<JsHandle> property(String propertyName) async {
+  Future<T> property<T extends JsHandle>(String propertyName) async {
     var objectHandle = await executionContext.evaluateHandle(
         //language=js
         '''
@@ -57,7 +57,7 @@ function _(object, propertyName) {
 }
 ''', args: [this, propertyName]);
     var properties = await objectHandle.properties;
-    var result = properties[propertyName];
+    T result = properties[propertyName] as T;
     await objectHandle.dispose();
     return result;
   }
@@ -75,7 +75,7 @@ function _(object, propertyName) {
   /// var handle = await page.evaluateHandle('() => ({window, document})');
   /// var properties = await handle.properties;
   /// JsHandle windowHandle = properties['window'];
-  /// ElementHandle documentHandle = properties['document'];
+  /// var documentHandle = properties['document'] as ElementHandle;
   /// await handle.dispose();
   /// ```
   Future<Map<String, JsHandle>> get properties async {

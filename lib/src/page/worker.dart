@@ -28,7 +28,8 @@ class Worker {
       this.client,
       this.url,
       {@required
-          void Function(ConsoleAPICalledEventType, List<JsHandle>, StackTraceData)
+          void Function(
+                  ConsoleAPICalledEventType, List<JsHandle>, StackTraceData)
               onConsoleApiCalled,
       @required
           void Function(ExceptionThrownEvent) onExceptionThrown}) {
@@ -97,7 +98,8 @@ class Worker {
   ///
   /// returns: Future which resolves to the return value of `pageFunction` as
   /// in-page object (JSHandle)
-  Future<JsHandle> evaluateHandle(@Language('js') String pageFunction,
+  Future<T> evaluateHandle<T extends JsHandle>(
+      @Language('js') String pageFunction,
       {List args}) async {
     return (await executionContext).evaluateHandle(pageFunction, args: args);
   }

@@ -55,7 +55,8 @@ class DomWorld {
     return _contextCompleter.future;
   }
 
-  Future<JsHandle> evaluateHandle(@Language('js') String pageFunction,
+  Future<T> evaluateHandle<T extends JsHandle>(
+      @Language('js') String pageFunction,
       {List args}) async {
     var context = await executionContext;
     return context.evaluateHandle(pageFunction, args: args);

@@ -6,7 +6,8 @@ import 'package:meta/meta.dart';
 import '../protocol/target.dart';
 
 abstract class Client {
-  Future<Map<String, dynamic>> send(String method, [Map<String, dynamic> parameters]);
+  Future<Map<String, dynamic>> send(String method,
+      [Map<String, dynamic> parameters]);
 
   Stream<Event> get onEvent;
 }
@@ -39,7 +40,8 @@ class Connection implements Client {
   final Duration _delay;
 
   Connection._(this._webSocket, this.url, {Duration delay}) : _delay = delay {
-    _subscriptions.add(_webSocket.cast<String>().listen(_onMessage, onError: (error) {
+    _subscriptions
+        .add(_webSocket.cast<String>().listen(_onMessage, onError: (error) {
       print('Websocket error: $error');
     }));
 
@@ -62,7 +64,8 @@ class Connection implements Client {
   Stream<Event> get onEvent => _eventController.stream;
 
   @override
-  Future<Map<String, dynamic>> send(String method, [Map<String, dynamic> parameters]) {
+  Future<Map<String, dynamic>> send(String method,
+      [Map<String, dynamic> parameters]) {
     var id = _rawSend(method, parameters);
     var message = _Message(method);
     _messagesInFly[id] = message;
@@ -70,7 +73,8 @@ class Connection implements Client {
     return message.completer.future;
   }
 
-  int _rawSend(String method, Map<String, dynamic> parameters, {SessionID sessionId}) {
+  int _rawSend(String method, Map<String, dynamic> parameters,
+      {SessionID sessionId}) {
     var id = ++_lastId;
     var message = _encodeMessage(id, method, parameters, sessionId: sessionId);
 
@@ -99,13 +103,15 @@ class Connection implements Client {
     var method = object['method'] as String;
     var sessionId = object['sessionId'] as String;
     if (method == 'Target.attachedToTarget') {
-      var params = AttachedToTargetEvent.fromJson(object['params'] as Map<String, dynamic>);
+      var params = AttachedToTargetEvent.fromJson(
+          object['params'] as Map<String, dynamic>);
       var sessionId = params.sessionId;
       var session =
           Session(this, sessionId, targetType: params.targetInfo.type);
       sessions[sessionId.value] = session;
     } else if (method == 'Target.detachedFromTarget') {
-      var params = DetachedFromTargetEvent.fromJson(object['params'] as Map<String, dynamic>);
+      var params = DetachedFromTargetEvent.fromJson(
+          object['params'] as Map<String, dynamic>);
       var session = sessions[params.sessionId.value];
       if (session != null) {
         session.dispose(reason: 'Target.detachedFromTarget');
@@ -127,9 +133,11 @@ class Connection implements Client {
 
       var error = object['error'] as Map<String, dynamic>;
       if (error != null) {
-        messageInFly.completer.completeError(ServerException(error['message'] as String));
+        messageInFly.completer
+            .completeError(ServerException(error['message'] as String));
       } else {
-        messageInFly.completer.complete(object['result'] as Map<String, dynamic>);
+        messageInFly.completer
+            .complete(object['result'] as Map<String, dynamic>);
       }
     } else {
       var method = object['method'] as String;
@@ -195,7 +203,8 @@ class Session implements Client {
   Session(this.connection, this.sessionId, {@required this.targetType});
 
   @override
-  Future<Map<String, dynamic>> send(String method, [Map<String, dynamic> parameters]) {
+  Future<Map<String, dynamic>> send(String method,
+      [Map<String, dynamic> parameters]) {
     if (_eventController.isClosed) {
       throw Exception(
           'Protocol error ($method): Session closed. Most likely the $targetType has been closed.');
@@ -219,12 +228,14 @@ class Session implements Client {
       var message = _messagesInFly.remove(id);
       var error = object['error'] as Map<String, dynamic>;
       if (error != null) {
-        message.completer.completeError(ServerException(error['message'] as String));
+        message.completer
+            .completeError(ServerException(error['message'] as String));
       } else {
         message.completer.complete(object['result'] as Map<String, dynamic>);
       }
     } else {
-      _eventController.add(Event._(object['method'] as String, object['params'] as Map<String, dynamic>));
+      _eventController.add(Event._(object['method'] as String,
+          object['params'] as Map<String, dynamic>));
     }
   }
 

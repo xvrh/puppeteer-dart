@@ -131,13 +131,15 @@ void findGroupAndTests(String fileCode, Block block, List<CodeSnippet> snippets,
     var methodName = expression.methodName.name;
     if (methodName == 'group') {
       var groupName = expression.argumentList.arguments[0] as StringLiteral;
-      var innerBlock = expression.argumentList.arguments[1] as FunctionExpression;
+      var innerBlock =
+          expression.argumentList.arguments[1] as FunctionExpression;
       var innerBody = innerBlock.body as BlockFunctionBody;
 
       findGroupAndTests(fileCode, innerBody.block, snippets,
           _joinPrefix(namePrefix, groupName.stringValue));
     } else if (methodName == 'test') {
-      var innerBlock = expression.argumentList.arguments[1] as FunctionExpression;
+      var innerBlock =
+          expression.argumentList.arguments[1] as FunctionExpression;
       var innerBody = innerBlock.body as BlockFunctionBody;
       var code = _extractCode(fileCode.substring(
           innerBody.block.offset + 1, innerBody.block.end - 1));

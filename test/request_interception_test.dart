@@ -406,7 +406,7 @@ main() {
       page.onRequest.listen((request) async {
         try {
           await request.continueRequest();
-        } on AssertionError catch  (e) {
+        } on AssertionError catch (e) {
           error = e;
         }
       });

@@ -551,7 +551,8 @@ class Page {
   ///
   /// returns: Future which resolves to the return value of `pageFunction` as
   /// in-page object (JSHandle)
-  Future<T> evaluateHandle<T extends JsHandle>(@Language('js') String pageFunction,
+  Future<T> evaluateHandle<T extends JsHandle>(
+      @Language('js') String pageFunction,
       {List args}) async {
     var context = await mainFrame.executionContext;
     return context.evaluateHandle(pageFunction, args: args);
@@ -790,8 +791,8 @@ function addPageBinding(bindingName) {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   page.onConsole.listen((msg) => print(msg.text));
-  ///   await page.exposeFunction(
-  ///       'md5', (text) => crypto.md5.convert(utf8.encode(text)).toString());
+  ///   await page.exposeFunction('md5',
+  ///       (String text) => crypto.md5.convert(utf8.encode(text)).toString());
   ///   await page.evaluate(r'''async () => {
   ///             // use window.md5 to compute hashes
   ///             const myString = 'PUPPETEER';
@@ -1440,8 +1441,11 @@ function deliverError(name, seq, message, stack) {
         var screenOrientation = viewport.isLandscape
             ? EmulationManager.landscape
             : EmulationManager.portrait;
-        await devTools.emulation.setDeviceMetricsOverride(roundedClip.width.toInt(),
-            roundedClip.height.toInt(), viewport.deviceScaleFactor, viewport.isMobile,
+        await devTools.emulation.setDeviceMetricsOverride(
+            roundedClip.width.toInt(),
+            roundedClip.height.toInt(),
+            viewport.deviceScaleFactor,
+            viewport.isMobile,
             screenOrientation: screenOrientation);
       }
       var shouldSetDefaultBackground =
