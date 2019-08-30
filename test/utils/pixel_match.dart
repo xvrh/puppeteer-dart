@@ -68,7 +68,7 @@ bool _antialiased(
   var zeroes = x1 == x0 || x1 == x2 || y1 == y0 || y1 == y2 ? 1 : 0;
   num min = 0;
   num max = 0;
-  num minX, minY, maxX, maxY;
+  int minX, minY, maxX, maxY;
 
   // go through 8 adjacent pixels
   for (var x = x0; x <= x2; x++) {
@@ -142,14 +142,14 @@ bool _hasManySiblings(Uint8List img, int x1, int y1, int width, int height) {
 
 num _colorDelta(Uint8List img1, Uint8List img2, int k, int m, {bool yOnly}) {
   yOnly ??= false;
-  var r1 = img1[k + 0];
-  var g1 = img1[k + 1];
-  var b1 = img1[k + 2];
+  num r1 = img1[k + 0];
+  num g1 = img1[k + 1];
+  num b1 = img1[k + 2];
   num a1 = img1[k + 3];
 
-  var r2 = img2[m + 0];
-  var g2 = img2[m + 1];
-  var b2 = img2[m + 2];
+  num r2 = img2[m + 0];
+  num g2 = img2[m + 1];
+  num b2 = img2[m + 2];
   num a2 = img2[m + 3];
 
   if (a1 == a2 && r1 == r2 && g1 == g2 && b1 == b2) return 0;

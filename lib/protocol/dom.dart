@@ -223,7 +223,7 @@ class DOMApi {
       if (objectId != null) 'objectId': objectId,
     });
     return (result['quads'] as List)
-        .map((e) => Quad.fromJson(e as List<num>))
+        .map((e) => Quad.fromJson(e as List))
         .toList();
   }
 
@@ -1382,10 +1382,10 @@ class BoxModel {
 
   factory BoxModel.fromJson(Map<String, dynamic> json) {
     return BoxModel(
-      content: Quad.fromJson(json['content'] as List<num>),
-      padding: Quad.fromJson(json['padding'] as List<num>),
-      border: Quad.fromJson(json['border'] as List<num>),
-      margin: Quad.fromJson(json['margin'] as List<num>),
+      content: Quad.fromJson(json['content'] as List),
+      padding: Quad.fromJson(json['padding'] as List),
+      border: Quad.fromJson(json['border'] as List),
+      margin: Quad.fromJson(json['margin'] as List),
       width: json['width'] as int,
       height: json['height'] as int,
       shapeOutside: json.containsKey('shapeOutside')

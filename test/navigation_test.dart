@@ -479,9 +479,9 @@ main() {
 
       server.setRoute(
           '/empty.html', (req) => Completer<shelf.Response>().future);
-      Exception error;
+      Object error;
       var navigationPromise =
-          page.frames[1].goto(server.emptyPage).catchError((Exception e) {
+          page.frames[1].goto(server.emptyPage).catchError((e) {
         error = e;
       });
       await server.waitForRequest('/empty.html');
@@ -547,8 +547,8 @@ main() {
 
       server.setRoute(
           '/empty-for-frame.html', (req) => Completer<shelf.Response>().future);
-      Exception error;
-      var navigationPromise = frame.waitForNavigation().catchError((Exception e) {
+      Object error;
+      var navigationPromise = frame.waitForNavigation().catchError((e) {
         error = e;
       });
       await Future.wait([

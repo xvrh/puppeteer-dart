@@ -37,11 +37,11 @@ main() {
   group('Page.close', () {
     test('should reject all promises when page is closed', () async {
       var newPage = await context.newPage();
-      TargetClosedException error;
+      Object error;
       await Future.wait([
         newPage
             .evaluate('() => new Promise(r => {})')
-            .catchError((TargetClosedException e) => error = e),
+            .catchError((e) => error = e),
         newPage.close(),
       ]);
       expect(error, TypeMatcher<TargetClosedException>());
@@ -111,8 +111,8 @@ main() {
       server.setRoute('my-page', (request) {
         return shelf.Response(204);
       });
-      Exception error;
-      await page.goto(server.hostUrl + '/my-page').catchError((Exception e, s) {
+      Object error;
+      await page.goto(server.hostUrl + '/my-page').catchError((e, s) {
         error = e;
         return null;
       });
