@@ -305,8 +305,8 @@ class CssCoverage {
         styleSheetIdToCoverage[entry.styleSheetId] = ranges;
       }
       ranges.add(CoverageRange(
-          startOffset: entry.startOffset,
-          endOffset: entry.endOffset,
+          startOffset: entry.startOffset.toInt(),
+          endOffset: entry.endOffset.toInt(),
           count: entry.used ? 1 : 0));
     }
 

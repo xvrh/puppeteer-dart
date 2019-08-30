@@ -49,7 +49,7 @@ Future<void> releaseObject(
 
   await runtimeApi
       .releaseObject(remoteObject.objectId)
-      .catchError((e, stackTrace) {
+      .catchError((e, StackTrace stackTrace) {
     // Exceptions might happen in case of a page been navigated or closed.
     // Swallow these since they are harmless and we don't leak anything in this case.
     _logger.fine(e, e, stackTrace);

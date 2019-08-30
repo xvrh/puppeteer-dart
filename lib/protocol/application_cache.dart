@@ -29,12 +29,12 @@ class ApplicationCacheApi {
   /// Returns: Relevant application cache data for the document in given frame.
   Future<ApplicationCache> getApplicationCacheForFrame(
       page.FrameId frameId) async {
-    var parameters = <String, dynamic>{
-      'frameId': frameId.toJson(),
-    };
-    var result = await _client.send(
-        'ApplicationCache.getApplicationCacheForFrame', parameters);
-    return ApplicationCache.fromJson(result['applicationCache']);
+    var result =
+        await _client.send('ApplicationCache.getApplicationCacheForFrame', {
+      'frameId': frameId,
+    });
+    return ApplicationCache.fromJson(
+        result['applicationCache'] as Map<String, dynamic>);
   }
 
   /// Returns array of frame identifiers with manifest urls for each frame containing a document
@@ -44,7 +44,7 @@ class ApplicationCacheApi {
   Future<List<FrameWithManifest>> getFramesWithManifests() async {
     var result = await _client.send('ApplicationCache.getFramesWithManifests');
     return (result['frameIds'] as List)
-        .map((e) => FrameWithManifest.fromJson(e))
+        .map((e) => FrameWithManifest.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
@@ -52,12 +52,10 @@ class ApplicationCacheApi {
   /// [frameId] Identifier of the frame containing document whose manifest is retrieved.
   /// Returns: Manifest URL for document in the given frame.
   Future<String> getManifestForFrame(page.FrameId frameId) async {
-    var parameters = <String, dynamic>{
-      'frameId': frameId.toJson(),
-    };
-    var result =
-        await _client.send('ApplicationCache.getManifestForFrame', parameters);
-    return result['manifestURL'];
+    var result = await _client.send('ApplicationCache.getManifestForFrame', {
+      'frameId': frameId,
+    });
+    return result['manifestURL'] as String;
   }
 }
 
@@ -79,9 +77,9 @@ class ApplicationCacheStatusUpdatedEvent {
   factory ApplicationCacheStatusUpdatedEvent.fromJson(
       Map<String, dynamic> json) {
     return ApplicationCacheStatusUpdatedEvent(
-      frameId: page.FrameId.fromJson(json['frameId']),
-      manifestURL: json['manifestURL'],
-      status: json['status'],
+      frameId: page.FrameId.fromJson(json['frameId'] as String),
+      manifestURL: json['manifestURL'] as String,
+      status: json['status'] as int,
     );
   }
 }
@@ -102,19 +100,18 @@ class ApplicationCacheResource {
 
   factory ApplicationCacheResource.fromJson(Map<String, dynamic> json) {
     return ApplicationCacheResource(
-      url: json['url'],
-      size: json['size'],
-      type: json['type'],
+      url: json['url'] as String,
+      size: json['size'] as int,
+      type: json['type'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'url': url,
       'size': size,
       'type': type,
     };
-    return json;
   }
 }
 
@@ -144,25 +141,25 @@ class ApplicationCache {
 
   factory ApplicationCache.fromJson(Map<String, dynamic> json) {
     return ApplicationCache(
-      manifestURL: json['manifestURL'],
-      size: json['size'],
-      creationTime: json['creationTime'],
-      updateTime: json['updateTime'],
+      manifestURL: json['manifestURL'] as String,
+      size: json['size'] as num,
+      creationTime: json['creationTime'] as num,
+      updateTime: json['updateTime'] as num,
       resources: (json['resources'] as List)
-          .map((e) => ApplicationCacheResource.fromJson(e))
+          .map((e) =>
+              ApplicationCacheResource.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'manifestURL': manifestURL,
       'size': size,
       'creationTime': creationTime,
       'updateTime': updateTime,
       'resources': resources.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -184,18 +181,17 @@ class FrameWithManifest {
 
   factory FrameWithManifest.fromJson(Map<String, dynamic> json) {
     return FrameWithManifest(
-      frameId: page.FrameId.fromJson(json['frameId']),
-      manifestURL: json['manifestURL'],
-      status: json['status'],
+      frameId: page.FrameId.fromJson(json['frameId'] as String),
+      manifestURL: json['manifestURL'] as String,
+      status: json['status'] as int,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'frameId': frameId.toJson(),
       'manifestURL': manifestURL,
       'status': status,
     };
-    return json;
   }
 }

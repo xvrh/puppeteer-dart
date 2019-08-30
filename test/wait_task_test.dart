@@ -242,7 +242,7 @@ main() {
     test('should throw when frame is detached', () async {
       await attachFrame(page, 'frame1', server.emptyPage);
       var frame = page.frames[1];
-      Exception waitError;
+      dynamic waitError;
       var waitPromise = frame.waitForSelector('.box').catchError((e) {
         waitError = e;
         return null;
@@ -402,7 +402,7 @@ main() {
     test('should throw when frame is detached', () async {
       await attachFrame(page, 'frame1', server.emptyPage);
       var frame = page.frames[1];
-      Exception waitError;
+      dynamic waitError;
       var waitPromise = frame.waitForXPath('//*[@class="box"]').catchError((e) {
         waitError = e;
         return null;

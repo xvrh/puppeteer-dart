@@ -24,13 +24,13 @@ class DOMStorageApi {
 
   Stream<StorageId> get onDomStorageItemsCleared => _client.onEvent
       .where((event) => event.name == 'DOMStorage.domStorageItemsCleared')
-      .map((event) => StorageId.fromJson(event.parameters['storageId']));
+      .map((event) => StorageId.fromJson(
+          event.parameters['storageId'] as Map<String, dynamic>));
 
   Future<void> clear(StorageId storageId) async {
-    var parameters = <String, dynamic>{
-      'storageId': storageId.toJson(),
-    };
-    await _client.send('DOMStorage.clear', parameters);
+    await _client.send('DOMStorage.clear', {
+      'storageId': storageId,
+    });
   }
 
   /// Disables storage tracking, prevents storage events from being sent to the client.
@@ -44,30 +44,28 @@ class DOMStorageApi {
   }
 
   Future<List<Item>> getDOMStorageItems(StorageId storageId) async {
-    var parameters = <String, dynamic>{
-      'storageId': storageId.toJson(),
-    };
-    var result =
-        await _client.send('DOMStorage.getDOMStorageItems', parameters);
-    return (result['entries'] as List).map((e) => Item.fromJson(e)).toList();
+    var result = await _client.send('DOMStorage.getDOMStorageItems', {
+      'storageId': storageId,
+    });
+    return (result['entries'] as List)
+        .map((e) => Item.fromJson(e as List<String>))
+        .toList();
   }
 
   Future<void> removeDOMStorageItem(StorageId storageId, String key) async {
-    var parameters = <String, dynamic>{
-      'storageId': storageId.toJson(),
+    await _client.send('DOMStorage.removeDOMStorageItem', {
+      'storageId': storageId,
       'key': key,
-    };
-    await _client.send('DOMStorage.removeDOMStorageItem', parameters);
+    });
   }
 
   Future<void> setDOMStorageItem(
       StorageId storageId, String key, String value) async {
-    var parameters = <String, dynamic>{
-      'storageId': storageId.toJson(),
+    await _client.send('DOMStorage.setDOMStorageItem', {
+      'storageId': storageId,
       'key': key,
       'value': value,
-    };
-    await _client.send('DOMStorage.setDOMStorageItem', parameters);
+    });
   }
 }
 
@@ -83,9 +81,9 @@ class DomStorageItemAddedEvent {
 
   factory DomStorageItemAddedEvent.fromJson(Map<String, dynamic> json) {
     return DomStorageItemAddedEvent(
-      storageId: StorageId.fromJson(json['storageId']),
-      key: json['key'],
-      newValue: json['newValue'],
+      storageId: StorageId.fromJson(json['storageId'] as Map<String, dynamic>),
+      key: json['key'] as String,
+      newValue: json['newValue'] as String,
     );
   }
 }
@@ -99,8 +97,8 @@ class DomStorageItemRemovedEvent {
 
   factory DomStorageItemRemovedEvent.fromJson(Map<String, dynamic> json) {
     return DomStorageItemRemovedEvent(
-      storageId: StorageId.fromJson(json['storageId']),
-      key: json['key'],
+      storageId: StorageId.fromJson(json['storageId'] as Map<String, dynamic>),
+      key: json['key'] as String,
     );
   }
 }
@@ -122,10 +120,10 @@ class DomStorageItemUpdatedEvent {
 
   factory DomStorageItemUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return DomStorageItemUpdatedEvent(
-      storageId: StorageId.fromJson(json['storageId']),
-      key: json['key'],
-      oldValue: json['oldValue'],
-      newValue: json['newValue'],
+      storageId: StorageId.fromJson(json['storageId'] as Map<String, dynamic>),
+      key: json['key'] as String,
+      oldValue: json['oldValue'] as String,
+      newValue: json['newValue'] as String,
     );
   }
 }
@@ -142,17 +140,16 @@ class StorageId {
 
   factory StorageId.fromJson(Map<String, dynamic> json) {
     return StorageId(
-      securityOrigin: json['securityOrigin'],
-      isLocalStorage: json['isLocalStorage'],
+      securityOrigin: json['securityOrigin'] as String,
+      isLocalStorage: json['isLocalStorage'] as bool,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'securityOrigin': securityOrigin,
       'isLocalStorage': isLocalStorage,
     };
-    return json;
   }
 }
 

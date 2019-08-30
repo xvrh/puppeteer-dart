@@ -15,7 +15,7 @@ class LifecycleWatcher {
       _lifecycleCompleter = Completer<Exception>(),
       _terminationCompleter = Completer<Exception>(),
       _newDocumentNavigationCompleter = Completer<Exception>();
-  Future _timeoutFuture;
+  Future<Exception> _timeoutFuture;
   bool _hasSameDocumentNavigation = false;
   Timer _timeoutTimer;
 

@@ -9,7 +9,8 @@ class DatabaseApi {
 
   Stream<Database> get onAddDatabase => _client.onEvent
       .where((event) => event.name == 'Database.addDatabase')
-      .map((event) => Database.fromJson(event.parameters['database']));
+      .map((event) => Database.fromJson(
+          event.parameters['database'] as Map<String, dynamic>));
 
   /// Disables database tracking, prevents database events from being sent to the client.
   Future<void> disable() async {
@@ -23,20 +24,17 @@ class DatabaseApi {
 
   Future<ExecuteSQLResult> executeSQL(
       DatabaseId databaseId, String query) async {
-    var parameters = <String, dynamic>{
-      'databaseId': databaseId.toJson(),
+    var result = await _client.send('Database.executeSQL', {
+      'databaseId': databaseId,
       'query': query,
-    };
-    var result = await _client.send('Database.executeSQL', parameters);
+    });
     return ExecuteSQLResult.fromJson(result);
   }
 
   Future<List<String>> getDatabaseTableNames(DatabaseId databaseId) async {
-    var parameters = <String, dynamic>{
-      'databaseId': databaseId.toJson(),
-    };
-    var result =
-        await _client.send('Database.getDatabaseTableNames', parameters);
+    var result = await _client.send('Database.getDatabaseTableNames', {
+      'databaseId': databaseId,
+    });
     return (result['tableNames'] as List).map((e) => e as String).toList();
   }
 }
@@ -59,7 +57,7 @@ class ExecuteSQLResult {
           ? (json['values'] as List).map((e) => e as dynamic).toList()
           : null,
       sqlError: json.containsKey('sqlError')
-          ? Error.fromJson(json['sqlError'])
+          ? Error.fromJson(json['sqlError'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -108,21 +106,20 @@ class Database {
 
   factory Database.fromJson(Map<String, dynamic> json) {
     return Database(
-      id: DatabaseId.fromJson(json['id']),
-      domain: json['domain'],
-      name: json['name'],
-      version: json['version'],
+      id: DatabaseId.fromJson(json['id'] as String),
+      domain: json['domain'] as String,
+      name: json['name'] as String,
+      version: json['version'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'id': id.toJson(),
       'domain': domain,
       'name': name,
       'version': version,
     };
-    return json;
   }
 }
 
@@ -138,16 +135,15 @@ class Error {
 
   factory Error.fromJson(Map<String, dynamic> json) {
     return Error(
-      message: json['message'],
-      code: json['code'],
+      message: json['message'] as String,
+      code: json['code'] as int,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'message': message,
       'code': code,
     };
-    return json;
   }
 }

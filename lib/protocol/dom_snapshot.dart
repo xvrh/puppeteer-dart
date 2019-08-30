@@ -34,19 +34,14 @@ class DOMSnapshotApi {
       {bool includeEventListeners,
       bool includePaintOrder,
       bool includeUserAgentShadowTree}) async {
-    var parameters = <String, dynamic>{
-      'computedStyleWhitelist': computedStyleWhitelist.map((e) => e).toList(),
-    };
-    if (includeEventListeners != null) {
-      parameters['includeEventListeners'] = includeEventListeners;
-    }
-    if (includePaintOrder != null) {
-      parameters['includePaintOrder'] = includePaintOrder;
-    }
-    if (includeUserAgentShadowTree != null) {
-      parameters['includeUserAgentShadowTree'] = includeUserAgentShadowTree;
-    }
-    var result = await _client.send('DOMSnapshot.getSnapshot', parameters);
+    var result = await _client.send('DOMSnapshot.getSnapshot', {
+      'computedStyleWhitelist': [...computedStyleWhitelist],
+      if (includeEventListeners != null)
+        'includeEventListeners': includeEventListeners,
+      if (includePaintOrder != null) 'includePaintOrder': includePaintOrder,
+      if (includeUserAgentShadowTree != null)
+        'includeUserAgentShadowTree': includeUserAgentShadowTree,
+    });
     return GetSnapshotResult.fromJson(result);
   }
 
@@ -59,16 +54,11 @@ class DOMSnapshotApi {
   /// [includeDOMRects] Whether to include DOM rectangles (offsetRects, clientRects, scrollRects) into the snapshot
   Future<CaptureSnapshotResult> captureSnapshot(List<String> computedStyles,
       {bool includePaintOrder, bool includeDOMRects}) async {
-    var parameters = <String, dynamic>{
-      'computedStyles': computedStyles.map((e) => e).toList(),
-    };
-    if (includePaintOrder != null) {
-      parameters['includePaintOrder'] = includePaintOrder;
-    }
-    if (includeDOMRects != null) {
-      parameters['includeDOMRects'] = includeDOMRects;
-    }
-    var result = await _client.send('DOMSnapshot.captureSnapshot', parameters);
+    var result = await _client.send('DOMSnapshot.captureSnapshot', {
+      'computedStyles': [...computedStyles],
+      if (includePaintOrder != null) 'includePaintOrder': includePaintOrder,
+      if (includeDOMRects != null) 'includeDOMRects': includeDOMRects,
+    });
     return CaptureSnapshotResult.fromJson(result);
   }
 }
@@ -90,13 +80,14 @@ class GetSnapshotResult {
 
   factory GetSnapshotResult.fromJson(Map<String, dynamic> json) {
     return GetSnapshotResult(
-      domNodes:
-          (json['domNodes'] as List).map((e) => DOMNode.fromJson(e)).toList(),
+      domNodes: (json['domNodes'] as List)
+          .map((e) => DOMNode.fromJson(e as Map<String, dynamic>))
+          .toList(),
       layoutTreeNodes: (json['layoutTreeNodes'] as List)
-          .map((e) => LayoutTreeNode.fromJson(e))
+          .map((e) => LayoutTreeNode.fromJson(e as Map<String, dynamic>))
           .toList(),
       computedStyles: (json['computedStyles'] as List)
-          .map((e) => ComputedStyle.fromJson(e))
+          .map((e) => ComputedStyle.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -114,7 +105,7 @@ class CaptureSnapshotResult {
   factory CaptureSnapshotResult.fromJson(Map<String, dynamic> json) {
     return CaptureSnapshotResult(
       documents: (json['documents'] as List)
-          .map((e) => DocumentSnapshot.fromJson(e))
+          .map((e) => DocumentSnapshot.fromJson(e as Map<String, dynamic>))
           .toList(),
       strings: (json['strings'] as List).map((e) => e as String).toList(),
     );
@@ -244,148 +235,117 @@ class DOMNode {
 
   factory DOMNode.fromJson(Map<String, dynamic> json) {
     return DOMNode(
-      nodeType: json['nodeType'],
-      nodeName: json['nodeName'],
-      nodeValue: json['nodeValue'],
-      textValue: json.containsKey('textValue') ? json['textValue'] : null,
-      inputValue: json.containsKey('inputValue') ? json['inputValue'] : null,
-      inputChecked:
-          json.containsKey('inputChecked') ? json['inputChecked'] : null,
-      optionSelected:
-          json.containsKey('optionSelected') ? json['optionSelected'] : null,
-      backendNodeId: dom.BackendNodeId.fromJson(json['backendNodeId']),
+      nodeType: json['nodeType'] as int,
+      nodeName: json['nodeName'] as String,
+      nodeValue: json['nodeValue'] as String,
+      textValue:
+          json.containsKey('textValue') ? json['textValue'] as String : null,
+      inputValue:
+          json.containsKey('inputValue') ? json['inputValue'] as String : null,
+      inputChecked: json.containsKey('inputChecked')
+          ? json['inputChecked'] as bool
+          : null,
+      optionSelected: json.containsKey('optionSelected')
+          ? json['optionSelected'] as bool
+          : null,
+      backendNodeId: dom.BackendNodeId.fromJson(json['backendNodeId'] as int),
       childNodeIndexes: json.containsKey('childNodeIndexes')
           ? (json['childNodeIndexes'] as List).map((e) => e as int).toList()
           : null,
       attributes: json.containsKey('attributes')
           ? (json['attributes'] as List)
-              .map((e) => NameValue.fromJson(e))
+              .map((e) => NameValue.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       pseudoElementIndexes: json.containsKey('pseudoElementIndexes')
           ? (json['pseudoElementIndexes'] as List).map((e) => e as int).toList()
           : null,
-      layoutNodeIndex:
-          json.containsKey('layoutNodeIndex') ? json['layoutNodeIndex'] : null,
-      documentURL: json.containsKey('documentURL') ? json['documentURL'] : null,
-      baseURL: json.containsKey('baseURL') ? json['baseURL'] : null,
-      contentLanguage:
-          json.containsKey('contentLanguage') ? json['contentLanguage'] : null,
-      documentEncoding: json.containsKey('documentEncoding')
-          ? json['documentEncoding']
+      layoutNodeIndex: json.containsKey('layoutNodeIndex')
+          ? json['layoutNodeIndex'] as int
           : null,
-      publicId: json.containsKey('publicId') ? json['publicId'] : null,
-      systemId: json.containsKey('systemId') ? json['systemId'] : null,
+      documentURL: json.containsKey('documentURL')
+          ? json['documentURL'] as String
+          : null,
+      baseURL: json.containsKey('baseURL') ? json['baseURL'] as String : null,
+      contentLanguage: json.containsKey('contentLanguage')
+          ? json['contentLanguage'] as String
+          : null,
+      documentEncoding: json.containsKey('documentEncoding')
+          ? json['documentEncoding'] as String
+          : null,
+      publicId:
+          json.containsKey('publicId') ? json['publicId'] as String : null,
+      systemId:
+          json.containsKey('systemId') ? json['systemId'] as String : null,
       frameId: json.containsKey('frameId')
-          ? page.FrameId.fromJson(json['frameId'])
+          ? page.FrameId.fromJson(json['frameId'] as String)
           : null,
       contentDocumentIndex: json.containsKey('contentDocumentIndex')
-          ? json['contentDocumentIndex']
+          ? json['contentDocumentIndex'] as int
           : null,
       pseudoType: json.containsKey('pseudoType')
-          ? dom.PseudoType.fromJson(json['pseudoType'])
+          ? dom.PseudoType.fromJson(json['pseudoType'] as String)
           : null,
       shadowRootType: json.containsKey('shadowRootType')
-          ? dom.ShadowRootType.fromJson(json['shadowRootType'])
+          ? dom.ShadowRootType.fromJson(json['shadowRootType'] as String)
           : null,
-      isClickable: json.containsKey('isClickable') ? json['isClickable'] : null,
+      isClickable:
+          json.containsKey('isClickable') ? json['isClickable'] as bool : null,
       eventListeners: json.containsKey('eventListeners')
           ? (json['eventListeners'] as List)
-              .map((e) => dom_debugger.EventListener.fromJson(e))
+              .map((e) => dom_debugger.EventListener.fromJson(
+                  e as Map<String, dynamic>))
               .toList()
           : null,
       currentSourceURL: json.containsKey('currentSourceURL')
-          ? json['currentSourceURL']
+          ? json['currentSourceURL'] as String
           : null,
-      originURL: json.containsKey('originURL') ? json['originURL'] : null,
-      scrollOffsetX:
-          json.containsKey('scrollOffsetX') ? json['scrollOffsetX'] : null,
-      scrollOffsetY:
-          json.containsKey('scrollOffsetY') ? json['scrollOffsetY'] : null,
+      originURL:
+          json.containsKey('originURL') ? json['originURL'] as String : null,
+      scrollOffsetX: json.containsKey('scrollOffsetX')
+          ? json['scrollOffsetX'] as num
+          : null,
+      scrollOffsetY: json.containsKey('scrollOffsetY')
+          ? json['scrollOffsetY'] as num
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'nodeType': nodeType,
       'nodeName': nodeName,
       'nodeValue': nodeValue,
       'backendNodeId': backendNodeId.toJson(),
+      if (textValue != null) 'textValue': textValue,
+      if (inputValue != null) 'inputValue': inputValue,
+      if (inputChecked != null) 'inputChecked': inputChecked,
+      if (optionSelected != null) 'optionSelected': optionSelected,
+      if (childNodeIndexes != null) 'childNodeIndexes': [...childNodeIndexes],
+      if (attributes != null)
+        'attributes': attributes.map((e) => e.toJson()).toList(),
+      if (pseudoElementIndexes != null)
+        'pseudoElementIndexes': [...pseudoElementIndexes],
+      if (layoutNodeIndex != null) 'layoutNodeIndex': layoutNodeIndex,
+      if (documentURL != null) 'documentURL': documentURL,
+      if (baseURL != null) 'baseURL': baseURL,
+      if (contentLanguage != null) 'contentLanguage': contentLanguage,
+      if (documentEncoding != null) 'documentEncoding': documentEncoding,
+      if (publicId != null) 'publicId': publicId,
+      if (systemId != null) 'systemId': systemId,
+      if (frameId != null) 'frameId': frameId.toJson(),
+      if (contentDocumentIndex != null)
+        'contentDocumentIndex': contentDocumentIndex,
+      if (pseudoType != null) 'pseudoType': pseudoType.toJson(),
+      if (shadowRootType != null) 'shadowRootType': shadowRootType.toJson(),
+      if (isClickable != null) 'isClickable': isClickable,
+      if (eventListeners != null)
+        'eventListeners': eventListeners.map((e) => e.toJson()).toList(),
+      if (currentSourceURL != null) 'currentSourceURL': currentSourceURL,
+      if (originURL != null) 'originURL': originURL,
+      if (scrollOffsetX != null) 'scrollOffsetX': scrollOffsetX,
+      if (scrollOffsetY != null) 'scrollOffsetY': scrollOffsetY,
     };
-    if (textValue != null) {
-      json['textValue'] = textValue;
-    }
-    if (inputValue != null) {
-      json['inputValue'] = inputValue;
-    }
-    if (inputChecked != null) {
-      json['inputChecked'] = inputChecked;
-    }
-    if (optionSelected != null) {
-      json['optionSelected'] = optionSelected;
-    }
-    if (childNodeIndexes != null) {
-      json['childNodeIndexes'] = childNodeIndexes.map((e) => e).toList();
-    }
-    if (attributes != null) {
-      json['attributes'] = attributes.map((e) => e.toJson()).toList();
-    }
-    if (pseudoElementIndexes != null) {
-      json['pseudoElementIndexes'] =
-          pseudoElementIndexes.map((e) => e).toList();
-    }
-    if (layoutNodeIndex != null) {
-      json['layoutNodeIndex'] = layoutNodeIndex;
-    }
-    if (documentURL != null) {
-      json['documentURL'] = documentURL;
-    }
-    if (baseURL != null) {
-      json['baseURL'] = baseURL;
-    }
-    if (contentLanguage != null) {
-      json['contentLanguage'] = contentLanguage;
-    }
-    if (documentEncoding != null) {
-      json['documentEncoding'] = documentEncoding;
-    }
-    if (publicId != null) {
-      json['publicId'] = publicId;
-    }
-    if (systemId != null) {
-      json['systemId'] = systemId;
-    }
-    if (frameId != null) {
-      json['frameId'] = frameId.toJson();
-    }
-    if (contentDocumentIndex != null) {
-      json['contentDocumentIndex'] = contentDocumentIndex;
-    }
-    if (pseudoType != null) {
-      json['pseudoType'] = pseudoType.toJson();
-    }
-    if (shadowRootType != null) {
-      json['shadowRootType'] = shadowRootType.toJson();
-    }
-    if (isClickable != null) {
-      json['isClickable'] = isClickable;
-    }
-    if (eventListeners != null) {
-      json['eventListeners'] = eventListeners.map((e) => e.toJson()).toList();
-    }
-    if (currentSourceURL != null) {
-      json['currentSourceURL'] = currentSourceURL;
-    }
-    if (originURL != null) {
-      json['originURL'] = originURL;
-    }
-    if (scrollOffsetX != null) {
-      json['scrollOffsetX'] = scrollOffsetX;
-    }
-    if (scrollOffsetY != null) {
-      json['scrollOffsetY'] = scrollOffsetY;
-    }
-    return json;
   }
 }
 
@@ -410,19 +370,19 @@ class InlineTextBox {
 
   factory InlineTextBox.fromJson(Map<String, dynamic> json) {
     return InlineTextBox(
-      boundingBox: dom.Rect.fromJson(json['boundingBox']),
-      startCharacterIndex: json['startCharacterIndex'],
-      numCharacters: json['numCharacters'],
+      boundingBox:
+          dom.Rect.fromJson(json['boundingBox'] as Map<String, dynamic>),
+      startCharacterIndex: json['startCharacterIndex'] as int,
+      numCharacters: json['numCharacters'] as int,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'boundingBox': boundingBox.toJson(),
       'startCharacterIndex': startCharacterIndex,
       'numCharacters': numCharacters,
     };
-    return json;
   }
 }
 
@@ -462,43 +422,37 @@ class LayoutTreeNode {
 
   factory LayoutTreeNode.fromJson(Map<String, dynamic> json) {
     return LayoutTreeNode(
-      domNodeIndex: json['domNodeIndex'],
-      boundingBox: dom.Rect.fromJson(json['boundingBox']),
-      layoutText: json.containsKey('layoutText') ? json['layoutText'] : null,
+      domNodeIndex: json['domNodeIndex'] as int,
+      boundingBox:
+          dom.Rect.fromJson(json['boundingBox'] as Map<String, dynamic>),
+      layoutText:
+          json.containsKey('layoutText') ? json['layoutText'] as String : null,
       inlineTextNodes: json.containsKey('inlineTextNodes')
           ? (json['inlineTextNodes'] as List)
-              .map((e) => InlineTextBox.fromJson(e))
+              .map((e) => InlineTextBox.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
-      styleIndex: json.containsKey('styleIndex') ? json['styleIndex'] : null,
-      paintOrder: json.containsKey('paintOrder') ? json['paintOrder'] : null,
+      styleIndex:
+          json.containsKey('styleIndex') ? json['styleIndex'] as int : null,
+      paintOrder:
+          json.containsKey('paintOrder') ? json['paintOrder'] as int : null,
       isStackingContext: json.containsKey('isStackingContext')
-          ? json['isStackingContext']
+          ? json['isStackingContext'] as bool
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'domNodeIndex': domNodeIndex,
       'boundingBox': boundingBox.toJson(),
+      if (layoutText != null) 'layoutText': layoutText,
+      if (inlineTextNodes != null)
+        'inlineTextNodes': inlineTextNodes.map((e) => e.toJson()).toList(),
+      if (styleIndex != null) 'styleIndex': styleIndex,
+      if (paintOrder != null) 'paintOrder': paintOrder,
+      if (isStackingContext != null) 'isStackingContext': isStackingContext,
     };
-    if (layoutText != null) {
-      json['layoutText'] = layoutText;
-    }
-    if (inlineTextNodes != null) {
-      json['inlineTextNodes'] = inlineTextNodes.map((e) => e.toJson()).toList();
-    }
-    if (styleIndex != null) {
-      json['styleIndex'] = styleIndex;
-    }
-    if (paintOrder != null) {
-      json['paintOrder'] = paintOrder;
-    }
-    if (isStackingContext != null) {
-      json['isStackingContext'] = isStackingContext;
-    }
-    return json;
   }
 }
 
@@ -512,16 +466,15 @@ class ComputedStyle {
   factory ComputedStyle.fromJson(Map<String, dynamic> json) {
     return ComputedStyle(
       properties: (json['properties'] as List)
-          .map((e) => NameValue.fromJson(e))
+          .map((e) => NameValue.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'properties': properties.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -537,17 +490,16 @@ class NameValue {
 
   factory NameValue.fromJson(Map<String, dynamic> json) {
     return NameValue(
-      name: json['name'],
-      value: json['value'],
+      name: json['name'] as String,
+      value: json['value'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'value': value,
     };
-    return json;
   }
 }
 
@@ -605,17 +557,17 @@ class RareStringData {
   factory RareStringData.fromJson(Map<String, dynamic> json) {
     return RareStringData(
       index: (json['index'] as List).map((e) => e as int).toList(),
-      value:
-          (json['value'] as List).map((e) => StringIndex.fromJson(e)).toList(),
+      value: (json['value'] as List)
+          .map((e) => StringIndex.fromJson(e as int))
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
-      'index': index.map((e) => e).toList(),
+    return {
+      'index': [...index],
       'value': value.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -631,10 +583,9 @@ class RareBooleanData {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
-      'index': index.map((e) => e).toList(),
+    return {
+      'index': [...index],
     };
-    return json;
   }
 }
 
@@ -653,11 +604,10 @@ class RareIntegerData {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
-      'index': index.map((e) => e).toList(),
-      'value': value.map((e) => e).toList(),
+    return {
+      'index': [...index],
+      'value': [...value],
     };
-    return json;
   }
 }
 
@@ -736,25 +686,29 @@ class DocumentSnapshot {
 
   factory DocumentSnapshot.fromJson(Map<String, dynamic> json) {
     return DocumentSnapshot(
-      documentURL: StringIndex.fromJson(json['documentURL']),
-      baseURL: StringIndex.fromJson(json['baseURL']),
-      contentLanguage: StringIndex.fromJson(json['contentLanguage']),
-      encodingName: StringIndex.fromJson(json['encodingName']),
-      publicId: StringIndex.fromJson(json['publicId']),
-      systemId: StringIndex.fromJson(json['systemId']),
-      frameId: StringIndex.fromJson(json['frameId']),
-      nodes: NodeTreeSnapshot.fromJson(json['nodes']),
-      layout: LayoutTreeSnapshot.fromJson(json['layout']),
-      textBoxes: TextBoxSnapshot.fromJson(json['textBoxes']),
-      scrollOffsetX:
-          json.containsKey('scrollOffsetX') ? json['scrollOffsetX'] : null,
-      scrollOffsetY:
-          json.containsKey('scrollOffsetY') ? json['scrollOffsetY'] : null,
+      documentURL: StringIndex.fromJson(json['documentURL'] as int),
+      baseURL: StringIndex.fromJson(json['baseURL'] as int),
+      contentLanguage: StringIndex.fromJson(json['contentLanguage'] as int),
+      encodingName: StringIndex.fromJson(json['encodingName'] as int),
+      publicId: StringIndex.fromJson(json['publicId'] as int),
+      systemId: StringIndex.fromJson(json['systemId'] as int),
+      frameId: StringIndex.fromJson(json['frameId'] as int),
+      nodes: NodeTreeSnapshot.fromJson(json['nodes'] as Map<String, dynamic>),
+      layout:
+          LayoutTreeSnapshot.fromJson(json['layout'] as Map<String, dynamic>),
+      textBoxes:
+          TextBoxSnapshot.fromJson(json['textBoxes'] as Map<String, dynamic>),
+      scrollOffsetX: json.containsKey('scrollOffsetX')
+          ? json['scrollOffsetX'] as num
+          : null,
+      scrollOffsetY: json.containsKey('scrollOffsetY')
+          ? json['scrollOffsetY'] as num
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'documentURL': documentURL.toJson(),
       'baseURL': baseURL.toJson(),
       'contentLanguage': contentLanguage.toJson(),
@@ -765,14 +719,9 @@ class DocumentSnapshot {
       'nodes': nodes.toJson(),
       'layout': layout.toJson(),
       'textBoxes': textBoxes.toJson(),
+      if (scrollOffsetX != null) 'scrollOffsetX': scrollOffsetX,
+      if (scrollOffsetY != null) 'scrollOffsetY': scrollOffsetY,
     };
-    if (scrollOffsetX != null) {
-      json['scrollOffsetX'] = scrollOffsetX;
-    }
-    if (scrollOffsetY != null) {
-      json['scrollOffsetY'] = scrollOffsetY;
-    }
-    return json;
   }
 }
 
@@ -852,102 +801,83 @@ class NodeTreeSnapshot {
           : null,
       nodeName: json.containsKey('nodeName')
           ? (json['nodeName'] as List)
-              .map((e) => StringIndex.fromJson(e))
+              .map((e) => StringIndex.fromJson(e as int))
               .toList()
           : null,
       nodeValue: json.containsKey('nodeValue')
           ? (json['nodeValue'] as List)
-              .map((e) => StringIndex.fromJson(e))
+              .map((e) => StringIndex.fromJson(e as int))
               .toList()
           : null,
       backendNodeId: json.containsKey('backendNodeId')
           ? (json['backendNodeId'] as List)
-              .map((e) => dom.BackendNodeId.fromJson(e))
+              .map((e) => dom.BackendNodeId.fromJson(e as int))
               .toList()
           : null,
       attributes: json.containsKey('attributes')
           ? (json['attributes'] as List)
-              .map((e) => ArrayOfStrings.fromJson(e))
+              .map((e) => ArrayOfStrings.fromJson(e as List<StringIndex>))
               .toList()
           : null,
       textValue: json.containsKey('textValue')
-          ? RareStringData.fromJson(json['textValue'])
+          ? RareStringData.fromJson(json['textValue'] as Map<String, dynamic>)
           : null,
       inputValue: json.containsKey('inputValue')
-          ? RareStringData.fromJson(json['inputValue'])
+          ? RareStringData.fromJson(json['inputValue'] as Map<String, dynamic>)
           : null,
       inputChecked: json.containsKey('inputChecked')
-          ? RareBooleanData.fromJson(json['inputChecked'])
+          ? RareBooleanData.fromJson(
+              json['inputChecked'] as Map<String, dynamic>)
           : null,
       optionSelected: json.containsKey('optionSelected')
-          ? RareBooleanData.fromJson(json['optionSelected'])
+          ? RareBooleanData.fromJson(
+              json['optionSelected'] as Map<String, dynamic>)
           : null,
       contentDocumentIndex: json.containsKey('contentDocumentIndex')
-          ? RareIntegerData.fromJson(json['contentDocumentIndex'])
+          ? RareIntegerData.fromJson(
+              json['contentDocumentIndex'] as Map<String, dynamic>)
           : null,
       pseudoType: json.containsKey('pseudoType')
-          ? RareStringData.fromJson(json['pseudoType'])
+          ? RareStringData.fromJson(json['pseudoType'] as Map<String, dynamic>)
           : null,
       isClickable: json.containsKey('isClickable')
-          ? RareBooleanData.fromJson(json['isClickable'])
+          ? RareBooleanData.fromJson(
+              json['isClickable'] as Map<String, dynamic>)
           : null,
       currentSourceURL: json.containsKey('currentSourceURL')
-          ? RareStringData.fromJson(json['currentSourceURL'])
+          ? RareStringData.fromJson(
+              json['currentSourceURL'] as Map<String, dynamic>)
           : null,
       originURL: json.containsKey('originURL')
-          ? RareStringData.fromJson(json['originURL'])
+          ? RareStringData.fromJson(json['originURL'] as Map<String, dynamic>)
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{};
-    if (parentIndex != null) {
-      json['parentIndex'] = parentIndex.map((e) => e).toList();
-    }
-    if (nodeType != null) {
-      json['nodeType'] = nodeType.map((e) => e).toList();
-    }
-    if (nodeName != null) {
-      json['nodeName'] = nodeName.map((e) => e.toJson()).toList();
-    }
-    if (nodeValue != null) {
-      json['nodeValue'] = nodeValue.map((e) => e.toJson()).toList();
-    }
-    if (backendNodeId != null) {
-      json['backendNodeId'] = backendNodeId.map((e) => e.toJson()).toList();
-    }
-    if (attributes != null) {
-      json['attributes'] = attributes.map((e) => e.toJson()).toList();
-    }
-    if (textValue != null) {
-      json['textValue'] = textValue.toJson();
-    }
-    if (inputValue != null) {
-      json['inputValue'] = inputValue.toJson();
-    }
-    if (inputChecked != null) {
-      json['inputChecked'] = inputChecked.toJson();
-    }
-    if (optionSelected != null) {
-      json['optionSelected'] = optionSelected.toJson();
-    }
-    if (contentDocumentIndex != null) {
-      json['contentDocumentIndex'] = contentDocumentIndex.toJson();
-    }
-    if (pseudoType != null) {
-      json['pseudoType'] = pseudoType.toJson();
-    }
-    if (isClickable != null) {
-      json['isClickable'] = isClickable.toJson();
-    }
-    if (currentSourceURL != null) {
-      json['currentSourceURL'] = currentSourceURL.toJson();
-    }
-    if (originURL != null) {
-      json['originURL'] = originURL.toJson();
-    }
-    return json;
+    return {
+      if (parentIndex != null) 'parentIndex': [...parentIndex],
+      if (nodeType != null) 'nodeType': [...nodeType],
+      if (nodeName != null)
+        'nodeName': nodeName.map((e) => e.toJson()).toList(),
+      if (nodeValue != null)
+        'nodeValue': nodeValue.map((e) => e.toJson()).toList(),
+      if (backendNodeId != null)
+        'backendNodeId': backendNodeId.map((e) => e.toJson()).toList(),
+      if (attributes != null)
+        'attributes': attributes.map((e) => e.toJson()).toList(),
+      if (textValue != null) 'textValue': textValue.toJson(),
+      if (inputValue != null) 'inputValue': inputValue.toJson(),
+      if (inputChecked != null) 'inputChecked': inputChecked.toJson(),
+      if (optionSelected != null) 'optionSelected': optionSelected.toJson(),
+      if (contentDocumentIndex != null)
+        'contentDocumentIndex': contentDocumentIndex.toJson(),
+      if (pseudoType != null) 'pseudoType': pseudoType.toJson(),
+      if (isClickable != null) 'isClickable': isClickable.toJson(),
+      if (currentSourceURL != null)
+        'currentSourceURL': currentSourceURL.toJson(),
+      if (originURL != null) 'originURL': originURL.toJson(),
+    };
   }
 }
 
@@ -997,54 +927,52 @@ class LayoutTreeSnapshot {
     return LayoutTreeSnapshot(
       nodeIndex: (json['nodeIndex'] as List).map((e) => e as int).toList(),
       styles: (json['styles'] as List)
-          .map((e) => ArrayOfStrings.fromJson(e))
+          .map((e) => ArrayOfStrings.fromJson(e as List<StringIndex>))
           .toList(),
-      bounds:
-          (json['bounds'] as List).map((e) => Rectangle.fromJson(e)).toList(),
-      text: (json['text'] as List).map((e) => StringIndex.fromJson(e)).toList(),
-      stackingContexts: RareBooleanData.fromJson(json['stackingContexts']),
+      bounds: (json['bounds'] as List)
+          .map((e) => Rectangle.fromJson(e as List<num>))
+          .toList(),
+      text: (json['text'] as List)
+          .map((e) => StringIndex.fromJson(e as int))
+          .toList(),
+      stackingContexts: RareBooleanData.fromJson(
+          json['stackingContexts'] as Map<String, dynamic>),
       paintOrders: json.containsKey('paintOrders')
           ? (json['paintOrders'] as List).map((e) => e as int).toList()
           : null,
       offsetRects: json.containsKey('offsetRects')
           ? (json['offsetRects'] as List)
-              .map((e) => Rectangle.fromJson(e))
+              .map((e) => Rectangle.fromJson(e as List<num>))
               .toList()
           : null,
       scrollRects: json.containsKey('scrollRects')
           ? (json['scrollRects'] as List)
-              .map((e) => Rectangle.fromJson(e))
+              .map((e) => Rectangle.fromJson(e as List<num>))
               .toList()
           : null,
       clientRects: json.containsKey('clientRects')
           ? (json['clientRects'] as List)
-              .map((e) => Rectangle.fromJson(e))
+              .map((e) => Rectangle.fromJson(e as List<num>))
               .toList()
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
-      'nodeIndex': nodeIndex.map((e) => e).toList(),
+    return {
+      'nodeIndex': [...nodeIndex],
       'styles': styles.map((e) => e.toJson()).toList(),
       'bounds': bounds.map((e) => e.toJson()).toList(),
       'text': text.map((e) => e.toJson()).toList(),
       'stackingContexts': stackingContexts.toJson(),
+      if (paintOrders != null) 'paintOrders': [...paintOrders],
+      if (offsetRects != null)
+        'offsetRects': offsetRects.map((e) => e.toJson()).toList(),
+      if (scrollRects != null)
+        'scrollRects': scrollRects.map((e) => e.toJson()).toList(),
+      if (clientRects != null)
+        'clientRects': clientRects.map((e) => e.toJson()).toList(),
     };
-    if (paintOrders != null) {
-      json['paintOrders'] = paintOrders.map((e) => e).toList();
-    }
-    if (offsetRects != null) {
-      json['offsetRects'] = offsetRects.map((e) => e.toJson()).toList();
-    }
-    if (scrollRects != null) {
-      json['scrollRects'] = scrollRects.map((e) => e.toJson()).toList();
-    }
-    if (clientRects != null) {
-      json['clientRects'] = clientRects.map((e) => e.toJson()).toList();
-    }
-    return json;
   }
 }
 
@@ -1074,20 +1002,20 @@ class TextBoxSnapshot {
   factory TextBoxSnapshot.fromJson(Map<String, dynamic> json) {
     return TextBoxSnapshot(
       layoutIndex: (json['layoutIndex'] as List).map((e) => e as int).toList(),
-      bounds:
-          (json['bounds'] as List).map((e) => Rectangle.fromJson(e)).toList(),
+      bounds: (json['bounds'] as List)
+          .map((e) => Rectangle.fromJson(e as List<num>))
+          .toList(),
       start: (json['start'] as List).map((e) => e as int).toList(),
       length: (json['length'] as List).map((e) => e as int).toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
-      'layoutIndex': layoutIndex.map((e) => e).toList(),
+    return {
+      'layoutIndex': [...layoutIndex],
       'bounds': bounds.map((e) => e.toJson()).toList(),
-      'start': start.map((e) => e).toList(),
-      'length': length.map((e) => e).toList(),
+      'start': [...start],
+      'length': [...length],
     };
-    return json;
   }
 }

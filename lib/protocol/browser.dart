@@ -17,40 +17,32 @@ class BrowserApi {
   Future<void> setPermission(
       String origin, PermissionDescriptor permission, PermissionSetting setting,
       {target.TargetID browserContextId}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Browser.setPermission', {
       'origin': origin,
-      'permission': permission.toJson(),
-      'setting': setting.toJson(),
-    };
-    if (browserContextId != null) {
-      parameters['browserContextId'] = browserContextId.toJson();
-    }
-    await _client.send('Browser.setPermission', parameters);
+      'permission': permission,
+      'setting': setting,
+      if (browserContextId != null) 'browserContextId': browserContextId,
+    });
   }
 
   /// Grant specific permissions to the given origin and reject all others.
   /// [browserContextId] BrowserContext to override permissions. When omitted, default browser context is used.
   Future<void> grantPermissions(String origin, List<PermissionType> permissions,
       {target.BrowserContextID browserContextId}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Browser.grantPermissions', {
       'origin': origin,
-      'permissions': permissions.map((e) => e.toJson()).toList(),
-    };
-    if (browserContextId != null) {
-      parameters['browserContextId'] = browserContextId.toJson();
-    }
-    await _client.send('Browser.grantPermissions', parameters);
+      'permissions': [...permissions],
+      if (browserContextId != null) 'browserContextId': browserContextId,
+    });
   }
 
   /// Reset all permission management for all origins.
   /// [browserContextId] BrowserContext to reset permissions. When omitted, default browser context is used.
   Future<void> resetPermissions(
       {target.BrowserContextID browserContextId}) async {
-    var parameters = <String, dynamic>{};
-    if (browserContextId != null) {
-      parameters['browserContextId'] = browserContextId.toJson();
-    }
-    await _client.send('Browser.resetPermissions', parameters);
+    await _client.send('Browser.resetPermissions', {
+      if (browserContextId != null) 'browserContextId': browserContextId,
+    });
   }
 
   /// Close browser gracefully.
@@ -89,16 +81,12 @@ class BrowserApi {
   /// [delta] If true, retrieve delta since last call.
   /// Returns: Histograms.
   Future<List<Histogram>> getHistograms({String query, bool delta}) async {
-    var parameters = <String, dynamic>{};
-    if (query != null) {
-      parameters['query'] = query;
-    }
-    if (delta != null) {
-      parameters['delta'] = delta;
-    }
-    var result = await _client.send('Browser.getHistograms', parameters);
+    var result = await _client.send('Browser.getHistograms', {
+      if (query != null) 'query': query,
+      if (delta != null) 'delta': delta,
+    });
     return (result['histograms'] as List)
-        .map((e) => Histogram.fromJson(e))
+        .map((e) => Histogram.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
@@ -107,14 +95,11 @@ class BrowserApi {
   /// [delta] If true, retrieve delta since last call.
   /// Returns: Histogram.
   Future<Histogram> getHistogram(String name, {bool delta}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Browser.getHistogram', {
       'name': name,
-    };
-    if (delta != null) {
-      parameters['delta'] = delta;
-    }
-    var result = await _client.send('Browser.getHistogram', parameters);
-    return Histogram.fromJson(result['histogram']);
+      if (delta != null) 'delta': delta,
+    });
+    return Histogram.fromJson(result['histogram'] as Map<String, dynamic>);
   }
 
   /// Get position and size of the browser window.
@@ -122,22 +107,19 @@ class BrowserApi {
   /// Returns: Bounds information of the window. When window state is 'minimized', the restored window
   /// position and size are returned.
   Future<Bounds> getWindowBounds(WindowID windowId) async {
-    var parameters = <String, dynamic>{
-      'windowId': windowId.toJson(),
-    };
-    var result = await _client.send('Browser.getWindowBounds', parameters);
-    return Bounds.fromJson(result['bounds']);
+    var result = await _client.send('Browser.getWindowBounds', {
+      'windowId': windowId,
+    });
+    return Bounds.fromJson(result['bounds'] as Map<String, dynamic>);
   }
 
   /// Get the browser window that contains the devtools target.
   /// [targetId] Devtools agent host id. If called as a part of the session, associated targetId is used.
   Future<GetWindowForTargetResult> getWindowForTarget(
       {target.TargetID targetId}) async {
-    var parameters = <String, dynamic>{};
-    if (targetId != null) {
-      parameters['targetId'] = targetId.toJson();
-    }
-    var result = await _client.send('Browser.getWindowForTarget', parameters);
+    var result = await _client.send('Browser.getWindowForTarget', {
+      if (targetId != null) 'targetId': targetId,
+    });
     return GetWindowForTargetResult.fromJson(result);
   }
 
@@ -146,24 +128,19 @@ class BrowserApi {
   /// [bounds] New window bounds. The 'minimized', 'maximized' and 'fullscreen' states cannot be combined
   /// with 'left', 'top', 'width' or 'height'. Leaves unspecified fields unchanged.
   Future<void> setWindowBounds(WindowID windowId, Bounds bounds) async {
-    var parameters = <String, dynamic>{
-      'windowId': windowId.toJson(),
-      'bounds': bounds.toJson(),
-    };
-    await _client.send('Browser.setWindowBounds', parameters);
+    await _client.send('Browser.setWindowBounds', {
+      'windowId': windowId,
+      'bounds': bounds,
+    });
   }
 
   /// Set dock tile details, platform-specific.
   /// [image] Png encoded image.
   Future<void> setDockTile({String badgeLabel, String image}) async {
-    var parameters = <String, dynamic>{};
-    if (badgeLabel != null) {
-      parameters['badgeLabel'] = badgeLabel;
-    }
-    if (image != null) {
-      parameters['image'] = image;
-    }
-    await _client.send('Browser.setDockTile', parameters);
+    await _client.send('Browser.setDockTile', {
+      if (badgeLabel != null) 'badgeLabel': badgeLabel,
+      if (image != null) 'image': image,
+    });
   }
 }
 
@@ -192,11 +169,11 @@ class GetVersionResult {
 
   factory GetVersionResult.fromJson(Map<String, dynamic> json) {
     return GetVersionResult(
-      protocolVersion: json['protocolVersion'],
-      product: json['product'],
-      revision: json['revision'],
-      userAgent: json['userAgent'],
-      jsVersion: json['jsVersion'],
+      protocolVersion: json['protocolVersion'] as String,
+      product: json['product'] as String,
+      revision: json['revision'] as String,
+      userAgent: json['userAgent'] as String,
+      jsVersion: json['jsVersion'] as String,
     );
   }
 }
@@ -213,8 +190,8 @@ class GetWindowForTargetResult {
 
   factory GetWindowForTargetResult.fromJson(Map<String, dynamic> json) {
     return GetWindowForTargetResult(
-      windowId: WindowID.fromJson(json['windowId']),
-      bounds: Bounds.fromJson(json['bounds']),
+      windowId: WindowID.fromJson(json['windowId'] as int),
+      bounds: Bounds.fromJson(json['bounds'] as Map<String, dynamic>),
     );
   }
 }
@@ -292,34 +269,24 @@ class Bounds {
 
   factory Bounds.fromJson(Map<String, dynamic> json) {
     return Bounds(
-      left: json.containsKey('left') ? json['left'] : null,
-      top: json.containsKey('top') ? json['top'] : null,
-      width: json.containsKey('width') ? json['width'] : null,
-      height: json.containsKey('height') ? json['height'] : null,
+      left: json.containsKey('left') ? json['left'] as int : null,
+      top: json.containsKey('top') ? json['top'] as int : null,
+      width: json.containsKey('width') ? json['width'] as int : null,
+      height: json.containsKey('height') ? json['height'] as int : null,
       windowState: json.containsKey('windowState')
-          ? WindowState.fromJson(json['windowState'])
+          ? WindowState.fromJson(json['windowState'] as String)
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{};
-    if (left != null) {
-      json['left'] = left;
-    }
-    if (top != null) {
-      json['top'] = top;
-    }
-    if (width != null) {
-      json['width'] = width;
-    }
-    if (height != null) {
-      json['height'] = height;
-    }
-    if (windowState != null) {
-      json['windowState'] = windowState.toJson();
-    }
-    return json;
+    return {
+      if (left != null) 'left': left,
+      if (top != null) 'top': top,
+      if (width != null) 'width': width,
+      if (height != null) 'height': height,
+      if (windowState != null) 'windowState': windowState.toJson(),
+    };
   }
 }
 
@@ -439,28 +406,22 @@ class PermissionDescriptor {
 
   factory PermissionDescriptor.fromJson(Map<String, dynamic> json) {
     return PermissionDescriptor(
-      name: json['name'],
-      sysex: json.containsKey('sysex') ? json['sysex'] : null,
-      userVisibleOnly:
-          json.containsKey('userVisibleOnly') ? json['userVisibleOnly'] : null,
-      type: json.containsKey('type') ? json['type'] : null,
+      name: json['name'] as String,
+      sysex: json.containsKey('sysex') ? json['sysex'] as bool : null,
+      userVisibleOnly: json.containsKey('userVisibleOnly')
+          ? json['userVisibleOnly'] as bool
+          : null,
+      type: json.containsKey('type') ? json['type'] as String : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
+      if (sysex != null) 'sysex': sysex,
+      if (userVisibleOnly != null) 'userVisibleOnly': userVisibleOnly,
+      if (type != null) 'type': type,
     };
-    if (sysex != null) {
-      json['sysex'] = sysex;
-    }
-    if (userVisibleOnly != null) {
-      json['userVisibleOnly'] = userVisibleOnly;
-    }
-    if (type != null) {
-      json['type'] = type;
-    }
-    return json;
   }
 }
 
@@ -479,19 +440,18 @@ class Bucket {
 
   factory Bucket.fromJson(Map<String, dynamic> json) {
     return Bucket(
-      low: json['low'],
-      high: json['high'],
-      count: json['count'],
+      low: json['low'] as int,
+      high: json['high'] as int,
+      count: json['count'] as int,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'low': low,
       'high': high,
       'count': count,
     };
-    return json;
   }
 }
 
@@ -517,21 +477,21 @@ class Histogram {
 
   factory Histogram.fromJson(Map<String, dynamic> json) {
     return Histogram(
-      name: json['name'],
-      sum: json['sum'],
-      count: json['count'],
-      buckets:
-          (json['buckets'] as List).map((e) => Bucket.fromJson(e)).toList(),
+      name: json['name'] as String,
+      sum: json['sum'] as int,
+      count: json['count'] as int,
+      buckets: (json['buckets'] as List)
+          .map((e) => Bucket.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'sum': sum,
       'count': count,
       'buckets': buckets.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }

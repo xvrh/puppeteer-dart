@@ -33,21 +33,12 @@ class HeadlessExperimentalApi {
       num interval,
       bool noDisplayUpdates,
       ScreenshotParams screenshot}) async {
-    var parameters = <String, dynamic>{};
-    if (frameTimeTicks != null) {
-      parameters['frameTimeTicks'] = frameTimeTicks;
-    }
-    if (interval != null) {
-      parameters['interval'] = interval;
-    }
-    if (noDisplayUpdates != null) {
-      parameters['noDisplayUpdates'] = noDisplayUpdates;
-    }
-    if (screenshot != null) {
-      parameters['screenshot'] = screenshot.toJson();
-    }
-    var result =
-        await _client.send('HeadlessExperimental.beginFrame', parameters);
+    var result = await _client.send('HeadlessExperimental.beginFrame', {
+      if (frameTimeTicks != null) 'frameTimeTicks': frameTimeTicks,
+      if (interval != null) 'interval': interval,
+      if (noDisplayUpdates != null) 'noDisplayUpdates': noDisplayUpdates,
+      if (screenshot != null) 'screenshot': screenshot,
+    });
     return BeginFrameResult.fromJson(result);
   }
 
@@ -74,9 +65,10 @@ class BeginFrameResult {
 
   factory BeginFrameResult.fromJson(Map<String, dynamic> json) {
     return BeginFrameResult(
-      hasDamage: json['hasDamage'],
-      screenshotData:
-          json.containsKey('screenshotData') ? json['screenshotData'] : null,
+      hasDamage: json['hasDamage'] as bool,
+      screenshotData: json.containsKey('screenshotData')
+          ? json['screenshotData'] as String
+          : null,
     );
   }
 }
@@ -94,21 +86,17 @@ class ScreenshotParams {
   factory ScreenshotParams.fromJson(Map<String, dynamic> json) {
     return ScreenshotParams(
       format: json.containsKey('format')
-          ? ScreenshotParamsFormat.fromJson(json['format'])
+          ? ScreenshotParamsFormat.fromJson(json['format'] as String)
           : null,
-      quality: json.containsKey('quality') ? json['quality'] : null,
+      quality: json.containsKey('quality') ? json['quality'] as int : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{};
-    if (format != null) {
-      json['format'] = format;
-    }
-    if (quality != null) {
-      json['quality'] = quality;
-    }
-    return json;
+    return {
+      if (format != null) 'format': format,
+      if (quality != null) 'quality': quality,
+    };
   }
 }
 

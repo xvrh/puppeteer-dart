@@ -45,7 +45,7 @@ main() {
           .start(categories: ['disabled-by-default-v8.cpu_profiler.hires']);
       var buffer = StringBuffer();
       await page.tracing.stop(buffer);
-      Map traceJson = jsonDecode(buffer.toString());
+      var traceJson = jsonDecode(buffer.toString()) as Map<String, dynamic>;
 
       expect(traceJson['metadata']['trace-config'],
           contains('disabled-by-default-v8.cpu_profiler.hires'));

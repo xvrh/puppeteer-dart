@@ -114,7 +114,7 @@ List<CodeSnippet> extractSnippets(String sourceCode) {
       .whereType<FunctionDeclaration>()
       .firstWhere((c) => c.name.name == 'main');
 
-  BlockFunctionBody mainBody = main.functionExpression.body;
+  var mainBody = main.functionExpression.body as BlockFunctionBody;
 
   var results = <CodeSnippet>[];
   findGroupAndTests(sourceCode, mainBody.block, results, '');
@@ -130,23 +130,25 @@ void findGroupAndTests(String fileCode, Block block, List<CodeSnippet> snippets,
       .whereType<MethodInvocation>()) {
     var methodName = expression.methodName.name;
     if (methodName == 'group') {
-      StringLiteral groupName = expression.argumentList.arguments[0];
-      FunctionExpression innerBlock = expression.argumentList.arguments[1];
-      BlockFunctionBody innerBody = innerBlock.body;
+      var groupName = expression.argumentList.arguments[0] as StringLiteral;
+      var innerBlock =
+          expression.argumentList.arguments[1] as FunctionExpression;
+      var innerBody = innerBlock.body as BlockFunctionBody;
 
       findGroupAndTests(fileCode, innerBody.block, snippets,
           _joinPrefix(namePrefix, groupName.stringValue));
     } else if (methodName == 'test') {
-      FunctionExpression innerBlock = expression.argumentList.arguments[1];
-      BlockFunctionBody innerBody = innerBlock.body;
+      var innerBlock =
+          expression.argumentList.arguments[1] as FunctionExpression;
+      var innerBody = innerBlock.body as BlockFunctionBody;
       var code = _extractCode(fileCode.substring(
           innerBody.block.offset + 1, innerBody.block.end - 1));
-      Literal firstArgument = expression.argumentList.arguments[0];
+      var firstArgument = expression.argumentList.arguments[0] as Literal;
       if (firstArgument is StringLiteral) {
         snippets.add(CodeSnippet(
             _joinPrefix(namePrefix, firstArgument.stringValue), code));
       } else {
-        IntegerLiteral indexArgument = firstArgument;
+        var indexArgument = firstArgument as IntegerLiteral;
         snippets.add(CodeSnippet(namePrefix, code, index: indexArgument.value));
       }
     }
@@ -223,7 +225,7 @@ class _ExampleReplacerVisitor extends RecursiveAstVisitor {
 
       String targetValue;
       if (_stringInterpolation != null) {
-        StringLiteral literal = argument;
+        var literal = argument as StringLiteral;
         targetValue = literal.stringValue;
       } else {
         targetValue = argument.toString();

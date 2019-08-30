@@ -14,10 +14,11 @@ class TracingApi {
 
   /// Contains an bucket of collected trace events. When tracing is stopped collected events will be
   /// send as a sequence of dataCollected events followed by tracingComplete event.
-  Stream<List<Map>> get onDataCollected => _client.onEvent
+  Stream<List<Map<String, dynamic>>> get onDataCollected => _client.onEvent
       .where((event) => event.name == 'Tracing.dataCollected')
-      .map((event) =>
-          (event.parameters['value'] as List).map((e) => e as Map).toList());
+      .map((event) => (event.parameters['value'] as List)
+          .map((e) => e as Map<String, dynamic>)
+          .toList());
 
   /// Signals that tracing is stopped and there is no trace buffers pending flush, all data were
   /// delivered via dataCollected events.
@@ -40,10 +41,9 @@ class TracingApi {
   /// Record a clock sync marker in the trace.
   /// [syncId] The ID of this clock sync marker
   Future<void> recordClockSyncMarker(String syncId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Tracing.recordClockSyncMarker', {
       'syncId': syncId,
-    };
-    await _client.send('Tracing.recordClockSyncMarker', parameters);
+    });
   }
 
   /// Request a global memory dump.
@@ -70,29 +70,16 @@ class TracingApi {
       TraceConfig traceConfig}) async {
     assert(transferMode == null ||
         const ['ReportEvents', 'ReturnAsStream'].contains(transferMode));
-    var parameters = <String, dynamic>{};
-    if (categories != null) {
-      parameters['categories'] = categories;
-    }
-    if (options != null) {
-      parameters['options'] = options;
-    }
-    if (bufferUsageReportingInterval != null) {
-      parameters['bufferUsageReportingInterval'] = bufferUsageReportingInterval;
-    }
-    if (transferMode != null) {
-      parameters['transferMode'] = transferMode;
-    }
-    if (streamFormat != null) {
-      parameters['streamFormat'] = streamFormat.toJson();
-    }
-    if (streamCompression != null) {
-      parameters['streamCompression'] = streamCompression.toJson();
-    }
-    if (traceConfig != null) {
-      parameters['traceConfig'] = traceConfig.toJson();
-    }
-    await _client.send('Tracing.start', parameters);
+    await _client.send('Tracing.start', {
+      if (categories != null) 'categories': categories,
+      if (options != null) 'options': options,
+      if (bufferUsageReportingInterval != null)
+        'bufferUsageReportingInterval': bufferUsageReportingInterval,
+      if (transferMode != null) 'transferMode': transferMode,
+      if (streamFormat != null) 'streamFormat': streamFormat,
+      if (streamCompression != null) 'streamCompression': streamCompression,
+      if (traceConfig != null) 'traceConfig': traceConfig,
+    });
   }
 }
 
@@ -112,9 +99,11 @@ class BufferUsageEvent {
 
   factory BufferUsageEvent.fromJson(Map<String, dynamic> json) {
     return BufferUsageEvent(
-      percentFull: json.containsKey('percentFull') ? json['percentFull'] : null,
-      eventCount: json.containsKey('eventCount') ? json['eventCount'] : null,
-      value: json.containsKey('value') ? json['value'] : null,
+      percentFull:
+          json.containsKey('percentFull') ? json['percentFull'] as num : null,
+      eventCount:
+          json.containsKey('eventCount') ? json['eventCount'] as num : null,
+      value: json.containsKey('value') ? json['value'] as num : null,
     );
   }
 }
@@ -141,15 +130,15 @@ class TracingCompleteEvent {
 
   factory TracingCompleteEvent.fromJson(Map<String, dynamic> json) {
     return TracingCompleteEvent(
-      dataLossOccurred: json['dataLossOccurred'],
+      dataLossOccurred: json['dataLossOccurred'] as bool,
       stream: json.containsKey('stream')
-          ? io.StreamHandle.fromJson(json['stream'])
+          ? io.StreamHandle.fromJson(json['stream'] as String)
           : null,
       traceFormat: json.containsKey('traceFormat')
-          ? StreamFormat.fromJson(json['traceFormat'])
+          ? StreamFormat.fromJson(json['traceFormat'] as String)
           : null,
       streamCompression: json.containsKey('streamCompression')
-          ? StreamCompression.fromJson(json['streamCompression'])
+          ? StreamCompression.fromJson(json['streamCompression'] as String)
           : null,
     );
   }
@@ -166,21 +155,22 @@ class RequestMemoryDumpResult {
 
   factory RequestMemoryDumpResult.fromJson(Map<String, dynamic> json) {
     return RequestMemoryDumpResult(
-      dumpGuid: json['dumpGuid'],
-      success: json['success'],
+      dumpGuid: json['dumpGuid'] as String,
+      success: json['success'] as bool,
     );
   }
 }
 
 /// Configuration for memory dump. Used only when "memory-infra" category is enabled.
 class MemoryDumpConfig {
-  final Map value;
+  final Map<String, dynamic> value;
 
   MemoryDumpConfig(this.value);
 
-  factory MemoryDumpConfig.fromJson(Map value) => MemoryDumpConfig(value);
+  factory MemoryDumpConfig.fromJson(Map<String, dynamic> value) =>
+      MemoryDumpConfig(value);
 
-  Map toJson() => value;
+  Map<String, dynamic> toJson() => value;
 
   @override
   bool operator ==(other) =>
@@ -231,14 +221,16 @@ class TraceConfig {
   factory TraceConfig.fromJson(Map<String, dynamic> json) {
     return TraceConfig(
       recordMode: json.containsKey('recordMode')
-          ? TraceConfigRecordMode.fromJson(json['recordMode'])
+          ? TraceConfigRecordMode.fromJson(json['recordMode'] as String)
           : null,
-      enableSampling:
-          json.containsKey('enableSampling') ? json['enableSampling'] : null,
-      enableSystrace:
-          json.containsKey('enableSystrace') ? json['enableSystrace'] : null,
+      enableSampling: json.containsKey('enableSampling')
+          ? json['enableSampling'] as bool
+          : null,
+      enableSystrace: json.containsKey('enableSystrace')
+          ? json['enableSystrace'] as bool
+          : null,
       enableArgumentFilter: json.containsKey('enableArgumentFilter')
-          ? json['enableArgumentFilter']
+          ? json['enableArgumentFilter'] as bool
           : null,
       includedCategories: json.containsKey('includedCategories')
           ? (json['includedCategories'] as List)
@@ -254,38 +246,27 @@ class TraceConfig {
           ? (json['syntheticDelays'] as List).map((e) => e as String).toList()
           : null,
       memoryDumpConfig: json.containsKey('memoryDumpConfig')
-          ? MemoryDumpConfig.fromJson(json['memoryDumpConfig'])
+          ? MemoryDumpConfig.fromJson(
+              json['memoryDumpConfig'] as Map<String, dynamic>)
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{};
-    if (recordMode != null) {
-      json['recordMode'] = recordMode;
-    }
-    if (enableSampling != null) {
-      json['enableSampling'] = enableSampling;
-    }
-    if (enableSystrace != null) {
-      json['enableSystrace'] = enableSystrace;
-    }
-    if (enableArgumentFilter != null) {
-      json['enableArgumentFilter'] = enableArgumentFilter;
-    }
-    if (includedCategories != null) {
-      json['includedCategories'] = includedCategories.map((e) => e).toList();
-    }
-    if (excludedCategories != null) {
-      json['excludedCategories'] = excludedCategories.map((e) => e).toList();
-    }
-    if (syntheticDelays != null) {
-      json['syntheticDelays'] = syntheticDelays.map((e) => e).toList();
-    }
-    if (memoryDumpConfig != null) {
-      json['memoryDumpConfig'] = memoryDumpConfig.toJson();
-    }
-    return json;
+    return {
+      if (recordMode != null) 'recordMode': recordMode,
+      if (enableSampling != null) 'enableSampling': enableSampling,
+      if (enableSystrace != null) 'enableSystrace': enableSystrace,
+      if (enableArgumentFilter != null)
+        'enableArgumentFilter': enableArgumentFilter,
+      if (includedCategories != null)
+        'includedCategories': [...includedCategories],
+      if (excludedCategories != null)
+        'excludedCategories': [...excludedCategories],
+      if (syntheticDelays != null) 'syntheticDelays': [...syntheticDelays],
+      if (memoryDumpConfig != null)
+        'memoryDumpConfig': memoryDumpConfig.toJson(),
+    };
   }
 }
 

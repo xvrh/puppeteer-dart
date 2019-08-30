@@ -374,7 +374,8 @@ class BrowserContext {
   }
 
   /// This searches for a target in this specific browser context.
-  Future<Target> waitForTarget(Function(Target) predicate, {Duration timeout}) {
+  Future<Target> waitForTarget(bool Function(Target) predicate,
+      {Duration timeout}) {
     return browser.waitForTarget(
         (target) => target.browserContext == this && predicate(target),
         timeout: timeout);

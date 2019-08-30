@@ -15,17 +15,16 @@ class LayerTreeApi {
   Stream<List<Layer>> get onLayerTreeDidChange => _client.onEvent
       .where((event) => event.name == 'LayerTree.layerTreeDidChange')
       .map((event) => (event.parameters['layers'] as List)
-          .map((e) => Layer.fromJson(e))
+          .map((e) => Layer.fromJson(e as Map<String, dynamic>))
           .toList());
 
   /// Provides the reasons why the given layer was composited.
   /// [layerId] The id of the layer for which we want to get the reasons it was composited.
   /// Returns: A list of strings specifying reasons for the given layer to become composited.
   Future<List<String>> compositingReasons(LayerId layerId) async {
-    var parameters = <String, dynamic>{
-      'layerId': layerId.toJson(),
-    };
-    var result = await _client.send('LayerTree.compositingReasons', parameters);
+    var result = await _client.send('LayerTree.compositingReasons', {
+      'layerId': layerId,
+    });
     return (result['compositingReasons'] as List)
         .map((e) => e as String)
         .toList();
@@ -45,22 +44,20 @@ class LayerTreeApi {
   /// [tiles] An array of tiles composing the snapshot.
   /// Returns: The id of the snapshot.
   Future<SnapshotId> loadSnapshot(List<PictureTile> tiles) async {
-    var parameters = <String, dynamic>{
-      'tiles': tiles.map((e) => e.toJson()).toList(),
-    };
-    var result = await _client.send('LayerTree.loadSnapshot', parameters);
-    return SnapshotId.fromJson(result['snapshotId']);
+    var result = await _client.send('LayerTree.loadSnapshot', {
+      'tiles': [...tiles],
+    });
+    return SnapshotId.fromJson(result['snapshotId'] as String);
   }
 
   /// Returns the layer snapshot identifier.
   /// [layerId] The id of the layer.
   /// Returns: The id of the layer snapshot.
   Future<SnapshotId> makeSnapshot(LayerId layerId) async {
-    var parameters = <String, dynamic>{
-      'layerId': layerId.toJson(),
-    };
-    var result = await _client.send('LayerTree.makeSnapshot', parameters);
-    return SnapshotId.fromJson(result['snapshotId']);
+    var result = await _client.send('LayerTree.makeSnapshot', {
+      'layerId': layerId,
+    });
+    return SnapshotId.fromJson(result['snapshotId'] as String);
   }
 
   /// [snapshotId] The id of the layer snapshot.
@@ -70,31 +67,23 @@ class LayerTreeApi {
   /// Returns: The array of paint profiles, one per run.
   Future<List<PaintProfile>> profileSnapshot(SnapshotId snapshotId,
       {int minRepeatCount, num minDuration, dom.Rect clipRect}) async {
-    var parameters = <String, dynamic>{
-      'snapshotId': snapshotId.toJson(),
-    };
-    if (minRepeatCount != null) {
-      parameters['minRepeatCount'] = minRepeatCount;
-    }
-    if (minDuration != null) {
-      parameters['minDuration'] = minDuration;
-    }
-    if (clipRect != null) {
-      parameters['clipRect'] = clipRect.toJson();
-    }
-    var result = await _client.send('LayerTree.profileSnapshot', parameters);
+    var result = await _client.send('LayerTree.profileSnapshot', {
+      'snapshotId': snapshotId,
+      if (minRepeatCount != null) 'minRepeatCount': minRepeatCount,
+      if (minDuration != null) 'minDuration': minDuration,
+      if (clipRect != null) 'clipRect': clipRect,
+    });
     return (result['timings'] as List)
-        .map((e) => PaintProfile.fromJson(e))
+        .map((e) => PaintProfile.fromJson(e as List<num>))
         .toList();
   }
 
   /// Releases layer snapshot captured by the back-end.
   /// [snapshotId] The id of the layer snapshot.
   Future<void> releaseSnapshot(SnapshotId snapshotId) async {
-    var parameters = <String, dynamic>{
-      'snapshotId': snapshotId.toJson(),
-    };
-    await _client.send('LayerTree.releaseSnapshot', parameters);
+    await _client.send('LayerTree.releaseSnapshot', {
+      'snapshotId': snapshotId,
+    });
   }
 
   /// Replays the layer snapshot and returns the resulting bitmap.
@@ -105,31 +94,26 @@ class LayerTreeApi {
   /// Returns: A data: URL for resulting image.
   Future<String> replaySnapshot(SnapshotId snapshotId,
       {int fromStep, int toStep, num scale}) async {
-    var parameters = <String, dynamic>{
-      'snapshotId': snapshotId.toJson(),
-    };
-    if (fromStep != null) {
-      parameters['fromStep'] = fromStep;
-    }
-    if (toStep != null) {
-      parameters['toStep'] = toStep;
-    }
-    if (scale != null) {
-      parameters['scale'] = scale;
-    }
-    var result = await _client.send('LayerTree.replaySnapshot', parameters);
-    return result['dataURL'];
+    var result = await _client.send('LayerTree.replaySnapshot', {
+      'snapshotId': snapshotId,
+      if (fromStep != null) 'fromStep': fromStep,
+      if (toStep != null) 'toStep': toStep,
+      if (scale != null) 'scale': scale,
+    });
+    return result['dataURL'] as String;
   }
 
   /// Replays the layer snapshot and returns canvas log.
   /// [snapshotId] The id of the layer snapshot.
   /// Returns: The array of canvas function calls.
-  Future<List<Map>> snapshotCommandLog(SnapshotId snapshotId) async {
-    var parameters = <String, dynamic>{
-      'snapshotId': snapshotId.toJson(),
-    };
-    var result = await _client.send('LayerTree.snapshotCommandLog', parameters);
-    return (result['commandLog'] as List).map((e) => e as Map).toList();
+  Future<List<Map<String, dynamic>>> snapshotCommandLog(
+      SnapshotId snapshotId) async {
+    var result = await _client.send('LayerTree.snapshotCommandLog', {
+      'snapshotId': snapshotId,
+    });
+    return (result['commandLog'] as List)
+        .map((e) => e as Map<String, dynamic>)
+        .toList();
   }
 }
 
@@ -144,8 +128,8 @@ class LayerPaintedEvent {
 
   factory LayerPaintedEvent.fromJson(Map<String, dynamic> json) {
     return LayerPaintedEvent(
-      layerId: LayerId.fromJson(json['layerId']),
-      clip: dom.Rect.fromJson(json['clip']),
+      layerId: LayerId.fromJson(json['layerId'] as String),
+      clip: dom.Rect.fromJson(json['clip'] as Map<String, dynamic>),
     );
   }
 }
@@ -204,17 +188,16 @@ class ScrollRect {
 
   factory ScrollRect.fromJson(Map<String, dynamic> json) {
     return ScrollRect(
-      rect: dom.Rect.fromJson(json['rect']),
-      type: ScrollRectType.fromJson(json['type']),
+      rect: dom.Rect.fromJson(json['rect'] as Map<String, dynamic>),
+      type: ScrollRectType.fromJson(json['type'] as String),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'rect': rect.toJson(),
       'type': type,
     };
-    return json;
   }
 }
 
@@ -269,33 +252,32 @@ class StickyPositionConstraint {
 
   factory StickyPositionConstraint.fromJson(Map<String, dynamic> json) {
     return StickyPositionConstraint(
-      stickyBoxRect: dom.Rect.fromJson(json['stickyBoxRect']),
-      containingBlockRect: dom.Rect.fromJson(json['containingBlockRect']),
-      nearestLayerShiftingStickyBox:
-          json.containsKey('nearestLayerShiftingStickyBox')
-              ? LayerId.fromJson(json['nearestLayerShiftingStickyBox'])
-              : null,
+      stickyBoxRect:
+          dom.Rect.fromJson(json['stickyBoxRect'] as Map<String, dynamic>),
+      containingBlockRect: dom.Rect.fromJson(
+          json['containingBlockRect'] as Map<String, dynamic>),
+      nearestLayerShiftingStickyBox: json
+              .containsKey('nearestLayerShiftingStickyBox')
+          ? LayerId.fromJson(json['nearestLayerShiftingStickyBox'] as String)
+          : null,
       nearestLayerShiftingContainingBlock:
           json.containsKey('nearestLayerShiftingContainingBlock')
-              ? LayerId.fromJson(json['nearestLayerShiftingContainingBlock'])
+              ? LayerId.fromJson(
+                  json['nearestLayerShiftingContainingBlock'] as String)
               : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'stickyBoxRect': stickyBoxRect.toJson(),
       'containingBlockRect': containingBlockRect.toJson(),
+      if (nearestLayerShiftingStickyBox != null)
+        'nearestLayerShiftingStickyBox': nearestLayerShiftingStickyBox.toJson(),
+      if (nearestLayerShiftingContainingBlock != null)
+        'nearestLayerShiftingContainingBlock':
+            nearestLayerShiftingContainingBlock.toJson(),
     };
-    if (nearestLayerShiftingStickyBox != null) {
-      json['nearestLayerShiftingStickyBox'] =
-          nearestLayerShiftingStickyBox.toJson();
-    }
-    if (nearestLayerShiftingContainingBlock != null) {
-      json['nearestLayerShiftingContainingBlock'] =
-          nearestLayerShiftingContainingBlock.toJson();
-    }
-    return json;
   }
 }
 
@@ -314,19 +296,18 @@ class PictureTile {
 
   factory PictureTile.fromJson(Map<String, dynamic> json) {
     return PictureTile(
-      x: json['x'],
-      y: json['y'],
-      picture: json['picture'],
+      x: json['x'] as num,
+      y: json['y'] as num,
+      picture: json['picture'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'x': x,
       'y': y,
       'picture': picture,
     };
-    return json;
   }
 }
 
@@ -401,39 +382,41 @@ class Layer {
 
   factory Layer.fromJson(Map<String, dynamic> json) {
     return Layer(
-      layerId: LayerId.fromJson(json['layerId']),
+      layerId: LayerId.fromJson(json['layerId'] as String),
       parentLayerId: json.containsKey('parentLayerId')
-          ? LayerId.fromJson(json['parentLayerId'])
+          ? LayerId.fromJson(json['parentLayerId'] as String)
           : null,
       backendNodeId: json.containsKey('backendNodeId')
-          ? dom.BackendNodeId.fromJson(json['backendNodeId'])
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
           : null,
-      offsetX: json['offsetX'],
-      offsetY: json['offsetY'],
-      width: json['width'],
-      height: json['height'],
+      offsetX: json['offsetX'] as num,
+      offsetY: json['offsetY'] as num,
+      width: json['width'] as num,
+      height: json['height'] as num,
       transform: json.containsKey('transform')
           ? (json['transform'] as List).map((e) => e as num).toList()
           : null,
-      anchorX: json.containsKey('anchorX') ? json['anchorX'] : null,
-      anchorY: json.containsKey('anchorY') ? json['anchorY'] : null,
-      anchorZ: json.containsKey('anchorZ') ? json['anchorZ'] : null,
-      paintCount: json['paintCount'],
-      drawsContent: json['drawsContent'],
-      invisible: json.containsKey('invisible') ? json['invisible'] : null,
+      anchorX: json.containsKey('anchorX') ? json['anchorX'] as num : null,
+      anchorY: json.containsKey('anchorY') ? json['anchorY'] as num : null,
+      anchorZ: json.containsKey('anchorZ') ? json['anchorZ'] as num : null,
+      paintCount: json['paintCount'] as int,
+      drawsContent: json['drawsContent'] as bool,
+      invisible:
+          json.containsKey('invisible') ? json['invisible'] as bool : null,
       scrollRects: json.containsKey('scrollRects')
           ? (json['scrollRects'] as List)
-              .map((e) => ScrollRect.fromJson(e))
+              .map((e) => ScrollRect.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       stickyPositionConstraint: json.containsKey('stickyPositionConstraint')
-          ? StickyPositionConstraint.fromJson(json['stickyPositionConstraint'])
+          ? StickyPositionConstraint.fromJson(
+              json['stickyPositionConstraint'] as Map<String, dynamic>)
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'layerId': layerId.toJson(),
       'offsetX': offsetX,
       'offsetY': offsetY,
@@ -441,35 +424,18 @@ class Layer {
       'height': height,
       'paintCount': paintCount,
       'drawsContent': drawsContent,
+      if (parentLayerId != null) 'parentLayerId': parentLayerId.toJson(),
+      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
+      if (transform != null) 'transform': [...transform],
+      if (anchorX != null) 'anchorX': anchorX,
+      if (anchorY != null) 'anchorY': anchorY,
+      if (anchorZ != null) 'anchorZ': anchorZ,
+      if (invisible != null) 'invisible': invisible,
+      if (scrollRects != null)
+        'scrollRects': scrollRects.map((e) => e.toJson()).toList(),
+      if (stickyPositionConstraint != null)
+        'stickyPositionConstraint': stickyPositionConstraint.toJson(),
     };
-    if (parentLayerId != null) {
-      json['parentLayerId'] = parentLayerId.toJson();
-    }
-    if (backendNodeId != null) {
-      json['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (transform != null) {
-      json['transform'] = transform.map((e) => e).toList();
-    }
-    if (anchorX != null) {
-      json['anchorX'] = anchorX;
-    }
-    if (anchorY != null) {
-      json['anchorY'] = anchorY;
-    }
-    if (anchorZ != null) {
-      json['anchorZ'] = anchorZ;
-    }
-    if (invisible != null) {
-      json['invisible'] = invisible;
-    }
-    if (scrollRects != null) {
-      json['scrollRects'] = scrollRects.map((e) => e.toJson()).toList();
-    }
-    if (stickyPositionConstraint != null) {
-      json['stickyPositionConstraint'] = stickyPositionConstraint.toJson();
-    }
-    return json;
   }
 }
 

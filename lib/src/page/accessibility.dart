@@ -175,79 +175,79 @@ class AXNode {
         }..removeWhere((k, v) => v == null);
 
   /// The [role](https://www.w3.org/TR/wai-aria/#usage_intro).
-  String get role => _properties['role'];
+  String get role => _properties['role'] as String;
 
   /// A human readable name for the node.
-  String get name => _properties['name'];
+  String get name => _properties['name'] as String;
 
   /// The current value of the node.
   dynamic get value => _properties['value'];
 
   /// An additional human readable description of the node.
-  String get description => _properties['description'];
+  String get description => _properties['description'] as String;
 
   /// Keyboard shortcuts associated with this node.
-  String get keyShortcuts => _properties['keyShortcuts'];
+  String get keyShortcuts => _properties['keyShortcuts'] as String;
 
   /// A human readable alternative to the role.
-  String get roleDescription => _properties['roleDescription'];
+  String get roleDescription => _properties['roleDescription'] as String;
 
   /// A description of the current value.
-  String get valueText => _properties['valueText'];
+  String get valueText => _properties['valueText'] as String;
 
   /// Whether the node is disabled.
-  bool get disabled => _properties['disabled'] ?? false;
+  bool get disabled => _properties['disabled'] as bool ?? false;
 
   /// Whether the node is expanded or collapsed.
-  bool get expanded => _properties['expanded'] ?? false;
+  bool get expanded => _properties['expanded'] as bool ?? false;
 
   /// Whether the node is focused.
-  bool get focused => _properties['focused'] ?? false;
+  bool get focused => _properties['focused'] as bool ?? false;
 
   /// Whether the node is [modal](https://en.wikipedia.org/wiki/Modal_window).
-  bool get modal => _properties['modal'] ?? false;
+  bool get modal => _properties['modal'] as bool ?? false;
 
   /// Whether the node text input supports multiline.
-  bool get multiLine => _properties['multiLine'] ?? false;
+  bool get multiLine => _properties['multiLine'] as bool ?? false;
 
   /// Whether more than one child can be selected.
-  bool get multiSelectable => _properties['multiSelectable'] ?? false;
+  bool get multiSelectable => _properties['multiSelectable'] as bool ?? false;
 
   /// Whether the node is read only.
-  bool get readonly => _properties['readonly'] ?? false;
+  bool get readonly => _properties['readonly'] as bool ?? false;
 
   /// Whether the node is required.
-  bool get required => _properties['required'] ?? false;
+  bool get required => _properties['required'] as bool ?? false;
 
   /// Whether the node is selected in its parent node.
-  bool get selected => _properties['selected'] ?? false;
+  bool get selected => _properties['selected'] as bool ?? false;
 
   /// Whether the checkbox is checked, or "mixed".
-  TriState get checked => _properties['checked'] ?? stateFalse;
+  TriState get checked => _properties['checked'] as TriState ?? stateFalse;
 
   /// Whether the toggle button is checked, or "mixed".
-  TriState get pressed => _properties['pressed'] ?? stateFalse;
+  TriState get pressed => _properties['pressed'] as TriState ?? stateFalse;
 
   /// The level of a heading.
-  num get level => _properties['level'];
+  num get level => _properties['level'] as num;
 
   /// The minimum value in a node.
-  num get valueMin => _properties['valueMin'];
+  num get valueMin => _properties['valueMin'] as num;
 
   /// The maximum value in a node.
-  num get valueMax => _properties['valueMax'];
+  num get valueMax => _properties['valueMax'] as num;
 
   /// What kind of autocomplete is supported by a control.
-  String get autocomplete => _properties['autocomplete'];
+  String get autocomplete => _properties['autocomplete'] as String;
 
   /// What kind of popup is currently being shown for a node.
-  String get hasPopup => _properties['hasPopup'];
+  String get hasPopup => _properties['hasPopup'] as String;
 
   /// Whether and in what way this node's value is invalid.
-  String get invalid => _properties['invalid'];
+  String get invalid => _properties['invalid'] as String;
 
   /// Whether the node is oriented horizontally or vertically.
-  String get orientation => _properties['orientation'];
+  String get orientation => _properties['orientation'] as String;
 
   /// Child [_AXNode]s of this node, if any.
   final List<AXNode> children;
@@ -310,8 +310,8 @@ class _AXNode {
   bool _cachedHasFocusableChild;
 
   _AXNode(this._payload) {
-    _name = _payload.name?.value ?? '';
-    _role = _payload.role?.value ?? 'Unknown';
+    _name = _payload.name?.value as String ?? '';
+    _role = _payload.role?.value as String ?? 'Unknown';
 
     if (_payload.properties != null) {
       for (var property in _payload.properties) {
@@ -320,10 +320,10 @@ class _AXNode {
           _editable = true;
         }
         if (property.name == AXPropertyName.focusable) {
-          _focusable = property.value.value;
+          _focusable = property.value.value as bool;
         }
         if (property.name == AXPropertyName.expanded) {
-          _expanded = property.value.value;
+          _expanded = property.value.value as bool;
         }
       }
     }
@@ -461,8 +461,8 @@ class _AXNode {
           return null;
         }
 
-        if (property.value.value is bool && property.value.value) {
-          return property.value.value;
+        if (property.value.value is bool && (property.value.value as bool)) {
+          return property.value.value as bool;
         }
       }
 
@@ -480,7 +480,7 @@ class _AXNode {
     num numValue(AXPropertyName name) {
       var property = findProperty(name);
       if (property != null && property.value?.value is num) {
-        return property.value.value;
+        return property.value.value as num;
       }
       return null;
     }

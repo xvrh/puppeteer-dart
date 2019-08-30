@@ -15,17 +15,18 @@ class OverlayApi {
   Stream<dom.BackendNodeId> get onInspectNodeRequested => _client.onEvent
       .where((event) => event.name == 'Overlay.inspectNodeRequested')
       .map((event) =>
-          dom.BackendNodeId.fromJson(event.parameters['backendNodeId']));
+          dom.BackendNodeId.fromJson(event.parameters['backendNodeId'] as int));
 
   /// Fired when the node should be highlighted. This happens after call to `setInspectMode`.
   Stream<dom.NodeId> get onNodeHighlightRequested => _client.onEvent
       .where((event) => event.name == 'Overlay.nodeHighlightRequested')
-      .map((event) => dom.NodeId.fromJson(event.parameters['nodeId']));
+      .map((event) => dom.NodeId.fromJson(event.parameters['nodeId'] as int));
 
   /// Fired when user asks to capture screenshot of some area on the page.
   Stream<page.Viewport> get onScreenshotRequested => _client.onEvent
       .where((event) => event.name == 'Overlay.screenshotRequested')
-      .map((event) => page.Viewport.fromJson(event.parameters['viewport']));
+      .map((event) => page.Viewport.fromJson(
+          event.parameters['viewport'] as Map<String, dynamic>));
 
   /// Fired when user cancels the inspect mode.
   Stream get onInspectModeCanceled => _client.onEvent
@@ -46,20 +47,14 @@ class OverlayApi {
   /// [includeDistance] Whether to include distance info.
   /// [includeStyle] Whether to include style info.
   /// Returns: Highlight data for the node.
-  Future<Map> getHighlightObjectForTest(dom.NodeId nodeId,
+  Future<Map<String, dynamic>> getHighlightObjectForTest(dom.NodeId nodeId,
       {bool includeDistance, bool includeStyle}) async {
-    var parameters = <String, dynamic>{
-      'nodeId': nodeId.toJson(),
-    };
-    if (includeDistance != null) {
-      parameters['includeDistance'] = includeDistance;
-    }
-    if (includeStyle != null) {
-      parameters['includeStyle'] = includeStyle;
-    }
-    var result =
-        await _client.send('Overlay.getHighlightObjectForTest', parameters);
-    return result['highlight'];
+    var result = await _client.send('Overlay.getHighlightObjectForTest', {
+      'nodeId': nodeId,
+      if (includeDistance != null) 'includeDistance': includeDistance,
+      if (includeStyle != null) 'includeStyle': includeStyle,
+    });
+    return result['highlight'] as Map<String, dynamic>;
   }
 
   /// Hides any highlight.
@@ -73,16 +68,12 @@ class OverlayApi {
   /// [contentOutlineColor] The content box highlight outline color (default: transparent).
   Future<void> highlightFrame(page.FrameId frameId,
       {dom.RGBA contentColor, dom.RGBA contentOutlineColor}) async {
-    var parameters = <String, dynamic>{
-      'frameId': frameId.toJson(),
-    };
-    if (contentColor != null) {
-      parameters['contentColor'] = contentColor.toJson();
-    }
-    if (contentOutlineColor != null) {
-      parameters['contentOutlineColor'] = contentOutlineColor.toJson();
-    }
-    await _client.send('Overlay.highlightFrame', parameters);
+    await _client.send('Overlay.highlightFrame', {
+      'frameId': frameId,
+      if (contentColor != null) 'contentColor': contentColor,
+      if (contentOutlineColor != null)
+        'contentOutlineColor': contentOutlineColor,
+    });
   }
 
   /// Highlights DOM node with given id or with the given JavaScript object wrapper. Either nodeId or
@@ -97,22 +88,13 @@ class OverlayApi {
       dom.BackendNodeId backendNodeId,
       runtime.RemoteObjectId objectId,
       String selector}) async {
-    var parameters = <String, dynamic>{
-      'highlightConfig': highlightConfig.toJson(),
-    };
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
-    if (selector != null) {
-      parameters['selector'] = selector;
-    }
-    await _client.send('Overlay.highlightNode', parameters);
+    await _client.send('Overlay.highlightNode', {
+      'highlightConfig': highlightConfig,
+      if (nodeId != null) 'nodeId': nodeId,
+      if (backendNodeId != null) 'backendNodeId': backendNodeId,
+      if (objectId != null) 'objectId': objectId,
+      if (selector != null) 'selector': selector,
+    });
   }
 
   /// Highlights given quad. Coordinates are absolute with respect to the main frame viewport.
@@ -121,16 +103,11 @@ class OverlayApi {
   /// [outlineColor] The highlight outline color (default: transparent).
   Future<void> highlightQuad(dom.Quad quad,
       {dom.RGBA color, dom.RGBA outlineColor}) async {
-    var parameters = <String, dynamic>{
-      'quad': quad.toJson(),
-    };
-    if (color != null) {
-      parameters['color'] = color.toJson();
-    }
-    if (outlineColor != null) {
-      parameters['outlineColor'] = outlineColor.toJson();
-    }
-    await _client.send('Overlay.highlightQuad', parameters);
+    await _client.send('Overlay.highlightQuad', {
+      'quad': quad,
+      if (color != null) 'color': color,
+      if (outlineColor != null) 'outlineColor': outlineColor,
+    });
   }
 
   /// Highlights given rectangle. Coordinates are absolute with respect to the main frame viewport.
@@ -142,19 +119,14 @@ class OverlayApi {
   /// [outlineColor] The highlight outline color (default: transparent).
   Future<void> highlightRect(int x, int y, int width, int height,
       {dom.RGBA color, dom.RGBA outlineColor}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Overlay.highlightRect', {
       'x': x,
       'y': y,
       'width': width,
       'height': height,
-    };
-    if (color != null) {
-      parameters['color'] = color.toJson();
-    }
-    if (outlineColor != null) {
-      parameters['outlineColor'] = outlineColor.toJson();
-    }
-    await _client.send('Overlay.highlightRect', parameters);
+      if (color != null) 'color': color,
+      if (outlineColor != null) 'outlineColor': outlineColor,
+    });
   }
 
   /// Enters the 'inspect' mode. In this mode, elements that user is hovering over are highlighted.
@@ -164,94 +136,81 @@ class OverlayApi {
   /// == false`.
   Future<void> setInspectMode(InspectMode mode,
       {HighlightConfig highlightConfig}) async {
-    var parameters = <String, dynamic>{
-      'mode': mode.toJson(),
-    };
-    if (highlightConfig != null) {
-      parameters['highlightConfig'] = highlightConfig.toJson();
-    }
-    await _client.send('Overlay.setInspectMode', parameters);
+    await _client.send('Overlay.setInspectMode', {
+      'mode': mode,
+      if (highlightConfig != null) 'highlightConfig': highlightConfig,
+    });
   }
 
   /// Highlights owner element of all frames detected to be ads.
   /// [show] True for showing ad highlights
   Future<void> setShowAdHighlights(bool show) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Overlay.setShowAdHighlights', {
       'show': show,
-    };
-    await _client.send('Overlay.setShowAdHighlights', parameters);
+    });
   }
 
   /// [message] The message to display, also triggers resume and step over controls.
   Future<void> setPausedInDebuggerMessage({String message}) async {
-    var parameters = <String, dynamic>{};
-    if (message != null) {
-      parameters['message'] = message;
-    }
-    await _client.send('Overlay.setPausedInDebuggerMessage', parameters);
+    await _client.send('Overlay.setPausedInDebuggerMessage', {
+      if (message != null) 'message': message,
+    });
   }
 
   /// Requests that backend shows debug borders on layers
   /// [show] True for showing debug borders
   Future<void> setShowDebugBorders(bool show) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Overlay.setShowDebugBorders', {
       'show': show,
-    };
-    await _client.send('Overlay.setShowDebugBorders', parameters);
+    });
   }
 
   /// Requests that backend shows the FPS counter
   /// [show] True for showing the FPS counter
   Future<void> setShowFPSCounter(bool show) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Overlay.setShowFPSCounter', {
       'show': show,
-    };
-    await _client.send('Overlay.setShowFPSCounter', parameters);
+    });
   }
 
   /// Requests that backend shows paint rectangles
   /// [result] True for showing paint rectangles
   Future<void> setShowPaintRects(bool result) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Overlay.setShowPaintRects', {
       'result': result,
-    };
-    await _client.send('Overlay.setShowPaintRects', parameters);
+    });
   }
 
   /// Requests that backend shows layout shift regions
   /// [result] True for showing layout shift regions
   Future<void> setShowLayoutShiftRegions(bool result) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Overlay.setShowLayoutShiftRegions', {
       'result': result,
-    };
-    await _client.send('Overlay.setShowLayoutShiftRegions', parameters);
+    });
   }
 
   /// Requests that backend shows scroll bottleneck rects
   /// [show] True for showing scroll bottleneck rects
   Future<void> setShowScrollBottleneckRects(bool show) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Overlay.setShowScrollBottleneckRects', {
       'show': show,
-    };
-    await _client.send('Overlay.setShowScrollBottleneckRects', parameters);
+    });
   }
 
   /// Requests that backend shows hit-test borders on layers
   /// [show] True for showing hit-test borders
   Future<void> setShowHitTestBorders(bool show) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Overlay.setShowHitTestBorders', {
       'show': show,
-    };
-    await _client.send('Overlay.setShowHitTestBorders', parameters);
+    });
   }
 
   /// Paints viewport size upon main frame resize.
   /// [show] Whether to paint size or not.
   Future<void> setShowViewportSizeOnResize(bool show) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Overlay.setShowViewportSizeOnResize', {
       'show': show,
-    };
-    await _client.send('Overlay.setShowViewportSizeOnResize', parameters);
+    });
   }
 }
 
@@ -309,78 +268,58 @@ class HighlightConfig {
 
   factory HighlightConfig.fromJson(Map<String, dynamic> json) {
     return HighlightConfig(
-      showInfo: json.containsKey('showInfo') ? json['showInfo'] : null,
-      showStyles: json.containsKey('showStyles') ? json['showStyles'] : null,
-      showRulers: json.containsKey('showRulers') ? json['showRulers'] : null,
+      showInfo: json.containsKey('showInfo') ? json['showInfo'] as bool : null,
+      showStyles:
+          json.containsKey('showStyles') ? json['showStyles'] as bool : null,
+      showRulers:
+          json.containsKey('showRulers') ? json['showRulers'] as bool : null,
       showExtensionLines: json.containsKey('showExtensionLines')
-          ? json['showExtensionLines']
+          ? json['showExtensionLines'] as bool
           : null,
       contentColor: json.containsKey('contentColor')
-          ? dom.RGBA.fromJson(json['contentColor'])
+          ? dom.RGBA.fromJson(json['contentColor'] as Map<String, dynamic>)
           : null,
       paddingColor: json.containsKey('paddingColor')
-          ? dom.RGBA.fromJson(json['paddingColor'])
+          ? dom.RGBA.fromJson(json['paddingColor'] as Map<String, dynamic>)
           : null,
       borderColor: json.containsKey('borderColor')
-          ? dom.RGBA.fromJson(json['borderColor'])
+          ? dom.RGBA.fromJson(json['borderColor'] as Map<String, dynamic>)
           : null,
       marginColor: json.containsKey('marginColor')
-          ? dom.RGBA.fromJson(json['marginColor'])
+          ? dom.RGBA.fromJson(json['marginColor'] as Map<String, dynamic>)
           : null,
       eventTargetColor: json.containsKey('eventTargetColor')
-          ? dom.RGBA.fromJson(json['eventTargetColor'])
+          ? dom.RGBA.fromJson(json['eventTargetColor'] as Map<String, dynamic>)
           : null,
       shapeColor: json.containsKey('shapeColor')
-          ? dom.RGBA.fromJson(json['shapeColor'])
+          ? dom.RGBA.fromJson(json['shapeColor'] as Map<String, dynamic>)
           : null,
       shapeMarginColor: json.containsKey('shapeMarginColor')
-          ? dom.RGBA.fromJson(json['shapeMarginColor'])
+          ? dom.RGBA.fromJson(json['shapeMarginColor'] as Map<String, dynamic>)
           : null,
       cssGridColor: json.containsKey('cssGridColor')
-          ? dom.RGBA.fromJson(json['cssGridColor'])
+          ? dom.RGBA.fromJson(json['cssGridColor'] as Map<String, dynamic>)
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{};
-    if (showInfo != null) {
-      json['showInfo'] = showInfo;
-    }
-    if (showStyles != null) {
-      json['showStyles'] = showStyles;
-    }
-    if (showRulers != null) {
-      json['showRulers'] = showRulers;
-    }
-    if (showExtensionLines != null) {
-      json['showExtensionLines'] = showExtensionLines;
-    }
-    if (contentColor != null) {
-      json['contentColor'] = contentColor.toJson();
-    }
-    if (paddingColor != null) {
-      json['paddingColor'] = paddingColor.toJson();
-    }
-    if (borderColor != null) {
-      json['borderColor'] = borderColor.toJson();
-    }
-    if (marginColor != null) {
-      json['marginColor'] = marginColor.toJson();
-    }
-    if (eventTargetColor != null) {
-      json['eventTargetColor'] = eventTargetColor.toJson();
-    }
-    if (shapeColor != null) {
-      json['shapeColor'] = shapeColor.toJson();
-    }
-    if (shapeMarginColor != null) {
-      json['shapeMarginColor'] = shapeMarginColor.toJson();
-    }
-    if (cssGridColor != null) {
-      json['cssGridColor'] = cssGridColor.toJson();
-    }
-    return json;
+    return {
+      if (showInfo != null) 'showInfo': showInfo,
+      if (showStyles != null) 'showStyles': showStyles,
+      if (showRulers != null) 'showRulers': showRulers,
+      if (showExtensionLines != null) 'showExtensionLines': showExtensionLines,
+      if (contentColor != null) 'contentColor': contentColor.toJson(),
+      if (paddingColor != null) 'paddingColor': paddingColor.toJson(),
+      if (borderColor != null) 'borderColor': borderColor.toJson(),
+      if (marginColor != null) 'marginColor': marginColor.toJson(),
+      if (eventTargetColor != null)
+        'eventTargetColor': eventTargetColor.toJson(),
+      if (shapeColor != null) 'shapeColor': shapeColor.toJson(),
+      if (shapeMarginColor != null)
+        'shapeMarginColor': shapeMarginColor.toJson(),
+      if (cssGridColor != null) 'cssGridColor': cssGridColor.toJson(),
+    };
   }
 }
 

@@ -10,33 +10,31 @@ class CacheStorageApi {
   /// Deletes a cache.
   /// [cacheId] Id of cache for deletion.
   Future<void> deleteCache(CacheId cacheId) async {
-    var parameters = <String, dynamic>{
-      'cacheId': cacheId.toJson(),
-    };
-    await _client.send('CacheStorage.deleteCache', parameters);
+    await _client.send('CacheStorage.deleteCache', {
+      'cacheId': cacheId,
+    });
   }
 
   /// Deletes a cache entry.
   /// [cacheId] Id of cache where the entry will be deleted.
   /// [request] URL spec of the request.
   Future<void> deleteEntry(CacheId cacheId, String request) async {
-    var parameters = <String, dynamic>{
-      'cacheId': cacheId.toJson(),
+    await _client.send('CacheStorage.deleteEntry', {
+      'cacheId': cacheId,
       'request': request,
-    };
-    await _client.send('CacheStorage.deleteEntry', parameters);
+    });
   }
 
   /// Requests cache names.
   /// [securityOrigin] Security origin.
   /// Returns: Caches for the security origin.
   Future<List<Cache>> requestCacheNames(String securityOrigin) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('CacheStorage.requestCacheNames', {
       'securityOrigin': securityOrigin,
-    };
-    var result =
-        await _client.send('CacheStorage.requestCacheNames', parameters);
-    return (result['caches'] as List).map((e) => Cache.fromJson(e)).toList();
+    });
+    return (result['caches'] as List)
+        .map((e) => Cache.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// Fetches cache entry.
@@ -46,14 +44,12 @@ class CacheStorageApi {
   /// Returns: Response read from the cache.
   Future<CachedResponse> requestCachedResponse(
       CacheId cacheId, String requestURL, List<Header> requestHeaders) async {
-    var parameters = <String, dynamic>{
-      'cacheId': cacheId.toJson(),
+    var result = await _client.send('CacheStorage.requestCachedResponse', {
+      'cacheId': cacheId,
       'requestURL': requestURL,
-      'requestHeaders': requestHeaders.map((e) => e.toJson()).toList(),
-    };
-    var result =
-        await _client.send('CacheStorage.requestCachedResponse', parameters);
-    return CachedResponse.fromJson(result['response']);
+      'requestHeaders': [...requestHeaders],
+    });
+    return CachedResponse.fromJson(result['response'] as Map<String, dynamic>);
   }
 
   /// Requests data from cache.
@@ -64,15 +60,12 @@ class CacheStorageApi {
   Future<RequestEntriesResult> requestEntries(
       CacheId cacheId, int skipCount, int pageSize,
       {String pathFilter}) async {
-    var parameters = <String, dynamic>{
-      'cacheId': cacheId.toJson(),
+    var result = await _client.send('CacheStorage.requestEntries', {
+      'cacheId': cacheId,
       'skipCount': skipCount,
       'pageSize': pageSize,
-    };
-    if (pathFilter != null) {
-      parameters['pathFilter'] = pathFilter;
-    }
-    var result = await _client.send('CacheStorage.requestEntries', parameters);
+      if (pathFilter != null) 'pathFilter': pathFilter,
+    });
     return RequestEntriesResult.fromJson(result);
   }
 }
@@ -91,9 +84,9 @@ class RequestEntriesResult {
   factory RequestEntriesResult.fromJson(Map<String, dynamic> json) {
     return RequestEntriesResult(
       cacheDataEntries: (json['cacheDataEntries'] as List)
-          .map((e) => DataEntry.fromJson(e))
+          .map((e) => DataEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
-      returnCount: json['returnCount'],
+      returnCount: json['returnCount'] as num,
     );
   }
 }
@@ -193,23 +186,23 @@ class DataEntry {
 
   factory DataEntry.fromJson(Map<String, dynamic> json) {
     return DataEntry(
-      requestURL: json['requestURL'],
-      requestMethod: json['requestMethod'],
+      requestURL: json['requestURL'] as String,
+      requestMethod: json['requestMethod'] as String,
       requestHeaders: (json['requestHeaders'] as List)
-          .map((e) => Header.fromJson(e))
+          .map((e) => Header.fromJson(e as Map<String, dynamic>))
           .toList(),
-      responseTime: json['responseTime'],
-      responseStatus: json['responseStatus'],
-      responseStatusText: json['responseStatusText'],
-      responseType: CachedResponseType.fromJson(json['responseType']),
+      responseTime: json['responseTime'] as num,
+      responseStatus: json['responseStatus'] as int,
+      responseStatusText: json['responseStatusText'] as String,
+      responseType: CachedResponseType.fromJson(json['responseType'] as String),
       responseHeaders: (json['responseHeaders'] as List)
-          .map((e) => Header.fromJson(e))
+          .map((e) => Header.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'requestURL': requestURL,
       'requestMethod': requestMethod,
       'requestHeaders': requestHeaders.map((e) => e.toJson()).toList(),
@@ -219,7 +212,6 @@ class DataEntry {
       'responseType': responseType.toJson(),
       'responseHeaders': responseHeaders.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -241,19 +233,18 @@ class Cache {
 
   factory Cache.fromJson(Map<String, dynamic> json) {
     return Cache(
-      cacheId: CacheId.fromJson(json['cacheId']),
-      securityOrigin: json['securityOrigin'],
-      cacheName: json['cacheName'],
+      cacheId: CacheId.fromJson(json['cacheId'] as String),
+      securityOrigin: json['securityOrigin'] as String,
+      cacheName: json['cacheName'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'cacheId': cacheId.toJson(),
       'securityOrigin': securityOrigin,
       'cacheName': cacheName,
     };
-    return json;
   }
 }
 
@@ -266,17 +257,16 @@ class Header {
 
   factory Header.fromJson(Map<String, dynamic> json) {
     return Header(
-      name: json['name'],
-      value: json['value'],
+      name: json['name'] as String,
+      value: json['value'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'value': value,
     };
-    return json;
   }
 }
 
@@ -289,14 +279,13 @@ class CachedResponse {
 
   factory CachedResponse.fromJson(Map<String, dynamic> json) {
     return CachedResponse(
-      body: json['body'],
+      body: json['body'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'body': body,
     };
-    return json;
   }
 }

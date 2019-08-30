@@ -35,10 +35,9 @@ class SecurityApi {
   /// Enable/disable whether all certificate errors should be ignored.
   /// [ignore] If true, all certificate errors will be ignored.
   Future<void> setIgnoreCertificateErrors(bool ignore) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Security.setIgnoreCertificateErrors', {
       'ignore': ignore,
-    };
-    await _client.send('Security.setIgnoreCertificateErrors', parameters);
+    });
   }
 
   /// Handles a certificate error that fired a certificateError event.
@@ -47,11 +46,10 @@ class SecurityApi {
   @deprecated
   Future<void> handleCertificateError(
       int eventId, CertificateErrorAction action) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Security.handleCertificateError', {
       'eventId': eventId,
-      'action': action.toJson(),
-    };
-    await _client.send('Security.handleCertificateError', parameters);
+      'action': action,
+    });
   }
 
   /// Enable/disable overriding certificate errors. If enabled, all certificate error events need to
@@ -59,10 +57,9 @@ class SecurityApi {
   /// [override] If true, certificate errors will be overridden.
   @deprecated
   Future<void> setOverrideCertificateErrors(bool override) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Security.setOverrideCertificateErrors', {
       'override': override,
-    };
-    await _client.send('Security.setOverrideCertificateErrors', parameters);
+    });
   }
 }
 
@@ -83,9 +80,9 @@ class CertificateErrorEvent {
 
   factory CertificateErrorEvent.fromJson(Map<String, dynamic> json) {
     return CertificateErrorEvent(
-      eventId: json['eventId'],
-      errorType: json['errorType'],
-      requestURL: json['requestURL'],
+      eventId: json['eventId'] as int,
+      errorType: json['errorType'] as String,
+      requestURL: json['requestURL'] as String,
     );
   }
 }
@@ -108,11 +105,12 @@ class SecurityStateChangedEvent {
 
   factory SecurityStateChangedEvent.fromJson(Map<String, dynamic> json) {
     return SecurityStateChangedEvent(
-      securityState: SecurityState.fromJson(json['securityState']),
+      securityState: SecurityState.fromJson(json['securityState'] as String),
       explanations: (json['explanations'] as List)
-          .map((e) => SecurityStateExplanation.fromJson(e))
+          .map((e) =>
+              SecurityStateExplanation.fromJson(e as Map<String, dynamic>))
           .toList(),
-      summary: json.containsKey('summary') ? json['summary'] : null,
+      summary: json.containsKey('summary') ? json['summary'] as String : null,
     );
   }
 }
@@ -237,11 +235,12 @@ class SecurityStateExplanation {
 
   factory SecurityStateExplanation.fromJson(Map<String, dynamic> json) {
     return SecurityStateExplanation(
-      securityState: SecurityState.fromJson(json['securityState']),
-      title: json['title'],
-      summary: json['summary'],
-      description: json['description'],
-      mixedContentType: MixedContentType.fromJson(json['mixedContentType']),
+      securityState: SecurityState.fromJson(json['securityState'] as String),
+      title: json['title'] as String,
+      summary: json['summary'] as String,
+      description: json['description'] as String,
+      mixedContentType:
+          MixedContentType.fromJson(json['mixedContentType'] as String),
       certificate:
           (json['certificate'] as List).map((e) => e as String).toList(),
       recommendations: json.containsKey('recommendations')
@@ -251,18 +250,15 @@ class SecurityStateExplanation {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'securityState': securityState.toJson(),
       'title': title,
       'summary': summary,
       'description': description,
       'mixedContentType': mixedContentType.toJson(),
-      'certificate': certificate.map((e) => e).toList(),
+      'certificate': [...certificate],
+      if (recommendations != null) 'recommendations': [...recommendations],
     };
-    if (recommendations != null) {
-      json['recommendations'] = recommendations.map((e) => e).toList();
-    }
-    return json;
   }
 }
 
@@ -300,20 +296,21 @@ class InsecureContentStatus {
 
   factory InsecureContentStatus.fromJson(Map<String, dynamic> json) {
     return InsecureContentStatus(
-      ranMixedContent: json['ranMixedContent'],
-      displayedMixedContent: json['displayedMixedContent'],
-      containedMixedForm: json['containedMixedForm'],
-      ranContentWithCertErrors: json['ranContentWithCertErrors'],
-      displayedContentWithCertErrors: json['displayedContentWithCertErrors'],
+      ranMixedContent: json['ranMixedContent'] as bool,
+      displayedMixedContent: json['displayedMixedContent'] as bool,
+      containedMixedForm: json['containedMixedForm'] as bool,
+      ranContentWithCertErrors: json['ranContentWithCertErrors'] as bool,
+      displayedContentWithCertErrors:
+          json['displayedContentWithCertErrors'] as bool,
       ranInsecureContentStyle:
-          SecurityState.fromJson(json['ranInsecureContentStyle']),
-      displayedInsecureContentStyle:
-          SecurityState.fromJson(json['displayedInsecureContentStyle']),
+          SecurityState.fromJson(json['ranInsecureContentStyle'] as String),
+      displayedInsecureContentStyle: SecurityState.fromJson(
+          json['displayedInsecureContentStyle'] as String),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'ranMixedContent': ranMixedContent,
       'displayedMixedContent': displayedMixedContent,
       'containedMixedForm': containedMixedForm,
@@ -322,7 +319,6 @@ class InsecureContentStatus {
       'ranInsecureContentStyle': ranInsecureContentStyle.toJson(),
       'displayedInsecureContentStyle': displayedInsecureContentStyle.toJson(),
     };
-    return json;
   }
 }
 

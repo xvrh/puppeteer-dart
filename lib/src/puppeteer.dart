@@ -280,9 +280,9 @@ class Puppeteer {
 
 Future<String> _wsEndpoint(String browserURL) async {
   var response = await read(p.url.join(browserURL, 'json/version'));
-  Map decodedResponse = jsonDecode(response);
+  var decodedResponse = jsonDecode(response) as Map<String, dynamic>;
 
-  return decodedResponse['webSocketDebuggerUrl'];
+  return decodedResponse['webSocketDebuggerUrl'] as String;
 }
 
 Future _killChrome(Process process) {

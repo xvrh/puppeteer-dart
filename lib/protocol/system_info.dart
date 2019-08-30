@@ -19,7 +19,7 @@ class SystemInfoApi {
   Future<List<ProcessInfo>> getProcessInfo() async {
     var result = await _client.send('SystemInfo.getProcessInfo');
     return (result['processInfo'] as List)
-        .map((e) => ProcessInfo.fromJson(e))
+        .map((e) => ProcessInfo.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 }
@@ -48,10 +48,10 @@ class GetInfoResult {
 
   factory GetInfoResult.fromJson(Map<String, dynamic> json) {
     return GetInfoResult(
-      gpu: GPUInfo.fromJson(json['gpu']),
-      modelName: json['modelName'],
-      modelVersion: json['modelVersion'],
-      commandLine: json['commandLine'],
+      gpu: GPUInfo.fromJson(json['gpu'] as Map<String, dynamic>),
+      modelName: json['modelName'] as String,
+      modelVersion: json['modelVersion'] as String,
+      commandLine: json['commandLine'] as String,
     );
   }
 }
@@ -86,17 +86,17 @@ class GPUDevice {
 
   factory GPUDevice.fromJson(Map<String, dynamic> json) {
     return GPUDevice(
-      vendorId: json['vendorId'],
-      deviceId: json['deviceId'],
-      vendorString: json['vendorString'],
-      deviceString: json['deviceString'],
-      driverVendor: json['driverVendor'],
-      driverVersion: json['driverVersion'],
+      vendorId: json['vendorId'] as num,
+      deviceId: json['deviceId'] as num,
+      vendorString: json['vendorString'] as String,
+      deviceString: json['deviceString'] as String,
+      driverVendor: json['driverVendor'] as String,
+      driverVersion: json['driverVersion'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'vendorId': vendorId,
       'deviceId': deviceId,
       'vendorString': vendorString,
@@ -104,7 +104,6 @@ class GPUDevice {
       'driverVendor': driverVendor,
       'driverVersion': driverVersion,
     };
-    return json;
   }
 }
 
@@ -120,17 +119,16 @@ class Size {
 
   factory Size.fromJson(Map<String, dynamic> json) {
     return Size(
-      width: json['width'],
-      height: json['height'],
+      width: json['width'] as int,
+      height: json['height'] as int,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'width': width,
       'height': height,
     };
-    return json;
   }
 }
 
@@ -153,19 +151,20 @@ class VideoDecodeAcceleratorCapability {
 
   factory VideoDecodeAcceleratorCapability.fromJson(Map<String, dynamic> json) {
     return VideoDecodeAcceleratorCapability(
-      profile: json['profile'],
-      maxResolution: Size.fromJson(json['maxResolution']),
-      minResolution: Size.fromJson(json['minResolution']),
+      profile: json['profile'] as String,
+      maxResolution:
+          Size.fromJson(json['maxResolution'] as Map<String, dynamic>),
+      minResolution:
+          Size.fromJson(json['minResolution'] as Map<String, dynamic>),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'profile': profile,
       'maxResolution': maxResolution.toJson(),
       'minResolution': minResolution.toJson(),
     };
-    return json;
   }
 }
 
@@ -193,21 +192,21 @@ class VideoEncodeAcceleratorCapability {
 
   factory VideoEncodeAcceleratorCapability.fromJson(Map<String, dynamic> json) {
     return VideoEncodeAcceleratorCapability(
-      profile: json['profile'],
-      maxResolution: Size.fromJson(json['maxResolution']),
-      maxFramerateNumerator: json['maxFramerateNumerator'],
-      maxFramerateDenominator: json['maxFramerateDenominator'],
+      profile: json['profile'] as String,
+      maxResolution:
+          Size.fromJson(json['maxResolution'] as Map<String, dynamic>),
+      maxFramerateNumerator: json['maxFramerateNumerator'] as int,
+      maxFramerateDenominator: json['maxFramerateDenominator'] as int,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'profile': profile,
       'maxResolution': maxResolution.toJson(),
       'maxFramerateNumerator': maxFramerateNumerator,
       'maxFramerateDenominator': maxFramerateDenominator,
     };
-    return json;
   }
 }
 
@@ -294,23 +293,24 @@ class ImageDecodeAcceleratorCapability {
 
   factory ImageDecodeAcceleratorCapability.fromJson(Map<String, dynamic> json) {
     return ImageDecodeAcceleratorCapability(
-      imageType: ImageType.fromJson(json['imageType']),
-      maxDimensions: Size.fromJson(json['maxDimensions']),
-      minDimensions: Size.fromJson(json['minDimensions']),
+      imageType: ImageType.fromJson(json['imageType'] as String),
+      maxDimensions:
+          Size.fromJson(json['maxDimensions'] as Map<String, dynamic>),
+      minDimensions:
+          Size.fromJson(json['minDimensions'] as Map<String, dynamic>),
       subsamplings: (json['subsamplings'] as List)
-          .map((e) => SubsamplingFormat.fromJson(e))
+          .map((e) => SubsamplingFormat.fromJson(e as String))
           .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'imageType': imageType.toJson(),
       'maxDimensions': maxDimensions.toJson(),
       'minDimensions': minDimensions.toJson(),
       'subsamplings': subsamplings.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -320,10 +320,10 @@ class GPUInfo {
   final List<GPUDevice> devices;
 
   /// An optional dictionary of additional GPU related attributes.
-  final Map auxAttributes;
+  final Map<String, dynamic> auxAttributes;
 
   /// An optional dictionary of graphics features and their status.
-  final Map featureStatus;
+  final Map<String, dynamic> featureStatus;
 
   /// An optional array of GPU driver bug workarounds.
   final List<String> driverBugWorkarounds;
@@ -348,42 +348,43 @@ class GPUInfo {
 
   factory GPUInfo.fromJson(Map<String, dynamic> json) {
     return GPUInfo(
-      devices:
-          (json['devices'] as List).map((e) => GPUDevice.fromJson(e)).toList(),
-      auxAttributes:
-          json.containsKey('auxAttributes') ? json['auxAttributes'] : null,
-      featureStatus:
-          json.containsKey('featureStatus') ? json['featureStatus'] : null,
+      devices: (json['devices'] as List)
+          .map((e) => GPUDevice.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      auxAttributes: json.containsKey('auxAttributes')
+          ? json['auxAttributes'] as Map<String, dynamic>
+          : null,
+      featureStatus: json.containsKey('featureStatus')
+          ? json['featureStatus'] as Map<String, dynamic>
+          : null,
       driverBugWorkarounds: (json['driverBugWorkarounds'] as List)
           .map((e) => e as String)
           .toList(),
       videoDecoding: (json['videoDecoding'] as List)
-          .map((e) => VideoDecodeAcceleratorCapability.fromJson(e))
+          .map((e) => VideoDecodeAcceleratorCapability.fromJson(
+              e as Map<String, dynamic>))
           .toList(),
       videoEncoding: (json['videoEncoding'] as List)
-          .map((e) => VideoEncodeAcceleratorCapability.fromJson(e))
+          .map((e) => VideoEncodeAcceleratorCapability.fromJson(
+              e as Map<String, dynamic>))
           .toList(),
       imageDecoding: (json['imageDecoding'] as List)
-          .map((e) => ImageDecodeAcceleratorCapability.fromJson(e))
+          .map((e) => ImageDecodeAcceleratorCapability.fromJson(
+              e as Map<String, dynamic>))
           .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'devices': devices.map((e) => e.toJson()).toList(),
-      'driverBugWorkarounds': driverBugWorkarounds.map((e) => e).toList(),
+      'driverBugWorkarounds': [...driverBugWorkarounds],
       'videoDecoding': videoDecoding.map((e) => e.toJson()).toList(),
       'videoEncoding': videoEncoding.map((e) => e.toJson()).toList(),
       'imageDecoding': imageDecoding.map((e) => e.toJson()).toList(),
+      if (auxAttributes != null) 'auxAttributes': auxAttributes,
+      if (featureStatus != null) 'featureStatus': featureStatus,
     };
-    if (auxAttributes != null) {
-      json['auxAttributes'] = auxAttributes;
-    }
-    if (featureStatus != null) {
-      json['featureStatus'] = featureStatus;
-    }
-    return json;
   }
 }
 
@@ -403,18 +404,17 @@ class ProcessInfo {
 
   factory ProcessInfo.fromJson(Map<String, dynamic> json) {
     return ProcessInfo(
-      type: json['type'],
-      id: json['id'],
-      cpuTime: json['cpuTime'],
+      type: json['type'] as String,
+      id: json['id'] as int,
+      cpuTime: json['cpuTime'] as num,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type,
       'id': id,
       'cpuTime': cpuTime,
     };
-    return json;
   }
 }

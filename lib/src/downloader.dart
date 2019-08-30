@@ -87,7 +87,7 @@ void _simpleUnzip(String path, String targetPath) {
 
   for (var file in archive) {
     var filename = file.name;
-    var data = file.content;
+    var data = file.content as List<int>;
     if (data.isNotEmpty) {
       File(p.join(targetPath, filename))
         ..createSync(recursive: true)

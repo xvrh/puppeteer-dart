@@ -46,7 +46,8 @@ class NetworkApi {
   /// Fired if request ended up loading from cache.
   Stream<RequestId> get onRequestServedFromCache => _client.onEvent
       .where((event) => event.name == 'Network.requestServedFromCache')
-      .map((event) => RequestId.fromJson(event.parameters['requestId']));
+      .map((event) =>
+          RequestId.fromJson(event.parameters['requestId'] as String));
 
   /// Fired when page is about to send HTTP request.
   Stream<RequestWillBeSentEvent> get onRequestWillBeSent => _client.onEvent
@@ -136,7 +137,7 @@ class NetworkApi {
   @deprecated
   Future<bool> canClearBrowserCache() async {
     var result = await _client.send('Network.canClearBrowserCache');
-    return result['result'];
+    return result['result'] as bool;
   }
 
   /// Tells whether clearing browser cookies is supported.
@@ -144,7 +145,7 @@ class NetworkApi {
   @deprecated
   Future<bool> canClearBrowserCookies() async {
     var result = await _client.send('Network.canClearBrowserCookies');
-    return result['result'];
+    return result['result'] as bool;
   }
 
   /// Tells whether emulation of network conditions is supported.
@@ -152,7 +153,7 @@ class NetworkApi {
   @deprecated
   Future<bool> canEmulateNetworkConditions() async {
     var result = await _client.send('Network.canEmulateNetworkConditions');
-    return result['result'];
+    return result['result'] as bool;
   }
 
   /// Clears browser cache.
@@ -192,31 +193,17 @@ class NetworkApi {
       String postData,
       Headers headers,
       AuthChallengeResponse authChallengeResponse}) async {
-    var parameters = <String, dynamic>{
-      'interceptionId': interceptionId.toJson(),
-    };
-    if (errorReason != null) {
-      parameters['errorReason'] = errorReason.toJson();
-    }
-    if (rawResponse != null) {
-      parameters['rawResponse'] = rawResponse;
-    }
-    if (url != null) {
-      parameters['url'] = url;
-    }
-    if (method != null) {
-      parameters['method'] = method;
-    }
-    if (postData != null) {
-      parameters['postData'] = postData;
-    }
-    if (headers != null) {
-      parameters['headers'] = headers.toJson();
-    }
-    if (authChallengeResponse != null) {
-      parameters['authChallengeResponse'] = authChallengeResponse.toJson();
-    }
-    await _client.send('Network.continueInterceptedRequest', parameters);
+    await _client.send('Network.continueInterceptedRequest', {
+      'interceptionId': interceptionId,
+      if (errorReason != null) 'errorReason': errorReason,
+      if (rawResponse != null) 'rawResponse': rawResponse,
+      if (url != null) 'url': url,
+      if (method != null) 'method': method,
+      if (postData != null) 'postData': postData,
+      if (headers != null) 'headers': headers,
+      if (authChallengeResponse != null)
+        'authChallengeResponse': authChallengeResponse,
+    });
   }
 
   /// Deletes browser cookies with matching name and url or domain/path pair.
@@ -227,19 +214,12 @@ class NetworkApi {
   /// [path] If specified, deletes only cookies with the exact path.
   Future<void> deleteCookies(String name,
       {String url, String domain, String path}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.deleteCookies', {
       'name': name,
-    };
-    if (url != null) {
-      parameters['url'] = url;
-    }
-    if (domain != null) {
-      parameters['domain'] = domain;
-    }
-    if (path != null) {
-      parameters['path'] = path;
-    }
-    await _client.send('Network.deleteCookies', parameters);
+      if (url != null) 'url': url,
+      if (domain != null) 'domain': domain,
+      if (path != null) 'path': path,
+    });
   }
 
   /// Disables network tracking, prevents network events from being sent to the client.
@@ -256,16 +236,13 @@ class NetworkApi {
   Future<void> emulateNetworkConditions(
       bool offline, num latency, num downloadThroughput, num uploadThroughput,
       {ConnectionType connectionType}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.emulateNetworkConditions', {
       'offline': offline,
       'latency': latency,
       'downloadThroughput': downloadThroughput,
       'uploadThroughput': uploadThroughput,
-    };
-    if (connectionType != null) {
-      parameters['connectionType'] = connectionType.toJson();
-    }
-    await _client.send('Network.emulateNetworkConditions', parameters);
+      if (connectionType != null) 'connectionType': connectionType,
+    });
   }
 
   /// Enables network tracking, network events will now be delivered to the client.
@@ -276,17 +253,12 @@ class NetworkApi {
       {int maxTotalBufferSize,
       int maxResourceBufferSize,
       int maxPostDataSize}) async {
-    var parameters = <String, dynamic>{};
-    if (maxTotalBufferSize != null) {
-      parameters['maxTotalBufferSize'] = maxTotalBufferSize;
-    }
-    if (maxResourceBufferSize != null) {
-      parameters['maxResourceBufferSize'] = maxResourceBufferSize;
-    }
-    if (maxPostDataSize != null) {
-      parameters['maxPostDataSize'] = maxPostDataSize;
-    }
-    await _client.send('Network.enable', parameters);
+    await _client.send('Network.enable', {
+      if (maxTotalBufferSize != null) 'maxTotalBufferSize': maxTotalBufferSize,
+      if (maxResourceBufferSize != null)
+        'maxResourceBufferSize': maxResourceBufferSize,
+      if (maxPostDataSize != null) 'maxPostDataSize': maxPostDataSize,
+    });
   }
 
   /// Returns all browser cookies. Depending on the backend support, will return detailed cookie
@@ -294,16 +266,17 @@ class NetworkApi {
   /// Returns: Array of cookie objects.
   Future<List<Cookie>> getAllCookies() async {
     var result = await _client.send('Network.getAllCookies');
-    return (result['cookies'] as List).map((e) => Cookie.fromJson(e)).toList();
+    return (result['cookies'] as List)
+        .map((e) => Cookie.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// Returns the DER-encoded certificate.
   /// [origin] Origin to get certificate for.
   Future<List<String>> getCertificate(String origin) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Network.getCertificate', {
       'origin': origin,
-    };
-    var result = await _client.send('Network.getCertificate', parameters);
+    });
     return (result['tableNames'] as List).map((e) => e as String).toList();
   }
 
@@ -312,21 +285,20 @@ class NetworkApi {
   /// [urls] The list of URLs for which applicable cookies will be fetched
   /// Returns: Array of cookie objects.
   Future<List<Cookie>> getCookies({List<String> urls}) async {
-    var parameters = <String, dynamic>{};
-    if (urls != null) {
-      parameters['urls'] = urls.map((e) => e).toList();
-    }
-    var result = await _client.send('Network.getCookies', parameters);
-    return (result['cookies'] as List).map((e) => Cookie.fromJson(e)).toList();
+    var result = await _client.send('Network.getCookies', {
+      if (urls != null) 'urls': [...urls],
+    });
+    return (result['cookies'] as List)
+        .map((e) => Cookie.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// Returns content served for the given request.
   /// [requestId] Identifier of the network request to get content for.
   Future<GetResponseBodyResult> getResponseBody(RequestId requestId) async {
-    var parameters = <String, dynamic>{
-      'requestId': requestId.toJson(),
-    };
-    var result = await _client.send('Network.getResponseBody', parameters);
+    var result = await _client.send('Network.getResponseBody', {
+      'requestId': requestId,
+    });
     return GetResponseBodyResult.fromJson(result);
   }
 
@@ -334,22 +306,19 @@ class NetworkApi {
   /// [requestId] Identifier of the network request to get content for.
   /// Returns: Request body string, omitting files from multipart requests
   Future<String> getRequestPostData(RequestId requestId) async {
-    var parameters = <String, dynamic>{
-      'requestId': requestId.toJson(),
-    };
-    var result = await _client.send('Network.getRequestPostData', parameters);
-    return result['postData'];
+    var result = await _client.send('Network.getRequestPostData', {
+      'requestId': requestId,
+    });
+    return result['postData'] as String;
   }
 
   /// Returns content served for the given currently intercepted request.
   /// [interceptionId] Identifier for the intercepted request to get body for.
   Future<GetResponseBodyForInterceptionResult> getResponseBodyForInterception(
       InterceptionId interceptionId) async {
-    var parameters = <String, dynamic>{
-      'interceptionId': interceptionId.toJson(),
-    };
-    var result = await _client.send(
-        'Network.getResponseBodyForInterception', parameters);
+    var result = await _client.send('Network.getResponseBodyForInterception', {
+      'interceptionId': interceptionId,
+    });
     return GetResponseBodyForInterceptionResult.fromJson(result);
   }
 
@@ -359,12 +328,11 @@ class NetworkApi {
   /// is specified.
   Future<io.StreamHandle> takeResponseBodyForInterceptionAsStream(
       InterceptionId interceptionId) async {
-    var parameters = <String, dynamic>{
-      'interceptionId': interceptionId.toJson(),
-    };
-    var result = await _client.send(
-        'Network.takeResponseBodyForInterceptionAsStream', parameters);
-    return io.StreamHandle.fromJson(result['stream']);
+    var result =
+        await _client.send('Network.takeResponseBodyForInterceptionAsStream', {
+      'interceptionId': interceptionId,
+    });
+    return io.StreamHandle.fromJson(result['stream'] as String);
   }
 
   /// This method sends a new XMLHttpRequest which is identical to the original one. The following
@@ -372,10 +340,9 @@ class NetworkApi {
   /// attribute, user, password.
   /// [requestId] Identifier of XHR to replay.
   Future<void> replayXHR(RequestId requestId) async {
-    var parameters = <String, dynamic>{
-      'requestId': requestId.toJson(),
-    };
-    await _client.send('Network.replayXHR', parameters);
+    await _client.send('Network.replayXHR', {
+      'requestId': requestId,
+    });
   }
 
   /// Searches for given string in response content.
@@ -387,47 +354,39 @@ class NetworkApi {
   Future<List<debugger.SearchMatch>> searchInResponseBody(
       RequestId requestId, String query,
       {bool caseSensitive, bool isRegex}) async {
-    var parameters = <String, dynamic>{
-      'requestId': requestId.toJson(),
+    var result = await _client.send('Network.searchInResponseBody', {
+      'requestId': requestId,
       'query': query,
-    };
-    if (caseSensitive != null) {
-      parameters['caseSensitive'] = caseSensitive;
-    }
-    if (isRegex != null) {
-      parameters['isRegex'] = isRegex;
-    }
-    var result = await _client.send('Network.searchInResponseBody', parameters);
+      if (caseSensitive != null) 'caseSensitive': caseSensitive,
+      if (isRegex != null) 'isRegex': isRegex,
+    });
     return (result['result'] as List)
-        .map((e) => debugger.SearchMatch.fromJson(e))
+        .map((e) => debugger.SearchMatch.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
   /// Blocks URLs from loading.
   /// [urls] URL patterns to block. Wildcards ('*') are allowed.
   Future<void> setBlockedURLs(List<String> urls) async {
-    var parameters = <String, dynamic>{
-      'urls': urls.map((e) => e).toList(),
-    };
-    await _client.send('Network.setBlockedURLs', parameters);
+    await _client.send('Network.setBlockedURLs', {
+      'urls': [...urls],
+    });
   }
 
   /// Toggles ignoring of service worker for each request.
   /// [bypass] Bypass service worker and load from network.
   Future<void> setBypassServiceWorker(bool bypass) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.setBypassServiceWorker', {
       'bypass': bypass,
-    };
-    await _client.send('Network.setBypassServiceWorker', parameters);
+    });
   }
 
   /// Toggles ignoring cache for each request. If `true`, cache will not be used.
   /// [cacheDisabled] Cache disabled state.
   Future<void> setCacheDisabled(bool cacheDisabled) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.setCacheDisabled', {
       'cacheDisabled': cacheDisabled,
-    };
-    await _client.send('Network.setCacheDisabled', parameters);
+    });
   }
 
   /// Sets a cookie with the given cookie data; may overwrite equivalent cookies if they exist.
@@ -450,42 +409,26 @@ class NetworkApi {
       bool httpOnly,
       CookieSameSite sameSite,
       TimeSinceEpoch expires}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Network.setCookie', {
       'name': name,
       'value': value,
-    };
-    if (url != null) {
-      parameters['url'] = url;
-    }
-    if (domain != null) {
-      parameters['domain'] = domain;
-    }
-    if (path != null) {
-      parameters['path'] = path;
-    }
-    if (secure != null) {
-      parameters['secure'] = secure;
-    }
-    if (httpOnly != null) {
-      parameters['httpOnly'] = httpOnly;
-    }
-    if (sameSite != null) {
-      parameters['sameSite'] = sameSite.toJson();
-    }
-    if (expires != null) {
-      parameters['expires'] = expires.toJson();
-    }
-    var result = await _client.send('Network.setCookie', parameters);
-    return result['success'];
+      if (url != null) 'url': url,
+      if (domain != null) 'domain': domain,
+      if (path != null) 'path': path,
+      if (secure != null) 'secure': secure,
+      if (httpOnly != null) 'httpOnly': httpOnly,
+      if (sameSite != null) 'sameSite': sameSite,
+      if (expires != null) 'expires': expires,
+    });
+    return result['success'] as bool;
   }
 
   /// Sets given cookies.
   /// [cookies] Cookies to be set.
   Future<void> setCookies(List<CookieParam> cookies) async {
-    var parameters = <String, dynamic>{
-      'cookies': cookies.map((e) => e.toJson()).toList(),
-    };
-    await _client.send('Network.setCookies', parameters);
+    await _client.send('Network.setCookies', {
+      'cookies': [...cookies],
+    });
   }
 
   /// For testing.
@@ -493,20 +436,18 @@ class NetworkApi {
   /// [maxResourceSize] Maximum per-resource size.
   Future<void> setDataSizeLimitsForTest(
       int maxTotalSize, int maxResourceSize) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.setDataSizeLimitsForTest', {
       'maxTotalSize': maxTotalSize,
       'maxResourceSize': maxResourceSize,
-    };
-    await _client.send('Network.setDataSizeLimitsForTest', parameters);
+    });
   }
 
   /// Specifies whether to always send extra HTTP headers with the requests from this page.
   /// [headers] Map with extra HTTP headers.
   Future<void> setExtraHTTPHeaders(Headers headers) async {
-    var parameters = <String, dynamic>{
-      'headers': headers.toJson(),
-    };
-    await _client.send('Network.setExtraHTTPHeaders', parameters);
+    await _client.send('Network.setExtraHTTPHeaders', {
+      'headers': headers,
+    });
   }
 
   /// Sets the requests to intercept that match the provided patterns and optionally resource types.
@@ -515,10 +456,9 @@ class NetworkApi {
   /// continueInterceptedRequest call.
   @deprecated
   Future<void> setRequestInterception(List<RequestPattern> patterns) async {
-    var parameters = <String, dynamic>{
-      'patterns': patterns.map((e) => e.toJson()).toList(),
-    };
-    await _client.send('Network.setRequestInterception', parameters);
+    await _client.send('Network.setRequestInterception', {
+      'patterns': [...patterns],
+    });
   }
 
   /// Allows overriding user agent with the given string.
@@ -527,16 +467,11 @@ class NetworkApi {
   /// [platform] The platform navigator.platform should return.
   Future<void> setUserAgentOverride(String userAgent,
       {String acceptLanguage, String platform}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Network.setUserAgentOverride', {
       'userAgent': userAgent,
-    };
-    if (acceptLanguage != null) {
-      parameters['acceptLanguage'] = acceptLanguage;
-    }
-    if (platform != null) {
-      parameters['platform'] = platform;
-    }
-    await _client.send('Network.setUserAgentOverride', parameters);
+      if (acceptLanguage != null) 'acceptLanguage': acceptLanguage,
+      if (platform != null) 'platform': platform,
+    });
   }
 }
 
@@ -561,10 +496,10 @@ class DataReceivedEvent {
 
   factory DataReceivedEvent.fromJson(Map<String, dynamic> json) {
     return DataReceivedEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      timestamp: MonotonicTime.fromJson(json['timestamp']),
-      dataLength: json['dataLength'],
-      encodedDataLength: json['encodedDataLength'],
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+      dataLength: json['dataLength'] as int,
+      encodedDataLength: json['encodedDataLength'] as int,
     );
   }
 }
@@ -594,11 +529,11 @@ class EventSourceMessageReceivedEvent {
 
   factory EventSourceMessageReceivedEvent.fromJson(Map<String, dynamic> json) {
     return EventSourceMessageReceivedEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      timestamp: MonotonicTime.fromJson(json['timestamp']),
-      eventName: json['eventName'],
-      eventId: json['eventId'],
-      data: json['data'],
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+      eventName: json['eventName'] as String,
+      eventId: json['eventId'] as String,
+      data: json['data'] as String,
     );
   }
 }
@@ -632,13 +567,13 @@ class LoadingFailedEvent {
 
   factory LoadingFailedEvent.fromJson(Map<String, dynamic> json) {
     return LoadingFailedEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      timestamp: MonotonicTime.fromJson(json['timestamp']),
-      type: ResourceType.fromJson(json['type']),
-      errorText: json['errorText'],
-      canceled: json.containsKey('canceled') ? json['canceled'] : null,
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+      type: ResourceType.fromJson(json['type'] as String),
+      errorText: json['errorText'] as String,
+      canceled: json.containsKey('canceled') ? json['canceled'] as bool : null,
       blockedReason: json.containsKey('blockedReason')
-          ? BlockedReason.fromJson(json['blockedReason'])
+          ? BlockedReason.fromJson(json['blockedReason'] as String)
           : null,
     );
   }
@@ -666,11 +601,11 @@ class LoadingFinishedEvent {
 
   factory LoadingFinishedEvent.fromJson(Map<String, dynamic> json) {
     return LoadingFinishedEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      timestamp: MonotonicTime.fromJson(json['timestamp']),
-      encodedDataLength: json['encodedDataLength'],
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+      encodedDataLength: json['encodedDataLength'] as num,
       shouldReportCorbBlocking: json.containsKey('shouldReportCorbBlocking')
-          ? json['shouldReportCorbBlocking']
+          ? json['shouldReportCorbBlocking'] as bool
           : null,
     );
   }
@@ -736,27 +671,31 @@ class RequestInterceptedEvent {
 
   factory RequestInterceptedEvent.fromJson(Map<String, dynamic> json) {
     return RequestInterceptedEvent(
-      interceptionId: InterceptionId.fromJson(json['interceptionId']),
-      request: RequestData.fromJson(json['request']),
-      frameId: page.FrameId.fromJson(json['frameId']),
-      resourceType: ResourceType.fromJson(json['resourceType']),
-      isNavigationRequest: json['isNavigationRequest'],
-      isDownload: json.containsKey('isDownload') ? json['isDownload'] : null,
-      redirectUrl: json.containsKey('redirectUrl') ? json['redirectUrl'] : null,
+      interceptionId: InterceptionId.fromJson(json['interceptionId'] as String),
+      request: RequestData.fromJson(json['request'] as Map<String, dynamic>),
+      frameId: page.FrameId.fromJson(json['frameId'] as String),
+      resourceType: ResourceType.fromJson(json['resourceType'] as String),
+      isNavigationRequest: json['isNavigationRequest'] as bool,
+      isDownload:
+          json.containsKey('isDownload') ? json['isDownload'] as bool : null,
+      redirectUrl: json.containsKey('redirectUrl')
+          ? json['redirectUrl'] as String
+          : null,
       authChallenge: json.containsKey('authChallenge')
-          ? AuthChallenge.fromJson(json['authChallenge'])
+          ? AuthChallenge.fromJson(
+              json['authChallenge'] as Map<String, dynamic>)
           : null,
       responseErrorReason: json.containsKey('responseErrorReason')
-          ? ErrorReason.fromJson(json['responseErrorReason'])
+          ? ErrorReason.fromJson(json['responseErrorReason'] as String)
           : null,
       responseStatusCode: json.containsKey('responseStatusCode')
-          ? json['responseStatusCode']
+          ? json['responseStatusCode'] as int
           : null,
       responseHeaders: json.containsKey('responseHeaders')
-          ? Headers.fromJson(json['responseHeaders'])
+          ? Headers.fromJson(json['responseHeaders'] as Map<String, dynamic>)
           : null,
       requestId: json.containsKey('requestId')
-          ? RequestId.fromJson(json['requestId'])
+          ? RequestId.fromJson(json['requestId'] as String)
           : null,
     );
   }
@@ -811,23 +750,26 @@ class RequestWillBeSentEvent {
 
   factory RequestWillBeSentEvent.fromJson(Map<String, dynamic> json) {
     return RequestWillBeSentEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      loaderId: LoaderId.fromJson(json['loaderId']),
-      documentURL: json['documentURL'],
-      request: RequestData.fromJson(json['request']),
-      timestamp: MonotonicTime.fromJson(json['timestamp']),
-      wallTime: TimeSinceEpoch.fromJson(json['wallTime']),
-      initiator: Initiator.fromJson(json['initiator']),
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      loaderId: LoaderId.fromJson(json['loaderId'] as String),
+      documentURL: json['documentURL'] as String,
+      request: RequestData.fromJson(json['request'] as Map<String, dynamic>),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+      wallTime: TimeSinceEpoch.fromJson(json['wallTime'] as num),
+      initiator: Initiator.fromJson(json['initiator'] as Map<String, dynamic>),
       redirectResponse: json.containsKey('redirectResponse')
-          ? ResponseData.fromJson(json['redirectResponse'])
+          ? ResponseData.fromJson(
+              json['redirectResponse'] as Map<String, dynamic>)
           : null,
-      type:
-          json.containsKey('type') ? ResourceType.fromJson(json['type']) : null,
+      type: json.containsKey('type')
+          ? ResourceType.fromJson(json['type'] as String)
+          : null,
       frameId: json.containsKey('frameId')
-          ? page.FrameId.fromJson(json['frameId'])
+          ? page.FrameId.fromJson(json['frameId'] as String)
           : null,
-      hasUserGesture:
-          json.containsKey('hasUserGesture') ? json['hasUserGesture'] : null,
+      hasUserGesture: json.containsKey('hasUserGesture')
+          ? json['hasUserGesture'] as bool
+          : null,
     );
   }
 }
@@ -849,9 +791,9 @@ class ResourceChangedPriorityEvent {
 
   factory ResourceChangedPriorityEvent.fromJson(Map<String, dynamic> json) {
     return ResourceChangedPriorityEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      newPriority: ResourcePriority.fromJson(json['newPriority']),
-      timestamp: MonotonicTime.fromJson(json['timestamp']),
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      newPriority: ResourcePriority.fromJson(json['newPriority'] as String),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
     );
   }
 }
@@ -867,8 +809,8 @@ class SignedExchangeReceivedEvent {
 
   factory SignedExchangeReceivedEvent.fromJson(Map<String, dynamic> json) {
     return SignedExchangeReceivedEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      info: SignedExchangeInfo.fromJson(json['info']),
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      info: SignedExchangeInfo.fromJson(json['info'] as Map<String, dynamic>),
     );
   }
 }
@@ -902,13 +844,13 @@ class ResponseReceivedEvent {
 
   factory ResponseReceivedEvent.fromJson(Map<String, dynamic> json) {
     return ResponseReceivedEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      loaderId: LoaderId.fromJson(json['loaderId']),
-      timestamp: MonotonicTime.fromJson(json['timestamp']),
-      type: ResourceType.fromJson(json['type']),
-      response: ResponseData.fromJson(json['response']),
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      loaderId: LoaderId.fromJson(json['loaderId'] as String),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+      type: ResourceType.fromJson(json['type'] as String),
+      response: ResponseData.fromJson(json['response'] as Map<String, dynamic>),
       frameId: json.containsKey('frameId')
-          ? page.FrameId.fromJson(json['frameId'])
+          ? page.FrameId.fromJson(json['frameId'] as String)
           : null,
     );
   }
@@ -925,8 +867,8 @@ class WebSocketClosedEvent {
 
   factory WebSocketClosedEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketClosedEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      timestamp: MonotonicTime.fromJson(json['timestamp']),
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
     );
   }
 }
@@ -946,10 +888,10 @@ class WebSocketCreatedEvent {
 
   factory WebSocketCreatedEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketCreatedEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      url: json['url'],
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      url: json['url'] as String,
       initiator: json.containsKey('initiator')
-          ? Initiator.fromJson(json['initiator'])
+          ? Initiator.fromJson(json['initiator'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -972,9 +914,9 @@ class WebSocketFrameErrorEvent {
 
   factory WebSocketFrameErrorEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketFrameErrorEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      timestamp: MonotonicTime.fromJson(json['timestamp']),
-      errorMessage: json['errorMessage'],
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+      errorMessage: json['errorMessage'] as String,
     );
   }
 }
@@ -996,9 +938,10 @@ class WebSocketFrameReceivedEvent {
 
   factory WebSocketFrameReceivedEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketFrameReceivedEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      timestamp: MonotonicTime.fromJson(json['timestamp']),
-      response: WebSocketFrame.fromJson(json['response']),
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+      response:
+          WebSocketFrame.fromJson(json['response'] as Map<String, dynamic>),
     );
   }
 }
@@ -1020,9 +963,10 @@ class WebSocketFrameSentEvent {
 
   factory WebSocketFrameSentEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketFrameSentEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      timestamp: MonotonicTime.fromJson(json['timestamp']),
-      response: WebSocketFrame.fromJson(json['response']),
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+      response:
+          WebSocketFrame.fromJson(json['response'] as Map<String, dynamic>),
     );
   }
 }
@@ -1045,9 +989,10 @@ class WebSocketHandshakeResponseReceivedEvent {
   factory WebSocketHandshakeResponseReceivedEvent.fromJson(
       Map<String, dynamic> json) {
     return WebSocketHandshakeResponseReceivedEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      timestamp: MonotonicTime.fromJson(json['timestamp']),
-      response: WebSocketResponse.fromJson(json['response']),
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+      response:
+          WebSocketResponse.fromJson(json['response'] as Map<String, dynamic>),
     );
   }
 }
@@ -1074,10 +1019,11 @@ class WebSocketWillSendHandshakeRequestEvent {
   factory WebSocketWillSendHandshakeRequestEvent.fromJson(
       Map<String, dynamic> json) {
     return WebSocketWillSendHandshakeRequestEvent(
-      requestId: RequestId.fromJson(json['requestId']),
-      timestamp: MonotonicTime.fromJson(json['timestamp']),
-      wallTime: TimeSinceEpoch.fromJson(json['wallTime']),
-      request: WebSocketRequest.fromJson(json['request']),
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+      wallTime: TimeSinceEpoch.fromJson(json['wallTime'] as num),
+      request:
+          WebSocketRequest.fromJson(json['request'] as Map<String, dynamic>),
     );
   }
 }
@@ -1100,11 +1046,12 @@ class RequestWillBeSentExtraInfoEvent {
 
   factory RequestWillBeSentExtraInfoEvent.fromJson(Map<String, dynamic> json) {
     return RequestWillBeSentExtraInfoEvent(
-      requestId: RequestId.fromJson(json['requestId']),
+      requestId: RequestId.fromJson(json['requestId'] as String),
       blockedCookies: (json['blockedCookies'] as List)
-          .map((e) => BlockedCookieWithReason.fromJson(e))
+          .map((e) =>
+              BlockedCookieWithReason.fromJson(e as Map<String, dynamic>))
           .toList(),
-      headers: Headers.fromJson(json['headers']),
+      headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
     );
   }
 }
@@ -1133,12 +1080,15 @@ class ResponseReceivedExtraInfoEvent {
 
   factory ResponseReceivedExtraInfoEvent.fromJson(Map<String, dynamic> json) {
     return ResponseReceivedExtraInfoEvent(
-      requestId: RequestId.fromJson(json['requestId']),
+      requestId: RequestId.fromJson(json['requestId'] as String),
       blockedCookies: (json['blockedCookies'] as List)
-          .map((e) => BlockedSetCookieWithReason.fromJson(e))
+          .map((e) =>
+              BlockedSetCookieWithReason.fromJson(e as Map<String, dynamic>))
           .toList(),
-      headers: Headers.fromJson(json['headers']),
-      headersText: json.containsKey('headersText') ? json['headersText'] : null,
+      headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
+      headersText: json.containsKey('headersText')
+          ? json['headersText'] as String
+          : null,
     );
   }
 }
@@ -1154,8 +1104,8 @@ class GetResponseBodyResult {
 
   factory GetResponseBodyResult.fromJson(Map<String, dynamic> json) {
     return GetResponseBodyResult(
-      body: json['body'],
-      base64Encoded: json['base64Encoded'],
+      body: json['body'] as String,
+      base64Encoded: json['base64Encoded'] as bool,
     );
   }
 }
@@ -1173,8 +1123,8 @@ class GetResponseBodyForInterceptionResult {
   factory GetResponseBodyForInterceptionResult.fromJson(
       Map<String, dynamic> json) {
     return GetResponseBodyForInterceptionResult(
-      body: json['body'],
-      base64Encoded: json['base64Encoded'],
+      body: json['body'] as String,
+      base64Encoded: json['base64Encoded'] as bool,
     );
   }
 }
@@ -1394,13 +1344,13 @@ class MonotonicTime {
 
 /// Request / response headers as keys / values of JSON object.
 class Headers {
-  final Map value;
+  final Map<String, dynamic> value;
 
   Headers(this.value);
 
-  factory Headers.fromJson(Map value) => Headers(value);
+  factory Headers.fromJson(Map<String, dynamic> value) => Headers(value);
 
-  Map toJson() => value;
+  Map<String, dynamic> toJson() => value;
 
   @override
   bool operator ==(other) =>
@@ -1559,27 +1509,27 @@ class ResourceTiming {
 
   factory ResourceTiming.fromJson(Map<String, dynamic> json) {
     return ResourceTiming(
-      requestTime: json['requestTime'],
-      proxyStart: json['proxyStart'],
-      proxyEnd: json['proxyEnd'],
-      dnsStart: json['dnsStart'],
-      dnsEnd: json['dnsEnd'],
-      connectStart: json['connectStart'],
-      connectEnd: json['connectEnd'],
-      sslStart: json['sslStart'],
-      sslEnd: json['sslEnd'],
-      workerStart: json['workerStart'],
-      workerReady: json['workerReady'],
-      sendStart: json['sendStart'],
-      sendEnd: json['sendEnd'],
-      pushStart: json['pushStart'],
-      pushEnd: json['pushEnd'],
-      receiveHeadersEnd: json['receiveHeadersEnd'],
+      requestTime: json['requestTime'] as num,
+      proxyStart: json['proxyStart'] as num,
+      proxyEnd: json['proxyEnd'] as num,
+      dnsStart: json['dnsStart'] as num,
+      dnsEnd: json['dnsEnd'] as num,
+      connectStart: json['connectStart'] as num,
+      connectEnd: json['connectEnd'] as num,
+      sslStart: json['sslStart'] as num,
+      sslEnd: json['sslEnd'] as num,
+      workerStart: json['workerStart'] as num,
+      workerReady: json['workerReady'] as num,
+      sendStart: json['sendStart'] as num,
+      sendEnd: json['sendEnd'] as num,
+      pushStart: json['pushStart'] as num,
+      pushEnd: json['pushEnd'] as num,
+      receiveHeadersEnd: json['receiveHeadersEnd'] as num,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'requestTime': requestTime,
       'proxyStart': proxyStart,
       'proxyEnd': proxyEnd,
@@ -1597,7 +1547,6 @@ class ResourceTiming {
       'pushEnd': pushEnd,
       'receiveHeadersEnd': receiveHeadersEnd,
     };
-    return json;
   }
 }
 
@@ -1681,46 +1630,44 @@ class RequestData {
 
   factory RequestData.fromJson(Map<String, dynamic> json) {
     return RequestData(
-      url: json['url'],
-      urlFragment: json.containsKey('urlFragment') ? json['urlFragment'] : null,
-      method: json['method'],
-      headers: Headers.fromJson(json['headers']),
-      postData: json.containsKey('postData') ? json['postData'] : null,
-      hasPostData: json.containsKey('hasPostData') ? json['hasPostData'] : null,
-      mixedContentType: json.containsKey('mixedContentType')
-          ? security.MixedContentType.fromJson(json['mixedContentType'])
+      url: json['url'] as String,
+      urlFragment: json.containsKey('urlFragment')
+          ? json['urlFragment'] as String
           : null,
-      initialPriority: ResourcePriority.fromJson(json['initialPriority']),
-      referrerPolicy: RequestReferrerPolicy.fromJson(json['referrerPolicy']),
-      isLinkPreload:
-          json.containsKey('isLinkPreload') ? json['isLinkPreload'] : null,
+      method: json['method'] as String,
+      headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
+      postData:
+          json.containsKey('postData') ? json['postData'] as String : null,
+      hasPostData:
+          json.containsKey('hasPostData') ? json['hasPostData'] as bool : null,
+      mixedContentType: json.containsKey('mixedContentType')
+          ? security.MixedContentType.fromJson(
+              json['mixedContentType'] as String)
+          : null,
+      initialPriority:
+          ResourcePriority.fromJson(json['initialPriority'] as String),
+      referrerPolicy:
+          RequestReferrerPolicy.fromJson(json['referrerPolicy'] as String),
+      isLinkPreload: json.containsKey('isLinkPreload')
+          ? json['isLinkPreload'] as bool
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'url': url,
       'method': method,
       'headers': headers.toJson(),
       'initialPriority': initialPriority.toJson(),
       'referrerPolicy': referrerPolicy,
+      if (urlFragment != null) 'urlFragment': urlFragment,
+      if (postData != null) 'postData': postData,
+      if (hasPostData != null) 'hasPostData': hasPostData,
+      if (mixedContentType != null)
+        'mixedContentType': mixedContentType.toJson(),
+      if (isLinkPreload != null) 'isLinkPreload': isLinkPreload,
     };
-    if (urlFragment != null) {
-      json['urlFragment'] = urlFragment;
-    }
-    if (postData != null) {
-      json['postData'] = postData;
-    }
-    if (hasPostData != null) {
-      json['hasPostData'] = hasPostData;
-    }
-    if (mixedContentType != null) {
-      json['mixedContentType'] = mixedContentType.toJson();
-    }
-    if (isLinkPreload != null) {
-      json['isLinkPreload'] = isLinkPreload;
-    }
-    return json;
   }
 }
 
@@ -1805,19 +1752,19 @@ class SignedCertificateTimestamp {
 
   factory SignedCertificateTimestamp.fromJson(Map<String, dynamic> json) {
     return SignedCertificateTimestamp(
-      status: json['status'],
-      origin: json['origin'],
-      logDescription: json['logDescription'],
-      logId: json['logId'],
-      timestamp: TimeSinceEpoch.fromJson(json['timestamp']),
-      hashAlgorithm: json['hashAlgorithm'],
-      signatureAlgorithm: json['signatureAlgorithm'],
-      signatureData: json['signatureData'],
+      status: json['status'] as String,
+      origin: json['origin'] as String,
+      logDescription: json['logDescription'] as String,
+      logId: json['logId'] as String,
+      timestamp: TimeSinceEpoch.fromJson(json['timestamp'] as num),
+      hashAlgorithm: json['hashAlgorithm'] as String,
+      signatureAlgorithm: json['signatureAlgorithm'] as String,
+      signatureData: json['signatureData'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'status': status,
       'origin': origin,
       'logDescription': logDescription,
@@ -1827,7 +1774,6 @@ class SignedCertificateTimestamp {
       'signatureAlgorithm': signatureAlgorithm,
       'signatureData': signatureData,
     };
-    return json;
   }
 }
 
@@ -1889,37 +1835,39 @@ class SecurityDetails {
 
   factory SecurityDetails.fromJson(Map<String, dynamic> json) {
     return SecurityDetails(
-      protocol: json['protocol'],
-      keyExchange: json['keyExchange'],
+      protocol: json['protocol'] as String,
+      keyExchange: json['keyExchange'] as String,
       keyExchangeGroup: json.containsKey('keyExchangeGroup')
-          ? json['keyExchangeGroup']
+          ? json['keyExchangeGroup'] as String
           : null,
-      cipher: json['cipher'],
-      mac: json.containsKey('mac') ? json['mac'] : null,
-      certificateId: security.CertificateId.fromJson(json['certificateId']),
-      subjectName: json['subjectName'],
+      cipher: json['cipher'] as String,
+      mac: json.containsKey('mac') ? json['mac'] as String : null,
+      certificateId:
+          security.CertificateId.fromJson(json['certificateId'] as int),
+      subjectName: json['subjectName'] as String,
       sanList: (json['sanList'] as List).map((e) => e as String).toList(),
-      issuer: json['issuer'],
-      validFrom: TimeSinceEpoch.fromJson(json['validFrom']),
-      validTo: TimeSinceEpoch.fromJson(json['validTo']),
-      signedCertificateTimestampList:
-          (json['signedCertificateTimestampList'] as List)
-              .map((e) => SignedCertificateTimestamp.fromJson(e))
-              .toList(),
+      issuer: json['issuer'] as String,
+      validFrom: TimeSinceEpoch.fromJson(json['validFrom'] as num),
+      validTo: TimeSinceEpoch.fromJson(json['validTo'] as num),
+      signedCertificateTimestampList: (json['signedCertificateTimestampList']
+              as List)
+          .map((e) =>
+              SignedCertificateTimestamp.fromJson(e as Map<String, dynamic>))
+          .toList(),
       certificateTransparencyCompliance:
           CertificateTransparencyCompliance.fromJson(
-              json['certificateTransparencyCompliance']),
+              json['certificateTransparencyCompliance'] as String),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'protocol': protocol,
       'keyExchange': keyExchange,
       'cipher': cipher,
       'certificateId': certificateId.toJson(),
       'subjectName': subjectName,
-      'sanList': sanList.map((e) => e).toList(),
+      'sanList': [...sanList],
       'issuer': issuer,
       'validFrom': validFrom.toJson(),
       'validTo': validTo.toJson(),
@@ -1927,14 +1875,9 @@ class SecurityDetails {
           signedCertificateTimestampList.map((e) => e.toJson()).toList(),
       'certificateTransparencyCompliance':
           certificateTransparencyCompliance.toJson(),
+      if (keyExchangeGroup != null) 'keyExchangeGroup': keyExchangeGroup,
+      if (mac != null) 'mac': mac,
     };
-    if (keyExchangeGroup != null) {
-      json['keyExchangeGroup'] = keyExchangeGroup;
-    }
-    if (mac != null) {
-      json['mac'] = mac;
-    }
-    return json;
   }
 }
 
@@ -2097,45 +2040,53 @@ class ResponseData {
 
   factory ResponseData.fromJson(Map<String, dynamic> json) {
     return ResponseData(
-      url: json['url'],
-      status: json['status'],
-      statusText: json['statusText'],
-      headers: Headers.fromJson(json['headers']),
-      headersText: json.containsKey('headersText') ? json['headersText'] : null,
-      mimeType: json['mimeType'],
+      url: json['url'] as String,
+      status: json['status'] as int,
+      statusText: json['statusText'] as String,
+      headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
+      headersText: json.containsKey('headersText')
+          ? json['headersText'] as String
+          : null,
+      mimeType: json['mimeType'] as String,
       requestHeaders: json.containsKey('requestHeaders')
-          ? Headers.fromJson(json['requestHeaders'])
+          ? Headers.fromJson(json['requestHeaders'] as Map<String, dynamic>)
           : null,
       requestHeadersText: json.containsKey('requestHeadersText')
-          ? json['requestHeadersText']
+          ? json['requestHeadersText'] as String
           : null,
-      connectionReused: json['connectionReused'],
-      connectionId: json['connectionId'],
-      remoteIPAddress:
-          json.containsKey('remoteIPAddress') ? json['remoteIPAddress'] : null,
-      remotePort: json.containsKey('remotePort') ? json['remotePort'] : null,
-      fromDiskCache:
-          json.containsKey('fromDiskCache') ? json['fromDiskCache'] : null,
+      connectionReused: json['connectionReused'] as bool,
+      connectionId: json['connectionId'] as num,
+      remoteIPAddress: json.containsKey('remoteIPAddress')
+          ? json['remoteIPAddress'] as String
+          : null,
+      remotePort:
+          json.containsKey('remotePort') ? json['remotePort'] as int : null,
+      fromDiskCache: json.containsKey('fromDiskCache')
+          ? json['fromDiskCache'] as bool
+          : null,
       fromServiceWorker: json.containsKey('fromServiceWorker')
-          ? json['fromServiceWorker']
+          ? json['fromServiceWorker'] as bool
           : null,
       fromPrefetchCache: json.containsKey('fromPrefetchCache')
-          ? json['fromPrefetchCache']
+          ? json['fromPrefetchCache'] as bool
           : null,
-      encodedDataLength: json['encodedDataLength'],
+      encodedDataLength: json['encodedDataLength'] as num,
       timing: json.containsKey('timing')
-          ? ResourceTiming.fromJson(json['timing'])
+          ? ResourceTiming.fromJson(json['timing'] as Map<String, dynamic>)
           : null,
-      protocol: json.containsKey('protocol') ? json['protocol'] : null,
-      securityState: security.SecurityState.fromJson(json['securityState']),
+      protocol:
+          json.containsKey('protocol') ? json['protocol'] as String : null,
+      securityState:
+          security.SecurityState.fromJson(json['securityState'] as String),
       securityDetails: json.containsKey('securityDetails')
-          ? SecurityDetails.fromJson(json['securityDetails'])
+          ? SecurityDetails.fromJson(
+              json['securityDetails'] as Map<String, dynamic>)
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'url': url,
       'status': status,
       'statusText': statusText,
@@ -2145,41 +2096,18 @@ class ResponseData {
       'connectionId': connectionId,
       'encodedDataLength': encodedDataLength,
       'securityState': securityState.toJson(),
+      if (headersText != null) 'headersText': headersText,
+      if (requestHeaders != null) 'requestHeaders': requestHeaders.toJson(),
+      if (requestHeadersText != null) 'requestHeadersText': requestHeadersText,
+      if (remoteIPAddress != null) 'remoteIPAddress': remoteIPAddress,
+      if (remotePort != null) 'remotePort': remotePort,
+      if (fromDiskCache != null) 'fromDiskCache': fromDiskCache,
+      if (fromServiceWorker != null) 'fromServiceWorker': fromServiceWorker,
+      if (fromPrefetchCache != null) 'fromPrefetchCache': fromPrefetchCache,
+      if (timing != null) 'timing': timing.toJson(),
+      if (protocol != null) 'protocol': protocol,
+      if (securityDetails != null) 'securityDetails': securityDetails.toJson(),
     };
-    if (headersText != null) {
-      json['headersText'] = headersText;
-    }
-    if (requestHeaders != null) {
-      json['requestHeaders'] = requestHeaders.toJson();
-    }
-    if (requestHeadersText != null) {
-      json['requestHeadersText'] = requestHeadersText;
-    }
-    if (remoteIPAddress != null) {
-      json['remoteIPAddress'] = remoteIPAddress;
-    }
-    if (remotePort != null) {
-      json['remotePort'] = remotePort;
-    }
-    if (fromDiskCache != null) {
-      json['fromDiskCache'] = fromDiskCache;
-    }
-    if (fromServiceWorker != null) {
-      json['fromServiceWorker'] = fromServiceWorker;
-    }
-    if (fromPrefetchCache != null) {
-      json['fromPrefetchCache'] = fromPrefetchCache;
-    }
-    if (timing != null) {
-      json['timing'] = timing.toJson();
-    }
-    if (protocol != null) {
-      json['protocol'] = protocol;
-    }
-    if (securityDetails != null) {
-      json['securityDetails'] = securityDetails.toJson();
-    }
-    return json;
   }
 }
 
@@ -2192,15 +2120,14 @@ class WebSocketRequest {
 
   factory WebSocketRequest.fromJson(Map<String, dynamic> json) {
     return WebSocketRequest(
-      headers: Headers.fromJson(json['headers']),
+      headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'headers': headers.toJson(),
     };
-    return json;
   }
 }
 
@@ -2234,35 +2161,30 @@ class WebSocketResponse {
 
   factory WebSocketResponse.fromJson(Map<String, dynamic> json) {
     return WebSocketResponse(
-      status: json['status'],
-      statusText: json['statusText'],
-      headers: Headers.fromJson(json['headers']),
-      headersText: json.containsKey('headersText') ? json['headersText'] : null,
+      status: json['status'] as int,
+      statusText: json['statusText'] as String,
+      headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
+      headersText: json.containsKey('headersText')
+          ? json['headersText'] as String
+          : null,
       requestHeaders: json.containsKey('requestHeaders')
-          ? Headers.fromJson(json['requestHeaders'])
+          ? Headers.fromJson(json['requestHeaders'] as Map<String, dynamic>)
           : null,
       requestHeadersText: json.containsKey('requestHeadersText')
-          ? json['requestHeadersText']
+          ? json['requestHeadersText'] as String
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'status': status,
       'statusText': statusText,
       'headers': headers.toJson(),
+      if (headersText != null) 'headersText': headersText,
+      if (requestHeaders != null) 'requestHeaders': requestHeaders.toJson(),
+      if (requestHeadersText != null) 'requestHeadersText': requestHeadersText,
     };
-    if (headersText != null) {
-      json['headersText'] = headersText;
-    }
-    if (requestHeaders != null) {
-      json['requestHeaders'] = requestHeaders.toJson();
-    }
-    if (requestHeadersText != null) {
-      json['requestHeadersText'] = requestHeadersText;
-    }
-    return json;
   }
 }
 
@@ -2284,19 +2206,18 @@ class WebSocketFrame {
 
   factory WebSocketFrame.fromJson(Map<String, dynamic> json) {
     return WebSocketFrame(
-      opcode: json['opcode'],
-      mask: json['mask'],
-      payloadData: json['payloadData'],
+      opcode: json['opcode'] as num,
+      mask: json['mask'] as bool,
+      payloadData: json['payloadData'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'opcode': opcode,
       'mask': mask,
       'payloadData': payloadData,
     };
-    return json;
   }
 }
 
@@ -2322,25 +2243,22 @@ class CachedResource {
 
   factory CachedResource.fromJson(Map<String, dynamic> json) {
     return CachedResource(
-      url: json['url'],
-      type: ResourceType.fromJson(json['type']),
+      url: json['url'] as String,
+      type: ResourceType.fromJson(json['type'] as String),
       response: json.containsKey('response')
-          ? ResponseData.fromJson(json['response'])
+          ? ResponseData.fromJson(json['response'] as Map<String, dynamic>)
           : null,
-      bodySize: json['bodySize'],
+      bodySize: json['bodySize'] as num,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'url': url,
       'type': type.toJson(),
       'bodySize': bodySize,
+      if (response != null) 'response': response.toJson(),
     };
-    if (response != null) {
-      json['response'] = response.toJson();
-    }
-    return json;
   }
 }
 
@@ -2350,7 +2268,7 @@ class Initiator {
   final InitiatorType type;
 
   /// Initiator JavaScript stack trace, set for Script only.
-  final runtime.StackTrace stack;
+  final runtime.StackTraceData stack;
 
   /// Initiator URL, set for Parser type or for Script type (when script is importing module) or for SignedExchange type.
   final String url;
@@ -2363,29 +2281,24 @@ class Initiator {
 
   factory Initiator.fromJson(Map<String, dynamic> json) {
     return Initiator(
-      type: InitiatorType.fromJson(json['type']),
+      type: InitiatorType.fromJson(json['type'] as String),
       stack: json.containsKey('stack')
-          ? runtime.StackTrace.fromJson(json['stack'])
+          ? runtime.StackTraceData.fromJson(
+              json['stack'] as Map<String, dynamic>)
           : null,
-      url: json.containsKey('url') ? json['url'] : null,
-      lineNumber: json.containsKey('lineNumber') ? json['lineNumber'] : null,
+      url: json.containsKey('url') ? json['url'] as String : null,
+      lineNumber:
+          json.containsKey('lineNumber') ? json['lineNumber'] as num : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type,
+      if (stack != null) 'stack': stack.toJson(),
+      if (url != null) 'url': url,
+      if (lineNumber != null) 'lineNumber': lineNumber,
     };
-    if (stack != null) {
-      json['stack'] = stack.toJson();
-    }
-    if (url != null) {
-      json['url'] = url;
-    }
-    if (lineNumber != null) {
-      json['lineNumber'] = lineNumber;
-    }
-    return json;
   }
 }
 
@@ -2468,23 +2381,23 @@ class Cookie {
 
   factory Cookie.fromJson(Map<String, dynamic> json) {
     return Cookie(
-      name: json['name'],
-      value: json['value'],
-      domain: json['domain'],
-      path: json['path'],
-      expires: json['expires'],
-      size: json['size'],
-      httpOnly: json['httpOnly'],
-      secure: json['secure'],
-      session: json['session'],
+      name: json['name'] as String,
+      value: json['value'] as String,
+      domain: json['domain'] as String,
+      path: json['path'] as String,
+      expires: json['expires'] as num,
+      size: json['size'] as int,
+      httpOnly: json['httpOnly'] as bool,
+      secure: json['secure'] as bool,
+      session: json['session'] as bool,
       sameSite: json.containsKey('sameSite')
-          ? CookieSameSite.fromJson(json['sameSite'])
+          ? CookieSameSite.fromJson(json['sameSite'] as String)
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'value': value,
       'domain': domain,
@@ -2494,11 +2407,8 @@ class Cookie {
       'httpOnly': httpOnly,
       'secure': secure,
       'session': session,
+      if (sameSite != null) 'sameSite': sameSite.toJson(),
     };
-    if (sameSite != null) {
-      json['sameSite'] = sameSite.toJson();
-    }
-    return json;
   }
 }
 
@@ -2621,22 +2531,21 @@ class BlockedSetCookieWithReason {
 
   factory BlockedSetCookieWithReason.fromJson(Map<String, dynamic> json) {
     return BlockedSetCookieWithReason(
-      blockedReason: SetCookieBlockedReason.fromJson(json['blockedReason']),
-      cookieLine: json['cookieLine'],
-      cookie:
-          json.containsKey('cookie') ? Cookie.fromJson(json['cookie']) : null,
+      blockedReason:
+          SetCookieBlockedReason.fromJson(json['blockedReason'] as String),
+      cookieLine: json['cookieLine'] as String,
+      cookie: json.containsKey('cookie')
+          ? Cookie.fromJson(json['cookie'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'blockedReason': blockedReason.toJson(),
       'cookieLine': cookieLine,
+      if (cookie != null) 'cookie': cookie.toJson(),
     };
-    if (cookie != null) {
-      json['cookie'] = cookie.toJson();
-    }
-    return json;
   }
 }
 
@@ -2653,17 +2562,17 @@ class BlockedCookieWithReason {
 
   factory BlockedCookieWithReason.fromJson(Map<String, dynamic> json) {
     return BlockedCookieWithReason(
-      blockedReason: CookieBlockedReason.fromJson(json['blockedReason']),
-      cookie: Cookie.fromJson(json['cookie']),
+      blockedReason:
+          CookieBlockedReason.fromJson(json['blockedReason'] as String),
+      cookie: Cookie.fromJson(json['cookie'] as Map<String, dynamic>),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'blockedReason': blockedReason.toJson(),
       'cookie': cookie.toJson(),
     };
-    return json;
   }
 }
 
@@ -2710,49 +2619,34 @@ class CookieParam {
 
   factory CookieParam.fromJson(Map<String, dynamic> json) {
     return CookieParam(
-      name: json['name'],
-      value: json['value'],
-      url: json.containsKey('url') ? json['url'] : null,
-      domain: json.containsKey('domain') ? json['domain'] : null,
-      path: json.containsKey('path') ? json['path'] : null,
-      secure: json.containsKey('secure') ? json['secure'] : null,
-      httpOnly: json.containsKey('httpOnly') ? json['httpOnly'] : null,
+      name: json['name'] as String,
+      value: json['value'] as String,
+      url: json.containsKey('url') ? json['url'] as String : null,
+      domain: json.containsKey('domain') ? json['domain'] as String : null,
+      path: json.containsKey('path') ? json['path'] as String : null,
+      secure: json.containsKey('secure') ? json['secure'] as bool : null,
+      httpOnly: json.containsKey('httpOnly') ? json['httpOnly'] as bool : null,
       sameSite: json.containsKey('sameSite')
-          ? CookieSameSite.fromJson(json['sameSite'])
+          ? CookieSameSite.fromJson(json['sameSite'] as String)
           : null,
       expires: json.containsKey('expires')
-          ? TimeSinceEpoch.fromJson(json['expires'])
+          ? TimeSinceEpoch.fromJson(json['expires'] as num)
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'value': value,
+      if (url != null) 'url': url,
+      if (domain != null) 'domain': domain,
+      if (path != null) 'path': path,
+      if (secure != null) 'secure': secure,
+      if (httpOnly != null) 'httpOnly': httpOnly,
+      if (sameSite != null) 'sameSite': sameSite.toJson(),
+      if (expires != null) 'expires': expires.toJson(),
     };
-    if (url != null) {
-      json['url'] = url;
-    }
-    if (domain != null) {
-      json['domain'] = domain;
-    }
-    if (path != null) {
-      json['path'] = path;
-    }
-    if (secure != null) {
-      json['secure'] = secure;
-    }
-    if (httpOnly != null) {
-      json['httpOnly'] = httpOnly;
-    }
-    if (sameSite != null) {
-      json['sameSite'] = sameSite.toJson();
-    }
-    if (expires != null) {
-      json['expires'] = expires.toJson();
-    }
-    return json;
   }
 }
 
@@ -2779,24 +2673,21 @@ class AuthChallenge {
   factory AuthChallenge.fromJson(Map<String, dynamic> json) {
     return AuthChallenge(
       source: json.containsKey('source')
-          ? AuthChallengeSource.fromJson(json['source'])
+          ? AuthChallengeSource.fromJson(json['source'] as String)
           : null,
-      origin: json['origin'],
-      scheme: json['scheme'],
-      realm: json['realm'],
+      origin: json['origin'] as String,
+      scheme: json['scheme'] as String,
+      realm: json['realm'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'origin': origin,
       'scheme': scheme,
       'realm': realm,
+      if (source != null) 'source': source,
     };
-    if (source != null) {
-      json['source'] = source;
-    }
-    return json;
   }
 }
 
@@ -2847,23 +2738,21 @@ class AuthChallengeResponse {
 
   factory AuthChallengeResponse.fromJson(Map<String, dynamic> json) {
     return AuthChallengeResponse(
-      response: AuthChallengeResponseResponse.fromJson(json['response']),
-      username: json.containsKey('username') ? json['username'] : null,
-      password: json.containsKey('password') ? json['password'] : null,
+      response:
+          AuthChallengeResponseResponse.fromJson(json['response'] as String),
+      username:
+          json.containsKey('username') ? json['username'] as String : null,
+      password:
+          json.containsKey('password') ? json['password'] as String : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'response': response,
+      if (username != null) 'username': username,
+      if (password != null) 'password': password,
     };
-    if (username != null) {
-      json['username'] = username;
-    }
-    if (password != null) {
-      json['password'] = password;
-    }
-    return json;
   }
 }
 
@@ -2943,28 +2832,24 @@ class RequestPattern {
 
   factory RequestPattern.fromJson(Map<String, dynamic> json) {
     return RequestPattern(
-      urlPattern: json.containsKey('urlPattern') ? json['urlPattern'] : null,
+      urlPattern:
+          json.containsKey('urlPattern') ? json['urlPattern'] as String : null,
       resourceType: json.containsKey('resourceType')
-          ? ResourceType.fromJson(json['resourceType'])
+          ? ResourceType.fromJson(json['resourceType'] as String)
           : null,
       interceptionStage: json.containsKey('interceptionStage')
-          ? InterceptionStage.fromJson(json['interceptionStage'])
+          ? InterceptionStage.fromJson(json['interceptionStage'] as String)
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{};
-    if (urlPattern != null) {
-      json['urlPattern'] = urlPattern;
-    }
-    if (resourceType != null) {
-      json['resourceType'] = resourceType.toJson();
-    }
-    if (interceptionStage != null) {
-      json['interceptionStage'] = interceptionStage.toJson();
-    }
-    return json;
+    return {
+      if (urlPattern != null) 'urlPattern': urlPattern,
+      if (resourceType != null) 'resourceType': resourceType.toJson(),
+      if (interceptionStage != null)
+        'interceptionStage': interceptionStage.toJson(),
+    };
   }
 }
 
@@ -3011,14 +2896,15 @@ class SignedExchangeSignature {
 
   factory SignedExchangeSignature.fromJson(Map<String, dynamic> json) {
     return SignedExchangeSignature(
-      label: json['label'],
-      signature: json['signature'],
-      integrity: json['integrity'],
-      certUrl: json.containsKey('certUrl') ? json['certUrl'] : null,
-      certSha256: json.containsKey('certSha256') ? json['certSha256'] : null,
-      validityUrl: json['validityUrl'],
-      date: json['date'],
-      expires: json['expires'],
+      label: json['label'] as String,
+      signature: json['signature'] as String,
+      integrity: json['integrity'] as String,
+      certUrl: json.containsKey('certUrl') ? json['certUrl'] as String : null,
+      certSha256:
+          json.containsKey('certSha256') ? json['certSha256'] as String : null,
+      validityUrl: json['validityUrl'] as String,
+      date: json['date'] as int,
+      expires: json['expires'] as int,
       certificates: json.containsKey('certificates')
           ? (json['certificates'] as List).map((e) => e as String).toList()
           : null,
@@ -3026,24 +2912,17 @@ class SignedExchangeSignature {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'label': label,
       'signature': signature,
       'integrity': integrity,
       'validityUrl': validityUrl,
       'date': date,
       'expires': expires,
+      if (certUrl != null) 'certUrl': certUrl,
+      if (certSha256 != null) 'certSha256': certSha256,
+      if (certificates != null) 'certificates': [...certificates],
     };
-    if (certUrl != null) {
-      json['certUrl'] = certUrl;
-    }
-    if (certSha256 != null) {
-      json['certSha256'] = certSha256;
-    }
-    if (certificates != null) {
-      json['certificates'] = certificates.map((e) => e).toList();
-    }
-    return json;
   }
 }
 
@@ -3074,25 +2953,26 @@ class SignedExchangeHeader {
 
   factory SignedExchangeHeader.fromJson(Map<String, dynamic> json) {
     return SignedExchangeHeader(
-      requestUrl: json['requestUrl'],
-      responseCode: json['responseCode'],
-      responseHeaders: Headers.fromJson(json['responseHeaders']),
+      requestUrl: json['requestUrl'] as String,
+      responseCode: json['responseCode'] as int,
+      responseHeaders:
+          Headers.fromJson(json['responseHeaders'] as Map<String, dynamic>),
       signatures: (json['signatures'] as List)
-          .map((e) => SignedExchangeSignature.fromJson(e))
+          .map((e) =>
+              SignedExchangeSignature.fromJson(e as Map<String, dynamic>))
           .toList(),
-      headerIntegrity: json['headerIntegrity'],
+      headerIntegrity: json['headerIntegrity'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'requestUrl': requestUrl,
       'responseCode': responseCode,
       'responseHeaders': responseHeaders.toJson(),
       'signatures': signatures.map((e) => e.toJson()).toList(),
       'headerIntegrity': headerIntegrity,
     };
-    return json;
   }
 }
 
@@ -3154,26 +3034,22 @@ class SignedExchangeError {
 
   factory SignedExchangeError.fromJson(Map<String, dynamic> json) {
     return SignedExchangeError(
-      message: json['message'],
-      signatureIndex:
-          json.containsKey('signatureIndex') ? json['signatureIndex'] : null,
+      message: json['message'] as String,
+      signatureIndex: json.containsKey('signatureIndex')
+          ? json['signatureIndex'] as int
+          : null,
       errorField: json.containsKey('errorField')
-          ? SignedExchangeErrorField.fromJson(json['errorField'])
+          ? SignedExchangeErrorField.fromJson(json['errorField'] as String)
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'message': message,
+      if (signatureIndex != null) 'signatureIndex': signatureIndex,
+      if (errorField != null) 'errorField': errorField.toJson(),
     };
-    if (signatureIndex != null) {
-      json['signatureIndex'] = signatureIndex;
-    }
-    if (errorField != null) {
-      json['errorField'] = errorField.toJson();
-    }
-    return json;
   }
 }
 
@@ -3199,34 +3075,31 @@ class SignedExchangeInfo {
 
   factory SignedExchangeInfo.fromJson(Map<String, dynamic> json) {
     return SignedExchangeInfo(
-      outerResponse: ResponseData.fromJson(json['outerResponse']),
+      outerResponse:
+          ResponseData.fromJson(json['outerResponse'] as Map<String, dynamic>),
       header: json.containsKey('header')
-          ? SignedExchangeHeader.fromJson(json['header'])
+          ? SignedExchangeHeader.fromJson(
+              json['header'] as Map<String, dynamic>)
           : null,
       securityDetails: json.containsKey('securityDetails')
-          ? SecurityDetails.fromJson(json['securityDetails'])
+          ? SecurityDetails.fromJson(
+              json['securityDetails'] as Map<String, dynamic>)
           : null,
       errors: json.containsKey('errors')
           ? (json['errors'] as List)
-              .map((e) => SignedExchangeError.fromJson(e))
+              .map((e) =>
+                  SignedExchangeError.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'outerResponse': outerResponse.toJson(),
+      if (header != null) 'header': header.toJson(),
+      if (securityDetails != null) 'securityDetails': securityDetails.toJson(),
+      if (errors != null) 'errors': errors.map((e) => e.toJson()).toList(),
     };
-    if (header != null) {
-      json['header'] = header.toJson();
-    }
-    if (securityDetails != null) {
-      json['securityDetails'] = securityDetails.toJson();
-    }
-    if (errors != null) {
-      json['errors'] = errors.map((e) => e.toJson()).toList();
-    }
-    return json;
   }
 }

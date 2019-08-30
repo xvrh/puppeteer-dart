@@ -83,7 +83,7 @@ class Page {
   final Tracing tracing;
   final Accessibility accessibility;
   FrameManager _frameManager;
-  final StreamController _workerCreated = StreamController<Worker>.broadcast(),
+  final _workerCreated = StreamController<Worker>.broadcast(),
       _workerDestroyed = StreamController<Worker>.broadcast(),
       _onErrorController = StreamController<ClientError>.broadcast(),
       _onPopupController = StreamController<Page>.broadcast(),
@@ -262,7 +262,7 @@ class Page {
     });
   }
 
-  Session get session => devTools.client;
+  Session get session => devTools.client as Session;
 
   /// Get the browser the page belongs to.
   Browser get browser => target.browser;
@@ -433,7 +433,7 @@ class Page {
   }
 
   void _addConsoleMessage(ConsoleAPICalledEventType type, List<JsHandle> args,
-      StackTrace stackTrace) {
+      StackTraceData stackTrace) {
     if (!_onConsoleController.hasListener) {
       args.forEach((arg) => arg.dispose());
       return;
@@ -551,7 +551,8 @@ class Page {
   ///
   /// returns: Future which resolves to the return value of `pageFunction` as
   /// in-page object (JSHandle)
-  Future<JsHandle> evaluateHandle(@Language('js') String pageFunction,
+  Future<T> evaluateHandle<T extends JsHandle>(
+      @Language('js') String pageFunction,
       {List args}) async {
     var context = await mainFrame.executionContext;
     return context.evaluateHandle(pageFunction, args: args);
@@ -790,8 +791,8 @@ function addPageBinding(bindingName) {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   page.onConsole.listen((msg) => print(msg.text));
-  ///   await page.exposeFunction(
-  ///       'md5', (text) => crypto.md5.convert(utf8.encode(text)).toString());
+  ///   await page.exposeFunction('md5',
+  ///       (String text) => crypto.md5.convert(utf8.encode(text)).toString());
   ///   await page.evaluate(r'''async () => {
   ///             // use window.md5 to compute hashes
   ///             const myString = 'PUPPETEER';
@@ -893,10 +894,10 @@ function addPageBinding(bindingName) {
   }
 
   Future _onBindingCalled(BindingCalledEvent event) async {
-    Map<String, dynamic> payload = jsonDecode(event.payload);
-    String name = payload['name'];
-    int seq = payload['seq'];
-    List args = payload['args'];
+    var payload = jsonDecode(event.payload) as Map<String, dynamic>;
+    var name = payload['name'] as String;
+    var seq = payload['seq'] as int;
+    var args = payload['args'] as List;
 
     String expression;
     try {
@@ -1224,7 +1225,7 @@ function deliverError(name, seq, message, stack) {
   ///
   /// > **NOTE** changing this value won't affect scripts that have already been
   /// run. It will take full effect on the next [navigation].
-  Future<void> setJavaScriptEnabled(enabled) async {
+  Future<void> setJavaScriptEnabled(bool enabled) async {
     if (_javascriptEnabled == enabled) {
       return;
     }
@@ -1347,7 +1348,7 @@ function deliverError(name, seq, message, stack) {
 
   /// Toggles ignoring cache for each request based on the enabled state. By
   /// default, caching is enabled.
-  Future<void> setCacheEnabled(enabled) {
+  Future<void> setCacheEnabled(bool enabled) {
     return _frameManager.networkManager.setCacheEnabled(enabled);
   }
 
@@ -1371,7 +1372,7 @@ function deliverError(name, seq, message, stack) {
       {ScreenshotFormat format,
       bool fullPage,
       Rectangle clip,
-      num quality,
+      int quality,
       bool omitBackground}) async {
     return base64Decode(await screenshotBase64(
         format: format,
@@ -1401,7 +1402,7 @@ function deliverError(name, seq, message, stack) {
       {ScreenshotFormat format,
       bool fullPage,
       Rectangle clip,
-      num quality,
+      int quality,
       bool omitBackground}) {
     format ??= ScreenshotFormat.png;
     fullPage ??= false;
@@ -1440,8 +1441,11 @@ function deliverError(name, seq, message, stack) {
         var screenOrientation = viewport.isLandscape
             ? EmulationManager.landscape
             : EmulationManager.portrait;
-        await devTools.emulation.setDeviceMetricsOverride(roundedClip.width,
-            roundedClip.height, viewport.deviceScaleFactor, viewport.isMobile,
+        await devTools.emulation.setDeviceMetricsOverride(
+            roundedClip.width.toInt(),
+            roundedClip.height.toInt(),
+            viewport.deviceScaleFactor,
+            viewport.isMobile,
             screenOrientation: screenOrientation);
       }
       var shouldSetDefaultBackground =
@@ -2037,7 +2041,7 @@ class ClientError implements Exception {
 
   static String _message(ExceptionDetails details) {
     if (details.exception != null) {
-      return details.exception.description ?? details.exception.value;
+      return details.exception.description ?? details.exception.value as String;
     } else {
       var message = details.text;
       if (details.stackTrace != null) {

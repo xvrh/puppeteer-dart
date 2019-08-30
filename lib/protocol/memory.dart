@@ -24,19 +24,17 @@ class MemoryApi {
   /// Enable/disable suppressing memory pressure notifications in all processes.
   /// [suppressed] If true, memory pressure notifications will be suppressed.
   Future<void> setPressureNotificationsSuppressed(bool suppressed) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Memory.setPressureNotificationsSuppressed', {
       'suppressed': suppressed,
-    };
-    await _client.send('Memory.setPressureNotificationsSuppressed', parameters);
+    });
   }
 
   /// Simulate a memory pressure notification in all processes.
   /// [level] Memory pressure level of the notification.
   Future<void> simulatePressureNotification(PressureLevel level) async {
-    var parameters = <String, dynamic>{
-      'level': level.toJson(),
-    };
-    await _client.send('Memory.simulatePressureNotification', parameters);
+    await _client.send('Memory.simulatePressureNotification', {
+      'level': level,
+    });
   }
 
   /// Start collecting native memory profile.
@@ -44,14 +42,10 @@ class MemoryApi {
   /// [suppressRandomness] Do not randomize intervals between samples.
   Future<void> startSampling(
       {int samplingInterval, bool suppressRandomness}) async {
-    var parameters = <String, dynamic>{};
-    if (samplingInterval != null) {
-      parameters['samplingInterval'] = samplingInterval;
-    }
-    if (suppressRandomness != null) {
-      parameters['suppressRandomness'] = suppressRandomness;
-    }
-    await _client.send('Memory.startSampling', parameters);
+    await _client.send('Memory.startSampling', {
+      if (samplingInterval != null) 'samplingInterval': samplingInterval,
+      if (suppressRandomness != null) 'suppressRandomness': suppressRandomness,
+    });
   }
 
   /// Stop collecting native memory profile.
@@ -63,21 +57,21 @@ class MemoryApi {
   /// collected since renderer process startup.
   Future<SamplingProfile> getAllTimeSamplingProfile() async {
     var result = await _client.send('Memory.getAllTimeSamplingProfile');
-    return SamplingProfile.fromJson(result['profile']);
+    return SamplingProfile.fromJson(result['profile'] as Map<String, dynamic>);
   }
 
   /// Retrieve native memory allocations profile
   /// collected since browser process startup.
   Future<SamplingProfile> getBrowserSamplingProfile() async {
     var result = await _client.send('Memory.getBrowserSamplingProfile');
-    return SamplingProfile.fromJson(result['profile']);
+    return SamplingProfile.fromJson(result['profile'] as Map<String, dynamic>);
   }
 
   /// Retrieve native memory allocations profile collected since last
   /// `startSampling` call.
   Future<SamplingProfile> getSamplingProfile() async {
     var result = await _client.send('Memory.getSamplingProfile');
-    return SamplingProfile.fromJson(result['profile']);
+    return SamplingProfile.fromJson(result['profile'] as Map<String, dynamic>);
   }
 }
 
@@ -95,9 +89,9 @@ class GetDOMCountersResult {
 
   factory GetDOMCountersResult.fromJson(Map<String, dynamic> json) {
     return GetDOMCountersResult(
-      documents: json['documents'],
-      nodes: json['nodes'],
-      jsEventListeners: json['jsEventListeners'],
+      documents: json['documents'] as int,
+      nodes: json['nodes'] as int,
+      jsEventListeners: json['jsEventListeners'] as int,
     );
   }
 }
@@ -146,19 +140,18 @@ class SamplingProfileNode {
 
   factory SamplingProfileNode.fromJson(Map<String, dynamic> json) {
     return SamplingProfileNode(
-      size: json['size'],
-      total: json['total'],
+      size: json['size'] as num,
+      total: json['total'] as num,
       stack: (json['stack'] as List).map((e) => e as String).toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'size': size,
       'total': total,
-      'stack': stack.map((e) => e).toList(),
+      'stack': [...stack],
     };
-    return json;
   }
 }
 
@@ -173,19 +166,19 @@ class SamplingProfile {
   factory SamplingProfile.fromJson(Map<String, dynamic> json) {
     return SamplingProfile(
       samples: (json['samples'] as List)
-          .map((e) => SamplingProfileNode.fromJson(e))
+          .map((e) => SamplingProfileNode.fromJson(e as Map<String, dynamic>))
           .toList(),
-      modules:
-          (json['modules'] as List).map((e) => Module.fromJson(e)).toList(),
+      modules: (json['modules'] as List)
+          .map((e) => Module.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'samples': samples.map((e) => e.toJson()).toList(),
       'modules': modules.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -212,20 +205,19 @@ class Module {
 
   factory Module.fromJson(Map<String, dynamic> json) {
     return Module(
-      name: json['name'],
-      uuid: json['uuid'],
-      baseAddress: json['baseAddress'],
-      size: json['size'],
+      name: json['name'] as String,
+      uuid: json['uuid'] as String,
+      baseAddress: json['baseAddress'] as String,
+      size: json['size'] as num,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'uuid': uuid,
       'baseAddress': baseAddress,
       'size': size,
     };
-    return json;
   }
 }

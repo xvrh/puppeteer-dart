@@ -29,17 +29,18 @@ class PerformanceApi {
   Future<void> setTimeDomain(
       @Enum(['timeTicks', 'threadTicks']) String timeDomain) async {
     assert(const ['timeTicks', 'threadTicks'].contains(timeDomain));
-    var parameters = <String, dynamic>{
+    await _client.send('Performance.setTimeDomain', {
       'timeDomain': timeDomain,
-    };
-    await _client.send('Performance.setTimeDomain', parameters);
+    });
   }
 
   /// Retrieve current values of run-time metrics.
   /// Returns: Current values for run-time metrics.
   Future<List<Metric>> getMetrics() async {
     var result = await _client.send('Performance.getMetrics');
-    return (result['metrics'] as List).map((e) => Metric.fromJson(e)).toList();
+    return (result['metrics'] as List)
+        .map((e) => Metric.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 }
 
@@ -54,9 +55,10 @@ class MetricsEvent {
 
   factory MetricsEvent.fromJson(Map<String, dynamic> json) {
     return MetricsEvent(
-      metrics:
-          (json['metrics'] as List).map((e) => Metric.fromJson(e)).toList(),
-      title: json['title'],
+      metrics: (json['metrics'] as List)
+          .map((e) => Metric.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      title: json['title'] as String,
     );
   }
 }
@@ -73,16 +75,15 @@ class Metric {
 
   factory Metric.fromJson(Map<String, dynamic> json) {
     return Metric(
-      name: json['name'],
-      value: json['value'],
+      name: json['name'] as String,
+      value: json['value'] as num,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'value': value,
     };
-    return json;
   }
 }

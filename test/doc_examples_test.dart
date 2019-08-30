@@ -274,8 +274,10 @@ main() {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           page.onConsole.listen((msg) => print(msg.text));
-          await page.exposeFunction('md5',
-              (text) => crypto.md5.convert(utf8.encode(text)).toString());
+          await page.exposeFunction(
+              'md5',
+              (String text) =>
+                  crypto.md5.convert(utf8.encode(text)).toString());
           await page.evaluate(r'''async () => {
             // use window.md5 to compute hashes
             const myString = 'PUPPETEER';
@@ -756,7 +758,7 @@ main() {
       var handle = await page.evaluateHandle('() => ({window, document})');
       var properties = await handle.properties;
       JsHandle windowHandle = properties['window'];
-      ElementHandle documentHandle = properties['document'];
+      var documentHandle = properties['document'] as ElementHandle;
       await handle.dispose();
       //----
       expect(windowHandle, isNotNull);

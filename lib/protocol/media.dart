@@ -27,7 +27,7 @@ class MediaApi {
   Stream<List<PlayerId>> get onPlayersCreated => _client.onEvent
       .where((event) => event.name == 'Media.playersCreated')
       .map((event) => (event.parameters['players'] as List)
-          .map((e) => PlayerId.fromJson(e))
+          .map((e) => PlayerId.fromJson(e as String))
           .toList());
 
   /// Enables the Media domain
@@ -51,9 +51,9 @@ class PlayerPropertiesChangedEvent {
 
   factory PlayerPropertiesChangedEvent.fromJson(Map<String, dynamic> json) {
     return PlayerPropertiesChangedEvent(
-      playerId: PlayerId.fromJson(json['playerId']),
+      playerId: PlayerId.fromJson(json['playerId'] as String),
       properties: (json['properties'] as List)
-          .map((e) => PlayerProperty.fromJson(e))
+          .map((e) => PlayerProperty.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -68,9 +68,10 @@ class PlayerEventsAddedEvent {
 
   factory PlayerEventsAddedEvent.fromJson(Map<String, dynamic> json) {
     return PlayerEventsAddedEvent(
-      playerId: PlayerId.fromJson(json['playerId']),
-      events:
-          (json['events'] as List).map((e) => PlayerEvent.fromJson(e)).toList(),
+      playerId: PlayerId.fromJson(json['playerId'] as String),
+      events: (json['events'] as List)
+          .map((e) => PlayerEvent.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -126,19 +127,16 @@ class PlayerProperty {
 
   factory PlayerProperty.fromJson(Map<String, dynamic> json) {
     return PlayerProperty(
-      name: json['name'],
-      value: json.containsKey('value') ? json['value'] : null,
+      name: json['name'] as String,
+      value: json.containsKey('value') ? json['value'] as String : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
+      if (value != null) 'value': value,
     };
-    if (value != null) {
-      json['value'] = value;
-    }
-    return json;
   }
 }
 
@@ -191,20 +189,19 @@ class PlayerEvent {
 
   factory PlayerEvent.fromJson(Map<String, dynamic> json) {
     return PlayerEvent(
-      type: PlayerEventType.fromJson(json['type']),
-      timestamp: Timestamp.fromJson(json['timestamp']),
-      name: json['name'],
-      value: json['value'],
+      type: PlayerEventType.fromJson(json['type'] as String),
+      timestamp: Timestamp.fromJson(json['timestamp'] as num),
+      name: json['name'] as String,
+      value: json['value'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type.toJson(),
       'timestamp': timestamp.toJson(),
       'name': name,
       'value': value,
     };
-    return json;
   }
 }

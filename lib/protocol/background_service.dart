@@ -23,39 +23,35 @@ class BackgroundServiceApi {
       .where((event) =>
           event.name == 'BackgroundService.backgroundServiceEventReceived')
       .map((event) => BackgroundServiceEvent.fromJson(
-          event.parameters['backgroundServiceEvent']));
+          event.parameters['backgroundServiceEvent'] as Map<String, dynamic>));
 
   /// Enables event updates for the service.
   Future<void> startObserving(ServiceName service) async {
-    var parameters = <String, dynamic>{
-      'service': service.toJson(),
-    };
-    await _client.send('BackgroundService.startObserving', parameters);
+    await _client.send('BackgroundService.startObserving', {
+      'service': service,
+    });
   }
 
   /// Disables event updates for the service.
   Future<void> stopObserving(ServiceName service) async {
-    var parameters = <String, dynamic>{
-      'service': service.toJson(),
-    };
-    await _client.send('BackgroundService.stopObserving', parameters);
+    await _client.send('BackgroundService.stopObserving', {
+      'service': service,
+    });
   }
 
   /// Set the recording state for the service.
   Future<void> setRecording(bool shouldRecord, ServiceName service) async {
-    var parameters = <String, dynamic>{
+    await _client.send('BackgroundService.setRecording', {
       'shouldRecord': shouldRecord,
-      'service': service.toJson(),
-    };
-    await _client.send('BackgroundService.setRecording', parameters);
+      'service': service,
+    });
   }
 
   /// Clears all stored data for the service.
   Future<void> clearEvents(ServiceName service) async {
-    var parameters = <String, dynamic>{
-      'service': service.toJson(),
-    };
-    await _client.send('BackgroundService.clearEvents', parameters);
+    await _client.send('BackgroundService.clearEvents', {
+      'service': service,
+    });
   }
 }
 
@@ -69,8 +65,8 @@ class RecordingStateChangedEvent {
 
   factory RecordingStateChangedEvent.fromJson(Map<String, dynamic> json) {
     return RecordingStateChangedEvent(
-      isRecording: json['isRecording'],
-      service: ServiceName.fromJson(json['service']),
+      isRecording: json['isRecording'] as bool,
+      service: ServiceName.fromJson(json['service'] as String),
     );
   }
 }
@@ -123,17 +119,16 @@ class EventMetadata {
 
   factory EventMetadata.fromJson(Map<String, dynamic> json) {
     return EventMetadata(
-      key: json['key'],
-      value: json['value'],
+      key: json['key'] as String,
+      value: json['value'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'key': key,
       'value': value,
     };
-    return json;
   }
 }
 
@@ -170,21 +165,21 @@ class BackgroundServiceEvent {
 
   factory BackgroundServiceEvent.fromJson(Map<String, dynamic> json) {
     return BackgroundServiceEvent(
-      timestamp: network.TimeSinceEpoch.fromJson(json['timestamp']),
-      origin: json['origin'],
+      timestamp: network.TimeSinceEpoch.fromJson(json['timestamp'] as num),
+      origin: json['origin'] as String,
       serviceWorkerRegistrationId: service_worker.RegistrationID.fromJson(
-          json['serviceWorkerRegistrationId']),
-      service: ServiceName.fromJson(json['service']),
-      eventName: json['eventName'],
-      instanceId: json['instanceId'],
+          json['serviceWorkerRegistrationId'] as String),
+      service: ServiceName.fromJson(json['service'] as String),
+      eventName: json['eventName'] as String,
+      instanceId: json['instanceId'] as String,
       eventMetadata: (json['eventMetadata'] as List)
-          .map((e) => EventMetadata.fromJson(e))
+          .map((e) => EventMetadata.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'timestamp': timestamp.toJson(),
       'origin': origin,
       'serviceWorkerRegistrationId': serviceWorkerRegistrationId.toJson(),
@@ -193,6 +188,5 @@ class BackgroundServiceEvent {
       'instanceId': instanceId,
       'eventMetadata': eventMetadata.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }

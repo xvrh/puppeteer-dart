@@ -14,7 +14,7 @@ const deviceUrl =
 main() async {
   var content = await read(deviceUrl);
 
-  var module = Module.fromJson(jsonDecode(content));
+  var module = Module.fromJson(jsonDecode(content) as Map<String, dynamic>);
 
   var buffer = StringBuffer();
   buffer.writeln("import 'dart:collection';");

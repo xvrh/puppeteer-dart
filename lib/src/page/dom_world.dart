@@ -55,7 +55,8 @@ class DomWorld {
     return _contextCompleter.future;
   }
 
-  Future<JsHandle> evaluateHandle(@Language('js') String pageFunction,
+  Future<T> evaluateHandle<T extends JsHandle>(
+      @Language('js') String pageFunction,
       {List args}) async {
     var context = await executionContext;
     return context.evaluateHandle(pageFunction, args: args);
@@ -84,7 +85,7 @@ class DomWorld {
     return _documentFuture;
   }
 
-  Future<List<ElementHandle>> $x(expression) async {
+  Future<List<ElementHandle>> $x(String expression) async {
     var document = await _document;
     var value = await document.$x(expression);
     return value;
@@ -480,7 +481,7 @@ class WaitTask {
       // Ignore timeouts in pageScript - we track timeouts ourselves.
       // If the frame's execution context has already changed, `frame.evaluate` will
       // throw an error - ignore this predicate run altogether.
-      if (await domWorld.evaluate('function(s) { return !s; }',
+      if (await domWorld.evaluate<bool>('function(s) { return !s; }',
           args: [success]).catchError((_) => true)) {
         await success.dispose();
         return;

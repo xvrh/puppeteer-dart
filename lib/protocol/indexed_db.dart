@@ -14,12 +14,11 @@ class IndexedDBApi {
   /// [objectStoreName] Object store name.
   Future<void> clearObjectStore(String securityOrigin, String databaseName,
       String objectStoreName) async {
-    var parameters = <String, dynamic>{
+    await _client.send('IndexedDB.clearObjectStore', {
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
-    };
-    await _client.send('IndexedDB.clearObjectStore', parameters);
+    });
   }
 
   /// Deletes a database.
@@ -27,24 +26,22 @@ class IndexedDBApi {
   /// [databaseName] Database name.
   Future<void> deleteDatabase(
       String securityOrigin, String databaseName) async {
-    var parameters = <String, dynamic>{
+    await _client.send('IndexedDB.deleteDatabase', {
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
-    };
-    await _client.send('IndexedDB.deleteDatabase', parameters);
+    });
   }
 
   /// Delete a range of entries from an object store
   /// [keyRange] Range of entry keys to delete
   Future<void> deleteObjectStoreEntries(String securityOrigin,
       String databaseName, String objectStoreName, KeyRange keyRange) async {
-    var parameters = <String, dynamic>{
+    await _client.send('IndexedDB.deleteObjectStoreEntries', {
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
-      'keyRange': keyRange.toJson(),
-    };
-    await _client.send('IndexedDB.deleteObjectStoreEntries', parameters);
+      'keyRange': keyRange,
+    });
   }
 
   /// Disables events from backend.
@@ -73,18 +70,15 @@ class IndexedDBApi {
       int skipCount,
       int pageSize,
       {KeyRange keyRange}) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('IndexedDB.requestData', {
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
       'indexName': indexName,
       'skipCount': skipCount,
       'pageSize': pageSize,
-    };
-    if (keyRange != null) {
-      parameters['keyRange'] = keyRange.toJson();
-    }
-    var result = await _client.send('IndexedDB.requestData', parameters);
+      if (keyRange != null) 'keyRange': keyRange,
+    });
     return RequestDataResult.fromJson(result);
   }
 
@@ -94,12 +88,11 @@ class IndexedDBApi {
   /// [objectStoreName] Object store name.
   Future<GetMetadataResult> getMetadata(String securityOrigin,
       String databaseName, String objectStoreName) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('IndexedDB.getMetadata', {
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
-    };
-    var result = await _client.send('IndexedDB.getMetadata', parameters);
+    });
     return GetMetadataResult.fromJson(result);
   }
 
@@ -109,24 +102,21 @@ class IndexedDBApi {
   /// Returns: Database with an array of object stores.
   Future<DatabaseWithObjectStores> requestDatabase(
       String securityOrigin, String databaseName) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('IndexedDB.requestDatabase', {
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
-    };
-    var result = await _client.send('IndexedDB.requestDatabase', parameters);
+    });
     return DatabaseWithObjectStores.fromJson(
-        result['databaseWithObjectStores']);
+        result['databaseWithObjectStores'] as Map<String, dynamic>);
   }
 
   /// Requests database names for given security origin.
   /// [securityOrigin] Security origin.
   /// Returns: Database names for origin.
   Future<List<String>> requestDatabaseNames(String securityOrigin) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('IndexedDB.requestDatabaseNames', {
       'securityOrigin': securityOrigin,
-    };
-    var result =
-        await _client.send('IndexedDB.requestDatabaseNames', parameters);
+    });
     return (result['databaseNames'] as List).map((e) => e as String).toList();
   }
 }
@@ -144,9 +134,9 @@ class RequestDataResult {
   factory RequestDataResult.fromJson(Map<String, dynamic> json) {
     return RequestDataResult(
       objectStoreDataEntries: (json['objectStoreDataEntries'] as List)
-          .map((e) => DataEntry.fromJson(e))
+          .map((e) => DataEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
-      hasMore: json['hasMore'],
+      hasMore: json['hasMore'] as bool,
     );
   }
 }
@@ -165,8 +155,8 @@ class GetMetadataResult {
 
   factory GetMetadataResult.fromJson(Map<String, dynamic> json) {
     return GetMetadataResult(
-      entriesCount: json['entriesCount'],
-      keyGeneratorValue: json['keyGeneratorValue'],
+      entriesCount: json['entriesCount'] as num,
+      keyGeneratorValue: json['keyGeneratorValue'] as num,
     );
   }
 }
@@ -190,21 +180,20 @@ class DatabaseWithObjectStores {
 
   factory DatabaseWithObjectStores.fromJson(Map<String, dynamic> json) {
     return DatabaseWithObjectStores(
-      name: json['name'],
-      version: json['version'],
+      name: json['name'] as String,
+      version: json['version'] as num,
       objectStores: (json['objectStores'] as List)
-          .map((e) => ObjectStore.fromJson(e))
+          .map((e) => ObjectStore.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'version': version,
       'objectStores': objectStores.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -230,23 +219,22 @@ class ObjectStore {
 
   factory ObjectStore.fromJson(Map<String, dynamic> json) {
     return ObjectStore(
-      name: json['name'],
-      keyPath: KeyPath.fromJson(json['keyPath']),
-      autoIncrement: json['autoIncrement'],
+      name: json['name'] as String,
+      keyPath: KeyPath.fromJson(json['keyPath'] as Map<String, dynamic>),
+      autoIncrement: json['autoIncrement'] as bool,
       indexes: (json['indexes'] as List)
-          .map((e) => ObjectStoreIndex.fromJson(e))
+          .map((e) => ObjectStoreIndex.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'keyPath': keyPath.toJson(),
       'autoIncrement': autoIncrement,
       'indexes': indexes.map((e) => e.toJson()).toList(),
     };
-    return json;
   }
 }
 
@@ -272,21 +260,20 @@ class ObjectStoreIndex {
 
   factory ObjectStoreIndex.fromJson(Map<String, dynamic> json) {
     return ObjectStoreIndex(
-      name: json['name'],
-      keyPath: KeyPath.fromJson(json['keyPath']),
-      unique: json['unique'],
-      multiEntry: json['multiEntry'],
+      name: json['name'] as String,
+      keyPath: KeyPath.fromJson(json['keyPath'] as Map<String, dynamic>),
+      unique: json['unique'] as bool,
+      multiEntry: json['multiEntry'] as bool,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'keyPath': keyPath.toJson(),
       'unique': unique,
       'multiEntry': multiEntry,
     };
-    return json;
   }
 }
 
@@ -311,33 +298,26 @@ class Key {
 
   factory Key.fromJson(Map<String, dynamic> json) {
     return Key(
-      type: KeyType.fromJson(json['type']),
-      number: json.containsKey('number') ? json['number'] : null,
-      string: json.containsKey('string') ? json['string'] : null,
-      date: json.containsKey('date') ? json['date'] : null,
+      type: KeyType.fromJson(json['type'] as String),
+      number: json.containsKey('number') ? json['number'] as num : null,
+      string: json.containsKey('string') ? json['string'] as String : null,
+      date: json.containsKey('date') ? json['date'] as num : null,
       array: json.containsKey('array')
-          ? (json['array'] as List).map((e) => Key.fromJson(e)).toList()
+          ? (json['array'] as List)
+              .map((e) => Key.fromJson(e as Map<String, dynamic>))
+              .toList()
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type,
+      if (number != null) 'number': number,
+      if (string != null) 'string': string,
+      if (date != null) 'date': date,
+      if (array != null) 'array': array.map((e) => e.toJson()).toList(),
     };
-    if (number != null) {
-      json['number'] = number;
-    }
-    if (string != null) {
-      json['string'] = string;
-    }
-    if (date != null) {
-      json['date'] = date;
-    }
-    if (array != null) {
-      json['array'] = array.map((e) => e.toJson()).toList();
-    }
-    return json;
   }
 }
 
@@ -394,25 +374,24 @@ class KeyRange {
 
   factory KeyRange.fromJson(Map<String, dynamic> json) {
     return KeyRange(
-      lower: json.containsKey('lower') ? Key.fromJson(json['lower']) : null,
-      upper: json.containsKey('upper') ? Key.fromJson(json['upper']) : null,
-      lowerOpen: json['lowerOpen'],
-      upperOpen: json['upperOpen'],
+      lower: json.containsKey('lower')
+          ? Key.fromJson(json['lower'] as Map<String, dynamic>)
+          : null,
+      upper: json.containsKey('upper')
+          ? Key.fromJson(json['upper'] as Map<String, dynamic>)
+          : null,
+      lowerOpen: json['lowerOpen'] as bool,
+      upperOpen: json['upperOpen'] as bool,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'lowerOpen': lowerOpen,
       'upperOpen': upperOpen,
+      if (lower != null) 'lower': lower.toJson(),
+      if (upper != null) 'upper': upper.toJson(),
     };
-    if (lower != null) {
-      json['lower'] = lower.toJson();
-    }
-    if (upper != null) {
-      json['upper'] = upper.toJson();
-    }
-    return json;
   }
 }
 
@@ -432,19 +411,20 @@ class DataEntry {
 
   factory DataEntry.fromJson(Map<String, dynamic> json) {
     return DataEntry(
-      key: runtime.RemoteObject.fromJson(json['key']),
-      primaryKey: runtime.RemoteObject.fromJson(json['primaryKey']),
-      value: runtime.RemoteObject.fromJson(json['value']),
+      key: runtime.RemoteObject.fromJson(json['key'] as Map<String, dynamic>),
+      primaryKey: runtime.RemoteObject.fromJson(
+          json['primaryKey'] as Map<String, dynamic>),
+      value:
+          runtime.RemoteObject.fromJson(json['value'] as Map<String, dynamic>),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'key': key.toJson(),
       'primaryKey': primaryKey.toJson(),
       'value': value.toJson(),
     };
-    return json;
   }
 }
 
@@ -463,8 +443,8 @@ class KeyPath {
 
   factory KeyPath.fromJson(Map<String, dynamic> json) {
     return KeyPath(
-      type: KeyPathType.fromJson(json['type']),
-      string: json.containsKey('string') ? json['string'] : null,
+      type: KeyPathType.fromJson(json['type'] as String),
+      string: json.containsKey('string') ? json['string'] as String : null,
       array: json.containsKey('array')
           ? (json['array'] as List).map((e) => e as String).toList()
           : null,
@@ -472,16 +452,11 @@ class KeyPath {
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type,
+      if (string != null) 'string': string,
+      if (array != null) 'array': [...array],
     };
-    if (string != null) {
-      json['string'] = string;
-    }
-    if (array != null) {
-      json['array'] = array.map((e) => e).toList();
-    }
-    return json;
   }
 }
 

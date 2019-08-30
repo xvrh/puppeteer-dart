@@ -249,7 +249,7 @@ class FrameManager {
 
   void _onExecutionContextCreated(ExecutionContextDescription contextPayload) {
     String frameId = contextPayload.auxData != null
-        ? contextPayload.auxData['frameId']
+        ? contextPayload.auxData['frameId'] as String
         : null;
     var frame = _frames[FrameId(frameId)];
     DomWorld world;
@@ -472,7 +472,8 @@ class Frame {
   ///
   /// returns: Future which resolves to the return value of `pageFunction` as
   /// in-page object (JSHandle)
-  Future<JsHandle> evaluateHandle(@Language('js') String pageFunction,
+  Future<T> evaluateHandle<T extends JsHandle>(
+      @Language('js') String pageFunction,
       {List args}) {
     return _mainWorld.evaluateHandle(pageFunction, args: args);
   }
@@ -718,7 +719,7 @@ class Frame {
   ///   first one is taken into account.
   ///
   /// Returns an array of option values that have been successfully selected.
-  Future<List<String>> select(selector, List<String> values) {
+  Future<List<String>> select(String selector, List<String> values) {
     return _secondaryWorld.select(selector, values);
   }
 

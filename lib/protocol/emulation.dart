@@ -19,7 +19,7 @@ class EmulationApi {
   /// Returns: True if emulation is supported.
   Future<bool> canEmulate() async {
     var result = await _client.send('Emulation.canEmulate');
-    return result['result'];
+    return result['result'] as bool;
   }
 
   /// Clears the overriden device metrics.
@@ -40,19 +40,17 @@ class EmulationApi {
   /// Enables or disables simulating a focused and active page.
   /// [enabled] Whether to enable to disable focus emulation.
   Future<void> setFocusEmulationEnabled(bool enabled) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Emulation.setFocusEmulationEnabled', {
       'enabled': enabled,
-    };
-    await _client.send('Emulation.setFocusEmulationEnabled', parameters);
+    });
   }
 
   /// Enables CPU throttling to emulate slow CPUs.
   /// [rate] Throttling rate as a slowdown factor (1 is no throttle, 2 is 2x slowdown, etc).
   Future<void> setCPUThrottlingRate(num rate) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Emulation.setCPUThrottlingRate', {
       'rate': rate,
-    };
-    await _client.send('Emulation.setCPUThrottlingRate', parameters);
+    });
   }
 
   /// Sets or clears an override of the default background color of the frame. This override is used
@@ -60,12 +58,9 @@ class EmulationApi {
   /// [color] RGBA of the default background color. If not specified, any existing override will be
   /// cleared.
   Future<void> setDefaultBackgroundColorOverride({dom.RGBA color}) async {
-    var parameters = <String, dynamic>{};
-    if (color != null) {
-      parameters['color'] = color.toJson();
-    }
-    await _client.send(
-        'Emulation.setDefaultBackgroundColorOverride', parameters);
+    await _client.send('Emulation.setDefaultBackgroundColorOverride', {
+      if (color != null) 'color': color,
+    });
   }
 
   /// Overrides the values of device screen dimensions (window.screen.width, window.screen.height,
@@ -95,53 +90,34 @@ class EmulationApi {
       bool dontSetVisibleSize,
       ScreenOrientation screenOrientation,
       page.Viewport viewport}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Emulation.setDeviceMetricsOverride', {
       'width': width,
       'height': height,
       'deviceScaleFactor': deviceScaleFactor,
       'mobile': mobile,
-    };
-    if (scale != null) {
-      parameters['scale'] = scale;
-    }
-    if (screenWidth != null) {
-      parameters['screenWidth'] = screenWidth;
-    }
-    if (screenHeight != null) {
-      parameters['screenHeight'] = screenHeight;
-    }
-    if (positionX != null) {
-      parameters['positionX'] = positionX;
-    }
-    if (positionY != null) {
-      parameters['positionY'] = positionY;
-    }
-    if (dontSetVisibleSize != null) {
-      parameters['dontSetVisibleSize'] = dontSetVisibleSize;
-    }
-    if (screenOrientation != null) {
-      parameters['screenOrientation'] = screenOrientation.toJson();
-    }
-    if (viewport != null) {
-      parameters['viewport'] = viewport.toJson();
-    }
-    await _client.send('Emulation.setDeviceMetricsOverride', parameters);
+      if (scale != null) 'scale': scale,
+      if (screenWidth != null) 'screenWidth': screenWidth,
+      if (screenHeight != null) 'screenHeight': screenHeight,
+      if (positionX != null) 'positionX': positionX,
+      if (positionY != null) 'positionY': positionY,
+      if (dontSetVisibleSize != null) 'dontSetVisibleSize': dontSetVisibleSize,
+      if (screenOrientation != null) 'screenOrientation': screenOrientation,
+      if (viewport != null) 'viewport': viewport,
+    });
   }
 
   /// [hidden] Whether scrollbars should be always hidden.
   Future<void> setScrollbarsHidden(bool hidden) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Emulation.setScrollbarsHidden', {
       'hidden': hidden,
-    };
-    await _client.send('Emulation.setScrollbarsHidden', parameters);
+    });
   }
 
   /// [disabled] Whether document.coookie API should be disabled.
   Future<void> setDocumentCookieDisabled(bool disabled) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Emulation.setDocumentCookieDisabled', {
       'disabled': disabled,
-    };
-    await _client.send('Emulation.setDocumentCookieDisabled', parameters);
+    });
   }
 
   /// [enabled] Whether touch emulation based on mouse input should be enabled.
@@ -150,22 +126,18 @@ class EmulationApi {
       {@Enum(['mobile', 'desktop']) String configuration}) async {
     assert(configuration == null ||
         const ['mobile', 'desktop'].contains(configuration));
-    var parameters = <String, dynamic>{
+    await _client.send('Emulation.setEmitTouchEventsForMouse', {
       'enabled': enabled,
-    };
-    if (configuration != null) {
-      parameters['configuration'] = configuration;
-    }
-    await _client.send('Emulation.setEmitTouchEventsForMouse', parameters);
+      if (configuration != null) 'configuration': configuration,
+    });
   }
 
   /// Emulates the given media for CSS media queries.
   /// [media] Media type to emulate. Empty string disables the override.
   Future<void> setEmulatedMedia(String media) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Emulation.setEmulatedMedia', {
       'media': media,
-    };
-    await _client.send('Emulation.setEmulatedMedia', parameters);
+    });
   }
 
   /// Overrides the Geolocation Position or Error. Omitting any of the parameters emulates position
@@ -175,45 +147,36 @@ class EmulationApi {
   /// [accuracy] Mock accuracy
   Future<void> setGeolocationOverride(
       {num latitude, num longitude, num accuracy}) async {
-    var parameters = <String, dynamic>{};
-    if (latitude != null) {
-      parameters['latitude'] = latitude;
-    }
-    if (longitude != null) {
-      parameters['longitude'] = longitude;
-    }
-    if (accuracy != null) {
-      parameters['accuracy'] = accuracy;
-    }
-    await _client.send('Emulation.setGeolocationOverride', parameters);
+    await _client.send('Emulation.setGeolocationOverride', {
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
+      if (accuracy != null) 'accuracy': accuracy,
+    });
   }
 
   /// Overrides value returned by the javascript navigator object.
   /// [platform] The platform navigator.platform should return.
   @deprecated
   Future<void> setNavigatorOverrides(String platform) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Emulation.setNavigatorOverrides', {
       'platform': platform,
-    };
-    await _client.send('Emulation.setNavigatorOverrides', parameters);
+    });
   }
 
   /// Sets a specified page scale factor.
   /// [pageScaleFactor] Page scale factor.
   Future<void> setPageScaleFactor(num pageScaleFactor) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Emulation.setPageScaleFactor', {
       'pageScaleFactor': pageScaleFactor,
-    };
-    await _client.send('Emulation.setPageScaleFactor', parameters);
+    });
   }
 
   /// Switches script execution in the page.
   /// [value] Whether script execution should be disabled in the page.
   Future<void> setScriptExecutionDisabled(bool value) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Emulation.setScriptExecutionDisabled', {
       'value': value,
-    };
-    await _client.send('Emulation.setScriptExecutionDisabled', parameters);
+    });
   }
 
   /// Enables touch on platforms which do not support them.
@@ -221,13 +184,10 @@ class EmulationApi {
   /// [maxTouchPoints] Maximum touch points supported. Defaults to one.
   Future<void> setTouchEmulationEnabled(bool enabled,
       {int maxTouchPoints}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Emulation.setTouchEmulationEnabled', {
       'enabled': enabled,
-    };
-    if (maxTouchPoints != null) {
-      parameters['maxTouchPoints'] = maxTouchPoints;
-    }
-    await _client.send('Emulation.setTouchEmulationEnabled', parameters);
+      if (maxTouchPoints != null) 'maxTouchPoints': maxTouchPoints,
+    });
   }
 
   /// Turns on virtual time for all frames (replacing real-time with a synthetic time source) and sets
@@ -245,35 +205,24 @@ class EmulationApi {
       int maxVirtualTimeTaskStarvationCount,
       bool waitForNavigation,
       network.TimeSinceEpoch initialVirtualTime}) async {
-    var parameters = <String, dynamic>{
-      'policy': policy.toJson(),
-    };
-    if (budget != null) {
-      parameters['budget'] = budget;
-    }
-    if (maxVirtualTimeTaskStarvationCount != null) {
-      parameters['maxVirtualTimeTaskStarvationCount'] =
-          maxVirtualTimeTaskStarvationCount;
-    }
-    if (waitForNavigation != null) {
-      parameters['waitForNavigation'] = waitForNavigation;
-    }
-    if (initialVirtualTime != null) {
-      parameters['initialVirtualTime'] = initialVirtualTime.toJson();
-    }
-    var result =
-        await _client.send('Emulation.setVirtualTimePolicy', parameters);
-    return result['virtualTimeTicksBase'];
+    var result = await _client.send('Emulation.setVirtualTimePolicy', {
+      'policy': policy,
+      if (budget != null) 'budget': budget,
+      if (maxVirtualTimeTaskStarvationCount != null)
+        'maxVirtualTimeTaskStarvationCount': maxVirtualTimeTaskStarvationCount,
+      if (waitForNavigation != null) 'waitForNavigation': waitForNavigation,
+      if (initialVirtualTime != null) 'initialVirtualTime': initialVirtualTime,
+    });
+    return result['virtualTimeTicksBase'] as num;
   }
 
   /// Overrides default host system timezone with the specified one.
   /// [timezoneId] The timezone identifier. If empty, disables the override and
   /// restores default host system timezone.
   Future<void> setTimezoneOverride(String timezoneId) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Emulation.setTimezoneOverride', {
       'timezoneId': timezoneId,
-    };
-    await _client.send('Emulation.setTimezoneOverride', parameters);
+    });
   }
 
   /// Resizes the frame/viewport of the page. Note that this does not affect the frame's container
@@ -283,11 +232,10 @@ class EmulationApi {
   /// [height] Frame height (DIP).
   @deprecated
   Future<void> setVisibleSize(int width, int height) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Emulation.setVisibleSize', {
       'width': width,
       'height': height,
-    };
-    await _client.send('Emulation.setVisibleSize', parameters);
+    });
   }
 
   /// Allows overriding user agent with the given string.
@@ -296,16 +244,11 @@ class EmulationApi {
   /// [platform] The platform navigator.platform should return.
   Future<void> setUserAgentOverride(String userAgent,
       {String acceptLanguage, String platform}) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Emulation.setUserAgentOverride', {
       'userAgent': userAgent,
-    };
-    if (acceptLanguage != null) {
-      parameters['acceptLanguage'] = acceptLanguage;
-    }
-    if (platform != null) {
-      parameters['platform'] = platform;
-    }
-    await _client.send('Emulation.setUserAgentOverride', parameters);
+      if (acceptLanguage != null) 'acceptLanguage': acceptLanguage,
+      if (platform != null) 'platform': platform,
+    });
   }
 }
 
@@ -321,17 +264,16 @@ class ScreenOrientation {
 
   factory ScreenOrientation.fromJson(Map<String, dynamic> json) {
     return ScreenOrientation(
-      type: ScreenOrientationType.fromJson(json['type']),
-      angle: json['angle'],
+      type: ScreenOrientationType.fromJson(json['type'] as String),
+      angle: json['angle'] as int,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type,
       'angle': angle,
     };
-    return json;
   }
 }
 

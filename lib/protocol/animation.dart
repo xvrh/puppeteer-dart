@@ -22,7 +22,8 @@ class AnimationApi {
   /// Event for animation that has been started.
   Stream<Animation> get onAnimationStarted => _client.onEvent
       .where((event) => event.name == 'Animation.animationStarted')
-      .map((event) => Animation.fromJson(event.parameters['animation']));
+      .map((event) => Animation.fromJson(
+          event.parameters['animation'] as Map<String, dynamic>));
 
   /// Disables animation domain notifications.
   Future<void> disable() async {
@@ -38,69 +39,64 @@ class AnimationApi {
   /// [id] Id of animation.
   /// Returns: Current time of the page.
   Future<num> getCurrentTime(String id) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Animation.getCurrentTime', {
       'id': id,
-    };
-    var result = await _client.send('Animation.getCurrentTime', parameters);
-    return result['currentTime'];
+    });
+    return result['currentTime'] as num;
   }
 
   /// Gets the playback rate of the document timeline.
   /// Returns: Playback rate for animations on page.
   Future<num> getPlaybackRate() async {
     var result = await _client.send('Animation.getPlaybackRate');
-    return result['playbackRate'];
+    return result['playbackRate'] as num;
   }
 
   /// Releases a set of animations to no longer be manipulated.
   /// [animations] List of animation ids to seek.
   Future<void> releaseAnimations(List<String> animations) async {
-    var parameters = <String, dynamic>{
-      'animations': animations.map((e) => e).toList(),
-    };
-    await _client.send('Animation.releaseAnimations', parameters);
+    await _client.send('Animation.releaseAnimations', {
+      'animations': [...animations],
+    });
   }
 
   /// Gets the remote object of the Animation.
   /// [animationId] Animation id.
   /// Returns: Corresponding remote object.
   Future<runtime.RemoteObject> resolveAnimation(String animationId) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Animation.resolveAnimation', {
       'animationId': animationId,
-    };
-    var result = await _client.send('Animation.resolveAnimation', parameters);
-    return runtime.RemoteObject.fromJson(result['remoteObject']);
+    });
+    return runtime.RemoteObject.fromJson(
+        result['remoteObject'] as Map<String, dynamic>);
   }
 
   /// Seek a set of animations to a particular time within each animation.
   /// [animations] List of animation ids to seek.
   /// [currentTime] Set the current time of each animation.
   Future<void> seekAnimations(List<String> animations, num currentTime) async {
-    var parameters = <String, dynamic>{
-      'animations': animations.map((e) => e).toList(),
+    await _client.send('Animation.seekAnimations', {
+      'animations': [...animations],
       'currentTime': currentTime,
-    };
-    await _client.send('Animation.seekAnimations', parameters);
+    });
   }
 
   /// Sets the paused state of a set of animations.
   /// [animations] Animations to set the pause state of.
   /// [paused] Paused state to set to.
   Future<void> setPaused(List<String> animations, bool paused) async {
-    var parameters = <String, dynamic>{
-      'animations': animations.map((e) => e).toList(),
+    await _client.send('Animation.setPaused', {
+      'animations': [...animations],
       'paused': paused,
-    };
-    await _client.send('Animation.setPaused', parameters);
+    });
   }
 
   /// Sets the playback rate of the document timeline.
   /// [playbackRate] Playback rate for animations on page
   Future<void> setPlaybackRate(num playbackRate) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Animation.setPlaybackRate', {
       'playbackRate': playbackRate,
-    };
-    await _client.send('Animation.setPlaybackRate', parameters);
+    });
   }
 
   /// Sets the timing of an animation node.
@@ -108,12 +104,11 @@ class AnimationApi {
   /// [duration] Duration of the animation.
   /// [delay] Delay of the animation.
   Future<void> setTiming(String animationId, num duration, num delay) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Animation.setTiming', {
       'animationId': animationId,
       'duration': duration,
       'delay': delay,
-    };
-    await _client.send('Animation.setTiming', parameters);
+    });
   }
 }
 
@@ -164,23 +159,23 @@ class Animation {
 
   factory Animation.fromJson(Map<String, dynamic> json) {
     return Animation(
-      id: json['id'],
-      name: json['name'],
-      pausedState: json['pausedState'],
-      playState: json['playState'],
-      playbackRate: json['playbackRate'],
-      startTime: json['startTime'],
-      currentTime: json['currentTime'],
-      type: AnimationType.fromJson(json['type']),
+      id: json['id'] as String,
+      name: json['name'] as String,
+      pausedState: json['pausedState'] as bool,
+      playState: json['playState'] as String,
+      playbackRate: json['playbackRate'] as num,
+      startTime: json['startTime'] as num,
+      currentTime: json['currentTime'] as num,
+      type: AnimationType.fromJson(json['type'] as String),
       source: json.containsKey('source')
-          ? AnimationEffect.fromJson(json['source'])
+          ? AnimationEffect.fromJson(json['source'] as Map<String, dynamic>)
           : null,
-      cssId: json.containsKey('cssId') ? json['cssId'] : null,
+      cssId: json.containsKey('cssId') ? json['cssId'] as String : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'id': id,
       'name': name,
       'pausedState': pausedState,
@@ -189,14 +184,9 @@ class Animation {
       'startTime': startTime,
       'currentTime': currentTime,
       'type': type,
+      if (source != null) 'source': source.toJson(),
+      if (cssId != null) 'cssId': cssId,
     };
-    if (source != null) {
-      json['source'] = source.toJson();
-    }
-    if (cssId != null) {
-      json['cssId'] = cssId;
-    }
-    return json;
   }
 }
 
@@ -275,25 +265,26 @@ class AnimationEffect {
 
   factory AnimationEffect.fromJson(Map<String, dynamic> json) {
     return AnimationEffect(
-      delay: json['delay'],
-      endDelay: json['endDelay'],
-      iterationStart: json['iterationStart'],
-      iterations: json['iterations'],
-      duration: json['duration'],
-      direction: json['direction'],
-      fill: json['fill'],
+      delay: json['delay'] as num,
+      endDelay: json['endDelay'] as num,
+      iterationStart: json['iterationStart'] as num,
+      iterations: json['iterations'] as num,
+      duration: json['duration'] as num,
+      direction: json['direction'] as String,
+      fill: json['fill'] as String,
       backendNodeId: json.containsKey('backendNodeId')
-          ? dom.BackendNodeId.fromJson(json['backendNodeId'])
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
           : null,
       keyframesRule: json.containsKey('keyframesRule')
-          ? KeyframesRule.fromJson(json['keyframesRule'])
+          ? KeyframesRule.fromJson(
+              json['keyframesRule'] as Map<String, dynamic>)
           : null,
-      easing: json['easing'],
+      easing: json['easing'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'delay': delay,
       'endDelay': endDelay,
       'iterationStart': iterationStart,
@@ -302,14 +293,9 @@ class AnimationEffect {
       'direction': direction,
       'fill': fill,
       'easing': easing,
+      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
+      if (keyframesRule != null) 'keyframesRule': keyframesRule.toJson(),
     };
-    if (backendNodeId != null) {
-      json['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (keyframesRule != null) {
-      json['keyframesRule'] = keyframesRule.toJson();
-    }
-    return json;
   }
 }
 
@@ -325,21 +311,18 @@ class KeyframesRule {
 
   factory KeyframesRule.fromJson(Map<String, dynamic> json) {
     return KeyframesRule(
-      name: json.containsKey('name') ? json['name'] : null,
+      name: json.containsKey('name') ? json['name'] as String : null,
       keyframes: (json['keyframes'] as List)
-          .map((e) => KeyframeStyle.fromJson(e))
+          .map((e) => KeyframeStyle.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'keyframes': keyframes.map((e) => e.toJson()).toList(),
+      if (name != null) 'name': name,
     };
-    if (name != null) {
-      json['name'] = name;
-    }
-    return json;
   }
 }
 
@@ -355,16 +338,15 @@ class KeyframeStyle {
 
   factory KeyframeStyle.fromJson(Map<String, dynamic> json) {
     return KeyframeStyle(
-      offset: json['offset'],
-      easing: json['easing'],
+      offset: json['offset'] as String,
+      easing: json['easing'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'offset': offset,
       'easing': easing,
     };
-    return json;
   }
 }

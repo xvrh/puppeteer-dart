@@ -4,10 +4,11 @@ import 'package:test/test.dart';
 
 // Test all the dart scripts in the example/ folder.
 main() {
-  for (File exampleFile in Directory('example').listSync().where((f) =>
-      f is File &&
-      f.path.endsWith('.dart') &&
-      !p.basename(f.path).startsWith('_'))) {
+  for (File exampleFile in Directory('example')
+      .listSync()
+      .whereType<File>()
+      .where((f) =>
+          f.path.endsWith('.dart') && !p.basename(f.path).startsWith('_'))) {
     var fileContent = exampleFile.readAsStringSync();
 
     if (fileContent.contains('main()')) {

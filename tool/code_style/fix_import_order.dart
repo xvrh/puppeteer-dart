@@ -90,7 +90,7 @@ String _reorderImports(String content, CompilationUnit unit) {
       } else if (directive is ExportDirective) {
         exports.add(directive);
       } else {
-        parts.add(directive);
+        parts.add(directive as PartDirective);
       }
     }
   }

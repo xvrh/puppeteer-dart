@@ -13,7 +13,8 @@ class LogApi {
   /// Issued when new message was logged.
   Stream<LogEntry> get onEntryAdded => _client.onEvent
       .where((event) => event.name == 'Log.entryAdded')
-      .map((event) => LogEntry.fromJson(event.parameters['entry']));
+      .map((event) =>
+          LogEntry.fromJson(event.parameters['entry'] as Map<String, dynamic>));
 
   /// Clears the log.
   Future<void> clear() async {
@@ -34,10 +35,9 @@ class LogApi {
   /// start violation reporting.
   /// [config] Configuration for violations.
   Future<void> startViolationsReport(List<ViolationSetting> config) async {
-    var parameters = <String, dynamic>{
-      'config': config.map((e) => e.toJson()).toList(),
-    };
-    await _client.send('Log.startViolationsReport', parameters);
+    await _client.send('Log.startViolationsReport', {
+      'config': [...config],
+    });
   }
 
   /// Stop violation reporting.
@@ -67,7 +67,7 @@ class LogEntry {
   final int lineNumber;
 
   /// JavaScript stack trace.
-  final runtime.StackTrace stackTrace;
+  final runtime.StackTraceData stackTrace;
 
   /// Identifier of the network request associated with this entry.
   final network.RequestId networkRequestId;
@@ -92,53 +92,45 @@ class LogEntry {
 
   factory LogEntry.fromJson(Map<String, dynamic> json) {
     return LogEntry(
-      source: LogEntrySource.fromJson(json['source']),
-      level: LogEntryLevel.fromJson(json['level']),
-      text: json['text'],
-      timestamp: runtime.Timestamp.fromJson(json['timestamp']),
-      url: json.containsKey('url') ? json['url'] : null,
-      lineNumber: json.containsKey('lineNumber') ? json['lineNumber'] : null,
+      source: LogEntrySource.fromJson(json['source'] as String),
+      level: LogEntryLevel.fromJson(json['level'] as String),
+      text: json['text'] as String,
+      timestamp: runtime.Timestamp.fromJson(json['timestamp'] as num),
+      url: json.containsKey('url') ? json['url'] as String : null,
+      lineNumber:
+          json.containsKey('lineNumber') ? json['lineNumber'] as int : null,
       stackTrace: json.containsKey('stackTrace')
-          ? runtime.StackTrace.fromJson(json['stackTrace'])
+          ? runtime.StackTraceData.fromJson(
+              json['stackTrace'] as Map<String, dynamic>)
           : null,
       networkRequestId: json.containsKey('networkRequestId')
-          ? network.RequestId.fromJson(json['networkRequestId'])
+          ? network.RequestId.fromJson(json['networkRequestId'] as String)
           : null,
-      workerId: json.containsKey('workerId') ? json['workerId'] : null,
+      workerId:
+          json.containsKey('workerId') ? json['workerId'] as String : null,
       args: json.containsKey('args')
           ? (json['args'] as List)
-              .map((e) => runtime.RemoteObject.fromJson(e))
+              .map((e) =>
+                  runtime.RemoteObject.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'source': source,
       'level': level,
       'text': text,
       'timestamp': timestamp.toJson(),
+      if (url != null) 'url': url,
+      if (lineNumber != null) 'lineNumber': lineNumber,
+      if (stackTrace != null) 'stackTrace': stackTrace.toJson(),
+      if (networkRequestId != null)
+        'networkRequestId': networkRequestId.toJson(),
+      if (workerId != null) 'workerId': workerId,
+      if (args != null) 'args': args.map((e) => e.toJson()).toList(),
     };
-    if (url != null) {
-      json['url'] = url;
-    }
-    if (lineNumber != null) {
-      json['lineNumber'] = lineNumber;
-    }
-    if (stackTrace != null) {
-      json['stackTrace'] = stackTrace.toJson();
-    }
-    if (networkRequestId != null) {
-      json['networkRequestId'] = networkRequestId.toJson();
-    }
-    if (workerId != null) {
-      json['workerId'] = workerId;
-    }
-    if (args != null) {
-      json['args'] = args.map((e) => e.toJson()).toList();
-    }
-    return json;
   }
 }
 
@@ -234,17 +226,16 @@ class ViolationSetting {
 
   factory ViolationSetting.fromJson(Map<String, dynamic> json) {
     return ViolationSetting(
-      name: ViolationSettingName.fromJson(json['name']),
-      threshold: json['threshold'],
+      name: ViolationSettingName.fromJson(json['name'] as String),
+      threshold: json['threshold'] as num,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name,
       'threshold': threshold,
     };
-    return json;
   }
 }
 

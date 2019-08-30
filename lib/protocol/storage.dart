@@ -34,57 +34,51 @@ class StorageApi {
   /// [origin] Security origin.
   /// [storageTypes] Comma separated list of StorageType to clear.
   Future<void> clearDataForOrigin(String origin, String storageTypes) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Storage.clearDataForOrigin', {
       'origin': origin,
       'storageTypes': storageTypes,
-    };
-    await _client.send('Storage.clearDataForOrigin', parameters);
+    });
   }
 
   /// Returns usage and quota in bytes.
   /// [origin] Security origin.
   Future<GetUsageAndQuotaResult> getUsageAndQuota(String origin) async {
-    var parameters = <String, dynamic>{
+    var result = await _client.send('Storage.getUsageAndQuota', {
       'origin': origin,
-    };
-    var result = await _client.send('Storage.getUsageAndQuota', parameters);
+    });
     return GetUsageAndQuotaResult.fromJson(result);
   }
 
   /// Registers origin to be notified when an update occurs to its cache storage list.
   /// [origin] Security origin.
   Future<void> trackCacheStorageForOrigin(String origin) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Storage.trackCacheStorageForOrigin', {
       'origin': origin,
-    };
-    await _client.send('Storage.trackCacheStorageForOrigin', parameters);
+    });
   }
 
   /// Registers origin to be notified when an update occurs to its IndexedDB.
   /// [origin] Security origin.
   Future<void> trackIndexedDBForOrigin(String origin) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Storage.trackIndexedDBForOrigin', {
       'origin': origin,
-    };
-    await _client.send('Storage.trackIndexedDBForOrigin', parameters);
+    });
   }
 
   /// Unregisters origin from receiving notifications for cache storage.
   /// [origin] Security origin.
   Future<void> untrackCacheStorageForOrigin(String origin) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Storage.untrackCacheStorageForOrigin', {
       'origin': origin,
-    };
-    await _client.send('Storage.untrackCacheStorageForOrigin', parameters);
+    });
   }
 
   /// Unregisters origin from receiving notifications for IndexedDB.
   /// [origin] Security origin.
   Future<void> untrackIndexedDBForOrigin(String origin) async {
-    var parameters = <String, dynamic>{
+    await _client.send('Storage.untrackIndexedDBForOrigin', {
       'origin': origin,
-    };
-    await _client.send('Storage.untrackIndexedDBForOrigin', parameters);
+    });
   }
 }
 
@@ -100,8 +94,8 @@ class CacheStorageContentUpdatedEvent {
 
   factory CacheStorageContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return CacheStorageContentUpdatedEvent(
-      origin: json['origin'],
-      cacheName: json['cacheName'],
+      origin: json['origin'] as String,
+      cacheName: json['cacheName'] as String,
     );
   }
 }
@@ -123,9 +117,9 @@ class IndexedDBContentUpdatedEvent {
 
   factory IndexedDBContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return IndexedDBContentUpdatedEvent(
-      origin: json['origin'],
-      databaseName: json['databaseName'],
-      objectStoreName: json['objectStoreName'],
+      origin: json['origin'] as String,
+      databaseName: json['databaseName'] as String,
+      objectStoreName: json['objectStoreName'] as String,
     );
   }
 }
@@ -147,10 +141,10 @@ class GetUsageAndQuotaResult {
 
   factory GetUsageAndQuotaResult.fromJson(Map<String, dynamic> json) {
     return GetUsageAndQuotaResult(
-      usage: json['usage'],
-      quota: json['quota'],
+      usage: json['usage'] as num,
+      quota: json['quota'] as num,
       usageBreakdown: (json['usageBreakdown'] as List)
-          .map((e) => UsageForType.fromJson(e))
+          .map((e) => UsageForType.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -214,16 +208,15 @@ class UsageForType {
 
   factory UsageForType.fromJson(Map<String, dynamic> json) {
     return UsageForType(
-      storageType: StorageType.fromJson(json['storageType']),
-      usage: json['usage'],
+      storageType: StorageType.fromJson(json['storageType'] as String),
+      usage: json['usage'] as num,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'storageType': storageType.toJson(),
       'usage': usage,
     };
-    return json;
   }
 }

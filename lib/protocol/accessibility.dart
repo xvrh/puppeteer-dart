@@ -32,23 +32,14 @@ class AccessibilityApi {
       dom.BackendNodeId backendNodeId,
       runtime.RemoteObjectId objectId,
       bool fetchRelatives}) async {
-    var parameters = <String, dynamic>{};
-    if (nodeId != null) {
-      parameters['nodeId'] = nodeId.toJson();
-    }
-    if (backendNodeId != null) {
-      parameters['backendNodeId'] = backendNodeId.toJson();
-    }
-    if (objectId != null) {
-      parameters['objectId'] = objectId.toJson();
-    }
-    if (fetchRelatives != null) {
-      parameters['fetchRelatives'] = fetchRelatives;
-    }
-    var result =
-        await _client.send('Accessibility.getPartialAXTree', parameters);
+    var result = await _client.send('Accessibility.getPartialAXTree', {
+      if (nodeId != null) 'nodeId': nodeId,
+      if (backendNodeId != null) 'backendNodeId': backendNodeId,
+      if (objectId != null) 'objectId': objectId,
+      if (fetchRelatives != null) 'fetchRelatives': fetchRelatives,
+    });
     return (result['nodes'] as List)
-        .map((e) => AXNodeData.fromJson(e))
+        .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
@@ -56,7 +47,7 @@ class AccessibilityApi {
   Future<List<AXNodeData>> getFullAXTree() async {
     var result = await _client.send('Accessibility.getFullAXTree');
     return (result['nodes'] as List)
-        .map((e) => AXNodeData.fromJson(e))
+        .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 }
@@ -259,54 +250,43 @@ class AXValueSource {
 
   factory AXValueSource.fromJson(Map<String, dynamic> json) {
     return AXValueSource(
-      type: AXValueSourceType.fromJson(json['type']),
-      value: json.containsKey('value') ? AXValue.fromJson(json['value']) : null,
-      attribute: json.containsKey('attribute') ? json['attribute'] : null,
-      attributeValue: json.containsKey('attributeValue')
-          ? AXValue.fromJson(json['attributeValue'])
+      type: AXValueSourceType.fromJson(json['type'] as String),
+      value: json.containsKey('value')
+          ? AXValue.fromJson(json['value'] as Map<String, dynamic>)
           : null,
-      superseded: json.containsKey('superseded') ? json['superseded'] : null,
+      attribute:
+          json.containsKey('attribute') ? json['attribute'] as String : null,
+      attributeValue: json.containsKey('attributeValue')
+          ? AXValue.fromJson(json['attributeValue'] as Map<String, dynamic>)
+          : null,
+      superseded:
+          json.containsKey('superseded') ? json['superseded'] as bool : null,
       nativeSource: json.containsKey('nativeSource')
-          ? AXValueNativeSourceType.fromJson(json['nativeSource'])
+          ? AXValueNativeSourceType.fromJson(json['nativeSource'] as String)
           : null,
       nativeSourceValue: json.containsKey('nativeSourceValue')
-          ? AXValue.fromJson(json['nativeSourceValue'])
+          ? AXValue.fromJson(json['nativeSourceValue'] as Map<String, dynamic>)
           : null,
-      invalid: json.containsKey('invalid') ? json['invalid'] : null,
-      invalidReason:
-          json.containsKey('invalidReason') ? json['invalidReason'] : null,
+      invalid: json.containsKey('invalid') ? json['invalid'] as bool : null,
+      invalidReason: json.containsKey('invalidReason')
+          ? json['invalidReason'] as String
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type.toJson(),
+      if (value != null) 'value': value.toJson(),
+      if (attribute != null) 'attribute': attribute,
+      if (attributeValue != null) 'attributeValue': attributeValue.toJson(),
+      if (superseded != null) 'superseded': superseded,
+      if (nativeSource != null) 'nativeSource': nativeSource.toJson(),
+      if (nativeSourceValue != null)
+        'nativeSourceValue': nativeSourceValue.toJson(),
+      if (invalid != null) 'invalid': invalid,
+      if (invalidReason != null) 'invalidReason': invalidReason,
     };
-    if (value != null) {
-      json['value'] = value.toJson();
-    }
-    if (attribute != null) {
-      json['attribute'] = attribute;
-    }
-    if (attributeValue != null) {
-      json['attributeValue'] = attributeValue.toJson();
-    }
-    if (superseded != null) {
-      json['superseded'] = superseded;
-    }
-    if (nativeSource != null) {
-      json['nativeSource'] = nativeSource.toJson();
-    }
-    if (nativeSourceValue != null) {
-      json['nativeSourceValue'] = nativeSourceValue.toJson();
-    }
-    if (invalid != null) {
-      json['invalid'] = invalid;
-    }
-    if (invalidReason != null) {
-      json['invalidReason'] = invalidReason;
-    }
-    return json;
   }
 }
 
@@ -324,23 +304,19 @@ class AXRelatedNode {
 
   factory AXRelatedNode.fromJson(Map<String, dynamic> json) {
     return AXRelatedNode(
-      backendDOMNodeId: dom.BackendNodeId.fromJson(json['backendDOMNodeId']),
-      idref: json.containsKey('idref') ? json['idref'] : null,
-      text: json.containsKey('text') ? json['text'] : null,
+      backendDOMNodeId:
+          dom.BackendNodeId.fromJson(json['backendDOMNodeId'] as int),
+      idref: json.containsKey('idref') ? json['idref'] as String : null,
+      text: json.containsKey('text') ? json['text'] as String : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'backendDOMNodeId': backendDOMNodeId.toJson(),
+      if (idref != null) 'idref': idref,
+      if (text != null) 'text': text,
     };
-    if (idref != null) {
-      json['idref'] = idref;
-    }
-    if (text != null) {
-      json['text'] = text;
-    }
-    return json;
   }
 }
 
@@ -355,17 +331,16 @@ class AXProperty {
 
   factory AXProperty.fromJson(Map<String, dynamic> json) {
     return AXProperty(
-      name: AXPropertyName.fromJson(json['name']),
-      value: AXValue.fromJson(json['value']),
+      name: AXPropertyName.fromJson(json['name'] as String),
+      value: AXValue.fromJson(json['value'] as Map<String, dynamic>),
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'name': name.toJson(),
       'value': value.toJson(),
     };
-    return json;
   }
 }
 
@@ -387,35 +362,29 @@ class AXValue {
 
   factory AXValue.fromJson(Map<String, dynamic> json) {
     return AXValue(
-      type: AXValueType.fromJson(json['type']),
-      value: json.containsKey('value') ? json['value'] : null,
+      type: AXValueType.fromJson(json['type'] as String),
+      value: json.containsKey('value') ? json['value'] as dynamic : null,
       relatedNodes: json.containsKey('relatedNodes')
           ? (json['relatedNodes'] as List)
-              .map((e) => AXRelatedNode.fromJson(e))
+              .map((e) => AXRelatedNode.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       sources: json.containsKey('sources')
           ? (json['sources'] as List)
-              .map((e) => AXValueSource.fromJson(e))
+              .map((e) => AXValueSource.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'type': type.toJson(),
+      if (value != null) 'value': value,
+      if (relatedNodes != null)
+        'relatedNodes': relatedNodes.map((e) => e.toJson()).toList(),
+      if (sources != null) 'sources': sources.map((e) => e.toJson()).toList(),
     };
-    if (value != null) {
-      json['value'] = value;
-    }
-    if (relatedNodes != null) {
-      json['relatedNodes'] = relatedNodes.map((e) => e.toJson()).toList();
-    }
-    if (sources != null) {
-      json['sources'] = sources.map((e) => e.toJson()).toList();
-    }
-    return json;
   }
 }
 
@@ -572,62 +541,57 @@ class AXNodeData {
 
   factory AXNodeData.fromJson(Map<String, dynamic> json) {
     return AXNodeData(
-      nodeId: AXNodeId.fromJson(json['nodeId']),
-      ignored: json['ignored'],
+      nodeId: AXNodeId.fromJson(json['nodeId'] as String),
+      ignored: json['ignored'] as bool,
       ignoredReasons: json.containsKey('ignoredReasons')
           ? (json['ignoredReasons'] as List)
-              .map((e) => AXProperty.fromJson(e))
+              .map((e) => AXProperty.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
-      role: json.containsKey('role') ? AXValue.fromJson(json['role']) : null,
-      name: json.containsKey('name') ? AXValue.fromJson(json['name']) : null,
-      description: json.containsKey('description')
-          ? AXValue.fromJson(json['description'])
+      role: json.containsKey('role')
+          ? AXValue.fromJson(json['role'] as Map<String, dynamic>)
           : null,
-      value: json.containsKey('value') ? AXValue.fromJson(json['value']) : null,
+      name: json.containsKey('name')
+          ? AXValue.fromJson(json['name'] as Map<String, dynamic>)
+          : null,
+      description: json.containsKey('description')
+          ? AXValue.fromJson(json['description'] as Map<String, dynamic>)
+          : null,
+      value: json.containsKey('value')
+          ? AXValue.fromJson(json['value'] as Map<String, dynamic>)
+          : null,
       properties: json.containsKey('properties')
           ? (json['properties'] as List)
-              .map((e) => AXProperty.fromJson(e))
+              .map((e) => AXProperty.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       childIds: json.containsKey('childIds')
-          ? (json['childIds'] as List).map((e) => AXNodeId.fromJson(e)).toList()
+          ? (json['childIds'] as List)
+              .map((e) => AXNodeId.fromJson(e as String))
+              .toList()
           : null,
       backendDOMNodeId: json.containsKey('backendDOMNodeId')
-          ? dom.BackendNodeId.fromJson(json['backendDOMNodeId'])
+          ? dom.BackendNodeId.fromJson(json['backendDOMNodeId'] as int)
           : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'nodeId': nodeId.toJson(),
       'ignored': ignored,
+      if (ignoredReasons != null)
+        'ignoredReasons': ignoredReasons.map((e) => e.toJson()).toList(),
+      if (role != null) 'role': role.toJson(),
+      if (name != null) 'name': name.toJson(),
+      if (description != null) 'description': description.toJson(),
+      if (value != null) 'value': value.toJson(),
+      if (properties != null)
+        'properties': properties.map((e) => e.toJson()).toList(),
+      if (childIds != null)
+        'childIds': childIds.map((e) => e.toJson()).toList(),
+      if (backendDOMNodeId != null)
+        'backendDOMNodeId': backendDOMNodeId.toJson(),
     };
-    if (ignoredReasons != null) {
-      json['ignoredReasons'] = ignoredReasons.map((e) => e.toJson()).toList();
-    }
-    if (role != null) {
-      json['role'] = role.toJson();
-    }
-    if (name != null) {
-      json['name'] = name.toJson();
-    }
-    if (description != null) {
-      json['description'] = description.toJson();
-    }
-    if (value != null) {
-      json['value'] = value.toJson();
-    }
-    if (properties != null) {
-      json['properties'] = properties.map((e) => e.toJson()).toList();
-    }
-    if (childIds != null) {
-      json['childIds'] = childIds.map((e) => e.toJson()).toList();
-    }
-    if (backendDOMNodeId != null) {
-      json['backendDOMNodeId'] = backendDOMNodeId.toJson();
-    }
-    return json;
   }
 }

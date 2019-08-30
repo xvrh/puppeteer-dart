@@ -46,7 +46,7 @@ class JsHandle {
   bool get isDisposed => _disposed;
 
   /// Fetches a single property from the referenced object.
-  Future<JsHandle> property(String propertyName) async {
+  Future<T> property<T extends JsHandle>(String propertyName) async {
     var objectHandle = await executionContext.evaluateHandle(
         //language=js
         '''
@@ -57,14 +57,14 @@ function _(object, propertyName) {
 }
 ''', args: [this, propertyName]);
     var properties = await objectHandle.properties;
-    var result = properties[propertyName];
+    T result = properties[propertyName] as T;
     await objectHandle.dispose();
     return result;
   }
 
   /// Fetches the jsonValue of a single property from the referenced object.
   Future<T> propertyValue<T>(String propertyName) async {
-    T value = await (await property(propertyName)).jsonValue;
+    T value = await (await property(propertyName)).jsonValue as T;
     return value;
   }
 
@@ -75,7 +75,7 @@ function _(object, propertyName) {
   /// var handle = await page.evaluateHandle('() => ({window, document})');
   /// var properties = await handle.properties;
   /// JsHandle windowHandle = properties['window'];
-  /// ElementHandle documentHandle = properties['document'];
+  /// var documentHandle = properties['document'] as ElementHandle;
   /// await handle.dispose();
   /// ```
   Future<Map<String, JsHandle>> get properties async {
@@ -413,7 +413,7 @@ async function _(element, pageJavascriptEnabled) {
   ///
   /// See [Page.screenshot] for more info.
   Future<List<int>> screenshot(
-      {ScreenshotFormat format, num quality, bool omitBackground}) async {
+      {ScreenshotFormat format, int quality, bool omitBackground}) async {
     var needsViewportReset = false;
 
     var boundingBox = await this.boundingBox;

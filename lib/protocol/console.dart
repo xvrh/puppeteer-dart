@@ -12,7 +12,8 @@ class ConsoleApi {
   /// Issued when new console message is added.
   Stream<ConsoleMessage> get onMessageAdded => _client.onEvent
       .where((event) => event.name == 'Console.messageAdded')
-      .map((event) => ConsoleMessage.fromJson(event.parameters['message']));
+      .map((event) => ConsoleMessage.fromJson(
+          event.parameters['message'] as Map<String, dynamic>));
 
   /// Does nothing.
   Future<void> clearMessages() async {
@@ -61,31 +62,24 @@ class ConsoleMessage {
 
   factory ConsoleMessage.fromJson(Map<String, dynamic> json) {
     return ConsoleMessage(
-      source: ConsoleMessageSource.fromJson(json['source']),
-      level: ConsoleMessageLevel.fromJson(json['level']),
-      text: json['text'],
-      url: json.containsKey('url') ? json['url'] : null,
-      line: json.containsKey('line') ? json['line'] : null,
-      column: json.containsKey('column') ? json['column'] : null,
+      source: ConsoleMessageSource.fromJson(json['source'] as String),
+      level: ConsoleMessageLevel.fromJson(json['level'] as String),
+      text: json['text'] as String,
+      url: json.containsKey('url') ? json['url'] as String : null,
+      line: json.containsKey('line') ? json['line'] as int : null,
+      column: json.containsKey('column') ? json['column'] as int : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    var json = <String, dynamic>{
+    return {
       'source': source,
       'level': level,
       'text': text,
+      if (url != null) 'url': url,
+      if (line != null) 'line': line,
+      if (column != null) 'column': column,
     };
-    if (url != null) {
-      json['url'] = url;
-    }
-    if (line != null) {
-      json['line'] = line;
-    }
-    if (column != null) {
-      json['column'] = column;
-    }
-    return json;
   }
 }
 

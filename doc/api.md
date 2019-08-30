@@ -90,11 +90,11 @@
   * [page.screenshotBase64](#pagescreenshotbase64)
   * [page.select](#pageselectstring-selector-liststring-values)
   * [page.setBypassCSP](#pagesetbypasscspbool-enabled)
-  * [page.setCacheEnabled](#pagesetcacheenabledenabled)
+  * [page.setCacheEnabled](#pagesetcacheenabledbool-enabled)
   * [page.setContent](#pagesetcontent)
   * [page.setExtraHTTPHeaders](#pagesetextrahttpheadersmapstring-string-headers)
   * [page.setGeolocation](#pagesetgeolocation)
-  * [page.setJavaScriptEnabled](#pagesetjavascriptenabledenabled)
+  * [page.setJavaScriptEnabled](#pagesetjavascriptenabledbool-enabled)
   * [page.setOfflineMode](#pagesetofflinemodebool-enabled)
   * [page.setRequestInterception](#pagesetrequestinterceptionbool-value)
   * [page.setUserAgent](#pagesetuseragentstring-useragent)
@@ -158,7 +158,7 @@
   * [frame.isDetached](#frameisdetached)
   * [frame.name](#framename)
   * [frame.parentFrame](#frameparentframe)
-  * [frame.select](#frameselectselector-liststring-values)
+  * [frame.select](#frameselectstring-selector-liststring-values)
   * [frame.setContent](#framesetcontent)
   * [frame.tap](#frametapstring-selector)
   * [frame.title](#frametitle)
@@ -574,7 +574,7 @@ browserContext.targets → List<Target>
 This searches for a target in this specific browser context.
 
 ```dart
-browserContext.waitForTarget( Function(Target) predicate, {Duration timeout}) → Future<Target> 
+browserContext.waitForTarget(bool Function(Target) predicate, {Duration timeout}) → Future<Target> 
 ```
 
 ### class: Page
@@ -1009,7 +1009,7 @@ returns: Future which resolves to the return value of `pageFunction` as
 in-page object (JSHandle)
 
 ```dart
-page.evaluateHandle(@Language('js') String pageFunction, {List args}) → Future<JsHandle> 
+page.evaluateHandle(@Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
 #### page.evaluateOnNewDocument(String pageFunction, {List args})
@@ -1068,8 +1068,8 @@ main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   page.onConsole.listen((msg) => print(msg.text));
-  await page.exposeFunction(
-      'md5', (text) => crypto.md5.convert(utf8.encode(text)).toString());
+  await page.exposeFunction('md5',
+      (String text) => crypto.md5.convert(utf8.encode(text)).toString());
   await page.evaluate(r'''async () => {
             // use window.md5 to compute hashes
             const myString = 'PUPPETEER';
@@ -1574,7 +1574,7 @@ Returns:
 https://crbug.com/741689 for discussion.
 
 ```dart
-page.screenshot({ScreenshotFormat format, bool fullPage, Rectangle clip, num quality, bool omitBackground}) → Future<Uint8List> 
+page.screenshot({ScreenshotFormat format, bool fullPage, Rectangle clip, int quality, bool omitBackground}) → Future<Uint8List> 
 ```
 
 #### page.screenshotBase64(...)
@@ -1596,7 +1596,7 @@ Returns:
 https://crbug.com/741689 for discussion.
 
 ```dart
-page.screenshotBase64({ScreenshotFormat format, bool fullPage, Rectangle clip, num quality, bool omitBackground}) → Future<String> 
+page.screenshotBase64({ScreenshotFormat format, bool fullPage, Rectangle clip, int quality, bool omitBackground}) → Future<String> 
 ```
 
 #### page.select(String selector, List\<String> values)
@@ -1636,12 +1636,12 @@ before navigating to the domain.
 page.setBypassCSP(bool enabled) → Future<void> 
 ```
 
-#### page.setCacheEnabled(enabled)
+#### page.setCacheEnabled(bool enabled)
 Toggles ignoring cache for each request based on the enabled state. By
 default, caching is enabled.
 
 ```dart
-page.setCacheEnabled(enabled) → Future<void> 
+page.setCacheEnabled(bool enabled) → Future<void> 
 ```
 
 #### page.setContent(...)
@@ -1690,14 +1690,14 @@ permissions for the page to read its geolocation.
 page.setGeolocation({num latitude, num longitude, num accuracy}) → Future<void> 
 ```
 
-#### page.setJavaScriptEnabled(enabled)
+#### page.setJavaScriptEnabled(bool enabled)
 Whether or not to enable JavaScript on the page.
 
 > **NOTE** changing this value won't affect scripts that have already been
 run. It will take full effect on the next [navigation].
 
 ```dart
-page.setJavaScriptEnabled(enabled) → Future<void> 
+page.setJavaScriptEnabled(bool enabled) → Future<void> 
 ```
 
 #### page.setOfflineMode(bool enabled)
@@ -2104,7 +2104,7 @@ returns: Future which resolves to the return value of `pageFunction` as
 in-page object (JSHandle)
 
 ```dart
-worker.evaluateHandle(@Language('js') String pageFunction, {List args}) → Future<JsHandle> 
+worker.evaluateHandle(@Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
 ### class: Accessibility
@@ -2667,7 +2667,7 @@ returns: Future which resolves to the return value of `pageFunction` as
 in-page object (JSHandle)
 
 ```dart
-frame.evaluateHandle(@Language('js') String pageFunction, {List args}) → Future<JsHandle> 
+frame.evaluateHandle(@Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
 #### frame.executionContext
@@ -2781,7 +2781,7 @@ Parent frame, if any. Detached frames and main frames return `null`.
 frame.parentFrame → Frame
 ```
 
-#### frame.select(selector, List\<String> values)
+#### frame.select(String selector, List\<String> values)
 Triggers a `change` and `input` event once all the provided options have
 been selected.
 If there's no `<select>` element matching `selector`, the method throws an
@@ -2804,7 +2804,7 @@ Parameters:
 Returns an array of option values that have been successfully selected.
 
 ```dart
-frame.select(selector, List<String> values) → Future<List<String>> 
+frame.select(String selector, List<String> values) → Future<List<String>> 
 ```
 
 #### frame.setContent(...)
@@ -3075,7 +3075,7 @@ await resultHandle.dispose();
 ```
 
 ```dart
-executionContext.evaluateHandle(@Language('js') String pageFunction, {List args}) → Future<JsHandle> 
+executionContext.evaluateHandle(@Language('js') String pageFunction, {List args}) → Future<T> 
 ```
 
 #### executionContext.frame
@@ -3158,7 +3158,7 @@ for the property values.
 var handle = await page.evaluateHandle('() => ({window, document})');
 var properties = await handle.properties;
 JsHandle windowHandle = properties['window'];
-ElementHandle documentHandle = properties['document'];
+var documentHandle = properties['document'] as ElementHandle;
 await handle.dispose();
 ```
 
@@ -3170,7 +3170,7 @@ jsHandle.properties → Future<Map<String, JsHandle>>
 Fetches a single property from the referenced object.
 
 ```dart
-jsHandle.property(String propertyName) → Future<JsHandle> 
+jsHandle.property(String propertyName) → Future<T> 
 ```
 
 #### jsHandle.propertyValue(String propertyName)
@@ -3375,7 +3375,7 @@ If the element is detached from DOM, the method throws an error.
 See [Page.screenshot] for more info.
 
 ```dart
-elementHandle.screenshot({ScreenshotFormat format, num quality, bool omitBackground}) → Future<List<int>> 
+elementHandle.screenshot({ScreenshotFormat format, int quality, bool omitBackground}) → Future<List<int>> 
 ```
 
 #### elementHandle.tap()
@@ -3475,7 +3475,7 @@ Parameters:
 - [headers]: If set changes the request HTTP headers
 
 ```dart
-request.continueRequest({String url, String method, String postData, Map headers}) → Future<void> 
+request.continueRequest({String url, String method, String postData, Map<String, String> headers}) → Future<void> 
 ```
 
 #### request.failure
@@ -3646,10 +3646,10 @@ response.fromServiceWorker → bool
 ```
 
 #### response.headers
-An object with HTTP headers associated with the response. All header names are lower-case.
+An object with HTTP headers associated with the response.
 
 ```dart
-response.headers → Map
+response.headers → Map<String, String>
 ```
 
 #### response.json
