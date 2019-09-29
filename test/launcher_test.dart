@@ -184,7 +184,7 @@ main() {
         expect(await page.evaluate('11 * 11'), equals(121));
         await page.close();
         await browser.close();
-      }, skip: true);
+      }, skip: 'manual test, it launchs a browser headful');
       test('should filter out ignored default arguments', () async {
         //TODO(xha): implement the feature and find a way to test it;
       });

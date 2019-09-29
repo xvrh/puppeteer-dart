@@ -620,6 +620,7 @@ async function _(element) {
   }
 }
 
+/// An exception throws when we try to interact (ie: click) on an invisible node.
 class NodeIsNotVisibleException implements Exception {
   @override
   String toString() => 'Node is either not visible or not an HTMLElement';

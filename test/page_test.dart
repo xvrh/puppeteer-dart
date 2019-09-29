@@ -123,9 +123,7 @@ main() {
     test('should throw when page crashes', () async {
       var onErrorFuture = page.onError.first;
 
-      //TODO(xha): navigation should terminate in case of target crashed
-      // ignore: unawaited_futures
-      page.goto('chrome://crash').catchError((_) => null);
+      await page.goto('chrome://crash').catchError((_) => null);
       var error = await onErrorFuture;
       expect(error.message, equals('Page crashed!'));
     });

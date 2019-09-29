@@ -302,7 +302,7 @@ main() {
       var url = server.prefix + '/redirect/1.html';
       expect(
           () => page.goto(url), throwsA(predicate((e) => '$e'.contains(url))));
-    }, skip: "Can't reproduce the original test");
+    }, skip: "Can't reproduce the original test (needs https)");
     test('should send referer', () async {
       var request1Future = server.waitForRequest('/grid.html');
       var request2Future = server.waitForRequest('/digits/1.png');
