@@ -141,7 +141,8 @@ main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
 
-  await page.goto('https://developers.google.com/web/');
+  await page.goto('https://developers.google.com/web/',
+      wait: Until.networkAlmostIdle);
 
   // Type into search box.
   await page.type('.devsite-search-field', 'Headless Chrome');

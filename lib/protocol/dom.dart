@@ -1333,7 +1333,8 @@ class Quad {
 
   Quad(this.value);
 
-  factory Quad.fromJson(List<dynamic> value) => Quad(List<num>.from(value));
+  factory Quad.fromJson(List<dynamic> value) =>
+      Quad(value.map((e) => e as num).toList());
 
   List<num> toJson() => value;
 
@@ -1426,7 +1427,7 @@ class ShapeOutsideInfo {
 
   factory ShapeOutsideInfo.fromJson(Map<String, dynamic> json) {
     return ShapeOutsideInfo(
-      bounds: Quad.fromJson(json['bounds'] as List<num>),
+      bounds: Quad.fromJson(json['bounds'] as List),
       shape: (json['shape'] as List).map((e) => e as dynamic).toList(),
       marginShape:
           (json['marginShape'] as List).map((e) => e as dynamic).toList(),
