@@ -201,9 +201,9 @@ main() {
   window.double = false;
   var button = document.querySelector('button');
   button.addEventListener('dblclick', event => {
-  window.double = true;
+    window.double = true;
   });
-  }''');
+}''');
       var button = await page.$('button');
       await button.click(clickCount: 2);
       expect(await page.evaluate('double'), isTrue);
