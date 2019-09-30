@@ -5,7 +5,7 @@ main() async {
   var page = await browser.newPage();
 
   await page.goto('https://developers.google.com/web/',
-      wait: Until.networkAlmostIdle);
+      wait: Until.networkIdle);
 
   // Type into search box.
   await page.type('.devsite-search-field', 'Headless Chrome');
