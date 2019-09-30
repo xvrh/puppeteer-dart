@@ -48,7 +48,7 @@ class DOMStorageApi {
       'storageId': storageId,
     });
     return (result['entries'] as List)
-        .map((e) => Item.fromJson(e as List<String>))
+        .map((e) => Item.fromJson(e as List))
         .toList();
   }
 
@@ -159,7 +159,8 @@ class Item {
 
   Item(this.value);
 
-  factory Item.fromJson(List<dynamic> value) => Item(List<String>.from(value));
+  factory Item.fromJson(List<dynamic> value) =>
+      Item(value.map((e) => e as String).toList());
 
   List<String> toJson() => value;
 

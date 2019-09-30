@@ -525,8 +525,18 @@ class _InternalType {
     } else {
       Parameter singleParameter = properties.single;
       if (context.isList(singleParameter)) {
-        code.writeln(
-            'factory $id.fromJson(List<dynamic> value) => $id(${context.getPropertyType(singleParameter)}.from(value));');
+        var listItem = singleParameter.items;
+        if (!isRawType(listItem.type)) {
+          Parameter elementParameter = Parameter(
+              name: 'e',
+              type: singleParameter.items.type,
+              ref: singleParameter.items.ref);
+          code.writeln(
+              'factory $id.fromJson(List<dynamic> value) => $id(value.map((e) => ${_fromJsonCode(elementParameter, 'e', withAs: true)}).toList());');
+        } else {
+          code.writeln(
+              'factory $id.fromJson(List<dynamic> value) => $id(${context.getPropertyType(singleParameter)}.from(value));');
+        }
       } else {
         code.writeln(
             'factory $id.fromJson(${context.getPropertyType(singleParameter)} value) => $id(value);');
@@ -663,9 +673,13 @@ class _DomainContext {
     if (type == 'array') {
       if (parameter is Parameter) {
         ListItems items = parameter.items;
-        String innerType = getPropertyType(items);
+        if (items != null) {
+          String innerType = getPropertyType(items);
 
-        return 'List<$innerType>';
+          return 'List<$innerType>';
+        } else {
+          return 'List';
+        }
       } else {
         assert(false);
       }
@@ -728,8 +742,7 @@ String _castForParameter(_DomainContext context, Parameter parameter) {
         complexType.properties.isNotEmpty) {
       return 'Map<String, dynamic>';
     } else {
-      var parameter = Parameter(
-          name: 'value', type: complexType.type, items: complexType.items);
+      var parameter = Parameter(name: 'value', type: complexType.type);
       return context.getPropertyType(parameter);
     }
   }

@@ -74,7 +74,7 @@ class LayerTreeApi {
       if (clipRect != null) 'clipRect': clipRect,
     });
     return (result['timings'] as List)
-        .map((e) => PaintProfile.fromJson(e as List<num>))
+        .map((e) => PaintProfile.fromJson(e as List))
         .toList();
   }
 
@@ -446,7 +446,7 @@ class PaintProfile {
   PaintProfile(this.value);
 
   factory PaintProfile.fromJson(List<dynamic> value) =>
-      PaintProfile(List<num>.from(value));
+      PaintProfile(value.map((e) => e as num).toList());
 
   List<num> toJson() => value;
 

@@ -531,7 +531,7 @@ class ArrayOfStrings {
   ArrayOfStrings(this.value);
 
   factory ArrayOfStrings.fromJson(List<dynamic> value) =>
-      ArrayOfStrings(List<StringIndex>.from(value));
+      ArrayOfStrings(value.map((e) => StringIndex.fromJson(e as int)).toList());
 
   List<StringIndex> toJson() => value;
 
@@ -617,7 +617,7 @@ class Rectangle {
   Rectangle(this.value);
 
   factory Rectangle.fromJson(List<dynamic> value) =>
-      Rectangle(List<num>.from(value));
+      Rectangle(value.map((e) => e as num).toList());
 
   List<num> toJson() => value;
 
@@ -816,7 +816,7 @@ class NodeTreeSnapshot {
           : null,
       attributes: json.containsKey('attributes')
           ? (json['attributes'] as List)
-              .map((e) => ArrayOfStrings.fromJson(e as List<StringIndex>))
+              .map((e) => ArrayOfStrings.fromJson(e as List))
               .toList()
           : null,
       textValue: json.containsKey('textValue')
@@ -927,10 +927,10 @@ class LayoutTreeSnapshot {
     return LayoutTreeSnapshot(
       nodeIndex: (json['nodeIndex'] as List).map((e) => e as int).toList(),
       styles: (json['styles'] as List)
-          .map((e) => ArrayOfStrings.fromJson(e as List<StringIndex>))
+          .map((e) => ArrayOfStrings.fromJson(e as List))
           .toList(),
       bounds: (json['bounds'] as List)
-          .map((e) => Rectangle.fromJson(e as List<num>))
+          .map((e) => Rectangle.fromJson(e as List))
           .toList(),
       text: (json['text'] as List)
           .map((e) => StringIndex.fromJson(e as int))
@@ -942,17 +942,17 @@ class LayoutTreeSnapshot {
           : null,
       offsetRects: json.containsKey('offsetRects')
           ? (json['offsetRects'] as List)
-              .map((e) => Rectangle.fromJson(e as List<num>))
+              .map((e) => Rectangle.fromJson(e as List))
               .toList()
           : null,
       scrollRects: json.containsKey('scrollRects')
           ? (json['scrollRects'] as List)
-              .map((e) => Rectangle.fromJson(e as List<num>))
+              .map((e) => Rectangle.fromJson(e as List))
               .toList()
           : null,
       clientRects: json.containsKey('clientRects')
           ? (json['clientRects'] as List)
-              .map((e) => Rectangle.fromJson(e as List<num>))
+              .map((e) => Rectangle.fromJson(e as List))
               .toList()
           : null,
     );
@@ -1003,7 +1003,7 @@ class TextBoxSnapshot {
     return TextBoxSnapshot(
       layoutIndex: (json['layoutIndex'] as List).map((e) => e as int).toList(),
       bounds: (json['bounds'] as List)
-          .map((e) => Rectangle.fromJson(e as List<num>))
+          .map((e) => Rectangle.fromJson(e as List))
           .toList(),
       start: (json['start'] as List).map((e) => e as int).toList(),
       length: (json['length'] as List).map((e) => e as int).toList(),
