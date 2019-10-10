@@ -137,7 +137,7 @@ class NetworkManager {
       var interceptionId = _requestIdToInterceptionId[requestId.value];
       if (interceptionId != null) {
         _onRequest(event, interceptionId);
-        _requestIdToInterceptionId.remove(requestId);
+        _requestIdToInterceptionId.remove(requestId.value);
       } else {
         _requestIdToRequestWillBeSentEvent[event.requestId.value] = event;
       }
@@ -171,14 +171,15 @@ class NetworkManager {
 
     var requestId = event.networkId;
     var interceptionId = event.requestId;
-    if (requestId != null &&
-        _requestIdToRequestWillBeSentEvent.containsKey(requestId.value)) {
-      var requestWillBeSentEvent =
-          _requestIdToRequestWillBeSentEvent[requestId.value];
-      _onRequest(requestWillBeSentEvent, interceptionId.value);
-      _requestIdToRequestWillBeSentEvent.remove(requestId.value);
-    } else {
-      _requestIdToInterceptionId[requestId.value] = interceptionId.value;
+    if (requestId != null) {
+      if (_requestIdToRequestWillBeSentEvent.containsKey(requestId.value)) {
+        var requestWillBeSentEvent =
+            _requestIdToRequestWillBeSentEvent[requestId.value];
+        _onRequest(requestWillBeSentEvent, interceptionId.value);
+        _requestIdToRequestWillBeSentEvent.remove(requestId.value);
+      } else {
+        _requestIdToInterceptionId[requestId.value] = interceptionId.value;
+      }
     }
   }
 

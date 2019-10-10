@@ -15,6 +15,7 @@ import 'evaluation_test.dart' as evaluation_test;
 import 'examples_test.dart' as examples_test;
 import 'frame_test.dart' as frame_test;
 import 'golden_utils_test.dart' as golden_utils_test;
+import 'headful_test.dart' as headful_test;
 import 'input_file_test.dart' as input_file_test;
 import 'javascript_parser_test.dart' as javascript_parser_test;
 import 'js_handle_test.dart' as js_handle_test;
@@ -54,6 +55,7 @@ main() {
   group('examples_test', examples_test.main);
   group('frame_test', frame_test.main);
   group('golden_utils_test', golden_utils_test.main);
+  group('headful_test', headful_test.main);
   group('input_file_test', input_file_test.main);
   group('javascript_parser_test', javascript_parser_test.main);
   group('js_handle_test', js_handle_test.main);
