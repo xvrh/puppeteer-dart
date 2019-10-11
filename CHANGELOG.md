@@ -1,5 +1,10 @@
 # Changelog
 
+# 1.13.0 (2019-10-11)
+- Fix a NullPointerException in NetworkManager
+- (internal) Add more tests for headful mode
+- (internal) Remove all implicit casts (preparation for nnbd)
+
 # 1.12.0 (2019-08-28)
 - Fix bug in `puppeteer.connect()`
 - Add the same capabilities that pupeeteer Node.JS to `puppeteer.launch` for the management of the flags passed to Chromium.
