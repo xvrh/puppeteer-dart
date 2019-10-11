@@ -28,15 +28,18 @@ main() {
     test('background_page target type should be available', () async {
       var browserWithExtension =
           await puppeteer.launch(headless: false, args: extensionOptions);
-      var page = await browserWithExtension.newPage();
-      var backgroundPageTarget = browserWithExtension.targets
-          .firstWhere((t) => t.type == 'background_page', orElse: () => null);
-      backgroundPageTarget ??= await browserWithExtension
-          .waitForTarget((target) => target.type == 'background_page');
-      await page.close();
-      await browserWithExtension.close();
-      expect(backgroundPageTarget, isNotNull);
-    });
+      try {
+        var page = await browserWithExtension.newPage();
+        var backgroundPageTarget = browserWithExtension.targets
+            .firstWhere((t) => t.type == 'background_page', orElse: () => null);
+        backgroundPageTarget ??= await browserWithExtension
+            .waitForTarget((target) => target.type == 'background_page');
+        expect(backgroundPageTarget, isNotNull);
+        await page.close();
+      } finally {
+        await browserWithExtension.close();
+      }
+    }, onPlatform: {"windows": Skip('TODO debug on windows')});
     test('target.page() should return a background_page', () async {
       var browserWithExtension =
           await puppeteer.launch(headless: false, args: extensionOptions);
@@ -51,7 +54,7 @@ main() {
       } finally {
         await browserWithExtension.close();
       }
-    });
+    }, onPlatform: {"windows": Skip('TODO debug on windows')});
     test('should have default url when launching browser', () async {
       var browser = await puppeteer.launch(args: extensionOptions);
 
@@ -90,7 +93,7 @@ main() {
       }
       // This might throw. See https://github.com/GoogleChrome/puppeteer/issues/2778
       _tryDeleteDirectory(userDataDir);
-    });
+    }, onPlatform: {"windows": Skip('TODO debug on windows')});
     // TODO:
     test('OOPIF: should report google.com frame', () async {
       // https://google.com is isolated by default in Chromium embedder.
