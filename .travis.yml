@@ -8,13 +8,6 @@ os:
 dart:
  - stable
 
-services:
- - xvfb
-
-# allow headful tests
-before_install:
- - "export DISPLAY=:99.0"
-
 before_script:
  - dart example/download_chromium.dart
 
