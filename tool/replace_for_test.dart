@@ -1,7 +1,8 @@
 import 'dart:io';
 
 main() {
-  var result = File('tool/_replace_for_test_source.txt').readAsStringSync()
+  var result = File('tool/_replace_for_test_source.txt')
+      .readAsStringSync()
       .replaceAll('describe(', 'group(')
       .replaceAll('it(', 'test(')
       .replaceAll('it_fails_ffox(', 'test(')
