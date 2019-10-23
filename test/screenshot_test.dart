@@ -49,14 +49,6 @@ main() {
           await page.screenshot(clip: Rectangle(50, 100, 150, 100));
       expect(screenshot, equalsGolden('test/golden/screenshot-clip-rect.png'));
     });
-    test('should work for offscreen clip', () async {
-      await page.setViewport(DeviceViewport(width: 500, height: 500));
-      await page.goto(server.prefix + '/grid.html');
-      var screenshot =
-          await page.screenshot(clip: Rectangle(50, 600, 100, 100));
-      expect(screenshot,
-          equalsGolden('test/golden/screenshot-offscreen-clip.png'));
-    });
     test('should run in parallel', () async {
       await page.setViewport(DeviceViewport(width: 500, height: 500));
       await page.goto(server.prefix + '/grid.html');

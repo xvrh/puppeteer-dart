@@ -1250,7 +1250,7 @@ function deliverError(name, seq, message, stack) {
     assert(mediaType == 'screen' || mediaType == 'print' || mediaType == null,
         'Unsupported media type: $mediaType');
     mediaType ??= '';
-    return devTools.emulation.setEmulatedMedia(mediaType);
+    return devTools.emulation.setEmulatedMedia(media: mediaType);
   }
 
   /// > **NOTE** in certain cases, setting viewport will reload the page in order

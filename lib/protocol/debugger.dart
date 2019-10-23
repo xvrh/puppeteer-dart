@@ -131,6 +131,16 @@ class DebuggerApi {
     return result['scriptSource'] as String;
   }
 
+  /// Returns bytecode for the WebAssembly script with given id.
+  /// [scriptId] Id of the Wasm script to get source for.
+  /// Returns: Script source.
+  Future<String> getWasmBytecode(runtime.ScriptId scriptId) async {
+    var result = await _client.send('Debugger.getWasmBytecode', {
+      'scriptId': scriptId,
+    });
+    return result['bytecode'] as String;
+  }
+
   /// Returns stack trace with given `stackTraceId`.
   Future<runtime.StackTraceData> getStackTrace(
       runtime.StackTraceId stackTraceId) async {
@@ -147,6 +157,7 @@ class DebuggerApi {
   }
 
   /// [parentStackTraceId] Debugger will pause when async call with given stack trace is started.
+  @deprecated
   Future<void> pauseOnAsyncCall(runtime.StackTraceId parentStackTraceId) async {
     await _client.send('Debugger.pauseOnAsyncCall', {
       'parentStackTraceId': parentStackTraceId,
@@ -368,7 +379,7 @@ class DebuggerApi {
   }
 
   /// Steps into the function call.
-  /// [breakOnAsyncCall] Debugger will issue additional Debugger.paused notification if any async task is scheduled
+  /// [breakOnAsyncCall] Debugger will pause on the execution of the first async task which was scheduled
   /// before next pause.
   Future<void> stepInto({bool breakOnAsyncCall}) async {
     await _client.send('Debugger.stepInto', {
@@ -424,18 +435,13 @@ class PausedEvent {
   /// Async stack trace, if any.
   final runtime.StackTraceId asyncStackTraceId;
 
-  /// Just scheduled async call will have this stack trace as parent stack during async execution.
-  /// This field is available only after `Debugger.stepInto` call with `breakOnAsynCall` flag.
-  final runtime.StackTraceId asyncCallStackTraceId;
-
   PausedEvent(
       {@required this.callFrames,
       @required this.reason,
       this.data,
       this.hitBreakpoints,
       this.asyncStackTrace,
-      this.asyncStackTraceId,
-      this.asyncCallStackTraceId});
+      this.asyncStackTraceId});
 
   factory PausedEvent.fromJson(Map<String, dynamic> json) {
     return PausedEvent(
@@ -456,10 +462,6 @@ class PausedEvent {
       asyncStackTraceId: json.containsKey('asyncStackTraceId')
           ? runtime.StackTraceId.fromJson(
               json['asyncStackTraceId'] as Map<String, dynamic>)
-          : null,
-      asyncCallStackTraceId: json.containsKey('asyncCallStackTraceId')
-          ? runtime.StackTraceId.fromJson(
-              json['asyncCallStackTraceId'] as Map<String, dynamic>)
           : null,
     );
   }

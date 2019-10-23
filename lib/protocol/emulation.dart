@@ -132,11 +132,14 @@ class EmulationApi {
     });
   }
 
-  /// Emulates the given media for CSS media queries.
+  /// Emulates the given media type or media feature for CSS media queries.
   /// [media] Media type to emulate. Empty string disables the override.
-  Future<void> setEmulatedMedia(String media) async {
+  /// [features] Media features to emulate.
+  Future<void> setEmulatedMedia(
+      {String media, List<MediaFeature> features}) async {
     await _client.send('Emulation.setEmulatedMedia', {
-      'media': media,
+      if (media != null) 'media': media,
+      if (features != null) 'features': [...features],
     });
   }
 
@@ -308,6 +311,28 @@ class ScreenOrientationType {
 
   @override
   String toString() => value.toString();
+}
+
+class MediaFeature {
+  final String name;
+
+  final String value;
+
+  MediaFeature({@required this.name, @required this.value});
+
+  factory MediaFeature.fromJson(Map<String, dynamic> json) {
+    return MediaFeature(
+      name: json['name'] as String,
+      value: json['value'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'value': value,
+    };
+  }
 }
 
 /// advance: If the scheduler runs out of immediate work, the virtual time base may fast forward to

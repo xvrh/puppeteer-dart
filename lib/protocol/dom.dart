@@ -262,13 +262,16 @@ class DOMApi {
   /// [x] X coordinate.
   /// [y] Y coordinate.
   /// [includeUserAgentShadowDOM] False to skip to the nearest non-UA shadow root ancestor (default: false).
+  /// [ignorePointerEventsNone] Whether to ignore pointer-events: none on elements and hit test them.
   Future<GetNodeForLocationResult> getNodeForLocation(int x, int y,
-      {bool includeUserAgentShadowDOM}) async {
+      {bool includeUserAgentShadowDOM, bool ignorePointerEventsNone}) async {
     var result = await _client.send('DOM.getNodeForLocation', {
       'x': x,
       'y': y,
       if (includeUserAgentShadowDOM != null)
         'includeUserAgentShadowDOM': includeUserAgentShadowDOM,
+      if (ignorePointerEventsNone != null)
+        'ignorePointerEventsNone': ignorePointerEventsNone,
     });
     return GetNodeForLocationResult.fromJson(result);
   }
@@ -850,14 +853,19 @@ class GetNodeForLocationResult {
   /// Resulting node.
   final BackendNodeId backendNodeId;
 
+  /// Frame this node belongs to.
+  final page.FrameId frameId;
+
   /// Id of the node at given coordinates, only when enabled and requested document.
   final NodeId nodeId;
 
-  GetNodeForLocationResult({@required this.backendNodeId, this.nodeId});
+  GetNodeForLocationResult(
+      {@required this.backendNodeId, @required this.frameId, this.nodeId});
 
   factory GetNodeForLocationResult.fromJson(Map<String, dynamic> json) {
     return GetNodeForLocationResult(
       backendNodeId: BackendNodeId.fromJson(json['backendNodeId'] as int),
+      frameId: page.FrameId.fromJson(json['frameId'] as String),
       nodeId: json.containsKey('nodeId')
           ? NodeId.fromJson(json['nodeId'] as int)
           : null,

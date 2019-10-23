@@ -161,7 +161,9 @@ class RuntimeApi {
   /// [awaitPromise] Whether execution should `await` for resulting value and return once awaited promise is
   /// resolved.
   /// [throwOnSideEffect] Whether to throw an exception if side effect cannot be ruled out during evaluation.
+  /// This implies `disableBreaks` below.
   /// [timeout] Terminate execution after timing out (number of milliseconds).
+  /// [disableBreaks] Disable breakpoints during execution.
   Future<EvaluateResult> evaluate(String expression,
       {String objectGroup,
       bool includeCommandLineAPI,
@@ -172,7 +174,8 @@ class RuntimeApi {
       bool userGesture,
       bool awaitPromise,
       bool throwOnSideEffect,
-      TimeDelta timeout}) async {
+      TimeDelta timeout,
+      bool disableBreaks}) async {
     var result = await _client.send('Runtime.evaluate', {
       'expression': expression,
       if (objectGroup != null) 'objectGroup': objectGroup,
@@ -186,6 +189,7 @@ class RuntimeApi {
       if (awaitPromise != null) 'awaitPromise': awaitPromise,
       if (throwOnSideEffect != null) 'throwOnSideEffect': throwOnSideEffect,
       if (timeout != null) 'timeout': timeout,
+      if (disableBreaks != null) 'disableBreaks': disableBreaks,
     });
     return EvaluateResult.fromJson(result);
   }

@@ -466,10 +466,8 @@ class Request {
     }
 
     await _fetchApi
-        .fulfillRequest(
-            fetch.RequestId(interceptionId),
-            status ?? 200,
-            headers.entries
+        .fulfillRequest(fetch.RequestId(interceptionId), status ?? 200,
+            responseHeaders: headers.entries
                 .map((e) => fetch.HeaderEntry(
                     name: e.key.toLowerCase(), value: e.value))
                 .toList(),

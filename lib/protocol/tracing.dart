@@ -47,8 +47,12 @@ class TracingApi {
   }
 
   /// Request a global memory dump.
-  Future<RequestMemoryDumpResult> requestMemoryDump() async {
-    var result = await _client.send('Tracing.requestMemoryDump');
+  /// [deterministic] Enables more deterministic results by forcing garbage collection
+  Future<RequestMemoryDumpResult> requestMemoryDump(
+      {bool deterministic}) async {
+    var result = await _client.send('Tracing.requestMemoryDump', {
+      if (deterministic != null) 'deterministic': deterministic,
+    });
     return RequestMemoryDumpResult.fromJson(result);
   }
 

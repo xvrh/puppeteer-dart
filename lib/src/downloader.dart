@@ -16,7 +16,7 @@ class RevisionInfo {
       @required this.revision});
 }
 
-const int _lastRevision = 686378;
+const int _lastRevision = 706915;
 
 Future<RevisionInfo> downloadChrome({int revision, String cachePath}) async {
   revision ??= _lastRevision;

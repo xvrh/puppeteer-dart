@@ -60,6 +60,8 @@ class TargetApi {
 
   /// Attaches to the target with given id.
   /// [flatten] Enables "flat" access to the session via specifying sessionId attribute in the commands.
+  /// We plan to make this the default, deprecate non-flattened mode,
+  /// and eventually retire it. See crbug.com/991325.
   /// Returns: Id assigned to the session.
   Future<SessionID> attachToTarget(TargetID targetId, {bool flatten}) async {
     var result = await _client.send('Target.attachToTarget', {
@@ -185,7 +187,10 @@ class TargetApi {
   }
 
   /// Sends protocol message over session with given id.
+  /// Consider using flat mode instead; see commands attachToTarget, setAutoAttach,
+  /// and crbug.com/991325.
   /// [sessionId] Identifier of the session.
+  @deprecated
   Future<void> sendMessageToTarget(String message,
       {SessionID sessionId, @deprecated TargetID targetId}) async {
     await _client.send('Target.sendMessageToTarget', {
@@ -202,12 +207,16 @@ class TargetApi {
   /// [waitForDebuggerOnStart] Whether to pause new targets when attaching to them. Use `Runtime.runIfWaitingForDebugger`
   /// to run paused targets.
   /// [flatten] Enables "flat" access to the session via specifying sessionId attribute in the commands.
+  /// We plan to make this the default, deprecate non-flattened mode,
+  /// and eventually retire it. See crbug.com/991325.
+  /// [windowOpen] Auto-attach to the targets created via window.open from current target.
   Future<void> setAutoAttach(bool autoAttach, bool waitForDebuggerOnStart,
-      {bool flatten}) async {
+      {bool flatten, bool windowOpen}) async {
     await _client.send('Target.setAutoAttach', {
       'autoAttach': autoAttach,
       'waitForDebuggerOnStart': waitForDebuggerOnStart,
       if (flatten != null) 'flatten': flatten,
+      if (windowOpen != null) 'windowOpen': windowOpen,
     });
   }
 

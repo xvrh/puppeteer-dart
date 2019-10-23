@@ -62,16 +62,24 @@ class FetchApi {
   /// [requestId] An id the client received in requestPaused event.
   /// [responseCode] An HTTP response code.
   /// [responseHeaders] Response headers.
+  /// [binaryResponseHeaders] Alternative way of specifying response headers as a \0-separated
+  /// series of name: value pairs. Prefer the above method unless you
+  /// need to represent some non-UTF8 values that can't be transmitted
+  /// over the protocol as text.
   /// [body] A response body.
   /// [responsePhrase] A textual representation of responseCode.
-  /// If absent, a standard phrase mathcing responseCode is used.
-  Future<void> fulfillRequest(
-      RequestId requestId, int responseCode, List<HeaderEntry> responseHeaders,
-      {String body, String responsePhrase}) async {
+  /// If absent, a standard phrase matching responseCode is used.
+  Future<void> fulfillRequest(RequestId requestId, int responseCode,
+      {List<HeaderEntry> responseHeaders,
+      String binaryResponseHeaders,
+      String body,
+      String responsePhrase}) async {
     await _client.send('Fetch.fulfillRequest', {
       'requestId': requestId,
       'responseCode': responseCode,
-      'responseHeaders': [...responseHeaders],
+      if (responseHeaders != null) 'responseHeaders': [...responseHeaders],
+      if (binaryResponseHeaders != null)
+        'binaryResponseHeaders': binaryResponseHeaders,
       if (body != null) 'body': body,
       if (responsePhrase != null) 'responsePhrase': responsePhrase,
     });
