@@ -1758,6 +1758,16 @@
                             "name": "length",
                             "description": "Size of the content (in characters).",
                             "type": "number"
+                        },
+                        {
+                            "name": "endLine",
+                            "description": "Line offset of the end of the stylesheet within the resource (zero based).",
+                            "type": "number"
+                        },
+                        {
+                            "name": "endColumn",
+                            "description": "Column offset of the end of the stylesheet within the resource (zero based).",
+                            "type": "number"
                         }
                     ]
                 },
@@ -3749,7 +3759,6 @@
                 {
                     "name": "getNodeForLocation",
                     "description": "Returns node id at given location. Depending on whether DOM domain is enabled, nodeId is\neither returned or not.",
-                    "experimental": true,
                     "parameters": [
                         {
                             "name": "x",
@@ -3766,6 +3775,12 @@
                             "description": "False to skip to the nearest non-UA shadow root ancestor (default: false).",
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "ignorePointerEventsNone",
+                            "description": "Whether to ignore pointer-events: none on elements and hit test them.",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ],
                     "returns": [
@@ -3773,6 +3788,11 @@
                             "name": "backendNodeId",
                             "description": "Resulting node.",
                             "$ref": "BackendNodeId"
+                        },
+                        {
+                            "name": "frameId",
+                            "description": "Frame this node belongs to.",
+                            "$ref": "Page.FrameId"
                         },
                         {
                             "name": "nodeId",
@@ -5215,6 +5235,11 @@
                             "$ref": "StringIndex"
                         },
                         {
+                            "name": "title",
+                            "description": "Document title.",
+                            "$ref": "StringIndex"
+                        },
+                        {
                             "name": "baseURL",
                             "description": "Base URL that `Document` or `FrameOwner` node uses for URL completion.",
                             "$ref": "StringIndex"
@@ -5268,6 +5293,18 @@
                         {
                             "name": "scrollOffsetY",
                             "description": "Vertical scroll offset.",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "contentWidth",
+                            "description": "Document content width.",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "contentHeight",
+                            "description": "Document content height.",
                             "optional": true,
                             "type": "number"
                         }
@@ -5977,6 +6014,20 @@
                     ]
                 },
                 {
+                    "id": "MediaFeature",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "name": "value",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
                     "id": "VirtualTimePolicy",
                     "description": "advance: If the scheduler runs out of immediate work, the virtual time base may fast forward to\nallow the next delayed task (if any) to run; pause: The virtual time base may not advance;\npauseIfNetworkFetchesPending: The virtual time base may not advance if there are any pending\nresource fetches.",
                     "experimental": true,
@@ -6175,12 +6226,22 @@
                 },
                 {
                     "name": "setEmulatedMedia",
-                    "description": "Emulates the given media for CSS media queries.",
+                    "description": "Emulates the given media type or media feature for CSS media queries.",
                     "parameters": [
                         {
                             "name": "media",
                             "description": "Media type to emulate. Empty string disables the override.",
+                            "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "features",
+                            "description": "Media features to emulate.",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "MediaFeature"
+                            }
                         }
                     ]
                 },
@@ -6454,7 +6515,8 @@
             "events": [
                 {
                     "name": "needsBeginFramesChanged",
-                    "description": "Issued when the target starts or stops needing BeginFrames.",
+                    "description": "Issued when the target starts or stops needing BeginFrames.\nDeprecated. Issue beginFrame unconditionally instead and use result from\nbeginFrame to detect whether the frames were suppressed.",
+                    "deprecated": true,
                     "parameters": [
                         {
                             "name": "needsBeginFrames",
@@ -9094,9 +9156,12 @@
                     "type": "object",
                     "properties": [
                         {
-                            "name": "blockedReason",
-                            "description": "The reason this cookie was blocked.",
-                            "$ref": "SetCookieBlockedReason"
+                            "name": "blockedReasons",
+                            "description": "The reason(s) this cookie was blocked.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "SetCookieBlockedReason"
+                            }
                         },
                         {
                             "name": "cookieLine",
@@ -9118,9 +9183,12 @@
                     "type": "object",
                     "properties": [
                         {
-                            "name": "blockedReason",
-                            "description": "The reason the cookie was blocked.",
-                            "$ref": "CookieBlockedReason"
+                            "name": "blockedReasons",
+                            "description": "The reason(s) the cookie was blocked.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "CookieBlockedReason"
+                            }
                         },
                         {
                             "name": "cookie",
@@ -13037,6 +13105,126 @@
                     ]
                 },
                 {
+                    "id": "CertificateSecurityState",
+                    "description": "Details about the security state of the page certificate.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "protocol",
+                            "description": "Protocol name (e.g. \"TLS 1.2\" or \"QUIC\").",
+                            "type": "string"
+                        },
+                        {
+                            "name": "keyExchange",
+                            "description": "Key Exchange used by the connection, or the empty string if not applicable.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "keyExchangeGroup",
+                            "description": "(EC)DH group used by the connection, if applicable.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "cipher",
+                            "description": "Cipher name.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "mac",
+                            "description": "TLS MAC. Note that AEAD ciphers do not have separate MACs.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "certificate",
+                            "description": "Page certificate.",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        {
+                            "name": "subjectName",
+                            "description": "Certificate subject name.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "issuer",
+                            "description": "Name of the issuing CA.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "validFrom",
+                            "description": "Certificate valid from date.",
+                            "$ref": "Network.TimeSinceEpoch"
+                        },
+                        {
+                            "name": "validTo",
+                            "description": "Certificate valid to (expiration) date",
+                            "$ref": "Network.TimeSinceEpoch"
+                        },
+                        {
+                            "name": "certifcateHasWeakSignature",
+                            "description": "True if the certificate uses a weak signature aglorithm.",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "modernSSL",
+                            "description": "True if modern SSL",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "obsoleteSslProtocol",
+                            "description": "True if the connection is using an obsolete SSL protocol.",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "obsoleteSslKeyExchange",
+                            "description": "True if the connection is using an obsolete SSL key exchange.",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "obsoleteSslCipher",
+                            "description": "True if the connection is using an obsolete SSL cipher.",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "obsoleteSslSignature",
+                            "description": "True if the connection is using an obsolete SSL signature.",
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "id": "VisibleSecurityState",
+                    "description": "Security state information about the page.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "securityState",
+                            "description": "The security level of the page.",
+                            "$ref": "SecurityState"
+                        },
+                        {
+                            "name": "certificateSecurityState",
+                            "description": "Security state details about the page certificate.",
+                            "optional": true,
+                            "$ref": "CertificateSecurityState"
+                        },
+                        {
+                            "name": "securityStateIssueIds",
+                            "description": "Array of security state issues ids.",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "SecurityStateExplanation",
                     "description": "An explanation of an factor contributing to the security state.",
                     "type": "object",
@@ -13209,6 +13397,18 @@
                             "name": "requestURL",
                             "description": "The url that was requested.",
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "visibleSecurityStateChanged",
+                    "description": "The security state of the page changed.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "visibleSecurityState",
+                            "description": "Security state information about the page.",
+                            "$ref": "VisibleSecurityState"
                         }
                     ]
                 },
@@ -13765,6 +13965,18 @@
                             "type": "number"
                         },
                         {
+                            "name": "subSysId",
+                            "description": "Sub sys ID of the GPU, only available on Windows.",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "revision",
+                            "description": "Revision of the GPU, only available on Windows.",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
                             "name": "vendorString",
                             "description": "String description of the GPU vendor, if the PCI ID is not available.",
                             "type": "string"
@@ -14120,8 +14332,7 @@
                         },
                         {
                             "name": "flatten",
-                            "description": "Enables \"flat\" access to the session via specifying sessionId attribute in the commands.",
-                            "experimental": true,
+                            "description": "Enables \"flat\" access to the session via specifying sessionId attribute in the commands.\nWe plan to make this the default, deprecate non-flattened mode,\nand eventually retire it. See crbug.com/991325.",
                             "optional": true,
                             "type": "boolean"
                         }
@@ -14325,7 +14536,8 @@
                 },
                 {
                     "name": "sendMessageToTarget",
-                    "description": "Sends protocol message over session with given id.",
+                    "description": "Sends protocol message over session with given id.\nConsider using flat mode instead; see commands attachToTarget, setAutoAttach,\nand crbug.com/991325.",
+                    "deprecated": true,
                     "parameters": [
                         {
                             "name": "message",
@@ -14363,7 +14575,13 @@
                         },
                         {
                             "name": "flatten",
-                            "description": "Enables \"flat\" access to the session via specifying sessionId attribute in the commands.",
+                            "description": "Enables \"flat\" access to the session via specifying sessionId attribute in the commands.\nWe plan to make this the default, deprecate non-flattened mode,\nand eventually retire it. See crbug.com/991325.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "windowOpen",
+                            "description": "Auto-attach to the targets created via window.open from current target.",
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
@@ -14691,6 +14909,14 @@
                 {
                     "name": "requestMemoryDump",
                     "description": "Request a global memory dump.",
+                    "parameters": [
+                        {
+                            "name": "deterministic",
+                            "description": "Enables more deterministic results by forcing garbage collection",
+                            "optional": true,
+                            "type": "boolean"
+                        }
+                    ],
                     "returns": [
                         {
                             "name": "dumpGuid",
@@ -15014,10 +15240,17 @@
                         {
                             "name": "responseHeaders",
                             "description": "Response headers.",
+                            "optional": true,
                             "type": "array",
                             "items": {
                                 "$ref": "HeaderEntry"
                             }
+                        },
+                        {
+                            "name": "binaryResponseHeaders",
+                            "description": "Alternative way of specifying response headers as a \\0-separated\nseries of name: value pairs. Prefer the above method unless you\nneed to represent some non-UTF8 values that can't be transmitted\nover the protocol as text.",
+                            "optional": true,
+                            "type": "string"
                         },
                         {
                             "name": "body",
@@ -15027,7 +15260,7 @@
                         },
                         {
                             "name": "responsePhrase",
-                            "description": "A textual representation of responseCode.\nIf absent, a standard phrase mathcing responseCode is used.",
+                            "description": "A textual representation of responseCode.\nIf absent, a standard phrase matching responseCode is used.",
                             "optional": true,
                             "type": "string"
                         }
@@ -15720,15 +15953,25 @@
                         },
                         {
                             "name": "hasResidentKey",
+                            "description": "Defaults to false.",
+                            "optional": true,
                             "type": "boolean"
                         },
                         {
                             "name": "hasUserVerification",
+                            "description": "Defaults to false.",
+                            "optional": true,
                             "type": "boolean"
                         },
                         {
                             "name": "automaticPresenceSimulation",
                             "description": "If set to true, tests of user presence will succeed immediately.\nOtherwise, they will not be resolved. Defaults to true.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "isUserVerified",
+                            "description": "Sets whether User Verification succeeds or fails for an authenticator.\nDefaults to false.",
                             "optional": true,
                             "type": "boolean"
                         }

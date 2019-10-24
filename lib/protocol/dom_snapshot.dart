@@ -637,6 +637,9 @@ class DocumentSnapshot {
   /// Document URL that `Document` or `FrameOwner` node points to.
   final StringIndex documentURL;
 
+  /// Document title.
+  final StringIndex title;
+
   /// Base URL that `Document` or `FrameOwner` node uses for URL completion.
   final StringIndex baseURL;
 
@@ -670,8 +673,15 @@ class DocumentSnapshot {
   /// Vertical scroll offset.
   final num scrollOffsetY;
 
+  /// Document content width.
+  final num contentWidth;
+
+  /// Document content height.
+  final num contentHeight;
+
   DocumentSnapshot(
       {@required this.documentURL,
+      @required this.title,
       @required this.baseURL,
       @required this.contentLanguage,
       @required this.encodingName,
@@ -682,11 +692,14 @@ class DocumentSnapshot {
       @required this.layout,
       @required this.textBoxes,
       this.scrollOffsetX,
-      this.scrollOffsetY});
+      this.scrollOffsetY,
+      this.contentWidth,
+      this.contentHeight});
 
   factory DocumentSnapshot.fromJson(Map<String, dynamic> json) {
     return DocumentSnapshot(
       documentURL: StringIndex.fromJson(json['documentURL'] as int),
+      title: StringIndex.fromJson(json['title'] as int),
       baseURL: StringIndex.fromJson(json['baseURL'] as int),
       contentLanguage: StringIndex.fromJson(json['contentLanguage'] as int),
       encodingName: StringIndex.fromJson(json['encodingName'] as int),
@@ -704,12 +717,18 @@ class DocumentSnapshot {
       scrollOffsetY: json.containsKey('scrollOffsetY')
           ? json['scrollOffsetY'] as num
           : null,
+      contentWidth:
+          json.containsKey('contentWidth') ? json['contentWidth'] as num : null,
+      contentHeight: json.containsKey('contentHeight')
+          ? json['contentHeight'] as num
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'documentURL': documentURL.toJson(),
+      'title': title.toJson(),
       'baseURL': baseURL.toJson(),
       'contentLanguage': contentLanguage.toJson(),
       'encodingName': encodingName.toJson(),
@@ -721,6 +740,8 @@ class DocumentSnapshot {
       'textBoxes': textBoxes.toJson(),
       if (scrollOffsetX != null) 'scrollOffsetX': scrollOffsetX,
       if (scrollOffsetY != null) 'scrollOffsetY': scrollOffsetY,
+      if (contentWidth != null) 'contentWidth': contentWidth,
+      if (contentHeight != null) 'contentHeight': contentHeight,
     };
   }
 }

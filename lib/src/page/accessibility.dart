@@ -306,6 +306,7 @@ class _AXNode {
   bool _editable = false;
   bool _focusable = false;
   bool _expanded = false;
+  bool _hidden = false;
   String _name, _role;
   bool _cachedHasFocusableChild;
 
@@ -324,6 +325,9 @@ class _AXNode {
         }
         if (property.name == AXPropertyName.expanded) {
           _expanded = property.value.value as bool;
+        }
+        if (property.name == AXPropertyName.hidden) {
+          _hidden = property.value.value as bool;
         }
       }
     }
@@ -427,7 +431,7 @@ class _AXNode {
 
   bool isInteresting({@required bool insideControl}) {
     var role = _role;
-    if (role == 'Ignored') return false;
+    if (role == 'Ignored' || _hidden) return false;
 
     if (_focusable || _richlyEditable) return true;
 

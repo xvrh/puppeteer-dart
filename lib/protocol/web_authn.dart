@@ -182,31 +182,45 @@ class VirtualAuthenticatorOptions {
 
   final AuthenticatorTransport transport;
 
+  /// Defaults to false.
   final bool hasResidentKey;
 
+  /// Defaults to false.
   final bool hasUserVerification;
 
   /// If set to true, tests of user presence will succeed immediately.
   /// Otherwise, they will not be resolved. Defaults to true.
   final bool automaticPresenceSimulation;
 
+  /// Sets whether User Verification succeeds or fails for an authenticator.
+  /// Defaults to false.
+  final bool isUserVerified;
+
   VirtualAuthenticatorOptions(
       {@required this.protocol,
       @required this.transport,
-      @required this.hasResidentKey,
-      @required this.hasUserVerification,
-      this.automaticPresenceSimulation});
+      this.hasResidentKey,
+      this.hasUserVerification,
+      this.automaticPresenceSimulation,
+      this.isUserVerified});
 
   factory VirtualAuthenticatorOptions.fromJson(Map<String, dynamic> json) {
     return VirtualAuthenticatorOptions(
       protocol: AuthenticatorProtocol.fromJson(json['protocol'] as String),
       transport: AuthenticatorTransport.fromJson(json['transport'] as String),
-      hasResidentKey: json['hasResidentKey'] as bool,
-      hasUserVerification: json['hasUserVerification'] as bool,
+      hasResidentKey: json.containsKey('hasResidentKey')
+          ? json['hasResidentKey'] as bool
+          : null,
+      hasUserVerification: json.containsKey('hasUserVerification')
+          ? json['hasUserVerification'] as bool
+          : null,
       automaticPresenceSimulation:
           json.containsKey('automaticPresenceSimulation')
               ? json['automaticPresenceSimulation'] as bool
               : null,
+      isUserVerified: json.containsKey('isUserVerified')
+          ? json['isUserVerified'] as bool
+          : null,
     );
   }
 
@@ -214,10 +228,12 @@ class VirtualAuthenticatorOptions {
     return {
       'protocol': protocol.toJson(),
       'transport': transport.toJson(),
-      'hasResidentKey': hasResidentKey,
-      'hasUserVerification': hasUserVerification,
+      if (hasResidentKey != null) 'hasResidentKey': hasResidentKey,
+      if (hasUserVerification != null)
+        'hasUserVerification': hasUserVerification,
       if (automaticPresenceSimulation != null)
         'automaticPresenceSimulation': automaticPresenceSimulation,
+      if (isUserVerified != null) 'isUserVerified': isUserVerified,
     };
   }
 }

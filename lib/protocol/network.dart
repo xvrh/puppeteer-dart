@@ -2514,8 +2514,8 @@ class CookieBlockedReason {
 
 /// A cookie which was not stored from a response with the corresponding reason.
 class BlockedSetCookieWithReason {
-  /// The reason this cookie was blocked.
-  final SetCookieBlockedReason blockedReason;
+  /// The reason(s) this cookie was blocked.
+  final List<SetCookieBlockedReason> blockedReasons;
 
   /// The string representing this individual cookie as it would appear in the header.
   /// This is not the entire "cookie" or "set-cookie" header which could have multiple cookies.
@@ -2527,12 +2527,13 @@ class BlockedSetCookieWithReason {
   final Cookie cookie;
 
   BlockedSetCookieWithReason(
-      {@required this.blockedReason, @required this.cookieLine, this.cookie});
+      {@required this.blockedReasons, @required this.cookieLine, this.cookie});
 
   factory BlockedSetCookieWithReason.fromJson(Map<String, dynamic> json) {
     return BlockedSetCookieWithReason(
-      blockedReason:
-          SetCookieBlockedReason.fromJson(json['blockedReason'] as String),
+      blockedReasons: (json['blockedReasons'] as List)
+          .map((e) => SetCookieBlockedReason.fromJson(e as String))
+          .toList(),
       cookieLine: json['cookieLine'] as String,
       cookie: json.containsKey('cookie')
           ? Cookie.fromJson(json['cookie'] as Map<String, dynamic>)
@@ -2542,7 +2543,7 @@ class BlockedSetCookieWithReason {
 
   Map<String, dynamic> toJson() {
     return {
-      'blockedReason': blockedReason.toJson(),
+      'blockedReasons': blockedReasons.map((e) => e.toJson()).toList(),
       'cookieLine': cookieLine,
       if (cookie != null) 'cookie': cookie.toJson(),
     };
@@ -2551,26 +2552,27 @@ class BlockedSetCookieWithReason {
 
 /// A cookie with was not sent with a request with the corresponding reason.
 class BlockedCookieWithReason {
-  /// The reason the cookie was blocked.
-  final CookieBlockedReason blockedReason;
+  /// The reason(s) the cookie was blocked.
+  final List<CookieBlockedReason> blockedReasons;
 
   /// The cookie object representing the cookie which was not sent.
   final Cookie cookie;
 
   BlockedCookieWithReason(
-      {@required this.blockedReason, @required this.cookie});
+      {@required this.blockedReasons, @required this.cookie});
 
   factory BlockedCookieWithReason.fromJson(Map<String, dynamic> json) {
     return BlockedCookieWithReason(
-      blockedReason:
-          CookieBlockedReason.fromJson(json['blockedReason'] as String),
+      blockedReasons: (json['blockedReasons'] as List)
+          .map((e) => CookieBlockedReason.fromJson(e as String))
+          .toList(),
       cookie: Cookie.fromJson(json['cookie'] as Map<String, dynamic>),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'blockedReason': blockedReason.toJson(),
+      'blockedReasons': blockedReasons.map((e) => e.toJson()).toList(),
       'cookie': cookie.toJson(),
     };
   }

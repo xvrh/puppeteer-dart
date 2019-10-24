@@ -177,7 +177,8 @@ class ExecutionContext {
       }
     } on ServerException catch (e) {
       if (e.message.contains('Cannot find context with specified id') ||
-          e.message.contains('Execution context was destroyed')) {
+          e.message.contains('Execution context was destroyed') ||
+          e.message.contains('Inspected target navigated or closed')) {
         throw ExecutionContextDestroyedException();
       }
       rethrow;

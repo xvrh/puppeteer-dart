@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
+import 'network.dart' as network;
 
 /// Security
 class SecurityApi {
@@ -15,6 +16,13 @@ class SecurityApi {
   Stream<CertificateErrorEvent> get onCertificateError => _client.onEvent
       .where((event) => event.name == 'Security.certificateError')
       .map((event) => CertificateErrorEvent.fromJson(event.parameters));
+
+  /// The security state of the page changed.
+  Stream<VisibleSecurityState> get onVisibleSecurityStateChanged => _client
+      .onEvent
+      .where((event) => event.name == 'Security.visibleSecurityStateChanged')
+      .map((event) => VisibleSecurityState.fromJson(
+          event.parameters['visibleSecurityState'] as Map<String, dynamic>));
 
   /// The security state of the page changed.
   Stream<SecurityStateChangedEvent> get onSecurityStateChanged =>
@@ -199,6 +207,159 @@ class SecurityState {
 
   @override
   String toString() => value.toString();
+}
+
+/// Details about the security state of the page certificate.
+class CertificateSecurityState {
+  /// Protocol name (e.g. "TLS 1.2" or "QUIC").
+  final String protocol;
+
+  /// Key Exchange used by the connection, or the empty string if not applicable.
+  final String keyExchange;
+
+  /// (EC)DH group used by the connection, if applicable.
+  final String keyExchangeGroup;
+
+  /// Cipher name.
+  final String cipher;
+
+  /// TLS MAC. Note that AEAD ciphers do not have separate MACs.
+  final String mac;
+
+  /// Page certificate.
+  final List<String> certificate;
+
+  /// Certificate subject name.
+  final String subjectName;
+
+  /// Name of the issuing CA.
+  final String issuer;
+
+  /// Certificate valid from date.
+  final network.TimeSinceEpoch validFrom;
+
+  /// Certificate valid to (expiration) date
+  final network.TimeSinceEpoch validTo;
+
+  /// True if the certificate uses a weak signature aglorithm.
+  final bool certifcateHasWeakSignature;
+
+  /// True if modern SSL
+  final bool modernSSL;
+
+  /// True if the connection is using an obsolete SSL protocol.
+  final bool obsoleteSslProtocol;
+
+  /// True if the connection is using an obsolete SSL key exchange.
+  final bool obsoleteSslKeyExchange;
+
+  /// True if the connection is using an obsolete SSL cipher.
+  final bool obsoleteSslCipher;
+
+  /// True if the connection is using an obsolete SSL signature.
+  final bool obsoleteSslSignature;
+
+  CertificateSecurityState(
+      {@required this.protocol,
+      @required this.keyExchange,
+      this.keyExchangeGroup,
+      @required this.cipher,
+      this.mac,
+      @required this.certificate,
+      @required this.subjectName,
+      @required this.issuer,
+      @required this.validFrom,
+      @required this.validTo,
+      @required this.certifcateHasWeakSignature,
+      @required this.modernSSL,
+      @required this.obsoleteSslProtocol,
+      @required this.obsoleteSslKeyExchange,
+      @required this.obsoleteSslCipher,
+      @required this.obsoleteSslSignature});
+
+  factory CertificateSecurityState.fromJson(Map<String, dynamic> json) {
+    return CertificateSecurityState(
+      protocol: json['protocol'] as String,
+      keyExchange: json['keyExchange'] as String,
+      keyExchangeGroup: json.containsKey('keyExchangeGroup')
+          ? json['keyExchangeGroup'] as String
+          : null,
+      cipher: json['cipher'] as String,
+      mac: json.containsKey('mac') ? json['mac'] as String : null,
+      certificate:
+          (json['certificate'] as List).map((e) => e as String).toList(),
+      subjectName: json['subjectName'] as String,
+      issuer: json['issuer'] as String,
+      validFrom: network.TimeSinceEpoch.fromJson(json['validFrom'] as num),
+      validTo: network.TimeSinceEpoch.fromJson(json['validTo'] as num),
+      certifcateHasWeakSignature: json['certifcateHasWeakSignature'] as bool,
+      modernSSL: json['modernSSL'] as bool,
+      obsoleteSslProtocol: json['obsoleteSslProtocol'] as bool,
+      obsoleteSslKeyExchange: json['obsoleteSslKeyExchange'] as bool,
+      obsoleteSslCipher: json['obsoleteSslCipher'] as bool,
+      obsoleteSslSignature: json['obsoleteSslSignature'] as bool,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'protocol': protocol,
+      'keyExchange': keyExchange,
+      'cipher': cipher,
+      'certificate': [...certificate],
+      'subjectName': subjectName,
+      'issuer': issuer,
+      'validFrom': validFrom.toJson(),
+      'validTo': validTo.toJson(),
+      'certifcateHasWeakSignature': certifcateHasWeakSignature,
+      'modernSSL': modernSSL,
+      'obsoleteSslProtocol': obsoleteSslProtocol,
+      'obsoleteSslKeyExchange': obsoleteSslKeyExchange,
+      'obsoleteSslCipher': obsoleteSslCipher,
+      'obsoleteSslSignature': obsoleteSslSignature,
+      if (keyExchangeGroup != null) 'keyExchangeGroup': keyExchangeGroup,
+      if (mac != null) 'mac': mac,
+    };
+  }
+}
+
+/// Security state information about the page.
+class VisibleSecurityState {
+  /// The security level of the page.
+  final SecurityState securityState;
+
+  /// Security state details about the page certificate.
+  final CertificateSecurityState certificateSecurityState;
+
+  /// Array of security state issues ids.
+  final List<String> securityStateIssueIds;
+
+  VisibleSecurityState(
+      {@required this.securityState,
+      this.certificateSecurityState,
+      @required this.securityStateIssueIds});
+
+  factory VisibleSecurityState.fromJson(Map<String, dynamic> json) {
+    return VisibleSecurityState(
+      securityState: SecurityState.fromJson(json['securityState'] as String),
+      certificateSecurityState: json.containsKey('certificateSecurityState')
+          ? CertificateSecurityState.fromJson(
+              json['certificateSecurityState'] as Map<String, dynamic>)
+          : null,
+      securityStateIssueIds: (json['securityStateIssueIds'] as List)
+          .map((e) => e as String)
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'securityState': securityState.toJson(),
+      'securityStateIssueIds': [...securityStateIssueIds],
+      if (certificateSecurityState != null)
+        'certificateSecurityState': certificateSecurityState.toJson(),
+    };
+  }
 }
 
 /// An explanation of an factor contributing to the security state.

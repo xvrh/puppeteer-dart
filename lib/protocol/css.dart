@@ -616,6 +616,12 @@ class CSSStyleSheetHeader {
   /// Size of the content (in characters).
   final num length;
 
+  /// Line offset of the end of the stylesheet within the resource (zero based).
+  final num endLine;
+
+  /// Column offset of the end of the stylesheet within the resource (zero based).
+  final num endColumn;
+
   CSSStyleSheetHeader(
       {@required this.styleSheetId,
       @required this.frameId,
@@ -629,7 +635,9 @@ class CSSStyleSheetHeader {
       @required this.isInline,
       @required this.startLine,
       @required this.startColumn,
-      @required this.length});
+      @required this.length,
+      @required this.endLine,
+      @required this.endColumn});
 
   factory CSSStyleSheetHeader.fromJson(Map<String, dynamic> json) {
     return CSSStyleSheetHeader(
@@ -652,6 +660,8 @@ class CSSStyleSheetHeader {
       startLine: json['startLine'] as num,
       startColumn: json['startColumn'] as num,
       length: json['length'] as num,
+      endLine: json['endLine'] as num,
+      endColumn: json['endColumn'] as num,
     );
   }
 
@@ -667,6 +677,8 @@ class CSSStyleSheetHeader {
       'startLine': startLine,
       'startColumn': startColumn,
       'length': length,
+      'endLine': endLine,
+      'endColumn': endColumn,
       if (sourceMapURL != null) 'sourceMapURL': sourceMapURL,
       if (ownerNode != null) 'ownerNode': ownerNode.toJson(),
       if (hasSourceURL != null) 'hasSourceURL': hasSourceURL,

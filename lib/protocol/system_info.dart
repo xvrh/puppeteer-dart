@@ -64,6 +64,12 @@ class GPUDevice {
   /// PCI ID of the GPU device, if available; 0 otherwise.
   final num deviceId;
 
+  /// Sub sys ID of the GPU, only available on Windows.
+  final num subSysId;
+
+  /// Revision of the GPU, only available on Windows.
+  final num revision;
+
   /// String description of the GPU vendor, if the PCI ID is not available.
   final String vendorString;
 
@@ -79,6 +85,8 @@ class GPUDevice {
   GPUDevice(
       {@required this.vendorId,
       @required this.deviceId,
+      this.subSysId,
+      this.revision,
       @required this.vendorString,
       @required this.deviceString,
       @required this.driverVendor,
@@ -88,6 +96,8 @@ class GPUDevice {
     return GPUDevice(
       vendorId: json['vendorId'] as num,
       deviceId: json['deviceId'] as num,
+      subSysId: json.containsKey('subSysId') ? json['subSysId'] as num : null,
+      revision: json.containsKey('revision') ? json['revision'] as num : null,
       vendorString: json['vendorString'] as String,
       deviceString: json['deviceString'] as String,
       driverVendor: json['driverVendor'] as String,
@@ -103,6 +113,8 @@ class GPUDevice {
       'deviceString': deviceString,
       'driverVendor': driverVendor,
       'driverVersion': driverVersion,
+      if (subSysId != null) 'subSysId': subSysId,
+      if (revision != null) 'revision': revision,
     };
   }
 }
