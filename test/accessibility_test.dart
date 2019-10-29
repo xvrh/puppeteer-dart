@@ -278,12 +278,12 @@ main() {
           await page.setContent('<button>My Button</button>');
           var button = await page.$('button');
           await page.$eval('button', 'button => button.remove()');
-          expect(await page.accessibility.snapshot(root: button), equals(null));
+          expect(await page.accessibility.snapshot(root: button), isNull);
         });
         test('should support the interestingOnly option', () async {
           await page.setContent('<div><button>My Button</button></div>');
           var div = await page.$('div');
-          expect(await page.accessibility.snapshot(root: div), equals(null));
+          expect(await page.accessibility.snapshot(root: div), isNull);
           expect(
               await page.accessibility
                   .snapshot(root: div, interestingOnly: false),

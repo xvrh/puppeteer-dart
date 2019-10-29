@@ -340,7 +340,7 @@ main() {
       await page.goto(server.prefix + '/one-style.html');
       expect(failedRequests.length, equals(1));
       expect(failedRequests[0].url, contains('one-style.css'));
-      expect(failedRequests[0].response, equals(null));
+      expect(failedRequests[0].response, isNull);
       expect(failedRequests[0].resourceType, equals(ResourceType.stylesheet));
       expect(failedRequests[0].failure, equals('net::ERR_FAILED'));
       expect(failedRequests[0].frame, isNotNull);

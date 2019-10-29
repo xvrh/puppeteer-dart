@@ -33,8 +33,8 @@ main() {
   test('Evaluate simple value', () async {
     expect(await page.evaluate('true'), equals(true));
     expect(await page.evaluate('false'), equals(false));
-    expect(await page.evaluate('undefined'), equals(null));
-    expect(await page.evaluate('null'), equals(null));
+    expect(await page.evaluate('undefined'), isNull);
+    expect(await page.evaluate('null'), isNull);
     expect(await page.evaluate('1'), equals(1));
     expect(await page.evaluate('1.5'), equals(1.5));
     expect(await page.evaluate('"Hello"'), equals('Hello'));

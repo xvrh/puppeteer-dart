@@ -18,10 +18,11 @@ Most things that you can do manually in the browser can be done using Puppeteer!
 * Automate form submission, UI testing, keyboard input, etc.
 * Create an up-to-date, automated testing environment. Run your tests directly in the latest version of Chrome using the latest JavaScript and browser features.
 
-## Api
+## API
 
 * See the full API in a single-page document: [doc/api.md](doc/api.md)
 * See the Dart Doc for this package: [API reference](https://pub.dartlang.org/documentation/puppeteer/latest/puppeteer/puppeteer-library.html)
+* The Dart version of Puppeteer is very similar to the original Javascript code. Every sample available for Puppeteer Node.JS could be converted in Dart very easily. 
 
 ## Examples
 * [Launch chrome](#launch-chrome)
