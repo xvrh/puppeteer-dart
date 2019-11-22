@@ -223,6 +223,19 @@ main() {
       // other actions...
       await browser.close();
     });
+    test('emulateMediaType', () async {
+      expect(await page.evaluate("() => matchMedia('screen').matches"), isTrue);
+      expect(await page.evaluate("() => matchMedia('print').matches"), isTrue);
+
+      await page.emulateMediaType(MediaType.print);
+      expect(
+          await page.evaluate("() => matchMedia('screen').matches"), isFalse);
+      expect(await page.evaluate("() => matchMedia('print').matches"), isTrue);
+
+      await page.emulateMediaType(null);
+      expect(await page.evaluate("() => matchMedia('screen').matches"), isTrue);
+      expect(await page.evaluate("() => matchMedia('print').matches"), isTrue);
+    });
     group('evaluate', () {
       test(0, () async {
         int result = await page.evaluate('''x => {

@@ -52,6 +52,7 @@ main() {
       </select>
       </body>''');
 
+      await page.focus('[placeholder="Empty input"]');
       var golden =
           AXNode(role: 'WebArea', name: 'Accessibility Test', children: [
         AXNode(role: 'text', name: 'Hello World'),
@@ -76,6 +77,7 @@ main() {
     });
     test('should report uninteresting nodes', () async {
       await page.setContent('<textarea autofocus>hi</textarea>');
+      await page.focus('textarea');
       var golden = AXNode(
           role: 'textbox',
           name: '',

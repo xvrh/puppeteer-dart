@@ -53,7 +53,8 @@
   * [page.defaultNavigationTimeout](#pagedefaultnavigationtimeout)
   * [page.defaultTimeout](#pagedefaulttimeout)
   * [page.emulate](#pageemulatedevice-device)
-  * [page.emulateMedia](#pageemulatemediastring-mediatype)
+  * [page.emulateMediaFeatures](#pageemulatemediafeatureslistmediafeature-features)
+  * [page.emulateMediaType](#pageemulatemediatypemediatype-mediatype)
   * [page.evaluate](#pageevaluate)
   * [page.evaluateHandle](#pageevaluatehandle)
   * [page.evaluateOnNewDocument](#pageevaluateonnewdocumentstring-pagefunction-list-args)
@@ -923,13 +924,33 @@ List of all available devices is available in the source code:
 page.emulate(Device device) → Future<void> 
 ```
 
-#### page.emulateMedia(String mediaType)
+#### page.emulateMediaFeatures(List\<MediaFeature> features)
+Given an array of media feature objects, emulates CSS media features on
+the page.
+
+```dart
+page.emulateMediaFeatures(List<MediaFeature> features) → Future<void> 
+```
+
+#### page.emulateMediaType(MediaType mediaType)
 Changes the CSS media type of the page.
 The only allowed values are `'screen'`, `'print'` and `null`.
 Passing `null` disables media emulation.
+```dart
+expect(await page.evaluate("() => matchMedia('screen').matches"), isTrue);
+expect(await page.evaluate("() => matchMedia('print').matches"), isTrue);
+
+await page.emulateMediaType(MediaType.print);
+expect(await page.evaluate("() => matchMedia('screen').matches"), isFalse);
+expect(await page.evaluate("() => matchMedia('print').matches"), isTrue);
+
+await page.emulateMediaType(null);
+expect(await page.evaluate("() => matchMedia('screen').matches"), isTrue);
+expect(await page.evaluate("() => matchMedia('print').matches"), isTrue);
+```
 
 ```dart
-page.emulateMedia(String mediaType) → Future<void> 
+page.emulateMediaType(MediaType mediaType) → Future<void> 
 ```
 
 #### page.evaluate(...)

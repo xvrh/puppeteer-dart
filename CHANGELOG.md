@@ -1,5 +1,10 @@
 # Changelog
 
+# 1.14.0 (2019-11-22)
+- Add `Page.emulateTimezone` and `Page.emulateMediaFeatures`
+- Deprecate `Page.emulateMedia` in profit of `Page.emulatedMediaType`
+- Fix a "Concurrent modification error" when navigating from a page with iframes.
+
 # 1.13.0 (2019-10-11)
 - Fix a NullPointerException in NetworkManager
 - (internal) Add more tests for headful mode

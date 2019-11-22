@@ -111,25 +111,169 @@ main() {
     });
   });
 
-  group('Page.emulateMedia', () {
+  group('Page.emulateMediaType', () {
     test('should work', () async {
       expect(await page.evaluate("() => window.matchMedia('screen').matches"),
           isTrue);
       expect(await page.evaluate("() => window.matchMedia('print').matches"),
           isFalse);
-      await page.emulateMedia('print');
+      await page.emulateMediaType(MediaType.print);
       expect(await page.evaluate("() => window.matchMedia('screen').matches"),
           isFalse);
       expect(await page.evaluate("() => window.matchMedia('print').matches"),
           isTrue);
-      await page.emulateMedia(null);
+      await page.emulateMediaType(null);
       expect(await page.evaluate("() => window.matchMedia('screen').matches"),
           isTrue);
       expect(await page.evaluate("() => window.matchMedia('print').matches"),
           isFalse);
     });
     test('should throw in case of bad argument', () async {
+      // ignore: deprecated_member_use_from_same_package
       expect(() => page.emulateMedia('bad'), throwsA(anything));
+    });
+  });
+
+  group('Page.emulateMediaFeatures', () {
+    test('should work ddd', () async {
+      await page
+          .emulateMediaFeatures([MediaFeature.prefersReducedMotion('reduce')]);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-reduced-motion: reduce)').matches"),
+          isTrue);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-reduced-motion: no-preference)').matches"),
+          isFalse);
+      await page
+          .emulateMediaFeatures([MediaFeature.prefersColorsScheme('light')]);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-color-scheme: light)').matches"),
+          isTrue);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-color-scheme: dark)').matches"),
+          isFalse);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-color-scheme: no-preference)').matches"),
+          isFalse);
+      await page
+          .emulateMediaFeatures([MediaFeature.prefersColorsScheme('dark')]);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-color-scheme: dark)').matches"),
+          isTrue);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-color-scheme: light)').matches"),
+          isFalse);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-color-scheme: no-preference)').matches"),
+          isFalse);
+      await page.emulateMediaFeatures([
+        MediaFeature.prefersReducedMotion('reduce'),
+        MediaFeature.prefersColorsScheme('light')
+      ]);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-reduced-motion: reduce)').matches"),
+          isTrue);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-reduced-motion: no-preference)').matches"),
+          isFalse);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-color-scheme: light)').matches"),
+          isTrue);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-color-scheme: dark)').matches"),
+          isFalse);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-color-scheme: no-preference)').matches"),
+          isFalse);
+    }, skip: 'This is not working in headless and flaky in headful');
+
+    test('should not interfer with emulateMediaType', () async {
+      await page.emulateMediaType(MediaType.print);
+      expect(await page.evaluate("() => window.matchMedia('screen').matches"),
+          isFalse);
+      await page
+          .emulateMediaFeatures([MediaFeature.prefersColorsScheme('dark')]);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-color-scheme: dark)').matches"),
+          isTrue);
+
+      await page.emulateMediaFeatures(null);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-color-scheme: dark)').matches"),
+          isFalse);
+      expect(await page.evaluate("() => window.matchMedia('screen').matches"),
+          isFalse);
+
+      await page.emulateMediaType(null);
+      expect(await page.evaluate("() => window.matchMedia('screen').matches"),
+          isTrue);
+
+      await page
+          .emulateMediaFeatures([MediaFeature.prefersColorsScheme('dark')]);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-color-scheme: dark)').matches"),
+          isTrue);
+      await page.emulateMediaType(null);
+      expect(
+          await page.evaluate(
+              "() => matchMedia('(prefers-color-scheme: dark)').matches"),
+          isTrue);
+    }, skip: 'This is not working in headless and flaky in headful');
+  });
+
+  group('Page.emulateTimezone', () {
+    test('should work', () async {
+      await page.evaluate('''() => {
+      globalThis.date = new Date(1479579154987);
+      }''');
+      await page.emulateTimezone('America/Jamaica');
+      expect(await page.evaluate('() => date.toString()'),
+          equals('Sat Nov 19 2016 13:12:34 GMT-0500 (Eastern Standard Time)'));
+
+      await page.emulateTimezone('Pacific/Honolulu');
+      expect(
+          await page.evaluate('() => date.toString()'),
+          equals(
+              'Sat Nov 19 2016 08:12:34 GMT-1000 (Hawaii-Aleutian Standard Time)'));
+
+      await page.emulateTimezone('America/Buenos_Aires');
+      expect(
+          await page.evaluate('() => date.toString()'),
+          equals(
+              'Sat Nov 19 2016 15:12:34 GMT-0300 (Argentina Standard Time)'));
+
+      await page.emulateTimezone('Europe/Berlin');
+      expect(
+          await page.evaluate('() => date.toString()'),
+          equals(
+              'Sat Nov 19 2016 19:12:34 GMT+0100 (Central European Standard Time)'));
+    });
+
+    test('should throw for invalid timezone IDs', () async {
+      expect(
+          () => page.emulateTimezone('Foo/Bar'),
+          throwsA(
+              predicate((e) => '$e'.contains('Invalid timezone ID: Foo/Bar'))));
+      expect(
+          () => page.emulateTimezone('Baz/Qux'),
+          throwsA(
+              predicate((e) => '$e'.contains('Invalid timezone ID: Baz/Qux'))));
     });
   });
 }

@@ -4,6 +4,7 @@ main() {
   var result = File('tool/_replace_for_test_source.txt')
       .readAsStringSync()
       .replaceAll('describe(', 'group(')
+      .replaceAll('describe_fails_ffox(', 'group(')
       .replaceAll('it(', 'test(')
       .replaceAll('it_fails_ffox(', 'test(')
       .replaceAll('.PREFIX', '.prefix')
