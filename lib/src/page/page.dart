@@ -1257,7 +1257,7 @@ function deliverError(name, seq, message, stack) {
   /// Passing `null` disables media emulation.
   /// ```dart
   /// expect(await page.evaluate("() => matchMedia('screen').matches"), isTrue);
-  /// expect(await page.evaluate("() => matchMedia('print').matches"), isTrue);
+  /// expect(await page.evaluate("() => matchMedia('print').matches"), isFalse);
   ///
   /// await page.emulateMediaType(MediaType.print);
   /// expect(await page.evaluate("() => matchMedia('screen').matches"), isFalse);
@@ -1265,7 +1265,7 @@ function deliverError(name, seq, message, stack) {
   ///
   /// await page.emulateMediaType(null);
   /// expect(await page.evaluate("() => matchMedia('screen').matches"), isTrue);
-  /// expect(await page.evaluate("() => matchMedia('print').matches"), isTrue);
+  /// expect(await page.evaluate("() => matchMedia('print').matches"), isFalse);
   /// ```
   Future<void> emulateMediaType(MediaType mediaType) {
     var mediaTypeName = mediaType?.name ?? '';
@@ -1293,7 +1293,7 @@ function deliverError(name, seq, message, stack) {
       await devTools.emulation.setTimezoneOverride(timezoneId);
     } catch (exception) {
       if ('$exception'.contains('Invalid timezone')) {
-        throw Exception('Invalid timezone ID: ${timezoneId}');
+        throw Exception('Invalid timezone ID: $timezoneId');
       }
       rethrow;
     }
@@ -1524,7 +1524,7 @@ function deliverError(name, seq, message, stack) {
   ///
   /// ```dart
   /// // Generates a PDF with 'screen' media type.
-  /// await page.emulateMedia('screen');
+  /// await page.emulateMediaType(MediaType.screen);
   /// await page.pdf(output: File('page.pdf').openWrite());
   /// ```
   ///

@@ -7,8 +7,9 @@ main() async {
   var page = await browser.newPage();
   await page.goto('https://www.github.com', wait: Until.networkIdle);
 
-  // Force the "screen" media or some CSS @media print can change the look
-  await page.emulateMedia('screen');
+  // For this example, we force the "screen" media-type because sometime
+  // CSS rules with "@media print" can change the look of the page.
+  await page.emulateMediaType(MediaType.screen);
 
   // Capture the PDF and save it to a file.
   await page.pdf(

@@ -225,7 +225,7 @@ main() {
     });
     test('emulateMediaType', () async {
       expect(await page.evaluate("() => matchMedia('screen').matches"), isTrue);
-      expect(await page.evaluate("() => matchMedia('print').matches"), isTrue);
+      expect(await page.evaluate("() => matchMedia('print').matches"), isFalse);
 
       await page.emulateMediaType(MediaType.print);
       expect(
@@ -234,7 +234,7 @@ main() {
 
       await page.emulateMediaType(null);
       expect(await page.evaluate("() => matchMedia('screen').matches"), isTrue);
-      expect(await page.evaluate("() => matchMedia('print').matches"), isTrue);
+      expect(await page.evaluate("() => matchMedia('print').matches"), isFalse);
     });
     group('evaluate', () {
       test(0, () async {
@@ -329,7 +329,7 @@ main() {
     });
     test('pdf', () async {
       // Generates a PDF with 'screen' media type.
-      await page.emulateMedia('screen');
+      await page.emulateMediaType(MediaType.screen);
       await page.pdf(
           output: File(exampleValue('_page.pdf', 'page.pdf')).openWrite());
     });

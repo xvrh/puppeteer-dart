@@ -938,7 +938,7 @@ The only allowed values are `'screen'`, `'print'` and `null`.
 Passing `null` disables media emulation.
 ```dart
 expect(await page.evaluate("() => matchMedia('screen').matches"), isTrue);
-expect(await page.evaluate("() => matchMedia('print').matches"), isTrue);
+expect(await page.evaluate("() => matchMedia('print').matches"), isFalse);
 
 await page.emulateMediaType(MediaType.print);
 expect(await page.evaluate("() => matchMedia('screen').matches"), isFalse);
@@ -946,7 +946,7 @@ expect(await page.evaluate("() => matchMedia('print').matches"), isTrue);
 
 await page.emulateMediaType(null);
 expect(await page.evaluate("() => matchMedia('screen').matches"), isTrue);
-expect(await page.evaluate("() => matchMedia('print').matches"), isTrue);
+expect(await page.evaluate("() => matchMedia('print').matches"), isFalse);
 ```
 
 ```dart
@@ -1476,7 +1476,7 @@ property to force rendering of exact colors.
 
 ```dart
 // Generates a PDF with 'screen' media type.
-await page.emulateMedia('screen');
+await page.emulateMediaType(MediaType.screen);
 await page.pdf(output: File('page.pdf').openWrite());
 ```
 
