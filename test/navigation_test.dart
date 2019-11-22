@@ -53,7 +53,7 @@ main() {
     });
     test('should navigate to about:blank', () async {
       var response = await page.goto('about:blank');
-      expect(response, equals(null));
+      expect(response, isNull);
     });
     test('should return response when page changes its URL after load',
         () async {
@@ -359,7 +359,7 @@ main() {
       var response = await waitFutures(page.waitForNavigation(), [
         page.click('a'),
       ]);
-      expect(response, equals(null));
+      expect(response, isNull);
       expect(page.url, equals(server.emptyPage + '#foobar'));
     });
     test('should work with history.pushState()', () async {
@@ -373,7 +373,7 @@ main() {
       var response = await waitFutures(page.waitForNavigation(), [
         page.click('a'),
       ]);
-      expect(response, equals(null));
+      expect(response, isNull);
       expect(page.url, equals(server.prefix + '/wow.html'));
     });
     test('should work with history.replaceState()', () async {
@@ -387,7 +387,7 @@ main() {
       var response = await waitFutures(page.waitForNavigation(), [
         page.click('a'),
       ]);
-      expect(response, equals(null));
+      expect(response, isNull);
       expect(page.url, equals(server.prefix + '/replaced.html'));
     });
     test('should work with DOM history.back()/history.forward()', () async {
@@ -406,12 +406,12 @@ main() {
       var backResponse = await waitFutures(page.waitForNavigation(), [
         page.click('a#back'),
       ]);
-      expect(backResponse, equals(null));
+      expect(backResponse, isNull);
       expect(page.url, equals(server.prefix + '/first.html'));
       var forwardResponse = await waitFutures(page.waitForNavigation(), [
         page.click('a#forward'),
       ]);
-      expect(forwardResponse, equals(null));
+      expect(forwardResponse, isNull);
       expect(page.url, equals(server.prefix + '/second.html'));
     });
     test('should work when subframe issues window.stop()', () async {
@@ -446,7 +446,7 @@ main() {
       expect(response.url, contains('/grid.html'));
 
       response = await page.goForward();
-      expect(response, equals(null));
+      expect(response, isNull);
     });
     test('should work with HistoryAPI', () async {
       await page.goto(server.emptyPage);

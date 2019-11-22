@@ -196,7 +196,7 @@ main() {
       expect((await createdTarget.page).url,
           equals(server.prefix + '/popup/popup.html'));
       expect(createdTarget.opener, equals(page.target));
-      expect(page.target.opener, equals(null));
+      expect(page.target.opener, isNull);
     });
   }, timeout: Timeout(Duration(seconds: 10)));
 

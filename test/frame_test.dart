@@ -245,7 +245,7 @@ main() {
     test('should report frame.parent()', () async {
       await attachFrame(page, 'frame1', server.emptyPage);
       await attachFrame(page, 'frame2', server.emptyPage);
-      expect(page.frames[0].parentFrame, equals(null));
+      expect(page.frames[0].parentFrame, isNull);
       expect(page.frames[1].parentFrame, equals(page.mainFrame));
       expect(page.frames[2].parentFrame, equals(page.mainFrame));
     });

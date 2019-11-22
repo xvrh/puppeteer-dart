@@ -8,6 +8,7 @@ import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import '../../protocol/dev_tools.dart';
 import '../../protocol/dom.dart';
+import '../../protocol/emulation.dart' as protocol;
 import '../../protocol/log.dart';
 import '../../protocol/network.dart';
 import '../../protocol/page.dart';
@@ -1243,14 +1244,59 @@ function deliverError(name, seq, message, stack) {
     return devTools.page.setBypassCSP(enabled);
   }
 
-  /// Changes the CSS media type of the page.
-  /// The only allowed values are `'screen'`, `'print'` and `null`.
-  /// Passing `null` disables media emulation.
+  @Deprecated('Use emulateMediaType(mediaType)')
   Future<void> emulateMedia(String mediaType) {
     assert(mediaType == 'screen' || mediaType == 'print' || mediaType == null,
         'Unsupported media type: $mediaType');
     mediaType ??= '';
     return devTools.emulation.setEmulatedMedia(media: mediaType);
+  }
+
+  /// Changes the CSS media type of the page.
+  /// The only allowed values are `'screen'`, `'print'` and `null`.
+  /// Passing `null` disables media emulation.
+  /// ```dart
+  /// expect(await page.evaluate("() => matchMedia('screen').matches"), isTrue);
+  /// expect(await page.evaluate("() => matchMedia('print').matches"), isFalse);
+  ///
+  /// await page.emulateMediaType(MediaType.print);
+  /// expect(await page.evaluate("() => matchMedia('screen').matches"), isFalse);
+  /// expect(await page.evaluate("() => matchMedia('print').matches"), isTrue);
+  ///
+  /// await page.emulateMediaType(null);
+  /// expect(await page.evaluate("() => matchMedia('screen').matches"), isTrue);
+  /// expect(await page.evaluate("() => matchMedia('print').matches"), isFalse);
+  /// ```
+  Future<void> emulateMediaType(MediaType mediaType) {
+    var mediaTypeName = mediaType?.name ?? '';
+    return devTools.emulation.setEmulatedMedia(media: mediaTypeName);
+  }
+
+  /// Given an array of media feature objects, emulates CSS media features on
+  /// the page.
+  Future<void> emulateMediaFeatures(List<MediaFeature> features) async {
+    if (features == null || features.isEmpty) {
+      // We cannot use the generated client because sending null or omiting the
+      // value has different signification
+      await devTools.client
+          .send('Emulation.setEmulatedMedia', {'features': null});
+    } else {
+      await devTools.emulation.setEmulatedMedia(
+          features: features
+              .map((f) => protocol.MediaFeature(name: f.name, value: f.value))
+              .toList());
+    }
+  }
+
+  Future<void> emulateTimezone(String timezoneId) async {
+    try {
+      await devTools.emulation.setTimezoneOverride(timezoneId);
+    } catch (exception) {
+      if ('$exception'.contains('Invalid timezone')) {
+        throw Exception('Invalid timezone ID: $timezoneId');
+      }
+      rethrow;
+    }
   }
 
   /// > **NOTE** in certain cases, setting viewport will reload the page in order
@@ -1478,7 +1524,7 @@ function deliverError(name, seq, message, stack) {
   ///
   /// ```dart
   /// // Generates a PDF with 'screen' media type.
-  /// await page.emulateMedia('screen');
+  /// await page.emulateMediaType(MediaType.screen);
   /// await page.pdf(output: File('page.pdf').openWrite());
   /// ```
   ///
@@ -2098,4 +2144,33 @@ class FileChooser {
     _handled = true;
     await devTools.page.handleFileChooser('cancel');
   }
+}
+
+class MediaType {
+  static final screen = MediaType._('screen');
+  static final print = MediaType._('print');
+  static final noEmulation = MediaType._('');
+
+  final String name;
+
+  MediaType._(this.name);
+}
+
+class MediaFeature {
+  /// The CSS media feature name. Supported names are `'prefers-colors-scheme'`
+  /// and `'prefers-reduced-motion'`.
+  final String name;
+
+  /// The value for the given CSS media feature.
+  final String value;
+
+  MediaFeature._(this.name, this.value);
+
+  factory MediaFeature.prefersColorsScheme(String value) =>
+      MediaFeature._('prefers-colors-scheme', value);
+  factory MediaFeature.prefersReducedMotion(String value) =>
+      MediaFeature._('prefers-reduced-motion', value);
+
+  @override
+  String toString() => '$name: $value';
 }

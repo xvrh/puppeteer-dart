@@ -52,6 +52,7 @@ main() {
       </select>
       </body>''');
 
+      await page.focus('[placeholder="Empty input"]');
       var golden =
           AXNode(role: 'WebArea', name: 'Accessibility Test', children: [
         AXNode(role: 'text', name: 'Hello World'),
@@ -76,6 +77,7 @@ main() {
     });
     test('should report uninteresting nodes', () async {
       await page.setContent('<textarea autofocus>hi</textarea>');
+      await page.focus('textarea');
       var golden = AXNode(
           role: 'textbox',
           name: '',
@@ -278,12 +280,12 @@ main() {
           await page.setContent('<button>My Button</button>');
           var button = await page.$('button');
           await page.$eval('button', 'button => button.remove()');
-          expect(await page.accessibility.snapshot(root: button), equals(null));
+          expect(await page.accessibility.snapshot(root: button), isNull);
         });
         test('should support the interestingOnly option', () async {
           await page.setContent('<div><button>My Button</button></div>');
           var div = await page.$('div');
-          expect(await page.accessibility.snapshot(root: div), equals(null));
+          expect(await page.accessibility.snapshot(root: div), isNull);
           expect(
               await page.accessibility
                   .snapshot(root: div, interestingOnly: false),
