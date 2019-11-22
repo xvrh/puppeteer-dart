@@ -191,7 +191,10 @@ class FrameManager {
 
     // Detach all child frames first.
     if (frame != null) {
-      frame.childFrames.forEach(_removeFramesRecursively);
+      // avoid 'Concurrent modification during iteration' Error,
+      // by iterating with another iterable object.
+      final childFramesForIterate = frame.childFrames.toList(growable: false);
+      childFramesForIterate.forEach(_removeFramesRecursively);
     }
 
     // Update or create main frame.
@@ -302,7 +305,10 @@ class FrameManager {
   }
 
   void _removeFramesRecursively(Frame frame) {
-    frame.childFrames.forEach(_removeFramesRecursively);
+    // avoid 'Concurrent modification during iteration' Error,
+    // by iterating with another iterable object.
+    final childFramesForIterate = frame.childFrames.toList(growable: false);
+    childFramesForIterate.forEach(_removeFramesRecursively);
 
     frame._detach();
     _frames.remove(frame.id);
