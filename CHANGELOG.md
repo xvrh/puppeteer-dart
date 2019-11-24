@@ -1,6 +1,10 @@
 # Changelog
 
+# 1.14.1 (2019-11-24)
+- Export class `Target` in `puppeteer.dart`
+
 # 1.14.0 (2019-11-22)
+- Update Chrome to version 79
 - Add `Page.emulateTimezone` and `Page.emulateMediaFeatures`
 - Deprecate `Page.emulateMedia` in profit of `Page.emulatedMediaType`
 - Fix a "Concurrent modification error" when navigating from a page with iframes.

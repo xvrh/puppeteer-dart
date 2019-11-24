@@ -2,8 +2,7 @@ export 'dart:math' show Point, Rectangle;
 export 'protocol/dom.dart' show BoxModel;
 export 'protocol/network.dart' show CookieParam, ResourceType, ErrorReason;
 export 'src/browser.dart' show Browser, BrowserContext, PermissionType;
-export 'src/connection.dart' show ServerException;
-export 'src/connection.dart' show TargetClosedException;
+export 'src/connection.dart' show ServerException, TargetClosedException;
 export 'src/downloader.dart' show downloadChrome, RevisionInfo;
 export 'src/page/accessibility.dart' show Accessibility, AXNode;
 export 'src/page/coverage.dart' show Coverage, CoverageEntry, Range;
@@ -30,6 +29,6 @@ export 'src/page/page.dart'
         FileChooser,
         MediaType,
         MediaFeature;
-export 'src/target.dart' show Target;
 export 'src/page/tracing.dart' show Tracing;
 export 'src/puppeteer.dart' show puppeteer, Puppeteer;
+export 'src/target.dart' show Target;
