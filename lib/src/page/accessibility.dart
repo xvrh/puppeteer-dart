@@ -14,7 +14,7 @@ import '../../puppeteer.dart';
 /// there are different screen readers that might have wildly different output.
 ///
 /// Blink - Chrome's rendering engine - has a concept of "accessibility tree",
-/// which is than translated into different platform-specific APIs.
+/// which is then translated into different platform-specific APIs.
 /// Accessibility namespace gives users access to the Blink Accessibility Tree.
 ///
 /// Most of the accessibility tree gets filtered out when converting from
