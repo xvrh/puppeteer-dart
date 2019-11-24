@@ -29,6 +29,6 @@ export 'src/page/page.dart'
         FileChooser,
         MediaType,
         MediaFeature;
-export 'src/target.dart' show Target;
 export 'src/page/tracing.dart' show Tracing;
 export 'src/puppeteer.dart' show puppeteer, Puppeteer;
+export 'src/target.dart' show Target;
