@@ -242,6 +242,7 @@
 Launch or connect to a chrome instance
 
 #### puppeteer.connect(...)
+This method attaches Puppeteer to an existing Chromium instance.
 
 Parameters:
  - `browserWSEndpoint`: a browser websocket endpoint to connect to.
@@ -259,7 +260,7 @@ puppeteer.connect({String browserWsEndpoint, String browserUrl, DeviceViewport d
 ```
 
 #### puppeteer.launch(...)
-Start a Chrome instance and connect to the DevTools endpoint.
+This method starts a Chrome instance and connects to the DevTools endpoint.
 
 If [executablePath] is not provided and no environment variable
 `PUPPETEER_EXECUTABLE_PATH` is present, it will download the Chromium binaries

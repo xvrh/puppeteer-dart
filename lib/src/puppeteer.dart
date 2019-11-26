@@ -56,7 +56,7 @@ class Puppeteer {
 
   Puppeteer._();
 
-  /// Start a Chrome instance and connect to the DevTools endpoint.
+  /// This method starts a Chrome instance and connects to the DevTools endpoint.
   ///
   /// If [executablePath] is not provided and no environment variable
   /// `PUPPETEER_EXECUTABLE_PATH` is present, it will download the Chromium binaries
@@ -199,7 +199,7 @@ class Puppeteer {
     }
   }
 
-  //This methods attaches Puppeteer to an existing Chromium instance.
+  /// This method attaches Puppeteer to an existing Chromium instance.
   ///
   /// Parameters:
   ///  - `browserWSEndpoint`: a browser websocket endpoint to connect to.
