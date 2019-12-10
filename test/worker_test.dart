@@ -5,7 +5,7 @@ import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
-main() {
+void main() {
   Server server;
   Browser browser;
   BrowserContext context;
@@ -75,7 +75,7 @@ main() {
     test('should have JSHandles for console logs', () async {
       var logPromise = page.onConsole.first;
       await page.evaluate(
-          "() => new Worker(`data:text/javascript,console.log(1,2,3,this)`)");
+          '() => new Worker(`data:text/javascript,console.log(1,2,3,this)`)');
       var log = await logPromise;
       expect(log.text, equals('1 2 3 JSHandle@object'));
       expect(log.args.length, equals(4));
@@ -85,7 +85,7 @@ main() {
     test('should have an execution context', () async {
       var workerCreatedPromise = page.onWorkerCreated.first;
       await page
-          .evaluate("() => new Worker(`data:text/javascript,console.log(1)`)");
+          .evaluate('() => new Worker(`data:text/javascript,console.log(1)`)');
       var worker = await workerCreatedPromise;
       expect(await (await worker.executionContext).evaluate('1+1'), equals(2));
     });

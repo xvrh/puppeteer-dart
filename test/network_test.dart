@@ -7,7 +7,7 @@ import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
-main() {
+void main() {
   Server server;
   Browser browser;
   BrowserContext context;
@@ -225,8 +225,9 @@ main() {
       await page.goto(server.emptyPage);
       // Setup server to trap request.
       IOSink serverResponse;
+      StreamController<List<int>> responseStream;
       server.setRoute('/get', (req) {
-        var responseStream = StreamController<List<int>>();
+        responseStream = StreamController<List<int>>();
         serverResponse = IOSink(responseStream);
         serverResponse.write('hello ');
 
@@ -259,6 +260,7 @@ main() {
       // Finish response.
       serverResponse.write('ld!');
       await serverResponse.close();
+      await responseStream.close();
       expect(await responseText, equals('hello world!'));
     });
   });

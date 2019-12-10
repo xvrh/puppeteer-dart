@@ -3,7 +3,7 @@ import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
-main() {
+void main() {
   Server server;
   setUpAll(() async {
     server = await Server.create();
@@ -23,7 +23,7 @@ main() {
     var page = await browser.newPage();
 
     await page.goto(server.emptyPage);
-    String ua = await page.evaluate('window.navigator.userAgent');
+    var ua = await page.evaluate<String>('window.navigator.userAgent');
     expect(ua.toLowerCase(), contains('chrome'));
     expect(ua.toLowerCase(), isNot(contains('headless')));
 

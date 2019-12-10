@@ -5,7 +5,7 @@ import 'generate_readme.dart' as generate_readme;
 import 'generate_test_all_file.dart' as generate_test_all_file;
 import 'inject_examples_to_doc.dart' as inject_examples_to_doc;
 
-main() {
+void main() {
   generate_test_all_file.main();
   inject_examples_to_doc.main();
   generate_readme.main();

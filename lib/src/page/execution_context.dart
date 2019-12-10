@@ -74,7 +74,7 @@ class ExecutionContext {
   Future<T> evaluate<T>(@Language('js') String pageFunction,
       {List args}) async {
     try {
-      T result = await _evaluateInternal(pageFunction,
+      var result = await _evaluateInternal<T>(pageFunction,
           args: args, returnByValue: true);
       return result;
     } catch (error) {
@@ -258,7 +258,7 @@ class ExecutionContext {
 
 class ExecutionContextDestroyedException implements Exception {
   @override
-  toString() =>
+  String toString() =>
       'Execution context was destroyed, most likely because of a navigation.';
 }
 

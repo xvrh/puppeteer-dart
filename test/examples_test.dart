@@ -3,8 +3,8 @@ import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
 // Test all the dart scripts in the example/ folder.
-main() {
-  for (File exampleFile in Directory('example')
+void main() {
+  for (var exampleFile in Directory('example')
       .listSync()
       .whereType<File>()
       .where((f) =>

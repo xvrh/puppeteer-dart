@@ -4,7 +4,7 @@ import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
-main() {
+void main() {
   Server server;
   Browser browser;
   BrowserContext context;
@@ -197,14 +197,15 @@ main() {
     });
     test('should work for Shadow DOM v1', () async {
       await page.goto(server.prefix + '/shadow.html');
-      ElementHandle buttonHandle = await page.evaluateHandle('() => button');
+      var buttonHandle =
+          await page.evaluateHandle<ElementHandle>('() => button');
       await buttonHandle.click();
       expect(await page.evaluate('() => clicked'), isTrue);
     });
     test('should work for TextNodes', () async {
       await page.goto(server.prefix + '/input/button.html');
-      ElementHandle buttonTextNode = await page
-          .evaluateHandle("() => document.querySelector('button').firstChild");
+      var buttonTextNode = await page.evaluateHandle<ElementHandle>(
+          "() => document.querySelector('button').firstChild");
 
       expect(
           buttonTextNode.click,

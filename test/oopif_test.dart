@@ -3,7 +3,7 @@ import 'package:puppeteer/src/target.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
-main() {
+void main() {
   Server server;
   Browser browser;
   BrowserContext context;

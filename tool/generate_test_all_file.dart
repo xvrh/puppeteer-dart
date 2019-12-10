@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as p;
 
-main() {
+void main() {
   var allFiles = Directory('test')
       .listSync()
       .whereType<File>()

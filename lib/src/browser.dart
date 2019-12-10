@@ -20,7 +20,7 @@ export '../protocol/browser.dart' show PermissionType;
 /// An example of using a Browser to create a Page:
 ///
 /// ```dart
-/// main() async {
+/// Future<void> main() async {
 ///   var browser = await puppeteer.launch();
 ///   var page = await browser.newPage();
 ///   await page.goto('https://example.com');
@@ -100,7 +100,7 @@ class Browser {
   /// with other browser contexts.
   ///
   /// ```dart
-  /// main() async {
+  /// Future<void> main() async {
   ///   var browser = await puppeteer.launch();
   ///   // Create a new incognito browser context.
   ///   var context = await browser.createIncognitoBrowserContext();

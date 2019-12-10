@@ -4,7 +4,7 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 import 'utils/pixel_match.dart';
 
-main() {
+void main() {
   test('pixelMatch', () {
     var img1 = decodeImage(File('test/golden/2a.png').readAsBytesSync());
     var img2 = decodeImage(File('test/golden/2b.png').readAsBytesSync());

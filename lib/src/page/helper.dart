@@ -67,5 +67,6 @@ Future<void> readStream(IOApi io, StreamHandle stream, IOSink output) async {
       output.write(response.data);
     }
   } while (!response.eof);
+  base64Sink.close();
   await io.close(stream);
 }

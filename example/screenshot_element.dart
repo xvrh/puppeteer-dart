@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
 
-main() async {
+Future<void> main() async {
   // Start the browser and go to a web page
   var browser = await puppeteer.launch();
   var page = await browser.newPage();

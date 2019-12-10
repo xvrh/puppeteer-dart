@@ -6,7 +6,7 @@ import '../puppeteer.dart';
 /// Applies various techniques to make detection of headless puppeteer harder.
 class StealthPlugin extends Plugin {
   @override
-  pageCreated(Page page) async {
+  Future<void> pageCreated(Page page) async {
     var jsOnNewDocument = StringBuffer();
     for (var js in [
       _chromeRuntime,

@@ -321,7 +321,7 @@ class Request {
       {this.redirectChain, @required bool allowInterception})
       : allowInterception = allowInterception ?? false,
         _fetchApi = FetchApi(client) {
-    for (String header in event.request.headers.value.keys) {
+    for (var header in event.request.headers.value.keys) {
       _headers[header] = event.request.headers.value[header] as String;
     }
   }
@@ -520,7 +520,7 @@ class Response {
   Response(this.client, this.request, this.data)
       : _networkApi = NetworkApi(client) {
     assert(data != null);
-    for (String header in data.headers.value.keys) {
+    for (var header in data.headers.value.keys) {
       _headers[header] = data.headers.value[header] as String;
     }
   }

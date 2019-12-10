@@ -4,7 +4,7 @@ import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
-main() {
+void main() {
   Server server;
   Browser browser;
   Page page;
@@ -43,7 +43,7 @@ main() {
   test('Evaluate List', () async {
     expect(
         await page.evaluate('[true, false, undefined, null, 1, 1.5, "Hello"]'),
-        equals([true, false, null, null, 1, 1.5, "Hello"]));
+        equals([true, false, null, null, 1, 1.5, 'Hello']));
   });
 
   group('Page.evaluate', () {
@@ -64,12 +64,13 @@ main() {
       expect(result, isZero);
     });
     test('should transfer Infinity', () async {
-      double result = await page.evaluate('a => a', args: [double.infinity]);
+      var result =
+          await page.evaluate<double>('a => a', args: [double.infinity]);
       expect(result.isInfinite, isTrue);
     });
     test('should transfer -Infinity', () async {
-      double result =
-          await page.evaluate('a => a', args: [double.negativeInfinity]);
+      var result = await page
+          .evaluate<double>('a => a', args: [double.negativeInfinity]);
       expect(result.isInfinite, isTrue);
       expect(result.isNegative, isTrue);
     });

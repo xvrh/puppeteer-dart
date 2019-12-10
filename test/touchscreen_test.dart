@@ -4,7 +4,7 @@ import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
-main() {
+void main() {
   Server server;
   Browser browser;
   BrowserContext context;

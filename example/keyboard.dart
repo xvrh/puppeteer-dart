@@ -5,7 +5,7 @@ import 'package:puppeteer/puppeteer.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_static/shelf_static.dart';
 
-main() async {
+Future<void> main() async {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen(print);
 
@@ -24,7 +24,7 @@ main() async {
 
   await page.bringToFront();
 
-  await page.keyboard.type("éèà Hello");
+  await page.keyboard.type('éèà Hello');
 
   await page.keyboard.down(Key.shift);
   await page.keyboard.press(Key.arrowLeft);

@@ -1,7 +1,7 @@
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 
-main() {
+void main() {
   test('Devices should find by name', () {
     expect(puppeteer.devices['iPhone 6'], equals(puppeteer.devices.iPhone6));
     expect(puppeteer.devices['iphone 6'], equals(puppeteer.devices.iPhone6));

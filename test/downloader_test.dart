@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 
-main() {
+void main() {
   test('Download to path', () async {
     var revision = await downloadChrome(cachePath: '.local-chromium-test');
 

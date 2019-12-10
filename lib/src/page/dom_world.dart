@@ -390,8 +390,8 @@ function _(selectorOrXPath, isXPath, waitForVisible, waitForHidden) {
       bool visible,
       bool hidden,
       Duration timeout}) async {
-    bool waitForVisible = visible ?? false;
-    bool waitForHidden = hidden ?? false;
+    var waitForVisible = visible ?? false;
+    var waitForHidden = hidden ?? false;
 
     var polling =
         waitForVisible || waitForHidden ? Polling.everyFrame : Polling.mutation;
@@ -614,5 +614,5 @@ class Polling {
     assert(duration.inMilliseconds > 0);
   }
 
-  get value => _value;
+  dynamic get value => _value;
 }

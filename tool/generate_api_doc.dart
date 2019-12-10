@@ -28,7 +28,7 @@ final classesOrder = [
   'FileChooser',
 ];
 
-main() {
+void main() {
   var classes = <Class>[];
   for (var dartFile in Directory('lib/src')
       .listSync(recursive: true)

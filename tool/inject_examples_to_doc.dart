@@ -8,7 +8,7 @@ import 'package:dart_style/dart_style.dart';
 
 // Extrat the samples from the file test/doc_examples_test.dart and inject
 // it in the source code
-main() {
+void main() {
   var snippets =
       extractSnippets(File('test/doc_examples_test.dart').readAsStringSync());
 
@@ -207,19 +207,19 @@ ${LineSplitter.split(code).map((line) => '  $line').join('\n')}
   String toString() => 'Snippet(target: $target, index: $index, code: \n$code)';
 }
 
-class _ExampleReplacerVisitor extends RecursiveAstVisitor {
+class _ExampleReplacerVisitor extends RecursiveAstVisitor<void> {
   final _nodesToReplace = <AstNode, String>{};
   InterpolationExpression _stringInterpolation;
 
   @override
-  visitInterpolationExpression(node) {
+  void visitInterpolationExpression(node) {
     _stringInterpolation = node;
     super.visitInterpolationExpression(node);
     _stringInterpolation = null;
   }
 
   @override
-  visitMethodInvocation(MethodInvocation node) {
+  void visitMethodInvocation(MethodInvocation node) {
     if (node.methodName.name == 'exampleValue') {
       var argument = node.argumentList.arguments[1];
 

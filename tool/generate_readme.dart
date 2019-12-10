@@ -4,12 +4,12 @@ import 'download_protocol_from_repo.dart' show protocols;
 
 final RegExp _importRegex = RegExp(r"import '([^']+)';\r?\n");
 final RegExp _ignoreForFileRegex =
-    RegExp(r"^// ignore_for_file:.*$", multiLine: true);
+    RegExp(r'^// ignore_for_file:.*$', multiLine: true);
 
 final DartFormatter _dartFormatter =
     DartFormatter(lineEnding: Platform.isWindows ? '\r\n' : '\n');
 
-main() {
+void main() {
   File('README.md').writeAsStringSync(generateReadme());
 }
 

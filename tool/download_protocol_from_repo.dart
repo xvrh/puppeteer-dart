@@ -10,7 +10,7 @@ final protocols = {
       'https://raw.githubusercontent.com/ChromeDevTools/devtools-protocol/master/json/js_protocol.json',
 };
 
-main() async {
+Future<void> main() async {
   for (var protocolName in protocols.keys) {
     await _download(protocols[protocolName], protocolName);
   }

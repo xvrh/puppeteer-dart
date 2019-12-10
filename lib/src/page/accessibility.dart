@@ -87,7 +87,7 @@ class Accessibility {
 void _collectInterestingNodes(Set<_AXNode> collection, _AXNode node,
     {bool insideControl}) {
   if (node.isInteresting(insideControl: insideControl)) collection.add(node);
-  if (node.isLeafNode) return null;
+  if (node.isLeafNode) return;
   insideControl = insideControl || node.isControl;
   for (var child in node._children) {
     _collectInterestingNodes(collection, child, insideControl: insideControl);

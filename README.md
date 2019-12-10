@@ -39,7 +39,7 @@ Download the last revision of chrome and launch it.
 ```dart
 import 'package:puppeteer/puppeteer.dart';
 
-main() async {
+Future<void> main() async {
   // Download the Chromium binaries, launch it and connect to the "DevTools"
   var browser = await puppeteer.launch();
 
@@ -65,7 +65,7 @@ main() async {
 import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
 
-main() async {
+Future<void> main() async {
   // Start the browser and go to a web page
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
@@ -91,7 +91,7 @@ main() async {
 import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
 
-main() async {
+Future<void> main() async {
   // Start the browser and go to a web page
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
@@ -116,7 +116,7 @@ main() async {
 import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
 
-main() async {
+Future<void> main() async {
   // Start the browser and go to a web page
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
@@ -139,7 +139,7 @@ main() async {
 ```dart
 import 'package:puppeteer/puppeteer.dart';
 
-main() async {
+Future<void> main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
 
@@ -176,7 +176,7 @@ main() async {
 ```dart
 import 'package:puppeteer/puppeteer.dart';
 
-main() async {
+Future<void> main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   await page.goto('https://w3c.github.io/');
@@ -205,7 +205,7 @@ import 'package:puppeteer/puppeteer.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_static/shelf_static.dart';
 
-main() async {
+Future<void> main() async {
   // Start a local web server and open the page
   var server =
       await io.serve(createStaticHandler('example/html'), 'localhost', 0);
@@ -252,7 +252,7 @@ The code is in `lib/protocol`
 ```dart
 import 'package:puppeteer/puppeteer.dart';
 
-main() async {
+Future<void> main() async {
   var browser = await puppeteer.launch();
   // Create a chrome's tab
   var page = await browser.newPage();
@@ -310,7 +310,7 @@ The javascript code can be:
 ```dart
 import 'package:puppeteer/puppeteer.dart';
 
-main() async {
+Future<void> main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
 

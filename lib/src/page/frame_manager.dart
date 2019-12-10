@@ -251,7 +251,7 @@ class FrameManager {
   }
 
   void _onExecutionContextCreated(ExecutionContextDescription contextPayload) {
-    String frameId = contextPayload.auxData != null
+    var frameId = contextPayload.auxData != null
         ? contextPayload.auxData['frameId'] as String
         : null;
     var frame = _frames[FrameId(frameId)];
@@ -331,7 +331,7 @@ class FrameManager {
 /// An example of dumping frame tree:
 ///
 /// ```dart
-/// dumpFrameTree(Frame frame, String indent) {
+/// void dumpFrameTree(Frame frame, String indent) {
 ///   print(indent + frame.url);
 ///   for (var child in frame.childFrames) {
 ///     dumpFrameTree(child, indent + '  ');
@@ -495,7 +495,7 @@ class Frame {
   ///
   /// Passing arguments to `pageFunction`:
   /// ```dart
-  /// int result = await frame.evaluate('''x => {
+  /// var result = await frame.evaluate<int>('''x => {
   ///           return Promise.resolve(8 * x);
   ///         }''', args: [7]);
   /// print(result); // prints "56"
@@ -765,7 +765,7 @@ class Frame {
   /// ```dart
   /// import 'package:puppeteer/puppeteer.dart';
   ///
-  /// main() async {
+  /// Future<void> main() async {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   var watchImg = page.mainFrame.waitForSelector('img');
@@ -813,7 +813,7 @@ class Frame {
   /// ```dart
   /// import 'package:puppeteer/puppeteer.dart';
   ///
-  /// main() async {
+  /// Future<void> main() async {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   var watchImg = page.mainFrame.waitForXPath('//img');
@@ -870,7 +870,7 @@ class Frame {
   /// ```dart
   /// import 'package:puppeteer/puppeteer.dart';
   ///
-  /// main() async {
+  /// Future<void> main() async {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   var watchDog = page.mainFrame.waitForFunction('window.innerWidth < 100');

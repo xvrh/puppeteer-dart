@@ -1,6 +1,6 @@
 import 'package:puppeteer/puppeteer.dart';
 
-main() async {
+Future<void> main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
 
@@ -10,7 +10,7 @@ main() async {
   });
 
   // Attach an event listener to page to capture a custom event on page load/navigation.
-  listenFor(type) {
+  Future<void> listenFor(type) {
     return page.evaluateOnNewDocument('''type => {
       document.addEventListener(type, e => {
         window.onCustomEvent({type, detail: e.detail});
