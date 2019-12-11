@@ -4,7 +4,7 @@ import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
-main() {
+void main() {
   Server server;
   Browser browser;
   BrowserContext context;
@@ -65,7 +65,7 @@ function dimensions() {
   });
 }''');
       await page.mouse.click(Point(50, 60));
-      Map event = await page.evaluate('() => window.clickPromise');
+      var event = await page.evaluate<Map>('() => window.clickPromise');
       expect(event['type'], equals('click'));
       expect(event['detail'], equals(1));
       expect(event['clientX'], equals(50));

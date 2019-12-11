@@ -2,7 +2,7 @@ import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
-main() {
+void main() {
   Server server;
   Browser browser;
   setUpAll(() async {

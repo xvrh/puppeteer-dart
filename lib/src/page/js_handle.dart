@@ -57,14 +57,14 @@ function _(object, propertyName) {
 }
 ''', args: [this, propertyName]);
     var properties = await objectHandle.properties;
-    T result = properties[propertyName] as T;
+    var result = properties[propertyName] as T;
     await objectHandle.dispose();
     return result;
   }
 
   /// Fetches the jsonValue of a single property from the referenced object.
   Future<T> propertyValue<T>(String propertyName) async {
-    T value = await (await property(propertyName)).jsonValue as T;
+    var value = await (await property(propertyName)).jsonValue as T;
     return value;
   }
 
@@ -74,7 +74,7 @@ function _(object, propertyName) {
   /// ```dart
   /// var handle = await page.evaluateHandle('() => ({window, document})');
   /// var properties = await handle.properties;
-  /// JsHandle windowHandle = properties['window'];
+  /// var windowHandle = properties['window'];
   /// var documentHandle = properties['document'] as ElementHandle;
   /// await handle.dispose();
   /// ```
@@ -148,7 +148,7 @@ function _(object, propertyName) {
 /// ```dart
 /// import 'package:puppeteer/puppeteer.dart';
 ///
-/// main() async {
+/// Future<void> main() async {
 ///   var browser = await puppeteer.launch();
 ///
 ///   var page = await browser.newPage();
@@ -527,7 +527,8 @@ async function _(element, pageJavascriptEnabled) {
       allArgs.addAll(args);
     }
 
-    T result = await executionContext.evaluate<T>(pageFunction, args: allArgs);
+    var result =
+        await executionContext.evaluate<T>(pageFunction, args: allArgs);
     await elementHandle.dispose();
     return result;
   }
@@ -570,8 +571,8 @@ async function _(element, pageJavascriptEnabled) {
     if (args != null) {
       allArgs.addAll(args);
     }
-
-    T result = await executionContext.evaluate<T>(pageFunction, args: allArgs);
+    var result =
+        await executionContext.evaluate<T>(pageFunction, args: allArgs);
     await arrayHandle.dispose();
     return result;
   }

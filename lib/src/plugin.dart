@@ -4,5 +4,5 @@ import 'puppeteer.dart';
 
 abstract class Plugin {
   FutureOr<LaunchOptions> willLaunchBrowser(LaunchOptions options) => options;
-  pageCreated(Page page) {}
+  Future<void> pageCreated(Page page) async {}
 }

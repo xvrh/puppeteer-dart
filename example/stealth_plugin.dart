@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:puppeteer/plugins/stealth.dart';
 import 'package:puppeteer/puppeteer.dart';
 
-main() async {
+Future<void> main() async {
   puppeteer.plugins.add(StealthPlugin());
 
   var browser = await puppeteer.launch();

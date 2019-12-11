@@ -44,7 +44,7 @@ Future<RevisionInfo> downloadChrome({int revision, String cachePath}) async {
   }
 
   if (!Platform.isWindows) {
-    Process.runSync("chmod", ["+x", executableFile.absolute.path]);
+    Process.runSync('chmod', ['+x', executableFile.absolute.path]);
   }
 
   return RevisionInfo(

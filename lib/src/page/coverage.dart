@@ -27,11 +27,12 @@ class CoverageEntry {
       };
 
   @override
-  toString() => 'CoverageEntry(url: $url, ranges: $ranges, text: $text)';
+  String toString() => 'CoverageEntry(url: $url, ranges: $ranges, text: $text)';
 }
 
 class Range {
-  int _start, _end;
+  final int _start;
+  int _end;
 
   Range(this._start, this._end)
       : assert(_start != null),
@@ -41,17 +42,17 @@ class Range {
 
   int get end => _end;
 
-  toJson() => {'start': start, 'end': end};
+  Map<String, dynamic> toJson() => {'start': start, 'end': end};
 
   @override
-  operator ==(other) =>
+  bool operator ==(other) =>
       other is Range && other.start == start && other.end == end;
 
   @override
   int get hashCode => start.hashCode + end.hashCode;
 
   @override
-  toString() => 'Range(start: $start, end: $end)';
+  String toString() => 'Range(start: $start, end: $end)';
 }
 
 /// Coverage gathers information about parts of JavaScript and CSS that were used by the page.
@@ -179,7 +180,7 @@ class JsCoverage {
     ]);
   }
 
-  _onExecutionContextsCleared(_) {
+  void _onExecutionContextsCleared(_) {
     if (!_resetOnNavigation) return;
     _scriptUrls.clear();
     _scriptSources.clear();
@@ -214,7 +215,9 @@ class JsCoverage {
 
     var profileResponse = await profileResponseFuture;
 
-    _subscriptions.forEach((s) => s.cancel());
+    for (var s in _subscriptions) {
+      await s.cancel();
+    }
 
     var coverage = <CoverageEntry>[];
     for (var entry in profileResponse) {

@@ -5,7 +5,7 @@ import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
-main() {
+void main() {
   Server server;
   setUpAll(() async {
     server = await Server.create();
@@ -167,7 +167,7 @@ main() {
           _tryDeleteDirectory(userDataDir);
         }
       }, onPlatform: {
-        "windows": Skip(
+        'windows': Skip(
             'This mysteriously fails on Windows. See https://github.com/GoogleChrome/puppeteer/issues/4111')
       });
       test('should return the default arguments', () {

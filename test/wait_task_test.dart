@@ -5,7 +5,7 @@ import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
-main() {
+void main() {
   Server server;
   Browser browser;
   BrowserContext context;
@@ -324,7 +324,7 @@ main() {
       expect(divHidden, isTrue);
     });
     test('hidden should wait for removal', () async {
-      await page.setContent("<div></div>");
+      await page.setContent('<div></div>');
       var divRemoved = false;
       var waitForSelector = page
           .waitForSelector('div', hidden: true)

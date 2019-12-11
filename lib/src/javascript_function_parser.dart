@@ -17,8 +17,8 @@ String convertToFunctionDeclaration(String javascript) {
       return javascript;
     } else {
       var hasBodyStatement = tokens.contains(_hasBodyStatements);
-      _Arguments arguments = tokens.whereType<_Arguments>().single;
-      _FunctionBody functionBody = tokens.whereType<_FunctionBody>().single;
+      var arguments = tokens.whereType<_Arguments>().single;
+      var functionBody = tokens.whereType<_FunctionBody>().single;
       var isAsync = tokens.contains(_isAsync);
 
       var body = hasBodyStatement
@@ -55,12 +55,12 @@ class JsGrammarDefinition extends GrammarDefinition {
   }
 
   @override
-  start() => ref(functionDeclarationOrShortHand).end();
+  Parser start() => ref(functionDeclarationOrShortHand).end();
 
-  functionDeclarationOrShortHand() =>
+  Parser functionDeclarationOrShortHand() =>
       ref(functionDeclaration) | ref(functionShorthand);
 
-  functionDeclaration() =>
+  Parser functionDeclaration() =>
       ref(token, 'async').optional() &
       ref(token, 'function').map((_) => _isFunction) &
       ref(identifier).optional() &
@@ -68,7 +68,7 @@ class JsGrammarDefinition extends GrammarDefinition {
       ref(token, '{') &
       ref(body);
 
-  functionShorthand() =>
+  Parser functionShorthand() =>
       ref(token, 'async').optional().map((t) => t != null ? _isAsync : null) &
       ref(functionShorthandArguments).flatten().map((t) => _Arguments(t)) &
       ref(token, '=>') &
@@ -77,43 +77,43 @@ class JsGrammarDefinition extends GrammarDefinition {
           .map((v) => v != null ? _hasBodyStatements : null) &
       ref(body);
 
-  functionShorthandArguments() => ref(arguments) | ref(identifier);
+  Parser functionShorthandArguments() => ref(arguments) | ref(identifier);
 
-  arguments() =>
+  Parser arguments() =>
       ref(token, '(') & ref(argumentList).optional() & ref(token, ')');
 
-  argumentList() => ref(argument).separatedBy(ref(token, ','));
+  Parser argumentList() => ref(argument).separatedBy(ref(token, ','));
 
-  argument() => ref(token, '...').optional() & ref(identifier);
+  Parser argument() => ref(token, '...').optional() & ref(identifier);
 
-  identifier() =>
+  Parser identifier() =>
       ref(token, ref(IDENTIFIER)).map((v) => v.value[0] + v.value[1].join(''));
 
-  body() => ref(any).star().map((v) => _FunctionBody(v.join('')));
+  Parser body() => ref(any).star().map((v) => _FunctionBody(v.join('')));
 
-  IDENTIFIER() => ref(IDENTIFIER_START) & ref(IDENTIFIER_PART).star();
+  Parser IDENTIFIER() => ref(IDENTIFIER_START) & ref(IDENTIFIER_PART).star();
 
-  IDENTIFIER_START() => ref(IDENTIFIER_START_NO_DOLLAR) | char('\$');
+  Parser IDENTIFIER_START() => ref(IDENTIFIER_START_NO_DOLLAR) | char('\$');
 
-  IDENTIFIER_START_NO_DOLLAR() => ref(LETTER) | char('_');
+  Parser IDENTIFIER_START_NO_DOLLAR() => ref(LETTER) | char('_');
 
-  IDENTIFIER_PART() => ref(IDENTIFIER_START) | ref(DIGIT);
+  Parser IDENTIFIER_PART() => ref(IDENTIFIER_START) | ref(DIGIT);
 
-  LETTER() => letter();
+  Parser LETTER() => letter();
 
-  DIGIT() => digit();
+  Parser DIGIT() => digit();
 
-  NEWLINE() => pattern('\n\r');
+  Parser NEWLINE() => pattern('\n\r');
 
-  HIDDEN_STUFF() =>
+  Parser HIDDEN_STUFF() =>
       ref(WHITESPACE) | ref(SINGLE_LINE_COMMENT) | ref(MULTI_LINE_COMMENT);
 
-  WHITESPACE() => whitespace();
+  Parser WHITESPACE() => whitespace();
 
-  SINGLE_LINE_COMMENT() =>
+  Parser SINGLE_LINE_COMMENT() =>
       string('//') & ref(NEWLINE).neg().star() & ref(NEWLINE).optional();
 
-  MULTI_LINE_COMMENT() =>
+  Parser MULTI_LINE_COMMENT() =>
       string('/*') &
       (ref(MULTI_LINE_COMMENT) | string('*/').neg()).star() &
       string('*/');
@@ -129,7 +129,7 @@ class _FunctionBody {
   _FunctionBody(this.value);
 
   @override
-  toString() => value;
+  String toString() => value;
 }
 
 class _Arguments {

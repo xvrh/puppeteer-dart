@@ -49,7 +49,7 @@ List<DartProject> getSubOrContainingProjects(String root) {
 }
 
 bool isInHiddenDir(String relative) =>
-    p.split(relative).any((part) => part.startsWith(".") || part == 'build');
+    p.split(relative).any((part) => part.startsWith('.') || part == 'build');
 
 class DartProject {
   final String rootDirectory;
@@ -80,7 +80,7 @@ class DartProject {
     return files;
   }
 
-  _visitDirectory(Directory directory, List<DartFile> files,
+  void _visitDirectory(Directory directory, List<DartFile> files,
       {bool isRoot = true}) {
     var directoryContent = directory.listSync();
 

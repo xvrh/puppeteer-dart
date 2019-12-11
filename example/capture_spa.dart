@@ -1,6 +1,6 @@
 import 'package:puppeteer/puppeteer.dart';
 
-main() async {
+Future<void> main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   await page.goto('https://w3c.github.io/');

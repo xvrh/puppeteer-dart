@@ -11,7 +11,7 @@ import 'utils/utils.dart';
 // The tests in this file are extracted by the script `tool/inject_examples_to_doc.dart`
 // and injected into the documentation in the source code.
 // This help to ensure that the examples provided in the code are correct.
-main() {
+void main() {
   Server server;
   Browser browser;
   Page page;
@@ -40,7 +40,7 @@ main() {
   group('Browser', () {
     test('class', () async {
       //---
-      main() async {
+      Future<void> main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         await page.goto(exampleValue(server.hostUrl, 'https://example.com'));
@@ -52,7 +52,7 @@ main() {
     });
     test('createIncognitoBrowserContext', () async {
       //---
-      main() async {
+      Future<void> main() async {
         var browser = await puppeteer.launch();
         // Create a new incognito browser context.
         var context = await browser.createIncognitoBrowserContext();
@@ -114,7 +114,7 @@ main() {
         //+ import 'dart:io';
         //+ import 'package:puppeteer/puppeteer.dart';
 
-        main() async {
+        Future<void> main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           await page.goto(exampleValue(server.hostUrl, 'https://example.com'));
@@ -130,7 +130,7 @@ main() {
         page.onLoad.listen((_) => print('Page loaded!'));
       });
       test(2, () async {
-        logRequest(Request interceptedRequest) {
+        void logRequest(Request interceptedRequest) {
           print('A request was made: ${interceptedRequest.url}');
         }
 
@@ -238,7 +238,7 @@ main() {
     });
     group('evaluate', () {
       test(0, () async {
-        int result = await page.evaluate('''x => {
+        var result = await page.evaluate<int>('''x => {
           return Promise.resolve(8 * x);
         }''', args: [7]);
         print(result); // prints "56"
@@ -283,7 +283,7 @@ main() {
         //+import 'package:puppeteer/puppeteer.dart';
         //+import 'package:crypto/crypto.dart' as crypto;
 
-        main() async {
+        Future<void> main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           page.onConsole.listen((msg) => print(msg.text));
@@ -308,7 +308,7 @@ main() {
         //+import 'dart:io';
         //+import 'package:puppeteer/puppeteer.dart';
 
-        main() async {
+        Future<void> main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           page.onConsole.listen((msg) => print(msg.text));
@@ -395,7 +395,7 @@ main() {
         //---
         //+import 'package:puppeteer/puppeteer.dart';
 
-        main() async {
+        Future<void> main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           var watchDog = page.waitForFunction('window.innerWidth < 100');
@@ -445,7 +445,7 @@ main() {
       //---
       //+import 'package:puppeteer/puppeteer.dart';
 
-      main() async {
+      Future<void> main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.waitForSelector('img');
@@ -463,7 +463,7 @@ main() {
       //---
       //+import 'package:puppeteer/puppeteer.dart';
 
-      main() async {
+      Future<void> main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.waitForXPath('//img');
@@ -494,7 +494,7 @@ main() {
   group('Frame', () {
     group('class', () {
       test(0, () async {
-        dumpFrameTree(Frame frame, String indent) {
+        void dumpFrameTree(Frame frame, String indent) {
           print(indent + frame.url);
           for (var child in frame.childFrames) {
             dumpFrameTree(child, indent + '  ');
@@ -543,7 +543,7 @@ main() {
     });
     group('evaluate', () {
       test(0, () async {
-        int result = await frame.evaluate('''x => {
+        var result = await frame.evaluate<int>('''x => {
           return Promise.resolve(8 * x);
         }''', args: [7]);
         print(result); // prints "56"
@@ -595,7 +595,7 @@ main() {
         //---
         //+import 'package:puppeteer/puppeteer.dart';
 
-        main() async {
+        Future<void> main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           var watchDog =
@@ -619,7 +619,7 @@ main() {
       //---
       //+import 'package:puppeteer/puppeteer.dart';
 
-      main() async {
+      Future<void> main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.mainFrame.waitForSelector('img');
@@ -637,7 +637,7 @@ main() {
       //---
       //+import 'package:puppeteer/puppeteer.dart';
 
-      main() async {
+      Future<void> main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.mainFrame.waitForXPath('//img');
@@ -770,7 +770,7 @@ main() {
       //----
       var handle = await page.evaluateHandle('() => ({window, document})');
       var properties = await handle.properties;
-      JsHandle windowHandle = properties['window'];
+      var windowHandle = properties['window'];
       var documentHandle = properties['document'] as ElementHandle;
       await handle.dispose();
       //----
@@ -783,7 +783,7 @@ main() {
       //---
       //+import 'package:puppeteer/puppeteer.dart';
 
-      main() async {
+      Future<void> main() async {
         var browser = await puppeteer.launch();
 
         var page = await browser.newPage();

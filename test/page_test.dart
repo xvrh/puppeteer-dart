@@ -7,7 +7,7 @@ import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
-main() {
+void main() {
   Server server;
   Browser browser;
   BrowserContext context;
@@ -267,7 +267,7 @@ main() {
           .overridePermissions(server.hostUrl, [PermissionType.geolocation]);
       await page.goto(server.emptyPage);
       await page.setGeolocation(longitude: 10, latitude: 10);
-      Map geolocation = await page.evaluate(
+      var geolocation = await page.evaluate<Map>(
           '''() => new Promise((resolve, failure) => navigator.geolocation.getCurrentPosition(position => {
       resolve({latitude: position.coords.latitude, longitude: position.coords.longitude});
       }, error => failure(error.message)))''');
@@ -442,7 +442,7 @@ main() {
     });
   });
   group('Page.metrics', () {
-    checkMetrics(Metrics metrics) {
+    void checkMetrics(Metrics metrics) {
       var metricsToCheck = {
         'Timestamp',
         'Documents',
@@ -548,7 +548,7 @@ main() {
       await page.exposeFunction('woof', () {
         throw Exception('WOOF WOOF');
       });
-      Map<String, dynamic> result = await page.evaluate('''async () => {
+      var result = await page.evaluate<Map<String, dynamic>>('''async () => {
       try {
         await woof();
       } catch (e) {
@@ -617,8 +617,8 @@ main() {
       await page.exposeFunction('complexObject', (Map a, Map b) {
         return {'x': a['x'] + b['x']};
       });
-      Map result =
-          await page.evaluate('async() => complexObject({x: 5}, {x: 2})');
+      var result =
+          await page.evaluate<Map>('async() => complexObject({x: 5}, {x: 2})');
       expect(result['x'], equals(7));
     });
   });

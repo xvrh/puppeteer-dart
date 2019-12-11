@@ -4,7 +4,7 @@ import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
-main() {
+void main() {
   Server server;
   setUpAll(() async {
     server = await Server.create();
@@ -39,7 +39,7 @@ main() {
       } finally {
         await browserWithExtension.close();
       }
-    }, onPlatform: {"windows": Skip('TODO debug on windows')});
+    }, onPlatform: {'windows': Skip('TODO debug on windows')});
     test('target.page() should return a background_page', () async {
       var browserWithExtension =
           await puppeteer.launch(headless: false, args: extensionOptions);
@@ -54,7 +54,7 @@ main() {
       } finally {
         await browserWithExtension.close();
       }
-    }, onPlatform: {"windows": Skip('TODO debug on windows')});
+    }, onPlatform: {'windows': Skip('TODO debug on windows')});
     test('should have default url when launching browser', () async {
       var browser = await puppeteer.launch(args: extensionOptions);
 
@@ -93,7 +93,7 @@ main() {
       }
       // This might throw. See https://github.com/GoogleChrome/puppeteer/issues/2778
       _tryDeleteDirectory(userDataDir);
-    }, onPlatform: {"windows": Skip('TODO debug on windows')});
+    }, onPlatform: {'windows': Skip('TODO debug on windows')});
     // TODO:
     test('OOPIF: should report google.com frame', () async {
       // https://google.com is isolated by default in Chromium embedder.

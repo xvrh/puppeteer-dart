@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 import '../tool/inject_examples_to_doc.dart';
 
-main() {
+void main() {
   test('Extract snippets', () {
     var snippets = extractSnippets(_testFileCode);
 

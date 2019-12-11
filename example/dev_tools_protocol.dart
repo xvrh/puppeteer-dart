@@ -1,6 +1,6 @@
 import 'package:puppeteer/puppeteer.dart';
 
-main() async {
+Future<void> main() async {
   var browser = await puppeteer.launch();
   // Create a chrome's tab
   var page = await browser.newPage();

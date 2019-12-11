@@ -4,7 +4,7 @@ import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
-main() {
+void main() {
   Server server;
   Browser browser;
   BrowserContext context;
@@ -40,7 +40,7 @@ main() {
     test('should accept arguments', () async {
       await page.setContent('<section>hello</section>');
       var text = await page.$eval(
-          'section', "(e, suffix) => e.textContent + suffix",
+          'section', '(e, suffix) => e.textContent + suffix',
           args: [' world!']);
       expect(text, equals('hello world!'));
     });
@@ -48,7 +48,7 @@ main() {
       await page.setContent('<section>hello</section><div> world</div>');
       var divHandle = await page.$('div');
       var text = await page.$eval(
-          'section', "(e, div) => e.textContent + div.textContent",
+          'section', '(e, div) => e.textContent + div.textContent',
           args: [divHandle]);
       expect(text, equals('hello world'));
     });

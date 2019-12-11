@@ -4,7 +4,7 @@ import 'package:puppeteer/puppeteer.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_static/shelf_static.dart';
 
-main() async {
+Future<void> main() async {
   Logger.root
     ..level = Level.ALL
     ..onRecord.listen(print);
@@ -28,12 +28,12 @@ main() async {
 
   await normalTab1.evaluate('window.localStorage.setItem("name", "xavier")');
 
-  String itemValue =
-      await normalTab2.evaluate('window.localStorage.getItem("name")');
+  var itemValue =
+      await normalTab2.evaluate<String>('window.localStorage.getItem("name")');
   assert(itemValue == 'xavier');
 
-  String incognitoValue =
-      await incognitoTab1.evaluate('window.localStorage.getItem("name")');
+  var incognitoValue = await incognitoTab1
+      .evaluate<String>('window.localStorage.getItem("name")');
   assert(incognitoValue == null);
 
   print('$itemValue vs $incognitoValue');

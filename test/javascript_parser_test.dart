@@ -1,7 +1,7 @@
 import 'package:puppeteer/src/javascript_function_parser.dart';
 import 'package:test/test.dart';
 
-main() {
+void main() {
   test('Returns function declaration as it', () {
     var declarations = [
       '''

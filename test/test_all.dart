@@ -38,7 +38,7 @@ import 'tracing_test.dart' as tracing_test;
 import 'wait_task_test.dart' as wait_task_test;
 import 'worker_test.dart' as worker_test;
 
-main() {
+void main() {
   group('accessibility_test', accessibility_test.main);
   group('browser_context_test', browser_context_test.main);
   group('browser_test', browser_test.main);

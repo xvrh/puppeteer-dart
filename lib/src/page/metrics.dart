@@ -6,8 +6,7 @@ class Metrics {
   Metrics(this.values);
 
   factory Metrics.fromBrowser(List<Metric> metrics) =>
-      Metrics(Map.fromIterable(metrics,
-          key: (m) => (m as Metric).name, value: (m) => (m as Metric).value));
+      Metrics({for (var m in metrics) m.name: m.value});
 
   /// The timestamp when the metrics sample was taken.
   num get timestamp => values['Timestamp'];
@@ -49,7 +48,7 @@ class Metrics {
   int get jsHeapTotalSize => values['JSHeapTotalSize'] as int;
 
   @override
-  toString() => values.toString();
+  String toString() => values.toString();
 }
 
 class MetricsEvent {

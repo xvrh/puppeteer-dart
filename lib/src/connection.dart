@@ -55,9 +55,7 @@ class Connection implements Client {
 
   static Future<Connection> create(String url,
       {@required Duration delay}) async {
-    var webSocket = await WebSocket.connect(url);
-
-    return Connection._(webSocket, url, delay: delay);
+    return Connection._(await WebSocket.connect(url), url, delay: delay);
   }
 
   @override
@@ -93,13 +91,13 @@ class Connection implements Client {
     return session;
   }
 
-  _onMessage(String message) async {
+  Future<void> _onMessage(String message) async {
     if (_delay != null) {
       await Future.delayed(_delay);
     }
 
-    Map<String, dynamic> object = jsonDecode(message) as Map<String, dynamic>;
-    int id = object['id'] as int;
+    var object = jsonDecode(message) as Map<String, dynamic>;
+    var id = object['id'] as int;
     var method = object['method'] as String;
     var sessionId = object['sessionId'] as String;
     if (method == 'Target.attachedToTarget') {
@@ -222,8 +220,8 @@ class Session implements Client {
 
   Future<void> get closed => _onClose.future;
 
-  _onMessage(Map object) {
-    int id = object['id'] as int;
+  void _onMessage(Map object) {
+    var id = object['id'] as int;
     if (id != null) {
       var message = _messagesInFly.remove(id);
       var error = object['error'] as Map<String, dynamic>;
@@ -264,7 +262,7 @@ class ServerException implements Exception {
   ServerException(this.message);
 
   @override
-  toString() => message;
+  String toString() => message;
 
   static bool Function(T) matcher<T>(String message) =>
       (e) => e is ServerException && e.message == message;

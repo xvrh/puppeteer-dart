@@ -48,7 +48,7 @@ final _logger = Logger('puppeteer.page');
 ///  import 'dart:io';
 ///  import 'package:puppeteer/puppeteer.dart';
 ///
-/// main() async {
+/// Future<void> main() async {
 ///   var browser = await puppeteer.launch();
 ///   var page = await browser.newPage();
 ///   await page.goto('https://example.com');
@@ -66,7 +66,7 @@ final _logger = Logger('puppeteer.page');
 ///
 /// To unsubscribe from events use the [StreamSubscription.cancel] method:
 /// ```dart
-/// logRequest(Request interceptedRequest) {
+/// void logRequest(Request interceptedRequest) {
 ///   print('A request was made: ${interceptedRequest.url}');
 /// }
 ///
@@ -788,7 +788,7 @@ function addPageBinding(bindingName) {
   /// import 'package:puppeteer/puppeteer.dart';
   /// import 'package:crypto/crypto.dart' as crypto;
   ///
-  /// main() async {
+  /// Future<void> main() async {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   page.onConsole.listen((msg) => print(msg.text));
@@ -810,7 +810,7 @@ function addPageBinding(bindingName) {
   /// import 'dart:io';
   /// import 'package:puppeteer/puppeteer.dart';
   ///
-  /// main() async {
+  /// Future<void> main() async {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   page.onConsole.listen((msg) => print(msg.text));
@@ -1325,7 +1325,7 @@ function deliverError(name, seq, message, stack) {
   ///
   /// Passing arguments to `pageFunction`:
   /// ```dart
-  /// int result = await page.evaluate('''x => {
+  /// var result = await page.evaluate<int>('''x => {
   ///           return Promise.resolve(8 * x);
   ///         }''', args: [7]);
   /// print(result); // prints "56"
@@ -1456,7 +1456,7 @@ function deliverError(name, seq, message, stack) {
 
     assert(quality == null || format == ScreenshotFormat.jpeg,
         'Quality is only supported for the jpeg screenshots');
-    assert(clip == null || !fullPage, "clip and fullPage are exclusive");
+    assert(clip == null || !fullPage, 'clip and fullPage are exclusive');
 
     return screenshotPool(target.browser).withResource(() async {
       await devTools.target.activateTarget(target.targetID);
@@ -1796,7 +1796,7 @@ function deliverError(name, seq, message, stack) {
   /// ```dart
   /// import 'package:puppeteer/puppeteer.dart';
   ///
-  /// main() async {
+  /// Future<void> main() async {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   var watchImg = page.waitForSelector('img');
@@ -1838,7 +1838,7 @@ function deliverError(name, seq, message, stack) {
   /// ```dart
   /// import 'package:puppeteer/puppeteer.dart';
   ///
-  /// main() async {
+  /// Future<void> main() async {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   var watchImg = page.waitForXPath('//img');
@@ -1889,7 +1889,7 @@ function deliverError(name, seq, message, stack) {
   /// ```dart
   /// import 'package:puppeteer/puppeteer.dart';
   ///
-  /// main() async {
+  /// Future<void> main() async {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   var watchDog = page.waitForFunction('window.innerWidth < 100');
