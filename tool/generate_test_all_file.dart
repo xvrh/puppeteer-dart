@@ -17,7 +17,7 @@ void main() {
     buffer.writeln("import '$file' as ${file.replaceAll('.dart', '')};");
   }
 
-  buffer.writeln('main() {');
+  buffer.writeln('void main() {');
   for (var file
       in allFiles.map((fileName) => fileName.replaceAll('.dart', ''))) {
     buffer.writeln("group('$file', $file.main);");
