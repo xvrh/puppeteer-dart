@@ -1,6 +1,6 @@
 import 'package:puppeteer/puppeteer.dart';
 
-Future<void> main() async {
+void main() async {
   // Download the Chromium binaries, launch it and connect to the "DevTools"
   var browser = await puppeteer.launch();
 

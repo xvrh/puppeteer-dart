@@ -5,7 +5,7 @@ import 'package:puppeteer/puppeteer.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_static/shelf_static.dart';
 
-Future<void> main() async {
+void main() async {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen(print);
 

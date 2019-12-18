@@ -765,7 +765,7 @@ class Frame {
   /// ```dart
   /// import 'package:puppeteer/puppeteer.dart';
   ///
-  /// Future<void> main() async {
+  /// void main() async {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   var watchImg = page.mainFrame.waitForSelector('img');
@@ -813,7 +813,7 @@ class Frame {
   /// ```dart
   /// import 'package:puppeteer/puppeteer.dart';
   ///
-  /// Future<void> main() async {
+  /// void main() async {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   var watchImg = page.mainFrame.waitForXPath('//img');
@@ -870,7 +870,7 @@ class Frame {
   /// ```dart
   /// import 'package:puppeteer/puppeteer.dart';
   ///
-  /// Future<void> main() async {
+  /// void main() async {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   var watchDog = page.mainFrame.waitForFunction('window.innerWidth < 100');

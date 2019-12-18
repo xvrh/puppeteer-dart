@@ -40,7 +40,7 @@ void main() {
   group('Browser', () {
     test('class', () async {
       //---
-      Future<void> main() async {
+      void main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         await page.goto(exampleValue(server.hostUrl, 'https://example.com'));
@@ -48,11 +48,12 @@ void main() {
       }
       //---
 
+      //ignore: await_only_futures
       await main();
     });
     test('createIncognitoBrowserContext', () async {
       //---
-      Future<void> main() async {
+      void main() async {
         var browser = await puppeteer.launch();
         // Create a new incognito browser context.
         var context = await browser.createIncognitoBrowserContext();
@@ -64,6 +65,7 @@ void main() {
       }
       //---
 
+      //ignore: await_only_futures
       await main();
     });
     test('waitForTarget', () async {
@@ -114,7 +116,7 @@ void main() {
         //+ import 'dart:io';
         //+ import 'package:puppeteer/puppeteer.dart';
 
-        Future<void> main() async {
+        void main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           await page.goto(exampleValue(server.hostUrl, 'https://example.com'));
@@ -124,6 +126,7 @@ void main() {
         }
 
         //---
+        //ignore: await_only_futures
         await main();
       });
       test(1, () async {
@@ -283,7 +286,7 @@ void main() {
         //+import 'package:puppeteer/puppeteer.dart';
         //+import 'package:crypto/crypto.dart' as crypto;
 
-        Future<void> main() async {
+        void main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           page.onConsole.listen((msg) => print(msg.text));
@@ -301,6 +304,7 @@ void main() {
         }
         //----
 
+        //ignore: await_only_futures
         await main();
       });
       test(1, () async {
@@ -308,7 +312,7 @@ void main() {
         //+import 'dart:io';
         //+import 'package:puppeteer/puppeteer.dart';
 
-        Future<void> main() async {
+        void main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           page.onConsole.listen((msg) => print(msg.text));
@@ -324,6 +328,7 @@ void main() {
         }
         //---
 
+        //ignore: await_only_futures
         await main();
       });
     });
@@ -395,7 +400,7 @@ void main() {
         //---
         //+import 'package:puppeteer/puppeteer.dart';
 
-        Future<void> main() async {
+        void main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           var watchDog = page.waitForFunction('window.innerWidth < 100');
@@ -405,6 +410,7 @@ void main() {
         }
         //---
 
+        //ignore: await_only_futures
         await main();
       });
       test(1, () async {
@@ -445,7 +451,7 @@ void main() {
       //---
       //+import 'package:puppeteer/puppeteer.dart';
 
-      Future<void> main() async {
+      void main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.waitForSelector('img');
@@ -457,13 +463,14 @@ void main() {
       }
       //---
 
+      //ignore: await_only_futures
       await main();
     });
     test('waitForXPath', () async {
       //---
       //+import 'package:puppeteer/puppeteer.dart';
 
-      Future<void> main() async {
+      void main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.waitForXPath('//img');
@@ -475,6 +482,7 @@ void main() {
       }
       //---
 
+      //ignore: await_only_futures
       await main();
     });
     test('waitForFileChooser', () async {
@@ -595,7 +603,7 @@ void main() {
         //---
         //+import 'package:puppeteer/puppeteer.dart';
 
-        Future<void> main() async {
+        void main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           var watchDog =
@@ -606,6 +614,7 @@ void main() {
         }
         //---
 
+        //ignore: await_only_futures
         await main();
       });
       test(1, () async {
@@ -619,7 +628,7 @@ void main() {
       //---
       //+import 'package:puppeteer/puppeteer.dart';
 
-      Future<void> main() async {
+      void main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.mainFrame.waitForSelector('img');
@@ -631,13 +640,14 @@ void main() {
       }
       //---
 
+      //ignore: await_only_futures
       await main();
     });
     test('waitForXPath', () async {
       //---
       //+import 'package:puppeteer/puppeteer.dart';
 
-      Future<void> main() async {
+      void main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.mainFrame.waitForXPath('//img');
@@ -649,6 +659,7 @@ void main() {
       }
       //---
 
+      //ignore: await_only_futures
       await main();
     });
   });
@@ -783,7 +794,7 @@ void main() {
       //---
       //+import 'package:puppeteer/puppeteer.dart';
 
-      Future<void> main() async {
+      void main() async {
         var browser = await puppeteer.launch();
 
         var page = await browser.newPage();
@@ -796,6 +807,7 @@ void main() {
       }
       //---
 
+      //ignore: await_only_futures
       await main();
     });
     test('SSeval', () async {

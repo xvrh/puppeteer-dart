@@ -11,7 +11,7 @@ part 'generate_devices.g.dart';
 const deviceUrl =
     'https://raw.githubusercontent.com/ChromeDevTools/devtools-frontend/master/front_end/emulated_devices/module.json';
 
-Future<void> main() async {
+void main() async {
   var content = await read(deviceUrl);
 
   var module = Module.fromJson(jsonDecode(content) as Map<String, dynamic>);

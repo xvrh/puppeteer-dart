@@ -5,7 +5,7 @@ import 'package:puppeteer/puppeteer.dart';
 import 'generate_protocol.dart';
 
 /// Download the Chrome Dev Tools protocol (json file) directly from a running Chrome instance.
-Future<void> main() async {
+void main() async {
   var chrome = await puppeteer.launch();
 
   try {

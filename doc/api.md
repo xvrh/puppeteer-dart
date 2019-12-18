@@ -309,7 +309,7 @@ through puppeteer.launch or puppeteer.connect.
 An example of using a Browser to create a Page:
 
 ```dart
-Future<void> main() async {
+void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   await page.goto('https://example.com');
@@ -338,7 +338,7 @@ Creates a new incognito browser context. This won't share cookies/cache
 with other browser contexts.
 
 ```dart
-Future<void> main() async {
+void main() async {
   var browser = await puppeteer.launch();
   // Create a new incognito browser context.
   var context = await browser.createIncognitoBrowserContext();
@@ -590,7 +590,7 @@ screenshot:
  import 'dart:io';
  import 'package:puppeteer/puppeteer.dart';
 
-Future<void> main() async {
+void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   await page.goto('https://example.com');
@@ -1086,7 +1086,7 @@ import 'dart:convert';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:crypto/crypto.dart' as crypto;
 
-Future<void> main() async {
+void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   page.onConsole.listen((msg) => print(msg.text));
@@ -1108,7 +1108,7 @@ An example of adding a `window.readfile` function into the page:
 import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
 
-Future<void> main() async {
+void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   page.onConsole.listen((msg) => print(msg.text));
@@ -1885,7 +1885,7 @@ The `waitForFunction` can be used to observe viewport size change:
 ```dart
 import 'package:puppeteer/puppeteer.dart';
 
-Future<void> main() async {
+void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   var watchDog = page.waitForFunction('window.innerWidth < 100');
@@ -1987,7 +1987,7 @@ This method works across navigations:
 ```dart
 import 'package:puppeteer/puppeteer.dart';
 
-Future<void> main() async {
+void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   var watchImg = page.waitForSelector('img');
@@ -2029,7 +2029,7 @@ This method works across navigations:
 ```dart
 import 'package:puppeteer/puppeteer.dart';
 
-Future<void> main() async {
+void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   var watchImg = page.waitForXPath('//img');
@@ -2915,7 +2915,7 @@ The `waitForFunction` can be used to observe viewport size change:
 ```dart
 import 'package:puppeteer/puppeteer.dart';
 
-Future<void> main() async {
+void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   var watchDog = page.mainFrame.waitForFunction('window.innerWidth < 100');
@@ -2948,7 +2948,7 @@ This method works across navigations:
 ```dart
 import 'package:puppeteer/puppeteer.dart';
 
-Future<void> main() async {
+void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   var watchImg = page.mainFrame.waitForSelector('img');
@@ -2989,7 +2989,7 @@ This method works across navigations:
 ```dart
 import 'package:puppeteer/puppeteer.dart';
 
-Future<void> main() async {
+void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   var watchImg = page.mainFrame.waitForXPath('//img');
@@ -3209,7 +3209,7 @@ created with the [page.$] method.
 ```dart
 import 'package:puppeteer/puppeteer.dart';
 
-Future<void> main() async {
+void main() async {
   var browser = await puppeteer.launch();
 
   var page = await browser.newPage();

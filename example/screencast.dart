@@ -5,7 +5,7 @@ import 'package:puppeteer/puppeteer.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_static/shelf_static.dart';
 
-Future<void> main() async {
+void main() async {
   // Start a local web server and open the page
   var server =
       await io.serve(createStaticHandler('example/html'), 'localhost', 0);
