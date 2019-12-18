@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
 
-Future<void> main() async {
+void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   await page.setRequestInterception(true);

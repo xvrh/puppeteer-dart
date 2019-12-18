@@ -48,7 +48,7 @@ final _logger = Logger('puppeteer.page');
 ///  import 'dart:io';
 ///  import 'package:puppeteer/puppeteer.dart';
 ///
-/// Future<void> main() async {
+/// void main() async {
 ///   var browser = await puppeteer.launch();
 ///   var page = await browser.newPage();
 ///   await page.goto('https://example.com');
@@ -788,7 +788,7 @@ function addPageBinding(bindingName) {
   /// import 'package:puppeteer/puppeteer.dart';
   /// import 'package:crypto/crypto.dart' as crypto;
   ///
-  /// Future<void> main() async {
+  /// void main() async {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   page.onConsole.listen((msg) => print(msg.text));
@@ -810,7 +810,7 @@ function addPageBinding(bindingName) {
   /// import 'dart:io';
   /// import 'package:puppeteer/puppeteer.dart';
   ///
-  /// Future<void> main() async {
+  /// void main() async {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   page.onConsole.listen((msg) => print(msg.text));
@@ -1796,7 +1796,7 @@ function deliverError(name, seq, message, stack) {
   /// ```dart
   /// import 'package:puppeteer/puppeteer.dart';
   ///
-  /// Future<void> main() async {
+  /// void main() async {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   var watchImg = page.waitForSelector('img');
@@ -1838,7 +1838,7 @@ function deliverError(name, seq, message, stack) {
   /// ```dart
   /// import 'package:puppeteer/puppeteer.dart';
   ///
-  /// Future<void> main() async {
+  /// void main() async {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   var watchImg = page.waitForXPath('//img');
@@ -1889,7 +1889,7 @@ function deliverError(name, seq, message, stack) {
   /// ```dart
   /// import 'package:puppeteer/puppeteer.dart';
   ///
-  /// Future<void> main() async {
+  /// void main() async {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   var watchDog = page.waitForFunction('window.innerWidth < 100');

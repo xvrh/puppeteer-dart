@@ -3,7 +3,7 @@ import 'package:puppeteer/puppeteer.dart';
 
 // ignore_for_file: unused_local_variable
 
-Future<void> main() async {
+void main() async {
   // Setup a logger if you want to see the raw chrome protocol
   Logger.root
     ..level = Level.ALL
