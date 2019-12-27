@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.15.0 (2019-12-27)
+- Add element.select and element.evaluate for consistency
+- Prepare jsHandle.uploadFile for CDP Page.handleFileChooser removal
+
 # 1.14.1 (2019-11-24)
 - Export class `Target` in `puppeteer.dart`
 

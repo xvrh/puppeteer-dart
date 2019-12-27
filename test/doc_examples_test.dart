@@ -777,6 +777,20 @@ void main() {
       //---
       expect(windowHandle, isNotNull);
     });
+    test('evaluate', () async {
+      server.setRoute('feed.html', (request) {
+        return shelf.Response(404, body: '''
+<div class="tweet">
+  <div class="retweets">10</div>
+</div>
+        ''', headers: {'content-type': 'text/html'});
+      });
+      await page.goto(server.assetUrl('feed.html'));
+      //---
+      var tweetHandle = await page.$('.tweet .retweets');
+      expect(await tweetHandle.evaluate('node => node.innerText'), '10');
+      //---
+    });
     test('properties', () async {
       //----
       var handle = await page.evaluateHandle('() => ({window, document})');
@@ -862,6 +876,13 @@ void main() {
         await elementHandle.type('some text');
         await elementHandle.press(Key.enter);
       });
+    });
+    test('select', () async {
+      var handle = await page.$('select');
+      //---
+      await handle.select(['blue']); // single selection
+      await handle.select(['red', 'green', 'blue']); // multiple selections
+      //---
     });
   });
   group('Request', () {

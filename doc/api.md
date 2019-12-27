@@ -176,6 +176,8 @@
 - [class: JsHandle](#class-jshandle)
   * [jsHandle.asElement](#jshandleaselement)
   * [jsHandle.dispose](#jshandledispose)
+  * [jsHandle.evaluate](#jshandleevaluate)
+  * [jsHandle.evaluateHandle](#jshandleevaluatehandle)
   * [jsHandle.executionContext](#jshandleexecutioncontext)
   * [jsHandle.jsonValue](#jshandlejsonvalue)
   * [jsHandle.properties](#jshandleproperties)
@@ -195,6 +197,7 @@
   * [elementHandle.isIntersectingViewport](#elementhandleisintersectingviewport)
   * [elementHandle.press](#elementhandlepresskey-key-duration-delay-string-text)
   * [elementHandle.screenshot](#elementhandlescreenshot)
+  * [elementHandle.select](#elementhandleselectliststring-values)
   * [elementHandle.tap](#elementhandletap)
   * [elementHandle.type](#elementhandletypestring-text-duration-delay)
   * [elementHandle.uploadFile](#elementhandleuploadfilelistfile-files)
@@ -3152,6 +3155,45 @@ disposed.
 jsHandle.dispose() → Future<void> 
 ```
 
+#### jsHandle.evaluate(...)
+This method passes this handle as the first argument to `pageFunction`.
+
+If `pageFunction` returns a [Future], then `handle.evaluate` would wait
+for the promise to resolve and return its value.
+
+Examples:
+```dart
+var tweetHandle = await page.$('.tweet .retweets');
+expect(await tweetHandle.evaluate('node => node.innerText'), '10');
+```
+
+Parameters:
+- `pageFunction` Function to be evaluated in browser context
+- `args` Arguments to pass to `pageFunction`
+- returns: Future which resolves to the return value of `pageFunction`
+
+```dart
+jsHandle.evaluate(@Language('js') String pageFunction, {List args}) → Future<T> 
+```
+
+#### jsHandle.evaluateHandle(...)
+This method passes this handle as the first argument to `pageFunction`.
+
+The only difference between `jsHandle.evaluate` and `jsHandle.evaluateHandle`
+is that `executionContext.evaluateHandle` returns in-page object (JSHandle).
+
+If the function passed to the `jsHandle.evaluateHandle` returns a [Promise],
+then `jsHandle.evaluateHandle` would wait for the future to resolve and return its value.
+
+See [Page.evaluateHandle] for more details.
+
+Parameters:
+- `pageFunction`: Function to be evaluated
+
+```dart
+jsHandle.evaluateHandle(@Language('js') String pageFunction, {List args}) → Future<T> 
+```
+
 #### jsHandle.executionContext
 Returns execution context the handle belongs to.
 
@@ -3398,6 +3440,26 @@ See [Page.screenshot] for more info.
 
 ```dart
 elementHandle.screenshot({ScreenshotFormat format, int quality, bool omitBackground}) → Future<List<int>> 
+```
+
+#### elementHandle.select(List\<String> values)
+Triggers a `change` and `input` event once all the provided options have been selected.
+If there's no `<select>` element matching `selector`, the method throws an error.
+
+```dart
+await handle.select(['blue']); // single selection
+await handle.select(['red', 'green', 'blue']); // multiple selections
+```
+
+Parameters
+- -Values of options to select. If the `<select>`
+  has the `multiple` attribute, all values are considered, otherwise only
+  the first one is taken into account.
+
+ Returns: A list of option values that have been successfully selected.
+
+```dart
+elementHandle.select(List<String> values) → Future<List<String>> 
 ```
 
 #### elementHandle.tap()
