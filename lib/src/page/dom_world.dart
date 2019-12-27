@@ -292,27 +292,14 @@ async function _(content) {
     await handle.dispose();
   }
 
-  Future<List<String>> select(String selector, List<String> values) {
-    return $eval<List>(selector,
-        //language=js
-        '''
-function _(element, values) {
-  if (element.nodeName.toLowerCase() !== 'select') {
-    throw new Error('Element is not a <select> element.');
-  }
-  
-  const options = Array.from(element.options);
-  element.value = undefined;
-  for (const option of options) {
-    option.selected = values.includes(option.value);
-    if (option.selected && !element.multiple)
-      break;
-  }
-  element.dispatchEvent(new Event('input', { 'bubbles': true }));
-  element.dispatchEvent(new Event('change', { 'bubbles': true }));
-  return options.filter(option => option.selected).map(option => option.value);
-}
-''', args: [values]).then((result) => result.cast<String>());
+  Future<List<String>> select(String selector, List<String> values) async {
+    var handle = await $(selector);
+    if (handle == null) {
+      throw Exception('No node found for selector: $selector');
+    }
+    var result = await handle.select(values);
+    await handle.dispose();
+    return result;
   }
 
   Future<void> tap(String selector) async {

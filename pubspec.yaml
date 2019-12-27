@@ -14,6 +14,7 @@ dependencies:
   http: '>=0.9.0 <0.13.0'
   logging: ^0.11.3
   meta: ^1.1.1
+  mime: ^0.9.0
   path: '>=1.0.0 <2.0.0'
   petitparser: '>=2.2.0 <3.0.0'
   pool: ^1.4.0

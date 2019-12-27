@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:mime/mime.dart';
+import 'package:path/path.dart' as p;
 import '../../protocol/dom.dart';
 import '../../protocol/runtime.dart';
 import '../connection.dart';
@@ -45,9 +48,49 @@ class JsHandle {
 
   bool get isDisposed => _disposed;
 
+  /// This method passes this handle as the first argument to `pageFunction`.
+  ///
+  /// If `pageFunction` returns a [Future], then `handle.evaluate` would wait
+  /// for the promise to resolve and return its value.
+  ///
+  /// Examples:
+  /// ```dart
+  /// var tweetHandle = await page.$('.tweet .retweets');
+  /// expect(await tweetHandle.evaluate('node => node.innerText'), '10');
+  /// ```
+  ///
+  /// Parameters:
+  /// - `pageFunction` Function to be evaluated in browser context
+  /// - `args` Arguments to pass to `pageFunction`
+  /// - returns: Future which resolves to the return value of `pageFunction`
+  Future<T> evaluate<T>(@Language('js') String pageFunction, {List args}) {
+    return executionContext.evaluate(pageFunction, args: [this, ...?args]);
+  }
+
+  /// This method passes this handle as the first argument to `pageFunction`.
+  ///
+  /// The only difference between `jsHandle.evaluate` and `jsHandle.evaluateHandle`
+  /// is that `executionContext.evaluateHandle` returns in-page object (JSHandle).
+  ///
+  /// If the function passed to the `jsHandle.evaluateHandle` returns a [Promise],
+  /// then `jsHandle.evaluateHandle` would wait for the future to resolve and return its value.
+  ///
+  /// See [Page.evaluateHandle] for more details.
+  ///
+  /// Parameters:
+  /// - `pageFunction`: Function to be evaluated
+  //  - `args`: Arguments to pass to `pageFunction`
+  //  Returns: Future which resolves to the return value of `pageFunction` as in-page object (JSHandle)
+  Future<T> evaluateHandle<T extends JsHandle>(
+      @Language('js') String pageFunction,
+      {List args}) {
+    return executionContext
+        .evaluateHandle(pageFunction, args: [this, ...?args]);
+  }
+
   /// Fetches a single property from the referenced object.
   Future<T> property<T extends JsHandle>(String propertyName) async {
-    var objectHandle = await executionContext.evaluateHandle(
+    var objectHandle = await evaluateHandle(
         //language=js
         '''
 function _(object, propertyName) {
@@ -55,7 +98,7 @@ function _(object, propertyName) {
   result[propertyName] = object[propertyName];
   return result;
 }
-''', args: [this, propertyName]);
+''', args: [propertyName]);
     var properties = await objectHandle.properties;
     var result = properties[propertyName] as T;
     await objectHandle.dispose();
@@ -190,7 +233,7 @@ class ElementHandle extends JsHandle {
   }
 
   Future<void> _scrollIntoViewIfNeeded() async {
-    var error = await executionContext.evaluate(
+    var error = await evaluate(
         //language=js
         '''
 async function _(element, pageJavascriptEnabled) {
@@ -217,7 +260,7 @@ async function _(element, pageJavascriptEnabled) {
   }
   return false;
 }
-''', args: [this, page.javascriptEnabled]);
+''', args: [page.javascriptEnabled]);
     if (error != null && error != false) {
       throw Exception(error);
     }
@@ -311,13 +354,63 @@ async function _(element, pageJavascriptEnabled) {
         .click(point, delay: delay, button: button, clickCount: clickCount);
   }
 
+  /// Triggers a `change` and `input` event once all the provided options have been selected.
+  /// If there's no `<select>` element matching `selector`, the method throws an error.
+  ///
+  /// ```dart
+  /// await handle.select(['blue']); // single selection
+  /// await handle.select(['red', 'green', 'blue']); // multiple selections
+  /// ```
+  ///
+  /// Parameters
+  /// - -Values of options to select. If the `<select>`
+  ///   has the `multiple` attribute, all values are considered, otherwise only
+  ///   the first one is taken into account.
+  ///
+  ///  Returns: A list of option values that have been successfully selected.
+  Future<List<String>> select(List<String> values) async {
+    return evaluate<List>(r'''(element, values) => {
+  if (element.nodeName.toLowerCase() !== 'select')
+    throw new Error('Element is not a <select> element.');
+
+  const options = Array.from(element.options);
+  element.value = undefined;
+  for (const option of options) {
+    option.selected = values.includes(option.value);
+    if (option.selected && !element.multiple)
+      break;
+  }
+  element.dispatchEvent(new Event('input', { 'bubbles': true }));
+  element.dispatchEvent(new Event('change', { 'bubbles': true }));
+  return options.filter(option => option.selected).map(option => option.value);
+}''', args: [values]).then((result) => result.cast<String>());
+  }
+
   /// This method expects `elementHandle` to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input).
   ///
   /// Sets the value of the file input these paths.
   Future<void> uploadFile(List<File> files) async {
-    await executionContext.domApi.setFileInputFiles(
-        files.map((file) => file.absolute.path).toList(),
-        objectId: remoteObject.objectId);
+    var filesArg = [];
+    for (var file in files) {
+      var fileArg = <String, String>{
+        'name': p.basename(file.path),
+        'content': base64.encode(await file.readAsBytes()),
+        'mimeType': lookupMimeType(file.path),
+      };
+      filesArg.add(fileArg);
+    }
+    await evaluateHandle(
+        //language=js
+        r'''async(element, files) => {
+    const dt = new DataTransfer();
+    for (const item of files) {
+      const response = await fetch(`data:${item.mimeType};base64,${item.content}`);
+      const file = new File([await response.blob()], item.name);
+      dt.items.add(file);
+    }
+    element.files = dt.files;
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+}''', args: [filesArg]);
   }
 
   /// This method scrolls element into view if needed, and then uses [touchscreen.tap]
@@ -332,10 +425,9 @@ async function _(element, pageJavascriptEnabled) {
   /// Calls [focus](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus)
   /// on the element.
   Future<void> focus() {
-    return executionContext.evaluate(
+    return evaluate(
         //language=js
-        'function _(element) {return element.focus();}',
-        args: [this]);
+        'function _(element) {return element.focus();}');
   }
 
   /// Focuses the element, and then sends a `keydown`, `keypress`/`input`, and
@@ -465,10 +557,10 @@ async function _(element, pageJavascriptEnabled) {
   /// The method runs `element.querySelector` within the page. If no element
   /// matches the selector, the return value resolves to `null`.
   Future<ElementHandle> $(String selector) async {
-    var handle = await executionContext.evaluateHandle(
+    var handle = await evaluateHandle(
         //language=js
         '(element, selector) => element.querySelector(selector);',
-        args: [this, selector]);
+        args: [selector]);
     var element = handle.asElement;
     if (element != null) return element;
     await handle.dispose();
@@ -478,10 +570,10 @@ async function _(element, pageJavascriptEnabled) {
   /// The method runs `element.querySelectorAll` within the page. If no elements
   /// match the selector, the return value resolves to `[]`.
   Future<List<ElementHandle>> $$(String selector) async {
-    var arrayHandle = await executionContext.evaluateHandle(
+    var arrayHandle = await evaluateHandle(
         //language=js
         'function _(element, selector) {return element.querySelectorAll(selector);}',
-        args: [this, selector]);
+        args: [selector]);
     var properties = await arrayHandle.properties;
     await arrayHandle.dispose();
     var result = <ElementHandle>[];
@@ -522,13 +614,7 @@ async function _(element, pageJavascriptEnabled) {
           'Error: failed to find element matching selector "$selector"');
     }
 
-    var allArgs = <dynamic>[elementHandle];
-    if (args != null) {
-      allArgs.addAll(args);
-    }
-
-    var result =
-        await executionContext.evaluate<T>(pageFunction, args: allArgs);
+    var result = await elementHandle.evaluate<T>(pageFunction, args: args);
     await elementHandle.dispose();
     return result;
   }
@@ -562,17 +648,12 @@ async function _(element, pageJavascriptEnabled) {
   /// Returns: [Future] which resolves to the return value of `pageFunction`
   Future<T> $$eval<T>(String selector, @Language('js') String pageFunction,
       {List args}) async {
-    var arrayHandle = await executionContext.evaluateHandle(
+    var arrayHandle = await evaluateHandle(
         //language=js
         'function _(element, selector) {return Array.from(element.querySelectorAll(selector));}',
-        args: [this, selector]);
+        args: [selector]);
 
-    var allArgs = <dynamic>[arrayHandle];
-    if (args != null) {
-      allArgs.addAll(args);
-    }
-    var result =
-        await executionContext.evaluate<T>(pageFunction, args: allArgs);
+    var result = await arrayHandle.evaluate<T>(pageFunction, args: args);
     await arrayHandle.dispose();
     return result;
   }
@@ -580,7 +661,7 @@ async function _(element, pageJavascriptEnabled) {
   /// The method evaluates the XPath expression relative to the elementHandle.
   /// If there are no such elements, the method will resolve to an empty array.
   Future<List<ElementHandle>> $x(String expression) async {
-    var arrayHandle = await executionContext.evaluateHandle(
+    var arrayHandle = await evaluateHandle(
         //language=js
         '''
 function _(element, expression) {
@@ -592,7 +673,7 @@ function _(element, expression) {
     array.push(item);
   return array;
 }
-''', args: [this, expression]);
+''', args: [expression]);
     var properties = await arrayHandle.properties;
     await arrayHandle.dispose();
     var result = <ElementHandle>[];
@@ -605,7 +686,7 @@ function _(element, expression) {
 
   /// Resolves to true if the element is visible in the current viewport.
   Future<bool> get isIntersectingViewport {
-    return executionContext.evaluate(
+    return evaluate(
         //language=js
         '''
 async function _(element) {
@@ -617,7 +698,7 @@ async function _(element) {
     observer.observe(element);
   });
   return visibleRatio > 0;
-}''', args: [this]);
+}''');
   }
 }
 
