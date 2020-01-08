@@ -1,6 +1,7 @@
 # Changelog
 
 # 1.15.1 (2020-01-08)
+- Expose `ClientError` class
 - (internal) Revert previous change in `jsHandle.uploadFile`
 
 # 1.15.0 (2019-12-27)
