@@ -1,8 +1,5 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:mime/mime.dart';
-import 'package:path/path.dart' as p;
 import '../../protocol/dom.dart';
 import '../../protocol/runtime.dart';
 import '../connection.dart';
