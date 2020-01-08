@@ -20,6 +20,7 @@ export 'src/page/mouse.dart' show MouseButton;
 export 'src/page/network_manager.dart' show Request, Response;
 export 'src/page/page.dart'
     show
+        ClientError,
         Page,
         PdfMargins,
         PaperFormat,

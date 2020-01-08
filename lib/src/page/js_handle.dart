@@ -362,8 +362,8 @@ async function _(element, pageJavascriptEnabled) {
   /// await handle.select(['red', 'green', 'blue']); // multiple selections
   /// ```
   ///
-  /// Parameters
-  /// - -Values of options to select. If the `<select>`
+  /// Parameters:
+  /// - `values`: Values of options to select. If the `<select>`
   ///   has the `multiple` attribute, all values are considered, otherwise only
   ///   the first one is taken into account.
   ///
@@ -390,27 +390,9 @@ async function _(element, pageJavascriptEnabled) {
   ///
   /// Sets the value of the file input these paths.
   Future<void> uploadFile(List<File> files) async {
-    var filesArg = [];
-    for (var file in files) {
-      var fileArg = <String, String>{
-        'name': p.basename(file.path),
-        'content': base64.encode(await file.readAsBytes()),
-        'mimeType': lookupMimeType(file.path),
-      };
-      filesArg.add(fileArg);
-    }
-    await evaluateHandle(
-        //language=js
-        r'''async(element, files) => {
-    const dt = new DataTransfer();
-    for (const item of files) {
-      const response = await fetch(`data:${item.mimeType};base64,${item.content}`);
-      const file = new File([await response.blob()], item.name);
-      dt.items.add(file);
-    }
-    element.files = dt.files;
-    element.dispatchEvent(new Event('input', { bubbles: true }));
-}''', args: [filesArg]);
+    await executionContext.domApi.setFileInputFiles(
+        files.map((file) => file.absolute.path).toList(),
+        objectId: remoteObject.objectId);
   }
 
   /// This method scrolls element into view if needed, and then uses [touchscreen.tap]
