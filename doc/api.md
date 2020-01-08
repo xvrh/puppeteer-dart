@@ -3451,8 +3451,8 @@ await handle.select(['blue']); // single selection
 await handle.select(['red', 'green', 'blue']); // multiple selections
 ```
 
-Parameters
-- -Values of options to select. If the `<select>`
+Parameters:
+- `values`: Values of options to select. If the `<select>`
   has the `multiple` attribute, all values are considered, otherwise only
   the first one is taken into account.
 
