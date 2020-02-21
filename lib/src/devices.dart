@@ -71,7 +71,7 @@ class Devices with IterableMixin<Device> {
 
   final iPhone6 = Device('iPhone 6',
       userAgent:
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
       viewport: DeviceViewport(
           width: 375,
           height: 667,
@@ -82,7 +82,7 @@ class Devices with IterableMixin<Device> {
 
   final iPhone6Landscape = Device('iPhone 6',
       userAgent:
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
       viewport: DeviceViewport(
           width: 667,
           height: 375,
@@ -93,7 +93,7 @@ class Devices with IterableMixin<Device> {
 
   final iPhone7 = Device('iPhone 7',
       userAgent:
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
       viewport: DeviceViewport(
           width: 375,
           height: 667,
@@ -104,7 +104,7 @@ class Devices with IterableMixin<Device> {
 
   final iPhone7Landscape = Device('iPhone 7',
       userAgent:
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
       viewport: DeviceViewport(
           width: 667,
           height: 375,
@@ -115,7 +115,7 @@ class Devices with IterableMixin<Device> {
 
   final iPhone8 = Device('iPhone 8',
       userAgent:
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
       viewport: DeviceViewport(
           width: 375,
           height: 667,
@@ -126,7 +126,7 @@ class Devices with IterableMixin<Device> {
 
   final iPhone8Landscape = Device('iPhone 8',
       userAgent:
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
       viewport: DeviceViewport(
           width: 667,
           height: 375,
@@ -137,7 +137,7 @@ class Devices with IterableMixin<Device> {
 
   final iPhone678Plus = Device('iPhone 6/7/8 Plus',
       userAgent:
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
       viewport: DeviceViewport(
           width: 414,
           height: 736,
@@ -148,7 +148,7 @@ class Devices with IterableMixin<Device> {
 
   final iPhone678PlusLandscape = Device('iPhone 6/7/8 Plus',
       userAgent:
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
       viewport: DeviceViewport(
           width: 736,
           height: 414,
@@ -159,7 +159,7 @@ class Devices with IterableMixin<Device> {
 
   final iPhoneX = Device('iPhone X',
       userAgent:
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
       viewport: DeviceViewport(
           width: 375,
           height: 812,
@@ -170,7 +170,7 @@ class Devices with IterableMixin<Device> {
 
   final iPhoneXLandscape = Device('iPhone X',
       userAgent:
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
       viewport: DeviceViewport(
           width: 812,
           height: 375,
@@ -789,6 +789,28 @@ class Devices with IterableMixin<Device> {
           hasTouch: false,
           isLandscape: true));
 
+  final motoG4 = Device('Moto G4',
+      userAgent:
+          'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Mobile Safari/537.36',
+      viewport: DeviceViewport(
+          width: 360,
+          height: 640,
+          deviceScaleFactor: 3,
+          isMobile: true,
+          hasTouch: true,
+          isLandscape: false));
+
+  final motoG4Landscape = Device('Moto G4',
+      userAgent:
+          'Mozilla/5.0 (Linux; Android 6.0.1; Moto G (4)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Mobile Safari/537.36',
+      viewport: DeviceViewport(
+          width: 640,
+          height: 360,
+          deviceScaleFactor: 3,
+          isMobile: true,
+          hasTouch: true,
+          isLandscape: true));
+
   Map<String, Device> _all;
   Devices._() {
     _all = CanonicalizedMap<String, String, Device>.from({
@@ -863,7 +885,9 @@ class Devices with IterableMixin<Device> {
       'Laptop with HiDPI screen': laptopWithHiDPIScreen,
       'Laptop with HiDPI screen Landscape': laptopWithHiDPIScreenLandscape,
       'Laptop with MDPI screen': laptopWithMDPIScreen,
-      'Laptop with MDPI screen Landscape': laptopWithMDPIScreenLandscape
+      'Laptop with MDPI screen Landscape': laptopWithMDPIScreenLandscape,
+      'Moto G4': motoG4,
+      'Moto G4 Landscape': motoG4Landscape
     }, (key) => key.replaceAll(' ', '').toLowerCase(),
         isValidKey: (key) => key != null);
   }

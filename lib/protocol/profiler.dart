@@ -102,6 +102,25 @@ class ProfilerApi {
         .map((e) => ScriptTypeProfile.fromJson(e as Map<String, dynamic>))
         .toList();
   }
+
+  /// Enable run time call stats collection.
+  Future<void> enableRuntimeCallStats() async {
+    await _client.send('Profiler.enableRuntimeCallStats');
+  }
+
+  /// Disable run time call stats collection.
+  Future<void> disableRuntimeCallStats() async {
+    await _client.send('Profiler.disableRuntimeCallStats');
+  }
+
+  /// Retrieve run time call stats.
+  /// Returns: Collected counter information.
+  Future<List<CounterInfo>> getRuntimeCallStats() async {
+    var result = await _client.send('Profiler.getRuntimeCallStats');
+    return (result['result'] as List)
+        .map((e) => CounterInfo.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
 }
 
 class ConsoleProfileFinishedEvent {
@@ -470,6 +489,31 @@ class ScriptTypeProfile {
       'scriptId': scriptId.toJson(),
       'url': url,
       'entries': entries.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+/// Collected counter information.
+class CounterInfo {
+  /// Counter name.
+  final String name;
+
+  /// Counter value.
+  final int value;
+
+  CounterInfo({@required this.name, @required this.value});
+
+  factory CounterInfo.fromJson(Map<String, dynamic> json) {
+    return CounterInfo(
+      name: json['name'] as String,
+      value: json['value'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'value': value,
     };
   }
 }

@@ -57,13 +57,12 @@ class CacheStorageApi {
   /// [skipCount] Number of records to skip.
   /// [pageSize] Number of records to fetch.
   /// [pathFilter] If present, only return the entries containing this substring in the path
-  Future<RequestEntriesResult> requestEntries(
-      CacheId cacheId, int skipCount, int pageSize,
-      {String pathFilter}) async {
+  Future<RequestEntriesResult> requestEntries(CacheId cacheId,
+      {int skipCount, int pageSize, String pathFilter}) async {
     var result = await _client.send('CacheStorage.requestEntries', {
       'cacheId': cacheId,
-      'skipCount': skipCount,
-      'pageSize': pageSize,
+      if (skipCount != null) 'skipCount': skipCount,
+      if (pageSize != null) 'pageSize': pageSize,
       if (pathFilter != null) 'pathFilter': pathFilter,
     });
     return RequestEntriesResult.fromJson(result);

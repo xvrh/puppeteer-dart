@@ -164,6 +164,7 @@ class RuntimeApi {
   /// This implies `disableBreaks` below.
   /// [timeout] Terminate execution after timing out (number of milliseconds).
   /// [disableBreaks] Disable breakpoints during execution.
+  /// [replMode] Reserved flag for future REPL mode support. Setting this flag has currently no effect.
   Future<EvaluateResult> evaluate(String expression,
       {String objectGroup,
       bool includeCommandLineAPI,
@@ -175,7 +176,8 @@ class RuntimeApi {
       bool awaitPromise,
       bool throwOnSideEffect,
       TimeDelta timeout,
-      bool disableBreaks}) async {
+      bool disableBreaks,
+      bool replMode}) async {
     var result = await _client.send('Runtime.evaluate', {
       'expression': expression,
       if (objectGroup != null) 'objectGroup': objectGroup,
@@ -190,6 +192,7 @@ class RuntimeApi {
       if (throwOnSideEffect != null) 'throwOnSideEffect': throwOnSideEffect,
       if (timeout != null) 'timeout': timeout,
       if (disableBreaks != null) 'disableBreaks': disableBreaks,
+      if (replMode != null) 'replMode': replMode,
     });
     return EvaluateResult.fromJson(result);
   }

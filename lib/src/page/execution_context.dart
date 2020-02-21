@@ -239,6 +239,12 @@ class ExecutionContext {
     return _createJsHandle(response);
   }
 
+  Future<ElementHandle> adoptBackendNodeId(BackendNodeId backendNodeId) async {
+    var object = await domApi.resolveNode(
+        backendNodeId: backendNodeId, executionContextId: context.id);
+    return _createJsHandle(object) as ElementHandle;
+  }
+
   Future<ElementHandle> adoptElementHandle(ElementHandle elementHandle) async {
     assert(elementHandle.executionContext != this,
         'Cannot adopt handle that already belongs to this execution context');
@@ -246,10 +252,7 @@ class ExecutionContext {
 
     var nodeInfo = await domApi.describeNode(
         objectId: elementHandle.remoteObject.objectId);
-    var object = await domApi.resolveNode(
-        backendNodeId: nodeInfo.backendNodeId, executionContextId: context.id);
-
-    return _createJsHandle(object) as ElementHandle;
+    return adoptBackendNodeId(nodeInfo.backendNodeId);
   }
 
   JsHandle _createJsHandle(RemoteObject remoteObject) =>

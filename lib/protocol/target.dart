@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
+import 'browser.dart' as browser;
 
 /// Supports additional targets discovery and allows to attach to them.
 class TargetApi {
@@ -106,17 +107,18 @@ class TargetApi {
   /// Creates a new empty BrowserContext. Similar to an incognito profile but you can have more than
   /// one.
   /// Returns: The id of the context created.
-  Future<BrowserContextID> createBrowserContext() async {
+  Future<browser.BrowserContextID> createBrowserContext() async {
     var result = await _client.send('Target.createBrowserContext');
-    return BrowserContextID.fromJson(result['browserContextId'] as String);
+    return browser.BrowserContextID.fromJson(
+        result['browserContextId'] as String);
   }
 
   /// Returns all browser contexts created with `Target.createBrowserContext` method.
   /// Returns: An array of browser context ids.
-  Future<List<BrowserContextID>> getBrowserContexts() async {
+  Future<List<browser.BrowserContextID>> getBrowserContexts() async {
     var result = await _client.send('Target.getBrowserContexts');
     return (result['browserContextIds'] as List)
-        .map((e) => BrowserContextID.fromJson(e as String))
+        .map((e) => browser.BrowserContextID.fromJson(e as String))
         .toList();
   }
 
@@ -134,7 +136,7 @@ class TargetApi {
   Future<TargetID> createTarget(String url,
       {int width,
       int height,
-      BrowserContextID browserContextId,
+      browser.BrowserContextID browserContextId,
       bool enableBeginFrameControl,
       bool newWindow,
       bool background}) async {
@@ -163,7 +165,8 @@ class TargetApi {
 
   /// Deletes a BrowserContext. All the belonging pages will be closed without calling their
   /// beforeunload hooks.
-  Future<void> disposeBrowserContext(BrowserContextID browserContextId) async {
+  Future<void> disposeBrowserContext(
+      browser.BrowserContextID browserContextId) async {
     await _client.send('Target.disposeBrowserContext', {
       'browserContextId': browserContextId,
     });
@@ -356,26 +359,6 @@ class SessionID {
   String toString() => value.toString();
 }
 
-class BrowserContextID {
-  final String value;
-
-  BrowserContextID(this.value);
-
-  factory BrowserContextID.fromJson(String value) => BrowserContextID(value);
-
-  String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is BrowserContextID && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
-}
-
 class TargetInfo {
   final TargetID targetId;
 
@@ -391,7 +374,7 @@ class TargetInfo {
   /// Opener target Id
   final TargetID openerId;
 
-  final BrowserContextID browserContextId;
+  final browser.BrowserContextID browserContextId;
 
   TargetInfo(
       {@required this.targetId,
@@ -413,7 +396,8 @@ class TargetInfo {
           ? TargetID.fromJson(json['openerId'] as String)
           : null,
       browserContextId: json.containsKey('browserContextId')
-          ? BrowserContextID.fromJson(json['browserContextId'] as String)
+          ? browser.BrowserContextID.fromJson(
+              json['browserContextId'] as String)
           : null,
     );
   }

@@ -13,7 +13,7 @@ Protocol _readProtocol(String fileName) {
           .readAsStringSync());
 }
 
-const _useFromChrome = false;
+const _useFromChrome = true;
 const protocolFromChromeFile = 'protocol_from_chrome.json';
 
 void main() {
@@ -402,7 +402,8 @@ const List<String> jsonTypes = [
   'number',
   'integer',
   'object',
-  'any'
+  'any',
+  'binary',
 ];
 
 String _toJsonCode(Parameter parameter, {bool needsExplicitToJson = true}) {
@@ -666,6 +667,7 @@ class _DomainContext {
     if (type == 'boolean') return 'bool';
     if (type == 'any') return 'dynamic';
     if (type == 'object') return 'Map<String, dynamic>';
+    if (type == 'binary') return 'String';
     if (type == 'array') {
       if (parameter is Parameter) {
         var items = parameter.items;

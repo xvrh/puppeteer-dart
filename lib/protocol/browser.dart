@@ -16,7 +16,7 @@ class BrowserApi {
   /// [browserContextId] Context to override. When omitted, default browser context is used.
   Future<void> setPermission(
       String origin, PermissionDescriptor permission, PermissionSetting setting,
-      {target.TargetID browserContextId}) async {
+      {BrowserContextID browserContextId}) async {
     await _client.send('Browser.setPermission', {
       'origin': origin,
       'permission': permission,
@@ -28,7 +28,7 @@ class BrowserApi {
   /// Grant specific permissions to the given origin and reject all others.
   /// [browserContextId] BrowserContext to override permissions. When omitted, default browser context is used.
   Future<void> grantPermissions(String origin, List<PermissionType> permissions,
-      {target.BrowserContextID browserContextId}) async {
+      {BrowserContextID browserContextId}) async {
     await _client.send('Browser.grantPermissions', {
       'origin': origin,
       'permissions': [...permissions],
@@ -38,8 +38,7 @@ class BrowserApi {
 
   /// Reset all permission management for all origins.
   /// [browserContextId] BrowserContext to reset permissions. When omitted, default browser context is used.
-  Future<void> resetPermissions(
-      {target.BrowserContextID browserContextId}) async {
+  Future<void> resetPermissions({BrowserContextID browserContextId}) async {
     await _client.send('Browser.resetPermissions', {
       if (browserContextId != null) 'browserContextId': browserContextId,
     });
@@ -196,6 +195,26 @@ class GetWindowForTargetResult {
   }
 }
 
+class BrowserContextID {
+  final String value;
+
+  BrowserContextID(this.value);
+
+  factory BrowserContextID.fromJson(String value) => BrowserContextID(value);
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is BrowserContextID && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 class WindowID {
   final int value;
 
@@ -302,6 +321,7 @@ class PermissionType {
   static const geolocation = PermissionType._('geolocation');
   static const midi = PermissionType._('midi');
   static const midiSysex = PermissionType._('midiSysex');
+  static const nfc = PermissionType._('nfc');
   static const notifications = PermissionType._('notifications');
   static const paymentHandler = PermissionType._('paymentHandler');
   static const periodicBackgroundSync =
@@ -325,6 +345,7 @@ class PermissionType {
     'geolocation': geolocation,
     'midi': midi,
     'midiSysex': midiSysex,
+    'nfc': nfc,
     'notifications': notifications,
     'paymentHandler': paymentHandler,
     'periodicBackgroundSync': periodicBackgroundSync,
