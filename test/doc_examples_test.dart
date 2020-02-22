@@ -493,9 +493,8 @@ void main() {
       await page.click('#upload-file-button');
       var fileChooser = await futureFileChooser;
 
-      await fileChooser.accept([
-        File(exampleValue('/test/assets/file-to-upload.txt', 'myfile.pdf'))
-      ]);
+      await fileChooser.accept(
+          [File(exampleValue('test/assets/file-to-upload.txt', 'myfile.pdf'))]);
       //----
     });
   });
@@ -1020,9 +1019,8 @@ void main() {
       await page.click('#upload-file-button');
       var fileChooser = await futureFileChooser;
 
-      await fileChooser.accept([
-        File(exampleValue('/test/assets/file-to-upload.txt', 'myfile.pdf'))
-      ]);
+      await fileChooser.accept(
+          [File(exampleValue('test/assets/file-to-upload.txt', 'myfile.pdf'))]);
       //----
     });
   });

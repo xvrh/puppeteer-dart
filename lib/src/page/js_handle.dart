@@ -390,6 +390,12 @@ async function _(element, pageJavascriptEnabled) {
   ///
   /// Sets the value of the file input these paths.
   Future<void> uploadFile(List<File> files) async {
+    var isMultiple = await evaluate<bool>('element => element.multiple');
+    if (files.length > 1 && !isMultiple) {
+      throw Exception(
+          'Multiple file uploads only work with <input type=file multiple>');
+    }
+
     var filesArg = <Map<String, String>>[];
     for (var file in files) {
       var fileArg = <String, String>{
