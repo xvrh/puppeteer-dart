@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.16.0 (2020-02-22)
+- Update to chromium 722234
+
 # 1.15.1 (2020-01-08)
 - Expose `ClientError` class
 - (internal) Revert previous change in `jsHandle.uploadFile`

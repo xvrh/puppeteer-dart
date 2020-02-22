@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
+import 'browser.dart' as browser;
+import 'network.dart' as network;
 
 class StorageApi {
   final Client _client;
@@ -37,6 +39,38 @@ class StorageApi {
     await _client.send('Storage.clearDataForOrigin', {
       'origin': origin,
       'storageTypes': storageTypes,
+    });
+  }
+
+  /// Returns all browser cookies.
+  /// [browserContextId] Browser context to use when called on the browser endpoint.
+  /// Returns: Array of cookie objects.
+  Future<List<network.Cookie>> getCookies(
+      {browser.BrowserContextID browserContextId}) async {
+    var result = await _client.send('Storage.getCookies', {
+      if (browserContextId != null) 'browserContextId': browserContextId,
+    });
+    return (result['cookies'] as List)
+        .map((e) => network.Cookie.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Sets given cookies.
+  /// [cookies] Cookies to be set.
+  /// [browserContextId] Browser context to use when called on the browser endpoint.
+  Future<void> setCookies(List<network.CookieParam> cookies,
+      {browser.BrowserContextID browserContextId}) async {
+    await _client.send('Storage.setCookies', {
+      'cookies': [...cookies],
+      if (browserContextId != null) 'browserContextId': browserContextId,
+    });
+  }
+
+  /// Clears cookies.
+  /// [browserContextId] Browser context to use when called on the browser endpoint.
+  Future<void> clearCookies({browser.BrowserContextID browserContextId}) async {
+    await _client.send('Storage.clearCookies', {
+      if (browserContextId != null) 'browserContextId': browserContextId,
     });
   }
 

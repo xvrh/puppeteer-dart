@@ -1410,12 +1410,10 @@ class ConnectionType {
 class CookieSameSite {
   static const strict = CookieSameSite._('Strict');
   static const lax = CookieSameSite._('Lax');
-  static const extended = CookieSameSite._('Extended');
   static const none = CookieSameSite._('None');
   static const values = {
     'Strict': strict,
     'Lax': lax,
-    'Extended': extended,
     'None': none,
   };
 
@@ -2417,7 +2415,6 @@ class SetCookieBlockedReason {
   static const secureOnly = SetCookieBlockedReason._('SecureOnly');
   static const sameSiteStrict = SetCookieBlockedReason._('SameSiteStrict');
   static const sameSiteLax = SetCookieBlockedReason._('SameSiteLax');
-  static const sameSiteExtended = SetCookieBlockedReason._('SameSiteExtended');
   static const sameSiteUnspecifiedTreatedAsLax =
       SetCookieBlockedReason._('SameSiteUnspecifiedTreatedAsLax');
   static const sameSiteNoneInsecure =
@@ -2434,7 +2431,6 @@ class SetCookieBlockedReason {
     'SecureOnly': secureOnly,
     'SameSiteStrict': sameSiteStrict,
     'SameSiteLax': sameSiteLax,
-    'SameSiteExtended': sameSiteExtended,
     'SameSiteUnspecifiedTreatedAsLax': sameSiteUnspecifiedTreatedAsLax,
     'SameSiteNoneInsecure': sameSiteNoneInsecure,
     'UserPreferences': userPreferences,
@@ -2473,7 +2469,6 @@ class CookieBlockedReason {
   static const domainMismatch = CookieBlockedReason._('DomainMismatch');
   static const sameSiteStrict = CookieBlockedReason._('SameSiteStrict');
   static const sameSiteLax = CookieBlockedReason._('SameSiteLax');
-  static const sameSiteExtended = CookieBlockedReason._('SameSiteExtended');
   static const sameSiteUnspecifiedTreatedAsLax =
       CookieBlockedReason._('SameSiteUnspecifiedTreatedAsLax');
   static const sameSiteNoneInsecure =
@@ -2486,7 +2481,6 @@ class CookieBlockedReason {
     'DomainMismatch': domainMismatch,
     'SameSiteStrict': sameSiteStrict,
     'SameSiteLax': sameSiteLax,
-    'SameSiteExtended': sameSiteExtended,
     'SameSiteUnspecifiedTreatedAsLax': sameSiteUnspecifiedTreatedAsLax,
     'SameSiteNoneInsecure': sameSiteNoneInsecure,
     'UserPreferences': userPreferences,

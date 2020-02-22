@@ -194,7 +194,7 @@ class JsCoverage {
     try {
       var response = await _devTools.debugger.getScriptSource(event.scriptId);
       _scriptUrls[event.scriptId] = event.url;
-      _scriptSources[event.scriptId] = response;
+      _scriptSources[event.scriptId] = response.scriptSource;
     } catch (e) {
       // This might happen if the page has already navigated away.
       _logger.fine('_onScriptParsed error', e);

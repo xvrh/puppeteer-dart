@@ -916,6 +916,18 @@
             "dependencies": [
                 "Network"
             ],
+            "types": [
+                {
+                    "id": "Issue",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "code",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
             "commands": [
                 {
                     "name": "getEncodedResponse",
@@ -965,6 +977,25 @@
                             "name": "encodedSize",
                             "description": "Size after re-encoding.",
                             "type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "name": "disable",
+                    "description": "Disables issues domain, prevents further issues from being reported to the client."
+                },
+                {
+                    "name": "enable",
+                    "description": "Enables issues domain, sends the issues collected so far to the client by means of the\n`issueAdded` event."
+                }
+            ],
+            "events": [
+                {
+                    "name": "issueAdded",
+                    "parameters": [
+                        {
+                            "name": "issue",
+                            "$ref": "Issue"
                         }
                     ]
                 }
@@ -1126,6 +1157,11 @@
             "description": "The Browser domain defines methods and events for browser managing.",
             "types": [
                 {
+                    "id": "BrowserContextID",
+                    "experimental": true,
+                    "type": "string"
+                },
+                {
                     "id": "WindowID",
                     "experimental": true,
                     "type": "integer"
@@ -1189,13 +1225,14 @@
                         "audioCapture",
                         "backgroundSync",
                         "backgroundFetch",
-                        "clipboardRead",
-                        "clipboardWrite",
+                        "clipboardReadWrite",
+                        "clipboardSanitizedWrite",
                         "durableStorage",
                         "flash",
                         "geolocation",
                         "midi",
                         "midiSysex",
+                        "nfc",
                         "notifications",
                         "paymentHandler",
                         "periodicBackgroundSync",
@@ -1245,6 +1282,12 @@
                             "description": "For \"wake-lock\" permission, must specify type as either \"screen\" or \"system\".",
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "allowWithoutSanitization",
+                            "description": "For \"clipboard\" permission, may specify allowWithoutSanitization.",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -1328,7 +1371,7 @@
                             "name": "browserContextId",
                             "description": "Context to override. When omitted, default browser context is used.",
                             "optional": true,
-                            "$ref": "Target.TargetID"
+                            "$ref": "BrowserContextID"
                         }
                     ]
                 },
@@ -1352,7 +1395,7 @@
                             "name": "browserContextId",
                             "description": "BrowserContext to override permissions. When omitted, default browser context is used.",
                             "optional": true,
-                            "$ref": "Target.BrowserContextID"
+                            "$ref": "BrowserContextID"
                         }
                     ]
                 },
@@ -1365,7 +1408,7 @@
                             "name": "browserContextId",
                             "description": "BrowserContext to reset permissions. When omitted, default browser context is used.",
                             "optional": true,
-                            "$ref": "Target.BrowserContextID"
+                            "$ref": "BrowserContextID"
                         }
                     ]
                 },
@@ -2685,6 +2728,11 @@
                             "items": {
                                 "$ref": "RuleUsage"
                             }
+                        },
+                        {
+                            "name": "timestamp",
+                            "description": "Monotonically increasing time, in seconds.",
+                            "type": "number"
                         }
                     ]
                 }
@@ -2956,11 +3004,13 @@
                         {
                             "name": "skipCount",
                             "description": "Number of records to skip.",
+                            "optional": true,
                             "type": "integer"
                         },
                         {
                             "name": "pageSize",
                             "description": "Number of records to fetch.",
+                            "optional": true,
                             "type": "integer"
                         },
                         {
@@ -3134,6 +3184,7 @@
                         "first-letter",
                         "before",
                         "after",
+                        "marker",
                         "backdrop",
                         "selection",
                         "first-line-inherited",
@@ -3569,6 +3620,37 @@
                             "name": "node",
                             "description": "Node description.",
                             "$ref": "Node"
+                        }
+                    ]
+                },
+                {
+                    "name": "scrollIntoViewIfNeeded",
+                    "description": "Scrolls the specified rect of the given node into view if not already visible.\nNote: exactly one between nodeId, backendNodeId and objectId should be passed\nto identify the node.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "nodeId",
+                            "description": "Identifier of the node.",
+                            "optional": true,
+                            "$ref": "NodeId"
+                        },
+                        {
+                            "name": "backendNodeId",
+                            "description": "Identifier of the backend node.",
+                            "optional": true,
+                            "$ref": "BackendNodeId"
+                        },
+                        {
+                            "name": "objectId",
+                            "description": "JavaScript object id of the node wrapper.",
+                            "optional": true,
+                            "$ref": "Runtime.RemoteObjectId"
+                        },
+                        {
+                            "name": "rect",
+                            "description": "The rect to be scrolled into view, relative to the node's border box, in CSS pixels.\nWhen omitted, center of the node will be used, similar to Element.scrollIntoView.",
+                            "optional": true,
+                            "$ref": "Rect"
                         }
                     ]
                 },
@@ -6365,6 +6447,19 @@
                     ]
                 },
                 {
+                    "name": "setLocaleOverride",
+                    "description": "Overrides default host system locale with the specified one.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "locale",
+                            "description": "ICU style C locale (e.g. \"en_US\"). If not specified or empty, disables the override and\nrestores default host system locale.",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
                     "name": "setTimezoneOverride",
                     "description": "Overrides default host system timezone with the specified one.",
                     "experimental": true,
@@ -7093,6 +7188,18 @@
                     ]
                 },
                 {
+                    "id": "MouseButton",
+                    "type": "string",
+                    "enum": [
+                        "none",
+                        "left",
+                        "middle",
+                        "right",
+                        "back",
+                        "forward"
+                    ]
+                },
+                {
                     "id": "TimeSinceEpoch",
                     "description": "UTC time in seconds, counted from January 1, 1970.",
                     "type": "number"
@@ -7247,15 +7354,7 @@
                             "name": "button",
                             "description": "Mouse button (default: \"none\").",
                             "optional": true,
-                            "type": "string",
-                            "enum": [
-                                "none",
-                                "left",
-                                "middle",
-                                "right",
-                                "back",
-                                "forward"
-                            ]
+                            "$ref": "MouseButton"
                         },
                         {
                             "name": "buttons",
@@ -7358,14 +7457,8 @@
                         },
                         {
                             "name": "button",
-                            "description": "Mouse button.",
-                            "type": "string",
-                            "enum": [
-                                "none",
-                                "left",
-                                "middle",
-                                "right"
-                            ]
+                            "description": "Mouse button. Only \"none\", \"left\", \"right\" are supported.",
+                            "$ref": "MouseButton"
                         },
                         {
                             "name": "timestamp",
@@ -7809,6 +7902,15 @@
                         {
                             "name": "compositingReasons",
                             "description": "A list of strings specifying reasons for the given layer to become composited.",
+                            "deprecated": true,
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        {
+                            "name": "compositingReasonIds",
+                            "description": "A list of strings specifying reason IDs for the given layer to become composited.",
                             "type": "array",
                             "items": {
                                 "type": "string"
@@ -8464,8 +8566,18 @@
                     "enum": [
                         "Strict",
                         "Lax",
-                        "Extended",
                         "None"
+                    ]
+                },
+                {
+                    "id": "CookiePriority",
+                    "description": "Represents the cookie's 'Priority' status:\nhttps://tools.ietf.org/html/draft-west-cookie-priority-00",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "Low",
+                        "Medium",
+                        "High"
                     ]
                 },
                 {
@@ -9107,6 +9219,12 @@
                             "description": "Cookie SameSite type.",
                             "optional": true,
                             "$ref": "CookieSameSite"
+                        },
+                        {
+                            "name": "priority",
+                            "description": "Cookie Priority",
+                            "experimental": true,
+                            "$ref": "CookiePriority"
                         }
                     ]
                 },
@@ -9119,7 +9237,6 @@
                         "SecureOnly",
                         "SameSiteStrict",
                         "SameSiteLax",
-                        "SameSiteExtended",
                         "SameSiteUnspecifiedTreatedAsLax",
                         "SameSiteNoneInsecure",
                         "UserPreferences",
@@ -9142,7 +9259,6 @@
                         "DomainMismatch",
                         "SameSiteStrict",
                         "SameSiteLax",
-                        "SameSiteExtended",
                         "SameSiteUnspecifiedTreatedAsLax",
                         "SameSiteNoneInsecure",
                         "UserPreferences",
@@ -9253,6 +9369,13 @@
                             "description": "Cookie expiration date, session cookie if not set",
                             "optional": true,
                             "$ref": "TimeSinceEpoch"
+                        },
+                        {
+                            "name": "priority",
+                            "description": "Cookie Priority.",
+                            "experimental": true,
+                            "optional": true,
+                            "$ref": "CookiePriority"
                         }
                     ]
                 },
@@ -10000,6 +10123,13 @@
                             "description": "Cookie expiration date, session cookie if not set",
                             "optional": true,
                             "$ref": "TimeSinceEpoch"
+                        },
+                        {
+                            "name": "priority",
+                            "description": "Cookie Priority type.",
+                            "experimental": true,
+                            "optional": true,
+                            "$ref": "CookiePriority"
                         }
                     ],
                     "returns": [
@@ -11379,6 +11509,19 @@
                     ]
                 },
                 {
+                    "id": "AppManifestParsedProperties",
+                    "description": "Parsed app manifest properties.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "scope",
+                            "description": "Computed scope value",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
                     "id": "LayoutViewport",
                     "description": "Layout viewport position and dimensions.",
                     "type": "object",
@@ -11566,7 +11709,46 @@
                         "scriptInitiated",
                         "metaTagRefresh",
                         "pageBlockInterstitial",
-                        "reload"
+                        "reload",
+                        "anchorClick"
+                    ]
+                },
+                {
+                    "id": "InstallabilityErrorArgument",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "description": "Argument name (e.g. name:'minimum-icon-size-in-pixels').",
+                            "type": "string"
+                        },
+                        {
+                            "name": "value",
+                            "description": "Argument value (e.g. value:'64').",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "id": "InstallabilityError",
+                    "description": "The installability error",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "errorId",
+                            "description": "The error id (e.g. 'manifest-missing-suitable-icon').",
+                            "type": "string"
+                        },
+                        {
+                            "name": "errorArguments",
+                            "description": "The list of error arguments (e.g. {name:'minimum-icon-size-in-pixels', value:'64'}).",
+                            "type": "array",
+                            "items": {
+                                "$ref": "InstallabilityErrorArgument"
+                            }
+                        }
                     ]
                 }
             ],
@@ -11780,6 +11962,13 @@
                             "description": "Manifest content.",
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "parsed",
+                            "description": "Parsed manifest properties",
+                            "experimental": true,
+                            "optional": true,
+                            "$ref": "AppManifestParsedProperties"
                         }
                     ]
                 },
@@ -11788,11 +11977,22 @@
                     "experimental": true,
                     "returns": [
                         {
-                            "name": "errors",
+                            "name": "installabilityErrors",
                             "type": "array",
                             "items": {
-                                "type": "string"
+                                "$ref": "InstallabilityError"
                             }
+                        }
+                    ]
+                },
+                {
+                    "name": "getManifestIcons",
+                    "experimental": true,
+                    "returns": [
+                        {
+                            "name": "primaryIcon",
+                            "optional": true,
+                            "type": "string"
                         }
                     ]
                 },
@@ -12585,37 +12785,12 @@
                 },
                 {
                     "name": "setInterceptFileChooserDialog",
-                    "description": "Intercept file chooser requests and transfer control to protocol clients.\nWhen file chooser interception is enabled, native file chooser dialog is not shown.\nInstead, a protocol event `Page.fileChooserOpened` is emitted.\nFile chooser can be handled with `page.handleFileChooser` command.",
+                    "description": "Intercept file chooser requests and transfer control to protocol clients.\nWhen file chooser interception is enabled, native file chooser dialog is not shown.\nInstead, a protocol event `Page.fileChooserOpened` is emitted.",
                     "experimental": true,
                     "parameters": [
                         {
                             "name": "enabled",
                             "type": "boolean"
-                        }
-                    ]
-                },
-                {
-                    "name": "handleFileChooser",
-                    "description": "Accepts or cancels an intercepted file chooser dialog.",
-                    "experimental": true,
-                    "parameters": [
-                        {
-                            "name": "action",
-                            "type": "string",
-                            "enum": [
-                                "accept",
-                                "cancel",
-                                "fallback"
-                            ]
-                        },
-                        {
-                            "name": "files",
-                            "description": "Array of absolute file paths to set, only respected with `accept` action.",
-                            "optional": true,
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
                         }
                     ]
                 }
@@ -12635,7 +12810,20 @@
                     "description": "Emitted only when `page.interceptFileChooser` is enabled.",
                     "parameters": [
                         {
+                            "name": "frameId",
+                            "description": "Id of the frame containing input node.",
+                            "experimental": true,
+                            "$ref": "FrameId"
+                        },
+                        {
+                            "name": "backendNodeId",
+                            "description": "Input node id.",
+                            "experimental": true,
+                            "$ref": "DOM.BackendNodeId"
+                        },
+                        {
                             "name": "mode",
+                            "description": "Input mode.",
                             "type": "string",
                             "enum": [
                                 "selectSingle",
@@ -12744,16 +12932,7 @@
                         {
                             "name": "reason",
                             "description": "The reason for the navigation.",
-                            "type": "string",
-                            "enum": [
-                                "formSubmissionGet",
-                                "formSubmissionPost",
-                                "httpHeaderRefresh",
-                                "scriptInitiated",
-                                "metaTagRefresh",
-                                "pageBlockInterstitial",
-                                "reload"
-                            ]
+                            "$ref": "ClientNavigationReason"
                         },
                         {
                             "name": "url",
@@ -13101,7 +13280,8 @@
                         "neutral",
                         "insecure",
                         "secure",
-                        "info"
+                        "info",
+                        "insecure-broken"
                     ]
                 },
                 {
@@ -13166,8 +13346,19 @@
                             "$ref": "Network.TimeSinceEpoch"
                         },
                         {
-                            "name": "certifcateHasWeakSignature",
+                            "name": "certificateNetworkError",
+                            "description": "The highest priority network error code, if the certificate has an error.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "certificateHasWeakSignature",
                             "description": "True if the certificate uses a weak signature aglorithm.",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "certificateHasSha1Signature",
+                            "description": "True if the certificate has a SHA1 signature in the chain.",
                             "type": "boolean"
                         },
                         {
@@ -13198,6 +13389,33 @@
                     ]
                 },
                 {
+                    "id": "SafetyTipStatus",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "badReputation",
+                        "lookalike"
+                    ]
+                },
+                {
+                    "id": "SafetyTipInfo",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "safetyTipStatus",
+                            "description": "Describes whether the page triggers any safety tips or reputation warnings. Default is unknown.",
+                            "$ref": "SafetyTipStatus"
+                        },
+                        {
+                            "name": "safeUrl",
+                            "description": "The URL the safety tip suggested (\"Did you mean?\"). Only filled in for lookalike matches.",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
                     "id": "VisibleSecurityState",
                     "description": "Security state information about the page.",
                     "experimental": true,
@@ -13213,6 +13431,12 @@
                             "description": "Security state details about the page certificate.",
                             "optional": true,
                             "$ref": "CertificateSecurityState"
+                        },
+                        {
+                            "name": "safetyTipInfo",
+                            "description": "The type of Safety Tip triggered on the page. Note that this field will be set even if the Safety Tip UI was not actually shown.",
+                            "optional": true,
+                            "$ref": "SafetyTipInfo"
                         },
                         {
                             "name": "securityStateIssueIds",
@@ -13752,6 +13976,10 @@
         {
             "domain": "Storage",
             "experimental": true,
+            "dependencies": [
+                "Browser",
+                "Network"
+            ],
             "types": [
                 {
                     "id": "StorageType",
@@ -13803,6 +14031,60 @@
                             "name": "storageTypes",
                             "description": "Comma separated list of StorageType to clear.",
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "getCookies",
+                    "description": "Returns all browser cookies.",
+                    "parameters": [
+                        {
+                            "name": "browserContextId",
+                            "description": "Browser context to use when called on the browser endpoint.",
+                            "optional": true,
+                            "$ref": "Browser.BrowserContextID"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "cookies",
+                            "description": "Array of cookie objects.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "Network.Cookie"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "setCookies",
+                    "description": "Sets given cookies.",
+                    "parameters": [
+                        {
+                            "name": "cookies",
+                            "description": "Cookies to be set.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "Network.CookieParam"
+                            }
+                        },
+                        {
+                            "name": "browserContextId",
+                            "description": "Browser context to use when called on the browser endpoint.",
+                            "optional": true,
+                            "$ref": "Browser.BrowserContextID"
+                        }
+                    ]
+                },
+                {
+                    "name": "clearCookies",
+                    "description": "Clears cookies.",
+                    "parameters": [
+                        {
+                            "name": "browserContextId",
+                            "description": "Browser context to use when called on the browser endpoint.",
+                            "optional": true,
+                            "$ref": "Browser.BrowserContextID"
                         }
                     ]
                 },
@@ -14252,11 +14534,6 @@
                     "type": "string"
                 },
                 {
-                    "id": "BrowserContextID",
-                    "experimental": true,
-                    "type": "string"
-                },
-                {
                     "id": "TargetInfo",
                     "type": "object",
                     "properties": [
@@ -14291,7 +14568,7 @@
                             "name": "browserContextId",
                             "experimental": true,
                             "optional": true,
-                            "$ref": "BrowserContextID"
+                            "$ref": "Browser.BrowserContextID"
                         }
                     ]
                 },
@@ -14394,11 +14671,19 @@
                     "name": "createBrowserContext",
                     "description": "Creates a new empty BrowserContext. Similar to an incognito profile but you can have more than\none.",
                     "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "disposeOnDetach",
+                            "description": "If specified, disposes this context when debugging session disconnects.",
+                            "optional": true,
+                            "type": "boolean"
+                        }
+                    ],
                     "returns": [
                         {
                             "name": "browserContextId",
                             "description": "The id of the context created.",
-                            "$ref": "BrowserContextID"
+                            "$ref": "Browser.BrowserContextID"
                         }
                     ]
                 },
@@ -14412,7 +14697,7 @@
                             "description": "An array of browser context ids.",
                             "type": "array",
                             "items": {
-                                "$ref": "BrowserContextID"
+                                "$ref": "Browser.BrowserContextID"
                             }
                         }
                     ]
@@ -14442,7 +14727,7 @@
                             "name": "browserContextId",
                             "description": "The browser context to create the page in.",
                             "optional": true,
-                            "$ref": "BrowserContextID"
+                            "$ref": "Browser.BrowserContextID"
                         },
                         {
                             "name": "enableBeginFrameControl",
@@ -14498,7 +14783,7 @@
                     "parameters": [
                         {
                             "name": "browserContextId",
-                            "$ref": "BrowserContextID"
+                            "$ref": "Browser.BrowserContextID"
                         }
                     ]
                 },
@@ -14576,13 +14861,6 @@
                         {
                             "name": "flatten",
                             "description": "Enables \"flat\" access to the session via specifying sessionId attribute in the commands.\nWe plan to make this the default, deprecate non-flattened mode,\nand eventually retire it. See crbug.com/991325.",
-                            "optional": true,
-                            "type": "boolean"
-                        },
-                        {
-                            "name": "windowOpen",
-                            "description": "Auto-attach to the targets created via window.open from current target.",
-                            "experimental": true,
                             "optional": true,
                             "type": "boolean"
                         }
@@ -16177,8 +16455,8 @@
                     "description": "Break out events into different types",
                     "type": "string",
                     "enum": [
-                        "playbackEvent",
-                        "systemEvent",
+                        "errorEvent",
+                        "triggeredEvent",
                         "messageEvent"
                     ]
                 },

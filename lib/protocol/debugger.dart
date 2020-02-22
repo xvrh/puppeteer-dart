@@ -123,17 +123,18 @@ class DebuggerApi {
 
   /// Returns source for the script with given id.
   /// [scriptId] Id of the script to get source for.
-  /// Returns: Script source.
-  Future<String> getScriptSource(runtime.ScriptId scriptId) async {
+  Future<GetScriptSourceResult> getScriptSource(
+      runtime.ScriptId scriptId) async {
     var result = await _client.send('Debugger.getScriptSource', {
       'scriptId': scriptId,
     });
-    return result['scriptSource'] as String;
+    return GetScriptSourceResult.fromJson(result);
   }
 
-  /// Returns bytecode for the WebAssembly script with given id.
+  /// This command is deprecated. Use getScriptSource instead.
   /// [scriptId] Id of the Wasm script to get source for.
   /// Returns: Script source.
+  @deprecated
   Future<String> getWasmBytecode(runtime.ScriptId scriptId) async {
     var result = await _client.send('Debugger.getWasmBytecode', {
       'scriptId': scriptId,
@@ -668,6 +669,24 @@ class EvaluateOnCallFrameResult {
           ? runtime.ExceptionDetails.fromJson(
               json['exceptionDetails'] as Map<String, dynamic>)
           : null,
+    );
+  }
+}
+
+class GetScriptSourceResult {
+  /// Script source (empty in case of Wasm bytecode).
+  final String scriptSource;
+
+  /// Wasm bytecode.
+  final String bytecode;
+
+  GetScriptSourceResult({@required this.scriptSource, this.bytecode});
+
+  factory GetScriptSourceResult.fromJson(Map<String, dynamic> json) {
+    return GetScriptSourceResult(
+      scriptSource: json['scriptSource'] as String,
+      bytecode:
+          json.containsKey('bytecode') ? json['bytecode'] as String : null,
     );
   }
 }

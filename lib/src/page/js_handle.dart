@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:mime/mime.dart';
+import 'package:path/path.dart' as p;
 import '../../protocol/dom.dart';
 import '../../protocol/runtime.dart';
 import '../connection.dart';
@@ -387,9 +390,33 @@ async function _(element, pageJavascriptEnabled) {
   ///
   /// Sets the value of the file input these paths.
   Future<void> uploadFile(List<File> files) async {
-    await executionContext.domApi.setFileInputFiles(
-        files.map((file) => file.absolute.path).toList(),
-        objectId: remoteObject.objectId);
+    var isMultiple = await evaluate<bool>('element => element.multiple');
+    if (files.length > 1 && !isMultiple) {
+      throw Exception(
+          'Multiple file uploads only work with <input type=file multiple>');
+    }
+
+    var filesArg = <Map<String, String>>[];
+    for (var file in files) {
+      var fileArg = <String, String>{
+        'name': p.basename(file.path),
+        'content': base64.encode(await file.readAsBytes()),
+        'mimeType': lookupMimeType(file.path) ?? 'application/octet-stream',
+      };
+      filesArg.add(fileArg);
+    }
+    await evaluateHandle(
+        //language=js
+        r'''async(element, files) => {
+    const dt = new DataTransfer();
+    for (const item of files) {
+      const response = await fetch(`data:${item.mimeType};base64,${item.content}`);
+      const file = new File([await response.blob()], item.name);
+      dt.items.add(file);
+    }
+    element.files = dt.files;
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+}''', args: [filesArg]);
   }
 
   /// This method scrolls element into view if needed, and then uses [touchscreen.tap]

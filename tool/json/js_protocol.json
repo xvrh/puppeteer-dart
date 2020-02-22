@@ -469,14 +469,21 @@
                     "returns": [
                         {
                             "name": "scriptSource",
-                            "description": "Script source.",
+                            "description": "Script source (empty in case of Wasm bytecode).",
+                            "type": "string"
+                        },
+                        {
+                            "name": "bytecode",
+                            "description": "Wasm bytecode.",
+                            "optional": true,
                             "type": "string"
                         }
                     ]
                 },
                 {
                     "name": "getWasmBytecode",
-                    "description": "Returns bytecode for the WebAssembly script with given id.",
+                    "description": "This command is deprecated. Use getScriptSource instead.",
+                    "deprecated": true,
                     "parameters": [
                         {
                             "name": "scriptId",
@@ -571,7 +578,15 @@
                 },
                 {
                     "name": "resume",
-                    "description": "Resumes JavaScript execution."
+                    "description": "Resumes JavaScript execution.",
+                    "parameters": [
+                        {
+                            "name": "terminateOnResume",
+                            "description": "Set to true to terminate execution upon resuming execution. In contrast\nto Runtime.terminateExecution, this will allows to execute further\nJavaScript (i.e. via evaluation) until execution of the paused code\nis actually resumed, at which point termination is triggered.\nIf execution is currently not paused, this parameter has no effect.",
+                            "optional": true,
+                            "type": "boolean"
+                        }
+                    ]
                 },
                 {
                     "name": "searchInContent",
@@ -1400,6 +1415,11 @@
                             "description": "If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken\nwhen the tracking is stopped.",
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "treatGlobalObjectsAsRoots",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -1409,6 +1429,12 @@
                         {
                             "name": "reportProgress",
                             "description": "If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "treatGlobalObjectsAsRoots",
+                            "description": "If true, a raw snapshot without artifical roots will be generated",
                             "optional": true,
                             "type": "boolean"
                         }
@@ -1721,6 +1747,24 @@
                             }
                         }
                     ]
+                },
+                {
+                    "id": "CounterInfo",
+                    "description": "Collected counter information.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "description": "Counter name.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "value",
+                            "description": "Counter value.",
+                            "type": "integer"
+                        }
+                    ]
                 }
             ],
             "commands": [
@@ -1773,6 +1817,19 @@
                             "description": "Collect block-based coverage.",
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "allowTriggeredUpdates",
+                            "description": "Allow the backend to send updates on its own initiative",
+                            "optional": true,
+                            "type": "boolean"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "timestamp",
+                            "description": "Monotonically increasing time (in seconds) when the coverage update was taken in the backend.",
+                            "type": "number"
                         }
                     ]
                 },
@@ -1811,6 +1868,11 @@
                             "items": {
                                 "$ref": "ScriptCoverage"
                             }
+                        },
+                        {
+                            "name": "timestamp",
+                            "description": "Monotonically increasing time (in seconds) when the coverage update was taken in the backend.",
+                            "type": "number"
                         }
                     ]
                 },
@@ -1825,6 +1887,31 @@
                             "type": "array",
                             "items": {
                                 "$ref": "ScriptTypeProfile"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "enableRuntimeCallStats",
+                    "description": "Enable run time call stats collection.",
+                    "experimental": true
+                },
+                {
+                    "name": "disableRuntimeCallStats",
+                    "description": "Disable run time call stats collection.",
+                    "experimental": true
+                },
+                {
+                    "name": "getRuntimeCallStats",
+                    "description": "Retrieve run time call stats.",
+                    "experimental": true,
+                    "returns": [
+                        {
+                            "name": "result",
+                            "description": "Collected counter information.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "CounterInfo"
                             }
                         }
                     ]
@@ -1873,6 +1960,31 @@
                             "description": "Profile title passed as an argument to console.profile().",
                             "optional": true,
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "preciseCoverageDeltaUpdate",
+                    "description": "Reports coverage delta since the last poll (either from an event like this, or from\n`takePreciseCoverage` for the current isolate. May only be sent if precise code\ncoverage has been started. This event can be trigged by the embedder to, for example,\ntrigger collection of coverage data immediatelly at a certain point in time.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "timestamp",
+                            "description": "Monotonically increasing time (in seconds) when the coverage update was taken in the backend.",
+                            "type": "number"
+                        },
+                        {
+                            "name": "occassion",
+                            "description": "Identifier for distinguishing coverage events.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "result",
+                            "description": "Coverage data for the current isolate.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "ScriptCoverage"
+                            }
                         }
                     ]
                 }
@@ -2250,6 +2362,19 @@
                         {
                             "name": "value",
                             "description": "The value associated with the private property.",
+                            "optional": true,
+                            "$ref": "RemoteObject"
+                        },
+                        {
+                            "name": "get",
+                            "description": "A function which serves as a getter for the private property,\nor `undefined` if there is no getter (accessor descriptors only).",
+                            "optional": true,
+                            "$ref": "RemoteObject"
+                        },
+                        {
+                            "name": "set",
+                            "description": "A function which serves as a setter for the private property,\nor `undefined` if there is no setter (accessor descriptors only).",
+                            "optional": true,
                             "$ref": "RemoteObject"
                         }
                     ]

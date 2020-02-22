@@ -182,12 +182,14 @@ class SecurityState {
   static const insecure = SecurityState._('insecure');
   static const secure = SecurityState._('secure');
   static const info = SecurityState._('info');
+  static const insecureBroken = SecurityState._('insecure-broken');
   static const values = {
     'unknown': unknown,
     'neutral': neutral,
     'insecure': insecure,
     'secure': secure,
     'info': info,
+    'insecure-broken': insecureBroken,
   };
 
   final String value;
@@ -241,8 +243,14 @@ class CertificateSecurityState {
   /// Certificate valid to (expiration) date
   final network.TimeSinceEpoch validTo;
 
+  /// The highest priority network error code, if the certificate has an error.
+  final String certificateNetworkError;
+
   /// True if the certificate uses a weak signature aglorithm.
-  final bool certifcateHasWeakSignature;
+  final bool certificateHasWeakSignature;
+
+  /// True if the certificate has a SHA1 signature in the chain.
+  final bool certificateHasSha1Signature;
 
   /// True if modern SSL
   final bool modernSSL;
@@ -270,7 +278,9 @@ class CertificateSecurityState {
       @required this.issuer,
       @required this.validFrom,
       @required this.validTo,
-      @required this.certifcateHasWeakSignature,
+      this.certificateNetworkError,
+      @required this.certificateHasWeakSignature,
+      @required this.certificateHasSha1Signature,
       @required this.modernSSL,
       @required this.obsoleteSslProtocol,
       @required this.obsoleteSslKeyExchange,
@@ -292,7 +302,11 @@ class CertificateSecurityState {
       issuer: json['issuer'] as String,
       validFrom: network.TimeSinceEpoch.fromJson(json['validFrom'] as num),
       validTo: network.TimeSinceEpoch.fromJson(json['validTo'] as num),
-      certifcateHasWeakSignature: json['certifcateHasWeakSignature'] as bool,
+      certificateNetworkError: json.containsKey('certificateNetworkError')
+          ? json['certificateNetworkError'] as String
+          : null,
+      certificateHasWeakSignature: json['certificateHasWeakSignature'] as bool,
+      certificateHasSha1Signature: json['certificateHasSha1Signature'] as bool,
       modernSSL: json['modernSSL'] as bool,
       obsoleteSslProtocol: json['obsoleteSslProtocol'] as bool,
       obsoleteSslKeyExchange: json['obsoleteSslKeyExchange'] as bool,
@@ -311,7 +325,8 @@ class CertificateSecurityState {
       'issuer': issuer,
       'validFrom': validFrom.toJson(),
       'validTo': validTo.toJson(),
-      'certifcateHasWeakSignature': certifcateHasWeakSignature,
+      'certificateHasWeakSignature': certificateHasWeakSignature,
+      'certificateHasSha1Signature': certificateHasSha1Signature,
       'modernSSL': modernSSL,
       'obsoleteSslProtocol': obsoleteSslProtocol,
       'obsoleteSslKeyExchange': obsoleteSslKeyExchange,
@@ -319,6 +334,60 @@ class CertificateSecurityState {
       'obsoleteSslSignature': obsoleteSslSignature,
       if (keyExchangeGroup != null) 'keyExchangeGroup': keyExchangeGroup,
       if (mac != null) 'mac': mac,
+      if (certificateNetworkError != null)
+        'certificateNetworkError': certificateNetworkError,
+    };
+  }
+}
+
+class SafetyTipStatus {
+  static const badReputation = SafetyTipStatus._('badReputation');
+  static const lookalike = SafetyTipStatus._('lookalike');
+  static const values = {
+    'badReputation': badReputation,
+    'lookalike': lookalike,
+  };
+
+  final String value;
+
+  const SafetyTipStatus._(this.value);
+
+  factory SafetyTipStatus.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is SafetyTipStatus && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class SafetyTipInfo {
+  /// Describes whether the page triggers any safety tips or reputation warnings. Default is unknown.
+  final SafetyTipStatus safetyTipStatus;
+
+  /// The URL the safety tip suggested ("Did you mean?"). Only filled in for lookalike matches.
+  final String safeUrl;
+
+  SafetyTipInfo({@required this.safetyTipStatus, this.safeUrl});
+
+  factory SafetyTipInfo.fromJson(Map<String, dynamic> json) {
+    return SafetyTipInfo(
+      safetyTipStatus:
+          SafetyTipStatus.fromJson(json['safetyTipStatus'] as String),
+      safeUrl: json.containsKey('safeUrl') ? json['safeUrl'] as String : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'safetyTipStatus': safetyTipStatus.toJson(),
+      if (safeUrl != null) 'safeUrl': safeUrl,
     };
   }
 }
@@ -331,12 +400,16 @@ class VisibleSecurityState {
   /// Security state details about the page certificate.
   final CertificateSecurityState certificateSecurityState;
 
+  /// The type of Safety Tip triggered on the page. Note that this field will be set even if the Safety Tip UI was not actually shown.
+  final SafetyTipInfo safetyTipInfo;
+
   /// Array of security state issues ids.
   final List<String> securityStateIssueIds;
 
   VisibleSecurityState(
       {@required this.securityState,
       this.certificateSecurityState,
+      this.safetyTipInfo,
       @required this.securityStateIssueIds});
 
   factory VisibleSecurityState.fromJson(Map<String, dynamic> json) {
@@ -345,6 +418,10 @@ class VisibleSecurityState {
       certificateSecurityState: json.containsKey('certificateSecurityState')
           ? CertificateSecurityState.fromJson(
               json['certificateSecurityState'] as Map<String, dynamic>)
+          : null,
+      safetyTipInfo: json.containsKey('safetyTipInfo')
+          ? SafetyTipInfo.fromJson(
+              json['safetyTipInfo'] as Map<String, dynamic>)
           : null,
       securityStateIssueIds: (json['securityStateIssueIds'] as List)
           .map((e) => e as String)
@@ -358,6 +435,7 @@ class VisibleSecurityState {
       'securityStateIssueIds': [...securityStateIssueIds],
       if (certificateSecurityState != null)
         'certificateSecurityState': certificateSecurityState.toJson(),
+      if (safetyTipInfo != null) 'safetyTipInfo': safetyTipInfo.toJson(),
     };
   }
 }

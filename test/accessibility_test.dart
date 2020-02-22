@@ -76,7 +76,7 @@ void main() {
       expect(await page.accessibility.snapshot(), equals(golden));
     });
     test('should report uninteresting nodes', () async {
-      await page.setContent('<textarea autofocus>hi</textarea>');
+      await page.setContent('<textarea>hi</textarea>');
       await page.focus('textarea');
       var golden = AXNode(
           role: 'textbox',
@@ -86,7 +86,7 @@ void main() {
           multiLine: true,
           children: [
             AXNode(
-                role: 'GenericContainer',
+                role: 'generic',
                 name: '',
                 children: [AXNode(role: 'text', name: 'hi')])
           ]);
@@ -143,7 +143,7 @@ void main() {
     Edit this image: <img src="fakeimage.png" alt="my fake image">
     </div>''');
         var golden = AXNode(
-            role: 'GenericContainer',
+            role: 'generic',
             name: '',
             value: 'Edit this image: ',
             children: [
@@ -184,8 +184,8 @@ void main() {
           await page.setContent('''
     <div contenteditable="plaintext-only">Edit this image:<img src="fakeimage.png" alt="my fake image"></div>''');
           var snapshot = await page.accessibility.snapshot();
-          expect(snapshot.children[0],
-              equals(AXNode(role: 'GenericContainer', name: '')));
+          expect(
+              snapshot.children[0], equals(AXNode(role: 'generic', name: '')));
         });
         test(
             'plain text field with tabindex and without role should not have content',
@@ -193,8 +193,8 @@ void main() {
           await page.setContent('''
     <div contenteditable="plaintext-only" tabIndex=0>Edit this image:<img src="fakeimage.png" alt="my fake image"></div>''');
           var snapshot = await page.accessibility.snapshot();
-          expect(snapshot.children[0],
-              equals(AXNode(role: 'GenericContainer', name: '')));
+          expect(
+              snapshot.children[0], equals(AXNode(role: 'generic', name: '')));
         });
       });
       test(
@@ -287,12 +287,24 @@ void main() {
           var div = await page.$('div');
           expect(await page.accessibility.snapshot(root: div), isNull);
           expect(
-              await page.accessibility
-                  .snapshot(root: div, interestingOnly: false),
-              equals(AXNode(
-                  role: 'GenericContainer',
-                  name: '',
-                  children: [AXNode(role: 'button', name: 'My Button')])));
+            await page.accessibility
+                .snapshot(root: div, interestingOnly: false),
+            equals(
+              AXNode(
+                role: 'generic',
+                name: '',
+                children: [
+                  AXNode(
+                    role: 'button',
+                    name: 'My Button',
+                    children: [
+                      AXNode(role: 'text', name: 'My Button'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
         });
       });
     });

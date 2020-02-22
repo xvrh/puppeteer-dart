@@ -128,7 +128,6 @@ class Page {
   Mouse _mouse;
   Touchscreen _touchscreen;
   Keyboard _keyboard;
-  bool _fileChooserInterceptionIsDisabled = false;
   final _fileChooserInterceptors = <Completer<FileChooser>>{};
 
   Page._(this.target, this.devTools)
@@ -206,22 +205,20 @@ class Page {
       devTools.target.setAutoAttach(true, false, flatten: true),
       devTools.performance.enable(),
       devTools.log.enable(),
-      devTools.page.setInterceptFileChooserDialog(true).catchError((_) {
-        _fileChooserInterceptionIsDisabled = true;
-      }),
     ]);
   }
 
-  void _onFileChooser(String event) {
+  void _onFileChooser(FileChooserOpenedEvent event) async {
     if (_fileChooserInterceptors.isEmpty) {
-      devTools.page.handleFileChooser('fallback').catchError((e) {
-        _logger.warning('Error handleFileChooser', e);
-      });
       return;
     }
+    var frame = _frameManager.frame(event.frameId);
+    var context = await frame.executionContext;
+    var element = await context.adoptBackendNodeId(event.backendNodeId);
+
     var interceptors = _fileChooserInterceptors.toList();
     _fileChooserInterceptors.clear();
-    var fileChooser = FileChooser(devTools, event);
+    var fileChooser = FileChooser(devTools, element, event);
     for (var interceptor in interceptors) {
       interceptor.complete(fileChooser);
     }
@@ -249,11 +246,11 @@ class Page {
   ///    seconds, pass `0` to disable the timeout. The default value can be
   ///    changed by using the [page.defaultTimeout] property.
   ///  - returns: [Future<FileChooser>] A promise that resolves after a page requests a file picker.
-  Future<FileChooser> waitForFileChooser({Duration timeout}) {
-    if (_fileChooserInterceptionIsDisabled) {
-      throw Exception(
-          'File chooser handling does not work with multiple connections to the same page');
+  Future<FileChooser> waitForFileChooser({Duration timeout}) async {
+    if (_fileChooserInterceptors.isEmpty) {
+      await devTools.page.setInterceptFileChooserDialog(true);
     }
+
     timeout ??= defaultTimeout;
     var callback = Completer<FileChooser>();
     _fileChooserInterceptors.add(callback);
@@ -2122,27 +2119,27 @@ class ClientError implements Exception {
 /// > All file choosers must be accepted or canceled. Not doing so will prevent subsequent file choosers from appearing.
 class FileChooser {
   final DevTools devTools;
+  final ElementHandle element;
 
   /// Whether file chooser allow for [multiple](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#attr-multiple)
   /// file selection.
   final bool isMultiple;
   bool _handled = false;
 
-  FileChooser(this.devTools, String mode) : isMultiple = mode != 'selectSingle';
+  FileChooser(this.devTools, this.element, FileChooserOpenedEvent event)
+      : isMultiple = event.mode != FileChooserOpenedEventMode.selectSingle;
 
   /// Accept the file chooser request with given files.
   Future<void> accept(List<File> files) async {
     assert(!_handled, 'Cannot accept FileChooser which is already handled!');
     _handled = true;
-    await devTools.page.handleFileChooser('accept',
-        files: files.map((f) => f.absolute.path).toList());
+    await element.uploadFile(files);
   }
 
   /// Closes the file chooser without selecting any files.
   Future<void> cancel() async {
     assert(!_handled, 'Cannot cancel FileChooser which is already handled!');
     _handled = true;
-    await devTools.page.handleFileChooser('cancel');
   }
 }
 
