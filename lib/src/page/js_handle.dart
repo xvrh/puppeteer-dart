@@ -415,6 +415,7 @@ async function _(element, pageJavascriptEnabled) {
       dt.items.add(file);
     }
     element.files = dt.files;
+    element.dispatchEvent(new Event('input', { bubbles: true }));
     element.dispatchEvent(new Event('change', { bubbles: true }));
 }''', args: [filesArg]);
   }
