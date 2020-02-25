@@ -44,6 +44,8 @@ void main() {
       await input.uploadFile([filePath]);
       expect(await page.evaluate('e => e.files[0].name', args: [input]),
           equals('file-to-upload.txt'));
+      expect(await page.evaluate('e => e.files[0].type', args: [input]),
+          'text/plain');
       expect(await page.evaluate('''e => {
       var reader = new FileReader();
       var promise = new Promise(fulfill => reader.onload = fulfill);

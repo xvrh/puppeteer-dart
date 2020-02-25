@@ -407,11 +407,11 @@ async function _(element, pageJavascriptEnabled) {
     }
     await evaluateHandle(
         //language=js
-        r'''async(element, files) => {
+        r'''async (element, files) => {
     const dt = new DataTransfer();
     for (const item of files) {
       const response = await fetch(`data:${item.mimeType};base64,${item.content}`);
-      const file = new File([await response.blob()], item.name);
+      const file = new File([await response.blob()], item.name, {type: item.mimeType});
       dt.items.add(file);
     }
     element.files = dt.files;
