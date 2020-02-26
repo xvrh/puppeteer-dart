@@ -3,6 +3,7 @@ _*
 !.gitignore
 !.gitattributes
 !.travis.yml
+!.github
 build/
 pubspec.lock
 
