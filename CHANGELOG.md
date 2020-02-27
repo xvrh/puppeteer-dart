@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.16.1 (2020-02-25)
+- Fix a bug with the new `uploadFile` implementation.
+
 # 1.16.0 (2020-02-22)
 - Update to chromium 722234
 
