@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: pub get
-      - run: dart tool/publish/check_version.dart ${GITHUB_REF}
+      - run: dart tool/check_version.dart ${GITHUB_REF}
       - name: Setup credentials
         run: |
           mkdir -p ~/.pub-cache
