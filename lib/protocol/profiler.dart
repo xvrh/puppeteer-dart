@@ -20,6 +20,16 @@ class ProfilerApi {
       .where((event) => event.name == 'Profiler.consoleProfileStarted')
       .map((event) => ConsoleProfileStartedEvent.fromJson(event.parameters));
 
+  /// Reports coverage delta since the last poll (either from an event like this, or from
+  /// `takePreciseCoverage` for the current isolate. May only be sent if precise code
+  /// coverage has been started. This event can be trigged by the embedder to, for example,
+  /// trigger collection of coverage data immediatelly at a certain point in time.
+  Stream<PreciseCoverageDeltaUpdateEvent> get onPreciseCoverageDeltaUpdate =>
+      _client.onEvent
+          .where((event) => event.name == 'Profiler.preciseCoverageDeltaUpdate')
+          .map((event) =>
+              PreciseCoverageDeltaUpdateEvent.fromJson(event.parameters));
+
   Future<void> disable() async {
     await _client.send('Profiler.disable');
   }
@@ -55,11 +65,13 @@ class ProfilerApi {
   /// counters.
   /// [callCount] Collect accurate call counts beyond simple 'covered' or 'not covered'.
   /// [detailed] Collect block-based coverage.
-  Future<void> startPreciseCoverage({bool callCount, bool detailed}) async {
-    await _client.send('Profiler.startPreciseCoverage', {
+  /// Returns: Monotonically increasing time (in seconds) when the coverage update was taken in the backend.
+  Future<num> startPreciseCoverage({bool callCount, bool detailed}) async {
+    var result = await _client.send('Profiler.startPreciseCoverage', {
       if (callCount != null) 'callCount': callCount,
       if (detailed != null) 'detailed': detailed,
     });
+    return result['timestamp'] as num;
   }
 
   /// Enable type profile.
@@ -86,12 +98,9 @@ class ProfilerApi {
 
   /// Collect coverage data for the current isolate, and resets execution counters. Precise code
   /// coverage needs to have started.
-  /// Returns: Coverage data for the current isolate.
-  Future<List<ScriptCoverage>> takePreciseCoverage() async {
+  Future<TakePreciseCoverageResult> takePreciseCoverage() async {
     var result = await _client.send('Profiler.takePreciseCoverage');
-    return (result['result'] as List)
-        .map((e) => ScriptCoverage.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return TakePreciseCoverageResult.fromJson(result);
   }
 
   /// Collect type profile.
@@ -169,6 +178,51 @@ class ConsoleProfileStartedEvent {
       location:
           debugger.Location.fromJson(json['location'] as Map<String, dynamic>),
       title: json.containsKey('title') ? json['title'] as String : null,
+    );
+  }
+}
+
+class PreciseCoverageDeltaUpdateEvent {
+  /// Monotonically increasing time (in seconds) when the coverage update was taken in the backend.
+  final num timestamp;
+
+  /// Identifier for distinguishing coverage events.
+  final String occassion;
+
+  /// Coverage data for the current isolate.
+  final List<ScriptCoverage> result;
+
+  PreciseCoverageDeltaUpdateEvent(
+      {@required this.timestamp,
+      @required this.occassion,
+      @required this.result});
+
+  factory PreciseCoverageDeltaUpdateEvent.fromJson(Map<String, dynamic> json) {
+    return PreciseCoverageDeltaUpdateEvent(
+      timestamp: json['timestamp'] as num,
+      occassion: json['occassion'] as String,
+      result: (json['result'] as List)
+          .map((e) => ScriptCoverage.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+class TakePreciseCoverageResult {
+  /// Coverage data for the current isolate.
+  final List<ScriptCoverage> result;
+
+  /// Monotonically increasing time (in seconds) when the coverage update was taken in the backend.
+  final num timestamp;
+
+  TakePreciseCoverageResult({@required this.result, @required this.timestamp});
+
+  factory TakePreciseCoverageResult.fromJson(Map<String, dynamic> json) {
+    return TakePreciseCoverageResult(
+      result: (json['result'] as List)
+          .map((e) => ScriptCoverage.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      timestamp: json['timestamp'] as num,
     );
   }
 }

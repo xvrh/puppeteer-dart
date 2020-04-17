@@ -1353,19 +1353,38 @@ class PrivatePropertyDescriptor {
   /// The value associated with the private property.
   final RemoteObject value;
 
-  PrivatePropertyDescriptor({@required this.name, @required this.value});
+  /// A function which serves as a getter for the private property,
+  /// or `undefined` if there is no getter (accessor descriptors only).
+  final RemoteObject get;
+
+  /// A function which serves as a setter for the private property,
+  /// or `undefined` if there is no setter (accessor descriptors only).
+  final RemoteObject set;
+
+  PrivatePropertyDescriptor(
+      {@required this.name, this.value, this.get, this.set});
 
   factory PrivatePropertyDescriptor.fromJson(Map<String, dynamic> json) {
     return PrivatePropertyDescriptor(
       name: json['name'] as String,
-      value: RemoteObject.fromJson(json['value'] as Map<String, dynamic>),
+      value: json.containsKey('value')
+          ? RemoteObject.fromJson(json['value'] as Map<String, dynamic>)
+          : null,
+      get: json.containsKey('get')
+          ? RemoteObject.fromJson(json['get'] as Map<String, dynamic>)
+          : null,
+      set: json.containsKey('set')
+          ? RemoteObject.fromJson(json['set'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'value': value.toJson(),
+      if (value != null) 'value': value.toJson(),
+      if (get != null) 'get': get.toJson(),
+      if (set != null) 'set': set.toJson(),
     };
   }
 }

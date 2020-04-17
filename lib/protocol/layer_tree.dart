@@ -20,14 +20,11 @@ class LayerTreeApi {
 
   /// Provides the reasons why the given layer was composited.
   /// [layerId] The id of the layer for which we want to get the reasons it was composited.
-  /// Returns: A list of strings specifying reasons for the given layer to become composited.
-  Future<List<String>> compositingReasons(LayerId layerId) async {
+  Future<CompositingReasonsResult> compositingReasons(LayerId layerId) async {
     var result = await _client.send('LayerTree.compositingReasons', {
       'layerId': layerId,
     });
-    return (result['compositingReasons'] as List)
-        .map((e) => e as String)
-        .toList();
+    return CompositingReasonsResult.fromJson(result);
   }
 
   /// Disables compositing tree inspection.
@@ -130,6 +127,21 @@ class LayerPaintedEvent {
     return LayerPaintedEvent(
       layerId: LayerId.fromJson(json['layerId'] as String),
       clip: dom.Rect.fromJson(json['clip'] as Map<String, dynamic>),
+    );
+  }
+}
+
+class CompositingReasonsResult {
+  /// A list of strings specifying reason IDs for the given layer to become composited.
+  final List<String> compositingReasonIds;
+
+  CompositingReasonsResult({@required this.compositingReasonIds});
+
+  factory CompositingReasonsResult.fromJson(Map<String, dynamic> json) {
+    return CompositingReasonsResult(
+      compositingReasonIds: (json['compositingReasonIds'] as List)
+          .map((e) => e as String)
+          .toList(),
     );
   }
 }

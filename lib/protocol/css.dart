@@ -261,11 +261,9 @@ class CSSApi {
 
   /// Obtain list of rules that became used since last call to this method (or since start of coverage
   /// instrumentation)
-  Future<List<RuleUsage>> takeCoverageDelta() async {
+  Future<TakeCoverageDeltaResult> takeCoverageDelta() async {
     var result = await _client.send('CSS.takeCoverageDelta');
-    return (result['coverage'] as List)
-        .map((e) => RuleUsage.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return TakeCoverageDeltaResult.fromJson(result);
   }
 }
 
@@ -380,6 +378,24 @@ class GetMatchedStylesForNodeResult {
               .map((e) => CSSKeyframesRule.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
+    );
+  }
+}
+
+class TakeCoverageDeltaResult {
+  final List<RuleUsage> coverage;
+
+  /// Monotonically increasing time, in seconds.
+  final num timestamp;
+
+  TakeCoverageDeltaResult({@required this.coverage, @required this.timestamp});
+
+  factory TakeCoverageDeltaResult.fromJson(Map<String, dynamic> json) {
+    return TakeCoverageDeltaResult(
+      coverage: (json['coverage'] as List)
+          .map((e) => RuleUsage.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      timestamp: json['timestamp'] as num,
     );
   }
 }

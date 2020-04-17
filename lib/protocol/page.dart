@@ -265,9 +265,14 @@ class PageApi {
     return GetAppManifestResult.fromJson(result);
   }
 
-  Future<List<String>> getInstallabilityErrors() async {
+  Future<GetInstallabilityErrorsResult> getInstallabilityErrors() async {
     var result = await _client.send('Page.getInstallabilityErrors');
-    return (result['errors'] as List).map((e) => e as String).toList();
+    return GetInstallabilityErrorsResult.fromJson(result);
+  }
+
+  Future<String> getManifestIcons() async {
+    var result = await _client.send('Page.getManifestIcons');
+    return result['primaryIcon'] as String;
   }
 
   /// Returns all browser cookies. Depending on the backend support, will return detailed cookie
@@ -819,7 +824,7 @@ class FrameScheduledNavigationEvent {
   final num delay;
 
   /// The reason for the navigation.
-  final FrameScheduledNavigationEventReason reason;
+  final ClientNavigationReason reason;
 
   /// The destination URL for the scheduled navigation.
   final String url;
@@ -834,8 +839,7 @@ class FrameScheduledNavigationEvent {
     return FrameScheduledNavigationEvent(
       frameId: FrameId.fromJson(json['frameId'] as String),
       delay: json['delay'] as num,
-      reason: FrameScheduledNavigationEventReason.fromJson(
-          json['reason'] as String),
+      reason: ClientNavigationReason.fromJson(json['reason'] as String),
       url: json['url'] as String,
     );
   }
@@ -1036,7 +1040,11 @@ class GetAppManifestResult {
   /// Manifest content.
   final String data;
 
-  GetAppManifestResult({@required this.url, @required this.errors, this.data});
+  /// Parsed manifest properties
+  final AppManifestParsedProperties parsed;
+
+  GetAppManifestResult(
+      {@required this.url, @required this.errors, this.data, this.parsed});
 
   factory GetAppManifestResult.fromJson(Map<String, dynamic> json) {
     return GetAppManifestResult(
@@ -1045,6 +1053,24 @@ class GetAppManifestResult {
           .map((e) => AppManifestError.fromJson(e as Map<String, dynamic>))
           .toList(),
       data: json.containsKey('data') ? json['data'] as String : null,
+      parsed: json.containsKey('parsed')
+          ? AppManifestParsedProperties.fromJson(
+              json['parsed'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+class GetInstallabilityErrorsResult {
+  final List<InstallabilityError> installabilityErrors;
+
+  GetInstallabilityErrorsResult({@required this.installabilityErrors});
+
+  factory GetInstallabilityErrorsResult.fromJson(Map<String, dynamic> json) {
+    return GetInstallabilityErrorsResult(
+      installabilityErrors: (json['installabilityErrors'] as List)
+          .map((e) => InstallabilityError.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -1626,6 +1652,26 @@ class AppManifestError {
   }
 }
 
+/// Parsed app manifest properties.
+class AppManifestParsedProperties {
+  /// Computed scope value
+  final String scope;
+
+  AppManifestParsedProperties({@required this.scope});
+
+  factory AppManifestParsedProperties.fromJson(Map<String, dynamic> json) {
+    return AppManifestParsedProperties(
+      scope: json['scope'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'scope': scope,
+    };
+  }
+}
+
 /// Layout viewport position and dimensions.
 class LayoutViewport {
   /// Horizontal offset relative to the document (CSS pixels).
@@ -1870,6 +1916,7 @@ class ClientNavigationReason {
   static const pageBlockInterstitial =
       ClientNavigationReason._('pageBlockInterstitial');
   static const reload = ClientNavigationReason._('reload');
+  static const anchorClick = ClientNavigationReason._('anchorClick');
   static const values = {
     'formSubmissionGet': formSubmissionGet,
     'formSubmissionPost': formSubmissionPost,
@@ -1878,6 +1925,7 @@ class ClientNavigationReason {
     'metaTagRefresh': metaTagRefresh,
     'pageBlockInterstitial': pageBlockInterstitial,
     'reload': reload,
+    'anchorClick': anchorClick,
   };
 
   final String value;
@@ -1900,6 +1948,58 @@ class ClientNavigationReason {
   String toString() => value.toString();
 }
 
+class InstallabilityErrorArgument {
+  /// Argument name (e.g. name:'minimum-icon-size-in-pixels').
+  final String name;
+
+  /// Argument value (e.g. value:'64').
+  final String value;
+
+  InstallabilityErrorArgument({@required this.name, @required this.value});
+
+  factory InstallabilityErrorArgument.fromJson(Map<String, dynamic> json) {
+    return InstallabilityErrorArgument(
+      name: json['name'] as String,
+      value: json['value'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'value': value,
+    };
+  }
+}
+
+/// The installability error
+class InstallabilityError {
+  /// The error id (e.g. 'manifest-missing-suitable-icon').
+  final String errorId;
+
+  /// The list of error arguments (e.g. {name:'minimum-icon-size-in-pixels', value:'64'}).
+  final List<InstallabilityErrorArgument> errorArguments;
+
+  InstallabilityError({@required this.errorId, @required this.errorArguments});
+
+  factory InstallabilityError.fromJson(Map<String, dynamic> json) {
+    return InstallabilityError(
+      errorId: json['errorId'] as String,
+      errorArguments: (json['errorArguments'] as List)
+          .map((e) =>
+              InstallabilityErrorArgument.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'errorId': errorId,
+      'errorArguments': errorArguments.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
 class FileChooserOpenedEventMode {
   static const selectSingle = FileChooserOpenedEventMode._('selectSingle');
   static const selectMultiple = FileChooserOpenedEventMode._('selectMultiple');
@@ -1919,51 +2019,6 @@ class FileChooserOpenedEventMode {
   @override
   bool operator ==(other) =>
       (other is FileChooserOpenedEventMode && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
-}
-
-class FrameScheduledNavigationEventReason {
-  static const formSubmissionGet =
-      FrameScheduledNavigationEventReason._('formSubmissionGet');
-  static const formSubmissionPost =
-      FrameScheduledNavigationEventReason._('formSubmissionPost');
-  static const httpHeaderRefresh =
-      FrameScheduledNavigationEventReason._('httpHeaderRefresh');
-  static const scriptInitiated =
-      FrameScheduledNavigationEventReason._('scriptInitiated');
-  static const metaTagRefresh =
-      FrameScheduledNavigationEventReason._('metaTagRefresh');
-  static const pageBlockInterstitial =
-      FrameScheduledNavigationEventReason._('pageBlockInterstitial');
-  static const reload = FrameScheduledNavigationEventReason._('reload');
-  static const values = {
-    'formSubmissionGet': formSubmissionGet,
-    'formSubmissionPost': formSubmissionPost,
-    'httpHeaderRefresh': httpHeaderRefresh,
-    'scriptInitiated': scriptInitiated,
-    'metaTagRefresh': metaTagRefresh,
-    'pageBlockInterstitial': pageBlockInterstitial,
-    'reload': reload,
-  };
-
-  final String value;
-
-  const FrameScheduledNavigationEventReason._(this.value);
-
-  factory FrameScheduledNavigationEventReason.fromJson(String value) =>
-      values[value];
-
-  String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is FrameScheduledNavigationEventReason && other.value == value) ||
       value == other;
 
   @override

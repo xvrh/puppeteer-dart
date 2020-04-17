@@ -94,8 +94,7 @@ class InputApi {
       num y,
       {int modifiers,
       TimeSinceEpoch timestamp,
-      @Enum(['none', 'left', 'middle', 'right', 'back', 'forward'])
-          String button,
+      MouseButton button,
       int buttons,
       int clickCount,
       num deltaX,
@@ -104,9 +103,6 @@ class InputApi {
           String pointerType}) async {
     assert(const ['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel']
         .contains(type));
-    assert(button == null ||
-        const ['none', 'left', 'middle', 'right', 'back', 'forward']
-            .contains(button));
     assert(pointerType == null || const ['mouse', 'pen'].contains(pointerType));
     await _client.send('Input.dispatchMouseEvent', {
       'type': type,
@@ -151,7 +147,7 @@ class InputApi {
   /// [type] Type of the mouse event.
   /// [x] X coordinate of the mouse pointer in DIP.
   /// [y] Y coordinate of the mouse pointer in DIP.
-  /// [button] Mouse button.
+  /// [button] Mouse button. Only "none", "left", "right" are supported.
   /// [timestamp] Time at which the event occurred (default: current time).
   /// [deltaX] X delta in DIP for mouse wheel event (default: 0).
   /// [deltaY] Y delta in DIP for mouse wheel event (default: 0).
@@ -163,8 +159,7 @@ class InputApi {
           String type,
       int x,
       int y,
-      @Enum(['none', 'left', 'middle', 'right'])
-          String button,
+      MouseButton button,
       {TimeSinceEpoch timestamp,
       num deltaX,
       num deltaY,
@@ -172,7 +167,6 @@ class InputApi {
       int clickCount}) async {
     assert(const ['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel']
         .contains(type));
-    assert(const ['none', 'left', 'middle', 'right'].contains(button));
     await _client.send('Input.emulateTouchFromMouseEvent', {
       'type': type,
       'x': x,
@@ -355,6 +349,41 @@ class GestureSourceType {
   @override
   bool operator ==(other) =>
       (other is GestureSourceType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class MouseButton {
+  static const none = MouseButton._('none');
+  static const left = MouseButton._('left');
+  static const middle = MouseButton._('middle');
+  static const right = MouseButton._('right');
+  static const back = MouseButton._('back');
+  static const forward = MouseButton._('forward');
+  static const values = {
+    'none': none,
+    'left': left,
+    'middle': middle,
+    'right': right,
+    'back': back,
+    'forward': forward,
+  };
+
+  final String value;
+
+  const MouseButton._(this.value);
+
+  factory MouseButton.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is MouseButton && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

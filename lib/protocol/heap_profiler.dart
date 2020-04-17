@@ -111,16 +111,23 @@ class HeapProfilerApi {
 
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken
   /// when the tracking is stopped.
-  Future<void> stopTrackingHeapObjects({bool reportProgress}) async {
+  Future<void> stopTrackingHeapObjects(
+      {bool reportProgress, bool treatGlobalObjectsAsRoots}) async {
     await _client.send('HeapProfiler.stopTrackingHeapObjects', {
       if (reportProgress != null) 'reportProgress': reportProgress,
+      if (treatGlobalObjectsAsRoots != null)
+        'treatGlobalObjectsAsRoots': treatGlobalObjectsAsRoots,
     });
   }
 
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken.
-  Future<void> takeHeapSnapshot({bool reportProgress}) async {
+  /// [treatGlobalObjectsAsRoots] If true, a raw snapshot without artifical roots will be generated
+  Future<void> takeHeapSnapshot(
+      {bool reportProgress, bool treatGlobalObjectsAsRoots}) async {
     await _client.send('HeapProfiler.takeHeapSnapshot', {
       if (reportProgress != null) 'reportProgress': reportProgress,
+      if (treatGlobalObjectsAsRoots != null)
+        'treatGlobalObjectsAsRoots': treatGlobalObjectsAsRoots,
     });
   }
 }

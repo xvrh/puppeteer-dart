@@ -489,7 +489,7 @@ Clears all permission overrides for the browser context.
 ```dart
 var context = browser.defaultBrowserContext;
 await context.overridePermissions(
-    'https://example.com', [PermissionType.clipboardRead]);
+    'https://example.com', [PermissionType.clipboardReadWrite]);
 // do stuff ..
 await context.clearPermissionOverrides();
 ```
