@@ -396,28 +396,26 @@ async function _(element, pageJavascriptEnabled) {
           'Multiple file uploads only work with <input type=file multiple>');
     }
 
-    var filesArg = <Map<String, String>>[];
-    for (var file in files) {
-      var fileArg = <String, String>{
-        'name': p.basename(file.path),
-        'content': base64.encode(await file.readAsBytes()),
-        'mimeType': lookupMimeType(file.path) ?? 'application/octet-stream',
-      };
-      filesArg.add(fileArg);
+    var objectId = remoteObject.objectId;
+    var node = await executionContext.domApi.describeNode(objectId: objectId);
+
+    // The zero-length array is a special case, it seems that DOM.setFileInputFiles does
+    // not actually update the files in that case, so the solution is to eval the element
+    // value to a new FileList directly.
+    if (files.isEmpty) {
+      await evaluate('''element => {
+        element.files = new DataTransfer().files;
+
+        // Dispatch events for this case because it should behave akin to a user action.
+        element.dispatchEvent(new Event('input', { bubbles: true }));
+        element.dispatchEvent(new Event('change', { bubbles: true }));
+      }''');
+    } else {
+      await executionContext.domApi.setFileInputFiles(
+          files.map((file) => file.absolute.path).toList(),
+          objectId: objectId,
+          backendNodeId: node.backendNodeId);
     }
-    await evaluateHandle(
-        //language=js
-        r'''async (element, files) => {
-    const dt = new DataTransfer();
-    for (const item of files) {
-      const response = await fetch(`data:${item.mimeType};base64,${item.content}`);
-      const file = new File([await response.blob()], item.name, {type: item.mimeType});
-      dt.items.add(file);
-    }
-    element.files = dt.files;
-    element.dispatchEvent(new Event('input', { bubbles: true }));
-    element.dispatchEvent(new Event('change', { bubbles: true }));
-}''', args: [filesArg]);
   }
 
   /// This method scrolls element into view if needed, and then uses [touchscreen.tap]
