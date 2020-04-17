@@ -990,6 +990,7 @@ class PseudoType {
   static const firstLetter = PseudoType._('first-letter');
   static const before = PseudoType._('before');
   static const after = PseudoType._('after');
+  static const marker = PseudoType._('marker');
   static const backdrop = PseudoType._('backdrop');
   static const selection = PseudoType._('selection');
   static const firstLineInherited = PseudoType._('first-line-inherited');
@@ -1006,6 +1007,7 @@ class PseudoType {
     'first-letter': firstLetter,
     'before': before,
     'after': after,
+    'marker': marker,
     'backdrop': backdrop,
     'selection': selection,
     'first-line-inherited': firstLineInherited,

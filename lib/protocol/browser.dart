@@ -314,8 +314,9 @@ class PermissionType {
   static const audioCapture = PermissionType._('audioCapture');
   static const backgroundSync = PermissionType._('backgroundSync');
   static const backgroundFetch = PermissionType._('backgroundFetch');
-  static const clipboardRead = PermissionType._('clipboardRead');
-  static const clipboardWrite = PermissionType._('clipboardWrite');
+  static const clipboardReadWrite = PermissionType._('clipboardReadWrite');
+  static const clipboardSanitizedWrite =
+      PermissionType._('clipboardSanitizedWrite');
   static const durableStorage = PermissionType._('durableStorage');
   static const flash = PermissionType._('flash');
   static const geolocation = PermissionType._('geolocation');
@@ -338,8 +339,8 @@ class PermissionType {
     'audioCapture': audioCapture,
     'backgroundSync': backgroundSync,
     'backgroundFetch': backgroundFetch,
-    'clipboardRead': clipboardRead,
-    'clipboardWrite': clipboardWrite,
+    'clipboardReadWrite': clipboardReadWrite,
+    'clipboardSanitizedWrite': clipboardSanitizedWrite,
     'durableStorage': durableStorage,
     'flash': flash,
     'geolocation': geolocation,
@@ -422,8 +423,15 @@ class PermissionDescriptor {
   /// For "wake-lock" permission, must specify type as either "screen" or "system".
   final String type;
 
+  /// For "clipboard" permission, may specify allowWithoutSanitization.
+  final bool allowWithoutSanitization;
+
   PermissionDescriptor(
-      {@required this.name, this.sysex, this.userVisibleOnly, this.type});
+      {@required this.name,
+      this.sysex,
+      this.userVisibleOnly,
+      this.type,
+      this.allowWithoutSanitization});
 
   factory PermissionDescriptor.fromJson(Map<String, dynamic> json) {
     return PermissionDescriptor(
@@ -433,6 +441,9 @@ class PermissionDescriptor {
           ? json['userVisibleOnly'] as bool
           : null,
       type: json.containsKey('type') ? json['type'] as String : null,
+      allowWithoutSanitization: json.containsKey('allowWithoutSanitization')
+          ? json['allowWithoutSanitization'] as bool
+          : null,
     );
   }
 
@@ -442,6 +453,8 @@ class PermissionDescriptor {
       if (sysex != null) 'sysex': sysex,
       if (userVisibleOnly != null) 'userVisibleOnly': userVisibleOnly,
       if (type != null) 'type': type,
+      if (allowWithoutSanitization != null)
+        'allowWithoutSanitization': allowWithoutSanitization,
     };
   }
 }

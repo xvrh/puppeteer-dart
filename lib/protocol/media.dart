@@ -142,12 +142,12 @@ class PlayerProperty {
 
 /// Break out events into different types
 class PlayerEventType {
-  static const playbackEvent = PlayerEventType._('playbackEvent');
-  static const systemEvent = PlayerEventType._('systemEvent');
+  static const errorEvent = PlayerEventType._('errorEvent');
+  static const triggeredEvent = PlayerEventType._('triggeredEvent');
   static const messageEvent = PlayerEventType._('messageEvent');
   static const values = {
-    'playbackEvent': playbackEvent,
-    'systemEvent': systemEvent,
+    'errorEvent': errorEvent,
+    'triggeredEvent': triggeredEvent,
     'messageEvent': messageEvent,
   };
 

@@ -220,7 +220,7 @@ class JsCoverage {
     }
 
     var coverage = <CoverageEntry>[];
-    for (var entry in profileResponse) {
+    for (var entry in profileResponse.result) {
       var url = _scriptUrls[entry.scriptId];
       if (_isNullOrEmpty(url) && _reportAnonymousScripts) {
         url = 'debugger://VM${entry.scriptId}';

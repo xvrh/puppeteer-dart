@@ -90,7 +90,7 @@ void main() {
       var context = browser.defaultBrowserContext;
       await context.overridePermissions(
           exampleValue(server.hostUrl, 'https://example.com'),
-          [PermissionType.clipboardRead]);
+          [PermissionType.clipboardReadWrite]);
       // do stuff ..
       await context.clearPermissionOverrides();
     });

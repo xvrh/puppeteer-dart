@@ -2,15 +2,7 @@ import 'dart:math';
 import '../../protocol/input.dart';
 import 'keyboard.dart';
 
-class MouseButton {
-  static const left = MouseButton._('left');
-  static const right = MouseButton._('right');
-  static const middle = MouseButton._('middle');
-
-  final String name;
-
-  const MouseButton._(this.name);
-}
+export '../../protocol/input.dart' show MouseButton;
 
 /// The Mouse class operates in main-frame CSS pixels relative to the top-left
 /// corner of the viewport.
@@ -35,8 +27,6 @@ class Mouse {
 
   Mouse(this.inputApi, this.keyboard);
 
-  static String _buttonName(MouseButton button) => button?.name ?? 'none';
-
   /// Dispatches a `mousemove` event.
   Future<void> move(Point position, {int steps}) async {
     steps ??= 1;
@@ -47,7 +37,7 @@ class Mouse {
           'mouseMoved',
           from.x + (position.x - from.x) * (i / steps),
           from.y + (position.y - from.y) * (i / steps),
-          button: _buttonName(_button),
+          button: _button ?? MouseButton.none,
           modifiers: keyboard.modifiers);
     }
   }
@@ -69,9 +59,7 @@ class Mouse {
     clickCount ??= 1;
     _button = button;
     await inputApi.dispatchMouseEvent('mousePressed', _position.x, _position.y,
-        button: _buttonName(button),
-        modifiers: keyboard.modifiers,
-        clickCount: clickCount);
+        button: button, modifiers: keyboard.modifiers, clickCount: clickCount);
   }
 
   /// Dispatches a `mouseup` event.
@@ -80,8 +68,6 @@ class Mouse {
     clickCount ??= 1;
     _button = null;
     await inputApi.dispatchMouseEvent('mouseReleased', _position.x, _position.y,
-        button: _buttonName(button),
-        modifiers: keyboard.modifiers,
-        clickCount: clickCount);
+        button: button, modifiers: keyboard.modifiers, clickCount: clickCount);
   }
 }

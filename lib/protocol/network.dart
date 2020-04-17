@@ -400,6 +400,7 @@ class NetworkApi {
   /// [httpOnly] True if cookie is http-only.
   /// [sameSite] Cookie SameSite type.
   /// [expires] Cookie expiration date, session cookie if not set
+  /// [priority] Cookie Priority type.
   /// Returns: True if successfully set cookie.
   Future<bool> setCookie(String name, String value,
       {String url,
@@ -408,7 +409,8 @@ class NetworkApi {
       bool secure,
       bool httpOnly,
       CookieSameSite sameSite,
-      TimeSinceEpoch expires}) async {
+      TimeSinceEpoch expires,
+      CookiePriority priority}) async {
     var result = await _client.send('Network.setCookie', {
       'name': name,
       'value': value,
@@ -419,6 +421,7 @@ class NetworkApi {
       if (httpOnly != null) 'httpOnly': httpOnly,
       if (sameSite != null) 'sameSite': sameSite,
       if (expires != null) 'expires': expires,
+      if (priority != null) 'priority': priority,
     });
     return result['success'] as bool;
   }
@@ -1436,6 +1439,37 @@ class CookieSameSite {
   String toString() => value.toString();
 }
 
+/// Represents the cookie's 'Priority' status:
+/// https://tools.ietf.org/html/draft-west-cookie-priority-00
+class CookiePriority {
+  static const low = CookiePriority._('Low');
+  static const medium = CookiePriority._('Medium');
+  static const high = CookiePriority._('High');
+  static const values = {
+    'Low': low,
+    'Medium': medium,
+    'High': high,
+  };
+
+  final String value;
+
+  const CookiePriority._(this.value);
+
+  factory CookiePriority.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is CookiePriority && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Timing information for the request.
 class ResourceTiming {
   /// Timing's requestTime is a baseline in seconds, while the other numbers are ticks in
@@ -2365,6 +2399,9 @@ class Cookie {
   /// Cookie SameSite type.
   final CookieSameSite sameSite;
 
+  /// Cookie Priority
+  final CookiePriority priority;
+
   Cookie(
       {@required this.name,
       @required this.value,
@@ -2375,7 +2412,8 @@ class Cookie {
       @required this.httpOnly,
       @required this.secure,
       @required this.session,
-      this.sameSite});
+      this.sameSite,
+      @required this.priority});
 
   factory Cookie.fromJson(Map<String, dynamic> json) {
     return Cookie(
@@ -2391,6 +2429,7 @@ class Cookie {
       sameSite: json.containsKey('sameSite')
           ? CookieSameSite.fromJson(json['sameSite'] as String)
           : null,
+      priority: CookiePriority.fromJson(json['priority'] as String),
     );
   }
 
@@ -2405,6 +2444,7 @@ class Cookie {
       'httpOnly': httpOnly,
       'secure': secure,
       'session': session,
+      'priority': priority.toJson(),
       if (sameSite != null) 'sameSite': sameSite.toJson(),
     };
   }
@@ -2602,6 +2642,9 @@ class CookieParam {
   /// Cookie expiration date, session cookie if not set
   final TimeSinceEpoch expires;
 
+  /// Cookie Priority.
+  final CookiePriority priority;
+
   CookieParam(
       {@required this.name,
       @required this.value,
@@ -2611,7 +2654,8 @@ class CookieParam {
       this.secure,
       this.httpOnly,
       this.sameSite,
-      this.expires});
+      this.expires,
+      this.priority});
 
   factory CookieParam.fromJson(Map<String, dynamic> json) {
     return CookieParam(
@@ -2628,6 +2672,9 @@ class CookieParam {
       expires: json.containsKey('expires')
           ? TimeSinceEpoch.fromJson(json['expires'] as num)
           : null,
+      priority: json.containsKey('priority')
+          ? CookiePriority.fromJson(json['priority'] as String)
+          : null,
     );
   }
 
@@ -2642,6 +2689,7 @@ class CookieParam {
       if (httpOnly != null) 'httpOnly': httpOnly,
       if (sameSite != null) 'sameSite': sameSite.toJson(),
       if (expires != null) 'expires': expires.toJson(),
+      if (priority != null) 'priority': priority.toJson(),
     };
   }
 }
