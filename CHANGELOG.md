@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.17.0 (2020-04-21)
+- Update Chromium to version 81
+- Revert change to `uploadFile` implementation.
+
 # 1.16.1 (2020-02-25)
 - Fix a bug with the new `uploadFile` implementation.
 
