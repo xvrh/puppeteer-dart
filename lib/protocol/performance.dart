@@ -18,14 +18,21 @@ class PerformanceApi {
   }
 
   /// Enable collecting and reporting metrics.
-  Future<void> enable() async {
-    await _client.send('Performance.enable');
+  /// [timeDomain] Time domain to use for collecting and reporting duration metrics.
+  Future<void> enable(
+      {@Enum(['timeTicks', 'threadTicks']) String timeDomain}) async {
+    assert(timeDomain == null ||
+        const ['timeTicks', 'threadTicks'].contains(timeDomain));
+    await _client.send('Performance.enable', {
+      if (timeDomain != null) 'timeDomain': timeDomain,
+    });
   }
 
   /// Sets time domain to use for collecting and reporting duration metrics.
   /// Note that this must be called before enabling metrics collection. Calling
   /// this method while metrics collection is enabled returns an error.
   /// [timeDomain] Time domain
+  @deprecated
   Future<void> setTimeDomain(
       @Enum(['timeTicks', 'threadTicks']) String timeDomain) async {
     assert(const ['timeTicks', 'threadTicks'].contains(timeDomain));

@@ -740,6 +740,9 @@
         {
             "domain": "ApplicationCache",
             "experimental": true,
+            "dependencies": [
+                "Page"
+            ],
             "types": [
                 {
                     "id": "ApplicationCacheResource",
@@ -955,6 +958,17 @@
                     ]
                 },
                 {
+                    "id": "AffectedFrame",
+                    "description": "Information about the frame affected by an inspector issue.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "frameId",
+                            "$ref": "Page.FrameId"
+                        }
+                    ]
+                },
+                {
                     "id": "SameSiteCookieExclusionReason",
                     "type": "string",
                     "enum": [
@@ -969,12 +983,11 @@
                         "WarnSameSiteUnspecifiedCrossSiteContext",
                         "WarnSameSiteNoneInsecure",
                         "WarnSameSiteUnspecifiedLaxAllowUnsafe",
-                        "WarnSameSiteCrossSchemeSecureUrlMethodUnsafe",
-                        "WarnSameSiteCrossSchemeSecureUrlLax",
-                        "WarnSameSiteCrossSchemeSecureUrlStrict",
-                        "WarnSameSiteCrossSchemeInsecureUrlMethodUnsafe",
-                        "WarnSameSiteCrossSchemeInsecureUrlLax",
-                        "WarnSameSiteCrossSchemeInsecureUrlStrict"
+                        "WarnSameSiteStrictLaxDowngradeStrict",
+                        "WarnSameSiteStrictCrossDowngradeStrict",
+                        "WarnSameSiteStrictCrossDowngradeLax",
+                        "WarnSameSiteLaxCrossDowngradeStrict",
+                        "WarnSameSiteLaxCrossDowngradeLax"
                     ]
                 },
                 {
@@ -1031,11 +1044,92 @@
                     ]
                 },
                 {
+                    "id": "MixedContentResolutionStatus",
+                    "type": "string",
+                    "enum": [
+                        "MixedContentBlocked",
+                        "MixedContentAutomaticallyUpgraded",
+                        "MixedContentWarning"
+                    ]
+                },
+                {
+                    "id": "MixedContentResourceType",
+                    "type": "string",
+                    "enum": [
+                        "Audio",
+                        "Beacon",
+                        "CSPReport",
+                        "Download",
+                        "EventSource",
+                        "Favicon",
+                        "Font",
+                        "Form",
+                        "Frame",
+                        "Image",
+                        "Import",
+                        "Manifest",
+                        "Ping",
+                        "PluginData",
+                        "PluginResource",
+                        "Prefetch",
+                        "Resource",
+                        "Script",
+                        "ServiceWorker",
+                        "SharedWorker",
+                        "Stylesheet",
+                        "Track",
+                        "Video",
+                        "Worker",
+                        "XMLHttpRequest",
+                        "XSLT"
+                    ]
+                },
+                {
+                    "id": "MixedContentIssueDetails",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "resourceType",
+                            "description": "The type of resource causing the mixed content issue (css, js, iframe,\nform,...). Marked as optional because it is mapped to from\nblink::mojom::RequestContextType, which will be replaced\nby network::mojom::RequestDestination",
+                            "optional": true,
+                            "$ref": "MixedContentResourceType"
+                        },
+                        {
+                            "name": "resolutionStatus",
+                            "description": "The way the mixed content issue is being resolved.",
+                            "$ref": "MixedContentResolutionStatus"
+                        },
+                        {
+                            "name": "insecureURL",
+                            "description": "The unsafe http url causing the mixed content issue.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "mainResourceURL",
+                            "description": "The url responsible for the call to an unsafe url.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "request",
+                            "description": "The mixed content request.\nDoes not always exist (e.g. for unsafe form submission urls).",
+                            "optional": true,
+                            "$ref": "AffectedRequest"
+                        },
+                        {
+                            "name": "frame",
+                            "description": "Optional because not every mixed content issue is necessarily linked to a frame.",
+                            "optional": true,
+                            "$ref": "AffectedFrame"
+                        }
+                    ]
+                },
+                {
                     "id": "InspectorIssueCode",
                     "description": "A unique identifier for the type of issue. Each type may use one of the\noptional fields in InspectorIssueDetails to convey more specific\ninformation about the kind of issue.",
                     "type": "string",
                     "enum": [
-                        "SameSiteCookieIssue"
+                        "SameSiteCookieIssue",
+                        "MixedContentIssue"
                     ]
                 },
                 {
@@ -1047,6 +1141,11 @@
                             "name": "sameSiteCookieIssueDetails",
                             "optional": true,
                             "$ref": "SameSiteCookieIssueDetails"
+                        },
+                        {
+                            "name": "mixedContentIssueDetails",
+                            "optional": true,
+                            "$ref": "MixedContentIssueDetails"
                         }
                     ]
                 },
@@ -1783,7 +1882,8 @@
             "description": "This domain exposes CSS read/write operations. All CSS objects (stylesheets, rules, and styles)\nhave an associated `id` used in subsequent operations on the related object. Each object type has\na specific `id` structure, and those are not interchangeable between objects of different kinds.\nCSS objects can be loaded using the `get*ForNode()` calls (which accept a DOM node id). A client\ncan also keep track of stylesheets via the `styleSheetAdded`/`styleSheetRemoved` events and\nsubsequently load the required stylesheet contents using the `getStyleSheet[Text]()` methods.",
             "experimental": true,
             "dependencies": [
-                "DOM"
+                "DOM",
+                "Page"
             ],
             "types": [
                 {
@@ -6290,6 +6390,61 @@
                         "pause",
                         "pauseIfNetworkFetchesPending"
                     ]
+                },
+                {
+                    "id": "UserAgentBrandVersion",
+                    "description": "Used to specify User Agent Cient Hints to emulate. See https://wicg.github.io/ua-client-hints",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "brand",
+                            "type": "string"
+                        },
+                        {
+                            "name": "version",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "id": "UserAgentMetadata",
+                    "description": "Used to specify User Agent Cient Hints to emulate. See https://wicg.github.io/ua-client-hints",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "brands",
+                            "type": "array",
+                            "items": {
+                                "$ref": "UserAgentBrandVersion"
+                            }
+                        },
+                        {
+                            "name": "fullVersion",
+                            "type": "string"
+                        },
+                        {
+                            "name": "platform",
+                            "type": "string"
+                        },
+                        {
+                            "name": "platformVersion",
+                            "type": "string"
+                        },
+                        {
+                            "name": "architecture",
+                            "type": "string"
+                        },
+                        {
+                            "name": "model",
+                            "type": "string"
+                        },
+                        {
+                            "name": "mobile",
+                            "type": "boolean"
+                        }
+                    ]
                 }
             ],
             "commands": [
@@ -6700,6 +6855,13 @@
                             "description": "The platform navigator.platform should return.",
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "userAgentMetadata",
+                            "description": "To be sent in Sec-CH-UA-* headers and returned in navigator.userAgentData",
+                            "experimental": true,
+                            "optional": true,
+                            "$ref": "UserAgentMetadata"
                         }
                     ]
                 }
@@ -10415,6 +10577,13 @@
                             "description": "The platform navigator.platform should return.",
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "userAgentMetadata",
+                            "description": "To be sent in Sec-CH-UA-* headers and returned in navigator.userAgentData",
+                            "experimental": true,
+                            "optional": true,
+                            "$ref": "Emulation.UserAgentMetadata"
                         }
                     ]
                 }
@@ -10927,8 +11096,8 @@
                             "$ref": "RequestId"
                         },
                         {
-                            "name": "blockedCookies",
-                            "description": "A list of cookies which will not be sent with this request along with corresponding reasons\nfor blocking.",
+                            "name": "associatedCookies",
+                            "description": "A list of cookies potentially associated to the requested URL. This includes both cookies sent with\nthe request and the ones not sent; the latter are distinguished by having blockedReason field set.",
                             "type": "array",
                             "items": {
                                 "$ref": "BlockedCookieWithReason"
@@ -10984,6 +11153,67 @@
                 "Runtime"
             ],
             "types": [
+                {
+                    "id": "GridHighlightConfig",
+                    "description": "Configuration data for the highlighting of Grid elements.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "showGridExtensionLines",
+                            "description": "Whether the extension lines from grid cells to the rulers should be shown (default: false).",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "gridBorderColor",
+                            "description": "The grid container border highlight color (default: transparent).",
+                            "optional": true,
+                            "$ref": "DOM.RGBA"
+                        },
+                        {
+                            "name": "cellBorderColor",
+                            "description": "The cell border color (default: transparent).",
+                            "optional": true,
+                            "$ref": "DOM.RGBA"
+                        },
+                        {
+                            "name": "gridBorderDash",
+                            "description": "Whether the grid border is dashed (default: false).",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "cellBorderDash",
+                            "description": "Whether the cell border is dashed (default: false).",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "rowGapColor",
+                            "description": "The row gap highlight fill color (default: transparent).",
+                            "optional": true,
+                            "$ref": "DOM.RGBA"
+                        },
+                        {
+                            "name": "rowHatchColor",
+                            "description": "The row gap hatching fill color (default: transparent).",
+                            "optional": true,
+                            "$ref": "DOM.RGBA"
+                        },
+                        {
+                            "name": "columnGapColor",
+                            "description": "The column gap highlight fill color (default: transparent).",
+                            "optional": true,
+                            "$ref": "DOM.RGBA"
+                        },
+                        {
+                            "name": "columnHatchColor",
+                            "description": "The column gap hatching fill color (default: transparent).",
+                            "optional": true,
+                            "$ref": "DOM.RGBA"
+                        }
+                    ]
+                },
                 {
                     "id": "HighlightConfig",
                     "description": "Configuration data for the highlighting of page elements.",
@@ -11060,6 +11290,51 @@
                             "description": "The grid layout color (default: transparent).",
                             "optional": true,
                             "$ref": "DOM.RGBA"
+                        },
+                        {
+                            "name": "colorFormat",
+                            "description": "The color format used to format color styles (default: hex).",
+                            "optional": true,
+                            "$ref": "ColorFormat"
+                        },
+                        {
+                            "name": "gridHighlightConfig",
+                            "description": "The grid layout highlight configuration (default: all transparent).",
+                            "optional": true,
+                            "$ref": "GridHighlightConfig"
+                        }
+                    ]
+                },
+                {
+                    "id": "ColorFormat",
+                    "type": "string",
+                    "enum": [
+                        "rgb",
+                        "hsl",
+                        "hex"
+                    ]
+                },
+                {
+                    "id": "HingeConfig",
+                    "description": "Configuration for dual screen hinge",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "rect",
+                            "description": "A rectangle represent hinge",
+                            "$ref": "DOM.Rect"
+                        },
+                        {
+                            "name": "contentColor",
+                            "description": "The content box highlight fill color (default: a dark color).",
+                            "optional": true,
+                            "$ref": "DOM.RGBA"
+                        },
+                        {
+                            "name": "outlineColor",
+                            "description": "The content box highlight outline color (default: transparent).",
+                            "optional": true,
+                            "$ref": "DOM.RGBA"
                         }
                     ]
                 },
@@ -11104,6 +11379,12 @@
                             "description": "Whether to include style info.",
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "colorFormat",
+                            "description": "The color format to get config with (default: hex)",
+                            "optional": true,
+                            "$ref": "ColorFormat"
                         }
                     ],
                     "returns": [
@@ -11350,6 +11631,18 @@
                             "name": "show",
                             "description": "Whether to paint size or not.",
                             "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "name": "setShowHinge",
+                    "description": "Add a dual screen device hinge",
+                    "parameters": [
+                        {
+                            "name": "hingeConfig",
+                            "description": "hinge data, null means hideHinge",
+                            "optional": true,
+                            "$ref": "HingeConfig"
                         }
                     ]
                 }
@@ -11907,6 +12200,17 @@
                         "pageBlockInterstitial",
                         "reload",
                         "anchorClick"
+                    ]
+                },
+                {
+                    "id": "ClientNavigationDisposition",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "currentTab",
+                        "newTab",
+                        "newWindow",
+                        "download"
                     ]
                 },
                 {
@@ -13131,6 +13435,11 @@
                             "name": "url",
                             "description": "The destination URL for the requested navigation.",
                             "type": "string"
+                        },
+                        {
+                            "name": "disposition",
+                            "description": "The disposition for the navigation.",
+                            "$ref": "ClientNavigationDisposition"
                         }
                     ]
                 },
@@ -13203,6 +13512,11 @@
                         {
                             "name": "url",
                             "description": "URL of the resource being downloaded.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "suggestedFilename",
+                            "description": "Suggested file name of the resource (the actual name of the file saved on disk may differ).",
                             "type": "string"
                         }
                     ]
@@ -13948,6 +14262,9 @@
         {
             "domain": "ServiceWorker",
             "experimental": true,
+            "dependencies": [
+                "Target"
+            ],
             "types": [
                 {
                     "id": "RegistrationID",
@@ -16705,50 +17022,73 @@
                     "type": "number"
                 },
                 {
-                    "id": "PlayerProperty",
-                    "description": "Player Property type",
+                    "id": "PlayerMessage",
+                    "description": "Have one type per entry in MediaLogRecord::Type\nCorresponds to kMessage",
                     "type": "object",
                     "properties": [
                         {
-                            "name": "name",
-                            "type": "string"
+                            "name": "level",
+                            "description": "Keep in sync with MediaLogMessageLevel\nWe are currently keeping the message level 'error' separate from the\nPlayerError type because right now they represent different things,\nthis one being a DVLOG(ERROR) style log message that gets printed\nbased on what log level is selected in the UI, and the other is a\nrepresentation of a media::PipelineStatus object. Soon however we're\ngoing to be moving away from using PipelineStatus for errors and\nintroducing a new error type which should hopefully let us integrate\nthe error log level into the PlayerError type.",
+                            "type": "string",
+                            "enum": [
+                                "error",
+                                "warning",
+                                "info",
+                                "debug"
+                            ]
                         },
                         {
-                            "name": "value",
-                            "optional": true,
+                            "name": "message",
                             "type": "string"
                         }
                     ]
                 },
                 {
-                    "id": "PlayerEventType",
-                    "description": "Break out events into different types",
-                    "type": "string",
-                    "enum": [
-                        "errorEvent",
-                        "triggeredEvent",
-                        "messageEvent"
-                    ]
-                },
-                {
-                    "id": "PlayerEvent",
+                    "id": "PlayerProperty",
+                    "description": "Corresponds to kMediaPropertyChange",
                     "type": "object",
                     "properties": [
-                        {
-                            "name": "type",
-                            "$ref": "PlayerEventType"
-                        },
-                        {
-                            "name": "timestamp",
-                            "description": "Events are timestamped relative to the start of the player creation\nnot relative to the start of playback.",
-                            "$ref": "Timestamp"
-                        },
                         {
                             "name": "name",
                             "type": "string"
                         },
                         {
                             "name": "value",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "id": "PlayerEvent",
+                    "description": "Corresponds to kMediaEventTriggered",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "timestamp",
+                            "$ref": "Timestamp"
+                        },
+                        {
+                            "name": "value",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "id": "PlayerError",
+                    "description": "Corresponds to kMediaError",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "type",
+                            "type": "string",
+                            "enum": [
+                                "pipeline_error",
+                                "media_error"
+                            ]
+                        },
+                        {
+                            "name": "errorCode",
+                            "description": "When this switches to using media::Status instead of PipelineStatus\nwe can remove \"errorCode\" and replace it with the fields from\na Status instance. This also seems like a duplicate of the error\nlevel enum - there is a todo bug to have that level removed and\nuse this instead. (crbug.com/1068454)",
                             "type": "string"
                         }
                     ]
@@ -16785,6 +17125,40 @@
                             "type": "array",
                             "items": {
                                 "$ref": "PlayerEvent"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "playerMessagesLogged",
+                    "description": "Send a list of any messages that need to be delivered.",
+                    "parameters": [
+                        {
+                            "name": "playerId",
+                            "$ref": "PlayerId"
+                        },
+                        {
+                            "name": "messages",
+                            "type": "array",
+                            "items": {
+                                "$ref": "PlayerMessage"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "playerErrorsRaised",
+                    "description": "Send a list of any errors that need to be delivered.",
+                    "parameters": [
+                        {
+                            "name": "playerId",
+                            "$ref": "PlayerId"
+                        },
+                        {
+                            "name": "errors",
+                            "type": "array",
+                            "items": {
+                                "$ref": "PlayerError"
                             }
                         }
                     ]

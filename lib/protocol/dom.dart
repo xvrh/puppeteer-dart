@@ -146,6 +146,27 @@ class DOMApi {
     return Node.fromJson(result['node'] as Map<String, dynamic>);
   }
 
+  /// Scrolls the specified rect of the given node into view if not already visible.
+  /// Note: exactly one between nodeId, backendNodeId and objectId should be passed
+  /// to identify the node.
+  /// [nodeId] Identifier of the node.
+  /// [backendNodeId] Identifier of the backend node.
+  /// [objectId] JavaScript object id of the node wrapper.
+  /// [rect] The rect to be scrolled into view, relative to the node's border box, in CSS pixels.
+  /// When omitted, center of the node will be used, similar to Element.scrollIntoView.
+  Future<void> scrollIntoViewIfNeeded(
+      {NodeId nodeId,
+      BackendNodeId backendNodeId,
+      runtime.RemoteObjectId objectId,
+      Rect rect}) async {
+    await _client.send('DOM.scrollIntoViewIfNeeded', {
+      if (nodeId != null) 'nodeId': nodeId,
+      if (backendNodeId != null) 'backendNodeId': backendNodeId,
+      if (objectId != null) 'objectId': objectId,
+      if (rect != null) 'rect': rect,
+    });
+  }
+
   /// Disables DOM agent for the given page.
   Future<void> disable() async {
     await _client.send('DOM.disable');

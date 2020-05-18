@@ -1956,6 +1956,15 @@ class BlockedReason {
   static const subresourceFilter = BlockedReason._('subresource-filter');
   static const contentType = BlockedReason._('content-type');
   static const collapsedByClient = BlockedReason._('collapsed-by-client');
+  static const coepFrameResourceNeedsCoepHeader =
+      BlockedReason._('coep-frame-resource-needs-coep-header');
+  static const coopSandboxedIframeCannotNavigateToCoopPage =
+      BlockedReason._('coop-sandboxed-iframe-cannot-navigate-to-coop-page');
+  static const corpNotSameOrigin = BlockedReason._('corp-not-same-origin');
+  static const corpNotSameOriginAfterDefaultedToSameOriginByCoep =
+      BlockedReason._(
+          'corp-not-same-origin-after-defaulted-to-same-origin-by-coep');
+  static const corpNotSameSite = BlockedReason._('corp-not-same-site');
   static const values = {
     'other': other,
     'csp': csp,
@@ -1965,6 +1974,13 @@ class BlockedReason {
     'subresource-filter': subresourceFilter,
     'content-type': contentType,
     'collapsed-by-client': collapsedByClient,
+    'coep-frame-resource-needs-coep-header': coepFrameResourceNeedsCoepHeader,
+    'coop-sandboxed-iframe-cannot-navigate-to-coop-page':
+        coopSandboxedIframeCannotNavigateToCoopPage,
+    'corp-not-same-origin': corpNotSameOrigin,
+    'corp-not-same-origin-after-defaulted-to-same-origin-by-coep':
+        corpNotSameOriginAfterDefaultedToSameOriginByCoep,
+    'corp-not-same-site': corpNotSameSite,
   };
 
   final String value;

@@ -164,7 +164,9 @@ class RuntimeApi {
   /// This implies `disableBreaks` below.
   /// [timeout] Terminate execution after timing out (number of milliseconds).
   /// [disableBreaks] Disable breakpoints during execution.
-  /// [replMode] Reserved flag for future REPL mode support. Setting this flag has currently no effect.
+  /// [replMode] Setting this flag to true enables `let` re-declaration and top-level `await`.
+  /// Note that `let` variables can only be re-declared if they originate from
+  /// `replMode` themselves.
   Future<EvaluateResult> evaluate(String expression,
       {String objectGroup,
       bool includeCommandLineAPI,
@@ -716,7 +718,7 @@ class RemoteObject {
   /// Object type.
   final RemoteObjectType type;
 
-  /// Object subtype hint. Specified for `object` type values only.
+  /// Object subtype hint. Specified for `object` or `wasm` type values only.
   final RemoteObjectSubtype subtype;
 
   /// Object class (constructor) name. Specified for `object` type values only.
@@ -804,6 +806,7 @@ class RemoteObjectType {
   static const boolean = RemoteObjectType._('boolean');
   static const symbol = RemoteObjectType._('symbol');
   static const bigint = RemoteObjectType._('bigint');
+  static const wasm = RemoteObjectType._('wasm');
   static const values = {
     'object': object,
     'function': function,
@@ -813,6 +816,7 @@ class RemoteObjectType {
     'boolean': boolean,
     'symbol': symbol,
     'bigint': bigint,
+    'wasm': wasm,
   };
 
   final String value;
@@ -852,6 +856,11 @@ class RemoteObjectSubtype {
   static const typedarray = RemoteObjectSubtype._('typedarray');
   static const arraybuffer = RemoteObjectSubtype._('arraybuffer');
   static const dataview = RemoteObjectSubtype._('dataview');
+  static const i32 = RemoteObjectSubtype._('i32');
+  static const i64 = RemoteObjectSubtype._('i64');
+  static const f32 = RemoteObjectSubtype._('f32');
+  static const f64 = RemoteObjectSubtype._('f64');
+  static const v128 = RemoteObjectSubtype._('v128');
   static const values = {
     'array': array,
     'null': null$,
@@ -870,6 +879,11 @@ class RemoteObjectSubtype {
     'typedarray': typedarray,
     'arraybuffer': arraybuffer,
     'dataview': dataview,
+    'i32': i32,
+    'i64': i64,
+    'f32': f32,
+    'f64': f64,
+    'v128': v128,
   };
 
   final String value;

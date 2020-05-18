@@ -143,6 +143,31 @@ class EmulationApi {
     });
   }
 
+  /// Emulates the given vision deficiency.
+  /// [type] Vision deficiency to emulate.
+  Future<void> setEmulatedVisionDeficiency(
+      @Enum([
+    'none',
+    'achromatopsia',
+    'blurredVision',
+    'deuteranopia',
+    'protanopia',
+    'tritanopia'
+  ])
+          String type) async {
+    assert(const [
+      'none',
+      'achromatopsia',
+      'blurredVision',
+      'deuteranopia',
+      'protanopia',
+      'tritanopia'
+    ].contains(type));
+    await _client.send('Emulation.setEmulatedVisionDeficiency', {
+      'type': type,
+    });
+  }
+
   /// Overrides the Geolocation Position or Error. Omitting any of the parameters emulates position
   /// unavailable.
   /// [latitude] Mock latitude
@@ -217,6 +242,15 @@ class EmulationApi {
       if (initialVirtualTime != null) 'initialVirtualTime': initialVirtualTime,
     });
     return result['virtualTimeTicksBase'] as num;
+  }
+
+  /// Overrides default host system locale with the specified one.
+  /// [locale] ICU style C locale (e.g. "en_US"). If not specified or empty, disables the override and
+  /// restores default host system locale.
+  Future<void> setLocaleOverride({String locale}) async {
+    await _client.send('Emulation.setLocaleOverride', {
+      if (locale != null) 'locale': locale,
+    });
   }
 
   /// Overrides default host system timezone with the specified one.

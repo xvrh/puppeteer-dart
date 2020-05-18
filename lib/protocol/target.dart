@@ -106,9 +106,13 @@ class TargetApi {
 
   /// Creates a new empty BrowserContext. Similar to an incognito profile but you can have more than
   /// one.
+  /// [disposeOnDetach] If specified, disposes this context when debugging session disconnects.
   /// Returns: The id of the context created.
-  Future<browser.BrowserContextID> createBrowserContext() async {
-    var result = await _client.send('Target.createBrowserContext');
+  Future<browser.BrowserContextID> createBrowserContext(
+      {bool disposeOnDetach}) async {
+    var result = await _client.send('Target.createBrowserContext', {
+      if (disposeOnDetach != null) 'disposeOnDetach': disposeOnDetach,
+    });
     return browser.BrowserContextID.fromJson(
         result['browserContextId'] as String);
   }
@@ -212,14 +216,12 @@ class TargetApi {
   /// [flatten] Enables "flat" access to the session via specifying sessionId attribute in the commands.
   /// We plan to make this the default, deprecate non-flattened mode,
   /// and eventually retire it. See crbug.com/991325.
-  /// [windowOpen] Auto-attach to the targets created via window.open from current target.
   Future<void> setAutoAttach(bool autoAttach, bool waitForDebuggerOnStart,
-      {bool flatten, bool windowOpen}) async {
+      {bool flatten}) async {
     await _client.send('Target.setAutoAttach', {
       'autoAttach': autoAttach,
       'waitForDebuggerOnStart': waitForDebuggerOnStart,
       if (flatten != null) 'flatten': flatten,
-      if (windowOpen != null) 'windowOpen': windowOpen,
     });
   }
 

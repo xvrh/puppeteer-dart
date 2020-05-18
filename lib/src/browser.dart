@@ -352,7 +352,7 @@ class BrowserContext {
   Future<void> overridePermissions(
       String origin, List<PermissionType> permissions) async {
     await browser.browser
-        .grantPermissions(origin, permissions, browserContextId: id);
+        .grantPermissions(permissions, origin: origin, browserContextId: id);
   }
 
   /// Clears all permission overrides for the browser context.

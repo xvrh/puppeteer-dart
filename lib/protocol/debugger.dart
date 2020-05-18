@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
+import 'debugger.dart' as debugger;
 import 'runtime.dart' as runtime;
 
 /// Debugger domain exposes JavaScript debugging capabilities. It allows setting and removing
@@ -182,8 +183,15 @@ class DebuggerApi {
   }
 
   /// Resumes JavaScript execution.
-  Future<void> resume() async {
-    await _client.send('Debugger.resume');
+  /// [terminateOnResume] Set to true to terminate execution upon resuming execution. In contrast
+  /// to Runtime.terminateExecution, this will allows to execute further
+  /// JavaScript (i.e. via evaluation) until execution of the paused code
+  /// is actually resumed, at which point termination is triggered.
+  /// If execution is currently not paused, this parameter has no effect.
+  Future<void> resume({bool terminateOnResume}) async {
+    await _client.send('Debugger.resume', {
+      if (terminateOnResume != null) 'terminateOnResume': terminateOnResume,
+    });
   }
 
   /// Searches for given string in script content.
@@ -511,6 +519,12 @@ class ScriptFailedToParseEvent {
   /// JavaScript top stack frame of where the script parsed event was triggered if available.
   final runtime.StackTraceData stackTrace;
 
+  /// If the scriptLanguage is WebAssembly, the code section offset in the module.
+  final int codeOffset;
+
+  /// The language of the script.
+  final debugger.ScriptLanguage scriptLanguage;
+
   ScriptFailedToParseEvent(
       {@required this.scriptId,
       @required this.url,
@@ -525,7 +539,9 @@ class ScriptFailedToParseEvent {
       this.hasSourceURL,
       this.isModule,
       this.length,
-      this.stackTrace});
+      this.stackTrace,
+      this.codeOffset,
+      this.scriptLanguage});
 
   factory ScriptFailedToParseEvent.fromJson(Map<String, dynamic> json) {
     return ScriptFailedToParseEvent(
@@ -552,6 +568,11 @@ class ScriptFailedToParseEvent {
       stackTrace: json.containsKey('stackTrace')
           ? runtime.StackTraceData.fromJson(
               json['stackTrace'] as Map<String, dynamic>)
+          : null,
+      codeOffset:
+          json.containsKey('codeOffset') ? json['codeOffset'] as int : null,
+      scriptLanguage: json.containsKey('scriptLanguage')
+          ? debugger.ScriptLanguage.fromJson(json['scriptLanguage'] as String)
           : null,
     );
   }
@@ -603,6 +624,12 @@ class ScriptParsedEvent {
   /// JavaScript top stack frame of where the script parsed event was triggered if available.
   final runtime.StackTraceData stackTrace;
 
+  /// If the scriptLanguage is WebAssembly, the code section offset in the module.
+  final int codeOffset;
+
+  /// The language of the script.
+  final debugger.ScriptLanguage scriptLanguage;
+
   ScriptParsedEvent(
       {@required this.scriptId,
       @required this.url,
@@ -618,7 +645,9 @@ class ScriptParsedEvent {
       this.hasSourceURL,
       this.isModule,
       this.length,
-      this.stackTrace});
+      this.stackTrace,
+      this.codeOffset,
+      this.scriptLanguage});
 
   factory ScriptParsedEvent.fromJson(Map<String, dynamic> json) {
     return ScriptParsedEvent(
@@ -647,6 +676,11 @@ class ScriptParsedEvent {
       stackTrace: json.containsKey('stackTrace')
           ? runtime.StackTraceData.fromJson(
               json['stackTrace'] as Map<String, dynamic>)
+          : null,
+      codeOffset:
+          json.containsKey('codeOffset') ? json['codeOffset'] as int : null,
+      scriptLanguage: json.containsKey('scriptLanguage')
+          ? debugger.ScriptLanguage.fromJson(json['scriptLanguage'] as String)
           : null,
     );
   }
@@ -1041,6 +1075,7 @@ class ScopeType {
   static const script = ScopeType._('script');
   static const eval = ScopeType._('eval');
   static const module = ScopeType._('module');
+  static const wasmExpressionStack = ScopeType._('wasm-expression-stack');
   static const values = {
     'global': global,
     'local': local,
@@ -1051,6 +1086,7 @@ class ScopeType {
     'script': script,
     'eval': eval,
     'module': module,
+    'wasm-expression-stack': wasmExpressionStack,
   };
 
   final String value;
@@ -1158,6 +1194,34 @@ class BreakLocationType {
   @override
   bool operator ==(other) =>
       (other is BreakLocationType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Enum of possible script languages.
+class ScriptLanguage {
+  static const javaScript = ScriptLanguage._('JavaScript');
+  static const webAssembly = ScriptLanguage._('WebAssembly');
+  static const values = {
+    'JavaScript': javaScript,
+    'WebAssembly': webAssembly,
+  };
+
+  final String value;
+
+  const ScriptLanguage._(this.value);
+
+  factory ScriptLanguage.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ScriptLanguage && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

@@ -78,6 +78,11 @@ class PageApi {
       .where((event) => event.name == 'Page.downloadWillBegin')
       .map((event) => DownloadWillBeginEvent.fromJson(event.parameters));
 
+  /// Fired when download makes progress. Last call has |done| == true.
+  Stream<DownloadProgressEvent> get onDownloadProgress => _client.onEvent
+      .where((event) => event.name == 'Page.downloadProgress')
+      .map((event) => DownloadProgressEvent.fromJson(event.parameters));
+
   /// Fired when interstitial page was hidden
   Stream get onInterstitialHidden =>
       _client.onEvent.where((event) => event.name == 'Page.interstitialHidden');
@@ -265,9 +270,11 @@ class PageApi {
     return GetAppManifestResult.fromJson(result);
   }
 
-  Future<GetInstallabilityErrorsResult> getInstallabilityErrors() async {
+  Future<List<InstallabilityError>> getInstallabilityErrors() async {
     var result = await _client.send('Page.getInstallabilityErrors');
-    return GetInstallabilityErrorsResult.fromJson(result);
+    return (result['installabilityErrors'] as List)
+        .map((e) => InstallabilityError.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<String> getManifestIcons() async {
@@ -346,13 +353,18 @@ class PageApi {
   /// [referrer] Referrer URL.
   /// [transitionType] Intended transition type.
   /// [frameId] Frame id to navigate, if not specified navigates the top frame.
+  /// [referrerPolicy] Referrer-policy used for the navigation.
   Future<NavigateResult> navigate(String url,
-      {String referrer, TransitionType transitionType, FrameId frameId}) async {
+      {String referrer,
+      TransitionType transitionType,
+      FrameId frameId,
+      ReferrerPolicy referrerPolicy}) async {
     var result = await _client.send('Page.navigate', {
       'url': url,
       if (referrer != null) 'referrer': referrer,
       if (transitionType != null) 'transitionType': transitionType,
       if (frameId != null) 'frameId': frameId,
+      if (referrerPolicy != null) 'referrerPolicy': referrerPolicy,
     });
     return NavigateResult.fromJson(result);
   }
@@ -596,6 +608,7 @@ class PageApi {
   /// [behavior] Whether to allow all or deny all download requests, or use default Chrome behavior if
   /// available (otherwise deny).
   /// [downloadPath] The default path to save downloaded files to. This is requred if behavior is set to 'allow'
+  @deprecated
   Future<void> setDownloadBehavior(
       @Enum(['deny', 'allow', 'default']) String behavior,
       {String downloadPath}) async {
@@ -849,15 +862,49 @@ class DownloadWillBeginEvent {
   /// Id of the frame that caused download to begin.
   final FrameId frameId;
 
+  /// Global unique identifier of the download.
+  final String guid;
+
   /// URL of the resource being downloaded.
   final String url;
 
-  DownloadWillBeginEvent({@required this.frameId, @required this.url});
+  DownloadWillBeginEvent(
+      {@required this.frameId, @required this.guid, @required this.url});
 
   factory DownloadWillBeginEvent.fromJson(Map<String, dynamic> json) {
     return DownloadWillBeginEvent(
       frameId: FrameId.fromJson(json['frameId'] as String),
+      guid: json['guid'] as String,
       url: json['url'] as String,
+    );
+  }
+}
+
+class DownloadProgressEvent {
+  /// Global unique identifier of the download.
+  final String guid;
+
+  /// Total expected bytes to download.
+  final num totalBytes;
+
+  /// Total bytes received.
+  final num receivedBytes;
+
+  /// Download status.
+  final DownloadProgressEventState state;
+
+  DownloadProgressEvent(
+      {@required this.guid,
+      @required this.totalBytes,
+      @required this.receivedBytes,
+      @required this.state});
+
+  factory DownloadProgressEvent.fromJson(Map<String, dynamic> json) {
+    return DownloadProgressEvent(
+      guid: json['guid'] as String,
+      totalBytes: json['totalBytes'] as num,
+      receivedBytes: json['receivedBytes'] as num,
+      state: DownloadProgressEventState.fromJson(json['state'] as String),
     );
   }
 }
@@ -1057,20 +1104,6 @@ class GetAppManifestResult {
           ? AppManifestParsedProperties.fromJson(
               json['parsed'] as Map<String, dynamic>)
           : null,
-    );
-  }
-}
-
-class GetInstallabilityErrorsResult {
-  final List<InstallabilityError> installabilityErrors;
-
-  GetInstallabilityErrorsResult({@required this.installabilityErrors});
-
-  factory GetInstallabilityErrorsResult.fromJson(Map<String, dynamic> json) {
-    return GetInstallabilityErrorsResult(
-      installabilityErrors: (json['installabilityErrors'] as List)
-          .map((e) => InstallabilityError.fromJson(e as Map<String, dynamic>))
-          .toList(),
     );
   }
 }
@@ -2000,6 +2033,49 @@ class InstallabilityError {
   }
 }
 
+/// The referring-policy used for the navigation.
+class ReferrerPolicy {
+  static const noReferrer = ReferrerPolicy._('noReferrer');
+  static const noReferrerWhenDowngrade =
+      ReferrerPolicy._('noReferrerWhenDowngrade');
+  static const origin = ReferrerPolicy._('origin');
+  static const originWhenCrossOrigin =
+      ReferrerPolicy._('originWhenCrossOrigin');
+  static const sameOrigin = ReferrerPolicy._('sameOrigin');
+  static const strictOrigin = ReferrerPolicy._('strictOrigin');
+  static const strictOriginWhenCrossOrigin =
+      ReferrerPolicy._('strictOriginWhenCrossOrigin');
+  static const unsafeUrl = ReferrerPolicy._('unsafeUrl');
+  static const values = {
+    'noReferrer': noReferrer,
+    'noReferrerWhenDowngrade': noReferrerWhenDowngrade,
+    'origin': origin,
+    'originWhenCrossOrigin': originWhenCrossOrigin,
+    'sameOrigin': sameOrigin,
+    'strictOrigin': strictOrigin,
+    'strictOriginWhenCrossOrigin': strictOriginWhenCrossOrigin,
+    'unsafeUrl': unsafeUrl,
+  };
+
+  final String value;
+
+  const ReferrerPolicy._(this.value);
+
+  factory ReferrerPolicy.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ReferrerPolicy && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 class FileChooserOpenedEventMode {
   static const selectSingle = FileChooserOpenedEventMode._('selectSingle');
   static const selectMultiple = FileChooserOpenedEventMode._('selectMultiple');
@@ -2019,6 +2095,36 @@ class FileChooserOpenedEventMode {
   @override
   bool operator ==(other) =>
       (other is FileChooserOpenedEventMode && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class DownloadProgressEventState {
+  static const inProgress = DownloadProgressEventState._('inProgress');
+  static const completed = DownloadProgressEventState._('completed');
+  static const canceled = DownloadProgressEventState._('canceled');
+  static const values = {
+    'inProgress': inProgress,
+    'completed': completed,
+    'canceled': canceled,
+  };
+
+  final String value;
+
+  const DownloadProgressEventState._(this.value);
+
+  factory DownloadProgressEventState.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is DownloadProgressEventState && other.value == value) ||
       value == other;
 
   @override
