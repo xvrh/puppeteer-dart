@@ -65,11 +65,15 @@ class ProfilerApi {
   /// counters.
   /// [callCount] Collect accurate call counts beyond simple 'covered' or 'not covered'.
   /// [detailed] Collect block-based coverage.
+  /// [allowTriggeredUpdates] Allow the backend to send updates on its own initiative
   /// Returns: Monotonically increasing time (in seconds) when the coverage update was taken in the backend.
-  Future<num> startPreciseCoverage({bool callCount, bool detailed}) async {
+  Future<num> startPreciseCoverage(
+      {bool callCount, bool detailed, bool allowTriggeredUpdates}) async {
     var result = await _client.send('Profiler.startPreciseCoverage', {
       if (callCount != null) 'callCount': callCount,
       if (detailed != null) 'detailed': detailed,
+      if (allowTriggeredUpdates != null)
+        'allowTriggeredUpdates': allowTriggeredUpdates,
     });
     return result['timestamp'] as num;
   }

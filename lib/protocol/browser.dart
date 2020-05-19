@@ -10,28 +10,29 @@ class BrowserApi {
   BrowserApi(this._client);
 
   /// Set permission settings for given origin.
-  /// [origin] Origin the permission applies to.
+  /// [origin] Origin the permission applies to, all origins if not specified.
   /// [permission] Descriptor of permission to override.
   /// [setting] Setting of the permission.
   /// [browserContextId] Context to override. When omitted, default browser context is used.
   Future<void> setPermission(
-      String origin, PermissionDescriptor permission, PermissionSetting setting,
-      {BrowserContextID browserContextId}) async {
+      PermissionDescriptor permission, PermissionSetting setting,
+      {String origin, BrowserContextID browserContextId}) async {
     await _client.send('Browser.setPermission', {
-      'origin': origin,
       'permission': permission,
       'setting': setting,
+      if (origin != null) 'origin': origin,
       if (browserContextId != null) 'browserContextId': browserContextId,
     });
   }
 
   /// Grant specific permissions to the given origin and reject all others.
+  /// [origin] Origin the permission applies to, all origins if not specified.
   /// [browserContextId] BrowserContext to override permissions. When omitted, default browser context is used.
-  Future<void> grantPermissions(String origin, List<PermissionType> permissions,
-      {BrowserContextID browserContextId}) async {
+  Future<void> grantPermissions(List<PermissionType> permissions,
+      {String origin, BrowserContextID browserContextId}) async {
     await _client.send('Browser.grantPermissions', {
-      'origin': origin,
       'permissions': [...permissions],
+      if (origin != null) 'origin': origin,
       if (browserContextId != null) 'browserContextId': browserContextId,
     });
   }
@@ -41,6 +42,26 @@ class BrowserApi {
   Future<void> resetPermissions({BrowserContextID browserContextId}) async {
     await _client.send('Browser.resetPermissions', {
       if (browserContextId != null) 'browserContextId': browserContextId,
+    });
+  }
+
+  /// Set the behavior when downloading a file.
+  /// [behavior] Whether to allow all or deny all download requests, or use default Chrome behavior if
+  /// available (otherwise deny). |allowAndName| allows download and names files according to
+  /// their dowmload guids.
+  /// [browserContextId] BrowserContext to set download behavior. When omitted, default browser context is used.
+  /// [downloadPath] The default path to save downloaded files to. This is requred if behavior is set to 'allow'
+  /// or 'allowAndName'.
+  Future<void> setDownloadBehavior(
+      @Enum(['deny', 'allow', 'allowAndName', 'default']) String behavior,
+      {BrowserContextID browserContextId,
+      String downloadPath}) async {
+    assert(
+        const ['deny', 'allow', 'allowAndName', 'default'].contains(behavior));
+    await _client.send('Browser.setDownloadBehavior', {
+      'behavior': behavior,
+      if (browserContextId != null) 'browserContextId': browserContextId,
+      if (downloadPath != null) 'downloadPath': downloadPath,
     });
   }
 
