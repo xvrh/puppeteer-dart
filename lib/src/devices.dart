@@ -811,6 +811,50 @@ class Devices with IterableMixin<Device> {
           hasTouch: true,
           isLandscape: true));
 
+  final surfaceDuo = Device('Surface Duo',
+      userAgent:
+          'Mozilla/5.0 (Linux; Android 8.0; Pixel 2 Build/OPD3.170816.012) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Mobile Safari/537.36',
+      viewport: DeviceViewport(
+          width: 540,
+          height: 720,
+          deviceScaleFactor: 2.5,
+          isMobile: true,
+          hasTouch: true,
+          isLandscape: false));
+
+  final surfaceDuoLandscape = Device('Surface Duo',
+      userAgent:
+          'Mozilla/5.0 (Linux; Android 8.0; Pixel 2 Build/OPD3.170816.012) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Mobile Safari/537.36',
+      viewport: DeviceViewport(
+          width: 720,
+          height: 540,
+          deviceScaleFactor: 2.5,
+          isMobile: true,
+          hasTouch: true,
+          isLandscape: true));
+
+  final galaxyFold = Device('Galaxy Fold',
+      userAgent:
+          'Mozilla/5.0 (Linux; Android 8.0; Pixel 2 Build/OPD3.170816.012) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Mobile Safari/537.36',
+      viewport: DeviceViewport(
+          width: 280,
+          height: 653,
+          deviceScaleFactor: 3,
+          isMobile: true,
+          hasTouch: true,
+          isLandscape: false));
+
+  final galaxyFoldLandscape = Device('Galaxy Fold',
+      userAgent:
+          'Mozilla/5.0 (Linux; Android 8.0; Pixel 2 Build/OPD3.170816.012) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/%s Mobile Safari/537.36',
+      viewport: DeviceViewport(
+          width: 653,
+          height: 280,
+          deviceScaleFactor: 3,
+          isMobile: true,
+          hasTouch: true,
+          isLandscape: true));
+
   Map<String, Device> _all;
   Devices._() {
     _all = CanonicalizedMap<String, String, Device>.from({
@@ -887,7 +931,11 @@ class Devices with IterableMixin<Device> {
       'Laptop with MDPI screen': laptopWithMDPIScreen,
       'Laptop with MDPI screen Landscape': laptopWithMDPIScreenLandscape,
       'Moto G4': motoG4,
-      'Moto G4 Landscape': motoG4Landscape
+      'Moto G4 Landscape': motoG4Landscape,
+      'Surface Duo': surfaceDuo,
+      'Surface Duo Landscape': surfaceDuoLandscape,
+      'Galaxy Fold': galaxyFold,
+      'Galaxy Fold Landscape': galaxyFoldLandscape,
     }, (key) => key.replaceAll(' ', '').toLowerCase(),
         isValidKey: (key) => key != null);
   }
