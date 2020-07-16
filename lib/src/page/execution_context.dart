@@ -155,7 +155,7 @@ class ExecutionContext {
 
         return (returnByValue
             ? valueFromRemoteObject(response.result)
-            : _createJsHandle(response.result)) as T;
+            : _createHandle(response.result)) as T;
       } else {
         args ??= [];
 
@@ -173,7 +173,7 @@ class ExecutionContext {
 
         return (returnByValue
             ? valueFromRemoteObject(result.result)
-            : _createJsHandle(result.result)) as T;
+            : _createHandle(result.result)) as T;
       }
     } on ServerException catch (e) {
       if (e.message.contains('Cannot find context with specified id') ||
@@ -236,13 +236,13 @@ class ExecutionContext {
     var response =
         await runtimeApi.queryObjects(prototypeHandle.remoteObject.objectId);
 
-    return _createJsHandle(response);
+    return _createHandle(response);
   }
 
   Future<ElementHandle> adoptBackendNodeId(BackendNodeId backendNodeId) async {
     var object = await domApi.resolveNode(
         backendNodeId: backendNodeId, executionContextId: context.id);
-    return _createJsHandle(object) as ElementHandle;
+    return _createHandle(object) as ElementHandle;
   }
 
   Future<ElementHandle> adoptElementHandle(ElementHandle elementHandle) async {
@@ -255,7 +255,7 @@ class ExecutionContext {
     return adoptBackendNodeId(nodeInfo.backendNodeId);
   }
 
-  JsHandle _createJsHandle(RemoteObject remoteObject) =>
+  JsHandle _createHandle(RemoteObject remoteObject) =>
       JsHandle.fromRemoteObject(this, remoteObject);
 }
 

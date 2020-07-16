@@ -128,6 +128,7 @@
   * [mouse.down](#mousedownmousebutton-button-int-clickcount)
   * [mouse.move](#mousemovepoint-position-int-steps)
   * [mouse.up](#mouseupmousebutton-button-int-clickcount)
+  * [mouse.wheel](#mousewheelnum-deltax-num-deltay)
 - [class: Touchscreen](#class-touchscreen)
   * [touchscreen.tap](#touchscreentappoint-position)
 - [class: Tracing](#class-tracing)
@@ -2339,6 +2340,26 @@ Dispatches a `mouseup` event.
 
 ```dart
 mouse.up({MouseButton button, int clickCount}) → Future<void> 
+```
+
+#### mouse.wheel({num deltaX, num deltaY})
+Dispatches a `mousewheel` event.
+@param options - Optional: `MouseWheelOptions`.
+
+@example
+An example of zooming into an element:
+```dart
+await page.goto(
+    r'https://mdn.mozillademos.org/en-US/docs/Web/API/Element/wheel_event$samples/Scaling_an_element_via_the_wheel?revision=1587366');
+var elem = await page.$('div');
+var boundingBox = await elem.boundingBox;
+await page.mouse.move(Point(boundingBox.left + boundingBox.width / 2,
+    boundingBox.top + boundingBox.height / 2));
+await page.mouse.wheel(deltaY: -100);
+```
+
+```dart
+mouse.wheel({num deltaX, num deltaY}) → Future<void> 
 ```
 
 ### class: Touchscreen

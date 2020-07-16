@@ -164,6 +164,22 @@ function dimensions() {
         }
       }
     });
+    test('should send mouse wheel events', () async {
+      await page.goto('${server.prefix}/input/wheel.html');
+      var elem = await page.$('div');
+      var boundingBoxBefore = await elem.boundingBox;
+      expect(boundingBoxBefore.width, 115);
+      expect(boundingBoxBefore.height, 115);
+
+      await page.mouse.move(Point(
+          boundingBoxBefore.left + boundingBoxBefore.width / 2,
+          boundingBoxBefore.top + boundingBoxBefore.height / 2));
+
+      await page.mouse.wheel(deltaY: -100);
+      var boundingBoxAfter = await elem.boundingBox;
+      expect(boundingBoxAfter.width, 230);
+      expect(boundingBoxAfter.height, 230);
+    });
     test('should tween mouse movement', () async {
       await page.mouse.move(Point(100, 100));
       await page.evaluate('''() => {

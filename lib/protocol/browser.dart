@@ -10,9 +10,9 @@ class BrowserApi {
   BrowserApi(this._client);
 
   /// Set permission settings for given origin.
-  /// [origin] Origin the permission applies to, all origins if not specified.
   /// [permission] Descriptor of permission to override.
   /// [setting] Setting of the permission.
+  /// [origin] Origin the permission applies to, all origins if not specified.
   /// [browserContextId] Context to override. When omitted, default browser context is used.
   Future<void> setPermission(
       PermissionDescriptor permission, PermissionSetting setting,

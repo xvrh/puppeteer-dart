@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.18.0 (2020-07-16)
+- Update Chromium to version 84
+- Add `Mouse.wheel`
+
 # 1.17.0 (2020-04-21)
 - Update Chromium to version 81
 - Revert change to `uploadFile` implementation.

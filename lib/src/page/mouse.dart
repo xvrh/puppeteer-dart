@@ -70,4 +70,26 @@ class Mouse {
     await inputApi.dispatchMouseEvent('mouseReleased', _position.x, _position.y,
         button: button, modifiers: keyboard.modifiers, clickCount: clickCount);
   }
+
+  /// Dispatches a `mousewheel` event.
+  /// @param options - Optional: `MouseWheelOptions`.
+  ///
+  /// @example
+  /// An example of zooming into an element:
+  /// ```dart
+  /// await page.goto(
+  ///     r'https://mdn.mozillademos.org/en-US/docs/Web/API/Element/wheel_event$samples/Scaling_an_element_via_the_wheel?revision=1587366');
+  /// var elem = await page.$('div');
+  /// var boundingBox = await elem.boundingBox;
+  /// await page.mouse.move(Point(boundingBox.left + boundingBox.width / 2,
+  ///     boundingBox.top + boundingBox.height / 2));
+  /// await page.mouse.wheel(deltaY: -100);
+  /// ```
+  Future<void> wheel({num deltaX, num deltaY}) async {
+    await inputApi.dispatchMouseEvent('mouseWheel', _position.x, _position.y,
+        deltaX: deltaX ?? 0,
+        deltaY: deltaY ?? 0,
+        modifiers: keyboard.modifiers,
+        pointerType: 'mouse');
+  }
 }
