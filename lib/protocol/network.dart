@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'debugger.dart' as debugger;
+import 'emulation.dart' as emulation;
 import 'io.dart' as io;
 import 'page.dart' as page;
 import 'runtime.dart' as runtime;
@@ -468,12 +469,16 @@ class NetworkApi {
   /// [userAgent] User agent to use.
   /// [acceptLanguage] Browser langugage to emulate.
   /// [platform] The platform navigator.platform should return.
+  /// [userAgentMetadata] To be sent in Sec-CH-UA-* headers and returned in navigator.userAgentData
   Future<void> setUserAgentOverride(String userAgent,
-      {String acceptLanguage, String platform}) async {
+      {String acceptLanguage,
+      String platform,
+      emulation.UserAgentMetadata userAgentMetadata}) async {
     await _client.send('Network.setUserAgentOverride', {
       'userAgent': userAgent,
       if (acceptLanguage != null) 'acceptLanguage': acceptLanguage,
       if (platform != null) 'platform': platform,
+      if (userAgentMetadata != null) 'userAgentMetadata': userAgentMetadata,
     });
   }
 }
@@ -1035,22 +1040,22 @@ class RequestWillBeSentExtraInfoEvent {
   /// Request identifier. Used to match this information to an existing requestWillBeSent event.
   final RequestId requestId;
 
-  /// A list of cookies which will not be sent with this request along with corresponding reasons
-  /// for blocking.
-  final List<BlockedCookieWithReason> blockedCookies;
+  /// A list of cookies potentially associated to the requested URL. This includes both cookies sent with
+  /// the request and the ones not sent; the latter are distinguished by having blockedReason field set.
+  final List<BlockedCookieWithReason> associatedCookies;
 
   /// Raw request headers as they will be sent over the wire.
   final Headers headers;
 
   RequestWillBeSentExtraInfoEvent(
       {@required this.requestId,
-      @required this.blockedCookies,
+      @required this.associatedCookies,
       @required this.headers});
 
   factory RequestWillBeSentExtraInfoEvent.fromJson(Map<String, dynamic> json) {
     return RequestWillBeSentExtraInfoEvent(
       requestId: RequestId.fromJson(json['requestId'] as String),
-      blockedCookies: (json['blockedCookies'] as List)
+      associatedCookies: (json['associatedCookies'] as List)
           .map((e) =>
               BlockedCookieWithReason.fromJson(e as Map<String, dynamic>))
           .toList(),

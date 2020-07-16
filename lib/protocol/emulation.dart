@@ -279,12 +279,16 @@ class EmulationApi {
   /// [userAgent] User agent to use.
   /// [acceptLanguage] Browser langugage to emulate.
   /// [platform] The platform navigator.platform should return.
+  /// [userAgentMetadata] To be sent in Sec-CH-UA-* headers and returned in navigator.userAgentData
   Future<void> setUserAgentOverride(String userAgent,
-      {String acceptLanguage, String platform}) async {
+      {String acceptLanguage,
+      String platform,
+      UserAgentMetadata userAgentMetadata}) async {
     await _client.send('Emulation.setUserAgentOverride', {
       'userAgent': userAgent,
       if (acceptLanguage != null) 'acceptLanguage': acceptLanguage,
       if (platform != null) 'platform': platform,
+      if (userAgentMetadata != null) 'userAgentMetadata': userAgentMetadata,
     });
   }
 }
@@ -401,4 +405,79 @@ class VirtualTimePolicy {
 
   @override
   String toString() => value.toString();
+}
+
+/// Used to specify User Agent Cient Hints to emulate. See https://wicg.github.io/ua-client-hints
+class UserAgentBrandVersion {
+  final String brand;
+
+  final String version;
+
+  UserAgentBrandVersion({@required this.brand, @required this.version});
+
+  factory UserAgentBrandVersion.fromJson(Map<String, dynamic> json) {
+    return UserAgentBrandVersion(
+      brand: json['brand'] as String,
+      version: json['version'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'brand': brand,
+      'version': version,
+    };
+  }
+}
+
+/// Used to specify User Agent Cient Hints to emulate. See https://wicg.github.io/ua-client-hints
+class UserAgentMetadata {
+  final List<UserAgentBrandVersion> brands;
+
+  final String fullVersion;
+
+  final String platform;
+
+  final String platformVersion;
+
+  final String architecture;
+
+  final String model;
+
+  final bool mobile;
+
+  UserAgentMetadata(
+      {@required this.brands,
+      @required this.fullVersion,
+      @required this.platform,
+      @required this.platformVersion,
+      @required this.architecture,
+      @required this.model,
+      @required this.mobile});
+
+  factory UserAgentMetadata.fromJson(Map<String, dynamic> json) {
+    return UserAgentMetadata(
+      brands: (json['brands'] as List)
+          .map((e) => UserAgentBrandVersion.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      fullVersion: json['fullVersion'] as String,
+      platform: json['platform'] as String,
+      platformVersion: json['platformVersion'] as String,
+      architecture: json['architecture'] as String,
+      model: json['model'] as String,
+      mobile: json['mobile'] as bool,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'brands': brands.map((e) => e.toJson()).toList(),
+      'fullVersion': fullVersion,
+      'platform': platform,
+      'platformVersion': platformVersion,
+      'architecture': architecture,
+      'model': model,
+      'mobile': mobile,
+    };
+  }
 }

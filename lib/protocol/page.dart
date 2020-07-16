@@ -816,14 +816,22 @@ class FrameRequestedNavigationEvent {
   /// The destination URL for the requested navigation.
   final String url;
 
+  /// The disposition for the navigation.
+  final ClientNavigationDisposition disposition;
+
   FrameRequestedNavigationEvent(
-      {@required this.frameId, @required this.reason, @required this.url});
+      {@required this.frameId,
+      @required this.reason,
+      @required this.url,
+      @required this.disposition});
 
   factory FrameRequestedNavigationEvent.fromJson(Map<String, dynamic> json) {
     return FrameRequestedNavigationEvent(
       frameId: FrameId.fromJson(json['frameId'] as String),
       reason: ClientNavigationReason.fromJson(json['reason'] as String),
       url: json['url'] as String,
+      disposition:
+          ClientNavigationDisposition.fromJson(json['disposition'] as String),
     );
   }
 }
@@ -868,14 +876,21 @@ class DownloadWillBeginEvent {
   /// URL of the resource being downloaded.
   final String url;
 
+  /// Suggested file name of the resource (the actual name of the file saved on disk may differ).
+  final String suggestedFilename;
+
   DownloadWillBeginEvent(
-      {@required this.frameId, @required this.guid, @required this.url});
+      {@required this.frameId,
+      @required this.guid,
+      @required this.url,
+      @required this.suggestedFilename});
 
   factory DownloadWillBeginEvent.fromJson(Map<String, dynamic> json) {
     return DownloadWillBeginEvent(
       frameId: FrameId.fromJson(json['frameId'] as String),
       guid: json['guid'] as String,
       url: json['url'] as String,
+      suggestedFilename: json['suggestedFilename'] as String,
     );
   }
 }
@@ -1972,6 +1987,38 @@ class ClientNavigationReason {
   @override
   bool operator ==(other) =>
       (other is ClientNavigationReason && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class ClientNavigationDisposition {
+  static const currentTab = ClientNavigationDisposition._('currentTab');
+  static const newTab = ClientNavigationDisposition._('newTab');
+  static const newWindow = ClientNavigationDisposition._('newWindow');
+  static const download = ClientNavigationDisposition._('download');
+  static const values = {
+    'currentTab': currentTab,
+    'newTab': newTab,
+    'newWindow': newWindow,
+    'download': download,
+  };
+
+  final String value;
+
+  const ClientNavigationDisposition._(this.value);
+
+  factory ClientNavigationDisposition.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ClientNavigationDisposition && other.value == value) ||
       value == other;
 
   @override

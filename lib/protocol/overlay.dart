@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'page.dart' as page;
@@ -46,13 +47,17 @@ class OverlayApi {
   /// [nodeId] Id of the node to get highlight object for.
   /// [includeDistance] Whether to include distance info.
   /// [includeStyle] Whether to include style info.
+  /// [colorFormat] The color format to get config with (default: hex)
   /// Returns: Highlight data for the node.
   Future<Map<String, dynamic>> getHighlightObjectForTest(dom.NodeId nodeId,
-      {bool includeDistance, bool includeStyle}) async {
+      {bool includeDistance,
+      bool includeStyle,
+      ColorFormat colorFormat}) async {
     var result = await _client.send('Overlay.getHighlightObjectForTest', {
       'nodeId': nodeId,
       if (includeDistance != null) 'includeDistance': includeDistance,
       if (includeStyle != null) 'includeStyle': includeStyle,
+      if (colorFormat != null) 'colorFormat': colorFormat,
     });
     return result['highlight'] as Map<String, dynamic>;
   }
@@ -212,6 +217,103 @@ class OverlayApi {
       'show': show,
     });
   }
+
+  /// Add a dual screen device hinge
+  /// [hingeConfig] hinge data, null means hideHinge
+  Future<void> setShowHinge({HingeConfig hingeConfig}) async {
+    await _client.send('Overlay.setShowHinge', {
+      if (hingeConfig != null) 'hingeConfig': hingeConfig,
+    });
+  }
+}
+
+/// Configuration data for the highlighting of Grid elements.
+class GridHighlightConfig {
+  /// Whether the extension lines from grid cells to the rulers should be shown (default: false).
+  final bool showGridExtensionLines;
+
+  /// The grid container border highlight color (default: transparent).
+  final dom.RGBA gridBorderColor;
+
+  /// The cell border color (default: transparent).
+  final dom.RGBA cellBorderColor;
+
+  /// Whether the grid border is dashed (default: false).
+  final bool gridBorderDash;
+
+  /// Whether the cell border is dashed (default: false).
+  final bool cellBorderDash;
+
+  /// The row gap highlight fill color (default: transparent).
+  final dom.RGBA rowGapColor;
+
+  /// The row gap hatching fill color (default: transparent).
+  final dom.RGBA rowHatchColor;
+
+  /// The column gap highlight fill color (default: transparent).
+  final dom.RGBA columnGapColor;
+
+  /// The column gap hatching fill color (default: transparent).
+  final dom.RGBA columnHatchColor;
+
+  GridHighlightConfig(
+      {this.showGridExtensionLines,
+      this.gridBorderColor,
+      this.cellBorderColor,
+      this.gridBorderDash,
+      this.cellBorderDash,
+      this.rowGapColor,
+      this.rowHatchColor,
+      this.columnGapColor,
+      this.columnHatchColor});
+
+  factory GridHighlightConfig.fromJson(Map<String, dynamic> json) {
+    return GridHighlightConfig(
+      showGridExtensionLines: json.containsKey('showGridExtensionLines')
+          ? json['showGridExtensionLines'] as bool
+          : null,
+      gridBorderColor: json.containsKey('gridBorderColor')
+          ? dom.RGBA.fromJson(json['gridBorderColor'] as Map<String, dynamic>)
+          : null,
+      cellBorderColor: json.containsKey('cellBorderColor')
+          ? dom.RGBA.fromJson(json['cellBorderColor'] as Map<String, dynamic>)
+          : null,
+      gridBorderDash: json.containsKey('gridBorderDash')
+          ? json['gridBorderDash'] as bool
+          : null,
+      cellBorderDash: json.containsKey('cellBorderDash')
+          ? json['cellBorderDash'] as bool
+          : null,
+      rowGapColor: json.containsKey('rowGapColor')
+          ? dom.RGBA.fromJson(json['rowGapColor'] as Map<String, dynamic>)
+          : null,
+      rowHatchColor: json.containsKey('rowHatchColor')
+          ? dom.RGBA.fromJson(json['rowHatchColor'] as Map<String, dynamic>)
+          : null,
+      columnGapColor: json.containsKey('columnGapColor')
+          ? dom.RGBA.fromJson(json['columnGapColor'] as Map<String, dynamic>)
+          : null,
+      columnHatchColor: json.containsKey('columnHatchColor')
+          ? dom.RGBA.fromJson(json['columnHatchColor'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (showGridExtensionLines != null)
+        'showGridExtensionLines': showGridExtensionLines,
+      if (gridBorderColor != null) 'gridBorderColor': gridBorderColor.toJson(),
+      if (cellBorderColor != null) 'cellBorderColor': cellBorderColor.toJson(),
+      if (gridBorderDash != null) 'gridBorderDash': gridBorderDash,
+      if (cellBorderDash != null) 'cellBorderDash': cellBorderDash,
+      if (rowGapColor != null) 'rowGapColor': rowGapColor.toJson(),
+      if (rowHatchColor != null) 'rowHatchColor': rowHatchColor.toJson(),
+      if (columnGapColor != null) 'columnGapColor': columnGapColor.toJson(),
+      if (columnHatchColor != null)
+        'columnHatchColor': columnHatchColor.toJson(),
+    };
+  }
 }
 
 /// Configuration data for the highlighting of page elements.
@@ -252,6 +354,12 @@ class HighlightConfig {
   /// The grid layout color (default: transparent).
   final dom.RGBA cssGridColor;
 
+  /// The color format used to format color styles (default: hex).
+  final ColorFormat colorFormat;
+
+  /// The grid layout highlight configuration (default: all transparent).
+  final GridHighlightConfig gridHighlightConfig;
+
   HighlightConfig(
       {this.showInfo,
       this.showStyles,
@@ -264,7 +372,9 @@ class HighlightConfig {
       this.eventTargetColor,
       this.shapeColor,
       this.shapeMarginColor,
-      this.cssGridColor});
+      this.cssGridColor,
+      this.colorFormat,
+      this.gridHighlightConfig});
 
   factory HighlightConfig.fromJson(Map<String, dynamic> json) {
     return HighlightConfig(
@@ -300,6 +410,13 @@ class HighlightConfig {
       cssGridColor: json.containsKey('cssGridColor')
           ? dom.RGBA.fromJson(json['cssGridColor'] as Map<String, dynamic>)
           : null,
+      colorFormat: json.containsKey('colorFormat')
+          ? ColorFormat.fromJson(json['colorFormat'] as String)
+          : null,
+      gridHighlightConfig: json.containsKey('gridHighlightConfig')
+          ? GridHighlightConfig.fromJson(
+              json['gridHighlightConfig'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -319,6 +436,72 @@ class HighlightConfig {
       if (shapeMarginColor != null)
         'shapeMarginColor': shapeMarginColor.toJson(),
       if (cssGridColor != null) 'cssGridColor': cssGridColor.toJson(),
+      if (colorFormat != null) 'colorFormat': colorFormat.toJson(),
+      if (gridHighlightConfig != null)
+        'gridHighlightConfig': gridHighlightConfig.toJson(),
+    };
+  }
+}
+
+class ColorFormat {
+  static const rgb = ColorFormat._('rgb');
+  static const hsl = ColorFormat._('hsl');
+  static const hex = ColorFormat._('hex');
+  static const values = {
+    'rgb': rgb,
+    'hsl': hsl,
+    'hex': hex,
+  };
+
+  final String value;
+
+  const ColorFormat._(this.value);
+
+  factory ColorFormat.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ColorFormat && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Configuration for dual screen hinge
+class HingeConfig {
+  /// A rectangle represent hinge
+  final dom.Rect rect;
+
+  /// The content box highlight fill color (default: a dark color).
+  final dom.RGBA contentColor;
+
+  /// The content box highlight outline color (default: transparent).
+  final dom.RGBA outlineColor;
+
+  HingeConfig({@required this.rect, this.contentColor, this.outlineColor});
+
+  factory HingeConfig.fromJson(Map<String, dynamic> json) {
+    return HingeConfig(
+      rect: dom.Rect.fromJson(json['rect'] as Map<String, dynamic>),
+      contentColor: json.containsKey('contentColor')
+          ? dom.RGBA.fromJson(json['contentColor'] as Map<String, dynamic>)
+          : null,
+      outlineColor: json.containsKey('outlineColor')
+          ? dom.RGBA.fromJson(json['outlineColor'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'rect': rect.toJson(),
+      if (contentColor != null) 'contentColor': contentColor.toJson(),
+      if (outlineColor != null) 'outlineColor': outlineColor.toJson(),
     };
   }
 }

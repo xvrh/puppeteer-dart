@@ -103,6 +103,21 @@ class DebuggerApi {
     return EvaluateOnCallFrameResult.fromJson(result);
   }
 
+  /// Execute a Wasm Evaluator module on a given call frame.
+  /// [callFrameId] WebAssembly call frame identifier to evaluate on.
+  /// [evaluator] Code of the evaluator module.
+  /// [timeout] Terminate execution after timing out (number of milliseconds).
+  Future<ExecuteWasmEvaluatorResult> executeWasmEvaluator(
+      CallFrameId callFrameId, String evaluator,
+      {runtime.TimeDelta timeout}) async {
+    var result = await _client.send('Debugger.executeWasmEvaluator', {
+      'callFrameId': callFrameId,
+      'evaluator': evaluator,
+      if (timeout != null) 'timeout': timeout,
+    });
+    return ExecuteWasmEvaluatorResult.fromJson(result);
+  }
+
   /// Returns possible locations for breakpoint. scriptId in start and end range locations should be
   /// the same.
   /// [start] Start of range to search possible breakpoint locations in.
@@ -630,6 +645,9 @@ class ScriptParsedEvent {
   /// The language of the script.
   final debugger.ScriptLanguage scriptLanguage;
 
+  /// If the scriptLanguage is WebASsembly, the source of debug symbols for the module.
+  final debugger.DebugSymbols debugSymbols;
+
   ScriptParsedEvent(
       {@required this.scriptId,
       @required this.url,
@@ -647,7 +665,8 @@ class ScriptParsedEvent {
       this.length,
       this.stackTrace,
       this.codeOffset,
-      this.scriptLanguage});
+      this.scriptLanguage,
+      this.debugSymbols});
 
   factory ScriptParsedEvent.fromJson(Map<String, dynamic> json) {
     return ScriptParsedEvent(
@@ -682,6 +701,10 @@ class ScriptParsedEvent {
       scriptLanguage: json.containsKey('scriptLanguage')
           ? debugger.ScriptLanguage.fromJson(json['scriptLanguage'] as String)
           : null,
+      debugSymbols: json.containsKey('debugSymbols')
+          ? debugger.DebugSymbols.fromJson(
+              json['debugSymbols'] as Map<String, dynamic>)
+          : null,
     );
   }
 }
@@ -697,6 +720,27 @@ class EvaluateOnCallFrameResult {
 
   factory EvaluateOnCallFrameResult.fromJson(Map<String, dynamic> json) {
     return EvaluateOnCallFrameResult(
+      result:
+          runtime.RemoteObject.fromJson(json['result'] as Map<String, dynamic>),
+      exceptionDetails: json.containsKey('exceptionDetails')
+          ? runtime.ExceptionDetails.fromJson(
+              json['exceptionDetails'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+class ExecuteWasmEvaluatorResult {
+  /// Object wrapper for the evaluation result.
+  final runtime.RemoteObject result;
+
+  /// Exception details.
+  final runtime.ExceptionDetails exceptionDetails;
+
+  ExecuteWasmEvaluatorResult({@required this.result, this.exceptionDetails});
+
+  factory ExecuteWasmEvaluatorResult.fromJson(Map<String, dynamic> json) {
+    return ExecuteWasmEvaluatorResult(
       result:
           runtime.RemoteObject.fromJson(json['result'] as Map<String, dynamic>),
       exceptionDetails: json.containsKey('exceptionDetails')
@@ -1222,6 +1266,64 @@ class ScriptLanguage {
   @override
   bool operator ==(other) =>
       (other is ScriptLanguage && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Debug symbols available for a wasm script.
+class DebugSymbols {
+  /// Type of the debug symbols.
+  final DebugSymbolsType type;
+
+  /// URL of the external symbol source.
+  final String externalURL;
+
+  DebugSymbols({@required this.type, this.externalURL});
+
+  factory DebugSymbols.fromJson(Map<String, dynamic> json) {
+    return DebugSymbols(
+      type: DebugSymbolsType.fromJson(json['type'] as String),
+      externalURL: json.containsKey('externalURL')
+          ? json['externalURL'] as String
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      if (externalURL != null) 'externalURL': externalURL,
+    };
+  }
+}
+
+class DebugSymbolsType {
+  static const none = DebugSymbolsType._('None');
+  static const sourceMap = DebugSymbolsType._('SourceMap');
+  static const embeddedDwarf = DebugSymbolsType._('EmbeddedDWARF');
+  static const externalDwarf = DebugSymbolsType._('ExternalDWARF');
+  static const values = {
+    'None': none,
+    'SourceMap': sourceMap,
+    'EmbeddedDWARF': embeddedDwarf,
+    'ExternalDWARF': externalDwarf,
+  };
+
+  final String value;
+
+  const DebugSymbolsType._(this.value);
+
+  factory DebugSymbolsType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is DebugSymbolsType && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

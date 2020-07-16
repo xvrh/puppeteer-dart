@@ -21,6 +21,17 @@ class MediaApi {
       .where((event) => event.name == 'Media.playerEventsAdded')
       .map((event) => PlayerEventsAddedEvent.fromJson(event.parameters));
 
+  /// Send a list of any messages that need to be delivered.
+  Stream<PlayerMessagesLoggedEvent> get onPlayerMessagesLogged =>
+      _client.onEvent
+          .where((event) => event.name == 'Media.playerMessagesLogged')
+          .map((event) => PlayerMessagesLoggedEvent.fromJson(event.parameters));
+
+  /// Send a list of any errors that need to be delivered.
+  Stream<PlayerErrorsRaisedEvent> get onPlayerErrorsRaised => _client.onEvent
+      .where((event) => event.name == 'Media.playerErrorsRaised')
+      .map((event) => PlayerErrorsRaisedEvent.fromJson(event.parameters));
+
   /// Called whenever a player is created, or when a new agent joins and recieves
   /// a list of active players. If an agent is restored, it will recieve the full
   /// list of player ids and all events again.
@@ -76,6 +87,40 @@ class PlayerEventsAddedEvent {
   }
 }
 
+class PlayerMessagesLoggedEvent {
+  final PlayerId playerId;
+
+  final List<PlayerMessage> messages;
+
+  PlayerMessagesLoggedEvent({@required this.playerId, @required this.messages});
+
+  factory PlayerMessagesLoggedEvent.fromJson(Map<String, dynamic> json) {
+    return PlayerMessagesLoggedEvent(
+      playerId: PlayerId.fromJson(json['playerId'] as String),
+      messages: (json['messages'] as List)
+          .map((e) => PlayerMessage.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+class PlayerErrorsRaisedEvent {
+  final PlayerId playerId;
+
+  final List<PlayerError> errors;
+
+  PlayerErrorsRaisedEvent({@required this.playerId, @required this.errors});
+
+  factory PlayerErrorsRaisedEvent.fromJson(Map<String, dynamic> json) {
+    return PlayerErrorsRaisedEvent(
+      playerId: PlayerId.fromJson(json['playerId'] as String),
+      errors: (json['errors'] as List)
+          .map((e) => PlayerError.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
 /// Players will get an ID that is unique within the agent context.
 class PlayerId {
   final String value;
@@ -117,51 +162,62 @@ class Timestamp {
   String toString() => value.toString();
 }
 
-/// Player Property type
-class PlayerProperty {
-  final String name;
+/// Have one type per entry in MediaLogRecord::Type
+/// Corresponds to kMessage
+class PlayerMessage {
+  /// Keep in sync with MediaLogMessageLevel
+  /// We are currently keeping the message level 'error' separate from the
+  /// PlayerError type because right now they represent different things,
+  /// this one being a DVLOG(ERROR) style log message that gets printed
+  /// based on what log level is selected in the UI, and the other is a
+  /// representation of a media::PipelineStatus object. Soon however we're
+  /// going to be moving away from using PipelineStatus for errors and
+  /// introducing a new error type which should hopefully let us integrate
+  /// the error log level into the PlayerError type.
+  final PlayerMessageLevel level;
 
-  final String value;
+  final String message;
 
-  PlayerProperty({@required this.name, this.value});
+  PlayerMessage({@required this.level, @required this.message});
 
-  factory PlayerProperty.fromJson(Map<String, dynamic> json) {
-    return PlayerProperty(
-      name: json['name'] as String,
-      value: json.containsKey('value') ? json['value'] as String : null,
+  factory PlayerMessage.fromJson(Map<String, dynamic> json) {
+    return PlayerMessage(
+      level: PlayerMessageLevel.fromJson(json['level'] as String),
+      message: json['message'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'name': name,
-      if (value != null) 'value': value,
+      'level': level,
+      'message': message,
     };
   }
 }
 
-/// Break out events into different types
-class PlayerEventType {
-  static const errorEvent = PlayerEventType._('errorEvent');
-  static const triggeredEvent = PlayerEventType._('triggeredEvent');
-  static const messageEvent = PlayerEventType._('messageEvent');
+class PlayerMessageLevel {
+  static const error = PlayerMessageLevel._('error');
+  static const warning = PlayerMessageLevel._('warning');
+  static const info = PlayerMessageLevel._('info');
+  static const debug = PlayerMessageLevel._('debug');
   static const values = {
-    'errorEvent': errorEvent,
-    'triggeredEvent': triggeredEvent,
-    'messageEvent': messageEvent,
+    'error': error,
+    'warning': warning,
+    'info': info,
+    'debug': debug,
   };
 
   final String value;
 
-  const PlayerEventType._(this.value);
+  const PlayerMessageLevel._(this.value);
 
-  factory PlayerEventType.fromJson(String value) => values[value];
+  factory PlayerMessageLevel.fromJson(String value) => values[value];
 
   String toJson() => value;
 
   @override
   bool operator ==(other) =>
-      (other is PlayerEventType && other.value == value) || value == other;
+      (other is PlayerMessageLevel && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -170,27 +226,16 @@ class PlayerEventType {
   String toString() => value.toString();
 }
 
-class PlayerEvent {
-  final PlayerEventType type;
-
-  /// Events are timestamped relative to the start of the player creation
-  /// not relative to the start of playback.
-  final Timestamp timestamp;
-
+/// Corresponds to kMediaPropertyChange
+class PlayerProperty {
   final String name;
 
   final String value;
 
-  PlayerEvent(
-      {@required this.type,
-      @required this.timestamp,
-      @required this.name,
-      @required this.value});
+  PlayerProperty({@required this.name, @required this.value});
 
-  factory PlayerEvent.fromJson(Map<String, dynamic> json) {
-    return PlayerEvent(
-      type: PlayerEventType.fromJson(json['type'] as String),
-      timestamp: Timestamp.fromJson(json['timestamp'] as num),
+  factory PlayerProperty.fromJson(Map<String, dynamic> json) {
+    return PlayerProperty(
       name: json['name'] as String,
       value: json['value'] as String,
     );
@@ -198,10 +243,86 @@ class PlayerEvent {
 
   Map<String, dynamic> toJson() {
     return {
-      'type': type.toJson(),
-      'timestamp': timestamp.toJson(),
       'name': name,
       'value': value,
     };
   }
+}
+
+/// Corresponds to kMediaEventTriggered
+class PlayerEvent {
+  final Timestamp timestamp;
+
+  final String value;
+
+  PlayerEvent({@required this.timestamp, @required this.value});
+
+  factory PlayerEvent.fromJson(Map<String, dynamic> json) {
+    return PlayerEvent(
+      timestamp: Timestamp.fromJson(json['timestamp'] as num),
+      value: json['value'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'timestamp': timestamp.toJson(),
+      'value': value,
+    };
+  }
+}
+
+/// Corresponds to kMediaError
+class PlayerError {
+  final PlayerErrorType type;
+
+  /// When this switches to using media::Status instead of PipelineStatus
+  /// we can remove "errorCode" and replace it with the fields from
+  /// a Status instance. This also seems like a duplicate of the error
+  /// level enum - there is a todo bug to have that level removed and
+  /// use this instead. (crbug.com/1068454)
+  final String errorCode;
+
+  PlayerError({@required this.type, @required this.errorCode});
+
+  factory PlayerError.fromJson(Map<String, dynamic> json) {
+    return PlayerError(
+      type: PlayerErrorType.fromJson(json['type'] as String),
+      errorCode: json['errorCode'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      'errorCode': errorCode,
+    };
+  }
+}
+
+class PlayerErrorType {
+  static const pipelineError = PlayerErrorType._('pipeline_error');
+  static const mediaError = PlayerErrorType._('media_error');
+  static const values = {
+    'pipeline_error': pipelineError,
+    'media_error': mediaError,
+  };
+
+  final String value;
+
+  const PlayerErrorType._(this.value);
+
+  factory PlayerErrorType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is PlayerErrorType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }

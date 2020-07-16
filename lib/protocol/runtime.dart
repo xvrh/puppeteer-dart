@@ -861,6 +861,7 @@ class RemoteObjectSubtype {
   static const f32 = RemoteObjectSubtype._('f32');
   static const f64 = RemoteObjectSubtype._('f64');
   static const v128 = RemoteObjectSubtype._('v128');
+  static const anyref = RemoteObjectSubtype._('anyref');
   static const values = {
     'array': array,
     'null': null$,
@@ -884,6 +885,7 @@ class RemoteObjectSubtype {
     'f32': f32,
     'f64': f64,
     'v128': v128,
+    'anyref': anyref,
   };
 
   final String value;
