@@ -67,7 +67,7 @@ void main() {
       var nestedFrame = page.frames[1].childFrames[1];
       var elementHandle = await nestedFrame.$('div');
       var box = await elementHandle.boundingBox;
-      expect(box, equals(Rectangle(28, 260, 264, 18)));
+      expect(box, equals(Rectangle(28, 182, 264, 18)));
     });
     test('should return null for invisible elements', () async {
       await page.setContent('<div style="display:none">hi</div>');

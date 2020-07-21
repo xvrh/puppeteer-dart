@@ -27,6 +27,9 @@ class InputApi {
   /// [isSystemKey] Whether the event was a system key event (default: false).
   /// [location] Whether the event was from the left or right side of the keyboard. 1=Left, 2=Right (default:
   /// 0).
+  /// [commands] Editing commands to send with the key event (e.g., 'selectAll') (default: []).
+  /// These are related to but not equal the command names used in `document.execCommand` and NSStandardKeyBindingResponding.
+  /// See https://source.chromium.org/chromium/chromium/src/+/master:third_party/blink/renderer/core/editing/commands/editor_command_names.h for valid command names.
   Future<void> dispatchKeyEvent(
       @Enum(['keyDown', 'keyUp', 'rawKeyDown', 'char']) String type,
       {int modifiers,
@@ -41,7 +44,8 @@ class InputApi {
       bool autoRepeat,
       bool isKeypad,
       bool isSystemKey,
-      int location}) async {
+      int location,
+      List<String> commands}) async {
     assert(const ['keyDown', 'keyUp', 'rawKeyDown', 'char'].contains(type));
     await _client.send('Input.dispatchKeyEvent', {
       'type': type,
@@ -60,6 +64,7 @@ class InputApi {
       if (isKeypad != null) 'isKeypad': isKeypad,
       if (isSystemKey != null) 'isSystemKey': isSystemKey,
       if (location != null) 'location': location,
+      if (commands != null) 'commands': [...commands],
     });
   }
 

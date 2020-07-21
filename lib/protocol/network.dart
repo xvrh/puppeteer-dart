@@ -1511,6 +1511,12 @@ class ResourceTiming {
   /// Finished Starting ServiceWorker.
   final num workerReady;
 
+  /// Started fetch event.
+  final num workerFetchStart;
+
+  /// Settled fetch event respondWith promise.
+  final num workerRespondWithSettled;
+
   /// Started sending request.
   final num sendStart;
 
@@ -1538,6 +1544,8 @@ class ResourceTiming {
       @required this.sslEnd,
       @required this.workerStart,
       @required this.workerReady,
+      @required this.workerFetchStart,
+      @required this.workerRespondWithSettled,
       @required this.sendStart,
       @required this.sendEnd,
       @required this.pushStart,
@@ -1557,6 +1565,8 @@ class ResourceTiming {
       sslEnd: json['sslEnd'] as num,
       workerStart: json['workerStart'] as num,
       workerReady: json['workerReady'] as num,
+      workerFetchStart: json['workerFetchStart'] as num,
+      workerRespondWithSettled: json['workerRespondWithSettled'] as num,
       sendStart: json['sendStart'] as num,
       sendEnd: json['sendEnd'] as num,
       pushStart: json['pushStart'] as num,
@@ -1578,6 +1588,8 @@ class ResourceTiming {
       'sslEnd': sslEnd,
       'workerStart': workerStart,
       'workerReady': workerReady,
+      'workerFetchStart': workerFetchStart,
+      'workerRespondWithSettled': workerRespondWithSettled,
       'sendStart': sendStart,
       'sendEnd': sendEnd,
       'pushStart': pushStart,
@@ -2007,6 +2019,39 @@ class BlockedReason {
   String toString() => value.toString();
 }
 
+/// Source of serviceworker response.
+class ServiceWorkerResponseSource {
+  static const cacheStorage = ServiceWorkerResponseSource._('cache-storage');
+  static const httpCache = ServiceWorkerResponseSource._('http-cache');
+  static const fallbackCode = ServiceWorkerResponseSource._('fallback-code');
+  static const network = ServiceWorkerResponseSource._('network');
+  static const values = {
+    'cache-storage': cacheStorage,
+    'http-cache': httpCache,
+    'fallback-code': fallbackCode,
+    'network': network,
+  };
+
+  final String value;
+
+  const ServiceWorkerResponseSource._(this.value);
+
+  factory ServiceWorkerResponseSource.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ServiceWorkerResponseSource && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// HTTP response data.
 class ResponseData {
   /// Response URL. This URL can be different from CachedResource.url in case of redirect.
@@ -2060,6 +2105,15 @@ class ResponseData {
   /// Timing information for the given request.
   final ResourceTiming timing;
 
+  /// Response source of response from ServiceWorker.
+  final ServiceWorkerResponseSource serviceWorkerResponseSource;
+
+  /// The time at which the returned response was generated.
+  final TimeSinceEpoch responseTime;
+
+  /// Cache Storage Cache Name.
+  final String cacheStorageCacheName;
+
   /// Protocol used to fetch this request.
   final String protocol;
 
@@ -2087,6 +2141,9 @@ class ResponseData {
       this.fromPrefetchCache,
       @required this.encodedDataLength,
       this.timing,
+      this.serviceWorkerResponseSource,
+      this.responseTime,
+      this.cacheStorageCacheName,
       this.protocol,
       @required this.securityState,
       this.securityDetails});
@@ -2127,6 +2184,17 @@ class ResponseData {
       timing: json.containsKey('timing')
           ? ResourceTiming.fromJson(json['timing'] as Map<String, dynamic>)
           : null,
+      serviceWorkerResponseSource:
+          json.containsKey('serviceWorkerResponseSource')
+              ? ServiceWorkerResponseSource.fromJson(
+                  json['serviceWorkerResponseSource'] as String)
+              : null,
+      responseTime: json.containsKey('responseTime')
+          ? TimeSinceEpoch.fromJson(json['responseTime'] as num)
+          : null,
+      cacheStorageCacheName: json.containsKey('cacheStorageCacheName')
+          ? json['cacheStorageCacheName'] as String
+          : null,
       protocol:
           json.containsKey('protocol') ? json['protocol'] as String : null,
       securityState:
@@ -2158,6 +2226,11 @@ class ResponseData {
       if (fromServiceWorker != null) 'fromServiceWorker': fromServiceWorker,
       if (fromPrefetchCache != null) 'fromPrefetchCache': fromPrefetchCache,
       if (timing != null) 'timing': timing.toJson(),
+      if (serviceWorkerResponseSource != null)
+        'serviceWorkerResponseSource': serviceWorkerResponseSource.toJson(),
+      if (responseTime != null) 'responseTime': responseTime.toJson(),
+      if (cacheStorageCacheName != null)
+        'cacheStorageCacheName': cacheStorageCacheName,
       if (protocol != null) 'protocol': protocol,
       if (securityDetails != null) 'securityDetails': securityDetails.toJson(),
     };

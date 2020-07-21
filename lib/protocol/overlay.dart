@@ -47,17 +47,21 @@ class OverlayApi {
   /// [nodeId] Id of the node to get highlight object for.
   /// [includeDistance] Whether to include distance info.
   /// [includeStyle] Whether to include style info.
-  /// [colorFormat] The color format to get config with (default: hex)
+  /// [colorFormat] The color format to get config with (default: hex).
+  /// [showAccessibilityInfo] Whether to show accessibility info (default: true).
   /// Returns: Highlight data for the node.
   Future<Map<String, dynamic>> getHighlightObjectForTest(dom.NodeId nodeId,
       {bool includeDistance,
       bool includeStyle,
-      ColorFormat colorFormat}) async {
+      ColorFormat colorFormat,
+      bool showAccessibilityInfo}) async {
     var result = await _client.send('Overlay.getHighlightObjectForTest', {
       'nodeId': nodeId,
       if (includeDistance != null) 'includeDistance': includeDistance,
       if (includeStyle != null) 'includeStyle': includeStyle,
       if (colorFormat != null) 'colorFormat': colorFormat,
+      if (showAccessibilityInfo != null)
+        'showAccessibilityInfo': showAccessibilityInfo,
     });
     return result['highlight'] as Map<String, dynamic>;
   }
@@ -232,6 +236,12 @@ class GridHighlightConfig {
   /// Whether the extension lines from grid cells to the rulers should be shown (default: false).
   final bool showGridExtensionLines;
 
+  /// Show Positive line number labels (default: false).
+  final bool showPositiveLineNumbers;
+
+  /// Show Negative line number labels (default: false).
+  final bool showNegativeLineNumbers;
+
   /// The grid container border highlight color (default: transparent).
   final dom.RGBA gridBorderColor;
 
@@ -258,6 +268,8 @@ class GridHighlightConfig {
 
   GridHighlightConfig(
       {this.showGridExtensionLines,
+      this.showPositiveLineNumbers,
+      this.showNegativeLineNumbers,
       this.gridBorderColor,
       this.cellBorderColor,
       this.gridBorderDash,
@@ -271,6 +283,12 @@ class GridHighlightConfig {
     return GridHighlightConfig(
       showGridExtensionLines: json.containsKey('showGridExtensionLines')
           ? json['showGridExtensionLines'] as bool
+          : null,
+      showPositiveLineNumbers: json.containsKey('showPositiveLineNumbers')
+          ? json['showPositiveLineNumbers'] as bool
+          : null,
+      showNegativeLineNumbers: json.containsKey('showNegativeLineNumbers')
+          ? json['showNegativeLineNumbers'] as bool
           : null,
       gridBorderColor: json.containsKey('gridBorderColor')
           ? dom.RGBA.fromJson(json['gridBorderColor'] as Map<String, dynamic>)
@@ -303,6 +321,10 @@ class GridHighlightConfig {
     return {
       if (showGridExtensionLines != null)
         'showGridExtensionLines': showGridExtensionLines,
+      if (showPositiveLineNumbers != null)
+        'showPositiveLineNumbers': showPositiveLineNumbers,
+      if (showNegativeLineNumbers != null)
+        'showNegativeLineNumbers': showNegativeLineNumbers,
       if (gridBorderColor != null) 'gridBorderColor': gridBorderColor.toJson(),
       if (cellBorderColor != null) 'cellBorderColor': cellBorderColor.toJson(),
       if (gridBorderDash != null) 'gridBorderDash': gridBorderDash,
@@ -326,6 +348,9 @@ class HighlightConfig {
 
   /// Whether the rulers should be shown (default: false).
   final bool showRulers;
+
+  /// Whether the a11y info should be shown (default: true).
+  final bool showAccessibilityInfo;
 
   /// Whether the extension lines from node to the rulers should be shown (default: false).
   final bool showExtensionLines;
@@ -364,6 +389,7 @@ class HighlightConfig {
       {this.showInfo,
       this.showStyles,
       this.showRulers,
+      this.showAccessibilityInfo,
       this.showExtensionLines,
       this.contentColor,
       this.paddingColor,
@@ -383,6 +409,9 @@ class HighlightConfig {
           json.containsKey('showStyles') ? json['showStyles'] as bool : null,
       showRulers:
           json.containsKey('showRulers') ? json['showRulers'] as bool : null,
+      showAccessibilityInfo: json.containsKey('showAccessibilityInfo')
+          ? json['showAccessibilityInfo'] as bool
+          : null,
       showExtensionLines: json.containsKey('showExtensionLines')
           ? json['showExtensionLines'] as bool
           : null,
@@ -425,6 +454,8 @@ class HighlightConfig {
       if (showInfo != null) 'showInfo': showInfo,
       if (showStyles != null) 'showStyles': showStyles,
       if (showRulers != null) 'showRulers': showRulers,
+      if (showAccessibilityInfo != null)
+        'showAccessibilityInfo': showAccessibilityInfo,
       if (showExtensionLines != null) 'showExtensionLines': showExtensionLines,
       if (contentColor != null) 'contentColor': contentColor.toJson(),
       if (paddingColor != null) 'paddingColor': paddingColor.toJson(),

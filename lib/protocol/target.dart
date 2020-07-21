@@ -107,11 +107,17 @@ class TargetApi {
   /// Creates a new empty BrowserContext. Similar to an incognito profile but you can have more than
   /// one.
   /// [disposeOnDetach] If specified, disposes this context when debugging session disconnects.
+  /// [proxyServer] Proxy server, similar to the one passed to --proxy-server
+  /// [proxyBypassList] Proxy bypass list, similar to the one passed to --proxy-bypass-list
   /// Returns: The id of the context created.
   Future<browser.BrowserContextID> createBrowserContext(
-      {bool disposeOnDetach}) async {
+      {bool disposeOnDetach,
+      String proxyServer,
+      String proxyBypassList}) async {
     var result = await _client.send('Target.createBrowserContext', {
       if (disposeOnDetach != null) 'disposeOnDetach': disposeOnDetach,
+      if (proxyServer != null) 'proxyServer': proxyServer,
+      if (proxyBypassList != null) 'proxyBypassList': proxyBypassList,
     });
     return browser.BrowserContextID.fromJson(
         result['browserContextId'] as String);
