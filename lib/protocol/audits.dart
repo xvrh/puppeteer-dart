@@ -488,6 +488,170 @@ class MixedContentIssueDetails {
   }
 }
 
+/// Enum indicating the reason a response has been blocked. These reasons are
+/// refinements of the net error BLOCKED_BY_RESPONSE.
+class BlockedByResponseReason {
+  static const coepFrameResourceNeedsCoepHeader =
+      BlockedByResponseReason._('CoepFrameResourceNeedsCoepHeader');
+  static const coopSandboxedIFrameCannotNavigateToCoopPage =
+      BlockedByResponseReason._('CoopSandboxedIFrameCannotNavigateToCoopPage');
+  static const corpNotSameOrigin =
+      BlockedByResponseReason._('CorpNotSameOrigin');
+  static const corpNotSameOriginAfterDefaultedToSameOriginByCoep =
+      BlockedByResponseReason._(
+          'CorpNotSameOriginAfterDefaultedToSameOriginByCoep');
+  static const corpNotSameSite = BlockedByResponseReason._('CorpNotSameSite');
+  static const values = {
+    'CoepFrameResourceNeedsCoepHeader': coepFrameResourceNeedsCoepHeader,
+    'CoopSandboxedIFrameCannotNavigateToCoopPage':
+        coopSandboxedIFrameCannotNavigateToCoopPage,
+    'CorpNotSameOrigin': corpNotSameOrigin,
+    'CorpNotSameOriginAfterDefaultedToSameOriginByCoep':
+        corpNotSameOriginAfterDefaultedToSameOriginByCoep,
+    'CorpNotSameSite': corpNotSameSite,
+  };
+
+  final String value;
+
+  const BlockedByResponseReason._(this.value);
+
+  factory BlockedByResponseReason.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is BlockedByResponseReason && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Details for a request that has been blocked with the BLOCKED_BY_RESPONSE
+/// code. Currently only used for COEP/COOP, but may be extended to include
+/// some CSP errors in the future.
+class BlockedByResponseIssueDetails {
+  final AffectedRequest request;
+
+  final AffectedFrame frame;
+
+  final BlockedByResponseReason reason;
+
+  BlockedByResponseIssueDetails(
+      {@required this.request, this.frame, @required this.reason});
+
+  factory BlockedByResponseIssueDetails.fromJson(Map<String, dynamic> json) {
+    return BlockedByResponseIssueDetails(
+      request:
+          AffectedRequest.fromJson(json['request'] as Map<String, dynamic>),
+      frame: json.containsKey('frame')
+          ? AffectedFrame.fromJson(json['frame'] as Map<String, dynamic>)
+          : null,
+      reason: BlockedByResponseReason.fromJson(json['reason'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'request': request.toJson(),
+      'reason': reason.toJson(),
+      if (frame != null) 'frame': frame.toJson(),
+    };
+  }
+}
+
+class HeavyAdResolutionStatus {
+  static const heavyAdBlocked = HeavyAdResolutionStatus._('HeavyAdBlocked');
+  static const heavyAdWarning = HeavyAdResolutionStatus._('HeavyAdWarning');
+  static const values = {
+    'HeavyAdBlocked': heavyAdBlocked,
+    'HeavyAdWarning': heavyAdWarning,
+  };
+
+  final String value;
+
+  const HeavyAdResolutionStatus._(this.value);
+
+  factory HeavyAdResolutionStatus.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is HeavyAdResolutionStatus && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class HeavyAdReason {
+  static const networkTotalLimit = HeavyAdReason._('NetworkTotalLimit');
+  static const cpuTotalLimit = HeavyAdReason._('CpuTotalLimit');
+  static const cpuPeakLimit = HeavyAdReason._('CpuPeakLimit');
+  static const values = {
+    'NetworkTotalLimit': networkTotalLimit,
+    'CpuTotalLimit': cpuTotalLimit,
+    'CpuPeakLimit': cpuPeakLimit,
+  };
+
+  final String value;
+
+  const HeavyAdReason._(this.value);
+
+  factory HeavyAdReason.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is HeavyAdReason && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class HeavyAdIssueDetails {
+  /// The resolution status, either blocking the content or warning.
+  final HeavyAdResolutionStatus resolution;
+
+  /// The reason the ad was blocked, total network or cpu or peak cpu.
+  final HeavyAdReason reason;
+
+  /// The frame that was blocked.
+  final AffectedFrame frame;
+
+  HeavyAdIssueDetails(
+      {@required this.resolution, @required this.reason, @required this.frame});
+
+  factory HeavyAdIssueDetails.fromJson(Map<String, dynamic> json) {
+    return HeavyAdIssueDetails(
+      resolution:
+          HeavyAdResolutionStatus.fromJson(json['resolution'] as String),
+      reason: HeavyAdReason.fromJson(json['reason'] as String),
+      frame: AffectedFrame.fromJson(json['frame'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'resolution': resolution.toJson(),
+      'reason': reason.toJson(),
+      'frame': frame.toJson(),
+    };
+  }
+}
+
 /// A unique identifier for the type of issue. Each type may use one of the
 /// optional fields in InspectorIssueDetails to convey more specific
 /// information about the kind of issue.
@@ -495,9 +659,14 @@ class InspectorIssueCode {
   static const sameSiteCookieIssue =
       InspectorIssueCode._('SameSiteCookieIssue');
   static const mixedContentIssue = InspectorIssueCode._('MixedContentIssue');
+  static const blockedByResponseIssue =
+      InspectorIssueCode._('BlockedByResponseIssue');
+  static const heavyAdIssue = InspectorIssueCode._('HeavyAdIssue');
   static const values = {
     'SameSiteCookieIssue': sameSiteCookieIssue,
     'MixedContentIssue': mixedContentIssue,
+    'BlockedByResponseIssue': blockedByResponseIssue,
+    'HeavyAdIssue': heavyAdIssue,
   };
 
   final String value;
@@ -527,8 +696,15 @@ class InspectorIssueDetails {
 
   final MixedContentIssueDetails mixedContentIssueDetails;
 
+  final BlockedByResponseIssueDetails blockedByResponseIssueDetails;
+
+  final HeavyAdIssueDetails heavyAdIssueDetails;
+
   InspectorIssueDetails(
-      {this.sameSiteCookieIssueDetails, this.mixedContentIssueDetails});
+      {this.sameSiteCookieIssueDetails,
+      this.mixedContentIssueDetails,
+      this.blockedByResponseIssueDetails,
+      this.heavyAdIssueDetails});
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
     return InspectorIssueDetails(
@@ -540,6 +716,15 @@ class InspectorIssueDetails {
           ? MixedContentIssueDetails.fromJson(
               json['mixedContentIssueDetails'] as Map<String, dynamic>)
           : null,
+      blockedByResponseIssueDetails:
+          json.containsKey('blockedByResponseIssueDetails')
+              ? BlockedByResponseIssueDetails.fromJson(
+                  json['blockedByResponseIssueDetails'] as Map<String, dynamic>)
+              : null,
+      heavyAdIssueDetails: json.containsKey('heavyAdIssueDetails')
+          ? HeavyAdIssueDetails.fromJson(
+              json['heavyAdIssueDetails'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -549,6 +734,10 @@ class InspectorIssueDetails {
         'sameSiteCookieIssueDetails': sameSiteCookieIssueDetails.toJson(),
       if (mixedContentIssueDetails != null)
         'mixedContentIssueDetails': mixedContentIssueDetails.toJson(),
+      if (blockedByResponseIssueDetails != null)
+        'blockedByResponseIssueDetails': blockedByResponseIssueDetails.toJson(),
+      if (heavyAdIssueDetails != null)
+        'heavyAdIssueDetails': heavyAdIssueDetails.toJson(),
     };
   }
 }

@@ -623,6 +623,12 @@ class CSSStyleSheetHeader {
   /// document.written STYLE tags.
   final bool isInline;
 
+  /// Whether this stylesheet is mutable. Inline stylesheets become mutable
+  /// after they have been modified via CSSOM API.
+  /// <link> element's stylesheets are never mutable. Constructed stylesheets
+  /// (new CSSStyleSheet()) are mutable immediately after creation.
+  final bool isMutable;
+
   /// Line offset of the stylesheet within the resource (zero based).
   final num startLine;
 
@@ -649,6 +655,7 @@ class CSSStyleSheetHeader {
       @required this.disabled,
       this.hasSourceURL,
       @required this.isInline,
+      @required this.isMutable,
       @required this.startLine,
       @required this.startColumn,
       @required this.length,
@@ -673,6 +680,7 @@ class CSSStyleSheetHeader {
           ? json['hasSourceURL'] as bool
           : null,
       isInline: json['isInline'] as bool,
+      isMutable: json['isMutable'] as bool,
       startLine: json['startLine'] as num,
       startColumn: json['startColumn'] as num,
       length: json['length'] as num,
@@ -690,6 +698,7 @@ class CSSStyleSheetHeader {
       'title': title,
       'disabled': disabled,
       'isInline': isInline,
+      'isMutable': isMutable,
       'startLine': startLine,
       'startColumn': startColumn,
       'length': length,

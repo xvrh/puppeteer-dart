@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.19.0 (2020-07-21)
+- Update Chromium to version 85
+
 # 1.18.0 (2020-07-16)
 - Update Chromium to version 84
 - Add `Mouse.wheel`

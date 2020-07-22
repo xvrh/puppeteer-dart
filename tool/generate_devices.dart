@@ -57,7 +57,7 @@ void main() async {
   buffer.writeln('Map<String, Device> _all;');
   buffer.writeln('Devices._() {');
   buffer.writeln(
-      '_all = CanonicalizedMap<String, String, Device>.from({$allNamesMap}, '
+      '_all = CanonicalizedMap<String, String, Device>.from({$allNamesMap,}, '
       "(key) => key.replaceAll(' ', '').toLowerCase(), isValidKey: (key) => key != null);");
   buffer.writeln('}');
   buffer.writeln();

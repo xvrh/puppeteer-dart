@@ -167,6 +167,10 @@ class RuntimeApi {
   /// [replMode] Setting this flag to true enables `let` re-declaration and top-level `await`.
   /// Note that `let` variables can only be re-declared if they originate from
   /// `replMode` themselves.
+  /// [allowUnsafeEvalBlockedByCSP] The Content Security Policy (CSP) for the target might block 'unsafe-eval'
+  /// which includes eval(), Function(), setTimeout() and setInterval()
+  /// when called with non-callable arguments. This flag bypasses CSP for this
+  /// evaluation and allows unsafe-eval. Defaults to true.
   Future<EvaluateResult> evaluate(String expression,
       {String objectGroup,
       bool includeCommandLineAPI,
@@ -179,7 +183,8 @@ class RuntimeApi {
       bool throwOnSideEffect,
       TimeDelta timeout,
       bool disableBreaks,
-      bool replMode}) async {
+      bool replMode,
+      bool allowUnsafeEvalBlockedByCSP}) async {
     var result = await _client.send('Runtime.evaluate', {
       'expression': expression,
       if (objectGroup != null) 'objectGroup': objectGroup,
@@ -195,6 +200,8 @@ class RuntimeApi {
       if (timeout != null) 'timeout': timeout,
       if (disableBreaks != null) 'disableBreaks': disableBreaks,
       if (replMode != null) 'replMode': replMode,
+      if (allowUnsafeEvalBlockedByCSP != null)
+        'allowUnsafeEvalBlockedByCSP': allowUnsafeEvalBlockedByCSP,
     });
     return EvaluateResult.fromJson(result);
   }
@@ -861,7 +868,7 @@ class RemoteObjectSubtype {
   static const f32 = RemoteObjectSubtype._('f32');
   static const f64 = RemoteObjectSubtype._('f64');
   static const v128 = RemoteObjectSubtype._('v128');
-  static const anyref = RemoteObjectSubtype._('anyref');
+  static const externref = RemoteObjectSubtype._('externref');
   static const values = {
     'array': array,
     'null': null$,
@@ -885,7 +892,7 @@ class RemoteObjectSubtype {
     'f32': f32,
     'f64': f64,
     'v128': v128,
-    'anyref': anyref,
+    'externref': externref,
   };
 
   final String value;

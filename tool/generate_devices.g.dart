@@ -14,8 +14,9 @@ Module _$ModuleFromJson(Map<String, dynamic> json) {
         ?.toList();
 }
 
-Map<String, dynamic> _$ModuleToJson(Module instance) =>
-    <String, dynamic>{'extensions': instance.extensions};
+Map<String, dynamic> _$ModuleToJson(Module instance) => <String, dynamic>{
+      'extensions': instance.extensions,
+    };
 
 Extension _$ExtensionFromJson(Map<String, dynamic> json) {
   return Extension()
@@ -29,7 +30,7 @@ Extension _$ExtensionFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$ExtensionToJson(Extension instance) => <String, dynamic>{
       'type': instance.type,
       'order': instance.order,
-      'device': instance.device
+      'device': instance.device,
     };
 
 Device _$DeviceFromJson(Map<String, dynamic> json) {
@@ -49,7 +50,7 @@ Map<String, dynamic> _$DeviceToJson(Device instance) => <String, dynamic>{
       'capabilities': instance.capabilities,
       'user-agent': instance.userAgent,
       'type': instance.type,
-      'screen': instance.screen
+      'screen': instance.screen,
     };
 
 Screen _$ScreenFromJson(Map<String, dynamic> json) {
@@ -66,7 +67,7 @@ Screen _$ScreenFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$ScreenToJson(Screen instance) => <String, dynamic>{
       'device-pixel-ratio': instance.devicePixelRatio,
       'horizontal': instance.horizontal,
-      'vertical': instance.vertical
+      'vertical': instance.vertical,
     };
 
 ScreenOrientation _$ScreenOrientationFromJson(Map<String, dynamic> json) {
@@ -76,4 +77,7 @@ ScreenOrientation _$ScreenOrientationFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$ScreenOrientationToJson(ScreenOrientation instance) =>
-    <String, dynamic>{'width': instance.width, 'height': instance.height};
+    <String, dynamic>{
+      'width': instance.width,
+      'height': instance.height,
+    };
