@@ -93,6 +93,16 @@ class WebAuthnApi {
       'isUserVerified': isUserVerified,
     });
   }
+
+  /// Sets whether tests of user presence will succeed immediately (if true) or fail to resolve (if false) for an authenticator.
+  /// The default is true.
+  Future<void> setAutomaticPresenceSimulation(
+      AuthenticatorId authenticatorId, bool enabled) async {
+    await _client.send('WebAuthn.setAutomaticPresenceSimulation', {
+      'authenticatorId': authenticatorId,
+      'enabled': enabled,
+    });
+  }
 }
 
 class AuthenticatorId {

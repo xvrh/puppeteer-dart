@@ -263,11 +263,14 @@ class DOMApi {
   }
 
   /// Returns the root DOM node (and optionally the subtree) to the caller.
+  /// Deprecated, as it is not designed to work well with the rest of the DOM agent.
+  /// Use DOMSnapshot.captureSnapshot instead.
   /// [depth] The maximum depth at which children should be retrieved, defaults to 1. Use -1 for the
   /// entire subtree or provide an integer larger than 0.
   /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the subtree
   /// (default is false).
   /// Returns: Resulting node.
+  @deprecated
   Future<List<Node>> getFlattenedDocument({int depth, bool pierce}) async {
     var result = await _client.send('DOM.getFlattenedDocument', {
       if (depth != null) 'depth': depth,
@@ -275,6 +278,25 @@ class DOMApi {
     });
     return (result['nodes'] as List)
         .map((e) => Node.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Finds nodes with a given computed style in a subtree.
+  /// [nodeId] Node ID pointing to the root of a subtree.
+  /// [computedStyles] The style to filter nodes by (includes nodes if any of properties matches).
+  /// [pierce] Whether or not iframes and shadow roots in the same target should be traversed when returning the
+  /// results (default is false).
+  /// Returns: Resulting nodes.
+  Future<List<NodeId>> getNodesForSubtreeByStyle(
+      NodeId nodeId, List<CSSComputedStyleProperty> computedStyles,
+      {bool pierce}) async {
+    var result = await _client.send('DOM.getNodesForSubtreeByStyle', {
+      'nodeId': nodeId,
+      'computedStyles': [...computedStyles],
+      if (pierce != null) 'pierce': pierce,
+    });
+    return (result['nodeIds'] as List)
+        .map((e) => NodeId.fromJson(e as int))
         .toList();
   }
 
@@ -1509,6 +1531,30 @@ class Rect {
       'y': y,
       'width': width,
       'height': height,
+    };
+  }
+}
+
+class CSSComputedStyleProperty {
+  /// Computed style property name.
+  final String name;
+
+  /// Computed style property value.
+  final String value;
+
+  CSSComputedStyleProperty({@required this.name, @required this.value});
+
+  factory CSSComputedStyleProperty.fromJson(Map<String, dynamic> json) {
+    return CSSComputedStyleProperty(
+      name: json['name'] as String,
+      value: json['value'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'value': value,
     };
   }
 }

@@ -263,5 +263,13 @@ void main() {
       expect(frame2.isDetached, isFalse);
       expect(frame1, isNot(equals(frame2)));
     });
+    test('should support url fragment', () async {
+      await page.goto(server.prefix + '/frames/one-frame-url-fragment.html');
+
+      expect(page.frames.length, 2);
+      expect(page.frames[1].url,
+          server.prefix + '/frames/frame.html&test=fragment');
+      print(page.frames[1].url);
+    });
   });
 }

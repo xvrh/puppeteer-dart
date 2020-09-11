@@ -909,7 +909,7 @@ class Frame {
 
   void _navigated(FrameInfo framePayload) {
     _name = framePayload.name;
-    _url = framePayload.url;
+    _url = '${framePayload.url}${framePayload.urlFragment ?? ''}';
   }
 
   void _navigatedWithinDocument(String url) {

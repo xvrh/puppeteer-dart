@@ -548,7 +548,7 @@ class _InternalType {
         for (var property in requireds) {
           code.writeln("'${property.name}': ${_toJsonCode(property)},");
         }
-        for (var property in optionals) {
+        for (var property in optionals.where((p) => !p.deprecated)) {
           code.writeln('if (${property.normalizedName} != null) ');
           code.writeln("'${property.name}' : ${_toJsonCode(property)},");
         }

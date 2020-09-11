@@ -405,9 +405,12 @@ class DebuggerApi {
   /// Steps into the function call.
   /// [breakOnAsyncCall] Debugger will pause on the execution of the first async task which was scheduled
   /// before next pause.
-  Future<void> stepInto({bool breakOnAsyncCall}) async {
+  /// [skipList] The skipList specifies location ranges that should be skipped on step into.
+  Future<void> stepInto(
+      {bool breakOnAsyncCall, List<LocationRange> skipList}) async {
     await _client.send('Debugger.stepInto', {
       if (breakOnAsyncCall != null) 'breakOnAsyncCall': breakOnAsyncCall,
+      if (skipList != null) 'skipList': [...skipList],
     });
   }
 
@@ -417,8 +420,11 @@ class DebuggerApi {
   }
 
   /// Steps over the statement.
-  Future<void> stepOver() async {
-    await _client.send('Debugger.stepOver');
+  /// [skipList] The skipList specifies location ranges that should be skipped on step over.
+  Future<void> stepOver({List<LocationRange> skipList}) async {
+    await _client.send('Debugger.stepOver', {
+      if (skipList != null) 'skipList': [...skipList],
+    });
   }
 }
 
@@ -540,6 +546,9 @@ class ScriptFailedToParseEvent {
   /// The language of the script.
   final debugger.ScriptLanguage scriptLanguage;
 
+  /// The name the embedder supplied for this script.
+  final String embedderName;
+
   ScriptFailedToParseEvent(
       {@required this.scriptId,
       @required this.url,
@@ -556,7 +565,8 @@ class ScriptFailedToParseEvent {
       this.length,
       this.stackTrace,
       this.codeOffset,
-      this.scriptLanguage});
+      this.scriptLanguage,
+      this.embedderName});
 
   factory ScriptFailedToParseEvent.fromJson(Map<String, dynamic> json) {
     return ScriptFailedToParseEvent(
@@ -588,6 +598,9 @@ class ScriptFailedToParseEvent {
           json.containsKey('codeOffset') ? json['codeOffset'] as int : null,
       scriptLanguage: json.containsKey('scriptLanguage')
           ? debugger.ScriptLanguage.fromJson(json['scriptLanguage'] as String)
+          : null,
+      embedderName: json.containsKey('embedderName')
+          ? json['embedderName'] as String
           : null,
     );
   }
@@ -648,6 +661,9 @@ class ScriptParsedEvent {
   /// If the scriptLanguage is WebASsembly, the source of debug symbols for the module.
   final debugger.DebugSymbols debugSymbols;
 
+  /// The name the embedder supplied for this script.
+  final String embedderName;
+
   ScriptParsedEvent(
       {@required this.scriptId,
       @required this.url,
@@ -666,7 +682,8 @@ class ScriptParsedEvent {
       this.stackTrace,
       this.codeOffset,
       this.scriptLanguage,
-      this.debugSymbols});
+      this.debugSymbols,
+      this.embedderName});
 
   factory ScriptParsedEvent.fromJson(Map<String, dynamic> json) {
     return ScriptParsedEvent(
@@ -704,6 +721,9 @@ class ScriptParsedEvent {
       debugSymbols: json.containsKey('debugSymbols')
           ? debugger.DebugSymbols.fromJson(
               json['debugSymbols'] as Map<String, dynamic>)
+          : null,
+      embedderName: json.containsKey('embedderName')
+          ? json['embedderName'] as String
           : null,
     );
   }
@@ -982,6 +1002,34 @@ class ScriptPosition {
     return {
       'lineNumber': lineNumber,
       'columnNumber': columnNumber,
+    };
+  }
+}
+
+/// Location range within one script.
+class LocationRange {
+  final runtime.ScriptId scriptId;
+
+  final ScriptPosition start;
+
+  final ScriptPosition end;
+
+  LocationRange(
+      {@required this.scriptId, @required this.start, @required this.end});
+
+  factory LocationRange.fromJson(Map<String, dynamic> json) {
+    return LocationRange(
+      scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
+      start: ScriptPosition.fromJson(json['start'] as Map<String, dynamic>),
+      end: ScriptPosition.fromJson(json['end'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'scriptId': scriptId.toJson(),
+      'start': start.toJson(),
+      'end': end.toJson(),
     };
   }
 }

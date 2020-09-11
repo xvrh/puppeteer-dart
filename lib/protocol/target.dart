@@ -382,6 +382,9 @@ class TargetInfo {
   /// Opener target Id
   final TargetID openerId;
 
+  /// Whether the opened window has access to the originating window.
+  final bool canAccessOpener;
+
   final browser.BrowserContextID browserContextId;
 
   TargetInfo(
@@ -391,6 +394,7 @@ class TargetInfo {
       @required this.url,
       @required this.attached,
       this.openerId,
+      @required this.canAccessOpener,
       this.browserContextId});
 
   factory TargetInfo.fromJson(Map<String, dynamic> json) {
@@ -403,6 +407,7 @@ class TargetInfo {
       openerId: json.containsKey('openerId')
           ? TargetID.fromJson(json['openerId'] as String)
           : null,
+      canAccessOpener: json['canAccessOpener'] as bool,
       browserContextId: json.containsKey('browserContextId')
           ? browser.BrowserContextID.fromJson(
               json['browserContextId'] as String)
@@ -417,6 +422,7 @@ class TargetInfo {
       'title': title,
       'url': url,
       'attached': attached,
+      'canAccessOpener': canAccessOpener,
       if (openerId != null) 'openerId': openerId.toJson(),
       if (browserContextId != null)
         'browserContextId': browserContextId.toJson(),

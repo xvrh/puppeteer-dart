@@ -158,6 +158,26 @@
                     ]
                 },
                 {
+                    "id": "LocationRange",
+                    "description": "Location range within one script.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "scriptId",
+                            "$ref": "Runtime.ScriptId"
+                        },
+                        {
+                            "name": "start",
+                            "$ref": "ScriptPosition"
+                        },
+                        {
+                            "name": "end",
+                            "$ref": "ScriptPosition"
+                        }
+                    ]
+                },
+                {
                     "id": "CallFrame",
                     "description": "JavaScript call frame. Array of call frames form the call stack.",
                     "type": "object",
@@ -1018,6 +1038,16 @@
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "skipList",
+                            "description": "The skipList specifies location ranges that should be skipped on step into.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "LocationRange"
+                            }
                         }
                     ]
                 },
@@ -1027,7 +1057,19 @@
                 },
                 {
                     "name": "stepOver",
-                    "description": "Steps over the statement."
+                    "description": "Steps over the statement.",
+                    "parameters": [
+                        {
+                            "name": "skipList",
+                            "description": "The skipList specifies location ranges that should be skipped on step over.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "LocationRange"
+                            }
+                        }
+                    ]
                 }
             ],
             "events": [
@@ -1213,6 +1255,13 @@
                             "experimental": true,
                             "optional": true,
                             "$ref": "Debugger.ScriptLanguage"
+                        },
+                        {
+                            "name": "embedderName",
+                            "description": "The name the embedder supplied for this script.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "string"
                         }
                     ]
                 },
@@ -1324,6 +1373,13 @@
                             "experimental": true,
                             "optional": true,
                             "$ref": "Debugger.DebugSymbols"
+                        },
+                        {
+                            "name": "embedderName",
+                            "description": "The name the embedder supplied for this script.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "string"
                         }
                     ]
                 }
@@ -1871,6 +1927,29 @@
                             "type": "integer"
                         }
                     ]
+                },
+                {
+                    "id": "RuntimeCallCounterInfo",
+                    "description": "Runtime call counter information.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "description": "Counter name.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "value",
+                            "description": "Counter value.",
+                            "type": "number"
+                        },
+                        {
+                            "name": "time",
+                            "description": "Counter time in seconds.",
+                            "type": "number"
+                        }
+                    ]
                 }
             ],
             "commands": [
@@ -1998,6 +2077,31 @@
                     ]
                 },
                 {
+                    "name": "enableCounters",
+                    "description": "Enable counters collection.",
+                    "experimental": true
+                },
+                {
+                    "name": "disableCounters",
+                    "description": "Disable counters collection.",
+                    "experimental": true
+                },
+                {
+                    "name": "getCounters",
+                    "description": "Retrieve counters.",
+                    "experimental": true,
+                    "returns": [
+                        {
+                            "name": "result",
+                            "description": "Collected counters information.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "CounterInfo"
+                            }
+                        }
+                    ]
+                },
+                {
                     "name": "enableRuntimeCallStats",
                     "description": "Enable run time call stats collection.",
                     "experimental": true
@@ -2014,10 +2118,10 @@
                     "returns": [
                         {
                             "name": "result",
-                            "description": "Collected counter information.",
+                            "description": "Collected runtime call counter information.",
                             "type": "array",
                             "items": {
-                                "$ref": "CounterInfo"
+                                "$ref": "RuntimeCallCounterInfo"
                             }
                         }
                     ]

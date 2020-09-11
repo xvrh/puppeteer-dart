@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
+import 'dom.dart' as dom;
 import 'network.dart' as network;
 import 'page.dart' as page;
 
@@ -147,10 +148,16 @@ class SameSiteCookieExclusionReason {
       SameSiteCookieExclusionReason._('ExcludeSameSiteUnspecifiedTreatedAsLax');
   static const excludeSameSiteNoneInsecure =
       SameSiteCookieExclusionReason._('ExcludeSameSiteNoneInsecure');
+  static const excludeSameSiteLax =
+      SameSiteCookieExclusionReason._('ExcludeSameSiteLax');
+  static const excludeSameSiteStrict =
+      SameSiteCookieExclusionReason._('ExcludeSameSiteStrict');
   static const values = {
     'ExcludeSameSiteUnspecifiedTreatedAsLax':
         excludeSameSiteUnspecifiedTreatedAsLax,
     'ExcludeSameSiteNoneInsecure': excludeSameSiteNoneInsecure,
+    'ExcludeSameSiteLax': excludeSameSiteLax,
+    'ExcludeSameSiteStrict': excludeSameSiteStrict,
   };
 
   final String value;
@@ -537,19 +544,27 @@ class BlockedByResponseReason {
 class BlockedByResponseIssueDetails {
   final AffectedRequest request;
 
-  final AffectedFrame frame;
+  final AffectedFrame parentFrame;
+
+  final AffectedFrame blockedFrame;
 
   final BlockedByResponseReason reason;
 
   BlockedByResponseIssueDetails(
-      {@required this.request, this.frame, @required this.reason});
+      {@required this.request,
+      this.parentFrame,
+      this.blockedFrame,
+      @required this.reason});
 
   factory BlockedByResponseIssueDetails.fromJson(Map<String, dynamic> json) {
     return BlockedByResponseIssueDetails(
       request:
           AffectedRequest.fromJson(json['request'] as Map<String, dynamic>),
-      frame: json.containsKey('frame')
-          ? AffectedFrame.fromJson(json['frame'] as Map<String, dynamic>)
+      parentFrame: json.containsKey('parentFrame')
+          ? AffectedFrame.fromJson(json['parentFrame'] as Map<String, dynamic>)
+          : null,
+      blockedFrame: json.containsKey('blockedFrame')
+          ? AffectedFrame.fromJson(json['blockedFrame'] as Map<String, dynamic>)
           : null,
       reason: BlockedByResponseReason.fromJson(json['reason'] as String),
     );
@@ -559,7 +574,8 @@ class BlockedByResponseIssueDetails {
     return {
       'request': request.toJson(),
       'reason': reason.toJson(),
-      if (frame != null) 'frame': frame.toJson(),
+      if (parentFrame != null) 'parentFrame': parentFrame.toJson(),
+      if (blockedFrame != null) 'blockedFrame': blockedFrame.toJson(),
     };
   }
 }
@@ -652,6 +668,135 @@ class HeavyAdIssueDetails {
   }
 }
 
+class ContentSecurityPolicyViolationType {
+  static const kInlineViolation =
+      ContentSecurityPolicyViolationType._('kInlineViolation');
+  static const kEvalViolation =
+      ContentSecurityPolicyViolationType._('kEvalViolation');
+  static const kUrlViolation =
+      ContentSecurityPolicyViolationType._('kURLViolation');
+  static const kTrustedTypesSinkViolation =
+      ContentSecurityPolicyViolationType._('kTrustedTypesSinkViolation');
+  static const kTrustedTypesPolicyViolation =
+      ContentSecurityPolicyViolationType._('kTrustedTypesPolicyViolation');
+  static const values = {
+    'kInlineViolation': kInlineViolation,
+    'kEvalViolation': kEvalViolation,
+    'kURLViolation': kUrlViolation,
+    'kTrustedTypesSinkViolation': kTrustedTypesSinkViolation,
+    'kTrustedTypesPolicyViolation': kTrustedTypesPolicyViolation,
+  };
+
+  final String value;
+
+  const ContentSecurityPolicyViolationType._(this.value);
+
+  factory ContentSecurityPolicyViolationType.fromJson(String value) =>
+      values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ContentSecurityPolicyViolationType && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class SourceCodeLocation {
+  final String url;
+
+  final int lineNumber;
+
+  final int columnNumber;
+
+  SourceCodeLocation(
+      {@required this.url,
+      @required this.lineNumber,
+      @required this.columnNumber});
+
+  factory SourceCodeLocation.fromJson(Map<String, dynamic> json) {
+    return SourceCodeLocation(
+      url: json['url'] as String,
+      lineNumber: json['lineNumber'] as int,
+      columnNumber: json['columnNumber'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      'lineNumber': lineNumber,
+      'columnNumber': columnNumber,
+    };
+  }
+}
+
+class ContentSecurityPolicyIssueDetails {
+  /// The url not included in allowed sources.
+  final String blockedURL;
+
+  /// Specific directive that is violated, causing the CSP issue.
+  final String violatedDirective;
+
+  final ContentSecurityPolicyViolationType contentSecurityPolicyViolationType;
+
+  final AffectedFrame frameAncestor;
+
+  final SourceCodeLocation sourceCodeLocation;
+
+  final dom.BackendNodeId violatingNodeId;
+
+  ContentSecurityPolicyIssueDetails(
+      {this.blockedURL,
+      @required this.violatedDirective,
+      @required this.contentSecurityPolicyViolationType,
+      this.frameAncestor,
+      this.sourceCodeLocation,
+      this.violatingNodeId});
+
+  factory ContentSecurityPolicyIssueDetails.fromJson(
+      Map<String, dynamic> json) {
+    return ContentSecurityPolicyIssueDetails(
+      blockedURL:
+          json.containsKey('blockedURL') ? json['blockedURL'] as String : null,
+      violatedDirective: json['violatedDirective'] as String,
+      contentSecurityPolicyViolationType:
+          ContentSecurityPolicyViolationType.fromJson(
+              json['contentSecurityPolicyViolationType'] as String),
+      frameAncestor: json.containsKey('frameAncestor')
+          ? AffectedFrame.fromJson(
+              json['frameAncestor'] as Map<String, dynamic>)
+          : null,
+      sourceCodeLocation: json.containsKey('sourceCodeLocation')
+          ? SourceCodeLocation.fromJson(
+              json['sourceCodeLocation'] as Map<String, dynamic>)
+          : null,
+      violatingNodeId: json.containsKey('violatingNodeId')
+          ? dom.BackendNodeId.fromJson(json['violatingNodeId'] as int)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'violatedDirective': violatedDirective,
+      'contentSecurityPolicyViolationType':
+          contentSecurityPolicyViolationType.toJson(),
+      if (blockedURL != null) 'blockedURL': blockedURL,
+      if (frameAncestor != null) 'frameAncestor': frameAncestor.toJson(),
+      if (sourceCodeLocation != null)
+        'sourceCodeLocation': sourceCodeLocation.toJson(),
+      if (violatingNodeId != null) 'violatingNodeId': violatingNodeId.toJson(),
+    };
+  }
+}
+
 /// A unique identifier for the type of issue. Each type may use one of the
 /// optional fields in InspectorIssueDetails to convey more specific
 /// information about the kind of issue.
@@ -662,11 +807,14 @@ class InspectorIssueCode {
   static const blockedByResponseIssue =
       InspectorIssueCode._('BlockedByResponseIssue');
   static const heavyAdIssue = InspectorIssueCode._('HeavyAdIssue');
+  static const contentSecurityPolicyIssue =
+      InspectorIssueCode._('ContentSecurityPolicyIssue');
   static const values = {
     'SameSiteCookieIssue': sameSiteCookieIssue,
     'MixedContentIssue': mixedContentIssue,
     'BlockedByResponseIssue': blockedByResponseIssue,
     'HeavyAdIssue': heavyAdIssue,
+    'ContentSecurityPolicyIssue': contentSecurityPolicyIssue,
   };
 
   final String value;
@@ -700,11 +848,14 @@ class InspectorIssueDetails {
 
   final HeavyAdIssueDetails heavyAdIssueDetails;
 
+  final ContentSecurityPolicyIssueDetails contentSecurityPolicyIssueDetails;
+
   InspectorIssueDetails(
       {this.sameSiteCookieIssueDetails,
       this.mixedContentIssueDetails,
       this.blockedByResponseIssueDetails,
-      this.heavyAdIssueDetails});
+      this.heavyAdIssueDetails,
+      this.contentSecurityPolicyIssueDetails});
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
     return InspectorIssueDetails(
@@ -725,6 +876,11 @@ class InspectorIssueDetails {
           ? HeavyAdIssueDetails.fromJson(
               json['heavyAdIssueDetails'] as Map<String, dynamic>)
           : null,
+      contentSecurityPolicyIssueDetails: json
+              .containsKey('contentSecurityPolicyIssueDetails')
+          ? ContentSecurityPolicyIssueDetails.fromJson(
+              json['contentSecurityPolicyIssueDetails'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -738,6 +894,9 @@ class InspectorIssueDetails {
         'blockedByResponseIssueDetails': blockedByResponseIssueDetails.toJson(),
       if (heavyAdIssueDetails != null)
         'heavyAdIssueDetails': heavyAdIssueDetails.toJson(),
+      if (contentSecurityPolicyIssueDetails != null)
+        'contentSecurityPolicyIssueDetails':
+            contentSecurityPolicyIssueDetails.toJson(),
     };
   }
 }

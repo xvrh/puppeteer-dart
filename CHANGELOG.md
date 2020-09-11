@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.20.0 (2020-09-11)
+- Update Chromium to version 86
+
 # 1.19.0 (2020-07-21)
 - Update Chromium to version 85
 

@@ -1252,6 +1252,101 @@ class FrameId {
   String toString() => value.toString();
 }
 
+/// Indicates whether a frame has been identified as an ad.
+class AdFrameType {
+  static const none = AdFrameType._('none');
+  static const child = AdFrameType._('child');
+  static const root = AdFrameType._('root');
+  static const values = {
+    'none': none,
+    'child': child,
+    'root': root,
+  };
+
+  final String value;
+
+  const AdFrameType._(this.value);
+
+  factory AdFrameType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is AdFrameType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Indicates whether the frame is a secure context and why it is the case.
+class SecureContextType {
+  static const secure = SecureContextType._('Secure');
+  static const secureLocalhost = SecureContextType._('SecureLocalhost');
+  static const insecureScheme = SecureContextType._('InsecureScheme');
+  static const insecureAncestor = SecureContextType._('InsecureAncestor');
+  static const values = {
+    'Secure': secure,
+    'SecureLocalhost': secureLocalhost,
+    'InsecureScheme': insecureScheme,
+    'InsecureAncestor': insecureAncestor,
+  };
+
+  final String value;
+
+  const SecureContextType._(this.value);
+
+  factory SecureContextType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is SecureContextType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Indicates whether the frame is cross-origin isolated and why it is the case.
+class CrossOriginIsolatedContextType {
+  static const isolated = CrossOriginIsolatedContextType._('Isolated');
+  static const notIsolated = CrossOriginIsolatedContextType._('NotIsolated');
+  static const notIsolatedFeatureDisabled =
+      CrossOriginIsolatedContextType._('NotIsolatedFeatureDisabled');
+  static const values = {
+    'Isolated': isolated,
+    'NotIsolated': notIsolated,
+    'NotIsolatedFeatureDisabled': notIsolatedFeatureDisabled,
+  };
+
+  final String value;
+
+  const CrossOriginIsolatedContextType._(this.value);
+
+  factory CrossOriginIsolatedContextType.fromJson(String value) =>
+      values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is CrossOriginIsolatedContextType && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Information about the Frame on the page.
 class FrameInfo {
   /// Frame unique identifier.
@@ -1272,6 +1367,12 @@ class FrameInfo {
   /// Frame document's URL fragment including the '#'.
   final String urlFragment;
 
+  /// Frame document's registered domain, taking the public suffixes list into account.
+  /// Extracted from the Frame's url.
+  /// Example URLs: http://www.google.com/file.html -> "google.com"
+  ///               http://a.b.co.uk/file.html      -> "b.co.uk"
+  final String domainAndRegistry;
+
   /// Frame document's security origin.
   final String securityOrigin;
 
@@ -1281,6 +1382,15 @@ class FrameInfo {
   /// If the frame failed to load, this contains the URL that could not be loaded. Note that unlike url above, this URL may contain a fragment.
   final String unreachableUrl;
 
+  /// Indicates whether this frame was tagged as an ad.
+  final AdFrameType adFrameType;
+
+  /// Indicates whether the main document is a secure context and explains why that is the case.
+  final SecureContextType secureContextType;
+
+  /// Indicates whether this is a cross origin isolated context.
+  final CrossOriginIsolatedContextType crossOriginIsolatedContextType;
+
   FrameInfo(
       {@required this.id,
       this.parentId,
@@ -1288,9 +1398,13 @@ class FrameInfo {
       this.name,
       @required this.url,
       this.urlFragment,
+      @required this.domainAndRegistry,
       @required this.securityOrigin,
       @required this.mimeType,
-      this.unreachableUrl});
+      this.unreachableUrl,
+      this.adFrameType,
+      @required this.secureContextType,
+      @required this.crossOriginIsolatedContextType});
 
   factory FrameInfo.fromJson(Map<String, dynamic> json) {
     return FrameInfo(
@@ -1303,11 +1417,19 @@ class FrameInfo {
       urlFragment: json.containsKey('urlFragment')
           ? json['urlFragment'] as String
           : null,
+      domainAndRegistry: json['domainAndRegistry'] as String,
       securityOrigin: json['securityOrigin'] as String,
       mimeType: json['mimeType'] as String,
       unreachableUrl: json.containsKey('unreachableUrl')
           ? json['unreachableUrl'] as String
           : null,
+      adFrameType: json.containsKey('adFrameType')
+          ? AdFrameType.fromJson(json['adFrameType'] as String)
+          : null,
+      secureContextType:
+          SecureContextType.fromJson(json['secureContextType'] as String),
+      crossOriginIsolatedContextType: CrossOriginIsolatedContextType.fromJson(
+          json['crossOriginIsolatedContextType'] as String),
     );
   }
 
@@ -1316,12 +1438,16 @@ class FrameInfo {
       'id': id.toJson(),
       'loaderId': loaderId.toJson(),
       'url': url,
+      'domainAndRegistry': domainAndRegistry,
       'securityOrigin': securityOrigin,
       'mimeType': mimeType,
+      'secureContextType': secureContextType.toJson(),
+      'crossOriginIsolatedContextType': crossOriginIsolatedContextType.toJson(),
       if (parentId != null) 'parentId': parentId,
       if (name != null) 'name': name,
       if (urlFragment != null) 'urlFragment': urlFragment,
       if (unreachableUrl != null) 'unreachableUrl': unreachableUrl,
+      if (adFrameType != null) 'adFrameType': adFrameType.toJson(),
     };
   }
 }

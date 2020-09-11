@@ -283,7 +283,9 @@ class NetworkApi {
 
   /// Returns all browser cookies for the current URL. Depending on the backend support, will return
   /// detailed cookie information in the `cookies` field.
-  /// [urls] The list of URLs for which applicable cookies will be fetched
+  /// [urls] The list of URLs for which applicable cookies will be fetched.
+  /// If not specified, it's assumed to be set to the list containing
+  /// the URLs of the page and all of its subframes.
   /// Returns: Array of cookie objects.
   Future<List<Cookie>> getCookies({List<String> urls}) async {
     var result = await _client.send('Network.getCookies', {
@@ -480,6 +482,17 @@ class NetworkApi {
       if (platform != null) 'platform': platform,
       if (userAgentMetadata != null) 'userAgentMetadata': userAgentMetadata,
     });
+  }
+
+  /// Returns information about the COEP/COOP isolation status.
+  /// [frameId] If no frameId is provided, the status of the target is provided.
+  Future<SecurityIsolationStatus> getSecurityIsolationStatus(
+      {page.FrameId frameId}) async {
+    var result = await _client.send('Network.getSecurityIsolationStatus', {
+      if (frameId != null) 'frameId': frameId,
+    });
+    return SecurityIsolationStatus.fromJson(
+        result['status'] as Map<String, dynamic>);
   }
 }
 
@@ -1633,6 +1646,25 @@ class ResourcePriority {
   String toString() => value.toString();
 }
 
+/// Post data entry for HTTP request
+class PostDataEntry {
+  final String bytes;
+
+  PostDataEntry({this.bytes});
+
+  factory PostDataEntry.fromJson(Map<String, dynamic> json) {
+    return PostDataEntry(
+      bytes: json.containsKey('bytes') ? json['bytes'] as String : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (bytes != null) 'bytes': bytes,
+    };
+  }
+}
+
 /// HTTP request data.
 class RequestData {
   /// Request URL (without fragment).
@@ -1653,6 +1685,9 @@ class RequestData {
   /// True when the request has POST data. Note that postData might still be omitted when this flag is true when the data is too long.
   final bool hasPostData;
 
+  /// Request body elements. This will be converted from base64 to binary
+  final List<PostDataEntry> postDataEntries;
+
   /// The mixed content type of the request.
   final security.MixedContentType mixedContentType;
 
@@ -1672,6 +1707,7 @@ class RequestData {
       @required this.headers,
       this.postData,
       this.hasPostData,
+      this.postDataEntries,
       this.mixedContentType,
       @required this.initialPriority,
       @required this.referrerPolicy,
@@ -1689,6 +1725,11 @@ class RequestData {
           json.containsKey('postData') ? json['postData'] as String : null,
       hasPostData:
           json.containsKey('hasPostData') ? json['hasPostData'] as bool : null,
+      postDataEntries: json.containsKey('postDataEntries')
+          ? (json['postDataEntries'] as List)
+              .map((e) => PostDataEntry.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
       mixedContentType: json.containsKey('mixedContentType')
           ? security.MixedContentType.fromJson(
               json['mixedContentType'] as String)
@@ -1713,6 +1754,8 @@ class RequestData {
       if (urlFragment != null) 'urlFragment': urlFragment,
       if (postData != null) 'postData': postData,
       if (hasPostData != null) 'hasPostData': hasPostData,
+      if (postDataEntries != null)
+        'postDataEntries': postDataEntries.map((e) => e.toJson()).toList(),
       if (mixedContentType != null)
         'mixedContentType': mixedContentType.toJson(),
       if (isLinkPreload != null) 'isLinkPreload': isLinkPreload,
@@ -3238,6 +3281,129 @@ class SignedExchangeInfo {
       if (header != null) 'header': header.toJson(),
       if (securityDetails != null) 'securityDetails': securityDetails.toJson(),
       if (errors != null) 'errors': errors.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+class CrossOriginOpenerPolicyValue {
+  static const sameOrigin = CrossOriginOpenerPolicyValue._('SameOrigin');
+  static const sameOriginAllowPopups =
+      CrossOriginOpenerPolicyValue._('SameOriginAllowPopups');
+  static const unsafeNone = CrossOriginOpenerPolicyValue._('UnsafeNone');
+  static const sameOriginPlusCoep =
+      CrossOriginOpenerPolicyValue._('SameOriginPlusCoep');
+  static const values = {
+    'SameOrigin': sameOrigin,
+    'SameOriginAllowPopups': sameOriginAllowPopups,
+    'UnsafeNone': unsafeNone,
+    'SameOriginPlusCoep': sameOriginPlusCoep,
+  };
+
+  final String value;
+
+  const CrossOriginOpenerPolicyValue._(this.value);
+
+  factory CrossOriginOpenerPolicyValue.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is CrossOriginOpenerPolicyValue && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class CrossOriginOpenerPolicyStatus {
+  final CrossOriginOpenerPolicyValue value;
+
+  CrossOriginOpenerPolicyStatus({@required this.value});
+
+  factory CrossOriginOpenerPolicyStatus.fromJson(Map<String, dynamic> json) {
+    return CrossOriginOpenerPolicyStatus(
+      value: CrossOriginOpenerPolicyValue.fromJson(json['value'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'value': value.toJson(),
+    };
+  }
+}
+
+class CrossOriginEmbedderPolicyValue {
+  static const none = CrossOriginEmbedderPolicyValue._('None');
+  static const requireCorp = CrossOriginEmbedderPolicyValue._('RequireCorp');
+  static const values = {
+    'None': none,
+    'RequireCorp': requireCorp,
+  };
+
+  final String value;
+
+  const CrossOriginEmbedderPolicyValue._(this.value);
+
+  factory CrossOriginEmbedderPolicyValue.fromJson(String value) =>
+      values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is CrossOriginEmbedderPolicyValue && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class CrossOriginEmbedderPolicyStatus {
+  final CrossOriginEmbedderPolicyValue value;
+
+  CrossOriginEmbedderPolicyStatus({@required this.value});
+
+  factory CrossOriginEmbedderPolicyStatus.fromJson(Map<String, dynamic> json) {
+    return CrossOriginEmbedderPolicyStatus(
+      value: CrossOriginEmbedderPolicyValue.fromJson(json['value'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'value': value.toJson(),
+    };
+  }
+}
+
+class SecurityIsolationStatus {
+  final CrossOriginOpenerPolicyStatus coop;
+
+  final CrossOriginEmbedderPolicyStatus coep;
+
+  SecurityIsolationStatus({@required this.coop, @required this.coep});
+
+  factory SecurityIsolationStatus.fromJson(Map<String, dynamic> json) {
+    return SecurityIsolationStatus(
+      coop: CrossOriginOpenerPolicyStatus.fromJson(
+          json['coop'] as Map<String, dynamic>),
+      coep: CrossOriginEmbedderPolicyStatus.fromJson(
+          json['coep'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'coop': coop.toJson(),
+      'coep': coep.toJson(),
     };
   }
 }

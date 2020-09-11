@@ -174,6 +174,28 @@ class CSSApi {
     return result['text'] as String;
   }
 
+  /// Starts tracking the given computed styles for updates. The specified array of properties
+  /// replaces the one previously specified. Pass empty array to disable tracking.
+  /// Use takeComputedStyleUpdates to retrieve the list of nodes that had properties modified.
+  /// The changes to computed style properties are only tracked for nodes pushed to the front-end
+  /// by the DOM agent. If no changes to the tracked properties occur after the node has been pushed
+  /// to the front-end, no updates will be issued for the node.
+  Future<void> trackComputedStyleUpdates(
+      List<CSSComputedStyleProperty> propertiesToTrack) async {
+    await _client.send('CSS.trackComputedStyleUpdates', {
+      'propertiesToTrack': [...propertiesToTrack],
+    });
+  }
+
+  /// Polls the next batch of computed style updates.
+  /// Returns: The list of node Ids that have their tracked computed styles updated
+  Future<List<dom.NodeId>> takeComputedStyleUpdates() async {
+    var result = await _client.send('CSS.takeComputedStyleUpdates');
+    return (result['nodeIds'] as List)
+        .map((e) => dom.NodeId.fromJson(e as int))
+        .toList();
+  }
+
   /// Find a rule with the given active property for the given node and set the new value for this
   /// property
   /// [nodeId] The element id for which to set property.
@@ -264,6 +286,14 @@ class CSSApi {
   Future<TakeCoverageDeltaResult> takeCoverageDelta() async {
     var result = await _client.send('CSS.takeCoverageDelta');
     return TakeCoverageDeltaResult.fromJson(result);
+  }
+
+  /// Enables/disables rendering of local CSS fonts (enabled by default).
+  /// [enabled] Whether rendering of local fonts is enabled.
+  Future<void> setLocalFontsEnabled(bool enabled) async {
+    await _client.send('CSS.setLocalFontsEnabled', {
+      'enabled': enabled,
+    });
   }
 }
 
@@ -1223,7 +1253,53 @@ class PlatformFontUsage {
   }
 }
 
+/// Information about font variation axes for variable fonts
+class FontVariationAxis {
+  /// The font-variation-setting tag (a.k.a. "axis tag").
+  final String tag;
+
+  /// Human-readable variation name in the default language (normally, "en").
+  final String name;
+
+  /// The minimum value (inclusive) the font supports for this tag.
+  final num minValue;
+
+  /// The maximum value (inclusive) the font supports for this tag.
+  final num maxValue;
+
+  /// The default value.
+  final num defaultValue;
+
+  FontVariationAxis(
+      {@required this.tag,
+      @required this.name,
+      @required this.minValue,
+      @required this.maxValue,
+      @required this.defaultValue});
+
+  factory FontVariationAxis.fromJson(Map<String, dynamic> json) {
+    return FontVariationAxis(
+      tag: json['tag'] as String,
+      name: json['name'] as String,
+      minValue: json['minValue'] as num,
+      maxValue: json['maxValue'] as num,
+      defaultValue: json['defaultValue'] as num,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'tag': tag,
+      'name': name,
+      'minValue': minValue,
+      'maxValue': maxValue,
+      'defaultValue': defaultValue,
+    };
+  }
+}
+
 /// Properties of a web font: https://www.w3.org/TR/2008/REC-CSS2-20080411/fonts.html#font-descriptions
+/// and additional information such as platformFontFamily and fontVariationAxes.
 class FontFace {
   /// The font-family.
   final String fontFamily;
@@ -1249,6 +1325,9 @@ class FontFace {
   /// The resolved platform font family
   final String platformFontFamily;
 
+  /// Available variation settings (a.k.a. "axes").
+  final List<FontVariationAxis> fontVariationAxes;
+
   FontFace(
       {@required this.fontFamily,
       @required this.fontStyle,
@@ -1257,7 +1336,8 @@ class FontFace {
       @required this.fontStretch,
       @required this.unicodeRange,
       @required this.src,
-      @required this.platformFontFamily});
+      @required this.platformFontFamily,
+      this.fontVariationAxes});
 
   factory FontFace.fromJson(Map<String, dynamic> json) {
     return FontFace(
@@ -1269,6 +1349,11 @@ class FontFace {
       unicodeRange: json['unicodeRange'] as String,
       src: json['src'] as String,
       platformFontFamily: json['platformFontFamily'] as String,
+      fontVariationAxes: json.containsKey('fontVariationAxes')
+          ? (json['fontVariationAxes'] as List)
+              .map((e) => FontVariationAxis.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
     );
   }
 
@@ -1282,6 +1367,8 @@ class FontFace {
       'unicodeRange': unicodeRange,
       'src': src,
       'platformFontFamily': platformFontFamily,
+      if (fontVariationAxes != null)
+        'fontVariationAxes': fontVariationAxes.map((e) => e.toJson()).toList(),
     };
   }
 }
