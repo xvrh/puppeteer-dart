@@ -7,7 +7,7 @@ on:
 jobs:
   test:
     name: Coverage
-    runs-on: macos-latest
+    runs-on: windows-latest
     steps:
       - uses: cedx/setup-dart@v2
       - uses: actions/checkout@v2
@@ -15,7 +15,8 @@ jobs:
       - run: pub get
       - run: dart example/download_chromium.dart
       - run: pub run test -P ci --platform vm
-      - run: |
+      - name: Run tests with coverage
+        run: |
           pub global activate coverage
           dart --disable-service-auth-codes --enable-vm-service=8111 --pause-isolates-on-exit test/test_all.dart &
           pub global run coverage:collect_coverage --port=8111 --out=coverage.json --wait-paused --resume-isolates
@@ -24,3 +25,4 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: lcov.info
