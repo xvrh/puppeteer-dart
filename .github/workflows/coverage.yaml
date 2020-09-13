@@ -14,10 +14,11 @@ jobs:
       - run: dart --version
       - run: pub get
       - run: dart example/download_chromium.dart
-      - run: pub run test -P ci --platform vm
+      - run: |
+          pub global activate coverage
+          echo "::add-path::%LOCALAPPDATA%\Pub\Cache\bin"
       - name: Run tests with coverage
         run: |
-          pub global activate coverage
           dart --disable-service-auth-codes --enable-vm-service=8111 --pause-isolates-on-exit test/test_all.dart &
           pub global run coverage:collect_coverage --port=8111 --out=coverage.json --wait-paused --resume-isolates
           pub global run coverage:format_coverage --lcov --in=coverage.json --out=lcov.info --packages=.packages --report-on=lib/src
