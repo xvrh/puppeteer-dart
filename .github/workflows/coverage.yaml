@@ -1,0 +1,26 @@
+name: Build
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+jobs:
+  test:
+    name: Coverage
+    runs-on: macos-latest
+    steps:
+      - uses: cedx/setup-dart@v2
+      - uses: actions/checkout@v2
+      - run: dart --version
+      - run: pub get
+      - run: dart example/download_chromium.dart
+      - run: pub run test -P ci --platform vm
+      - run: |
+          pub global activate coverage
+          dart --disable-service-auth-codes --enable-vm-service=8111 --pause-isolates-on-exit test/test_all.dart &
+          pub global run coverage:collect_coverage --port=8111 --out=coverage.json --wait-paused --resume-isolates
+          pub global run coverage:format_coverage --lcov --in=coverage.json --out=lcov.info --packages=.packages --report-on=lib/src
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
