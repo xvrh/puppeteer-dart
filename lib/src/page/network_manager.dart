@@ -399,12 +399,15 @@ class Request {
     assert(!_interceptionHandled, 'Request is already handled!');
     _interceptionHandled = true;
 
+    var postDataBinaryBase64 =
+        postData != null ? base64Encode(utf8.encode(postData)) : null;
+
     headers ??= {};
     await _fetchApi
         .continueRequest(fetch.RequestId(interceptionId),
             url: url,
             method: method,
-            postData: postData,
+            postData: postDataBinaryBase64,
             headers: headers.entries
                 .map((e) => fetch.HeaderEntry(name: e.key, value: e.value))
                 .toList())

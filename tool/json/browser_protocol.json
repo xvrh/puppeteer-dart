@@ -973,7 +973,9 @@
                     "type": "string",
                     "enum": [
                         "ExcludeSameSiteUnspecifiedTreatedAsLax",
-                        "ExcludeSameSiteNoneInsecure"
+                        "ExcludeSameSiteNoneInsecure",
+                        "ExcludeSameSiteLax",
+                        "ExcludeSameSiteStrict"
                     ]
                 },
                 {
@@ -1145,7 +1147,12 @@
                             "$ref": "AffectedRequest"
                         },
                         {
-                            "name": "frame",
+                            "name": "parentFrame",
+                            "optional": true,
+                            "$ref": "AffectedFrame"
+                        },
+                        {
+                            "name": "blockedFrame",
                             "optional": true,
                             "$ref": "AffectedFrame"
                         },
@@ -1250,6 +1257,11 @@
                             "name": "sourceCodeLocation",
                             "optional": true,
                             "$ref": "SourceCodeLocation"
+                        },
+                        {
+                            "name": "violatingNodeId",
+                            "optional": true,
+                            "$ref": "DOM.BackendNodeId"
                         }
                     ]
                 },
@@ -1661,12 +1673,6 @@
                             "description": "For \"push\" permission, may specify userVisibleOnly.\nNote that userVisibleOnly = true is the only currently supported type.",
                             "optional": true,
                             "type": "boolean"
-                        },
-                        {
-                            "name": "type",
-                            "description": "For \"wake-lock\" permission, must specify type as either \"screen\" or \"system\".",
-                            "optional": true,
-                            "type": "string"
                         },
                         {
                             "name": "allowWithoutSanitization",
@@ -2208,7 +2214,12 @@
                         },
                         {
                             "name": "isMutable",
-                            "description": "Whether this stylesheet is mutable. Inline stylesheets become mutable\nafter they have been modified via CSSOM API.\n<link> element's stylesheets are never mutable. Constructed stylesheets\n(new CSSStyleSheet()) are mutable immediately after creation.",
+                            "description": "Whether this stylesheet is mutable. Inline stylesheets become mutable\nafter they have been modified via CSSOM API.\n<link> element's stylesheets become mutable only if DevTools modifies them.\nConstructed stylesheets (new CSSStyleSheet()) are mutable immediately after creation.",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "isConstructed",
+                            "description": "Whether this stylesheet is a constructed stylesheet (created using new CSSStyleSheet()).",
                             "type": "boolean"
                         },
                         {
@@ -3024,6 +3035,35 @@
                             "name": "text",
                             "description": "The stylesheet text.",
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "trackComputedStyleUpdates",
+                    "description": "Starts tracking the given computed styles for updates. The specified array of properties\nreplaces the one previously specified. Pass empty array to disable tracking.\nUse takeComputedStyleUpdates to retrieve the list of nodes that had properties modified.\nThe changes to computed style properties are only tracked for nodes pushed to the front-end\nby the DOM agent. If no changes to the tracked properties occur after the node has been pushed\nto the front-end, no updates will be issued for the node.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "propertiesToTrack",
+                            "type": "array",
+                            "items": {
+                                "$ref": "CSSComputedStyleProperty"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "takeComputedStyleUpdates",
+                    "description": "Polls the next batch of computed style updates.",
+                    "experimental": true,
+                    "returns": [
+                        {
+                            "name": "nodeIds",
+                            "description": "The list of node Ids that have their tracked computed styles updated",
+                            "type": "array",
+                            "items": {
+                                "$ref": "DOM.NodeId"
+                            }
                         }
                     ]
                 },
@@ -4002,6 +4042,22 @@
                             "type": "number"
                         }
                     ]
+                },
+                {
+                    "id": "CSSComputedStyleProperty",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "description": "Computed style property name.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "value",
+                            "description": "Computed style property value.",
+                            "type": "string"
+                        }
+                    ]
                 }
             ],
             "commands": [
@@ -4289,7 +4345,8 @@
                 },
                 {
                     "name": "getFlattenedDocument",
-                    "description": "Returns the root DOM node (and optionally the subtree) to the caller.",
+                    "description": "Returns the root DOM node (and optionally the subtree) to the caller.\nDeprecated, as it is not designed to work well with the rest of the DOM agent.\nUse DOMSnapshot.captureSnapshot instead.",
+                    "deprecated": true,
                     "parameters": [
                         {
                             "name": "depth",
@@ -4311,6 +4368,42 @@
                             "type": "array",
                             "items": {
                                 "$ref": "Node"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "getNodesForSubtreeByStyle",
+                    "description": "Finds nodes with a given computed style in a subtree.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "nodeId",
+                            "description": "Node ID pointing to the root of a subtree.",
+                            "$ref": "NodeId"
+                        },
+                        {
+                            "name": "computedStyles",
+                            "description": "The style to filter nodes by (includes nodes if any of properties matches).",
+                            "type": "array",
+                            "items": {
+                                "$ref": "CSSComputedStyleProperty"
+                            }
+                        },
+                        {
+                            "name": "pierce",
+                            "description": "Whether or not iframes and shadow roots in the same target should be traversed when returning the\nresults (default is false).",
+                            "optional": true,
+                            "type": "boolean"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "nodeIds",
+                            "description": "Resulting nodes.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "NodeId"
                             }
                         }
                     ]
@@ -6934,6 +7027,28 @@
                             "type": "number"
                         }
                     ]
+                },
+                {
+                    "name": "setIdleOverride",
+                    "description": "Overrides the Idle state.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "isUserActive",
+                            "description": "Mock isUserActive",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "isScreenUnlocked",
+                            "description": "Mock isScreenUnlocked",
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "name": "clearIdleOverride",
+                    "description": "Clears Idle state overrides.",
+                    "experimental": true
                 },
                 {
                     "name": "setNavigatorOverrides",
@@ -10314,6 +10429,63 @@
                             }
                         }
                     ]
+                },
+                {
+                    "id": "CrossOriginOpenerPolicyValue",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "SameOrigin",
+                        "SameOriginAllowPopups",
+                        "UnsafeNone",
+                        "SameOriginPlusCoep"
+                    ]
+                },
+                {
+                    "id": "CrossOriginOpenerPolicyStatus",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "value",
+                            "$ref": "CrossOriginOpenerPolicyValue"
+                        }
+                    ]
+                },
+                {
+                    "id": "CrossOriginEmbedderPolicyValue",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "None",
+                        "RequireCorp"
+                    ]
+                },
+                {
+                    "id": "CrossOriginEmbedderPolicyStatus",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "value",
+                            "$ref": "CrossOriginEmbedderPolicyValue"
+                        }
+                    ]
+                },
+                {
+                    "id": "SecurityIsolationStatus",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "coop",
+                            "$ref": "CrossOriginOpenerPolicyStatus"
+                        },
+                        {
+                            "name": "coep",
+                            "$ref": "CrossOriginEmbedderPolicyStatus"
+                        }
+                    ]
                 }
             ],
             "commands": [
@@ -10547,7 +10719,7 @@
                     "parameters": [
                         {
                             "name": "urls",
-                            "description": "The list of URLs for which applicable cookies will be fetched",
+                            "description": "The list of URLs for which applicable cookies will be fetched.\nIf not specified, it's assumed to be set to the list containing\nthe URLs of the page and all of its subframes.",
                             "optional": true,
                             "type": "array",
                             "items": {
@@ -10852,6 +11024,18 @@
                     ]
                 },
                 {
+                    "name": "setAttachDebugHeader",
+                    "description": "Specifies whether to sned a debug header to all outgoing requests.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "enabled",
+                            "description": "Whether to send a debug header.",
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
                     "name": "setRequestInterception",
                     "description": "Sets the requests to intercept that match the provided patterns and optionally resource types.\nDeprecated, please use Fetch.enable instead.",
                     "experimental": true,
@@ -10895,6 +11079,25 @@
                             "experimental": true,
                             "optional": true,
                             "$ref": "Emulation.UserAgentMetadata"
+                        }
+                    ]
+                },
+                {
+                    "name": "getSecurityIsolationStatus",
+                    "description": "Returns information about the COEP/COOP isolation status.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "frameId",
+                            "description": "If no frameId is provided, the status of the target is provided.",
+                            "optional": true,
+                            "$ref": "Page.FrameId"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "status",
+                            "$ref": "SecurityIsolationStatus"
                         }
                     ]
                 }
@@ -11465,6 +11668,23 @@
             ],
             "types": [
                 {
+                    "id": "SourceOrderConfig",
+                    "description": "Configuration data for drawing the source order of an elements children.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "parentOutlineColor",
+                            "description": "the color to outline the givent element in.",
+                            "$ref": "DOM.RGBA"
+                        },
+                        {
+                            "name": "childOutlineColor",
+                            "description": "the color to outline the child elements in.",
+                            "$ref": "DOM.RGBA"
+                        }
+                    ]
+                },
+                {
                     "id": "GridHighlightConfig",
                     "description": "Configuration data for the highlighting of Grid elements.",
                     "type": "object",
@@ -11513,7 +11733,20 @@
                         },
                         {
                             "name": "cellBorderColor",
-                            "description": "The cell border color (default: transparent).",
+                            "description": "The cell border color (default: transparent). Deprecated, please use rowLineColor and columnLineColor instead.",
+                            "deprecated": true,
+                            "optional": true,
+                            "$ref": "DOM.RGBA"
+                        },
+                        {
+                            "name": "rowLineColor",
+                            "description": "The row line color (default: transparent).",
+                            "optional": true,
+                            "$ref": "DOM.RGBA"
+                        },
+                        {
+                            "name": "columnLineColor",
+                            "description": "The column line color (default: transparent).",
                             "optional": true,
                             "$ref": "DOM.RGBA"
                         },
@@ -11525,7 +11758,20 @@
                         },
                         {
                             "name": "cellBorderDash",
-                            "description": "Whether the cell border is dashed (default: false).",
+                            "description": "Whether the cell border is dashed (default: false). Deprecated, please us rowLineDash and columnLineDash instead.",
+                            "deprecated": true,
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "rowLineDash",
+                            "description": "Whether row lines are dashed (default: false).",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "columnLineDash",
+                            "description": "Whether column lines are dashed (default: false).",
                             "optional": true,
                             "type": "boolean"
                         },
@@ -11793,6 +12039,24 @@
                     ]
                 },
                 {
+                    "name": "getSourceOrderHighlightObjectForTest",
+                    "description": "For Source Order Viewer testing.",
+                    "parameters": [
+                        {
+                            "name": "nodeId",
+                            "description": "Id of the node to highlight.",
+                            "$ref": "DOM.NodeId"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "highlight",
+                            "description": "Source order highlight data for the node id provided.",
+                            "type": "object"
+                        }
+                    ]
+                },
+                {
                     "name": "hideHighlight",
                     "description": "Hides any highlight."
                 },
@@ -11912,6 +12176,35 @@
                             "description": "The highlight outline color (default: transparent).",
                             "optional": true,
                             "$ref": "DOM.RGBA"
+                        }
+                    ]
+                },
+                {
+                    "name": "highlightSourceOrder",
+                    "description": "Highlights the source order of the children of the DOM node with given id or with the given\nJavaScript object wrapper. Either nodeId or objectId must be specified.",
+                    "parameters": [
+                        {
+                            "name": "sourceOrderConfig",
+                            "description": "A descriptor for the appearance of the overlay drawing.",
+                            "$ref": "SourceOrderConfig"
+                        },
+                        {
+                            "name": "nodeId",
+                            "description": "Identifier of the node to highlight.",
+                            "optional": true,
+                            "$ref": "DOM.NodeId"
+                        },
+                        {
+                            "name": "backendNodeId",
+                            "description": "Identifier of the backend node to highlight.",
+                            "optional": true,
+                            "$ref": "DOM.BackendNodeId"
+                        },
+                        {
+                            "name": "objectId",
+                            "description": "JavaScript object id of the node to be highlighted.",
+                            "optional": true,
+                            "$ref": "Runtime.RemoteObjectId"
                         }
                     ]
                 },
@@ -12125,6 +12418,29 @@
                     ]
                 },
                 {
+                    "id": "SecureContextType",
+                    "description": "Indicates whether the frame is a secure context and why it is the case.",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "Secure",
+                        "SecureLocalhost",
+                        "InsecureScheme",
+                        "InsecureAncestor"
+                    ]
+                },
+                {
+                    "id": "CrossOriginIsolatedContextType",
+                    "description": "Indicates whether the frame is cross-origin isolated and why it is the case.",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "Isolated",
+                        "NotIsolated",
+                        "NotIsolatedFeatureDisabled"
+                    ]
+                },
+                {
                     "id": "Frame",
                     "description": "Information about the Frame on the page.",
                     "type": "object",
@@ -12164,6 +12480,12 @@
                             "type": "string"
                         },
                         {
+                            "name": "domainAndRegistry",
+                            "description": "Frame document's registered domain, taking the public suffixes list into account.\nExtracted from the Frame's url.\nExample URLs: http://www.google.com/file.html -> \"google.com\"\n              http://a.b.co.uk/file.html      -> \"b.co.uk\"",
+                            "experimental": true,
+                            "type": "string"
+                        },
+                        {
                             "name": "securityOrigin",
                             "description": "Frame document's security origin.",
                             "type": "string"
@@ -12186,6 +12508,18 @@
                             "experimental": true,
                             "optional": true,
                             "$ref": "AdFrameType"
+                        },
+                        {
+                            "name": "secureContextType",
+                            "description": "Indicates whether the main document is a secure context and explains why that is the case.",
+                            "experimental": true,
+                            "$ref": "SecureContextType"
+                        },
+                        {
+                            "name": "crossOriginIsolatedContextType",
+                            "description": "Indicates whether this is a cross origin isolated context.",
+                            "experimental": true,
+                            "$ref": "CrossOriginIsolatedContextType"
                         }
                     ]
                 },
@@ -15581,6 +15915,12 @@
                             "$ref": "TargetID"
                         },
                         {
+                            "name": "canAccessOpener",
+                            "description": "Whether the opened window has access to the originating window.",
+                            "experimental": true,
+                            "type": "boolean"
+                        },
+                        {
                             "name": "browserContextId",
                             "experimental": true,
                             "optional": true,
@@ -16888,7 +17228,7 @@
                 },
                 {
                     "id": "AudioListener",
-                    "description": "Protocol object for AudioListner",
+                    "description": "Protocol object for AudioListener",
                     "type": "object",
                     "properties": [
                         {

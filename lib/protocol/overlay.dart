@@ -66,6 +66,29 @@ class OverlayApi {
     return result['highlight'] as Map<String, dynamic>;
   }
 
+  /// For Persistent Grid testing.
+  /// [nodeIds] Ids of the node to get highlight object for.
+  /// Returns: Grid Highlight data for the node ids provided.
+  Future<Map<String, dynamic>> getGridHighlightObjectsForTest(
+      List<dom.NodeId> nodeIds) async {
+    var result = await _client.send('Overlay.getGridHighlightObjectsForTest', {
+      'nodeIds': [...nodeIds],
+    });
+    return result['highlights'] as Map<String, dynamic>;
+  }
+
+  /// For Source Order Viewer testing.
+  /// [nodeId] Id of the node to highlight.
+  /// Returns: Source order highlight data for the node id provided.
+  Future<Map<String, dynamic>> getSourceOrderHighlightObjectForTest(
+      dom.NodeId nodeId) async {
+    var result =
+        await _client.send('Overlay.getSourceOrderHighlightObjectForTest', {
+      'nodeId': nodeId,
+    });
+    return result['highlight'] as Map<String, dynamic>;
+  }
+
   /// Hides any highlight.
   Future<void> hideHighlight() async {
     await _client.send('Overlay.hideHighlight');
@@ -138,6 +161,24 @@ class OverlayApi {
     });
   }
 
+  /// Highlights the source order of the children of the DOM node with given id or with the given
+  /// JavaScript object wrapper. Either nodeId or objectId must be specified.
+  /// [sourceOrderConfig] A descriptor for the appearance of the overlay drawing.
+  /// [nodeId] Identifier of the node to highlight.
+  /// [backendNodeId] Identifier of the backend node to highlight.
+  /// [objectId] JavaScript object id of the node to be highlighted.
+  Future<void> highlightSourceOrder(SourceOrderConfig sourceOrderConfig,
+      {dom.NodeId nodeId,
+      dom.BackendNodeId backendNodeId,
+      runtime.RemoteObjectId objectId}) async {
+    await _client.send('Overlay.highlightSourceOrder', {
+      'sourceOrderConfig': sourceOrderConfig,
+      if (nodeId != null) 'nodeId': nodeId,
+      if (backendNodeId != null) 'backendNodeId': backendNodeId,
+      if (objectId != null) 'objectId': objectId,
+    });
+  }
+
   /// Enters the 'inspect' mode. In this mode, elements that user is hovering over are highlighted.
   /// Backend then generates 'inspectNodeRequested' event upon element selection.
   /// [mode] Set an inspection mode.
@@ -179,6 +220,15 @@ class OverlayApi {
   Future<void> setShowFPSCounter(bool show) async {
     await _client.send('Overlay.setShowFPSCounter', {
       'show': show,
+    });
+  }
+
+  /// Highlight multiple elements with the CSS Grid overlay.
+  /// [gridNodeHighlightConfigs] An array of node identifiers and descriptors for the highlight appearance.
+  Future<void> setShowGridOverlays(
+      List<GridNodeHighlightConfig> gridNodeHighlightConfigs) async {
+    await _client.send('Overlay.setShowGridOverlays', {
+      'gridNodeHighlightConfigs': [...gridNodeHighlightConfigs],
     });
   }
 
@@ -231,6 +281,34 @@ class OverlayApi {
   }
 }
 
+/// Configuration data for drawing the source order of an elements children.
+class SourceOrderConfig {
+  /// the color to outline the givent element in.
+  final dom.RGBA parentOutlineColor;
+
+  /// the color to outline the child elements in.
+  final dom.RGBA childOutlineColor;
+
+  SourceOrderConfig(
+      {@required this.parentOutlineColor, @required this.childOutlineColor});
+
+  factory SourceOrderConfig.fromJson(Map<String, dynamic> json) {
+    return SourceOrderConfig(
+      parentOutlineColor:
+          dom.RGBA.fromJson(json['parentOutlineColor'] as Map<String, dynamic>),
+      childOutlineColor:
+          dom.RGBA.fromJson(json['childOutlineColor'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'parentOutlineColor': parentOutlineColor.toJson(),
+      'childOutlineColor': childOutlineColor.toJson(),
+    };
+  }
+}
+
 /// Configuration data for the highlighting of Grid elements.
 class GridHighlightConfig {
   /// Whether the extension lines from grid cells to the rulers should be shown (default: false).
@@ -242,17 +320,32 @@ class GridHighlightConfig {
   /// Show Negative line number labels (default: false).
   final bool showNegativeLineNumbers;
 
+  /// Show area name labels (default: false).
+  final bool showAreaNames;
+
+  /// Show line name labels (default: false).
+  final bool showLineNames;
+
+  /// Show track size labels (default: false).
+  final bool showTrackSizes;
+
   /// The grid container border highlight color (default: transparent).
   final dom.RGBA gridBorderColor;
 
-  /// The cell border color (default: transparent).
-  final dom.RGBA cellBorderColor;
+  /// The row line color (default: transparent).
+  final dom.RGBA rowLineColor;
+
+  /// The column line color (default: transparent).
+  final dom.RGBA columnLineColor;
 
   /// Whether the grid border is dashed (default: false).
   final bool gridBorderDash;
 
-  /// Whether the cell border is dashed (default: false).
-  final bool cellBorderDash;
+  /// Whether row lines are dashed (default: false).
+  final bool rowLineDash;
+
+  /// Whether column lines are dashed (default: false).
+  final bool columnLineDash;
 
   /// The row gap highlight fill color (default: transparent).
   final dom.RGBA rowGapColor;
@@ -266,18 +359,27 @@ class GridHighlightConfig {
   /// The column gap hatching fill color (default: transparent).
   final dom.RGBA columnHatchColor;
 
+  /// The named grid areas border color (Default: transparent).
+  final dom.RGBA areaBorderColor;
+
   GridHighlightConfig(
       {this.showGridExtensionLines,
       this.showPositiveLineNumbers,
       this.showNegativeLineNumbers,
+      this.showAreaNames,
+      this.showLineNames,
+      this.showTrackSizes,
       this.gridBorderColor,
-      this.cellBorderColor,
+      this.rowLineColor,
+      this.columnLineColor,
       this.gridBorderDash,
-      this.cellBorderDash,
+      this.rowLineDash,
+      this.columnLineDash,
       this.rowGapColor,
       this.rowHatchColor,
       this.columnGapColor,
-      this.columnHatchColor});
+      this.columnHatchColor,
+      this.areaBorderColor});
 
   factory GridHighlightConfig.fromJson(Map<String, dynamic> json) {
     return GridHighlightConfig(
@@ -290,17 +392,31 @@ class GridHighlightConfig {
       showNegativeLineNumbers: json.containsKey('showNegativeLineNumbers')
           ? json['showNegativeLineNumbers'] as bool
           : null,
+      showAreaNames: json.containsKey('showAreaNames')
+          ? json['showAreaNames'] as bool
+          : null,
+      showLineNames: json.containsKey('showLineNames')
+          ? json['showLineNames'] as bool
+          : null,
+      showTrackSizes: json.containsKey('showTrackSizes')
+          ? json['showTrackSizes'] as bool
+          : null,
       gridBorderColor: json.containsKey('gridBorderColor')
           ? dom.RGBA.fromJson(json['gridBorderColor'] as Map<String, dynamic>)
           : null,
-      cellBorderColor: json.containsKey('cellBorderColor')
-          ? dom.RGBA.fromJson(json['cellBorderColor'] as Map<String, dynamic>)
+      rowLineColor: json.containsKey('rowLineColor')
+          ? dom.RGBA.fromJson(json['rowLineColor'] as Map<String, dynamic>)
+          : null,
+      columnLineColor: json.containsKey('columnLineColor')
+          ? dom.RGBA.fromJson(json['columnLineColor'] as Map<String, dynamic>)
           : null,
       gridBorderDash: json.containsKey('gridBorderDash')
           ? json['gridBorderDash'] as bool
           : null,
-      cellBorderDash: json.containsKey('cellBorderDash')
-          ? json['cellBorderDash'] as bool
+      rowLineDash:
+          json.containsKey('rowLineDash') ? json['rowLineDash'] as bool : null,
+      columnLineDash: json.containsKey('columnLineDash')
+          ? json['columnLineDash'] as bool
           : null,
       rowGapColor: json.containsKey('rowGapColor')
           ? dom.RGBA.fromJson(json['rowGapColor'] as Map<String, dynamic>)
@@ -314,6 +430,9 @@ class GridHighlightConfig {
       columnHatchColor: json.containsKey('columnHatchColor')
           ? dom.RGBA.fromJson(json['columnHatchColor'] as Map<String, dynamic>)
           : null,
+      areaBorderColor: json.containsKey('areaBorderColor')
+          ? dom.RGBA.fromJson(json['areaBorderColor'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -325,15 +444,21 @@ class GridHighlightConfig {
         'showPositiveLineNumbers': showPositiveLineNumbers,
       if (showNegativeLineNumbers != null)
         'showNegativeLineNumbers': showNegativeLineNumbers,
+      if (showAreaNames != null) 'showAreaNames': showAreaNames,
+      if (showLineNames != null) 'showLineNames': showLineNames,
+      if (showTrackSizes != null) 'showTrackSizes': showTrackSizes,
       if (gridBorderColor != null) 'gridBorderColor': gridBorderColor.toJson(),
-      if (cellBorderColor != null) 'cellBorderColor': cellBorderColor.toJson(),
+      if (rowLineColor != null) 'rowLineColor': rowLineColor.toJson(),
+      if (columnLineColor != null) 'columnLineColor': columnLineColor.toJson(),
       if (gridBorderDash != null) 'gridBorderDash': gridBorderDash,
-      if (cellBorderDash != null) 'cellBorderDash': cellBorderDash,
+      if (rowLineDash != null) 'rowLineDash': rowLineDash,
+      if (columnLineDash != null) 'columnLineDash': columnLineDash,
       if (rowGapColor != null) 'rowGapColor': rowGapColor.toJson(),
       if (rowHatchColor != null) 'rowHatchColor': rowHatchColor.toJson(),
       if (columnGapColor != null) 'columnGapColor': columnGapColor.toJson(),
       if (columnHatchColor != null)
         'columnHatchColor': columnHatchColor.toJson(),
+      if (areaBorderColor != null) 'areaBorderColor': areaBorderColor.toJson(),
     };
   }
 }
@@ -501,6 +626,33 @@ class ColorFormat {
 
   @override
   String toString() => value.toString();
+}
+
+/// Configurations for Persistent Grid Highlight
+class GridNodeHighlightConfig {
+  /// A descriptor for the highlight appearance.
+  final GridHighlightConfig gridHighlightConfig;
+
+  /// Identifier of the node to highlight.
+  final dom.NodeId nodeId;
+
+  GridNodeHighlightConfig(
+      {@required this.gridHighlightConfig, @required this.nodeId});
+
+  factory GridNodeHighlightConfig.fromJson(Map<String, dynamic> json) {
+    return GridNodeHighlightConfig(
+      gridHighlightConfig: GridHighlightConfig.fromJson(
+          json['gridHighlightConfig'] as Map<String, dynamic>),
+      nodeId: dom.NodeId.fromJson(json['nodeId'] as int),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'gridHighlightConfig': gridHighlightConfig.toJson(),
+      'nodeId': nodeId.toJson(),
+    };
+  }
 }
 
 /// Configuration for dual screen hinge

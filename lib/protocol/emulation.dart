@@ -80,6 +80,8 @@ class EmulationApi {
   /// [screenOrientation] Screen orientation override.
   /// [viewport] If set, the visible area of the page will be overridden to this viewport. This viewport
   /// change is not observed by the page, e.g. viewport-relative elements do not change positions.
+  /// [displayFeature] If set, the display feature of a multi-segment screen. If not set, multi-segment support
+  /// is turned-off.
   Future<void> setDeviceMetricsOverride(
       int width, int height, num deviceScaleFactor, bool mobile,
       {num scale,
@@ -89,7 +91,8 @@ class EmulationApi {
       int positionY,
       bool dontSetVisibleSize,
       ScreenOrientation screenOrientation,
-      page.Viewport viewport}) async {
+      page.Viewport viewport,
+      DisplayFeature displayFeature}) async {
     await _client.send('Emulation.setDeviceMetricsOverride', {
       'width': width,
       'height': height,
@@ -103,6 +106,7 @@ class EmulationApi {
       if (dontSetVisibleSize != null) 'dontSetVisibleSize': dontSetVisibleSize,
       if (screenOrientation != null) 'screenOrientation': screenOrientation,
       if (viewport != null) 'viewport': viewport,
+      if (displayFeature != null) 'displayFeature': displayFeature,
     });
   }
 
@@ -180,6 +184,21 @@ class EmulationApi {
       if (longitude != null) 'longitude': longitude,
       if (accuracy != null) 'accuracy': accuracy,
     });
+  }
+
+  /// Overrides the Idle state.
+  /// [isUserActive] Mock isUserActive
+  /// [isScreenUnlocked] Mock isScreenUnlocked
+  Future<void> setIdleOverride(bool isUserActive, bool isScreenUnlocked) async {
+    await _client.send('Emulation.setIdleOverride', {
+      'isUserActive': isUserActive,
+      'isScreenUnlocked': isScreenUnlocked,
+    });
+  }
+
+  /// Clears Idle state overrides.
+  Future<void> clearIdleOverride() async {
+    await _client.send('Emulation.clearIdleOverride');
   }
 
   /// Overrides value returned by the javascript navigator object.
@@ -342,6 +361,70 @@ class ScreenOrientationType {
   @override
   bool operator ==(other) =>
       (other is ScreenOrientationType && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class DisplayFeature {
+  /// Orientation of a display feature in relation to screen
+  final DisplayFeatureOrientation orientation;
+
+  /// The offset from the screen origin in either the x (for vertical
+  /// orientation) or y (for horizontal orientation) direction.
+  final int offset;
+
+  /// A display feature may mask content such that it is not physically
+  /// displayed - this length along with the offset describes this area.
+  /// A display feature that only splits content will have a 0 mask_length.
+  final int maskLength;
+
+  DisplayFeature(
+      {@required this.orientation,
+      @required this.offset,
+      @required this.maskLength});
+
+  factory DisplayFeature.fromJson(Map<String, dynamic> json) {
+    return DisplayFeature(
+      orientation:
+          DisplayFeatureOrientation.fromJson(json['orientation'] as String),
+      offset: json['offset'] as int,
+      maskLength: json['maskLength'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'orientation': orientation,
+      'offset': offset,
+      'maskLength': maskLength,
+    };
+  }
+}
+
+class DisplayFeatureOrientation {
+  static const vertical = DisplayFeatureOrientation._('vertical');
+  static const horizontal = DisplayFeatureOrientation._('horizontal');
+  static const values = {
+    'vertical': vertical,
+    'horizontal': horizontal,
+  };
+
+  final String value;
+
+  const DisplayFeatureOrientation._(this.value);
+
+  factory DisplayFeatureOrientation.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is DisplayFeatureOrientation && other.value == value) ||
       value == other;
 
   @override
