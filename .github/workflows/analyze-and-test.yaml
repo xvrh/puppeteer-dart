@@ -1,0 +1,44 @@
+name: Puppeteer-dart analyze and test
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+jobs:
+  test:
+    name: Run tests ${{matrix.sdk}} on ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        dart: ['stable']
+    runs-on: ${{ matrix.os }}
+#    env:
+#      #In travis/docker we need the --no-sandbox flag in chrome
+#      CHROME_FORCE_NO_SANDBOX: true
+    steps:
+      - uses: cedx/setup-dart@v2
+        with:
+          release-channel: ${{matrix.sdk}}
+      - uses: actions/checkout@v2
+      - run: dart --version
+      - run: pub get
+      - run: dartanalyzer --fatal-infos --fatal-warnings .
+      - run: dart example/download_chromium.dart
+      - name: install required packages
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get install libwoff1 libopus0 libwebp6 libwebpdemux2 libenchant1c2a libgudev-1.0-0 libsecret-1-0 libhyphen0 libgdk-pixbuf2.0-0
+          export DISPLAY=:99.0
+          Xvfb -ac :99 -screen 0 1280x1024x16 > /dev/null 2>&1 &
+      - run: xvfb-run --auto-servernum pub run test -P ci --platform vm
+        if: runner.os == 'Linux'
+      - run: pub run test -P ci --platform vm
+        if: runner.os != 'Linux'
+      - run: dart tool/prepare_submit.dart
+      - name: "check for uncommitted changes"
+        run: |
+          git diff --exit-code --stat -- . \
+          || (echo "##[error] found changed files after build. please run 'dart tool/prepare_submit.dart'" \
+                   "and check in all changes" \
+              && exit 1)
+        shell: bash
