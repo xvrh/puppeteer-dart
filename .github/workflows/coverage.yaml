@@ -23,7 +23,6 @@ jobs:
           pub global run coverage:collect_coverage --port=8111 --out=coverage.json --wait-paused --resume-isolates
           pub global run coverage:format_coverage --lcov --in=coverage.json --out=lcov.info --packages=.packages --report-on=lib/src
       - name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: "lcov.info"
+        run: |
+          gem install coveralls-lcov
+          coveralls-lcov --repo-token "${{ secrets.COVERALLS_TOKEN }}" lcov.info
