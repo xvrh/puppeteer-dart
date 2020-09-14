@@ -7,7 +7,7 @@ on:
 jobs:
   test:
     name: Coverage
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: cedx/setup-dart@v2
       - uses: actions/checkout@v2
@@ -16,7 +16,7 @@ jobs:
       - run: dart example/download_chromium.dart
       - run: |
           pub global activate coverage
-          echo "::add-path::%LOCALAPPDATA%\Pub\Cache\bin"
+          echo "::add-path::%HOME%/.pub-cache/bin"
       - name: Run tests with coverage
         run: |
           dart --disable-service-auth-codes --enable-vm-service=8111 --pause-isolates-on-exit test/test_all.dart &
