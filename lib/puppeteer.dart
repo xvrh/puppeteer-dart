@@ -32,4 +32,5 @@ export 'src/page/page.dart'
         MediaFeature;
 export 'src/page/tracing.dart' show Tracing;
 export 'src/puppeteer.dart' show puppeteer, Puppeteer;
+export 'src/puppeteer_firefox.dart' show puppeteerFirefox, PuppeteerFirefox;
 export 'src/target.dart' show Target;

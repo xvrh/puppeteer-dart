@@ -111,6 +111,23 @@ String _downloadUrl(int revision) {
   }
 }
 
+const _baseUrlFirefox =
+    'https://archive.mozilla.org/pub/firefox/nightly/latest-mozilla-central';
+
+// ignore: unused_element
+String _downloadUrlForFirefox(String version) {
+  if (Platform.isWindows) {
+    return '$_baseUrlFirefox/firefox-$version.en-US.win64.zip';
+  } else if (Platform.isLinux) {
+    return '$_baseUrlFirefox/firefox-$version.en-US.linux-x86_64.tar.bz2';
+  } else if (Platform.isMacOS) {
+    return '$_baseUrlFirefox/firefox-$version.en-US.mac.dmg';
+  } else {
+    throw UnsupportedError(
+        "Can't download chrome for platform ${Platform.operatingSystem}");
+  }
+}
+
 String getExecutablePath(String revisionPath) {
   if (Platform.isWindows) {
     return p.join(revisionPath, 'chrome-win', 'chrome.exe');
