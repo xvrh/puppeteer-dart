@@ -95,6 +95,7 @@ class Connection implements Client {
     if (_delay != null) {
       await Future.delayed(_delay);
     }
+    if (_eventController.isClosed) return;
 
     var object = jsonDecode(message) as Map<String, dynamic>;
     var id = object['id'] as int;
