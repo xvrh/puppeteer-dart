@@ -456,6 +456,14 @@ class NetworkApi {
     });
   }
 
+  /// Specifies whether to sned a debug header to all outgoing requests.
+  /// [enabled] Whether to send a debug header.
+  Future<void> setAttachDebugHeader(bool enabled) async {
+    await _client.send('Network.setAttachDebugHeader', {
+      'enabled': enabled,
+    });
+  }
+
   /// Sets the requests to intercept that match the provided patterns and optionally resource types.
   /// Deprecated, please use Fetch.enable instead.
   /// [patterns] Requests matching any of these patterns will be forwarded and wait for the corresponding
@@ -3322,17 +3330,40 @@ class CrossOriginOpenerPolicyValue {
 class CrossOriginOpenerPolicyStatus {
   final CrossOriginOpenerPolicyValue value;
 
-  CrossOriginOpenerPolicyStatus({@required this.value});
+  final CrossOriginOpenerPolicyValue reportOnlyValue;
+
+  final String reportingEndpoint;
+
+  final String reportOnlyReportingEndpoint;
+
+  CrossOriginOpenerPolicyStatus(
+      {@required this.value,
+      @required this.reportOnlyValue,
+      this.reportingEndpoint,
+      this.reportOnlyReportingEndpoint});
 
   factory CrossOriginOpenerPolicyStatus.fromJson(Map<String, dynamic> json) {
     return CrossOriginOpenerPolicyStatus(
       value: CrossOriginOpenerPolicyValue.fromJson(json['value'] as String),
+      reportOnlyValue: CrossOriginOpenerPolicyValue.fromJson(
+          json['reportOnlyValue'] as String),
+      reportingEndpoint: json.containsKey('reportingEndpoint')
+          ? json['reportingEndpoint'] as String
+          : null,
+      reportOnlyReportingEndpoint:
+          json.containsKey('reportOnlyReportingEndpoint')
+              ? json['reportOnlyReportingEndpoint'] as String
+              : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'value': value.toJson(),
+      'reportOnlyValue': reportOnlyValue.toJson(),
+      if (reportingEndpoint != null) 'reportingEndpoint': reportingEndpoint,
+      if (reportOnlyReportingEndpoint != null)
+        'reportOnlyReportingEndpoint': reportOnlyReportingEndpoint,
     };
   }
 }
@@ -3369,17 +3400,40 @@ class CrossOriginEmbedderPolicyValue {
 class CrossOriginEmbedderPolicyStatus {
   final CrossOriginEmbedderPolicyValue value;
 
-  CrossOriginEmbedderPolicyStatus({@required this.value});
+  final CrossOriginEmbedderPolicyValue reportOnlyValue;
+
+  final String reportingEndpoint;
+
+  final String reportOnlyReportingEndpoint;
+
+  CrossOriginEmbedderPolicyStatus(
+      {@required this.value,
+      @required this.reportOnlyValue,
+      this.reportingEndpoint,
+      this.reportOnlyReportingEndpoint});
 
   factory CrossOriginEmbedderPolicyStatus.fromJson(Map<String, dynamic> json) {
     return CrossOriginEmbedderPolicyStatus(
       value: CrossOriginEmbedderPolicyValue.fromJson(json['value'] as String),
+      reportOnlyValue: CrossOriginEmbedderPolicyValue.fromJson(
+          json['reportOnlyValue'] as String),
+      reportingEndpoint: json.containsKey('reportingEndpoint')
+          ? json['reportingEndpoint'] as String
+          : null,
+      reportOnlyReportingEndpoint:
+          json.containsKey('reportOnlyReportingEndpoint')
+              ? json['reportOnlyReportingEndpoint'] as String
+              : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'value': value.toJson(),
+      'reportOnlyValue': reportOnlyValue.toJson(),
+      if (reportingEndpoint != null) 'reportingEndpoint': reportingEndpoint,
+      if (reportOnlyReportingEndpoint != null)
+        'reportOnlyReportingEndpoint': reportOnlyReportingEndpoint,
     };
   }
 }

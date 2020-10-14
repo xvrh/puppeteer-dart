@@ -441,9 +441,6 @@ class PermissionDescriptor {
   /// Note that userVisibleOnly = true is the only currently supported type.
   final bool userVisibleOnly;
 
-  /// For "wake-lock" permission, must specify type as either "screen" or "system".
-  final String type;
-
   /// For "clipboard" permission, may specify allowWithoutSanitization.
   final bool allowWithoutSanitization;
 
@@ -451,7 +448,6 @@ class PermissionDescriptor {
       {@required this.name,
       this.sysex,
       this.userVisibleOnly,
-      this.type,
       this.allowWithoutSanitization});
 
   factory PermissionDescriptor.fromJson(Map<String, dynamic> json) {
@@ -461,7 +457,6 @@ class PermissionDescriptor {
       userVisibleOnly: json.containsKey('userVisibleOnly')
           ? json['userVisibleOnly'] as bool
           : null,
-      type: json.containsKey('type') ? json['type'] as String : null,
       allowWithoutSanitization: json.containsKey('allowWithoutSanitization')
           ? json['allowWithoutSanitization'] as bool
           : null,
@@ -473,7 +468,6 @@ class PermissionDescriptor {
       'name': name,
       if (sysex != null) 'sysex': sysex,
       if (userVisibleOnly != null) 'userVisibleOnly': userVisibleOnly,
-      if (type != null) 'type': type,
       if (allowWithoutSanitization != null)
         'allowWithoutSanitization': allowWithoutSanitization,
     };

@@ -587,7 +587,7 @@ class BaseAudioContext {
   }
 }
 
-/// Protocol object for AudioListner
+/// Protocol object for AudioListener
 class AudioListener {
   final GraphObjectId listenerId;
 
