@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.20.1 (2020-10-14)
+- Fix `Browser.close()` error
+
 # 1.20.0 (2020-09-11)
 - Update Chromium to version 86
 
