@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
@@ -11,7 +12,7 @@ void main() {
   Page page;
   setUpAll(() async {
     server = await Server.create();
-    browser = await puppeteer.launch();
+    browser = await puppeteer.launch(defaultViewport: DeviceViewport());
   });
 
   tearDownAll(() async {
