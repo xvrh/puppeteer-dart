@@ -5,7 +5,7 @@ A Dart library to automate the Chrome browser over the DevTools Protocol.
 This is a port of the [Puppeteer Node.JS library](https://pptr.dev/) in the [Dart language](https://www.dartlang.org/).
 
 [![pub package](https://img.shields.io/pub/v/puppeteer.svg)](https://pub.dartlang.org/packages/puppeteer)
-[![Build Status](https://travis-ci.org/xvrh/puppeteer-dart.svg?branch=master)](https://travis-ci.org/xvrh/puppeteer-dart)
+[![Build Status](https://github.com/xvrh/puppeteer-dart/workflows/build/badge.svg?branch=master)](https://github.com/xvrh/puppeteer-dart)
 [![Coverage Status](https://coveralls.io/repos/github/xvrh/puppeteer-dart/badge.svg?branch=master)](https://coveralls.io/github/xvrh/puppeteer-dart?branch=master)
 
 
@@ -120,16 +120,16 @@ void main() async {
   // Start the browser and go to a web page
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
-  await page.goto('https://www.github.com', wait: Until.networkIdle);
+  await page.goto('https://stackoverflow.com/', wait: Until.networkIdle);
 
   // Select an element on the page
-  var form = await page.$('form[action="/join"]');
+  var form = await page.$('input[name="q"]');
 
   // Take a screenshot of the element
   var screenshot = await form.screenshot();
 
   // Save it to a file
-  await File('example/_github_form.png').writeAsBytes(screenshot);
+  await File('example/_element.png').writeAsBytes(screenshot);
 
   await browser.close();
 }
