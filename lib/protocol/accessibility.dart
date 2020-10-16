@@ -50,6 +50,36 @@ class AccessibilityApi {
         .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
         .toList();
   }
+
+  /// Query a DOM node's accessibility subtree for accessible name and role.
+  /// This command computes the name and role for all nodes in the subtree, including those that are
+  /// ignored for accessibility, and returns those that mactch the specified name and role. If no DOM
+  /// node is specified, or the DOM node does not exist, the command returns an error. If neither
+  /// `accessibleName` or `role` is specified, it returns all the accessibility nodes in the subtree.
+  /// [nodeId] Identifier of the node for the root to query.
+  /// [backendNodeId] Identifier of the backend node for the root to query.
+  /// [objectId] JavaScript object id of the node wrapper for the root to query.
+  /// [accessibleName] Find nodes with this computed name.
+  /// [role] Find nodes with this computed role.
+  /// Returns: A list of `Accessibility.AXNode` matching the specified attributes,
+  /// including nodes that are ignored for accessibility.
+  Future<List<AXNodeData>> queryAXTree(
+      {dom.NodeId nodeId,
+      dom.BackendNodeId backendNodeId,
+      runtime.RemoteObjectId objectId,
+      String accessibleName,
+      String role}) async {
+    var result = await _client.send('Accessibility.queryAXTree', {
+      if (nodeId != null) 'nodeId': nodeId,
+      if (backendNodeId != null) 'backendNodeId': backendNodeId,
+      if (objectId != null) 'objectId': objectId,
+      if (accessibleName != null) 'accessibleName': accessibleName,
+      if (role != null) 'role': role,
+    });
+    return (result['nodes'] as List)
+        .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
 }
 
 /// Unique accessibility node identifier.

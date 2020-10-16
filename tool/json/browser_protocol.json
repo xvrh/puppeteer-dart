@@ -387,6 +387,53 @@
                             }
                         }
                     ]
+                },
+                {
+                    "name": "queryAXTree",
+                    "description": "Query a DOM node's accessibility subtree for accessible name and role.\nThis command computes the name and role for all nodes in the subtree, including those that are\nignored for accessibility, and returns those that mactch the specified name and role. If no DOM\nnode is specified, or the DOM node does not exist, the command returns an error. If neither\n`accessibleName` or `role` is specified, it returns all the accessibility nodes in the subtree.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "nodeId",
+                            "description": "Identifier of the node for the root to query.",
+                            "optional": true,
+                            "$ref": "DOM.NodeId"
+                        },
+                        {
+                            "name": "backendNodeId",
+                            "description": "Identifier of the backend node for the root to query.",
+                            "optional": true,
+                            "$ref": "DOM.BackendNodeId"
+                        },
+                        {
+                            "name": "objectId",
+                            "description": "JavaScript object id of the node wrapper for the root to query.",
+                            "optional": true,
+                            "$ref": "Runtime.RemoteObjectId"
+                        },
+                        {
+                            "name": "accessibleName",
+                            "description": "Find nodes with this computed name.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "role",
+                            "description": "Find nodes with this computed role.",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "nodes",
+                            "description": "A list of `Accessibility.AXNode` matching the specified attributes,\nincluding nodes that are ignored for accessibility.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "AXNode"
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -1636,6 +1683,7 @@
                         "protectedMediaIdentifier",
                         "sensors",
                         "videoCapture",
+                        "videoCapturePanTiltZoom",
                         "idleDetection",
                         "wakeLockScreen",
                         "wakeLockSystem"
@@ -1677,6 +1725,12 @@
                         {
                             "name": "allowWithoutSanitization",
                             "description": "For \"clipboard\" permission, may specify allowWithoutSanitization.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "panTiltZoom",
+                            "description": "For \"camera\" permission, may specify panTiltZoom.",
                             "optional": true,
                             "type": "boolean"
                         }
@@ -9502,6 +9556,13 @@
                             "description": "Whether is loaded via link preload.",
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "trustTokenParams",
+                            "description": "Set for requests when the TrustToken API is used. Contains the parameters\npassed by the developer (e.g. via \"fetch\") as understood by the backend.",
+                            "experimental": true,
+                            "optional": true,
+                            "$ref": "TrustTokenParams"
                         }
                     ]
                 },
@@ -9671,6 +9732,46 @@
                         "http-cache",
                         "fallback-code",
                         "network"
+                    ]
+                },
+                {
+                    "id": "TrustTokenParams",
+                    "description": "Determines what type of Trust Token operation is executed and\ndepending on the type, some additional parameters.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "type",
+                            "$ref": "TrustTokenOperationType"
+                        },
+                        {
+                            "name": "refreshPolicy",
+                            "description": "Only set for \"srr-token-redemption\" type and determine whether\nto request a fresh SRR or use a still valid cached SRR.",
+                            "type": "string",
+                            "enum": [
+                                "UseCached",
+                                "Refresh"
+                            ]
+                        },
+                        {
+                            "name": "issuers",
+                            "description": "Origins of issuers from whom to request tokens or redemption\nrecords.",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "TrustTokenOperationType",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "Issuance",
+                        "Redemption",
+                        "Signing"
                     ]
                 },
                 {
@@ -9945,6 +10046,12 @@
                             "description": "Initiator line number, set for Parser type or for Script type (when script is importing\nmodule) (0-based).",
                             "optional": true,
                             "type": "number"
+                        },
+                        {
+                            "name": "columnNumber",
+                            "description": "Initiator column number, set for Parser type or for Script type (when script is importing\nmodule) (0-based).",
+                            "optional": true,
+                            "type": "number"
                         }
                     ]
                 },
@@ -10029,7 +10136,10 @@
                         "OverwriteSecure",
                         "InvalidDomain",
                         "InvalidPrefix",
-                        "UnknownError"
+                        "UnknownError",
+                        "SchemefulSameSiteStrict",
+                        "SchemefulSameSiteLax",
+                        "SchemefulSameSiteUnspecifiedTreatedAsLax"
                     ]
                 },
                 {
@@ -10046,7 +10156,10 @@
                         "SameSiteUnspecifiedTreatedAsLax",
                         "SameSiteNoneInsecure",
                         "UserPreferences",
-                        "UnknownError"
+                        "UnknownError",
+                        "SchemefulSameSiteStrict",
+                        "SchemefulSameSiteLax",
+                        "SchemefulSameSiteUnspecifiedTreatedAsLax"
                     ]
                 },
                 {
@@ -10449,6 +10562,20 @@
                         {
                             "name": "value",
                             "$ref": "CrossOriginOpenerPolicyValue"
+                        },
+                        {
+                            "name": "reportOnlyValue",
+                            "$ref": "CrossOriginOpenerPolicyValue"
+                        },
+                        {
+                            "name": "reportingEndpoint",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "reportOnlyReportingEndpoint",
+                            "optional": true,
+                            "type": "string"
                         }
                     ]
                 },
@@ -10469,6 +10596,20 @@
                         {
                             "name": "value",
                             "$ref": "CrossOriginEmbedderPolicyValue"
+                        },
+                        {
+                            "name": "reportOnlyValue",
+                            "$ref": "CrossOriginEmbedderPolicyValue"
+                        },
+                        {
+                            "name": "reportingEndpoint",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "reportOnlyReportingEndpoint",
+                            "optional": true,
+                            "type": "string"
                         }
                     ]
                 },
@@ -10484,6 +10625,62 @@
                         {
                             "name": "coep",
                             "$ref": "CrossOriginEmbedderPolicyStatus"
+                        }
+                    ]
+                },
+                {
+                    "id": "LoadNetworkResourcePageResult",
+                    "description": "An object providing the result of a network resource load.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "success",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "netError",
+                            "description": "Optional values used for error reporting.",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "netErrorName",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "httpStatusCode",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "stream",
+                            "description": "If successful, one of the following two fields holds the result.",
+                            "optional": true,
+                            "$ref": "IO.StreamHandle"
+                        },
+                        {
+                            "name": "headers",
+                            "description": "Response headers.",
+                            "optional": true,
+                            "$ref": "Network.Headers"
+                        }
+                    ]
+                },
+                {
+                    "id": "LoadNetworkResourceOptions",
+                    "description": "An options object that may be extended later to better support CORS,\nCORB and streaming.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "disableCache",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "includeCredentials",
+                            "type": "boolean"
                         }
                     ]
                 }
@@ -10976,7 +11173,8 @@
                     "returns": [
                         {
                             "name": "success",
-                            "description": "True if successfully set cookie.",
+                            "description": "Always set to true. If an error occurs, the response indicates protocol error.",
+                            "deprecated": true,
                             "type": "boolean"
                         }
                     ]
@@ -11098,6 +11296,34 @@
                         {
                             "name": "status",
                             "$ref": "SecurityIsolationStatus"
+                        }
+                    ]
+                },
+                {
+                    "name": "loadNetworkResource",
+                    "description": "Fetches the resource and returns the content.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "frameId",
+                            "description": "Frame id to get the resource for.",
+                            "$ref": "Page.FrameId"
+                        },
+                        {
+                            "name": "url",
+                            "description": "URL of the resource to get content for.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "options",
+                            "description": "Options for the request.",
+                            "$ref": "LoadNetworkResourceOptions"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "resource",
+                            "$ref": "LoadNetworkResourcePageResult"
                         }
                     ]
                 }
@@ -11802,6 +12028,12 @@
                         {
                             "name": "areaBorderColor",
                             "description": "The named grid areas border color (Default: transparent).",
+                            "optional": true,
+                            "$ref": "DOM.RGBA"
+                        },
+                        {
+                            "name": "gridBackgroundColor",
+                            "description": "The grid container background color (Default: transparent).",
                             "optional": true,
                             "$ref": "DOM.RGBA"
                         }
@@ -15916,9 +16148,16 @@
                         },
                         {
                             "name": "canAccessOpener",
-                            "description": "Whether the opened window has access to the originating window.",
+                            "description": "Whether the target has access to the originating window.",
                             "experimental": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "openerFrameId",
+                            "description": "Frame id of originating window (is only set if target has an opener).",
+                            "experimental": true,
+                            "optional": true,
+                            "$ref": "Page.FrameId"
                         },
                         {
                             "name": "browserContextId",
@@ -16002,6 +16241,8 @@
                     "returns": [
                         {
                             "name": "success",
+                            "description": "Always set to true. If an error occurs, the response indicates protocol error.",
+                            "deprecated": true,
                             "type": "boolean"
                         }
                     ]
@@ -16701,7 +16942,6 @@
         {
             "domain": "Fetch",
             "description": "A domain for letting clients substitute browser's network layer with client code.",
-            "experimental": true,
             "dependencies": [
                 "Network",
                 "IO",
@@ -16716,7 +16956,6 @@
                 {
                     "id": "RequestStage",
                     "description": "Stages of the request to handle. Request will intercept before the request is\nsent. Response will intercept after the response is received (but before response\nbody is received.",
-                    "experimental": true,
                     "type": "string",
                     "enum": [
                         "Request",
@@ -16725,7 +16964,6 @@
                 },
                 {
                     "id": "RequestPattern",
-                    "experimental": true,
                     "type": "object",
                     "properties": [
                         {
@@ -16766,7 +17004,6 @@
                 {
                     "id": "AuthChallenge",
                     "description": "Authorization challenge for HTTP status code 401 or 407.",
-                    "experimental": true,
                     "type": "object",
                     "properties": [
                         {
@@ -16799,7 +17036,6 @@
                 {
                     "id": "AuthChallengeResponse",
                     "description": "Response to an AuthChallenge.",
-                    "experimental": true,
                     "type": "object",
                     "properties": [
                         {
@@ -17606,6 +17842,12 @@
                         {
                             "name": "hasUserVerification",
                             "description": "Defaults to false.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "hasLargeBlob",
+                            "description": "If set to true, the authenticator will support the largeBlob extension.\nhttps://w3c.github.io/webauthn#largeBlob\nDefaults to false.",
                             "optional": true,
                             "type": "boolean"
                         },

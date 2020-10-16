@@ -116,6 +116,25 @@ class ProfilerApi {
         .toList();
   }
 
+  /// Enable counters collection.
+  Future<void> enableCounters() async {
+    await _client.send('Profiler.enableCounters');
+  }
+
+  /// Disable counters collection.
+  Future<void> disableCounters() async {
+    await _client.send('Profiler.disableCounters');
+  }
+
+  /// Retrieve counters.
+  /// Returns: Collected counters information.
+  Future<List<CounterInfo>> getCounters() async {
+    var result = await _client.send('Profiler.getCounters');
+    return (result['result'] as List)
+        .map((e) => CounterInfo.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
   /// Enable run time call stats collection.
   Future<void> enableRuntimeCallStats() async {
     await _client.send('Profiler.enableRuntimeCallStats');
@@ -127,11 +146,11 @@ class ProfilerApi {
   }
 
   /// Retrieve run time call stats.
-  /// Returns: Collected counter information.
-  Future<List<CounterInfo>> getRuntimeCallStats() async {
+  /// Returns: Collected runtime call counter information.
+  Future<List<RuntimeCallCounterInfo>> getRuntimeCallStats() async {
     var result = await _client.send('Profiler.getRuntimeCallStats');
     return (result['result'] as List)
-        .map((e) => CounterInfo.fromJson(e as Map<String, dynamic>))
+        .map((e) => RuntimeCallCounterInfo.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 }
@@ -572,6 +591,37 @@ class CounterInfo {
     return {
       'name': name,
       'value': value,
+    };
+  }
+}
+
+/// Runtime call counter information.
+class RuntimeCallCounterInfo {
+  /// Counter name.
+  final String name;
+
+  /// Counter value.
+  final num value;
+
+  /// Counter time in seconds.
+  final num time;
+
+  RuntimeCallCounterInfo(
+      {@required this.name, @required this.value, @required this.time});
+
+  factory RuntimeCallCounterInfo.fromJson(Map<String, dynamic> json) {
+    return RuntimeCallCounterInfo(
+      name: json['name'] as String,
+      value: json['value'] as num,
+      time: json['time'] as num,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'value': value,
+      'time': time,
     };
   }
 }

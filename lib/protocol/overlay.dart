@@ -362,6 +362,9 @@ class GridHighlightConfig {
   /// The named grid areas border color (Default: transparent).
   final dom.RGBA areaBorderColor;
 
+  /// The grid container background color (Default: transparent).
+  final dom.RGBA gridBackgroundColor;
+
   GridHighlightConfig(
       {this.showGridExtensionLines,
       this.showPositiveLineNumbers,
@@ -379,7 +382,8 @@ class GridHighlightConfig {
       this.rowHatchColor,
       this.columnGapColor,
       this.columnHatchColor,
-      this.areaBorderColor});
+      this.areaBorderColor,
+      this.gridBackgroundColor});
 
   factory GridHighlightConfig.fromJson(Map<String, dynamic> json) {
     return GridHighlightConfig(
@@ -433,6 +437,10 @@ class GridHighlightConfig {
       areaBorderColor: json.containsKey('areaBorderColor')
           ? dom.RGBA.fromJson(json['areaBorderColor'] as Map<String, dynamic>)
           : null,
+      gridBackgroundColor: json.containsKey('gridBackgroundColor')
+          ? dom.RGBA
+              .fromJson(json['gridBackgroundColor'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -459,6 +467,8 @@ class GridHighlightConfig {
       if (columnHatchColor != null)
         'columnHatchColor': columnHatchColor.toJson(),
       if (areaBorderColor != null) 'areaBorderColor': areaBorderColor.toJson(),
+      if (gridBackgroundColor != null)
+        'gridBackgroundColor': gridBackgroundColor.toJson(),
     };
   }
 }

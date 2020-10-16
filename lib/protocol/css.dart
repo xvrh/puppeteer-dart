@@ -655,9 +655,12 @@ class CSSStyleSheetHeader {
 
   /// Whether this stylesheet is mutable. Inline stylesheets become mutable
   /// after they have been modified via CSSOM API.
-  /// <link> element's stylesheets are never mutable. Constructed stylesheets
-  /// (new CSSStyleSheet()) are mutable immediately after creation.
+  /// <link> element's stylesheets become mutable only if DevTools modifies them.
+  /// Constructed stylesheets (new CSSStyleSheet()) are mutable immediately after creation.
   final bool isMutable;
+
+  /// Whether this stylesheet is a constructed stylesheet (created using new CSSStyleSheet()).
+  final bool isConstructed;
 
   /// Line offset of the stylesheet within the resource (zero based).
   final num startLine;
@@ -686,6 +689,7 @@ class CSSStyleSheetHeader {
       this.hasSourceURL,
       @required this.isInline,
       @required this.isMutable,
+      @required this.isConstructed,
       @required this.startLine,
       @required this.startColumn,
       @required this.length,
@@ -711,6 +715,7 @@ class CSSStyleSheetHeader {
           : null,
       isInline: json['isInline'] as bool,
       isMutable: json['isMutable'] as bool,
+      isConstructed: json['isConstructed'] as bool,
       startLine: json['startLine'] as num,
       startColumn: json['startColumn'] as num,
       length: json['length'] as num,
@@ -729,6 +734,7 @@ class CSSStyleSheetHeader {
       'disabled': disabled,
       'isInline': isInline,
       'isMutable': isMutable,
+      'isConstructed': isConstructed,
       'startLine': startLine,
       'startColumn': startColumn,
       'length': length,

@@ -2,8 +2,6 @@ import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
-// ignore_for_file: prefer_interpolation_to_compose_strings
-
 void main() {
   Server server;
   Browser browser;
@@ -11,7 +9,7 @@ void main() {
   Page page;
   setUpAll(() async {
     server = await Server.create();
-    browser = await puppeteer.launch();
+    browser = await puppeteer.launch(defaultViewport: DeviceViewport());
   });
 
   tearDownAll(() async {
@@ -74,7 +72,7 @@ function dimensions() {
       expect(event['button'], equals(0));
     });
     test('should resize the textarea', () async {
-      await page.goto(server.prefix + '/input/textarea.html');
+      await page.goto('${server.prefix}/input/textarea.html');
       var dimensions = await getDimensions();
       var mouse = page.mouse;
       await mouse.move(Point(dimensions.left + dimensions.width - 4,
@@ -88,7 +86,7 @@ function dimensions() {
       expect(newDimensions.height, equals((dimensions.height + 104).round()));
     });
     test('should select the text with mouse', () async {
-      await page.goto(server.prefix + '/input/textarea.html');
+      await page.goto('${server.prefix}/input/textarea.html');
       await page.focus('textarea');
       var text =
           'This is the text that we are going to try to select. Let\'s see how it goes.';
@@ -108,7 +106,7 @@ function dimensions() {
       }'''), equals(text));
     });
     test('should trigger hover state', () async {
-      await page.goto(server.prefix + '/input/scrollable.html');
+      await page.goto('${server.prefix}/input/scrollable.html');
       await page.hover('#button-6');
       expect(
           await page
@@ -126,7 +124,7 @@ function dimensions() {
           equals('button-91'));
     });
     test('should trigger hover state with removed window.Node', () async {
-      await page.goto(server.prefix + '/input/scrollable.html');
+      await page.goto('${server.prefix}/input/scrollable.html');
       await page.evaluate('() => delete window.Node');
       await page.hover('#button-6');
       expect(
@@ -135,7 +133,7 @@ function dimensions() {
           equals('button-6'));
     });
     test('should set modifier keys on click', () async {
-      await page.goto(server.prefix + '/input/scrollable.html');
+      await page.goto('${server.prefix}/input/scrollable.html');
       await page.evaluate(
           "() => document.querySelector('#button-3').addEventListener('mousedown', e => window.lastEvent = e, true)");
       var modifiers = {
@@ -204,7 +202,7 @@ function dimensions() {
       await page.goto(server.emptyPage);
       await page
           .setViewport(DeviceViewport(width: 360, height: 640, isMobile: true));
-      await page.goto(server.crossProcessPrefix + '/mobile.html');
+      await page.goto('${server.crossProcessPrefix}/mobile.html');
       await page.evaluate('''() => {
       document.addEventListener('click', event => {
         window.result = {
