@@ -803,7 +803,9 @@ class RequestWillBeSentEvent {
       request: RequestData.fromJson(json['request'] as Map<String, dynamic>),
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
       wallTime: TimeSinceEpoch.fromJson(json['wallTime'] as num),
-      initiator: Initiator.fromJson(json['initiator'] as Map<String, dynamic>),
+      initiator: json.containsKey('initiator')
+          ? Initiator.fromJson(json['initiator'] as Map<String, dynamic>)
+          : null,
       redirectResponse: json.containsKey('redirectResponse')
           ? ResponseData.fromJson(
               json['redirectResponse'] as Map<String, dynamic>)
@@ -1963,6 +1965,9 @@ class SecurityDetails {
       @required this.certificateTransparencyCompliance});
 
   factory SecurityDetails.fromJson(Map<String, dynamic> json) {
+    // Firefox doesn't implement this payload.
+    if (json == null) return null;
+
     return SecurityDetails(
       protocol: json['protocol'] as String,
       keyExchange: json['keyExchange'] as String,
@@ -1974,15 +1979,19 @@ class SecurityDetails {
       certificateId:
           security.CertificateId.fromJson(json['certificateId'] as int),
       subjectName: json['subjectName'] as String,
-      sanList: (json['sanList'] as List).map((e) => e as String).toList(),
+      sanList: json.containsKey('sanList')
+          ? (json['sanList'] as List).map((e) => e as String).toList()
+          : null,
       issuer: json['issuer'] as String,
       validFrom: TimeSinceEpoch.fromJson(json['validFrom'] as num),
       validTo: TimeSinceEpoch.fromJson(json['validTo'] as num),
-      signedCertificateTimestampList: (json['signedCertificateTimestampList']
-              as List)
-          .map((e) =>
-              SignedCertificateTimestamp.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      signedCertificateTimestampList:
+          json.containsKey('signedCertificateTimestampList')
+              ? (json['signedCertificateTimestampList'] as List)
+                  .map((e) => SignedCertificateTimestamp.fromJson(
+                      e as Map<String, dynamic>))
+                  .toList()
+              : null,
       certificateTransparencyCompliance:
           CertificateTransparencyCompliance.fromJson(
               json['certificateTransparencyCompliance'] as String),

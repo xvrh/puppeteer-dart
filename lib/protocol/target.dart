@@ -86,7 +86,8 @@ class TargetApi {
     var result = await _client.send('Target.closeTarget', {
       'targetId': targetId,
     });
-    return result['success'] as bool;
+    // Firefox returns null.
+    return result == null || result['success'] as bool;
   }
 
   /// Inject object to the target's main frame that provides a communication
@@ -121,8 +122,7 @@ class TargetApi {
       if (proxyServer != null) 'proxyServer': proxyServer,
       if (proxyBypassList != null) 'proxyBypassList': proxyBypassList,
     });
-    return browser.BrowserContextID.fromJson(
-        result['browserContextId'] as String);
+    return browser.BrowserContextID.fromJson(result['browserContextId']);
   }
 
   /// Returns all browser contexts created with `Target.createBrowserContext` method.
@@ -130,7 +130,7 @@ class TargetApi {
   Future<List<browser.BrowserContextID>> getBrowserContexts() async {
     var result = await _client.send('Target.getBrowserContexts');
     return (result['browserContextIds'] as List)
-        .map((e) => browser.BrowserContextID.fromJson(e as String))
+        .map((e) => browser.BrowserContextID.fromJson(e))
         .toList();
   }
 
@@ -418,8 +418,7 @@ class TargetInfo {
           ? page.FrameId.fromJson(json['openerFrameId'] as String)
           : null,
       browserContextId: json.containsKey('browserContextId')
-          ? browser.BrowserContextID.fromJson(
-              json['browserContextId'] as String)
+          ? browser.BrowserContextID.fromJson(json['browserContextId'])
           : null,
     );
   }

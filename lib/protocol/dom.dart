@@ -63,7 +63,7 @@ class DOMApi {
   Stream<List<NodeId>> get onInlineStyleInvalidated => _client.onEvent
       .where((event) => event.name == 'DOM.inlineStyleInvalidated')
       .map((event) => (event.parameters['nodeIds'] as List)
-          .map((e) => NodeId.fromJson(e as int))
+          .map((e) => NodeId.fromJson(e))
           .toList());
 
   /// Called when a pseudo element is added to an element.
@@ -117,7 +117,7 @@ class DOMApi {
       'targetNodeId': targetNodeId,
       if (insertBeforeNodeId != null) 'insertBeforeNodeId': insertBeforeNodeId,
     });
-    return NodeId.fromJson(result['nodeId'] as int);
+    return NodeId.fromJson(result['nodeId']);
   }
 
   /// Describes node given its id, does not require domain to be enabled. Does not start tracking any
@@ -295,9 +295,7 @@ class DOMApi {
       'computedStyles': [...computedStyles],
       if (pierce != null) 'pierce': pierce,
     });
-    return (result['nodeIds'] as List)
-        .map((e) => NodeId.fromJson(e as int))
-        .toList();
+    return (result['nodeIds'] as List).map((e) => NodeId.fromJson(e)).toList();
   }
 
   /// Returns node id at given location. Depending on whether DOM domain is enabled, nodeId is
@@ -343,7 +341,7 @@ class DOMApi {
     var result = await _client.send('DOM.getRelayoutBoundary', {
       'nodeId': nodeId,
     });
-    return NodeId.fromJson(result['nodeId'] as int);
+    return NodeId.fromJson(result['nodeId']);
   }
 
   /// Returns search results from given `fromIndex` to given `toIndex` from the search with the given
@@ -359,9 +357,7 @@ class DOMApi {
       'fromIndex': fromIndex,
       'toIndex': toIndex,
     });
-    return (result['nodeIds'] as List)
-        .map((e) => NodeId.fromJson(e as int))
-        .toList();
+    return (result['nodeIds'] as List).map((e) => NodeId.fromJson(e)).toList();
   }
 
   /// Hides any highlight.
@@ -397,7 +393,7 @@ class DOMApi {
       'targetNodeId': targetNodeId,
       if (insertBeforeNodeId != null) 'insertBeforeNodeId': insertBeforeNodeId,
     });
-    return NodeId.fromJson(result['nodeId'] as int);
+    return NodeId.fromJson(result['nodeId']);
   }
 
   /// Searches for a given string in the DOM tree. Use `getSearchResults` to access search results or
@@ -421,7 +417,7 @@ class DOMApi {
     var result = await _client.send('DOM.pushNodeByPathToFrontend', {
       'path': path,
     });
-    return NodeId.fromJson(result['nodeId'] as int);
+    return NodeId.fromJson(result['nodeId']);
   }
 
   /// Requests that a batch of nodes is sent to the caller given their backend node ids.
@@ -433,9 +429,7 @@ class DOMApi {
     var result = await _client.send('DOM.pushNodesByBackendIdsToFrontend', {
       'backendNodeIds': [...backendNodeIds],
     });
-    return (result['nodeIds'] as List)
-        .map((e) => NodeId.fromJson(e as int))
-        .toList();
+    return (result['nodeIds'] as List).map((e) => NodeId.fromJson(e)).toList();
   }
 
   /// Executes `querySelector` on a given node.
@@ -447,7 +441,7 @@ class DOMApi {
       'nodeId': nodeId,
       'selector': selector,
     });
-    return NodeId.fromJson(result['nodeId'] as int);
+    return NodeId.fromJson(result['nodeId']);
   }
 
   /// Executes `querySelectorAll` on a given node.
@@ -459,9 +453,7 @@ class DOMApi {
       'nodeId': nodeId,
       'selector': selector,
     });
-    return (result['nodeIds'] as List)
-        .map((e) => NodeId.fromJson(e as int))
-        .toList();
+    return (result['nodeIds'] as List).map((e) => NodeId.fromJson(e)).toList();
   }
 
   /// Re-does the last undone action.
@@ -513,7 +505,7 @@ class DOMApi {
     var result = await _client.send('DOM.requestNode', {
       'objectId': objectId,
     });
-    return NodeId.fromJson(result['nodeId'] as int);
+    return NodeId.fromJson(result['nodeId']);
   }
 
   /// Resolves the JavaScript node object for a given NodeId or BackendNodeId.
@@ -629,7 +621,7 @@ class DOMApi {
       'nodeId': nodeId,
       'name': name,
     });
-    return NodeId.fromJson(result['nodeId'] as int);
+    return NodeId.fromJson(result['nodeId']);
   }
 
   /// Sets node value for a node with given id.
@@ -681,7 +673,7 @@ class AttributeModifiedEvent {
 
   factory AttributeModifiedEvent.fromJson(Map<String, dynamic> json) {
     return AttributeModifiedEvent(
-      nodeId: NodeId.fromJson(json['nodeId'] as int),
+      nodeId: NodeId.fromJson(json['nodeId']),
       name: json['name'] as String,
       value: json['value'] as String,
     );
@@ -699,7 +691,7 @@ class AttributeRemovedEvent {
 
   factory AttributeRemovedEvent.fromJson(Map<String, dynamic> json) {
     return AttributeRemovedEvent(
-      nodeId: NodeId.fromJson(json['nodeId'] as int),
+      nodeId: NodeId.fromJson(json['nodeId']),
       name: json['name'] as String,
     );
   }
@@ -717,7 +709,7 @@ class CharacterDataModifiedEvent {
 
   factory CharacterDataModifiedEvent.fromJson(Map<String, dynamic> json) {
     return CharacterDataModifiedEvent(
-      nodeId: NodeId.fromJson(json['nodeId'] as int),
+      nodeId: NodeId.fromJson(json['nodeId']),
       characterData: json['characterData'] as String,
     );
   }
@@ -735,7 +727,7 @@ class ChildNodeCountUpdatedEvent {
 
   factory ChildNodeCountUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return ChildNodeCountUpdatedEvent(
-      nodeId: NodeId.fromJson(json['nodeId'] as int),
+      nodeId: NodeId.fromJson(json['nodeId']),
       childNodeCount: json['childNodeCount'] as int,
     );
   }
@@ -758,8 +750,8 @@ class ChildNodeInsertedEvent {
 
   factory ChildNodeInsertedEvent.fromJson(Map<String, dynamic> json) {
     return ChildNodeInsertedEvent(
-      parentNodeId: NodeId.fromJson(json['parentNodeId'] as int),
-      previousNodeId: NodeId.fromJson(json['previousNodeId'] as int),
+      parentNodeId: NodeId.fromJson(json['parentNodeId']),
+      previousNodeId: NodeId.fromJson(json['previousNodeId']),
       node: Node.fromJson(json['node'] as Map<String, dynamic>),
     );
   }
@@ -776,8 +768,8 @@ class ChildNodeRemovedEvent {
 
   factory ChildNodeRemovedEvent.fromJson(Map<String, dynamic> json) {
     return ChildNodeRemovedEvent(
-      parentNodeId: NodeId.fromJson(json['parentNodeId'] as int),
-      nodeId: NodeId.fromJson(json['nodeId'] as int),
+      parentNodeId: NodeId.fromJson(json['parentNodeId']),
+      nodeId: NodeId.fromJson(json['nodeId']),
     );
   }
 }
@@ -794,7 +786,7 @@ class DistributedNodesUpdatedEvent {
 
   factory DistributedNodesUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return DistributedNodesUpdatedEvent(
-      insertionPointId: NodeId.fromJson(json['insertionPointId'] as int),
+      insertionPointId: NodeId.fromJson(json['insertionPointId']),
       distributedNodes: (json['distributedNodes'] as List)
           .map((e) => BackendNode.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -814,7 +806,7 @@ class PseudoElementAddedEvent {
 
   factory PseudoElementAddedEvent.fromJson(Map<String, dynamic> json) {
     return PseudoElementAddedEvent(
-      parentId: NodeId.fromJson(json['parentId'] as int),
+      parentId: NodeId.fromJson(json['parentId']),
       pseudoElement:
           Node.fromJson(json['pseudoElement'] as Map<String, dynamic>),
     );
@@ -833,8 +825,8 @@ class PseudoElementRemovedEvent {
 
   factory PseudoElementRemovedEvent.fromJson(Map<String, dynamic> json) {
     return PseudoElementRemovedEvent(
-      parentId: NodeId.fromJson(json['parentId'] as int),
-      pseudoElementId: NodeId.fromJson(json['pseudoElementId'] as int),
+      parentId: NodeId.fromJson(json['parentId']),
+      pseudoElementId: NodeId.fromJson(json['pseudoElementId']),
     );
   }
 }
@@ -850,7 +842,7 @@ class SetChildNodesEvent {
 
   factory SetChildNodesEvent.fromJson(Map<String, dynamic> json) {
     return SetChildNodesEvent(
-      parentId: NodeId.fromJson(json['parentId'] as int),
+      parentId: NodeId.fromJson(json['parentId']),
       nodes: (json['nodes'] as List)
           .map((e) => Node.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -869,8 +861,8 @@ class ShadowRootPoppedEvent {
 
   factory ShadowRootPoppedEvent.fromJson(Map<String, dynamic> json) {
     return ShadowRootPoppedEvent(
-      hostId: NodeId.fromJson(json['hostId'] as int),
-      rootId: NodeId.fromJson(json['rootId'] as int),
+      hostId: NodeId.fromJson(json['hostId']),
+      rootId: NodeId.fromJson(json['rootId']),
     );
   }
 }
@@ -886,7 +878,7 @@ class ShadowRootPushedEvent {
 
   factory ShadowRootPushedEvent.fromJson(Map<String, dynamic> json) {
     return ShadowRootPushedEvent(
-      hostId: NodeId.fromJson(json['hostId'] as int),
+      hostId: NodeId.fromJson(json['hostId']),
       root: Node.fromJson(json['root'] as Map<String, dynamic>),
     );
   }
@@ -907,11 +899,10 @@ class GetNodeForLocationResult {
 
   factory GetNodeForLocationResult.fromJson(Map<String, dynamic> json) {
     return GetNodeForLocationResult(
-      backendNodeId: BackendNodeId.fromJson(json['backendNodeId'] as int),
+      backendNodeId: BackendNodeId.fromJson(json['backendNodeId']),
       frameId: page.FrameId.fromJson(json['frameId'] as String),
-      nodeId: json.containsKey('nodeId')
-          ? NodeId.fromJson(json['nodeId'] as int)
-          : null,
+      nodeId:
+          json.containsKey('nodeId') ? NodeId.fromJson(json['nodeId']) : null,
     );
   }
 }
@@ -944,23 +935,22 @@ class GetFrameOwnerResult {
 
   factory GetFrameOwnerResult.fromJson(Map<String, dynamic> json) {
     return GetFrameOwnerResult(
-      backendNodeId: BackendNodeId.fromJson(json['backendNodeId'] as int),
-      nodeId: json.containsKey('nodeId')
-          ? NodeId.fromJson(json['nodeId'] as int)
-          : null,
+      backendNodeId: BackendNodeId.fromJson(json['backendNodeId']),
+      nodeId:
+          json.containsKey('nodeId') ? NodeId.fromJson(json['nodeId']) : null,
     );
   }
 }
 
 /// Unique DOM node identifier.
 class NodeId {
-  final int value;
+  final dynamic value;
 
   NodeId(this.value);
 
-  factory NodeId.fromJson(int value) => NodeId(value);
+  factory NodeId.fromJson(dynamic value) => NodeId(value);
 
-  int toJson() => value;
+  dynamic toJson() => value;
 
   @override
   bool operator ==(other) =>
@@ -976,13 +966,13 @@ class NodeId {
 /// Unique DOM node identifier used to reference a node that may not have been pushed to the
 /// front-end.
 class BackendNodeId {
-  final int value;
+  final dynamic value;
 
   BackendNodeId(this.value);
 
-  factory BackendNodeId.fromJson(int value) => BackendNodeId(value);
+  factory BackendNodeId.fromJson(dynamic value) => BackendNodeId(value);
 
-  int toJson() => value;
+  dynamic toJson() => value;
 
   @override
   bool operator ==(other) =>
@@ -1014,7 +1004,7 @@ class BackendNode {
     return BackendNode(
       nodeType: json['nodeType'] as int,
       nodeName: json['nodeName'] as String,
-      backendNodeId: BackendNodeId.fromJson(json['backendNodeId'] as int),
+      backendNodeId: BackendNodeId.fromJson(json['backendNodeId']),
     );
   }
 
@@ -1234,11 +1224,11 @@ class Node {
 
   factory Node.fromJson(Map<String, dynamic> json) {
     return Node(
-      nodeId: NodeId.fromJson(json['nodeId'] as int),
+      nodeId: NodeId.fromJson(json['nodeId']),
       parentId: json.containsKey('parentId')
-          ? NodeId.fromJson(json['parentId'] as int)
+          ? NodeId.fromJson(json['parentId'])
           : null,
-      backendNodeId: BackendNodeId.fromJson(json['backendNodeId'] as int),
+      backendNodeId: BackendNodeId.fromJson(json['backendNodeId']),
       nodeType: json['nodeType'] as int,
       nodeName: json['nodeName'] as String,
       localName: json['localName'] as String,

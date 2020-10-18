@@ -1922,6 +1922,9 @@ class VisualViewport {
       this.zoom});
 
   factory VisualViewport.fromJson(Map<String, dynamic> json) {
+    // Firefox doesn't implement this payload.
+    if (json == null) return null;
+
     return VisualViewport(
       offsetX: json['offsetX'] as num,
       offsetY: json['offsetY'] as num,

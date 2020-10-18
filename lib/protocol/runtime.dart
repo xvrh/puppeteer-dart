@@ -1709,13 +1709,18 @@ class StackTraceData {
       this.parentId});
 
   factory StackTraceData.fromJson(Map<String, dynamic> json) {
+    // Firefox sometimes doesn't implement this payload.
+    if (json == null) return null;
+
     return StackTraceData(
       description: json.containsKey('description')
           ? json['description'] as String
           : null,
-      callFrames: (json['callFrames'] as List)
-          .map((e) => CallFrame.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      callFrames: json.containsKey('callFrames')
+          ? (json['callFrames'] as List)
+              .map((e) => CallFrame.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
       parent: json.containsKey('parent')
           ? StackTraceData.fromJson(json['parent'] as Map<String, dynamic>)
           : null,

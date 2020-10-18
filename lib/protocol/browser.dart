@@ -221,7 +221,8 @@ class BrowserContextID {
 
   BrowserContextID(this.value);
 
-  factory BrowserContextID.fromJson(String value) => BrowserContextID(value);
+  factory BrowserContextID.fromJson(dynamic value) =>
+      BrowserContextID(value.toString());
 
   String toJson() => value;
 

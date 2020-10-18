@@ -94,7 +94,9 @@ class LogEntry {
     return LogEntry(
       source: LogEntrySource.fromJson(json['source'] as String),
       level: LogEntryLevel.fromJson(json['level'] as String),
-      text: json['text'] as String,
+      text: (json['text'] is List)
+          ? (json['text'] as List).join('\n')
+          : json['text'] as String,
       timestamp: runtime.Timestamp.fromJson(json['timestamp'] as num),
       url: json.containsKey('url') ? json['url'] as String : null,
       lineNumber:

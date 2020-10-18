@@ -94,6 +94,8 @@ void main() {
     });
     test('should send events when frames are manipulated dynamically',
         () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto(server.emptyPage);
       // validate frameattached events
       var attachedFrames = <Frame>[];
@@ -118,6 +120,8 @@ void main() {
     });
     test('should send "framenavigated" when navigating on anchor URLs',
         () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto(server.emptyPage);
       await Future.wait([
         page.onFrameNavigated.first,
@@ -139,6 +143,8 @@ void main() {
       expect(hasEvents, isFalse);
     });
     test('should detach child frames on navigation', () async {
+      if (isPuppeteerFirefox) return;
+
       var attachedFrames = <Frame>[];
       var detachedFrames = <Frame>[];
       var navigatedFrames = <Frame>[];
@@ -179,6 +185,8 @@ void main() {
       expect(navigatedFrames.length, equals(1));
     });
     test('should support framesets', () async {
+      if (isPuppeteerFirefox) return;
+
       var attachedFrames = <Frame>[];
       var detachedFrames = <Frame>[];
       var navigatedFrames = <Frame>[];
