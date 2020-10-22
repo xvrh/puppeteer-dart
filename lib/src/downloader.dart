@@ -16,10 +16,11 @@ class RevisionInfo {
       @required this.revision});
 }
 
-const int _lastRevision = 818858;
+const int _lastChromeRevision = 818858;
+const String _lastFirefoxRevision = '84.0a1';
 
 Future<RevisionInfo> downloadChrome({int revision, String cachePath}) async {
-  revision ??= _lastRevision;
+  revision ??= _lastChromeRevision;
   cachePath ??= '.local-chromium';
 
   var revisionDirectory = Directory(p.join(cachePath, '$revision'));
@@ -96,6 +97,85 @@ void _simpleUnzip(String path, String targetPath) {
   }
 }
 
+Future<RevisionInfo> downloadFirefox({
+  String revision,
+  String cachePath,
+}) async {
+  revision ??= _lastFirefoxRevision;
+  cachePath ??= '.local-firefox';
+
+  var revisionDirectory = Directory(p.join(cachePath, revision));
+  if (!revisionDirectory.existsSync()) {
+    revisionDirectory.createSync(recursive: true);
+  }
+
+  var exePath = getFirefoxExecutablePath(revisionDirectory.path);
+
+  var executableFile = File(exePath);
+
+  if (!executableFile.existsSync()) {
+    final url = _downloadUrlForFirefox(revision);
+    final archivePath = p.join(cachePath, '${revision}_${p.url.basename(url)}');
+    await _downloadFile(url, archivePath);
+    await _installFirefox(archivePath, revisionDirectory.path);
+    File(archivePath).deleteSync();
+  }
+
+  if (!executableFile.existsSync()) {
+    throw Exception("$exePath doesn't exist");
+  }
+
+  if (!Platform.isWindows) {
+    Process.runSync('chmod', ['+x', executableFile.absolute.path]);
+  }
+
+  return RevisionInfo(
+      folderPath: revisionDirectory.path,
+      executablePath: executableFile.path,
+      revision: null);
+}
+
+Future<void> _installFirefox(String archivePath, String folderPath) async {
+  if (archivePath.endsWith('.zip')) {
+    // Windows
+    _unzip(archivePath, folderPath);
+  } else if (archivePath.endsWith('.tar.bz2')) {
+    // Linux
+    await Process.run('tar', ['xjf', archivePath, '-C', folderPath]);
+  } else if (archivePath.endsWith('.dmg')) {
+    // macOS
+    final result = await Process.run('hdiutil', [
+      'attach',
+      '-nobrowse',
+      '-noautoopen',
+      archivePath,
+    ]);
+    final stdout = result.stdout as String;
+    final match = RegExp(r'/Volumes/(.*)').firstMatch(stdout);
+    if (match == null) {
+      throw Exception('Could not find volume path in $stdout');
+    }
+    final mountPath = match.group(0);
+    try {
+      // print('cp -R $mountPath/Firefox Nightly.app $folderPath');
+      await Process.run('cp', [
+        '-R',
+        '$mountPath/Firefox Nightly.app',
+        folderPath,
+      ]);
+    } finally {
+      // unmount.
+      Process.runSync('hdiutil', [
+        'detach',
+        '"$mountPath"',
+        '-quiet',
+      ]);
+    }
+  } else {
+    throw Exception('Unsupported archive format: $archivePath');
+  }
+}
+
 const _baseUrl = 'https://storage.googleapis.com/chromium-browser-snapshots';
 
 String _downloadUrl(int revision) {
@@ -114,7 +194,6 @@ String _downloadUrl(int revision) {
 const _baseUrlFirefox =
     'https://archive.mozilla.org/pub/firefox/nightly/latest-mozilla-central';
 
-// ignore: unused_element
 String _downloadUrlForFirefox(String version) {
   if (Platform.isWindows) {
     return '$_baseUrlFirefox/firefox-$version.en-US.win64.zip';
@@ -136,6 +215,19 @@ String getExecutablePath(String revisionPath) {
   } else if (Platform.isMacOS) {
     return p.join(revisionPath, 'chrome-mac', 'Chromium.app', 'Contents',
         'MacOS', 'Chromium');
+  } else {
+    throw UnsupportedError('Unknown platform ${Platform.operatingSystem}');
+  }
+}
+
+String getFirefoxExecutablePath(String revisionPath) {
+  if (Platform.isWindows) {
+    return p.join(revisionPath, 'firefox', 'firefox.exe');
+  } else if (Platform.isLinux) {
+    return p.join(revisionPath, 'firefox', 'firefox');
+  } else if (Platform.isMacOS) {
+    return p.join(
+        revisionPath, 'Firefox Nightly.app', 'Contents', 'MacOS', 'firefox');
   } else {
     throw UnsupportedError('Unknown platform ${Platform.operatingSystem}');
   }

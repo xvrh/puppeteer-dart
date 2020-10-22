@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:logging/logging.dart';
 import 'package:puppeteer/puppeteer.dart';
 
@@ -7,10 +6,7 @@ Future<void> main() async {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen(print);
 
-  final browser = await puppeteerFirefox.launch(
-    headless: false,
-    executablePath: '/Applications/Firefox Nightly.app/Contents/MacOS/firefox',
-  );
+  final browser = await puppeteerFirefox.launch();
   final myPage = await browser.newPage();
 
   // Go to a page and wait to be fully loaded

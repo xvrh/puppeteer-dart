@@ -55,7 +55,7 @@ class PuppeteerFirefox {
   ///  - `userDataDir` <[string]> Path to a [User Data Directory](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md).
   ///  - `timeout` Maximum time to wait for the browser instance to start. Defaults to 30 seconds.
   Future<Browser> launch(
-      {@required String executablePath,
+      {String executablePath,
       bool headless,
       bool devTools,
       String userDataDir,
@@ -486,13 +486,8 @@ Future<String> _inferExecutablePath() async {
     }
     return executablePath;
   } else {
-    // Downloading Firefox is much more complecated than downloading Chrome.
-    // We have to extract not only zip, but also tar.bz2 (for Linux) and dmg (for macOS).
-    // https://github.com/puppeteer/puppeteer/blob/main/src/node/BrowserFetcher.ts
-    //
-    // Pull Request is welcome :)
-    throw UnimplementedError(
-        'Downloading firefox nightly is not implemeted yet. Please specify executablePath.');
+    // We download locally a version of firefox and use it.
+    return (await downloadFirefox()).executablePath;
   }
 }
 
