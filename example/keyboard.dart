@@ -24,7 +24,12 @@ void main() async {
 
   await page.bringToFront();
 
-  await page.keyboard.type('éèà Hello');
+  if (isPuppeteerFirefox) {
+    // Firefox cannot input 'è' with Input.insertText
+    await page.keyboard.type('Hello World!');
+  } else {
+    await page.keyboard.type('éèà Hello');
+  }
 
   await page.keyboard.down(Key.shift);
   await page.keyboard.press(Key.arrowLeft);

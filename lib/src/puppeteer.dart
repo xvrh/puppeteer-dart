@@ -13,6 +13,9 @@ import 'downloader.dart';
 import 'page/emulation_manager.dart';
 import 'plugin.dart';
 
+final bool isPuppeteerFirefox =
+    Platform.environment['PUPPETEER_PRODUCT'] == 'firefox';
+
 final Logger _logger = Logger('puppeteer.launcher');
 
 final List<String> _defaultArgs = <String>[
@@ -106,6 +109,22 @@ class Puppeteer {
       Map<String, String> environment,
       List<Plugin> plugins,
       Duration timeout}) async {
+    if (isPuppeteerFirefox) {
+      return puppeteerFirefox.launch(
+        executablePath: executablePath,
+        headless: headless,
+        devTools: devTools,
+        userDataDir: userDataDir,
+        defaultViewport: defaultViewport,
+        ignoreHttpsErrors: ignoreHttpsErrors,
+        slowMo: slowMo,
+        args: args,
+        ignoreDefaultArgs: ignoreDefaultArgs,
+        environment: environment,
+        timeout: timeout,
+      );
+    }
+
     devTools ??= false;
     headless ??= !devTools;
     timeout ??= Duration(seconds: 30);
@@ -260,6 +279,15 @@ class Puppeteer {
       List<String> args,
       String userDataDir,
       bool noSandboxFlag}) {
+    if (isPuppeteerFirefox) {
+      return puppeteerFirefox.defaultArgs(
+        devTools: devTools,
+        headless: headless,
+        args: args,
+        userDataDir: userDataDir,
+      );
+    }
+
     devTools ??= false;
     headless ??= !devTools;
     // In docker environment we want to force the '--no-sandbox' flag automatically

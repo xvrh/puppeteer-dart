@@ -12,6 +12,9 @@ import 'devices.dart' as devices_lib;
 import 'downloader.dart';
 import 'page/emulation_manager.dart';
 
+final bool isPuppeteerFirefox =
+    Platform.environment['PUPPETEER_PRODUCT'] == 'firefox';
+
 final Logger _logger = Logger('puppeteer.launcher_firefox');
 
 final puppeteerFirefox = PuppeteerFirefox._();
