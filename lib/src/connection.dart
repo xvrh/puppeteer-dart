@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import '../protocol/target.dart';
+import '../puppeteer.dart';
 
 abstract class Client {
   Future<Map<String, dynamic>> send(String method,
@@ -122,7 +123,12 @@ class Connection implements Client {
       if (session != null) {
         _logger.fine('◀ RECV $message');
 
-        session._onMessage(object);
+        if (isPuppeteerFirefox && session.isClosed) {
+          // Firefox often send message callback after Page#onClosed.
+          // onMessage should be ignored when session is already disconnected.
+        } else {
+          session._onMessage(object);
+        }
       }
     } else if (id != null) {
       _logger.fine('◀ RECV $id $message');
