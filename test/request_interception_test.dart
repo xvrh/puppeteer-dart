@@ -38,6 +38,8 @@ void main() {
   });
 
   group('Page.setRequestInterception', () {
+    if (isPuppeteerFirefox) return;
+
     test('should intercept', () async {
       await page.setRequestInterception(true);
       page.onRequest.listen((request) {
@@ -430,6 +432,8 @@ void main() {
   });
 
   group('Request.continue', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       await page.setRequestInterception(true);
       page.onRequest.listen((request) => request.continueRequest());
@@ -512,6 +516,8 @@ void main() {
   });
 
   group('Request.respond', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       await page.setRequestInterception(true);
       page.onRequest.listen((request) {

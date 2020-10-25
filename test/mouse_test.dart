@@ -106,6 +106,8 @@ function dimensions() {
       }'''), equals(text));
     });
     test('should trigger hover state', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto('${server.prefix}/input/scrollable.html');
       await page.hover('#button-6');
       expect(
@@ -124,6 +126,8 @@ function dimensions() {
           equals('button-91'));
     });
     test('should trigger hover state with removed window.Node', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto('${server.prefix}/input/scrollable.html');
       await page.evaluate('() => delete window.Node');
       await page.hover('#button-6');
@@ -163,6 +167,8 @@ function dimensions() {
       }
     });
     test('should send mouse wheel events', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto('${server.prefix}/input/wheel.html');
       var elem = await page.$('div');
       var boundingBoxBefore = await elem.boundingBox;
@@ -179,6 +185,8 @@ function dimensions() {
       expect(boundingBoxAfter.height, 230);
     });
     test('should tween mouse movement', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.mouse.move(Point(100, 100));
       await page.evaluate('''() => {
       window.result = [];

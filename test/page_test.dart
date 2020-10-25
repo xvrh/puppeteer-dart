@@ -53,6 +53,8 @@ void main() {
       expect(await browser.pages, isNot(contains(newPage)));
     });
     test('should run beforeunload if asked for', () async {
+      if (isPuppeteerFirefox) return;
+
       var newPage = await context.newPage();
       await newPage.goto(server.prefix + '/beforeunload.html');
       // We have to interact with a page so that 'beforeunload' handlers
@@ -67,6 +69,8 @@ void main() {
       await pageClosingPromise;
     });
     test('should *not* run beforeunload by default', () async {
+      if (isPuppeteerFirefox) return;
+
       var newPage = await context.newPage();
       await newPage.goto(server.prefix + '/beforeunload.html');
       // We have to interact with a page so that 'beforeunload' handlers
@@ -120,6 +124,8 @@ void main() {
     });
   });
   group('Page.Events.error', () {
+    if (isPuppeteerFirefox) return;
+
     test('should throw when page crashes', () async {
       var onErrorFuture = page.onError.first;
 
@@ -129,6 +135,8 @@ void main() {
     });
   });
   group('Page.Events.Popup', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       var dialogFuture = page.onPopup.first;
       await page.evaluate("() => window.open('about:blank')");
@@ -187,12 +195,16 @@ void main() {
           equals('prompt'));
     });
     test('should deny permission when not listed', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto(server.emptyPage);
       await context.overridePermissions(server.emptyPage, []);
       expect(await getPermission(page, PermissionType.geolocation),
           equals('denied'));
     });
     test('should grant permission when listed', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto(server.emptyPage);
       await context
           .overridePermissions(server.emptyPage, [PermissionType.geolocation]);
@@ -200,6 +212,8 @@ void main() {
           equals('granted'));
     });
     test('should reset permissions', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto(server.emptyPage);
       await context
           .overridePermissions(server.emptyPage, [PermissionType.geolocation]);
@@ -210,6 +224,8 @@ void main() {
           equals('prompt'));
     });
     test('should trigger permission onchange', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto(server.emptyPage);
       await page.evaluate('''() => {
         window.events = [];
@@ -235,6 +251,8 @@ void main() {
           equals(['prompt', 'denied', 'granted', 'prompt']));
     });
     test('should isolate permissions between browser contexs', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto(server.emptyPage);
       var otherContext = await browser.createIncognitoBrowserContext();
       var otherPage = await otherContext.newPage();
@@ -263,6 +281,8 @@ void main() {
   });
   group('Page.setGeolocation', () {
     test('should work', () async {
+      if (isPuppeteerFirefox) return;
+
       await context
           .overridePermissions(server.hostUrl, [PermissionType.geolocation]);
       await page.goto(server.emptyPage);
@@ -279,6 +299,8 @@ void main() {
     });
   });
   group('Page.setOfflineMode', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       await page.setOfflineMode(true);
       await expectLater(
@@ -298,6 +320,8 @@ void main() {
 
   group('ExecutionContext.queryObjects', () {
     test('should work', () async {
+      if (isPuppeteerFirefox) return;
+
       // Instantiate an object
       await page.evaluate("() => window.set = new Set(['hello', 'world'])");
       var prototypeHandle = await page.evaluateHandle('() => Set.prototype');
@@ -311,6 +335,8 @@ void main() {
       expect(values, equals(['hello', 'world']));
     });
     test('should work for non-blank page', () async {
+      if (isPuppeteerFirefox) return;
+
       // Instantiate an object
       await page.goto(server.emptyPage);
       await page.evaluate("() => window.set = new Set(['hello', 'world'])");
@@ -339,6 +365,8 @@ void main() {
     });
   });
   group('Page.Events.Console', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       var message = await waitFutures(page.onConsole.first,
           [page.evaluate("() => console.log('hello', 5, {foo: 'bar'})")]);
@@ -442,6 +470,8 @@ void main() {
     });
   });
   group('Page.metrics', () {
+    if (isPuppeteerFirefox) return;
+
     void checkMetrics(Metrics metrics) {
       var metricsToCheck = {
         'Timestamp',
@@ -535,6 +565,8 @@ void main() {
     });
   });
   group('Page.exposeFunction', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       await page.exposeFunction('compute', (num a, num b) {
         return a * b;
@@ -624,6 +656,8 @@ void main() {
   });
 
   group('Page.Events.PageError', () {
+    if (isPuppeteerFirefox) return;
+
     test('should fire', () async {
       var error = await waitFutures(page.onError.first, [
         page.goto(server.prefix + '/error.html'),
@@ -708,6 +742,8 @@ void main() {
           throwsA(TypeMatcher<TimeoutException>()));
     });
     test('should await resources to load', () async {
+      if (isPuppeteerFirefox) return;
+
       var imgPath = 'img.png';
       Completer<shelf.Response> imgResponse;
       server.setRoute(imgPath, (req) {
@@ -787,6 +823,8 @@ void main() {
     });
 
     test('should throw an error if loading from url fail', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto(server.emptyPage);
       expect(() => page.addScriptTag(url: '/nonexistfile.js'),
           throwsA(predicate((e) => '$e'.contains('Evaluation failed'))));
@@ -884,6 +922,8 @@ void main() {
     });
 
     test('should throw when added with content to the CSP page', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto(server.prefix + '/csp.html');
       expect(
           () => page.addStyleTag(content: 'body { background-color: green; }'),
@@ -908,6 +948,8 @@ void main() {
   });
 
   group('Page.setJavaScriptEnabled', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       await page.setJavaScriptEnabled(false);
       await page
@@ -1032,6 +1074,8 @@ void main() {
     });
     // @see https://github.com/GoogleChrome/puppeteer/issues/3327
     test('should work when re-defining top-level Event class', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto(server.prefix + '/input/select.html');
       await page.evaluate('() => window.Event = null');
       await page.select('select', ['blue']);
@@ -1042,6 +1086,8 @@ void main() {
 
   group('Page.Events.Close', () {
     test('should work with window.close', () async {
+      if (isPuppeteerFirefox) return;
+
       var newPageFuture =
           context.onTargetCreated.first.then((target) => target.page);
       await page

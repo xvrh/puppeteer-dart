@@ -30,6 +30,8 @@ void main() {
   });
 
   group('Accessibility', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       await page.setContent('''
       <head>

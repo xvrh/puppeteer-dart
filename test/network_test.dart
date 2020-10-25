@@ -112,7 +112,11 @@ void main() {
   group('Request.headers', () {
     test('should work', () async {
       var response = await page.goto(server.emptyPage);
-      expect(response.request.headers['user-agent'], contains('Chrome'));
+      if (isPuppeteerFirefox) {
+        expect(response.request.headers['user-agent'], contains('Firefox'));
+      } else {
+        expect(response.request.headers['user-agent'], contains('Chrome'));
+      }
     });
   });
 
@@ -127,6 +131,8 @@ void main() {
   });
 
   group('Response.fromCache', () {
+    if (isPuppeteerFirefox) return;
+
     test('should return |false| for non-cached content', () async {
       var response = await page.goto(server.emptyPage);
       expect(response.fromCache, isFalse);
@@ -153,6 +159,8 @@ void main() {
   });
 
   group('Response.fromServiceWorker', () {
+    if (isPuppeteerFirefox) return;
+
     test('should return |false| for non-service-worker content', () async {
       var response = await page.goto(server.emptyPage);
       expect(response.fromServiceWorker, isFalse);
@@ -179,6 +187,8 @@ void main() {
   });
 
   group('Request.postData', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       await page.goto(server.emptyPage);
       server.setRoute('/post', (req) => shelf.Response.ok(''));
@@ -198,6 +208,8 @@ void main() {
   });
 
   group('Response.text', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       var response = await page.goto(server.prefix + '/simple.json');
       expect(await response.text, startsWith('{"foo": "bar"}'));
@@ -266,6 +278,8 @@ void main() {
   });
 
   group('Response.json', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       var response = await page.goto(server.prefix + '/simple.json');
       expect(await response.json, equals({'foo': 'bar'}));
@@ -273,6 +287,8 @@ void main() {
   });
 
   group('Response.buffer', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       var response = await page.goto(server.prefix + '/pptr.png');
       var imageBuffer = File('test/assets/pptr.png').readAsBytesSync();
@@ -299,6 +315,8 @@ void main() {
   });
 
   group('Network Events', () {
+    if (isPuppeteerFirefox) return;
+
     test('Page.Events.Request', () async {
       var requests = <Request>[];
       page.onRequest.listen(requests.add);
@@ -344,7 +362,11 @@ void main() {
       expect(failedRequests[0].url, contains('one-style.css'));
       expect(failedRequests[0].response, isNull);
       expect(failedRequests[0].resourceType, equals(ResourceType.stylesheet));
-      expect(failedRequests[0].failure, equals('net::ERR_FAILED'));
+      if (isPuppeteerFirefox) {
+        expect(failedRequests[0].failure, equals('NS_ERROR_FAILURE'));
+      } else {
+        expect(failedRequests[0].failure, equals('net::ERR_FAILED'));
+      }
       expect(failedRequests[0].frame, isNotNull);
     });
     test('Page.Events.RequestFinished', () async {
@@ -399,6 +421,8 @@ void main() {
 
   group('Request.isNavigationRequest', () {
     test('should work', () async {
+      if (isPuppeteerFirefox) return;
+
       var requests = <String, Request>{};
       page.onRequest
           .listen((request) => requests[request.url.split('/').last] = request);
@@ -411,6 +435,8 @@ void main() {
       expect(requests['style.css'].isNavigationRequest, isFalse);
     });
     test('should work with request interception', () async {
+      if (isPuppeteerFirefox) return;
+
       var requests = <String, Request>{};
       page.onRequest.listen((request) {
         requests[request.url.split('/').last] = request;
@@ -434,6 +460,8 @@ void main() {
   });
 
   group('Page.setExtraHTTPHeaders', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       await page.setExtraHTTPHeaders({'foo': 'bar'});
       var request = await waitFutures(server.waitForRequest('/simple.html'), [
@@ -444,6 +472,8 @@ void main() {
   });
 
   group('Page.authenticate', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       //TODO(xha): add auth to test server and re-enable test
       //server.setAuth('/empty.html', 'user', 'pass');

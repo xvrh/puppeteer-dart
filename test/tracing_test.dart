@@ -33,6 +33,8 @@ void main() {
   });
 
   group('Tracing', () {
+    if (isPuppeteerFirefox) return;
+
     test('should output a trace', () async {
       await page.tracing.start(screenshots: true);
       await page.goto(server.prefix + '/grid.html');

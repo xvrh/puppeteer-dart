@@ -69,6 +69,8 @@ void main() {
       await main();
     });
     test('waitForTarget', () async {
+      if (isPuppeteerFirefox) return;
+
       //---
       var newWindowTarget = browser.waitForTarget((target) =>
           target.url ==
@@ -81,6 +83,8 @@ void main() {
     });
   });
   group('BrowserContext', () {
+    if (isPuppeteerFirefox) return;
+
     test('overridePermissions', () async {
       var context = browser.defaultBrowserContext;
       await context.overridePermissions(
@@ -151,6 +155,8 @@ void main() {
       await page.evaluate("() => console.log('hello', 5, {foo: 'bar'})");
     });
     group('onPopup', () {
+      if (isPuppeteerFirefox) return;
+
       test(0, () async {
         //----
         var popupFuture = page.onPopup.first;
@@ -227,6 +233,9 @@ void main() {
       await browser.close();
     });
     test('emulateMediaType', () async {
+      if (isPuppeteerFirefox) return;
+
+      //----
       expect(await page.evaluate("() => matchMedia('screen').matches"), isTrue);
       expect(await page.evaluate("() => matchMedia('print').matches"), isFalse);
 
@@ -238,6 +247,7 @@ void main() {
       await page.emulateMediaType(null);
       expect(await page.evaluate("() => matchMedia('screen').matches"), isTrue);
       expect(await page.evaluate("() => matchMedia('print').matches"), isFalse);
+      //----
     });
     group('evaluate', () {
       test(0, () async {
@@ -280,6 +290,8 @@ void main() {
       await page.evaluateOnNewDocument(preloadFile);
     });
     group('exposeFunction', () {
+      if (isPuppeteerFirefox) return;
+
       test(0, () async {
         //----
         //+import 'dart:convert';
@@ -333,12 +345,18 @@ void main() {
       });
     });
     test('pdf', () async {
+      if (isPuppeteerFirefox) return;
+
+      //----
       // Generates a PDF with 'screen' media type.
       await page.emulateMediaType(MediaType.screen);
       await page.pdf(
           output: File(exampleValue('_page.pdf', 'page.pdf')).openWrite());
+      //----
     });
     test('queryObjects', () async {
+      if (isPuppeteerFirefox) return;
+
       // There is a bug currently with queryObjects if the page has navigated
       // before.
       // https://github.com/GoogleChrome/puppeteer/issues/4263
@@ -370,9 +388,16 @@ void main() {
           'select#colors', ['red', 'green', 'blue']); // multiple selections
     });
     test('setGeolocation', () async {
+      if (isPuppeteerFirefox) return;
+
+      //----
       await page.setGeolocation(latitude: 59.95, longitude: 30.31667);
+      //----
     });
     test('setRequestInterception', () async {
+      if (isPuppeteerFirefox) return;
+
+      //----
       var browser = await puppeteer.launch();
       var page = await browser.newPage();
       await page.setRequestInterception(true);
@@ -386,6 +411,7 @@ void main() {
       });
       await page.goto(exampleValue(server.hostUrl, 'https://example.com'));
       await browser.close();
+      //----
     });
     test('type', () async {
       // Types instantly
@@ -486,6 +512,8 @@ void main() {
       await main();
     });
     test('waitForFileChooser', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto(server.assetUrl('doc_examples_3.html'));
       //------
       var futureFileChooser = page.waitForFileChooser();
@@ -540,6 +568,8 @@ void main() {
       expect(divsCounts, greaterThan(0));
     });
     test('click', () async {
+      if (isPuppeteerFirefox) return;
+
       var frame = page.mainFrame;
       //---
       var responseFuture = page.waitForNavigation();
@@ -692,6 +722,8 @@ void main() {
       });
     });
     test('sendCharacter', () async {
+      if (isPuppeteerFirefox) return;
+
       var input = await page.$('input');
       await input.focus();
       //----
@@ -724,6 +756,9 @@ void main() {
       await page.mouse.up();
     });
     test('wheel', () async {
+      if (isPuppeteerFirefox) return;
+
+      //----
       await page.goto(exampleValue('${server.assetUrl('input/wheel.html')}',
           r'https://mdn.mozillademos.org/en-US/docs/Web/API/Element/wheel_event$samples/Scaling_an_element_via_the_wheel?revision=1587366'));
       var elem = await page.$('div');
@@ -731,6 +766,7 @@ void main() {
       await page.mouse.move(Point(boundingBox.left + boundingBox.width / 2,
           boundingBox.top + boundingBox.height / 2));
       await page.mouse.wheel(deltaY: -100);
+      //----
     });
   });
   group('ExecutionContext', () {
@@ -894,6 +930,8 @@ void main() {
     });
   });
   group('Request', () {
+    if (isPuppeteerFirefox) return;
+
     test('continueRequest', () async {
       //---
       await page.setRequestInterception(true);
@@ -947,6 +985,8 @@ void main() {
     });
   });
   group('Worker', () {
+    if (isPuppeteerFirefox) return;
+
     test('class', () async {
       page.onWorkerCreated
           .listen((worker) => print('Worker created: ${worker.url}'));
@@ -959,6 +999,8 @@ void main() {
     });
   });
   group('Coverage', () {
+    if (isPuppeteerFirefox) return;
+
     test('class', () async {
       //---
       // Enable both JavaScript and CSS coverage
@@ -986,6 +1028,8 @@ void main() {
     });
   });
   group('Tracing', () {
+    if (isPuppeteerFirefox) return;
+
     test('class', () async {
       //----
       await page.tracing.start();
@@ -998,6 +1042,8 @@ void main() {
     });
   });
   group('Accessibility', () {
+    if (isPuppeteerFirefox) return;
+
     group('snapshot', () {
       test(0, () async {
         var snapshot = await page.accessibility.snapshot();
@@ -1020,6 +1066,8 @@ void main() {
     });
   });
   group('FileChooser', () {
+    if (isPuppeteerFirefox) return;
+
     test('class', () async {
       await page.goto(server.assetUrl('doc_examples_3.html'));
       //------

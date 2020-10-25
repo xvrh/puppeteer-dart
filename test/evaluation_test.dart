@@ -95,6 +95,8 @@ void main() {
       expect(await page.evaluate('globalVar'), equals(123));
     });
     test('should return undefined for objects with symbols', () async {
+      if (isPuppeteerFirefox) return;
+
       expect(await page.evaluate("() => [Symbol('foo4')]"), isNull);
     });
     test('should work with function shorthands', () async {
@@ -112,6 +114,8 @@ void main() {
       expect(result, equals(42));
     });
     test('should throw when evaluation triggers reload', () async {
+      if (isPuppeteerFirefox) return;
+
       expect(() => page.evaluate('''() => {
         location.reload();
         return new Promise(() => {});
@@ -130,6 +134,8 @@ void main() {
       expect(await frameEvaluation, equals(42));
     });
     test('should work from-inside an exposed function', () async {
+      if (isPuppeteerFirefox) return;
+
       // Setup inpage callback, which calls Page.evaluate
       await page.exposeFunction('callController', (num a, num b) async {
         return await page.evaluate('(a, b) => a * b', args: [a, b]);
@@ -187,9 +193,13 @@ void main() {
       expect(await page.evaluate('() => ({a: undefined})'), equals({}));
     });
     test('should return undefined for non-serializable objects', () async {
+      if (isPuppeteerFirefox) return;
+
       expect(await page.evaluate('() => window'), isNull);
     });
     test('should fail for circular object', () async {
+      if (isPuppeteerFirefox) return;
+
       var result = await page.evaluate('''() => {
           var a = {};
           var b = {a};
@@ -233,6 +243,8 @@ void main() {
               'JSHandles can be evaluated only in the context they were created'))));
     });
     test('should simulate a user gesture', () async {
+      if (isPuppeteerFirefox) return;
+
       var result = await page.evaluate('''() => {
       document.body.appendChild(document.createTextNode('test'));
           document.execCommand('selectAll');
@@ -241,6 +253,8 @@ void main() {
       expect(result, isTrue);
     });
     test('should throw a nice error after a navigation', () async {
+      if (isPuppeteerFirefox) return;
+
       var executionContext = await page.mainFrame.executionContext;
 
       await Future.wait([
@@ -269,6 +283,8 @@ void main() {
   });
 
   group('Page.evaluateOnNewDocument', () {
+    if (isPuppeteerFirefox) return;
+
     test('should evaluate before anything else on the page', () async {
       await page.evaluateOnNewDocument('''() => {
 window.injected = 123;

@@ -21,6 +21,9 @@ void main() {
   group('Puppeteer', () {
     group('Browser.disconnect', () {
       test('should reject navigation when browser closes', () async {
+        // This test is really unstable on Firefox.
+        if (isPuppeteerFirefox) return;
+
         server.setRoute('/one-style.css', (request) {
           return Completer<shelf.Response>().future;
         });
@@ -116,6 +119,9 @@ void main() {
       test('userDataDir argument', () async {
         var userDataDir = Directory.systemTemp.createTempSync('chrome');
         var args = ['--user-data-dir=${userDataDir.path}'];
+        if (isPuppeteerFirefox) {
+          args = ['-profile', userDataDir.path];
+        }
 
         var browser = await puppeteer.launch(args: args);
         await browser.newPage();
@@ -171,12 +177,23 @@ void main() {
             'This mysteriously fails on Windows. See https://github.com/GoogleChrome/puppeteer/issues/4111')
       });
       test('should return the default arguments', () {
-        expect(puppeteer.defaultArgs(), contains('--no-first-run'));
-        expect(puppeteer.defaultArgs(), contains('--headless'));
-        expect(puppeteer.defaultArgs(headless: false),
-            isNot(contains('--headless')));
-        expect(puppeteer.defaultArgs(userDataDir: 'foo'),
-            contains('--user-data-dir=foo'));
+        if (isPuppeteerFirefox) {
+          expect(puppeteer.defaultArgs(), contains('--headless'));
+          expect(puppeteer.defaultArgs(), contains('--no-remote'));
+          expect(puppeteer.defaultArgs(), contains('--foreground'));
+          expect(puppeteer.defaultArgs(headless: false),
+              isNot(contains('--headless')));
+          expect(
+              puppeteer.defaultArgs(userDataDir: 'foo'), contains('--profile'));
+          expect(puppeteer.defaultArgs(userDataDir: 'foo'), contains('foo'));
+        } else {
+          expect(puppeteer.defaultArgs(), contains('--no-first-run'));
+          expect(puppeteer.defaultArgs(), contains('--headless'));
+          expect(puppeteer.defaultArgs(headless: false),
+              isNot(contains('--headless')));
+          expect(puppeteer.defaultArgs(userDataDir: 'foo'),
+              contains('--user-data-dir=foo'));
+        }
       });
       test('should work with no default arguments', () async {
         var browser = await puppeteer.launch(ignoreDefaultArgs: true);
@@ -195,6 +212,8 @@ void main() {
         await browser.close();
       });
       test('should have custom url when launching browser', () async {
+        if (isPuppeteerFirefox) return;
+
         var browser = await puppeteer.launch(args: [server.emptyPage]);
         var pages = await browser.pages;
         expect(pages.length, equals(1));
@@ -257,6 +276,8 @@ void main() {
         //TODO(xha): enable once we support https server
       });
       test('should be able to reconnect to a disconnected browser', () async {
+        if (isPuppeteerFirefox) return;
+
         var originalBrowser = await puppeteer.launch();
         var browserWsEndpoint = originalBrowser.wsEndpoint;
         var page = await originalBrowser.newPage();
@@ -283,6 +304,8 @@ void main() {
     });
     // @see https://github.com/GoogleChrome/puppeteer/issues/4197#issuecomment-481793410
     test('should be able to connect to the same page simultaneously', () async {
+      if (isPuppeteerFirefox) return;
+
       var browserOne = await puppeteer.launch();
       var browserTwo =
           await puppeteer.connect(browserWsEndpoint: browserOne.wsEndpoint);
@@ -298,6 +321,8 @@ void main() {
 
   group('Browser target events', () {
     test('should work', () async {
+      if (isPuppeteerFirefox) return;
+
       var browser = await puppeteer.launch();
       var events = [];
       browser.onTargetCreated.listen((_) => events.add('CREATED'));

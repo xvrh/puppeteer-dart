@@ -37,6 +37,8 @@ void main() {
   const fileToUpload = 'test/assets/file-to-upload.txt';
 
   group('input', () {
+    if (isPuppeteerFirefox) return;
+
     test('should upload the file', () async {
       await page.goto(server.prefix + '/input/fileupload.html');
       var filePath = File(fileToUpload);
@@ -56,6 +58,8 @@ void main() {
   });
 
   group('Page.waitForFileChooser', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work when file input is attached to DOM', () async {
       await page.setContent('<input type=file>');
       var chooser =
@@ -117,6 +121,8 @@ void main() {
   });
 
   group('FileChooser.accept', () {
+    if (isPuppeteerFirefox) return;
+
     test('should accept single file', () async {
       await page.setContent(
           '''<input type=file oninput='javascript:console.timeStamp()'>''');
@@ -193,6 +199,8 @@ void main() {
   });
 
   group('FileChooser.cancel', () {
+    if (isPuppeteerFirefox) return;
+
     test('should cancel dialog', () async {
       // Consider file chooser canceled if we can summon another one.
       // There's no reliable way in WebPlatform to see that FileChooser was
@@ -223,6 +231,8 @@ void main() {
   });
 
   group('FileChooser.isMultiple', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work for single file pick', () async {
       await page.setContent('<input type=file>');
       var chooser = await waitFutures(page.waitForFileChooser(), [

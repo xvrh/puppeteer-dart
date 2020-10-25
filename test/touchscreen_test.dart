@@ -32,6 +32,8 @@ void main() {
   });
 
   group('Touchscreen', () {
+    if (isPuppeteerFirefox) return;
+
     test('should tap the button', () async {
       await page.emulate(puppeteer.devices.iPhone6);
       await page.goto(server.prefix + '/input/button.html');

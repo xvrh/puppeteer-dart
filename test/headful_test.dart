@@ -25,6 +25,8 @@ void main() {
   ];
 
   group('HEADFUL', () {
+    if (isPuppeteerFirefox) return;
+
     test('background_page target type should be available', () async {
       var browserWithExtension =
           await puppeteer.launch(headless: false, args: extensionOptions);
@@ -146,6 +148,8 @@ void main() {
   });
 
   group('Page.bringToFront', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       var browser = await puppeteer.launch(headless: false);
       try {

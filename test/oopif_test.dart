@@ -36,6 +36,8 @@ void main() {
         .toList();
   }
 
+  if (isPuppeteerFirefox) return;
+
   test('should report oopif frames', () async {
     await page.goto('${server.prefix}/dynamic-oopif.html');
     expect(_oopifs(), hasLength(1));

@@ -1,7 +1,16 @@
 import 'dart:io';
+import 'package:logging/logging.dart';
 import 'package:puppeteer/puppeteer.dart';
 
 void main() async {
+  final logger = Logger('example.block_images');
+
+  if (isPuppeteerFirefox) {
+    logger.warning('block_images cannot be executed on Firefox.');
+    logger.warning(
+        'Firefox currently does not support intercepting request/response');
+    return;
+  }
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   await page.setRequestInterception(true);

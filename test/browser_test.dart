@@ -31,7 +31,12 @@ void main() {
     test('should include WebKit', () async {
       var userAgent = await browser.userAgent;
       expect(userAgent.length, greaterThan(0));
-      expect(userAgent, contains('WebKit'));
+
+      if (isPuppeteerFirefox) {
+        expect(userAgent, contains('Gecko'));
+      } else {
+        expect(userAgent, contains('WebKit'));
+      }
     });
   });
 

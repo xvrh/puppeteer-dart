@@ -771,6 +771,9 @@ class RemoteObject {
       this.customPreview});
 
   factory RemoteObject.fromJson(Map<String, dynamic> json) {
+    // Firefox sometimes doesn't implement this payload.
+    if (json == null) return null;
+
     return RemoteObject(
       type: RemoteObjectType.fromJson(json['type'] as String),
       subtype: json.containsKey('subtype')

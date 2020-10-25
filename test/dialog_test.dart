@@ -33,7 +33,9 @@ void main() {
     test('should fire', () async {
       page.onDialog.listen((dialog) {
         expect(dialog.type, equals(DialogType.alert));
-        expect(dialog.defaultValue, equals(''));
+        if (!isPuppeteerFirefox) {
+          expect(dialog.defaultValue, equals(''));
+        }
         expect(dialog.message, equals('yo'));
         dialog.accept();
       });
@@ -42,7 +44,9 @@ void main() {
     test('should allow accepting prompts', () async {
       page.onDialog.listen((dialog) {
         expect(dialog.type, equals(DialogType.prompt));
-        expect(dialog.defaultValue, equals('yes.'));
+        if (!isPuppeteerFirefox) {
+          expect(dialog.defaultValue, equals('yes.'));
+        }
         expect(dialog.message, equals('question?'));
         dialog.accept(promptText: 'answer!');
       });

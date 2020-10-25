@@ -188,6 +188,8 @@ void main() {
     });
 
     test('should work with removed MutationObserver', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.evaluate('() => delete window.MutationObserver');
       var handle = await waitFutures(page.waitForSelector('.zombo'), [
         page.setContent("<div class='zombo'>anything</div>"),
@@ -228,6 +230,8 @@ void main() {
     });
 
     test('should run in specified frame', () async {
+      if (isPuppeteerFirefox) return;
+
       await attachFrame(page, 'frame1', server.emptyPage);
       await attachFrame(page, 'frame2', server.emptyPage);
       var frame1 = page.frames[1];
@@ -240,6 +244,8 @@ void main() {
     });
 
     test('should throw when frame is detached', () async {
+      if (isPuppeteerFirefox) return;
+
       await attachFrame(page, 'frame1', server.emptyPage);
       var frame = page.frames[1];
       dynamic waitError;
@@ -389,6 +395,8 @@ void main() {
           equals('hello  world  '));
     });
     test('should run in specified frame', () async {
+      if (isPuppeteerFirefox) return;
+
       await attachFrame(page, 'frame1', server.emptyPage);
       await attachFrame(page, 'frame2', server.emptyPage);
       var frame1 = page.frames[1];
@@ -400,6 +408,8 @@ void main() {
       expect(eHandle.executionContext.frame, equals(frame2));
     });
     test('should throw when frame is detached', () async {
+      if (isPuppeteerFirefox) return;
+
       await attachFrame(page, 'frame1', server.emptyPage);
       var frame = page.frames[1];
       dynamic waitError;

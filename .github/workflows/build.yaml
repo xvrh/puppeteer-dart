@@ -33,7 +33,10 @@ jobs:
           Xvfb -ac :99 -screen 0 1280x1024x16 > /dev/null 2>&1 &
       - run: xvfb-run --auto-servernum pub run test -P ci --platform vm
         if: runner.os == 'Linux'
-      - run: xvfb-run --auto-servernum pub run test -P ci --platform vm
+      - run: |
+          rm example/print_to_pdf.dart example/screenshot_element.dart
+          xvfb-run --auto-servernum pub run test -P ci --platform vm
+          git reset --hard HEAD
         if: runner.os == 'Linux'
         env:
           PUPPETEER_PRODUCT: firefox

@@ -34,6 +34,8 @@ void main() {
   });
 
   group('JSCoverage', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       await page.coverage.startJSCoverage();
       await page.goto(server.prefix + '/jscoverage/simple.html',
@@ -143,6 +145,8 @@ void main() {
   });
 
   group('CSSCoverage', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       await page.coverage.startCSSCoverage();
       await page.goto(server.prefix + '/csscoverage/simple.html');

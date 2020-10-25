@@ -54,6 +54,8 @@ void main() {
   });
 
   group('ElementHandle.boundingBox', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       await page.setViewport(DeviceViewport(width: 500, height: 500));
       await page.goto(server.assetUrl('grid.html'));
@@ -106,6 +108,8 @@ void main() {
   });
 
   group('ElementHandle.boxModel', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       await page.goto(server.prefix + '/resetcss.html');
 
@@ -244,6 +248,8 @@ void main() {
   });
 
   group('ElementHandle.hover', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       await page.goto(server.prefix + '/input/scrollable.html');
       var button = await page.$('#button-6');

@@ -82,6 +82,8 @@ void main() {
       expect(await page.evaluate('() => Modernizr.touchevents'), isTrue);
     });
     test('should support landscape emulation', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto(server.prefix + '/mobile.html');
       await page.setViewport(puppeteer.devices.iPhone6Landscape.viewport);
       expect(await page.evaluate('() => screen.orientation.type'),
@@ -113,6 +115,8 @@ void main() {
 
   group('Page.emulateMediaType', () {
     test('should work', () async {
+      if (isPuppeteerFirefox) return;
+
       expect(await page.evaluate("() => window.matchMedia('screen').matches"),
           isTrue);
       expect(await page.evaluate("() => window.matchMedia('print').matches"),
@@ -135,6 +139,8 @@ void main() {
   });
 
   group('Page.emulateMediaFeatures', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work ddd', () async {
       await page
           .emulateMediaFeatures([MediaFeature.prefersReducedMotion('reduce')]);
@@ -238,6 +244,8 @@ void main() {
   });
 
   group('Page.emulateTimezone', () {
+    if (isPuppeteerFirefox) return;
+
     test('should work', () async {
       await page.evaluate('''() => {
       globalThis.date = new Date(1479579154987);

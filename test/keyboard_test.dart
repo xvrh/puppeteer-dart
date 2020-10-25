@@ -42,7 +42,7 @@ void main() {
     }
   });
 
-  test('Can type into a textarea', () async {
+  test('should type into a textarea', () async {
     await page.goto(server.emptyPage);
     await page.evaluate(
         //language=js
@@ -53,12 +53,14 @@ function _() {
   textarea.focus();
 }
 ''');
-    var text = 'Hello world. éàê^';
+    var text = 'Hello world. I am the text that was typed!';
     await page.keyboard.type(text);
     expect(await page.evaluate('document.querySelector("textarea").value'),
         equals(text));
   });
   test('Press the metaKey', () async {
+    if (isPuppeteerFirefox) return;
+
     await page.evaluate(
         //language=js
         '''
@@ -93,6 +95,8 @@ function _() {
         equals('Hello World!'));
   });
   test('should send a character with sendCharacter', () async {
+    if (isPuppeteerFirefox) return;
+
     await page.goto(server.assetUrl('input/textarea.html'));
     await page.focus('textarea');
     await page.keyboard.sendCharacter('嗨');
@@ -179,6 +183,8 @@ function _() {
     expect(await page.evaluate('() => textarea.value'), equals('He Wrd!'));
   });
   test('should specify repeat property', () async {
+    if (isPuppeteerFirefox) return;
+
     await page.goto(server.assetUrl('input/textarea.html'));
     await page.focus('textarea');
     await page.evaluate(
@@ -198,6 +204,8 @@ function _() {
     expect(await page.evaluate('() => window.lastEvent.repeat'), isFalse);
   });
   test('should type all kinds of characters', () async {
+    if (isPuppeteerFirefox) return;
+
     await page.goto(server.assetUrl('input/textarea.html'));
     await page.focus('textarea');
     var text = 'This text goes onto two lines.\nThis character is 嗨.';
@@ -205,6 +213,8 @@ function _() {
     expect(await page.evaluate('result'), equals(text));
   });
   test('should specify location', () async {
+    if (isPuppeteerFirefox) return;
+
     await page.goto(server.assetUrl('input/textarea.html'));
     await page.evaluate('''() => {
   window.addEventListener('keydown', event => window.keyLocation = event.location, true);
@@ -224,12 +234,16 @@ function _() {
     expect(await page.evaluate('keyLocation'), equals(3));
   });
   test('Type emoji', () async {
+    if (isPuppeteerFirefox) return;
+
     await page.goto(server.assetUrl('input/textarea.html'));
     await page.type('textarea', '👹 Tokyo street Japan 🇯🇵');
     expect(await page.$eval('textarea', '(textarea) => textarea.value'),
         equals('👹 Tokyo street Japan 🇯🇵'));
   });
   test('should type emoji into an iframe', () async {
+    if (isPuppeteerFirefox) return;
+
     await page.goto(server.emptyPage);
     await attachFrame(
         page, 'emoji-test', server.assetUrl('input/textarea.html'));

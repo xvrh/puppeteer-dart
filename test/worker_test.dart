@@ -32,6 +32,8 @@ void main() {
   });
 
   group('Workers', () {
+    if (isPuppeteerFirefox) return;
+
     test('Page.workers', () async {
       await Future.wait([
         page.onWorkerCreated.first,

@@ -96,6 +96,8 @@ void main() {
       expect(json, equals({'foo': 'bar'}));
     });
     test('should not work with dates', () async {
+      if (isPuppeteerFirefox) return;
+
       var dateHandle = await page
           .evaluateHandle("() => new Date('2017-09-26T00:00:00.000Z')");
       var json = await dateHandle.jsonValue;
@@ -103,10 +105,15 @@ void main() {
     });
     test('should throw for circular objects', () async {
       var windowHandle = await page.evaluateHandle('window');
-      expect(
-          () => windowHandle.jsonValue,
-          throwsA(
-              predicate((e) => '$e' == 'Object reference chain is too long')));
+      if (isPuppeteerFirefox) {
+        expect(() => windowHandle.jsonValue,
+            throwsA(predicate((e) => '$e' == 'Object is not serializable')));
+      } else {
+        expect(
+            () => windowHandle.jsonValue,
+            throwsA(predicate(
+                (e) => '$e' == 'Object reference chain is too long')));
+      }
     });
   });
 

@@ -65,6 +65,8 @@ void main() {
       expect(await originalPage.$('body'), isNotNull);
     });
     test('should report when a new page is created and closed', () async {
+      if (isPuppeteerFirefox) return;
+
       var otherPage = await waitFutures(
           context
               .waitForTarget((target) =>
@@ -95,6 +97,8 @@ void main() {
     });
     test('should report when a service worker is created and destroyed',
         () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto(server.emptyPage);
       var createdTarget = context.onTargetCreated.first;
 
@@ -110,6 +114,8 @@ void main() {
       expect(await destroyedTarget, equals(await createdTarget));
     });
     test('should create a worker from a service worker', () async {
+      if (isPuppeteerFirefox) return;
+
       var targetFuture =
           context.waitForTarget((target) => target.type == 'service_worker');
       await page.goto(server.prefix + '/serviceworkers/empty/sw.html');
@@ -120,6 +126,8 @@ void main() {
           equals('[object ServiceWorkerGlobalScope]'));
     });
     test('should create a worker from a shared worker', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto(server.emptyPage);
       var targetFuture =
           context.waitForTarget((target) => target.type == 'shared_worker');
@@ -132,6 +140,8 @@ void main() {
           equals('[object SharedWorkerGlobalScope]'));
     });
     test('should report when a target url changes', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto(server.emptyPage);
       var changedTarget = context.onTargetChanged.first;
       await page.goto(server.crossProcessPrefix + '/');
@@ -143,6 +153,8 @@ void main() {
       expect((await changedTarget).url, equals(server.emptyPage));
     });
     test('should not report uninitialized pages', () async {
+      if (isPuppeteerFirefox) return;
+
       var targetChanged = false;
       var listener =
           context.onTargetChanged.listen((_) => targetChanged = true);
@@ -165,6 +177,8 @@ void main() {
     });
     test('should not crash while redirecting if original request was missed',
         () async {
+      if (isPuppeteerFirefox) return;
+
       Completer<shelf.Response> serverResponse;
       server.setRoute('one-style.css', (req) {
         serverResponse = Completer<shelf.Response>();
@@ -190,6 +204,8 @@ void main() {
       await newPage.close();
     });
     test('should have an opener', () async {
+      if (isPuppeteerFirefox) return;
+
       await page.goto(server.emptyPage);
       var createdTarget = await waitFutures(context.onTargetCreated.first,
           [page.goto(server.prefix + '/popup/window-open.html')]);
@@ -202,6 +218,8 @@ void main() {
 
   group('Browser.waitForTarget', () {
     test('should wait for a target', () async {
+      if (isPuppeteerFirefox) return;
+
       var resolved = false;
       var targetPromise =
           browser.waitForTarget((target) => target.url == server.emptyPage);
