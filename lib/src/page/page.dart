@@ -917,7 +917,7 @@ function addPageBinding(bindingName) {
 function deliverResult(name, seq, result) {
   window[name]['callbacks'].get(seq).resolve(result);
   window[name]['callbacks'].delete(seq);
-}  
+}
 ''';
 
   static final _deliverError = '''
@@ -2084,7 +2084,8 @@ class ClientError implements Exception {
 
   static String _message(ExceptionDetails details) {
     if (details.exception != null) {
-      return details.exception.description ?? details.exception.value as String;
+      return details.exception.description ??
+          details.exception.value.toString();
     } else {
       var message = details.text;
       if (details.stackTrace != null) {
