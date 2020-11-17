@@ -744,6 +744,8 @@ class ContentSecurityPolicyIssueDetails {
   /// Specific directive that is violated, causing the CSP issue.
   final String violatedDirective;
 
+  final bool isReportOnly;
+
   final ContentSecurityPolicyViolationType contentSecurityPolicyViolationType;
 
   final AffectedFrame frameAncestor;
@@ -755,6 +757,7 @@ class ContentSecurityPolicyIssueDetails {
   ContentSecurityPolicyIssueDetails(
       {this.blockedURL,
       @required this.violatedDirective,
+      @required this.isReportOnly,
       @required this.contentSecurityPolicyViolationType,
       this.frameAncestor,
       this.sourceCodeLocation,
@@ -766,6 +769,7 @@ class ContentSecurityPolicyIssueDetails {
       blockedURL:
           json.containsKey('blockedURL') ? json['blockedURL'] as String : null,
       violatedDirective: json['violatedDirective'] as String,
+      isReportOnly: json['isReportOnly'] as bool,
       contentSecurityPolicyViolationType:
           ContentSecurityPolicyViolationType.fromJson(
               json['contentSecurityPolicyViolationType'] as String),
@@ -786,6 +790,7 @@ class ContentSecurityPolicyIssueDetails {
   Map<String, dynamic> toJson() {
     return {
       'violatedDirective': violatedDirective,
+      'isReportOnly': isReportOnly,
       'contentSecurityPolicyViolationType':
           contentSecurityPolicyViolationType.toJson(),
       if (blockedURL != null) 'blockedURL': blockedURL,

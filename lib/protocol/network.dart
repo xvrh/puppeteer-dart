@@ -4,6 +4,7 @@ import '../src/connection.dart';
 import 'debugger.dart' as debugger;
 import 'emulation.dart' as emulation;
 import 'io.dart' as io;
+import 'network.dart' as network;
 import 'page.dart' as page;
 import 'runtime.dart' as runtime;
 import 'security.dart' as security;
@@ -404,7 +405,7 @@ class NetworkApi {
   /// [sameSite] Cookie SameSite type.
   /// [expires] Cookie expiration date, session cookie if not set
   /// [priority] Cookie Priority type.
-  /// Returns: True if successfully set cookie.
+  /// Returns: Always set to true. If an error occurs, the response indicates protocol error.
   Future<bool> setCookie(String name, String value,
       {String url,
       String domain,
@@ -501,6 +502,23 @@ class NetworkApi {
     });
     return SecurityIsolationStatus.fromJson(
         result['status'] as Map<String, dynamic>);
+  }
+
+  /// Fetches the resource and returns the content.
+  /// [frameId] Frame id to get the resource for.
+  /// [url] URL of the resource to get content for.
+  /// [options] Options for the request.
+  Future<LoadNetworkResourcePageResult> loadNetworkResource(
+      page.FrameId frameId,
+      String url,
+      LoadNetworkResourceOptions options) async {
+    var result = await _client.send('Network.loadNetworkResource', {
+      'frameId': frameId,
+      'url': url,
+      'options': options,
+    });
+    return LoadNetworkResourcePageResult.fromJson(
+        result['resource'] as Map<String, dynamic>);
   }
 }
 
@@ -1708,6 +1726,10 @@ class RequestData {
   /// Whether is loaded via link preload.
   final bool isLinkPreload;
 
+  /// Set for requests when the TrustToken API is used. Contains the parameters
+  /// passed by the developer (e.g. via "fetch") as understood by the backend.
+  final TrustTokenParams trustTokenParams;
+
   RequestData(
       {@required this.url,
       this.urlFragment,
@@ -1719,7 +1741,8 @@ class RequestData {
       this.mixedContentType,
       @required this.initialPriority,
       @required this.referrerPolicy,
-      this.isLinkPreload});
+      this.isLinkPreload,
+      this.trustTokenParams});
 
   factory RequestData.fromJson(Map<String, dynamic> json) {
     return RequestData(
@@ -1749,6 +1772,10 @@ class RequestData {
       isLinkPreload: json.containsKey('isLinkPreload')
           ? json['isLinkPreload'] as bool
           : null,
+      trustTokenParams: json.containsKey('trustTokenParams')
+          ? TrustTokenParams.fromJson(
+              json['trustTokenParams'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -1767,6 +1794,8 @@ class RequestData {
       if (mixedContentType != null)
         'mixedContentType': mixedContentType.toJson(),
       if (isLinkPreload != null) 'isLinkPreload': isLinkPreload,
+      if (trustTokenParams != null)
+        'trustTokenParams': trustTokenParams.toJson(),
     };
   }
 }
@@ -2094,6 +2123,100 @@ class ServiceWorkerResponseSource {
   @override
   bool operator ==(other) =>
       (other is ServiceWorkerResponseSource && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Determines what type of Trust Token operation is executed and
+/// depending on the type, some additional parameters.
+class TrustTokenParams {
+  final TrustTokenOperationType type;
+
+  /// Only set for "srr-token-redemption" type and determine whether
+  /// to request a fresh SRR or use a still valid cached SRR.
+  final TrustTokenParamsRefreshPolicy refreshPolicy;
+
+  /// Origins of issuers from whom to request tokens or redemption
+  /// records.
+  final List<String> issuers;
+
+  TrustTokenParams(
+      {@required this.type, @required this.refreshPolicy, this.issuers});
+
+  factory TrustTokenParams.fromJson(Map<String, dynamic> json) {
+    return TrustTokenParams(
+      type: TrustTokenOperationType.fromJson(json['type'] as String),
+      refreshPolicy: TrustTokenParamsRefreshPolicy.fromJson(
+          json['refreshPolicy'] as String),
+      issuers: json.containsKey('issuers')
+          ? (json['issuers'] as List).map((e) => e as String).toList()
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type.toJson(),
+      'refreshPolicy': refreshPolicy,
+      if (issuers != null) 'issuers': [...issuers],
+    };
+  }
+}
+
+class TrustTokenParamsRefreshPolicy {
+  static const useCached = TrustTokenParamsRefreshPolicy._('UseCached');
+  static const refresh = TrustTokenParamsRefreshPolicy._('Refresh');
+  static const values = {
+    'UseCached': useCached,
+    'Refresh': refresh,
+  };
+
+  final String value;
+
+  const TrustTokenParamsRefreshPolicy._(this.value);
+
+  factory TrustTokenParamsRefreshPolicy.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is TrustTokenParamsRefreshPolicy && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class TrustTokenOperationType {
+  static const issuance = TrustTokenOperationType._('Issuance');
+  static const redemption = TrustTokenOperationType._('Redemption');
+  static const signing = TrustTokenOperationType._('Signing');
+  static const values = {
+    'Issuance': issuance,
+    'Redemption': redemption,
+    'Signing': signing,
+  };
+
+  final String value;
+
+  const TrustTokenOperationType._(this.value);
+
+  factory TrustTokenOperationType.fromJson(String value) => values[value];
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is TrustTokenOperationType && other.value == value) ||
       value == other;
 
   @override
@@ -2454,7 +2577,16 @@ class Initiator {
   /// module) (0-based).
   final num lineNumber;
 
-  Initiator({@required this.type, this.stack, this.url, this.lineNumber});
+  /// Initiator column number, set for Parser type or for Script type (when script is importing
+  /// module) (0-based).
+  final num columnNumber;
+
+  Initiator(
+      {@required this.type,
+      this.stack,
+      this.url,
+      this.lineNumber,
+      this.columnNumber});
 
   factory Initiator.fromJson(Map<String, dynamic> json) {
     return Initiator(
@@ -2466,6 +2598,8 @@ class Initiator {
       url: json.containsKey('url') ? json['url'] as String : null,
       lineNumber:
           json.containsKey('lineNumber') ? json['lineNumber'] as num : null,
+      columnNumber:
+          json.containsKey('columnNumber') ? json['columnNumber'] as num : null,
     );
   }
 
@@ -2475,6 +2609,7 @@ class Initiator {
       if (stack != null) 'stack': stack.toJson(),
       if (url != null) 'url': url,
       if (lineNumber != null) 'lineNumber': lineNumber,
+      if (columnNumber != null) 'columnNumber': columnNumber,
     };
   }
 }
@@ -2612,6 +2747,12 @@ class SetCookieBlockedReason {
   static const invalidDomain = SetCookieBlockedReason._('InvalidDomain');
   static const invalidPrefix = SetCookieBlockedReason._('InvalidPrefix');
   static const unknownError = SetCookieBlockedReason._('UnknownError');
+  static const schemefulSameSiteStrict =
+      SetCookieBlockedReason._('SchemefulSameSiteStrict');
+  static const schemefulSameSiteLax =
+      SetCookieBlockedReason._('SchemefulSameSiteLax');
+  static const schemefulSameSiteUnspecifiedTreatedAsLax =
+      SetCookieBlockedReason._('SchemefulSameSiteUnspecifiedTreatedAsLax');
   static const values = {
     'SecureOnly': secureOnly,
     'SameSiteStrict': sameSiteStrict,
@@ -2625,6 +2766,10 @@ class SetCookieBlockedReason {
     'InvalidDomain': invalidDomain,
     'InvalidPrefix': invalidPrefix,
     'UnknownError': unknownError,
+    'SchemefulSameSiteStrict': schemefulSameSiteStrict,
+    'SchemefulSameSiteLax': schemefulSameSiteLax,
+    'SchemefulSameSiteUnspecifiedTreatedAsLax':
+        schemefulSameSiteUnspecifiedTreatedAsLax,
   };
 
   final String value;
@@ -2660,6 +2805,12 @@ class CookieBlockedReason {
       CookieBlockedReason._('SameSiteNoneInsecure');
   static const userPreferences = CookieBlockedReason._('UserPreferences');
   static const unknownError = CookieBlockedReason._('UnknownError');
+  static const schemefulSameSiteStrict =
+      CookieBlockedReason._('SchemefulSameSiteStrict');
+  static const schemefulSameSiteLax =
+      CookieBlockedReason._('SchemefulSameSiteLax');
+  static const schemefulSameSiteUnspecifiedTreatedAsLax =
+      CookieBlockedReason._('SchemefulSameSiteUnspecifiedTreatedAsLax');
   static const values = {
     'SecureOnly': secureOnly,
     'NotOnPath': notOnPath,
@@ -2670,6 +2821,10 @@ class CookieBlockedReason {
     'SameSiteNoneInsecure': sameSiteNoneInsecure,
     'UserPreferences': userPreferences,
     'UnknownError': unknownError,
+    'SchemefulSameSiteStrict': schemefulSameSiteStrict,
+    'SchemefulSameSiteLax': schemefulSameSiteLax,
+    'SchemefulSameSiteUnspecifiedTreatedAsLax':
+        schemefulSameSiteUnspecifiedTreatedAsLax,
   };
 
   final String value;
@@ -3458,6 +3613,87 @@ class SecurityIsolationStatus {
     return {
       'coop': coop.toJson(),
       'coep': coep.toJson(),
+    };
+  }
+}
+
+/// An object providing the result of a network resource load.
+class LoadNetworkResourcePageResult {
+  final bool success;
+
+  /// Optional values used for error reporting.
+  final num netError;
+
+  final String netErrorName;
+
+  final num httpStatusCode;
+
+  /// If successful, one of the following two fields holds the result.
+  final io.StreamHandle stream;
+
+  /// Response headers.
+  final network.Headers headers;
+
+  LoadNetworkResourcePageResult(
+      {@required this.success,
+      this.netError,
+      this.netErrorName,
+      this.httpStatusCode,
+      this.stream,
+      this.headers});
+
+  factory LoadNetworkResourcePageResult.fromJson(Map<String, dynamic> json) {
+    return LoadNetworkResourcePageResult(
+      success: json['success'] as bool,
+      netError: json.containsKey('netError') ? json['netError'] as num : null,
+      netErrorName: json.containsKey('netErrorName')
+          ? json['netErrorName'] as String
+          : null,
+      httpStatusCode: json.containsKey('httpStatusCode')
+          ? json['httpStatusCode'] as num
+          : null,
+      stream: json.containsKey('stream')
+          ? io.StreamHandle.fromJson(json['stream'] as String)
+          : null,
+      headers: json.containsKey('headers')
+          ? network.Headers.fromJson(json['headers'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'success': success,
+      if (netError != null) 'netError': netError,
+      if (netErrorName != null) 'netErrorName': netErrorName,
+      if (httpStatusCode != null) 'httpStatusCode': httpStatusCode,
+      if (stream != null) 'stream': stream.toJson(),
+      if (headers != null) 'headers': headers.toJson(),
+    };
+  }
+}
+
+/// An options object that may be extended later to better support CORS,
+/// CORB and streaming.
+class LoadNetworkResourceOptions {
+  final bool disableCache;
+
+  final bool includeCredentials;
+
+  LoadNetworkResourceOptions(
+      {@required this.disableCache, @required this.includeCredentials});
+
+  factory LoadNetworkResourceOptions.fromJson(Map<String, dynamic> json) {
+    return LoadNetworkResourceOptions(
+      disableCache: json['disableCache'] as bool,
+      includeCredentials: json['includeCredentials'] as bool,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'disableCache': disableCache,
+      'includeCredentials': includeCredentials,
     };
   }
 }

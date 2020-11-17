@@ -1,68 +1,71 @@
 # Changelog
 
-# 1.21.0 (2020-10-23)
+## 1.22.0 (2020-11-17)
 - Update Chromium to version 87
 
-# 1.20.1 (2020-10-14)
+## 1.21.0 (2020-10-23)
+- Update Chromium to version 87
+
+## 1.20.1 (2020-10-14)
 - Fix `Browser.close()` error
 
-# 1.20.0 (2020-09-11)
+## 1.20.0 (2020-09-11)
 - Update Chromium to version 86
 
-# 1.19.0 (2020-07-21)
+## 1.19.0 (2020-07-21)
 - Update Chromium to version 85
 
-# 1.18.0 (2020-07-16)
+## 1.18.0 (2020-07-16)
 - Update Chromium to version 84
 - Add `Mouse.wheel`
 
-# 1.17.0 (2020-04-21)
+## 1.17.0 (2020-04-21)
 - Update Chromium to version 81
 - Revert change to `uploadFile` implementation.
 
-# 1.16.1 (2020-02-25)
+## 1.16.1 (2020-02-25)
 - Fix a bug with the new `uploadFile` implementation.
 
-# 1.16.0 (2020-02-22)
+## 1.16.0 (2020-02-22)
 - Update to chromium 722234
 
-# 1.15.1 (2020-01-08)
+## 1.15.1 (2020-01-08)
 - Expose `ClientError` class
 - (internal) Revert previous change in `jsHandle.uploadFile`
 
-# 1.15.0 (2019-12-27)
+## 1.15.0 (2019-12-27)
 - Add element.select and element.evaluate for consistency
 - Prepare jsHandle.uploadFile for CDP Page.handleFileChooser removal
 
-# 1.14.1 (2019-11-24)
+## 1.14.1 (2019-11-24)
 - Export class `Target` in `puppeteer.dart`
 
-# 1.14.0 (2019-11-22)
+## 1.14.0 (2019-11-22)
 - Update Chrome to version 79
 - Add `Page.emulateTimezone` and `Page.emulateMediaFeatures`
 - Deprecate `Page.emulateMedia` in profit of `Page.emulatedMediaType`
 - Fix a "Concurrent modification error" when navigating from a page with iframes.
 
-# 1.13.0 (2019-10-11)
+## 1.13.0 (2019-10-11)
 - Fix a NullPointerException in NetworkManager
 - (internal) Add more tests for headful mode
 - (internal) Remove all implicit casts (preparation for nnbd)
 
-# 1.12.0 (2019-08-28)
+## 1.12.0 (2019-08-28)
 - Fix bug in `puppeteer.connect()`
 - Add the same capabilities that pupeeteer Node.JS to `puppeteer.launch` for the management of the flags passed to Chromium.
 - Add `userDataDir` to `puppeteer.launch` to allow managing the user data directory.
   By default, we now use a temporary data directory in the system temp folder.
 - Add more tests for launching and connecting to chromium
 
-# 1.11.0 (2019-08-15)
+## 1.11.0 (2019-08-15)
 - Update Chromium version to 686378
 
-# 1.10.0 (2019-07-26)
+## 1.10.0 (2019-07-26)
 - Introduce file chooser interception
 - Update Chromium version to 674921
 
-# 1.9.0 (2019-06-30)
+## 1.9.0 (2019-06-30)
 - Update Chromium version to 672088
 - Update dependencies
 - Fixes for Dart 2.4.0

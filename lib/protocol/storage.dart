@@ -83,6 +83,22 @@ class StorageApi {
     return GetUsageAndQuotaResult.fromJson(result);
   }
 
+  /// Override quota for the specified origin
+  /// [origin] Security origin.
+  /// [quotaSize] The quota size (in bytes) to override the original quota with.
+  /// If this is called multiple times, the overriden quota will be equal to
+  /// the quotaSize provided in the final call. If this is called without
+  /// specifying a quotaSize, the quota will be reset to the default value for
+  /// the specified origin. If this is called multiple times with different
+  /// origins, the override will be maintained for each origin until it is
+  /// disabled (called without a quotaSize).
+  Future<void> overrideQuotaForOrigin(String origin, {num quotaSize}) async {
+    await _client.send('Storage.overrideQuotaForOrigin', {
+      'origin': origin,
+      if (quotaSize != null) 'quotaSize': quotaSize,
+    });
+  }
+
   /// Registers origin to be notified when an update occurs to its cache storage list.
   /// [origin] Security origin.
   Future<void> trackCacheStorageForOrigin(String origin) async {
@@ -165,18 +181,23 @@ class GetUsageAndQuotaResult {
   /// Storage quota (bytes).
   final num quota;
 
+  /// Whether or not the origin has an active storage quota override
+  final bool overrideActive;
+
   /// Storage usage per type (bytes).
   final List<UsageForType> usageBreakdown;
 
   GetUsageAndQuotaResult(
       {@required this.usage,
       @required this.quota,
+      @required this.overrideActive,
       @required this.usageBreakdown});
 
   factory GetUsageAndQuotaResult.fromJson(Map<String, dynamic> json) {
     return GetUsageAndQuotaResult(
       usage: json['usage'] as num,
       quota: json['quota'] as num,
+      overrideActive: json['overrideActive'] as bool,
       usageBreakdown: (json['usageBreakdown'] as List)
           .map((e) => UsageForType.fromJson(e as Map<String, dynamic>))
           .toList(),
