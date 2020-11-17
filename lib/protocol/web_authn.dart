@@ -198,6 +198,11 @@ class VirtualAuthenticatorOptions {
   /// Defaults to false.
   final bool hasUserVerification;
 
+  /// If set to true, the authenticator will support the largeBlob extension.
+  /// https://w3c.github.io/webauthn#largeBlob
+  /// Defaults to false.
+  final bool hasLargeBlob;
+
   /// If set to true, tests of user presence will succeed immediately.
   /// Otherwise, they will not be resolved. Defaults to true.
   final bool automaticPresenceSimulation;
@@ -211,6 +216,7 @@ class VirtualAuthenticatorOptions {
       @required this.transport,
       this.hasResidentKey,
       this.hasUserVerification,
+      this.hasLargeBlob,
       this.automaticPresenceSimulation,
       this.isUserVerified});
 
@@ -223,6 +229,9 @@ class VirtualAuthenticatorOptions {
           : null,
       hasUserVerification: json.containsKey('hasUserVerification')
           ? json['hasUserVerification'] as bool
+          : null,
+      hasLargeBlob: json.containsKey('hasLargeBlob')
+          ? json['hasLargeBlob'] as bool
           : null,
       automaticPresenceSimulation:
           json.containsKey('automaticPresenceSimulation')
@@ -241,6 +250,7 @@ class VirtualAuthenticatorOptions {
       if (hasResidentKey != null) 'hasResidentKey': hasResidentKey,
       if (hasUserVerification != null)
         'hasUserVerification': hasUserVerification,
+      if (hasLargeBlob != null) 'hasLargeBlob': hasLargeBlob,
       if (automaticPresenceSimulation != null)
         'automaticPresenceSimulation': automaticPresenceSimulation,
       if (isUserVerified != null) 'isUserVerified': isUserVerified,

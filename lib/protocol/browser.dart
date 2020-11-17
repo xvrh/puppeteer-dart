@@ -352,6 +352,8 @@ class PermissionType {
       PermissionType._('protectedMediaIdentifier');
   static const sensors = PermissionType._('sensors');
   static const videoCapture = PermissionType._('videoCapture');
+  static const videoCapturePanTiltZoom =
+      PermissionType._('videoCapturePanTiltZoom');
   static const idleDetection = PermissionType._('idleDetection');
   static const wakeLockScreen = PermissionType._('wakeLockScreen');
   static const wakeLockSystem = PermissionType._('wakeLockSystem');
@@ -374,6 +376,7 @@ class PermissionType {
     'protectedMediaIdentifier': protectedMediaIdentifier,
     'sensors': sensors,
     'videoCapture': videoCapture,
+    'videoCapturePanTiltZoom': videoCapturePanTiltZoom,
     'idleDetection': idleDetection,
     'wakeLockScreen': wakeLockScreen,
     'wakeLockSystem': wakeLockSystem,
@@ -444,11 +447,15 @@ class PermissionDescriptor {
   /// For "clipboard" permission, may specify allowWithoutSanitization.
   final bool allowWithoutSanitization;
 
+  /// For "camera" permission, may specify panTiltZoom.
+  final bool panTiltZoom;
+
   PermissionDescriptor(
       {@required this.name,
       this.sysex,
       this.userVisibleOnly,
-      this.allowWithoutSanitization});
+      this.allowWithoutSanitization,
+      this.panTiltZoom});
 
   factory PermissionDescriptor.fromJson(Map<String, dynamic> json) {
     return PermissionDescriptor(
@@ -460,6 +467,8 @@ class PermissionDescriptor {
       allowWithoutSanitization: json.containsKey('allowWithoutSanitization')
           ? json['allowWithoutSanitization'] as bool
           : null,
+      panTiltZoom:
+          json.containsKey('panTiltZoom') ? json['panTiltZoom'] as bool : null,
     );
   }
 
@@ -470,6 +479,7 @@ class PermissionDescriptor {
       if (userVisibleOnly != null) 'userVisibleOnly': userVisibleOnly,
       if (allowWithoutSanitization != null)
         'allowWithoutSanitization': allowWithoutSanitization,
+      if (panTiltZoom != null) 'panTiltZoom': panTiltZoom,
     };
   }
 }

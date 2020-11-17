@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'browser.dart' as browser;
+import 'page.dart' as page;
 
 /// Supports additional targets discovery and allows to attach to them.
 class TargetApi {
@@ -80,6 +81,7 @@ class TargetApi {
   }
 
   /// Closes the target. If the target is a page that gets closed too.
+  /// Returns: Always set to true. If an error occurs, the response indicates protocol error.
   Future<bool> closeTarget(TargetID targetId) async {
     var result = await _client.send('Target.closeTarget', {
       'targetId': targetId,
@@ -382,8 +384,11 @@ class TargetInfo {
   /// Opener target Id
   final TargetID openerId;
 
-  /// Whether the opened window has access to the originating window.
+  /// Whether the target has access to the originating window.
   final bool canAccessOpener;
+
+  /// Frame id of originating window (is only set if target has an opener).
+  final page.FrameId openerFrameId;
 
   final browser.BrowserContextID browserContextId;
 
@@ -395,6 +400,7 @@ class TargetInfo {
       @required this.attached,
       this.openerId,
       @required this.canAccessOpener,
+      this.openerFrameId,
       this.browserContextId});
 
   factory TargetInfo.fromJson(Map<String, dynamic> json) {
@@ -408,6 +414,9 @@ class TargetInfo {
           ? TargetID.fromJson(json['openerId'] as String)
           : null,
       canAccessOpener: json['canAccessOpener'] as bool,
+      openerFrameId: json.containsKey('openerFrameId')
+          ? page.FrameId.fromJson(json['openerFrameId'] as String)
+          : null,
       browserContextId: json.containsKey('browserContextId')
           ? browser.BrowserContextID.fromJson(
               json['browserContextId'] as String)
@@ -424,6 +433,7 @@ class TargetInfo {
       'attached': attached,
       'canAccessOpener': canAccessOpener,
       if (openerId != null) 'openerId': openerId.toJson(),
+      if (openerFrameId != null) 'openerFrameId': openerFrameId.toJson(),
       if (browserContextId != null)
         'browserContextId': browserContextId.toJson(),
     };
