@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
 
 void main() async {
@@ -8,11 +9,11 @@ void main() async {
   var myPage = await browser.newPage();
 
   // Go to a page and wait to be fully loaded
-  await myPage.goto('https://www.github.com', wait: Until.networkIdle);
+  await myPage.goto('https://www.github.com', wait: Until.domContentLoaded);
 
   // Do something... See other examples
   await myPage.screenshot();
-  await myPage.pdf();
+  await myPage.pdf(output: File('github_my_page.pdf').openWrite());
   await myPage.evaluate('() => document.title');
 
   // Gracefully close the browser's process
