@@ -17,7 +17,7 @@ class RevisionInfo {
 }
 
 const int _lastChromeRevision = 818858;
-const String _lastFirefoxRevision = '84.0a1';
+const String _lastFirefoxRevision = '85.0a1';
 
 Future<RevisionInfo> downloadChrome({int revision, String cachePath}) async {
   revision ??= _lastChromeRevision;
