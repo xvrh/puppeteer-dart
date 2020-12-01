@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
+import 'utils/test_api.dart';
 import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
@@ -33,9 +34,7 @@ void main() {
     page = null;
   });
 
-  group('JSCoverage', () {
-    if (isPuppeteerFirefox) return;
-
+  groupChromeOnly('JSCoverage', () {
     test('should work', () async {
       await page.coverage.startJSCoverage();
       await page.goto(server.prefix + '/jscoverage/simple.html',
@@ -144,9 +143,7 @@ void main() {
     });
   });
 
-  group('CSSCoverage', () {
-    if (isPuppeteerFirefox) return;
-
+  groupChromeOnly('CSSCoverage', () {
     test('should work', () async {
       await page.coverage.startCSSCoverage();
       await page.goto(server.prefix + '/csscoverage/simple.html');

@@ -1,6 +1,7 @@
 import 'package:puppeteer/puppeteer.dart';
 import 'package:puppeteer/src/target.dart';
 import 'package:test/test.dart';
+import 'utils/test_api.dart';
 import 'utils/utils.dart';
 
 void main() {
@@ -36,18 +37,18 @@ void main() {
         .toList();
   }
 
-  if (isPuppeteerFirefox) return;
-
-  test('should report oopif frames', () async {
-    await page.goto('${server.prefix}/dynamic-oopif.html');
-    expect(_oopifs(), hasLength(1));
-    expect(page.frames, hasLength(2));
-  }, skip: true);
-  test('should load oopif iframes with subresources and request interception',
-      () async {
-    await page.setRequestInterception(true);
-    page.onRequest.listen((request) => request.continueRequest());
-    await page.goto('${server.prefix}/dynamic-oopif.html');
-    expect(_oopifs(), hasLength(1));
+  groupChromeOnly('OOPIF', () {
+    test('should report oopif frames', () async {
+      await page.goto('${server.prefix}/dynamic-oopif.html');
+      expect(_oopifs(), hasLength(1));
+      expect(page.frames, hasLength(2));
+    }, skip: true);
+    test('should load oopif iframes with subresources and request interception',
+        () async {
+      await page.setRequestInterception(true);
+      page.onRequest.listen((request) => request.continueRequest());
+      await page.goto('${server.prefix}/dynamic-oopif.html');
+      expect(_oopifs(), hasLength(1));
+    });
   });
 }

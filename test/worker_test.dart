@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
+import 'utils/test_api.dart';
 import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
@@ -31,9 +32,7 @@ void main() {
     page = null;
   });
 
-  group('Workers', () {
-    if (isPuppeteerFirefox) return;
-
+  groupFailsFirefox('Workers', () {
     test('Page.workers', () async {
       await Future.wait([
         page.onWorkerCreated.first,

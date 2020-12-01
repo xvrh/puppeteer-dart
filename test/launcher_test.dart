@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
+import 'utils/test_api.dart';
 import 'utils/utils.dart';
 
 void main() {
@@ -20,10 +21,9 @@ void main() {
   });
   group('Puppeteer', () {
     group('Browser.disconnect', () {
-      test('should reject navigation when browser closes', () async {
-        // This test is really unstable on Firefox.
-        if (isPuppeteerFirefox) return;
-
+      // This test is really unstable on Firefox.
+      testFailsFirefoxFIXME('should reject navigation when browser closes',
+          () async {
         server.setRoute('/one-style.css', (request) {
           return Completer<shelf.Response>().future;
         });
@@ -211,9 +211,8 @@ void main() {
         expect(pages, equals(['about:blank']));
         await browser.close();
       });
-      test('should have custom url when launching browser', () async {
-        if (isPuppeteerFirefox) return;
-
+      testFailsFirefox('should have custom url when launching browser',
+          () async {
         var browser = await puppeteer.launch(args: [server.emptyPage]);
         var pages = await browser.pages;
         expect(pages.length, equals(1));
@@ -275,9 +274,8 @@ void main() {
       test('should support ignoreHTTPSErrors option', () async {
         //TODO(xha): enable once we support https server
       });
-      test('should be able to reconnect to a disconnected browser', () async {
-        if (isPuppeteerFirefox) return;
-
+      testFailsFirefox('should be able to reconnect to a disconnected browser',
+          () async {
         var originalBrowser = await puppeteer.launch();
         var browserWsEndpoint = originalBrowser.wsEndpoint;
         var page = await originalBrowser.newPage();
@@ -303,9 +301,8 @@ void main() {
       });
     });
     // @see https://github.com/GoogleChrome/puppeteer/issues/4197#issuecomment-481793410
-    test('should be able to connect to the same page simultaneously', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox(
+        'should be able to connect to the same page simultaneously', () async {
       var browserOne = await puppeteer.launch();
       var browserTwo =
           await puppeteer.connect(browserWsEndpoint: browserOne.wsEndpoint);
@@ -320,9 +317,7 @@ void main() {
   });
 
   group('Browser target events', () {
-    test('should work', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should work', () async {
       var browser = await puppeteer.launch();
       var events = [];
       browser.onTargetCreated.listen((_) => events.add('CREATED'));

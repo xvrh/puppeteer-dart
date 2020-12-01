@@ -1,5 +1,6 @@
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
+import 'utils/test_api.dart';
 import 'utils/utils.dart';
 
 void main() {
@@ -105,9 +106,7 @@ function dimensions() {
       return textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
       }'''), equals(text));
     });
-    test('should trigger hover state', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should trigger hover state', () async {
       await page.goto('${server.prefix}/input/scrollable.html');
       await page.hover('#button-6');
       expect(
@@ -125,9 +124,8 @@ function dimensions() {
               .evaluate("() => document.querySelector('button:hover').id"),
           equals('button-91'));
     });
-    test('should trigger hover state with removed window.Node', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should trigger hover state with removed window.Node',
+        () async {
       await page.goto('${server.prefix}/input/scrollable.html');
       await page.evaluate('() => delete window.Node');
       await page.hover('#button-6');
@@ -166,9 +164,7 @@ function dimensions() {
         }
       }
     });
-    test('should send mouse wheel events', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should send mouse wheel events', () async {
       await page.goto('${server.prefix}/input/wheel.html');
       var elem = await page.$('div');
       var boundingBoxBefore = await elem.boundingBox;
@@ -184,9 +180,7 @@ function dimensions() {
       expect(boundingBoxAfter.width, 230);
       expect(boundingBoxAfter.height, 230);
     });
-    test('should tween mouse movement', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should tween mouse movement', () async {
       await page.mouse.move(Point(100, 100));
       await page.evaluate('''() => {
       window.result = [];

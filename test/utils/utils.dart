@@ -119,7 +119,7 @@ async function attachFrame(frameId, url) {
     document.body.appendChild(frame);
     await new Promise(x => frame.onload = x);
     return frame;
-  }  
+  }
 ''', args: [frameId, url]);
   return await handle.asElement.contentFrame;
 }
@@ -144,7 +144,7 @@ function navigateFrame(frameId, url) {
   const frame = document.getElementById(frameId);
   frame.src = url;
   return new Promise(x => frame.onload = x);
-}  
+}
 ''', args: [frameId, url]);
 }
 

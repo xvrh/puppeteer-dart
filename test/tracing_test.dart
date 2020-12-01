@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
+import 'utils/test_api.dart';
 import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
@@ -32,9 +33,7 @@ void main() {
     page = null;
   });
 
-  group('Tracing', () {
-    if (isPuppeteerFirefox) return;
-
+  groupChromeOnly('Tracing', () {
     test('should output a trace', () async {
       await page.tracing.start(screenshots: true);
       await page.goto(server.prefix + '/grid.html');

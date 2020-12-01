@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
+import 'utils/test_api.dart';
 import 'utils/utils.dart';
 import 'utils/utils_golden.dart';
 
@@ -52,8 +53,7 @@ void main() {
           await page.screenshot(clip: Rectangle(50, 100, 150, 100));
       expect(screenshot, equalsGolden('test/golden/screenshot-clip-rect.png'));
     });
-    test('should clip elements to the viewport', () async {
-      if (isPuppeteerFirefox) return;
+    testFailsFirefox('should clip elements to the viewport', () async {
       await page.setViewport(DeviceViewport(width: 500, height: 500));
       await page.goto(server.prefix + '/grid.html');
       var screenshot =
@@ -95,8 +95,7 @@ void main() {
       }
       await Future.wait(pages.map((page) => page.close()));
     });
-    test('should allow transparency', () async {
-      if (isPuppeteerFirefox) return;
+    testFailsFirefox('should allow transparency', () async {
       await page.setViewport(DeviceViewport(width: 100, height: 100));
       await page.goto(server.emptyPage);
       var screenshot = await page.screenshot(omitBackground: true);
@@ -208,8 +207,7 @@ void main() {
           equalsGolden(
               'test/golden/screenshot-element-scrolled-into-view.png'));
     });
-    test('should work with a rotated element', () async {
-      if (isPuppeteerFirefox) return;
+    testFailsFirefox('should work with a rotated element', () async {
       await page.setViewport(DeviceViewport(width: 500, height: 500));
       await page.setContent('''<div style="position:absolute;
       top: 100px;
@@ -223,8 +221,7 @@ void main() {
       expect(screenshot,
           equalsGolden('test/golden/screenshot-element-rotate.png'));
     });
-    test('should fail to screenshot a detached element', () async {
-      if (isPuppeteerFirefox) return;
+    testFailsFirefox('should fail to screenshot a detached element', () async {
       await page.setContent('<h1>remove this</h1>');
       var elementHandle = await page.$('h1');
       await page.evaluate('element => element.remove()', args: [elementHandle]);
@@ -247,8 +244,7 @@ void main() {
       expect(screenshot,
           equalsGolden('test/golden/screenshot-element-fractional.png'));
     });
-    test('should work for an element with an offset', () async {
-      if (isPuppeteerFirefox) return;
+    testFailsFirefox('should work for an element with an offset', () async {
       await page.setContent(
           '<div style="position:absolute; top: 10.3px; left: 20.4px;width:50.3px;height:20.2px;border:1px solid black;"></div>');
       var elementHandle = await page.$('div');

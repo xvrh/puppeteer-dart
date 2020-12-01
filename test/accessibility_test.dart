@@ -1,5 +1,6 @@
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
+import 'utils/test_api.dart';
 import 'utils/utils.dart';
 
 void main() {
@@ -29,9 +30,7 @@ void main() {
     page = null;
   });
 
-  group('Accessibility', () {
-    if (isPuppeteerFirefox) return;
-
+  groupFailsFirefox('Accessibility', () {
     test('should work', () async {
       await page.setContent('''
       <head>

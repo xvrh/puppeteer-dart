@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:puppeteer/src/page/page.dart';
 import 'package:test/test.dart';
+import 'utils/test_api.dart';
 import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
@@ -36,9 +37,7 @@ void main() {
 
   const fileToUpload = 'test/assets/file-to-upload.txt';
 
-  group('input', () {
-    if (isPuppeteerFirefox) return;
-
+  groupFailsFirefox('input', () {
     test('should upload the file', () async {
       await page.goto(server.prefix + '/input/fileupload.html');
       var filePath = File(fileToUpload);
@@ -57,9 +56,7 @@ void main() {
     });
   });
 
-  group('Page.waitForFileChooser', () {
-    if (isPuppeteerFirefox) return;
-
+  groupFailsFirefox('Page.waitForFileChooser', () {
     test('should work when file input is attached to DOM', () async {
       await page.setContent('<input type=file>');
       var chooser =
@@ -120,9 +117,7 @@ void main() {
     });
   });
 
-  group('FileChooser.accept', () {
-    if (isPuppeteerFirefox) return;
-
+  groupFailsFirefox('FileChooser.accept', () {
     test('should accept single file', () async {
       await page.setContent(
           '''<input type=file oninput='javascript:console.timeStamp()'>''');
@@ -198,9 +193,7 @@ void main() {
     });
   });
 
-  group('FileChooser.cancel', () {
-    if (isPuppeteerFirefox) return;
-
+  groupFailsFirefox('FileChooser.cancel', () {
     test('should cancel dialog', () async {
       // Consider file chooser canceled if we can summon another one.
       // There's no reliable way in WebPlatform to see that FileChooser was
@@ -230,9 +223,7 @@ void main() {
     });
   });
 
-  group('FileChooser.isMultiple', () {
-    if (isPuppeteerFirefox) return;
-
+  groupFailsFirefox('FileChooser.isMultiple', () {
     test('should work for single file pick', () async {
       await page.setContent('<input type=file>');
       var chooser = await waitFutures(page.waitForFileChooser(), [

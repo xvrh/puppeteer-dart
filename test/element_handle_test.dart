@@ -1,5 +1,6 @@
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
+import 'utils/test_api.dart';
 import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
@@ -53,9 +54,7 @@ void main() {
     });
   });
 
-  group('ElementHandle.boundingBox', () {
-    if (isPuppeteerFirefox) return;
-
+  groupFailsFirefox('ElementHandle.boundingBox', () {
     test('should work', () async {
       await page.setViewport(DeviceViewport(width: 500, height: 500));
       await page.goto(server.assetUrl('grid.html'));
@@ -107,9 +106,7 @@ void main() {
     });
   });
 
-  group('ElementHandle.boxModel', () {
-    if (isPuppeteerFirefox) return;
-
+  groupFailsFirefox('ElementHandle.boxModel', () {
     test('should work', () async {
       await page.goto(server.prefix + '/resetcss.html');
 
@@ -248,9 +245,7 @@ void main() {
   });
 
   group('ElementHandle.hover', () {
-    if (isPuppeteerFirefox) return;
-
-    test('should work', () async {
+    testFailsFirefox('should work', () async {
       await page.goto(server.prefix + '/input/scrollable.html');
       var button = await page.$('#button-6');
       await button.hover();

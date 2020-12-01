@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
+import 'utils/test_api.dart';
 import 'utils/utils.dart';
 
 void main() {
@@ -24,9 +25,7 @@ void main() {
     '--load-extension=$extensionPath',
   ];
 
-  group('HEADFUL', () {
-    if (isPuppeteerFirefox) return;
-
+  groupChromeOnly('HEADFUL', () {
     test('background_page target type should be available', () async {
       var browserWithExtension =
           await puppeteer.launch(headless: false, args: extensionOptions);
@@ -148,9 +147,7 @@ void main() {
   });
 
   group('Page.bringToFront', () {
-    if (isPuppeteerFirefox) return;
-
-    test('should work', () async {
+    testFailsFirefoxFIXME('should work', () async {
       var browser = await puppeteer.launch(headless: false);
       try {
         var page1 = await browser.newPage();

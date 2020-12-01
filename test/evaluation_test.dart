@@ -1,5 +1,6 @@
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
+import 'utils/test_api.dart';
 import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
@@ -94,9 +95,8 @@ void main() {
       await page.goto(server.prefix + '/global-var.html');
       expect(await page.evaluate('globalVar'), equals(123));
     });
-    test('should return undefined for objects with symbols', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should return undefined for objects with symbols',
+        () async {
       expect(await page.evaluate("() => [Symbol('foo4')]"), isNull);
     });
     test('should work with function shorthands', () async {
@@ -113,9 +113,7 @@ void main() {
       ]);
       expect(result, equals(42));
     });
-    test('should throw when evaluation triggers reload', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should throw when evaluation triggers reload', () async {
       expect(() => page.evaluate('''() => {
         location.reload();
         return new Promise(() => {});
@@ -133,9 +131,7 @@ void main() {
       await page.goto(server.emptyPage);
       expect(await frameEvaluation, equals(42));
     });
-    test('should work from-inside an exposed function', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should work from-inside an exposed function', () async {
       // Setup inpage callback, which calls Page.evaluate
       await page.exposeFunction('callController', (num a, num b) async {
         return await page.evaluate('(a, b) => a * b', args: [a, b]);
@@ -192,14 +188,11 @@ void main() {
     test('should properly serialize null fields', () async {
       expect(await page.evaluate('() => ({a: undefined})'), equals({}));
     });
-    test('should return undefined for non-serializable objects', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should return undefined for non-serializable objects',
+        () async {
       expect(await page.evaluate('() => window'), isNull);
     });
-    test('should fail for circular object', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should fail for circular object', () async {
       var result = await page.evaluate('''() => {
           var a = {};
           var b = {a};
@@ -242,9 +235,7 @@ void main() {
           throwsA(predicate((e) => '$e'.contains(
               'JSHandles can be evaluated only in the context they were created'))));
     });
-    test('should simulate a user gesture', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should simulate a user gesture', () async {
       var result = await page.evaluate('''() => {
       document.body.appendChild(document.createTextNode('test'));
           document.execCommand('selectAll');
@@ -252,9 +243,7 @@ void main() {
     }''');
       expect(result, isTrue);
     });
-    test('should throw a nice error after a navigation', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should throw a nice error after a navigation', () async {
       var executionContext = await page.mainFrame.executionContext;
 
       await Future.wait([
@@ -282,9 +271,7 @@ void main() {
     });
   });
 
-  group('Page.evaluateOnNewDocument', () {
-    if (isPuppeteerFirefox) return;
-
+  groupFailsFirefox('Page.evaluateOnNewDocument', () {
     test('should evaluate before anything else on the page', () async {
       await page.evaluateOnNewDocument('''() => {
 window.injected = 123;

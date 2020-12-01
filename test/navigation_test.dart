@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
+import 'utils/test_api.dart';
 import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
@@ -37,9 +38,7 @@ void main() {
       await page.goto(server.emptyPage);
       expect(page.url, equals(server.emptyPage));
     });
-    test('should work with anchor navigation', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should work with anchor navigation', () async {
       await page.goto(server.emptyPage);
       expect(page.url, equals(server.emptyPage));
       await page.goto(server.emptyPage + '#foo');
@@ -62,17 +61,13 @@ void main() {
       var response = await page.goto(server.prefix + '/historyapi.html');
       expect(response.status, equals(200));
     });
-    test('should work with subframes return 204', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should work with subframes return 204', () async {
       server.setRoute('/frames/frame.html', (req) {
         return shelf.Response(204);
       });
       await page.goto(server.prefix + '/frames/one-frame.html');
     });
-    test('should fail when server returns 204', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should fail when server returns 204', () async {
       server.setRoute('/204.html', (req) => shelf.Response(204));
       expect(() => page.goto(server.assetUrl('204.html')),
           throwsA(predicate((e) => '$e'.contains('net::ERR_ABORTED'))));
@@ -90,15 +85,13 @@ void main() {
       var response = await page.goto(server.prefix + '/grid.html');
       expect(response.status, equals(200));
     });
-    test('should navigate to empty page with networkidle0', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should navigate to empty page with networkidle0',
+        () async {
       var response = await page.goto(server.emptyPage, wait: Until.networkIdle);
       expect(response.status, equals(200));
     });
-    test('should navigate to empty page with networkidle2', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should navigate to empty page with networkidle2',
+        () async {
       var response =
           await page.goto(server.emptyPage, wait: Until.networkAlmostIdle);
       expect(response.status, equals(200));
@@ -109,9 +102,7 @@ void main() {
           throwsA(predicate(
               (e) => '$e'.contains('Cannot navigate to invalid URL'))));
     });
-    test('should fail when navigating to bad SSL', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should fail when navigating to bad SSL', () async {
       // Make sure that network events do not emit 'undefined'.
       // @see https://crbug.com/750469
       page.onRequest.listen((request) => expect(request, isNotNull));
@@ -188,9 +179,7 @@ void main() {
       var response = await page.goto(server.assetUrl('simple.html'));
       expect(response.ok, isTrue);
     });
-    test('should work when navigating to data url', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should work when navigating to data url', () async {
       var response = await page.goto('data:text/html,hello');
       expect(response.ok, isTrue);
     });
@@ -207,9 +196,8 @@ void main() {
       expect(response.ok, isTrue);
       expect(response.url, equals(server.emptyPage));
     });
-    test('should wait for network idle to succeed navigation', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should wait for network idle to succeed navigation',
+        () async {
       var responses = <Completer<shelf.Response>>[];
       Future<shelf.Response> addResponse() {
         var response = Completer<shelf.Response>();
@@ -288,9 +276,8 @@ void main() {
     test('should not leak listeners during navigation of 11 pages', () async {
       //TODO(xha): implement, the test uses a warning listener on the process
     });
-    test('should navigate to dataURL and fire dataURL requests', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should navigate to dataURL and fire dataURL requests',
+        () async {
       var requests = <Request>[];
       page.onRequest.listen((request) {
         if (!request.url.contains('favicon.ico')) {
@@ -303,10 +290,9 @@ void main() {
       expect(requests.length, equals(1));
       expect(requests[0].url, equals(dataURL));
     });
-    test('should navigate to URL with hash and fire requests without hash',
+    testFailsFirefox(
+        'should navigate to URL with hash and fire requests without hash',
         () async {
-      if (isPuppeteerFirefox) return;
-
       var requests = [];
       page.onRequest.listen((request) {
         if (!request.url.contains('favicon.ico')) {
@@ -330,9 +316,7 @@ void main() {
       expect(
           () => page.goto(url), throwsA(predicate((e) => '$e'.contains(url))));
     }, skip: "Can't reproduce the original test (needs https)");
-    test('should send referer', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should send referer', () async {
       var request1Future = server.waitForRequest('/grid.html');
       var request2Future = server.waitForRequest('/digits/1.png');
 
@@ -350,9 +334,7 @@ void main() {
   });
 
   group('Page.waitForNavigation', () {
-    test('should work', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should work', () async {
       await page.goto(server.emptyPage);
       var response = await waitFutures(page.waitForNavigation(), [
         page.evaluate('url => window.location.href = url',
@@ -384,9 +366,7 @@ void main() {
       await bothFiredPromise;
       await navigationPromise;
     });
-    test('should work with clicking on anchor links', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should work with clicking on anchor links', () async {
       await page.goto(server.emptyPage);
       await page.setContent("<a href='#foobar'>foobar</a>");
       var response = await waitFutures(page.waitForNavigation(), [
@@ -395,9 +375,7 @@ void main() {
       expect(response, isNull);
       expect(page.url, equals(server.emptyPage + '#foobar'));
     });
-    test('should work with history.pushState()', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should work with history.pushState()', () async {
       await page.goto(server.emptyPage);
       await page.setContent('''
       <a onclick='javascript:pushState()'>SPA</a>
@@ -411,9 +389,7 @@ void main() {
       expect(response, isNull);
       expect(page.url, equals(server.prefix + '/wow.html'));
     });
-    test('should work with history.replaceState()', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should work with history.replaceState()', () async {
       await page.goto(server.emptyPage);
       await page.setContent('''
       <a onclick='javascript:replaceState()'>SPA</a>
@@ -427,9 +403,8 @@ void main() {
       expect(response, isNull);
       expect(page.url, equals(server.prefix + '/replaced.html'));
     });
-    test('should work with DOM history.back()/history.forward()', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should work with DOM history.back()/history.forward()',
+        () async {
       await page.goto(server.emptyPage);
       await page.setContent('''
       <a id=back onclick='javascript:goBack()'>back</a>
@@ -453,9 +428,8 @@ void main() {
       expect(forwardResponse, isNull);
       expect(page.url, equals(server.prefix + '/second.html'));
     });
-    test('should work when subframe issues window.stop()', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should work when subframe issues window.stop()',
+        () async {
       server.setRoute(
           '/frames/style.css', (req) => Completer<shelf.Response>().future);
 
@@ -474,9 +448,7 @@ void main() {
   });
 
   group('Page.goBack', () {
-    test('should work', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefoxFIXME('should work', () async {
       await page.goto(server.emptyPage);
       await page.goto(server.prefix + '/grid.html');
 
@@ -491,9 +463,7 @@ void main() {
       response = await page.goForward();
       expect(response, isNull);
     });
-    test('should work with HistoryAPI', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should work with HistoryAPI', () async {
       await page.goto(server.emptyPage);
       await page.evaluate('''() => {
       history.pushState({}, '', '/first.html');
@@ -510,9 +480,7 @@ void main() {
     });
   });
 
-  group('Frame.goto', () {
-    if (isPuppeteerFirefox) return;
-
+  groupFailsFirefox('Frame.goto', () {
     test('should navigate subframes', () async {
       await page.goto(server.prefix + '/frames/one-frame.html');
       expect(page.frames[0].url, contains('/frames/one-frame.html'));
@@ -576,9 +544,7 @@ void main() {
     });
   });
 
-  group('Frame.waitForNavigation', () {
-    if (isPuppeteerFirefox) return;
-
+  groupFailsFirefox('Frame.waitForNavigation', () {
     test('should work', () async {
       await page.goto(server.prefix + '/frames/one-frame.html');
       var frame = page.frames[1];

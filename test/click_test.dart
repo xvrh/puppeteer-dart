@@ -1,5 +1,6 @@
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
+import 'utils/test_api.dart';
 import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
@@ -37,9 +38,8 @@ void main() {
       await page.click('button');
       expect(await page.evaluate('() => result'), equals('Clicked'));
     });
-    test('should click the button if window.Node is removed', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should click the button if window.Node is removed',
+        () async {
       await page.goto(server.prefix + '/input/button.html');
       await page.evaluate('() => delete window.Node');
       await page.click('button');
@@ -65,9 +65,7 @@ void main() {
       await page.click('button');
       expect(await page.evaluate('() => result'), equals('Clicked'));
     });
-    test('should click with disabled javascript', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should click with disabled javascript', () async {
       await page.setJavaScriptEnabled(false);
       await page.goto(server.prefix + '/wrappedlink.html');
       await Future.wait([page.click('a'), page.waitForNavigation()]);
@@ -156,9 +154,7 @@ void main() {
       expect(await page.evaluate('() => result.check'), isFalse);
     });
 
-    test('should click on checkbox label and toggle', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should click on checkbox label and toggle', () async {
       await page.goto(server.prefix + '/input/checkbox.html');
       expect(await page.evaluate('() => result.check'), isNull);
       await page.click('label[for="agree"]');

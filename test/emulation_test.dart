@@ -1,5 +1,6 @@
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
+import 'utils/test_api.dart';
 import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
@@ -81,9 +82,7 @@ void main() {
       await page.addScriptTag(url: server.prefix + '/modernizr.js');
       expect(await page.evaluate('() => Modernizr.touchevents'), isTrue);
     });
-    test('should support landscape emulation', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should support landscape emulation', () async {
       await page.goto(server.prefix + '/mobile.html');
       await page.setViewport(puppeteer.devices.iPhone6Landscape.viewport);
       expect(await page.evaluate('() => screen.orientation.type'),
@@ -114,9 +113,7 @@ void main() {
   });
 
   group('Page.emulateMediaType', () {
-    test('should work', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should work', () async {
       expect(await page.evaluate("() => window.matchMedia('screen').matches"),
           isTrue);
       expect(await page.evaluate("() => window.matchMedia('print').matches"),
@@ -139,9 +136,7 @@ void main() {
   });
 
   group('Page.emulateMediaFeatures', () {
-    if (isPuppeteerFirefox) return;
-
-    test('should work ddd', () async {
+    testFailsFirefox('should work ddd', () async {
       await page
           .emulateMediaFeatures([MediaFeature.prefersReducedMotion('reduce')]);
       expect(
@@ -243,9 +238,7 @@ void main() {
     }, skip: 'This is not working in headless and flaky in headful');
   });
 
-  group('Page.emulateTimezone', () {
-    if (isPuppeteerFirefox) return;
-
+  groupFailsFirefox('Page.emulateTimezone', () {
     test('should work', () async {
       await page.evaluate('''() => {
       globalThis.date = new Date(1479579154987);

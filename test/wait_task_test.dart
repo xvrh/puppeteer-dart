@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
+import 'utils/test_api.dart';
 import 'utils/utils.dart';
 
 // ignore_for_file: prefer_interpolation_to_compose_strings
@@ -187,9 +188,7 @@ void main() {
       await frame.waitForSelector('div');
     });
 
-    test('should work with removed MutationObserver', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should work with removed MutationObserver', () async {
       await page.evaluate('() => delete window.MutationObserver');
       var handle = await waitFutures(page.waitForSelector('.zombo'), [
         page.setContent("<div class='zombo'>anything</div>"),
@@ -229,9 +228,7 @@ void main() {
       expect(eHandle.executionContext.frame, equals(page.mainFrame));
     });
 
-    test('should run in specified frame', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should run in specified frame', () async {
       await attachFrame(page, 'frame1', server.emptyPage);
       await attachFrame(page, 'frame2', server.emptyPage);
       var frame1 = page.frames[1];
@@ -243,9 +240,7 @@ void main() {
       expect(eHandle.executionContext.frame, equals(frame2));
     });
 
-    test('should throw when frame is detached', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should throw when frame is detached', () async {
       await attachFrame(page, 'frame1', server.emptyPage);
       var frame = page.frames[1];
       dynamic waitError;
@@ -394,9 +389,7 @@ void main() {
           await page.evaluate('x => x.textContent', args: [await waitForXPath]),
           equals('hello  world  '));
     });
-    test('should run in specified frame', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should run in specified frame', () async {
       await attachFrame(page, 'frame1', server.emptyPage);
       await attachFrame(page, 'frame2', server.emptyPage);
       var frame1 = page.frames[1];
@@ -407,9 +400,7 @@ void main() {
       var eHandle = await waitForXPathPromise;
       expect(eHandle.executionContext.frame, equals(frame2));
     });
-    test('should throw when frame is detached', () async {
-      if (isPuppeteerFirefox) return;
-
+    testFailsFirefox('should throw when frame is detached', () async {
       await attachFrame(page, 'frame1', server.emptyPage);
       var frame = page.frames[1];
       dynamic waitError;
