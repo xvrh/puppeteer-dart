@@ -1807,7 +1807,7 @@ function deliverError(name, seq, message, stack) {
   ///   var watchImg = page.waitForSelector('img');
   ///   await page.goto('https://example.com');
   ///   var image = await watchImg;
-  ///   print(await image.propertyValue('src'));
+  ///   print(await image!.propertyValue('src'));
   ///   await browser.close();
   /// }
   /// ```
@@ -1849,7 +1849,7 @@ function deliverError(name, seq, message, stack) {
   ///   var watchImg = page.waitForXPath('//img');
   ///   await page.goto('https://example.com');
   ///   var image = await watchImg;
-  ///   print(await image.propertyValue('src'));
+  ///   print(await image!.propertyValue('src'));
   ///   await browser.close();
   /// }
   /// ```

@@ -784,7 +784,7 @@ class Frame {
   ///   var watchImg = page.mainFrame.waitForSelector('img');
   ///   await page.goto('https://example.com');
   ///   var image = await watchImg;
-  ///   print(await image.propertyValue('src'));
+  ///   print(await image!.propertyValue('src'));
   ///   await browser.close();
   /// }
   /// ```
@@ -832,7 +832,7 @@ class Frame {
   ///   var watchImg = page.mainFrame.waitForXPath('//img');
   ///   await page.goto('https://example.com');
   ///   var image = await watchImg;
-  ///   print(await image.propertyValue('src'));
+  ///   print(await image!.propertyValue('src'));
   ///   await browser.close();
   /// }
   /// ```

@@ -669,31 +669,31 @@ void main() {
     test('should work', () async {
       await page.setContent('<div>hello</div>');
       var result = await page.content;
-      expect(result, equals(expectedOutput));
+      expect(result, expectedOutput);
     });
     test('should work with doctype', () async {
       var doctype = '<!DOCTYPE html>';
       await page.setContent('$doctype<div>hello</div>');
       var result = await page.content;
-      expect(result, equals('$doctype$expectedOutput'));
+      expect(result, '$doctype$expectedOutput');
     });
     test('should work with HTML 4 doctype', () async {
       var doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" '
           '"http://www.w3.org/TR/html4/strict.dtd">';
       await page.setContent('$doctype<div>hello</div>');
       var result = await page.content;
-      expect(result, equals('$doctype$expectedOutput'));
+      expect(result, '$doctype$expectedOutput');
     });
     test('should respect timeout', () async {
       var imgPath = 'img.png';
       // stall for image
-      server.setRoute(imgPath, (req) {
-        return Future.delayed(
-            Duration(seconds: 3000), () => shelf.Response.notFound(''));
+      server.setRoute(imgPath, (req) async {
+        await Future.delayed(Duration(seconds: 30000));
+        return shelf.Response.notFound('');
       });
       expect(
           () => page.setContent(
-              '<img src="${server.hostUrl + '/' + imgPath}"></img>',
+              '<img src="${server.hostUrl + '/' + imgPath}" />',
               timeout: Duration(milliseconds: 1)),
           throwsA(TypeMatcher<TimeoutException>()));
     });
@@ -701,12 +701,13 @@ void main() {
       page.defaultTimeout = Duration(milliseconds: 1);
       var imgPath = 'img.png';
       // stall for image
-      server.setRoute(imgPath, (req) {
-        return Future.delayed(Duration(seconds: 3000));
+      server.setRoute(imgPath, (req) async {
+        return Future.delayed(
+            Duration(seconds: 3000), () => shelf.Response.notFound(''));
       });
       expect(
-          () => page.setContent(
-              '<img src="${server.hostUrl + '/' + imgPath}"></img>'),
+          () => page
+              .setContent('<img src="${server.hostUrl + '/' + imgPath}" />'),
           throwsA(TypeMatcher<TimeoutException>()));
     });
     test('should await resources to load', () async {
@@ -718,7 +719,7 @@ void main() {
       });
       var loaded = false;
       var contentPromise = page
-          .setContent('<img src="${server.hostUrl + '/' + imgPath}"></img>')
+          .setContent('<img src="${server.hostUrl + '/' + imgPath}"/>')
           .then((_) {
         loaded = true;
       });

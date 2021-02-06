@@ -2010,7 +2010,7 @@ void main() async {
   var watchImg = page.waitForSelector('img');
   await page.goto('https://example.com');
   var image = await watchImg;
-  print(await image.propertyValue('src'));
+  print(await image!.propertyValue('src'));
   await browser.close();
 }
 ```
@@ -2033,7 +2033,7 @@ is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
 is not found in DOM.
 
 ```dart
-page.waitForSelector(String selector, {bool? visible, bool? hidden, Duration? timeout}) → Future<ElementHandle> 
+page.waitForSelector(String selector, {bool? visible, bool? hidden, Duration? timeout}) → Future<ElementHandle?> 
 ```
 
 #### page.waitForXPath(...)
@@ -2052,7 +2052,7 @@ void main() async {
   var watchImg = page.waitForXPath('//img');
   await page.goto('https://example.com');
   var image = await watchImg;
-  print(await image.propertyValue('src'));
+  print(await image!.propertyValue('src'));
   await browser.close();
 }
 ```
@@ -2075,7 +2075,7 @@ is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
 is not found in DOM.
 
 ```dart
-page.waitForXPath(String xpath, {bool? visible, bool? hidden, Duration? timeout}) → Future<ElementHandle> 
+page.waitForXPath(String xpath, {bool? visible, bool? hidden, Duration? timeout}) → Future<ElementHandle?> 
 ```
 
 #### page.workers
@@ -3003,7 +3003,7 @@ void main() async {
   var watchImg = page.mainFrame.waitForSelector('img');
   await page.goto('https://example.com');
   var image = await watchImg;
-  print(await image.propertyValue('src'));
+  print(await image!.propertyValue('src'));
   await browser.close();
 }
 ```
@@ -3025,7 +3025,7 @@ is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
 is not found in DOM.
 
 ```dart
-frame.waitForSelector(String selector, {bool? visible, bool? hidden, Duration? timeout}) → Future<ElementHandle> 
+frame.waitForSelector(String selector, {bool? visible, bool? hidden, Duration? timeout}) → Future<ElementHandle?> 
 ```
 
 #### frame.waitForXPath(...)
@@ -3044,7 +3044,7 @@ void main() async {
   var watchImg = page.mainFrame.waitForXPath('//img');
   await page.goto('https://example.com');
   var image = await watchImg;
-  print(await image.propertyValue('src'));
+  print(await image!.propertyValue('src'));
   await browser.close();
 }
 ```
@@ -3066,7 +3066,7 @@ is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
 is not found in DOM.
 
 ```dart
-frame.waitForXPath(String xpath, {bool? visible, bool? hidden, Duration? timeout}) → Future<ElementHandle> 
+frame.waitForXPath(String xpath, {bool? visible, bool? hidden, Duration? timeout}) → Future<ElementHandle?> 
 ```
 
 ### class: ExecutionContext

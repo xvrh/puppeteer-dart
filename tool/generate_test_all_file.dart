@@ -14,6 +14,7 @@ void main() {
   allFiles.sort();
 
   var buffer = StringBuffer();
+  buffer.writeln('// @dart=2.9');
   buffer.writeln("import 'package:test/test.dart';");
   for (var file in allFiles) {
     buffer.writeln("import '$file' as ${file.replaceAll('.dart', '')};");

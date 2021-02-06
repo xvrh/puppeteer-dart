@@ -37,7 +37,7 @@ class Server {
     return server;
   }
 
-  Future _setup() async {
+  Future<void> _setup() async {
     var staticHandler = createStaticHandler('test/assets');
     _httpServer = await io.serve((request) async {
       var notificationCompleter = _requestCallbacks[request.url.toString()];
