@@ -8,10 +8,10 @@ import 'utils/utils.dart';
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 void main() {
-  Server server;
-  Browser browser;
-  BrowserContext context;
-  Page page;
+  late Server server;
+  late Browser browser;
+  late BrowserContext context;
+  late Page page;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
@@ -30,7 +30,6 @@ void main() {
   tearDown(() async {
     server.clearRoutes();
     await page.close();
-    page = null;
   });
 
   group('Page.Events.Request', () {
@@ -145,10 +144,10 @@ void main() {
       await page.reload();
 
       expect(responses.length, equals(2));
-      expect(responses['one-style.css'].status, equals(200));
-      expect(responses['one-style.css'].fromCache, isTrue);
-      expect(responses['one-style.html'].status, equals(304));
-      expect(responses['one-style.html'].fromCache, isFalse);
+      expect(responses['one-style.css']!.status, equals(200));
+      expect(responses['one-style.css']!.fromCache, isTrue);
+      expect(responses['one-style.html']!.status, equals(304));
+      expect(responses['one-style.html']!.fromCache, isFalse);
     });
   });
 
@@ -171,10 +170,10 @@ void main() {
       await page.reload();
 
       expect(responses.length, equals(2));
-      expect(responses['sw.html'].status, equals(200));
-      expect(responses['sw.html'].fromServiceWorker, isTrue);
-      expect(responses['style.css'].status, equals(200));
-      expect(responses['style.css'].fromServiceWorker, isTrue);
+      expect(responses['sw.html']!.status, equals(200));
+      expect(responses['sw.html']!.fromServiceWorker, isTrue);
+      expect(responses['style.css']!.status, equals(200));
+      expect(responses['style.css']!.fromServiceWorker, isTrue);
     });
   });
 
@@ -182,7 +181,7 @@ void main() {
     test('should work', () async {
       await page.goto(server.emptyPage);
       server.setRoute('/post', (req) => shelf.Response.ok(''));
-      Request request;
+      late Request request;
       page.onRequest.listen((r) {
         request = r;
       });
@@ -214,7 +213,7 @@ void main() {
       var response = await page.goto(server.prefix + '/foo.html');
       var redirectChain = response.request.redirectChain;
       expect(redirectChain.length, equals(1));
-      var redirected = redirectChain[0].response;
+      var redirected = redirectChain[0].response!;
       expect(redirected.status, equals(302));
       expect(
           () => redirected.text,
@@ -224,8 +223,8 @@ void main() {
     test('should wait until response completes', () async {
       await page.goto(server.emptyPage);
       // Setup server to trap request.
-      IOSink serverResponse;
-      StreamController<List<int>> responseStream;
+      late IOSink serverResponse;
+      late StreamController<List<int>> responseStream;
       server.setRoute('/get', (req) {
         responseStream = StreamController<List<int>>();
         serverResponse = IOSink(responseStream);
@@ -309,7 +308,7 @@ void main() {
       expect(requests[0].method, equals('GET'));
       expect(requests[0].response, isNotNull);
       expect(requests[0].frame == page.mainFrame, isTrue);
-      expect(requests[0].frame.url, equals(server.emptyPage));
+      expect(requests[0].frame!.url, equals(server.emptyPage));
     });
     test('Page.Events.Response', () async {
       var responses = <Response>[];
@@ -322,7 +321,7 @@ void main() {
       expect(responses[0].request, isNotNull);
       // Either IPv6 or IPv4, depending on environment.
       expect(
-          responses[0].remoteIPAddress.contains('::1') ||
+          responses[0].remoteIPAddress!.contains('::1') ||
               responses[0].remoteIPAddress == '127.0.0.1',
           isTrue);
       expect(responses[0].remotePort, equals(server.port));
@@ -355,7 +354,7 @@ void main() {
       expect(requests[0].url, equals(server.emptyPage));
       expect(requests[0].response, isNotNull);
       expect(requests[0].frame == page.mainFrame, isTrue);
-      expect(requests[0].frame.url, equals(server.emptyPage));
+      expect(requests[0].frame!.url, equals(server.emptyPage));
     });
     test('should fire events in proper order', () async {
       var events = <String>[];
@@ -393,7 +392,7 @@ void main() {
       var redirectChain = response.request.redirectChain;
       expect(redirectChain.length, equals(1));
       expect(redirectChain[0].url, contains('/foo.html'));
-      expect(redirectChain[0].response.remotePort, equals(server.port));
+      expect(redirectChain[0].response!.remotePort, equals(server.port));
     });
   });
 
@@ -404,11 +403,11 @@ void main() {
           .listen((request) => requests[request.url.split('/').last] = request);
       server.setRedirect('/rrredirect', '/frames/one-frame.html');
       await page.goto(server.prefix + '/rrredirect');
-      expect(requests['rrredirect'].isNavigationRequest, isTrue);
-      expect(requests['one-frame.html'].isNavigationRequest, isTrue);
-      expect(requests['frame.html'].isNavigationRequest, isTrue);
-      expect(requests['script.js'].isNavigationRequest, isFalse);
-      expect(requests['style.css'].isNavigationRequest, isFalse);
+      expect(requests['rrredirect']!.isNavigationRequest, isTrue);
+      expect(requests['one-frame.html']!.isNavigationRequest, isTrue);
+      expect(requests['frame.html']!.isNavigationRequest, isTrue);
+      expect(requests['script.js']!.isNavigationRequest, isFalse);
+      expect(requests['style.css']!.isNavigationRequest, isFalse);
     });
     test('should work with request interception', () async {
       var requests = <String, Request>{};
@@ -419,11 +418,11 @@ void main() {
       await page.setRequestInterception(true);
       server.setRedirect('/rrredirect', '/frames/one-frame.html');
       await page.goto(server.prefix + '/rrredirect');
-      expect(requests['rrredirect'].isNavigationRequest, isTrue);
-      expect(requests['one-frame.html'].isNavigationRequest, isTrue);
-      expect(requests['frame.html'].isNavigationRequest, isTrue);
-      expect(requests['script.js'].isNavigationRequest, isFalse);
-      expect(requests['style.css'].isNavigationRequest, isFalse);
+      expect(requests['rrredirect']!.isNavigationRequest, isTrue);
+      expect(requests['one-frame.html']!.isNavigationRequest, isTrue);
+      expect(requests['frame.html']!.isNavigationRequest, isTrue);
+      expect(requests['script.js']!.isNavigationRequest, isFalse);
+      expect(requests['style.css']!.isNavigationRequest, isFalse);
     });
     test('should work when navigating to image', () async {
       var requests = <Request>[];

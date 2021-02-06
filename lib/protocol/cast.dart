@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// A domain for interacting with Cast, Presentation API, and Remote Playback API
@@ -28,7 +27,7 @@ class CastApi {
   /// |sinksUpdated| event is fired.
   /// Also starts observing for issue messages. When an issue is added or removed,
   /// an |issueUpdated| event is fired.
-  Future<void> enable({String presentationUrl}) async {
+  Future<void> enable({String? presentationUrl}) async {
     await _client.send('Cast.enable', {
       if (presentationUrl != null) 'presentationUrl': presentationUrl,
     });
@@ -69,9 +68,9 @@ class Sink {
 
   /// Text describing the current session. Present only if there is an active
   /// session on the sink.
-  final String session;
+  final String? session;
 
-  Sink({@required this.name, @required this.id, this.session});
+  Sink({required this.name, required this.id, this.session});
 
   factory Sink.fromJson(Map<String, dynamic> json) {
     return Sink(

@@ -37,6 +37,7 @@
   * [page.$](#pagestring-selector)
   * [page.$$](#pagestring-selector)
   * [page.$$eval](#pageeval)
+  * [page.$OrNull](#pageornullstring-selector)
   * [page.$eval](#pageeval)
   * [page.$x](#pagexstring-expression)
   * [page.addScriptTag](#pageaddscripttag)
@@ -119,7 +120,7 @@
   * [accessibility.snapshot](#accessibilitysnapshot)
 - [class: Keyboard](#class-keyboard)
   * [keyboard.down](#keyboarddownkey-key-string-text)
-  * [keyboard.press](#keyboardpresskey-key-duration-delay-string-text)
+  * [keyboard.press](#keyboardpress)
   * [keyboard.sendCharacter](#keyboardsendcharacterstring-text)
   * [keyboard.type](#keyboardtypestring-text-duration-delay)
   * [keyboard.up](#keyboardupkey-key)
@@ -145,6 +146,7 @@
   * [frame.$](#framestring-selector)
   * [frame.$$](#framestring-selector)
   * [frame.$$eval](#frameeval)
+  * [frame.$OrNull](#frameornullstring-selector)
   * [frame.$eval](#frameeval)
   * [frame.$x](#framexstring-expression)
   * [frame.addScriptTag](#frameaddscripttag)
@@ -196,7 +198,7 @@
   * [elementHandle.contentFrame](#elementhandlecontentframe)
   * [elementHandle.focus](#elementhandlefocus)
   * [elementHandle.isIntersectingViewport](#elementhandleisintersectingviewport)
-  * [elementHandle.press](#elementhandlepresskey-key-duration-delay-string-text)
+  * [elementHandle.press](#elementhandlepress)
   * [elementHandle.screenshot](#elementhandlescreenshot)
   * [elementHandle.select](#elementhandleselectliststring-values)
   * [elementHandle.tap](#elementhandletap)
@@ -260,7 +262,7 @@ Parameters:
     Useful so that you can see what is going on.
 
 ```dart
-puppeteer.connect({String browserWsEndpoint, String browserUrl, DeviceViewport defaultViewport = LaunchOptions.viewportNotSpecified, bool ignoreHttpsErrors, Duration slowMo, List<Plugin> plugins}) → Future<Browser> 
+puppeteer.connect({String? browserWsEndpoint, String? browserUrl, DeviceViewport defaultViewport = LaunchOptions.viewportNotSpecified, bool? ignoreHttpsErrors, Duration? slowMo, List<Plugin>? plugins}) → Future<Browser> 
 ```
 
 #### puppeteer.launch(...)
@@ -303,7 +305,7 @@ Parameters:
  - `timeout` Maximum time to wait for the browser instance to start. Defaults to 30 seconds.
 
 ```dart
-puppeteer.launch({String executablePath, bool headless, bool devTools, String userDataDir, bool noSandboxFlag, DeviceViewport defaultViewport = LaunchOptions.viewportNotSpecified, bool ignoreHttpsErrors, Duration slowMo, List<String> args, dynamic ignoreDefaultArgs, Map<String, String> environment, List<Plugin> plugins, Duration timeout}) → Future<Browser> 
+puppeteer.launch({String? executablePath, bool? headless, bool? devTools, String? userDataDir, bool? noSandboxFlag, DeviceViewport? defaultViewport = LaunchOptions.viewportNotSpecified, bool? ignoreHttpsErrors, Duration? slowMo, List<String>? args, dynamic ignoreDefaultArgs, Map<String, String>? environment, List<Plugin>? plugins, Duration? timeout}) → Future<Browser> 
 ```
 
 ### class: Browser
@@ -461,7 +463,7 @@ await newWindowTarget;
 ```
 
 ```dart
-browser.waitForTarget(bool Function(Target) predicate, {Duration timeout}) → Future<Target> 
+browser.waitForTarget(bool Function(Target) predicate, {Duration? timeout}) → Future<Target> 
 ```
 
 ### class: BrowserContext
@@ -580,7 +582,7 @@ browserContext.targets → List<Target>
 This searches for a target in this specific browser context.
 
 ```dart
-browserContext.waitForTarget(bool Function(Target) predicate, {Duration timeout}) → Future<Target> 
+browserContext.waitForTarget(bool Function(Target) predicate, {Duration? timeout}) → Future<Target> 
 ```
 
 ### class: Page
@@ -621,7 +623,7 @@ await subscription.cancel();
 ```
 
 #### page.$(String selector)
-The method runs `document.querySelector` within the page. If no element matches the selector, the return value resolves to `null`.
+The method runs `document.querySelector` within the page. If no element matches the selector, it throws an exception.
 
 Shortcut for [Page.mainFrame.$(selector)].
 
@@ -660,7 +662,18 @@ A [selector] to query page for
 Returns a [Future] which resolves to the return value of `pageFunction`
 
 ```dart
-page.$$eval(String selector, @Language('js') String pageFunction, {List args}) → Future<T> 
+page.$$eval(String selector, @Language('js') String pageFunction, {List? args}) → Future<T?> 
+```
+
+#### page.$OrNull(String selector)
+The method runs `document.querySelector` within the page. If no element matches the selector, the return value resolves to `null`.
+
+Shortcut for [Page.mainFrame.$(selector)].
+
+A [selector] to query page for
+
+```dart
+page.$OrNull(String selector) → Future<ElementHandle?> 
 ```
 
 #### page.$eval(...)
@@ -684,7 +697,7 @@ var html = await page.$eval(
 Shortcut for [Page.mainFrame.$eval(selector, pageFunction)].
 
 ```dart
-page.$eval(String selector, @Language('js') String pageFunction, {List args}) → Future<T> 
+page.$eval(String selector, @Language('js') String pageFunction, {List? args}) → Future<T?> 
 ```
 
 #### page.$x(String expression)
@@ -716,7 +729,7 @@ Returns a [Future<ElementHandle>] which resolves to the added tag when the
 script's onload fires or when the script content was injected into frame.
 
 ```dart
-page.addScriptTag({String url, File file, String content, String type}) → Future<ElementHandle> 
+page.addScriptTag({String? url, File? file, String? content, String? type}) → Future<ElementHandle> 
 ```
 
 #### page.addStyleTag(...)
@@ -734,16 +747,16 @@ Returns a [Future<ElementHandle>] which resolves to the added tag when the
 stylesheet's onload fires or when the CSS content was injected into frame.
 
 ```dart
-page.addStyleTag({String url, File file, String content}) → Future<ElementHandle> 
+page.addStyleTag({String? url, File? file, String? content}) → Future<ElementHandle> 
 ```
 
-#### page.authenticate({String username, String password})
+#### page.authenticate({String? username, String? password})
 Provide credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
 
 To disable authentication, pass `null`.
 
 ```dart
-page.authenticate({String username, String password}) → Future<void> 
+page.authenticate({String? username, String? password}) → Future<void> 
 ```
 
 #### page.bringToFront()
@@ -804,7 +817,7 @@ multiple elements satisfying the selector, the first will be clicked.
 [delay]: Time to wait between `mousedown` and `mouseup`. Default to zero.
 
 ```dart
-page.click(String selector, {Duration delay, MouseButton button, int clickCount}) → Future<void> 
+page.click(String selector, {Duration? delay, MouseButton? button, int? clickCount}) → Future<void> 
 ```
 
 #### page.clickAndWaitForNavigation(...)
@@ -827,10 +840,10 @@ await Future.wait([
 ```
 
 ```dart
-page.clickAndWaitForNavigation(String selector, {Duration timeout, Until wait}) → Future<Response> 
+page.clickAndWaitForNavigation(String selector, {Duration? timeout, Until? wait}) → Future<Response?> 
 ```
 
-#### page.close({bool runBeforeUnload})
+#### page.close({bool? runBeforeUnload})
 By default, [Page.close] **does not** run beforeunload handlers.
 
 **NOTE** if `runBeforeUnload` is passed as true, a `beforeunload` dialog
@@ -841,22 +854,22 @@ Parameters:
    [before unload](https://developer.mozilla.org/en-US/docs/Web/Events/beforeunload)
 
 ```dart
-page.close({bool runBeforeUnload}) → Future<void> 
+page.close({bool? runBeforeUnload}) → Future<void> 
 ```
 
 #### page.content
 Gets the full HTML contents of the page, including the doctype.
 
 ```dart
-page.content → Future<String>
+page.content → Future<String?>
 ```
 
-#### page.cookies({List\<String> urls})
+#### page.cookies({List\<String>? urls})
 If no URLs are specified, this method returns cookies for the current page URL.
 If URLs are specified, only cookies for those URLs are returned.
 
 ```dart
-page.cookies({List<String> urls}) → Future<List<Cookie>> 
+page.cookies({List<String>? urls}) → Future<List<Cookie>> 
 ```
 
 #### page.defaultNavigationTimeout
@@ -873,7 +886,7 @@ following methods and related shortcuts:
 > **NOTE** [page.defaultNavigationTimeout] takes priority over [page.defaultTimeout]
 
 ```dart
-page.defaultNavigationTimeout → Duration
+page.defaultNavigationTimeout → Duration?
 ```
 
 #### page.defaultTimeout
@@ -896,7 +909,7 @@ and related shortcuts:
 > **NOTE** [`page.defaultNavigationTimeout`] takes priority over [`page.defaultTimeout`]
 
 ```dart
-page.defaultTimeout → Duration
+page.defaultTimeout → Duration?
 ```
 
 #### page.emulate(Device device)
@@ -929,15 +942,15 @@ List of all available devices is available in the source code:
 page.emulate(Device device) → Future<void> 
 ```
 
-#### page.emulateMediaFeatures(List\<MediaFeature> features)
+#### page.emulateMediaFeatures(List\<MediaFeature>? features)
 Given an array of media feature objects, emulates CSS media features on
 the page.
 
 ```dart
-page.emulateMediaFeatures(List<MediaFeature> features) → Future<void> 
+page.emulateMediaFeatures(List<MediaFeature>? features) → Future<void> 
 ```
 
-#### page.emulateMediaType(MediaType mediaType)
+#### page.emulateMediaType(MediaType? mediaType)
 Changes the CSS media type of the page.
 The only allowed values are `'screen'`, `'print'` and `null`.
 Passing `null` disables media emulation.
@@ -955,7 +968,7 @@ expect(await page.evaluate("() => matchMedia('print').matches"), isFalse);
 ```
 
 ```dart
-page.emulateMediaType(MediaType mediaType) → Future<void> 
+page.emulateMediaType(MediaType? mediaType) → Future<void> 
 ```
 
 #### page.evaluate(...)
@@ -999,7 +1012,7 @@ Parameters:
 - Returns: Future which resolves to the return value of `pageFunction`
 
 ```dart
-page.evaluate(@Language('js') String pageFunction, {List args}) → Future<T> 
+page.evaluate(@Language('js') String pageFunction, {List? args}) → Future<T> 
 ```
 
 #### page.evaluateHandle(...)
@@ -1035,10 +1048,10 @@ returns: Future which resolves to the return value of `pageFunction` as
 in-page object (JSHandle)
 
 ```dart
-page.evaluateHandle(@Language('js') String pageFunction, {List args}) → Future<T> 
+page.evaluateHandle(@Language('js') String pageFunction, {List? args}) → Future<T> 
 ```
 
-#### page.evaluateOnNewDocument(String pageFunction, {List args})
+#### page.evaluateOnNewDocument(String pageFunction, {List? args})
 Adds a function which would be invoked in one of the following scenarios:
 - whenever the page is navigated
 - whenever the child frame is attached or navigated. In this case, the
@@ -1072,7 +1085,7 @@ Parameters:
 - [args] Arguments to pass to [pageFunction]
 
 ```dart
-page.evaluateOnNewDocument(String pageFunction, {List args}) → Future<void> 
+page.evaluateOnNewDocument(String pageFunction, {List? args}) → Future<void> 
 ```
 
 #### page.exposeFunction(String name, Function callbackFunction)
@@ -1158,7 +1171,7 @@ An array of all frames attached to the page.
 page.frames → List<Frame>
 ```
 
-#### page.goBack({Duration timeout, Until wait})
+#### page.goBack({Duration? timeout, Until? wait})
 Navigate to the previous page in history.
 
 Parameters:
@@ -1183,10 +1196,10 @@ response. In case of multiple redirects, the navigation will resolve with
 the response of the last redirect. If can not go back, resolves to `null`.
 
 ```dart
-page.goBack({Duration timeout, Until wait}) → Future<Response> 
+page.goBack({Duration? timeout, Until? wait}) → Future<Response?> 
 ```
 
-#### page.goForward({Duration timeout, Until wait})
+#### page.goForward({Duration? timeout, Until? wait})
 Navigate to the next page in history.
 
 Parameters:
@@ -1211,7 +1224,7 @@ response. In case of multiple redirects, the navigation will resolve with
 the response of the last redirect. If can not go back, resolves to `null`.
 
 ```dart
-page.goForward({Duration timeout, Until wait}) → Future<Response> 
+page.goForward({Duration? timeout, Until? wait}) → Future<Response?> 
 ```
 
 #### page.goto(...)
@@ -1259,7 +1272,7 @@ of multiple redirects, the navigation will resolve with the response of
 the last redirect.
 
 ```dart
-page.goto(String url, {String referrer, Duration timeout, Until wait}) → Future<Response> 
+page.goto(String url, {String? referrer, Duration? timeout, Until? wait}) → Future<Response> 
 ```
 
 #### page.hover(String selector)
@@ -1521,7 +1534,7 @@ limitations:
 > 2. Page styles are not visible inside templates.
 
 ```dart
-page.pdf({PaperFormat format, num scale, bool displayHeaderFooter, String headerTemplate, String footerTemplate, bool printBackground, bool landscape, String pageRanges, bool preferCssPageSize, PdfMargins margins, IOSink output}) → Future<Uint8List> 
+page.pdf({PaperFormat? format, num? scale, bool? displayHeaderFooter, String? headerTemplate, String? footerTemplate, bool? printBackground, bool? landscape, String? pageRanges, bool? preferCssPageSize, PdfMargins? margins, IOSink? output}) → Future<Uint8List?> 
 ```
 
 #### page.queryObjects(JsHandle prototypeHandle)
@@ -1553,7 +1566,7 @@ this prototype.
 page.queryObjects(JsHandle prototypeHandle) → Future<JsHandle> 
 ```
 
-#### page.reload({Duration timeout, Until wait})
+#### page.reload({Duration? timeout, Until? wait})
 Parameters:
 - [timeout] Maximum navigation time in milliseconds, defaults
     to 30 seconds, pass [Duration.zero] to disable timeout. The default value
@@ -1578,7 +1591,7 @@ of multiple redirects, the navigation will resolve with the response of
 the last redirect.
 
 ```dart
-page.reload({Duration timeout, Until wait}) → Future<Response> 
+page.reload({Duration? timeout, Until? wait}) → Future<Response> 
 ```
 
 #### page.screenshot(...)
@@ -1600,7 +1613,7 @@ Returns:
 https://crbug.com/741689 for discussion.
 
 ```dart
-page.screenshot({ScreenshotFormat format, bool fullPage, Rectangle clip, int quality, bool omitBackground}) → Future<Uint8List> 
+page.screenshot({ScreenshotFormat? format, bool? fullPage, Rectangle? clip, int? quality, bool? omitBackground}) → Future<Uint8List> 
 ```
 
 #### page.screenshotBase64(...)
@@ -1622,7 +1635,7 @@ Returns:
 https://crbug.com/741689 for discussion.
 
 ```dart
-page.screenshotBase64({ScreenshotFormat format, bool fullPage, Rectangle clip, int quality, bool omitBackground}) → Future<String> 
+page.screenshotBase64({ScreenshotFormat? format, bool? fullPage, Rectangle? clip, int? quality, bool? omitBackground}) → Future<String> 
 ```
 
 #### page.select(String selector, List\<String> values)
@@ -1689,7 +1702,7 @@ Parameters:
     there are no more than 2 network connections for at least `500` ms.
 
 ```dart
-page.setContent(String html, {Duration timeout, Until wait}) → Future<void> 
+page.setContent(String html, {Duration? timeout, Until? wait}) → Future<void> 
 ```
 
 #### page.setExtraHTTPHeaders(Map\<String, String> headers)
@@ -1713,7 +1726,7 @@ await page.setGeolocation(latitude: 59.95, longitude: 30.31667);
 permissions for the page to read its geolocation.
 
 ```dart
-page.setGeolocation({num latitude, num longitude, num accuracy}) → Future<void> 
+page.setGeolocation({required num latitude, required num longitude, num? accuracy}) → Future<void> 
 ```
 
 #### page.setJavaScriptEnabled(bool enabled)
@@ -1812,7 +1825,7 @@ The page's title.
 Shortcut for [Page.mainFrame.title].
 
 ```dart
-page.title → Future<String>
+page.title → Future<String?>
 ```
 
 #### page.type(...)
@@ -1832,17 +1845,17 @@ await page.type('#mytextarea', 'World', delay: Duration(milliseconds: 100));
 Shortcut for [page.mainFrame.type].
 
 ```dart
-page.type(String selector, String text, {Duration delay}) → Future<void> 
+page.type(String selector, String text, {Duration? delay}) → Future<void> 
 ```
 
 #### page.url
 This is a shortcut for [page.mainFrame.url]
 
 ```dart
-page.url → String
+page.url → String?
 ```
 
-#### page.waitForFileChooser({Duration timeout})
+#### page.waitForFileChooser({Duration? timeout})
 > **NOTE** In non-headless Chromium, this method results in the native file picker dialog **not showing up** for the user.
 
 This method is typically coupled with an action that triggers file choosing.
@@ -1867,7 +1880,7 @@ Parameters:
  - returns: [Future<FileChooser>] A promise that resolves after a page requests a file picker.
 
 ```dart
-page.waitForFileChooser({Duration timeout}) → Future<FileChooser> 
+page.waitForFileChooser({Duration? timeout}) → Future<FileChooser> 
 ```
 
 #### page.waitForFunction(...)
@@ -1910,10 +1923,10 @@ await page.waitForFunction('selector => !!document.querySelector(selector)',
 Shortcut for [page.mainFrame().waitForFunction(pageFunction[, options[, ...args]])](#framewaitforfunctionpagefunction-options-args).
 
 ```dart
-page.waitForFunction(@Language('js') String pageFunction, {List args, Duration timeout, Polling polling}) → Future<JsHandle> 
+page.waitForFunction(@Language('js') String pageFunction, {List? args, Duration? timeout, Polling? polling}) → Future<JsHandle> 
 ```
 
-#### page.waitForNavigation({Duration timeout, Until wait})
+#### page.waitForNavigation({Duration? timeout, Until? wait})
 This resolves when the page navigates to a new URL or reloads. It is useful
 for when you run code which will indirectly cause the page to navigate.
 Consider this example:
@@ -1956,10 +1969,10 @@ In case of navigation to a different anchor or navigation due to History
 API usage, the navigation will resolve with `null`.
 
 ```dart
-page.waitForNavigation({Duration timeout, Until wait}) → Future<Response> 
+page.waitForNavigation({Duration? timeout, Until? wait}) → Future<Response> 
 ```
 
-#### page.waitForRequest(String url, {Duration timeout})
+#### page.waitForRequest(String url, {Duration? timeout})
 Example:
 ```dart
 var firstRequest = page.waitForRequest('https://example.com');
@@ -1978,7 +1991,7 @@ await Future.wait([firstRequest, finalRequest]);
 ```
 
 ```dart
-page.waitForRequest(String url, {Duration timeout}) → Future<Request> 
+page.waitForRequest(String url, {Duration? timeout}) → Future<Request> 
 ```
 
 #### page.waitForSelector(...)
@@ -2020,7 +2033,7 @@ is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
 is not found in DOM.
 
 ```dart
-page.waitForSelector(String selector, {bool visible, bool hidden, Duration timeout}) → Future<ElementHandle> 
+page.waitForSelector(String selector, {bool? visible, bool? hidden, Duration? timeout}) → Future<ElementHandle> 
 ```
 
 #### page.waitForXPath(...)
@@ -2062,7 +2075,7 @@ is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
 is not found in DOM.
 
 ```dart
-page.waitForXPath(String xpath, {bool visible, bool hidden, Duration timeout}) → Future<ElementHandle> 
+page.waitForXPath(String xpath, {bool? visible, bool? hidden, Duration? timeout}) → Future<ElementHandle> 
 ```
 
 #### page.workers
@@ -2109,7 +2122,7 @@ Parameters:
 - Returns: Future which resolves to the return value of `pageFunction`
 
 ```dart
-worker.evaluate(@Language('js') String pageFunction, {List args}) → Future<T> 
+worker.evaluate(@Language('js') String pageFunction, {List? args}) → Future<T?> 
 ```
 
 #### worker.evaluateHandle(...)
@@ -2130,7 +2143,7 @@ returns: Future which resolves to the return value of `pageFunction` as
 in-page object (JSHandle)
 
 ```dart
-worker.evaluateHandle(@Language('js') String pageFunction, {List args}) → Future<T> 
+worker.evaluateHandle(@Language('js') String pageFunction, {List? args}) → Future<T> 
 ```
 
 ### class: Accessibility
@@ -2167,7 +2180,7 @@ print(snapshot);
 
 An example of logging the focused node's name:
 ```dart
-AXNode findFocusedNode(AXNode node) {
+AXNode? findFocusedNode(AXNode node) {
   if (node.focused) return node;
   for (var child in node.children) {
     var foundNode = findFocusedNode(child);
@@ -2186,7 +2199,7 @@ Parameters:
  - `root` The root DOM element for the snapshot. Defaults to the whole page.
 
 ```dart
-accessibility.snapshot({bool interestingOnly, ElementHandle root}) → Future<AXNode> 
+accessibility.snapshot({bool? interestingOnly, ElementHandle? root}) → Future<AXNode> 
 ```
 
 ### class: Keyboard
@@ -2220,7 +2233,7 @@ await page.keyboard.up(Key.shift);
 
 > **NOTE** On MacOS, keyboard shortcuts like `⌘ A` -> Select All do not work. See [#1313](https://github.com/GoogleChrome/puppeteer/issues/1313)
 
-#### keyboard.down(Key key, {String text})
+#### keyboard.down(Key key, {String? text})
 Dispatches a `keydown` event.
 
 If `key` is a modifier key, `Shift`, `Meta`, `Control`, or `Alt`,
@@ -2238,10 +2251,10 @@ Parameters:
 [text]: If specified, generates an input event with this text.
 
 ```dart
-keyboard.down(Key key, {String text}) → Future<void> 
+keyboard.down(Key key, {String? text}) → Future<void> 
 ```
 
-#### keyboard.press(Key key, {Duration delay, String text})
+#### keyboard.press(...)
 Shortcut for [Keyboard.down] and [Keyboard.up].
 
 > **NOTE** Modifier keys DO effect `keyboard.press`. Holding down `Shift`
@@ -2251,7 +2264,7 @@ will type the text in upper case.
 [delay]: Time to wait between `keydown` and `keyup`. Defaults to 0.
 
 ```dart
-keyboard.press(Key key, {Duration delay, String text}) → Future<void> 
+keyboard.press(Key key, {Duration? delay, String? text}) → Future<void> 
 ```
 
 #### keyboard.sendCharacter(String text)
@@ -2269,7 +2282,7 @@ await page.keyboard.sendCharacter('嗨');
 keyboard.sendCharacter(String text) → Future<void> 
 ```
 
-#### keyboard.type(String text, {Duration delay})
+#### keyboard.type(String text, {Duration? delay})
 Sends a keydown, keypress/input, and keyup event for each character in the
 text.
 
@@ -2285,7 +2298,7 @@ await page.keyboard.type('World', delay: Duration(milliseconds: 10));
 ```
 
 ```dart
-keyboard.type(String text, {Duration delay}) → Future<void> 
+keyboard.type(String text, {Duration? delay}) → Future<void> 
 ```
 
 #### keyboard.up(Key key)
@@ -2318,31 +2331,31 @@ Shortcut for [mouse.move], [mouse.down] and [mouse.up].
 [delay]: Time to wait between `mousedown` and `mouseup`. Defaults to 0.
 
 ```dart
-mouse.click(Point position, {Duration delay, MouseButton button, int clickCount}) → Future<void> 
+mouse.click(Point position, {Duration? delay, MouseButton? button, int? clickCount}) → Future<void> 
 ```
 
-#### mouse.down({MouseButton button, int clickCount})
+#### mouse.down({MouseButton? button, int? clickCount})
 Dispatches a `mousedown` event.
 
 ```dart
-mouse.down({MouseButton button, int clickCount}) → Future<void> 
+mouse.down({MouseButton? button, int? clickCount}) → Future<void> 
 ```
 
-#### mouse.move(Point position, {int steps})
+#### mouse.move(Point position, {int? steps})
 Dispatches a `mousemove` event.
 
 ```dart
-mouse.move(Point position, {int steps}) → Future<void> 
+mouse.move(Point position, {int? steps}) → Future<void> 
 ```
 
-#### mouse.up({MouseButton button, int clickCount})
+#### mouse.up({MouseButton? button, int? clickCount})
 Dispatches a `mouseup` event.
 
 ```dart
-mouse.up({MouseButton button, int clickCount}) → Future<void> 
+mouse.up({MouseButton? button, int? clickCount}) → Future<void> 
 ```
 
-#### mouse.wheel({num deltaX, num deltaY})
+#### mouse.wheel({num? deltaX, num? deltaY})
 Dispatches a `mousewheel` event.
 @param options - Optional: `MouseWheelOptions`.
 
@@ -2352,14 +2365,14 @@ An example of zooming into an element:
 await page.goto(
     r'https://mdn.mozillademos.org/en-US/docs/Web/API/Element/wheel_event$samples/Scaling_an_element_via_the_wheel?revision=1587366');
 var elem = await page.$('div');
-var boundingBox = await elem.boundingBox;
+var boundingBox = (await elem.boundingBox)!;
 await page.mouse.move(Point(boundingBox.left + boundingBox.width / 2,
     boundingBox.top + boundingBox.height / 2));
 await page.mouse.wheel(deltaY: -100);
 ```
 
 ```dart
-mouse.wheel({num deltaX, num deltaY}) → Future<void> 
+mouse.wheel({num? deltaX, num? deltaY}) → Future<void> 
 ```
 
 ### class: Touchscreen
@@ -2389,7 +2402,7 @@ Only one trace can be active at a time per browser.
 Parameters:
 
 ```dart
-tracing.start({bool screenshots, List<String> categories}) → Future<void> 
+tracing.start({bool? screenshots, List<String>? categories}) → Future<void> 
 ```
 
 #### tracing.stop(StringSink output)
@@ -2415,14 +2428,14 @@ await page.evaluate("() => alert('1')");
 await browser.close();
 ```
 
-#### dialog.accept({String promptText})
+#### dialog.accept({String? promptText})
 [promptText]: A text to enter in prompt. Does not cause any effects if
 the dialog's `type` is not prompt.
 
 Returns [Future] which resolves when the dialog has been accepted.
 
 ```dart
-dialog.accept({String promptText}) → Future<void> 
+dialog.accept({String? promptText}) → Future<void> 
 ```
 
 #### dialog.defaultValue
@@ -2430,7 +2443,7 @@ If dialog is prompt, returns default prompt value. Otherwise, returns
 empty string.
 
 ```dart
-dialog.defaultValue → String
+dialog.defaultValue → String?
 ```
 
 #### dialog.dismiss()
@@ -2444,7 +2457,7 @@ dialog.dismiss() → Future<void>
 A message displayed in the dialog.
 
 ```dart
-dialog.message → String
+dialog.message → String?
 ```
 
 #### dialog.type
@@ -2497,7 +2510,7 @@ print(text);
 
 #### frame.$(String selector)
 The method queries frame for the selector. If there's no such element
-within the frame, the method will resolve to null.
+within the frame, the method will throw an Exception.
 
 [selector]: A selector to query frame for
 Returns a Future which resolves to ElementHandle pointing to the frame
@@ -2534,7 +2547,19 @@ var divsCounts = await frame.$$eval('div', 'divs => divs.length');
 ```
 
 ```dart
-frame.$$eval(String selector, @Language('js') String pageFunction, {List args}) → Future<T> 
+frame.$$eval(String selector, @Language('js') String pageFunction, {List? args}) → Future<T?> 
+```
+
+#### frame.$OrNull(String selector)
+The method queries frame for the selector. If there's no such element
+within the frame, the method will resolve to null.
+
+[selector]: A selector to query frame for
+Returns a Future which resolves to ElementHandle pointing to the frame
+element.
+
+```dart
+frame.$OrNull(String selector) → Future<ElementHandle?> 
 ```
 
 #### frame.$eval(...)
@@ -2562,7 +2587,7 @@ var html = await frame.$eval(
 Returns a Future which resolves to the return value of pageFunction
 
 ```dart
-frame.$eval(String selector, @Language('js') String pageFunction, {List args}) → Future<T> 
+frame.$eval(String selector, @Language('js') String pageFunction, {List? args}) → Future<T?> 
 ```
 
 #### frame.$x(String expression)
@@ -2587,7 +2612,7 @@ Returns a [Future<ElementHandle>] which resolves to the added tag when the
 script's onload fires or when the script content was injected into frame.
 
 ```dart
-frame.addScriptTag({String url, File file, String content, String type}) → Future<ElementHandle> 
+frame.addScriptTag({String? url, File? file, String? content, String? type}) → Future<ElementHandle> 
 ```
 
 #### frame.addStyleTag(...)
@@ -2603,7 +2628,7 @@ Returns a [Future<ElementHandle>] which resolves to the added tag when the
 stylesheet's onload fires or when the CSS content was injected into frame.
 
 ```dart
-frame.addStyleTag({String url, File file, String content}) → Future<ElementHandle> 
+frame.addStyleTag({String? url, File? file, String? content}) → Future<ElementHandle> 
 ```
 
 #### frame.click(...)
@@ -2630,14 +2655,14 @@ Parameters:
 - [delay]: Time to wait between `mousedown` and `mouseup`. Default to zero.
 
 ```dart
-frame.click(String selector, {Duration delay, MouseButton button, int clickCount}) → Future<void> 
+frame.click(String selector, {Duration? delay, MouseButton? button, int? clickCount}) → Future<void> 
 ```
 
 #### frame.content
 Gets the full HTML contents of the frame, including the doctype.
 
 ```dart
-frame.content → Future<String>
+frame.content → Future<String?>
 ```
 
 #### frame.evaluate(...)
@@ -2679,7 +2704,7 @@ Parameters:
 - Returns: Future which resolves to the return value of `pageFunction`
 
 ```dart
-frame.evaluate(@Language('js') String pageFunction, {List args}) → Future<T> 
+frame.evaluate(@Language('js') String pageFunction, {List? args}) → Future<T> 
 ```
 
 #### frame.evaluateHandle(...)
@@ -2713,7 +2738,7 @@ returns: Future which resolves to the return value of `pageFunction` as
 in-page object (JSHandle)
 
 ```dart
-frame.evaluateHandle(@Language('js') String pageFunction, {List args}) → Future<T> 
+frame.evaluateHandle(@Language('js') String pageFunction, {List? args}) → Future<T> 
 ```
 
 #### frame.executionContext
@@ -2780,7 +2805,7 @@ of multiple redirects, the navigation will resolve with the response of
 the last redirect.
 
 ```dart
-frame.goto(String url, {String referrer, Duration timeout, Until wait}) → Future<Response> 
+frame.goto(String url, {String? referrer, Duration? timeout, Until? wait}) → Future<Response> 
 ```
 
 #### frame.hover(String selector)
@@ -2817,14 +2842,14 @@ If the name is empty, returns the id attribute instead.
 will not update if the attribute is changed later.
 
 ```dart
-frame.name → String
+frame.name → String?
 ```
 
 #### frame.parentFrame
 Parent frame, if any. Detached frames and main frames return `null`.
 
 ```dart
-frame.parentFrame → Frame
+frame.parentFrame → Frame?
 ```
 
 #### frame.select(String selector, List\<String> values)
@@ -2872,7 +2897,7 @@ Parameters:
     there are no more than 2 network connections for at least `500` ms.
 
 ```dart
-frame.setContent(String html, {Duration timeout, Until wait}) → Future<void> 
+frame.setContent(String html, {Duration? timeout, Until? wait}) → Future<void> 
 ```
 
 #### frame.tap(String selector)
@@ -2892,7 +2917,7 @@ frame.tap(String selector) → Future<void>
 The page's title.
 
 ```dart
-frame.title → Future<String>
+frame.title → Future<String?>
 ```
 
 #### frame.type(...)
@@ -2910,7 +2935,7 @@ await frame.type('#mytextarea', 'World', delay: Duration(milliseconds: 100));
 ```
 
 ```dart
-frame.type(String selector, String text, {Duration delay}) → Future<void> 
+frame.type(String selector, String text, {Duration? delay}) → Future<void> 
 ```
 
 #### frame.url
@@ -2959,7 +2984,7 @@ await page.mainFrame.waitForFunction(
 ```
 
 ```dart
-frame.waitForFunction(@Language('js') String pageFunction, {List args, Duration timeout, Polling polling}) → Future<JsHandle> 
+frame.waitForFunction(@Language('js') String pageFunction, {List? args, Duration? timeout, Polling? polling}) → Future<JsHandle> 
 ```
 
 #### frame.waitForSelector(...)
@@ -3000,7 +3025,7 @@ is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
 is not found in DOM.
 
 ```dart
-frame.waitForSelector(String selector, {bool visible, bool hidden, Duration timeout}) → Future<ElementHandle> 
+frame.waitForSelector(String selector, {bool? visible, bool? hidden, Duration? timeout}) → Future<ElementHandle> 
 ```
 
 #### frame.waitForXPath(...)
@@ -3041,7 +3066,7 @@ is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
 is not found in DOM.
 
 ```dart
-frame.waitForXPath(String xpath, {bool visible, bool hidden, Duration timeout}) → Future<ElementHandle> 
+frame.waitForXPath(String xpath, {bool? visible, bool? hidden, Duration? timeout}) → Future<ElementHandle> 
 ```
 
 ### class: ExecutionContext
@@ -3085,7 +3110,7 @@ Parameters:
 Returns [Future] which resolves to the return value of `pageFunction`
 
 ```dart
-executionContext.evaluate(@Language('js') String pageFunction, {List args}) → Future<T> 
+executionContext.evaluate(@Language('js') String pageFunction, {List? args}) → Future<T> 
 ```
 
 #### executionContext.evaluateHandle(...)
@@ -3121,7 +3146,7 @@ await resultHandle.dispose();
 ```
 
 ```dart
-executionContext.evaluateHandle(@Language('js') String pageFunction, {List args}) → Future<T> 
+executionContext.evaluateHandle(@Language('js') String pageFunction, {List? args}) → Future<T> 
 ```
 
 #### executionContext.frame
@@ -3132,7 +3157,7 @@ example, workers and extensions have execution contexts that are not
 associated with frames.
 
 ```dart
-executionContext.frame → Frame
+executionContext.frame → Frame?
 ```
 
 #### executionContext.queryObjects(JsHandle prototypeHandle)
@@ -3163,7 +3188,7 @@ Returns either `null` or the object handle itself, if the object handle is
 an instance of [ElementHandle].
 
 ```dart
-jsHandle.asElement → ElementHandle
+jsHandle.asElement → ElementHandle?
 ```
 
 #### jsHandle.dispose()
@@ -3194,7 +3219,7 @@ Parameters:
 - returns: Future which resolves to the return value of `pageFunction`
 
 ```dart
-jsHandle.evaluate(@Language('js') String pageFunction, {List args}) → Future<T> 
+jsHandle.evaluate(@Language('js') String pageFunction, {List? args}) → Future<T?> 
 ```
 
 #### jsHandle.evaluateHandle(...)
@@ -3212,7 +3237,7 @@ Parameters:
 - `pageFunction`: Function to be evaluated
 
 ```dart
-jsHandle.evaluateHandle(@Language('js') String pageFunction, {List args}) → Future<T> 
+jsHandle.evaluateHandle(@Language('js') String pageFunction, {List? args}) → Future<T> 
 ```
 
 #### jsHandle.executionContext
@@ -3337,7 +3362,7 @@ Parameters:
 Returns: [Future] which resolves to the return value of `pageFunction`
 
 ```dart
-elementHandle.$$eval(String selector, @Language('js') String pageFunction, {List args}) → Future<T> 
+elementHandle.$$eval(String selector, @Language('js') String pageFunction, {List? args}) → Future<T?> 
 ```
 
 #### elementHandle.$eval(...)
@@ -3365,7 +3390,7 @@ Parameters:
 Returns [Future] which resolves to the return value of `pageFunction`.
 
 ```dart
-elementHandle.$eval(String selector, @Language('js') String pageFunction, {List args}) → Future<T> 
+elementHandle.$eval(String selector, @Language('js') String pageFunction, {List? args}) → Future<T?> 
 ```
 
 #### elementHandle.$x(String expression)
@@ -3381,7 +3406,7 @@ This method returns the bounding box of the element (relative to the main
 frame), or `null` if the element is not visible.
 
 ```dart
-elementHandle.boundingBox → Future<Rectangle>
+elementHandle.boundingBox → Future<Rectangle?>
 ```
 
 #### elementHandle.boxModel
@@ -3391,7 +3416,7 @@ Boxes are represented as an array of points;
 Box points are sorted clock-wise.
 
 ```dart
-elementHandle.boxModel → Future<BoxModel>
+elementHandle.boxModel → Future<BoxModel?>
 ```
 
 #### elementHandle.click(...)
@@ -3408,7 +3433,7 @@ Returns [Future] which resolves when the element is successfully clicked.
 [Future] gets rejected if the element is detached from DOM.
 
 ```dart
-elementHandle.click({Duration delay, MouseButton button, int clickCount}) → Future<void> 
+elementHandle.click({Duration? delay, MouseButton? button, int? clickCount}) → Future<void> 
 ```
 
 #### elementHandle.contentFrame
@@ -3416,7 +3441,7 @@ Resolves to the content frame for element handles referencing iframe nodes,
 or null otherwise
 
 ```dart
-elementHandle.contentFrame → Future<Frame>
+elementHandle.contentFrame → Future<Frame?>
 ```
 
 #### elementHandle.focus()
@@ -3431,10 +3456,10 @@ elementHandle.focus() → Future<void>
 Resolves to true if the element is visible in the current viewport.
 
 ```dart
-elementHandle.isIntersectingViewport → Future<bool>
+elementHandle.isIntersectingViewport → Future<bool?>
 ```
 
-#### elementHandle.press(Key key, {Duration delay, String text})
+#### elementHandle.press(...)
 Focuses the element, and then uses [`keyboard.down`] and [`keyboard.up`].
 
 If `key` is a single character and no modifier keys besides `Shift` are
@@ -3449,7 +3474,7 @@ Parameters:
 - [delay]: Time to wait between `keydown` and `keyup`. Defaults to 0.
 
 ```dart
-elementHandle.press(Key key, {Duration delay, String text}) → Future<void> 
+elementHandle.press(Key key, {Duration? delay, String? text}) → Future<void> 
 ```
 
 #### elementHandle.screenshot(...)
@@ -3460,7 +3485,7 @@ If the element is detached from DOM, the method throws an error.
 See [Page.screenshot] for more info.
 
 ```dart
-elementHandle.screenshot({ScreenshotFormat format, int quality, bool omitBackground}) → Future<List<int>> 
+elementHandle.screenshot({ScreenshotFormat? format, int? quality, bool? omitBackground}) → Future<List<int>> 
 ```
 
 #### elementHandle.select(List\<String> values)
@@ -3492,7 +3517,7 @@ If the element is detached from DOM, the method throws an error.
 elementHandle.tap() → Future<void> 
 ```
 
-#### elementHandle.type(String text, {Duration delay})
+#### elementHandle.type(String text, {Duration? delay})
 Focuses the element, and then sends a `keydown`, `keypress`/`input`, and
 `keyup` event for each character in the text.
 
@@ -3515,7 +3540,7 @@ await elementHandle.press(Key.enter);
 ```
 
 ```dart
-elementHandle.type(String text, {Duration delay}) → Future<void> 
+elementHandle.type(String text, {Duration? delay}) → Future<void> 
 ```
 
 #### elementHandle.uploadFile(List\<File> files)
@@ -3543,7 +3568,7 @@ If request gets a 'redirect' response, the request is successfully finished
 with the 'onRequestFinished' event, and a new request is  issued to a
 redirected url.
 
-#### request.abort({ErrorReason error})
+#### request.abort({ErrorReason? error})
 Aborts request. To use this, request interception should be enabled with
 `page.setRequestInterception`.
 Exception is immediately thrown if the request interception is not enabled.
@@ -3552,7 +3577,7 @@ Parameters:
 [error]: Optional error code. Defaults to `failed`
 
 ```dart
-request.abort({ErrorReason error}) → Future<void> 
+request.abort({ErrorReason? error}) → Future<void> 
 ```
 
 #### request.continueRequest(...)
@@ -3580,7 +3605,7 @@ Parameters:
 - [headers]: If set changes the request HTTP headers
 
 ```dart
-request.continueRequest({String url, String method, String postData, Map<String, String> headers}) → Future<void> 
+request.continueRequest({String? url, String? method, String? postData, Map<String, String>? headers}) → Future<void> 
 ```
 
 #### request.failure
@@ -3591,12 +3616,12 @@ Example of logging all failed requests:
 
 ```dart
 page.onRequestFailed.listen((request) {
-  print(request.url + ' ' + request.failure);
+  print(request.url + ' ' + request.failure!);
 });
 ```
 
 ```dart
-request.failure → String
+request.failure → String?
 ```
 
 #### request.frame
@@ -3604,7 +3629,7 @@ A [Frame] that initiated this request, or `null` if navigating to
 error pages.
 
 ```dart
-request.frame → Frame
+request.frame → Frame?
 ```
 
 #### request.headers
@@ -3633,7 +3658,7 @@ request.method → String
 Request's post body, if any.
 
 ```dart
-request.postData → String
+request.postData → String?
 ```
 
 #### request.redirectChain
@@ -3672,7 +3697,7 @@ Contains the request's resource type as it was perceived by the rendering
 engine.
 
 ```dart
-request.resourceType → ResourceType
+request.resourceType → ResourceType?
 ```
 
 #### request.respond(...)
@@ -3699,7 +3724,7 @@ Parameters:
 - [body]: Optional response body
 
 ```dart
-request.respond({int status, Map<String, String> headers, String contentType, body}) → Future<void> 
+request.respond({int? status, Map<String, String>? headers, String? contentType, body}) → Future<void> 
 ```
 
 #### request.response
@@ -3707,7 +3732,7 @@ A matching [Response] object, or `null` if the response has not been
 received yet.
 
 ```dart
-request.response → Response
+request.response → Response?
 ```
 
 #### request.url
@@ -3732,7 +3757,7 @@ A [Frame] that initiated this response, or `null` if navigating to error
 pages.
 
 ```dart
-response.frame → Frame
+response.frame → Frame?
 ```
 
 #### response.fromCache
@@ -3776,14 +3801,14 @@ response.ok → bool
 The IP address of the remote server
 
 ```dart
-response.remoteIPAddress → String
+response.remoteIPAddress → String?
 ```
 
 #### response.remotePort
 The port used to connect to the remote server
 
 ```dart
-response.remotePort → int
+response.remotePort → int?
 ```
 
 #### response.request
@@ -3798,7 +3823,7 @@ Security details if the response was received over the secure connection,
 or `null` otherwise.
 
 ```dart
-response.securityDetails → SecurityDetails
+response.securityDetails → SecurityDetails?
 ```
 
 #### response.status
@@ -3856,7 +3881,7 @@ for (var entry in coverage) {
 print('Bytes used: ${usedBytes / totalBytes * 100}%');
 ```
 
-#### coverage.startCSSCoverage({bool resetOnNavigation})
+#### coverage.startCSSCoverage({bool? resetOnNavigation})
 Parameters
  - `resetOnNavigation`:  Whether to reset coverage on every navigation.
    Defaults to `true`.
@@ -3864,7 +3889,7 @@ Parameters
  Returns: Future that resolves when coverage is started
 
 ```dart
-coverage.startCSSCoverage({bool resetOnNavigation}) → Future<void> 
+coverage.startCSSCoverage({bool? resetOnNavigation}) → Future<void> 
 ```
 
 #### coverage.startJSCoverage(...)
@@ -3882,7 +3907,7 @@ These are scripts that are dynamically created on the page using `eval` or
 scripts will have `__puppeteer_evaluation_script__` as their URL.
 
 ```dart
-coverage.startJSCoverage({bool resetOnNavigation, bool reportAnonymousScripts}) → Future<void> 
+coverage.startJSCoverage({bool? resetOnNavigation, bool? reportAnonymousScripts}) → Future<void> 
 ```
 
 #### coverage.stopCSSCoverage()

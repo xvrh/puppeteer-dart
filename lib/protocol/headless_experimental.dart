@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// This domain provides experimental commands only supported in headless mode.
@@ -31,10 +30,10 @@ class HeadlessExperimentalApi {
   /// no screenshot will be captured. Note that capturing a screenshot can fail, for example,
   /// during renderer initialization. In such a case, no screenshot data will be returned.
   Future<BeginFrameResult> beginFrame(
-      {num frameTimeTicks,
-      num interval,
-      bool noDisplayUpdates,
-      ScreenshotParams screenshot}) async {
+      {num? frameTimeTicks,
+      num? interval,
+      bool? noDisplayUpdates,
+      ScreenshotParams? screenshot}) async {
     var result = await _client.send('HeadlessExperimental.beginFrame', {
       if (frameTimeTicks != null) 'frameTimeTicks': frameTimeTicks,
       if (interval != null) 'interval': interval,
@@ -61,9 +60,9 @@ class BeginFrameResult {
   final bool hasDamage;
 
   /// Base64-encoded image data of the screenshot, if one was requested and successfully taken.
-  final String screenshotData;
+  final String? screenshotData;
 
-  BeginFrameResult({@required this.hasDamage, this.screenshotData});
+  BeginFrameResult({required this.hasDamage, this.screenshotData});
 
   factory BeginFrameResult.fromJson(Map<String, dynamic> json) {
     return BeginFrameResult(
@@ -78,10 +77,10 @@ class BeginFrameResult {
 /// Encoding options for a screenshot.
 class ScreenshotParams {
   /// Image compression format (defaults to png).
-  final ScreenshotParamsFormat format;
+  final ScreenshotParamsFormat? format;
 
   /// Compression quality from range [0..100] (jpeg only).
-  final int quality;
+  final int? quality;
 
   ScreenshotParams({this.format, this.quality});
 
@@ -114,7 +113,7 @@ class ScreenshotParamsFormat {
 
   const ScreenshotParamsFormat._(this.value);
 
-  factory ScreenshotParamsFormat.fromJson(String value) => values[value];
+  factory ScreenshotParamsFormat.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 

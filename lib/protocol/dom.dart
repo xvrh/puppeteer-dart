@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'page.dart' as page;
@@ -111,7 +110,7 @@ class DOMApi {
   /// `targetNodeId`).
   /// Returns: Id of the node clone.
   Future<NodeId> copyTo(NodeId nodeId, NodeId targetNodeId,
-      {NodeId insertBeforeNodeId}) async {
+      {NodeId? insertBeforeNodeId}) async {
     var result = await _client.send('DOM.copyTo', {
       'nodeId': nodeId,
       'targetNodeId': targetNodeId,
@@ -131,11 +130,11 @@ class DOMApi {
   /// (default is false).
   /// Returns: Node description.
   Future<Node> describeNode(
-      {NodeId nodeId,
-      BackendNodeId backendNodeId,
-      runtime.RemoteObjectId objectId,
-      int depth,
-      bool pierce}) async {
+      {NodeId? nodeId,
+      BackendNodeId? backendNodeId,
+      runtime.RemoteObjectId? objectId,
+      int? depth,
+      bool? pierce}) async {
     var result = await _client.send('DOM.describeNode', {
       if (nodeId != null) 'nodeId': nodeId,
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
@@ -155,10 +154,10 @@ class DOMApi {
   /// [rect] The rect to be scrolled into view, relative to the node's border box, in CSS pixels.
   /// When omitted, center of the node will be used, similar to Element.scrollIntoView.
   Future<void> scrollIntoViewIfNeeded(
-      {NodeId nodeId,
-      BackendNodeId backendNodeId,
-      runtime.RemoteObjectId objectId,
-      Rect rect}) async {
+      {NodeId? nodeId,
+      BackendNodeId? backendNodeId,
+      runtime.RemoteObjectId? objectId,
+      Rect? rect}) async {
     await _client.send('DOM.scrollIntoViewIfNeeded', {
       if (nodeId != null) 'nodeId': nodeId,
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
@@ -191,9 +190,9 @@ class DOMApi {
   /// [backendNodeId] Identifier of the backend node.
   /// [objectId] JavaScript object id of the node wrapper.
   Future<void> focus(
-      {NodeId nodeId,
-      BackendNodeId backendNodeId,
-      runtime.RemoteObjectId objectId}) async {
+      {NodeId? nodeId,
+      BackendNodeId? backendNodeId,
+      runtime.RemoteObjectId? objectId}) async {
     await _client.send('DOM.focus', {
       if (nodeId != null) 'nodeId': nodeId,
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
@@ -217,9 +216,9 @@ class DOMApi {
   /// [objectId] JavaScript object id of the node wrapper.
   /// Returns: Box model for the node.
   Future<BoxModel> getBoxModel(
-      {NodeId nodeId,
-      BackendNodeId backendNodeId,
-      runtime.RemoteObjectId objectId}) async {
+      {NodeId? nodeId,
+      BackendNodeId? backendNodeId,
+      runtime.RemoteObjectId? objectId}) async {
     var result = await _client.send('DOM.getBoxModel', {
       if (nodeId != null) 'nodeId': nodeId,
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
@@ -235,9 +234,9 @@ class DOMApi {
   /// [objectId] JavaScript object id of the node wrapper.
   /// Returns: Quads that describe node layout relative to viewport.
   Future<List<Quad>> getContentQuads(
-      {NodeId nodeId,
-      BackendNodeId backendNodeId,
-      runtime.RemoteObjectId objectId}) async {
+      {NodeId? nodeId,
+      BackendNodeId? backendNodeId,
+      runtime.RemoteObjectId? objectId}) async {
     var result = await _client.send('DOM.getContentQuads', {
       if (nodeId != null) 'nodeId': nodeId,
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
@@ -254,7 +253,7 @@ class DOMApi {
   /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the subtree
   /// (default is false).
   /// Returns: Resulting node.
-  Future<Node> getDocument({int depth, bool pierce}) async {
+  Future<Node> getDocument({int? depth, bool? pierce}) async {
     var result = await _client.send('DOM.getDocument', {
       if (depth != null) 'depth': depth,
       if (pierce != null) 'pierce': pierce,
@@ -271,7 +270,7 @@ class DOMApi {
   /// (default is false).
   /// Returns: Resulting node.
   @deprecated
-  Future<List<Node>> getFlattenedDocument({int depth, bool pierce}) async {
+  Future<List<Node>> getFlattenedDocument({int? depth, bool? pierce}) async {
     var result = await _client.send('DOM.getFlattenedDocument', {
       if (depth != null) 'depth': depth,
       if (pierce != null) 'pierce': pierce,
@@ -289,7 +288,7 @@ class DOMApi {
   /// Returns: Resulting nodes.
   Future<List<NodeId>> getNodesForSubtreeByStyle(
       NodeId nodeId, List<CSSComputedStyleProperty> computedStyles,
-      {bool pierce}) async {
+      {bool? pierce}) async {
     var result = await _client.send('DOM.getNodesForSubtreeByStyle', {
       'nodeId': nodeId,
       'computedStyles': [...computedStyles],
@@ -307,7 +306,7 @@ class DOMApi {
   /// [includeUserAgentShadowDOM] False to skip to the nearest non-UA shadow root ancestor (default: false).
   /// [ignorePointerEventsNone] Whether to ignore pointer-events: none on elements and hit test them.
   Future<GetNodeForLocationResult> getNodeForLocation(int x, int y,
-      {bool includeUserAgentShadowDOM, bool ignorePointerEventsNone}) async {
+      {bool? includeUserAgentShadowDOM, bool? ignorePointerEventsNone}) async {
     var result = await _client.send('DOM.getNodeForLocation', {
       'x': x,
       'y': y,
@@ -325,9 +324,9 @@ class DOMApi {
   /// [objectId] JavaScript object id of the node wrapper.
   /// Returns: Outer HTML markup.
   Future<String> getOuterHTML(
-      {NodeId nodeId,
-      BackendNodeId backendNodeId,
-      runtime.RemoteObjectId objectId}) async {
+      {NodeId? nodeId,
+      BackendNodeId? backendNodeId,
+      runtime.RemoteObjectId? objectId}) async {
     var result = await _client.send('DOM.getOuterHTML', {
       if (nodeId != null) 'nodeId': nodeId,
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
@@ -391,7 +390,7 @@ class DOMApi {
   /// `targetNodeId`).
   /// Returns: New id of the moved node.
   Future<NodeId> moveTo(NodeId nodeId, NodeId targetNodeId,
-      {NodeId insertBeforeNodeId}) async {
+      {NodeId? insertBeforeNodeId}) async {
     var result = await _client.send('DOM.moveTo', {
       'nodeId': nodeId,
       'targetNodeId': targetNodeId,
@@ -405,7 +404,7 @@ class DOMApi {
   /// [query] Plain text or query selector or XPath search query.
   /// [includeUserAgentShadowDOM] True to search in user agent shadow DOM.
   Future<PerformSearchResult> performSearch(String query,
-      {bool includeUserAgentShadowDOM}) async {
+      {bool? includeUserAgentShadowDOM}) async {
     var result = await _client.send('DOM.performSearch', {
       'query': query,
       if (includeUserAgentShadowDOM != null)
@@ -496,7 +495,7 @@ class DOMApi {
   /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the sub-tree
   /// (default is false).
   Future<void> requestChildNodes(NodeId nodeId,
-      {int depth, bool pierce}) async {
+      {int? depth, bool? pierce}) async {
     await _client.send('DOM.requestChildNodes', {
       'nodeId': nodeId,
       if (depth != null) 'depth': depth,
@@ -523,10 +522,10 @@ class DOMApi {
   /// [executionContextId] Execution context in which to resolve the node.
   /// Returns: JavaScript object wrapper for given node.
   Future<runtime.RemoteObject> resolveNode(
-      {NodeId nodeId,
-      dom.BackendNodeId backendNodeId,
-      String objectGroup,
-      runtime.ExecutionContextId executionContextId}) async {
+      {NodeId? nodeId,
+      dom.BackendNodeId? backendNodeId,
+      String? objectGroup,
+      runtime.ExecutionContextId? executionContextId}) async {
     var result = await _client.send('DOM.resolveNode', {
       if (nodeId != null) 'nodeId': nodeId,
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
@@ -557,7 +556,7 @@ class DOMApi {
   /// [name] Attribute name to replace with new attributes derived from text in case text parsed
   /// successfully.
   Future<void> setAttributesAsText(NodeId nodeId, String text,
-      {String name}) async {
+      {String? name}) async {
     await _client.send('DOM.setAttributesAsText', {
       'nodeId': nodeId,
       'text': text,
@@ -571,9 +570,9 @@ class DOMApi {
   /// [backendNodeId] Identifier of the backend node.
   /// [objectId] JavaScript object id of the node wrapper.
   Future<void> setFileInputFiles(List<String> files,
-      {NodeId nodeId,
-      BackendNodeId backendNodeId,
-      runtime.RemoteObjectId objectId}) async {
+      {NodeId? nodeId,
+      BackendNodeId? backendNodeId,
+      runtime.RemoteObjectId? objectId}) async {
     await _client.send('DOM.setFileInputFiles', {
       'files': [...files],
       if (nodeId != null) 'nodeId': nodeId,
@@ -677,7 +676,7 @@ class AttributeModifiedEvent {
   final String value;
 
   AttributeModifiedEvent(
-      {@required this.nodeId, @required this.name, @required this.value});
+      {required this.nodeId, required this.name, required this.value});
 
   factory AttributeModifiedEvent.fromJson(Map<String, dynamic> json) {
     return AttributeModifiedEvent(
@@ -695,7 +694,7 @@ class AttributeRemovedEvent {
   /// A ttribute name.
   final String name;
 
-  AttributeRemovedEvent({@required this.nodeId, @required this.name});
+  AttributeRemovedEvent({required this.nodeId, required this.name});
 
   factory AttributeRemovedEvent.fromJson(Map<String, dynamic> json) {
     return AttributeRemovedEvent(
@@ -713,7 +712,7 @@ class CharacterDataModifiedEvent {
   final String characterData;
 
   CharacterDataModifiedEvent(
-      {@required this.nodeId, @required this.characterData});
+      {required this.nodeId, required this.characterData});
 
   factory CharacterDataModifiedEvent.fromJson(Map<String, dynamic> json) {
     return CharacterDataModifiedEvent(
@@ -731,7 +730,7 @@ class ChildNodeCountUpdatedEvent {
   final int childNodeCount;
 
   ChildNodeCountUpdatedEvent(
-      {@required this.nodeId, @required this.childNodeCount});
+      {required this.nodeId, required this.childNodeCount});
 
   factory ChildNodeCountUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return ChildNodeCountUpdatedEvent(
@@ -752,9 +751,9 @@ class ChildNodeInsertedEvent {
   final Node node;
 
   ChildNodeInsertedEvent(
-      {@required this.parentNodeId,
-      @required this.previousNodeId,
-      @required this.node});
+      {required this.parentNodeId,
+      required this.previousNodeId,
+      required this.node});
 
   factory ChildNodeInsertedEvent.fromJson(Map<String, dynamic> json) {
     return ChildNodeInsertedEvent(
@@ -772,7 +771,7 @@ class ChildNodeRemovedEvent {
   /// Id of the node that has been removed.
   final NodeId nodeId;
 
-  ChildNodeRemovedEvent({@required this.parentNodeId, @required this.nodeId});
+  ChildNodeRemovedEvent({required this.parentNodeId, required this.nodeId});
 
   factory ChildNodeRemovedEvent.fromJson(Map<String, dynamic> json) {
     return ChildNodeRemovedEvent(
@@ -790,7 +789,7 @@ class DistributedNodesUpdatedEvent {
   final List<BackendNode> distributedNodes;
 
   DistributedNodesUpdatedEvent(
-      {@required this.insertionPointId, @required this.distributedNodes});
+      {required this.insertionPointId, required this.distributedNodes});
 
   factory DistributedNodesUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return DistributedNodesUpdatedEvent(
@@ -810,7 +809,7 @@ class PseudoElementAddedEvent {
   final Node pseudoElement;
 
   PseudoElementAddedEvent(
-      {@required this.parentId, @required this.pseudoElement});
+      {required this.parentId, required this.pseudoElement});
 
   factory PseudoElementAddedEvent.fromJson(Map<String, dynamic> json) {
     return PseudoElementAddedEvent(
@@ -829,7 +828,7 @@ class PseudoElementRemovedEvent {
   final NodeId pseudoElementId;
 
   PseudoElementRemovedEvent(
-      {@required this.parentId, @required this.pseudoElementId});
+      {required this.parentId, required this.pseudoElementId});
 
   factory PseudoElementRemovedEvent.fromJson(Map<String, dynamic> json) {
     return PseudoElementRemovedEvent(
@@ -846,7 +845,7 @@ class SetChildNodesEvent {
   /// Child nodes array.
   final List<Node> nodes;
 
-  SetChildNodesEvent({@required this.parentId, @required this.nodes});
+  SetChildNodesEvent({required this.parentId, required this.nodes});
 
   factory SetChildNodesEvent.fromJson(Map<String, dynamic> json) {
     return SetChildNodesEvent(
@@ -865,7 +864,7 @@ class ShadowRootPoppedEvent {
   /// Shadow root id.
   final NodeId rootId;
 
-  ShadowRootPoppedEvent({@required this.hostId, @required this.rootId});
+  ShadowRootPoppedEvent({required this.hostId, required this.rootId});
 
   factory ShadowRootPoppedEvent.fromJson(Map<String, dynamic> json) {
     return ShadowRootPoppedEvent(
@@ -882,7 +881,7 @@ class ShadowRootPushedEvent {
   /// Shadow root.
   final Node root;
 
-  ShadowRootPushedEvent({@required this.hostId, @required this.root});
+  ShadowRootPushedEvent({required this.hostId, required this.root});
 
   factory ShadowRootPushedEvent.fromJson(Map<String, dynamic> json) {
     return ShadowRootPushedEvent(
@@ -900,10 +899,10 @@ class GetNodeForLocationResult {
   final page.FrameId frameId;
 
   /// Id of the node at given coordinates, only when enabled and requested document.
-  final NodeId nodeId;
+  final NodeId? nodeId;
 
   GetNodeForLocationResult(
-      {@required this.backendNodeId, @required this.frameId, this.nodeId});
+      {required this.backendNodeId, required this.frameId, this.nodeId});
 
   factory GetNodeForLocationResult.fromJson(Map<String, dynamic> json) {
     return GetNodeForLocationResult(
@@ -923,7 +922,7 @@ class PerformSearchResult {
   /// Number of search results.
   final int resultCount;
 
-  PerformSearchResult({@required this.searchId, @required this.resultCount});
+  PerformSearchResult({required this.searchId, required this.resultCount});
 
   factory PerformSearchResult.fromJson(Map<String, dynamic> json) {
     return PerformSearchResult(
@@ -938,9 +937,9 @@ class GetFrameOwnerResult {
   final BackendNodeId backendNodeId;
 
   /// Id of the node at given coordinates, only when enabled and requested document.
-  final NodeId nodeId;
+  final NodeId? nodeId;
 
-  GetFrameOwnerResult({@required this.backendNodeId, this.nodeId});
+  GetFrameOwnerResult({required this.backendNodeId, this.nodeId});
 
   factory GetFrameOwnerResult.fromJson(Map<String, dynamic> json) {
     return GetFrameOwnerResult(
@@ -1006,9 +1005,9 @@ class BackendNode {
   final BackendNodeId backendNodeId;
 
   BackendNode(
-      {@required this.nodeType,
-      @required this.nodeName,
-      @required this.backendNodeId});
+      {required this.nodeType,
+      required this.nodeName,
+      required this.backendNodeId});
 
   factory BackendNode.fromJson(Map<String, dynamic> json) {
     return BackendNode(
@@ -1068,7 +1067,7 @@ class PseudoType {
 
   const PseudoType._(this.value);
 
-  factory PseudoType.fromJson(String value) => values[value];
+  factory PseudoType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1098,7 +1097,7 @@ class ShadowRootType {
 
   const ShadowRootType._(this.value);
 
-  factory ShadowRootType.fromJson(String value) => values[value];
+  factory ShadowRootType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1122,7 +1121,7 @@ class Node {
   final NodeId nodeId;
 
   /// The id of the parent node if any.
-  final NodeId parentId;
+  final NodeId? parentId;
 
   /// The BackendNodeId for this node.
   final BackendNodeId backendNodeId;
@@ -1140,76 +1139,76 @@ class Node {
   final String nodeValue;
 
   /// Child count for `Container` nodes.
-  final int childNodeCount;
+  final int? childNodeCount;
 
   /// Child nodes of this node when requested with children.
-  final List<Node> children;
+  final List<Node>? children;
 
   /// Attributes of the `Element` node in the form of flat array `[name1, value1, name2, value2]`.
-  final List<String> attributes;
+  final List<String>? attributes;
 
   /// Document URL that `Document` or `FrameOwner` node points to.
-  final String documentURL;
+  final String? documentURL;
 
   /// Base URL that `Document` or `FrameOwner` node uses for URL completion.
-  final String baseURL;
+  final String? baseURL;
 
   /// `DocumentType`'s publicId.
-  final String publicId;
+  final String? publicId;
 
   /// `DocumentType`'s systemId.
-  final String systemId;
+  final String? systemId;
 
   /// `DocumentType`'s internalSubset.
-  final String internalSubset;
+  final String? internalSubset;
 
   /// `Document`'s XML version in case of XML documents.
-  final String xmlVersion;
+  final String? xmlVersion;
 
   /// `Attr`'s name.
-  final String name;
+  final String? name;
 
   /// `Attr`'s value.
-  final String value;
+  final String? value;
 
   /// Pseudo element type for this node.
-  final PseudoType pseudoType;
+  final PseudoType? pseudoType;
 
   /// Shadow root type.
-  final ShadowRootType shadowRootType;
+  final ShadowRootType? shadowRootType;
 
   /// Frame ID for frame owner elements.
-  final page.FrameId frameId;
+  final page.FrameId? frameId;
 
   /// Content document for frame owner elements.
-  final Node contentDocument;
+  final Node? contentDocument;
 
   /// Shadow root list for given element host.
-  final List<Node> shadowRoots;
+  final List<Node>? shadowRoots;
 
   /// Content document fragment for template elements.
-  final Node templateContent;
+  final Node? templateContent;
 
   /// Pseudo elements associated with this node.
-  final List<Node> pseudoElements;
+  final List<Node>? pseudoElements;
 
   /// Import document for the HTMLImport links.
-  final Node importedDocument;
+  final Node? importedDocument;
 
   /// Distributed nodes for given insertion point.
-  final List<BackendNode> distributedNodes;
+  final List<BackendNode>? distributedNodes;
 
   /// Whether the node is SVG.
-  final bool isSVG;
+  final bool? isSVG;
 
   Node(
-      {@required this.nodeId,
+      {required this.nodeId,
       this.parentId,
-      @required this.backendNodeId,
-      @required this.nodeType,
-      @required this.nodeName,
-      @required this.localName,
-      @required this.nodeValue,
+      required this.backendNodeId,
+      required this.nodeType,
+      required this.nodeName,
+      required this.localName,
+      required this.nodeValue,
       this.childNodeCount,
       this.children,
       this.attributes,
@@ -1314,11 +1313,11 @@ class Node {
       'nodeName': nodeName,
       'localName': localName,
       'nodeValue': nodeValue,
-      if (parentId != null) 'parentId': parentId.toJson(),
+      if (parentId != null) 'parentId': parentId!.toJson(),
       if (childNodeCount != null) 'childNodeCount': childNodeCount,
       if (children != null)
-        'children': children.map((e) => e.toJson()).toList(),
-      if (attributes != null) 'attributes': [...attributes],
+        'children': children!.map((e) => e.toJson()).toList(),
+      if (attributes != null) 'attributes': [...?attributes],
       if (documentURL != null) 'documentURL': documentURL,
       if (baseURL != null) 'baseURL': baseURL,
       if (publicId != null) 'publicId': publicId,
@@ -1327,19 +1326,19 @@ class Node {
       if (xmlVersion != null) 'xmlVersion': xmlVersion,
       if (name != null) 'name': name,
       if (value != null) 'value': value,
-      if (pseudoType != null) 'pseudoType': pseudoType.toJson(),
-      if (shadowRootType != null) 'shadowRootType': shadowRootType.toJson(),
-      if (frameId != null) 'frameId': frameId.toJson(),
-      if (contentDocument != null) 'contentDocument': contentDocument.toJson(),
+      if (pseudoType != null) 'pseudoType': pseudoType!.toJson(),
+      if (shadowRootType != null) 'shadowRootType': shadowRootType!.toJson(),
+      if (frameId != null) 'frameId': frameId!.toJson(),
+      if (contentDocument != null) 'contentDocument': contentDocument!.toJson(),
       if (shadowRoots != null)
-        'shadowRoots': shadowRoots.map((e) => e.toJson()).toList(),
-      if (templateContent != null) 'templateContent': templateContent.toJson(),
+        'shadowRoots': shadowRoots!.map((e) => e.toJson()).toList(),
+      if (templateContent != null) 'templateContent': templateContent!.toJson(),
       if (pseudoElements != null)
-        'pseudoElements': pseudoElements.map((e) => e.toJson()).toList(),
+        'pseudoElements': pseudoElements!.map((e) => e.toJson()).toList(),
       if (importedDocument != null)
-        'importedDocument': importedDocument.toJson(),
+        'importedDocument': importedDocument!.toJson(),
       if (distributedNodes != null)
-        'distributedNodes': distributedNodes.map((e) => e.toJson()).toList(),
+        'distributedNodes': distributedNodes!.map((e) => e.toJson()).toList(),
       if (isSVG != null) 'isSVG': isSVG,
     };
   }
@@ -1357,9 +1356,9 @@ class RGBA {
   final int b;
 
   /// The alpha component, in the [0-1] range (default: 1).
-  final num a;
+  final num? a;
 
-  RGBA({@required this.r, @required this.g, @required this.b, this.a});
+  RGBA({required this.r, required this.g, required this.b, this.a});
 
   factory RGBA.fromJson(Map<String, dynamic> json) {
     return RGBA(
@@ -1423,15 +1422,15 @@ class BoxModel {
   final int height;
 
   /// Shape outside coordinates
-  final ShapeOutsideInfo shapeOutside;
+  final ShapeOutsideInfo? shapeOutside;
 
   BoxModel(
-      {@required this.content,
-      @required this.padding,
-      @required this.border,
-      @required this.margin,
-      @required this.width,
-      @required this.height,
+      {required this.content,
+      required this.padding,
+      required this.border,
+      required this.margin,
+      required this.width,
+      required this.height,
       this.shapeOutside});
 
   factory BoxModel.fromJson(Map<String, dynamic> json) {
@@ -1457,7 +1456,7 @@ class BoxModel {
       'margin': margin.toJson(),
       'width': width,
       'height': height,
-      if (shapeOutside != null) 'shapeOutside': shapeOutside.toJson(),
+      if (shapeOutside != null) 'shapeOutside': shapeOutside!.toJson(),
     };
   }
 }
@@ -1474,9 +1473,7 @@ class ShapeOutsideInfo {
   final List<dynamic> marginShape;
 
   ShapeOutsideInfo(
-      {@required this.bounds,
-      @required this.shape,
-      @required this.marginShape});
+      {required this.bounds, required this.shape, required this.marginShape});
 
   factory ShapeOutsideInfo.fromJson(Map<String, dynamic> json) {
     return ShapeOutsideInfo(
@@ -1511,10 +1508,10 @@ class Rect {
   final num height;
 
   Rect(
-      {@required this.x,
-      @required this.y,
-      @required this.width,
-      @required this.height});
+      {required this.x,
+      required this.y,
+      required this.width,
+      required this.height});
 
   factory Rect.fromJson(Map<String, dynamic> json) {
     return Rect(
@@ -1542,7 +1539,7 @@ class CSSComputedStyleProperty {
   /// Computed style property value.
   final String value;
 
-  CSSComputedStyleProperty({@required this.name, @required this.value});
+  CSSComputedStyleProperty({required this.name, required this.value});
 
   factory CSSComputedStyleProperty.fromJson(Map<String, dynamic> json) {
     return CSSComputedStyleProperty(

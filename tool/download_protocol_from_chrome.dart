@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:http/http.dart';
-import 'package:path/path.dart' as p;
 import 'package:puppeteer/puppeteer.dart';
 import 'generate_protocol.dart';
 
@@ -9,8 +8,9 @@ void main() async {
   var chrome = await puppeteer.launch();
 
   try {
-    var url = chrome.connection.url.replaceAll('ws://', 'http://');
-    var response = await read(p.url.join(url, '/json/protocol'));
+    var url = Uri.parse(chrome.connection.url);
+    url = url.replace(scheme: 'http', path: '/json/protocol');
+    var response = await read(url);
 
     File('tool/json/$protocolFromChromeFile').writeAsStringSync(response);
   } finally {

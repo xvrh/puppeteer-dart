@@ -1,10 +1,15 @@
+// @dart=2.9
+
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:dart_style/dart_style.dart';
+import 'package:pub_semver/pub_semver.dart';
 
 // Extrat the samples from the file test/doc_examples_test.dart and inject
 // it in the source code
@@ -33,8 +38,11 @@ void main() {
 
 final _formatter = DartFormatter();
 
+final _featureSet = FeatureSet.fromEnableFlags2(
+    sdkLanguageVersion: Version(2, 12, 0), flags: []);
+
 String replaceExamples(String sourceFile, List<CodeSnippet> snippets) {
-  var unit = parseString(content: sourceFile).unit;
+  var unit = parseString(content: sourceFile, featureSet: _featureSet).unit;
 
   for (var aClass
       in unit.declarations.whereType<ClassDeclaration>().toList().reversed) {
@@ -82,9 +90,8 @@ String _newComment(
 
   var index = 0;
   return lines.join('\n').replaceAllMapped(_dartExampleExtractor, (match) {
-    var snippet = allSnippets.firstWhere(
-        (s) => s.target == target.replaceAll(r'$', 'S') && s.index == index,
-        orElse: () => null);
+    var snippet = allSnippets.firstWhereOrNull(
+        (s) => s.target == target.replaceAll(r'$', 'S') && s.index == index);
     if (snippet == null) {
       throw Exception("Can't find snippet for [$target] at index $index");
     }
@@ -109,7 +116,8 @@ String replaceComment(String file, Comment comment, String newComment) {
 }
 
 List<CodeSnippet> extractSnippets(String sourceCode) {
-  var compilationUnit = parseString(content: sourceCode).unit;
+  var compilationUnit =
+      parseString(content: sourceCode, featureSet: _featureSet).unit;
   var main = compilationUnit.declarations
       .whereType<FunctionDeclaration>()
       .firstWhere((c) => c.name.name == 'main');
@@ -188,10 +196,11 @@ class CodeSnippet {
 main() async {
 ${LineSplitter.split(code).map((line) => '  $line').join('\n')}
 }''';
-    var compilation = parseString(content: code).unit;
+    var compilation = parseString(content: code, featureSet: _featureSet).unit;
     var replacerVisitor = _ExampleReplacerVisitor();
     compilation.visitChildren(replacerVisitor);
     code = replacerVisitor.replace(code);
+    code = code.replaceAll('Future<void> main()', 'void main()');
     code = _formatter.format(code);
     var lines = LineSplitter.split(code).skip(1);
     lines = lines.take(lines.length - 1);

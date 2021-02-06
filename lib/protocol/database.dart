@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 class DatabaseApi {
@@ -40,11 +39,11 @@ class DatabaseApi {
 }
 
 class ExecuteSQLResult {
-  final List<String> columnNames;
+  final List<String>? columnNames;
 
-  final List<dynamic> values;
+  final List<dynamic>? values;
 
-  final Error sqlError;
+  final Error? sqlError;
 
   ExecuteSQLResult({this.columnNames, this.values, this.sqlError});
 
@@ -99,10 +98,10 @@ class Database {
   final String version;
 
   Database(
-      {@required this.id,
-      @required this.domain,
-      @required this.name,
-      @required this.version});
+      {required this.id,
+      required this.domain,
+      required this.name,
+      required this.version});
 
   factory Database.fromJson(Map<String, dynamic> json) {
     return Database(
@@ -131,7 +130,7 @@ class Error {
   /// Error code.
   final int code;
 
-  Error({@required this.message, @required this.code});
+  Error({required this.message, required this.code});
 
   factory Error.fromJson(Map<String, dynamic> json) {
     return Error(

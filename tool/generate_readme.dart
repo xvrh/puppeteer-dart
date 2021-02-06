@@ -1,4 +1,5 @@
 import 'dart:io';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:dart_style/dart_style.dart';
 import 'download_protocol_from_repo.dart' show protocols;
 
@@ -17,7 +18,7 @@ String generateReadme() {
   var template = File('README.template.md').readAsStringSync();
 
   var readme = template.replaceAllMapped(_importRegex, (match) {
-    var filePath = match.group(1);
+    var filePath = match.group(1)!;
 
     var fileContent = File(filePath).readAsStringSync();
     fileContent = fileContent.replaceAll(_ignoreForFileRegex, '');

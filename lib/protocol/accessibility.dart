@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'runtime.dart' as runtime;
@@ -28,10 +27,10 @@ class AccessibilityApi {
   /// Returns: The `Accessibility.AXNode` for this DOM node, if it exists, plus its ancestors, siblings and
   /// children, if requested.
   Future<List<AXNodeData>> getPartialAXTree(
-      {dom.NodeId nodeId,
-      dom.BackendNodeId backendNodeId,
-      runtime.RemoteObjectId objectId,
-      bool fetchRelatives}) async {
+      {dom.NodeId? nodeId,
+      dom.BackendNodeId? backendNodeId,
+      runtime.RemoteObjectId? objectId,
+      bool? fetchRelatives}) async {
     var result = await _client.send('Accessibility.getPartialAXTree', {
       if (nodeId != null) 'nodeId': nodeId,
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
@@ -64,11 +63,11 @@ class AccessibilityApi {
   /// Returns: A list of `Accessibility.AXNode` matching the specified attributes,
   /// including nodes that are ignored for accessibility.
   Future<List<AXNodeData>> queryAXTree(
-      {dom.NodeId nodeId,
-      dom.BackendNodeId backendNodeId,
-      runtime.RemoteObjectId objectId,
-      String accessibleName,
-      String role}) async {
+      {dom.NodeId? nodeId,
+      dom.BackendNodeId? backendNodeId,
+      runtime.RemoteObjectId? objectId,
+      String? accessibleName,
+      String? role}) async {
     var result = await _client.send('Accessibility.queryAXTree', {
       if (nodeId != null) 'nodeId': nodeId,
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
@@ -146,7 +145,7 @@ class AXValueType {
 
   const AXValueType._(this.value);
 
-  factory AXValueType.fromJson(String value) => values[value];
+  factory AXValueType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -182,7 +181,7 @@ class AXValueSourceType {
 
   const AXValueSourceType._(this.value);
 
-  factory AXValueSourceType.fromJson(String value) => values[value];
+  factory AXValueSourceType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -222,7 +221,7 @@ class AXValueNativeSourceType {
 
   const AXValueNativeSourceType._(this.value);
 
-  factory AXValueNativeSourceType.fromJson(String value) => values[value];
+  factory AXValueNativeSourceType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -244,31 +243,31 @@ class AXValueSource {
   final AXValueSourceType type;
 
   /// The value of this property source.
-  final AXValue value;
+  final AXValue? value;
 
   /// The name of the relevant attribute, if any.
-  final String attribute;
+  final String? attribute;
 
   /// The value of the relevant attribute, if any.
-  final AXValue attributeValue;
+  final AXValue? attributeValue;
 
   /// Whether this source is superseded by a higher priority source.
-  final bool superseded;
+  final bool? superseded;
 
   /// The native markup source for this value, e.g. a <label> element.
-  final AXValueNativeSourceType nativeSource;
+  final AXValueNativeSourceType? nativeSource;
 
   /// The value, such as a node or node list, of the native source.
-  final AXValue nativeSourceValue;
+  final AXValue? nativeSourceValue;
 
   /// Whether the value for this property is invalid.
-  final bool invalid;
+  final bool? invalid;
 
   /// Reason for the value being invalid, if it is.
-  final String invalidReason;
+  final String? invalidReason;
 
   AXValueSource(
-      {@required this.type,
+      {required this.type,
       this.value,
       this.attribute,
       this.attributeValue,
@@ -307,13 +306,13 @@ class AXValueSource {
   Map<String, dynamic> toJson() {
     return {
       'type': type.toJson(),
-      if (value != null) 'value': value.toJson(),
+      if (value != null) 'value': value!.toJson(),
       if (attribute != null) 'attribute': attribute,
-      if (attributeValue != null) 'attributeValue': attributeValue.toJson(),
+      if (attributeValue != null) 'attributeValue': attributeValue!.toJson(),
       if (superseded != null) 'superseded': superseded,
-      if (nativeSource != null) 'nativeSource': nativeSource.toJson(),
+      if (nativeSource != null) 'nativeSource': nativeSource!.toJson(),
       if (nativeSourceValue != null)
-        'nativeSourceValue': nativeSourceValue.toJson(),
+        'nativeSourceValue': nativeSourceValue!.toJson(),
       if (invalid != null) 'invalid': invalid,
       if (invalidReason != null) 'invalidReason': invalidReason,
     };
@@ -325,12 +324,12 @@ class AXRelatedNode {
   final dom.BackendNodeId backendDOMNodeId;
 
   /// The IDRef value provided, if any.
-  final String idref;
+  final String? idref;
 
   /// The text alternative of this node in the current context.
-  final String text;
+  final String? text;
 
-  AXRelatedNode({@required this.backendDOMNodeId, this.idref, this.text});
+  AXRelatedNode({required this.backendDOMNodeId, this.idref, this.text});
 
   factory AXRelatedNode.fromJson(Map<String, dynamic> json) {
     return AXRelatedNode(
@@ -357,7 +356,7 @@ class AXProperty {
   /// The value of this property.
   final AXValue value;
 
-  AXProperty({@required this.name, @required this.value});
+  AXProperty({required this.name, required this.value});
 
   factory AXProperty.fromJson(Map<String, dynamic> json) {
     return AXProperty(
@@ -380,15 +379,15 @@ class AXValue {
   final AXValueType type;
 
   /// The computed value of this property.
-  final dynamic value;
+  final dynamic? value;
 
   /// One or more related nodes, if applicable.
-  final List<AXRelatedNode> relatedNodes;
+  final List<AXRelatedNode>? relatedNodes;
 
   /// The sources which contributed to the computation of this property.
-  final List<AXValueSource> sources;
+  final List<AXValueSource>? sources;
 
-  AXValue({@required this.type, this.value, this.relatedNodes, this.sources});
+  AXValue({required this.type, this.value, this.relatedNodes, this.sources});
 
   factory AXValue.fromJson(Map<String, dynamic> json) {
     return AXValue(
@@ -412,8 +411,8 @@ class AXValue {
       'type': type.toJson(),
       if (value != null) 'value': value,
       if (relatedNodes != null)
-        'relatedNodes': relatedNodes.map((e) => e.toJson()).toList(),
-      if (sources != null) 'sources': sources.map((e) => e.toJson()).toList(),
+        'relatedNodes': relatedNodes!.map((e) => e.toJson()).toList(),
+      if (sources != null) 'sources': sources!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -510,7 +509,7 @@ class AXPropertyName {
 
   const AXPropertyName._(this.value);
 
-  factory AXPropertyName.fromJson(String value) => values[value];
+  factory AXPropertyName.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -534,32 +533,32 @@ class AXNodeData {
   final bool ignored;
 
   /// Collection of reasons why this node is hidden.
-  final List<AXProperty> ignoredReasons;
+  final List<AXProperty>? ignoredReasons;
 
   /// This `Node`'s role, whether explicit or implicit.
-  final AXValue role;
+  final AXValue? role;
 
   /// The accessible name for this `Node`.
-  final AXValue name;
+  final AXValue? name;
 
   /// The accessible description for this `Node`.
-  final AXValue description;
+  final AXValue? description;
 
   /// The value for this `Node`.
-  final AXValue value;
+  final AXValue? value;
 
   /// All other properties
-  final List<AXProperty> properties;
+  final List<AXProperty>? properties;
 
   /// IDs for each of this node's child nodes.
-  final List<AXNodeId> childIds;
+  final List<AXNodeId>? childIds;
 
   /// The backend ID for the associated DOM node, if any.
-  final dom.BackendNodeId backendDOMNodeId;
+  final dom.BackendNodeId? backendDOMNodeId;
 
   AXNodeData(
-      {@required this.nodeId,
-      @required this.ignored,
+      {required this.nodeId,
+      required this.ignored,
       this.ignoredReasons,
       this.role,
       this.name,
@@ -611,17 +610,17 @@ class AXNodeData {
       'nodeId': nodeId.toJson(),
       'ignored': ignored,
       if (ignoredReasons != null)
-        'ignoredReasons': ignoredReasons.map((e) => e.toJson()).toList(),
-      if (role != null) 'role': role.toJson(),
-      if (name != null) 'name': name.toJson(),
-      if (description != null) 'description': description.toJson(),
-      if (value != null) 'value': value.toJson(),
+        'ignoredReasons': ignoredReasons!.map((e) => e.toJson()).toList(),
+      if (role != null) 'role': role!.toJson(),
+      if (name != null) 'name': name!.toJson(),
+      if (description != null) 'description': description!.toJson(),
+      if (value != null) 'value': value!.toJson(),
       if (properties != null)
-        'properties': properties.map((e) => e.toJson()).toList(),
+        'properties': properties!.map((e) => e.toJson()).toList(),
       if (childIds != null)
-        'childIds': childIds.map((e) => e.toJson()).toList(),
+        'childIds': childIds!.map((e) => e.toJson()).toList(),
       if (backendDOMNodeId != null)
-        'backendDOMNodeId': backendDOMNodeId.toJson(),
+        'backendDOMNodeId': backendDOMNodeId!.toJson(),
     };
   }
 }

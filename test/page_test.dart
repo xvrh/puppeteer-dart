@@ -8,10 +8,10 @@ import 'utils/utils.dart';
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 void main() {
-  Server server;
-  Browser browser;
-  BrowserContext context;
-  Page page;
+  late Server server;
+  late Browser browser;
+  late BrowserContext context;
+  late Page page;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
@@ -20,7 +20,6 @@ void main() {
   tearDownAll(() async {
     await server.close();
     await browser.close();
-    browser = null;
   });
 
   setUp(() async {
@@ -31,13 +30,12 @@ void main() {
   tearDown(() async {
     server.clearRoutes();
     await context.close();
-    page = null;
   });
 
   group('Page.close', () {
     test('should reject all promises when page is closed', () async {
       var newPage = await context.newPage();
-      Object error;
+      Object? error;
       await Future.wait([
         newPage
             .evaluate('() => new Promise(r => {})')
@@ -111,8 +109,11 @@ void main() {
       server.setRoute('my-page', (request) {
         return shelf.Response(204);
       });
-      Object error;
-      await page.goto(server.hostUrl + '/my-page').catchError((e, s) {
+      Object? error;
+      await page
+          .goto(server.hostUrl + '/my-page')
+          .then<Response?>((e) => e)
+          .catchError((e, s) {
         error = e;
         return null;
       });
@@ -123,7 +124,10 @@ void main() {
     test('should throw when page crashes', () async {
       var onErrorFuture = page.onError.first;
 
-      await page.goto('chrome://crash').catchError((_) => null);
+      await page
+          .goto('chrome://crash')
+          .then<Response?>((e) => e)
+          .catchError((_) => null);
       var error = await onErrorFuture;
       expect(error.message, equals('Page crashed!'));
     });
@@ -365,18 +369,16 @@ void main() {
       }''');
       // Gives time for the logs to arrive on Windows
       await Future.delayed(Duration(milliseconds: 1));
-      expect(messages.map((msg) => msg.typeName),
-          equals(['timeEnd', 'trace', 'dir', 'warning', 'error', 'log']));
+      expect(messages.map((msg) => msg.typeName).toList(),
+          ['timeEnd', 'trace', 'dir', 'warning', 'error', 'log']);
       expect(messages[0].text, contains('calling console.time'));
-      expect(
-          messages.skip(1).map((msg) => msg.text),
-          equals([
-            'calling console.trace',
-            'calling console.dir',
-            'calling console.warn',
-            'calling console.error',
-            'JSHandle@promise',
-          ]));
+      expect(messages.skip(1).map((msg) => msg.text).toList(), [
+        'calling console.trace',
+        'calling console.dir',
+        'calling console.warn',
+        'calling console.error',
+        'JSHandle@promise',
+      ]);
     });
     test('should not fail for window object', () async {
       var message = await waitFutures(
@@ -709,7 +711,7 @@ void main() {
     });
     test('should await resources to load', () async {
       var imgPath = 'img.png';
-      Completer<shelf.Response> imgResponse;
+      late Completer<shelf.Response> imgResponse;
       server.setRoute(imgPath, (req) {
         imgResponse = Completer();
         return imgResponse.future;
@@ -926,7 +928,7 @@ void main() {
   group('Page.pdf', () {
     test('should be able to save file', () async {
       var result = await page.pdf();
-      expect(result.length, greaterThan(0));
+      expect(result!.length, greaterThan(0));
     });
   });
 

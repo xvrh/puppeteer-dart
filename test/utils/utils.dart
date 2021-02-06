@@ -22,7 +22,7 @@ Future server(String location, Function(String) callback) async {
 typedef _RouteCallback = FutureOr<shelf.Response> Function(shelf.Request);
 
 class Server {
-  HttpServer _httpServer;
+  late final HttpServer _httpServer;
   final _routes = CanonicalizedMap<String, String, _RouteCallback>(
       (key) => p.url.normalize(_removeLeadingSlash(key)));
   final _requestCallbacks =
@@ -121,7 +121,7 @@ async function attachFrame(frameId, url) {
     return frame;
   }  
 ''', args: [frameId, url]);
-  return await handle.asElement.contentFrame;
+  return (await handle.asElement!.contentFrame)!;
 }
 
 Future<void> detachFrame(Page page, String frameId) async {
@@ -133,9 +133,10 @@ function detachFrame(frameId) {
 ''', args: [frameId]);
 }
 
-Future<T> waitFutures<T>(Future<T> firstFuture, List<Future> others) async {
+Future<T /*!*/ > waitFutures<T>(
+    Future<T> firstFuture, List<Future> others) async {
   var futures = <Future>[firstFuture, ...others];
-  return (await Future.wait(futures))[0] as T;
+  return (await Future.wait(futures))[0] as T /*!*/;
 }
 
 Future<void> navigateFrame(Page page, String frameId, String url) async {
@@ -148,7 +149,7 @@ function navigateFrame(frameId, url) {
 ''', args: [frameId, url]);
 }
 
-List<String> dumpFrames(Frame frame, [String indentation]) {
+List<String> dumpFrames(Frame frame, [String? indentation]) {
   indentation ??= '';
   var description = frame.url.replaceAll(RegExp(r'//[^/]+/'), '//<host>/');
   if (frame.name != null) {

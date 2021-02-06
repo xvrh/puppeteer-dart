@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart';
 import '../protocol/target.dart';
 import 'browser.dart';
 import 'connection.dart';
@@ -15,16 +14,16 @@ class Target {
 
   final TargetID targetID;
   final Future<Session> Function() _sessionFactory;
-  TargetInfo _info;
+  TargetInfo? _info;
   final _initializeCompleter = Completer<bool>();
-  Future<Page> _pageFuture;
-  Future<Worker> _workerFuture;
-  Future<bool> _initialized;
+  Future<Page>? _pageFuture;
+  Future<Worker>? _workerFuture;
+  late final Future<bool> _initialized;
   final _closedCompleter = Completer();
   bool _isInitialized = false;
 
   Target(this.browser, TargetInfo info, this._sessionFactory,
-      {@required this.browserContext})
+      {required this.browserContext})
       : targetID = info.targetId {
     _initialized = _initializeCompleter.future.then((success) async {
       if (!success) return false;
@@ -32,7 +31,7 @@ class Target {
       if (opener == null || opener._pageFuture == null || type != 'page') {
         return true;
       }
-      var openerPage = await opener._pageFuture;
+      var openerPage = await opener._pageFuture!;
 
       if (openerPage.hasPopupListener) {
         openerPage.emitPopup(await page);
@@ -42,21 +41,21 @@ class Target {
     changeInfo(info);
   }
 
-  Future<bool> get initialized => _initialized;
+  Future<bool>? get initialized => _initialized;
 
   bool get isInitialized => _isInitialized;
 
   Future<void> get onClose => _closedCompleter.future;
 
-  String get url => _info.url;
+  String get url => _info!.url;
 
-  TargetInfo get targetInfo => _info;
+  TargetInfo get targetInfo => _info!;
 
   /// Identifies what kind of target this is.
   /// Can be `"page"`, [`"background_page"`](https://developer.chrome.com/extensions/background_pages),
   /// `"service_worker"`, `"shared_worker"`, `"browser"` or `"other"`.
-  String get type {
-    var type = _info.type;
+  String? get type {
+    var type = _info!.type;
     if (const [
       'page',
       'background_page',
@@ -68,26 +67,29 @@ class Target {
   }
 
   /// Get the target that opened this target. Top-level targets return `null`.
-  Target get opener {
-    return _info.openerId != null ? browser.targetById(_info.openerId) : null;
+  Target? get opener {
+    return _info!.openerId != null ? browser.targetById(_info!.openerId) : null;
   }
 
-  /// If the target is not of type `"page"` or `"background_page"`, returns `null`.
+  bool get isPage => _info!.type == 'page' || _info!.type == 'background_page';
+
   Future<Page> get page {
-    if ((_info.type == 'page' || _info.type == 'background_page') &&
-        _pageFuture == null) {
-      _pageFuture = _sessionFactory().then((session) =>
-          Page.create(this, session, viewport: browser.defaultViewport));
+    if (!isPage) {
+      throw Exception('The target is not page or background_page. '
+          'Check `isPage` before accessing the `page` getter');
     }
-    return _pageFuture;
+
+    _pageFuture ??= _sessionFactory().then((session) =>
+        Page.create(this, session, viewport: browser.defaultViewport));
+    return _pageFuture!;
   }
 
-  Future<Worker> get worker async {
-    if (_info.type != 'service_worker' && _info.type != 'shared_worker') {
+  Future<Worker?> get worker async {
+    if (_info!.type != 'service_worker' && _info!.type != 'shared_worker') {
       return null;
     }
     _workerFuture ??= _sessionFactory().then((client) async {
-      return _sessionFactory().then((client) => Worker(client, _info.url,
+      return _sessionFactory().then((client) => Worker(client, _info!.url,
           onConsoleApiCalled: null, onExceptionThrown: null));
     });
     return _workerFuture;
@@ -97,7 +99,7 @@ class Target {
     _info = info;
 
     if (!_initializeCompleter.isCompleted &&
-        (_info.type != 'page' || _info.url != '')) {
+        (_info!.type != 'page' || _info!.url != '')) {
       _isInitialized = true;
       _initializeCompleter.complete(true);
     }

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
@@ -72,7 +71,7 @@ class HeapProfilerApi {
   /// Returns: Evaluation result.
   Future<runtime.RemoteObject> getObjectByHeapObjectId(
       HeapSnapshotObjectId objectId,
-      {String objectGroup}) async {
+      {String? objectGroup}) async {
     var result = await _client.send('HeapProfiler.getObjectByHeapObjectId', {
       'objectId': objectId,
       if (objectGroup != null) 'objectGroup': objectGroup,
@@ -90,13 +89,13 @@ class HeapProfilerApi {
 
   /// [samplingInterval] Average sample interval in bytes. Poisson distribution is used for the intervals. The
   /// default value is 32768 bytes.
-  Future<void> startSampling({num samplingInterval}) async {
+  Future<void> startSampling({num? samplingInterval}) async {
     await _client.send('HeapProfiler.startSampling', {
       if (samplingInterval != null) 'samplingInterval': samplingInterval,
     });
   }
 
-  Future<void> startTrackingHeapObjects({bool trackAllocations}) async {
+  Future<void> startTrackingHeapObjects({bool? trackAllocations}) async {
     await _client.send('HeapProfiler.startTrackingHeapObjects', {
       if (trackAllocations != null) 'trackAllocations': trackAllocations,
     });
@@ -112,7 +111,7 @@ class HeapProfilerApi {
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken
   /// when the tracking is stopped.
   Future<void> stopTrackingHeapObjects(
-      {bool reportProgress, bool treatGlobalObjectsAsRoots}) async {
+      {bool? reportProgress, bool? treatGlobalObjectsAsRoots}) async {
     await _client.send('HeapProfiler.stopTrackingHeapObjects', {
       if (reportProgress != null) 'reportProgress': reportProgress,
       if (treatGlobalObjectsAsRoots != null)
@@ -123,7 +122,7 @@ class HeapProfilerApi {
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken.
   /// [treatGlobalObjectsAsRoots] If true, a raw snapshot without artifical roots will be generated
   Future<void> takeHeapSnapshot(
-      {bool reportProgress, bool treatGlobalObjectsAsRoots}) async {
+      {bool? reportProgress, bool? treatGlobalObjectsAsRoots}) async {
     await _client.send('HeapProfiler.takeHeapSnapshot', {
       if (reportProgress != null) 'reportProgress': reportProgress,
       if (treatGlobalObjectsAsRoots != null)
@@ -138,7 +137,7 @@ class LastSeenObjectIdEvent {
   final num timestamp;
 
   LastSeenObjectIdEvent(
-      {@required this.lastSeenObjectId, @required this.timestamp});
+      {required this.lastSeenObjectId, required this.timestamp});
 
   factory LastSeenObjectIdEvent.fromJson(Map<String, dynamic> json) {
     return LastSeenObjectIdEvent(
@@ -153,10 +152,10 @@ class ReportHeapSnapshotProgressEvent {
 
   final int total;
 
-  final bool finished;
+  final bool? finished;
 
   ReportHeapSnapshotProgressEvent(
-      {@required this.done, @required this.total, this.finished});
+      {required this.done, required this.total, this.finished});
 
   factory ReportHeapSnapshotProgressEvent.fromJson(Map<String, dynamic> json) {
     return ReportHeapSnapshotProgressEvent(
@@ -204,10 +203,10 @@ class SamplingHeapProfileNode {
   final List<SamplingHeapProfileNode> children;
 
   SamplingHeapProfileNode(
-      {@required this.callFrame,
-      @required this.selfSize,
-      @required this.id,
-      @required this.children});
+      {required this.callFrame,
+      required this.selfSize,
+      required this.id,
+      required this.children});
 
   factory SamplingHeapProfileNode.fromJson(Map<String, dynamic> json) {
     return SamplingHeapProfileNode(
@@ -245,7 +244,7 @@ class SamplingHeapProfileSample {
   final num ordinal;
 
   SamplingHeapProfileSample(
-      {@required this.size, @required this.nodeId, @required this.ordinal});
+      {required this.size, required this.nodeId, required this.ordinal});
 
   factory SamplingHeapProfileSample.fromJson(Map<String, dynamic> json) {
     return SamplingHeapProfileSample(
@@ -270,7 +269,7 @@ class SamplingHeapProfile {
 
   final List<SamplingHeapProfileSample> samples;
 
-  SamplingHeapProfile({@required this.head, @required this.samples});
+  SamplingHeapProfile({required this.head, required this.samples});
 
   factory SamplingHeapProfile.fromJson(Map<String, dynamic> json) {
     return SamplingHeapProfile(

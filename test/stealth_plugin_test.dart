@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 import 'utils/utils.dart';
 
 void main() {
-  Server server;
+  late Server server;
   setUpAll(() async {
     server = await Server.create();
   });

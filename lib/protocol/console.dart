@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// This domain is deprecated - use Runtime or Log instead.
@@ -44,18 +43,18 @@ class ConsoleMessage {
   final String text;
 
   /// URL of the message origin.
-  final String url;
+  final String? url;
 
   /// Line number in the resource that generated this message (1-based).
-  final int line;
+  final int? line;
 
   /// Column number in the resource that generated this message (1-based).
-  final int column;
+  final int? column;
 
   ConsoleMessage(
-      {@required this.source,
-      @required this.level,
-      @required this.text,
+      {required this.source,
+      required this.level,
+      required this.text,
       this.url,
       this.line,
       this.column});
@@ -113,7 +112,7 @@ class ConsoleMessageSource {
 
   const ConsoleMessageSource._(this.value);
 
-  factory ConsoleMessageSource.fromJson(String value) => values[value];
+  factory ConsoleMessageSource.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -146,7 +145,7 @@ class ConsoleMessageLevel {
 
   const ConsoleMessageLevel._(this.value);
 
-  factory ConsoleMessageLevel.fromJson(String value) => values[value];
+  factory ConsoleMessageLevel.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 

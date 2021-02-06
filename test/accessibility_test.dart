@@ -3,10 +3,10 @@ import 'package:test/test.dart';
 import 'utils/utils.dart';
 
 void main() {
-  Server server;
-  Browser browser;
-  BrowserContext context;
-  Page page;
+  late Server server;
+  late Browser browser;
+  late BrowserContext context;
+  late Page page;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
@@ -15,7 +15,6 @@ void main() {
   tearDownAll(() async {
     await server.close();
     await browser.close();
-    browser = null;
   });
 
   setUp(() async {
@@ -26,7 +25,6 @@ void main() {
   tearDown(() async {
     server.clearRoutes();
     await context.close();
-    page = null;
   });
 
   group('Accessibility', () {
@@ -252,10 +250,8 @@ void main() {
           await page.setContent('<input title="My Input" value="My Value">');
 
           var input = await page.$('input');
-          expect(
-              await page.accessibility.snapshot(root: input),
-              equals(AXNode(
-                  role: 'textbox', name: 'My Input', value: 'My Value')));
+          expect(await page.accessibility.snapshot(root: input),
+              AXNode(role: 'textbox', name: 'My Input', value: 'My Value'));
         });
         test('should work a menu', () async {
           await page.setContent('''
@@ -280,12 +276,12 @@ void main() {
           await page.setContent('<button>My Button</button>');
           var button = await page.$('button');
           await page.$eval('button', 'button => button.remove()');
-          expect(await page.accessibility.snapshot(root: button), isNull);
+          expect(await page.accessibility.snapshot(root: button), AXNode.empty);
         });
         test('should support the interestingOnly option', () async {
           await page.setContent('<div><button>My Button</button></div>');
           var div = await page.$('div');
-          expect(await page.accessibility.snapshot(root: div), isNull);
+          expect(await page.accessibility.snapshot(root: div), AXNode.empty);
           expect(
             await page.accessibility
                 .snapshot(root: div, interestingOnly: false),
@@ -311,8 +307,8 @@ void main() {
   });
 }
 
-AXNode findFocusedNode(AXNode node) {
-  if (node.focused ?? false) return node;
+AXNode? findFocusedNode(AXNode node) {
+  if (node.focused) return node;
   for (var child in node.children) {
     var focusedChild = findFocusedNode(child);
     if (focusedChild != null) return focusedChild;

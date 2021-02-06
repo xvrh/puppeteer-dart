@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// The Tethering domain defines methods and events for browser port binding.
@@ -37,7 +36,7 @@ class AcceptedEvent {
   /// Connection id to be used.
   final String connectionId;
 
-  AcceptedEvent({@required this.port, @required this.connectionId});
+  AcceptedEvent({required this.port, required this.connectionId});
 
   factory AcceptedEvent.fromJson(Map<String, dynamic> json) {
     return AcceptedEvent(

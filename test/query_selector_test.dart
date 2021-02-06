@@ -5,10 +5,10 @@ import 'utils/utils.dart';
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 void main() {
-  Server server;
-  Browser browser;
-  BrowserContext context;
-  Page page;
+  late Server server;
+  late Browser browser;
+  late BrowserContext context;
+  late Page page;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
@@ -17,7 +17,6 @@ void main() {
   tearDownAll(() async {
     await server.close();
     await browser.close();
-    browser = null;
   });
 
   setUp(() async {
@@ -28,7 +27,6 @@ void main() {
   tearDown(() async {
     server.clearRoutes();
     await context.close();
-    page = null;
   });
 
   group(r'Page.$eval', () {
@@ -77,7 +75,7 @@ void main() {
       expect(element, isNotNull);
     });
     test('should return null for non-existing element', () async {
-      var element = await page.$('non-existing-element');
+      var element = await page.$OrNull('non-existing-element');
       expect(element, isNull);
     });
   });
@@ -132,7 +130,7 @@ void main() {
       await page.setContent(
           '<html><body><div class="second"><div class="inner">B</div></div></body></html>');
       var html = await page.$('html');
-      var second = await html.$('.third');
+      var second = await html.$OrNull('.third');
       expect(second, isNull);
     });
   });

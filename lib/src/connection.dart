@@ -2,12 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:logging/logging.dart';
-import 'package:meta/meta.dart';
 import '../protocol/target.dart';
 
 abstract class Client {
   Future<Map<String, dynamic>> send(String method,
-      [Map<String, dynamic> parameters]);
+      [Map<String, dynamic>? parameters]);
 
   Stream<Event> get onEvent;
 }
@@ -35,17 +34,15 @@ class Connection implements Client {
   final Map<String, Session> sessions = {};
   final StreamController<Event> _eventController =
       StreamController<Event>.broadcast(sync: true);
-  TargetApi _targetApi;
+  late final _targetApi = TargetApi(this);
   final List<StreamSubscription> _subscriptions = [];
-  final Duration _delay;
+  final Duration? _delay;
 
-  Connection._(this._webSocket, this.url, {Duration delay}) : _delay = delay {
+  Connection._(this._webSocket, this.url, {Duration? delay}) : _delay = delay {
     _subscriptions
         .add(_webSocket.cast<String>().listen(_onMessage, onError: (error) {
       print('Websocket error: $error');
     }));
-
-    _targetApi = TargetApi(this);
 
     _webSocket.done.then((_) => _onClose(
         'Websocket.done(code: ${_webSocket.closeCode}, reason: ${_webSocket.closeReason})'));
@@ -54,7 +51,7 @@ class Connection implements Client {
   TargetApi get targetApi => _targetApi;
 
   static Future<Connection> create(String url,
-      {@required Duration delay}) async {
+      {required Duration? delay}) async {
     return Connection._(await WebSocket.connect(url), url, delay: delay);
   }
 
@@ -63,7 +60,7 @@ class Connection implements Client {
 
   @override
   Future<Map<String, dynamic>> send(String method,
-      [Map<String, dynamic> parameters]) {
+      [Map<String, dynamic>? parameters]) {
     var id = _rawSend(method, parameters);
     var message = _Message(method);
     _messagesInFly[id] = message;
@@ -71,8 +68,8 @@ class Connection implements Client {
     return message.completer.future;
   }
 
-  int _rawSend(String method, Map<String, dynamic> parameters,
-      {SessionID sessionId}) {
+  int _rawSend(String method, Map<String, dynamic>? parameters,
+      {SessionID? sessionId}) {
     var id = ++_lastId;
     var message = _encodeMessage(id, method, parameters, sessionId: sessionId);
 
@@ -86,21 +83,20 @@ class Connection implements Client {
     var sessionId =
         await _targetApi.attachToTarget(targetInfo.targetId, flatten: true);
 
-    var session = sessions[sessionId.value];
-    assert(session != null);
+    var session = sessions[sessionId.value]!;
     return session;
   }
 
   Future<void> _onMessage(String message) async {
     if (_delay != null) {
-      await Future.delayed(_delay);
+      await Future.delayed(_delay!);
     }
     if (_eventController.isClosed) return;
 
     var object = jsonDecode(message) as Map<String, dynamic>;
-    var id = object['id'] as int;
-    var method = object['method'] as String;
-    var sessionId = object['sessionId'] as String;
+    var id = object['id'] as int?;
+    var method = object['method'] as String?;
+    var sessionId = object['sessionId'] as String?;
     if (method == 'Target.attachedToTarget') {
       var params = AttachedToTargetEvent.fromJson(
           object['params'] as Map<String, dynamic>);
@@ -127,16 +123,15 @@ class Connection implements Client {
     } else if (id != null) {
       _logger.fine('◀ RECV $id $message');
 
-      var messageInFly = _messagesInFly.remove(id);
-      assert(messageInFly != null);
+      var messageInFly = _messagesInFly.remove(id)!;
 
-      var error = object['error'] as Map<String, dynamic>;
+      var error = object['error'] as Map<String, dynamic>?;
       if (error != null) {
         messageInFly.completer
             .completeError(ServerException(error['message'] as String));
       } else {
         messageInFly.completer
-            .complete(object['result'] as Map<String, dynamic>);
+            .complete(object['result'] as Map<String, dynamic>?);
       }
     } else {
       var method = object['method'] as String;
@@ -178,8 +173,8 @@ class Connection implements Client {
   Future get disconnected => _webSocket.done;
 }
 
-String _encodeMessage(int id, String method, Map<String, dynamic> parameters,
-    {SessionID sessionId}) {
+String _encodeMessage(int id, String method, Map<String, dynamic>? parameters,
+    {SessionID? sessionId}) {
   var message = {
     'id': id,
     'method': method,
@@ -194,16 +189,16 @@ String _encodeMessage(int id, String method, Map<String, dynamic> parameters,
 class Session implements Client {
   final SessionID sessionId;
   final Connection connection;
-  final String targetType;
+  final String? targetType;
   final _messagesInFly = <int, _Message>{};
   final _eventController = StreamController<Event>.broadcast(sync: true);
   final _onClose = Completer<void>();
 
-  Session(this.connection, this.sessionId, {@required this.targetType});
+  Session(this.connection, this.sessionId, {required this.targetType});
 
   @override
   Future<Map<String, dynamic>> send(String method,
-      [Map<String, dynamic> parameters]) {
+      [Map<String, dynamic>? parameters]) {
     if (_eventController.isClosed) {
       throw Exception(
           'Protocol error ($method): Session closed. Most likely the $targetType has been closed.');
@@ -222,15 +217,15 @@ class Session implements Client {
   Future<void> get closed => _onClose.future;
 
   void _onMessage(Map object) {
-    var id = object['id'] as int;
+    var id = object['id'] as int?;
     if (id != null) {
       var message = _messagesInFly.remove(id);
-      var error = object['error'] as Map<String, dynamic>;
+      var error = object['error'] as Map<String, dynamic>?;
       if (error != null) {
-        message.completer
+        message!.completer
             .completeError(ServerException(error['message'] as String));
       } else {
-        message.completer.complete(object['result'] as Map<String, dynamic>);
+        message!.completer.complete(object['result'] as Map<String, dynamic>?);
       }
     } else {
       _eventController.add(Event._(object['method'] as String,
@@ -244,7 +239,7 @@ class Session implements Client {
     await connection.targetApi.detachFromTarget(sessionId: sessionId);
   }
 
-  void dispose({@required String reason}) {
+  void dispose({required String reason}) {
     if (_eventController.isClosed) return;
 
     _eventController.close();
@@ -280,7 +275,7 @@ class TargetClosedException implements Exception {
   final String method;
   final String reason;
 
-  TargetClosedException(this.method, {@required this.reason});
+  TargetClosedException(this.method, {required this.reason});
 
   @override
   String toString() =>

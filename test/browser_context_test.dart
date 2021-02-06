@@ -6,8 +6,8 @@ import 'utils/utils.dart';
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 void main() {
-  Server server;
-  Browser browser;
+  late Server server;
+  late Browser browser;
   setUpAll(() async {
     server = await Server.create();
   });

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:dart_style/dart_style.dart';
+//import 'package:dart_style/dart_style.dart';
 import 'package:http/http.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'utils/split_words.dart';
@@ -12,7 +12,7 @@ const deviceUrl =
     'https://raw.githubusercontent.com/ChromeDevTools/devtools-frontend/master/front_end/emulated_devices/module.json';
 
 void main() async {
-  var content = await read(deviceUrl);
+  var content = await read(Uri.parse(deviceUrl));
 
   var module = Module.fromJson(jsonDecode(content) as Map<String, dynamic>);
 
@@ -22,10 +22,10 @@ void main() async {
   buffer.writeln(
       "import 'page/emulation_manager.dart' show Device, DeviceViewport;");
   buffer.writeln('class Devices with IterableMixin<Device> {');
-  var allNames = <String, String>{};
+  var allNames = <String?, String>{};
   for (var emulatedDevice
-      in module.extensions.where((e) => e.type == 'emulated-device')) {
-    var device = emulatedDevice.device;
+      in module.extensions!.where((e) => e.type == 'emulated-device')) {
+    var device = emulatedDevice.device!;
 
     const deviceSplits = {
       'iPhone 6/7/8': ['iPhone 6', 'iPhone 7', 'iPhone 8'],
@@ -40,10 +40,10 @@ void main() async {
       allNames[name] = deviceName;
 
       buffer.writeln(
-          'final $deviceName = ${device.toCode(name, viewportCode(device, device.screen.vertical))};');
+          'final $deviceName = ${device.toCode(name, viewportCode(device, device.screen!.vertical!))};');
       buffer.writeln();
 
-      var landscape = device.screen.horizontal;
+      var landscape = device.screen!.horizontal;
       if (landscape != null) {
         allNames['$name Landscape'] = '${deviceName}Landscape';
         buffer.writeln(
@@ -69,12 +69,13 @@ void main() async {
   buffer.writeln('}');
   buffer.writeln('final devices = Devices._();');
   File('lib/src/devices.dart')
-      .writeAsStringSync(DartFormatter().format(buffer.toString()));
+      //.writeAsStringSync(DartFormatter().format(buffer.toString()));
+      .writeAsStringSync(buffer.toString());
 }
 
 @JsonSerializable()
 class Module {
-  List<Extension> extensions;
+  List<Extension>? extensions;
 
   Module();
 
@@ -85,9 +86,9 @@ class Module {
 
 @JsonSerializable()
 class Extension {
-  String type;
-  int order;
-  Device device;
+  String? type;
+  int? order;
+  Device? device;
 
   Extension();
 
@@ -100,17 +101,17 @@ class Extension {
 @JsonSerializable()
 class Device {
   String title;
-  List<String> capabilities;
+  List<String>? capabilities;
   @JsonKey(name: 'user-agent')
-  String userAgent;
-  String type;
-  Screen screen;
+  String? userAgent;
+  String? type;
+  Screen? screen;
 
-  Device();
+  Device(this.title);
 
   factory Device.fromJson(Map<String, dynamic> json) => _$DeviceFromJson(json);
 
-  String toCode(String name, String viewportCode) {
+  String toCode(String? name, String viewportCode) {
     return "Device('$name', userAgent: '$userAgent', viewport: $viewportCode)";
   }
 
@@ -120,8 +121,8 @@ class Device {
 @JsonSerializable()
 class Screen {
   @JsonKey(name: 'device-pixel-ratio')
-  num devicePixelRatio;
-  ScreenOrientation horizontal, vertical;
+  num? devicePixelRatio;
+  ScreenOrientation? horizontal, vertical;
 
   Screen();
 
@@ -132,7 +133,7 @@ class Screen {
 
 @JsonSerializable()
 class ScreenOrientation {
-  num width, height;
+  num? width, height;
 
   ScreenOrientation();
 
@@ -146,9 +147,9 @@ String viewportCode(Device device, ScreenOrientation orientation,
     {bool isLandscape = false}) {
   return 'DeviceViewport(width: ${orientation.width}, '
       'height: ${orientation.height}, '
-      'deviceScaleFactor: ${device.screen.devicePixelRatio}, '
-      'isMobile: ${device.capabilities.contains('mobile')},'
-      'hasTouch: ${device.capabilities.contains('touch')},'
+      'deviceScaleFactor: ${device.screen!.devicePixelRatio}, '
+      'isMobile: ${device.capabilities!.contains('mobile')},'
+      'hasTouch: ${device.capabilities!.contains('touch')},'
       'isLandscape: $isLandscape'
       ')';
 }

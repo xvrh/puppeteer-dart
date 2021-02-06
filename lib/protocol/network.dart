@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'debugger.dart' as debugger;
 import 'emulation.dart' as emulation;
@@ -188,13 +187,13 @@ class NetworkApi {
   /// [authChallengeResponse] Response to a requestIntercepted with an authChallenge. Must not be set otherwise.
   @deprecated
   Future<void> continueInterceptedRequest(InterceptionId interceptionId,
-      {ErrorReason errorReason,
-      String rawResponse,
-      String url,
-      String method,
-      String postData,
-      Headers headers,
-      AuthChallengeResponse authChallengeResponse}) async {
+      {ErrorReason? errorReason,
+      String? rawResponse,
+      String? url,
+      String? method,
+      String? postData,
+      Headers? headers,
+      AuthChallengeResponse? authChallengeResponse}) async {
     await _client.send('Network.continueInterceptedRequest', {
       'interceptionId': interceptionId,
       if (errorReason != null) 'errorReason': errorReason,
@@ -215,7 +214,7 @@ class NetworkApi {
   /// [domain] If specified, deletes only cookies with the exact domain.
   /// [path] If specified, deletes only cookies with the exact path.
   Future<void> deleteCookies(String name,
-      {String url, String domain, String path}) async {
+      {String? url, String? domain, String? path}) async {
     await _client.send('Network.deleteCookies', {
       'name': name,
       if (url != null) 'url': url,
@@ -237,7 +236,7 @@ class NetworkApi {
   /// [connectionType] Connection type if known.
   Future<void> emulateNetworkConditions(
       bool offline, num latency, num downloadThroughput, num uploadThroughput,
-      {ConnectionType connectionType}) async {
+      {ConnectionType? connectionType}) async {
     await _client.send('Network.emulateNetworkConditions', {
       'offline': offline,
       'latency': latency,
@@ -252,9 +251,9 @@ class NetworkApi {
   /// [maxResourceBufferSize] Per-resource buffer size in bytes to use when preserving network payloads (XHRs, etc).
   /// [maxPostDataSize] Longest post body size (in bytes) that would be included in requestWillBeSent notification
   Future<void> enable(
-      {int maxTotalBufferSize,
-      int maxResourceBufferSize,
-      int maxPostDataSize}) async {
+      {int? maxTotalBufferSize,
+      int? maxResourceBufferSize,
+      int? maxPostDataSize}) async {
     await _client.send('Network.enable', {
       if (maxTotalBufferSize != null) 'maxTotalBufferSize': maxTotalBufferSize,
       if (maxResourceBufferSize != null)
@@ -288,7 +287,7 @@ class NetworkApi {
   /// If not specified, it's assumed to be set to the list containing
   /// the URLs of the page and all of its subframes.
   /// Returns: Array of cookie objects.
-  Future<List<Cookie>> getCookies({List<String> urls}) async {
+  Future<List<Cookie>> getCookies({List<String>? urls}) async {
     var result = await _client.send('Network.getCookies', {
       if (urls != null) 'urls': [...urls],
     });
@@ -357,7 +356,7 @@ class NetworkApi {
   /// Returns: List of search matches.
   Future<List<debugger.SearchMatch>> searchInResponseBody(
       RequestId requestId, String query,
-      {bool caseSensitive, bool isRegex}) async {
+      {bool? caseSensitive, bool? isRegex}) async {
     var result = await _client.send('Network.searchInResponseBody', {
       'requestId': requestId,
       'query': query,
@@ -407,14 +406,14 @@ class NetworkApi {
   /// [priority] Cookie Priority type.
   /// Returns: Always set to true. If an error occurs, the response indicates protocol error.
   Future<bool> setCookie(String name, String value,
-      {String url,
-      String domain,
-      String path,
-      bool secure,
-      bool httpOnly,
-      CookieSameSite sameSite,
-      TimeSinceEpoch expires,
-      CookiePriority priority}) async {
+      {String? url,
+      String? domain,
+      String? path,
+      bool? secure,
+      bool? httpOnly,
+      CookieSameSite? sameSite,
+      TimeSinceEpoch? expires,
+      CookiePriority? priority}) async {
     var result = await _client.send('Network.setCookie', {
       'name': name,
       'value': value,
@@ -482,9 +481,9 @@ class NetworkApi {
   /// [platform] The platform navigator.platform should return.
   /// [userAgentMetadata] To be sent in Sec-CH-UA-* headers and returned in navigator.userAgentData
   Future<void> setUserAgentOverride(String userAgent,
-      {String acceptLanguage,
-      String platform,
-      emulation.UserAgentMetadata userAgentMetadata}) async {
+      {String? acceptLanguage,
+      String? platform,
+      emulation.UserAgentMetadata? userAgentMetadata}) async {
     await _client.send('Network.setUserAgentOverride', {
       'userAgent': userAgent,
       if (acceptLanguage != null) 'acceptLanguage': acceptLanguage,
@@ -496,7 +495,7 @@ class NetworkApi {
   /// Returns information about the COEP/COOP isolation status.
   /// [frameId] If no frameId is provided, the status of the target is provided.
   Future<SecurityIsolationStatus> getSecurityIsolationStatus(
-      {page.FrameId frameId}) async {
+      {page.FrameId? frameId}) async {
     var result = await _client.send('Network.getSecurityIsolationStatus', {
       if (frameId != null) 'frameId': frameId,
     });
@@ -536,10 +535,10 @@ class DataReceivedEvent {
   final int encodedDataLength;
 
   DataReceivedEvent(
-      {@required this.requestId,
-      @required this.timestamp,
-      @required this.dataLength,
-      @required this.encodedDataLength});
+      {required this.requestId,
+      required this.timestamp,
+      required this.dataLength,
+      required this.encodedDataLength});
 
   factory DataReceivedEvent.fromJson(Map<String, dynamic> json) {
     return DataReceivedEvent(
@@ -568,11 +567,11 @@ class EventSourceMessageReceivedEvent {
   final String data;
 
   EventSourceMessageReceivedEvent(
-      {@required this.requestId,
-      @required this.timestamp,
-      @required this.eventName,
-      @required this.eventId,
-      @required this.data});
+      {required this.requestId,
+      required this.timestamp,
+      required this.eventName,
+      required this.eventId,
+      required this.data});
 
   factory EventSourceMessageReceivedEvent.fromJson(Map<String, dynamic> json) {
     return EventSourceMessageReceivedEvent(
@@ -599,16 +598,16 @@ class LoadingFailedEvent {
   final String errorText;
 
   /// True if loading was canceled.
-  final bool canceled;
+  final bool? canceled;
 
   /// The reason why loading was blocked, if any.
-  final BlockedReason blockedReason;
+  final BlockedReason? blockedReason;
 
   LoadingFailedEvent(
-      {@required this.requestId,
-      @required this.timestamp,
-      @required this.type,
-      @required this.errorText,
+      {required this.requestId,
+      required this.timestamp,
+      required this.type,
+      required this.errorText,
       this.canceled,
       this.blockedReason});
 
@@ -638,12 +637,12 @@ class LoadingFinishedEvent {
 
   /// Set when 1) response was blocked by Cross-Origin Read Blocking and also
   /// 2) this needs to be reported to the DevTools console.
-  final bool shouldReportCorbBlocking;
+  final bool? shouldReportCorbBlocking;
 
   LoadingFinishedEvent(
-      {@required this.requestId,
-      @required this.timestamp,
-      @required this.encodedDataLength,
+      {required this.requestId,
+      required this.timestamp,
+      required this.encodedDataLength,
       this.shouldReportCorbBlocking});
 
   factory LoadingFinishedEvent.fromJson(Map<String, dynamic> json) {
@@ -677,37 +676,37 @@ class RequestInterceptedEvent {
 
   /// Set if the request is a navigation that will result in a download.
   /// Only present after response is received from the server (i.e. HeadersReceived stage).
-  final bool isDownload;
+  final bool? isDownload;
 
   /// Redirect location, only sent if a redirect was intercepted.
-  final String redirectUrl;
+  final String? redirectUrl;
 
   /// Details of the Authorization Challenge encountered. If this is set then
   /// continueInterceptedRequest must contain an authChallengeResponse.
-  final AuthChallenge authChallenge;
+  final AuthChallenge? authChallenge;
 
   /// Response error if intercepted at response stage or if redirect occurred while intercepting
   /// request.
-  final ErrorReason responseErrorReason;
+  final ErrorReason? responseErrorReason;
 
   /// Response code if intercepted at response stage or if redirect occurred while intercepting
   /// request or auth retry occurred.
-  final int responseStatusCode;
+  final int? responseStatusCode;
 
   /// Response headers if intercepted at the response stage or if redirect occurred while
   /// intercepting request or auth retry occurred.
-  final Headers responseHeaders;
+  final Headers? responseHeaders;
 
   /// If the intercepted request had a corresponding requestWillBeSent event fired for it, then
   /// this requestId will be the same as the requestId present in the requestWillBeSent event.
-  final RequestId requestId;
+  final RequestId? requestId;
 
   RequestInterceptedEvent(
-      {@required this.interceptionId,
-      @required this.request,
-      @required this.frameId,
-      @required this.resourceType,
-      @required this.isNavigationRequest,
+      {required this.interceptionId,
+      required this.request,
+      required this.frameId,
+      required this.resourceType,
+      required this.isNavigationRequest,
       this.isDownload,
       this.redirectUrl,
       this.authChallenge,
@@ -771,25 +770,25 @@ class RequestWillBeSentEvent {
   final Initiator initiator;
 
   /// Redirect response data.
-  final ResponseData redirectResponse;
+  final ResponseData? redirectResponse;
 
   /// Type of this resource.
-  final ResourceType type;
+  final ResourceType? type;
 
   /// Frame identifier.
-  final page.FrameId frameId;
+  final page.FrameId? frameId;
 
   /// Whether the request is initiated by a user gesture. Defaults to false.
-  final bool hasUserGesture;
+  final bool? hasUserGesture;
 
   RequestWillBeSentEvent(
-      {@required this.requestId,
-      @required this.loaderId,
-      @required this.documentURL,
-      @required this.request,
-      @required this.timestamp,
-      @required this.wallTime,
-      @required this.initiator,
+      {required this.requestId,
+      required this.loaderId,
+      required this.documentURL,
+      required this.request,
+      required this.timestamp,
+      required this.wallTime,
+      required this.initiator,
       this.redirectResponse,
       this.type,
       this.frameId,
@@ -832,9 +831,9 @@ class ResourceChangedPriorityEvent {
   final MonotonicTime timestamp;
 
   ResourceChangedPriorityEvent(
-      {@required this.requestId,
-      @required this.newPriority,
-      @required this.timestamp});
+      {required this.requestId,
+      required this.newPriority,
+      required this.timestamp});
 
   factory ResourceChangedPriorityEvent.fromJson(Map<String, dynamic> json) {
     return ResourceChangedPriorityEvent(
@@ -852,7 +851,7 @@ class SignedExchangeReceivedEvent {
   /// Information about the signed exchange response.
   final SignedExchangeInfo info;
 
-  SignedExchangeReceivedEvent({@required this.requestId, @required this.info});
+  SignedExchangeReceivedEvent({required this.requestId, required this.info});
 
   factory SignedExchangeReceivedEvent.fromJson(Map<String, dynamic> json) {
     return SignedExchangeReceivedEvent(
@@ -879,14 +878,14 @@ class ResponseReceivedEvent {
   final ResponseData response;
 
   /// Frame identifier.
-  final page.FrameId frameId;
+  final page.FrameId? frameId;
 
   ResponseReceivedEvent(
-      {@required this.requestId,
-      @required this.loaderId,
-      @required this.timestamp,
-      @required this.type,
-      @required this.response,
+      {required this.requestId,
+      required this.loaderId,
+      required this.timestamp,
+      required this.type,
+      required this.response,
       this.frameId});
 
   factory ResponseReceivedEvent.fromJson(Map<String, dynamic> json) {
@@ -910,7 +909,7 @@ class WebSocketClosedEvent {
   /// Timestamp.
   final MonotonicTime timestamp;
 
-  WebSocketClosedEvent({@required this.requestId, @required this.timestamp});
+  WebSocketClosedEvent({required this.requestId, required this.timestamp});
 
   factory WebSocketClosedEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketClosedEvent(
@@ -928,10 +927,10 @@ class WebSocketCreatedEvent {
   final String url;
 
   /// Request initiator.
-  final Initiator initiator;
+  final Initiator? initiator;
 
   WebSocketCreatedEvent(
-      {@required this.requestId, @required this.url, this.initiator});
+      {required this.requestId, required this.url, this.initiator});
 
   factory WebSocketCreatedEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketCreatedEvent(
@@ -955,9 +954,9 @@ class WebSocketFrameErrorEvent {
   final String errorMessage;
 
   WebSocketFrameErrorEvent(
-      {@required this.requestId,
-      @required this.timestamp,
-      @required this.errorMessage});
+      {required this.requestId,
+      required this.timestamp,
+      required this.errorMessage});
 
   factory WebSocketFrameErrorEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketFrameErrorEvent(
@@ -979,9 +978,9 @@ class WebSocketFrameReceivedEvent {
   final WebSocketFrame response;
 
   WebSocketFrameReceivedEvent(
-      {@required this.requestId,
-      @required this.timestamp,
-      @required this.response});
+      {required this.requestId,
+      required this.timestamp,
+      required this.response});
 
   factory WebSocketFrameReceivedEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketFrameReceivedEvent(
@@ -1004,9 +1003,9 @@ class WebSocketFrameSentEvent {
   final WebSocketFrame response;
 
   WebSocketFrameSentEvent(
-      {@required this.requestId,
-      @required this.timestamp,
-      @required this.response});
+      {required this.requestId,
+      required this.timestamp,
+      required this.response});
 
   factory WebSocketFrameSentEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketFrameSentEvent(
@@ -1029,9 +1028,9 @@ class WebSocketHandshakeResponseReceivedEvent {
   final WebSocketResponse response;
 
   WebSocketHandshakeResponseReceivedEvent(
-      {@required this.requestId,
-      @required this.timestamp,
-      @required this.response});
+      {required this.requestId,
+      required this.timestamp,
+      required this.response});
 
   factory WebSocketHandshakeResponseReceivedEvent.fromJson(
       Map<String, dynamic> json) {
@@ -1058,10 +1057,10 @@ class WebSocketWillSendHandshakeRequestEvent {
   final WebSocketRequest request;
 
   WebSocketWillSendHandshakeRequestEvent(
-      {@required this.requestId,
-      @required this.timestamp,
-      @required this.wallTime,
-      @required this.request});
+      {required this.requestId,
+      required this.timestamp,
+      required this.wallTime,
+      required this.request});
 
   factory WebSocketWillSendHandshakeRequestEvent.fromJson(
       Map<String, dynamic> json) {
@@ -1087,9 +1086,9 @@ class RequestWillBeSentExtraInfoEvent {
   final Headers headers;
 
   RequestWillBeSentExtraInfoEvent(
-      {@required this.requestId,
-      @required this.associatedCookies,
-      @required this.headers});
+      {required this.requestId,
+      required this.associatedCookies,
+      required this.headers});
 
   factory RequestWillBeSentExtraInfoEvent.fromJson(Map<String, dynamic> json) {
     return RequestWillBeSentExtraInfoEvent(
@@ -1117,12 +1116,12 @@ class ResponseReceivedExtraInfoEvent {
 
   /// Raw response header text as it was received over the wire. The raw text may not always be
   /// available, such as in the case of HTTP/2 or QUIC.
-  final String headersText;
+  final String? headersText;
 
   ResponseReceivedExtraInfoEvent(
-      {@required this.requestId,
-      @required this.blockedCookies,
-      @required this.headers,
+      {required this.requestId,
+      required this.blockedCookies,
+      required this.headers,
       this.headersText});
 
   factory ResponseReceivedExtraInfoEvent.fromJson(Map<String, dynamic> json) {
@@ -1147,7 +1146,7 @@ class GetResponseBodyResult {
   /// True, if content was sent as base64.
   final bool base64Encoded;
 
-  GetResponseBodyResult({@required this.body, @required this.base64Encoded});
+  GetResponseBodyResult({required this.body, required this.base64Encoded});
 
   factory GetResponseBodyResult.fromJson(Map<String, dynamic> json) {
     return GetResponseBodyResult(
@@ -1165,7 +1164,7 @@ class GetResponseBodyForInterceptionResult {
   final bool base64Encoded;
 
   GetResponseBodyForInterceptionResult(
-      {@required this.body, @required this.base64Encoded});
+      {required this.body, required this.base64Encoded});
 
   factory GetResponseBodyForInterceptionResult.fromJson(
       Map<String, dynamic> json) {
@@ -1217,7 +1216,7 @@ class ResourceType {
 
   const ResourceType._(this.value);
 
-  factory ResourceType.fromJson(String value) => values[value];
+  factory ResourceType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1332,7 +1331,7 @@ class ErrorReason {
 
   const ErrorReason._(this.value);
 
-  factory ErrorReason.fromJson(String value) => values[value];
+  factory ErrorReason.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1437,7 +1436,7 @@ class ConnectionType {
 
   const ConnectionType._(this.value);
 
-  factory ConnectionType.fromJson(String value) => values[value];
+  factory ConnectionType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1468,7 +1467,7 @@ class CookieSameSite {
 
   const CookieSameSite._(this.value);
 
-  factory CookieSameSite.fromJson(String value) => values[value];
+  factory CookieSameSite.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1499,7 +1498,7 @@ class CookiePriority {
 
   const CookiePriority._(this.value);
 
-  factory CookiePriority.fromJson(String value) => values[value];
+  factory CookiePriority.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1572,24 +1571,24 @@ class ResourceTiming {
   final num receiveHeadersEnd;
 
   ResourceTiming(
-      {@required this.requestTime,
-      @required this.proxyStart,
-      @required this.proxyEnd,
-      @required this.dnsStart,
-      @required this.dnsEnd,
-      @required this.connectStart,
-      @required this.connectEnd,
-      @required this.sslStart,
-      @required this.sslEnd,
-      @required this.workerStart,
-      @required this.workerReady,
-      @required this.workerFetchStart,
-      @required this.workerRespondWithSettled,
-      @required this.sendStart,
-      @required this.sendEnd,
-      @required this.pushStart,
-      @required this.pushEnd,
-      @required this.receiveHeadersEnd});
+      {required this.requestTime,
+      required this.proxyStart,
+      required this.proxyEnd,
+      required this.dnsStart,
+      required this.dnsEnd,
+      required this.connectStart,
+      required this.connectEnd,
+      required this.sslStart,
+      required this.sslEnd,
+      required this.workerStart,
+      required this.workerReady,
+      required this.workerFetchStart,
+      required this.workerRespondWithSettled,
+      required this.sendStart,
+      required this.sendEnd,
+      required this.pushStart,
+      required this.pushEnd,
+      required this.receiveHeadersEnd});
 
   factory ResourceTiming.fromJson(Map<String, dynamic> json) {
     return ResourceTiming(
@@ -1657,7 +1656,7 @@ class ResourcePriority {
 
   const ResourcePriority._(this.value);
 
-  factory ResourcePriority.fromJson(String value) => values[value];
+  factory ResourcePriority.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1674,7 +1673,7 @@ class ResourcePriority {
 
 /// Post data entry for HTTP request
 class PostDataEntry {
-  final String bytes;
+  final String? bytes;
 
   PostDataEntry({this.bytes});
 
@@ -1697,7 +1696,7 @@ class RequestData {
   final String url;
 
   /// Fragment of the requested URL starting with hash, if present.
-  final String urlFragment;
+  final String? urlFragment;
 
   /// HTTP request method.
   final String method;
@@ -1706,16 +1705,16 @@ class RequestData {
   final Headers headers;
 
   /// HTTP POST request data.
-  final String postData;
+  final String? postData;
 
   /// True when the request has POST data. Note that postData might still be omitted when this flag is true when the data is too long.
-  final bool hasPostData;
+  final bool? hasPostData;
 
   /// Request body elements. This will be converted from base64 to binary
-  final List<PostDataEntry> postDataEntries;
+  final List<PostDataEntry>? postDataEntries;
 
   /// The mixed content type of the request.
-  final security.MixedContentType mixedContentType;
+  final security.MixedContentType? mixedContentType;
 
   /// Priority of the resource request at the time request is sent.
   final ResourcePriority initialPriority;
@@ -1724,23 +1723,23 @@ class RequestData {
   final RequestReferrerPolicy referrerPolicy;
 
   /// Whether is loaded via link preload.
-  final bool isLinkPreload;
+  final bool? isLinkPreload;
 
   /// Set for requests when the TrustToken API is used. Contains the parameters
   /// passed by the developer (e.g. via "fetch") as understood by the backend.
-  final TrustTokenParams trustTokenParams;
+  final TrustTokenParams? trustTokenParams;
 
   RequestData(
-      {@required this.url,
+      {required this.url,
       this.urlFragment,
-      @required this.method,
-      @required this.headers,
+      required this.method,
+      required this.headers,
       this.postData,
       this.hasPostData,
       this.postDataEntries,
       this.mixedContentType,
-      @required this.initialPriority,
-      @required this.referrerPolicy,
+      required this.initialPriority,
+      required this.referrerPolicy,
       this.isLinkPreload,
       this.trustTokenParams});
 
@@ -1790,12 +1789,12 @@ class RequestData {
       if (postData != null) 'postData': postData,
       if (hasPostData != null) 'hasPostData': hasPostData,
       if (postDataEntries != null)
-        'postDataEntries': postDataEntries.map((e) => e.toJson()).toList(),
+        'postDataEntries': postDataEntries!.map((e) => e.toJson()).toList(),
       if (mixedContentType != null)
-        'mixedContentType': mixedContentType.toJson(),
+        'mixedContentType': mixedContentType!.toJson(),
       if (isLinkPreload != null) 'isLinkPreload': isLinkPreload,
       if (trustTokenParams != null)
-        'trustTokenParams': trustTokenParams.toJson(),
+        'trustTokenParams': trustTokenParams!.toJson(),
     };
   }
 }
@@ -1827,7 +1826,7 @@ class RequestReferrerPolicy {
 
   const RequestReferrerPolicy._(this.value);
 
-  factory RequestReferrerPolicy.fromJson(String value) => values[value];
+  factory RequestReferrerPolicy.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1870,14 +1869,14 @@ class SignedCertificateTimestamp {
   final String signatureData;
 
   SignedCertificateTimestamp(
-      {@required this.status,
-      @required this.origin,
-      @required this.logDescription,
-      @required this.logId,
-      @required this.timestamp,
-      @required this.hashAlgorithm,
-      @required this.signatureAlgorithm,
-      @required this.signatureData});
+      {required this.status,
+      required this.origin,
+      required this.logDescription,
+      required this.logId,
+      required this.timestamp,
+      required this.hashAlgorithm,
+      required this.signatureAlgorithm,
+      required this.signatureData});
 
   factory SignedCertificateTimestamp.fromJson(Map<String, dynamic> json) {
     return SignedCertificateTimestamp(
@@ -1915,13 +1914,13 @@ class SecurityDetails {
   final String keyExchange;
 
   /// (EC)DH group used by the connection, if applicable.
-  final String keyExchangeGroup;
+  final String? keyExchangeGroup;
 
   /// Cipher name.
   final String cipher;
 
   /// TLS MAC. Note that AEAD ciphers do not have separate MACs.
-  final String mac;
+  final String? mac;
 
   /// Certificate ID value.
   final security.CertificateId certificateId;
@@ -1948,19 +1947,19 @@ class SecurityDetails {
   final CertificateTransparencyCompliance certificateTransparencyCompliance;
 
   SecurityDetails(
-      {@required this.protocol,
-      @required this.keyExchange,
+      {required this.protocol,
+      required this.keyExchange,
       this.keyExchangeGroup,
-      @required this.cipher,
+      required this.cipher,
       this.mac,
-      @required this.certificateId,
-      @required this.subjectName,
-      @required this.sanList,
-      @required this.issuer,
-      @required this.validFrom,
-      @required this.validTo,
-      @required this.signedCertificateTimestampList,
-      @required this.certificateTransparencyCompliance});
+      required this.certificateId,
+      required this.subjectName,
+      required this.sanList,
+      required this.issuer,
+      required this.validFrom,
+      required this.validTo,
+      required this.signedCertificateTimestampList,
+      required this.certificateTransparencyCompliance});
 
   factory SecurityDetails.fromJson(Map<String, dynamic> json) {
     return SecurityDetails(
@@ -2027,7 +2026,7 @@ class CertificateTransparencyCompliance {
   const CertificateTransparencyCompliance._(this.value);
 
   factory CertificateTransparencyCompliance.fromJson(String value) =>
-      values[value];
+      values[value]!;
 
   String toJson() => value;
 
@@ -2084,7 +2083,7 @@ class BlockedReason {
 
   const BlockedReason._(this.value);
 
-  factory BlockedReason.fromJson(String value) => values[value];
+  factory BlockedReason.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -2116,7 +2115,7 @@ class ServiceWorkerResponseSource {
 
   const ServiceWorkerResponseSource._(this.value);
 
-  factory ServiceWorkerResponseSource.fromJson(String value) => values[value];
+  factory ServiceWorkerResponseSource.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -2143,10 +2142,10 @@ class TrustTokenParams {
 
   /// Origins of issuers from whom to request tokens or redemption
   /// records.
-  final List<String> issuers;
+  final List<String>? issuers;
 
   TrustTokenParams(
-      {@required this.type, @required this.refreshPolicy, this.issuers});
+      {required this.type, required this.refreshPolicy, this.issuers});
 
   factory TrustTokenParams.fromJson(Map<String, dynamic> json) {
     return TrustTokenParams(
@@ -2163,7 +2162,7 @@ class TrustTokenParams {
     return {
       'type': type.toJson(),
       'refreshPolicy': refreshPolicy,
-      if (issuers != null) 'issuers': [...issuers],
+      if (issuers != null) 'issuers': [...?issuers],
     };
   }
 }
@@ -2180,7 +2179,8 @@ class TrustTokenParamsRefreshPolicy {
 
   const TrustTokenParamsRefreshPolicy._(this.value);
 
-  factory TrustTokenParamsRefreshPolicy.fromJson(String value) => values[value];
+  factory TrustTokenParamsRefreshPolicy.fromJson(String value) =>
+      values[value]!;
 
   String toJson() => value;
 
@@ -2210,7 +2210,7 @@ class TrustTokenOperationType {
 
   const TrustTokenOperationType._(this.value);
 
-  factory TrustTokenOperationType.fromJson(String value) => values[value];
+  factory TrustTokenOperationType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -2241,16 +2241,16 @@ class ResponseData {
   final Headers headers;
 
   /// HTTP response headers text.
-  final String headersText;
+  final String? headersText;
 
   /// Resource mimeType as determined by the browser.
   final String mimeType;
 
   /// Refined HTTP request headers that were actually transmitted over the network.
-  final Headers requestHeaders;
+  final Headers? requestHeaders;
 
   /// HTTP request headers text.
-  final String requestHeadersText;
+  final String? requestHeadersText;
 
   /// Specifies whether physical connection was actually reused for this request.
   final bool connectionReused;
@@ -2259,67 +2259,67 @@ class ResponseData {
   final num connectionId;
 
   /// Remote IP address.
-  final String remoteIPAddress;
+  final String? remoteIPAddress;
 
   /// Remote port.
-  final int remotePort;
+  final int? remotePort;
 
   /// Specifies that the request was served from the disk cache.
-  final bool fromDiskCache;
+  final bool? fromDiskCache;
 
   /// Specifies that the request was served from the ServiceWorker.
-  final bool fromServiceWorker;
+  final bool? fromServiceWorker;
 
   /// Specifies that the request was served from the prefetch cache.
-  final bool fromPrefetchCache;
+  final bool? fromPrefetchCache;
 
   /// Total number of bytes received for this request so far.
   final num encodedDataLength;
 
   /// Timing information for the given request.
-  final ResourceTiming timing;
+  final ResourceTiming? timing;
 
   /// Response source of response from ServiceWorker.
-  final ServiceWorkerResponseSource serviceWorkerResponseSource;
+  final ServiceWorkerResponseSource? serviceWorkerResponseSource;
 
   /// The time at which the returned response was generated.
-  final TimeSinceEpoch responseTime;
+  final TimeSinceEpoch? responseTime;
 
   /// Cache Storage Cache Name.
-  final String cacheStorageCacheName;
+  final String? cacheStorageCacheName;
 
   /// Protocol used to fetch this request.
-  final String protocol;
+  final String? protocol;
 
   /// Security state of the request resource.
   final security.SecurityState securityState;
 
   /// Security details for the request.
-  final SecurityDetails securityDetails;
+  final SecurityDetails? securityDetails;
 
   ResponseData(
-      {@required this.url,
-      @required this.status,
-      @required this.statusText,
-      @required this.headers,
+      {required this.url,
+      required this.status,
+      required this.statusText,
+      required this.headers,
       this.headersText,
-      @required this.mimeType,
+      required this.mimeType,
       this.requestHeaders,
       this.requestHeadersText,
-      @required this.connectionReused,
-      @required this.connectionId,
+      required this.connectionReused,
+      required this.connectionId,
       this.remoteIPAddress,
       this.remotePort,
       this.fromDiskCache,
       this.fromServiceWorker,
       this.fromPrefetchCache,
-      @required this.encodedDataLength,
+      required this.encodedDataLength,
       this.timing,
       this.serviceWorkerResponseSource,
       this.responseTime,
       this.cacheStorageCacheName,
       this.protocol,
-      @required this.securityState,
+      required this.securityState,
       this.securityDetails});
 
   factory ResponseData.fromJson(Map<String, dynamic> json) {
@@ -2392,21 +2392,21 @@ class ResponseData {
       'encodedDataLength': encodedDataLength,
       'securityState': securityState.toJson(),
       if (headersText != null) 'headersText': headersText,
-      if (requestHeaders != null) 'requestHeaders': requestHeaders.toJson(),
+      if (requestHeaders != null) 'requestHeaders': requestHeaders!.toJson(),
       if (requestHeadersText != null) 'requestHeadersText': requestHeadersText,
       if (remoteIPAddress != null) 'remoteIPAddress': remoteIPAddress,
       if (remotePort != null) 'remotePort': remotePort,
       if (fromDiskCache != null) 'fromDiskCache': fromDiskCache,
       if (fromServiceWorker != null) 'fromServiceWorker': fromServiceWorker,
       if (fromPrefetchCache != null) 'fromPrefetchCache': fromPrefetchCache,
-      if (timing != null) 'timing': timing.toJson(),
+      if (timing != null) 'timing': timing!.toJson(),
       if (serviceWorkerResponseSource != null)
-        'serviceWorkerResponseSource': serviceWorkerResponseSource.toJson(),
-      if (responseTime != null) 'responseTime': responseTime.toJson(),
+        'serviceWorkerResponseSource': serviceWorkerResponseSource!.toJson(),
+      if (responseTime != null) 'responseTime': responseTime!.toJson(),
       if (cacheStorageCacheName != null)
         'cacheStorageCacheName': cacheStorageCacheName,
       if (protocol != null) 'protocol': protocol,
-      if (securityDetails != null) 'securityDetails': securityDetails.toJson(),
+      if (securityDetails != null) 'securityDetails': securityDetails!.toJson(),
     };
   }
 }
@@ -2416,7 +2416,7 @@ class WebSocketRequest {
   /// HTTP request headers.
   final Headers headers;
 
-  WebSocketRequest({@required this.headers});
+  WebSocketRequest({required this.headers});
 
   factory WebSocketRequest.fromJson(Map<String, dynamic> json) {
     return WebSocketRequest(
@@ -2443,18 +2443,18 @@ class WebSocketResponse {
   final Headers headers;
 
   /// HTTP response headers text.
-  final String headersText;
+  final String? headersText;
 
   /// HTTP request headers.
-  final Headers requestHeaders;
+  final Headers? requestHeaders;
 
   /// HTTP request headers text.
-  final String requestHeadersText;
+  final String? requestHeadersText;
 
   WebSocketResponse(
-      {@required this.status,
-      @required this.statusText,
-      @required this.headers,
+      {required this.status,
+      required this.statusText,
+      required this.headers,
       this.headersText,
       this.requestHeaders,
       this.requestHeadersText});
@@ -2482,7 +2482,7 @@ class WebSocketResponse {
       'statusText': statusText,
       'headers': headers.toJson(),
       if (headersText != null) 'headersText': headersText,
-      if (requestHeaders != null) 'requestHeaders': requestHeaders.toJson(),
+      if (requestHeaders != null) 'requestHeaders': requestHeaders!.toJson(),
       if (requestHeadersText != null) 'requestHeadersText': requestHeadersText,
     };
   }
@@ -2502,7 +2502,7 @@ class WebSocketFrame {
   final String payloadData;
 
   WebSocketFrame(
-      {@required this.opcode, @required this.mask, @required this.payloadData});
+      {required this.opcode, required this.mask, required this.payloadData});
 
   factory WebSocketFrame.fromJson(Map<String, dynamic> json) {
     return WebSocketFrame(
@@ -2530,16 +2530,16 @@ class CachedResource {
   final ResourceType type;
 
   /// Cached response data.
-  final ResponseData response;
+  final ResponseData? response;
 
   /// Cached response body size.
   final num bodySize;
 
   CachedResource(
-      {@required this.url,
-      @required this.type,
+      {required this.url,
+      required this.type,
       this.response,
-      @required this.bodySize});
+      required this.bodySize});
 
   factory CachedResource.fromJson(Map<String, dynamic> json) {
     return CachedResource(
@@ -2557,7 +2557,7 @@ class CachedResource {
       'url': url,
       'type': type.toJson(),
       'bodySize': bodySize,
-      if (response != null) 'response': response.toJson(),
+      if (response != null) 'response': response!.toJson(),
     };
   }
 }
@@ -2568,21 +2568,21 @@ class Initiator {
   final InitiatorType type;
 
   /// Initiator JavaScript stack trace, set for Script only.
-  final runtime.StackTraceData stack;
+  final runtime.StackTraceData? stack;
 
   /// Initiator URL, set for Parser type or for Script type (when script is importing module) or for SignedExchange type.
-  final String url;
+  final String? url;
 
   /// Initiator line number, set for Parser type or for Script type (when script is importing
   /// module) (0-based).
-  final num lineNumber;
+  final num? lineNumber;
 
   /// Initiator column number, set for Parser type or for Script type (when script is importing
   /// module) (0-based).
-  final num columnNumber;
+  final num? columnNumber;
 
   Initiator(
-      {@required this.type,
+      {required this.type,
       this.stack,
       this.url,
       this.lineNumber,
@@ -2606,7 +2606,7 @@ class Initiator {
   Map<String, dynamic> toJson() {
     return {
       'type': type,
-      if (stack != null) 'stack': stack.toJson(),
+      if (stack != null) 'stack': stack!.toJson(),
       if (url != null) 'url': url,
       if (lineNumber != null) 'lineNumber': lineNumber,
       if (columnNumber != null) 'columnNumber': columnNumber,
@@ -2632,7 +2632,7 @@ class InitiatorType {
 
   const InitiatorType._(this.value);
 
-  factory InitiatorType.fromJson(String value) => values[value];
+  factory InitiatorType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -2677,23 +2677,23 @@ class Cookie {
   final bool session;
 
   /// Cookie SameSite type.
-  final CookieSameSite sameSite;
+  final CookieSameSite? sameSite;
 
   /// Cookie Priority
   final CookiePriority priority;
 
   Cookie(
-      {@required this.name,
-      @required this.value,
-      @required this.domain,
-      @required this.path,
-      @required this.expires,
-      @required this.size,
-      @required this.httpOnly,
-      @required this.secure,
-      @required this.session,
+      {required this.name,
+      required this.value,
+      required this.domain,
+      required this.path,
+      required this.expires,
+      required this.size,
+      required this.httpOnly,
+      required this.secure,
+      required this.session,
       this.sameSite,
-      @required this.priority});
+      required this.priority});
 
   factory Cookie.fromJson(Map<String, dynamic> json) {
     return Cookie(
@@ -2725,7 +2725,7 @@ class Cookie {
       'secure': secure,
       'session': session,
       'priority': priority.toJson(),
-      if (sameSite != null) 'sameSite': sameSite.toJson(),
+      if (sameSite != null) 'sameSite': sameSite!.toJson(),
     };
   }
 }
@@ -2776,7 +2776,7 @@ class SetCookieBlockedReason {
 
   const SetCookieBlockedReason._(this.value);
 
-  factory SetCookieBlockedReason.fromJson(String value) => values[value];
+  factory SetCookieBlockedReason.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -2831,7 +2831,7 @@ class CookieBlockedReason {
 
   const CookieBlockedReason._(this.value);
 
-  factory CookieBlockedReason.fromJson(String value) => values[value];
+  factory CookieBlockedReason.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -2858,10 +2858,10 @@ class BlockedSetCookieWithReason {
   /// The cookie object which represents the cookie which was not stored. It is optional because
   /// sometimes complete cookie information is not available, such as in the case of parsing
   /// errors.
-  final Cookie cookie;
+  final Cookie? cookie;
 
   BlockedSetCookieWithReason(
-      {@required this.blockedReasons, @required this.cookieLine, this.cookie});
+      {required this.blockedReasons, required this.cookieLine, this.cookie});
 
   factory BlockedSetCookieWithReason.fromJson(Map<String, dynamic> json) {
     return BlockedSetCookieWithReason(
@@ -2879,7 +2879,7 @@ class BlockedSetCookieWithReason {
     return {
       'blockedReasons': blockedReasons.map((e) => e.toJson()).toList(),
       'cookieLine': cookieLine,
-      if (cookie != null) 'cookie': cookie.toJson(),
+      if (cookie != null) 'cookie': cookie!.toJson(),
     };
   }
 }
@@ -2892,8 +2892,7 @@ class BlockedCookieWithReason {
   /// The cookie object representing the cookie which was not sent.
   final Cookie cookie;
 
-  BlockedCookieWithReason(
-      {@required this.blockedReasons, @required this.cookie});
+  BlockedCookieWithReason({required this.blockedReasons, required this.cookie});
 
   factory BlockedCookieWithReason.fromJson(Map<String, dynamic> json) {
     return BlockedCookieWithReason(
@@ -2922,32 +2921,32 @@ class CookieParam {
 
   /// The request-URI to associate with the setting of the cookie. This value can affect the
   /// default domain and path values of the created cookie.
-  final String url;
+  final String? url;
 
   /// Cookie domain.
-  final String domain;
+  final String? domain;
 
   /// Cookie path.
-  final String path;
+  final String? path;
 
   /// True if cookie is secure.
-  final bool secure;
+  final bool? secure;
 
   /// True if cookie is http-only.
-  final bool httpOnly;
+  final bool? httpOnly;
 
   /// Cookie SameSite type.
-  final CookieSameSite sameSite;
+  final CookieSameSite? sameSite;
 
   /// Cookie expiration date, session cookie if not set
-  final TimeSinceEpoch expires;
+  final TimeSinceEpoch? expires;
 
   /// Cookie Priority.
-  final CookiePriority priority;
+  final CookiePriority? priority;
 
   CookieParam(
-      {@required this.name,
-      @required this.value,
+      {required this.name,
+      required this.value,
       this.url,
       this.domain,
       this.path,
@@ -2987,9 +2986,9 @@ class CookieParam {
       if (path != null) 'path': path,
       if (secure != null) 'secure': secure,
       if (httpOnly != null) 'httpOnly': httpOnly,
-      if (sameSite != null) 'sameSite': sameSite.toJson(),
-      if (expires != null) 'expires': expires.toJson(),
-      if (priority != null) 'priority': priority.toJson(),
+      if (sameSite != null) 'sameSite': sameSite!.toJson(),
+      if (expires != null) 'expires': expires!.toJson(),
+      if (priority != null) 'priority': priority!.toJson(),
     };
   }
 }
@@ -2997,7 +2996,7 @@ class CookieParam {
 /// Authorization challenge for HTTP status code 401 or 407.
 class AuthChallenge {
   /// Source of the authentication challenge.
-  final AuthChallengeSource source;
+  final AuthChallengeSource? source;
 
   /// Origin of the challenger.
   final String origin;
@@ -3010,9 +3009,9 @@ class AuthChallenge {
 
   AuthChallenge(
       {this.source,
-      @required this.origin,
-      @required this.scheme,
-      @required this.realm});
+      required this.origin,
+      required this.scheme,
+      required this.realm});
 
   factory AuthChallenge.fromJson(Map<String, dynamic> json) {
     return AuthChallenge(
@@ -3047,7 +3046,7 @@ class AuthChallengeSource {
 
   const AuthChallengeSource._(this.value);
 
-  factory AuthChallengeSource.fromJson(String value) => values[value];
+  factory AuthChallengeSource.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -3071,14 +3070,13 @@ class AuthChallengeResponse {
 
   /// The username to provide, possibly empty. Should only be set if response is
   /// ProvideCredentials.
-  final String username;
+  final String? username;
 
   /// The password to provide, possibly empty. Should only be set if response is
   /// ProvideCredentials.
-  final String password;
+  final String? password;
 
-  AuthChallengeResponse(
-      {@required this.response, this.username, this.password});
+  AuthChallengeResponse({required this.response, this.username, this.password});
 
   factory AuthChallengeResponse.fromJson(Map<String, dynamic> json) {
     return AuthChallengeResponse(
@@ -3115,7 +3113,8 @@ class AuthChallengeResponseResponse {
 
   const AuthChallengeResponseResponse._(this.value);
 
-  factory AuthChallengeResponseResponse.fromJson(String value) => values[value];
+  factory AuthChallengeResponseResponse.fromJson(String value) =>
+      values[value]!;
 
   String toJson() => value;
 
@@ -3145,7 +3144,7 @@ class InterceptionStage {
 
   const InterceptionStage._(this.value);
 
-  factory InterceptionStage.fromJson(String value) => values[value];
+  factory InterceptionStage.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -3164,13 +3163,13 @@ class InterceptionStage {
 class RequestPattern {
   /// Wildcards ('*' -> zero or more, '?' -> exactly one) are allowed. Escape character is
   /// backslash. Omitting is equivalent to "*".
-  final String urlPattern;
+  final String? urlPattern;
 
   /// If set, only requests for matching resource types will be intercepted.
-  final ResourceType resourceType;
+  final ResourceType? resourceType;
 
   /// Stage at wich to begin intercepting requests. Default is Request.
-  final InterceptionStage interceptionStage;
+  final InterceptionStage? interceptionStage;
 
   RequestPattern({this.urlPattern, this.resourceType, this.interceptionStage});
 
@@ -3190,9 +3189,9 @@ class RequestPattern {
   Map<String, dynamic> toJson() {
     return {
       if (urlPattern != null) 'urlPattern': urlPattern,
-      if (resourceType != null) 'resourceType': resourceType.toJson(),
+      if (resourceType != null) 'resourceType': resourceType!.toJson(),
       if (interceptionStage != null)
-        'interceptionStage': interceptionStage.toJson(),
+        'interceptionStage': interceptionStage!.toJson(),
     };
   }
 }
@@ -3210,10 +3209,10 @@ class SignedExchangeSignature {
   final String integrity;
 
   /// Signed exchange signature cert Url.
-  final String certUrl;
+  final String? certUrl;
 
   /// The hex string of signed exchange signature cert sha256.
-  final String certSha256;
+  final String? certSha256;
 
   /// Signed exchange signature validity Url.
   final String validityUrl;
@@ -3225,17 +3224,17 @@ class SignedExchangeSignature {
   final int expires;
 
   /// The encoded certificates.
-  final List<String> certificates;
+  final List<String>? certificates;
 
   SignedExchangeSignature(
-      {@required this.label,
-      @required this.signature,
-      @required this.integrity,
+      {required this.label,
+      required this.signature,
+      required this.integrity,
       this.certUrl,
       this.certSha256,
-      @required this.validityUrl,
-      @required this.date,
-      @required this.expires,
+      required this.validityUrl,
+      required this.date,
+      required this.expires,
       this.certificates});
 
   factory SignedExchangeSignature.fromJson(Map<String, dynamic> json) {
@@ -3265,7 +3264,7 @@ class SignedExchangeSignature {
       'expires': expires,
       if (certUrl != null) 'certUrl': certUrl,
       if (certSha256 != null) 'certSha256': certSha256,
-      if (certificates != null) 'certificates': [...certificates],
+      if (certificates != null) 'certificates': [...?certificates],
     };
   }
 }
@@ -3289,11 +3288,11 @@ class SignedExchangeHeader {
   final String headerIntegrity;
 
   SignedExchangeHeader(
-      {@required this.requestUrl,
-      @required this.responseCode,
-      @required this.responseHeaders,
-      @required this.signatures,
-      @required this.headerIntegrity});
+      {required this.requestUrl,
+      required this.responseCode,
+      required this.responseHeaders,
+      required this.signatures,
+      required this.headerIntegrity});
 
   factory SignedExchangeHeader.fromJson(Map<String, dynamic> json) {
     return SignedExchangeHeader(
@@ -3346,7 +3345,7 @@ class SignedExchangeErrorField {
 
   const SignedExchangeErrorField._(this.value);
 
-  factory SignedExchangeErrorField.fromJson(String value) => values[value];
+  factory SignedExchangeErrorField.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -3368,13 +3367,13 @@ class SignedExchangeError {
   final String message;
 
   /// The index of the signature which caused the error.
-  final int signatureIndex;
+  final int? signatureIndex;
 
   /// The field which caused the error.
-  final SignedExchangeErrorField errorField;
+  final SignedExchangeErrorField? errorField;
 
   SignedExchangeError(
-      {@required this.message, this.signatureIndex, this.errorField});
+      {required this.message, this.signatureIndex, this.errorField});
 
   factory SignedExchangeError.fromJson(Map<String, dynamic> json) {
     return SignedExchangeError(
@@ -3392,7 +3391,7 @@ class SignedExchangeError {
     return {
       'message': message,
       if (signatureIndex != null) 'signatureIndex': signatureIndex,
-      if (errorField != null) 'errorField': errorField.toJson(),
+      if (errorField != null) 'errorField': errorField!.toJson(),
     };
   }
 }
@@ -3403,16 +3402,16 @@ class SignedExchangeInfo {
   final ResponseData outerResponse;
 
   /// Information about the signed exchange header.
-  final SignedExchangeHeader header;
+  final SignedExchangeHeader? header;
 
   /// Security details for the signed exchange header.
-  final SecurityDetails securityDetails;
+  final SecurityDetails? securityDetails;
 
   /// Errors occurred while handling the signed exchagne.
-  final List<SignedExchangeError> errors;
+  final List<SignedExchangeError>? errors;
 
   SignedExchangeInfo(
-      {@required this.outerResponse,
+      {required this.outerResponse,
       this.header,
       this.securityDetails,
       this.errors});
@@ -3441,9 +3440,9 @@ class SignedExchangeInfo {
   Map<String, dynamic> toJson() {
     return {
       'outerResponse': outerResponse.toJson(),
-      if (header != null) 'header': header.toJson(),
-      if (securityDetails != null) 'securityDetails': securityDetails.toJson(),
-      if (errors != null) 'errors': errors.map((e) => e.toJson()).toList(),
+      if (header != null) 'header': header!.toJson(),
+      if (securityDetails != null) 'securityDetails': securityDetails!.toJson(),
+      if (errors != null) 'errors': errors!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -3466,7 +3465,7 @@ class CrossOriginOpenerPolicyValue {
 
   const CrossOriginOpenerPolicyValue._(this.value);
 
-  factory CrossOriginOpenerPolicyValue.fromJson(String value) => values[value];
+  factory CrossOriginOpenerPolicyValue.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -3487,13 +3486,13 @@ class CrossOriginOpenerPolicyStatus {
 
   final CrossOriginOpenerPolicyValue reportOnlyValue;
 
-  final String reportingEndpoint;
+  final String? reportingEndpoint;
 
-  final String reportOnlyReportingEndpoint;
+  final String? reportOnlyReportingEndpoint;
 
   CrossOriginOpenerPolicyStatus(
-      {@required this.value,
-      @required this.reportOnlyValue,
+      {required this.value,
+      required this.reportOnlyValue,
       this.reportingEndpoint,
       this.reportOnlyReportingEndpoint});
 
@@ -3536,7 +3535,7 @@ class CrossOriginEmbedderPolicyValue {
   const CrossOriginEmbedderPolicyValue._(this.value);
 
   factory CrossOriginEmbedderPolicyValue.fromJson(String value) =>
-      values[value];
+      values[value]!;
 
   String toJson() => value;
 
@@ -3557,13 +3556,13 @@ class CrossOriginEmbedderPolicyStatus {
 
   final CrossOriginEmbedderPolicyValue reportOnlyValue;
 
-  final String reportingEndpoint;
+  final String? reportingEndpoint;
 
-  final String reportOnlyReportingEndpoint;
+  final String? reportOnlyReportingEndpoint;
 
   CrossOriginEmbedderPolicyStatus(
-      {@required this.value,
-      @required this.reportOnlyValue,
+      {required this.value,
+      required this.reportOnlyValue,
       this.reportingEndpoint,
       this.reportOnlyReportingEndpoint});
 
@@ -3598,7 +3597,7 @@ class SecurityIsolationStatus {
 
   final CrossOriginEmbedderPolicyStatus coep;
 
-  SecurityIsolationStatus({@required this.coop, @required this.coep});
+  SecurityIsolationStatus({required this.coop, required this.coep});
 
   factory SecurityIsolationStatus.fromJson(Map<String, dynamic> json) {
     return SecurityIsolationStatus(
@@ -3622,20 +3621,20 @@ class LoadNetworkResourcePageResult {
   final bool success;
 
   /// Optional values used for error reporting.
-  final num netError;
+  final num? netError;
 
-  final String netErrorName;
+  final String? netErrorName;
 
-  final num httpStatusCode;
+  final num? httpStatusCode;
 
   /// If successful, one of the following two fields holds the result.
-  final io.StreamHandle stream;
+  final io.StreamHandle? stream;
 
   /// Response headers.
-  final network.Headers headers;
+  final network.Headers? headers;
 
   LoadNetworkResourcePageResult(
-      {@required this.success,
+      {required this.success,
       this.netError,
       this.netErrorName,
       this.httpStatusCode,
@@ -3667,8 +3666,8 @@ class LoadNetworkResourcePageResult {
       if (netError != null) 'netError': netError,
       if (netErrorName != null) 'netErrorName': netErrorName,
       if (httpStatusCode != null) 'httpStatusCode': httpStatusCode,
-      if (stream != null) 'stream': stream.toJson(),
-      if (headers != null) 'headers': headers.toJson(),
+      if (stream != null) 'stream': stream!.toJson(),
+      if (headers != null) 'headers': headers!.toJson(),
     };
   }
 }
@@ -3681,7 +3680,7 @@ class LoadNetworkResourceOptions {
   final bool includeCredentials;
 
   LoadNetworkResourceOptions(
-      {@required this.disableCache, @required this.includeCredentials});
+      {required this.disableCache, required this.includeCredentials});
 
   factory LoadNetworkResourceOptions.fromJson(Map<String, dynamic> json) {
     return LoadNetworkResourceOptions(

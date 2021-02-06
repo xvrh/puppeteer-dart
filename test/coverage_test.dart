@@ -7,10 +7,10 @@ import 'utils/utils.dart';
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 void main() {
-  Server server;
-  Browser browser;
-  BrowserContext context;
-  Page page;
+  late Server server;
+  late Browser browser;
+  late BrowserContext context;
+  late Page page;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
@@ -19,7 +19,6 @@ void main() {
   tearDownAll(() async {
     await server.close();
     await browser.close();
-    browser = null;
   });
 
   setUp(() async {
@@ -30,7 +29,6 @@ void main() {
   tearDown(() async {
     server.clearRoutes();
     await context.close();
-    page = null;
   });
 
   group('JSCoverage', () {

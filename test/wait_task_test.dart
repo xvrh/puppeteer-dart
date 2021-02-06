@@ -6,10 +6,10 @@ import 'utils/utils.dart';
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 void main() {
-  Server server;
-  Browser browser;
-  BrowserContext context;
-  Page page;
+  late Server server;
+  late Browser browser;
+  late BrowserContext context;
+  late Page page;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
@@ -18,7 +18,6 @@ void main() {
   tearDownAll(() async {
     await server.close();
     await browser.close();
-    browser = null;
   });
 
   setUp(() async {
@@ -29,7 +28,6 @@ void main() {
   tearDown(() async {
     server.clearRoutes();
     await context.close();
-    page = null;
   });
 
   group('Page.waitFor', () {
@@ -203,7 +201,7 @@ void main() {
       await frame.evaluate(addElement, args: ['br']);
       await frame.evaluate(addElement, args: ['div']);
       var eHandle = await watchdog;
-      var tagName = await eHandle.property('tagName').then((e) => e.jsonValue);
+      var tagName = await eHandle!.property('tagName').then((e) => e.jsonValue);
       expect(tagName, equals('DIV'));
     });
 
@@ -224,7 +222,7 @@ void main() {
       await otherFrame.evaluate(addElement, args: ['div']);
       await page.evaluate(addElement, args: ['div']);
       var eHandle = await watchdog;
-      expect(eHandle.executionContext.frame, equals(page.mainFrame));
+      expect(eHandle!.executionContext.frame, equals(page.mainFrame));
     });
 
     test('should run in specified frame', () async {
@@ -236,14 +234,17 @@ void main() {
       await frame1.evaluate(addElement, args: ['div']);
       await frame2.evaluate(addElement, args: ['div']);
       var eHandle = await waitForSelectorPromise;
-      expect(eHandle.executionContext.frame, equals(frame2));
+      expect(eHandle!.executionContext.frame, equals(frame2));
     });
 
     test('should throw when frame is detached', () async {
       await attachFrame(page, 'frame1', server.emptyPage);
       var frame = page.frames[1];
       dynamic waitError;
-      var waitPromise = frame.waitForSelector('.box').catchError((e) {
+      var waitPromise = frame
+          .waitForSelector('.box')
+          .then<ElementHandle?>((e) => e)
+          .catchError((e) {
         waitError = e;
         return null;
       });
@@ -397,7 +398,7 @@ void main() {
       await frame1.evaluate(addElement, args: ['div']);
       await frame2.evaluate(addElement, args: ['div']);
       var eHandle = await waitForXPathPromise;
-      expect(eHandle.executionContext.frame, equals(frame2));
+      expect(eHandle!.executionContext.frame, equals(frame2));
     });
     test('should throw when frame is detached', () async {
       await attachFrame(page, 'frame1', server.emptyPage);
@@ -436,7 +437,7 @@ void main() {
     test('should allow you to select a text node', () async {
       await page.setContent('<div>some text</div>');
       var text = await page.waitForXPath('//div/text()');
-      expect(await (await text.property('nodeType')).jsonValue, equals(3));
+      expect(await (await text!.property('nodeType')).jsonValue, equals(3));
     });
     test('should allow you to select an element with single slash', () async {
       await page.setContent('<div>some text</div>');

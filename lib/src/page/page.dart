@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:logging/logging.dart';
-import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import '../../protocol/dev_tools.dart';
 import '../../protocol/dom.dart';
@@ -37,6 +36,8 @@ import 'tracing.dart';
 import 'worker.dart';
 
 final _logger = Logger('puppeteer.page');
+
+const globalDefaultTimeout = Duration(seconds: 30);
 
 /// Page provides methods to interact with a single tab or extension background
 /// page in Chromium. One Browser instance might have multiple Page instances.
@@ -83,7 +84,7 @@ class Page {
   final Coverage coverage;
   final Tracing tracing;
   final Accessibility accessibility;
-  FrameManager _frameManager;
+  late final FrameManager _frameManager = FrameManager(this);
   final _workerCreated = StreamController<Worker>.broadcast(),
       _workerDestroyed = StreamController<Worker>.broadcast(),
       _onErrorController = StreamController<ClientError>.broadcast(),
@@ -103,7 +104,7 @@ class Page {
   /// - [Page.waitForNavigation]
   ///
   /// > **NOTE** [page.defaultNavigationTimeout] takes priority over [page.defaultTimeout]
-  Duration defaultNavigationTimeout;
+  Duration? defaultNavigationTimeout;
 
   /// Maximum time in milliseconds
   ///
@@ -122,12 +123,13 @@ class Page {
   /// - [Page.waitForXPath]
   ///
   /// > **NOTE** [`page.defaultNavigationTimeout`] takes priority over [`page.defaultTimeout`]
-  Duration defaultTimeout = Duration(seconds: 30);
-  DeviceViewport _viewport;
+  Duration? defaultTimeout = globalDefaultTimeout;
+  DeviceViewport? _viewport;
   final EmulationManager _emulationManager;
-  Mouse _mouse;
-  Touchscreen _touchscreen;
-  Keyboard _keyboard;
+  late final Mouse _mouse = Mouse(devTools.input, _keyboard);
+  late final Touchscreen _touchscreen =
+      Touchscreen(devTools.runtime, devTools.input, _keyboard);
+  late final Keyboard _keyboard = Keyboard(devTools.input);
   final _fileChooserInterceptors = <Completer<FileChooser>>{};
 
   Page._(this.target, this.devTools)
@@ -135,11 +137,6 @@ class Page {
         accessibility = Accessibility(devTools),
         coverage = Coverage(devTools),
         tracing = Tracing(devTools) {
-    _frameManager = FrameManager(this);
-    _keyboard = Keyboard(devTools.input);
-    _mouse = Mouse(devTools.input, _keyboard);
-    _touchscreen = Touchscreen(devTools.runtime, devTools.input, _keyboard);
-
     devTools.target.onAttachedToTarget.listen((e) {
       if (e.targetInfo.type != 'worker') {
         // If we don't detach from service workers, they will never die.
@@ -149,8 +146,7 @@ class Page {
           _logger.fine('[devTools.target.detachFromTarget] swallow error', e);
         });
       } else {
-        var session = target.browser.connection.sessions[e.sessionId.value];
-        assert(session != null);
+        var session = target.browser.connection.sessions[e.sessionId.value]!;
         var worker = Worker(session, e.targetInfo.url,
             onConsoleApiCalled: _addConsoleMessage,
             onExceptionThrown: _handleException);
@@ -182,7 +178,7 @@ class Page {
   }
 
   static Future<Page> create(Target target, Session session,
-      {DeviceViewport viewport}) async {
+      {DeviceViewport? viewport}) async {
     var devTools = DevTools(session);
     var page = Page._(target, devTools);
 
@@ -212,7 +208,7 @@ class Page {
     if (_fileChooserInterceptors.isEmpty) {
       return;
     }
-    var frame = _frameManager.frame(event.frameId);
+    var frame = _frameManager.frame(event.frameId)!;
     var context = await frame.executionContext;
     var element = await context.adoptBackendNodeId(event.backendNodeId);
 
@@ -246,12 +242,12 @@ class Page {
   ///    seconds, pass `0` to disable the timeout. The default value can be
   ///    changed by using the [page.defaultTimeout] property.
   ///  - returns: [Future<FileChooser>] A promise that resolves after a page requests a file picker.
-  Future<FileChooser> waitForFileChooser({Duration timeout}) async {
+  Future<FileChooser> waitForFileChooser({Duration? timeout}) async {
     if (_fileChooserInterceptors.isEmpty) {
       await devTools.page.setInterceptFileChooserDialog(true);
     }
 
-    timeout ??= defaultTimeout;
+    timeout ??= defaultTimeout ?? globalDefaultTimeout;
     var callback = Completer<FileChooser>();
     _fileChooserInterceptors.add(callback);
 
@@ -282,7 +278,7 @@ class Page {
 
   NetworkManager get _networkManager => _frameManager.networkManager;
 
-  Duration get navigationTimeoutOrDefault =>
+  Duration? get navigationTimeoutOrDefault =>
       defaultNavigationTimeout ?? defaultTimeout;
 
   Stream<Worker> get onWorkerCreated => _workerCreated.stream;
@@ -384,7 +380,9 @@ class Page {
   /// The page's main frame.
   ///
   /// Page is guaranteed to have a main frame which persists during navigations.
-  Frame get mainFrame => _frameManager.mainFrame;
+  Frame get mainFrame => _frameManager.mainFrame!;
+
+  bool get hasMainFrame => _frameManager.mainFrame != null;
 
   Keyboard get keyboard => _keyboard;
 
@@ -431,7 +429,7 @@ class Page {
   }
 
   void _addConsoleMessage(ConsoleAPICalledEventType type, List<JsHandle> args,
-      StackTraceData stackTrace) {
+      StackTraceData? stackTrace) {
     if (!_onConsoleController.hasListener) {
       args.forEach((arg) => arg.dispose());
       return;
@@ -446,8 +444,8 @@ class Page {
       }
     }
 
-    String url;
-    int lineNumber, columnNumber;
+    String? url;
+    int? lineNumber, columnNumber;
     if (stackTrace != null && stackTrace.callFrames.isNotEmpty) {
       url = stackTrace.callFrames[0].url;
       lineNumber = stackTrace.callFrames[0].lineNumber;
@@ -460,8 +458,8 @@ class Page {
   }
 
   void _onLogEntryAdded(LogEntry event) {
-    if (event.args != null && event.args.isNotEmpty) {
-      event.args.map((arg) => releaseObject(devTools.runtime, arg));
+    if (event.args != null && event.args!.isNotEmpty) {
+      event.args!.map((arg) => releaseObject(devTools.runtime, arg));
     }
     if (event.source != LogEntrySource.worker) {
       _onConsoleController.add(ConsoleMessage(
@@ -510,13 +508,22 @@ class Page {
     return _frameManager.networkManager.setOfflineMode(enabled);
   }
 
-  /// The method runs `document.querySelector` within the page. If no element matches the selector, the return value resolves to `null`.
+  /// The method runs `document.querySelector` within the page. If no element matches the selector, it throws an exception.
   ///
   /// Shortcut for [Page.mainFrame.$(selector)].
   ///
   /// A [selector] to query page for
   Future<ElementHandle> $(String selector) {
     return mainFrame.$(selector);
+  }
+
+  /// The method runs `document.querySelector` within the page. If no element matches the selector, the return value resolves to `null`.
+  ///
+  /// Shortcut for [Page.mainFrame.$(selector)].
+  ///
+  /// A [selector] to query page for
+  Future<ElementHandle?> $OrNull(String selector) {
+    return mainFrame.$OrNull(selector);
   }
 
   /// The only difference between [Page.evaluate] and [Page.evaluateHandle] is
@@ -551,7 +558,7 @@ class Page {
   /// in-page object (JSHandle)
   Future<T> evaluateHandle<T extends JsHandle>(
       @Language('js') String pageFunction,
-      {List args}) async {
+      {List? args}) async {
     var context = await mainFrame.executionContext;
     return context.evaluateHandle(pageFunction, args: args);
   }
@@ -602,8 +609,8 @@ class Page {
   /// ```
   ///
   /// Shortcut for [Page.mainFrame.$eval(selector, pageFunction)].
-  Future<T> $eval<T>(String selector, @Language('js') String pageFunction,
-      {List args}) {
+  Future<T?> $eval<T>(String selector, @Language('js') String pageFunction,
+      {List? args}) {
     return mainFrame.$eval<T>(selector, pageFunction, args: args);
   }
 
@@ -623,8 +630,8 @@ class Page {
   /// [pageFunction] Function to be evaluated in browser context
   /// [args] Arguments to pass to `pageFunction`
   /// Returns a [Future] which resolves to the return value of `pageFunction`
-  Future<T> $$eval<T>(String selector, @Language('js') String pageFunction,
-      {List args}) {
+  Future<T?> $$eval<T>(String selector, @Language('js') String pageFunction,
+      {List? args}) {
     return mainFrame.$$eval<T>(selector, pageFunction, args: args);
   }
 
@@ -648,12 +655,12 @@ class Page {
 
   /// If no URLs are specified, this method returns cookies for the current page URL.
   /// If URLs are specified, only cookies for those URLs are returned.
-  Future<List<Cookie>> cookies({List<String> urls}) {
+  Future<List<Cookie>> cookies({List<String>? urls}) {
     return devTools.network.getCookies(urls: urls);
   }
 
-  Future<void> deleteCookie(String name, {String domain, String path}) async {
-    var pageUrl = url;
+  Future<void> deleteCookie(String name, {String? domain, String? path}) async {
+    var pageUrl = url!;
     await devTools.network.deleteCookies(name,
         url: pageUrl.startsWith('http') ? pageUrl : null,
         domain: domain,
@@ -661,10 +668,10 @@ class Page {
   }
 
   Future<void> setCookies(List<CookieParam> cookies) async {
-    var pageURL = url;
+    var pageURL = url!;
     var startsWithHTTP = pageURL.startsWith('http');
     var items = cookies.map((cookie) {
-      String cookieUrl;
+      String? cookieUrl;
       if (cookie.url == null && startsWithHTTP) {
         cookieUrl = pageURL;
       }
@@ -702,7 +709,7 @@ class Page {
   /// > **NOTE** Consider using [BrowserContext.overridePermissions] to grant
   /// permissions for the page to read its geolocation.
   Future<void> setGeolocation(
-      {num latitude, num longitude, num accuracy}) async {
+      {required num latitude, required num longitude, num? accuracy}) async {
     accuracy ??= 0;
     assert(longitude >= -180 && longitude <= 180,
         'Invalid longitude "$longitude": precondition -180 <= LONGITUDE <= 180 failed.');
@@ -729,7 +736,7 @@ class Page {
   /// Returns a [Future<ElementHandle>] which resolves to the added tag when the
   /// script's onload fires or when the script content was injected into frame.
   Future<ElementHandle> addScriptTag(
-      {String url, File file, String content, String type}) {
+      {String? url, File? file, String? content, String? type}) {
     return mainFrame.addScriptTag(
         url: url, file: file, content: content, type: type);
   }
@@ -746,7 +753,8 @@ class Page {
   ///
   /// Returns a [Future<ElementHandle>] which resolves to the added tag when the
   /// stylesheet's onload fires or when the CSS content was injected into frame.
-  Future<ElementHandle> addStyleTag({String url, File file, String content}) {
+  Future<ElementHandle> addStyleTag(
+      {String? url, File? file, String? content}) {
     return mainFrame.addStyleTag(url: url, file: file, content: content);
   }
 
@@ -843,7 +851,7 @@ function addPageBinding(bindingName) {
   /// Provide credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
   ///
   /// To disable authentication, pass `null`.
-  Future<void> authenticate({String username, String password}) {
+  Future<void> authenticate({String? username, String? password}) {
     return _frameManager.networkManager.authenticate(
         username == null ? null : Credentials(username, password));
   }
@@ -893,24 +901,26 @@ function addPageBinding(bindingName) {
 
   Future _onBindingCalled(BindingCalledEvent event) async {
     var payload = jsonDecode(event.payload) as Map<String, dynamic>;
-    var name = payload['name'] as String;
-    var seq = payload['seq'] as int;
-    var args = payload['args'] as List;
+    var name = payload['name'] as String?;
+    var seq = payload['seq'] as int?;
+    var args = payload['args'] as List?;
 
     String expression;
     try {
-      var callback = _pageBindings[name];
+      var callback = _pageBindings[name!]!;
       var result = await Function.apply(callback, args);
       expression = evaluationString(_deliverResult, [name, seq, result]);
     } catch (error, stackTrace) {
       expression = evaluationString(
           _deliverError, [name, seq, error.toString(), stackTrace.toString()]);
     }
-    await devTools.runtime
-        .evaluate(expression, contextId: event.executionContextId)
-        // It is possible to have a data race, so we don't care if we don't
-        // receive the response here.
-        .catchError((_) => null, test: (e) => e is TargetClosedException);
+    try {
+      await devTools.runtime
+          .evaluate(expression, contextId: event.executionContextId);
+    } on TargetClosedException catch (_) {
+      // It is possible to have a data race, so we don't care if we don't
+      // receive the response here.
+    }
   }
 
   static final _deliverResult = '''
@@ -930,13 +940,13 @@ function deliverError(name, seq, message, stack) {
 ''';
 
   /// This is a shortcut for [page.mainFrame.url]
-  String get url {
+  String? get url {
     return mainFrame.url;
   }
 
   /// Gets the full HTML contents of the page, including the doctype.
-  Future<String> get content {
-    return _frameManager.mainFrame.content;
+  Future<String?> get content {
+    return mainFrame.content;
   }
 
   /// Parameters:
@@ -955,9 +965,8 @@ function deliverError(name, seq, message, stack) {
   ///     are no more than 0 network connections for at least `500` ms.
   ///   - [Until.networkAlmostIdle] - consider navigation to be finished when
   ///     there are no more than 2 network connections for at least `500` ms.
-  Future<void> setContent(String html, {Duration timeout, Until wait}) {
-    return _frameManager.mainFrame
-        .setContent(html, timeout: timeout, wait: wait);
+  Future<void> setContent(String html, {Duration? timeout, Until? wait}) {
+    return mainFrame.setContent(html, timeout: timeout, wait: wait);
   }
 
   /// The [Page.goto] will throw an error if:
@@ -1003,9 +1012,9 @@ function deliverError(name, seq, message, stack) {
   /// of multiple redirects, the navigation will resolve with the response of
   /// the last redirect.
   Future<Response> goto(String url,
-      {String referrer, Duration timeout, Until wait}) {
-    return _frameManager.mainFrame
-        .goto(url, referrer: referrer, timeout: timeout, wait: wait);
+      {String? referrer, Duration? timeout, Until? wait}) {
+    return mainFrame.goto(url,
+        referrer: referrer, timeout: timeout, wait: wait);
   }
 
   /// Parameters:
@@ -1030,7 +1039,7 @@ function deliverError(name, seq, message, stack) {
   /// Returns: [Future] which resolves to the main resource response. In case
   /// of multiple redirects, the navigation will resolve with the response of
   /// the last redirect.
-  Future<Response> reload({Duration timeout, Until wait}) async {
+  Future<Response> reload({Duration? timeout, Until? wait}) async {
     var responseFuture = waitForNavigation(timeout: timeout, wait: wait);
 
     await devTools.page.reload();
@@ -1077,9 +1086,8 @@ function deliverError(name, seq, message, stack) {
   /// the last redirect.
   /// In case of navigation to a different anchor or navigation due to History
   /// API usage, the navigation will resolve with `null`.
-  Future<Response> waitForNavigation({Duration timeout, Until wait}) {
-    return _frameManager.mainFrame
-        .waitForNavigation(timeout: timeout, wait: wait);
+  Future<Response> waitForNavigation({Duration? timeout, Until? wait}) {
+    return mainFrame.waitForNavigation(timeout: timeout, wait: wait);
   }
 
   /// Example:
@@ -1098,8 +1106,8 @@ function deliverError(name, seq, message, stack) {
   /// await page.goto('https://example.com');
   /// await Future.wait([firstRequest, finalRequest]);
   /// ```
-  Future<Request> waitForRequest(String url, {Duration timeout}) async {
-    timeout ??= defaultTimeout;
+  Future<Request> waitForRequest(String url, {Duration? timeout}) async {
+    timeout ??= defaultTimeout ?? globalDefaultTimeout;
 
     return onRequest
         .where((request) =>
@@ -1108,8 +1116,8 @@ function deliverError(name, seq, message, stack) {
         .timeout(timeout);
   }
 
-  Future<Response> waitForResponse(String url, {Duration timeout}) {
-    timeout ??= defaultTimeout;
+  Future<Response> waitForResponse(String url, {Duration? timeout}) {
+    timeout ??= defaultTimeout ?? globalDefaultTimeout;
 
     return frameManager.networkManager.onResponse
         .where((response) =>
@@ -1140,7 +1148,7 @@ function deliverError(name, seq, message, stack) {
   /// Returns: [Future<Response>] which resolves to the main resource
   /// response. In case of multiple redirects, the navigation will resolve with
   /// the response of the last redirect. If can not go back, resolves to `null`.
-  Future<Response> goBack({Duration timeout, Until wait}) {
+  Future<Response?> goBack({Duration? timeout, Until? wait}) {
     return _go(-1, timeout: timeout, wait: wait);
   }
 
@@ -1166,11 +1174,11 @@ function deliverError(name, seq, message, stack) {
   /// Returns: [Future<Response>] which resolves to the main resource
   /// response. In case of multiple redirects, the navigation will resolve with
   /// the response of the last redirect. If can not go back, resolves to `null`.
-  Future<Response> goForward({Duration timeout, Until wait}) {
+  Future<Response?> goForward({Duration? timeout, Until? wait}) {
     return _go(1, timeout: timeout, wait: wait);
   }
 
-  Future<Response> _go(int delta, {Duration timeout, Until wait}) async {
+  Future<Response?> _go(int delta, {Duration? timeout, Until? wait}) async {
     var history = await devTools.page.getNavigationHistory();
     var index = history.currentIndex + delta;
     if (index < 0 || index >= history.entries.length) {
@@ -1242,7 +1250,7 @@ function deliverError(name, seq, message, stack) {
   }
 
   @Deprecated('Use emulateMediaType(mediaType)')
-  Future<void> emulateMedia(String mediaType) {
+  Future<void> emulateMedia(String? mediaType) {
     assert(mediaType == 'screen' || mediaType == 'print' || mediaType == null,
         'Unsupported media type: $mediaType');
     mediaType ??= '';
@@ -1264,14 +1272,14 @@ function deliverError(name, seq, message, stack) {
   /// expect(await page.evaluate("() => matchMedia('screen').matches"), isTrue);
   /// expect(await page.evaluate("() => matchMedia('print').matches"), isFalse);
   /// ```
-  Future<void> emulateMediaType(MediaType mediaType) {
+  Future<void> emulateMediaType(MediaType? mediaType) {
     var mediaTypeName = mediaType?.name ?? '';
     return devTools.emulation.setEmulatedMedia(media: mediaTypeName);
   }
 
   /// Given an array of media feature objects, emulates CSS media features on
   /// the page.
-  Future<void> emulateMediaFeatures(List<MediaFeature> features) async {
+  Future<void> emulateMediaFeatures(List<MediaFeature>? features) async {
     if (features == null || features.isEmpty) {
       // We cannot use the generated client because sending null or omiting the
       // value has different signification
@@ -1309,7 +1317,7 @@ function deliverError(name, seq, message, stack) {
     }
   }
 
-  DeviceViewport get viewport => _viewport;
+  DeviceViewport? get viewport => _viewport;
 
   /// If the function passed to the [Page.evaluate] returns a [Promise], then
   /// [Page.evaluate] would wait for the promise to resolve and return its value.
@@ -1349,8 +1357,8 @@ function deliverError(name, seq, message, stack) {
   /// - [pageFunction] Function to be evaluated in the page context
   /// - [args] Arguments to pass to `pageFunction`
   /// - Returns: Future which resolves to the return value of `pageFunction`
-  Future<T> evaluate<T>(@Language('js') String pageFunction, {List args}) {
-    return _frameManager.mainFrame.evaluate<T>(pageFunction, args: args);
+  Future<T> evaluate<T>(@Language('js') String pageFunction, {List? args}) {
+    return mainFrame.evaluate<T>(pageFunction, args: args);
   }
 
   /// Adds a function which would be invoked in one of the following scenarios:
@@ -1384,7 +1392,7 @@ function deliverError(name, seq, message, stack) {
   /// Parameters:
   /// - [pageFunction] Function to be evaluated in browser context
   /// - [args] Arguments to pass to [pageFunction]
-  Future<void> evaluateOnNewDocument(String pageFunction, {List args}) async {
+  Future<void> evaluateOnNewDocument(String pageFunction, {List? args}) async {
     var source = evaluationString(pageFunction, args);
     await devTools.page.addScriptToEvaluateOnNewDocument(source);
   }
@@ -1412,11 +1420,11 @@ function deliverError(name, seq, message, stack) {
   /// > **NOTE** Screenshots take at least 1/6 second on OS X. See
   /// https://crbug.com/741689 for discussion.
   Future<Uint8List> screenshot(
-      {ScreenshotFormat format,
-      bool fullPage,
-      Rectangle clip,
-      int quality,
-      bool omitBackground}) async {
+      {ScreenshotFormat? format,
+      bool? fullPage,
+      Rectangle? clip,
+      int? quality,
+      bool? omitBackground}) async {
     return base64Decode(await screenshotBase64(
         format: format,
         fullPage: fullPage,
@@ -1442,11 +1450,11 @@ function deliverError(name, seq, message, stack) {
   /// > **NOTE** Screenshots take at least 1/6 second on OS X. See
   /// https://crbug.com/741689 for discussion.
   Future<String> screenshotBase64(
-      {ScreenshotFormat format,
-      bool fullPage,
-      Rectangle clip,
-      int quality,
-      bool omitBackground}) {
+      {ScreenshotFormat? format,
+      bool? fullPage,
+      Rectangle? clip,
+      int? quality,
+      bool? omitBackground}) {
     format ??= ScreenshotFormat.png;
     fullPage ??= false;
     omitBackground ??= false;
@@ -1458,7 +1466,7 @@ function deliverError(name, seq, message, stack) {
     return screenshotPool(target.browser).withResource(() async {
       await devTools.target.activateTarget(target.targetID);
 
-      Viewport roundedClip;
+      Viewport? roundedClip;
       if (clip != null) {
         roundedClip = Viewport(
             x: clip.left.round(),
@@ -1468,7 +1476,7 @@ function deliverError(name, seq, message, stack) {
             scale: 1);
       }
 
-      if (fullPage) {
+      if (fullPage!) {
         var metrics = await devTools.page.getLayoutMetrics();
 
         // Overwrite clip for full page at all times.
@@ -1492,19 +1500,19 @@ function deliverError(name, seq, message, stack) {
             screenOrientation: screenOrientation);
       }
       var shouldSetDefaultBackground =
-          omitBackground && format == ScreenshotFormat.png;
+          omitBackground! && format == ScreenshotFormat.png;
       if (shouldSetDefaultBackground) {
         await devTools.emulation.setDefaultBackgroundColorOverride(
             color: RGBA(r: 0, g: 0, b: 0, a: 0));
       }
       var result = await devTools.page.captureScreenshot(
-          format: format.name, quality: quality, clip: roundedClip);
+          format: format!.name, quality: quality, clip: roundedClip);
       if (shouldSetDefaultBackground) {
         await devTools.emulation.setDefaultBackgroundColorOverride();
       }
 
       if (fullPage && _viewport != null) {
-        await setViewport(_viewport);
+        await setViewport(_viewport!);
       }
 
       return result;
@@ -1559,18 +1567,18 @@ function deliverError(name, seq, message, stack) {
   /// limitations:
   /// > 1. Script tags inside templates are not evaluated.
   /// > 2. Page styles are not visible inside templates.
-  Future<Uint8List> pdf(
-      {PaperFormat format,
-      num scale,
-      bool displayHeaderFooter,
-      String headerTemplate,
-      String footerTemplate,
-      bool printBackground,
-      bool landscape,
-      String pageRanges,
-      bool preferCssPageSize,
-      PdfMargins margins,
-      IOSink output}) async {
+  Future<Uint8List?> pdf(
+      {PaperFormat? format,
+      num? scale,
+      bool? displayHeaderFooter,
+      String? headerTemplate,
+      String? footerTemplate,
+      bool? printBackground,
+      bool? landscape,
+      String? pageRanges,
+      bool? preferCssPageSize,
+      PdfMargins? margins,
+      IOSink? output}) async {
     scale ??= 1;
     displayHeaderFooter ??= false;
     headerTemplate ??= '';
@@ -1602,7 +1610,7 @@ function deliverError(name, seq, message, stack) {
     if (output == null) {
       return base64Decode(result.data);
     } else {
-      await readStream(devTools.io, result.stream, output);
+      await readStream(devTools.io, result.stream!, output);
       await output.close();
       return null;
     }
@@ -1611,7 +1619,7 @@ function deliverError(name, seq, message, stack) {
   /// The page's title.
   ///
   /// Shortcut for [Page.mainFrame.title].
-  Future<String> get title {
+  Future<String?> get title {
     return mainFrame.title;
   }
 
@@ -1623,7 +1631,7 @@ function deliverError(name, seq, message, stack) {
   /// Parameters:
   /// [runBeforeUnload]: Whether to run the
   ///    [before unload](https://developer.mozilla.org/en-US/docs/Web/Events/beforeunload)
-  Future<void> close({bool runBeforeUnload}) async {
+  Future<void> close({bool? runBeforeUnload}) async {
     runBeforeUnload ??= false;
     if (runBeforeUnload) {
       await devTools.page.close();
@@ -1668,7 +1676,7 @@ function deliverError(name, seq, message, stack) {
   ///
   /// [delay]: Time to wait between `mousedown` and `mouseup`. Default to zero.
   Future<void> click(String selector,
-      {Duration delay, MouseButton button, int clickCount}) {
+      {Duration? delay, MouseButton? button, int? clickCount}) {
     return mainFrame.click(selector,
         delay: delay, button: button, clickCount: clickCount);
   }
@@ -1690,8 +1698,8 @@ function deliverError(name, seq, message, stack) {
   ///   page.click('input#submitData'),
   /// ]);
   /// ```
-  Future<Response> clickAndWaitForNavigation(String selector,
-      {Duration timeout, Until wait}) async {
+  Future<Response?> clickAndWaitForNavigation(String selector,
+      {Duration? timeout, Until? wait}) async {
     var navigationFuture = waitForNavigation(timeout: timeout, wait: wait);
     await click(selector);
     return await navigationFuture;
@@ -1780,7 +1788,7 @@ function deliverError(name, seq, message, stack) {
   /// ```
   ///
   /// Shortcut for [page.mainFrame.type].
-  Future<void> type(String selector, String text, {Duration delay}) {
+  Future<void> type(String selector, String text, {Duration? delay}) {
     return mainFrame.type(selector, text, delay: delay);
   }
 
@@ -1820,8 +1828,8 @@ function deliverError(name, seq, message, stack) {
   /// Returns a [Future] which resolves when element specified by selector string
   /// is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
   /// is not found in DOM.
-  Future<ElementHandle> waitForSelector(String selector,
-      {bool visible, bool hidden, Duration timeout}) {
+  Future<ElementHandle?> waitForSelector(String selector,
+      {bool? visible, bool? hidden, Duration? timeout}) {
     return mainFrame.waitForSelector(selector,
         visible: visible, hidden: hidden, timeout: timeout);
   }
@@ -1862,8 +1870,8 @@ function deliverError(name, seq, message, stack) {
   /// Returns a [Future] which resolves when element specified by xpath string
   /// is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
   /// is not found in DOM.
-  Future<ElementHandle> waitForXPath(String xpath,
-      {bool visible, bool hidden, Duration timeout}) {
+  Future<ElementHandle?> waitForXPath(String xpath,
+      {bool? visible, bool? hidden, Duration? timeout}) {
     return mainFrame.waitForXPath(xpath,
         visible: visible, hidden: hidden, timeout: timeout);
   }
@@ -1906,7 +1914,7 @@ function deliverError(name, seq, message, stack) {
   ///
   /// Shortcut for [page.mainFrame().waitForFunction(pageFunction[, options[, ...args]])](#framewaitforfunctionpagefunction-options-args).
   Future<JsHandle> waitForFunction(@Language('js') String pageFunction,
-      {List args, Duration timeout, Polling polling}) {
+      {List? args, Duration? timeout, Polling? polling}) {
     return mainFrame.waitForFunction(pageFunction,
         args: args, timeout: timeout, polling: polling);
   }
@@ -1922,17 +1930,13 @@ function deliverError(name, seq, message, stack) {
 class ConsoleMessage {
   final ConsoleMessageType type;
   final String typeName;
-  final String text;
+  final String? text;
   final List<JsHandle> args;
-  final String url;
-  final int lineNumber, columnNumber;
+  final String? url;
+  final int? lineNumber, columnNumber;
 
   ConsoleMessage(this.type, this.typeName, this.text, this.args,
-      {this.url, this.lineNumber, this.columnNumber}) {
-    assert(type != null);
-    assert(text != null);
-    assert(args != null);
-  }
+      {this.url, this.lineNumber, this.columnNumber});
 
   @override
   String toString() =>
@@ -2002,17 +2006,17 @@ class PaperFormat {
 
   final num width, height;
 
-  const PaperFormat.inches({@required this.width, @required this.height});
+  const PaperFormat.inches({required this.width, required this.height});
 
-  PaperFormat.px({@required int width, @required int height})
+  PaperFormat.px({required int width, required int height})
       : width = _pxToInches(width),
         height = _pxToInches(height);
 
-  PaperFormat.cm({@required num width, @required num height})
+  PaperFormat.cm({required num width, required num height})
       : width = _cmToInches(width),
         height = _cmToInches(height);
 
-  PaperFormat.mm({@required num width, @required num height})
+  PaperFormat.mm({required num width, required num height})
       : width = _mmToInches(width),
         height = _mmToInches(height);
 
@@ -2031,13 +2035,13 @@ class PdfMargins {
 
   static final zero = PdfMargins.inches();
 
-  PdfMargins.inches({num top, num bottom, num left, num right})
+  PdfMargins.inches({num? top, num? bottom, num? left, num? right})
       : top = top ?? 0,
         bottom = bottom ?? 0,
         left = left ?? 0,
         right = right ?? 0;
 
-  factory PdfMargins.px({int top, int bottom, int left, int right}) {
+  factory PdfMargins.px({int? top, int? bottom, int? left, int? right}) {
     return PdfMargins.inches(
       top: top != null ? _pxToInches(top) : null,
       bottom: bottom != null ? _pxToInches(bottom) : null,
@@ -2046,7 +2050,7 @@ class PdfMargins {
     );
   }
 
-  factory PdfMargins.cm({num top, num bottom, num left, num right}) {
+  factory PdfMargins.cm({num? top, num? bottom, num? left, num? right}) {
     return PdfMargins.inches(
       top: top != null ? _cmToInches(top) : null,
       bottom: bottom != null ? _cmToInches(bottom) : null,
@@ -2055,7 +2059,7 @@ class PdfMargins {
     );
   }
 
-  factory PdfMargins.mm({num top, num bottom, num left, num right}) {
+  factory PdfMargins.mm({num? top, num? bottom, num? left, num? right}) {
     return PdfMargins.inches(
       top: top != null ? _mmToInches(top) : null,
       bottom: bottom != null ? _mmToInches(bottom) : null,
@@ -2070,10 +2074,10 @@ class PdfMargins {
 }
 
 class ClientError implements Exception {
-  final ExceptionDetails details;
-  final String message;
+  final ExceptionDetails? details;
+  final String? message;
 
-  ClientError(this.details) : message = _message(details);
+  ClientError(ExceptionDetails this.details) : message = _message(details);
 
   ClientError.pageCrashed()
       : message = 'Page crashed!',
@@ -2082,16 +2086,19 @@ class ClientError implements Exception {
   @override
   String toString() => 'Evaluation failed: $message';
 
-  static String _message(ExceptionDetails details) {
+  static String? _message(ExceptionDetails details) {
     if (details.exception != null) {
-      return details.exception.description ?? details.exception.value as String;
+      return details.exception!.description ??
+          details.exception!.value as String?;
     } else {
       var message = details.text;
       if (details.stackTrace != null) {
-        for (var callFrame in details.stackTrace.callFrames) {
+        for (var callFrame in details.stackTrace!.callFrames) {
           var location =
               '${callFrame.url}:${callFrame.lineNumber}:${callFrame.columnNumber}';
-          var functionName = callFrame.functionName ?? '<anonymous>';
+          var functionName = callFrame.functionName.isEmpty
+              ? '<anonymous>'
+              : callFrame.functionName;
           message += '\n    at $functionName ($location)';
         }
       }

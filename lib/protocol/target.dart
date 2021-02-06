@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'browser.dart' as browser;
 import 'page.dart' as page;
@@ -65,7 +64,7 @@ class TargetApi {
   /// We plan to make this the default, deprecate non-flattened mode,
   /// and eventually retire it. See crbug.com/991325.
   /// Returns: Id assigned to the session.
-  Future<SessionID> attachToTarget(TargetID targetId, {bool flatten}) async {
+  Future<SessionID> attachToTarget(TargetID targetId, {bool? flatten}) async {
     var result = await _client.send('Target.attachToTarget', {
       'targetId': targetId,
       if (flatten != null) 'flatten': flatten,
@@ -99,7 +98,7 @@ class TargetApi {
   /// - `binding.onmessage = json => handleMessage(json)` - a callback that will be called for the protocol notifications and command responses.
   /// [bindingName] Binding name, 'cdp' if not specified.
   Future<void> exposeDevToolsProtocol(TargetID targetId,
-      {String bindingName}) async {
+      {String? bindingName}) async {
     await _client.send('Target.exposeDevToolsProtocol', {
       'targetId': targetId,
       if (bindingName != null) 'bindingName': bindingName,
@@ -113,9 +112,9 @@ class TargetApi {
   /// [proxyBypassList] Proxy bypass list, similar to the one passed to --proxy-bypass-list
   /// Returns: The id of the context created.
   Future<browser.BrowserContextID> createBrowserContext(
-      {bool disposeOnDetach,
-      String proxyServer,
-      String proxyBypassList}) async {
+      {bool? disposeOnDetach,
+      String? proxyServer,
+      String? proxyBypassList}) async {
     var result = await _client.send('Target.createBrowserContext', {
       if (disposeOnDetach != null) 'disposeOnDetach': disposeOnDetach,
       if (proxyServer != null) 'proxyServer': proxyServer,
@@ -146,12 +145,12 @@ class TargetApi {
   /// false by default).
   /// Returns: The id of the page opened.
   Future<TargetID> createTarget(String url,
-      {int width,
-      int height,
-      browser.BrowserContextID browserContextId,
-      bool enableBeginFrameControl,
-      bool newWindow,
-      bool background}) async {
+      {int? width,
+      int? height,
+      browser.BrowserContextID? browserContextId,
+      bool? enableBeginFrameControl,
+      bool? newWindow,
+      bool? background}) async {
     var result = await _client.send('Target.createTarget', {
       'url': url,
       if (width != null) 'width': width,
@@ -168,7 +167,7 @@ class TargetApi {
   /// Detaches session with given id.
   /// [sessionId] Session to detach.
   Future<void> detachFromTarget(
-      {SessionID sessionId, @deprecated TargetID targetId}) async {
+      {SessionID? sessionId, @deprecated TargetID? targetId}) async {
     await _client.send('Target.detachFromTarget', {
       if (sessionId != null) 'sessionId': sessionId,
       if (targetId != null) 'targetId': targetId,
@@ -185,7 +184,7 @@ class TargetApi {
   }
 
   /// Returns information about a target.
-  Future<TargetInfo> getTargetInfo({TargetID targetId}) async {
+  Future<TargetInfo> getTargetInfo({TargetID? targetId}) async {
     var result = await _client.send('Target.getTargetInfo', {
       if (targetId != null) 'targetId': targetId,
     });
@@ -207,7 +206,7 @@ class TargetApi {
   /// [sessionId] Identifier of the session.
   @deprecated
   Future<void> sendMessageToTarget(String message,
-      {SessionID sessionId, @deprecated TargetID targetId}) async {
+      {SessionID? sessionId, @deprecated TargetID? targetId}) async {
     await _client.send('Target.sendMessageToTarget', {
       'message': message,
       if (sessionId != null) 'sessionId': sessionId,
@@ -225,7 +224,7 @@ class TargetApi {
   /// We plan to make this the default, deprecate non-flattened mode,
   /// and eventually retire it. See crbug.com/991325.
   Future<void> setAutoAttach(bool autoAttach, bool waitForDebuggerOnStart,
-      {bool flatten}) async {
+      {bool? flatten}) async {
     await _client.send('Target.setAutoAttach', {
       'autoAttach': autoAttach,
       'waitForDebuggerOnStart': waitForDebuggerOnStart,
@@ -261,9 +260,9 @@ class AttachedToTargetEvent {
   final bool waitingForDebugger;
 
   AttachedToTargetEvent(
-      {@required this.sessionId,
-      @required this.targetInfo,
-      @required this.waitingForDebugger});
+      {required this.sessionId,
+      required this.targetInfo,
+      required this.waitingForDebugger});
 
   factory AttachedToTargetEvent.fromJson(Map<String, dynamic> json) {
     return AttachedToTargetEvent(
@@ -279,7 +278,7 @@ class DetachedFromTargetEvent {
   /// Detached session identifier.
   final SessionID sessionId;
 
-  DetachedFromTargetEvent({@required this.sessionId});
+  DetachedFromTargetEvent({required this.sessionId});
 
   factory DetachedFromTargetEvent.fromJson(Map<String, dynamic> json) {
     return DetachedFromTargetEvent(
@@ -295,7 +294,7 @@ class ReceivedMessageFromTargetEvent {
   final String message;
 
   ReceivedMessageFromTargetEvent(
-      {@required this.sessionId, @required this.message});
+      {required this.sessionId, required this.message});
 
   factory ReceivedMessageFromTargetEvent.fromJson(Map<String, dynamic> json) {
     return ReceivedMessageFromTargetEvent(
@@ -315,9 +314,7 @@ class TargetCrashedEvent {
   final int errorCode;
 
   TargetCrashedEvent(
-      {@required this.targetId,
-      @required this.status,
-      @required this.errorCode});
+      {required this.targetId, required this.status, required this.errorCode});
 
   factory TargetCrashedEvent.fromJson(Map<String, dynamic> json) {
     return TargetCrashedEvent(
@@ -382,24 +379,24 @@ class TargetInfo {
   final bool attached;
 
   /// Opener target Id
-  final TargetID openerId;
+  final TargetID? openerId;
 
   /// Whether the target has access to the originating window.
   final bool canAccessOpener;
 
   /// Frame id of originating window (is only set if target has an opener).
-  final page.FrameId openerFrameId;
+  final page.FrameId? openerFrameId;
 
-  final browser.BrowserContextID browserContextId;
+  final browser.BrowserContextID? browserContextId;
 
   TargetInfo(
-      {@required this.targetId,
-      @required this.type,
-      @required this.title,
-      @required this.url,
-      @required this.attached,
+      {required this.targetId,
+      required this.type,
+      required this.title,
+      required this.url,
+      required this.attached,
       this.openerId,
-      @required this.canAccessOpener,
+      required this.canAccessOpener,
       this.openerFrameId,
       this.browserContextId});
 
@@ -432,10 +429,10 @@ class TargetInfo {
       'url': url,
       'attached': attached,
       'canAccessOpener': canAccessOpener,
-      if (openerId != null) 'openerId': openerId.toJson(),
-      if (openerFrameId != null) 'openerFrameId': openerFrameId.toJson(),
+      if (openerId != null) 'openerId': openerId!.toJson(),
+      if (openerFrameId != null) 'openerFrameId': openerFrameId!.toJson(),
       if (browserContextId != null)
-        'browserContextId': browserContextId.toJson(),
+        'browserContextId': browserContextId!.toJson(),
     };
   }
 }
@@ -445,7 +442,7 @@ class RemoteLocation {
 
   final int port;
 
-  RemoteLocation({@required this.host, @required this.port});
+  RemoteLocation({required this.host, required this.port});
 
   factory RemoteLocation.fromJson(Map<String, dynamic> json) {
     return RemoteLocation(

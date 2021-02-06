@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'runtime.dart' as runtime;
@@ -139,21 +138,21 @@ class Animation {
   final AnimationType type;
 
   /// `Animation`'s source animation node.
-  final AnimationEffect source;
+  final AnimationEffect? source;
 
   /// A unique ID for `Animation` representing the sources that triggered this CSS
   /// animation/transition.
-  final String cssId;
+  final String? cssId;
 
   Animation(
-      {@required this.id,
-      @required this.name,
-      @required this.pausedState,
-      @required this.playState,
-      @required this.playbackRate,
-      @required this.startTime,
-      @required this.currentTime,
-      @required this.type,
+      {required this.id,
+      required this.name,
+      required this.pausedState,
+      required this.playState,
+      required this.playbackRate,
+      required this.startTime,
+      required this.currentTime,
+      required this.type,
       this.source,
       this.cssId});
 
@@ -184,7 +183,7 @@ class Animation {
       'startTime': startTime,
       'currentTime': currentTime,
       'type': type,
-      if (source != null) 'source': source.toJson(),
+      if (source != null) 'source': source!.toJson(),
       if (cssId != null) 'cssId': cssId,
     };
   }
@@ -204,7 +203,7 @@ class AnimationType {
 
   const AnimationType._(this.value);
 
-  factory AnimationType.fromJson(String value) => values[value];
+  factory AnimationType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -243,25 +242,25 @@ class AnimationEffect {
   final String fill;
 
   /// `AnimationEffect`'s target node.
-  final dom.BackendNodeId backendNodeId;
+  final dom.BackendNodeId? backendNodeId;
 
   /// `AnimationEffect`'s keyframes.
-  final KeyframesRule keyframesRule;
+  final KeyframesRule? keyframesRule;
 
   /// `AnimationEffect`'s timing function.
   final String easing;
 
   AnimationEffect(
-      {@required this.delay,
-      @required this.endDelay,
-      @required this.iterationStart,
-      @required this.iterations,
-      @required this.duration,
-      @required this.direction,
-      @required this.fill,
+      {required this.delay,
+      required this.endDelay,
+      required this.iterationStart,
+      required this.iterations,
+      required this.duration,
+      required this.direction,
+      required this.fill,
       this.backendNodeId,
       this.keyframesRule,
-      @required this.easing});
+      required this.easing});
 
   factory AnimationEffect.fromJson(Map<String, dynamic> json) {
     return AnimationEffect(
@@ -293,8 +292,8 @@ class AnimationEffect {
       'direction': direction,
       'fill': fill,
       'easing': easing,
-      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
-      if (keyframesRule != null) 'keyframesRule': keyframesRule.toJson(),
+      if (backendNodeId != null) 'backendNodeId': backendNodeId!.toJson(),
+      if (keyframesRule != null) 'keyframesRule': keyframesRule!.toJson(),
     };
   }
 }
@@ -302,12 +301,12 @@ class AnimationEffect {
 /// Keyframes Rule
 class KeyframesRule {
   /// CSS keyframed animation's name.
-  final String name;
+  final String? name;
 
   /// List of animation keyframes.
   final List<KeyframeStyle> keyframes;
 
-  KeyframesRule({this.name, @required this.keyframes});
+  KeyframesRule({this.name, required this.keyframes});
 
   factory KeyframesRule.fromJson(Map<String, dynamic> json) {
     return KeyframesRule(
@@ -334,7 +333,7 @@ class KeyframeStyle {
   /// `AnimationEffect`'s timing function.
   final String easing;
 
-  KeyframeStyle({@required this.offset, @required this.easing});
+  KeyframeStyle({required this.offset, required this.easing});
 
   factory KeyframeStyle.fromJson(Map<String, dynamic> json) {
     return KeyframeStyle(

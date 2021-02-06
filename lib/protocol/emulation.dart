@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'network.dart' as network;
@@ -57,7 +56,7 @@ class EmulationApi {
   /// if the content does not specify one.
   /// [color] RGBA of the default background color. If not specified, any existing override will be
   /// cleared.
-  Future<void> setDefaultBackgroundColorOverride({dom.RGBA color}) async {
+  Future<void> setDefaultBackgroundColorOverride({dom.RGBA? color}) async {
     await _client.send('Emulation.setDefaultBackgroundColorOverride', {
       if (color != null) 'color': color,
     });
@@ -84,15 +83,15 @@ class EmulationApi {
   /// is turned-off.
   Future<void> setDeviceMetricsOverride(
       int width, int height, num deviceScaleFactor, bool mobile,
-      {num scale,
-      int screenWidth,
-      int screenHeight,
-      int positionX,
-      int positionY,
-      bool dontSetVisibleSize,
-      ScreenOrientation screenOrientation,
-      page.Viewport viewport,
-      DisplayFeature displayFeature}) async {
+      {num? scale,
+      int? screenWidth,
+      int? screenHeight,
+      int? positionX,
+      int? positionY,
+      bool? dontSetVisibleSize,
+      ScreenOrientation? screenOrientation,
+      page.Viewport? viewport,
+      DisplayFeature? displayFeature}) async {
     await _client.send('Emulation.setDeviceMetricsOverride', {
       'width': width,
       'height': height,
@@ -127,7 +126,7 @@ class EmulationApi {
   /// [enabled] Whether touch emulation based on mouse input should be enabled.
   /// [configuration] Touch/gesture events configuration. Default: current platform.
   Future<void> setEmitTouchEventsForMouse(bool enabled,
-      {@Enum(['mobile', 'desktop']) String configuration}) async {
+      {@Enum(['mobile', 'desktop']) String? configuration}) async {
     assert(configuration == null ||
         const ['mobile', 'desktop'].contains(configuration));
     await _client.send('Emulation.setEmitTouchEventsForMouse', {
@@ -140,7 +139,7 @@ class EmulationApi {
   /// [media] Media type to emulate. Empty string disables the override.
   /// [features] Media features to emulate.
   Future<void> setEmulatedMedia(
-      {String media, List<MediaFeature> features}) async {
+      {String? media, List<MediaFeature>? features}) async {
     await _client.send('Emulation.setEmulatedMedia', {
       if (media != null) 'media': media,
       if (features != null) 'features': [...features],
@@ -178,7 +177,7 @@ class EmulationApi {
   /// [longitude] Mock longitude
   /// [accuracy] Mock accuracy
   Future<void> setGeolocationOverride(
-      {num latitude, num longitude, num accuracy}) async {
+      {num? latitude, num? longitude, num? accuracy}) async {
     await _client.send('Emulation.setGeolocationOverride', {
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
@@ -230,7 +229,7 @@ class EmulationApi {
   /// [enabled] Whether the touch event emulation should be enabled.
   /// [maxTouchPoints] Maximum touch points supported. Defaults to one.
   Future<void> setTouchEmulationEnabled(bool enabled,
-      {int maxTouchPoints}) async {
+      {int? maxTouchPoints}) async {
     await _client.send('Emulation.setTouchEmulationEnabled', {
       'enabled': enabled,
       if (maxTouchPoints != null) 'maxTouchPoints': maxTouchPoints,
@@ -248,10 +247,10 @@ class EmulationApi {
   /// [initialVirtualTime] If set, base::Time::Now will be overriden to initially return this value.
   /// Returns: Absolute timestamp at which virtual time was first enabled (up time in milliseconds).
   Future<num> setVirtualTimePolicy(VirtualTimePolicy policy,
-      {num budget,
-      int maxVirtualTimeTaskStarvationCount,
-      bool waitForNavigation,
-      network.TimeSinceEpoch initialVirtualTime}) async {
+      {num? budget,
+      int? maxVirtualTimeTaskStarvationCount,
+      bool? waitForNavigation,
+      network.TimeSinceEpoch? initialVirtualTime}) async {
     var result = await _client.send('Emulation.setVirtualTimePolicy', {
       'policy': policy,
       if (budget != null) 'budget': budget,
@@ -266,7 +265,7 @@ class EmulationApi {
   /// Overrides default host system locale with the specified one.
   /// [locale] ICU style C locale (e.g. "en_US"). If not specified or empty, disables the override and
   /// restores default host system locale.
-  Future<void> setLocaleOverride({String locale}) async {
+  Future<void> setLocaleOverride({String? locale}) async {
     await _client.send('Emulation.setLocaleOverride', {
       if (locale != null) 'locale': locale,
     });
@@ -300,9 +299,9 @@ class EmulationApi {
   /// [platform] The platform navigator.platform should return.
   /// [userAgentMetadata] To be sent in Sec-CH-UA-* headers and returned in navigator.userAgentData
   Future<void> setUserAgentOverride(String userAgent,
-      {String acceptLanguage,
-      String platform,
-      UserAgentMetadata userAgentMetadata}) async {
+      {String? acceptLanguage,
+      String? platform,
+      UserAgentMetadata? userAgentMetadata}) async {
     await _client.send('Emulation.setUserAgentOverride', {
       'userAgent': userAgent,
       if (acceptLanguage != null) 'acceptLanguage': acceptLanguage,
@@ -320,7 +319,7 @@ class ScreenOrientation {
   /// Orientation angle.
   final int angle;
 
-  ScreenOrientation({@required this.type, @required this.angle});
+  ScreenOrientation({required this.type, required this.angle});
 
   factory ScreenOrientation.fromJson(Map<String, dynamic> json) {
     return ScreenOrientation(
@@ -354,7 +353,7 @@ class ScreenOrientationType {
 
   const ScreenOrientationType._(this.value);
 
-  factory ScreenOrientationType.fromJson(String value) => values[value];
+  factory ScreenOrientationType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -384,9 +383,9 @@ class DisplayFeature {
   final int maskLength;
 
   DisplayFeature(
-      {@required this.orientation,
-      @required this.offset,
-      @required this.maskLength});
+      {required this.orientation,
+      required this.offset,
+      required this.maskLength});
 
   factory DisplayFeature.fromJson(Map<String, dynamic> json) {
     return DisplayFeature(
@@ -418,7 +417,7 @@ class DisplayFeatureOrientation {
 
   const DisplayFeatureOrientation._(this.value);
 
-  factory DisplayFeatureOrientation.fromJson(String value) => values[value];
+  factory DisplayFeatureOrientation.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -439,7 +438,7 @@ class MediaFeature {
 
   final String value;
 
-  MediaFeature({@required this.name, @required this.value});
+  MediaFeature({required this.name, required this.value});
 
   factory MediaFeature.fromJson(Map<String, dynamic> json) {
     return MediaFeature(
@@ -475,7 +474,7 @@ class VirtualTimePolicy {
 
   const VirtualTimePolicy._(this.value);
 
-  factory VirtualTimePolicy.fromJson(String value) => values[value];
+  factory VirtualTimePolicy.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -496,7 +495,7 @@ class UserAgentBrandVersion {
 
   final String version;
 
-  UserAgentBrandVersion({@required this.brand, @required this.version});
+  UserAgentBrandVersion({required this.brand, required this.version});
 
   factory UserAgentBrandVersion.fromJson(Map<String, dynamic> json) {
     return UserAgentBrandVersion(
@@ -530,13 +529,13 @@ class UserAgentMetadata {
   final bool mobile;
 
   UserAgentMetadata(
-      {@required this.brands,
-      @required this.fullVersion,
-      @required this.platform,
-      @required this.platformVersion,
-      @required this.architecture,
-      @required this.model,
-      @required this.mobile});
+      {required this.brands,
+      required this.fullVersion,
+      required this.platform,
+      required this.platformVersion,
+      required this.architecture,
+      required this.model,
+      required this.mobile});
 
   factory UserAgentMetadata.fromJson(Map<String, dynamic> json) {
     return UserAgentMetadata(

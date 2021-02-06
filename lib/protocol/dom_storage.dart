@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// Query and modify DOM storage.
@@ -77,7 +76,7 @@ class DomStorageItemAddedEvent {
   final String newValue;
 
   DomStorageItemAddedEvent(
-      {@required this.storageId, @required this.key, @required this.newValue});
+      {required this.storageId, required this.key, required this.newValue});
 
   factory DomStorageItemAddedEvent.fromJson(Map<String, dynamic> json) {
     return DomStorageItemAddedEvent(
@@ -93,7 +92,7 @@ class DomStorageItemRemovedEvent {
 
   final String key;
 
-  DomStorageItemRemovedEvent({@required this.storageId, @required this.key});
+  DomStorageItemRemovedEvent({required this.storageId, required this.key});
 
   factory DomStorageItemRemovedEvent.fromJson(Map<String, dynamic> json) {
     return DomStorageItemRemovedEvent(
@@ -113,10 +112,10 @@ class DomStorageItemUpdatedEvent {
   final String newValue;
 
   DomStorageItemUpdatedEvent(
-      {@required this.storageId,
-      @required this.key,
-      @required this.oldValue,
-      @required this.newValue});
+      {required this.storageId,
+      required this.key,
+      required this.oldValue,
+      required this.newValue});
 
   factory DomStorageItemUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return DomStorageItemUpdatedEvent(
@@ -136,7 +135,7 @@ class StorageId {
   /// Whether the storage is local storage (not session storage).
   final bool isLocalStorage;
 
-  StorageId({@required this.securityOrigin, @required this.isLocalStorage});
+  StorageId({required this.securityOrigin, required this.isLocalStorage});
 
   factory StorageId.fromJson(Map<String, dynamic> json) {
     return StorageId(

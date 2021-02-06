@@ -8,7 +8,6 @@ void main() {
     expect(puppeteer.devices['iphone6'], equals(puppeteer.devices.iPhone6));
     expect(puppeteer.devices['  iphone6  '], equals(puppeteer.devices.iPhone6));
     expect(puppeteer.devices['not exist'], isNull);
-    expect(puppeteer.devices[null], isNull);
   });
   test('All devices has viewport', () {
     for (var device in puppeteer.devices) {

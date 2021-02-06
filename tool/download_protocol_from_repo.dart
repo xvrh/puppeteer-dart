@@ -11,12 +11,12 @@ final protocols = {
 };
 
 void main() async {
-  for (var protocolName in protocols.keys) {
-    await _download(protocols[protocolName], protocolName);
+  for (var protocol in protocols.entries) {
+    await _download(Uri.parse(protocol.value), protocol.key);
   }
 }
 
-Future<void> _download(String url, String fileName) async {
+Future<void> _download(Uri url, String fileName) async {
   var json = await read(url);
   await File.fromUri(Platform.script.resolve(p.posix.join('json', fileName)))
       .writeAsString(json);

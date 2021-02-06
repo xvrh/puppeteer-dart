@@ -7,19 +7,19 @@ class LifecycleWatcher {
   final FrameManager frameManager;
   final Frame frame;
   final Until wait;
-  final Duration timeout;
-  List<StreamSubscription> _subscriptions;
-  LoaderId _initialLoaderId;
-  Request _navigationRequest;
-  final _sameDocumentNavigationCompleter = Completer<Exception>(),
-      _lifecycleCompleter = Completer<Exception>(),
+  final Duration? timeout;
+  late List<StreamSubscription> _subscriptions;
+  LoaderId? _initialLoaderId;
+  Request? _navigationRequest;
+  final _sameDocumentNavigationCompleter = Completer<Exception?>(),
+      _lifecycleCompleter = Completer<Exception?>(),
       _terminationCompleter = Completer<Exception>(),
-      _newDocumentNavigationCompleter = Completer<Exception>();
-  Future<Exception> _timeoutFuture;
+      _newDocumentNavigationCompleter = Completer<Exception?>();
+  late final Future<Exception> _timeoutFuture;
   bool _hasSameDocumentNavigation = false;
-  Timer _timeoutTimer;
+  Timer? _timeoutTimer;
 
-  LifecycleWatcher(this.frameManager, this.frame, {Until wait, this.timeout})
+  LifecycleWatcher(this.frameManager, this.frame, {Until? wait, this.timeout})
       : wait = wait ?? Until.load {
     _initialLoaderId = frame.loaderId;
 
@@ -44,17 +44,19 @@ class LifecycleWatcher {
     ]);
   }
 
-  Future<Exception> get newDocumentNavigation =>
+  Future<Exception?> get newDocumentNavigation =>
       _newDocumentNavigationCompleter.future;
 
-  Future<Exception> get sameDocumentNavigation =>
+  Future<Exception?> get sameDocumentNavigation =>
       _sameDocumentNavigationCompleter.future;
 
-  Future<Exception> get lifecycle => _lifecycleCompleter.future;
+  Future<Exception?> get lifecycle => _lifecycleCompleter.future;
 
-  Response get navigationResponse {
+  Response? get navigationResponse {
     return _navigationRequest?.response;
   }
+
+  Request? get navigationRequest => _navigationRequest;
 
   void _onRequest(Request request) {
     if (request.frame != frame || !request.isNavigationRequest) {
@@ -63,7 +65,7 @@ class LifecycleWatcher {
     _navigationRequest = request;
   }
 
-  void _onFrameDetached(Frame frame) {
+  void _onFrameDetached(Frame? frame) {
     if (this.frame == frame) {
       _terminationCompleter
           .complete(Exception('Navigating frame was detached'));
@@ -77,14 +79,14 @@ class LifecycleWatcher {
       return Completer<Exception>().future;
     }
     var errorMessage =
-        'Navigation Timeout Exceeded: ${timeout.inMilliseconds}ms exceeded';
+        'Navigation Timeout Exceeded: ${timeout!.inMilliseconds}ms exceeded';
     var completer = Completer<Exception>();
     _timeoutTimer = Timer(
-        timeout, () => completer.complete(TimeoutException(errorMessage)));
+        timeout!, () => completer.complete(TimeoutException(errorMessage)));
     return completer.future;
   }
 
-  void _navigatedWithinDocument(Frame frame) {
+  void _navigatedWithinDocument(Frame? frame) {
     if (frame != this.frame) return;
     _hasSameDocumentNavigation = true;
     _checkLifecycleComplete();

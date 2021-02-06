@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 class InputApi {
@@ -32,20 +31,20 @@ class InputApi {
   /// See https://source.chromium.org/chromium/chromium/src/+/master:third_party/blink/renderer/core/editing/commands/editor_command_names.h for valid command names.
   Future<void> dispatchKeyEvent(
       @Enum(['keyDown', 'keyUp', 'rawKeyDown', 'char']) String type,
-      {int modifiers,
-      TimeSinceEpoch timestamp,
-      String text,
-      String unmodifiedText,
-      String keyIdentifier,
-      String code,
-      String key,
-      int windowsVirtualKeyCode,
-      int nativeVirtualKeyCode,
-      bool autoRepeat,
-      bool isKeypad,
-      bool isSystemKey,
-      int location,
-      List<String> commands}) async {
+      {int? modifiers,
+      TimeSinceEpoch? timestamp,
+      String? text,
+      String? unmodifiedText,
+      String? keyIdentifier,
+      String? code,
+      String? key,
+      int? windowsVirtualKeyCode,
+      int? nativeVirtualKeyCode,
+      bool? autoRepeat,
+      bool? isKeypad,
+      bool? isSystemKey,
+      int? location,
+      List<String>? commands}) async {
     assert(const ['keyDown', 'keyUp', 'rawKeyDown', 'char'].contains(type));
     await _client.send('Input.dispatchKeyEvent', {
       'type': type,
@@ -97,15 +96,15 @@ class InputApi {
           String type,
       num x,
       num y,
-      {int modifiers,
-      TimeSinceEpoch timestamp,
-      MouseButton button,
-      int buttons,
-      int clickCount,
-      num deltaX,
-      num deltaY,
+      {int? modifiers,
+      TimeSinceEpoch? timestamp,
+      MouseButton? button,
+      int? buttons,
+      int? clickCount,
+      num? deltaX,
+      num? deltaY,
       @Enum(['mouse', 'pen'])
-          String pointerType}) async {
+          String? pointerType}) async {
     assert(const ['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel']
         .contains(type));
     assert(pointerType == null || const ['mouse', 'pen'].contains(pointerType));
@@ -136,8 +135,8 @@ class InputApi {
   Future<void> dispatchTouchEvent(
       @Enum(['touchStart', 'touchEnd', 'touchMove', 'touchCancel']) String type,
       List<TouchPoint> touchPoints,
-      {int modifiers,
-      TimeSinceEpoch timestamp}) async {
+      {int? modifiers,
+      TimeSinceEpoch? timestamp}) async {
     assert(const ['touchStart', 'touchEnd', 'touchMove', 'touchCancel']
         .contains(type));
     await _client.send('Input.dispatchTouchEvent', {
@@ -165,11 +164,11 @@ class InputApi {
       int x,
       int y,
       MouseButton button,
-      {TimeSinceEpoch timestamp,
-      num deltaX,
-      num deltaY,
-      int modifiers,
-      int clickCount}) async {
+      {TimeSinceEpoch? timestamp,
+      num? deltaX,
+      num? deltaY,
+      int? modifiers,
+      int? clickCount}) async {
     assert(const ['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel']
         .contains(type));
     await _client.send('Input.emulateTouchFromMouseEvent', {
@@ -201,7 +200,7 @@ class InputApi {
   /// [gestureSourceType] Which type of input events to be generated (default: 'default', which queries the platform
   /// for the preferred input type).
   Future<void> synthesizePinchGesture(num x, num y, num scaleFactor,
-      {int relativeSpeed, GestureSourceType gestureSourceType}) async {
+      {int? relativeSpeed, GestureSourceType? gestureSourceType}) async {
     await _client.send('Input.synthesizePinchGesture', {
       'x': x,
       'y': y,
@@ -228,16 +227,16 @@ class InputApi {
   /// [repeatDelayMs] The number of milliseconds delay between each repeat. (default: 250).
   /// [interactionMarkerName] The name of the interaction markers to generate, if not empty (default: "").
   Future<void> synthesizeScrollGesture(num x, num y,
-      {num xDistance,
-      num yDistance,
-      num xOverscroll,
-      num yOverscroll,
-      bool preventFling,
-      int speed,
-      GestureSourceType gestureSourceType,
-      int repeatCount,
-      int repeatDelayMs,
-      String interactionMarkerName}) async {
+      {num? xDistance,
+      num? yDistance,
+      num? xOverscroll,
+      num? yOverscroll,
+      bool? preventFling,
+      int? speed,
+      GestureSourceType? gestureSourceType,
+      int? repeatCount,
+      int? repeatDelayMs,
+      String? interactionMarkerName}) async {
     await _client.send('Input.synthesizeScrollGesture', {
       'x': x,
       'y': y,
@@ -263,7 +262,9 @@ class InputApi {
   /// [gestureSourceType] Which type of input events to be generated (default: 'default', which queries the platform
   /// for the preferred input type).
   Future<void> synthesizeTapGesture(num x, num y,
-      {int duration, int tapCount, GestureSourceType gestureSourceType}) async {
+      {int? duration,
+      int? tapCount,
+      GestureSourceType? gestureSourceType}) async {
     await _client.send('Input.synthesizeTapGesture', {
       'x': x,
       'y': y,
@@ -283,23 +284,23 @@ class TouchPoint {
   final num y;
 
   /// X radius of the touch area (default: 1.0).
-  final num radiusX;
+  final num? radiusX;
 
   /// Y radius of the touch area (default: 1.0).
-  final num radiusY;
+  final num? radiusY;
 
   /// Rotation angle (default: 0.0).
-  final num rotationAngle;
+  final num? rotationAngle;
 
   /// Force (default: 1.0).
-  final num force;
+  final num? force;
 
   /// Identifier used to track touch sources between events, must be unique within an event.
-  final num id;
+  final num? id;
 
   TouchPoint(
-      {@required this.x,
-      @required this.y,
+      {required this.x,
+      required this.y,
       this.radiusX,
       this.radiusY,
       this.rotationAngle,
@@ -347,7 +348,7 @@ class GestureSourceType {
 
   const GestureSourceType._(this.value);
 
-  factory GestureSourceType.fromJson(String value) => values[value];
+  factory GestureSourceType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -382,7 +383,7 @@ class MouseButton {
 
   const MouseButton._(this.value);
 
-  factory MouseButton.fromJson(String value) => values[value];
+  factory MouseButton.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 

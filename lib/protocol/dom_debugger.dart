@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'runtime.dart' as runtime;
@@ -19,7 +18,7 @@ class DOMDebuggerApi {
   /// (default is false). Reports listeners for all contexts if pierce is enabled.
   /// Returns: Array of relevant listeners.
   Future<List<EventListener>> getEventListeners(runtime.RemoteObjectId objectId,
-      {int depth, bool pierce}) async {
+      {int? depth, bool? pierce}) async {
     var result = await _client.send('DOMDebugger.getEventListeners', {
       'objectId': objectId,
       if (depth != null) 'depth': depth,
@@ -45,7 +44,7 @@ class DOMDebuggerApi {
   /// [eventName] Event name.
   /// [targetName] EventTarget interface name.
   Future<void> removeEventListenerBreakpoint(String eventName,
-      {String targetName}) async {
+      {String? targetName}) async {
     await _client.send('DOMDebugger.removeEventListenerBreakpoint', {
       'eventName': eventName,
       if (targetName != null) 'targetName': targetName,
@@ -84,7 +83,7 @@ class DOMDebuggerApi {
   /// [targetName] EventTarget interface name to stop on. If equal to `"*"` or not provided, will stop on any
   /// EventTarget.
   Future<void> setEventListenerBreakpoint(String eventName,
-      {String targetName}) async {
+      {String? targetName}) async {
     await _client.send('DOMDebugger.setEventListenerBreakpoint', {
       'eventName': eventName,
       if (targetName != null) 'targetName': targetName,
@@ -123,7 +122,7 @@ class DOMBreakpointType {
 
   const DOMBreakpointType._(this.value);
 
-  factory DOMBreakpointType.fromJson(String value) => values[value];
+  factory DOMBreakpointType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -162,22 +161,22 @@ class EventListener {
   final int columnNumber;
 
   /// Event handler function value.
-  final runtime.RemoteObject handler;
+  final runtime.RemoteObject? handler;
 
   /// Event original handler function value.
-  final runtime.RemoteObject originalHandler;
+  final runtime.RemoteObject? originalHandler;
 
   /// Node the listener is added to (if any).
-  final dom.BackendNodeId backendNodeId;
+  final dom.BackendNodeId? backendNodeId;
 
   EventListener(
-      {@required this.type,
-      @required this.useCapture,
-      @required this.passive,
-      @required this.once,
-      @required this.scriptId,
-      @required this.lineNumber,
-      @required this.columnNumber,
+      {required this.type,
+      required this.useCapture,
+      required this.passive,
+      required this.once,
+      required this.scriptId,
+      required this.lineNumber,
+      required this.columnNumber,
       this.handler,
       this.originalHandler,
       this.backendNodeId});
@@ -214,9 +213,9 @@ class EventListener {
       'scriptId': scriptId.toJson(),
       'lineNumber': lineNumber,
       'columnNumber': columnNumber,
-      if (handler != null) 'handler': handler.toJson(),
-      if (originalHandler != null) 'originalHandler': originalHandler.toJson(),
-      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
+      if (handler != null) 'handler': handler!.toJson(),
+      if (originalHandler != null) 'originalHandler': originalHandler!.toJson(),
+      if (backendNodeId != null) 'backendNodeId': backendNodeId!.toJson(),
     };
   }
 }

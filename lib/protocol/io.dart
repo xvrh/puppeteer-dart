@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
@@ -22,7 +21,7 @@ class IOApi {
   /// [offset] Seek to the specified offset before reading (if not specificed, proceed with offset
   /// following the last read). Some types of streams may only support sequential reads.
   /// [size] Maximum number of bytes to read (left upon the agent discretion if not specified).
-  Future<ReadResult> read(StreamHandle handle, {int offset, int size}) async {
+  Future<ReadResult> read(StreamHandle handle, {int? offset, int? size}) async {
     var result = await _client.send('IO.read', {
       'handle': handle,
       if (offset != null) 'offset': offset,
@@ -44,7 +43,7 @@ class IOApi {
 
 class ReadResult {
   /// Set if the data is base64-encoded
-  final bool base64Encoded;
+  final bool? base64Encoded;
 
   /// Data that were read.
   final String data;
@@ -52,7 +51,7 @@ class ReadResult {
   /// Set if the end-of-file condition occured while reading.
   final bool eof;
 
-  ReadResult({this.base64Encoded, @required this.data, @required this.eof});
+  ReadResult({this.base64Encoded, required this.data, required this.eof});
 
   factory ReadResult.fromJson(Map<String, dynamic> json) {
     return ReadResult(

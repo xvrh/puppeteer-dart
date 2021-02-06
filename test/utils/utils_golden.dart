@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:image/image.dart';
-import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 import 'pixel_match.dart';
 
@@ -52,9 +51,10 @@ _GoldenMatcher equalsGolden(String goldenPath) {
   return _GoldenMatcher(goldenPath);
 }
 
-ImageDifference _compareImages(List<int> actualBytes, List<int> expectedBytes) {
-  var actual = decodeImage(actualBytes);
-  var expected = decodeImage(expectedBytes);
+ImageDifference? _compareImages(
+    List<int> actualBytes, List<int> expectedBytes) {
+  var actual = decodeImage(actualBytes)!;
+  var expected = decodeImage(expectedBytes)!;
 
   if (expected.width != actual.width || expected.height != actual.height) {
     return SizeDifference(
@@ -96,7 +96,7 @@ class ContentDifference implements ImageDifference {
   final num usedThreshold;
 
   ContentDifference(this.differenceCount, this.pngDiff,
-      {@required this.usedThreshold});
+      {required this.usedThreshold});
 
   String get _base64Png =>
       Uri.dataFromBytes(pngDiff, mimeType: 'image/png').toString();

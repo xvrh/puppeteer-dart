@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'network.dart' as network;
 import 'runtime.dart' as runtime;
@@ -61,28 +60,28 @@ class LogEntry {
   final runtime.Timestamp timestamp;
 
   /// URL of the resource if known.
-  final String url;
+  final String? url;
 
   /// Line number in the resource.
-  final int lineNumber;
+  final int? lineNumber;
 
   /// JavaScript stack trace.
-  final runtime.StackTraceData stackTrace;
+  final runtime.StackTraceData? stackTrace;
 
   /// Identifier of the network request associated with this entry.
-  final network.RequestId networkRequestId;
+  final network.RequestId? networkRequestId;
 
   /// Identifier of the worker associated with this entry.
-  final String workerId;
+  final String? workerId;
 
   /// Call arguments.
-  final List<runtime.RemoteObject> args;
+  final List<runtime.RemoteObject>? args;
 
   LogEntry(
-      {@required this.source,
-      @required this.level,
-      @required this.text,
-      @required this.timestamp,
+      {required this.source,
+      required this.level,
+      required this.text,
+      required this.timestamp,
       this.url,
       this.lineNumber,
       this.stackTrace,
@@ -125,11 +124,11 @@ class LogEntry {
       'timestamp': timestamp.toJson(),
       if (url != null) 'url': url,
       if (lineNumber != null) 'lineNumber': lineNumber,
-      if (stackTrace != null) 'stackTrace': stackTrace.toJson(),
+      if (stackTrace != null) 'stackTrace': stackTrace!.toJson(),
       if (networkRequestId != null)
-        'networkRequestId': networkRequestId.toJson(),
+        'networkRequestId': networkRequestId!.toJson(),
       if (workerId != null) 'workerId': workerId,
-      if (args != null) 'args': args.map((e) => e.toJson()).toList(),
+      if (args != null) 'args': args!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -168,7 +167,7 @@ class LogEntrySource {
 
   const LogEntrySource._(this.value);
 
-  factory LogEntrySource.fromJson(String value) => values[value];
+  factory LogEntrySource.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -199,7 +198,7 @@ class LogEntryLevel {
 
   const LogEntryLevel._(this.value);
 
-  factory LogEntryLevel.fromJson(String value) => values[value];
+  factory LogEntryLevel.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -222,7 +221,7 @@ class ViolationSetting {
   /// Time threshold to trigger upon.
   final num threshold;
 
-  ViolationSetting({@required this.name, @required this.threshold});
+  ViolationSetting({required this.name, required this.threshold});
 
   factory ViolationSetting.fromJson(Map<String, dynamic> json) {
     return ViolationSetting(
@@ -261,7 +260,7 @@ class ViolationSettingName {
 
   const ViolationSettingName._(this.value);
 
-  factory ViolationSettingName.fromJson(String value) => values[value];
+  factory ViolationSettingName.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 

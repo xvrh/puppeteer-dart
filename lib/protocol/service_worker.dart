@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'target.dart' as target;
 
@@ -141,9 +140,9 @@ class ServiceWorkerRegistration {
   final bool isDeleted;
 
   ServiceWorkerRegistration(
-      {@required this.registrationId,
-      @required this.scopeURL,
-      @required this.isDeleted});
+      {required this.registrationId,
+      required this.scopeURL,
+      required this.isDeleted});
 
   factory ServiceWorkerRegistration.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerRegistration(
@@ -179,7 +178,7 @@ class ServiceWorkerVersionRunningStatus {
   const ServiceWorkerVersionRunningStatus._(this.value);
 
   factory ServiceWorkerVersionRunningStatus.fromJson(String value) =>
-      values[value];
+      values[value]!;
 
   String toJson() => value;
 
@@ -215,7 +214,7 @@ class ServiceWorkerVersionStatus {
 
   const ServiceWorkerVersionStatus._(this.value);
 
-  factory ServiceWorkerVersionStatus.fromJson(String value) => values[value];
+  factory ServiceWorkerVersionStatus.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -244,22 +243,22 @@ class ServiceWorkerVersion {
   final ServiceWorkerVersionStatus status;
 
   /// The Last-Modified header value of the main script.
-  final num scriptLastModified;
+  final num? scriptLastModified;
 
   /// The time at which the response headers of the main script were received from the server.
   /// For cached script it is the last time the cache entry was validated.
-  final num scriptResponseTime;
+  final num? scriptResponseTime;
 
-  final List<target.TargetID> controlledClients;
+  final List<target.TargetID>? controlledClients;
 
-  final target.TargetID targetId;
+  final target.TargetID? targetId;
 
   ServiceWorkerVersion(
-      {@required this.versionId,
-      @required this.registrationId,
-      @required this.scriptURL,
-      @required this.runningStatus,
-      @required this.status,
+      {required this.versionId,
+      required this.registrationId,
+      required this.scriptURL,
+      required this.runningStatus,
+      required this.status,
       this.scriptLastModified,
       this.scriptResponseTime,
       this.controlledClients,
@@ -300,8 +299,8 @@ class ServiceWorkerVersion {
       if (scriptLastModified != null) 'scriptLastModified': scriptLastModified,
       if (scriptResponseTime != null) 'scriptResponseTime': scriptResponseTime,
       if (controlledClients != null)
-        'controlledClients': controlledClients.map((e) => e.toJson()).toList(),
-      if (targetId != null) 'targetId': targetId.toJson(),
+        'controlledClients': controlledClients!.map((e) => e.toJson()).toList(),
+      if (targetId != null) 'targetId': targetId!.toJson(),
     };
   }
 }
@@ -321,12 +320,12 @@ class ServiceWorkerErrorMessage {
   final int columnNumber;
 
   ServiceWorkerErrorMessage(
-      {@required this.errorMessage,
-      @required this.registrationId,
-      @required this.versionId,
-      @required this.sourceURL,
-      @required this.lineNumber,
-      @required this.columnNumber});
+      {required this.errorMessage,
+      required this.registrationId,
+      required this.versionId,
+      required this.sourceURL,
+      required this.lineNumber,
+      required this.columnNumber});
 
   factory ServiceWorkerErrorMessage.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerErrorMessage(

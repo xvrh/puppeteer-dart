@@ -11,10 +11,10 @@ import 'utils/utils_golden.dart';
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 void main() {
-  Server server;
-  Browser browser;
-  BrowserContext context;
-  Page page;
+  late Server server;
+  late Browser browser;
+  late BrowserContext context;
+  late Page page;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
@@ -23,7 +23,6 @@ void main() {
   tearDownAll(() async {
     await server.close();
     await browser.close();
-    browser = null;
   });
 
   setUp(() async {
@@ -34,7 +33,6 @@ void main() {
   tearDown(() async {
     server.clearRoutes();
     await context.close();
-    page = null;
   });
 
   group('Page.setRequestInterception', () {
@@ -52,7 +50,7 @@ void main() {
         expect(request.isNavigationRequest, isTrue);
         expect(request.resourceType, equals(ResourceType.document));
         expect(request.frame == page.mainFrame, isTrue);
-        expect(request.frame.url, equals('about:blank'));
+        expect(request.frame!.url, equals('about:blank'));
         request.continueRequest();
       });
       var response = await page.goto(server.emptyPage);
@@ -190,11 +188,15 @@ void main() {
       page.onRequest.listen((request) {
         request.abort(error: ErrorReason.internetDisconnected);
       });
-      Request failedRequest;
+      Request? failedRequest;
       page.onRequestFailed.listen((request) => failedRequest = request);
-      await page.goto(server.emptyPage).catchError((e) => null);
+      try {
+        await page.goto(server.emptyPage);
+      } catch (e) {
+        // ok
+      }
       expect(failedRequest, isNotNull);
-      expect(failedRequest.failure, equals('net::ERR_INTERNET_DISCONNECTED'));
+      expect(failedRequest!.failure, 'net::ERR_INTERNET_DISCONNECTED');
     });
     test('should send referer', () async {
       await page.setExtraHTTPHeaders({'referer': 'http://google.com/'});
@@ -381,14 +383,14 @@ void main() {
           'data:text/html,<link rel="stylesheet" href="${server.prefix}/fonts?helvetica|arial"/>');
       expect(response.status, equals(200));
       expect(requests.length, equals(2));
-      expect(requests[1].response.status, equals(404));
+      expect(requests[1].response!.status, equals(404));
     });
     test(
         'should not throw Invalid Interception Id if the request was cancelled',
         () async {
       await page.setContent('<iframe></iframe>');
       await page.setRequestInterception(true);
-      Request request;
+      Request? request;
       page.onRequest.listen((r) {
         request = r;
       });
@@ -399,10 +401,10 @@ void main() {
       await page.onRequest.first;
       // Delete frame to cause request to be canceled.
       await page.$eval('iframe', 'frame => frame.remove()');
-      await request.continueRequest();
+      await request!.continueRequest();
     });
     test('should throw if interception is not enabled', () async {
-      AssertionError error;
+      AssertionError? error;
       page.onRequest.listen((request) async {
         try {
           await request.continueRequest();
@@ -411,7 +413,7 @@ void main() {
         }
       });
       await page.goto(server.emptyPage);
-      expect(error.message, contains('Request Interception is not enabled'));
+      expect(error!.message, contains('Request Interception is not enabled'));
     });
     test('should work with file URLs', () async {
       await page.setRequestInterception(true);
@@ -455,11 +457,11 @@ void main() {
             : null;
         request.continueRequest(url: redirectURL);
       });
-      ConsoleMessage consoleMessage;
+      ConsoleMessage? consoleMessage;
       page.onConsole.listen((msg) => consoleMessage = msg);
       await page.goto(server.emptyPage);
       expect(page.url, equals(server.emptyPage));
-      expect(consoleMessage.text, equals('yellow'));
+      expect(consoleMessage!.text, equals('yellow'));
     });
     test('should amend method', () async {
       await page.goto(server.emptyPage);
@@ -479,7 +481,7 @@ void main() {
       page.onRequest.listen((request) {
         request.continueRequest(postData: 'doggo');
       });
-      String body;
+      String? body;
       server.setRoute('sleep.zzz', (request) async {
         body = await request.readAsString();
         return shelf.Response.ok('ok');
@@ -497,7 +499,7 @@ void main() {
       page.onRequest.listen((request) {
         request.continueRequest(method: 'POST', postData: 'doggo');
       });
-      String body;
+      String? body;
       server.setRoute('empty.html', (request) async {
         body = await request.readAsString();
         return shelf.Response.ok('ok');

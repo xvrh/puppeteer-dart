@@ -47,7 +47,7 @@ void main() async {
   var myPage = await browser.newPage();
 
   // Go to a page and wait to be fully loaded
-  await myPage.goto('https://www.github.com', wait: Until.networkIdle);
+  await myPage.goto('https://dart.dev', wait: Until.networkIdle);
 
   // Do something... See other examples
   await myPage.screenshot();
@@ -69,7 +69,7 @@ void main() async {
   // Start the browser and go to a web page
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
-  await page.goto('https://www.github.com', wait: Until.networkIdle);
+  await page.goto('https://dart.dev', wait: Until.networkIdle);
 
   // For this example, we force the "screen" media-type because sometime
   // CSS rules with "@media print" can change the look of the page.
@@ -80,7 +80,7 @@ void main() async {
       format: PaperFormat.a4,
       printBackground: true,
       pageRanges: '1',
-      output: File('example/_github.pdf').openWrite());
+      output: File('example/_dart.pdf').openWrite());
   await browser.close();
 }
 ```
@@ -99,7 +99,7 @@ void main() async {
   // Setup the dimensions and user-agent of a particular phone
   await page.emulate(puppeteer.devices.pixel2XL);
 
-  await page.goto('https://www.github.com', wait: Until.networkIdle);
+  await page.goto('https://dart.dev', wait: Until.networkIdle);
 
   // Take a screenshot of the page
   var screenshot = await page.screenshot();
@@ -217,7 +217,10 @@ void main() async {
   // animated gif.
   var animation = image.Animation();
   page.devTools.page.onScreencastFrame.listen((event) {
-    animation.addFrame(image.decodePng(base64.decode(event.data)));
+    var frame = image.decodePng(base64.decode(event.data));
+    if (frame != null) {
+      animation.addFrame(frame);
+    }
   });
 
   // For this example, we change the CSS animations speed.
@@ -232,7 +235,7 @@ void main() async {
 
   // Encode all the frames in an animated Gif file.
   File('example/_rubkis_cube.gif')
-      .writeAsBytesSync(image.GifEncoder().encodeAnimation(animation));
+      .writeAsBytesSync(image.GifEncoder().encodeAnimation(animation)!);
 
   // Alternatively, we can save all the frames on disk and use ffmpeg to convert
   // it to a video file. (for example: ffmpeg -i frames/%3d.png -r 10 output.mp4)

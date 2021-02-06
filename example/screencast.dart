@@ -17,7 +17,10 @@ void main() async {
   // animated gif.
   var animation = image.Animation();
   page.devTools.page.onScreencastFrame.listen((event) {
-    animation.addFrame(image.decodePng(base64.decode(event.data)));
+    var frame = image.decodePng(base64.decode(event.data));
+    if (frame != null) {
+      animation.addFrame(frame);
+    }
   });
 
   // For this example, we change the CSS animations speed.
@@ -32,7 +35,7 @@ void main() async {
 
   // Encode all the frames in an animated Gif file.
   File('example/_rubkis_cube.gif')
-      .writeAsBytesSync(image.GifEncoder().encodeAnimation(animation));
+      .writeAsBytesSync(image.GifEncoder().encodeAnimation(animation)!);
 
   // Alternatively, we can save all the frames on disk and use ffmpeg to convert
   // it to a video file. (for example: ffmpeg -i frames/%3d.png -r 10 output.mp4)

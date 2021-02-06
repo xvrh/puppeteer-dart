@@ -6,7 +6,7 @@ import 'package:petitparser/petitparser.dart';
 /// function declaration.
 /// Returns the string as it if this is already a classical function declaration
 /// Returns null if we cannot parse recognize the declaration
-String convertToFunctionDeclaration(String javascript) {
+String? convertToFunctionDeclaration(String javascript) {
   var grammar = JsGrammar();
   var result = grammar.parse(javascript);
 
@@ -44,14 +44,14 @@ class JsGrammar extends GrammarParser {
 class JsGrammarDefinition extends GrammarDefinition {
   Parser token(input) {
     if (input is String) {
-      input = input.length == 1 ? char(input) : string(input as String);
+      input = input.length == 1 ? char(input) : string(input);
     } else if (input is Function) {
-      input = ref(input as Function);
+      input = ref(input);
     }
     if (input is! Parser || input is TrimmingParser || input is TokenParser) {
       throw ArgumentError('Invalid token parser: $input');
     }
-    return (input as Parser).token().trim(ref(HIDDEN_STUFF));
+    return input.token().trim(ref(HIDDEN_STUFF));
   }
 
   @override

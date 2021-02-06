@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'dom_debugger.dart' as dom_debugger;
@@ -31,9 +30,9 @@ class DOMSnapshotApi {
   /// [includeUserAgentShadowTree] Whether to include UA shadow tree in the snapshot (default false).
   @deprecated
   Future<GetSnapshotResult> getSnapshot(List<String> computedStyleWhitelist,
-      {bool includeEventListeners,
-      bool includePaintOrder,
-      bool includeUserAgentShadowTree}) async {
+      {bool? includeEventListeners,
+      bool? includePaintOrder,
+      bool? includeUserAgentShadowTree}) async {
     var result = await _client.send('DOMSnapshot.getSnapshot', {
       'computedStyleWhitelist': [...computedStyleWhitelist],
       if (includeEventListeners != null)
@@ -53,7 +52,7 @@ class DOMSnapshotApi {
   /// [includePaintOrder] Whether to include layout object paint orders into the snapshot.
   /// [includeDOMRects] Whether to include DOM rectangles (offsetRects, clientRects, scrollRects) into the snapshot
   Future<CaptureSnapshotResult> captureSnapshot(List<String> computedStyles,
-      {bool includePaintOrder, bool includeDOMRects}) async {
+      {bool? includePaintOrder, bool? includeDOMRects}) async {
     var result = await _client.send('DOMSnapshot.captureSnapshot', {
       'computedStyles': [...computedStyles],
       if (includePaintOrder != null) 'includePaintOrder': includePaintOrder,
@@ -74,9 +73,9 @@ class GetSnapshotResult {
   final List<ComputedStyle> computedStyles;
 
   GetSnapshotResult(
-      {@required this.domNodes,
-      @required this.layoutTreeNodes,
-      @required this.computedStyles});
+      {required this.domNodes,
+      required this.layoutTreeNodes,
+      required this.computedStyles});
 
   factory GetSnapshotResult.fromJson(Map<String, dynamic> json) {
     return GetSnapshotResult(
@@ -100,7 +99,7 @@ class CaptureSnapshotResult {
   /// Shared string table that all string properties refer to with indexes.
   final List<String> strings;
 
-  CaptureSnapshotResult({@required this.documents, @required this.strings});
+  CaptureSnapshotResult({required this.documents, required this.strings});
 
   factory CaptureSnapshotResult.fromJson(Map<String, dynamic> json) {
     return CaptureSnapshotResult(
@@ -124,94 +123,94 @@ class DOMNode {
   final String nodeValue;
 
   /// Only set for textarea elements, contains the text value.
-  final String textValue;
+  final String? textValue;
 
   /// Only set for input elements, contains the input's associated text value.
-  final String inputValue;
+  final String? inputValue;
 
   /// Only set for radio and checkbox input elements, indicates if the element has been checked
-  final bool inputChecked;
+  final bool? inputChecked;
 
   /// Only set for option elements, indicates if the element has been selected
-  final bool optionSelected;
+  final bool? optionSelected;
 
   /// `Node`'s id, corresponds to DOM.Node.backendNodeId.
   final dom.BackendNodeId backendNodeId;
 
   /// The indexes of the node's child nodes in the `domNodes` array returned by `getSnapshot`, if
   /// any.
-  final List<int> childNodeIndexes;
+  final List<int>? childNodeIndexes;
 
   /// Attributes of an `Element` node.
-  final List<NameValue> attributes;
+  final List<NameValue>? attributes;
 
   /// Indexes of pseudo elements associated with this node in the `domNodes` array returned by
   /// `getSnapshot`, if any.
-  final List<int> pseudoElementIndexes;
+  final List<int>? pseudoElementIndexes;
 
   /// The index of the node's related layout tree node in the `layoutTreeNodes` array returned by
   /// `getSnapshot`, if any.
-  final int layoutNodeIndex;
+  final int? layoutNodeIndex;
 
   /// Document URL that `Document` or `FrameOwner` node points to.
-  final String documentURL;
+  final String? documentURL;
 
   /// Base URL that `Document` or `FrameOwner` node uses for URL completion.
-  final String baseURL;
+  final String? baseURL;
 
   /// Only set for documents, contains the document's content language.
-  final String contentLanguage;
+  final String? contentLanguage;
 
   /// Only set for documents, contains the document's character set encoding.
-  final String documentEncoding;
+  final String? documentEncoding;
 
   /// `DocumentType` node's publicId.
-  final String publicId;
+  final String? publicId;
 
   /// `DocumentType` node's systemId.
-  final String systemId;
+  final String? systemId;
 
   /// Frame ID for frame owner elements and also for the document node.
-  final page.FrameId frameId;
+  final page.FrameId? frameId;
 
   /// The index of a frame owner element's content document in the `domNodes` array returned by
   /// `getSnapshot`, if any.
-  final int contentDocumentIndex;
+  final int? contentDocumentIndex;
 
   /// Type of a pseudo element node.
-  final dom.PseudoType pseudoType;
+  final dom.PseudoType? pseudoType;
 
   /// Shadow root type.
-  final dom.ShadowRootType shadowRootType;
+  final dom.ShadowRootType? shadowRootType;
 
   /// Whether this DOM node responds to mouse clicks. This includes nodes that have had click
   /// event listeners attached via JavaScript as well as anchor tags that naturally navigate when
   /// clicked.
-  final bool isClickable;
+  final bool? isClickable;
 
   /// Details of the node's event listeners, if any.
-  final List<dom_debugger.EventListener> eventListeners;
+  final List<dom_debugger.EventListener>? eventListeners;
 
   /// The selected url for nodes with a srcset attribute.
-  final String currentSourceURL;
+  final String? currentSourceURL;
 
   /// The url of the script (if any) that generates this node.
-  final String originURL;
+  final String? originURL;
 
   /// Scroll offsets, set when this node is a Document.
-  final num scrollOffsetX;
+  final num? scrollOffsetX;
 
-  final num scrollOffsetY;
+  final num? scrollOffsetY;
 
   DOMNode(
-      {@required this.nodeType,
-      @required this.nodeName,
-      @required this.nodeValue,
+      {required this.nodeType,
+      required this.nodeName,
+      required this.nodeValue,
       this.textValue,
       this.inputValue,
       this.inputChecked,
       this.optionSelected,
-      @required this.backendNodeId,
+      required this.backendNodeId,
       this.childNodeIndexes,
       this.attributes,
       this.pseudoElementIndexes,
@@ -321,11 +320,11 @@ class DOMNode {
       if (inputValue != null) 'inputValue': inputValue,
       if (inputChecked != null) 'inputChecked': inputChecked,
       if (optionSelected != null) 'optionSelected': optionSelected,
-      if (childNodeIndexes != null) 'childNodeIndexes': [...childNodeIndexes],
+      if (childNodeIndexes != null) 'childNodeIndexes': [...?childNodeIndexes],
       if (attributes != null)
-        'attributes': attributes.map((e) => e.toJson()).toList(),
+        'attributes': attributes!.map((e) => e.toJson()).toList(),
       if (pseudoElementIndexes != null)
-        'pseudoElementIndexes': [...pseudoElementIndexes],
+        'pseudoElementIndexes': [...?pseudoElementIndexes],
       if (layoutNodeIndex != null) 'layoutNodeIndex': layoutNodeIndex,
       if (documentURL != null) 'documentURL': documentURL,
       if (baseURL != null) 'baseURL': baseURL,
@@ -333,14 +332,14 @@ class DOMNode {
       if (documentEncoding != null) 'documentEncoding': documentEncoding,
       if (publicId != null) 'publicId': publicId,
       if (systemId != null) 'systemId': systemId,
-      if (frameId != null) 'frameId': frameId.toJson(),
+      if (frameId != null) 'frameId': frameId!.toJson(),
       if (contentDocumentIndex != null)
         'contentDocumentIndex': contentDocumentIndex,
-      if (pseudoType != null) 'pseudoType': pseudoType.toJson(),
-      if (shadowRootType != null) 'shadowRootType': shadowRootType.toJson(),
+      if (pseudoType != null) 'pseudoType': pseudoType!.toJson(),
+      if (shadowRootType != null) 'shadowRootType': shadowRootType!.toJson(),
       if (isClickable != null) 'isClickable': isClickable,
       if (eventListeners != null)
-        'eventListeners': eventListeners.map((e) => e.toJson()).toList(),
+        'eventListeners': eventListeners!.map((e) => e.toJson()).toList(),
       if (currentSourceURL != null) 'currentSourceURL': currentSourceURL,
       if (originURL != null) 'originURL': originURL,
       if (scrollOffsetX != null) 'scrollOffsetX': scrollOffsetX,
@@ -364,9 +363,9 @@ class InlineTextBox {
   final int numCharacters;
 
   InlineTextBox(
-      {@required this.boundingBox,
-      @required this.startCharacterIndex,
-      @required this.numCharacters});
+      {required this.boundingBox,
+      required this.startCharacterIndex,
+      required this.numCharacters});
 
   factory InlineTextBox.fromJson(Map<String, dynamic> json) {
     return InlineTextBox(
@@ -395,25 +394,25 @@ class LayoutTreeNode {
   final dom.Rect boundingBox;
 
   /// Contents of the LayoutText, if any.
-  final String layoutText;
+  final String? layoutText;
 
   /// The post-layout inline text nodes, if any.
-  final List<InlineTextBox> inlineTextNodes;
+  final List<InlineTextBox>? inlineTextNodes;
 
   /// Index into the `computedStyles` array returned by `getSnapshot`.
-  final int styleIndex;
+  final int? styleIndex;
 
   /// Global paint order index, which is determined by the stacking order of the nodes. Nodes
   /// that are painted together will have the same index. Only provided if includePaintOrder in
   /// getSnapshot was true.
-  final int paintOrder;
+  final int? paintOrder;
 
   /// Set to true to indicate the element begins a new stacking context.
-  final bool isStackingContext;
+  final bool? isStackingContext;
 
   LayoutTreeNode(
-      {@required this.domNodeIndex,
-      @required this.boundingBox,
+      {required this.domNodeIndex,
+      required this.boundingBox,
       this.layoutText,
       this.inlineTextNodes,
       this.styleIndex,
@@ -448,7 +447,7 @@ class LayoutTreeNode {
       'boundingBox': boundingBox.toJson(),
       if (layoutText != null) 'layoutText': layoutText,
       if (inlineTextNodes != null)
-        'inlineTextNodes': inlineTextNodes.map((e) => e.toJson()).toList(),
+        'inlineTextNodes': inlineTextNodes!.map((e) => e.toJson()).toList(),
       if (styleIndex != null) 'styleIndex': styleIndex,
       if (paintOrder != null) 'paintOrder': paintOrder,
       if (isStackingContext != null) 'isStackingContext': isStackingContext,
@@ -461,7 +460,7 @@ class ComputedStyle {
   /// Name/value pairs of computed style properties.
   final List<NameValue> properties;
 
-  ComputedStyle({@required this.properties});
+  ComputedStyle({required this.properties});
 
   factory ComputedStyle.fromJson(Map<String, dynamic> json) {
     return ComputedStyle(
@@ -486,7 +485,7 @@ class NameValue {
   /// Attribute/property value.
   final String value;
 
-  NameValue({@required this.name, @required this.value});
+  NameValue({required this.name, required this.value});
 
   factory NameValue.fromJson(Map<String, dynamic> json) {
     return NameValue(
@@ -552,7 +551,7 @@ class RareStringData {
 
   final List<StringIndex> value;
 
-  RareStringData({@required this.index, @required this.value});
+  RareStringData({required this.index, required this.value});
 
   factory RareStringData.fromJson(Map<String, dynamic> json) {
     return RareStringData(
@@ -574,7 +573,7 @@ class RareStringData {
 class RareBooleanData {
   final List<int> index;
 
-  RareBooleanData({@required this.index});
+  RareBooleanData({required this.index});
 
   factory RareBooleanData.fromJson(Map<String, dynamic> json) {
     return RareBooleanData(
@@ -594,7 +593,7 @@ class RareIntegerData {
 
   final List<int> value;
 
-  RareIntegerData({@required this.index, @required this.value});
+  RareIntegerData({required this.index, required this.value});
 
   factory RareIntegerData.fromJson(Map<String, dynamic> json) {
     return RareIntegerData(
@@ -668,29 +667,29 @@ class DocumentSnapshot {
   final TextBoxSnapshot textBoxes;
 
   /// Horizontal scroll offset.
-  final num scrollOffsetX;
+  final num? scrollOffsetX;
 
   /// Vertical scroll offset.
-  final num scrollOffsetY;
+  final num? scrollOffsetY;
 
   /// Document content width.
-  final num contentWidth;
+  final num? contentWidth;
 
   /// Document content height.
-  final num contentHeight;
+  final num? contentHeight;
 
   DocumentSnapshot(
-      {@required this.documentURL,
-      @required this.title,
-      @required this.baseURL,
-      @required this.contentLanguage,
-      @required this.encodingName,
-      @required this.publicId,
-      @required this.systemId,
-      @required this.frameId,
-      @required this.nodes,
-      @required this.layout,
-      @required this.textBoxes,
+      {required this.documentURL,
+      required this.title,
+      required this.baseURL,
+      required this.contentLanguage,
+      required this.encodingName,
+      required this.publicId,
+      required this.systemId,
+      required this.frameId,
+      required this.nodes,
+      required this.layout,
+      required this.textBoxes,
       this.scrollOffsetX,
       this.scrollOffsetY,
       this.contentWidth,
@@ -749,51 +748,51 @@ class DocumentSnapshot {
 /// Table containing nodes.
 class NodeTreeSnapshot {
   /// Parent node index.
-  final List<int> parentIndex;
+  final List<int>? parentIndex;
 
   /// `Node`'s nodeType.
-  final List<int> nodeType;
+  final List<int>? nodeType;
 
   /// `Node`'s nodeName.
-  final List<StringIndex> nodeName;
+  final List<StringIndex>? nodeName;
 
   /// `Node`'s nodeValue.
-  final List<StringIndex> nodeValue;
+  final List<StringIndex>? nodeValue;
 
   /// `Node`'s id, corresponds to DOM.Node.backendNodeId.
-  final List<dom.BackendNodeId> backendNodeId;
+  final List<dom.BackendNodeId>? backendNodeId;
 
   /// Attributes of an `Element` node. Flatten name, value pairs.
-  final List<ArrayOfStrings> attributes;
+  final List<ArrayOfStrings>? attributes;
 
   /// Only set for textarea elements, contains the text value.
-  final RareStringData textValue;
+  final RareStringData? textValue;
 
   /// Only set for input elements, contains the input's associated text value.
-  final RareStringData inputValue;
+  final RareStringData? inputValue;
 
   /// Only set for radio and checkbox input elements, indicates if the element has been checked
-  final RareBooleanData inputChecked;
+  final RareBooleanData? inputChecked;
 
   /// Only set for option elements, indicates if the element has been selected
-  final RareBooleanData optionSelected;
+  final RareBooleanData? optionSelected;
 
   /// The index of the document in the list of the snapshot documents.
-  final RareIntegerData contentDocumentIndex;
+  final RareIntegerData? contentDocumentIndex;
 
   /// Type of a pseudo element node.
-  final RareStringData pseudoType;
+  final RareStringData? pseudoType;
 
   /// Whether this DOM node responds to mouse clicks. This includes nodes that have had click
   /// event listeners attached via JavaScript as well as anchor tags that naturally navigate when
   /// clicked.
-  final RareBooleanData isClickable;
+  final RareBooleanData? isClickable;
 
   /// The selected url for nodes with a srcset attribute.
-  final RareStringData currentSourceURL;
+  final RareStringData? currentSourceURL;
 
   /// The url of the script (if any) that generates this node.
-  final RareStringData originURL;
+  final RareStringData? originURL;
 
   NodeTreeSnapshot(
       {this.parentIndex,
@@ -877,27 +876,27 @@ class NodeTreeSnapshot {
 
   Map<String, dynamic> toJson() {
     return {
-      if (parentIndex != null) 'parentIndex': [...parentIndex],
-      if (nodeType != null) 'nodeType': [...nodeType],
+      if (parentIndex != null) 'parentIndex': [...?parentIndex],
+      if (nodeType != null) 'nodeType': [...?nodeType],
       if (nodeName != null)
-        'nodeName': nodeName.map((e) => e.toJson()).toList(),
+        'nodeName': nodeName!.map((e) => e.toJson()).toList(),
       if (nodeValue != null)
-        'nodeValue': nodeValue.map((e) => e.toJson()).toList(),
+        'nodeValue': nodeValue!.map((e) => e.toJson()).toList(),
       if (backendNodeId != null)
-        'backendNodeId': backendNodeId.map((e) => e.toJson()).toList(),
+        'backendNodeId': backendNodeId!.map((e) => e.toJson()).toList(),
       if (attributes != null)
-        'attributes': attributes.map((e) => e.toJson()).toList(),
-      if (textValue != null) 'textValue': textValue.toJson(),
-      if (inputValue != null) 'inputValue': inputValue.toJson(),
-      if (inputChecked != null) 'inputChecked': inputChecked.toJson(),
-      if (optionSelected != null) 'optionSelected': optionSelected.toJson(),
+        'attributes': attributes!.map((e) => e.toJson()).toList(),
+      if (textValue != null) 'textValue': textValue!.toJson(),
+      if (inputValue != null) 'inputValue': inputValue!.toJson(),
+      if (inputChecked != null) 'inputChecked': inputChecked!.toJson(),
+      if (optionSelected != null) 'optionSelected': optionSelected!.toJson(),
       if (contentDocumentIndex != null)
-        'contentDocumentIndex': contentDocumentIndex.toJson(),
-      if (pseudoType != null) 'pseudoType': pseudoType.toJson(),
-      if (isClickable != null) 'isClickable': isClickable.toJson(),
+        'contentDocumentIndex': contentDocumentIndex!.toJson(),
+      if (pseudoType != null) 'pseudoType': pseudoType!.toJson(),
+      if (isClickable != null) 'isClickable': isClickable!.toJson(),
       if (currentSourceURL != null)
-        'currentSourceURL': currentSourceURL.toJson(),
-      if (originURL != null) 'originURL': originURL.toJson(),
+        'currentSourceURL': currentSourceURL!.toJson(),
+      if (originURL != null) 'originURL': originURL!.toJson(),
     };
   }
 }
@@ -922,23 +921,23 @@ class LayoutTreeSnapshot {
   /// Global paint order index, which is determined by the stacking order of the nodes. Nodes
   /// that are painted together will have the same index. Only provided if includePaintOrder in
   /// captureSnapshot was true.
-  final List<int> paintOrders;
+  final List<int>? paintOrders;
 
   /// The offset rect of nodes. Only available when includeDOMRects is set to true
-  final List<Rectangle> offsetRects;
+  final List<Rectangle>? offsetRects;
 
   /// The scroll rect of nodes. Only available when includeDOMRects is set to true
-  final List<Rectangle> scrollRects;
+  final List<Rectangle>? scrollRects;
 
   /// The client rect of nodes. Only available when includeDOMRects is set to true
-  final List<Rectangle> clientRects;
+  final List<Rectangle>? clientRects;
 
   LayoutTreeSnapshot(
-      {@required this.nodeIndex,
-      @required this.styles,
-      @required this.bounds,
-      @required this.text,
-      @required this.stackingContexts,
+      {required this.nodeIndex,
+      required this.styles,
+      required this.bounds,
+      required this.text,
+      required this.stackingContexts,
       this.paintOrders,
       this.offsetRects,
       this.scrollRects,
@@ -986,13 +985,13 @@ class LayoutTreeSnapshot {
       'bounds': bounds.map((e) => e.toJson()).toList(),
       'text': text.map((e) => e.toJson()).toList(),
       'stackingContexts': stackingContexts.toJson(),
-      if (paintOrders != null) 'paintOrders': [...paintOrders],
+      if (paintOrders != null) 'paintOrders': [...?paintOrders],
       if (offsetRects != null)
-        'offsetRects': offsetRects.map((e) => e.toJson()).toList(),
+        'offsetRects': offsetRects!.map((e) => e.toJson()).toList(),
       if (scrollRects != null)
-        'scrollRects': scrollRects.map((e) => e.toJson()).toList(),
+        'scrollRects': scrollRects!.map((e) => e.toJson()).toList(),
       if (clientRects != null)
-        'clientRects': clientRects.map((e) => e.toJson()).toList(),
+        'clientRects': clientRects!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -1015,10 +1014,10 @@ class TextBoxSnapshot {
   final List<int> length;
 
   TextBoxSnapshot(
-      {@required this.layoutIndex,
-      @required this.bounds,
-      @required this.start,
-      @required this.length});
+      {required this.layoutIndex,
+      required this.bounds,
+      required this.start,
+      required this.length});
 
   factory TextBoxSnapshot.fromJson(Map<String, dynamic> json) {
     return TextBoxSnapshot(
