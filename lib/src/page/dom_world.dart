@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:meta/meta.dart';
 import '../javascript_function_parser.dart';
 import 'execution_context.dart';
 import 'frame_manager.dart';
@@ -12,32 +11,32 @@ class DomWorld {
   final FrameManager frameManager;
   final Frame frame;
   final _waitTasks = <WaitTask>{};
-  Completer<ExecutionContext> _contextCompleter;
-  Future<ElementHandle> _documentFuture;
+  Completer<ExecutionContext>? _contextCompleter;
+  Future<ElementHandle>? _documentFuture;
   bool _detached = false;
 
   DomWorld(this.frameManager, this.frame) {
     setContext(null);
   }
 
-  void setContext(ExecutionContext context) {
+  void setContext(ExecutionContext? context) {
     if (context != null) {
       _documentFuture = null;
-      _contextCompleter.complete(context);
+      _contextCompleter!.complete(context);
 
       for (var waitTask in _waitTasks) {
         waitTask.rerun();
       }
     } else {
-      if (_contextCompleter != null && !_contextCompleter.isCompleted) {
-        _contextCompleter.completeError('Context is disposed');
+      if (_contextCompleter != null && !_contextCompleter!.isCompleted) {
+        _contextCompleter!.completeError('Context is disposed');
       }
       _contextCompleter = Completer<ExecutionContext>();
     }
   }
 
   bool get hasContext =>
-      _contextCompleter != null && _contextCompleter.isCompleted;
+      _contextCompleter != null && _contextCompleter!.isCompleted;
 
   void detach() {
     _detached = true;
@@ -52,18 +51,18 @@ class DomWorld {
       throw Exception(
           'Execution Context is not available in detached frame "${frame.url}" (are you trying to evaluate?)');
     }
-    return _contextCompleter.future;
+    return _contextCompleter!.future;
   }
 
   Future<T> evaluateHandle<T extends JsHandle>(
       @Language('js') String pageFunction,
-      {List args}) async {
+      {List? args}) async {
     var context = await executionContext;
     return context.evaluateHandle(pageFunction, args: args);
   }
 
   Future<T> evaluate<T>(@Language('js') String pageFunction,
-      {List args}) async {
+      {List? args}) async {
     var context = await executionContext;
     return context.evaluate<T>(pageFunction, args: args);
   }
@@ -74,15 +73,20 @@ class DomWorld {
     return value;
   }
 
+  Future<ElementHandle?> $OrNull(String selector) async {
+    var document = await _document;
+    return document.$OrNull(selector);
+  }
+
   Future<ElementHandle> get _document {
     if (_documentFuture != null) {
-      return _documentFuture;
+      return _documentFuture!;
     }
     _documentFuture = executionContext.then((context) async {
       var document = await context.evaluateHandle('document');
-      return document.asElement;
+      return document.asElement!;
     });
-    return _documentFuture;
+    return _documentFuture!;
   }
 
   Future<List<ElementHandle>> $x(String expression) async {
@@ -91,14 +95,14 @@ class DomWorld {
     return value;
   }
 
-  Future<T> $eval<T>(String selector, @Language('js') String pageFunction,
-      {List args}) async {
+  Future<T?> $eval<T>(String selector, @Language('js') String pageFunction,
+      {List? args}) async {
     var document = await _document;
     return document.$eval<T>(selector, pageFunction, args: args);
   }
 
-  Future<T> $$eval<T>(String selector, @Language('js') String pageFunction,
-      {List args}) async {
+  Future<T?> $$eval<T>(String selector, @Language('js') String pageFunction,
+      {List? args}) async {
     var document = await _document;
     return document.$$eval<T>(selector, pageFunction, args: args);
   }
@@ -109,7 +113,7 @@ class DomWorld {
     return value;
   }
 
-  Future<String> get content async {
+  Future<String?> get content async {
     return await evaluate(
         //language=js
         '''
@@ -126,7 +130,7 @@ function _() {
 ''');
   }
 
-  Future<void> setContent(String html, {Duration timeout, Until wait}) async {
+  Future<void> setContent(String html, {Duration? timeout, Until? wait}) async {
     timeout ??= frameManager.page.navigationTimeoutOrDefault;
     wait ??= Until.load;
 
@@ -154,7 +158,7 @@ function _(html) {
   }
 
   Future<ElementHandle> addScriptTag(
-      {String url, File file, String content, String type}) async {
+      {String? url, File? file, String? content, String? type}) async {
     assert(url != null || file != null || content != null);
     type ??= '';
 
@@ -177,7 +181,7 @@ async function _(url, type) {
   await promise;
   return script;
 }
-''', args: [url, type])).asElement;
+''', args: [url, type])).asElement!;
     }
 
     var addScriptContent =
@@ -201,20 +205,20 @@ function _(content, type) {
       contents += '//# sourceURL=${file.absolute.path}';
       return (await context
               .evaluateHandle(addScriptContent, args: [contents, type]))
-          .asElement;
+          .asElement!;
     }
 
     if (content != null) {
       return (await context
               .evaluateHandle(addScriptContent, args: [content, type]))
-          .asElement;
+          .asElement!;
     }
 
     throw StateError('');
   }
 
   Future<ElementHandle> addStyleTag(
-      {String url, File file, String content}) async {
+      {String? url, File? file, String? content}) async {
     assert(url != null || file != null || content != null);
 
     var context = await executionContext;
@@ -235,7 +239,7 @@ async function _(url) {
   await promise;
   return link;   
 }
-''', args: [url])).asElement;
+''', args: [url])).asElement!;
     }
 
     var addStyleContent =
@@ -259,44 +263,41 @@ async function _(content) {
       var contents = await file.readAsString();
       contents += '/*# sourceURL=${file.absolute.path}*/';
       return (await context.evaluateHandle(addStyleContent, args: [contents]))
-          .asElement;
+          .asElement!;
     }
 
     if (content != null) {
       return (await context.evaluateHandle(addStyleContent, args: [content]))
-          .asElement;
+          .asElement!;
     }
 
     throw StateError('');
   }
 
   Future<void> click(String selector,
-      {Duration delay, MouseButton button, int clickCount}) async {
-    var handle = await $(selector);
-    assert(handle != null, 'No node found for selector: $selector');
+      {Duration? delay, MouseButton? button, int? clickCount}) async {
+    var handle = await $OrNull(selector);
+    if (handle == null) {
+      throw Exception('No node found for selector: $selector');
+    }
     await handle.click(delay: delay, button: button, clickCount: clickCount);
     await handle.dispose();
   }
 
   Future<void> focus(String selector) async {
     var handle = await $(selector);
-    assert(handle != null, 'No node found for selector: $selector');
     await handle.focus();
     await handle.dispose();
   }
 
   Future<void> hover(String selector) async {
     var handle = await $(selector);
-    assert(handle != null, 'No node found for selector: $selector');
     await handle.hover();
     await handle.dispose();
   }
 
   Future<List<String>> select(String selector, List<String> values) async {
     var handle = await $(selector);
-    if (handle == null) {
-      throw Exception('No node found for selector: $selector');
-    }
     var result = await handle.select(values);
     await handle.dispose();
     return result;
@@ -304,33 +305,31 @@ async function _(content) {
 
   Future<void> tap(String selector) async {
     var handle = await $(selector);
-    assert(handle != null, 'No node found for selector: $selector');
     await handle.tap();
     await handle.dispose();
   }
 
-  Future<void> type(String selector, String text, {Duration delay}) async {
+  Future<void> type(String selector, String text, {Duration? delay}) async {
     var handle = await $(selector);
-    assert(handle != null, 'No node found for selector: $selector');
     await handle.type(text, delay: delay);
     await handle.dispose();
   }
 
-  Future<ElementHandle> waitForSelector(String selector,
-      {bool visible, bool hidden, Duration timeout}) {
+  Future<ElementHandle?> waitForSelector(String selector,
+      {bool? visible, bool? hidden, Duration? timeout}) {
     return _waitForSelectorOrXPath(selector,
         isXPath: false, visible: visible, hidden: hidden, timeout: timeout);
   }
 
-  Future<ElementHandle> waitForXPath(String xpath,
-      {bool visible, bool hidden, Duration timeout}) {
+  Future<ElementHandle?> waitForXPath(String xpath,
+      {bool? visible, bool? hidden, Duration? timeout}) {
     return _waitForSelectorOrXPath(xpath,
         isXPath: true, visible: visible, hidden: hidden, timeout: timeout);
   }
 
   Future<JsHandle> waitForFunction(
-      @Language('js') String pageFunction, List args,
-      {Duration timeout, Polling polling}) async {
+      @Language('js') String pageFunction, List? args,
+      {Duration? timeout, Polling? polling}) async {
     var functionDeclaration = convertToFunctionDeclaration(pageFunction);
     if (functionDeclaration == null) {
       pageFunction = 'function _() { return $pageFunction; }';
@@ -372,11 +371,11 @@ function _(selectorOrXPath, isXPath, waitForVisible, waitForHidden) {
 }
 ''';
 
-  Future<ElementHandle> _waitForSelectorOrXPath(String selectorOrXPath,
+  Future<ElementHandle?> _waitForSelectorOrXPath(String selectorOrXPath,
       {bool isXPath = false,
-      bool visible,
-      bool hidden,
-      Duration timeout}) async {
+      bool? visible,
+      bool? hidden,
+      Duration? timeout}) async {
     var waitForVisible = visible ?? false;
     var waitForHidden = hidden ?? false;
 
@@ -397,12 +396,14 @@ function _(selectorOrXPath, isXPath, waitForVisible, waitForHidden) {
     var handle = await waitTask.future;
     if (handle.asElement == null) {
       await handle.dispose();
+      //throw Exception(
+      //    "selector $selectorOrXPath doesn't resolve to an element");
       return null;
     }
     return handle.asElement;
   }
 
-  Future<String> get title => evaluate('document.title');
+  Future<String?> get title => evaluate('document.title');
 }
 
 class WaitTask {
@@ -411,27 +412,26 @@ class WaitTask {
   final String predicate;
   final String title;
   final Polling polling;
-  final Duration timeout;
-  final List predicateArgs;
+  final Duration? timeout;
+  final List? predicateArgs;
   final _completer = Completer<JsHandle>();
   int _runCount = 0;
-  Timer _timeoutTimer;
+  late Timer _timeoutTimer;
   bool _terminated = false;
 
   WaitTask(this.domWorld, @Language('js') this.predicate,
-      {@required this.title,
-      @required this.polling,
-      @required this.timeout,
-      @required this.predicateArgs})
-      : assert(polling != null) {
+      {required this.title,
+      required this.polling,
+      required this.timeout,
+      required this.predicateArgs}) {
     domWorld._waitTasks.add(this);
 
     // Since page navigation requires us to re-install the pageScript, we should track
     // timeout on our end.
     if (timeout != null) {
       var timeoutError = TimeoutException(
-          'waiting for $title failed: timeout ${timeout.inMilliseconds}ms exceeded');
-      _timeoutTimer = Timer(timeout, () => terminate(timeoutError));
+          'waiting for $title failed: timeout ${timeout!.inMilliseconds}ms exceeded');
+      _timeoutTimer = Timer(timeout!, () => terminate(timeoutError));
     }
     rerun();
   }
@@ -450,18 +450,16 @@ class WaitTask {
       var args = <dynamic>[
         'return ($predicate)(...args)',
         polling.value,
-        timeout.inMilliseconds
+        timeout!.inMilliseconds
       ];
       if (predicateArgs != null) {
-        args.addAll(predicateArgs);
+        args.addAll(predicateArgs!);
       }
       var success = await domWorld.evaluateHandle(_waitForPredicatePageFunction,
           args: args);
 
       if (_terminated || runCount != _runCount) {
-        if (success != null) {
-          await success.dispose();
-        }
+        await success.dispose();
         return;
       }
 

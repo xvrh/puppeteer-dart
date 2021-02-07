@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart';
 import '../../protocol/dom.dart';
 import '../../protocol/page.dart';
 import '../../protocol/runtime.dart';
@@ -30,7 +29,7 @@ class ExecutionContext {
   final DOMApi domApi;
   final PageApi pageApi;
   final ExecutionContextDescription context;
-  final DomWorld world;
+  final DomWorld? world;
 
   ExecutionContext(this.client, this.context, this.world)
       : runtimeApi = RuntimeApi(client),
@@ -42,7 +41,7 @@ class ExecutionContext {
   /// > **NOTE** Not every execution context is associated with a frame. For
   /// example, workers and extensions have execution contexts that are not
   /// associated with frames.
-  Frame get frame => world?.frame;
+  Frame? get frame => world?.frame;
 
   /// If the function passed to the `executionContext.evaluate` returns a [Promise],
   /// then `executionContext.evaluate` would wait for the promise to resolve and
@@ -72,7 +71,7 @@ class ExecutionContext {
   ///
   /// Returns [Future] which resolves to the return value of `pageFunction`
   Future<T> evaluate<T>(@Language('js') String pageFunction,
-      {List args}) async {
+      {List? args}) async {
     try {
       var result = await _evaluateInternal<T>(pageFunction,
           args: args, returnByValue: true);
@@ -82,7 +81,7 @@ class ExecutionContext {
           (error.message.contains('Object reference chain is too long') ||
               error.message
                   .contains('Object couldn\'t be returned by value'))) {
-        return null;
+        return null as T;
       } else {
         rethrow;
       }
@@ -121,11 +120,11 @@ class ExecutionContext {
   /// ```
   Future<T> evaluateHandle<T extends JsHandle>(
           @Language('js') String pageFunction,
-          {List args}) async =>
+          {List? args}) async =>
       await _evaluateInternal(pageFunction, args: args, returnByValue: false);
 
   Future<T> _evaluateInternal<T>(@Language('js') String pageFunction,
-      {List args, @required bool returnByValue}) async {
+      {List? args, required bool returnByValue}) async {
     // Try to convert a function shorthand (ie: '(el) => el.value;' to a full
     // function declaration (function(el) { return el.value; })
     // If it can't parse the shorthand function, it considers it as a
@@ -150,7 +149,7 @@ class ExecutionContext {
             userGesture: true);
 
         if (response.exceptionDetails != null) {
-          throw ClientError(response.exceptionDetails);
+          throw ClientError(response.exceptionDetails!);
         }
 
         return (returnByValue
@@ -168,7 +167,7 @@ class ExecutionContext {
             userGesture: true);
 
         if (result.exceptionDetails != null) {
-          throw ClientError(result.exceptionDetails);
+          throw ClientError(result.exceptionDetails!);
         }
 
         return (returnByValue
@@ -234,7 +233,7 @@ class ExecutionContext {
           'Prototype JSHandle must not be referencing primitive value');
     }
     var response =
-        await runtimeApi.queryObjects(prototypeHandle.remoteObject.objectId);
+        await runtimeApi.queryObjects(prototypeHandle.remoteObject.objectId!);
 
     return _createHandle(response);
   }

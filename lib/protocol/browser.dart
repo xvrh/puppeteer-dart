@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'target.dart' as target;
 
@@ -16,7 +15,7 @@ class BrowserApi {
   /// [browserContextId] Context to override. When omitted, default browser context is used.
   Future<void> setPermission(
       PermissionDescriptor permission, PermissionSetting setting,
-      {String origin, BrowserContextID browserContextId}) async {
+      {String? origin, BrowserContextID? browserContextId}) async {
     await _client.send('Browser.setPermission', {
       'permission': permission,
       'setting': setting,
@@ -29,7 +28,7 @@ class BrowserApi {
   /// [origin] Origin the permission applies to, all origins if not specified.
   /// [browserContextId] BrowserContext to override permissions. When omitted, default browser context is used.
   Future<void> grantPermissions(List<PermissionType> permissions,
-      {String origin, BrowserContextID browserContextId}) async {
+      {String? origin, BrowserContextID? browserContextId}) async {
     await _client.send('Browser.grantPermissions', {
       'permissions': [...permissions],
       if (origin != null) 'origin': origin,
@@ -39,7 +38,7 @@ class BrowserApi {
 
   /// Reset all permission management for all origins.
   /// [browserContextId] BrowserContext to reset permissions. When omitted, default browser context is used.
-  Future<void> resetPermissions({BrowserContextID browserContextId}) async {
+  Future<void> resetPermissions({BrowserContextID? browserContextId}) async {
     await _client.send('Browser.resetPermissions', {
       if (browserContextId != null) 'browserContextId': browserContextId,
     });
@@ -54,8 +53,8 @@ class BrowserApi {
   /// or 'allowAndName'.
   Future<void> setDownloadBehavior(
       @Enum(['deny', 'allow', 'allowAndName', 'default']) String behavior,
-      {BrowserContextID browserContextId,
-      String downloadPath}) async {
+      {BrowserContextID? browserContextId,
+      String? downloadPath}) async {
     assert(
         const ['deny', 'allow', 'allowAndName', 'default'].contains(behavior));
     await _client.send('Browser.setDownloadBehavior', {
@@ -100,7 +99,7 @@ class BrowserApi {
   /// all histograms.
   /// [delta] If true, retrieve delta since last call.
   /// Returns: Histograms.
-  Future<List<Histogram>> getHistograms({String query, bool delta}) async {
+  Future<List<Histogram>> getHistograms({String? query, bool? delta}) async {
     var result = await _client.send('Browser.getHistograms', {
       if (query != null) 'query': query,
       if (delta != null) 'delta': delta,
@@ -114,7 +113,7 @@ class BrowserApi {
   /// [name] Requested histogram name.
   /// [delta] If true, retrieve delta since last call.
   /// Returns: Histogram.
-  Future<Histogram> getHistogram(String name, {bool delta}) async {
+  Future<Histogram> getHistogram(String name, {bool? delta}) async {
     var result = await _client.send('Browser.getHistogram', {
       'name': name,
       if (delta != null) 'delta': delta,
@@ -136,7 +135,7 @@ class BrowserApi {
   /// Get the browser window that contains the devtools target.
   /// [targetId] Devtools agent host id. If called as a part of the session, associated targetId is used.
   Future<GetWindowForTargetResult> getWindowForTarget(
-      {target.TargetID targetId}) async {
+      {target.TargetID? targetId}) async {
     var result = await _client.send('Browser.getWindowForTarget', {
       if (targetId != null) 'targetId': targetId,
     });
@@ -156,7 +155,7 @@ class BrowserApi {
 
   /// Set dock tile details, platform-specific.
   /// [image] Png encoded image.
-  Future<void> setDockTile({String badgeLabel, String image}) async {
+  Future<void> setDockTile({String? badgeLabel, String? image}) async {
     await _client.send('Browser.setDockTile', {
       if (badgeLabel != null) 'badgeLabel': badgeLabel,
       if (image != null) 'image': image,
@@ -181,11 +180,11 @@ class GetVersionResult {
   final String jsVersion;
 
   GetVersionResult(
-      {@required this.protocolVersion,
-      @required this.product,
-      @required this.revision,
-      @required this.userAgent,
-      @required this.jsVersion});
+      {required this.protocolVersion,
+      required this.product,
+      required this.revision,
+      required this.userAgent,
+      required this.jsVersion});
 
   factory GetVersionResult.fromJson(Map<String, dynamic> json) {
     return GetVersionResult(
@@ -206,7 +205,7 @@ class GetWindowForTargetResult {
   /// position and size are returned.
   final Bounds bounds;
 
-  GetWindowForTargetResult({@required this.windowId, @required this.bounds});
+  GetWindowForTargetResult({required this.windowId, required this.bounds});
 
   factory GetWindowForTargetResult.fromJson(Map<String, dynamic> json) {
     return GetWindowForTargetResult(
@@ -273,7 +272,7 @@ class WindowState {
 
   const WindowState._(this.value);
 
-  factory WindowState.fromJson(String value) => values[value];
+  factory WindowState.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -291,19 +290,19 @@ class WindowState {
 /// Browser window bounds information
 class Bounds {
   /// The offset from the left edge of the screen to the window in pixels.
-  final int left;
+  final int? left;
 
   /// The offset from the top edge of the screen to the window in pixels.
-  final int top;
+  final int? top;
 
   /// The window width in pixels.
-  final int width;
+  final int? width;
 
   /// The window height in pixels.
-  final int height;
+  final int? height;
 
   /// The window state. Default to normal.
-  final WindowState windowState;
+  final WindowState? windowState;
 
   Bounds({this.left, this.top, this.width, this.height, this.windowState});
 
@@ -325,7 +324,7 @@ class Bounds {
       if (top != null) 'top': top,
       if (width != null) 'width': width,
       if (height != null) 'height': height,
-      if (windowState != null) 'windowState': windowState.toJson(),
+      if (windowState != null) 'windowState': windowState!.toJson(),
     };
   }
 }
@@ -386,7 +385,7 @@ class PermissionType {
 
   const PermissionType._(this.value);
 
-  factory PermissionType.fromJson(String value) => values[value];
+  factory PermissionType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -415,7 +414,7 @@ class PermissionSetting {
 
   const PermissionSetting._(this.value);
 
-  factory PermissionSetting.fromJson(String value) => values[value];
+  factory PermissionSetting.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -438,20 +437,20 @@ class PermissionDescriptor {
   final String name;
 
   /// For "midi" permission, may also specify sysex control.
-  final bool sysex;
+  final bool? sysex;
 
   /// For "push" permission, may specify userVisibleOnly.
   /// Note that userVisibleOnly = true is the only currently supported type.
-  final bool userVisibleOnly;
+  final bool? userVisibleOnly;
 
   /// For "clipboard" permission, may specify allowWithoutSanitization.
-  final bool allowWithoutSanitization;
+  final bool? allowWithoutSanitization;
 
   /// For "camera" permission, may specify panTiltZoom.
-  final bool panTiltZoom;
+  final bool? panTiltZoom;
 
   PermissionDescriptor(
-      {@required this.name,
+      {required this.name,
       this.sysex,
       this.userVisibleOnly,
       this.allowWithoutSanitization,
@@ -495,7 +494,7 @@ class Bucket {
   /// Number of samples.
   final int count;
 
-  Bucket({@required this.low, @required this.high, @required this.count});
+  Bucket({required this.low, required this.high, required this.count});
 
   factory Bucket.fromJson(Map<String, dynamic> json) {
     return Bucket(
@@ -529,10 +528,10 @@ class Histogram {
   final List<Bucket> buckets;
 
   Histogram(
-      {@required this.name,
-      @required this.sum,
-      @required this.count,
-      @required this.buckets});
+      {required this.name,
+      required this.sum,
+      required this.count,
+      required this.buckets});
 
   factory Histogram.fromJson(Map<String, dynamic> json) {
     return Histogram(

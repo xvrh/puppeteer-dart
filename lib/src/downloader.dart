@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:http/http.dart' as http;
-import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
 class RevisionInfo {
@@ -11,14 +10,14 @@ class RevisionInfo {
   final int revision;
 
   RevisionInfo(
-      {@required this.executablePath,
-      @required this.folderPath,
-      @required this.revision});
+      {required this.executablePath,
+      required this.folderPath,
+      required this.revision});
 }
 
 const int _lastRevision = 818858;
 
-Future<RevisionInfo> downloadChrome({int revision, String cachePath}) async {
+Future<RevisionInfo> downloadChrome({int? revision, String? cachePath}) async {
   revision ??= _lastRevision;
   cachePath ??= '.local-chromium';
 

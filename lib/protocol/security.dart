@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'network.dart' as network;
 
@@ -82,9 +81,9 @@ class CertificateErrorEvent {
   final String requestURL;
 
   CertificateErrorEvent(
-      {@required this.eventId,
-      @required this.errorType,
-      @required this.requestURL});
+      {required this.eventId,
+      required this.errorType,
+      required this.requestURL});
 
   factory CertificateErrorEvent.fromJson(Map<String, dynamic> json) {
     return CertificateErrorEvent(
@@ -104,12 +103,10 @@ class SecurityStateChangedEvent {
   final List<SecurityStateExplanation> explanations;
 
   /// Overrides user-visible description of the state.
-  final String summary;
+  final String? summary;
 
   SecurityStateChangedEvent(
-      {@required this.securityState,
-      @required this.explanations,
-      this.summary});
+      {required this.securityState, required this.explanations, this.summary});
 
   factory SecurityStateChangedEvent.fromJson(Map<String, dynamic> json) {
     return SecurityStateChangedEvent(
@@ -160,7 +157,7 @@ class MixedContentType {
 
   const MixedContentType._(this.value);
 
-  factory MixedContentType.fromJson(String value) => values[value];
+  factory MixedContentType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -196,7 +193,7 @@ class SecurityState {
 
   const SecurityState._(this.value);
 
-  factory SecurityState.fromJson(String value) => values[value];
+  factory SecurityState.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -220,13 +217,13 @@ class CertificateSecurityState {
   final String keyExchange;
 
   /// (EC)DH group used by the connection, if applicable.
-  final String keyExchangeGroup;
+  final String? keyExchangeGroup;
 
   /// Cipher name.
   final String cipher;
 
   /// TLS MAC. Note that AEAD ciphers do not have separate MACs.
-  final String mac;
+  final String? mac;
 
   /// Page certificate.
   final List<String> certificate;
@@ -244,7 +241,7 @@ class CertificateSecurityState {
   final network.TimeSinceEpoch validTo;
 
   /// The highest priority network error code, if the certificate has an error.
-  final String certificateNetworkError;
+  final String? certificateNetworkError;
 
   /// True if the certificate uses a weak signature aglorithm.
   final bool certificateHasWeakSignature;
@@ -268,24 +265,24 @@ class CertificateSecurityState {
   final bool obsoleteSslSignature;
 
   CertificateSecurityState(
-      {@required this.protocol,
-      @required this.keyExchange,
+      {required this.protocol,
+      required this.keyExchange,
       this.keyExchangeGroup,
-      @required this.cipher,
+      required this.cipher,
       this.mac,
-      @required this.certificate,
-      @required this.subjectName,
-      @required this.issuer,
-      @required this.validFrom,
-      @required this.validTo,
+      required this.certificate,
+      required this.subjectName,
+      required this.issuer,
+      required this.validFrom,
+      required this.validTo,
       this.certificateNetworkError,
-      @required this.certificateHasWeakSignature,
-      @required this.certificateHasSha1Signature,
-      @required this.modernSSL,
-      @required this.obsoleteSslProtocol,
-      @required this.obsoleteSslKeyExchange,
-      @required this.obsoleteSslCipher,
-      @required this.obsoleteSslSignature});
+      required this.certificateHasWeakSignature,
+      required this.certificateHasSha1Signature,
+      required this.modernSSL,
+      required this.obsoleteSslProtocol,
+      required this.obsoleteSslKeyExchange,
+      required this.obsoleteSslCipher,
+      required this.obsoleteSslSignature});
 
   factory CertificateSecurityState.fromJson(Map<String, dynamic> json) {
     return CertificateSecurityState(
@@ -352,7 +349,7 @@ class SafetyTipStatus {
 
   const SafetyTipStatus._(this.value);
 
-  factory SafetyTipStatus.fromJson(String value) => values[value];
+  factory SafetyTipStatus.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -372,9 +369,9 @@ class SafetyTipInfo {
   final SafetyTipStatus safetyTipStatus;
 
   /// The URL the safety tip suggested ("Did you mean?"). Only filled in for lookalike matches.
-  final String safeUrl;
+  final String? safeUrl;
 
-  SafetyTipInfo({@required this.safetyTipStatus, this.safeUrl});
+  SafetyTipInfo({required this.safetyTipStatus, this.safeUrl});
 
   factory SafetyTipInfo.fromJson(Map<String, dynamic> json) {
     return SafetyTipInfo(
@@ -398,19 +395,19 @@ class VisibleSecurityState {
   final SecurityState securityState;
 
   /// Security state details about the page certificate.
-  final CertificateSecurityState certificateSecurityState;
+  final CertificateSecurityState? certificateSecurityState;
 
   /// The type of Safety Tip triggered on the page. Note that this field will be set even if the Safety Tip UI was not actually shown.
-  final SafetyTipInfo safetyTipInfo;
+  final SafetyTipInfo? safetyTipInfo;
 
   /// Array of security state issues ids.
   final List<String> securityStateIssueIds;
 
   VisibleSecurityState(
-      {@required this.securityState,
+      {required this.securityState,
       this.certificateSecurityState,
       this.safetyTipInfo,
-      @required this.securityStateIssueIds});
+      required this.securityStateIssueIds});
 
   factory VisibleSecurityState.fromJson(Map<String, dynamic> json) {
     return VisibleSecurityState(
@@ -434,8 +431,8 @@ class VisibleSecurityState {
       'securityState': securityState.toJson(),
       'securityStateIssueIds': [...securityStateIssueIds],
       if (certificateSecurityState != null)
-        'certificateSecurityState': certificateSecurityState.toJson(),
-      if (safetyTipInfo != null) 'safetyTipInfo': safetyTipInfo.toJson(),
+        'certificateSecurityState': certificateSecurityState!.toJson(),
+      if (safetyTipInfo != null) 'safetyTipInfo': safetyTipInfo!.toJson(),
     };
   }
 }
@@ -461,15 +458,15 @@ class SecurityStateExplanation {
   final List<String> certificate;
 
   /// Recommendations to fix any issues.
-  final List<String> recommendations;
+  final List<String>? recommendations;
 
   SecurityStateExplanation(
-      {@required this.securityState,
-      @required this.title,
-      @required this.summary,
-      @required this.description,
-      @required this.mixedContentType,
-      @required this.certificate,
+      {required this.securityState,
+      required this.title,
+      required this.summary,
+      required this.description,
+      required this.mixedContentType,
+      required this.certificate,
       this.recommendations});
 
   factory SecurityStateExplanation.fromJson(Map<String, dynamic> json) {
@@ -496,7 +493,7 @@ class SecurityStateExplanation {
       'description': description,
       'mixedContentType': mixedContentType.toJson(),
       'certificate': [...certificate],
-      if (recommendations != null) 'recommendations': [...recommendations],
+      if (recommendations != null) 'recommendations': [...?recommendations],
     };
   }
 }
@@ -525,13 +522,13 @@ class InsecureContentStatus {
   final SecurityState displayedInsecureContentStyle;
 
   InsecureContentStatus(
-      {@required this.ranMixedContent,
-      @required this.displayedMixedContent,
-      @required this.containedMixedForm,
-      @required this.ranContentWithCertErrors,
-      @required this.displayedContentWithCertErrors,
-      @required this.ranInsecureContentStyle,
-      @required this.displayedInsecureContentStyle});
+      {required this.ranMixedContent,
+      required this.displayedMixedContent,
+      required this.containedMixedForm,
+      required this.ranContentWithCertErrors,
+      required this.displayedContentWithCertErrors,
+      required this.ranInsecureContentStyle,
+      required this.displayedInsecureContentStyle});
 
   factory InsecureContentStatus.fromJson(Map<String, dynamic> json) {
     return InsecureContentStatus(
@@ -575,7 +572,7 @@ class CertificateErrorAction {
 
   const CertificateErrorAction._(this.value);
 
-  factory CertificateErrorAction.fromJson(String value) => values[value];
+  factory CertificateErrorAction.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 

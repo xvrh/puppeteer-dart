@@ -1,5 +1,5 @@
 String firstLetterUpper(String src) {
-  if (src != null && src.isNotEmpty) {
+  if (src.isNotEmpty) {
     var first = src[0];
 
     return first.toUpperCase() + src.substring(1);
@@ -8,7 +8,7 @@ String firstLetterUpper(String src) {
 }
 
 String firstLetterLower(String src) {
-  if (src != null && src.isNotEmpty) {
+  if (src.isNotEmpty) {
     var first = src[0];
 
     return first.toLowerCase() + src.substring(1);

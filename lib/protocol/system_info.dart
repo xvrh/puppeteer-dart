@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// The SystemInfo domain defines methods and events for querying low-level system information.
@@ -41,10 +40,10 @@ class GetInfoResult {
   final String commandLine;
 
   GetInfoResult(
-      {@required this.gpu,
-      @required this.modelName,
-      @required this.modelVersion,
-      @required this.commandLine});
+      {required this.gpu,
+      required this.modelName,
+      required this.modelVersion,
+      required this.commandLine});
 
   factory GetInfoResult.fromJson(Map<String, dynamic> json) {
     return GetInfoResult(
@@ -65,10 +64,10 @@ class GPUDevice {
   final num deviceId;
 
   /// Sub sys ID of the GPU, only available on Windows.
-  final num subSysId;
+  final num? subSysId;
 
   /// Revision of the GPU, only available on Windows.
-  final num revision;
+  final num? revision;
 
   /// String description of the GPU vendor, if the PCI ID is not available.
   final String vendorString;
@@ -83,14 +82,14 @@ class GPUDevice {
   final String driverVersion;
 
   GPUDevice(
-      {@required this.vendorId,
-      @required this.deviceId,
+      {required this.vendorId,
+      required this.deviceId,
       this.subSysId,
       this.revision,
-      @required this.vendorString,
-      @required this.deviceString,
-      @required this.driverVendor,
-      @required this.driverVersion});
+      required this.vendorString,
+      required this.deviceString,
+      required this.driverVendor,
+      required this.driverVersion});
 
   factory GPUDevice.fromJson(Map<String, dynamic> json) {
     return GPUDevice(
@@ -127,7 +126,7 @@ class Size {
   /// Height in pixels.
   final int height;
 
-  Size({@required this.width, @required this.height});
+  Size({required this.width, required this.height});
 
   factory Size.fromJson(Map<String, dynamic> json) {
     return Size(
@@ -157,9 +156,9 @@ class VideoDecodeAcceleratorCapability {
   final Size minResolution;
 
   VideoDecodeAcceleratorCapability(
-      {@required this.profile,
-      @required this.maxResolution,
-      @required this.minResolution});
+      {required this.profile,
+      required this.maxResolution,
+      required this.minResolution});
 
   factory VideoDecodeAcceleratorCapability.fromJson(Map<String, dynamic> json) {
     return VideoDecodeAcceleratorCapability(
@@ -197,10 +196,10 @@ class VideoEncodeAcceleratorCapability {
   final int maxFramerateDenominator;
 
   VideoEncodeAcceleratorCapability(
-      {@required this.profile,
-      @required this.maxResolution,
-      @required this.maxFramerateNumerator,
-      @required this.maxFramerateDenominator});
+      {required this.profile,
+      required this.maxResolution,
+      required this.maxFramerateNumerator,
+      required this.maxFramerateDenominator});
 
   factory VideoEncodeAcceleratorCapability.fromJson(Map<String, dynamic> json) {
     return VideoEncodeAcceleratorCapability(
@@ -237,7 +236,7 @@ class SubsamplingFormat {
 
   const SubsamplingFormat._(this.value);
 
-  factory SubsamplingFormat.fromJson(String value) => values[value];
+  factory SubsamplingFormat.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -267,7 +266,7 @@ class ImageType {
 
   const ImageType._(this.value);
 
-  factory ImageType.fromJson(String value) => values[value];
+  factory ImageType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -298,10 +297,10 @@ class ImageDecodeAcceleratorCapability {
   final List<SubsamplingFormat> subsamplings;
 
   ImageDecodeAcceleratorCapability(
-      {@required this.imageType,
-      @required this.maxDimensions,
-      @required this.minDimensions,
-      @required this.subsamplings});
+      {required this.imageType,
+      required this.maxDimensions,
+      required this.minDimensions,
+      required this.subsamplings});
 
   factory ImageDecodeAcceleratorCapability.fromJson(Map<String, dynamic> json) {
     return ImageDecodeAcceleratorCapability(
@@ -332,10 +331,10 @@ class GPUInfo {
   final List<GPUDevice> devices;
 
   /// An optional dictionary of additional GPU related attributes.
-  final Map<String, dynamic> auxAttributes;
+  final Map<String, dynamic>? auxAttributes;
 
   /// An optional dictionary of graphics features and their status.
-  final Map<String, dynamic> featureStatus;
+  final Map<String, dynamic>? featureStatus;
 
   /// An optional array of GPU driver bug workarounds.
   final List<String> driverBugWorkarounds;
@@ -350,13 +349,13 @@ class GPUInfo {
   final List<ImageDecodeAcceleratorCapability> imageDecoding;
 
   GPUInfo(
-      {@required this.devices,
+      {required this.devices,
       this.auxAttributes,
       this.featureStatus,
-      @required this.driverBugWorkarounds,
-      @required this.videoDecoding,
-      @required this.videoEncoding,
-      @required this.imageDecoding});
+      required this.driverBugWorkarounds,
+      required this.videoDecoding,
+      required this.videoEncoding,
+      required this.imageDecoding});
 
   factory GPUInfo.fromJson(Map<String, dynamic> json) {
     return GPUInfo(
@@ -412,7 +411,7 @@ class ProcessInfo {
   /// process since the process start.
   final num cpuTime;
 
-  ProcessInfo({@required this.type, @required this.id, @required this.cpuTime});
+  ProcessInfo({required this.type, required this.id, required this.cpuTime});
 
   factory ProcessInfo.fromJson(Map<String, dynamic> json) {
     return ProcessInfo(

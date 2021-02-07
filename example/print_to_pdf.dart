@@ -5,7 +5,7 @@ void main() async {
   // Start the browser and go to a web page
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
-  await page.goto('https://www.github.com', wait: Until.networkIdle);
+  await page.goto('https://dart.dev', wait: Until.networkIdle);
 
   // For this example, we force the "screen" media-type because sometime
   // CSS rules with "@media print" can change the look of the page.
@@ -16,6 +16,6 @@ void main() async {
       format: PaperFormat.a4,
       printBackground: true,
       pageRanges: '1',
-      output: File('example/_github.pdf').openWrite());
+      output: File('example/_dart.pdf').openWrite());
   await browser.close();
 }

@@ -37,7 +37,7 @@ class JsHandle {
       ExecutionContext context, RemoteObject remoteObject) {
     var frame = context.frame;
     if (remoteObject.subtype == RemoteObjectSubtype.node && frame != null) {
-      var frameManager = context.world.frameManager;
+      var frameManager = context.world!.frameManager;
       return ElementHandle(context, remoteObject, context.frame, frameManager);
     }
     return JsHandle(context, remoteObject);
@@ -60,7 +60,7 @@ class JsHandle {
   /// - `pageFunction` Function to be evaluated in browser context
   /// - `args` Arguments to pass to `pageFunction`
   /// - returns: Future which resolves to the return value of `pageFunction`
-  Future<T> evaluate<T>(@Language('js') String pageFunction, {List args}) {
+  Future<T?> evaluate<T>(@Language('js') String pageFunction, {List? args}) {
     return executionContext.evaluate(pageFunction, args: [this, ...?args]);
   }
 
@@ -80,7 +80,7 @@ class JsHandle {
   //  Returns: Future which resolves to the return value of `pageFunction` as in-page object (JSHandle)
   Future<T> evaluateHandle<T extends JsHandle>(
       @Language('js') String pageFunction,
-      {List args}) {
+      {List? args}) {
     return executionContext
         .evaluateHandle(pageFunction, args: [this, ...?args]);
   }
@@ -120,12 +120,12 @@ function _(object, propertyName) {
   /// ```
   Future<Map<String, JsHandle>> get properties async {
     var response = await executionContext.runtimeApi
-        .getProperties(remoteObject.objectId, ownProperties: true);
+        .getProperties(remoteObject.objectId!, ownProperties: true);
     var result = <String, JsHandle>{};
     for (var property in response.result) {
       if (!property.enumerable) continue;
       result[property.name] =
-          JsHandle.fromRemoteObject(executionContext, property.value);
+          JsHandle.fromRemoteObject(executionContext, property.value!);
     }
     return result;
   }
@@ -152,7 +152,7 @@ function _(object, propertyName) {
 
   /// Returns either `null` or the object handle itself, if the object handle is
   /// an instance of [ElementHandle].
-  ElementHandle get asElement => null;
+  ElementHandle? get asElement => null;
 
   /// Stops referencing the element handle.
   ///
@@ -164,7 +164,7 @@ function _(object, propertyName) {
 
     if (remoteObject.objectId != null) {
       await executionContext.runtimeApi
-          .releaseObject(remoteObject.objectId)
+          .releaseObject(remoteObject.objectId!)
           .catchError((_) {
         // Exceptions might happen in case of a page been navigated or closed.
         // Swallow these since they are harmless and we don't leak anything in this case.
@@ -175,7 +175,7 @@ function _(object, propertyName) {
   @override
   String toString() {
     if (remoteObject.objectId != null) {
-      var type = remoteObject.subtype?.value ?? remoteObject.type?.value;
+      var type = remoteObject.subtype?.value ?? remoteObject.type.value;
       return 'JSHandle@$type';
     }
     return 'JSHandle:${valueFromRemoteObject(remoteObject)}';
@@ -207,7 +207,7 @@ function _(object, propertyName) {
 /// ElementHandle instances can be used as arguments in [page.$eval] and
 /// [page.evaluate] methods.
 class ElementHandle extends JsHandle {
-  final Frame frame;
+  final Frame? frame;
   final FrameManager frameManager;
 
   ElementHandle(ExecutionContext context, RemoteObject remoteObject, this.frame,
@@ -221,7 +221,7 @@ class ElementHandle extends JsHandle {
 
   /// Resolves to the content frame for element handles referencing iframe nodes,
   /// or null otherwise
-  Future<Frame> get contentFrame async {
+  Future<Frame?> get contentFrame async {
     var nodeInfo = await executionContext.domApi
         .describeNode(objectId: remoteObject.objectId);
 
@@ -264,10 +264,15 @@ async function _(element, pageJavascriptEnabled) {
   }
 
   Future<Point> _clickablePoint() async {
-    var quads = await executionContext.domApi
-        .getContentQuads(objectId: remoteObject.objectId)
-        .catchError((_) => null,
-            test: ServerException.matcher('Could not compute content quads.'));
+    List<Quad>? quads;
+    try {
+      quads = await executionContext.domApi
+          .getContentQuads(objectId: remoteObject.objectId);
+    } catch (e) {
+      if (!ServerException.matcher('Could not compute content quads.')(e)) {
+        rethrow;
+      }
+    }
     var layoutMetrics = await executionContext.pageApi.getLayoutMetrics();
 
     if (quads == null || quads.isEmpty) {
@@ -344,7 +349,7 @@ async function _(element, pageJavascriptEnabled) {
   /// Returns [Future] which resolves when the element is successfully clicked.
   /// [Future] gets rejected if the element is detached from DOM.
   Future<void> click(
-      {Duration delay, MouseButton button, int clickCount}) async {
+      {Duration? delay, MouseButton? button, int? clickCount}) async {
     await _scrollIntoViewIfNeeded();
     var point = await _clickablePoint();
     await page.mouse
@@ -380,7 +385,7 @@ async function _(element, pageJavascriptEnabled) {
   element.dispatchEvent(new Event('input', { 'bubbles': true }));
   element.dispatchEvent(new Event('change', { 'bubbles': true }));
   return options.filter(option => option.selected).map(option => option.value);
-}''', args: [values]).then((result) => result.cast<String>());
+}''', args: [values]).then((result) => result!.cast<String>());
   }
 
   /// This method expects `elementHandle` to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input).
@@ -388,7 +393,7 @@ async function _(element, pageJavascriptEnabled) {
   /// Sets the value of the file input these paths.
   Future<void> uploadFile(List<File> files) async {
     var isMultiple = await evaluate<bool>('element => element.multiple');
-    if (files.length > 1 && !isMultiple) {
+    if (files.length > 1 && !isMultiple!) {
       throw Exception(
           'Multiple file uploads only work with <input type=file multiple>');
     }
@@ -452,7 +457,7 @@ async function _(element, pageJavascriptEnabled) {
   /// await elementHandle.type('some text');
   /// await elementHandle.press(Key.enter);
   /// ```
-  Future<void> type(String text, {Duration delay}) async {
+  Future<void> type(String text, {Duration? delay}) async {
     await focus();
     await page.keyboard.type(text, delay: delay);
   }
@@ -469,14 +474,14 @@ async function _(element, pageJavascriptEnabled) {
   /// Parameters:
   /// - [text]: If specified, generates an input event with this text.
   /// - [delay]: Time to wait between `keydown` and `keyup`. Defaults to 0.
-  Future<void> press(Key key, {Duration delay, String text}) async {
+  Future<void> press(Key key, {Duration? delay, String? text}) async {
     await focus();
     await page.keyboard.press(key, delay: delay, text: text);
   }
 
   /// This method returns the bounding box of the element (relative to the main
   /// frame), or `null` if the element is not visible.
-  Future<Rectangle> get boundingBox async {
+  Future<Rectangle?> get boundingBox async {
     var result = await boxModel;
 
     if (result == null) return null;
@@ -494,11 +499,16 @@ async function _(element, pageJavascriptEnabled) {
   /// visible.
   /// Boxes are represented as an array of points;
   /// Box points are sorted clock-wise.
-  Future<BoxModel> get boxModel {
-    return executionContext.domApi
-        .getBoxModel(objectId: remoteObject.objectId)
-        .catchError((_) => null,
-            test: ServerException.matcher('Could not compute box model.'));
+  Future<BoxModel?> get boxModel async {
+    try {
+      return await executionContext.domApi
+          .getBoxModel(objectId: remoteObject.objectId);
+    } on ServerException catch (e) {
+      if (ServerException.matcher('Could not compute box model.')(e)) {
+        return null;
+      }
+      rethrow;
+    }
   }
 
   /// This method scrolls element into view if needed, and then uses [page.screenshot]
@@ -507,12 +517,13 @@ async function _(element, pageJavascriptEnabled) {
   ///
   /// See [Page.screenshot] for more info.
   Future<List<int>> screenshot(
-      {ScreenshotFormat format, int quality, bool omitBackground}) async {
+      {ScreenshotFormat? format, int? quality, bool? omitBackground}) async {
     var needsViewportReset = false;
 
     var boundingBox = await this.boundingBox;
-    assert(boundingBox != null,
-        'Node is either not visible or not an HTMLElement');
+    if (boundingBox == null) {
+      throw Exception('Node is either not visible or not an HTMLElement');
+    }
 
     var viewport = page.viewport;
 
@@ -529,8 +540,9 @@ async function _(element, pageJavascriptEnabled) {
     await _scrollIntoViewIfNeeded();
 
     boundingBox = await this.boundingBox;
-    assert(boundingBox != null,
-        'Node is either not visible or not an HTMLElement');
+    if (boundingBox == null) {
+      throw Exception('Node is either not visible or not an HTMLElement');
+    }
     assert(boundingBox.width != 0, 'Node has 0 width.');
     assert(boundingBox.height != 0, 'Node has 0 height.');
 
@@ -550,7 +562,7 @@ async function _(element, pageJavascriptEnabled) {
         omitBackground: omitBackground);
 
     if (needsViewportReset) {
-      await page.setViewport(viewport);
+      await page.setViewport(viewport!);
     }
 
     return imageData;
@@ -559,6 +571,10 @@ async function _(element, pageJavascriptEnabled) {
   /// The method runs `element.querySelector` within the page. If no element
   /// matches the selector, the return value resolves to `null`.
   Future<ElementHandle> $(String selector) async {
+    return $OrNull(selector).then((e) => e!);
+  }
+
+  Future<ElementHandle?> $OrNull(String selector) async {
     var handle = await evaluateHandle(
         //language=js
         '(element, selector) => element.querySelector(selector);',
@@ -608,9 +624,9 @@ async function _(element, pageJavascriptEnabled) {
   /// - [args]: Arguments to pass to `pageFunction`
   ///
   /// Returns [Future] which resolves to the return value of `pageFunction`.
-  Future<T> $eval<T>(String selector, @Language('js') String pageFunction,
-      {List args}) async {
-    var elementHandle = await $(selector);
+  Future<T?> $eval<T>(String selector, @Language('js') String pageFunction,
+      {List? args}) async {
+    var elementHandle = await $OrNull(selector);
     if (elementHandle == null) {
       throw Exception(
           'Error: failed to find element matching selector "$selector"');
@@ -648,8 +664,8 @@ async function _(element, pageJavascriptEnabled) {
   /// - [args]: Arguments to pass to `pageFunction`
   ///
   /// Returns: [Future] which resolves to the return value of `pageFunction`
-  Future<T> $$eval<T>(String selector, @Language('js') String pageFunction,
-      {List args}) async {
+  Future<T?> $$eval<T>(String selector, @Language('js') String pageFunction,
+      {List? args}) async {
     var arrayHandle = await evaluateHandle(
         //language=js
         'function _(element, selector) {return Array.from(element.querySelectorAll(selector));}',
@@ -687,7 +703,7 @@ function _(element, expression) {
   }
 
   /// Resolves to true if the element is visible in the current viewport.
-  Future<bool> get isIntersectingViewport {
+  Future<bool?> get isIntersectingViewport {
     return evaluate(
         //language=js
         '''

@@ -23,12 +23,12 @@ class Mouse {
   final InputApi inputApi;
   final Keyboard keyboard;
   Point _position = Point(0, 0);
-  MouseButton _button;
+  MouseButton? _button;
 
   Mouse(this.inputApi, this.keyboard);
 
   /// Dispatches a `mousemove` event.
-  Future<void> move(Point position, {int steps}) async {
+  Future<void> move(Point position, {int? steps}) async {
     steps ??= 1;
     var from = _position;
     _position = position;
@@ -46,7 +46,7 @@ class Mouse {
   ///
   /// [delay]: Time to wait between `mousedown` and `mouseup`. Defaults to 0.
   Future<void> click(Point position,
-      {Duration delay, MouseButton button, int clickCount}) async {
+      {Duration? delay, MouseButton? button, int? clickCount}) async {
     await move(position);
     await down(button: button, clickCount: clickCount);
     if (delay != null) await Future.delayed(delay);
@@ -54,7 +54,7 @@ class Mouse {
   }
 
   /// Dispatches a `mousedown` event.
-  Future<void> down({MouseButton button, int clickCount}) async {
+  Future<void> down({MouseButton? button, int? clickCount}) async {
     button ??= MouseButton.left;
     clickCount ??= 1;
     _button = button;
@@ -63,7 +63,7 @@ class Mouse {
   }
 
   /// Dispatches a `mouseup` event.
-  Future<void> up({MouseButton button, int clickCount}) async {
+  Future<void> up({MouseButton? button, int? clickCount}) async {
     button ??= MouseButton.left;
     clickCount ??= 1;
     _button = null;
@@ -80,12 +80,12 @@ class Mouse {
   /// await page.goto(
   ///     r'https://mdn.mozillademos.org/en-US/docs/Web/API/Element/wheel_event$samples/Scaling_an_element_via_the_wheel?revision=1587366');
   /// var elem = await page.$('div');
-  /// var boundingBox = await elem.boundingBox;
+  /// var boundingBox = (await elem.boundingBox)!;
   /// await page.mouse.move(Point(boundingBox.left + boundingBox.width / 2,
   ///     boundingBox.top + boundingBox.height / 2));
   /// await page.mouse.wheel(deltaY: -100);
   /// ```
-  Future<void> wheel({num deltaX, num deltaY}) async {
+  Future<void> wheel({num? deltaX, num? deltaY}) async {
     await inputApi.dispatchMouseEvent('mouseWheel', _position.x, _position.y,
         deltaX: deltaX ?? 0,
         deltaY: deltaY ?? 0,

@@ -1,11 +1,12 @@
 import 'dart:io';
+import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 
 void main() {
-  Server server;
+  late Server server;
   setUpAll(() async {
     server = await Server.create();
   });
@@ -31,7 +32,7 @@ void main() {
       try {
         var page = await browserWithExtension.newPage();
         var backgroundPageTarget = browserWithExtension.targets
-            .firstWhere((t) => t.type == 'background_page', orElse: () => null);
+            .firstWhereOrNull((t) => t.type == 'background_page');
         backgroundPageTarget ??= await browserWithExtension
             .waitForTarget((target) => target.type == 'background_page');
         expect(backgroundPageTarget, isNotNull);
@@ -45,7 +46,7 @@ void main() {
           await puppeteer.launch(headless: false, args: extensionOptions);
       try {
         var backgroundPageTarget = browserWithExtension.targets
-            .firstWhere((t) => t.type == 'background_page', orElse: () => null);
+            .firstWhereOrNull((t) => t.type == 'background_page');
         backgroundPageTarget ??= await browserWithExtension
             .waitForTarget((target) => target.type == 'background_page');
         var page = await backgroundPageTarget.page;

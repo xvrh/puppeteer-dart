@@ -4,10 +4,10 @@ import 'package:test/test.dart';
 import 'utils/utils.dart';
 
 void main() {
-  Server server;
-  Browser browser;
-  BrowserContext context;
-  Page page;
+  late Server server;
+  late Browser browser;
+  late BrowserContext context;
+  late Page page;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
@@ -16,7 +16,6 @@ void main() {
   tearDownAll(() async {
     await server.close();
     await browser.close();
-    browser = null;
   });
 
   setUp(() async {
@@ -27,7 +26,6 @@ void main() {
   tearDown(() async {
     server.clearRoutes();
     await context.close();
-    page = null;
   });
 
   group('Page.evaluateHandle', () {
@@ -118,7 +116,7 @@ void main() {
       var properties = await aHandle.properties;
       var foo = properties['foo'];
       expect(foo, isNotNull);
-      expect(await foo.jsonValue, equals('bar'));
+      expect(await foo!.jsonValue, equals('bar'));
     });
     test('should return even non-own properties', () async {
       var aHandle = await page.evaluateHandle("""() => {
@@ -136,8 +134,8 @@ void main() {
   return new B();
   }""");
       var properties = await aHandle.properties;
-      expect(await properties['a'].jsonValue, equals('1'));
-      expect(await properties['b'].jsonValue, equals('2'));
+      expect(await properties['a']!.jsonValue, equals('1'));
+      expect(await properties['b']!.jsonValue, equals('2'));
     });
   });
 

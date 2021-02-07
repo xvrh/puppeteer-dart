@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 class MemoryApi {
@@ -41,7 +40,7 @@ class MemoryApi {
   /// [samplingInterval] Average number of bytes between samples.
   /// [suppressRandomness] Do not randomize intervals between samples.
   Future<void> startSampling(
-      {int samplingInterval, bool suppressRandomness}) async {
+      {int? samplingInterval, bool? suppressRandomness}) async {
     await _client.send('Memory.startSampling', {
       if (samplingInterval != null) 'samplingInterval': samplingInterval,
       if (suppressRandomness != null) 'suppressRandomness': suppressRandomness,
@@ -83,9 +82,9 @@ class GetDOMCountersResult {
   final int jsEventListeners;
 
   GetDOMCountersResult(
-      {@required this.documents,
-      @required this.nodes,
-      @required this.jsEventListeners});
+      {required this.documents,
+      required this.nodes,
+      required this.jsEventListeners});
 
   factory GetDOMCountersResult.fromJson(Map<String, dynamic> json) {
     return GetDOMCountersResult(
@@ -109,7 +108,7 @@ class PressureLevel {
 
   const PressureLevel._(this.value);
 
-  factory PressureLevel.fromJson(String value) => values[value];
+  factory PressureLevel.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -136,7 +135,7 @@ class SamplingProfileNode {
   final List<String> stack;
 
   SamplingProfileNode(
-      {@required this.size, @required this.total, @required this.stack});
+      {required this.size, required this.total, required this.stack});
 
   factory SamplingProfileNode.fromJson(Map<String, dynamic> json) {
     return SamplingProfileNode(
@@ -161,7 +160,7 @@ class SamplingProfile {
 
   final List<Module> modules;
 
-  SamplingProfile({@required this.samples, @required this.modules});
+  SamplingProfile({required this.samples, required this.modules});
 
   factory SamplingProfile.fromJson(Map<String, dynamic> json) {
     return SamplingProfile(
@@ -198,10 +197,10 @@ class Module {
   final num size;
 
   Module(
-      {@required this.name,
-      @required this.uuid,
-      @required this.baseAddress,
-      @required this.size});
+      {required this.name,
+      required this.uuid,
+      required this.baseAddress,
+      required this.size});
 
   factory Module.fromJson(Map<String, dynamic> json) {
     return Module(

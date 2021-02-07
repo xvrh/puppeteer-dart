@@ -33,7 +33,7 @@ void main() async {
   assert(itemValue == 'xavier');
 
   var incognitoValue = await incognitoTab1
-      .evaluate<String>('window.localStorage.getItem("name")');
+      .evaluate<String?>('window.localStorage.getItem("name")');
   assert(incognitoValue == null);
 
   print('$itemValue vs $incognitoValue');

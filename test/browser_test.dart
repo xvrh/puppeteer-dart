@@ -3,8 +3,8 @@ import 'package:test/test.dart';
 import 'utils/utils.dart';
 
 void main() {
-  Server server;
-  Browser browser;
+  late Server server;
+  late Browser browser;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
@@ -44,7 +44,7 @@ void main() {
 
   group('Browser.process', () {
     test('should return child_process instance', () async {
-      var process = browser.process;
+      var process = browser.process!;
       expect(process.pid, greaterThan(0));
     });
     test('should not return child_process for remote browser', () async {

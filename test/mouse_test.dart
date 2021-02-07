@@ -3,10 +3,10 @@ import 'package:test/test.dart';
 import 'utils/utils.dart';
 
 void main() {
-  Server server;
-  Browser browser;
-  BrowserContext context;
-  Page page;
+  late Server server;
+  late Browser browser;
+  late BrowserContext context;
+  late Page page;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch(defaultViewport: DeviceViewport());
@@ -15,7 +15,6 @@ void main() {
   tearDownAll(() async {
     await server.close();
     await browser.close();
-    browser = null;
   });
 
   setUp(() async {
@@ -26,7 +25,6 @@ void main() {
   tearDown(() async {
     server.clearRoutes();
     await context.close();
-    page = null;
   });
 
   Future<Rectangle> getDimensions() => page.evaluate<Map>('''
@@ -165,7 +163,7 @@ function dimensions() {
     test('should send mouse wheel events', () async {
       await page.goto('${server.prefix}/input/wheel.html');
       var elem = await page.$('div');
-      var boundingBoxBefore = await elem.boundingBox;
+      var boundingBoxBefore = (await elem.boundingBox)!;
       expect(boundingBoxBefore.width, 115);
       expect(boundingBoxBefore.height, 115);
 
@@ -174,7 +172,7 @@ function dimensions() {
           boundingBoxBefore.top + boundingBoxBefore.height / 2));
 
       await page.mouse.wheel(deltaY: -100);
-      var boundingBoxAfter = await elem.boundingBox;
+      var boundingBoxAfter = (await elem.boundingBox)!;
       expect(boundingBoxAfter.width, 230);
       expect(boundingBoxAfter.height, 230);
     });

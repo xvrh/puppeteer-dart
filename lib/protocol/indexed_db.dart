@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
 
@@ -69,7 +68,7 @@ class IndexedDBApi {
       String indexName,
       int skipCount,
       int pageSize,
-      {KeyRange keyRange}) async {
+      {KeyRange? keyRange}) async {
     var result = await _client.send('IndexedDB.requestData', {
       'securityOrigin': securityOrigin,
       'databaseName': databaseName,
@@ -129,7 +128,7 @@ class RequestDataResult {
   final bool hasMore;
 
   RequestDataResult(
-      {@required this.objectStoreDataEntries, @required this.hasMore});
+      {required this.objectStoreDataEntries, required this.hasMore});
 
   factory RequestDataResult.fromJson(Map<String, dynamic> json) {
     return RequestDataResult(
@@ -151,7 +150,7 @@ class GetMetadataResult {
   final num keyGeneratorValue;
 
   GetMetadataResult(
-      {@required this.entriesCount, @required this.keyGeneratorValue});
+      {required this.entriesCount, required this.keyGeneratorValue});
 
   factory GetMetadataResult.fromJson(Map<String, dynamic> json) {
     return GetMetadataResult(
@@ -174,9 +173,7 @@ class DatabaseWithObjectStores {
   final List<ObjectStore> objectStores;
 
   DatabaseWithObjectStores(
-      {@required this.name,
-      @required this.version,
-      @required this.objectStores});
+      {required this.name, required this.version, required this.objectStores});
 
   factory DatabaseWithObjectStores.fromJson(Map<String, dynamic> json) {
     return DatabaseWithObjectStores(
@@ -212,10 +209,10 @@ class ObjectStore {
   final List<ObjectStoreIndex> indexes;
 
   ObjectStore(
-      {@required this.name,
-      @required this.keyPath,
-      @required this.autoIncrement,
-      @required this.indexes});
+      {required this.name,
+      required this.keyPath,
+      required this.autoIncrement,
+      required this.indexes});
 
   factory ObjectStore.fromJson(Map<String, dynamic> json) {
     return ObjectStore(
@@ -253,10 +250,10 @@ class ObjectStoreIndex {
   final bool multiEntry;
 
   ObjectStoreIndex(
-      {@required this.name,
-      @required this.keyPath,
-      @required this.unique,
-      @required this.multiEntry});
+      {required this.name,
+      required this.keyPath,
+      required this.unique,
+      required this.multiEntry});
 
   factory ObjectStoreIndex.fromJson(Map<String, dynamic> json) {
     return ObjectStoreIndex(
@@ -283,18 +280,18 @@ class Key {
   final KeyType type;
 
   /// Number value.
-  final num number;
+  final num? number;
 
   /// String value.
-  final String string;
+  final String? string;
 
   /// Date value.
-  final num date;
+  final num? date;
 
   /// Array value.
-  final List<Key> array;
+  final List<Key>? array;
 
-  Key({@required this.type, this.number, this.string, this.date, this.array});
+  Key({required this.type, this.number, this.string, this.date, this.array});
 
   factory Key.fromJson(Map<String, dynamic> json) {
     return Key(
@@ -316,7 +313,7 @@ class Key {
       if (number != null) 'number': number,
       if (string != null) 'string': string,
       if (date != null) 'date': date,
-      if (array != null) 'array': array.map((e) => e.toJson()).toList(),
+      if (array != null) 'array': array!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -337,7 +334,7 @@ class KeyType {
 
   const KeyType._(this.value);
 
-  factory KeyType.fromJson(String value) => values[value];
+  factory KeyType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -355,10 +352,10 @@ class KeyType {
 /// Key range.
 class KeyRange {
   /// Lower bound.
-  final Key lower;
+  final Key? lower;
 
   /// Upper bound.
-  final Key upper;
+  final Key? upper;
 
   /// If true lower bound is open.
   final bool lowerOpen;
@@ -369,8 +366,8 @@ class KeyRange {
   KeyRange(
       {this.lower,
       this.upper,
-      @required this.lowerOpen,
-      @required this.upperOpen});
+      required this.lowerOpen,
+      required this.upperOpen});
 
   factory KeyRange.fromJson(Map<String, dynamic> json) {
     return KeyRange(
@@ -389,8 +386,8 @@ class KeyRange {
     return {
       'lowerOpen': lowerOpen,
       'upperOpen': upperOpen,
-      if (lower != null) 'lower': lower.toJson(),
-      if (upper != null) 'upper': upper.toJson(),
+      if (lower != null) 'lower': lower!.toJson(),
+      if (upper != null) 'upper': upper!.toJson(),
     };
   }
 }
@@ -406,8 +403,7 @@ class DataEntry {
   /// Value object.
   final runtime.RemoteObject value;
 
-  DataEntry(
-      {@required this.key, @required this.primaryKey, @required this.value});
+  DataEntry({required this.key, required this.primaryKey, required this.value});
 
   factory DataEntry.fromJson(Map<String, dynamic> json) {
     return DataEntry(
@@ -434,12 +430,12 @@ class KeyPath {
   final KeyPathType type;
 
   /// String value.
-  final String string;
+  final String? string;
 
   /// Array value.
-  final List<String> array;
+  final List<String>? array;
 
-  KeyPath({@required this.type, this.string, this.array});
+  KeyPath({required this.type, this.string, this.array});
 
   factory KeyPath.fromJson(Map<String, dynamic> json) {
     return KeyPath(
@@ -455,7 +451,7 @@ class KeyPath {
     return {
       'type': type,
       if (string != null) 'string': string,
-      if (array != null) 'array': [...array],
+      if (array != null) 'array': [...?array],
     };
   }
 }
@@ -474,7 +470,7 @@ class KeyPathType {
 
   const KeyPathType._(this.value);
 
-  factory KeyPathType.fromJson(String value) => values[value];
+  factory KeyPathType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 

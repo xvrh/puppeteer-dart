@@ -16,17 +16,17 @@ const _utilityWorldName = '__cdt_utility_world__';
 
 class FrameManager {
   final Page page;
-  NetworkManager _networkManager;
+  late final NetworkManager _networkManager;
   final _frames = <FrameId, Frame>{};
   final _contextIdToContext = <ExecutionContextId, ExecutionContext>{};
-  final _isolatedWorlds = <String>{};
+  final _isolatedWorlds = <String?>{};
   final _lifecycleEventController = StreamController<Frame>.broadcast(),
       _frameAttachedController = StreamController<Frame>.broadcast(),
       _frameNavigatedController = StreamController<Frame>.broadcast(),
       _frameNavigatedWithinDocumentController =
           StreamController<Frame>.broadcast(),
       _frameDetachedController = StreamController<Frame>.broadcast();
-  Frame _mainFrame;
+  Frame? _mainFrame;
 
   FrameManager(this.page) {
     _networkManager = NetworkManager(page.session, this);
@@ -82,10 +82,10 @@ class FrameManager {
     await _ensureIsolatedWorld(_utilityWorldName);
   }
 
-  Frame frame(FrameId frameId) => _frames[frameId];
+  Frame? frame(FrameId? frameId) => _frames[frameId];
 
   Future<Response> navigateFrame(Frame frame, String url,
-      {String referrer, Duration timeout, Until wait}) async {
+      {String? referrer, Duration? timeout, Until? wait}) async {
     referrer ??= _networkManager.extraHTTPHeaders['referer'];
     var watcher = LifecycleWatcher(this, frame,
         wait: wait, timeout: timeout ?? page.navigationTimeoutOrDefault);
@@ -114,11 +114,12 @@ class FrameManager {
       watcher.dispose();
     }
 
-    return watcher.navigationResponse;
+    return watcher.navigationResponse ??
+        Response.aborted(page.devTools, watcher.navigationRequest);
   }
 
   Future<Response> waitForFrameNavigation(Frame frame,
-      {Until wait, Duration timeout}) async {
+      {Until? wait, Duration? timeout}) async {
     var watcher = LifecycleWatcher(this, frame,
         wait: wait, timeout: timeout ?? page.navigationTimeoutOrDefault);
     try {
@@ -135,7 +136,8 @@ class FrameManager {
       watcher.dispose();
     }
 
-    return watcher.navigationResponse;
+    return watcher.navigationResponse ??
+        Response.aborted(page.devTools, watcher.navigationRequest);
   }
 
   void _onLifecycleEvent(LifecycleEventEvent event) {
@@ -158,25 +160,24 @@ class FrameManager {
 
   void _handleFrameTree(FrameTree frameTree) {
     if (frameTree.frame.parentId != null) {
-      _onFrameAttached(frameTree.frame.id, FrameId(frameTree.frame.parentId));
+      _onFrameAttached(frameTree.frame.id, FrameId(frameTree.frame.parentId!));
     }
     _onFrameNavigated(frameTree.frame);
     if (frameTree.childFrames == null) {
       return;
     }
 
-    frameTree.childFrames.forEach(_handleFrameTree);
+    frameTree.childFrames!.forEach(_handleFrameTree);
   }
 
-  Frame get mainFrame => _mainFrame;
+  Frame? get mainFrame => _mainFrame;
 
   List<Frame> get frames => List.unmodifiable(_frames.values);
 
-  Frame frameById(FrameId frameId) => _frames[frameId];
+  Frame? frameById(FrameId frameId) => _frames[frameId];
 
   void _onFrameAttached(FrameId frameId, FrameId parentFrameId) {
     if (_frames.containsKey(frameId)) return;
-    assert(parentFrameId != null);
     var parentFrame = _frames[parentFrameId];
     var frame = Frame(this, page.session, parentFrame, frameId);
     _frames[frameId] = frame;
@@ -212,7 +213,7 @@ class FrameManager {
     }
 
     // Update frame payload.
-    frame._navigated(framePayload);
+    frame!._navigated(framePayload);
 
     _frameNavigatedController.add(frame);
   }
@@ -252,13 +253,13 @@ class FrameManager {
 
   void _onExecutionContextCreated(ExecutionContextDescription contextPayload) {
     var frameId = contextPayload.auxData != null
-        ? contextPayload.auxData['frameId'] as String
+        ? contextPayload.auxData!['frameId'] as String?
         : null;
-    var frame = _frames[FrameId(frameId)];
-    DomWorld world;
+    var frame = frameId != null ? _frames[FrameId(frameId)] : null;
+    DomWorld? world;
     if (frame != null) {
       if (contextPayload.auxData != null &&
-          contextPayload.auxData['isDefault'] == true) {
+          contextPayload.auxData!['isDefault'] == true) {
         world = frame._mainWorld;
       } else if (contextPayload.name == _utilityWorldName &&
           !frame._secondaryWorld.hasContext) {
@@ -269,7 +270,7 @@ class FrameManager {
       }
     }
     if (contextPayload.auxData != null &&
-        contextPayload.auxData['type'] == 'isolated') {
+        contextPayload.auxData!['type'] == 'isolated') {
       _isolatedWorlds.add(contextPayload.name);
     }
     var context = ExecutionContext(page.session, contextPayload, world);
@@ -286,13 +287,13 @@ class FrameManager {
     }
     _contextIdToContext.remove(executionContextId);
     if (context.world != null) {
-      context.world.setContext(null);
+      context.world!.setContext(null);
     }
   }
 
   void _onExecutionContextsCleared(_) {
     for (var context in _contextIdToContext.values) {
-      if (context.world != null) context.world.setContext(null);
+      if (context.world != null) context.world!.setContext(null);
     }
     _contextIdToContext.clear();
   }
@@ -301,7 +302,7 @@ class FrameManager {
     var context = _contextIdToContext[contextId];
     assert(context != null,
         'INTERNAL ERROR: missing context with id = ${contextId.value}');
-    return context;
+    return context!;
   }
 
   void _removeFramesRecursively(Frame frame) {
@@ -355,21 +356,22 @@ class FrameManager {
 class Frame {
   final FrameManager frameManager;
   final Client client;
-  Frame _parent;
+  Frame? _parent;
   FrameId _id;
-  final lifecycleEvents = <String>{};
+  final lifecycleEvents = <String?>{};
   final childFrames = <Frame>[];
-  String _url, _name;
+  late String _url;
+  String? _name;
   bool _detached = false;
-  LoaderId _loaderId;
-  DomWorld _mainWorld, _secondaryWorld;
+  LoaderId? _loaderId;
+  late final DomWorld _mainWorld, _secondaryWorld;
 
   Frame(this.frameManager, this.client, this._parent, this._id) {
     _mainWorld = DomWorld(frameManager, this);
     _secondaryWorld = DomWorld(frameManager, this);
 
     if (_parent != null) {
-      _parent.childFrames.add(this);
+      _parent!.childFrames.add(this);
     }
   }
 
@@ -384,15 +386,15 @@ class Frame {
   ///
   /// > **NOTE** This value is calculated once when the frame is created, and
   /// will not update if the attribute is changed later.
-  String get name => _name;
+  String? get name => _name;
 
   /// Returns `true` if the frame has been detached, or `false` otherwise.
   bool get isDetached => _detached;
 
-  LoaderId get loaderId => _loaderId;
+  LoaderId? get loaderId => _loaderId;
 
   /// Parent frame, if any. Detached frames and main frames return `null`.
-  Frame get parentFrame => _parent;
+  Frame? get parentFrame => _parent;
 
   /// The [Frame.goto] will throw an error if:
   /// - there's an SSL error (e.g. in case of self-signed certificates).
@@ -435,12 +437,12 @@ class Frame {
   /// of multiple redirects, the navigation will resolve with the response of
   /// the last redirect.
   Future<Response> goto(String url,
-      {String referrer, Duration timeout, Until wait}) {
+      {String? referrer, Duration? timeout, Until? wait}) {
     return frameManager.navigateFrame(this, url,
         referrer: referrer, timeout: timeout, wait: wait);
   }
 
-  Future<Response> waitForNavigation({Duration timeout, Until wait}) {
+  Future<Response> waitForNavigation({Duration? timeout, Until? wait}) {
     return frameManager.waitForFrameNavigation(this,
         timeout: timeout, wait: wait);
   }
@@ -480,7 +482,7 @@ class Frame {
   /// in-page object (JSHandle)
   Future<T> evaluateHandle<T extends JsHandle>(
       @Language('js') String pageFunction,
-      {List args}) {
+      {List? args}) {
     return _mainWorld.evaluateHandle(pageFunction, args: args);
   }
 
@@ -520,8 +522,18 @@ class Frame {
   /// - [pageFunction] Function to be evaluated in the page context
   /// - [args] Arguments to pass to `pageFunction`
   /// - Returns: Future which resolves to the return value of `pageFunction`
-  Future<T> evaluate<T>(@Language('js') String pageFunction, {List args}) {
+  Future<T> evaluate<T>(@Language('js') String pageFunction, {List? args}) {
     return _mainWorld.evaluate<T>(pageFunction, args: args);
+  }
+
+  /// The method queries frame for the selector. If there's no such element
+  /// within the frame, the method will throw an Exception.
+  ///
+  /// [selector]: A selector to query frame for
+  /// Returns a Future which resolves to ElementHandle pointing to the frame
+  /// element.
+  Future<ElementHandle> $(String selector) {
+    return _mainWorld.$(selector);
   }
 
   /// The method queries frame for the selector. If there's no such element
@@ -530,8 +542,8 @@ class Frame {
   /// [selector]: A selector to query frame for
   /// Returns a Future which resolves to ElementHandle pointing to the frame
   /// element.
-  Future<ElementHandle> $(String selector) {
-    return _mainWorld.$(selector);
+  Future<ElementHandle?> $OrNull(String selector) {
+    return _mainWorld.$OrNull(selector);
   }
 
   /// Evaluates the XPath expression.
@@ -561,8 +573,8 @@ class Frame {
   /// [pageFunction]: Function to be evaluated in browser context
   /// [args]: Arguments to pass to pageFunction
   /// Returns a Future which resolves to the return value of pageFunction
-  Future<T> $eval<T>(String selector, @Language('js') String pageFunction,
-      {List args}) {
+  Future<T?> $eval<T>(String selector, @Language('js') String pageFunction,
+      {List? args}) {
     return _mainWorld.$eval<T>(selector, pageFunction, args: args);
   }
 
@@ -576,8 +588,8 @@ class Frame {
   /// ```dart
   /// var divsCounts = await frame.$$eval('div', 'divs => divs.length');
   /// ```
-  Future<T> $$eval<T>(String selector, @Language('js') String pageFunction,
-      {List args}) {
+  Future<T?> $$eval<T>(String selector, @Language('js') String pageFunction,
+      {List? args}) {
     return _mainWorld.$$eval<T>(selector, pageFunction, args: args);
   }
 
@@ -594,7 +606,7 @@ class Frame {
   }
 
   /// Gets the full HTML contents of the frame, including the doctype.
-  Future<String> get content {
+  Future<String?> get content {
     return _secondaryWorld.content;
   }
 
@@ -614,7 +626,7 @@ class Frame {
   ///     are no more than 0 network connections for at least `500` ms.
   ///   - [Until.networkAlmostIdle] - consider navigation to be finished when
   ///     there are no more than 2 network connections for at least `500` ms.
-  Future<void> setContent(String html, {Duration timeout, Until wait}) {
+  Future<void> setContent(String html, {Duration? timeout, Until? wait}) {
     return _secondaryWorld.setContent(html, timeout: timeout, wait: wait);
   }
 
@@ -631,7 +643,7 @@ class Frame {
   /// Returns a [Future<ElementHandle>] which resolves to the added tag when the
   /// script's onload fires or when the script content was injected into frame.
   Future<ElementHandle> addScriptTag(
-      {String url, File file, String content, String type}) {
+      {String? url, File? file, String? content, String? type}) {
     return _mainWorld.addScriptTag(
         url: url, file: file, content: content, type: type);
   }
@@ -646,7 +658,8 @@ class Frame {
   ///
   /// Returns a [Future<ElementHandle>] which resolves to the added tag when the
   /// stylesheet's onload fires or when the CSS content was injected into frame.
-  Future<ElementHandle> addStyleTag({String url, File file, String content}) {
+  Future<ElementHandle> addStyleTag(
+      {String? url, File? file, String? content}) {
     return _mainWorld.addStyleTag(url: url, file: file, content: content);
   }
 
@@ -672,7 +685,7 @@ class Frame {
   /// - [clickCount]: defaults to 1
   /// - [delay]: Time to wait between `mousedown` and `mouseup`. Default to zero.
   Future<void> click(String selector,
-      {Duration delay, MouseButton button, int clickCount}) {
+      {Duration? delay, MouseButton? button, int? clickCount}) {
     return _secondaryWorld.click(selector,
         delay: delay, button: button, clickCount: clickCount);
   }
@@ -752,7 +765,7 @@ class Frame {
   /// // Types slower, like a user
   /// await frame.type('#mytextarea', 'World', delay: Duration(milliseconds: 100));
   /// ```
-  Future<void> type(String selector, String text, {Duration delay}) {
+  Future<void> type(String selector, String text, {Duration? delay}) {
     return _mainWorld.type(selector, text, delay: delay);
   }
 
@@ -771,7 +784,7 @@ class Frame {
   ///   var watchImg = page.mainFrame.waitForSelector('img');
   ///   await page.goto('https://example.com');
   ///   var image = await watchImg;
-  ///   print(await image.propertyValue('src'));
+  ///   print(await image!.propertyValue('src'));
   ///   await browser.close();
   /// }
   /// ```
@@ -791,8 +804,8 @@ class Frame {
   /// Returns a [Future] which resolves when element specified by selector string
   /// is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
   /// is not found in DOM.
-  Future<ElementHandle> waitForSelector(String selector,
-      {bool visible, bool hidden, Duration timeout}) async {
+  Future<ElementHandle?> waitForSelector(String selector,
+      {bool? visible, bool? hidden, Duration? timeout}) async {
     var handle = await _secondaryWorld.waitForSelector(selector,
         visible: visible, hidden: hidden, timeout: timeout);
     if (handle == null) {
@@ -819,7 +832,7 @@ class Frame {
   ///   var watchImg = page.mainFrame.waitForXPath('//img');
   ///   await page.goto('https://example.com');
   ///   var image = await watchImg;
-  ///   print(await image.propertyValue('src'));
+  ///   print(await image!.propertyValue('src'));
   ///   await browser.close();
   /// }
   /// ```
@@ -839,8 +852,8 @@ class Frame {
   /// Returns a [Future] which resolves when element specified by xpath string
   /// is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
   /// is not found in DOM.
-  Future<ElementHandle> waitForXPath(String xpath,
-      {bool visible, bool hidden, Duration timeout}) async {
+  Future<ElementHandle?> waitForXPath(String xpath,
+      {bool? visible, bool? hidden, Duration? timeout}) async {
     var handle = await _secondaryWorld.waitForXPath(xpath,
         visible: visible, hidden: hidden, timeout: timeout);
     if (handle == null) {
@@ -889,17 +902,17 @@ class Frame {
   ///     args: [selector]);
   /// ```
   Future<JsHandle> waitForFunction(@Language('js') String pageFunction,
-      {List args, Duration timeout, Polling polling}) {
+      {List? args, Duration? timeout, Polling? polling}) {
     return _mainWorld.waitForFunction(pageFunction, args,
         timeout: timeout, polling: polling);
   }
 
   /// The page's title.
-  Future<String> get title {
+  Future<String?> get title {
     return _secondaryWorld.title;
   }
 
-  void _onLifecycleEvent(LoaderId loaderId, String name) {
+  void _onLifecycleEvent(LoaderId loaderId, String? name) {
     if (name == 'init') {
       _loaderId = loaderId;
       lifecycleEvents.clear();
@@ -926,7 +939,7 @@ class Frame {
     _mainWorld.detach();
     _secondaryWorld.detach();
     if (_parent != null) {
-      _parent.childFrames.remove(this);
+      _parent!.childFrames.remove(this);
     }
     _parent = null;
   }

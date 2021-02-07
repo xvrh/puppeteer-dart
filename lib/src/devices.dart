@@ -855,7 +855,7 @@ class Devices with IterableMixin<Device> {
           hasTouch: true,
           isLandscape: true));
 
-  Map<String, Device> _all;
+  late Map<String, Device> _all;
   Devices._() {
     _all = CanonicalizedMap<String, String, Device>.from({
       'iPhone 4': iPhone4,
@@ -936,11 +936,10 @@ class Devices with IterableMixin<Device> {
       'Surface Duo Landscape': surfaceDuoLandscape,
       'Galaxy Fold': galaxyFold,
       'Galaxy Fold Landscape': galaxyFoldLandscape,
-    }, (key) => key.replaceAll(' ', '').toLowerCase(),
-        isValidKey: (key) => key != null);
+    }, (key) => key.replaceAll(' ', '').toLowerCase());
   }
 
-  Device operator [](String name) => _all[name];
+  Device? operator [](String name) => _all[name];
 
   @override
   Iterator<Device> get iterator => _all.values.iterator;

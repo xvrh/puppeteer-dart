@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'debugger.dart' as debugger;
 import 'runtime.dart' as runtime;
@@ -39,7 +38,7 @@ class DebuggerApi {
   /// Continues execution until specific location is reached.
   /// [location] Location to continue to.
   Future<void> continueToLocation(Location location,
-      {@Enum(['any', 'current']) String targetCallFrames}) async {
+      {@Enum(['any', 'current']) String? targetCallFrames}) async {
     assert(targetCallFrames == null ||
         const ['any', 'current'].contains(targetCallFrames));
     await _client.send('Debugger.continueToLocation', {
@@ -58,7 +57,7 @@ class DebuggerApi {
   /// [maxScriptsCacheSize] The maximum size in bytes of collected scripts (not referenced by other heap objects)
   /// the debugger can hold. Puts no limit if paramter is omitted.
   /// Returns: Unique identifier of the debugger.
-  Future<runtime.UniqueDebuggerId> enable({num maxScriptsCacheSize}) async {
+  Future<runtime.UniqueDebuggerId> enable({num? maxScriptsCacheSize}) async {
     var result = await _client.send('Debugger.enable', {
       if (maxScriptsCacheSize != null)
         'maxScriptsCacheSize': maxScriptsCacheSize,
@@ -81,13 +80,13 @@ class DebuggerApi {
   /// [timeout] Terminate execution after timing out (number of milliseconds).
   Future<EvaluateOnCallFrameResult> evaluateOnCallFrame(
       CallFrameId callFrameId, String expression,
-      {String objectGroup,
-      bool includeCommandLineAPI,
-      bool silent,
-      bool returnByValue,
-      bool generatePreview,
-      bool throwOnSideEffect,
-      runtime.TimeDelta timeout}) async {
+      {String? objectGroup,
+      bool? includeCommandLineAPI,
+      bool? silent,
+      bool? returnByValue,
+      bool? generatePreview,
+      bool? throwOnSideEffect,
+      runtime.TimeDelta? timeout}) async {
     var result = await _client.send('Debugger.evaluateOnCallFrame', {
       'callFrameId': callFrameId,
       'expression': expression,
@@ -109,7 +108,7 @@ class DebuggerApi {
   /// [timeout] Terminate execution after timing out (number of milliseconds).
   Future<ExecuteWasmEvaluatorResult> executeWasmEvaluator(
       CallFrameId callFrameId, String evaluator,
-      {runtime.TimeDelta timeout}) async {
+      {runtime.TimeDelta? timeout}) async {
     var result = await _client.send('Debugger.executeWasmEvaluator', {
       'callFrameId': callFrameId,
       'evaluator': evaluator,
@@ -126,7 +125,7 @@ class DebuggerApi {
   /// [restrictToFunction] Only consider locations which are in the same (non-nested) function as start.
   /// Returns: List of the possible breakpoint locations.
   Future<List<BreakLocation>> getPossibleBreakpoints(Location start,
-      {Location end, bool restrictToFunction}) async {
+      {Location? end, bool? restrictToFunction}) async {
     var result = await _client.send('Debugger.getPossibleBreakpoints', {
       'start': start,
       if (end != null) 'end': end,
@@ -203,7 +202,7 @@ class DebuggerApi {
   /// JavaScript (i.e. via evaluation) until execution of the paused code
   /// is actually resumed, at which point termination is triggered.
   /// If execution is currently not paused, this parameter has no effect.
-  Future<void> resume({bool terminateOnResume}) async {
+  Future<void> resume({bool? terminateOnResume}) async {
     await _client.send('Debugger.resume', {
       if (terminateOnResume != null) 'terminateOnResume': terminateOnResume,
     });
@@ -217,7 +216,7 @@ class DebuggerApi {
   /// Returns: List of search matches.
   Future<List<SearchMatch>> searchInContent(
       runtime.ScriptId scriptId, String query,
-      {bool caseSensitive, bool isRegex}) async {
+      {bool? caseSensitive, bool? isRegex}) async {
     var result = await _client.send('Debugger.searchInContent', {
       'scriptId': scriptId,
       'query': query,
@@ -266,7 +265,7 @@ class DebuggerApi {
   /// [condition] Expression to use as a breakpoint condition. When specified, debugger will only stop on the
   /// breakpoint if this expression evaluates to true.
   Future<SetBreakpointResult> setBreakpoint(Location location,
-      {String condition}) async {
+      {String? condition}) async {
     var result = await _client.send('Debugger.setBreakpoint', {
       'location': location,
       if (condition != null) 'condition': condition,
@@ -301,11 +300,11 @@ class DebuggerApi {
   /// [condition] Expression to use as a breakpoint condition. When specified, debugger will only stop on the
   /// breakpoint if this expression evaluates to true.
   Future<SetBreakpointByUrlResult> setBreakpointByUrl(int lineNumber,
-      {String url,
-      String urlRegex,
-      String scriptHash,
-      int columnNumber,
-      String condition}) async {
+      {String? url,
+      String? urlRegex,
+      String? scriptHash,
+      int? columnNumber,
+      String? condition}) async {
     var result = await _client.send('Debugger.setBreakpointByUrl', {
       'lineNumber': lineNumber,
       if (url != null) 'url': url,
@@ -326,7 +325,7 @@ class DebuggerApi {
   /// Returns: Id of the created breakpoint for further reference.
   Future<BreakpointId> setBreakpointOnFunctionCall(
       runtime.RemoteObjectId objectId,
-      {String condition}) async {
+      {String? condition}) async {
     var result = await _client.send('Debugger.setBreakpointOnFunctionCall', {
       'objectId': objectId,
       if (condition != null) 'condition': condition,
@@ -368,7 +367,7 @@ class DebuggerApi {
   /// description without actually modifying the code.
   Future<SetScriptSourceResult> setScriptSource(
       runtime.ScriptId scriptId, String scriptSource,
-      {bool dryRun}) async {
+      {bool? dryRun}) async {
     var result = await _client.send('Debugger.setScriptSource', {
       'scriptId': scriptId,
       'scriptSource': scriptSource,
@@ -407,7 +406,7 @@ class DebuggerApi {
   /// before next pause.
   /// [skipList] The skipList specifies location ranges that should be skipped on step into.
   Future<void> stepInto(
-      {bool breakOnAsyncCall, List<LocationRange> skipList}) async {
+      {bool? breakOnAsyncCall, List<LocationRange>? skipList}) async {
     await _client.send('Debugger.stepInto', {
       if (breakOnAsyncCall != null) 'breakOnAsyncCall': breakOnAsyncCall,
       if (skipList != null) 'skipList': [...skipList],
@@ -421,7 +420,7 @@ class DebuggerApi {
 
   /// Steps over the statement.
   /// [skipList] The skipList specifies location ranges that should be skipped on step over.
-  Future<void> stepOver({List<LocationRange> skipList}) async {
+  Future<void> stepOver({List<LocationRange>? skipList}) async {
     await _client.send('Debugger.stepOver', {
       if (skipList != null) 'skipList': [...skipList],
     });
@@ -435,8 +434,7 @@ class BreakpointResolvedEvent {
   /// Actual breakpoint location.
   final Location location;
 
-  BreakpointResolvedEvent(
-      {@required this.breakpointId, @required this.location});
+  BreakpointResolvedEvent({required this.breakpointId, required this.location});
 
   factory BreakpointResolvedEvent.fromJson(Map<String, dynamic> json) {
     return BreakpointResolvedEvent(
@@ -454,20 +452,20 @@ class PausedEvent {
   final PausedEventReason reason;
 
   /// Object containing break-specific auxiliary properties.
-  final Map<String, dynamic> data;
+  final Map<String, dynamic>? data;
 
   /// Hit breakpoints IDs
-  final List<String> hitBreakpoints;
+  final List<String>? hitBreakpoints;
 
   /// Async stack trace, if any.
-  final runtime.StackTraceData asyncStackTrace;
+  final runtime.StackTraceData? asyncStackTrace;
 
   /// Async stack trace, if any.
-  final runtime.StackTraceId asyncStackTraceId;
+  final runtime.StackTraceId? asyncStackTraceId;
 
   PausedEvent(
-      {@required this.callFrames,
-      @required this.reason,
+      {required this.callFrames,
+      required this.reason,
       this.data,
       this.hitBreakpoints,
       this.asyncStackTrace,
@@ -523,41 +521,41 @@ class ScriptFailedToParseEvent {
   final String hash;
 
   /// Embedder-specific auxiliary data.
-  final Map<String, dynamic> executionContextAuxData;
+  final Map<String, dynamic>? executionContextAuxData;
 
   /// URL of source map associated with script (if any).
-  final String sourceMapURL;
+  final String? sourceMapURL;
 
   /// True, if this script has sourceURL.
-  final bool hasSourceURL;
+  final bool? hasSourceURL;
 
   /// True, if this script is ES6 module.
-  final bool isModule;
+  final bool? isModule;
 
   /// This script length.
-  final int length;
+  final int? length;
 
   /// JavaScript top stack frame of where the script parsed event was triggered if available.
-  final runtime.StackTraceData stackTrace;
+  final runtime.StackTraceData? stackTrace;
 
   /// If the scriptLanguage is WebAssembly, the code section offset in the module.
-  final int codeOffset;
+  final int? codeOffset;
 
   /// The language of the script.
-  final debugger.ScriptLanguage scriptLanguage;
+  final debugger.ScriptLanguage? scriptLanguage;
 
   /// The name the embedder supplied for this script.
-  final String embedderName;
+  final String? embedderName;
 
   ScriptFailedToParseEvent(
-      {@required this.scriptId,
-      @required this.url,
-      @required this.startLine,
-      @required this.startColumn,
-      @required this.endLine,
-      @required this.endColumn,
-      @required this.executionContextId,
-      @required this.hash,
+      {required this.scriptId,
+      required this.url,
+      required this.startLine,
+      required this.startColumn,
+      required this.endLine,
+      required this.endColumn,
+      required this.executionContextId,
+      required this.hash,
       this.executionContextAuxData,
       this.sourceMapURL,
       this.hasSourceURL,
@@ -632,47 +630,47 @@ class ScriptParsedEvent {
   final String hash;
 
   /// Embedder-specific auxiliary data.
-  final Map<String, dynamic> executionContextAuxData;
+  final Map<String, dynamic>? executionContextAuxData;
 
   /// True, if this script is generated as a result of the live edit operation.
-  final bool isLiveEdit;
+  final bool? isLiveEdit;
 
   /// URL of source map associated with script (if any).
-  final String sourceMapURL;
+  final String? sourceMapURL;
 
   /// True, if this script has sourceURL.
-  final bool hasSourceURL;
+  final bool? hasSourceURL;
 
   /// True, if this script is ES6 module.
-  final bool isModule;
+  final bool? isModule;
 
   /// This script length.
-  final int length;
+  final int? length;
 
   /// JavaScript top stack frame of where the script parsed event was triggered if available.
-  final runtime.StackTraceData stackTrace;
+  final runtime.StackTraceData? stackTrace;
 
   /// If the scriptLanguage is WebAssembly, the code section offset in the module.
-  final int codeOffset;
+  final int? codeOffset;
 
   /// The language of the script.
-  final debugger.ScriptLanguage scriptLanguage;
+  final debugger.ScriptLanguage? scriptLanguage;
 
   /// If the scriptLanguage is WebASsembly, the source of debug symbols for the module.
-  final debugger.DebugSymbols debugSymbols;
+  final debugger.DebugSymbols? debugSymbols;
 
   /// The name the embedder supplied for this script.
-  final String embedderName;
+  final String? embedderName;
 
   ScriptParsedEvent(
-      {@required this.scriptId,
-      @required this.url,
-      @required this.startLine,
-      @required this.startColumn,
-      @required this.endLine,
-      @required this.endColumn,
-      @required this.executionContextId,
-      @required this.hash,
+      {required this.scriptId,
+      required this.url,
+      required this.startLine,
+      required this.startColumn,
+      required this.endLine,
+      required this.endColumn,
+      required this.executionContextId,
+      required this.hash,
       this.executionContextAuxData,
       this.isLiveEdit,
       this.sourceMapURL,
@@ -734,9 +732,9 @@ class EvaluateOnCallFrameResult {
   final runtime.RemoteObject result;
 
   /// Exception details.
-  final runtime.ExceptionDetails exceptionDetails;
+  final runtime.ExceptionDetails? exceptionDetails;
 
-  EvaluateOnCallFrameResult({@required this.result, this.exceptionDetails});
+  EvaluateOnCallFrameResult({required this.result, this.exceptionDetails});
 
   factory EvaluateOnCallFrameResult.fromJson(Map<String, dynamic> json) {
     return EvaluateOnCallFrameResult(
@@ -755,9 +753,9 @@ class ExecuteWasmEvaluatorResult {
   final runtime.RemoteObject result;
 
   /// Exception details.
-  final runtime.ExceptionDetails exceptionDetails;
+  final runtime.ExceptionDetails? exceptionDetails;
 
-  ExecuteWasmEvaluatorResult({@required this.result, this.exceptionDetails});
+  ExecuteWasmEvaluatorResult({required this.result, this.exceptionDetails});
 
   factory ExecuteWasmEvaluatorResult.fromJson(Map<String, dynamic> json) {
     return ExecuteWasmEvaluatorResult(
@@ -776,9 +774,9 @@ class GetScriptSourceResult {
   final String scriptSource;
 
   /// Wasm bytecode.
-  final String bytecode;
+  final String? bytecode;
 
-  GetScriptSourceResult({@required this.scriptSource, this.bytecode});
+  GetScriptSourceResult({required this.scriptSource, this.bytecode});
 
   factory GetScriptSourceResult.fromJson(Map<String, dynamic> json) {
     return GetScriptSourceResult(
@@ -794,15 +792,13 @@ class RestartFrameResult {
   final List<CallFrame> callFrames;
 
   /// Async stack trace, if any.
-  final runtime.StackTraceData asyncStackTrace;
+  final runtime.StackTraceData? asyncStackTrace;
 
   /// Async stack trace, if any.
-  final runtime.StackTraceId asyncStackTraceId;
+  final runtime.StackTraceId? asyncStackTraceId;
 
   RestartFrameResult(
-      {@required this.callFrames,
-      this.asyncStackTrace,
-      this.asyncStackTraceId});
+      {required this.callFrames, this.asyncStackTrace, this.asyncStackTraceId});
 
   factory RestartFrameResult.fromJson(Map<String, dynamic> json) {
     return RestartFrameResult(
@@ -829,7 +825,7 @@ class SetBreakpointResult {
   final Location actualLocation;
 
   SetBreakpointResult(
-      {@required this.breakpointId, @required this.actualLocation});
+      {required this.breakpointId, required this.actualLocation});
 
   factory SetBreakpointResult.fromJson(Map<String, dynamic> json) {
     return SetBreakpointResult(
@@ -848,7 +844,7 @@ class SetBreakpointByUrlResult {
   final List<Location> locations;
 
   SetBreakpointByUrlResult(
-      {@required this.breakpointId, @required this.locations});
+      {required this.breakpointId, required this.locations});
 
   factory SetBreakpointByUrlResult.fromJson(Map<String, dynamic> json) {
     return SetBreakpointByUrlResult(
@@ -862,19 +858,19 @@ class SetBreakpointByUrlResult {
 
 class SetScriptSourceResult {
   /// New stack trace in case editing has happened while VM was stopped.
-  final List<CallFrame> callFrames;
+  final List<CallFrame>? callFrames;
 
   /// Whether current call stack  was modified after applying the changes.
-  final bool stackChanged;
+  final bool? stackChanged;
 
   /// Async stack trace, if any.
-  final runtime.StackTraceData asyncStackTrace;
+  final runtime.StackTraceData? asyncStackTrace;
 
   /// Async stack trace, if any.
-  final runtime.StackTraceId asyncStackTraceId;
+  final runtime.StackTraceId? asyncStackTraceId;
 
   /// Exception details if any.
-  final runtime.ExceptionDetails exceptionDetails;
+  final runtime.ExceptionDetails? exceptionDetails;
 
   SetScriptSourceResult(
       {this.callFrames,
@@ -960,10 +956,10 @@ class Location {
   final int lineNumber;
 
   /// Column number in the script (0-based).
-  final int columnNumber;
+  final int? columnNumber;
 
   Location(
-      {@required this.scriptId, @required this.lineNumber, this.columnNumber});
+      {required this.scriptId, required this.lineNumber, this.columnNumber});
 
   factory Location.fromJson(Map<String, dynamic> json) {
     return Location(
@@ -989,7 +985,7 @@ class ScriptPosition {
 
   final int columnNumber;
 
-  ScriptPosition({@required this.lineNumber, @required this.columnNumber});
+  ScriptPosition({required this.lineNumber, required this.columnNumber});
 
   factory ScriptPosition.fromJson(Map<String, dynamic> json) {
     return ScriptPosition(
@@ -1015,7 +1011,7 @@ class LocationRange {
   final ScriptPosition end;
 
   LocationRange(
-      {@required this.scriptId, @required this.start, @required this.end});
+      {required this.scriptId, required this.start, required this.end});
 
   factory LocationRange.fromJson(Map<String, dynamic> json) {
     return LocationRange(
@@ -1043,7 +1039,7 @@ class CallFrame {
   final String functionName;
 
   /// Location in the source code.
-  final Location functionLocation;
+  final Location? functionLocation;
 
   /// Location in the source code.
   final Location location;
@@ -1058,16 +1054,16 @@ class CallFrame {
   final runtime.RemoteObject this$;
 
   /// The value being returned, if the function is at return point.
-  final runtime.RemoteObject returnValue;
+  final runtime.RemoteObject? returnValue;
 
   CallFrame(
-      {@required this.callFrameId,
-      @required this.functionName,
+      {required this.callFrameId,
+      required this.functionName,
       this.functionLocation,
-      @required this.location,
-      @required this.url,
-      @required this.scopeChain,
-      @required this.this$,
+      required this.location,
+      required this.url,
+      required this.scopeChain,
+      required this.this$,
       this.returnValue});
 
   factory CallFrame.fromJson(Map<String, dynamic> json) {
@@ -1100,8 +1096,8 @@ class CallFrame {
       'scopeChain': scopeChain.map((e) => e.toJson()).toList(),
       'this': this$.toJson(),
       if (functionLocation != null)
-        'functionLocation': functionLocation.toJson(),
-      if (returnValue != null) 'returnValue': returnValue.toJson(),
+        'functionLocation': functionLocation!.toJson(),
+      if (returnValue != null) 'returnValue': returnValue!.toJson(),
     };
   }
 }
@@ -1116,17 +1112,17 @@ class Scope {
   /// variables as its properties.
   final runtime.RemoteObject object;
 
-  final String name;
+  final String? name;
 
   /// Location in the source code where scope starts
-  final Location startLocation;
+  final Location? startLocation;
 
   /// Location in the source code where scope ends
-  final Location endLocation;
+  final Location? endLocation;
 
   Scope(
-      {@required this.type,
-      @required this.object,
+      {required this.type,
+      required this.object,
       this.name,
       this.startLocation,
       this.endLocation});
@@ -1151,8 +1147,8 @@ class Scope {
       'type': type,
       'object': object.toJson(),
       if (name != null) 'name': name,
-      if (startLocation != null) 'startLocation': startLocation.toJson(),
-      if (endLocation != null) 'endLocation': endLocation.toJson(),
+      if (startLocation != null) 'startLocation': startLocation!.toJson(),
+      if (endLocation != null) 'endLocation': endLocation!.toJson(),
     };
   }
 }
@@ -1185,7 +1181,7 @@ class ScopeType {
 
   const ScopeType._(this.value);
 
-  factory ScopeType.fromJson(String value) => values[value];
+  factory ScopeType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1208,7 +1204,7 @@ class SearchMatch {
   /// Line with match content.
   final String lineContent;
 
-  SearchMatch({@required this.lineNumber, @required this.lineContent});
+  SearchMatch({required this.lineNumber, required this.lineContent});
 
   factory SearchMatch.fromJson(Map<String, dynamic> json) {
     return SearchMatch(
@@ -1233,13 +1229,13 @@ class BreakLocation {
   final int lineNumber;
 
   /// Column number in the script (0-based).
-  final int columnNumber;
+  final int? columnNumber;
 
-  final BreakLocationType type;
+  final BreakLocationType? type;
 
   BreakLocation(
-      {@required this.scriptId,
-      @required this.lineNumber,
+      {required this.scriptId,
+      required this.lineNumber,
       this.columnNumber,
       this.type});
 
@@ -1279,7 +1275,7 @@ class BreakLocationType {
 
   const BreakLocationType._(this.value);
 
-  factory BreakLocationType.fromJson(String value) => values[value];
+  factory BreakLocationType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1307,7 +1303,7 @@ class ScriptLanguage {
 
   const ScriptLanguage._(this.value);
 
-  factory ScriptLanguage.fromJson(String value) => values[value];
+  factory ScriptLanguage.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1328,9 +1324,9 @@ class DebugSymbols {
   final DebugSymbolsType type;
 
   /// URL of the external symbol source.
-  final String externalURL;
+  final String? externalURL;
 
-  DebugSymbols({@required this.type, this.externalURL});
+  DebugSymbols({required this.type, this.externalURL});
 
   factory DebugSymbols.fromJson(Map<String, dynamic> json) {
     return DebugSymbols(
@@ -1365,7 +1361,7 @@ class DebugSymbolsType {
 
   const DebugSymbolsType._(this.value);
 
-  factory DebugSymbolsType.fromJson(String value) => values[value];
+  factory DebugSymbolsType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1410,7 +1406,7 @@ class PausedEventReason {
 
   const PausedEventReason._(this.value);
 
-  factory PausedEventReason.fromJson(String value) => values[value];
+  factory PausedEventReason.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 

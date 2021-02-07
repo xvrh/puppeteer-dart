@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'network.dart' as network;
@@ -25,8 +24,8 @@ class AuditsApi {
   Future<GetEncodedResponseResult> getEncodedResponse(
       network.RequestId requestId,
       @Enum(['webp', 'jpeg', 'png']) String encoding,
-      {num quality,
-      bool sizeOnly}) async {
+      {num? quality,
+      bool? sizeOnly}) async {
     assert(const ['webp', 'jpeg', 'png'].contains(encoding));
     var result = await _client.send('Audits.getEncodedResponse', {
       'requestId': requestId,
@@ -51,7 +50,7 @@ class AuditsApi {
 
 class GetEncodedResponseResult {
   /// The encoded body as a base64 string. Omitted if sizeOnly is true.
-  final String body;
+  final String? body;
 
   /// Size before re-encoding.
   final int originalSize;
@@ -60,7 +59,7 @@ class GetEncodedResponseResult {
   final int encodedSize;
 
   GetEncodedResponseResult(
-      {this.body, @required this.originalSize, @required this.encodedSize});
+      {this.body, required this.originalSize, required this.encodedSize});
 
   factory GetEncodedResponseResult.fromJson(Map<String, dynamic> json) {
     return GetEncodedResponseResult(
@@ -81,7 +80,7 @@ class AffectedCookie {
   final String domain;
 
   AffectedCookie(
-      {@required this.name, @required this.path, @required this.domain});
+      {required this.name, required this.path, required this.domain});
 
   factory AffectedCookie.fromJson(Map<String, dynamic> json) {
     return AffectedCookie(
@@ -105,9 +104,9 @@ class AffectedRequest {
   /// The unique request id.
   final network.RequestId requestId;
 
-  final String url;
+  final String? url;
 
-  AffectedRequest({@required this.requestId, this.url});
+  AffectedRequest({required this.requestId, this.url});
 
   factory AffectedRequest.fromJson(Map<String, dynamic> json) {
     return AffectedRequest(
@@ -128,7 +127,7 @@ class AffectedRequest {
 class AffectedFrame {
   final page.FrameId frameId;
 
-  AffectedFrame({@required this.frameId});
+  AffectedFrame({required this.frameId});
 
   factory AffectedFrame.fromJson(Map<String, dynamic> json) {
     return AffectedFrame(
@@ -164,7 +163,8 @@ class SameSiteCookieExclusionReason {
 
   const SameSiteCookieExclusionReason._(this.value);
 
-  factory SameSiteCookieExclusionReason.fromJson(String value) => values[value];
+  factory SameSiteCookieExclusionReason.fromJson(String value) =>
+      values[value]!;
 
   String toJson() => value;
 
@@ -216,7 +216,7 @@ class SameSiteCookieWarningReason {
 
   const SameSiteCookieWarningReason._(this.value);
 
-  factory SameSiteCookieWarningReason.fromJson(String value) => values[value];
+  factory SameSiteCookieWarningReason.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -244,7 +244,7 @@ class SameSiteCookieOperation {
 
   const SameSiteCookieOperation._(this.value);
 
-  factory SameSiteCookieOperation.fromJson(String value) => values[value];
+  factory SameSiteCookieOperation.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -274,17 +274,17 @@ class SameSiteCookieIssueDetails {
   /// may be used by the front-end as additional context.
   final SameSiteCookieOperation operation;
 
-  final String siteForCookies;
+  final String? siteForCookies;
 
-  final String cookieUrl;
+  final String? cookieUrl;
 
-  final AffectedRequest request;
+  final AffectedRequest? request;
 
   SameSiteCookieIssueDetails(
-      {@required this.cookie,
-      @required this.cookieWarningReasons,
-      @required this.cookieExclusionReasons,
-      @required this.operation,
+      {required this.cookie,
+      required this.cookieWarningReasons,
+      required this.cookieExclusionReasons,
+      required this.operation,
       this.siteForCookies,
       this.cookieUrl,
       this.request});
@@ -320,7 +320,7 @@ class SameSiteCookieIssueDetails {
       'operation': operation.toJson(),
       if (siteForCookies != null) 'siteForCookies': siteForCookies,
       if (cookieUrl != null) 'cookieUrl': cookieUrl,
-      if (request != null) 'request': request.toJson(),
+      if (request != null) 'request': request!.toJson(),
     };
   }
 }
@@ -342,7 +342,7 @@ class MixedContentResolutionStatus {
 
   const MixedContentResolutionStatus._(this.value);
 
-  factory MixedContentResolutionStatus.fromJson(String value) => values[value];
+  factory MixedContentResolutionStatus.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -418,7 +418,7 @@ class MixedContentResourceType {
 
   const MixedContentResourceType._(this.value);
 
-  factory MixedContentResourceType.fromJson(String value) => values[value];
+  factory MixedContentResourceType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -439,7 +439,7 @@ class MixedContentIssueDetails {
   /// form,...). Marked as optional because it is mapped to from
   /// blink::mojom::RequestContextType, which will be replaced
   /// by network::mojom::RequestDestination
-  final MixedContentResourceType resourceType;
+  final MixedContentResourceType? resourceType;
 
   /// The way the mixed content issue is being resolved.
   final MixedContentResolutionStatus resolutionStatus;
@@ -452,16 +452,16 @@ class MixedContentIssueDetails {
 
   /// The mixed content request.
   /// Does not always exist (e.g. for unsafe form submission urls).
-  final AffectedRequest request;
+  final AffectedRequest? request;
 
   /// Optional because not every mixed content issue is necessarily linked to a frame.
-  final AffectedFrame frame;
+  final AffectedFrame? frame;
 
   MixedContentIssueDetails(
       {this.resourceType,
-      @required this.resolutionStatus,
-      @required this.insecureURL,
-      @required this.mainResourceURL,
+      required this.resolutionStatus,
+      required this.insecureURL,
+      required this.mainResourceURL,
       this.request,
       this.frame});
 
@@ -488,9 +488,9 @@ class MixedContentIssueDetails {
       'resolutionStatus': resolutionStatus.toJson(),
       'insecureURL': insecureURL,
       'mainResourceURL': mainResourceURL,
-      if (resourceType != null) 'resourceType': resourceType.toJson(),
-      if (request != null) 'request': request.toJson(),
-      if (frame != null) 'frame': frame.toJson(),
+      if (resourceType != null) 'resourceType': resourceType!.toJson(),
+      if (request != null) 'request': request!.toJson(),
+      if (frame != null) 'frame': frame!.toJson(),
     };
   }
 }
@@ -522,7 +522,7 @@ class BlockedByResponseReason {
 
   const BlockedByResponseReason._(this.value);
 
-  factory BlockedByResponseReason.fromJson(String value) => values[value];
+  factory BlockedByResponseReason.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -544,17 +544,17 @@ class BlockedByResponseReason {
 class BlockedByResponseIssueDetails {
   final AffectedRequest request;
 
-  final AffectedFrame parentFrame;
+  final AffectedFrame? parentFrame;
 
-  final AffectedFrame blockedFrame;
+  final AffectedFrame? blockedFrame;
 
   final BlockedByResponseReason reason;
 
   BlockedByResponseIssueDetails(
-      {@required this.request,
+      {required this.request,
       this.parentFrame,
       this.blockedFrame,
-      @required this.reason});
+      required this.reason});
 
   factory BlockedByResponseIssueDetails.fromJson(Map<String, dynamic> json) {
     return BlockedByResponseIssueDetails(
@@ -574,8 +574,8 @@ class BlockedByResponseIssueDetails {
     return {
       'request': request.toJson(),
       'reason': reason.toJson(),
-      if (parentFrame != null) 'parentFrame': parentFrame.toJson(),
-      if (blockedFrame != null) 'blockedFrame': blockedFrame.toJson(),
+      if (parentFrame != null) 'parentFrame': parentFrame!.toJson(),
+      if (blockedFrame != null) 'blockedFrame': blockedFrame!.toJson(),
     };
   }
 }
@@ -592,7 +592,7 @@ class HeavyAdResolutionStatus {
 
   const HeavyAdResolutionStatus._(this.value);
 
-  factory HeavyAdResolutionStatus.fromJson(String value) => values[value];
+  factory HeavyAdResolutionStatus.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -622,7 +622,7 @@ class HeavyAdReason {
 
   const HeavyAdReason._(this.value);
 
-  factory HeavyAdReason.fromJson(String value) => values[value];
+  factory HeavyAdReason.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -648,7 +648,7 @@ class HeavyAdIssueDetails {
   final AffectedFrame frame;
 
   HeavyAdIssueDetails(
-      {@required this.resolution, @required this.reason, @required this.frame});
+      {required this.resolution, required this.reason, required this.frame});
 
   factory HeavyAdIssueDetails.fromJson(Map<String, dynamic> json) {
     return HeavyAdIssueDetails(
@@ -692,7 +692,7 @@ class ContentSecurityPolicyViolationType {
   const ContentSecurityPolicyViolationType._(this.value);
 
   factory ContentSecurityPolicyViolationType.fromJson(String value) =>
-      values[value];
+      values[value]!;
 
   String toJson() => value;
 
@@ -716,9 +716,9 @@ class SourceCodeLocation {
   final int columnNumber;
 
   SourceCodeLocation(
-      {@required this.url,
-      @required this.lineNumber,
-      @required this.columnNumber});
+      {required this.url,
+      required this.lineNumber,
+      required this.columnNumber});
 
   factory SourceCodeLocation.fromJson(Map<String, dynamic> json) {
     return SourceCodeLocation(
@@ -739,7 +739,7 @@ class SourceCodeLocation {
 
 class ContentSecurityPolicyIssueDetails {
   /// The url not included in allowed sources.
-  final String blockedURL;
+  final String? blockedURL;
 
   /// Specific directive that is violated, causing the CSP issue.
   final String violatedDirective;
@@ -748,17 +748,17 @@ class ContentSecurityPolicyIssueDetails {
 
   final ContentSecurityPolicyViolationType contentSecurityPolicyViolationType;
 
-  final AffectedFrame frameAncestor;
+  final AffectedFrame? frameAncestor;
 
-  final SourceCodeLocation sourceCodeLocation;
+  final SourceCodeLocation? sourceCodeLocation;
 
-  final dom.BackendNodeId violatingNodeId;
+  final dom.BackendNodeId? violatingNodeId;
 
   ContentSecurityPolicyIssueDetails(
       {this.blockedURL,
-      @required this.violatedDirective,
-      @required this.isReportOnly,
-      @required this.contentSecurityPolicyViolationType,
+      required this.violatedDirective,
+      required this.isReportOnly,
+      required this.contentSecurityPolicyViolationType,
       this.frameAncestor,
       this.sourceCodeLocation,
       this.violatingNodeId});
@@ -794,10 +794,10 @@ class ContentSecurityPolicyIssueDetails {
       'contentSecurityPolicyViolationType':
           contentSecurityPolicyViolationType.toJson(),
       if (blockedURL != null) 'blockedURL': blockedURL,
-      if (frameAncestor != null) 'frameAncestor': frameAncestor.toJson(),
+      if (frameAncestor != null) 'frameAncestor': frameAncestor!.toJson(),
       if (sourceCodeLocation != null)
-        'sourceCodeLocation': sourceCodeLocation.toJson(),
-      if (violatingNodeId != null) 'violatingNodeId': violatingNodeId.toJson(),
+        'sourceCodeLocation': sourceCodeLocation!.toJson(),
+      if (violatingNodeId != null) 'violatingNodeId': violatingNodeId!.toJson(),
     };
   }
 }
@@ -826,7 +826,7 @@ class InspectorIssueCode {
 
   const InspectorIssueCode._(this.value);
 
-  factory InspectorIssueCode.fromJson(String value) => values[value];
+  factory InspectorIssueCode.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -845,15 +845,15 @@ class InspectorIssueCode {
 /// specific to the kind of issue. When adding a new issue code, please also
 /// add a new optional field to this type.
 class InspectorIssueDetails {
-  final SameSiteCookieIssueDetails sameSiteCookieIssueDetails;
+  final SameSiteCookieIssueDetails? sameSiteCookieIssueDetails;
 
-  final MixedContentIssueDetails mixedContentIssueDetails;
+  final MixedContentIssueDetails? mixedContentIssueDetails;
 
-  final BlockedByResponseIssueDetails blockedByResponseIssueDetails;
+  final BlockedByResponseIssueDetails? blockedByResponseIssueDetails;
 
-  final HeavyAdIssueDetails heavyAdIssueDetails;
+  final HeavyAdIssueDetails? heavyAdIssueDetails;
 
-  final ContentSecurityPolicyIssueDetails contentSecurityPolicyIssueDetails;
+  final ContentSecurityPolicyIssueDetails? contentSecurityPolicyIssueDetails;
 
   InspectorIssueDetails(
       {this.sameSiteCookieIssueDetails,
@@ -892,16 +892,17 @@ class InspectorIssueDetails {
   Map<String, dynamic> toJson() {
     return {
       if (sameSiteCookieIssueDetails != null)
-        'sameSiteCookieIssueDetails': sameSiteCookieIssueDetails.toJson(),
+        'sameSiteCookieIssueDetails': sameSiteCookieIssueDetails!.toJson(),
       if (mixedContentIssueDetails != null)
-        'mixedContentIssueDetails': mixedContentIssueDetails.toJson(),
+        'mixedContentIssueDetails': mixedContentIssueDetails!.toJson(),
       if (blockedByResponseIssueDetails != null)
-        'blockedByResponseIssueDetails': blockedByResponseIssueDetails.toJson(),
+        'blockedByResponseIssueDetails':
+            blockedByResponseIssueDetails!.toJson(),
       if (heavyAdIssueDetails != null)
-        'heavyAdIssueDetails': heavyAdIssueDetails.toJson(),
+        'heavyAdIssueDetails': heavyAdIssueDetails!.toJson(),
       if (contentSecurityPolicyIssueDetails != null)
         'contentSecurityPolicyIssueDetails':
-            contentSecurityPolicyIssueDetails.toJson(),
+            contentSecurityPolicyIssueDetails!.toJson(),
     };
   }
 }
@@ -912,7 +913,7 @@ class InspectorIssue {
 
   final InspectorIssueDetails details;
 
-  InspectorIssue({@required this.code, @required this.details});
+  InspectorIssue({required this.code, required this.details});
 
   factory InspectorIssue.fromJson(Map<String, dynamic> json) {
     return InspectorIssue(

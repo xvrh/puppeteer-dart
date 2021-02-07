@@ -5,10 +5,10 @@ import 'utils/utils.dart';
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 void main() {
-  Server server;
-  Browser browser;
-  BrowserContext context;
-  Page page;
+  late Server server;
+  late Browser browser;
+  late BrowserContext context;
+  late Page page;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
@@ -17,7 +17,6 @@ void main() {
   tearDownAll(() async {
     await server.close();
     await browser.close();
-    browser = null;
   });
 
   setUp(() async {
@@ -28,7 +27,6 @@ void main() {
   tearDown(() async {
     server.clearRoutes();
     await context.close();
-    page = null;
   });
 
   group('ElementHandle.properties', () {
@@ -48,7 +46,7 @@ void main() {
 
     test('null handle', () async {
       await page.goto(server.assetUrl('simple.html'));
-      var input = await page.$('no exist');
+      var input = await page.$OrNull('no exist');
       expect(input, isNull);
     });
   });
@@ -69,7 +67,7 @@ void main() {
       var box = await elementHandle.boundingBox;
       expect(box, equals(Rectangle(28, 182, 264, 18)));
     });
-    test('should return null for invisible elements', () async {
+    test('should return null for invisible elements 2', () async {
       await page.setContent('<div style="display:none">hi</div>');
       var element = await page.$('div');
       expect(await element.boundingBox, isNull);
@@ -91,7 +89,7 @@ void main() {
   </svg>
   ''');
       var element = await page.$('#therect');
-      var pptrBoundingBox = await element.boundingBox;
+      var pptrBoundingBox = (await element.boundingBox)!;
       var webBoundingBox = await page.evaluate('''e => {
   var rect = e.getBoundingClientRect();
   return {x: rect.x, y: rect.y, width: rect.width, height: rect.height};
@@ -137,11 +135,11 @@ void main() {
   height: 7px;
   `;
   return div;
-  }''')).asElement;
+  }''')).asElement!;
 
       // Step 3: query div's boxModel and assert box values.
       var box = await divHandle.boxModel;
-      expect(box.width, equals(6));
+      expect(box!.width, equals(6));
       expect(box.height, equals(7));
       expect(
           ElementHandle.quadToPoints(box.margin)[0],

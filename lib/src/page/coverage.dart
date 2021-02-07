@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:logging/logging.dart';
-import 'package:meta/meta.dart';
 import '../../protocol/css.dart';
 import '../../protocol/debugger.dart';
 import '../../protocol/dev_tools.dart';
@@ -14,11 +13,7 @@ class CoverageEntry {
   final String url, text;
   final List<Range> ranges;
 
-  CoverageEntry(
-      {@required this.url, @required this.text, @required this.ranges})
-      : assert(url != null),
-        assert(text != null),
-        assert(ranges != null);
+  CoverageEntry({required this.url, required this.text, required this.ranges});
 
   Map<String, dynamic> toJson() => {
         'url': url,
@@ -34,9 +29,7 @@ class Range {
   final int _start;
   int _end;
 
-  Range(this._start, this._end)
-      : assert(_start != null),
-        assert(_end != null);
+  Range(this._start, this._end);
 
   int get start => _start;
 
@@ -101,7 +94,7 @@ class Coverage {
   /// `new Function`. If `reportAnonymousScripts` is set to `true`, anonymous
   /// scripts will have `__puppeteer_evaluation_script__` as their URL.
   Future<void> startJSCoverage(
-      {bool resetOnNavigation, bool reportAnonymousScripts}) {
+      {bool? resetOnNavigation, bool? reportAnonymousScripts}) {
     return _jsCoverage.start(
         resetOnNavigation: resetOnNavigation,
         reportAnonymousScripts: reportAnonymousScripts);
@@ -125,7 +118,7 @@ class Coverage {
   ///    Defaults to `true`.
   ///
   ///  Returns: Future that resolves when coverage is started
-  Future<void> startCSSCoverage({bool resetOnNavigation}) {
+  Future<void> startCSSCoverage({bool? resetOnNavigation}) {
     return _cssCoverage.start(resetOnNavigation: resetOnNavigation);
   }
 
@@ -146,9 +139,9 @@ class Coverage {
 
 class JsCoverage {
   final DevTools _devTools;
-  final _scriptUrls = <ScriptId, String>{};
-  final _scriptSources = <ScriptId, String>{};
-  List<StreamSubscription> _subscriptions;
+  final _scriptUrls = <ScriptId, String?>{};
+  final _scriptSources = <ScriptId, String?>{};
+  late List<StreamSubscription> _subscriptions;
   bool _enabled = false;
   bool _resetOnNavigation = false;
   bool _reportAnonymousScripts = false;
@@ -156,7 +149,7 @@ class JsCoverage {
   JsCoverage(this._devTools);
 
   Future<void> start(
-      {bool resetOnNavigation, bool reportAnonymousScripts}) async {
+      {bool? resetOnNavigation, bool? reportAnonymousScripts}) async {
     assert(!_enabled, 'JSCoverage is already enabled');
 
     resetOnNavigation ??= true;
@@ -232,25 +225,25 @@ class JsCoverage {
         flattenRanges.addAll(func.ranges);
       }
       var ranges = _convertToDisjointRanges(flattenRanges);
-      coverage.add(CoverageEntry(url: url, text: text, ranges: ranges));
+      coverage.add(CoverageEntry(url: url!, text: text, ranges: ranges));
     }
     return coverage;
   }
 }
 
-bool _isNullOrEmpty(String input) => input == null || input.isEmpty;
+bool _isNullOrEmpty(String? input) => input == null || input.isEmpty;
 
 class CssCoverage {
   final DevTools _devTools;
-  final _stylesheetUrls = <StyleSheetId, String>{};
-  final _stylesheetSources = <StyleSheetId, String>{};
-  List<StreamSubscription> _subscriptions;
+  final _stylesheetUrls = <StyleSheetId, String?>{};
+  final _stylesheetSources = <StyleSheetId, String?>{};
+  late List<StreamSubscription> _subscriptions;
   bool _enabled = false;
   bool _resetOnNavigation = false;
 
   CssCoverage(this._devTools);
 
-  Future<void> start({bool resetOnNavigation}) async {
+  Future<void> start({bool? resetOnNavigation}) async {
     assert(!_enabled, 'CSSCoverage is already enabled');
     resetOnNavigation ??= true;
 
@@ -315,8 +308,8 @@ class CssCoverage {
 
     var coverage = <CoverageEntry>[];
     for (var styleSheetId in _stylesheetUrls.keys) {
-      var url = _stylesheetUrls[styleSheetId];
-      var text = _stylesheetSources[styleSheetId];
+      var url = _stylesheetUrls[styleSheetId]!;
+      var text = _stylesheetSources[styleSheetId]!;
       var ranges =
           _convertToDisjointRanges(styleSheetIdToCoverage[styleSheetId] ?? []);
       coverage.add(CoverageEntry(url: url, text: text, ranges: ranges));
@@ -330,7 +323,7 @@ class _Point {
   final int offset, type;
   final CoverageRange range;
 
-  _Point({@required this.offset, @required this.type, @required this.range});
+  _Point({required this.offset, required this.type, required this.range});
 }
 
 List<Range> _convertToDisjointRanges(List<CoverageRange> nestedRanges) {

@@ -6,9 +6,9 @@ import 'utils/pixel_match.dart';
 
 void main() {
   test('pixelMatch', () {
-    var img1 = decodeImage(File('test/golden/2a.png').readAsBytesSync());
-    var img2 = decodeImage(File('test/golden/2b.png').readAsBytesSync());
-    var diff = decodeImage(File('test/golden/2diff.png').readAsBytesSync());
+    var img1 = decodeImage(File('test/golden/2a.png').readAsBytesSync())!;
+    var img2 = decodeImage(File('test/golden/2b.png').readAsBytesSync())!;
+    var diff = decodeImage(File('test/golden/2diff.png').readAsBytesSync())!;
     var output = Uint8List(img1.data.buffer.lengthInBytes);
 
     var count = pixelMatch(

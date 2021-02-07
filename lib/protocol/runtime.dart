@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// Runtime domain exposes JavaScript runtime by means of remote evaluation and mirror objects.
@@ -60,7 +59,7 @@ class RuntimeApi {
   /// [returnByValue] Whether the result is expected to be a JSON object that should be sent by value.
   /// [generatePreview] Whether preview should be generated for the result.
   Future<AwaitPromiseResult> awaitPromise(RemoteObjectId promiseObjectId,
-      {bool returnByValue, bool generatePreview}) async {
+      {bool? returnByValue, bool? generatePreview}) async {
     var result = await _client.send('Runtime.awaitPromise', {
       'promiseObjectId': promiseObjectId,
       if (returnByValue != null) 'returnByValue': returnByValue,
@@ -88,15 +87,15 @@ class RuntimeApi {
   /// [objectGroup] Symbolic group name that can be used to release multiple objects. If objectGroup is not
   /// specified and objectId is, objectGroup will be inherited from object.
   Future<CallFunctionOnResult> callFunctionOn(String functionDeclaration,
-      {RemoteObjectId objectId,
-      List<CallArgument> arguments,
-      bool silent,
-      bool returnByValue,
-      bool generatePreview,
-      bool userGesture,
-      bool awaitPromise,
-      ExecutionContextId executionContextId,
-      String objectGroup}) async {
+      {RemoteObjectId? objectId,
+      List<CallArgument>? arguments,
+      bool? silent,
+      bool? returnByValue,
+      bool? generatePreview,
+      bool? userGesture,
+      bool? awaitPromise,
+      ExecutionContextId? executionContextId,
+      String? objectGroup}) async {
     var result = await _client.send('Runtime.callFunctionOn', {
       'functionDeclaration': functionDeclaration,
       if (objectId != null) 'objectId': objectId,
@@ -120,7 +119,7 @@ class RuntimeApi {
   /// evaluation will be performed in the context of the inspected page.
   Future<CompileScriptResult> compileScript(
       String expression, String sourceURL, bool persistScript,
-      {ExecutionContextId executionContextId}) async {
+      {ExecutionContextId? executionContextId}) async {
     var result = await _client.send('Runtime.compileScript', {
       'expression': expression,
       'sourceURL': sourceURL,
@@ -172,19 +171,19 @@ class RuntimeApi {
   /// when called with non-callable arguments. This flag bypasses CSP for this
   /// evaluation and allows unsafe-eval. Defaults to true.
   Future<EvaluateResult> evaluate(String expression,
-      {String objectGroup,
-      bool includeCommandLineAPI,
-      bool silent,
-      ExecutionContextId contextId,
-      bool returnByValue,
-      bool generatePreview,
-      bool userGesture,
-      bool awaitPromise,
-      bool throwOnSideEffect,
-      TimeDelta timeout,
-      bool disableBreaks,
-      bool replMode,
-      bool allowUnsafeEvalBlockedByCSP}) async {
+      {String? objectGroup,
+      bool? includeCommandLineAPI,
+      bool? silent,
+      ExecutionContextId? contextId,
+      bool? returnByValue,
+      bool? generatePreview,
+      bool? userGesture,
+      bool? awaitPromise,
+      bool? throwOnSideEffect,
+      TimeDelta? timeout,
+      bool? disableBreaks,
+      bool? replMode,
+      bool? allowUnsafeEvalBlockedByCSP}) async {
     var result = await _client.send('Runtime.evaluate', {
       'expression': expression,
       if (objectGroup != null) 'objectGroup': objectGroup,
@@ -229,9 +228,9 @@ class RuntimeApi {
   /// returned either.
   /// [generatePreview] Whether preview should be generated for the results.
   Future<GetPropertiesResult> getProperties(RemoteObjectId objectId,
-      {bool ownProperties,
-      bool accessorPropertiesOnly,
-      bool generatePreview}) async {
+      {bool? ownProperties,
+      bool? accessorPropertiesOnly,
+      bool? generatePreview}) async {
     var result = await _client.send('Runtime.getProperties', {
       'objectId': objectId,
       if (ownProperties != null) 'ownProperties': ownProperties,
@@ -245,7 +244,7 @@ class RuntimeApi {
   /// Returns all let, const and class variables from global scope.
   /// [executionContextId] Specifies in which execution context to lookup global scope variables.
   Future<List<String>> globalLexicalScopeNames(
-      {ExecutionContextId executionContextId}) async {
+      {ExecutionContextId? executionContextId}) async {
     var result = await _client.send('Runtime.globalLexicalScopeNames', {
       if (executionContextId != null) 'executionContextId': executionContextId,
     });
@@ -256,7 +255,7 @@ class RuntimeApi {
   /// [objectGroup] Symbolic group name that can be used to release the results.
   /// Returns: Array with objects.
   Future<RemoteObject> queryObjects(RemoteObjectId prototypeObjectId,
-      {String objectGroup}) async {
+      {String? objectGroup}) async {
     var result = await _client.send('Runtime.queryObjects', {
       'prototypeObjectId': prototypeObjectId,
       if (objectGroup != null) 'objectGroup': objectGroup,
@@ -298,13 +297,13 @@ class RuntimeApi {
   /// [awaitPromise] Whether execution should `await` for resulting value and return once awaited promise is
   /// resolved.
   Future<RunScriptResult> runScript(ScriptId scriptId,
-      {ExecutionContextId executionContextId,
-      String objectGroup,
-      bool silent,
-      bool includeCommandLineAPI,
-      bool returnByValue,
-      bool generatePreview,
-      bool awaitPromise}) async {
+      {ExecutionContextId? executionContextId,
+      String? objectGroup,
+      bool? silent,
+      bool? includeCommandLineAPI,
+      bool? returnByValue,
+      bool? generatePreview,
+      bool? awaitPromise}) async {
     var result = await _client.send('Runtime.runScript', {
       'scriptId': scriptId,
       if (executionContextId != null) 'executionContextId': executionContextId,
@@ -362,8 +361,8 @@ class RuntimeApi {
   /// `Page.addScriptToEvaluateOnNewDocument`.
   /// This parameter is mutually exclusive with `executionContextId`.
   Future<void> addBinding(String name,
-      {ExecutionContextId executionContextId,
-      String executionContextName}) async {
+      {ExecutionContextId? executionContextId,
+      String? executionContextName}) async {
     await _client.send('Runtime.addBinding', {
       'name': name,
       if (executionContextId != null) 'executionContextId': executionContextId,
@@ -390,9 +389,9 @@ class BindingCalledEvent {
   final ExecutionContextId executionContextId;
 
   BindingCalledEvent(
-      {@required this.name,
-      @required this.payload,
-      @required this.executionContextId});
+      {required this.name,
+      required this.payload,
+      required this.executionContextId});
 
   factory BindingCalledEvent.fromJson(Map<String, dynamic> json) {
     return BindingCalledEvent(
@@ -420,18 +419,18 @@ class ConsoleAPICalledEvent {
   /// Stack trace captured when the call was made. The async stack chain is automatically reported for
   /// the following call types: `assert`, `error`, `trace`, `warning`. For other types the async call
   /// chain can be retrieved using `Debugger.getStackTrace` and `stackTrace.parentId` field.
-  final StackTraceData stackTrace;
+  final StackTraceData? stackTrace;
 
   /// Console context descriptor for calls on non-default console context (not console.*):
   /// 'anonymous#unique-logger-id' for call on unnamed context, 'name#unique-logger-id' for call
   /// on named context.
-  final String context;
+  final String? context;
 
   ConsoleAPICalledEvent(
-      {@required this.type,
-      @required this.args,
-      @required this.executionContextId,
-      @required this.timestamp,
+      {required this.type,
+      required this.args,
+      required this.executionContextId,
+      required this.timestamp,
       this.stackTrace,
       this.context});
 
@@ -459,7 +458,7 @@ class ExceptionRevokedEvent {
   /// The id of revoked exception, as reported in `exceptionThrown`.
   final int exceptionId;
 
-  ExceptionRevokedEvent({@required this.reason, @required this.exceptionId});
+  ExceptionRevokedEvent({required this.reason, required this.exceptionId});
 
   factory ExceptionRevokedEvent.fromJson(Map<String, dynamic> json) {
     return ExceptionRevokedEvent(
@@ -476,7 +475,7 @@ class ExceptionThrownEvent {
   final ExceptionDetails exceptionDetails;
 
   ExceptionThrownEvent(
-      {@required this.timestamp, @required this.exceptionDetails});
+      {required this.timestamp, required this.exceptionDetails});
 
   factory ExceptionThrownEvent.fromJson(Map<String, dynamic> json) {
     return ExceptionThrownEvent(
@@ -492,7 +491,7 @@ class InspectRequestedEvent {
 
   final Map<String, dynamic> hints;
 
-  InspectRequestedEvent({@required this.object, @required this.hints});
+  InspectRequestedEvent({required this.object, required this.hints});
 
   factory InspectRequestedEvent.fromJson(Map<String, dynamic> json) {
     return InspectRequestedEvent(
@@ -507,9 +506,9 @@ class AwaitPromiseResult {
   final RemoteObject result;
 
   /// Exception details if stack strace is available.
-  final ExceptionDetails exceptionDetails;
+  final ExceptionDetails? exceptionDetails;
 
-  AwaitPromiseResult({@required this.result, this.exceptionDetails});
+  AwaitPromiseResult({required this.result, this.exceptionDetails});
 
   factory AwaitPromiseResult.fromJson(Map<String, dynamic> json) {
     return AwaitPromiseResult(
@@ -527,9 +526,9 @@ class CallFunctionOnResult {
   final RemoteObject result;
 
   /// Exception details.
-  final ExceptionDetails exceptionDetails;
+  final ExceptionDetails? exceptionDetails;
 
-  CallFunctionOnResult({@required this.result, this.exceptionDetails});
+  CallFunctionOnResult({required this.result, this.exceptionDetails});
 
   factory CallFunctionOnResult.fromJson(Map<String, dynamic> json) {
     return CallFunctionOnResult(
@@ -544,10 +543,10 @@ class CallFunctionOnResult {
 
 class CompileScriptResult {
   /// Id of the script.
-  final ScriptId scriptId;
+  final ScriptId? scriptId;
 
   /// Exception details.
-  final ExceptionDetails exceptionDetails;
+  final ExceptionDetails? exceptionDetails;
 
   CompileScriptResult({this.scriptId, this.exceptionDetails});
 
@@ -569,9 +568,9 @@ class EvaluateResult {
   final RemoteObject result;
 
   /// Exception details.
-  final ExceptionDetails exceptionDetails;
+  final ExceptionDetails? exceptionDetails;
 
-  EvaluateResult({@required this.result, this.exceptionDetails});
+  EvaluateResult({required this.result, this.exceptionDetails});
 
   factory EvaluateResult.fromJson(Map<String, dynamic> json) {
     return EvaluateResult(
@@ -591,7 +590,7 @@ class GetHeapUsageResult {
   /// Allocated heap size in bytes.
   final num totalSize;
 
-  GetHeapUsageResult({@required this.usedSize, @required this.totalSize});
+  GetHeapUsageResult({required this.usedSize, required this.totalSize});
 
   factory GetHeapUsageResult.fromJson(Map<String, dynamic> json) {
     return GetHeapUsageResult(
@@ -606,16 +605,16 @@ class GetPropertiesResult {
   final List<PropertyDescriptor> result;
 
   /// Internal object properties (only of the element itself).
-  final List<InternalPropertyDescriptor> internalProperties;
+  final List<InternalPropertyDescriptor>? internalProperties;
 
   /// Object private properties.
-  final List<PrivatePropertyDescriptor> privateProperties;
+  final List<PrivatePropertyDescriptor>? privateProperties;
 
   /// Exception details.
-  final ExceptionDetails exceptionDetails;
+  final ExceptionDetails? exceptionDetails;
 
   GetPropertiesResult(
-      {@required this.result,
+      {required this.result,
       this.internalProperties,
       this.privateProperties,
       this.exceptionDetails});
@@ -650,9 +649,9 @@ class RunScriptResult {
   final RemoteObject result;
 
   /// Exception details.
-  final ExceptionDetails exceptionDetails;
+  final ExceptionDetails? exceptionDetails;
 
-  RunScriptResult({@required this.result, this.exceptionDetails});
+  RunScriptResult({required this.result, this.exceptionDetails});
 
   factory RunScriptResult.fromJson(Map<String, dynamic> json) {
     return RunScriptResult(
@@ -736,31 +735,31 @@ class RemoteObject {
   final RemoteObjectType type;
 
   /// Object subtype hint. Specified for `object` or `wasm` type values only.
-  final RemoteObjectSubtype subtype;
+  final RemoteObjectSubtype? subtype;
 
   /// Object class (constructor) name. Specified for `object` type values only.
-  final String className;
+  final String? className;
 
   /// Remote object value in case of primitive values or JSON values (if it was requested).
-  final dynamic value;
+  final dynamic? value;
 
   /// Primitive value which can not be JSON-stringified does not have `value`, but gets this
   /// property.
-  final UnserializableValue unserializableValue;
+  final UnserializableValue? unserializableValue;
 
   /// String representation of the object.
-  final String description;
+  final String? description;
 
   /// Unique object identifier (for non-primitive values).
-  final RemoteObjectId objectId;
+  final RemoteObjectId? objectId;
 
   /// Preview containing abbreviated property values. Specified for `object` type values only.
-  final ObjectPreview preview;
+  final ObjectPreview? preview;
 
-  final CustomPreview customPreview;
+  final CustomPreview? customPreview;
 
   RemoteObject(
-      {@required this.type,
+      {required this.type,
       this.subtype,
       this.className,
       this.value,
@@ -805,11 +804,11 @@ class RemoteObject {
       if (className != null) 'className': className,
       if (value != null) 'value': value,
       if (unserializableValue != null)
-        'unserializableValue': unserializableValue.toJson(),
+        'unserializableValue': unserializableValue!.toJson(),
       if (description != null) 'description': description,
-      if (objectId != null) 'objectId': objectId.toJson(),
-      if (preview != null) 'preview': preview.toJson(),
-      if (customPreview != null) 'customPreview': customPreview.toJson(),
+      if (objectId != null) 'objectId': objectId!.toJson(),
+      if (preview != null) 'preview': preview!.toJson(),
+      if (customPreview != null) 'customPreview': customPreview!.toJson(),
     };
   }
 }
@@ -840,7 +839,7 @@ class RemoteObjectType {
 
   const RemoteObjectType._(this.value);
 
-  factory RemoteObjectType.fromJson(String value) => values[value];
+  factory RemoteObjectType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -909,7 +908,7 @@ class RemoteObjectSubtype {
 
   const RemoteObjectSubtype._(this.value);
 
-  factory RemoteObjectSubtype.fromJson(String value) => values[value];
+  factory RemoteObjectSubtype.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -932,9 +931,9 @@ class CustomPreview {
   /// If formatter returns true as a result of formatter.hasBody call then bodyGetterId will
   /// contain RemoteObjectId for the function that returns result of formatter.body(object, config) call.
   /// The result value is json ML array.
-  final RemoteObjectId bodyGetterId;
+  final RemoteObjectId? bodyGetterId;
 
-  CustomPreview({@required this.header, this.bodyGetterId});
+  CustomPreview({required this.header, this.bodyGetterId});
 
   factory CustomPreview.fromJson(Map<String, dynamic> json) {
     return CustomPreview(
@@ -948,7 +947,7 @@ class CustomPreview {
   Map<String, dynamic> toJson() {
     return {
       'header': header,
-      if (bodyGetterId != null) 'bodyGetterId': bodyGetterId.toJson(),
+      if (bodyGetterId != null) 'bodyGetterId': bodyGetterId!.toJson(),
     };
   }
 }
@@ -959,10 +958,10 @@ class ObjectPreview {
   final ObjectPreviewType type;
 
   /// Object subtype hint. Specified for `object` type values only.
-  final ObjectPreviewSubtype subtype;
+  final ObjectPreviewSubtype? subtype;
 
   /// String representation of the object.
-  final String description;
+  final String? description;
 
   /// True iff some of the properties or entries of the original object did not fit.
   final bool overflow;
@@ -971,14 +970,14 @@ class ObjectPreview {
   final List<PropertyPreview> properties;
 
   /// List of the entries. Specified for `map` and `set` subtype values only.
-  final List<EntryPreview> entries;
+  final List<EntryPreview>? entries;
 
   ObjectPreview(
-      {@required this.type,
+      {required this.type,
       this.subtype,
       this.description,
-      @required this.overflow,
-      @required this.properties,
+      required this.overflow,
+      required this.properties,
       this.entries});
 
   factory ObjectPreview.fromJson(Map<String, dynamic> json) {
@@ -1009,7 +1008,7 @@ class ObjectPreview {
       'properties': properties.map((e) => e.toJson()).toList(),
       if (subtype != null) 'subtype': subtype,
       if (description != null) 'description': description,
-      if (entries != null) 'entries': entries.map((e) => e.toJson()).toList(),
+      if (entries != null) 'entries': entries!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -1038,7 +1037,7 @@ class ObjectPreviewType {
 
   const ObjectPreviewType._(this.value);
 
-  factory ObjectPreviewType.fromJson(String value) => values[value];
+  factory ObjectPreviewType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1066,6 +1065,7 @@ class ObjectPreviewSubtype {
   static const iterator = ObjectPreviewSubtype._('iterator');
   static const generator = ObjectPreviewSubtype._('generator');
   static const error = ObjectPreviewSubtype._('error');
+  static const promise = ObjectPreviewSubtype._('promise');
   static const values = {
     'array': array,
     'null': null$,
@@ -1079,13 +1079,14 @@ class ObjectPreviewSubtype {
     'iterator': iterator,
     'generator': generator,
     'error': error,
+    'promise': promise,
   };
 
   final String value;
 
   const ObjectPreviewSubtype._(this.value);
 
-  factory ObjectPreviewSubtype.fromJson(String value) => values[value];
+  factory ObjectPreviewSubtype.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1108,17 +1109,17 @@ class PropertyPreview {
   final PropertyPreviewType type;
 
   /// User-friendly property value string.
-  final String value;
+  final String? value;
 
   /// Nested value preview.
-  final ObjectPreview valuePreview;
+  final ObjectPreview? valuePreview;
 
   /// Object subtype hint. Specified for `object` type values only.
-  final PropertyPreviewSubtype subtype;
+  final PropertyPreviewSubtype? subtype;
 
   PropertyPreview(
-      {@required this.name,
-      @required this.type,
+      {required this.name,
+      required this.type,
       this.value,
       this.valuePreview,
       this.subtype});
@@ -1142,7 +1143,7 @@ class PropertyPreview {
       'name': name,
       'type': type,
       if (value != null) 'value': value,
-      if (valuePreview != null) 'valuePreview': valuePreview.toJson(),
+      if (valuePreview != null) 'valuePreview': valuePreview!.toJson(),
       if (subtype != null) 'subtype': subtype,
     };
   }
@@ -1174,7 +1175,7 @@ class PropertyPreviewType {
 
   const PropertyPreviewType._(this.value);
 
-  factory PropertyPreviewType.fromJson(String value) => values[value];
+  factory PropertyPreviewType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1221,7 +1222,7 @@ class PropertyPreviewSubtype {
 
   const PropertyPreviewSubtype._(this.value);
 
-  factory PropertyPreviewSubtype.fromJson(String value) => values[value];
+  factory PropertyPreviewSubtype.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1239,12 +1240,12 @@ class PropertyPreviewSubtype {
 
 class EntryPreview {
   /// Preview of the key. Specified for map-like collection entries.
-  final ObjectPreview key;
+  final ObjectPreview? key;
 
   /// Preview of the value.
   final ObjectPreview value;
 
-  EntryPreview({this.key, @required this.value});
+  EntryPreview({this.key, required this.value});
 
   factory EntryPreview.fromJson(Map<String, dynamic> json) {
     return EntryPreview(
@@ -1258,7 +1259,7 @@ class EntryPreview {
   Map<String, dynamic> toJson() {
     return {
       'value': value.toJson(),
-      if (key != null) 'key': key.toJson(),
+      if (key != null) 'key': key!.toJson(),
     };
   }
 }
@@ -1269,18 +1270,18 @@ class PropertyDescriptor {
   final String name;
 
   /// The value associated with the property.
-  final RemoteObject value;
+  final RemoteObject? value;
 
   /// True if the value associated with the property may be changed (data descriptors only).
-  final bool writable;
+  final bool? writable;
 
   /// A function which serves as a getter for the property, or `undefined` if there is no getter
   /// (accessor descriptors only).
-  final RemoteObject get;
+  final RemoteObject? get;
 
   /// A function which serves as a setter for the property, or `undefined` if there is no setter
   /// (accessor descriptors only).
-  final RemoteObject set;
+  final RemoteObject? set;
 
   /// True if the type of this property descriptor may be changed and if the property may be
   /// deleted from the corresponding object.
@@ -1291,22 +1292,22 @@ class PropertyDescriptor {
   final bool enumerable;
 
   /// True if the result was thrown during the evaluation.
-  final bool wasThrown;
+  final bool? wasThrown;
 
   /// True if the property is owned for the object.
-  final bool isOwn;
+  final bool? isOwn;
 
   /// Property symbol object, if the property is of the `symbol` type.
-  final RemoteObject symbol;
+  final RemoteObject? symbol;
 
   PropertyDescriptor(
-      {@required this.name,
+      {required this.name,
       this.value,
       this.writable,
       this.get,
       this.set,
-      @required this.configurable,
-      @required this.enumerable,
+      required this.configurable,
+      required this.enumerable,
       this.wasThrown,
       this.isOwn,
       this.symbol});
@@ -1340,13 +1341,13 @@ class PropertyDescriptor {
       'name': name,
       'configurable': configurable,
       'enumerable': enumerable,
-      if (value != null) 'value': value.toJson(),
+      if (value != null) 'value': value!.toJson(),
       if (writable != null) 'writable': writable,
-      if (get != null) 'get': get.toJson(),
-      if (set != null) 'set': set.toJson(),
+      if (get != null) 'get': get!.toJson(),
+      if (set != null) 'set': set!.toJson(),
       if (wasThrown != null) 'wasThrown': wasThrown,
       if (isOwn != null) 'isOwn': isOwn,
-      if (symbol != null) 'symbol': symbol.toJson(),
+      if (symbol != null) 'symbol': symbol!.toJson(),
     };
   }
 }
@@ -1357,9 +1358,9 @@ class InternalPropertyDescriptor {
   final String name;
 
   /// The value associated with the property.
-  final RemoteObject value;
+  final RemoteObject? value;
 
-  InternalPropertyDescriptor({@required this.name, this.value});
+  InternalPropertyDescriptor({required this.name, this.value});
 
   factory InternalPropertyDescriptor.fromJson(Map<String, dynamic> json) {
     return InternalPropertyDescriptor(
@@ -1373,7 +1374,7 @@ class InternalPropertyDescriptor {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      if (value != null) 'value': value.toJson(),
+      if (value != null) 'value': value!.toJson(),
     };
   }
 }
@@ -1384,18 +1385,18 @@ class PrivatePropertyDescriptor {
   final String name;
 
   /// The value associated with the private property.
-  final RemoteObject value;
+  final RemoteObject? value;
 
   /// A function which serves as a getter for the private property,
   /// or `undefined` if there is no getter (accessor descriptors only).
-  final RemoteObject get;
+  final RemoteObject? get;
 
   /// A function which serves as a setter for the private property,
   /// or `undefined` if there is no setter (accessor descriptors only).
-  final RemoteObject set;
+  final RemoteObject? set;
 
   PrivatePropertyDescriptor(
-      {@required this.name, this.value, this.get, this.set});
+      {required this.name, this.value, this.get, this.set});
 
   factory PrivatePropertyDescriptor.fromJson(Map<String, dynamic> json) {
     return PrivatePropertyDescriptor(
@@ -1415,9 +1416,9 @@ class PrivatePropertyDescriptor {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      if (value != null) 'value': value.toJson(),
-      if (get != null) 'get': get.toJson(),
-      if (set != null) 'set': set.toJson(),
+      if (value != null) 'value': value!.toJson(),
+      if (get != null) 'get': get!.toJson(),
+      if (set != null) 'set': set!.toJson(),
     };
   }
 }
@@ -1426,13 +1427,13 @@ class PrivatePropertyDescriptor {
 /// unserializable primitive value or neither of (for undefined) them should be specified.
 class CallArgument {
   /// Primitive value or serializable javascript object.
-  final dynamic value;
+  final dynamic? value;
 
   /// Primitive value which can not be JSON-stringified.
-  final UnserializableValue unserializableValue;
+  final UnserializableValue? unserializableValue;
 
   /// Remote object handle.
-  final RemoteObjectId objectId;
+  final RemoteObjectId? objectId;
 
   CallArgument({this.value, this.unserializableValue, this.objectId});
 
@@ -1452,8 +1453,8 @@ class CallArgument {
     return {
       if (value != null) 'value': value,
       if (unserializableValue != null)
-        'unserializableValue': unserializableValue.toJson(),
-      if (objectId != null) 'objectId': objectId.toJson(),
+        'unserializableValue': unserializableValue!.toJson(),
+      if (objectId != null) 'objectId': objectId!.toJson(),
     };
   }
 }
@@ -1492,12 +1493,12 @@ class ExecutionContextDescription {
   final String name;
 
   /// Embedder-specific auxiliary data.
-  final Map<String, dynamic> auxData;
+  final Map<String, dynamic>? auxData;
 
   ExecutionContextDescription(
-      {@required this.id,
-      @required this.origin,
-      @required this.name,
+      {required this.id,
+      required this.origin,
+      required this.name,
       this.auxData});
 
   factory ExecutionContextDescription.fromJson(Map<String, dynamic> json) {
@@ -1537,25 +1538,25 @@ class ExceptionDetails {
   final int columnNumber;
 
   /// Script ID of the exception location.
-  final ScriptId scriptId;
+  final ScriptId? scriptId;
 
   /// URL of the exception location, to be used when the script was not reported.
-  final String url;
+  final String? url;
 
   /// JavaScript stack trace if available.
-  final StackTraceData stackTrace;
+  final StackTraceData? stackTrace;
 
   /// Exception object if available.
-  final RemoteObject exception;
+  final RemoteObject? exception;
 
   /// Identifier of the context where exception happened.
-  final ExecutionContextId executionContextId;
+  final ExecutionContextId? executionContextId;
 
   ExceptionDetails(
-      {@required this.exceptionId,
-      @required this.text,
-      @required this.lineNumber,
-      @required this.columnNumber,
+      {required this.exceptionId,
+      required this.text,
+      required this.lineNumber,
+      required this.columnNumber,
       this.scriptId,
       this.url,
       this.stackTrace,
@@ -1590,12 +1591,12 @@ class ExceptionDetails {
       'text': text,
       'lineNumber': lineNumber,
       'columnNumber': columnNumber,
-      if (scriptId != null) 'scriptId': scriptId.toJson(),
+      if (scriptId != null) 'scriptId': scriptId!.toJson(),
       if (url != null) 'url': url,
-      if (stackTrace != null) 'stackTrace': stackTrace.toJson(),
-      if (exception != null) 'exception': exception.toJson(),
+      if (stackTrace != null) 'stackTrace': stackTrace!.toJson(),
+      if (exception != null) 'exception': exception!.toJson(),
       if (executionContextId != null)
-        'executionContextId': executionContextId.toJson(),
+        'executionContextId': executionContextId!.toJson(),
     };
   }
 }
@@ -1660,11 +1661,11 @@ class CallFrame {
   final int columnNumber;
 
   CallFrame(
-      {@required this.functionName,
-      @required this.scriptId,
-      @required this.url,
-      @required this.lineNumber,
-      @required this.columnNumber});
+      {required this.functionName,
+      required this.scriptId,
+      required this.url,
+      required this.lineNumber,
+      required this.columnNumber});
 
   factory CallFrame.fromJson(Map<String, dynamic> json) {
     return CallFrame(
@@ -1691,22 +1692,19 @@ class CallFrame {
 class StackTraceData {
   /// String label of this stack trace. For async traces this may be a name of the function that
   /// initiated the async call.
-  final String description;
+  final String? description;
 
   /// JavaScript function name.
   final List<CallFrame> callFrames;
 
   /// Asynchronous JavaScript stack trace that preceded this stack, if available.
-  final StackTraceData parent;
+  final StackTraceData? parent;
 
   /// Asynchronous JavaScript stack trace that preceded this stack, if available.
-  final StackTraceId parentId;
+  final StackTraceId? parentId;
 
   StackTraceData(
-      {this.description,
-      @required this.callFrames,
-      this.parent,
-      this.parentId});
+      {this.description, required this.callFrames, this.parent, this.parentId});
 
   factory StackTraceData.fromJson(Map<String, dynamic> json) {
     return StackTraceData(
@@ -1729,8 +1727,8 @@ class StackTraceData {
     return {
       'callFrames': callFrames.map((e) => e.toJson()).toList(),
       if (description != null) 'description': description,
-      if (parent != null) 'parent': parent.toJson(),
-      if (parentId != null) 'parentId': parentId.toJson(),
+      if (parent != null) 'parent': parent!.toJson(),
+      if (parentId != null) 'parentId': parentId!.toJson(),
     };
   }
 }
@@ -1761,9 +1759,9 @@ class UniqueDebuggerId {
 class StackTraceId {
   final String id;
 
-  final UniqueDebuggerId debuggerId;
+  final UniqueDebuggerId? debuggerId;
 
-  StackTraceId({@required this.id, this.debuggerId});
+  StackTraceId({required this.id, this.debuggerId});
 
   factory StackTraceId.fromJson(Map<String, dynamic> json) {
     return StackTraceId(
@@ -1777,7 +1775,7 @@ class StackTraceId {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      if (debuggerId != null) 'debuggerId': debuggerId.toJson(),
+      if (debuggerId != null) 'debuggerId': debuggerId!.toJson(),
     };
   }
 }
@@ -1827,7 +1825,7 @@ class ConsoleAPICalledEventType {
 
   const ConsoleAPICalledEventType._(this.value);
 
-  factory ConsoleAPICalledEventType.fromJson(String value) => values[value];
+  factory ConsoleAPICalledEventType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 

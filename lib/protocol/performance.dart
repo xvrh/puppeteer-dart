@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 class PerformanceApi {
@@ -20,7 +19,7 @@ class PerformanceApi {
   /// Enable collecting and reporting metrics.
   /// [timeDomain] Time domain to use for collecting and reporting duration metrics.
   Future<void> enable(
-      {@Enum(['timeTicks', 'threadTicks']) String timeDomain}) async {
+      {@Enum(['timeTicks', 'threadTicks']) String? timeDomain}) async {
     assert(timeDomain == null ||
         const ['timeTicks', 'threadTicks'].contains(timeDomain));
     await _client.send('Performance.enable', {
@@ -58,7 +57,7 @@ class MetricsEvent {
   /// Timestamp title.
   final String title;
 
-  MetricsEvent({@required this.metrics, @required this.title});
+  MetricsEvent({required this.metrics, required this.title});
 
   factory MetricsEvent.fromJson(Map<String, dynamic> json) {
     return MetricsEvent(
@@ -78,7 +77,7 @@ class Metric {
   /// Metric value.
   final num value;
 
-  Metric({@required this.name, @required this.value});
+  Metric({required this.name, required this.value});
 
   factory Metric.fromJson(Map<String, dynamic> json) {
     return Metric(

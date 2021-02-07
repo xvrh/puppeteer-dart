@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart';
 import '../../protocol/runtime.dart';
 import '../../puppeteer.dart';
 import '../connection.dart';
@@ -21,21 +20,17 @@ import 'execution_context.dart';
 /// ```
 class Worker {
   final Client client;
-  final String url;
+  final String? url;
   final _executionContextCompleter = Completer<ExecutionContext>();
 
-  Worker(
-      this.client,
-      this.url,
-      {@required
-          void Function(
-                  ConsoleAPICalledEventType, List<JsHandle>, StackTraceData)
-              onConsoleApiCalled,
-      @required
-          void Function(ExceptionThrownEvent) onExceptionThrown}) {
+  Worker(this.client, this.url,
+      {required void Function(
+              ConsoleAPICalledEventType, List<JsHandle>, StackTraceData?)?
+          onConsoleApiCalled,
+      required void Function(ExceptionThrownEvent)? onExceptionThrown}) {
     var runtimeApi = RuntimeApi(client);
 
-    JsHandle Function(RemoteObject) jsHandleFactory;
+    late JsHandle Function(RemoteObject) jsHandleFactory;
     runtimeApi.onExecutionContextCreated.listen((event) {
       var executionContext = ExecutionContext(client, event, null);
       jsHandleFactory =
@@ -78,8 +73,8 @@ class Worker {
   /// - [pageFunction] Function to be evaluated in the page context
   /// - [args] Arguments to pass to `pageFunction`
   /// - Returns: Future which resolves to the return value of `pageFunction`
-  Future<T> evaluate<T>(@Language('js') String pageFunction,
-      {List args}) async {
+  Future<T?> evaluate<T>(@Language('js') String pageFunction,
+      {List? args}) async {
     return (await executionContext).evaluate<T>(pageFunction, args: args);
   }
 
@@ -100,7 +95,7 @@ class Worker {
   /// in-page object (JSHandle)
   Future<T> evaluateHandle<T extends JsHandle>(
       @Language('js') String pageFunction,
-      {List args}) async {
+      {List? args}) async {
     return (await executionContext).evaluateHandle(pageFunction, args: args);
   }
 }

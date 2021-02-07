@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// This domain allows detailed inspection of media elements
@@ -58,7 +57,7 @@ class PlayerPropertiesChangedEvent {
   final List<PlayerProperty> properties;
 
   PlayerPropertiesChangedEvent(
-      {@required this.playerId, @required this.properties});
+      {required this.playerId, required this.properties});
 
   factory PlayerPropertiesChangedEvent.fromJson(Map<String, dynamic> json) {
     return PlayerPropertiesChangedEvent(
@@ -75,7 +74,7 @@ class PlayerEventsAddedEvent {
 
   final List<PlayerEvent> events;
 
-  PlayerEventsAddedEvent({@required this.playerId, @required this.events});
+  PlayerEventsAddedEvent({required this.playerId, required this.events});
 
   factory PlayerEventsAddedEvent.fromJson(Map<String, dynamic> json) {
     return PlayerEventsAddedEvent(
@@ -92,7 +91,7 @@ class PlayerMessagesLoggedEvent {
 
   final List<PlayerMessage> messages;
 
-  PlayerMessagesLoggedEvent({@required this.playerId, @required this.messages});
+  PlayerMessagesLoggedEvent({required this.playerId, required this.messages});
 
   factory PlayerMessagesLoggedEvent.fromJson(Map<String, dynamic> json) {
     return PlayerMessagesLoggedEvent(
@@ -109,7 +108,7 @@ class PlayerErrorsRaisedEvent {
 
   final List<PlayerError> errors;
 
-  PlayerErrorsRaisedEvent({@required this.playerId, @required this.errors});
+  PlayerErrorsRaisedEvent({required this.playerId, required this.errors});
 
   factory PlayerErrorsRaisedEvent.fromJson(Map<String, dynamic> json) {
     return PlayerErrorsRaisedEvent(
@@ -178,7 +177,7 @@ class PlayerMessage {
 
   final String message;
 
-  PlayerMessage({@required this.level, @required this.message});
+  PlayerMessage({required this.level, required this.message});
 
   factory PlayerMessage.fromJson(Map<String, dynamic> json) {
     return PlayerMessage(
@@ -211,7 +210,7 @@ class PlayerMessageLevel {
 
   const PlayerMessageLevel._(this.value);
 
-  factory PlayerMessageLevel.fromJson(String value) => values[value];
+  factory PlayerMessageLevel.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -232,7 +231,7 @@ class PlayerProperty {
 
   final String value;
 
-  PlayerProperty({@required this.name, @required this.value});
+  PlayerProperty({required this.name, required this.value});
 
   factory PlayerProperty.fromJson(Map<String, dynamic> json) {
     return PlayerProperty(
@@ -255,7 +254,7 @@ class PlayerEvent {
 
   final String value;
 
-  PlayerEvent({@required this.timestamp, @required this.value});
+  PlayerEvent({required this.timestamp, required this.value});
 
   factory PlayerEvent.fromJson(Map<String, dynamic> json) {
     return PlayerEvent(
@@ -283,7 +282,7 @@ class PlayerError {
   /// use this instead. (crbug.com/1068454)
   final String errorCode;
 
-  PlayerError({@required this.type, @required this.errorCode});
+  PlayerError({required this.type, required this.errorCode});
 
   factory PlayerError.fromJson(Map<String, dynamic> json) {
     return PlayerError(
@@ -312,7 +311,7 @@ class PlayerErrorType {
 
   const PlayerErrorType._(this.value);
 
-  factory PlayerErrorType.fromJson(String value) => values[value];
+  factory PlayerErrorType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 

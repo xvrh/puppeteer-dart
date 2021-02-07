@@ -12,10 +12,10 @@ import 'utils/utils.dart';
 // and injected into the documentation in the source code.
 // This help to ensure that the examples provided in the code are correct.
 void main() {
-  Server server;
-  Browser browser;
-  Page page;
-  Frame frame;
+  late Server server;
+  late Browser browser;
+  late Page page;
+  late Frame frame;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
@@ -40,7 +40,7 @@ void main() {
   group('Browser', () {
     test('class', () async {
       //---
-      void main() async {
+      Future<void> main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         await page.goto(exampleValue(server.hostUrl, 'https://example.com'));
@@ -53,7 +53,7 @@ void main() {
     });
     test('createIncognitoBrowserContext', () async {
       //---
-      void main() async {
+      Future<void> main() async {
         var browser = await puppeteer.launch();
         // Create a new incognito browser context.
         var context = await browser.createIncognitoBrowserContext();
@@ -116,7 +116,7 @@ void main() {
         //+ import 'dart:io';
         //+ import 'package:puppeteer/puppeteer.dart';
 
-        void main() async {
+        Future<void> main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           await page.goto(exampleValue(server.hostUrl, 'https://example.com'));
@@ -286,7 +286,7 @@ void main() {
         //+import 'package:puppeteer/puppeteer.dart';
         //+import 'package:crypto/crypto.dart' as crypto;
 
-        void main() async {
+        Future<void> main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           page.onConsole.listen((msg) => print(msg.text));
@@ -312,7 +312,7 @@ void main() {
         //+import 'dart:io';
         //+import 'package:puppeteer/puppeteer.dart';
 
-        void main() async {
+        Future<void> main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           page.onConsole.listen((msg) => print(msg.text));
@@ -400,7 +400,7 @@ void main() {
         //---
         //+import 'package:puppeteer/puppeteer.dart';
 
-        void main() async {
+        Future<void> main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           var watchDog = page.waitForFunction('window.innerWidth < 100');
@@ -451,14 +451,14 @@ void main() {
       //---
       //+import 'package:puppeteer/puppeteer.dart';
 
-      void main() async {
+      Future<void> main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.waitForSelector('img');
         await page.goto(exampleValue(
             server.assetUrl('doc_examples_2.html'), 'https://example.com'));
         var image = await watchImg;
-        print(await image.propertyValue('src'));
+        print(await image!.propertyValue('src'));
         await browser.close();
       }
       //---
@@ -470,14 +470,14 @@ void main() {
       //---
       //+import 'package:puppeteer/puppeteer.dart';
 
-      void main() async {
+      Future<void> main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.waitForXPath('//img');
         await page.goto(exampleValue(
             server.assetUrl('doc_examples_2.html'), 'https://example.com'));
         var image = await watchImg;
-        print(await image.propertyValue('src'));
+        print(await image!.propertyValue('src'));
         await browser.close();
       }
       //---
@@ -602,7 +602,7 @@ void main() {
         //---
         //+import 'package:puppeteer/puppeteer.dart';
 
-        void main() async {
+        Future<void> main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           var watchDog =
@@ -627,14 +627,14 @@ void main() {
       //---
       //+import 'package:puppeteer/puppeteer.dart';
 
-      void main() async {
+      Future<void> main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.mainFrame.waitForSelector('img');
         await page.goto(exampleValue(
             server.assetUrl('doc_examples_2.html'), 'https://example.com'));
         var image = await watchImg;
-        print(await image.propertyValue('src'));
+        print(await image!.propertyValue('src'));
         await browser.close();
       }
       //---
@@ -646,14 +646,14 @@ void main() {
       //---
       //+import 'package:puppeteer/puppeteer.dart';
 
-      void main() async {
+      Future<void> main() async {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.mainFrame.waitForXPath('//img');
         await page.goto(exampleValue(
             server.assetUrl('doc_examples_2.html'), 'https://example.com'));
         var image = await watchImg;
-        print(await image.propertyValue('src'));
+        print(await image!.propertyValue('src'));
         await browser.close();
       }
       //---
@@ -727,7 +727,7 @@ void main() {
       await page.goto(exampleValue('${server.assetUrl('input/wheel.html')}',
           r'https://mdn.mozillademos.org/en-US/docs/Web/API/Element/wheel_event$samples/Scaling_an_element_via_the_wheel?revision=1587366'));
       var elem = await page.$('div');
-      var boundingBox = await elem.boundingBox;
+      var boundingBox = (await elem.boundingBox)!;
       await page.mouse.move(Point(boundingBox.left + boundingBox.width / 2,
           boundingBox.top + boundingBox.height / 2));
       await page.mouse.wheel(deltaY: -100);
@@ -816,7 +816,7 @@ void main() {
       //---
       //+import 'package:puppeteer/puppeteer.dart';
 
-      void main() async {
+      Future<void> main() async {
         var browser = await puppeteer.launch();
 
         var page = await browser.newPage();
@@ -909,7 +909,7 @@ void main() {
     });
     test('failure', () async {
       page.onRequestFailed.listen((request) {
-        print(request.url + ' ' + request.failure);
+        print(request.url + ' ' + request.failure!);
       });
     });
     group('redirectChain', () {
@@ -1004,7 +1004,7 @@ void main() {
         print(snapshot);
       });
       test(1, () async {
-        AXNode findFocusedNode(AXNode node) {
+        AXNode? findFocusedNode(AXNode node) {
           if (node.focused) return node;
           for (var child in node.children) {
             var foundNode = findFocusedNode(child);

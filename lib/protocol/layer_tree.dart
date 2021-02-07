@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 
@@ -63,7 +62,7 @@ class LayerTreeApi {
   /// [clipRect] The clip rectangle to apply when replaying the snapshot.
   /// Returns: The array of paint profiles, one per run.
   Future<List<PaintProfile>> profileSnapshot(SnapshotId snapshotId,
-      {int minRepeatCount, num minDuration, dom.Rect clipRect}) async {
+      {int? minRepeatCount, num? minDuration, dom.Rect? clipRect}) async {
     var result = await _client.send('LayerTree.profileSnapshot', {
       'snapshotId': snapshotId,
       if (minRepeatCount != null) 'minRepeatCount': minRepeatCount,
@@ -90,7 +89,7 @@ class LayerTreeApi {
   /// [scale] The scale to apply while replaying (defaults to 1).
   /// Returns: A data: URL for resulting image.
   Future<String> replaySnapshot(SnapshotId snapshotId,
-      {int fromStep, int toStep, num scale}) async {
+      {int? fromStep, int? toStep, num? scale}) async {
     var result = await _client.send('LayerTree.replaySnapshot', {
       'snapshotId': snapshotId,
       if (fromStep != null) 'fromStep': fromStep,
@@ -121,7 +120,7 @@ class LayerPaintedEvent {
   /// Clip rectangle.
   final dom.Rect clip;
 
-  LayerPaintedEvent({@required this.layerId, @required this.clip});
+  LayerPaintedEvent({required this.layerId, required this.clip});
 
   factory LayerPaintedEvent.fromJson(Map<String, dynamic> json) {
     return LayerPaintedEvent(
@@ -135,7 +134,7 @@ class CompositingReasonsResult {
   /// A list of strings specifying reason IDs for the given layer to become composited.
   final List<String> compositingReasonIds;
 
-  CompositingReasonsResult({@required this.compositingReasonIds});
+  CompositingReasonsResult({required this.compositingReasonIds});
 
   factory CompositingReasonsResult.fromJson(Map<String, dynamic> json) {
     return CompositingReasonsResult(
@@ -196,7 +195,7 @@ class ScrollRect {
   /// Reason for rectangle to force scrolling on the main thread
   final ScrollRectType type;
 
-  ScrollRect({@required this.rect, @required this.type});
+  ScrollRect({required this.rect, required this.type});
 
   factory ScrollRect.fromJson(Map<String, dynamic> json) {
     return ScrollRect(
@@ -227,7 +226,7 @@ class ScrollRectType {
 
   const ScrollRectType._(this.value);
 
-  factory ScrollRectType.fromJson(String value) => values[value];
+  factory ScrollRectType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -251,14 +250,14 @@ class StickyPositionConstraint {
   final dom.Rect containingBlockRect;
 
   /// The nearest sticky layer that shifts the sticky box
-  final LayerId nearestLayerShiftingStickyBox;
+  final LayerId? nearestLayerShiftingStickyBox;
 
   /// The nearest sticky layer that shifts the containing block
-  final LayerId nearestLayerShiftingContainingBlock;
+  final LayerId? nearestLayerShiftingContainingBlock;
 
   StickyPositionConstraint(
-      {@required this.stickyBoxRect,
-      @required this.containingBlockRect,
+      {required this.stickyBoxRect,
+      required this.containingBlockRect,
       this.nearestLayerShiftingStickyBox,
       this.nearestLayerShiftingContainingBlock});
 
@@ -285,10 +284,11 @@ class StickyPositionConstraint {
       'stickyBoxRect': stickyBoxRect.toJson(),
       'containingBlockRect': containingBlockRect.toJson(),
       if (nearestLayerShiftingStickyBox != null)
-        'nearestLayerShiftingStickyBox': nearestLayerShiftingStickyBox.toJson(),
+        'nearestLayerShiftingStickyBox':
+            nearestLayerShiftingStickyBox!.toJson(),
       if (nearestLayerShiftingContainingBlock != null)
         'nearestLayerShiftingContainingBlock':
-            nearestLayerShiftingContainingBlock.toJson(),
+            nearestLayerShiftingContainingBlock!.toJson(),
     };
   }
 }
@@ -304,7 +304,7 @@ class PictureTile {
   /// Base64-encoded snapshot data.
   final String picture;
 
-  PictureTile({@required this.x, @required this.y, @required this.picture});
+  PictureTile({required this.x, required this.y, required this.picture});
 
   factory PictureTile.fromJson(Map<String, dynamic> json) {
     return PictureTile(
@@ -329,10 +329,10 @@ class Layer {
   final LayerId layerId;
 
   /// The id of parent (not present for root).
-  final LayerId parentLayerId;
+  final LayerId? parentLayerId;
 
   /// The backend id for the node associated with this layer.
-  final dom.BackendNodeId backendNodeId;
+  final dom.BackendNodeId? backendNodeId;
 
   /// Offset from parent layer, X coordinate.
   final num offsetX;
@@ -347,16 +347,16 @@ class Layer {
   final num height;
 
   /// Transformation matrix for layer, default is identity matrix
-  final List<num> transform;
+  final List<num>? transform;
 
   /// Transform anchor point X, absent if no transform specified
-  final num anchorX;
+  final num? anchorX;
 
   /// Transform anchor point Y, absent if no transform specified
-  final num anchorY;
+  final num? anchorY;
 
   /// Transform anchor point Z, absent if no transform specified
-  final num anchorZ;
+  final num? anchorZ;
 
   /// Indicates how many time this layer has painted.
   final int paintCount;
@@ -366,28 +366,28 @@ class Layer {
   final bool drawsContent;
 
   /// Set if layer is not visible.
-  final bool invisible;
+  final bool? invisible;
 
   /// Rectangles scrolling on main thread only.
-  final List<ScrollRect> scrollRects;
+  final List<ScrollRect>? scrollRects;
 
   /// Sticky position constraint information
-  final StickyPositionConstraint stickyPositionConstraint;
+  final StickyPositionConstraint? stickyPositionConstraint;
 
   Layer(
-      {@required this.layerId,
+      {required this.layerId,
       this.parentLayerId,
       this.backendNodeId,
-      @required this.offsetX,
-      @required this.offsetY,
-      @required this.width,
-      @required this.height,
+      required this.offsetX,
+      required this.offsetY,
+      required this.width,
+      required this.height,
       this.transform,
       this.anchorX,
       this.anchorY,
       this.anchorZ,
-      @required this.paintCount,
-      @required this.drawsContent,
+      required this.paintCount,
+      required this.drawsContent,
       this.invisible,
       this.scrollRects,
       this.stickyPositionConstraint});
@@ -436,17 +436,17 @@ class Layer {
       'height': height,
       'paintCount': paintCount,
       'drawsContent': drawsContent,
-      if (parentLayerId != null) 'parentLayerId': parentLayerId.toJson(),
-      if (backendNodeId != null) 'backendNodeId': backendNodeId.toJson(),
-      if (transform != null) 'transform': [...transform],
+      if (parentLayerId != null) 'parentLayerId': parentLayerId!.toJson(),
+      if (backendNodeId != null) 'backendNodeId': backendNodeId!.toJson(),
+      if (transform != null) 'transform': [...?transform],
       if (anchorX != null) 'anchorX': anchorX,
       if (anchorY != null) 'anchorY': anchorY,
       if (anchorZ != null) 'anchorZ': anchorZ,
       if (invisible != null) 'invisible': invisible,
       if (scrollRects != null)
-        'scrollRects': scrollRects.map((e) => e.toJson()).toList(),
+        'scrollRects': scrollRects!.map((e) => e.toJson()).toList(),
       if (stickyPositionConstraint != null)
-        'stickyPositionConstraint': stickyPositionConstraint.toJson(),
+        'stickyPositionConstraint': stickyPositionConstraint!.toJson(),
     };
   }
 }

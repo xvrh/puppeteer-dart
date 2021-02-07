@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'page.dart' as page;
 
@@ -70,9 +69,7 @@ class ApplicationCacheStatusUpdatedEvent {
   final int status;
 
   ApplicationCacheStatusUpdatedEvent(
-      {@required this.frameId,
-      @required this.manifestURL,
-      @required this.status});
+      {required this.frameId, required this.manifestURL, required this.status});
 
   factory ApplicationCacheStatusUpdatedEvent.fromJson(
       Map<String, dynamic> json) {
@@ -96,7 +93,7 @@ class ApplicationCacheResource {
   final String type;
 
   ApplicationCacheResource(
-      {@required this.url, @required this.size, @required this.type});
+      {required this.url, required this.size, required this.type});
 
   factory ApplicationCacheResource.fromJson(Map<String, dynamic> json) {
     return ApplicationCacheResource(
@@ -133,11 +130,11 @@ class ApplicationCache {
   final List<ApplicationCacheResource> resources;
 
   ApplicationCache(
-      {@required this.manifestURL,
-      @required this.size,
-      @required this.creationTime,
-      @required this.updateTime,
-      @required this.resources});
+      {required this.manifestURL,
+      required this.size,
+      required this.creationTime,
+      required this.updateTime,
+      required this.resources});
 
   factory ApplicationCache.fromJson(Map<String, dynamic> json) {
     return ApplicationCache(
@@ -175,9 +172,7 @@ class FrameWithManifest {
   final int status;
 
   FrameWithManifest(
-      {@required this.frameId,
-      @required this.manifestURL,
-      @required this.status});
+      {required this.frameId, required this.manifestURL, required this.status});
 
   factory FrameWithManifest.fromJson(Map<String, dynamic> json) {
     return FrameWithManifest(

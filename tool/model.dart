@@ -22,7 +22,7 @@ class Protocol {
 
 class Domain {
   final String name;
-  final String description;
+  final String? description;
   final List<ComplexType> types;
   final List<Command> commands;
   final List<Event> events;
@@ -30,11 +30,11 @@ class Domain {
 
   Domain.fromJson(Map json)
       : name = json['domain'] as String,
-        description = json['description'] as String,
+        description = json['description'] as String?,
         types = json.containsKey('types')
             ? (json['types'] as List)
                 .map((j) => ComplexType.fromJson(
-                    j as Map<String, dynamic>, json['domain'] as String))
+                    j as Map<String, dynamic>, json['domain'] as String?))
                 .toList()
             : const [],
         commands = json.containsKey('commands')
@@ -47,39 +47,39 @@ class Domain {
                 .map((j) => Event.fromJson(j as Map<String, dynamic>))
                 .toList()
             : const [],
-        deprecated = json['deprecated'] as bool ?? false;
+        deprecated = json['deprecated'] as bool? ?? false;
 }
 
 class ComplexType {
   final String id;
   final String rawId;
-  final String description;
+  final String? description;
   final String type;
   final List<Parameter> properties;
-  final List<String> enums;
-  final ListItems items;
+  final List<String>? enums;
+  final ListItems? items;
 
   ComplexType(
-      {String id,
+      {required String id,
       this.properties = const [],
       this.description,
-      this.type,
+      this.type = '',
       this.enums,
       this.items})
       : id = _aliases[id] ?? id,
         rawId = id;
 
-  ComplexType.fromJson(Map json, String domain)
+  ComplexType.fromJson(Map json, String? domain)
       : id = _aliases[json['id'] as String] ?? json['id'] as String,
         rawId = json['id'] as String,
-        description = json['description'] as String,
-        type = json['type'] as String,
+        description = json['description'] as String?,
+        type = json['type'] as String? ?? '',
         properties = json.containsKey('properties')
             ? (json['properties'] as List)
                 .map((j) => Parameter.fromJson(j as Map<String, dynamic>))
                 .toList()
             : const [],
-        enums = (json['enum'] as List)?.cast<String>(),
+        enums = (json['enum'] as List?)?.cast<String>(),
         items = json.containsKey('items')
             ? ListItems.fromJson(json['items'] as Map<String, dynamic>)
             : null;
@@ -87,15 +87,15 @@ class ComplexType {
 
 class Command {
   final String name;
-  final String description;
+  final String? description;
   final List<Parameter> parameters;
   final List<Parameter> returns;
   final bool deprecated;
 
   Command.fromJson(Map json)
       : name = json['name'] as String,
-        description = json['description'] as String,
-        deprecated = json['deprecated'] as bool ?? false,
+        description = json['description'] as String?,
+        deprecated = json['deprecated'] as bool? ?? false,
         parameters = json.containsKey('parameters')
             ? (json['parameters'] as List)
                 .map((j) => Parameter.fromJson(j as Map<String, dynamic>))
@@ -110,12 +110,12 @@ class Command {
 
 class Event {
   final String name;
-  final String description;
+  final String? description;
   final List<Parameter> parameters;
 
   Event.fromJson(Map json)
       : name = json['name'] as String,
-        description = json['description'] as String,
+        description = json['description'] as String?,
         parameters = json.containsKey('parameters')
             ? (json['parameters'] as List)
                 .map((j) => Parameter.fromJson(j as Map<String, dynamic>))
@@ -123,7 +123,7 @@ class Event {
             : const [];
 }
 
-String _ref(String ref) {
+String? _ref(String? ref) {
   if (ref == null) return null;
 
   var alias = _aliases[ref];
@@ -147,23 +147,23 @@ String _ref(String ref) {
 
 class Parameter implements Typed {
   final String name;
-  final String description;
+  final String? description;
   final bool optional;
   final bool deprecated;
-  final ListItems items;
-  final List<String> enumValues;
+  final ListItems? items;
+  final List<String>? enumValues;
 
   @override
-  final String type;
+  final String? type;
 
   @override
-  final String ref;
+  final String? ref;
 
   Parameter(
-      {this.name,
+      {required this.name,
       this.description,
       this.type,
-      String ref,
+      String? ref,
       this.optional = false,
       this.deprecated = false,
       this.items,
@@ -172,11 +172,11 @@ class Parameter implements Typed {
 
   Parameter.fromJson(Map json)
       : name = json['name'] as String,
-        description = json['description'] as String,
-        type = json['type'] as String,
-        ref = _ref(json[r'$ref'] as String),
-        optional = json['optional'] as bool ?? false,
-        deprecated = json['deprecated'] as bool ?? false,
+        description = json['description'] as String?,
+        type = json['type'] as String?,
+        ref = _ref(json[r'$ref'] as String?),
+        optional = json['optional'] as bool? ?? false,
+        deprecated = json['deprecated'] as bool? ?? false,
         items = json.containsKey('items')
             ? ListItems.fromJson(json['items'] as Map<String, dynamic>)
             : null,
@@ -184,26 +184,26 @@ class Parameter implements Typed {
             ? (json['enum'] as List).cast<String>()
             : null;
 
-  String get normalizedName => preventKeywords(name);
+  String? get normalizedName => preventKeywords(name);
 
   String get deprecatedAttribute => deprecated ? '@deprecated' : '';
 }
 
 class ListItems implements Typed {
   @override
-  final String type;
+  final String? type;
 
   @override
-  final String ref;
+  final String? ref;
 
   ListItems.fromJson(Map<String, dynamic> json)
-      : type = json['type'] as String,
-        ref = _ref(json[r'$ref'] as String);
+      : type = json['type'] as String?,
+        ref = _ref(json[r'$ref'] as String?);
 }
 
 abstract class Typed {
-  String get type;
-  String get ref;
+  String? get type;
+  String? get ref;
 }
 
 const Set<String> _dartKeywords = {
@@ -223,7 +223,7 @@ const Set<String> _dartKeywords = {
   'default', 'static' //
 };
 
-String preventKeywords(String input) {
+String? preventKeywords(String? input) {
   if (_dartKeywords.contains(input)) {
     return '$input\$';
   } else {

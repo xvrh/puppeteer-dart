@@ -7,7 +7,7 @@ import '../javascript_function_parser.dart';
 
 final _logger = Logger('puppeteer.helper');
 
-String evaluationString(String function, List args) {
+String evaluationString(String function, List? args) {
   var functionDeclaration = convertToFunctionDeclaration(function);
 
   if (functionDeclaration == null) {
@@ -24,9 +24,9 @@ dynamic valueFromRemoteObject(RemoteObject remoteObject) {
   if (remoteObject.unserializableValue != null) {
     if (remoteObject.type == RemoteObjectType.bigint) {
       return BigInt.tryParse(
-          remoteObject.unserializableValue.value.replaceAll('n', ''));
+          remoteObject.unserializableValue!.value.replaceAll('n', ''));
     }
-    switch (remoteObject.unserializableValue.value) {
+    switch (remoteObject.unserializableValue!.value) {
       case '-0':
         return -0;
       case 'NaN':
@@ -37,7 +37,7 @@ dynamic valueFromRemoteObject(RemoteObject remoteObject) {
         return double.negativeInfinity;
       default:
         throw Exception(
-            'Unsupported unserializable value: ${remoteObject.unserializableValue.value}');
+            'Unsupported unserializable value: ${remoteObject.unserializableValue!.value}');
     }
   }
   return remoteObject.value;
@@ -48,7 +48,7 @@ Future<void> releaseObject(
   if (remoteObject.objectId == null) return;
 
   await runtimeApi
-      .releaseObject(remoteObject.objectId)
+      .releaseObject(remoteObject.objectId!)
       .catchError((e, StackTrace stackTrace) {
     // Exceptions might happen in case of a page been navigated or closed.
     // Swallow these since they are harmless and we don't leak anything in this case.
@@ -61,7 +61,7 @@ Future<void> readStream(IOApi io, StreamHandle stream, IOSink output) async {
   var base64Sink = Base64Decoder().startChunkedConversion(output);
   do {
     response = await io.read(stream);
-    if (response.base64Encoded) {
+    if (response.base64Encoded!) {
       base64Sink.add(response.data);
     } else {
       output.write(response.data);

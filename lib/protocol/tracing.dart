@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'io.dart' as io;
 
@@ -49,7 +48,7 @@ class TracingApi {
   /// Request a global memory dump.
   /// [deterministic] Enables more deterministic results by forcing garbage collection
   Future<RequestMemoryDumpResult> requestMemoryDump(
-      {bool deterministic}) async {
+      {bool? deterministic}) async {
     var result = await _client.send('Tracing.requestMemoryDump', {
       if (deterministic != null) 'deterministic': deterministic,
     });
@@ -65,13 +64,13 @@ class TracingApi {
   /// [streamCompression] Compression format to use. This only applies when using `ReturnAsStream`
   /// transfer mode (defaults to `none`)
   Future<void> start(
-      {@deprecated String categories,
-      @deprecated String options,
-      num bufferUsageReportingInterval,
-      @Enum(['ReportEvents', 'ReturnAsStream']) String transferMode,
-      StreamFormat streamFormat,
-      StreamCompression streamCompression,
-      TraceConfig traceConfig}) async {
+      {@deprecated String? categories,
+      @deprecated String? options,
+      num? bufferUsageReportingInterval,
+      @Enum(['ReportEvents', 'ReturnAsStream']) String? transferMode,
+      StreamFormat? streamFormat,
+      StreamCompression? streamCompression,
+      TraceConfig? traceConfig}) async {
     assert(transferMode == null ||
         const ['ReportEvents', 'ReturnAsStream'].contains(transferMode));
     await _client.send('Tracing.start', {
@@ -90,14 +89,14 @@ class TracingApi {
 class BufferUsageEvent {
   /// A number in range [0..1] that indicates the used size of event buffer as a fraction of its
   /// total size.
-  final num percentFull;
+  final num? percentFull;
 
   /// An approximate number of events in the trace log.
-  final num eventCount;
+  final num? eventCount;
 
   /// A number in range [0..1] that indicates the used size of event buffer as a fraction of its
   /// total size.
-  final num value;
+  final num? value;
 
   BufferUsageEvent({this.percentFull, this.eventCount, this.value});
 
@@ -118,16 +117,16 @@ class TracingCompleteEvent {
   final bool dataLossOccurred;
 
   /// A handle of the stream that holds resulting trace data.
-  final io.StreamHandle stream;
+  final io.StreamHandle? stream;
 
   /// Trace data format of returned stream.
-  final StreamFormat traceFormat;
+  final StreamFormat? traceFormat;
 
   /// Compression format of returned stream.
-  final StreamCompression streamCompression;
+  final StreamCompression? streamCompression;
 
   TracingCompleteEvent(
-      {@required this.dataLossOccurred,
+      {required this.dataLossOccurred,
       this.stream,
       this.traceFormat,
       this.streamCompression});
@@ -155,7 +154,7 @@ class RequestMemoryDumpResult {
   /// True iff the global memory dump succeeded.
   final bool success;
 
-  RequestMemoryDumpResult({@required this.dumpGuid, @required this.success});
+  RequestMemoryDumpResult({required this.dumpGuid, required this.success});
 
   factory RequestMemoryDumpResult.fromJson(Map<String, dynamic> json) {
     return RequestMemoryDumpResult(
@@ -189,28 +188,28 @@ class MemoryDumpConfig {
 
 class TraceConfig {
   /// Controls how the trace buffer stores data.
-  final TraceConfigRecordMode recordMode;
+  final TraceConfigRecordMode? recordMode;
 
   /// Turns on JavaScript stack sampling.
-  final bool enableSampling;
+  final bool? enableSampling;
 
   /// Turns on system tracing.
-  final bool enableSystrace;
+  final bool? enableSystrace;
 
   /// Turns on argument filter.
-  final bool enableArgumentFilter;
+  final bool? enableArgumentFilter;
 
   /// Included category filters.
-  final List<String> includedCategories;
+  final List<String>? includedCategories;
 
   /// Excluded category filters.
-  final List<String> excludedCategories;
+  final List<String>? excludedCategories;
 
   /// Configuration to synthesize the delays in tracing.
-  final List<String> syntheticDelays;
+  final List<String>? syntheticDelays;
 
   /// Configuration for memory dump triggers. Used only when "memory-infra" category is enabled.
-  final MemoryDumpConfig memoryDumpConfig;
+  final MemoryDumpConfig? memoryDumpConfig;
 
   TraceConfig(
       {this.recordMode,
@@ -264,12 +263,12 @@ class TraceConfig {
       if (enableArgumentFilter != null)
         'enableArgumentFilter': enableArgumentFilter,
       if (includedCategories != null)
-        'includedCategories': [...includedCategories],
+        'includedCategories': [...?includedCategories],
       if (excludedCategories != null)
-        'excludedCategories': [...excludedCategories],
-      if (syntheticDelays != null) 'syntheticDelays': [...syntheticDelays],
+        'excludedCategories': [...?excludedCategories],
+      if (syntheticDelays != null) 'syntheticDelays': [...?syntheticDelays],
       if (memoryDumpConfig != null)
-        'memoryDumpConfig': memoryDumpConfig.toJson(),
+        'memoryDumpConfig': memoryDumpConfig!.toJson(),
     };
   }
 }
@@ -292,7 +291,7 @@ class TraceConfigRecordMode {
 
   const TraceConfigRecordMode._(this.value);
 
-  factory TraceConfigRecordMode.fromJson(String value) => values[value];
+  factory TraceConfigRecordMode.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -322,7 +321,7 @@ class StreamFormat {
 
   const StreamFormat._(this.value);
 
-  factory StreamFormat.fromJson(String value) => values[value];
+  factory StreamFormat.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -350,7 +349,7 @@ class StreamCompression {
 
   const StreamCompression._(this.value);
 
-  factory StreamCompression.fromJson(String value) => values[value];
+  factory StreamCompression.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 

@@ -1,8 +1,12 @@
+// @dart=2.9
+
 import 'dart:io';
 import 'dart:math';
+import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:meta/meta.dart';
+import 'package:pub_semver/pub_semver.dart';
 import 'utils/string_helpers.dart';
 
 final classesOrder = [
@@ -36,7 +40,10 @@ void main() {
       .where((file) => file.path.endsWith('.dart'))) {
     var fileContent = dartFile.readAsStringSync();
 
-    var unit = parseString(content: fileContent).unit;
+    var unit = parseString(
+        content: fileContent,
+        featureSet: FeatureSet.fromEnableFlags2(
+            sdkLanguageVersion: Version(2, 12, 0), flags: [])).unit;
 
     classes.addAll(unit.declarations
         .whereType<ClassDeclaration>()

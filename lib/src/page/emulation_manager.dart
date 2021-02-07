@@ -1,4 +1,3 @@
-import 'package:meta/meta.dart';
 import '../../protocol/dev_tools.dart';
 import '../../protocol/emulation.dart';
 
@@ -7,11 +6,8 @@ class Device {
   final String _userAgentTemplate;
   final DeviceViewport viewport;
 
-  const Device(this.name, {@required this.viewport, @required String userAgent})
-      : _userAgentTemplate = userAgent,
-        assert(name != null),
-        assert(viewport != null),
-        assert(userAgent != null);
+  const Device(this.name, {required this.viewport, required String userAgent})
+      : _userAgentTemplate = userAgent;
 
   String userAgent(String chromeVersion) =>
       _userAgentTemplate.replaceAll('%s', chromeVersion);
@@ -41,17 +37,15 @@ class DeviceViewport {
       this.deviceScaleFactor = 1,
       this.isMobile = false,
       this.isLandscape = false,
-      this.hasTouch = false})
-      : assert(width != null),
-        assert(height != null);
+      this.hasTouch = false});
 
   DeviceViewport copyWith(
-      {int width,
-      int height,
-      num deviceScaleFactor,
-      bool isMobile,
-      bool isLandscape,
-      bool hasTouch}) {
+      {int? width,
+      int? height,
+      num? deviceScaleFactor,
+      bool? isMobile,
+      bool? isLandscape,
+      bool? hasTouch}) {
     return DeviceViewport(
       width: width ?? this.width,
       height: height ?? this.height,

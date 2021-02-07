@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'debugger.dart' as debugger;
 import 'runtime.dart' as runtime;
@@ -68,7 +67,7 @@ class ProfilerApi {
   /// [allowTriggeredUpdates] Allow the backend to send updates on its own initiative
   /// Returns: Monotonically increasing time (in seconds) when the coverage update was taken in the backend.
   Future<num> startPreciseCoverage(
-      {bool callCount, bool detailed, bool allowTriggeredUpdates}) async {
+      {bool? callCount, bool? detailed, bool? allowTriggeredUpdates}) async {
     var result = await _client.send('Profiler.startPreciseCoverage', {
       if (callCount != null) 'callCount': callCount,
       if (detailed != null) 'detailed': detailed,
@@ -164,12 +163,12 @@ class ConsoleProfileFinishedEvent {
   final Profile profile;
 
   /// Profile title passed as an argument to console.profile().
-  final String title;
+  final String? title;
 
   ConsoleProfileFinishedEvent(
-      {@required this.id,
-      @required this.location,
-      @required this.profile,
+      {required this.id,
+      required this.location,
+      required this.profile,
       this.title});
 
   factory ConsoleProfileFinishedEvent.fromJson(Map<String, dynamic> json) {
@@ -190,10 +189,10 @@ class ConsoleProfileStartedEvent {
   final debugger.Location location;
 
   /// Profile title passed as an argument to console.profile().
-  final String title;
+  final String? title;
 
   ConsoleProfileStartedEvent(
-      {@required this.id, @required this.location, this.title});
+      {required this.id, required this.location, this.title});
 
   factory ConsoleProfileStartedEvent.fromJson(Map<String, dynamic> json) {
     return ConsoleProfileStartedEvent(
@@ -216,9 +215,7 @@ class PreciseCoverageDeltaUpdateEvent {
   final List<ScriptCoverage> result;
 
   PreciseCoverageDeltaUpdateEvent(
-      {@required this.timestamp,
-      @required this.occassion,
-      @required this.result});
+      {required this.timestamp, required this.occassion, required this.result});
 
   factory PreciseCoverageDeltaUpdateEvent.fromJson(Map<String, dynamic> json) {
     return PreciseCoverageDeltaUpdateEvent(
@@ -238,7 +235,7 @@ class TakePreciseCoverageResult {
   /// Monotonically increasing time (in seconds) when the coverage update was taken in the backend.
   final num timestamp;
 
-  TakePreciseCoverageResult({@required this.result, @required this.timestamp});
+  TakePreciseCoverageResult({required this.result, required this.timestamp});
 
   factory TakePreciseCoverageResult.fromJson(Map<String, dynamic> json) {
     return TakePreciseCoverageResult(
@@ -259,21 +256,21 @@ class ProfileNode {
   final runtime.CallFrame callFrame;
 
   /// Number of samples where this node was on top of the call stack.
-  final int hitCount;
+  final int? hitCount;
 
   /// Child node ids.
-  final List<int> children;
+  final List<int>? children;
 
   /// The reason of being not optimized. The function may be deoptimized or marked as don't
   /// optimize.
-  final String deoptReason;
+  final String? deoptReason;
 
   /// An array of source position ticks.
-  final List<PositionTickInfo> positionTicks;
+  final List<PositionTickInfo>? positionTicks;
 
   ProfileNode(
-      {@required this.id,
-      @required this.callFrame,
+      {required this.id,
+      required this.callFrame,
       this.hitCount,
       this.children,
       this.deoptReason,
@@ -304,10 +301,10 @@ class ProfileNode {
       'id': id,
       'callFrame': callFrame.toJson(),
       if (hitCount != null) 'hitCount': hitCount,
-      if (children != null) 'children': [...children],
+      if (children != null) 'children': [...?children],
       if (deoptReason != null) 'deoptReason': deoptReason,
       if (positionTicks != null)
-        'positionTicks': positionTicks.map((e) => e.toJson()).toList(),
+        'positionTicks': positionTicks!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -324,16 +321,16 @@ class Profile {
   final num endTime;
 
   /// Ids of samples top nodes.
-  final List<int> samples;
+  final List<int>? samples;
 
   /// Time intervals between adjacent samples in microseconds. The first delta is relative to the
   /// profile startTime.
-  final List<int> timeDeltas;
+  final List<int>? timeDeltas;
 
   Profile(
-      {@required this.nodes,
-      @required this.startTime,
-      @required this.endTime,
+      {required this.nodes,
+      required this.startTime,
+      required this.endTime,
       this.samples,
       this.timeDeltas});
 
@@ -358,8 +355,8 @@ class Profile {
       'nodes': nodes.map((e) => e.toJson()).toList(),
       'startTime': startTime,
       'endTime': endTime,
-      if (samples != null) 'samples': [...samples],
-      if (timeDeltas != null) 'timeDeltas': [...timeDeltas],
+      if (samples != null) 'samples': [...?samples],
+      if (timeDeltas != null) 'timeDeltas': [...?timeDeltas],
     };
   }
 }
@@ -372,7 +369,7 @@ class PositionTickInfo {
   /// Number of samples attributed to the source line.
   final int ticks;
 
-  PositionTickInfo({@required this.line, @required this.ticks});
+  PositionTickInfo({required this.line, required this.ticks});
 
   factory PositionTickInfo.fromJson(Map<String, dynamic> json) {
     return PositionTickInfo(
@@ -401,9 +398,9 @@ class CoverageRange {
   final int count;
 
   CoverageRange(
-      {@required this.startOffset,
-      @required this.endOffset,
-      @required this.count});
+      {required this.startOffset,
+      required this.endOffset,
+      required this.count});
 
   factory CoverageRange.fromJson(Map<String, dynamic> json) {
     return CoverageRange(
@@ -434,9 +431,9 @@ class FunctionCoverage {
   final bool isBlockCoverage;
 
   FunctionCoverage(
-      {@required this.functionName,
-      @required this.ranges,
-      @required this.isBlockCoverage});
+      {required this.functionName,
+      required this.ranges,
+      required this.isBlockCoverage});
 
   factory FunctionCoverage.fromJson(Map<String, dynamic> json) {
     return FunctionCoverage(
@@ -469,7 +466,7 @@ class ScriptCoverage {
   final List<FunctionCoverage> functions;
 
   ScriptCoverage(
-      {@required this.scriptId, @required this.url, @required this.functions});
+      {required this.scriptId, required this.url, required this.functions});
 
   factory ScriptCoverage.fromJson(Map<String, dynamic> json) {
     return ScriptCoverage(
@@ -495,7 +492,7 @@ class TypeObject {
   /// Name of a type collected with type profiling.
   final String name;
 
-  TypeObject({@required this.name});
+  TypeObject({required this.name});
 
   factory TypeObject.fromJson(Map<String, dynamic> json) {
     return TypeObject(
@@ -518,7 +515,7 @@ class TypeProfileEntry {
   /// The types for this parameter or return value.
   final List<TypeObject> types;
 
-  TypeProfileEntry({@required this.offset, @required this.types});
+  TypeProfileEntry({required this.offset, required this.types});
 
   factory TypeProfileEntry.fromJson(Map<String, dynamic> json) {
     return TypeProfileEntry(
@@ -549,7 +546,7 @@ class ScriptTypeProfile {
   final List<TypeProfileEntry> entries;
 
   ScriptTypeProfile(
-      {@required this.scriptId, @required this.url, @required this.entries});
+      {required this.scriptId, required this.url, required this.entries});
 
   factory ScriptTypeProfile.fromJson(Map<String, dynamic> json) {
     return ScriptTypeProfile(
@@ -578,7 +575,7 @@ class CounterInfo {
   /// Counter value.
   final int value;
 
-  CounterInfo({@required this.name, @required this.value});
+  CounterInfo({required this.name, required this.value});
 
   factory CounterInfo.fromJson(Map<String, dynamic> json) {
     return CounterInfo(
@@ -607,7 +604,7 @@ class RuntimeCallCounterInfo {
   final num time;
 
   RuntimeCallCounterInfo(
-      {@required this.name, @required this.value, @required this.time});
+      {required this.name, required this.value, required this.time});
 
   factory RuntimeCallCounterInfo.fromJson(Map<String, dynamic> json) {
     return RuntimeCallCounterInfo(

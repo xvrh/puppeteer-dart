@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'page.dart' as page;
@@ -303,14 +302,14 @@ class GetBackgroundColorsResult {
   /// this will consist of simply that color. In the case of a gradient, this will consist of each
   /// of the color stops. For anything more complicated, this will be an empty array. Images will
   /// be ignored (as if the image had failed to load).
-  final List<String> backgroundColors;
+  final List<String>? backgroundColors;
 
   /// The computed font size for this node, as a CSS computed value string (e.g. '12px').
-  final String computedFontSize;
+  final String? computedFontSize;
 
   /// The computed font weight for this node, as a CSS computed value string (e.g. 'normal' or
   /// '100').
-  final String computedFontWeight;
+  final String? computedFontWeight;
 
   GetBackgroundColorsResult(
       {this.backgroundColors, this.computedFontSize, this.computedFontWeight});
@@ -332,10 +331,10 @@ class GetBackgroundColorsResult {
 
 class GetInlineStylesForNodeResult {
   /// Inline style for the specified DOM node.
-  final CSSStyle inlineStyle;
+  final CSSStyle? inlineStyle;
 
   /// Attribute-defined element style (e.g. resulting from "width=20 height=100%").
-  final CSSStyle attributesStyle;
+  final CSSStyle? attributesStyle;
 
   GetInlineStylesForNodeResult({this.inlineStyle, this.attributesStyle});
 
@@ -353,22 +352,22 @@ class GetInlineStylesForNodeResult {
 
 class GetMatchedStylesForNodeResult {
   /// Inline style for the specified DOM node.
-  final CSSStyle inlineStyle;
+  final CSSStyle? inlineStyle;
 
   /// Attribute-defined element style (e.g. resulting from "width=20 height=100%").
-  final CSSStyle attributesStyle;
+  final CSSStyle? attributesStyle;
 
   /// CSS rules matching this node, from all applicable stylesheets.
-  final List<RuleMatch> matchedCSSRules;
+  final List<RuleMatch>? matchedCSSRules;
 
   /// Pseudo style matches for this node.
-  final List<PseudoElementMatches> pseudoElements;
+  final List<PseudoElementMatches>? pseudoElements;
 
   /// A chain of inherited styles (from the immediate node parent up to the DOM tree root).
-  final List<InheritedStyleEntry> inherited;
+  final List<InheritedStyleEntry>? inherited;
 
   /// A list of CSS keyframed animations matching this node.
-  final List<CSSKeyframesRule> cssKeyframesRules;
+  final List<CSSKeyframesRule>? cssKeyframesRules;
 
   GetMatchedStylesForNodeResult(
       {this.inlineStyle,
@@ -418,7 +417,7 @@ class TakeCoverageDeltaResult {
   /// Monotonically increasing time, in seconds.
   final num timestamp;
 
-  TakeCoverageDeltaResult({@required this.coverage, @required this.timestamp});
+  TakeCoverageDeltaResult({required this.coverage, required this.timestamp});
 
   factory TakeCoverageDeltaResult.fromJson(Map<String, dynamic> json) {
     return TakeCoverageDeltaResult(
@@ -469,7 +468,7 @@ class StyleSheetOrigin {
 
   const StyleSheetOrigin._(this.value);
 
-  factory StyleSheetOrigin.fromJson(String value) => values[value];
+  factory StyleSheetOrigin.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -492,7 +491,7 @@ class PseudoElementMatches {
   /// Matches of CSS rules applicable to the pseudo style.
   final List<RuleMatch> matches;
 
-  PseudoElementMatches({@required this.pseudoType, @required this.matches});
+  PseudoElementMatches({required this.pseudoType, required this.matches});
 
   factory PseudoElementMatches.fromJson(Map<String, dynamic> json) {
     return PseudoElementMatches(
@@ -514,12 +513,12 @@ class PseudoElementMatches {
 /// Inherited CSS rule collection from ancestor node.
 class InheritedStyleEntry {
   /// The ancestor node's inline style, if any, in the style inheritance chain.
-  final CSSStyle inlineStyle;
+  final CSSStyle? inlineStyle;
 
   /// Matches of CSS rules matching the ancestor node in the style inheritance chain.
   final List<RuleMatch> matchedCSSRules;
 
-  InheritedStyleEntry({this.inlineStyle, @required this.matchedCSSRules});
+  InheritedStyleEntry({this.inlineStyle, required this.matchedCSSRules});
 
   factory InheritedStyleEntry.fromJson(Map<String, dynamic> json) {
     return InheritedStyleEntry(
@@ -535,7 +534,7 @@ class InheritedStyleEntry {
   Map<String, dynamic> toJson() {
     return {
       'matchedCSSRules': matchedCSSRules.map((e) => e.toJson()).toList(),
-      if (inlineStyle != null) 'inlineStyle': inlineStyle.toJson(),
+      if (inlineStyle != null) 'inlineStyle': inlineStyle!.toJson(),
     };
   }
 }
@@ -548,7 +547,7 @@ class RuleMatch {
   /// Matching selector indices in the rule's selectorList selectors (0-based).
   final List<int> matchingSelectors;
 
-  RuleMatch({@required this.rule, @required this.matchingSelectors});
+  RuleMatch({required this.rule, required this.matchingSelectors});
 
   factory RuleMatch.fromJson(Map<String, dynamic> json) {
     return RuleMatch(
@@ -572,9 +571,9 @@ class Value {
   final String text;
 
   /// Value range in the underlying resource (if available).
-  final SourceRange range;
+  final SourceRange? range;
 
-  Value({@required this.text, this.range});
+  Value({required this.text, this.range});
 
   factory Value.fromJson(Map<String, dynamic> json) {
     return Value(
@@ -588,7 +587,7 @@ class Value {
   Map<String, dynamic> toJson() {
     return {
       'text': text,
-      if (range != null) 'range': range.toJson(),
+      if (range != null) 'range': range!.toJson(),
     };
   }
 }
@@ -601,7 +600,7 @@ class SelectorList {
   /// Rule selector text.
   final String text;
 
-  SelectorList({@required this.selectors, @required this.text});
+  SelectorList({required this.selectors, required this.text});
 
   factory SelectorList.fromJson(Map<String, dynamic> json) {
     return SelectorList(
@@ -632,7 +631,7 @@ class CSSStyleSheetHeader {
   final String sourceURL;
 
   /// URL of source map associated with the stylesheet (if any).
-  final String sourceMapURL;
+  final String? sourceMapURL;
 
   /// Stylesheet origin.
   final StyleSheetOrigin origin;
@@ -641,13 +640,13 @@ class CSSStyleSheetHeader {
   final String title;
 
   /// The backend id for the owner node of the stylesheet.
-  final dom.BackendNodeId ownerNode;
+  final dom.BackendNodeId? ownerNode;
 
   /// Denotes whether the stylesheet is disabled.
   final bool disabled;
 
   /// Whether the sourceURL field value comes from the sourceURL comment.
-  final bool hasSourceURL;
+  final bool? hasSourceURL;
 
   /// Whether this stylesheet is created for STYLE tag by parser. This flag is not set for
   /// document.written STYLE tags.
@@ -678,23 +677,23 @@ class CSSStyleSheetHeader {
   final num endColumn;
 
   CSSStyleSheetHeader(
-      {@required this.styleSheetId,
-      @required this.frameId,
-      @required this.sourceURL,
+      {required this.styleSheetId,
+      required this.frameId,
+      required this.sourceURL,
       this.sourceMapURL,
-      @required this.origin,
-      @required this.title,
+      required this.origin,
+      required this.title,
       this.ownerNode,
-      @required this.disabled,
+      required this.disabled,
       this.hasSourceURL,
-      @required this.isInline,
-      @required this.isMutable,
-      @required this.isConstructed,
-      @required this.startLine,
-      @required this.startColumn,
-      @required this.length,
-      @required this.endLine,
-      @required this.endColumn});
+      required this.isInline,
+      required this.isMutable,
+      required this.isConstructed,
+      required this.startLine,
+      required this.startColumn,
+      required this.length,
+      required this.endLine,
+      required this.endColumn});
 
   factory CSSStyleSheetHeader.fromJson(Map<String, dynamic> json) {
     return CSSStyleSheetHeader(
@@ -741,7 +740,7 @@ class CSSStyleSheetHeader {
       'endLine': endLine,
       'endColumn': endColumn,
       if (sourceMapURL != null) 'sourceMapURL': sourceMapURL,
-      if (ownerNode != null) 'ownerNode': ownerNode.toJson(),
+      if (ownerNode != null) 'ownerNode': ownerNode!.toJson(),
       if (hasSourceURL != null) 'hasSourceURL': hasSourceURL,
     };
   }
@@ -751,7 +750,7 @@ class CSSStyleSheetHeader {
 class CSSRule {
   /// The css style sheet identifier (absent for user agent stylesheet and user-specified
   /// stylesheet rules) this rule came from.
-  final StyleSheetId styleSheetId;
+  final StyleSheetId? styleSheetId;
 
   /// Rule selector data.
   final SelectorList selectorList;
@@ -764,13 +763,13 @@ class CSSRule {
 
   /// Media list array (for rules involving media queries). The array enumerates media queries
   /// starting with the innermost one, going outwards.
-  final List<CSSMedia> media;
+  final List<CSSMedia>? media;
 
   CSSRule(
       {this.styleSheetId,
-      @required this.selectorList,
-      @required this.origin,
-      @required this.style,
+      required this.selectorList,
+      required this.origin,
+      required this.style,
       this.media});
 
   factory CSSRule.fromJson(Map<String, dynamic> json) {
@@ -795,8 +794,8 @@ class CSSRule {
       'selectorList': selectorList.toJson(),
       'origin': origin.toJson(),
       'style': style.toJson(),
-      if (styleSheetId != null) 'styleSheetId': styleSheetId.toJson(),
-      if (media != null) 'media': media.map((e) => e.toJson()).toList(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
+      if (media != null) 'media': media!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -817,10 +816,10 @@ class RuleUsage {
   final bool used;
 
   RuleUsage(
-      {@required this.styleSheetId,
-      @required this.startOffset,
-      @required this.endOffset,
-      @required this.used});
+      {required this.styleSheetId,
+      required this.startOffset,
+      required this.endOffset,
+      required this.used});
 
   factory RuleUsage.fromJson(Map<String, dynamic> json) {
     return RuleUsage(
@@ -856,10 +855,10 @@ class SourceRange {
   final int endColumn;
 
   SourceRange(
-      {@required this.startLine,
-      @required this.startColumn,
-      @required this.endLine,
-      @required this.endColumn});
+      {required this.startLine,
+      required this.startColumn,
+      required this.endLine,
+      required this.endColumn});
 
   factory SourceRange.fromJson(Map<String, dynamic> json) {
     return SourceRange(
@@ -888,9 +887,9 @@ class ShorthandEntry {
   final String value;
 
   /// Whether the property has "!important" annotation (implies `false` if absent).
-  final bool important;
+  final bool? important;
 
-  ShorthandEntry({@required this.name, @required this.value, this.important});
+  ShorthandEntry({required this.name, required this.value, this.important});
 
   factory ShorthandEntry.fromJson(Map<String, dynamic> json) {
     return ShorthandEntry(
@@ -917,7 +916,7 @@ class CSSComputedStyleProperty {
   /// Computed style property value.
   final String value;
 
-  CSSComputedStyleProperty({@required this.name, @required this.value});
+  CSSComputedStyleProperty({required this.name, required this.value});
 
   factory CSSComputedStyleProperty.fromJson(Map<String, dynamic> json) {
     return CSSComputedStyleProperty(
@@ -938,7 +937,7 @@ class CSSComputedStyleProperty {
 class CSSStyle {
   /// The css style sheet identifier (absent for user agent stylesheet and user-specified
   /// stylesheet rules) this rule came from.
-  final StyleSheetId styleSheetId;
+  final StyleSheetId? styleSheetId;
 
   /// CSS properties in the style.
   final List<CSSProperty> cssProperties;
@@ -947,15 +946,15 @@ class CSSStyle {
   final List<ShorthandEntry> shorthandEntries;
 
   /// Style declaration text (if available).
-  final String cssText;
+  final String? cssText;
 
   /// Style declaration range in the enclosing stylesheet (if available).
-  final SourceRange range;
+  final SourceRange? range;
 
   CSSStyle(
       {this.styleSheetId,
-      @required this.cssProperties,
-      @required this.shorthandEntries,
+      required this.cssProperties,
+      required this.shorthandEntries,
       this.cssText,
       this.range});
 
@@ -981,9 +980,9 @@ class CSSStyle {
     return {
       'cssProperties': cssProperties.map((e) => e.toJson()).toList(),
       'shorthandEntries': shorthandEntries.map((e) => e.toJson()).toList(),
-      if (styleSheetId != null) 'styleSheetId': styleSheetId.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
       if (cssText != null) 'cssText': cssText,
-      if (range != null) 'range': range.toJson(),
+      if (range != null) 'range': range!.toJson(),
     };
   }
 }
@@ -997,26 +996,26 @@ class CSSProperty {
   final String value;
 
   /// Whether the property has "!important" annotation (implies `false` if absent).
-  final bool important;
+  final bool? important;
 
   /// Whether the property is implicit (implies `false` if absent).
-  final bool implicit;
+  final bool? implicit;
 
   /// The full property text as specified in the style.
-  final String text;
+  final String? text;
 
   /// Whether the property is understood by the browser (implies `true` if absent).
-  final bool parsedOk;
+  final bool? parsedOk;
 
   /// Whether the property is disabled by the user (present for source-based properties only).
-  final bool disabled;
+  final bool? disabled;
 
   /// The entire property range in the enclosing style declaration (if available).
-  final SourceRange range;
+  final SourceRange? range;
 
   CSSProperty(
-      {@required this.name,
-      @required this.value,
+      {required this.name,
+      required this.value,
       this.important,
       this.implicit,
       this.text,
@@ -1049,7 +1048,7 @@ class CSSProperty {
       if (text != null) 'text': text,
       if (parsedOk != null) 'parsedOk': parsedOk,
       if (disabled != null) 'disabled': disabled,
-      if (range != null) 'range': range.toJson(),
+      if (range != null) 'range': range!.toJson(),
     };
   }
 }
@@ -1066,21 +1065,21 @@ class CSSMedia {
   final CSSMediaSource source;
 
   /// URL of the document containing the media query description.
-  final String sourceURL;
+  final String? sourceURL;
 
   /// The associated rule (@media or @import) header range in the enclosing stylesheet (if
   /// available).
-  final SourceRange range;
+  final SourceRange? range;
 
   /// Identifier of the stylesheet containing this object (if exists).
-  final StyleSheetId styleSheetId;
+  final StyleSheetId? styleSheetId;
 
   /// Array of media queries.
-  final List<MediaQuery> mediaList;
+  final List<MediaQuery>? mediaList;
 
   CSSMedia(
-      {@required this.text,
-      @required this.source,
+      {required this.text,
+      required this.source,
       this.sourceURL,
       this.range,
       this.styleSheetId,
@@ -1111,10 +1110,10 @@ class CSSMedia {
       'text': text,
       'source': source,
       if (sourceURL != null) 'sourceURL': sourceURL,
-      if (range != null) 'range': range.toJson(),
-      if (styleSheetId != null) 'styleSheetId': styleSheetId.toJson(),
+      if (range != null) 'range': range!.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
       if (mediaList != null)
-        'mediaList': mediaList.map((e) => e.toJson()).toList(),
+        'mediaList': mediaList!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -1135,7 +1134,7 @@ class CSSMediaSource {
 
   const CSSMediaSource._(this.value);
 
-  factory CSSMediaSource.fromJson(String value) => values[value];
+  factory CSSMediaSource.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -1158,7 +1157,7 @@ class MediaQuery {
   /// Whether the media query condition is satisfied.
   final bool active;
 
-  MediaQuery({@required this.expressions, @required this.active});
+  MediaQuery({required this.expressions, required this.active});
 
   factory MediaQuery.fromJson(Map<String, dynamic> json) {
     return MediaQuery(
@@ -1189,15 +1188,15 @@ class MediaQueryExpression {
   final String feature;
 
   /// The associated range of the value text in the enclosing stylesheet (if available).
-  final SourceRange valueRange;
+  final SourceRange? valueRange;
 
   /// Computed length of media query expression (if applicable).
-  final num computedLength;
+  final num? computedLength;
 
   MediaQueryExpression(
-      {@required this.value,
-      @required this.unit,
-      @required this.feature,
+      {required this.value,
+      required this.unit,
+      required this.feature,
       this.valueRange,
       this.computedLength});
 
@@ -1220,7 +1219,7 @@ class MediaQueryExpression {
       'value': value,
       'unit': unit,
       'feature': feature,
-      if (valueRange != null) 'valueRange': valueRange.toJson(),
+      if (valueRange != null) 'valueRange': valueRange!.toJson(),
       if (computedLength != null) 'computedLength': computedLength,
     };
   }
@@ -1238,9 +1237,9 @@ class PlatformFontUsage {
   final num glyphCount;
 
   PlatformFontUsage(
-      {@required this.familyName,
-      @required this.isCustomFont,
-      @required this.glyphCount});
+      {required this.familyName,
+      required this.isCustomFont,
+      required this.glyphCount});
 
   factory PlatformFontUsage.fromJson(Map<String, dynamic> json) {
     return PlatformFontUsage(
@@ -1277,11 +1276,11 @@ class FontVariationAxis {
   final num defaultValue;
 
   FontVariationAxis(
-      {@required this.tag,
-      @required this.name,
-      @required this.minValue,
-      @required this.maxValue,
-      @required this.defaultValue});
+      {required this.tag,
+      required this.name,
+      required this.minValue,
+      required this.maxValue,
+      required this.defaultValue});
 
   factory FontVariationAxis.fromJson(Map<String, dynamic> json) {
     return FontVariationAxis(
@@ -1332,17 +1331,17 @@ class FontFace {
   final String platformFontFamily;
 
   /// Available variation settings (a.k.a. "axes").
-  final List<FontVariationAxis> fontVariationAxes;
+  final List<FontVariationAxis>? fontVariationAxes;
 
   FontFace(
-      {@required this.fontFamily,
-      @required this.fontStyle,
-      @required this.fontVariant,
-      @required this.fontWeight,
-      @required this.fontStretch,
-      @required this.unicodeRange,
-      @required this.src,
-      @required this.platformFontFamily,
+      {required this.fontFamily,
+      required this.fontStyle,
+      required this.fontVariant,
+      required this.fontWeight,
+      required this.fontStretch,
+      required this.unicodeRange,
+      required this.src,
+      required this.platformFontFamily,
       this.fontVariationAxes});
 
   factory FontFace.fromJson(Map<String, dynamic> json) {
@@ -1374,7 +1373,7 @@ class FontFace {
       'src': src,
       'platformFontFamily': platformFontFamily,
       if (fontVariationAxes != null)
-        'fontVariationAxes': fontVariationAxes.map((e) => e.toJson()).toList(),
+        'fontVariationAxes': fontVariationAxes!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -1387,7 +1386,7 @@ class CSSKeyframesRule {
   /// List of keyframes.
   final List<CSSKeyframeRule> keyframes;
 
-  CSSKeyframesRule({@required this.animationName, @required this.keyframes});
+  CSSKeyframesRule({required this.animationName, required this.keyframes});
 
   factory CSSKeyframesRule.fromJson(Map<String, dynamic> json) {
     return CSSKeyframesRule(
@@ -1411,7 +1410,7 @@ class CSSKeyframesRule {
 class CSSKeyframeRule {
   /// The css style sheet identifier (absent for user agent stylesheet and user-specified
   /// stylesheet rules) this rule came from.
-  final StyleSheetId styleSheetId;
+  final StyleSheetId? styleSheetId;
 
   /// Parent stylesheet's origin.
   final StyleSheetOrigin origin;
@@ -1424,9 +1423,9 @@ class CSSKeyframeRule {
 
   CSSKeyframeRule(
       {this.styleSheetId,
-      @required this.origin,
-      @required this.keyText,
-      @required this.style});
+      required this.origin,
+      required this.keyText,
+      required this.style});
 
   factory CSSKeyframeRule.fromJson(Map<String, dynamic> json) {
     return CSSKeyframeRule(
@@ -1444,7 +1443,7 @@ class CSSKeyframeRule {
       'origin': origin.toJson(),
       'keyText': keyText.toJson(),
       'style': style.toJson(),
-      if (styleSheetId != null) 'styleSheetId': styleSheetId.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
     };
   }
 }
@@ -1461,7 +1460,7 @@ class StyleDeclarationEdit {
   final String text;
 
   StyleDeclarationEdit(
-      {@required this.styleSheetId, @required this.range, @required this.text});
+      {required this.styleSheetId, required this.range, required this.text});
 
   factory StyleDeclarationEdit.fromJson(Map<String, dynamic> json) {
     return StyleDeclarationEdit(

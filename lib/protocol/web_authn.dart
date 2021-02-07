@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// This domain allows configuring virtual authenticators to test the WebAuthn
@@ -137,7 +136,7 @@ class AuthenticatorProtocol {
 
   const AuthenticatorProtocol._(this.value);
 
-  factory AuthenticatorProtocol.fromJson(String value) => values[value];
+  factory AuthenticatorProtocol.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -171,7 +170,7 @@ class AuthenticatorTransport {
 
   const AuthenticatorTransport._(this.value);
 
-  factory AuthenticatorTransport.fromJson(String value) => values[value];
+  factory AuthenticatorTransport.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -193,27 +192,27 @@ class VirtualAuthenticatorOptions {
   final AuthenticatorTransport transport;
 
   /// Defaults to false.
-  final bool hasResidentKey;
+  final bool? hasResidentKey;
 
   /// Defaults to false.
-  final bool hasUserVerification;
+  final bool? hasUserVerification;
 
   /// If set to true, the authenticator will support the largeBlob extension.
   /// https://w3c.github.io/webauthn#largeBlob
   /// Defaults to false.
-  final bool hasLargeBlob;
+  final bool? hasLargeBlob;
 
   /// If set to true, tests of user presence will succeed immediately.
   /// Otherwise, they will not be resolved. Defaults to true.
-  final bool automaticPresenceSimulation;
+  final bool? automaticPresenceSimulation;
 
   /// Sets whether User Verification succeeds or fails for an authenticator.
   /// Defaults to false.
-  final bool isUserVerified;
+  final bool? isUserVerified;
 
   VirtualAuthenticatorOptions(
-      {@required this.protocol,
-      @required this.transport,
+      {required this.protocol,
+      required this.transport,
       this.hasResidentKey,
       this.hasUserVerification,
       this.hasLargeBlob,
@@ -265,14 +264,14 @@ class Credential {
 
   /// Relying Party ID the credential is scoped to. Must be set when adding a
   /// credential.
-  final String rpId;
+  final String? rpId;
 
   /// The ECDSA P-256 private key in PKCS#8 format.
   final String privateKey;
 
   /// An opaque byte sequence with a maximum size of 64 bytes mapping the
   /// credential to a specific user.
-  final String userHandle;
+  final String? userHandle;
 
   /// Signature counter. This is incremented by one for each successful
   /// assertion.
@@ -280,12 +279,12 @@ class Credential {
   final int signCount;
 
   Credential(
-      {@required this.credentialId,
-      @required this.isResidentCredential,
+      {required this.credentialId,
+      required this.isResidentCredential,
       this.rpId,
-      @required this.privateKey,
+      required this.privateKey,
       this.userHandle,
-      @required this.signCount});
+      required this.signCount});
 
   factory Credential.fromJson(Map<String, dynamic> json) {
     return Credential(

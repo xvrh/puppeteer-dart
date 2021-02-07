@@ -7,10 +7,10 @@ import 'utils/utils.dart';
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 void main() {
-  Server server;
-  Browser browser;
-  BrowserContext context;
-  Page page;
+  late Server server;
+  late Browser browser;
+  late BrowserContext context;
+  late Page page;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
@@ -29,7 +29,6 @@ void main() {
   tearDown(() async {
     server.clearRoutes();
     await context.close();
-    page = null;
   });
 
   group('Page.goto', () {
@@ -53,7 +52,7 @@ void main() {
     });
     test('should navigate to about:blank', () async {
       var response = await page.goto('about:blank');
-      expect(response, isNull);
+      expect(response.status, 0);
     });
     test('should return response when page changes its URL after load',
         () async {
@@ -331,9 +330,8 @@ void main() {
       expect(response.url, contains('grid.html'));
     });
     test('should work with both domcontentloaded and load', () async {
-      Completer<shelf.Response> response;
+      var response = Completer<shelf.Response>();
       server.setRoute('/one-style.css', (req) {
-        response = Completer<shelf.Response>();
         return response.future;
       });
       var navigationPromise = page.goto(server.prefix + '/one-style.html');
@@ -359,7 +357,7 @@ void main() {
       var response = await waitFutures(page.waitForNavigation(), [
         page.click('a'),
       ]);
-      expect(response, isNull);
+      expect(response.status, 0);
       expect(page.url, equals(server.emptyPage + '#foobar'));
     });
     test('should work with history.pushState()', () async {
@@ -373,7 +371,7 @@ void main() {
       var response = await waitFutures(page.waitForNavigation(), [
         page.click('a'),
       ]);
-      expect(response, isNull);
+      expect(response.status, 0);
       expect(page.url, equals(server.prefix + '/wow.html'));
     });
     test('should work with history.replaceState()', () async {
@@ -387,7 +385,7 @@ void main() {
       var response = await waitFutures(page.waitForNavigation(), [
         page.click('a'),
       ]);
-      expect(response, isNull);
+      expect(response.status, 0);
       expect(page.url, equals(server.prefix + '/replaced.html'));
     });
     test('should work with DOM history.back()/history.forward()', () async {
@@ -406,26 +404,23 @@ void main() {
       var backResponse = await waitFutures(page.waitForNavigation(), [
         page.click('a#back'),
       ]);
-      expect(backResponse, isNull);
+      expect(backResponse.status, 0);
       expect(page.url, equals(server.prefix + '/first.html'));
       var forwardResponse = await waitFutures(page.waitForNavigation(), [
         page.click('a#forward'),
       ]);
-      expect(forwardResponse, isNull);
+      expect(forwardResponse.status, 0);
       expect(page.url, equals(server.prefix + '/second.html'));
     });
     test('should work when subframe issues window.stop()', () async {
       server.setRoute(
           '/frames/style.css', (req) => Completer<shelf.Response>().future);
 
-      Frame frame;
       // ignore: unawaited_futures
-      var frameAttachedFuture = page.onFrameAttached.first.then((f) {
-        frame = f;
-      });
+      var frameAttachedFuture = page.onFrameAttached.first;
       var navigationPromise =
           page.goto(server.prefix + '/frames/one-frame.html');
-      await frameAttachedFuture;
+      var frame = await frameAttachedFuture;
 
       await Future.wait(
           [frame.evaluate('() => window.stop()'), navigationPromise]);
@@ -438,11 +433,11 @@ void main() {
       await page.goto(server.prefix + '/grid.html');
 
       var response = await page.goBack();
-      expect(response.ok, isTrue);
+      expect(response!.ok, isTrue);
       expect(response.url, contains(server.emptyPage));
 
       response = await page.goForward();
-      expect(response.ok, isTrue);
+      expect(response!.ok, isTrue);
       expect(response.url, contains('/grid.html'));
 
       response = await page.goForward();
@@ -480,9 +475,11 @@ void main() {
 
       server.setRoute(
           '/empty.html', (req) => Completer<shelf.Response>().future);
-      Object error;
-      var navigationPromise =
-          page.frames[1].goto(server.emptyPage).catchError((e) {
+      Object? error;
+      var navigationPromise = page.frames[1]
+          .goto(server.emptyPage)
+          .then<Response?>((e) => e)
+          .catchError((e) {
         error = e;
       });
       await server.waitForRequest('/empty.html');
@@ -548,8 +545,9 @@ void main() {
 
       server.setRoute(
           '/empty-for-frame.html', (req) => Completer<shelf.Response>().future);
-      Object error;
-      var navigationPromise = frame.waitForNavigation().catchError((e) {
+      Object? error;
+      var navigationPromise =
+          frame.waitForNavigation().then<Response?>((e) => e).catchError((e) {
         error = e;
       });
       await Future.wait([

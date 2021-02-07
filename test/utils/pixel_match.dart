@@ -1,13 +1,12 @@
 import 'dart:math' as math;
 import 'dart:typed_data';
-import 'package:meta/meta.dart';
 
 int pixelMatch(Uint8List img1, Uint8List img2,
-    {@required int width,
-    @required int height,
-    Uint8List output,
-    num threshold,
-    bool includeAA}) {
+    {required int width,
+    required int height,
+    Uint8List? output,
+    num? threshold,
+    bool? includeAA}) {
   if (img1.length != img2.length) {
     throw Exception('Image sizes do not match.');
   }
@@ -68,7 +67,7 @@ bool _antialiased(
   var zeroes = x1 == x0 || x1 == x2 || y1 == y0 || y1 == y2 ? 1 : 0;
   num min = 0;
   num max = 0;
-  int minX, minY, maxX, maxY;
+  var minX = 0, minY = 0, maxX = 0, maxY = 0;
 
   // go through 8 adjacent pixels
   for (var x = x0; x <= x2; x++) {
@@ -140,7 +139,7 @@ bool _hasManySiblings(Uint8List img, int x1, int y1, int width, int height) {
 // calculate color difference according to the paper "Measuring perceived color difference
 // using YIQ NTSC transmission color space in mobile applications" by Y. Kotsarenko and F. Ramos
 
-num _colorDelta(Uint8List img1, Uint8List img2, int k, int m, {bool yOnly}) {
+num _colorDelta(Uint8List img1, Uint8List img2, int k, int m, {bool? yOnly}) {
   yOnly ??= false;
   num r1 = img1[k + 0];
   num g1 = img1[k + 1];

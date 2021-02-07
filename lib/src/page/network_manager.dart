@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
-import 'package:meta/meta.dart';
 import '../../protocol/dev_tools.dart';
 import '../../protocol/fetch.dart';
 import '../../protocol/fetch.dart' as fetch;
 import '../../protocol/network.dart';
 import '../../protocol/network.dart' as network;
+import '../../protocol/security.dart';
 import '../connection.dart';
 import 'frame_manager.dart';
 
@@ -19,14 +19,14 @@ class NetworkManager {
   final _requestIdToRequest = <String, Request>{};
   final _requestIdToRequestWillBeSentEvent = <String, RequestWillBeSentEvent>{};
   final _extraHTTPHeaders =
-      CanonicalizedMap<String, String, String>((key) => key.toLowerCase());
+      CanonicalizedMap<String, String, String?>((key) => key.toLowerCase());
   bool _offline = false;
-  Credentials _credentials;
-  final _attemptedAuthentications = <String>{};
+  Credentials? _credentials;
+  final _attemptedAuthentications = <String?>{};
   bool _userRequestInterceptionEnabled = false;
   bool _protocolRequestInterceptionEnabled = false;
   bool _userCacheDisabled = false;
-  final _requestIdToInterceptionId = <String, String>{};
+  final _requestIdToInterceptionId = <String?, String?>{};
   final _onRequestController = StreamController<Request>.broadcast(),
       _onRequestFinishedController = StreamController<Request>.broadcast(),
       _onResponseController = StreamController<Response>.broadcast(),
@@ -70,7 +70,7 @@ class NetworkManager {
     }
   }
 
-  Future<void> authenticate(Credentials credentials) async {
+  Future<void> authenticate(Credentials? credentials) async {
     _credentials = credentials;
     await _updateProtocolRequestInterception();
   }
@@ -174,7 +174,7 @@ class NetworkManager {
     if (requestId != null) {
       if (_requestIdToRequestWillBeSentEvent.containsKey(requestId.value)) {
         var requestWillBeSentEvent =
-            _requestIdToRequestWillBeSentEvent[requestId.value];
+            _requestIdToRequestWillBeSentEvent[requestId.value]!;
         _onRequest(requestWillBeSentEvent, interceptionId.value);
         _requestIdToRequestWillBeSentEvent.remove(requestId.value);
       } else {
@@ -183,19 +183,20 @@ class NetworkManager {
     }
   }
 
-  void _onRequest(RequestWillBeSentEvent event, String interceptionId) {
-    var redirectChain = <Request>[];
-    if (event.redirectResponse != null) {
+  void _onRequest(RequestWillBeSentEvent event, String? interceptionId) {
+    List<Request>? redirectChain = <Request>[];
+    var redirectResponse = event.redirectResponse;
+    if (redirectResponse != null) {
       var request = _requestIdToRequest[event.requestId.value];
       // If we connect late to the target, we could have missed the requestWillBeSent event.
       if (request != null) {
-        _handleRequestRedirect(request, event.redirectResponse);
+        _handleRequestRedirect(request, redirectResponse);
         redirectChain = request.redirectChain;
       }
     }
     var frame =
         event.frameId != null ? frameManager.frame(event.frameId) : null;
-    var request = Request(client, frame, interceptionId, event,
+    var request = Request(FetchApi(client), frame, interceptionId, event,
         allowInterception: _userRequestInterceptionEnabled,
         redirectChain: redirectChain);
     _requestIdToRequest[event.requestId.value] = request;
@@ -208,7 +209,7 @@ class NetworkManager {
   }
 
   void _handleRequestRedirect(Request request, ResponseData responsePayload) {
-    var response = Response(client, request, responsePayload);
+    var response = Response(_network, request, responsePayload);
     request._response = response;
     request.redirectChain.add(request);
     response._bodyLoadedCompleter.complete(
@@ -223,7 +224,7 @@ class NetworkManager {
     var request = _requestIdToRequest[event.requestId.value];
     // FileUpload sends a response without a matching request.
     if (request == null) return;
-    var response = Response(client, request, event.response);
+    var response = Response(_network, request, event.response);
     request._response = response;
     _onResponseController.add(response);
   }
@@ -237,7 +238,7 @@ class NetworkManager {
     // Under certain conditions we never get the Network.responseReceived
     // event from protocol. @see https://crbug.com/883475
     if (request.response != null) {
-      request.response._bodyLoadedCompleter.complete(null);
+      request.response!._bodyLoadedCompleter.complete(null);
     }
     _requestIdToRequest.remove(request.requestId);
     _attemptedAuthentications.remove(request.interceptionId);
@@ -273,12 +274,10 @@ class NetworkManager {
 /// with the 'onRequestFinished' event, and a new request is  issued to a
 /// redirected url.
 class Request {
-  final Client client;
-
   /// A [Frame] that initiated this request, or `null` if navigating to
   /// error pages.
-  final Frame frame;
-  final String interceptionId;
+  final Frame? frame;
+  final String? interceptionId;
   final RequestWillBeSentEvent event;
 
   /// A `redirectChain` is a chain of requests initiated to fetch a resource.
@@ -311,16 +310,15 @@ class Request {
   final bool allowInterception;
   final _headers =
       CanonicalizedMap<String, String, String>((key) => key.toLowerCase());
-  Response _response;
-  String _failureText;
+  Response? _response;
+  String? _failureText;
   bool _fromMemoryCache = false;
   bool _interceptionHandled = false;
   final FetchApi _fetchApi;
 
-  Request(this.client, this.frame, this.interceptionId, this.event,
-      {this.redirectChain, @required bool allowInterception})
-      : allowInterception = allowInterception ?? false,
-        _fetchApi = FetchApi(client) {
+  Request(this._fetchApi, this.frame, this.interceptionId, this.event,
+      {required this.redirectChain, required bool? allowInterception})
+      : allowInterception = allowInterception ?? false {
     for (var header in event.request.headers.value.keys) {
       _headers[header] = event.request.headers.value[header] as String;
     }
@@ -338,13 +336,13 @@ class Request {
 
   /// Contains the request's resource type as it was perceived by the rendering
   /// engine.
-  ResourceType get resourceType => event.type;
+  ResourceType? get resourceType => event.type;
 
   /// Request's method (GET, POST, etc.)
   String get method => event.request.method;
 
   /// Request's post body, if any.
-  String get postData => event.request.postData;
+  String? get postData => event.request.postData;
 
   /// An object with HTTP headers associated with the request. All header names
   /// are lower-case.
@@ -352,7 +350,7 @@ class Request {
 
   /// A matching [Response] object, or `null` if the response has not been
   /// received yet.
-  Response get response => _response;
+  Response? get response => _response;
 
   /// The method returns `null` unless this request was failed, as reported by
   /// `onRequestFailed` event.
@@ -361,10 +359,10 @@ class Request {
   ///
   /// ```dart
   /// page.onRequestFailed.listen((request) {
-  ///   print(request.url + ' ' + request.failure);
+  ///   print(request.url + ' ' + request.failure!);
   /// });
   /// ```
-  String get failure => _failureText;
+  String? get failure => _failureText;
 
   /// Continues request with optional request overrides. To use this, request
   /// interception should be enabled with `page.setRequestInterception`.
@@ -389,10 +387,10 @@ class Request {
   /// - [postData]: If set changes the post data of request
   /// - [headers]: If set changes the request HTTP headers
   Future<void> continueRequest(
-      {String url,
-      String method,
-      String postData,
-      Map<String, String> headers}) async {
+      {String? url,
+      String? method,
+      String? postData,
+      Map<String, String>? headers}) async {
     // Request interception is not supported for data: urls.
     if (this.url.startsWith('data:')) return;
     assert(allowInterception, 'Request Interception is not enabled!');
@@ -404,7 +402,7 @@ class Request {
 
     headers ??= {};
     await _fetchApi
-        .continueRequest(fetch.RequestId(interceptionId),
+        .continueRequest(fetch.RequestId(interceptionId!),
             url: url,
             method: method,
             postData: postDataBinaryBase64,
@@ -440,9 +438,9 @@ class Request {
   /// - [contentType]: If set, equals to setting `Content-Type` response header
   /// - [body]: Optional response body
   Future<void> respond(
-      {int status,
-      Map<String, String> headers,
-      String contentType,
+      {int? status,
+      Map<String, String>? headers,
+      String? contentType,
       body}) async {
     // Mocking responses for dataURL requests is not currently supported.
     if (url.startsWith('data:')) return;
@@ -456,7 +454,7 @@ class Request {
       headers['content-type'] = contentType;
     }
 
-    List<int> bodyBytes;
+    List<int>? bodyBytes;
     if (body is String) {
       bodyBytes = utf8.encode(body);
     }
@@ -469,13 +467,13 @@ class Request {
     }
 
     await _fetchApi
-        .fulfillRequest(fetch.RequestId(interceptionId), status ?? 200,
+        .fulfillRequest(fetch.RequestId(interceptionId!), status ?? 200,
             responseHeaders: headers.entries
                 .map((e) => fetch.HeaderEntry(
                     name: e.key.toLowerCase(), value: e.value))
                 .toList(),
             responsePhrase: _statusTexts[status ?? 200],
-            body: body != null ? base64.encode(bodyBytes) : null)
+            body: body != null ? base64.encode(bodyBytes!) : null)
         .catchError((error) {
       // In certain cases, protocol will return error if the request was already canceled
       // or the page was closed. We should tolerate these errors.
@@ -489,7 +487,7 @@ class Request {
   ///
   /// Parameters:
   /// [error]: Optional error code. Defaults to `failed`
-  Future<void> abort({ErrorReason error}) async {
+  Future<void> abort({ErrorReason? error}) async {
     error ??= ErrorReason.failed;
     // Request interception is not supported for data: urls.
     if (url.startsWith('data:')) return;
@@ -498,7 +496,7 @@ class Request {
     assert(!_interceptionHandled, 'Request is already handled!');
     _interceptionHandled = true;
     await _fetchApi
-        .failRequest(fetch.RequestId(interceptionId), error)
+        .failRequest(fetch.RequestId(interceptionId!), error)
         .catchError((error) {
       // In certain cases, protocol will return error if the request was already canceled
       // or the page was closed. We should tolerate these errors.
@@ -509,30 +507,62 @@ class Request {
 
 /// [Response] class represents responses which are received by page.
 class Response {
-  final Client client;
-
   /// A matching [Request] object.
   final Request request;
   final ResponseData data;
   final _bodyLoadedCompleter = Completer();
-  Future _contentFuture;
+  Future? _contentFuture;
   final NetworkApi _networkApi;
   final _headers =
       CanonicalizedMap<String, String, String>((key) => key.toLowerCase());
 
-  Response(this.client, this.request, this.data)
-      : _networkApi = NetworkApi(client) {
-    assert(data != null);
+  Response(this._networkApi, this.request, this.data) {
     for (var header in data.headers.value.keys) {
       _headers[header] = data.headers.value[header] as String;
     }
   }
 
+  factory Response.aborted(DevTools apis, Request? request) {
+    return Response(
+      apis.network,
+      request ??
+          Request(
+              apis.fetch,
+              null,
+              null,
+              RequestWillBeSentEvent(
+                  requestId: network.RequestId(''),
+                  loaderId: network.LoaderId(''),
+                  documentURL: '',
+                  request: RequestData(
+                      url: '',
+                      method: '',
+                      headers: Headers({}),
+                      initialPriority: network.ResourcePriority.medium,
+                      referrerPolicy: network.RequestReferrerPolicy.noReferrer),
+                  timestamp: network.MonotonicTime(0),
+                  wallTime: network.TimeSinceEpoch(0),
+                  initiator: network.Initiator(type: InitiatorType.other)),
+              redirectChain: [],
+              allowInterception: false),
+      ResponseData(
+          url: '',
+          status: 0,
+          statusText: '',
+          headers: Headers({}),
+          mimeType: '',
+          connectionReused: false,
+          connectionId: 0,
+          encodedDataLength: 0,
+          securityState: SecurityState.unknown),
+    );
+  }
+
   /// The IP address of the remote server
-  String get remoteIPAddress => data.remoteIPAddress;
+  String? get remoteIPAddress => data.remoteIPAddress;
 
   /// The port used to connect to the remote server
-  int get remotePort => data.remotePort;
+  int? get remotePort => data.remotePort;
 
   /// Contains the status code of the response (e.g., 200 for a success).
   int get status => data.status;
@@ -543,10 +573,10 @@ class Response {
   /// Contains the URL of the response.
   String get url => request.url;
 
-  bool get fromDiskCache => data.fromDiskCache;
+  bool get fromDiskCache => data.fromDiskCache ?? false;
 
   /// True if the response was served by a service worker.
-  bool get fromServiceWorker => data.fromServiceWorker;
+  bool get fromServiceWorker => data.fromServiceWorker ?? false;
 
   /// True if the response was served from either the browser's disk cache or
   /// memory cache.
@@ -557,17 +587,17 @@ class Response {
 
   /// Security details if the response was received over the secure connection,
   /// or `null` otherwise.
-  SecurityDetails get securityDetails => data.securityDetails;
+  SecurityDetails? get securityDetails => data.securityDetails;
 
   /// A [Frame] that initiated this response, or `null` if navigating to error
   /// pages.
-  Frame get frame => request.frame;
+  Frame? get frame => request.frame;
 
   /// Contains a boolean stating whether the response was successful (status in
   /// the range 200-299) or not.
   bool get ok => status == 0 || (status >= 200 && status <= 299);
 
-  Future get content {
+  Future? get content {
     _contentFuture ??= _bodyLoadedCompleter.future.then((error) async {
       if (error is Exception) throw error;
       var response = await _networkApi
@@ -582,11 +612,11 @@ class Response {
   }
 
   /// Promise which resolves to the bytes with response body.
-  Future<List<int>> get bytes => content.then((content) =>
+  Future<List<int>> get bytes => content!.then((content) =>
       content is List<int> ? content : utf8.encode(content as String));
 
   /// Promise which resolves to a text representation of response body.
-  Future<String> get text => content.then((content) =>
+  Future<String> get text => content!.then((content) =>
       content is String ? content : utf8.decode(content as List<int>));
 
   /// This method will throw if the response body is not parsable via `jsonDecode`.
@@ -594,7 +624,7 @@ class Response {
 }
 
 class Credentials {
-  final String username, password;
+  final String? username, password;
 
   Credentials(this.username, this.password);
 }

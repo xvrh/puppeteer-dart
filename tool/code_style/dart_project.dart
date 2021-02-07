@@ -20,7 +20,7 @@ List<DartProject> getDartProjects(String root) {
   return paths;
 }
 
-DartProject getContainingProject(String currentPath) {
+DartProject? getContainingProject(String currentPath) {
   var dir = Directory(currentPath);
 
   while (true) {
@@ -38,7 +38,7 @@ DartProject getContainingProject(String currentPath) {
 }
 
 /// Retourne les sous-projets ou le projet qui contient le dossier cible.
-List<DartProject> getSubOrContainingProjects(String root) {
+List<DartProject?> getSubOrContainingProjects(String root) {
   var projects = getDartProjects(root);
   if (projects.isEmpty) {
     var containingProject = getContainingProject(root);
@@ -53,25 +53,25 @@ bool isInHiddenDir(String relative) =>
 
 class DartProject {
   final String rootDirectory;
-  String _listingPath;
-  String _packageName;
+  late String _listingPath;
+  String? _packageName;
 
-  DartProject(this.rootDirectory, {String listingPath}) {
+  DartProject(this.rootDirectory, {String? listingPath}) {
     _packageName = _getPackageName(rootDirectory);
 
     _listingPath = listingPath ?? rootDirectory;
   }
 
-  String get packageName => _packageName;
+  String? get packageName => _packageName;
 
   String get absoluteRootDirectory => Directory(rootDirectory).absolute.path;
 
-  static String _getPackageName(String projectRoot) {
+  static String? _getPackageName(String projectRoot) {
     var pubspecContent =
         File(p.join(projectRoot, 'pubspec.yaml')).readAsStringSync();
     var loadedPubspec = loadYaml(pubspecContent);
 
-    return loadedPubspec['name'] as String;
+    return loadedPubspec['name'] as String?;
   }
 
   List<DartFile> getDartFiles() {
@@ -107,7 +107,7 @@ class DartProject {
 class DartFile {
   final DartProject project;
   final File file;
-  String _relativePath;
+  String? _relativePath;
 
   DartFile(this.project, this.file) {
     _relativePath = p.relative(file.absolute.path, from: project.rootDirectory);
@@ -115,9 +115,9 @@ class DartFile {
 
   String get path => file.path;
 
-  String get relativePath => _relativePath;
+  String? get relativePath => _relativePath;
 
-  String get normalizedRelativePath => relativePath.replaceAll('\\', '/');
+  String get normalizedRelativePath => relativePath!.replaceAll('\\', '/');
 
   @override
   String toString() => 'DartFile($file)';

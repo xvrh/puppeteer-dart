@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'network.dart' as network;
 import 'service_worker.dart' as service_worker;
@@ -61,7 +60,7 @@ class RecordingStateChangedEvent {
   final ServiceName service;
 
   RecordingStateChangedEvent(
-      {@required this.isRecording, @required this.service});
+      {required this.isRecording, required this.service});
 
   factory RecordingStateChangedEvent.fromJson(Map<String, dynamic> json) {
     return RecordingStateChangedEvent(
@@ -94,7 +93,7 @@ class ServiceName {
 
   const ServiceName._(this.value);
 
-  factory ServiceName.fromJson(String value) => values[value];
+  factory ServiceName.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -115,7 +114,7 @@ class EventMetadata {
 
   final String value;
 
-  EventMetadata({@required this.key, @required this.value});
+  EventMetadata({required this.key, required this.value});
 
   factory EventMetadata.fromJson(Map<String, dynamic> json) {
     return EventMetadata(
@@ -155,13 +154,13 @@ class BackgroundServiceEvent {
   final List<EventMetadata> eventMetadata;
 
   BackgroundServiceEvent(
-      {@required this.timestamp,
-      @required this.origin,
-      @required this.serviceWorkerRegistrationId,
-      @required this.service,
-      @required this.eventName,
-      @required this.instanceId,
-      @required this.eventMetadata});
+      {required this.timestamp,
+      required this.origin,
+      required this.serviceWorkerRegistrationId,
+      required this.service,
+      required this.eventName,
+      required this.instanceId,
+      required this.eventMetadata});
 
   factory BackgroundServiceEvent.fromJson(Map<String, dynamic> json) {
     return BackgroundServiceEvent(

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'browser.dart' as browser;
 import 'network.dart' as network;
@@ -46,7 +45,7 @@ class StorageApi {
   /// [browserContextId] Browser context to use when called on the browser endpoint.
   /// Returns: Array of cookie objects.
   Future<List<network.Cookie>> getCookies(
-      {browser.BrowserContextID browserContextId}) async {
+      {browser.BrowserContextID? browserContextId}) async {
     var result = await _client.send('Storage.getCookies', {
       if (browserContextId != null) 'browserContextId': browserContextId,
     });
@@ -59,7 +58,7 @@ class StorageApi {
   /// [cookies] Cookies to be set.
   /// [browserContextId] Browser context to use when called on the browser endpoint.
   Future<void> setCookies(List<network.CookieParam> cookies,
-      {browser.BrowserContextID browserContextId}) async {
+      {browser.BrowserContextID? browserContextId}) async {
     await _client.send('Storage.setCookies', {
       'cookies': [...cookies],
       if (browserContextId != null) 'browserContextId': browserContextId,
@@ -68,7 +67,8 @@ class StorageApi {
 
   /// Clears cookies.
   /// [browserContextId] Browser context to use when called on the browser endpoint.
-  Future<void> clearCookies({browser.BrowserContextID browserContextId}) async {
+  Future<void> clearCookies(
+      {browser.BrowserContextID? browserContextId}) async {
     await _client.send('Storage.clearCookies', {
       if (browserContextId != null) 'browserContextId': browserContextId,
     });
@@ -92,7 +92,7 @@ class StorageApi {
   /// the specified origin. If this is called multiple times with different
   /// origins, the override will be maintained for each origin until it is
   /// disabled (called without a quotaSize).
-  Future<void> overrideQuotaForOrigin(String origin, {num quotaSize}) async {
+  Future<void> overrideQuotaForOrigin(String origin, {num? quotaSize}) async {
     await _client.send('Storage.overrideQuotaForOrigin', {
       'origin': origin,
       if (quotaSize != null) 'quotaSize': quotaSize,
@@ -140,7 +140,7 @@ class CacheStorageContentUpdatedEvent {
   final String cacheName;
 
   CacheStorageContentUpdatedEvent(
-      {@required this.origin, @required this.cacheName});
+      {required this.origin, required this.cacheName});
 
   factory CacheStorageContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return CacheStorageContentUpdatedEvent(
@@ -161,9 +161,9 @@ class IndexedDBContentUpdatedEvent {
   final String objectStoreName;
 
   IndexedDBContentUpdatedEvent(
-      {@required this.origin,
-      @required this.databaseName,
-      @required this.objectStoreName});
+      {required this.origin,
+      required this.databaseName,
+      required this.objectStoreName});
 
   factory IndexedDBContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return IndexedDBContentUpdatedEvent(
@@ -188,10 +188,10 @@ class GetUsageAndQuotaResult {
   final List<UsageForType> usageBreakdown;
 
   GetUsageAndQuotaResult(
-      {@required this.usage,
-      @required this.quota,
-      @required this.overrideActive,
-      @required this.usageBreakdown});
+      {required this.usage,
+      required this.quota,
+      required this.overrideActive,
+      required this.usageBreakdown});
 
   factory GetUsageAndQuotaResult.fromJson(Map<String, dynamic> json) {
     return GetUsageAndQuotaResult(
@@ -236,7 +236,7 @@ class StorageType {
 
   const StorageType._(this.value);
 
-  factory StorageType.fromJson(String value) => values[value];
+  factory StorageType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -259,7 +259,7 @@ class UsageForType {
   /// Storage usage (bytes).
   final num usage;
 
-  UsageForType({@required this.storageType, @required this.usage});
+  UsageForType({required this.storageType, required this.usage});
 
   factory UsageForType.fromJson(Map<String, dynamic> json) {
     return UsageForType(

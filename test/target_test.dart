@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:shelf/shelf.dart' as shelf;
@@ -10,10 +11,10 @@ import 'utils/utils.dart';
 void main() {
   Logger.root.onRecord.listen(print);
 
-  Server server;
-  Browser browser;
-  BrowserContext context;
-  Page page;
+  late Server server;
+  late Browser browser;
+  late BrowserContext context;
+  late Page page;
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
@@ -89,7 +90,7 @@ void main() {
       expect(await closePagePromise, equals(otherPage));
 
       allPages = await Future.wait(
-          context.targets.map((target) => target.page).where((p) => p != null));
+          context.targets.map((target) => target.page).whereNotNull());
       expect(allPages, contains(page));
       expect(allPages, isNot(contains(otherPage)));
     });
@@ -115,7 +116,7 @@ void main() {
       await page.goto(server.prefix + '/serviceworkers/empty/sw.html');
 
       var target = await targetFuture;
-      var worker = await target.worker;
+      var worker = (await target.worker)!;
       expect(await worker.evaluate('() => self.toString()'),
           equals('[object ServiceWorkerGlobalScope]'));
     });
@@ -127,7 +128,7 @@ void main() {
     new SharedWorker('data:text/javascript,console.log("hi")');
     }''');
       var target = await targetFuture;
-      var worker = await target.worker;
+      var worker = (await target.worker)!;
       expect(await worker.evaluate('() => self.toString()'),
           equals('[object SharedWorkerGlobalScope]'));
     });
@@ -165,9 +166,8 @@ void main() {
     });
     test('should not crash while redirecting if original request was missed',
         () async {
-      Completer<shelf.Response> serverResponse;
+      var serverResponse = Completer<shelf.Response>();
       server.setRoute('one-style.css', (req) {
-        serverResponse = Completer<shelf.Response>();
         return serverResponse.future;
       });
 

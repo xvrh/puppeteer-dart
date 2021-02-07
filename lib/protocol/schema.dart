@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 /// This domain is deprecated.
@@ -27,7 +26,7 @@ class Domain {
   /// Domain version.
   final String version;
 
-  Domain({@required this.name, @required this.version});
+  Domain({required this.name, required this.version});
 
   factory Domain.fromJson(Map<String, dynamic> json) {
     return Domain(

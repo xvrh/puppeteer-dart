@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'page.dart' as page;
@@ -51,10 +50,10 @@ class OverlayApi {
   /// [showAccessibilityInfo] Whether to show accessibility info (default: true).
   /// Returns: Highlight data for the node.
   Future<Map<String, dynamic>> getHighlightObjectForTest(dom.NodeId nodeId,
-      {bool includeDistance,
-      bool includeStyle,
-      ColorFormat colorFormat,
-      bool showAccessibilityInfo}) async {
+      {bool? includeDistance,
+      bool? includeStyle,
+      ColorFormat? colorFormat,
+      bool? showAccessibilityInfo}) async {
     var result = await _client.send('Overlay.getHighlightObjectForTest', {
       'nodeId': nodeId,
       if (includeDistance != null) 'includeDistance': includeDistance,
@@ -99,7 +98,7 @@ class OverlayApi {
   /// [contentColor] The content box highlight fill color (default: transparent).
   /// [contentOutlineColor] The content box highlight outline color (default: transparent).
   Future<void> highlightFrame(page.FrameId frameId,
-      {dom.RGBA contentColor, dom.RGBA contentOutlineColor}) async {
+      {dom.RGBA? contentColor, dom.RGBA? contentOutlineColor}) async {
     await _client.send('Overlay.highlightFrame', {
       'frameId': frameId,
       if (contentColor != null) 'contentColor': contentColor,
@@ -116,10 +115,10 @@ class OverlayApi {
   /// [objectId] JavaScript object id of the node to be highlighted.
   /// [selector] Selectors to highlight relevant nodes.
   Future<void> highlightNode(HighlightConfig highlightConfig,
-      {dom.NodeId nodeId,
-      dom.BackendNodeId backendNodeId,
-      runtime.RemoteObjectId objectId,
-      String selector}) async {
+      {dom.NodeId? nodeId,
+      dom.BackendNodeId? backendNodeId,
+      runtime.RemoteObjectId? objectId,
+      String? selector}) async {
     await _client.send('Overlay.highlightNode', {
       'highlightConfig': highlightConfig,
       if (nodeId != null) 'nodeId': nodeId,
@@ -134,7 +133,7 @@ class OverlayApi {
   /// [color] The highlight fill color (default: transparent).
   /// [outlineColor] The highlight outline color (default: transparent).
   Future<void> highlightQuad(dom.Quad quad,
-      {dom.RGBA color, dom.RGBA outlineColor}) async {
+      {dom.RGBA? color, dom.RGBA? outlineColor}) async {
     await _client.send('Overlay.highlightQuad', {
       'quad': quad,
       if (color != null) 'color': color,
@@ -150,7 +149,7 @@ class OverlayApi {
   /// [color] The highlight fill color (default: transparent).
   /// [outlineColor] The highlight outline color (default: transparent).
   Future<void> highlightRect(int x, int y, int width, int height,
-      {dom.RGBA color, dom.RGBA outlineColor}) async {
+      {dom.RGBA? color, dom.RGBA? outlineColor}) async {
     await _client.send('Overlay.highlightRect', {
       'x': x,
       'y': y,
@@ -168,9 +167,9 @@ class OverlayApi {
   /// [backendNodeId] Identifier of the backend node to highlight.
   /// [objectId] JavaScript object id of the node to be highlighted.
   Future<void> highlightSourceOrder(SourceOrderConfig sourceOrderConfig,
-      {dom.NodeId nodeId,
-      dom.BackendNodeId backendNodeId,
-      runtime.RemoteObjectId objectId}) async {
+      {dom.NodeId? nodeId,
+      dom.BackendNodeId? backendNodeId,
+      runtime.RemoteObjectId? objectId}) async {
     await _client.send('Overlay.highlightSourceOrder', {
       'sourceOrderConfig': sourceOrderConfig,
       if (nodeId != null) 'nodeId': nodeId,
@@ -185,7 +184,7 @@ class OverlayApi {
   /// [highlightConfig] A descriptor for the highlight appearance of hovered-over nodes. May be omitted if `enabled
   /// == false`.
   Future<void> setInspectMode(InspectMode mode,
-      {HighlightConfig highlightConfig}) async {
+      {HighlightConfig? highlightConfig}) async {
     await _client.send('Overlay.setInspectMode', {
       'mode': mode,
       if (highlightConfig != null) 'highlightConfig': highlightConfig,
@@ -201,7 +200,7 @@ class OverlayApi {
   }
 
   /// [message] The message to display, also triggers resume and step over controls.
-  Future<void> setPausedInDebuggerMessage({String message}) async {
+  Future<void> setPausedInDebuggerMessage({String? message}) async {
     await _client.send('Overlay.setPausedInDebuggerMessage', {
       if (message != null) 'message': message,
     });
@@ -274,7 +273,7 @@ class OverlayApi {
 
   /// Add a dual screen device hinge
   /// [hingeConfig] hinge data, null means hideHinge
-  Future<void> setShowHinge({HingeConfig hingeConfig}) async {
+  Future<void> setShowHinge({HingeConfig? hingeConfig}) async {
     await _client.send('Overlay.setShowHinge', {
       if (hingeConfig != null) 'hingeConfig': hingeConfig,
     });
@@ -290,7 +289,7 @@ class SourceOrderConfig {
   final dom.RGBA childOutlineColor;
 
   SourceOrderConfig(
-      {@required this.parentOutlineColor, @required this.childOutlineColor});
+      {required this.parentOutlineColor, required this.childOutlineColor});
 
   factory SourceOrderConfig.fromJson(Map<String, dynamic> json) {
     return SourceOrderConfig(
@@ -312,58 +311,58 @@ class SourceOrderConfig {
 /// Configuration data for the highlighting of Grid elements.
 class GridHighlightConfig {
   /// Whether the extension lines from grid cells to the rulers should be shown (default: false).
-  final bool showGridExtensionLines;
+  final bool? showGridExtensionLines;
 
   /// Show Positive line number labels (default: false).
-  final bool showPositiveLineNumbers;
+  final bool? showPositiveLineNumbers;
 
   /// Show Negative line number labels (default: false).
-  final bool showNegativeLineNumbers;
+  final bool? showNegativeLineNumbers;
 
   /// Show area name labels (default: false).
-  final bool showAreaNames;
+  final bool? showAreaNames;
 
   /// Show line name labels (default: false).
-  final bool showLineNames;
+  final bool? showLineNames;
 
   /// Show track size labels (default: false).
-  final bool showTrackSizes;
+  final bool? showTrackSizes;
 
   /// The grid container border highlight color (default: transparent).
-  final dom.RGBA gridBorderColor;
+  final dom.RGBA? gridBorderColor;
 
   /// The row line color (default: transparent).
-  final dom.RGBA rowLineColor;
+  final dom.RGBA? rowLineColor;
 
   /// The column line color (default: transparent).
-  final dom.RGBA columnLineColor;
+  final dom.RGBA? columnLineColor;
 
   /// Whether the grid border is dashed (default: false).
-  final bool gridBorderDash;
+  final bool? gridBorderDash;
 
   /// Whether row lines are dashed (default: false).
-  final bool rowLineDash;
+  final bool? rowLineDash;
 
   /// Whether column lines are dashed (default: false).
-  final bool columnLineDash;
+  final bool? columnLineDash;
 
   /// The row gap highlight fill color (default: transparent).
-  final dom.RGBA rowGapColor;
+  final dom.RGBA? rowGapColor;
 
   /// The row gap hatching fill color (default: transparent).
-  final dom.RGBA rowHatchColor;
+  final dom.RGBA? rowHatchColor;
 
   /// The column gap highlight fill color (default: transparent).
-  final dom.RGBA columnGapColor;
+  final dom.RGBA? columnGapColor;
 
   /// The column gap hatching fill color (default: transparent).
-  final dom.RGBA columnHatchColor;
+  final dom.RGBA? columnHatchColor;
 
   /// The named grid areas border color (Default: transparent).
-  final dom.RGBA areaBorderColor;
+  final dom.RGBA? areaBorderColor;
 
   /// The grid container background color (Default: transparent).
-  final dom.RGBA gridBackgroundColor;
+  final dom.RGBA? gridBackgroundColor;
 
   GridHighlightConfig(
       {this.showGridExtensionLines,
@@ -455,20 +454,20 @@ class GridHighlightConfig {
       if (showAreaNames != null) 'showAreaNames': showAreaNames,
       if (showLineNames != null) 'showLineNames': showLineNames,
       if (showTrackSizes != null) 'showTrackSizes': showTrackSizes,
-      if (gridBorderColor != null) 'gridBorderColor': gridBorderColor.toJson(),
-      if (rowLineColor != null) 'rowLineColor': rowLineColor.toJson(),
-      if (columnLineColor != null) 'columnLineColor': columnLineColor.toJson(),
+      if (gridBorderColor != null) 'gridBorderColor': gridBorderColor!.toJson(),
+      if (rowLineColor != null) 'rowLineColor': rowLineColor!.toJson(),
+      if (columnLineColor != null) 'columnLineColor': columnLineColor!.toJson(),
       if (gridBorderDash != null) 'gridBorderDash': gridBorderDash,
       if (rowLineDash != null) 'rowLineDash': rowLineDash,
       if (columnLineDash != null) 'columnLineDash': columnLineDash,
-      if (rowGapColor != null) 'rowGapColor': rowGapColor.toJson(),
-      if (rowHatchColor != null) 'rowHatchColor': rowHatchColor.toJson(),
-      if (columnGapColor != null) 'columnGapColor': columnGapColor.toJson(),
+      if (rowGapColor != null) 'rowGapColor': rowGapColor!.toJson(),
+      if (rowHatchColor != null) 'rowHatchColor': rowHatchColor!.toJson(),
+      if (columnGapColor != null) 'columnGapColor': columnGapColor!.toJson(),
       if (columnHatchColor != null)
-        'columnHatchColor': columnHatchColor.toJson(),
-      if (areaBorderColor != null) 'areaBorderColor': areaBorderColor.toJson(),
+        'columnHatchColor': columnHatchColor!.toJson(),
+      if (areaBorderColor != null) 'areaBorderColor': areaBorderColor!.toJson(),
       if (gridBackgroundColor != null)
-        'gridBackgroundColor': gridBackgroundColor.toJson(),
+        'gridBackgroundColor': gridBackgroundColor!.toJson(),
     };
   }
 }
@@ -476,49 +475,49 @@ class GridHighlightConfig {
 /// Configuration data for the highlighting of page elements.
 class HighlightConfig {
   /// Whether the node info tooltip should be shown (default: false).
-  final bool showInfo;
+  final bool? showInfo;
 
   /// Whether the node styles in the tooltip (default: false).
-  final bool showStyles;
+  final bool? showStyles;
 
   /// Whether the rulers should be shown (default: false).
-  final bool showRulers;
+  final bool? showRulers;
 
   /// Whether the a11y info should be shown (default: true).
-  final bool showAccessibilityInfo;
+  final bool? showAccessibilityInfo;
 
   /// Whether the extension lines from node to the rulers should be shown (default: false).
-  final bool showExtensionLines;
+  final bool? showExtensionLines;
 
   /// The content box highlight fill color (default: transparent).
-  final dom.RGBA contentColor;
+  final dom.RGBA? contentColor;
 
   /// The padding highlight fill color (default: transparent).
-  final dom.RGBA paddingColor;
+  final dom.RGBA? paddingColor;
 
   /// The border highlight fill color (default: transparent).
-  final dom.RGBA borderColor;
+  final dom.RGBA? borderColor;
 
   /// The margin highlight fill color (default: transparent).
-  final dom.RGBA marginColor;
+  final dom.RGBA? marginColor;
 
   /// The event target element highlight fill color (default: transparent).
-  final dom.RGBA eventTargetColor;
+  final dom.RGBA? eventTargetColor;
 
   /// The shape outside fill color (default: transparent).
-  final dom.RGBA shapeColor;
+  final dom.RGBA? shapeColor;
 
   /// The shape margin fill color (default: transparent).
-  final dom.RGBA shapeMarginColor;
+  final dom.RGBA? shapeMarginColor;
 
   /// The grid layout color (default: transparent).
-  final dom.RGBA cssGridColor;
+  final dom.RGBA? cssGridColor;
 
   /// The color format used to format color styles (default: hex).
-  final ColorFormat colorFormat;
+  final ColorFormat? colorFormat;
 
   /// The grid layout highlight configuration (default: all transparent).
-  final GridHighlightConfig gridHighlightConfig;
+  final GridHighlightConfig? gridHighlightConfig;
 
   HighlightConfig(
       {this.showInfo,
@@ -592,19 +591,19 @@ class HighlightConfig {
       if (showAccessibilityInfo != null)
         'showAccessibilityInfo': showAccessibilityInfo,
       if (showExtensionLines != null) 'showExtensionLines': showExtensionLines,
-      if (contentColor != null) 'contentColor': contentColor.toJson(),
-      if (paddingColor != null) 'paddingColor': paddingColor.toJson(),
-      if (borderColor != null) 'borderColor': borderColor.toJson(),
-      if (marginColor != null) 'marginColor': marginColor.toJson(),
+      if (contentColor != null) 'contentColor': contentColor!.toJson(),
+      if (paddingColor != null) 'paddingColor': paddingColor!.toJson(),
+      if (borderColor != null) 'borderColor': borderColor!.toJson(),
+      if (marginColor != null) 'marginColor': marginColor!.toJson(),
       if (eventTargetColor != null)
-        'eventTargetColor': eventTargetColor.toJson(),
-      if (shapeColor != null) 'shapeColor': shapeColor.toJson(),
+        'eventTargetColor': eventTargetColor!.toJson(),
+      if (shapeColor != null) 'shapeColor': shapeColor!.toJson(),
       if (shapeMarginColor != null)
-        'shapeMarginColor': shapeMarginColor.toJson(),
-      if (cssGridColor != null) 'cssGridColor': cssGridColor.toJson(),
-      if (colorFormat != null) 'colorFormat': colorFormat.toJson(),
+        'shapeMarginColor': shapeMarginColor!.toJson(),
+      if (cssGridColor != null) 'cssGridColor': cssGridColor!.toJson(),
+      if (colorFormat != null) 'colorFormat': colorFormat!.toJson(),
       if (gridHighlightConfig != null)
-        'gridHighlightConfig': gridHighlightConfig.toJson(),
+        'gridHighlightConfig': gridHighlightConfig!.toJson(),
     };
   }
 }
@@ -623,7 +622,7 @@ class ColorFormat {
 
   const ColorFormat._(this.value);
 
-  factory ColorFormat.fromJson(String value) => values[value];
+  factory ColorFormat.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -647,7 +646,7 @@ class GridNodeHighlightConfig {
   final dom.NodeId nodeId;
 
   GridNodeHighlightConfig(
-      {@required this.gridHighlightConfig, @required this.nodeId});
+      {required this.gridHighlightConfig, required this.nodeId});
 
   factory GridNodeHighlightConfig.fromJson(Map<String, dynamic> json) {
     return GridNodeHighlightConfig(
@@ -671,12 +670,12 @@ class HingeConfig {
   final dom.Rect rect;
 
   /// The content box highlight fill color (default: a dark color).
-  final dom.RGBA contentColor;
+  final dom.RGBA? contentColor;
 
   /// The content box highlight outline color (default: transparent).
-  final dom.RGBA outlineColor;
+  final dom.RGBA? outlineColor;
 
-  HingeConfig({@required this.rect, this.contentColor, this.outlineColor});
+  HingeConfig({required this.rect, this.contentColor, this.outlineColor});
 
   factory HingeConfig.fromJson(Map<String, dynamic> json) {
     return HingeConfig(
@@ -693,8 +692,8 @@ class HingeConfig {
   Map<String, dynamic> toJson() {
     return {
       'rect': rect.toJson(),
-      if (contentColor != null) 'contentColor': contentColor.toJson(),
-      if (outlineColor != null) 'outlineColor': outlineColor.toJson(),
+      if (contentColor != null) 'contentColor': contentColor!.toJson(),
+      if (outlineColor != null) 'outlineColor': outlineColor!.toJson(),
     };
   }
 }
@@ -717,7 +716,7 @@ class InspectMode {
 
   const InspectMode._(this.value);
 
-  factory InspectMode.fromJson(String value) => values[value];
+  factory InspectMode.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 

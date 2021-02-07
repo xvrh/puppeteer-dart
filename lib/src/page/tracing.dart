@@ -22,7 +22,7 @@ class Tracing {
   /// Parameters:
   //  - `screenshots`: captures screenshots in the trace.
   //  - `categories`: specify custom categories to use instead of default.
-  Future<void> start({bool screenshots, List<String> categories}) async {
+  Future<void> start({bool? screenshots, List<String>? categories}) async {
     if (_recording) {
       throw Exception(
           'Cannot start recording trace while already recording trace.');
@@ -61,7 +61,7 @@ class Tracing {
   /// Promise which resolves to buffer with trace data.
   Future<void> stop(StringSink output) async {
     var contentFuture = _devTools.tracing.onTracingComplete.first
-        .then((e) => _readStream(e.stream, output));
+        .then((e) => _readStream(e.stream!, output));
     await _devTools.tracing.end();
 
     _recording = false;

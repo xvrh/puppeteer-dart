@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:collection/collection.dart';
-import 'package:meta/meta.dart';
 import '../../protocol/input.dart';
 
 /// Keyboard provides an api for managing a virtual keyboard. The high level api
@@ -34,7 +33,7 @@ import '../../protocol/input.dart';
 /// > **NOTE** On MacOS, keyboard shortcuts like `⌘ A` -> Select All do not work. See [#1313](https://github.com/GoogleChrome/puppeteer/issues/1313)
 class Keyboard {
   final InputApi _inputApi;
-  final Set<String> _pressedKeys = {};
+  final Set<String?> _pressedKeys = {};
   int _modifiers = 0;
 
   Keyboard(this._inputApi);
@@ -56,7 +55,7 @@ class Keyboard {
   ///
   /// Parameters:
   /// [text]: If specified, generates an input event with this text.
-  Future<void> down(Key key, {String text}) async {
+  Future<void> down(Key key, {String? text}) async {
     var description = _keyDescription(key);
 
     var autoRepeat = _pressedKeys.contains(description.code);
@@ -73,7 +72,7 @@ class Keyboard {
         text: text,
         unmodifiedText: text,
         autoRepeat: autoRepeat,
-        location: description.location.index,
+        location: description.location!.index,
         isKeypad: description.location == KeyLocation.numpad);
   }
 
@@ -88,7 +87,7 @@ class Keyboard {
         key: description.key,
         windowsVirtualKeyCode: description.keyCode,
         code: description.code,
-        location: description.location.index);
+        location: description.location!.index);
   }
 
   /// Dispatches a keypress and input event. This does not send a keydown or
@@ -117,7 +116,7 @@ class Keyboard {
   /// // Types slower, like a user
   /// await page.keyboard.type('World', delay: Duration(milliseconds: 10));
   /// ```
-  Future<void> type(String text, {Duration delay}) async {
+  Future<void> type(String text, {Duration? delay}) async {
     for (var rune in text.runes) {
       var char = String.fromCharCode(rune);
 
@@ -141,7 +140,7 @@ class Keyboard {
   ///
   /// [text]: If specified, generates an input event with this text.
   /// [delay]: Time to wait between `keydown` and `keyup`. Defaults to 0.
-  Future<void> press(Key key, {Duration delay, String text}) async {
+  Future<void> press(Key key, {Duration? delay, String? text}) async {
     await down(key, text: text);
     if (delay != null) {
       await Future.delayed(delay);
@@ -149,7 +148,7 @@ class Keyboard {
     await up(key);
   }
 
-  int _modifierBit(String key) {
+  int _modifierBit(String? key) {
     if (key == Key.alt.key) return 1;
     if (key == Key.control.key) return 2;
     if (key == Key.meta.key) return 4;
@@ -177,11 +176,11 @@ class Keyboard {
 }
 
 class _KeyDescription {
-  String key;
-  int keyCode;
-  String code;
-  String text;
-  KeyLocation location;
+  String? key;
+  int? keyCode;
+  String? code;
+  String? text;
+  KeyLocation? location;
 }
 
 class Key {
@@ -518,9 +517,9 @@ class Key {
   static const Key keyZ =
       Key._(keyCode: 90, code: 'KeyZ', shiftKey: 'Z', key: 'z');
 
-  final int keyCode, shiftKeyCode;
-  final KeyLocation location;
-  final String key, shiftKey, code, text, shiftText;
+  final int? keyCode, shiftKeyCode;
+  final KeyLocation? location;
+  final String? key, shiftKey, code, text, shiftText;
 
   static final Map<String, Key> allKeys =
       CanonicalizedMap<String, String, Key>.from({
@@ -674,12 +673,11 @@ class Key {
     'KeyX': keyX,
     'KeyY': keyY,
     'KeyZ': keyZ,
-  }, (key) => key.toLowerCase().replaceAll(' ', ''),
-          isValidKey: (key) => key != null);
+  }, (key) => key.toLowerCase().replaceAll(' ', ''));
 
   const Key._(
       {this.keyCode,
-      @required this.key,
+      required this.key,
       this.shiftKey,
       this.shiftKeyCode,
       this.code,

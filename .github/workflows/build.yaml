@@ -10,15 +10,15 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        dart: ['stable']
+        sdk: ['beta']
     runs-on: ${{ matrix.os }}
 #    env:
 #      #In travis/docker we need the --no-sandbox flag in chrome
 #      CHROME_FORCE_NO_SANDBOX: true
     steps:
-      - uses: cedx/setup-dart@v2
+      - uses: dart-lang/setup-dart@v0.3
         with:
-          release-channel: ${{matrix.sdk}}
+          sdk: ${{ matrix.sdk }}
       - uses: actions/checkout@v2
       - run: dart --version
       - run: pub get

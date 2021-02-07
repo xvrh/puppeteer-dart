@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 import 'io.dart' as io;
 import 'network.dart' as network;
@@ -40,7 +39,7 @@ class FetchApi {
   /// [handleAuthRequests] If true, authRequired events will be issued and requests will be paused
   /// expecting a call to continueWithAuth.
   Future<void> enable(
-      {List<RequestPattern> patterns, bool handleAuthRequests}) async {
+      {List<RequestPattern>? patterns, bool? handleAuthRequests}) async {
     await _client.send('Fetch.enable', {
       if (patterns != null) 'patterns': [...patterns],
       if (handleAuthRequests != null) 'handleAuthRequests': handleAuthRequests,
@@ -70,10 +69,10 @@ class FetchApi {
   /// [responsePhrase] A textual representation of responseCode.
   /// If absent, a standard phrase matching responseCode is used.
   Future<void> fulfillRequest(RequestId requestId, int responseCode,
-      {List<HeaderEntry> responseHeaders,
-      String binaryResponseHeaders,
-      String body,
-      String responsePhrase}) async {
+      {List<HeaderEntry>? responseHeaders,
+      String? binaryResponseHeaders,
+      String? body,
+      String? responsePhrase}) async {
     await _client.send('Fetch.fulfillRequest', {
       'requestId': requestId,
       'responseCode': responseCode,
@@ -92,10 +91,10 @@ class FetchApi {
   /// [postData] If set, overrides the post data in the request.
   /// [headers] If set, overrides the request headers.
   Future<void> continueRequest(RequestId requestId,
-      {String url,
-      String method,
-      String postData,
-      List<HeaderEntry> headers}) async {
+      {String? url,
+      String? method,
+      String? postData,
+      List<HeaderEntry>? headers}) async {
     await _client.send('Fetch.continueRequest', {
       'requestId': requestId,
       if (url != null) 'url': url,
@@ -162,23 +161,23 @@ class RequestPausedEvent {
   final network.ResourceType resourceType;
 
   /// Response error if intercepted at response stage.
-  final network.ErrorReason responseErrorReason;
+  final network.ErrorReason? responseErrorReason;
 
   /// Response code if intercepted at response stage.
-  final int responseStatusCode;
+  final int? responseStatusCode;
 
   /// Response headers if intercepted at the response stage.
-  final List<HeaderEntry> responseHeaders;
+  final List<HeaderEntry>? responseHeaders;
 
   /// If the intercepted request had a corresponding Network.requestWillBeSent event fired for it,
   /// then this networkId will be the same as the requestId present in the requestWillBeSent event.
-  final RequestId networkId;
+  final RequestId? networkId;
 
   RequestPausedEvent(
-      {@required this.requestId,
-      @required this.request,
-      @required this.frameId,
-      @required this.resourceType,
+      {required this.requestId,
+      required this.request,
+      required this.frameId,
+      required this.resourceType,
       this.responseErrorReason,
       this.responseStatusCode,
       this.responseHeaders,
@@ -229,11 +228,11 @@ class AuthRequiredEvent {
   final AuthChallenge authChallenge;
 
   AuthRequiredEvent(
-      {@required this.requestId,
-      @required this.request,
-      @required this.frameId,
-      @required this.resourceType,
-      @required this.authChallenge});
+      {required this.requestId,
+      required this.request,
+      required this.frameId,
+      required this.resourceType,
+      required this.authChallenge});
 
   factory AuthRequiredEvent.fromJson(Map<String, dynamic> json) {
     return AuthRequiredEvent(
@@ -256,7 +255,7 @@ class GetResponseBodyResult {
   /// True, if content was sent as base64.
   final bool base64Encoded;
 
-  GetResponseBodyResult({@required this.body, @required this.base64Encoded});
+  GetResponseBodyResult({required this.body, required this.base64Encoded});
 
   factory GetResponseBodyResult.fromJson(Map<String, dynamic> json) {
     return GetResponseBodyResult(
@@ -302,7 +301,7 @@ class RequestStage {
 
   const RequestStage._(this.value);
 
-  factory RequestStage.fromJson(String value) => values[value];
+  factory RequestStage.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -320,13 +319,13 @@ class RequestStage {
 class RequestPattern {
   /// Wildcards ('*' -> zero or more, '?' -> exactly one) are allowed. Escape character is
   /// backslash. Omitting is equivalent to "*".
-  final String urlPattern;
+  final String? urlPattern;
 
   /// If set, only requests for matching resource types will be intercepted.
-  final network.ResourceType resourceType;
+  final network.ResourceType? resourceType;
 
   /// Stage at wich to begin intercepting requests. Default is Request.
-  final RequestStage requestStage;
+  final RequestStage? requestStage;
 
   RequestPattern({this.urlPattern, this.resourceType, this.requestStage});
 
@@ -346,8 +345,8 @@ class RequestPattern {
   Map<String, dynamic> toJson() {
     return {
       if (urlPattern != null) 'urlPattern': urlPattern,
-      if (resourceType != null) 'resourceType': resourceType.toJson(),
-      if (requestStage != null) 'requestStage': requestStage.toJson(),
+      if (resourceType != null) 'resourceType': resourceType!.toJson(),
+      if (requestStage != null) 'requestStage': requestStage!.toJson(),
     };
   }
 }
@@ -358,7 +357,7 @@ class HeaderEntry {
 
   final String value;
 
-  HeaderEntry({@required this.name, @required this.value});
+  HeaderEntry({required this.name, required this.value});
 
   factory HeaderEntry.fromJson(Map<String, dynamic> json) {
     return HeaderEntry(
@@ -378,7 +377,7 @@ class HeaderEntry {
 /// Authorization challenge for HTTP status code 401 or 407.
 class AuthChallenge {
   /// Source of the authentication challenge.
-  final AuthChallengeSource source;
+  final AuthChallengeSource? source;
 
   /// Origin of the challenger.
   final String origin;
@@ -391,9 +390,9 @@ class AuthChallenge {
 
   AuthChallenge(
       {this.source,
-      @required this.origin,
-      @required this.scheme,
-      @required this.realm});
+      required this.origin,
+      required this.scheme,
+      required this.realm});
 
   factory AuthChallenge.fromJson(Map<String, dynamic> json) {
     return AuthChallenge(
@@ -428,7 +427,7 @@ class AuthChallengeSource {
 
   const AuthChallengeSource._(this.value);
 
-  factory AuthChallengeSource.fromJson(String value) => values[value];
+  factory AuthChallengeSource.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -452,14 +451,13 @@ class AuthChallengeResponse {
 
   /// The username to provide, possibly empty. Should only be set if response is
   /// ProvideCredentials.
-  final String username;
+  final String? username;
 
   /// The password to provide, possibly empty. Should only be set if response is
   /// ProvideCredentials.
-  final String password;
+  final String? password;
 
-  AuthChallengeResponse(
-      {@required this.response, this.username, this.password});
+  AuthChallengeResponse({required this.response, this.username, this.password});
 
   factory AuthChallengeResponse.fromJson(Map<String, dynamic> json) {
     return AuthChallengeResponse(
@@ -496,7 +494,8 @@ class AuthChallengeResponseResponse {
 
   const AuthChallengeResponseResponse._(this.value);
 
-  factory AuthChallengeResponseResponse.fromJson(String value) => values[value];
+  factory AuthChallengeResponseResponse.fromJson(String value) =>
+      values[value]!;
 
   String toJson() => value;
 

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart' show required;
 import '../src/connection.dart';
 
 class CacheStorageApi {
@@ -58,7 +57,7 @@ class CacheStorageApi {
   /// [pageSize] Number of records to fetch.
   /// [pathFilter] If present, only return the entries containing this substring in the path
   Future<RequestEntriesResult> requestEntries(CacheId cacheId,
-      {int skipCount, int pageSize, String pathFilter}) async {
+      {int? skipCount, int? pageSize, String? pathFilter}) async {
     var result = await _client.send('CacheStorage.requestEntries', {
       'cacheId': cacheId,
       if (skipCount != null) 'skipCount': skipCount,
@@ -78,7 +77,7 @@ class RequestEntriesResult {
   final num returnCount;
 
   RequestEntriesResult(
-      {@required this.cacheDataEntries, @required this.returnCount});
+      {required this.cacheDataEntries, required this.returnCount});
 
   factory RequestEntriesResult.fromJson(Map<String, dynamic> json) {
     return RequestEntriesResult(
@@ -132,7 +131,7 @@ class CachedResponseType {
 
   const CachedResponseType._(this.value);
 
-  factory CachedResponseType.fromJson(String value) => values[value];
+  factory CachedResponseType.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
@@ -174,14 +173,14 @@ class DataEntry {
   final List<Header> responseHeaders;
 
   DataEntry(
-      {@required this.requestURL,
-      @required this.requestMethod,
-      @required this.requestHeaders,
-      @required this.responseTime,
-      @required this.responseStatus,
-      @required this.responseStatusText,
-      @required this.responseType,
-      @required this.responseHeaders});
+      {required this.requestURL,
+      required this.requestMethod,
+      required this.requestHeaders,
+      required this.responseTime,
+      required this.responseStatus,
+      required this.responseStatusText,
+      required this.responseType,
+      required this.responseHeaders});
 
   factory DataEntry.fromJson(Map<String, dynamic> json) {
     return DataEntry(
@@ -226,9 +225,9 @@ class Cache {
   final String cacheName;
 
   Cache(
-      {@required this.cacheId,
-      @required this.securityOrigin,
-      @required this.cacheName});
+      {required this.cacheId,
+      required this.securityOrigin,
+      required this.cacheName});
 
   factory Cache.fromJson(Map<String, dynamic> json) {
     return Cache(
@@ -252,7 +251,7 @@ class Header {
 
   final String value;
 
-  Header({@required this.name, @required this.value});
+  Header({required this.name, required this.value});
 
   factory Header.fromJson(Map<String, dynamic> json) {
     return Header(
@@ -274,7 +273,7 @@ class CachedResponse {
   /// Entry content, base64-encoded.
   final String body;
 
-  CachedResponse({@required this.body});
+  CachedResponse({required this.body});
 
   factory CachedResponse.fromJson(Map<String, dynamic> json) {
     return CachedResponse(
