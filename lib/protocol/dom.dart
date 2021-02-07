@@ -1035,6 +1035,9 @@ class PseudoType {
   static const marker = PseudoType._('marker');
   static const backdrop = PseudoType._('backdrop');
   static const selection = PseudoType._('selection');
+  static const targetText = PseudoType._('target-text');
+  static const spellingError = PseudoType._('spelling-error');
+  static const grammarError = PseudoType._('grammar-error');
   static const firstLineInherited = PseudoType._('first-line-inherited');
   static const scrollbar = PseudoType._('scrollbar');
   static const scrollbarThumb = PseudoType._('scrollbar-thumb');
@@ -1052,6 +1055,9 @@ class PseudoType {
     'marker': marker,
     'backdrop': backdrop,
     'selection': selection,
+    'target-text': targetText,
+    'spelling-error': spellingError,
+    'grammar-error': grammarError,
     'first-line-inherited': firstLineInherited,
     'scrollbar': scrollbar,
     'scrollbar-thumb': scrollbarThumb,

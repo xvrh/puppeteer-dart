@@ -244,8 +244,8 @@ class FrameManager {
     _frameNavigatedController.add(frame);
   }
 
-  void _onFrameDetached(FrameId frameId) {
-    var frame = _frames[frameId];
+  void _onFrameDetached(FrameDetachedEvent event) {
+    var frame = _frames[event.frameId];
     if (frame != null) {
       _removeFramesRecursively(frame);
     }

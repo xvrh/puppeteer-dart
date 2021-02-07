@@ -130,6 +130,15 @@ class StorageApi {
       'origin': origin,
     });
   }
+
+  /// Returns the number of stored Trust Tokens per issuer for the
+  /// current browsing context.
+  Future<List<TrustTokens>> getTrustTokens() async {
+    var result = await _client.send('Storage.getTrustTokens');
+    return (result['tokens'] as List)
+        .map((e) => TrustTokens.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
 }
 
 class CacheStorageContentUpdatedEvent {
@@ -272,6 +281,30 @@ class UsageForType {
     return {
       'storageType': storageType.toJson(),
       'usage': usage,
+    };
+  }
+}
+
+/// Pair of issuer origin and number of available (signed, but not used) Trust
+/// Tokens from that issuer.
+class TrustTokens {
+  final String issuerOrigin;
+
+  final num count;
+
+  TrustTokens({required this.issuerOrigin, required this.count});
+
+  factory TrustTokens.fromJson(Map<String, dynamic> json) {
+    return TrustTokens(
+      issuerOrigin: json['issuerOrigin'] as String,
+      count: json['count'] as num,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'issuerOrigin': issuerOrigin,
+      'count': count,
     };
   }
 }

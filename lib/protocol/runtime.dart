@@ -154,6 +154,9 @@ class RuntimeApi {
   /// execution. Overrides `setPauseOnException` state.
   /// [contextId] Specifies in which execution context to perform evaluation. If the parameter is omitted the
   /// evaluation will be performed in the context of the inspected page.
+  /// This is mutually exclusive with `uniqueContextId`, which offers an
+  /// alternative way to identify the execution context that is more reliable
+  /// in a multi-process environment.
   /// [returnByValue] Whether the result is expected to be a JSON object that should be sent by value.
   /// [generatePreview] Whether preview should be generated for the result.
   /// [userGesture] Whether execution should be treated as initiated by user in the UI.
@@ -170,6 +173,12 @@ class RuntimeApi {
   /// which includes eval(), Function(), setTimeout() and setInterval()
   /// when called with non-callable arguments. This flag bypasses CSP for this
   /// evaluation and allows unsafe-eval. Defaults to true.
+  /// [uniqueContextId] An alternative way to specify the execution context to evaluate in.
+  /// Compared to contextId that may be reused accross processes, this is guaranteed to be
+  /// system-unique, so it can be used to prevent accidental evaluation of the expression
+  /// in context different than intended (e.g. as a result of navigation accross process
+  /// boundaries).
+  /// This is mutually exclusive with `contextId`.
   Future<EvaluateResult> evaluate(String expression,
       {String? objectGroup,
       bool? includeCommandLineAPI,
@@ -183,7 +192,8 @@ class RuntimeApi {
       TimeDelta? timeout,
       bool? disableBreaks,
       bool? replMode,
-      bool? allowUnsafeEvalBlockedByCSP}) async {
+      bool? allowUnsafeEvalBlockedByCSP,
+      String? uniqueContextId}) async {
     var result = await _client.send('Runtime.evaluate', {
       'expression': expression,
       if (objectGroup != null) 'objectGroup': objectGroup,
@@ -201,6 +211,7 @@ class RuntimeApi {
       if (replMode != null) 'replMode': replMode,
       if (allowUnsafeEvalBlockedByCSP != null)
         'allowUnsafeEvalBlockedByCSP': allowUnsafeEvalBlockedByCSP,
+      if (uniqueContextId != null) 'uniqueContextId': uniqueContextId,
     });
     return EvaluateResult.fromJson(result);
   }
@@ -734,7 +745,9 @@ class RemoteObject {
   /// Object type.
   final RemoteObjectType type;
 
-  /// Object subtype hint. Specified for `object` or `wasm` type values only.
+  /// Object subtype hint. Specified for `object` type values only.
+  /// NOTE: If you change anything here, make sure to also update
+  /// `subtype` in `ObjectPreview` and `PropertyPreview` below.
   final RemoteObjectSubtype? subtype;
 
   /// Object class (constructor) name. Specified for `object` type values only.
@@ -822,7 +835,6 @@ class RemoteObjectType {
   static const boolean = RemoteObjectType._('boolean');
   static const symbol = RemoteObjectType._('symbol');
   static const bigint = RemoteObjectType._('bigint');
-  static const wasm = RemoteObjectType._('wasm');
   static const values = {
     'object': object,
     'function': function,
@@ -832,7 +844,6 @@ class RemoteObjectType {
     'boolean': boolean,
     'symbol': symbol,
     'bigint': bigint,
-    'wasm': wasm,
   };
 
   final String value;
@@ -872,12 +883,7 @@ class RemoteObjectSubtype {
   static const typedarray = RemoteObjectSubtype._('typedarray');
   static const arraybuffer = RemoteObjectSubtype._('arraybuffer');
   static const dataview = RemoteObjectSubtype._('dataview');
-  static const i32 = RemoteObjectSubtype._('i32');
-  static const i64 = RemoteObjectSubtype._('i64');
-  static const f32 = RemoteObjectSubtype._('f32');
-  static const f64 = RemoteObjectSubtype._('f64');
-  static const v128 = RemoteObjectSubtype._('v128');
-  static const externref = RemoteObjectSubtype._('externref');
+  static const webassemblymemory = RemoteObjectSubtype._('webassemblymemory');
   static const values = {
     'array': array,
     'null': null$,
@@ -896,12 +902,7 @@ class RemoteObjectSubtype {
     'typedarray': typedarray,
     'arraybuffer': arraybuffer,
     'dataview': dataview,
-    'i32': i32,
-    'i64': i64,
-    'f32': f32,
-    'f64': f64,
-    'v128': v128,
-    'externref': externref,
+    'webassemblymemory': webassemblymemory,
   };
 
   final String value;
@@ -1065,7 +1066,12 @@ class ObjectPreviewSubtype {
   static const iterator = ObjectPreviewSubtype._('iterator');
   static const generator = ObjectPreviewSubtype._('generator');
   static const error = ObjectPreviewSubtype._('error');
+  static const proxy = ObjectPreviewSubtype._('proxy');
   static const promise = ObjectPreviewSubtype._('promise');
+  static const typedarray = ObjectPreviewSubtype._('typedarray');
+  static const arraybuffer = ObjectPreviewSubtype._('arraybuffer');
+  static const dataview = ObjectPreviewSubtype._('dataview');
+  static const webassemblymemory = ObjectPreviewSubtype._('webassemblymemory');
   static const values = {
     'array': array,
     'null': null$,
@@ -1079,7 +1085,12 @@ class ObjectPreviewSubtype {
     'iterator': iterator,
     'generator': generator,
     'error': error,
+    'proxy': proxy,
     'promise': promise,
+    'typedarray': typedarray,
+    'arraybuffer': arraybuffer,
+    'dataview': dataview,
+    'webassemblymemory': webassemblymemory,
   };
 
   final String value;
@@ -1203,6 +1214,13 @@ class PropertyPreviewSubtype {
   static const iterator = PropertyPreviewSubtype._('iterator');
   static const generator = PropertyPreviewSubtype._('generator');
   static const error = PropertyPreviewSubtype._('error');
+  static const proxy = PropertyPreviewSubtype._('proxy');
+  static const promise = PropertyPreviewSubtype._('promise');
+  static const typedarray = PropertyPreviewSubtype._('typedarray');
+  static const arraybuffer = PropertyPreviewSubtype._('arraybuffer');
+  static const dataview = PropertyPreviewSubtype._('dataview');
+  static const webassemblymemory =
+      PropertyPreviewSubtype._('webassemblymemory');
   static const values = {
     'array': array,
     'null': null$,
@@ -1216,6 +1234,12 @@ class PropertyPreviewSubtype {
     'iterator': iterator,
     'generator': generator,
     'error': error,
+    'proxy': proxy,
+    'promise': promise,
+    'typedarray': typedarray,
+    'arraybuffer': arraybuffer,
+    'dataview': dataview,
+    'webassemblymemory': webassemblymemory,
   };
 
   final String value;
@@ -1492,6 +1516,11 @@ class ExecutionContextDescription {
   /// Human readable name describing given context.
   final String name;
 
+  /// A system-unique execution context identifier. Unlike the id, this is unique accross
+  /// multiple processes, so can be reliably used to identify specific context while backend
+  /// performs a cross-process navigation.
+  final String uniqueId;
+
   /// Embedder-specific auxiliary data.
   final Map<String, dynamic>? auxData;
 
@@ -1499,6 +1528,7 @@ class ExecutionContextDescription {
       {required this.id,
       required this.origin,
       required this.name,
+      required this.uniqueId,
       this.auxData});
 
   factory ExecutionContextDescription.fromJson(Map<String, dynamic> json) {
@@ -1506,6 +1536,7 @@ class ExecutionContextDescription {
       id: ExecutionContextId.fromJson(json['id'] as int),
       origin: json['origin'] as String,
       name: json['name'] as String,
+      uniqueId: json['uniqueId'] as String,
       auxData: json.containsKey('auxData')
           ? json['auxData'] as Map<String, dynamic>
           : null,
@@ -1517,6 +1548,7 @@ class ExecutionContextDescription {
       'id': id.toJson(),
       'origin': origin,
       'name': name,
+      'uniqueId': uniqueId,
       if (auxData != null) 'auxData': auxData,
     };
   }

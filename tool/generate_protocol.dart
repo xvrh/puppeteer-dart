@@ -36,8 +36,6 @@ void main() {
   var domains =
       protocolFiles.map(_readProtocol).expand((f) => f.domains).toList();
 
-  _fixProtocol(domains);
-
   for (var domain in domains) {
     var types = domain.types;
     var commandsJson = domain.commands;
@@ -742,13 +740,4 @@ String _castForParameter(_DomainContext context, Parameter parameter) {
       return context.getPropertyType(parameter);
     }
   }
-}
-
-void _fixProtocol(List<Domain> domains) {
-  // Fix some bugs in the protocol definition
-
-  var runtime = domains.firstWhere((e) => e.name == 'Runtime');
-  var objectPreview = runtime.types.firstWhere((e) => e.id == 'ObjectPreview');
-  var subtype = objectPreview.properties.firstWhere((e) => e.name == 'subtype');
-  subtype.enumValues!.add('promise');
 }

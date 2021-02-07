@@ -1292,6 +1292,11 @@
                     "type": "object",
                     "properties": [
                         {
+                            "name": "scriptId",
+                            "optional": true,
+                            "$ref": "Runtime.ScriptId"
+                        },
+                        {
                             "name": "url",
                             "type": "string"
                         },
@@ -1346,7 +1351,15 @@
                     ]
                 },
                 {
-                    "id": "SharedArrayBufferTransferIssueDetails",
+                    "id": "SharedArrayBufferIssueType",
+                    "type": "string",
+                    "enum": [
+                        "TransferIssue",
+                        "CreationIssue"
+                    ]
+                },
+                {
+                    "id": "SharedArrayBufferIssueDetails",
                     "description": "Details for a request that has been blocked with the BLOCKED_BY_RESPONSE\ncode. Currently only used for COEP/COOP, but may be extended to include\nsome CSP errors in the future.",
                     "type": "object",
                     "properties": [
@@ -1357,6 +1370,10 @@
                         {
                             "name": "isWarning",
                             "type": "boolean"
+                        },
+                        {
+                            "name": "type",
+                            "$ref": "SharedArrayBufferIssueType"
                         }
                     ]
                 },
@@ -1402,6 +1419,40 @@
                     ]
                 },
                 {
+                    "id": "LowTextContrastIssueDetails",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "violatingNodeId",
+                            "$ref": "DOM.BackendNodeId"
+                        },
+                        {
+                            "name": "violatingNodeSelector",
+                            "type": "string"
+                        },
+                        {
+                            "name": "contrastRatio",
+                            "type": "number"
+                        },
+                        {
+                            "name": "thresholdAA",
+                            "type": "number"
+                        },
+                        {
+                            "name": "thresholdAAA",
+                            "type": "number"
+                        },
+                        {
+                            "name": "fontSize",
+                            "type": "string"
+                        },
+                        {
+                            "name": "fontWeight",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
                     "id": "InspectorIssueCode",
                     "description": "A unique identifier for the type of issue. Each type may use one of the\noptional fields in InspectorIssueDetails to convey more specific\ninformation about the kind of issue.",
                     "type": "string",
@@ -1411,8 +1462,9 @@
                         "BlockedByResponseIssue",
                         "HeavyAdIssue",
                         "ContentSecurityPolicyIssue",
-                        "SharedArrayBufferTransferIssue",
-                        "TrustedWebActivityIssue"
+                        "SharedArrayBufferIssue",
+                        "TrustedWebActivityIssue",
+                        "LowTextContrastIssue"
                     ]
                 },
                 {
@@ -1446,14 +1498,19 @@
                             "$ref": "ContentSecurityPolicyIssueDetails"
                         },
                         {
-                            "name": "sharedArrayBufferTransferIssueDetails",
+                            "name": "sharedArrayBufferIssueDetails",
                             "optional": true,
-                            "$ref": "SharedArrayBufferTransferIssueDetails"
+                            "$ref": "SharedArrayBufferIssueDetails"
                         },
                         {
                             "name": "twaQualityEnforcementDetails",
                             "optional": true,
                             "$ref": "TrustedWebActivityIssueDetails"
+                        },
+                        {
+                            "name": "lowTextContrastIssueDetails",
+                            "optional": true,
+                            "$ref": "LowTextContrastIssueDetails"
                         }
                     ]
                 },
@@ -1532,6 +1589,10 @@
                 {
                     "name": "enable",
                     "description": "Enables issues domain, sends the issues collected so far to the client by means of the\n`issueAdded` event."
+                },
+                {
+                    "name": "checkContrast",
+                    "description": "Runs the contrast check for the target page. Found issues are reported\nusing Audits.issueAdded event."
                 }
             ],
             "events": [
@@ -6938,12 +6999,13 @@
                 },
                 {
                     "id": "UserAgentMetadata",
-                    "description": "Used to specify User Agent Cient Hints to emulate. See https://wicg.github.io/ua-client-hints",
+                    "description": "Used to specify User Agent Cient Hints to emulate. See https://wicg.github.io/ua-client-hints\nMissing optional values will be filled in by the target with what it would normally use.",
                     "experimental": true,
                     "type": "object",
                     "properties": [
                         {
                             "name": "brands",
+                            "optional": true,
                             "type": "array",
                             "items": {
                                 "$ref": "UserAgentBrandVersion"
@@ -6951,6 +7013,7 @@
                         },
                         {
                             "name": "fullVersion",
+                            "optional": true,
                             "type": "string"
                         },
                         {
@@ -10437,7 +10500,9 @@
                         "UnknownError",
                         "SchemefulSameSiteStrict",
                         "SchemefulSameSiteLax",
-                        "SchemefulSameSiteUnspecifiedTreatedAsLax"
+                        "SchemefulSameSiteUnspecifiedTreatedAsLax",
+                        "SamePartyFromCrossPartyContext",
+                        "SamePartyConflictsWithOtherAttributes"
                     ]
                 },
                 {
@@ -10457,7 +10522,8 @@
                         "UnknownError",
                         "SchemefulSameSiteStrict",
                         "SchemefulSameSiteLax",
-                        "SchemefulSameSiteUnspecifiedTreatedAsLax"
+                        "SchemefulSameSiteUnspecifiedTreatedAsLax",
+                        "SamePartyFromCrossPartyContext"
                     ]
                 },
                 {
@@ -12198,7 +12264,24 @@
                     ]
                 },
                 {
+                    "name": "webTransportConnectionEstablished",
+                    "description": "Fired when WebTransport handshake is finished.",
+                    "parameters": [
+                        {
+                            "name": "transportId",
+                            "description": "WebTransport identifier.",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "timestamp",
+                            "description": "Timestamp.",
+                            "$ref": "MonotonicTime"
+                        }
+                    ]
+                },
+                {
                     "name": "webTransportClosed",
+                    "description": "Fired when WebTransport is disposed.",
                     "parameters": [
                         {
                             "name": "transportId",
@@ -12265,6 +12348,11 @@
                             "name": "headers",
                             "description": "Raw response headers as they were received over the wire.",
                             "$ref": "Headers"
+                        },
+                        {
+                            "name": "resourceIPAddressSpace",
+                            "description": "The IP address space of the resource. The address space can only be determined once the transport\nestablished the connection, so we can't send it in `requestWillBeSentExtraInfo`.",
+                            "$ref": "IPAddressSpace"
                         },
                         {
                             "name": "headersText",
@@ -12538,6 +12626,31 @@
                     ]
                 },
                 {
+                    "id": "FlexItemHighlightConfig",
+                    "description": "Configuration data for the highlighting of Flex item elements.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "baseSizeBox",
+                            "description": "Style of the box representing the item's base size",
+                            "optional": true,
+                            "$ref": "BoxStyle"
+                        },
+                        {
+                            "name": "baseSizeBorder",
+                            "description": "Style of the border around the box representing the item's base size",
+                            "optional": true,
+                            "$ref": "LineStyle"
+                        },
+                        {
+                            "name": "flexibilityArrow",
+                            "description": "Style of the arrow representing if the item grew or shrank",
+                            "optional": true,
+                            "$ref": "LineStyle"
+                        }
+                    ]
+                },
+                {
                     "id": "LineStyle",
                     "description": "Style information for drawing a line.",
                     "type": "object",
@@ -12688,6 +12801,12 @@
                             "description": "The flex container highlight configuration (default: all transparent).",
                             "optional": true,
                             "$ref": "FlexContainerHighlightConfig"
+                        },
+                        {
+                            "name": "flexItemHighlightConfig",
+                            "description": "The flex item highlight configuration (default: all transparent).",
+                            "optional": true,
+                            "$ref": "FlexItemHighlightConfig"
                         },
                         {
                             "name": "contrastAlgorithm",

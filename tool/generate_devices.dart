@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-//import 'package:dart_style/dart_style.dart';
+// ignore: import_of_legacy_library_into_null_safe
+import 'package:dart_style/dart_style.dart';
 import 'package:http/http.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'utils/split_words.dart';
@@ -54,14 +55,14 @@ void main() async {
   }
   var allNamesMap =
       allNames.entries.map((e) => "'${e.key}': ${e.value}").join(', ');
-  buffer.writeln('Map<String, Device> _all;');
+  buffer.writeln('late final Map<String, Device> _all;');
   buffer.writeln('Devices._() {');
   buffer.writeln(
       '_all = CanonicalizedMap<String, String, Device>.from({$allNamesMap,}, '
-      "(key) => key.replaceAll(' ', '').toLowerCase(), isValidKey: (key) => key != null);");
+      "(key) => key.replaceAll(' ', '').toLowerCase());");
   buffer.writeln('}');
   buffer.writeln();
-  buffer.writeln('Device operator[](String name) => _all[name];');
+  buffer.writeln('Device? operator[](String name) => _all[name];');
   buffer.writeln();
   buffer.writeln('@override');
   buffer.writeln('Iterator<Device> get iterator => _all.values.iterator;');
@@ -69,8 +70,7 @@ void main() async {
   buffer.writeln('}');
   buffer.writeln('final devices = Devices._();');
   File('lib/src/devices.dart')
-      //.writeAsStringSync(DartFormatter().format(buffer.toString()));
-      .writeAsStringSync(buffer.toString());
+      .writeAsStringSync(DartFormatter().format(buffer.toString()));
 }
 
 @JsonSerializable()

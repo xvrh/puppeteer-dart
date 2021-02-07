@@ -293,6 +293,13 @@ class EmulationApi {
     });
   }
 
+  /// [imageTypes] Image types to disable.
+  Future<void> setDisabledImageTypes(List<DisabledImageType> imageTypes) async {
+    await _client.send('Emulation.setDisabledImageTypes', {
+      'imageTypes': [...imageTypes],
+    });
+  }
+
   /// Allows overriding user agent with the given string.
   /// [userAgent] User agent to use.
   /// [acceptLanguage] Browser langugage to emulate.
@@ -562,4 +569,32 @@ class UserAgentMetadata {
       'mobile': mobile,
     };
   }
+}
+
+/// Enum of image types that can be disabled.
+class DisabledImageType {
+  static const avif = DisabledImageType._('avif');
+  static const webp = DisabledImageType._('webp');
+  static const values = {
+    'avif': avif,
+    'webp': webp,
+  };
+
+  final String value;
+
+  const DisabledImageType._(this.value);
+
+  factory DisabledImageType.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is DisabledImageType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }

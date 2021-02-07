@@ -147,9 +147,21 @@ void main() {
       expect(await page.evaluate('() => !!window.opener'), isFalse);
       expect(await popup.evaluate('() => !!window.opener'), isFalse);
     });
-    test('should work with clicking target=_blank', () async {
+    test('should work with clicking target=_blank and without rel=opener',
+        () async {
       await page.goto(server.emptyPage);
       await page.setContent('<a target=_blank href="/one-style.html">yo</a>');
+      var popupFuture = page.onPopup.first;
+      await page.click('a');
+      var popup = await popupFuture;
+      expect(await page.evaluate('() => !!window.opener'), isFalse);
+      expect(await popup.evaluate('() => !!window.opener'), isFalse);
+    });
+    test('should work with clicking target=_blank and with rel=opener',
+        () async {
+      await page.goto(server.emptyPage);
+      await page.setContent(
+          '<a target=_blank rel=opener href="/one-style.html">yo</a>');
       var popupFuture = page.onPopup.first;
       await page.click('a');
       var popup = await popupFuture;

@@ -102,21 +102,6 @@ class DebuggerApi {
     return EvaluateOnCallFrameResult.fromJson(result);
   }
 
-  /// Execute a Wasm Evaluator module on a given call frame.
-  /// [callFrameId] WebAssembly call frame identifier to evaluate on.
-  /// [evaluator] Code of the evaluator module.
-  /// [timeout] Terminate execution after timing out (number of milliseconds).
-  Future<ExecuteWasmEvaluatorResult> executeWasmEvaluator(
-      CallFrameId callFrameId, String evaluator,
-      {runtime.TimeDelta? timeout}) async {
-    var result = await _client.send('Debugger.executeWasmEvaluator', {
-      'callFrameId': callFrameId,
-      'evaluator': evaluator,
-      if (timeout != null) 'timeout': timeout,
-    });
-    return ExecuteWasmEvaluatorResult.fromJson(result);
-  }
-
   /// Returns possible locations for breakpoint. scriptId in start and end range locations should be
   /// the same.
   /// [start] Start of range to search possible breakpoint locations in.
@@ -748,27 +733,6 @@ class EvaluateOnCallFrameResult {
   }
 }
 
-class ExecuteWasmEvaluatorResult {
-  /// Object wrapper for the evaluation result.
-  final runtime.RemoteObject result;
-
-  /// Exception details.
-  final runtime.ExceptionDetails? exceptionDetails;
-
-  ExecuteWasmEvaluatorResult({required this.result, this.exceptionDetails});
-
-  factory ExecuteWasmEvaluatorResult.fromJson(Map<String, dynamic> json) {
-    return ExecuteWasmEvaluatorResult(
-      result:
-          runtime.RemoteObject.fromJson(json['result'] as Map<String, dynamic>),
-      exceptionDetails: json.containsKey('exceptionDetails')
-          ? runtime.ExceptionDetails.fromJson(
-              json['exceptionDetails'] as Map<String, dynamic>)
-          : null,
-    );
-  }
-}
-
 class GetScriptSourceResult {
   /// Script source (empty in case of Wasm bytecode).
   final String scriptSource;
@@ -1379,6 +1343,7 @@ class DebugSymbolsType {
 class PausedEventReason {
   static const ambiguous = PausedEventReason._('ambiguous');
   static const assert$ = PausedEventReason._('assert');
+  static const cspViolation = PausedEventReason._('CSPViolation');
   static const debugCommand = PausedEventReason._('debugCommand');
   static const dom = PausedEventReason._('DOM');
   static const eventListener = PausedEventReason._('EventListener');
@@ -1391,6 +1356,7 @@ class PausedEventReason {
   static const values = {
     'ambiguous': ambiguous,
     'assert': assert$,
+    'CSPViolation': cspViolation,
     'debugCommand': debugCommand,
     'DOM': dom,
     'EventListener': eventListener,

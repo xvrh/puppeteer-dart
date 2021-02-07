@@ -47,10 +47,12 @@ class TracingApi {
 
   /// Request a global memory dump.
   /// [deterministic] Enables more deterministic results by forcing garbage collection
+  /// [levelOfDetail] Specifies level of details in memory dump. Defaults to "detailed".
   Future<RequestMemoryDumpResult> requestMemoryDump(
-      {bool? deterministic}) async {
+      {bool? deterministic, MemoryDumpLevelOfDetail? levelOfDetail}) async {
     var result = await _client.send('Tracing.requestMemoryDump', {
       if (deterministic != null) 'deterministic': deterministic,
+      if (levelOfDetail != null) 'levelOfDetail': levelOfDetail,
     });
     return RequestMemoryDumpResult.fromJson(result);
   }
@@ -63,6 +65,9 @@ class TracingApi {
   /// transfer mode (defaults to `json`).
   /// [streamCompression] Compression format to use. This only applies when using `ReturnAsStream`
   /// transfer mode (defaults to `none`)
+  /// [perfettoConfig] Base64-encoded serialized perfetto.protos.TraceConfig protobuf message
+  /// When specified, the parameters `categories`, `options`, `traceConfig`
+  /// are ignored.
   Future<void> start(
       {@deprecated String? categories,
       @deprecated String? options,
@@ -70,7 +75,8 @@ class TracingApi {
       @Enum(['ReportEvents', 'ReturnAsStream']) String? transferMode,
       StreamFormat? streamFormat,
       StreamCompression? streamCompression,
-      TraceConfig? traceConfig}) async {
+      TraceConfig? traceConfig,
+      String? perfettoConfig}) async {
     assert(transferMode == null ||
         const ['ReportEvents', 'ReturnAsStream'].contains(transferMode));
     await _client.send('Tracing.start', {
@@ -82,6 +88,7 @@ class TracingApi {
       if (streamFormat != null) 'streamFormat': streamFormat,
       if (streamCompression != null) 'streamCompression': streamCompression,
       if (traceConfig != null) 'traceConfig': traceConfig,
+      if (perfettoConfig != null) 'perfettoConfig': perfettoConfig,
     });
   }
 }
@@ -356,6 +363,39 @@ class StreamCompression {
   @override
   bool operator ==(other) =>
       (other is StreamCompression && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Details exposed when memory request explicitly declared.
+/// Keep consistent with memory_dump_request_args.h and
+/// memory_instrumentation.mojom
+class MemoryDumpLevelOfDetail {
+  static const background = MemoryDumpLevelOfDetail._('background');
+  static const light = MemoryDumpLevelOfDetail._('light');
+  static const detailed = MemoryDumpLevelOfDetail._('detailed');
+  static const values = {
+    'background': background,
+    'light': light,
+    'detailed': detailed,
+  };
+
+  final String value;
+
+  const MemoryDumpLevelOfDetail._(this.value);
+
+  factory MemoryDumpLevelOfDetail.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is MemoryDumpLevelOfDetail && other.value == value) ||
+      value == other;
 
   @override
   int get hashCode => value.hashCode;

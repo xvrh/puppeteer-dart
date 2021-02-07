@@ -855,7 +855,7 @@ class Devices with IterableMixin<Device> {
           hasTouch: true,
           isLandscape: true));
 
-  late Map<String, Device> _all;
+  late final Map<String, Device> _all;
   Devices._() {
     _all = CanonicalizedMap<String, String, Device>.from({
       'iPhone 4': iPhone4,

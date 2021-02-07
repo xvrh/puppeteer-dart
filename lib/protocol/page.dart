@@ -34,13 +34,19 @@ class PageApi {
       .map((event) => FrameId.fromJson(event.parameters['frameId'] as String));
 
   /// Fired when frame has been detached from its parent.
-  Stream<FrameId> get onFrameDetached => _client.onEvent
+  Stream<FrameDetachedEvent> get onFrameDetached => _client.onEvent
       .where((event) => event.name == 'Page.frameDetached')
-      .map((event) => FrameId.fromJson(event.parameters['frameId'] as String));
+      .map((event) => FrameDetachedEvent.fromJson(event.parameters));
 
   /// Fired once navigation of the frame has completed. Frame is now associated with the new loader.
   Stream<FrameInfo> get onFrameNavigated => _client.onEvent
       .where((event) => event.name == 'Page.frameNavigated')
+      .map((event) => FrameInfo.fromJson(
+          event.parameters['frame'] as Map<String, dynamic>));
+
+  /// Fired when opening document to write to.
+  Stream<FrameInfo> get onDocumentOpened => _client.onEvent
+      .where((event) => event.name == 'Page.documentOpened')
       .map((event) => FrameInfo.fromJson(
           event.parameters['frame'] as Map<String, dynamic>));
 
@@ -179,18 +185,22 @@ class PageApi {
   /// [quality] Compression quality from range [0..100] (jpeg only).
   /// [clip] Capture the screenshot of a given region only.
   /// [fromSurface] Capture the screenshot from the surface, rather than the view. Defaults to true.
+  /// [captureBeyondViewport] Capture the screenshot beyond the viewport. Defaults to false.
   /// Returns: Base64-encoded image data.
   Future<String> captureScreenshot(
       {@Enum(['jpeg', 'png']) String? format,
       int? quality,
       Viewport? clip,
-      bool? fromSurface}) async {
+      bool? fromSurface,
+      bool? captureBeyondViewport}) async {
     assert(format == null || const ['jpeg', 'png'].contains(format));
     var result = await _client.send('Page.captureScreenshot', {
       if (format != null) 'format': format,
       if (quality != null) 'quality': quality,
       if (clip != null) 'clip': clip,
       if (fromSurface != null) 'fromSurface': fromSurface,
+      if (captureBeyondViewport != null)
+        'captureBeyondViewport': captureBeyondViewport,
     });
     return result['data'] as String;
   }
@@ -804,6 +814,22 @@ class FrameAttachedEvent {
   }
 }
 
+class FrameDetachedEvent {
+  /// Id of the frame that has been detached.
+  final FrameId frameId;
+
+  final FrameDetachedEventReason reason;
+
+  FrameDetachedEvent({required this.frameId, required this.reason});
+
+  factory FrameDetachedEvent.fromJson(Map<String, dynamic> json) {
+    return FrameDetachedEvent(
+      frameId: FrameId.fromJson(json['frameId'] as String),
+      reason: FrameDetachedEventReason.fromJson(json['reason'] as String),
+    );
+  }
+}
+
 class FrameRequestedNavigationEvent {
   /// Id of the frame that is being navigated.
   final FrameId frameId;
@@ -1344,6 +1370,39 @@ class CrossOriginIsolatedContextType {
   String toString() => value.toString();
 }
 
+class GatedAPIFeatures {
+  static const sharedArrayBuffers = GatedAPIFeatures._('SharedArrayBuffers');
+  static const sharedArrayBuffersTransferAllowed =
+      GatedAPIFeatures._('SharedArrayBuffersTransferAllowed');
+  static const performanceMeasureMemory =
+      GatedAPIFeatures._('PerformanceMeasureMemory');
+  static const performanceProfile = GatedAPIFeatures._('PerformanceProfile');
+  static const values = {
+    'SharedArrayBuffers': sharedArrayBuffers,
+    'SharedArrayBuffersTransferAllowed': sharedArrayBuffersTransferAllowed,
+    'PerformanceMeasureMemory': performanceMeasureMemory,
+    'PerformanceProfile': performanceProfile,
+  };
+
+  final String value;
+
+  const GatedAPIFeatures._(this.value);
+
+  factory GatedAPIFeatures.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is GatedAPIFeatures && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Information about the Frame on the page.
 class FrameInfo {
   /// Frame unique identifier.
@@ -1388,6 +1447,9 @@ class FrameInfo {
   /// Indicates whether this is a cross origin isolated context.
   final CrossOriginIsolatedContextType crossOriginIsolatedContextType;
 
+  /// Indicated which gated APIs / features are available.
+  final List<GatedAPIFeatures> gatedAPIFeatures;
+
   FrameInfo(
       {required this.id,
       this.parentId,
@@ -1401,7 +1463,8 @@ class FrameInfo {
       this.unreachableUrl,
       this.adFrameType,
       required this.secureContextType,
-      required this.crossOriginIsolatedContextType});
+      required this.crossOriginIsolatedContextType,
+      required this.gatedAPIFeatures});
 
   factory FrameInfo.fromJson(Map<String, dynamic> json) {
     return FrameInfo(
@@ -1427,6 +1490,9 @@ class FrameInfo {
           SecureContextType.fromJson(json['secureContextType'] as String),
       crossOriginIsolatedContextType: CrossOriginIsolatedContextType.fromJson(
           json['crossOriginIsolatedContextType'] as String),
+      gatedAPIFeatures: (json['gatedAPIFeatures'] as List)
+          .map((e) => GatedAPIFeatures.fromJson(e as String))
+          .toList(),
     );
   }
 
@@ -1440,6 +1506,7 @@ class FrameInfo {
       'mimeType': mimeType,
       'secureContextType': secureContextType.toJson(),
       'crossOriginIsolatedContextType': crossOriginIsolatedContextType.toJson(),
+      'gatedAPIFeatures': gatedAPIFeatures.map((e) => e.toJson()).toList(),
       if (parentId != null) 'parentId': parentId,
       if (name != null) 'name': name,
       if (urlFragment != null) 'urlFragment': urlFragment,
@@ -2265,6 +2332,34 @@ class FileChooserOpenedEventMode {
   @override
   bool operator ==(other) =>
       (other is FileChooserOpenedEventMode && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class FrameDetachedEventReason {
+  static const remove = FrameDetachedEventReason._('remove');
+  static const swap = FrameDetachedEventReason._('swap');
+  static const values = {
+    'remove': remove,
+    'swap': swap,
+  };
+
+  final String value;
+
+  const FrameDetachedEventReason._(this.value);
+
+  factory FrameDetachedEventReason.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is FrameDetachedEventReason && other.value == value) ||
       value == other;
 
   @override

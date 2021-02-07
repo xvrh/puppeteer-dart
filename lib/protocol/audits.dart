@@ -3,6 +3,7 @@ import '../src/connection.dart';
 import 'dom.dart' as dom;
 import 'network.dart' as network;
 import 'page.dart' as page;
+import 'runtime.dart' as runtime;
 
 /// Audits domain allows investigation of page violations and possible improvements.
 class AuditsApi {
@@ -709,6 +710,8 @@ class ContentSecurityPolicyViolationType {
 }
 
 class SourceCodeLocation {
+  final runtime.ScriptId? scriptId;
+
   final String url;
 
   final int lineNumber;
@@ -716,12 +719,16 @@ class SourceCodeLocation {
   final int columnNumber;
 
   SourceCodeLocation(
-      {required this.url,
+      {this.scriptId,
+      required this.url,
       required this.lineNumber,
       required this.columnNumber});
 
   factory SourceCodeLocation.fromJson(Map<String, dynamic> json) {
     return SourceCodeLocation(
+      scriptId: json.containsKey('scriptId')
+          ? runtime.ScriptId.fromJson(json['scriptId'] as String)
+          : null,
       url: json['url'] as String,
       lineNumber: json['lineNumber'] as int,
       columnNumber: json['columnNumber'] as int,
@@ -733,6 +740,7 @@ class SourceCodeLocation {
       'url': url,
       'lineNumber': lineNumber,
       'columnNumber': columnNumber,
+      if (scriptId != null) 'scriptId': scriptId!.toJson(),
     };
   }
 }
@@ -802,6 +810,150 @@ class ContentSecurityPolicyIssueDetails {
   }
 }
 
+class SharedArrayBufferIssueType {
+  static const transferIssue = SharedArrayBufferIssueType._('TransferIssue');
+  static const creationIssue = SharedArrayBufferIssueType._('CreationIssue');
+  static const values = {
+    'TransferIssue': transferIssue,
+    'CreationIssue': creationIssue,
+  };
+
+  final String value;
+
+  const SharedArrayBufferIssueType._(this.value);
+
+  factory SharedArrayBufferIssueType.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is SharedArrayBufferIssueType && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Details for a request that has been blocked with the BLOCKED_BY_RESPONSE
+/// code. Currently only used for COEP/COOP, but may be extended to include
+/// some CSP errors in the future.
+class SharedArrayBufferIssueDetails {
+  final SourceCodeLocation sourceCodeLocation;
+
+  final bool isWarning;
+
+  final SharedArrayBufferIssueType type;
+
+  SharedArrayBufferIssueDetails(
+      {required this.sourceCodeLocation,
+      required this.isWarning,
+      required this.type});
+
+  factory SharedArrayBufferIssueDetails.fromJson(Map<String, dynamic> json) {
+    return SharedArrayBufferIssueDetails(
+      sourceCodeLocation: SourceCodeLocation.fromJson(
+          json['sourceCodeLocation'] as Map<String, dynamic>),
+      isWarning: json['isWarning'] as bool,
+      type: SharedArrayBufferIssueType.fromJson(json['type'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sourceCodeLocation': sourceCodeLocation.toJson(),
+      'isWarning': isWarning,
+      'type': type.toJson(),
+    };
+  }
+}
+
+class TwaQualityEnforcementViolationType {
+  static const kHttpError = TwaQualityEnforcementViolationType._('kHttpError');
+  static const kUnavailableOffline =
+      TwaQualityEnforcementViolationType._('kUnavailableOffline');
+  static const kDigitalAssetLinks =
+      TwaQualityEnforcementViolationType._('kDigitalAssetLinks');
+  static const values = {
+    'kHttpError': kHttpError,
+    'kUnavailableOffline': kUnavailableOffline,
+    'kDigitalAssetLinks': kDigitalAssetLinks,
+  };
+
+  final String value;
+
+  const TwaQualityEnforcementViolationType._(this.value);
+
+  factory TwaQualityEnforcementViolationType.fromJson(String value) =>
+      values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is TwaQualityEnforcementViolationType && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class TrustedWebActivityIssueDetails {
+  /// The url that triggers the violation.
+  final String url;
+
+  final TwaQualityEnforcementViolationType violationType;
+
+  final int? httpStatusCode;
+
+  /// The package name of the Trusted Web Activity client app. This field is
+  /// only used when violation type is kDigitalAssetLinks.
+  final String? packageName;
+
+  /// The signature of the Trusted Web Activity client app. This field is only
+  /// used when violation type is kDigitalAssetLinks.
+  final String? signature;
+
+  TrustedWebActivityIssueDetails(
+      {required this.url,
+      required this.violationType,
+      this.httpStatusCode,
+      this.packageName,
+      this.signature});
+
+  factory TrustedWebActivityIssueDetails.fromJson(Map<String, dynamic> json) {
+    return TrustedWebActivityIssueDetails(
+      url: json['url'] as String,
+      violationType: TwaQualityEnforcementViolationType.fromJson(
+          json['violationType'] as String),
+      httpStatusCode: json.containsKey('httpStatusCode')
+          ? json['httpStatusCode'] as int
+          : null,
+      packageName: json.containsKey('packageName')
+          ? json['packageName'] as String
+          : null,
+      signature:
+          json.containsKey('signature') ? json['signature'] as String : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      'violationType': violationType.toJson(),
+      if (httpStatusCode != null) 'httpStatusCode': httpStatusCode,
+      if (packageName != null) 'packageName': packageName,
+      if (signature != null) 'signature': signature,
+    };
+  }
+}
+
 /// A unique identifier for the type of issue. Each type may use one of the
 /// optional fields in InspectorIssueDetails to convey more specific
 /// information about the kind of issue.
@@ -814,12 +966,18 @@ class InspectorIssueCode {
   static const heavyAdIssue = InspectorIssueCode._('HeavyAdIssue');
   static const contentSecurityPolicyIssue =
       InspectorIssueCode._('ContentSecurityPolicyIssue');
+  static const sharedArrayBufferIssue =
+      InspectorIssueCode._('SharedArrayBufferIssue');
+  static const trustedWebActivityIssue =
+      InspectorIssueCode._('TrustedWebActivityIssue');
   static const values = {
     'SameSiteCookieIssue': sameSiteCookieIssue,
     'MixedContentIssue': mixedContentIssue,
     'BlockedByResponseIssue': blockedByResponseIssue,
     'HeavyAdIssue': heavyAdIssue,
     'ContentSecurityPolicyIssue': contentSecurityPolicyIssue,
+    'SharedArrayBufferIssue': sharedArrayBufferIssue,
+    'TrustedWebActivityIssue': trustedWebActivityIssue,
   };
 
   final String value;
@@ -855,12 +1013,18 @@ class InspectorIssueDetails {
 
   final ContentSecurityPolicyIssueDetails? contentSecurityPolicyIssueDetails;
 
+  final SharedArrayBufferIssueDetails? sharedArrayBufferIssueDetails;
+
+  final TrustedWebActivityIssueDetails? twaQualityEnforcementDetails;
+
   InspectorIssueDetails(
       {this.sameSiteCookieIssueDetails,
       this.mixedContentIssueDetails,
       this.blockedByResponseIssueDetails,
       this.heavyAdIssueDetails,
-      this.contentSecurityPolicyIssueDetails});
+      this.contentSecurityPolicyIssueDetails,
+      this.sharedArrayBufferIssueDetails,
+      this.twaQualityEnforcementDetails});
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
     return InspectorIssueDetails(
@@ -886,6 +1050,16 @@ class InspectorIssueDetails {
           ? ContentSecurityPolicyIssueDetails.fromJson(
               json['contentSecurityPolicyIssueDetails'] as Map<String, dynamic>)
           : null,
+      sharedArrayBufferIssueDetails:
+          json.containsKey('sharedArrayBufferIssueDetails')
+              ? SharedArrayBufferIssueDetails.fromJson(
+                  json['sharedArrayBufferIssueDetails'] as Map<String, dynamic>)
+              : null,
+      twaQualityEnforcementDetails:
+          json.containsKey('twaQualityEnforcementDetails')
+              ? TrustedWebActivityIssueDetails.fromJson(
+                  json['twaQualityEnforcementDetails'] as Map<String, dynamic>)
+              : null,
     );
   }
 
@@ -903,6 +1077,11 @@ class InspectorIssueDetails {
       if (contentSecurityPolicyIssueDetails != null)
         'contentSecurityPolicyIssueDetails':
             contentSecurityPolicyIssueDetails!.toJson(),
+      if (sharedArrayBufferIssueDetails != null)
+        'sharedArrayBufferIssueDetails':
+            sharedArrayBufferIssueDetails!.toJson(),
+      if (twaQualityEnforcementDetails != null)
+        'twaQualityEnforcementDetails': twaQualityEnforcementDetails!.toJson(),
     };
   }
 }
