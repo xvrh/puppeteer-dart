@@ -45,9 +45,9 @@ class AccessibilityApi {
   /// Fetches the entire accessibility tree for the root Document
   /// [max_depth] The maximum depth at which descendants of the root node should be retrieved.
   /// If omitted, the full tree is returned.
-  Future<List<AXNodeData>> getFullAXTree({int? max_depth}) async {
+  Future<List<AXNodeData>> getFullAXTree({int? maxDepth}) async {
     var result = await _client.send('Accessibility.getFullAXTree', {
-      if (max_depth != null) 'max_depth': max_depth,
+      if (maxDepth != null) 'max_depth': maxDepth,
     });
     return (result['nodes'] as List)
         .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))

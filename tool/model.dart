@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'utils/split_words.dart';
+import 'utils/string_helpers.dart';
+
 final _aliases = {
   'Request': 'RequestData',
   'Response': 'ResponseData',
@@ -184,7 +187,7 @@ class Parameter implements Typed {
             ? (json['enum'] as List).cast<String>()
             : null;
 
-  String? get normalizedName => preventKeywords(name);
+  String? get normalizedName => preventKeywords(lowerCamel(splitWords(name)));
 
   String get deprecatedAttribute => deprecated ? '@deprecated' : '';
 }
@@ -223,7 +226,7 @@ const Set<String> _dartKeywords = {
   'default', 'static' //
 };
 
-String? preventKeywords(String? input) {
+String preventKeywords(String input) {
   if (_dartKeywords.contains(input)) {
     return '$input\$';
   } else {
