@@ -1455,13 +1455,13 @@ function deliverError(name, seq, message, stack) {
       Rectangle? clip,
       int? quality,
       bool? omitBackground}) {
-    format ??= ScreenshotFormat.png;
-    fullPage ??= false;
+    final localFormat = format ?? ScreenshotFormat.png;
+    final localFullPage = fullPage ?? false;
     omitBackground ??= false;
 
-    assert(quality == null || format == ScreenshotFormat.jpeg,
+    assert(quality == null || localFormat == ScreenshotFormat.jpeg,
         'Quality is only supported for the jpeg screenshots');
-    assert(clip == null || !fullPage, 'clip and fullPage are exclusive');
+    assert(clip == null || !localFullPage, 'clip and fullPage are exclusive');
 
     return screenshotPool(target.browser).withResource(() async {
       await devTools.target.activateTarget(target.targetID);
@@ -1476,42 +1476,33 @@ function deliverError(name, seq, message, stack) {
             scale: 1);
       }
 
-      if (fullPage!) {
+      if (localFullPage) {
         var metrics = await devTools.page.getLayoutMetrics();
 
-        // Overwrite clip for full page at all times.
+        // Overwrite clip for full page
         roundedClip = Viewport(
             x: 0,
             y: 0,
             width: metrics.contentSize.width.ceil(),
             height: metrics.contentSize.height.ceil(),
             scale: 1);
-
-        var viewport = this.viewport ?? DeviceViewport();
-
-        var screenOrientation = viewport.isLandscape
-            ? EmulationManager.landscape
-            : EmulationManager.portrait;
-        await devTools.emulation.setDeviceMetricsOverride(
-            roundedClip.width.toInt(),
-            roundedClip.height.toInt(),
-            viewport.deviceScaleFactor,
-            viewport.isMobile,
-            screenOrientation: screenOrientation);
       }
       var shouldSetDefaultBackground =
-          omitBackground! && format == ScreenshotFormat.png;
+          omitBackground! && localFormat == ScreenshotFormat.png;
       if (shouldSetDefaultBackground) {
         await devTools.emulation.setDefaultBackgroundColorOverride(
             color: RGBA(r: 0, g: 0, b: 0, a: 0));
       }
       var result = await devTools.page.captureScreenshot(
-          format: format!.name, quality: quality, clip: roundedClip);
+          format: localFormat.name,
+          quality: quality,
+          clip: roundedClip,
+          captureBeyondViewport: true);
       if (shouldSetDefaultBackground) {
         await devTools.emulation.setDefaultBackgroundColorOverride();
       }
 
-      if (fullPage && _viewport != null) {
+      if (localFullPage && _viewport != null) {
         await setViewport(_viewport!);
       }
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.23.0 (2021-02-09)
+- Migrate to null-safety
+- Update Chromium to version 90
+
 ## 1.22.0 (2020-11-17)
 - Update Chromium to version 87
 
