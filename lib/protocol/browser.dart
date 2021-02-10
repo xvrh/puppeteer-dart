@@ -161,6 +161,13 @@ class BrowserApi {
       if (image != null) 'image': image,
     });
   }
+
+  /// Invoke custom browser commands used by telemetry.
+  Future<void> executeBrowserCommand(BrowserCommandId commandId) async {
+    await _client.send('Browser.executeBrowserCommand', {
+      'commandId': commandId,
+    });
+  }
 }
 
 class GetVersionResult {
@@ -337,6 +344,7 @@ class PermissionType {
   static const clipboardReadWrite = PermissionType._('clipboardReadWrite');
   static const clipboardSanitizedWrite =
       PermissionType._('clipboardSanitizedWrite');
+  static const displayCapture = PermissionType._('displayCapture');
   static const durableStorage = PermissionType._('durableStorage');
   static const flash = PermissionType._('flash');
   static const geolocation = PermissionType._('geolocation');
@@ -363,6 +371,7 @@ class PermissionType {
     'backgroundFetch': backgroundFetch,
     'clipboardReadWrite': clipboardReadWrite,
     'clipboardSanitizedWrite': clipboardSanitizedWrite,
+    'displayCapture': displayCapture,
     'durableStorage': durableStorage,
     'flash': flash,
     'geolocation': geolocation,
@@ -481,6 +490,34 @@ class PermissionDescriptor {
       if (panTiltZoom != null) 'panTiltZoom': panTiltZoom,
     };
   }
+}
+
+/// Browser command ids used by executeBrowserCommand.
+class BrowserCommandId {
+  static const openTabSearch = BrowserCommandId._('openTabSearch');
+  static const closeTabSearch = BrowserCommandId._('closeTabSearch');
+  static const values = {
+    'openTabSearch': openTabSearch,
+    'closeTabSearch': closeTabSearch,
+  };
+
+  final String value;
+
+  const BrowserCommandId._(this.value);
+
+  factory BrowserCommandId.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is BrowserCommandId && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// Chrome histogram bucket.

@@ -152,6 +152,33 @@ class AuthenticatorProtocol {
   String toString() => value.toString();
 }
 
+class Ctap2Version {
+  static const ctap20 = Ctap2Version._('ctap2_0');
+  static const ctap21 = Ctap2Version._('ctap2_1');
+  static const values = {
+    'ctap2_0': ctap20,
+    'ctap2_1': ctap21,
+  };
+
+  final String value;
+
+  const Ctap2Version._(this.value);
+
+  factory Ctap2Version.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is Ctap2Version && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 class AuthenticatorTransport {
   static const usb = AuthenticatorTransport._('usb');
   static const nfc = AuthenticatorTransport._('nfc');
@@ -189,6 +216,9 @@ class AuthenticatorTransport {
 class VirtualAuthenticatorOptions {
   final AuthenticatorProtocol protocol;
 
+  /// Defaults to ctap2_0. Ignored if |protocol| == u2f.
+  final Ctap2Version? ctap2Version;
+
   final AuthenticatorTransport transport;
 
   /// Defaults to false.
@@ -212,6 +242,7 @@ class VirtualAuthenticatorOptions {
 
   VirtualAuthenticatorOptions(
       {required this.protocol,
+      this.ctap2Version,
       required this.transport,
       this.hasResidentKey,
       this.hasUserVerification,
@@ -222,6 +253,9 @@ class VirtualAuthenticatorOptions {
   factory VirtualAuthenticatorOptions.fromJson(Map<String, dynamic> json) {
     return VirtualAuthenticatorOptions(
       protocol: AuthenticatorProtocol.fromJson(json['protocol'] as String),
+      ctap2Version: json.containsKey('ctap2Version')
+          ? Ctap2Version.fromJson(json['ctap2Version'] as String)
+          : null,
       transport: AuthenticatorTransport.fromJson(json['transport'] as String),
       hasResidentKey: json.containsKey('hasResidentKey')
           ? json['hasResidentKey'] as bool
@@ -246,6 +280,7 @@ class VirtualAuthenticatorOptions {
     return {
       'protocol': protocol.toJson(),
       'transport': transport.toJson(),
+      if (ctap2Version != null) 'ctap2Version': ctap2Version!.toJson(),
       if (hasResidentKey != null) 'hasResidentKey': hasResidentKey,
       if (hasUserVerification != null)
         'hasUserVerification': hasUserVerification,
@@ -278,13 +313,18 @@ class Credential {
   /// See https://w3c.github.io/webauthn/#signature-counter
   final int signCount;
 
+  /// The large blob associated with the credential.
+  /// See https://w3c.github.io/webauthn/#sctn-large-blob-extension
+  final String? largeBlob;
+
   Credential(
       {required this.credentialId,
       required this.isResidentCredential,
       this.rpId,
       required this.privateKey,
       this.userHandle,
-      required this.signCount});
+      required this.signCount,
+      this.largeBlob});
 
   factory Credential.fromJson(Map<String, dynamic> json) {
     return Credential(
@@ -295,6 +335,8 @@ class Credential {
       userHandle:
           json.containsKey('userHandle') ? json['userHandle'] as String : null,
       signCount: json['signCount'] as int,
+      largeBlob:
+          json.containsKey('largeBlob') ? json['largeBlob'] as String : null,
     );
   }
 
@@ -306,6 +348,7 @@ class Credential {
       'signCount': signCount,
       if (rpId != null) 'rpId': rpId,
       if (userHandle != null) 'userHandle': userHandle,
+      if (largeBlob != null) 'largeBlob': largeBlob,
     };
   }
 }

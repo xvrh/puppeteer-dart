@@ -114,6 +114,24 @@ class NetworkApi {
           .map((event) => WebSocketWillSendHandshakeRequestEvent.fromJson(
               event.parameters));
 
+  /// Fired upon WebTransport creation.
+  Stream<WebTransportCreatedEvent> get onWebTransportCreated => _client.onEvent
+      .where((event) => event.name == 'Network.webTransportCreated')
+      .map((event) => WebTransportCreatedEvent.fromJson(event.parameters));
+
+  /// Fired when WebTransport handshake is finished.
+  Stream<WebTransportConnectionEstablishedEvent>
+      get onWebTransportConnectionEstablished => _client.onEvent
+          .where((event) =>
+              event.name == 'Network.webTransportConnectionEstablished')
+          .map((event) => WebTransportConnectionEstablishedEvent.fromJson(
+              event.parameters));
+
+  /// Fired when WebTransport is disposed.
+  Stream<WebTransportClosedEvent> get onWebTransportClosed => _client.onEvent
+      .where((event) => event.name == 'Network.webTransportClosed')
+      .map((event) => WebTransportClosedEvent.fromJson(event.parameters));
+
   /// Fired when additional information about a requestWillBeSent event is available from the
   /// network stack. Not every requestWillBeSent event will have an additional
   /// requestWillBeSentExtraInfo fired for it, and there is no guarantee whether requestWillBeSent
@@ -132,6 +150,15 @@ class NetworkApi {
           .where((event) => event.name == 'Network.responseReceivedExtraInfo')
           .map((event) =>
               ResponseReceivedExtraInfoEvent.fromJson(event.parameters));
+
+  /// Fired exactly once for each Trust Token operation. Depending on
+  /// the type of the operation and whether the operation succeeded or
+  /// failed, the event is fired before the corresponding request was sent
+  /// or after the response was received.
+  Stream<TrustTokenOperationDoneEvent> get onTrustTokenOperationDone => _client
+      .onEvent
+      .where((event) => event.name == 'Network.trustTokenOperationDone')
+      .map((event) => TrustTokenOperationDoneEvent.fromJson(event.parameters));
 
   /// Tells whether clearing browser cache is supported.
   /// Returns: True if browser cache can be cleared.
@@ -456,10 +483,10 @@ class NetworkApi {
     });
   }
 
-  /// Specifies whether to sned a debug header to all outgoing requests.
-  /// [enabled] Whether to send a debug header.
-  Future<void> setAttachDebugHeader(bool enabled) async {
-    await _client.send('Network.setAttachDebugHeader', {
+  /// Specifies whether to attach a page script stack id in requests
+  /// [enabled] Whether to attach a page script stack for debugging purpose.
+  Future<void> setAttachDebugStack(bool enabled) async {
+    await _client.send('Network.setAttachDebugStack', {
       'enabled': enabled,
     });
   }
@@ -603,13 +630,17 @@ class LoadingFailedEvent {
   /// The reason why loading was blocked, if any.
   final BlockedReason? blockedReason;
 
+  /// The reason why loading was blocked by CORS, if any.
+  final CorsErrorStatus? corsErrorStatus;
+
   LoadingFailedEvent(
       {required this.requestId,
       required this.timestamp,
       required this.type,
       required this.errorText,
       this.canceled,
-      this.blockedReason});
+      this.blockedReason,
+      this.corsErrorStatus});
 
   factory LoadingFailedEvent.fromJson(Map<String, dynamic> json) {
     return LoadingFailedEvent(
@@ -620,6 +651,10 @@ class LoadingFailedEvent {
       canceled: json.containsKey('canceled') ? json['canceled'] as bool : null,
       blockedReason: json.containsKey('blockedReason')
           ? BlockedReason.fromJson(json['blockedReason'] as String)
+          : null,
+      corsErrorStatus: json.containsKey('corsErrorStatus')
+          ? CorsErrorStatus.fromJson(
+              json['corsErrorStatus'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -1074,6 +1109,73 @@ class WebSocketWillSendHandshakeRequestEvent {
   }
 }
 
+class WebTransportCreatedEvent {
+  /// WebTransport identifier.
+  final RequestId transportId;
+
+  /// WebTransport request URL.
+  final String url;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  /// Request initiator.
+  final Initiator? initiator;
+
+  WebTransportCreatedEvent(
+      {required this.transportId,
+      required this.url,
+      required this.timestamp,
+      this.initiator});
+
+  factory WebTransportCreatedEvent.fromJson(Map<String, dynamic> json) {
+    return WebTransportCreatedEvent(
+      transportId: RequestId.fromJson(json['transportId'] as String),
+      url: json['url'] as String,
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+      initiator: json.containsKey('initiator')
+          ? Initiator.fromJson(json['initiator'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+class WebTransportConnectionEstablishedEvent {
+  /// WebTransport identifier.
+  final RequestId transportId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  WebTransportConnectionEstablishedEvent(
+      {required this.transportId, required this.timestamp});
+
+  factory WebTransportConnectionEstablishedEvent.fromJson(
+      Map<String, dynamic> json) {
+    return WebTransportConnectionEstablishedEvent(
+      transportId: RequestId.fromJson(json['transportId'] as String),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+    );
+  }
+}
+
+class WebTransportClosedEvent {
+  /// WebTransport identifier.
+  final RequestId transportId;
+
+  /// Timestamp.
+  final MonotonicTime timestamp;
+
+  WebTransportClosedEvent({required this.transportId, required this.timestamp});
+
+  factory WebTransportClosedEvent.fromJson(Map<String, dynamic> json) {
+    return WebTransportClosedEvent(
+      transportId: RequestId.fromJson(json['transportId'] as String),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+    );
+  }
+}
+
 class RequestWillBeSentExtraInfoEvent {
   /// Request identifier. Used to match this information to an existing requestWillBeSent event.
   final RequestId requestId;
@@ -1085,10 +1187,14 @@ class RequestWillBeSentExtraInfoEvent {
   /// Raw request headers as they will be sent over the wire.
   final Headers headers;
 
+  /// The client security state set for the request.
+  final ClientSecurityState? clientSecurityState;
+
   RequestWillBeSentExtraInfoEvent(
       {required this.requestId,
       required this.associatedCookies,
-      required this.headers});
+      required this.headers,
+      this.clientSecurityState});
 
   factory RequestWillBeSentExtraInfoEvent.fromJson(Map<String, dynamic> json) {
     return RequestWillBeSentExtraInfoEvent(
@@ -1098,6 +1204,10 @@ class RequestWillBeSentExtraInfoEvent {
               BlockedCookieWithReason.fromJson(e as Map<String, dynamic>))
           .toList(),
       headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
+      clientSecurityState: json.containsKey('clientSecurityState')
+          ? ClientSecurityState.fromJson(
+              json['clientSecurityState'] as Map<String, dynamic>)
+          : null,
     );
   }
 }
@@ -1134,6 +1244,53 @@ class ResponseReceivedExtraInfoEvent {
       headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
       headersText: json.containsKey('headersText')
           ? json['headersText'] as String
+          : null,
+    );
+  }
+}
+
+class TrustTokenOperationDoneEvent {
+  /// Detailed success or error status of the operation.
+  /// 'AlreadyExists' also signifies a successful operation, as the result
+  /// of the operation already exists und thus, the operation was abort
+  /// preemptively (e.g. a cache hit).
+  final TrustTokenOperationDoneEventStatus status;
+
+  final TrustTokenOperationType type;
+
+  final RequestId requestId;
+
+  /// Top level origin. The context in which the operation was attempted.
+  final String? topLevelOrigin;
+
+  /// Origin of the issuer in case of a "Issuance" or "Redemption" operation.
+  final String? issuerOrigin;
+
+  /// The number of obtained Trust Tokens on a successful "Issuance" operation.
+  final int? issuedTokenCount;
+
+  TrustTokenOperationDoneEvent(
+      {required this.status,
+      required this.type,
+      required this.requestId,
+      this.topLevelOrigin,
+      this.issuerOrigin,
+      this.issuedTokenCount});
+
+  factory TrustTokenOperationDoneEvent.fromJson(Map<String, dynamic> json) {
+    return TrustTokenOperationDoneEvent(
+      status:
+          TrustTokenOperationDoneEventStatus.fromJson(json['status'] as String),
+      type: TrustTokenOperationType.fromJson(json['type'] as String),
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      topLevelOrigin: json.containsKey('topLevelOrigin')
+          ? json['topLevelOrigin'] as String
+          : null,
+      issuerOrigin: json.containsKey('issuerOrigin')
+          ? json['issuerOrigin'] as String
+          : null,
+      issuedTokenCount: json.containsKey('issuedTokenCount')
+          ? json['issuedTokenCount'] as int
           : null,
     );
   }
@@ -1192,6 +1349,7 @@ class ResourceType {
   static const signedExchange = ResourceType._('SignedExchange');
   static const ping = ResourceType._('Ping');
   static const cspViolationReport = ResourceType._('CSPViolationReport');
+  static const preflight = ResourceType._('Preflight');
   static const other = ResourceType._('Other');
   static const values = {
     'Document': document,
@@ -1209,6 +1367,7 @@ class ResourceType {
     'SignedExchange': signedExchange,
     'Ping': ping,
     'CSPViolationReport': cspViolationReport,
+    'Preflight': preflight,
     'Other': other,
   };
 
@@ -2098,6 +2257,121 @@ class BlockedReason {
   String toString() => value.toString();
 }
 
+/// The reason why request was blocked.
+class CorsError {
+  static const disallowedByMode = CorsError._('DisallowedByMode');
+  static const invalidResponse = CorsError._('InvalidResponse');
+  static const wildcardOriginNotAllowed =
+      CorsError._('WildcardOriginNotAllowed');
+  static const missingAllowOriginHeader =
+      CorsError._('MissingAllowOriginHeader');
+  static const multipleAllowOriginValues =
+      CorsError._('MultipleAllowOriginValues');
+  static const invalidAllowOriginValue = CorsError._('InvalidAllowOriginValue');
+  static const allowOriginMismatch = CorsError._('AllowOriginMismatch');
+  static const invalidAllowCredentials = CorsError._('InvalidAllowCredentials');
+  static const corsDisabledScheme = CorsError._('CorsDisabledScheme');
+  static const preflightInvalidStatus = CorsError._('PreflightInvalidStatus');
+  static const preflightDisallowedRedirect =
+      CorsError._('PreflightDisallowedRedirect');
+  static const preflightWildcardOriginNotAllowed =
+      CorsError._('PreflightWildcardOriginNotAllowed');
+  static const preflightMissingAllowOriginHeader =
+      CorsError._('PreflightMissingAllowOriginHeader');
+  static const preflightMultipleAllowOriginValues =
+      CorsError._('PreflightMultipleAllowOriginValues');
+  static const preflightInvalidAllowOriginValue =
+      CorsError._('PreflightInvalidAllowOriginValue');
+  static const preflightAllowOriginMismatch =
+      CorsError._('PreflightAllowOriginMismatch');
+  static const preflightInvalidAllowCredentials =
+      CorsError._('PreflightInvalidAllowCredentials');
+  static const preflightMissingAllowExternal =
+      CorsError._('PreflightMissingAllowExternal');
+  static const preflightInvalidAllowExternal =
+      CorsError._('PreflightInvalidAllowExternal');
+  static const invalidAllowMethodsPreflightResponse =
+      CorsError._('InvalidAllowMethodsPreflightResponse');
+  static const invalidAllowHeadersPreflightResponse =
+      CorsError._('InvalidAllowHeadersPreflightResponse');
+  static const methodDisallowedByPreflightResponse =
+      CorsError._('MethodDisallowedByPreflightResponse');
+  static const headerDisallowedByPreflightResponse =
+      CorsError._('HeaderDisallowedByPreflightResponse');
+  static const redirectContainsCredentials =
+      CorsError._('RedirectContainsCredentials');
+  static const insecurePrivateNetwork = CorsError._('InsecurePrivateNetwork');
+  static const values = {
+    'DisallowedByMode': disallowedByMode,
+    'InvalidResponse': invalidResponse,
+    'WildcardOriginNotAllowed': wildcardOriginNotAllowed,
+    'MissingAllowOriginHeader': missingAllowOriginHeader,
+    'MultipleAllowOriginValues': multipleAllowOriginValues,
+    'InvalidAllowOriginValue': invalidAllowOriginValue,
+    'AllowOriginMismatch': allowOriginMismatch,
+    'InvalidAllowCredentials': invalidAllowCredentials,
+    'CorsDisabledScheme': corsDisabledScheme,
+    'PreflightInvalidStatus': preflightInvalidStatus,
+    'PreflightDisallowedRedirect': preflightDisallowedRedirect,
+    'PreflightWildcardOriginNotAllowed': preflightWildcardOriginNotAllowed,
+    'PreflightMissingAllowOriginHeader': preflightMissingAllowOriginHeader,
+    'PreflightMultipleAllowOriginValues': preflightMultipleAllowOriginValues,
+    'PreflightInvalidAllowOriginValue': preflightInvalidAllowOriginValue,
+    'PreflightAllowOriginMismatch': preflightAllowOriginMismatch,
+    'PreflightInvalidAllowCredentials': preflightInvalidAllowCredentials,
+    'PreflightMissingAllowExternal': preflightMissingAllowExternal,
+    'PreflightInvalidAllowExternal': preflightInvalidAllowExternal,
+    'InvalidAllowMethodsPreflightResponse':
+        invalidAllowMethodsPreflightResponse,
+    'InvalidAllowHeadersPreflightResponse':
+        invalidAllowHeadersPreflightResponse,
+    'MethodDisallowedByPreflightResponse': methodDisallowedByPreflightResponse,
+    'HeaderDisallowedByPreflightResponse': headerDisallowedByPreflightResponse,
+    'RedirectContainsCredentials': redirectContainsCredentials,
+    'InsecurePrivateNetwork': insecurePrivateNetwork,
+  };
+
+  final String value;
+
+  const CorsError._(this.value);
+
+  factory CorsError.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is CorsError && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class CorsErrorStatus {
+  final CorsError corsError;
+
+  final String failedParameter;
+
+  CorsErrorStatus({required this.corsError, required this.failedParameter});
+
+  factory CorsErrorStatus.fromJson(Map<String, dynamic> json) {
+    return CorsErrorStatus(
+      corsError: CorsError.fromJson(json['corsError'] as String),
+      failedParameter: json['failedParameter'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'corsError': corsError.toJson(),
+      'failedParameter': failedParameter,
+    };
+  }
+}
+
 /// Source of serviceworker response.
 class ServiceWorkerResponseSource {
   static const cacheStorage = ServiceWorkerResponseSource._('cache-storage');
@@ -2132,11 +2406,12 @@ class ServiceWorkerResponseSource {
 }
 
 /// Determines what type of Trust Token operation is executed and
-/// depending on the type, some additional parameters.
+/// depending on the type, some additional parameters. The values
+/// are specified in third_party/blink/renderer/core/fetch/trust_token.idl.
 class TrustTokenParams {
   final TrustTokenOperationType type;
 
-  /// Only set for "srr-token-redemption" type and determine whether
+  /// Only set for "token-redemption" type and determine whether
   /// to request a fresh SRR or use a still valid cached SRR.
   final TrustTokenParamsRefreshPolicy refreshPolicy;
 
@@ -2581,12 +2856,16 @@ class Initiator {
   /// module) (0-based).
   final num? columnNumber;
 
+  /// Set if another request triggered this request (e.g. preflight).
+  final RequestId? requestId;
+
   Initiator(
       {required this.type,
       this.stack,
       this.url,
       this.lineNumber,
-      this.columnNumber});
+      this.columnNumber,
+      this.requestId});
 
   factory Initiator.fromJson(Map<String, dynamic> json) {
     return Initiator(
@@ -2600,6 +2879,9 @@ class Initiator {
           json.containsKey('lineNumber') ? json['lineNumber'] as num : null,
       columnNumber:
           json.containsKey('columnNumber') ? json['columnNumber'] as num : null,
+      requestId: json.containsKey('requestId')
+          ? RequestId.fromJson(json['requestId'] as String)
+          : null,
     );
   }
 
@@ -2610,6 +2892,7 @@ class Initiator {
       if (url != null) 'url': url,
       if (lineNumber != null) 'lineNumber': lineNumber,
       if (columnNumber != null) 'columnNumber': columnNumber,
+      if (requestId != null) 'requestId': requestId!.toJson(),
     };
   }
 }
@@ -2619,12 +2902,14 @@ class InitiatorType {
   static const script = InitiatorType._('script');
   static const preload = InitiatorType._('preload');
   static const signedExchange = InitiatorType._('SignedExchange');
+  static const preflight = InitiatorType._('preflight');
   static const other = InitiatorType._('other');
   static const values = {
     'parser': parser,
     'script': script,
     'preload': preload,
     'SignedExchange': signedExchange,
+    'preflight': preflight,
     'other': other,
   };
 
@@ -2682,6 +2967,9 @@ class Cookie {
   /// Cookie Priority
   final CookiePriority priority;
 
+  /// True if cookie is SameParty.
+  final bool sameParty;
+
   Cookie(
       {required this.name,
       required this.value,
@@ -2693,7 +2981,8 @@ class Cookie {
       required this.secure,
       required this.session,
       this.sameSite,
-      required this.priority});
+      required this.priority,
+      required this.sameParty});
 
   factory Cookie.fromJson(Map<String, dynamic> json) {
     return Cookie(
@@ -2710,6 +2999,7 @@ class Cookie {
           ? CookieSameSite.fromJson(json['sameSite'] as String)
           : null,
       priority: CookiePriority.fromJson(json['priority'] as String),
+      sameParty: json['sameParty'] as bool,
     );
   }
 
@@ -2725,6 +3015,7 @@ class Cookie {
       'secure': secure,
       'session': session,
       'priority': priority.toJson(),
+      'sameParty': sameParty,
       if (sameSite != null) 'sameSite': sameSite!.toJson(),
     };
   }
@@ -3447,6 +3738,97 @@ class SignedExchangeInfo {
   }
 }
 
+class PrivateNetworkRequestPolicy {
+  static const allow = PrivateNetworkRequestPolicy._('Allow');
+  static const blockFromInsecureToMorePrivate =
+      PrivateNetworkRequestPolicy._('BlockFromInsecureToMorePrivate');
+  static const values = {
+    'Allow': allow,
+    'BlockFromInsecureToMorePrivate': blockFromInsecureToMorePrivate,
+  };
+
+  final String value;
+
+  const PrivateNetworkRequestPolicy._(this.value);
+
+  factory PrivateNetworkRequestPolicy.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is PrivateNetworkRequestPolicy && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class IPAddressSpace {
+  static const local = IPAddressSpace._('Local');
+  static const private = IPAddressSpace._('Private');
+  static const public = IPAddressSpace._('Public');
+  static const unknown = IPAddressSpace._('Unknown');
+  static const values = {
+    'Local': local,
+    'Private': private,
+    'Public': public,
+    'Unknown': unknown,
+  };
+
+  final String value;
+
+  const IPAddressSpace._(this.value);
+
+  factory IPAddressSpace.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is IPAddressSpace && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class ClientSecurityState {
+  final bool initiatorIsSecureContext;
+
+  final IPAddressSpace initiatorIPAddressSpace;
+
+  final PrivateNetworkRequestPolicy privateNetworkRequestPolicy;
+
+  ClientSecurityState(
+      {required this.initiatorIsSecureContext,
+      required this.initiatorIPAddressSpace,
+      required this.privateNetworkRequestPolicy});
+
+  factory ClientSecurityState.fromJson(Map<String, dynamic> json) {
+    return ClientSecurityState(
+      initiatorIsSecureContext: json['initiatorIsSecureContext'] as bool,
+      initiatorIPAddressSpace:
+          IPAddressSpace.fromJson(json['initiatorIPAddressSpace'] as String),
+      privateNetworkRequestPolicy: PrivateNetworkRequestPolicy.fromJson(
+          json['privateNetworkRequestPolicy'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'initiatorIsSecureContext': initiatorIsSecureContext,
+      'initiatorIPAddressSpace': initiatorIPAddressSpace.toJson(),
+      'privateNetworkRequestPolicy': privateNetworkRequestPolicy.toJson(),
+    };
+  }
+}
+
 class CrossOriginOpenerPolicyValue {
   static const sameOrigin = CrossOriginOpenerPolicyValue._('SameOrigin');
   static const sameOriginAllowPopups =
@@ -3593,25 +3975,29 @@ class CrossOriginEmbedderPolicyStatus {
 }
 
 class SecurityIsolationStatus {
-  final CrossOriginOpenerPolicyStatus coop;
+  final CrossOriginOpenerPolicyStatus? coop;
 
-  final CrossOriginEmbedderPolicyStatus coep;
+  final CrossOriginEmbedderPolicyStatus? coep;
 
-  SecurityIsolationStatus({required this.coop, required this.coep});
+  SecurityIsolationStatus({this.coop, this.coep});
 
   factory SecurityIsolationStatus.fromJson(Map<String, dynamic> json) {
     return SecurityIsolationStatus(
-      coop: CrossOriginOpenerPolicyStatus.fromJson(
-          json['coop'] as Map<String, dynamic>),
-      coep: CrossOriginEmbedderPolicyStatus.fromJson(
-          json['coep'] as Map<String, dynamic>),
+      coop: json.containsKey('coop')
+          ? CrossOriginOpenerPolicyStatus.fromJson(
+              json['coop'] as Map<String, dynamic>)
+          : null,
+      coep: json.containsKey('coep')
+          ? CrossOriginEmbedderPolicyStatus.fromJson(
+              json['coep'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'coop': coop.toJson(),
-      'coep': coep.toJson(),
+      if (coop != null) 'coop': coop!.toJson(),
+      if (coep != null) 'coep': coep!.toJson(),
     };
   }
 }
@@ -3695,4 +4081,58 @@ class LoadNetworkResourceOptions {
       'includeCredentials': includeCredentials,
     };
   }
+}
+
+class TrustTokenOperationDoneEventStatus {
+  static const ok = TrustTokenOperationDoneEventStatus._('Ok');
+  static const invalidArgument =
+      TrustTokenOperationDoneEventStatus._('InvalidArgument');
+  static const failedPrecondition =
+      TrustTokenOperationDoneEventStatus._('FailedPrecondition');
+  static const resourceExhausted =
+      TrustTokenOperationDoneEventStatus._('ResourceExhausted');
+  static const alreadyExists =
+      TrustTokenOperationDoneEventStatus._('AlreadyExists');
+  static const unavailable =
+      TrustTokenOperationDoneEventStatus._('Unavailable');
+  static const badResponse =
+      TrustTokenOperationDoneEventStatus._('BadResponse');
+  static const internalError =
+      TrustTokenOperationDoneEventStatus._('InternalError');
+  static const unknownError =
+      TrustTokenOperationDoneEventStatus._('UnknownError');
+  static const fulfilledLocally =
+      TrustTokenOperationDoneEventStatus._('FulfilledLocally');
+  static const values = {
+    'Ok': ok,
+    'InvalidArgument': invalidArgument,
+    'FailedPrecondition': failedPrecondition,
+    'ResourceExhausted': resourceExhausted,
+    'AlreadyExists': alreadyExists,
+    'Unavailable': unavailable,
+    'BadResponse': badResponse,
+    'InternalError': internalError,
+    'UnknownError': unknownError,
+    'FulfilledLocally': fulfilledLocally,
+  };
+
+  final String value;
+
+  const TrustTokenOperationDoneEventStatus._(this.value);
+
+  factory TrustTokenOperationDoneEventStatus.fromJson(String value) =>
+      values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is TrustTokenOperationDoneEventStatus && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }

@@ -67,7 +67,7 @@ void main() {
             '() => new Worker(`data:text/javascript,console.log(1)`)'),
       ]);
       expect(message.text, equals('1'));
-      expect(message.url, equals('data:text/javascript,console.log(1)'));
+      expect(message.url, equals(''));
       expect(message.lineNumber, equals(0));
       expect(message.columnNumber, equals(8));
     });

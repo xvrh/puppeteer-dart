@@ -42,9 +42,24 @@ class AccessibilityApi {
         .toList();
   }
 
-  /// Fetches the entire accessibility tree
-  Future<List<AXNodeData>> getFullAXTree() async {
-    var result = await _client.send('Accessibility.getFullAXTree');
+  /// Fetches the entire accessibility tree for the root Document
+  /// [max_depth] The maximum depth at which descendants of the root node should be retrieved.
+  /// If omitted, the full tree is returned.
+  Future<List<AXNodeData>> getFullAXTree({int? maxDepth}) async {
+    var result = await _client.send('Accessibility.getFullAXTree', {
+      if (maxDepth != null) 'max_depth': maxDepth,
+    });
+    return (result['nodes'] as List)
+        .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Fetches a particular accessibility node by AXNodeId.
+  /// Requires `enable()` to have been called previously.
+  Future<List<AXNodeData>> getChildAXNodes(AXNodeId id) async {
+    var result = await _client.send('Accessibility.getChildAXNodes', {
+      'id': id,
+    });
     return (result['nodes'] as List)
         .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -203,6 +218,7 @@ class AXValueNativeSourceType {
   static const labelfor = AXValueNativeSourceType._('labelfor');
   static const labelwrapped = AXValueNativeSourceType._('labelwrapped');
   static const legend = AXValueNativeSourceType._('legend');
+  static const rubyannotation = AXValueNativeSourceType._('rubyannotation');
   static const tablecaption = AXValueNativeSourceType._('tablecaption');
   static const title = AXValueNativeSourceType._('title');
   static const other = AXValueNativeSourceType._('other');
@@ -212,6 +228,7 @@ class AXValueNativeSourceType {
     'labelfor': labelfor,
     'labelwrapped': labelwrapped,
     'legend': legend,
+    'rubyannotation': rubyannotation,
     'tablecaption': tablecaption,
     'title': title,
     'other': other,

@@ -47,11 +47,10 @@ void main() {
           await page.screenshot(clip: Rectangle(50, 100, 150, 100));
       expect(screenshot, equalsGolden('test/golden/screenshot-clip-rect.png'));
     });
-    test('should clip elements to the viewport', () async {
-      await page.setViewport(DeviceViewport(width: 500, height: 500));
+    test('should get screenshot bigger than the viewport', () async {
+      await page.setViewport(DeviceViewport(width: 50, height: 50));
       await page.goto(server.prefix + '/grid.html');
-      var screenshot =
-          await page.screenshot(clip: Rectangle(50, 600, 100, 100));
+      var screenshot = await page.screenshot(clip: Rectangle(25, 25, 100, 100));
       expect(screenshot,
           equalsGolden('test/golden/screenshot-offscreen-clip.png'));
     });

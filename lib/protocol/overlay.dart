@@ -231,6 +231,14 @@ class OverlayApi {
     });
   }
 
+  /// [flexNodeHighlightConfigs] An array of node identifiers and descriptors for the highlight appearance.
+  Future<void> setShowFlexOverlays(
+      List<FlexNodeHighlightConfig> flexNodeHighlightConfigs) async {
+    await _client.send('Overlay.setShowFlexOverlays', {
+      'flexNodeHighlightConfigs': [...flexNodeHighlightConfigs],
+    });
+  }
+
   /// Requests that backend shows paint rectangles
   /// [result] True for showing paint rectangles
   Future<void> setShowPaintRects(bool result) async {
@@ -259,6 +267,13 @@ class OverlayApi {
   /// [show] True for showing hit-test borders
   Future<void> setShowHitTestBorders(bool show) async {
     await _client.send('Overlay.setShowHitTestBorders', {
+      'show': show,
+    });
+  }
+
+  /// Request that backend shows an overlay with web vital metrics.
+  Future<void> setShowWebVitals(bool show) async {
+    await _client.send('Overlay.setShowWebVitals', {
       'show': show,
     });
   }
@@ -472,6 +487,203 @@ class GridHighlightConfig {
   }
 }
 
+/// Configuration data for the highlighting of Flex container elements.
+class FlexContainerHighlightConfig {
+  /// The style of the container border
+  final LineStyle? containerBorder;
+
+  /// The style of the separator between lines
+  final LineStyle? lineSeparator;
+
+  /// The style of the separator between items
+  final LineStyle? itemSeparator;
+
+  /// Style of content-distribution space on the main axis (justify-content).
+  final BoxStyle? mainDistributedSpace;
+
+  /// Style of content-distribution space on the cross axis (align-content).
+  final BoxStyle? crossDistributedSpace;
+
+  /// Style of empty space caused by row gaps (gap/row-gap).
+  final BoxStyle? rowGapSpace;
+
+  /// Style of empty space caused by columns gaps (gap/column-gap).
+  final BoxStyle? columnGapSpace;
+
+  /// Style of the self-alignment line (align-items).
+  final LineStyle? crossAlignment;
+
+  FlexContainerHighlightConfig(
+      {this.containerBorder,
+      this.lineSeparator,
+      this.itemSeparator,
+      this.mainDistributedSpace,
+      this.crossDistributedSpace,
+      this.rowGapSpace,
+      this.columnGapSpace,
+      this.crossAlignment});
+
+  factory FlexContainerHighlightConfig.fromJson(Map<String, dynamic> json) {
+    return FlexContainerHighlightConfig(
+      containerBorder: json.containsKey('containerBorder')
+          ? LineStyle.fromJson(json['containerBorder'] as Map<String, dynamic>)
+          : null,
+      lineSeparator: json.containsKey('lineSeparator')
+          ? LineStyle.fromJson(json['lineSeparator'] as Map<String, dynamic>)
+          : null,
+      itemSeparator: json.containsKey('itemSeparator')
+          ? LineStyle.fromJson(json['itemSeparator'] as Map<String, dynamic>)
+          : null,
+      mainDistributedSpace: json.containsKey('mainDistributedSpace')
+          ? BoxStyle.fromJson(
+              json['mainDistributedSpace'] as Map<String, dynamic>)
+          : null,
+      crossDistributedSpace: json.containsKey('crossDistributedSpace')
+          ? BoxStyle.fromJson(
+              json['crossDistributedSpace'] as Map<String, dynamic>)
+          : null,
+      rowGapSpace: json.containsKey('rowGapSpace')
+          ? BoxStyle.fromJson(json['rowGapSpace'] as Map<String, dynamic>)
+          : null,
+      columnGapSpace: json.containsKey('columnGapSpace')
+          ? BoxStyle.fromJson(json['columnGapSpace'] as Map<String, dynamic>)
+          : null,
+      crossAlignment: json.containsKey('crossAlignment')
+          ? LineStyle.fromJson(json['crossAlignment'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (containerBorder != null) 'containerBorder': containerBorder!.toJson(),
+      if (lineSeparator != null) 'lineSeparator': lineSeparator!.toJson(),
+      if (itemSeparator != null) 'itemSeparator': itemSeparator!.toJson(),
+      if (mainDistributedSpace != null)
+        'mainDistributedSpace': mainDistributedSpace!.toJson(),
+      if (crossDistributedSpace != null)
+        'crossDistributedSpace': crossDistributedSpace!.toJson(),
+      if (rowGapSpace != null) 'rowGapSpace': rowGapSpace!.toJson(),
+      if (columnGapSpace != null) 'columnGapSpace': columnGapSpace!.toJson(),
+      if (crossAlignment != null) 'crossAlignment': crossAlignment!.toJson(),
+    };
+  }
+}
+
+/// Style information for drawing a line.
+class LineStyle {
+  /// The color of the line (default: transparent)
+  final dom.RGBA? color;
+
+  /// The line pattern (default: solid)
+  final LineStylePattern? pattern;
+
+  LineStyle({this.color, this.pattern});
+
+  factory LineStyle.fromJson(Map<String, dynamic> json) {
+    return LineStyle(
+      color: json.containsKey('color')
+          ? dom.RGBA.fromJson(json['color'] as Map<String, dynamic>)
+          : null,
+      pattern: json.containsKey('pattern')
+          ? LineStylePattern.fromJson(json['pattern'] as String)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (color != null) 'color': color!.toJson(),
+      if (pattern != null) 'pattern': pattern,
+    };
+  }
+}
+
+class LineStylePattern {
+  static const dashed = LineStylePattern._('dashed');
+  static const dotted = LineStylePattern._('dotted');
+  static const values = {
+    'dashed': dashed,
+    'dotted': dotted,
+  };
+
+  final String value;
+
+  const LineStylePattern._(this.value);
+
+  factory LineStylePattern.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is LineStylePattern && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Style information for drawing a box.
+class BoxStyle {
+  /// The background color for the box (default: transparent)
+  final dom.RGBA? fillColor;
+
+  /// The hatching color for the box (default: transparent)
+  final dom.RGBA? hatchColor;
+
+  BoxStyle({this.fillColor, this.hatchColor});
+
+  factory BoxStyle.fromJson(Map<String, dynamic> json) {
+    return BoxStyle(
+      fillColor: json.containsKey('fillColor')
+          ? dom.RGBA.fromJson(json['fillColor'] as Map<String, dynamic>)
+          : null,
+      hatchColor: json.containsKey('hatchColor')
+          ? dom.RGBA.fromJson(json['hatchColor'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (fillColor != null) 'fillColor': fillColor!.toJson(),
+      if (hatchColor != null) 'hatchColor': hatchColor!.toJson(),
+    };
+  }
+}
+
+class ContrastAlgorithm {
+  static const aa = ContrastAlgorithm._('aa');
+  static const aaa = ContrastAlgorithm._('aaa');
+  static const apca = ContrastAlgorithm._('apca');
+  static const values = {
+    'aa': aa,
+    'aaa': aaa,
+    'apca': apca,
+  };
+
+  final String value;
+
+  const ContrastAlgorithm._(this.value);
+
+  factory ContrastAlgorithm.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ContrastAlgorithm && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Configuration data for the highlighting of page elements.
 class HighlightConfig {
   /// Whether the node info tooltip should be shown (default: false).
@@ -519,6 +731,12 @@ class HighlightConfig {
   /// The grid layout highlight configuration (default: all transparent).
   final GridHighlightConfig? gridHighlightConfig;
 
+  /// The flex container highlight configuration (default: all transparent).
+  final FlexContainerHighlightConfig? flexContainerHighlightConfig;
+
+  /// The contrast algorithm to use for the contrast ratio (default: aa).
+  final ContrastAlgorithm? contrastAlgorithm;
+
   HighlightConfig(
       {this.showInfo,
       this.showStyles,
@@ -534,7 +752,9 @@ class HighlightConfig {
       this.shapeMarginColor,
       this.cssGridColor,
       this.colorFormat,
-      this.gridHighlightConfig});
+      this.gridHighlightConfig,
+      this.flexContainerHighlightConfig,
+      this.contrastAlgorithm});
 
   factory HighlightConfig.fromJson(Map<String, dynamic> json) {
     return HighlightConfig(
@@ -580,6 +800,14 @@ class HighlightConfig {
           ? GridHighlightConfig.fromJson(
               json['gridHighlightConfig'] as Map<String, dynamic>)
           : null,
+      flexContainerHighlightConfig:
+          json.containsKey('flexContainerHighlightConfig')
+              ? FlexContainerHighlightConfig.fromJson(
+                  json['flexContainerHighlightConfig'] as Map<String, dynamic>)
+              : null,
+      contrastAlgorithm: json.containsKey('contrastAlgorithm')
+          ? ContrastAlgorithm.fromJson(json['contrastAlgorithm'] as String)
+          : null,
     );
   }
 
@@ -604,6 +832,10 @@ class HighlightConfig {
       if (colorFormat != null) 'colorFormat': colorFormat!.toJson(),
       if (gridHighlightConfig != null)
         'gridHighlightConfig': gridHighlightConfig!.toJson(),
+      if (flexContainerHighlightConfig != null)
+        'flexContainerHighlightConfig': flexContainerHighlightConfig!.toJson(),
+      if (contrastAlgorithm != null)
+        'contrastAlgorithm': contrastAlgorithm!.toJson(),
     };
   }
 }
@@ -659,6 +891,32 @@ class GridNodeHighlightConfig {
   Map<String, dynamic> toJson() {
     return {
       'gridHighlightConfig': gridHighlightConfig.toJson(),
+      'nodeId': nodeId.toJson(),
+    };
+  }
+}
+
+class FlexNodeHighlightConfig {
+  /// A descriptor for the highlight appearance of flex containers.
+  final FlexContainerHighlightConfig flexContainerHighlightConfig;
+
+  /// Identifier of the node to highlight.
+  final dom.NodeId nodeId;
+
+  FlexNodeHighlightConfig(
+      {required this.flexContainerHighlightConfig, required this.nodeId});
+
+  factory FlexNodeHighlightConfig.fromJson(Map<String, dynamic> json) {
+    return FlexNodeHighlightConfig(
+      flexContainerHighlightConfig: FlexContainerHighlightConfig.fromJson(
+          json['flexContainerHighlightConfig'] as Map<String, dynamic>),
+      nodeId: dom.NodeId.fromJson(json['nodeId'] as int),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'flexContainerHighlightConfig': flexContainerHighlightConfig.toJson(),
       'nodeId': nodeId.toJson(),
     };
   }

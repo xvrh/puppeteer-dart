@@ -88,6 +88,11 @@ class InputApi {
   /// [buttons] A number indicating which buttons are pressed on the mouse when a mouse event is triggered.
   /// Left=1, Right=2, Middle=4, Back=8, Forward=16, None=0.
   /// [clickCount] Number of times the mouse button was clicked (default: 0).
+  /// [force] The normalized pressure, which has a range of [0,1] (default: 0).
+  /// [tangentialPressure] The normalized tangential pressure, which has a range of [-1,1] (default: 0).
+  /// [tiltX] The plane angle between the Y-Z plane and the plane containing both the stylus axis and the Y axis, in degrees of the range [-90,90], a positive tiltX is to the right (default: 0).
+  /// [tiltY] The plane angle between the X-Z plane and the plane containing both the stylus axis and the X axis, in degrees of the range [-90,90], a positive tiltY is towards the user (default: 0).
+  /// [twist] The clockwise rotation of a pen stylus around its own major axis, in degrees in the range [0,359] (default: 0).
   /// [deltaX] X delta in CSS pixels for mouse wheel event (default: 0).
   /// [deltaY] Y delta in CSS pixels for mouse wheel event (default: 0).
   /// [pointerType] Pointer type (default: "mouse").
@@ -101,6 +106,11 @@ class InputApi {
       MouseButton? button,
       int? buttons,
       int? clickCount,
+      num? force,
+      num? tangentialPressure,
+      int? tiltX,
+      int? tiltY,
+      int? twist,
       num? deltaX,
       num? deltaY,
       @Enum(['mouse', 'pen'])
@@ -117,6 +127,11 @@ class InputApi {
       if (button != null) 'button': button,
       if (buttons != null) 'buttons': buttons,
       if (clickCount != null) 'clickCount': clickCount,
+      if (force != null) 'force': force,
+      if (tangentialPressure != null) 'tangentialPressure': tangentialPressure,
+      if (tiltX != null) 'tiltX': tiltX,
+      if (tiltY != null) 'tiltY': tiltY,
+      if (twist != null) 'twist': twist,
       if (deltaX != null) 'deltaX': deltaX,
       if (deltaY != null) 'deltaY': deltaY,
       if (pointerType != null) 'pointerType': pointerType,
@@ -295,6 +310,18 @@ class TouchPoint {
   /// Force (default: 1.0).
   final num? force;
 
+  /// The normalized tangential pressure, which has a range of [-1,1] (default: 0).
+  final num? tangentialPressure;
+
+  /// The plane angle between the Y-Z plane and the plane containing both the stylus axis and the Y axis, in degrees of the range [-90,90], a positive tiltX is to the right (default: 0)
+  final int? tiltX;
+
+  /// The plane angle between the X-Z plane and the plane containing both the stylus axis and the X axis, in degrees of the range [-90,90], a positive tiltY is towards the user (default: 0).
+  final int? tiltY;
+
+  /// The clockwise rotation of a pen stylus around its own major axis, in degrees in the range [0,359] (default: 0).
+  final int? twist;
+
   /// Identifier used to track touch sources between events, must be unique within an event.
   final num? id;
 
@@ -305,6 +332,10 @@ class TouchPoint {
       this.radiusY,
       this.rotationAngle,
       this.force,
+      this.tangentialPressure,
+      this.tiltX,
+      this.tiltY,
+      this.twist,
       this.id});
 
   factory TouchPoint.fromJson(Map<String, dynamic> json) {
@@ -317,6 +348,12 @@ class TouchPoint {
           ? json['rotationAngle'] as num
           : null,
       force: json.containsKey('force') ? json['force'] as num : null,
+      tangentialPressure: json.containsKey('tangentialPressure')
+          ? json['tangentialPressure'] as num
+          : null,
+      tiltX: json.containsKey('tiltX') ? json['tiltX'] as int : null,
+      tiltY: json.containsKey('tiltY') ? json['tiltY'] as int : null,
+      twist: json.containsKey('twist') ? json['twist'] as int : null,
       id: json.containsKey('id') ? json['id'] as num : null,
     );
   }
@@ -329,6 +366,10 @@ class TouchPoint {
       if (radiusY != null) 'radiusY': radiusY,
       if (rotationAngle != null) 'rotationAngle': rotationAngle,
       if (force != null) 'force': force,
+      if (tangentialPressure != null) 'tangentialPressure': tangentialPressure,
+      if (tiltX != null) 'tiltX': tiltX,
+      if (tiltY != null) 'tiltY': tiltY,
+      if (twist != null) 'twist': twist,
       if (id != null) 'id': id,
     };
   }

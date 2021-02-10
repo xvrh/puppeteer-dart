@@ -67,6 +67,15 @@ class DOMDebuggerApi {
     });
   }
 
+  /// Sets breakpoint on particular CSP violations.
+  /// [violationTypes] CSP Violations to stop upon.
+  Future<void> setBreakOnCSPViolation(
+      List<CSPViolationType> violationTypes) async {
+    await _client.send('DOMDebugger.setBreakOnCSPViolation', {
+      'violationTypes': [...violationTypes],
+    });
+  }
+
   /// Sets breakpoint on particular operation with DOM.
   /// [nodeId] Identifier of the node to set breakpoint on.
   /// [type] Type of the operation to stop upon.
@@ -129,6 +138,36 @@ class DOMBreakpointType {
   @override
   bool operator ==(other) =>
       (other is DOMBreakpointType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// CSP Violation type.
+class CSPViolationType {
+  static const trustedtypeSinkViolation =
+      CSPViolationType._('trustedtype-sink-violation');
+  static const trustedtypePolicyViolation =
+      CSPViolationType._('trustedtype-policy-violation');
+  static const values = {
+    'trustedtype-sink-violation': trustedtypeSinkViolation,
+    'trustedtype-policy-violation': trustedtypePolicyViolation,
+  };
+
+  final String value;
+
+  const CSPViolationType._(this.value);
+
+  factory CSPViolationType.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is CSPViolationType && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

@@ -31,6 +31,7 @@ import 'network.dart';
 import 'overlay.dart';
 import 'page.dart';
 import 'performance.dart';
+import 'performance_timeline.dart';
 import 'profiler.dart';
 import 'runtime.dart';
 import 'security.dart';
@@ -166,6 +167,12 @@ class DevTools {
 
   PerformanceApi get performance => _performance ??= PerformanceApi(client);
   PerformanceApi? _performance;
+
+  /// Reporting of performance timeline events, as specified in
+  /// https://w3c.github.io/performance-timeline/#dom-performanceobserver.
+  PerformanceTimelineApi get performanceTimeline =>
+      _performanceTimeline ??= PerformanceTimelineApi(client);
+  PerformanceTimelineApi? _performanceTimeline;
 
   /// Security
   SecurityApi get security => _security ??= SecurityApi(client);
