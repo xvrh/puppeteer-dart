@@ -520,10 +520,11 @@ class UserAgentBrandVersion {
 }
 
 /// Used to specify User Agent Cient Hints to emulate. See https://wicg.github.io/ua-client-hints
+/// Missing optional values will be filled in by the target with what it would normally use.
 class UserAgentMetadata {
-  final List<UserAgentBrandVersion> brands;
+  final List<UserAgentBrandVersion>? brands;
 
-  final String fullVersion;
+  final String? fullVersion;
 
   final String platform;
 
@@ -536,8 +537,8 @@ class UserAgentMetadata {
   final bool mobile;
 
   UserAgentMetadata(
-      {required this.brands,
-      required this.fullVersion,
+      {this.brands,
+      this.fullVersion,
       required this.platform,
       required this.platformVersion,
       required this.architecture,
@@ -546,10 +547,15 @@ class UserAgentMetadata {
 
   factory UserAgentMetadata.fromJson(Map<String, dynamic> json) {
     return UserAgentMetadata(
-      brands: (json['brands'] as List)
-          .map((e) => UserAgentBrandVersion.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      fullVersion: json['fullVersion'] as String,
+      brands: json.containsKey('brands')
+          ? (json['brands'] as List)
+              .map((e) =>
+                  UserAgentBrandVersion.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+      fullVersion: json.containsKey('fullVersion')
+          ? json['fullVersion'] as String
+          : null,
       platform: json['platform'] as String,
       platformVersion: json['platformVersion'] as String,
       architecture: json['architecture'] as String,
@@ -560,13 +566,13 @@ class UserAgentMetadata {
 
   Map<String, dynamic> toJson() {
     return {
-      'brands': brands.map((e) => e.toJson()).toList(),
-      'fullVersion': fullVersion,
       'platform': platform,
       'platformVersion': platformVersion,
       'architecture': architecture,
       'model': model,
       'mobile': mobile,
+      if (brands != null) 'brands': brands!.map((e) => e.toJson()).toList(),
+      if (fullVersion != null) 'fullVersion': fullVersion,
     };
   }
 }

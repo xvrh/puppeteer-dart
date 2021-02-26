@@ -47,6 +47,12 @@ class AuditsApi {
   Future<void> enable() async {
     await _client.send('Audits.enable');
   }
+
+  /// Runs the contrast check for the target page. Found issues are reported
+  /// using Audits.issueAdded event.
+  Future<void> checkContrast() async {
+    await _client.send('Audits.checkContrast');
+  }
 }
 
 class GetEncodedResponseResult {
@@ -838,9 +844,8 @@ class SharedArrayBufferIssueType {
   String toString() => value.toString();
 }
 
-/// Details for a request that has been blocked with the BLOCKED_BY_RESPONSE
-/// code. Currently only used for COEP/COOP, but may be extended to include
-/// some CSP errors in the future.
+/// Details for a issue arising from an SAB being instantiated in, or
+/// transfered to a context that is not cross-origin isolated.
 class SharedArrayBufferIssueDetails {
   final SourceCodeLocation sourceCodeLocation;
 
@@ -954,6 +959,107 @@ class TrustedWebActivityIssueDetails {
   }
 }
 
+class LowTextContrastIssueDetails {
+  final dom.BackendNodeId violatingNodeId;
+
+  final String violatingNodeSelector;
+
+  final num contrastRatio;
+
+  final num thresholdAA;
+
+  final num thresholdAAA;
+
+  final String fontSize;
+
+  final String fontWeight;
+
+  LowTextContrastIssueDetails(
+      {required this.violatingNodeId,
+      required this.violatingNodeSelector,
+      required this.contrastRatio,
+      required this.thresholdAA,
+      required this.thresholdAAA,
+      required this.fontSize,
+      required this.fontWeight});
+
+  factory LowTextContrastIssueDetails.fromJson(Map<String, dynamic> json) {
+    return LowTextContrastIssueDetails(
+      violatingNodeId:
+          dom.BackendNodeId.fromJson(json['violatingNodeId'] as int),
+      violatingNodeSelector: json['violatingNodeSelector'] as String,
+      contrastRatio: json['contrastRatio'] as num,
+      thresholdAA: json['thresholdAA'] as num,
+      thresholdAAA: json['thresholdAAA'] as num,
+      fontSize: json['fontSize'] as String,
+      fontWeight: json['fontWeight'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'violatingNodeId': violatingNodeId.toJson(),
+      'violatingNodeSelector': violatingNodeSelector,
+      'contrastRatio': contrastRatio,
+      'thresholdAA': thresholdAA,
+      'thresholdAAA': thresholdAAA,
+      'fontSize': fontSize,
+      'fontWeight': fontWeight,
+    };
+  }
+}
+
+/// Details for a CORS related issue, e.g. a warning or error related to
+/// CORS RFC1918 enforcement.
+class CorsIssueDetails {
+  final network.CorsErrorStatus corsErrorStatus;
+
+  final bool isWarning;
+
+  final AffectedRequest request;
+
+  final network.IPAddressSpace? resourceIPAddressSpace;
+
+  final network.ClientSecurityState? clientSecurityState;
+
+  CorsIssueDetails(
+      {required this.corsErrorStatus,
+      required this.isWarning,
+      required this.request,
+      this.resourceIPAddressSpace,
+      this.clientSecurityState});
+
+  factory CorsIssueDetails.fromJson(Map<String, dynamic> json) {
+    return CorsIssueDetails(
+      corsErrorStatus: network.CorsErrorStatus.fromJson(
+          json['corsErrorStatus'] as Map<String, dynamic>),
+      isWarning: json['isWarning'] as bool,
+      request:
+          AffectedRequest.fromJson(json['request'] as Map<String, dynamic>),
+      resourceIPAddressSpace: json.containsKey('resourceIPAddressSpace')
+          ? network.IPAddressSpace.fromJson(
+              json['resourceIPAddressSpace'] as String)
+          : null,
+      clientSecurityState: json.containsKey('clientSecurityState')
+          ? network.ClientSecurityState.fromJson(
+              json['clientSecurityState'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'corsErrorStatus': corsErrorStatus.toJson(),
+      'isWarning': isWarning,
+      'request': request.toJson(),
+      if (resourceIPAddressSpace != null)
+        'resourceIPAddressSpace': resourceIPAddressSpace!.toJson(),
+      if (clientSecurityState != null)
+        'clientSecurityState': clientSecurityState!.toJson(),
+    };
+  }
+}
+
 /// A unique identifier for the type of issue. Each type may use one of the
 /// optional fields in InspectorIssueDetails to convey more specific
 /// information about the kind of issue.
@@ -970,6 +1076,9 @@ class InspectorIssueCode {
       InspectorIssueCode._('SharedArrayBufferIssue');
   static const trustedWebActivityIssue =
       InspectorIssueCode._('TrustedWebActivityIssue');
+  static const lowTextContrastIssue =
+      InspectorIssueCode._('LowTextContrastIssue');
+  static const corsIssue = InspectorIssueCode._('CorsIssue');
   static const values = {
     'SameSiteCookieIssue': sameSiteCookieIssue,
     'MixedContentIssue': mixedContentIssue,
@@ -978,6 +1087,8 @@ class InspectorIssueCode {
     'ContentSecurityPolicyIssue': contentSecurityPolicyIssue,
     'SharedArrayBufferIssue': sharedArrayBufferIssue,
     'TrustedWebActivityIssue': trustedWebActivityIssue,
+    'LowTextContrastIssue': lowTextContrastIssue,
+    'CorsIssue': corsIssue,
   };
 
   final String value;
@@ -1017,6 +1128,10 @@ class InspectorIssueDetails {
 
   final TrustedWebActivityIssueDetails? twaQualityEnforcementDetails;
 
+  final LowTextContrastIssueDetails? lowTextContrastIssueDetails;
+
+  final CorsIssueDetails? corsIssueDetails;
+
   InspectorIssueDetails(
       {this.sameSiteCookieIssueDetails,
       this.mixedContentIssueDetails,
@@ -1024,7 +1139,9 @@ class InspectorIssueDetails {
       this.heavyAdIssueDetails,
       this.contentSecurityPolicyIssueDetails,
       this.sharedArrayBufferIssueDetails,
-      this.twaQualityEnforcementDetails});
+      this.twaQualityEnforcementDetails,
+      this.lowTextContrastIssueDetails,
+      this.corsIssueDetails});
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
     return InspectorIssueDetails(
@@ -1060,6 +1177,15 @@ class InspectorIssueDetails {
               ? TrustedWebActivityIssueDetails.fromJson(
                   json['twaQualityEnforcementDetails'] as Map<String, dynamic>)
               : null,
+      lowTextContrastIssueDetails:
+          json.containsKey('lowTextContrastIssueDetails')
+              ? LowTextContrastIssueDetails.fromJson(
+                  json['lowTextContrastIssueDetails'] as Map<String, dynamic>)
+              : null,
+      corsIssueDetails: json.containsKey('corsIssueDetails')
+          ? CorsIssueDetails.fromJson(
+              json['corsIssueDetails'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -1082,6 +1208,10 @@ class InspectorIssueDetails {
             sharedArrayBufferIssueDetails!.toJson(),
       if (twaQualityEnforcementDetails != null)
         'twaQualityEnforcementDetails': twaQualityEnforcementDetails!.toJson(),
+      if (lowTextContrastIssueDetails != null)
+        'lowTextContrastIssueDetails': lowTextContrastIssueDetails!.toJson(),
+      if (corsIssueDetails != null)
+        'corsIssueDetails': corsIssueDetails!.toJson(),
     };
   }
 }

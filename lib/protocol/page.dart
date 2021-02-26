@@ -531,6 +531,18 @@ class PageApi {
     });
   }
 
+  /// Get Permissions Policy state on given frame.
+  Future<List<PermissionsPolicyFeatureState>> getPermissionsPolicyState(
+      FrameId frameId) async {
+    var result = await _client.send('Page.getPermissionsPolicyState', {
+      'frameId': frameId,
+    });
+    return (result['states'] as List)
+        .map((e) =>
+            PermissionsPolicyFeatureState.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
   /// Overrides the values of device screen dimensions (window.screen.width, window.screen.height,
   /// window.innerWidth, window.innerHeight, and "device-width"/"device-height"-related CSS media
   /// query results).
@@ -1401,6 +1413,236 @@ class GatedAPIFeatures {
 
   @override
   String toString() => value.toString();
+}
+
+/// All Permissions Policy features. This enum should match the one defined
+/// in renderer/core/feature_policy/feature_policy_features.json5.
+class PermissionsPolicyFeature {
+  static const accelerometer = PermissionsPolicyFeature._('accelerometer');
+  static const ambientLightSensor =
+      PermissionsPolicyFeature._('ambient-light-sensor');
+  static const autoplay = PermissionsPolicyFeature._('autoplay');
+  static const camera = PermissionsPolicyFeature._('camera');
+  static const chDpr = PermissionsPolicyFeature._('ch-dpr');
+  static const chDeviceMemory = PermissionsPolicyFeature._('ch-device-memory');
+  static const chDownlink = PermissionsPolicyFeature._('ch-downlink');
+  static const chEct = PermissionsPolicyFeature._('ch-ect');
+  static const chLang = PermissionsPolicyFeature._('ch-lang');
+  static const chRtt = PermissionsPolicyFeature._('ch-rtt');
+  static const chUa = PermissionsPolicyFeature._('ch-ua');
+  static const chUaArch = PermissionsPolicyFeature._('ch-ua-arch');
+  static const chUaPlatform = PermissionsPolicyFeature._('ch-ua-platform');
+  static const chUaModel = PermissionsPolicyFeature._('ch-ua-model');
+  static const chUaMobile = PermissionsPolicyFeature._('ch-ua-mobile');
+  static const chUaFullVersion =
+      PermissionsPolicyFeature._('ch-ua-full-version');
+  static const chUaPlatformVersion =
+      PermissionsPolicyFeature._('ch-ua-platform-version');
+  static const chViewportWidth =
+      PermissionsPolicyFeature._('ch-viewport-width');
+  static const chWidth = PermissionsPolicyFeature._('ch-width');
+  static const clipboardRead = PermissionsPolicyFeature._('clipboard-read');
+  static const clipboardWrite = PermissionsPolicyFeature._('clipboard-write');
+  static const conversionMeasurement =
+      PermissionsPolicyFeature._('conversion-measurement');
+  static const crossOriginIsolated =
+      PermissionsPolicyFeature._('cross-origin-isolated');
+  static const displayCapture = PermissionsPolicyFeature._('display-capture');
+  static const documentDomain = PermissionsPolicyFeature._('document-domain');
+  static const encryptedMedia = PermissionsPolicyFeature._('encrypted-media');
+  static const executionWhileOutOfViewport =
+      PermissionsPolicyFeature._('execution-while-out-of-viewport');
+  static const executionWhileNotRendered =
+      PermissionsPolicyFeature._('execution-while-not-rendered');
+  static const focusWithoutUserActivation =
+      PermissionsPolicyFeature._('focus-without-user-activation');
+  static const fullscreen = PermissionsPolicyFeature._('fullscreen');
+  static const frobulate = PermissionsPolicyFeature._('frobulate');
+  static const gamepad = PermissionsPolicyFeature._('gamepad');
+  static const geolocation = PermissionsPolicyFeature._('geolocation');
+  static const gyroscope = PermissionsPolicyFeature._('gyroscope');
+  static const hid = PermissionsPolicyFeature._('hid');
+  static const idleDetection = PermissionsPolicyFeature._('idle-detection');
+  static const interestCohort = PermissionsPolicyFeature._('interest-cohort');
+  static const magnetometer = PermissionsPolicyFeature._('magnetometer');
+  static const microphone = PermissionsPolicyFeature._('microphone');
+  static const midi = PermissionsPolicyFeature._('midi');
+  static const otpCredentials = PermissionsPolicyFeature._('otp-credentials');
+  static const payment = PermissionsPolicyFeature._('payment');
+  static const pictureInPicture =
+      PermissionsPolicyFeature._('picture-in-picture');
+  static const publickeyCredentialsGet =
+      PermissionsPolicyFeature._('publickey-credentials-get');
+  static const screenWakeLock = PermissionsPolicyFeature._('screen-wake-lock');
+  static const serial = PermissionsPolicyFeature._('serial');
+  static const storageAccessApi =
+      PermissionsPolicyFeature._('storage-access-api');
+  static const syncXhr = PermissionsPolicyFeature._('sync-xhr');
+  static const trustTokenRedemption =
+      PermissionsPolicyFeature._('trust-token-redemption');
+  static const usb = PermissionsPolicyFeature._('usb');
+  static const verticalScroll = PermissionsPolicyFeature._('vertical-scroll');
+  static const webShare = PermissionsPolicyFeature._('web-share');
+  static const xrSpatialTracking =
+      PermissionsPolicyFeature._('xr-spatial-tracking');
+  static const values = {
+    'accelerometer': accelerometer,
+    'ambient-light-sensor': ambientLightSensor,
+    'autoplay': autoplay,
+    'camera': camera,
+    'ch-dpr': chDpr,
+    'ch-device-memory': chDeviceMemory,
+    'ch-downlink': chDownlink,
+    'ch-ect': chEct,
+    'ch-lang': chLang,
+    'ch-rtt': chRtt,
+    'ch-ua': chUa,
+    'ch-ua-arch': chUaArch,
+    'ch-ua-platform': chUaPlatform,
+    'ch-ua-model': chUaModel,
+    'ch-ua-mobile': chUaMobile,
+    'ch-ua-full-version': chUaFullVersion,
+    'ch-ua-platform-version': chUaPlatformVersion,
+    'ch-viewport-width': chViewportWidth,
+    'ch-width': chWidth,
+    'clipboard-read': clipboardRead,
+    'clipboard-write': clipboardWrite,
+    'conversion-measurement': conversionMeasurement,
+    'cross-origin-isolated': crossOriginIsolated,
+    'display-capture': displayCapture,
+    'document-domain': documentDomain,
+    'encrypted-media': encryptedMedia,
+    'execution-while-out-of-viewport': executionWhileOutOfViewport,
+    'execution-while-not-rendered': executionWhileNotRendered,
+    'focus-without-user-activation': focusWithoutUserActivation,
+    'fullscreen': fullscreen,
+    'frobulate': frobulate,
+    'gamepad': gamepad,
+    'geolocation': geolocation,
+    'gyroscope': gyroscope,
+    'hid': hid,
+    'idle-detection': idleDetection,
+    'interest-cohort': interestCohort,
+    'magnetometer': magnetometer,
+    'microphone': microphone,
+    'midi': midi,
+    'otp-credentials': otpCredentials,
+    'payment': payment,
+    'picture-in-picture': pictureInPicture,
+    'publickey-credentials-get': publickeyCredentialsGet,
+    'screen-wake-lock': screenWakeLock,
+    'serial': serial,
+    'storage-access-api': storageAccessApi,
+    'sync-xhr': syncXhr,
+    'trust-token-redemption': trustTokenRedemption,
+    'usb': usb,
+    'vertical-scroll': verticalScroll,
+    'web-share': webShare,
+    'xr-spatial-tracking': xrSpatialTracking,
+  };
+
+  final String value;
+
+  const PermissionsPolicyFeature._(this.value);
+
+  factory PermissionsPolicyFeature.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is PermissionsPolicyFeature && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Reason for a permissions policy feature to be disabled.
+class PermissionsPolicyBlockReason {
+  static const header = PermissionsPolicyBlockReason._('Header');
+  static const iframeAttribute =
+      PermissionsPolicyBlockReason._('IframeAttribute');
+  static const values = {
+    'Header': header,
+    'IframeAttribute': iframeAttribute,
+  };
+
+  final String value;
+
+  const PermissionsPolicyBlockReason._(this.value);
+
+  factory PermissionsPolicyBlockReason.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is PermissionsPolicyBlockReason && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class PermissionsPolicyBlockLocator {
+  final FrameId frameId;
+
+  final PermissionsPolicyBlockReason blockReason;
+
+  PermissionsPolicyBlockLocator(
+      {required this.frameId, required this.blockReason});
+
+  factory PermissionsPolicyBlockLocator.fromJson(Map<String, dynamic> json) {
+    return PermissionsPolicyBlockLocator(
+      frameId: FrameId.fromJson(json['frameId'] as String),
+      blockReason:
+          PermissionsPolicyBlockReason.fromJson(json['blockReason'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'frameId': frameId.toJson(),
+      'blockReason': blockReason.toJson(),
+    };
+  }
+}
+
+class PermissionsPolicyFeatureState {
+  final PermissionsPolicyFeature feature;
+
+  final bool allowed;
+
+  final PermissionsPolicyBlockLocator? locator;
+
+  PermissionsPolicyFeatureState(
+      {required this.feature, required this.allowed, this.locator});
+
+  factory PermissionsPolicyFeatureState.fromJson(Map<String, dynamic> json) {
+    return PermissionsPolicyFeatureState(
+      feature: PermissionsPolicyFeature.fromJson(json['feature'] as String),
+      allowed: json['allowed'] as bool,
+      locator: json.containsKey('locator')
+          ? PermissionsPolicyBlockLocator.fromJson(
+              json['locator'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'feature': feature.toJson(),
+      'allowed': allowed,
+      if (locator != null) 'locator': locator!.toJson(),
+    };
+  }
 }
 
 /// Information about the Frame on the page.

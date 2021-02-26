@@ -1360,7 +1360,7 @@
                 },
                 {
                     "id": "SharedArrayBufferIssueDetails",
-                    "description": "Details for a request that has been blocked with the BLOCKED_BY_RESPONSE\ncode. Currently only used for COEP/COOP, but may be extended to include\nsome CSP errors in the future.",
+                    "description": "Details for a issue arising from an SAB being instantiated in, or\ntransfered to a context that is not cross-origin isolated.",
                     "type": "object",
                     "properties": [
                         {
@@ -1453,6 +1453,35 @@
                     ]
                 },
                 {
+                    "id": "CorsIssueDetails",
+                    "description": "Details for a CORS related issue, e.g. a warning or error related to\nCORS RFC1918 enforcement.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "corsErrorStatus",
+                            "$ref": "Network.CorsErrorStatus"
+                        },
+                        {
+                            "name": "isWarning",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "request",
+                            "$ref": "AffectedRequest"
+                        },
+                        {
+                            "name": "resourceIPAddressSpace",
+                            "optional": true,
+                            "$ref": "Network.IPAddressSpace"
+                        },
+                        {
+                            "name": "clientSecurityState",
+                            "optional": true,
+                            "$ref": "Network.ClientSecurityState"
+                        }
+                    ]
+                },
+                {
                     "id": "InspectorIssueCode",
                     "description": "A unique identifier for the type of issue. Each type may use one of the\noptional fields in InspectorIssueDetails to convey more specific\ninformation about the kind of issue.",
                     "type": "string",
@@ -1464,7 +1493,8 @@
                         "ContentSecurityPolicyIssue",
                         "SharedArrayBufferIssue",
                         "TrustedWebActivityIssue",
-                        "LowTextContrastIssue"
+                        "LowTextContrastIssue",
+                        "CorsIssue"
                     ]
                 },
                 {
@@ -1511,6 +1541,11 @@
                             "name": "lowTextContrastIssueDetails",
                             "optional": true,
                             "$ref": "LowTextContrastIssueDetails"
+                        },
+                        {
+                            "name": "corsIssueDetails",
+                            "optional": true,
+                            "$ref": "CorsIssueDetails"
                         }
                     ]
                 },
@@ -1592,7 +1627,15 @@
                 },
                 {
                     "name": "checkContrast",
-                    "description": "Runs the contrast check for the target page. Found issues are reported\nusing Audits.issueAdded event."
+                    "description": "Runs the contrast check for the target page. Found issues are reported\nusing Audits.issueAdded event.",
+                    "parameters": [
+                        {
+                            "name": "reportAAA",
+                            "description": "Whether to report WCAG AAA level issues. Default is false.",
+                            "optional": true,
+                            "type": "boolean"
+                        }
+                    ]
                 }
             ],
             "events": [
@@ -9653,6 +9696,17 @@
                     ]
                 },
                 {
+                    "id": "CookieSourceScheme",
+                    "description": "Represents the source scheme of the origin that originally set the cookie.\nA value of \"Unset\" allows protocol clients to emulate legacy cookie scope for the scheme.\nThis is a temporary ability and it will be removed in the future.",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "Unset",
+                        "NonSecure",
+                        "Secure"
+                    ]
+                },
+                {
                     "id": "ResourceTiming",
                     "description": "Timing information for the request.",
                     "type": "object",
@@ -10477,6 +10531,18 @@
                             "description": "True if cookie is SameParty.",
                             "experimental": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "sourceScheme",
+                            "description": "Cookie source scheme type.",
+                            "experimental": true,
+                            "$ref": "CookieSourceScheme"
+                        },
+                        {
+                            "name": "sourcePort",
+                            "description": "Cookie source port. Valid values are {-1, [1, 65535]}, -1 indicates an unspecified port.\nAn unspecified port value allows protocol clients to emulate legacy cookie scope for the port.\nThis is a temporary ability and it will be removed in the future.",
+                            "experimental": true,
+                            "type": "integer"
                         }
                     ]
                 },
@@ -10591,7 +10657,7 @@
                         },
                         {
                             "name": "url",
-                            "description": "The request-URI to associate with the setting of the cookie. This value can affect the\ndefault domain and path values of the created cookie.",
+                            "description": "The request-URI to associate with the setting of the cookie. This value can affect the\ndefault domain, path, source port, and source scheme values of the created cookie.",
                             "optional": true,
                             "type": "string"
                         },
@@ -10637,6 +10703,27 @@
                             "experimental": true,
                             "optional": true,
                             "$ref": "CookiePriority"
+                        },
+                        {
+                            "name": "sameParty",
+                            "description": "True if cookie is SameParty.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "sourceScheme",
+                            "description": "Cookie source scheme type.",
+                            "experimental": true,
+                            "optional": true,
+                            "$ref": "CookieSourceScheme"
+                        },
+                        {
+                            "name": "sourcePort",
+                            "description": "Cookie source port. Valid values are {-1, [1, 65535]}, -1 indicates an unspecified port.\nAn unspecified port value allows protocol clients to emulate legacy cookie scope for the port.\nThis is a temporary ability and it will be removed in the future.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "integer"
                         }
                     ]
                 },
@@ -10913,7 +11000,8 @@
                     "type": "string",
                     "enum": [
                         "Allow",
-                        "BlockFromInsecureToMorePrivate"
+                        "BlockFromInsecureToMorePrivate",
+                        "WarnFromInsecureToMorePrivate"
                     ]
                 },
                 {
@@ -11527,7 +11615,7 @@
                         },
                         {
                             "name": "url",
-                            "description": "The request-URI to associate with the setting of the cookie. This value can affect the\ndefault domain and path values of the created cookie.",
+                            "description": "The request-URI to associate with the setting of the cookie. This value can affect the\ndefault domain, path, source port, and source scheme values of the created cookie.",
                             "optional": true,
                             "type": "string"
                         },
@@ -11573,6 +11661,27 @@
                             "experimental": true,
                             "optional": true,
                             "$ref": "CookiePriority"
+                        },
+                        {
+                            "name": "sameParty",
+                            "description": "True if cookie is SameParty.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "sourceScheme",
+                            "description": "Cookie source scheme type.",
+                            "experimental": true,
+                            "optional": true,
+                            "$ref": "CookieSourceScheme"
+                        },
+                        {
+                            "name": "sourcePort",
+                            "description": "Cookie source port. Valid values are {-1, [1, 65535]}, -1 indicates an unspecified port.\nAn unspecified port value allows protocol clients to emulate legacy cookie scope for the port.\nThis is a temporary ability and it will be removed in the future.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "integer"
                         }
                     ],
                     "returns": [
@@ -13403,6 +13512,112 @@
                     ]
                 },
                 {
+                    "id": "PermissionsPolicyFeature",
+                    "description": "All Permissions Policy features. This enum should match the one defined\nin renderer/core/feature_policy/feature_policy_features.json5.",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "accelerometer",
+                        "ambient-light-sensor",
+                        "autoplay",
+                        "camera",
+                        "ch-dpr",
+                        "ch-device-memory",
+                        "ch-downlink",
+                        "ch-ect",
+                        "ch-lang",
+                        "ch-rtt",
+                        "ch-ua",
+                        "ch-ua-arch",
+                        "ch-ua-platform",
+                        "ch-ua-model",
+                        "ch-ua-mobile",
+                        "ch-ua-full-version",
+                        "ch-ua-platform-version",
+                        "ch-viewport-width",
+                        "ch-width",
+                        "clipboard-read",
+                        "clipboard-write",
+                        "conversion-measurement",
+                        "cross-origin-isolated",
+                        "display-capture",
+                        "document-domain",
+                        "encrypted-media",
+                        "execution-while-out-of-viewport",
+                        "execution-while-not-rendered",
+                        "focus-without-user-activation",
+                        "fullscreen",
+                        "frobulate",
+                        "gamepad",
+                        "geolocation",
+                        "gyroscope",
+                        "hid",
+                        "idle-detection",
+                        "interest-cohort",
+                        "magnetometer",
+                        "microphone",
+                        "midi",
+                        "otp-credentials",
+                        "payment",
+                        "picture-in-picture",
+                        "publickey-credentials-get",
+                        "screen-wake-lock",
+                        "serial",
+                        "storage-access-api",
+                        "sync-xhr",
+                        "trust-token-redemption",
+                        "usb",
+                        "vertical-scroll",
+                        "web-share",
+                        "xr-spatial-tracking"
+                    ]
+                },
+                {
+                    "id": "PermissionsPolicyBlockReason",
+                    "description": "Reason for a permissions policy feature to be disabled.",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "Header",
+                        "IframeAttribute"
+                    ]
+                },
+                {
+                    "id": "PermissionsPolicyBlockLocator",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "frameId",
+                            "$ref": "FrameId"
+                        },
+                        {
+                            "name": "blockReason",
+                            "$ref": "PermissionsPolicyBlockReason"
+                        }
+                    ]
+                },
+                {
+                    "id": "PermissionsPolicyFeatureState",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "feature",
+                            "$ref": "PermissionsPolicyFeature"
+                        },
+                        {
+                            "name": "allowed",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "locator",
+                            "optional": true,
+                            "$ref": "PermissionsPolicyBlockLocator"
+                        }
+                    ]
+                },
+                {
                     "id": "Frame",
                     "description": "Information about the Frame on the page.",
                     "type": "object",
@@ -14687,6 +14902,26 @@
                             "name": "enabled",
                             "description": "Whether to bypass page CSP.",
                             "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "name": "getPermissionsPolicyState",
+                    "description": "Get Permissions Policy state on given frame.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "frameId",
+                            "$ref": "FrameId"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "states",
+                            "type": "array",
+                            "items": {
+                                "$ref": "PermissionsPolicyFeatureState"
+                            }
                         }
                     ]
                 },
