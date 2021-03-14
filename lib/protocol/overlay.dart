@@ -570,6 +570,44 @@ class FlexContainerHighlightConfig {
   }
 }
 
+/// Configuration data for the highlighting of Flex item elements.
+class FlexItemHighlightConfig {
+  /// Style of the box representing the item's base size
+  final BoxStyle? baseSizeBox;
+
+  /// Style of the border around the box representing the item's base size
+  final LineStyle? baseSizeBorder;
+
+  /// Style of the arrow representing if the item grew or shrank
+  final LineStyle? flexibilityArrow;
+
+  FlexItemHighlightConfig(
+      {this.baseSizeBox, this.baseSizeBorder, this.flexibilityArrow});
+
+  factory FlexItemHighlightConfig.fromJson(Map<String, dynamic> json) {
+    return FlexItemHighlightConfig(
+      baseSizeBox: json.containsKey('baseSizeBox')
+          ? BoxStyle.fromJson(json['baseSizeBox'] as Map<String, dynamic>)
+          : null,
+      baseSizeBorder: json.containsKey('baseSizeBorder')
+          ? LineStyle.fromJson(json['baseSizeBorder'] as Map<String, dynamic>)
+          : null,
+      flexibilityArrow: json.containsKey('flexibilityArrow')
+          ? LineStyle.fromJson(json['flexibilityArrow'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (baseSizeBox != null) 'baseSizeBox': baseSizeBox!.toJson(),
+      if (baseSizeBorder != null) 'baseSizeBorder': baseSizeBorder!.toJson(),
+      if (flexibilityArrow != null)
+        'flexibilityArrow': flexibilityArrow!.toJson(),
+    };
+  }
+}
+
 /// Style information for drawing a line.
 class LineStyle {
   /// The color of the line (default: transparent)
@@ -734,6 +772,9 @@ class HighlightConfig {
   /// The flex container highlight configuration (default: all transparent).
   final FlexContainerHighlightConfig? flexContainerHighlightConfig;
 
+  /// The flex item highlight configuration (default: all transparent).
+  final FlexItemHighlightConfig? flexItemHighlightConfig;
+
   /// The contrast algorithm to use for the contrast ratio (default: aa).
   final ContrastAlgorithm? contrastAlgorithm;
 
@@ -754,6 +795,7 @@ class HighlightConfig {
       this.colorFormat,
       this.gridHighlightConfig,
       this.flexContainerHighlightConfig,
+      this.flexItemHighlightConfig,
       this.contrastAlgorithm});
 
   factory HighlightConfig.fromJson(Map<String, dynamic> json) {
@@ -805,6 +847,10 @@ class HighlightConfig {
               ? FlexContainerHighlightConfig.fromJson(
                   json['flexContainerHighlightConfig'] as Map<String, dynamic>)
               : null,
+      flexItemHighlightConfig: json.containsKey('flexItemHighlightConfig')
+          ? FlexItemHighlightConfig.fromJson(
+              json['flexItemHighlightConfig'] as Map<String, dynamic>)
+          : null,
       contrastAlgorithm: json.containsKey('contrastAlgorithm')
           ? ContrastAlgorithm.fromJson(json['contrastAlgorithm'] as String)
           : null,
@@ -834,6 +880,8 @@ class HighlightConfig {
         'gridHighlightConfig': gridHighlightConfig!.toJson(),
       if (flexContainerHighlightConfig != null)
         'flexContainerHighlightConfig': flexContainerHighlightConfig!.toJson(),
+      if (flexItemHighlightConfig != null)
+        'flexItemHighlightConfig': flexItemHighlightConfig!.toJson(),
       if (contrastAlgorithm != null)
         'contrastAlgorithm': contrastAlgorithm!.toJson(),
     };

@@ -884,6 +884,7 @@ class RemoteObjectSubtype {
   static const arraybuffer = RemoteObjectSubtype._('arraybuffer');
   static const dataview = RemoteObjectSubtype._('dataview');
   static const webassemblymemory = RemoteObjectSubtype._('webassemblymemory');
+  static const wasmvalue = RemoteObjectSubtype._('wasmvalue');
   static const values = {
     'array': array,
     'null': null$,
@@ -903,6 +904,7 @@ class RemoteObjectSubtype {
     'arraybuffer': arraybuffer,
     'dataview': dataview,
     'webassemblymemory': webassemblymemory,
+    'wasmvalue': wasmvalue,
   };
 
   final String value;
@@ -1072,6 +1074,7 @@ class ObjectPreviewSubtype {
   static const arraybuffer = ObjectPreviewSubtype._('arraybuffer');
   static const dataview = ObjectPreviewSubtype._('dataview');
   static const webassemblymemory = ObjectPreviewSubtype._('webassemblymemory');
+  static const wasmvalue = ObjectPreviewSubtype._('wasmvalue');
   static const values = {
     'array': array,
     'null': null$,
@@ -1091,6 +1094,7 @@ class ObjectPreviewSubtype {
     'arraybuffer': arraybuffer,
     'dataview': dataview,
     'webassemblymemory': webassemblymemory,
+    'wasmvalue': wasmvalue,
   };
 
   final String value;
@@ -1221,6 +1225,7 @@ class PropertyPreviewSubtype {
   static const dataview = PropertyPreviewSubtype._('dataview');
   static const webassemblymemory =
       PropertyPreviewSubtype._('webassemblymemory');
+  static const wasmvalue = PropertyPreviewSubtype._('wasmvalue');
   static const values = {
     'array': array,
     'null': null$,
@@ -1240,6 +1245,7 @@ class PropertyPreviewSubtype {
     'arraybuffer': arraybuffer,
     'dataview': dataview,
     'webassemblymemory': webassemblymemory,
+    'wasmvalue': wasmvalue,
   };
 
   final String value;

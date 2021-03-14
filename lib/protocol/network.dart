@@ -423,7 +423,7 @@ class NetworkApi {
   /// [name] Cookie name.
   /// [value] Cookie value.
   /// [url] The request-URI to associate with the setting of the cookie. This value can affect the
-  /// default domain and path values of the created cookie.
+  /// default domain, path, source port, and source scheme values of the created cookie.
   /// [domain] Cookie domain.
   /// [path] Cookie path.
   /// [secure] True if cookie is secure.
@@ -431,6 +431,11 @@ class NetworkApi {
   /// [sameSite] Cookie SameSite type.
   /// [expires] Cookie expiration date, session cookie if not set
   /// [priority] Cookie Priority type.
+  /// [sameParty] True if cookie is SameParty.
+  /// [sourceScheme] Cookie source scheme type.
+  /// [sourcePort] Cookie source port. Valid values are {-1, [1, 65535]}, -1 indicates an unspecified port.
+  /// An unspecified port value allows protocol clients to emulate legacy cookie scope for the port.
+  /// This is a temporary ability and it will be removed in the future.
   /// Returns: Always set to true. If an error occurs, the response indicates protocol error.
   Future<bool> setCookie(String name, String value,
       {String? url,
@@ -440,7 +445,10 @@ class NetworkApi {
       bool? httpOnly,
       CookieSameSite? sameSite,
       TimeSinceEpoch? expires,
-      CookiePriority? priority}) async {
+      CookiePriority? priority,
+      bool? sameParty,
+      CookieSourceScheme? sourceScheme,
+      int? sourcePort}) async {
     var result = await _client.send('Network.setCookie', {
       'name': name,
       'value': value,
@@ -452,6 +460,9 @@ class NetworkApi {
       if (sameSite != null) 'sameSite': sameSite,
       if (expires != null) 'expires': expires,
       if (priority != null) 'priority': priority,
+      if (sameParty != null) 'sameParty': sameParty,
+      if (sourceScheme != null) 'sourceScheme': sourceScheme,
+      if (sourcePort != null) 'sourcePort': sourcePort,
     });
     return result['success'] as bool;
   }
@@ -1224,6 +1235,10 @@ class ResponseReceivedExtraInfoEvent {
   /// Raw response headers as they were received over the wire.
   final Headers headers;
 
+  /// The IP address space of the resource. The address space can only be determined once the transport
+  /// established the connection, so we can't send it in `requestWillBeSentExtraInfo`.
+  final IPAddressSpace resourceIPAddressSpace;
+
   /// Raw response header text as it was received over the wire. The raw text may not always be
   /// available, such as in the case of HTTP/2 or QUIC.
   final String? headersText;
@@ -1232,6 +1247,7 @@ class ResponseReceivedExtraInfoEvent {
       {required this.requestId,
       required this.blockedCookies,
       required this.headers,
+      required this.resourceIPAddressSpace,
       this.headersText});
 
   factory ResponseReceivedExtraInfoEvent.fromJson(Map<String, dynamic> json) {
@@ -1242,6 +1258,8 @@ class ResponseReceivedExtraInfoEvent {
               BlockedSetCookieWithReason.fromJson(e as Map<String, dynamic>))
           .toList(),
       headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
+      resourceIPAddressSpace:
+          IPAddressSpace.fromJson(json['resourceIPAddressSpace'] as String),
       headersText: json.containsKey('headersText')
           ? json['headersText'] as String
           : null,
@@ -1664,6 +1682,38 @@ class CookiePriority {
   @override
   bool operator ==(other) =>
       (other is CookiePriority && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Represents the source scheme of the origin that originally set the cookie.
+/// A value of "Unset" allows protocol clients to emulate legacy cookie scope for the scheme.
+/// This is a temporary ability and it will be removed in the future.
+class CookieSourceScheme {
+  static const unset = CookieSourceScheme._('Unset');
+  static const nonSecure = CookieSourceScheme._('NonSecure');
+  static const secure = CookieSourceScheme._('Secure');
+  static const values = {
+    'Unset': unset,
+    'NonSecure': nonSecure,
+    'Secure': secure,
+  };
+
+  final String value;
+
+  const CookieSourceScheme._(this.value);
+
+  factory CookieSourceScheme.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is CookieSourceScheme && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -2970,6 +3020,14 @@ class Cookie {
   /// True if cookie is SameParty.
   final bool sameParty;
 
+  /// Cookie source scheme type.
+  final CookieSourceScheme sourceScheme;
+
+  /// Cookie source port. Valid values are {-1, [1, 65535]}, -1 indicates an unspecified port.
+  /// An unspecified port value allows protocol clients to emulate legacy cookie scope for the port.
+  /// This is a temporary ability and it will be removed in the future.
+  final int sourcePort;
+
   Cookie(
       {required this.name,
       required this.value,
@@ -2982,7 +3040,9 @@ class Cookie {
       required this.session,
       this.sameSite,
       required this.priority,
-      required this.sameParty});
+      required this.sameParty,
+      required this.sourceScheme,
+      required this.sourcePort});
 
   factory Cookie.fromJson(Map<String, dynamic> json) {
     return Cookie(
@@ -3000,6 +3060,8 @@ class Cookie {
           : null,
       priority: CookiePriority.fromJson(json['priority'] as String),
       sameParty: json['sameParty'] as bool,
+      sourceScheme: CookieSourceScheme.fromJson(json['sourceScheme'] as String),
+      sourcePort: json['sourcePort'] as int,
     );
   }
 
@@ -3016,6 +3078,8 @@ class Cookie {
       'session': session,
       'priority': priority.toJson(),
       'sameParty': sameParty,
+      'sourceScheme': sourceScheme.toJson(),
+      'sourcePort': sourcePort,
       if (sameSite != null) 'sameSite': sameSite!.toJson(),
     };
   }
@@ -3044,6 +3108,10 @@ class SetCookieBlockedReason {
       SetCookieBlockedReason._('SchemefulSameSiteLax');
   static const schemefulSameSiteUnspecifiedTreatedAsLax =
       SetCookieBlockedReason._('SchemefulSameSiteUnspecifiedTreatedAsLax');
+  static const samePartyFromCrossPartyContext =
+      SetCookieBlockedReason._('SamePartyFromCrossPartyContext');
+  static const samePartyConflictsWithOtherAttributes =
+      SetCookieBlockedReason._('SamePartyConflictsWithOtherAttributes');
   static const values = {
     'SecureOnly': secureOnly,
     'SameSiteStrict': sameSiteStrict,
@@ -3061,6 +3129,9 @@ class SetCookieBlockedReason {
     'SchemefulSameSiteLax': schemefulSameSiteLax,
     'SchemefulSameSiteUnspecifiedTreatedAsLax':
         schemefulSameSiteUnspecifiedTreatedAsLax,
+    'SamePartyFromCrossPartyContext': samePartyFromCrossPartyContext,
+    'SamePartyConflictsWithOtherAttributes':
+        samePartyConflictsWithOtherAttributes,
   };
 
   final String value;
@@ -3102,6 +3173,8 @@ class CookieBlockedReason {
       CookieBlockedReason._('SchemefulSameSiteLax');
   static const schemefulSameSiteUnspecifiedTreatedAsLax =
       CookieBlockedReason._('SchemefulSameSiteUnspecifiedTreatedAsLax');
+  static const samePartyFromCrossPartyContext =
+      CookieBlockedReason._('SamePartyFromCrossPartyContext');
   static const values = {
     'SecureOnly': secureOnly,
     'NotOnPath': notOnPath,
@@ -3116,6 +3189,7 @@ class CookieBlockedReason {
     'SchemefulSameSiteLax': schemefulSameSiteLax,
     'SchemefulSameSiteUnspecifiedTreatedAsLax':
         schemefulSameSiteUnspecifiedTreatedAsLax,
+    'SamePartyFromCrossPartyContext': samePartyFromCrossPartyContext,
   };
 
   final String value;
@@ -3211,7 +3285,7 @@ class CookieParam {
   final String value;
 
   /// The request-URI to associate with the setting of the cookie. This value can affect the
-  /// default domain and path values of the created cookie.
+  /// default domain, path, source port, and source scheme values of the created cookie.
   final String? url;
 
   /// Cookie domain.
@@ -3235,6 +3309,17 @@ class CookieParam {
   /// Cookie Priority.
   final CookiePriority? priority;
 
+  /// True if cookie is SameParty.
+  final bool? sameParty;
+
+  /// Cookie source scheme type.
+  final CookieSourceScheme? sourceScheme;
+
+  /// Cookie source port. Valid values are {-1, [1, 65535]}, -1 indicates an unspecified port.
+  /// An unspecified port value allows protocol clients to emulate legacy cookie scope for the port.
+  /// This is a temporary ability and it will be removed in the future.
+  final int? sourcePort;
+
   CookieParam(
       {required this.name,
       required this.value,
@@ -3245,7 +3330,10 @@ class CookieParam {
       this.httpOnly,
       this.sameSite,
       this.expires,
-      this.priority});
+      this.priority,
+      this.sameParty,
+      this.sourceScheme,
+      this.sourcePort});
 
   factory CookieParam.fromJson(Map<String, dynamic> json) {
     return CookieParam(
@@ -3265,6 +3353,13 @@ class CookieParam {
       priority: json.containsKey('priority')
           ? CookiePriority.fromJson(json['priority'] as String)
           : null,
+      sameParty:
+          json.containsKey('sameParty') ? json['sameParty'] as bool : null,
+      sourceScheme: json.containsKey('sourceScheme')
+          ? CookieSourceScheme.fromJson(json['sourceScheme'] as String)
+          : null,
+      sourcePort:
+          json.containsKey('sourcePort') ? json['sourcePort'] as int : null,
     );
   }
 
@@ -3280,6 +3375,9 @@ class CookieParam {
       if (sameSite != null) 'sameSite': sameSite!.toJson(),
       if (expires != null) 'expires': expires!.toJson(),
       if (priority != null) 'priority': priority!.toJson(),
+      if (sameParty != null) 'sameParty': sameParty,
+      if (sourceScheme != null) 'sourceScheme': sourceScheme!.toJson(),
+      if (sourcePort != null) 'sourcePort': sourcePort,
     };
   }
 }
@@ -3742,9 +3840,12 @@ class PrivateNetworkRequestPolicy {
   static const allow = PrivateNetworkRequestPolicy._('Allow');
   static const blockFromInsecureToMorePrivate =
       PrivateNetworkRequestPolicy._('BlockFromInsecureToMorePrivate');
+  static const warnFromInsecureToMorePrivate =
+      PrivateNetworkRequestPolicy._('WarnFromInsecureToMorePrivate');
   static const values = {
     'Allow': allow,
     'BlockFromInsecureToMorePrivate': blockFromInsecureToMorePrivate,
+    'WarnFromInsecureToMorePrivate': warnFromInsecureToMorePrivate,
   };
 
   final String value;
