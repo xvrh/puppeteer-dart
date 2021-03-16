@@ -569,9 +569,15 @@ async function _(element, pageJavascriptEnabled) {
   }
 
   /// The method runs `element.querySelector` within the page. If no element
-  /// matches the selector, the return value resolves to `null`.
+  /// matches the selector, an exception is thrown.
   Future<ElementHandle> $(String selector) async {
-    return $OrNull(selector).then((e) => e!);
+    return $OrNull(selector).then((e) {
+      if (e == null) {
+        throw Exception(
+            'Error: failed to find element matching selector "$selector"');
+      }
+      return e;
+    });
   }
 
   Future<ElementHandle?> $OrNull(String selector) async {
