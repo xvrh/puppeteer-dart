@@ -509,6 +509,7 @@ class Page {
   }
 
   /// The method runs `document.querySelector` within the page. If no element matches the selector, it throws an exception.
+  /// If you know that no element may match use `$OrNull(selector)` which will return `null` if no element matches the selector.
   ///
   /// Shortcut for [Page.mainFrame.$(selector)].
   ///

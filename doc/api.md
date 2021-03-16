@@ -624,6 +624,7 @@ await subscription.cancel();
 
 #### page.$(String selector)
 The method runs `document.querySelector` within the page. If no element matches the selector, it throws an exception.
+If you know that no element may match use `$OrNull(selector)` which will return `null` if no element matches the selector.
 
 Shortcut for [Page.mainFrame.$(selector)].
 
@@ -3318,7 +3319,7 @@ ElementHandle instances can be used as arguments in [page.$eval] and
 
 #### elementHandle.$(String selector)
 The method runs `element.querySelector` within the page. If no element
-matches the selector, the return value resolves to `null`.
+matches the selector, an exception is thrown.
 
 ```dart
 elementHandle.$(String selector) → Future<ElementHandle> 
