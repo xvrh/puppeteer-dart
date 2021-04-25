@@ -60,16 +60,23 @@ String _reorderImports(String content, CompilationUnit unit) {
         var token = directive.metadata.beginToken ??
             directive.firstTokenAfterCommentAndMetadata;
 
-        var hasTestMeta = const [
+        for (var testMeta in const [
           '@TestOn',
           '@Skip',
           '@Timeout',
           '@OnPlatform',
-          '@Tags'
-        ].any((tag) => directive.metadata.toList().contains(tag));
-        if (hasTestMeta) {
-          token = directive.firstTokenAfterCommentAndMetadata;
+          '@Tags',
+          '@GenerateMocks',
+        ]) {
+          var hasTestMeta = directive.metadata
+              .map((m) => '$m')
+              .any((m) => m.startsWith(testMeta));
+          if (hasTestMeta) {
+            token = directive.firstTokenAfterCommentAndMetadata;
+            break;
+          }
         }
+
         offset = token.offset;
         length =
             (directive.endToken.offset + directive.endToken.length) - offset;
