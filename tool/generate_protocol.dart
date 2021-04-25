@@ -667,7 +667,7 @@ class _DomainContext {
     if (type == 'number') return 'num';
     if (type == 'string') return 'String';
     if (type == 'boolean') return 'bool';
-    if (type == 'any') return 'dynamic';
+    if (type == 'any') return 'Object';
     if (type == 'object') return 'Map<String, dynamic>';
     if (type == 'binary') return 'String';
     if (type == 'array') {
@@ -696,7 +696,7 @@ bool isRawType(String? type) => const [
       'num',
       'String',
       'bool',
-      'dynamic',
+      'Object',
       'Map<String, dynamic>'
     ].contains(type);
 

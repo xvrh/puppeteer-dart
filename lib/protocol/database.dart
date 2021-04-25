@@ -41,7 +41,7 @@ class DatabaseApi {
 class ExecuteSQLResult {
   final List<String>? columnNames;
 
-  final List<dynamic>? values;
+  final List<Object>? values;
 
   final Error? sqlError;
 
@@ -53,7 +53,7 @@ class ExecuteSQLResult {
           ? (json['columnNames'] as List).map((e) => e as String).toList()
           : null,
       values: json.containsKey('values')
-          ? (json['values'] as List).map((e) => e as dynamic).toList()
+          ? (json['values'] as List).map((e) => e as Object).toList()
           : null,
       sqlError: json.containsKey('sqlError')
           ? Error.fromJson(json['sqlError'] as Map<String, dynamic>)

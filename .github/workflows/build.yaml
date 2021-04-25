@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v2
       - run: dart --version
       - run: dart pub get
-      - run: dart analyze --fatal-infos --fatal-warnings .
+      - run: dart analyze --fatal-infos .
       - run: dart example/download_chromium.dart
       - name: install required packages
         if: runner.os == 'Linux'
