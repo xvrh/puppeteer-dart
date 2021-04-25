@@ -6,6 +6,30 @@ class InputApi {
 
   InputApi(this._client);
 
+  /// Dispatches a drag event into the page.
+  /// [type] Type of the drag event.
+  /// [x] X coordinate of the event relative to the main frame's viewport in CSS pixels.
+  /// [y] Y coordinate of the event relative to the main frame's viewport in CSS pixels. 0 refers to
+  /// the top of the viewport and Y increases as it proceeds towards the bottom of the viewport.
+  /// [modifiers] Bit field representing pressed modifier keys. Alt=1, Ctrl=2, Meta/Command=4, Shift=8
+  /// (default: 0).
+  Future<void> dispatchDragEvent(
+      @Enum(['dragEnter', 'dragOver', 'drop', 'dragCancel']) String type,
+      num x,
+      num y,
+      DragData data,
+      {int? modifiers}) async {
+    assert(
+        const ['dragEnter', 'dragOver', 'drop', 'dragCancel'].contains(type));
+    await _client.send('Input.dispatchDragEvent', {
+      'type': type,
+      'x': x,
+      'y': y,
+      'data': data,
+      if (modifiers != null) 'modifiers': modifiers,
+    });
+  }
+
   /// Dispatches a key event to the page.
   /// [type] Type of the key event.
   /// [modifiers] Bit field representing pressed modifier keys. Alt=1, Ctrl=2, Meta/Command=4, Shift=8
@@ -458,4 +482,66 @@ class TimeSinceEpoch {
 
   @override
   String toString() => value.toString();
+}
+
+class DragDataItem {
+  /// Mime type of the dragged data.
+  final String mimeType;
+
+  /// Depending of the value of `mimeType`, it contains the dragged link,
+  /// text, HTML markup or any other data.
+  final String data;
+
+  /// Title associated with a link. Only valid when `mimeType` == "text/uri-list".
+  final String? title;
+
+  /// Stores the base URL for the contained markup. Only valid when `mimeType`
+  /// == "text/html".
+  final String? baseURL;
+
+  DragDataItem(
+      {required this.mimeType, required this.data, this.title, this.baseURL});
+
+  factory DragDataItem.fromJson(Map<String, dynamic> json) {
+    return DragDataItem(
+      mimeType: json['mimeType'] as String,
+      data: json['data'] as String,
+      title: json.containsKey('title') ? json['title'] as String : null,
+      baseURL: json.containsKey('baseURL') ? json['baseURL'] as String : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'mimeType': mimeType,
+      'data': data,
+      if (title != null) 'title': title,
+      if (baseURL != null) 'baseURL': baseURL,
+    };
+  }
+}
+
+class DragData {
+  final List<DragDataItem> items;
+
+  /// Bit field representing allowed drag operations. Copy = 1, Link = 2, Move = 16
+  final int dragOperationsMask;
+
+  DragData({required this.items, required this.dragOperationsMask});
+
+  factory DragData.fromJson(Map<String, dynamic> json) {
+    return DragData(
+      items: (json['items'] as List)
+          .map((e) => DragDataItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      dragOperationsMask: json['dragOperationsMask'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'items': items.map((e) => e.toJson()).toList(),
+      'dragOperationsMask': dragOperationsMask,
+    };
+  }
 }

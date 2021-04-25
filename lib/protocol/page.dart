@@ -733,9 +733,26 @@ class PageApi {
   }
 
   /// Forces compilation cache to be generated for every subresource script.
+  /// See also: `Page.produceCompilationCache`.
   Future<void> setProduceCompilationCache(bool enabled) async {
     await _client.send('Page.setProduceCompilationCache', {
       'enabled': enabled,
+    });
+  }
+
+  /// Requests backend to produce compilation cache for the specified scripts.
+  /// Unlike setProduceCompilationCache, this allows client to only produce cache
+  /// for specific scripts. `scripts` are appeneded to the list of scripts
+  /// for which the cache for would produced. Disabling compilation cache with
+  /// `setProduceCompilationCache` would reset all pending cache requests.
+  /// The list may also be reset during page navigation.
+  /// When script with a matching URL is encountered, the cache is optionally
+  /// produced upon backend discretion, based on internal heuristics.
+  /// See also: `Page.compilationCacheProduced`.
+  Future<void> produceCompilationCache(
+      List<CompilationCacheParams> scripts) async {
+    await _client.send('Page.produceCompilationCache', {
+      'scripts': [...scripts],
     });
   }
 
@@ -1159,28 +1176,28 @@ class GetAppManifestResult {
 }
 
 class GetLayoutMetricsResult {
-  /// Metrics relating to the layout viewport.
-  final LayoutViewport layoutViewport;
+  /// Metrics relating to the layout viewport in CSS pixels.
+  final LayoutViewport cssLayoutViewport;
 
-  /// Metrics relating to the visual viewport.
-  final VisualViewport visualViewport;
+  /// Metrics relating to the visual viewport in CSS pixels.
+  final VisualViewport cssVisualViewport;
 
-  /// Size of scrollable area.
-  final dom.Rect contentSize;
+  /// Size of scrollable area in CSS pixels.
+  final dom.Rect cssContentSize;
 
   GetLayoutMetricsResult(
-      {required this.layoutViewport,
-      required this.visualViewport,
-      required this.contentSize});
+      {required this.cssLayoutViewport,
+      required this.cssVisualViewport,
+      required this.cssContentSize});
 
   factory GetLayoutMetricsResult.fromJson(Map<String, dynamic> json) {
     return GetLayoutMetricsResult(
-      layoutViewport: LayoutViewport.fromJson(
-          json['layoutViewport'] as Map<String, dynamic>),
-      visualViewport: VisualViewport.fromJson(
-          json['visualViewport'] as Map<String, dynamic>),
-      contentSize:
-          dom.Rect.fromJson(json['contentSize'] as Map<String, dynamic>),
+      cssLayoutViewport: LayoutViewport.fromJson(
+          json['cssLayoutViewport'] as Map<String, dynamic>),
+      cssVisualViewport: VisualViewport.fromJson(
+          json['cssVisualViewport'] as Map<String, dynamic>),
+      cssContentSize:
+          dom.Rect.fromJson(json['cssContentSize'] as Map<String, dynamic>),
     );
   }
 }
@@ -2553,6 +2570,32 @@ class ReferrerPolicy {
 
   @override
   String toString() => value.toString();
+}
+
+/// Per-script compilation cache parameters for `Page.produceCompilationCache`
+class CompilationCacheParams {
+  /// The URL of the script to produce a compilation cache entry for.
+  final String url;
+
+  /// A hint to the backend whether eager compilation is recommended.
+  /// (the actual compilation mode used is upon backend discretion).
+  final bool? eager;
+
+  CompilationCacheParams({required this.url, this.eager});
+
+  factory CompilationCacheParams.fromJson(Map<String, dynamic> json) {
+    return CompilationCacheParams(
+      url: json['url'] as String,
+      eager: json.containsKey('eager') ? json['eager'] as bool : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      if (eager != null) 'eager': eager,
+    };
+  }
 }
 
 class FileChooserOpenedEventMode {

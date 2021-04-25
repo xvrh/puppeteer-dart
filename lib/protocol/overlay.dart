@@ -239,6 +239,14 @@ class OverlayApi {
     });
   }
 
+  /// [scrollSnapHighlightConfigs] An array of node identifiers and descriptors for the highlight appearance.
+  Future<void> setShowScrollSnapOverlays(
+      List<ScrollSnapHighlightConfig> scrollSnapHighlightConfigs) async {
+    await _client.send('Overlay.setShowScrollSnapOverlays', {
+      'scrollSnapHighlightConfigs': [...scrollSnapHighlightConfigs],
+    });
+  }
+
   /// Requests that backend shows paint rectangles
   /// [result] True for showing paint rectangles
   Future<void> setShowPaintRects(bool result) async {
@@ -965,6 +973,85 @@ class FlexNodeHighlightConfig {
   Map<String, dynamic> toJson() {
     return {
       'flexContainerHighlightConfig': flexContainerHighlightConfig.toJson(),
+      'nodeId': nodeId.toJson(),
+    };
+  }
+}
+
+class ScrollSnapContainerHighlightConfig {
+  /// The style of the snapport border (default: transparent)
+  final LineStyle? snapportBorder;
+
+  /// The style of the snap area border (default: transparent)
+  final LineStyle? snapAreaBorder;
+
+  /// The margin highlight fill color (default: transparent).
+  final dom.RGBA? scrollMarginColor;
+
+  /// The padding highlight fill color (default: transparent).
+  final dom.RGBA? scrollPaddingColor;
+
+  ScrollSnapContainerHighlightConfig(
+      {this.snapportBorder,
+      this.snapAreaBorder,
+      this.scrollMarginColor,
+      this.scrollPaddingColor});
+
+  factory ScrollSnapContainerHighlightConfig.fromJson(
+      Map<String, dynamic> json) {
+    return ScrollSnapContainerHighlightConfig(
+      snapportBorder: json.containsKey('snapportBorder')
+          ? LineStyle.fromJson(json['snapportBorder'] as Map<String, dynamic>)
+          : null,
+      snapAreaBorder: json.containsKey('snapAreaBorder')
+          ? LineStyle.fromJson(json['snapAreaBorder'] as Map<String, dynamic>)
+          : null,
+      scrollMarginColor: json.containsKey('scrollMarginColor')
+          ? dom.RGBA.fromJson(json['scrollMarginColor'] as Map<String, dynamic>)
+          : null,
+      scrollPaddingColor: json.containsKey('scrollPaddingColor')
+          ? dom.RGBA
+              .fromJson(json['scrollPaddingColor'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (snapportBorder != null) 'snapportBorder': snapportBorder!.toJson(),
+      if (snapAreaBorder != null) 'snapAreaBorder': snapAreaBorder!.toJson(),
+      if (scrollMarginColor != null)
+        'scrollMarginColor': scrollMarginColor!.toJson(),
+      if (scrollPaddingColor != null)
+        'scrollPaddingColor': scrollPaddingColor!.toJson(),
+    };
+  }
+}
+
+class ScrollSnapHighlightConfig {
+  /// A descriptor for the highlight appearance of scroll snap containers.
+  final ScrollSnapContainerHighlightConfig scrollSnapContainerHighlightConfig;
+
+  /// Identifier of the node to highlight.
+  final dom.NodeId nodeId;
+
+  ScrollSnapHighlightConfig(
+      {required this.scrollSnapContainerHighlightConfig, required this.nodeId});
+
+  factory ScrollSnapHighlightConfig.fromJson(Map<String, dynamic> json) {
+    return ScrollSnapHighlightConfig(
+      scrollSnapContainerHighlightConfig:
+          ScrollSnapContainerHighlightConfig.fromJson(
+              json['scrollSnapContainerHighlightConfig']
+                  as Map<String, dynamic>),
+      nodeId: dom.NodeId.fromJson(json['nodeId'] as int),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'scrollSnapContainerHighlightConfig':
+          scrollSnapContainerHighlightConfig.toJson(),
       'nodeId': nodeId.toJson(),
     };
   }

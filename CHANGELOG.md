@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.1.0 (2021-04-25)
+- Update Chromium to version 91
+
 ## 2.0.0 (2021-02-24)
 - Migrate to null-safety
 - Update Chromium to version 90

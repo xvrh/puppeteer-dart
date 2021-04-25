@@ -64,6 +64,17 @@ class BrowserApi {
     });
   }
 
+  /// Cancel a download if in progress
+  /// [guid] Global unique identifier of the download.
+  /// [browserContextId] BrowserContext to perform the action in. When omitted, default browser context is used.
+  Future<void> cancelDownload(String guid,
+      {BrowserContextID? browserContextId}) async {
+    await _client.send('Browser.cancelDownload', {
+      'guid': guid,
+      if (browserContextId != null) 'browserContextId': browserContextId,
+    });
+  }
+
   /// Close browser gracefully.
   Future<void> close() async {
     await _client.send('Browser.close');

@@ -134,7 +134,7 @@ class TargetApi {
   }
 
   /// Creates a new page.
-  /// [url] The initial URL the page will be navigated to.
+  /// [url] The initial URL the page will be navigated to. An empty string indicates about:blank.
   /// [width] Frame width in DIP (headless chrome only).
   /// [height] Frame height in DIP (headless chrome only).
   /// [browserContextId] The browser context to create the page in.

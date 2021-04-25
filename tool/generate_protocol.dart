@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:path/path.dart' as p;
-// ignore: import_of_legacy_library_into_null_safe
 import 'code_style/fix_import_order.dart';
 import 'download_protocol_from_repo.dart' as protocols_from_repo;
 import 'model.dart';

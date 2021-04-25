@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-// ignore: import_of_legacy_library_into_null_safe
 import 'package:dart_style/dart_style.dart';
 import 'package:http/http.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -9,6 +8,9 @@ import 'utils/string_helpers.dart';
 
 part 'generate_devices.g.dart';
 
+//TODO(xha): this script doesn't work anymore since the file has changed to
+// typescript code (instead of json file):
+// https://github.com/ChromeDevTools/devtools-frontend/blob/master/front_end/panels/emulation/EmulatedDevices.ts
 const deviceUrl =
     'https://raw.githubusercontent.com/ChromeDevTools/devtools-frontend/master/front_end/emulated_devices/module.json';
 
@@ -25,7 +27,8 @@ void main() async {
   buffer.writeln('class Devices with IterableMixin<Device> {');
   var allNames = <String?, String>{};
   for (var emulatedDevice
-      in module.extensions!.where((e) => e.type == 'emulated-device')) {
+      in module.extensions?.where((e) => e.type == 'emulated-device') ??
+          <Extension>[]) {
     var device = emulatedDevice.device!;
 
     const deviceSplits = {

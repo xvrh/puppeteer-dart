@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:test/test.dart';
 import 'accessibility_test.dart' as accessibility_test;
 import 'browser_context_test.dart' as browser_context_test;

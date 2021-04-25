@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'dart:convert';
 import 'dart:io';
 import 'package:analyzer/dart/analysis/utilities.dart';
@@ -59,7 +57,7 @@ String _reorderImports(String content, CompilationUnit unit) {
 
         // C'est très fragile mais on essaye de faire que les attributs @TestOn
         // reste toujours en premier. Les autres attributs restent attaché à leur import (ex: @MirrorUsed)
-        var token = directive.metadata?.beginToken ??
+        var token = directive.metadata.beginToken ??
             directive.firstTokenAfterCommentAndMetadata;
 
         var hasTestMeta = const [
@@ -151,8 +149,8 @@ String _removeBlankLines(String content) {
 }
 
 int _compare(UriBasedDirective directive1, UriBasedDirective directive2) {
-  var uri1 = directive1.uri.stringValue;
-  var uri2 = directive2.uri.stringValue;
+  var uri1 = directive1.uri.stringValue!;
+  var uri2 = directive2.uri.stringValue!;
 
   if (uri1.contains(':') && !uri2.contains(':')) {
     return -1;

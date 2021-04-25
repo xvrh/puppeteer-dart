@@ -139,6 +139,16 @@ class StorageApi {
         .map((e) => TrustTokens.fromJson(e as Map<String, dynamic>))
         .toList();
   }
+
+  /// Removes all Trust Tokens issued by the provided issuerOrigin.
+  /// Leaves other stored data, including the issuer's Redemption Records, intact.
+  /// Returns: True if any tokens were deleted, false otherwise.
+  Future<bool> clearTrustTokens(String issuerOrigin) async {
+    var result = await _client.send('Storage.clearTrustTokens', {
+      'issuerOrigin': issuerOrigin,
+    });
+    return result['didDeleteTokens'] as bool;
+  }
 }
 
 class CacheStorageContentUpdatedEvent {

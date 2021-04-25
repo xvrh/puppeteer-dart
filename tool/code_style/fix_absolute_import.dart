@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'dart:io';
 import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
@@ -43,7 +41,7 @@ String fixCode(DartFile dartFile, String content) {
 
     for (var directive
         in unit.directives.reversed.whereType<NamespaceDirective>()) {
-      var uriValue = directive.uri.stringValue;
+      var uriValue = directive.uri.stringValue!;
       var absolutePrefix = 'package:${dartFile.project.packageName}/';
       if (uriValue.startsWith(absolutePrefix)) {
         var absoluteImportFromLib = uriValue.replaceAll(absolutePrefix, '');

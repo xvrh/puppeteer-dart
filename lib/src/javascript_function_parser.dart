@@ -7,7 +7,7 @@ import 'package:petitparser/petitparser.dart';
 /// Returns the string as it if this is already a classical function declaration
 /// Returns null if we cannot parse recognize the declaration
 String? convertToFunctionDeclaration(String javascript) {
-  var grammar = JsGrammar();
+  var grammar = JsGrammarDefinition().build();
   var result = grammar.parse(javascript);
 
   if (result.isSuccess) {
@@ -37,67 +37,63 @@ String? convertToFunctionDeclaration(String javascript) {
   }
 }
 
-class JsGrammar extends GrammarParser {
-  JsGrammar() : super(JsGrammarDefinition());
-}
-
 class JsGrammarDefinition extends GrammarDefinition {
   Parser token(input) {
     if (input is String) {
       input = input.length == 1 ? char(input) : string(input);
-    } else if (input is Function) {
-      input = ref(input);
+    } else if (input is Parser Function()) {
+      input = ref0(input);
     }
     if (input is! Parser || input is TrimmingParser || input is TokenParser) {
       throw ArgumentError('Invalid token parser: $input');
     }
-    return input.token().trim(ref(HIDDEN_STUFF));
+    return input.token().trim(ref0(HIDDEN_STUFF));
   }
 
   @override
-  Parser start() => ref(functionDeclarationOrShortHand).end();
+  Parser start() => ref0(functionDeclarationOrShortHand).end();
 
   Parser functionDeclarationOrShortHand() =>
-      ref(functionDeclaration) | ref(functionShorthand);
+      ref0(functionDeclaration) | ref0(functionShorthand);
 
   Parser functionDeclaration() =>
-      ref(token, 'async').optional() &
-      ref(token, 'function').map((_) => _isFunction) &
-      ref(identifier).optional() &
-      ref(arguments) &
-      ref(token, '{') &
-      ref(body);
+      ref1(token, 'async').optional() &
+      ref1(token, 'function').map((_) => _isFunction) &
+      ref0(identifier).optional() &
+      ref0(arguments) &
+      ref1(token, '{') &
+      ref0(body);
 
   Parser functionShorthand() =>
-      ref(token, 'async').optional().map((t) => t != null ? _isAsync : null) &
-      ref(functionShorthandArguments).flatten().map((t) => _Arguments(t)) &
-      ref(token, '=>') &
-      ref(token, '{')
+      ref1(token, 'async').optional().map((t) => t != null ? _isAsync : null) &
+      ref0(functionShorthandArguments).flatten().map((t) => _Arguments(t)) &
+      ref1(token, '=>') &
+      ref1(token, '{')
           .optional()
           .map((v) => v != null ? _hasBodyStatements : null) &
-      ref(body);
+      ref0(body);
 
-  Parser functionShorthandArguments() => ref(arguments) | ref(identifier);
+  Parser functionShorthandArguments() => ref0(arguments) | ref0(identifier);
 
   Parser arguments() =>
-      ref(token, '(') & ref(argumentList).optional() & ref(token, ')');
+      ref1(token, '(') & ref0(argumentList).optional() & ref1(token, ')');
 
-  Parser argumentList() => ref(argument).separatedBy(ref(token, ','));
+  Parser argumentList() => ref0(argument).separatedBy(ref1(token, ','));
 
-  Parser argument() => ref(token, '...').optional() & ref(identifier);
+  Parser argument() => ref1(token, '...').optional() & ref0(identifier);
 
-  Parser identifier() =>
-      ref(token, ref(IDENTIFIER)).map((v) => v.value[0] + v.value[1].join(''));
+  Parser identifier() => ref1(token, ref0(IDENTIFIER))
+      .map((v) => v.value[0] + v.value[1].join(''));
 
-  Parser body() => ref(any).star().map((v) => _FunctionBody(v.join('')));
+  Parser body() => ref0(any).star().map((v) => _FunctionBody(v.join('')));
 
-  Parser IDENTIFIER() => ref(IDENTIFIER_START) & ref(IDENTIFIER_PART).star();
+  Parser IDENTIFIER() => ref0(IDENTIFIER_START) & ref0(IDENTIFIER_PART).star();
 
-  Parser IDENTIFIER_START() => ref(IDENTIFIER_START_NO_DOLLAR) | char('\$');
+  Parser IDENTIFIER_START() => ref0(IDENTIFIER_START_NO_DOLLAR) | char('\$');
 
-  Parser IDENTIFIER_START_NO_DOLLAR() => ref(LETTER) | char('_');
+  Parser IDENTIFIER_START_NO_DOLLAR() => ref0(LETTER) | char('_');
 
-  Parser IDENTIFIER_PART() => ref(IDENTIFIER_START) | ref(DIGIT);
+  Parser IDENTIFIER_PART() => ref0(IDENTIFIER_START) | ref0(DIGIT);
 
   Parser LETTER() => letter();
 
@@ -106,16 +102,16 @@ class JsGrammarDefinition extends GrammarDefinition {
   Parser NEWLINE() => pattern('\n\r');
 
   Parser HIDDEN_STUFF() =>
-      ref(WHITESPACE) | ref(SINGLE_LINE_COMMENT) | ref(MULTI_LINE_COMMENT);
+      ref0(WHITESPACE) | ref0(SINGLE_LINE_COMMENT) | ref0(MULTI_LINE_COMMENT);
 
   Parser WHITESPACE() => whitespace();
 
   Parser SINGLE_LINE_COMMENT() =>
-      string('//') & ref(NEWLINE).neg().star() & ref(NEWLINE).optional();
+      string('//') & ref0(NEWLINE).neg().star() & ref0(NEWLINE).optional();
 
   Parser MULTI_LINE_COMMENT() =>
       string('/*') &
-      (ref(MULTI_LINE_COMMENT) | string('*/').neg()).star() &
+      (ref0(MULTI_LINE_COMMENT) | string('*/').neg()).star() &
       string('*/');
 }
 

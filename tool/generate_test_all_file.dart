@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'dart:io';
 import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as p;
@@ -14,7 +12,6 @@ void main() {
   allFiles.sort();
 
   var buffer = StringBuffer();
-  buffer.writeln('// @dart=2.9');
   buffer.writeln("import 'package:test/test.dart';");
   for (var file in allFiles) {
     buffer.writeln("import '$file' as ${file.replaceAll('.dart', '')};");
