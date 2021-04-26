@@ -1473,10 +1473,10 @@ class ShapeOutsideInfo {
   final Quad bounds;
 
   /// Shape coordinate details
-  final List<Object> shape;
+  final List<dynamic> shape;
 
   /// Margin shape bounds
-  final List<Object> marginShape;
+  final List<dynamic> marginShape;
 
   ShapeOutsideInfo(
       {required this.bounds, required this.shape, required this.marginShape});
@@ -1484,9 +1484,9 @@ class ShapeOutsideInfo {
   factory ShapeOutsideInfo.fromJson(Map<String, dynamic> json) {
     return ShapeOutsideInfo(
       bounds: Quad.fromJson(json['bounds'] as List),
-      shape: (json['shape'] as List).map((e) => e as Object).toList(),
+      shape: (json['shape'] as List).map((e) => e as dynamic).toList(),
       marginShape:
-          (json['marginShape'] as List).map((e) => e as Object).toList(),
+          (json['marginShape'] as List).map((e) => e as dynamic).toList(),
     );
   }
 

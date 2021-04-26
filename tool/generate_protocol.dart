@@ -118,7 +118,9 @@ void main() {
       code.writeln(type.code);
     }
 
-    _writeDartFile(p.join(targetDir.path, fileName), code.toString());
+    var finalCode = code.toString().replaceAll('dynamic?', 'dynamic');
+
+    _writeDartFile(p.join(targetDir.path, fileName), finalCode);
   }
 
   var tabBuffer = StringBuffer();
@@ -667,7 +669,7 @@ class _DomainContext {
     if (type == 'number') return 'num';
     if (type == 'string') return 'String';
     if (type == 'boolean') return 'bool';
-    if (type == 'any') return 'Object';
+    if (type == 'any') return 'dynamic';
     if (type == 'object') return 'Map<String, dynamic>';
     if (type == 'binary') return 'String';
     if (type == 'array') {
@@ -696,7 +698,7 @@ bool isRawType(String? type) => const [
       'num',
       'String',
       'bool',
-      'Object',
+      'dynamic',
       'Map<String, dynamic>'
     ].contains(type);
 

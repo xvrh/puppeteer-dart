@@ -396,7 +396,7 @@ class AXValue {
   final AXValueType type;
 
   /// The computed value of this property.
-  final Object? value;
+  final dynamic value;
 
   /// One or more related nodes, if applicable.
   final List<AXRelatedNode>? relatedNodes;
@@ -409,7 +409,7 @@ class AXValue {
   factory AXValue.fromJson(Map<String, dynamic> json) {
     return AXValue(
       type: AXValueType.fromJson(json['type'] as String),
-      value: json.containsKey('value') ? json['value'] as Object : null,
+      value: json.containsKey('value') ? json['value'] as dynamic : null,
       relatedNodes: json.containsKey('relatedNodes')
           ? (json['relatedNodes'] as List)
               .map((e) => AXRelatedNode.fromJson(e as Map<String, dynamic>))

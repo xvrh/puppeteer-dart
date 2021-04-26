@@ -754,7 +754,7 @@ class RemoteObject {
   final String? className;
 
   /// Remote object value in case of primitive values or JSON values (if it was requested).
-  final Object? value;
+  final dynamic value;
 
   /// Primitive value which can not be JSON-stringified does not have `value`, but gets this
   /// property.
@@ -790,7 +790,7 @@ class RemoteObject {
           : null,
       className:
           json.containsKey('className') ? json['className'] as String : null,
-      value: json.containsKey('value') ? json['value'] as Object : null,
+      value: json.containsKey('value') ? json['value'] as dynamic : null,
       unserializableValue: json.containsKey('unserializableValue')
           ? UnserializableValue.fromJson(json['unserializableValue'] as String)
           : null,
@@ -1457,7 +1457,7 @@ class PrivatePropertyDescriptor {
 /// unserializable primitive value or neither of (for undefined) them should be specified.
 class CallArgument {
   /// Primitive value or serializable javascript object.
-  final Object? value;
+  final dynamic value;
 
   /// Primitive value which can not be JSON-stringified.
   final UnserializableValue? unserializableValue;
@@ -1469,7 +1469,7 @@ class CallArgument {
 
   factory CallArgument.fromJson(Map<String, dynamic> json) {
     return CallArgument(
-      value: json.containsKey('value') ? json['value'] as Object : null,
+      value: json.containsKey('value') ? json['value'] as dynamic : null,
       unserializableValue: json.containsKey('unserializableValue')
           ? UnserializableValue.fromJson(json['unserializableValue'] as String)
           : null,
