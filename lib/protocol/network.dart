@@ -160,6 +160,19 @@ class NetworkApi {
       .where((event) => event.name == 'Network.trustTokenOperationDone')
       .map((event) => TrustTokenOperationDoneEvent.fromJson(event.parameters));
 
+  /// Sets a list of content encodings that will be accepted. Empty list means no encoding is accepted.
+  /// [encodings] List of accepted content encodings.
+  Future<void> setAcceptedEncodings(List<ContentEncoding> encodings) async {
+    await _client.send('Network.setAcceptedEncodings', {
+      'encodings': [...encodings],
+    });
+  }
+
+  /// Clears accepted encodings set by setAcceptedEncodings
+  Future<void> clearAcceptedEncodingsOverride() async {
+    await _client.send('Network.clearAcceptedEncodingsOverride');
+  }
+
   /// Tells whether clearing browser cache is supported.
   /// Returns: True if browser cache can be cleared.
   @deprecated
@@ -2260,7 +2273,6 @@ class BlockedReason {
   static const inspector = BlockedReason._('inspector');
   static const subresourceFilter = BlockedReason._('subresource-filter');
   static const contentType = BlockedReason._('content-type');
-  static const collapsedByClient = BlockedReason._('collapsed-by-client');
   static const coepFrameResourceNeedsCoepHeader =
       BlockedReason._('coep-frame-resource-needs-coep-header');
   static const coopSandboxedIframeCannotNavigateToCoopPage =
@@ -2278,7 +2290,6 @@ class BlockedReason {
     'inspector': inspector,
     'subresource-filter': subresourceFilter,
     'content-type': contentType,
-    'collapsed-by-client': collapsedByClient,
     'coep-frame-resource-needs-coep-header': coepFrameResourceNeedsCoepHeader,
     'coop-sandboxed-iframe-cannot-navigate-to-coop-page':
         coopSandboxedIframeCannotNavigateToCoopPage,
@@ -3836,6 +3847,36 @@ class SignedExchangeInfo {
   }
 }
 
+/// List of content encodings supported by the backend.
+class ContentEncoding {
+  static const deflate = ContentEncoding._('deflate');
+  static const gzip = ContentEncoding._('gzip');
+  static const br = ContentEncoding._('br');
+  static const values = {
+    'deflate': deflate,
+    'gzip': gzip,
+    'br': br,
+  };
+
+  final String value;
+
+  const ContentEncoding._(this.value);
+
+  factory ContentEncoding.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ContentEncoding && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 class PrivateNetworkRequestPolicy {
   static const allow = PrivateNetworkRequestPolicy._('Allow');
   static const blockFromInsecureToMorePrivate =
@@ -4007,9 +4048,12 @@ class CrossOriginOpenerPolicyStatus {
 
 class CrossOriginEmbedderPolicyValue {
   static const none = CrossOriginEmbedderPolicyValue._('None');
+  static const corsOrCredentialless =
+      CrossOriginEmbedderPolicyValue._('CorsOrCredentialless');
   static const requireCorp = CrossOriginEmbedderPolicyValue._('RequireCorp');
   static const values = {
     'None': none,
+    'CorsOrCredentialless': corsOrCredentialless,
     'RequireCorp': requireCorp,
   };
 

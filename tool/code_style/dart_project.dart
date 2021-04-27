@@ -38,10 +38,10 @@ DartProject? getContainingProject(String currentPath) {
 }
 
 /// Retourne les sous-projets ou le projet qui contient le dossier cible.
-List<DartProject?> getSubOrContainingProjects(String root) {
+List<DartProject> getSubOrContainingProjects(String root) {
   var projects = getDartProjects(root);
   if (projects.isEmpty) {
-    var containingProject = getContainingProject(root);
+    var containingProject = getContainingProject(root)!;
     return [containingProject];
   } else {
     return projects;
@@ -107,17 +107,17 @@ class DartProject {
 class DartFile {
   final DartProject project;
   final File file;
-  String? _relativePath;
+  final String _relativePath;
 
-  DartFile(this.project, this.file) {
-    _relativePath = p.relative(file.absolute.path, from: project.rootDirectory);
-  }
+  DartFile(this.project, this.file)
+      : _relativePath =
+            p.relative(file.absolute.path, from: project.rootDirectory);
 
   String get path => file.path;
 
-  String? get relativePath => _relativePath;
+  String get relativePath => _relativePath;
 
-  String get normalizedRelativePath => relativePath!.replaceAll('\\', '/');
+  String get normalizedRelativePath => relativePath.replaceAll('\\', '/');
 
   @override
   String toString() => 'DartFile($file)';

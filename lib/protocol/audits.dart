@@ -50,8 +50,11 @@ class AuditsApi {
 
   /// Runs the contrast check for the target page. Found issues are reported
   /// using Audits.issueAdded event.
-  Future<void> checkContrast() async {
-    await _client.send('Audits.checkContrast');
+  /// [reportAAA] Whether to report WCAG AAA level issues. Default is false.
+  Future<void> checkContrast({bool? reportAAA}) async {
+    await _client.send('Audits.checkContrast', {
+      if (reportAAA != null) 'reportAAA': reportAAA,
+    });
   }
 }
 
@@ -1018,6 +1021,8 @@ class CorsIssueDetails {
 
   final AffectedRequest request;
 
+  final String? initiatorOrigin;
+
   final network.IPAddressSpace? resourceIPAddressSpace;
 
   final network.ClientSecurityState? clientSecurityState;
@@ -1026,6 +1031,7 @@ class CorsIssueDetails {
       {required this.corsErrorStatus,
       required this.isWarning,
       required this.request,
+      this.initiatorOrigin,
       this.resourceIPAddressSpace,
       this.clientSecurityState});
 
@@ -1036,6 +1042,9 @@ class CorsIssueDetails {
       isWarning: json['isWarning'] as bool,
       request:
           AffectedRequest.fromJson(json['request'] as Map<String, dynamic>),
+      initiatorOrigin: json.containsKey('initiatorOrigin')
+          ? json['initiatorOrigin'] as String
+          : null,
       resourceIPAddressSpace: json.containsKey('resourceIPAddressSpace')
           ? network.IPAddressSpace.fromJson(
               json['resourceIPAddressSpace'] as String)
@@ -1052,6 +1061,7 @@ class CorsIssueDetails {
       'corsErrorStatus': corsErrorStatus.toJson(),
       'isWarning': isWarning,
       'request': request.toJson(),
+      if (initiatorOrigin != null) 'initiatorOrigin': initiatorOrigin,
       if (resourceIPAddressSpace != null)
         'resourceIPAddressSpace': resourceIPAddressSpace!.toJson(),
       if (clientSecurityState != null)

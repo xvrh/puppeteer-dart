@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'dart:io';
 import 'package:http/http.dart';
 import 'package:puppeteer/puppeteer.dart';

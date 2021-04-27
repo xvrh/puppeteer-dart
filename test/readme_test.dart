@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'dart:io';
 import 'package:test/test.dart';
 import '../tool/generate_readme.dart';

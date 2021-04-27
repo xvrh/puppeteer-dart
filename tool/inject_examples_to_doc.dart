@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -52,11 +50,11 @@ String replaceExamples(String sourceFile, List<CodeSnippet> snippets) {
       var comment = member.documentationComment;
 
       if (comment != null) {
-        String memberName;
+        String? memberName;
         if (member is MethodDeclaration) {
           memberName = member.name.name;
         } else if (member is ConstructorDeclaration) {
-          memberName = member.name.name;
+          memberName = member.name?.name;
         } else if (member is FieldDeclaration) {
           memberName = member.fields.variables.first.name.name;
         }
@@ -144,7 +142,7 @@ void findGroupAndTests(String fileCode, Block block, List<CodeSnippet> snippets,
       var innerBody = innerBlock.body as BlockFunctionBody;
 
       findGroupAndTests(fileCode, innerBody.block, snippets,
-          _joinPrefix(namePrefix, groupName.stringValue));
+          _joinPrefix(namePrefix, groupName.stringValue!));
     } else if (methodName == 'test') {
       var innerBlock =
           expression.argumentList.arguments[1] as FunctionExpression;
@@ -154,10 +152,11 @@ void findGroupAndTests(String fileCode, Block block, List<CodeSnippet> snippets,
       var firstArgument = expression.argumentList.arguments[0] as Literal;
       if (firstArgument is StringLiteral) {
         snippets.add(CodeSnippet(
-            _joinPrefix(namePrefix, firstArgument.stringValue), code));
+            _joinPrefix(namePrefix, firstArgument.stringValue!), code));
       } else {
         var indexArgument = firstArgument as IntegerLiteral;
-        snippets.add(CodeSnippet(namePrefix, code, index: indexArgument.value));
+        snippets
+            .add(CodeSnippet(namePrefix, code, index: indexArgument.value!));
       }
     }
   }
@@ -218,7 +217,7 @@ ${LineSplitter.split(code).map((line) => '  $line').join('\n')}
 
 class _ExampleReplacerVisitor extends RecursiveAstVisitor<void> {
   final _nodesToReplace = <AstNode, String>{};
-  InterpolationExpression _stringInterpolation;
+  InterpolationExpression? _stringInterpolation;
 
   @override
   void visitInterpolationExpression(node) {
@@ -235,7 +234,7 @@ class _ExampleReplacerVisitor extends RecursiveAstVisitor<void> {
       String targetValue;
       if (_stringInterpolation != null) {
         var literal = argument as StringLiteral;
-        targetValue = literal.stringValue;
+        targetValue = literal.stringValue!;
       } else {
         targetValue = argument.toString();
       }

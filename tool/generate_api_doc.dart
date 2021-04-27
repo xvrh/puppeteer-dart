@@ -1,11 +1,9 @@
-// @dart=2.9
-
 import 'dart:io';
 import 'dart:math';
 import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:meta/meta.dart';
+import 'package:collection/collection.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'utils/string_helpers.dart';
 
@@ -90,10 +88,12 @@ void main() {
   File('doc/api.md').writeAsStringSync(buffer.toString());
 }
 
-String readComment(Comment comment) => comment.tokens
-    .map((t) => t.toString().substring(min(t.length, 4)))
-    .toList()
-    .join('\n');
+String readComment(Comment? comment) =>
+    comment?.tokens
+        .map((t) => t.toString().substring(min(t.length, 4)))
+        .toList()
+        .join('\n') ??
+    '';
 
 final _nonAlphaNum = RegExp(r'[^a-zA-Z0-9_ ]');
 String toLink(String title) =>
@@ -115,7 +115,7 @@ class Class {
     clas.methods.addAll(declaration.members
         .where((member) => member.documentationComment != null)
         .map((member) => Method.fromClassMember(clas, member))
-        .where((method) => method != null));
+        .whereNotNull());
 
     clas.methods.sort((m1, m2) => m1.name.compareTo(m2.name));
 
@@ -136,11 +136,11 @@ class Method {
   final String documentation;
 
   Method(this.parent, this.name, this.documentation,
-      {@required this.title,
-      @required this.shortTitle,
-      @required this.fullSignature});
+      {required this.title,
+      required this.shortTitle,
+      required this.fullSignature});
 
-  static Method fromClassMember(Class parent, ClassMember member) {
+  static Method? fromClassMember(Class parent, ClassMember member) {
     String name;
     String title, shortTitle, fullSignature;
     if (member is MethodDeclaration) {

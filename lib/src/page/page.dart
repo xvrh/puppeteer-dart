@@ -157,8 +157,8 @@ class Page {
     devTools.target.onDetachedFromTarget.listen((e) {
       var worker = _workers[e.sessionId];
       if (worker != null) {
-        _workerDestroyed.add(worker);
         _workers.remove(e.sessionId);
+        _workerDestroyed.add(worker);
       }
     });
 
@@ -1484,8 +1484,8 @@ function deliverError(name, seq, message, stack) {
         roundedClip = Viewport(
             x: 0,
             y: 0,
-            width: metrics.contentSize.width.ceil(),
-            height: metrics.contentSize.height.ceil(),
+            width: metrics.cssContentSize.width.ceil(),
+            height: metrics.cssContentSize.height.ceil(),
             scale: 1);
       }
       var shouldSetDefaultBackground =

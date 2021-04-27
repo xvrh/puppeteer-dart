@@ -279,7 +279,7 @@ async function _(element, pageJavascriptEnabled) {
       throw NodeIsNotVisibleException();
     }
 
-    var layoutViewport = layoutMetrics.layoutViewport;
+    var layoutViewport = layoutMetrics.cssLayoutViewport;
 
     // Filter out quads that have too small area to click into.
     var pointsList = quads
@@ -547,7 +547,7 @@ async function _(element, pageJavascriptEnabled) {
     assert(boundingBox.height != 0, 'Node has 0 height.');
 
     var layoutViewPort =
-        (await executionContext.pageApi.getLayoutMetrics()).layoutViewport;
+        (await executionContext.pageApi.getLayoutMetrics()).cssLayoutViewport;
 
     var clip = Rectangle(
         boundingBox.left + layoutViewPort.pageX,

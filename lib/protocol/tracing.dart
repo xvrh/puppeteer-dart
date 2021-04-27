@@ -68,6 +68,7 @@ class TracingApi {
   /// [perfettoConfig] Base64-encoded serialized perfetto.protos.TraceConfig protobuf message
   /// When specified, the parameters `categories`, `options`, `traceConfig`
   /// are ignored.
+  /// [tracingBackend] Backend type (defaults to `auto`)
   Future<void> start(
       {@deprecated String? categories,
       @deprecated String? options,
@@ -76,7 +77,8 @@ class TracingApi {
       StreamFormat? streamFormat,
       StreamCompression? streamCompression,
       TraceConfig? traceConfig,
-      String? perfettoConfig}) async {
+      String? perfettoConfig,
+      TracingBackend? tracingBackend}) async {
     assert(transferMode == null ||
         const ['ReportEvents', 'ReturnAsStream'].contains(transferMode));
     await _client.send('Tracing.start', {
@@ -89,6 +91,7 @@ class TracingApi {
       if (streamCompression != null) 'streamCompression': streamCompression,
       if (traceConfig != null) 'traceConfig': traceConfig,
       if (perfettoConfig != null) 'perfettoConfig': perfettoConfig,
+      if (tracingBackend != null) 'tracingBackend': tracingBackend,
     });
   }
 }
@@ -396,6 +399,40 @@ class MemoryDumpLevelOfDetail {
   bool operator ==(other) =>
       (other is MemoryDumpLevelOfDetail && other.value == value) ||
       value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Backend type to use for tracing. `chrome` uses the Chrome-integrated
+/// tracing service and is supported on all platforms. `system` is only
+/// supported on Chrome OS and uses the Perfetto system tracing service.
+/// `auto` chooses `system` when the perfettoConfig provided to Tracing.start
+/// specifies at least one non-Chrome data source; otherwise uses `chrome`.
+class TracingBackend {
+  static const auto = TracingBackend._('auto');
+  static const chrome = TracingBackend._('chrome');
+  static const system = TracingBackend._('system');
+  static const values = {
+    'auto': auto,
+    'chrome': chrome,
+    'system': system,
+  };
+
+  final String value;
+
+  const TracingBackend._(this.value);
+
+  factory TracingBackend.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is TracingBackend && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

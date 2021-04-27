@@ -754,7 +754,7 @@ class RemoteObject {
   final String? className;
 
   /// Remote object value in case of primitive values or JSON values (if it was requested).
-  final dynamic? value;
+  final dynamic value;
 
   /// Primitive value which can not be JSON-stringified does not have `value`, but gets this
   /// property.
@@ -1457,7 +1457,7 @@ class PrivatePropertyDescriptor {
 /// unserializable primitive value or neither of (for undefined) them should be specified.
 class CallArgument {
   /// Primitive value or serializable javascript object.
-  final dynamic? value;
+  final dynamic value;
 
   /// Primitive value which can not be JSON-stringified.
   final UnserializableValue? unserializableValue;

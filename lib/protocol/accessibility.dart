@@ -396,7 +396,7 @@ class AXValue {
   final AXValueType type;
 
   /// The computed value of this property.
-  final dynamic? value;
+  final dynamic value;
 
   /// One or more related nodes, if applicable.
   final List<AXRelatedNode>? relatedNodes;

@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'package:test/test.dart';
 import '../tool/inject_examples_to_doc.dart';
 
