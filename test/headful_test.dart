@@ -131,14 +131,13 @@ void main() {
         await browser.close();
       }
     });
-    test('should open devtools when "devtools: true" option is given',
-        () async {
+    test('should open devtools when devtools: true option is given', () async {
       var browser = await puppeteer.launch(headless: false, devTools: true);
       try {
         var context = await browser.createIncognitoBrowserContext();
         await Future.wait([
           context.newPage(),
-          context.waitForTarget((target) => target.url.contains('devtools://')),
+          browser.waitForTarget((target) => target.url.contains('devtools://')),
         ]);
       } finally {
         await browser.close();

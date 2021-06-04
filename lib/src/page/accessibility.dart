@@ -467,9 +467,9 @@ class _AXNode {
     bool? boolValue(AXPropertyName name) {
       var property = findProperty(name);
       if (property != null && property.value.value != null) {
-        // WebArea's treat focus differently than other nodes. They report whether their frame  has focus,
+        // RootWebArea's treat focus differently than other nodes. They report whether their frame  has focus,
         // not whether focus is specifically on the root node.
-        if (property.name == AXPropertyName.focused && _role == 'WebArea') {
+        if (property.name == AXPropertyName.focused && _role == 'RootWebArea') {
           return null;
         }
 
