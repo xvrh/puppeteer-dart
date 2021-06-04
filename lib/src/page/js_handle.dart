@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:puppeteer/protocol/input.dart';
+import '../../protocol/input.dart';
 
 import '../../protocol/dom.dart';
 import '../../protocol/runtime.dart';
