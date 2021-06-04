@@ -94,6 +94,7 @@
   * [page.setBypassCSP](#pagesetbypasscspbool-enabled)
   * [page.setCacheEnabled](#pagesetcacheenabledbool-enabled)
   * [page.setContent](#pagesetcontent)
+  * [page.setDragInterception](#pagesetdraginterceptionbool-enabled)
   * [page.setExtraHTTPHeaders](#pagesetextrahttpheadersmapstring-string-headers)
   * [page.setGeolocation](#pagesetgeolocation)
   * [page.setJavaScriptEnabled](#pagesetjavascriptenabledbool-enabled)
@@ -127,6 +128,11 @@
 - [class: Mouse](#class-mouse)
   * [mouse.click](#mouseclick)
   * [mouse.down](#mousedownmousebutton-button-int-clickcount)
+  * [mouse.drag](#mousedragpoint-start-point-target)
+  * [mouse.dragAndDrop](#mousedraganddrop)
+  * [mouse.dragEnter](#mousedragenterpoint-target-dragdata-data)
+  * [mouse.dragOver](#mousedragoverpoint-target-dragdata-data)
+  * [mouse.drop](#mousedroppoint-target-dragdata-data)
   * [mouse.move](#mousemovepoint-position-int-steps)
   * [mouse.up](#mouseupmousebutton-button-int-clickcount)
   * [mouse.wheel](#mousewheelnum-deltax-num-deltay)
@@ -196,6 +202,11 @@
   * [elementHandle.boxModel](#elementhandleboxmodel)
   * [elementHandle.click](#elementhandleclick)
   * [elementHandle.contentFrame](#elementhandlecontentframe)
+  * [elementHandle.drag](#elementhandledragpoint-target)
+  * [elementHandle.dragAndDrop](#elementhandledraganddrop)
+  * [elementHandle.dragEnter](#elementhandledragenterdragdata-data)
+  * [elementHandle.dragOver](#elementhandledragoverdragdata-data)
+  * [elementHandle.drop](#elementhandledropdragdata-data)
   * [elementHandle.focus](#elementhandlefocus)
   * [elementHandle.isIntersectingViewport](#elementhandleisintersectingviewport)
   * [elementHandle.press](#elementhandlepress)
@@ -1706,6 +1717,18 @@ Parameters:
 page.setContent(String html, {Duration? timeout, Until? wait}) → Future<void> 
 ```
 
+#### page.setDragInterception(bool enabled)
+@param enabled - Whether to enable drag interception.
+
+@remarks
+Activating drag interception enables the {@link Input.drag},
+methods  This provides the capability to capture drag events emitted
+on the page, which can then be used to simulate drag-and-drop.
+
+```dart
+page.setDragInterception(bool enabled) → Future<void> 
+```
+
 #### page.setExtraHTTPHeaders(Map\<String, String> headers)
 The extra HTTP headers will be sent with every request the page initiates.
 
@@ -2340,6 +2363,60 @@ Dispatches a `mousedown` event.
 
 ```dart
 mouse.down({MouseButton? button, int? clickCount}) → Future<void> 
+```
+
+#### mouse.drag(Point start, Point target)
+Dispatches a `drag` event.
+@param start - starting point for drag
+@param target - point to drag to
+```
+
+```dart
+mouse.drag(Point start, Point target) → Future<DragData> 
+```
+
+#### mouse.dragAndDrop(...)
+Performs a drag, dragenter, dragover, and drop in sequence.
+@param target - point to drag from
+@param target - point to drop on
+@param options - An object of options. Accepts delay which,
+if specified, is the time to wait between `dragover` and `drop` in milliseconds.
+Defaults to 0.
+```
+
+```dart
+mouse.dragAndDrop(Point start, Point target, {Duration? delay}) → Future<void> 
+```
+
+#### mouse.dragEnter(Point target, DragData data)
+Dispatches a `dragenter` event.
+@param target - point for emitting `dragenter` event
+```
+
+```dart
+mouse.dragEnter(Point target, DragData data) → Future<void> 
+```
+
+#### mouse.dragOver(Point target, DragData data)
+Dispatches a `dragover` event.
+@param target - point for emitting `dragover` event
+```
+
+```dart
+mouse.dragOver(Point target, DragData data) → Future<void> 
+```
+
+#### mouse.drop(Point target, DragData data)
+Performs a dragenter, dragover, and drop in sequence.
+@param target - point to drop on
+@param data - drag data containing items and operations mask
+@param options - An object of options. Accepts delay which,
+if specified, is the time to wait between `dragover` and `drop` in milliseconds.
+Defaults to 0.
+```
+
+```dart
+mouse.drop(Point target, DragData data) → Future<void> 
 ```
 
 #### mouse.move(Point position, {int? steps})
@@ -3443,6 +3520,41 @@ or null otherwise
 
 ```dart
 elementHandle.contentFrame → Future<Frame?>
+```
+
+#### elementHandle.drag(Point target)
+This method creates and captures a dragevent from the element.
+
+```dart
+elementHandle.drag(Point target) → Future<DragData> 
+```
+
+#### elementHandle.dragAndDrop(...)
+This method triggers a dragenter, dragover, and drop on the element.
+
+```dart
+elementHandle.dragAndDrop(ElementHandle target, {Duration? delay}) → Future<void> 
+```
+
+#### elementHandle.dragEnter(DragData data)
+This method creates a `dragenter` event on the element.
+
+```dart
+elementHandle.dragEnter(DragData data) → Future<void> 
+```
+
+#### elementHandle.dragOver(DragData data)
+This method creates a `dragover` event on the element.
+
+```dart
+elementHandle.dragOver(DragData data) → Future<void> 
+```
+
+#### elementHandle.drop(DragData data)
+This method triggers a drop on the element.
+
+```dart
+elementHandle.drop(DragData data) → Future<void> 
 ```
 
 #### elementHandle.focus()
