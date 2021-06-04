@@ -4,7 +4,7 @@ version: 2.2.0
 homepage: https://github.com/xvrh/puppeteer-dart
 
 environment:
-  sdk: '>=2.12.0-0 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   archive: ^3.0.0
