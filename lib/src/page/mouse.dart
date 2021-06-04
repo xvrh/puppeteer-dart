@@ -92,4 +92,60 @@ class Mouse {
         modifiers: keyboard.modifiers,
         pointerType: 'mouse');
   }
+
+  /// Dispatches a `drag` event.
+  /// @param start - starting point for drag
+  /// @param target - point to drag to
+  /// ```
+  Future<DragData> drag(Point start, Point target) async {
+    var future = inputApi.onDragIntercepted.first;
+    await move(start);
+    await down();
+    await move(target);
+    return future;
+  }
+
+  /// Dispatches a `dragenter` event.
+  /// @param target - point for emitting `dragenter` event
+  /// ```
+  Future<void> dragEnter(Point target, DragData data) async {
+    await inputApi.dispatchDragEvent('dragEnter', target.x, target.y, data,
+        modifiers: keyboard.modifiers);
+  }
+
+  /// Dispatches a `dragover` event.
+  /// @param target - point for emitting `dragover` event
+  /// ```
+  Future<void> dragOver(Point target, DragData data) async {
+    await inputApi.dispatchDragEvent('dragOver', target.x, target.y, data,
+        modifiers: keyboard.modifiers);
+  }
+
+  /// Performs a dragenter, dragover, and drop in sequence.
+  /// @param target - point to drop on
+  /// @param data - drag data containing items and operations mask
+  /// @param options - An object of options. Accepts delay which,
+  /// if specified, is the time to wait between `dragover` and `drop` in milliseconds.
+  /// Defaults to 0.
+  /// ```
+  Future<void> drop(Point target, DragData data) async {
+    await inputApi.dispatchDragEvent('drop', target.x, target.y, data,
+        modifiers: keyboard.modifiers);
+  }
+
+  /// Performs a drag, dragenter, dragover, and drop in sequence.
+  /// @param target - point to drag from
+  /// @param target - point to drop on
+  /// @param options - An object of options. Accepts delay which,
+  /// if specified, is the time to wait between `dragover` and `drop` in milliseconds.
+  /// Defaults to 0.
+  /// ```
+  Future<void> dragAndDrop(Point start, Point target, {Duration? delay}) async {
+    var data = await drag(start, target);
+    await dragEnter(target, data);
+    await dragOver(target, data);
+    if (delay != null) await Future.delayed(delay);
+    await drop(target, data);
+    await up();
+  }
 }

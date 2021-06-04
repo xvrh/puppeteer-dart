@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0 (2021-06-4)
+- Update Chromium to version 92
+- Add drag-and-drop support
+
 ## 2.1.0 (2021-04-25)
 - Update Chromium to version 91
 

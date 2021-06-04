@@ -848,7 +848,7 @@ class SharedArrayBufferIssueType {
 }
 
 /// Details for a issue arising from an SAB being instantiated in, or
-/// transfered to a context that is not cross-origin isolated.
+/// transferred to a context that is not cross-origin isolated.
 class SharedArrayBufferIssueDetails {
   final SourceCodeLocation sourceCodeLocation;
 
@@ -1021,6 +1021,8 @@ class CorsIssueDetails {
 
   final AffectedRequest request;
 
+  final SourceCodeLocation? location;
+
   final String? initiatorOrigin;
 
   final network.IPAddressSpace? resourceIPAddressSpace;
@@ -1031,6 +1033,7 @@ class CorsIssueDetails {
       {required this.corsErrorStatus,
       required this.isWarning,
       required this.request,
+      this.location,
       this.initiatorOrigin,
       this.resourceIPAddressSpace,
       this.clientSecurityState});
@@ -1042,6 +1045,10 @@ class CorsIssueDetails {
       isWarning: json['isWarning'] as bool,
       request:
           AffectedRequest.fromJson(json['request'] as Map<String, dynamic>),
+      location: json.containsKey('location')
+          ? SourceCodeLocation.fromJson(
+              json['location'] as Map<String, dynamic>)
+          : null,
       initiatorOrigin: json.containsKey('initiatorOrigin')
           ? json['initiatorOrigin'] as String
           : null,
@@ -1061,11 +1068,146 @@ class CorsIssueDetails {
       'corsErrorStatus': corsErrorStatus.toJson(),
       'isWarning': isWarning,
       'request': request.toJson(),
+      if (location != null) 'location': location!.toJson(),
       if (initiatorOrigin != null) 'initiatorOrigin': initiatorOrigin,
       if (resourceIPAddressSpace != null)
         'resourceIPAddressSpace': resourceIPAddressSpace!.toJson(),
       if (clientSecurityState != null)
         'clientSecurityState': clientSecurityState!.toJson(),
+    };
+  }
+}
+
+class AttributionReportingIssueType {
+  static const permissionPolicyDisabled =
+      AttributionReportingIssueType._('PermissionPolicyDisabled');
+  static const invalidAttributionSourceEventId =
+      AttributionReportingIssueType._('InvalidAttributionSourceEventId');
+  static const invalidAttributionData =
+      AttributionReportingIssueType._('InvalidAttributionData');
+  static const attributionSourceUntrustworthyOrigin =
+      AttributionReportingIssueType._('AttributionSourceUntrustworthyOrigin');
+  static const attributionUntrustworthyOrigin =
+      AttributionReportingIssueType._('AttributionUntrustworthyOrigin');
+  static const values = {
+    'PermissionPolicyDisabled': permissionPolicyDisabled,
+    'InvalidAttributionSourceEventId': invalidAttributionSourceEventId,
+    'InvalidAttributionData': invalidAttributionData,
+    'AttributionSourceUntrustworthyOrigin':
+        attributionSourceUntrustworthyOrigin,
+    'AttributionUntrustworthyOrigin': attributionUntrustworthyOrigin,
+  };
+
+  final String value;
+
+  const AttributionReportingIssueType._(this.value);
+
+  factory AttributionReportingIssueType.fromJson(String value) =>
+      values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is AttributionReportingIssueType && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Details for issues around "Attribution Reporting API" usage.
+/// Explainer: https://github.com/WICG/conversion-measurement-api
+class AttributionReportingIssueDetails {
+  final AttributionReportingIssueType violationType;
+
+  final AffectedFrame? frame;
+
+  final AffectedRequest? request;
+
+  final dom.BackendNodeId? violatingNodeId;
+
+  final String? invalidParameter;
+
+  AttributionReportingIssueDetails(
+      {required this.violationType,
+      this.frame,
+      this.request,
+      this.violatingNodeId,
+      this.invalidParameter});
+
+  factory AttributionReportingIssueDetails.fromJson(Map<String, dynamic> json) {
+    return AttributionReportingIssueDetails(
+      violationType: AttributionReportingIssueType.fromJson(
+          json['violationType'] as String),
+      frame: json.containsKey('frame')
+          ? AffectedFrame.fromJson(json['frame'] as Map<String, dynamic>)
+          : null,
+      request: json.containsKey('request')
+          ? AffectedRequest.fromJson(json['request'] as Map<String, dynamic>)
+          : null,
+      violatingNodeId: json.containsKey('violatingNodeId')
+          ? dom.BackendNodeId.fromJson(json['violatingNodeId'] as int)
+          : null,
+      invalidParameter: json.containsKey('invalidParameter')
+          ? json['invalidParameter'] as String
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'violationType': violationType.toJson(),
+      if (frame != null) 'frame': frame!.toJson(),
+      if (request != null) 'request': request!.toJson(),
+      if (violatingNodeId != null) 'violatingNodeId': violatingNodeId!.toJson(),
+      if (invalidParameter != null) 'invalidParameter': invalidParameter,
+    };
+  }
+}
+
+/// Details for issues about documents in Quirks Mode
+/// or Limited Quirks Mode that affects page layouting.
+class QuirksModeIssueDetails {
+  /// If false, it means the document's mode is "quirks"
+  /// instead of "limited-quirks".
+  final bool isLimitedQuirksMode;
+
+  final dom.BackendNodeId documentNodeId;
+
+  final String url;
+
+  final page.FrameId frameId;
+
+  final network.LoaderId loaderId;
+
+  QuirksModeIssueDetails(
+      {required this.isLimitedQuirksMode,
+      required this.documentNodeId,
+      required this.url,
+      required this.frameId,
+      required this.loaderId});
+
+  factory QuirksModeIssueDetails.fromJson(Map<String, dynamic> json) {
+    return QuirksModeIssueDetails(
+      isLimitedQuirksMode: json['isLimitedQuirksMode'] as bool,
+      documentNodeId: dom.BackendNodeId.fromJson(json['documentNodeId'] as int),
+      url: json['url'] as String,
+      frameId: page.FrameId.fromJson(json['frameId'] as String),
+      loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'isLimitedQuirksMode': isLimitedQuirksMode,
+      'documentNodeId': documentNodeId.toJson(),
+      'url': url,
+      'frameId': frameId.toJson(),
+      'loaderId': loaderId.toJson(),
     };
   }
 }
@@ -1089,6 +1231,9 @@ class InspectorIssueCode {
   static const lowTextContrastIssue =
       InspectorIssueCode._('LowTextContrastIssue');
   static const corsIssue = InspectorIssueCode._('CorsIssue');
+  static const attributionReportingIssue =
+      InspectorIssueCode._('AttributionReportingIssue');
+  static const quirksModeIssue = InspectorIssueCode._('QuirksModeIssue');
   static const values = {
     'SameSiteCookieIssue': sameSiteCookieIssue,
     'MixedContentIssue': mixedContentIssue,
@@ -1099,6 +1244,8 @@ class InspectorIssueCode {
     'TrustedWebActivityIssue': trustedWebActivityIssue,
     'LowTextContrastIssue': lowTextContrastIssue,
     'CorsIssue': corsIssue,
+    'AttributionReportingIssue': attributionReportingIssue,
+    'QuirksModeIssue': quirksModeIssue,
   };
 
   final String value;
@@ -1142,6 +1289,10 @@ class InspectorIssueDetails {
 
   final CorsIssueDetails? corsIssueDetails;
 
+  final AttributionReportingIssueDetails? attributionReportingIssueDetails;
+
+  final QuirksModeIssueDetails? quirksModeIssueDetails;
+
   InspectorIssueDetails(
       {this.sameSiteCookieIssueDetails,
       this.mixedContentIssueDetails,
@@ -1151,7 +1302,9 @@ class InspectorIssueDetails {
       this.sharedArrayBufferIssueDetails,
       this.twaQualityEnforcementDetails,
       this.lowTextContrastIssueDetails,
-      this.corsIssueDetails});
+      this.corsIssueDetails,
+      this.attributionReportingIssueDetails,
+      this.quirksModeIssueDetails});
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
     return InspectorIssueDetails(
@@ -1196,6 +1349,15 @@ class InspectorIssueDetails {
           ? CorsIssueDetails.fromJson(
               json['corsIssueDetails'] as Map<String, dynamic>)
           : null,
+      attributionReportingIssueDetails: json
+              .containsKey('attributionReportingIssueDetails')
+          ? AttributionReportingIssueDetails.fromJson(
+              json['attributionReportingIssueDetails'] as Map<String, dynamic>)
+          : null,
+      quirksModeIssueDetails: json.containsKey('quirksModeIssueDetails')
+          ? QuirksModeIssueDetails.fromJson(
+              json['quirksModeIssueDetails'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -1222,6 +1384,11 @@ class InspectorIssueDetails {
         'lowTextContrastIssueDetails': lowTextContrastIssueDetails!.toJson(),
       if (corsIssueDetails != null)
         'corsIssueDetails': corsIssueDetails!.toJson(),
+      if (attributionReportingIssueDetails != null)
+        'attributionReportingIssueDetails':
+            attributionReportingIssueDetails!.toJson(),
+      if (quirksModeIssueDetails != null)
+        'quirksModeIssueDetails': quirksModeIssueDetails!.toJson(),
     };
   }
 }

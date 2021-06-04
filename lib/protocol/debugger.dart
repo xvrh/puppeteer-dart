@@ -174,6 +174,7 @@ class DebuggerApi {
 
   /// Restarts particular call frame from the beginning.
   /// [callFrameId] Call frame identifier to evaluate on.
+  @deprecated
   Future<RestartFrameResult> restartFrame(CallFrameId callFrameId) async {
     var result = await _client.send('Debugger.restartFrame', {
       'callFrameId': callFrameId,

@@ -110,23 +110,33 @@ class HeapProfilerApi {
 
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken
   /// when the tracking is stopped.
+  /// [captureNumericValue] If true, numerical values are included in the snapshot
   Future<void> stopTrackingHeapObjects(
-      {bool? reportProgress, bool? treatGlobalObjectsAsRoots}) async {
+      {bool? reportProgress,
+      bool? treatGlobalObjectsAsRoots,
+      bool? captureNumericValue}) async {
     await _client.send('HeapProfiler.stopTrackingHeapObjects', {
       if (reportProgress != null) 'reportProgress': reportProgress,
       if (treatGlobalObjectsAsRoots != null)
         'treatGlobalObjectsAsRoots': treatGlobalObjectsAsRoots,
+      if (captureNumericValue != null)
+        'captureNumericValue': captureNumericValue,
     });
   }
 
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken.
   /// [treatGlobalObjectsAsRoots] If true, a raw snapshot without artifical roots will be generated
+  /// [captureNumericValue] If true, numerical values are included in the snapshot
   Future<void> takeHeapSnapshot(
-      {bool? reportProgress, bool? treatGlobalObjectsAsRoots}) async {
+      {bool? reportProgress,
+      bool? treatGlobalObjectsAsRoots,
+      bool? captureNumericValue}) async {
     await _client.send('HeapProfiler.takeHeapSnapshot', {
       if (reportProgress != null) 'reportProgress': reportProgress,
       if (treatGlobalObjectsAsRoots != null)
         'treatGlobalObjectsAsRoots': treatGlobalObjectsAsRoots,
+      if (captureNumericValue != null)
+        'captureNumericValue': captureNumericValue,
     });
   }
 }

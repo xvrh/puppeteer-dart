@@ -52,8 +52,8 @@ void main() {
 
       await page.focus('[placeholder="Empty input"]');
       var golden =
-          AXNode(role: 'WebArea', name: 'Accessibility Test', children: [
-        AXNode(role: 'text', name: 'Hello World'),
+          AXNode(role: 'RootWebArea', name: 'Accessibility Test', children: [
+        AXNode(role: 'StaticText', name: 'Hello World'),
         AXNode(role: 'heading', name: 'Inputs', level: 1),
         AXNode(role: 'textbox', name: 'Empty input', focused: true),
         AXNode(role: 'textbox', name: 'readonly input', readonly: true),
@@ -86,7 +86,7 @@ void main() {
             AXNode(
                 role: 'generic',
                 name: '',
-                children: [AXNode(role: 'text', name: 'hi')])
+                children: [AXNode(role: 'StaticText', name: 'hi')])
           ]);
       expect(
           findFocusedNode(
@@ -129,7 +129,7 @@ void main() {
     <div role="tab" aria-selected="true"><b>Tab1</b></div>
     <div role="tab">Tab2</div>
     </div>''');
-        var golden = AXNode(role: 'WebArea', name: '', children: [
+        var golden = AXNode(role: 'RootWebArea', name: '', children: [
           AXNode(role: 'tab', name: 'Tab1', selected: true),
           AXNode(role: 'tab', name: 'Tab2')
         ]);
@@ -145,7 +145,7 @@ void main() {
             name: '',
             value: 'Edit this image: ',
             children: [
-              AXNode(role: 'text', name: 'Edit this image:'),
+              AXNode(role: 'StaticText', name: 'Edit this image:'),
               AXNode(role: 'img', name: 'my fake image')
             ]);
         var snapshot = await page.accessibility.snapshot();
@@ -162,29 +162,14 @@ void main() {
             name: '',
             value: 'Edit this image: ',
             children: [
-              AXNode(role: 'text', name: 'Edit this image:'),
+              AXNode(role: 'StaticText', name: 'Edit this image:'),
               AXNode(role: 'img', name: 'my fake image')
-            ]);
+            ],
+            multiLine: true);
         var snapshot = await page.accessibility.snapshot();
         expect(snapshot.children[0], equals(golden));
       });
       group('plaintext contenteditable', () {
-        test('plain text field with role should not have children', () async {
-          await page.setContent('''
-    <div contenteditable="plaintext-only" role='textbox'>Edit this image:<img src="fakeimage.png" alt="my fake image"></div>''');
-          var snapshot = await page.accessibility.snapshot();
-          expect(
-              snapshot.children[0],
-              equals(AXNode(
-                  role: 'textbox', name: '', value: 'Edit this image:')));
-        });
-        test('plain text field without role should not have content', () async {
-          await page.setContent('''
-    <div contenteditable="plaintext-only">Edit this image:<img src="fakeimage.png" alt="my fake image"></div>''');
-          var snapshot = await page.accessibility.snapshot();
-          expect(
-              snapshot.children[0], equals(AXNode(role: 'generic', name: '')));
-        });
         test(
             'plain text field with tabindex and without role should not have content',
             () async {
@@ -192,7 +177,9 @@ void main() {
     <div contenteditable="plaintext-only" tabIndex=0>Edit this image:<img src="fakeimage.png" alt="my fake image"></div>''');
           var snapshot = await page.accessibility.snapshot();
           expect(
-              snapshot.children[0], equals(AXNode(role: 'generic', name: '')));
+              snapshot.children[0],
+              equals(AXNode(
+                  role: 'generic', name: '', value: 'Edit this image:')));
         });
       });
       test(
@@ -294,7 +281,7 @@ void main() {
                     role: 'button',
                     name: 'My Button',
                     children: [
-                      AXNode(role: 'text', name: 'My Button'),
+                      AXNode(role: 'StaticText', name: 'My Button'),
                     ],
                   ),
                 ],

@@ -21,12 +21,12 @@ class EmulationApi {
     return result['result'] as bool;
   }
 
-  /// Clears the overriden device metrics.
+  /// Clears the overridden device metrics.
   Future<void> clearDeviceMetricsOverride() async {
     await _client.send('Emulation.clearDeviceMetricsOverride');
   }
 
-  /// Clears the overriden Geolocation Position and Error.
+  /// Clears the overridden Geolocation Position and Error.
   Future<void> clearGeolocationOverride() async {
     await _client.send('Emulation.clearGeolocationOverride');
   }
@@ -244,7 +244,7 @@ class EmulationApi {
   /// forwards to prevent deadlock.
   /// [waitForNavigation] If set the virtual time policy change should be deferred until any frame starts navigating.
   /// Note any previous deferred policy change is superseded.
-  /// [initialVirtualTime] If set, base::Time::Now will be overriden to initially return this value.
+  /// [initialVirtualTime] If set, base::Time::Now will be overridden to initially return this value.
   /// Returns: Absolute timestamp at which virtual time was first enabled (up time in milliseconds).
   Future<num> setVirtualTimePolicy(VirtualTimePolicy policy,
       {num? budget,
@@ -580,9 +580,11 @@ class UserAgentMetadata {
 /// Enum of image types that can be disabled.
 class DisabledImageType {
   static const avif = DisabledImageType._('avif');
+  static const jxl = DisabledImageType._('jxl');
   static const webp = DisabledImageType._('webp');
   static const values = {
     'avif': avif,
+    'jxl': jxl,
     'webp': webp,
   };
 

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 import '../../protocol/dom.dart';
+import '../../protocol/input.dart';
 import '../../protocol/runtime.dart';
 import '../connection.dart';
 import 'execution_context.dart';
@@ -354,6 +355,43 @@ async function _(element, pageJavascriptEnabled) {
     var point = await _clickablePoint();
     await page.mouse
         .click(point, delay: delay, button: button, clickCount: clickCount);
+  }
+
+  /// This method creates and captures a dragevent from the element.
+  Future<DragData> drag(Point target) async {
+    assert(page.isDragInterceptionEnabled, 'Drag Interception is not enabled!');
+    await _scrollIntoViewIfNeeded();
+    var start = await _clickablePoint();
+    return await page.mouse.drag(start, target);
+  }
+
+  /// This method creates a `dragenter` event on the element.
+  Future<void> dragEnter(DragData data) async {
+    await _scrollIntoViewIfNeeded();
+    var target = await _clickablePoint();
+    await page.mouse.dragEnter(target, data);
+  }
+
+  /// This method creates a `dragover` event on the element.
+  Future<void> dragOver(DragData data) async {
+    await _scrollIntoViewIfNeeded();
+    var target = await _clickablePoint();
+    await page.mouse.dragOver(target, data);
+  }
+
+  /// This method triggers a drop on the element.
+  Future<void> drop(DragData data) async {
+    await _scrollIntoViewIfNeeded();
+    var destination = await _clickablePoint();
+    await page.mouse.drop(destination, data);
+  }
+
+  /// This method triggers a dragenter, dragover, and drop on the element.
+  Future<void> dragAndDrop(ElementHandle target, {Duration? delay}) async {
+    await _scrollIntoViewIfNeeded();
+    var startPoint = await _clickablePoint();
+    var targetPoint = await target._clickablePoint();
+    await page.mouse.dragAndDrop(startPoint, targetPoint, delay: delay);
   }
 
   /// Triggers a `change` and `input` event once all the provided options have been selected.

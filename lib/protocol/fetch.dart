@@ -317,14 +317,14 @@ class RequestStage {
 }
 
 class RequestPattern {
-  /// Wildcards ('*' -> zero or more, '?' -> exactly one) are allowed. Escape character is
-  /// backslash. Omitting is equivalent to "*".
+  /// Wildcards (`'*'` -> zero or more, `'?'` -> exactly one) are allowed. Escape character is
+  /// backslash. Omitting is equivalent to `"*"`.
   final String? urlPattern;
 
   /// If set, only requests for matching resource types will be intercepted.
   final network.ResourceType? resourceType;
 
-  /// Stage at wich to begin intercepting requests. Default is Request.
+  /// Stage at which to begin intercepting requests. Default is Request.
   final RequestStage? requestStage;
 
   RequestPattern({this.urlPattern, this.resourceType, this.requestStage});

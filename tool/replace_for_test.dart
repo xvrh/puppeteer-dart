@@ -34,6 +34,7 @@ void main() {
       .replaceAll('async({page, server}) =>', '() async ')
       .replaceAll('async({page, server, browser}) =>', '() async ')
       .replaceAll('async({page}) =>', '() async ')
+      .replaceAll('async () => {', '() async {')
       .replaceAll('utils.attachFrame(', 'attachFrame(')
       .replaceAll('utils.detachFrame(', 'detachFrame(')
       .replaceAll('.push(', '.add(')

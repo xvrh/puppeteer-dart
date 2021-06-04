@@ -131,6 +131,7 @@ class Page {
       Touchscreen(devTools.runtime, devTools.input, _keyboard);
   late final Keyboard _keyboard = Keyboard(devTools.input);
   final _fileChooserInterceptors = <Completer<FileChooser>>{};
+  bool _userDragInterceptionEnabled = false;
 
   Page._(this.target, this.devTools)
       : _emulationManager = EmulationManager(devTools),
@@ -390,6 +391,8 @@ class Page {
 
   Mouse get mouse => _mouse;
 
+  bool get isDragInterceptionEnabled => _userDragInterceptionEnabled;
+
   /// An array of all frames attached to the page.
   List<Frame> get frames => frameManager.frames;
 
@@ -501,6 +504,17 @@ class Page {
   /// > **NOTE** Enabling request interception disables page caching.
   Future<void> setRequestInterception(bool value) {
     return _frameManager.networkManager.setRequestInterception(value);
+  }
+
+  /// @param enabled - Whether to enable drag interception.
+  ///
+  /// @remarks
+  /// Activating drag interception enables the {@link Input.drag},
+  /// methods  This provides the capability to capture drag events emitted
+  /// on the page, which can then be used to simulate drag-and-drop.
+  Future<void> setDragInterception(bool enabled) async {
+    _userDragInterceptionEnabled = enabled;
+    await devTools.input.setInterceptDrags(enabled);
   }
 
   /// When `true`, enables offline mode for the page.
