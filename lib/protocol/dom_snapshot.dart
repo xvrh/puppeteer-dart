@@ -51,12 +51,25 @@ class DOMSnapshotApi {
   /// [computedStyles] Whitelist of computed styles to return.
   /// [includePaintOrder] Whether to include layout object paint orders into the snapshot.
   /// [includeDOMRects] Whether to include DOM rectangles (offsetRects, clientRects, scrollRects) into the snapshot
+  /// [includeBlendedBackgroundColors] Whether to include blended background colors in the snapshot (default: false).
+  /// Blended background color is achieved by blending background colors of all elements
+  /// that overlap with the current element.
+  /// [includeTextColorOpacities] Whether to include text color opacity in the snapshot (default: false).
+  /// An element might have the opacity property set that affects the text color of the element.
+  /// The final text color opacity is computed based on the opacity of all overlapping elements.
   Future<CaptureSnapshotResult> captureSnapshot(List<String> computedStyles,
-      {bool? includePaintOrder, bool? includeDOMRects}) async {
+      {bool? includePaintOrder,
+      bool? includeDOMRects,
+      bool? includeBlendedBackgroundColors,
+      bool? includeTextColorOpacities}) async {
     var result = await _client.send('DOMSnapshot.captureSnapshot', {
       'computedStyles': [...computedStyles],
       if (includePaintOrder != null) 'includePaintOrder': includePaintOrder,
       if (includeDOMRects != null) 'includeDOMRects': includeDOMRects,
+      if (includeBlendedBackgroundColors != null)
+        'includeBlendedBackgroundColors': includeBlendedBackgroundColors,
+      if (includeTextColorOpacities != null)
+        'includeTextColorOpacities': includeTextColorOpacities,
     });
     return CaptureSnapshotResult.fromJson(result);
   }
@@ -932,6 +945,12 @@ class LayoutTreeSnapshot {
   /// The client rect of nodes. Only available when includeDOMRects is set to true
   final List<Rectangle>? clientRects;
 
+  /// The list of background colors that are blended with colors of overlapping elements.
+  final List<StringIndex>? blendedBackgroundColors;
+
+  /// The list of computed text opacities.
+  final List<num>? textColorOpacities;
+
   LayoutTreeSnapshot(
       {required this.nodeIndex,
       required this.styles,
@@ -941,7 +960,9 @@ class LayoutTreeSnapshot {
       this.paintOrders,
       this.offsetRects,
       this.scrollRects,
-      this.clientRects});
+      this.clientRects,
+      this.blendedBackgroundColors,
+      this.textColorOpacities});
 
   factory LayoutTreeSnapshot.fromJson(Map<String, dynamic> json) {
     return LayoutTreeSnapshot(
@@ -975,6 +996,14 @@ class LayoutTreeSnapshot {
               .map((e) => Rectangle.fromJson(e as List))
               .toList()
           : null,
+      blendedBackgroundColors: json.containsKey('blendedBackgroundColors')
+          ? (json['blendedBackgroundColors'] as List)
+              .map((e) => StringIndex.fromJson(e as int))
+              .toList()
+          : null,
+      textColorOpacities: json.containsKey('textColorOpacities')
+          ? (json['textColorOpacities'] as List).map((e) => e as num).toList()
+          : null,
     );
   }
 
@@ -992,6 +1021,11 @@ class LayoutTreeSnapshot {
         'scrollRects': scrollRects!.map((e) => e.toJson()).toList(),
       if (clientRects != null)
         'clientRects': clientRects!.map((e) => e.toJson()).toList(),
+      if (blendedBackgroundColors != null)
+        'blendedBackgroundColors':
+            blendedBackgroundColors!.map((e) => e.toJson()).toList(),
+      if (textColorOpacities != null)
+        'textColorOpacities': [...?textColorOpacities],
     };
   }
 }

@@ -232,6 +232,11 @@ class VirtualAuthenticatorOptions {
   /// Defaults to false.
   final bool? hasLargeBlob;
 
+  /// If set to true, the authenticator will support the credBlob extension.
+  /// https://fidoalliance.org/specs/fido-v2.1-rd-20201208/fido-client-to-authenticator-protocol-v2.1-rd-20201208.html#sctn-credBlob-extension
+  /// Defaults to false.
+  final bool? hasCredBlob;
+
   /// If set to true, tests of user presence will succeed immediately.
   /// Otherwise, they will not be resolved. Defaults to true.
   final bool? automaticPresenceSimulation;
@@ -247,6 +252,7 @@ class VirtualAuthenticatorOptions {
       this.hasResidentKey,
       this.hasUserVerification,
       this.hasLargeBlob,
+      this.hasCredBlob,
       this.automaticPresenceSimulation,
       this.isUserVerified});
 
@@ -266,6 +272,8 @@ class VirtualAuthenticatorOptions {
       hasLargeBlob: json.containsKey('hasLargeBlob')
           ? json['hasLargeBlob'] as bool
           : null,
+      hasCredBlob:
+          json.containsKey('hasCredBlob') ? json['hasCredBlob'] as bool : null,
       automaticPresenceSimulation:
           json.containsKey('automaticPresenceSimulation')
               ? json['automaticPresenceSimulation'] as bool
@@ -285,6 +293,7 @@ class VirtualAuthenticatorOptions {
       if (hasUserVerification != null)
         'hasUserVerification': hasUserVerification,
       if (hasLargeBlob != null) 'hasLargeBlob': hasLargeBlob,
+      if (hasCredBlob != null) 'hasCredBlob': hasCredBlob,
       if (automaticPresenceSimulation != null)
         'automaticPresenceSimulation': automaticPresenceSimulation,
       if (isUserVerified != null) 'isUserVerified': isUserVerified,

@@ -39,10 +39,9 @@ class PageApi {
       .map((event) => FrameDetachedEvent.fromJson(event.parameters));
 
   /// Fired once navigation of the frame has completed. Frame is now associated with the new loader.
-  Stream<FrameInfo> get onFrameNavigated => _client.onEvent
+  Stream<FrameNavigatedEvent> get onFrameNavigated => _client.onEvent
       .where((event) => event.name == 'Page.frameNavigated')
-      .map((event) => FrameInfo.fromJson(
-          event.parameters['frame'] as Map<String, dynamic>));
+      .map((event) => FrameNavigatedEvent.fromJson(event.parameters));
 
   /// Fired when opening document to write to.
   Stream<FrameInfo> get onDocumentOpened => _client.onEvent
@@ -79,11 +78,13 @@ class PageApi {
       .map((event) => FrameId.fromJson(event.parameters['frameId'] as String));
 
   /// Fired when page is about to start a download.
+  /// Deprecated. Use Browser.downloadWillBegin instead.
   Stream<DownloadWillBeginEvent> get onDownloadWillBegin => _client.onEvent
       .where((event) => event.name == 'Page.downloadWillBegin')
       .map((event) => DownloadWillBeginEvent.fromJson(event.parameters));
 
   /// Fired when download makes progress. Last call has |done| == true.
+  /// Deprecated. Use Browser.downloadProgress instead.
   Stream<DownloadProgressEvent> get onDownloadProgress => _client.onEvent
       .where((event) => event.name == 'Page.downloadProgress')
       .map((event) => DownloadProgressEvent.fromJson(event.parameters));
@@ -114,6 +115,15 @@ class PageApi {
   Stream<LifecycleEventEvent> get onLifecycleEvent => _client.onEvent
       .where((event) => event.name == 'Page.lifecycleEvent')
       .map((event) => LifecycleEventEvent.fromJson(event.parameters));
+
+  /// Fired for failed bfcache history navigations if BackForwardCache feature is enabled. Do
+  /// not assume any ordering with the Page.frameNavigated event. This event is fired only for
+  /// main-frame history navigation where the document changes (non-same-document navigations),
+  /// when bfcache navigation fails.
+  Stream<BackForwardCacheNotUsedEvent> get onBackForwardCacheNotUsed => _client
+      .onEvent
+      .where((event) => event.name == 'Page.backForwardCacheNotUsed')
+      .map((event) => BackForwardCacheNotUsedEvent.fromJson(event.parameters));
 
   Stream<network.MonotonicTime> get onLoadEventFired => _client.onEvent
       .where((event) => event.name == 'Page.loadEventFired')
@@ -165,12 +175,16 @@ class PageApi {
   /// [worldName] If specified, creates an isolated world with the given name and evaluates given script in it.
   /// This world name will be used as the ExecutionContextDescription::name when the corresponding
   /// event is emitted.
+  /// [includeCommandLineAPI] Specifies whether command line API should be available to the script, defaults
+  /// to false.
   /// Returns: Identifier of the added script.
   Future<ScriptIdentifier> addScriptToEvaluateOnNewDocument(String source,
-      {String? worldName}) async {
+      {String? worldName, bool? includeCommandLineAPI}) async {
     var result = await _client.send('Page.addScriptToEvaluateOnNewDocument', {
       'source': source,
       if (worldName != null) 'worldName': worldName,
+      if (includeCommandLineAPI != null)
+        'includeCommandLineAPI': includeCommandLineAPI,
     });
     return ScriptIdentifier.fromJson(result['identifier'] as String);
   }
@@ -217,7 +231,7 @@ class PageApi {
     return result['data'] as String;
   }
 
-  /// Clears the overriden device metrics.
+  /// Clears the overridden device metrics.
   @deprecated
   Future<void> clearDeviceMetricsOverride() async {
     await _client.send('Page.clearDeviceMetricsOverride');
@@ -229,7 +243,7 @@ class PageApi {
     await _client.send('Page.clearDeviceOrientationOverride');
   }
 
-  /// Clears the overriden Geolocation Position and Error.
+  /// Clears the overridden Geolocation Position and Error.
   @deprecated
   Future<void> clearGeolocationOverride() async {
     await _client.send('Page.clearGeolocationOverride');
@@ -629,7 +643,7 @@ class PageApi {
   /// Set the behavior when downloading a file.
   /// [behavior] Whether to allow all or deny all download requests, or use default Chrome behavior if
   /// available (otherwise deny).
-  /// [downloadPath] The default path to save downloaded files to. This is requred if behavior is set to 'allow'
+  /// [downloadPath] The default path to save downloaded files to. This is required if behavior is set to 'allow'
   @deprecated
   Future<void> setDownloadBehavior(
       @Enum(['deny', 'allow', 'default']) String behavior,
@@ -859,6 +873,22 @@ class FrameDetachedEvent {
   }
 }
 
+class FrameNavigatedEvent {
+  /// Frame object.
+  final FrameInfo frame;
+
+  final NavigationType type;
+
+  FrameNavigatedEvent({required this.frame, required this.type});
+
+  factory FrameNavigatedEvent.fromJson(Map<String, dynamic> json) {
+    return FrameNavigatedEvent(
+      frame: FrameInfo.fromJson(json['frame'] as Map<String, dynamic>),
+      type: NavigationType.fromJson(json['type'] as String),
+    );
+  }
+}
+
 class FrameRequestedNavigationEvent {
   /// Id of the frame that is being navigated.
   final FrameId frameId;
@@ -1055,6 +1085,23 @@ class LifecycleEventEvent {
       loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
       name: json['name'] as String,
       timestamp: network.MonotonicTime.fromJson(json['timestamp'] as num),
+    );
+  }
+}
+
+class BackForwardCacheNotUsedEvent {
+  /// The loader id for the associated navgation.
+  final network.LoaderId loaderId;
+
+  /// The frame id of the associated frame.
+  final FrameId frameId;
+
+  BackForwardCacheNotUsedEvent({required this.loaderId, required this.frameId});
+
+  factory BackForwardCacheNotUsedEvent.fromJson(Map<String, dynamic> json) {
+    return BackForwardCacheNotUsedEvent(
+      loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
+      frameId: FrameId.fromJson(json['frameId'] as String),
     );
   }
 }
@@ -1433,11 +1480,13 @@ class GatedAPIFeatures {
 }
 
 /// All Permissions Policy features. This enum should match the one defined
-/// in renderer/core/feature_policy/feature_policy_features.json5.
+/// in third_party/blink/renderer/core/permissions_policy/permissions_policy_features.json5.
 class PermissionsPolicyFeature {
   static const accelerometer = PermissionsPolicyFeature._('accelerometer');
   static const ambientLightSensor =
       PermissionsPolicyFeature._('ambient-light-sensor');
+  static const attributionReporting =
+      PermissionsPolicyFeature._('attribution-reporting');
   static const autoplay = PermissionsPolicyFeature._('autoplay');
   static const camera = PermissionsPolicyFeature._('camera');
   static const chDpr = PermissionsPolicyFeature._('ch-dpr');
@@ -1445,6 +1494,8 @@ class PermissionsPolicyFeature {
   static const chDownlink = PermissionsPolicyFeature._('ch-downlink');
   static const chEct = PermissionsPolicyFeature._('ch-ect');
   static const chLang = PermissionsPolicyFeature._('ch-lang');
+  static const chPrefersColorScheme =
+      PermissionsPolicyFeature._('ch-prefers-color-scheme');
   static const chRtt = PermissionsPolicyFeature._('ch-rtt');
   static const chUa = PermissionsPolicyFeature._('ch-ua');
   static const chUaArch = PermissionsPolicyFeature._('ch-ua-arch');
@@ -1460,10 +1511,9 @@ class PermissionsPolicyFeature {
   static const chWidth = PermissionsPolicyFeature._('ch-width');
   static const clipboardRead = PermissionsPolicyFeature._('clipboard-read');
   static const clipboardWrite = PermissionsPolicyFeature._('clipboard-write');
-  static const conversionMeasurement =
-      PermissionsPolicyFeature._('conversion-measurement');
   static const crossOriginIsolated =
       PermissionsPolicyFeature._('cross-origin-isolated');
+  static const directSockets = PermissionsPolicyFeature._('direct-sockets');
   static const displayCapture = PermissionsPolicyFeature._('display-capture');
   static const documentDomain = PermissionsPolicyFeature._('document-domain');
   static const encryptedMedia = PermissionsPolicyFeature._('encrypted-media');
@@ -1492,6 +1542,7 @@ class PermissionsPolicyFeature {
       PermissionsPolicyFeature._('publickey-credentials-get');
   static const screenWakeLock = PermissionsPolicyFeature._('screen-wake-lock');
   static const serial = PermissionsPolicyFeature._('serial');
+  static const sharedAutofill = PermissionsPolicyFeature._('shared-autofill');
   static const storageAccessApi =
       PermissionsPolicyFeature._('storage-access-api');
   static const syncXhr = PermissionsPolicyFeature._('sync-xhr');
@@ -1505,6 +1556,7 @@ class PermissionsPolicyFeature {
   static const values = {
     'accelerometer': accelerometer,
     'ambient-light-sensor': ambientLightSensor,
+    'attribution-reporting': attributionReporting,
     'autoplay': autoplay,
     'camera': camera,
     'ch-dpr': chDpr,
@@ -1512,6 +1564,7 @@ class PermissionsPolicyFeature {
     'ch-downlink': chDownlink,
     'ch-ect': chEct,
     'ch-lang': chLang,
+    'ch-prefers-color-scheme': chPrefersColorScheme,
     'ch-rtt': chRtt,
     'ch-ua': chUa,
     'ch-ua-arch': chUaArch,
@@ -1524,8 +1577,8 @@ class PermissionsPolicyFeature {
     'ch-width': chWidth,
     'clipboard-read': clipboardRead,
     'clipboard-write': clipboardWrite,
-    'conversion-measurement': conversionMeasurement,
     'cross-origin-isolated': crossOriginIsolated,
+    'direct-sockets': directSockets,
     'display-capture': displayCapture,
     'document-domain': documentDomain,
     'encrypted-media': encryptedMedia,
@@ -1549,6 +1602,7 @@ class PermissionsPolicyFeature {
     'publickey-credentials-get': publickeyCredentialsGet,
     'screen-wake-lock': screenWakeLock,
     'serial': serial,
+    'shared-autofill': sharedAutofill,
     'storage-access-api': storageAccessApi,
     'sync-xhr': syncXhr,
     'trust-token-redemption': trustTokenRedemption,
@@ -1662,6 +1716,225 @@ class PermissionsPolicyFeatureState {
   }
 }
 
+/// Origin Trial(https://www.chromium.org/blink/origin-trials) support.
+/// Status for an Origin Trial token.
+class OriginTrialTokenStatus {
+  static const success = OriginTrialTokenStatus._('Success');
+  static const notSupported = OriginTrialTokenStatus._('NotSupported');
+  static const insecure = OriginTrialTokenStatus._('Insecure');
+  static const expired = OriginTrialTokenStatus._('Expired');
+  static const wrongOrigin = OriginTrialTokenStatus._('WrongOrigin');
+  static const invalidSignature = OriginTrialTokenStatus._('InvalidSignature');
+  static const malformed = OriginTrialTokenStatus._('Malformed');
+  static const wrongVersion = OriginTrialTokenStatus._('WrongVersion');
+  static const featureDisabled = OriginTrialTokenStatus._('FeatureDisabled');
+  static const tokenDisabled = OriginTrialTokenStatus._('TokenDisabled');
+  static const featureDisabledForUser =
+      OriginTrialTokenStatus._('FeatureDisabledForUser');
+  static const values = {
+    'Success': success,
+    'NotSupported': notSupported,
+    'Insecure': insecure,
+    'Expired': expired,
+    'WrongOrigin': wrongOrigin,
+    'InvalidSignature': invalidSignature,
+    'Malformed': malformed,
+    'WrongVersion': wrongVersion,
+    'FeatureDisabled': featureDisabled,
+    'TokenDisabled': tokenDisabled,
+    'FeatureDisabledForUser': featureDisabledForUser,
+  };
+
+  final String value;
+
+  const OriginTrialTokenStatus._(this.value);
+
+  factory OriginTrialTokenStatus.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is OriginTrialTokenStatus && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Status for an Origin Trial.
+class OriginTrialStatus {
+  static const enabled = OriginTrialStatus._('Enabled');
+  static const validTokenNotProvided =
+      OriginTrialStatus._('ValidTokenNotProvided');
+  static const osNotSupported = OriginTrialStatus._('OSNotSupported');
+  static const trialNotAllowed = OriginTrialStatus._('TrialNotAllowed');
+  static const values = {
+    'Enabled': enabled,
+    'ValidTokenNotProvided': validTokenNotProvided,
+    'OSNotSupported': osNotSupported,
+    'TrialNotAllowed': trialNotAllowed,
+  };
+
+  final String value;
+
+  const OriginTrialStatus._(this.value);
+
+  factory OriginTrialStatus.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is OriginTrialStatus && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class OriginTrialUsageRestriction {
+  static const none = OriginTrialUsageRestriction._('None');
+  static const subset = OriginTrialUsageRestriction._('Subset');
+  static const values = {
+    'None': none,
+    'Subset': subset,
+  };
+
+  final String value;
+
+  const OriginTrialUsageRestriction._(this.value);
+
+  factory OriginTrialUsageRestriction.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is OriginTrialUsageRestriction && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class OriginTrialToken {
+  final String origin;
+
+  final bool matchSubDomains;
+
+  final String trialName;
+
+  final network.TimeSinceEpoch expiryTime;
+
+  final bool isThirdParty;
+
+  final OriginTrialUsageRestriction usageRestriction;
+
+  OriginTrialToken(
+      {required this.origin,
+      required this.matchSubDomains,
+      required this.trialName,
+      required this.expiryTime,
+      required this.isThirdParty,
+      required this.usageRestriction});
+
+  factory OriginTrialToken.fromJson(Map<String, dynamic> json) {
+    return OriginTrialToken(
+      origin: json['origin'] as String,
+      matchSubDomains: json['matchSubDomains'] as bool,
+      trialName: json['trialName'] as String,
+      expiryTime: network.TimeSinceEpoch.fromJson(json['expiryTime'] as num),
+      isThirdParty: json['isThirdParty'] as bool,
+      usageRestriction: OriginTrialUsageRestriction.fromJson(
+          json['usageRestriction'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'origin': origin,
+      'matchSubDomains': matchSubDomains,
+      'trialName': trialName,
+      'expiryTime': expiryTime.toJson(),
+      'isThirdParty': isThirdParty,
+      'usageRestriction': usageRestriction.toJson(),
+    };
+  }
+}
+
+class OriginTrialTokenWithStatus {
+  final String rawTokenText;
+
+  /// `parsedToken` is present only when the token is extractable and
+  /// parsable.
+  final OriginTrialToken? parsedToken;
+
+  final OriginTrialTokenStatus status;
+
+  OriginTrialTokenWithStatus(
+      {required this.rawTokenText, this.parsedToken, required this.status});
+
+  factory OriginTrialTokenWithStatus.fromJson(Map<String, dynamic> json) {
+    return OriginTrialTokenWithStatus(
+      rawTokenText: json['rawTokenText'] as String,
+      parsedToken: json.containsKey('parsedToken')
+          ? OriginTrialToken.fromJson(
+              json['parsedToken'] as Map<String, dynamic>)
+          : null,
+      status: OriginTrialTokenStatus.fromJson(json['status'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'rawTokenText': rawTokenText,
+      'status': status.toJson(),
+      if (parsedToken != null) 'parsedToken': parsedToken!.toJson(),
+    };
+  }
+}
+
+class OriginTrial {
+  final String trialName;
+
+  final OriginTrialStatus status;
+
+  final List<OriginTrialTokenWithStatus> tokensWithStatus;
+
+  OriginTrial(
+      {required this.trialName,
+      required this.status,
+      required this.tokensWithStatus});
+
+  factory OriginTrial.fromJson(Map<String, dynamic> json) {
+    return OriginTrial(
+      trialName: json['trialName'] as String,
+      status: OriginTrialStatus.fromJson(json['status'] as String),
+      tokensWithStatus: (json['tokensWithStatus'] as List)
+          .map((e) =>
+              OriginTrialTokenWithStatus.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'trialName': trialName,
+      'status': status.toJson(),
+      'tokensWithStatus': tokensWithStatus.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
 /// Information about the Frame on the page.
 class FrameInfo {
   /// Frame unique identifier.
@@ -1709,6 +1982,9 @@ class FrameInfo {
   /// Indicated which gated APIs / features are available.
   final List<GatedAPIFeatures> gatedAPIFeatures;
 
+  /// Frame document's origin trials with at least one token present.
+  final List<OriginTrial>? originTrials;
+
   FrameInfo(
       {required this.id,
       this.parentId,
@@ -1723,7 +1999,8 @@ class FrameInfo {
       this.adFrameType,
       required this.secureContextType,
       required this.crossOriginIsolatedContextType,
-      required this.gatedAPIFeatures});
+      required this.gatedAPIFeatures,
+      this.originTrials});
 
   factory FrameInfo.fromJson(Map<String, dynamic> json) {
     return FrameInfo(
@@ -1752,6 +2029,11 @@ class FrameInfo {
       gatedAPIFeatures: (json['gatedAPIFeatures'] as List)
           .map((e) => GatedAPIFeatures.fromJson(e as String))
           .toList(),
+      originTrials: json.containsKey('originTrials')
+          ? (json['originTrials'] as List)
+              .map((e) => OriginTrial.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
     );
   }
 
@@ -1771,6 +2053,8 @@ class FrameInfo {
       if (urlFragment != null) 'urlFragment': urlFragment,
       if (unreachableUrl != null) 'unreachableUrl': unreachableUrl,
       if (adFrameType != null) 'adFrameType': adFrameType!.toJson(),
+      if (originTrials != null)
+        'originTrials': originTrials!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -2596,6 +2880,35 @@ class CompilationCacheParams {
       if (eager != null) 'eager': eager,
     };
   }
+}
+
+/// The type of a frameNavigated event.
+class NavigationType {
+  static const navigation = NavigationType._('Navigation');
+  static const backForwardCacheRestore =
+      NavigationType._('BackForwardCacheRestore');
+  static const values = {
+    'Navigation': navigation,
+    'BackForwardCacheRestore': backForwardCacheRestore,
+  };
+
+  final String value;
+
+  const NavigationType._(this.value);
+
+  factory NavigationType.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is NavigationType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }
 
 class FileChooserOpenedEventMode {

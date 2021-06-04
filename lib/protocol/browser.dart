@@ -1,5 +1,6 @@
 import 'dart:async';
 import '../src/connection.dart';
+import 'page.dart' as page;
 import 'target.dart' as target;
 
 /// The Browser domain defines methods and events for browser managing.
@@ -7,6 +8,16 @@ class BrowserApi {
   final Client _client;
 
   BrowserApi(this._client);
+
+  /// Fired when page is about to start a download.
+  Stream<DownloadWillBeginEvent> get onDownloadWillBegin => _client.onEvent
+      .where((event) => event.name == 'Browser.downloadWillBegin')
+      .map((event) => DownloadWillBeginEvent.fromJson(event.parameters));
+
+  /// Fired when download makes progress. Last call has |done| == true.
+  Stream<DownloadProgressEvent> get onDownloadProgress => _client.onEvent
+      .where((event) => event.name == 'Browser.downloadProgress')
+      .map((event) => DownloadProgressEvent.fromJson(event.parameters));
 
   /// Set permission settings for given origin.
   /// [permission] Descriptor of permission to override.
@@ -49,18 +60,21 @@ class BrowserApi {
   /// available (otherwise deny). |allowAndName| allows download and names files according to
   /// their dowmload guids.
   /// [browserContextId] BrowserContext to set download behavior. When omitted, default browser context is used.
-  /// [downloadPath] The default path to save downloaded files to. This is requred if behavior is set to 'allow'
+  /// [downloadPath] The default path to save downloaded files to. This is required if behavior is set to 'allow'
   /// or 'allowAndName'.
+  /// [eventsEnabled] Whether to emit download events (defaults to false).
   Future<void> setDownloadBehavior(
       @Enum(['deny', 'allow', 'allowAndName', 'default']) String behavior,
       {BrowserContextID? browserContextId,
-      String? downloadPath}) async {
+      String? downloadPath,
+      bool? eventsEnabled}) async {
     assert(
         const ['deny', 'allow', 'allowAndName', 'default'].contains(behavior));
     await _client.send('Browser.setDownloadBehavior', {
       'behavior': behavior,
       if (browserContextId != null) 'browserContextId': browserContextId,
       if (downloadPath != null) 'downloadPath': downloadPath,
+      if (eventsEnabled != null) 'eventsEnabled': eventsEnabled,
     });
   }
 
@@ -178,6 +192,64 @@ class BrowserApi {
     await _client.send('Browser.executeBrowserCommand', {
       'commandId': commandId,
     });
+  }
+}
+
+class DownloadWillBeginEvent {
+  /// Id of the frame that caused the download to begin.
+  final page.FrameId frameId;
+
+  /// Global unique identifier of the download.
+  final String guid;
+
+  /// URL of the resource being downloaded.
+  final String url;
+
+  /// Suggested file name of the resource (the actual name of the file saved on disk may differ).
+  final String suggestedFilename;
+
+  DownloadWillBeginEvent(
+      {required this.frameId,
+      required this.guid,
+      required this.url,
+      required this.suggestedFilename});
+
+  factory DownloadWillBeginEvent.fromJson(Map<String, dynamic> json) {
+    return DownloadWillBeginEvent(
+      frameId: page.FrameId.fromJson(json['frameId'] as String),
+      guid: json['guid'] as String,
+      url: json['url'] as String,
+      suggestedFilename: json['suggestedFilename'] as String,
+    );
+  }
+}
+
+class DownloadProgressEvent {
+  /// Global unique identifier of the download.
+  final String guid;
+
+  /// Total expected bytes to download.
+  final num totalBytes;
+
+  /// Total bytes received.
+  final num receivedBytes;
+
+  /// Download status.
+  final DownloadProgressEventState state;
+
+  DownloadProgressEvent(
+      {required this.guid,
+      required this.totalBytes,
+      required this.receivedBytes,
+      required this.state});
+
+  factory DownloadProgressEvent.fromJson(Map<String, dynamic> json) {
+    return DownloadProgressEvent(
+      guid: json['guid'] as String,
+      totalBytes: json['totalBytes'] as num,
+      receivedBytes: json['receivedBytes'] as num,
+      state: DownloadProgressEventState.fromJson(json['state'] as String),
+    );
   }
 }
 
@@ -600,4 +672,34 @@ class Histogram {
       'buckets': buckets.map((e) => e.toJson()).toList(),
     };
   }
+}
+
+class DownloadProgressEventState {
+  static const inProgress = DownloadProgressEventState._('inProgress');
+  static const completed = DownloadProgressEventState._('completed');
+  static const canceled = DownloadProgressEventState._('canceled');
+  static const values = {
+    'inProgress': inProgress,
+    'completed': completed,
+    'canceled': canceled,
+  };
+
+  final String value;
+
+  const DownloadProgressEventState._(this.value);
+
+  factory DownloadProgressEventState.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is DownloadProgressEventState && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }

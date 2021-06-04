@@ -33,7 +33,7 @@ class FrameManager {
 
     _pageApi.onFrameAttached.listen(
         (event) => _onFrameAttached(event.frameId, event.parentFrameId));
-    _pageApi.onFrameNavigated.listen(_onFrameNavigated);
+    _pageApi.onFrameNavigated.listen((e) => _onFrameNavigated(e.frame));
     _pageApi.onNavigatedWithinDocument.listen(_onFrameNavigatedWithinDocument);
     _pageApi.onFrameDetached.listen(_onFrameDetached);
     _pageApi.onFrameStoppedLoading.listen(_onFrameStoppedLoading);

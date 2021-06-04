@@ -2362,6 +2362,8 @@ class CorsError {
   static const redirectContainsCredentials =
       CorsError._('RedirectContainsCredentials');
   static const insecurePrivateNetwork = CorsError._('InsecurePrivateNetwork');
+  static const noCorsRedirectModeNotFollow =
+      CorsError._('NoCorsRedirectModeNotFollow');
   static const values = {
     'DisallowedByMode': disallowedByMode,
     'InvalidResponse': invalidResponse,
@@ -2390,6 +2392,7 @@ class CorsError {
     'HeaderDisallowedByPreflightResponse': headerDisallowedByPreflightResponse,
     'RedirectContainsCredentials': redirectContainsCredentials,
     'InsecurePrivateNetwork': insecurePrivateNetwork,
+    'NoCorsRedirectModeNotFollow': noCorsRedirectModeNotFollow,
   };
 
   final String value;
@@ -3561,14 +3564,14 @@ class InterceptionStage {
 
 /// Request pattern for interception.
 class RequestPattern {
-  /// Wildcards ('*' -> zero or more, '?' -> exactly one) are allowed. Escape character is
-  /// backslash. Omitting is equivalent to "*".
+  /// Wildcards (`'*'` -> zero or more, `'?'` -> exactly one) are allowed. Escape character is
+  /// backslash. Omitting is equivalent to `"*"`.
   final String? urlPattern;
 
   /// If set, only requests for matching resource types will be intercepted.
   final ResourceType? resourceType;
 
-  /// Stage at wich to begin intercepting requests. Default is Request.
+  /// Stage at which to begin intercepting requests. Default is Request.
   final InterceptionStage? interceptionStage;
 
   RequestPattern({this.urlPattern, this.resourceType, this.interceptionStage});

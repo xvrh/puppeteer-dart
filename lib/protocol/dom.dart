@@ -48,7 +48,7 @@ class DOMApi {
       .where((event) => event.name == 'DOM.childNodeRemoved')
       .map((event) => ChildNodeRemovedEvent.fromJson(event.parameters));
 
-  /// Called when distrubution is changed.
+  /// Called when distribution is changed.
   Stream<DistributedNodesUpdatedEvent> get onDistributedNodesUpdated => _client
       .onEvent
       .where((event) => event.name == 'DOM.distributedNodesUpdated')
@@ -782,7 +782,7 @@ class ChildNodeRemovedEvent {
 }
 
 class DistributedNodesUpdatedEvent {
-  /// Insertion point where distrubuted nodes were updated.
+  /// Insertion point where distributed nodes were updated.
   final NodeId insertionPointId;
 
   /// Distributed nodes for given insertion point.
@@ -1118,6 +1118,36 @@ class ShadowRootType {
   String toString() => value.toString();
 }
 
+/// Document compatibility mode.
+class CompatibilityMode {
+  static const quirksMode = CompatibilityMode._('QuirksMode');
+  static const limitedQuirksMode = CompatibilityMode._('LimitedQuirksMode');
+  static const noQuirksMode = CompatibilityMode._('NoQuirksMode');
+  static const values = {
+    'QuirksMode': quirksMode,
+    'LimitedQuirksMode': limitedQuirksMode,
+    'NoQuirksMode': noQuirksMode,
+  };
+
+  final String value;
+
+  const CompatibilityMode._(this.value);
+
+  factory CompatibilityMode.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is CompatibilityMode && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// DOM interaction is implemented in terms of mirror objects that represent the actual DOM nodes.
 /// DOMNode is a base node mirror type.
 class Node {
@@ -1198,14 +1228,13 @@ class Node {
   /// Pseudo elements associated with this node.
   final List<Node>? pseudoElements;
 
-  /// Import document for the HTMLImport links.
-  final Node? importedDocument;
-
   /// Distributed nodes for given insertion point.
   final List<BackendNode>? distributedNodes;
 
   /// Whether the node is SVG.
   final bool? isSVG;
+
+  final CompatibilityMode? compatibilityMode;
 
   Node(
       {required this.nodeId,
@@ -1233,9 +1262,9 @@ class Node {
       this.shadowRoots,
       this.templateContent,
       this.pseudoElements,
-      this.importedDocument,
       this.distributedNodes,
-      this.isSVG});
+      this.isSVG,
+      this.compatibilityMode});
 
   factory Node.fromJson(Map<String, dynamic> json) {
     return Node(
@@ -1299,15 +1328,15 @@ class Node {
               .map((e) => Node.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
-      importedDocument: json.containsKey('importedDocument')
-          ? Node.fromJson(json['importedDocument'] as Map<String, dynamic>)
-          : null,
       distributedNodes: json.containsKey('distributedNodes')
           ? (json['distributedNodes'] as List)
               .map((e) => BackendNode.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       isSVG: json.containsKey('isSVG') ? json['isSVG'] as bool : null,
+      compatibilityMode: json.containsKey('compatibilityMode')
+          ? CompatibilityMode.fromJson(json['compatibilityMode'] as String)
+          : null,
     );
   }
 
@@ -1341,11 +1370,11 @@ class Node {
       if (templateContent != null) 'templateContent': templateContent!.toJson(),
       if (pseudoElements != null)
         'pseudoElements': pseudoElements!.map((e) => e.toJson()).toList(),
-      if (importedDocument != null)
-        'importedDocument': importedDocument!.toJson(),
       if (distributedNodes != null)
         'distributedNodes': distributedNodes!.map((e) => e.toJson()).toList(),
       if (isSVG != null) 'isSVG': isSVG,
+      if (compatibilityMode != null)
+        'compatibilityMode': compatibilityMode!.toJson(),
     };
   }
 }

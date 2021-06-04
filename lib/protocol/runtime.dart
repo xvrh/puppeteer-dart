@@ -362,17 +362,13 @@ class RuntimeApi {
   /// Binding function takes exactly one argument, this argument should be string,
   /// in case of any other input, function throws an exception.
   /// Each binding function call produces Runtime.bindingCalled notification.
-  /// [executionContextId] If specified, the binding would only be exposed to the specified
-  /// execution context. If omitted and `executionContextName` is not set,
-  /// the binding is exposed to all execution contexts of the target.
-  /// This parameter is mutually exclusive with `executionContextName`.
   /// [executionContextName] If specified, the binding is exposed to the executionContext with
   /// matching name, even for contexts created after the binding is added.
   /// See also `ExecutionContext.name` and `worldName` parameter to
   /// `Page.addScriptToEvaluateOnNewDocument`.
   /// This parameter is mutually exclusive with `executionContextId`.
   Future<void> addBinding(String name,
-      {ExecutionContextId? executionContextId,
+      {@deprecated ExecutionContextId? executionContextId,
       String? executionContextName}) async {
     await _client.send('Runtime.addBinding', {
       'name': name,

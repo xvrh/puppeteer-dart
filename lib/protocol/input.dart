@@ -6,6 +6,13 @@ class InputApi {
 
   InputApi(this._client);
 
+  /// Emitted only when `Input.setInterceptDrags` is enabled. Use this data with `Input.dispatchDragEvent` to
+  /// restore normal drag and drop behavior.
+  Stream<DragData> get onDragIntercepted => _client.onEvent
+      .where((event) => event.name == 'Input.dragIntercepted')
+      .map((event) =>
+          DragData.fromJson(event.parameters['data'] as Map<String, dynamic>));
+
   /// Dispatches a drag event into the page.
   /// [type] Type of the drag event.
   /// [x] X coordinate of the event relative to the main frame's viewport in CSS pixels.
@@ -228,6 +235,14 @@ class InputApi {
   Future<void> setIgnoreInputEvents(bool ignore) async {
     await _client.send('Input.setIgnoreInputEvents', {
       'ignore': ignore,
+    });
+  }
+
+  /// Prevents default drag and drop behavior and instead emits `Input.dragIntercepted` events.
+  /// Drag and drop behavior can be directly controlled via `Input.dispatchDragEvent`.
+  Future<void> setInterceptDrags(bool enabled) async {
+    await _client.send('Input.setInterceptDrags', {
+      'enabled': enabled,
     });
   }
 

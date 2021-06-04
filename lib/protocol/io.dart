@@ -48,7 +48,7 @@ class ReadResult {
   /// Data that were read.
   final String data;
 
-  /// Set if the end-of-file condition occured while reading.
+  /// Set if the end-of-file condition occurred while reading.
   final bool eof;
 
   ReadResult({this.base64Encoded, required this.data, required this.eof});
@@ -64,7 +64,7 @@ class ReadResult {
   }
 }
 
-/// This is either obtained from another method or specifed as `blob:&lt;uuid&gt;` where
+/// This is either obtained from another method or specified as `blob:&lt;uuid&gt;` where
 /// `&lt;uuid&gt` is an UUID of a Blob.
 class StreamHandle {
   final String value;

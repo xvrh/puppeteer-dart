@@ -32,6 +32,3 @@ dev_dependencies:
   shelf_static:
   test:
   yaml:
-
-dependency_overrides:
-  shelf_static: ^1.0.0
