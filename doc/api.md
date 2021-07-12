@@ -273,7 +273,7 @@ Parameters:
     Useful so that you can see what is going on.
 
 ```dart
-puppeteer.connect({String? browserWsEndpoint, String? browserUrl, DeviceViewport defaultViewport = LaunchOptions.viewportNotSpecified, bool? ignoreHttpsErrors, Duration? slowMo, List<Plugin>? plugins}) → Future<Browser> 
+puppeteer.connect({String? browserWsEndpoint, String? browserUrl, DeviceViewport? defaultViewport = LaunchOptions.viewportNotSpecified, bool? ignoreHttpsErrors, Duration? slowMo, List<Plugin>? plugins}) → Future<Browser> 
 ```
 
 #### puppeteer.launch(...)
