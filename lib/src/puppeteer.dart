@@ -213,7 +213,7 @@ class Puppeteer {
   Future<Browser> connect(
       {String? browserWsEndpoint,
       String? browserUrl,
-      DeviceViewport defaultViewport = LaunchOptions.viewportNotSpecified,
+      DeviceViewport? defaultViewport = LaunchOptions.viewportNotSpecified,
       bool? ignoreHttpsErrors,
       Duration? slowMo,
       List<Plugin>? plugins}) async {
