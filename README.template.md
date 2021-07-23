@@ -8,6 +8,7 @@ This is a port of the [Puppeteer Node.JS library](https://pptr.dev/) in the [Dar
 [![Build Status](https://github.com/xvrh/puppeteer-dart/workflows/Build/badge.svg?branch=master)](https://github.com/xvrh/puppeteer-dart)
 [![Coverage Status](https://coveralls.io/repos/github/xvrh/puppeteer-dart/badge.svg?branch=master)](https://coveralls.io/github/xvrh/puppeteer-dart?branch=master)
 
+For Flutter users, see [limitations with Flutter section](#limitations-with-flutter)
 
 ###### What can I do?
 
@@ -132,6 +133,23 @@ main() {
 
 Note: In a future version, we can imagine writing the code in Dart and it would be compiled to javascript transparently 
  (with ddc or dart2js).
+
+## Limitations with Flutter
+
+This library does 2 things:
+
+1) Download the chromium binaries and launch a Chromium process.
+2) Connect to this process with Websocket and send json commands to control the browser.
+
+Due to limitations on mobile platforms (iOS and Android), **it is not possible to launch an external Chromium process** on 
+those platforms. So, n°1. does not work on mobile.
+
+You can still use `puppeteer-dart` on Flutter either with:
+- Flutter on Desktop (macOS, windows, Linux)
+- Flutter on mobile BUT with the actual Chrome instance running on a server and accessed from the mobile app using puppeteer.connect
+
+> The pub.dev website reports that this library works with Android and iOS. The supported platform list is 
+> detected automatically and can't be manually modified to express the current limitations.
 
 ## Related work
  * [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface)
