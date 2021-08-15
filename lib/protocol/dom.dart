@@ -663,6 +663,19 @@ class DOMApi {
     });
     return GetFrameOwnerResult.fromJson(result);
   }
+
+  /// Returns the container of the given node based on container query conditions.
+  /// If containerName is given, it will find the nearest container with a matching name;
+  /// otherwise it will find the nearest container regardless of its container name.
+  /// Returns: The container node for the given node, or null if not found.
+  Future<NodeId> getContainerForNode(NodeId nodeId,
+      {String? containerName}) async {
+    var result = await _client.send('DOM.getContainerForNode', {
+      'nodeId': nodeId,
+      if (containerName != null) 'containerName': containerName,
+    });
+    return NodeId.fromJson(result['nodeId'] as int);
+  }
 }
 
 class AttributeModifiedEvent {
@@ -1038,6 +1051,7 @@ class PseudoType {
   static const targetText = PseudoType._('target-text');
   static const spellingError = PseudoType._('spelling-error');
   static const grammarError = PseudoType._('grammar-error');
+  static const highlight = PseudoType._('highlight');
   static const firstLineInherited = PseudoType._('first-line-inherited');
   static const scrollbar = PseudoType._('scrollbar');
   static const scrollbarThumb = PseudoType._('scrollbar-thumb');
@@ -1058,6 +1072,7 @@ class PseudoType {
     'target-text': targetText,
     'spelling-error': spellingError,
     'grammar-error': grammarError,
+    'highlight': highlight,
     'first-line-inherited': firstLineInherited,
     'scrollbar': scrollbar,
     'scrollbar-thumb': scrollbarThumb,

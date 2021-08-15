@@ -86,6 +86,7 @@ class RuntimeApi {
   /// executionContextId or objectId should be specified.
   /// [objectGroup] Symbolic group name that can be used to release multiple objects. If objectGroup is not
   /// specified and objectId is, objectGroup will be inherited from object.
+  /// [throwOnSideEffect] Whether to throw an exception if side effect cannot be ruled out during evaluation.
   Future<CallFunctionOnResult> callFunctionOn(String functionDeclaration,
       {RemoteObjectId? objectId,
       List<CallArgument>? arguments,
@@ -95,7 +96,8 @@ class RuntimeApi {
       bool? userGesture,
       bool? awaitPromise,
       ExecutionContextId? executionContextId,
-      String? objectGroup}) async {
+      String? objectGroup,
+      bool? throwOnSideEffect}) async {
     var result = await _client.send('Runtime.callFunctionOn', {
       'functionDeclaration': functionDeclaration,
       if (objectId != null) 'objectId': objectId,
@@ -107,6 +109,7 @@ class RuntimeApi {
       if (awaitPromise != null) 'awaitPromise': awaitPromise,
       if (executionContextId != null) 'executionContextId': executionContextId,
       if (objectGroup != null) 'objectGroup': objectGroup,
+      if (throwOnSideEffect != null) 'throwOnSideEffect': throwOnSideEffect,
     });
     return CallFunctionOnResult.fromJson(result);
   }
@@ -174,9 +177,9 @@ class RuntimeApi {
   /// when called with non-callable arguments. This flag bypasses CSP for this
   /// evaluation and allows unsafe-eval. Defaults to true.
   /// [uniqueContextId] An alternative way to specify the execution context to evaluate in.
-  /// Compared to contextId that may be reused accross processes, this is guaranteed to be
+  /// Compared to contextId that may be reused across processes, this is guaranteed to be
   /// system-unique, so it can be used to prevent accidental evaluation of the expression
-  /// in context different than intended (e.g. as a result of navigation accross process
+  /// in context different than intended (e.g. as a result of navigation across process
   /// boundaries).
   /// This is mutually exclusive with `contextId`.
   Future<EvaluateResult> evaluate(String expression,
@@ -1518,7 +1521,7 @@ class ExecutionContextDescription {
   /// Human readable name describing given context.
   final String name;
 
-  /// A system-unique execution context identifier. Unlike the id, this is unique accross
+  /// A system-unique execution context identifier. Unlike the id, this is unique across
   /// multiple processes, so can be reliably used to identify specific context while backend
   /// performs a cross-process navigation.
   final String uniqueId;
@@ -1586,6 +1589,11 @@ class ExceptionDetails {
   /// Identifier of the context where exception happened.
   final ExecutionContextId? executionContextId;
 
+  /// Dictionary with entries of meta data that the client associated
+  /// with this exception, such as information about associated network
+  /// requests, etc.
+  final Map<String, dynamic>? exceptionMetaData;
+
   ExceptionDetails(
       {required this.exceptionId,
       required this.text,
@@ -1595,7 +1603,8 @@ class ExceptionDetails {
       this.url,
       this.stackTrace,
       this.exception,
-      this.executionContextId});
+      this.executionContextId,
+      this.exceptionMetaData});
 
   factory ExceptionDetails.fromJson(Map<String, dynamic> json) {
     return ExceptionDetails(
@@ -1616,6 +1625,9 @@ class ExceptionDetails {
       executionContextId: json.containsKey('executionContextId')
           ? ExecutionContextId.fromJson(json['executionContextId'] as int)
           : null,
+      exceptionMetaData: json.containsKey('exceptionMetaData')
+          ? json['exceptionMetaData'] as Map<String, dynamic>
+          : null,
     );
   }
 
@@ -1631,6 +1643,7 @@ class ExceptionDetails {
       if (exception != null) 'exception': exception!.toJson(),
       if (executionContextId != null)
         'executionContextId': executionContextId!.toJson(),
+      if (exceptionMetaData != null) 'exceptionMetaData': exceptionMetaData,
     };
   }
 }

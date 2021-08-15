@@ -202,12 +202,12 @@ class PageApi {
   /// [captureBeyondViewport] Capture the screenshot beyond the viewport. Defaults to false.
   /// Returns: Base64-encoded image data.
   Future<String> captureScreenshot(
-      {@Enum(['jpeg', 'png']) String? format,
+      {@Enum(['jpeg', 'png', 'webp']) String? format,
       int? quality,
       Viewport? clip,
       bool? fromSurface,
       bool? captureBeyondViewport}) async {
-    assert(format == null || const ['jpeg', 'png'].contains(format));
+    assert(format == null || const ['jpeg', 'png', 'webp'].contains(format));
     var result = await _client.send('Page.captureScreenshot', {
       if (format != null) 'format': format,
       if (quality != null) 'quality': quality,
@@ -1096,12 +1096,22 @@ class BackForwardCacheNotUsedEvent {
   /// The frame id of the associated frame.
   final FrameId frameId;
 
-  BackForwardCacheNotUsedEvent({required this.loaderId, required this.frameId});
+  /// Array of reasons why the page could not be cached. This must not be empty.
+  final List<BackForwardCacheNotRestoredExplanation> notRestoredExplanations;
+
+  BackForwardCacheNotUsedEvent(
+      {required this.loaderId,
+      required this.frameId,
+      required this.notRestoredExplanations});
 
   factory BackForwardCacheNotUsedEvent.fromJson(Map<String, dynamic> json) {
     return BackForwardCacheNotUsedEvent(
       loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
       frameId: FrameId.fromJson(json['frameId'] as String),
+      notRestoredExplanations: (json['notRestoredExplanations'] as List)
+          .map((e) => BackForwardCacheNotRestoredExplanation.fromJson(
+              e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -1381,6 +1391,64 @@ class AdFrameType {
   String toString() => value.toString();
 }
 
+class AdFrameExplanation {
+  static const parentIsAd = AdFrameExplanation._('ParentIsAd');
+  static const createdByAdScript = AdFrameExplanation._('CreatedByAdScript');
+  static const matchedBlockingRule =
+      AdFrameExplanation._('MatchedBlockingRule');
+  static const values = {
+    'ParentIsAd': parentIsAd,
+    'CreatedByAdScript': createdByAdScript,
+    'MatchedBlockingRule': matchedBlockingRule,
+  };
+
+  final String value;
+
+  const AdFrameExplanation._(this.value);
+
+  factory AdFrameExplanation.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is AdFrameExplanation && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Indicates whether a frame has been identified as an ad and why.
+class AdFrameStatus {
+  final AdFrameType adFrameType;
+
+  final List<AdFrameExplanation>? explanations;
+
+  AdFrameStatus({required this.adFrameType, this.explanations});
+
+  factory AdFrameStatus.fromJson(Map<String, dynamic> json) {
+    return AdFrameStatus(
+      adFrameType: AdFrameType.fromJson(json['adFrameType'] as String),
+      explanations: json.containsKey('explanations')
+          ? (json['explanations'] as List)
+              .map((e) => AdFrameExplanation.fromJson(e as String))
+              .toList()
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'adFrameType': adFrameType.toJson(),
+      if (explanations != null)
+        'explanations': explanations!.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
 /// Indicates whether the frame is a secure context and why it is the case.
 class SecureContextType {
   static const secure = SecureContextType._('Secure');
@@ -1499,6 +1567,7 @@ class PermissionsPolicyFeature {
   static const chRtt = PermissionsPolicyFeature._('ch-rtt');
   static const chUa = PermissionsPolicyFeature._('ch-ua');
   static const chUaArch = PermissionsPolicyFeature._('ch-ua-arch');
+  static const chUaBitness = PermissionsPolicyFeature._('ch-ua-bitness');
   static const chUaPlatform = PermissionsPolicyFeature._('ch-ua-platform');
   static const chUaModel = PermissionsPolicyFeature._('ch-ua-model');
   static const chUaMobile = PermissionsPolicyFeature._('ch-ua-mobile');
@@ -1551,6 +1620,7 @@ class PermissionsPolicyFeature {
   static const usb = PermissionsPolicyFeature._('usb');
   static const verticalScroll = PermissionsPolicyFeature._('vertical-scroll');
   static const webShare = PermissionsPolicyFeature._('web-share');
+  static const windowPlacement = PermissionsPolicyFeature._('window-placement');
   static const xrSpatialTracking =
       PermissionsPolicyFeature._('xr-spatial-tracking');
   static const values = {
@@ -1568,6 +1638,7 @@ class PermissionsPolicyFeature {
     'ch-rtt': chRtt,
     'ch-ua': chUa,
     'ch-ua-arch': chUaArch,
+    'ch-ua-bitness': chUaBitness,
     'ch-ua-platform': chUaPlatform,
     'ch-ua-model': chUaModel,
     'ch-ua-mobile': chUaMobile,
@@ -1609,6 +1680,7 @@ class PermissionsPolicyFeature {
     'usb': usb,
     'vertical-scroll': verticalScroll,
     'web-share': webShare,
+    'window-placement': windowPlacement,
     'xr-spatial-tracking': xrSpatialTracking,
   };
 
@@ -1970,8 +2042,8 @@ class FrameInfo {
   /// If the frame failed to load, this contains the URL that could not be loaded. Note that unlike url above, this URL may contain a fragment.
   final String? unreachableUrl;
 
-  /// Indicates whether this frame was tagged as an ad.
-  final AdFrameType? adFrameType;
+  /// Indicates whether this frame was tagged as an ad and why.
+  final AdFrameStatus? adFrameStatus;
 
   /// Indicates whether the main document is a secure context and explains why that is the case.
   final SecureContextType secureContextType;
@@ -1996,7 +2068,7 @@ class FrameInfo {
       required this.securityOrigin,
       required this.mimeType,
       this.unreachableUrl,
-      this.adFrameType,
+      this.adFrameStatus,
       required this.secureContextType,
       required this.crossOriginIsolatedContextType,
       required this.gatedAPIFeatures,
@@ -2019,8 +2091,9 @@ class FrameInfo {
       unreachableUrl: json.containsKey('unreachableUrl')
           ? json['unreachableUrl'] as String
           : null,
-      adFrameType: json.containsKey('adFrameType')
-          ? AdFrameType.fromJson(json['adFrameType'] as String)
+      adFrameStatus: json.containsKey('adFrameStatus')
+          ? AdFrameStatus.fromJson(
+              json['adFrameStatus'] as Map<String, dynamic>)
           : null,
       secureContextType:
           SecureContextType.fromJson(json['secureContextType'] as String),
@@ -2052,7 +2125,7 @@ class FrameInfo {
       if (name != null) 'name': name,
       if (urlFragment != null) 'urlFragment': urlFragment,
       if (unreachableUrl != null) 'unreachableUrl': unreachableUrl,
-      if (adFrameType != null) 'adFrameType': adFrameType!.toJson(),
+      if (adFrameStatus != null) 'adFrameStatus': adFrameStatus!.toJson(),
       if (originTrials != null)
         'originTrials': originTrials!.map((e) => e.toJson()).toList(),
     };
@@ -2909,6 +2982,378 @@ class NavigationType {
 
   @override
   String toString() => value.toString();
+}
+
+/// List of not restored reasons for back-forward cache.
+class BackForwardCacheNotRestoredReason {
+  static const notMainFrame =
+      BackForwardCacheNotRestoredReason._('NotMainFrame');
+  static const backForwardCacheDisabled =
+      BackForwardCacheNotRestoredReason._('BackForwardCacheDisabled');
+  static const relatedActiveContentsExist =
+      BackForwardCacheNotRestoredReason._('RelatedActiveContentsExist');
+  static const httpStatusNotOk =
+      BackForwardCacheNotRestoredReason._('HTTPStatusNotOK');
+  static const schemeNotHttpOrHttps =
+      BackForwardCacheNotRestoredReason._('SchemeNotHTTPOrHTTPS');
+  static const loading = BackForwardCacheNotRestoredReason._('Loading');
+  static const wasGrantedMediaAccess =
+      BackForwardCacheNotRestoredReason._('WasGrantedMediaAccess');
+  static const disableForRenderFrameHostCalled =
+      BackForwardCacheNotRestoredReason._('DisableForRenderFrameHostCalled');
+  static const domainNotAllowed =
+      BackForwardCacheNotRestoredReason._('DomainNotAllowed');
+  static const httpMethodNotGet =
+      BackForwardCacheNotRestoredReason._('HTTPMethodNotGET');
+  static const subframeIsNavigating =
+      BackForwardCacheNotRestoredReason._('SubframeIsNavigating');
+  static const timeout = BackForwardCacheNotRestoredReason._('Timeout');
+  static const cacheLimit = BackForwardCacheNotRestoredReason._('CacheLimit');
+  static const javaScriptExecution =
+      BackForwardCacheNotRestoredReason._('JavaScriptExecution');
+  static const rendererProcessKilled =
+      BackForwardCacheNotRestoredReason._('RendererProcessKilled');
+  static const rendererProcessCrashed =
+      BackForwardCacheNotRestoredReason._('RendererProcessCrashed');
+  static const grantedMediaStreamAccess =
+      BackForwardCacheNotRestoredReason._('GrantedMediaStreamAccess');
+  static const schedulerTrackedFeatureUsed =
+      BackForwardCacheNotRestoredReason._('SchedulerTrackedFeatureUsed');
+  static const conflictingBrowsingInstance =
+      BackForwardCacheNotRestoredReason._('ConflictingBrowsingInstance');
+  static const cacheFlushed =
+      BackForwardCacheNotRestoredReason._('CacheFlushed');
+  static const serviceWorkerVersionActivation =
+      BackForwardCacheNotRestoredReason._('ServiceWorkerVersionActivation');
+  static const sessionRestored =
+      BackForwardCacheNotRestoredReason._('SessionRestored');
+  static const serviceWorkerPostMessage =
+      BackForwardCacheNotRestoredReason._('ServiceWorkerPostMessage');
+  static const enteredBackForwardCacheBeforeServiceWorkerHostAdded =
+      BackForwardCacheNotRestoredReason._(
+          'EnteredBackForwardCacheBeforeServiceWorkerHostAdded');
+  static const renderFrameHostReusedSameSite =
+      BackForwardCacheNotRestoredReason._('RenderFrameHostReused_SameSite');
+  static const renderFrameHostReusedCrossSite =
+      BackForwardCacheNotRestoredReason._('RenderFrameHostReused_CrossSite');
+  static const serviceWorkerClaim =
+      BackForwardCacheNotRestoredReason._('ServiceWorkerClaim');
+  static const ignoreEventAndEvict =
+      BackForwardCacheNotRestoredReason._('IgnoreEventAndEvict');
+  static const haveInnerContents =
+      BackForwardCacheNotRestoredReason._('HaveInnerContents');
+  static const timeoutPuttingInCache =
+      BackForwardCacheNotRestoredReason._('TimeoutPuttingInCache');
+  static const backForwardCacheDisabledByLowMemory =
+      BackForwardCacheNotRestoredReason._(
+          'BackForwardCacheDisabledByLowMemory');
+  static const backForwardCacheDisabledByCommandLine =
+      BackForwardCacheNotRestoredReason._(
+          'BackForwardCacheDisabledByCommandLine');
+  static const networkRequestDatapipeDrainedAsBytesConsumer =
+      BackForwardCacheNotRestoredReason._(
+          'NetworkRequestDatapipeDrainedAsBytesConsumer');
+  static const networkRequestRedirected =
+      BackForwardCacheNotRestoredReason._('NetworkRequestRedirected');
+  static const networkRequestTimeout =
+      BackForwardCacheNotRestoredReason._('NetworkRequestTimeout');
+  static const networkExceedsBufferLimit =
+      BackForwardCacheNotRestoredReason._('NetworkExceedsBufferLimit');
+  static const navigationCancelledWhileRestoring =
+      BackForwardCacheNotRestoredReason._('NavigationCancelledWhileRestoring');
+  static const notMostRecentNavigationEntry =
+      BackForwardCacheNotRestoredReason._('NotMostRecentNavigationEntry');
+  static const backForwardCacheDisabledForPrerender =
+      BackForwardCacheNotRestoredReason._(
+          'BackForwardCacheDisabledForPrerender');
+  static const userAgentOverrideDiffers =
+      BackForwardCacheNotRestoredReason._('UserAgentOverrideDiffers');
+  static const foregroundCacheLimit =
+      BackForwardCacheNotRestoredReason._('ForegroundCacheLimit');
+  static const browsingInstanceNotSwapped =
+      BackForwardCacheNotRestoredReason._('BrowsingInstanceNotSwapped');
+  static const backForwardCacheDisabledForDelegate =
+      BackForwardCacheNotRestoredReason._(
+          'BackForwardCacheDisabledForDelegate');
+  static const optInUnloadHeaderNotPresent =
+      BackForwardCacheNotRestoredReason._('OptInUnloadHeaderNotPresent');
+  static const unloadHandlerExistsInSubFrame =
+      BackForwardCacheNotRestoredReason._('UnloadHandlerExistsInSubFrame');
+  static const serviceWorkerUnregistration =
+      BackForwardCacheNotRestoredReason._('ServiceWorkerUnregistration');
+  static const cacheControlNoStore =
+      BackForwardCacheNotRestoredReason._('CacheControlNoStore');
+  static const cacheControlNoStoreCookieModified =
+      BackForwardCacheNotRestoredReason._('CacheControlNoStoreCookieModified');
+  static const cacheControlNoStoreHttpOnlyCookieModified =
+      BackForwardCacheNotRestoredReason._(
+          'CacheControlNoStoreHTTPOnlyCookieModified');
+  static const webSocket = BackForwardCacheNotRestoredReason._('WebSocket');
+  static const webRtc = BackForwardCacheNotRestoredReason._('WebRTC');
+  static const mainResourceHasCacheControlNoStore =
+      BackForwardCacheNotRestoredReason._('MainResourceHasCacheControlNoStore');
+  static const mainResourceHasCacheControlNoCache =
+      BackForwardCacheNotRestoredReason._('MainResourceHasCacheControlNoCache');
+  static const subresourceHasCacheControlNoStore =
+      BackForwardCacheNotRestoredReason._('SubresourceHasCacheControlNoStore');
+  static const subresourceHasCacheControlNoCache =
+      BackForwardCacheNotRestoredReason._('SubresourceHasCacheControlNoCache');
+  static const containsPlugins =
+      BackForwardCacheNotRestoredReason._('ContainsPlugins');
+  static const documentLoaded =
+      BackForwardCacheNotRestoredReason._('DocumentLoaded');
+  static const dedicatedWorkerOrWorklet =
+      BackForwardCacheNotRestoredReason._('DedicatedWorkerOrWorklet');
+  static const outstandingNetworkRequestOthers =
+      BackForwardCacheNotRestoredReason._('OutstandingNetworkRequestOthers');
+  static const outstandingIndexedDbTransaction =
+      BackForwardCacheNotRestoredReason._('OutstandingIndexedDBTransaction');
+  static const requestedNotificationsPermission =
+      BackForwardCacheNotRestoredReason._('RequestedNotificationsPermission');
+  static const requestedMidiPermission =
+      BackForwardCacheNotRestoredReason._('RequestedMIDIPermission');
+  static const requestedAudioCapturePermission =
+      BackForwardCacheNotRestoredReason._('RequestedAudioCapturePermission');
+  static const requestedVideoCapturePermission =
+      BackForwardCacheNotRestoredReason._('RequestedVideoCapturePermission');
+  static const requestedBackForwardCacheBlockedSensors =
+      BackForwardCacheNotRestoredReason._(
+          'RequestedBackForwardCacheBlockedSensors');
+  static const requestedBackgroundWorkPermission =
+      BackForwardCacheNotRestoredReason._('RequestedBackgroundWorkPermission');
+  static const broadcastChannel =
+      BackForwardCacheNotRestoredReason._('BroadcastChannel');
+  static const indexedDbConnection =
+      BackForwardCacheNotRestoredReason._('IndexedDBConnection');
+  static const webXr = BackForwardCacheNotRestoredReason._('WebXR');
+  static const sharedWorker =
+      BackForwardCacheNotRestoredReason._('SharedWorker');
+  static const webLocks = BackForwardCacheNotRestoredReason._('WebLocks');
+  static const webHid = BackForwardCacheNotRestoredReason._('WebHID');
+  static const webShare = BackForwardCacheNotRestoredReason._('WebShare');
+  static const requestedStorageAccessGrant =
+      BackForwardCacheNotRestoredReason._('RequestedStorageAccessGrant');
+  static const webNfc = BackForwardCacheNotRestoredReason._('WebNfc');
+  static const webFileSystem =
+      BackForwardCacheNotRestoredReason._('WebFileSystem');
+  static const outstandingNetworkRequestFetch =
+      BackForwardCacheNotRestoredReason._('OutstandingNetworkRequestFetch');
+  static const outstandingNetworkRequestXhr =
+      BackForwardCacheNotRestoredReason._('OutstandingNetworkRequestXHR');
+  static const appBanner = BackForwardCacheNotRestoredReason._('AppBanner');
+  static const printing = BackForwardCacheNotRestoredReason._('Printing');
+  static const webDatabase = BackForwardCacheNotRestoredReason._('WebDatabase');
+  static const pictureInPicture =
+      BackForwardCacheNotRestoredReason._('PictureInPicture');
+  static const portal = BackForwardCacheNotRestoredReason._('Portal');
+  static const speechRecognizer =
+      BackForwardCacheNotRestoredReason._('SpeechRecognizer');
+  static const idleManager = BackForwardCacheNotRestoredReason._('IdleManager');
+  static const paymentManager =
+      BackForwardCacheNotRestoredReason._('PaymentManager');
+  static const speechSynthesis =
+      BackForwardCacheNotRestoredReason._('SpeechSynthesis');
+  static const keyboardLock =
+      BackForwardCacheNotRestoredReason._('KeyboardLock');
+  static const webOtpService =
+      BackForwardCacheNotRestoredReason._('WebOTPService');
+  static const outstandingNetworkRequestDirectSocket =
+      BackForwardCacheNotRestoredReason._(
+          'OutstandingNetworkRequestDirectSocket');
+  static const isolatedWorldScript =
+      BackForwardCacheNotRestoredReason._('IsolatedWorldScript');
+  static const injectedStyleSheet =
+      BackForwardCacheNotRestoredReason._('InjectedStyleSheet');
+  static const mediaSessionImplOnServiceCreated =
+      BackForwardCacheNotRestoredReason._('MediaSessionImplOnServiceCreated');
+  static const unknown = BackForwardCacheNotRestoredReason._('Unknown');
+  static const values = {
+    'NotMainFrame': notMainFrame,
+    'BackForwardCacheDisabled': backForwardCacheDisabled,
+    'RelatedActiveContentsExist': relatedActiveContentsExist,
+    'HTTPStatusNotOK': httpStatusNotOk,
+    'SchemeNotHTTPOrHTTPS': schemeNotHttpOrHttps,
+    'Loading': loading,
+    'WasGrantedMediaAccess': wasGrantedMediaAccess,
+    'DisableForRenderFrameHostCalled': disableForRenderFrameHostCalled,
+    'DomainNotAllowed': domainNotAllowed,
+    'HTTPMethodNotGET': httpMethodNotGet,
+    'SubframeIsNavigating': subframeIsNavigating,
+    'Timeout': timeout,
+    'CacheLimit': cacheLimit,
+    'JavaScriptExecution': javaScriptExecution,
+    'RendererProcessKilled': rendererProcessKilled,
+    'RendererProcessCrashed': rendererProcessCrashed,
+    'GrantedMediaStreamAccess': grantedMediaStreamAccess,
+    'SchedulerTrackedFeatureUsed': schedulerTrackedFeatureUsed,
+    'ConflictingBrowsingInstance': conflictingBrowsingInstance,
+    'CacheFlushed': cacheFlushed,
+    'ServiceWorkerVersionActivation': serviceWorkerVersionActivation,
+    'SessionRestored': sessionRestored,
+    'ServiceWorkerPostMessage': serviceWorkerPostMessage,
+    'EnteredBackForwardCacheBeforeServiceWorkerHostAdded':
+        enteredBackForwardCacheBeforeServiceWorkerHostAdded,
+    'RenderFrameHostReused_SameSite': renderFrameHostReusedSameSite,
+    'RenderFrameHostReused_CrossSite': renderFrameHostReusedCrossSite,
+    'ServiceWorkerClaim': serviceWorkerClaim,
+    'IgnoreEventAndEvict': ignoreEventAndEvict,
+    'HaveInnerContents': haveInnerContents,
+    'TimeoutPuttingInCache': timeoutPuttingInCache,
+    'BackForwardCacheDisabledByLowMemory': backForwardCacheDisabledByLowMemory,
+    'BackForwardCacheDisabledByCommandLine':
+        backForwardCacheDisabledByCommandLine,
+    'NetworkRequestDatapipeDrainedAsBytesConsumer':
+        networkRequestDatapipeDrainedAsBytesConsumer,
+    'NetworkRequestRedirected': networkRequestRedirected,
+    'NetworkRequestTimeout': networkRequestTimeout,
+    'NetworkExceedsBufferLimit': networkExceedsBufferLimit,
+    'NavigationCancelledWhileRestoring': navigationCancelledWhileRestoring,
+    'NotMostRecentNavigationEntry': notMostRecentNavigationEntry,
+    'BackForwardCacheDisabledForPrerender':
+        backForwardCacheDisabledForPrerender,
+    'UserAgentOverrideDiffers': userAgentOverrideDiffers,
+    'ForegroundCacheLimit': foregroundCacheLimit,
+    'BrowsingInstanceNotSwapped': browsingInstanceNotSwapped,
+    'BackForwardCacheDisabledForDelegate': backForwardCacheDisabledForDelegate,
+    'OptInUnloadHeaderNotPresent': optInUnloadHeaderNotPresent,
+    'UnloadHandlerExistsInSubFrame': unloadHandlerExistsInSubFrame,
+    'ServiceWorkerUnregistration': serviceWorkerUnregistration,
+    'CacheControlNoStore': cacheControlNoStore,
+    'CacheControlNoStoreCookieModified': cacheControlNoStoreCookieModified,
+    'CacheControlNoStoreHTTPOnlyCookieModified':
+        cacheControlNoStoreHttpOnlyCookieModified,
+    'WebSocket': webSocket,
+    'WebRTC': webRtc,
+    'MainResourceHasCacheControlNoStore': mainResourceHasCacheControlNoStore,
+    'MainResourceHasCacheControlNoCache': mainResourceHasCacheControlNoCache,
+    'SubresourceHasCacheControlNoStore': subresourceHasCacheControlNoStore,
+    'SubresourceHasCacheControlNoCache': subresourceHasCacheControlNoCache,
+    'ContainsPlugins': containsPlugins,
+    'DocumentLoaded': documentLoaded,
+    'DedicatedWorkerOrWorklet': dedicatedWorkerOrWorklet,
+    'OutstandingNetworkRequestOthers': outstandingNetworkRequestOthers,
+    'OutstandingIndexedDBTransaction': outstandingIndexedDbTransaction,
+    'RequestedNotificationsPermission': requestedNotificationsPermission,
+    'RequestedMIDIPermission': requestedMidiPermission,
+    'RequestedAudioCapturePermission': requestedAudioCapturePermission,
+    'RequestedVideoCapturePermission': requestedVideoCapturePermission,
+    'RequestedBackForwardCacheBlockedSensors':
+        requestedBackForwardCacheBlockedSensors,
+    'RequestedBackgroundWorkPermission': requestedBackgroundWorkPermission,
+    'BroadcastChannel': broadcastChannel,
+    'IndexedDBConnection': indexedDbConnection,
+    'WebXR': webXr,
+    'SharedWorker': sharedWorker,
+    'WebLocks': webLocks,
+    'WebHID': webHid,
+    'WebShare': webShare,
+    'RequestedStorageAccessGrant': requestedStorageAccessGrant,
+    'WebNfc': webNfc,
+    'WebFileSystem': webFileSystem,
+    'OutstandingNetworkRequestFetch': outstandingNetworkRequestFetch,
+    'OutstandingNetworkRequestXHR': outstandingNetworkRequestXhr,
+    'AppBanner': appBanner,
+    'Printing': printing,
+    'WebDatabase': webDatabase,
+    'PictureInPicture': pictureInPicture,
+    'Portal': portal,
+    'SpeechRecognizer': speechRecognizer,
+    'IdleManager': idleManager,
+    'PaymentManager': paymentManager,
+    'SpeechSynthesis': speechSynthesis,
+    'KeyboardLock': keyboardLock,
+    'WebOTPService': webOtpService,
+    'OutstandingNetworkRequestDirectSocket':
+        outstandingNetworkRequestDirectSocket,
+    'IsolatedWorldScript': isolatedWorldScript,
+    'InjectedStyleSheet': injectedStyleSheet,
+    'MediaSessionImplOnServiceCreated': mediaSessionImplOnServiceCreated,
+    'Unknown': unknown,
+  };
+
+  final String value;
+
+  const BackForwardCacheNotRestoredReason._(this.value);
+
+  factory BackForwardCacheNotRestoredReason.fromJson(String value) =>
+      values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is BackForwardCacheNotRestoredReason && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Types of not restored reasons for back-forward cache.
+class BackForwardCacheNotRestoredReasonType {
+  static const supportPending =
+      BackForwardCacheNotRestoredReasonType._('SupportPending');
+  static const pageSupportNeeded =
+      BackForwardCacheNotRestoredReasonType._('PageSupportNeeded');
+  static const circumstantial =
+      BackForwardCacheNotRestoredReasonType._('Circumstantial');
+  static const values = {
+    'SupportPending': supportPending,
+    'PageSupportNeeded': pageSupportNeeded,
+    'Circumstantial': circumstantial,
+  };
+
+  final String value;
+
+  const BackForwardCacheNotRestoredReasonType._(this.value);
+
+  factory BackForwardCacheNotRestoredReasonType.fromJson(String value) =>
+      values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is BackForwardCacheNotRestoredReasonType &&
+          other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class BackForwardCacheNotRestoredExplanation {
+  /// Type of the reason
+  final BackForwardCacheNotRestoredReasonType type;
+
+  /// Not restored reason
+  final BackForwardCacheNotRestoredReason reason;
+
+  BackForwardCacheNotRestoredExplanation(
+      {required this.type, required this.reason});
+
+  factory BackForwardCacheNotRestoredExplanation.fromJson(
+      Map<String, dynamic> json) {
+    return BackForwardCacheNotRestoredExplanation(
+      type: BackForwardCacheNotRestoredReasonType.fromJson(
+          json['type'] as String),
+      reason:
+          BackForwardCacheNotRestoredReason.fromJson(json['reason'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type.toJson(),
+      'reason': reason.toJson(),
+    };
+  }
 }
 
 class FileChooserOpenedEventMode {

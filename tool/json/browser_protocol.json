@@ -385,6 +385,12 @@
                             "description": "The maximum depth at which descendants of the root node should be retrieved.\nIf omitted, the full tree is returned.",
                             "optional": true,
                             "type": "integer"
+                        },
+                        {
+                            "name": "frameId",
+                            "description": "The frame for whose document the AX tree should be retrieved.\nIf omited, the root frame is used.",
+                            "optional": true,
+                            "$ref": "Page.FrameId"
                         }
                     ],
                     "returns": [
@@ -405,6 +411,12 @@
                         {
                             "name": "id",
                             "$ref": "AXNodeId"
+                        },
+                        {
+                            "name": "frameId",
+                            "description": "The frame in whose document the node resides.\nIf omitted, the root frame is used.",
+                            "optional": true,
+                            "$ref": "Page.FrameId"
                         }
                     ],
                     "returns": [
@@ -1052,7 +1064,8 @@
                         "ExcludeSameSiteNoneInsecure",
                         "ExcludeSameSiteLax",
                         "ExcludeSameSiteStrict",
-                        "ExcludeInvalidSameParty"
+                        "ExcludeInvalidSameParty",
+                        "ExcludeSamePartyCrossPartyContext"
                     ]
                 },
                 {
@@ -1507,7 +1520,8 @@
                         "InvalidAttributionSourceEventId",
                         "InvalidAttributionData",
                         "AttributionSourceUntrustworthyOrigin",
-                        "AttributionUntrustworthyOrigin"
+                        "AttributionUntrustworthyOrigin",
+                        "AttributionTriggerDataTooLarge"
                     ]
                 },
                 {
@@ -1585,6 +1599,28 @@
                     ]
                 },
                 {
+                    "id": "WasmCrossOriginModuleSharingIssueDetails",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "wasmModuleUrl",
+                            "type": "string"
+                        },
+                        {
+                            "name": "sourceOrigin",
+                            "type": "string"
+                        },
+                        {
+                            "name": "targetOrigin",
+                            "type": "string"
+                        },
+                        {
+                            "name": "isWarning",
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
                     "id": "InspectorIssueCode",
                     "description": "A unique identifier for the type of issue. Each type may use one of the\noptional fields in InspectorIssueDetails to convey more specific\ninformation about the kind of issue.",
                     "type": "string",
@@ -1600,7 +1636,8 @@
                         "CorsIssue",
                         "AttributionReportingIssue",
                         "QuirksModeIssue",
-                        "NavigatorUserAgentIssue"
+                        "NavigatorUserAgentIssue",
+                        "WasmCrossOriginModuleSharingIssue"
                     ]
                 },
                 {
@@ -1667,8 +1704,18 @@
                             "name": "navigatorUserAgentIssueDetails",
                             "optional": true,
                             "$ref": "NavigatorUserAgentIssueDetails"
+                        },
+                        {
+                            "name": "wasmCrossOriginModuleSharingIssue",
+                            "optional": true,
+                            "$ref": "WasmCrossOriginModuleSharingIssueDetails"
                         }
                     ]
+                },
+                {
+                    "id": "IssueId",
+                    "description": "A unique id for a DevTools inspector issue. Allows other entities (e.g.\nexceptions, CDP message, console messages, etc.) to reference an issue.",
+                    "type": "string"
                 },
                 {
                     "id": "InspectorIssue",
@@ -1687,7 +1734,7 @@
                             "name": "issueId",
                             "description": "A unique id for this issue. May be omitted if no other entity (e.g.\nexception, CDP message, etc.) is referencing this issue.",
                             "optional": true,
-                            "type": "string"
+                            "$ref": "IssueId"
                         }
                     ]
                 }
@@ -2664,7 +2711,7 @@
                         },
                         {
                             "name": "sourceURL",
-                            "description": "Stylesheet resource URL.",
+                            "description": "Stylesheet resource URL. Empty if this is a constructed stylesheet created using\nnew CSSStyleSheet() (but non-empty if this is a constructed sylesheet imported\nas a CSS module script).",
                             "type": "string"
                         },
                         {
@@ -2712,7 +2759,7 @@
                         },
                         {
                             "name": "isConstructed",
-                            "description": "Whether this stylesheet is a constructed stylesheet (created using new CSSStyleSheet()).",
+                            "description": "True if this stylesheet is created through new CSSStyleSheet() or imported as a\nCSS module script.",
                             "type": "boolean"
                         },
                         {
@@ -3101,6 +3148,12 @@
                             "description": "Identifier of the stylesheet containing this object (if exists).",
                             "optional": true,
                             "$ref": "StyleSheetId"
+                        },
+                        {
+                            "name": "name",
+                            "description": "Optional name for the container.",
+                            "optional": true,
+                            "type": "string"
                         }
                     ]
                 },
@@ -3661,6 +3714,32 @@
                             "name": "media",
                             "description": "The resulting CSS media rule after modification.",
                             "$ref": "CSSMedia"
+                        }
+                    ]
+                },
+                {
+                    "name": "setContainerQueryText",
+                    "description": "Modifies the expression of a container query.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "styleSheetId",
+                            "$ref": "StyleSheetId"
+                        },
+                        {
+                            "name": "range",
+                            "$ref": "SourceRange"
+                        },
+                        {
+                            "name": "text",
+                            "type": "string"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "containerQuery",
+                            "description": "The resulting CSS container query rule after modification.",
+                            "$ref": "CSSContainerQuery"
                         }
                     ]
                 },
@@ -4235,6 +4314,7 @@
                         "target-text",
                         "spelling-error",
                         "grammar-error",
+                        "highlight",
                         "first-line-inherited",
                         "scrollbar",
                         "scrollbar-thumb",
@@ -5585,6 +5665,52 @@
                             "$ref": "NodeId"
                         }
                     ]
+                },
+                {
+                    "name": "getContainerForNode",
+                    "description": "Returns the container of the given node based on container query conditions.\nIf containerName is given, it will find the nearest container with a matching name;\notherwise it will find the nearest container regardless of its container name.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "nodeId",
+                            "$ref": "NodeId"
+                        },
+                        {
+                            "name": "containerName",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "nodeId",
+                            "description": "The container node for the given node, or null if not found.",
+                            "optional": true,
+                            "$ref": "NodeId"
+                        }
+                    ]
+                },
+                {
+                    "name": "getQueryingDescendantsForContainer",
+                    "description": "Returns the descendants of a container query container that have\ncontainer queries against this container.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "nodeId",
+                            "description": "Id of the container node to find querying descendants from.",
+                            "$ref": "NodeId"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "nodeIds",
+                            "description": "Descendant nodes with container queries against the given container.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "NodeId"
+                            }
+                        }
+                    ]
                 }
             ],
             "events": [
@@ -6556,6 +6682,12 @@
                             "items": {
                                 "type": "integer"
                             }
+                        },
+                        {
+                            "name": "shadowRootType",
+                            "description": "Type of the shadow root the `Node` is in. String values are equal to the `ShadowRootType` enum.",
+                            "optional": true,
+                            "$ref": "RareStringData"
                         },
                         {
                             "name": "nodeName",
@@ -8613,6 +8745,15 @@
                             }
                         },
                         {
+                            "name": "files",
+                            "description": "List of filenames that should be included when dropping",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        {
                             "name": "dragOperationsMask",
                             "description": "Bit field representing allowed drag operations. Copy = 1, Link = 2, Move = 16",
                             "type": "integer"
@@ -8773,6 +8914,40 @@
                             "name": "text",
                             "description": "The text to insert.",
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "imeSetComposition",
+                    "description": "This method sets the current candidate text for ime.\nUse imeCommitComposition to commit the final text.\nUse imeSetComposition with empty string as text to cancel composition.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "text",
+                            "description": "The text to insert",
+                            "type": "string"
+                        },
+                        {
+                            "name": "selectionStart",
+                            "description": "selection start",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "selectionEnd",
+                            "description": "selection end",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "replacementStart",
+                            "description": "replacement start",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "replacementEnd",
+                            "description": "replacement end",
+                            "optional": true,
+                            "type": "integer"
                         }
                     ]
                 },
@@ -10327,6 +10502,13 @@
                             "experimental": true,
                             "optional": true,
                             "$ref": "TrustTokenParams"
+                        },
+                        {
+                            "name": "isSameSite",
+                            "description": "True if this resource request is considered to be the 'same site' as the\nrequest correspondinfg to the main frame.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -10611,7 +10793,8 @@
                         },
                         {
                             "name": "headersText",
-                            "description": "HTTP response headers text.",
+                            "description": "HTTP response headers text. This has been replaced by the headers in Network.responseReceivedExtraInfo.",
+                            "deprecated": true,
                             "optional": true,
                             "type": "string"
                         },
@@ -10628,7 +10811,8 @@
                         },
                         {
                             "name": "requestHeadersText",
-                            "description": "HTTP request headers text.",
+                            "description": "HTTP request headers text. This has been replaced by the headers in Network.requestWillBeSentExtraInfo.",
+                            "deprecated": true,
                             "optional": true,
                             "type": "string"
                         },
@@ -11435,6 +11619,18 @@
                     ]
                 },
                 {
+                    "id": "ConnectTiming",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "requestTime",
+                            "description": "Timing's requestTime is a baseline in seconds, while the other numbers are ticks in\nmilliseconds relatively to this requestTime. Matches ResourceTiming's requestTime for\nthe same request (but not for redirected requests).",
+                            "type": "number"
+                        }
+                    ]
+                },
+                {
                     "id": "ClientSecurityState",
                     "experimental": true,
                     "type": "object",
@@ -12148,23 +12344,6 @@
                     ]
                 },
                 {
-                    "name": "setDataSizeLimitsForTest",
-                    "description": "For testing.",
-                    "experimental": true,
-                    "parameters": [
-                        {
-                            "name": "maxTotalSize",
-                            "description": "Maximum total buffer size.",
-                            "type": "integer"
-                        },
-                        {
-                            "name": "maxResourceSize",
-                            "description": "Maximum per-resource size.",
-                            "type": "integer"
-                        }
-                    ]
-                },
-                {
                     "name": "setExtraHTTPHeaders",
                     "description": "Specifies whether to always send extra HTTP headers with the requests from this page.",
                     "parameters": [
@@ -12260,7 +12439,8 @@
                     "parameters": [
                         {
                             "name": "frameId",
-                            "description": "Frame id to get the resource for.",
+                            "description": "Frame id to get the resource for. Mandatory for frame targets, and\nshould be omitted for worker targets.",
+                            "optional": true,
                             "$ref": "Page.FrameId"
                         },
                         {
@@ -12868,6 +13048,12 @@
                             "$ref": "Headers"
                         },
                         {
+                            "name": "connectTiming",
+                            "description": "Connection timing information for the request.",
+                            "experimental": true,
+                            "$ref": "ConnectTiming"
+                        },
+                        {
                             "name": "clientSecurityState",
                             "description": "The client security state set for the request.",
                             "optional": true,
@@ -12902,6 +13088,11 @@
                             "name": "resourceIPAddressSpace",
                             "description": "The IP address space of the resource. The address space can only be determined once the transport\nestablished the connection, so we can't send it in `requestWillBeSentExtraInfo`.",
                             "$ref": "IPAddressSpace"
+                        },
+                        {
+                            "name": "statusCode",
+                            "description": "The status code of the response. This is useful in cases the request failed and no responseReceived\nevent is triggered, which is the case for, e.g., CORS errors. This is also the correct status code\nfor cached requests, where the status in responseReceived is a 200 and this will be 304.",
+                            "type": "integer"
                         },
                         {
                             "name": "headersText",
@@ -13450,6 +13641,12 @@
                             "description": "The contrast algorithm to use for the contrast ratio (default: aa).",
                             "optional": true,
                             "$ref": "ContrastAlgorithm"
+                        },
+                        {
+                            "name": "containerQueryContainerHighlightConfig",
+                            "description": "The container query container highlight configuration (default: all transparent).",
+                            "optional": true,
+                            "$ref": "ContainerQueryContainerHighlightConfig"
                         }
                     ]
                 },
@@ -13566,6 +13763,40 @@
                     ]
                 },
                 {
+                    "id": "ContainerQueryHighlightConfig",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "containerQueryContainerHighlightConfig",
+                            "description": "A descriptor for the highlight appearance of container query containers.",
+                            "$ref": "ContainerQueryContainerHighlightConfig"
+                        },
+                        {
+                            "name": "nodeId",
+                            "description": "Identifier of the container node to highlight.",
+                            "$ref": "DOM.NodeId"
+                        }
+                    ]
+                },
+                {
+                    "id": "ContainerQueryContainerHighlightConfig",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "containerBorder",
+                            "description": "The style of the container border.",
+                            "optional": true,
+                            "$ref": "LineStyle"
+                        },
+                        {
+                            "name": "descendantBorder",
+                            "description": "The style of the descendants' borders.",
+                            "optional": true,
+                            "$ref": "LineStyle"
+                        }
+                    ]
+                },
+                {
                     "id": "InspectMode",
                     "type": "string",
                     "enum": [
@@ -13673,7 +13904,8 @@
                 },
                 {
                     "name": "highlightFrame",
-                    "description": "Highlights owner element of the frame with given id.",
+                    "description": "Highlights owner element of the frame with given id.\nDeprecated: Doesn't work reliablity and cannot be fixed due to process\nseparatation (the owner node might be in a different process). Determine\nthe owner node in the client and use highlightNode.",
+                    "deprecated": true,
                     "parameters": [
                         {
                             "name": "frameId",
@@ -13921,6 +14153,19 @@
                     ]
                 },
                 {
+                    "name": "setShowContainerQueryOverlays",
+                    "parameters": [
+                        {
+                            "name": "containerQueryHighlightConfigs",
+                            "description": "An array of node identifiers and descriptors for the highlight appearance.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "ContainerQueryHighlightConfig"
+                            }
+                        }
+                    ]
+                },
+                {
                     "name": "setShowPaintRects",
                     "description": "Requests that backend shows paint rectangles",
                     "parameters": [
@@ -14065,6 +14310,36 @@
                     ]
                 },
                 {
+                    "id": "AdFrameExplanation",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "ParentIsAd",
+                        "CreatedByAdScript",
+                        "MatchedBlockingRule"
+                    ]
+                },
+                {
+                    "id": "AdFrameStatus",
+                    "description": "Indicates whether a frame has been identified as an ad and why.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "adFrameType",
+                            "$ref": "AdFrameType"
+                        },
+                        {
+                            "name": "explanations",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "AdFrameExplanation"
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "SecureContextType",
                     "description": "Indicates whether the frame is a secure context and why it is the case.",
                     "experimental": true,
@@ -14118,11 +14393,13 @@
                         "ch-rtt",
                         "ch-ua",
                         "ch-ua-arch",
+                        "ch-ua-bitness",
                         "ch-ua-platform",
                         "ch-ua-model",
                         "ch-ua-mobile",
                         "ch-ua-full-version",
                         "ch-ua-platform-version",
+                        "ch-ua-reduced",
                         "ch-viewport-width",
                         "ch-width",
                         "clipboard-read",
@@ -14336,7 +14613,7 @@
                             "name": "parentId",
                             "description": "Parent frame identifier.",
                             "optional": true,
-                            "type": "string"
+                            "$ref": "FrameId"
                         },
                         {
                             "name": "loaderId",
@@ -14385,11 +14662,11 @@
                             "type": "string"
                         },
                         {
-                            "name": "adFrameType",
-                            "description": "Indicates whether this frame was tagged as an ad.",
+                            "name": "adFrameStatus",
+                            "description": "Indicates whether this frame was tagged as an ad and why.",
                             "experimental": true,
                             "optional": true,
-                            "$ref": "AdFrameType"
+                            "$ref": "AdFrameStatus"
                         },
                         {
                             "name": "secureContextType",
@@ -14959,6 +15236,148 @@
                         "Navigation",
                         "BackForwardCacheRestore"
                     ]
+                },
+                {
+                    "id": "BackForwardCacheNotRestoredReason",
+                    "description": "List of not restored reasons for back-forward cache.",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "NotMainFrame",
+                        "BackForwardCacheDisabled",
+                        "RelatedActiveContentsExist",
+                        "HTTPStatusNotOK",
+                        "SchemeNotHTTPOrHTTPS",
+                        "Loading",
+                        "WasGrantedMediaAccess",
+                        "DisableForRenderFrameHostCalled",
+                        "DomainNotAllowed",
+                        "HTTPMethodNotGET",
+                        "SubframeIsNavigating",
+                        "Timeout",
+                        "CacheLimit",
+                        "JavaScriptExecution",
+                        "RendererProcessKilled",
+                        "RendererProcessCrashed",
+                        "GrantedMediaStreamAccess",
+                        "SchedulerTrackedFeatureUsed",
+                        "ConflictingBrowsingInstance",
+                        "CacheFlushed",
+                        "ServiceWorkerVersionActivation",
+                        "SessionRestored",
+                        "ServiceWorkerPostMessage",
+                        "EnteredBackForwardCacheBeforeServiceWorkerHostAdded",
+                        "RenderFrameHostReused_SameSite",
+                        "RenderFrameHostReused_CrossSite",
+                        "ServiceWorkerClaim",
+                        "IgnoreEventAndEvict",
+                        "HaveInnerContents",
+                        "TimeoutPuttingInCache",
+                        "BackForwardCacheDisabledByLowMemory",
+                        "BackForwardCacheDisabledByCommandLine",
+                        "NetworkRequestDatapipeDrainedAsBytesConsumer",
+                        "NetworkRequestRedirected",
+                        "NetworkRequestTimeout",
+                        "NetworkExceedsBufferLimit",
+                        "NavigationCancelledWhileRestoring",
+                        "NotMostRecentNavigationEntry",
+                        "BackForwardCacheDisabledForPrerender",
+                        "UserAgentOverrideDiffers",
+                        "ForegroundCacheLimit",
+                        "BrowsingInstanceNotSwapped",
+                        "BackForwardCacheDisabledForDelegate",
+                        "OptInUnloadHeaderNotPresent",
+                        "UnloadHandlerExistsInSubFrame",
+                        "ServiceWorkerUnregistration",
+                        "CacheControlNoStore",
+                        "CacheControlNoStoreCookieModified",
+                        "CacheControlNoStoreHTTPOnlyCookieModified",
+                        "NoResponseHead",
+                        "Unknown",
+                        "ActivationNavigationsDisallowedForBug1234857",
+                        "WebSocket",
+                        "WebTransport",
+                        "WebRTC",
+                        "MainResourceHasCacheControlNoStore",
+                        "MainResourceHasCacheControlNoCache",
+                        "SubresourceHasCacheControlNoStore",
+                        "SubresourceHasCacheControlNoCache",
+                        "ContainsPlugins",
+                        "DocumentLoaded",
+                        "DedicatedWorkerOrWorklet",
+                        "OutstandingNetworkRequestOthers",
+                        "OutstandingIndexedDBTransaction",
+                        "RequestedNotificationsPermission",
+                        "RequestedMIDIPermission",
+                        "RequestedAudioCapturePermission",
+                        "RequestedVideoCapturePermission",
+                        "RequestedBackForwardCacheBlockedSensors",
+                        "RequestedBackgroundWorkPermission",
+                        "BroadcastChannel",
+                        "IndexedDBConnection",
+                        "WebXR",
+                        "SharedWorker",
+                        "WebLocks",
+                        "WebHID",
+                        "WebShare",
+                        "RequestedStorageAccessGrant",
+                        "WebNfc",
+                        "WebFileSystem",
+                        "OutstandingNetworkRequestFetch",
+                        "OutstandingNetworkRequestXHR",
+                        "AppBanner",
+                        "Printing",
+                        "WebDatabase",
+                        "PictureInPicture",
+                        "Portal",
+                        "SpeechRecognizer",
+                        "IdleManager",
+                        "PaymentManager",
+                        "SpeechSynthesis",
+                        "KeyboardLock",
+                        "WebOTPService",
+                        "OutstandingNetworkRequestDirectSocket",
+                        "IsolatedWorldScript",
+                        "InjectedStyleSheet",
+                        "MediaSessionImplOnServiceCreated",
+                        "SecurityHandler",
+                        "WebAuthenticationAPI",
+                        "FileChooser",
+                        "Serial",
+                        "FileSystemAccess",
+                        "MediaDevicesDispatcherHost",
+                        "WebBluetooth",
+                        "WebUSB",
+                        "MediaSession"
+                    ]
+                },
+                {
+                    "id": "BackForwardCacheNotRestoredReasonType",
+                    "description": "Types of not restored reasons for back-forward cache.",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "SupportPending",
+                        "PageSupportNeeded",
+                        "Circumstantial"
+                    ]
+                },
+                {
+                    "id": "BackForwardCacheNotRestoredExplanation",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "type",
+                            "description": "Type of the reason",
+                            "$ref": "BackForwardCacheNotRestoredReasonType"
+                        },
+                        {
+                            "name": "reason",
+                            "description": "Not restored reason",
+                            "$ref": "BackForwardCacheNotRestoredReason"
+                        }
+                    ]
                 }
             ],
             "commands": [
@@ -15027,7 +15446,8 @@
                             "type": "string",
                             "enum": [
                                 "jpeg",
-                                "png"
+                                "png",
+                                "webp"
                             ]
                         },
                         {
@@ -15690,6 +16110,26 @@
                             "type": "array",
                             "items": {
                                 "$ref": "PermissionsPolicyFeatureState"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "getOriginTrials",
+                    "description": "Get Origin Trials on given frame.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "frameId",
+                            "$ref": "FrameId"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "originTrials",
+                            "type": "array",
+                            "items": {
+                                "$ref": "OriginTrial"
                             }
                         }
                     ]
@@ -16434,6 +16874,14 @@
                             "name": "frameId",
                             "description": "The frame id of the associated frame.",
                             "$ref": "FrameId"
+                        },
+                        {
+                            "name": "notRestoredExplanations",
+                            "description": "Array of reasons why the page could not be cached. This must not be empty.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "BackForwardCacheNotRestoredExplanation"
+                            }
                         }
                     ]
                 },
@@ -18498,7 +18946,7 @@
                 },
                 {
                     "name": "setAutoAttach",
-                    "description": "Controls whether to automatically attach to new targets which are considered to be related to\nthis one. When turned on, attaches to all existing related targets as well. When turned off,\nautomatically detaches from all currently attached targets.",
+                    "description": "Controls whether to automatically attach to new targets which are considered to be related to\nthis one. When turned on, attaches to all existing related targets as well. When turned off,\nautomatically detaches from all currently attached targets.\nThis also clears all targets added by `autoAttachRelated` from the list of targets to watch\nfor creation of related targets.",
                     "experimental": true,
                     "parameters": [
                         {
@@ -18515,6 +18963,22 @@
                             "name": "flatten",
                             "description": "Enables \"flat\" access to the session via specifying sessionId attribute in the commands.\nWe plan to make this the default, deprecate non-flattened mode,\nand eventually retire it. See crbug.com/991325.",
                             "optional": true,
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "name": "autoAttachRelated",
+                    "description": "Adds the specified target to the list of targets that will be monitored for any related target\ncreation (such as child frames, child workers and new versions of service worker) and reported\nthrough `attachedToTarget`. This cancel the effect of any previous `setAutoAttach` and is also\ncancelled by subsequent `setAutoAttach`. Only available at the Browser target.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "targetId",
+                            "$ref": "TargetID"
+                        },
+                        {
+                            "name": "waitForDebuggerOnStart",
+                            "description": "Whether to pause new targets when attaching to them. Use `Runtime.runIfWaitingForDebugger`\nto run paused targets.",
                             "type": "boolean"
                         }
                     ]
@@ -19265,6 +19729,13 @@
                             "items": {
                                 "$ref": "HeaderEntry"
                             }
+                        },
+                        {
+                            "name": "interceptResponse",
+                            "description": "If set, overrides response interception behavior for this request.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },

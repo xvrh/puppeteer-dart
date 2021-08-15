@@ -766,6 +766,9 @@ class NodeTreeSnapshot {
   /// `Node`'s nodeType.
   final List<int>? nodeType;
 
+  /// Type of the shadow root the `Node` is in. String values are equal to the `ShadowRootType` enum.
+  final RareStringData? shadowRootType;
+
   /// `Node`'s nodeName.
   final List<StringIndex>? nodeName;
 
@@ -810,6 +813,7 @@ class NodeTreeSnapshot {
   NodeTreeSnapshot(
       {this.parentIndex,
       this.nodeType,
+      this.shadowRootType,
       this.nodeName,
       this.nodeValue,
       this.backendNodeId,
@@ -831,6 +835,10 @@ class NodeTreeSnapshot {
           : null,
       nodeType: json.containsKey('nodeType')
           ? (json['nodeType'] as List).map((e) => e as int).toList()
+          : null,
+      shadowRootType: json.containsKey('shadowRootType')
+          ? RareStringData.fromJson(
+              json['shadowRootType'] as Map<String, dynamic>)
           : null,
       nodeName: json.containsKey('nodeName')
           ? (json['nodeName'] as List)
@@ -891,6 +899,7 @@ class NodeTreeSnapshot {
     return {
       if (parentIndex != null) 'parentIndex': [...?parentIndex],
       if (nodeType != null) 'nodeType': [...?nodeType],
+      if (shadowRootType != null) 'shadowRootType': shadowRootType!.toJson(),
       if (nodeName != null)
         'nodeName': nodeName!.map((e) => e.toJson()).toList(),
       if (nodeValue != null)
