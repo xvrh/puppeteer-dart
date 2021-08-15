@@ -8,8 +8,6 @@ This is a port of the [Puppeteer Node.JS library](https://pptr.dev/) in the [Dar
 [![Build Status](https://github.com/xvrh/puppeteer-dart/workflows/Build/badge.svg?branch=master)](https://github.com/xvrh/puppeteer-dart)
 [![Coverage Status](https://coveralls.io/repos/github/xvrh/puppeteer-dart/badge.svg?branch=master)](https://coveralls.io/github/xvrh/puppeteer-dart?branch=master)
 
-For Flutter users, see [limitations with Flutter section](#limitations-with-flutter)
-
 ###### What can I do?
 
 Most things that you can do manually in the browser can be done using Puppeteer! Here are a few examples to get you started:
@@ -18,6 +16,9 @@ Most things that you can do manually in the browser can be done using Puppeteer!
 * Crawl a SPA (Single-Page Application) and generate pre-rendered content (i.e. "SSR" (Server-Side Rendering)).
 * Automate form submission, UI testing, keyboard input, etc.
 * Create an up-to-date, automated testing environment. Run your tests directly in the latest version of Chrome using the latest JavaScript and browser features.
+
+###### Flutter
+See [limitations with Flutter](#limitations-with-flutter) section.
 
 ## API
 
@@ -364,8 +365,8 @@ This library does 2 things:
 1) Download the chromium binaries and launch a Chromium process.
 2) Connect to this process with Websocket and send json commands to control the browser.
 
-Due to limitations on mobile platforms (iOS and Android), **it is not possible to launch an external Chromium process** on 
-those platforms. So, n°1. does not work on mobile.
+Due to limitations on mobile platforms (iOS and Android), **it is not possible to launch an external Chromium process on iOS and Android**.
+So, step 1) does not work on mobile.
 
 You can still use `puppeteer-dart` on Flutter either with:
 - Flutter on Desktop (macOS, windows, Linux)
