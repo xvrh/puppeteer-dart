@@ -288,7 +288,7 @@ class RequestId {
 
 /// Stages of the request to handle. Request will intercept before the request is
 /// sent. Response will intercept after the response is received (but before response
-/// body is received.
+/// body is received).
 class RequestStage {
   static const request = RequestStage._('Request');
   static const response = RequestStage._('Response');

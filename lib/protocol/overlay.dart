@@ -94,9 +94,13 @@ class OverlayApi {
   }
 
   /// Highlights owner element of the frame with given id.
+  /// Deprecated: Doesn't work reliablity and cannot be fixed due to process
+  /// separatation (the owner node might be in a different process). Determine
+  /// the owner node in the client and use highlightNode.
   /// [frameId] Identifier of the frame to highlight.
   /// [contentColor] The content box highlight fill color (default: transparent).
   /// [contentOutlineColor] The content box highlight outline color (default: transparent).
+  @deprecated
   Future<void> highlightFrame(page.FrameId frameId,
       {dom.RGBA? contentColor, dom.RGBA? contentOutlineColor}) async {
     await _client.send('Overlay.highlightFrame', {
@@ -244,6 +248,15 @@ class OverlayApi {
       List<ScrollSnapHighlightConfig> scrollSnapHighlightConfigs) async {
     await _client.send('Overlay.setShowScrollSnapOverlays', {
       'scrollSnapHighlightConfigs': [...scrollSnapHighlightConfigs],
+    });
+  }
+
+  /// [containerQueryHighlightConfigs] An array of node identifiers and descriptors for the highlight appearance.
+  Future<void> setShowContainerQueryOverlays(
+      List<ContainerQueryHighlightConfig>
+          containerQueryHighlightConfigs) async {
+    await _client.send('Overlay.setShowContainerQueryOverlays', {
+      'containerQueryHighlightConfigs': [...containerQueryHighlightConfigs],
     });
   }
 
@@ -786,6 +799,10 @@ class HighlightConfig {
   /// The contrast algorithm to use for the contrast ratio (default: aa).
   final ContrastAlgorithm? contrastAlgorithm;
 
+  /// The container query container highlight configuration (default: all transparent).
+  final ContainerQueryContainerHighlightConfig?
+      containerQueryContainerHighlightConfig;
+
   HighlightConfig(
       {this.showInfo,
       this.showStyles,
@@ -804,7 +821,8 @@ class HighlightConfig {
       this.gridHighlightConfig,
       this.flexContainerHighlightConfig,
       this.flexItemHighlightConfig,
-      this.contrastAlgorithm});
+      this.contrastAlgorithm,
+      this.containerQueryContainerHighlightConfig});
 
   factory HighlightConfig.fromJson(Map<String, dynamic> json) {
     return HighlightConfig(
@@ -862,6 +880,12 @@ class HighlightConfig {
       contrastAlgorithm: json.containsKey('contrastAlgorithm')
           ? ContrastAlgorithm.fromJson(json['contrastAlgorithm'] as String)
           : null,
+      containerQueryContainerHighlightConfig:
+          json.containsKey('containerQueryContainerHighlightConfig')
+              ? ContainerQueryContainerHighlightConfig.fromJson(
+                  json['containerQueryContainerHighlightConfig']
+                      as Map<String, dynamic>)
+              : null,
     );
   }
 
@@ -892,6 +916,9 @@ class HighlightConfig {
         'flexItemHighlightConfig': flexItemHighlightConfig!.toJson(),
       if (contrastAlgorithm != null)
         'contrastAlgorithm': contrastAlgorithm!.toJson(),
+      if (containerQueryContainerHighlightConfig != null)
+        'containerQueryContainerHighlightConfig':
+            containerQueryContainerHighlightConfig!.toJson(),
     };
   }
 }
@@ -1087,6 +1114,59 @@ class HingeConfig {
       'rect': rect.toJson(),
       if (contentColor != null) 'contentColor': contentColor!.toJson(),
       if (outlineColor != null) 'outlineColor': outlineColor!.toJson(),
+    };
+  }
+}
+
+class ContainerQueryHighlightConfig {
+  /// A descriptor for the highlight appearance of container query containers.
+  final ContainerQueryContainerHighlightConfig
+      containerQueryContainerHighlightConfig;
+
+  /// Identifier of the container node to highlight.
+  final dom.NodeId nodeId;
+
+  ContainerQueryHighlightConfig(
+      {required this.containerQueryContainerHighlightConfig,
+      required this.nodeId});
+
+  factory ContainerQueryHighlightConfig.fromJson(Map<String, dynamic> json) {
+    return ContainerQueryHighlightConfig(
+      containerQueryContainerHighlightConfig:
+          ContainerQueryContainerHighlightConfig.fromJson(
+              json['containerQueryContainerHighlightConfig']
+                  as Map<String, dynamic>),
+      nodeId: dom.NodeId.fromJson(json['nodeId'] as int),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'containerQueryContainerHighlightConfig':
+          containerQueryContainerHighlightConfig.toJson(),
+      'nodeId': nodeId.toJson(),
+    };
+  }
+}
+
+class ContainerQueryContainerHighlightConfig {
+  /// The style of the container border
+  final LineStyle? containerBorder;
+
+  ContainerQueryContainerHighlightConfig({this.containerBorder});
+
+  factory ContainerQueryContainerHighlightConfig.fromJson(
+      Map<String, dynamic> json) {
+    return ContainerQueryContainerHighlightConfig(
+      containerBorder: json.containsKey('containerBorder')
+          ? LineStyle.fromJson(json['containerBorder'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (containerBorder != null) 'containerBorder': containerBorder!.toJson(),
     };
   }
 }

@@ -161,12 +161,15 @@ class SameSiteCookieExclusionReason {
       SameSiteCookieExclusionReason._('ExcludeSameSiteLax');
   static const excludeSameSiteStrict =
       SameSiteCookieExclusionReason._('ExcludeSameSiteStrict');
+  static const excludeInvalidSameParty =
+      SameSiteCookieExclusionReason._('ExcludeInvalidSameParty');
   static const values = {
     'ExcludeSameSiteUnspecifiedTreatedAsLax':
         excludeSameSiteUnspecifiedTreatedAsLax,
     'ExcludeSameSiteNoneInsecure': excludeSameSiteNoneInsecure,
     'ExcludeSameSiteLax': excludeSameSiteLax,
     'ExcludeSameSiteStrict': excludeSameSiteStrict,
+    'ExcludeInvalidSameParty': excludeInvalidSameParty,
   };
 
   final String value;
@@ -274,7 +277,13 @@ class SameSiteCookieOperation {
 /// time finding a specific cookie. With this, we can convey specific error
 /// information without the cookie.
 class SameSiteCookieIssueDetails {
-  final AffectedCookie cookie;
+  /// If AffectedCookie is not set then rawCookieLine contains the raw
+  /// Set-Cookie header string. This hints at a problem where the
+  /// cookie line is syntactically or semantically malformed in a way
+  /// that no valid cookie could be created.
+  final AffectedCookie? cookie;
+
+  final String? rawCookieLine;
 
   final List<SameSiteCookieWarningReason> cookieWarningReasons;
 
@@ -291,7 +300,8 @@ class SameSiteCookieIssueDetails {
   final AffectedRequest? request;
 
   SameSiteCookieIssueDetails(
-      {required this.cookie,
+      {this.cookie,
+      this.rawCookieLine,
       required this.cookieWarningReasons,
       required this.cookieExclusionReasons,
       required this.operation,
@@ -301,7 +311,12 @@ class SameSiteCookieIssueDetails {
 
   factory SameSiteCookieIssueDetails.fromJson(Map<String, dynamic> json) {
     return SameSiteCookieIssueDetails(
-      cookie: AffectedCookie.fromJson(json['cookie'] as Map<String, dynamic>),
+      cookie: json.containsKey('cookie')
+          ? AffectedCookie.fromJson(json['cookie'] as Map<String, dynamic>)
+          : null,
+      rawCookieLine: json.containsKey('rawCookieLine')
+          ? json['rawCookieLine'] as String
+          : null,
       cookieWarningReasons: (json['cookieWarningReasons'] as List)
           .map((e) => SameSiteCookieWarningReason.fromJson(e as String))
           .toList(),
@@ -322,12 +337,13 @@ class SameSiteCookieIssueDetails {
 
   Map<String, dynamic> toJson() {
     return {
-      'cookie': cookie.toJson(),
       'cookieWarningReasons':
           cookieWarningReasons.map((e) => e.toJson()).toList(),
       'cookieExclusionReasons':
           cookieExclusionReasons.map((e) => e.toJson()).toList(),
       'operation': operation.toJson(),
+      if (cookie != null) 'cookie': cookie!.toJson(),
+      if (rawCookieLine != null) 'rawCookieLine': rawCookieLine,
       if (siteForCookies != null) 'siteForCookies': siteForCookies,
       if (cookieUrl != null) 'cookieUrl': cookieUrl,
       if (request != null) 'request': request!.toJson(),
@@ -1212,6 +1228,66 @@ class QuirksModeIssueDetails {
   }
 }
 
+class NavigatorUserAgentIssueDetails {
+  final String url;
+
+  final SourceCodeLocation? location;
+
+  NavigatorUserAgentIssueDetails({required this.url, this.location});
+
+  factory NavigatorUserAgentIssueDetails.fromJson(Map<String, dynamic> json) {
+    return NavigatorUserAgentIssueDetails(
+      url: json['url'] as String,
+      location: json.containsKey('location')
+          ? SourceCodeLocation.fromJson(
+              json['location'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      if (location != null) 'location': location!.toJson(),
+    };
+  }
+}
+
+class WasmCrossOriginModuleSharingIssueDetails {
+  final String wasmModuleUrl;
+
+  final String sourceOrigin;
+
+  final String targetOrigin;
+
+  final bool isWarning;
+
+  WasmCrossOriginModuleSharingIssueDetails(
+      {required this.wasmModuleUrl,
+      required this.sourceOrigin,
+      required this.targetOrigin,
+      required this.isWarning});
+
+  factory WasmCrossOriginModuleSharingIssueDetails.fromJson(
+      Map<String, dynamic> json) {
+    return WasmCrossOriginModuleSharingIssueDetails(
+      wasmModuleUrl: json['wasmModuleUrl'] as String,
+      sourceOrigin: json['sourceOrigin'] as String,
+      targetOrigin: json['targetOrigin'] as String,
+      isWarning: json['isWarning'] as bool,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'wasmModuleUrl': wasmModuleUrl,
+      'sourceOrigin': sourceOrigin,
+      'targetOrigin': targetOrigin,
+      'isWarning': isWarning,
+    };
+  }
+}
+
 /// A unique identifier for the type of issue. Each type may use one of the
 /// optional fields in InspectorIssueDetails to convey more specific
 /// information about the kind of issue.
@@ -1234,6 +1310,10 @@ class InspectorIssueCode {
   static const attributionReportingIssue =
       InspectorIssueCode._('AttributionReportingIssue');
   static const quirksModeIssue = InspectorIssueCode._('QuirksModeIssue');
+  static const navigatorUserAgentIssue =
+      InspectorIssueCode._('NavigatorUserAgentIssue');
+  static const wasmCrossOriginModuleSharingIssue =
+      InspectorIssueCode._('WasmCrossOriginModuleSharingIssue');
   static const values = {
     'SameSiteCookieIssue': sameSiteCookieIssue,
     'MixedContentIssue': mixedContentIssue,
@@ -1246,6 +1326,8 @@ class InspectorIssueCode {
     'CorsIssue': corsIssue,
     'AttributionReportingIssue': attributionReportingIssue,
     'QuirksModeIssue': quirksModeIssue,
+    'NavigatorUserAgentIssue': navigatorUserAgentIssue,
+    'WasmCrossOriginModuleSharingIssue': wasmCrossOriginModuleSharingIssue,
   };
 
   final String value;
@@ -1293,6 +1375,11 @@ class InspectorIssueDetails {
 
   final QuirksModeIssueDetails? quirksModeIssueDetails;
 
+  final NavigatorUserAgentIssueDetails? navigatorUserAgentIssueDetails;
+
+  final WasmCrossOriginModuleSharingIssueDetails?
+      wasmCrossOriginModuleSharingIssue;
+
   InspectorIssueDetails(
       {this.sameSiteCookieIssueDetails,
       this.mixedContentIssueDetails,
@@ -1304,7 +1391,9 @@ class InspectorIssueDetails {
       this.lowTextContrastIssueDetails,
       this.corsIssueDetails,
       this.attributionReportingIssueDetails,
-      this.quirksModeIssueDetails});
+      this.quirksModeIssueDetails,
+      this.navigatorUserAgentIssueDetails,
+      this.wasmCrossOriginModuleSharingIssue});
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
     return InspectorIssueDetails(
@@ -1358,6 +1447,16 @@ class InspectorIssueDetails {
           ? QuirksModeIssueDetails.fromJson(
               json['quirksModeIssueDetails'] as Map<String, dynamic>)
           : null,
+      navigatorUserAgentIssueDetails: json
+              .containsKey('navigatorUserAgentIssueDetails')
+          ? NavigatorUserAgentIssueDetails.fromJson(
+              json['navigatorUserAgentIssueDetails'] as Map<String, dynamic>)
+          : null,
+      wasmCrossOriginModuleSharingIssue: json
+              .containsKey('wasmCrossOriginModuleSharingIssue')
+          ? WasmCrossOriginModuleSharingIssueDetails.fromJson(
+              json['wasmCrossOriginModuleSharingIssue'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -1389,8 +1488,36 @@ class InspectorIssueDetails {
             attributionReportingIssueDetails!.toJson(),
       if (quirksModeIssueDetails != null)
         'quirksModeIssueDetails': quirksModeIssueDetails!.toJson(),
+      if (navigatorUserAgentIssueDetails != null)
+        'navigatorUserAgentIssueDetails':
+            navigatorUserAgentIssueDetails!.toJson(),
+      if (wasmCrossOriginModuleSharingIssue != null)
+        'wasmCrossOriginModuleSharingIssue':
+            wasmCrossOriginModuleSharingIssue!.toJson(),
     };
   }
+}
+
+/// A unique id for a DevTools inspector issue. Allows other entities (e.g.
+/// exceptions, CDP message, console messages, etc.) to reference an issue.
+class IssueId {
+  final String value;
+
+  IssueId(this.value);
+
+  factory IssueId.fromJson(String value) => IssueId(value);
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is IssueId && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// An inspector issue reported from the back-end.
@@ -1399,13 +1526,20 @@ class InspectorIssue {
 
   final InspectorIssueDetails details;
 
-  InspectorIssue({required this.code, required this.details});
+  /// A unique id for this issue. May be omitted if no other entity (e.g.
+  /// exception, CDP message, etc.) is referencing this issue.
+  final IssueId? issueId;
+
+  InspectorIssue({required this.code, required this.details, this.issueId});
 
   factory InspectorIssue.fromJson(Map<String, dynamic> json) {
     return InspectorIssue(
       code: InspectorIssueCode.fromJson(json['code'] as String),
       details: InspectorIssueDetails.fromJson(
           json['details'] as Map<String, dynamic>),
+      issueId: json.containsKey('issueId')
+          ? IssueId.fromJson(json['issueId'] as String)
+          : null,
     );
   }
 
@@ -1413,6 +1547,7 @@ class InspectorIssue {
     return {
       'code': code.toJson(),
       'details': details.toJson(),
+      if (issueId != null) 'issueId': issueId!.toJson(),
     };
   }
 }

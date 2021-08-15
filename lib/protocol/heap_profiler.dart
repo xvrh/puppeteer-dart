@@ -125,7 +125,7 @@ class HeapProfilerApi {
   }
 
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken.
-  /// [treatGlobalObjectsAsRoots] If true, a raw snapshot without artifical roots will be generated
+  /// [treatGlobalObjectsAsRoots] If true, a raw snapshot without artificial roots will be generated
   /// [captureNumericValue] If true, numerical values are included in the snapshot
   Future<void> takeHeapSnapshot(
       {bool? reportProgress,

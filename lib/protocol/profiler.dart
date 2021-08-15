@@ -22,7 +22,7 @@ class ProfilerApi {
   /// Reports coverage delta since the last poll (either from an event like this, or from
   /// `takePreciseCoverage` for the current isolate. May only be sent if precise code
   /// coverage has been started. This event can be trigged by the embedder to, for example,
-  /// trigger collection of coverage data immediatelly at a certain point in time.
+  /// trigger collection of coverage data immediately at a certain point in time.
   Stream<PreciseCoverageDeltaUpdateEvent> get onPreciseCoverageDeltaUpdate =>
       _client.onEvent
           .where((event) => event.name == 'Profiler.preciseCoverageDeltaUpdate')
@@ -209,18 +209,18 @@ class PreciseCoverageDeltaUpdateEvent {
   final num timestamp;
 
   /// Identifier for distinguishing coverage events.
-  final String occassion;
+  final String occasion;
 
   /// Coverage data for the current isolate.
   final List<ScriptCoverage> result;
 
   PreciseCoverageDeltaUpdateEvent(
-      {required this.timestamp, required this.occassion, required this.result});
+      {required this.timestamp, required this.occasion, required this.result});
 
   factory PreciseCoverageDeltaUpdateEvent.fromJson(Map<String, dynamic> json) {
     return PreciseCoverageDeltaUpdateEvent(
       timestamp: json['timestamp'] as num,
-      occassion: json['occassion'] as String,
+      occasion: json['occasion'] as String,
       result: (json['result'] as List)
           .map((e) => ScriptCoverage.fromJson(e as Map<String, dynamic>))
           .toList(),

@@ -1,9 +1,12 @@
 # Changelog
 
+## 2.3.0 (2021-08-15)
+- Update Chromium to version 93
+
 ## 2.2.1 (2021-07-12
 - Make `defaultViewport` nullable in the `connect` method.
 
-## 2.2.0 (2021-06-4)
+## 2.2.0 (2021-06-04)
 - Update Chromium to version 92
 - Add drag-and-drop support
 

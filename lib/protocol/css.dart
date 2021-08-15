@@ -231,6 +231,19 @@ class CSSApi {
     return CSSMedia.fromJson(result['media'] as Map<String, dynamic>);
   }
 
+  /// Modifies the expression of a container query.
+  /// Returns: The resulting CSS container query rule after modification.
+  Future<CSSContainerQuery> setContainerQueryText(
+      StyleSheetId styleSheetId, SourceRange range, String text) async {
+    var result = await _client.send('CSS.setContainerQueryText', {
+      'styleSheetId': styleSheetId,
+      'range': range,
+      'text': text,
+    });
+    return CSSContainerQuery.fromJson(
+        result['containerQuery'] as Map<String, dynamic>);
+  }
+
   /// Modifies the rule selector.
   /// Returns: The resulting selector list after modification.
   Future<SelectorList> setRuleSelector(
@@ -627,7 +640,9 @@ class CSSStyleSheetHeader {
   /// Owner frame identifier.
   final page.FrameId frameId;
 
-  /// Stylesheet resource URL.
+  /// Stylesheet resource URL. Empty if this is a constructed stylesheet created using
+  /// new CSSStyleSheet() (but non-empty if this is a constructed sylesheet imported
+  /// as a CSS module script).
   final String sourceURL;
 
   /// URL of source map associated with the stylesheet (if any).
@@ -658,7 +673,8 @@ class CSSStyleSheetHeader {
   /// Constructed stylesheets (new CSSStyleSheet()) are mutable immediately after creation.
   final bool isMutable;
 
-  /// Whether this stylesheet is a constructed stylesheet (created using new CSSStyleSheet()).
+  /// True if this stylesheet is created through new CSSStyleSheet() or imported as a
+  /// CSS module script.
   final bool isConstructed;
 
   /// Line offset of the stylesheet within the resource (zero based).
@@ -765,12 +781,17 @@ class CSSRule {
   /// starting with the innermost one, going outwards.
   final List<CSSMedia>? media;
 
+  /// Container query list array (for rules involving container queries).
+  /// The array enumerates container queries starting with the innermost one, going outwards.
+  final List<CSSContainerQuery>? containerQueries;
+
   CSSRule(
       {this.styleSheetId,
       required this.selectorList,
       required this.origin,
       required this.style,
-      this.media});
+      this.media,
+      this.containerQueries});
 
   factory CSSRule.fromJson(Map<String, dynamic> json) {
     return CSSRule(
@@ -786,6 +807,11 @@ class CSSRule {
               .map((e) => CSSMedia.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
+      containerQueries: json.containsKey('containerQueries')
+          ? (json['containerQueries'] as List)
+              .map((e) => CSSContainerQuery.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
     );
   }
 
@@ -796,6 +822,8 @@ class CSSRule {
       'style': style.toJson(),
       if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
       if (media != null) 'media': media!.map((e) => e.toJson()).toList(),
+      if (containerQueries != null)
+        'containerQueries': containerQueries!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -1221,6 +1249,47 @@ class MediaQueryExpression {
       'feature': feature,
       if (valueRange != null) 'valueRange': valueRange!.toJson(),
       if (computedLength != null) 'computedLength': computedLength,
+    };
+  }
+}
+
+/// CSS container query rule descriptor.
+class CSSContainerQuery {
+  /// Container query text.
+  final String text;
+
+  /// The associated rule header range in the enclosing stylesheet (if
+  /// available).
+  final SourceRange? range;
+
+  /// Identifier of the stylesheet containing this object (if exists).
+  final StyleSheetId? styleSheetId;
+
+  /// Optional name for the container.
+  final String? name;
+
+  CSSContainerQuery(
+      {required this.text, this.range, this.styleSheetId, this.name});
+
+  factory CSSContainerQuery.fromJson(Map<String, dynamic> json) {
+    return CSSContainerQuery(
+      text: json['text'] as String,
+      range: json.containsKey('range')
+          ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
+          : null,
+      styleSheetId: json.containsKey('styleSheetId')
+          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          : null,
+      name: json.containsKey('name') ? json['name'] as String : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'text': text,
+      if (range != null) 'range': range!.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
+      if (name != null) 'name': name,
     };
   }
 }
