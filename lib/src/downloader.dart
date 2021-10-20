@@ -43,7 +43,13 @@ Future<RevisionInfo> downloadChrome({int? revision, String? cachePath}) async {
   }
 
   if (!Platform.isWindows) {
-    Process.runSync('chmod', ['+x', executableFile.absolute.path]);
+    await Process.run('chmod', ['+x', executableFile.absolute.path]);
+  }
+
+  if (Platform.isMacOS) {
+    final chromeAppPath = executableFile.absolute.parent.parent.parent.path;
+
+    await Process.run('xattr', ['-d', 'com.apple.quarantine', chromeAppPath]);
   }
 
   return RevisionInfo(
