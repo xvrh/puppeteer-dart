@@ -56,6 +56,8 @@ class LogEntry {
   /// Logged text.
   final String text;
 
+  final LogEntryCategory? category;
+
   /// Timestamp when this entry was added.
   final runtime.Timestamp timestamp;
 
@@ -81,6 +83,7 @@ class LogEntry {
       {required this.source,
       required this.level,
       required this.text,
+      this.category,
       required this.timestamp,
       this.url,
       this.lineNumber,
@@ -94,6 +97,9 @@ class LogEntry {
       source: LogEntrySource.fromJson(json['source'] as String),
       level: LogEntryLevel.fromJson(json['level'] as String),
       text: json['text'] as String,
+      category: json.containsKey('category')
+          ? LogEntryCategory.fromJson(json['category'] as String)
+          : null,
       timestamp: runtime.Timestamp.fromJson(json['timestamp'] as num),
       url: json.containsKey('url') ? json['url'] as String : null,
       lineNumber:
@@ -122,6 +128,7 @@ class LogEntry {
       'level': level,
       'text': text,
       'timestamp': timestamp.toJson(),
+      if (category != null) 'category': category,
       if (url != null) 'url': url,
       if (lineNumber != null) 'lineNumber': lineNumber,
       if (stackTrace != null) 'stackTrace': stackTrace!.toJson(),
@@ -205,6 +212,31 @@ class LogEntryLevel {
   @override
   bool operator ==(other) =>
       (other is LogEntryLevel && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class LogEntryCategory {
+  static const cors = LogEntryCategory._('cors');
+  static const values = {
+    'cors': cors,
+  };
+
+  final String value;
+
+  const LogEntryCategory._(this.value);
+
+  factory LogEntryCategory.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is LogEntryCategory && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;

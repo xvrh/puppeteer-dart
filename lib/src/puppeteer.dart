@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:http/http.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
-import '../puppeteer.dart';
 import 'browser.dart';
 import 'connection.dart';
 import 'devices.dart';

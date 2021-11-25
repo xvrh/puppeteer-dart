@@ -8,7 +8,6 @@ import 'execution_context.dart';
 import 'frame_manager.dart';
 import 'helper.dart';
 import 'keyboard.dart';
-import 'mouse.dart';
 import 'page.dart';
 
 export '../../protocol/dom.dart' show BoxModel;

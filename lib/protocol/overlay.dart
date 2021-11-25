@@ -314,6 +314,16 @@ class OverlayApi {
       if (hingeConfig != null) 'hingeConfig': hingeConfig,
     });
   }
+
+  /// Show elements in isolation mode with overlays.
+  /// [isolatedElementHighlightConfigs] An array of node identifiers and descriptors for the highlight appearance.
+  Future<void> setShowIsolatedElements(
+      List<IsolatedElementHighlightConfig>
+          isolatedElementHighlightConfigs) async {
+    await _client.send('Overlay.setShowIsolatedElements', {
+      'isolatedElementHighlightConfigs': [...isolatedElementHighlightConfigs],
+    });
+  }
 }
 
 /// Configuration data for drawing the source order of an elements children.
@@ -1150,10 +1160,14 @@ class ContainerQueryHighlightConfig {
 }
 
 class ContainerQueryContainerHighlightConfig {
-  /// The style of the container border
+  /// The style of the container border.
   final LineStyle? containerBorder;
 
-  ContainerQueryContainerHighlightConfig({this.containerBorder});
+  /// The style of the descendants' borders.
+  final LineStyle? descendantBorder;
+
+  ContainerQueryContainerHighlightConfig(
+      {this.containerBorder, this.descendantBorder});
 
   factory ContainerQueryContainerHighlightConfig.fromJson(
       Map<String, dynamic> json) {
@@ -1161,12 +1175,81 @@ class ContainerQueryContainerHighlightConfig {
       containerBorder: json.containsKey('containerBorder')
           ? LineStyle.fromJson(json['containerBorder'] as Map<String, dynamic>)
           : null,
+      descendantBorder: json.containsKey('descendantBorder')
+          ? LineStyle.fromJson(json['descendantBorder'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       if (containerBorder != null) 'containerBorder': containerBorder!.toJson(),
+      if (descendantBorder != null)
+        'descendantBorder': descendantBorder!.toJson(),
+    };
+  }
+}
+
+class IsolatedElementHighlightConfig {
+  /// A descriptor for the highlight appearance of an element in isolation mode.
+  final IsolationModeHighlightConfig isolationModeHighlightConfig;
+
+  /// Identifier of the isolated element to highlight.
+  final dom.NodeId nodeId;
+
+  IsolatedElementHighlightConfig(
+      {required this.isolationModeHighlightConfig, required this.nodeId});
+
+  factory IsolatedElementHighlightConfig.fromJson(Map<String, dynamic> json) {
+    return IsolatedElementHighlightConfig(
+      isolationModeHighlightConfig: IsolationModeHighlightConfig.fromJson(
+          json['isolationModeHighlightConfig'] as Map<String, dynamic>),
+      nodeId: dom.NodeId.fromJson(json['nodeId'] as int),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'isolationModeHighlightConfig': isolationModeHighlightConfig.toJson(),
+      'nodeId': nodeId.toJson(),
+    };
+  }
+}
+
+class IsolationModeHighlightConfig {
+  /// The fill color of the resizers (default: transparent).
+  final dom.RGBA? resizerColor;
+
+  /// The fill color for resizer handles (default: transparent).
+  final dom.RGBA? resizerHandleColor;
+
+  /// The fill color for the mask covering non-isolated elements (default: transparent).
+  final dom.RGBA? maskColor;
+
+  IsolationModeHighlightConfig(
+      {this.resizerColor, this.resizerHandleColor, this.maskColor});
+
+  factory IsolationModeHighlightConfig.fromJson(Map<String, dynamic> json) {
+    return IsolationModeHighlightConfig(
+      resizerColor: json.containsKey('resizerColor')
+          ? dom.RGBA.fromJson(json['resizerColor'] as Map<String, dynamic>)
+          : null,
+      resizerHandleColor: json.containsKey('resizerHandleColor')
+          ? dom.RGBA
+              .fromJson(json['resizerHandleColor'] as Map<String, dynamic>)
+          : null,
+      maskColor: json.containsKey('maskColor')
+          ? dom.RGBA.fromJson(json['maskColor'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (resizerColor != null) 'resizerColor': resizerColor!.toJson(),
+      if (resizerHandleColor != null)
+        'resizerHandleColor': resizerHandleColor!.toJson(),
+      if (maskColor != null) 'maskColor': maskColor!.toJson(),
     };
   }
 }

@@ -107,6 +107,26 @@ class InputApi {
     });
   }
 
+  /// This method sets the current candidate text for ime.
+  /// Use imeCommitComposition to commit the final text.
+  /// Use imeSetComposition with empty string as text to cancel composition.
+  /// [text] The text to insert
+  /// [selectionStart] selection start
+  /// [selectionEnd] selection end
+  /// [replacementStart] replacement start
+  /// [replacementEnd] replacement end
+  Future<void> imeSetComposition(
+      String text, int selectionStart, int selectionEnd,
+      {int? replacementStart, int? replacementEnd}) async {
+    await _client.send('Input.imeSetComposition', {
+      'text': text,
+      'selectionStart': selectionStart,
+      'selectionEnd': selectionEnd,
+      if (replacementStart != null) 'replacementStart': replacementStart,
+      if (replacementEnd != null) 'replacementEnd': replacementEnd,
+    });
+  }
+
   /// Dispatches a mouse event to the page.
   /// [type] Type of the mouse event.
   /// [x] X coordinate of the event relative to the main frame's viewport in CSS pixels.
@@ -539,16 +559,22 @@ class DragDataItem {
 class DragData {
   final List<DragDataItem> items;
 
+  /// List of filenames that should be included when dropping
+  final List<String>? files;
+
   /// Bit field representing allowed drag operations. Copy = 1, Link = 2, Move = 16
   final int dragOperationsMask;
 
-  DragData({required this.items, required this.dragOperationsMask});
+  DragData({required this.items, this.files, required this.dragOperationsMask});
 
   factory DragData.fromJson(Map<String, dynamic> json) {
     return DragData(
       items: (json['items'] as List)
           .map((e) => DragDataItem.fromJson(e as Map<String, dynamic>))
           .toList(),
+      files: json.containsKey('files')
+          ? (json['files'] as List).map((e) => e as String).toList()
+          : null,
       dragOperationsMask: json['dragOperationsMask'] as int,
     );
   }
@@ -557,6 +583,7 @@ class DragData {
     return {
       'items': items.map((e) => e.toJson()).toList(),
       'dragOperationsMask': dragOperationsMask,
+      if (files != null) 'files': [...?files],
     };
   }
 }

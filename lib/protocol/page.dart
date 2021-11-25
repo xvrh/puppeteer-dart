@@ -305,6 +305,13 @@ class PageApi {
     return result['primaryIcon'] as String;
   }
 
+  /// Returns the unique (PWA) app id.
+  /// Only returns values if the feature flag 'WebAppEnableManifestId' is enabled
+  Future<GetAppIdResult> getAppId() async {
+    var result = await _client.send('Page.getAppId');
+    return GetAppIdResult.fromJson(result);
+  }
+
   /// Returns all browser cookies. Depending on the backend support, will return detailed cookie
   /// information in the `cookies` field.
   /// Returns: Array of cookie objects.
@@ -557,6 +564,16 @@ class PageApi {
         .toList();
   }
 
+  /// Get Origin Trials on given frame.
+  Future<List<OriginTrial>> getOriginTrials(FrameId frameId) async {
+    var result = await _client.send('Page.getOriginTrials', {
+      'frameId': frameId,
+    });
+    return (result['originTrials'] as List)
+        .map((e) => OriginTrial.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
   /// Overrides the values of device screen dimensions (window.screen.width, window.screen.height,
   /// window.innerWidth, window.innerHeight, and "device-width"/"device-height"-related CSS media
   /// query results).
@@ -746,20 +763,9 @@ class PageApi {
     await _client.send('Page.stopScreencast');
   }
 
-  /// Forces compilation cache to be generated for every subresource script.
-  /// See also: `Page.produceCompilationCache`.
-  Future<void> setProduceCompilationCache(bool enabled) async {
-    await _client.send('Page.setProduceCompilationCache', {
-      'enabled': enabled,
-    });
-  }
-
   /// Requests backend to produce compilation cache for the specified scripts.
-  /// Unlike setProduceCompilationCache, this allows client to only produce cache
-  /// for specific scripts. `scripts` are appeneded to the list of scripts
-  /// for which the cache for would produced. Disabling compilation cache with
-  /// `setProduceCompilationCache` would reset all pending cache requests.
-  /// The list may also be reset during page navigation.
+  /// `scripts` are appeneded to the list of scripts for which the cache
+  /// would be produced. The list may be reset during page navigation.
   /// When script with a matching URL is encountered, the cache is optionally
   /// produced upon backend discretion, based on internal heuristics.
   /// See also: `Page.compilationCacheProduced`.
@@ -1232,6 +1238,25 @@ class GetAppManifestResult {
   }
 }
 
+class GetAppIdResult {
+  /// App id, either from manifest's id attribute or computed from start_url
+  final String? appId;
+
+  /// Recommendation for manifest's id attribute to match current id computed from start_url
+  final String? recommendedId;
+
+  GetAppIdResult({this.appId, this.recommendedId});
+
+  factory GetAppIdResult.fromJson(Map<String, dynamic> json) {
+    return GetAppIdResult(
+      appId: json.containsKey('appId') ? json['appId'] as String : null,
+      recommendedId: json.containsKey('recommendedId')
+          ? json['recommendedId'] as String
+          : null,
+    );
+  }
+}
+
 class GetLayoutMetricsResult {
   /// Metrics relating to the layout viewport in CSS pixels.
   final LayoutViewport cssLayoutViewport;
@@ -1561,7 +1586,6 @@ class PermissionsPolicyFeature {
   static const chDeviceMemory = PermissionsPolicyFeature._('ch-device-memory');
   static const chDownlink = PermissionsPolicyFeature._('ch-downlink');
   static const chEct = PermissionsPolicyFeature._('ch-ect');
-  static const chLang = PermissionsPolicyFeature._('ch-lang');
   static const chPrefersColorScheme =
       PermissionsPolicyFeature._('ch-prefers-color-scheme');
   static const chRtt = PermissionsPolicyFeature._('ch-rtt');
@@ -1575,6 +1599,9 @@ class PermissionsPolicyFeature {
       PermissionsPolicyFeature._('ch-ua-full-version');
   static const chUaPlatformVersion =
       PermissionsPolicyFeature._('ch-ua-platform-version');
+  static const chUaReduced = PermissionsPolicyFeature._('ch-ua-reduced');
+  static const chViewportHeight =
+      PermissionsPolicyFeature._('ch-viewport-height');
   static const chViewportWidth =
       PermissionsPolicyFeature._('ch-viewport-width');
   static const chWidth = PermissionsPolicyFeature._('ch-width');
@@ -1600,6 +1627,7 @@ class PermissionsPolicyFeature {
   static const hid = PermissionsPolicyFeature._('hid');
   static const idleDetection = PermissionsPolicyFeature._('idle-detection');
   static const interestCohort = PermissionsPolicyFeature._('interest-cohort');
+  static const keyboardMap = PermissionsPolicyFeature._('keyboard-map');
   static const magnetometer = PermissionsPolicyFeature._('magnetometer');
   static const microphone = PermissionsPolicyFeature._('microphone');
   static const midi = PermissionsPolicyFeature._('midi');
@@ -1633,7 +1661,6 @@ class PermissionsPolicyFeature {
     'ch-device-memory': chDeviceMemory,
     'ch-downlink': chDownlink,
     'ch-ect': chEct,
-    'ch-lang': chLang,
     'ch-prefers-color-scheme': chPrefersColorScheme,
     'ch-rtt': chRtt,
     'ch-ua': chUa,
@@ -1644,6 +1671,8 @@ class PermissionsPolicyFeature {
     'ch-ua-mobile': chUaMobile,
     'ch-ua-full-version': chUaFullVersion,
     'ch-ua-platform-version': chUaPlatformVersion,
+    'ch-ua-reduced': chUaReduced,
+    'ch-viewport-height': chViewportHeight,
     'ch-viewport-width': chViewportWidth,
     'ch-width': chWidth,
     'clipboard-read': clipboardRead,
@@ -1664,6 +1693,7 @@ class PermissionsPolicyFeature {
     'hid': hid,
     'idle-detection': idleDetection,
     'interest-cohort': interestCohort,
+    'keyboard-map': keyboardMap,
     'magnetometer': magnetometer,
     'microphone': microphone,
     'midi': midi,
@@ -1803,6 +1833,7 @@ class OriginTrialTokenStatus {
   static const tokenDisabled = OriginTrialTokenStatus._('TokenDisabled');
   static const featureDisabledForUser =
       OriginTrialTokenStatus._('FeatureDisabledForUser');
+  static const unknownTrial = OriginTrialTokenStatus._('UnknownTrial');
   static const values = {
     'Success': success,
     'NotSupported': notSupported,
@@ -1815,6 +1846,7 @@ class OriginTrialTokenStatus {
     'FeatureDisabled': featureDisabled,
     'TokenDisabled': tokenDisabled,
     'FeatureDisabledForUser': featureDisabledForUser,
+    'UnknownTrial': unknownTrial,
   };
 
   final String value;
@@ -2013,7 +2045,7 @@ class FrameInfo {
   final FrameId id;
 
   /// Parent frame identifier.
-  final String? parentId;
+  final FrameId? parentId;
 
   /// Identifier of the loader associated with this frame.
   final network.LoaderId loaderId;
@@ -2054,9 +2086,6 @@ class FrameInfo {
   /// Indicated which gated APIs / features are available.
   final List<GatedAPIFeatures> gatedAPIFeatures;
 
-  /// Frame document's origin trials with at least one token present.
-  final List<OriginTrial>? originTrials;
-
   FrameInfo(
       {required this.id,
       this.parentId,
@@ -2071,14 +2100,14 @@ class FrameInfo {
       this.adFrameStatus,
       required this.secureContextType,
       required this.crossOriginIsolatedContextType,
-      required this.gatedAPIFeatures,
-      this.originTrials});
+      required this.gatedAPIFeatures});
 
   factory FrameInfo.fromJson(Map<String, dynamic> json) {
     return FrameInfo(
       id: FrameId.fromJson(json['id'] as String),
-      parentId:
-          json.containsKey('parentId') ? json['parentId'] as String : null,
+      parentId: json.containsKey('parentId')
+          ? FrameId.fromJson(json['parentId'] as String)
+          : null,
       loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
       name: json.containsKey('name') ? json['name'] as String : null,
       url: json['url'] as String,
@@ -2102,11 +2131,6 @@ class FrameInfo {
       gatedAPIFeatures: (json['gatedAPIFeatures'] as List)
           .map((e) => GatedAPIFeatures.fromJson(e as String))
           .toList(),
-      originTrials: json.containsKey('originTrials')
-          ? (json['originTrials'] as List)
-              .map((e) => OriginTrial.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
     );
   }
 
@@ -2121,13 +2145,11 @@ class FrameInfo {
       'secureContextType': secureContextType.toJson(),
       'crossOriginIsolatedContextType': crossOriginIsolatedContextType.toJson(),
       'gatedAPIFeatures': gatedAPIFeatures.map((e) => e.toJson()).toList(),
-      if (parentId != null) 'parentId': parentId,
+      if (parentId != null) 'parentId': parentId!.toJson(),
       if (name != null) 'name': name,
       if (urlFragment != null) 'urlFragment': urlFragment,
       if (unreachableUrl != null) 'unreachableUrl': unreachableUrl,
       if (adFrameStatus != null) 'adFrameStatus': adFrameStatus!.toJson(),
-      if (originTrials != null)
-        'originTrials': originTrials!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -3077,6 +3099,8 @@ class BackForwardCacheNotRestoredReason {
           'BackForwardCacheDisabledForDelegate');
   static const optInUnloadHeaderNotPresent =
       BackForwardCacheNotRestoredReason._('OptInUnloadHeaderNotPresent');
+  static const unloadHandlerExistsInMainFrame =
+      BackForwardCacheNotRestoredReason._('UnloadHandlerExistsInMainFrame');
   static const unloadHandlerExistsInSubFrame =
       BackForwardCacheNotRestoredReason._('UnloadHandlerExistsInSubFrame');
   static const serviceWorkerUnregistration =
@@ -3088,7 +3112,15 @@ class BackForwardCacheNotRestoredReason {
   static const cacheControlNoStoreHttpOnlyCookieModified =
       BackForwardCacheNotRestoredReason._(
           'CacheControlNoStoreHTTPOnlyCookieModified');
+  static const noResponseHead =
+      BackForwardCacheNotRestoredReason._('NoResponseHead');
+  static const unknown = BackForwardCacheNotRestoredReason._('Unknown');
+  static const activationNavigationsDisallowedForBug1234857 =
+      BackForwardCacheNotRestoredReason._(
+          'ActivationNavigationsDisallowedForBug1234857');
   static const webSocket = BackForwardCacheNotRestoredReason._('WebSocket');
+  static const webTransport =
+      BackForwardCacheNotRestoredReason._('WebTransport');
   static const webRtc = BackForwardCacheNotRestoredReason._('WebRTC');
   static const mainResourceHasCacheControlNoStore =
       BackForwardCacheNotRestoredReason._('MainResourceHasCacheControlNoStore');
@@ -3134,8 +3166,6 @@ class BackForwardCacheNotRestoredReason {
   static const requestedStorageAccessGrant =
       BackForwardCacheNotRestoredReason._('RequestedStorageAccessGrant');
   static const webNfc = BackForwardCacheNotRestoredReason._('WebNfc');
-  static const webFileSystem =
-      BackForwardCacheNotRestoredReason._('WebFileSystem');
   static const outstandingNetworkRequestFetch =
       BackForwardCacheNotRestoredReason._('OutstandingNetworkRequestFetch');
   static const outstandingNetworkRequestXhr =
@@ -3160,13 +3190,66 @@ class BackForwardCacheNotRestoredReason {
   static const outstandingNetworkRequestDirectSocket =
       BackForwardCacheNotRestoredReason._(
           'OutstandingNetworkRequestDirectSocket');
-  static const isolatedWorldScript =
-      BackForwardCacheNotRestoredReason._('IsolatedWorldScript');
+  static const injectedJavascript =
+      BackForwardCacheNotRestoredReason._('InjectedJavascript');
   static const injectedStyleSheet =
       BackForwardCacheNotRestoredReason._('InjectedStyleSheet');
-  static const mediaSessionImplOnServiceCreated =
-      BackForwardCacheNotRestoredReason._('MediaSessionImplOnServiceCreated');
-  static const unknown = BackForwardCacheNotRestoredReason._('Unknown');
+  static const dummy = BackForwardCacheNotRestoredReason._('Dummy');
+  static const contentSecurityHandler =
+      BackForwardCacheNotRestoredReason._('ContentSecurityHandler');
+  static const contentWebAuthenticationApi =
+      BackForwardCacheNotRestoredReason._('ContentWebAuthenticationAPI');
+  static const contentFileChooser =
+      BackForwardCacheNotRestoredReason._('ContentFileChooser');
+  static const contentSerial =
+      BackForwardCacheNotRestoredReason._('ContentSerial');
+  static const contentFileSystemAccess =
+      BackForwardCacheNotRestoredReason._('ContentFileSystemAccess');
+  static const contentMediaDevicesDispatcherHost =
+      BackForwardCacheNotRestoredReason._('ContentMediaDevicesDispatcherHost');
+  static const contentWebBluetooth =
+      BackForwardCacheNotRestoredReason._('ContentWebBluetooth');
+  static const contentWebUsb =
+      BackForwardCacheNotRestoredReason._('ContentWebUSB');
+  static const contentMediaSession =
+      BackForwardCacheNotRestoredReason._('ContentMediaSession');
+  static const contentMediaSessionService =
+      BackForwardCacheNotRestoredReason._('ContentMediaSessionService');
+  static const embedderPopupBlockerTabHelper =
+      BackForwardCacheNotRestoredReason._('EmbedderPopupBlockerTabHelper');
+  static const embedderSafeBrowsingTriggeredPopupBlocker =
+      BackForwardCacheNotRestoredReason._(
+          'EmbedderSafeBrowsingTriggeredPopupBlocker');
+  static const embedderSafeBrowsingThreatDetails =
+      BackForwardCacheNotRestoredReason._('EmbedderSafeBrowsingThreatDetails');
+  static const embedderAppBannerManager =
+      BackForwardCacheNotRestoredReason._('EmbedderAppBannerManager');
+  static const embedderDomDistillerViewerSource =
+      BackForwardCacheNotRestoredReason._('EmbedderDomDistillerViewerSource');
+  static const embedderDomDistillerSelfDeletingRequestDelegate =
+      BackForwardCacheNotRestoredReason._(
+          'EmbedderDomDistillerSelfDeletingRequestDelegate');
+  static const embedderOomInterventionTabHelper =
+      BackForwardCacheNotRestoredReason._('EmbedderOomInterventionTabHelper');
+  static const embedderOfflinePage =
+      BackForwardCacheNotRestoredReason._('EmbedderOfflinePage');
+  static const embedderChromePasswordManagerClientBindCredentialManager =
+      BackForwardCacheNotRestoredReason._(
+          'EmbedderChromePasswordManagerClientBindCredentialManager');
+  static const embedderPermissionRequestManager =
+      BackForwardCacheNotRestoredReason._('EmbedderPermissionRequestManager');
+  static const embedderModalDialog =
+      BackForwardCacheNotRestoredReason._('EmbedderModalDialog');
+  static const embedderExtensions =
+      BackForwardCacheNotRestoredReason._('EmbedderExtensions');
+  static const embedderExtensionMessaging =
+      BackForwardCacheNotRestoredReason._('EmbedderExtensionMessaging');
+  static const embedderExtensionMessagingForOpenPort =
+      BackForwardCacheNotRestoredReason._(
+          'EmbedderExtensionMessagingForOpenPort');
+  static const embedderExtensionSentMessageToCachedFrame =
+      BackForwardCacheNotRestoredReason._(
+          'EmbedderExtensionSentMessageToCachedFrame');
   static const values = {
     'NotMainFrame': notMainFrame,
     'BackForwardCacheDisabled': backForwardCacheDisabled,
@@ -3216,13 +3299,19 @@ class BackForwardCacheNotRestoredReason {
     'BrowsingInstanceNotSwapped': browsingInstanceNotSwapped,
     'BackForwardCacheDisabledForDelegate': backForwardCacheDisabledForDelegate,
     'OptInUnloadHeaderNotPresent': optInUnloadHeaderNotPresent,
+    'UnloadHandlerExistsInMainFrame': unloadHandlerExistsInMainFrame,
     'UnloadHandlerExistsInSubFrame': unloadHandlerExistsInSubFrame,
     'ServiceWorkerUnregistration': serviceWorkerUnregistration,
     'CacheControlNoStore': cacheControlNoStore,
     'CacheControlNoStoreCookieModified': cacheControlNoStoreCookieModified,
     'CacheControlNoStoreHTTPOnlyCookieModified':
         cacheControlNoStoreHttpOnlyCookieModified,
+    'NoResponseHead': noResponseHead,
+    'Unknown': unknown,
+    'ActivationNavigationsDisallowedForBug1234857':
+        activationNavigationsDisallowedForBug1234857,
     'WebSocket': webSocket,
+    'WebTransport': webTransport,
     'WebRTC': webRtc,
     'MainResourceHasCacheControlNoStore': mainResourceHasCacheControlNoStore,
     'MainResourceHasCacheControlNoCache': mainResourceHasCacheControlNoCache,
@@ -3249,7 +3338,6 @@ class BackForwardCacheNotRestoredReason {
     'WebShare': webShare,
     'RequestedStorageAccessGrant': requestedStorageAccessGrant,
     'WebNfc': webNfc,
-    'WebFileSystem': webFileSystem,
     'OutstandingNetworkRequestFetch': outstandingNetworkRequestFetch,
     'OutstandingNetworkRequestXHR': outstandingNetworkRequestXhr,
     'AppBanner': appBanner,
@@ -3265,10 +3353,39 @@ class BackForwardCacheNotRestoredReason {
     'WebOTPService': webOtpService,
     'OutstandingNetworkRequestDirectSocket':
         outstandingNetworkRequestDirectSocket,
-    'IsolatedWorldScript': isolatedWorldScript,
+    'InjectedJavascript': injectedJavascript,
     'InjectedStyleSheet': injectedStyleSheet,
-    'MediaSessionImplOnServiceCreated': mediaSessionImplOnServiceCreated,
-    'Unknown': unknown,
+    'Dummy': dummy,
+    'ContentSecurityHandler': contentSecurityHandler,
+    'ContentWebAuthenticationAPI': contentWebAuthenticationApi,
+    'ContentFileChooser': contentFileChooser,
+    'ContentSerial': contentSerial,
+    'ContentFileSystemAccess': contentFileSystemAccess,
+    'ContentMediaDevicesDispatcherHost': contentMediaDevicesDispatcherHost,
+    'ContentWebBluetooth': contentWebBluetooth,
+    'ContentWebUSB': contentWebUsb,
+    'ContentMediaSession': contentMediaSession,
+    'ContentMediaSessionService': contentMediaSessionService,
+    'EmbedderPopupBlockerTabHelper': embedderPopupBlockerTabHelper,
+    'EmbedderSafeBrowsingTriggeredPopupBlocker':
+        embedderSafeBrowsingTriggeredPopupBlocker,
+    'EmbedderSafeBrowsingThreatDetails': embedderSafeBrowsingThreatDetails,
+    'EmbedderAppBannerManager': embedderAppBannerManager,
+    'EmbedderDomDistillerViewerSource': embedderDomDistillerViewerSource,
+    'EmbedderDomDistillerSelfDeletingRequestDelegate':
+        embedderDomDistillerSelfDeletingRequestDelegate,
+    'EmbedderOomInterventionTabHelper': embedderOomInterventionTabHelper,
+    'EmbedderOfflinePage': embedderOfflinePage,
+    'EmbedderChromePasswordManagerClientBindCredentialManager':
+        embedderChromePasswordManagerClientBindCredentialManager,
+    'EmbedderPermissionRequestManager': embedderPermissionRequestManager,
+    'EmbedderModalDialog': embedderModalDialog,
+    'EmbedderExtensions': embedderExtensions,
+    'EmbedderExtensionMessaging': embedderExtensionMessaging,
+    'EmbedderExtensionMessagingForOpenPort':
+        embedderExtensionMessagingForOpenPort,
+    'EmbedderExtensionSentMessageToCachedFrame':
+        embedderExtensionSentMessageToCachedFrame,
   };
 
   final String value;

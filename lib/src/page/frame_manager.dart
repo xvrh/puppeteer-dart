@@ -159,8 +159,9 @@ class FrameManager {
   }
 
   void _handleFrameTree(FrameTree frameTree) {
-    if (frameTree.frame.parentId != null) {
-      _onFrameAttached(frameTree.frame.id, FrameId(frameTree.frame.parentId!));
+    var parentId = frameTree.frame.parentId;
+    if (parentId != null) {
+      _onFrameAttached(frameTree.frame.id, parentId);
     }
     _onFrameNavigated(frameTree.frame);
     if (frameTree.childFrames == null) {

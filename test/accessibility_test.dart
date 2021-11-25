@@ -97,7 +97,8 @@ void main() {
       await page
           .setContent('<div tabIndex=-1 aria-roledescription="foo">Hi</div>');
       var snapshot = await page.accessibility.snapshot();
-      expect(snapshot.children[0].roleDescription, equals('foo'));
+      //// See https://chromium-review.googlesource.com/c/chromium/src/+/3088862
+      expect(snapshot.children[0].roleDescription, isNull);
     });
     test('orientation', () async {
       await page.setContent(

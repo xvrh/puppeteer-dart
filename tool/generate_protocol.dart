@@ -35,6 +35,8 @@ void main() {
   var domains =
       protocolFiles.map(_readProtocol).expand((f) => f.domains).toList();
 
+  _applyTemporaryFixes(domains);
+
   for (var domain in domains) {
     var types = domain.types;
     var commandsJson = domain.commands;
@@ -741,4 +743,18 @@ String _castForParameter(_DomainContext context, Parameter parameter) {
       return context.getPropertyType(parameter);
     }
   }
+}
+
+void _applyTemporaryFixes(List<Domain> domains) {
+  var accessiblityDomain = domains.firstWhere((e) => e.name == 'Accessibility');
+  var axPropertyName =
+      accessiblityDomain.types.firstWhere((e) => e.id == 'AXPropertyName');
+  var axPropertyNameEnums = axPropertyName.enums!;
+  var newAxPropertyNames = const [
+    'uninteresting',
+    'ariaHiddenElement',
+    'ariaHiddenSubtree'
+  ];
+  assert(!newAxPropertyNames.any((e) => axPropertyNameEnums.contains(e)));
+  axPropertyNameEnums.addAll(newAxPropertyNames);
 }
