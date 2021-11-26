@@ -753,7 +753,8 @@ void _applyTemporaryFixes(List<Domain> domains) {
   var newAxPropertyNames = const [
     'uninteresting',
     'ariaHiddenElement',
-    'ariaHiddenSubtree'
+    'ariaHiddenSubtree',
+    'notRendered',
   ];
   assert(!newAxPropertyNames.any((e) => axPropertyNameEnums.contains(e)));
   axPropertyNameEnums.addAll(newAxPropertyNames);

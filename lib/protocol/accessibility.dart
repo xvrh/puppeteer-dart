@@ -495,6 +495,7 @@ class AXPropertyName {
   static const uninteresting = AXPropertyName._('uninteresting');
   static const ariaHiddenElement = AXPropertyName._('ariaHiddenElement');
   static const ariaHiddenSubtree = AXPropertyName._('ariaHiddenSubtree');
+  static const notRendered = AXPropertyName._('notRendered');
   static const values = {
     'busy': busy,
     'disabled': disabled,
@@ -538,6 +539,7 @@ class AXPropertyName {
     'uninteresting': uninteresting,
     'ariaHiddenElement': ariaHiddenElement,
     'ariaHiddenSubtree': ariaHiddenSubtree,
+    'notRendered': notRendered,
   };
 
   final String value;
