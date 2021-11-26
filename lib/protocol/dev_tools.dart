@@ -1,7 +1,6 @@
 import '../src/connection.dart';
 import 'accessibility.dart';
 import 'animation.dart';
-import 'application_cache.dart';
 import 'audits.dart';
 import 'background_service.dart';
 import 'browser.dart';
@@ -16,6 +15,7 @@ import 'dom_debugger.dart';
 import 'dom_snapshot.dart';
 import 'dom_storage.dart';
 import 'emulation.dart';
+import 'event_breakpoints.dart';
 import 'fetch.dart';
 import 'headless_experimental.dart';
 import 'heap_profiler.dart';
@@ -55,10 +55,6 @@ class DevTools {
 
   AnimationApi get animation => _animation ??= AnimationApi(client);
   AnimationApi? _animation;
-
-  ApplicationCacheApi get applicationCache =>
-      _applicationCache ??= ApplicationCacheApi(client);
-  ApplicationCacheApi? _applicationCache;
 
   /// Audits domain allows investigation of page violations and possible improvements.
   AuditsApi get audits => _audits ??= AuditsApi(client);
@@ -104,6 +100,14 @@ class DevTools {
   /// execution will stop on these operations as if there was a regular breakpoint set.
   DOMDebuggerApi get domDebugger => _domDebugger ??= DOMDebuggerApi(client);
   DOMDebuggerApi? _domDebugger;
+
+  /// EventBreakpoints permits setting breakpoints on particular operations and
+  /// events in targets that run JavaScript but do not have a DOM.
+  /// JavaScript execution will stop on these operations as if there was a regular
+  /// breakpoint set.
+  EventBreakpointsApi get eventBreakpoints =>
+      _eventBreakpoints ??= EventBreakpointsApi(client);
+  EventBreakpointsApi? _eventBreakpoints;
 
   /// This domain facilitates obtaining document snapshots with DOM, layout, and style information.
   DOMSnapshotApi get domSnapshot => _domSnapshot ??= DOMSnapshotApi(client);

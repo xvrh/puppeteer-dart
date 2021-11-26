@@ -676,6 +676,19 @@ class DOMApi {
     });
     return NodeId.fromJson(result['nodeId'] as int);
   }
+
+  /// Returns the descendants of a container query container that have
+  /// container queries against this container.
+  /// [nodeId] Id of the container node to find querying descendants from.
+  /// Returns: Descendant nodes with container queries against the given container.
+  Future<List<NodeId>> getQueryingDescendantsForContainer(NodeId nodeId) async {
+    var result = await _client.send('DOM.getQueryingDescendantsForContainer', {
+      'nodeId': nodeId,
+    });
+    return (result['nodeIds'] as List)
+        .map((e) => NodeId.fromJson(e as int))
+        .toList();
+  }
 }
 
 class AttributeModifiedEvent {

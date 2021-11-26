@@ -65,7 +65,9 @@ class FetchApi {
   /// series of name: value pairs. Prefer the above method unless you
   /// need to represent some non-UTF8 values that can't be transmitted
   /// over the protocol as text.
-  /// [body] A response body.
+  /// [body] A response body. If absent, original response body will be used if
+  /// the request is intercepted at the response stage and empty body
+  /// will be used if the request is intercepted at the request stage.
   /// [responsePhrase] A textual representation of responseCode.
   /// If absent, a standard phrase matching responseCode is used.
   Future<void> fulfillRequest(RequestId requestId, int responseCode,
@@ -90,17 +92,20 @@ class FetchApi {
   /// [method] If set, the request method is overridden.
   /// [postData] If set, overrides the post data in the request.
   /// [headers] If set, overrides the request headers.
+  /// [interceptResponse] If set, overrides response interception behavior for this request.
   Future<void> continueRequest(RequestId requestId,
       {String? url,
       String? method,
       String? postData,
-      List<HeaderEntry>? headers}) async {
+      List<HeaderEntry>? headers,
+      bool? interceptResponse}) async {
     await _client.send('Fetch.continueRequest', {
       'requestId': requestId,
       if (url != null) 'url': url,
       if (method != null) 'method': method,
       if (postData != null) 'postData': postData,
       if (headers != null) 'headers': [...headers],
+      if (interceptResponse != null) 'interceptResponse': interceptResponse,
     });
   }
 
@@ -112,6 +117,33 @@ class FetchApi {
     await _client.send('Fetch.continueWithAuth', {
       'requestId': requestId,
       'authChallengeResponse': authChallengeResponse,
+    });
+  }
+
+  /// Continues loading of the paused response, optionally modifying the
+  /// response headers. If either responseCode or headers are modified, all of them
+  /// must be present.
+  /// [requestId] An id the client received in requestPaused event.
+  /// [responseCode] An HTTP response code. If absent, original response code will be used.
+  /// [responsePhrase] A textual representation of responseCode.
+  /// If absent, a standard phrase matching responseCode is used.
+  /// [responseHeaders] Response headers. If absent, original response headers will be used.
+  /// [binaryResponseHeaders] Alternative way of specifying response headers as a \0-separated
+  /// series of name: value pairs. Prefer the above method unless you
+  /// need to represent some non-UTF8 values that can't be transmitted
+  /// over the protocol as text.
+  Future<void> continueResponse(RequestId requestId,
+      {int? responseCode,
+      String? responsePhrase,
+      List<HeaderEntry>? responseHeaders,
+      String? binaryResponseHeaders}) async {
+    await _client.send('Fetch.continueResponse', {
+      'requestId': requestId,
+      if (responseCode != null) 'responseCode': responseCode,
+      if (responsePhrase != null) 'responsePhrase': responsePhrase,
+      if (responseHeaders != null) 'responseHeaders': [...responseHeaders],
+      if (binaryResponseHeaders != null)
+        'binaryResponseHeaders': binaryResponseHeaders,
     });
   }
 
@@ -166,6 +198,9 @@ class RequestPausedEvent {
   /// Response code if intercepted at response stage.
   final int? responseStatusCode;
 
+  /// Response status text if intercepted at response stage.
+  final String? responseStatusText;
+
   /// Response headers if intercepted at the response stage.
   final List<HeaderEntry>? responseHeaders;
 
@@ -180,6 +215,7 @@ class RequestPausedEvent {
       required this.resourceType,
       this.responseErrorReason,
       this.responseStatusCode,
+      this.responseStatusText,
       this.responseHeaders,
       this.networkId});
 
@@ -196,6 +232,9 @@ class RequestPausedEvent {
           : null,
       responseStatusCode: json.containsKey('responseStatusCode')
           ? json['responseStatusCode'] as int
+          : null,
+      responseStatusText: json.containsKey('responseStatusText')
+          ? json['responseStatusText'] as String
           : null,
       responseHeaders: json.containsKey('responseHeaders')
           ? (json['responseHeaders'] as List)

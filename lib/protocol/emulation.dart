@@ -44,6 +44,15 @@ class EmulationApi {
     });
   }
 
+  /// Automatically render all web contents using a dark theme.
+  /// [enabled] Whether to enable or disable automatic dark mode.
+  /// If not specified, any existing override will be cleared.
+  Future<void> setAutoDarkModeOverride({bool? enabled}) async {
+    await _client.send('Emulation.setAutoDarkModeOverride', {
+      if (enabled != null) 'enabled': enabled,
+    });
+  }
+
   /// Enables CPU throttling to emulate slow CPUs.
   /// [rate] Throttling rate as a slowdown factor (1 is no throttle, 2 is 2x slowdown, etc).
   Future<void> setCPUThrottlingRate(num rate) async {

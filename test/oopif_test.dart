@@ -1,5 +1,4 @@
 import 'package:puppeteer/puppeteer.dart';
-import 'package:puppeteer/src/target.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
 

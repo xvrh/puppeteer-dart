@@ -217,6 +217,8 @@ class TargetApi {
   /// Controls whether to automatically attach to new targets which are considered to be related to
   /// this one. When turned on, attaches to all existing related targets as well. When turned off,
   /// automatically detaches from all currently attached targets.
+  /// This also clears all targets added by `autoAttachRelated` from the list of targets to watch
+  /// for creation of related targets.
   /// [autoAttach] Whether to auto-attach to related targets.
   /// [waitForDebuggerOnStart] Whether to pause new targets when attaching to them. Use `Runtime.runIfWaitingForDebugger`
   /// to run paused targets.
@@ -229,6 +231,21 @@ class TargetApi {
       'autoAttach': autoAttach,
       'waitForDebuggerOnStart': waitForDebuggerOnStart,
       if (flatten != null) 'flatten': flatten,
+    });
+  }
+
+  /// Adds the specified target to the list of targets that will be monitored for any related target
+  /// creation (such as child frames, child workers and new versions of service worker) and reported
+  /// through `attachedToTarget`. The specified target is also auto-attached.
+  /// This cancels the effect of any previous `setAutoAttach` and is also cancelled by subsequent
+  /// `setAutoAttach`. Only available at the Browser target.
+  /// [waitForDebuggerOnStart] Whether to pause new targets when attaching to them. Use `Runtime.runIfWaitingForDebugger`
+  /// to run paused targets.
+  Future<void> autoAttachRelated(
+      TargetID targetId, bool waitForDebuggerOnStart) async {
+    await _client.send('Target.autoAttachRelated', {
+      'targetId': targetId,
+      'waitForDebuggerOnStart': waitForDebuggerOnStart,
     });
   }
 

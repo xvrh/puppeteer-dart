@@ -146,7 +146,7 @@ void main() {
       expect(responses.length, equals(2));
       expect(responses['one-style.css']!.status, equals(200));
       expect(responses['one-style.css']!.fromCache, isTrue);
-      expect(responses['one-style.html']!.status, equals(304));
+      expect(responses['one-style.html']!.status, equals(200));
       expect(responses['one-style.html']!.fromCache, isFalse);
     });
   });

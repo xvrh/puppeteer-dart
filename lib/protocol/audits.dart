@@ -163,6 +163,8 @@ class SameSiteCookieExclusionReason {
       SameSiteCookieExclusionReason._('ExcludeSameSiteStrict');
   static const excludeInvalidSameParty =
       SameSiteCookieExclusionReason._('ExcludeInvalidSameParty');
+  static const excludeSamePartyCrossPartyContext =
+      SameSiteCookieExclusionReason._('ExcludeSamePartyCrossPartyContext');
   static const values = {
     'ExcludeSameSiteUnspecifiedTreatedAsLax':
         excludeSameSiteUnspecifiedTreatedAsLax,
@@ -170,6 +172,7 @@ class SameSiteCookieExclusionReason {
     'ExcludeSameSiteLax': excludeSameSiteLax,
     'ExcludeSameSiteStrict': excludeSameSiteStrict,
     'ExcludeInvalidSameParty': excludeInvalidSameParty,
+    'ExcludeSamePartyCrossPartyContext': excludeSamePartyCrossPartyContext,
   };
 
   final String value;
@@ -705,12 +708,15 @@ class ContentSecurityPolicyViolationType {
       ContentSecurityPolicyViolationType._('kTrustedTypesSinkViolation');
   static const kTrustedTypesPolicyViolation =
       ContentSecurityPolicyViolationType._('kTrustedTypesPolicyViolation');
+  static const kWasmEvalViolation =
+      ContentSecurityPolicyViolationType._('kWasmEvalViolation');
   static const values = {
     'kInlineViolation': kInlineViolation,
     'kEvalViolation': kEvalViolation,
     'kURLViolation': kUrlViolation,
     'kTrustedTypesSinkViolation': kTrustedTypesSinkViolation,
     'kTrustedTypesPolicyViolation': kTrustedTypesPolicyViolation,
+    'kWasmEvalViolation': kWasmEvalViolation,
   };
 
   final String value;
@@ -1105,6 +1111,11 @@ class AttributionReportingIssueType {
       AttributionReportingIssueType._('AttributionSourceUntrustworthyOrigin');
   static const attributionUntrustworthyOrigin =
       AttributionReportingIssueType._('AttributionUntrustworthyOrigin');
+  static const attributionTriggerDataTooLarge =
+      AttributionReportingIssueType._('AttributionTriggerDataTooLarge');
+  static const attributionEventSourceTriggerDataTooLarge =
+      AttributionReportingIssueType._(
+          'AttributionEventSourceTriggerDataTooLarge');
   static const values = {
     'PermissionPolicyDisabled': permissionPolicyDisabled,
     'InvalidAttributionSourceEventId': invalidAttributionSourceEventId,
@@ -1112,6 +1123,9 @@ class AttributionReportingIssueType {
     'AttributionSourceUntrustworthyOrigin':
         attributionSourceUntrustworthyOrigin,
     'AttributionUntrustworthyOrigin': attributionUntrustworthyOrigin,
+    'AttributionTriggerDataTooLarge': attributionTriggerDataTooLarge,
+    'AttributionEventSourceTriggerDataTooLarge':
+        attributionEventSourceTriggerDataTooLarge,
   };
 
   final String value;
@@ -1288,6 +1302,91 @@ class WasmCrossOriginModuleSharingIssueDetails {
   }
 }
 
+class GenericIssueErrorType {
+  static const crossOriginPortalPostMessageError =
+      GenericIssueErrorType._('CrossOriginPortalPostMessageError');
+  static const values = {
+    'CrossOriginPortalPostMessageError': crossOriginPortalPostMessageError,
+  };
+
+  final String value;
+
+  const GenericIssueErrorType._(this.value);
+
+  factory GenericIssueErrorType.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is GenericIssueErrorType && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Depending on the concrete errorType, different properties are set.
+class GenericIssueDetails {
+  /// Issues with the same errorType are aggregated in the frontend.
+  final GenericIssueErrorType errorType;
+
+  final page.FrameId? frameId;
+
+  GenericIssueDetails({required this.errorType, this.frameId});
+
+  factory GenericIssueDetails.fromJson(Map<String, dynamic> json) {
+    return GenericIssueDetails(
+      errorType: GenericIssueErrorType.fromJson(json['errorType'] as String),
+      frameId: json.containsKey('frameId')
+          ? page.FrameId.fromJson(json['frameId'] as String)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'errorType': errorType.toJson(),
+      if (frameId != null) 'frameId': frameId!.toJson(),
+    };
+  }
+}
+
+/// This issue tracks information needed to print a deprecation message.
+/// The formatting is inherited from the old console.log version, see more at:
+/// https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/frame/deprecation.cc
+/// TODO(crbug.com/1264960): Re-work format to add i18n support per:
+/// https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/public/devtools_protocol/README.md
+class DeprecationIssueDetails {
+  final AffectedFrame? affectedFrame;
+
+  final SourceCodeLocation sourceCodeLocation;
+
+  DeprecationIssueDetails(
+      {this.affectedFrame, required this.sourceCodeLocation});
+
+  factory DeprecationIssueDetails.fromJson(Map<String, dynamic> json) {
+    return DeprecationIssueDetails(
+      affectedFrame: json.containsKey('affectedFrame')
+          ? AffectedFrame.fromJson(
+              json['affectedFrame'] as Map<String, dynamic>)
+          : null,
+      sourceCodeLocation: SourceCodeLocation.fromJson(
+          json['sourceCodeLocation'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sourceCodeLocation': sourceCodeLocation.toJson(),
+      if (affectedFrame != null) 'affectedFrame': affectedFrame!.toJson(),
+    };
+  }
+}
+
 /// A unique identifier for the type of issue. Each type may use one of the
 /// optional fields in InspectorIssueDetails to convey more specific
 /// information about the kind of issue.
@@ -1314,6 +1413,8 @@ class InspectorIssueCode {
       InspectorIssueCode._('NavigatorUserAgentIssue');
   static const wasmCrossOriginModuleSharingIssue =
       InspectorIssueCode._('WasmCrossOriginModuleSharingIssue');
+  static const genericIssue = InspectorIssueCode._('GenericIssue');
+  static const deprecationIssue = InspectorIssueCode._('DeprecationIssue');
   static const values = {
     'SameSiteCookieIssue': sameSiteCookieIssue,
     'MixedContentIssue': mixedContentIssue,
@@ -1328,6 +1429,8 @@ class InspectorIssueCode {
     'QuirksModeIssue': quirksModeIssue,
     'NavigatorUserAgentIssue': navigatorUserAgentIssue,
     'WasmCrossOriginModuleSharingIssue': wasmCrossOriginModuleSharingIssue,
+    'GenericIssue': genericIssue,
+    'DeprecationIssue': deprecationIssue,
   };
 
   final String value;
@@ -1380,6 +1483,10 @@ class InspectorIssueDetails {
   final WasmCrossOriginModuleSharingIssueDetails?
       wasmCrossOriginModuleSharingIssue;
 
+  final GenericIssueDetails? genericIssueDetails;
+
+  final DeprecationIssueDetails? deprecationIssueDetails;
+
   InspectorIssueDetails(
       {this.sameSiteCookieIssueDetails,
       this.mixedContentIssueDetails,
@@ -1393,7 +1500,9 @@ class InspectorIssueDetails {
       this.attributionReportingIssueDetails,
       this.quirksModeIssueDetails,
       this.navigatorUserAgentIssueDetails,
-      this.wasmCrossOriginModuleSharingIssue});
+      this.wasmCrossOriginModuleSharingIssue,
+      this.genericIssueDetails,
+      this.deprecationIssueDetails});
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
     return InspectorIssueDetails(
@@ -1457,6 +1566,14 @@ class InspectorIssueDetails {
           ? WasmCrossOriginModuleSharingIssueDetails.fromJson(
               json['wasmCrossOriginModuleSharingIssue'] as Map<String, dynamic>)
           : null,
+      genericIssueDetails: json.containsKey('genericIssueDetails')
+          ? GenericIssueDetails.fromJson(
+              json['genericIssueDetails'] as Map<String, dynamic>)
+          : null,
+      deprecationIssueDetails: json.containsKey('deprecationIssueDetails')
+          ? DeprecationIssueDetails.fromJson(
+              json['deprecationIssueDetails'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -1494,6 +1611,10 @@ class InspectorIssueDetails {
       if (wasmCrossOriginModuleSharingIssue != null)
         'wasmCrossOriginModuleSharingIssue':
             wasmCrossOriginModuleSharingIssue!.toJson(),
+      if (genericIssueDetails != null)
+        'genericIssueDetails': genericIssueDetails!.toJson(),
+      if (deprecationIssueDetails != null)
+        'deprecationIssueDetails': deprecationIssueDetails!.toJson(),
     };
   }
 }

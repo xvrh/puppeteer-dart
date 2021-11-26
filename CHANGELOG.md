@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.4.0 (2021-11-26)
+- Update Chromium to version 97
+
 ## 2.3.0 (2021-08-15)
 - Update Chromium to version 93
 

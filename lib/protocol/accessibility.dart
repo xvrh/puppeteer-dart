@@ -1,6 +1,7 @@
 import 'dart:async';
 import '../src/connection.dart';
 import 'dom.dart' as dom;
+import 'page.dart' as page;
 import 'runtime.dart' as runtime;
 
 class AccessibilityApi {
@@ -43,11 +44,16 @@ class AccessibilityApi {
   }
 
   /// Fetches the entire accessibility tree for the root Document
-  /// [max_depth] The maximum depth at which descendants of the root node should be retrieved.
+  /// [depth] The maximum depth at which descendants of the root node should be retrieved.
   /// If omitted, the full tree is returned.
-  Future<List<AXNodeData>> getFullAXTree({int? maxDepth}) async {
+  /// [frameId] The frame for whose document the AX tree should be retrieved.
+  /// If omited, the root frame is used.
+  Future<List<AXNodeData>> getFullAXTree(
+      {int? depth, @deprecated int? maxDepth, page.FrameId? frameId}) async {
     var result = await _client.send('Accessibility.getFullAXTree', {
+      if (depth != null) 'depth': depth,
       if (maxDepth != null) 'max_depth': maxDepth,
+      if (frameId != null) 'frameId': frameId,
     });
     return (result['nodes'] as List)
         .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
@@ -56,9 +62,13 @@ class AccessibilityApi {
 
   /// Fetches a particular accessibility node by AXNodeId.
   /// Requires `enable()` to have been called previously.
-  Future<List<AXNodeData>> getChildAXNodes(AXNodeId id) async {
+  /// [frameId] The frame in whose document the node resides.
+  /// If omitted, the root frame is used.
+  Future<List<AXNodeData>> getChildAXNodes(AXNodeId id,
+      {page.FrameId? frameId}) async {
     var result = await _client.send('Accessibility.getChildAXNodes', {
       'id': id,
+      if (frameId != null) 'frameId': frameId,
     });
     return (result['nodes'] as List)
         .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
@@ -213,6 +223,7 @@ class AXValueSourceType {
 
 /// Enum of possible native property sources (as a subtype of a particular AXValueSourceType).
 class AXValueNativeSourceType {
+  static const description = AXValueNativeSourceType._('description');
   static const figcaption = AXValueNativeSourceType._('figcaption');
   static const label = AXValueNativeSourceType._('label');
   static const labelfor = AXValueNativeSourceType._('labelfor');
@@ -223,6 +234,7 @@ class AXValueNativeSourceType {
   static const title = AXValueNativeSourceType._('title');
   static const other = AXValueNativeSourceType._('other');
   static const values = {
+    'description': description,
     'figcaption': figcaption,
     'label': label,
     'labelfor': labelfor,
@@ -480,6 +492,10 @@ class AXPropertyName {
   static const flowto = AXPropertyName._('flowto');
   static const labelledby = AXPropertyName._('labelledby');
   static const owns = AXPropertyName._('owns');
+  static const uninteresting = AXPropertyName._('uninteresting');
+  static const ariaHiddenElement = AXPropertyName._('ariaHiddenElement');
+  static const ariaHiddenSubtree = AXPropertyName._('ariaHiddenSubtree');
+  static const notRendered = AXPropertyName._('notRendered');
   static const values = {
     'busy': busy,
     'disabled': disabled,
@@ -520,6 +536,10 @@ class AXPropertyName {
     'flowto': flowto,
     'labelledby': labelledby,
     'owns': owns,
+    'uninteresting': uninteresting,
+    'ariaHiddenElement': ariaHiddenElement,
+    'ariaHiddenSubtree': ariaHiddenSubtree,
+    'notRendered': notRendered,
   };
 
   final String value;

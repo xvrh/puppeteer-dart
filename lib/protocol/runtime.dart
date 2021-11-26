@@ -241,16 +241,20 @@ class RuntimeApi {
   /// [accessorPropertiesOnly] If true, returns accessor properties (with getter/setter) only; internal properties are not
   /// returned either.
   /// [generatePreview] Whether preview should be generated for the results.
+  /// [nonIndexedPropertiesOnly] If true, returns non-indexed properties only.
   Future<GetPropertiesResult> getProperties(RemoteObjectId objectId,
       {bool? ownProperties,
       bool? accessorPropertiesOnly,
-      bool? generatePreview}) async {
+      bool? generatePreview,
+      bool? nonIndexedPropertiesOnly}) async {
     var result = await _client.send('Runtime.getProperties', {
       'objectId': objectId,
       if (ownProperties != null) 'ownProperties': ownProperties,
       if (accessorPropertiesOnly != null)
         'accessorPropertiesOnly': accessorPropertiesOnly,
       if (generatePreview != null) 'generatePreview': generatePreview,
+      if (nonIndexedPropertiesOnly != null)
+        'nonIndexedPropertiesOnly': nonIndexedPropertiesOnly,
     });
     return GetPropertiesResult.fromJson(result);
   }
@@ -501,12 +505,19 @@ class InspectRequestedEvent {
 
   final Map<String, dynamic> hints;
 
-  InspectRequestedEvent({required this.object, required this.hints});
+  /// Identifier of the context where the call was made.
+  final ExecutionContextId? executionContextId;
+
+  InspectRequestedEvent(
+      {required this.object, required this.hints, this.executionContextId});
 
   factory InspectRequestedEvent.fromJson(Map<String, dynamic> json) {
     return InspectRequestedEvent(
       object: RemoteObject.fromJson(json['object'] as Map<String, dynamic>),
       hints: json['hints'] as Map<String, dynamic>,
+      executionContextId: json.containsKey('executionContextId')
+          ? ExecutionContextId.fromJson(json['executionContextId'] as int)
+          : null,
     );
   }
 }
