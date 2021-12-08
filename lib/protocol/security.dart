@@ -302,13 +302,15 @@ class CertificateSecurityState {
       certificateNetworkError: json.containsKey('certificateNetworkError')
           ? json['certificateNetworkError'] as String
           : null,
-      certificateHasWeakSignature: json['certificateHasWeakSignature'] as bool,
-      certificateHasSha1Signature: json['certificateHasSha1Signature'] as bool,
-      modernSSL: json['modernSSL'] as bool,
-      obsoleteSslProtocol: json['obsoleteSslProtocol'] as bool,
-      obsoleteSslKeyExchange: json['obsoleteSslKeyExchange'] as bool,
-      obsoleteSslCipher: json['obsoleteSslCipher'] as bool,
-      obsoleteSslSignature: json['obsoleteSslSignature'] as bool,
+      certificateHasWeakSignature:
+          json['certificateHasWeakSignature'] as bool? ?? false,
+      certificateHasSha1Signature:
+          json['certificateHasSha1Signature'] as bool? ?? false,
+      modernSSL: json['modernSSL'] as bool? ?? false,
+      obsoleteSslProtocol: json['obsoleteSslProtocol'] as bool? ?? false,
+      obsoleteSslKeyExchange: json['obsoleteSslKeyExchange'] as bool? ?? false,
+      obsoleteSslCipher: json['obsoleteSslCipher'] as bool? ?? false,
+      obsoleteSslSignature: json['obsoleteSslSignature'] as bool? ?? false,
     );
   }
 
@@ -532,12 +534,13 @@ class InsecureContentStatus {
 
   factory InsecureContentStatus.fromJson(Map<String, dynamic> json) {
     return InsecureContentStatus(
-      ranMixedContent: json['ranMixedContent'] as bool,
-      displayedMixedContent: json['displayedMixedContent'] as bool,
-      containedMixedForm: json['containedMixedForm'] as bool,
-      ranContentWithCertErrors: json['ranContentWithCertErrors'] as bool,
+      ranMixedContent: json['ranMixedContent'] as bool? ?? false,
+      displayedMixedContent: json['displayedMixedContent'] as bool? ?? false,
+      containedMixedForm: json['containedMixedForm'] as bool? ?? false,
+      ranContentWithCertErrors:
+          json['ranContentWithCertErrors'] as bool? ?? false,
       displayedContentWithCertErrors:
-          json['displayedContentWithCertErrors'] as bool,
+          json['displayedContentWithCertErrors'] as bool? ?? false,
       ranInsecureContentStyle:
           SecurityState.fromJson(json['ranInsecureContentStyle'] as String),
       displayedInsecureContentStyle: SecurityState.fromJson(

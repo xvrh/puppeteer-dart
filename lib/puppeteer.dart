@@ -3,6 +3,7 @@ export 'protocol/dom.dart' show BoxModel;
 export 'protocol/input.dart' show MouseButton;
 export 'protocol/network.dart' show CookieParam, ResourceType, ErrorReason;
 export 'src/browser.dart' show Browser, BrowserContext, PermissionType;
+export 'src/browser_path.dart' show BrowserPath;
 export 'src/connection.dart' show ServerException, TargetClosedException;
 export 'src/downloader.dart' show downloadChrome, RevisionInfo;
 export 'src/page/accessibility.dart' show Accessibility, AXNode;

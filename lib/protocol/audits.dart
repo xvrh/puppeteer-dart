@@ -808,7 +808,7 @@ class ContentSecurityPolicyIssueDetails {
       blockedURL:
           json.containsKey('blockedURL') ? json['blockedURL'] as String : null,
       violatedDirective: json['violatedDirective'] as String,
-      isReportOnly: json['isReportOnly'] as bool,
+      isReportOnly: json['isReportOnly'] as bool? ?? false,
       contentSecurityPolicyViolationType:
           ContentSecurityPolicyViolationType.fromJson(
               json['contentSecurityPolicyViolationType'] as String),
@@ -887,7 +887,7 @@ class SharedArrayBufferIssueDetails {
     return SharedArrayBufferIssueDetails(
       sourceCodeLocation: SourceCodeLocation.fromJson(
           json['sourceCodeLocation'] as Map<String, dynamic>),
-      isWarning: json['isWarning'] as bool,
+      isWarning: json['isWarning'] as bool? ?? false,
       type: SharedArrayBufferIssueType.fromJson(json['type'] as String),
     );
   }
@@ -1064,7 +1064,7 @@ class CorsIssueDetails {
     return CorsIssueDetails(
       corsErrorStatus: network.CorsErrorStatus.fromJson(
           json['corsErrorStatus'] as Map<String, dynamic>),
-      isWarning: json['isWarning'] as bool,
+      isWarning: json['isWarning'] as bool? ?? false,
       request:
           AffectedRequest.fromJson(json['request'] as Map<String, dynamic>),
       location: json.containsKey('location')
@@ -1223,7 +1223,7 @@ class QuirksModeIssueDetails {
 
   factory QuirksModeIssueDetails.fromJson(Map<String, dynamic> json) {
     return QuirksModeIssueDetails(
-      isLimitedQuirksMode: json['isLimitedQuirksMode'] as bool,
+      isLimitedQuirksMode: json['isLimitedQuirksMode'] as bool? ?? false,
       documentNodeId: dom.BackendNodeId.fromJson(json['documentNodeId'] as int),
       url: json['url'] as String,
       frameId: page.FrameId.fromJson(json['frameId'] as String),
@@ -1288,7 +1288,7 @@ class WasmCrossOriginModuleSharingIssueDetails {
       wasmModuleUrl: json['wasmModuleUrl'] as String,
       sourceOrigin: json['sourceOrigin'] as String,
       targetOrigin: json['targetOrigin'] as String,
-      isWarning: json['isWarning'] as bool,
+      isWarning: json['isWarning'] as bool? ?? false,
     );
   }
 

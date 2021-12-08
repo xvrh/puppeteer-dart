@@ -1002,7 +1002,7 @@ class ObjectPreview {
       description: json.containsKey('description')
           ? json['description'] as String
           : null,
-      overflow: json['overflow'] as bool,
+      overflow: json['overflow'] as bool? ?? false,
       properties: (json['properties'] as List)
           .map((e) => PropertyPreview.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -1365,8 +1365,8 @@ class PropertyDescriptor {
       set: json.containsKey('set')
           ? RemoteObject.fromJson(json['set'] as Map<String, dynamic>)
           : null,
-      configurable: json['configurable'] as bool,
-      enumerable: json['enumerable'] as bool,
+      configurable: json['configurable'] as bool? ?? false,
+      enumerable: json['enumerable'] as bool? ?? false,
       wasThrown:
           json.containsKey('wasThrown') ? json['wasThrown'] as bool : null,
       isOwn: json.containsKey('isOwn') ? json['isOwn'] as bool : null,

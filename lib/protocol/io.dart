@@ -59,7 +59,7 @@ class ReadResult {
           ? json['base64Encoded'] as bool
           : null,
       data: json['data'] as String,
-      eof: json['eof'] as bool,
+      eof: json['eof'] as bool? ?? false,
     );
   }
 }

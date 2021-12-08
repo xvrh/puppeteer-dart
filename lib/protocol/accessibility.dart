@@ -608,7 +608,7 @@ class AXNodeData {
   factory AXNodeData.fromJson(Map<String, dynamic> json) {
     return AXNodeData(
       nodeId: AXNodeId.fromJson(json['nodeId'] as String),
-      ignored: json['ignored'] as bool,
+      ignored: json['ignored'] as bool? ?? false,
       ignoredReasons: json.containsKey('ignoredReasons')
           ? (json['ignoredReasons'] as List)
               .map((e) => AXProperty.fromJson(e as Map<String, dynamic>))

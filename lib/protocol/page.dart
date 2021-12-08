@@ -1024,7 +1024,7 @@ class JavascriptDialogClosedEvent {
 
   factory JavascriptDialogClosedEvent.fromJson(Map<String, dynamic> json) {
     return JavascriptDialogClosedEvent(
-      result: json['result'] as bool,
+      result: json['result'] as bool? ?? false,
       userInput: json['userInput'] as String,
     );
   }
@@ -1060,7 +1060,7 @@ class JavascriptDialogOpeningEvent {
       url: json['url'] as String,
       message: json['message'] as String,
       type: DialogType.fromJson(json['type'] as String),
-      hasBrowserHandler: json['hasBrowserHandler'] as bool,
+      hasBrowserHandler: json['hasBrowserHandler'] as bool? ?? false,
       defaultPrompt: json.containsKey('defaultPrompt')
           ? json['defaultPrompt'] as String
           : null,
@@ -1187,7 +1187,7 @@ class WindowOpenEvent {
       windowName: json['windowName'] as String,
       windowFeatures:
           (json['windowFeatures'] as List).map((e) => e as String).toList(),
-      userGesture: json['userGesture'] as bool,
+      userGesture: json['userGesture'] as bool? ?? false,
     );
   }
 }
@@ -1317,7 +1317,7 @@ class GetResourceContentResult {
   factory GetResourceContentResult.fromJson(Map<String, dynamic> json) {
     return GetResourceContentResult(
       content: json['content'] as String,
-      base64Encoded: json['base64Encoded'] as bool,
+      base64Encoded: json['base64Encoded'] as bool? ?? false,
     );
   }
 }
@@ -1801,7 +1801,7 @@ class PermissionsPolicyFeatureState {
   factory PermissionsPolicyFeatureState.fromJson(Map<String, dynamic> json) {
     return PermissionsPolicyFeatureState(
       feature: PermissionsPolicyFeature.fromJson(json['feature'] as String),
-      allowed: json['allowed'] as bool,
+      allowed: json['allowed'] as bool? ?? false,
       locator: json.containsKey('locator')
           ? PermissionsPolicyBlockLocator.fromJson(
               json['locator'] as Map<String, dynamic>)
@@ -1954,10 +1954,10 @@ class OriginTrialToken {
   factory OriginTrialToken.fromJson(Map<String, dynamic> json) {
     return OriginTrialToken(
       origin: json['origin'] as String,
-      matchSubDomains: json['matchSubDomains'] as bool,
+      matchSubDomains: json['matchSubDomains'] as bool? ?? false,
       trialName: json['trialName'] as String,
       expiryTime: network.TimeSinceEpoch.fromJson(json['expiryTime'] as num),
-      isThirdParty: json['isThirdParty'] as bool,
+      isThirdParty: json['isThirdParty'] as bool? ?? false,
       usageRestriction: OriginTrialUsageRestriction.fromJson(
           json['usageRestriction'] as String),
     );

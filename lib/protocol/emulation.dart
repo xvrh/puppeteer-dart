@@ -569,7 +569,7 @@ class UserAgentMetadata {
       platformVersion: json['platformVersion'] as String,
       architecture: json['architecture'] as String,
       model: json['model'] as String,
-      mobile: json['mobile'] as bool,
+      mobile: json['mobile'] as bool? ?? false,
     );
   }
 

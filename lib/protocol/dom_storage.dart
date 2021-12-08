@@ -140,7 +140,7 @@ class StorageId {
   factory StorageId.fromJson(Map<String, dynamic> json) {
     return StorageId(
       securityOrigin: json['securityOrigin'] as String,
-      isLocalStorage: json['isLocalStorage'] as bool,
+      isLocalStorage: json['isLocalStorage'] as bool? ?? false,
     );
   }
 

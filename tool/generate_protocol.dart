@@ -609,7 +609,11 @@ class _InternalType {
 
     if (jsonTypes.contains(type) && parameter.enumValues == null) {
       if (withAs) {
-        return '$jsonParameter as ${context.getPropertyType(parameter)}';
+        var propertyType = context.getPropertyType(parameter);
+        if (!parameter.optional && propertyType == 'bool') {
+          return '$jsonParameter as $propertyType? ?? false';
+        }
+        return '$jsonParameter as $propertyType';
       } else {
         assert(jsonParameter.isNotEmpty);
         return jsonParameter;
@@ -746,9 +750,10 @@ String _castForParameter(_DomainContext context, Parameter parameter) {
 }
 
 void _applyTemporaryFixes(List<Domain> domains) {
-  var accessiblityDomain = domains.firstWhere((e) => e.name == 'Accessibility');
+  var accessibilityDomain =
+      domains.firstWhere((e) => e.name == 'Accessibility');
   var axPropertyName =
-      accessiblityDomain.types.firstWhere((e) => e.id == 'AXPropertyName');
+      accessibilityDomain.types.firstWhere((e) => e.id == 'AXPropertyName');
   var axPropertyNameEnums = axPropertyName.enums!;
   var newAxPropertyNames = const [
     'uninteresting',

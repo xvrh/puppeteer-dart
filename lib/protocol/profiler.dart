@@ -403,7 +403,7 @@ class FunctionCoverage {
       ranges: (json['ranges'] as List)
           .map((e) => CoverageRange.fromJson(e as Map<String, dynamic>))
           .toList(),
-      isBlockCoverage: json['isBlockCoverage'] as bool,
+      isBlockCoverage: json['isBlockCoverage'] as bool? ?? false,
     );
   }
 

@@ -143,7 +143,7 @@ class TracingCompleteEvent {
 
   factory TracingCompleteEvent.fromJson(Map<String, dynamic> json) {
     return TracingCompleteEvent(
-      dataLossOccurred: json['dataLossOccurred'] as bool,
+      dataLossOccurred: json['dataLossOccurred'] as bool? ?? false,
       stream: json.containsKey('stream')
           ? io.StreamHandle.fromJson(json['stream'] as String)
           : null,
@@ -169,7 +169,7 @@ class RequestMemoryDumpResult {
   factory RequestMemoryDumpResult.fromJson(Map<String, dynamic> json) {
     return RequestMemoryDumpResult(
       dumpGuid: json['dumpGuid'] as String,
-      success: json['success'] as bool,
+      success: json['success'] as bool? ?? false,
     );
   }
 }

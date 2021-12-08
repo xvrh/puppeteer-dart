@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.5.0 (2021-12-08)
+- Add `BrowserPath` to have access to installed browser executable path.
+```dart
+var browser = await puppeteer.launch(executablePath: BrowserPath.chromeCanary);
+```
+
+- Fix bug to make current version work with chrome stable 96
+
 ## 2.4.0 (2021-11-26)
 - Update Chromium to version 97
 

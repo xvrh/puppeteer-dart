@@ -824,7 +824,7 @@ class RequestInterceptedEvent {
       request: RequestData.fromJson(json['request'] as Map<String, dynamic>),
       frameId: page.FrameId.fromJson(json['frameId'] as String),
       resourceType: ResourceType.fromJson(json['resourceType'] as String),
-      isNavigationRequest: json['isNavigationRequest'] as bool,
+      isNavigationRequest: json['isNavigationRequest'] as bool? ?? false,
       isDownload:
           json.containsKey('isDownload') ? json['isDownload'] as bool : null,
       redirectUrl: json.containsKey('redirectUrl')
@@ -912,7 +912,7 @@ class RequestWillBeSentEvent {
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
       wallTime: TimeSinceEpoch.fromJson(json['wallTime'] as num),
       initiator: Initiator.fromJson(json['initiator'] as Map<String, dynamic>),
-      redirectHasExtraInfo: json['redirectHasExtraInfo'] as bool,
+      redirectHasExtraInfo: json['redirectHasExtraInfo'] as bool? ?? false,
       redirectResponse: json.containsKey('redirectResponse')
           ? ResponseData.fromJson(
               json['redirectResponse'] as Map<String, dynamic>)
@@ -1010,7 +1010,7 @@ class ResponseReceivedEvent {
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
       type: ResourceType.fromJson(json['type'] as String),
       response: ResponseData.fromJson(json['response'] as Map<String, dynamic>),
-      hasExtraInfo: json['hasExtraInfo'] as bool,
+      hasExtraInfo: json['hasExtraInfo'] as bool? ?? false,
       frameId: json.containsKey('frameId')
           ? page.FrameId.fromJson(json['frameId'] as String)
           : null,
@@ -1510,7 +1510,7 @@ class GetResponseBodyResult {
   factory GetResponseBodyResult.fromJson(Map<String, dynamic> json) {
     return GetResponseBodyResult(
       body: json['body'] as String,
-      base64Encoded: json['base64Encoded'] as bool,
+      base64Encoded: json['base64Encoded'] as bool? ?? false,
     );
   }
 }
@@ -1529,7 +1529,7 @@ class GetResponseBodyForInterceptionResult {
       Map<String, dynamic> json) {
     return GetResponseBodyForInterceptionResult(
       body: json['body'] as String,
-      base64Encoded: json['base64Encoded'] as bool,
+      base64Encoded: json['base64Encoded'] as bool? ?? false,
     );
   }
 }
@@ -2848,7 +2848,7 @@ class ResponseData {
       requestHeaders: json.containsKey('requestHeaders')
           ? Headers.fromJson(json['requestHeaders'] as Map<String, dynamic>)
           : null,
-      connectionReused: json['connectionReused'] as bool,
+      connectionReused: json['connectionReused'] as bool? ?? false,
       connectionId: json['connectionId'] as num,
       remoteIPAddress: json.containsKey('remoteIPAddress')
           ? json['remoteIPAddress'] as String
@@ -3015,7 +3015,7 @@ class WebSocketFrame {
   factory WebSocketFrame.fromJson(Map<String, dynamic> json) {
     return WebSocketFrame(
       opcode: json['opcode'] as num,
-      mask: json['mask'] as bool,
+      mask: json['mask'] as bool? ?? false,
       payloadData: json['payloadData'] as String,
     );
   }
@@ -3235,14 +3235,14 @@ class Cookie {
       path: json['path'] as String,
       expires: json['expires'] as num,
       size: json['size'] as int,
-      httpOnly: json['httpOnly'] as bool,
-      secure: json['secure'] as bool,
-      session: json['session'] as bool,
+      httpOnly: json['httpOnly'] as bool? ?? false,
+      secure: json['secure'] as bool? ?? false,
+      session: json['session'] as bool? ?? false,
       sameSite: json.containsKey('sameSite')
           ? CookieSameSite.fromJson(json['sameSite'] as String)
           : null,
       priority: CookiePriority.fromJson(json['priority'] as String),
-      sameParty: json['sameParty'] as bool,
+      sameParty: json['sameParty'] as bool? ?? false,
       sourceScheme: CookieSourceScheme.fromJson(json['sourceScheme'] as String),
       sourcePort: json['sourcePort'] as int,
     );
@@ -4157,7 +4157,8 @@ class ClientSecurityState {
 
   factory ClientSecurityState.fromJson(Map<String, dynamic> json) {
     return ClientSecurityState(
-      initiatorIsSecureContext: json['initiatorIsSecureContext'] as bool,
+      initiatorIsSecureContext:
+          json['initiatorIsSecureContext'] as bool? ?? false,
       initiatorIPAddressSpace:
           IPAddressSpace.fromJson(json['initiatorIPAddressSpace'] as String),
       privateNetworkRequestPolicy: PrivateNetworkRequestPolicy.fromJson(
@@ -4495,7 +4496,7 @@ class LoadNetworkResourcePageResult {
 
   factory LoadNetworkResourcePageResult.fromJson(Map<String, dynamic> json) {
     return LoadNetworkResourcePageResult(
-      success: json['success'] as bool,
+      success: json['success'] as bool? ?? false,
       netError: json.containsKey('netError') ? json['netError'] as num : null,
       netErrorName: json.containsKey('netErrorName')
           ? json['netErrorName'] as String
@@ -4536,8 +4537,8 @@ class LoadNetworkResourceOptions {
 
   factory LoadNetworkResourceOptions.fromJson(Map<String, dynamic> json) {
     return LoadNetworkResourceOptions(
-      disableCache: json['disableCache'] as bool,
-      includeCredentials: json['includeCredentials'] as bool,
+      disableCache: json['disableCache'] as bool? ?? false,
+      includeCredentials: json['includeCredentials'] as bool? ?? false,
     );
   }
 
