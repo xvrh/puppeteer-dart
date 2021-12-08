@@ -286,7 +286,7 @@ class AttachedToTargetEvent {
       sessionId: SessionID.fromJson(json['sessionId'] as String),
       targetInfo:
           TargetInfo.fromJson(json['targetInfo'] as Map<String, dynamic>),
-      waitingForDebugger: json['waitingForDebugger'] as bool,
+      waitingForDebugger: json['waitingForDebugger'] as bool? ?? false,
     );
   }
 }
@@ -423,11 +423,11 @@ class TargetInfo {
       type: json['type'] as String,
       title: json['title'] as String,
       url: json['url'] as String,
-      attached: json['attached'] as bool,
+      attached: json['attached'] as bool? ?? false,
       openerId: json.containsKey('openerId')
           ? TargetID.fromJson(json['openerId'] as String)
           : null,
-      canAccessOpener: json['canAccessOpener'] as bool,
+      canAccessOpener: json['canAccessOpener'] as bool? ?? false,
       openerFrameId: json.containsKey('openerFrameId')
           ? page.FrameId.fromJson(json['openerFrameId'] as String)
           : null,

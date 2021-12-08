@@ -64,7 +64,7 @@ class RecordingStateChangedEvent {
 
   factory RecordingStateChangedEvent.fromJson(Map<String, dynamic> json) {
     return RecordingStateChangedEvent(
-      isRecording: json['isRecording'] as bool,
+      isRecording: json['isRecording'] as bool? ?? false,
       service: ServiceName.fromJson(json['service'] as String),
     );
   }

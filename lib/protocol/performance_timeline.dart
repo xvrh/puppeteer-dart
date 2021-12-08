@@ -133,7 +133,7 @@ class LayoutShift {
   factory LayoutShift.fromJson(Map<String, dynamic> json) {
     return LayoutShift(
       value: json['value'] as num,
-      hadRecentInput: json['hadRecentInput'] as bool,
+      hadRecentInput: json['hadRecentInput'] as bool? ?? false,
       lastInputTime:
           network.TimeSinceEpoch.fromJson(json['lastInputTime'] as num),
       sources: (json['sources'] as List)

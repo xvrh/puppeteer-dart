@@ -148,7 +148,7 @@ class ServiceWorkerRegistration {
     return ServiceWorkerRegistration(
       registrationId: RegistrationID.fromJson(json['registrationId'] as String),
       scopeURL: json['scopeURL'] as String,
-      isDeleted: json['isDeleted'] as bool,
+      isDeleted: json['isDeleted'] as bool? ?? false,
     );
   }
 

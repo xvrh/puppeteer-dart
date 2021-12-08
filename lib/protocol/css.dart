@@ -724,13 +724,13 @@ class CSSStyleSheetHeader {
       ownerNode: json.containsKey('ownerNode')
           ? dom.BackendNodeId.fromJson(json['ownerNode'] as int)
           : null,
-      disabled: json['disabled'] as bool,
+      disabled: json['disabled'] as bool? ?? false,
       hasSourceURL: json.containsKey('hasSourceURL')
           ? json['hasSourceURL'] as bool
           : null,
-      isInline: json['isInline'] as bool,
-      isMutable: json['isMutable'] as bool,
-      isConstructed: json['isConstructed'] as bool,
+      isInline: json['isInline'] as bool? ?? false,
+      isMutable: json['isMutable'] as bool? ?? false,
+      isConstructed: json['isConstructed'] as bool? ?? false,
       startLine: json['startLine'] as num,
       startColumn: json['startColumn'] as num,
       length: json['length'] as num,
@@ -854,7 +854,7 @@ class RuleUsage {
       styleSheetId: StyleSheetId.fromJson(json['styleSheetId'] as String),
       startOffset: json['startOffset'] as num,
       endOffset: json['endOffset'] as num,
-      used: json['used'] as bool,
+      used: json['used'] as bool? ?? false,
     );
   }
 
@@ -1192,7 +1192,7 @@ class MediaQuery {
       expressions: (json['expressions'] as List)
           .map((e) => MediaQueryExpression.fromJson(e as Map<String, dynamic>))
           .toList(),
-      active: json['active'] as bool,
+      active: json['active'] as bool? ?? false,
     );
   }
 
@@ -1313,7 +1313,7 @@ class PlatformFontUsage {
   factory PlatformFontUsage.fromJson(Map<String, dynamic> json) {
     return PlatformFontUsage(
       familyName: json['familyName'] as String,
-      isCustomFont: json['isCustomFont'] as bool,
+      isCustomFont: json['isCustomFont'] as bool? ?? false,
       glyphCount: json['glyphCount'] as num,
     );
   }

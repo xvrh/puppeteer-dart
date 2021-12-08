@@ -338,7 +338,7 @@ class Credential {
   factory Credential.fromJson(Map<String, dynamic> json) {
     return Credential(
       credentialId: json['credentialId'] as String,
-      isResidentCredential: json['isResidentCredential'] as bool,
+      isResidentCredential: json['isResidentCredential'] as bool? ?? false,
       rpId: json.containsKey('rpId') ? json['rpId'] as String : null,
       privateKey: json['privateKey'] as String,
       userHandle:

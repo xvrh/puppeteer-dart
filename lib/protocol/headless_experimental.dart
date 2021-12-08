@@ -66,7 +66,7 @@ class BeginFrameResult {
 
   factory BeginFrameResult.fromJson(Map<String, dynamic> json) {
     return BeginFrameResult(
-      hasDamage: json['hasDamage'] as bool,
+      hasDamage: json['hasDamage'] as bool? ?? false,
       screenshotData: json.containsKey('screenshotData')
           ? json['screenshotData'] as String
           : null,

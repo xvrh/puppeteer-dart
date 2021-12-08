@@ -216,7 +216,7 @@ class GetUsageAndQuotaResult {
     return GetUsageAndQuotaResult(
       usage: json['usage'] as num,
       quota: json['quota'] as num,
-      overrideActive: json['overrideActive'] as bool,
+      overrideActive: json['overrideActive'] as bool? ?? false,
       usageBreakdown: (json['usageBreakdown'] as List)
           .map((e) => UsageForType.fromJson(e as Map<String, dynamic>))
           .toList(),

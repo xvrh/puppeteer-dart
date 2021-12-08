@@ -299,7 +299,7 @@ class GetResponseBodyResult {
   factory GetResponseBodyResult.fromJson(Map<String, dynamic> json) {
     return GetResponseBodyResult(
       body: json['body'] as String,
-      base64Encoded: json['base64Encoded'] as bool,
+      base64Encoded: json['base64Encoded'] as bool? ?? false,
     );
   }
 }

@@ -135,7 +135,7 @@ class RequestDataResult {
       objectStoreDataEntries: (json['objectStoreDataEntries'] as List)
           .map((e) => DataEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
-      hasMore: json['hasMore'] as bool,
+      hasMore: json['hasMore'] as bool? ?? false,
     );
   }
 }
@@ -218,7 +218,7 @@ class ObjectStore {
     return ObjectStore(
       name: json['name'] as String,
       keyPath: KeyPath.fromJson(json['keyPath'] as Map<String, dynamic>),
-      autoIncrement: json['autoIncrement'] as bool,
+      autoIncrement: json['autoIncrement'] as bool? ?? false,
       indexes: (json['indexes'] as List)
           .map((e) => ObjectStoreIndex.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -259,8 +259,8 @@ class ObjectStoreIndex {
     return ObjectStoreIndex(
       name: json['name'] as String,
       keyPath: KeyPath.fromJson(json['keyPath'] as Map<String, dynamic>),
-      unique: json['unique'] as bool,
-      multiEntry: json['multiEntry'] as bool,
+      unique: json['unique'] as bool? ?? false,
+      multiEntry: json['multiEntry'] as bool? ?? false,
     );
   }
 
@@ -377,8 +377,8 @@ class KeyRange {
       upper: json.containsKey('upper')
           ? Key.fromJson(json['upper'] as Map<String, dynamic>)
           : null,
-      lowerOpen: json['lowerOpen'] as bool,
-      upperOpen: json['upperOpen'] as bool,
+      lowerOpen: json['lowerOpen'] as bool? ?? false,
+      upperOpen: json['upperOpen'] as bool? ?? false,
     );
   }
 

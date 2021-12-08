@@ -412,7 +412,7 @@ class Layer {
       anchorY: json.containsKey('anchorY') ? json['anchorY'] as num : null,
       anchorZ: json.containsKey('anchorZ') ? json['anchorZ'] as num : null,
       paintCount: json['paintCount'] as int,
-      drawsContent: json['drawsContent'] as bool,
+      drawsContent: json['drawsContent'] as bool? ?? false,
       invisible:
           json.containsKey('invisible') ? json['invisible'] as bool : null,
       scrollRects: json.containsKey('scrollRects')

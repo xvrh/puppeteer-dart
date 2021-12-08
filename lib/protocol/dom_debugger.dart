@@ -223,9 +223,9 @@ class EventListener {
   factory EventListener.fromJson(Map<String, dynamic> json) {
     return EventListener(
       type: json['type'] as String,
-      useCapture: json['useCapture'] as bool,
-      passive: json['passive'] as bool,
-      once: json['once'] as bool,
+      useCapture: json['useCapture'] as bool? ?? false,
+      passive: json['passive'] as bool? ?? false,
+      once: json['once'] as bool? ?? false,
       scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
       lineNumber: json['lineNumber'] as int,
       columnNumber: json['columnNumber'] as int,

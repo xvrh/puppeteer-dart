@@ -160,7 +160,7 @@ class Animation {
     return Animation(
       id: json['id'] as String,
       name: json['name'] as String,
-      pausedState: json['pausedState'] as bool,
+      pausedState: json['pausedState'] as bool? ?? false,
       playState: json['playState'] as String,
       playbackRate: json['playbackRate'] as num,
       startTime: json['startTime'] as num,
