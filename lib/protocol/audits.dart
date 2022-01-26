@@ -1116,6 +1116,16 @@ class AttributionReportingIssueType {
   static const attributionEventSourceTriggerDataTooLarge =
       AttributionReportingIssueType._(
           'AttributionEventSourceTriggerDataTooLarge');
+  static const invalidAttributionSourceExpiry =
+      AttributionReportingIssueType._('InvalidAttributionSourceExpiry');
+  static const invalidAttributionSourcePriority =
+      AttributionReportingIssueType._('InvalidAttributionSourcePriority');
+  static const invalidEventSourceTriggerData =
+      AttributionReportingIssueType._('InvalidEventSourceTriggerData');
+  static const invalidTriggerPriority =
+      AttributionReportingIssueType._('InvalidTriggerPriority');
+  static const invalidTriggerDedupKey =
+      AttributionReportingIssueType._('InvalidTriggerDedupKey');
   static const values = {
     'PermissionPolicyDisabled': permissionPolicyDisabled,
     'InvalidAttributionSourceEventId': invalidAttributionSourceEventId,
@@ -1126,6 +1136,11 @@ class AttributionReportingIssueType {
     'AttributionTriggerDataTooLarge': attributionTriggerDataTooLarge,
     'AttributionEventSourceTriggerDataTooLarge':
         attributionEventSourceTriggerDataTooLarge,
+    'InvalidAttributionSourceExpiry': invalidAttributionSourceExpiry,
+    'InvalidAttributionSourcePriority': invalidAttributionSourcePriority,
+    'InvalidEventSourceTriggerData': invalidEventSourceTriggerData,
+    'InvalidTriggerPriority': invalidTriggerPriority,
+    'InvalidTriggerDedupKey': invalidTriggerDedupKey,
   };
 
   final String value;

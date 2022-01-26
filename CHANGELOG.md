@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.6.0 (2022-01-26)
+- Update to Chromium 98
+
 ## 2.5.0 (2021-12-08)
 - Add `BrowserPath` to have access to installed browser executable path.
 ```dart

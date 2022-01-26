@@ -9,6 +9,20 @@ class AccessibilityApi {
 
   AccessibilityApi(this._client);
 
+  /// The loadComplete event mirrors the load complete event sent by the browser to assistive
+  /// technology when the web page has finished loading.
+  Stream<AXNodeData> get onLoadComplete => _client.onEvent
+      .where((event) => event.name == 'Accessibility.loadComplete')
+      .map((event) => AXNodeData.fromJson(
+          event.parameters['root'] as Map<String, dynamic>));
+
+  /// The nodesUpdated event is sent every time a previously requested node has changed the in tree.
+  Stream<List<AXNodeData>> get onNodesUpdated => _client.onEvent
+      .where((event) => event.name == 'Accessibility.nodesUpdated')
+      .map((event) => (event.parameters['nodes'] as List)
+          .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
+          .toList());
+
   /// Disables the accessibility domain.
   Future<void> disable() async {
     await _client.send('Accessibility.disable');
@@ -54,6 +68,36 @@ class AccessibilityApi {
       if (depth != null) 'depth': depth,
       if (maxDepth != null) 'max_depth': maxDepth,
       if (frameId != null) 'frameId': frameId,
+    });
+    return (result['nodes'] as List)
+        .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Fetches the root node.
+  /// Requires `enable()` to have been called previously.
+  /// [frameId] The frame in whose document the node resides.
+  /// If omitted, the root frame is used.
+  Future<AXNodeData> getRootAXNode({page.FrameId? frameId}) async {
+    var result = await _client.send('Accessibility.getRootAXNode', {
+      if (frameId != null) 'frameId': frameId,
+    });
+    return AXNodeData.fromJson(result['node'] as Map<String, dynamic>);
+  }
+
+  /// Fetches a node and all ancestors up to and including the root.
+  /// Requires `enable()` to have been called previously.
+  /// [nodeId] Identifier of the node to get.
+  /// [backendNodeId] Identifier of the backend node to get.
+  /// [objectId] JavaScript object id of the node wrapper to get.
+  Future<List<AXNodeData>> getAXNodeAndAncestors(
+      {dom.NodeId? nodeId,
+      dom.BackendNodeId? backendNodeId,
+      runtime.RemoteObjectId? objectId}) async {
+    var result = await _client.send('Accessibility.getAXNodeAndAncestors', {
+      if (nodeId != null) 'nodeId': nodeId,
+      if (backendNodeId != null) 'backendNodeId': backendNodeId,
+      if (objectId != null) 'objectId': objectId,
     });
     return (result['nodes'] as List)
         .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
@@ -587,11 +631,17 @@ class AXNodeData {
   /// All other properties
   final List<AXProperty>? properties;
 
+  /// ID for this node's parent.
+  final AXNodeId? parentId;
+
   /// IDs for each of this node's child nodes.
   final List<AXNodeId>? childIds;
 
   /// The backend ID for the associated DOM node, if any.
   final dom.BackendNodeId? backendDOMNodeId;
+
+  /// The frame ID for the frame associated with this nodes document.
+  final page.FrameId? frameId;
 
   AXNodeData(
       {required this.nodeId,
@@ -602,8 +652,10 @@ class AXNodeData {
       this.description,
       this.value,
       this.properties,
+      this.parentId,
       this.childIds,
-      this.backendDOMNodeId});
+      this.backendDOMNodeId,
+      this.frameId});
 
   factory AXNodeData.fromJson(Map<String, dynamic> json) {
     return AXNodeData(
@@ -631,6 +683,9 @@ class AXNodeData {
               .map((e) => AXProperty.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
+      parentId: json.containsKey('parentId')
+          ? AXNodeId.fromJson(json['parentId'] as String)
+          : null,
       childIds: json.containsKey('childIds')
           ? (json['childIds'] as List)
               .map((e) => AXNodeId.fromJson(e as String))
@@ -638,6 +693,9 @@ class AXNodeData {
           : null,
       backendDOMNodeId: json.containsKey('backendDOMNodeId')
           ? dom.BackendNodeId.fromJson(json['backendDOMNodeId'] as int)
+          : null,
+      frameId: json.containsKey('frameId')
+          ? page.FrameId.fromJson(json['frameId'] as String)
           : null,
     );
   }
@@ -654,10 +712,12 @@ class AXNodeData {
       if (value != null) 'value': value!.toJson(),
       if (properties != null)
         'properties': properties!.map((e) => e.toJson()).toList(),
+      if (parentId != null) 'parentId': parentId!.toJson(),
       if (childIds != null)
         'childIds': childIds!.map((e) => e.toJson()).toList(),
       if (backendDOMNodeId != null)
         'backendDOMNodeId': backendDOMNodeId!.toJson(),
+      if (frameId != null) 'frameId': frameId!.toJson(),
     };
   }
 }

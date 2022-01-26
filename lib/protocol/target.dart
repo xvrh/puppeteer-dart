@@ -110,15 +110,22 @@ class TargetApi {
   /// [disposeOnDetach] If specified, disposes this context when debugging session disconnects.
   /// [proxyServer] Proxy server, similar to the one passed to --proxy-server
   /// [proxyBypassList] Proxy bypass list, similar to the one passed to --proxy-bypass-list
+  /// [originsWithUniversalNetworkAccess] An optional list of origins to grant unlimited cross-origin access to.
+  /// Parts of the URL other than those constituting origin are ignored.
   /// Returns: The id of the context created.
   Future<browser.BrowserContextID> createBrowserContext(
       {bool? disposeOnDetach,
       String? proxyServer,
-      String? proxyBypassList}) async {
+      String? proxyBypassList,
+      List<String>? originsWithUniversalNetworkAccess}) async {
     var result = await _client.send('Target.createBrowserContext', {
       if (disposeOnDetach != null) 'disposeOnDetach': disposeOnDetach,
       if (proxyServer != null) 'proxyServer': proxyServer,
       if (proxyBypassList != null) 'proxyBypassList': proxyBypassList,
+      if (originsWithUniversalNetworkAccess != null)
+        'originsWithUniversalNetworkAccess': [
+          ...originsWithUniversalNetworkAccess
+        ],
     });
     return browser.BrowserContextID.fromJson(
         result['browserContextId'] as String);

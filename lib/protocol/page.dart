@@ -791,6 +791,16 @@ class PageApi {
     await _client.send('Page.clearCompilationCache');
   }
 
+  /// Sets the Secure Payment Confirmation transaction mode.
+  /// https://w3c.github.io/secure-payment-confirmation/#sctn-automation-set-spc-transaction-mode
+  Future<void> setSPCTransactionMode(
+      @Enum(['none', 'autoaccept', 'autoreject']) String mode) async {
+    assert(const ['none', 'autoaccept', 'autoreject'].contains(mode));
+    await _client.send('Page.setSPCTransactionMode', {
+      'mode': mode,
+    });
+  }
+
   /// Generates a report for testing.
   /// [message] Message to be displayed in the report.
   /// [group] Specifies the endpoint group to deliver the report to.
@@ -1597,6 +1607,8 @@ class PermissionsPolicyFeature {
   static const chUaMobile = PermissionsPolicyFeature._('ch-ua-mobile');
   static const chUaFullVersion =
       PermissionsPolicyFeature._('ch-ua-full-version');
+  static const chUaFullVersionList =
+      PermissionsPolicyFeature._('ch-ua-full-version-list');
   static const chUaPlatformVersion =
       PermissionsPolicyFeature._('ch-ua-platform-version');
   static const chUaReduced = PermissionsPolicyFeature._('ch-ua-reduced');
@@ -1627,6 +1639,8 @@ class PermissionsPolicyFeature {
   static const hid = PermissionsPolicyFeature._('hid');
   static const idleDetection = PermissionsPolicyFeature._('idle-detection');
   static const interestCohort = PermissionsPolicyFeature._('interest-cohort');
+  static const joinAdInterestGroup =
+      PermissionsPolicyFeature._('join-ad-interest-group');
   static const keyboardMap = PermissionsPolicyFeature._('keyboard-map');
   static const magnetometer = PermissionsPolicyFeature._('magnetometer');
   static const microphone = PermissionsPolicyFeature._('microphone');
@@ -1637,6 +1651,7 @@ class PermissionsPolicyFeature {
       PermissionsPolicyFeature._('picture-in-picture');
   static const publickeyCredentialsGet =
       PermissionsPolicyFeature._('publickey-credentials-get');
+  static const runAdAuction = PermissionsPolicyFeature._('run-ad-auction');
   static const screenWakeLock = PermissionsPolicyFeature._('screen-wake-lock');
   static const serial = PermissionsPolicyFeature._('serial');
   static const sharedAutofill = PermissionsPolicyFeature._('shared-autofill');
@@ -1670,6 +1685,7 @@ class PermissionsPolicyFeature {
     'ch-ua-model': chUaModel,
     'ch-ua-mobile': chUaMobile,
     'ch-ua-full-version': chUaFullVersion,
+    'ch-ua-full-version-list': chUaFullVersionList,
     'ch-ua-platform-version': chUaPlatformVersion,
     'ch-ua-reduced': chUaReduced,
     'ch-viewport-height': chViewportHeight,
@@ -1693,6 +1709,7 @@ class PermissionsPolicyFeature {
     'hid': hid,
     'idle-detection': idleDetection,
     'interest-cohort': interestCohort,
+    'join-ad-interest-group': joinAdInterestGroup,
     'keyboard-map': keyboardMap,
     'magnetometer': magnetometer,
     'microphone': microphone,
@@ -1701,6 +1718,7 @@ class PermissionsPolicyFeature {
     'payment': payment,
     'picture-in-picture': pictureInPicture,
     'publickey-credentials-get': publickeyCredentialsGet,
+    'run-ad-auction': runAdAuction,
     'screen-wake-lock': screenWakeLock,
     'serial': serial,
     'shared-autofill': sharedAutofill,
@@ -3215,6 +3233,8 @@ class BackForwardCacheNotRestoredReason {
       BackForwardCacheNotRestoredReason._('ContentMediaSession');
   static const contentMediaSessionService =
       BackForwardCacheNotRestoredReason._('ContentMediaSessionService');
+  static const contentScreenReader =
+      BackForwardCacheNotRestoredReason._('ContentScreenReader');
   static const embedderPopupBlockerTabHelper =
       BackForwardCacheNotRestoredReason._('EmbedderPopupBlockerTabHelper');
   static const embedderSafeBrowsingTriggeredPopupBlocker =
@@ -3366,6 +3386,7 @@ class BackForwardCacheNotRestoredReason {
     'ContentWebUSB': contentWebUsb,
     'ContentMediaSession': contentMediaSession,
     'ContentMediaSessionService': contentMediaSessionService,
+    'ContentScreenReader': contentScreenReader,
     'EmbedderPopupBlockerTabHelper': embedderPopupBlockerTabHelper,
     'EmbedderSafeBrowsingTriggeredPopupBlocker':
         embedderSafeBrowsingTriggeredPopupBlocker,

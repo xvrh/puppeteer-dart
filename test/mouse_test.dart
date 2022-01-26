@@ -173,8 +173,8 @@ function dimensions() {
 
       await page.mouse.wheel(deltaY: -100);
       var boundingBoxAfter = (await elem.boundingBox)!;
-      expect(boundingBoxAfter.width, 230);
-      expect(boundingBoxAfter.height, 230);
+      expect(boundingBoxAfter.width, 345);
+      expect(boundingBoxAfter.height, 345);
     });
     test('should tween mouse movement', () async {
       await page.mouse.move(Point(100, 100));

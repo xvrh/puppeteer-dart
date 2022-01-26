@@ -23,7 +23,7 @@ class SecurityApi {
       .map((event) => VisibleSecurityState.fromJson(
           event.parameters['visibleSecurityState'] as Map<String, dynamic>));
 
-  /// The security state of the page changed.
+  /// The security state of the page changed. No longer being sent.
   Stream<SecurityStateChangedEvent> get onSecurityStateChanged =>
       _client.onEvent
           .where((event) => event.name == 'Security.securityStateChanged')
@@ -98,24 +98,11 @@ class SecurityStateChangedEvent {
   /// Security state.
   final SecurityState securityState;
 
-  /// List of explanations for the security state. If the overall security state is `insecure` or
-  /// `warning`, at least one corresponding explanation should be included.
-  final List<SecurityStateExplanation> explanations;
-
-  /// Overrides user-visible description of the state.
-  final String? summary;
-
-  SecurityStateChangedEvent(
-      {required this.securityState, required this.explanations, this.summary});
+  SecurityStateChangedEvent({required this.securityState});
 
   factory SecurityStateChangedEvent.fromJson(Map<String, dynamic> json) {
     return SecurityStateChangedEvent(
       securityState: SecurityState.fromJson(json['securityState'] as String),
-      explanations: (json['explanations'] as List)
-          .map((e) =>
-              SecurityStateExplanation.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      summary: json.containsKey('summary') ? json['summary'] as String : null,
     );
   }
 }

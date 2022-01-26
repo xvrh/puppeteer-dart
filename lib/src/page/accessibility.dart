@@ -454,7 +454,7 @@ class _AXNode {
 
   AXNode serialize() {
     AXProperty? findProperty(AXPropertyName name) =>
-        _payload.properties!.firstWhereOrNull((p) => p.name == name);
+        _payload.properties?.firstWhereOrNull((p) => p.name == name);
 
     String? stringValue(AXPropertyName name) {
       var property = findProperty(name);

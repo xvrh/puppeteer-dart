@@ -1450,7 +1450,12 @@
                         "AttributionSourceUntrustworthyOrigin",
                         "AttributionUntrustworthyOrigin",
                         "AttributionTriggerDataTooLarge",
-                        "AttributionEventSourceTriggerDataTooLarge"
+                        "AttributionEventSourceTriggerDataTooLarge",
+                        "InvalidAttributionSourceExpiry",
+                        "InvalidAttributionSourcePriority",
+                        "InvalidEventSourceTriggerData",
+                        "InvalidTriggerPriority",
+                        "InvalidTriggerDedupKey"
                     ]
                 },
                 {
@@ -1528,28 +1533,6 @@
                     ]
                 },
                 {
-                    "id": "WasmCrossOriginModuleSharingIssueDetails",
-                    "type": "object",
-                    "properties": [
-                        {
-                            "name": "wasmModuleUrl",
-                            "type": "string"
-                        },
-                        {
-                            "name": "sourceOrigin",
-                            "type": "string"
-                        },
-                        {
-                            "name": "targetOrigin",
-                            "type": "string"
-                        },
-                        {
-                            "name": "isWarning",
-                            "type": "boolean"
-                        }
-                    ]
-                },
-                {
                     "id": "GenericIssueErrorType",
                     "type": "string",
                     "enum": [
@@ -1593,6 +1576,33 @@
                             "deprecated": true,
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "deprecationType",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "id": "ClientHintIssueReason",
+                    "type": "string",
+                    "enum": [
+                        "MetaTagAllowListInvalidOrigin",
+                        "MetaTagModifiedHTML"
+                    ]
+                },
+                {
+                    "id": "ClientHintIssueDetails",
+                    "description": "This issue tracks client hints related issues. It's used to deprecate old\nfeatures, encourage the use of new ones, and provide general guidance.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "sourceCodeLocation",
+                            "$ref": "SourceCodeLocation"
+                        },
+                        {
+                            "name": "clientHintIssueReason",
+                            "$ref": "ClientHintIssueReason"
                         }
                     ]
                 },
@@ -1613,9 +1623,9 @@
                         "AttributionReportingIssue",
                         "QuirksModeIssue",
                         "NavigatorUserAgentIssue",
-                        "WasmCrossOriginModuleSharingIssue",
                         "GenericIssue",
-                        "DeprecationIssue"
+                        "DeprecationIssue",
+                        "ClientHintIssue"
                     ]
                 },
                 {
@@ -1684,11 +1694,6 @@
                             "$ref": "NavigatorUserAgentIssueDetails"
                         },
                         {
-                            "name": "wasmCrossOriginModuleSharingIssue",
-                            "optional": true,
-                            "$ref": "WasmCrossOriginModuleSharingIssueDetails"
-                        },
-                        {
                             "name": "genericIssueDetails",
                             "optional": true,
                             "$ref": "GenericIssueDetails"
@@ -1697,6 +1702,11 @@
                             "name": "deprecationIssueDetails",
                             "optional": true,
                             "$ref": "DeprecationIssueDetails"
+                        },
+                        {
+                            "name": "clientHintIssueDetails",
+                            "optional": true,
+                            "$ref": "ClientHintIssueDetails"
                         }
                     ]
                 },
@@ -4203,6 +4213,16 @@
                     ]
                 },
                 {
+                    "name": "startDesktopMirroring",
+                    "description": "Starts mirroring the desktop to the sink.",
+                    "parameters": [
+                        {
+                            "name": "sinkName",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
                     "name": "startTabMirroring",
                     "description": "Starts mirroring the tab to the sink.",
                     "parameters": [
@@ -4311,7 +4331,11 @@
                         "scrollbar-track-piece",
                         "scrollbar-corner",
                         "resizer",
-                        "input-list-button"
+                        "input-list-button",
+                        "transition",
+                        "transition-container",
+                        "transition-old-content",
+                        "transition-new-content"
                     ]
                 },
                 {
@@ -4820,7 +4844,20 @@
                 },
                 {
                     "name": "enable",
-                    "description": "Enables DOM agent for the given page."
+                    "description": "Enables DOM agent for the given page.",
+                    "parameters": [
+                        {
+                            "name": "includeWhitespace",
+                            "description": "Whether to include whitespaces in the children array of returned Nodes.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "string",
+                            "enum": [
+                                "none",
+                                "all"
+                            ]
+                        }
+                    ]
                 },
                 {
                     "name": "focus",
@@ -8934,7 +8971,7 @@
                         },
                         {
                             "name": "commands",
-                            "description": "Editing commands to send with the key event (e.g., 'selectAll') (default: []).\nThese are related to but not equal the command names used in `document.execCommand` and NSStandardKeyBindingResponding.\nSee https://source.chromium.org/chromium/chromium/src/+/master:third_party/blink/renderer/core/editing/commands/editor_command_names.h for valid command names.",
+                            "description": "Editing commands to send with the key event (e.g., 'selectAll') (default: []).\nThese are related to but not equal the command names used in `document.execCommand` and NSStandardKeyBindingResponding.\nSee https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/editing/commands/editor_command_names.h for valid command names.",
                             "experimental": true,
                             "optional": true,
                             "type": "array",
@@ -10739,6 +10776,8 @@
                         "PreflightInvalidAllowCredentials",
                         "PreflightMissingAllowExternal",
                         "PreflightInvalidAllowExternal",
+                        "PreflightMissingAllowPrivateNetwork",
+                        "PreflightInvalidAllowPrivateNetwork",
                         "InvalidAllowMethodsPreflightResponse",
                         "InvalidAllowHeadersPreflightResponse",
                         "MethodDisallowedByPreflightResponse",
@@ -14468,7 +14507,8 @@
                 },
                 {
                     "name": "setShowHitTestBorders",
-                    "description": "Requests that backend shows hit-test borders on layers",
+                    "description": "Deprecated, no longer has any effect.",
+                    "deprecated": true,
                     "parameters": [
                         {
                             "name": "show",
@@ -14678,6 +14718,7 @@
                         "ch-ua-platform",
                         "ch-ua-model",
                         "ch-ua-mobile",
+                        "ch-ua-full",
                         "ch-ua-full-version",
                         "ch-ua-full-version-list",
                         "ch-ua-platform-version",
@@ -14733,7 +14774,8 @@
                     "type": "string",
                     "enum": [
                         "Header",
-                        "IframeAttribute"
+                        "IframeAttribute",
+                        "InFencedFrameTree"
                     ]
                 },
                 {
@@ -15386,6 +15428,24 @@
                     ]
                 },
                 {
+                    "id": "ScriptFontFamilies",
+                    "description": "Font families collection for a script.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "script",
+                            "description": "Name of the script which these font families are defined for.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "fontFamilies",
+                            "description": "Generic font families collection for the script.",
+                            "$ref": "FontFamilies"
+                        }
+                    ]
+                },
+                {
                     "id": "FontSizes",
                     "description": "Default font sizes.",
                     "experimental": true,
@@ -15520,7 +15580,7 @@
                     "experimental": true,
                     "type": "string",
                     "enum": [
-                        "NotMainFrame",
+                        "NotPrimaryMainFrame",
                         "BackForwardCacheDisabled",
                         "RelatedActiveContentsExist",
                         "HTTPStatusNotOK",
@@ -15627,6 +15687,7 @@
                         "ContentWebUSB",
                         "ContentMediaSession",
                         "ContentMediaSessionService",
+                        "ContentScreenReader",
                         "EmbedderPopupBlockerTabHelper",
                         "EmbedderSafeBrowsingTriggeredPopupBlocker",
                         "EmbedderSafeBrowsingThreatDetails",
@@ -15669,6 +15730,34 @@
                             "name": "reason",
                             "description": "Not restored reason",
                             "$ref": "BackForwardCacheNotRestoredReason"
+                        }
+                    ]
+                },
+                {
+                    "id": "BackForwardCacheNotRestoredExplanationTree",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "url",
+                            "description": "URL of each frame",
+                            "type": "string"
+                        },
+                        {
+                            "name": "explanations",
+                            "description": "Not restored reasons of each frame",
+                            "type": "array",
+                            "items": {
+                                "$ref": "BackForwardCacheNotRestoredExplanation"
+                            }
+                        },
+                        {
+                            "name": "children",
+                            "description": "Array of children frame",
+                            "type": "array",
+                            "items": {
+                                "$ref": "BackForwardCacheNotRestoredExplanationTree"
+                            }
                         }
                     ]
                 }
@@ -16556,6 +16645,15 @@
                             "name": "fontFamilies",
                             "description": "Specifies font families to set. If a font family is not specified, it won't be changed.",
                             "$ref": "FontFamilies"
+                        },
+                        {
+                            "name": "forScripts",
+                            "description": "Specifies font families to set for individual scripts.",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "ScriptFontFamilies"
+                            }
                         }
                     ]
                 },
@@ -17199,6 +17297,12 @@
                             "items": {
                                 "$ref": "BackForwardCacheNotRestoredExplanation"
                             }
+                        },
+                        {
+                            "name": "notRestoredExplanationsTree",
+                            "description": "Tree structure of reasons why the page could not be cached for each frame.",
+                            "optional": true,
+                            "$ref": "BackForwardCacheNotRestoredExplanationTree"
                         }
                     ]
                 },
@@ -18318,6 +18422,7 @@
                         "websql",
                         "service_workers",
                         "cache_storage",
+                        "interest_groups",
                         "all",
                         "other"
                     ]
@@ -18352,6 +18457,103 @@
                         {
                             "name": "count",
                             "type": "number"
+                        }
+                    ]
+                },
+                {
+                    "id": "InterestGroupAccessType",
+                    "description": "Enum of interest group access types.",
+                    "type": "string",
+                    "enum": [
+                        "join",
+                        "leave",
+                        "update",
+                        "bid",
+                        "win"
+                    ]
+                },
+                {
+                    "id": "InterestGroupAd",
+                    "description": "Ad advertising element inside an interest group.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "renderUrl",
+                            "type": "string"
+                        },
+                        {
+                            "name": "metadata",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "id": "InterestGroupDetails",
+                    "description": "The full details of an interest group.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "ownerOrigin",
+                            "type": "string"
+                        },
+                        {
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "name": "expirationTime",
+                            "$ref": "Network.TimeSinceEpoch"
+                        },
+                        {
+                            "name": "joiningOrigin",
+                            "type": "string"
+                        },
+                        {
+                            "name": "biddingUrl",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "biddingWasmHelperUrl",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "updateUrl",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "trustedBiddingSignalsUrl",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "trustedBiddingSignalsKeys",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        {
+                            "name": "userBiddingSignals",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "ads",
+                            "type": "array",
+                            "items": {
+                                "$ref": "InterestGroupAd"
+                            }
+                        },
+                        {
+                            "name": "adComponents",
+                            "type": "array",
+                            "items": {
+                                "$ref": "InterestGroupAd"
+                            }
                         }
                     ]
                 }
@@ -18556,6 +18758,38 @@
                             "type": "boolean"
                         }
                     ]
+                },
+                {
+                    "name": "getInterestGroupDetails",
+                    "description": "Gets details for a named interest group.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "ownerOrigin",
+                            "type": "string"
+                        },
+                        {
+                            "name": "name",
+                            "type": "string"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "details",
+                            "$ref": "InterestGroupDetails"
+                        }
+                    ]
+                },
+                {
+                    "name": "setInterestGroupTracking",
+                    "description": "Enables/Disables issuing of interestGroupAccessed events.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "enable",
+                            "type": "boolean"
+                        }
+                    ]
                 }
             ],
             "events": [
@@ -18614,6 +18848,28 @@
                         {
                             "name": "origin",
                             "description": "Origin to update.",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "interestGroupAccessed",
+                    "description": "One of the interest groups was accessed by the associated page.",
+                    "parameters": [
+                        {
+                            "name": "accessTime",
+                            "$ref": "Network.TimeSinceEpoch"
+                        },
+                        {
+                            "name": "type",
+                            "$ref": "InterestGroupAccessType"
+                        },
+                        {
+                            "name": "ownerOrigin",
+                            "type": "string"
+                        },
+                        {
+                            "name": "name",
                             "type": "string"
                         }
                     ]
@@ -20796,6 +21052,12 @@
                         {
                             "name": "hasCredBlob",
                             "description": "If set to true, the authenticator will support the credBlob extension.\nhttps://fidoalliance.org/specs/fido-v2.1-rd-20201208/fido-client-to-authenticator-protocol-v2.1-rd-20201208.html#sctn-credBlob-extension\nDefaults to false.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "hasMinPinLength",
+                            "description": "If set to true, the authenticator will support the minPinLength extension.\nhttps://fidoalliance.org/specs/fido-v2.1-ps-20210615/fido-client-to-authenticator-protocol-v2.1-ps-20210615.html#sctn-minpinlength-extension\nDefaults to false.",
                             "optional": true,
                             "type": "boolean"
                         },
