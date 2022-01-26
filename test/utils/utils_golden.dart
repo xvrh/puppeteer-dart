@@ -5,7 +5,10 @@ import 'package:test/test.dart';
 import 'pixel_match.dart';
 
 final bool _updateGolden =
-    Platform.environment['PUPPETEER_UPDATE_GOLDEN'] != null;
+(() {
+  var env = Platform.environment['PUPPETEER_UPDATE_GOLDEN'];
+  return env != null && env != 'false';
+})();
 
 class _GoldenMatcher extends Matcher {
   final String goldenPath;

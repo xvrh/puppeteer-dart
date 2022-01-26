@@ -114,7 +114,7 @@ void main() {
       expect(base64Decode(screenshot),
           equalsGolden('test/golden/screenshot-sanity.png'));
     });
-  });
+  }, tags: ['golden']);
 
   group('ElementHandle.screenshot', () {
     test('should work', () async {
