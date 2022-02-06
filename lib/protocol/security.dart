@@ -50,7 +50,7 @@ class SecurityApi {
   /// Handles a certificate error that fired a certificateError event.
   /// [eventId] The ID of the event.
   /// [action] The action to take on the certificate error.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> handleCertificateError(
       int eventId, CertificateErrorAction action) async {
     await _client.send('Security.handleCertificateError', {
@@ -62,7 +62,7 @@ class SecurityApi {
   /// Enable/disable overriding certificate errors. If enabled, all certificate error events need to
   /// be handled by the DevTools client and should be answered with `handleCertificateError` commands.
   /// [override] If true, certificate errors will be overridden.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> setOverrideCertificateErrors(bool override) async {
     await _client.send('Security.setOverrideCertificateErrors', {
       'override': override,

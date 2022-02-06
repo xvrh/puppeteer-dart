@@ -174,7 +174,8 @@ class TargetApi {
   /// Detaches session with given id.
   /// [sessionId] Session to detach.
   Future<void> detachFromTarget(
-      {SessionID? sessionId, @deprecated TargetID? targetId}) async {
+      {SessionID? sessionId,
+      @Deprecated('This parameter is deprecated') TargetID? targetId}) async {
     await _client.send('Target.detachFromTarget', {
       if (sessionId != null) 'sessionId': sessionId,
       if (targetId != null) 'targetId': targetId,
@@ -211,9 +212,10 @@ class TargetApi {
   /// Consider using flat mode instead; see commands attachToTarget, setAutoAttach,
   /// and crbug.com/991325.
   /// [sessionId] Identifier of the session.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> sendMessageToTarget(String message,
-      {SessionID? sessionId, @deprecated TargetID? targetId}) async {
+      {SessionID? sessionId,
+      @Deprecated('This parameter is deprecated') TargetID? targetId}) async {
     await _client.send('Target.sendMessageToTarget', {
       'message': message,
       if (sessionId != null) 'sessionId': sessionId,

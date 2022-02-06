@@ -237,6 +237,11 @@ class VirtualAuthenticatorOptions {
   /// Defaults to false.
   final bool? hasCredBlob;
 
+  /// If set to true, the authenticator will support the minPinLength extension.
+  /// https://fidoalliance.org/specs/fido-v2.1-ps-20210615/fido-client-to-authenticator-protocol-v2.1-ps-20210615.html#sctn-minpinlength-extension
+  /// Defaults to false.
+  final bool? hasMinPinLength;
+
   /// If set to true, tests of user presence will succeed immediately.
   /// Otherwise, they will not be resolved. Defaults to true.
   final bool? automaticPresenceSimulation;
@@ -253,6 +258,7 @@ class VirtualAuthenticatorOptions {
       this.hasUserVerification,
       this.hasLargeBlob,
       this.hasCredBlob,
+      this.hasMinPinLength,
       this.automaticPresenceSimulation,
       this.isUserVerified});
 
@@ -274,6 +280,9 @@ class VirtualAuthenticatorOptions {
           : null,
       hasCredBlob:
           json.containsKey('hasCredBlob') ? json['hasCredBlob'] as bool : null,
+      hasMinPinLength: json.containsKey('hasMinPinLength')
+          ? json['hasMinPinLength'] as bool
+          : null,
       automaticPresenceSimulation:
           json.containsKey('automaticPresenceSimulation')
               ? json['automaticPresenceSimulation'] as bool
@@ -294,6 +303,7 @@ class VirtualAuthenticatorOptions {
         'hasUserVerification': hasUserVerification,
       if (hasLargeBlob != null) 'hasLargeBlob': hasLargeBlob,
       if (hasCredBlob != null) 'hasCredBlob': hasCredBlob,
+      if (hasMinPinLength != null) 'hasMinPinLength': hasMinPinLength,
       if (automaticPresenceSimulation != null)
         'automaticPresenceSimulation': automaticPresenceSimulation,
       if (isUserVerified != null) 'isUserVerified': isUserVerified,

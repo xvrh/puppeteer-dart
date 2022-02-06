@@ -63,7 +63,9 @@ class AccessibilityApi {
   /// [frameId] The frame for whose document the AX tree should be retrieved.
   /// If omited, the root frame is used.
   Future<List<AXNodeData>> getFullAXTree(
-      {int? depth, @deprecated int? maxDepth, page.FrameId? frameId}) async {
+      {int? depth,
+      @Deprecated('This parameter is deprecated') int? maxDepth,
+      page.FrameId? frameId}) async {
     var result = await _client.send('Accessibility.getFullAXTree', {
       if (depth != null) 'depth': depth,
       if (maxDepth != null) 'max_depth': maxDepth,

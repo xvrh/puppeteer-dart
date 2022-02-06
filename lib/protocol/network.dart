@@ -228,7 +228,7 @@ class NetworkApi {
 
   /// Tells whether clearing browser cache is supported.
   /// Returns: True if browser cache can be cleared.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<bool> canClearBrowserCache() async {
     var result = await _client.send('Network.canClearBrowserCache');
     return result['result'] as bool;
@@ -236,7 +236,7 @@ class NetworkApi {
 
   /// Tells whether clearing browser cookies is supported.
   /// Returns: True if browser cookies can be cleared.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<bool> canClearBrowserCookies() async {
     var result = await _client.send('Network.canClearBrowserCookies');
     return result['result'] as bool;
@@ -244,7 +244,7 @@ class NetworkApi {
 
   /// Tells whether emulation of network conditions is supported.
   /// Returns: True if emulation of network conditions is supported.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<bool> canEmulateNetworkConditions() async {
     var result = await _client.send('Network.canEmulateNetworkConditions');
     return result['result'] as bool;
@@ -278,7 +278,8 @@ class NetworkApi {
   /// [headers] If set this allows the request headers to be changed. Must not be set in response to an
   /// authChallenge.
   /// [authChallengeResponse] Response to a requestIntercepted with an authChallenge. Must not be set otherwise.
-  @deprecated
+  @Deprecated(
+      'use Fetch.continueRequest, Fetch.fulfillRequest and Fetch.failRequest instead')
   Future<void> continueInterceptedRequest(InterceptionId interceptionId,
       {ErrorReason? errorReason,
       String? rawResponse,
@@ -566,7 +567,7 @@ class NetworkApi {
   /// Deprecated, please use Fetch.enable instead.
   /// [patterns] Requests matching any of these patterns will be forwarded and wait for the corresponding
   /// continueInterceptedRequest call.
-  @deprecated
+  @Deprecated('use Fetch.enable instead')
   Future<void> setRequestInterception(List<RequestPattern> patterns) async {
     await _client.send('Network.setRequestInterception', {
       'patterns': [...patterns],

@@ -211,7 +211,7 @@ class EmulationApi {
 
   /// Overrides value returned by the javascript navigator object.
   /// [platform] The platform navigator.platform should return.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> setNavigatorOverrides(String platform) async {
     await _client.send('Emulation.setNavigatorOverrides', {
       'platform': platform,
@@ -294,7 +294,7 @@ class EmulationApi {
   /// on Android.
   /// [width] Frame width (DIP).
   /// [height] Frame height (DIP).
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> setVisibleSize(int width, int height) async {
     await _client.send('Emulation.setVisibleSize', {
       'width': width,

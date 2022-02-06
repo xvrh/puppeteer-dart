@@ -2,7 +2,7 @@ import 'dart:async';
 import '../src/connection.dart';
 
 /// This domain is deprecated.
-@deprecated
+@Deprecated('This domain is deprecated')
 class SchemaApi {
   final Client _client;
 

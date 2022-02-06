@@ -31,7 +31,7 @@ class PerformanceApi {
   /// Note that this must be called before enabling metrics collection. Calling
   /// this method while metrics collection is enabled returns an error.
   /// [timeDomain] Time domain
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> setTimeDomain(
       @Enum(['timeTicks', 'threadTicks']) String timeDomain) async {
     assert(const ['timeTicks', 'threadTicks'].contains(timeDomain));

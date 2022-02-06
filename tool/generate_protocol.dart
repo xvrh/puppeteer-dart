@@ -4,6 +4,7 @@ import 'package:path/path.dart' as p;
 import 'code_style/fix_import_order.dart';
 import 'download_protocol_from_repo.dart' as protocols_from_repo;
 import 'model.dart';
+import 'utils/escape_dart_string.dart';
 import 'utils/split_words.dart';
 import 'utils/string_helpers.dart';
 
@@ -88,7 +89,8 @@ void main() {
     var className = '${domain.name}Api';
     code.writeln(toComment(domain.description));
     if (domain.deprecated) {
-      code.writeln('@deprecated');
+      code.writeln(
+          '@Deprecated(${escapeDartString(deprecatedDocumentation(domain.description) ?? 'This domain is deprecated')})');
     }
     code
       ..writeln('class $className {')
@@ -203,7 +205,8 @@ class _Command {
     }
 
     if (command.deprecated) {
-      code.writeln('@deprecated');
+      code.writeln(
+          '@Deprecated(${escapeDartString(deprecatedDocumentation(command.description) ?? 'This command is deprecated')})');
     }
 
     String? returnTypeName;
@@ -552,7 +555,7 @@ class _InternalType {
       if (hasProperties) {
         code.writeln('Map<String, dynamic> toJson() {');
         code.writeln('return {');
-        for (var property in requireds) {
+        for (var property in requireds.where((p) => !p.deprecated)) {
           code.writeln("'${property.name}': ${_toJsonCode(property)},");
         }
         for (var property in optionals.where((p) => !p.deprecated)) {
@@ -747,6 +750,21 @@ String _castForParameter(_DomainContext context, Parameter parameter) {
       return context.getPropertyType(parameter);
     }
   }
+}
+
+String? deprecatedDocumentation(String? description) {
+  if (description == null) return null;
+
+  var useInsteadExtractor = RegExp(r'Use (.*) instead', caseSensitive: false);
+  var match = useInsteadExtractor.firstMatch(description);
+  if (match != null) {
+    return match.group(0);
+  }
+  var split = description.split('Deprecated,');
+  if (split.length > 1) {
+    return split[1].trim();
+  }
+  return null;
 }
 
 void _applyTemporaryFixes(List<Domain> domains) {

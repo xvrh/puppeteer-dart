@@ -269,7 +269,7 @@ class DOMApi {
   /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the subtree
   /// (default is false).
   /// Returns: Resulting node.
-  @deprecated
+  @Deprecated('Use DOMSnapshot.captureSnapshot instead')
   Future<List<Node>> getFlattenedDocument({int? depth, bool? pierce}) async {
     var result = await _client.send('DOM.getFlattenedDocument', {
       if (depth != null) 'depth': depth,
@@ -1074,6 +1074,10 @@ class PseudoType {
   static const scrollbarCorner = PseudoType._('scrollbar-corner');
   static const resizer = PseudoType._('resizer');
   static const inputListButton = PseudoType._('input-list-button');
+  static const transition = PseudoType._('transition');
+  static const transitionContainer = PseudoType._('transition-container');
+  static const transitionOldContent = PseudoType._('transition-old-content');
+  static const transitionNewContent = PseudoType._('transition-new-content');
   static const values = {
     'first-line': firstLine,
     'first-letter': firstLetter,
@@ -1095,6 +1099,10 @@ class PseudoType {
     'scrollbar-corner': scrollbarCorner,
     'resizer': resizer,
     'input-list-button': inputListButton,
+    'transition': transition,
+    'transition-container': transitionContainer,
+    'transition-old-content': transitionOldContent,
+    'transition-new-content': transitionNewContent,
   };
 
   final String value;

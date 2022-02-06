@@ -162,7 +162,7 @@ class PageApi {
 
   /// Deprecated, please use addScriptToEvaluateOnNewDocument instead.
   /// Returns: Identifier of the added script.
-  @deprecated
+  @Deprecated('use addScriptToEvaluateOnNewDocument instead')
   Future<ScriptIdentifier> addScriptToEvaluateOnLoad(
       String scriptSource) async {
     var result = await _client.send('Page.addScriptToEvaluateOnLoad', {
@@ -232,19 +232,19 @@ class PageApi {
   }
 
   /// Clears the overridden device metrics.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> clearDeviceMetricsOverride() async {
     await _client.send('Page.clearDeviceMetricsOverride');
   }
 
   /// Clears the overridden Device Orientation.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> clearDeviceOrientationOverride() async {
     await _client.send('Page.clearDeviceOrientationOverride');
   }
 
   /// Clears the overridden Geolocation Position and Error.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> clearGeolocationOverride() async {
     await _client.send('Page.clearGeolocationOverride');
   }
@@ -270,7 +270,7 @@ class PageApi {
   /// Deletes browser cookie with given name, domain and path.
   /// [cookieName] Name of the cookie to remove.
   /// [url] URL to match cooke domain and path.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> deleteCookie(String cookieName, String url) async {
     await _client.send('Page.deleteCookie', {
       'cookieName': cookieName,
@@ -315,7 +315,7 @@ class PageApi {
   /// Returns all browser cookies. Depending on the backend support, will return detailed cookie
   /// information in the `cookies` field.
   /// Returns: Array of cookie objects.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<List<network.Cookie>> getCookies() async {
     var result = await _client.send('Page.getCookies');
     return (result['cookies'] as List)
@@ -491,7 +491,7 @@ class PageApi {
   }
 
   /// Deprecated, please use removeScriptToEvaluateOnNewDocument instead.
-  @deprecated
+  @Deprecated('use removeScriptToEvaluateOnNewDocument instead')
   Future<void> removeScriptToEvaluateOnLoad(ScriptIdentifier identifier) async {
     await _client.send('Page.removeScriptToEvaluateOnLoad', {
       'identifier': identifier,
@@ -590,7 +590,7 @@ class PageApi {
   /// [dontSetVisibleSize] Do not set visible view size, rely upon explicit setVisibleSize call.
   /// [screenOrientation] Screen orientation override.
   /// [viewport] The viewport dimensions and scale. If not set, the override is cleared.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> setDeviceMetricsOverride(
       int width, int height, num deviceScaleFactor, bool mobile,
       {num? scale,
@@ -621,7 +621,7 @@ class PageApi {
   /// [alpha] Mock alpha
   /// [beta] Mock beta
   /// [gamma] Mock gamma
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> setDeviceOrientationOverride(
       num alpha, num beta, num gamma) async {
     await _client.send('Page.setDeviceOrientationOverride', {
@@ -633,9 +633,12 @@ class PageApi {
 
   /// Set generic font families.
   /// [fontFamilies] Specifies font families to set. If a font family is not specified, it won't be changed.
-  Future<void> setFontFamilies(FontFamilies fontFamilies) async {
+  /// [forScripts] Specifies font families to set for individual scripts.
+  Future<void> setFontFamilies(FontFamilies fontFamilies,
+      {List<ScriptFontFamilies>? forScripts}) async {
     await _client.send('Page.setFontFamilies', {
       'fontFamilies': fontFamilies,
+      if (forScripts != null) 'forScripts': [...forScripts],
     });
   }
 
@@ -661,7 +664,7 @@ class PageApi {
   /// [behavior] Whether to allow all or deny all download requests, or use default Chrome behavior if
   /// available (otherwise deny).
   /// [downloadPath] The default path to save downloaded files to. This is required if behavior is set to 'allow'
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> setDownloadBehavior(
       @Enum(['deny', 'allow', 'default']) String behavior,
       {String? downloadPath}) async {
@@ -677,7 +680,7 @@ class PageApi {
   /// [latitude] Mock latitude
   /// [longitude] Mock longitude
   /// [accuracy] Mock accuracy
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> setGeolocationOverride(
       {num? latitude, num? longitude, num? accuracy}) async {
     await _client.send('Page.setGeolocationOverride', {
@@ -698,7 +701,7 @@ class PageApi {
   /// Toggles mouse event-based touch event emulation.
   /// [enabled] Whether the touch event emulation should be enabled.
   /// [configuration] Touch/gesture events configuration. Default: current platform.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> setTouchEmulationEnabled(bool enabled,
       {@Enum(['mobile', 'desktop']) String? configuration}) async {
     assert(configuration == null ||
@@ -1115,10 +1118,14 @@ class BackForwardCacheNotUsedEvent {
   /// Array of reasons why the page could not be cached. This must not be empty.
   final List<BackForwardCacheNotRestoredExplanation> notRestoredExplanations;
 
+  /// Tree structure of reasons why the page could not be cached for each frame.
+  final BackForwardCacheNotRestoredExplanationTree? notRestoredExplanationsTree;
+
   BackForwardCacheNotUsedEvent(
       {required this.loaderId,
       required this.frameId,
-      required this.notRestoredExplanations});
+      required this.notRestoredExplanations,
+      this.notRestoredExplanationsTree});
 
   factory BackForwardCacheNotUsedEvent.fromJson(Map<String, dynamic> json) {
     return BackForwardCacheNotUsedEvent(
@@ -1128,6 +1135,11 @@ class BackForwardCacheNotUsedEvent {
           .map((e) => BackForwardCacheNotRestoredExplanation.fromJson(
               e as Map<String, dynamic>))
           .toList(),
+      notRestoredExplanationsTree:
+          json.containsKey('notRestoredExplanationsTree')
+              ? BackForwardCacheNotRestoredExplanationTree.fromJson(
+                  json['notRestoredExplanationsTree'] as Map<String, dynamic>)
+              : null,
     );
   }
 }
@@ -1757,9 +1769,12 @@ class PermissionsPolicyBlockReason {
   static const header = PermissionsPolicyBlockReason._('Header');
   static const iframeAttribute =
       PermissionsPolicyBlockReason._('IframeAttribute');
+  static const inFencedFrameTree =
+      PermissionsPolicyBlockReason._('InFencedFrameTree');
   static const values = {
     'Header': header,
     'IframeAttribute': iframeAttribute,
+    'InFencedFrameTree': inFencedFrameTree,
   };
 
   final String value;
@@ -2773,6 +2788,32 @@ class FontFamilies {
   }
 }
 
+/// Font families collection for a script.
+class ScriptFontFamilies {
+  /// Name of the script which these font families are defined for.
+  final String script;
+
+  /// Generic font families collection for the script.
+  final FontFamilies fontFamilies;
+
+  ScriptFontFamilies({required this.script, required this.fontFamilies});
+
+  factory ScriptFontFamilies.fromJson(Map<String, dynamic> json) {
+    return ScriptFontFamilies(
+      script: json['script'] as String,
+      fontFamilies:
+          FontFamilies.fromJson(json['fontFamilies'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'script': script,
+      'fontFamilies': fontFamilies.toJson(),
+    };
+  }
+}
+
 /// Default font sizes.
 class FontSizes {
   /// Default standard font size.
@@ -3490,6 +3531,43 @@ class BackForwardCacheNotRestoredExplanation {
     return {
       'type': type.toJson(),
       'reason': reason.toJson(),
+    };
+  }
+}
+
+class BackForwardCacheNotRestoredExplanationTree {
+  /// URL of each frame
+  final String url;
+
+  /// Not restored reasons of each frame
+  final List<BackForwardCacheNotRestoredExplanation> explanations;
+
+  /// Array of children frame
+  final List<BackForwardCacheNotRestoredExplanationTree> children;
+
+  BackForwardCacheNotRestoredExplanationTree(
+      {required this.url, required this.explanations, required this.children});
+
+  factory BackForwardCacheNotRestoredExplanationTree.fromJson(
+      Map<String, dynamic> json) {
+    return BackForwardCacheNotRestoredExplanationTree(
+      url: json['url'] as String,
+      explanations: (json['explanations'] as List)
+          .map((e) => BackForwardCacheNotRestoredExplanation.fromJson(
+              e as Map<String, dynamic>))
+          .toList(),
+      children: (json['children'] as List)
+          .map((e) => BackForwardCacheNotRestoredExplanationTree.fromJson(
+              e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      'explanations': explanations.map((e) => e.toJson()).toList(),
+      'children': children.map((e) => e.toJson()).toList(),
     };
   }
 }

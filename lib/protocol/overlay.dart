@@ -100,7 +100,7 @@ class OverlayApi {
   /// [frameId] Identifier of the frame to highlight.
   /// [contentColor] The content box highlight fill color (default: transparent).
   /// [contentOutlineColor] The content box highlight outline color (default: transparent).
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> highlightFrame(page.FrameId frameId,
       {dom.RGBA? contentColor, dom.RGBA? contentOutlineColor}) async {
     await _client.send('Overlay.highlightFrame', {
@@ -284,8 +284,9 @@ class OverlayApi {
     });
   }
 
-  /// Requests that backend shows hit-test borders on layers
+  /// Deprecated, no longer has any effect.
   /// [show] True for showing hit-test borders
+  @Deprecated('no longer has any effect.')
   Future<void> setShowHitTestBorders(bool show) async {
     await _client.send('Overlay.setShowHitTestBorders', {
       'show': show,

@@ -1380,8 +1380,12 @@ class DeprecationIssueDetails {
 
   final SourceCodeLocation sourceCodeLocation;
 
+  final String deprecationType;
+
   DeprecationIssueDetails(
-      {this.affectedFrame, required this.sourceCodeLocation});
+      {this.affectedFrame,
+      required this.sourceCodeLocation,
+      required this.deprecationType});
 
   factory DeprecationIssueDetails.fromJson(Map<String, dynamic> json) {
     return DeprecationIssueDetails(
@@ -1391,13 +1395,72 @@ class DeprecationIssueDetails {
           : null,
       sourceCodeLocation: SourceCodeLocation.fromJson(
           json['sourceCodeLocation'] as Map<String, dynamic>),
+      deprecationType: json['deprecationType'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'sourceCodeLocation': sourceCodeLocation.toJson(),
+      'deprecationType': deprecationType,
       if (affectedFrame != null) 'affectedFrame': affectedFrame!.toJson(),
+    };
+  }
+}
+
+class ClientHintIssueReason {
+  static const metaTagAllowListInvalidOrigin =
+      ClientHintIssueReason._('MetaTagAllowListInvalidOrigin');
+  static const metaTagModifiedHtml =
+      ClientHintIssueReason._('MetaTagModifiedHTML');
+  static const values = {
+    'MetaTagAllowListInvalidOrigin': metaTagAllowListInvalidOrigin,
+    'MetaTagModifiedHTML': metaTagModifiedHtml,
+  };
+
+  final String value;
+
+  const ClientHintIssueReason._(this.value);
+
+  factory ClientHintIssueReason.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is ClientHintIssueReason && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// This issue tracks client hints related issues. It's used to deprecate old
+/// features, encourage the use of new ones, and provide general guidance.
+class ClientHintIssueDetails {
+  final SourceCodeLocation sourceCodeLocation;
+
+  final ClientHintIssueReason clientHintIssueReason;
+
+  ClientHintIssueDetails(
+      {required this.sourceCodeLocation, required this.clientHintIssueReason});
+
+  factory ClientHintIssueDetails.fromJson(Map<String, dynamic> json) {
+    return ClientHintIssueDetails(
+      sourceCodeLocation: SourceCodeLocation.fromJson(
+          json['sourceCodeLocation'] as Map<String, dynamic>),
+      clientHintIssueReason: ClientHintIssueReason.fromJson(
+          json['clientHintIssueReason'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sourceCodeLocation': sourceCodeLocation.toJson(),
+      'clientHintIssueReason': clientHintIssueReason.toJson(),
     };
   }
 }
@@ -1430,6 +1493,7 @@ class InspectorIssueCode {
       InspectorIssueCode._('WasmCrossOriginModuleSharingIssue');
   static const genericIssue = InspectorIssueCode._('GenericIssue');
   static const deprecationIssue = InspectorIssueCode._('DeprecationIssue');
+  static const clientHintIssue = InspectorIssueCode._('ClientHintIssue');
   static const values = {
     'SameSiteCookieIssue': sameSiteCookieIssue,
     'MixedContentIssue': mixedContentIssue,
@@ -1446,6 +1510,7 @@ class InspectorIssueCode {
     'WasmCrossOriginModuleSharingIssue': wasmCrossOriginModuleSharingIssue,
     'GenericIssue': genericIssue,
     'DeprecationIssue': deprecationIssue,
+    'ClientHintIssue': clientHintIssue,
   };
 
   final String value;
@@ -1502,6 +1567,8 @@ class InspectorIssueDetails {
 
   final DeprecationIssueDetails? deprecationIssueDetails;
 
+  final ClientHintIssueDetails? clientHintIssueDetails;
+
   InspectorIssueDetails(
       {this.sameSiteCookieIssueDetails,
       this.mixedContentIssueDetails,
@@ -1517,7 +1584,8 @@ class InspectorIssueDetails {
       this.navigatorUserAgentIssueDetails,
       this.wasmCrossOriginModuleSharingIssue,
       this.genericIssueDetails,
-      this.deprecationIssueDetails});
+      this.deprecationIssueDetails,
+      this.clientHintIssueDetails});
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
     return InspectorIssueDetails(
@@ -1589,6 +1657,10 @@ class InspectorIssueDetails {
           ? DeprecationIssueDetails.fromJson(
               json['deprecationIssueDetails'] as Map<String, dynamic>)
           : null,
+      clientHintIssueDetails: json.containsKey('clientHintIssueDetails')
+          ? ClientHintIssueDetails.fromJson(
+              json['clientHintIssueDetails'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -1630,6 +1702,8 @@ class InspectorIssueDetails {
         'genericIssueDetails': genericIssueDetails!.toJson(),
       if (deprecationIssueDetails != null)
         'deprecationIssueDetails': deprecationIssueDetails!.toJson(),
+      if (clientHintIssueDetails != null)
+        'clientHintIssueDetails': clientHintIssueDetails!.toJson(),
     };
   }
 }

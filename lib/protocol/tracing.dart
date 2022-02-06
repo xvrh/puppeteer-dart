@@ -70,8 +70,8 @@ class TracingApi {
   /// are ignored.
   /// [tracingBackend] Backend type (defaults to `auto`)
   Future<void> start(
-      {@deprecated String? categories,
-      @deprecated String? options,
+      {@Deprecated('This parameter is deprecated') String? categories,
+      @Deprecated('This parameter is deprecated') String? options,
       num? bufferUsageReportingInterval,
       @Enum(['ReportEvents', 'ReturnAsStream']) String? transferMode,
       StreamFormat? streamFormat,

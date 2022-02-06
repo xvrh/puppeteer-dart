@@ -4,8 +4,7 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 import 'pixel_match.dart';
 
-final bool _updateGolden =
-(() {
+final bool _updateGolden = (() {
   var env = Platform.environment['PUPPETEER_UPDATE_GOLDEN'];
   return env != null && env != 'false';
 })();
@@ -73,6 +72,8 @@ ImageDifference? _compareImages(
   if (count > 0) {
     return ContentDifference(
         count,
+        actualBytes,
+        expectedBytes,
         PngEncoder()
             .encodeImage(Image.fromBytes(actual.width, actual.height, output)),
         usedThreshold: threshold);
@@ -95,16 +96,18 @@ class SizeDifference implements ImageDifference {
 
 class ContentDifference implements ImageDifference {
   final int differenceCount;
-  final List<int> pngDiff;
+  final List<int> actual, golden, diff;
   final num usedThreshold;
 
-  ContentDifference(this.differenceCount, this.pngDiff,
+  ContentDifference(this.differenceCount, this.actual, this.golden, this.diff,
       {required this.usedThreshold});
 
-  String get _base64Png =>
-      Uri.dataFromBytes(pngDiff, mimeType: 'image/png').toString();
+  static String _bytesToPng(List<int> bytes) =>
+      Uri.dataFromBytes(bytes, mimeType: 'image/png').toString();
 
   @override
-  String toString() =>
-      'Image content has $differenceCount different pixels.\n\nDiff: $_base64Png';
+  String toString() => 'Image content has $differenceCount different pixels.'
+      '\n\nActual: ${_bytesToPng(actual)}'
+      '\n\nGolden: ${_bytesToPng(golden)}'
+      '\n\nDiff: ${_bytesToPng(diff)}';
 }

@@ -374,8 +374,10 @@ class RuntimeApi {
   /// See also `ExecutionContext.name` and `worldName` parameter to
   /// `Page.addScriptToEvaluateOnNewDocument`.
   /// This parameter is mutually exclusive with `executionContextId`.
-  Future<void> addBinding(String name,
-      {@deprecated ExecutionContextId? executionContextId,
+  Future<void> addBinding(
+      String name,
+      {@Deprecated('This parameter is deprecated')
+          ExecutionContextId? executionContextId,
       String? executionContextName}) async {
     await _client.send('Runtime.addBinding', {
       'name': name,
@@ -391,6 +393,21 @@ class RuntimeApi {
     await _client.send('Runtime.removeBinding', {
       'name': name,
     });
+  }
+
+  /// This method tries to lookup and populate exception details for a
+  /// JavaScript Error object.
+  /// Note that the stackTrace portion of the resulting exceptionDetails will
+  /// only be populated if the Runtime domain was enabled at the time when the
+  /// Error was thrown.
+  /// [errorObjectId] The error object for which to resolve the exception details.
+  Future<ExceptionDetails> getExceptionDetails(
+      RemoteObjectId errorObjectId) async {
+    var result = await _client.send('Runtime.getExceptionDetails', {
+      'errorObjectId': errorObjectId,
+    });
+    return ExceptionDetails.fromJson(
+        result['exceptionDetails'] as Map<String, dynamic>);
   }
 }
 
