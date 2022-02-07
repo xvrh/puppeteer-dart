@@ -28,7 +28,7 @@ class DOMSnapshotApi {
   /// [includeEventListeners] Whether or not to retrieve details of DOM listeners (default false).
   /// [includePaintOrder] Whether to determine and include the paint order index of LayoutTreeNodes (default false).
   /// [includeUserAgentShadowTree] Whether to include UA shadow tree in the snapshot (default false).
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<GetSnapshotResult> getSnapshot(List<String> computedStyleWhitelist,
       {bool? includeEventListeners,
       bool? includePaintOrder,

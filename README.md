@@ -247,6 +247,22 @@ void main() async {
 }
 ```
 
+### Launch with visible window
+By default, puppeteer launch Chromium in "headless" mode, the browser is invisible.
+For better development & debugging, you can force "headful" mode with parameter `headless: false`
+
+```dart
+import 'package:puppeteer/puppeteer.dart';
+
+void main() async {
+  var browser = await puppeteer.launch(headless: false);
+  // Do something...
+  await browser.newPage();
+  await browser.close();
+}
+```
+
+
 ### Low-level DevTools protocol
 This package contains a fully typed API of the [Chrome DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).
 The code is generated from the [JSON Schema](https://github.com/ChromeDevTools/devtools-protocol) provided by Chrome.

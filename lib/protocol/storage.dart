@@ -31,6 +31,12 @@ class StorageApi {
       .where((event) => event.name == 'Storage.indexedDBListUpdated')
       .map((event) => event.parameters['origin'] as String);
 
+  /// One of the interest groups was accessed by the associated page.
+  Stream<InterestGroupAccessedEvent> get onInterestGroupAccessed => _client
+      .onEvent
+      .where((event) => event.name == 'Storage.interestGroupAccessed')
+      .map((event) => InterestGroupAccessedEvent.fromJson(event.parameters));
+
   /// Clears storage for origin.
   /// [origin] Security origin.
   /// [storageTypes] Comma separated list of StorageType to clear.
@@ -149,6 +155,24 @@ class StorageApi {
     });
     return result['didDeleteTokens'] as bool;
   }
+
+  /// Gets details for a named interest group.
+  Future<InterestGroupDetails> getInterestGroupDetails(
+      String ownerOrigin, String name) async {
+    var result = await _client.send('Storage.getInterestGroupDetails', {
+      'ownerOrigin': ownerOrigin,
+      'name': name,
+    });
+    return InterestGroupDetails.fromJson(
+        result['details'] as Map<String, dynamic>);
+  }
+
+  /// Enables/Disables issuing of interestGroupAccessed events.
+  Future<void> setInterestGroupTracking(bool enable) async {
+    await _client.send('Storage.setInterestGroupTracking', {
+      'enable': enable,
+    });
+  }
 }
 
 class CacheStorageContentUpdatedEvent {
@@ -189,6 +213,25 @@ class IndexedDBContentUpdatedEvent {
       origin: json['origin'] as String,
       databaseName: json['databaseName'] as String,
       objectStoreName: json['objectStoreName'] as String,
+    );
+  }
+}
+
+class InterestGroupAccessedEvent {
+  final InterestGroupAccessType type;
+
+  final String ownerOrigin;
+
+  final String name;
+
+  InterestGroupAccessedEvent(
+      {required this.type, required this.ownerOrigin, required this.name});
+
+  factory InterestGroupAccessedEvent.fromJson(Map<String, dynamic> json) {
+    return InterestGroupAccessedEvent(
+      type: InterestGroupAccessType.fromJson(json['type'] as String),
+      ownerOrigin: json['ownerOrigin'] as String,
+      name: json['name'] as String,
     );
   }
 }
@@ -235,6 +278,7 @@ class StorageType {
   static const websql = StorageType._('websql');
   static const serviceWorkers = StorageType._('service_workers');
   static const cacheStorage = StorageType._('cache_storage');
+  static const interestGroups = StorageType._('interest_groups');
   static const all = StorageType._('all');
   static const other = StorageType._('other');
   static const values = {
@@ -247,6 +291,7 @@ class StorageType {
     'websql': websql,
     'service_workers': serviceWorkers,
     'cache_storage': cacheStorage,
+    'interest_groups': interestGroups,
     'all': all,
     'other': other,
   };
@@ -315,6 +360,156 @@ class TrustTokens {
     return {
       'issuerOrigin': issuerOrigin,
       'count': count,
+    };
+  }
+}
+
+/// Enum of interest group access types.
+class InterestGroupAccessType {
+  static const join = InterestGroupAccessType._('join');
+  static const leave = InterestGroupAccessType._('leave');
+  static const update = InterestGroupAccessType._('update');
+  static const bid = InterestGroupAccessType._('bid');
+  static const win = InterestGroupAccessType._('win');
+  static const values = {
+    'join': join,
+    'leave': leave,
+    'update': update,
+    'bid': bid,
+    'win': win,
+  };
+
+  final String value;
+
+  const InterestGroupAccessType._(this.value);
+
+  factory InterestGroupAccessType.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is InterestGroupAccessType && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Ad advertising element inside an interest group.
+class InterestGroupAd {
+  final String renderUrl;
+
+  final String? metadata;
+
+  InterestGroupAd({required this.renderUrl, this.metadata});
+
+  factory InterestGroupAd.fromJson(Map<String, dynamic> json) {
+    return InterestGroupAd(
+      renderUrl: json['renderUrl'] as String,
+      metadata:
+          json.containsKey('metadata') ? json['metadata'] as String : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'renderUrl': renderUrl,
+      if (metadata != null) 'metadata': metadata,
+    };
+  }
+}
+
+/// The full details of an interest group.
+class InterestGroupDetails {
+  final String ownerOrigin;
+
+  final String name;
+
+  final num expirationTime;
+
+  final String joiningOrigin;
+
+  final String? biddingUrl;
+
+  final String? biddingWasmHelperUrl;
+
+  final String? updateUrl;
+
+  final String? trustedBiddingSignalsUrl;
+
+  final List<String> trustedBiddingSignalsKeys;
+
+  final String? userBiddingSignals;
+
+  final List<InterestGroupAd> ads;
+
+  final List<InterestGroupAd> adComponents;
+
+  InterestGroupDetails(
+      {required this.ownerOrigin,
+      required this.name,
+      required this.expirationTime,
+      required this.joiningOrigin,
+      this.biddingUrl,
+      this.biddingWasmHelperUrl,
+      this.updateUrl,
+      this.trustedBiddingSignalsUrl,
+      required this.trustedBiddingSignalsKeys,
+      this.userBiddingSignals,
+      required this.ads,
+      required this.adComponents});
+
+  factory InterestGroupDetails.fromJson(Map<String, dynamic> json) {
+    return InterestGroupDetails(
+      ownerOrigin: json['ownerOrigin'] as String,
+      name: json['name'] as String,
+      expirationTime: json['expirationTime'] as num,
+      joiningOrigin: json['joiningOrigin'] as String,
+      biddingUrl:
+          json.containsKey('biddingUrl') ? json['biddingUrl'] as String : null,
+      biddingWasmHelperUrl: json.containsKey('biddingWasmHelperUrl')
+          ? json['biddingWasmHelperUrl'] as String
+          : null,
+      updateUrl:
+          json.containsKey('updateUrl') ? json['updateUrl'] as String : null,
+      trustedBiddingSignalsUrl: json.containsKey('trustedBiddingSignalsUrl')
+          ? json['trustedBiddingSignalsUrl'] as String
+          : null,
+      trustedBiddingSignalsKeys: (json['trustedBiddingSignalsKeys'] as List)
+          .map((e) => e as String)
+          .toList(),
+      userBiddingSignals: json.containsKey('userBiddingSignals')
+          ? json['userBiddingSignals'] as String
+          : null,
+      ads: (json['ads'] as List)
+          .map((e) => InterestGroupAd.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      adComponents: (json['adComponents'] as List)
+          .map((e) => InterestGroupAd.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'ownerOrigin': ownerOrigin,
+      'name': name,
+      'expirationTime': expirationTime,
+      'joiningOrigin': joiningOrigin,
+      'trustedBiddingSignalsKeys': [...trustedBiddingSignalsKeys],
+      'ads': ads.map((e) => e.toJson()).toList(),
+      'adComponents': adComponents.map((e) => e.toJson()).toList(),
+      if (biddingUrl != null) 'biddingUrl': biddingUrl,
+      if (biddingWasmHelperUrl != null)
+        'biddingWasmHelperUrl': biddingWasmHelperUrl,
+      if (updateUrl != null) 'updateUrl': updateUrl,
+      if (trustedBiddingSignalsUrl != null)
+        'trustedBiddingSignalsUrl': trustedBiddingSignalsUrl,
+      if (userBiddingSignals != null) 'userBiddingSignals': userBiddingSignals,
     };
   }
 }

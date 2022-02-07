@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'generate_protocol.dart' show deprecatedDocumentation;
+import 'utils/escape_dart_string.dart';
 import 'utils/split_words.dart';
 import 'utils/string_helpers.dart';
 
@@ -188,7 +190,9 @@ class Parameter implements Typed {
 
   String? get normalizedName => preventKeywords(lowerCamel(splitWords(name)));
 
-  String get deprecatedAttribute => deprecated ? '@deprecated' : '';
+  String get deprecatedAttribute => deprecated
+      ? '@Deprecated(${escapeDartString(deprecatedDocumentation(description) ?? 'This parameter is deprecated')})'
+      : '';
 }
 
 class ListItems implements Typed {

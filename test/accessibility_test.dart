@@ -66,10 +66,15 @@ void main() {
             name: 'placeholder',
             value: 'and a value',
             description: 'This is a description!'),
-        AXNode(role: 'combobox', name: '', value: 'First Option', children: [
-          AXNode(role: 'menuitem', name: 'First Option', selected: true),
-          AXNode(role: 'menuitem', name: 'Second Option')
-        ])
+        AXNode(
+            role: 'combobox',
+            name: '',
+            value: 'First Option',
+            hasPopup: 'menu',
+            children: [
+              AXNode(role: 'menuitem', name: 'First Option', selected: true),
+              AXNode(role: 'menuitem', name: 'Second Option')
+            ])
       ]);
       expect(await page.accessibility.snapshot(), equals(golden));
     });
@@ -253,11 +258,15 @@ void main() {
           var menu = await page.$('div[role="menu"]');
           expect(
               await page.accessibility.snapshot(root: menu),
-              equals(AXNode(role: 'menu', name: 'My Menu', children: [
-                AXNode(role: 'menuitem', name: 'First Item'),
-                AXNode(role: 'menuitem', name: 'Second Item'),
-                AXNode(role: 'menuitem', name: 'Third Item')
-              ])));
+              equals(AXNode(
+                  role: 'menu',
+                  name: 'My Menu',
+                  orientation: 'vertical',
+                  children: [
+                    AXNode(role: 'menuitem', name: 'First Item'),
+                    AXNode(role: 'menuitem', name: 'Second Item'),
+                    AXNode(role: 'menuitem', name: 'Third Item')
+                  ])));
         });
         test('should return null when the element is no longer in DOM',
             () async {

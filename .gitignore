@@ -4,6 +4,7 @@ _*
 !.gitattributes
 !.travis.yml
 !.github
+!.dockerignore
 build/
 pubspec.lock
 

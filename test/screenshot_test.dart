@@ -35,27 +35,31 @@ void main() {
 
   group('Page.screenshot', () {
     test('should work', () async {
-      await page.setViewport(DeviceViewport(width: 500, height: 500));
+      await page.setViewport(
+          DeviceViewport(width: 500, height: 500, deviceScaleFactor: 1));
       await page.goto(server.prefix + '/grid.html');
       var screenshot = await page.screenshot();
       expect(screenshot, equalsGolden('test/golden/screenshot-sanity.png'));
     });
     test('should clip rect', () async {
-      await page.setViewport(DeviceViewport(width: 500, height: 500));
+      await page.setViewport(
+          DeviceViewport(width: 500, height: 500, deviceScaleFactor: 1));
       await page.goto(server.prefix + '/grid.html');
       var screenshot =
           await page.screenshot(clip: Rectangle(50, 100, 150, 100));
       expect(screenshot, equalsGolden('test/golden/screenshot-clip-rect.png'));
     });
     test('should get screenshot bigger than the viewport', () async {
-      await page.setViewport(DeviceViewport(width: 50, height: 50));
+      await page.setViewport(
+          DeviceViewport(width: 50, height: 50, deviceScaleFactor: 1));
       await page.goto(server.prefix + '/grid.html');
       var screenshot = await page.screenshot(clip: Rectangle(25, 25, 100, 100));
       expect(screenshot,
           equalsGolden('test/golden/screenshot-offscreen-clip.png'));
     });
     test('should run in parallel', () async {
-      await page.setViewport(DeviceViewport(width: 500, height: 500));
+      await page.setViewport(
+          DeviceViewport(width: 500, height: 500, deviceScaleFactor: 1));
       await page.goto(server.prefix + '/grid.html');
       var promises = <Future>[];
       for (var i = 0; i < 3; ++i) {
@@ -65,7 +69,8 @@ void main() {
       expect(screenshots[1], equalsGolden('test/golden/grid-cell-1.png'));
     });
     test('should take fullPage screenshots', () async {
-      await page.setViewport(DeviceViewport(width: 500, height: 500));
+      await page.setViewport(
+          DeviceViewport(width: 500, height: 500, deviceScaleFactor: 1));
       await page.goto(server.prefix + '/grid.html');
       var screenshot = await page.screenshot(fullPage: true);
       expect(
@@ -89,13 +94,15 @@ void main() {
       await Future.wait(pages.map((page) => page.close()));
     });
     test('should allow transparency', () async {
-      await page.setViewport(DeviceViewport(width: 100, height: 100));
+      await page.setViewport(
+          DeviceViewport(width: 100, height: 100, deviceScaleFactor: 1));
       await page.goto(server.emptyPage);
       var screenshot = await page.screenshot(omitBackground: true);
       expect(screenshot, equalsGolden('test/golden/transparent.png'));
     });
     test('should render white background on jpeg file', () async {
-      await page.setViewport(DeviceViewport(width: 100, height: 100));
+      await page.setViewport(
+          DeviceViewport(width: 100, height: 100, deviceScaleFactor: 1));
       await page.goto(server.emptyPage);
       var screenshot = await page.screenshot(
           omitBackground: true, format: ScreenshotFormat.jpeg);
@@ -108,17 +115,19 @@ void main() {
           screenshot, equalsGolden('test/golden/screenshot-clip-odd-size.png'));
     });
     test('should return base64', () async {
-      await page.setViewport(DeviceViewport(width: 500, height: 500));
+      await page.setViewport(
+          DeviceViewport(width: 500, height: 500, deviceScaleFactor: 1));
       await page.goto(server.prefix + '/grid.html');
       var screenshot = await page.screenshotBase64();
       expect(base64Decode(screenshot),
           equalsGolden('test/golden/screenshot-sanity.png'));
     });
-  });
+  }, tags: ['golden']);
 
   group('ElementHandle.screenshot', () {
     test('should work', () async {
-      await page.setViewport(DeviceViewport(width: 500, height: 500));
+      await page.setViewport(
+          DeviceViewport(width: 500, height: 500, deviceScaleFactor: 1));
       await page.goto(server.prefix + '/grid.html');
       await page.evaluate('() => window.scrollBy(50, 100)');
       var elementHandle = await page.$('.box:nth-of-type(3)');
@@ -139,13 +148,16 @@ void main() {
       </style>
       <div></div>
       ''');
+      await Future.delayed(const Duration(milliseconds: 200));
+      await page.devTools.animation.setPlaybackRate(12);
       var elementHandle = await page.$('div');
       var screenshot = await elementHandle.screenshot();
       expect(screenshot,
           equalsGolden('test/golden/screenshot-element-padding-border.png'));
     });
     test('should capture full element when larger than viewport', () async {
-      await page.setViewport(DeviceViewport(width: 500, height: 500));
+      await page.setViewport(
+          DeviceViewport(width: 500, height: 500, deviceScaleFactor: 1));
 
       await page.setContent('''
       something above
@@ -175,7 +187,8 @@ void main() {
           equals({'w': 500, 'h': 500}));
     });
     test('should scroll element into view', () async {
-      await page.setViewport(DeviceViewport(width: 500, height: 500));
+      await page.setViewport(
+          DeviceViewport(width: 500, height: 500, deviceScaleFactor: 1));
       await page.setContent('''
       something above
       <style>div.above {
@@ -201,14 +214,15 @@ void main() {
               'test/golden/screenshot-element-scrolled-into-view.png'));
     });
     test('should work with a rotated element', () async {
-      await page.setViewport(DeviceViewport(width: 500, height: 500));
+      await page.setViewport(
+          DeviceViewport(width: 500, height: 500, deviceScaleFactor: 1));
       await page.setContent('''<div style="position:absolute;
       top: 100px;
       left: 100px;
       width: 100px;
       height: 100px;
       background: green;
-      transform: rotateZ(200deg);">&nbsp;</div>''');
+      transform: rotate(200deg);">&nbsp;</div>''');
       var elementHandle = await page.$('div');
       var screenshot = await elementHandle.screenshot();
       expect(screenshot,
@@ -245,5 +259,5 @@ void main() {
       expect(screenshot,
           equalsGolden('test/golden/screenshot-element-fractional-offset.png'));
     });
-  });
+  }, tags: ['golden']);
 }

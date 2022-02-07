@@ -77,6 +77,15 @@ This example uses the low-level protocol API to send the commands to the browser
 import 'example/screencast.dart';
 ```
 
+### Launch with visible window
+By default, puppeteer launch Chromium in "headless" mode, the browser is invisible.
+For better development & debugging, you can force "headful" mode with parameter `headless: false`
+
+```dart
+import 'example/headful.dart';
+```
+
+
 ### Low-level DevTools protocol
 This package contains a fully typed API of the [Chrome DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).
 The code is generated from the [JSON Schema](https://github.com/ChromeDevTools/devtools-protocol) provided by Chrome.

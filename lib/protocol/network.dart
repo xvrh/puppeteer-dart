@@ -206,6 +206,13 @@ class NetworkApi {
       .map((event) => ReportingApiReport.fromJson(
           event.parameters['report'] as Map<String, dynamic>));
 
+  Stream<ReportingApiEndpointsChangedForOriginEvent>
+      get onReportingApiEndpointsChangedForOrigin => _client.onEvent
+          .where((event) =>
+              event.name == 'Network.reportingApiEndpointsChangedForOrigin')
+          .map((event) => ReportingApiEndpointsChangedForOriginEvent.fromJson(
+              event.parameters));
+
   /// Sets a list of content encodings that will be accepted. Empty list means no encoding is accepted.
   /// [encodings] List of accepted content encodings.
   Future<void> setAcceptedEncodings(List<ContentEncoding> encodings) async {
@@ -221,7 +228,7 @@ class NetworkApi {
 
   /// Tells whether clearing browser cache is supported.
   /// Returns: True if browser cache can be cleared.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<bool> canClearBrowserCache() async {
     var result = await _client.send('Network.canClearBrowserCache');
     return result['result'] as bool;
@@ -229,7 +236,7 @@ class NetworkApi {
 
   /// Tells whether clearing browser cookies is supported.
   /// Returns: True if browser cookies can be cleared.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<bool> canClearBrowserCookies() async {
     var result = await _client.send('Network.canClearBrowserCookies');
     return result['result'] as bool;
@@ -237,7 +244,7 @@ class NetworkApi {
 
   /// Tells whether emulation of network conditions is supported.
   /// Returns: True if emulation of network conditions is supported.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<bool> canEmulateNetworkConditions() async {
     var result = await _client.send('Network.canEmulateNetworkConditions');
     return result['result'] as bool;
@@ -271,7 +278,8 @@ class NetworkApi {
   /// [headers] If set this allows the request headers to be changed. Must not be set in response to an
   /// authChallenge.
   /// [authChallengeResponse] Response to a requestIntercepted with an authChallenge. Must not be set otherwise.
-  @deprecated
+  @Deprecated(
+      'use Fetch.continueRequest, Fetch.fulfillRequest and Fetch.failRequest instead')
   Future<void> continueInterceptedRequest(InterceptionId interceptionId,
       {ErrorReason? errorReason,
       String? rawResponse,
@@ -495,6 +503,9 @@ class NetworkApi {
   /// [sourcePort] Cookie source port. Valid values are {-1, [1, 65535]}, -1 indicates an unspecified port.
   /// An unspecified port value allows protocol clients to emulate legacy cookie scope for the port.
   /// This is a temporary ability and it will be removed in the future.
+  /// [partitionKey] Cookie partition key. The site of the top-level URL the browser was visiting at the start
+  /// of the request to the endpoint that set the cookie.
+  /// If not set, the cookie will be set as not partitioned.
   /// Returns: Always set to true. If an error occurs, the response indicates protocol error.
   Future<bool> setCookie(String name, String value,
       {String? url,
@@ -507,7 +518,8 @@ class NetworkApi {
       CookiePriority? priority,
       bool? sameParty,
       CookieSourceScheme? sourceScheme,
-      int? sourcePort}) async {
+      int? sourcePort,
+      String? partitionKey}) async {
     var result = await _client.send('Network.setCookie', {
       'name': name,
       'value': value,
@@ -522,6 +534,7 @@ class NetworkApi {
       if (sameParty != null) 'sameParty': sameParty,
       if (sourceScheme != null) 'sourceScheme': sourceScheme,
       if (sourcePort != null) 'sourcePort': sourcePort,
+      if (partitionKey != null) 'partitionKey': partitionKey,
     });
     return result['success'] as bool;
   }
@@ -554,7 +567,7 @@ class NetworkApi {
   /// Deprecated, please use Fetch.enable instead.
   /// [patterns] Requests matching any of these patterns will be forwarded and wait for the corresponding
   /// continueInterceptedRequest call.
-  @deprecated
+  @Deprecated('use Fetch.enable instead')
   Future<void> setRequestInterception(List<RequestPattern> patterns) async {
     await _client.send('Network.setRequestInterception', {
       'patterns': [...patterns],
@@ -1498,6 +1511,26 @@ class SubresourceWebBundleInnerResponseErrorEvent {
   }
 }
 
+class ReportingApiEndpointsChangedForOriginEvent {
+  /// Origin of the document(s) which configured the endpoints.
+  final String origin;
+
+  final List<ReportingApiEndpoint> endpoints;
+
+  ReportingApiEndpointsChangedForOriginEvent(
+      {required this.origin, required this.endpoints});
+
+  factory ReportingApiEndpointsChangedForOriginEvent.fromJson(
+      Map<String, dynamic> json) {
+    return ReportingApiEndpointsChangedForOriginEvent(
+      origin: json['origin'] as String,
+      endpoints: (json['endpoints'] as List)
+          .map((e) => ReportingApiEndpoint.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
 class GetResponseBodyResult {
   /// Response body.
   final String body;
@@ -2257,8 +2290,9 @@ class SignedCertificateTimestamp {
   /// Log ID.
   final String logId;
 
-  /// Issuance date.
-  final TimeSinceEpoch timestamp;
+  /// Issuance date. Unlike TimeSinceEpoch, this contains the number of
+  /// milliseconds since January 1, 1970, UTC, not the number of seconds.
+  final num timestamp;
 
   /// Hash algorithm.
   final String hashAlgorithm;
@@ -2285,7 +2319,7 @@ class SignedCertificateTimestamp {
       origin: json['origin'] as String,
       logDescription: json['logDescription'] as String,
       logId: json['logId'] as String,
-      timestamp: TimeSinceEpoch.fromJson(json['timestamp'] as num),
+      timestamp: json['timestamp'] as num,
       hashAlgorithm: json['hashAlgorithm'] as String,
       signatureAlgorithm: json['signatureAlgorithm'] as String,
       signatureData: json['signatureData'] as String,
@@ -2298,7 +2332,7 @@ class SignedCertificateTimestamp {
       'origin': origin,
       'logDescription': logDescription,
       'logId': logId,
-      'timestamp': timestamp.toJson(),
+      'timestamp': timestamp,
       'hashAlgorithm': hashAlgorithm,
       'signatureAlgorithm': signatureAlgorithm,
       'signatureData': signatureData,
@@ -2530,6 +2564,10 @@ class CorsError {
       CorsError._('PreflightMissingAllowExternal');
   static const preflightInvalidAllowExternal =
       CorsError._('PreflightInvalidAllowExternal');
+  static const preflightMissingAllowPrivateNetwork =
+      CorsError._('PreflightMissingAllowPrivateNetwork');
+  static const preflightInvalidAllowPrivateNetwork =
+      CorsError._('PreflightInvalidAllowPrivateNetwork');
   static const invalidAllowMethodsPreflightResponse =
       CorsError._('InvalidAllowMethodsPreflightResponse');
   static const invalidAllowHeadersPreflightResponse =
@@ -2567,6 +2605,8 @@ class CorsError {
     'PreflightInvalidAllowCredentials': preflightInvalidAllowCredentials,
     'PreflightMissingAllowExternal': preflightMissingAllowExternal,
     'PreflightInvalidAllowExternal': preflightInvalidAllowExternal,
+    'PreflightMissingAllowPrivateNetwork': preflightMissingAllowPrivateNetwork,
+    'PreflightInvalidAllowPrivateNetwork': preflightInvalidAllowPrivateNetwork,
     'InvalidAllowMethodsPreflightResponse':
         invalidAllowMethodsPreflightResponse,
     'InvalidAllowHeadersPreflightResponse':
@@ -3211,6 +3251,13 @@ class Cookie {
   /// This is a temporary ability and it will be removed in the future.
   final int sourcePort;
 
+  /// Cookie partition key. The site of the top-level URL the browser was visiting at the start
+  /// of the request to the endpoint that set the cookie.
+  final String? partitionKey;
+
+  /// True if cookie partition key is opaque.
+  final bool? partitionKeyOpaque;
+
   Cookie(
       {required this.name,
       required this.value,
@@ -3225,7 +3272,9 @@ class Cookie {
       required this.priority,
       required this.sameParty,
       required this.sourceScheme,
-      required this.sourcePort});
+      required this.sourcePort,
+      this.partitionKey,
+      this.partitionKeyOpaque});
 
   factory Cookie.fromJson(Map<String, dynamic> json) {
     return Cookie(
@@ -3245,6 +3294,12 @@ class Cookie {
       sameParty: json['sameParty'] as bool? ?? false,
       sourceScheme: CookieSourceScheme.fromJson(json['sourceScheme'] as String),
       sourcePort: json['sourcePort'] as int,
+      partitionKey: json.containsKey('partitionKey')
+          ? json['partitionKey'] as String
+          : null,
+      partitionKeyOpaque: json.containsKey('partitionKeyOpaque')
+          ? json['partitionKeyOpaque'] as bool
+          : null,
     );
   }
 
@@ -3264,6 +3319,8 @@ class Cookie {
       'sourceScheme': sourceScheme.toJson(),
       'sourcePort': sourcePort,
       if (sameSite != null) 'sameSite': sameSite!.toJson(),
+      if (partitionKey != null) 'partitionKey': partitionKey,
+      if (partitionKeyOpaque != null) 'partitionKeyOpaque': partitionKeyOpaque,
     };
   }
 }
@@ -3509,6 +3566,11 @@ class CookieParam {
   /// This is a temporary ability and it will be removed in the future.
   final int? sourcePort;
 
+  /// Cookie partition key. The site of the top-level URL the browser was visiting at the start
+  /// of the request to the endpoint that set the cookie.
+  /// If not set, the cookie will be set as not partitioned.
+  final String? partitionKey;
+
   CookieParam(
       {required this.name,
       required this.value,
@@ -3522,7 +3584,8 @@ class CookieParam {
       this.priority,
       this.sameParty,
       this.sourceScheme,
-      this.sourcePort});
+      this.sourcePort,
+      this.partitionKey});
 
   factory CookieParam.fromJson(Map<String, dynamic> json) {
     return CookieParam(
@@ -3549,6 +3612,9 @@ class CookieParam {
           : null,
       sourcePort:
           json.containsKey('sourcePort') ? json['sourcePort'] as int : null,
+      partitionKey: json.containsKey('partitionKey')
+          ? json['partitionKey'] as String
+          : null,
     );
   }
 
@@ -3567,6 +3633,7 @@ class CookieParam {
       if (sameParty != null) 'sameParty': sameParty,
       if (sourceScheme != null) 'sourceScheme': sourceScheme!.toJson(),
       if (sourcePort != null) 'sourcePort': sourcePort,
+      if (partitionKey != null) 'partitionKey': partitionKey,
     };
   }
 }
@@ -4465,6 +4532,30 @@ class ReportingApiReport {
       'completedAttempts': completedAttempts,
       'body': body,
       'status': status.toJson(),
+    };
+  }
+}
+
+class ReportingApiEndpoint {
+  /// The URL of the endpoint to which reports may be delivered.
+  final String url;
+
+  /// Name of the endpoint group.
+  final String groupName;
+
+  ReportingApiEndpoint({required this.url, required this.groupName});
+
+  factory ReportingApiEndpoint.fromJson(Map<String, dynamic> json) {
+    return ReportingApiEndpoint(
+      url: json['url'] as String,
+      groupName: json['groupName'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      'groupName': groupName,
     };
   }
 }

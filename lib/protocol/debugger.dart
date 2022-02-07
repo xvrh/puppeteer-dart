@@ -134,7 +134,7 @@ class DebuggerApi {
   /// This command is deprecated. Use getScriptSource instead.
   /// [scriptId] Id of the Wasm script to get source for.
   /// Returns: Script source.
-  @deprecated
+  @Deprecated('Use getScriptSource instead')
   Future<String> getWasmBytecode(runtime.ScriptId scriptId) async {
     var result = await _client.send('Debugger.getWasmBytecode', {
       'scriptId': scriptId,
@@ -158,7 +158,7 @@ class DebuggerApi {
   }
 
   /// [parentStackTraceId] Debugger will pause when async call with given stack trace is started.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> pauseOnAsyncCall(runtime.StackTraceId parentStackTraceId) async {
     await _client.send('Debugger.pauseOnAsyncCall', {
       'parentStackTraceId': parentStackTraceId,
@@ -174,7 +174,7 @@ class DebuggerApi {
 
   /// Restarts particular call frame from the beginning.
   /// [callFrameId] Call frame identifier to evaluate on.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<RestartFrameResult> restartFrame(CallFrameId callFrameId) async {
     var result = await _client.send('Debugger.restartFrame', {
       'callFrameId': callFrameId,
@@ -1009,9 +1009,6 @@ class CallFrame {
   /// Location in the source code.
   final Location location;
 
-  /// JavaScript script name or url.
-  final String url;
-
   /// Scope chain for this call frame.
   final List<Scope> scopeChain;
 
@@ -1026,7 +1023,6 @@ class CallFrame {
       required this.functionName,
       this.functionLocation,
       required this.location,
-      required this.url,
       required this.scopeChain,
       required this.this$,
       this.returnValue});
@@ -1039,7 +1035,6 @@ class CallFrame {
           ? Location.fromJson(json['functionLocation'] as Map<String, dynamic>)
           : null,
       location: Location.fromJson(json['location'] as Map<String, dynamic>),
-      url: json['url'] as String,
       scopeChain: (json['scopeChain'] as List)
           .map((e) => Scope.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -1057,7 +1052,6 @@ class CallFrame {
       'callFrameId': callFrameId.toJson(),
       'functionName': functionName,
       'location': location.toJson(),
-      'url': url,
       'scopeChain': scopeChain.map((e) => e.toJson()).toList(),
       'this': this$.toJson(),
       if (functionLocation != null)

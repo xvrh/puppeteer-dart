@@ -2,7 +2,7 @@ import 'dart:async';
 import '../src/connection.dart';
 
 /// This domain is deprecated - use Runtime or Log instead.
-@deprecated
+@Deprecated('use Runtime or Log instead')
 class ConsoleApi {
   final Client _client;
 

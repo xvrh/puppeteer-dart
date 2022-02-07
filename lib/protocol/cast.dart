@@ -46,6 +46,13 @@ class CastApi {
     });
   }
 
+  /// Starts mirroring the desktop to the sink.
+  Future<void> startDesktopMirroring(String sinkName) async {
+    await _client.send('Cast.startDesktopMirroring', {
+      'sinkName': sinkName,
+    });
+  }
+
   /// Starts mirroring the tab to the sink.
   Future<void> startTabMirroring(String sinkName) async {
     await _client.send('Cast.startTabMirroring', {

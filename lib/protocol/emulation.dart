@@ -211,7 +211,7 @@ class EmulationApi {
 
   /// Overrides value returned by the javascript navigator object.
   /// [platform] The platform navigator.platform should return.
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> setNavigatorOverrides(String platform) async {
     await _client.send('Emulation.setNavigatorOverrides', {
       'platform': platform,
@@ -294,7 +294,7 @@ class EmulationApi {
   /// on Android.
   /// [width] Frame width (DIP).
   /// [height] Frame height (DIP).
-  @deprecated
+  @Deprecated('This command is deprecated')
   Future<void> setVisibleSize(int width, int height) async {
     await _client.send('Emulation.setVisibleSize', {
       'width': width,
@@ -533,7 +533,7 @@ class UserAgentBrandVersion {
 class UserAgentMetadata {
   final List<UserAgentBrandVersion>? brands;
 
-  final String? fullVersion;
+  final List<UserAgentBrandVersion>? fullVersionList;
 
   final String platform;
 
@@ -547,7 +547,7 @@ class UserAgentMetadata {
 
   UserAgentMetadata(
       {this.brands,
-      this.fullVersion,
+      this.fullVersionList,
       required this.platform,
       required this.platformVersion,
       required this.architecture,
@@ -562,8 +562,11 @@ class UserAgentMetadata {
                   UserAgentBrandVersion.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
-      fullVersion: json.containsKey('fullVersion')
-          ? json['fullVersion'] as String
+      fullVersionList: json.containsKey('fullVersionList')
+          ? (json['fullVersionList'] as List)
+              .map((e) =>
+                  UserAgentBrandVersion.fromJson(e as Map<String, dynamic>))
+              .toList()
           : null,
       platform: json['platform'] as String,
       platformVersion: json['platformVersion'] as String,
@@ -581,7 +584,8 @@ class UserAgentMetadata {
       'model': model,
       'mobile': mobile,
       if (brands != null) 'brands': brands!.map((e) => e.toJson()).toList(),
-      if (fullVersion != null) 'fullVersion': fullVersion,
+      if (fullVersionList != null)
+        'fullVersionList': fullVersionList!.map((e) => e.toJson()).toList(),
     };
   }
 }
