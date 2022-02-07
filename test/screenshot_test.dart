@@ -136,8 +136,7 @@ void main() {
           equalsGolden('test/golden/screenshot-element-bounding-box.png'));
     });
     test('should take into account padding and border', () async {
-      await page.setViewport(
-          DeviceViewport(width: 500, height: 500, deviceScaleFactor: 1));
+      await page.setViewport(DeviceViewport(width: 500, height: 500));
       await page.setContent('''
       something above
       <style>div {
@@ -149,6 +148,8 @@ void main() {
       </style>
       <div></div>
       ''');
+      await Future.delayed(const Duration(milliseconds: 200));
+      await page.devTools.animation.setPlaybackRate(12);
       var elementHandle = await page.$('div');
       var screenshot = await elementHandle.screenshot();
       expect(screenshot,
@@ -258,5 +259,5 @@ void main() {
       expect(screenshot,
           equalsGolden('test/golden/screenshot-element-fractional-offset.png'));
     });
-  });
+  }, tags: ['golden']);
 }

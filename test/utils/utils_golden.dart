@@ -9,6 +9,11 @@ final bool _updateGolden = (() {
   return env != null && env != 'false';
 })();
 
+final bool _skipGoldenComparison = (() {
+  var env = Platform.environment['PUPPETEER_SKIP_GOLDEN_COMPARISON'];
+  return env != null && env != 'false';
+})();
+
 class _GoldenMatcher extends Matcher {
   final String goldenPath;
 
@@ -21,6 +26,8 @@ class _GoldenMatcher extends Matcher {
 
   @override
   bool matches(covariant List<int> item, Map matchState) {
+    if (_skipGoldenComparison) return true;
+
     var goldenFile = File(goldenPath);
 
     if (_updateGolden) {

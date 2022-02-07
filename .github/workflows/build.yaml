@@ -29,14 +29,10 @@ jobs:
           Xvfb -ac :99 -screen 0 1280x1024x16 > /dev/null 2>&1 &
       - run: xvfb-run --auto-servernum dart test -P ci --platform vm --concurrency=1
         if: runner.os == 'Linux'
-        env:
-          PUPPETEER_UPDATE_GOLDEN: 'true'
       - run: dart test -P ci --platform vm --concurrency=1
-        if: runner.os == 'Windows'
+        if: runner.os != 'Linux'
         env:
-          PUPPETEER_UPDATE_GOLDEN: 'true'
-      - run: dart test -P ci --platform vm --concurrency=1
-        if: runner.os == 'macOS'
+          PUPPETEER_SKIP_GOLDEN_COMPARISON: 'true'
       - run: dart tool/prepare_submit.dart
       - name: "check for uncommitted changes"
         run: |
@@ -45,4 +41,3 @@ jobs:
                    "and check in all changes" \
               && exit 1)
         shell: bash
-        if: runner.os == 'macOS'
