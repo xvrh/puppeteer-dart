@@ -47,7 +47,7 @@ List<String> _windowsPaths(String folder) {
   ]) {
     var env = Platform.environment[envName];
     if (env != null) {
-      paths.add(p.join(env, '\\Google\\$folder\\Application\\chrome.exe'));
+      paths.add(p.join(env, 'Google\\$folder\\Application\\chrome.exe'));
     }
   }
   return paths;
