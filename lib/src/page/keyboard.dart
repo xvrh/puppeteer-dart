@@ -164,7 +164,7 @@ class Keyboard {
           shift && key.shiftKeyCode != null ? key.shiftKeyCode : key.keyCode
       ..code = key.code
       ..location = key.location ?? KeyLocation.standard
-      ..text = shift && key.shiftText != null ? key.shiftText : key.text;
+      ..text = key.text;
 
     // if any modifiers besides shift are pressed, no text should be sent
     if (_modifiers & ~8 != 0) {
@@ -519,7 +519,7 @@ class Key {
 
   final int? keyCode, shiftKeyCode;
   final KeyLocation? location;
-  final String? key, shiftKey, code, text, shiftText;
+  final String? key, shiftKey, code, text;
 
   static final Map<String, Key> allKeys =
       CanonicalizedMap<String, String, Key>.from({
@@ -675,20 +675,19 @@ class Key {
     'KeyZ': keyZ,
   }, (key) => key.toLowerCase().replaceAll(' ', ''));
 
-  const Key._(
-      {this.keyCode,
-      required this.key,
-      this.shiftKey,
-      this.shiftKeyCode,
-      this.code,
-      this.location,
-      this.text,
-      this.shiftText});
+  const Key._({
+    this.keyCode,
+    required this.key,
+    this.shiftKey,
+    this.shiftKeyCode,
+    this.code,
+    this.location,
+    this.text,
+  });
 
   @override
   String toString() => 'Key(keyCode: $keyCode, key: $key, shiftKey: $shiftKey, '
-      'shiftKeyCode: $shiftKeyCode, code: $code, location: $location, text: $text, '
-      'shiftText: $shiftText)';
+      'shiftKeyCode: $shiftKeyCode, code: $code, location: $location, text: $text)';
 }
 
 final _characters = const {
