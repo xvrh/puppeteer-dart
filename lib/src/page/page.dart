@@ -2092,9 +2092,16 @@ class ClientError implements Exception {
   String toString() => 'Evaluation failed: $message';
 
   static String? _message(ExceptionDetails details) {
-    if (details.exception != null) {
-      return details.exception!.description ??
-          details.exception!.value as String?;
+    var exception = details.exception;
+    if (exception != null) {
+      if (exception.description != null) {
+        return exception.description;
+      }
+      var value = exception.value;
+      if (value != null) {
+        return '$value';
+      }
+      return null;
     } else {
       var message = details.text;
       if (details.stackTrace != null) {
