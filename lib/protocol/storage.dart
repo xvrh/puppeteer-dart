@@ -218,6 +218,8 @@ class IndexedDBContentUpdatedEvent {
 }
 
 class InterestGroupAccessedEvent {
+  final network.TimeSinceEpoch accessTime;
+
   final InterestGroupAccessType type;
 
   final String ownerOrigin;
@@ -225,10 +227,14 @@ class InterestGroupAccessedEvent {
   final String name;
 
   InterestGroupAccessedEvent(
-      {required this.type, required this.ownerOrigin, required this.name});
+      {required this.accessTime,
+      required this.type,
+      required this.ownerOrigin,
+      required this.name});
 
   factory InterestGroupAccessedEvent.fromJson(Map<String, dynamic> json) {
     return InterestGroupAccessedEvent(
+      accessTime: network.TimeSinceEpoch.fromJson(json['accessTime'] as num),
       type: InterestGroupAccessType.fromJson(json['type'] as String),
       ownerOrigin: json['ownerOrigin'] as String,
       name: json['name'] as String,
@@ -429,7 +435,7 @@ class InterestGroupDetails {
 
   final String name;
 
-  final num expirationTime;
+  final network.TimeSinceEpoch expirationTime;
 
   final String joiningOrigin;
 
@@ -467,7 +473,8 @@ class InterestGroupDetails {
     return InterestGroupDetails(
       ownerOrigin: json['ownerOrigin'] as String,
       name: json['name'] as String,
-      expirationTime: json['expirationTime'] as num,
+      expirationTime:
+          network.TimeSinceEpoch.fromJson(json['expirationTime'] as num),
       joiningOrigin: json['joiningOrigin'] as String,
       biddingUrl:
           json.containsKey('biddingUrl') ? json['biddingUrl'] as String : null,
@@ -498,7 +505,7 @@ class InterestGroupDetails {
     return {
       'ownerOrigin': ownerOrigin,
       'name': name,
-      'expirationTime': expirationTime,
+      'expirationTime': expirationTime.toJson(),
       'joiningOrigin': joiningOrigin,
       'trustedBiddingSignalsKeys': [...trustedBiddingSignalsKeys],
       'ads': ads.map((e) => e.toJson()).toList(),

@@ -181,8 +181,14 @@ class DOMApi {
   }
 
   /// Enables DOM agent for the given page.
-  Future<void> enable() async {
-    await _client.send('DOM.enable');
+  /// [includeWhitespace] Whether to include whitespaces in the children array of returned Nodes.
+  Future<void> enable(
+      {@Enum(['none', 'all']) String? includeWhitespace}) async {
+    assert(includeWhitespace == null ||
+        const ['none', 'all'].contains(includeWhitespace));
+    await _client.send('DOM.enable', {
+      if (includeWhitespace != null) 'includeWhitespace': includeWhitespace,
+    });
   }
 
   /// Focuses the given element.

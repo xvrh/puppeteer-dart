@@ -4249,11 +4249,14 @@ class CrossOriginOpenerPolicyValue {
   static const unsafeNone = CrossOriginOpenerPolicyValue._('UnsafeNone');
   static const sameOriginPlusCoep =
       CrossOriginOpenerPolicyValue._('SameOriginPlusCoep');
+  static const sameOriginAllowPopupsPlusCoep =
+      CrossOriginOpenerPolicyValue._('SameOriginAllowPopupsPlusCoep');
   static const values = {
     'SameOrigin': sameOrigin,
     'SameOriginAllowPopups': sameOriginAllowPopups,
     'UnsafeNone': unsafeNone,
     'SameOriginPlusCoep': sameOriginPlusCoep,
+    'SameOriginAllowPopupsPlusCoep': sameOriginAllowPopupsPlusCoep,
   };
 
   final String value;

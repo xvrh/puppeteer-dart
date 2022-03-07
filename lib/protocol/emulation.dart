@@ -251,21 +251,17 @@ class EmulationApi {
   /// virtualTimeBudgetExpired event is sent.
   /// [maxVirtualTimeTaskStarvationCount] If set this specifies the maximum number of tasks that can be run before virtual is forced
   /// forwards to prevent deadlock.
-  /// [waitForNavigation] If set the virtual time policy change should be deferred until any frame starts navigating.
-  /// Note any previous deferred policy change is superseded.
   /// [initialVirtualTime] If set, base::Time::Now will be overridden to initially return this value.
   /// Returns: Absolute timestamp at which virtual time was first enabled (up time in milliseconds).
   Future<num> setVirtualTimePolicy(VirtualTimePolicy policy,
       {num? budget,
       int? maxVirtualTimeTaskStarvationCount,
-      bool? waitForNavigation,
       network.TimeSinceEpoch? initialVirtualTime}) async {
     var result = await _client.send('Emulation.setVirtualTimePolicy', {
       'policy': policy,
       if (budget != null) 'budget': budget,
       if (maxVirtualTimeTaskStarvationCount != null)
         'maxVirtualTimeTaskStarvationCount': maxVirtualTimeTaskStarvationCount,
-      if (waitForNavigation != null) 'waitForNavigation': waitForNavigation,
       if (initialVirtualTime != null) 'initialVirtualTime': initialVirtualTime,
     });
     return result['virtualTimeTicksBase'] as num;
