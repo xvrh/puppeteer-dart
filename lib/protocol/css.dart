@@ -785,13 +785,18 @@ class CSSRule {
   /// The array enumerates container queries starting with the innermost one, going outwards.
   final List<CSSContainerQuery>? containerQueries;
 
+  /// @supports CSS at-rule array.
+  /// The array enumerates @supports at-rules starting with the innermost one, going outwards.
+  final List<CSSSupports>? supports;
+
   CSSRule(
       {this.styleSheetId,
       required this.selectorList,
       required this.origin,
       required this.style,
       this.media,
-      this.containerQueries});
+      this.containerQueries,
+      this.supports});
 
   factory CSSRule.fromJson(Map<String, dynamic> json) {
     return CSSRule(
@@ -812,6 +817,11 @@ class CSSRule {
               .map((e) => CSSContainerQuery.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
+      supports: json.containsKey('supports')
+          ? (json['supports'] as List)
+              .map((e) => CSSSupports.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
     );
   }
 
@@ -824,6 +834,8 @@ class CSSRule {
       if (media != null) 'media': media!.map((e) => e.toJson()).toList(),
       if (containerQueries != null)
         'containerQueries': containerQueries!.map((e) => e.toJson()).toList(),
+      if (supports != null)
+        'supports': supports!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -1290,6 +1302,41 @@ class CSSContainerQuery {
       if (range != null) 'range': range!.toJson(),
       if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
       if (name != null) 'name': name,
+    };
+  }
+}
+
+/// CSS Supports at-rule descriptor.
+class CSSSupports {
+  /// Supports rule text.
+  final String text;
+
+  /// The associated rule header range in the enclosing stylesheet (if
+  /// available).
+  final SourceRange? range;
+
+  /// Identifier of the stylesheet containing this object (if exists).
+  final StyleSheetId? styleSheetId;
+
+  CSSSupports({required this.text, this.range, this.styleSheetId});
+
+  factory CSSSupports.fromJson(Map<String, dynamic> json) {
+    return CSSSupports(
+      text: json['text'] as String,
+      range: json.containsKey('range')
+          ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
+          : null,
+      styleSheetId: json.containsKey('styleSheetId')
+          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'text': text,
+      if (range != null) 'range': range!.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
     };
   }
 }

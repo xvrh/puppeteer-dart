@@ -1617,6 +1617,7 @@ class PermissionsPolicyFeature {
   static const chUaPlatform = PermissionsPolicyFeature._('ch-ua-platform');
   static const chUaModel = PermissionsPolicyFeature._('ch-ua-model');
   static const chUaMobile = PermissionsPolicyFeature._('ch-ua-mobile');
+  static const chUaFull = PermissionsPolicyFeature._('ch-ua-full');
   static const chUaFullVersion =
       PermissionsPolicyFeature._('ch-ua-full-version');
   static const chUaFullVersionList =
@@ -1624,11 +1625,14 @@ class PermissionsPolicyFeature {
   static const chUaPlatformVersion =
       PermissionsPolicyFeature._('ch-ua-platform-version');
   static const chUaReduced = PermissionsPolicyFeature._('ch-ua-reduced');
+  static const chUaWow64 = PermissionsPolicyFeature._('ch-ua-wow64');
   static const chViewportHeight =
       PermissionsPolicyFeature._('ch-viewport-height');
   static const chViewportWidth =
       PermissionsPolicyFeature._('ch-viewport-width');
   static const chWidth = PermissionsPolicyFeature._('ch-width');
+  static const chPartitionedCookies =
+      PermissionsPolicyFeature._('ch-partitioned-cookies');
   static const clipboardRead = PermissionsPolicyFeature._('clipboard-read');
   static const clipboardWrite = PermissionsPolicyFeature._('clipboard-write');
   static const crossOriginIsolated =
@@ -1650,7 +1654,6 @@ class PermissionsPolicyFeature {
   static const gyroscope = PermissionsPolicyFeature._('gyroscope');
   static const hid = PermissionsPolicyFeature._('hid');
   static const idleDetection = PermissionsPolicyFeature._('idle-detection');
-  static const interestCohort = PermissionsPolicyFeature._('interest-cohort');
   static const joinAdInterestGroup =
       PermissionsPolicyFeature._('join-ad-interest-group');
   static const keyboardMap = PermissionsPolicyFeature._('keyboard-map');
@@ -1696,13 +1699,16 @@ class PermissionsPolicyFeature {
     'ch-ua-platform': chUaPlatform,
     'ch-ua-model': chUaModel,
     'ch-ua-mobile': chUaMobile,
+    'ch-ua-full': chUaFull,
     'ch-ua-full-version': chUaFullVersion,
     'ch-ua-full-version-list': chUaFullVersionList,
     'ch-ua-platform-version': chUaPlatformVersion,
     'ch-ua-reduced': chUaReduced,
+    'ch-ua-wow64': chUaWow64,
     'ch-viewport-height': chViewportHeight,
     'ch-viewport-width': chViewportWidth,
     'ch-width': chWidth,
+    'ch-partitioned-cookies': chPartitionedCookies,
     'clipboard-read': clipboardRead,
     'clipboard-write': clipboardWrite,
     'cross-origin-isolated': crossOriginIsolated,
@@ -1720,7 +1726,6 @@ class PermissionsPolicyFeature {
     'gyroscope': gyroscope,
     'hid': hid,
     'idle-detection': idleDetection,
-    'interest-cohort': interestCohort,
     'join-ad-interest-group': joinAdInterestGroup,
     'keyboard-map': keyboardMap,
     'magnetometer': magnetometer,
@@ -3067,8 +3072,8 @@ class NavigationType {
 
 /// List of not restored reasons for back-forward cache.
 class BackForwardCacheNotRestoredReason {
-  static const notMainFrame =
-      BackForwardCacheNotRestoredReason._('NotMainFrame');
+  static const notPrimaryMainFrame =
+      BackForwardCacheNotRestoredReason._('NotPrimaryMainFrame');
   static const backForwardCacheDisabled =
       BackForwardCacheNotRestoredReason._('BackForwardCacheDisabled');
   static const relatedActiveContentsExist =
@@ -3312,7 +3317,7 @@ class BackForwardCacheNotRestoredReason {
       BackForwardCacheNotRestoredReason._(
           'EmbedderExtensionSentMessageToCachedFrame');
   static const values = {
-    'NotMainFrame': notMainFrame,
+    'NotPrimaryMainFrame': notPrimaryMainFrame,
     'BackForwardCacheDisabled': backForwardCacheDisabled,
     'RelatedActiveContentsExist': relatedActiveContentsExist,
     'HTTPStatusNotOK': httpStatusNotOk,

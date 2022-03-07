@@ -1282,41 +1282,6 @@ class NavigatorUserAgentIssueDetails {
   }
 }
 
-class WasmCrossOriginModuleSharingIssueDetails {
-  final String wasmModuleUrl;
-
-  final String sourceOrigin;
-
-  final String targetOrigin;
-
-  final bool isWarning;
-
-  WasmCrossOriginModuleSharingIssueDetails(
-      {required this.wasmModuleUrl,
-      required this.sourceOrigin,
-      required this.targetOrigin,
-      required this.isWarning});
-
-  factory WasmCrossOriginModuleSharingIssueDetails.fromJson(
-      Map<String, dynamic> json) {
-    return WasmCrossOriginModuleSharingIssueDetails(
-      wasmModuleUrl: json['wasmModuleUrl'] as String,
-      sourceOrigin: json['sourceOrigin'] as String,
-      targetOrigin: json['targetOrigin'] as String,
-      isWarning: json['isWarning'] as bool? ?? false,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'wasmModuleUrl': wasmModuleUrl,
-      'sourceOrigin': sourceOrigin,
-      'targetOrigin': targetOrigin,
-      'isWarning': isWarning,
-    };
-  }
-}
-
 class GenericIssueErrorType {
   static const crossOriginPortalPostMessageError =
       GenericIssueErrorType._('CrossOriginPortalPostMessageError');
@@ -1438,6 +1403,111 @@ class ClientHintIssueReason {
   String toString() => value.toString();
 }
 
+class FederatedAuthRequestIssueDetails {
+  final FederatedAuthRequestIssueReason federatedAuthRequestIssueReason;
+
+  FederatedAuthRequestIssueDetails(
+      {required this.federatedAuthRequestIssueReason});
+
+  factory FederatedAuthRequestIssueDetails.fromJson(Map<String, dynamic> json) {
+    return FederatedAuthRequestIssueDetails(
+      federatedAuthRequestIssueReason: FederatedAuthRequestIssueReason.fromJson(
+          json['federatedAuthRequestIssueReason'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'federatedAuthRequestIssueReason':
+          federatedAuthRequestIssueReason.toJson(),
+    };
+  }
+}
+
+/// Represents the failure reason when a federated authentication reason fails.
+/// Should be updated alongside RequestIdTokenStatus in
+/// third_party/blink/public/mojom/webid/federated_auth_request.mojom to include
+/// all cases except for success.
+class FederatedAuthRequestIssueReason {
+  static const approvalDeclined =
+      FederatedAuthRequestIssueReason._('ApprovalDeclined');
+  static const tooManyRequests =
+      FederatedAuthRequestIssueReason._('TooManyRequests');
+  static const manifestHttpNotFound =
+      FederatedAuthRequestIssueReason._('ManifestHttpNotFound');
+  static const manifestNoResponse =
+      FederatedAuthRequestIssueReason._('ManifestNoResponse');
+  static const manifestInvalidResponse =
+      FederatedAuthRequestIssueReason._('ManifestInvalidResponse');
+  static const clientMetadataHttpNotFound =
+      FederatedAuthRequestIssueReason._('ClientMetadataHttpNotFound');
+  static const clientMetadataNoResponse =
+      FederatedAuthRequestIssueReason._('ClientMetadataNoResponse');
+  static const clientMetadataInvalidResponse =
+      FederatedAuthRequestIssueReason._('ClientMetadataInvalidResponse');
+  static const errorFetchingSignin =
+      FederatedAuthRequestIssueReason._('ErrorFetchingSignin');
+  static const invalidSigninResponse =
+      FederatedAuthRequestIssueReason._('InvalidSigninResponse');
+  static const accountsHttpNotFound =
+      FederatedAuthRequestIssueReason._('AccountsHttpNotFound');
+  static const accountsNoResponse =
+      FederatedAuthRequestIssueReason._('AccountsNoResponse');
+  static const accountsInvalidResponse =
+      FederatedAuthRequestIssueReason._('AccountsInvalidResponse');
+  static const idTokenHttpNotFound =
+      FederatedAuthRequestIssueReason._('IdTokenHttpNotFound');
+  static const idTokenNoResponse =
+      FederatedAuthRequestIssueReason._('IdTokenNoResponse');
+  static const idTokenInvalidResponse =
+      FederatedAuthRequestIssueReason._('IdTokenInvalidResponse');
+  static const idTokenInvalidRequest =
+      FederatedAuthRequestIssueReason._('IdTokenInvalidRequest');
+  static const errorIdToken = FederatedAuthRequestIssueReason._('ErrorIdToken');
+  static const canceled = FederatedAuthRequestIssueReason._('Canceled');
+  static const values = {
+    'ApprovalDeclined': approvalDeclined,
+    'TooManyRequests': tooManyRequests,
+    'ManifestHttpNotFound': manifestHttpNotFound,
+    'ManifestNoResponse': manifestNoResponse,
+    'ManifestInvalidResponse': manifestInvalidResponse,
+    'ClientMetadataHttpNotFound': clientMetadataHttpNotFound,
+    'ClientMetadataNoResponse': clientMetadataNoResponse,
+    'ClientMetadataInvalidResponse': clientMetadataInvalidResponse,
+    'ErrorFetchingSignin': errorFetchingSignin,
+    'InvalidSigninResponse': invalidSigninResponse,
+    'AccountsHttpNotFound': accountsHttpNotFound,
+    'AccountsNoResponse': accountsNoResponse,
+    'AccountsInvalidResponse': accountsInvalidResponse,
+    'IdTokenHttpNotFound': idTokenHttpNotFound,
+    'IdTokenNoResponse': idTokenNoResponse,
+    'IdTokenInvalidResponse': idTokenInvalidResponse,
+    'IdTokenInvalidRequest': idTokenInvalidRequest,
+    'ErrorIdToken': errorIdToken,
+    'Canceled': canceled,
+  };
+
+  final String value;
+
+  const FederatedAuthRequestIssueReason._(this.value);
+
+  factory FederatedAuthRequestIssueReason.fromJson(String value) =>
+      values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is FederatedAuthRequestIssueReason && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// This issue tracks client hints related issues. It's used to deprecate old
 /// features, encourage the use of new ones, and provide general guidance.
 class ClientHintIssueDetails {
@@ -1489,11 +1559,11 @@ class InspectorIssueCode {
   static const quirksModeIssue = InspectorIssueCode._('QuirksModeIssue');
   static const navigatorUserAgentIssue =
       InspectorIssueCode._('NavigatorUserAgentIssue');
-  static const wasmCrossOriginModuleSharingIssue =
-      InspectorIssueCode._('WasmCrossOriginModuleSharingIssue');
   static const genericIssue = InspectorIssueCode._('GenericIssue');
   static const deprecationIssue = InspectorIssueCode._('DeprecationIssue');
   static const clientHintIssue = InspectorIssueCode._('ClientHintIssue');
+  static const federatedAuthRequestIssue =
+      InspectorIssueCode._('FederatedAuthRequestIssue');
   static const values = {
     'SameSiteCookieIssue': sameSiteCookieIssue,
     'MixedContentIssue': mixedContentIssue,
@@ -1507,10 +1577,10 @@ class InspectorIssueCode {
     'AttributionReportingIssue': attributionReportingIssue,
     'QuirksModeIssue': quirksModeIssue,
     'NavigatorUserAgentIssue': navigatorUserAgentIssue,
-    'WasmCrossOriginModuleSharingIssue': wasmCrossOriginModuleSharingIssue,
     'GenericIssue': genericIssue,
     'DeprecationIssue': deprecationIssue,
     'ClientHintIssue': clientHintIssue,
+    'FederatedAuthRequestIssue': federatedAuthRequestIssue,
   };
 
   final String value;
@@ -1560,14 +1630,13 @@ class InspectorIssueDetails {
 
   final NavigatorUserAgentIssueDetails? navigatorUserAgentIssueDetails;
 
-  final WasmCrossOriginModuleSharingIssueDetails?
-      wasmCrossOriginModuleSharingIssue;
-
   final GenericIssueDetails? genericIssueDetails;
 
   final DeprecationIssueDetails? deprecationIssueDetails;
 
   final ClientHintIssueDetails? clientHintIssueDetails;
+
+  final FederatedAuthRequestIssueDetails? federatedAuthRequestIssueDetails;
 
   InspectorIssueDetails(
       {this.sameSiteCookieIssueDetails,
@@ -1582,10 +1651,10 @@ class InspectorIssueDetails {
       this.attributionReportingIssueDetails,
       this.quirksModeIssueDetails,
       this.navigatorUserAgentIssueDetails,
-      this.wasmCrossOriginModuleSharingIssue,
       this.genericIssueDetails,
       this.deprecationIssueDetails,
-      this.clientHintIssueDetails});
+      this.clientHintIssueDetails,
+      this.federatedAuthRequestIssueDetails});
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
     return InspectorIssueDetails(
@@ -1644,11 +1713,6 @@ class InspectorIssueDetails {
           ? NavigatorUserAgentIssueDetails.fromJson(
               json['navigatorUserAgentIssueDetails'] as Map<String, dynamic>)
           : null,
-      wasmCrossOriginModuleSharingIssue: json
-              .containsKey('wasmCrossOriginModuleSharingIssue')
-          ? WasmCrossOriginModuleSharingIssueDetails.fromJson(
-              json['wasmCrossOriginModuleSharingIssue'] as Map<String, dynamic>)
-          : null,
       genericIssueDetails: json.containsKey('genericIssueDetails')
           ? GenericIssueDetails.fromJson(
               json['genericIssueDetails'] as Map<String, dynamic>)
@@ -1660,6 +1724,11 @@ class InspectorIssueDetails {
       clientHintIssueDetails: json.containsKey('clientHintIssueDetails')
           ? ClientHintIssueDetails.fromJson(
               json['clientHintIssueDetails'] as Map<String, dynamic>)
+          : null,
+      federatedAuthRequestIssueDetails: json
+              .containsKey('federatedAuthRequestIssueDetails')
+          ? FederatedAuthRequestIssueDetails.fromJson(
+              json['federatedAuthRequestIssueDetails'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -1695,15 +1764,15 @@ class InspectorIssueDetails {
       if (navigatorUserAgentIssueDetails != null)
         'navigatorUserAgentIssueDetails':
             navigatorUserAgentIssueDetails!.toJson(),
-      if (wasmCrossOriginModuleSharingIssue != null)
-        'wasmCrossOriginModuleSharingIssue':
-            wasmCrossOriginModuleSharingIssue!.toJson(),
       if (genericIssueDetails != null)
         'genericIssueDetails': genericIssueDetails!.toJson(),
       if (deprecationIssueDetails != null)
         'deprecationIssueDetails': deprecationIssueDetails!.toJson(),
       if (clientHintIssueDetails != null)
         'clientHintIssueDetails': clientHintIssueDetails!.toJson(),
+      if (federatedAuthRequestIssueDetails != null)
+        'federatedAuthRequestIssueDetails':
+            federatedAuthRequestIssueDetails!.toJson(),
     };
   }
 }
