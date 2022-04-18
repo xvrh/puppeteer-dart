@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.8.0 (2022-04-18)
+- Update to Chromium 101
+
 ## 2.7.0 (2022-03-07)
 - Update to Chromium 100
 - Resolving browser paths in windows
