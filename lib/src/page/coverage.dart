@@ -190,7 +190,7 @@ class JsCoverage {
       _scriptSources[event.scriptId] = response.scriptSource;
     } catch (e) {
       // This might happen if the page has already navigated away.
-      _logger.fine('_onScriptParsed error', e);
+      _logger.finer('_onScriptParsed error', e);
     }
   }
 
@@ -278,7 +278,7 @@ class CssCoverage {
       _stylesheetSources[header.styleSheetId] = response;
     } catch (e) {
       // This might happen if the page has already navigated away.
-      _logger.fine('Error in _onStyleSheet', e);
+      _logger.finer('Error in _onStyleSheet', e);
     }
   }
 

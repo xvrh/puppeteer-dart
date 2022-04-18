@@ -412,7 +412,7 @@ class Request {
         .catchError((error) {
       // In certain cases, protocol will return error if the request was already canceled
       // or the page was closed. We should tolerate these errors.
-      _logger.fine('[Request.continueRequest] swallow error: $error');
+      _logger.finer('[Request.continueRequest] swallow error: $error');
     });
   }
 
@@ -477,7 +477,7 @@ class Request {
         .catchError((error) {
       // In certain cases, protocol will return error if the request was already canceled
       // or the page was closed. We should tolerate these errors.
-      _logger.fine('[Request.respond] swallow error: $error');
+      _logger.finer('[Request.respond] swallow error: $error');
     });
   }
 
@@ -500,7 +500,7 @@ class Request {
         .catchError((error) {
       // In certain cases, protocol will return error if the request was already canceled
       // or the page was closed. We should tolerate these errors.
-      _logger.fine('[Request.abort] swallow error: $error');
+      _logger.finer('[Request.abort] swallow error: $error');
     });
   }
 }

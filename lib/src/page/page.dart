@@ -143,7 +143,7 @@ class Page {
         devTools.target
             .detachFromTarget(sessionId: e.sessionId)
             .catchError((e) {
-          _logger.fine('[devTools.target.detachFromTarget] swallow error', e);
+          _logger.finer('[devTools.target.detachFromTarget] swallow error', e);
         });
       } else {
         var session = target.browser.connection.sessions[e.sessionId.value]!;

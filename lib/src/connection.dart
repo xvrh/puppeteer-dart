@@ -73,7 +73,7 @@ class Connection implements Client {
     var id = ++_lastId;
     var message = _encodeMessage(id, method, parameters, sessionId: sessionId);
 
-    _logger.fine('SEND ► $message');
+    _logger.finer('SEND ► $message');
     _webSocket.add(message);
 
     return id;
@@ -116,12 +116,12 @@ class Connection implements Client {
     if (sessionId != null) {
       var session = sessions[sessionId];
       if (session != null) {
-        _logger.fine('◀ RECV $message');
+        _logger.finer('◀ RECV $message');
 
         session._onMessage(object);
       }
     } else if (id != null) {
-      _logger.fine('◀ RECV $id $message');
+      _logger.finer('◀ RECV $id $message');
 
       var messageInFly = _messagesInFly.remove(id)!;
 
@@ -137,7 +137,7 @@ class Connection implements Client {
       var method = object['method'] as String;
       var params = object['params'] as Map<String, dynamic>;
 
-      _logger.fine('◀ EVENT $message');
+      _logger.finer('◀ EVENT $message');
 
       _eventController.add(Event._(method, params));
     }
