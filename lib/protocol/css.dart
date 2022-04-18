@@ -173,6 +173,17 @@ class CSSApi {
     return result['text'] as String;
   }
 
+  /// Returns all layers parsed by the rendering engine for the tree scope of a node.
+  /// Given a DOM element identified by nodeId, getLayersForNode returns the root
+  /// layer for the nearest ancestor document or shadow root. The layer root contains
+  /// the full layer tree for the tree scope and their ordering.
+  Future<CSSLayerData> getLayersForNode(dom.NodeId nodeId) async {
+    var result = await _client.send('CSS.getLayersForNode', {
+      'nodeId': nodeId,
+    });
+    return CSSLayerData.fromJson(result['rootLayer'] as Map<String, dynamic>);
+  }
+
   /// Starts tracking the given computed styles for updates. The specified array of properties
   /// replaces the one previously specified. Pass empty array to disable tracking.
   /// Use takeComputedStyleUpdates to retrieve the list of nodes that had properties modified.
@@ -242,6 +253,18 @@ class CSSApi {
     });
     return CSSContainerQuery.fromJson(
         result['containerQuery'] as Map<String, dynamic>);
+  }
+
+  /// Modifies the expression of a supports at-rule.
+  /// Returns: The resulting CSS Supports rule after modification.
+  Future<CSSSupports> setSupportsText(
+      StyleSheetId styleSheetId, SourceRange range, String text) async {
+    var result = await _client.send('CSS.setSupportsText', {
+      'styleSheetId': styleSheetId,
+      'range': range,
+      'text': text,
+    });
+    return CSSSupports.fromJson(result['supports'] as Map<String, dynamic>);
   }
 
   /// Modifies the rule selector.
@@ -379,6 +402,9 @@ class GetMatchedStylesForNodeResult {
   /// A chain of inherited styles (from the immediate node parent up to the DOM tree root).
   final List<InheritedStyleEntry>? inherited;
 
+  /// A chain of inherited pseudo element styles (from the immediate node parent up to the DOM tree root).
+  final List<InheritedPseudoElementMatches>? inheritedPseudoElements;
+
   /// A list of CSS keyframed animations matching this node.
   final List<CSSKeyframesRule>? cssKeyframesRules;
 
@@ -388,6 +414,7 @@ class GetMatchedStylesForNodeResult {
       this.matchedCSSRules,
       this.pseudoElements,
       this.inherited,
+      this.inheritedPseudoElements,
       this.cssKeyframesRules});
 
   factory GetMatchedStylesForNodeResult.fromJson(Map<String, dynamic> json) {
@@ -413,6 +440,12 @@ class GetMatchedStylesForNodeResult {
           ? (json['inherited'] as List)
               .map((e) =>
                   InheritedStyleEntry.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+      inheritedPseudoElements: json.containsKey('inheritedPseudoElements')
+          ? (json['inheritedPseudoElements'] as List)
+              .map((e) => InheritedPseudoElementMatches.fromJson(
+                  e as Map<String, dynamic>))
               .toList()
           : null,
       cssKeyframesRules: json.containsKey('cssKeyframesRules')
@@ -548,6 +581,28 @@ class InheritedStyleEntry {
     return {
       'matchedCSSRules': matchedCSSRules.map((e) => e.toJson()).toList(),
       if (inlineStyle != null) 'inlineStyle': inlineStyle!.toJson(),
+    };
+  }
+}
+
+/// Inherited pseudo element matches from pseudos of an ancestor node.
+class InheritedPseudoElementMatches {
+  /// Matches of pseudo styles from the pseudos of an ancestor node.
+  final List<PseudoElementMatches> pseudoElements;
+
+  InheritedPseudoElementMatches({required this.pseudoElements});
+
+  factory InheritedPseudoElementMatches.fromJson(Map<String, dynamic> json) {
+    return InheritedPseudoElementMatches(
+      pseudoElements: (json['pseudoElements'] as List)
+          .map((e) => PseudoElementMatches.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'pseudoElements': pseudoElements.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -789,6 +844,10 @@ class CSSRule {
   /// The array enumerates @supports at-rules starting with the innermost one, going outwards.
   final List<CSSSupports>? supports;
 
+  /// Cascade layer array. Contains the layer hierarchy that this rule belongs to starting
+  /// with the innermost layer and going outwards.
+  final List<CSSLayer>? layers;
+
   CSSRule(
       {this.styleSheetId,
       required this.selectorList,
@@ -796,7 +855,8 @@ class CSSRule {
       required this.style,
       this.media,
       this.containerQueries,
-      this.supports});
+      this.supports,
+      this.layers});
 
   factory CSSRule.fromJson(Map<String, dynamic> json) {
     return CSSRule(
@@ -822,6 +882,11 @@ class CSSRule {
               .map((e) => CSSSupports.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
+      layers: json.containsKey('layers')
+          ? (json['layers'] as List)
+              .map((e) => CSSLayer.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
     );
   }
 
@@ -836,6 +901,7 @@ class CSSRule {
         'containerQueries': containerQueries!.map((e) => e.toJson()).toList(),
       if (supports != null)
         'supports': supports!.map((e) => e.toJson()).toList(),
+      if (layers != null) 'layers': layers!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -1337,6 +1403,77 @@ class CSSSupports {
       'text': text,
       if (range != null) 'range': range!.toJson(),
       if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
+    };
+  }
+}
+
+/// CSS Layer at-rule descriptor.
+class CSSLayer {
+  /// Layer name.
+  final String text;
+
+  /// The associated rule header range in the enclosing stylesheet (if
+  /// available).
+  final SourceRange? range;
+
+  /// Identifier of the stylesheet containing this object (if exists).
+  final StyleSheetId? styleSheetId;
+
+  CSSLayer({required this.text, this.range, this.styleSheetId});
+
+  factory CSSLayer.fromJson(Map<String, dynamic> json) {
+    return CSSLayer(
+      text: json['text'] as String,
+      range: json.containsKey('range')
+          ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
+          : null,
+      styleSheetId: json.containsKey('styleSheetId')
+          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'text': text,
+      if (range != null) 'range': range!.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
+    };
+  }
+}
+
+/// CSS Layer data.
+class CSSLayerData {
+  /// Layer name.
+  final String name;
+
+  /// Direct sub-layers
+  final List<CSSLayerData>? subLayers;
+
+  /// Layer order. The order determines the order of the layer in the cascade order.
+  /// A higher number has higher priority in the cascade order.
+  final num order;
+
+  CSSLayerData({required this.name, this.subLayers, required this.order});
+
+  factory CSSLayerData.fromJson(Map<String, dynamic> json) {
+    return CSSLayerData(
+      name: json['name'] as String,
+      subLayers: json.containsKey('subLayers')
+          ? (json['subLayers'] as List)
+              .map((e) => CSSLayerData.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+      order: json['order'] as num,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'order': order,
+      if (subLayers != null)
+        'subLayers': subLayers!.map((e) => e.toJson()).toList(),
     };
   }
 }

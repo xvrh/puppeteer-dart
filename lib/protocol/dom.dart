@@ -1080,10 +1080,15 @@ class PseudoType {
   static const scrollbarCorner = PseudoType._('scrollbar-corner');
   static const resizer = PseudoType._('resizer');
   static const inputListButton = PseudoType._('input-list-button');
-  static const transition = PseudoType._('transition');
-  static const transitionContainer = PseudoType._('transition-container');
-  static const transitionOldContent = PseudoType._('transition-old-content');
-  static const transitionNewContent = PseudoType._('transition-new-content');
+  static const pageTransition = PseudoType._('page-transition');
+  static const pageTransitionContainer =
+      PseudoType._('page-transition-container');
+  static const pageTransitionImageWrapper =
+      PseudoType._('page-transition-image-wrapper');
+  static const pageTransitionOutgoingImage =
+      PseudoType._('page-transition-outgoing-image');
+  static const pageTransitionIncomingImage =
+      PseudoType._('page-transition-incoming-image');
   static const values = {
     'first-line': firstLine,
     'first-letter': firstLetter,
@@ -1105,10 +1110,11 @@ class PseudoType {
     'scrollbar-corner': scrollbarCorner,
     'resizer': resizer,
     'input-list-button': inputListButton,
-    'transition': transition,
-    'transition-container': transitionContainer,
-    'transition-old-content': transitionOldContent,
-    'transition-new-content': transitionNewContent,
+    'page-transition': pageTransition,
+    'page-transition-container': pageTransitionContainer,
+    'page-transition-image-wrapper': pageTransitionImageWrapper,
+    'page-transition-outgoing-image': pageTransitionOutgoingImage,
+    'page-transition-incoming-image': pageTransitionIncomingImage,
   };
 
   final String value;
