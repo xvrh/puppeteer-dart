@@ -9,7 +9,8 @@ void main() async {
   // Setup the dimensions and user-agent of a particular phone
   await page.emulate(puppeteer.devices.pixel2XL);
 
-  await page.goto('https://dart.dev', wait: Until.networkIdle);
+  await page.goto('https://pub.dev/packages/puppeteer',
+      wait: Until.networkIdle);
 
   // Take a screenshot of the page
   var screenshot = await page.screenshot();

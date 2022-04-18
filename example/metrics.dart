@@ -3,7 +3,8 @@ import 'package:puppeteer/puppeteer.dart';
 void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
-  await page.goto('https://dart.dev', wait: Until.networkIdle);
+  await page.goto('https://pub.dev/packages/puppeteer',
+      wait: Until.networkIdle);
 
   var metrics = await page.metrics();
 
