@@ -52,7 +52,7 @@ Future<void> releaseObject(
       .catchError((e, StackTrace stackTrace) {
     // Exceptions might happen in case of a page been navigated or closed.
     // Swallow these since they are harmless and we don't leak anything in this case.
-    _logger.fine(e, e, stackTrace);
+    _logger.finer(e, e, stackTrace);
   });
 }
 

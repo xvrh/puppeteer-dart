@@ -3182,6 +3182,8 @@ class BackForwardCacheNotRestoredReason {
   static const activationNavigationsDisallowedForBug1234857 =
       BackForwardCacheNotRestoredReason._(
           'ActivationNavigationsDisallowedForBug1234857');
+  static const errorDocument =
+      BackForwardCacheNotRestoredReason._('ErrorDocument');
   static const webSocket = BackForwardCacheNotRestoredReason._('WebSocket');
   static const webTransport =
       BackForwardCacheNotRestoredReason._('WebTransport');
@@ -3376,6 +3378,7 @@ class BackForwardCacheNotRestoredReason {
     'Unknown': unknown,
     'ActivationNavigationsDisallowedForBug1234857':
         activationNavigationsDisallowedForBug1234857,
+    'ErrorDocument': errorDocument,
     'WebSocket': webSocket,
     'WebTransport': webTransport,
     'WebRTC': webRtc,
@@ -3519,8 +3522,13 @@ class BackForwardCacheNotRestoredExplanation {
   /// Not restored reason
   final BackForwardCacheNotRestoredReason reason;
 
+  /// Context associated with the reason. The meaning of this context is
+  /// dependent on the reason:
+  /// - EmbedderExtensionSentMessageToCachedFrame: the extension ID.
+  final String? context;
+
   BackForwardCacheNotRestoredExplanation(
-      {required this.type, required this.reason});
+      {required this.type, required this.reason, this.context});
 
   factory BackForwardCacheNotRestoredExplanation.fromJson(
       Map<String, dynamic> json) {
@@ -3529,6 +3537,7 @@ class BackForwardCacheNotRestoredExplanation {
           json['type'] as String),
       reason:
           BackForwardCacheNotRestoredReason.fromJson(json['reason'] as String),
+      context: json.containsKey('context') ? json['context'] as String : null,
     );
   }
 
@@ -3536,6 +3545,7 @@ class BackForwardCacheNotRestoredExplanation {
     return {
       'type': type.toJson(),
       'reason': reason.toJson(),
+      if (context != null) 'context': context,
     };
   }
 }

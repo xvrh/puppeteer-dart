@@ -152,19 +152,19 @@ class AffectedFrame {
   }
 }
 
-class SameSiteCookieExclusionReason {
+class CookieExclusionReason {
   static const excludeSameSiteUnspecifiedTreatedAsLax =
-      SameSiteCookieExclusionReason._('ExcludeSameSiteUnspecifiedTreatedAsLax');
+      CookieExclusionReason._('ExcludeSameSiteUnspecifiedTreatedAsLax');
   static const excludeSameSiteNoneInsecure =
-      SameSiteCookieExclusionReason._('ExcludeSameSiteNoneInsecure');
+      CookieExclusionReason._('ExcludeSameSiteNoneInsecure');
   static const excludeSameSiteLax =
-      SameSiteCookieExclusionReason._('ExcludeSameSiteLax');
+      CookieExclusionReason._('ExcludeSameSiteLax');
   static const excludeSameSiteStrict =
-      SameSiteCookieExclusionReason._('ExcludeSameSiteStrict');
+      CookieExclusionReason._('ExcludeSameSiteStrict');
   static const excludeInvalidSameParty =
-      SameSiteCookieExclusionReason._('ExcludeInvalidSameParty');
+      CookieExclusionReason._('ExcludeInvalidSameParty');
   static const excludeSamePartyCrossPartyContext =
-      SameSiteCookieExclusionReason._('ExcludeSamePartyCrossPartyContext');
+      CookieExclusionReason._('ExcludeSamePartyCrossPartyContext');
   static const values = {
     'ExcludeSameSiteUnspecifiedTreatedAsLax':
         excludeSameSiteUnspecifiedTreatedAsLax,
@@ -177,16 +177,15 @@ class SameSiteCookieExclusionReason {
 
   final String value;
 
-  const SameSiteCookieExclusionReason._(this.value);
+  const CookieExclusionReason._(this.value);
 
-  factory SameSiteCookieExclusionReason.fromJson(String value) =>
-      values[value]!;
+  factory CookieExclusionReason.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
   @override
   bool operator ==(other) =>
-      (other is SameSiteCookieExclusionReason && other.value == value) ||
+      (other is CookieExclusionReason && other.value == value) ||
       value == other;
 
   @override
@@ -196,23 +195,25 @@ class SameSiteCookieExclusionReason {
   String toString() => value.toString();
 }
 
-class SameSiteCookieWarningReason {
+class CookieWarningReason {
   static const warnSameSiteUnspecifiedCrossSiteContext =
-      SameSiteCookieWarningReason._('WarnSameSiteUnspecifiedCrossSiteContext');
+      CookieWarningReason._('WarnSameSiteUnspecifiedCrossSiteContext');
   static const warnSameSiteNoneInsecure =
-      SameSiteCookieWarningReason._('WarnSameSiteNoneInsecure');
+      CookieWarningReason._('WarnSameSiteNoneInsecure');
   static const warnSameSiteUnspecifiedLaxAllowUnsafe =
-      SameSiteCookieWarningReason._('WarnSameSiteUnspecifiedLaxAllowUnsafe');
+      CookieWarningReason._('WarnSameSiteUnspecifiedLaxAllowUnsafe');
   static const warnSameSiteStrictLaxDowngradeStrict =
-      SameSiteCookieWarningReason._('WarnSameSiteStrictLaxDowngradeStrict');
+      CookieWarningReason._('WarnSameSiteStrictLaxDowngradeStrict');
   static const warnSameSiteStrictCrossDowngradeStrict =
-      SameSiteCookieWarningReason._('WarnSameSiteStrictCrossDowngradeStrict');
+      CookieWarningReason._('WarnSameSiteStrictCrossDowngradeStrict');
   static const warnSameSiteStrictCrossDowngradeLax =
-      SameSiteCookieWarningReason._('WarnSameSiteStrictCrossDowngradeLax');
+      CookieWarningReason._('WarnSameSiteStrictCrossDowngradeLax');
   static const warnSameSiteLaxCrossDowngradeStrict =
-      SameSiteCookieWarningReason._('WarnSameSiteLaxCrossDowngradeStrict');
+      CookieWarningReason._('WarnSameSiteLaxCrossDowngradeStrict');
   static const warnSameSiteLaxCrossDowngradeLax =
-      SameSiteCookieWarningReason._('WarnSameSiteLaxCrossDowngradeLax');
+      CookieWarningReason._('WarnSameSiteLaxCrossDowngradeLax');
+  static const warnAttributeValueExceedsMaxSize =
+      CookieWarningReason._('WarnAttributeValueExceedsMaxSize');
   static const values = {
     'WarnSameSiteUnspecifiedCrossSiteContext':
         warnSameSiteUnspecifiedCrossSiteContext,
@@ -226,20 +227,20 @@ class SameSiteCookieWarningReason {
     'WarnSameSiteStrictCrossDowngradeLax': warnSameSiteStrictCrossDowngradeLax,
     'WarnSameSiteLaxCrossDowngradeStrict': warnSameSiteLaxCrossDowngradeStrict,
     'WarnSameSiteLaxCrossDowngradeLax': warnSameSiteLaxCrossDowngradeLax,
+    'WarnAttributeValueExceedsMaxSize': warnAttributeValueExceedsMaxSize,
   };
 
   final String value;
 
-  const SameSiteCookieWarningReason._(this.value);
+  const CookieWarningReason._(this.value);
 
-  factory SameSiteCookieWarningReason.fromJson(String value) => values[value]!;
+  factory CookieWarningReason.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
   @override
   bool operator ==(other) =>
-      (other is SameSiteCookieWarningReason && other.value == value) ||
-      value == other;
+      (other is CookieWarningReason && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -248,9 +249,9 @@ class SameSiteCookieWarningReason {
   String toString() => value.toString();
 }
 
-class SameSiteCookieOperation {
-  static const setCookie = SameSiteCookieOperation._('SetCookie');
-  static const readCookie = SameSiteCookieOperation._('ReadCookie');
+class CookieOperation {
+  static const setCookie = CookieOperation._('SetCookie');
+  static const readCookie = CookieOperation._('ReadCookie');
   static const values = {
     'SetCookie': setCookie,
     'ReadCookie': readCookie,
@@ -258,16 +259,15 @@ class SameSiteCookieOperation {
 
   final String value;
 
-  const SameSiteCookieOperation._(this.value);
+  const CookieOperation._(this.value);
 
-  factory SameSiteCookieOperation.fromJson(String value) => values[value]!;
+  factory CookieOperation.fromJson(String value) => values[value]!;
 
   String toJson() => value;
 
   @override
   bool operator ==(other) =>
-      (other is SameSiteCookieOperation && other.value == value) ||
-      value == other;
+      (other is CookieOperation && other.value == value) || value == other;
 
   @override
   int get hashCode => value.hashCode;
@@ -279,7 +279,7 @@ class SameSiteCookieOperation {
 /// This information is currently necessary, as the front-end has a difficult
 /// time finding a specific cookie. With this, we can convey specific error
 /// information without the cookie.
-class SameSiteCookieIssueDetails {
+class CookieIssueDetails {
   /// If AffectedCookie is not set then rawCookieLine contains the raw
   /// Set-Cookie header string. This hints at a problem where the
   /// cookie line is syntactically or semantically malformed in a way
@@ -288,13 +288,13 @@ class SameSiteCookieIssueDetails {
 
   final String? rawCookieLine;
 
-  final List<SameSiteCookieWarningReason> cookieWarningReasons;
+  final List<CookieWarningReason> cookieWarningReasons;
 
-  final List<SameSiteCookieExclusionReason> cookieExclusionReasons;
+  final List<CookieExclusionReason> cookieExclusionReasons;
 
   /// Optionally identifies the site-for-cookies and the cookie url, which
   /// may be used by the front-end as additional context.
-  final SameSiteCookieOperation operation;
+  final CookieOperation operation;
 
   final String? siteForCookies;
 
@@ -302,7 +302,7 @@ class SameSiteCookieIssueDetails {
 
   final AffectedRequest? request;
 
-  SameSiteCookieIssueDetails(
+  CookieIssueDetails(
       {this.cookie,
       this.rawCookieLine,
       required this.cookieWarningReasons,
@@ -312,8 +312,8 @@ class SameSiteCookieIssueDetails {
       this.cookieUrl,
       this.request});
 
-  factory SameSiteCookieIssueDetails.fromJson(Map<String, dynamic> json) {
-    return SameSiteCookieIssueDetails(
+  factory CookieIssueDetails.fromJson(Map<String, dynamic> json) {
+    return CookieIssueDetails(
       cookie: json.containsKey('cookie')
           ? AffectedCookie.fromJson(json['cookie'] as Map<String, dynamic>)
           : null,
@@ -321,12 +321,12 @@ class SameSiteCookieIssueDetails {
           ? json['rawCookieLine'] as String
           : null,
       cookieWarningReasons: (json['cookieWarningReasons'] as List)
-          .map((e) => SameSiteCookieWarningReason.fromJson(e as String))
+          .map((e) => CookieWarningReason.fromJson(e as String))
           .toList(),
       cookieExclusionReasons: (json['cookieExclusionReasons'] as List)
-          .map((e) => SameSiteCookieExclusionReason.fromJson(e as String))
+          .map((e) => CookieExclusionReason.fromJson(e as String))
           .toList(),
-      operation: SameSiteCookieOperation.fromJson(json['operation'] as String),
+      operation: CookieOperation.fromJson(json['operation'] as String),
       siteForCookies: json.containsKey('siteForCookies')
           ? json['siteForCookies'] as String
           : null,
@@ -388,6 +388,7 @@ class MixedContentResolutionStatus {
 }
 
 class MixedContentResourceType {
+  static const attributionSrc = MixedContentResourceType._('AttributionSrc');
   static const audio = MixedContentResourceType._('Audio');
   static const beacon = MixedContentResourceType._('Beacon');
   static const cspReport = MixedContentResourceType._('CSPReport');
@@ -415,6 +416,7 @@ class MixedContentResourceType {
   static const xmlHttpRequest = MixedContentResourceType._('XMLHttpRequest');
   static const xslt = MixedContentResourceType._('XSLT');
   static const values = {
+    'AttributionSrc': attributionSrc,
     'Audio': audio,
     'Beacon': beacon,
     'CSPReport': cspReport,
@@ -1345,12 +1347,8 @@ class DeprecationIssueDetails {
 
   final SourceCodeLocation sourceCodeLocation;
 
-  final String deprecationType;
-
   DeprecationIssueDetails(
-      {this.affectedFrame,
-      required this.sourceCodeLocation,
-      required this.deprecationType});
+      {this.affectedFrame, required this.sourceCodeLocation});
 
   factory DeprecationIssueDetails.fromJson(Map<String, dynamic> json) {
     return DeprecationIssueDetails(
@@ -1360,14 +1358,12 @@ class DeprecationIssueDetails {
           : null,
       sourceCodeLocation: SourceCodeLocation.fromJson(
           json['sourceCodeLocation'] as Map<String, dynamic>),
-      deprecationType: json['deprecationType'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'sourceCodeLocation': sourceCodeLocation.toJson(),
-      'deprecationType': deprecationType,
       if (affectedFrame != null) 'affectedFrame': affectedFrame!.toJson(),
     };
   }
@@ -1426,7 +1422,7 @@ class FederatedAuthRequestIssueDetails {
 
 /// Represents the failure reason when a federated authentication reason fails.
 /// Should be updated alongside RequestIdTokenStatus in
-/// third_party/blink/public/mojom/webid/federated_auth_request.mojom to include
+/// third_party/blink/public/mojom/devtools/inspector_issue.mojom to include
 /// all cases except for success.
 class FederatedAuthRequestIssueReason {
   static const approvalDeclined =
@@ -1445,6 +1441,11 @@ class FederatedAuthRequestIssueReason {
       FederatedAuthRequestIssueReason._('ClientMetadataNoResponse');
   static const clientMetadataInvalidResponse =
       FederatedAuthRequestIssueReason._('ClientMetadataInvalidResponse');
+  static const clientMetadataMissingPrivacyPolicyUrl =
+      FederatedAuthRequestIssueReason._(
+          'ClientMetadataMissingPrivacyPolicyUrl');
+  static const disabledInSettings =
+      FederatedAuthRequestIssueReason._('DisabledInSettings');
   static const errorFetchingSignin =
       FederatedAuthRequestIssueReason._('ErrorFetchingSignin');
   static const invalidSigninResponse =
@@ -1474,6 +1475,9 @@ class FederatedAuthRequestIssueReason {
     'ClientMetadataHttpNotFound': clientMetadataHttpNotFound,
     'ClientMetadataNoResponse': clientMetadataNoResponse,
     'ClientMetadataInvalidResponse': clientMetadataInvalidResponse,
+    'ClientMetadataMissingPrivacyPolicyUrl':
+        clientMetadataMissingPrivacyPolicyUrl,
+    'DisabledInSettings': disabledInSettings,
     'ErrorFetchingSignin': errorFetchingSignin,
     'InvalidSigninResponse': invalidSigninResponse,
     'AccountsHttpNotFound': accountsHttpNotFound,
@@ -1539,8 +1543,7 @@ class ClientHintIssueDetails {
 /// optional fields in InspectorIssueDetails to convey more specific
 /// information about the kind of issue.
 class InspectorIssueCode {
-  static const sameSiteCookieIssue =
-      InspectorIssueCode._('SameSiteCookieIssue');
+  static const cookieIssue = InspectorIssueCode._('CookieIssue');
   static const mixedContentIssue = InspectorIssueCode._('MixedContentIssue');
   static const blockedByResponseIssue =
       InspectorIssueCode._('BlockedByResponseIssue');
@@ -1565,7 +1568,7 @@ class InspectorIssueCode {
   static const federatedAuthRequestIssue =
       InspectorIssueCode._('FederatedAuthRequestIssue');
   static const values = {
-    'SameSiteCookieIssue': sameSiteCookieIssue,
+    'CookieIssue': cookieIssue,
     'MixedContentIssue': mixedContentIssue,
     'BlockedByResponseIssue': blockedByResponseIssue,
     'HeavyAdIssue': heavyAdIssue,
@@ -1606,7 +1609,7 @@ class InspectorIssueCode {
 /// specific to the kind of issue. When adding a new issue code, please also
 /// add a new optional field to this type.
 class InspectorIssueDetails {
-  final SameSiteCookieIssueDetails? sameSiteCookieIssueDetails;
+  final CookieIssueDetails? cookieIssueDetails;
 
   final MixedContentIssueDetails? mixedContentIssueDetails;
 
@@ -1639,7 +1642,7 @@ class InspectorIssueDetails {
   final FederatedAuthRequestIssueDetails? federatedAuthRequestIssueDetails;
 
   InspectorIssueDetails(
-      {this.sameSiteCookieIssueDetails,
+      {this.cookieIssueDetails,
       this.mixedContentIssueDetails,
       this.blockedByResponseIssueDetails,
       this.heavyAdIssueDetails,
@@ -1658,9 +1661,9 @@ class InspectorIssueDetails {
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
     return InspectorIssueDetails(
-      sameSiteCookieIssueDetails: json.containsKey('sameSiteCookieIssueDetails')
-          ? SameSiteCookieIssueDetails.fromJson(
-              json['sameSiteCookieIssueDetails'] as Map<String, dynamic>)
+      cookieIssueDetails: json.containsKey('cookieIssueDetails')
+          ? CookieIssueDetails.fromJson(
+              json['cookieIssueDetails'] as Map<String, dynamic>)
           : null,
       mixedContentIssueDetails: json.containsKey('mixedContentIssueDetails')
           ? MixedContentIssueDetails.fromJson(
@@ -1735,8 +1738,8 @@ class InspectorIssueDetails {
 
   Map<String, dynamic> toJson() {
     return {
-      if (sameSiteCookieIssueDetails != null)
-        'sameSiteCookieIssueDetails': sameSiteCookieIssueDetails!.toJson(),
+      if (cookieIssueDetails != null)
+        'cookieIssueDetails': cookieIssueDetails!.toJson(),
       if (mixedContentIssueDetails != null)
         'mixedContentIssueDetails': mixedContentIssueDetails!.toJson(),
       if (blockedByResponseIssueDetails != null)

@@ -937,10 +937,12 @@ class HighlightConfig {
 class ColorFormat {
   static const rgb = ColorFormat._('rgb');
   static const hsl = ColorFormat._('hsl');
+  static const hwb = ColorFormat._('hwb');
   static const hex = ColorFormat._('hex');
   static const values = {
     'rgb': rgb,
     'hsl': hsl,
+    'hwb': hwb,
     'hex': hex,
   };
 

@@ -5,7 +5,8 @@ void main() async {
   // Start the browser and go to a web page
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
-  await page.goto('https://dart.dev', wait: Until.networkIdle);
+  await page.goto('https://pub.dev/packages/puppeteer',
+      wait: Until.networkIdle);
 
   // For this example, we force the "screen" media-type because sometime
   // CSS rules with "@media print" can change the look of the page.

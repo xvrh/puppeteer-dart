@@ -321,6 +321,14 @@ class EmulationApi {
       if (userAgentMetadata != null) 'userAgentMetadata': userAgentMetadata,
     });
   }
+
+  /// Allows overriding the automation flag.
+  /// [enabled] Whether the override should be enabled.
+  Future<void> setAutomationOverride(bool enabled) async {
+    await _client.send('Emulation.setAutomationOverride', {
+      'enabled': enabled,
+    });
+  }
 }
 
 /// Screen orientation.

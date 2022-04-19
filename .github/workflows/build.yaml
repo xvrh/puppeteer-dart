@@ -13,7 +13,7 @@ jobs:
         sdk: ['beta']
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: dart-lang/setup-dart@v0.3
+      - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.sdk }}
       - uses: actions/checkout@v2

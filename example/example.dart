@@ -8,7 +8,8 @@ void main() async {
   var myPage = await browser.newPage();
 
   // Go to a page and wait to be fully loaded
-  await myPage.goto('https://dart.dev', wait: Until.networkIdle);
+  await myPage.goto('https://pub.dev/packages/puppeteer',
+      wait: Until.networkIdle);
 
   // Do something... See other examples
   await myPage.screenshot();
