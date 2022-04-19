@@ -20,7 +20,9 @@ String generateReadme() {
     var filePath = match.group(1)!;
 
     var fileContent = File(filePath).readAsStringSync();
-    fileContent = fileContent.replaceAll(_ignoreForFileRegex, '');
+    fileContent = fileContent
+        .replaceAll(_ignoreForFileRegex, '')
+        .replaceAll('https://pub.dev/packages/puppeteer', 'https://dart.dev');
 
     fileContent = _dartFormatter.format(fileContent);
 
