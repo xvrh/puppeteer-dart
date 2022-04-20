@@ -5,6 +5,7 @@ _*
 !.travis.yml
 !.github
 !.dockerignore
+!.pubignore
 build/
 pubspec.lock
 

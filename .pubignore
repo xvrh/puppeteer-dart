@@ -1,0 +1,10 @@
+.dart_tool/
+.packages
+build/
+doc/api/
+*.iml
+_*
+.*
+test/golden/
+test/assets/
+tool/
