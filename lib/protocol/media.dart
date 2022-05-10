@@ -271,57 +271,77 @@ class PlayerEvent {
   }
 }
 
-/// Corresponds to kMediaError
-class PlayerError {
-  final PlayerErrorType type;
+/// Represents logged source line numbers reported in an error.
+/// NOTE: file and line are from chromium c++ implementation code, not js.
+class PlayerErrorSourceLocation {
+  final String file;
 
-  /// When this switches to using media::Status instead of PipelineStatus
-  /// we can remove "errorCode" and replace it with the fields from
-  /// a Status instance. This also seems like a duplicate of the error
-  /// level enum - there is a todo bug to have that level removed and
-  /// use this instead. (crbug.com/1068454)
-  final String errorCode;
+  final int line;
 
-  PlayerError({required this.type, required this.errorCode});
+  PlayerErrorSourceLocation({required this.file, required this.line});
 
-  factory PlayerError.fromJson(Map<String, dynamic> json) {
-    return PlayerError(
-      type: PlayerErrorType.fromJson(json['type'] as String),
-      errorCode: json['errorCode'] as String,
+  factory PlayerErrorSourceLocation.fromJson(Map<String, dynamic> json) {
+    return PlayerErrorSourceLocation(
+      file: json['file'] as String,
+      line: json['line'] as int,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'type': type,
-      'errorCode': errorCode,
+      'file': file,
+      'line': line,
     };
   }
 }
 
-class PlayerErrorType {
-  static const pipelineError = PlayerErrorType._('pipeline_error');
-  static const mediaError = PlayerErrorType._('media_error');
-  static const values = {
-    'pipeline_error': pipelineError,
-    'media_error': mediaError,
-  };
+/// Corresponds to kMediaError
+class PlayerError {
+  final String errorType;
 
-  final String value;
+  /// Code is the numeric enum entry for a specific set of error codes, such
+  /// as PipelineStatusCodes in media/base/pipeline_status.h
+  final int code;
 
-  const PlayerErrorType._(this.value);
+  /// A trace of where this error was caused / where it passed through.
+  final List<PlayerErrorSourceLocation> stack;
 
-  factory PlayerErrorType.fromJson(String value) => values[value]!;
+  /// Errors potentially have a root cause error, ie, a DecoderError might be
+  /// caused by an WindowsError
+  final List<PlayerError> cause;
 
-  String toJson() => value;
+  /// Extra data attached to an error, such as an HRESULT, Video Codec, etc.
+  final Map<String, dynamic> data;
 
-  @override
-  bool operator ==(other) =>
-      (other is PlayerErrorType && other.value == value) || value == other;
+  PlayerError(
+      {required this.errorType,
+      required this.code,
+      required this.stack,
+      required this.cause,
+      required this.data});
 
-  @override
-  int get hashCode => value.hashCode;
+  factory PlayerError.fromJson(Map<String, dynamic> json) {
+    return PlayerError(
+      errorType: json['errorType'] as String,
+      code: json['code'] as int,
+      stack: (json['stack'] as List)
+          .map((e) =>
+              PlayerErrorSourceLocation.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      cause: (json['cause'] as List)
+          .map((e) => PlayerError.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      data: json['data'] as Map<String, dynamic>,
+    );
+  }
 
-  @override
-  String toString() => value.toString();
+  Map<String, dynamic> toJson() {
+    return {
+      'errorType': errorType,
+      'code': code,
+      'stack': stack.map((e) => e.toJson()).toList(),
+      'cause': cause.map((e) => e.toJson()).toList(),
+      'data': data,
+    };
+  }
 }

@@ -125,6 +125,13 @@ class PageApi {
       .where((event) => event.name == 'Page.backForwardCacheNotUsed')
       .map((event) => BackForwardCacheNotUsedEvent.fromJson(event.parameters));
 
+  /// Fired when a prerender attempt is completed.
+  Stream<PrerenderAttemptCompletedEvent> get onPrerenderAttemptCompleted =>
+      _client.onEvent
+          .where((event) => event.name == 'Page.prerenderAttemptCompleted')
+          .map((event) =>
+              PrerenderAttemptCompletedEvent.fromJson(event.parameters));
+
   Stream<network.MonotonicTime> get onLoadEventFired => _client.onEvent
       .where((event) => event.name == 'Page.loadEventFired')
       .map((event) =>
@@ -1144,6 +1151,28 @@ class BackForwardCacheNotUsedEvent {
   }
 }
 
+class PrerenderAttemptCompletedEvent {
+  /// The frame id of the frame initiating prerendering.
+  final FrameId initiatingFrameId;
+
+  final String prerenderingUrl;
+
+  final PrerenderFinalStatus finalStatus;
+
+  PrerenderAttemptCompletedEvent(
+      {required this.initiatingFrameId,
+      required this.prerenderingUrl,
+      required this.finalStatus});
+
+  factory PrerenderAttemptCompletedEvent.fromJson(Map<String, dynamic> json) {
+    return PrerenderAttemptCompletedEvent(
+      initiatingFrameId: FrameId.fromJson(json['initiatingFrameId'] as String),
+      prerenderingUrl: json['prerenderingUrl'] as String,
+      finalStatus: PrerenderFinalStatus.fromJson(json['finalStatus'] as String),
+    );
+  }
+}
+
 class NavigatedWithinDocumentEvent {
   /// Id of the frame.
   final FrameId frameId;
@@ -1603,6 +1632,7 @@ class PermissionsPolicyFeature {
   static const attributionReporting =
       PermissionsPolicyFeature._('attribution-reporting');
   static const autoplay = PermissionsPolicyFeature._('autoplay');
+  static const browsingTopics = PermissionsPolicyFeature._('browsing-topics');
   static const camera = PermissionsPolicyFeature._('camera');
   static const chDpr = PermissionsPolicyFeature._('ch-dpr');
   static const chDeviceMemory = PermissionsPolicyFeature._('ch-device-memory');
@@ -1654,6 +1684,7 @@ class PermissionsPolicyFeature {
   static const gyroscope = PermissionsPolicyFeature._('gyroscope');
   static const hid = PermissionsPolicyFeature._('hid');
   static const idleDetection = PermissionsPolicyFeature._('idle-detection');
+  static const interestCohort = PermissionsPolicyFeature._('interest-cohort');
   static const joinAdInterestGroup =
       PermissionsPolicyFeature._('join-ad-interest-group');
   static const keyboardMap = PermissionsPolicyFeature._('keyboard-map');
@@ -1686,6 +1717,7 @@ class PermissionsPolicyFeature {
     'ambient-light-sensor': ambientLightSensor,
     'attribution-reporting': attributionReporting,
     'autoplay': autoplay,
+    'browsing-topics': browsingTopics,
     'camera': camera,
     'ch-dpr': chDpr,
     'ch-device-memory': chDeviceMemory,
@@ -1726,6 +1758,7 @@ class PermissionsPolicyFeature {
     'gyroscope': gyroscope,
     'hid': hid,
     'idle-detection': idleDetection,
+    'interest-cohort': interestCohort,
     'join-ad-interest-group': joinAdInterestGroup,
     'keyboard-map': keyboardMap,
     'magnetometer': magnetometer,
@@ -2753,17 +2786,13 @@ class FontFamilies {
   /// The fantasy font-family.
   final String? fantasy;
 
-  /// The pictograph font-family.
-  final String? pictograph;
-
   FontFamilies(
       {this.standard,
       this.fixed,
       this.serif,
       this.sansSerif,
       this.cursive,
-      this.fantasy,
-      this.pictograph});
+      this.fantasy});
 
   factory FontFamilies.fromJson(Map<String, dynamic> json) {
     return FontFamilies(
@@ -2775,8 +2804,6 @@ class FontFamilies {
           json.containsKey('sansSerif') ? json['sansSerif'] as String : null,
       cursive: json.containsKey('cursive') ? json['cursive'] as String : null,
       fantasy: json.containsKey('fantasy') ? json['fantasy'] as String : null,
-      pictograph:
-          json.containsKey('pictograph') ? json['pictograph'] as String : null,
     );
   }
 
@@ -2788,7 +2815,6 @@ class FontFamilies {
       if (sansSerif != null) 'sansSerif': sansSerif,
       if (cursive != null) 'cursive': cursive,
       if (fantasy != null) 'fantasy': fantasy,
-      if (pictograph != null) 'pictograph': pictograph,
     };
   }
 }
@@ -3184,6 +3210,8 @@ class BackForwardCacheNotRestoredReason {
           'ActivationNavigationsDisallowedForBug1234857');
   static const errorDocument =
       BackForwardCacheNotRestoredReason._('ErrorDocument');
+  static const fencedFramesEmbedder =
+      BackForwardCacheNotRestoredReason._('FencedFramesEmbedder');
   static const webSocket = BackForwardCacheNotRestoredReason._('WebSocket');
   static const webTransport =
       BackForwardCacheNotRestoredReason._('WebTransport');
@@ -3379,6 +3407,7 @@ class BackForwardCacheNotRestoredReason {
     'ActivationNavigationsDisallowedForBug1234857':
         activationNavigationsDisallowedForBug1234857,
     'ErrorDocument': errorDocument,
+    'FencedFramesEmbedder': fencedFramesEmbedder,
     'WebSocket': webSocket,
     'WebTransport': webTransport,
     'WebRTC': webRtc,
@@ -3585,6 +3614,32 @@ class BackForwardCacheNotRestoredExplanationTree {
       'children': children.map((e) => e.toJson()).toList(),
     };
   }
+}
+
+/// List of FinalStatus reasons for Prerender2.
+class PrerenderFinalStatus {
+  static const activated = PrerenderFinalStatus._('Activated');
+  static const values = {
+    'Activated': activated,
+  };
+
+  final String value;
+
+  const PrerenderFinalStatus._(this.value);
+
+  factory PrerenderFinalStatus.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is PrerenderFinalStatus && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }
 
 class FileChooserOpenedEventMode {
