@@ -1377,6 +1377,9 @@ class CSSSupports {
   /// Supports rule text.
   final String text;
 
+  /// Whether the supports condition is satisfied.
+  final bool active;
+
   /// The associated rule header range in the enclosing stylesheet (if
   /// available).
   final SourceRange? range;
@@ -1384,11 +1387,16 @@ class CSSSupports {
   /// Identifier of the stylesheet containing this object (if exists).
   final StyleSheetId? styleSheetId;
 
-  CSSSupports({required this.text, this.range, this.styleSheetId});
+  CSSSupports(
+      {required this.text,
+      required this.active,
+      this.range,
+      this.styleSheetId});
 
   factory CSSSupports.fromJson(Map<String, dynamic> json) {
     return CSSSupports(
       text: json['text'] as String,
+      active: json['active'] as bool? ?? false,
       range: json.containsKey('range')
           ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
           : null,
@@ -1401,6 +1409,7 @@ class CSSSupports {
   Map<String, dynamic> toJson() {
     return {
       'text': text,
+      'active': active,
       if (range != null) 'range': range!.toJson(),
       if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
     };

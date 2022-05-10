@@ -87,6 +87,7 @@ class RuntimeApi {
   /// [objectGroup] Symbolic group name that can be used to release multiple objects. If objectGroup is not
   /// specified and objectId is, objectGroup will be inherited from object.
   /// [throwOnSideEffect] Whether to throw an exception if side effect cannot be ruled out during evaluation.
+  /// [generateWebDriverValue] Whether the result should be serialized according to https://w3c.github.io/webdriver-bidi.
   Future<CallFunctionOnResult> callFunctionOn(String functionDeclaration,
       {RemoteObjectId? objectId,
       List<CallArgument>? arguments,
@@ -97,7 +98,8 @@ class RuntimeApi {
       bool? awaitPromise,
       ExecutionContextId? executionContextId,
       String? objectGroup,
-      bool? throwOnSideEffect}) async {
+      bool? throwOnSideEffect,
+      bool? generateWebDriverValue}) async {
     var result = await _client.send('Runtime.callFunctionOn', {
       'functionDeclaration': functionDeclaration,
       if (objectId != null) 'objectId': objectId,
@@ -110,6 +112,8 @@ class RuntimeApi {
       if (executionContextId != null) 'executionContextId': executionContextId,
       if (objectGroup != null) 'objectGroup': objectGroup,
       if (throwOnSideEffect != null) 'throwOnSideEffect': throwOnSideEffect,
+      if (generateWebDriverValue != null)
+        'generateWebDriverValue': generateWebDriverValue,
     });
     return CallFunctionOnResult.fromJson(result);
   }
@@ -182,6 +186,7 @@ class RuntimeApi {
   /// in context different than intended (e.g. as a result of navigation across process
   /// boundaries).
   /// This is mutually exclusive with `contextId`.
+  /// [generateWebDriverValue] Whether the result should be serialized according to https://w3c.github.io/webdriver-bidi.
   Future<EvaluateResult> evaluate(String expression,
       {String? objectGroup,
       bool? includeCommandLineAPI,
@@ -196,7 +201,8 @@ class RuntimeApi {
       bool? disableBreaks,
       bool? replMode,
       bool? allowUnsafeEvalBlockedByCSP,
-      String? uniqueContextId}) async {
+      String? uniqueContextId,
+      bool? generateWebDriverValue}) async {
     var result = await _client.send('Runtime.evaluate', {
       'expression': expression,
       if (objectGroup != null) 'objectGroup': objectGroup,
@@ -215,6 +221,8 @@ class RuntimeApi {
       if (allowUnsafeEvalBlockedByCSP != null)
         'allowUnsafeEvalBlockedByCSP': allowUnsafeEvalBlockedByCSP,
       if (uniqueContextId != null) 'uniqueContextId': uniqueContextId,
+      if (generateWebDriverValue != null)
+        'generateWebDriverValue': generateWebDriverValue,
     });
     return EvaluateResult.fromJson(result);
   }
@@ -723,6 +731,104 @@ class ScriptId {
   String toString() => value.toString();
 }
 
+/// Represents the value serialiazed by the WebDriver BiDi specification
+/// https://w3c.github.io/webdriver-bidi.
+class WebDriverValue {
+  final WebDriverValueType type;
+
+  final dynamic value;
+
+  final String? objectId;
+
+  WebDriverValue({required this.type, this.value, this.objectId});
+
+  factory WebDriverValue.fromJson(Map<String, dynamic> json) {
+    return WebDriverValue(
+      type: WebDriverValueType.fromJson(json['type'] as String),
+      value: json.containsKey('value') ? json['value'] as dynamic : null,
+      objectId:
+          json.containsKey('objectId') ? json['objectId'] as String : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+      if (value != null) 'value': value,
+      if (objectId != null) 'objectId': objectId,
+    };
+  }
+}
+
+class WebDriverValueType {
+  static const undefined = WebDriverValueType._('undefined');
+  static const null$ = WebDriverValueType._('null');
+  static const string = WebDriverValueType._('string');
+  static const number = WebDriverValueType._('number');
+  static const boolean = WebDriverValueType._('boolean');
+  static const bigint = WebDriverValueType._('bigint');
+  static const regexp = WebDriverValueType._('regexp');
+  static const date = WebDriverValueType._('date');
+  static const symbol = WebDriverValueType._('symbol');
+  static const array = WebDriverValueType._('array');
+  static const object = WebDriverValueType._('object');
+  static const function = WebDriverValueType._('function');
+  static const map = WebDriverValueType._('map');
+  static const set = WebDriverValueType._('set');
+  static const weakmap = WebDriverValueType._('weakmap');
+  static const weakset = WebDriverValueType._('weakset');
+  static const error = WebDriverValueType._('error');
+  static const proxy = WebDriverValueType._('proxy');
+  static const promise = WebDriverValueType._('promise');
+  static const typedarray = WebDriverValueType._('typedarray');
+  static const arraybuffer = WebDriverValueType._('arraybuffer');
+  static const node = WebDriverValueType._('node');
+  static const window = WebDriverValueType._('window');
+  static const values = {
+    'undefined': undefined,
+    'null': null$,
+    'string': string,
+    'number': number,
+    'boolean': boolean,
+    'bigint': bigint,
+    'regexp': regexp,
+    'date': date,
+    'symbol': symbol,
+    'array': array,
+    'object': object,
+    'function': function,
+    'map': map,
+    'set': set,
+    'weakmap': weakmap,
+    'weakset': weakset,
+    'error': error,
+    'proxy': proxy,
+    'promise': promise,
+    'typedarray': typedarray,
+    'arraybuffer': arraybuffer,
+    'node': node,
+    'window': window,
+  };
+
+  final String value;
+
+  const WebDriverValueType._(this.value);
+
+  factory WebDriverValueType.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is WebDriverValueType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Unique object identifier.
 class RemoteObjectId {
   final String value;
@@ -790,6 +896,9 @@ class RemoteObject {
   /// String representation of the object.
   final String? description;
 
+  /// WebDriver BiDi representation of the value.
+  final WebDriverValue? webDriverValue;
+
   /// Unique object identifier (for non-primitive values).
   final RemoteObjectId? objectId;
 
@@ -805,6 +914,7 @@ class RemoteObject {
       this.value,
       this.unserializableValue,
       this.description,
+      this.webDriverValue,
       this.objectId,
       this.preview,
       this.customPreview});
@@ -823,6 +933,10 @@ class RemoteObject {
           : null,
       description: json.containsKey('description')
           ? json['description'] as String
+          : null,
+      webDriverValue: json.containsKey('webDriverValue')
+          ? WebDriverValue.fromJson(
+              json['webDriverValue'] as Map<String, dynamic>)
           : null,
       objectId: json.containsKey('objectId')
           ? RemoteObjectId.fromJson(json['objectId'] as String)
@@ -846,6 +960,7 @@ class RemoteObject {
       if (unserializableValue != null)
         'unserializableValue': unserializableValue!.toJson(),
       if (description != null) 'description': description,
+      if (webDriverValue != null) 'webDriverValue': webDriverValue!.toJson(),
       if (objectId != null) 'objectId': objectId!.toJson(),
       if (preview != null) 'preview': preview!.toJson(),
       if (customPreview != null) 'customPreview': customPreview!.toJson(),

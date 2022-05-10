@@ -1107,42 +1107,22 @@ class AttributionReportingIssueType {
       AttributionReportingIssueType._('PermissionPolicyDisabled');
   static const invalidAttributionSourceEventId =
       AttributionReportingIssueType._('InvalidAttributionSourceEventId');
-  static const invalidAttributionData =
-      AttributionReportingIssueType._('InvalidAttributionData');
   static const attributionSourceUntrustworthyOrigin =
       AttributionReportingIssueType._('AttributionSourceUntrustworthyOrigin');
   static const attributionUntrustworthyOrigin =
       AttributionReportingIssueType._('AttributionUntrustworthyOrigin');
-  static const attributionTriggerDataTooLarge =
-      AttributionReportingIssueType._('AttributionTriggerDataTooLarge');
-  static const attributionEventSourceTriggerDataTooLarge =
-      AttributionReportingIssueType._(
-          'AttributionEventSourceTriggerDataTooLarge');
   static const invalidAttributionSourceExpiry =
       AttributionReportingIssueType._('InvalidAttributionSourceExpiry');
   static const invalidAttributionSourcePriority =
       AttributionReportingIssueType._('InvalidAttributionSourcePriority');
-  static const invalidEventSourceTriggerData =
-      AttributionReportingIssueType._('InvalidEventSourceTriggerData');
-  static const invalidTriggerPriority =
-      AttributionReportingIssueType._('InvalidTriggerPriority');
-  static const invalidTriggerDedupKey =
-      AttributionReportingIssueType._('InvalidTriggerDedupKey');
   static const values = {
     'PermissionPolicyDisabled': permissionPolicyDisabled,
     'InvalidAttributionSourceEventId': invalidAttributionSourceEventId,
-    'InvalidAttributionData': invalidAttributionData,
     'AttributionSourceUntrustworthyOrigin':
         attributionSourceUntrustworthyOrigin,
     'AttributionUntrustworthyOrigin': attributionUntrustworthyOrigin,
-    'AttributionTriggerDataTooLarge': attributionTriggerDataTooLarge,
-    'AttributionEventSourceTriggerDataTooLarge':
-        attributionEventSourceTriggerDataTooLarge,
     'InvalidAttributionSourceExpiry': invalidAttributionSourceExpiry,
     'InvalidAttributionSourcePriority': invalidAttributionSourcePriority,
-    'InvalidEventSourceTriggerData': invalidEventSourceTriggerData,
-    'InvalidTriggerPriority': invalidTriggerPriority,
-    'InvalidTriggerDedupKey': invalidTriggerDedupKey,
   };
 
   final String value;
@@ -1337,6 +1317,34 @@ class GenericIssueDetails {
   }
 }
 
+class DeprecationIssueType {
+  static const deprecationExample =
+      DeprecationIssueType._('DeprecationExample');
+  static const untranslated = DeprecationIssueType._('Untranslated');
+  static const values = {
+    'DeprecationExample': deprecationExample,
+    'Untranslated': untranslated,
+  };
+
+  final String value;
+
+  const DeprecationIssueType._(this.value);
+
+  factory DeprecationIssueType.fromJson(String value) => values[value]!;
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is DeprecationIssueType && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// This issue tracks information needed to print a deprecation message.
 /// The formatting is inherited from the old console.log version, see more at:
 /// https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/frame/deprecation.cc
@@ -1347,8 +1355,12 @@ class DeprecationIssueDetails {
 
   final SourceCodeLocation sourceCodeLocation;
 
+  final DeprecationIssueType type;
+
   DeprecationIssueDetails(
-      {this.affectedFrame, required this.sourceCodeLocation});
+      {this.affectedFrame,
+      required this.sourceCodeLocation,
+      required this.type});
 
   factory DeprecationIssueDetails.fromJson(Map<String, dynamic> json) {
     return DeprecationIssueDetails(
@@ -1358,12 +1370,14 @@ class DeprecationIssueDetails {
           : null,
       sourceCodeLocation: SourceCodeLocation.fromJson(
           json['sourceCodeLocation'] as Map<String, dynamic>),
+      type: DeprecationIssueType.fromJson(json['type'] as String),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'sourceCodeLocation': sourceCodeLocation.toJson(),
+      'type': type.toJson(),
       if (affectedFrame != null) 'affectedFrame': affectedFrame!.toJson(),
     };
   }
@@ -1429,6 +1443,16 @@ class FederatedAuthRequestIssueReason {
       FederatedAuthRequestIssueReason._('ApprovalDeclined');
   static const tooManyRequests =
       FederatedAuthRequestIssueReason._('TooManyRequests');
+  static const manifestListHttpNotFound =
+      FederatedAuthRequestIssueReason._('ManifestListHttpNotFound');
+  static const manifestListNoResponse =
+      FederatedAuthRequestIssueReason._('ManifestListNoResponse');
+  static const manifestListInvalidResponse =
+      FederatedAuthRequestIssueReason._('ManifestListInvalidResponse');
+  static const manifestNotInManifestList =
+      FederatedAuthRequestIssueReason._('ManifestNotInManifestList');
+  static const manifestListTooBig =
+      FederatedAuthRequestIssueReason._('ManifestListTooBig');
   static const manifestHttpNotFound =
       FederatedAuthRequestIssueReason._('ManifestHttpNotFound');
   static const manifestNoResponse =
@@ -1469,6 +1493,11 @@ class FederatedAuthRequestIssueReason {
   static const values = {
     'ApprovalDeclined': approvalDeclined,
     'TooManyRequests': tooManyRequests,
+    'ManifestListHttpNotFound': manifestListHttpNotFound,
+    'ManifestListNoResponse': manifestListNoResponse,
+    'ManifestListInvalidResponse': manifestListInvalidResponse,
+    'ManifestNotInManifestList': manifestNotInManifestList,
+    'ManifestListTooBig': manifestListTooBig,
     'ManifestHttpNotFound': manifestHttpNotFound,
     'ManifestNoResponse': manifestNoResponse,
     'ManifestInvalidResponse': manifestInvalidResponse,

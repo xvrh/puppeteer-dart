@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.9.0 (2022-05-10)
+- Update to Chromium 102
+
 ## 2.8.0 (2022-04-18)
 - Update to Chromium 101
 
