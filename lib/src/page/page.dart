@@ -433,7 +433,9 @@ class Page {
   void _addConsoleMessage(ConsoleAPICalledEventType type, List<JsHandle> args,
       StackTraceData? stackTrace) {
     if (!_onConsoleController.hasListener) {
-      args.forEach((arg) => arg.dispose());
+      for (var arg in args) {
+        arg.dispose();
+      }
       return;
     }
     var textTokens = [];

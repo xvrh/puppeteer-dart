@@ -337,7 +337,7 @@ class Key {
       key: '=',
       location: KeyLocation.numpad);
   static const Key comma =
-      Key._(keyCode: 188, code: 'Comma', shiftKey: '\<', key: ',');
+      Key._(keyCode: 188, code: 'Comma', shiftKey: '<', key: ',');
   static const Key minus =
       Key._(keyCode: 189, code: 'Minus', shiftKey: '_', key: '-');
   static const Key period =
@@ -463,7 +463,7 @@ class Key {
   static const Key digit8 =
       Key._(keyCode: 56, code: 'Digit8', shiftKey: '*', key: '8');
   static const Key digit9 =
-      Key._(keyCode: 57, code: 'Digit9', shiftKey: '\(', key: '9');
+      Key._(keyCode: 57, code: 'Digit9', shiftKey: '(', key: '9');
   static const Key keyA =
       Key._(keyCode: 65, code: 'KeyA', shiftKey: 'A', key: 'a');
   static const Key keyB =

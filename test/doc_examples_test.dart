@@ -724,7 +724,7 @@ void main() {
       await page.mouse.up();
     });
     test('wheel', () async {
-      await page.goto(exampleValue('${server.assetUrl('input/wheel.html')}',
+      await page.goto(exampleValue(server.assetUrl('input/wheel.html'),
           r'https://mdn.mozillademos.org/en-US/docs/Web/API/Element/wheel_event$samples/Scaling_an_element_via_the_wheel?revision=1587366'));
       var elem = await page.$('div');
       var boundingBox = (await elem.boundingBox)!;

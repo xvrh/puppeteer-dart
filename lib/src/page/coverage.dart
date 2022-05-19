@@ -290,7 +290,9 @@ class CssCoverage {
       _devTools.css.disable(),
       _devTools.dom.disable(),
     ]);
-    _subscriptions.forEach((s) => s.cancel());
+    for (var sub in _subscriptions) {
+      sub.cancel();
+    }
 
     // aggregate by styleSheetId
     var styleSheetIdToCoverage = <StyleSheetId, List<CoverageRange>>{};

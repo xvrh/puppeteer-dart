@@ -126,7 +126,7 @@ class Class {
   String get shortTitle => 'class: $name';
 
   @override
-  String toString() => '$name';
+  String toString() => name;
 }
 
 class Method {
@@ -174,5 +174,5 @@ class Method {
   }
 
   @override
-  String toString() => '$name';
+  String toString() => name;
 }

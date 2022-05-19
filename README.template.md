@@ -158,9 +158,6 @@ You can still use `puppeteer-dart` on Flutter either with:
 - Flutter on Desktop (macOS, windows, Linux)
 - Flutter on mobile BUT with the actual Chrome instance running on a server and accessed from the mobile app using puppeteer.connect
 
-> The pub.dev website reports that this library works with Android and iOS. The supported platform list is 
-> detected automatically and can't be manually modified to express the current limitations.
-
 ## Related work
  * [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface)
  * [puppeteer](https://github.com/GoogleChrome/puppeteer)
