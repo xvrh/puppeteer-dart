@@ -1,13 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:dart_style/dart_style.dart';
-import 'package:pub_semver/pub_semver.dart';
 
 // Extrat the samples from the file test/doc_examples_test.dart and inject
 // it in the source code
@@ -36,11 +34,8 @@ void main() {
 
 final _formatter = DartFormatter();
 
-final _featureSet = FeatureSet.fromEnableFlags2(
-    sdkLanguageVersion: Version(2, 17, 0), flags: []);
-
 String replaceExamples(String sourceFile, List<CodeSnippet> snippets) {
-  var unit = parseString(content: sourceFile, featureSet: _featureSet).unit;
+  var unit = parseString(content: sourceFile).unit;
 
   for (var aClass
       in unit.declarations.whereType<ClassDeclaration>().toList().reversed) {
@@ -114,8 +109,7 @@ String replaceComment(String file, Comment comment, String newComment) {
 }
 
 List<CodeSnippet> extractSnippets(String sourceCode) {
-  var compilationUnit =
-      parseString(content: sourceCode, featureSet: _featureSet).unit;
+  var compilationUnit = parseString(content: sourceCode).unit;
   var main = compilationUnit.declarations
       .whereType<FunctionDeclaration>()
       .firstWhere((c) => c.name.name == 'main');
@@ -195,7 +189,7 @@ class CodeSnippet {
 main() async {
 ${LineSplitter.split(code).map((line) => '  $line').join('\n')}
 }''';
-    var compilation = parseString(content: code, featureSet: _featureSet).unit;
+    var compilation = parseString(content: code).unit;
     var replacerVisitor = _ExampleReplacerVisitor();
     compilation.visitChildren(replacerVisitor);
     code = replacerVisitor.replace(code);
