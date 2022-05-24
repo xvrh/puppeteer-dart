@@ -301,58 +301,39 @@ class GraphObjectId {
 }
 
 /// Enum of BaseAudioContext types
-class ContextType {
-  static const realtime = ContextType._('realtime');
-  static const offline = ContextType._('offline');
-  static const values = {
-    'realtime': realtime,
-    'offline': offline,
-  };
+enum ContextType {
+  realtime('realtime'),
+  offline('offline'),
+  ;
 
   final String value;
 
-  const ContextType._(this.value);
+  const ContextType(this.value);
 
-  factory ContextType.fromJson(String value) => values[value]!;
+  factory ContextType.fromJson(String value) =>
+      ContextType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ContextType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// Enum of AudioContextState from the spec
-class ContextState {
-  static const suspended = ContextState._('suspended');
-  static const running = ContextState._('running');
-  static const closed = ContextState._('closed');
-  static const values = {
-    'suspended': suspended,
-    'running': running,
-    'closed': closed,
-  };
+enum ContextState {
+  suspended('suspended'),
+  running('running'),
+  closed('closed'),
+  ;
 
   final String value;
 
-  const ContextState._(this.value);
+  const ContextState(this.value);
 
-  factory ContextState.fromJson(String value) => values[value]!;
+  factory ContextState.fromJson(String value) =>
+      ContextState.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ContextState && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -380,59 +361,39 @@ class NodeType {
 }
 
 /// Enum of AudioNode::ChannelCountMode from the spec
-class ChannelCountMode {
-  static const clampedMax = ChannelCountMode._('clamped-max');
-  static const explicit = ChannelCountMode._('explicit');
-  static const max = ChannelCountMode._('max');
-  static const values = {
-    'clamped-max': clampedMax,
-    'explicit': explicit,
-    'max': max,
-  };
+enum ChannelCountMode {
+  clampedMax('clamped-max'),
+  explicit('explicit'),
+  max('max'),
+  ;
 
   final String value;
 
-  const ChannelCountMode._(this.value);
+  const ChannelCountMode(this.value);
 
-  factory ChannelCountMode.fromJson(String value) => values[value]!;
+  factory ChannelCountMode.fromJson(String value) =>
+      ChannelCountMode.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ChannelCountMode && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// Enum of AudioNode::ChannelInterpretation from the spec
-class ChannelInterpretation {
-  static const discrete = ChannelInterpretation._('discrete');
-  static const speakers = ChannelInterpretation._('speakers');
-  static const values = {
-    'discrete': discrete,
-    'speakers': speakers,
-  };
+enum ChannelInterpretation {
+  discrete('discrete'),
+  speakers('speakers'),
+  ;
 
   final String value;
 
-  const ChannelInterpretation._(this.value);
+  const ChannelInterpretation(this.value);
 
-  factory ChannelInterpretation.fromJson(String value) => values[value]!;
+  factory ChannelInterpretation.fromJson(String value) =>
+      ChannelInterpretation.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ChannelInterpretation && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -460,28 +421,19 @@ class ParamType {
 }
 
 /// Enum of AudioParam::AutomationRate from the spec
-class AutomationRate {
-  static const aRate = AutomationRate._('a-rate');
-  static const kRate = AutomationRate._('k-rate');
-  static const values = {
-    'a-rate': aRate,
-    'k-rate': kRate,
-  };
+enum AutomationRate {
+  aRate('a-rate'),
+  kRate('k-rate'),
+  ;
 
   final String value;
 
-  const AutomationRate._(this.value);
+  const AutomationRate(this.value);
 
-  factory AutomationRate.fromJson(String value) => values[value]!;
+  factory AutomationRate.fromJson(String value) =>
+      AutomationRate.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is AutomationRate && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

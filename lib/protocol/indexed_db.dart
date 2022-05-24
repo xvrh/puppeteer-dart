@@ -318,32 +318,21 @@ class Key {
   }
 }
 
-class KeyType {
-  static const number = KeyType._('number');
-  static const string = KeyType._('string');
-  static const date = KeyType._('date');
-  static const array = KeyType._('array');
-  static const values = {
-    'number': number,
-    'string': string,
-    'date': date,
-    'array': array,
-  };
+enum KeyType {
+  number('number'),
+  string('string'),
+  date('date'),
+  array('array'),
+  ;
 
   final String value;
 
-  const KeyType._(this.value);
+  const KeyType(this.value);
 
-  factory KeyType.fromJson(String value) => values[value]!;
+  factory KeyType.fromJson(String value) =>
+      KeyType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is KeyType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -456,30 +445,20 @@ class KeyPath {
   }
 }
 
-class KeyPathType {
-  static const null$ = KeyPathType._('null');
-  static const string = KeyPathType._('string');
-  static const array = KeyPathType._('array');
-  static const values = {
-    'null': null$,
-    'string': string,
-    'array': array,
-  };
+enum KeyPathType {
+  null$('null'),
+  string('string'),
+  array('array'),
+  ;
 
   final String value;
 
-  const KeyPathType._(this.value);
+  const KeyPathType(this.value);
 
-  factory KeyPathType.fromJson(String value) => values[value]!;
+  factory KeyPathType.fromJson(String value) =>
+      KeyPathType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is KeyPathType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

@@ -152,125 +152,70 @@ class AffectedFrame {
   }
 }
 
-class CookieExclusionReason {
-  static const excludeSameSiteUnspecifiedTreatedAsLax =
-      CookieExclusionReason._('ExcludeSameSiteUnspecifiedTreatedAsLax');
-  static const excludeSameSiteNoneInsecure =
-      CookieExclusionReason._('ExcludeSameSiteNoneInsecure');
-  static const excludeSameSiteLax =
-      CookieExclusionReason._('ExcludeSameSiteLax');
-  static const excludeSameSiteStrict =
-      CookieExclusionReason._('ExcludeSameSiteStrict');
-  static const excludeInvalidSameParty =
-      CookieExclusionReason._('ExcludeInvalidSameParty');
-  static const excludeSamePartyCrossPartyContext =
-      CookieExclusionReason._('ExcludeSamePartyCrossPartyContext');
-  static const values = {
-    'ExcludeSameSiteUnspecifiedTreatedAsLax':
-        excludeSameSiteUnspecifiedTreatedAsLax,
-    'ExcludeSameSiteNoneInsecure': excludeSameSiteNoneInsecure,
-    'ExcludeSameSiteLax': excludeSameSiteLax,
-    'ExcludeSameSiteStrict': excludeSameSiteStrict,
-    'ExcludeInvalidSameParty': excludeInvalidSameParty,
-    'ExcludeSamePartyCrossPartyContext': excludeSamePartyCrossPartyContext,
-  };
+enum CookieExclusionReason {
+  excludeSameSiteUnspecifiedTreatedAsLax(
+      'ExcludeSameSiteUnspecifiedTreatedAsLax'),
+  excludeSameSiteNoneInsecure('ExcludeSameSiteNoneInsecure'),
+  excludeSameSiteLax('ExcludeSameSiteLax'),
+  excludeSameSiteStrict('ExcludeSameSiteStrict'),
+  excludeInvalidSameParty('ExcludeInvalidSameParty'),
+  excludeSamePartyCrossPartyContext('ExcludeSamePartyCrossPartyContext'),
+  ;
 
   final String value;
 
-  const CookieExclusionReason._(this.value);
+  const CookieExclusionReason(this.value);
 
-  factory CookieExclusionReason.fromJson(String value) => values[value]!;
+  factory CookieExclusionReason.fromJson(String value) =>
+      CookieExclusionReason.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CookieExclusionReason && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class CookieWarningReason {
-  static const warnSameSiteUnspecifiedCrossSiteContext =
-      CookieWarningReason._('WarnSameSiteUnspecifiedCrossSiteContext');
-  static const warnSameSiteNoneInsecure =
-      CookieWarningReason._('WarnSameSiteNoneInsecure');
-  static const warnSameSiteUnspecifiedLaxAllowUnsafe =
-      CookieWarningReason._('WarnSameSiteUnspecifiedLaxAllowUnsafe');
-  static const warnSameSiteStrictLaxDowngradeStrict =
-      CookieWarningReason._('WarnSameSiteStrictLaxDowngradeStrict');
-  static const warnSameSiteStrictCrossDowngradeStrict =
-      CookieWarningReason._('WarnSameSiteStrictCrossDowngradeStrict');
-  static const warnSameSiteStrictCrossDowngradeLax =
-      CookieWarningReason._('WarnSameSiteStrictCrossDowngradeLax');
-  static const warnSameSiteLaxCrossDowngradeStrict =
-      CookieWarningReason._('WarnSameSiteLaxCrossDowngradeStrict');
-  static const warnSameSiteLaxCrossDowngradeLax =
-      CookieWarningReason._('WarnSameSiteLaxCrossDowngradeLax');
-  static const warnAttributeValueExceedsMaxSize =
-      CookieWarningReason._('WarnAttributeValueExceedsMaxSize');
-  static const values = {
-    'WarnSameSiteUnspecifiedCrossSiteContext':
-        warnSameSiteUnspecifiedCrossSiteContext,
-    'WarnSameSiteNoneInsecure': warnSameSiteNoneInsecure,
-    'WarnSameSiteUnspecifiedLaxAllowUnsafe':
-        warnSameSiteUnspecifiedLaxAllowUnsafe,
-    'WarnSameSiteStrictLaxDowngradeStrict':
-        warnSameSiteStrictLaxDowngradeStrict,
-    'WarnSameSiteStrictCrossDowngradeStrict':
-        warnSameSiteStrictCrossDowngradeStrict,
-    'WarnSameSiteStrictCrossDowngradeLax': warnSameSiteStrictCrossDowngradeLax,
-    'WarnSameSiteLaxCrossDowngradeStrict': warnSameSiteLaxCrossDowngradeStrict,
-    'WarnSameSiteLaxCrossDowngradeLax': warnSameSiteLaxCrossDowngradeLax,
-    'WarnAttributeValueExceedsMaxSize': warnAttributeValueExceedsMaxSize,
-  };
+enum CookieWarningReason {
+  warnSameSiteUnspecifiedCrossSiteContext(
+      'WarnSameSiteUnspecifiedCrossSiteContext'),
+  warnSameSiteNoneInsecure('WarnSameSiteNoneInsecure'),
+  warnSameSiteUnspecifiedLaxAllowUnsafe(
+      'WarnSameSiteUnspecifiedLaxAllowUnsafe'),
+  warnSameSiteStrictLaxDowngradeStrict('WarnSameSiteStrictLaxDowngradeStrict'),
+  warnSameSiteStrictCrossDowngradeStrict(
+      'WarnSameSiteStrictCrossDowngradeStrict'),
+  warnSameSiteStrictCrossDowngradeLax('WarnSameSiteStrictCrossDowngradeLax'),
+  warnSameSiteLaxCrossDowngradeStrict('WarnSameSiteLaxCrossDowngradeStrict'),
+  warnSameSiteLaxCrossDowngradeLax('WarnSameSiteLaxCrossDowngradeLax'),
+  warnAttributeValueExceedsMaxSize('WarnAttributeValueExceedsMaxSize'),
+  ;
 
   final String value;
 
-  const CookieWarningReason._(this.value);
+  const CookieWarningReason(this.value);
 
-  factory CookieWarningReason.fromJson(String value) => values[value]!;
+  factory CookieWarningReason.fromJson(String value) =>
+      CookieWarningReason.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CookieWarningReason && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class CookieOperation {
-  static const setCookie = CookieOperation._('SetCookie');
-  static const readCookie = CookieOperation._('ReadCookie');
-  static const values = {
-    'SetCookie': setCookie,
-    'ReadCookie': readCookie,
-  };
+enum CookieOperation {
+  setCookie('SetCookie'),
+  readCookie('ReadCookie'),
+  ;
 
   final String value;
 
-  const CookieOperation._(this.value);
+  const CookieOperation(this.value);
 
-  factory CookieOperation.fromJson(String value) => values[value]!;
+  factory CookieOperation.fromJson(String value) =>
+      CookieOperation.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CookieOperation && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -354,112 +299,63 @@ class CookieIssueDetails {
   }
 }
 
-class MixedContentResolutionStatus {
-  static const mixedContentBlocked =
-      MixedContentResolutionStatus._('MixedContentBlocked');
-  static const mixedContentAutomaticallyUpgraded =
-      MixedContentResolutionStatus._('MixedContentAutomaticallyUpgraded');
-  static const mixedContentWarning =
-      MixedContentResolutionStatus._('MixedContentWarning');
-  static const values = {
-    'MixedContentBlocked': mixedContentBlocked,
-    'MixedContentAutomaticallyUpgraded': mixedContentAutomaticallyUpgraded,
-    'MixedContentWarning': mixedContentWarning,
-  };
+enum MixedContentResolutionStatus {
+  mixedContentBlocked('MixedContentBlocked'),
+  mixedContentAutomaticallyUpgraded('MixedContentAutomaticallyUpgraded'),
+  mixedContentWarning('MixedContentWarning'),
+  ;
 
   final String value;
 
-  const MixedContentResolutionStatus._(this.value);
+  const MixedContentResolutionStatus(this.value);
 
-  factory MixedContentResolutionStatus.fromJson(String value) => values[value]!;
+  factory MixedContentResolutionStatus.fromJson(String value) =>
+      MixedContentResolutionStatus.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is MixedContentResolutionStatus && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class MixedContentResourceType {
-  static const attributionSrc = MixedContentResourceType._('AttributionSrc');
-  static const audio = MixedContentResourceType._('Audio');
-  static const beacon = MixedContentResourceType._('Beacon');
-  static const cspReport = MixedContentResourceType._('CSPReport');
-  static const download = MixedContentResourceType._('Download');
-  static const eventSource = MixedContentResourceType._('EventSource');
-  static const favicon = MixedContentResourceType._('Favicon');
-  static const font = MixedContentResourceType._('Font');
-  static const form = MixedContentResourceType._('Form');
-  static const frame = MixedContentResourceType._('Frame');
-  static const image = MixedContentResourceType._('Image');
-  static const import$ = MixedContentResourceType._('Import');
-  static const manifest = MixedContentResourceType._('Manifest');
-  static const ping = MixedContentResourceType._('Ping');
-  static const pluginData = MixedContentResourceType._('PluginData');
-  static const pluginResource = MixedContentResourceType._('PluginResource');
-  static const prefetch = MixedContentResourceType._('Prefetch');
-  static const resource = MixedContentResourceType._('Resource');
-  static const script = MixedContentResourceType._('Script');
-  static const serviceWorker = MixedContentResourceType._('ServiceWorker');
-  static const sharedWorker = MixedContentResourceType._('SharedWorker');
-  static const stylesheet = MixedContentResourceType._('Stylesheet');
-  static const track = MixedContentResourceType._('Track');
-  static const video = MixedContentResourceType._('Video');
-  static const worker = MixedContentResourceType._('Worker');
-  static const xmlHttpRequest = MixedContentResourceType._('XMLHttpRequest');
-  static const xslt = MixedContentResourceType._('XSLT');
-  static const values = {
-    'AttributionSrc': attributionSrc,
-    'Audio': audio,
-    'Beacon': beacon,
-    'CSPReport': cspReport,
-    'Download': download,
-    'EventSource': eventSource,
-    'Favicon': favicon,
-    'Font': font,
-    'Form': form,
-    'Frame': frame,
-    'Image': image,
-    'Import': import$,
-    'Manifest': manifest,
-    'Ping': ping,
-    'PluginData': pluginData,
-    'PluginResource': pluginResource,
-    'Prefetch': prefetch,
-    'Resource': resource,
-    'Script': script,
-    'ServiceWorker': serviceWorker,
-    'SharedWorker': sharedWorker,
-    'Stylesheet': stylesheet,
-    'Track': track,
-    'Video': video,
-    'Worker': worker,
-    'XMLHttpRequest': xmlHttpRequest,
-    'XSLT': xslt,
-  };
+enum MixedContentResourceType {
+  attributionSrc('AttributionSrc'),
+  audio('Audio'),
+  beacon('Beacon'),
+  cspReport('CSPReport'),
+  download('Download'),
+  eventSource('EventSource'),
+  favicon('Favicon'),
+  font('Font'),
+  form('Form'),
+  frame('Frame'),
+  image('Image'),
+  import$('Import'),
+  manifest('Manifest'),
+  ping('Ping'),
+  pluginData('PluginData'),
+  pluginResource('PluginResource'),
+  prefetch('Prefetch'),
+  resource('Resource'),
+  script('Script'),
+  serviceWorker('ServiceWorker'),
+  sharedWorker('SharedWorker'),
+  stylesheet('Stylesheet'),
+  track('Track'),
+  video('Video'),
+  worker('Worker'),
+  xmlHttpRequest('XMLHttpRequest'),
+  xslt('XSLT'),
+  ;
 
   final String value;
 
-  const MixedContentResourceType._(this.value);
+  const MixedContentResourceType(this.value);
 
-  factory MixedContentResourceType.fromJson(String value) => values[value]!;
+  factory MixedContentResourceType.fromJson(String value) =>
+      MixedContentResourceType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is MixedContentResourceType && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -528,42 +424,24 @@ class MixedContentIssueDetails {
 
 /// Enum indicating the reason a response has been blocked. These reasons are
 /// refinements of the net error BLOCKED_BY_RESPONSE.
-class BlockedByResponseReason {
-  static const coepFrameResourceNeedsCoepHeader =
-      BlockedByResponseReason._('CoepFrameResourceNeedsCoepHeader');
-  static const coopSandboxedIFrameCannotNavigateToCoopPage =
-      BlockedByResponseReason._('CoopSandboxedIFrameCannotNavigateToCoopPage');
-  static const corpNotSameOrigin =
-      BlockedByResponseReason._('CorpNotSameOrigin');
-  static const corpNotSameOriginAfterDefaultedToSameOriginByCoep =
-      BlockedByResponseReason._(
-          'CorpNotSameOriginAfterDefaultedToSameOriginByCoep');
-  static const corpNotSameSite = BlockedByResponseReason._('CorpNotSameSite');
-  static const values = {
-    'CoepFrameResourceNeedsCoepHeader': coepFrameResourceNeedsCoepHeader,
-    'CoopSandboxedIFrameCannotNavigateToCoopPage':
-        coopSandboxedIFrameCannotNavigateToCoopPage,
-    'CorpNotSameOrigin': corpNotSameOrigin,
-    'CorpNotSameOriginAfterDefaultedToSameOriginByCoep':
-        corpNotSameOriginAfterDefaultedToSameOriginByCoep,
-    'CorpNotSameSite': corpNotSameSite,
-  };
+enum BlockedByResponseReason {
+  coepFrameResourceNeedsCoepHeader('CoepFrameResourceNeedsCoepHeader'),
+  coopSandboxedIFrameCannotNavigateToCoopPage(
+      'CoopSandboxedIFrameCannotNavigateToCoopPage'),
+  corpNotSameOrigin('CorpNotSameOrigin'),
+  corpNotSameOriginAfterDefaultedToSameOriginByCoep(
+      'CorpNotSameOriginAfterDefaultedToSameOriginByCoep'),
+  corpNotSameSite('CorpNotSameSite'),
+  ;
 
   final String value;
 
-  const BlockedByResponseReason._(this.value);
+  const BlockedByResponseReason(this.value);
 
-  factory BlockedByResponseReason.fromJson(String value) => values[value]!;
+  factory BlockedByResponseReason.fromJson(String value) =>
+      BlockedByResponseReason.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is BlockedByResponseReason && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -611,58 +489,38 @@ class BlockedByResponseIssueDetails {
   }
 }
 
-class HeavyAdResolutionStatus {
-  static const heavyAdBlocked = HeavyAdResolutionStatus._('HeavyAdBlocked');
-  static const heavyAdWarning = HeavyAdResolutionStatus._('HeavyAdWarning');
-  static const values = {
-    'HeavyAdBlocked': heavyAdBlocked,
-    'HeavyAdWarning': heavyAdWarning,
-  };
+enum HeavyAdResolutionStatus {
+  heavyAdBlocked('HeavyAdBlocked'),
+  heavyAdWarning('HeavyAdWarning'),
+  ;
 
   final String value;
 
-  const HeavyAdResolutionStatus._(this.value);
+  const HeavyAdResolutionStatus(this.value);
 
-  factory HeavyAdResolutionStatus.fromJson(String value) => values[value]!;
+  factory HeavyAdResolutionStatus.fromJson(String value) =>
+      HeavyAdResolutionStatus.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is HeavyAdResolutionStatus && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class HeavyAdReason {
-  static const networkTotalLimit = HeavyAdReason._('NetworkTotalLimit');
-  static const cpuTotalLimit = HeavyAdReason._('CpuTotalLimit');
-  static const cpuPeakLimit = HeavyAdReason._('CpuPeakLimit');
-  static const values = {
-    'NetworkTotalLimit': networkTotalLimit,
-    'CpuTotalLimit': cpuTotalLimit,
-    'CpuPeakLimit': cpuPeakLimit,
-  };
+enum HeavyAdReason {
+  networkTotalLimit('NetworkTotalLimit'),
+  cpuTotalLimit('CpuTotalLimit'),
+  cpuPeakLimit('CpuPeakLimit'),
+  ;
 
   final String value;
 
-  const HeavyAdReason._(this.value);
+  const HeavyAdReason(this.value);
 
-  factory HeavyAdReason.fromJson(String value) => values[value]!;
+  factory HeavyAdReason.fromJson(String value) =>
+      HeavyAdReason.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is HeavyAdReason && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -699,44 +557,24 @@ class HeavyAdIssueDetails {
   }
 }
 
-class ContentSecurityPolicyViolationType {
-  static const kInlineViolation =
-      ContentSecurityPolicyViolationType._('kInlineViolation');
-  static const kEvalViolation =
-      ContentSecurityPolicyViolationType._('kEvalViolation');
-  static const kUrlViolation =
-      ContentSecurityPolicyViolationType._('kURLViolation');
-  static const kTrustedTypesSinkViolation =
-      ContentSecurityPolicyViolationType._('kTrustedTypesSinkViolation');
-  static const kTrustedTypesPolicyViolation =
-      ContentSecurityPolicyViolationType._('kTrustedTypesPolicyViolation');
-  static const kWasmEvalViolation =
-      ContentSecurityPolicyViolationType._('kWasmEvalViolation');
-  static const values = {
-    'kInlineViolation': kInlineViolation,
-    'kEvalViolation': kEvalViolation,
-    'kURLViolation': kUrlViolation,
-    'kTrustedTypesSinkViolation': kTrustedTypesSinkViolation,
-    'kTrustedTypesPolicyViolation': kTrustedTypesPolicyViolation,
-    'kWasmEvalViolation': kWasmEvalViolation,
-  };
+enum ContentSecurityPolicyViolationType {
+  kInlineViolation('kInlineViolation'),
+  kEvalViolation('kEvalViolation'),
+  kUrlViolation('kURLViolation'),
+  kTrustedTypesSinkViolation('kTrustedTypesSinkViolation'),
+  kTrustedTypesPolicyViolation('kTrustedTypesPolicyViolation'),
+  kWasmEvalViolation('kWasmEvalViolation'),
+  ;
 
   final String value;
 
-  const ContentSecurityPolicyViolationType._(this.value);
+  const ContentSecurityPolicyViolationType(this.value);
 
   factory ContentSecurityPolicyViolationType.fromJson(String value) =>
-      values[value]!;
+      ContentSecurityPolicyViolationType.values
+          .firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ContentSecurityPolicyViolationType && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -843,29 +681,19 @@ class ContentSecurityPolicyIssueDetails {
   }
 }
 
-class SharedArrayBufferIssueType {
-  static const transferIssue = SharedArrayBufferIssueType._('TransferIssue');
-  static const creationIssue = SharedArrayBufferIssueType._('CreationIssue');
-  static const values = {
-    'TransferIssue': transferIssue,
-    'CreationIssue': creationIssue,
-  };
+enum SharedArrayBufferIssueType {
+  transferIssue('TransferIssue'),
+  creationIssue('CreationIssue'),
+  ;
 
   final String value;
 
-  const SharedArrayBufferIssueType._(this.value);
+  const SharedArrayBufferIssueType(this.value);
 
-  factory SharedArrayBufferIssueType.fromJson(String value) => values[value]!;
+  factory SharedArrayBufferIssueType.fromJson(String value) =>
+      SharedArrayBufferIssueType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is SharedArrayBufferIssueType && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -903,34 +731,21 @@ class SharedArrayBufferIssueDetails {
   }
 }
 
-class TwaQualityEnforcementViolationType {
-  static const kHttpError = TwaQualityEnforcementViolationType._('kHttpError');
-  static const kUnavailableOffline =
-      TwaQualityEnforcementViolationType._('kUnavailableOffline');
-  static const kDigitalAssetLinks =
-      TwaQualityEnforcementViolationType._('kDigitalAssetLinks');
-  static const values = {
-    'kHttpError': kHttpError,
-    'kUnavailableOffline': kUnavailableOffline,
-    'kDigitalAssetLinks': kDigitalAssetLinks,
-  };
+enum TwaQualityEnforcementViolationType {
+  kHttpError('kHttpError'),
+  kUnavailableOffline('kUnavailableOffline'),
+  kDigitalAssetLinks('kDigitalAssetLinks'),
+  ;
 
   final String value;
 
-  const TwaQualityEnforcementViolationType._(this.value);
+  const TwaQualityEnforcementViolationType(this.value);
 
   factory TwaQualityEnforcementViolationType.fromJson(String value) =>
-      values[value]!;
+      TwaQualityEnforcementViolationType.values
+          .firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is TwaQualityEnforcementViolationType && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1102,45 +917,23 @@ class CorsIssueDetails {
   }
 }
 
-class AttributionReportingIssueType {
-  static const permissionPolicyDisabled =
-      AttributionReportingIssueType._('PermissionPolicyDisabled');
-  static const invalidAttributionSourceEventId =
-      AttributionReportingIssueType._('InvalidAttributionSourceEventId');
-  static const attributionSourceUntrustworthyOrigin =
-      AttributionReportingIssueType._('AttributionSourceUntrustworthyOrigin');
-  static const attributionUntrustworthyOrigin =
-      AttributionReportingIssueType._('AttributionUntrustworthyOrigin');
-  static const invalidAttributionSourceExpiry =
-      AttributionReportingIssueType._('InvalidAttributionSourceExpiry');
-  static const invalidAttributionSourcePriority =
-      AttributionReportingIssueType._('InvalidAttributionSourcePriority');
-  static const values = {
-    'PermissionPolicyDisabled': permissionPolicyDisabled,
-    'InvalidAttributionSourceEventId': invalidAttributionSourceEventId,
-    'AttributionSourceUntrustworthyOrigin':
-        attributionSourceUntrustworthyOrigin,
-    'AttributionUntrustworthyOrigin': attributionUntrustworthyOrigin,
-    'InvalidAttributionSourceExpiry': invalidAttributionSourceExpiry,
-    'InvalidAttributionSourcePriority': invalidAttributionSourcePriority,
-  };
+enum AttributionReportingIssueType {
+  permissionPolicyDisabled('PermissionPolicyDisabled'),
+  invalidAttributionSourceEventId('InvalidAttributionSourceEventId'),
+  attributionSourceUntrustworthyOrigin('AttributionSourceUntrustworthyOrigin'),
+  attributionUntrustworthyOrigin('AttributionUntrustworthyOrigin'),
+  invalidAttributionSourceExpiry('InvalidAttributionSourceExpiry'),
+  invalidAttributionSourcePriority('InvalidAttributionSourcePriority'),
+  ;
 
   final String value;
 
-  const AttributionReportingIssueType._(this.value);
+  const AttributionReportingIssueType(this.value);
 
   factory AttributionReportingIssueType.fromJson(String value) =>
-      values[value]!;
+      AttributionReportingIssueType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is AttributionReportingIssueType && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1264,28 +1057,18 @@ class NavigatorUserAgentIssueDetails {
   }
 }
 
-class GenericIssueErrorType {
-  static const crossOriginPortalPostMessageError =
-      GenericIssueErrorType._('CrossOriginPortalPostMessageError');
-  static const values = {
-    'CrossOriginPortalPostMessageError': crossOriginPortalPostMessageError,
-  };
+enum GenericIssueErrorType {
+  crossOriginPortalPostMessageError('CrossOriginPortalPostMessageError'),
+  ;
 
   final String value;
 
-  const GenericIssueErrorType._(this.value);
+  const GenericIssueErrorType(this.value);
 
-  factory GenericIssueErrorType.fromJson(String value) => values[value]!;
+  factory GenericIssueErrorType.fromJson(String value) =>
+      GenericIssueErrorType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is GenericIssueErrorType && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1317,29 +1100,19 @@ class GenericIssueDetails {
   }
 }
 
-class DeprecationIssueType {
-  static const deprecationExample =
-      DeprecationIssueType._('DeprecationExample');
-  static const untranslated = DeprecationIssueType._('Untranslated');
-  static const values = {
-    'DeprecationExample': deprecationExample,
-    'Untranslated': untranslated,
-  };
+enum DeprecationIssueType {
+  deprecationExample('DeprecationExample'),
+  untranslated('Untranslated'),
+  ;
 
   final String value;
 
-  const DeprecationIssueType._(this.value);
+  const DeprecationIssueType(this.value);
 
-  factory DeprecationIssueType.fromJson(String value) => values[value]!;
+  factory DeprecationIssueType.fromJson(String value) =>
+      DeprecationIssueType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is DeprecationIssueType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1383,31 +1156,19 @@ class DeprecationIssueDetails {
   }
 }
 
-class ClientHintIssueReason {
-  static const metaTagAllowListInvalidOrigin =
-      ClientHintIssueReason._('MetaTagAllowListInvalidOrigin');
-  static const metaTagModifiedHtml =
-      ClientHintIssueReason._('MetaTagModifiedHTML');
-  static const values = {
-    'MetaTagAllowListInvalidOrigin': metaTagAllowListInvalidOrigin,
-    'MetaTagModifiedHTML': metaTagModifiedHtml,
-  };
+enum ClientHintIssueReason {
+  metaTagAllowListInvalidOrigin('MetaTagAllowListInvalidOrigin'),
+  metaTagModifiedHtml('MetaTagModifiedHTML'),
+  ;
 
   final String value;
 
-  const ClientHintIssueReason._(this.value);
+  const ClientHintIssueReason(this.value);
 
-  factory ClientHintIssueReason.fromJson(String value) => values[value]!;
+  factory ClientHintIssueReason.fromJson(String value) =>
+      ClientHintIssueReason.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ClientHintIssueReason && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1438,104 +1199,45 @@ class FederatedAuthRequestIssueDetails {
 /// Should be updated alongside RequestIdTokenStatus in
 /// third_party/blink/public/mojom/devtools/inspector_issue.mojom to include
 /// all cases except for success.
-class FederatedAuthRequestIssueReason {
-  static const approvalDeclined =
-      FederatedAuthRequestIssueReason._('ApprovalDeclined');
-  static const tooManyRequests =
-      FederatedAuthRequestIssueReason._('TooManyRequests');
-  static const manifestListHttpNotFound =
-      FederatedAuthRequestIssueReason._('ManifestListHttpNotFound');
-  static const manifestListNoResponse =
-      FederatedAuthRequestIssueReason._('ManifestListNoResponse');
-  static const manifestListInvalidResponse =
-      FederatedAuthRequestIssueReason._('ManifestListInvalidResponse');
-  static const manifestNotInManifestList =
-      FederatedAuthRequestIssueReason._('ManifestNotInManifestList');
-  static const manifestListTooBig =
-      FederatedAuthRequestIssueReason._('ManifestListTooBig');
-  static const manifestHttpNotFound =
-      FederatedAuthRequestIssueReason._('ManifestHttpNotFound');
-  static const manifestNoResponse =
-      FederatedAuthRequestIssueReason._('ManifestNoResponse');
-  static const manifestInvalidResponse =
-      FederatedAuthRequestIssueReason._('ManifestInvalidResponse');
-  static const clientMetadataHttpNotFound =
-      FederatedAuthRequestIssueReason._('ClientMetadataHttpNotFound');
-  static const clientMetadataNoResponse =
-      FederatedAuthRequestIssueReason._('ClientMetadataNoResponse');
-  static const clientMetadataInvalidResponse =
-      FederatedAuthRequestIssueReason._('ClientMetadataInvalidResponse');
-  static const clientMetadataMissingPrivacyPolicyUrl =
-      FederatedAuthRequestIssueReason._(
-          'ClientMetadataMissingPrivacyPolicyUrl');
-  static const disabledInSettings =
-      FederatedAuthRequestIssueReason._('DisabledInSettings');
-  static const errorFetchingSignin =
-      FederatedAuthRequestIssueReason._('ErrorFetchingSignin');
-  static const invalidSigninResponse =
-      FederatedAuthRequestIssueReason._('InvalidSigninResponse');
-  static const accountsHttpNotFound =
-      FederatedAuthRequestIssueReason._('AccountsHttpNotFound');
-  static const accountsNoResponse =
-      FederatedAuthRequestIssueReason._('AccountsNoResponse');
-  static const accountsInvalidResponse =
-      FederatedAuthRequestIssueReason._('AccountsInvalidResponse');
-  static const idTokenHttpNotFound =
-      FederatedAuthRequestIssueReason._('IdTokenHttpNotFound');
-  static const idTokenNoResponse =
-      FederatedAuthRequestIssueReason._('IdTokenNoResponse');
-  static const idTokenInvalidResponse =
-      FederatedAuthRequestIssueReason._('IdTokenInvalidResponse');
-  static const idTokenInvalidRequest =
-      FederatedAuthRequestIssueReason._('IdTokenInvalidRequest');
-  static const errorIdToken = FederatedAuthRequestIssueReason._('ErrorIdToken');
-  static const canceled = FederatedAuthRequestIssueReason._('Canceled');
-  static const values = {
-    'ApprovalDeclined': approvalDeclined,
-    'TooManyRequests': tooManyRequests,
-    'ManifestListHttpNotFound': manifestListHttpNotFound,
-    'ManifestListNoResponse': manifestListNoResponse,
-    'ManifestListInvalidResponse': manifestListInvalidResponse,
-    'ManifestNotInManifestList': manifestNotInManifestList,
-    'ManifestListTooBig': manifestListTooBig,
-    'ManifestHttpNotFound': manifestHttpNotFound,
-    'ManifestNoResponse': manifestNoResponse,
-    'ManifestInvalidResponse': manifestInvalidResponse,
-    'ClientMetadataHttpNotFound': clientMetadataHttpNotFound,
-    'ClientMetadataNoResponse': clientMetadataNoResponse,
-    'ClientMetadataInvalidResponse': clientMetadataInvalidResponse,
-    'ClientMetadataMissingPrivacyPolicyUrl':
-        clientMetadataMissingPrivacyPolicyUrl,
-    'DisabledInSettings': disabledInSettings,
-    'ErrorFetchingSignin': errorFetchingSignin,
-    'InvalidSigninResponse': invalidSigninResponse,
-    'AccountsHttpNotFound': accountsHttpNotFound,
-    'AccountsNoResponse': accountsNoResponse,
-    'AccountsInvalidResponse': accountsInvalidResponse,
-    'IdTokenHttpNotFound': idTokenHttpNotFound,
-    'IdTokenNoResponse': idTokenNoResponse,
-    'IdTokenInvalidResponse': idTokenInvalidResponse,
-    'IdTokenInvalidRequest': idTokenInvalidRequest,
-    'ErrorIdToken': errorIdToken,
-    'Canceled': canceled,
-  };
+enum FederatedAuthRequestIssueReason {
+  approvalDeclined('ApprovalDeclined'),
+  tooManyRequests('TooManyRequests'),
+  manifestListHttpNotFound('ManifestListHttpNotFound'),
+  manifestListNoResponse('ManifestListNoResponse'),
+  manifestListInvalidResponse('ManifestListInvalidResponse'),
+  manifestNotInManifestList('ManifestNotInManifestList'),
+  manifestListTooBig('ManifestListTooBig'),
+  manifestHttpNotFound('ManifestHttpNotFound'),
+  manifestNoResponse('ManifestNoResponse'),
+  manifestInvalidResponse('ManifestInvalidResponse'),
+  clientMetadataHttpNotFound('ClientMetadataHttpNotFound'),
+  clientMetadataNoResponse('ClientMetadataNoResponse'),
+  clientMetadataInvalidResponse('ClientMetadataInvalidResponse'),
+  clientMetadataMissingPrivacyPolicyUrl(
+      'ClientMetadataMissingPrivacyPolicyUrl'),
+  disabledInSettings('DisabledInSettings'),
+  errorFetchingSignin('ErrorFetchingSignin'),
+  invalidSigninResponse('InvalidSigninResponse'),
+  accountsHttpNotFound('AccountsHttpNotFound'),
+  accountsNoResponse('AccountsNoResponse'),
+  accountsInvalidResponse('AccountsInvalidResponse'),
+  idTokenHttpNotFound('IdTokenHttpNotFound'),
+  idTokenNoResponse('IdTokenNoResponse'),
+  idTokenInvalidResponse('IdTokenInvalidResponse'),
+  idTokenInvalidRequest('IdTokenInvalidRequest'),
+  errorIdToken('ErrorIdToken'),
+  canceled('Canceled'),
+  ;
 
   final String value;
 
-  const FederatedAuthRequestIssueReason._(this.value);
+  const FederatedAuthRequestIssueReason(this.value);
 
   factory FederatedAuthRequestIssueReason.fromJson(String value) =>
-      values[value]!;
+      FederatedAuthRequestIssueReason.values
+          .firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is FederatedAuthRequestIssueReason && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1571,64 +1273,33 @@ class ClientHintIssueDetails {
 /// A unique identifier for the type of issue. Each type may use one of the
 /// optional fields in InspectorIssueDetails to convey more specific
 /// information about the kind of issue.
-class InspectorIssueCode {
-  static const cookieIssue = InspectorIssueCode._('CookieIssue');
-  static const mixedContentIssue = InspectorIssueCode._('MixedContentIssue');
-  static const blockedByResponseIssue =
-      InspectorIssueCode._('BlockedByResponseIssue');
-  static const heavyAdIssue = InspectorIssueCode._('HeavyAdIssue');
-  static const contentSecurityPolicyIssue =
-      InspectorIssueCode._('ContentSecurityPolicyIssue');
-  static const sharedArrayBufferIssue =
-      InspectorIssueCode._('SharedArrayBufferIssue');
-  static const trustedWebActivityIssue =
-      InspectorIssueCode._('TrustedWebActivityIssue');
-  static const lowTextContrastIssue =
-      InspectorIssueCode._('LowTextContrastIssue');
-  static const corsIssue = InspectorIssueCode._('CorsIssue');
-  static const attributionReportingIssue =
-      InspectorIssueCode._('AttributionReportingIssue');
-  static const quirksModeIssue = InspectorIssueCode._('QuirksModeIssue');
-  static const navigatorUserAgentIssue =
-      InspectorIssueCode._('NavigatorUserAgentIssue');
-  static const genericIssue = InspectorIssueCode._('GenericIssue');
-  static const deprecationIssue = InspectorIssueCode._('DeprecationIssue');
-  static const clientHintIssue = InspectorIssueCode._('ClientHintIssue');
-  static const federatedAuthRequestIssue =
-      InspectorIssueCode._('FederatedAuthRequestIssue');
-  static const values = {
-    'CookieIssue': cookieIssue,
-    'MixedContentIssue': mixedContentIssue,
-    'BlockedByResponseIssue': blockedByResponseIssue,
-    'HeavyAdIssue': heavyAdIssue,
-    'ContentSecurityPolicyIssue': contentSecurityPolicyIssue,
-    'SharedArrayBufferIssue': sharedArrayBufferIssue,
-    'TrustedWebActivityIssue': trustedWebActivityIssue,
-    'LowTextContrastIssue': lowTextContrastIssue,
-    'CorsIssue': corsIssue,
-    'AttributionReportingIssue': attributionReportingIssue,
-    'QuirksModeIssue': quirksModeIssue,
-    'NavigatorUserAgentIssue': navigatorUserAgentIssue,
-    'GenericIssue': genericIssue,
-    'DeprecationIssue': deprecationIssue,
-    'ClientHintIssue': clientHintIssue,
-    'FederatedAuthRequestIssue': federatedAuthRequestIssue,
-  };
+enum InspectorIssueCode {
+  cookieIssue('CookieIssue'),
+  mixedContentIssue('MixedContentIssue'),
+  blockedByResponseIssue('BlockedByResponseIssue'),
+  heavyAdIssue('HeavyAdIssue'),
+  contentSecurityPolicyIssue('ContentSecurityPolicyIssue'),
+  sharedArrayBufferIssue('SharedArrayBufferIssue'),
+  trustedWebActivityIssue('TrustedWebActivityIssue'),
+  lowTextContrastIssue('LowTextContrastIssue'),
+  corsIssue('CorsIssue'),
+  attributionReportingIssue('AttributionReportingIssue'),
+  quirksModeIssue('QuirksModeIssue'),
+  navigatorUserAgentIssue('NavigatorUserAgentIssue'),
+  genericIssue('GenericIssue'),
+  deprecationIssue('DeprecationIssue'),
+  clientHintIssue('ClientHintIssue'),
+  federatedAuthRequestIssue('FederatedAuthRequestIssue'),
+  ;
 
   final String value;
 
-  const InspectorIssueCode._(this.value);
+  const InspectorIssueCode(this.value);
 
-  factory InspectorIssueCode.fromJson(String value) => values[value]!;
+  factory InspectorIssueCode.fromJson(String value) =>
+      InspectorIssueCode.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is InspectorIssueCode && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

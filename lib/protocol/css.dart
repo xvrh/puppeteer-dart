@@ -498,32 +498,21 @@ class StyleSheetId {
 /// Stylesheet type: "injected" for stylesheets injected via extension, "user-agent" for user-agent
 /// stylesheets, "inspector" for stylesheets created by the inspector (i.e. those holding the "via
 /// inspector" rules), "regular" for regular stylesheets.
-class StyleSheetOrigin {
-  static const injected = StyleSheetOrigin._('injected');
-  static const userAgent = StyleSheetOrigin._('user-agent');
-  static const inspector = StyleSheetOrigin._('inspector');
-  static const regular = StyleSheetOrigin._('regular');
-  static const values = {
-    'injected': injected,
-    'user-agent': userAgent,
-    'inspector': inspector,
-    'regular': regular,
-  };
+enum StyleSheetOrigin {
+  injected('injected'),
+  userAgent('user-agent'),
+  inspector('inspector'),
+  regular('regular'),
+  ;
 
   final String value;
 
-  const StyleSheetOrigin._(this.value);
+  const StyleSheetOrigin(this.value);
 
-  factory StyleSheetOrigin.fromJson(String value) => values[value]!;
+  factory StyleSheetOrigin.fromJson(String value) =>
+      StyleSheetOrigin.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is StyleSheetOrigin && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1224,32 +1213,21 @@ class CSSMedia {
   }
 }
 
-class CSSMediaSource {
-  static const mediaRule = CSSMediaSource._('mediaRule');
-  static const importRule = CSSMediaSource._('importRule');
-  static const linkedSheet = CSSMediaSource._('linkedSheet');
-  static const inlineSheet = CSSMediaSource._('inlineSheet');
-  static const values = {
-    'mediaRule': mediaRule,
-    'importRule': importRule,
-    'linkedSheet': linkedSheet,
-    'inlineSheet': inlineSheet,
-  };
+enum CSSMediaSource {
+  mediaRule('mediaRule'),
+  importRule('importRule'),
+  linkedSheet('linkedSheet'),
+  inlineSheet('inlineSheet'),
+  ;
 
   final String value;
 
-  const CSSMediaSource._(this.value);
+  const CSSMediaSource(this.value);
 
-  factory CSSMediaSource.fromJson(String value) => values[value]!;
+  factory CSSMediaSource.fromJson(String value) =>
+      CSSMediaSource.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CSSMediaSource && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

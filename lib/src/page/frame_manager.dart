@@ -90,7 +90,7 @@ class FrameManager {
     var watcher = LifecycleWatcher(this, frame,
         wait: wait, timeout: timeout ?? page.navigationTimeoutOrDefault);
 
-    Future<Null> navigate() async {
+    Future<Object?> navigate() async {
       var response =
           await _pageApi.navigate(url, referrer: referrer, frameId: frame.id);
       if (response.errorText != null) {
@@ -99,6 +99,7 @@ class FrameManager {
       await (response.loaderId != null
           ? watcher.newDocumentNavigation
           : watcher.sameDocumentNavigation);
+      return null;
     }
 
     try {

@@ -328,28 +328,19 @@ class RequestId {
 /// Stages of the request to handle. Request will intercept before the request is
 /// sent. Response will intercept after the response is received (but before response
 /// body is received).
-class RequestStage {
-  static const request = RequestStage._('Request');
-  static const response = RequestStage._('Response');
-  static const values = {
-    'Request': request,
-    'Response': response,
-  };
+enum RequestStage {
+  request('Request'),
+  response('Response'),
+  ;
 
   final String value;
 
-  const RequestStage._(this.value);
+  const RequestStage(this.value);
 
-  factory RequestStage.fromJson(String value) => values[value]!;
+  factory RequestStage.fromJson(String value) =>
+      RequestStage.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is RequestStage && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -454,28 +445,19 @@ class AuthChallenge {
   }
 }
 
-class AuthChallengeSource {
-  static const server = AuthChallengeSource._('Server');
-  static const proxy = AuthChallengeSource._('Proxy');
-  static const values = {
-    'Server': server,
-    'Proxy': proxy,
-  };
+enum AuthChallengeSource {
+  server('Server'),
+  proxy('Proxy'),
+  ;
 
   final String value;
 
-  const AuthChallengeSource._(this.value);
+  const AuthChallengeSource(this.value);
 
-  factory AuthChallengeSource.fromJson(String value) => values[value]!;
+  factory AuthChallengeSource.fromJson(String value) =>
+      AuthChallengeSource.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is AuthChallengeSource && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -518,33 +500,20 @@ class AuthChallengeResponse {
   }
 }
 
-class AuthChallengeResponseResponse {
-  static const default$ = AuthChallengeResponseResponse._('Default');
-  static const cancelAuth = AuthChallengeResponseResponse._('CancelAuth');
-  static const provideCredentials =
-      AuthChallengeResponseResponse._('ProvideCredentials');
-  static const values = {
-    'Default': default$,
-    'CancelAuth': cancelAuth,
-    'ProvideCredentials': provideCredentials,
-  };
+enum AuthChallengeResponseResponse {
+  default$('Default'),
+  cancelAuth('CancelAuth'),
+  provideCredentials('ProvideCredentials'),
+  ;
 
   final String value;
 
-  const AuthChallengeResponseResponse._(this.value);
+  const AuthChallengeResponseResponse(this.value);
 
   factory AuthChallengeResponseResponse.fromJson(String value) =>
-      values[value]!;
+      AuthChallengeResponseResponse.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is AuthChallengeResponseResponse && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

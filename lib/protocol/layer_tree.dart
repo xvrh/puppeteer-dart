@@ -212,30 +212,20 @@ class ScrollRect {
   }
 }
 
-class ScrollRectType {
-  static const repaintsOnScroll = ScrollRectType._('RepaintsOnScroll');
-  static const touchEventHandler = ScrollRectType._('TouchEventHandler');
-  static const wheelEventHandler = ScrollRectType._('WheelEventHandler');
-  static const values = {
-    'RepaintsOnScroll': repaintsOnScroll,
-    'TouchEventHandler': touchEventHandler,
-    'WheelEventHandler': wheelEventHandler,
-  };
+enum ScrollRectType {
+  repaintsOnScroll('RepaintsOnScroll'),
+  touchEventHandler('TouchEventHandler'),
+  wheelEventHandler('WheelEventHandler'),
+  ;
 
   final String value;
 
-  const ScrollRectType._(this.value);
+  const ScrollRectType(this.value);
 
-  factory ScrollRectType.fromJson(String value) => values[value]!;
+  factory ScrollRectType.fromJson(String value) =>
+      ScrollRectType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ScrollRectType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

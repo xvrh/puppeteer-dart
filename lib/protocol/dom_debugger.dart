@@ -117,60 +117,39 @@ class DOMDebuggerApi {
 }
 
 /// DOM breakpoint type.
-class DOMBreakpointType {
-  static const subtreeModified = DOMBreakpointType._('subtree-modified');
-  static const attributeModified = DOMBreakpointType._('attribute-modified');
-  static const nodeRemoved = DOMBreakpointType._('node-removed');
-  static const values = {
-    'subtree-modified': subtreeModified,
-    'attribute-modified': attributeModified,
-    'node-removed': nodeRemoved,
-  };
+enum DOMBreakpointType {
+  subtreeModified('subtree-modified'),
+  attributeModified('attribute-modified'),
+  nodeRemoved('node-removed'),
+  ;
 
   final String value;
 
-  const DOMBreakpointType._(this.value);
+  const DOMBreakpointType(this.value);
 
-  factory DOMBreakpointType.fromJson(String value) => values[value]!;
+  factory DOMBreakpointType.fromJson(String value) =>
+      DOMBreakpointType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is DOMBreakpointType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// CSP Violation type.
-class CSPViolationType {
-  static const trustedtypeSinkViolation =
-      CSPViolationType._('trustedtype-sink-violation');
-  static const trustedtypePolicyViolation =
-      CSPViolationType._('trustedtype-policy-violation');
-  static const values = {
-    'trustedtype-sink-violation': trustedtypeSinkViolation,
-    'trustedtype-policy-violation': trustedtypePolicyViolation,
-  };
+enum CSPViolationType {
+  trustedtypeSinkViolation('trustedtype-sink-violation'),
+  trustedtypePolicyViolation('trustedtype-policy-violation'),
+  ;
 
   final String value;
 
-  const CSPViolationType._(this.value);
+  const CSPViolationType(this.value);
 
-  factory CSPViolationType.fromJson(String value) => values[value]!;
+  factory CSPViolationType.fromJson(String value) =>
+      CSPViolationType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CSPViolationType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

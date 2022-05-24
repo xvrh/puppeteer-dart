@@ -274,48 +274,29 @@ class GetUsageAndQuotaResult {
 }
 
 /// Enum of possible storage types.
-class StorageType {
-  static const appcache = StorageType._('appcache');
-  static const cookies = StorageType._('cookies');
-  static const fileSystems = StorageType._('file_systems');
-  static const indexeddb = StorageType._('indexeddb');
-  static const localStorage = StorageType._('local_storage');
-  static const shaderCache = StorageType._('shader_cache');
-  static const websql = StorageType._('websql');
-  static const serviceWorkers = StorageType._('service_workers');
-  static const cacheStorage = StorageType._('cache_storage');
-  static const interestGroups = StorageType._('interest_groups');
-  static const all = StorageType._('all');
-  static const other = StorageType._('other');
-  static const values = {
-    'appcache': appcache,
-    'cookies': cookies,
-    'file_systems': fileSystems,
-    'indexeddb': indexeddb,
-    'local_storage': localStorage,
-    'shader_cache': shaderCache,
-    'websql': websql,
-    'service_workers': serviceWorkers,
-    'cache_storage': cacheStorage,
-    'interest_groups': interestGroups,
-    'all': all,
-    'other': other,
-  };
+enum StorageType {
+  appcache('appcache'),
+  cookies('cookies'),
+  fileSystems('file_systems'),
+  indexeddb('indexeddb'),
+  localStorage('local_storage'),
+  shaderCache('shader_cache'),
+  websql('websql'),
+  serviceWorkers('service_workers'),
+  cacheStorage('cache_storage'),
+  interestGroups('interest_groups'),
+  all('all'),
+  other('other'),
+  ;
 
   final String value;
 
-  const StorageType._(this.value);
+  const StorageType(this.value);
 
-  factory StorageType.fromJson(String value) => values[value]!;
+  factory StorageType.fromJson(String value) =>
+      StorageType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is StorageType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -371,35 +352,22 @@ class TrustTokens {
 }
 
 /// Enum of interest group access types.
-class InterestGroupAccessType {
-  static const join = InterestGroupAccessType._('join');
-  static const leave = InterestGroupAccessType._('leave');
-  static const update = InterestGroupAccessType._('update');
-  static const bid = InterestGroupAccessType._('bid');
-  static const win = InterestGroupAccessType._('win');
-  static const values = {
-    'join': join,
-    'leave': leave,
-    'update': update,
-    'bid': bid,
-    'win': win,
-  };
+enum InterestGroupAccessType {
+  join('join'),
+  leave('leave'),
+  update('update'),
+  bid('bid'),
+  win('win'),
+  ;
 
   final String value;
 
-  const InterestGroupAccessType._(this.value);
+  const InterestGroupAccessType(this.value);
 
-  factory InterestGroupAccessType.fromJson(String value) => values[value]!;
+  factory InterestGroupAccessType.fromJson(String value) =>
+      InterestGroupAccessType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is InterestGroupAccessType && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

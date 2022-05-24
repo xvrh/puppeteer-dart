@@ -56,7 +56,7 @@ class _GoldenMatcher extends Matcher {
   }
 }
 
-_GoldenMatcher equalsGolden(String goldenPath) {
+Matcher equalsGolden(String goldenPath) {
   return _GoldenMatcher(goldenPath);
 }
 

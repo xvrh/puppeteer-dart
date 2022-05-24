@@ -1,9 +1,7 @@
 import 'dart:io';
-import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:path/path.dart' as p;
-import 'package:pub_semver/pub_semver.dart';
 import 'dart_project.dart';
 
 // A script that replace all absolute imports to relative one
@@ -30,14 +28,11 @@ bool fixFile(DartFile dartFile) {
   return false;
 }
 
-final featureSet = FeatureSet.fromEnableFlags2(
-    sdkLanguageVersion: Version(2, 12, 0), flags: []);
-
 String fixCode(DartFile dartFile, String content) {
   try {
     var newContent = content;
 
-    var unit = parseString(content: content, featureSet: featureSet).unit;
+    var unit = parseString(content: content).unit;
 
     for (var directive
         in unit.directives.reversed.whereType<NamespaceDirective>()) {

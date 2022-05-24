@@ -1112,44 +1112,27 @@ class Scope {
   }
 }
 
-class ScopeType {
-  static const global = ScopeType._('global');
-  static const local = ScopeType._('local');
-  static const with$ = ScopeType._('with');
-  static const closure = ScopeType._('closure');
-  static const catch$ = ScopeType._('catch');
-  static const block = ScopeType._('block');
-  static const script = ScopeType._('script');
-  static const eval = ScopeType._('eval');
-  static const module = ScopeType._('module');
-  static const wasmExpressionStack = ScopeType._('wasm-expression-stack');
-  static const values = {
-    'global': global,
-    'local': local,
-    'with': with$,
-    'closure': closure,
-    'catch': catch$,
-    'block': block,
-    'script': script,
-    'eval': eval,
-    'module': module,
-    'wasm-expression-stack': wasmExpressionStack,
-  };
+enum ScopeType {
+  global('global'),
+  local('local'),
+  with$('with'),
+  closure('closure'),
+  catch$('catch'),
+  block('block'),
+  script('script'),
+  eval('eval'),
+  module('module'),
+  wasmExpressionStack('wasm-expression-stack'),
+  ;
 
   final String value;
 
-  const ScopeType._(this.value);
+  const ScopeType(this.value);
 
-  factory ScopeType.fromJson(String value) => values[value]!;
+  factory ScopeType.fromJson(String value) =>
+      ScopeType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ScopeType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1220,58 +1203,39 @@ class BreakLocation {
   }
 }
 
-class BreakLocationType {
-  static const debuggerStatement = BreakLocationType._('debuggerStatement');
-  static const call = BreakLocationType._('call');
-  static const return$ = BreakLocationType._('return');
-  static const values = {
-    'debuggerStatement': debuggerStatement,
-    'call': call,
-    'return': return$,
-  };
+enum BreakLocationType {
+  debuggerStatement('debuggerStatement'),
+  call('call'),
+  return$('return'),
+  ;
 
   final String value;
 
-  const BreakLocationType._(this.value);
+  const BreakLocationType(this.value);
 
-  factory BreakLocationType.fromJson(String value) => values[value]!;
+  factory BreakLocationType.fromJson(String value) =>
+      BreakLocationType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is BreakLocationType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// Enum of possible script languages.
-class ScriptLanguage {
-  static const javaScript = ScriptLanguage._('JavaScript');
-  static const webAssembly = ScriptLanguage._('WebAssembly');
-  static const values = {
-    'JavaScript': javaScript,
-    'WebAssembly': webAssembly,
-  };
+enum ScriptLanguage {
+  javaScript('JavaScript'),
+  webAssembly('WebAssembly'),
+  ;
 
   final String value;
 
-  const ScriptLanguage._(this.value);
+  const ScriptLanguage(this.value);
 
-  factory ScriptLanguage.fromJson(String value) => values[value]!;
+  factory ScriptLanguage.fromJson(String value) =>
+      ScriptLanguage.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ScriptLanguage && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1304,79 +1268,49 @@ class DebugSymbols {
   }
 }
 
-class DebugSymbolsType {
-  static const none = DebugSymbolsType._('None');
-  static const sourceMap = DebugSymbolsType._('SourceMap');
-  static const embeddedDwarf = DebugSymbolsType._('EmbeddedDWARF');
-  static const externalDwarf = DebugSymbolsType._('ExternalDWARF');
-  static const values = {
-    'None': none,
-    'SourceMap': sourceMap,
-    'EmbeddedDWARF': embeddedDwarf,
-    'ExternalDWARF': externalDwarf,
-  };
+enum DebugSymbolsType {
+  none('None'),
+  sourceMap('SourceMap'),
+  embeddedDwarf('EmbeddedDWARF'),
+  externalDwarf('ExternalDWARF'),
+  ;
 
   final String value;
 
-  const DebugSymbolsType._(this.value);
+  const DebugSymbolsType(this.value);
 
-  factory DebugSymbolsType.fromJson(String value) => values[value]!;
+  factory DebugSymbolsType.fromJson(String value) =>
+      DebugSymbolsType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is DebugSymbolsType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class PausedEventReason {
-  static const ambiguous = PausedEventReason._('ambiguous');
-  static const assert$ = PausedEventReason._('assert');
-  static const cspViolation = PausedEventReason._('CSPViolation');
-  static const debugCommand = PausedEventReason._('debugCommand');
-  static const dom = PausedEventReason._('DOM');
-  static const eventListener = PausedEventReason._('EventListener');
-  static const exception = PausedEventReason._('exception');
-  static const instrumentation = PausedEventReason._('instrumentation');
-  static const oom = PausedEventReason._('OOM');
-  static const other = PausedEventReason._('other');
-  static const promiseRejection = PausedEventReason._('promiseRejection');
-  static const xhr = PausedEventReason._('XHR');
-  static const values = {
-    'ambiguous': ambiguous,
-    'assert': assert$,
-    'CSPViolation': cspViolation,
-    'debugCommand': debugCommand,
-    'DOM': dom,
-    'EventListener': eventListener,
-    'exception': exception,
-    'instrumentation': instrumentation,
-    'OOM': oom,
-    'other': other,
-    'promiseRejection': promiseRejection,
-    'XHR': xhr,
-  };
+enum PausedEventReason {
+  ambiguous('ambiguous'),
+  assert$('assert'),
+  cspViolation('CSPViolation'),
+  debugCommand('debugCommand'),
+  dom('DOM'),
+  eventListener('EventListener'),
+  exception('exception'),
+  instrumentation('instrumentation'),
+  oom('OOM'),
+  other('other'),
+  promiseRejection('promiseRejection'),
+  xhr('XHR'),
+  ;
 
   final String value;
 
-  const PausedEventReason._(this.value);
+  const PausedEventReason(this.value);
 
-  factory PausedEventReason.fromJson(String value) => values[value]!;
+  factory PausedEventReason.fromJson(String value) =>
+      PausedEventReason.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is PausedEventReason && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

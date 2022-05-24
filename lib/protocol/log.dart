@@ -140,106 +140,67 @@ class LogEntry {
   }
 }
 
-class LogEntrySource {
-  static const xml = LogEntrySource._('xml');
-  static const javascript = LogEntrySource._('javascript');
-  static const network = LogEntrySource._('network');
-  static const storage = LogEntrySource._('storage');
-  static const appcache = LogEntrySource._('appcache');
-  static const rendering = LogEntrySource._('rendering');
-  static const security = LogEntrySource._('security');
-  static const deprecation = LogEntrySource._('deprecation');
-  static const worker = LogEntrySource._('worker');
-  static const violation = LogEntrySource._('violation');
-  static const intervention = LogEntrySource._('intervention');
-  static const recommendation = LogEntrySource._('recommendation');
-  static const other = LogEntrySource._('other');
-  static const values = {
-    'xml': xml,
-    'javascript': javascript,
-    'network': network,
-    'storage': storage,
-    'appcache': appcache,
-    'rendering': rendering,
-    'security': security,
-    'deprecation': deprecation,
-    'worker': worker,
-    'violation': violation,
-    'intervention': intervention,
-    'recommendation': recommendation,
-    'other': other,
-  };
+enum LogEntrySource {
+  xml('xml'),
+  javascript('javascript'),
+  network('network'),
+  storage('storage'),
+  appcache('appcache'),
+  rendering('rendering'),
+  security('security'),
+  deprecation('deprecation'),
+  worker('worker'),
+  violation('violation'),
+  intervention('intervention'),
+  recommendation('recommendation'),
+  other('other'),
+  ;
 
   final String value;
 
-  const LogEntrySource._(this.value);
+  const LogEntrySource(this.value);
 
-  factory LogEntrySource.fromJson(String value) => values[value]!;
+  factory LogEntrySource.fromJson(String value) =>
+      LogEntrySource.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is LogEntrySource && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class LogEntryLevel {
-  static const verbose = LogEntryLevel._('verbose');
-  static const info = LogEntryLevel._('info');
-  static const warning = LogEntryLevel._('warning');
-  static const error = LogEntryLevel._('error');
-  static const values = {
-    'verbose': verbose,
-    'info': info,
-    'warning': warning,
-    'error': error,
-  };
+enum LogEntryLevel {
+  verbose('verbose'),
+  info('info'),
+  warning('warning'),
+  error('error'),
+  ;
 
   final String value;
 
-  const LogEntryLevel._(this.value);
+  const LogEntryLevel(this.value);
 
-  factory LogEntryLevel.fromJson(String value) => values[value]!;
+  factory LogEntryLevel.fromJson(String value) =>
+      LogEntryLevel.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is LogEntryLevel && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class LogEntryCategory {
-  static const cors = LogEntryCategory._('cors');
-  static const values = {
-    'cors': cors,
-  };
+enum LogEntryCategory {
+  cors('cors'),
+  ;
 
   final String value;
 
-  const LogEntryCategory._(this.value);
+  const LogEntryCategory(this.value);
 
-  factory LogEntryCategory.fromJson(String value) => values[value]!;
+  factory LogEntryCategory.fromJson(String value) =>
+      LogEntryCategory.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is LogEntryCategory && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -270,38 +231,24 @@ class ViolationSetting {
   }
 }
 
-class ViolationSettingName {
-  static const longTask = ViolationSettingName._('longTask');
-  static const longLayout = ViolationSettingName._('longLayout');
-  static const blockedEvent = ViolationSettingName._('blockedEvent');
-  static const blockedParser = ViolationSettingName._('blockedParser');
-  static const discouragedApiUse = ViolationSettingName._('discouragedAPIUse');
-  static const handler = ViolationSettingName._('handler');
-  static const recurringHandler = ViolationSettingName._('recurringHandler');
-  static const values = {
-    'longTask': longTask,
-    'longLayout': longLayout,
-    'blockedEvent': blockedEvent,
-    'blockedParser': blockedParser,
-    'discouragedAPIUse': discouragedApiUse,
-    'handler': handler,
-    'recurringHandler': recurringHandler,
-  };
+enum ViolationSettingName {
+  longTask('longTask'),
+  longLayout('longLayout'),
+  blockedEvent('blockedEvent'),
+  blockedParser('blockedParser'),
+  discouragedApiUse('discouragedAPIUse'),
+  handler('handler'),
+  recurringHandler('recurringHandler'),
+  ;
 
   final String value;
 
-  const ViolationSettingName._(this.value);
+  const ViolationSettingName(this.value);
 
-  factory ViolationSettingName.fromJson(String value) => values[value]!;
+  factory ViolationSettingName.fromJson(String value) =>
+      ViolationSettingName.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ViolationSettingName && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

@@ -111,36 +111,23 @@ class CacheId {
 }
 
 /// type of HTTP response cached
-class CachedResponseType {
-  static const basic = CachedResponseType._('basic');
-  static const cors = CachedResponseType._('cors');
-  static const default$ = CachedResponseType._('default');
-  static const error = CachedResponseType._('error');
-  static const opaqueResponse = CachedResponseType._('opaqueResponse');
-  static const opaqueRedirect = CachedResponseType._('opaqueRedirect');
-  static const values = {
-    'basic': basic,
-    'cors': cors,
-    'default': default$,
-    'error': error,
-    'opaqueResponse': opaqueResponse,
-    'opaqueRedirect': opaqueRedirect,
-  };
+enum CachedResponseType {
+  basic('basic'),
+  cors('cors'),
+  default$('default'),
+  error('error'),
+  opaqueResponse('opaqueResponse'),
+  opaqueRedirect('opaqueRedirect'),
+  ;
 
   final String value;
 
-  const CachedResponseType._(this.value);
+  const CachedResponseType(this.value);
 
-  factory CachedResponseType.fromJson(String value) => values[value]!;
+  factory CachedResponseType.fromJson(String value) =>
+      CachedResponseType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CachedResponseType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

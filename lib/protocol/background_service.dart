@@ -73,36 +73,23 @@ class RecordingStateChangedEvent {
 /// The Background Service that will be associated with the commands/events.
 /// Every Background Service operates independently, but they share the same
 /// API.
-class ServiceName {
-  static const backgroundFetch = ServiceName._('backgroundFetch');
-  static const backgroundSync = ServiceName._('backgroundSync');
-  static const pushMessaging = ServiceName._('pushMessaging');
-  static const notifications = ServiceName._('notifications');
-  static const paymentHandler = ServiceName._('paymentHandler');
-  static const periodicBackgroundSync = ServiceName._('periodicBackgroundSync');
-  static const values = {
-    'backgroundFetch': backgroundFetch,
-    'backgroundSync': backgroundSync,
-    'pushMessaging': pushMessaging,
-    'notifications': notifications,
-    'paymentHandler': paymentHandler,
-    'periodicBackgroundSync': periodicBackgroundSync,
-  };
+enum ServiceName {
+  backgroundFetch('backgroundFetch'),
+  backgroundSync('backgroundSync'),
+  pushMessaging('pushMessaging'),
+  notifications('notifications'),
+  paymentHandler('paymentHandler'),
+  periodicBackgroundSync('periodicBackgroundSync'),
+  ;
 
   final String value;
 
-  const ServiceName._(this.value);
+  const ServiceName(this.value);
 
-  factory ServiceName.fromJson(String value) => values[value]!;
+  factory ServiceName.fromJson(String value) =>
+      ServiceName.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ServiceName && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

@@ -171,139 +171,84 @@ class AXNodeId {
 }
 
 /// Enum of possible property types.
-class AXValueType {
-  static const boolean = AXValueType._('boolean');
-  static const tristate = AXValueType._('tristate');
-  static const booleanOrUndefined = AXValueType._('booleanOrUndefined');
-  static const idref = AXValueType._('idref');
-  static const idrefList = AXValueType._('idrefList');
-  static const integer = AXValueType._('integer');
-  static const node = AXValueType._('node');
-  static const nodeList = AXValueType._('nodeList');
-  static const number = AXValueType._('number');
-  static const string = AXValueType._('string');
-  static const computedString = AXValueType._('computedString');
-  static const token = AXValueType._('token');
-  static const tokenList = AXValueType._('tokenList');
-  static const domRelation = AXValueType._('domRelation');
-  static const role = AXValueType._('role');
-  static const internalRole = AXValueType._('internalRole');
-  static const valueUndefined = AXValueType._('valueUndefined');
-  static const values = {
-    'boolean': boolean,
-    'tristate': tristate,
-    'booleanOrUndefined': booleanOrUndefined,
-    'idref': idref,
-    'idrefList': idrefList,
-    'integer': integer,
-    'node': node,
-    'nodeList': nodeList,
-    'number': number,
-    'string': string,
-    'computedString': computedString,
-    'token': token,
-    'tokenList': tokenList,
-    'domRelation': domRelation,
-    'role': role,
-    'internalRole': internalRole,
-    'valueUndefined': valueUndefined,
-  };
+enum AXValueType {
+  boolean('boolean'),
+  tristate('tristate'),
+  booleanOrUndefined('booleanOrUndefined'),
+  idref('idref'),
+  idrefList('idrefList'),
+  integer('integer'),
+  node('node'),
+  nodeList('nodeList'),
+  number('number'),
+  string('string'),
+  computedString('computedString'),
+  token('token'),
+  tokenList('tokenList'),
+  domRelation('domRelation'),
+  role('role'),
+  internalRole('internalRole'),
+  valueUndefined('valueUndefined'),
+  ;
 
   final String value;
 
-  const AXValueType._(this.value);
+  const AXValueType(this.value);
 
-  factory AXValueType.fromJson(String value) => values[value]!;
+  factory AXValueType.fromJson(String value) =>
+      AXValueType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is AXValueType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// Enum of possible property sources.
-class AXValueSourceType {
-  static const attribute = AXValueSourceType._('attribute');
-  static const implicit = AXValueSourceType._('implicit');
-  static const style = AXValueSourceType._('style');
-  static const contents = AXValueSourceType._('contents');
-  static const placeholder = AXValueSourceType._('placeholder');
-  static const relatedElement = AXValueSourceType._('relatedElement');
-  static const values = {
-    'attribute': attribute,
-    'implicit': implicit,
-    'style': style,
-    'contents': contents,
-    'placeholder': placeholder,
-    'relatedElement': relatedElement,
-  };
+enum AXValueSourceType {
+  attribute('attribute'),
+  implicit('implicit'),
+  style('style'),
+  contents('contents'),
+  placeholder('placeholder'),
+  relatedElement('relatedElement'),
+  ;
 
   final String value;
 
-  const AXValueSourceType._(this.value);
+  const AXValueSourceType(this.value);
 
-  factory AXValueSourceType.fromJson(String value) => values[value]!;
+  factory AXValueSourceType.fromJson(String value) =>
+      AXValueSourceType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is AXValueSourceType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// Enum of possible native property sources (as a subtype of a particular AXValueSourceType).
-class AXValueNativeSourceType {
-  static const description = AXValueNativeSourceType._('description');
-  static const figcaption = AXValueNativeSourceType._('figcaption');
-  static const label = AXValueNativeSourceType._('label');
-  static const labelfor = AXValueNativeSourceType._('labelfor');
-  static const labelwrapped = AXValueNativeSourceType._('labelwrapped');
-  static const legend = AXValueNativeSourceType._('legend');
-  static const rubyannotation = AXValueNativeSourceType._('rubyannotation');
-  static const tablecaption = AXValueNativeSourceType._('tablecaption');
-  static const title = AXValueNativeSourceType._('title');
-  static const other = AXValueNativeSourceType._('other');
-  static const values = {
-    'description': description,
-    'figcaption': figcaption,
-    'label': label,
-    'labelfor': labelfor,
-    'labelwrapped': labelwrapped,
-    'legend': legend,
-    'rubyannotation': rubyannotation,
-    'tablecaption': tablecaption,
-    'title': title,
-    'other': other,
-  };
+enum AXValueNativeSourceType {
+  description('description'),
+  figcaption('figcaption'),
+  label('label'),
+  labelfor('labelfor'),
+  labelwrapped('labelwrapped'),
+  legend('legend'),
+  rubyannotation('rubyannotation'),
+  tablecaption('tablecaption'),
+  title('title'),
+  other('other'),
+  ;
 
   final String value;
 
-  const AXValueNativeSourceType._(this.value);
+  const AXValueNativeSourceType(this.value);
 
-  factory AXValueNativeSourceType.fromJson(String value) => values[value]!;
+  factory AXValueNativeSourceType.fromJson(String value) =>
+      AXValueNativeSourceType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is AXValueNativeSourceType && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -495,110 +440,60 @@ class AXValue {
 /// - from 'autocomplete' to 'valuetext': attributes which apply to widgets
 /// - from 'checked' to 'selected': states which apply to widgets
 /// - from 'activedescendant' to 'owns' - relationships between elements other than parent/child/sibling.
-class AXPropertyName {
-  static const busy = AXPropertyName._('busy');
-  static const disabled = AXPropertyName._('disabled');
-  static const editable = AXPropertyName._('editable');
-  static const focusable = AXPropertyName._('focusable');
-  static const focused = AXPropertyName._('focused');
-  static const hidden = AXPropertyName._('hidden');
-  static const hiddenRoot = AXPropertyName._('hiddenRoot');
-  static const invalid = AXPropertyName._('invalid');
-  static const keyshortcuts = AXPropertyName._('keyshortcuts');
-  static const settable = AXPropertyName._('settable');
-  static const roledescription = AXPropertyName._('roledescription');
-  static const live = AXPropertyName._('live');
-  static const atomic = AXPropertyName._('atomic');
-  static const relevant = AXPropertyName._('relevant');
-  static const root = AXPropertyName._('root');
-  static const autocomplete = AXPropertyName._('autocomplete');
-  static const hasPopup = AXPropertyName._('hasPopup');
-  static const level = AXPropertyName._('level');
-  static const multiselectable = AXPropertyName._('multiselectable');
-  static const orientation = AXPropertyName._('orientation');
-  static const multiline = AXPropertyName._('multiline');
-  static const readonly = AXPropertyName._('readonly');
-  static const required = AXPropertyName._('required');
-  static const valuemin = AXPropertyName._('valuemin');
-  static const valuemax = AXPropertyName._('valuemax');
-  static const valuetext = AXPropertyName._('valuetext');
-  static const checked = AXPropertyName._('checked');
-  static const expanded = AXPropertyName._('expanded');
-  static const modal = AXPropertyName._('modal');
-  static const pressed = AXPropertyName._('pressed');
-  static const selected = AXPropertyName._('selected');
-  static const activedescendant = AXPropertyName._('activedescendant');
-  static const controls = AXPropertyName._('controls');
-  static const describedby = AXPropertyName._('describedby');
-  static const details = AXPropertyName._('details');
-  static const errormessage = AXPropertyName._('errormessage');
-  static const flowto = AXPropertyName._('flowto');
-  static const labelledby = AXPropertyName._('labelledby');
-  static const owns = AXPropertyName._('owns');
-  static const uninteresting = AXPropertyName._('uninteresting');
-  static const ariaHiddenElement = AXPropertyName._('ariaHiddenElement');
-  static const ariaHiddenSubtree = AXPropertyName._('ariaHiddenSubtree');
-  static const notRendered = AXPropertyName._('notRendered');
-  static const values = {
-    'busy': busy,
-    'disabled': disabled,
-    'editable': editable,
-    'focusable': focusable,
-    'focused': focused,
-    'hidden': hidden,
-    'hiddenRoot': hiddenRoot,
-    'invalid': invalid,
-    'keyshortcuts': keyshortcuts,
-    'settable': settable,
-    'roledescription': roledescription,
-    'live': live,
-    'atomic': atomic,
-    'relevant': relevant,
-    'root': root,
-    'autocomplete': autocomplete,
-    'hasPopup': hasPopup,
-    'level': level,
-    'multiselectable': multiselectable,
-    'orientation': orientation,
-    'multiline': multiline,
-    'readonly': readonly,
-    'required': required,
-    'valuemin': valuemin,
-    'valuemax': valuemax,
-    'valuetext': valuetext,
-    'checked': checked,
-    'expanded': expanded,
-    'modal': modal,
-    'pressed': pressed,
-    'selected': selected,
-    'activedescendant': activedescendant,
-    'controls': controls,
-    'describedby': describedby,
-    'details': details,
-    'errormessage': errormessage,
-    'flowto': flowto,
-    'labelledby': labelledby,
-    'owns': owns,
-    'uninteresting': uninteresting,
-    'ariaHiddenElement': ariaHiddenElement,
-    'ariaHiddenSubtree': ariaHiddenSubtree,
-    'notRendered': notRendered,
-  };
+enum AXPropertyName {
+  busy('busy'),
+  disabled('disabled'),
+  editable('editable'),
+  focusable('focusable'),
+  focused('focused'),
+  hidden('hidden'),
+  hiddenRoot('hiddenRoot'),
+  invalid('invalid'),
+  keyshortcuts('keyshortcuts'),
+  settable('settable'),
+  roledescription('roledescription'),
+  live('live'),
+  atomic('atomic'),
+  relevant('relevant'),
+  root('root'),
+  autocomplete('autocomplete'),
+  hasPopup('hasPopup'),
+  level('level'),
+  multiselectable('multiselectable'),
+  orientation('orientation'),
+  multiline('multiline'),
+  readonly('readonly'),
+  required('required'),
+  valuemin('valuemin'),
+  valuemax('valuemax'),
+  valuetext('valuetext'),
+  checked('checked'),
+  expanded('expanded'),
+  modal('modal'),
+  pressed('pressed'),
+  selected('selected'),
+  activedescendant('activedescendant'),
+  controls('controls'),
+  describedby('describedby'),
+  details('details'),
+  errormessage('errormessage'),
+  flowto('flowto'),
+  labelledby('labelledby'),
+  owns('owns'),
+  uninteresting('uninteresting'),
+  ariaHiddenElement('ariaHiddenElement'),
+  ariaHiddenSubtree('ariaHiddenSubtree'),
+  notRendered('notRendered'),
+  ;
 
   final String value;
 
-  const AXPropertyName._(this.value);
+  const AXPropertyName(this.value);
 
-  factory AXPropertyName.fromJson(String value) => values[value]!;
+  factory AXPropertyName.fromJson(String value) =>
+      AXPropertyName.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is AXPropertyName && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

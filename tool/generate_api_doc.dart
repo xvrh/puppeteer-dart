@@ -1,10 +1,8 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:collection/collection.dart';
-import 'package:pub_semver/pub_semver.dart';
 import 'utils/string_helpers.dart';
 
 final classesOrder = [
@@ -38,10 +36,7 @@ void main() {
       .where((file) => file.path.endsWith('.dart'))) {
     var fileContent = dartFile.readAsStringSync();
 
-    var unit = parseString(
-        content: fileContent,
-        featureSet: FeatureSet.fromEnableFlags2(
-            sdkLanguageVersion: Version(2, 12, 0), flags: [])).unit;
+    var unit = parseString(content: fileContent).unit;
 
     classes.addAll(unit.declarations
         .whereType<ClassDeclaration>()
@@ -126,7 +121,7 @@ class Class {
   String get shortTitle => 'class: $name';
 
   @override
-  String toString() => '$name';
+  String toString() => name;
 }
 
 class Method {
@@ -174,5 +169,5 @@ class Method {
   }
 
   @override
-  String toString() => '$name';
+  String toString() => name;
 }

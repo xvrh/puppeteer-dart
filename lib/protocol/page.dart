@@ -1438,60 +1438,39 @@ class FrameId {
 }
 
 /// Indicates whether a frame has been identified as an ad.
-class AdFrameType {
-  static const none = AdFrameType._('none');
-  static const child = AdFrameType._('child');
-  static const root = AdFrameType._('root');
-  static const values = {
-    'none': none,
-    'child': child,
-    'root': root,
-  };
+enum AdFrameType {
+  none('none'),
+  child('child'),
+  root('root'),
+  ;
 
   final String value;
 
-  const AdFrameType._(this.value);
+  const AdFrameType(this.value);
 
-  factory AdFrameType.fromJson(String value) => values[value]!;
+  factory AdFrameType.fromJson(String value) =>
+      AdFrameType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is AdFrameType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class AdFrameExplanation {
-  static const parentIsAd = AdFrameExplanation._('ParentIsAd');
-  static const createdByAdScript = AdFrameExplanation._('CreatedByAdScript');
-  static const matchedBlockingRule =
-      AdFrameExplanation._('MatchedBlockingRule');
-  static const values = {
-    'ParentIsAd': parentIsAd,
-    'CreatedByAdScript': createdByAdScript,
-    'MatchedBlockingRule': matchedBlockingRule,
-  };
+enum AdFrameExplanation {
+  parentIsAd('ParentIsAd'),
+  createdByAdScript('CreatedByAdScript'),
+  matchedBlockingRule('MatchedBlockingRule'),
+  ;
 
   final String value;
 
-  const AdFrameExplanation._(this.value);
+  const AdFrameExplanation(this.value);
 
-  factory AdFrameExplanation.fromJson(String value) => values[value]!;
+  factory AdFrameExplanation.fromJson(String value) =>
+      AdFrameExplanation.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is AdFrameExplanation && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1526,98 +1505,61 @@ class AdFrameStatus {
 }
 
 /// Indicates whether the frame is a secure context and why it is the case.
-class SecureContextType {
-  static const secure = SecureContextType._('Secure');
-  static const secureLocalhost = SecureContextType._('SecureLocalhost');
-  static const insecureScheme = SecureContextType._('InsecureScheme');
-  static const insecureAncestor = SecureContextType._('InsecureAncestor');
-  static const values = {
-    'Secure': secure,
-    'SecureLocalhost': secureLocalhost,
-    'InsecureScheme': insecureScheme,
-    'InsecureAncestor': insecureAncestor,
-  };
+enum SecureContextType {
+  secure('Secure'),
+  secureLocalhost('SecureLocalhost'),
+  insecureScheme('InsecureScheme'),
+  insecureAncestor('InsecureAncestor'),
+  ;
 
   final String value;
 
-  const SecureContextType._(this.value);
+  const SecureContextType(this.value);
 
-  factory SecureContextType.fromJson(String value) => values[value]!;
+  factory SecureContextType.fromJson(String value) =>
+      SecureContextType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is SecureContextType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// Indicates whether the frame is cross-origin isolated and why it is the case.
-class CrossOriginIsolatedContextType {
-  static const isolated = CrossOriginIsolatedContextType._('Isolated');
-  static const notIsolated = CrossOriginIsolatedContextType._('NotIsolated');
-  static const notIsolatedFeatureDisabled =
-      CrossOriginIsolatedContextType._('NotIsolatedFeatureDisabled');
-  static const values = {
-    'Isolated': isolated,
-    'NotIsolated': notIsolated,
-    'NotIsolatedFeatureDisabled': notIsolatedFeatureDisabled,
-  };
+enum CrossOriginIsolatedContextType {
+  isolated('Isolated'),
+  notIsolated('NotIsolated'),
+  notIsolatedFeatureDisabled('NotIsolatedFeatureDisabled'),
+  ;
 
   final String value;
 
-  const CrossOriginIsolatedContextType._(this.value);
+  const CrossOriginIsolatedContextType(this.value);
 
   factory CrossOriginIsolatedContextType.fromJson(String value) =>
-      values[value]!;
+      CrossOriginIsolatedContextType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CrossOriginIsolatedContextType && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class GatedAPIFeatures {
-  static const sharedArrayBuffers = GatedAPIFeatures._('SharedArrayBuffers');
-  static const sharedArrayBuffersTransferAllowed =
-      GatedAPIFeatures._('SharedArrayBuffersTransferAllowed');
-  static const performanceMeasureMemory =
-      GatedAPIFeatures._('PerformanceMeasureMemory');
-  static const performanceProfile = GatedAPIFeatures._('PerformanceProfile');
-  static const values = {
-    'SharedArrayBuffers': sharedArrayBuffers,
-    'SharedArrayBuffersTransferAllowed': sharedArrayBuffersTransferAllowed,
-    'PerformanceMeasureMemory': performanceMeasureMemory,
-    'PerformanceProfile': performanceProfile,
-  };
+enum GatedAPIFeatures {
+  sharedArrayBuffers('SharedArrayBuffers'),
+  sharedArrayBuffersTransferAllowed('SharedArrayBuffersTransferAllowed'),
+  performanceMeasureMemory('PerformanceMeasureMemory'),
+  performanceProfile('PerformanceProfile'),
+  ;
 
   final String value;
 
-  const GatedAPIFeatures._(this.value);
+  const GatedAPIFeatures(this.value);
 
-  factory GatedAPIFeatures.fromJson(String value) => values[value]!;
+  factory GatedAPIFeatures.fromJson(String value) =>
+      GatedAPIFeatures.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is GatedAPIFeatures && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1625,211 +1567,104 @@ class GatedAPIFeatures {
 
 /// All Permissions Policy features. This enum should match the one defined
 /// in third_party/blink/renderer/core/permissions_policy/permissions_policy_features.json5.
-class PermissionsPolicyFeature {
-  static const accelerometer = PermissionsPolicyFeature._('accelerometer');
-  static const ambientLightSensor =
-      PermissionsPolicyFeature._('ambient-light-sensor');
-  static const attributionReporting =
-      PermissionsPolicyFeature._('attribution-reporting');
-  static const autoplay = PermissionsPolicyFeature._('autoplay');
-  static const browsingTopics = PermissionsPolicyFeature._('browsing-topics');
-  static const camera = PermissionsPolicyFeature._('camera');
-  static const chDpr = PermissionsPolicyFeature._('ch-dpr');
-  static const chDeviceMemory = PermissionsPolicyFeature._('ch-device-memory');
-  static const chDownlink = PermissionsPolicyFeature._('ch-downlink');
-  static const chEct = PermissionsPolicyFeature._('ch-ect');
-  static const chPrefersColorScheme =
-      PermissionsPolicyFeature._('ch-prefers-color-scheme');
-  static const chRtt = PermissionsPolicyFeature._('ch-rtt');
-  static const chUa = PermissionsPolicyFeature._('ch-ua');
-  static const chUaArch = PermissionsPolicyFeature._('ch-ua-arch');
-  static const chUaBitness = PermissionsPolicyFeature._('ch-ua-bitness');
-  static const chUaPlatform = PermissionsPolicyFeature._('ch-ua-platform');
-  static const chUaModel = PermissionsPolicyFeature._('ch-ua-model');
-  static const chUaMobile = PermissionsPolicyFeature._('ch-ua-mobile');
-  static const chUaFull = PermissionsPolicyFeature._('ch-ua-full');
-  static const chUaFullVersion =
-      PermissionsPolicyFeature._('ch-ua-full-version');
-  static const chUaFullVersionList =
-      PermissionsPolicyFeature._('ch-ua-full-version-list');
-  static const chUaPlatformVersion =
-      PermissionsPolicyFeature._('ch-ua-platform-version');
-  static const chUaReduced = PermissionsPolicyFeature._('ch-ua-reduced');
-  static const chUaWow64 = PermissionsPolicyFeature._('ch-ua-wow64');
-  static const chViewportHeight =
-      PermissionsPolicyFeature._('ch-viewport-height');
-  static const chViewportWidth =
-      PermissionsPolicyFeature._('ch-viewport-width');
-  static const chWidth = PermissionsPolicyFeature._('ch-width');
-  static const chPartitionedCookies =
-      PermissionsPolicyFeature._('ch-partitioned-cookies');
-  static const clipboardRead = PermissionsPolicyFeature._('clipboard-read');
-  static const clipboardWrite = PermissionsPolicyFeature._('clipboard-write');
-  static const crossOriginIsolated =
-      PermissionsPolicyFeature._('cross-origin-isolated');
-  static const directSockets = PermissionsPolicyFeature._('direct-sockets');
-  static const displayCapture = PermissionsPolicyFeature._('display-capture');
-  static const documentDomain = PermissionsPolicyFeature._('document-domain');
-  static const encryptedMedia = PermissionsPolicyFeature._('encrypted-media');
-  static const executionWhileOutOfViewport =
-      PermissionsPolicyFeature._('execution-while-out-of-viewport');
-  static const executionWhileNotRendered =
-      PermissionsPolicyFeature._('execution-while-not-rendered');
-  static const focusWithoutUserActivation =
-      PermissionsPolicyFeature._('focus-without-user-activation');
-  static const fullscreen = PermissionsPolicyFeature._('fullscreen');
-  static const frobulate = PermissionsPolicyFeature._('frobulate');
-  static const gamepad = PermissionsPolicyFeature._('gamepad');
-  static const geolocation = PermissionsPolicyFeature._('geolocation');
-  static const gyroscope = PermissionsPolicyFeature._('gyroscope');
-  static const hid = PermissionsPolicyFeature._('hid');
-  static const idleDetection = PermissionsPolicyFeature._('idle-detection');
-  static const interestCohort = PermissionsPolicyFeature._('interest-cohort');
-  static const joinAdInterestGroup =
-      PermissionsPolicyFeature._('join-ad-interest-group');
-  static const keyboardMap = PermissionsPolicyFeature._('keyboard-map');
-  static const magnetometer = PermissionsPolicyFeature._('magnetometer');
-  static const microphone = PermissionsPolicyFeature._('microphone');
-  static const midi = PermissionsPolicyFeature._('midi');
-  static const otpCredentials = PermissionsPolicyFeature._('otp-credentials');
-  static const payment = PermissionsPolicyFeature._('payment');
-  static const pictureInPicture =
-      PermissionsPolicyFeature._('picture-in-picture');
-  static const publickeyCredentialsGet =
-      PermissionsPolicyFeature._('publickey-credentials-get');
-  static const runAdAuction = PermissionsPolicyFeature._('run-ad-auction');
-  static const screenWakeLock = PermissionsPolicyFeature._('screen-wake-lock');
-  static const serial = PermissionsPolicyFeature._('serial');
-  static const sharedAutofill = PermissionsPolicyFeature._('shared-autofill');
-  static const storageAccessApi =
-      PermissionsPolicyFeature._('storage-access-api');
-  static const syncXhr = PermissionsPolicyFeature._('sync-xhr');
-  static const trustTokenRedemption =
-      PermissionsPolicyFeature._('trust-token-redemption');
-  static const usb = PermissionsPolicyFeature._('usb');
-  static const verticalScroll = PermissionsPolicyFeature._('vertical-scroll');
-  static const webShare = PermissionsPolicyFeature._('web-share');
-  static const windowPlacement = PermissionsPolicyFeature._('window-placement');
-  static const xrSpatialTracking =
-      PermissionsPolicyFeature._('xr-spatial-tracking');
-  static const values = {
-    'accelerometer': accelerometer,
-    'ambient-light-sensor': ambientLightSensor,
-    'attribution-reporting': attributionReporting,
-    'autoplay': autoplay,
-    'browsing-topics': browsingTopics,
-    'camera': camera,
-    'ch-dpr': chDpr,
-    'ch-device-memory': chDeviceMemory,
-    'ch-downlink': chDownlink,
-    'ch-ect': chEct,
-    'ch-prefers-color-scheme': chPrefersColorScheme,
-    'ch-rtt': chRtt,
-    'ch-ua': chUa,
-    'ch-ua-arch': chUaArch,
-    'ch-ua-bitness': chUaBitness,
-    'ch-ua-platform': chUaPlatform,
-    'ch-ua-model': chUaModel,
-    'ch-ua-mobile': chUaMobile,
-    'ch-ua-full': chUaFull,
-    'ch-ua-full-version': chUaFullVersion,
-    'ch-ua-full-version-list': chUaFullVersionList,
-    'ch-ua-platform-version': chUaPlatformVersion,
-    'ch-ua-reduced': chUaReduced,
-    'ch-ua-wow64': chUaWow64,
-    'ch-viewport-height': chViewportHeight,
-    'ch-viewport-width': chViewportWidth,
-    'ch-width': chWidth,
-    'ch-partitioned-cookies': chPartitionedCookies,
-    'clipboard-read': clipboardRead,
-    'clipboard-write': clipboardWrite,
-    'cross-origin-isolated': crossOriginIsolated,
-    'direct-sockets': directSockets,
-    'display-capture': displayCapture,
-    'document-domain': documentDomain,
-    'encrypted-media': encryptedMedia,
-    'execution-while-out-of-viewport': executionWhileOutOfViewport,
-    'execution-while-not-rendered': executionWhileNotRendered,
-    'focus-without-user-activation': focusWithoutUserActivation,
-    'fullscreen': fullscreen,
-    'frobulate': frobulate,
-    'gamepad': gamepad,
-    'geolocation': geolocation,
-    'gyroscope': gyroscope,
-    'hid': hid,
-    'idle-detection': idleDetection,
-    'interest-cohort': interestCohort,
-    'join-ad-interest-group': joinAdInterestGroup,
-    'keyboard-map': keyboardMap,
-    'magnetometer': magnetometer,
-    'microphone': microphone,
-    'midi': midi,
-    'otp-credentials': otpCredentials,
-    'payment': payment,
-    'picture-in-picture': pictureInPicture,
-    'publickey-credentials-get': publickeyCredentialsGet,
-    'run-ad-auction': runAdAuction,
-    'screen-wake-lock': screenWakeLock,
-    'serial': serial,
-    'shared-autofill': sharedAutofill,
-    'storage-access-api': storageAccessApi,
-    'sync-xhr': syncXhr,
-    'trust-token-redemption': trustTokenRedemption,
-    'usb': usb,
-    'vertical-scroll': verticalScroll,
-    'web-share': webShare,
-    'window-placement': windowPlacement,
-    'xr-spatial-tracking': xrSpatialTracking,
-  };
+enum PermissionsPolicyFeature {
+  accelerometer('accelerometer'),
+  ambientLightSensor('ambient-light-sensor'),
+  attributionReporting('attribution-reporting'),
+  autoplay('autoplay'),
+  browsingTopics('browsing-topics'),
+  camera('camera'),
+  chDpr('ch-dpr'),
+  chDeviceMemory('ch-device-memory'),
+  chDownlink('ch-downlink'),
+  chEct('ch-ect'),
+  chPrefersColorScheme('ch-prefers-color-scheme'),
+  chRtt('ch-rtt'),
+  chUa('ch-ua'),
+  chUaArch('ch-ua-arch'),
+  chUaBitness('ch-ua-bitness'),
+  chUaPlatform('ch-ua-platform'),
+  chUaModel('ch-ua-model'),
+  chUaMobile('ch-ua-mobile'),
+  chUaFull('ch-ua-full'),
+  chUaFullVersion('ch-ua-full-version'),
+  chUaFullVersionList('ch-ua-full-version-list'),
+  chUaPlatformVersion('ch-ua-platform-version'),
+  chUaReduced('ch-ua-reduced'),
+  chUaWow64('ch-ua-wow64'),
+  chViewportHeight('ch-viewport-height'),
+  chViewportWidth('ch-viewport-width'),
+  chWidth('ch-width'),
+  chPartitionedCookies('ch-partitioned-cookies'),
+  clipboardRead('clipboard-read'),
+  clipboardWrite('clipboard-write'),
+  crossOriginIsolated('cross-origin-isolated'),
+  directSockets('direct-sockets'),
+  displayCapture('display-capture'),
+  documentDomain('document-domain'),
+  encryptedMedia('encrypted-media'),
+  executionWhileOutOfViewport('execution-while-out-of-viewport'),
+  executionWhileNotRendered('execution-while-not-rendered'),
+  focusWithoutUserActivation('focus-without-user-activation'),
+  fullscreen('fullscreen'),
+  frobulate('frobulate'),
+  gamepad('gamepad'),
+  geolocation('geolocation'),
+  gyroscope('gyroscope'),
+  hid('hid'),
+  idleDetection('idle-detection'),
+  interestCohort('interest-cohort'),
+  joinAdInterestGroup('join-ad-interest-group'),
+  keyboardMap('keyboard-map'),
+  magnetometer('magnetometer'),
+  microphone('microphone'),
+  midi('midi'),
+  otpCredentials('otp-credentials'),
+  payment('payment'),
+  pictureInPicture('picture-in-picture'),
+  publickeyCredentialsGet('publickey-credentials-get'),
+  runAdAuction('run-ad-auction'),
+  screenWakeLock('screen-wake-lock'),
+  serial('serial'),
+  sharedAutofill('shared-autofill'),
+  storageAccessApi('storage-access-api'),
+  syncXhr('sync-xhr'),
+  trustTokenRedemption('trust-token-redemption'),
+  usb('usb'),
+  verticalScroll('vertical-scroll'),
+  webShare('web-share'),
+  windowPlacement('window-placement'),
+  xrSpatialTracking('xr-spatial-tracking'),
+  ;
 
   final String value;
 
-  const PermissionsPolicyFeature._(this.value);
+  const PermissionsPolicyFeature(this.value);
 
-  factory PermissionsPolicyFeature.fromJson(String value) => values[value]!;
+  factory PermissionsPolicyFeature.fromJson(String value) =>
+      PermissionsPolicyFeature.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is PermissionsPolicyFeature && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// Reason for a permissions policy feature to be disabled.
-class PermissionsPolicyBlockReason {
-  static const header = PermissionsPolicyBlockReason._('Header');
-  static const iframeAttribute =
-      PermissionsPolicyBlockReason._('IframeAttribute');
-  static const inFencedFrameTree =
-      PermissionsPolicyBlockReason._('InFencedFrameTree');
-  static const values = {
-    'Header': header,
-    'IframeAttribute': iframeAttribute,
-    'InFencedFrameTree': inFencedFrameTree,
-  };
+enum PermissionsPolicyBlockReason {
+  header('Header'),
+  iframeAttribute('IframeAttribute'),
+  inFencedFrameTree('InFencedFrameTree'),
+  ;
 
   final String value;
 
-  const PermissionsPolicyBlockReason._(this.value);
+  const PermissionsPolicyBlockReason(this.value);
 
-  factory PermissionsPolicyBlockReason.fromJson(String value) => values[value]!;
+  factory PermissionsPolicyBlockReason.fromJson(String value) =>
+      PermissionsPolicyBlockReason.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is PermissionsPolicyBlockReason && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1891,111 +1726,68 @@ class PermissionsPolicyFeatureState {
 
 /// Origin Trial(https://www.chromium.org/blink/origin-trials) support.
 /// Status for an Origin Trial token.
-class OriginTrialTokenStatus {
-  static const success = OriginTrialTokenStatus._('Success');
-  static const notSupported = OriginTrialTokenStatus._('NotSupported');
-  static const insecure = OriginTrialTokenStatus._('Insecure');
-  static const expired = OriginTrialTokenStatus._('Expired');
-  static const wrongOrigin = OriginTrialTokenStatus._('WrongOrigin');
-  static const invalidSignature = OriginTrialTokenStatus._('InvalidSignature');
-  static const malformed = OriginTrialTokenStatus._('Malformed');
-  static const wrongVersion = OriginTrialTokenStatus._('WrongVersion');
-  static const featureDisabled = OriginTrialTokenStatus._('FeatureDisabled');
-  static const tokenDisabled = OriginTrialTokenStatus._('TokenDisabled');
-  static const featureDisabledForUser =
-      OriginTrialTokenStatus._('FeatureDisabledForUser');
-  static const unknownTrial = OriginTrialTokenStatus._('UnknownTrial');
-  static const values = {
-    'Success': success,
-    'NotSupported': notSupported,
-    'Insecure': insecure,
-    'Expired': expired,
-    'WrongOrigin': wrongOrigin,
-    'InvalidSignature': invalidSignature,
-    'Malformed': malformed,
-    'WrongVersion': wrongVersion,
-    'FeatureDisabled': featureDisabled,
-    'TokenDisabled': tokenDisabled,
-    'FeatureDisabledForUser': featureDisabledForUser,
-    'UnknownTrial': unknownTrial,
-  };
+enum OriginTrialTokenStatus {
+  success('Success'),
+  notSupported('NotSupported'),
+  insecure('Insecure'),
+  expired('Expired'),
+  wrongOrigin('WrongOrigin'),
+  invalidSignature('InvalidSignature'),
+  malformed('Malformed'),
+  wrongVersion('WrongVersion'),
+  featureDisabled('FeatureDisabled'),
+  tokenDisabled('TokenDisabled'),
+  featureDisabledForUser('FeatureDisabledForUser'),
+  unknownTrial('UnknownTrial'),
+  ;
 
   final String value;
 
-  const OriginTrialTokenStatus._(this.value);
+  const OriginTrialTokenStatus(this.value);
 
-  factory OriginTrialTokenStatus.fromJson(String value) => values[value]!;
+  factory OriginTrialTokenStatus.fromJson(String value) =>
+      OriginTrialTokenStatus.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is OriginTrialTokenStatus && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// Status for an Origin Trial.
-class OriginTrialStatus {
-  static const enabled = OriginTrialStatus._('Enabled');
-  static const validTokenNotProvided =
-      OriginTrialStatus._('ValidTokenNotProvided');
-  static const osNotSupported = OriginTrialStatus._('OSNotSupported');
-  static const trialNotAllowed = OriginTrialStatus._('TrialNotAllowed');
-  static const values = {
-    'Enabled': enabled,
-    'ValidTokenNotProvided': validTokenNotProvided,
-    'OSNotSupported': osNotSupported,
-    'TrialNotAllowed': trialNotAllowed,
-  };
+enum OriginTrialStatus {
+  enabled('Enabled'),
+  validTokenNotProvided('ValidTokenNotProvided'),
+  osNotSupported('OSNotSupported'),
+  trialNotAllowed('TrialNotAllowed'),
+  ;
 
   final String value;
 
-  const OriginTrialStatus._(this.value);
+  const OriginTrialStatus(this.value);
 
-  factory OriginTrialStatus.fromJson(String value) => values[value]!;
+  factory OriginTrialStatus.fromJson(String value) =>
+      OriginTrialStatus.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is OriginTrialStatus && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class OriginTrialUsageRestriction {
-  static const none = OriginTrialUsageRestriction._('None');
-  static const subset = OriginTrialUsageRestriction._('Subset');
-  static const values = {
-    'None': none,
-    'Subset': subset,
-  };
+enum OriginTrialUsageRestriction {
+  none('None'),
+  subset('Subset'),
+  ;
 
   final String value;
 
-  const OriginTrialUsageRestriction._(this.value);
+  const OriginTrialUsageRestriction(this.value);
 
-  factory OriginTrialUsageRestriction.fromJson(String value) => values[value]!;
+  factory OriginTrialUsageRestriction.fromJson(String value) =>
+      OriginTrialUsageRestriction.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is OriginTrialUsageRestriction && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -2375,50 +2167,30 @@ class ScriptIdentifier {
 }
 
 /// Transition type.
-class TransitionType {
-  static const link = TransitionType._('link');
-  static const typed = TransitionType._('typed');
-  static const addressBar = TransitionType._('address_bar');
-  static const autoBookmark = TransitionType._('auto_bookmark');
-  static const autoSubframe = TransitionType._('auto_subframe');
-  static const manualSubframe = TransitionType._('manual_subframe');
-  static const generated = TransitionType._('generated');
-  static const autoToplevel = TransitionType._('auto_toplevel');
-  static const formSubmit = TransitionType._('form_submit');
-  static const reload = TransitionType._('reload');
-  static const keyword = TransitionType._('keyword');
-  static const keywordGenerated = TransitionType._('keyword_generated');
-  static const other = TransitionType._('other');
-  static const values = {
-    'link': link,
-    'typed': typed,
-    'address_bar': addressBar,
-    'auto_bookmark': autoBookmark,
-    'auto_subframe': autoSubframe,
-    'manual_subframe': manualSubframe,
-    'generated': generated,
-    'auto_toplevel': autoToplevel,
-    'form_submit': formSubmit,
-    'reload': reload,
-    'keyword': keyword,
-    'keyword_generated': keywordGenerated,
-    'other': other,
-  };
+enum TransitionType {
+  link('link'),
+  typed('typed'),
+  addressBar('address_bar'),
+  autoBookmark('auto_bookmark'),
+  autoSubframe('auto_subframe'),
+  manualSubframe('manual_subframe'),
+  generated('generated'),
+  autoToplevel('auto_toplevel'),
+  formSubmit('form_submit'),
+  reload('reload'),
+  keyword('keyword'),
+  keywordGenerated('keyword_generated'),
+  other('other'),
+  ;
 
   final String value;
 
-  const TransitionType._(this.value);
+  const TransitionType(this.value);
 
-  factory TransitionType.fromJson(String value) => values[value]!;
+  factory TransitionType.fromJson(String value) =>
+      TransitionType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is TransitionType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -2529,32 +2301,21 @@ class ScreencastFrameMetadata {
 }
 
 /// Javascript dialog type.
-class DialogType {
-  static const alert = DialogType._('alert');
-  static const confirm = DialogType._('confirm');
-  static const prompt = DialogType._('prompt');
-  static const beforeunload = DialogType._('beforeunload');
-  static const values = {
-    'alert': alert,
-    'confirm': confirm,
-    'prompt': prompt,
-    'beforeunload': beforeunload,
-  };
+enum DialogType {
+  alert('alert'),
+  confirm('confirm'),
+  prompt('prompt'),
+  beforeunload('beforeunload'),
+  ;
 
   final String value;
 
-  const DialogType._(this.value);
+  const DialogType(this.value);
 
-  factory DialogType.fromJson(String value) => values[value]!;
+  factory DialogType.fromJson(String value) =>
+      DialogType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is DialogType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -2870,77 +2631,45 @@ class FontSizes {
   }
 }
 
-class ClientNavigationReason {
-  static const formSubmissionGet =
-      ClientNavigationReason._('formSubmissionGet');
-  static const formSubmissionPost =
-      ClientNavigationReason._('formSubmissionPost');
-  static const httpHeaderRefresh =
-      ClientNavigationReason._('httpHeaderRefresh');
-  static const scriptInitiated = ClientNavigationReason._('scriptInitiated');
-  static const metaTagRefresh = ClientNavigationReason._('metaTagRefresh');
-  static const pageBlockInterstitial =
-      ClientNavigationReason._('pageBlockInterstitial');
-  static const reload = ClientNavigationReason._('reload');
-  static const anchorClick = ClientNavigationReason._('anchorClick');
-  static const values = {
-    'formSubmissionGet': formSubmissionGet,
-    'formSubmissionPost': formSubmissionPost,
-    'httpHeaderRefresh': httpHeaderRefresh,
-    'scriptInitiated': scriptInitiated,
-    'metaTagRefresh': metaTagRefresh,
-    'pageBlockInterstitial': pageBlockInterstitial,
-    'reload': reload,
-    'anchorClick': anchorClick,
-  };
+enum ClientNavigationReason {
+  formSubmissionGet('formSubmissionGet'),
+  formSubmissionPost('formSubmissionPost'),
+  httpHeaderRefresh('httpHeaderRefresh'),
+  scriptInitiated('scriptInitiated'),
+  metaTagRefresh('metaTagRefresh'),
+  pageBlockInterstitial('pageBlockInterstitial'),
+  reload('reload'),
+  anchorClick('anchorClick'),
+  ;
 
   final String value;
 
-  const ClientNavigationReason._(this.value);
+  const ClientNavigationReason(this.value);
 
-  factory ClientNavigationReason.fromJson(String value) => values[value]!;
+  factory ClientNavigationReason.fromJson(String value) =>
+      ClientNavigationReason.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ClientNavigationReason && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class ClientNavigationDisposition {
-  static const currentTab = ClientNavigationDisposition._('currentTab');
-  static const newTab = ClientNavigationDisposition._('newTab');
-  static const newWindow = ClientNavigationDisposition._('newWindow');
-  static const download = ClientNavigationDisposition._('download');
-  static const values = {
-    'currentTab': currentTab,
-    'newTab': newTab,
-    'newWindow': newWindow,
-    'download': download,
-  };
+enum ClientNavigationDisposition {
+  currentTab('currentTab'),
+  newTab('newTab'),
+  newWindow('newWindow'),
+  download('download'),
+  ;
 
   final String value;
 
-  const ClientNavigationDisposition._(this.value);
+  const ClientNavigationDisposition(this.value);
 
-  factory ClientNavigationDisposition.fromJson(String value) => values[value]!;
+  factory ClientNavigationDisposition.fromJson(String value) =>
+      ClientNavigationDisposition.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ClientNavigationDisposition && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -2999,43 +2728,25 @@ class InstallabilityError {
 }
 
 /// The referring-policy used for the navigation.
-class ReferrerPolicy {
-  static const noReferrer = ReferrerPolicy._('noReferrer');
-  static const noReferrerWhenDowngrade =
-      ReferrerPolicy._('noReferrerWhenDowngrade');
-  static const origin = ReferrerPolicy._('origin');
-  static const originWhenCrossOrigin =
-      ReferrerPolicy._('originWhenCrossOrigin');
-  static const sameOrigin = ReferrerPolicy._('sameOrigin');
-  static const strictOrigin = ReferrerPolicy._('strictOrigin');
-  static const strictOriginWhenCrossOrigin =
-      ReferrerPolicy._('strictOriginWhenCrossOrigin');
-  static const unsafeUrl = ReferrerPolicy._('unsafeUrl');
-  static const values = {
-    'noReferrer': noReferrer,
-    'noReferrerWhenDowngrade': noReferrerWhenDowngrade,
-    'origin': origin,
-    'originWhenCrossOrigin': originWhenCrossOrigin,
-    'sameOrigin': sameOrigin,
-    'strictOrigin': strictOrigin,
-    'strictOriginWhenCrossOrigin': strictOriginWhenCrossOrigin,
-    'unsafeUrl': unsafeUrl,
-  };
+enum ReferrerPolicy {
+  noReferrer('noReferrer'),
+  noReferrerWhenDowngrade('noReferrerWhenDowngrade'),
+  origin('origin'),
+  originWhenCrossOrigin('originWhenCrossOrigin'),
+  sameOrigin('sameOrigin'),
+  strictOrigin('strictOrigin'),
+  strictOriginWhenCrossOrigin('strictOriginWhenCrossOrigin'),
+  unsafeUrl('unsafeUrl'),
+  ;
 
   final String value;
 
-  const ReferrerPolicy._(this.value);
+  const ReferrerPolicy(this.value);
 
-  factory ReferrerPolicy.fromJson(String value) => values[value]!;
+  factory ReferrerPolicy.fromJson(String value) =>
+      ReferrerPolicy.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ReferrerPolicy && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -3068,477 +2779,195 @@ class CompilationCacheParams {
 }
 
 /// The type of a frameNavigated event.
-class NavigationType {
-  static const navigation = NavigationType._('Navigation');
-  static const backForwardCacheRestore =
-      NavigationType._('BackForwardCacheRestore');
-  static const values = {
-    'Navigation': navigation,
-    'BackForwardCacheRestore': backForwardCacheRestore,
-  };
+enum NavigationType {
+  navigation('Navigation'),
+  backForwardCacheRestore('BackForwardCacheRestore'),
+  ;
 
   final String value;
 
-  const NavigationType._(this.value);
+  const NavigationType(this.value);
 
-  factory NavigationType.fromJson(String value) => values[value]!;
+  factory NavigationType.fromJson(String value) =>
+      NavigationType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is NavigationType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// List of not restored reasons for back-forward cache.
-class BackForwardCacheNotRestoredReason {
-  static const notPrimaryMainFrame =
-      BackForwardCacheNotRestoredReason._('NotPrimaryMainFrame');
-  static const backForwardCacheDisabled =
-      BackForwardCacheNotRestoredReason._('BackForwardCacheDisabled');
-  static const relatedActiveContentsExist =
-      BackForwardCacheNotRestoredReason._('RelatedActiveContentsExist');
-  static const httpStatusNotOk =
-      BackForwardCacheNotRestoredReason._('HTTPStatusNotOK');
-  static const schemeNotHttpOrHttps =
-      BackForwardCacheNotRestoredReason._('SchemeNotHTTPOrHTTPS');
-  static const loading = BackForwardCacheNotRestoredReason._('Loading');
-  static const wasGrantedMediaAccess =
-      BackForwardCacheNotRestoredReason._('WasGrantedMediaAccess');
-  static const disableForRenderFrameHostCalled =
-      BackForwardCacheNotRestoredReason._('DisableForRenderFrameHostCalled');
-  static const domainNotAllowed =
-      BackForwardCacheNotRestoredReason._('DomainNotAllowed');
-  static const httpMethodNotGet =
-      BackForwardCacheNotRestoredReason._('HTTPMethodNotGET');
-  static const subframeIsNavigating =
-      BackForwardCacheNotRestoredReason._('SubframeIsNavigating');
-  static const timeout = BackForwardCacheNotRestoredReason._('Timeout');
-  static const cacheLimit = BackForwardCacheNotRestoredReason._('CacheLimit');
-  static const javaScriptExecution =
-      BackForwardCacheNotRestoredReason._('JavaScriptExecution');
-  static const rendererProcessKilled =
-      BackForwardCacheNotRestoredReason._('RendererProcessKilled');
-  static const rendererProcessCrashed =
-      BackForwardCacheNotRestoredReason._('RendererProcessCrashed');
-  static const grantedMediaStreamAccess =
-      BackForwardCacheNotRestoredReason._('GrantedMediaStreamAccess');
-  static const schedulerTrackedFeatureUsed =
-      BackForwardCacheNotRestoredReason._('SchedulerTrackedFeatureUsed');
-  static const conflictingBrowsingInstance =
-      BackForwardCacheNotRestoredReason._('ConflictingBrowsingInstance');
-  static const cacheFlushed =
-      BackForwardCacheNotRestoredReason._('CacheFlushed');
-  static const serviceWorkerVersionActivation =
-      BackForwardCacheNotRestoredReason._('ServiceWorkerVersionActivation');
-  static const sessionRestored =
-      BackForwardCacheNotRestoredReason._('SessionRestored');
-  static const serviceWorkerPostMessage =
-      BackForwardCacheNotRestoredReason._('ServiceWorkerPostMessage');
-  static const enteredBackForwardCacheBeforeServiceWorkerHostAdded =
-      BackForwardCacheNotRestoredReason._(
-          'EnteredBackForwardCacheBeforeServiceWorkerHostAdded');
-  static const renderFrameHostReusedSameSite =
-      BackForwardCacheNotRestoredReason._('RenderFrameHostReused_SameSite');
-  static const renderFrameHostReusedCrossSite =
-      BackForwardCacheNotRestoredReason._('RenderFrameHostReused_CrossSite');
-  static const serviceWorkerClaim =
-      BackForwardCacheNotRestoredReason._('ServiceWorkerClaim');
-  static const ignoreEventAndEvict =
-      BackForwardCacheNotRestoredReason._('IgnoreEventAndEvict');
-  static const haveInnerContents =
-      BackForwardCacheNotRestoredReason._('HaveInnerContents');
-  static const timeoutPuttingInCache =
-      BackForwardCacheNotRestoredReason._('TimeoutPuttingInCache');
-  static const backForwardCacheDisabledByLowMemory =
-      BackForwardCacheNotRestoredReason._(
-          'BackForwardCacheDisabledByLowMemory');
-  static const backForwardCacheDisabledByCommandLine =
-      BackForwardCacheNotRestoredReason._(
-          'BackForwardCacheDisabledByCommandLine');
-  static const networkRequestDatapipeDrainedAsBytesConsumer =
-      BackForwardCacheNotRestoredReason._(
-          'NetworkRequestDatapipeDrainedAsBytesConsumer');
-  static const networkRequestRedirected =
-      BackForwardCacheNotRestoredReason._('NetworkRequestRedirected');
-  static const networkRequestTimeout =
-      BackForwardCacheNotRestoredReason._('NetworkRequestTimeout');
-  static const networkExceedsBufferLimit =
-      BackForwardCacheNotRestoredReason._('NetworkExceedsBufferLimit');
-  static const navigationCancelledWhileRestoring =
-      BackForwardCacheNotRestoredReason._('NavigationCancelledWhileRestoring');
-  static const notMostRecentNavigationEntry =
-      BackForwardCacheNotRestoredReason._('NotMostRecentNavigationEntry');
-  static const backForwardCacheDisabledForPrerender =
-      BackForwardCacheNotRestoredReason._(
-          'BackForwardCacheDisabledForPrerender');
-  static const userAgentOverrideDiffers =
-      BackForwardCacheNotRestoredReason._('UserAgentOverrideDiffers');
-  static const foregroundCacheLimit =
-      BackForwardCacheNotRestoredReason._('ForegroundCacheLimit');
-  static const browsingInstanceNotSwapped =
-      BackForwardCacheNotRestoredReason._('BrowsingInstanceNotSwapped');
-  static const backForwardCacheDisabledForDelegate =
-      BackForwardCacheNotRestoredReason._(
-          'BackForwardCacheDisabledForDelegate');
-  static const optInUnloadHeaderNotPresent =
-      BackForwardCacheNotRestoredReason._('OptInUnloadHeaderNotPresent');
-  static const unloadHandlerExistsInMainFrame =
-      BackForwardCacheNotRestoredReason._('UnloadHandlerExistsInMainFrame');
-  static const unloadHandlerExistsInSubFrame =
-      BackForwardCacheNotRestoredReason._('UnloadHandlerExistsInSubFrame');
-  static const serviceWorkerUnregistration =
-      BackForwardCacheNotRestoredReason._('ServiceWorkerUnregistration');
-  static const cacheControlNoStore =
-      BackForwardCacheNotRestoredReason._('CacheControlNoStore');
-  static const cacheControlNoStoreCookieModified =
-      BackForwardCacheNotRestoredReason._('CacheControlNoStoreCookieModified');
-  static const cacheControlNoStoreHttpOnlyCookieModified =
-      BackForwardCacheNotRestoredReason._(
-          'CacheControlNoStoreHTTPOnlyCookieModified');
-  static const noResponseHead =
-      BackForwardCacheNotRestoredReason._('NoResponseHead');
-  static const unknown = BackForwardCacheNotRestoredReason._('Unknown');
-  static const activationNavigationsDisallowedForBug1234857 =
-      BackForwardCacheNotRestoredReason._(
-          'ActivationNavigationsDisallowedForBug1234857');
-  static const errorDocument =
-      BackForwardCacheNotRestoredReason._('ErrorDocument');
-  static const fencedFramesEmbedder =
-      BackForwardCacheNotRestoredReason._('FencedFramesEmbedder');
-  static const webSocket = BackForwardCacheNotRestoredReason._('WebSocket');
-  static const webTransport =
-      BackForwardCacheNotRestoredReason._('WebTransport');
-  static const webRtc = BackForwardCacheNotRestoredReason._('WebRTC');
-  static const mainResourceHasCacheControlNoStore =
-      BackForwardCacheNotRestoredReason._('MainResourceHasCacheControlNoStore');
-  static const mainResourceHasCacheControlNoCache =
-      BackForwardCacheNotRestoredReason._('MainResourceHasCacheControlNoCache');
-  static const subresourceHasCacheControlNoStore =
-      BackForwardCacheNotRestoredReason._('SubresourceHasCacheControlNoStore');
-  static const subresourceHasCacheControlNoCache =
-      BackForwardCacheNotRestoredReason._('SubresourceHasCacheControlNoCache');
-  static const containsPlugins =
-      BackForwardCacheNotRestoredReason._('ContainsPlugins');
-  static const documentLoaded =
-      BackForwardCacheNotRestoredReason._('DocumentLoaded');
-  static const dedicatedWorkerOrWorklet =
-      BackForwardCacheNotRestoredReason._('DedicatedWorkerOrWorklet');
-  static const outstandingNetworkRequestOthers =
-      BackForwardCacheNotRestoredReason._('OutstandingNetworkRequestOthers');
-  static const outstandingIndexedDbTransaction =
-      BackForwardCacheNotRestoredReason._('OutstandingIndexedDBTransaction');
-  static const requestedNotificationsPermission =
-      BackForwardCacheNotRestoredReason._('RequestedNotificationsPermission');
-  static const requestedMidiPermission =
-      BackForwardCacheNotRestoredReason._('RequestedMIDIPermission');
-  static const requestedAudioCapturePermission =
-      BackForwardCacheNotRestoredReason._('RequestedAudioCapturePermission');
-  static const requestedVideoCapturePermission =
-      BackForwardCacheNotRestoredReason._('RequestedVideoCapturePermission');
-  static const requestedBackForwardCacheBlockedSensors =
-      BackForwardCacheNotRestoredReason._(
-          'RequestedBackForwardCacheBlockedSensors');
-  static const requestedBackgroundWorkPermission =
-      BackForwardCacheNotRestoredReason._('RequestedBackgroundWorkPermission');
-  static const broadcastChannel =
-      BackForwardCacheNotRestoredReason._('BroadcastChannel');
-  static const indexedDbConnection =
-      BackForwardCacheNotRestoredReason._('IndexedDBConnection');
-  static const webXr = BackForwardCacheNotRestoredReason._('WebXR');
-  static const sharedWorker =
-      BackForwardCacheNotRestoredReason._('SharedWorker');
-  static const webLocks = BackForwardCacheNotRestoredReason._('WebLocks');
-  static const webHid = BackForwardCacheNotRestoredReason._('WebHID');
-  static const webShare = BackForwardCacheNotRestoredReason._('WebShare');
-  static const requestedStorageAccessGrant =
-      BackForwardCacheNotRestoredReason._('RequestedStorageAccessGrant');
-  static const webNfc = BackForwardCacheNotRestoredReason._('WebNfc');
-  static const outstandingNetworkRequestFetch =
-      BackForwardCacheNotRestoredReason._('OutstandingNetworkRequestFetch');
-  static const outstandingNetworkRequestXhr =
-      BackForwardCacheNotRestoredReason._('OutstandingNetworkRequestXHR');
-  static const appBanner = BackForwardCacheNotRestoredReason._('AppBanner');
-  static const printing = BackForwardCacheNotRestoredReason._('Printing');
-  static const webDatabase = BackForwardCacheNotRestoredReason._('WebDatabase');
-  static const pictureInPicture =
-      BackForwardCacheNotRestoredReason._('PictureInPicture');
-  static const portal = BackForwardCacheNotRestoredReason._('Portal');
-  static const speechRecognizer =
-      BackForwardCacheNotRestoredReason._('SpeechRecognizer');
-  static const idleManager = BackForwardCacheNotRestoredReason._('IdleManager');
-  static const paymentManager =
-      BackForwardCacheNotRestoredReason._('PaymentManager');
-  static const speechSynthesis =
-      BackForwardCacheNotRestoredReason._('SpeechSynthesis');
-  static const keyboardLock =
-      BackForwardCacheNotRestoredReason._('KeyboardLock');
-  static const webOtpService =
-      BackForwardCacheNotRestoredReason._('WebOTPService');
-  static const outstandingNetworkRequestDirectSocket =
-      BackForwardCacheNotRestoredReason._(
-          'OutstandingNetworkRequestDirectSocket');
-  static const injectedJavascript =
-      BackForwardCacheNotRestoredReason._('InjectedJavascript');
-  static const injectedStyleSheet =
-      BackForwardCacheNotRestoredReason._('InjectedStyleSheet');
-  static const dummy = BackForwardCacheNotRestoredReason._('Dummy');
-  static const contentSecurityHandler =
-      BackForwardCacheNotRestoredReason._('ContentSecurityHandler');
-  static const contentWebAuthenticationApi =
-      BackForwardCacheNotRestoredReason._('ContentWebAuthenticationAPI');
-  static const contentFileChooser =
-      BackForwardCacheNotRestoredReason._('ContentFileChooser');
-  static const contentSerial =
-      BackForwardCacheNotRestoredReason._('ContentSerial');
-  static const contentFileSystemAccess =
-      BackForwardCacheNotRestoredReason._('ContentFileSystemAccess');
-  static const contentMediaDevicesDispatcherHost =
-      BackForwardCacheNotRestoredReason._('ContentMediaDevicesDispatcherHost');
-  static const contentWebBluetooth =
-      BackForwardCacheNotRestoredReason._('ContentWebBluetooth');
-  static const contentWebUsb =
-      BackForwardCacheNotRestoredReason._('ContentWebUSB');
-  static const contentMediaSession =
-      BackForwardCacheNotRestoredReason._('ContentMediaSession');
-  static const contentMediaSessionService =
-      BackForwardCacheNotRestoredReason._('ContentMediaSessionService');
-  static const contentScreenReader =
-      BackForwardCacheNotRestoredReason._('ContentScreenReader');
-  static const embedderPopupBlockerTabHelper =
-      BackForwardCacheNotRestoredReason._('EmbedderPopupBlockerTabHelper');
-  static const embedderSafeBrowsingTriggeredPopupBlocker =
-      BackForwardCacheNotRestoredReason._(
-          'EmbedderSafeBrowsingTriggeredPopupBlocker');
-  static const embedderSafeBrowsingThreatDetails =
-      BackForwardCacheNotRestoredReason._('EmbedderSafeBrowsingThreatDetails');
-  static const embedderAppBannerManager =
-      BackForwardCacheNotRestoredReason._('EmbedderAppBannerManager');
-  static const embedderDomDistillerViewerSource =
-      BackForwardCacheNotRestoredReason._('EmbedderDomDistillerViewerSource');
-  static const embedderDomDistillerSelfDeletingRequestDelegate =
-      BackForwardCacheNotRestoredReason._(
-          'EmbedderDomDistillerSelfDeletingRequestDelegate');
-  static const embedderOomInterventionTabHelper =
-      BackForwardCacheNotRestoredReason._('EmbedderOomInterventionTabHelper');
-  static const embedderOfflinePage =
-      BackForwardCacheNotRestoredReason._('EmbedderOfflinePage');
-  static const embedderChromePasswordManagerClientBindCredentialManager =
-      BackForwardCacheNotRestoredReason._(
-          'EmbedderChromePasswordManagerClientBindCredentialManager');
-  static const embedderPermissionRequestManager =
-      BackForwardCacheNotRestoredReason._('EmbedderPermissionRequestManager');
-  static const embedderModalDialog =
-      BackForwardCacheNotRestoredReason._('EmbedderModalDialog');
-  static const embedderExtensions =
-      BackForwardCacheNotRestoredReason._('EmbedderExtensions');
-  static const embedderExtensionMessaging =
-      BackForwardCacheNotRestoredReason._('EmbedderExtensionMessaging');
-  static const embedderExtensionMessagingForOpenPort =
-      BackForwardCacheNotRestoredReason._(
-          'EmbedderExtensionMessagingForOpenPort');
-  static const embedderExtensionSentMessageToCachedFrame =
-      BackForwardCacheNotRestoredReason._(
-          'EmbedderExtensionSentMessageToCachedFrame');
-  static const values = {
-    'NotPrimaryMainFrame': notPrimaryMainFrame,
-    'BackForwardCacheDisabled': backForwardCacheDisabled,
-    'RelatedActiveContentsExist': relatedActiveContentsExist,
-    'HTTPStatusNotOK': httpStatusNotOk,
-    'SchemeNotHTTPOrHTTPS': schemeNotHttpOrHttps,
-    'Loading': loading,
-    'WasGrantedMediaAccess': wasGrantedMediaAccess,
-    'DisableForRenderFrameHostCalled': disableForRenderFrameHostCalled,
-    'DomainNotAllowed': domainNotAllowed,
-    'HTTPMethodNotGET': httpMethodNotGet,
-    'SubframeIsNavigating': subframeIsNavigating,
-    'Timeout': timeout,
-    'CacheLimit': cacheLimit,
-    'JavaScriptExecution': javaScriptExecution,
-    'RendererProcessKilled': rendererProcessKilled,
-    'RendererProcessCrashed': rendererProcessCrashed,
-    'GrantedMediaStreamAccess': grantedMediaStreamAccess,
-    'SchedulerTrackedFeatureUsed': schedulerTrackedFeatureUsed,
-    'ConflictingBrowsingInstance': conflictingBrowsingInstance,
-    'CacheFlushed': cacheFlushed,
-    'ServiceWorkerVersionActivation': serviceWorkerVersionActivation,
-    'SessionRestored': sessionRestored,
-    'ServiceWorkerPostMessage': serviceWorkerPostMessage,
-    'EnteredBackForwardCacheBeforeServiceWorkerHostAdded':
-        enteredBackForwardCacheBeforeServiceWorkerHostAdded,
-    'RenderFrameHostReused_SameSite': renderFrameHostReusedSameSite,
-    'RenderFrameHostReused_CrossSite': renderFrameHostReusedCrossSite,
-    'ServiceWorkerClaim': serviceWorkerClaim,
-    'IgnoreEventAndEvict': ignoreEventAndEvict,
-    'HaveInnerContents': haveInnerContents,
-    'TimeoutPuttingInCache': timeoutPuttingInCache,
-    'BackForwardCacheDisabledByLowMemory': backForwardCacheDisabledByLowMemory,
-    'BackForwardCacheDisabledByCommandLine':
-        backForwardCacheDisabledByCommandLine,
-    'NetworkRequestDatapipeDrainedAsBytesConsumer':
-        networkRequestDatapipeDrainedAsBytesConsumer,
-    'NetworkRequestRedirected': networkRequestRedirected,
-    'NetworkRequestTimeout': networkRequestTimeout,
-    'NetworkExceedsBufferLimit': networkExceedsBufferLimit,
-    'NavigationCancelledWhileRestoring': navigationCancelledWhileRestoring,
-    'NotMostRecentNavigationEntry': notMostRecentNavigationEntry,
-    'BackForwardCacheDisabledForPrerender':
-        backForwardCacheDisabledForPrerender,
-    'UserAgentOverrideDiffers': userAgentOverrideDiffers,
-    'ForegroundCacheLimit': foregroundCacheLimit,
-    'BrowsingInstanceNotSwapped': browsingInstanceNotSwapped,
-    'BackForwardCacheDisabledForDelegate': backForwardCacheDisabledForDelegate,
-    'OptInUnloadHeaderNotPresent': optInUnloadHeaderNotPresent,
-    'UnloadHandlerExistsInMainFrame': unloadHandlerExistsInMainFrame,
-    'UnloadHandlerExistsInSubFrame': unloadHandlerExistsInSubFrame,
-    'ServiceWorkerUnregistration': serviceWorkerUnregistration,
-    'CacheControlNoStore': cacheControlNoStore,
-    'CacheControlNoStoreCookieModified': cacheControlNoStoreCookieModified,
-    'CacheControlNoStoreHTTPOnlyCookieModified':
-        cacheControlNoStoreHttpOnlyCookieModified,
-    'NoResponseHead': noResponseHead,
-    'Unknown': unknown,
-    'ActivationNavigationsDisallowedForBug1234857':
-        activationNavigationsDisallowedForBug1234857,
-    'ErrorDocument': errorDocument,
-    'FencedFramesEmbedder': fencedFramesEmbedder,
-    'WebSocket': webSocket,
-    'WebTransport': webTransport,
-    'WebRTC': webRtc,
-    'MainResourceHasCacheControlNoStore': mainResourceHasCacheControlNoStore,
-    'MainResourceHasCacheControlNoCache': mainResourceHasCacheControlNoCache,
-    'SubresourceHasCacheControlNoStore': subresourceHasCacheControlNoStore,
-    'SubresourceHasCacheControlNoCache': subresourceHasCacheControlNoCache,
-    'ContainsPlugins': containsPlugins,
-    'DocumentLoaded': documentLoaded,
-    'DedicatedWorkerOrWorklet': dedicatedWorkerOrWorklet,
-    'OutstandingNetworkRequestOthers': outstandingNetworkRequestOthers,
-    'OutstandingIndexedDBTransaction': outstandingIndexedDbTransaction,
-    'RequestedNotificationsPermission': requestedNotificationsPermission,
-    'RequestedMIDIPermission': requestedMidiPermission,
-    'RequestedAudioCapturePermission': requestedAudioCapturePermission,
-    'RequestedVideoCapturePermission': requestedVideoCapturePermission,
-    'RequestedBackForwardCacheBlockedSensors':
-        requestedBackForwardCacheBlockedSensors,
-    'RequestedBackgroundWorkPermission': requestedBackgroundWorkPermission,
-    'BroadcastChannel': broadcastChannel,
-    'IndexedDBConnection': indexedDbConnection,
-    'WebXR': webXr,
-    'SharedWorker': sharedWorker,
-    'WebLocks': webLocks,
-    'WebHID': webHid,
-    'WebShare': webShare,
-    'RequestedStorageAccessGrant': requestedStorageAccessGrant,
-    'WebNfc': webNfc,
-    'OutstandingNetworkRequestFetch': outstandingNetworkRequestFetch,
-    'OutstandingNetworkRequestXHR': outstandingNetworkRequestXhr,
-    'AppBanner': appBanner,
-    'Printing': printing,
-    'WebDatabase': webDatabase,
-    'PictureInPicture': pictureInPicture,
-    'Portal': portal,
-    'SpeechRecognizer': speechRecognizer,
-    'IdleManager': idleManager,
-    'PaymentManager': paymentManager,
-    'SpeechSynthesis': speechSynthesis,
-    'KeyboardLock': keyboardLock,
-    'WebOTPService': webOtpService,
-    'OutstandingNetworkRequestDirectSocket':
-        outstandingNetworkRequestDirectSocket,
-    'InjectedJavascript': injectedJavascript,
-    'InjectedStyleSheet': injectedStyleSheet,
-    'Dummy': dummy,
-    'ContentSecurityHandler': contentSecurityHandler,
-    'ContentWebAuthenticationAPI': contentWebAuthenticationApi,
-    'ContentFileChooser': contentFileChooser,
-    'ContentSerial': contentSerial,
-    'ContentFileSystemAccess': contentFileSystemAccess,
-    'ContentMediaDevicesDispatcherHost': contentMediaDevicesDispatcherHost,
-    'ContentWebBluetooth': contentWebBluetooth,
-    'ContentWebUSB': contentWebUsb,
-    'ContentMediaSession': contentMediaSession,
-    'ContentMediaSessionService': contentMediaSessionService,
-    'ContentScreenReader': contentScreenReader,
-    'EmbedderPopupBlockerTabHelper': embedderPopupBlockerTabHelper,
-    'EmbedderSafeBrowsingTriggeredPopupBlocker':
-        embedderSafeBrowsingTriggeredPopupBlocker,
-    'EmbedderSafeBrowsingThreatDetails': embedderSafeBrowsingThreatDetails,
-    'EmbedderAppBannerManager': embedderAppBannerManager,
-    'EmbedderDomDistillerViewerSource': embedderDomDistillerViewerSource,
-    'EmbedderDomDistillerSelfDeletingRequestDelegate':
-        embedderDomDistillerSelfDeletingRequestDelegate,
-    'EmbedderOomInterventionTabHelper': embedderOomInterventionTabHelper,
-    'EmbedderOfflinePage': embedderOfflinePage,
-    'EmbedderChromePasswordManagerClientBindCredentialManager':
-        embedderChromePasswordManagerClientBindCredentialManager,
-    'EmbedderPermissionRequestManager': embedderPermissionRequestManager,
-    'EmbedderModalDialog': embedderModalDialog,
-    'EmbedderExtensions': embedderExtensions,
-    'EmbedderExtensionMessaging': embedderExtensionMessaging,
-    'EmbedderExtensionMessagingForOpenPort':
-        embedderExtensionMessagingForOpenPort,
-    'EmbedderExtensionSentMessageToCachedFrame':
-        embedderExtensionSentMessageToCachedFrame,
-  };
+enum BackForwardCacheNotRestoredReason {
+  notPrimaryMainFrame('NotPrimaryMainFrame'),
+  backForwardCacheDisabled('BackForwardCacheDisabled'),
+  relatedActiveContentsExist('RelatedActiveContentsExist'),
+  httpStatusNotOk('HTTPStatusNotOK'),
+  schemeNotHttpOrHttps('SchemeNotHTTPOrHTTPS'),
+  loading('Loading'),
+  wasGrantedMediaAccess('WasGrantedMediaAccess'),
+  disableForRenderFrameHostCalled('DisableForRenderFrameHostCalled'),
+  domainNotAllowed('DomainNotAllowed'),
+  httpMethodNotGet('HTTPMethodNotGET'),
+  subframeIsNavigating('SubframeIsNavigating'),
+  timeout('Timeout'),
+  cacheLimit('CacheLimit'),
+  javaScriptExecution('JavaScriptExecution'),
+  rendererProcessKilled('RendererProcessKilled'),
+  rendererProcessCrashed('RendererProcessCrashed'),
+  grantedMediaStreamAccess('GrantedMediaStreamAccess'),
+  schedulerTrackedFeatureUsed('SchedulerTrackedFeatureUsed'),
+  conflictingBrowsingInstance('ConflictingBrowsingInstance'),
+  cacheFlushed('CacheFlushed'),
+  serviceWorkerVersionActivation('ServiceWorkerVersionActivation'),
+  sessionRestored('SessionRestored'),
+  serviceWorkerPostMessage('ServiceWorkerPostMessage'),
+  enteredBackForwardCacheBeforeServiceWorkerHostAdded(
+      'EnteredBackForwardCacheBeforeServiceWorkerHostAdded'),
+  renderFrameHostReusedSameSite('RenderFrameHostReused_SameSite'),
+  renderFrameHostReusedCrossSite('RenderFrameHostReused_CrossSite'),
+  serviceWorkerClaim('ServiceWorkerClaim'),
+  ignoreEventAndEvict('IgnoreEventAndEvict'),
+  haveInnerContents('HaveInnerContents'),
+  timeoutPuttingInCache('TimeoutPuttingInCache'),
+  backForwardCacheDisabledByLowMemory('BackForwardCacheDisabledByLowMemory'),
+  backForwardCacheDisabledByCommandLine(
+      'BackForwardCacheDisabledByCommandLine'),
+  networkRequestDatapipeDrainedAsBytesConsumer(
+      'NetworkRequestDatapipeDrainedAsBytesConsumer'),
+  networkRequestRedirected('NetworkRequestRedirected'),
+  networkRequestTimeout('NetworkRequestTimeout'),
+  networkExceedsBufferLimit('NetworkExceedsBufferLimit'),
+  navigationCancelledWhileRestoring('NavigationCancelledWhileRestoring'),
+  notMostRecentNavigationEntry('NotMostRecentNavigationEntry'),
+  backForwardCacheDisabledForPrerender('BackForwardCacheDisabledForPrerender'),
+  userAgentOverrideDiffers('UserAgentOverrideDiffers'),
+  foregroundCacheLimit('ForegroundCacheLimit'),
+  browsingInstanceNotSwapped('BrowsingInstanceNotSwapped'),
+  backForwardCacheDisabledForDelegate('BackForwardCacheDisabledForDelegate'),
+  optInUnloadHeaderNotPresent('OptInUnloadHeaderNotPresent'),
+  unloadHandlerExistsInMainFrame('UnloadHandlerExistsInMainFrame'),
+  unloadHandlerExistsInSubFrame('UnloadHandlerExistsInSubFrame'),
+  serviceWorkerUnregistration('ServiceWorkerUnregistration'),
+  cacheControlNoStore('CacheControlNoStore'),
+  cacheControlNoStoreCookieModified('CacheControlNoStoreCookieModified'),
+  cacheControlNoStoreHttpOnlyCookieModified(
+      'CacheControlNoStoreHTTPOnlyCookieModified'),
+  noResponseHead('NoResponseHead'),
+  unknown('Unknown'),
+  activationNavigationsDisallowedForBug1234857(
+      'ActivationNavigationsDisallowedForBug1234857'),
+  errorDocument('ErrorDocument'),
+  fencedFramesEmbedder('FencedFramesEmbedder'),
+  webSocket('WebSocket'),
+  webTransport('WebTransport'),
+  webRtc('WebRTC'),
+  mainResourceHasCacheControlNoStore('MainResourceHasCacheControlNoStore'),
+  mainResourceHasCacheControlNoCache('MainResourceHasCacheControlNoCache'),
+  subresourceHasCacheControlNoStore('SubresourceHasCacheControlNoStore'),
+  subresourceHasCacheControlNoCache('SubresourceHasCacheControlNoCache'),
+  containsPlugins('ContainsPlugins'),
+  documentLoaded('DocumentLoaded'),
+  dedicatedWorkerOrWorklet('DedicatedWorkerOrWorklet'),
+  outstandingNetworkRequestOthers('OutstandingNetworkRequestOthers'),
+  outstandingIndexedDbTransaction('OutstandingIndexedDBTransaction'),
+  requestedNotificationsPermission('RequestedNotificationsPermission'),
+  requestedMidiPermission('RequestedMIDIPermission'),
+  requestedAudioCapturePermission('RequestedAudioCapturePermission'),
+  requestedVideoCapturePermission('RequestedVideoCapturePermission'),
+  requestedBackForwardCacheBlockedSensors(
+      'RequestedBackForwardCacheBlockedSensors'),
+  requestedBackgroundWorkPermission('RequestedBackgroundWorkPermission'),
+  broadcastChannel('BroadcastChannel'),
+  indexedDbConnection('IndexedDBConnection'),
+  webXr('WebXR'),
+  sharedWorker('SharedWorker'),
+  webLocks('WebLocks'),
+  webHid('WebHID'),
+  webShare('WebShare'),
+  requestedStorageAccessGrant('RequestedStorageAccessGrant'),
+  webNfc('WebNfc'),
+  outstandingNetworkRequestFetch('OutstandingNetworkRequestFetch'),
+  outstandingNetworkRequestXhr('OutstandingNetworkRequestXHR'),
+  appBanner('AppBanner'),
+  printing('Printing'),
+  webDatabase('WebDatabase'),
+  pictureInPicture('PictureInPicture'),
+  portal('Portal'),
+  speechRecognizer('SpeechRecognizer'),
+  idleManager('IdleManager'),
+  paymentManager('PaymentManager'),
+  speechSynthesis('SpeechSynthesis'),
+  keyboardLock('KeyboardLock'),
+  webOtpService('WebOTPService'),
+  outstandingNetworkRequestDirectSocket(
+      'OutstandingNetworkRequestDirectSocket'),
+  injectedJavascript('InjectedJavascript'),
+  injectedStyleSheet('InjectedStyleSheet'),
+  dummy('Dummy'),
+  contentSecurityHandler('ContentSecurityHandler'),
+  contentWebAuthenticationApi('ContentWebAuthenticationAPI'),
+  contentFileChooser('ContentFileChooser'),
+  contentSerial('ContentSerial'),
+  contentFileSystemAccess('ContentFileSystemAccess'),
+  contentMediaDevicesDispatcherHost('ContentMediaDevicesDispatcherHost'),
+  contentWebBluetooth('ContentWebBluetooth'),
+  contentWebUsb('ContentWebUSB'),
+  contentMediaSession('ContentMediaSession'),
+  contentMediaSessionService('ContentMediaSessionService'),
+  contentScreenReader('ContentScreenReader'),
+  embedderPopupBlockerTabHelper('EmbedderPopupBlockerTabHelper'),
+  embedderSafeBrowsingTriggeredPopupBlocker(
+      'EmbedderSafeBrowsingTriggeredPopupBlocker'),
+  embedderSafeBrowsingThreatDetails('EmbedderSafeBrowsingThreatDetails'),
+  embedderAppBannerManager('EmbedderAppBannerManager'),
+  embedderDomDistillerViewerSource('EmbedderDomDistillerViewerSource'),
+  embedderDomDistillerSelfDeletingRequestDelegate(
+      'EmbedderDomDistillerSelfDeletingRequestDelegate'),
+  embedderOomInterventionTabHelper('EmbedderOomInterventionTabHelper'),
+  embedderOfflinePage('EmbedderOfflinePage'),
+  embedderChromePasswordManagerClientBindCredentialManager(
+      'EmbedderChromePasswordManagerClientBindCredentialManager'),
+  embedderPermissionRequestManager('EmbedderPermissionRequestManager'),
+  embedderModalDialog('EmbedderModalDialog'),
+  embedderExtensions('EmbedderExtensions'),
+  embedderExtensionMessaging('EmbedderExtensionMessaging'),
+  embedderExtensionMessagingForOpenPort(
+      'EmbedderExtensionMessagingForOpenPort'),
+  embedderExtensionSentMessageToCachedFrame(
+      'EmbedderExtensionSentMessageToCachedFrame'),
+  ;
 
   final String value;
 
-  const BackForwardCacheNotRestoredReason._(this.value);
+  const BackForwardCacheNotRestoredReason(this.value);
 
   factory BackForwardCacheNotRestoredReason.fromJson(String value) =>
-      values[value]!;
+      BackForwardCacheNotRestoredReason.values
+          .firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is BackForwardCacheNotRestoredReason && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// Types of not restored reasons for back-forward cache.
-class BackForwardCacheNotRestoredReasonType {
-  static const supportPending =
-      BackForwardCacheNotRestoredReasonType._('SupportPending');
-  static const pageSupportNeeded =
-      BackForwardCacheNotRestoredReasonType._('PageSupportNeeded');
-  static const circumstantial =
-      BackForwardCacheNotRestoredReasonType._('Circumstantial');
-  static const values = {
-    'SupportPending': supportPending,
-    'PageSupportNeeded': pageSupportNeeded,
-    'Circumstantial': circumstantial,
-  };
+enum BackForwardCacheNotRestoredReasonType {
+  supportPending('SupportPending'),
+  pageSupportNeeded('PageSupportNeeded'),
+  circumstantial('Circumstantial'),
+  ;
 
   final String value;
 
-  const BackForwardCacheNotRestoredReasonType._(this.value);
+  const BackForwardCacheNotRestoredReasonType(this.value);
 
   factory BackForwardCacheNotRestoredReasonType.fromJson(String value) =>
-      values[value]!;
+      BackForwardCacheNotRestoredReasonType.values
+          .firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is BackForwardCacheNotRestoredReasonType &&
-          other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -3617,112 +3046,73 @@ class BackForwardCacheNotRestoredExplanationTree {
 }
 
 /// List of FinalStatus reasons for Prerender2.
-class PrerenderFinalStatus {
-  static const activated = PrerenderFinalStatus._('Activated');
-  static const values = {
-    'Activated': activated,
-  };
+enum PrerenderFinalStatus {
+  activated('Activated'),
+  ;
 
   final String value;
 
-  const PrerenderFinalStatus._(this.value);
+  const PrerenderFinalStatus(this.value);
 
-  factory PrerenderFinalStatus.fromJson(String value) => values[value]!;
+  factory PrerenderFinalStatus.fromJson(String value) =>
+      PrerenderFinalStatus.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is PrerenderFinalStatus && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class FileChooserOpenedEventMode {
-  static const selectSingle = FileChooserOpenedEventMode._('selectSingle');
-  static const selectMultiple = FileChooserOpenedEventMode._('selectMultiple');
-  static const values = {
-    'selectSingle': selectSingle,
-    'selectMultiple': selectMultiple,
-  };
+enum FileChooserOpenedEventMode {
+  selectSingle('selectSingle'),
+  selectMultiple('selectMultiple'),
+  ;
 
   final String value;
 
-  const FileChooserOpenedEventMode._(this.value);
+  const FileChooserOpenedEventMode(this.value);
 
-  factory FileChooserOpenedEventMode.fromJson(String value) => values[value]!;
+  factory FileChooserOpenedEventMode.fromJson(String value) =>
+      FileChooserOpenedEventMode.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is FileChooserOpenedEventMode && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class FrameDetachedEventReason {
-  static const remove = FrameDetachedEventReason._('remove');
-  static const swap = FrameDetachedEventReason._('swap');
-  static const values = {
-    'remove': remove,
-    'swap': swap,
-  };
+enum FrameDetachedEventReason {
+  remove('remove'),
+  swap('swap'),
+  ;
 
   final String value;
 
-  const FrameDetachedEventReason._(this.value);
+  const FrameDetachedEventReason(this.value);
 
-  factory FrameDetachedEventReason.fromJson(String value) => values[value]!;
+  factory FrameDetachedEventReason.fromJson(String value) =>
+      FrameDetachedEventReason.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is FrameDetachedEventReason && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class DownloadProgressEventState {
-  static const inProgress = DownloadProgressEventState._('inProgress');
-  static const completed = DownloadProgressEventState._('completed');
-  static const canceled = DownloadProgressEventState._('canceled');
-  static const values = {
-    'inProgress': inProgress,
-    'completed': completed,
-    'canceled': canceled,
-  };
+enum DownloadProgressEventState {
+  inProgress('inProgress'),
+  completed('completed'),
+  canceled('canceled'),
+  ;
 
   final String value;
 
-  const DownloadProgressEventState._(this.value);
+  const DownloadProgressEventState(this.value);
 
-  factory DownloadProgressEventState.fromJson(String value) => values[value]!;
+  factory DownloadProgressEventState.fromJson(String value) =>
+      DownloadProgressEventState.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is DownloadProgressEventState && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

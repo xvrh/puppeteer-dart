@@ -346,32 +346,21 @@ class WindowID {
 }
 
 /// The state of the browser window.
-class WindowState {
-  static const normal = WindowState._('normal');
-  static const minimized = WindowState._('minimized');
-  static const maximized = WindowState._('maximized');
-  static const fullscreen = WindowState._('fullscreen');
-  static const values = {
-    'normal': normal,
-    'minimized': minimized,
-    'maximized': maximized,
-    'fullscreen': fullscreen,
-  };
+enum WindowState {
+  normal('normal'),
+  minimized('minimized'),
+  maximized('maximized'),
+  fullscreen('fullscreen'),
+  ;
 
   final String value;
 
-  const WindowState._(this.value);
+  const WindowState(this.value);
 
-  factory WindowState.fromJson(String value) => values[value]!;
+  factory WindowState.fromJson(String value) =>
+      WindowState.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is WindowState && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -419,103 +408,59 @@ class Bounds {
   }
 }
 
-class PermissionType {
-  static const accessibilityEvents = PermissionType._('accessibilityEvents');
-  static const audioCapture = PermissionType._('audioCapture');
-  static const backgroundSync = PermissionType._('backgroundSync');
-  static const backgroundFetch = PermissionType._('backgroundFetch');
-  static const clipboardReadWrite = PermissionType._('clipboardReadWrite');
-  static const clipboardSanitizedWrite =
-      PermissionType._('clipboardSanitizedWrite');
-  static const displayCapture = PermissionType._('displayCapture');
-  static const durableStorage = PermissionType._('durableStorage');
-  static const flash = PermissionType._('flash');
-  static const geolocation = PermissionType._('geolocation');
-  static const midi = PermissionType._('midi');
-  static const midiSysex = PermissionType._('midiSysex');
-  static const nfc = PermissionType._('nfc');
-  static const notifications = PermissionType._('notifications');
-  static const paymentHandler = PermissionType._('paymentHandler');
-  static const periodicBackgroundSync =
-      PermissionType._('periodicBackgroundSync');
-  static const protectedMediaIdentifier =
-      PermissionType._('protectedMediaIdentifier');
-  static const sensors = PermissionType._('sensors');
-  static const videoCapture = PermissionType._('videoCapture');
-  static const videoCapturePanTiltZoom =
-      PermissionType._('videoCapturePanTiltZoom');
-  static const idleDetection = PermissionType._('idleDetection');
-  static const wakeLockScreen = PermissionType._('wakeLockScreen');
-  static const wakeLockSystem = PermissionType._('wakeLockSystem');
-  static const values = {
-    'accessibilityEvents': accessibilityEvents,
-    'audioCapture': audioCapture,
-    'backgroundSync': backgroundSync,
-    'backgroundFetch': backgroundFetch,
-    'clipboardReadWrite': clipboardReadWrite,
-    'clipboardSanitizedWrite': clipboardSanitizedWrite,
-    'displayCapture': displayCapture,
-    'durableStorage': durableStorage,
-    'flash': flash,
-    'geolocation': geolocation,
-    'midi': midi,
-    'midiSysex': midiSysex,
-    'nfc': nfc,
-    'notifications': notifications,
-    'paymentHandler': paymentHandler,
-    'periodicBackgroundSync': periodicBackgroundSync,
-    'protectedMediaIdentifier': protectedMediaIdentifier,
-    'sensors': sensors,
-    'videoCapture': videoCapture,
-    'videoCapturePanTiltZoom': videoCapturePanTiltZoom,
-    'idleDetection': idleDetection,
-    'wakeLockScreen': wakeLockScreen,
-    'wakeLockSystem': wakeLockSystem,
-  };
+enum PermissionType {
+  accessibilityEvents('accessibilityEvents'),
+  audioCapture('audioCapture'),
+  backgroundSync('backgroundSync'),
+  backgroundFetch('backgroundFetch'),
+  clipboardReadWrite('clipboardReadWrite'),
+  clipboardSanitizedWrite('clipboardSanitizedWrite'),
+  displayCapture('displayCapture'),
+  durableStorage('durableStorage'),
+  flash('flash'),
+  geolocation('geolocation'),
+  midi('midi'),
+  midiSysex('midiSysex'),
+  nfc('nfc'),
+  notifications('notifications'),
+  paymentHandler('paymentHandler'),
+  periodicBackgroundSync('periodicBackgroundSync'),
+  protectedMediaIdentifier('protectedMediaIdentifier'),
+  sensors('sensors'),
+  videoCapture('videoCapture'),
+  videoCapturePanTiltZoom('videoCapturePanTiltZoom'),
+  idleDetection('idleDetection'),
+  wakeLockScreen('wakeLockScreen'),
+  wakeLockSystem('wakeLockSystem'),
+  ;
 
   final String value;
 
-  const PermissionType._(this.value);
+  const PermissionType(this.value);
 
-  factory PermissionType.fromJson(String value) => values[value]!;
+  factory PermissionType.fromJson(String value) =>
+      PermissionType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is PermissionType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class PermissionSetting {
-  static const granted = PermissionSetting._('granted');
-  static const denied = PermissionSetting._('denied');
-  static const prompt = PermissionSetting._('prompt');
-  static const values = {
-    'granted': granted,
-    'denied': denied,
-    'prompt': prompt,
-  };
+enum PermissionSetting {
+  granted('granted'),
+  denied('denied'),
+  prompt('prompt'),
+  ;
 
   final String value;
 
-  const PermissionSetting._(this.value);
+  const PermissionSetting(this.value);
 
-  factory PermissionSetting.fromJson(String value) => values[value]!;
+  factory PermissionSetting.fromJson(String value) =>
+      PermissionSetting.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is PermissionSetting && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -576,28 +521,19 @@ class PermissionDescriptor {
 }
 
 /// Browser command ids used by executeBrowserCommand.
-class BrowserCommandId {
-  static const openTabSearch = BrowserCommandId._('openTabSearch');
-  static const closeTabSearch = BrowserCommandId._('closeTabSearch');
-  static const values = {
-    'openTabSearch': openTabSearch,
-    'closeTabSearch': closeTabSearch,
-  };
+enum BrowserCommandId {
+  openTabSearch('openTabSearch'),
+  closeTabSearch('closeTabSearch'),
+  ;
 
   final String value;
 
-  const BrowserCommandId._(this.value);
+  const BrowserCommandId(this.value);
 
-  factory BrowserCommandId.fromJson(String value) => values[value]!;
+  factory BrowserCommandId.fromJson(String value) =>
+      BrowserCommandId.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is BrowserCommandId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -674,31 +610,20 @@ class Histogram {
   }
 }
 
-class DownloadProgressEventState {
-  static const inProgress = DownloadProgressEventState._('inProgress');
-  static const completed = DownloadProgressEventState._('completed');
-  static const canceled = DownloadProgressEventState._('canceled');
-  static const values = {
-    'inProgress': inProgress,
-    'completed': completed,
-    'canceled': canceled,
-  };
+enum DownloadProgressEventState {
+  inProgress('inProgress'),
+  completed('completed'),
+  canceled('canceled'),
+  ;
 
   final String value;
 
-  const DownloadProgressEventState._(this.value);
+  const DownloadProgressEventState(this.value);
 
-  factory DownloadProgressEventState.fromJson(String value) => values[value]!;
+  factory DownloadProgressEventState.fromJson(String value) =>
+      DownloadProgressEventState.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is DownloadProgressEventState && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

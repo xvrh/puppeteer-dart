@@ -101,29 +101,19 @@ class ScreenshotParams {
   }
 }
 
-class ScreenshotParamsFormat {
-  static const jpeg = ScreenshotParamsFormat._('jpeg');
-  static const png = ScreenshotParamsFormat._('png');
-  static const values = {
-    'jpeg': jpeg,
-    'png': png,
-  };
+enum ScreenshotParamsFormat {
+  jpeg('jpeg'),
+  png('png'),
+  ;
 
   final String value;
 
-  const ScreenshotParamsFormat._(this.value);
+  const ScreenshotParamsFormat(this.value);
 
-  factory ScreenshotParamsFormat.fromJson(String value) => values[value]!;
+  factory ScreenshotParamsFormat.fromJson(String value) =>
+      ScreenshotParamsFormat.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ScreenshotParamsFormat && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
