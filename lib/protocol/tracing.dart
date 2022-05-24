@@ -283,35 +283,21 @@ class TraceConfig {
   }
 }
 
-class TraceConfigRecordMode {
-  static const recordUntilFull = TraceConfigRecordMode._('recordUntilFull');
-  static const recordContinuously =
-      TraceConfigRecordMode._('recordContinuously');
-  static const recordAsMuchAsPossible =
-      TraceConfigRecordMode._('recordAsMuchAsPossible');
-  static const echoToConsole = TraceConfigRecordMode._('echoToConsole');
-  static const values = {
-    'recordUntilFull': recordUntilFull,
-    'recordContinuously': recordContinuously,
-    'recordAsMuchAsPossible': recordAsMuchAsPossible,
-    'echoToConsole': echoToConsole,
-  };
+enum TraceConfigRecordMode {
+  recordUntilFull('recordUntilFull'),
+  recordContinuously('recordContinuously'),
+  recordAsMuchAsPossible('recordAsMuchAsPossible'),
+  echoToConsole('echoToConsole'),
+  ;
 
   final String value;
 
-  const TraceConfigRecordMode._(this.value);
+  const TraceConfigRecordMode(this.value);
 
-  factory TraceConfigRecordMode.fromJson(String value) => values[value]!;
+  factory TraceConfigRecordMode.fromJson(String value) =>
+      TraceConfigRecordMode.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is TraceConfigRecordMode && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -319,56 +305,38 @@ class TraceConfigRecordMode {
 
 /// Data format of a trace. Can be either the legacy JSON format or the
 /// protocol buffer format. Note that the JSON format will be deprecated soon.
-class StreamFormat {
-  static const json = StreamFormat._('json');
-  static const proto = StreamFormat._('proto');
-  static const values = {
-    'json': json,
-    'proto': proto,
-  };
+enum StreamFormat {
+  json('json'),
+  proto('proto'),
+  ;
 
   final String value;
 
-  const StreamFormat._(this.value);
+  const StreamFormat(this.value);
 
-  factory StreamFormat.fromJson(String value) => values[value]!;
+  factory StreamFormat.fromJson(String value) =>
+      StreamFormat.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is StreamFormat && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// Compression type to use for traces returned via streams.
-class StreamCompression {
-  static const none = StreamCompression._('none');
-  static const gzip = StreamCompression._('gzip');
-  static const values = {
-    'none': none,
-    'gzip': gzip,
-  };
+enum StreamCompression {
+  none('none'),
+  gzip('gzip'),
+  ;
 
   final String value;
 
-  const StreamCompression._(this.value);
+  const StreamCompression(this.value);
 
-  factory StreamCompression.fromJson(String value) => values[value]!;
+  factory StreamCompression.fromJson(String value) =>
+      StreamCompression.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is StreamCompression && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -377,31 +345,20 @@ class StreamCompression {
 /// Details exposed when memory request explicitly declared.
 /// Keep consistent with memory_dump_request_args.h and
 /// memory_instrumentation.mojom
-class MemoryDumpLevelOfDetail {
-  static const background = MemoryDumpLevelOfDetail._('background');
-  static const light = MemoryDumpLevelOfDetail._('light');
-  static const detailed = MemoryDumpLevelOfDetail._('detailed');
-  static const values = {
-    'background': background,
-    'light': light,
-    'detailed': detailed,
-  };
+enum MemoryDumpLevelOfDetail {
+  background('background'),
+  light('light'),
+  detailed('detailed'),
+  ;
 
   final String value;
 
-  const MemoryDumpLevelOfDetail._(this.value);
+  const MemoryDumpLevelOfDetail(this.value);
 
-  factory MemoryDumpLevelOfDetail.fromJson(String value) => values[value]!;
+  factory MemoryDumpLevelOfDetail.fromJson(String value) =>
+      MemoryDumpLevelOfDetail.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is MemoryDumpLevelOfDetail && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -412,30 +369,20 @@ class MemoryDumpLevelOfDetail {
 /// supported on Chrome OS and uses the Perfetto system tracing service.
 /// `auto` chooses `system` when the perfettoConfig provided to Tracing.start
 /// specifies at least one non-Chrome data source; otherwise uses `chrome`.
-class TracingBackend {
-  static const auto = TracingBackend._('auto');
-  static const chrome = TracingBackend._('chrome');
-  static const system = TracingBackend._('system');
-  static const values = {
-    'auto': auto,
-    'chrome': chrome,
-    'system': system,
-  };
+enum TracingBackend {
+  auto('auto'),
+  chrome('chrome'),
+  system('system'),
+  ;
 
   final String value;
 
-  const TracingBackend._(this.value);
+  const TracingBackend(this.value);
 
-  factory TracingBackend.fromJson(String value) => values[value]!;
+  factory TracingBackend.fromJson(String value) =>
+      TracingBackend.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is TracingBackend && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

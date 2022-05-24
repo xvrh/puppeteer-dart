@@ -96,28 +96,19 @@ class GetDOMCountersResult {
 }
 
 /// Memory pressure level.
-class PressureLevel {
-  static const moderate = PressureLevel._('moderate');
-  static const critical = PressureLevel._('critical');
-  static const values = {
-    'moderate': moderate,
-    'critical': critical,
-  };
+enum PressureLevel {
+  moderate('moderate'),
+  critical('critical'),
+  ;
 
   final String value;
 
-  const PressureLevel._(this.value);
+  const PressureLevel(this.value);
 
-  factory PressureLevel.fromJson(String value) => values[value]!;
+  factory PressureLevel.fromJson(String value) =>
+      PressureLevel.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is PressureLevel && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

@@ -434,65 +434,42 @@ class TouchPoint {
   }
 }
 
-class GestureSourceType {
-  static const default$ = GestureSourceType._('default');
-  static const touch = GestureSourceType._('touch');
-  static const mouse = GestureSourceType._('mouse');
-  static const values = {
-    'default': default$,
-    'touch': touch,
-    'mouse': mouse,
-  };
+enum GestureSourceType {
+  default$('default'),
+  touch('touch'),
+  mouse('mouse'),
+  ;
 
   final String value;
 
-  const GestureSourceType._(this.value);
+  const GestureSourceType(this.value);
 
-  factory GestureSourceType.fromJson(String value) => values[value]!;
+  factory GestureSourceType.fromJson(String value) =>
+      GestureSourceType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is GestureSourceType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class MouseButton {
-  static const none = MouseButton._('none');
-  static const left = MouseButton._('left');
-  static const middle = MouseButton._('middle');
-  static const right = MouseButton._('right');
-  static const back = MouseButton._('back');
-  static const forward = MouseButton._('forward');
-  static const values = {
-    'none': none,
-    'left': left,
-    'middle': middle,
-    'right': right,
-    'back': back,
-    'forward': forward,
-  };
+enum MouseButton {
+  none('none'),
+  left('left'),
+  middle('middle'),
+  right('right'),
+  back('back'),
+  forward('forward'),
+  ;
 
   final String value;
 
-  const MouseButton._(this.value);
+  const MouseButton(this.value);
 
-  factory MouseButton.fromJson(String value) => values[value]!;
+  factory MouseButton.fromJson(String value) =>
+      MouseButton.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is MouseButton && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

@@ -124,90 +124,58 @@ class AuthenticatorId {
   String toString() => value.toString();
 }
 
-class AuthenticatorProtocol {
-  static const u2f = AuthenticatorProtocol._('u2f');
-  static const ctap2 = AuthenticatorProtocol._('ctap2');
-  static const values = {
-    'u2f': u2f,
-    'ctap2': ctap2,
-  };
+enum AuthenticatorProtocol {
+  u2f('u2f'),
+  ctap2('ctap2'),
+  ;
 
   final String value;
 
-  const AuthenticatorProtocol._(this.value);
+  const AuthenticatorProtocol(this.value);
 
-  factory AuthenticatorProtocol.fromJson(String value) => values[value]!;
+  factory AuthenticatorProtocol.fromJson(String value) =>
+      AuthenticatorProtocol.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is AuthenticatorProtocol && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class Ctap2Version {
-  static const ctap20 = Ctap2Version._('ctap2_0');
-  static const ctap21 = Ctap2Version._('ctap2_1');
-  static const values = {
-    'ctap2_0': ctap20,
-    'ctap2_1': ctap21,
-  };
+enum Ctap2Version {
+  ctap20('ctap2_0'),
+  ctap21('ctap2_1'),
+  ;
 
   final String value;
 
-  const Ctap2Version._(this.value);
+  const Ctap2Version(this.value);
 
-  factory Ctap2Version.fromJson(String value) => values[value]!;
+  factory Ctap2Version.fromJson(String value) =>
+      Ctap2Version.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is Ctap2Version && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class AuthenticatorTransport {
-  static const usb = AuthenticatorTransport._('usb');
-  static const nfc = AuthenticatorTransport._('nfc');
-  static const ble = AuthenticatorTransport._('ble');
-  static const cable = AuthenticatorTransport._('cable');
-  static const internal = AuthenticatorTransport._('internal');
-  static const values = {
-    'usb': usb,
-    'nfc': nfc,
-    'ble': ble,
-    'cable': cable,
-    'internal': internal,
-  };
+enum AuthenticatorTransport {
+  usb('usb'),
+  nfc('nfc'),
+  ble('ble'),
+  cable('cable'),
+  internal('internal'),
+  ;
 
   final String value;
 
-  const AuthenticatorTransport._(this.value);
+  const AuthenticatorTransport(this.value);
 
-  factory AuthenticatorTransport.fromJson(String value) => values[value]!;
+  factory AuthenticatorTransport.fromJson(String value) =>
+      AuthenticatorTransport.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is AuthenticatorTransport && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

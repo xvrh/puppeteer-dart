@@ -669,28 +669,19 @@ class LineStyle {
   }
 }
 
-class LineStylePattern {
-  static const dashed = LineStylePattern._('dashed');
-  static const dotted = LineStylePattern._('dotted');
-  static const values = {
-    'dashed': dashed,
-    'dotted': dotted,
-  };
+enum LineStylePattern {
+  dashed('dashed'),
+  dotted('dotted'),
+  ;
 
   final String value;
 
-  const LineStylePattern._(this.value);
+  const LineStylePattern(this.value);
 
-  factory LineStylePattern.fromJson(String value) => values[value]!;
+  factory LineStylePattern.fromJson(String value) =>
+      LineStylePattern.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is LineStylePattern && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -725,30 +716,20 @@ class BoxStyle {
   }
 }
 
-class ContrastAlgorithm {
-  static const aa = ContrastAlgorithm._('aa');
-  static const aaa = ContrastAlgorithm._('aaa');
-  static const apca = ContrastAlgorithm._('apca');
-  static const values = {
-    'aa': aa,
-    'aaa': aaa,
-    'apca': apca,
-  };
+enum ContrastAlgorithm {
+  aa('aa'),
+  aaa('aaa'),
+  apca('apca'),
+  ;
 
   final String value;
 
-  const ContrastAlgorithm._(this.value);
+  const ContrastAlgorithm(this.value);
 
-  factory ContrastAlgorithm.fromJson(String value) => values[value]!;
+  factory ContrastAlgorithm.fromJson(String value) =>
+      ContrastAlgorithm.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ContrastAlgorithm && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -934,32 +915,21 @@ class HighlightConfig {
   }
 }
 
-class ColorFormat {
-  static const rgb = ColorFormat._('rgb');
-  static const hsl = ColorFormat._('hsl');
-  static const hwb = ColorFormat._('hwb');
-  static const hex = ColorFormat._('hex');
-  static const values = {
-    'rgb': rgb,
-    'hsl': hsl,
-    'hwb': hwb,
-    'hex': hex,
-  };
+enum ColorFormat {
+  rgb('rgb'),
+  hsl('hsl'),
+  hwb('hwb'),
+  hex('hex'),
+  ;
 
   final String value;
 
-  const ColorFormat._(this.value);
+  const ColorFormat(this.value);
 
-  factory ColorFormat.fromJson(String value) => values[value]!;
+  factory ColorFormat.fromJson(String value) =>
+      ColorFormat.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ColorFormat && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1257,34 +1227,22 @@ class IsolationModeHighlightConfig {
   }
 }
 
-class InspectMode {
-  static const searchForNode = InspectMode._('searchForNode');
-  static const searchForUaShadowDom = InspectMode._('searchForUAShadowDOM');
-  static const captureAreaScreenshot = InspectMode._('captureAreaScreenshot');
-  static const showDistances = InspectMode._('showDistances');
-  static const none = InspectMode._('none');
-  static const values = {
-    'searchForNode': searchForNode,
-    'searchForUAShadowDOM': searchForUaShadowDom,
-    'captureAreaScreenshot': captureAreaScreenshot,
-    'showDistances': showDistances,
-    'none': none,
-  };
+enum InspectMode {
+  searchForNode('searchForNode'),
+  searchForUaShadowDom('searchForUAShadowDOM'),
+  captureAreaScreenshot('captureAreaScreenshot'),
+  showDistances('showDistances'),
+  none('none'),
+  ;
 
   final String value;
 
-  const InspectMode._(this.value);
+  const InspectMode(this.value);
 
-  factory InspectMode.fromJson(String value) => values[value]!;
+  factory InspectMode.fromJson(String value) =>
+      InspectMode.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is InspectMode && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

@@ -760,70 +760,40 @@ class WebDriverValue {
   }
 }
 
-class WebDriverValueType {
-  static const undefined = WebDriverValueType._('undefined');
-  static const null$ = WebDriverValueType._('null');
-  static const string = WebDriverValueType._('string');
-  static const number = WebDriverValueType._('number');
-  static const boolean = WebDriverValueType._('boolean');
-  static const bigint = WebDriverValueType._('bigint');
-  static const regexp = WebDriverValueType._('regexp');
-  static const date = WebDriverValueType._('date');
-  static const symbol = WebDriverValueType._('symbol');
-  static const array = WebDriverValueType._('array');
-  static const object = WebDriverValueType._('object');
-  static const function = WebDriverValueType._('function');
-  static const map = WebDriverValueType._('map');
-  static const set = WebDriverValueType._('set');
-  static const weakmap = WebDriverValueType._('weakmap');
-  static const weakset = WebDriverValueType._('weakset');
-  static const error = WebDriverValueType._('error');
-  static const proxy = WebDriverValueType._('proxy');
-  static const promise = WebDriverValueType._('promise');
-  static const typedarray = WebDriverValueType._('typedarray');
-  static const arraybuffer = WebDriverValueType._('arraybuffer');
-  static const node = WebDriverValueType._('node');
-  static const window = WebDriverValueType._('window');
-  static const values = {
-    'undefined': undefined,
-    'null': null$,
-    'string': string,
-    'number': number,
-    'boolean': boolean,
-    'bigint': bigint,
-    'regexp': regexp,
-    'date': date,
-    'symbol': symbol,
-    'array': array,
-    'object': object,
-    'function': function,
-    'map': map,
-    'set': set,
-    'weakmap': weakmap,
-    'weakset': weakset,
-    'error': error,
-    'proxy': proxy,
-    'promise': promise,
-    'typedarray': typedarray,
-    'arraybuffer': arraybuffer,
-    'node': node,
-    'window': window,
-  };
+enum WebDriverValueType {
+  undefined('undefined'),
+  null$('null'),
+  string('string'),
+  number('number'),
+  boolean('boolean'),
+  bigint('bigint'),
+  regexp('regexp'),
+  date('date'),
+  symbol('symbol'),
+  array('array'),
+  object('object'),
+  function('function'),
+  map('map'),
+  set('set'),
+  weakmap('weakmap'),
+  weakset('weakset'),
+  error('error'),
+  proxy('proxy'),
+  promise('promise'),
+  typedarray('typedarray'),
+  arraybuffer('arraybuffer'),
+  node('node'),
+  window('window'),
+  ;
 
   final String value;
 
-  const WebDriverValueType._(this.value);
+  const WebDriverValueType(this.value);
 
-  factory WebDriverValueType.fromJson(String value) => values[value]!;
+  factory WebDriverValueType.fromJson(String value) =>
+      WebDriverValueType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is WebDriverValueType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -968,101 +938,60 @@ class RemoteObject {
   }
 }
 
-class RemoteObjectType {
-  static const object = RemoteObjectType._('object');
-  static const function = RemoteObjectType._('function');
-  static const undefined = RemoteObjectType._('undefined');
-  static const string = RemoteObjectType._('string');
-  static const number = RemoteObjectType._('number');
-  static const boolean = RemoteObjectType._('boolean');
-  static const symbol = RemoteObjectType._('symbol');
-  static const bigint = RemoteObjectType._('bigint');
-  static const values = {
-    'object': object,
-    'function': function,
-    'undefined': undefined,
-    'string': string,
-    'number': number,
-    'boolean': boolean,
-    'symbol': symbol,
-    'bigint': bigint,
-  };
+enum RemoteObjectType {
+  object('object'),
+  function('function'),
+  undefined('undefined'),
+  string('string'),
+  number('number'),
+  boolean('boolean'),
+  symbol('symbol'),
+  bigint('bigint'),
+  ;
 
   final String value;
 
-  const RemoteObjectType._(this.value);
+  const RemoteObjectType(this.value);
 
-  factory RemoteObjectType.fromJson(String value) => values[value]!;
+  factory RemoteObjectType.fromJson(String value) =>
+      RemoteObjectType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is RemoteObjectType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class RemoteObjectSubtype {
-  static const array = RemoteObjectSubtype._('array');
-  static const null$ = RemoteObjectSubtype._('null');
-  static const node = RemoteObjectSubtype._('node');
-  static const regexp = RemoteObjectSubtype._('regexp');
-  static const date = RemoteObjectSubtype._('date');
-  static const map = RemoteObjectSubtype._('map');
-  static const set = RemoteObjectSubtype._('set');
-  static const weakmap = RemoteObjectSubtype._('weakmap');
-  static const weakset = RemoteObjectSubtype._('weakset');
-  static const iterator = RemoteObjectSubtype._('iterator');
-  static const generator = RemoteObjectSubtype._('generator');
-  static const error = RemoteObjectSubtype._('error');
-  static const proxy = RemoteObjectSubtype._('proxy');
-  static const promise = RemoteObjectSubtype._('promise');
-  static const typedarray = RemoteObjectSubtype._('typedarray');
-  static const arraybuffer = RemoteObjectSubtype._('arraybuffer');
-  static const dataview = RemoteObjectSubtype._('dataview');
-  static const webassemblymemory = RemoteObjectSubtype._('webassemblymemory');
-  static const wasmvalue = RemoteObjectSubtype._('wasmvalue');
-  static const values = {
-    'array': array,
-    'null': null$,
-    'node': node,
-    'regexp': regexp,
-    'date': date,
-    'map': map,
-    'set': set,
-    'weakmap': weakmap,
-    'weakset': weakset,
-    'iterator': iterator,
-    'generator': generator,
-    'error': error,
-    'proxy': proxy,
-    'promise': promise,
-    'typedarray': typedarray,
-    'arraybuffer': arraybuffer,
-    'dataview': dataview,
-    'webassemblymemory': webassemblymemory,
-    'wasmvalue': wasmvalue,
-  };
+enum RemoteObjectSubtype {
+  array('array'),
+  null$('null'),
+  node('node'),
+  regexp('regexp'),
+  date('date'),
+  map('map'),
+  set('set'),
+  weakmap('weakmap'),
+  weakset('weakset'),
+  iterator('iterator'),
+  generator('generator'),
+  error('error'),
+  proxy('proxy'),
+  promise('promise'),
+  typedarray('typedarray'),
+  arraybuffer('arraybuffer'),
+  dataview('dataview'),
+  webassemblymemory('webassemblymemory'),
+  wasmvalue('wasmvalue'),
+  ;
 
   final String value;
 
-  const RemoteObjectSubtype._(this.value);
+  const RemoteObjectSubtype(this.value);
 
-  factory RemoteObjectSubtype.fromJson(String value) => values[value]!;
+  factory RemoteObjectSubtype.fromJson(String value) =>
+      RemoteObjectSubtype.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is RemoteObjectSubtype && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1158,101 +1087,60 @@ class ObjectPreview {
   }
 }
 
-class ObjectPreviewType {
-  static const object = ObjectPreviewType._('object');
-  static const function = ObjectPreviewType._('function');
-  static const undefined = ObjectPreviewType._('undefined');
-  static const string = ObjectPreviewType._('string');
-  static const number = ObjectPreviewType._('number');
-  static const boolean = ObjectPreviewType._('boolean');
-  static const symbol = ObjectPreviewType._('symbol');
-  static const bigint = ObjectPreviewType._('bigint');
-  static const values = {
-    'object': object,
-    'function': function,
-    'undefined': undefined,
-    'string': string,
-    'number': number,
-    'boolean': boolean,
-    'symbol': symbol,
-    'bigint': bigint,
-  };
+enum ObjectPreviewType {
+  object('object'),
+  function('function'),
+  undefined('undefined'),
+  string('string'),
+  number('number'),
+  boolean('boolean'),
+  symbol('symbol'),
+  bigint('bigint'),
+  ;
 
   final String value;
 
-  const ObjectPreviewType._(this.value);
+  const ObjectPreviewType(this.value);
 
-  factory ObjectPreviewType.fromJson(String value) => values[value]!;
+  factory ObjectPreviewType.fromJson(String value) =>
+      ObjectPreviewType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ObjectPreviewType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class ObjectPreviewSubtype {
-  static const array = ObjectPreviewSubtype._('array');
-  static const null$ = ObjectPreviewSubtype._('null');
-  static const node = ObjectPreviewSubtype._('node');
-  static const regexp = ObjectPreviewSubtype._('regexp');
-  static const date = ObjectPreviewSubtype._('date');
-  static const map = ObjectPreviewSubtype._('map');
-  static const set = ObjectPreviewSubtype._('set');
-  static const weakmap = ObjectPreviewSubtype._('weakmap');
-  static const weakset = ObjectPreviewSubtype._('weakset');
-  static const iterator = ObjectPreviewSubtype._('iterator');
-  static const generator = ObjectPreviewSubtype._('generator');
-  static const error = ObjectPreviewSubtype._('error');
-  static const proxy = ObjectPreviewSubtype._('proxy');
-  static const promise = ObjectPreviewSubtype._('promise');
-  static const typedarray = ObjectPreviewSubtype._('typedarray');
-  static const arraybuffer = ObjectPreviewSubtype._('arraybuffer');
-  static const dataview = ObjectPreviewSubtype._('dataview');
-  static const webassemblymemory = ObjectPreviewSubtype._('webassemblymemory');
-  static const wasmvalue = ObjectPreviewSubtype._('wasmvalue');
-  static const values = {
-    'array': array,
-    'null': null$,
-    'node': node,
-    'regexp': regexp,
-    'date': date,
-    'map': map,
-    'set': set,
-    'weakmap': weakmap,
-    'weakset': weakset,
-    'iterator': iterator,
-    'generator': generator,
-    'error': error,
-    'proxy': proxy,
-    'promise': promise,
-    'typedarray': typedarray,
-    'arraybuffer': arraybuffer,
-    'dataview': dataview,
-    'webassemblymemory': webassemblymemory,
-    'wasmvalue': wasmvalue,
-  };
+enum ObjectPreviewSubtype {
+  array('array'),
+  null$('null'),
+  node('node'),
+  regexp('regexp'),
+  date('date'),
+  map('map'),
+  set('set'),
+  weakmap('weakmap'),
+  weakset('weakset'),
+  iterator('iterator'),
+  generator('generator'),
+  error('error'),
+  proxy('proxy'),
+  promise('promise'),
+  typedarray('typedarray'),
+  arraybuffer('arraybuffer'),
+  dataview('dataview'),
+  webassemblymemory('webassemblymemory'),
+  wasmvalue('wasmvalue'),
+  ;
 
   final String value;
 
-  const ObjectPreviewSubtype._(this.value);
+  const ObjectPreviewSubtype(this.value);
 
-  factory ObjectPreviewSubtype.fromJson(String value) => values[value]!;
+  factory ObjectPreviewSubtype.fromJson(String value) =>
+      ObjectPreviewSubtype.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ObjectPreviewSubtype && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1306,105 +1194,61 @@ class PropertyPreview {
   }
 }
 
-class PropertyPreviewType {
-  static const object = PropertyPreviewType._('object');
-  static const function = PropertyPreviewType._('function');
-  static const undefined = PropertyPreviewType._('undefined');
-  static const string = PropertyPreviewType._('string');
-  static const number = PropertyPreviewType._('number');
-  static const boolean = PropertyPreviewType._('boolean');
-  static const symbol = PropertyPreviewType._('symbol');
-  static const accessor = PropertyPreviewType._('accessor');
-  static const bigint = PropertyPreviewType._('bigint');
-  static const values = {
-    'object': object,
-    'function': function,
-    'undefined': undefined,
-    'string': string,
-    'number': number,
-    'boolean': boolean,
-    'symbol': symbol,
-    'accessor': accessor,
-    'bigint': bigint,
-  };
+enum PropertyPreviewType {
+  object('object'),
+  function('function'),
+  undefined('undefined'),
+  string('string'),
+  number('number'),
+  boolean('boolean'),
+  symbol('symbol'),
+  accessor('accessor'),
+  bigint('bigint'),
+  ;
 
   final String value;
 
-  const PropertyPreviewType._(this.value);
+  const PropertyPreviewType(this.value);
 
-  factory PropertyPreviewType.fromJson(String value) => values[value]!;
+  factory PropertyPreviewType.fromJson(String value) =>
+      PropertyPreviewType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is PropertyPreviewType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class PropertyPreviewSubtype {
-  static const array = PropertyPreviewSubtype._('array');
-  static const null$ = PropertyPreviewSubtype._('null');
-  static const node = PropertyPreviewSubtype._('node');
-  static const regexp = PropertyPreviewSubtype._('regexp');
-  static const date = PropertyPreviewSubtype._('date');
-  static const map = PropertyPreviewSubtype._('map');
-  static const set = PropertyPreviewSubtype._('set');
-  static const weakmap = PropertyPreviewSubtype._('weakmap');
-  static const weakset = PropertyPreviewSubtype._('weakset');
-  static const iterator = PropertyPreviewSubtype._('iterator');
-  static const generator = PropertyPreviewSubtype._('generator');
-  static const error = PropertyPreviewSubtype._('error');
-  static const proxy = PropertyPreviewSubtype._('proxy');
-  static const promise = PropertyPreviewSubtype._('promise');
-  static const typedarray = PropertyPreviewSubtype._('typedarray');
-  static const arraybuffer = PropertyPreviewSubtype._('arraybuffer');
-  static const dataview = PropertyPreviewSubtype._('dataview');
-  static const webassemblymemory =
-      PropertyPreviewSubtype._('webassemblymemory');
-  static const wasmvalue = PropertyPreviewSubtype._('wasmvalue');
-  static const values = {
-    'array': array,
-    'null': null$,
-    'node': node,
-    'regexp': regexp,
-    'date': date,
-    'map': map,
-    'set': set,
-    'weakmap': weakmap,
-    'weakset': weakset,
-    'iterator': iterator,
-    'generator': generator,
-    'error': error,
-    'proxy': proxy,
-    'promise': promise,
-    'typedarray': typedarray,
-    'arraybuffer': arraybuffer,
-    'dataview': dataview,
-    'webassemblymemory': webassemblymemory,
-    'wasmvalue': wasmvalue,
-  };
+enum PropertyPreviewSubtype {
+  array('array'),
+  null$('null'),
+  node('node'),
+  regexp('regexp'),
+  date('date'),
+  map('map'),
+  set('set'),
+  weakmap('weakmap'),
+  weakset('weakset'),
+  iterator('iterator'),
+  generator('generator'),
+  error('error'),
+  proxy('proxy'),
+  promise('promise'),
+  typedarray('typedarray'),
+  arraybuffer('arraybuffer'),
+  dataview('dataview'),
+  webassemblymemory('webassemblymemory'),
+  wasmvalue('wasmvalue'),
+  ;
 
   final String value;
 
-  const PropertyPreviewSubtype._(this.value);
+  const PropertyPreviewSubtype(this.value);
 
-  factory PropertyPreviewSubtype.fromJson(String value) => values[value]!;
+  factory PropertyPreviewSubtype.fromJson(String value) =>
+      PropertyPreviewSubtype.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is PropertyPreviewSubtype && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1970,62 +1814,35 @@ class StackTraceId {
   }
 }
 
-class ConsoleAPICalledEventType {
-  static const log = ConsoleAPICalledEventType._('log');
-  static const debug = ConsoleAPICalledEventType._('debug');
-  static const info = ConsoleAPICalledEventType._('info');
-  static const error = ConsoleAPICalledEventType._('error');
-  static const warning = ConsoleAPICalledEventType._('warning');
-  static const dir = ConsoleAPICalledEventType._('dir');
-  static const dirxml = ConsoleAPICalledEventType._('dirxml');
-  static const table = ConsoleAPICalledEventType._('table');
-  static const trace = ConsoleAPICalledEventType._('trace');
-  static const clear = ConsoleAPICalledEventType._('clear');
-  static const startGroup = ConsoleAPICalledEventType._('startGroup');
-  static const startGroupCollapsed =
-      ConsoleAPICalledEventType._('startGroupCollapsed');
-  static const endGroup = ConsoleAPICalledEventType._('endGroup');
-  static const assert$ = ConsoleAPICalledEventType._('assert');
-  static const profile = ConsoleAPICalledEventType._('profile');
-  static const profileEnd = ConsoleAPICalledEventType._('profileEnd');
-  static const count = ConsoleAPICalledEventType._('count');
-  static const timeEnd = ConsoleAPICalledEventType._('timeEnd');
-  static const values = {
-    'log': log,
-    'debug': debug,
-    'info': info,
-    'error': error,
-    'warning': warning,
-    'dir': dir,
-    'dirxml': dirxml,
-    'table': table,
-    'trace': trace,
-    'clear': clear,
-    'startGroup': startGroup,
-    'startGroupCollapsed': startGroupCollapsed,
-    'endGroup': endGroup,
-    'assert': assert$,
-    'profile': profile,
-    'profileEnd': profileEnd,
-    'count': count,
-    'timeEnd': timeEnd,
-  };
+enum ConsoleAPICalledEventType {
+  log('log'),
+  debug('debug'),
+  info('info'),
+  error('error'),
+  warning('warning'),
+  dir('dir'),
+  dirxml('dirxml'),
+  table('table'),
+  trace('trace'),
+  clear('clear'),
+  startGroup('startGroup'),
+  startGroupCollapsed('startGroupCollapsed'),
+  endGroup('endGroup'),
+  assert$('assert'),
+  profile('profile'),
+  profileEnd('profileEnd'),
+  count('count'),
+  timeEnd('timeEnd'),
+  ;
 
   final String value;
 
-  const ConsoleAPICalledEventType._(this.value);
+  const ConsoleAPICalledEventType(this.value);
 
-  factory ConsoleAPICalledEventType.fromJson(String value) => values[value]!;
+  factory ConsoleAPICalledEventType.fromJson(String value) =>
+      ConsoleAPICalledEventType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ConsoleAPICalledEventType && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

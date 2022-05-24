@@ -291,7 +291,7 @@ class CssCoverage {
       _devTools.dom.disable(),
     ]);
     for (var sub in _subscriptions) {
-      sub.cancel();
+      await sub.cancel();
     }
 
     // aggregate by styleSheetId

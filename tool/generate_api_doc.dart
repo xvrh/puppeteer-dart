@@ -41,7 +41,7 @@ void main() {
     var unit = parseString(
         content: fileContent,
         featureSet: FeatureSet.fromEnableFlags2(
-            sdkLanguageVersion: Version(2, 12, 0), flags: [])).unit;
+            sdkLanguageVersion: Version(2, 17, 0), flags: [])).unit;
 
     classes.addAll(unit.declarations
         .whereType<ClassDeclaration>()

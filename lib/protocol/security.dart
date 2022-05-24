@@ -130,66 +130,43 @@ class CertificateId {
 
 /// A description of mixed content (HTTP resources on HTTPS pages), as defined by
 /// https://www.w3.org/TR/mixed-content/#categories
-class MixedContentType {
-  static const blockable = MixedContentType._('blockable');
-  static const optionallyBlockable = MixedContentType._('optionally-blockable');
-  static const none = MixedContentType._('none');
-  static const values = {
-    'blockable': blockable,
-    'optionally-blockable': optionallyBlockable,
-    'none': none,
-  };
+enum MixedContentType {
+  blockable('blockable'),
+  optionallyBlockable('optionally-blockable'),
+  none('none'),
+  ;
 
   final String value;
 
-  const MixedContentType._(this.value);
+  const MixedContentType(this.value);
 
-  factory MixedContentType.fromJson(String value) => values[value]!;
+  factory MixedContentType.fromJson(String value) =>
+      MixedContentType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is MixedContentType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// The security level of a page or resource.
-class SecurityState {
-  static const unknown = SecurityState._('unknown');
-  static const neutral = SecurityState._('neutral');
-  static const insecure = SecurityState._('insecure');
-  static const secure = SecurityState._('secure');
-  static const info = SecurityState._('info');
-  static const insecureBroken = SecurityState._('insecure-broken');
-  static const values = {
-    'unknown': unknown,
-    'neutral': neutral,
-    'insecure': insecure,
-    'secure': secure,
-    'info': info,
-    'insecure-broken': insecureBroken,
-  };
+enum SecurityState {
+  unknown('unknown'),
+  neutral('neutral'),
+  insecure('insecure'),
+  secure('secure'),
+  info('info'),
+  insecureBroken('insecure-broken'),
+  ;
 
   final String value;
 
-  const SecurityState._(this.value);
+  const SecurityState(this.value);
 
-  factory SecurityState.fromJson(String value) => values[value]!;
+  factory SecurityState.fromJson(String value) =>
+      SecurityState.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is SecurityState && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -326,28 +303,19 @@ class CertificateSecurityState {
   }
 }
 
-class SafetyTipStatus {
-  static const badReputation = SafetyTipStatus._('badReputation');
-  static const lookalike = SafetyTipStatus._('lookalike');
-  static const values = {
-    'badReputation': badReputation,
-    'lookalike': lookalike,
-  };
+enum SafetyTipStatus {
+  badReputation('badReputation'),
+  lookalike('lookalike'),
+  ;
 
   final String value;
 
-  const SafetyTipStatus._(this.value);
+  const SafetyTipStatus(this.value);
 
-  factory SafetyTipStatus.fromJson(String value) => values[value]!;
+  factory SafetyTipStatus.fromJson(String value) =>
+      SafetyTipStatus.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is SafetyTipStatus && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -550,29 +518,19 @@ class InsecureContentStatus {
 
 /// The action to take when a certificate error occurs. continue will continue processing the
 /// request and cancel will cancel the request.
-class CertificateErrorAction {
-  static const continue$ = CertificateErrorAction._('continue');
-  static const cancel = CertificateErrorAction._('cancel');
-  static const values = {
-    'continue': continue$,
-    'cancel': cancel,
-  };
+enum CertificateErrorAction {
+  continue$('continue'),
+  cancel('cancel'),
+  ;
 
   final String value;
 
-  const CertificateErrorAction._(this.value);
+  const CertificateErrorAction(this.value);
 
-  factory CertificateErrorAction.fromJson(String value) => values[value]!;
+  factory CertificateErrorAction.fromJson(String value) =>
+      CertificateErrorAction.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CertificateErrorAction && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

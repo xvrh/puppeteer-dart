@@ -37,7 +37,7 @@ void main() {
 final _formatter = DartFormatter();
 
 final _featureSet = FeatureSet.fromEnableFlags2(
-    sdkLanguageVersion: Version(2, 12, 0), flags: []);
+    sdkLanguageVersion: Version(2, 17, 0), flags: []);
 
 String replaceExamples(String sourceFile, List<CodeSnippet> snippets) {
   var unit = parseString(content: sourceFile, featureSet: _featureSet).unit;

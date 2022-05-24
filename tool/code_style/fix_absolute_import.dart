@@ -31,7 +31,7 @@ bool fixFile(DartFile dartFile) {
 }
 
 final featureSet = FeatureSet.fromEnableFlags2(
-    sdkLanguageVersion: Version(2, 12, 0), flags: []);
+    sdkLanguageVersion: Version(2, 17, 0), flags: []);
 
 String fixCode(DartFile dartFile, String content) {
   try {

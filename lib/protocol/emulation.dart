@@ -356,34 +356,21 @@ class ScreenOrientation {
   }
 }
 
-class ScreenOrientationType {
-  static const portraitPrimary = ScreenOrientationType._('portraitPrimary');
-  static const portraitSecondary = ScreenOrientationType._('portraitSecondary');
-  static const landscapePrimary = ScreenOrientationType._('landscapePrimary');
-  static const landscapeSecondary =
-      ScreenOrientationType._('landscapeSecondary');
-  static const values = {
-    'portraitPrimary': portraitPrimary,
-    'portraitSecondary': portraitSecondary,
-    'landscapePrimary': landscapePrimary,
-    'landscapeSecondary': landscapeSecondary,
-  };
+enum ScreenOrientationType {
+  portraitPrimary('portraitPrimary'),
+  portraitSecondary('portraitSecondary'),
+  landscapePrimary('landscapePrimary'),
+  landscapeSecondary('landscapeSecondary'),
+  ;
 
   final String value;
 
-  const ScreenOrientationType._(this.value);
+  const ScreenOrientationType(this.value);
 
-  factory ScreenOrientationType.fromJson(String value) => values[value]!;
+  factory ScreenOrientationType.fromJson(String value) =>
+      ScreenOrientationType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ScreenOrientationType && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -425,29 +412,19 @@ class DisplayFeature {
   }
 }
 
-class DisplayFeatureOrientation {
-  static const vertical = DisplayFeatureOrientation._('vertical');
-  static const horizontal = DisplayFeatureOrientation._('horizontal');
-  static const values = {
-    'vertical': vertical,
-    'horizontal': horizontal,
-  };
+enum DisplayFeatureOrientation {
+  vertical('vertical'),
+  horizontal('horizontal'),
+  ;
 
   final String value;
 
-  const DisplayFeatureOrientation._(this.value);
+  const DisplayFeatureOrientation(this.value);
 
-  factory DisplayFeatureOrientation.fromJson(String value) => values[value]!;
+  factory DisplayFeatureOrientation.fromJson(String value) =>
+      DisplayFeatureOrientation.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is DisplayFeatureOrientation && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -479,31 +456,20 @@ class MediaFeature {
 /// allow the next delayed task (if any) to run; pause: The virtual time base may not advance;
 /// pauseIfNetworkFetchesPending: The virtual time base may not advance if there are any pending
 /// resource fetches.
-class VirtualTimePolicy {
-  static const advance = VirtualTimePolicy._('advance');
-  static const pause = VirtualTimePolicy._('pause');
-  static const pauseIfNetworkFetchesPending =
-      VirtualTimePolicy._('pauseIfNetworkFetchesPending');
-  static const values = {
-    'advance': advance,
-    'pause': pause,
-    'pauseIfNetworkFetchesPending': pauseIfNetworkFetchesPending,
-  };
+enum VirtualTimePolicy {
+  advance('advance'),
+  pause('pause'),
+  pauseIfNetworkFetchesPending('pauseIfNetworkFetchesPending'),
+  ;
 
   final String value;
 
-  const VirtualTimePolicy._(this.value);
+  const VirtualTimePolicy(this.value);
 
-  factory VirtualTimePolicy.fromJson(String value) => values[value]!;
+  factory VirtualTimePolicy.fromJson(String value) =>
+      VirtualTimePolicy.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is VirtualTimePolicy && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -595,30 +561,20 @@ class UserAgentMetadata {
 }
 
 /// Enum of image types that can be disabled.
-class DisabledImageType {
-  static const avif = DisabledImageType._('avif');
-  static const jxl = DisabledImageType._('jxl');
-  static const webp = DisabledImageType._('webp');
-  static const values = {
-    'avif': avif,
-    'jxl': jxl,
-    'webp': webp,
-  };
+enum DisabledImageType {
+  avif('avif'),
+  jxl('jxl'),
+  webp('webp'),
+  ;
 
   final String value;
 
-  const DisabledImageType._(this.value);
+  const DisabledImageType(this.value);
 
-  factory DisabledImageType.fromJson(String value) => values[value]!;
+  factory DisabledImageType.fromJson(String value) =>
+      DisabledImageType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is DisabledImageType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

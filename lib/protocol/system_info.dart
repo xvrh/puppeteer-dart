@@ -222,60 +222,40 @@ class VideoEncodeAcceleratorCapability {
 }
 
 /// YUV subsampling type of the pixels of a given image.
-class SubsamplingFormat {
-  static const yuv420 = SubsamplingFormat._('yuv420');
-  static const yuv422 = SubsamplingFormat._('yuv422');
-  static const yuv444 = SubsamplingFormat._('yuv444');
-  static const values = {
-    'yuv420': yuv420,
-    'yuv422': yuv422,
-    'yuv444': yuv444,
-  };
+enum SubsamplingFormat {
+  yuv420('yuv420'),
+  yuv422('yuv422'),
+  yuv444('yuv444'),
+  ;
 
   final String value;
 
-  const SubsamplingFormat._(this.value);
+  const SubsamplingFormat(this.value);
 
-  factory SubsamplingFormat.fromJson(String value) => values[value]!;
+  factory SubsamplingFormat.fromJson(String value) =>
+      SubsamplingFormat.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is SubsamplingFormat && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// Image format of a given image.
-class ImageType {
-  static const jpeg = ImageType._('jpeg');
-  static const webp = ImageType._('webp');
-  static const unknown = ImageType._('unknown');
-  static const values = {
-    'jpeg': jpeg,
-    'webp': webp,
-    'unknown': unknown,
-  };
+enum ImageType {
+  jpeg('jpeg'),
+  webp('webp'),
+  unknown('unknown'),
+  ;
 
   final String value;
 
-  const ImageType._(this.value);
+  const ImageType(this.value);
 
-  factory ImageType.fromJson(String value) => values[value]!;
+  factory ImageType.fromJson(String value) =>
+      ImageType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ImageType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

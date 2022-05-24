@@ -82,79 +82,49 @@ class ConsoleMessage {
   }
 }
 
-class ConsoleMessageSource {
-  static const xml = ConsoleMessageSource._('xml');
-  static const javascript = ConsoleMessageSource._('javascript');
-  static const network = ConsoleMessageSource._('network');
-  static const consoleApi = ConsoleMessageSource._('console-api');
-  static const storage = ConsoleMessageSource._('storage');
-  static const appcache = ConsoleMessageSource._('appcache');
-  static const rendering = ConsoleMessageSource._('rendering');
-  static const security = ConsoleMessageSource._('security');
-  static const other = ConsoleMessageSource._('other');
-  static const deprecation = ConsoleMessageSource._('deprecation');
-  static const worker = ConsoleMessageSource._('worker');
-  static const values = {
-    'xml': xml,
-    'javascript': javascript,
-    'network': network,
-    'console-api': consoleApi,
-    'storage': storage,
-    'appcache': appcache,
-    'rendering': rendering,
-    'security': security,
-    'other': other,
-    'deprecation': deprecation,
-    'worker': worker,
-  };
+enum ConsoleMessageSource {
+  xml('xml'),
+  javascript('javascript'),
+  network('network'),
+  consoleApi('console-api'),
+  storage('storage'),
+  appcache('appcache'),
+  rendering('rendering'),
+  security('security'),
+  other('other'),
+  deprecation('deprecation'),
+  worker('worker'),
+  ;
 
   final String value;
 
-  const ConsoleMessageSource._(this.value);
+  const ConsoleMessageSource(this.value);
 
-  factory ConsoleMessageSource.fromJson(String value) => values[value]!;
+  factory ConsoleMessageSource.fromJson(String value) =>
+      ConsoleMessageSource.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ConsoleMessageSource && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class ConsoleMessageLevel {
-  static const log = ConsoleMessageLevel._('log');
-  static const warning = ConsoleMessageLevel._('warning');
-  static const error = ConsoleMessageLevel._('error');
-  static const debug = ConsoleMessageLevel._('debug');
-  static const info = ConsoleMessageLevel._('info');
-  static const values = {
-    'log': log,
-    'warning': warning,
-    'error': error,
-    'debug': debug,
-    'info': info,
-  };
+enum ConsoleMessageLevel {
+  log('log'),
+  warning('warning'),
+  error('error'),
+  debug('debug'),
+  info('info'),
+  ;
 
   final String value;
 
-  const ConsoleMessageLevel._(this.value);
+  const ConsoleMessageLevel(this.value);
 
-  factory ConsoleMessageLevel.fromJson(String value) => values[value]!;
+  factory ConsoleMessageLevel.fromJson(String value) =>
+      ConsoleMessageLevel.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ConsoleMessageLevel && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

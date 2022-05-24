@@ -1059,138 +1059,82 @@ class BackendNode {
 }
 
 /// Pseudo element type.
-class PseudoType {
-  static const firstLine = PseudoType._('first-line');
-  static const firstLetter = PseudoType._('first-letter');
-  static const before = PseudoType._('before');
-  static const after = PseudoType._('after');
-  static const marker = PseudoType._('marker');
-  static const backdrop = PseudoType._('backdrop');
-  static const selection = PseudoType._('selection');
-  static const targetText = PseudoType._('target-text');
-  static const spellingError = PseudoType._('spelling-error');
-  static const grammarError = PseudoType._('grammar-error');
-  static const highlight = PseudoType._('highlight');
-  static const firstLineInherited = PseudoType._('first-line-inherited');
-  static const scrollbar = PseudoType._('scrollbar');
-  static const scrollbarThumb = PseudoType._('scrollbar-thumb');
-  static const scrollbarButton = PseudoType._('scrollbar-button');
-  static const scrollbarTrack = PseudoType._('scrollbar-track');
-  static const scrollbarTrackPiece = PseudoType._('scrollbar-track-piece');
-  static const scrollbarCorner = PseudoType._('scrollbar-corner');
-  static const resizer = PseudoType._('resizer');
-  static const inputListButton = PseudoType._('input-list-button');
-  static const pageTransition = PseudoType._('page-transition');
-  static const pageTransitionContainer =
-      PseudoType._('page-transition-container');
-  static const pageTransitionImageWrapper =
-      PseudoType._('page-transition-image-wrapper');
-  static const pageTransitionOutgoingImage =
-      PseudoType._('page-transition-outgoing-image');
-  static const pageTransitionIncomingImage =
-      PseudoType._('page-transition-incoming-image');
-  static const values = {
-    'first-line': firstLine,
-    'first-letter': firstLetter,
-    'before': before,
-    'after': after,
-    'marker': marker,
-    'backdrop': backdrop,
-    'selection': selection,
-    'target-text': targetText,
-    'spelling-error': spellingError,
-    'grammar-error': grammarError,
-    'highlight': highlight,
-    'first-line-inherited': firstLineInherited,
-    'scrollbar': scrollbar,
-    'scrollbar-thumb': scrollbarThumb,
-    'scrollbar-button': scrollbarButton,
-    'scrollbar-track': scrollbarTrack,
-    'scrollbar-track-piece': scrollbarTrackPiece,
-    'scrollbar-corner': scrollbarCorner,
-    'resizer': resizer,
-    'input-list-button': inputListButton,
-    'page-transition': pageTransition,
-    'page-transition-container': pageTransitionContainer,
-    'page-transition-image-wrapper': pageTransitionImageWrapper,
-    'page-transition-outgoing-image': pageTransitionOutgoingImage,
-    'page-transition-incoming-image': pageTransitionIncomingImage,
-  };
+enum PseudoType {
+  firstLine('first-line'),
+  firstLetter('first-letter'),
+  before('before'),
+  after('after'),
+  marker('marker'),
+  backdrop('backdrop'),
+  selection('selection'),
+  targetText('target-text'),
+  spellingError('spelling-error'),
+  grammarError('grammar-error'),
+  highlight('highlight'),
+  firstLineInherited('first-line-inherited'),
+  scrollbar('scrollbar'),
+  scrollbarThumb('scrollbar-thumb'),
+  scrollbarButton('scrollbar-button'),
+  scrollbarTrack('scrollbar-track'),
+  scrollbarTrackPiece('scrollbar-track-piece'),
+  scrollbarCorner('scrollbar-corner'),
+  resizer('resizer'),
+  inputListButton('input-list-button'),
+  pageTransition('page-transition'),
+  pageTransitionContainer('page-transition-container'),
+  pageTransitionImageWrapper('page-transition-image-wrapper'),
+  pageTransitionOutgoingImage('page-transition-outgoing-image'),
+  pageTransitionIncomingImage('page-transition-incoming-image'),
+  ;
 
   final String value;
 
-  const PseudoType._(this.value);
+  const PseudoType(this.value);
 
-  factory PseudoType.fromJson(String value) => values[value]!;
+  factory PseudoType.fromJson(String value) =>
+      PseudoType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is PseudoType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// Shadow root type.
-class ShadowRootType {
-  static const userAgent = ShadowRootType._('user-agent');
-  static const open = ShadowRootType._('open');
-  static const closed = ShadowRootType._('closed');
-  static const values = {
-    'user-agent': userAgent,
-    'open': open,
-    'closed': closed,
-  };
+enum ShadowRootType {
+  userAgent('user-agent'),
+  open('open'),
+  closed('closed'),
+  ;
 
   final String value;
 
-  const ShadowRootType._(this.value);
+  const ShadowRootType(this.value);
 
-  factory ShadowRootType.fromJson(String value) => values[value]!;
+  factory ShadowRootType.fromJson(String value) =>
+      ShadowRootType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ShadowRootType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// Document compatibility mode.
-class CompatibilityMode {
-  static const quirksMode = CompatibilityMode._('QuirksMode');
-  static const limitedQuirksMode = CompatibilityMode._('LimitedQuirksMode');
-  static const noQuirksMode = CompatibilityMode._('NoQuirksMode');
-  static const values = {
-    'QuirksMode': quirksMode,
-    'LimitedQuirksMode': limitedQuirksMode,
-    'NoQuirksMode': noQuirksMode,
-  };
+enum CompatibilityMode {
+  quirksMode('QuirksMode'),
+  limitedQuirksMode('LimitedQuirksMode'),
+  noQuirksMode('NoQuirksMode'),
+  ;
 
   final String value;
 
-  const CompatibilityMode._(this.value);
+  const CompatibilityMode(this.value);
 
-  factory CompatibilityMode.fromJson(String value) => values[value]!;
+  factory CompatibilityMode.fromJson(String value) =>
+      CompatibilityMode.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CompatibilityMode && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

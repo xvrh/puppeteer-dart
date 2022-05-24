@@ -194,32 +194,21 @@ class PlayerMessage {
   }
 }
 
-class PlayerMessageLevel {
-  static const error = PlayerMessageLevel._('error');
-  static const warning = PlayerMessageLevel._('warning');
-  static const info = PlayerMessageLevel._('info');
-  static const debug = PlayerMessageLevel._('debug');
-  static const values = {
-    'error': error,
-    'warning': warning,
-    'info': info,
-    'debug': debug,
-  };
+enum PlayerMessageLevel {
+  error('error'),
+  warning('warning'),
+  info('info'),
+  debug('debug'),
+  ;
 
   final String value;
 
-  const PlayerMessageLevel._(this.value);
+  const PlayerMessageLevel(this.value);
 
-  factory PlayerMessageLevel.fromJson(String value) => values[value]!;
+  factory PlayerMessageLevel.fromJson(String value) =>
+      PlayerMessageLevel.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is PlayerMessageLevel && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

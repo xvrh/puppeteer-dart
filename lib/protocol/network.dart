@@ -1568,58 +1568,34 @@ class GetResponseBodyForInterceptionResult {
 }
 
 /// Resource type as it was perceived by the rendering engine.
-class ResourceType {
-  static const document = ResourceType._('Document');
-  static const stylesheet = ResourceType._('Stylesheet');
-  static const image = ResourceType._('Image');
-  static const media = ResourceType._('Media');
-  static const font = ResourceType._('Font');
-  static const script = ResourceType._('Script');
-  static const textTrack = ResourceType._('TextTrack');
-  static const xhr = ResourceType._('XHR');
-  static const fetch = ResourceType._('Fetch');
-  static const eventSource = ResourceType._('EventSource');
-  static const webSocket = ResourceType._('WebSocket');
-  static const manifest = ResourceType._('Manifest');
-  static const signedExchange = ResourceType._('SignedExchange');
-  static const ping = ResourceType._('Ping');
-  static const cspViolationReport = ResourceType._('CSPViolationReport');
-  static const preflight = ResourceType._('Preflight');
-  static const other = ResourceType._('Other');
-  static const values = {
-    'Document': document,
-    'Stylesheet': stylesheet,
-    'Image': image,
-    'Media': media,
-    'Font': font,
-    'Script': script,
-    'TextTrack': textTrack,
-    'XHR': xhr,
-    'Fetch': fetch,
-    'EventSource': eventSource,
-    'WebSocket': webSocket,
-    'Manifest': manifest,
-    'SignedExchange': signedExchange,
-    'Ping': ping,
-    'CSPViolationReport': cspViolationReport,
-    'Preflight': preflight,
-    'Other': other,
-  };
+enum ResourceType {
+  document('Document'),
+  stylesheet('Stylesheet'),
+  image('Image'),
+  media('Media'),
+  font('Font'),
+  script('Script'),
+  textTrack('TextTrack'),
+  xhr('XHR'),
+  fetch('Fetch'),
+  eventSource('EventSource'),
+  webSocket('WebSocket'),
+  manifest('Manifest'),
+  signedExchange('SignedExchange'),
+  ping('Ping'),
+  cspViolationReport('CSPViolationReport'),
+  preflight('Preflight'),
+  other('Other'),
+  ;
 
   final String value;
 
-  const ResourceType._(this.value);
+  const ResourceType(this.value);
 
-  factory ResourceType.fromJson(String value) => values[value]!;
+  factory ResourceType.fromJson(String value) =>
+      ResourceType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ResourceType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1689,52 +1665,31 @@ class InterceptionId {
 }
 
 /// Network level fetch failure reason.
-class ErrorReason {
-  static const failed = ErrorReason._('Failed');
-  static const aborted = ErrorReason._('Aborted');
-  static const timedOut = ErrorReason._('TimedOut');
-  static const accessDenied = ErrorReason._('AccessDenied');
-  static const connectionClosed = ErrorReason._('ConnectionClosed');
-  static const connectionReset = ErrorReason._('ConnectionReset');
-  static const connectionRefused = ErrorReason._('ConnectionRefused');
-  static const connectionAborted = ErrorReason._('ConnectionAborted');
-  static const connectionFailed = ErrorReason._('ConnectionFailed');
-  static const nameNotResolved = ErrorReason._('NameNotResolved');
-  static const internetDisconnected = ErrorReason._('InternetDisconnected');
-  static const addressUnreachable = ErrorReason._('AddressUnreachable');
-  static const blockedByClient = ErrorReason._('BlockedByClient');
-  static const blockedByResponse = ErrorReason._('BlockedByResponse');
-  static const values = {
-    'Failed': failed,
-    'Aborted': aborted,
-    'TimedOut': timedOut,
-    'AccessDenied': accessDenied,
-    'ConnectionClosed': connectionClosed,
-    'ConnectionReset': connectionReset,
-    'ConnectionRefused': connectionRefused,
-    'ConnectionAborted': connectionAborted,
-    'ConnectionFailed': connectionFailed,
-    'NameNotResolved': nameNotResolved,
-    'InternetDisconnected': internetDisconnected,
-    'AddressUnreachable': addressUnreachable,
-    'BlockedByClient': blockedByClient,
-    'BlockedByResponse': blockedByResponse,
-  };
+enum ErrorReason {
+  failed('Failed'),
+  aborted('Aborted'),
+  timedOut('TimedOut'),
+  accessDenied('AccessDenied'),
+  connectionClosed('ConnectionClosed'),
+  connectionReset('ConnectionReset'),
+  connectionRefused('ConnectionRefused'),
+  connectionAborted('ConnectionAborted'),
+  connectionFailed('ConnectionFailed'),
+  nameNotResolved('NameNotResolved'),
+  internetDisconnected('InternetDisconnected'),
+  addressUnreachable('AddressUnreachable'),
+  blockedByClient('BlockedByClient'),
+  blockedByResponse('BlockedByResponse'),
+  ;
 
   final String value;
 
-  const ErrorReason._(this.value);
+  const ErrorReason(this.value);
 
-  factory ErrorReason.fromJson(String value) => values[value]!;
+  factory ErrorReason.fromJson(String value) =>
+      ErrorReason.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ErrorReason && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1804,42 +1759,26 @@ class Headers {
 }
 
 /// The underlying connection technology that the browser is supposedly using.
-class ConnectionType {
-  static const none = ConnectionType._('none');
-  static const cellular2g = ConnectionType._('cellular2g');
-  static const cellular3g = ConnectionType._('cellular3g');
-  static const cellular4g = ConnectionType._('cellular4g');
-  static const bluetooth = ConnectionType._('bluetooth');
-  static const ethernet = ConnectionType._('ethernet');
-  static const wifi = ConnectionType._('wifi');
-  static const wimax = ConnectionType._('wimax');
-  static const other = ConnectionType._('other');
-  static const values = {
-    'none': none,
-    'cellular2g': cellular2g,
-    'cellular3g': cellular3g,
-    'cellular4g': cellular4g,
-    'bluetooth': bluetooth,
-    'ethernet': ethernet,
-    'wifi': wifi,
-    'wimax': wimax,
-    'other': other,
-  };
+enum ConnectionType {
+  none('none'),
+  cellular2g('cellular2g'),
+  cellular3g('cellular3g'),
+  cellular4g('cellular4g'),
+  bluetooth('bluetooth'),
+  ethernet('ethernet'),
+  wifi('wifi'),
+  wimax('wimax'),
+  other('other'),
+  ;
 
   final String value;
 
-  const ConnectionType._(this.value);
+  const ConnectionType(this.value);
 
-  factory ConnectionType.fromJson(String value) => values[value]!;
+  factory ConnectionType.fromJson(String value) =>
+      ConnectionType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ConnectionType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1847,30 +1786,20 @@ class ConnectionType {
 
 /// Represents the cookie's 'SameSite' status:
 /// https://tools.ietf.org/html/draft-west-first-party-cookies
-class CookieSameSite {
-  static const strict = CookieSameSite._('Strict');
-  static const lax = CookieSameSite._('Lax');
-  static const none = CookieSameSite._('None');
-  static const values = {
-    'Strict': strict,
-    'Lax': lax,
-    'None': none,
-  };
+enum CookieSameSite {
+  strict('Strict'),
+  lax('Lax'),
+  none('None'),
+  ;
 
   final String value;
 
-  const CookieSameSite._(this.value);
+  const CookieSameSite(this.value);
 
-  factory CookieSameSite.fromJson(String value) => values[value]!;
+  factory CookieSameSite.fromJson(String value) =>
+      CookieSameSite.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CookieSameSite && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1878,30 +1807,20 @@ class CookieSameSite {
 
 /// Represents the cookie's 'Priority' status:
 /// https://tools.ietf.org/html/draft-west-cookie-priority-00
-class CookiePriority {
-  static const low = CookiePriority._('Low');
-  static const medium = CookiePriority._('Medium');
-  static const high = CookiePriority._('High');
-  static const values = {
-    'Low': low,
-    'Medium': medium,
-    'High': high,
-  };
+enum CookiePriority {
+  low('Low'),
+  medium('Medium'),
+  high('High'),
+  ;
 
   final String value;
 
-  const CookiePriority._(this.value);
+  const CookiePriority(this.value);
 
-  factory CookiePriority.fromJson(String value) => values[value]!;
+  factory CookiePriority.fromJson(String value) =>
+      CookiePriority.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CookiePriority && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -1910,30 +1829,20 @@ class CookiePriority {
 /// Represents the source scheme of the origin that originally set the cookie.
 /// A value of "Unset" allows protocol clients to emulate legacy cookie scope for the scheme.
 /// This is a temporary ability and it will be removed in the future.
-class CookieSourceScheme {
-  static const unset = CookieSourceScheme._('Unset');
-  static const nonSecure = CookieSourceScheme._('NonSecure');
-  static const secure = CookieSourceScheme._('Secure');
-  static const values = {
-    'Unset': unset,
-    'NonSecure': nonSecure,
-    'Secure': secure,
-  };
+enum CookieSourceScheme {
+  unset('Unset'),
+  nonSecure('NonSecure'),
+  secure('Secure'),
+  ;
 
   final String value;
 
-  const CookieSourceScheme._(this.value);
+  const CookieSourceScheme(this.value);
 
-  factory CookieSourceScheme.fromJson(String value) => values[value]!;
+  factory CookieSourceScheme.fromJson(String value) =>
+      CookieSourceScheme.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CookieSourceScheme && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -2064,34 +1973,22 @@ class ResourceTiming {
 }
 
 /// Loading priority of a resource request.
-class ResourcePriority {
-  static const veryLow = ResourcePriority._('VeryLow');
-  static const low = ResourcePriority._('Low');
-  static const medium = ResourcePriority._('Medium');
-  static const high = ResourcePriority._('High');
-  static const veryHigh = ResourcePriority._('VeryHigh');
-  static const values = {
-    'VeryLow': veryLow,
-    'Low': low,
-    'Medium': medium,
-    'High': high,
-    'VeryHigh': veryHigh,
-  };
+enum ResourcePriority {
+  veryLow('VeryLow'),
+  low('Low'),
+  medium('Medium'),
+  high('High'),
+  veryHigh('VeryHigh'),
+  ;
 
   final String value;
 
-  const ResourcePriority._(this.value);
+  const ResourcePriority(this.value);
 
-  factory ResourcePriority.fromJson(String value) => values[value]!;
+  factory ResourcePriority.fromJson(String value) =>
+      ResourcePriority.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ResourcePriority && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -2233,44 +2130,25 @@ class RequestData {
   }
 }
 
-class RequestReferrerPolicy {
-  static const unsafeUrl = RequestReferrerPolicy._('unsafe-url');
-  static const noReferrerWhenDowngrade =
-      RequestReferrerPolicy._('no-referrer-when-downgrade');
-  static const noReferrer = RequestReferrerPolicy._('no-referrer');
-  static const origin = RequestReferrerPolicy._('origin');
-  static const originWhenCrossOrigin =
-      RequestReferrerPolicy._('origin-when-cross-origin');
-  static const sameOrigin = RequestReferrerPolicy._('same-origin');
-  static const strictOrigin = RequestReferrerPolicy._('strict-origin');
-  static const strictOriginWhenCrossOrigin =
-      RequestReferrerPolicy._('strict-origin-when-cross-origin');
-  static const values = {
-    'unsafe-url': unsafeUrl,
-    'no-referrer-when-downgrade': noReferrerWhenDowngrade,
-    'no-referrer': noReferrer,
-    'origin': origin,
-    'origin-when-cross-origin': originWhenCrossOrigin,
-    'same-origin': sameOrigin,
-    'strict-origin': strictOrigin,
-    'strict-origin-when-cross-origin': strictOriginWhenCrossOrigin,
-  };
+enum RequestReferrerPolicy {
+  unsafeUrl('unsafe-url'),
+  noReferrerWhenDowngrade('no-referrer-when-downgrade'),
+  noReferrer('no-referrer'),
+  origin('origin'),
+  originWhenCrossOrigin('origin-when-cross-origin'),
+  sameOrigin('same-origin'),
+  strictOrigin('strict-origin'),
+  strictOriginWhenCrossOrigin('strict-origin-when-cross-origin'),
+  ;
 
   final String value;
 
-  const RequestReferrerPolicy._(this.value);
+  const RequestReferrerPolicy(this.value);
 
-  factory RequestReferrerPolicy.fromJson(String value) => values[value]!;
+  factory RequestReferrerPolicy.fromJson(String value) =>
+      RequestReferrerPolicy.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is RequestReferrerPolicy && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -2445,195 +2323,99 @@ class SecurityDetails {
 }
 
 /// Whether the request complied with Certificate Transparency policy.
-class CertificateTransparencyCompliance {
-  static const unknown = CertificateTransparencyCompliance._('unknown');
-  static const notCompliant =
-      CertificateTransparencyCompliance._('not-compliant');
-  static const compliant = CertificateTransparencyCompliance._('compliant');
-  static const values = {
-    'unknown': unknown,
-    'not-compliant': notCompliant,
-    'compliant': compliant,
-  };
+enum CertificateTransparencyCompliance {
+  unknown('unknown'),
+  notCompliant('not-compliant'),
+  compliant('compliant'),
+  ;
 
   final String value;
 
-  const CertificateTransparencyCompliance._(this.value);
+  const CertificateTransparencyCompliance(this.value);
 
   factory CertificateTransparencyCompliance.fromJson(String value) =>
-      values[value]!;
+      CertificateTransparencyCompliance.values
+          .firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CertificateTransparencyCompliance && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// The reason why request was blocked.
-class BlockedReason {
-  static const other = BlockedReason._('other');
-  static const csp = BlockedReason._('csp');
-  static const mixedContent = BlockedReason._('mixed-content');
-  static const origin = BlockedReason._('origin');
-  static const inspector = BlockedReason._('inspector');
-  static const subresourceFilter = BlockedReason._('subresource-filter');
-  static const contentType = BlockedReason._('content-type');
-  static const coepFrameResourceNeedsCoepHeader =
-      BlockedReason._('coep-frame-resource-needs-coep-header');
-  static const coopSandboxedIframeCannotNavigateToCoopPage =
-      BlockedReason._('coop-sandboxed-iframe-cannot-navigate-to-coop-page');
-  static const corpNotSameOrigin = BlockedReason._('corp-not-same-origin');
-  static const corpNotSameOriginAfterDefaultedToSameOriginByCoep =
-      BlockedReason._(
-          'corp-not-same-origin-after-defaulted-to-same-origin-by-coep');
-  static const corpNotSameSite = BlockedReason._('corp-not-same-site');
-  static const values = {
-    'other': other,
-    'csp': csp,
-    'mixed-content': mixedContent,
-    'origin': origin,
-    'inspector': inspector,
-    'subresource-filter': subresourceFilter,
-    'content-type': contentType,
-    'coep-frame-resource-needs-coep-header': coepFrameResourceNeedsCoepHeader,
-    'coop-sandboxed-iframe-cannot-navigate-to-coop-page':
-        coopSandboxedIframeCannotNavigateToCoopPage,
-    'corp-not-same-origin': corpNotSameOrigin,
-    'corp-not-same-origin-after-defaulted-to-same-origin-by-coep':
-        corpNotSameOriginAfterDefaultedToSameOriginByCoep,
-    'corp-not-same-site': corpNotSameSite,
-  };
+enum BlockedReason {
+  other('other'),
+  csp('csp'),
+  mixedContent('mixed-content'),
+  origin('origin'),
+  inspector('inspector'),
+  subresourceFilter('subresource-filter'),
+  contentType('content-type'),
+  coepFrameResourceNeedsCoepHeader('coep-frame-resource-needs-coep-header'),
+  coopSandboxedIframeCannotNavigateToCoopPage(
+      'coop-sandboxed-iframe-cannot-navigate-to-coop-page'),
+  corpNotSameOrigin('corp-not-same-origin'),
+  corpNotSameOriginAfterDefaultedToSameOriginByCoep(
+      'corp-not-same-origin-after-defaulted-to-same-origin-by-coep'),
+  corpNotSameSite('corp-not-same-site'),
+  ;
 
   final String value;
 
-  const BlockedReason._(this.value);
+  const BlockedReason(this.value);
 
-  factory BlockedReason.fromJson(String value) => values[value]!;
+  factory BlockedReason.fromJson(String value) =>
+      BlockedReason.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is BlockedReason && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// The reason why request was blocked.
-class CorsError {
-  static const disallowedByMode = CorsError._('DisallowedByMode');
-  static const invalidResponse = CorsError._('InvalidResponse');
-  static const wildcardOriginNotAllowed =
-      CorsError._('WildcardOriginNotAllowed');
-  static const missingAllowOriginHeader =
-      CorsError._('MissingAllowOriginHeader');
-  static const multipleAllowOriginValues =
-      CorsError._('MultipleAllowOriginValues');
-  static const invalidAllowOriginValue = CorsError._('InvalidAllowOriginValue');
-  static const allowOriginMismatch = CorsError._('AllowOriginMismatch');
-  static const invalidAllowCredentials = CorsError._('InvalidAllowCredentials');
-  static const corsDisabledScheme = CorsError._('CorsDisabledScheme');
-  static const preflightInvalidStatus = CorsError._('PreflightInvalidStatus');
-  static const preflightDisallowedRedirect =
-      CorsError._('PreflightDisallowedRedirect');
-  static const preflightWildcardOriginNotAllowed =
-      CorsError._('PreflightWildcardOriginNotAllowed');
-  static const preflightMissingAllowOriginHeader =
-      CorsError._('PreflightMissingAllowOriginHeader');
-  static const preflightMultipleAllowOriginValues =
-      CorsError._('PreflightMultipleAllowOriginValues');
-  static const preflightInvalidAllowOriginValue =
-      CorsError._('PreflightInvalidAllowOriginValue');
-  static const preflightAllowOriginMismatch =
-      CorsError._('PreflightAllowOriginMismatch');
-  static const preflightInvalidAllowCredentials =
-      CorsError._('PreflightInvalidAllowCredentials');
-  static const preflightMissingAllowExternal =
-      CorsError._('PreflightMissingAllowExternal');
-  static const preflightInvalidAllowExternal =
-      CorsError._('PreflightInvalidAllowExternal');
-  static const preflightMissingAllowPrivateNetwork =
-      CorsError._('PreflightMissingAllowPrivateNetwork');
-  static const preflightInvalidAllowPrivateNetwork =
-      CorsError._('PreflightInvalidAllowPrivateNetwork');
-  static const invalidAllowMethodsPreflightResponse =
-      CorsError._('InvalidAllowMethodsPreflightResponse');
-  static const invalidAllowHeadersPreflightResponse =
-      CorsError._('InvalidAllowHeadersPreflightResponse');
-  static const methodDisallowedByPreflightResponse =
-      CorsError._('MethodDisallowedByPreflightResponse');
-  static const headerDisallowedByPreflightResponse =
-      CorsError._('HeaderDisallowedByPreflightResponse');
-  static const redirectContainsCredentials =
-      CorsError._('RedirectContainsCredentials');
-  static const insecurePrivateNetwork = CorsError._('InsecurePrivateNetwork');
-  static const invalidPrivateNetworkAccess =
-      CorsError._('InvalidPrivateNetworkAccess');
-  static const unexpectedPrivateNetworkAccess =
-      CorsError._('UnexpectedPrivateNetworkAccess');
-  static const noCorsRedirectModeNotFollow =
-      CorsError._('NoCorsRedirectModeNotFollow');
-  static const values = {
-    'DisallowedByMode': disallowedByMode,
-    'InvalidResponse': invalidResponse,
-    'WildcardOriginNotAllowed': wildcardOriginNotAllowed,
-    'MissingAllowOriginHeader': missingAllowOriginHeader,
-    'MultipleAllowOriginValues': multipleAllowOriginValues,
-    'InvalidAllowOriginValue': invalidAllowOriginValue,
-    'AllowOriginMismatch': allowOriginMismatch,
-    'InvalidAllowCredentials': invalidAllowCredentials,
-    'CorsDisabledScheme': corsDisabledScheme,
-    'PreflightInvalidStatus': preflightInvalidStatus,
-    'PreflightDisallowedRedirect': preflightDisallowedRedirect,
-    'PreflightWildcardOriginNotAllowed': preflightWildcardOriginNotAllowed,
-    'PreflightMissingAllowOriginHeader': preflightMissingAllowOriginHeader,
-    'PreflightMultipleAllowOriginValues': preflightMultipleAllowOriginValues,
-    'PreflightInvalidAllowOriginValue': preflightInvalidAllowOriginValue,
-    'PreflightAllowOriginMismatch': preflightAllowOriginMismatch,
-    'PreflightInvalidAllowCredentials': preflightInvalidAllowCredentials,
-    'PreflightMissingAllowExternal': preflightMissingAllowExternal,
-    'PreflightInvalidAllowExternal': preflightInvalidAllowExternal,
-    'PreflightMissingAllowPrivateNetwork': preflightMissingAllowPrivateNetwork,
-    'PreflightInvalidAllowPrivateNetwork': preflightInvalidAllowPrivateNetwork,
-    'InvalidAllowMethodsPreflightResponse':
-        invalidAllowMethodsPreflightResponse,
-    'InvalidAllowHeadersPreflightResponse':
-        invalidAllowHeadersPreflightResponse,
-    'MethodDisallowedByPreflightResponse': methodDisallowedByPreflightResponse,
-    'HeaderDisallowedByPreflightResponse': headerDisallowedByPreflightResponse,
-    'RedirectContainsCredentials': redirectContainsCredentials,
-    'InsecurePrivateNetwork': insecurePrivateNetwork,
-    'InvalidPrivateNetworkAccess': invalidPrivateNetworkAccess,
-    'UnexpectedPrivateNetworkAccess': unexpectedPrivateNetworkAccess,
-    'NoCorsRedirectModeNotFollow': noCorsRedirectModeNotFollow,
-  };
+enum CorsError {
+  disallowedByMode('DisallowedByMode'),
+  invalidResponse('InvalidResponse'),
+  wildcardOriginNotAllowed('WildcardOriginNotAllowed'),
+  missingAllowOriginHeader('MissingAllowOriginHeader'),
+  multipleAllowOriginValues('MultipleAllowOriginValues'),
+  invalidAllowOriginValue('InvalidAllowOriginValue'),
+  allowOriginMismatch('AllowOriginMismatch'),
+  invalidAllowCredentials('InvalidAllowCredentials'),
+  corsDisabledScheme('CorsDisabledScheme'),
+  preflightInvalidStatus('PreflightInvalidStatus'),
+  preflightDisallowedRedirect('PreflightDisallowedRedirect'),
+  preflightWildcardOriginNotAllowed('PreflightWildcardOriginNotAllowed'),
+  preflightMissingAllowOriginHeader('PreflightMissingAllowOriginHeader'),
+  preflightMultipleAllowOriginValues('PreflightMultipleAllowOriginValues'),
+  preflightInvalidAllowOriginValue('PreflightInvalidAllowOriginValue'),
+  preflightAllowOriginMismatch('PreflightAllowOriginMismatch'),
+  preflightInvalidAllowCredentials('PreflightInvalidAllowCredentials'),
+  preflightMissingAllowExternal('PreflightMissingAllowExternal'),
+  preflightInvalidAllowExternal('PreflightInvalidAllowExternal'),
+  preflightMissingAllowPrivateNetwork('PreflightMissingAllowPrivateNetwork'),
+  preflightInvalidAllowPrivateNetwork('PreflightInvalidAllowPrivateNetwork'),
+  invalidAllowMethodsPreflightResponse('InvalidAllowMethodsPreflightResponse'),
+  invalidAllowHeadersPreflightResponse('InvalidAllowHeadersPreflightResponse'),
+  methodDisallowedByPreflightResponse('MethodDisallowedByPreflightResponse'),
+  headerDisallowedByPreflightResponse('HeaderDisallowedByPreflightResponse'),
+  redirectContainsCredentials('RedirectContainsCredentials'),
+  insecurePrivateNetwork('InsecurePrivateNetwork'),
+  invalidPrivateNetworkAccess('InvalidPrivateNetworkAccess'),
+  unexpectedPrivateNetworkAccess('UnexpectedPrivateNetworkAccess'),
+  noCorsRedirectModeNotFollow('NoCorsRedirectModeNotFollow'),
+  ;
 
   final String value;
 
-  const CorsError._(this.value);
+  const CorsError(this.value);
 
-  factory CorsError.fromJson(String value) => values[value]!;
+  factory CorsError.fromJson(String value) =>
+      CorsError.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CorsError && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -2662,33 +2444,21 @@ class CorsErrorStatus {
 }
 
 /// Source of serviceworker response.
-class ServiceWorkerResponseSource {
-  static const cacheStorage = ServiceWorkerResponseSource._('cache-storage');
-  static const httpCache = ServiceWorkerResponseSource._('http-cache');
-  static const fallbackCode = ServiceWorkerResponseSource._('fallback-code');
-  static const network = ServiceWorkerResponseSource._('network');
-  static const values = {
-    'cache-storage': cacheStorage,
-    'http-cache': httpCache,
-    'fallback-code': fallbackCode,
-    'network': network,
-  };
+enum ServiceWorkerResponseSource {
+  cacheStorage('cache-storage'),
+  httpCache('http-cache'),
+  fallbackCode('fallback-code'),
+  network('network'),
+  ;
 
   final String value;
 
-  const ServiceWorkerResponseSource._(this.value);
+  const ServiceWorkerResponseSource(this.value);
 
-  factory ServiceWorkerResponseSource.fromJson(String value) => values[value]!;
+  factory ServiceWorkerResponseSource.fromJson(String value) =>
+      ServiceWorkerResponseSource.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ServiceWorkerResponseSource && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -2731,60 +2501,38 @@ class TrustTokenParams {
   }
 }
 
-class TrustTokenParamsRefreshPolicy {
-  static const useCached = TrustTokenParamsRefreshPolicy._('UseCached');
-  static const refresh = TrustTokenParamsRefreshPolicy._('Refresh');
-  static const values = {
-    'UseCached': useCached,
-    'Refresh': refresh,
-  };
+enum TrustTokenParamsRefreshPolicy {
+  useCached('UseCached'),
+  refresh('Refresh'),
+  ;
 
   final String value;
 
-  const TrustTokenParamsRefreshPolicy._(this.value);
+  const TrustTokenParamsRefreshPolicy(this.value);
 
   factory TrustTokenParamsRefreshPolicy.fromJson(String value) =>
-      values[value]!;
+      TrustTokenParamsRefreshPolicy.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is TrustTokenParamsRefreshPolicy && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class TrustTokenOperationType {
-  static const issuance = TrustTokenOperationType._('Issuance');
-  static const redemption = TrustTokenOperationType._('Redemption');
-  static const signing = TrustTokenOperationType._('Signing');
-  static const values = {
-    'Issuance': issuance,
-    'Redemption': redemption,
-    'Signing': signing,
-  };
+enum TrustTokenOperationType {
+  issuance('Issuance'),
+  redemption('Redemption'),
+  signing('Signing'),
+  ;
 
   final String value;
 
-  const TrustTokenOperationType._(this.value);
+  const TrustTokenOperationType(this.value);
 
-  factory TrustTokenOperationType.fromJson(String value) => values[value]!;
+  factory TrustTokenOperationType.fromJson(String value) =>
+      TrustTokenOperationType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is TrustTokenOperationType && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -3170,36 +2918,23 @@ class Initiator {
   }
 }
 
-class InitiatorType {
-  static const parser = InitiatorType._('parser');
-  static const script = InitiatorType._('script');
-  static const preload = InitiatorType._('preload');
-  static const signedExchange = InitiatorType._('SignedExchange');
-  static const preflight = InitiatorType._('preflight');
-  static const other = InitiatorType._('other');
-  static const values = {
-    'parser': parser,
-    'script': script,
-    'preload': preload,
-    'SignedExchange': signedExchange,
-    'preflight': preflight,
-    'other': other,
-  };
+enum InitiatorType {
+  parser('parser'),
+  script('script'),
+  preload('preload'),
+  signedExchange('SignedExchange'),
+  preflight('preflight'),
+  other('other'),
+  ;
 
   final String value;
 
-  const InitiatorType._(this.value);
+  const InitiatorType(this.value);
 
-  factory InitiatorType.fromJson(String value) => values[value]!;
+  factory InitiatorType.fromJson(String value) =>
+      InitiatorType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is InitiatorType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -3326,132 +3061,69 @@ class Cookie {
 }
 
 /// Types of reasons why a cookie may not be stored from a response.
-class SetCookieBlockedReason {
-  static const secureOnly = SetCookieBlockedReason._('SecureOnly');
-  static const sameSiteStrict = SetCookieBlockedReason._('SameSiteStrict');
-  static const sameSiteLax = SetCookieBlockedReason._('SameSiteLax');
-  static const sameSiteUnspecifiedTreatedAsLax =
-      SetCookieBlockedReason._('SameSiteUnspecifiedTreatedAsLax');
-  static const sameSiteNoneInsecure =
-      SetCookieBlockedReason._('SameSiteNoneInsecure');
-  static const userPreferences = SetCookieBlockedReason._('UserPreferences');
-  static const syntaxError = SetCookieBlockedReason._('SyntaxError');
-  static const schemeNotSupported =
-      SetCookieBlockedReason._('SchemeNotSupported');
-  static const overwriteSecure = SetCookieBlockedReason._('OverwriteSecure');
-  static const invalidDomain = SetCookieBlockedReason._('InvalidDomain');
-  static const invalidPrefix = SetCookieBlockedReason._('InvalidPrefix');
-  static const unknownError = SetCookieBlockedReason._('UnknownError');
-  static const schemefulSameSiteStrict =
-      SetCookieBlockedReason._('SchemefulSameSiteStrict');
-  static const schemefulSameSiteLax =
-      SetCookieBlockedReason._('SchemefulSameSiteLax');
-  static const schemefulSameSiteUnspecifiedTreatedAsLax =
-      SetCookieBlockedReason._('SchemefulSameSiteUnspecifiedTreatedAsLax');
-  static const samePartyFromCrossPartyContext =
-      SetCookieBlockedReason._('SamePartyFromCrossPartyContext');
-  static const samePartyConflictsWithOtherAttributes =
-      SetCookieBlockedReason._('SamePartyConflictsWithOtherAttributes');
-  static const nameValuePairExceedsMaxSize =
-      SetCookieBlockedReason._('NameValuePairExceedsMaxSize');
-  static const values = {
-    'SecureOnly': secureOnly,
-    'SameSiteStrict': sameSiteStrict,
-    'SameSiteLax': sameSiteLax,
-    'SameSiteUnspecifiedTreatedAsLax': sameSiteUnspecifiedTreatedAsLax,
-    'SameSiteNoneInsecure': sameSiteNoneInsecure,
-    'UserPreferences': userPreferences,
-    'SyntaxError': syntaxError,
-    'SchemeNotSupported': schemeNotSupported,
-    'OverwriteSecure': overwriteSecure,
-    'InvalidDomain': invalidDomain,
-    'InvalidPrefix': invalidPrefix,
-    'UnknownError': unknownError,
-    'SchemefulSameSiteStrict': schemefulSameSiteStrict,
-    'SchemefulSameSiteLax': schemefulSameSiteLax,
-    'SchemefulSameSiteUnspecifiedTreatedAsLax':
-        schemefulSameSiteUnspecifiedTreatedAsLax,
-    'SamePartyFromCrossPartyContext': samePartyFromCrossPartyContext,
-    'SamePartyConflictsWithOtherAttributes':
-        samePartyConflictsWithOtherAttributes,
-    'NameValuePairExceedsMaxSize': nameValuePairExceedsMaxSize,
-  };
+enum SetCookieBlockedReason {
+  secureOnly('SecureOnly'),
+  sameSiteStrict('SameSiteStrict'),
+  sameSiteLax('SameSiteLax'),
+  sameSiteUnspecifiedTreatedAsLax('SameSiteUnspecifiedTreatedAsLax'),
+  sameSiteNoneInsecure('SameSiteNoneInsecure'),
+  userPreferences('UserPreferences'),
+  syntaxError('SyntaxError'),
+  schemeNotSupported('SchemeNotSupported'),
+  overwriteSecure('OverwriteSecure'),
+  invalidDomain('InvalidDomain'),
+  invalidPrefix('InvalidPrefix'),
+  unknownError('UnknownError'),
+  schemefulSameSiteStrict('SchemefulSameSiteStrict'),
+  schemefulSameSiteLax('SchemefulSameSiteLax'),
+  schemefulSameSiteUnspecifiedTreatedAsLax(
+      'SchemefulSameSiteUnspecifiedTreatedAsLax'),
+  samePartyFromCrossPartyContext('SamePartyFromCrossPartyContext'),
+  samePartyConflictsWithOtherAttributes(
+      'SamePartyConflictsWithOtherAttributes'),
+  nameValuePairExceedsMaxSize('NameValuePairExceedsMaxSize'),
+  ;
 
   final String value;
 
-  const SetCookieBlockedReason._(this.value);
+  const SetCookieBlockedReason(this.value);
 
-  factory SetCookieBlockedReason.fromJson(String value) => values[value]!;
+  factory SetCookieBlockedReason.fromJson(String value) =>
+      SetCookieBlockedReason.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is SetCookieBlockedReason && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
 /// Types of reasons why a cookie may not be sent with a request.
-class CookieBlockedReason {
-  static const secureOnly = CookieBlockedReason._('SecureOnly');
-  static const notOnPath = CookieBlockedReason._('NotOnPath');
-  static const domainMismatch = CookieBlockedReason._('DomainMismatch');
-  static const sameSiteStrict = CookieBlockedReason._('SameSiteStrict');
-  static const sameSiteLax = CookieBlockedReason._('SameSiteLax');
-  static const sameSiteUnspecifiedTreatedAsLax =
-      CookieBlockedReason._('SameSiteUnspecifiedTreatedAsLax');
-  static const sameSiteNoneInsecure =
-      CookieBlockedReason._('SameSiteNoneInsecure');
-  static const userPreferences = CookieBlockedReason._('UserPreferences');
-  static const unknownError = CookieBlockedReason._('UnknownError');
-  static const schemefulSameSiteStrict =
-      CookieBlockedReason._('SchemefulSameSiteStrict');
-  static const schemefulSameSiteLax =
-      CookieBlockedReason._('SchemefulSameSiteLax');
-  static const schemefulSameSiteUnspecifiedTreatedAsLax =
-      CookieBlockedReason._('SchemefulSameSiteUnspecifiedTreatedAsLax');
-  static const samePartyFromCrossPartyContext =
-      CookieBlockedReason._('SamePartyFromCrossPartyContext');
-  static const nameValuePairExceedsMaxSize =
-      CookieBlockedReason._('NameValuePairExceedsMaxSize');
-  static const values = {
-    'SecureOnly': secureOnly,
-    'NotOnPath': notOnPath,
-    'DomainMismatch': domainMismatch,
-    'SameSiteStrict': sameSiteStrict,
-    'SameSiteLax': sameSiteLax,
-    'SameSiteUnspecifiedTreatedAsLax': sameSiteUnspecifiedTreatedAsLax,
-    'SameSiteNoneInsecure': sameSiteNoneInsecure,
-    'UserPreferences': userPreferences,
-    'UnknownError': unknownError,
-    'SchemefulSameSiteStrict': schemefulSameSiteStrict,
-    'SchemefulSameSiteLax': schemefulSameSiteLax,
-    'SchemefulSameSiteUnspecifiedTreatedAsLax':
-        schemefulSameSiteUnspecifiedTreatedAsLax,
-    'SamePartyFromCrossPartyContext': samePartyFromCrossPartyContext,
-    'NameValuePairExceedsMaxSize': nameValuePairExceedsMaxSize,
-  };
+enum CookieBlockedReason {
+  secureOnly('SecureOnly'),
+  notOnPath('NotOnPath'),
+  domainMismatch('DomainMismatch'),
+  sameSiteStrict('SameSiteStrict'),
+  sameSiteLax('SameSiteLax'),
+  sameSiteUnspecifiedTreatedAsLax('SameSiteUnspecifiedTreatedAsLax'),
+  sameSiteNoneInsecure('SameSiteNoneInsecure'),
+  userPreferences('UserPreferences'),
+  unknownError('UnknownError'),
+  schemefulSameSiteStrict('SchemefulSameSiteStrict'),
+  schemefulSameSiteLax('SchemefulSameSiteLax'),
+  schemefulSameSiteUnspecifiedTreatedAsLax(
+      'SchemefulSameSiteUnspecifiedTreatedAsLax'),
+  samePartyFromCrossPartyContext('SamePartyFromCrossPartyContext'),
+  nameValuePairExceedsMaxSize('NameValuePairExceedsMaxSize'),
+  ;
 
   final String value;
 
-  const CookieBlockedReason._(this.value);
+  const CookieBlockedReason(this.value);
 
-  factory CookieBlockedReason.fromJson(String value) => values[value]!;
+  factory CookieBlockedReason.fromJson(String value) =>
+      CookieBlockedReason.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CookieBlockedReason && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -3679,28 +3351,19 @@ class AuthChallenge {
   }
 }
 
-class AuthChallengeSource {
-  static const server = AuthChallengeSource._('Server');
-  static const proxy = AuthChallengeSource._('Proxy');
-  static const values = {
-    'Server': server,
-    'Proxy': proxy,
-  };
+enum AuthChallengeSource {
+  server('Server'),
+  proxy('Proxy'),
+  ;
 
   final String value;
 
-  const AuthChallengeSource._(this.value);
+  const AuthChallengeSource(this.value);
 
-  factory AuthChallengeSource.fromJson(String value) => values[value]!;
+  factory AuthChallengeSource.fromJson(String value) =>
+      AuthChallengeSource.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is AuthChallengeSource && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -3743,33 +3406,20 @@ class AuthChallengeResponse {
   }
 }
 
-class AuthChallengeResponseResponse {
-  static const default$ = AuthChallengeResponseResponse._('Default');
-  static const cancelAuth = AuthChallengeResponseResponse._('CancelAuth');
-  static const provideCredentials =
-      AuthChallengeResponseResponse._('ProvideCredentials');
-  static const values = {
-    'Default': default$,
-    'CancelAuth': cancelAuth,
-    'ProvideCredentials': provideCredentials,
-  };
+enum AuthChallengeResponseResponse {
+  default$('Default'),
+  cancelAuth('CancelAuth'),
+  provideCredentials('ProvideCredentials'),
+  ;
 
   final String value;
 
-  const AuthChallengeResponseResponse._(this.value);
+  const AuthChallengeResponseResponse(this.value);
 
   factory AuthChallengeResponseResponse.fromJson(String value) =>
-      values[value]!;
+      AuthChallengeResponseResponse.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is AuthChallengeResponseResponse && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -3777,28 +3427,19 @@ class AuthChallengeResponseResponse {
 
 /// Stages of the interception to begin intercepting. Request will intercept before the request is
 /// sent. Response will intercept after the response is received.
-class InterceptionStage {
-  static const request = InterceptionStage._('Request');
-  static const headersReceived = InterceptionStage._('HeadersReceived');
-  static const values = {
-    'Request': request,
-    'HeadersReceived': headersReceived,
-  };
+enum InterceptionStage {
+  request('Request'),
+  headersReceived('HeadersReceived'),
+  ;
 
   final String value;
 
-  const InterceptionStage._(this.value);
+  const InterceptionStage(this.value);
 
-  factory InterceptionStage.fromJson(String value) => values[value]!;
+  factory InterceptionStage.fromJson(String value) =>
+      InterceptionStage.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is InterceptionStage && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -3965,42 +3606,23 @@ class SignedExchangeHeader {
 }
 
 /// Field type for a signed exchange related error.
-class SignedExchangeErrorField {
-  static const signatureSig = SignedExchangeErrorField._('signatureSig');
-  static const signatureIntegrity =
-      SignedExchangeErrorField._('signatureIntegrity');
-  static const signatureCertUrl =
-      SignedExchangeErrorField._('signatureCertUrl');
-  static const signatureCertSha256 =
-      SignedExchangeErrorField._('signatureCertSha256');
-  static const signatureValidityUrl =
-      SignedExchangeErrorField._('signatureValidityUrl');
-  static const signatureTimestamps =
-      SignedExchangeErrorField._('signatureTimestamps');
-  static const values = {
-    'signatureSig': signatureSig,
-    'signatureIntegrity': signatureIntegrity,
-    'signatureCertUrl': signatureCertUrl,
-    'signatureCertSha256': signatureCertSha256,
-    'signatureValidityUrl': signatureValidityUrl,
-    'signatureTimestamps': signatureTimestamps,
-  };
+enum SignedExchangeErrorField {
+  signatureSig('signatureSig'),
+  signatureIntegrity('signatureIntegrity'),
+  signatureCertUrl('signatureCertUrl'),
+  signatureCertSha256('signatureCertSha256'),
+  signatureValidityUrl('signatureValidityUrl'),
+  signatureTimestamps('signatureTimestamps'),
+  ;
 
   final String value;
 
-  const SignedExchangeErrorField._(this.value);
+  const SignedExchangeErrorField(this.value);
 
-  factory SignedExchangeErrorField.fromJson(String value) => values[value]!;
+  factory SignedExchangeErrorField.fromJson(String value) =>
+      SignedExchangeErrorField.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is SignedExchangeErrorField && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -4093,97 +3715,61 @@ class SignedExchangeInfo {
 }
 
 /// List of content encodings supported by the backend.
-class ContentEncoding {
-  static const deflate = ContentEncoding._('deflate');
-  static const gzip = ContentEncoding._('gzip');
-  static const br = ContentEncoding._('br');
-  static const values = {
-    'deflate': deflate,
-    'gzip': gzip,
-    'br': br,
-  };
+enum ContentEncoding {
+  deflate('deflate'),
+  gzip('gzip'),
+  br('br'),
+  ;
 
   final String value;
 
-  const ContentEncoding._(this.value);
+  const ContentEncoding(this.value);
 
-  factory ContentEncoding.fromJson(String value) => values[value]!;
+  factory ContentEncoding.fromJson(String value) =>
+      ContentEncoding.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ContentEncoding && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class PrivateNetworkRequestPolicy {
-  static const allow = PrivateNetworkRequestPolicy._('Allow');
-  static const blockFromInsecureToMorePrivate =
-      PrivateNetworkRequestPolicy._('BlockFromInsecureToMorePrivate');
-  static const warnFromInsecureToMorePrivate =
-      PrivateNetworkRequestPolicy._('WarnFromInsecureToMorePrivate');
-  static const preflightBlock = PrivateNetworkRequestPolicy._('PreflightBlock');
-  static const preflightWarn = PrivateNetworkRequestPolicy._('PreflightWarn');
-  static const values = {
-    'Allow': allow,
-    'BlockFromInsecureToMorePrivate': blockFromInsecureToMorePrivate,
-    'WarnFromInsecureToMorePrivate': warnFromInsecureToMorePrivate,
-    'PreflightBlock': preflightBlock,
-    'PreflightWarn': preflightWarn,
-  };
+enum PrivateNetworkRequestPolicy {
+  allow('Allow'),
+  blockFromInsecureToMorePrivate('BlockFromInsecureToMorePrivate'),
+  warnFromInsecureToMorePrivate('WarnFromInsecureToMorePrivate'),
+  preflightBlock('PreflightBlock'),
+  preflightWarn('PreflightWarn'),
+  ;
 
   final String value;
 
-  const PrivateNetworkRequestPolicy._(this.value);
+  const PrivateNetworkRequestPolicy(this.value);
 
-  factory PrivateNetworkRequestPolicy.fromJson(String value) => values[value]!;
+  factory PrivateNetworkRequestPolicy.fromJson(String value) =>
+      PrivateNetworkRequestPolicy.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is PrivateNetworkRequestPolicy && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class IPAddressSpace {
-  static const local = IPAddressSpace._('Local');
-  static const private = IPAddressSpace._('Private');
-  static const public = IPAddressSpace._('Public');
-  static const unknown = IPAddressSpace._('Unknown');
-  static const values = {
-    'Local': local,
-    'Private': private,
-    'Public': public,
-    'Unknown': unknown,
-  };
+enum IPAddressSpace {
+  local('Local'),
+  private('Private'),
+  public('Public'),
+  unknown('Unknown'),
+  ;
 
   final String value;
 
-  const IPAddressSpace._(this.value);
+  const IPAddressSpace(this.value);
 
-  factory IPAddressSpace.fromJson(String value) => values[value]!;
+  factory IPAddressSpace.fromJson(String value) =>
+      IPAddressSpace.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is IPAddressSpace && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -4242,38 +3828,22 @@ class ClientSecurityState {
   }
 }
 
-class CrossOriginOpenerPolicyValue {
-  static const sameOrigin = CrossOriginOpenerPolicyValue._('SameOrigin');
-  static const sameOriginAllowPopups =
-      CrossOriginOpenerPolicyValue._('SameOriginAllowPopups');
-  static const unsafeNone = CrossOriginOpenerPolicyValue._('UnsafeNone');
-  static const sameOriginPlusCoep =
-      CrossOriginOpenerPolicyValue._('SameOriginPlusCoep');
-  static const sameOriginAllowPopupsPlusCoep =
-      CrossOriginOpenerPolicyValue._('SameOriginAllowPopupsPlusCoep');
-  static const values = {
-    'SameOrigin': sameOrigin,
-    'SameOriginAllowPopups': sameOriginAllowPopups,
-    'UnsafeNone': unsafeNone,
-    'SameOriginPlusCoep': sameOriginPlusCoep,
-    'SameOriginAllowPopupsPlusCoep': sameOriginAllowPopupsPlusCoep,
-  };
+enum CrossOriginOpenerPolicyValue {
+  sameOrigin('SameOrigin'),
+  sameOriginAllowPopups('SameOriginAllowPopups'),
+  unsafeNone('UnsafeNone'),
+  sameOriginPlusCoep('SameOriginPlusCoep'),
+  sameOriginAllowPopupsPlusCoep('SameOriginAllowPopupsPlusCoep'),
+  ;
 
   final String value;
 
-  const CrossOriginOpenerPolicyValue._(this.value);
+  const CrossOriginOpenerPolicyValue(this.value);
 
-  factory CrossOriginOpenerPolicyValue.fromJson(String value) => values[value]!;
+  factory CrossOriginOpenerPolicyValue.fromJson(String value) =>
+      CrossOriginOpenerPolicyValue.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CrossOriginOpenerPolicyValue && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -4320,33 +3890,20 @@ class CrossOriginOpenerPolicyStatus {
   }
 }
 
-class CrossOriginEmbedderPolicyValue {
-  static const none = CrossOriginEmbedderPolicyValue._('None');
-  static const credentialless =
-      CrossOriginEmbedderPolicyValue._('Credentialless');
-  static const requireCorp = CrossOriginEmbedderPolicyValue._('RequireCorp');
-  static const values = {
-    'None': none,
-    'Credentialless': credentialless,
-    'RequireCorp': requireCorp,
-  };
+enum CrossOriginEmbedderPolicyValue {
+  none('None'),
+  credentialless('Credentialless'),
+  requireCorp('RequireCorp'),
+  ;
 
   final String value;
 
-  const CrossOriginEmbedderPolicyValue._(this.value);
+  const CrossOriginEmbedderPolicyValue(this.value);
 
   factory CrossOriginEmbedderPolicyValue.fromJson(String value) =>
-      values[value]!;
+      CrossOriginEmbedderPolicyValue.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CrossOriginEmbedderPolicyValue && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -4422,32 +3979,21 @@ class SecurityIsolationStatus {
 }
 
 /// The status of a Reporting API report.
-class ReportStatus {
-  static const queued = ReportStatus._('Queued');
-  static const pending = ReportStatus._('Pending');
-  static const markedForRemoval = ReportStatus._('MarkedForRemoval');
-  static const success = ReportStatus._('Success');
-  static const values = {
-    'Queued': queued,
-    'Pending': pending,
-    'MarkedForRemoval': markedForRemoval,
-    'Success': success,
-  };
+enum ReportStatus {
+  queued('Queued'),
+  pending('Pending'),
+  markedForRemoval('MarkedForRemoval'),
+  success('Success'),
+  ;
 
   final String value;
 
-  const ReportStatus._(this.value);
+  const ReportStatus(this.value);
 
-  factory ReportStatus.fromJson(String value) => values[value]!;
+  factory ReportStatus.fromJson(String value) =>
+      ReportStatus.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ReportStatus && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
@@ -4644,55 +4190,28 @@ class LoadNetworkResourceOptions {
   }
 }
 
-class TrustTokenOperationDoneEventStatus {
-  static const ok = TrustTokenOperationDoneEventStatus._('Ok');
-  static const invalidArgument =
-      TrustTokenOperationDoneEventStatus._('InvalidArgument');
-  static const failedPrecondition =
-      TrustTokenOperationDoneEventStatus._('FailedPrecondition');
-  static const resourceExhausted =
-      TrustTokenOperationDoneEventStatus._('ResourceExhausted');
-  static const alreadyExists =
-      TrustTokenOperationDoneEventStatus._('AlreadyExists');
-  static const unavailable =
-      TrustTokenOperationDoneEventStatus._('Unavailable');
-  static const badResponse =
-      TrustTokenOperationDoneEventStatus._('BadResponse');
-  static const internalError =
-      TrustTokenOperationDoneEventStatus._('InternalError');
-  static const unknownError =
-      TrustTokenOperationDoneEventStatus._('UnknownError');
-  static const fulfilledLocally =
-      TrustTokenOperationDoneEventStatus._('FulfilledLocally');
-  static const values = {
-    'Ok': ok,
-    'InvalidArgument': invalidArgument,
-    'FailedPrecondition': failedPrecondition,
-    'ResourceExhausted': resourceExhausted,
-    'AlreadyExists': alreadyExists,
-    'Unavailable': unavailable,
-    'BadResponse': badResponse,
-    'InternalError': internalError,
-    'UnknownError': unknownError,
-    'FulfilledLocally': fulfilledLocally,
-  };
+enum TrustTokenOperationDoneEventStatus {
+  ok('Ok'),
+  invalidArgument('InvalidArgument'),
+  failedPrecondition('FailedPrecondition'),
+  resourceExhausted('ResourceExhausted'),
+  alreadyExists('AlreadyExists'),
+  unavailable('Unavailable'),
+  badResponse('BadResponse'),
+  internalError('InternalError'),
+  unknownError('UnknownError'),
+  fulfilledLocally('FulfilledLocally'),
+  ;
 
   final String value;
 
-  const TrustTokenOperationDoneEventStatus._(this.value);
+  const TrustTokenOperationDoneEventStatus(this.value);
 
   factory TrustTokenOperationDoneEventStatus.fromJson(String value) =>
-      values[value]!;
+      TrustTokenOperationDoneEventStatus.values
+          .firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is TrustTokenOperationDoneEventStatus && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();

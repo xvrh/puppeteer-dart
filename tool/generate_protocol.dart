@@ -449,17 +449,18 @@ class _InternalType {
 
   _InternalType(this.context, this.type, {this.generateToJson = true}) {
     var id = type.id;
+    var enumValues = type.enums;
+    var isEnum = enumValues != null;
 
     var code = StringBuffer();
 
     code.writeln(toComment(type.description));
-    code.writeln('class $id {');
+    code.writeln('${isEnum ? 'enum' : 'class'} $id {');
 
     var properties = <Parameter>[];
     var jsonProperties = type.properties;
     var hasProperties = jsonProperties.isNotEmpty;
-    var enumValues = type.enums;
-    var isEnum = false;
+
     if (hasProperties) {
       properties.addAll(jsonProperties);
     } else {
@@ -467,19 +468,12 @@ class _InternalType {
           .add(Parameter(name: 'value', type: type.type, items: type.items));
 
       if (enumValues != null) {
-        isEnum = true;
         for (var enumValue in enumValues) {
           var normalizedValue = _normalizeEnumValue(enumValue);
 
-          code.writeln("static const $normalizedValue = $id._('$enumValue');");
+          code.writeln("$normalizedValue('$enumValue'),");
         }
-
-        code.writeln('static const values = {');
-        for (var enumValue in enumValues) {
-          var normalizedValue = _normalizeEnumValue(enumValue);
-          code.writeln("'$enumValue': $normalizedValue,");
-        }
-        code.writeln('};');
+        code.writeln(';');
       }
     }
 
@@ -505,7 +499,7 @@ class _InternalType {
       }
       code.writeln('$id({${parametersCode.join(',')}});');
     } else if (isEnum) {
-      code.writeln('const $id._(this.value);');
+      code.writeln('const $id(this.value);');
     } else {
       code.writeln('$id(this.value);');
     }
@@ -528,7 +522,8 @@ class _InternalType {
       code.writeln(');');
       code.writeln('}');
     } else if (isEnum) {
-      code.writeln('factory $id.fromJson(String value) => values[value]!;');
+      code.writeln(
+          'factory $id.fromJson(String value) => $id.values.firstWhere((e) => e.value == value);');
     } else {
       var singleParameter = properties.single;
       if (context.isList(singleParameter)) {
@@ -570,16 +565,17 @@ class _InternalType {
     }
 
     if (!hasProperties) {
-      //TODO(xha): generate operator== and hashcode also for complex type?
+      if (!isEnum) {
+        //TODO(xha): generate operator== and hashcode also for complex type?
+        code.writeln();
+        code.writeln('@override');
+        code.writeln(
+            'bool operator ==(other) => (other is $id && other.value == value) || value == other;');
+        code.writeln();
+        code.writeln('@override');
+        code.writeln('int get hashCode => value.hashCode;');
+      }
       code.writeln();
-      code.writeln('@override');
-      code.writeln(
-          'bool operator ==(other) => (other is $id && other.value == value) || value == other;');
-      code.writeln();
-      code.writeln('@override');
-      code.writeln('int get hashCode => value.hashCode;');
-      code.writeln();
-
       //TODO(xha): generate a readable toString() method for the complex type
       code.writeln('@override');
       code.writeln('String toString() => value.toString();');

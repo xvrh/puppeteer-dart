@@ -161,70 +161,44 @@ class ServiceWorkerRegistration {
   }
 }
 
-class ServiceWorkerVersionRunningStatus {
-  static const stopped = ServiceWorkerVersionRunningStatus._('stopped');
-  static const starting = ServiceWorkerVersionRunningStatus._('starting');
-  static const running = ServiceWorkerVersionRunningStatus._('running');
-  static const stopping = ServiceWorkerVersionRunningStatus._('stopping');
-  static const values = {
-    'stopped': stopped,
-    'starting': starting,
-    'running': running,
-    'stopping': stopping,
-  };
+enum ServiceWorkerVersionRunningStatus {
+  stopped('stopped'),
+  starting('starting'),
+  running('running'),
+  stopping('stopping'),
+  ;
 
   final String value;
 
-  const ServiceWorkerVersionRunningStatus._(this.value);
+  const ServiceWorkerVersionRunningStatus(this.value);
 
   factory ServiceWorkerVersionRunningStatus.fromJson(String value) =>
-      values[value]!;
+      ServiceWorkerVersionRunningStatus.values
+          .firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ServiceWorkerVersionRunningStatus && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
 }
 
-class ServiceWorkerVersionStatus {
-  static const new$ = ServiceWorkerVersionStatus._('new');
-  static const installing = ServiceWorkerVersionStatus._('installing');
-  static const installed = ServiceWorkerVersionStatus._('installed');
-  static const activating = ServiceWorkerVersionStatus._('activating');
-  static const activated = ServiceWorkerVersionStatus._('activated');
-  static const redundant = ServiceWorkerVersionStatus._('redundant');
-  static const values = {
-    'new': new$,
-    'installing': installing,
-    'installed': installed,
-    'activating': activating,
-    'activated': activated,
-    'redundant': redundant,
-  };
+enum ServiceWorkerVersionStatus {
+  new$('new'),
+  installing('installing'),
+  installed('installed'),
+  activating('activating'),
+  activated('activated'),
+  redundant('redundant'),
+  ;
 
   final String value;
 
-  const ServiceWorkerVersionStatus._(this.value);
+  const ServiceWorkerVersionStatus(this.value);
 
-  factory ServiceWorkerVersionStatus.fromJson(String value) => values[value]!;
+  factory ServiceWorkerVersionStatus.fromJson(String value) =>
+      ServiceWorkerVersionStatus.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ServiceWorkerVersionStatus && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
 
   @override
   String toString() => value.toString();
