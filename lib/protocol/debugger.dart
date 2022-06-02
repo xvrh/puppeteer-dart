@@ -503,7 +503,7 @@ class ScriptFailedToParseEvent {
   /// Specifies script creation context.
   final runtime.ExecutionContextId executionContextId;
 
-  /// Content hash of the script.
+  /// Content hash of the script, SHA-256.
   final String hash;
 
   /// Embedder-specific auxiliary data.
@@ -612,7 +612,7 @@ class ScriptParsedEvent {
   /// Specifies script creation context.
   final runtime.ExecutionContextId executionContextId;
 
-  /// Content hash of the script.
+  /// Content hash of the script, SHA-256.
   final String hash;
 
   /// Embedder-specific auxiliary data.
@@ -1018,6 +1018,12 @@ class CallFrame {
   /// The value being returned, if the function is at return point.
   final runtime.RemoteObject? returnValue;
 
+  /// Valid only while the VM is paused and indicates whether this frame
+  /// can be restarted or not. Note that a `true` value here does not
+  /// guarantee that Debugger#restartFrame with this CallFrameId will be
+  /// successful, but it is very likely.
+  final bool? canBeRestarted;
+
   CallFrame(
       {required this.callFrameId,
       required this.functionName,
@@ -1025,7 +1031,8 @@ class CallFrame {
       required this.location,
       required this.scopeChain,
       required this.this$,
-      this.returnValue});
+      this.returnValue,
+      this.canBeRestarted});
 
   factory CallFrame.fromJson(Map<String, dynamic> json) {
     return CallFrame(
@@ -1044,6 +1051,9 @@ class CallFrame {
           ? runtime.RemoteObject.fromJson(
               json['returnValue'] as Map<String, dynamic>)
           : null,
+      canBeRestarted: json.containsKey('canBeRestarted')
+          ? json['canBeRestarted'] as bool
+          : null,
     );
   }
 
@@ -1057,6 +1067,7 @@ class CallFrame {
       if (functionLocation != null)
         'functionLocation': functionLocation!.toJson(),
       if (returnValue != null) 'returnValue': returnValue!.toJson(),
+      if (canBeRestarted != null) 'canBeRestarted': canBeRestarted,
     };
   }
 }

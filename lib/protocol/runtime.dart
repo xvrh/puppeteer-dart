@@ -87,7 +87,9 @@ class RuntimeApi {
   /// [objectGroup] Symbolic group name that can be used to release multiple objects. If objectGroup is not
   /// specified and objectId is, objectGroup will be inherited from object.
   /// [throwOnSideEffect] Whether to throw an exception if side effect cannot be ruled out during evaluation.
-  /// [generateWebDriverValue] Whether the result should be serialized according to https://w3c.github.io/webdriver-bidi.
+  /// [generateWebDriverValue] Whether the result should contain `webDriverValue`, serialized according to
+  /// https://w3c.github.io/webdriver-bidi. This is mutually exclusive with `returnByValue`, but
+  /// resulting `objectId` is still provided.
   Future<CallFunctionOnResult> callFunctionOn(String functionDeclaration,
       {RemoteObjectId? objectId,
       List<CallArgument>? arguments,

@@ -1,7 +1,7 @@
 include: package:lints/recommended.yaml
 analyzer:
- strong-mode:
-  implicit-casts: false
+  language:
+    strict-casts: true
 linter:
  rules:
    avoid_returning_null_for_future: true

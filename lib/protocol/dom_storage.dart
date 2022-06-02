@@ -1,5 +1,6 @@
 import 'dart:async';
 import '../src/connection.dart';
+import 'page.dart' as page;
 
 /// Query and modify DOM storage.
 class DOMStorageApi {
@@ -66,6 +67,14 @@ class DOMStorageApi {
       'value': value,
     });
   }
+
+  Future<SerializedStorageKey> getStorageKeyForFrame(
+      page.FrameId frameId) async {
+    var result = await _client.send('DOMStorage.getStorageKeyForFrame', {
+      'frameId': frameId,
+    });
+    return SerializedStorageKey.fromJson(result['storageKey'] as String);
+  }
 }
 
 class DomStorageItemAddedEvent {
@@ -127,27 +136,58 @@ class DomStorageItemUpdatedEvent {
   }
 }
 
+class SerializedStorageKey {
+  final String value;
+
+  SerializedStorageKey(this.value);
+
+  factory SerializedStorageKey.fromJson(String value) =>
+      SerializedStorageKey(value);
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is SerializedStorageKey && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// DOM Storage identifier.
 class StorageId {
   /// Security origin for the storage.
-  final String securityOrigin;
+  final String? securityOrigin;
+
+  /// Represents a key by which DOM Storage keys its CachedStorageAreas
+  final SerializedStorageKey? storageKey;
 
   /// Whether the storage is local storage (not session storage).
   final bool isLocalStorage;
 
-  StorageId({required this.securityOrigin, required this.isLocalStorage});
+  StorageId(
+      {this.securityOrigin, this.storageKey, required this.isLocalStorage});
 
   factory StorageId.fromJson(Map<String, dynamic> json) {
     return StorageId(
-      securityOrigin: json['securityOrigin'] as String,
+      securityOrigin: json.containsKey('securityOrigin')
+          ? json['securityOrigin'] as String
+          : null,
+      storageKey: json.containsKey('storageKey')
+          ? SerializedStorageKey.fromJson(json['storageKey'] as String)
+          : null,
       isLocalStorage: json['isLocalStorage'] as bool? ?? false,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'securityOrigin': securityOrigin,
       'isLocalStorage': isLocalStorage,
+      if (securityOrigin != null) 'securityOrigin': securityOrigin,
+      if (storageKey != null) 'storageKey': storageKey!.toJson(),
     };
   }
 }

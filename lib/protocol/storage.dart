@@ -273,6 +273,27 @@ class GetUsageAndQuotaResult {
   }
 }
 
+class SerializedStorageKey {
+  final String value;
+
+  SerializedStorageKey(this.value);
+
+  factory SerializedStorageKey.fromJson(String value) =>
+      SerializedStorageKey(value);
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is SerializedStorageKey && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Enum of possible storage types.
 enum StorageType {
   appcache('appcache'),
