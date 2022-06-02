@@ -10,7 +10,7 @@ jobs:
       image: dart:stable
     steps:
       - uses: actions/checkout@v2
-      - run: pub get
+      - run: dart pub get
       - run: dart tool/check_version.dart ${GITHUB_REF}
       - name: Setup credentials
         run: |
@@ -25,4 +25,4 @@ jobs:
           }
           EOF
       - name: Publish package
-        run: pub publish --force
+        run: dart pub publish --force
