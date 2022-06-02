@@ -1,5 +1,4 @@
 import 'dart:async';
-import '../../protocol/network.dart';
 import 'frame_manager.dart';
 import 'network_manager.dart';
 
