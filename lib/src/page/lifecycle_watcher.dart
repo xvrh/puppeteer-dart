@@ -9,7 +9,6 @@ class LifecycleWatcher {
   final Until wait;
   final Duration? timeout;
   late List<StreamSubscription> _subscriptions;
-  LoaderId? _initialLoaderId;
   Request? _navigationRequest;
   final _sameDocumentNavigationCompleter = Completer<Exception?>(),
       _lifecycleCompleter = Completer<Exception?>(),
@@ -17,16 +16,18 @@ class LifecycleWatcher {
       _newDocumentNavigationCompleter = Completer<Exception?>();
   late final Future<Exception> _timeoutFuture;
   bool _hasSameDocumentNavigation = false;
+  bool _newDocumentNavigation = false;
+  bool _swapped = false;
   Timer? _timeoutTimer;
 
   LifecycleWatcher(this.frameManager, this.frame, {Until? wait, this.timeout})
       : wait = wait ?? Until.load {
-    _initialLoaderId = frame.loaderId;
-
     _subscriptions = [
       frameManager.onLifecycleEvent.listen(_checkLifecycleComplete),
       frameManager.onFrameNavigatedWithinDocument
           .listen(_navigatedWithinDocument),
+      frameManager.onFrameNavigated.listen(_navigated),
+      frameManager.onFrameSwapped.listen(_frameSwapped),
       frameManager.onFrameDetached.listen(_onFrameDetached),
       frameManager.networkManager.onRequest.listen(_onRequest),
     ];
@@ -92,6 +93,18 @@ class LifecycleWatcher {
     _checkLifecycleComplete();
   }
 
+  void _navigated(Frame frame) {
+    if (frame != this.frame) return;
+    _newDocumentNavigation = true;
+    _checkLifecycleComplete();
+  }
+
+  void _frameSwapped(Frame frame) {
+    if (frame != this.frame) return;
+    _swapped = true;
+    _checkLifecycleComplete();
+  }
+
   void _checkLifecycleComplete([_]) {
     // We expect navigation to commit.
     if (!_checkLifecycle(frame)) return;
@@ -99,15 +112,12 @@ class LifecycleWatcher {
     if (!_lifecycleCompleter.isCompleted) {
       _lifecycleCompleter.complete();
     }
-    if (frame.loaderId == _initialLoaderId && !_hasSameDocumentNavigation) {
-      return;
-    }
     if (_hasSameDocumentNavigation) {
       if (!_sameDocumentNavigationCompleter.isCompleted) {
         _sameDocumentNavigationCompleter.complete();
       }
     }
-    if (frame.loaderId != _initialLoaderId) {
+    if (_swapped || _newDocumentNavigation) {
       if (!_newDocumentNavigationCompleter.isCompleted) {
         _newDocumentNavigationCompleter.complete();
       }
