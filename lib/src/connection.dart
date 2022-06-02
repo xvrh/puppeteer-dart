@@ -123,15 +123,18 @@ class Connection implements Client {
     } else if (id != null) {
       _logger.finer('◀ RECV $id $message');
 
-      var messageInFly = _messagesInFly.remove(id)!;
+      var messageInFly = _messagesInFly.remove(id);
 
-      var error = object['error'] as Map<String, dynamic>?;
-      if (error != null) {
-        messageInFly.completer
-            .completeError(ServerException(error['message'] as String));
-      } else {
-        messageInFly.completer
-            .complete(object['result'] as Map<String, dynamic>?);
+      // Callbacks could be all rejected if someone has called `.dispose()`.
+      if (messageInFly != null) {
+        var error = object['error'] as Map<String, dynamic>?;
+        if (error != null) {
+          messageInFly.completer
+              .completeError(ServerException(error['message'] as String));
+        } else {
+          messageInFly.completer
+              .complete(object['result'] as Map<String, dynamic>?);
+        }
       }
     } else {
       var method = object['method'] as String;

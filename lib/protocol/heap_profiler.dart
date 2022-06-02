@@ -111,32 +111,39 @@ class HeapProfilerApi {
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken
   /// when the tracking is stopped.
   /// [captureNumericValue] If true, numerical values are included in the snapshot
+  /// [exposeInternals] If true, exposes internals of the snapshot.
   Future<void> stopTrackingHeapObjects(
       {bool? reportProgress,
-      bool? treatGlobalObjectsAsRoots,
-      bool? captureNumericValue}) async {
+      @Deprecated('This parameter is deprecated')
+          bool? treatGlobalObjectsAsRoots,
+      bool? captureNumericValue,
+      bool? exposeInternals}) async {
     await _client.send('HeapProfiler.stopTrackingHeapObjects', {
       if (reportProgress != null) 'reportProgress': reportProgress,
       if (treatGlobalObjectsAsRoots != null)
         'treatGlobalObjectsAsRoots': treatGlobalObjectsAsRoots,
       if (captureNumericValue != null)
         'captureNumericValue': captureNumericValue,
+      if (exposeInternals != null) 'exposeInternals': exposeInternals,
     });
   }
 
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken.
-  /// [treatGlobalObjectsAsRoots] If true, a raw snapshot without artificial roots will be generated
   /// [captureNumericValue] If true, numerical values are included in the snapshot
+  /// [exposeInternals] If true, exposes internals of the snapshot.
   Future<void> takeHeapSnapshot(
       {bool? reportProgress,
-      bool? treatGlobalObjectsAsRoots,
-      bool? captureNumericValue}) async {
+      @Deprecated('This parameter is deprecated')
+          bool? treatGlobalObjectsAsRoots,
+      bool? captureNumericValue,
+      bool? exposeInternals}) async {
     await _client.send('HeapProfiler.takeHeapSnapshot', {
       if (reportProgress != null) 'reportProgress': reportProgress,
       if (treatGlobalObjectsAsRoots != null)
         'treatGlobalObjectsAsRoots': treatGlobalObjectsAsRoots,
       if (captureNumericValue != null)
         'captureNumericValue': captureNumericValue,
+      if (exposeInternals != null) 'exposeInternals': exposeInternals,
     });
   }
 }

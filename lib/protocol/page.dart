@@ -425,10 +425,14 @@ class PageApi {
   /// [marginBottom] Bottom margin in inches. Defaults to 1cm (~0.4 inches).
   /// [marginLeft] Left margin in inches. Defaults to 1cm (~0.4 inches).
   /// [marginRight] Right margin in inches. Defaults to 1cm (~0.4 inches).
-  /// [pageRanges] Paper ranges to print, e.g., '1-5, 8, 11-13'. Defaults to the empty string, which means
-  /// print all pages.
-  /// [ignoreInvalidPageRanges] Whether to silently ignore invalid but successfully parsed page ranges, such as '3-2'.
-  /// Defaults to false.
+  /// [pageRanges] Paper ranges to print, one based, e.g., '1-5, 8, 11-13'. Pages are
+  /// printed in the document order, not in the order specified, and no
+  /// more than once.
+  /// Defaults to empty string, which implies the entire document is printed.
+  /// The page numbers are quietly capped to actual page count of the
+  /// document, and ranges beyond the end of the document are ignored.
+  /// If this results in no pages to print, an error is reported.
+  /// It is an error to specify a range with start greater than end.
   /// [headerTemplate] HTML template for the print header. Should be valid HTML markup with following
   /// classes used to inject printing values into them:
   /// - `date`: formatted print date
@@ -454,7 +458,6 @@ class PageApi {
       num? marginLeft,
       num? marginRight,
       String? pageRanges,
-      bool? ignoreInvalidPageRanges,
       String? headerTemplate,
       String? footerTemplate,
       bool? preferCSSPageSize,
@@ -474,8 +477,6 @@ class PageApi {
       if (marginLeft != null) 'marginLeft': marginLeft,
       if (marginRight != null) 'marginRight': marginRight,
       if (pageRanges != null) 'pageRanges': pageRanges,
-      if (ignoreInvalidPageRanges != null)
-        'ignoreInvalidPageRanges': ignoreInvalidPageRanges,
       if (headerTemplate != null) 'headerTemplate': headerTemplate,
       if (footerTemplate != null) 'footerTemplate': footerTemplate,
       if (preferCSSPageSize != null) 'preferCSSPageSize': preferCSSPageSize,
@@ -1578,8 +1579,10 @@ enum PermissionsPolicyFeature {
   chDeviceMemory('ch-device-memory'),
   chDownlink('ch-downlink'),
   chEct('ch-ect'),
+  chPartitionedCookies('ch-partitioned-cookies'),
   chPrefersColorScheme('ch-prefers-color-scheme'),
   chRtt('ch-rtt'),
+  chSaveData('ch-save-data'),
   chUa('ch-ua'),
   chUaArch('ch-ua-arch'),
   chUaBitness('ch-ua-bitness'),
@@ -1595,7 +1598,6 @@ enum PermissionsPolicyFeature {
   chViewportHeight('ch-viewport-height'),
   chViewportWidth('ch-viewport-width'),
   chWidth('ch-width'),
-  chPartitionedCookies('ch-partitioned-cookies'),
   clipboardRead('clipboard-read'),
   clipboardWrite('clipboard-write'),
   crossOriginIsolated('cross-origin-isolated'),
@@ -1616,6 +1618,7 @@ enum PermissionsPolicyFeature {
   interestCohort('interest-cohort'),
   joinAdInterestGroup('join-ad-interest-group'),
   keyboardMap('keyboard-map'),
+  localFonts('local-fonts'),
   magnetometer('magnetometer'),
   microphone('microphone'),
   midi('midi'),
@@ -2547,13 +2550,17 @@ class FontFamilies {
   /// The fantasy font-family.
   final String? fantasy;
 
+  /// The math font-family.
+  final String? math;
+
   FontFamilies(
       {this.standard,
       this.fixed,
       this.serif,
       this.sansSerif,
       this.cursive,
-      this.fantasy});
+      this.fantasy,
+      this.math});
 
   factory FontFamilies.fromJson(Map<String, dynamic> json) {
     return FontFamilies(
@@ -2565,6 +2572,7 @@ class FontFamilies {
           json.containsKey('sansSerif') ? json['sansSerif'] as String : null,
       cursive: json.containsKey('cursive') ? json['cursive'] as String : null,
       fantasy: json.containsKey('fantasy') ? json['fantasy'] as String : null,
+      math: json.containsKey('math') ? json['math'] as String : null,
     );
   }
 
@@ -2576,6 +2584,7 @@ class FontFamilies {
       if (sansSerif != null) 'sansSerif': sansSerif,
       if (cursive != null) 'cursive': cursive,
       if (fantasy != null) 'fantasy': fantasy,
+      if (math != null) 'math': math,
     };
   }
 }
@@ -2815,7 +2824,6 @@ enum BackForwardCacheNotRestoredReason {
   javaScriptExecution('JavaScriptExecution'),
   rendererProcessKilled('RendererProcessKilled'),
   rendererProcessCrashed('RendererProcessCrashed'),
-  grantedMediaStreamAccess('GrantedMediaStreamAccess'),
   schedulerTrackedFeatureUsed('SchedulerTrackedFeatureUsed'),
   conflictingBrowsingInstance('ConflictingBrowsingInstance'),
   cacheFlushed('CacheFlushed'),
@@ -2845,7 +2853,6 @@ enum BackForwardCacheNotRestoredReason {
   foregroundCacheLimit('ForegroundCacheLimit'),
   browsingInstanceNotSwapped('BrowsingInstanceNotSwapped'),
   backForwardCacheDisabledForDelegate('BackForwardCacheDisabledForDelegate'),
-  optInUnloadHeaderNotPresent('OptInUnloadHeaderNotPresent'),
   unloadHandlerExistsInMainFrame('UnloadHandlerExistsInMainFrame'),
   unloadHandlerExistsInSubFrame('UnloadHandlerExistsInSubFrame'),
   serviceWorkerUnregistration('ServiceWorkerUnregistration'),
@@ -3048,6 +3055,40 @@ class BackForwardCacheNotRestoredExplanationTree {
 /// List of FinalStatus reasons for Prerender2.
 enum PrerenderFinalStatus {
   activated('Activated'),
+  destroyed('Destroyed'),
+  lowEndDevice('LowEndDevice'),
+  crossOriginRedirect('CrossOriginRedirect'),
+  crossOriginNavigation('CrossOriginNavigation'),
+  invalidSchemeRedirect('InvalidSchemeRedirect'),
+  invalidSchemeNavigation('InvalidSchemeNavigation'),
+  inProgressNavigation('InProgressNavigation'),
+  navigationRequestBlockedByCsp('NavigationRequestBlockedByCsp'),
+  mainFrameNavigation('MainFrameNavigation'),
+  mojoBinderPolicy('MojoBinderPolicy'),
+  rendererProcessCrashed('RendererProcessCrashed'),
+  rendererProcessKilled('RendererProcessKilled'),
+  download('Download'),
+  triggerDestroyed('TriggerDestroyed'),
+  navigationNotCommitted('NavigationNotCommitted'),
+  navigationBadHttpStatus('NavigationBadHttpStatus'),
+  clientCertRequested('ClientCertRequested'),
+  navigationRequestNetworkError('NavigationRequestNetworkError'),
+  maxNumOfRunningPrerendersExceeded('MaxNumOfRunningPrerendersExceeded'),
+  cancelAllHostsForTesting('CancelAllHostsForTesting'),
+  didFailLoad('DidFailLoad'),
+  stop('Stop'),
+  sslCertificateError('SslCertificateError'),
+  loginAuthRequested('LoginAuthRequested'),
+  uaChangeRequiresReload('UaChangeRequiresReload'),
+  blockedByClient('BlockedByClient'),
+  audioOutputDeviceRequested('AudioOutputDeviceRequested'),
+  mixedContent('MixedContent'),
+  triggerBackgrounded('TriggerBackgrounded'),
+  embedderTriggeredAndSameOriginRedirected(
+      'EmbedderTriggeredAndSameOriginRedirected'),
+  embedderTriggeredAndCrossOriginRedirected(
+      'EmbedderTriggeredAndCrossOriginRedirected'),
+  embedderTriggeredAndDestroyed('EmbedderTriggeredAndDestroyed'),
   ;
 
   final String value;

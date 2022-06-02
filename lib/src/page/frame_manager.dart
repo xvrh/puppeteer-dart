@@ -23,6 +23,7 @@ class FrameManager {
   final _lifecycleEventController = StreamController<Frame>.broadcast(),
       _frameAttachedController = StreamController<Frame>.broadcast(),
       _frameNavigatedController = StreamController<Frame>.broadcast(),
+      _frameSwappedController = StreamController<Frame>.broadcast(),
       _frameNavigatedWithinDocumentController =
           StreamController<Frame>.broadcast(),
       _frameDetachedController = StreamController<Frame>.broadcast();
@@ -56,6 +57,8 @@ class FrameManager {
 
   Stream<Frame> get onFrameNavigated => _frameNavigatedController.stream;
 
+  Stream<Frame> get onFrameSwapped => _frameSwappedController.stream;
+
   Stream<Frame> get onFrameNavigatedWithinDocument =>
       _frameNavigatedWithinDocumentController.stream;
 
@@ -66,6 +69,7 @@ class FrameManager {
     _lifecycleEventController.close();
     _frameAttachedController.close();
     _frameNavigatedController.close();
+    _frameSwappedController.close();
     _frameNavigatedWithinDocumentController.close();
     _frameDetachedController.close();
   }
@@ -96,9 +100,8 @@ class FrameManager {
       if (response.errorText != null) {
         throw Exception('${response.errorText} at $url');
       }
-      await (response.loaderId != null
-          ? watcher.newDocumentNavigation
-          : watcher.sameDocumentNavigation);
+      await Future.any(
+          [watcher.newDocumentNavigation, watcher.sameDocumentNavigation]);
       return null;
     }
 
@@ -249,7 +252,11 @@ class FrameManager {
   void _onFrameDetached(FrameDetachedEvent event) {
     var frame = _frames[event.frameId];
     if (frame != null) {
-      _removeFramesRecursively(frame);
+      if (event.reason == FrameDetachedEventReason.remove) {
+        _removeFramesRecursively(frame);
+      } else if (event.reason == FrameDetachedEventReason.swap) {
+        _frameSwappedController.add(frame);
+      }
     }
   }
 

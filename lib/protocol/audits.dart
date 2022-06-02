@@ -919,11 +919,9 @@ class CorsIssueDetails {
 
 enum AttributionReportingIssueType {
   permissionPolicyDisabled('PermissionPolicyDisabled'),
-  invalidAttributionSourceEventId('InvalidAttributionSourceEventId'),
   attributionSourceUntrustworthyOrigin('AttributionSourceUntrustworthyOrigin'),
   attributionUntrustworthyOrigin('AttributionUntrustworthyOrigin'),
-  invalidAttributionSourceExpiry('InvalidAttributionSourceExpiry'),
-  invalidAttributionSourcePriority('InvalidAttributionSourcePriority'),
+  invalidHeader('InvalidHeader'),
   ;
 
   final String value;
@@ -1101,8 +1099,74 @@ class GenericIssueDetails {
 }
 
 enum DeprecationIssueType {
+  authorizationCoveredByWildcard('AuthorizationCoveredByWildcard'),
+  canRequestUrlhttpContainingNewline('CanRequestURLHTTPContainingNewline'),
+  chromeLoadTimesConnectionInfo('ChromeLoadTimesConnectionInfo'),
+  chromeLoadTimesFirstPaintAfterLoadTime(
+      'ChromeLoadTimesFirstPaintAfterLoadTime'),
+  chromeLoadTimesWasAlternateProtocolAvailable(
+      'ChromeLoadTimesWasAlternateProtocolAvailable'),
+  cookieWithTruncatingChar('CookieWithTruncatingChar'),
+  crossOriginAccessBasedOnDocumentDomain(
+      'CrossOriginAccessBasedOnDocumentDomain'),
+  crossOriginWindowAlert('CrossOriginWindowAlert'),
+  crossOriginWindowConfirm('CrossOriginWindowConfirm'),
+  cssSelectorInternalMediaControlsOverlayCastButton(
+      'CSSSelectorInternalMediaControlsOverlayCastButton'),
+  customCursorIntersectsViewport('CustomCursorIntersectsViewport'),
   deprecationExample('DeprecationExample'),
-  untranslated('Untranslated'),
+  documentDomainSettingWithoutOriginAgentClusterHeader(
+      'DocumentDomainSettingWithoutOriginAgentClusterHeader'),
+  eventPath('EventPath'),
+  geolocationInsecureOrigin('GeolocationInsecureOrigin'),
+  geolocationInsecureOriginDeprecatedNotRemoved(
+      'GeolocationInsecureOriginDeprecatedNotRemoved'),
+  getUserMediaInsecureOrigin('GetUserMediaInsecureOrigin'),
+  hostCandidateAttributeGetter('HostCandidateAttributeGetter'),
+  insecurePrivateNetworkSubresourceRequest(
+      'InsecurePrivateNetworkSubresourceRequest'),
+  legacyConstraintGoogIPv6('LegacyConstraintGoogIPv6'),
+  localCssFileExtensionRejected('LocalCSSFileExtensionRejected'),
+  mediaElementAudioSourceNode('MediaElementAudioSourceNode'),
+  mediaSourceAbortRemove('MediaSourceAbortRemove'),
+  mediaSourceDurationTruncatingBuffered(
+      'MediaSourceDurationTruncatingBuffered'),
+  noSysexWebMidiWithoutPermission('NoSysexWebMIDIWithoutPermission'),
+  notificationInsecureOrigin('NotificationInsecureOrigin'),
+  notificationPermissionRequestedIframe(
+      'NotificationPermissionRequestedIframe'),
+  obsoleteWebRtcCipherSuite('ObsoleteWebRtcCipherSuite'),
+  paymentRequestBasicCard('PaymentRequestBasicCard'),
+  paymentRequestShowWithoutGesture('PaymentRequestShowWithoutGesture'),
+  pictureSourceSrc('PictureSourceSrc'),
+  prefixedCancelAnimationFrame('PrefixedCancelAnimationFrame'),
+  prefixedRequestAnimationFrame('PrefixedRequestAnimationFrame'),
+  prefixedStorageInfo('PrefixedStorageInfo'),
+  prefixedVideoDisplayingFullscreen('PrefixedVideoDisplayingFullscreen'),
+  prefixedVideoEnterFullscreen('PrefixedVideoEnterFullscreen'),
+  prefixedVideoEnterFullScreen('PrefixedVideoEnterFullScreen'),
+  prefixedVideoExitFullscreen('PrefixedVideoExitFullscreen'),
+  prefixedVideoExitFullScreen('PrefixedVideoExitFullScreen'),
+  prefixedVideoSupportsFullscreen('PrefixedVideoSupportsFullscreen'),
+  rangeExpand('RangeExpand'),
+  requestedSubresourceWithEmbeddedCredentials(
+      'RequestedSubresourceWithEmbeddedCredentials'),
+  rtcConstraintEnableDtlsSrtpFalse('RTCConstraintEnableDtlsSrtpFalse'),
+  rtcConstraintEnableDtlsSrtpTrue('RTCConstraintEnableDtlsSrtpTrue'),
+  rtcPeerConnectionComplexPlanBSdpUsingDefaultSdpSemantics(
+      'RTCPeerConnectionComplexPlanBSdpUsingDefaultSdpSemantics'),
+  rtcPeerConnectionSdpSemanticsPlanB('RTCPeerConnectionSdpSemanticsPlanB'),
+  rtcpMuxPolicyNegotiate('RtcpMuxPolicyNegotiate'),
+  rtpDataChannel('RTPDataChannel'),
+  sharedArrayBufferConstructedWithoutIsolation(
+      'SharedArrayBufferConstructedWithoutIsolation'),
+  textToSpeechDisallowedByAutoplay('TextToSpeech_DisallowedByAutoplay'),
+  v8SharedArrayBufferConstructedInExtensionWithoutIsolation(
+      'V8SharedArrayBufferConstructedInExtensionWithoutIsolation'),
+  xhrjsonEncodingDetection('XHRJSONEncodingDetection'),
+  xmlHttpRequestSynchronousInNonWorkerOutsideBeforeUnload(
+      'XMLHttpRequestSynchronousInNonWorkerOutsideBeforeUnload'),
+  xrSupportsSession('XRSupportsSession'),
   ;
 
   final String value;
@@ -1119,10 +1183,7 @@ enum DeprecationIssueType {
 }
 
 /// This issue tracks information needed to print a deprecation message.
-/// The formatting is inherited from the old console.log version, see more at:
-/// https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/frame/deprecation.cc
-/// TODO(crbug.com/1264960): Re-work format to add i18n support per:
-/// https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/public/devtools_protocol/README.md
+/// https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/frame/third_party/blink/renderer/core/frame/deprecation/README.md
 class DeprecationIssueDetails {
   final AffectedFrame? affectedFrame;
 

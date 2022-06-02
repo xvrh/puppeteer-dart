@@ -515,6 +515,10 @@ class UserAgentMetadata {
 
   final bool mobile;
 
+  final String? bitness;
+
+  final bool? wow64;
+
   UserAgentMetadata(
       {this.brands,
       this.fullVersionList,
@@ -522,7 +526,9 @@ class UserAgentMetadata {
       required this.platformVersion,
       required this.architecture,
       required this.model,
-      required this.mobile});
+      required this.mobile,
+      this.bitness,
+      this.wow64});
 
   factory UserAgentMetadata.fromJson(Map<String, dynamic> json) {
     return UserAgentMetadata(
@@ -543,6 +549,8 @@ class UserAgentMetadata {
       architecture: json['architecture'] as String,
       model: json['model'] as String,
       mobile: json['mobile'] as bool? ?? false,
+      bitness: json.containsKey('bitness') ? json['bitness'] as String : null,
+      wow64: json.containsKey('wow64') ? json['wow64'] as bool : null,
     );
   }
 
@@ -556,6 +564,8 @@ class UserAgentMetadata {
       if (brands != null) 'brands': brands!.map((e) => e.toJson()).toList(),
       if (fullVersionList != null)
         'fullVersionList': fullVersionList!.map((e) => e.toJson()).toList(),
+      if (bitness != null) 'bitness': bitness,
+      if (wow64 != null) 'wow64': wow64,
     };
   }
 }

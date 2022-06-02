@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.10.0 (2022-06-2)
+- Update to Chromium 103
+- Use dart enhanced `enums` for all enumerations in the protocol 
+
 ## 2.9.0 (2022-05-10)
 - Update to Chromium 102
 

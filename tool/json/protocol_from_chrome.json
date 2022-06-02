@@ -1440,11 +1440,9 @@
                     "type": "string",
                     "enum": [
                         "PermissionPolicyDisabled",
-                        "InvalidAttributionSourceEventId",
                         "AttributionSourceUntrustworthyOrigin",
                         "AttributionUntrustworthyOrigin",
-                        "InvalidAttributionSourceExpiry",
-                        "InvalidAttributionSourcePriority"
+                        "InvalidHeader"
                     ]
                 },
                 {
@@ -1549,13 +1547,65 @@
                     "id": "DeprecationIssueType",
                     "type": "string",
                     "enum": [
+                        "AuthorizationCoveredByWildcard",
+                        "CanRequestURLHTTPContainingNewline",
+                        "ChromeLoadTimesConnectionInfo",
+                        "ChromeLoadTimesFirstPaintAfterLoadTime",
+                        "ChromeLoadTimesWasAlternateProtocolAvailable",
+                        "CookieWithTruncatingChar",
+                        "CrossOriginAccessBasedOnDocumentDomain",
+                        "CrossOriginWindowAlert",
+                        "CrossOriginWindowConfirm",
+                        "CSSSelectorInternalMediaControlsOverlayCastButton",
+                        "CustomCursorIntersectsViewport",
                         "DeprecationExample",
-                        "Untranslated"
+                        "DocumentDomainSettingWithoutOriginAgentClusterHeader",
+                        "EventPath",
+                        "GeolocationInsecureOrigin",
+                        "GeolocationInsecureOriginDeprecatedNotRemoved",
+                        "GetUserMediaInsecureOrigin",
+                        "HostCandidateAttributeGetter",
+                        "InsecurePrivateNetworkSubresourceRequest",
+                        "LegacyConstraintGoogIPv6",
+                        "LocalCSSFileExtensionRejected",
+                        "MediaElementAudioSourceNode",
+                        "MediaSourceAbortRemove",
+                        "MediaSourceDurationTruncatingBuffered",
+                        "NoSysexWebMIDIWithoutPermission",
+                        "NotificationInsecureOrigin",
+                        "NotificationPermissionRequestedIframe",
+                        "ObsoleteWebRtcCipherSuite",
+                        "PaymentRequestBasicCard",
+                        "PaymentRequestShowWithoutGesture",
+                        "PictureSourceSrc",
+                        "PrefixedCancelAnimationFrame",
+                        "PrefixedRequestAnimationFrame",
+                        "PrefixedStorageInfo",
+                        "PrefixedVideoDisplayingFullscreen",
+                        "PrefixedVideoEnterFullscreen",
+                        "PrefixedVideoEnterFullScreen",
+                        "PrefixedVideoExitFullscreen",
+                        "PrefixedVideoExitFullScreen",
+                        "PrefixedVideoSupportsFullscreen",
+                        "RangeExpand",
+                        "RequestedSubresourceWithEmbeddedCredentials",
+                        "RTCConstraintEnableDtlsSrtpFalse",
+                        "RTCConstraintEnableDtlsSrtpTrue",
+                        "RTCPeerConnectionComplexPlanBSdpUsingDefaultSdpSemantics",
+                        "RTCPeerConnectionSdpSemanticsPlanB",
+                        "RtcpMuxPolicyNegotiate",
+                        "RTPDataChannel",
+                        "SharedArrayBufferConstructedWithoutIsolation",
+                        "TextToSpeech_DisallowedByAutoplay",
+                        "V8SharedArrayBufferConstructedInExtensionWithoutIsolation",
+                        "XHRJSONEncodingDetection",
+                        "XMLHttpRequestSynchronousInNonWorkerOutsideBeforeUnload",
+                        "XRSupportsSession"
                     ]
                 },
                 {
                     "id": "DeprecationIssueDetails",
-                    "description": "This issue tracks information needed to print a deprecation message.\nThe formatting is inherited from the old console.log version, see more at:\nhttps://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/frame/deprecation.cc\nTODO(crbug.com/1264960): Re-work format to add i18n support per:\nhttps://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/public/devtools_protocol/README.md",
+                    "description": "This issue tracks information needed to print a deprecation message.\nhttps://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/frame/third_party/blink/renderer/core/frame/deprecation/README.md",
                     "type": "object",
                     "properties": [
                         {
@@ -1566,20 +1616,6 @@
                         {
                             "name": "sourceCodeLocation",
                             "$ref": "SourceCodeLocation"
-                        },
-                        {
-                            "name": "message",
-                            "description": "The content of an untranslated deprecation issue,\ne.g. \"window.inefficientLegacyStorageMethod will be removed in M97,\naround January 2022. Please use Web Storage or Indexed Database\ninstead. This standard was abandoned in January, 1970. See\nhttps://www.chromestatus.com/feature/5684870116278272 for more details.\"",
-                            "deprecated": true,
-                            "optional": true,
-                            "type": "string"
-                        },
-                        {
-                            "name": "deprecationType",
-                            "description": "The id of an untranslated deprecation issue e.g. PrefixedStorageInfo.",
-                            "deprecated": true,
-                            "optional": true,
-                            "type": "string"
                         },
                         {
                             "name": "type",
@@ -7332,6 +7368,10 @@
             "experimental": true,
             "types": [
                 {
+                    "id": "SerializedStorageKey",
+                    "type": "string"
+                },
+                {
                     "id": "StorageId",
                     "description": "DOM Storage identifier.",
                     "type": "object",
@@ -7339,7 +7379,14 @@
                         {
                             "name": "securityOrigin",
                             "description": "Security origin for the storage.",
+                            "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "storageKey",
+                            "description": "Represents a key by which DOM Storage keys its CachedStorageAreas",
+                            "optional": true,
+                            "$ref": "SerializedStorageKey"
                         },
                         {
                             "name": "isLocalStorage",
@@ -7420,6 +7467,21 @@
                         {
                             "name": "value",
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "getStorageKeyForFrame",
+                    "parameters": [
+                        {
+                            "name": "frameId",
+                            "$ref": "Page.FrameId"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "storageKey",
+                            "$ref": "SerializedStorageKey"
                         }
                     ]
                 }
@@ -7792,6 +7854,16 @@
                         },
                         {
                             "name": "mobile",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "bitness",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "wow64",
+                            "optional": true,
                             "type": "boolean"
                         }
                     ]
@@ -8333,7 +8405,7 @@
             "commands": [
                 {
                     "name": "beginFrame",
-                    "description": "Sends a BeginFrame to the target and returns when the frame was completed. Optionally captures a\nscreenshot from the resulting frame. Requires that the target was created with enabled\nBeginFrameControl. Designed for use with --run-all-compositor-stages-before-draw, see also\nhttps://goo.gl/3zHXhB for more background.",
+                    "description": "Sends a BeginFrame to the target and returns when the frame was completed. Optionally captures a\nscreenshot from the resulting frame. Requires that the target was created with enabled\nBeginFrameControl. Designed for use with --run-all-compositor-stages-before-draw, see also\nhttps://goo.gle/chrome-headless-rendering for more background.",
                     "parameters": [
                         {
                             "name": "frameTimeTicks",
@@ -14942,8 +15014,10 @@
                         "ch-device-memory",
                         "ch-downlink",
                         "ch-ect",
+                        "ch-partitioned-cookies",
                         "ch-prefers-color-scheme",
                         "ch-rtt",
+                        "ch-save-data",
                         "ch-ua",
                         "ch-ua-arch",
                         "ch-ua-bitness",
@@ -14959,7 +15033,6 @@
                         "ch-viewport-height",
                         "ch-viewport-width",
                         "ch-width",
-                        "ch-partitioned-cookies",
                         "clipboard-read",
                         "clipboard-write",
                         "cross-origin-isolated",
@@ -14980,6 +15053,7 @@
                         "interest-cohort",
                         "join-ad-interest-group",
                         "keyboard-map",
+                        "local-fonts",
                         "magnetometer",
                         "microphone",
                         "midi",
@@ -15652,6 +15726,12 @@
                             "description": "The fantasy font-family.",
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "math",
+                            "description": "The math font-family.",
+                            "optional": true,
+                            "type": "string"
                         }
                     ]
                 },
@@ -15824,7 +15904,6 @@
                         "JavaScriptExecution",
                         "RendererProcessKilled",
                         "RendererProcessCrashed",
-                        "GrantedMediaStreamAccess",
                         "SchedulerTrackedFeatureUsed",
                         "ConflictingBrowsingInstance",
                         "CacheFlushed",
@@ -15851,7 +15930,6 @@
                         "ForegroundCacheLimit",
                         "BrowsingInstanceNotSwapped",
                         "BackForwardCacheDisabledForDelegate",
-                        "OptInUnloadHeaderNotPresent",
                         "UnloadHandlerExistsInMainFrame",
                         "UnloadHandlerExistsInSubFrame",
                         "ServiceWorkerUnregistration",
@@ -16002,7 +16080,39 @@
                     "description": "List of FinalStatus reasons for Prerender2.",
                     "type": "string",
                     "enum": [
-                        "Activated"
+                        "Activated",
+                        "Destroyed",
+                        "LowEndDevice",
+                        "CrossOriginRedirect",
+                        "CrossOriginNavigation",
+                        "InvalidSchemeRedirect",
+                        "InvalidSchemeNavigation",
+                        "InProgressNavigation",
+                        "NavigationRequestBlockedByCsp",
+                        "MainFrameNavigation",
+                        "MojoBinderPolicy",
+                        "RendererProcessCrashed",
+                        "RendererProcessKilled",
+                        "Download",
+                        "TriggerDestroyed",
+                        "NavigationNotCommitted",
+                        "NavigationBadHttpStatus",
+                        "ClientCertRequested",
+                        "NavigationRequestNetworkError",
+                        "MaxNumOfRunningPrerendersExceeded",
+                        "CancelAllHostsForTesting",
+                        "DidFailLoad",
+                        "Stop",
+                        "SslCertificateError",
+                        "LoginAuthRequested",
+                        "UaChangeRequiresReload",
+                        "BlockedByClient",
+                        "AudioOutputDeviceRequested",
+                        "MixedContent",
+                        "TriggerBackgrounded",
+                        "EmbedderTriggeredAndSameOriginRedirected",
+                        "EmbedderTriggeredAndCrossOriginRedirected",
+                        "EmbedderTriggeredAndDestroyed"
                     ]
                 }
             ],
@@ -16564,15 +16674,9 @@
                         },
                         {
                             "name": "pageRanges",
-                            "description": "Paper ranges to print, e.g., '1-5, 8, 11-13'. Defaults to the empty string, which means\nprint all pages.",
+                            "description": "Paper ranges to print, one based, e.g., '1-5, 8, 11-13'. Pages are\nprinted in the document order, not in the order specified, and no\nmore than once.\nDefaults to empty string, which implies the entire document is printed.\nThe page numbers are quietly capped to actual page count of the\ndocument, and ranges beyond the end of the document are ignored.\nIf this results in no pages to print, an error is reported.\nIt is an error to specify a range with start greater than end.",
                             "optional": true,
                             "type": "string"
-                        },
-                        {
-                            "name": "ignoreInvalidPageRanges",
-                            "description": "Whether to silently ignore invalid but successfully parsed page ranges, such as '3-2'.\nDefaults to false.",
-                            "optional": true,
-                            "type": "boolean"
                         },
                         {
                             "name": "headerTemplate",
@@ -18671,6 +18775,10 @@
                 "Network"
             ],
             "types": [
+                {
+                    "id": "SerializedStorageKey",
+                    "type": "string"
+                },
                 {
                     "id": "StorageType",
                     "description": "Enum of possible storage types.",
@@ -21959,6 +22067,13 @@
                             "description": "The value being returned, if the function is at return point.",
                             "optional": true,
                             "$ref": "Runtime.RemoteObject"
+                        },
+                        {
+                            "name": "canBeRestarted",
+                            "description": "Valid only while the VM is paused and indicates whether this frame\ncan be restarted or not. Note that a `true` value here does not\nguarantee that Debugger#restartFrame with this CallFrameId will be\nsuccessful, but it is very likely.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -22900,7 +23015,7 @@
                         },
                         {
                             "name": "hash",
-                            "description": "Content hash of the script.",
+                            "description": "Content hash of the script, SHA-256.",
                             "type": "string"
                         },
                         {
@@ -23004,7 +23119,7 @@
                         },
                         {
                             "name": "hash",
-                            "description": "Content hash of the script.",
+                            "description": "Content hash of the script, SHA-256.",
                             "type": "string"
                         },
                         {
@@ -23278,12 +23393,21 @@
                         },
                         {
                             "name": "treatGlobalObjectsAsRoots",
+                            "description": "Deprecated in favor of `exposeInternals`.",
+                            "deprecated": true,
                             "optional": true,
                             "type": "boolean"
                         },
                         {
                             "name": "captureNumericValue",
                             "description": "If true, numerical values are included in the snapshot",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "exposeInternals",
+                            "description": "If true, exposes internals of the snapshot.",
+                            "experimental": true,
                             "optional": true,
                             "type": "boolean"
                         }
@@ -23300,13 +23424,21 @@
                         },
                         {
                             "name": "treatGlobalObjectsAsRoots",
-                            "description": "If true, a raw snapshot without artificial roots will be generated",
+                            "description": "If true, a raw snapshot without artificial roots will be generated.\nDeprecated in favor of `exposeInternals`.",
+                            "deprecated": true,
                             "optional": true,
                             "type": "boolean"
                         },
                         {
                             "name": "captureNumericValue",
                             "description": "If true, numerical values are included in the snapshot",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "exposeInternals",
+                            "description": "If true, exposes internals of the snapshot.",
+                            "experimental": true,
                             "optional": true,
                             "type": "boolean"
                         }
@@ -24618,7 +24750,7 @@
                         },
                         {
                             "name": "generateWebDriverValue",
-                            "description": "Whether the result should be serialized according to https://w3c.github.io/webdriver-bidi.",
+                            "description": "Whether the result should contain `webDriverValue`, serialized according to\nhttps://w3c.github.io/webdriver-bidi. This is mutually exclusive with `returnByValue`, but\nresulting `objectId` is still provided.",
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
