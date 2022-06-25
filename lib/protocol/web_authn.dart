@@ -10,8 +10,15 @@ class WebAuthnApi {
 
   /// Enable the WebAuthn domain and start intercepting credential storage and
   /// retrieval with a virtual authenticator.
-  Future<void> enable() async {
-    await _client.send('WebAuthn.enable');
+  /// [enableUI] Whether to enable the WebAuthn user interface. Enabling the UI is
+  /// recommended for debugging and demo purposes, as it is closer to the real
+  /// experience. Disabling the UI is recommended for automated testing.
+  /// Supported at the embedder's discretion if UI is available.
+  /// Defaults to false.
+  Future<void> enable({bool? enableUI}) async {
+    await _client.send('WebAuthn.enable', {
+      if (enableUI != null) 'enableUI': enableUI,
+    });
   }
 
   /// Disable the WebAuthn domain.

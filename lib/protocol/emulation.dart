@@ -305,6 +305,13 @@ class EmulationApi {
     });
   }
 
+  /// [hardwareConcurrency] Hardware concurrency to report
+  Future<void> setHardwareConcurrencyOverride(int hardwareConcurrency) async {
+    await _client.send('Emulation.setHardwareConcurrencyOverride', {
+      'hardwareConcurrency': hardwareConcurrency,
+    });
+  }
+
   /// Allows overriding user agent with the given string.
   /// [userAgent] User agent to use.
   /// [acceptLanguage] Browser langugage to emulate.

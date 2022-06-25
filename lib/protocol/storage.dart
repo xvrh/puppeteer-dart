@@ -2,6 +2,7 @@ import 'dart:async';
 import '../src/connection.dart';
 import 'browser.dart' as browser;
 import 'network.dart' as network;
+import 'page.dart' as page;
 
 class StorageApi {
   final Client _client;
@@ -36,6 +37,15 @@ class StorageApi {
       .onEvent
       .where((event) => event.name == 'Storage.interestGroupAccessed')
       .map((event) => InterestGroupAccessedEvent.fromJson(event.parameters));
+
+  /// Returns a storage key given a frame id.
+  Future<SerializedStorageKey> getStorageKeyForFrame(
+      page.FrameId frameId) async {
+    var result = await _client.send('Storage.getStorageKeyForFrame', {
+      'frameId': frameId,
+    });
+    return SerializedStorageKey.fromJson(result['storageKey'] as String);
+  }
 
   /// Clears storage for origin.
   /// [origin] Security origin.

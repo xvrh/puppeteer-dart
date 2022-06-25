@@ -3831,9 +3831,10 @@ class ClientSecurityState {
 enum CrossOriginOpenerPolicyValue {
   sameOrigin('SameOrigin'),
   sameOriginAllowPopups('SameOriginAllowPopups'),
+  restrictProperties('RestrictProperties'),
   unsafeNone('UnsafeNone'),
   sameOriginPlusCoep('SameOriginPlusCoep'),
-  sameOriginAllowPopupsPlusCoep('SameOriginAllowPopupsPlusCoep'),
+  restrictPropertiesPlusCoep('RestrictPropertiesPlusCoep'),
   ;
 
   final String value;

@@ -172,12 +172,28 @@ class DebuggerApi {
     });
   }
 
-  /// Restarts particular call frame from the beginning.
+  /// Restarts particular call frame from the beginning. The old, deprecated
+  /// behavior of `restartFrame` is to stay paused and allow further CDP commands
+  /// after a restart was scheduled. This can cause problems with restarting, so
+  /// we now continue execution immediatly after it has been scheduled until we
+  /// reach the beginning of the restarted frame.
+  ///
+  /// To stay back-wards compatible, `restartFrame` now expects a `mode`
+  /// parameter to be present. If the `mode` parameter is missing, `restartFrame`
+  /// errors out.
+  ///
+  /// The various return values are deprecated and `callFrames` is always empty.
+  /// Use the call frames from the `Debugger#paused` events instead, that fires
+  /// once V8 pauses at the beginning of the restarted function.
   /// [callFrameId] Call frame identifier to evaluate on.
-  @Deprecated('This command is deprecated')
-  Future<RestartFrameResult> restartFrame(CallFrameId callFrameId) async {
+  /// [mode] The `mode` parameter must be present and set to 'StepInto', otherwise
+  /// `restartFrame` will error out.
+  Future<RestartFrameResult> restartFrame(CallFrameId callFrameId,
+      {@Enum(['StepInto']) String? mode}) async {
+    assert(mode == null || const ['StepInto'].contains(mode));
     var result = await _client.send('Debugger.restartFrame', {
       'callFrameId': callFrameId,
+      if (mode != null) 'mode': mode,
     });
     return RestartFrameResult.fromJson(result);
   }
@@ -753,32 +769,10 @@ class GetScriptSourceResult {
 }
 
 class RestartFrameResult {
-  /// New stack trace.
-  final List<CallFrame> callFrames;
-
-  /// Async stack trace, if any.
-  final runtime.StackTraceData? asyncStackTrace;
-
-  /// Async stack trace, if any.
-  final runtime.StackTraceId? asyncStackTraceId;
-
-  RestartFrameResult(
-      {required this.callFrames, this.asyncStackTrace, this.asyncStackTraceId});
+  RestartFrameResult();
 
   factory RestartFrameResult.fromJson(Map<String, dynamic> json) {
-    return RestartFrameResult(
-      callFrames: (json['callFrames'] as List)
-          .map((e) => CallFrame.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      asyncStackTrace: json.containsKey('asyncStackTrace')
-          ? runtime.StackTraceData.fromJson(
-              json['asyncStackTrace'] as Map<String, dynamic>)
-          : null,
-      asyncStackTraceId: json.containsKey('asyncStackTraceId')
-          ? runtime.StackTraceId.fromJson(
-              json['asyncStackTraceId'] as Map<String, dynamic>)
-          : null,
-    );
+    return RestartFrameResult();
   }
 }
 

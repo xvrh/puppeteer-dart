@@ -1228,6 +1228,8 @@ class Node {
 
   final CompatibilityMode? compatibilityMode;
 
+  final BackendNode? assignedSlot;
+
   Node(
       {required this.nodeId,
       this.parentId,
@@ -1256,7 +1258,8 @@ class Node {
       this.pseudoElements,
       this.distributedNodes,
       this.isSVG,
-      this.compatibilityMode});
+      this.compatibilityMode,
+      this.assignedSlot});
 
   factory Node.fromJson(Map<String, dynamic> json) {
     return Node(
@@ -1329,6 +1332,9 @@ class Node {
       compatibilityMode: json.containsKey('compatibilityMode')
           ? CompatibilityMode.fromJson(json['compatibilityMode'] as String)
           : null,
+      assignedSlot: json.containsKey('assignedSlot')
+          ? BackendNode.fromJson(json['assignedSlot'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -1367,6 +1373,7 @@ class Node {
       if (isSVG != null) 'isSVG': isSVG,
       if (compatibilityMode != null)
         'compatibilityMode': compatibilityMode!.toJson(),
+      if (assignedSlot != null) 'assignedSlot': assignedSlot!.toJson(),
     };
   }
 }
