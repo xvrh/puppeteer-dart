@@ -169,7 +169,6 @@ void main() {
             value: 'Edit this image: ',
             children: [
               AXNode(role: 'StaticText', name: 'Edit this image:'),
-              AXNode(role: 'img', name: 'my fake image')
             ],
             multiLine: true);
         var snapshot = await page.accessibility.snapshot();
