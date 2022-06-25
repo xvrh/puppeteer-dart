@@ -938,7 +938,7 @@ enum AttributionReportingIssueType {
 }
 
 /// Details for issues around "Attribution Reporting API" usage.
-/// Explainer: https://github.com/WICG/conversion-measurement-api
+/// Explainer: https://github.com/WICG/attribution-reporting-api
 class AttributionReportingIssueDetails {
   final AttributionReportingIssueType violationType;
 
@@ -1113,7 +1113,6 @@ enum DeprecationIssueType {
   crossOriginWindowConfirm('CrossOriginWindowConfirm'),
   cssSelectorInternalMediaControlsOverlayCastButton(
       'CSSSelectorInternalMediaControlsOverlayCastButton'),
-  customCursorIntersectsViewport('CustomCursorIntersectsViewport'),
   deprecationExample('DeprecationExample'),
   documentDomainSettingWithoutOriginAgentClusterHeader(
       'DocumentDomainSettingWithoutOriginAgentClusterHeader'),
@@ -1127,7 +1126,6 @@ enum DeprecationIssueType {
       'InsecurePrivateNetworkSubresourceRequest'),
   legacyConstraintGoogIPv6('LegacyConstraintGoogIPv6'),
   localCssFileExtensionRejected('LocalCSSFileExtensionRejected'),
-  mediaElementAudioSourceNode('MediaElementAudioSourceNode'),
   mediaSourceAbortRemove('MediaSourceAbortRemove'),
   mediaSourceDurationTruncatingBuffered(
       'MediaSourceDurationTruncatingBuffered'),
@@ -1136,8 +1134,6 @@ enum DeprecationIssueType {
   notificationPermissionRequestedIframe(
       'NotificationPermissionRequestedIframe'),
   obsoleteWebRtcCipherSuite('ObsoleteWebRtcCipherSuite'),
-  paymentRequestBasicCard('PaymentRequestBasicCard'),
-  paymentRequestShowWithoutGesture('PaymentRequestShowWithoutGesture'),
   pictureSourceSrc('PictureSourceSrc'),
   prefixedCancelAnimationFrame('PrefixedCancelAnimationFrame'),
   prefixedRequestAnimationFrame('PrefixedRequestAnimationFrame'),
@@ -1157,7 +1153,6 @@ enum DeprecationIssueType {
       'RTCPeerConnectionComplexPlanBSdpUsingDefaultSdpSemantics'),
   rtcPeerConnectionSdpSemanticsPlanB('RTCPeerConnectionSdpSemanticsPlanB'),
   rtcpMuxPolicyNegotiate('RtcpMuxPolicyNegotiate'),
-  rtpDataChannel('RTPDataChannel'),
   sharedArrayBufferConstructedWithoutIsolation(
       'SharedArrayBufferConstructedWithoutIsolation'),
   textToSpeechDisallowedByAutoplay('TextToSpeech_DisallowedByAutoplay'),

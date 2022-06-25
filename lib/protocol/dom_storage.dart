@@ -1,6 +1,5 @@
 import 'dart:async';
 import '../src/connection.dart';
-import 'page.dart' as page;
 
 /// Query and modify DOM storage.
 class DOMStorageApi {
@@ -66,14 +65,6 @@ class DOMStorageApi {
       'key': key,
       'value': value,
     });
-  }
-
-  Future<SerializedStorageKey> getStorageKeyForFrame(
-      page.FrameId frameId) async {
-    var result = await _client.send('DOMStorage.getStorageKeyForFrame', {
-      'frameId': frameId,
-    });
-    return SerializedStorageKey.fromJson(result['storageKey'] as String);
   }
 }
 

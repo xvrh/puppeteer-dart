@@ -869,8 +869,15 @@ class FrameAttachedEvent {
   /// JavaScript stack trace of when frame was attached, only set if frame initiated from script.
   final runtime.StackTraceData? stack;
 
+  /// Identifies the bottom-most script which caused the frame to be labelled
+  /// as an ad. Only sent if frame is labelled as an ad and id is available.
+  final AdScriptId? adScriptId;
+
   FrameAttachedEvent(
-      {required this.frameId, required this.parentFrameId, this.stack});
+      {required this.frameId,
+      required this.parentFrameId,
+      this.stack,
+      this.adScriptId});
 
   factory FrameAttachedEvent.fromJson(Map<String, dynamic> json) {
     return FrameAttachedEvent(
@@ -879,6 +886,9 @@ class FrameAttachedEvent {
       stack: json.containsKey('stack')
           ? runtime.StackTraceData.fromJson(
               json['stack'] as Map<String, dynamic>)
+          : null,
+      adScriptId: json.containsKey('adScriptId')
+          ? AdScriptId.fromJson(json['adScriptId'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -1378,7 +1388,8 @@ class NavigateResult {
   /// Frame id that has navigated (or failed to navigate)
   final FrameId frameId;
 
-  /// Loader identifier.
+  /// Loader identifier. This is omitted in case of same-document navigation,
+  /// as the previously committed loaderId would not change.
   final network.LoaderId? loaderId;
 
   /// User friendly error message, present if and only if navigation has failed.
@@ -1505,6 +1516,34 @@ class AdFrameStatus {
   }
 }
 
+/// Identifies the bottom-most script which caused the frame to be labelled
+/// as an ad.
+class AdScriptId {
+  /// Script Id of the bottom-most script which caused the frame to be labelled
+  /// as an ad.
+  final runtime.ScriptId scriptId;
+
+  /// Id of adScriptId's debugger.
+  final runtime.UniqueDebuggerId debuggerId;
+
+  AdScriptId({required this.scriptId, required this.debuggerId});
+
+  factory AdScriptId.fromJson(Map<String, dynamic> json) {
+    return AdScriptId(
+      scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
+      debuggerId:
+          runtime.UniqueDebuggerId.fromJson(json['debuggerId'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'scriptId': scriptId.toJson(),
+      'debuggerId': debuggerId.toJson(),
+    };
+  }
+}
+
 /// Indicates whether the frame is a secure context and why it is the case.
 enum SecureContextType {
   secure('Secure'),
@@ -1573,13 +1612,13 @@ enum PermissionsPolicyFeature {
   ambientLightSensor('ambient-light-sensor'),
   attributionReporting('attribution-reporting'),
   autoplay('autoplay'),
+  bluetooth('bluetooth'),
   browsingTopics('browsing-topics'),
   camera('camera'),
   chDpr('ch-dpr'),
   chDeviceMemory('ch-device-memory'),
   chDownlink('ch-downlink'),
   chEct('ch-ect'),
-  chPartitionedCookies('ch-partitioned-cookies'),
   chPrefersColorScheme('ch-prefers-color-scheme'),
   chRtt('ch-rtt'),
   chSaveData('ch-save-data'),
@@ -2920,7 +2959,6 @@ enum BackForwardCacheNotRestoredReason {
   contentMediaDevicesDispatcherHost('ContentMediaDevicesDispatcherHost'),
   contentWebBluetooth('ContentWebBluetooth'),
   contentWebUsb('ContentWebUSB'),
-  contentMediaSession('ContentMediaSession'),
   contentMediaSessionService('ContentMediaSessionService'),
   contentScreenReader('ContentScreenReader'),
   embedderPopupBlockerTabHelper('EmbedderPopupBlockerTabHelper'),

@@ -249,7 +249,9 @@ class _Command {
       if (requiredParametersCode.isNotEmpty) {
         code.writeln(',');
       }
-      code.writeln('{${optionalParametersCode.join(',')}}');
+      if (optionalParametersCode.isNotEmpty) {
+        code.writeln('{${optionalParametersCode.join(',')}}');
+      }
     }
     code.writeln(') async {');
 
@@ -497,7 +499,11 @@ class _InternalType {
         parametersCode.add(
             '${isOptional ? '' : 'required '}this.${property.normalizedName}');
       }
-      code.writeln('$id({${parametersCode.join(',')}});');
+      var constructorSignature = '';
+      if (parametersCode.isNotEmpty) {
+        constructorSignature = '{${parametersCode.join(',')}}';
+      }
+      code.writeln('$id($constructorSignature);');
     } else if (isEnum) {
       code.writeln('const $id(this.value);');
     } else {
