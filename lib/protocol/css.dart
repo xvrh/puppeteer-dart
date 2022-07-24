@@ -267,6 +267,18 @@ class CSSApi {
     return CSSSupports.fromJson(result['supports'] as Map<String, dynamic>);
   }
 
+  /// Modifies the expression of a scope at-rule.
+  /// Returns: The resulting CSS Scope rule after modification.
+  Future<CSSScope> setScopeText(
+      StyleSheetId styleSheetId, SourceRange range, String text) async {
+    var result = await _client.send('CSS.setScopeText', {
+      'styleSheetId': styleSheetId,
+      'range': range,
+      'text': text,
+    });
+    return CSSScope.fromJson(result['scope'] as Map<String, dynamic>);
+  }
+
   /// Modifies the rule selector.
   /// Returns: The resulting selector list after modification.
   Future<SelectorList> setRuleSelector(
@@ -523,14 +535,21 @@ class PseudoElementMatches {
   /// Pseudo element type.
   final dom.PseudoType pseudoType;
 
+  /// Pseudo element custom ident.
+  final String? pseudoIdentifier;
+
   /// Matches of CSS rules applicable to the pseudo style.
   final List<RuleMatch> matches;
 
-  PseudoElementMatches({required this.pseudoType, required this.matches});
+  PseudoElementMatches(
+      {required this.pseudoType, this.pseudoIdentifier, required this.matches});
 
   factory PseudoElementMatches.fromJson(Map<String, dynamic> json) {
     return PseudoElementMatches(
       pseudoType: dom.PseudoType.fromJson(json['pseudoType'] as String),
+      pseudoIdentifier: json.containsKey('pseudoIdentifier')
+          ? json['pseudoIdentifier'] as String
+          : null,
       matches: (json['matches'] as List)
           .map((e) => RuleMatch.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -541,6 +560,7 @@ class PseudoElementMatches {
     return {
       'pseudoType': pseudoType.toJson(),
       'matches': matches.map((e) => e.toJson()).toList(),
+      if (pseudoIdentifier != null) 'pseudoIdentifier': pseudoIdentifier,
     };
   }
 }
@@ -837,6 +857,10 @@ class CSSRule {
   /// with the innermost layer and going outwards.
   final List<CSSLayer>? layers;
 
+  /// @scope CSS at-rule array.
+  /// The array enumerates @scope at-rules starting with the innermost one, going outwards.
+  final List<CSSScope>? scopes;
+
   CSSRule(
       {this.styleSheetId,
       required this.selectorList,
@@ -845,7 +869,8 @@ class CSSRule {
       this.media,
       this.containerQueries,
       this.supports,
-      this.layers});
+      this.layers,
+      this.scopes});
 
   factory CSSRule.fromJson(Map<String, dynamic> json) {
     return CSSRule(
@@ -876,6 +901,11 @@ class CSSRule {
               .map((e) => CSSLayer.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
+      scopes: json.containsKey('scopes')
+          ? (json['scopes'] as List)
+              .map((e) => CSSScope.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
     );
   }
 
@@ -891,6 +921,7 @@ class CSSRule {
       if (supports != null)
         'supports': supports!.map((e) => e.toJson()).toList(),
       if (layers != null) 'layers': layers!.map((e) => e.toJson()).toList(),
+      if (scopes != null) 'scopes': scopes!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -1394,6 +1425,41 @@ class CSSSupports {
   }
 }
 
+/// CSS Scope at-rule descriptor.
+class CSSScope {
+  /// Scope rule text.
+  final String text;
+
+  /// The associated rule header range in the enclosing stylesheet (if
+  /// available).
+  final SourceRange? range;
+
+  /// Identifier of the stylesheet containing this object (if exists).
+  final StyleSheetId? styleSheetId;
+
+  CSSScope({required this.text, this.range, this.styleSheetId});
+
+  factory CSSScope.fromJson(Map<String, dynamic> json) {
+    return CSSScope(
+      text: json['text'] as String,
+      range: json.containsKey('range')
+          ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
+          : null,
+      styleSheetId: json.containsKey('styleSheetId')
+          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'text': text,
+      if (range != null) 'range': range!.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
+    };
+  }
+}
+
 /// CSS Layer at-rule descriptor.
 class CSSLayer {
   /// Layer name.
@@ -1561,6 +1627,9 @@ class FontFace {
   /// The font-stretch.
   final String fontStretch;
 
+  /// The font-display.
+  final String fontDisplay;
+
   /// The unicode-range.
   final String unicodeRange;
 
@@ -1579,6 +1648,7 @@ class FontFace {
       required this.fontVariant,
       required this.fontWeight,
       required this.fontStretch,
+      required this.fontDisplay,
       required this.unicodeRange,
       required this.src,
       required this.platformFontFamily,
@@ -1591,6 +1661,7 @@ class FontFace {
       fontVariant: json['fontVariant'] as String,
       fontWeight: json['fontWeight'] as String,
       fontStretch: json['fontStretch'] as String,
+      fontDisplay: json['fontDisplay'] as String,
       unicodeRange: json['unicodeRange'] as String,
       src: json['src'] as String,
       platformFontFamily: json['platformFontFamily'] as String,
@@ -1609,6 +1680,7 @@ class FontFace {
       'fontVariant': fontVariant,
       'fontWeight': fontWeight,
       'fontStretch': fontStretch,
+      'fontDisplay': fontDisplay,
       'unicodeRange': unicodeRange,
       'src': src,
       'platformFontFamily': platformFontFamily,

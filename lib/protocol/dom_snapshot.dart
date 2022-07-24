@@ -799,6 +799,10 @@ class NodeTreeSnapshot {
   /// Type of a pseudo element node.
   final RareStringData? pseudoType;
 
+  /// Pseudo element identifier for this node. Only present if there is a
+  /// valid pseudoType.
+  final RareStringData? pseudoIdentifier;
+
   /// Whether this DOM node responds to mouse clicks. This includes nodes that have had click
   /// event listeners attached via JavaScript as well as anchor tags that naturally navigate when
   /// clicked.
@@ -824,6 +828,7 @@ class NodeTreeSnapshot {
       this.optionSelected,
       this.contentDocumentIndex,
       this.pseudoType,
+      this.pseudoIdentifier,
       this.isClickable,
       this.currentSourceURL,
       this.originURL});
@@ -881,6 +886,10 @@ class NodeTreeSnapshot {
       pseudoType: json.containsKey('pseudoType')
           ? RareStringData.fromJson(json['pseudoType'] as Map<String, dynamic>)
           : null,
+      pseudoIdentifier: json.containsKey('pseudoIdentifier')
+          ? RareStringData.fromJson(
+              json['pseudoIdentifier'] as Map<String, dynamic>)
+          : null,
       isClickable: json.containsKey('isClickable')
           ? RareBooleanData.fromJson(
               json['isClickable'] as Map<String, dynamic>)
@@ -915,6 +924,8 @@ class NodeTreeSnapshot {
       if (contentDocumentIndex != null)
         'contentDocumentIndex': contentDocumentIndex!.toJson(),
       if (pseudoType != null) 'pseudoType': pseudoType!.toJson(),
+      if (pseudoIdentifier != null)
+        'pseudoIdentifier': pseudoIdentifier!.toJson(),
       if (isClickable != null) 'isClickable': isClickable!.toJson(),
       if (currentSourceURL != null)
         'currentSourceURL': currentSourceURL!.toJson(),

@@ -363,17 +363,27 @@ class DebuggerApi {
   }
 
   /// Edits JavaScript source live.
+  ///
+  /// In general, functions that are currently on the stack can not be edited with
+  /// a single exception: If the edited function is the top-most stack frame and
+  /// that is the only activation of that function on the stack. In this case
+  /// the live edit will be successful and a `Debugger.restartFrame` for the
+  /// top-most function is automatically triggered.
   /// [scriptId] Id of the script to edit.
   /// [scriptSource] New content of the script.
   /// [dryRun] If true the change will not actually be applied. Dry run may be used to get result
   /// description without actually modifying the code.
+  /// [allowTopFrameEditing] If true, then `scriptSource` is allowed to change the function on top of the stack
+  /// as long as the top-most stack frame is the only activation of that function.
   Future<SetScriptSourceResult> setScriptSource(
       runtime.ScriptId scriptId, String scriptSource,
-      {bool? dryRun}) async {
+      {bool? dryRun, bool? allowTopFrameEditing}) async {
     var result = await _client.send('Debugger.setScriptSource', {
       'scriptId': scriptId,
       'scriptSource': scriptSource,
       if (dryRun != null) 'dryRun': dryRun,
+      if (allowTopFrameEditing != null)
+        'allowTopFrameEditing': allowTopFrameEditing,
     });
     return SetScriptSourceResult.fromJson(result);
   }
@@ -816,46 +826,19 @@ class SetBreakpointByUrlResult {
 }
 
 class SetScriptSourceResult {
-  /// New stack trace in case editing has happened while VM was stopped.
-  final List<CallFrame>? callFrames;
+  /// Whether the operation was successful or not. Only `Ok` denotes a
+  /// successful live edit while the other enum variants denote why
+  /// the live edit failed.
+  final SetScriptSourceResultStatus status;
 
-  /// Whether current call stack  was modified after applying the changes.
-  final bool? stackChanged;
-
-  /// Async stack trace, if any.
-  final runtime.StackTraceData? asyncStackTrace;
-
-  /// Async stack trace, if any.
-  final runtime.StackTraceId? asyncStackTraceId;
-
-  /// Exception details if any.
+  /// Exception details if any. Only present when `status` is `CompileError`.
   final runtime.ExceptionDetails? exceptionDetails;
 
-  SetScriptSourceResult(
-      {this.callFrames,
-      this.stackChanged,
-      this.asyncStackTrace,
-      this.asyncStackTraceId,
-      this.exceptionDetails});
+  SetScriptSourceResult({required this.status, this.exceptionDetails});
 
   factory SetScriptSourceResult.fromJson(Map<String, dynamic> json) {
     return SetScriptSourceResult(
-      callFrames: json.containsKey('callFrames')
-          ? (json['callFrames'] as List)
-              .map((e) => CallFrame.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-      stackChanged: json.containsKey('stackChanged')
-          ? json['stackChanged'] as bool
-          : null,
-      asyncStackTrace: json.containsKey('asyncStackTrace')
-          ? runtime.StackTraceData.fromJson(
-              json['asyncStackTrace'] as Map<String, dynamic>)
-          : null,
-      asyncStackTraceId: json.containsKey('asyncStackTraceId')
-          ? runtime.StackTraceId.fromJson(
-              json['asyncStackTraceId'] as Map<String, dynamic>)
-          : null,
+      status: SetScriptSourceResultStatus.fromJson(json['status'] as String),
       exceptionDetails: json.containsKey('exceptionDetails')
           ? runtime.ExceptionDetails.fromJson(
               json['exceptionDetails'] as Map<String, dynamic>)
@@ -1286,6 +1269,26 @@ enum DebugSymbolsType {
 
   factory DebugSymbolsType.fromJson(String value) =>
       DebugSymbolsType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+enum SetScriptSourceResultStatus {
+  ok('Ok'),
+  compileError('CompileError'),
+  blockedByActiveGenerator('BlockedByActiveGenerator'),
+  blockedByActiveFunction('BlockedByActiveFunction'),
+  ;
+
+  final String value;
+
+  const SetScriptSourceResultStatus(this.value);
+
+  factory SetScriptSourceResultStatus.fromJson(String value) =>
+      SetScriptSourceResultStatus.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 

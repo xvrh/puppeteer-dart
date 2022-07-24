@@ -1122,6 +1122,7 @@ enum DeprecationIssueType {
       'GeolocationInsecureOriginDeprecatedNotRemoved'),
   getUserMediaInsecureOrigin('GetUserMediaInsecureOrigin'),
   hostCandidateAttributeGetter('HostCandidateAttributeGetter'),
+  identityInCanMakePaymentEvent('IdentityInCanMakePaymentEvent'),
   insecurePrivateNetworkSubresourceRequest(
       'InsecurePrivateNetworkSubresourceRequest'),
   legacyConstraintGoogIPv6('LegacyConstraintGoogIPv6'),
@@ -1134,6 +1135,7 @@ enum DeprecationIssueType {
   notificationPermissionRequestedIframe(
       'NotificationPermissionRequestedIframe'),
   obsoleteWebRtcCipherSuite('ObsoleteWebRtcCipherSuite'),
+  openWebDatabaseInsecureContext('OpenWebDatabaseInsecureContext'),
   pictureSourceSrc('PictureSourceSrc'),
   prefixedCancelAnimationFrame('PrefixedCancelAnimationFrame'),
   prefixedRequestAnimationFrame('PrefixedRequestAnimationFrame'),

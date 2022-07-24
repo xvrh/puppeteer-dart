@@ -42,10 +42,10 @@ void main() {
     var types = domain.types;
     var commandsJson = domain.commands;
     var context = _DomainContext(domain, domains);
+    var internalTypes = context.internalTypes;
 
     var fileName = '${_underscoreize(domain.name)}.dart';
 
-    var internalTypes = <_InternalType>[];
     for (var type in types) {
       internalTypes.add(_InternalType(context, type));
       internalTypes.addAll(type.properties
@@ -218,6 +218,15 @@ class _Command {
         returnTypeName = '${firstLetterUpper(name)}Result';
         var returnJson = ComplexType(id: returnTypeName, properties: returns);
         _returnType = _InternalType(context, returnJson, generateToJson: false);
+
+        context.internalTypes.addAll(returns
+            .where((p) => p.enumValues != null)
+            .map((p) => _InternalType(
+                context,
+                ComplexType(
+                    id: returnTypeName! + firstLetterUpper(p.name),
+                    type: p.type!,
+                    enums: p.enumValues))));
       }
     }
 
@@ -641,6 +650,7 @@ class _DomainContext {
   final Domain domain;
   final List<Domain> allDomains;
   final Set<String> dependencies = {};
+  final internalTypes = <_InternalType>[];
 
   _DomainContext(this.domain, this.allDomains);
 

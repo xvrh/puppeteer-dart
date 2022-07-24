@@ -210,7 +210,7 @@ class Page {
     }
     var frame = _frameManager.frame(event.frameId)!;
     var context = await frame.executionContext;
-    var element = await context.adoptBackendNodeId(event.backendNodeId);
+    var element = await context.adoptBackendNodeId(event.backendNodeId!);
 
     var interceptors = _fileChooserInterceptors.toList();
     _fileChooserInterceptors.clear();
