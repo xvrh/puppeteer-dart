@@ -841,20 +841,22 @@ class FileChooserOpenedEvent {
   /// Id of the frame containing input node.
   final FrameId frameId;
 
-  /// Input node id.
-  final dom.BackendNodeId backendNodeId;
-
   /// Input mode.
   final FileChooserOpenedEventMode mode;
 
+  /// Input node id. Only present for file choosers opened via an <input type="file"> element.
+  final dom.BackendNodeId? backendNodeId;
+
   FileChooserOpenedEvent(
-      {required this.frameId, required this.backendNodeId, required this.mode});
+      {required this.frameId, required this.mode, this.backendNodeId});
 
   factory FileChooserOpenedEvent.fromJson(Map<String, dynamic> json) {
     return FileChooserOpenedEvent(
       frameId: FrameId.fromJson(json['frameId'] as String),
-      backendNodeId: dom.BackendNodeId.fromJson(json['backendNodeId'] as int),
       mode: FileChooserOpenedEventMode.fromJson(json['mode'] as String),
+      backendNodeId: json.containsKey('backendNodeId')
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
+          : null,
     );
   }
 }
@@ -1646,6 +1648,7 @@ enum PermissionsPolicyFeature {
   encryptedMedia('encrypted-media'),
   executionWhileOutOfViewport('execution-while-out-of-viewport'),
   executionWhileNotRendered('execution-while-not-rendered'),
+  federatedCredentials('federated-credentials'),
   focusWithoutUserActivation('focus-without-user-activation'),
   fullscreen('fullscreen'),
   frobulate('frobulate'),
@@ -1697,6 +1700,7 @@ enum PermissionsPolicyBlockReason {
   header('Header'),
   iframeAttribute('IframeAttribute'),
   inFencedFrameTree('InFencedFrameTree'),
+  inIsolatedApp('InIsolatedApp'),
   ;
 
   final String value;

@@ -70,6 +70,10 @@ class DOMApi {
       .where((event) => event.name == 'DOM.pseudoElementAdded')
       .map((event) => PseudoElementAddedEvent.fromJson(event.parameters));
 
+  /// Called when top layer elements are changed.
+  Stream get onTopLayerElementsUpdated => _client.onEvent
+      .where((event) => event.name == 'DOM.topLayerElementsUpdated');
+
   /// Called when a pseudo element is removed from an element.
   Stream<PseudoElementRemovedEvent> get onPseudoElementRemoved =>
       _client.onEvent
@@ -464,6 +468,17 @@ class DOMApi {
       'nodeId': nodeId,
       'selector': selector,
     });
+    return (result['nodeIds'] as List)
+        .map((e) => NodeId.fromJson(e as int))
+        .toList();
+  }
+
+  /// Returns NodeIds of current top layer elements.
+  /// Top layer is rendered closest to the user within a viewport, therefore its elements always
+  /// appear on top of all other content.
+  /// Returns: NodeIds of top layer elements
+  Future<List<NodeId>> getTopLayerElements() async {
+    var result = await _client.send('DOM.getTopLayerElements');
     return (result['nodeIds'] as List)
         .map((e) => NodeId.fromJson(e as int))
         .toList();
@@ -1202,6 +1217,10 @@ class Node {
   /// Pseudo element type for this node.
   final PseudoType? pseudoType;
 
+  /// Pseudo element identifier for this node. Only present if there is a
+  /// valid pseudoType.
+  final String? pseudoIdentifier;
+
   /// Shadow root type.
   final ShadowRootType? shadowRootType;
 
@@ -1250,6 +1269,7 @@ class Node {
       this.name,
       this.value,
       this.pseudoType,
+      this.pseudoIdentifier,
       this.shadowRootType,
       this.frameId,
       this.contentDocument,
@@ -1300,6 +1320,9 @@ class Node {
       value: json.containsKey('value') ? json['value'] as String : null,
       pseudoType: json.containsKey('pseudoType')
           ? PseudoType.fromJson(json['pseudoType'] as String)
+          : null,
+      pseudoIdentifier: json.containsKey('pseudoIdentifier')
+          ? json['pseudoIdentifier'] as String
           : null,
       shadowRootType: json.containsKey('shadowRootType')
           ? ShadowRootType.fromJson(json['shadowRootType'] as String)
@@ -1360,6 +1383,7 @@ class Node {
       if (name != null) 'name': name,
       if (value != null) 'value': value,
       if (pseudoType != null) 'pseudoType': pseudoType!.toJson(),
+      if (pseudoIdentifier != null) 'pseudoIdentifier': pseudoIdentifier,
       if (shadowRootType != null) 'shadowRootType': shadowRootType!.toJson(),
       if (frameId != null) 'frameId': frameId!.toJson(),
       if (contentDocument != null) 'contentDocument': contentDocument!.toJson(),

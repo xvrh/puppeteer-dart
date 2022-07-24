@@ -200,6 +200,10 @@ class TraceConfig {
   /// Controls how the trace buffer stores data.
   final TraceConfigRecordMode? recordMode;
 
+  /// Size of the trace buffer in kilobytes. If not specified or zero is passed, a default value
+  /// of 200 MB would be used.
+  final num? traceBufferSizeInKb;
+
   /// Turns on JavaScript stack sampling.
   final bool? enableSampling;
 
@@ -223,6 +227,7 @@ class TraceConfig {
 
   TraceConfig(
       {this.recordMode,
+      this.traceBufferSizeInKb,
       this.enableSampling,
       this.enableSystrace,
       this.enableArgumentFilter,
@@ -235,6 +240,9 @@ class TraceConfig {
     return TraceConfig(
       recordMode: json.containsKey('recordMode')
           ? TraceConfigRecordMode.fromJson(json['recordMode'] as String)
+          : null,
+      traceBufferSizeInKb: json.containsKey('traceBufferSizeInKb')
+          ? json['traceBufferSizeInKb'] as num
           : null,
       enableSampling: json.containsKey('enableSampling')
           ? json['enableSampling'] as bool
@@ -268,6 +276,8 @@ class TraceConfig {
   Map<String, dynamic> toJson() {
     return {
       if (recordMode != null) 'recordMode': recordMode,
+      if (traceBufferSizeInKb != null)
+        'traceBufferSizeInKb': traceBufferSizeInKb,
       if (enableSampling != null) 'enableSampling': enableSampling,
       if (enableSystrace != null) 'enableSystrace': enableSystrace,
       if (enableArgumentFilter != null)
