@@ -222,11 +222,11 @@ class _Command {
         context.internalTypes.addAll(returns
             .where((p) => p.enumValues != null)
             .map((p) => _InternalType(
-            context,
-            ComplexType(
-                id: returnTypeName! + firstLetterUpper(p.name),
-                type: p.type!,
-                enums: p.enumValues))));
+                context,
+                ComplexType(
+                    id: returnTypeName! + firstLetterUpper(p.name),
+                    type: p.type!,
+                    enums: p.enumValues))));
       }
     }
 
