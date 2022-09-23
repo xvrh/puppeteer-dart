@@ -424,6 +424,64 @@ void main() {
       expect(requests['script.js']!.isNavigationRequest, isFalse);
       expect(requests['style.css']!.isNavigationRequest, isFalse);
     });
+    test('Request interception should leave original headers', () async {
+      page.onRequest.listen((request) {
+        request.continueRequest();
+      });
+      await page.setRequestInterception(true);
+
+      server.setRoute('/', (request) {
+        return shelf.Response.ok('''<script>
+fetch('/handler', {
+  headers: {
+    'authorization': 'abc',
+    'x-some-header': 'efg',
+  }
+})        
+</script>''', headers: {'content-type': 'text/html'});
+      });
+
+      late Map<String, String> headers;
+      server.setRoute('/handler', (request) {
+        headers = request.headers;
+        return shelf.Response.ok('ok');
+      });
+
+      await page.goto(server.prefix, wait: Until.networkIdle);
+
+      expect(headers['authorization'], 'abc');
+      expect(headers['x-some-header'], 'efg');
+    });
+    test('Request interception can change original  headers', () async {
+      page.onRequest.listen((request) {
+        request.continueRequest(headers: {
+          'authorization': 'authorization-override',
+        });
+      });
+      await page.setRequestInterception(true);
+
+      server.setRoute('/', (request) {
+        return shelf.Response.ok('''<script>
+fetch('/handler', {
+  headers: {
+    'authorization': 'abc',
+    'x-some-header': 'efg',
+  }
+})        
+</script>''', headers: {'content-type': 'text/html'});
+      });
+
+      late Map<String, String> headers;
+      server.setRoute('/handler', (request) {
+        headers = request.headers;
+        return shelf.Response.ok('ok');
+      });
+
+      await page.goto(server.prefix, wait: Until.networkIdle);
+
+      expect(headers['authorization'], 'authorization-override');
+      expect(headers, isNot(contains('x-some-header')));
+    });
     test('should work when navigating to image', () async {
       var requests = <Request>[];
       page.onRequest.listen(requests.add);

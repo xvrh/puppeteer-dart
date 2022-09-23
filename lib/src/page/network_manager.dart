@@ -400,13 +400,12 @@ class Request {
     var postDataBinaryBase64 =
         postData != null ? base64Encode(utf8.encode(postData)) : null;
 
-    headers ??= {};
     await _fetchApi
         .continueRequest(fetch.RequestId(interceptionId!),
             url: url,
             method: method,
             postData: postDataBinaryBase64,
-            headers: headers.entries
+            headers: headers?.entries
                 .map((e) => fetch.HeaderEntry(name: e.key, value: e.value))
                 .toList())
         .catchError((error) {
