@@ -34,7 +34,6 @@ void main() async {
         wait: Until.networkIdle);
 
     // Do something... See other examples
-
   } finally {
     // Close the browser process
     // You should always ensure that your script close the process even in case
