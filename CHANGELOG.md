@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.13.0
+- Fix a bug during request interception. In `NetworkManager.continueRequest` original headers were discarded.
+
 ## 2.12.0
 - Update to Chromium 105
 
