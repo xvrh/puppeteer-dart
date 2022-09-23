@@ -27,7 +27,7 @@ void main() {
     await context.close();
   });
 
-  List<Target> _oopifs() {
+  List<Target> oopifs() {
     return context.targets
         .where((target) => target.targetInfo.type == 'iframe')
         .toList();
@@ -35,7 +35,7 @@ void main() {
 
   test('should report oopif frames', () async {
     await page.goto('${server.prefix}/dynamic-oopif.html');
-    expect(_oopifs(), hasLength(1));
+    expect(oopifs(), hasLength(1));
     expect(page.frames, hasLength(2));
   }, skip: true);
   test('should load oopif iframes with subresources and request interception',
@@ -43,6 +43,6 @@ void main() {
     await page.setRequestInterception(true);
     page.onRequest.listen((request) => request.continueRequest());
     await page.goto('${server.prefix}/dynamic-oopif.html');
-    expect(_oopifs(), hasLength(1));
+    expect(oopifs(), hasLength(1));
   });
 }

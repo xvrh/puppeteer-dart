@@ -39,7 +39,7 @@ String replaceExamples(String sourceFile, List<CodeSnippet> snippets) {
 
   for (var aClass
       in unit.declarations.whereType<ClassDeclaration>().toList().reversed) {
-    var className = aClass.name.name;
+    var className = aClass.name2.toString();
 
     for (var member in aClass.members.reversed) {
       var comment = member.documentationComment;
@@ -47,11 +47,11 @@ String replaceExamples(String sourceFile, List<CodeSnippet> snippets) {
       if (comment != null) {
         String? memberName;
         if (member is MethodDeclaration) {
-          memberName = member.name.name;
+          memberName = member.name2.toString();
         } else if (member is ConstructorDeclaration) {
-          memberName = member.name?.name;
+          memberName = member.name2?.toString();
         } else if (member is FieldDeclaration) {
-          memberName = member.fields.variables.first.name.name;
+          memberName = member.fields.variables.first.name2.toString();
         }
 
         if (memberName != null) {
@@ -112,7 +112,7 @@ List<CodeSnippet> extractSnippets(String sourceCode) {
   var compilationUnit = parseString(content: sourceCode).unit;
   var main = compilationUnit.declarations
       .whereType<FunctionDeclaration>()
-      .firstWhere((c) => c.name.name == 'main');
+      .firstWhere((c) => c.name2.value() == 'main');
 
   var mainBody = main.functionExpression.body as BlockFunctionBody;
 
