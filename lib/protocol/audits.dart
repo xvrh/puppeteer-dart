@@ -160,6 +160,7 @@ enum CookieExclusionReason {
   excludeSameSiteStrict('ExcludeSameSiteStrict'),
   excludeInvalidSameParty('ExcludeInvalidSameParty'),
   excludeSamePartyCrossPartyContext('ExcludeSamePartyCrossPartyContext'),
+  excludeDomainNonAscii('ExcludeDomainNonASCII'),
   ;
 
   final String value;
@@ -188,6 +189,7 @@ enum CookieWarningReason {
   warnSameSiteLaxCrossDowngradeStrict('WarnSameSiteLaxCrossDowngradeStrict'),
   warnSameSiteLaxCrossDowngradeLax('WarnSameSiteLaxCrossDowngradeLax'),
   warnAttributeValueExceedsMaxSize('WarnAttributeValueExceedsMaxSize'),
+  warnDomainNonAscii('WarnDomainNonASCII'),
   ;
 
   final String value;
@@ -919,9 +921,16 @@ class CorsIssueDetails {
 
 enum AttributionReportingIssueType {
   permissionPolicyDisabled('PermissionPolicyDisabled'),
-  attributionSourceUntrustworthyOrigin('AttributionSourceUntrustworthyOrigin'),
-  attributionUntrustworthyOrigin('AttributionUntrustworthyOrigin'),
+  permissionPolicyNotDelegated('PermissionPolicyNotDelegated'),
+  untrustworthyReportingOrigin('UntrustworthyReportingOrigin'),
+  insecureContext('InsecureContext'),
   invalidHeader('InvalidHeader'),
+  invalidRegisterTriggerHeader('InvalidRegisterTriggerHeader'),
+  invalidEligibleHeader('InvalidEligibleHeader'),
+  tooManyConcurrentRequests('TooManyConcurrentRequests'),
+  sourceAndTriggerHeaders('SourceAndTriggerHeaders'),
+  sourceIgnored('SourceIgnored'),
+  triggerIgnored('TriggerIgnored'),
   ;
 
   final String value;
@@ -942,8 +951,6 @@ enum AttributionReportingIssueType {
 class AttributionReportingIssueDetails {
   final AttributionReportingIssueType violationType;
 
-  final AffectedFrame? frame;
-
   final AffectedRequest? request;
 
   final dom.BackendNodeId? violatingNodeId;
@@ -952,7 +959,6 @@ class AttributionReportingIssueDetails {
 
   AttributionReportingIssueDetails(
       {required this.violationType,
-      this.frame,
       this.request,
       this.violatingNodeId,
       this.invalidParameter});
@@ -961,9 +967,6 @@ class AttributionReportingIssueDetails {
     return AttributionReportingIssueDetails(
       violationType: AttributionReportingIssueType.fromJson(
           json['violationType'] as String),
-      frame: json.containsKey('frame')
-          ? AffectedFrame.fromJson(json['frame'] as Map<String, dynamic>)
-          : null,
       request: json.containsKey('request')
           ? AffectedRequest.fromJson(json['request'] as Map<String, dynamic>)
           : null,
@@ -979,7 +982,6 @@ class AttributionReportingIssueDetails {
   Map<String, dynamic> toJson() {
     return {
       'violationType': violationType.toJson(),
-      if (frame != null) 'frame': frame!.toJson(),
       if (request != null) 'request': request!.toJson(),
       if (violatingNodeId != null) 'violatingNodeId': violatingNodeId!.toJson(),
       if (invalidParameter != null) 'invalidParameter': invalidParameter,
@@ -1117,6 +1119,7 @@ enum DeprecationIssueType {
   documentDomainSettingWithoutOriginAgentClusterHeader(
       'DocumentDomainSettingWithoutOriginAgentClusterHeader'),
   eventPath('EventPath'),
+  expectCtHeader('ExpectCTHeader'),
   geolocationInsecureOrigin('GeolocationInsecureOrigin'),
   geolocationInsecureOriginDeprecatedNotRemoved(
       'GeolocationInsecureOriginDeprecatedNotRemoved'),
@@ -1130,12 +1133,16 @@ enum DeprecationIssueType {
   mediaSourceAbortRemove('MediaSourceAbortRemove'),
   mediaSourceDurationTruncatingBuffered(
       'MediaSourceDurationTruncatingBuffered'),
+  navigateEventRestoreScroll('NavigateEventRestoreScroll'),
+  navigateEventTransitionWhile('NavigateEventTransitionWhile'),
   noSysexWebMidiWithoutPermission('NoSysexWebMIDIWithoutPermission'),
   notificationInsecureOrigin('NotificationInsecureOrigin'),
   notificationPermissionRequestedIframe(
       'NotificationPermissionRequestedIframe'),
   obsoleteWebRtcCipherSuite('ObsoleteWebRtcCipherSuite'),
   openWebDatabaseInsecureContext('OpenWebDatabaseInsecureContext'),
+  overflowVisibleOnReplacedElement('OverflowVisibleOnReplacedElement'),
+  persistentQuotaType('PersistentQuotaType'),
   pictureSourceSrc('PictureSourceSrc'),
   prefixedCancelAnimationFrame('PrefixedCancelAnimationFrame'),
   prefixedRequestAnimationFrame('PrefixedRequestAnimationFrame'),
@@ -1258,7 +1265,7 @@ class FederatedAuthRequestIssueDetails {
 /// third_party/blink/public/mojom/devtools/inspector_issue.mojom to include
 /// all cases except for success.
 enum FederatedAuthRequestIssueReason {
-  approvalDeclined('ApprovalDeclined'),
+  shouldEmbargo('ShouldEmbargo'),
   tooManyRequests('TooManyRequests'),
   manifestListHttpNotFound('ManifestListHttpNotFound'),
   manifestListNoResponse('ManifestListNoResponse'),
@@ -1271,8 +1278,6 @@ enum FederatedAuthRequestIssueReason {
   clientMetadataHttpNotFound('ClientMetadataHttpNotFound'),
   clientMetadataNoResponse('ClientMetadataNoResponse'),
   clientMetadataInvalidResponse('ClientMetadataInvalidResponse'),
-  clientMetadataMissingPrivacyPolicyUrl(
-      'ClientMetadataMissingPrivacyPolicyUrl'),
   disabledInSettings('DisabledInSettings'),
   errorFetchingSignin('ErrorFetchingSignin'),
   invalidSigninResponse('InvalidSigninResponse'),
@@ -1285,6 +1290,7 @@ enum FederatedAuthRequestIssueReason {
   idTokenInvalidRequest('IdTokenInvalidRequest'),
   errorIdToken('ErrorIdToken'),
   canceled('Canceled'),
+  rpPageNotVisible('RpPageNotVisible'),
   ;
 
   final String value;

@@ -513,6 +513,9 @@ class AXNodeData {
   /// This `Node`'s role, whether explicit or implicit.
   final AXValue? role;
 
+  /// This `Node`'s Chrome raw role.
+  final AXValue? chromeRole;
+
   /// The accessible name for this `Node`.
   final AXValue? name;
 
@@ -542,6 +545,7 @@ class AXNodeData {
       required this.ignored,
       this.ignoredReasons,
       this.role,
+      this.chromeRole,
       this.name,
       this.description,
       this.value,
@@ -562,6 +566,9 @@ class AXNodeData {
           : null,
       role: json.containsKey('role')
           ? AXValue.fromJson(json['role'] as Map<String, dynamic>)
+          : null,
+      chromeRole: json.containsKey('chromeRole')
+          ? AXValue.fromJson(json['chromeRole'] as Map<String, dynamic>)
           : null,
       name: json.containsKey('name')
           ? AXValue.fromJson(json['name'] as Map<String, dynamic>)
@@ -601,6 +608,7 @@ class AXNodeData {
       if (ignoredReasons != null)
         'ignoredReasons': ignoredReasons!.map((e) => e.toJson()).toList(),
       if (role != null) 'role': role!.toJson(),
+      if (chromeRole != null) 'chromeRole': chromeRole!.toJson(),
       if (name != null) 'name': name!.toJson(),
       if (description != null) 'description': description!.toJson(),
       if (value != null) 'value': value!.toJson(),

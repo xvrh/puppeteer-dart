@@ -131,6 +131,28 @@ class DebuggerApi {
     return GetScriptSourceResult.fromJson(result);
   }
 
+  /// [scriptId] Id of the script to disassemble
+  Future<DisassembleWasmModuleResult> disassembleWasmModule(
+      runtime.ScriptId scriptId) async {
+    var result = await _client.send('Debugger.disassembleWasmModule', {
+      'scriptId': scriptId,
+    });
+    return DisassembleWasmModuleResult.fromJson(result);
+  }
+
+  /// Disassemble the next chunk of lines for the module corresponding to the
+  /// stream. If disassembly is complete, this API will invalidate the streamId
+  /// and return an empty chunk. Any subsequent calls for the now invalid stream
+  /// will return errors.
+  /// Returns: The next chunk of disassembly.
+  Future<WasmDisassemblyChunk> nextWasmDisassemblyChunk(String streamId) async {
+    var result = await _client.send('Debugger.nextWasmDisassemblyChunk', {
+      'streamId': streamId,
+    });
+    return WasmDisassemblyChunk.fromJson(
+        result['chunk'] as Map<String, dynamic>);
+  }
+
   /// This command is deprecated. Use getScriptSource instead.
   /// [scriptId] Id of the Wasm script to get source for.
   /// Returns: Script source.
@@ -778,6 +800,40 @@ class GetScriptSourceResult {
   }
 }
 
+class DisassembleWasmModuleResult {
+  /// For large modules, return a stream from which additional chunks of
+  /// disassembly can be read successively.
+  final String? streamId;
+
+  /// The total number of lines in the disassembly text.
+  final int totalNumberOfLines;
+
+  /// The offsets of all function bodies, in the format [start1, end1,
+  /// start2, end2, ...] where all ends are exclusive.
+  final List<int> functionBodyOffsets;
+
+  /// The first chunk of disassembly.
+  final WasmDisassemblyChunk chunk;
+
+  DisassembleWasmModuleResult(
+      {this.streamId,
+      required this.totalNumberOfLines,
+      required this.functionBodyOffsets,
+      required this.chunk});
+
+  factory DisassembleWasmModuleResult.fromJson(Map<String, dynamic> json) {
+    return DisassembleWasmModuleResult(
+      streamId:
+          json.containsKey('streamId') ? json['streamId'] as String : null,
+      totalNumberOfLines: json['totalNumberOfLines'] as int,
+      functionBodyOffsets:
+          (json['functionBodyOffsets'] as List).map((e) => e as int).toList(),
+      chunk:
+          WasmDisassemblyChunk.fromJson(json['chunk'] as Map<String, dynamic>),
+    );
+  }
+}
+
 class RestartFrameResult {
   RestartFrameResult();
 
@@ -1208,6 +1264,31 @@ enum BreakLocationType {
 
   @override
   String toString() => value.toString();
+}
+
+class WasmDisassemblyChunk {
+  /// The next chunk of disassembled lines.
+  final List<String> lines;
+
+  /// The bytecode offsets describing the start of each line.
+  final List<int> bytecodeOffsets;
+
+  WasmDisassemblyChunk({required this.lines, required this.bytecodeOffsets});
+
+  factory WasmDisassemblyChunk.fromJson(Map<String, dynamic> json) {
+    return WasmDisassemblyChunk(
+      lines: (json['lines'] as List).map((e) => e as String).toList(),
+      bytecodeOffsets:
+          (json['bytecodeOffsets'] as List).map((e) => e as int).toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'lines': [...lines],
+      'bytecodeOffsets': [...bytecodeOffsets],
+    };
+  }
 }
 
 /// Enum of possible script languages.
