@@ -104,7 +104,7 @@ class Class {
   Class(this.name, this.documentation);
 
   static Class fromDeclaration(ClassDeclaration declaration) {
-    var clas = Class(declaration.name2.toString(),
+    var clas = Class(declaration.name.toString(),
         readComment(declaration.documentationComment));
 
     clas.methods.addAll(declaration.members
@@ -139,7 +139,7 @@ class Method {
     String name;
     String title, shortTitle, fullSignature;
     if (member is MethodDeclaration) {
-      name = member.name2.toString();
+      name = member.name.toString();
       if (member.isGetter) {
         title = '${firstLetterLower(parent.name)}.$name';
         fullSignature =
@@ -155,7 +155,7 @@ class Method {
       }
       shortTitle = '${firstLetterLower(parent.name)}.$name';
     } else if (member is FieldDeclaration) {
-      name = member.fields.variables.first.name2.toString();
+      name = member.fields.variables.first.name.toString();
       title = '${firstLetterLower(parent.name)}.$name';
       shortTitle = '${firstLetterLower(parent.name)}.$name';
       fullSignature =

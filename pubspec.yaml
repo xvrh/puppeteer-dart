@@ -22,7 +22,7 @@ dependencies:
   pool: ^1.5.0
 
 dev_dependencies:
-  analyzer:
+  analyzer: ^5.1.0
   build:
   build_runner:
   crypto:
