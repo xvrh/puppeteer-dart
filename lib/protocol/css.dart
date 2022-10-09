@@ -420,6 +420,9 @@ class GetMatchedStylesForNodeResult {
   /// A list of CSS keyframed animations matching this node.
   final List<CSSKeyframesRule>? cssKeyframesRules;
 
+  /// Id of the first parent element that does not have display: contents.
+  final dom.NodeId? parentLayoutNodeId;
+
   GetMatchedStylesForNodeResult(
       {this.inlineStyle,
       this.attributesStyle,
@@ -427,7 +430,8 @@ class GetMatchedStylesForNodeResult {
       this.pseudoElements,
       this.inherited,
       this.inheritedPseudoElements,
-      this.cssKeyframesRules});
+      this.cssKeyframesRules,
+      this.parentLayoutNodeId});
 
   factory GetMatchedStylesForNodeResult.fromJson(Map<String, dynamic> json) {
     return GetMatchedStylesForNodeResult(
@@ -464,6 +468,9 @@ class GetMatchedStylesForNodeResult {
           ? (json['cssKeyframesRules'] as List)
               .map((e) => CSSKeyframesRule.fromJson(e as Map<String, dynamic>))
               .toList()
+          : null,
+      parentLayoutNodeId: json.containsKey('parentLayoutNodeId')
+          ? dom.NodeId.fromJson(json['parentLayoutNodeId'] as int)
           : null,
     );
   }
@@ -1139,6 +1146,10 @@ class CSSProperty {
   /// The entire property range in the enclosing style declaration (if available).
   final SourceRange? range;
 
+  /// Parsed longhand components of this property if it is a shorthand.
+  /// This field will be empty if the given property is not a shorthand.
+  final List<CSSProperty>? longhandProperties;
+
   CSSProperty(
       {required this.name,
       required this.value,
@@ -1147,7 +1158,8 @@ class CSSProperty {
       this.text,
       this.parsedOk,
       this.disabled,
-      this.range});
+      this.range,
+      this.longhandProperties});
 
   factory CSSProperty.fromJson(Map<String, dynamic> json) {
     return CSSProperty(
@@ -1162,6 +1174,11 @@ class CSSProperty {
       range: json.containsKey('range')
           ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
           : null,
+      longhandProperties: json.containsKey('longhandProperties')
+          ? (json['longhandProperties'] as List)
+              .map((e) => CSSProperty.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
     );
   }
 
@@ -1175,6 +1192,9 @@ class CSSProperty {
       if (parsedOk != null) 'parsedOk': parsedOk,
       if (disabled != null) 'disabled': disabled,
       if (range != null) 'range': range!.toJson(),
+      if (longhandProperties != null)
+        'longhandProperties':
+            longhandProperties!.map((e) => e.toJson()).toList(),
     };
   }
 }

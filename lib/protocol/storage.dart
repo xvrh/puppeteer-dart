@@ -28,9 +28,10 @@ class StorageApi {
       .map((event) => IndexedDBContentUpdatedEvent.fromJson(event.parameters));
 
   /// The origin's IndexedDB database list has been modified.
-  Stream<String> get onIndexedDBListUpdated => _client.onEvent
-      .where((event) => event.name == 'Storage.indexedDBListUpdated')
-      .map((event) => event.parameters['origin'] as String);
+  Stream<IndexedDBListUpdatedEvent> get onIndexedDBListUpdated =>
+      _client.onEvent
+          .where((event) => event.name == 'Storage.indexedDBListUpdated')
+          .map((event) => IndexedDBListUpdatedEvent.fromJson(event.parameters));
 
   /// One of the interest groups was accessed by the associated page.
   Stream<InterestGroupAccessedEvent> get onInterestGroupAccessed => _client
@@ -53,6 +54,17 @@ class StorageApi {
   Future<void> clearDataForOrigin(String origin, String storageTypes) async {
     await _client.send('Storage.clearDataForOrigin', {
       'origin': origin,
+      'storageTypes': storageTypes,
+    });
+  }
+
+  /// Clears storage for storage key.
+  /// [storageKey] Storage key.
+  /// [storageTypes] Comma separated list of StorageType to clear.
+  Future<void> clearDataForStorageKey(
+      String storageKey, String storageTypes) async {
+    await _client.send('Storage.clearDataForStorageKey', {
+      'storageKey': storageKey,
       'storageTypes': storageTypes,
     });
   }
@@ -131,6 +143,14 @@ class StorageApi {
     });
   }
 
+  /// Registers storage key to be notified when an update occurs to its IndexedDB.
+  /// [storageKey] Storage key.
+  Future<void> trackIndexedDBForStorageKey(String storageKey) async {
+    await _client.send('Storage.trackIndexedDBForStorageKey', {
+      'storageKey': storageKey,
+    });
+  }
+
   /// Unregisters origin from receiving notifications for cache storage.
   /// [origin] Security origin.
   Future<void> untrackCacheStorageForOrigin(String origin) async {
@@ -144,6 +164,14 @@ class StorageApi {
   Future<void> untrackIndexedDBForOrigin(String origin) async {
     await _client.send('Storage.untrackIndexedDBForOrigin', {
       'origin': origin,
+    });
+  }
+
+  /// Unregisters storage key from receiving notifications for IndexedDB.
+  /// [storageKey] Storage key.
+  Future<void> untrackIndexedDBForStorageKey(String storageKey) async {
+    await _client.send('Storage.untrackIndexedDBForStorageKey', {
+      'storageKey': storageKey,
     });
   }
 
@@ -207,6 +235,9 @@ class IndexedDBContentUpdatedEvent {
   /// Origin to update.
   final String origin;
 
+  /// Storage key to update.
+  final String storageKey;
+
   /// Database to update.
   final String databaseName;
 
@@ -215,14 +246,33 @@ class IndexedDBContentUpdatedEvent {
 
   IndexedDBContentUpdatedEvent(
       {required this.origin,
+      required this.storageKey,
       required this.databaseName,
       required this.objectStoreName});
 
   factory IndexedDBContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return IndexedDBContentUpdatedEvent(
       origin: json['origin'] as String,
+      storageKey: json['storageKey'] as String,
       databaseName: json['databaseName'] as String,
       objectStoreName: json['objectStoreName'] as String,
+    );
+  }
+}
+
+class IndexedDBListUpdatedEvent {
+  /// Origin to update.
+  final String origin;
+
+  /// Storage key to update.
+  final String storageKey;
+
+  IndexedDBListUpdatedEvent({required this.origin, required this.storageKey});
+
+  factory IndexedDBListUpdatedEvent.fromJson(Map<String, dynamic> json) {
+    return IndexedDBListUpdatedEvent(
+      origin: json['origin'] as String,
+      storageKey: json['storageKey'] as String,
     );
   }
 }

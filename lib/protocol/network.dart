@@ -1578,6 +1578,7 @@ enum ResourceType {
   textTrack('TextTrack'),
   xhr('XHR'),
   fetch('Fetch'),
+  prefetch('Prefetch'),
   eventSource('EventSource'),
   webSocket('WebSocket'),
   manifest('Manifest'),
@@ -2259,6 +2260,14 @@ class SecurityDetails {
   /// Whether the request complied with Certificate Transparency policy
   final CertificateTransparencyCompliance certificateTransparencyCompliance;
 
+  /// The signature algorithm used by the server in the TLS server signature,
+  /// represented as a TLS SignatureScheme code point. Omitted if not
+  /// applicable or not known.
+  final int? serverSignatureAlgorithm;
+
+  /// Whether the connection used Encrypted ClientHello
+  final bool encryptedClientHello;
+
   SecurityDetails(
       {required this.protocol,
       required this.keyExchange,
@@ -2272,7 +2281,9 @@ class SecurityDetails {
       required this.validFrom,
       required this.validTo,
       required this.signedCertificateTimestampList,
-      required this.certificateTransparencyCompliance});
+      required this.certificateTransparencyCompliance,
+      this.serverSignatureAlgorithm,
+      required this.encryptedClientHello});
 
   factory SecurityDetails.fromJson(Map<String, dynamic> json) {
     return SecurityDetails(
@@ -2298,6 +2309,10 @@ class SecurityDetails {
       certificateTransparencyCompliance:
           CertificateTransparencyCompliance.fromJson(
               json['certificateTransparencyCompliance'] as String),
+      serverSignatureAlgorithm: json.containsKey('serverSignatureAlgorithm')
+          ? json['serverSignatureAlgorithm'] as int
+          : null,
+      encryptedClientHello: json['encryptedClientHello'] as bool? ?? false,
     );
   }
 
@@ -2316,8 +2331,11 @@ class SecurityDetails {
           signedCertificateTimestampList.map((e) => e.toJson()).toList(),
       'certificateTransparencyCompliance':
           certificateTransparencyCompliance.toJson(),
+      'encryptedClientHello': encryptedClientHello,
       if (keyExchangeGroup != null) 'keyExchangeGroup': keyExchangeGroup,
       if (mac != null) 'mac': mac,
+      if (serverSignatureAlgorithm != null)
+        'serverSignatureAlgorithm': serverSignatureAlgorithm,
     };
   }
 }

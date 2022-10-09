@@ -791,7 +791,7 @@ class ChildNodeInsertedEvent {
   /// Id of the node that has changed.
   final NodeId parentNodeId;
 
-  /// If of the previous siblint.
+  /// Id of the previous sibling.
   final NodeId previousNodeId;
 
   /// Inserted node data.

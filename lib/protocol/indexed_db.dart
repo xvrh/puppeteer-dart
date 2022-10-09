@@ -8,38 +8,49 @@ class IndexedDBApi {
   IndexedDBApi(this._client);
 
   /// Clears all entries from an object store.
-  /// [securityOrigin] Security origin.
+  /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
+  /// Security origin.
+  /// [storageKey] Storage key.
   /// [databaseName] Database name.
   /// [objectStoreName] Object store name.
-  Future<void> clearObjectStore(String securityOrigin, String databaseName,
-      String objectStoreName) async {
+  Future<void> clearObjectStore(String databaseName, String objectStoreName,
+      {String? securityOrigin, String? storageKey}) async {
     await _client.send('IndexedDB.clearObjectStore', {
-      'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
+      if (securityOrigin != null) 'securityOrigin': securityOrigin,
+      if (storageKey != null) 'storageKey': storageKey,
     });
   }
 
   /// Deletes a database.
-  /// [securityOrigin] Security origin.
+  /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
+  /// Security origin.
+  /// [storageKey] Storage key.
   /// [databaseName] Database name.
-  Future<void> deleteDatabase(
-      String securityOrigin, String databaseName) async {
+  Future<void> deleteDatabase(String databaseName,
+      {String? securityOrigin, String? storageKey}) async {
     await _client.send('IndexedDB.deleteDatabase', {
-      'securityOrigin': securityOrigin,
       'databaseName': databaseName,
+      if (securityOrigin != null) 'securityOrigin': securityOrigin,
+      if (storageKey != null) 'storageKey': storageKey,
     });
   }
 
   /// Delete a range of entries from an object store
+  /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
+  /// Security origin.
+  /// [storageKey] Storage key.
   /// [keyRange] Range of entry keys to delete
-  Future<void> deleteObjectStoreEntries(String securityOrigin,
-      String databaseName, String objectStoreName, KeyRange keyRange) async {
+  Future<void> deleteObjectStoreEntries(
+      String databaseName, String objectStoreName, KeyRange keyRange,
+      {String? securityOrigin, String? storageKey}) async {
     await _client.send('IndexedDB.deleteObjectStoreEntries', {
-      'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
       'keyRange': keyRange,
+      if (securityOrigin != null) 'securityOrigin': securityOrigin,
+      if (storageKey != null) 'storageKey': storageKey,
     });
   }
 
@@ -54,67 +65,76 @@ class IndexedDBApi {
   }
 
   /// Requests data from object store or index.
-  /// [securityOrigin] Security origin.
+  /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
+  /// Security origin.
+  /// [storageKey] Storage key.
   /// [databaseName] Database name.
   /// [objectStoreName] Object store name.
   /// [indexName] Index name, empty string for object store data requests.
   /// [skipCount] Number of records to skip.
   /// [pageSize] Number of records to fetch.
   /// [keyRange] Key range.
-  Future<RequestDataResult> requestData(
-      String securityOrigin,
-      String databaseName,
-      String objectStoreName,
-      String indexName,
-      int skipCount,
-      int pageSize,
-      {KeyRange? keyRange}) async {
+  Future<RequestDataResult> requestData(String databaseName,
+      String objectStoreName, String indexName, int skipCount, int pageSize,
+      {String? securityOrigin, String? storageKey, KeyRange? keyRange}) async {
     var result = await _client.send('IndexedDB.requestData', {
-      'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
       'indexName': indexName,
       'skipCount': skipCount,
       'pageSize': pageSize,
+      if (securityOrigin != null) 'securityOrigin': securityOrigin,
+      if (storageKey != null) 'storageKey': storageKey,
       if (keyRange != null) 'keyRange': keyRange,
     });
     return RequestDataResult.fromJson(result);
   }
 
   /// Gets metadata of an object store
-  /// [securityOrigin] Security origin.
+  /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
+  /// Security origin.
+  /// [storageKey] Storage key.
   /// [databaseName] Database name.
   /// [objectStoreName] Object store name.
-  Future<GetMetadataResult> getMetadata(String securityOrigin,
-      String databaseName, String objectStoreName) async {
+  Future<GetMetadataResult> getMetadata(
+      String databaseName, String objectStoreName,
+      {String? securityOrigin, String? storageKey}) async {
     var result = await _client.send('IndexedDB.getMetadata', {
-      'securityOrigin': securityOrigin,
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
+      if (securityOrigin != null) 'securityOrigin': securityOrigin,
+      if (storageKey != null) 'storageKey': storageKey,
     });
     return GetMetadataResult.fromJson(result);
   }
 
   /// Requests database with given name in given frame.
-  /// [securityOrigin] Security origin.
+  /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
+  /// Security origin.
+  /// [storageKey] Storage key.
   /// [databaseName] Database name.
   /// Returns: Database with an array of object stores.
-  Future<DatabaseWithObjectStores> requestDatabase(
-      String securityOrigin, String databaseName) async {
+  Future<DatabaseWithObjectStores> requestDatabase(String databaseName,
+      {String? securityOrigin, String? storageKey}) async {
     var result = await _client.send('IndexedDB.requestDatabase', {
-      'securityOrigin': securityOrigin,
       'databaseName': databaseName,
+      if (securityOrigin != null) 'securityOrigin': securityOrigin,
+      if (storageKey != null) 'storageKey': storageKey,
     });
     return DatabaseWithObjectStores.fromJson(
         result['databaseWithObjectStores'] as Map<String, dynamic>);
   }
 
   /// Requests database names for given security origin.
-  /// [securityOrigin] Security origin.
+  /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
+  /// Security origin.
+  /// [storageKey] Storage key.
   /// Returns: Database names for origin.
-  Future<List<String>> requestDatabaseNames(String securityOrigin) async {
+  Future<List<String>> requestDatabaseNames(
+      {String? securityOrigin, String? storageKey}) async {
     var result = await _client.send('IndexedDB.requestDatabaseNames', {
-      'securityOrigin': securityOrigin,
+      if (securityOrigin != null) 'securityOrigin': securityOrigin,
+      if (storageKey != null) 'storageKey': storageKey,
     });
     return (result['databaseNames'] as List).map((e) => e as String).toList();
   }

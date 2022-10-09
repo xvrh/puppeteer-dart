@@ -200,9 +200,14 @@ class TargetApi {
   }
 
   /// Retrieves a list of available targets.
+  /// [filter] Only targets matching filter will be reported. If filter is not specified
+  /// and target discovery is currently enabled, a filter used for target discovery
+  /// is used for consistency.
   /// Returns: The list of targets.
-  Future<List<TargetInfo>> getTargets() async {
-    var result = await _client.send('Target.getTargets');
+  Future<List<TargetInfo>> getTargets({TargetFilter? filter}) async {
+    var result = await _client.send('Target.getTargets', {
+      if (filter != null) 'filter': filter,
+    });
     return (result['targetInfos'] as List)
         .map((e) => TargetInfo.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -234,12 +239,14 @@ class TargetApi {
   /// [flatten] Enables "flat" access to the session via specifying sessionId attribute in the commands.
   /// We plan to make this the default, deprecate non-flattened mode,
   /// and eventually retire it. See crbug.com/991325.
+  /// [filter] Only targets matching filter will be attached.
   Future<void> setAutoAttach(bool autoAttach, bool waitForDebuggerOnStart,
-      {bool? flatten}) async {
+      {bool? flatten, TargetFilter? filter}) async {
     await _client.send('Target.setAutoAttach', {
       'autoAttach': autoAttach,
       'waitForDebuggerOnStart': waitForDebuggerOnStart,
       if (flatten != null) 'flatten': flatten,
+      if (filter != null) 'filter': filter,
     });
   }
 
@@ -250,20 +257,25 @@ class TargetApi {
   /// `setAutoAttach`. Only available at the Browser target.
   /// [waitForDebuggerOnStart] Whether to pause new targets when attaching to them. Use `Runtime.runIfWaitingForDebugger`
   /// to run paused targets.
-  Future<void> autoAttachRelated(
-      TargetID targetId, bool waitForDebuggerOnStart) async {
+  /// [filter] Only targets matching filter will be attached.
+  Future<void> autoAttachRelated(TargetID targetId, bool waitForDebuggerOnStart,
+      {TargetFilter? filter}) async {
     await _client.send('Target.autoAttachRelated', {
       'targetId': targetId,
       'waitForDebuggerOnStart': waitForDebuggerOnStart,
+      if (filter != null) 'filter': filter,
     });
   }
 
   /// Controls whether to discover available targets and notify via
   /// `targetCreated/targetInfoChanged/targetDestroyed` events.
   /// [discover] Whether to discover available targets.
-  Future<void> setDiscoverTargets(bool discover) async {
+  /// [filter] Only targets matching filter will be attached. If `discover` is false,
+  /// `filter` must be omitted or empty.
+  Future<void> setDiscoverTargets(bool discover, {TargetFilter? filter}) async {
     await _client.send('Target.setDiscoverTargets', {
       'discover': discover,
+      if (filter != null) 'filter': filter,
     });
   }
 
@@ -461,6 +473,59 @@ class TargetInfo {
         'browserContextId': browserContextId!.toJson(),
     };
   }
+}
+
+/// A filter used by target query/discovery/auto-attach operations.
+class FilterEntry {
+  /// If set, causes exclusion of mathcing targets from the list.
+  final bool? exclude;
+
+  /// If not present, matches any type.
+  final String? type;
+
+  FilterEntry({this.exclude, this.type});
+
+  factory FilterEntry.fromJson(Map<String, dynamic> json) {
+    return FilterEntry(
+      exclude: json.containsKey('exclude') ? json['exclude'] as bool : null,
+      type: json.containsKey('type') ? json['type'] as String : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (exclude != null) 'exclude': exclude,
+      if (type != null) 'type': type,
+    };
+  }
+}
+
+/// The entries in TargetFilter are matched sequentially against targets and
+/// the first entry that matches determines if the target is included or not,
+/// depending on the value of `exclude` field in the entry.
+/// If filter is not specified, the one assumed is
+/// [{type: "browser", exclude: true}, {type: "tab", exclude: true}, {}]
+/// (i.e. include everything but `browser` and `tab`).
+class TargetFilter {
+  final List<FilterEntry> value;
+
+  TargetFilter(this.value);
+
+  factory TargetFilter.fromJson(List<dynamic> value) => TargetFilter(value
+      .map((e) => FilterEntry.fromJson(e as Map<String, dynamic>))
+      .toList());
+
+  List<FilterEntry> toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is TargetFilter && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
 }
 
 class RemoteLocation {

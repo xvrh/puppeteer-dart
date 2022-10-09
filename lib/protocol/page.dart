@@ -1172,16 +1172,24 @@ class PrerenderAttemptCompletedEvent {
 
   final PrerenderFinalStatus finalStatus;
 
+  /// This is used to give users more information about the cancellation details,
+  /// and this will be formatted for display.
+  final String? reasonDetails;
+
   PrerenderAttemptCompletedEvent(
       {required this.initiatingFrameId,
       required this.prerenderingUrl,
-      required this.finalStatus});
+      required this.finalStatus,
+      this.reasonDetails});
 
   factory PrerenderAttemptCompletedEvent.fromJson(Map<String, dynamic> json) {
     return PrerenderAttemptCompletedEvent(
       initiatingFrameId: FrameId.fromJson(json['initiatingFrameId'] as String),
       prerenderingUrl: json['prerenderingUrl'] as String,
       finalStatus: PrerenderFinalStatus.fromJson(json['finalStatus'] as String),
+      reasonDetails: json.containsKey('reasonDetails')
+          ? json['reasonDetails'] as String
+          : null,
     );
   }
 }
@@ -1672,9 +1680,11 @@ enum PermissionsPolicyFeature {
   screenWakeLock('screen-wake-lock'),
   serial('serial'),
   sharedAutofill('shared-autofill'),
-  storageAccessApi('storage-access-api'),
+  sharedStorage('shared-storage'),
+  storageAccess('storage-access'),
   syncXhr('sync-xhr'),
   trustTokenRedemption('trust-token-redemption'),
+  unload('unload'),
   usb('usb'),
   verticalScroll('vertical-scroll'),
   webShare('web-share'),
@@ -3130,7 +3140,10 @@ enum PrerenderFinalStatus {
       'EmbedderTriggeredAndSameOriginRedirected'),
   embedderTriggeredAndCrossOriginRedirected(
       'EmbedderTriggeredAndCrossOriginRedirected'),
-  embedderTriggeredAndDestroyed('EmbedderTriggeredAndDestroyed'),
+  memoryLimitExceeded('MemoryLimitExceeded'),
+  failToGetMemoryUsage('FailToGetMemoryUsage'),
+  dataSaverEnabled('DataSaverEnabled'),
+  hasEffectiveUrl('HasEffectiveUrl'),
   ;
 
   final String value;
