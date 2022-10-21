@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+import 'websocket.dart';
 import 'package:logging/logging.dart';
 import '../protocol/target.dart';
 
@@ -40,12 +40,12 @@ class Connection implements Client {
 
   Connection._(this._webSocket, this.url, {Duration? delay}) : _delay = delay {
     _subscriptions
-        .add(_webSocket.cast<String>().listen(_onMessage, onError: (error) {
+        .add(_webSocket.events.listen(_onMessage, onError: (error) {
       print('Websocket error: $error');
     }));
 
     _webSocket.done.then((_) => _onClose(
-        'Websocket.done(code: ${_webSocket.closeCode}, reason: ${_webSocket.closeReason})'));
+        'Websocket.done(reason: ${_webSocket.closeReason})'));
   }
 
   TargetApi get targetApi => _targetApi;
@@ -168,7 +168,7 @@ class Connection implements Client {
 
   Future dispose(String reason) async {
     _onClose(reason);
-    await _webSocket.close(WebSocketStatus.normalClosure, 'Connection.dispose');
+    await _webSocket.close('Connection.dispose');
   }
 
   bool get isClosed => _eventController.isClosed;
