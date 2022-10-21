@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.15.0
+- Allow `puppeteer.connect` to be called on the Web platform (Dart code compiled to JavaScript).
+
 ## 2.14.0
 - Update to Chromium 107
 
