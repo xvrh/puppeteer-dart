@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
-import 'websocket.dart';
 import 'package:logging/logging.dart';
 import '../protocol/target.dart';
+import 'websocket.dart';
 
 abstract class Client {
   Future<Map<String, dynamic>> send(String method,
@@ -39,13 +39,12 @@ class Connection implements Client {
   final Duration? _delay;
 
   Connection._(this._webSocket, this.url, {Duration? delay}) : _delay = delay {
-    _subscriptions
-        .add(_webSocket.events.listen(_onMessage, onError: (error) {
+    _subscriptions.add(_webSocket.events.listen(_onMessage, onError: (error) {
       print('Websocket error: $error');
     }));
 
-    _webSocket.done.then((_) => _onClose(
-        'Websocket.done(reason: ${_webSocket.closeReason})'));
+    _webSocket.done.then(
+        (_) => _onClose('Websocket.done(reason: ${_webSocket.closeReason})'));
   }
 
   TargetApi get targetApi => _targetApi;

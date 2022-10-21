@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:puppeteer/puppeteer.dart';
-import 'package:shelf_static/shelf_static.dart';
-import 'package:test/test.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf/shelf_io.dart' as shelf;
+import 'package:shelf_static/shelf_static.dart';
+import 'package:test/test.dart';
 
 // Test that we can use puppeteer.connect from a web page (dart compiled with Dart2js)
 void main() {
@@ -46,14 +46,15 @@ void main() {
         jsFile,
         'test/connect_on_web_part.dart'
       ]);
-      expect(compileResult.exitCode, 0, reason: '${compileResult.stdout}\n${compileResult.stderr}');
+      expect(compileResult.exitCode, 0,
+          reason: '${compileResult.stdout}\n${compileResult.stderr}');
       assert(File(jsFile).existsSync());
 
       var page = await browser.newPage();
       await page.goto('http://localhost:${httpServer.port}/index.html');
 
-      await page.onConsole.firstWhere((e) => e.text == 'Hello from puppeteer in js');
-
+      await page.onConsole
+          .firstWhere((e) => e.text == 'Hello from puppeteer in js');
     } finally {
       await httpServer.close();
       tempDirectory.deleteSync(recursive: true);
