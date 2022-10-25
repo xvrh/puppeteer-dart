@@ -45,7 +45,7 @@ void main() {
       await page.tracing.stop(buffer);
       var traceJson = jsonDecode(buffer.toString()) as Map<String, dynamic>;
 
-      expect(traceJson['metadata']['trace-config'],
+      expect((traceJson['metadata'] as Map<String, dynamic>)['trace-config'],
           contains('disabled-by-default-v8.cpu_profiler.hires'));
     });
     test('should throw if tracing on two pages', () async {

@@ -279,7 +279,7 @@ void main() {
     });
     test('should navigate to URL with hash and fire requests without hash',
         () async {
-      var requests = [];
+      var requests = <Request>[];
       page.onRequest.listen((request) {
         if (!request.url.contains('favicon.ico')) {
           requests.add(request);

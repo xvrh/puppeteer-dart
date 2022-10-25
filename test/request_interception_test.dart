@@ -314,7 +314,7 @@ void main() {
     });
     test('should navigate to dataURL and fire dataURL requests', () async {
       await page.setRequestInterception(true);
-      var requests = [];
+      var requests = <Request>[];
       page.onRequest.listen((request) {
         requests.add(request);
         request.continueRequest();
@@ -343,7 +343,7 @@ void main() {
     test('should navigate to URL with hash and and fire requests without hash',
         () async {
       await page.setRequestInterception(true);
-      var requests = [];
+      var requests = <Request>[];
       page.onRequest.listen((request) {
         requests.add(request);
         request.continueRequest();
