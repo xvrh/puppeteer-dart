@@ -20,7 +20,7 @@ void main() async {
   await page.waitForSelector(resultsSelector);
 
   // Extract the results from the page.
-  var links = await page.evaluate(r'''resultsSelector => {
+  var links = await page.evaluate<List>(r'''resultsSelector => {
   const anchors = Array.from(document.querySelectorAll(resultsSelector));
   return anchors.map(anchor => {
     const title = anchor.textContent.split('|')[0].trim();

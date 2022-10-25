@@ -97,7 +97,7 @@ function _(object, propertyName) {
 }
 ''', args: [propertyName]);
     var properties = await objectHandle.properties;
-    var result = properties[propertyName] as T;
+    var result = properties[propertyName]! as T;
     await objectHandle.dispose();
     return result;
   }
@@ -115,7 +115,7 @@ function _(object, propertyName) {
   /// var handle = await page.evaluateHandle('() => ({window, document})');
   /// var properties = await handle.properties;
   /// var windowHandle = properties['window'];
-  /// var documentHandle = properties['document'] as ElementHandle;
+  /// var documentHandle = properties['document']! as ElementHandle;
   /// await handle.dispose();
   /// ```
   Future<Map<String, JsHandle>> get properties async {
@@ -210,9 +210,8 @@ class ElementHandle extends JsHandle {
   final Frame? frame;
   final FrameManager frameManager;
 
-  ElementHandle(ExecutionContext context, RemoteObject remoteObject, this.frame,
-      this.frameManager)
-      : super(context, remoteObject);
+  ElementHandle(
+      super.context, super.remoteObject, this.frame, this.frameManager);
 
   Page get page => frameManager.page;
 

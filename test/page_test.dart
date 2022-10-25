@@ -629,7 +629,7 @@ void main() {
     });
     test('should work with complex objects', () async {
       await page.exposeFunction('complexObject', (Map a, Map b) {
-        return {'x': a['x'] + b['x']};
+        return {'x': (a['x'] as num) + (b['x'] as num)};
       });
       var result =
           await page.evaluate<Map>('async() => complexObject({x: 5}, {x: 2})');

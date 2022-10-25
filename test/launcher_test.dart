@@ -81,7 +81,7 @@ void main() {
           browser.close()
         ]);
         for (var i = 0; i < 2; i++) {
-          var message = results[i].message;
+          var message = (results[i] as StateError).message;
           expect(message, contains('No element'));
           expect(message, isNot(contains('Timeout')));
         }

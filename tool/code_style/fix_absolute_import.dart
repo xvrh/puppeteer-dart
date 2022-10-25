@@ -43,7 +43,7 @@ String fixCode(DartFile dartFile, String content) {
         var thisFilePath = dartFile.relativePath.substring('lib/'.length);
         var relativePath = p
             .relative(absoluteImportFromLib, from: p.dirname(thisFilePath))
-            .replaceAll('\\', '/');
+            .replaceAll(r'\', '/');
 
         var directiveContent =
             directive.uri.toString().replaceAll(uriValue, relativePath);

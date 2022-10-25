@@ -78,18 +78,20 @@ class JsGrammarDefinition extends GrammarDefinition {
   Parser arguments() =>
       ref1(token, '(') & ref0(argumentList).optional() & ref1(token, ')');
 
-  Parser argumentList() => ref0(argument).separatedBy(ref1(token, ','));
+  Parser argumentList() => ref0(argument).plusSeparated(ref1(token, ','));
 
   Parser argument() => ref1(token, '...').optional() & ref0(identifier);
 
-  Parser identifier() => ref1(token, ref0(IDENTIFIER))
-      .map((v) => v.value[0] + v.value[1].join(''));
+  Parser identifier() => ref1(token, ref0(IDENTIFIER)).cast<Token>().map((v) {
+        var values = v.value as List;
+        return (values[0] as String) + (values[1] as List).join('');
+      });
 
   Parser body() => ref0(any).star().map((v) => _FunctionBody(v.join('')));
 
   Parser IDENTIFIER() => ref0(IDENTIFIER_START) & ref0(IDENTIFIER_PART).star();
 
-  Parser IDENTIFIER_START() => ref0(IDENTIFIER_START_NO_DOLLAR) | char('\$');
+  Parser IDENTIFIER_START() => ref0(IDENTIFIER_START_NO_DOLLAR) | char(r'$');
 
   Parser IDENTIFIER_START_NO_DOLLAR() => ref0(LETTER) | char('_');
 

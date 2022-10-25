@@ -349,7 +349,7 @@ class Key {
   static const Key bracketLeft =
       Key._(keyCode: 219, code: 'BracketLeft', shiftKey: '{', key: '[');
   static const Key backslash =
-      Key._(keyCode: 220, code: 'Backslash', shiftKey: '|', key: '\\');
+      Key._(keyCode: 220, code: 'Backslash', shiftKey: '|', key: r'\');
   static const Key bracketRight =
       Key._(keyCode: 221, code: 'BracketRight', shiftKey: '}', key: ']');
   static const Key quote =

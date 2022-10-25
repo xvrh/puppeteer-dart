@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.15.1
+- Upgrade `package:petitparser` to version 5.1.0
+- Fix some lint rules
+
 ## 2.15.0
 - Allow `puppeteer.connect` to be called on the Web platform (Dart code compiled to JavaScript).
 
