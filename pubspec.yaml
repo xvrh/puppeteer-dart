@@ -1,11 +1,12 @@
 name: puppeteer
 description: A high-level API to control headless Chrome over the DevTools Protocol. This is a port of Puppeteer in Dart.
-version: 2.16.0
+version: 2.17.0
 homepage: https://github.com/xvrh/puppeteer-dart
 
 platforms:
   linux:
   macos:
+  web:
   windows:
 
 environment:

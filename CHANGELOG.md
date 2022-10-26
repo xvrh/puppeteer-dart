@@ -1,6 +1,9 @@
 # Changelog
 
-## 2.15.1
+## 2.17.0
+- Update to Chromium 108
+
+## 2.16.0
 - Upgrade `package:petitparser` to version 5.1.0
 - Fix some lint rules
 

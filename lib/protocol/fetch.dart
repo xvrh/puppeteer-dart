@@ -206,7 +206,11 @@ class RequestPausedEvent {
 
   /// If the intercepted request had a corresponding Network.requestWillBeSent event fired for it,
   /// then this networkId will be the same as the requestId present in the requestWillBeSent event.
-  final RequestId? networkId;
+  final network.RequestId? networkId;
+
+  /// If the request is due to a redirect response from the server, the id of the request that
+  /// has caused the redirect.
+  final RequestId? redirectedRequestId;
 
   RequestPausedEvent(
       {required this.requestId,
@@ -217,7 +221,8 @@ class RequestPausedEvent {
       this.responseStatusCode,
       this.responseStatusText,
       this.responseHeaders,
-      this.networkId});
+      this.networkId,
+      this.redirectedRequestId});
 
   factory RequestPausedEvent.fromJson(Map<String, dynamic> json) {
     return RequestPausedEvent(
@@ -242,7 +247,10 @@ class RequestPausedEvent {
               .toList()
           : null,
       networkId: json.containsKey('networkId')
-          ? RequestId.fromJson(json['networkId'] as String)
+          ? network.RequestId.fromJson(json['networkId'] as String)
+          : null,
+      redirectedRequestId: json.containsKey('redirectedRequestId')
+          ? RequestId.fromJson(json['redirectedRequestId'] as String)
           : null,
     );
   }

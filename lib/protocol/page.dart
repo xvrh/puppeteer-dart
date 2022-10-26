@@ -319,8 +319,9 @@ class PageApi {
     return GetAppIdResult.fromJson(result);
   }
 
-  /// Returns all browser cookies. Depending on the backend support, will return detailed cookie
-  /// information in the `cookies` field.
+  /// Returns all browser cookies for the page and all of its subframes. Depending
+  /// on the backend support, will return detailed cookie information in the
+  /// `cookies` field.
   /// Returns: Array of cookie objects.
   @Deprecated('This command is deprecated')
   Future<List<network.Cookie>> getCookies() async {
@@ -1172,23 +1173,23 @@ class PrerenderAttemptCompletedEvent {
 
   final PrerenderFinalStatus finalStatus;
 
-  /// This is used to give users more information about the cancellation details,
-  /// and this will be formatted for display.
-  final String? reasonDetails;
+  /// This is used to give users more information about the name of the API call
+  /// that is incompatible with prerender and has caused the cancellation of the attempt
+  final String? disallowedApiMethod;
 
   PrerenderAttemptCompletedEvent(
       {required this.initiatingFrameId,
       required this.prerenderingUrl,
       required this.finalStatus,
-      this.reasonDetails});
+      this.disallowedApiMethod});
 
   factory PrerenderAttemptCompletedEvent.fromJson(Map<String, dynamic> json) {
     return PrerenderAttemptCompletedEvent(
       initiatingFrameId: FrameId.fromJson(json['initiatingFrameId'] as String),
       prerenderingUrl: json['prerenderingUrl'] as String,
       finalStatus: PrerenderFinalStatus.fromJson(json['finalStatus'] as String),
-      reasonDetails: json.containsKey('reasonDetails')
-          ? json['reasonDetails'] as String
+      disallowedApiMethod: json.containsKey('disallowedApiMethod')
+          ? json['disallowedApiMethod'] as String
           : null,
     );
   }
@@ -1630,6 +1631,7 @@ enum PermissionsPolicyFeature {
   chDownlink('ch-downlink'),
   chEct('ch-ect'),
   chPrefersColorScheme('ch-prefers-color-scheme'),
+  chPrefersReducedMotion('ch-prefers-reduced-motion'),
   chRtt('ch-rtt'),
   chSaveData('ch-save-data'),
   chUa('ch-ua'),
@@ -1656,7 +1658,6 @@ enum PermissionsPolicyFeature {
   encryptedMedia('encrypted-media'),
   executionWhileOutOfViewport('execution-while-out-of-viewport'),
   executionWhileNotRendered('execution-while-not-rendered'),
-  federatedCredentials('federated-credentials'),
   focusWithoutUserActivation('focus-without-user-activation'),
   fullscreen('fullscreen'),
   frobulate('frobulate'),
@@ -1664,6 +1665,7 @@ enum PermissionsPolicyFeature {
   geolocation('geolocation'),
   gyroscope('gyroscope'),
   hid('hid'),
+  identityCredentialsGet('identity-credentials-get'),
   idleDetection('idle-detection'),
   interestCohort('interest-cohort'),
   joinAdInterestGroup('join-ad-interest-group'),
@@ -3136,14 +3138,16 @@ enum PrerenderFinalStatus {
   audioOutputDeviceRequested('AudioOutputDeviceRequested'),
   mixedContent('MixedContent'),
   triggerBackgrounded('TriggerBackgrounded'),
-  embedderTriggeredAndSameOriginRedirected(
-      'EmbedderTriggeredAndSameOriginRedirected'),
   embedderTriggeredAndCrossOriginRedirected(
       'EmbedderTriggeredAndCrossOriginRedirected'),
   memoryLimitExceeded('MemoryLimitExceeded'),
   failToGetMemoryUsage('FailToGetMemoryUsage'),
   dataSaverEnabled('DataSaverEnabled'),
   hasEffectiveUrl('HasEffectiveUrl'),
+  activatedBeforeStarted('ActivatedBeforeStarted'),
+  inactivePageRestriction('InactivePageRestriction'),
+  startFailed('StartFailed'),
+  timeoutBackgrounded('TimeoutBackgrounded'),
   ;
 
   final String value;
