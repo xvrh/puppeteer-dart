@@ -151,7 +151,7 @@ void main() {
             name: '',
             value: 'Edit this image: ',
             children: [
-              AXNode(role: 'StaticText', name: 'Edit this image:'),
+              AXNode(role: 'StaticText', name: 'Edit this image: '),
               AXNode(role: 'img', name: 'my fake image')
             ]);
         var snapshot = await page.accessibility.snapshot();
@@ -168,7 +168,7 @@ void main() {
             name: '',
             value: 'Edit this image: ',
             children: [
-              AXNode(role: 'StaticText', name: 'Edit this image:'),
+              AXNode(role: 'StaticText', name: 'Edit this image: '),
             ],
             multiLine: true);
         var snapshot = await page.accessibility.snapshot();
