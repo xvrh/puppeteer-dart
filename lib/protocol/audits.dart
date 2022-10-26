@@ -1128,13 +1128,10 @@ enum DeprecationIssueType {
   identityInCanMakePaymentEvent('IdentityInCanMakePaymentEvent'),
   insecurePrivateNetworkSubresourceRequest(
       'InsecurePrivateNetworkSubresourceRequest'),
-  legacyConstraintGoogIPv6('LegacyConstraintGoogIPv6'),
   localCssFileExtensionRejected('LocalCSSFileExtensionRejected'),
   mediaSourceAbortRemove('MediaSourceAbortRemove'),
   mediaSourceDurationTruncatingBuffered(
       'MediaSourceDurationTruncatingBuffered'),
-  navigateEventRestoreScroll('NavigateEventRestoreScroll'),
-  navigateEventTransitionWhile('NavigateEventTransitionWhile'),
   noSysexWebMidiWithoutPermission('NoSysexWebMIDIWithoutPermission'),
   notificationInsecureOrigin('NotificationInsecureOrigin'),
   notificationPermissionRequestedIframe(
@@ -1142,6 +1139,8 @@ enum DeprecationIssueType {
   obsoleteWebRtcCipherSuite('ObsoleteWebRtcCipherSuite'),
   openWebDatabaseInsecureContext('OpenWebDatabaseInsecureContext'),
   overflowVisibleOnReplacedElement('OverflowVisibleOnReplacedElement'),
+  paymentInstruments('PaymentInstruments'),
+  paymentRequestCspViolation('PaymentRequestCSPViolation'),
   persistentQuotaType('PersistentQuotaType'),
   pictureSourceSrc('PictureSourceSrc'),
   prefixedCancelAnimationFrame('PrefixedCancelAnimationFrame'),

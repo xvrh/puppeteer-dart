@@ -427,6 +427,10 @@ class TargetInfo {
 
   final browser.BrowserContextID? browserContextId;
 
+  /// Provides additional details for specific target types. For example, for
+  /// the type of "page", this may be set to "portal" or "prerender".
+  final String? subtype;
+
   TargetInfo(
       {required this.targetId,
       required this.type,
@@ -436,7 +440,8 @@ class TargetInfo {
       this.openerId,
       required this.canAccessOpener,
       this.openerFrameId,
-      this.browserContextId});
+      this.browserContextId,
+      this.subtype});
 
   factory TargetInfo.fromJson(Map<String, dynamic> json) {
     return TargetInfo(
@@ -456,6 +461,7 @@ class TargetInfo {
           ? browser.BrowserContextID.fromJson(
               json['browserContextId'] as String)
           : null,
+      subtype: json.containsKey('subtype') ? json['subtype'] as String : null,
     );
   }
 
@@ -471,6 +477,7 @@ class TargetInfo {
       if (openerFrameId != null) 'openerFrameId': openerFrameId!.toJson(),
       if (browserContextId != null)
         'browserContextId': browserContextId!.toJson(),
+      if (subtype != null) 'subtype': subtype,
     };
   }
 }

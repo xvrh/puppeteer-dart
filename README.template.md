@@ -141,22 +141,19 @@ main() {
 }
 ```
 
-Note: In a future version, we can imagine writing the code in Dart and it would be compiled to javascript transparently 
- (with ddc or dart2js).
-
 ## Limitations with Flutter
 
 This library does 2 things:
 
-1) Download the chromium binaries and launch a Chromium process.
+1) Download the Chromium binaries and launch a Chromium process.
 2) Connect to this process with Websocket and send json commands to control the browser.
 
 Due to limitations on mobile platforms (iOS and Android), **it is not possible to launch an external Chromium process on iOS and Android**.
 So, step 1) does not work on mobile.
 
 You can still use `puppeteer-dart` on Flutter either with:
-- Flutter on Desktop (macOS, windows, Linux)
-- Flutter on mobile BUT with the actual Chrome instance running on a server and accessed from the mobile app using puppeteer.connect
+- Flutter on Desktop (macOS, Windows, Linux)
+- Flutter on Mobile BUT with the actual Chrome instance running on a server and accessed from the mobile app using `puppeteer.connect`
 
 ## Related work
  * [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface)

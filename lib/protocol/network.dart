@@ -2556,6 +2556,31 @@ enum TrustTokenOperationType {
   String toString() => value.toString();
 }
 
+/// The reason why Chrome uses a specific transport protocol for HTTP semantics.
+enum AlternateProtocolUsage {
+  alternativeJobWonWithoutRace('alternativeJobWonWithoutRace'),
+  alternativeJobWonRace('alternativeJobWonRace'),
+  mainJobWonRace('mainJobWonRace'),
+  mappingMissing('mappingMissing'),
+  broken('broken'),
+  dnsAlpnH3JobWonWithoutRace('dnsAlpnH3JobWonWithoutRace'),
+  dnsAlpnH3JobWonRace('dnsAlpnH3JobWonRace'),
+  unspecifiedReason('unspecifiedReason'),
+  ;
+
+  final String value;
+
+  const AlternateProtocolUsage(this.value);
+
+  factory AlternateProtocolUsage.fromJson(String value) =>
+      AlternateProtocolUsage.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// HTTP response data.
 class ResponseData {
   /// Response URL. This URL can be different from CachedResource.url in case of redirect.
@@ -2615,6 +2640,9 @@ class ResponseData {
   /// Protocol used to fetch this request.
   final String? protocol;
 
+  /// The reason why Chrome uses a specific transport protocol for HTTP semantics.
+  final AlternateProtocolUsage? alternateProtocolUsage;
+
   /// Security state of the request resource.
   final security.SecurityState securityState;
 
@@ -2641,6 +2669,7 @@ class ResponseData {
       this.responseTime,
       this.cacheStorageCacheName,
       this.protocol,
+      this.alternateProtocolUsage,
       required this.securityState,
       this.securityDetails});
 
@@ -2687,6 +2716,10 @@ class ResponseData {
           : null,
       protocol:
           json.containsKey('protocol') ? json['protocol'] as String : null,
+      alternateProtocolUsage: json.containsKey('alternateProtocolUsage')
+          ? AlternateProtocolUsage.fromJson(
+              json['alternateProtocolUsage'] as String)
+          : null,
       securityState:
           security.SecurityState.fromJson(json['securityState'] as String),
       securityDetails: json.containsKey('securityDetails')
@@ -2720,6 +2753,8 @@ class ResponseData {
       if (cacheStorageCacheName != null)
         'cacheStorageCacheName': cacheStorageCacheName,
       if (protocol != null) 'protocol': protocol,
+      if (alternateProtocolUsage != null)
+        'alternateProtocolUsage': alternateProtocolUsage!.toJson(),
       if (securityDetails != null) 'securityDetails': securityDetails!.toJson(),
     };
   }
