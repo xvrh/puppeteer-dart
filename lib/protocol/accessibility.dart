@@ -484,6 +484,9 @@ enum AXPropertyName {
   ariaHiddenElement('ariaHiddenElement'),
   ariaHiddenSubtree('ariaHiddenSubtree'),
   notRendered('notRendered'),
+  notVisible('notVisible'),
+  labelFor('labelFor'),
+  presentationalRole('presentationalRole'),
   ;
 
   final String value;
