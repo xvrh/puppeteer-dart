@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.9.1
+- Add missing `AXPropertyName` entries.
+
 ## 2.9.0 (2022-05-10)
 - Update to Chromium 102
 

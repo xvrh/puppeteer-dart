@@ -539,6 +539,9 @@ class AXPropertyName {
   static const ariaHiddenElement = AXPropertyName._('ariaHiddenElement');
   static const ariaHiddenSubtree = AXPropertyName._('ariaHiddenSubtree');
   static const notRendered = AXPropertyName._('notRendered');
+  static const notVisible = AXPropertyName._('notVisible');
+  static const labelFor = AXPropertyName._('labelFor');
+  static const presentationalRole = AXPropertyName._('presentationalRole');
   static const values = {
     'busy': busy,
     'disabled': disabled,
@@ -583,6 +586,9 @@ class AXPropertyName {
     'ariaHiddenElement': ariaHiddenElement,
     'ariaHiddenSubtree': ariaHiddenSubtree,
     'notRendered': notRendered,
+    'notVisible': notVisible,
+    'labelFor': labelFor,
+    'presentationalRole': presentationalRole,
   };
 
   final String value;
