@@ -353,7 +353,7 @@ class Key {
   static const Key bracketRight =
       Key._(keyCode: 221, code: 'BracketRight', shiftKey: '}', key: ']');
   static const Key quote =
-      Key._(keyCode: 222, code: 'Quote', shiftKey: '"', key: '\'');
+      Key._(keyCode: 222, code: 'Quote', shiftKey: '"', key: "'");
   static const Key altGraph =
       Key._(keyCode: 225, code: 'AltGraph', key: 'AltGraph');
   static const Key props = Key._(keyCode: 247, code: 'Props', key: 'CrSel');
@@ -768,7 +768,7 @@ final _characters = const {
   '[': Key._(keyCode: 219, key: '[', code: 'BracketLeft', text: '['),
   r'\': Key._(keyCode: 220, key: r'\', code: 'Backslash', text: r'\'),
   ']': Key._(keyCode: 221, key: ']', code: 'BracketRight', text: ']'),
-  '\'': Key._(keyCode: 222, key: '\'', code: 'Quote', text: '\''),
+  "'": Key._(keyCode: 222, key: "'", code: 'Quote', text: "'"),
   ')': Key._(keyCode: 48, key: ')', code: 'Digit0', text: ')'),
   '!': Key._(keyCode: 49, key: '!', code: 'Digit1', text: '!'),
   '@': Key._(keyCode: 50, key: '@', code: 'Digit2', text: '@'),
