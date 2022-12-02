@@ -13,28 +13,36 @@ import 'plugin.dart';
 
 final Logger _logger = Logger('puppeteer.launcher');
 
+// See https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md
 final List<String> _defaultArgs = <String>[
+  '--allow-pre-commit-input',
   '--disable-background-networking',
-  '--enable-features=NetworkService,NetworkServiceInProcess',
   '--disable-background-timer-throttling',
   '--disable-backgrounding-occluded-windows',
   '--disable-breakpad',
   '--disable-client-side-phishing-detection',
   '--disable-component-extensions-with-background-pages',
+  '--disable-component-update',
   '--disable-default-apps',
   '--disable-dev-shm-usage',
   '--disable-extensions',
-  '--disable-features=Translate',
+  // AcceptCHFrame disabled because of crbug.com/1348106.
+  '--disable-features=Translate,BackForwardCache,AcceptCHFrame,MediaRouter,OptimizationHints',
   '--disable-hang-monitor',
   '--disable-ipc-flooding-protection',
   '--disable-popup-blocking',
   '--disable-prompt-on-repost',
   '--disable-renderer-backgrounding',
   '--disable-sync',
+  '--enable-automation',
+  // TODO(sadym): remove '--enable-blink-features=IdleDetection' once
+  // IdleDetection is turned on by default.
+  '--enable-blink-features=IdleDetection',
+  '--enable-features=NetworkServiceInProcess2',
+  '--export-tagged-pdf',
   '--force-color-profile=srgb',
   '--metrics-recording-only',
   '--no-first-run',
-  '--enable-automation',
   '--password-store=basic',
   '--use-mock-keychain',
 ];
