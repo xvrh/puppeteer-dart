@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.18.0
+- Expose `Worker` class
+- Update the default arguments used to launch the chromium process
+
 ## 2.17.0
 - Update to Chromium 108
 

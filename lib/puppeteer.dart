@@ -32,5 +32,6 @@ export 'src/page/page.dart'
         MediaType,
         MediaFeature;
 export 'src/page/tracing.dart' show Tracing;
+export 'src/page/worker.dart' show Worker;
 export 'src/puppeteer.dart' show puppeteer, Puppeteer;
 export 'src/target.dart' show Target;
