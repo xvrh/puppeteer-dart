@@ -79,8 +79,7 @@ class ExecutionContext {
     } catch (error) {
       if (error is ServerException &&
           (error.message.contains('Object reference chain is too long') ||
-              error.message
-                  .contains("Object couldn't be returned by value"))) {
+              error.message.contains("Object couldn't be returned by value"))) {
         return null as T;
       } else {
         rethrow;
