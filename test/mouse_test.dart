@@ -87,7 +87,7 @@ function dimensions() {
       await page.goto('${server.prefix}/input/textarea.html');
       await page.focus('textarea');
       var text =
-          'This is the text that we are going to try to select. Let\'s see how it goes.';
+          "This is the text that we are going to try to select. Let's see how it goes.";
       await page.keyboard.type(text);
       // Firefox needs an extra frame here after typing or it will fail to set the scrollTop
       await page.evaluate('() => new Promise(requestAnimationFrame)');

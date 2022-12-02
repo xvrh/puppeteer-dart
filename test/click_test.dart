@@ -85,7 +85,7 @@ void main() {
       await page.goto(server.prefix + '/input/textarea.html');
       await page.focus('textarea');
       var text =
-          'This is the text that we are going to try to select. Let\'s see how it goes.';
+          "This is the text that we are going to try to select. Let's see how it goes.";
       await page.keyboard.type(text);
       await page.click('textarea');
       await page.click('textarea', clickCount: 2);
