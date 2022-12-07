@@ -54,16 +54,21 @@ class Target {
   /// Identifies what kind of target this is.
   /// Can be `"page"`, [`"background_page"`](https://developer.chrome.com/extensions/background_pages),
   /// `"service_worker"`, `"shared_worker"`, `"browser"` or `"other"`.
-  String? get type {
+  String get type {
     var type = _info!.type;
-    if (const [
-      'page',
-      'background_page',
-      'service_worker',
-      'shared_worker',
-      'browser'
-    ].contains(type)) return type;
+    if (_possibleTargetTypes.contains(type)) return type;
     return 'other';
+  }
+
+  /// Sets the kind of target this is.
+  /// Must be `"page"`, [`"background_page"`](https://developer.chrome.com/extensions/background_pages),
+  /// `"service_worker"`, `"shared_worker"`, or `"browser"`.
+  set type(String targetType) {
+    if (_possibleTargetTypes.contains(targetType) && _info != null) {
+      final json = _info!.toJson();
+      json['type'] = targetType;
+      _info = TargetInfo.fromJson(json);
+    }
   }
 
   /// Get the target that opened this target. Top-level targets return `null`.
@@ -112,3 +117,11 @@ class Target {
     _closedCompleter.complete();
   }
 }
+
+const _possibleTargetTypes = [
+  'page',
+  'background_page',
+  'service_worker',
+  'shared_worker',
+  'browser',
+];
