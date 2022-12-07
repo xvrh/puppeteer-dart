@@ -543,10 +543,6 @@ class Page {
   ///
   /// A [selector] to query page for
   Future<ElementHandle?> $OrNull(String selector) {
-    print('======== IN OrNull, # of frames:');
-    print(frames.length);
-    final frame = frames.first;
-
     return mainFrame.$OrNull(selector);
   }
 
@@ -664,7 +660,6 @@ class Page {
   ///
   /// Shortcut for [Page.mainFrame.$$(selector)].
   Future<List<ElementHandle>> $$(String selector) {
-    print('running in main frame ${mainFrame.url}');
     return mainFrame.$$(selector);
   }
 
