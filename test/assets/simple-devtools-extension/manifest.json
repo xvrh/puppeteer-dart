@@ -1,0 +1,7 @@
+{
+    "name": "Simple DevTools Extension",
+    "version": "0.1",
+    "manifest_version": 3,
+    "devtools_page": "devtools.html"
+  }
+  
