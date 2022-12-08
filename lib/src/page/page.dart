@@ -190,7 +190,7 @@ class Page {
       } catch (e) {
         _logger.warning('Unable to set viewport for ${target.url}: $e');
       }
-    } 
+    }
 
     for (var plugin in page.browser.plugins) {
       await plugin.pageCreated(page);
