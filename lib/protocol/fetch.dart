@@ -91,7 +91,9 @@ class FetchApi {
   /// [url] If set, the request url will be modified in a way that's not observable by page.
   /// [method] If set, the request method is overridden.
   /// [postData] If set, overrides the post data in the request.
-  /// [headers] If set, overrides the request headers.
+  /// [headers] If set, overrides the request headers. Note that the overrides do not
+  /// extend to subsequent redirect hops, if a redirect happens. Another override
+  /// may be applied to a different request produced by a redirect.
   /// [interceptResponse] If set, overrides response interception behavior for this request.
   Future<void> continueRequest(RequestId requestId,
       {String? url,

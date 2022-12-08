@@ -1375,8 +1375,19 @@ class CSSContainerQuery {
   /// Optional name for the container.
   final String? name;
 
+  /// Optional physical axes queried for the container.
+  final dom.PhysicalAxes? physicalAxes;
+
+  /// Optional logical axes queried for the container.
+  final dom.LogicalAxes? logicalAxes;
+
   CSSContainerQuery(
-      {required this.text, this.range, this.styleSheetId, this.name});
+      {required this.text,
+      this.range,
+      this.styleSheetId,
+      this.name,
+      this.physicalAxes,
+      this.logicalAxes});
 
   factory CSSContainerQuery.fromJson(Map<String, dynamic> json) {
     return CSSContainerQuery(
@@ -1388,6 +1399,12 @@ class CSSContainerQuery {
           ? StyleSheetId.fromJson(json['styleSheetId'] as String)
           : null,
       name: json.containsKey('name') ? json['name'] as String : null,
+      physicalAxes: json.containsKey('physicalAxes')
+          ? dom.PhysicalAxes.fromJson(json['physicalAxes'] as String)
+          : null,
+      logicalAxes: json.containsKey('logicalAxes')
+          ? dom.LogicalAxes.fromJson(json['logicalAxes'] as String)
+          : null,
     );
   }
 
@@ -1397,6 +1414,8 @@ class CSSContainerQuery {
       if (range != null) 'range': range!.toJson(),
       if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
       if (name != null) 'name': name,
+      if (physicalAxes != null) 'physicalAxes': physicalAxes!.toJson(),
+      if (logicalAxes != null) 'logicalAxes': logicalAxes!.toJson(),
     };
   }
 }

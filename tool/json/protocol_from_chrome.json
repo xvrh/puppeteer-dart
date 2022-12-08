@@ -2152,6 +2152,8 @@
                         "durableStorage",
                         "flash",
                         "geolocation",
+                        "idleDetection",
+                        "localFonts",
                         "midi",
                         "midiSysex",
                         "nfc",
@@ -2160,11 +2162,12 @@
                         "periodicBackgroundSync",
                         "protectedMediaIdentifier",
                         "sensors",
+                        "storageAccess",
                         "videoCapture",
                         "videoCapturePanTiltZoom",
-                        "idleDetection",
                         "wakeLockScreen",
-                        "wakeLockSystem"
+                        "wakeLockSystem",
+                        "windowManagement"
                     ]
                 },
                 {
@@ -2173,8 +2176,7 @@
                     "type": "string",
                     "enum": [
                         "granted",
-                        "denied",
-                        "prompt"
+                        "denied"
                     ]
                 },
                 {
@@ -3313,6 +3315,18 @@
                             "description": "Optional name for the container.",
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "physicalAxes",
+                            "description": "Optional physical axes queried for the container.",
+                            "optional": true,
+                            "$ref": "DOM.PhysicalAxes"
+                        },
+                        {
+                            "name": "logicalAxes",
+                            "description": "Optional logical axes queried for the container.",
+                            "optional": true,
+                            "$ref": "DOM.LogicalAxes"
                         }
                     ]
                 },
@@ -4690,11 +4704,11 @@
                         "scrollbar-corner",
                         "resizer",
                         "input-list-button",
-                        "page-transition",
-                        "page-transition-container",
-                        "page-transition-image-wrapper",
-                        "page-transition-outgoing-image",
-                        "page-transition-incoming-image"
+                        "view-transition",
+                        "view-transition-group",
+                        "view-transition-image-pair",
+                        "view-transition-old",
+                        "view-transition-new"
                     ]
                 },
                 {
@@ -4715,6 +4729,26 @@
                         "QuirksMode",
                         "LimitedQuirksMode",
                         "NoQuirksMode"
+                    ]
+                },
+                {
+                    "id": "PhysicalAxes",
+                    "description": "ContainerSelector physical axes",
+                    "type": "string",
+                    "enum": [
+                        "Horizontal",
+                        "Vertical",
+                        "Both"
+                    ]
+                },
+                {
+                    "id": "LogicalAxes",
+                    "description": "ContainerSelector logical axes",
+                    "type": "string",
+                    "enum": [
+                        "Inline",
+                        "Block",
+                        "Both"
                     ]
                 },
                 {
@@ -6078,7 +6112,7 @@
                 },
                 {
                     "name": "getContainerForNode",
-                    "description": "Returns the container of the given node based on container query conditions.\nIf containerName is given, it will find the nearest container with a matching name;\notherwise it will find the nearest container regardless of its container name.",
+                    "description": "Returns the query container of the given node based on container query\nconditions: containerName, physical, and logical axes. If no axes are\nprovided, the style container is returned, which is the direct parent or the\nclosest element with a matching container-name.",
                     "experimental": true,
                     "parameters": [
                         {
@@ -6089,6 +6123,16 @@
                             "name": "containerName",
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "physicalAxes",
+                            "optional": true,
+                            "$ref": "PhysicalAxes"
+                        },
+                        {
+                            "name": "logicalAxes",
+                            "optional": true,
+                            "$ref": "LogicalAxes"
                         }
                     ],
                     "returns": [
@@ -8523,7 +8567,8 @@
                             "type": "string",
                             "enum": [
                                 "jpeg",
-                                "png"
+                                "png",
+                                "webp"
                             ]
                         },
                         {
@@ -8531,6 +8576,12 @@
                             "description": "Compression quality from range [0..100] (jpeg only).",
                             "optional": true,
                             "type": "integer"
+                        },
+                        {
+                            "name": "optimizeForSpeed",
+                            "description": "Optimize image encoding for speed, not for resulting size (defaults to false)",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 }
@@ -8581,25 +8632,13 @@
                 },
                 {
                     "name": "disable",
-                    "description": "Disables headless events for the target."
+                    "description": "Disables headless events for the target.",
+                    "deprecated": true
                 },
                 {
                     "name": "enable",
-                    "description": "Enables headless events for the target."
-                }
-            ],
-            "events": [
-                {
-                    "name": "needsBeginFramesChanged",
-                    "description": "Issued when the target starts or stops needing BeginFrames.\nDeprecated. Issue beginFrame unconditionally instead and use result from\nbeginFrame to detect whether the frames were suppressed.",
-                    "deprecated": true,
-                    "parameters": [
-                        {
-                            "name": "needsBeginFrames",
-                            "description": "True if BeginFrames are needed, false otherwise.",
-                            "type": "boolean"
-                        }
-                    ]
+                    "description": "Enables headless events for the target.",
+                    "deprecated": true
                 }
             ]
         },
@@ -13807,6 +13846,12 @@
                             "description": "The client security state set for the request.",
                             "optional": true,
                             "$ref": "ClientSecurityState"
+                        },
+                        {
+                            "name": "siteHasCookieInOtherPartition",
+                            "description": "Whether the site has partitioned cookies stored in a partition different than the current one.",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -15273,6 +15318,7 @@
                         "ch-width",
                         "clipboard-read",
                         "clipboard-write",
+                        "compute-pressure",
                         "cross-origin-isolated",
                         "direct-sockets",
                         "display-capture",
@@ -16195,7 +16241,6 @@
                         "DedicatedWorkerOrWorklet",
                         "OutstandingNetworkRequestOthers",
                         "OutstandingIndexedDBTransaction",
-                        "RequestedNotificationsPermission",
                         "RequestedMIDIPermission",
                         "RequestedAudioCapturePermission",
                         "RequestedVideoCapturePermission",
@@ -16226,6 +16271,7 @@
                         "OutstandingNetworkRequestDirectSocket",
                         "InjectedJavascript",
                         "InjectedStyleSheet",
+                        "KeepaliveRequest",
                         "Dummy",
                         "ContentSecurityHandler",
                         "ContentWebAuthenticationAPI",
@@ -16324,8 +16370,6 @@
                         "Activated",
                         "Destroyed",
                         "LowEndDevice",
-                        "CrossOriginRedirect",
-                        "CrossOriginNavigation",
                         "InvalidSchemeRedirect",
                         "InvalidSchemeNavigation",
                         "InProgressNavigation",
@@ -16359,7 +16403,14 @@
                         "ActivatedBeforeStarted",
                         "InactivePageRestriction",
                         "StartFailed",
-                        "TimeoutBackgrounded"
+                        "TimeoutBackgrounded",
+                        "CrossSiteRedirect",
+                        "CrossSiteNavigation",
+                        "SameSiteCrossOriginRedirect",
+                        "SameSiteCrossOriginNavigation",
+                        "SameSiteCrossOriginRedirectNotOptIn",
+                        "SameSiteCrossOriginNavigationNotOptIn",
+                        "ActivationNavigationParameterMismatch"
                     ]
                 }
             ],
@@ -16455,6 +16506,13 @@
                         {
                             "name": "captureBeyondViewport",
                             "description": "Capture the screenshot beyond the viewport. Defaults to false.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "optimizeForSpeed",
+                            "description": "Optimize image encoding for speed, not for resulting size (defaults to false)",
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
@@ -16638,6 +16696,24 @@
                             "description": "Recommendation for manifest's id attribute to match current id computed from start_url",
                             "optional": true,
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "getAdScriptId",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "frameId",
+                            "$ref": "FrameId"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "adScriptId",
+                            "description": "Identifies the bottom-most script which caused the frame to be labelled\nas an ad. Only sent if frame is labelled as an ad and id is available.",
+                            "optional": true,
+                            "$ref": "AdScriptId"
                         }
                     ]
                 },
@@ -17585,13 +17661,6 @@
                             "description": "JavaScript stack trace of when frame was attached, only set if frame initiated from script.",
                             "optional": true,
                             "$ref": "Runtime.StackTrace"
-                        },
-                        {
-                            "name": "adScriptId",
-                            "description": "Identifies the bottom-most script which caused the frame to be labelled\nas an ad. Only sent if frame is labelled as an ad and id is available.",
-                            "experimental": true,
-                            "optional": true,
-                            "$ref": "AdScriptId"
                         }
                     ]
                 },
@@ -19056,6 +19125,7 @@
                         "service_workers",
                         "cache_storage",
                         "interest_groups",
+                        "shared_storage",
                         "all",
                         "other"
                     ]
@@ -19187,6 +19257,150 @@
                             "items": {
                                 "$ref": "InterestGroupAd"
                             }
+                        }
+                    ]
+                },
+                {
+                    "id": "SharedStorageAccessType",
+                    "description": "Enum of shared storage access types.",
+                    "type": "string",
+                    "enum": [
+                        "documentAddModule",
+                        "documentSelectURL",
+                        "documentRun",
+                        "documentSet",
+                        "documentAppend",
+                        "documentDelete",
+                        "documentClear",
+                        "workletSet",
+                        "workletAppend",
+                        "workletDelete",
+                        "workletClear",
+                        "workletGet",
+                        "workletKeys",
+                        "workletEntries",
+                        "workletLength",
+                        "workletRemainingBudget"
+                    ]
+                },
+                {
+                    "id": "SharedStorageEntry",
+                    "description": "Struct for a single key-value pair in an origin's shared storage.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "key",
+                            "type": "string"
+                        },
+                        {
+                            "name": "value",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "id": "SharedStorageMetadata",
+                    "description": "Details for an origin's shared storage.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "creationTime",
+                            "$ref": "Network.TimeSinceEpoch"
+                        },
+                        {
+                            "name": "length",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "remainingBudget",
+                            "type": "number"
+                        }
+                    ]
+                },
+                {
+                    "id": "SharedStorageReportingMetadata",
+                    "description": "Pair of reporting metadata details for a candidate URL for `selectURL()`.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "eventType",
+                            "type": "string"
+                        },
+                        {
+                            "name": "reportingUrl",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "id": "SharedStorageUrlWithMetadata",
+                    "description": "Bundles a candidate URL with its reporting metadata.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "url",
+                            "description": "Spec of candidate URL.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "reportingMetadata",
+                            "description": "Any associated reporting metadata.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "SharedStorageReportingMetadata"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "SharedStorageAccessParams",
+                    "description": "Bundles the parameters for shared storage access events whose\npresence/absence can vary according to SharedStorageAccessType.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "scriptSourceUrl",
+                            "description": "Spec of the module script URL.\nPresent only for SharedStorageAccessType.documentAddModule.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "operationName",
+                            "description": "Name of the registered operation to be run.\nPresent only for SharedStorageAccessType.documentRun and\nSharedStorageAccessType.documentSelectURL.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "serializedData",
+                            "description": "The operation's serialized data in bytes (converted to a string).\nPresent only for SharedStorageAccessType.documentRun and\nSharedStorageAccessType.documentSelectURL.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "urlsWithMetadata",
+                            "description": "Array of candidate URLs' specs, along with any associated metadata.\nPresent only for SharedStorageAccessType.documentSelectURL.",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "SharedStorageUrlWithMetadata"
+                            }
+                        },
+                        {
+                            "name": "key",
+                            "description": "Key for a specific entry in an origin's shared storage.\nPresent only for SharedStorageAccessType.documentSet,\nSharedStorageAccessType.documentAppend,\nSharedStorageAccessType.documentDelete,\nSharedStorageAccessType.workletSet,\nSharedStorageAccessType.workletAppend,\nSharedStorageAccessType.workletDelete, and\nSharedStorageAccessType.workletGet.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "value",
+                            "description": "Value for a specific entry in an origin's shared storage.\nPresent only for SharedStorageAccessType.documentSet,\nSharedStorageAccessType.documentAppend,\nSharedStorageAccessType.workletSet, and\nSharedStorageAccessType.workletAppend.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "ignoreIfPresent",
+                            "description": "Whether or not to set an entry for a key if that key is already present.\nPresent only for SharedStorageAccessType.documentSet and\nSharedStorageAccessType.workletSet.",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 }
@@ -19477,6 +19691,105 @@
                             "type": "boolean"
                         }
                     ]
+                },
+                {
+                    "name": "getSharedStorageMetadata",
+                    "description": "Gets metadata for an origin's shared storage.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "ownerOrigin",
+                            "type": "string"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "metadata",
+                            "$ref": "SharedStorageMetadata"
+                        }
+                    ]
+                },
+                {
+                    "name": "getSharedStorageEntries",
+                    "description": "Gets the entries in an given origin's shared storage.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "ownerOrigin",
+                            "type": "string"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "entries",
+                            "type": "array",
+                            "items": {
+                                "$ref": "SharedStorageEntry"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "setSharedStorageEntry",
+                    "description": "Sets entry with `key` and `value` for a given origin's shared storage.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "ownerOrigin",
+                            "type": "string"
+                        },
+                        {
+                            "name": "key",
+                            "type": "string"
+                        },
+                        {
+                            "name": "value",
+                            "type": "string"
+                        },
+                        {
+                            "name": "ignoreIfPresent",
+                            "description": "If `ignoreIfPresent` is included and true, then only sets the entry if\n`key` doesn't already exist.",
+                            "optional": true,
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "name": "deleteSharedStorageEntry",
+                    "description": "Deletes entry for `key` (if it exists) for a given origin's shared storage.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "ownerOrigin",
+                            "type": "string"
+                        },
+                        {
+                            "name": "key",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "clearSharedStorageEntries",
+                    "description": "Clears all entries for a given origin's shared storage.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "ownerOrigin",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "setSharedStorageTracking",
+                    "description": "Enables/disables issuing of sharedStorageAccessed events.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "enable",
+                            "type": "boolean"
+                        }
+                    ]
                 }
             ],
             "events": [
@@ -19568,6 +19881,37 @@
                         {
                             "name": "name",
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "sharedStorageAccessed",
+                    "description": "Shared storage was accessed by the associated page.\nThe following parameters are included in all events.",
+                    "parameters": [
+                        {
+                            "name": "accessTime",
+                            "description": "Time of the access.",
+                            "$ref": "Network.TimeSinceEpoch"
+                        },
+                        {
+                            "name": "type",
+                            "description": "Enum value indicating the Shared Storage API method invoked.",
+                            "$ref": "SharedStorageAccessType"
+                        },
+                        {
+                            "name": "mainFrameId",
+                            "description": "DevTools Frame Token for the primary frame tree's root.",
+                            "$ref": "Page.FrameId"
+                        },
+                        {
+                            "name": "ownerOrigin",
+                            "description": "Serialized origin for the context that invoked the Shared Storage API.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "params",
+                            "description": "The sub-parameters warapped by `params` are all optional and their\npresence/absence depends on `type`.",
+                            "$ref": "SharedStorageAccessParams"
                         }
                     ]
                 }
@@ -21078,7 +21422,7 @@
                         },
                         {
                             "name": "headers",
-                            "description": "If set, overrides the request headers.",
+                            "description": "If set, overrides the request headers. Note that the overrides do not\nextend to subsequent redirect hops, if a redirect happens. Another override\nmay be applied to a different request produced by a redirect.",
                             "optional": true,
                             "type": "array",
                             "items": {
@@ -21924,6 +22268,34 @@
                         {
                             "name": "authenticatorId",
                             "$ref": "AuthenticatorId"
+                        }
+                    ]
+                },
+                {
+                    "name": "setResponseOverrideBits",
+                    "description": "Resets parameters isBogusSignature, isBadUV, isBadUP to false if they are not present.",
+                    "parameters": [
+                        {
+                            "name": "authenticatorId",
+                            "$ref": "AuthenticatorId"
+                        },
+                        {
+                            "name": "isBogusSignature",
+                            "description": "If isBogusSignature is set, overrides the signature in the authenticator response to be zero.\nDefaults to false.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "isBadUV",
+                            "description": "If isBadUV is set, overrides the UV bit in the flags in the authenticator response to\nbe zero. Defaults to false.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "isBadUP",
+                            "description": "If isBadUP is set, overrides the UP bit in the flags in the authenticator response to\nbe zero. Defaults to false.",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -23221,7 +23593,7 @@
                 },
                 {
                     "name": "setPauseOnExceptions",
-                    "description": "Defines pause on exceptions state. Can be set to stop on all exceptions, uncaught exceptions or\nno exceptions. Initial pause on exceptions state is `none`.",
+                    "description": "Defines pause on exceptions state. Can be set to stop on all exceptions, uncaught exceptions,\nor caught exceptions, no exceptions. Initial pause on exceptions state is `none`.",
                     "parameters": [
                         {
                             "name": "state",
@@ -23229,6 +23601,7 @@
                             "type": "string",
                             "enum": [
                                 "none",
+                                "caught",
                                 "uncaught",
                                 "all"
                             ]
@@ -24227,66 +24600,6 @@
                             }
                         }
                     ]
-                },
-                {
-                    "id": "TypeObject",
-                    "description": "Describes a type collected during runtime.",
-                    "experimental": true,
-                    "type": "object",
-                    "properties": [
-                        {
-                            "name": "name",
-                            "description": "Name of a type collected with type profiling.",
-                            "type": "string"
-                        }
-                    ]
-                },
-                {
-                    "id": "TypeProfileEntry",
-                    "description": "Source offset and types for a parameter or return value.",
-                    "experimental": true,
-                    "type": "object",
-                    "properties": [
-                        {
-                            "name": "offset",
-                            "description": "Source offset of the parameter or end of function for return values.",
-                            "type": "integer"
-                        },
-                        {
-                            "name": "types",
-                            "description": "The types for this parameter or return value.",
-                            "type": "array",
-                            "items": {
-                                "$ref": "TypeObject"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "id": "ScriptTypeProfile",
-                    "description": "Type profile data collected during runtime for a JavaScript script.",
-                    "experimental": true,
-                    "type": "object",
-                    "properties": [
-                        {
-                            "name": "scriptId",
-                            "description": "JavaScript script id.",
-                            "$ref": "Runtime.ScriptId"
-                        },
-                        {
-                            "name": "url",
-                            "description": "JavaScript script name or url.",
-                            "type": "string"
-                        },
-                        {
-                            "name": "entries",
-                            "description": "Type profile entries for parameters and return values of the functions in the script.",
-                            "type": "array",
-                            "items": {
-                                "$ref": "TypeProfileEntry"
-                            }
-                        }
-                    ]
                 }
             ],
             "commands": [
@@ -24356,11 +24669,6 @@
                     ]
                 },
                 {
-                    "name": "startTypeProfile",
-                    "description": "Enable type profile.",
-                    "experimental": true
-                },
-                {
                     "name": "stop",
                     "returns": [
                         {
@@ -24373,11 +24681,6 @@
                 {
                     "name": "stopPreciseCoverage",
                     "description": "Disable precise code coverage. Disabling releases unnecessary execution count records and allows\nexecuting optimized code."
-                },
-                {
-                    "name": "stopTypeProfile",
-                    "description": "Disable type profile. Disabling releases type profile data collected so far.",
-                    "experimental": true
                 },
                 {
                     "name": "takePreciseCoverage",
@@ -24395,21 +24698,6 @@
                             "name": "timestamp",
                             "description": "Monotonically increasing time (in seconds) when the coverage update was taken in the backend.",
                             "type": "number"
-                        }
-                    ]
-                },
-                {
-                    "name": "takeTypeProfile",
-                    "description": "Collect type profile.",
-                    "experimental": true,
-                    "returns": [
-                        {
-                            "name": "result",
-                            "description": "Type profile for all scripts since startTypeProfile() was turned on.",
-                            "type": "array",
-                            "items": {
-                                "$ref": "ScriptTypeProfile"
-                            }
                         }
                     ]
                 }

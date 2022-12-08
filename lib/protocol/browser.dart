@@ -419,6 +419,8 @@ enum PermissionType {
   durableStorage('durableStorage'),
   flash('flash'),
   geolocation('geolocation'),
+  idleDetection('idleDetection'),
+  localFonts('localFonts'),
   midi('midi'),
   midiSysex('midiSysex'),
   nfc('nfc'),
@@ -427,11 +429,12 @@ enum PermissionType {
   periodicBackgroundSync('periodicBackgroundSync'),
   protectedMediaIdentifier('protectedMediaIdentifier'),
   sensors('sensors'),
+  storageAccess('storageAccess'),
   videoCapture('videoCapture'),
   videoCapturePanTiltZoom('videoCapturePanTiltZoom'),
-  idleDetection('idleDetection'),
   wakeLockScreen('wakeLockScreen'),
   wakeLockSystem('wakeLockSystem'),
+  windowManagement('windowManagement'),
   ;
 
   final String value;
@@ -450,7 +453,6 @@ enum PermissionType {
 enum PermissionSetting {
   granted('granted'),
   denied('denied'),
-  prompt('prompt'),
   ;
 
   final String value;

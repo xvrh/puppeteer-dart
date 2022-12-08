@@ -35,6 +35,23 @@ class WebAuthnApi {
     return AuthenticatorId.fromJson(result['authenticatorId'] as String);
   }
 
+  /// Resets parameters isBogusSignature, isBadUV, isBadUP to false if they are not present.
+  /// [isBogusSignature] If isBogusSignature is set, overrides the signature in the authenticator response to be zero.
+  /// Defaults to false.
+  /// [isBadUV] If isBadUV is set, overrides the UV bit in the flags in the authenticator response to
+  /// be zero. Defaults to false.
+  /// [isBadUP] If isBadUP is set, overrides the UP bit in the flags in the authenticator response to
+  /// be zero. Defaults to false.
+  Future<void> setResponseOverrideBits(AuthenticatorId authenticatorId,
+      {bool? isBogusSignature, bool? isBadUV, bool? isBadUP}) async {
+    await _client.send('WebAuthn.setResponseOverrideBits', {
+      'authenticatorId': authenticatorId,
+      if (isBogusSignature != null) 'isBogusSignature': isBogusSignature,
+      if (isBadUV != null) 'isBadUV': isBadUV,
+      if (isBadUP != null) 'isBadUP': isBadUP,
+    });
+  }
+
   /// Removes the given authenticator.
   Future<void> removeVirtualAuthenticator(
       AuthenticatorId authenticatorId) async {

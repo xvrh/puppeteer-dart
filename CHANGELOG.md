@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.19.0
+- Update to Chromium 109
+- Adds a setter for the TargetInfo type
+
 ## 2.18.0
 - Expose `Worker` class
 - Update the default arguments used to launch the chromium process

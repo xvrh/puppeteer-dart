@@ -685,15 +685,20 @@ class DOMApi {
     return GetFrameOwnerResult.fromJson(result);
   }
 
-  /// Returns the container of the given node based on container query conditions.
-  /// If containerName is given, it will find the nearest container with a matching name;
-  /// otherwise it will find the nearest container regardless of its container name.
+  /// Returns the query container of the given node based on container query
+  /// conditions: containerName, physical, and logical axes. If no axes are
+  /// provided, the style container is returned, which is the direct parent or the
+  /// closest element with a matching container-name.
   /// Returns: The container node for the given node, or null if not found.
   Future<NodeId> getContainerForNode(NodeId nodeId,
-      {String? containerName}) async {
+      {String? containerName,
+      PhysicalAxes? physicalAxes,
+      LogicalAxes? logicalAxes}) async {
     var result = await _client.send('DOM.getContainerForNode', {
       'nodeId': nodeId,
       if (containerName != null) 'containerName': containerName,
+      if (physicalAxes != null) 'physicalAxes': physicalAxes,
+      if (logicalAxes != null) 'logicalAxes': logicalAxes,
     });
     return NodeId.fromJson(result['nodeId'] as int);
   }
@@ -1095,11 +1100,11 @@ enum PseudoType {
   scrollbarCorner('scrollbar-corner'),
   resizer('resizer'),
   inputListButton('input-list-button'),
-  pageTransition('page-transition'),
-  pageTransitionContainer('page-transition-container'),
-  pageTransitionImageWrapper('page-transition-image-wrapper'),
-  pageTransitionOutgoingImage('page-transition-outgoing-image'),
-  pageTransitionIncomingImage('page-transition-incoming-image'),
+  viewTransition('view-transition'),
+  viewTransitionGroup('view-transition-group'),
+  viewTransitionImagePair('view-transition-image-pair'),
+  viewTransitionOld('view-transition-old'),
+  viewTransitionNew('view-transition-new'),
   ;
 
   final String value;
@@ -1148,6 +1153,46 @@ enum CompatibilityMode {
 
   factory CompatibilityMode.fromJson(String value) =>
       CompatibilityMode.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// ContainerSelector physical axes
+enum PhysicalAxes {
+  horizontal('Horizontal'),
+  vertical('Vertical'),
+  both('Both'),
+  ;
+
+  final String value;
+
+  const PhysicalAxes(this.value);
+
+  factory PhysicalAxes.fromJson(String value) =>
+      PhysicalAxes.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// ContainerSelector logical axes
+enum LogicalAxes {
+  inline('Inline'),
+  block('Block'),
+  both('Both'),
+  ;
+
+  final String value;
+
+  const LogicalAxes(this.value);
+
+  factory LogicalAxes.fromJson(String value) =>
+      LogicalAxes.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 
