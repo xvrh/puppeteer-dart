@@ -7,14 +7,6 @@ class HeadlessExperimentalApi {
 
   HeadlessExperimentalApi(this._client);
 
-  /// Issued when the target starts or stops needing BeginFrames.
-  /// Deprecated. Issue beginFrame unconditionally instead and use result from
-  /// beginFrame to detect whether the frames were suppressed.
-  Stream<bool> get onNeedsBeginFramesChanged => _client.onEvent
-      .where((event) =>
-          event.name == 'HeadlessExperimental.needsBeginFramesChanged')
-      .map((event) => event.parameters['needsBeginFrames'] as bool);
-
   /// Sends a BeginFrame to the target and returns when the frame was completed. Optionally captures a
   /// screenshot from the resulting frame. Requires that the target was created with enabled
   /// BeginFrameControl. Designed for use with --run-all-compositor-stages-before-draw, see also
@@ -44,11 +36,13 @@ class HeadlessExperimentalApi {
   }
 
   /// Disables headless events for the target.
+  @Deprecated('This command is deprecated')
   Future<void> disable() async {
     await _client.send('HeadlessExperimental.disable');
   }
 
   /// Enables headless events for the target.
+  @Deprecated('This command is deprecated')
   Future<void> enable() async {
     await _client.send('HeadlessExperimental.enable');
   }
@@ -82,7 +76,10 @@ class ScreenshotParams {
   /// Compression quality from range [0..100] (jpeg only).
   final int? quality;
 
-  ScreenshotParams({this.format, this.quality});
+  /// Optimize image encoding for speed, not for resulting size (defaults to false)
+  final bool? optimizeForSpeed;
+
+  ScreenshotParams({this.format, this.quality, this.optimizeForSpeed});
 
   factory ScreenshotParams.fromJson(Map<String, dynamic> json) {
     return ScreenshotParams(
@@ -90,6 +87,9 @@ class ScreenshotParams {
           ? ScreenshotParamsFormat.fromJson(json['format'] as String)
           : null,
       quality: json.containsKey('quality') ? json['quality'] as int : null,
+      optimizeForSpeed: json.containsKey('optimizeForSpeed')
+          ? json['optimizeForSpeed'] as bool
+          : null,
     );
   }
 
@@ -97,6 +97,7 @@ class ScreenshotParams {
     return {
       if (format != null) 'format': format,
       if (quality != null) 'quality': quality,
+      if (optimizeForSpeed != null) 'optimizeForSpeed': optimizeForSpeed,
     };
   }
 }
@@ -104,6 +105,7 @@ class ScreenshotParams {
 enum ScreenshotParamsFormat {
   jpeg('jpeg'),
   png('png'),
+  webp('webp'),
   ;
 
   final String value;

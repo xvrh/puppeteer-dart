@@ -39,6 +39,13 @@ class StorageApi {
       .where((event) => event.name == 'Storage.interestGroupAccessed')
       .map((event) => InterestGroupAccessedEvent.fromJson(event.parameters));
 
+  /// Shared storage was accessed by the associated page.
+  /// The following parameters are included in all events.
+  Stream<SharedStorageAccessedEvent> get onSharedStorageAccessed => _client
+      .onEvent
+      .where((event) => event.name == 'Storage.sharedStorageAccessed')
+      .map((event) => SharedStorageAccessedEvent.fromJson(event.parameters));
+
   /// Returns a storage key given a frame id.
   Future<SerializedStorageKey> getStorageKeyForFrame(
       page.FrameId frameId) async {
@@ -211,6 +218,63 @@ class StorageApi {
       'enable': enable,
     });
   }
+
+  /// Gets metadata for an origin's shared storage.
+  Future<SharedStorageMetadata> getSharedStorageMetadata(
+      String ownerOrigin) async {
+    var result = await _client.send('Storage.getSharedStorageMetadata', {
+      'ownerOrigin': ownerOrigin,
+    });
+    return SharedStorageMetadata.fromJson(
+        result['metadata'] as Map<String, dynamic>);
+  }
+
+  /// Gets the entries in an given origin's shared storage.
+  Future<List<SharedStorageEntry>> getSharedStorageEntries(
+      String ownerOrigin) async {
+    var result = await _client.send('Storage.getSharedStorageEntries', {
+      'ownerOrigin': ownerOrigin,
+    });
+    return (result['entries'] as List)
+        .map((e) => SharedStorageEntry.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Sets entry with `key` and `value` for a given origin's shared storage.
+  /// [ignoreIfPresent] If `ignoreIfPresent` is included and true, then only sets the entry if
+  /// `key` doesn't already exist.
+  Future<void> setSharedStorageEntry(
+      String ownerOrigin, String key, String value,
+      {bool? ignoreIfPresent}) async {
+    await _client.send('Storage.setSharedStorageEntry', {
+      'ownerOrigin': ownerOrigin,
+      'key': key,
+      'value': value,
+      if (ignoreIfPresent != null) 'ignoreIfPresent': ignoreIfPresent,
+    });
+  }
+
+  /// Deletes entry for `key` (if it exists) for a given origin's shared storage.
+  Future<void> deleteSharedStorageEntry(String ownerOrigin, String key) async {
+    await _client.send('Storage.deleteSharedStorageEntry', {
+      'ownerOrigin': ownerOrigin,
+      'key': key,
+    });
+  }
+
+  /// Clears all entries for a given origin's shared storage.
+  Future<void> clearSharedStorageEntries(String ownerOrigin) async {
+    await _client.send('Storage.clearSharedStorageEntries', {
+      'ownerOrigin': ownerOrigin,
+    });
+  }
+
+  /// Enables/disables issuing of sharedStorageAccessed events.
+  Future<void> setSharedStorageTracking(bool enable) async {
+    await _client.send('Storage.setSharedStorageTracking', {
+      'enable': enable,
+    });
+  }
 }
 
 class CacheStorageContentUpdatedEvent {
@@ -302,6 +366,42 @@ class InterestGroupAccessedEvent {
   }
 }
 
+class SharedStorageAccessedEvent {
+  /// Time of the access.
+  final network.TimeSinceEpoch accessTime;
+
+  /// Enum value indicating the Shared Storage API method invoked.
+  final SharedStorageAccessType type;
+
+  /// DevTools Frame Token for the primary frame tree's root.
+  final page.FrameId mainFrameId;
+
+  /// Serialized origin for the context that invoked the Shared Storage API.
+  final String ownerOrigin;
+
+  /// The sub-parameters warapped by `params` are all optional and their
+  /// presence/absence depends on `type`.
+  final SharedStorageAccessParams params;
+
+  SharedStorageAccessedEvent(
+      {required this.accessTime,
+      required this.type,
+      required this.mainFrameId,
+      required this.ownerOrigin,
+      required this.params});
+
+  factory SharedStorageAccessedEvent.fromJson(Map<String, dynamic> json) {
+    return SharedStorageAccessedEvent(
+      accessTime: network.TimeSinceEpoch.fromJson(json['accessTime'] as num),
+      type: SharedStorageAccessType.fromJson(json['type'] as String),
+      mainFrameId: page.FrameId.fromJson(json['mainFrameId'] as String),
+      ownerOrigin: json['ownerOrigin'] as String,
+      params: SharedStorageAccessParams.fromJson(
+          json['params'] as Map<String, dynamic>),
+    );
+  }
+}
+
 class GetUsageAndQuotaResult {
   /// Storage usage (bytes).
   final num usage;
@@ -366,6 +466,7 @@ enum StorageType {
   serviceWorkers('service_workers'),
   cacheStorage('cache_storage'),
   interestGroups('interest_groups'),
+  sharedStorage('shared_storage'),
   all('all'),
   other('other'),
   ;
@@ -566,6 +667,237 @@ class InterestGroupDetails {
       if (trustedBiddingSignalsUrl != null)
         'trustedBiddingSignalsUrl': trustedBiddingSignalsUrl,
       if (userBiddingSignals != null) 'userBiddingSignals': userBiddingSignals,
+    };
+  }
+}
+
+/// Enum of shared storage access types.
+enum SharedStorageAccessType {
+  documentAddModule('documentAddModule'),
+  documentSelectUrl('documentSelectURL'),
+  documentRun('documentRun'),
+  documentSet('documentSet'),
+  documentAppend('documentAppend'),
+  documentDelete('documentDelete'),
+  documentClear('documentClear'),
+  workletSet('workletSet'),
+  workletAppend('workletAppend'),
+  workletDelete('workletDelete'),
+  workletClear('workletClear'),
+  workletGet('workletGet'),
+  workletKeys('workletKeys'),
+  workletEntries('workletEntries'),
+  workletLength('workletLength'),
+  workletRemainingBudget('workletRemainingBudget'),
+  ;
+
+  final String value;
+
+  const SharedStorageAccessType(this.value);
+
+  factory SharedStorageAccessType.fromJson(String value) =>
+      SharedStorageAccessType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Struct for a single key-value pair in an origin's shared storage.
+class SharedStorageEntry {
+  final String key;
+
+  final String value;
+
+  SharedStorageEntry({required this.key, required this.value});
+
+  factory SharedStorageEntry.fromJson(Map<String, dynamic> json) {
+    return SharedStorageEntry(
+      key: json['key'] as String,
+      value: json['value'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'key': key,
+      'value': value,
+    };
+  }
+}
+
+/// Details for an origin's shared storage.
+class SharedStorageMetadata {
+  final network.TimeSinceEpoch creationTime;
+
+  final int length;
+
+  final num remainingBudget;
+
+  SharedStorageMetadata(
+      {required this.creationTime,
+      required this.length,
+      required this.remainingBudget});
+
+  factory SharedStorageMetadata.fromJson(Map<String, dynamic> json) {
+    return SharedStorageMetadata(
+      creationTime:
+          network.TimeSinceEpoch.fromJson(json['creationTime'] as num),
+      length: json['length'] as int,
+      remainingBudget: json['remainingBudget'] as num,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'creationTime': creationTime.toJson(),
+      'length': length,
+      'remainingBudget': remainingBudget,
+    };
+  }
+}
+
+/// Pair of reporting metadata details for a candidate URL for `selectURL()`.
+class SharedStorageReportingMetadata {
+  final String eventType;
+
+  final String reportingUrl;
+
+  SharedStorageReportingMetadata(
+      {required this.eventType, required this.reportingUrl});
+
+  factory SharedStorageReportingMetadata.fromJson(Map<String, dynamic> json) {
+    return SharedStorageReportingMetadata(
+      eventType: json['eventType'] as String,
+      reportingUrl: json['reportingUrl'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'eventType': eventType,
+      'reportingUrl': reportingUrl,
+    };
+  }
+}
+
+/// Bundles a candidate URL with its reporting metadata.
+class SharedStorageUrlWithMetadata {
+  /// Spec of candidate URL.
+  final String url;
+
+  /// Any associated reporting metadata.
+  final List<SharedStorageReportingMetadata> reportingMetadata;
+
+  SharedStorageUrlWithMetadata(
+      {required this.url, required this.reportingMetadata});
+
+  factory SharedStorageUrlWithMetadata.fromJson(Map<String, dynamic> json) {
+    return SharedStorageUrlWithMetadata(
+      url: json['url'] as String,
+      reportingMetadata: (json['reportingMetadata'] as List)
+          .map((e) => SharedStorageReportingMetadata.fromJson(
+              e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      'reportingMetadata': reportingMetadata.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+/// Bundles the parameters for shared storage access events whose
+/// presence/absence can vary according to SharedStorageAccessType.
+class SharedStorageAccessParams {
+  /// Spec of the module script URL.
+  /// Present only for SharedStorageAccessType.documentAddModule.
+  final String? scriptSourceUrl;
+
+  /// Name of the registered operation to be run.
+  /// Present only for SharedStorageAccessType.documentRun and
+  /// SharedStorageAccessType.documentSelectURL.
+  final String? operationName;
+
+  /// The operation's serialized data in bytes (converted to a string).
+  /// Present only for SharedStorageAccessType.documentRun and
+  /// SharedStorageAccessType.documentSelectURL.
+  final String? serializedData;
+
+  /// Array of candidate URLs' specs, along with any associated metadata.
+  /// Present only for SharedStorageAccessType.documentSelectURL.
+  final List<SharedStorageUrlWithMetadata>? urlsWithMetadata;
+
+  /// Key for a specific entry in an origin's shared storage.
+  /// Present only for SharedStorageAccessType.documentSet,
+  /// SharedStorageAccessType.documentAppend,
+  /// SharedStorageAccessType.documentDelete,
+  /// SharedStorageAccessType.workletSet,
+  /// SharedStorageAccessType.workletAppend,
+  /// SharedStorageAccessType.workletDelete, and
+  /// SharedStorageAccessType.workletGet.
+  final String? key;
+
+  /// Value for a specific entry in an origin's shared storage.
+  /// Present only for SharedStorageAccessType.documentSet,
+  /// SharedStorageAccessType.documentAppend,
+  /// SharedStorageAccessType.workletSet, and
+  /// SharedStorageAccessType.workletAppend.
+  final String? value;
+
+  /// Whether or not to set an entry for a key if that key is already present.
+  /// Present only for SharedStorageAccessType.documentSet and
+  /// SharedStorageAccessType.workletSet.
+  final bool? ignoreIfPresent;
+
+  SharedStorageAccessParams(
+      {this.scriptSourceUrl,
+      this.operationName,
+      this.serializedData,
+      this.urlsWithMetadata,
+      this.key,
+      this.value,
+      this.ignoreIfPresent});
+
+  factory SharedStorageAccessParams.fromJson(Map<String, dynamic> json) {
+    return SharedStorageAccessParams(
+      scriptSourceUrl: json.containsKey('scriptSourceUrl')
+          ? json['scriptSourceUrl'] as String
+          : null,
+      operationName: json.containsKey('operationName')
+          ? json['operationName'] as String
+          : null,
+      serializedData: json.containsKey('serializedData')
+          ? json['serializedData'] as String
+          : null,
+      urlsWithMetadata: json.containsKey('urlsWithMetadata')
+          ? (json['urlsWithMetadata'] as List)
+              .map((e) => SharedStorageUrlWithMetadata.fromJson(
+                  e as Map<String, dynamic>))
+              .toList()
+          : null,
+      key: json.containsKey('key') ? json['key'] as String : null,
+      value: json.containsKey('value') ? json['value'] as String : null,
+      ignoreIfPresent: json.containsKey('ignoreIfPresent')
+          ? json['ignoreIfPresent'] as bool
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (scriptSourceUrl != null) 'scriptSourceUrl': scriptSourceUrl,
+      if (operationName != null) 'operationName': operationName,
+      if (serializedData != null) 'serializedData': serializedData,
+      if (urlsWithMetadata != null)
+        'urlsWithMetadata': urlsWithMetadata!.map((e) => e.toJson()).toList(),
+      if (key != null) 'key': key,
+      if (value != null) 'value': value,
+      if (ignoreIfPresent != null) 'ignoreIfPresent': ignoreIfPresent,
     };
   }
 }

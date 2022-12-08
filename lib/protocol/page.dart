@@ -207,13 +207,15 @@ class PageApi {
   /// [clip] Capture the screenshot of a given region only.
   /// [fromSurface] Capture the screenshot from the surface, rather than the view. Defaults to true.
   /// [captureBeyondViewport] Capture the screenshot beyond the viewport. Defaults to false.
+  /// [optimizeForSpeed] Optimize image encoding for speed, not for resulting size (defaults to false)
   /// Returns: Base64-encoded image data.
   Future<String> captureScreenshot(
       {@Enum(['jpeg', 'png', 'webp']) String? format,
       int? quality,
       Viewport? clip,
       bool? fromSurface,
-      bool? captureBeyondViewport}) async {
+      bool? captureBeyondViewport,
+      bool? optimizeForSpeed}) async {
     assert(format == null || const ['jpeg', 'png', 'webp'].contains(format));
     var result = await _client.send('Page.captureScreenshot', {
       if (format != null) 'format': format,
@@ -222,6 +224,7 @@ class PageApi {
       if (fromSurface != null) 'fromSurface': fromSurface,
       if (captureBeyondViewport != null)
         'captureBeyondViewport': captureBeyondViewport,
+      if (optimizeForSpeed != null) 'optimizeForSpeed': optimizeForSpeed,
     });
     return result['data'] as String;
   }
@@ -317,6 +320,15 @@ class PageApi {
   Future<GetAppIdResult> getAppId() async {
     var result = await _client.send('Page.getAppId');
     return GetAppIdResult.fromJson(result);
+  }
+
+  /// Returns: Identifies the bottom-most script which caused the frame to be labelled
+  /// as an ad. Only sent if frame is labelled as an ad and id is available.
+  Future<AdScriptId> getAdScriptId(FrameId frameId) async {
+    var result = await _client.send('Page.getAdScriptId', {
+      'frameId': frameId,
+    });
+    return AdScriptId.fromJson(result['adScriptId'] as Map<String, dynamic>);
   }
 
   /// Returns all browser cookies for the page and all of its subframes. Depending
@@ -872,15 +884,8 @@ class FrameAttachedEvent {
   /// JavaScript stack trace of when frame was attached, only set if frame initiated from script.
   final runtime.StackTraceData? stack;
 
-  /// Identifies the bottom-most script which caused the frame to be labelled
-  /// as an ad. Only sent if frame is labelled as an ad and id is available.
-  final AdScriptId? adScriptId;
-
   FrameAttachedEvent(
-      {required this.frameId,
-      required this.parentFrameId,
-      this.stack,
-      this.adScriptId});
+      {required this.frameId, required this.parentFrameId, this.stack});
 
   factory FrameAttachedEvent.fromJson(Map<String, dynamic> json) {
     return FrameAttachedEvent(
@@ -889,9 +894,6 @@ class FrameAttachedEvent {
       stack: json.containsKey('stack')
           ? runtime.StackTraceData.fromJson(
               json['stack'] as Map<String, dynamic>)
-          : null,
-      adScriptId: json.containsKey('adScriptId')
-          ? AdScriptId.fromJson(json['adScriptId'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -1651,6 +1653,7 @@ enum PermissionsPolicyFeature {
   chWidth('ch-width'),
   clipboardRead('clipboard-read'),
   clipboardWrite('clipboard-write'),
+  computePressure('compute-pressure'),
   crossOriginIsolated('cross-origin-isolated'),
   directSockets('direct-sockets'),
   displayCapture('display-capture'),
@@ -2933,7 +2936,6 @@ enum BackForwardCacheNotRestoredReason {
   dedicatedWorkerOrWorklet('DedicatedWorkerOrWorklet'),
   outstandingNetworkRequestOthers('OutstandingNetworkRequestOthers'),
   outstandingIndexedDbTransaction('OutstandingIndexedDBTransaction'),
-  requestedNotificationsPermission('RequestedNotificationsPermission'),
   requestedMidiPermission('RequestedMIDIPermission'),
   requestedAudioCapturePermission('RequestedAudioCapturePermission'),
   requestedVideoCapturePermission('RequestedVideoCapturePermission'),
@@ -2966,6 +2968,7 @@ enum BackForwardCacheNotRestoredReason {
       'OutstandingNetworkRequestDirectSocket'),
   injectedJavascript('InjectedJavascript'),
   injectedStyleSheet('InjectedStyleSheet'),
+  keepaliveRequest('KeepaliveRequest'),
   dummy('Dummy'),
   contentSecurityHandler('ContentSecurityHandler'),
   contentWebAuthenticationApi('ContentWebAuthenticationAPI'),
@@ -3111,8 +3114,6 @@ enum PrerenderFinalStatus {
   activated('Activated'),
   destroyed('Destroyed'),
   lowEndDevice('LowEndDevice'),
-  crossOriginRedirect('CrossOriginRedirect'),
-  crossOriginNavigation('CrossOriginNavigation'),
   invalidSchemeRedirect('InvalidSchemeRedirect'),
   invalidSchemeNavigation('InvalidSchemeNavigation'),
   inProgressNavigation('InProgressNavigation'),
@@ -3148,6 +3149,15 @@ enum PrerenderFinalStatus {
   inactivePageRestriction('InactivePageRestriction'),
   startFailed('StartFailed'),
   timeoutBackgrounded('TimeoutBackgrounded'),
+  crossSiteRedirect('CrossSiteRedirect'),
+  crossSiteNavigation('CrossSiteNavigation'),
+  sameSiteCrossOriginRedirect('SameSiteCrossOriginRedirect'),
+  sameSiteCrossOriginNavigation('SameSiteCrossOriginNavigation'),
+  sameSiteCrossOriginRedirectNotOptIn('SameSiteCrossOriginRedirectNotOptIn'),
+  sameSiteCrossOriginNavigationNotOptIn(
+      'SameSiteCrossOriginNavigationNotOptIn'),
+  activationNavigationParameterMismatch(
+      'ActivationNavigationParameterMismatch'),
   ;
 
   final String value;

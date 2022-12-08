@@ -77,11 +77,6 @@ class ProfilerApi {
     return result['timestamp'] as num;
   }
 
-  /// Enable type profile.
-  Future<void> startTypeProfile() async {
-    await _client.send('Profiler.startTypeProfile');
-  }
-
   /// Returns: Recorded profile.
   Future<Profile> stop() async {
     var result = await _client.send('Profiler.stop');
@@ -94,25 +89,11 @@ class ProfilerApi {
     await _client.send('Profiler.stopPreciseCoverage');
   }
 
-  /// Disable type profile. Disabling releases type profile data collected so far.
-  Future<void> stopTypeProfile() async {
-    await _client.send('Profiler.stopTypeProfile');
-  }
-
   /// Collect coverage data for the current isolate, and resets execution counters. Precise code
   /// coverage needs to have started.
   Future<TakePreciseCoverageResult> takePreciseCoverage() async {
     var result = await _client.send('Profiler.takePreciseCoverage');
     return TakePreciseCoverageResult.fromJson(result);
-  }
-
-  /// Collect type profile.
-  /// Returns: Type profile for all scripts since startTypeProfile() was turned on.
-  Future<List<ScriptTypeProfile>> takeTypeProfile() async {
-    var result = await _client.send('Profiler.takeTypeProfile');
-    return (result['result'] as List)
-        .map((e) => ScriptTypeProfile.fromJson(e as Map<String, dynamic>))
-        .toList();
   }
 }
 
@@ -445,86 +426,6 @@ class ScriptCoverage {
       'scriptId': scriptId.toJson(),
       'url': url,
       'functions': functions.map((e) => e.toJson()).toList(),
-    };
-  }
-}
-
-/// Describes a type collected during runtime.
-class TypeObject {
-  /// Name of a type collected with type profiling.
-  final String name;
-
-  TypeObject({required this.name});
-
-  factory TypeObject.fromJson(Map<String, dynamic> json) {
-    return TypeObject(
-      name: json['name'] as String,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-    };
-  }
-}
-
-/// Source offset and types for a parameter or return value.
-class TypeProfileEntry {
-  /// Source offset of the parameter or end of function for return values.
-  final int offset;
-
-  /// The types for this parameter or return value.
-  final List<TypeObject> types;
-
-  TypeProfileEntry({required this.offset, required this.types});
-
-  factory TypeProfileEntry.fromJson(Map<String, dynamic> json) {
-    return TypeProfileEntry(
-      offset: json['offset'] as int,
-      types: (json['types'] as List)
-          .map((e) => TypeObject.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'offset': offset,
-      'types': types.map((e) => e.toJson()).toList(),
-    };
-  }
-}
-
-/// Type profile data collected during runtime for a JavaScript script.
-class ScriptTypeProfile {
-  /// JavaScript script id.
-  final runtime.ScriptId scriptId;
-
-  /// JavaScript script name or url.
-  final String url;
-
-  /// Type profile entries for parameters and return values of the functions in the script.
-  final List<TypeProfileEntry> entries;
-
-  ScriptTypeProfile(
-      {required this.scriptId, required this.url, required this.entries});
-
-  factory ScriptTypeProfile.fromJson(Map<String, dynamic> json) {
-    return ScriptTypeProfile(
-      scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
-      url: json['url'] as String,
-      entries: (json['entries'] as List)
-          .map((e) => TypeProfileEntry.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'scriptId': scriptId.toJson(),
-      'url': url,
-      'entries': entries.map((e) => e.toJson()).toList(),
     };
   }
 }

@@ -1287,12 +1287,16 @@ class RequestWillBeSentExtraInfoEvent {
   /// The client security state set for the request.
   final ClientSecurityState? clientSecurityState;
 
+  /// Whether the site has partitioned cookies stored in a partition different than the current one.
+  final bool? siteHasCookieInOtherPartition;
+
   RequestWillBeSentExtraInfoEvent(
       {required this.requestId,
       required this.associatedCookies,
       required this.headers,
       required this.connectTiming,
-      this.clientSecurityState});
+      this.clientSecurityState,
+      this.siteHasCookieInOtherPartition});
 
   factory RequestWillBeSentExtraInfoEvent.fromJson(Map<String, dynamic> json) {
     return RequestWillBeSentExtraInfoEvent(
@@ -1308,6 +1312,10 @@ class RequestWillBeSentExtraInfoEvent {
           ? ClientSecurityState.fromJson(
               json['clientSecurityState'] as Map<String, dynamic>)
           : null,
+      siteHasCookieInOtherPartition:
+          json.containsKey('siteHasCookieInOtherPartition')
+              ? json['siteHasCookieInOtherPartition'] as bool
+              : null,
     );
   }
 }

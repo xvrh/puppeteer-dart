@@ -365,12 +365,12 @@ class DebuggerApi {
     });
   }
 
-  /// Defines pause on exceptions state. Can be set to stop on all exceptions, uncaught exceptions or
-  /// no exceptions. Initial pause on exceptions state is `none`.
+  /// Defines pause on exceptions state. Can be set to stop on all exceptions, uncaught exceptions,
+  /// or caught exceptions, no exceptions. Initial pause on exceptions state is `none`.
   /// [state] Pause on exceptions mode.
   Future<void> setPauseOnExceptions(
-      @Enum(['none', 'uncaught', 'all']) String state) async {
-    assert(const ['none', 'uncaught', 'all'].contains(state));
+      @Enum(['none', 'caught', 'uncaught', 'all']) String state) async {
+    assert(const ['none', 'caught', 'uncaught', 'all'].contains(state));
     await _client.send('Debugger.setPauseOnExceptions', {
       'state': state,
     });
