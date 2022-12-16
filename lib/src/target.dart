@@ -1,20 +1,27 @@
 import 'dart:async';
+import 'package:collection/collection.dart';
 import '../protocol/target.dart';
 import 'browser.dart';
 import 'connection.dart';
 import 'page/page.dart';
 import 'page/worker.dart';
+import 'target_manager.dart';
+
+bool _isPageTarget(TargetInfo target) =>
+    const ['page', 'background_page', 'webview'].contains(target.type);
 
 class Target {
-  /// Get the browser the target belongs to.
-  final Browser browser;
+  final Session? session;
 
   /// The browser context the target belongs to.
   final BrowserContext browserContext;
 
+  final TargetManager targetManager;
+
   final TargetID targetID;
-  final Future<Session> Function() _sessionFactory;
-  TargetInfo? _info;
+  final Future<Session> Function({required bool isAutoAttachEmulated})
+      _sessionFactory;
+  TargetInfo _info;
   final _initializeCompleter = Completer<bool>();
   Future<Page>? _pageFuture;
   Future<Worker>? _workerFuture;
@@ -22,9 +29,11 @@ class Target {
   final _closedCompleter = Completer();
   bool _isInitialized = false;
 
-  Target(this.browser, TargetInfo info, this._sessionFactory,
+  Target(
+      this.session, this.targetManager, TargetInfo info, this._sessionFactory,
       {required this.browserContext})
-      : targetID = info.targetId {
+      : _info = info,
+        targetID = info.targetId {
     _initialized = _initializeCompleter.future.then((success) async {
       if (!success) return false;
       var opener = this.opener;
@@ -32,40 +41,48 @@ class Target {
         return true;
       }
       var openerPage = await opener._pageFuture!;
-
-      if (openerPage.hasPopupListener) {
-        openerPage.emitPopup(await page);
+      if (!openerPage.hasPopupListener) {
+        return true;
+      }
+      var popupPage = await page;
+      if (popupPage != null) {
+        openerPage.emitPopup(popupPage);
       }
       return true;
     });
-    changeInfo(info);
+    _isInitialized = !_isPageTarget(info) || info.url != '';
+    if (_isInitialized) {
+      _initializeCompleter.complete(true);
+    }
   }
 
-  Future<bool>? get initialized => _initialized;
+  Browser get browser => browserContext.browser;
+
+  Future<bool> get initialized => _initialized;
 
   bool get isInitialized => _isInitialized;
 
   Future<void> get onClose => _closedCompleter.future;
 
-  String get url => _info!.url;
+  String get url => _info.url;
 
-  TargetInfo get targetInfo => _info!;
+  TargetInfo get targetInfo => _info;
 
   /// Identifies what kind of target this is.
   /// Can be `"page"`, [`"background_page"`](https://developer.chrome.com/extensions/background_pages),
-  /// `"service_worker"`, `"shared_worker"`, `"browser"` or `"other"`.
+  /// `"service_worker"`, `"shared_worker"`, `"browser"`, `"webview"` or `"other"`.
   String get type {
-    var type = _info!.type;
+    var type = _info.type;
     if (_possibleTargetTypes.contains(type)) return type;
     return 'other';
   }
 
   /// Sets the kind of target this is.
   /// Must be `"page"`, [`"background_page"`](https://developer.chrome.com/extensions/background_pages),
-  /// `"service_worker"`, `"shared_worker"`, or `"browser"`.
+  /// `"service_worker"`, `"shared_worker"`, `"browser"` or `"webview"`.
   set type(String targetType) {
-    if (_possibleTargetTypes.contains(targetType) && _info != null) {
-      final json = _info!.toJson();
+    if (_possibleTargetTypes.contains(targetType)) {
+      final json = _info.toJson();
       json['type'] = targetType;
       _info = TargetInfo.fromJson(json);
     }
@@ -73,29 +90,33 @@ class Target {
 
   /// Get the target that opened this target. Top-level targets return `null`.
   Target? get opener {
-    return _info!.openerId != null ? browser.targetById(_info!.openerId) : null;
+    return _info.openerId != null
+        ? browser.targets.firstWhereOrNull((e) => e.targetID == _info.openerId)
+        : null;
   }
 
-  bool get isPage => _info!.type == 'page' || _info!.type == 'background_page';
-
-  Future<Page> get page {
-    if (!isPage) {
-      throw Exception('The target is not page or background_page. '
-          'Check `isPage` before accessing the `page` getter');
+  /// If the target is not of type `"page"` or `"background_page"`, returns `null`.
+  Future<Page?> get page async {
+    if (_isPageTarget(_info) && _pageFuture == null) {
+      var session = this.session;
+      _pageFuture = (session != null
+              ? Future.value(session)
+              : _sessionFactory(isAutoAttachEmulated: true))
+          .then((session) =>
+              Page.create(this, session, viewport: browser.defaultViewport));
     }
-
-    _pageFuture ??= _sessionFactory().then((session) =>
-        Page.create(this, session, viewport: browser.defaultViewport));
-    return _pageFuture!;
+    return await _pageFuture;
   }
 
+  /// If the target is not of type `"service_worker"` or `"shared_worker"`, returns `null`.
   Future<Worker?> get worker async {
-    if (_info!.type != 'service_worker' && _info!.type != 'shared_worker') {
+    if (!const ['service_worker', 'shared_worker'].contains(_info.type)) {
       return null;
     }
-    _workerFuture ??= _sessionFactory().then((client) async {
-      return _sessionFactory().then((client) => Worker(client, _info!.url,
-          onConsoleApiCalled: null, onExceptionThrown: null));
+    _workerFuture ??=
+        _sessionFactory(isAutoAttachEmulated: false).then((client) async {
+      return Worker(client, _info.url,
+          onConsoleApiCalled: null, onExceptionThrown: null);
     });
     return _workerFuture;
   }
@@ -104,7 +125,7 @@ class Target {
     _info = info;
 
     if (!_initializeCompleter.isCompleted &&
-        (_info!.type != 'page' || _info!.url != '')) {
+        (!_isPageTarget(info) || _info.url != '')) {
       _isInitialized = true;
       _initializeCompleter.complete(true);
     }
@@ -114,8 +135,12 @@ class Target {
     if (!_initializeCompleter.isCompleted) {
       _initializeCompleter.complete(false);
     }
-    _closedCompleter.complete();
+    if (!_closedCompleter.isCompleted) {
+      _closedCompleter.complete();
+    }
   }
+
+  bool get isDestroyed => _closedCompleter.isCompleted;
 }
 
 const _possibleTargetTypes = [
@@ -124,4 +149,5 @@ const _possibleTargetTypes = [
   'service_worker',
   'shared_worker',
   'browser',
+  'webview',
 ];

@@ -7,16 +7,13 @@ import 'utils/utils.dart';
 
 void main() {
   late Server server;
-  setUpAll(() async {
+  setUp(() async {
     server = await Server.create();
-  });
-
-  tearDownAll(() async {
-    await server.close();
   });
 
   tearDown(() async {
     server.clearRoutes();
+    await server.close();
   });
   group('Puppeteer', () {
     group('Browser.disconnect', () {
@@ -184,7 +181,7 @@ void main() {
         expect(await page.evaluate('11 * 11'), equals(121));
         await page.close();
         await browser.close();
-      }, skip: 'manual test, it launchs a browser headful');
+      }, skip: 'manual test, it launches a browser headful');
       test('should filter out ignored default arguments', () async {
         //TODO(xha): implement the feature and find a way to test it;
       });
@@ -252,7 +249,19 @@ void main() {
           remoteBrowser.close(),
         ]);
       });
-
+      test('should be able to connect to a browser with no page targets',
+          () async {
+        var originalBrowser = await puppeteer.launch();
+        var pages = await originalBrowser.pages;
+        await Future.wait(pages.map((page) => page.close()));
+        var remoteBrowser = await puppeteer.connect(
+          browserWsEndpoint: originalBrowser.wsEndpoint,
+        );
+        await Future.wait([
+          originalBrowser.disconnected,
+          remoteBrowser.close(),
+        ]);
+      });
       test('should support ignoreHTTPSErrors option', () async {
         //TODO(xha): enable once we support https server
       });
@@ -287,7 +296,8 @@ void main() {
       var browserTwo =
           await puppeteer.connect(browserWsEndpoint: browserOne.wsEndpoint);
       var pages = await Future.wait([
-        browserOne.onTargetCreated.first.then((target) => target.page),
+        browserOne.onTargetCreated.first
+            .then((target) async => (await target.page)!),
         browserTwo.newPage(),
       ]);
       expect(await pages[0].evaluate('() => 7 * 8'), equals(56));

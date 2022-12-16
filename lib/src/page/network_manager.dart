@@ -195,7 +195,7 @@ class NetworkManager {
       }
     }
     var frame =
-        event.frameId != null ? frameManager.frame(event.frameId) : null;
+        event.frameId != null ? frameManager.frameById(event.frameId!) : null;
     var request = Request(FetchApi(client), frame, interceptionId, event,
         allowInterception: _userRequestInterceptionEnabled,
         redirectChain: redirectChain);

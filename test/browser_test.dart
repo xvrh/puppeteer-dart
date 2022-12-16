@@ -5,7 +5,7 @@ import 'utils/utils.dart';
 void main() {
   late Server server;
   late Browser browser;
-  setUpAll(() async {
+  setUp(() async {
     server = await Server.create();
     browser = await puppeteer.launch();
   });

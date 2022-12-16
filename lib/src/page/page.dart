@@ -137,30 +137,10 @@ class Page {
         accessibility = Accessibility(devTools),
         coverage = Coverage(devTools),
         tracing = Tracing(devTools) {
-    devTools.target.onAttachedToTarget.listen((e) {
-      if (e.targetInfo.type != 'worker') {
-        // If we don't detach from service workers, they will never die.
-        devTools.target
-            .detachFromTarget(sessionId: e.sessionId)
-            .catchError((e) {
-          _logger.finer('[devTools.target.detachFromTarget] swallow error', e);
-        });
-      } else {
-        var session = target.browser.connection.sessions[e.sessionId.value]!;
-        var worker = Worker(session, e.targetInfo.url,
-            onConsoleApiCalled: _addConsoleMessage,
-            onExceptionThrown: _handleException);
-        _workers[e.sessionId] = worker;
-        _workerCreated.add(worker);
-      }
-    });
-    devTools.target.onDetachedFromTarget.listen((e) {
-      var worker = _workers[e.sessionId];
-      if (worker != null) {
-        _workers.remove(e.sessionId);
-        _workerDestroyed.add(worker);
-      }
-    });
+    target.targetManager
+        .addTargetInterceptor(devTools.client, _onAttachedToTarget);
+    var onTargetGoneSubscription =
+        target.targetManager.onTargetGone.listen(_onDetachedFromTarget);
 
     devTools.runtime.onBindingCalled.listen(_onBindingCalled);
     devTools.page.onJavascriptDialogOpening.listen(_onDialog);
@@ -170,6 +150,9 @@ class Page {
     devTools.log.onEntryAdded.listen(_onLogEntryAdded);
     devTools.page.onFileChooserOpened.listen(_onFileChooser);
     onClose.then((_) {
+      target.targetManager
+          .removeTargetInterceptor(devTools.client, _onAttachedToTarget);
+      onTargetGoneSubscription.cancel();
       _dispose('Page.onClose completed');
     });
     browser.disconnected.then((_) {
@@ -202,17 +185,42 @@ class Page {
   Future _initialize() async {
     await Future.wait([
       _frameManager.initialize(),
-      devTools.target.setAutoAttach(true, false, flatten: true),
       devTools.performance.enable(),
       devTools.log.enable(),
     ]);
+  }
+
+  Future<void> _onAttachedToTarget(
+      Target createdTarget, Target? parentTarget) async {
+    _frameManager.onAttachedToTarget(createdTarget);
+    var session = createdTarget.session;
+    if (createdTarget.targetInfo.type == 'worker') {
+      var worker = Worker(session!, createdTarget.targetInfo.url,
+          onConsoleApiCalled: _addConsoleMessage,
+          onExceptionThrown: _handleException);
+      _workers[session.sessionId] = worker;
+      _workerCreated.add(worker);
+    }
+    if (session != null) {
+      target.targetManager.addTargetInterceptor(session, _onAttachedToTarget);
+    }
+  }
+
+  void _onDetachedFromTarget(Target target) {
+    var sessionId = target.session?.sessionId;
+
+    var worker = _workers[sessionId];
+    if (worker != null) {
+      _workers.remove(sessionId);
+      _workerDestroyed.add(worker);
+    }
   }
 
   void _onFileChooser(FileChooserOpenedEvent event) async {
     if (_fileChooserInterceptors.isEmpty) {
       return;
     }
-    var frame = _frameManager.frame(event.frameId)!;
+    var frame = _frameManager.frameById(event.frameId)!;
     var context = await frame.executionContext;
     var element = await context.adoptBackendNodeId(event.backendNodeId!);
 
@@ -384,9 +392,7 @@ class Page {
   /// The page's main frame.
   ///
   /// Page is guaranteed to have a main frame which persists during navigations.
-  Frame get mainFrame => _frameManager.mainFrame!;
-
-  bool get hasMainFrame => _frameManager.mainFrame != null;
+  Frame get mainFrame => _frameManager.mainFrame;
 
   Keyboard get keyboard => _keyboard;
 
@@ -1647,7 +1653,7 @@ function deliverError(name, seq, message, stack) {
     if (runBeforeUnload) {
       await devTools.page.close();
     } else {
-      await target.browser.targetApi.closeTarget(target.targetID);
+      await target.browser.connection.targetApi.closeTarget(target.targetID);
       await target.onClose;
     }
   }

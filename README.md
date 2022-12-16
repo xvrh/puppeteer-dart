@@ -54,7 +54,7 @@ void main() async {
   // Do something... See other examples
   await myPage.screenshot();
   await myPage.pdf();
-  await myPage.evaluate('() => document.title');
+  await myPage.evaluate<String>('() => document.title');
 
   // Gracefully close the browser's process
   await browser.close();
@@ -71,7 +71,7 @@ void main() async {
   // Start the browser and go to a web page
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
-  await page.goto('https://dart.dev', wait: Until.networkIdle);
+  await page.goto('https://dart.dev', wait: Until.networkAlmostIdle);
 
   // For this example, we force the "screen" media-type because sometime
   // CSS rules with "@media print" can change the look of the page.
@@ -188,7 +188,8 @@ void main() async {
   print(pageContent);
 
   // Or get the content directly by executing some Javascript
-  var pageContent2 = await page.evaluate('document.documentElement.outerHTML');
+  var pageContent2 =
+      await page.evaluate<String>('document.documentElement.outerHTML');
   print(pageContent2);
 
   await browser.close();
