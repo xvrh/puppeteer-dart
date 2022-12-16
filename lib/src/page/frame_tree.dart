@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:collection/collection.dart';
-
 import '../../protocol/page.dart' show FrameId;
 import 'frame_manager.dart';
 

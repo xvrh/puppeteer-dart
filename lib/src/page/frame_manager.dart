@@ -7,12 +7,12 @@ import '../connection.dart';
 import '../target.dart';
 import 'dom_world.dart';
 import 'execution_context.dart';
+import 'frame_tree.dart' as tree;
 import 'js_handle.dart';
 import 'lifecycle_watcher.dart';
 import 'mouse.dart';
 import 'network_manager.dart';
 import 'page.dart';
-import 'frame_tree.dart' as tree;
 
 const _utilityWorldName = '__cdt_utility_world__';
 
