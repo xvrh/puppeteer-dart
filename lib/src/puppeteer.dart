@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
+import '../protocol/browser.dart';
 import 'browser.dart';
 import 'connection.dart';
 import 'devices.dart';
@@ -98,23 +99,28 @@ class Puppeteer {
   ///     the given default arguments. Dangerous option; use with care. Defaults to `false`.
   ///  - `userDataDir` <[string]> Path to a [User Data Directory](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md).
   ///  - `timeout` Maximum time to wait for the browser instance to start. Defaults to 30 seconds.
-  Future<Browser> launch(
-      {String? executablePath,
-      bool? headless,
-      bool? devTools,
-      String? userDataDir,
-      bool? noSandboxFlag,
-      DeviceViewport? defaultViewport = LaunchOptions.viewportNotSpecified,
-      bool? ignoreHttpsErrors,
-      Duration? slowMo,
-      List<String>? args,
-      /* bool | List */ dynamic ignoreDefaultArgs,
-      Map<String, String>? environment,
-      List<Plugin>? plugins,
-      Duration? timeout}) async {
+  ///  - `waitForInitialPage`: Whether to wait for the initial page to be ready.
+  ///     Useful when a user explicitly disables that (e.g. `--no-startup-window` for Chrome).
+  Future<Browser> launch({
+    String? executablePath,
+    bool? headless,
+    bool? devTools,
+    String? userDataDir,
+    bool? noSandboxFlag,
+    DeviceViewport? defaultViewport = LaunchOptions.viewportNotSpecified,
+    bool? ignoreHttpsErrors,
+    Duration? slowMo,
+    List<String>? args,
+    /* bool | List */ dynamic ignoreDefaultArgs,
+    Map<String, String>? environment,
+    List<Plugin>? plugins,
+    Duration? timeout,
+    bool? waitForInitialPage,
+  }) async {
     devTools ??= false;
     headless ??= !devTools;
     timeout ??= Duration(seconds: 30);
+    waitForInitialPage ??= true;
 
     var chromeArgs = <String>[];
     var defaultArguments = defaultArgs(
@@ -179,26 +185,32 @@ class Puppeteer {
     if (webSocketUrl != null) {
       var connection = await Connection.create(webSocketUrl, delay: slowMo);
 
-      var browser = createBrowser(chromeProcess, connection,
+      var browser = await createBrowser(chromeProcess, connection,
           defaultViewport: launchOptions.computedDefaultViewport,
           closeCallback: () async {
-        if (temporaryUserDataDir != null) {
+        await BrowserApi(connection).close().catchError((error) async {
           await _killChrome(chromeProcess);
-        } else {
-          // If there is a custom data-directory we need to give chrome a chance
-          // to save the last data
-          // Attempt to close chrome gracefully
-          await connection.send('Browser.close').catchError((error) async {
-            await _killChrome(chromeProcess);
-          });
-        }
+        });
 
         return chromeProcessExit;
       }, ignoreHttpsErrors: ignoreHttpsErrors, plugins: allPlugins);
-      var targetFuture =
-          browser.waitForTarget((target) => target.type == 'page');
-      await browser.targetApi.setDiscoverTargets(true);
-      await targetFuture;
+
+      Future? initialWait;
+      if (waitForInitialPage) {
+        initialWait = browser.waitForTarget((target) => target.type == 'page');
+      }
+
+      await attachBrowser(browser);
+
+      if (waitForInitialPage) {
+        try {
+          await initialWait;
+        } catch (e) {
+          await browser.close();
+          rethrow;
+        }
+      }
+
       return browser;
     } else {
       throw Exception('Not able to connect to Chrome DevTools');
@@ -248,7 +260,7 @@ class Puppeteer {
     }
 
     var browserContextIds = await connection!.targetApi.getBrowserContexts();
-    var browser = createBrowser(null, connection,
+    var browser = await createBrowser(null, connection,
         browserContextIds: browserContextIds,
         ignoreHttpsErrors: ignoreHttpsErrors,
         defaultViewport: connectOptions.computedDefaultViewport,
@@ -259,7 +271,8 @@ class Puppeteer {
         // ignore
       }
     });
-    await browser.targetApi.setDiscoverTargets(true);
+    await attachBrowser(browser);
+    await browser.pages;
     return browser;
   }
 

@@ -49,7 +49,7 @@ void main() {
             .firstWhereOrNull((t) => t.type == 'background_page');
         backgroundPageTarget ??= await browserWithExtension
             .waitForTarget((target) => target.type == 'background_page');
-        var page = await backgroundPageTarget.page;
+        var page = (await backgroundPageTarget.page)!;
         expect(await page.evaluate('() => 2 * 3'), equals(6));
         expect(await page.evaluate('() => window.MAGIC'), equals(42));
       } finally {

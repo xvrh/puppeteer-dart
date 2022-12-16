@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:collection/collection.dart';
-import 'package:logging/logging.dart';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
@@ -9,23 +8,20 @@ import 'utils/utils.dart';
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 void main() {
-  Logger.root.onRecord.listen(print);
-
   late Server server;
   late Browser browser;
   late BrowserContext context;
   late Page page;
   setUpAll(() async {
     server = await Server.create();
-    browser = await puppeteer.launch();
   });
 
   tearDownAll(() async {
-    await browser.close();
     await server.close();
   });
 
   setUp(() async {
+    browser = await puppeteer.launch();
     context = await browser.createIncognitoBrowserContext();
     page = await context.newPage();
   });
@@ -33,6 +29,7 @@ void main() {
   tearDown(() async {
     server.clearRoutes();
     await context.close();
+    await browser.close();
   });
 
   group('Target', () {
@@ -44,7 +41,7 @@ void main() {
               (target) => target.type == 'page' && target.url == 'about:blank'),
           isNotEmpty);
       expect(targets.where((target) => target.type == 'browser'), isNotEmpty);
-    }, skip: 'Investigate to use autoAttach and fix failure');
+    });
     test('Browser.pages should return all of the pages', () async {
       // The pages will be the testing page
       var allPages = await context.pages;
@@ -56,7 +53,7 @@ void main() {
       var targets = browser.targets;
       var browserTarget = targets.where((target) => target.type == 'browser');
       expect(browserTarget, isNotEmpty);
-    }, skip: 'Investigate to use autoAttach and fix failure');
+    });
     test('should be able to use the default page in the browser', () async {
       // The pages will be the testing page and the original newtab page
       var allPages = await browser.pages;
@@ -70,7 +67,7 @@ void main() {
           context
               .waitForTarget((target) =>
                   target.url == server.crossProcessPrefix + '/empty.html')
-              .then((target) => target.page),
+              .then((target) async => (await target.page)!),
           [
             page.evaluate('url => window.open(url)',
                 args: [server.crossProcessPrefix + '/empty.html']),
@@ -89,8 +86,10 @@ void main() {
       await otherPage.close();
       expect(await closePagePromise, equals(otherPage));
 
-      allPages = await Future.wait(
-          context.targets.map((target) => target.page).whereNotNull());
+      allPages =
+          (await Future.wait(context.targets.map((target) => target.page)))
+              .whereNotNull()
+              .toList();
       expect(allPages, contains(page));
       expect(allPages, isNot(contains(otherPage)));
     });
@@ -181,7 +180,7 @@ void main() {
       ]);
       // Connect to the opened page.
       var target = await targetFuture;
-      var newPage = await target.page;
+      var newPage = (await target.page)!;
       // Issue a redirect.
       serverResponse.complete(shelf.Response.found('/injectedstyle.css'));
       // Wait for the new page to load.
@@ -193,7 +192,7 @@ void main() {
       await page.goto(server.emptyPage);
       var createdTarget = await waitFutures(context.onTargetCreated.first,
           [page.goto(server.prefix + '/popup/window-open.html')]);
-      expect((await createdTarget.page).url,
+      expect((await createdTarget.page)!.url,
           equals(server.prefix + '/popup/popup.html'));
       expect(createdTarget.opener, equals(page.target));
       expect(page.target.opener, isNull);

@@ -314,9 +314,11 @@ Parameters:
     the given default arguments. Dangerous option; use with care. Defaults to `false`.
  - `userDataDir` <[string]> Path to a [User Data Directory](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md).
  - `timeout` Maximum time to wait for the browser instance to start. Defaults to 30 seconds.
+ - `waitForInitialPage`: Whether to wait for the initial page to be ready.
+    Useful when a user explicitly disables that (e.g. `--no-startup-window` for Chrome).
 
 ```dart
-puppeteer.launch({String? executablePath, bool? headless, bool? devTools, String? userDataDir, bool? noSandboxFlag, DeviceViewport? defaultViewport = LaunchOptions.viewportNotSpecified, bool? ignoreHttpsErrors, Duration? slowMo, List<String>? args, dynamic ignoreDefaultArgs, Map<String, String>? environment, List<Plugin>? plugins, Duration? timeout}) → Future<Browser> 
+puppeteer.launch({String? executablePath, bool? headless, bool? devTools, String? userDataDir, bool? noSandboxFlag, DeviceViewport? defaultViewport = LaunchOptions.viewportNotSpecified, bool? ignoreHttpsErrors, Duration? slowMo, List<String>? args, dynamic ignoreDefaultArgs, Map<String, String>? environment, List<Plugin>? plugins, Duration? timeout, bool? waitForInitialPage}) → Future<Browser> 
 ```
 
 ### class: Browser

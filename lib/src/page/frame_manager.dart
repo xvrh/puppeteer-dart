@@ -4,6 +4,7 @@ import '../../protocol/network.dart';
 import '../../protocol/page.dart';
 import '../../protocol/runtime.dart';
 import '../connection.dart';
+import '../target.dart';
 import 'dom_world.dart';
 import 'execution_context.dart';
 import 'js_handle.dart';
@@ -75,15 +76,21 @@ class FrameManager {
   }
 
   Future initialize() async {
-    await _pageApi.enable();
-    _handleFrameTree(await _pageApi.getFrameTree());
-    await Future.wait([
-      _pageApi.setLifecycleEventsEnabled(true),
-      _runtimeApi.enable(),
-      _networkManager.initialize()
-    ]);
+    try {
+      await _pageApi.enable();
+      _handleFrameTree(await _pageApi.getFrameTree());
+      await Future.wait([
+        _pageApi.setLifecycleEventsEnabled(true),
+        _runtimeApi.enable(),
+        _networkManager.initialize()
+      ]);
 
-    await _ensureIsolatedWorld(_utilityWorldName);
+      await _ensureIsolatedWorld(_utilityWorldName);
+    } catch (e) {
+      // The target might have been closed before the initialization finished.
+      if (isTargetClosedError(e)) return;
+      rethrow;
+    }
   }
 
   Frame? frame(FrameId? frameId) => _frames[frameId];
@@ -142,6 +149,20 @@ class FrameManager {
 
     return watcher.navigationResponse ??
         Response.aborted(page.devTools, watcher.navigationRequest);
+  }
+
+  void onAttachedToTarget(Target target) {
+    if (target.targetInfo.type != 'iframe') {
+      return;
+    }
+
+    //TODO(xha): implement this
+    //var frame = this.frameById(FrameId(target.targetInfo.targetId.value));
+    //if (frame != null) {
+    //  frame.updateClient(target.session!);
+    //}
+    //this.setupEventListeners(target.session!);
+    //this.initialize(target.session);
   }
 
   void _onLifecycleEvent(LifecycleEventEvent event) {

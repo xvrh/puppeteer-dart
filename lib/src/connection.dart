@@ -27,13 +27,15 @@ class Enum {
 
 class Connection implements Client {
   final Logger _logger = Logger('connection');
-  static int _lastId = 0;
+  int _lastId = 0;
   final WebSocket _webSocket;
   final String url;
-  final Map<int, _Message> _messagesInFly = {};
-  final Map<String, Session> sessions = {};
-  final StreamController<Event> _eventController =
-      StreamController<Event>.broadcast(sync: true);
+  final _messagesInFly = <int, _Message>{};
+  final sessions = <SessionID, Session>{};
+  final _eventController = StreamController<Event>.broadcast(sync: true);
+  final _sessionAttachedController = StreamController<Session>.broadcast();
+  final _sessionDetachedController = StreamController<Session>.broadcast();
+  final _manuallyAttached = <TargetID>{};
   late final _targetApi = TargetApi(this);
   final List<StreamSubscription> _subscriptions = [];
   final Duration? _delay;
@@ -57,6 +59,8 @@ class Connection implements Client {
   @override
   Stream<Event> get onEvent => _eventController.stream;
 
+  Stream<Session> get onSessionDetached => _sessionDetachedController.stream;
+
   @override
   Future<Map<String, dynamic>> send(String method,
       [Map<String, dynamic>? parameters]) {
@@ -78,11 +82,20 @@ class Connection implements Client {
     return id;
   }
 
-  Future<Session> createSession(TargetInfo targetInfo) async {
+  bool isAutoAttached(TargetID targetId) {
+    return !_manuallyAttached.contains(targetId);
+  }
+
+  Future<Session> createSession(TargetInfo targetInfo,
+      {bool isAutoAttachEmulated = true}) async {
+    if (!isAutoAttachEmulated) {
+      _manuallyAttached.add(targetInfo.targetId);
+    }
     var sessionId =
         await _targetApi.attachToTarget(targetInfo.targetId, flatten: true);
+    _manuallyAttached.remove(targetInfo.targetId);
 
-    var session = sessions[sessionId.value]!;
+    var session = sessions[sessionId]!;
     return session;
   }
 
@@ -95,25 +108,36 @@ class Connection implements Client {
     var object = jsonDecode(message) as Map<String, dynamic>;
     var id = object['id'] as int?;
     var method = object['method'] as String?;
-    var sessionId = object['sessionId'] as String?;
+    var rawParentId = object['sessionId'] as String?;
+    var parentId = rawParentId != null ? SessionID(rawParentId) : null;
     if (method == 'Target.attachedToTarget') {
       var params = AttachedToTargetEvent.fromJson(
           object['params'] as Map<String, dynamic>);
       var sessionId = params.sessionId;
       var session =
           Session(this, sessionId, targetType: params.targetInfo.type);
-      sessions[sessionId.value] = session;
+      sessions[sessionId] = session;
+      _sessionAttachedController.add(session);
+      final parentSession = sessions[parentId];
+      if (parentSession != null) {
+        // TODO(xha): emit parent sessionattached event
+      }
     } else if (method == 'Target.detachedFromTarget') {
       var params = DetachedFromTargetEvent.fromJson(
           object['params'] as Map<String, dynamic>);
-      var session = sessions[params.sessionId.value];
+      var session = sessions[params.sessionId];
       if (session != null) {
         session.dispose(reason: 'Target.detachedFromTarget');
-        sessions.remove(params.sessionId.value);
+        sessions.remove(params.sessionId);
+        _sessionDetachedController.add(session);
+        final parentSession = sessions[parentId];
+        if (parentSession != null) {
+          // TODO(xha): emit parent sessiondeteached event
+        }
       }
     }
-    if (sessionId != null) {
-      var session = sessions[sessionId];
+    if (parentId != null) {
+      var session = sessions[parentId];
       if (session != null) {
         _logger.finer('◀ RECV $message');
 
@@ -168,6 +192,8 @@ class Connection implements Client {
   Future dispose(String reason) async {
     _onClose(reason);
     await _webSocket.close('Connection.dispose');
+    await _sessionAttachedController.close();
+    await _sessionAttachedController.close();
   }
 
   bool get isClosed => _eventController.isClosed;
@@ -282,4 +308,11 @@ class TargetClosedException implements Exception {
   @override
   String toString() =>
       'TargetClosedException(method: $method, reason: $reason)';
+}
+
+bool isTargetClosedError(Object e) {
+  for (var target in const ['Target closed', 'Session closed']) {
+    if ('$e'.contains(target)) return true;
+  }
+  return false;
 }
