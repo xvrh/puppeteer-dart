@@ -44,7 +44,7 @@ class Target {
       if (!openerPage.hasPopupListener) {
         return true;
       }
-      var popupPage = await page;
+      var popupPage = await pageOrNull;
       if (popupPage != null) {
         openerPage.emitPopup(popupPage);
       }
@@ -88,6 +88,8 @@ class Target {
     }
   }
 
+  bool get isPage => _possibleTargetTypes.contains(type);
+
   /// Get the target that opened this target. Top-level targets return `null`.
   Target? get opener {
     return _info.openerId != null
@@ -96,7 +98,7 @@ class Target {
   }
 
   /// If the target is not of type `"page"` or `"background_page"`, returns `null`.
-  Future<Page?> get page async {
+  Future<Page?> get pageOrNull async {
     if (_isPageTarget(_info) && _pageFuture == null) {
       var session = this.session;
       _pageFuture = (session != null
@@ -106,6 +108,10 @@ class Target {
               Page.create(this, session, viewport: browser.defaultViewport));
     }
     return await _pageFuture;
+  }
+
+  Future<Page> get page async {
+    return (await pageOrNull)!;
   }
 
   /// If the target is not of type `"service_worker"` or `"shared_worker"`, returns `null`.

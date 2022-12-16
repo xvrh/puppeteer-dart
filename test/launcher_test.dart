@@ -297,7 +297,7 @@ void main() {
           await puppeteer.connect(browserWsEndpoint: browserOne.wsEndpoint);
       var pages = await Future.wait([
         browserOne.onTargetCreated.first
-            .then((target) async => (await target.page)!),
+            .then((target) async => await target.page),
         browserTwo.newPage(),
       ]);
       expect(await pages[0].evaluate('() => 7 * 8'), equals(56));

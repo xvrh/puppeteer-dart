@@ -193,7 +193,7 @@ class Browser {
       throw Exception('Missing target for page (id = $targetId)');
     }
     assert(await target.initialized, 'Failed to create target for page');
-    var page = await target.page;
+    var page = await target.pageOrNull;
     if (page == null) {
       throw Exception('Failed to create a page for context (id = $contextId)');
     }
