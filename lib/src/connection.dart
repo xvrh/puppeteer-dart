@@ -311,6 +311,8 @@ class TargetClosedException implements Exception {
 }
 
 bool isTargetClosedError(Object e) {
+  if (e is TargetClosedException) return true;
+
   for (var target in const ['Target closed', 'Session closed']) {
     if ('$e'.contains(target)) return true;
   }

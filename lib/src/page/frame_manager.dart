@@ -90,7 +90,9 @@ class FrameManager {
       await Future.wait([
         pageApi.setLifecycleEventsEnabled(true),
         runtimeApi.enable(),
-        _networkManager.initialize()
+        // TODO: Network manager is not aware of OOP iframes yet.
+        if (session == page.session)
+          _networkManager.initialize()
       ]);
 
       await _createIsolatedWorld(session, _utilityWorldName);
@@ -389,7 +391,7 @@ class Frame {
   String? _name;
   bool _detached = false;
   LoaderId? _loaderId;
-  late final DomWorld _mainWorld, _secondaryWorld;
+  late DomWorld _mainWorld, _secondaryWorld;
 
   Frame(this.frameManager, Session client, this.parentId, this._id) {
     _updateClient(client);
