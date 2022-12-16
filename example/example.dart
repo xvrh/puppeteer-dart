@@ -14,7 +14,7 @@ void main() async {
   // Do something... See other examples
   await myPage.screenshot();
   await myPage.pdf();
-  await myPage.evaluate('() => document.title');
+  await myPage.evaluate<String>('() => document.title');
 
   // Gracefully close the browser's process
   await browser.close();

@@ -54,7 +54,7 @@ void main() async {
   // Do something... See other examples
   await myPage.screenshot();
   await myPage.pdf();
-  await myPage.evaluate('() => document.title');
+  await myPage.evaluate<String>('() => document.title');
 
   // Gracefully close the browser's process
   await browser.close();
@@ -188,7 +188,8 @@ void main() async {
   print(pageContent);
 
   // Or get the content directly by executing some Javascript
-  var pageContent2 = await page.evaluate('document.documentElement.outerHTML');
+  var pageContent2 =
+      await page.evaluate<String>('document.documentElement.outerHTML');
   print(pageContent2);
 
   await browser.close();

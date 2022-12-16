@@ -91,8 +91,7 @@ class FrameManager {
         pageApi.setLifecycleEventsEnabled(true),
         runtimeApi.enable(),
         // TODO: Network manager is not aware of OOP iframes yet.
-        if (session == page.session)
-          _networkManager.initialize()
+        if (session == page.session) _networkManager.initialize()
       ]);
 
       await _createIsolatedWorld(session, _utilityWorldName);

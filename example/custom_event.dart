@@ -10,7 +10,7 @@ void main() async {
   });
 
   // Attach an event listener to page to capture a custom event on page load/navigation.
-  Future<void> listenFor(type) {
+  Future<void> listenFor(String type) {
     return page.evaluateOnNewDocument('''type => {
       document.addEventListener(type, e => {
         window.onCustomEvent({type, detail: e.detail});
