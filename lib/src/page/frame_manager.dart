@@ -12,13 +12,13 @@ import 'lifecycle_watcher.dart';
 import 'mouse.dart';
 import 'network_manager.dart';
 import 'page.dart';
+import 'frame_tree.dart' as tree;
 
 const _utilityWorldName = '__cdt_utility_world__';
 
 class FrameManager {
   final Page page;
   late final NetworkManager _networkManager;
-  final _frames = <FrameId, Frame>{};
   final _contextIdToContext = <ExecutionContextId, ExecutionContext>{};
   final _isolatedWorlds = <String?>{};
   final _lifecycleEventController = StreamController<Frame>.broadcast(),
@@ -28,27 +28,32 @@ class FrameManager {
       _frameNavigatedWithinDocumentController =
           StreamController<Frame>.broadcast(),
       _frameDetachedController = StreamController<Frame>.broadcast();
-  Frame? _mainFrame;
+  final frameTree = tree.FrameTree();
+
+  /// Set of frame IDs stored to indicate if a frame has received a
+  /// frameNavigated event so that frame tree responses could be ignored as the
+  /// frameNavigated event usually contains the latest information.
+  final _frameNavigatedReceived = <FrameId>{};
 
   FrameManager(this.page) {
     _networkManager = NetworkManager(page.session, this);
-
-    _pageApi.onFrameAttached.listen(
-        (event) => _onFrameAttached(event.frameId, event.parentFrameId));
-    _pageApi.onFrameNavigated.listen((e) => _onFrameNavigated(e.frame));
-    _pageApi.onNavigatedWithinDocument.listen(_onFrameNavigatedWithinDocument);
-    _pageApi.onFrameDetached.listen(_onFrameDetached);
-    _pageApi.onFrameStoppedLoading.listen(_onFrameStoppedLoading);
-    _runtimeApi.onExecutionContextCreated.listen(_onExecutionContextCreated);
-    _runtimeApi.onExecutionContextDestroyed
-        .listen(_onExecutionContextDestroyed);
-    _runtimeApi.onExecutionContextsCleared.listen(_onExecutionContextsCleared);
-    _pageApi.onLifecycleEvent.listen(_onLifecycleEvent);
+    _setupEventListeners(page.session);
   }
 
-  PageApi get _pageApi => page.devTools.page;
-
-  RuntimeApi get _runtimeApi => page.devTools.runtime;
+  void _setupEventListeners(Session session) {
+    var pageApi = PageApi(session);
+    var runtimeApi = RuntimeApi(session);
+    pageApi.onFrameAttached.listen((event) =>
+        _onFrameAttached(page.session, event.frameId, event.parentFrameId));
+    pageApi.onFrameNavigated.listen((e) => _onFrameNavigated(e.frame));
+    pageApi.onNavigatedWithinDocument.listen(_onFrameNavigatedWithinDocument);
+    pageApi.onFrameDetached.listen(_onFrameDetached);
+    pageApi.onFrameStoppedLoading.listen(_onFrameStoppedLoading);
+    runtimeApi.onExecutionContextCreated.listen(_onExecutionContextCreated);
+    runtimeApi.onExecutionContextDestroyed.listen(_onExecutionContextDestroyed);
+    runtimeApi.onExecutionContextsCleared.listen(_onExecutionContextsCleared);
+    pageApi.onLifecycleEvent.listen(_onLifecycleEvent);
+  }
 
   NetworkManager get networkManager => _networkManager;
 
@@ -75,17 +80,20 @@ class FrameManager {
     _frameDetachedController.close();
   }
 
-  Future initialize() async {
+  Future initialize([Session? session]) async {
+    session ??= page.session;
+    var pageApi = PageApi(session);
+    var runtimeApi = RuntimeApi(session);
     try {
-      await _pageApi.enable();
-      _handleFrameTree(await _pageApi.getFrameTree());
+      await pageApi.enable();
+      _handleFrameTree(session, await pageApi.getFrameTree());
       await Future.wait([
-        _pageApi.setLifecycleEventsEnabled(true),
-        _runtimeApi.enable(),
+        pageApi.setLifecycleEventsEnabled(true),
+        runtimeApi.enable(),
         _networkManager.initialize()
       ]);
 
-      await _ensureIsolatedWorld(_utilityWorldName);
+      await _createIsolatedWorld(session, _utilityWorldName);
     } catch (e) {
       // The target might have been closed before the initialization finished.
       if (isTargetClosedError(e)) return;
@@ -93,41 +101,7 @@ class FrameManager {
     }
   }
 
-  Frame? frame(FrameId? frameId) => _frames[frameId];
-
-  Future<Response> navigateFrame(Frame frame, String url,
-      {String? referrer, Duration? timeout, Until? wait}) async {
-    referrer ??= _networkManager.extraHTTPHeaders['referer'];
-    var watcher = LifecycleWatcher(this, frame,
-        wait: wait, timeout: timeout ?? page.navigationTimeoutOrDefault);
-
-    Future<Object?> navigate() async {
-      var response =
-          await _pageApi.navigate(url, referrer: referrer, frameId: frame.id);
-      if (response.errorText != null) {
-        throw Exception('${response.errorText} at $url');
-      }
-      await Future.any(
-          [watcher.newDocumentNavigation, watcher.sameDocumentNavigation]);
-      return null;
-    }
-
-    try {
-      var error = await Future.any([
-        navigate(),
-        watcher.timeoutOrTermination,
-      ]);
-
-      if (error != null) {
-        return Future.error(error);
-      }
-    } finally {
-      watcher.dispose();
-    }
-
-    return watcher.navigationResponse ??
-        Response.aborted(page.devTools, watcher.navigationRequest);
-  }
+  Frame? frameById(FrameId frameId) => frameTree.getById(frameId);
 
   Future<Response> waitForFrameNavigation(Frame frame,
       {Until? wait, Duration? timeout}) async {
@@ -156,17 +130,16 @@ class FrameManager {
       return;
     }
 
-    //TODO(xha): implement this
-    //var frame = this.frameById(FrameId(target.targetInfo.targetId.value));
-    //if (frame != null) {
-    //  frame.updateClient(target.session!);
-    //}
-    //this.setupEventListeners(target.session!);
-    //this.initialize(target.session);
+    var frame = frameById(FrameId(target.targetInfo.targetId.value));
+    if (frame != null) {
+      frame._updateClient(target.session!);
+    }
+    _setupEventListeners(target.session!);
+    initialize(target.session!);
   }
 
   void _onLifecycleEvent(LifecycleEventEvent event) {
-    var frame = _frames[event.frameId];
+    var frame = frameById(event.frameId);
     if (frame == null) {
       return;
     }
@@ -175,7 +148,7 @@ class FrameManager {
   }
 
   void _onFrameStoppedLoading(FrameId frameId) {
-    var frame = _frames[frameId];
+    var frame = frameById(frameId);
     if (frame == null) {
       return;
     }
@@ -183,84 +156,107 @@ class FrameManager {
     _lifecycleEventController.add(frame);
   }
 
-  void _handleFrameTree(FrameTree frameTree) {
+  void _handleFrameTree(Session session, FrameTree frameTree) {
     var parentId = frameTree.frame.parentId;
     if (parentId != null) {
-      _onFrameAttached(frameTree.frame.id, parentId);
+      _onFrameAttached(session, frameTree.frame.id, parentId);
     }
-    _onFrameNavigated(frameTree.frame);
-    if (frameTree.childFrames == null) {
-      return;
+    if (!_frameNavigatedReceived.contains(frameTree.frame.id)) {
+      _onFrameNavigated(frameTree.frame);
+    } else {
+      _frameNavigatedReceived.remove(frameTree.frame.id);
     }
 
-    frameTree.childFrames!.forEach(_handleFrameTree);
+    var childFrames = frameTree.childFrames;
+    if (childFrames == null) return;
+
+    for (var child in childFrames) {
+      _handleFrameTree(session, child);
+    }
   }
 
-  Frame? get mainFrame => _mainFrame;
+  Frame get mainFrame {
+    var mainFrame = frameTree.mainFrame;
+    assert(mainFrame != null, 'Requesting main frame too early!');
+    return mainFrame!;
+  }
 
-  List<Frame> get frames => List.unmodifiable(_frames.values);
+  List<Frame> get frames => frameTree.frames;
 
-  Frame? frameById(FrameId frameId) => _frames[frameId];
-
-  void _onFrameAttached(FrameId frameId, FrameId parentFrameId) {
-    if (_frames.containsKey(frameId)) return;
-    var parentFrame = _frames[parentFrameId];
-    var frame = Frame(this, page.session, parentFrame, frameId);
-    _frames[frameId] = frame;
+  void _onFrameAttached(
+      Session session, FrameId frameId, FrameId parentFrameId) {
+    var frame = frameById(frameId);
+    if (frame != null) {
+      if (frame.isOOPFrame) {
+        // If an OOP iframes becomes a normal iframe again
+        // it is first attached to the parent page before
+        // the target is removed.
+        frame._updateClient(session);
+      }
+      return;
+    }
+    frame = Frame(this, page.session, parentFrameId, frameId);
+    frameTree.addFrame(frame);
     _frameAttachedController.add(frame);
   }
 
-  void _onFrameNavigated(FrameInfo framePayload) {
+  void _onFrameNavigated(FrameInfo framePayload) async {
+    var frameId = framePayload.id;
     var isMainFrame = framePayload.parentId == null;
-    var frame = isMainFrame ? _mainFrame : _frames[framePayload.id];
+    var frame = frameById(frameId);
     assert(isMainFrame || frame != null,
         'We either navigate top level or have old version of the navigated frame');
 
     // Detach all child frames first.
     if (frame != null) {
-      // avoid 'Concurrent modification during iteration' Error,
-      // by iterating with another iterable object.
-      final childFramesForIterate = frame.childFrames.toList(growable: false);
-      childFramesForIterate.forEach(_removeFramesRecursively);
+      for (var child in frame.childFrames) {
+        _removeFramesRecursively(child);
+      }
     }
 
     // Update or create main frame.
     if (isMainFrame) {
       if (frame != null) {
         // Update frame id to retain frame identity on cross-process navigation.
-        _frames.remove(frame.id);
-        frame._id = framePayload.id;
+        frameTree.removeFrame(frame);
+        frame._id = frameId;
       } else {
         // Initial main frame navigation.
         frame = Frame(this, page.session, null, framePayload.id);
       }
-      _frames[framePayload.id] = frame;
-      _mainFrame = frame;
+      frameTree.addFrame(frame);
     }
 
-    // Update frame payload.
-    frame!._navigated(framePayload);
+    frame = await frameTree.waitForFrame(frameId);
+    frame._navigated(framePayload);
 
     _frameNavigatedController.add(frame);
   }
 
-  Future<void> _ensureIsolatedWorld(String name) async {
+  Future<void> _createIsolatedWorld(Session session, String name) async {
+    var pageApi = PageApi(session);
     if (_isolatedWorlds.contains(name)) {
       return;
     }
-    _isolatedWorlds.add(name);
-    await _pageApi.addScriptToEvaluateOnNewDocument(
+    await pageApi.addScriptToEvaluateOnNewDocument(
         '//# sourceURL=$evaluationScriptUrl',
         worldName: name);
 
-    await Future.wait(frames.map((frame) => _pageApi.createIsolatedWorld(
-        frame.id,
-        grantUniveralAccess: true,
-        worldName: name)));
+    await Future.wait(frames.map((frame) async {
+      try {
+        await pageApi.createIsolatedWorld(frame.id,
+            grantUniveralAccess: true, worldName: name);
+      } catch (e) {
+        // Frames might be removed before we send this, so we don't want to
+        // throw an error.
+      }
+    }));
+
+    _isolatedWorlds.add(name);
   }
 
   void _onFrameNavigatedWithinDocument(NavigatedWithinDocumentEvent event) {
-    var frame = _frames[event.frameId];
+    var frame = frameById(event.frameId);
     if (frame == null) {
       return;
     }
@@ -271,7 +267,7 @@ class FrameManager {
   }
 
   void _onFrameDetached(FrameDetachedEvent event) {
-    var frame = _frames[event.frameId];
+    var frame = frameById(event.frameId);
     if (frame != null) {
       if (event.reason == FrameDetachedEventReason.remove) {
         _removeFramesRecursively(frame);
@@ -285,7 +281,7 @@ class FrameManager {
     var frameId = contextPayload.auxData != null
         ? contextPayload.auxData!['frameId'] as String?
         : null;
-    var frame = frameId != null ? _frames[FrameId(frameId)] : null;
+    var frame = frameId != null ? frameById(FrameId(frameId)) : null;
     DomWorld? world;
     if (frame != null) {
       if (contextPayload.auxData != null &&
@@ -342,7 +338,7 @@ class FrameManager {
     childFramesForIterate.forEach(_removeFramesRecursively);
 
     frame._detach();
-    _frames.remove(frame.id);
+    frameTree.removeFrame(frame);
     _frameDetachedController.add(frame);
   }
 }
@@ -385,24 +381,28 @@ class FrameManager {
 /// ```
 class Frame {
   final FrameManager frameManager;
-  final Client client;
-  Frame? _parent;
+  late Client _client;
+  final FrameId? parentId;
   FrameId _id;
   final lifecycleEvents = <String?>{};
-  final childFrames = <Frame>[];
   late String _url;
   String? _name;
   bool _detached = false;
   LoaderId? _loaderId;
   late final DomWorld _mainWorld, _secondaryWorld;
 
-  Frame(this.frameManager, this.client, this._parent, this._id) {
+  Frame(this.frameManager, Session client, this.parentId, this._id) {
+    _updateClient(client);
+  }
+
+  void _updateClient(Session client) {
+    _client = client;
     _mainWorld = DomWorld(frameManager, this);
     _secondaryWorld = DomWorld(frameManager, this);
+  }
 
-    if (_parent != null) {
-      _parent!.childFrames.add(this);
-    }
+  bool get isOOPFrame {
+    return _client != frameManager.page.session;
   }
 
   FrameId get id => _id;
@@ -424,8 +424,15 @@ class Frame {
   LoaderId? get loaderId => _loaderId;
 
   /// Parent frame, if any. Detached frames and main frames return `null`.
-  Frame? get parentFrame => _parent;
+  Frame? get parentFrame => frameManager.frameTree.parentFrame(id);
 
+  /// @returns An array of child frames.
+  List<Frame> get childFrames {
+    return frameManager.frameTree.childFrames(id);
+  }
+
+  /// Navigates a frame to the given url.
+  ///
   /// The [Frame.goto] will throw an error if:
   /// - there's an SSL error (e.g. in case of self-signed certificates).
   /// - target URL is invalid.
@@ -467,9 +474,38 @@ class Frame {
   /// of multiple redirects, the navigation will resolve with the response of
   /// the last redirect.
   Future<Response> goto(String url,
-      {String? referrer, Duration? timeout, Until? wait}) {
-    return frameManager.navigateFrame(this, url,
-        referrer: referrer, timeout: timeout, wait: wait);
+      {String? referrer, Duration? timeout, Until? wait}) async {
+    referrer ??= frameManager.networkManager.extraHTTPHeaders['referer'];
+    var watcher = LifecycleWatcher(frameManager, this,
+        wait: wait,
+        timeout: timeout ?? frameManager.page.navigationTimeoutOrDefault);
+
+    Future<Object?> navigate() async {
+      var response =
+          await PageApi(_client).navigate(url, referrer: referrer, frameId: id);
+      if (response.errorText != null) {
+        throw Exception('${response.errorText} at $url');
+      }
+      await Future.any(
+          [watcher.newDocumentNavigation, watcher.sameDocumentNavigation]);
+      return null;
+    }
+
+    try {
+      var error = await Future.any([
+        navigate(),
+        watcher.timeoutOrTermination,
+      ]);
+
+      if (error != null) {
+        return Future.error(error);
+      }
+    } finally {
+      watcher.dispose();
+    }
+
+    return watcher.navigationResponse ??
+        Response.aborted(frameManager.page.devTools, watcher.navigationRequest);
   }
 
   Future<Response> waitForNavigation({Duration? timeout, Until? wait}) {
@@ -968,9 +1004,5 @@ class Frame {
     _detached = true;
     _mainWorld.detach();
     _secondaryWorld.detach();
-    if (_parent != null) {
-      _parent!.childFrames.remove(this);
-    }
-    _parent = null;
   }
 }
