@@ -55,7 +55,8 @@ class Keyboard {
   ///
   /// Parameters:
   /// [text]: If specified, generates an input event with this text.
-  Future<void> down(Key key, {String? text}) async {
+  Future<void> down(Key key, {String? text, bool? sendNativeCode}) async {
+    sendNativeCode ??= false;
     var description = _keyDescription(key);
 
     var autoRepeat = _pressedKeys.contains(description.code);
@@ -67,6 +68,7 @@ class Keyboard {
         text != null && text.isNotEmpty ? 'keyDown' : 'rawKeyDown',
         modifiers: _modifiers,
         windowsVirtualKeyCode: description.keyCode,
+        nativeVirtualKeyCode: sendNativeCode ? description.keyCode : null,
         code: description.code,
         key: description.key,
         text: text,
