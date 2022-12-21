@@ -192,7 +192,6 @@ class Page {
 
   Future<void> _onAttachedToTarget(
       Target createdTarget, Target? parentTarget) async {
-    _frameManager.onAttachedToTarget(createdTarget);
     var session = createdTarget.session;
     if (createdTarget.targetInfo.type == 'worker') {
       var worker = Worker(session!, createdTarget.targetInfo.url,
@@ -220,7 +219,7 @@ class Page {
     if (_fileChooserInterceptors.isEmpty) {
       return;
     }
-    var frame = _frameManager.frameById(event.frameId)!;
+    var frame = _frameManager.frame(event.frameId)!;
     var context = await frame.executionContext;
     var element = await context.adoptBackendNodeId(event.backendNodeId!);
 
@@ -392,7 +391,9 @@ class Page {
   /// The page's main frame.
   ///
   /// Page is guaranteed to have a main frame which persists during navigations.
-  Frame get mainFrame => _frameManager.mainFrame;
+  Frame get mainFrame => _frameManager.mainFrame!;
+
+  bool get hasMainFrame => _frameManager.mainFrame != null;
 
   Keyboard get keyboard => _keyboard;
 

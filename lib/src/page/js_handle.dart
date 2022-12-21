@@ -225,7 +225,7 @@ class ElementHandle extends JsHandle {
         .describeNode(objectId: remoteObject.objectId);
 
     if (nodeInfo.frameId == null) return null;
-    return frameManager.frameById(nodeInfo.frameId!);
+    return frameManager.frame(nodeInfo.frameId);
   }
 
   Future<void> _scrollIntoViewIfNeeded() async {
