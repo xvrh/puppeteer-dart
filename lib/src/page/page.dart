@@ -83,7 +83,7 @@ class Page {
   final Coverage coverage;
   final Tracing tracing;
   final Accessibility accessibility;
-  late final FrameManager _frameManager = FrameManager(this);
+  late final FrameManager _frameManager = FrameManager(session, this);
   final _workerCreated = StreamController<Worker>.broadcast(),
       _workerDestroyed = StreamController<Worker>.broadcast(),
       _onErrorController = StreamController<ClientError>.broadcast(),
@@ -433,7 +433,7 @@ class Page {
       // @see https://github.com/GoogleChrome/puppeteer/issues/3865
       return;
     }
-    var context = frameManager.executionContextById(event.executionContextId);
+    var context = frameManager.executionContextById(event.executionContextId, session);
     var values = event.args
         .map((arg) => JsHandle.fromRemoteObject(context, arg))
         .toList();

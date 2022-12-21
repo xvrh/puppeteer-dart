@@ -14,12 +14,13 @@ import 'mouse.dart';
 import 'network_manager.dart';
 import 'page.dart';
 
-const _utilityWorldName = '__cdt_utility_world__';
+const _utilityWorldName = '__puppeteer_utility_world__';
 
 class FrameManager {
+  final Session session;
   final Page page;
   late final NetworkManager _networkManager;
-  final _contextIdToContext = <ExecutionContextId, ExecutionContext>{};
+  final _contextIdToContext = <String, ExecutionContext>{};
   final _isolatedWorlds = <String?>{};
   final _lifecycleEventController = StreamController<Frame>.broadcast(),
       _frameAttachedController = StreamController<Frame>.broadcast(),
@@ -35,23 +36,26 @@ class FrameManager {
   /// frameNavigated event usually contains the latest information.
   final _frameNavigatedReceived = <FrameId>{};
 
-  FrameManager(this.page) {
-    _networkManager = NetworkManager(page.session, this);
-    _setupEventListeners(page.session);
+  FrameManager(this.session, this.page) {
+    _networkManager = NetworkManager(session, this);
+    _setupEventListeners(session);
   }
 
   void _setupEventListeners(Session session) {
     var pageApi = PageApi(session);
     var runtimeApi = RuntimeApi(session);
     pageApi.onFrameAttached.listen((event) =>
-        _onFrameAttached(page.session, event.frameId, event.parentFrameId));
+        _onFrameAttached(session, event.frameId, event.parentFrameId));
     pageApi.onFrameNavigated.listen((e) => _onFrameNavigated(e.frame));
     pageApi.onNavigatedWithinDocument.listen(_onFrameNavigatedWithinDocument);
     pageApi.onFrameDetached.listen(_onFrameDetached);
     pageApi.onFrameStoppedLoading.listen(_onFrameStoppedLoading);
-    runtimeApi.onExecutionContextCreated.listen(_onExecutionContextCreated);
-    runtimeApi.onExecutionContextDestroyed.listen(_onExecutionContextDestroyed);
-    runtimeApi.onExecutionContextsCleared.listen(_onExecutionContextsCleared);
+    runtimeApi.onExecutionContextCreated
+        .listen((e) => _onExecutionContextCreated(e, session));
+    runtimeApi.onExecutionContextDestroyed
+        .listen((e) => _onExecutionContextDestroyed(e, session));
+    runtimeApi.onExecutionContextsCleared
+        .listen((_) => _onExecutionContextsCleared(session));
     pageApi.onLifecycleEvent.listen(_onLifecycleEvent);
   }
 
@@ -81,7 +85,7 @@ class FrameManager {
   }
 
   Future initialize([Session? session]) async {
-    session ??= page.session;
+    session ??= this.session;
     var pageApi = PageApi(session);
     var runtimeApi = RuntimeApi(session);
     try {
@@ -91,7 +95,7 @@ class FrameManager {
         pageApi.setLifecycleEventsEnabled(true),
         runtimeApi.enable(),
         // TODO: Network manager is not aware of OOP iframes yet.
-        if (session == page.session) _networkManager.initialize()
+        if (session == this.session) _networkManager.initialize()
       ]);
 
       await _createIsolatedWorld(session, _utilityWorldName);
@@ -196,7 +200,7 @@ class FrameManager {
       }
       return;
     }
-    frame = Frame(this, page.session, parentFrameId, frameId);
+    frame = Frame(this, session, parentFrameId, frameId);
     frameTree.addFrame(frame);
     _frameAttachedController.add(frame);
   }
@@ -223,7 +227,7 @@ class FrameManager {
         frame._id = frameId;
       } else {
         // Initial main frame navigation.
-        frame = Frame(this, page.session, null, framePayload.id);
+        frame = Frame(this, session, null, framePayload.id);
       }
       frameTree.addFrame(frame);
     }
@@ -243,7 +247,7 @@ class FrameManager {
         '//# sourceURL=$evaluationScriptUrl',
         worldName: name);
 
-    await Future.wait(frames.map((frame) async {
+    await Future.wait(frames.where((frame) => frame._client == session).map((frame) async {
       try {
         await pageApi.createIsolatedWorld(frame.id,
             grantUniveralAccess: true, worldName: name);
@@ -278,15 +282,18 @@ class FrameManager {
     }
   }
 
-  void _onExecutionContextCreated(ExecutionContextDescription contextPayload) {
-    var frameId = contextPayload.auxData != null
-        ? contextPayload.auxData!['frameId'] as String?
-        : null;
+  void _onExecutionContextCreated(
+      ExecutionContextDescription contextPayload, Session session) {
+    var auxData = contextPayload.auxData;
+    var frameId = auxData != null ? auxData['frameId'] as String? : null;
     var frame = frameId != null ? frameById(FrameId(frameId)) : null;
     DomWorld? world;
     if (frame != null) {
-      if (contextPayload.auxData != null &&
-          contextPayload.auxData!['isDefault'] == true) {
+      // Only care about execution contexts created for the current session.
+      if (frame._client != session) {
+        return;
+      }
+      if (auxData != null && auxData['isDefault'] == true) {
         world = frame._mainWorld;
       } else if (contextPayload.name == _utilityWorldName &&
           !frame._secondaryWorld.hasContext) {
@@ -296,37 +303,44 @@ class FrameManager {
         world = frame._secondaryWorld;
       }
     }
-    if (contextPayload.auxData != null &&
-        contextPayload.auxData!['type'] == 'isolated') {
-      _isolatedWorlds.add(contextPayload.name);
-    }
-    var context = ExecutionContext(page.session, contextPayload, world);
+    var context =
+        ExecutionContext(frame?._client ?? page.session, contextPayload, world);
     if (world != null) {
       world.setContext(context);
     }
-    _contextIdToContext[contextPayload.id] = context;
+    _contextIdToContext['${session.sessionId}:${contextPayload.id}'] = context;
   }
 
-  void _onExecutionContextDestroyed(ExecutionContextId executionContextId) {
-    var context = _contextIdToContext[executionContextId];
+  void _onExecutionContextDestroyed(
+      ExecutionContextId executionContextId, Session session) {
+    var key = '${session.sessionId.value}:${executionContextId.value}';
+    var context = _contextIdToContext[key];
     if (context == null) {
       return;
     }
-    _contextIdToContext.remove(executionContextId);
+    _contextIdToContext.remove(key);
     if (context.world != null) {
       context.world!.setContext(null);
     }
   }
 
-  void _onExecutionContextsCleared(_) {
-    for (var context in _contextIdToContext.values) {
+  void _onExecutionContextsCleared(Session session) {
+    for (var entry in _contextIdToContext.entries.toList()) {
+      var context = entry.value;
+      // Make sure to only clear execution contexts that belong
+      // to the current session.
+      if (context.client != session) {
+        continue;
+      }
       if (context.world != null) context.world!.setContext(null);
+      _contextIdToContext.remove(entry.key);
     }
-    _contextIdToContext.clear();
   }
 
-  ExecutionContext executionContextById(ExecutionContextId contextId) {
-    var context = _contextIdToContext[contextId];
+  ExecutionContext executionContextById(
+      ExecutionContextId contextId, Session session) {
+    var key = '${session.sessionId.value}:${contextId.value}';
+    var context = _contextIdToContext[key];
     assert(context != null,
         'INTERNAL ERROR: missing context with id = ${contextId.value}');
     return context!;
@@ -403,7 +417,7 @@ class Frame {
   }
 
   bool get isOOPFrame {
-    return _client != frameManager.page.session;
+    return _client != frameManager.session;
   }
 
   FrameId get id => _id;

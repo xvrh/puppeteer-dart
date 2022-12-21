@@ -10,13 +10,21 @@ import 'mouse.dart';
 class DomWorld {
   final FrameManager frameManager;
   final Frame frame;
+  ElementHandle? _document;
   final _waitTasks = <WaitTask>{};
+  final _ctxBindings = <String>{};
   Completer<ExecutionContext>? _contextCompleter;
   Future<ElementHandle>? _documentFuture;
   bool _detached = false;
 
   DomWorld(this.frameManager, this.frame) {
     setContext(null);
+  }
+
+  void clearContext() {
+  document = undefined;
+  this.#puppeteerUtil = createDeferredPromise();
+  this.#context = createDeferredPromise();
   }
 
   void setContext(ExecutionContext? context) {
