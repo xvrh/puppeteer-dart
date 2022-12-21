@@ -120,7 +120,7 @@
 - [class: Accessibility](#class-accessibility)
   * [accessibility.snapshot](#accessibilitysnapshot)
 - [class: Keyboard](#class-keyboard)
-  * [keyboard.down](#keyboarddownkey-key-string-text)
+  * [keyboard.down](#keyboarddown)
   * [keyboard.press](#keyboardpress)
   * [keyboard.sendCharacter](#keyboardsendcharacterstring-text)
   * [keyboard.type](#keyboardtypestring-text-duration-delay)
@@ -2259,7 +2259,7 @@ await page.keyboard.up(Key.shift);
 
 > **NOTE** On MacOS, keyboard shortcuts like `⌘ A` -> Select All do not work. See [#1313](https://github.com/GoogleChrome/puppeteer/issues/1313)
 
-#### keyboard.down(Key key, {String? text})
+#### keyboard.down(...)
 Dispatches a `keydown` event.
 
 If `key` is a modifier key, `Shift`, `Meta`, `Control`, or `Alt`,
@@ -2277,7 +2277,7 @@ Parameters:
 [text]: If specified, generates an input event with this text.
 
 ```dart
-keyboard.down(Key key, {String? text}) → Future<void> 
+keyboard.down(Key key, {String? text, bool? sendNativeCode}) → Future<void> 
 ```
 
 #### keyboard.press(...)

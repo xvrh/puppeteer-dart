@@ -1061,7 +1061,7 @@ void main() {
           context.onTargetCreated.first.then((target) => target.page);
       await page
           .evaluate("() => window['newPage'] = window.open('about:blank')");
-      var newPage = (await newPageFuture)!;
+      var newPage = await newPageFuture;
       var closedFuture = newPage.onClose;
       await page.evaluate("() => window['newPage'].close()");
       await closedFuture;

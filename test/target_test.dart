@@ -67,7 +67,7 @@ void main() {
           context
               .waitForTarget((target) =>
                   target.url == server.crossProcessPrefix + '/empty.html')
-              .then((target) async => (await target.page)!),
+              .then((target) async => await target.page),
           [
             page.evaluate('url => window.open(url)',
                 args: [server.crossProcessPrefix + '/empty.html']),
@@ -180,7 +180,7 @@ void main() {
       ]);
       // Connect to the opened page.
       var target = await targetFuture;
-      var newPage = (await target.page)!;
+      var newPage = await target.page;
       // Issue a redirect.
       serverResponse.complete(shelf.Response.found('/injectedstyle.css'));
       // Wait for the new page to load.
@@ -192,7 +192,7 @@ void main() {
       await page.goto(server.emptyPage);
       var createdTarget = await waitFutures(context.onTargetCreated.first,
           [page.goto(server.prefix + '/popup/window-open.html')]);
-      expect((await createdTarget.page)!.url,
+      expect((await createdTarget.page).url,
           equals(server.prefix + '/popup/popup.html'));
       expect(createdTarget.opener, equals(page.target));
       expect(page.target.opener, isNull);

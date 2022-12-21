@@ -44,7 +44,7 @@ class Target {
       if (!openerPage.hasPopupListener) {
         return true;
       }
-      var popupPage = await page;
+      var popupPage = await pageOrNull;
       if (popupPage != null) {
         openerPage.emitPopup(popupPage);
       }
@@ -95,8 +95,12 @@ class Target {
         : null;
   }
 
+  Future<Page> get page async => (await pageOrNull)!;
+
+  bool get isPage => _isPageTarget(_info);
+
   /// If the target is not of type `"page"` or `"background_page"`, returns `null`.
-  Future<Page?> get page async {
+  Future<Page?> get pageOrNull async {
     if (_isPageTarget(_info) && _pageFuture == null) {
       var session = this.session;
       _pageFuture = (session != null
