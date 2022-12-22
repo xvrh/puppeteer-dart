@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:path/path.dart' as p;
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
@@ -55,11 +54,12 @@ void main() {
       devToolsTarget.type = 'page';
       final devToolsPage = await devToolsTarget.page;
       // Slight delay to guarantee that the extension panel has been added:
-      await Future.delayed(Duration(milliseconds: 500));
+      await Future.delayed(Duration(milliseconds: 1000));
       var panelTargetFuture =
           browser.waitForTarget((target) => target.url.contains('panel.html'));
       // Toggle to the last panel in Chrome DevTools:
-      await devToolsPage.keyboard.down(_modifierKey);
+      await devToolsPage.keyboard
+          .down(_modifierKey, sendNativeCode: Platform.isMacOS);
       await devToolsPage.keyboard.press(Key.bracketLeft);
       await devToolsPage.keyboard.press(_modifierKey);
       // Set the panel target type to be a "page":
