@@ -416,7 +416,7 @@ class WaitTask {
   final List? predicateArgs;
   final _completer = Completer<JsHandle>();
   int _runCount = 0;
-  late Timer _timeoutTimer;
+  Timer? _timeoutTimer;
   bool _terminated = false;
 
   WaitTask(this.domWorld, @Language('js') this.predicate,
@@ -490,7 +490,7 @@ class WaitTask {
   }
 
   void _cleanup() {
-    _timeoutTimer.cancel();
+    _timeoutTimer?.cancel();
     domWorld._waitTasks.remove(this);
   }
 }
