@@ -209,8 +209,6 @@ class FrameManager {
     var frameId = framePayload.id;
     var isMainFrame = framePayload.parentId == null;
     var frame = frameById(frameId);
-    assert(isMainFrame || frame != null,
-        'We either navigate top level or have old version of the navigated frame');
 
     // Detach all child frames first.
     if (frame != null) {
