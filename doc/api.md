@@ -157,6 +157,7 @@
   * [frame.$x](#framexstring-expression)
   * [frame.addScriptTag](#frameaddscripttag)
   * [frame.addStyleTag](#frameaddstyletag)
+  * [frame.childFrames](#framechildframes)
   * [frame.click](#frameclick)
   * [frame.content](#framecontent)
   * [frame.evaluate](#frameevaluate)
@@ -2711,6 +2712,13 @@ stylesheet's onload fires or when the CSS content was injected into frame.
 frame.addStyleTag({String? url, File? file, String? content}) → Future<ElementHandle> 
 ```
 
+#### frame.childFrames
+@returns An array of child frames.
+
+```dart
+frame.childFrames → List<Frame>
+```
+
 #### frame.click(...)
 This method fetches an element with `selector`, scrolls it into view if
 needed, and then uses [Page.mouse] to click in the center of the element.
@@ -2843,6 +2851,8 @@ frame.focus(String selector) → Future<void>
 ```
 
 #### frame.goto(...)
+Navigates a frame to the given url.
+
 The [Frame.goto] will throw an error if:
 - there's an SSL error (e.g. in case of self-signed certificates).
 - target URL is invalid.
