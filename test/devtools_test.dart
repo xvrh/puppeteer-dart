@@ -10,7 +10,8 @@ void main() {
   late Page page;
 
   setUpAll(() async {
-    var extensionPath = p.absolute('test', 'assets', 'simple-devtools-extension');
+    var extensionPath =
+        p.absolute('test', 'assets', 'simple-devtools-extension');
     var extensionOptions = [
       '--disable-extensions-except=$extensionPath',
       '--load-extension=$extensionPath',
