@@ -6,6 +6,7 @@ import 'click_test.dart' as click_test;
 import 'connect_on_web_test.dart' as connect_on_web_test;
 import 'coverage_test.dart' as coverage_test;
 import 'devices_test.dart' as devices_test;
+import 'devtools_test.dart' as devtools_test;
 import 'dialog_test.dart' as dialog_test;
 import 'doc_example_extractor_test.dart' as doc_example_extractor_test;
 import 'doc_examples_test.dart' as doc_examples_test;
@@ -48,6 +49,7 @@ void main() {
   group('connect_on_web_test', connect_on_web_test.main);
   group('coverage_test', coverage_test.main);
   group('devices_test', devices_test.main);
+  group('devtools_test', devtools_test.main);
   group('dialog_test', dialog_test.main);
   group('doc_example_extractor_test', doc_example_extractor_test.main);
   group('doc_examples_test', doc_examples_test.main);
