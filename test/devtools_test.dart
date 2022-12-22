@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:puppeteer/puppeteer.dart';
@@ -8,6 +9,7 @@ void main() {
   late Browser browser;
   late BrowserContext context;
   late Page page;
+  late Directory userDataDir;
 
   setUpAll(() async {
     var extensionPath =
@@ -17,11 +19,21 @@ void main() {
       '--load-extension=$extensionPath',
     ];
 
-    browser = await puppeteer.launch(devTools: true, args: extensionOptions);
+    userDataDir = _createUserDataDirectory(preferences: {
+      'devtools': {
+        'preferences': {
+          //'panel-selectedTab': jsonEncode('chrome-extension://kepbohpddinpiifpmamocdbccmmpfig'),
+          //'currentDockState': jsonEncode('undocked'),
+        }
+      }
+    });
+    browser = await puppeteer.launch(
+        devTools: true, args: extensionOptions, userDataDir: userDataDir.path);
   });
 
   tearDownAll(() async {
     await browser.close();
+    userDataDir.deleteSync(recursive: true);
   });
 
   setUp(() async {
@@ -56,6 +68,11 @@ void main() {
       final devToolsPage = await devToolsTarget.page;
       // Slight delay to guarantee that the extension panel has been added:
       await Future.delayed(Duration(milliseconds: 1000));
+
+      for (var target in browser.targets) {
+        print("Target ${target.url}");
+      }
+
       var panelTargetFuture =
           browser.waitForTarget((target) => target.url.contains('panel.html'));
       // Toggle to the last panel in Chrome DevTools:
@@ -76,3 +93,14 @@ void main() {
 }
 
 Key get _modifierKey => Platform.isMacOS ? Key.meta : Key.control;
+
+Directory _createUserDataDirectory({Map<String, dynamic>? preferences}) {
+  var dir = Directory.systemTemp.createTempSync('user_pref');
+  var defaultDir = Directory(p.join(dir.path, 'Default'))
+    ..createSync(recursive: true);
+  if (preferences != null) {
+    File(p.join(defaultDir.path, 'Preferences'))
+        .writeAsStringSync(jsonEncode(preferences));
+  }
+  return dir;
+}
