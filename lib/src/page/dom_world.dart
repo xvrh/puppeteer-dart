@@ -416,7 +416,7 @@ class WaitTask {
   final List? predicateArgs;
   final _completer = Completer<JsHandle>();
   int _runCount = 0;
-  late Timer _timeoutTimer;
+  Timer? _timeoutTimer;
   bool _terminated = false;
 
   WaitTask(this.domWorld, @Language('js') this.predicate,
@@ -426,12 +426,13 @@ class WaitTask {
       required this.predicateArgs}) {
     domWorld._waitTasks.add(this);
 
+    var timeout = this.timeout;
     // Since page navigation requires us to re-install the pageScript, we should track
     // timeout on our end.
-    if (timeout != null) {
+    if (timeout != null && timeout.inMicroseconds > 0) {
       var timeoutError = TimeoutException(
-          'waiting for $title failed: timeout ${timeout!.inMilliseconds}ms exceeded');
-      _timeoutTimer = Timer(timeout!, () => terminate(timeoutError));
+          'waiting for $title failed: timeout ${timeout.inMilliseconds}ms exceeded');
+      _timeoutTimer = Timer(timeout, () => terminate(timeoutError));
     }
     rerun();
   }
@@ -489,7 +490,7 @@ class WaitTask {
   }
 
   void _cleanup() {
-    _timeoutTimer.cancel();
+    _timeoutTimer?.cancel();
     domWorld._waitTasks.remove(this);
   }
 }

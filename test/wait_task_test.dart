@@ -375,6 +375,25 @@ void main() {
               .evaluate('x => x.textContent', args: [await waitForSelector]),
           equals('anything'));
     });
+    test('should disable timeout if Duration.zero is passed', () async {
+      var page = await browser.newPage();
+      await page.goto(server.emptyPage);
+      var frame = page.mainFrame;
+      var completed = false;
+      Object? error;
+      unawaited(frame
+          .waitForSelector('noexist', timeout: Duration.zero)
+          .whenComplete(() async {
+        completed = true;
+      }).catchError((e) {
+        error = e;
+      }));
+      await Future.delayed(const Duration(milliseconds: 500));
+      expect(completed, false);
+      await page.close();
+      expect(completed, true);
+      expect(error, isNotNull);
+    });
   });
 
   group('Frame.waitForXPath', () {
