@@ -6,10 +6,9 @@ import 'package:test/test.dart';
 
 void main() {
   late Browser browser;
-  late BrowserContext context;
   late Page page;
 
-  setUpAll(() async {
+  setUp(() async {
     var extensionPath =
         p.absolute('test', 'assets', 'simple-devtools-extension');
     var extensionOptions = [
@@ -18,19 +17,11 @@ void main() {
     ];
 
     browser = await puppeteer.launch(devTools: true, args: extensionOptions);
-  });
-
-  tearDownAll(() async {
-    await browser.close();
-  });
-
-  setUp(() async {
-    context = await browser.createIncognitoBrowserContext();
     page = (await browser.pages).first;
   });
 
   tearDown(() async {
-    await context.close();
+    await browser.close();
   });
 
   group('Chrome DevTools', () {
@@ -72,7 +63,7 @@ void main() {
       var panelElement = await frame.$OrNull('#simple-devtools-extension');
       expect(panelElement, isNotNull);
     });
-  });
+  }, retry: 3);
 }
 
 Key get _modifierKey => Platform.isMacOS ? Key.meta : Key.control;
