@@ -317,7 +317,7 @@ void main() {
       await page.close();
       expect(events, equals(['CREATED', 'CHANGED', 'DESTROYED']));
       await browser.close();
-    });
+    }, retry: 3);
   });
 
   group('Browser.Events.disconnected', () {
