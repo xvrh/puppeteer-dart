@@ -111,7 +111,7 @@ void main() {
       var fileChooser2 = choosers[1] as FileChooser;
       expect(fileChooser1, equals(fileChooser2));
     });
-  });
+  }, retry: 3);
 
   group('FileChooser.accept', () {
     test('should accept single file', () async {
