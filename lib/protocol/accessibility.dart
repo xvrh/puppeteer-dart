@@ -542,6 +542,7 @@ class AXPropertyName {
   static const notVisible = AXPropertyName._('notVisible');
   static const labelFor = AXPropertyName._('labelFor');
   static const presentationalRole = AXPropertyName._('presentationalRole');
+  static const emptyAlt = AXPropertyName._('emptyAlt');
   static const values = {
     'busy': busy,
     'disabled': disabled,
@@ -589,6 +590,7 @@ class AXPropertyName {
     'notVisible': notVisible,
     'labelFor': labelFor,
     'presentationalRole': presentationalRole,
+    'emptyAlt': emptyAlt,
   };
 
   final String value;

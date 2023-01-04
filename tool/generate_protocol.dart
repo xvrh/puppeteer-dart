@@ -781,6 +781,7 @@ void _applyTemporaryFixes(List<Domain> domains) {
     'notVisible',
     'labelFor',
     'presentationalRole',
+    'emptyAlt',
   ];
   assert(!newAxPropertyNames.any((e) => axPropertyNameEnums.contains(e)));
   axPropertyNameEnums.addAll(newAxPropertyNames);
