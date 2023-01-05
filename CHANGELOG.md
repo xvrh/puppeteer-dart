@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.9.2
+- Add one more missing `AXPropertyName` entry.
+
 ## 2.9.1
 - Add missing `AXPropertyName` entries.
 
