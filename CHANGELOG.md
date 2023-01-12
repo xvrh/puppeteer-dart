@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.21.0
+- Update to Chromium 110
+
 ## 2.20.0
 - Fixed a bug: `page.waitForSelector('#selector', timeout: Duration.zero)` throws instantly instead of disabling timeout #210.
 - Internal refactor of target management to use auto discover feature of Chromium.

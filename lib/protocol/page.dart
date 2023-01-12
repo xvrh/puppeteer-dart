@@ -818,8 +818,10 @@ class PageApi {
   /// Sets the Secure Payment Confirmation transaction mode.
   /// https://w3c.github.io/secure-payment-confirmation/#sctn-automation-set-spc-transaction-mode
   Future<void> setSPCTransactionMode(
-      @Enum(['none', 'autoaccept', 'autoreject']) String mode) async {
-    assert(const ['none', 'autoaccept', 'autoreject'].contains(mode));
+      @Enum(['none', 'autoAccept', 'autoReject', 'autoOptOut'])
+          String mode) async {
+    assert(const ['none', 'autoAccept', 'autoReject', 'autoOptOut']
+        .contains(mode));
     await _client.send('Page.setSPCTransactionMode', {
       'mode': mode,
     });
@@ -1686,6 +1688,7 @@ enum PermissionsPolicyFeature {
   serial('serial'),
   sharedAutofill('shared-autofill'),
   sharedStorage('shared-storage'),
+  smartCard('smart-card'),
   storageAccess('storage-access'),
   syncXhr('sync-xhr'),
   trustTokenRedemption('trust-token-redemption'),
@@ -2970,6 +2973,7 @@ enum BackForwardCacheNotRestoredReason {
   injectedStyleSheet('InjectedStyleSheet'),
   keepaliveRequest('KeepaliveRequest'),
   dummy('Dummy'),
+  authorizationHeader('AuthorizationHeader'),
   contentSecurityHandler('ContentSecurityHandler'),
   contentWebAuthenticationApi('ContentWebAuthenticationAPI'),
   contentFileChooser('ContentFileChooser'),
@@ -3158,6 +3162,8 @@ enum PrerenderFinalStatus {
       'SameSiteCrossOriginNavigationNotOptIn'),
   activationNavigationParameterMismatch(
       'ActivationNavigationParameterMismatch'),
+  activatedInBackground('ActivatedInBackground'),
+  embedderHostDisallowed('EmbedderHostDisallowed'),
   ;
 
   final String value;

@@ -161,6 +161,8 @@ enum CookieExclusionReason {
   excludeInvalidSameParty('ExcludeInvalidSameParty'),
   excludeSamePartyCrossPartyContext('ExcludeSamePartyCrossPartyContext'),
   excludeDomainNonAscii('ExcludeDomainNonASCII'),
+  excludeThirdPartyCookieBlockedInFirstPartySet(
+      'ExcludeThirdPartyCookieBlockedInFirstPartySet'),
   ;
 
   final String value;
@@ -1266,14 +1268,14 @@ class FederatedAuthRequestIssueDetails {
 enum FederatedAuthRequestIssueReason {
   shouldEmbargo('ShouldEmbargo'),
   tooManyRequests('TooManyRequests'),
-  manifestListHttpNotFound('ManifestListHttpNotFound'),
-  manifestListNoResponse('ManifestListNoResponse'),
-  manifestListInvalidResponse('ManifestListInvalidResponse'),
-  manifestNotInManifestList('ManifestNotInManifestList'),
-  manifestListTooBig('ManifestListTooBig'),
-  manifestHttpNotFound('ManifestHttpNotFound'),
-  manifestNoResponse('ManifestNoResponse'),
-  manifestInvalidResponse('ManifestInvalidResponse'),
+  wellKnownHttpNotFound('WellKnownHttpNotFound'),
+  wellKnownNoResponse('WellKnownNoResponse'),
+  wellKnownInvalidResponse('WellKnownInvalidResponse'),
+  configNotInWellKnown('ConfigNotInWellKnown'),
+  wellKnownTooBig('WellKnownTooBig'),
+  configHttpNotFound('ConfigHttpNotFound'),
+  configNoResponse('ConfigNoResponse'),
+  configInvalidResponse('ConfigInvalidResponse'),
   clientMetadataHttpNotFound('ClientMetadataHttpNotFound'),
   clientMetadataNoResponse('ClientMetadataNoResponse'),
   clientMetadataInvalidResponse('ClientMetadataInvalidResponse'),

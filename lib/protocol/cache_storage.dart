@@ -25,11 +25,15 @@ class CacheStorageApi {
   }
 
   /// Requests cache names.
-  /// [securityOrigin] Security origin.
+  /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
+  /// Security origin.
+  /// [storageKey] Storage key.
   /// Returns: Caches for the security origin.
-  Future<List<Cache>> requestCacheNames(String securityOrigin) async {
+  Future<List<Cache>> requestCacheNames(
+      {String? securityOrigin, String? storageKey}) async {
     var result = await _client.send('CacheStorage.requestCacheNames', {
-      'securityOrigin': securityOrigin,
+      if (securityOrigin != null) 'securityOrigin': securityOrigin,
+      if (storageKey != null) 'storageKey': storageKey,
     });
     return (result['caches'] as List)
         .map((e) => Cache.fromJson(e as Map<String, dynamic>))
@@ -208,18 +212,23 @@ class Cache {
   /// Security origin of the cache.
   final String securityOrigin;
 
+  /// Storage key of the cache.
+  final String storageKey;
+
   /// The name of the cache.
   final String cacheName;
 
   Cache(
       {required this.cacheId,
       required this.securityOrigin,
+      required this.storageKey,
       required this.cacheName});
 
   factory Cache.fromJson(Map<String, dynamic> json) {
     return Cache(
       cacheId: CacheId.fromJson(json['cacheId'] as String),
       securityOrigin: json['securityOrigin'] as String,
+      storageKey: json['storageKey'] as String,
       cacheName: json['cacheName'] as String,
     );
   }
@@ -228,6 +237,7 @@ class Cache {
     return {
       'cacheId': cacheId.toJson(),
       'securityOrigin': securityOrigin,
+      'storageKey': storageKey,
       'cacheName': cacheName,
     };
   }
