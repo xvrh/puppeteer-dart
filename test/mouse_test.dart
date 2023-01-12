@@ -62,12 +62,12 @@ function dimensions() {
 }''');
       await page.mouse.click(Point(50, 60));
       var event = await page.evaluate<Map>('() => window.clickPromise');
-      expect(event['type'], equals('click'));
-      expect(event['detail'], equals(1));
-      expect(event['clientX'], equals(50));
-      expect(event['clientY'], equals(60));
+      expect(event['type'], 'click');
+      expect(event['detail'], 1);
+      expect(event['clientX'], 50);
+      expect(event['clientY'], 60);
       expect(event['isTrusted'], isTrue);
-      expect(event['button'], equals(0));
+      expect(event['button'], 0);
     });
     test('should resize the textarea', () async {
       await page.goto('${server.prefix}/input/textarea.html');
@@ -80,8 +80,8 @@ function dimensions() {
           dimensions.top + dimensions.height + 100));
       await mouse.up();
       var newDimensions = await getDimensions();
-      expect(newDimensions.width, equals((dimensions.width + 104).round()));
-      expect(newDimensions.height, equals((dimensions.height + 104).round()));
+      expect(newDimensions.width, (dimensions.width + 104).round());
+      expect(newDimensions.height, (dimensions.height + 104).round());
     });
     test('should select the text with mouse', () async {
       await page.goto('${server.prefix}/input/textarea.html');
@@ -101,7 +101,7 @@ function dimensions() {
       expect(await page.evaluate('''() => {
       var textarea = document.querySelector('textarea');
       return textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
-      }'''), equals(text));
+      }'''), text);
     });
     test('should trigger hover state', () async {
       await page.goto('${server.prefix}/input/scrollable.html');
@@ -109,17 +109,17 @@ function dimensions() {
       expect(
           await page
               .evaluate("() => document.querySelector('button:hover').id"),
-          equals('button-6'));
+          'button-6');
       await page.hover('#button-2');
       expect(
           await page
               .evaluate("() => document.querySelector('button:hover').id"),
-          equals('button-2'));
+          'button-2');
       await page.hover('#button-91');
       expect(
           await page
               .evaluate("() => document.querySelector('button:hover').id"),
-          equals('button-91'));
+          'button-91');
     });
     test('should trigger hover state with removed window.Node', () async {
       await page.goto('${server.prefix}/input/scrollable.html');
@@ -128,7 +128,7 @@ function dimensions() {
       expect(
           await page
               .evaluate("() => document.querySelector('button:hover').id"),
-          equals('button-6'));
+          'button-6');
     });
     test('should set modifier keys on click', () async {
       await page.goto('${server.prefix}/input/scrollable.html');
@@ -211,7 +211,7 @@ function dimensions() {
 
       await page.mouse.click(Point(30, 40));
 
-      expect(await page.evaluate('result'), equals({'x': 30, 'y': 40}));
+      expect(await page.evaluate('result'), {'x': 30, 'y': 40});
     });
   });
 }

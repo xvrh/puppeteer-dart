@@ -3456,10 +3456,8 @@ the promise to resolve and return its value.
 Examples:
 ```dart
 var tweetHandle = await page.$('.tweet');
-expect(await tweetHandle.$eval('.like', 'node => node.innerText'),
-    equals('100'));
-expect(await tweetHandle.$eval('.retweets', 'node => node.innerText'),
-    equals('10'));
+expect(await tweetHandle.$eval('.like', 'node => node.innerText'), '100');
+expect(await tweetHandle.$eval('.retweets', 'node => node.innerText'), '10');
 ```
 
 Parameters:
@@ -3792,7 +3790,7 @@ For example, if the website `http://example.com` has a single redirect to
 var response = await page.goto('http://example.com');
 var chain = response.request.redirectChain;
 expect(chain, hasLength(1));
-expect(chain[0].url, equals('http://example.com'));
+expect(chain[0].url, 'http://example.com');
 ```
 
 If the website `https://example.com` has no redirects, then the chain will

@@ -27,10 +27,10 @@ void main() {
     await context.close();
   });
   test('Can find key', () {
-    expect(Key.allKeys['Meta'], equals(Key.meta));
-    expect(Key.allKeys['meta'], equals(Key.meta));
-    expect(Key.allKeys[' meta '], equals(Key.meta));
-    expect(Key.allKeys['Control'], equals(Key.control));
+    expect(Key.allKeys['Meta'], Key.meta);
+    expect(Key.allKeys['meta'], Key.meta);
+    expect(Key.allKeys[' meta '], Key.meta);
+    expect(Key.allKeys['Control'], Key.control);
     expect(Key.allKeys['notexist'], isNull);
     expect(Key.allKeys[''], isNull);
     expect(Key.allKeys[null], isNull);

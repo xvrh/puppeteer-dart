@@ -33,13 +33,13 @@ void main() {
     test('should click the button', () async {
       await page.goto(server.prefix + '/input/button.html');
       await page.click('button');
-      expect(await page.evaluate('() => result'), equals('Clicked'));
+      expect(await page.evaluate('() => result'), 'Clicked');
     });
     test('should click the button if window.Node is removed', () async {
       await page.goto(server.prefix + '/input/button.html');
       await page.evaluate('() => delete window.Node');
       await page.click('button');
-      expect(await page.evaluate('() => result'), equals('Clicked'));
+      expect(await page.evaluate('() => result'), 'Clicked');
     });
     // @see https://github.com/GoogleChrome/puppeteer/issues/4281
     test('should click on a span with an inline element inside', () async {
@@ -52,20 +52,20 @@ void main() {
   <span onclick='javascript:window.CLICKED=42'></span>
   ''');
       await page.click('span');
-      expect(await page.evaluate('() => window.CLICKED'), equals(42));
+      expect(await page.evaluate('() => window.CLICKED'), 42);
     });
     test('should click the button after navigation ', () async {
       await page.goto(server.prefix + '/input/button.html');
       await page.click('button');
       await page.goto(server.prefix + '/input/button.html');
       await page.click('button');
-      expect(await page.evaluate('() => result'), equals('Clicked'));
+      expect(await page.evaluate('() => result'), 'Clicked');
     });
     test('should click with disabled javascript', () async {
       await page.setJavaScriptEnabled(false);
       await page.goto(server.prefix + '/wrappedlink.html');
       await Future.wait([page.click('a'), page.waitForNavigation()]);
-      expect(page.url, equals(server.prefix + '/wrappedlink.html#clicked'));
+      expect(page.url, server.prefix + '/wrappedlink.html#clicked');
     });
     test('should click when one of inline box children is outside of viewport',
         () async {
@@ -79,7 +79,7 @@ void main() {
   <span onclick='javascript:window.CLICKED = 42;'><i>woof</i><b>doggo</b></span>
   ''');
       await page.click('span');
-      expect(await page.evaluate('() => window.CLICKED'), equals(42));
+      expect(await page.evaluate('() => window.CLICKED'), 42);
     });
     test('should select the text by triple clicking', () async {
       await page.goto(server.prefix + '/input/textarea.html');
@@ -93,7 +93,7 @@ void main() {
       expect(await page.evaluate('''() => {
   var textarea = document.querySelector('textarea');
   return textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
-  }'''), equals(text));
+  }'''), text);
     });
     test('should click offscreen buttons', () async {
       await page.goto(server.prefix + '/offscreenbuttons.html');
@@ -186,12 +186,12 @@ void main() {
       expect(
           await page.evaluate(
               "() => document.querySelector('#button-5').textContent"),
-          equals('clicked'));
+          'clicked');
       await page.click('#button-80');
       expect(
           await page.evaluate(
               "() => document.querySelector('#button-80').textContent"),
-          equals('clicked'));
+          'clicked');
     });
     test('should double click the button', () async {
       await page.goto(server.prefix + '/input/button.html');
@@ -205,7 +205,7 @@ void main() {
       var button = await page.$('button');
       await button.click(clickCount: 2);
       expect(await page.evaluate('double'), isTrue);
-      expect(await page.evaluate('result'), equals('Clicked'));
+      expect(await page.evaluate('result'), 'Clicked');
     });
     test('should click a partially obscured button', () async {
       await page.goto(server.prefix + '/input/button.html');

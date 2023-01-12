@@ -33,7 +33,7 @@ void main() {
     test('should work', () async {
       await page.goto(server.emptyPage);
       await attachFrame(page, 'frame1', server.emptyPage);
-      expect(page.frames.length, equals(2));
+      expect(page.frames.length, 2);
       var frames = page.frames;
       var frame1 = frames[0];
       var frame2 = frames[1];
@@ -42,8 +42,8 @@ void main() {
       expect(context1, isNotNull);
       expect(context2, isNotNull);
       expect(context1 != context2, isNotNull);
-      expect(context1.frame, equals(frame1));
-      expect(context2.frame, equals(frame2));
+      expect(context1.frame, frame1);
+      expect(context2.frame, frame2);
 
       await Future.wait([
         context1.evaluate('() => window.a = 1'),

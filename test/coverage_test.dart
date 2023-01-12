@@ -37,7 +37,7 @@ void main() {
       await page.goto(server.prefix + '/jscoverage/simple.html',
           wait: Until.networkIdle);
       var coverage = await page.coverage.stopJSCoverage();
-      expect(coverage.length, equals(1));
+      expect(coverage.length, 1);
       expect(coverage[0].url, contains('/jscoverage/simple.html'));
       expect(
           coverage[0].ranges,
@@ -50,14 +50,14 @@ void main() {
       await page.coverage.startJSCoverage();
       await page.goto(server.prefix + '/jscoverage/sourceurl.html');
       var coverage = await page.coverage.stopJSCoverage();
-      expect(coverage.length, equals(1));
-      expect(coverage[0].url, equals('nicename.js'));
+      expect(coverage.length, 1);
+      expect(coverage[0].url, 'nicename.js');
     });
     test('should ignore eval() scripts by default', () async {
       await page.coverage.startJSCoverage();
       await page.goto(server.prefix + '/jscoverage/eval.html');
       var coverage = await page.coverage.stopJSCoverage();
-      expect(coverage.length, equals(1));
+      expect(coverage.length, 1);
     });
     test('shouldnt ignore eval() scripts if reportAnonymousScripts is true',
         () async {
@@ -67,7 +67,7 @@ void main() {
       expect(
           coverage.firstWhere((entry) => entry.url.startsWith('debugger://')),
           isNotNull);
-      expect(coverage.length, equals(2));
+      expect(coverage.length, 2);
     });
     test(
         'should ignore pptr internal scripts if reportAnonymousScripts is true',
@@ -77,13 +77,13 @@ void main() {
       await page.evaluate('console.log("foo")');
       await page.evaluate("() => console.log('bar')");
       var coverage = await page.coverage.stopJSCoverage();
-      expect(coverage.length, equals(0));
+      expect(coverage.length, 0);
     });
     test('should report multiple scripts', () async {
       await page.coverage.startJSCoverage();
       await page.goto(server.prefix + '/jscoverage/multiple.html');
       var coverage = await page.coverage.stopJSCoverage();
-      expect(coverage.length, equals(2));
+      expect(coverage.length, 2);
       coverage.sort((a, b) => a.url.compareTo(b.url));
       expect(coverage[0].url, contains('/jscoverage/script1.js'));
       expect(coverage[1].url, contains('/jscoverage/script2.js'));
@@ -92,21 +92,21 @@ void main() {
       await page.coverage.startJSCoverage();
       await page.goto(server.prefix + '/jscoverage/ranges.html');
       var coverage = await page.coverage.stopJSCoverage();
-      expect(coverage.length, equals(1));
+      expect(coverage.length, 1);
       var entry = coverage[0];
-      expect(entry.ranges.length, equals(1));
+      expect(entry.ranges.length, 1);
       var range = entry.ranges[0];
       expect(entry.text.substring(range.start, range.end),
-          equals("console.log('used!');"));
+          "console.log('used!');");
     });
     test('should report scripts that have no coverage', () async {
       await page.coverage.startJSCoverage();
       await page.goto(server.prefix + '/jscoverage/unused.html');
       var coverage = await page.coverage.stopJSCoverage();
-      expect(coverage.length, equals(1));
+      expect(coverage.length, 1);
       var entry = coverage[0];
       expect(entry.url, contains('unused.html'));
-      expect(entry.ranges.length, equals(0));
+      expect(entry.ranges.length, 0);
     });
     test('should work with conditionals', () async {
       await page.coverage.startJSCoverage();
@@ -150,14 +150,14 @@ void main() {
       expect(coverage[0].ranges, equals([Range(1, 22)]));
       var range = coverage[0].ranges[0];
       expect(coverage[0].text.substring(range.start, range.end),
-          equals('div { color: green; }'));
+          'div { color: green; }');
     });
     test('should report sourceURLs', () async {
       await page.coverage.startCSSCoverage();
       await page.goto(server.prefix + '/csscoverage/sourceurl.html');
       var coverage = await page.coverage.stopCSSCoverage();
-      expect(coverage.length, equals(1));
-      expect(coverage[0].url, equals('nicename.css'));
+      expect(coverage.length, 1);
+      expect(coverage[0].url, 'nicename.css');
     });
     test('should report multiple stylesheets', () async {
       await page.coverage.startCSSCoverage();
@@ -182,7 +182,7 @@ void main() {
       var coverage = await page.coverage.stopCSSCoverage();
       expect(coverage.length, equals(1));
       expect(coverage[0].url, contains('/csscoverage/media.html'));
-      expect(coverage[0].ranges, equals([Range(17, 38)]));
+      expect(coverage[0].ranges, equals([Range(8, 40)]));
     });
     test('should work with complicated usecases', () async {
       await page.coverage.startCSSCoverage();

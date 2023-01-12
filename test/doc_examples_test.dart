@@ -678,7 +678,7 @@ void main() {
         await page.keyboard.press(Key.backspace);
         // Result text will end up saying 'Hello!'
         //----
-        expect(await input.propertyValue('value'), equals('Hello!'));
+        expect(await input.propertyValue('value'), 'Hello!');
       });
       test(1, () async {
         var input = await page.$('input');
@@ -688,7 +688,7 @@ void main() {
         await page.keyboard.press(Key.keyA, text: 'A');
         await page.keyboard.up(Key.shift);
         //----
-        expect(await input.propertyValue('value'), equals('A'));
+        expect(await input.propertyValue('value'), 'A');
       });
     });
     test('sendCharacter', () async {
@@ -697,7 +697,7 @@ void main() {
       //----
       await page.keyboard.sendCharacter('嗨');
       //----
-      expect(await input.propertyValue('value'), equals('嗨'));
+      expect(await input.propertyValue('value'), '嗨');
     });
     test('type', () async {
       var input = await page.$('input');
@@ -709,7 +709,7 @@ void main() {
       // Types slower, like a user
       await page.keyboard.type('World', delay: Duration(milliseconds: 10));
       //----
-      expect(await input.propertyValue('value'), equals('HelloWorld'));
+      expect(await input.propertyValue('value'), 'HelloWorld');
     });
   });
   group('Mouse', () {
@@ -862,10 +862,9 @@ void main() {
       await page.goto(server.assetUrl('feed.html'));
       //---
       var tweetHandle = await page.$('.tweet');
-      expect(await tweetHandle.$eval('.like', 'node => node.innerText'),
-          equals('100'));
-      expect(await tweetHandle.$eval('.retweets', 'node => node.innerText'),
-          equals('10'));
+      expect(await tweetHandle.$eval('.like', 'node => node.innerText'), '100');
+      expect(
+          await tweetHandle.$eval('.retweets', 'node => node.innerText'), '10');
       //--
     });
     group('type', () {
@@ -925,10 +924,8 @@ void main() {
             exampleValue(server.assetUrl('empty2.html'), 'http://example.com'));
         var chain = response.request.redirectChain;
         expect(chain, hasLength(1));
-        expect(
-            chain[0].url,
-            equals(exampleValue(
-                server.assetUrl('empty2.html'), 'http://example.com')));
+        expect(chain[0].url,
+            exampleValue(server.assetUrl('empty2.html'), 'http://example.com'));
         //--
       });
       test(1, () async {

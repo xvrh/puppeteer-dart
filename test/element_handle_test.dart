@@ -34,7 +34,7 @@ void main() {
       await page.goto(server.assetUrl('simple.html'));
       var input = await page.$('input');
       var value = await input.propertyValue('value');
-      expect(value, equals('some text'));
+      expect(value, 'some text');
     });
 
     test('non existent property returns null', () async {
@@ -57,7 +57,7 @@ void main() {
       await page.goto(server.assetUrl('grid.html'));
       var elementHandle = await page.$('.box:nth-of-type(13)');
       var box = await elementHandle.boundingBox;
-      expect(box, equals(Rectangle(100, 50, 50, 50)));
+      expect(box, Rectangle(100, 50, 50, 50));
     });
     test('should handle nested frames', () async {
       await page.setViewport(DeviceViewport(width: 500, height: 500));

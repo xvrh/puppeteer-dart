@@ -110,8 +110,7 @@ void main() {
       await watchdog;
     });
     test('should return the success value as a JSHandle', () async {
-      expect(
-          await (await page.waitForFunction('() => 5')).jsonValue, equals(5));
+      expect(await (await page.waitForFunction('() => 5')).jsonValue, 5);
     });
     test('should return the window as a success value', () async {
       expect(await page.waitForFunction('() => window'), isNotNull);
@@ -191,7 +190,7 @@ void main() {
         page.setContent("<div class='zombo'>anything</div>"),
       ]);
       expect(await page.evaluate('x => x.textContent', args: [handle]),
-          equals('anything'));
+          'anything');
     });
 
     test('should resolve promise when node is added', () async {
@@ -202,7 +201,7 @@ void main() {
       await frame.evaluate(addElement, args: ['div']);
       var eHandle = await watchdog;
       var tagName = await eHandle!.property('tagName').then((e) => e.jsonValue);
-      expect(tagName, equals('DIV'));
+      expect(tagName, 'DIV');
     });
 
     test('should work when node is added through innerHTML', () async {
@@ -222,7 +221,7 @@ void main() {
       await otherFrame.evaluate(addElement, args: ['div']);
       await page.evaluate(addElement, args: ['div']);
       var eHandle = await watchdog;
-      expect(eHandle!.executionContext.frame, equals(page.mainFrame));
+      expect(eHandle!.executionContext.frame, page.mainFrame);
     });
 
     test('should run in specified frame', () async {
@@ -234,7 +233,7 @@ void main() {
       await frame1.evaluate(addElement, args: ['div']);
       await frame2.evaluate(addElement, args: ['div']);
       var eHandle = await waitForSelectorPromise;
-      expect(eHandle!.executionContext.frame, equals(frame2));
+      expect(eHandle!.executionContext.frame, frame2);
     });
 
     test('should throw when frame is detached', () async {
@@ -373,7 +372,7 @@ void main() {
       expect(
           await page
               .evaluate('x => x.textContent', args: [await waitForSelector]),
-          equals('anything'));
+          'anything');
     });
     test('should disable timeout if Duration.zero is passed', () async {
       var page = await browser.newPage();

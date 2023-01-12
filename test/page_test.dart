@@ -58,9 +58,9 @@ void main() {
       await newPage.click('body');
       var pageClosingPromise = newPage.close(runBeforeUnload: true);
       var dialog = await newPage.onDialog.first;
-      expect(dialog.type, equals(DialogType.beforeunload));
-      expect(dialog.defaultValue, equals(''));
-      expect(dialog.message, equals(''));
+      expect(dialog.type, DialogType.beforeunload);
+      expect(dialog.defaultValue, '');
+      expect(dialog.message, '');
       await dialog.accept();
       await pageClosingPromise;
     });
@@ -129,7 +129,7 @@ void main() {
           .then<Response?>((e) => e)
           .catchError((_) => null);
       var error = await onErrorFuture;
-      expect(error.message, equals('Page crashed!'));
+      expect(error.message, 'Page crashed!');
     });
   });
   group('Page.Events.Popup', () {
@@ -199,8 +199,7 @@ void main() {
 
     test('should be prompt by default', () async {
       await page.goto(server.emptyPage);
-      expect(await getPermission(page, PermissionType.geolocation),
-          equals('prompt'));
+      expect(await getPermission(page, PermissionType.geolocation), 'prompt');
     });
     test('should deny permission when not listed', () async {
       await page.goto(server.emptyPage);
@@ -250,7 +249,7 @@ void main() {
       expect(await page.evaluate('() => window.events'),
           equals(['prompt', 'denied', 'granted', 'prompt']));
     });
-    test('should isolate permissions between browser contexs', () async {
+    test('should isolate permissions between browser contexts', () async {
       await page.goto(server.emptyPage);
       var otherContext = await browser.createIncognitoBrowserContext();
       var otherPage = await otherContext.newPage();

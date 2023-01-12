@@ -41,7 +41,7 @@ void main() {
         }
       });
       await page.goto(server.emptyPage);
-      expect(requests.length, equals(1));
+      expect(requests.length, 1);
     });
     test('should fire for iframes', () async {
       var requests = <Request>[];
@@ -52,7 +52,7 @@ void main() {
       });
       await page.goto(server.emptyPage);
       await attachFrame(page, 'frame1', server.emptyPage);
-      expect(requests.length, equals(2));
+      expect(requests.length, 2);
     });
     test('should fire for fetches', () async {
       var requests = <Request>[];
@@ -63,7 +63,7 @@ void main() {
       });
       await page.goto(server.emptyPage);
       await page.evaluate("() => fetch('/empty.html')");
-      expect(requests.length, equals(2));
+      expect(requests.length, 2);
     });
   });
 
@@ -76,8 +76,8 @@ void main() {
         }
       });
       await page.goto(server.emptyPage);
-      expect(requests.length, equals(1));
-      expect(requests[0].frame, equals(page.mainFrame));
+      expect(requests.length, 1);
+      expect(requests[0].frame, page.mainFrame);
     });
     test('should work for subframe navigation request', () async {
       await page.goto(server.emptyPage);

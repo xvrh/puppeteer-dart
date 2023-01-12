@@ -50,8 +50,8 @@ void main() {
         backgroundPageTarget ??= await browserWithExtension
             .waitForTarget((target) => target.type == 'background_page');
         var page = await backgroundPageTarget.page;
-        expect(await page.evaluate('() => 2 * 3'), equals(6));
-        expect(await page.evaluate('() => window.MAGIC'), equals(42));
+        expect(await page.evaluate('() => 2 * 3'), 6);
+        expect(await page.evaluate('() => window.MAGIC'), 42);
       } finally {
         await browserWithExtension.close();
       }
@@ -61,7 +61,7 @@ void main() {
 
       try {
         var pages = (await browser.pages).map((page) => page.url);
-        expect(pages, equals(['about:blank']));
+        expect(pages, ['about:blank']);
       } finally {
         await browser.close();
       }
@@ -88,7 +88,7 @@ void main() {
         var headlessPage = await headlessBrowser.newPage();
         await headlessPage.goto(server.emptyPage);
         var cookie = await headlessPage.evaluate('() => document.cookie');
-        expect(cookie, equals('foo=true'));
+        expect(cookie, 'foo=true');
       } finally {
         await headlessBrowser.close();
       }
@@ -112,7 +112,7 @@ void main() {
     }''');
         await page.waitForSelector('iframe[src="https://google.com/"]');
         var urls = page.frames.map((frame) => frame.url).toList()..sort();
-        expect(urls, equals([server.emptyPage, 'https://google.com/']));
+        expect(urls, [server.emptyPage, 'https://google.com/']);
       } finally {
         await browser.close();
       }
@@ -153,16 +153,16 @@ void main() {
         var page2 = await browser.newPage();
 
         await page1.bringToFront();
-        expect(await page1.evaluate('() => document.visibilityState'),
-            equals('visible'));
-        expect(await page2.evaluate('() => document.visibilityState'),
-            equals('hidden'));
+        expect(
+            await page1.evaluate('() => document.visibilityState'), 'visible');
+        expect(
+            await page2.evaluate('() => document.visibilityState'), 'hidden');
 
         await page2.bringToFront();
-        expect(await page1.evaluate('() => document.visibilityState'),
-            equals('hidden'));
-        expect(await page2.evaluate('() => document.visibilityState'),
-            equals('visible'));
+        expect(
+            await page1.evaluate('() => document.visibilityState'), 'hidden');
+        expect(
+            await page2.evaluate('() => document.visibilityState'), 'visible');
 
         await page1.close();
         await page2.close();

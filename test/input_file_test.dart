@@ -40,7 +40,7 @@ void main() {
       var input = await page.$('input');
       await input.uploadFile([filePath]);
       expect(await page.evaluate('e => e.files[0].name', args: [input]),
-          equals('file-to-upload.txt'));
+          'file-to-upload.txt');
       expect(await page.evaluate('e => e.files[0].type', args: [input]),
           'text/plain');
       expect(await page.evaluate('''e => {
@@ -48,7 +48,7 @@ void main() {
       var promise = new Promise(fulfill => reader.onload = fulfill);
       reader.readAsText(e.files[0]);
       return promise.then(() => reader.result);
-      }''', args: [input]), equals('contents of the file'));
+      }''', args: [input]), 'contents of the file');
     });
   });
 
@@ -109,7 +109,7 @@ void main() {
       ]);
       var fileChooser1 = choosers[0] as FileChooser;
       var fileChooser2 = choosers[1] as FileChooser;
-      expect(fileChooser1, equals(fileChooser2));
+      expect(fileChooser1, fileChooser2);
     });
   }, retry: 3);
 
@@ -124,10 +124,9 @@ void main() {
         chooser.accept([File(fileToUpload)]),
         page.onMetrics.first
       ]);
-      expect(
-          await page.$eval('input', 'input => input.files.length'), equals(1));
+      expect(await page.$eval('input', 'input => input.files.length'), 1);
       expect(await page.$eval('input', 'input => input.files[0].name'),
-          equals('file-to-upload.txt'));
+          'file-to-upload.txt');
     });
     test('should be able to read selected file', () async {
       await page.setContent('<input type=file>');
@@ -142,7 +141,7 @@ void main() {
       var promise = new Promise(fulfill => reader.onload = fulfill);
       reader.readAsText(picker.files[0]);
       return promise.then(() => reader.result);
-      }'''), equals('contents of the file'));
+      }'''), 'contents of the file');
     });
     test('should be able to reset selected files with empty file list',
         () async {
@@ -155,14 +154,14 @@ void main() {
       picker.click();
       await new Promise(x => picker.oninput = x);
       return picker.files.length;
-      }'''), equals(1));
+      }'''), 1);
       // ignore: unawaited_futures
       page.waitForFileChooser().then((chooser) => chooser.accept([]));
       expect(await page.$eval('input', '''async picker => {
       picker.click();
       await new Promise(x => picker.oninput = x);
       return picker.files.length;
-      }'''), equals(0));
+      }'''), 0);
     });
     test('should not accept multiple files for single-file input', () async {
       await page.setContent('<input type=file>');

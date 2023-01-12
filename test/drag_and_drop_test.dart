@@ -43,7 +43,7 @@ void main() {
     var draggable = await page.$('#drag');
     var data = await draggable.drag(Point(1, 1));
 
-    expect(data.items.length, equals(1));
+    expect(data.items.length, 1);
     expect(await page.evaluate('() => globalThis.didDragStart'), isTrue);
   });
   test('should emit a dragEnter', () async {
