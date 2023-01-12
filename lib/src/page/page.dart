@@ -1511,7 +1511,7 @@ function deliverError(name, seq, message, stack) {
           format: localFormat.name,
           quality: quality,
           clip: roundedClip,
-          captureBeyondViewport: true);
+          captureBeyondViewport: false);
       if (shouldSetDefaultBackground) {
         await devTools.emulation.setDefaultBackgroundColorOverride();
       }
