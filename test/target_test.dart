@@ -45,7 +45,7 @@ void main() {
     test('Browser.pages should return all of the pages', () async {
       // The pages will be the testing page
       var allPages = await context.pages;
-      expect(allPages.length, equals(1));
+      expect(allPages.length, 1);
       expect(allPages, contains(page));
       expect(allPages[0], isNotNull);
     });
@@ -59,7 +59,7 @@ void main() {
       var allPages = await browser.pages;
       var originalPage = allPages.firstWhere((p) => p != page);
       expect(await originalPage.evaluate("() => ['Hello', 'world'].join(' ')"),
-          equals('Hello world'));
+          'Hello world');
       expect(await originalPage.$('body'), isNotNull);
     });
     test('should report when a new page is created and closed', () async {
@@ -74,7 +74,7 @@ void main() {
           ]);
       expect(otherPage.url, contains(server.crossProcessPrefix));
       expect(await otherPage.evaluate("() => ['Hello', 'world'].join(' ')"),
-          equals('Hello world'));
+          'Hello world');
       expect(await otherPage.$('body'), isNotNull);
 
       var allPages = await context.pages;
@@ -84,7 +84,7 @@ void main() {
       var closePagePromise =
           context.onTargetDestroyed.first.then((target) => target.page);
       await otherPage.close();
-      expect(await closePagePromise, equals(otherPage));
+      expect(await closePagePromise, otherPage);
 
       allPages =
           (await Future.wait(context.targets.map((target) => target.page)))
@@ -100,14 +100,14 @@ void main() {
 
       await page.goto(server.prefix + '/serviceworkers/empty/sw.html');
 
-      expect((await createdTarget).type, equals('service_worker'));
+      expect((await createdTarget).type, 'service_worker');
       expect((await createdTarget).url,
-          equals(server.prefix + '/serviceworkers/empty/sw.js'));
+          server.prefix + '/serviceworkers/empty/sw.js');
 
       var destroyedTarget = context.onTargetDestroyed.first;
       await page.evaluate(
           '() => window.registrationPromise.then(registration => registration.unregister())');
-      expect(await destroyedTarget, equals(await createdTarget));
+      expect(await destroyedTarget, await createdTarget);
     });
     test('should create a worker from a service worker', () async {
       var targetFuture =
@@ -117,7 +117,7 @@ void main() {
       var target = await targetFuture;
       var worker = (await target.worker)!;
       expect(await worker.evaluate('() => self.toString()'),
-          equals('[object ServiceWorkerGlobalScope]'));
+          '[object ServiceWorkerGlobalScope]');
     });
     test('should create a worker from a shared worker', () async {
       await page.goto(server.emptyPage);

@@ -30,29 +30,29 @@ void main() {
   });
 
   test('Evaluate simple value', () async {
-    expect(await page.evaluate('true'), equals(true));
-    expect(await page.evaluate('false'), equals(false));
+    expect(await page.evaluate('true'), isTrue);
+    expect(await page.evaluate('false'), isFalse);
     expect(await page.evaluate('undefined'), isNull);
     expect(await page.evaluate('null'), isNull);
-    expect(await page.evaluate('1'), equals(1));
-    expect(await page.evaluate('1.5'), equals(1.5));
-    expect(await page.evaluate('"Hello"'), equals('Hello'));
+    expect(await page.evaluate('1'), 1);
+    expect(await page.evaluate('1.5'), 1.5);
+    expect(await page.evaluate('"Hello"'), 'Hello');
   });
 
   test('Evaluate List', () async {
     expect(
         await page.evaluate('[true, false, undefined, null, 1, 1.5, "Hello"]'),
-        equals([true, false, null, null, 1, 1.5, 'Hello']));
+        [true, false, null, null, 1, 1.5, 'Hello']);
   });
 
   group('Page.evaluate', () {
     test('should work', () async {
       var result = await page.evaluate('() => 7 * 3');
-      expect(result, equals(21));
+      expect(result, 21);
     });
     test('should transfer BigInt', () async {
       var result = await page.evaluate('a => a', args: [BigInt.from(42)]);
-      expect(result, equals(BigInt.from(42)));
+      expect(result, BigInt.from(42));
     });
     test('should transfer NaN', () async {
       var result = await page.evaluate('a => a', args: [double.nan]);
@@ -77,7 +77,7 @@ void main() {
       var result = await page.evaluate('a => a', args: [
         [1, 2, 3]
       ]);
-      expect(result, equals([1, 2, 3]));
+      expect(result, [1, 2, 3]);
     });
     test('should transfer arrays as arrays, not objects', () async {
       var result = await page.evaluate('a => Array.isArray(a)', args: [
@@ -87,22 +87,22 @@ void main() {
     });
     test('should modify global environment', () async {
       await page.evaluate('() => window.globalVar = 123');
-      expect(await page.evaluate('globalVar'), equals(123));
+      expect(await page.evaluate('globalVar'), 123);
     });
     test('should evaluate in the page context', () async {
       await page.goto(server.prefix + '/global-var.html');
-      expect(await page.evaluate('globalVar'), equals(123));
+      expect(await page.evaluate('globalVar'), 123);
     });
     test('should return undefined for objects with symbols', () async {
       expect(await page.evaluate("() => [Symbol('foo4')]"), isNull);
     });
     test('should work with function shorthands', () async {
-      expect(await page.evaluate('(a, b) => { return a + b; }', args: [1, 2]),
-          equals(3));
+      expect(
+          await page.evaluate('(a, b) => { return a + b; }', args: [1, 2]), 3);
       expect(
           await page
               .evaluate('async (a, b) => { return a * b; }', args: [2, 4]),
-          equals(8));
+          8);
     });
     test('should work with unicode chars', () async {
       var result = await page.evaluate("a => a['中文字符']", args: [

@@ -29,9 +29,9 @@ void main() {
       await page.bringToFront();
       final devToolsTarget = browser.targets
           .firstWhere((target) => target.url.startsWith('devtools://devtools'));
-      expect(devToolsTarget.isPage, equals(false));
+      expect(devToolsTarget.isPage, isFalse);
       devToolsTarget.type = 'page';
-      expect(devToolsTarget.isPage, equals(true));
+      expect(devToolsTarget.isPage, isTrue);
     });
 
     // Note: The following test checks that an extension panel added by

@@ -140,6 +140,9 @@ class BackgroundServiceEvent {
   /// A list of event-specific information.
   final List<EventMetadata> eventMetadata;
 
+  /// Storage key this event belongs to.
+  final String storageKey;
+
   BackgroundServiceEvent(
       {required this.timestamp,
       required this.origin,
@@ -147,7 +150,8 @@ class BackgroundServiceEvent {
       required this.service,
       required this.eventName,
       required this.instanceId,
-      required this.eventMetadata});
+      required this.eventMetadata,
+      required this.storageKey});
 
   factory BackgroundServiceEvent.fromJson(Map<String, dynamic> json) {
     return BackgroundServiceEvent(
@@ -161,6 +165,7 @@ class BackgroundServiceEvent {
       eventMetadata: (json['eventMetadata'] as List)
           .map((e) => EventMetadata.fromJson(e as Map<String, dynamic>))
           .toList(),
+      storageKey: json['storageKey'] as String,
     );
   }
 
@@ -173,6 +178,7 @@ class BackgroundServiceEvent {
       'eventName': eventName,
       'instanceId': instanceId,
       'eventMetadata': eventMetadata.map((e) => e.toJson()).toList(),
+      'storageKey': storageKey,
     };
   }
 }

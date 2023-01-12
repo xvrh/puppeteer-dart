@@ -34,10 +34,8 @@ void main() {
           await server.waitForRequest('/one-style.css');
           remote.disconnect();
           var error = await navigationPromise;
-          expect(
-              error.toString(),
-              equals(
-                  'Exception: Navigation failed because browser has disconnected!'));
+          expect(error.toString(),
+              'Exception: Navigation failed because browser has disconnected!');
         } finally {
           await browser.close();
         }
@@ -137,8 +135,7 @@ void main() {
               await puppeteer.launch(userDataDir: userDataDir.absolute.path);
           var page2 = await browser2.newPage();
           await page2.goto(server.emptyPage);
-          expect(
-              await page2.evaluate('() => localStorage.hey'), equals('hello'));
+          expect(await page2.evaluate('() => localStorage.hey'), 'hello');
           await browser2.close();
         } finally {
           _tryDeleteDirectory(userDataDir);
@@ -158,7 +155,7 @@ void main() {
           var page2 = await browser2.newPage();
           await page2.goto(server.emptyPage);
           expect(await page2.evaluate('() => document.cookie'),
-              equals('doSomethingOnlyOnce=true'));
+              'doSomethingOnlyOnce=true');
           await browser2.close();
         } finally {
           _tryDeleteDirectory(userDataDir);
@@ -178,7 +175,7 @@ void main() {
       test('should work with no default arguments', () async {
         var browser = await puppeteer.launch(ignoreDefaultArgs: true);
         var page = await browser.newPage();
-        expect(await page.evaluate('11 * 11'), equals(121));
+        expect(await page.evaluate('11 * 11'), 121);
         await page.close();
         await browser.close();
       }, skip: 'manual test, it launches a browser headful');
@@ -188,7 +185,7 @@ void main() {
       test('should have default url when launching browser', () async {
         var browser = await puppeteer.launch();
         var pages = (await browser.pages).map((page) => page.url);
-        expect(pages, equals(['about:blank']));
+        expect(pages, ['about:blank']);
         await browser.close();
       });
       test('should have custom url when launching browser', () async {

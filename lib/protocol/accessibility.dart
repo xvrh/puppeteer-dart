@@ -487,6 +487,7 @@ enum AXPropertyName {
   notVisible('notVisible'),
   labelFor('labelFor'),
   presentationalRole('presentationalRole'),
+  emptyAlt('emptyAlt'),
   ;
 
   final String value;

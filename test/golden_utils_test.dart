@@ -21,6 +21,6 @@ void main() {
 
     var outputImage = Image.fromBytes(img1.width, img1.height, output);
 
-    expect(diff.data, equals(outputImage.data));
+    expect(diff.data, outputImage.data);
   });
 }

@@ -5,17 +5,17 @@ void main() {
   test('Extract snippets', () {
     var snippets = extractSnippets(_testFileCode);
 
-    expect(snippets[0].target, equals('Browser.class'));
-    expect(snippets[0].code, equals(r'''
+    expect(snippets[0].target, 'Browser.class');
+    expect(snippets[0].code, r'''
 main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   await page.goto('https://example.com');
   await browser.close();
-}'''));
+}''');
 
-    expect(snippets[1].target, equals('Browser.createIncognitoBrowserContext'));
-    expect(snippets[1].code, equals(r'''
+    expect(snippets[1].target, 'Browser.createIncognitoBrowserContext');
+    expect(snippets[1].code, r'''
 var browser = await puppeteer.launch();
 // Create a new incognito browser context.
 var context = await browser.createIncognitoBrowserContext();
@@ -23,11 +23,11 @@ var context = await browser.createIncognitoBrowserContext();
 var page = await context.newPage();
 // Do stuff
 await page.goto('https://example.com');
-await browser.close();'''));
+await browser.close();''');
 
-    expect(snippets[4].target, equals('Page.class'));
-    expect(snippets[4].index, equals(0));
-    expect(snippets[4].code, equals(r'''
+    expect(snippets[4].target, 'Page.class');
+    expect(snippets[4].index, 0);
+    expect(snippets[4].code, r'''
 import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
 
@@ -37,7 +37,7 @@ main() async {
   await page.goto('https://example.com');
   await File('screenshot.png').writeAsBytes(await page.screenshot());
   await browser.close();
-}'''));
+}''');
 
     expect(snippets[5].target, equals('Page.class'));
     expect(snippets[5].index, equals(1));

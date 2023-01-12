@@ -580,7 +580,6 @@ class UserAgentMetadata {
 /// Enum of image types that can be disabled.
 enum DisabledImageType {
   avif('avif'),
-  jxl('jxl'),
   webp('webp'),
   ;
 

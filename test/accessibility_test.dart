@@ -76,7 +76,7 @@ void main() {
               AXNode(role: 'menuitem', name: 'Second Option')
             ])
       ]);
-      expect(await page.accessibility.snapshot(), equals(golden));
+      expect(await page.accessibility.snapshot(), golden);
     });
     test('should report uninteresting nodes', () async {
       await page.setContent('<textarea>hi</textarea>');
@@ -96,7 +96,7 @@ void main() {
       expect(
           findFocusedNode(
               await page.accessibility.snapshot(interestingOnly: false)),
-          equals(golden));
+          golden);
     });
     test('roledescription', () async {
       await page
@@ -109,7 +109,7 @@ void main() {
       await page.setContent(
           '<a href="" role="slider" aria-orientation="vertical">11</a>');
       var snapshot = await page.accessibility.snapshot();
-      expect(snapshot.children[0].orientation, equals('vertical'));
+      expect(snapshot.children[0].orientation, 'vertical');
     });
     test('autocomplete', () async {
       await page.setContent('<input type="number" aria-autocomplete="list" />');
@@ -120,7 +120,7 @@ void main() {
       await page.setContent(
           '<div role="grid" tabIndex=-1 aria-multiselectable=true>hey</div>');
       var snapshot = await page.accessibility.snapshot();
-      expect(snapshot.children[0].multiSelectable, equals(true));
+      expect(snapshot.children[0].multiSelectable, isTrue);
     });
     test('keyshortcuts', () async {
       await page.setContent(

@@ -64,14 +64,14 @@ void main() {
   window.FOO = 123;
   return window;
   }''');
-      expect(await page.evaluate('e => e.FOO', args: [aHandle]), equals(123));
+      expect(await page.evaluate('e => e.FOO', args: [aHandle]), 123);
     });
     test('should work with primitives', () async {
       var aHandle = await page.evaluateHandle('''() => {
   window.FOO = 123;
   return window;
   }''');
-      expect(await page.evaluate('e => e.FOO', args: [aHandle]), equals(123));
+      expect(await page.evaluate('e => e.FOO', args: [aHandle]), 123);
     });
   });
 
@@ -83,7 +83,7 @@ void main() {
   three: 3
   })''');
       var twoHandle = await aHandle.property('two');
-      expect(await twoHandle.jsonValue, equals(2));
+      expect(await twoHandle.jsonValue, 2);
     });
   });
 
@@ -91,7 +91,7 @@ void main() {
     test('should work', () async {
       var aHandle = await page.evaluateHandle("() => ({foo: 'bar'})");
       var json = await aHandle.jsonValue;
-      expect(json, equals({'foo': 'bar'}));
+      expect(json, {'foo': 'bar'});
     });
     test('should not work with dates', () async {
       var dateHandle = await page

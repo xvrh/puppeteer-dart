@@ -31,15 +31,15 @@ void main() {
 
   group('Page.viewport', () {
     test('should get the proper viewport size', () async {
-      expect(page.viewport, equals(DeviceViewport(width: 800, height: 600)));
+      expect(page.viewport, DeviceViewport(width: 800, height: 600));
       await page.setViewport(DeviceViewport(width: 123, height: 456));
-      expect(page.viewport, equals(DeviceViewport(width: 123, height: 456)));
+      expect(page.viewport, DeviceViewport(width: 123, height: 456));
     });
     test('should support mobile emulation', () async {
       await page.goto(server.prefix + '/mobile.html');
-      expect(await page.evaluate('() => window.innerWidth'), equals(800));
+      expect(await page.evaluate('() => window.innerWidth'), 800);
       await page.setViewport(puppeteer.devices.iPhone6.viewport);
-      expect(await page.evaluate('() => window.innerWidth'), equals(375));
+      expect(await page.evaluate('() => window.innerWidth'), 375);
       await page.setViewport(DeviceViewport(width: 400, height: 300));
       expect(await page.evaluate('() => window.innerWidth'), equals(400));
     });

@@ -8,6 +8,16 @@ class WebAuthnApi {
 
   WebAuthnApi(this._client);
 
+  /// Triggered when a credential is added to an authenticator.
+  Stream<CredentialAddedEvent> get onCredentialAdded => _client.onEvent
+      .where((event) => event.name == 'WebAuthn.credentialAdded')
+      .map((event) => CredentialAddedEvent.fromJson(event.parameters));
+
+  /// Triggered when a credential is used in a webauthn assertion.
+  Stream<CredentialAssertedEvent> get onCredentialAsserted => _client.onEvent
+      .where((event) => event.name == 'WebAuthn.credentialAsserted')
+      .map((event) => CredentialAssertedEvent.fromJson(event.parameters));
+
   /// Enable the WebAuthn domain and start intercepting credential storage and
   /// retrieval with a virtual authenticator.
   /// [enableUI] Whether to enable the WebAuthn user interface. Enabling the UI is
@@ -125,6 +135,42 @@ class WebAuthnApi {
       'authenticatorId': authenticatorId,
       'enabled': enabled,
     });
+  }
+}
+
+class CredentialAddedEvent {
+  final AuthenticatorId authenticatorId;
+
+  final Credential credential;
+
+  CredentialAddedEvent(
+      {required this.authenticatorId, required this.credential});
+
+  factory CredentialAddedEvent.fromJson(Map<String, dynamic> json) {
+    return CredentialAddedEvent(
+      authenticatorId:
+          AuthenticatorId.fromJson(json['authenticatorId'] as String),
+      credential:
+          Credential.fromJson(json['credential'] as Map<String, dynamic>),
+    );
+  }
+}
+
+class CredentialAssertedEvent {
+  final AuthenticatorId authenticatorId;
+
+  final Credential credential;
+
+  CredentialAssertedEvent(
+      {required this.authenticatorId, required this.credential});
+
+  factory CredentialAssertedEvent.fromJson(Map<String, dynamic> json) {
+    return CredentialAssertedEvent(
+      authenticatorId:
+          AuthenticatorId.fromJson(json['authenticatorId'] as String),
+      credential:
+          Credential.fromJson(json['credential'] as Map<String, dynamic>),
+    );
   }
 }
 

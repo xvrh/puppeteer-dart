@@ -654,10 +654,8 @@ async function _(element, pageJavascriptEnabled) {
   /// Examples:
   /// ```dart
   /// var tweetHandle = await page.$('.tweet');
-  /// expect(await tweetHandle.$eval('.like', 'node => node.innerText'),
-  ///     equals('100'));
-  /// expect(await tweetHandle.$eval('.retweets', 'node => node.innerText'),
-  ///     equals('10'));
+  /// expect(await tweetHandle.$eval('.like', 'node => node.innerText'), '100');
+  /// expect(await tweetHandle.$eval('.retweets', 'node => node.innerText'), '10');
   /// ```
   ///
   /// Parameters:

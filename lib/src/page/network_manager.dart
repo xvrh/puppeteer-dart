@@ -295,7 +295,7 @@ class Request {
   /// var response = await page.goto('http://example.com');
   /// var chain = response.request.redirectChain;
   /// expect(chain, hasLength(1));
-  /// expect(chain[0].url, equals('http://example.com'));
+  /// expect(chain[0].url, 'http://example.com');
   /// ```
   ///
   /// If the website `https://example.com` has no redirects, then the chain will

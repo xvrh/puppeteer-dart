@@ -11,8 +11,8 @@ class TracingApi {
       .where((event) => event.name == 'Tracing.bufferUsage')
       .map((event) => BufferUsageEvent.fromJson(event.parameters));
 
-  /// Contains an bucket of collected trace events. When tracing is stopped collected events will be
-  /// send as a sequence of dataCollected events followed by tracingComplete event.
+  /// Contains a bucket of collected trace events. When tracing is stopped collected events will be
+  /// sent as a sequence of dataCollected events followed by tracingComplete event.
   Stream<List<Map<String, dynamic>>> get onDataCollected => _client.onEvent
       .where((event) => event.name == 'Tracing.dataCollected')
       .map((event) => (event.parameters['value'] as List)

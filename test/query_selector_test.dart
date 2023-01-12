@@ -33,14 +33,14 @@ void main() {
     test('should work', () async {
       await page.setContent('<section id="testAttribute">43543</section>');
       var idAttribute = await page.$eval('section', 'e => e.id');
-      expect(idAttribute, equals('testAttribute'));
+      expect(idAttribute, 'testAttribute');
     });
     test('should accept arguments', () async {
       await page.setContent('<section>hello</section>');
       var text = await page.$eval(
           'section', '(e, suffix) => e.textContent + suffix',
           args: [' world!']);
-      expect(text, equals('hello world!'));
+      expect(text, 'hello world!');
     });
     test('should accept ElementHandles as arguments', () async {
       await page.setContent('<section>hello</section><div> world</div>');
@@ -48,7 +48,7 @@ void main() {
       var text = await page.$eval(
           'section', '(e, div) => e.textContent + div.textContent',
           args: [divHandle]);
-      expect(text, equals('hello world'));
+      expect(text, 'hello world');
     });
     test('should throw error if no element is found', () async {
       expect(
@@ -64,7 +64,7 @@ void main() {
       await page
           .setContent('<div>hello</div><div>beautiful</div><div>world!</div>');
       var divsCount = await page.$$eval('div', 'divs => divs.length');
-      expect(divsCount, equals(3));
+      expect(divsCount, 3);
     });
   });
 

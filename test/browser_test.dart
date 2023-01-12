@@ -38,7 +38,7 @@ void main() {
   group('Browser.target', () {
     test('should return browser target', () async {
       var target = browser.target;
-      expect(target.type, equals('browser'));
+      expect(target.type, 'browser');
     }, skip: 'Investigate to use autoAttach and fix failure');
   });
 

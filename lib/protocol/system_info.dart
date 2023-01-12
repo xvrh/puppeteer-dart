@@ -13,6 +13,14 @@ class SystemInfoApi {
     return GetInfoResult.fromJson(result);
   }
 
+  /// Returns information about the feature state.
+  Future<bool> getFeatureState(String featureState) async {
+    var result = await _client.send('SystemInfo.getFeatureState', {
+      'featureState': featureState,
+    });
+    return result['featureEnabled'] as bool;
+  }
+
   /// Returns information about all running processes.
   /// Returns: An array of process info blocks.
   Future<List<ProcessInfo>> getProcessInfo() async {

@@ -453,6 +453,7 @@ enum PermissionType {
 enum PermissionSetting {
   granted('granted'),
   denied('denied'),
+  prompt('prompt'),
   ;
 
   final String value;

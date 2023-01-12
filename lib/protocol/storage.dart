@@ -17,9 +17,10 @@ class StorageApi {
               CacheStorageContentUpdatedEvent.fromJson(event.parameters));
 
   /// A cache has been added/deleted.
-  Stream<String> get onCacheStorageListUpdated => _client.onEvent
+  Stream<CacheStorageListUpdatedEvent> get onCacheStorageListUpdated => _client
+      .onEvent
       .where((event) => event.name == 'Storage.cacheStorageListUpdated')
-      .map((event) => event.parameters['origin'] as String);
+      .map((event) => CacheStorageListUpdatedEvent.fromJson(event.parameters));
 
   /// The origin's IndexedDB object store has been modified.
   Stream<IndexedDBContentUpdatedEvent> get onIndexedDBContentUpdated => _client
@@ -142,6 +143,14 @@ class StorageApi {
     });
   }
 
+  /// Registers storage key to be notified when an update occurs to its cache storage list.
+  /// [storageKey] Storage key.
+  Future<void> trackCacheStorageForStorageKey(String storageKey) async {
+    await _client.send('Storage.trackCacheStorageForStorageKey', {
+      'storageKey': storageKey,
+    });
+  }
+
   /// Registers origin to be notified when an update occurs to its IndexedDB.
   /// [origin] Security origin.
   Future<void> trackIndexedDBForOrigin(String origin) async {
@@ -163,6 +172,14 @@ class StorageApi {
   Future<void> untrackCacheStorageForOrigin(String origin) async {
     await _client.send('Storage.untrackCacheStorageForOrigin', {
       'origin': origin,
+    });
+  }
+
+  /// Unregisters storage key from receiving notifications for cache storage.
+  /// [storageKey] Storage key.
+  Future<void> untrackCacheStorageForStorageKey(String storageKey) async {
+    await _client.send('Storage.untrackCacheStorageForStorageKey', {
+      'storageKey': storageKey,
     });
   }
 
@@ -281,16 +298,40 @@ class CacheStorageContentUpdatedEvent {
   /// Origin to update.
   final String origin;
 
+  /// Storage key to update.
+  final String storageKey;
+
   /// Name of cache in origin.
   final String cacheName;
 
   CacheStorageContentUpdatedEvent(
-      {required this.origin, required this.cacheName});
+      {required this.origin,
+      required this.storageKey,
+      required this.cacheName});
 
   factory CacheStorageContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return CacheStorageContentUpdatedEvent(
       origin: json['origin'] as String,
+      storageKey: json['storageKey'] as String,
       cacheName: json['cacheName'] as String,
+    );
+  }
+}
+
+class CacheStorageListUpdatedEvent {
+  /// Origin to update.
+  final String origin;
+
+  /// Storage key to update.
+  final String storageKey;
+
+  CacheStorageListUpdatedEvent(
+      {required this.origin, required this.storageKey});
+
+  factory CacheStorageListUpdatedEvent.fromJson(Map<String, dynamic> json) {
+    return CacheStorageListUpdatedEvent(
+      origin: json['origin'] as String,
+      storageKey: json['storageKey'] as String,
     );
   }
 }
@@ -538,6 +579,7 @@ enum InterestGroupAccessType {
   join('join'),
   leave('leave'),
   update('update'),
+  loaded('loaded'),
   bid('bid'),
   win('win'),
   ;

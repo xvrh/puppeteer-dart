@@ -31,7 +31,7 @@ void main() {
       expect(defaultContext.isIncognito, isFalse);
       expect(() => defaultContext.close(),
           throwsA(predicate((e) => '$e'.contains('cannot be closed'))));
-      expect(browser.defaultBrowserContext, equals(defaultContext));
+      expect(browser.defaultBrowserContext, defaultContext);
     });
     test('should create new incognito context', () async {
       expect(browser.browserContexts, hasLength(1));
@@ -63,7 +63,7 @@ void main() {
           .evaluate('(url) => window.open(url)', args: [server.emptyPage]);
       var popupTarget = await popupTargetFuture;
 
-      expect(popupTarget.browserContext, equals(context));
+      expect(popupTarget.browserContext, context);
       await context.close();
     });
     test('should fire target events', () async {
@@ -100,7 +100,7 @@ void main() {
       expect(resolved, isFalse);
       await page.goto(server.emptyPage);
       var target = await targetPromise;
-      expect(await target.page, equals(page));
+      expect(await target.page, page);
       await context.close();
     });
     test('should timeout waiting for a non-existent target', () async {
@@ -139,19 +139,17 @@ void main() {
   }''');
 
       expect(context1.targets, hasLength(1));
-      expect(context1.targets[0], equals(page1.target));
+      expect(context1.targets[0], page1.target);
       expect(context2.targets, hasLength(1));
-      expect(context2.targets[0], equals(page2.target));
+      expect(context2.targets[0], page2.target);
 
       // Make sure pages don't share localstorage or cookies.
-      expect(await page1.evaluate("() => localStorage.getItem('name')"),
-          equals('page1'));
       expect(
-          await page1.evaluate('() => document.cookie'), equals('name=page1'));
-      expect(await page2.evaluate("() => localStorage.getItem('name')"),
-          equals('page2'));
+          await page1.evaluate("() => localStorage.getItem('name')"), 'page1');
+      expect(await page1.evaluate('() => document.cookie'), 'name=page1');
       expect(
-          await page2.evaluate('() => document.cookie'), equals('name=page2'));
+          await page2.evaluate("() => localStorage.getItem('name')"), 'page2');
+      expect(await page2.evaluate('() => document.cookie'), 'name=page2');
 
       // Cleanup contexts.
       await Future.wait([context1.close(), context2.close()]);

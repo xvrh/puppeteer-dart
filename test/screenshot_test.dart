@@ -190,7 +190,7 @@ void main() {
       expect(
           await page.evaluate(
               '() => ({ w: window.innerWidth, h: window.innerHeight })'),
-          equals({'w': 500, 'h': 500}));
+          {'w': 500, 'h': 500});
     });
     test('should scroll element into view', () async {
       await page.setViewport(
