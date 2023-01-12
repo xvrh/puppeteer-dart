@@ -246,8 +246,13 @@ void main() {
       expect(await page.evaluate('() => window.events'),
           equals(['prompt', 'denied', 'granted']));
       await context.clearPermissionOverrides();
-      expect(await page.evaluate('() => window.events'),
-          equals(['prompt', 'denied', 'granted'/*, 'prompt' TODO(xha): re-enable once fixed in Chromium*/]));
+      expect(
+          await page.evaluate('() => window.events'),
+          equals([
+            'prompt',
+            'denied',
+            'granted' /*, 'prompt' TODO(xha): re-enable once fixed in Chromium*/
+          ]));
     });
     test('should isolate permissions between browser contexts', () async {
       await page.goto(server.emptyPage);
