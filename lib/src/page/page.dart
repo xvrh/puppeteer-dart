@@ -1440,6 +1440,11 @@ function deliverError(name, seq, message, stack) {
   /// - [clip]: a [Rectangle] which specifies clipping region of the page.
   /// - [omitBackground]: Hides default white background and allows capturing
   ///   screenshots with transparency. Defaults to `false`.
+  /// - [captureBeyondViewport]: Capture the screenshot beyond the viewport.
+  ///   When false, cuts the screenshot by the viewport size. Defaults to `true`.
+  /// - [fromSurface]: Captures screenshot from the surface rather than the view.
+  ///   When false, works only in headful mode and ignores page viewport
+  ///  (but not browser window's bounds). Defaults to `true`.
   ///
   /// Returns:
   /// [Future] which resolves to a list of bytes with captured screenshot.
@@ -1451,13 +1456,17 @@ function deliverError(name, seq, message, stack) {
       bool? fullPage,
       Rectangle? clip,
       int? quality,
-      bool? omitBackground}) async {
+      bool? omitBackground,
+      bool? captureBeyondViewport,
+      bool? fromSurface}) async {
     return base64Decode(await screenshotBase64(
         format: format,
         fullPage: fullPage,
         clip: clip,
         quality: quality,
-        omitBackground: omitBackground));
+        omitBackground: omitBackground,
+        captureBeyondViewport: captureBeyondViewport,
+        fromSurface: fromSurface));
   }
 
   /// Parameters:
@@ -1470,6 +1479,11 @@ function deliverError(name, seq, message, stack) {
   /// - [clip]: a [Rectangle] which specifies clipping region of the page.
   /// - [omitBackground]: Hides default white background and allows capturing
   ///   screenshots with transparency. Defaults to `false`.
+  /// - [captureBeyondViewport]: Capture the screenshot beyond the viewport.
+  ///   When false, cuts the screenshot by the viewport size. Defaults to `true`.
+  /// - [fromSurface]: Captures screenshot from the surface rather than the view.
+  ///   When false, works only in headful mode and ignores page viewport
+  ///  (but not browser window's bounds). Defaults to `true`.
   ///
   /// Returns:
   /// [Future<String>] which resolves to the captured screenshot encoded in `base64`.
@@ -1481,9 +1495,13 @@ function deliverError(name, seq, message, stack) {
       bool? fullPage,
       Rectangle? clip,
       int? quality,
-      bool? omitBackground}) {
+      bool? omitBackground,
+      bool? captureBeyondViewport,
+      bool? fromSurface}) {
     final localFormat = format ?? ScreenshotFormat.png;
     final localFullPage = fullPage ?? false;
+    captureBeyondViewport ??= true;
+    fromSurface ??= true;
     omitBackground ??= false;
 
     assert(quality == null || localFormat == ScreenshotFormat.jpeg,
@@ -1524,7 +1542,8 @@ function deliverError(name, seq, message, stack) {
           format: localFormat.name,
           quality: quality,
           clip: roundedClip,
-          captureBeyondViewport: true);
+          captureBeyondViewport: captureBeyondViewport,
+          fromSurface: fromSurface);
       if (shouldSetDefaultBackground) {
         await devTools.emulation.setDefaultBackgroundColorOverride();
       }
