@@ -123,6 +123,19 @@ void main() {
       expect(base64Decode(screenshot),
           equalsGolden('test/golden/screenshot-sanity.png'));
     });
+    test('should work in "fromSurface: false" mode', () async {
+      var browser = await puppeteer.launch(headless: false);
+      try {
+        var page = await browser.newPage();
+        await page.setViewport(DeviceViewport(width: 500, height: 500));
+        await page.goto('${server.prefix}/grid.html');
+        var screenshot = await page.screenshot(fromSurface: false);
+        expect(screenshot,
+            equalsGolden('test/golden/screenshot-fromsurface-false.png'));
+      } finally {
+        await browser.close();
+      }
+    });
   },
       tags: ['golden'],
       //TODO(xha): re-enable once the current difference disappear
