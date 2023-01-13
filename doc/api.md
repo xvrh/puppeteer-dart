@@ -1617,7 +1617,8 @@ Parameters:
 - [clip]: a [Rectangle] which specifies clipping region of the page.
 - [omitBackground]: Hides default white background and allows capturing
   screenshots with transparency. Defaults to `false`.
-- [captureBeyondViewport]: Capture the screenshot beyond the viewport. Defaults to `true`.
+- [captureBeyondViewport]: Capture the screenshot beyond the viewport.
+  When false, cuts the screenshot by the viewport size. Defaults to `true`.
 
 Returns:
 [Future] which resolves to a list of bytes with captured screenshot.
@@ -1640,7 +1641,8 @@ Parameters:
 - [clip]: a [Rectangle] which specifies clipping region of the page.
 - [omitBackground]: Hides default white background and allows capturing
   screenshots with transparency. Defaults to `false`.
-- [captureBeyondViewport]: Capture the screenshot beyond the viewport. Defaults to `true`.
+- [captureBeyondViewport]: Capture the screenshot beyond the viewport.
+  When false, cuts the screenshot by the viewport size. Defaults to `true`.
 
 Returns:
 [Future<String>] which resolves to the captured screenshot encoded in `base64`.
