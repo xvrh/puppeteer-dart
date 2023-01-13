@@ -1619,6 +1619,11 @@ Parameters:
 - [clip]: a [Rectangle] which specifies clipping region of the page.
 - [omitBackground]: Hides default white background and allows capturing
   screenshots with transparency. Defaults to `false`.
+- [captureBeyondViewport]: Capture the screenshot beyond the viewport.
+  When false, cuts the screenshot by the viewport size. Defaults to `true`.
+- [fromSurface]: Captures screenshot from the surface rather than the view.
+  When false, works only in headful mode and ignores page viewport
+ (but not browser window's bounds). Defaults to `true`.
 
 Returns:
 [Future] which resolves to a list of bytes with captured screenshot.
@@ -1627,7 +1632,7 @@ Returns:
 https://crbug.com/741689 for discussion.
 
 ```dart
-page.screenshot({ScreenshotFormat? format, bool? fullPage, Rectangle? clip, int? quality, bool? omitBackground}) → Future<Uint8List> 
+page.screenshot({ScreenshotFormat? format, bool? fullPage, Rectangle? clip, int? quality, bool? omitBackground, bool? captureBeyondViewport, bool? fromSurface}) → Future<Uint8List> 
 ```
 
 #### page.screenshotBase64(...)
@@ -1641,6 +1646,11 @@ Parameters:
 - [clip]: a [Rectangle] which specifies clipping region of the page.
 - [omitBackground]: Hides default white background and allows capturing
   screenshots with transparency. Defaults to `false`.
+- [captureBeyondViewport]: Capture the screenshot beyond the viewport.
+  When false, cuts the screenshot by the viewport size. Defaults to `true`.
+- [fromSurface]: Captures screenshot from the surface rather than the view.
+  When false, works only in headful mode and ignores page viewport
+ (but not browser window's bounds). Defaults to `true`.
 
 Returns:
 [Future<String>] which resolves to the captured screenshot encoded in `base64`.
@@ -1649,7 +1659,7 @@ Returns:
 https://crbug.com/741689 for discussion.
 
 ```dart
-page.screenshotBase64({ScreenshotFormat? format, bool? fullPage, Rectangle? clip, int? quality, bool? omitBackground}) → Future<String> 
+page.screenshotBase64({ScreenshotFormat? format, bool? fullPage, Rectangle? clip, int? quality, bool? omitBackground, bool? captureBeyondViewport, bool? fromSurface}) → Future<String> 
 ```
 
 #### page.select(String selector, List\<String> values)
