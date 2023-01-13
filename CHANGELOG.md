@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.22.0
+- Add additional screenshot parameters
+
 ## 2.21.0
 - Update to Chromium 110
 
