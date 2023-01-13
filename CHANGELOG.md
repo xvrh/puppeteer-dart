@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.9.3
+- Add `captureBeyondViewport` parameter.
+
 ## 2.9.2
 - Add one more missing `AXPropertyName` entry.
 
