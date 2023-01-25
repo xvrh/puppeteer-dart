@@ -18,6 +18,16 @@ class RevisionInfo {
       required this.revision});
 }
 
+///
+/// Downloads the chrome revision specified by [revision] to the [cachePath] directory.
+/// ```dart
+/// await downloadChrome(
+///   revision: 1083080,
+///   cachePath: '.local-chromium',
+///   onDownloadProgress: (received, total) {
+///     print('downloaded $received of $total bytes');
+///   });
+/// ```
 Future<RevisionInfo> downloadChrome({
   int? revision,
   String? cachePath,
