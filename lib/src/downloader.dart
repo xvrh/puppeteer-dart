@@ -21,7 +21,7 @@ class RevisionInfo {
 Future<RevisionInfo> downloadChrome({
   int? revision,
   String? cachePath,
-  Function(int, int)? onRecieveProgress,
+  Function(int, int)? onDownloadProgress,
 }) async {
   revision ??= _lastRevision;
   cachePath ??= '.local-chromium';
@@ -38,7 +38,7 @@ Future<RevisionInfo> downloadChrome({
   if (!executableFile.existsSync()) {
     var url = _downloadUrl(revision);
     var zipPath = p.join(cachePath, '${revision}_${p.url.basename(url)}');
-    await _downloadFile(url, zipPath, onRecieveProgress);
+    await _downloadFile(url, zipPath, onDownloadProgress);
     _unzip(zipPath, revisionDirectory.path);
     File(zipPath).deleteSync();
   }
