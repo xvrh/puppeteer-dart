@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:archive/archive.dart';
-import 'package:dio/dio.dart';
+import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 
 const int _lastRevision = 1083080;
@@ -31,7 +31,7 @@ class RevisionInfo {
 Future<RevisionInfo> downloadChrome({
   int? revision,
   String? cachePath,
-  Function(int, int)? onDownloadProgress,
+  Function(int, int?)? onDownloadProgress,
 }) async {
   revision ??= _lastRevision;
   cachePath ??= '.local-chromium';
@@ -76,16 +76,23 @@ Future<RevisionInfo> downloadChrome({
 Future _downloadFile(
   String url,
   String output,
-  Function(int, int)? onRecieveProgress,
+  Function(int, int?)? onRecieveProgress,
 ) async {
-  final client = Dio();
-  await client.download(
-    url,
-    output,
-    onReceiveProgress: onRecieveProgress,
-  );
-  var ouputFile = File(output);
-  if (!ouputFile.existsSync() || ouputFile.lengthSync() == 0) {
+  final client = http.Client();
+  final response = await client.send(http.Request('get', Uri.parse(url)));
+  final totalBytes = response.contentLength;
+  final outputFile = File(output);
+  final outputSink = outputFile.openWrite();
+  var recievedBytes = 0;
+
+  await response.stream.map((s) {
+    recievedBytes += s.length;
+    onRecieveProgress?.call(recievedBytes, totalBytes);
+    return s;
+  }).pipe(outputSink);
+
+  client.close();
+  if (!outputFile.existsSync() || outputFile.lengthSync() == 0) {
     throw Exception('File was not downloaded from $url to $output');
   }
 }
