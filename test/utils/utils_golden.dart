@@ -62,8 +62,8 @@ Matcher equalsGolden(String goldenPath) {
 
 ImageDifference? _compareImages(
     Uint8List actualBytes, Uint8List expectedBytes) {
-  var actual = decodeImage(actualBytes)!;
-  var expected = decodeImage(expectedBytes)!;
+  var actual = decodeImage(actualBytes)!.convert(numChannels: 4);
+  var expected = decodeImage(expectedBytes)!.convert(numChannels: 4);
 
   if (expected.width != actual.width || expected.height != actual.height) {
     return SizeDifference(
