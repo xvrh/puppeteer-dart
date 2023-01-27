@@ -236,9 +236,10 @@ packages:
   image:
     dependency: "direct dev"
     description:
-      path: "../image"
-      relative: true
-    source: path
+      name: image
+      sha256: "1f9ecf99b08c92dedb699de1d28549f5d79b4423b48cf3f95d6968156db5dd67"
+      url: "https://pub.dev"
+    source: hosted
     version: "4.0.12"
   io:
     dependency: transitive
