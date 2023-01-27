@@ -17,7 +17,21 @@ class RevisionInfo {
       required this.revision});
 }
 
-Future<RevisionInfo> downloadChrome({int? revision, String? cachePath}) async {
+///
+/// Downloads the chrome revision specified by [revision] to the [cachePath] directory.
+/// ```dart
+/// await downloadChrome(
+///   revision: 1083080,
+///   cachePath: '.local-chromium',
+///   onDownloadProgress: (received, total) {
+///     print('downloaded $received of $total bytes');
+///   });
+/// ```
+Future<RevisionInfo> downloadChrome({
+  int? revision,
+  String? cachePath,
+  void Function(int received, int total)? onDownloadProgress,
+}) async {
   revision ??= _lastRevision;
   cachePath ??= '.local-chromium';
 
@@ -33,7 +47,7 @@ Future<RevisionInfo> downloadChrome({int? revision, String? cachePath}) async {
   if (!executableFile.existsSync()) {
     var url = _downloadUrl(revision);
     var zipPath = p.join(cachePath, '${revision}_${p.url.basename(url)}');
-    await _downloadFile(url, zipPath);
+    await _downloadFile(url, zipPath, onDownloadProgress);
     _unzip(zipPath, revisionDirectory.path);
     File(zipPath).deleteSync();
   }
@@ -58,14 +72,25 @@ Future<RevisionInfo> downloadChrome({int? revision, String? cachePath}) async {
       revision: revision);
 }
 
-Future _downloadFile(String url, String output) async {
-  var client = http.Client();
-  var response = await client.send(http.Request('get', Uri.parse(url)));
-  var ouputFile = File(output);
-  await response.stream.pipe(ouputFile.openWrite());
-  client.close();
+Future _downloadFile(
+  String url,
+  String output,
+  void Function(int, int)? onReceiveProgress,
+) async {
+  final client = http.Client();
+  final response = await client.send(http.Request('get', Uri.parse(url)));
+  final totalBytes = response.contentLength ?? 0;
+  final outputFile = File(output);
+  var receivedBytes = 0;
 
-  if (!ouputFile.existsSync() || ouputFile.lengthSync() == 0) {
+  await response.stream.map((s) {
+    receivedBytes += s.length;
+    onReceiveProgress?.call(receivedBytes, totalBytes);
+    return s;
+  }).pipe(outputFile.openWrite());
+
+  client.close();
+  if (!outputFile.existsSync() || outputFile.lengthSync() == 0) {
     throw Exception('File was not downloaded from $url to $output');
   }
 }
