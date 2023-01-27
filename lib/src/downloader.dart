@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:archive/archive.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
@@ -31,7 +30,7 @@ class RevisionInfo {
 Future<RevisionInfo> downloadChrome({
   int? revision,
   String? cachePath,
-  Function(int, int?)? onDownloadProgress,
+  void Function(int received, int total)? onDownloadProgress,
 }) async {
   revision ??= _lastRevision;
   cachePath ??= '.local-chromium';
@@ -76,20 +75,19 @@ Future<RevisionInfo> downloadChrome({
 Future _downloadFile(
   String url,
   String output,
-  Function(int, int?)? onRecieveProgress,
+  void Function(int, int)? onReceiveProgress,
 ) async {
   final client = http.Client();
   final response = await client.send(http.Request('get', Uri.parse(url)));
-  final totalBytes = response.contentLength;
+  final totalBytes = response.contentLength ?? 0;
   final outputFile = File(output);
-  final outputSink = outputFile.openWrite();
-  var recievedBytes = 0;
+  var receivedBytes = 0;
 
   await response.stream.map((s) {
-    recievedBytes += s.length;
-    onRecieveProgress?.call(recievedBytes, totalBytes);
+    receivedBytes += s.length;
+    onReceiveProgress?.call(receivedBytes, totalBytes);
     return s;
-  }).pipe(outputSink);
+  }).pipe(outputFile.openWrite());
 
   client.close();
   if (!outputFile.existsSync() || outputFile.lengthSync() == 0) {
