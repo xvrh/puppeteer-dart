@@ -386,6 +386,7 @@ void main() {
         completed = true;
       }).catchError((e) {
         error = e;
+        return null;
       }));
       await Future.delayed(const Duration(milliseconds: 500));
       expect(completed, false);
