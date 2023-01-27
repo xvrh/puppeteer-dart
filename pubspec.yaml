@@ -29,6 +29,7 @@ dev_dependencies:
   crypto:
   dart_style:
   image:
+    path: ../image
   json_annotation:
   json_serializable:
   lints:

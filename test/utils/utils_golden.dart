@@ -25,7 +25,7 @@ class _GoldenMatcher extends Matcher {
   }
 
   @override
-  bool matches(covariant List<int> item, Map matchState) {
+  bool matches(covariant Uint8List item, Map matchState) {
     if (_skipGoldenComparison) return true;
 
     var goldenFile = File(goldenPath);
@@ -61,7 +61,7 @@ Matcher equalsGolden(String goldenPath) {
 }
 
 ImageDifference? _compareImages(
-    List<int> actualBytes, List<int> expectedBytes) {
+    Uint8List actualBytes, Uint8List expectedBytes) {
   var actual = decodeImage(actualBytes)!;
   var expected = decodeImage(expectedBytes)!;
 
@@ -70,19 +70,19 @@ ImageDifference? _compareImages(
         expected.width, expected.height, actual.width, actual.height);
   }
 
-  var output = Uint8List(actual.data.buffer.lengthInBytes);
+  var output = Uint8List(actual.buffer.lengthInBytes);
 
   num threshold = 0.1;
   var count = pixelMatch(
-      Uint8List.view(expected.data.buffer), Uint8List.view(actual.data.buffer),
+      Uint8List.view(expected.buffer), Uint8List.view(actual.buffer),
       width: expected.width, height: expected.height, threshold: threshold);
   if (count > 0) {
     return ContentDifference(
         count,
         actualBytes,
         expectedBytes,
-        PngEncoder()
-            .encodeImage(Image.fromBytes(actual.width, actual.height, output)),
+        PngEncoder().encode(Image.fromBytes(
+            width: actual.width, height: actual.height, bytes: output.buffer)),
         usedThreshold: threshold);
   }
   return null;

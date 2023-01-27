@@ -218,11 +218,15 @@ void main() async {
 
   // On each frame, decode the image and use the "image" package to create an
   // animated gif.
-  var animation = image.Animation();
+  image.Image? animation;
   page.devTools.page.onScreencastFrame.listen((event) {
     var frame = image.decodePng(base64.decode(event.data));
     if (frame != null) {
-      animation.addFrame(frame);
+      if (animation == null) {
+        animation = frame;
+      } else {
+        animation!.addFrame(frame);
+      }
     }
   });
 
@@ -238,7 +242,7 @@ void main() async {
 
   // Encode all the frames in an animated Gif file.
   File('example/_rubkis_cube.gif')
-      .writeAsBytesSync(image.GifEncoder().encodeAnimation(animation)!);
+      .writeAsBytesSync(image.GifEncoder().encode(animation!));
 
   // Alternatively, we can save all the frames on disk and use ffmpeg to convert
   // it to a video file. (for example: ffmpeg -i frames/%3d.png -r 10 output.mp4)
