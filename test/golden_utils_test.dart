@@ -6,8 +6,8 @@ import 'utils/pixel_match.dart';
 
 void main() {
   test('pixelMatch', () {
-    Image readPng(String path) => decodePng(File(path).readAsBytesSync())!
-        .convert(numChannels: 4);
+    Image readPng(String path) =>
+        decodePng(File(path).readAsBytesSync())!.convert(numChannels: 4);
 
     var img1 = readPng('test/golden/2a.png');
     var img2 = readPng('test/golden/2b.png');
