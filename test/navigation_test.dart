@@ -481,6 +481,7 @@ void main() {
           .then<Response?>((e) => e)
           .catchError((e) {
         error = e;
+        return null;
       });
       await server.waitForRequest('/empty.html');
 
@@ -549,6 +550,7 @@ void main() {
       var navigationPromise =
           frame.waitForNavigation().then<Response?>((e) => e).catchError((e) {
         error = e;
+        return null;
       });
       await Future.wait([
         server.waitForRequest('/empty-for-frame.html'),

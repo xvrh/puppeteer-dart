@@ -6,21 +6,22 @@ import 'utils/pixel_match.dart';
 
 void main() {
   test('pixelMatch', () {
-    var img1 = decodeImage(File('test/golden/2a.png').readAsBytesSync())!;
-    var img2 = decodeImage(File('test/golden/2b.png').readAsBytesSync())!;
-    var diff = decodeImage(File('test/golden/2diff.png').readAsBytesSync())!;
-    var output = Uint8List(img1.data.buffer.lengthInBytes);
+    Image readPng(String path) =>
+        decodePng(File(path).readAsBytesSync())!.convert(numChannels: 4);
 
-    var count = pixelMatch(
-        Uint8List.view(img1.data.buffer), Uint8List.view(img2.data.buffer),
+    var img1 = readPng('test/golden/2a.png');
+    var img2 = readPng('test/golden/2b.png');
+    var diff = readPng('test/golden/2diff.png');
+    var output = Uint8List(img1.width * img2.height * 4);
+
+    var count = pixelMatch(img1.getBytes(order: ChannelOrder.rgba),
+        img2.getBytes(order: ChannelOrder.rgba),
         width: img1.width,
         height: img1.height,
         output: output,
         threshold: 0.05);
     expect(count, greaterThan(0));
 
-    var outputImage = Image.fromBytes(img1.width, img1.height, output);
-
-    expect(diff.data, outputImage.data);
+    expect(diff.getBytes(order: ChannelOrder.rgba), output);
   });
 }

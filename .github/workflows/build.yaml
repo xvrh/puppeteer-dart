@@ -23,7 +23,7 @@ jobs:
       - run: dart example/download_chromium.dart
       - run: xvfb-run --auto-servernum dart test -P ci --platform vm
         if: runner.os == 'Linux'
-      - run: dart test -P ci --platform vm
+      - run: dart test -P ci --platform vm --concurrency 1
         if: runner.os != 'Linux'
         env:
           PUPPETEER_SKIP_GOLDEN_COMPARISON: 'true'
