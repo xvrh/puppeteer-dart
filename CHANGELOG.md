@@ -2,6 +2,7 @@
 
 ## 2.22.0
 - Add additional screenshot parameters
+- Add `onDownloadProgress` callback on `downloadChrome` function
 
 ## 2.21.0
 - Update to Chromium 110
