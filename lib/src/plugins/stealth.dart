@@ -14,7 +14,7 @@ class StealthPlugin extends Plugin {
       _navigatorLanguages,
       _navigatorPermission,
       _navigatorPlugin,
-      _navigatorWebdriver,
+      // _navigatorWebdriver,
       _webglVendor,
       _windowOuterDimensions,
     ]) {
@@ -36,6 +36,9 @@ class StealthPlugin extends Plugin {
     // Have viewport match window size, unless specified by user
     if (options.defaultViewport == LaunchOptions.viewportNotSpecified) {
       options = options.replace(defaultViewport: null);
+
+
+      options.args.add('--disable-blink-features=AutomationControlled');
     }
 
     return options;
