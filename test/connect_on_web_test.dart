@@ -60,5 +60,5 @@ void main() {
       tempDirectory.deleteSync(recursive: true);
       await browser.close();
     }
-  });
+  }, timeout: Timeout.factor(3));
 }

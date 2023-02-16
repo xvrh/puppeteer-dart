@@ -22,10 +22,12 @@ class DomWorld {
   void setContext(ExecutionContext? context) {
     if (context != null) {
       _documentFuture = null;
-      _contextCompleter!.complete(context);
+      if (!_contextCompleter!.isCompleted) {
+        _contextCompleter!.complete(context);
 
-      for (var waitTask in _waitTasks) {
-        waitTask.rerun();
+        for (var waitTask in _waitTasks) {
+          waitTask.rerun();
+        }
       }
     } else {
       if (_contextCompleter != null && !_contextCompleter!.isCompleted) {
