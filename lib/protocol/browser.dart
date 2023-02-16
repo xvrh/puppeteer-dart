@@ -430,6 +430,7 @@ enum PermissionType {
   protectedMediaIdentifier('protectedMediaIdentifier'),
   sensors('sensors'),
   storageAccess('storageAccess'),
+  topLevelStorageAccess('topLevelStorageAccess'),
   videoCapture('videoCapture'),
   videoCapturePanTiltZoom('videoCapturePanTiltZoom'),
   wakeLockScreen('wakeLockScreen'),

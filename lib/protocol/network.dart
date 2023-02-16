@@ -358,7 +358,9 @@ class NetworkApi {
 
   /// Returns all browser cookies. Depending on the backend support, will return detailed cookie
   /// information in the `cookies` field.
+  /// Deprecated. Use Storage.getCookies instead.
   /// Returns: Array of cookie objects.
+  @Deprecated('Use Storage.getCookies instead')
   Future<List<Cookie>> getAllCookies() async {
     var result = await _client.send('Network.getAllCookies');
     return (result['cookies'] as List)
@@ -2494,9 +2496,9 @@ enum ServiceWorkerResponseSource {
 /// depending on the type, some additional parameters. The values
 /// are specified in third_party/blink/renderer/core/fetch/trust_token.idl.
 class TrustTokenParams {
-  final TrustTokenOperationType type;
+  final TrustTokenOperationType operation;
 
-  /// Only set for "token-redemption" type and determine whether
+  /// Only set for "token-redemption" operation and determine whether
   /// to request a fresh SRR or use a still valid cached SRR.
   final TrustTokenParamsRefreshPolicy refreshPolicy;
 
@@ -2505,11 +2507,11 @@ class TrustTokenParams {
   final List<String>? issuers;
 
   TrustTokenParams(
-      {required this.type, required this.refreshPolicy, this.issuers});
+      {required this.operation, required this.refreshPolicy, this.issuers});
 
   factory TrustTokenParams.fromJson(Map<String, dynamic> json) {
     return TrustTokenParams(
-      type: TrustTokenOperationType.fromJson(json['type'] as String),
+      operation: TrustTokenOperationType.fromJson(json['operation'] as String),
       refreshPolicy: TrustTokenParamsRefreshPolicy.fromJson(
           json['refreshPolicy'] as String),
       issuers: json.containsKey('issuers')
@@ -2520,7 +2522,7 @@ class TrustTokenParams {
 
   Map<String, dynamic> toJson() {
     return {
-      'type': type.toJson(),
+      'operation': operation.toJson(),
       'refreshPolicy': refreshPolicy,
       if (issuers != null) 'issuers': [...?issuers],
     };
@@ -4261,6 +4263,7 @@ enum TrustTokenOperationDoneEventStatus {
   resourceExhausted('ResourceExhausted'),
   alreadyExists('AlreadyExists'),
   unavailable('Unavailable'),
+  unauthorized('Unauthorized'),
   badResponse('BadResponse'),
   internalError('InternalError'),
   unknownError('UnknownError'),

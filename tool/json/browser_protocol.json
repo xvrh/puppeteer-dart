@@ -378,7 +378,7 @@
                         },
                         {
                             "name": "fetchRelatives",
-                            "description": "Whether to fetch this nodes ancestors, siblings and children. Defaults to true.",
+                            "description": "Whether to fetch this node's ancestors, siblings and children. Defaults to true.",
                             "optional": true,
                             "type": "boolean"
                         }
@@ -1535,7 +1535,15 @@
                     "type": "string",
                     "enum": [
                         "CrossOriginPortalPostMessageError",
-                        "FormLabelForNameError"
+                        "FormLabelForNameError",
+                        "FormDuplicateIdForInputError",
+                        "FormInputWithNoLabelError",
+                        "FormAutocompleteAttributeEmptyError",
+                        "FormEmptyIdAndNameAttributesForInputError",
+                        "FormAriaLabelledByToNonExistingId",
+                        "FormInputAssignedAutocompleteValueToIdOrNameAttributeError",
+                        "FormLabelHasNeitherForNorNestedInput",
+                        "FormLabelForMatchesNonExistingIdError"
                     ]
                 },
                 {
@@ -1561,67 +1569,6 @@
                     ]
                 },
                 {
-                    "id": "DeprecationIssueType",
-                    "type": "string",
-                    "enum": [
-                        "AuthorizationCoveredByWildcard",
-                        "CanRequestURLHTTPContainingNewline",
-                        "ChromeLoadTimesConnectionInfo",
-                        "ChromeLoadTimesFirstPaintAfterLoadTime",
-                        "ChromeLoadTimesWasAlternateProtocolAvailable",
-                        "CookieWithTruncatingChar",
-                        "CrossOriginAccessBasedOnDocumentDomain",
-                        "CrossOriginWindowAlert",
-                        "CrossOriginWindowConfirm",
-                        "CSSSelectorInternalMediaControlsOverlayCastButton",
-                        "DeprecationExample",
-                        "DocumentDomainSettingWithoutOriginAgentClusterHeader",
-                        "EventPath",
-                        "ExpectCTHeader",
-                        "GeolocationInsecureOrigin",
-                        "GeolocationInsecureOriginDeprecatedNotRemoved",
-                        "GetUserMediaInsecureOrigin",
-                        "HostCandidateAttributeGetter",
-                        "IdentityInCanMakePaymentEvent",
-                        "InsecurePrivateNetworkSubresourceRequest",
-                        "LocalCSSFileExtensionRejected",
-                        "MediaSourceAbortRemove",
-                        "MediaSourceDurationTruncatingBuffered",
-                        "NoSysexWebMIDIWithoutPermission",
-                        "NotificationInsecureOrigin",
-                        "NotificationPermissionRequestedIframe",
-                        "ObsoleteWebRtcCipherSuite",
-                        "OpenWebDatabaseInsecureContext",
-                        "OverflowVisibleOnReplacedElement",
-                        "PaymentInstruments",
-                        "PaymentRequestCSPViolation",
-                        "PersistentQuotaType",
-                        "PictureSourceSrc",
-                        "PrefixedCancelAnimationFrame",
-                        "PrefixedRequestAnimationFrame",
-                        "PrefixedStorageInfo",
-                        "PrefixedVideoDisplayingFullscreen",
-                        "PrefixedVideoEnterFullscreen",
-                        "PrefixedVideoEnterFullScreen",
-                        "PrefixedVideoExitFullscreen",
-                        "PrefixedVideoExitFullScreen",
-                        "PrefixedVideoSupportsFullscreen",
-                        "RangeExpand",
-                        "RequestedSubresourceWithEmbeddedCredentials",
-                        "RTCConstraintEnableDtlsSrtpFalse",
-                        "RTCConstraintEnableDtlsSrtpTrue",
-                        "RTCPeerConnectionComplexPlanBSdpUsingDefaultSdpSemantics",
-                        "RTCPeerConnectionSdpSemanticsPlanB",
-                        "RtcpMuxPolicyNegotiate",
-                        "SharedArrayBufferConstructedWithoutIsolation",
-                        "TextToSpeech_DisallowedByAutoplay",
-                        "V8SharedArrayBufferConstructedInExtensionWithoutIsolation",
-                        "XHRJSONEncodingDetection",
-                        "XMLHttpRequestSynchronousInNonWorkerOutsideBeforeUnload",
-                        "XRSupportsSession"
-                    ]
-                },
-                {
                     "id": "DeprecationIssueDetails",
                     "description": "This issue tracks information needed to print a deprecation message.\nhttps://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/frame/third_party/blink/renderer/core/frame/deprecation/README.md",
                     "type": "object",
@@ -1637,7 +1584,8 @@
                         },
                         {
                             "name": "type",
-                            "$ref": "DeprecationIssueType"
+                            "description": "One of the deprecation names from third_party/blink/renderer/core/frame/deprecation/deprecation.json5",
+                            "type": "string"
                         }
                     ]
                 },
@@ -2493,7 +2441,7 @@
                         },
                         {
                             "name": "delta",
-                            "description": "If true, retrieve delta since last call.",
+                            "description": "If true, retrieve delta since last delta call.",
                             "optional": true,
                             "type": "boolean"
                         }
@@ -2521,7 +2469,7 @@
                         },
                         {
                             "name": "delta",
-                            "description": "If true, retrieve delta since last call.",
+                            "description": "If true, retrieve delta since last delta call.",
                             "optional": true,
                             "type": "boolean"
                         }
@@ -3974,7 +3922,7 @@
                     "returns": [
                         {
                             "name": "nodeIds",
-                            "description": "The list of node Ids that have their tracked computed styles updated",
+                            "description": "The list of node Ids that have their tracked computed styles updated.",
                             "type": "array",
                             "items": {
                                 "$ref": "DOM.NodeId"
@@ -4205,7 +4153,7 @@
                 },
                 {
                     "name": "stopRuleUsageTracking",
-                    "description": "Stop tracking rule usage and return the list of rules that were used since last call to\n`takeCoverageDelta` (or since start of coverage instrumentation)",
+                    "description": "Stop tracking rule usage and return the list of rules that were used since last call to\n`takeCoverageDelta` (or since start of coverage instrumentation).",
                     "returns": [
                         {
                             "name": "ruleUsage",
@@ -4218,7 +4166,7 @@
                 },
                 {
                     "name": "takeCoverageDelta",
-                    "description": "Obtain list of rules that became used since last call to this method (or since start of coverage\ninstrumentation)",
+                    "description": "Obtain list of rules that became used since last call to this method (or since start of coverage\ninstrumentation).",
                     "returns": [
                         {
                             "name": "coverage",
@@ -4250,7 +4198,7 @@
             "events": [
                 {
                     "name": "fontsUpdated",
-                    "description": "Fires whenever a web font is updated.  A non-empty font parameter indicates a successfully loaded\nweb font",
+                    "description": "Fires whenever a web font is updated.  A non-empty font parameter indicates a successfully loaded\nweb font.",
                     "parameters": [
                         {
                             "name": "font",
@@ -5404,7 +5352,7 @@
                 },
                 {
                     "name": "getDocument",
-                    "description": "Returns the root DOM node (and optionally the subtree) to the caller.",
+                    "description": "Returns the root DOM node (and optionally the subtree) to the caller.\nImplicitly enables the DOM domain events for the current target.",
                     "parameters": [
                         {
                             "name": "depth",
@@ -8010,6 +7958,7 @@
                     "properties": [
                         {
                             "name": "brands",
+                            "description": "Brands appearing in Sec-CH-UA.",
                             "optional": true,
                             "type": "array",
                             "items": {
@@ -8018,6 +7967,7 @@
                         },
                         {
                             "name": "fullVersionList",
+                            "description": "Brands appearing in Sec-CH-UA-Full-Version-List.",
                             "optional": true,
                             "type": "array",
                             "items": {
@@ -8306,12 +8256,13 @@
                     "parameters": [
                         {
                             "name": "type",
-                            "description": "Vision deficiency to emulate.",
+                            "description": "Vision deficiency to emulate. Order: best-effort emulations come first, followed by any\nphysiologically accurate emulations for medically recognized color vision deficiencies.",
                             "type": "string",
                             "enum": [
                                 "none",
-                                "achromatopsia",
                                 "blurredVision",
+                                "reducedContrast",
+                                "achromatopsia",
                                 "deuteranopia",
                                 "protanopia",
                                 "tritanopia"
@@ -9127,7 +9078,7 @@
                 },
                 {
                     "name": "getMetadata",
-                    "description": "Gets metadata of an object store",
+                    "description": "Gets metadata of an object store.",
                     "parameters": [
                         {
                             "name": "securityOrigin",
@@ -11383,12 +11334,12 @@
                     "type": "object",
                     "properties": [
                         {
-                            "name": "type",
+                            "name": "operation",
                             "$ref": "TrustTokenOperationType"
                         },
                         {
                             "name": "refreshPolicy",
-                            "description": "Only set for \"token-redemption\" type and determine whether\nto request a fresh SRR or use a still valid cached SRR.",
+                            "description": "Only set for \"token-redemption\" operation and determine whether\nto request a fresh SRR or use a still valid cached SRR.",
                             "type": "string",
                             "enum": [
                                 "UseCached",
@@ -13923,6 +13874,18 @@
                             "description": "Raw response header text as it was received over the wire. The raw text may not always be\navailable, such as in the case of HTTP/2 or QUIC.",
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "cookiePartitionKey",
+                            "description": "The cookie partition key that will be used to store partitioned cookies set in this response.\nOnly sent when partitioned cookies are enabled.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "cookiePartitionKeyOpaque",
+                            "description": "True if partitioned cookies are enabled, but the partition key is not serializeable to string.",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -15392,6 +15355,7 @@
                         "usb",
                         "vertical-scroll",
                         "web-share",
+                        "window-management",
                         "window-placement",
                         "xr-spatial-tracking"
                     ]
@@ -16195,6 +16159,18 @@
                     ]
                 },
                 {
+                    "id": "AutoResponseMode",
+                    "description": "Enum of possible auto-reponse for permisison / prompt dialogs.",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "none",
+                        "autoAccept",
+                        "autoReject",
+                        "autoOptOut"
+                    ]
+                },
+                {
                     "id": "NavigationType",
                     "description": "The type of a frameNavigated event.",
                     "experimental": true,
@@ -16451,7 +16427,26 @@
                         "EmbedderHostDisallowed",
                         "ActivationNavigationDestroyedBeforeSuccess",
                         "TabClosedByUserGesture",
-                        "TabClosedWithoutUserGesture"
+                        "TabClosedWithoutUserGesture",
+                        "PrimaryMainFrameRendererProcessCrashed",
+                        "PrimaryMainFrameRendererProcessKilled",
+                        "ActivationFramePolicyNotCompatible",
+                        "PreloadingDisabled",
+                        "BatterySaverEnabled",
+                        "ActivatedDuringMainFrameNavigation",
+                        "PreloadingUnsupportedByWebContents"
+                    ]
+                },
+                {
+                    "id": "PrefetchStatus",
+                    "description": "List of Prefetch status, which refers to PreloadingTriggeringOutcome.",
+                    "type": "string",
+                    "enum": [
+                        "Running",
+                        "Ready",
+                        "Success",
+                        "Failure",
+                        "NotSupported"
                     ]
                 }
             ],
@@ -16712,7 +16707,9 @@
                 },
                 {
                     "name": "getManifestIcons",
+                    "description": "Deprecated because it's not guaranteed that the returned icon is in fact the one used for PWA installation.",
                     "experimental": true,
+                    "deprecated": true,
                     "returns": [
                         {
                             "name": "primaryIcon",
@@ -17601,13 +17598,18 @@
                     "parameters": [
                         {
                             "name": "mode",
-                            "type": "string",
-                            "enum": [
-                                "none",
-                                "autoAccept",
-                                "autoReject",
-                                "autoOptOut"
-                            ]
+                            "$ref": "AutoResponseMode"
+                        }
+                    ]
+                },
+                {
+                    "name": "setRPHRegistrationMode",
+                    "description": "Extensions for Custom Handlers API:\nhttps://html.spec.whatwg.org/multipage/system-state.html#rph-automation",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "mode",
+                            "$ref": "AutoResponseMode"
                         }
                     ]
                 },
@@ -18043,6 +18045,26 @@
                             "description": "This is used to give users more information about the name of the API call\nthat is incompatible with prerender and has caused the cancellation of the attempt",
                             "optional": true,
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "prefetchStatusUpdated",
+                    "description": "TODO(crbug/1384419): Create a dedicated domain for preloading.\nFired when a prefetch attempt is updated.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "initiatingFrameId",
+                            "description": "The frame id of the frame initiating prefetch.",
+                            "$ref": "FrameId"
+                        },
+                        {
+                            "name": "prefetchUrl",
+                            "type": "string"
+                        },
+                        {
+                            "name": "status",
+                            "$ref": "PrefetchStatus"
                         }
                     ]
                 },
@@ -22291,6 +22313,12 @@
                             "type": "boolean"
                         },
                         {
+                            "name": "hasPrf",
+                            "description": "If set to true, the authenticator will support the prf extension.\nhttps://w3c.github.io/webauthn/#prf-extension\nDefaults to false.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
                             "name": "automaticPresenceSimulation",
                             "description": "If set to true, tests of user presence will succeed immediately.\nOtherwise, they will not be resolved. Defaults to true.",
                             "optional": true,
@@ -22765,6 +22793,152 @@
                 {
                     "name": "disable",
                     "description": "Disables the Media domain."
+                }
+            ]
+        },
+        {
+            "domain": "DeviceAccess",
+            "experimental": true,
+            "types": [
+                {
+                    "id": "RequestId",
+                    "description": "Device request id.",
+                    "type": "string"
+                },
+                {
+                    "id": "DeviceId",
+                    "description": "A device id.",
+                    "type": "string"
+                },
+                {
+                    "id": "PromptDevice",
+                    "description": "Device information displayed in a user prompt to select a device.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "id",
+                            "$ref": "DeviceId"
+                        },
+                        {
+                            "name": "name",
+                            "description": "Display name as it appears in a device request user prompt.",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "commands": [
+                {
+                    "name": "enable",
+                    "description": "Enable events in this domain."
+                },
+                {
+                    "name": "disable",
+                    "description": "Disable events in this domain."
+                },
+                {
+                    "name": "selectPrompt",
+                    "description": "Select a device in response to a DeviceAccess.deviceRequestPrompted event.",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "deviceId",
+                            "$ref": "DeviceId"
+                        }
+                    ]
+                },
+                {
+                    "name": "cancelPrompt",
+                    "description": "Cancel a prompt in response to a DeviceAccess.deviceRequestPrompted event.",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "$ref": "RequestId"
+                        }
+                    ]
+                }
+            ],
+            "events": [
+                {
+                    "name": "deviceRequestPrompted",
+                    "description": "A device request opened a user prompt to select a device. Respond with the\nselectPrompt or cancelPrompt command.",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "devices",
+                            "type": "array",
+                            "items": {
+                                "$ref": "PromptDevice"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "domain": "Preload",
+            "experimental": true,
+            "types": [
+                {
+                    "id": "RuleSetId",
+                    "description": "Unique id",
+                    "type": "string"
+                },
+                {
+                    "id": "RuleSet",
+                    "description": "Corresponds to SpeculationRuleSet",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "id",
+                            "$ref": "RuleSetId"
+                        },
+                        {
+                            "name": "loaderId",
+                            "description": "Identifies a document which the rule set is associated with.",
+                            "$ref": "Network.LoaderId"
+                        },
+                        {
+                            "name": "sourceText",
+                            "description": "Source text of JSON representing the rule set. If it comes from\n<script> tag, it is the textContent of the node. Note that it is\na JSON for valid case.\n\nSee also:\n- https://wicg.github.io/nav-speculation/speculation-rules.html\n- https://github.com/WICG/nav-speculation/blob/main/triggers.md",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "commands": [
+                {
+                    "name": "enable"
+                },
+                {
+                    "name": "disable"
+                }
+            ],
+            "events": [
+                {
+                    "name": "ruleSetUpdated",
+                    "description": "Upsert. Currently, it is only emitted when a rule set added.",
+                    "parameters": [
+                        {
+                            "name": "ruleSet",
+                            "$ref": "RuleSet"
+                        }
+                    ]
+                },
+                {
+                    "name": "ruleSetRemoved",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "$ref": "RuleSetId"
+                        }
+                    ]
                 }
             ]
         }

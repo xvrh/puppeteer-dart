@@ -286,6 +286,13 @@ class StorageApi {
     });
   }
 
+  /// Resets the budget for `ownerOrigin` by clearing all budget withdrawals.
+  Future<void> resetSharedStorageBudget(String ownerOrigin) async {
+    await _client.send('Storage.resetSharedStorageBudget', {
+      'ownerOrigin': ownerOrigin,
+    });
+  }
+
   /// Enables/disables issuing of sharedStorageAccessed events.
   Future<void> setSharedStorageTracking(bool enable) async {
     await _client.send('Storage.setSharedStorageTracking', {

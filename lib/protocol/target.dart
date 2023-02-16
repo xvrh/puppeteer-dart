@@ -150,6 +150,7 @@ class TargetApi {
   /// [newWindow] Whether to create a new Window or Tab (chrome-only, false by default).
   /// [background] Whether to create the target in background or foreground (chrome-only,
   /// false by default).
+  /// [forTab] Whether to create the target of type "tab".
   /// Returns: The id of the page opened.
   Future<TargetID> createTarget(String url,
       {int? width,
@@ -157,7 +158,8 @@ class TargetApi {
       browser.BrowserContextID? browserContextId,
       bool? enableBeginFrameControl,
       bool? newWindow,
-      bool? background}) async {
+      bool? background,
+      bool? forTab}) async {
     var result = await _client.send('Target.createTarget', {
       'url': url,
       if (width != null) 'width': width,
@@ -167,6 +169,7 @@ class TargetApi {
         'enableBeginFrameControl': enableBeginFrameControl,
       if (newWindow != null) 'newWindow': newWindow,
       if (background != null) 'background': background,
+      if (forTab != null) 'forTab': forTab,
     });
     return TargetID.fromJson(result['targetId'] as String);
   }

@@ -39,10 +39,11 @@ class RuntimeApi {
               event.parameters['context'] as Map<String, dynamic>));
 
   /// Issued when execution context is destroyed.
-  Stream<ExecutionContextId> get onExecutionContextDestroyed => _client.onEvent
-      .where((event) => event.name == 'Runtime.executionContextDestroyed')
-      .map((event) => ExecutionContextId.fromJson(
-          event.parameters['executionContextId'] as int));
+  Stream<ExecutionContextDestroyedEvent> get onExecutionContextDestroyed =>
+      _client.onEvent
+          .where((event) => event.name == 'Runtime.executionContextDestroyed')
+          .map((event) =>
+              ExecutionContextDestroyedEvent.fromJson(event.parameters));
 
   /// Issued when all executionContexts were cleared in browser
   Stream get onExecutionContextsCleared => _client.onEvent
@@ -87,6 +88,12 @@ class RuntimeApi {
   /// [objectGroup] Symbolic group name that can be used to release multiple objects. If objectGroup is not
   /// specified and objectId is, objectGroup will be inherited from object.
   /// [throwOnSideEffect] Whether to throw an exception if side effect cannot be ruled out during evaluation.
+  /// [uniqueContextId] An alternative way to specify the execution context to call function on.
+  /// Compared to contextId that may be reused across processes, this is guaranteed to be
+  /// system-unique, so it can be used to prevent accidental function call
+  /// in context different than intended (e.g. as a result of navigation across process
+  /// boundaries).
+  /// This is mutually exclusive with `executionContextId`.
   /// [generateWebDriverValue] Whether the result should contain `webDriverValue`, serialized according to
   /// https://w3c.github.io/webdriver-bidi. This is mutually exclusive with `returnByValue`, but
   /// resulting `objectId` is still provided.
@@ -101,6 +108,7 @@ class RuntimeApi {
       ExecutionContextId? executionContextId,
       String? objectGroup,
       bool? throwOnSideEffect,
+      String? uniqueContextId,
       bool? generateWebDriverValue}) async {
     var result = await _client.send('Runtime.callFunctionOn', {
       'functionDeclaration': functionDeclaration,
@@ -114,6 +122,7 @@ class RuntimeApi {
       if (executionContextId != null) 'executionContextId': executionContextId,
       if (objectGroup != null) 'objectGroup': objectGroup,
       if (throwOnSideEffect != null) 'throwOnSideEffect': throwOnSideEffect,
+      if (uniqueContextId != null) 'uniqueContextId': uniqueContextId,
       if (generateWebDriverValue != null)
         'generateWebDriverValue': generateWebDriverValue,
     });
@@ -523,6 +532,19 @@ class ExceptionThrownEvent {
       timestamp: Timestamp.fromJson(json['timestamp'] as num),
       exceptionDetails: ExceptionDetails.fromJson(
           json['exceptionDetails'] as Map<String, dynamic>),
+    );
+  }
+}
+
+class ExecutionContextDestroyedEvent {
+  /// Unique Id of the destroyed context
+  final String executionContextUniqueId;
+
+  ExecutionContextDestroyedEvent({required this.executionContextUniqueId});
+
+  factory ExecutionContextDestroyedEvent.fromJson(Map<String, dynamic> json) {
+    return ExecutionContextDestroyedEvent(
+      executionContextUniqueId: json['executionContextUniqueId'] as String,
     );
   }
 }
