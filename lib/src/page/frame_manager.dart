@@ -97,8 +97,6 @@ class FrameManager {
     Future<Object?> navigate() async {
       var response =
           await _pageApi.navigate(url, referrer: referrer, frameId: frame.id);
-      // Give the time to timeoutOrTermination to complete before
-      await Future.delayed(Duration.zero);
       if (response.errorText != null) {
         throw Exception('${response.errorText} at $url');
       }
