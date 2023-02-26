@@ -545,7 +545,7 @@ class _AXNode {
     for (var node in nodeById.values) {
       for (var childId in node._payload.childIds ?? <AXNodeId>[]) {
         final childNode = nodeById[childId.value];
-        if(childNode != null) {
+        if (childNode != null) {
           node._children.add(childNode);
         }
       }
