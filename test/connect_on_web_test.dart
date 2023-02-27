@@ -25,7 +25,7 @@ void main() {
     <script async src="/script.js"></script>
   </head>
  
-  <body x-puppeteer-endpoint="ws://${httpServer.address.host}:${httpServer.port}/proxy">
+  <body x-puppeteer-endpoint="ws://localhost:${httpServer.port}/proxy">
     <h1>Puppeteer</h1>
   </body>
 </html>          
