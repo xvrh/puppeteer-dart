@@ -34,6 +34,9 @@ dev_dependencies:
   lints:
   pub_semver:
   shelf:
+  shelf_router:
   shelf_static:
+  shelf_web_socket:
   test:
   yaml:
+  web_socket_channel:
