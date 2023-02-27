@@ -289,7 +289,8 @@ class FrameManager {
     _contextIdToContext[contextPayload.id] = context;
   }
 
-  void _onExecutionContextDestroyed(ExecutionContextId executionContextId) {
+  void _onExecutionContextDestroyed(ExecutionContextDestroyedEvent event) {
+    var executionContextId = event.executionContextUniqueId;
     var context = _contextIdToContext[executionContextId];
     if (context == null) {
       return;

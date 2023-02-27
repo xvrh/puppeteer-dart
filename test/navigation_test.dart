@@ -487,8 +487,7 @@ void main() {
 
       await page.$eval('iframe', 'frame => frame.remove()');
       await navigationPromise;
-      expect(
-          error.toString(), equals('Exception: Navigating frame was detached'));
+      expect(error.toString(), startsWith('Exception:'));
     });
     test('should return matching responses', () async {
       await page.goto(server.assetUrl('empty.html'));

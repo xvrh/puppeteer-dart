@@ -280,6 +280,11 @@ class VirtualAuthenticatorOptions {
   /// Defaults to false.
   final bool? hasMinPinLength;
 
+  /// If set to true, the authenticator will support the prf extension.
+  /// https://w3c.github.io/webauthn/#prf-extension
+  /// Defaults to false.
+  final bool? hasPrf;
+
   /// If set to true, tests of user presence will succeed immediately.
   /// Otherwise, they will not be resolved. Defaults to true.
   final bool? automaticPresenceSimulation;
@@ -297,6 +302,7 @@ class VirtualAuthenticatorOptions {
       this.hasLargeBlob,
       this.hasCredBlob,
       this.hasMinPinLength,
+      this.hasPrf,
       this.automaticPresenceSimulation,
       this.isUserVerified});
 
@@ -321,6 +327,7 @@ class VirtualAuthenticatorOptions {
       hasMinPinLength: json.containsKey('hasMinPinLength')
           ? json['hasMinPinLength'] as bool
           : null,
+      hasPrf: json.containsKey('hasPrf') ? json['hasPrf'] as bool : null,
       automaticPresenceSimulation:
           json.containsKey('automaticPresenceSimulation')
               ? json['automaticPresenceSimulation'] as bool
@@ -342,6 +349,7 @@ class VirtualAuthenticatorOptions {
       if (hasLargeBlob != null) 'hasLargeBlob': hasLargeBlob,
       if (hasCredBlob != null) 'hasCredBlob': hasCredBlob,
       if (hasMinPinLength != null) 'hasMinPinLength': hasMinPinLength,
+      if (hasPrf != null) 'hasPrf': hasPrf,
       if (automaticPresenceSimulation != null)
         'automaticPresenceSimulation': automaticPresenceSimulation,
       if (isUserVerified != null) 'isUserVerified': isUserVerified,

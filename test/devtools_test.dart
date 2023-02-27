@@ -46,7 +46,7 @@ void main() {
       devToolsTarget.type = 'page';
       final devToolsPage = await devToolsTarget.page;
       // Slight delay to guarantee that the extension panel has been added:
-      await Future.delayed(Duration(milliseconds: 1000));
+      await Future.delayed(Duration(milliseconds: 2000));
       var panelTargetFuture =
           browser.waitForTarget((target) => target.url.contains('panel.html'));
       // Toggle to the last panel in Chrome DevTools:

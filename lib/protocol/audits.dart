@@ -1061,6 +1061,9 @@ class NavigatorUserAgentIssueDetails {
 
 enum GenericIssueErrorType {
   crossOriginPortalPostMessageError('CrossOriginPortalPostMessageError'),
+  formLabelForNameError('FormLabelForNameError'),
+  formDuplicateIdForInputError('FormDuplicateIdForInputError'),
+  formInputWithNoLabelError('FormInputWithNoLabelError'),
   ;
 
   final String value;
@@ -1083,13 +1086,19 @@ class GenericIssueDetails {
 
   final page.FrameId? frameId;
 
-  GenericIssueDetails({required this.errorType, this.frameId});
+  final dom.BackendNodeId? violatingNodeId;
+
+  GenericIssueDetails(
+      {required this.errorType, this.frameId, this.violatingNodeId});
 
   factory GenericIssueDetails.fromJson(Map<String, dynamic> json) {
     return GenericIssueDetails(
       errorType: GenericIssueErrorType.fromJson(json['errorType'] as String),
       frameId: json.containsKey('frameId')
           ? page.FrameId.fromJson(json['frameId'] as String)
+          : null,
+      violatingNodeId: json.containsKey('violatingNodeId')
+          ? dom.BackendNodeId.fromJson(json['violatingNodeId'] as int)
           : null,
     );
   }
@@ -1098,6 +1107,7 @@ class GenericIssueDetails {
     return {
       'errorType': errorType.toJson(),
       if (frameId != null) 'frameId': frameId!.toJson(),
+      if (violatingNodeId != null) 'violatingNodeId': violatingNodeId!.toJson(),
     };
   }
 }
@@ -1138,6 +1148,8 @@ enum DeprecationIssueType {
   notificationInsecureOrigin('NotificationInsecureOrigin'),
   notificationPermissionRequestedIframe(
       'NotificationPermissionRequestedIframe'),
+  obsoleteCreateImageBitmapImageOrientationNone(
+      'ObsoleteCreateImageBitmapImageOrientationNone'),
   obsoleteWebRtcCipherSuite('ObsoleteWebRtcCipherSuite'),
   openWebDatabaseInsecureContext('OpenWebDatabaseInsecureContext'),
   overflowVisibleOnReplacedElement('OverflowVisibleOnReplacedElement'),
@@ -1271,6 +1283,7 @@ enum FederatedAuthRequestIssueReason {
   wellKnownHttpNotFound('WellKnownHttpNotFound'),
   wellKnownNoResponse('WellKnownNoResponse'),
   wellKnownInvalidResponse('WellKnownInvalidResponse'),
+  wellKnownListEmpty('WellKnownListEmpty'),
   configNotInWellKnown('ConfigNotInWellKnown'),
   wellKnownTooBig('WellKnownTooBig'),
   configHttpNotFound('ConfigHttpNotFound'),
@@ -1285,6 +1298,7 @@ enum FederatedAuthRequestIssueReason {
   accountsHttpNotFound('AccountsHttpNotFound'),
   accountsNoResponse('AccountsNoResponse'),
   accountsInvalidResponse('AccountsInvalidResponse'),
+  accountsListEmpty('AccountsListEmpty'),
   idTokenHttpNotFound('IdTokenHttpNotFound'),
   idTokenNoResponse('IdTokenNoResponse'),
   idTokenInvalidResponse('IdTokenInvalidResponse'),

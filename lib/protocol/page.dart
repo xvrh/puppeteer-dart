@@ -1682,12 +1682,14 @@ enum PermissionsPolicyFeature {
   otpCredentials('otp-credentials'),
   payment('payment'),
   pictureInPicture('picture-in-picture'),
+  privateAggregation('private-aggregation'),
   publickeyCredentialsGet('publickey-credentials-get'),
   runAdAuction('run-ad-auction'),
   screenWakeLock('screen-wake-lock'),
   serial('serial'),
   sharedAutofill('shared-autofill'),
   sharedStorage('shared-storage'),
+  sharedStorageSelectUrl('shared-storage-select-url'),
   smartCard('smart-card'),
   storageAccess('storage-access'),
   syncXhr('sync-xhr'),
@@ -1696,6 +1698,7 @@ enum PermissionsPolicyFeature {
   usb('usb'),
   verticalScroll('vertical-scroll'),
   webShare('web-share'),
+  windowManagement('window-management'),
   windowPlacement('window-placement'),
   xrSpatialTracking('xr-spatial-tracking'),
   ;
@@ -2972,6 +2975,7 @@ enum BackForwardCacheNotRestoredReason {
   injectedJavascript('InjectedJavascript'),
   injectedStyleSheet('InjectedStyleSheet'),
   keepaliveRequest('KeepaliveRequest'),
+  indexedDbEvent('IndexedDBEvent'),
   dummy('Dummy'),
   authorizationHeader('AuthorizationHeader'),
   contentSecurityHandler('ContentSecurityHandler'),
@@ -3164,6 +3168,15 @@ enum PrerenderFinalStatus {
       'ActivationNavigationParameterMismatch'),
   activatedInBackground('ActivatedInBackground'),
   embedderHostDisallowed('EmbedderHostDisallowed'),
+  activationNavigationDestroyedBeforeSuccess(
+      'ActivationNavigationDestroyedBeforeSuccess'),
+  tabClosedByUserGesture('TabClosedByUserGesture'),
+  tabClosedWithoutUserGesture('TabClosedWithoutUserGesture'),
+  primaryMainFrameRendererProcessCrashed(
+      'PrimaryMainFrameRendererProcessCrashed'),
+  primaryMainFrameRendererProcessKilled(
+      'PrimaryMainFrameRendererProcessKilled'),
+  activationFramePolicyNotCompatible('ActivationFramePolicyNotCompatible'),
   ;
 
   final String value;
