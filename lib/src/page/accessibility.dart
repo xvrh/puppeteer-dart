@@ -543,9 +543,10 @@ class _AXNode {
       nodeById[payload.nodeId.value] = _AXNode(payload);
     }
     for (var node in nodeById.values) {
-      if (node._payload.childIds != null) {
-        for (var childId in node._payload.childIds!) {
-          node._children.add(nodeById[childId.value]!);
+      for (var childId in node._payload.childIds ?? <AXNodeId>[]) {
+        final childNode = nodeById[childId.value];
+        if (childNode != null) {
+          node._children.add(childNode);
         }
       }
     }
