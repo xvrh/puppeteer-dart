@@ -132,6 +132,20 @@ class PageApi {
           .map((event) =>
               PrerenderAttemptCompletedEvent.fromJson(event.parameters));
 
+  /// TODO(crbug/1384419): Create a dedicated domain for preloading.
+  /// Fired when a prefetch attempt is updated.
+  Stream<PrefetchStatusUpdatedEvent> get onPrefetchStatusUpdated => _client
+      .onEvent
+      .where((event) => event.name == 'Page.prefetchStatusUpdated')
+      .map((event) => PrefetchStatusUpdatedEvent.fromJson(event.parameters));
+
+  /// TODO(crbug/1384419): Create a dedicated domain for preloading.
+  /// Fired when a prerender attempt is updated.
+  Stream<PrerenderStatusUpdatedEvent> get onPrerenderStatusUpdated => _client
+      .onEvent
+      .where((event) => event.name == 'Page.prerenderStatusUpdated')
+      .map((event) => PrerenderStatusUpdatedEvent.fromJson(event.parameters));
+
   Stream<network.MonotonicTime> get onLoadEventFired => _client.onEvent
       .where((event) => event.name == 'Page.loadEventFired')
       .map((event) =>
@@ -310,6 +324,8 @@ class PageApi {
         .toList();
   }
 
+  /// Deprecated because it's not guaranteed that the returned icon is in fact the one used for PWA installation.
+  @Deprecated('This command is deprecated')
   Future<String> getManifestIcons() async {
     var result = await _client.send('Page.getManifestIcons');
     return result['primaryIcon'] as String;
@@ -817,12 +833,16 @@ class PageApi {
 
   /// Sets the Secure Payment Confirmation transaction mode.
   /// https://w3c.github.io/secure-payment-confirmation/#sctn-automation-set-spc-transaction-mode
-  Future<void> setSPCTransactionMode(
-      @Enum(['none', 'autoAccept', 'autoReject', 'autoOptOut'])
-          String mode) async {
-    assert(const ['none', 'autoAccept', 'autoReject', 'autoOptOut']
-        .contains(mode));
+  Future<void> setSPCTransactionMode(AutoResponseMode mode) async {
     await _client.send('Page.setSPCTransactionMode', {
+      'mode': mode,
+    });
+  }
+
+  /// Extensions for Custom Handlers API:
+  /// https://html.spec.whatwg.org/multipage/system-state.html#rph-automation
+  Future<void> setRPHRegistrationMode(AutoResponseMode mode) async {
+    await _client.send('Page.setRPHRegistrationMode', {
       'mode': mode,
     });
   }
@@ -1195,6 +1215,50 @@ class PrerenderAttemptCompletedEvent {
       disallowedApiMethod: json.containsKey('disallowedApiMethod')
           ? json['disallowedApiMethod'] as String
           : null,
+    );
+  }
+}
+
+class PrefetchStatusUpdatedEvent {
+  /// The frame id of the frame initiating prefetch.
+  final FrameId initiatingFrameId;
+
+  final String prefetchUrl;
+
+  final PreloadingStatus status;
+
+  PrefetchStatusUpdatedEvent(
+      {required this.initiatingFrameId,
+      required this.prefetchUrl,
+      required this.status});
+
+  factory PrefetchStatusUpdatedEvent.fromJson(Map<String, dynamic> json) {
+    return PrefetchStatusUpdatedEvent(
+      initiatingFrameId: FrameId.fromJson(json['initiatingFrameId'] as String),
+      prefetchUrl: json['prefetchUrl'] as String,
+      status: PreloadingStatus.fromJson(json['status'] as String),
+    );
+  }
+}
+
+class PrerenderStatusUpdatedEvent {
+  /// The frame id of the frame initiating prerender.
+  final FrameId initiatingFrameId;
+
+  final String prerenderingUrl;
+
+  final PreloadingStatus status;
+
+  PrerenderStatusUpdatedEvent(
+      {required this.initiatingFrameId,
+      required this.prerenderingUrl,
+      required this.status});
+
+  factory PrerenderStatusUpdatedEvent.fromJson(Map<String, dynamic> json) {
+    return PrerenderStatusUpdatedEvent(
+      initiatingFrameId: FrameId.fromJson(json['initiatingFrameId'] as String),
+      prerenderingUrl: json['prerenderingUrl'] as String,
+      status: PreloadingStatus.fromJson(json['status'] as String),
     );
   }
 }
@@ -2851,6 +2915,27 @@ class CompilationCacheParams {
   }
 }
 
+/// Enum of possible auto-reponse for permisison / prompt dialogs.
+enum AutoResponseMode {
+  none('none'),
+  autoAccept('autoAccept'),
+  autoReject('autoReject'),
+  autoOptOut('autoOptOut'),
+  ;
+
+  final String value;
+
+  const AutoResponseMode(this.value);
+
+  factory AutoResponseMode.fromJson(String value) =>
+      AutoResponseMode.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// The type of a frameNavigated event.
 enum NavigationType {
   navigation('Navigation'),
@@ -3177,6 +3262,10 @@ enum PrerenderFinalStatus {
   primaryMainFrameRendererProcessKilled(
       'PrimaryMainFrameRendererProcessKilled'),
   activationFramePolicyNotCompatible('ActivationFramePolicyNotCompatible'),
+  preloadingDisabled('PreloadingDisabled'),
+  batterySaverEnabled('BatterySaverEnabled'),
+  activatedDuringMainFrameNavigation('ActivatedDuringMainFrameNavigation'),
+  preloadingUnsupportedByWebContents('PreloadingUnsupportedByWebContents'),
   ;
 
   final String value;
@@ -3185,6 +3274,30 @@ enum PrerenderFinalStatus {
 
   factory PrerenderFinalStatus.fromJson(String value) =>
       PrerenderFinalStatus.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Preloading status values, see also PreloadingTriggeringOutcome. This
+/// status is shared by prefetchStatusUpdated and prerenderStatusUpdated.
+enum PreloadingStatus {
+  pending('Pending'),
+  running('Running'),
+  ready('Ready'),
+  success('Success'),
+  failure('Failure'),
+  notSupported('NotSupported'),
+  ;
+
+  final String value;
+
+  const PreloadingStatus(this.value);
+
+  factory PreloadingStatus.fromJson(String value) =>
+      PreloadingStatus.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 

@@ -90,7 +90,7 @@ class IndexedDBApi {
     return RequestDataResult.fromJson(result);
   }
 
-  /// Gets metadata of an object store
+  /// Gets metadata of an object store.
   /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
   /// Security origin.
   /// [storageKey] Storage key.

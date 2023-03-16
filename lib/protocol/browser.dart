@@ -122,7 +122,7 @@ class BrowserApi {
   /// [query] Requested substring in name. Only histograms which have query as a
   /// substring in their name are extracted. An empty or absent query returns
   /// all histograms.
-  /// [delta] If true, retrieve delta since last call.
+  /// [delta] If true, retrieve delta since last delta call.
   /// Returns: Histograms.
   Future<List<Histogram>> getHistograms({String? query, bool? delta}) async {
     var result = await _client.send('Browser.getHistograms', {
@@ -136,7 +136,7 @@ class BrowserApi {
 
   /// Get a Chrome histogram by name.
   /// [name] Requested histogram name.
-  /// [delta] If true, retrieve delta since last call.
+  /// [delta] If true, retrieve delta since last delta call.
   /// Returns: Histogram.
   Future<Histogram> getHistogram(String name, {bool? delta}) async {
     var result = await _client.send('Browser.getHistogram', {

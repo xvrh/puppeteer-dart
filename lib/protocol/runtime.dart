@@ -393,8 +393,7 @@ class RuntimeApi {
   /// See also `ExecutionContext.name` and `worldName` parameter to
   /// `Page.addScriptToEvaluateOnNewDocument`.
   /// This parameter is mutually exclusive with `executionContextId`.
-  Future<void> addBinding(
-      String name,
+  Future<void> addBinding(String name,
       {@Deprecated('This parameter is deprecated')
           ExecutionContextId? executionContextId,
       String? executionContextName}) async {

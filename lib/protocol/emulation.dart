@@ -156,21 +156,24 @@ class EmulationApi {
   }
 
   /// Emulates the given vision deficiency.
-  /// [type] Vision deficiency to emulate.
+  /// [type] Vision deficiency to emulate. Order: best-effort emulations come first, followed by any
+  /// physiologically accurate emulations for medically recognized color vision deficiencies.
   Future<void> setEmulatedVisionDeficiency(
       @Enum([
-    'none',
-    'achromatopsia',
-    'blurredVision',
-    'deuteranopia',
-    'protanopia',
-    'tritanopia'
-  ])
+        'none',
+        'blurredVision',
+        'reducedContrast',
+        'achromatopsia',
+        'deuteranopia',
+        'protanopia',
+        'tritanopia'
+      ])
           String type) async {
     assert(const [
       'none',
-      'achromatopsia',
       'blurredVision',
+      'reducedContrast',
+      'achromatopsia',
       'deuteranopia',
       'protanopia',
       'tritanopia'

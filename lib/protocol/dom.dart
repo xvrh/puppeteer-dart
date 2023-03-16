@@ -258,6 +258,7 @@ class DOMApi {
   }
 
   /// Returns the root DOM node (and optionally the subtree) to the caller.
+  /// Implicitly enables the DOM domain events for the current target.
   /// [depth] The maximum depth at which children should be retrieved, defaults to 1. Use -1 for the
   /// entire subtree or provide an integer larger than 0.
   /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the subtree

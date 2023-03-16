@@ -1,4 +1,7 @@
 ## 2.23.0
+- Update to Chromium 112
+
+## 2.23.0
 - Update to Chromium 111
 - Check for null child node/Ids in Accessibility
 
