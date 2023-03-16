@@ -1347,13 +1347,22 @@ class ResponseReceivedExtraInfoEvent {
   /// available, such as in the case of HTTP/2 or QUIC.
   final String? headersText;
 
+  /// The cookie partition key that will be used to store partitioned cookies set in this response.
+  /// Only sent when partitioned cookies are enabled.
+  final String? cookiePartitionKey;
+
+  /// True if partitioned cookies are enabled, but the partition key is not serializeable to string.
+  final bool? cookiePartitionKeyOpaque;
+
   ResponseReceivedExtraInfoEvent(
       {required this.requestId,
       required this.blockedCookies,
       required this.headers,
       required this.resourceIPAddressSpace,
       required this.statusCode,
-      this.headersText});
+      this.headersText,
+      this.cookiePartitionKey,
+      this.cookiePartitionKeyOpaque});
 
   factory ResponseReceivedExtraInfoEvent.fromJson(Map<String, dynamic> json) {
     return ResponseReceivedExtraInfoEvent(
@@ -1368,6 +1377,12 @@ class ResponseReceivedExtraInfoEvent {
       statusCode: json['statusCode'] as int,
       headersText: json.containsKey('headersText')
           ? json['headersText'] as String
+          : null,
+      cookiePartitionKey: json.containsKey('cookiePartitionKey')
+          ? json['cookiePartitionKey'] as String
+          : null,
+      cookiePartitionKeyOpaque: json.containsKey('cookiePartitionKeyOpaque')
+          ? json['cookiePartitionKeyOpaque'] as bool
           : null,
     );
   }

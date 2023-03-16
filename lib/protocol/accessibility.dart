@@ -38,7 +38,7 @@ class AccessibilityApi {
   /// [nodeId] Identifier of the node to get the partial accessibility tree for.
   /// [backendNodeId] Identifier of the backend node to get the partial accessibility tree for.
   /// [objectId] JavaScript object id of the node wrapper to get the partial accessibility tree for.
-  /// [fetchRelatives] Whether to fetch this nodes ancestors, siblings and children. Defaults to true.
+  /// [fetchRelatives] Whether to fetch this node's ancestors, siblings and children. Defaults to true.
   /// Returns: The `Accessibility.AXNode` for this DOM node, if it exists, plus its ancestors, siblings and
   /// children, if requested.
   Future<List<AXNodeData>> getPartialAXTree(

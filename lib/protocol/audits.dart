@@ -1064,6 +1064,15 @@ enum GenericIssueErrorType {
   formLabelForNameError('FormLabelForNameError'),
   formDuplicateIdForInputError('FormDuplicateIdForInputError'),
   formInputWithNoLabelError('FormInputWithNoLabelError'),
+  formAutocompleteAttributeEmptyError('FormAutocompleteAttributeEmptyError'),
+  formEmptyIdAndNameAttributesForInputError(
+      'FormEmptyIdAndNameAttributesForInputError'),
+  formAriaLabelledByToNonExistingId('FormAriaLabelledByToNonExistingId'),
+  formInputAssignedAutocompleteValueToIdOrNameAttributeError(
+      'FormInputAssignedAutocompleteValueToIdOrNameAttributeError'),
+  formLabelHasNeitherForNorNestedInput('FormLabelHasNeitherForNorNestedInput'),
+  formLabelForMatchesNonExistingIdError(
+      'FormLabelForMatchesNonExistingIdError'),
   ;
 
   final String value;
@@ -1112,93 +1121,6 @@ class GenericIssueDetails {
   }
 }
 
-enum DeprecationIssueType {
-  authorizationCoveredByWildcard('AuthorizationCoveredByWildcard'),
-  canRequestUrlhttpContainingNewline('CanRequestURLHTTPContainingNewline'),
-  chromeLoadTimesConnectionInfo('ChromeLoadTimesConnectionInfo'),
-  chromeLoadTimesFirstPaintAfterLoadTime(
-      'ChromeLoadTimesFirstPaintAfterLoadTime'),
-  chromeLoadTimesWasAlternateProtocolAvailable(
-      'ChromeLoadTimesWasAlternateProtocolAvailable'),
-  cookieWithTruncatingChar('CookieWithTruncatingChar'),
-  crossOriginAccessBasedOnDocumentDomain(
-      'CrossOriginAccessBasedOnDocumentDomain'),
-  crossOriginWindowAlert('CrossOriginWindowAlert'),
-  crossOriginWindowConfirm('CrossOriginWindowConfirm'),
-  cssSelectorInternalMediaControlsOverlayCastButton(
-      'CSSSelectorInternalMediaControlsOverlayCastButton'),
-  deprecationExample('DeprecationExample'),
-  documentDomainSettingWithoutOriginAgentClusterHeader(
-      'DocumentDomainSettingWithoutOriginAgentClusterHeader'),
-  eventPath('EventPath'),
-  expectCtHeader('ExpectCTHeader'),
-  geolocationInsecureOrigin('GeolocationInsecureOrigin'),
-  geolocationInsecureOriginDeprecatedNotRemoved(
-      'GeolocationInsecureOriginDeprecatedNotRemoved'),
-  getUserMediaInsecureOrigin('GetUserMediaInsecureOrigin'),
-  hostCandidateAttributeGetter('HostCandidateAttributeGetter'),
-  identityInCanMakePaymentEvent('IdentityInCanMakePaymentEvent'),
-  insecurePrivateNetworkSubresourceRequest(
-      'InsecurePrivateNetworkSubresourceRequest'),
-  localCssFileExtensionRejected('LocalCSSFileExtensionRejected'),
-  mediaSourceAbortRemove('MediaSourceAbortRemove'),
-  mediaSourceDurationTruncatingBuffered(
-      'MediaSourceDurationTruncatingBuffered'),
-  noSysexWebMidiWithoutPermission('NoSysexWebMIDIWithoutPermission'),
-  notificationInsecureOrigin('NotificationInsecureOrigin'),
-  notificationPermissionRequestedIframe(
-      'NotificationPermissionRequestedIframe'),
-  obsoleteCreateImageBitmapImageOrientationNone(
-      'ObsoleteCreateImageBitmapImageOrientationNone'),
-  obsoleteWebRtcCipherSuite('ObsoleteWebRtcCipherSuite'),
-  openWebDatabaseInsecureContext('OpenWebDatabaseInsecureContext'),
-  overflowVisibleOnReplacedElement('OverflowVisibleOnReplacedElement'),
-  paymentInstruments('PaymentInstruments'),
-  paymentRequestCspViolation('PaymentRequestCSPViolation'),
-  persistentQuotaType('PersistentQuotaType'),
-  pictureSourceSrc('PictureSourceSrc'),
-  prefixedCancelAnimationFrame('PrefixedCancelAnimationFrame'),
-  prefixedRequestAnimationFrame('PrefixedRequestAnimationFrame'),
-  prefixedStorageInfo('PrefixedStorageInfo'),
-  prefixedVideoDisplayingFullscreen('PrefixedVideoDisplayingFullscreen'),
-  prefixedVideoEnterFullscreen('PrefixedVideoEnterFullscreen'),
-  prefixedVideoEnterFullScreen('PrefixedVideoEnterFullScreen'),
-  prefixedVideoExitFullscreen('PrefixedVideoExitFullscreen'),
-  prefixedVideoExitFullScreen('PrefixedVideoExitFullScreen'),
-  prefixedVideoSupportsFullscreen('PrefixedVideoSupportsFullscreen'),
-  rangeExpand('RangeExpand'),
-  requestedSubresourceWithEmbeddedCredentials(
-      'RequestedSubresourceWithEmbeddedCredentials'),
-  rtcConstraintEnableDtlsSrtpFalse('RTCConstraintEnableDtlsSrtpFalse'),
-  rtcConstraintEnableDtlsSrtpTrue('RTCConstraintEnableDtlsSrtpTrue'),
-  rtcPeerConnectionComplexPlanBSdpUsingDefaultSdpSemantics(
-      'RTCPeerConnectionComplexPlanBSdpUsingDefaultSdpSemantics'),
-  rtcPeerConnectionSdpSemanticsPlanB('RTCPeerConnectionSdpSemanticsPlanB'),
-  rtcpMuxPolicyNegotiate('RtcpMuxPolicyNegotiate'),
-  sharedArrayBufferConstructedWithoutIsolation(
-      'SharedArrayBufferConstructedWithoutIsolation'),
-  textToSpeechDisallowedByAutoplay('TextToSpeech_DisallowedByAutoplay'),
-  v8SharedArrayBufferConstructedInExtensionWithoutIsolation(
-      'V8SharedArrayBufferConstructedInExtensionWithoutIsolation'),
-  xhrjsonEncodingDetection('XHRJSONEncodingDetection'),
-  xmlHttpRequestSynchronousInNonWorkerOutsideBeforeUnload(
-      'XMLHttpRequestSynchronousInNonWorkerOutsideBeforeUnload'),
-  xrSupportsSession('XRSupportsSession'),
-  ;
-
-  final String value;
-
-  const DeprecationIssueType(this.value);
-
-  factory DeprecationIssueType.fromJson(String value) =>
-      DeprecationIssueType.values.firstWhere((e) => e.value == value);
-
-  String toJson() => value;
-
-  @override
-  String toString() => value.toString();
-}
-
 /// This issue tracks information needed to print a deprecation message.
 /// https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/frame/third_party/blink/renderer/core/frame/deprecation/README.md
 class DeprecationIssueDetails {
@@ -1206,7 +1128,8 @@ class DeprecationIssueDetails {
 
   final SourceCodeLocation sourceCodeLocation;
 
-  final DeprecationIssueType type;
+  /// One of the deprecation names from third_party/blink/renderer/core/frame/deprecation/deprecation.json5
+  final String type;
 
   DeprecationIssueDetails(
       {this.affectedFrame,
@@ -1221,14 +1144,14 @@ class DeprecationIssueDetails {
           : null,
       sourceCodeLocation: SourceCodeLocation.fromJson(
           json['sourceCodeLocation'] as Map<String, dynamic>),
-      type: DeprecationIssueType.fromJson(json['type'] as String),
+      type: json['type'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'sourceCodeLocation': sourceCodeLocation.toJson(),
-      'type': type.toJson(),
+      'type': type,
       if (affectedFrame != null) 'affectedFrame': affectedFrame!.toJson(),
     };
   }

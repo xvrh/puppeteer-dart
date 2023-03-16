@@ -1362,6 +1362,7 @@ enum SetScriptSourceResultStatus {
   compileError('CompileError'),
   blockedByActiveGenerator('BlockedByActiveGenerator'),
   blockedByActiveFunction('BlockedByActiveFunction'),
+  blockedByTopLevelEsModuleChange('BlockedByTopLevelEsModuleChange'),
   ;
 
   final String value;

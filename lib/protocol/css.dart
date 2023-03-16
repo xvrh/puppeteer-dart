@@ -15,7 +15,7 @@ class CSSApi {
   CSSApi(this._client);
 
   /// Fires whenever a web font is updated.  A non-empty font parameter indicates a successfully loaded
-  /// web font
+  /// web font.
   Stream<FontFace> get onFontsUpdated => _client.onEvent
       .where((event) => event.name == 'CSS.fontsUpdated')
       .map((event) =>
@@ -198,7 +198,7 @@ class CSSApi {
   }
 
   /// Polls the next batch of computed style updates.
-  /// Returns: The list of node Ids that have their tracked computed styles updated
+  /// Returns: The list of node Ids that have their tracked computed styles updated.
   Future<List<dom.NodeId>> takeComputedStyleUpdates() async {
     var result = await _client.send('CSS.takeComputedStyleUpdates');
     return (result['nodeIds'] as List)
@@ -320,7 +320,7 @@ class CSSApi {
   }
 
   /// Stop tracking rule usage and return the list of rules that were used since last call to
-  /// `takeCoverageDelta` (or since start of coverage instrumentation)
+  /// `takeCoverageDelta` (or since start of coverage instrumentation).
   Future<List<RuleUsage>> stopRuleUsageTracking() async {
     var result = await _client.send('CSS.stopRuleUsageTracking');
     return (result['ruleUsage'] as List)
@@ -329,7 +329,7 @@ class CSSApi {
   }
 
   /// Obtain list of rules that became used since last call to this method (or since start of coverage
-  /// instrumentation)
+  /// instrumentation).
   Future<TakeCoverageDeltaResult> takeCoverageDelta() async {
     var result = await _client.send('CSS.takeCoverageDelta');
     return TakeCoverageDeltaResult.fromJson(result);

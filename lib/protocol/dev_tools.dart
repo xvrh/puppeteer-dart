@@ -9,6 +9,7 @@ import 'cast.dart';
 import 'css.dart';
 import 'database.dart';
 import 'debugger.dart';
+import 'device_access.dart';
 import 'device_orientation.dart';
 import 'dom.dart';
 import 'dom_debugger.dart';
@@ -32,6 +33,7 @@ import 'overlay.dart';
 import 'page.dart';
 import 'performance.dart';
 import 'performance_timeline.dart';
+import 'preload.dart';
 import 'profiler.dart';
 import 'runtime.dart';
 import 'security.dart';
@@ -221,6 +223,12 @@ class DevTools {
   /// This domain allows detailed inspection of media elements
   MediaApi get media => _media ??= MediaApi(client);
   MediaApi? _media;
+
+  DeviceAccessApi get deviceAccess => _deviceAccess ??= DeviceAccessApi(client);
+  DeviceAccessApi? _deviceAccess;
+
+  PreloadApi get preload => _preload ??= PreloadApi(client);
+  PreloadApi? _preload;
 
   /// Debugger domain exposes JavaScript debugging capabilities. It allows setting and removing
   /// breakpoints, stepping through execution, exploring stack traces, etc.
