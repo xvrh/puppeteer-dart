@@ -4,17 +4,17 @@ import 'package:archive/archive.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 
-const int _lastRevision = 1108766;
+const _lastVersion = '112.0.5615.121';
 
 class RevisionInfo {
   final String executablePath;
   final String folderPath;
-  final int revision;
+  final String version;
 
   RevisionInfo(
       {required this.executablePath,
       required this.folderPath,
-      required this.revision});
+      required this.version});
 }
 
 ///
@@ -28,14 +28,14 @@ class RevisionInfo {
 ///   });
 /// ```
 Future<RevisionInfo> downloadChrome({
-  int? revision,
+  String? version,
   String? cachePath,
   void Function(int received, int total)? onDownloadProgress,
 }) async {
-  revision ??= _lastRevision;
+  version ??= _lastVersion;
   cachePath ??= '.local-chromium';
 
-  var revisionDirectory = Directory(p.join(cachePath, '$revision'));
+  var revisionDirectory = Directory(p.join(cachePath, version));
   if (!revisionDirectory.existsSync()) {
     revisionDirectory.createSync(recursive: true);
   }
@@ -45,8 +45,8 @@ Future<RevisionInfo> downloadChrome({
   var executableFile = File(exePath);
 
   if (!executableFile.existsSync()) {
-    var url = _downloadUrl(revision);
-    var zipPath = p.join(cachePath, '${revision}_${p.url.basename(url)}');
+    var url = _downloadUrl(version);
+    var zipPath = p.join(cachePath, '${version}_${p.url.basename(url)}');
     await _downloadFile(url, zipPath, onDownloadProgress);
     _unzip(zipPath, revisionDirectory.path);
     File(zipPath).deleteSync();
@@ -69,7 +69,7 @@ Future<RevisionInfo> downloadChrome({
   return RevisionInfo(
       folderPath: revisionDirectory.path,
       executablePath: executableFile.path,
-      revision: revision);
+      version: version);
 }
 
 Future _downloadFile(
@@ -126,15 +126,15 @@ void _simpleUnzip(String path, String targetPath) {
   }
 }
 
-const _baseUrl = 'https://storage.googleapis.com/chromium-browser-snapshots';
+const _baseUrl = 'https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing';
 
-String _downloadUrl(int revision) {
+String _downloadUrl(String version) {
   if (Platform.isWindows) {
-    return '$_baseUrl/Win_x64/$revision/chrome-win.zip';
+    return '$_baseUrl/$version/win64/chrome-win64.zip';
   } else if (Platform.isLinux) {
-    return '$_baseUrl/Linux_x64/$revision/chrome-linux.zip';
+    return '$_baseUrl/$version/linux64/chrome-linux64.zip';
   } else if (Platform.isMacOS) {
-    return '$_baseUrl/Mac/$revision/chrome-mac.zip';
+    return '$_baseUrl/$version/mac-x64/chrome-mac-x64.zip';
   } else {
     throw UnsupportedError(
         "Can't download chrome for platform ${Platform.operatingSystem}");
@@ -143,12 +143,17 @@ String _downloadUrl(int revision) {
 
 String getExecutablePath(String revisionPath) {
   if (Platform.isWindows) {
-    return p.join(revisionPath, 'chrome-win', 'chrome.exe');
+    return p.join(revisionPath, 'chrome-win64', 'chrome.exe');
   } else if (Platform.isLinux) {
-    return p.join(revisionPath, 'chrome-linux', 'chrome');
+    return p.join(revisionPath, 'chrome-linux64', 'chrome');
   } else if (Platform.isMacOS) {
-    return p.join(revisionPath, 'chrome-mac', 'Chromium.app', 'Contents',
-        'MacOS', 'Chromium');
+    return p.join(
+        revisionPath,
+        'chrome-mac-x64',
+        'Google Chrome for Testing.app',
+        'Contents',
+        'MacOS',
+        'Google Chrome for Testing');
   } else {
     throw UnsupportedError('Unknown platform ${Platform.operatingSystem}');
   }

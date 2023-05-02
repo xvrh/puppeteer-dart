@@ -12,6 +12,4 @@ void main() {
   fix_absolute_import.main();
   fix_import_order.main();
   generate_api_doc.main();
-
-  // TODO(xha): convert double quote to simple quote
 }
