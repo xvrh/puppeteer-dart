@@ -923,7 +923,6 @@ class CorsIssueDetails {
 
 enum AttributionReportingIssueType {
   permissionPolicyDisabled('PermissionPolicyDisabled'),
-  permissionPolicyNotDelegated('PermissionPolicyNotDelegated'),
   untrustworthyReportingOrigin('UntrustworthyReportingOrigin'),
   insecureContext('InsecureContext'),
   invalidHeader('InvalidHeader'),
@@ -933,6 +932,11 @@ enum AttributionReportingIssueType {
   sourceAndTriggerHeaders('SourceAndTriggerHeaders'),
   sourceIgnored('SourceIgnored'),
   triggerIgnored('TriggerIgnored'),
+  osSourceIgnored('OsSourceIgnored'),
+  osTriggerIgnored('OsTriggerIgnored'),
+  invalidRegisterOsSourceHeader('InvalidRegisterOsSourceHeader'),
+  invalidRegisterOsTriggerHeader('InvalidRegisterOsTriggerHeader'),
+  webAndOsHeaders('WebAndOsHeaders'),
   ;
 
   final String value;
@@ -1073,6 +1077,8 @@ enum GenericIssueErrorType {
   formLabelHasNeitherForNorNestedInput('FormLabelHasNeitherForNorNestedInput'),
   formLabelForMatchesNonExistingIdError(
       'FormLabelForMatchesNonExistingIdError'),
+  formInputHasWrongButWellIntendedAutocompleteValueError(
+      'FormInputHasWrongButWellIntendedAutocompleteValueError'),
   ;
 
   final String value;

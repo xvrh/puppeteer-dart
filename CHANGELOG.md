@@ -1,6 +1,9 @@
 ## 3.0.0
-- Use Chrome for Testing instead of Chromium
-- By default, cache the browser binaries in `.local-chrome` instead of `.local-chromium`
+- Download "Chrome for Testing" instead of Chromium.
+- Update to Chrome 113
+- Cache the browser binaries by default in `.local-chrome` instead of `.local-chromium`
+- Replace `revision` parameter with `version` in `downloadChrome`
+- Require minimum Dart `3.0.0` version.
 
 ## 2.24.0
 - Update to Chromium 112

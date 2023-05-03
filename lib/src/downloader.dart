@@ -4,14 +4,14 @@ import 'package:archive/archive.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 
-const _lastVersion = '112.0.5615.121';
+const _lastVersion = '113.0.5672.63';
 
-class RevisionInfo {
+class DownloadedBrowserInfo {
   final String executablePath;
   final String folderPath;
   final String version;
 
-  RevisionInfo(
+  DownloadedBrowserInfo(
       {required this.executablePath,
       required this.folderPath,
       required this.version});
@@ -27,7 +27,7 @@ class RevisionInfo {
 ///     print('downloaded $received of $total bytes');
 ///   });
 /// ```
-Future<RevisionInfo> downloadChrome({
+Future<DownloadedBrowserInfo> downloadChrome({
   String? version,
   String? cachePath,
   void Function(int received, int total)? onDownloadProgress,
@@ -42,7 +42,7 @@ Future<RevisionInfo> downloadChrome({
     revisionDirectory.createSync(recursive: true);
   }
 
-  var exePath = getExecutablePath(platform, revisionDirectory.path);
+  var exePath = p.join(revisionDirectory.path, getExecutablePath(platform));
 
   var executableFile = File(exePath);
 
@@ -68,7 +68,7 @@ Future<RevisionInfo> downloadChrome({
     await Process.run('xattr', ['-d', 'com.apple.quarantine', chromeAppPath]);
   }
 
-  return RevisionInfo(
+  return DownloadedBrowserInfo(
       folderPath: revisionDirectory.path,
       executablePath: executableFile.path,
       version: version);
@@ -131,31 +131,21 @@ void _simpleUnzip(String path, String targetPath) {
 const _baseUrl = 'https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing';
 
 String _downloadUrl(BrowserPlatform platform, String version) {
-  if (Platform.isWindows) {
-    return '$_baseUrl/$version/win64/chrome-win64.zip';
-  } else if (Platform.isLinux) {
-    return '$_baseUrl/$version/linux64/chrome-linux64.zip';
-  } else if (Platform.isMacOS) {
-    return '$_baseUrl/$version/mac-x64/chrome-mac-x64.zip';
-  } else {
-    throw UnsupportedError(
-        "Can't download chrome for platform ${Platform.operatingSystem}");
-  }
+  return '$_baseUrl/$version/${platform.folder}/chrome-${platform.folder}.zip';
 }
 
-String getExecutablePath(BrowserPlatform platform, String revisionPath) {
+String getExecutablePath(BrowserPlatform platform) {
   return switch (platform) {
     BrowserPlatform.macArm64 || BrowserPlatform.macX64 => p.join(
-        revisionPath,
         'chrome-${platform.folder}',
         'Google Chrome for Testing.app',
         'Contents',
         'MacOS',
         'Google Chrome for Testing'),
-    BrowserPlatform.linux64 => p.join(revisionPath, 'chrome-linux64', 'chrome'),
+    BrowserPlatform.linux64 => p.join('chrome-linux64', 'chrome'),
     BrowserPlatform.windows32 ||
     BrowserPlatform.windows64 =>
-      p.join(revisionPath, 'chrome-${platform.folder}', 'chrome.exe'),
+      p.join('chrome-${platform.folder}', 'chrome.exe'),
   };
 }
 

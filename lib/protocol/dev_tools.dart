@@ -17,6 +17,7 @@ import 'dom_snapshot.dart';
 import 'dom_storage.dart';
 import 'emulation.dart';
 import 'event_breakpoints.dart';
+import 'fed_cm.dart';
 import 'fetch.dart';
 import 'headless_experimental.dart';
 import 'heap_profiler.dart';
@@ -229,6 +230,10 @@ class DevTools {
 
   PreloadApi get preload => _preload ??= PreloadApi(client);
   PreloadApi? _preload;
+
+  /// This domain allows interacting with the FedCM dialog.
+  FedCmApi get fedCm => _fedCm ??= FedCmApi(client);
+  FedCmApi? _fedCm;
 
   /// Debugger domain exposes JavaScript debugging capabilities. It allows setting and removing
   /// breakpoints, stepping through execution, exploring stack traces, etc.

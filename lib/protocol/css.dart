@@ -842,6 +842,9 @@ class CSSRule {
   /// Rule selector data.
   final SelectorList selectorList;
 
+  /// Array of selectors from ancestor style rules, sorted by distance from the current rule.
+  final List<String>? nestingSelectors;
+
   /// Parent stylesheet's origin.
   final StyleSheetOrigin origin;
 
@@ -871,6 +874,7 @@ class CSSRule {
   CSSRule(
       {this.styleSheetId,
       required this.selectorList,
+      this.nestingSelectors,
       required this.origin,
       required this.style,
       this.media,
@@ -886,6 +890,9 @@ class CSSRule {
           : null,
       selectorList:
           SelectorList.fromJson(json['selectorList'] as Map<String, dynamic>),
+      nestingSelectors: json.containsKey('nestingSelectors')
+          ? (json['nestingSelectors'] as List).map((e) => e as String).toList()
+          : null,
       origin: StyleSheetOrigin.fromJson(json['origin'] as String),
       style: CSSStyle.fromJson(json['style'] as Map<String, dynamic>),
       media: json.containsKey('media')
@@ -922,6 +929,7 @@ class CSSRule {
       'origin': origin.toJson(),
       'style': style.toJson(),
       if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
+      if (nestingSelectors != null) 'nestingSelectors': [...?nestingSelectors],
       if (media != null) 'media': media!.map((e) => e.toJson()).toList(),
       if (containerQueries != null)
         'containerQueries': containerQueries!.map((e) => e.toJson()).toList(),
