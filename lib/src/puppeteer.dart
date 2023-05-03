@@ -321,7 +321,7 @@ Future _killChrome(Process process) {
   return process.exitCode;
 }
 
-final _devToolRegExp = RegExp(r'^DevTools listening on (ws:\/\/.*)$');
+final _devToolRegExp = RegExp(r'^DevTools listening on (ws://.*)$');
 
 Future<String> _waitForWebSocketUrl(Process chromeProcess) async {
   await for (String line in chromeProcess.stderr
@@ -341,7 +341,7 @@ Future<String> _inferExecutablePath() async {
   if (executablePath != null) {
     var file = File(executablePath);
     if (!file.existsSync()) {
-      executablePath = getExecutablePath(executablePath);
+      executablePath = getExecutablePath(BrowserPlatform.current, executablePath);
       if (!File(executablePath).existsSync()) {
         throw Exception(
             'The environment variable contains PUPPETEER_EXECUTABLE_PATH with '

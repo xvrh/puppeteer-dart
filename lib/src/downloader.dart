@@ -21,8 +21,8 @@ class RevisionInfo {
 /// Downloads the chrome revision specified by [revision] to the [cachePath] directory.
 /// ```dart
 /// await downloadChrome(
-///   revision: 1083080,
-///   cachePath: '.local-chromium',
+///   version: '112.0.5615.121',
+///   cachePath: '.local-chrome',
 ///   onDownloadProgress: (received, total) {
 ///     print('downloaded $received of $total bytes');
 ///   });
@@ -31,21 +31,23 @@ Future<RevisionInfo> downloadChrome({
   String? version,
   String? cachePath,
   void Function(int received, int total)? onDownloadProgress,
+  BrowserPlatform? platform,
 }) async {
   version ??= _lastVersion;
-  cachePath ??= '.local-chromium';
+  cachePath ??= '.local-chrome';
+  platform ??= BrowserPlatform.current;
 
   var revisionDirectory = Directory(p.join(cachePath, version));
   if (!revisionDirectory.existsSync()) {
     revisionDirectory.createSync(recursive: true);
   }
 
-  var exePath = getExecutablePath(revisionDirectory.path);
+  var exePath = getExecutablePath(platform, revisionDirectory.path);
 
   var executableFile = File(exePath);
 
   if (!executableFile.existsSync()) {
-    var url = _downloadUrl(version);
+    var url = _downloadUrl(platform, version);
     var zipPath = p.join(cachePath, '${version}_${p.url.basename(url)}');
     await _downloadFile(url, zipPath, onDownloadProgress);
     _unzip(zipPath, revisionDirectory.path);
@@ -128,7 +130,7 @@ void _simpleUnzip(String path, String targetPath) {
 
 const _baseUrl = 'https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing';
 
-String _downloadUrl(String version) {
+String _downloadUrl(BrowserPlatform platform, String version) {
   if (Platform.isWindows) {
     return '$_baseUrl/$version/win64/chrome-win64.zip';
   } else if (Platform.isLinux) {
@@ -141,20 +143,47 @@ String _downloadUrl(String version) {
   }
 }
 
-String getExecutablePath(String revisionPath) {
-  if (Platform.isWindows) {
-    return p.join(revisionPath, 'chrome-win64', 'chrome.exe');
-  } else if (Platform.isLinux) {
-    return p.join(revisionPath, 'chrome-linux64', 'chrome');
-  } else if (Platform.isMacOS) {
-    return p.join(
+String getExecutablePath(BrowserPlatform platform, String revisionPath) {
+  return switch (platform) {
+    BrowserPlatform.macArm64 || BrowserPlatform.macX64 => p.join(
         revisionPath,
-        'chrome-mac-x64',
+        'chrome-${platform.folder}',
         'Google Chrome for Testing.app',
         'Contents',
         'MacOS',
-        'Google Chrome for Testing');
-  } else {
-    throw UnsupportedError('Unknown platform ${Platform.operatingSystem}');
+        'Google Chrome for Testing'),
+    BrowserPlatform.linux64 => p.join(revisionPath, 'chrome-linux64', 'chrome'),
+    BrowserPlatform.windows32 ||
+    BrowserPlatform.windows64 =>
+      p.join(revisionPath, 'chrome-${platform.folder}', 'chrome.exe'),
+  };
+}
+
+enum BrowserPlatform {
+  macArm64._('macos_arm64', 'mac-arm64'),
+  macX64._('macos_x64', 'mac-x64'),
+  linux64._('linux_x64', 'linux64'),
+  windows32._('windows_ia32', 'win32'),
+  windows64._('windows_x64', 'win64'),
+  ;
+
+  final String dartPlatform;
+  final String folder;
+
+  const BrowserPlatform._(this.dartPlatform, this.folder);
+
+  factory BrowserPlatform.fromDartPlatform(String versionStringFull) {
+    final split = versionStringFull.split('"');
+    if (split.length < 2) {
+      throw FormatException(
+          "Unknown version from Platform.version '$versionStringFull'.");
+    }
+    final versionString = split[1];
+    return values.firstWhere((e) => e.dartPlatform == versionString,
+        orElse: () => throw FormatException(
+            "Unknown '$versionString' from Platform.version"
+            " '$versionStringFull'."));
   }
+
+  static final BrowserPlatform current = BrowserPlatform.fromDartPlatform(Platform.version);
 }

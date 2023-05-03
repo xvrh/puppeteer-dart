@@ -1,3 +1,7 @@
+## 3.0.0
+- Use Chrome for Testing instead of Chromium
+- By default, cache the browser binaries in `.local-chrome` instead of `.local-chromium`
+
 ## 2.24.0
 - Update to Chromium 112
 
