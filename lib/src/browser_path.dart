@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:path/path.dart' as p;
-
 import 'downloader.dart';
 
 class BrowserPath {
