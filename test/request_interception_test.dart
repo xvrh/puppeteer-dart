@@ -557,7 +557,12 @@ void main() {
       expect(response.url, equals(server.emptyPage));
     });
     test('should allow mocking binary responses', () async {
-      await page.emulate(puppeteer.devices.laptopWithMDPIScreen);
+      await page.emulate(Device('Laptop with MDPI screen',
+          userAgent: '',
+          viewport: DeviceViewport(
+            width: 800,
+            height: 1280,
+          )));
       await page.setRequestInterception(true);
       page.onRequest.listen((request) {
         var imageBuffer =

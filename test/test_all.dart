@@ -10,6 +10,7 @@ import 'devtools_test.dart' as devtools_test;
 import 'dialog_test.dart' as dialog_test;
 import 'doc_example_extractor_test.dart' as doc_example_extractor_test;
 import 'doc_examples_test.dart' as doc_examples_test;
+import 'download_all_platforms_test.dart' as download_all_platforms_test;
 import 'downloader_test.dart' as downloader_test;
 import 'drag_and_drop_test.dart' as drag_and_drop_test;
 import 'element_handle_test.dart' as element_handle_test;
@@ -53,6 +54,7 @@ void main() {
   group('dialog_test', dialog_test.main);
   group('doc_example_extractor_test', doc_example_extractor_test.main);
   group('doc_examples_test', doc_examples_test.main);
+  group('download_all_platforms_test', download_all_platforms_test.main);
   group('downloader_test', downloader_test.main);
   group('drag_and_drop_test', drag_and_drop_test.main);
   group('element_handle_test', element_handle_test.main);

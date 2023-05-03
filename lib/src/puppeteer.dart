@@ -341,7 +341,8 @@ Future<String> _inferExecutablePath() async {
   if (executablePath != null) {
     var file = File(executablePath);
     if (!file.existsSync()) {
-      executablePath = p.join(executablePath, getExecutablePath(BrowserPlatform.current));
+      executablePath =
+          p.join(executablePath, getExecutablePath(BrowserPlatform.current));
       if (!File(executablePath).existsSync()) {
         throw Exception(
             'The environment variable contains PUPPETEER_EXECUTABLE_PATH with '

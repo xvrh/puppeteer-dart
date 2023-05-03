@@ -143,8 +143,7 @@ String getExecutablePath(BrowserPlatform platform) {
         'MacOS',
         'Google Chrome for Testing'),
     BrowserPlatform.linux64 => p.join('chrome-linux64', 'chrome'),
-    BrowserPlatform.windows32 ||
-    BrowserPlatform.windows64 =>
+    BrowserPlatform.windows32 || BrowserPlatform.windows64 =>
       p.join('chrome-${platform.folder}', 'chrome.exe'),
   };
 }
@@ -175,5 +174,6 @@ enum BrowserPlatform {
             " '$versionStringFull'."));
   }
 
-  static final BrowserPlatform current = BrowserPlatform.fromDartPlatform(Platform.version);
+  static final BrowserPlatform current =
+      BrowserPlatform.fromDartPlatform(Platform.version);
 }
