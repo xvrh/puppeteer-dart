@@ -3,6 +3,7 @@ import 'accessibility_test.dart' as accessibility_test;
 import 'browser_context_test.dart' as browser_context_test;
 import 'browser_test.dart' as browser_test;
 import 'click_test.dart' as click_test;
+import 'connect_on_web_directly_test.dart' as connect_on_web_directly_test;
 import 'connect_on_web_test.dart' as connect_on_web_test;
 import 'coverage_test.dart' as coverage_test;
 import 'devices_test.dart' as devices_test;
@@ -47,6 +48,7 @@ void main() {
   group('browser_context_test', browser_context_test.main);
   group('browser_test', browser_test.main);
   group('click_test', click_test.main);
+  group('connect_on_web_directly_test', connect_on_web_directly_test.main);
   group('connect_on_web_test', connect_on_web_test.main);
   group('coverage_test', coverage_test.main);
   group('devices_test', devices_test.main);
