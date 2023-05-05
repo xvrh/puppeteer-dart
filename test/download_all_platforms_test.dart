@@ -7,7 +7,10 @@ import 'package:puppeteer/src/downloader.dart';
 import 'package:test/test.dart';
 
 void main() {
-  for (var platform in BrowserPlatform.values) {
+  var platformsToTest = Platform.isWindows ? [
+    BrowserPlatform.windows32,BrowserPlatform.windows64
+  ] : BrowserPlatform.values;
+  for (var platform in platformsToTest) {
     test('Download on ${platform.name}', () async {
       var info = await downloadChrome(platform: platform);
       expect(File(info.executablePath).lengthSync(), greaterThan(0));

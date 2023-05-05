@@ -48,7 +48,7 @@ Future<DownloadedBrowserInfo> downloadChrome({
 
   if (!executableFile.existsSync()) {
     var url = _downloadUrl(platform, version);
-    var zipPath = p.join(cachePath, '${version}_${p.url.basename(url)}');
+    var zipPath = p.join(revisionDirectory.path, p.url.basename(url));
     await _downloadFile(url, zipPath, onDownloadProgress);
     _unzip(zipPath, revisionDirectory.path);
     File(zipPath).deleteSync();
@@ -102,7 +102,14 @@ void _unzip(String path, String targetPath) {
     // The _simpleUnzip doesn't support symlinks so we prefer a native command
     Process.runSync('unzip', [path, '-d', targetPath]);
   } else {
-    _simpleUnzip(path, targetPath);
+    try {
+      var result = Process.runSync('tar', ['-xf', path, '-C', targetPath]);
+      if (result.exitCode != 0) {
+        throw Exception('Failed to unzip chrome binaries:\n${result.stderr}');
+      }
+    } on ProcessException {
+      _simpleUnzip(path, targetPath);
+    }
   }
 }
 
@@ -142,7 +149,7 @@ String getExecutablePath(BrowserPlatform platform) {
         'Contents',
         'MacOS',
         'Google Chrome for Testing'),
-    BrowserPlatform.linux64 => p.join('chrome-linux64', 'chrome'),
+    BrowserPlatform.linux64 => p.join('chrome-${platform.folder}', 'chrome'),
     BrowserPlatform.windows32 || BrowserPlatform.windows64 =>
       p.join('chrome-${platform.folder}', 'chrome.exe'),
   };
