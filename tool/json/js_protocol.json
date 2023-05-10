@@ -1202,7 +1202,8 @@
                                 "OOM",
                                 "other",
                                 "promiseRejection",
-                                "XHR"
+                                "XHR",
+                                "step"
                             ]
                         },
                         {
@@ -1293,7 +1294,7 @@
                         },
                         {
                             "name": "executionContextAuxData",
-                            "description": "Embedder-specific auxiliary data.",
+                            "description": "Embedder-specific auxiliary data likely matching {isDefault: boolean, type: 'default'|'isolated'|'worker', frameId: string}",
                             "optional": true,
                             "type": "object"
                         },
@@ -1397,7 +1398,7 @@
                         },
                         {
                             "name": "executionContextAuxData",
-                            "description": "Embedder-specific auxiliary data.",
+                            "description": "Embedder-specific auxiliary data likely matching {isDefault: boolean, type: 'default'|'isolated'|'worker', frameId: string}",
                             "optional": true,
                             "type": "object"
                         },
@@ -2161,8 +2162,8 @@
                     "type": "string"
                 },
                 {
-                    "id": "WebDriverValue",
-                    "description": "Represents the value serialiazed by the WebDriver BiDi specification\nhttps://w3c.github.io/webdriver-bidi.",
+                    "id": "DeepSerializedValue",
+                    "description": "Represents the value serialiazed by the WebDriver BiDi specification\nhttps://goo.gle/browser-automation-deepserialization.",
                     "type": "object",
                     "properties": [
                         {
@@ -2203,6 +2204,12 @@
                             "name": "objectId",
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "weakLocalObjectReference",
+                            "description": "Set if value reference met more then once during serialization. In such\ncase, value is provided only to one of the serialized values. Unique\nper value in the scope of one CDP call.",
+                            "optional": true,
+                            "type": "integer"
                         }
                     ]
                 },
@@ -2292,7 +2299,7 @@
                             "description": "WebDriver BiDi representation of the value.",
                             "experimental": true,
                             "optional": true,
-                            "$ref": "WebDriverValue"
+                            "$ref": "DeepSerializedValue"
                         },
                         {
                             "name": "objectId",
@@ -2667,7 +2674,7 @@
                         },
                         {
                             "name": "auxData",
-                            "description": "Embedder-specific auxiliary data.",
+                            "description": "Embedder-specific auxiliary data likely matching {isDefault: boolean, type: 'default'|'isolated'|'worker', frameId: string}",
                             "optional": true,
                             "type": "object"
                         }
@@ -2957,7 +2964,7 @@
                         },
                         {
                             "name": "generateWebDriverValue",
-                            "description": "Whether the result should contain `webDriverValue`, serialized according to\nhttps://w3c.github.io/webdriver-bidi. This is mutually exclusive with `returnByValue`, but\nresulting `objectId` is still provided.",
+                            "description": "Whether the result should contain `webDriverValue`, serialized according to\nhttps://goo.gle/browser-automation-deepserialization. This is mutually\nexclusive with `returnByValue`, but resulting `objectId` is still provided.",
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
@@ -3132,7 +3139,7 @@
                         },
                         {
                             "name": "generateWebDriverValue",
-                            "description": "Whether the result should be serialized according to https://w3c.github.io/webdriver-bidi.",
+                            "description": "Whether the result should be serialized according to https://goo.gle/browser-automation-deepserialization.",
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"

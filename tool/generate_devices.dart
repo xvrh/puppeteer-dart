@@ -1,23 +1,18 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dart_style/dart_style.dart';
-import 'package:http/http.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'utils/split_words.dart';
 import 'utils/string_helpers.dart';
 
 part 'generate_devices.g.dart';
 
-//TODO(xha): this script doesn't work anymore since the file has changed to
-// typescript code (instead of json file):
-// https://github.com/ChromeDevTools/devtools-frontend/blob/master/front_end/panels/emulation/EmulatedDevices.ts
-const deviceUrl =
-    'https://raw.githubusercontent.com/ChromeDevTools/devtools-frontend/master/front_end/emulated_devices/module.json';
-
 void main() async {
-  var content = await read(Uri.parse(deviceUrl));
+  // List extracted from https://github.com/puppeteer/puppeteer/blob/main/packages/puppeteer-core/src/common/Device.ts
+  var content = await File('tool/known_devices.json').readAsString();
 
-  var module = Module.fromJson(jsonDecode(content) as Map<String, dynamic>);
+  var devices = (jsonDecode(content) as List<dynamic>)
+      .map((e) => Device.fromJson(e as Map<String, dynamic>));
 
   var buffer = StringBuffer();
   buffer.writeln("import 'dart:collection';");
@@ -26,35 +21,13 @@ void main() async {
       "import 'page/emulation_manager.dart' show Device, DeviceViewport;");
   buffer.writeln('class Devices with IterableMixin<Device> {');
   var allNames = <String?, String>{};
-  for (var emulatedDevice
-      in module.extensions?.where((e) => e.type == 'emulated-device') ??
-          <Extension>[]) {
-    var device = emulatedDevice.device!;
+  for (var device in devices) {
+    var variableName = firstLetterLower(
+        splitWords(device.name).map(firstLetterUpper).join(''));
+    allNames[device.name] = variableName;
 
-    const deviceSplits = {
-      'iPhone 6/7/8': ['iPhone 6', 'iPhone 7', 'iPhone 8'],
-      'iPhone 6 Plus': ['iPhone 6 Plus', 'iPhone 7 Plus', 'iPhone 8 Plus'],
-      'iPhone 5/SE': ['iPhone 5', 'iPhone SE'],
-    };
-    var names = deviceSplits[device.title] ?? [device.title];
-
-    for (var name in names) {
-      var deviceName =
-          firstLetterLower(splitWords(name).map(firstLetterUpper).join(''));
-      allNames[name] = deviceName;
-
-      buffer.writeln(
-          'final $deviceName = ${device.toCode(name, viewportCode(device, device.screen!.vertical!))};');
-      buffer.writeln();
-
-      var landscape = device.screen!.horizontal;
-      if (landscape != null) {
-        allNames['$name Landscape'] = '${deviceName}Landscape';
-        buffer.writeln(
-            'final ${deviceName}Landscape = ${device.toCode(name, viewportCode(device, landscape, isLandscape: true))};');
-        buffer.writeln();
-      }
-    }
+    buffer.writeln('final $variableName = ${device.toCode()};');
+    buffer.writeln();
   }
   var allNamesMap =
       allNames.entries.map((e) => "'${e.key}': ${e.value}").join(', ');
@@ -77,82 +50,45 @@ void main() async {
 }
 
 @JsonSerializable()
-class Module {
-  List<Extension>? extensions;
-
-  Module();
-
-  factory Module.fromJson(Map<String, dynamic> json) => _$ModuleFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ModuleToJson(this);
-}
-
-@JsonSerializable()
-class Extension {
-  String? type;
-  int? order;
-  Device? device;
-
-  Extension();
-
-  factory Extension.fromJson(Map<String, dynamic> json) =>
-      _$ExtensionFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ExtensionToJson(this);
-}
-
-@JsonSerializable()
 class Device {
-  String title;
-  List<String>? capabilities;
-  @JsonKey(name: 'user-agent')
-  String? userAgent;
-  String? type;
-  Screen? screen;
+  final String name;
+  final String userAgent;
+  final DeviceViewport viewport;
 
-  Device(this.title);
+  Device(this.name, this.userAgent, this.viewport);
 
   factory Device.fromJson(Map<String, dynamic> json) => _$DeviceFromJson(json);
 
-  String toCode(String? name, String viewportCode) {
-    return "Device('$name', userAgent: '$userAgent', viewport: $viewportCode)";
+  String toCode() {
+    return "Device('$name', userAgent: '$userAgent', viewport: ${viewport.toCode()})";
   }
 
   Map<String, dynamic> toJson() => _$DeviceToJson(this);
 }
 
 @JsonSerializable()
-class Screen {
-  @JsonKey(name: 'device-pixel-ratio')
-  num? devicePixelRatio;
-  ScreenOrientation? horizontal, vertical;
+class DeviceViewport {
+  final int width, height;
+  final num deviceScaleFactor;
+  final bool isMobile;
+  final bool hasTouch;
+  final bool isLandscape;
 
-  Screen();
+  DeviceViewport(this.width, this.height, this.deviceScaleFactor, this.isMobile,
+      this.hasTouch, this.isLandscape);
 
-  factory Screen.fromJson(Map<String, dynamic> json) => _$ScreenFromJson(json);
+  factory DeviceViewport.fromJson(Map<String, dynamic> json) =>
+      _$DeviceViewportFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ScreenToJson(this);
-}
+  String toCode() {
+    return 'DeviceViewport(width: $width, '
+        'height: $height, '
+        'deviceScaleFactor: $deviceScaleFactor, '
+        'isMobile: $isMobile,'
+        'hasTouch: $hasTouch,'
+        'isLandscape: $isLandscape'
+        ')';
+  }
 
-@JsonSerializable()
-class ScreenOrientation {
-  num? width, height;
-
-  ScreenOrientation();
-
-  factory ScreenOrientation.fromJson(Map<String, dynamic> json) =>
-      _$ScreenOrientationFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ScreenOrientationToJson(this);
-}
-
-String viewportCode(Device device, ScreenOrientation orientation,
-    {bool isLandscape = false}) {
-  return 'DeviceViewport(width: ${orientation.width}, '
-      'height: ${orientation.height}, '
-      'deviceScaleFactor: ${device.screen!.devicePixelRatio}, '
-      'isMobile: ${device.capabilities!.contains('mobile')},'
-      'hasTouch: ${device.capabilities!.contains('touch')},'
-      'isLandscape: $isLandscape'
-      ')';
+  Map<String, dynamic> toJson() => _$DeviceViewportToJson(this);
 }

@@ -47,6 +47,16 @@ class StorageApi {
       .where((event) => event.name == 'Storage.sharedStorageAccessed')
       .map((event) => SharedStorageAccessedEvent.fromJson(event.parameters));
 
+  Stream<StorageBucketInfo> get onStorageBucketCreatedOrUpdated => _client
+      .onEvent
+      .where((event) => event.name == 'Storage.storageBucketCreatedOrUpdated')
+      .map((event) => StorageBucketInfo.fromJson(
+          event.parameters['bucket'] as Map<String, dynamic>));
+
+  Stream<String> get onStorageBucketDeleted => _client.onEvent
+      .where((event) => event.name == 'Storage.storageBucketDeleted')
+      .map((event) => event.parameters['bucketId'] as String);
+
   /// Returns a storage key given a frame id.
   Future<SerializedStorageKey> getStorageKeyForFrame(
       page.FrameId frameId) async {
@@ -299,6 +309,22 @@ class StorageApi {
       'enable': enable,
     });
   }
+
+  /// Set tracking for a storage key's buckets.
+  Future<void> setStorageBucketTracking(String storageKey, bool enable) async {
+    await _client.send('Storage.setStorageBucketTracking', {
+      'storageKey': storageKey,
+      'enable': enable,
+    });
+  }
+
+  /// Deletes the Storage Bucket with the given storage key and bucket name.
+  Future<void> deleteStorageBucket(String storageKey, String bucketName) async {
+    await _client.send('Storage.deleteStorageBucket', {
+      'storageKey': storageKey,
+      'bucketName': bucketName,
+    });
+  }
 }
 
 class CacheStorageContentUpdatedEvent {
@@ -515,6 +541,7 @@ enum StorageType {
   cacheStorage('cache_storage'),
   interestGroups('interest_groups'),
   sharedStorage('shared_storage'),
+  storageBuckets('storage_buckets'),
   all('all'),
   other('other'),
   ;
@@ -947,6 +974,80 @@ class SharedStorageAccessParams {
       if (key != null) 'key': key,
       if (value != null) 'value': value,
       if (ignoreIfPresent != null) 'ignoreIfPresent': ignoreIfPresent,
+    };
+  }
+}
+
+enum StorageBucketsDurability {
+  relaxed('relaxed'),
+  strict('strict'),
+  ;
+
+  final String value;
+
+  const StorageBucketsDurability(this.value);
+
+  factory StorageBucketsDurability.fromJson(String value) =>
+      StorageBucketsDurability.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+class StorageBucketInfo {
+  final SerializedStorageKey storageKey;
+
+  final String id;
+
+  final String name;
+
+  final bool isDefault;
+
+  final network.TimeSinceEpoch expiration;
+
+  /// Storage quota (bytes).
+  final num quota;
+
+  final bool persistent;
+
+  final StorageBucketsDurability durability;
+
+  StorageBucketInfo(
+      {required this.storageKey,
+      required this.id,
+      required this.name,
+      required this.isDefault,
+      required this.expiration,
+      required this.quota,
+      required this.persistent,
+      required this.durability});
+
+  factory StorageBucketInfo.fromJson(Map<String, dynamic> json) {
+    return StorageBucketInfo(
+      storageKey: SerializedStorageKey.fromJson(json['storageKey'] as String),
+      id: json['id'] as String,
+      name: json['name'] as String,
+      isDefault: json['isDefault'] as bool? ?? false,
+      expiration: network.TimeSinceEpoch.fromJson(json['expiration'] as num),
+      quota: json['quota'] as num,
+      persistent: json['persistent'] as bool? ?? false,
+      durability:
+          StorageBucketsDurability.fromJson(json['durability'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'storageKey': storageKey.toJson(),
+      'id': id,
+      'name': name,
+      'isDefault': isDefault,
+      'expiration': expiration.toJson(),
+      'quota': quota,
+      'persistent': persistent,
+      'durability': durability.toJson(),
     };
   }
 }

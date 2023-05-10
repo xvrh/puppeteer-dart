@@ -110,7 +110,8 @@ void main() {
       expect(screenshot, equalsGolden('test/golden/white.jpg'));
     });
     test('should work with odd clip size on Retina displays', () async {
-      await page.setViewport(puppeteer.devices.laptopWithHiDPIScreen.viewport);
+      await page.setViewport(
+          DeviceViewport(width: 900, height: 1440, deviceScaleFactor: 2));
       var screenshot = await page.screenshot(clip: Rectangle(0, 0, 11, 11));
       expect(
           screenshot, equalsGolden('test/golden/screenshot-clip-odd-size.png'));

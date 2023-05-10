@@ -247,7 +247,7 @@ class Browser {
     ]).where(predicate).first.timeout(timeout);
   }
 
-  /// For headless Chromium, this is similar to HeadlessChrome/61.0.3153.0. For
+  /// For headless Chrome, this is similar to HeadlessChrome/61.0.3153.0. For
   /// non-headless, this is similar to Chrome/61.0.3153.0.
   Future<String> get version async {
     var version = await browser.getVersion();

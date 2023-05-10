@@ -28,7 +28,8 @@ final List<String> _defaultArgs = <String>[
   '--disable-dev-shm-usage',
   '--disable-extensions',
   // AcceptCHFrame disabled because of crbug.com/1348106.
-  '--disable-features=Translate,BackForwardCache,AcceptCHFrame,MediaRouter,OptimizationHints',
+  // DIPS is disabled because of crbug.com/1439578. TODO: enable after M115.
+  '--disable-features=Translate,BackForwardCache,AcceptCHFrame,MediaRouter,OptimizationHints,DIPS',
   '--disable-hang-monitor',
   '--disable-ipc-flooding-protection',
   '--disable-popup-blocking',
@@ -320,7 +321,7 @@ Future _killChrome(Process process) {
   return process.exitCode;
 }
 
-final _devToolRegExp = RegExp(r'^DevTools listening on (ws:\/\/.*)$');
+final _devToolRegExp = RegExp(r'^DevTools listening on (ws://.*)$');
 
 Future<String> _waitForWebSocketUrl(Process chromeProcess) async {
   await for (String line in chromeProcess.stderr
@@ -340,7 +341,8 @@ Future<String> _inferExecutablePath() async {
   if (executablePath != null) {
     var file = File(executablePath);
     if (!file.existsSync()) {
-      executablePath = getExecutablePath(executablePath);
+      executablePath =
+          p.join(executablePath, getExecutablePath(BrowserPlatform.current));
       if (!File(executablePath).existsSync()) {
         throw Exception(
             'The environment variable contains PUPPETEER_EXECUTABLE_PATH with '

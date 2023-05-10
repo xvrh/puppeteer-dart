@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:path/path.dart' as p;
+import 'downloader.dart';
 
 class BrowserPath {
   static final _chrome = _BrowserPath(
@@ -27,10 +28,10 @@ class BrowserPath {
     linux: [],
   );
 
-  static String get chrome => _chrome.forPlatform;
-  static String get chromeBeta => _chromeBeta.forPlatform;
-  static String get chromeDev => _chromeDev.forPlatform;
-  static String get chromeCanary => _chromeCanary.forPlatform;
+  static String get chrome => _chrome.forCurrentPlatform;
+  static String get chromeBeta => _chromeBeta.forCurrentPlatform;
+  static String get chromeDev => _chromeDev.forCurrentPlatform;
+  static String get chromeCanary => _chromeCanary.forCurrentPlatform;
 }
 
 List<String> _linuxPath(String folder) => ['/opt/google/$folder/chrome'];
@@ -62,21 +63,13 @@ class _BrowserPath {
   _BrowserPath(this.name,
       {required this.windows, required this.linux, required this.macOS});
 
-  List<String> get _possiblePaths {
-    if (Platform.isLinux) {
-      return linux;
-    } else if (Platform.isMacOS) {
-      return macOS;
-    } else if (Platform.isWindows) {
-      return windows;
-    } else {
-      throw Exception(
-          'The platform ${Platform.operatingSystem} is not supported');
-    }
-  }
+  String forPlatform(BrowserPlatform platform) {
+    var possiblePaths = switch (platform) {
+      BrowserPlatform.macArm64 || BrowserPlatform.macX64 => macOS,
+      BrowserPlatform.linux64 => linux,
+      BrowserPlatform.windows32 || BrowserPlatform.windows64 => windows,
+    };
 
-  String get forPlatform {
-    var possiblePaths = _possiblePaths;
     for (var possiblePath in possiblePaths) {
       if (FileSystemEntity.isFileSync(possiblePath)) {
         return possiblePath;
@@ -85,4 +78,6 @@ class _BrowserPath {
     throw Exception(
         'Chrome $name is not installed on the system ${Platform.operatingSystem}');
   }
+
+  String get forCurrentPlatform => forPlatform(BrowserPlatform.current);
 }

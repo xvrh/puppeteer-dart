@@ -5,7 +5,7 @@ export 'protocol/network.dart' show CookieParam, ResourceType, ErrorReason;
 export 'src/browser.dart' show Browser, BrowserContext, PermissionType;
 export 'src/browser_path.dart' show BrowserPath;
 export 'src/connection.dart' show ServerException, TargetClosedException;
-export 'src/downloader.dart' show downloadChrome, RevisionInfo;
+export 'src/downloader.dart' show downloadChrome, DownloadedBrowserInfo;
 export 'src/page/accessibility.dart' show Accessibility, AXNode;
 export 'src/page/coverage.dart' show Coverage, CoverageEntry, Range;
 export 'src/page/dialog.dart' show Dialog, DialogType;
