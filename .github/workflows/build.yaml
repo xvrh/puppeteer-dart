@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: ['beta'] #TODO(xha): back to stable once Dart 3 is released
+        sdk: ['stable']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: dart-lang/setup-dart@v1
