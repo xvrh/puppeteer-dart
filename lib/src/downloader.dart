@@ -150,7 +150,8 @@ String getExecutablePath(BrowserPlatform platform) {
         'MacOS',
         'Google Chrome for Testing'),
     BrowserPlatform.linux64 => p.join('chrome-${platform.folder}', 'chrome'),
-    BrowserPlatform.windows32 || BrowserPlatform.windows64 =>
+    BrowserPlatform.windows32 ||
+    BrowserPlatform.windows64 =>
       p.join('chrome-${platform.folder}', 'chrome.exe'),
   };
 }
