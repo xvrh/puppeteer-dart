@@ -1,7 +1,7 @@
 import 'package:puppeteer/puppeteer.dart';
 
 void main() async {
-  // Download the Chromium binaries, launch it and connect to the "DevTools"
+  // Download the Chrome binaries, launch it and connect to the "DevTools"
   var browser = await puppeteer.launch();
 
   // Open a new tab

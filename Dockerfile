@@ -19,4 +19,4 @@ ENV CHROME_FORCE_NO_SANDBOX=true
 
 COPY . .
 RUN dart pub get
-RUN dart example/download_chromium.dart
+RUN dart example/download_chrome.dart

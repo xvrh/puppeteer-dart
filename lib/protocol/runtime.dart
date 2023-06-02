@@ -1536,7 +1536,7 @@ class ExecutionContextDescription {
   /// performs a cross-process navigation.
   final String uniqueId;
 
-  /// Embedder-specific auxiliary data.
+  /// Embedder-specific auxiliary data likely matching {isDefault: boolean, type: 'default'|'isolated'|'worker', frameId: string}
   final Map<String, dynamic>? auxData;
 
   ExecutionContextDescription(

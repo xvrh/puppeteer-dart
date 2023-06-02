@@ -42,7 +42,7 @@ Download the last revision of chrome and launch it.
 import 'package:puppeteer/puppeteer.dart';
 
 void main() async {
-  // Download the Chromium binaries, launch it and connect to the "DevTools"
+  // Download the Chrome binaries, launch it and connect to the "DevTools"
   var browser = await puppeteer.launch();
 
   // Open a new tab
@@ -253,7 +253,7 @@ void main() async {
 ```
 
 ### Launch with visible window
-By default, puppeteer launch Chromium in "headless" mode, the browser is invisible.
+By default, puppeteer launch Chrome in "headless" mode, the browser is invisible.
 For better development & debugging, you can force "headful" mode with parameter `headless: false`
 
 ```dart
@@ -380,10 +380,10 @@ main() {
 
 This library does 2 things:
 
-1) Download the Chromium binaries and launch a Chromium process.
+1) Download the Chrome binaries and launch a Chrome process.
 2) Connect to this process with Websocket and send json commands to control the browser.
 
-Due to limitations on mobile platforms (iOS and Android), **it is not possible to launch an external Chromium process on iOS and Android**.
+Due to limitations on mobile platforms (iOS and Android), **it is not possible to launch an external Chrome process on iOS and Android**.
 So, step 1) does not work on mobile.
 
 You can still use `puppeteer-dart` on Flutter either with:

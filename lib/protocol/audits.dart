@@ -928,7 +928,6 @@ enum AttributionReportingIssueType {
   invalidHeader('InvalidHeader'),
   invalidRegisterTriggerHeader('InvalidRegisterTriggerHeader'),
   invalidEligibleHeader('InvalidEligibleHeader'),
-  tooManyConcurrentRequests('TooManyConcurrentRequests'),
   sourceAndTriggerHeaders('SourceAndTriggerHeaders'),
   sourceIgnored('SourceIgnored'),
   triggerIgnored('TriggerIgnored'),
@@ -937,6 +936,7 @@ enum AttributionReportingIssueType {
   invalidRegisterOsSourceHeader('InvalidRegisterOsSourceHeader'),
   invalidRegisterOsTriggerHeader('InvalidRegisterOsTriggerHeader'),
   webAndOsHeaders('WebAndOsHeaders'),
+  noWebOrOsSupport('NoWebOrOsSupport'),
   ;
 
   final String value;
@@ -1103,8 +1103,13 @@ class GenericIssueDetails {
 
   final dom.BackendNodeId? violatingNodeId;
 
+  final String? violatingNodeAttribute;
+
   GenericIssueDetails(
-      {required this.errorType, this.frameId, this.violatingNodeId});
+      {required this.errorType,
+      this.frameId,
+      this.violatingNodeId,
+      this.violatingNodeAttribute});
 
   factory GenericIssueDetails.fromJson(Map<String, dynamic> json) {
     return GenericIssueDetails(
@@ -1115,6 +1120,9 @@ class GenericIssueDetails {
       violatingNodeId: json.containsKey('violatingNodeId')
           ? dom.BackendNodeId.fromJson(json['violatingNodeId'] as int)
           : null,
+      violatingNodeAttribute: json.containsKey('violatingNodeAttribute')
+          ? json['violatingNodeAttribute'] as String
+          : null,
     );
   }
 
@@ -1123,6 +1131,8 @@ class GenericIssueDetails {
       'errorType': errorType.toJson(),
       if (frameId != null) 'frameId': frameId!.toJson(),
       if (violatingNodeId != null) 'violatingNodeId': violatingNodeId!.toJson(),
+      if (violatingNodeAttribute != null)
+        'violatingNodeAttribute': violatingNodeAttribute,
     };
   }
 }
@@ -1159,6 +1169,30 @@ class DeprecationIssueDetails {
       'sourceCodeLocation': sourceCodeLocation.toJson(),
       'type': type,
       if (affectedFrame != null) 'affectedFrame': affectedFrame!.toJson(),
+    };
+  }
+}
+
+/// This issue warns about sites in the redirect chain of a finished navigation
+/// that may be flagged as trackers and have their state cleared if they don't
+/// receive a user interaction. Note that in this context 'site' means eTLD+1.
+/// For example, if the URL `https://example.test:80/bounce` was in the
+/// redirect chain, the site reported would be `example.test`.
+class BounceTrackingIssueDetails {
+  final List<String> trackingSites;
+
+  BounceTrackingIssueDetails({required this.trackingSites});
+
+  factory BounceTrackingIssueDetails.fromJson(Map<String, dynamic> json) {
+    return BounceTrackingIssueDetails(
+      trackingSites:
+          (json['trackingSites'] as List).map((e) => e as String).toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'trackingSites': [...trackingSites],
     };
   }
 }
@@ -1213,14 +1247,17 @@ enum FederatedAuthRequestIssueReason {
   wellKnownNoResponse('WellKnownNoResponse'),
   wellKnownInvalidResponse('WellKnownInvalidResponse'),
   wellKnownListEmpty('WellKnownListEmpty'),
+  wellKnownInvalidContentType('WellKnownInvalidContentType'),
   configNotInWellKnown('ConfigNotInWellKnown'),
   wellKnownTooBig('WellKnownTooBig'),
   configHttpNotFound('ConfigHttpNotFound'),
   configNoResponse('ConfigNoResponse'),
   configInvalidResponse('ConfigInvalidResponse'),
+  configInvalidContentType('ConfigInvalidContentType'),
   clientMetadataHttpNotFound('ClientMetadataHttpNotFound'),
   clientMetadataNoResponse('ClientMetadataNoResponse'),
   clientMetadataInvalidResponse('ClientMetadataInvalidResponse'),
+  clientMetadataInvalidContentType('ClientMetadataInvalidContentType'),
   disabledInSettings('DisabledInSettings'),
   errorFetchingSignin('ErrorFetchingSignin'),
   invalidSigninResponse('InvalidSigninResponse'),
@@ -1228,10 +1265,12 @@ enum FederatedAuthRequestIssueReason {
   accountsNoResponse('AccountsNoResponse'),
   accountsInvalidResponse('AccountsInvalidResponse'),
   accountsListEmpty('AccountsListEmpty'),
+  accountsInvalidContentType('AccountsInvalidContentType'),
   idTokenHttpNotFound('IdTokenHttpNotFound'),
   idTokenNoResponse('IdTokenNoResponse'),
   idTokenInvalidResponse('IdTokenInvalidResponse'),
   idTokenInvalidRequest('IdTokenInvalidRequest'),
+  idTokenInvalidContentType('IdTokenInvalidContentType'),
   errorIdToken('ErrorIdToken'),
   canceled('Canceled'),
   rpPageNotVisible('RpPageNotVisible'),
@@ -1298,6 +1337,7 @@ enum InspectorIssueCode {
   deprecationIssue('DeprecationIssue'),
   clientHintIssue('ClientHintIssue'),
   federatedAuthRequestIssue('FederatedAuthRequestIssue'),
+  bounceTrackingIssue('BounceTrackingIssue'),
   ;
 
   final String value;
@@ -1349,6 +1389,8 @@ class InspectorIssueDetails {
 
   final FederatedAuthRequestIssueDetails? federatedAuthRequestIssueDetails;
 
+  final BounceTrackingIssueDetails? bounceTrackingIssueDetails;
+
   InspectorIssueDetails(
       {this.cookieIssueDetails,
       this.mixedContentIssueDetails,
@@ -1365,7 +1407,8 @@ class InspectorIssueDetails {
       this.genericIssueDetails,
       this.deprecationIssueDetails,
       this.clientHintIssueDetails,
-      this.federatedAuthRequestIssueDetails});
+      this.federatedAuthRequestIssueDetails,
+      this.bounceTrackingIssueDetails});
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
     return InspectorIssueDetails(
@@ -1441,6 +1484,10 @@ class InspectorIssueDetails {
           ? FederatedAuthRequestIssueDetails.fromJson(
               json['federatedAuthRequestIssueDetails'] as Map<String, dynamic>)
           : null,
+      bounceTrackingIssueDetails: json.containsKey('bounceTrackingIssueDetails')
+          ? BounceTrackingIssueDetails.fromJson(
+              json['bounceTrackingIssueDetails'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -1484,6 +1531,8 @@ class InspectorIssueDetails {
       if (federatedAuthRequestIssueDetails != null)
         'federatedAuthRequestIssueDetails':
             federatedAuthRequestIssueDetails!.toJson(),
+      if (bounceTrackingIssueDetails != null)
+        'bounceTrackingIssueDetails': bounceTrackingIssueDetails!.toJson(),
     };
   }
 }

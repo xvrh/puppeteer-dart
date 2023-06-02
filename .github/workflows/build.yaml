@@ -20,7 +20,7 @@ jobs:
       - run: dart --version
       - run: dart pub get
       - run: dart analyze --fatal-infos .
-      - run: dart example/download_chromium.dart
+      - run: dart example/download_chrome.dart
       - run: xvfb-run --auto-servernum dart test -P ci --platform vm
         if: runner.os == 'Linux'
       - run: dart test -P ci --platform vm --concurrency 1
