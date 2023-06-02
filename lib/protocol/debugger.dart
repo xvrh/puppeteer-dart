@@ -554,7 +554,7 @@ class ScriptFailedToParseEvent {
   /// Content hash of the script, SHA-256.
   final String hash;
 
-  /// Embedder-specific auxiliary data.
+  /// Embedder-specific auxiliary data likely matching {isDefault: boolean, type: 'default'|'isolated'|'worker', frameId: string}
   final Map<String, dynamic>? executionContextAuxData;
 
   /// URL of source map associated with script (if any).
@@ -663,7 +663,7 @@ class ScriptParsedEvent {
   /// Content hash of the script, SHA-256.
   final String hash;
 
-  /// Embedder-specific auxiliary data.
+  /// Embedder-specific auxiliary data likely matching {isDefault: boolean, type: 'default'|'isolated'|'worker', frameId: string}
   final Map<String, dynamic>? executionContextAuxData;
 
   /// True, if this script is generated as a result of the live edit operation.
@@ -1391,6 +1391,7 @@ enum PausedEventReason {
   other('other'),
   promiseRejection('promiseRejection'),
   xhr('XHR'),
+  step('step'),
   ;
 
   final String value;

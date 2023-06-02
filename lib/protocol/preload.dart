@@ -26,6 +26,13 @@ class PreloadApi {
           .map((event) =>
               PrerenderAttemptCompletedEvent.fromJson(event.parameters));
 
+  /// Fired when a preload enabled state is updated.
+  Stream<PreloadEnabledState> get onPreloadEnabledStateUpdated => _client
+      .onEvent
+      .where((event) => event.name == 'Preload.preloadEnabledStateUpdated')
+      .map((event) =>
+          PreloadEnabledState.fromJson(event.parameters['state'] as String));
+
   /// Fired when a prefetch attempt is updated.
   Stream<PrefetchStatusUpdatedEvent> get onPrefetchStatusUpdated => _client
       .onEvent
@@ -441,6 +448,8 @@ enum PrerenderFinalStatus {
       'SameSiteCrossOriginRedirectNotOptInInMainFrameNavigation'),
   sameSiteCrossOriginNavigationNotOptInInMainFrameNavigation(
       'SameSiteCrossOriginNavigationNotOptInInMainFrameNavigation'),
+  memoryPressureOnTrigger('MemoryPressureOnTrigger'),
+  memoryPressureAfterTriggered('MemoryPressureAfterTriggered'),
   ;
 
   final String value;
@@ -449,6 +458,27 @@ enum PrerenderFinalStatus {
 
   factory PrerenderFinalStatus.fromJson(String value) =>
       PrerenderFinalStatus.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+enum PreloadEnabledState {
+  enabled('Enabled'),
+  disabledByDataSaver('DisabledByDataSaver'),
+  disabledByBatterySaver('DisabledByBatterySaver'),
+  disabledByPreference('DisabledByPreference'),
+  notSupported('NotSupported'),
+  ;
+
+  final String value;
+
+  const PreloadEnabledState(this.value);
+
+  factory PreloadEnabledState.fromJson(String value) =>
+      PreloadEnabledState.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 

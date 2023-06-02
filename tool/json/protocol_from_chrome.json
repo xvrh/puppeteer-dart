@@ -1454,7 +1454,6 @@
                         "InvalidHeader",
                         "InvalidRegisterTriggerHeader",
                         "InvalidEligibleHeader",
-                        "TooManyConcurrentRequests",
                         "SourceAndTriggerHeaders",
                         "SourceIgnored",
                         "TriggerIgnored",
@@ -1462,7 +1461,8 @@
                         "OsTriggerIgnored",
                         "InvalidRegisterOsSourceHeader",
                         "InvalidRegisterOsTriggerHeader",
-                        "WebAndOsHeaders"
+                        "WebAndOsHeaders",
+                        "NoWebOrOsSupport"
                     ]
                 },
                 {
@@ -1570,6 +1570,11 @@
                             "name": "violatingNodeId",
                             "optional": true,
                             "$ref": "DOM.BackendNodeId"
+                        },
+                        {
+                            "name": "violatingNodeAttribute",
+                            "optional": true,
+                            "type": "string"
                         }
                     ]
                 },
@@ -1591,6 +1596,20 @@
                             "name": "type",
                             "description": "One of the deprecation names from third_party/blink/renderer/core/frame/deprecation/deprecation.json5",
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "id": "BounceTrackingIssueDetails",
+                    "description": "This issue warns about sites in the redirect chain of a finished navigation\nthat may be flagged as trackers and have their state cleared if they don't\nreceive a user interaction. Note that in this context 'site' means eTLD+1.\nFor example, if the URL `https://example.test:80/bounce` was in the\nredirect chain, the site reported would be `example.test`.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "trackingSites",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     ]
                 },
@@ -1623,14 +1642,17 @@
                         "WellKnownNoResponse",
                         "WellKnownInvalidResponse",
                         "WellKnownListEmpty",
+                        "WellKnownInvalidContentType",
                         "ConfigNotInWellKnown",
                         "WellKnownTooBig",
                         "ConfigHttpNotFound",
                         "ConfigNoResponse",
                         "ConfigInvalidResponse",
+                        "ConfigInvalidContentType",
                         "ClientMetadataHttpNotFound",
                         "ClientMetadataNoResponse",
                         "ClientMetadataInvalidResponse",
+                        "ClientMetadataInvalidContentType",
                         "DisabledInSettings",
                         "ErrorFetchingSignin",
                         "InvalidSigninResponse",
@@ -1638,10 +1660,12 @@
                         "AccountsNoResponse",
                         "AccountsInvalidResponse",
                         "AccountsListEmpty",
+                        "AccountsInvalidContentType",
                         "IdTokenHttpNotFound",
                         "IdTokenNoResponse",
                         "IdTokenInvalidResponse",
                         "IdTokenInvalidRequest",
+                        "IdTokenInvalidContentType",
                         "ErrorIdToken",
                         "Canceled",
                         "RpPageNotVisible"
@@ -1682,7 +1706,8 @@
                         "GenericIssue",
                         "DeprecationIssue",
                         "ClientHintIssue",
-                        "FederatedAuthRequestIssue"
+                        "FederatedAuthRequestIssue",
+                        "BounceTrackingIssue"
                     ]
                 },
                 {
@@ -1769,6 +1794,11 @@
                             "name": "federatedAuthRequestIssueDetails",
                             "optional": true,
                             "$ref": "FederatedAuthRequestIssueDetails"
+                        },
+                        {
+                            "name": "bounceTrackingIssueDetails",
+                            "optional": true,
+                            "$ref": "BounceTrackingIssueDetails"
                         }
                     ]
                 },
@@ -2876,6 +2906,13 @@
                             "name": "endColumn",
                             "description": "Column offset of the end of the stylesheet within the resource (zero based).",
                             "type": "number"
+                        },
+                        {
+                            "name": "loadingFailed",
+                            "description": "If the style sheet was loaded from a network resource, this indicates when the resource failed to load",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -3532,6 +3569,48 @@
                     ]
                 },
                 {
+                    "id": "CSSTryRule",
+                    "description": "CSS try rule representation.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "styleSheetId",
+                            "description": "The css style sheet identifier (absent for user agent stylesheet and user-specified\nstylesheet rules) this rule came from.",
+                            "optional": true,
+                            "$ref": "StyleSheetId"
+                        },
+                        {
+                            "name": "origin",
+                            "description": "Parent stylesheet's origin.",
+                            "$ref": "StyleSheetOrigin"
+                        },
+                        {
+                            "name": "style",
+                            "description": "Associated style declaration.",
+                            "$ref": "CSSStyle"
+                        }
+                    ]
+                },
+                {
+                    "id": "CSSPositionFallbackRule",
+                    "description": "CSS position-fallback rule representation.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "$ref": "Value"
+                        },
+                        {
+                            "name": "tryRules",
+                            "description": "List of keyframes.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "CSSTryRule"
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "CSSKeyframesRule",
                     "description": "CSS keyframes rule representation.",
                     "type": "object",
@@ -3838,6 +3917,15 @@
                             "type": "array",
                             "items": {
                                 "$ref": "CSSKeyframesRule"
+                            }
+                        },
+                        {
+                            "name": "cssPositionFallbackRules",
+                            "description": "A list of CSS position fallbacks matching this node.",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "CSSPositionFallbackRule"
                             }
                         },
                         {
@@ -15355,6 +15443,8 @@
                         "payment",
                         "picture-in-picture",
                         "private-aggregation",
+                        "private-state-token-issuance",
+                        "private-state-token-redemption",
                         "publickey-credentials-get",
                         "run-ad-auction",
                         "screen-wake-lock",
@@ -15365,7 +15455,6 @@
                         "smart-card",
                         "storage-access",
                         "sync-xhr",
-                        "trust-token-redemption",
                         "unload",
                         "usb",
                         "vertical-scroll",
@@ -19860,6 +19949,20 @@
                             "type": "string"
                         }
                     ]
+                },
+                {
+                    "name": "runBounceTrackingMitigations",
+                    "description": "Deletes state for sites identified as potential bounce trackers, immediately.",
+                    "experimental": true,
+                    "returns": [
+                        {
+                            "name": "deletedSites",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ]
                 }
             ],
             "events": [
@@ -23051,7 +23154,20 @@
                         "CrossSiteRedirectInMainFrameNavigation",
                         "CrossSiteNavigationInMainFrameNavigation",
                         "SameSiteCrossOriginRedirectNotOptInInMainFrameNavigation",
-                        "SameSiteCrossOriginNavigationNotOptInInMainFrameNavigation"
+                        "SameSiteCrossOriginNavigationNotOptInInMainFrameNavigation",
+                        "MemoryPressureOnTrigger",
+                        "MemoryPressureAfterTriggered"
+                    ]
+                },
+                {
+                    "id": "PreloadEnabledState",
+                    "type": "string",
+                    "enum": [
+                        "Enabled",
+                        "DisabledByDataSaver",
+                        "DisabledByBatterySaver",
+                        "DisabledByPreference",
+                        "NotSupported"
                     ]
                 },
                 {
@@ -23122,6 +23238,16 @@
                             "description": "This is used to give users more information about the name of the API call\nthat is incompatible with prerender and has caused the cancellation of the attempt",
                             "optional": true,
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "preloadEnabledStateUpdated",
+                    "description": "Fired when a preload enabled state is updated.",
+                    "parameters": [
+                        {
+                            "name": "state",
+                            "$ref": "PreloadEnabledState"
                         }
                     ]
                 },
@@ -24529,7 +24655,8 @@
                                 "OOM",
                                 "other",
                                 "promiseRejection",
-                                "XHR"
+                                "XHR",
+                                "step"
                             ]
                         },
                         {
@@ -24620,7 +24747,7 @@
                         },
                         {
                             "name": "executionContextAuxData",
-                            "description": "Embedder-specific auxiliary data.",
+                            "description": "Embedder-specific auxiliary data likely matching {isDefault: boolean, type: 'default'|'isolated'|'worker', frameId: string}",
                             "optional": true,
                             "type": "object"
                         },
@@ -24724,7 +24851,7 @@
                         },
                         {
                             "name": "executionContextAuxData",
-                            "description": "Embedder-specific auxiliary data.",
+                            "description": "Embedder-specific auxiliary data likely matching {isDefault: boolean, type: 'default'|'isolated'|'worker', frameId: string}",
                             "optional": true,
                             "type": "object"
                         },
@@ -25994,7 +26121,7 @@
                         },
                         {
                             "name": "auxData",
-                            "description": "Embedder-specific auxiliary data.",
+                            "description": "Embedder-specific auxiliary data likely matching {isDefault: boolean, type: 'default'|'isolated'|'worker', frameId: string}",
                             "optional": true,
                             "type": "object"
                         }

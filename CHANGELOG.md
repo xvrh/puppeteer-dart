@@ -1,3 +1,6 @@
+## 3.1.0
+- Update to Chrome 114
+
 ## 3.0.0
 - Download "Chrome for Testing" instead of Chromium.
 - Update to Chrome 113

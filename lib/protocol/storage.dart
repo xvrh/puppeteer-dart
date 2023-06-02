@@ -325,6 +325,12 @@ class StorageApi {
       'bucketName': bucketName,
     });
   }
+
+  /// Deletes state for sites identified as potential bounce trackers, immediately.
+  Future<List<String>> runBounceTrackingMitigations() async {
+    var result = await _client.send('Storage.runBounceTrackingMitigations');
+    return (result['deletedSites'] as List).map((e) => e as String).toList();
+  }
 }
 
 class CacheStorageContentUpdatedEvent {

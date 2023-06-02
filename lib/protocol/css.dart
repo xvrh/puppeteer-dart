@@ -420,6 +420,9 @@ class GetMatchedStylesForNodeResult {
   /// A list of CSS keyframed animations matching this node.
   final List<CSSKeyframesRule>? cssKeyframesRules;
 
+  /// A list of CSS position fallbacks matching this node.
+  final List<CSSPositionFallbackRule>? cssPositionFallbackRules;
+
   /// Id of the first parent element that does not have display: contents.
   final dom.NodeId? parentLayoutNodeId;
 
@@ -431,6 +434,7 @@ class GetMatchedStylesForNodeResult {
       this.inherited,
       this.inheritedPseudoElements,
       this.cssKeyframesRules,
+      this.cssPositionFallbackRules,
       this.parentLayoutNodeId});
 
   factory GetMatchedStylesForNodeResult.fromJson(Map<String, dynamic> json) {
@@ -467,6 +471,12 @@ class GetMatchedStylesForNodeResult {
       cssKeyframesRules: json.containsKey('cssKeyframesRules')
           ? (json['cssKeyframesRules'] as List)
               .map((e) => CSSKeyframesRule.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+      cssPositionFallbackRules: json.containsKey('cssPositionFallbackRules')
+          ? (json['cssPositionFallbackRules'] as List)
+              .map((e) =>
+                  CSSPositionFallbackRule.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       parentLayoutNodeId: json.containsKey('parentLayoutNodeId')
@@ -763,6 +773,9 @@ class CSSStyleSheetHeader {
   /// Column offset of the end of the stylesheet within the resource (zero based).
   final num endColumn;
 
+  /// If the style sheet was loaded from a network resource, this indicates when the resource failed to load
+  final bool? loadingFailed;
+
   CSSStyleSheetHeader(
       {required this.styleSheetId,
       required this.frameId,
@@ -780,7 +793,8 @@ class CSSStyleSheetHeader {
       required this.startColumn,
       required this.length,
       required this.endLine,
-      required this.endColumn});
+      required this.endColumn,
+      this.loadingFailed});
 
   factory CSSStyleSheetHeader.fromJson(Map<String, dynamic> json) {
     return CSSStyleSheetHeader(
@@ -807,6 +821,9 @@ class CSSStyleSheetHeader {
       length: json['length'] as num,
       endLine: json['endLine'] as num,
       endColumn: json['endColumn'] as num,
+      loadingFailed: json.containsKey('loadingFailed')
+          ? json['loadingFailed'] as bool
+          : null,
     );
   }
 
@@ -829,6 +846,7 @@ class CSSStyleSheetHeader {
       if (sourceMapURL != null) 'sourceMapURL': sourceMapURL,
       if (ownerNode != null) 'ownerNode': ownerNode!.toJson(),
       if (hasSourceURL != null) 'hasSourceURL': hasSourceURL,
+      if (loadingFailed != null) 'loadingFailed': loadingFailed,
     };
   }
 }
@@ -1733,6 +1751,65 @@ class FontFace {
       'platformFontFamily': platformFontFamily,
       if (fontVariationAxes != null)
         'fontVariationAxes': fontVariationAxes!.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+/// CSS try rule representation.
+class CSSTryRule {
+  /// The css style sheet identifier (absent for user agent stylesheet and user-specified
+  /// stylesheet rules) this rule came from.
+  final StyleSheetId? styleSheetId;
+
+  /// Parent stylesheet's origin.
+  final StyleSheetOrigin origin;
+
+  /// Associated style declaration.
+  final CSSStyle style;
+
+  CSSTryRule({this.styleSheetId, required this.origin, required this.style});
+
+  factory CSSTryRule.fromJson(Map<String, dynamic> json) {
+    return CSSTryRule(
+      styleSheetId: json.containsKey('styleSheetId')
+          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          : null,
+      origin: StyleSheetOrigin.fromJson(json['origin'] as String),
+      style: CSSStyle.fromJson(json['style'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'origin': origin.toJson(),
+      'style': style.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
+    };
+  }
+}
+
+/// CSS position-fallback rule representation.
+class CSSPositionFallbackRule {
+  final Value name;
+
+  /// List of keyframes.
+  final List<CSSTryRule> tryRules;
+
+  CSSPositionFallbackRule({required this.name, required this.tryRules});
+
+  factory CSSPositionFallbackRule.fromJson(Map<String, dynamic> json) {
+    return CSSPositionFallbackRule(
+      name: Value.fromJson(json['name'] as Map<String, dynamic>),
+      tryRules: (json['tryRules'] as List)
+          .map((e) => CSSTryRule.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name.toJson(),
+      'tryRules': tryRules.map((e) => e.toJson()).toList(),
     };
   }
 }
