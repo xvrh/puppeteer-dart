@@ -293,7 +293,7 @@ class Puppeteer {
     return [
       ..._defaultArgs,
       if (userDataDir != null)
-        '--user-data-dir=${Uri.base.resolve(userDataDir).toFilePath()}',
+        '--user-data-dir=${p.join(Directory.current.path, userDataDir)}',
       if (noSandboxFlag) '--no-sandbox',
       if (devTools) '--auto-open-devtools-for-tabs',
       if (headless) ..._headlessArgs,
