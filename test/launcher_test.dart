@@ -180,8 +180,10 @@ void main() {
         expect(puppeteer.defaultArgs(), contains('--headless'));
         expect(puppeteer.defaultArgs(headless: false),
             isNot(contains('--headless')));
-        expect(puppeteer.defaultArgs(userDataDir: 'foo'),
-            contains('--user-data-dir=foo'));
+        expect(
+            puppeteer.defaultArgs(userDataDir: 'foo'),
+            contains(
+                '--user-data-dir=${Uri.base.resolve('foo').toFilePath()}'));
       });
       test('should work with no default arguments', () async {
         var browser = await puppeteer.launch(ignoreDefaultArgs: true);
