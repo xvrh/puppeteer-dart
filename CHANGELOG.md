@@ -1,5 +1,6 @@
 ## 3.1.0
 - Update to Chrome 114
+- Fix a bug on Windows when a relative directory was passed to `userDataDir`
 
 ## 3.0.0
 - Download "Chrome for Testing" instead of Chromium.
