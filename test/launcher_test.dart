@@ -160,9 +160,20 @@ void main() {
         } finally {
           _tryDeleteDirectory(userDataDir);
         }
-      }, onPlatform: {
-        'windows': Skip(
-            'This mysteriously fails on Windows. See https://github.com/GoogleChrome/puppeteer/issues/4111')
+      });
+      test('userDataDir with relative path', () async {
+        for (var headlessMode in [true, false]) {
+          var dir = '_user_data_dir_${DateTime.now().microsecondsSinceEpoch}';
+          try {
+            var browser = await puppeteer.launch(
+                userDataDir: dir, headless: headlessMode);
+            await browser.newPage();
+            await browser.close();
+            expect(Directory(dir).existsSync(), true);
+          } finally {
+            _tryDeleteDirectory(Directory(dir));
+          }
+        }
       });
       test('should return the default arguments', () {
         expect(puppeteer.defaultArgs(), contains('--no-first-run'));
