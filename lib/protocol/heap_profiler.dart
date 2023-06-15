@@ -136,7 +136,7 @@ class HeapProfilerApi {
   Future<void> stopTrackingHeapObjects(
       {bool? reportProgress,
       @Deprecated('This parameter is deprecated')
-          bool? treatGlobalObjectsAsRoots,
+      bool? treatGlobalObjectsAsRoots,
       bool? captureNumericValue,
       bool? exposeInternals}) async {
     await _client.send('HeapProfiler.stopTrackingHeapObjects', {
@@ -155,7 +155,7 @@ class HeapProfilerApi {
   Future<void> takeHeapSnapshot(
       {bool? reportProgress,
       @Deprecated('This parameter is deprecated')
-          bool? treatGlobalObjectsAsRoots,
+      bool? treatGlobalObjectsAsRoots,
       bool? captureNumericValue,
       bool? exposeInternals}) async {
     await _client.send('HeapProfiler.takeHeapSnapshot', {

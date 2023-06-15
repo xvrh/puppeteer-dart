@@ -395,7 +395,7 @@ class RuntimeApi {
   /// This parameter is mutually exclusive with `executionContextId`.
   Future<void> addBinding(String name,
       {@Deprecated('This parameter is deprecated')
-          ExecutionContextId? executionContextId,
+      ExecutionContextId? executionContextId,
       String? executionContextName}) async {
     await _client.send('Runtime.addBinding', {
       'name': name,

@@ -1,3 +1,7 @@
+## 3.1.1
+- Update to Chrome 114.0.5735.133
+- Widen constraint on dependency `package:http`
+
 ## 3.1.0
 - Update to Chrome 114
 - Fix a bug on Windows when a relative directory was passed to `userDataDir`

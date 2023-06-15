@@ -149,7 +149,7 @@ class InputApi {
   /// [pointerType] Pointer type (default: "mouse").
   Future<void> dispatchMouseEvent(
       @Enum(['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel'])
-          String type,
+      String type,
       num x,
       num y,
       {int? modifiers,
@@ -164,8 +164,7 @@ class InputApi {
       int? twist,
       num? deltaX,
       num? deltaY,
-      @Enum(['mouse', 'pen'])
-          String? pointerType}) async {
+      @Enum(['mouse', 'pen']) String? pointerType}) async {
     assert(const ['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel']
         .contains(type));
     assert(pointerType == null || const ['mouse', 'pen'].contains(pointerType));
@@ -226,7 +225,7 @@ class InputApi {
   /// [clickCount] Number of times the mouse button was clicked (default: 0).
   Future<void> emulateTouchFromMouseEvent(
       @Enum(['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel'])
-          String type,
+      String type,
       int x,
       int y,
       MouseButton button,
