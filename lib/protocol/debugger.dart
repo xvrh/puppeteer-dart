@@ -302,7 +302,7 @@ class DebuggerApi {
   /// Returns: Id of the created breakpoint for further reference.
   Future<BreakpointId> setInstrumentationBreakpoint(
       @Enum(['beforeScriptExecution', 'beforeScriptWithSourceMapExecution'])
-          String instrumentation) async {
+      String instrumentation) async {
     assert(const ['beforeScriptExecution', 'beforeScriptWithSourceMapExecution']
         .contains(instrumentation));
     var result = await _client.send('Debugger.setInstrumentationBreakpoint', {

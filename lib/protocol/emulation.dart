@@ -168,7 +168,7 @@ class EmulationApi {
         'protanopia',
         'tritanopia'
       ])
-          String type) async {
+      String type) async {
     assert(const [
       'none',
       'blurredVision',
