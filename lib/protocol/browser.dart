@@ -193,6 +193,14 @@ class BrowserApi {
       'commandId': commandId,
     });
   }
+
+  /// Allows a site to use privacy sandbox features that require enrollment
+  /// without the site actually being enrolled. Only supported on page targets.
+  Future<void> addPrivacySandboxEnrollmentOverride(String url) async {
+    await _client.send('Browser.addPrivacySandboxEnrollmentOverride', {
+      'url': url,
+    });
+  }
 }
 
 class DownloadWillBeginEvent {

@@ -79,6 +79,7 @@ class RuntimeApi {
   /// [silent] In silent mode exceptions thrown during evaluation are not reported and do not pause
   /// execution. Overrides `setPauseOnException` state.
   /// [returnByValue] Whether the result is expected to be a JSON object which should be sent by value.
+  /// Can be overriden by `serializationOptions`.
   /// [generatePreview] Whether preview should be generated for the result.
   /// [userGesture] Whether execution should be treated as initiated by user in the UI.
   /// [awaitPromise] Whether execution should `await` for resulting value and return once awaited promise is
@@ -94,9 +95,8 @@ class RuntimeApi {
   /// in context different than intended (e.g. as a result of navigation across process
   /// boundaries).
   /// This is mutually exclusive with `executionContextId`.
-  /// [generateWebDriverValue] Whether the result should contain `webDriverValue`, serialized according to
-  /// https://w3c.github.io/webdriver-bidi. This is mutually exclusive with `returnByValue`, but
-  /// resulting `objectId` is still provided.
+  /// [serializationOptions] Specifies the result serialization. If provided, overrides
+  /// `returnByValue` and `generateWebDriverValue`.
   Future<CallFunctionOnResult> callFunctionOn(String functionDeclaration,
       {RemoteObjectId? objectId,
       List<CallArgument>? arguments,
@@ -109,7 +109,9 @@ class RuntimeApi {
       String? objectGroup,
       bool? throwOnSideEffect,
       String? uniqueContextId,
-      bool? generateWebDriverValue}) async {
+      @Deprecated('Use `serializationOptions: {serialization:"deep"}` instead')
+      bool? generateWebDriverValue,
+      SerializationOptions? serializationOptions}) async {
     var result = await _client.send('Runtime.callFunctionOn', {
       'functionDeclaration': functionDeclaration,
       if (objectId != null) 'objectId': objectId,
@@ -125,6 +127,8 @@ class RuntimeApi {
       if (uniqueContextId != null) 'uniqueContextId': uniqueContextId,
       if (generateWebDriverValue != null)
         'generateWebDriverValue': generateWebDriverValue,
+      if (serializationOptions != null)
+        'serializationOptions': serializationOptions,
     });
     return CallFunctionOnResult.fromJson(result);
   }
@@ -197,7 +201,8 @@ class RuntimeApi {
   /// in context different than intended (e.g. as a result of navigation across process
   /// boundaries).
   /// This is mutually exclusive with `contextId`.
-  /// [generateWebDriverValue] Whether the result should be serialized according to https://w3c.github.io/webdriver-bidi.
+  /// [serializationOptions] Specifies the result serialization. If provided, overrides
+  /// `returnByValue` and `generateWebDriverValue`.
   Future<EvaluateResult> evaluate(String expression,
       {String? objectGroup,
       bool? includeCommandLineAPI,
@@ -213,7 +218,9 @@ class RuntimeApi {
       bool? replMode,
       bool? allowUnsafeEvalBlockedByCSP,
       String? uniqueContextId,
-      bool? generateWebDriverValue}) async {
+      @Deprecated('Use `serializationOptions: {serialization:"deep"}` instead')
+      bool? generateWebDriverValue,
+      SerializationOptions? serializationOptions}) async {
     var result = await _client.send('Runtime.evaluate', {
       'expression': expression,
       if (objectGroup != null) 'objectGroup': objectGroup,
@@ -234,6 +241,8 @@ class RuntimeApi {
       if (uniqueContextId != null) 'uniqueContextId': uniqueContextId,
       if (generateWebDriverValue != null)
         'generateWebDriverValue': generateWebDriverValue,
+      if (serializationOptions != null)
+        'serializationOptions': serializationOptions,
     });
     return EvaluateResult.fromJson(result);
   }
@@ -754,23 +763,80 @@ class ScriptId {
   String toString() => value.toString();
 }
 
-/// Represents the value serialiazed by the WebDriver BiDi specification
-/// https://w3c.github.io/webdriver-bidi.
-class WebDriverValue {
-  final WebDriverValueType type;
+/// Represents options for serialization. Overrides `generatePreview`, `returnByValue` and
+/// `generateWebDriverValue`.
+class SerializationOptions {
+  final SerializationOptionsSerialization serialization;
+
+  /// Deep serialization depth. Default is full depth. Respected only in `deep` serialization mode.
+  final int? maxDepth;
+
+  SerializationOptions({required this.serialization, this.maxDepth});
+
+  factory SerializationOptions.fromJson(Map<String, dynamic> json) {
+    return SerializationOptions(
+      serialization: SerializationOptionsSerialization.fromJson(
+          json['serialization'] as String),
+      maxDepth: json.containsKey('maxDepth') ? json['maxDepth'] as int : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'serialization': serialization,
+      if (maxDepth != null) 'maxDepth': maxDepth,
+    };
+  }
+}
+
+enum SerializationOptionsSerialization {
+  deep('deep'),
+  json('json'),
+  idOnly('idOnly'),
+  ;
+
+  final String value;
+
+  const SerializationOptionsSerialization(this.value);
+
+  factory SerializationOptionsSerialization.fromJson(String value) =>
+      SerializationOptionsSerialization.values
+          .firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Represents deep serialized value.
+class DeepSerializedValue {
+  final DeepSerializedValueType type;
 
   final dynamic value;
 
   final String? objectId;
 
-  WebDriverValue({required this.type, this.value, this.objectId});
+  /// Set if value reference met more then once during serialization. In such
+  /// case, value is provided only to one of the serialized values. Unique
+  /// per value in the scope of one CDP call.
+  final int? weakLocalObjectReference;
 
-  factory WebDriverValue.fromJson(Map<String, dynamic> json) {
-    return WebDriverValue(
-      type: WebDriverValueType.fromJson(json['type'] as String),
+  DeepSerializedValue(
+      {required this.type,
+      this.value,
+      this.objectId,
+      this.weakLocalObjectReference});
+
+  factory DeepSerializedValue.fromJson(Map<String, dynamic> json) {
+    return DeepSerializedValue(
+      type: DeepSerializedValueType.fromJson(json['type'] as String),
       value: json.containsKey('value') ? json['value'] as dynamic : null,
       objectId:
           json.containsKey('objectId') ? json['objectId'] as String : null,
+      weakLocalObjectReference: json.containsKey('weakLocalObjectReference')
+          ? json['weakLocalObjectReference'] as int
+          : null,
     );
   }
 
@@ -779,11 +845,13 @@ class WebDriverValue {
       'type': type,
       if (value != null) 'value': value,
       if (objectId != null) 'objectId': objectId,
+      if (weakLocalObjectReference != null)
+        'weakLocalObjectReference': weakLocalObjectReference,
     };
   }
 }
 
-enum WebDriverValueType {
+enum DeepSerializedValueType {
   undefined('undefined'),
   null$('null'),
   string('string'),
@@ -811,10 +879,10 @@ enum WebDriverValueType {
 
   final String value;
 
-  const WebDriverValueType(this.value);
+  const DeepSerializedValueType(this.value);
 
-  factory WebDriverValueType.fromJson(String value) =>
-      WebDriverValueType.values.firstWhere((e) => e.value == value);
+  factory DeepSerializedValueType.fromJson(String value) =>
+      DeepSerializedValueType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 
@@ -889,8 +957,8 @@ class RemoteObject {
   /// String representation of the object.
   final String? description;
 
-  /// WebDriver BiDi representation of the value.
-  final WebDriverValue? webDriverValue;
+  /// Deep serialized value.
+  final DeepSerializedValue? deepSerializedValue;
 
   /// Unique object identifier (for non-primitive values).
   final RemoteObjectId? objectId;
@@ -907,7 +975,7 @@ class RemoteObject {
       this.value,
       this.unserializableValue,
       this.description,
-      this.webDriverValue,
+      this.deepSerializedValue,
       this.objectId,
       this.preview,
       this.customPreview});
@@ -927,9 +995,9 @@ class RemoteObject {
       description: json.containsKey('description')
           ? json['description'] as String
           : null,
-      webDriverValue: json.containsKey('webDriverValue')
-          ? WebDriverValue.fromJson(
-              json['webDriverValue'] as Map<String, dynamic>)
+      deepSerializedValue: json.containsKey('deepSerializedValue')
+          ? DeepSerializedValue.fromJson(
+              json['deepSerializedValue'] as Map<String, dynamic>)
           : null,
       objectId: json.containsKey('objectId')
           ? RemoteObjectId.fromJson(json['objectId'] as String)
@@ -953,7 +1021,8 @@ class RemoteObject {
       if (unserializableValue != null)
         'unserializableValue': unserializableValue!.toJson(),
       if (description != null) 'description': description,
-      if (webDriverValue != null) 'webDriverValue': webDriverValue!.toJson(),
+      if (deepSerializedValue != null)
+        'deepSerializedValue': deepSerializedValue!.toJson(),
       if (objectId != null) 'objectId': objectId!.toJson(),
       if (preview != null) 'preview': preview!.toJson(),
       if (customPreview != null) 'customPreview': customPreview!.toJson(),

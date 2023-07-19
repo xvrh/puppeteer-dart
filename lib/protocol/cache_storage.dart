@@ -1,5 +1,6 @@
 import 'dart:async';
 import '../src/connection.dart';
+import 'storage.dart' as storage;
 
 class CacheStorageApi {
   final Client _client;
@@ -25,15 +26,19 @@ class CacheStorageApi {
   }
 
   /// Requests cache names.
-  /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
+  /// [securityOrigin] At least and at most one of securityOrigin, storageKey, storageBucket must be specified.
   /// Security origin.
   /// [storageKey] Storage key.
+  /// [storageBucket] Storage bucket. If not specified, it uses the default bucket.
   /// Returns: Caches for the security origin.
   Future<List<Cache>> requestCacheNames(
-      {String? securityOrigin, String? storageKey}) async {
+      {String? securityOrigin,
+      String? storageKey,
+      storage.StorageBucket? storageBucket}) async {
     var result = await _client.send('CacheStorage.requestCacheNames', {
       if (securityOrigin != null) 'securityOrigin': securityOrigin,
       if (storageKey != null) 'storageKey': storageKey,
+      if (storageBucket != null) 'storageBucket': storageBucket,
     });
     return (result['caches'] as List)
         .map((e) => Cache.fromJson(e as Map<String, dynamic>))
@@ -215,6 +220,9 @@ class Cache {
   /// Storage key of the cache.
   final String storageKey;
 
+  /// Storage bucket of the cache.
+  final storage.StorageBucket? storageBucket;
+
   /// The name of the cache.
   final String cacheName;
 
@@ -222,6 +230,7 @@ class Cache {
       {required this.cacheId,
       required this.securityOrigin,
       required this.storageKey,
+      this.storageBucket,
       required this.cacheName});
 
   factory Cache.fromJson(Map<String, dynamic> json) {
@@ -229,6 +238,10 @@ class Cache {
       cacheId: CacheId.fromJson(json['cacheId'] as String),
       securityOrigin: json['securityOrigin'] as String,
       storageKey: json['storageKey'] as String,
+      storageBucket: json.containsKey('storageBucket')
+          ? storage.StorageBucket.fromJson(
+              json['storageBucket'] as Map<String, dynamic>)
+          : null,
       cacheName: json['cacheName'] as String,
     );
   }
@@ -239,6 +252,7 @@ class Cache {
       'securityOrigin': securityOrigin,
       'storageKey': storageKey,
       'cacheName': cacheName,
+      if (storageBucket != null) 'storageBucket': storageBucket!.toJson(),
     };
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import '../src/connection.dart';
 import 'runtime.dart' as runtime;
+import 'storage.dart' as storage;
 
 class IndexedDBApi {
   final Client _client;
@@ -8,49 +9,61 @@ class IndexedDBApi {
   IndexedDBApi(this._client);
 
   /// Clears all entries from an object store.
-  /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
+  /// [securityOrigin] At least and at most one of securityOrigin, storageKey, or storageBucket must be specified.
   /// Security origin.
   /// [storageKey] Storage key.
+  /// [storageBucket] Storage bucket. If not specified, it uses the default bucket.
   /// [databaseName] Database name.
   /// [objectStoreName] Object store name.
   Future<void> clearObjectStore(String databaseName, String objectStoreName,
-      {String? securityOrigin, String? storageKey}) async {
+      {String? securityOrigin,
+      String? storageKey,
+      storage.StorageBucket? storageBucket}) async {
     await _client.send('IndexedDB.clearObjectStore', {
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
       if (securityOrigin != null) 'securityOrigin': securityOrigin,
       if (storageKey != null) 'storageKey': storageKey,
+      if (storageBucket != null) 'storageBucket': storageBucket,
     });
   }
 
   /// Deletes a database.
-  /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
+  /// [securityOrigin] At least and at most one of securityOrigin, storageKey, or storageBucket must be specified.
   /// Security origin.
   /// [storageKey] Storage key.
+  /// [storageBucket] Storage bucket. If not specified, it uses the default bucket.
   /// [databaseName] Database name.
   Future<void> deleteDatabase(String databaseName,
-      {String? securityOrigin, String? storageKey}) async {
+      {String? securityOrigin,
+      String? storageKey,
+      storage.StorageBucket? storageBucket}) async {
     await _client.send('IndexedDB.deleteDatabase', {
       'databaseName': databaseName,
       if (securityOrigin != null) 'securityOrigin': securityOrigin,
       if (storageKey != null) 'storageKey': storageKey,
+      if (storageBucket != null) 'storageBucket': storageBucket,
     });
   }
 
   /// Delete a range of entries from an object store
-  /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
+  /// [securityOrigin] At least and at most one of securityOrigin, storageKey, or storageBucket must be specified.
   /// Security origin.
   /// [storageKey] Storage key.
+  /// [storageBucket] Storage bucket. If not specified, it uses the default bucket.
   /// [keyRange] Range of entry keys to delete
   Future<void> deleteObjectStoreEntries(
       String databaseName, String objectStoreName, KeyRange keyRange,
-      {String? securityOrigin, String? storageKey}) async {
+      {String? securityOrigin,
+      String? storageKey,
+      storage.StorageBucket? storageBucket}) async {
     await _client.send('IndexedDB.deleteObjectStoreEntries', {
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
       'keyRange': keyRange,
       if (securityOrigin != null) 'securityOrigin': securityOrigin,
       if (storageKey != null) 'storageKey': storageKey,
+      if (storageBucket != null) 'storageBucket': storageBucket,
     });
   }
 
@@ -65,9 +78,10 @@ class IndexedDBApi {
   }
 
   /// Requests data from object store or index.
-  /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
+  /// [securityOrigin] At least and at most one of securityOrigin, storageKey, or storageBucket must be specified.
   /// Security origin.
   /// [storageKey] Storage key.
+  /// [storageBucket] Storage bucket. If not specified, it uses the default bucket.
   /// [databaseName] Database name.
   /// [objectStoreName] Object store name.
   /// [indexName] Index name, empty string for object store data requests.
@@ -76,7 +90,10 @@ class IndexedDBApi {
   /// [keyRange] Key range.
   Future<RequestDataResult> requestData(String databaseName,
       String objectStoreName, String indexName, int skipCount, int pageSize,
-      {String? securityOrigin, String? storageKey, KeyRange? keyRange}) async {
+      {String? securityOrigin,
+      String? storageKey,
+      storage.StorageBucket? storageBucket,
+      KeyRange? keyRange}) async {
     var result = await _client.send('IndexedDB.requestData', {
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
@@ -85,56 +102,69 @@ class IndexedDBApi {
       'pageSize': pageSize,
       if (securityOrigin != null) 'securityOrigin': securityOrigin,
       if (storageKey != null) 'storageKey': storageKey,
+      if (storageBucket != null) 'storageBucket': storageBucket,
       if (keyRange != null) 'keyRange': keyRange,
     });
     return RequestDataResult.fromJson(result);
   }
 
   /// Gets metadata of an object store.
-  /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
+  /// [securityOrigin] At least and at most one of securityOrigin, storageKey, or storageBucket must be specified.
   /// Security origin.
   /// [storageKey] Storage key.
+  /// [storageBucket] Storage bucket. If not specified, it uses the default bucket.
   /// [databaseName] Database name.
   /// [objectStoreName] Object store name.
   Future<GetMetadataResult> getMetadata(
       String databaseName, String objectStoreName,
-      {String? securityOrigin, String? storageKey}) async {
+      {String? securityOrigin,
+      String? storageKey,
+      storage.StorageBucket? storageBucket}) async {
     var result = await _client.send('IndexedDB.getMetadata', {
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
       if (securityOrigin != null) 'securityOrigin': securityOrigin,
       if (storageKey != null) 'storageKey': storageKey,
+      if (storageBucket != null) 'storageBucket': storageBucket,
     });
     return GetMetadataResult.fromJson(result);
   }
 
   /// Requests database with given name in given frame.
-  /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
+  /// [securityOrigin] At least and at most one of securityOrigin, storageKey, or storageBucket must be specified.
   /// Security origin.
   /// [storageKey] Storage key.
+  /// [storageBucket] Storage bucket. If not specified, it uses the default bucket.
   /// [databaseName] Database name.
   /// Returns: Database with an array of object stores.
   Future<DatabaseWithObjectStores> requestDatabase(String databaseName,
-      {String? securityOrigin, String? storageKey}) async {
+      {String? securityOrigin,
+      String? storageKey,
+      storage.StorageBucket? storageBucket}) async {
     var result = await _client.send('IndexedDB.requestDatabase', {
       'databaseName': databaseName,
       if (securityOrigin != null) 'securityOrigin': securityOrigin,
       if (storageKey != null) 'storageKey': storageKey,
+      if (storageBucket != null) 'storageBucket': storageBucket,
     });
     return DatabaseWithObjectStores.fromJson(
         result['databaseWithObjectStores'] as Map<String, dynamic>);
   }
 
   /// Requests database names for given security origin.
-  /// [securityOrigin] At least and at most one of securityOrigin, storageKey must be specified.
+  /// [securityOrigin] At least and at most one of securityOrigin, storageKey, or storageBucket must be specified.
   /// Security origin.
   /// [storageKey] Storage key.
+  /// [storageBucket] Storage bucket. If not specified, it uses the default bucket.
   /// Returns: Database names for origin.
   Future<List<String>> requestDatabaseNames(
-      {String? securityOrigin, String? storageKey}) async {
+      {String? securityOrigin,
+      String? storageKey,
+      storage.StorageBucket? storageBucket}) async {
     var result = await _client.send('IndexedDB.requestDatabaseNames', {
       if (securityOrigin != null) 'securityOrigin': securityOrigin,
       if (storageKey != null) 'storageKey': storageKey,
+      if (storageBucket != null) 'storageBucket': storageBucket,
     });
     return (result['databaseNames'] as List).map((e) => e as String).toList();
   }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
@@ -19,7 +20,7 @@ void main() {
     server.clearRoutes();
   });
 
-  var extensionPath = p.join('test', 'assets', 'simple-extension');
+  var extensionPath = p.absolute(p.join('test', 'assets', 'simple-extension'));
   var extensionOptions = [
     '--disable-extensions-except=$extensionPath',
     '--load-extension=$extensionPath',
@@ -40,7 +41,7 @@ void main() {
       } finally {
         await browserWithExtension.close();
       }
-    }, onPlatform: {'windows': Skip('TODO debug on windows')});
+    });
     test('target.page() should return a background_page', () async {
       var browserWithExtension =
           await puppeteer.launch(headless: false, args: extensionOptions);
@@ -51,11 +52,12 @@ void main() {
             .waitForTarget((target) => target.type == 'background_page');
         var page = await backgroundPageTarget.page;
         expect(await page.evaluate('() => 2 * 3'), 6);
+        await waitFor(() => page.evaluate('() => !!window.MAGIC'));
         expect(await page.evaluate('() => window.MAGIC'), 42);
       } finally {
         await browserWithExtension.close();
       }
-    }, onPlatform: {'windows': Skip('TODO debug on windows')});
+    });
     test('should have default url when launching browser', () async {
       var browser = await puppeteer.launch(args: extensionOptions);
 
@@ -94,7 +96,7 @@ void main() {
       }
       // This might throw. See https://github.com/GoogleChrome/puppeteer/issues/2778
       _tryDeleteDirectory(userDataDir);
-    }, onPlatform: {'windows': Skip('TODO debug on windows')});
+    });
     // TODO:
     test('OOPIF: should report google.com frame', () async {
       // https://google.com is isolated by default in Chromium embedder.
@@ -177,4 +179,20 @@ void _tryDeleteDirectory(Directory directory) {
   try {
     directory.deleteSync(recursive: true);
   } catch (_) {}
+}
+
+Future<void> waitFor(FutureOr<bool> Function() predicate,
+    {Duration? pollInterval, Duration? timeout}) async {
+  pollInterval ??= Duration(milliseconds: 100);
+  timeout ??= Duration(seconds: 10);
+  var stopwatch = Stopwatch()..start();
+  while (true) {
+    var result = await predicate();
+    if (result) return;
+    if (stopwatch.elapsed > timeout) {
+      throw TimeoutException('waitFor has timed out');
+    }
+
+    await Future.delayed(pollInterval);
+  }
 }
