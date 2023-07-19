@@ -131,13 +131,19 @@ class LayerPaintedEvent {
 }
 
 class CompositingReasonsResult {
+  /// A list of strings specifying reasons for the given layer to become composited.
+  final List<String> compositingReasons;
+
   /// A list of strings specifying reason IDs for the given layer to become composited.
   final List<String> compositingReasonIds;
 
-  CompositingReasonsResult({required this.compositingReasonIds});
+  CompositingReasonsResult(
+      {required this.compositingReasons, required this.compositingReasonIds});
 
   factory CompositingReasonsResult.fromJson(Map<String, dynamic> json) {
     return CompositingReasonsResult(
+      compositingReasons:
+          (json['compositingReasons'] as List).map((e) => e as String).toList(),
       compositingReasonIds: (json['compositingReasonIds'] as List)
           .map((e) => e as String)
           .toList(),

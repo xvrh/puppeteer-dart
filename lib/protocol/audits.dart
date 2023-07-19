@@ -56,6 +56,15 @@ class AuditsApi {
       if (reportAAA != null) 'reportAAA': reportAAA,
     });
   }
+
+  /// Runs the form issues check for the target page. Found issues are reported
+  /// using Audits.issueAdded event.
+  Future<List<GenericIssueDetails>> checkFormsIssues() async {
+    var result = await _client.send('Audits.checkFormsIssues');
+    return (result['formIssues'] as List)
+        .map((e) => GenericIssueDetails.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
 }
 
 class GetEncodedResponseResult {
@@ -735,76 +744,6 @@ class SharedArrayBufferIssueDetails {
   }
 }
 
-enum TwaQualityEnforcementViolationType {
-  kHttpError('kHttpError'),
-  kUnavailableOffline('kUnavailableOffline'),
-  kDigitalAssetLinks('kDigitalAssetLinks'),
-  ;
-
-  final String value;
-
-  const TwaQualityEnforcementViolationType(this.value);
-
-  factory TwaQualityEnforcementViolationType.fromJson(String value) =>
-      TwaQualityEnforcementViolationType.values
-          .firstWhere((e) => e.value == value);
-
-  String toJson() => value;
-
-  @override
-  String toString() => value.toString();
-}
-
-class TrustedWebActivityIssueDetails {
-  /// The url that triggers the violation.
-  final String url;
-
-  final TwaQualityEnforcementViolationType violationType;
-
-  final int? httpStatusCode;
-
-  /// The package name of the Trusted Web Activity client app. This field is
-  /// only used when violation type is kDigitalAssetLinks.
-  final String? packageName;
-
-  /// The signature of the Trusted Web Activity client app. This field is only
-  /// used when violation type is kDigitalAssetLinks.
-  final String? signature;
-
-  TrustedWebActivityIssueDetails(
-      {required this.url,
-      required this.violationType,
-      this.httpStatusCode,
-      this.packageName,
-      this.signature});
-
-  factory TrustedWebActivityIssueDetails.fromJson(Map<String, dynamic> json) {
-    return TrustedWebActivityIssueDetails(
-      url: json['url'] as String,
-      violationType: TwaQualityEnforcementViolationType.fromJson(
-          json['violationType'] as String),
-      httpStatusCode: json.containsKey('httpStatusCode')
-          ? json['httpStatusCode'] as int
-          : null,
-      packageName: json.containsKey('packageName')
-          ? json['packageName'] as String
-          : null,
-      signature:
-          json.containsKey('signature') ? json['signature'] as String : null,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'url': url,
-      'violationType': violationType.toJson(),
-      if (httpStatusCode != null) 'httpStatusCode': httpStatusCode,
-      if (packageName != null) 'packageName': packageName,
-      if (signature != null) 'signature': signature,
-    };
-  }
-}
-
 class LowTextContrastIssueDetails {
   final dom.BackendNodeId violatingNodeId;
 
@@ -927,7 +866,6 @@ enum AttributionReportingIssueType {
   insecureContext('InsecureContext'),
   invalidHeader('InvalidHeader'),
   invalidRegisterTriggerHeader('InvalidRegisterTriggerHeader'),
-  invalidEligibleHeader('InvalidEligibleHeader'),
   sourceAndTriggerHeaders('SourceAndTriggerHeaders'),
   sourceIgnored('SourceIgnored'),
   triggerIgnored('TriggerIgnored'),
@@ -1274,6 +1212,7 @@ enum FederatedAuthRequestIssueReason {
   errorIdToken('ErrorIdToken'),
   canceled('Canceled'),
   rpPageNotVisible('RpPageNotVisible'),
+  silentMediationFailure('SilentMediationFailure'),
   ;
 
   final String value;
@@ -1327,7 +1266,6 @@ enum InspectorIssueCode {
   heavyAdIssue('HeavyAdIssue'),
   contentSecurityPolicyIssue('ContentSecurityPolicyIssue'),
   sharedArrayBufferIssue('SharedArrayBufferIssue'),
-  trustedWebActivityIssue('TrustedWebActivityIssue'),
   lowTextContrastIssue('LowTextContrastIssue'),
   corsIssue('CorsIssue'),
   attributionReportingIssue('AttributionReportingIssue'),
@@ -1369,8 +1307,6 @@ class InspectorIssueDetails {
 
   final SharedArrayBufferIssueDetails? sharedArrayBufferIssueDetails;
 
-  final TrustedWebActivityIssueDetails? twaQualityEnforcementDetails;
-
   final LowTextContrastIssueDetails? lowTextContrastIssueDetails;
 
   final CorsIssueDetails? corsIssueDetails;
@@ -1398,7 +1334,6 @@ class InspectorIssueDetails {
       this.heavyAdIssueDetails,
       this.contentSecurityPolicyIssueDetails,
       this.sharedArrayBufferIssueDetails,
-      this.twaQualityEnforcementDetails,
       this.lowTextContrastIssueDetails,
       this.corsIssueDetails,
       this.attributionReportingIssueDetails,
@@ -1438,11 +1373,6 @@ class InspectorIssueDetails {
           json.containsKey('sharedArrayBufferIssueDetails')
               ? SharedArrayBufferIssueDetails.fromJson(
                   json['sharedArrayBufferIssueDetails'] as Map<String, dynamic>)
-              : null,
-      twaQualityEnforcementDetails:
-          json.containsKey('twaQualityEnforcementDetails')
-              ? TrustedWebActivityIssueDetails.fromJson(
-                  json['twaQualityEnforcementDetails'] as Map<String, dynamic>)
               : null,
       lowTextContrastIssueDetails:
           json.containsKey('lowTextContrastIssueDetails')
@@ -1508,8 +1438,6 @@ class InspectorIssueDetails {
       if (sharedArrayBufferIssueDetails != null)
         'sharedArrayBufferIssueDetails':
             sharedArrayBufferIssueDetails!.toJson(),
-      if (twaQualityEnforcementDetails != null)
-        'twaQualityEnforcementDetails': twaQualityEnforcementDetails!.toJson(),
       if (lowTextContrastIssueDetails != null)
         'lowTextContrastIssueDetails': lowTextContrastIssueDetails!.toJson(),
       if (corsIssueDetails != null)

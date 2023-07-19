@@ -667,13 +667,19 @@ class Value {
   /// Value range in the underlying resource (if available).
   final SourceRange? range;
 
-  Value({required this.text, this.range});
+  /// Specificity of the selector.
+  final Specificity? specificity;
+
+  Value({required this.text, this.range, this.specificity});
 
   factory Value.fromJson(Map<String, dynamic> json) {
     return Value(
       text: json['text'] as String,
       range: json.containsKey('range')
           ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
+          : null,
+      specificity: json.containsKey('specificity')
+          ? Specificity.fromJson(json['specificity'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -682,6 +688,39 @@ class Value {
     return {
       'text': text,
       if (range != null) 'range': range!.toJson(),
+      if (specificity != null) 'specificity': specificity!.toJson(),
+    };
+  }
+}
+
+/// Specificity:
+/// https://drafts.csswg.org/selectors/#specificity-rules
+class Specificity {
+  /// The a component, which represents the number of ID selectors.
+  final int a;
+
+  /// The b component, which represents the number of class selectors, attributes selectors, and
+  /// pseudo-classes.
+  final int b;
+
+  /// The c component, which represents the number of type selectors and pseudo-elements.
+  final int c;
+
+  Specificity({required this.a, required this.b, required this.c});
+
+  factory Specificity.fromJson(Map<String, dynamic> json) {
+    return Specificity(
+      a: json['a'] as int,
+      b: json['b'] as int,
+      c: json['c'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'a': a,
+      'b': b,
+      'c': c,
     };
   }
 }

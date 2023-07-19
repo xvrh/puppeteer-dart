@@ -49,6 +49,8 @@ class FedCmApi {
 class DialogShownEvent {
   final String dialogId;
 
+  final DialogType dialogType;
+
   final List<Account> accounts;
 
   /// These exist primarily so that the caller can verify the
@@ -59,6 +61,7 @@ class DialogShownEvent {
 
   DialogShownEvent(
       {required this.dialogId,
+      required this.dialogType,
       required this.accounts,
       required this.title,
       this.subtitle});
@@ -66,6 +69,7 @@ class DialogShownEvent {
   factory DialogShownEvent.fromJson(Map<String, dynamic> json) {
     return DialogShownEvent(
       dialogId: json['dialogId'] as String,
+      dialogType: DialogType.fromJson(json['dialogType'] as String),
       accounts: (json['accounts'] as List)
           .map((e) => Account.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -89,6 +93,25 @@ enum LoginState {
 
   factory LoginState.fromJson(String value) =>
       LoginState.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Whether the dialog shown is an account chooser or an auto re-authentication dialog.
+enum DialogType {
+  accountChooser('AccountChooser'),
+  autoReauthn('AutoReauthn'),
+  ;
+
+  final String value;
+
+  const DialogType(this.value);
+
+  factory DialogType.fromJson(String value) =>
+      DialogType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 

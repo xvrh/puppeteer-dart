@@ -1420,7 +1420,8 @@
                         "InvalidRegisterOsSourceHeader",
                         "InvalidRegisterOsTriggerHeader",
                         "WebAndOsHeaders",
-                        "NoWebOrOsSupport"
+                        "NoWebOrOsSupport",
+                        "NavigationRegistrationWithoutTransientUserActivation"
                     ]
                 },
                 {
@@ -1479,6 +1480,7 @@
                 },
                 {
                     "id": "NavigatorUserAgentIssueDetails",
+                    "deprecated": true,
                     "type": "object",
                     "properties": [
                         {
@@ -1506,7 +1508,8 @@
                         "FormInputAssignedAutocompleteValueToIdOrNameAttributeError",
                         "FormLabelHasNeitherForNorNestedInput",
                         "FormLabelForMatchesNonExistingIdError",
-                        "FormInputHasWrongButWellIntendedAutocompleteValueError"
+                        "FormInputHasWrongButWellIntendedAutocompleteValueError",
+                        "ResponseWasBlockedByORB"
                     ]
                 },
                 {
@@ -1533,6 +1536,11 @@
                             "name": "violatingNodeAttribute",
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "request",
+                            "optional": true,
+                            "$ref": "AffectedRequest"
                         }
                     ]
                 },
@@ -1806,6 +1814,7 @@
                         },
                         {
                             "name": "navigatorUserAgentIssueDetails",
+                            "deprecated": true,
                             "optional": true,
                             "$ref": "NavigatorUserAgentIssueDetails"
                         },
@@ -2006,6 +2015,36 @@
                             "type": "string"
                         }
                     ]
+                },
+                {
+                    "id": "AddressField",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "description": "address field name, for example GIVEN_NAME.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "value",
+                            "description": "address field name, for example Jon Doe.",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "id": "Address",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "fields",
+                            "description": "fields and values defining a test address.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "AddressField"
+                            }
+                        }
+                    ]
                 }
             ],
             "commands": [
@@ -2028,6 +2067,19 @@
                             "name": "card",
                             "description": "Credit card information to fill out the form. Credit card data is not saved.",
                             "$ref": "CreditCard"
+                        }
+                    ]
+                },
+                {
+                    "name": "setAddresses",
+                    "description": "Set addresses so that developers can verify their forms implementation.",
+                    "parameters": [
+                        {
+                            "name": "addresses",
+                            "type": "array",
+                            "items": {
+                                "$ref": "Address"
+                            }
                         }
                     ]
                 }
@@ -3159,7 +3211,31 @@
                             "items": {
                                 "$ref": "CSSScope"
                             }
+                        },
+                        {
+                            "name": "ruleTypes",
+                            "description": "The array keeps the types of ancestor CSSRules from the innermost going outwards.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "CSSRuleType"
+                            }
                         }
+                    ]
+                },
+                {
+                    "id": "CSSRuleType",
+                    "description": "Enum indicating the type of a CSS rule, used to represent the order of a style rule's ancestors.\nThis list only contains rule types that are collected during the ancestor rule collection.",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "MediaRule",
+                        "SupportsRule",
+                        "ContainerRule",
+                        "LayerRule",
+                        "ScopeRule",
+                        "StyleRule"
                     ]
                 },
                 {
@@ -10000,6 +10076,10 @@
                     ]
                 },
                 {
+                    "name": "cancelDragging",
+                    "description": "Cancels any active dragging in the page."
+                },
+                {
                     "name": "emulateTouchFromMouseEvent",
                     "description": "Emulates touch event from the mouse event parameters.",
                     "experimental": true,
@@ -11624,7 +11704,11 @@
                         "InsecurePrivateNetwork",
                         "InvalidPrivateNetworkAccess",
                         "UnexpectedPrivateNetworkAccess",
-                        "NoCorsRedirectModeNotFollow"
+                        "NoCorsRedirectModeNotFollow",
+                        "PreflightMissingPrivateNetworkAccessId",
+                        "PreflightMissingPrivateNetworkAccessName",
+                        "PrivateNetworkAccessPermissionUnavailable",
+                        "PrivateNetworkAccessPermissionDenied"
                     ]
                 },
                 {
@@ -12568,7 +12652,8 @@
                     "enum": [
                         "deflate",
                         "gzip",
-                        "br"
+                        "br",
+                        "zstd"
                     ]
                 },
                 {
@@ -13700,12 +13785,6 @@
                             "name": "encodedDataLength",
                             "description": "Total number of bytes received for this request.",
                             "type": "number"
-                        },
-                        {
-                            "name": "shouldReportCorbBlocking",
-                            "description": "Set when 1) response was blocked by Cross-Origin Read Blocking and also\n2) this needs to be reported to the DevTools console.",
-                            "optional": true,
-                            "type": "boolean"
                         }
                     ]
                 },
@@ -15663,6 +15742,7 @@
                         "ch-ua-platform",
                         "ch-ua-model",
                         "ch-ua-mobile",
+                        "ch-ua-form-factor",
                         "ch-ua-full-version",
                         "ch-ua-full-version-list",
                         "ch-ua-platform-version",
@@ -16601,6 +16681,8 @@
                         "ErrorDocument",
                         "FencedFramesEmbedder",
                         "CookieDisabled",
+                        "HTTPAuthRequired",
+                        "CookieFlushed",
                         "WebSocket",
                         "WebTransport",
                         "WebRTC",
@@ -16612,14 +16694,12 @@
                         "DocumentLoaded",
                         "DedicatedWorkerOrWorklet",
                         "OutstandingNetworkRequestOthers",
-                        "OutstandingIndexedDBTransaction",
                         "RequestedMIDIPermission",
                         "RequestedAudioCapturePermission",
                         "RequestedVideoCapturePermission",
                         "RequestedBackForwardCacheBlockedSensors",
                         "RequestedBackgroundWorkPermission",
                         "BroadcastChannel",
-                        "IndexedDBConnection",
                         "WebXR",
                         "SharedWorker",
                         "WebLocks",
@@ -16647,6 +16727,9 @@
                         "IndexedDBEvent",
                         "Dummy",
                         "JsNetworkRequestReceivedCacheControlNoStoreResource",
+                        "WebRTCSticky",
+                        "WebTransportSticky",
+                        "WebSocketSticky",
                         "ContentSecurityHandler",
                         "ContentWebAuthenticationAPI",
                         "ContentFileChooser",
@@ -16775,6 +16858,13 @@
                         {
                             "name": "includeCommandLineAPI",
                             "description": "Specifies whether command line API should be available to the script, defaults\nto false.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "runImmediately",
+                            "description": "If true, runs the script immediately on existing execution contexts or worlds.\nDefault: false.",
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
@@ -19776,6 +19866,156 @@
                             "$ref": "StorageBucketsDurability"
                         }
                     ]
+                },
+                {
+                    "id": "AttributionReportingSourceType",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "navigation",
+                        "event"
+                    ]
+                },
+                {
+                    "id": "UnsignedInt64AsBase10",
+                    "experimental": true,
+                    "type": "string"
+                },
+                {
+                    "id": "UnsignedInt128AsBase16",
+                    "experimental": true,
+                    "type": "string"
+                },
+                {
+                    "id": "SignedInt64AsBase10",
+                    "experimental": true,
+                    "type": "string"
+                },
+                {
+                    "id": "AttributionReportingFilterDataEntry",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "key",
+                            "type": "string"
+                        },
+                        {
+                            "name": "values",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "AttributionReportingAggregationKeysEntry",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "key",
+                            "type": "string"
+                        },
+                        {
+                            "name": "value",
+                            "$ref": "UnsignedInt128AsBase16"
+                        }
+                    ]
+                },
+                {
+                    "id": "AttributionReportingSourceRegistration",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "time",
+                            "$ref": "Network.TimeSinceEpoch"
+                        },
+                        {
+                            "name": "expiry",
+                            "description": "duration in seconds",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "eventReportWindow",
+                            "description": "duration in seconds",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "aggregatableReportWindow",
+                            "description": "duration in seconds",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "type",
+                            "$ref": "AttributionReportingSourceType"
+                        },
+                        {
+                            "name": "sourceOrigin",
+                            "type": "string"
+                        },
+                        {
+                            "name": "reportingOrigin",
+                            "type": "string"
+                        },
+                        {
+                            "name": "destinationSites",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        {
+                            "name": "eventId",
+                            "$ref": "UnsignedInt64AsBase10"
+                        },
+                        {
+                            "name": "priority",
+                            "$ref": "SignedInt64AsBase10"
+                        },
+                        {
+                            "name": "filterData",
+                            "type": "array",
+                            "items": {
+                                "$ref": "AttributionReportingFilterDataEntry"
+                            }
+                        },
+                        {
+                            "name": "aggregationKeys",
+                            "type": "array",
+                            "items": {
+                                "$ref": "AttributionReportingAggregationKeysEntry"
+                            }
+                        },
+                        {
+                            "name": "debugKey",
+                            "optional": true,
+                            "$ref": "UnsignedInt64AsBase10"
+                        }
+                    ]
+                },
+                {
+                    "id": "AttributionReportingSourceRegistrationResult",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "success",
+                        "internalError",
+                        "insufficientSourceCapacity",
+                        "insufficientUniqueDestinationCapacity",
+                        "excessiveReportingOrigins",
+                        "prohibitedByBrowserPolicy",
+                        "successNoised",
+                        "destinationReportingLimitReached",
+                        "destinationGlobalLimitReached",
+                        "destinationBothLimitsReached",
+                        "reportingOriginsPerSiteLimitReached"
+                    ]
                 }
             ],
             "commands": [
@@ -20236,6 +20476,29 @@
                             }
                         }
                     ]
+                },
+                {
+                    "name": "setAttributionReportingLocalTestingMode",
+                    "description": "https://wicg.github.io/attribution-reporting-api/",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "enabled",
+                            "description": "If enabled, noise is suppressed and reports are sent immediately.",
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "name": "setAttributionReportingTracking",
+                    "description": "Enables/disables issuing of Attribution Reporting events.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "enable",
+                            "type": "boolean"
+                        }
+                    ]
                 }
             ],
             "events": [
@@ -20406,6 +20669,21 @@
                         {
                             "name": "bucketId",
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "attributionReportingSourceRegistered",
+                    "description": "TODO(crbug.com/1458532): Add other Attribution Reporting events, e.g.\ntrigger registration.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "registration",
+                            "$ref": "AttributionReportingSourceRegistration"
+                        },
+                        {
+                            "name": "result",
+                            "$ref": "AttributionReportingSourceRegistrationResult"
                         }
                     ]
                 }
@@ -22012,7 +22290,7 @@
                 },
                 {
                     "name": "getResponseBody",
-                    "description": "Causes the body of the response to be received from the server and\nreturned as a single string. May only be issued for a request that\nis paused in the Response stage and is mutually exclusive with\ntakeResponseBodyForInterceptionAsStream. Calling other methods that\naffect the request or disabling fetch domain before body is received\nresults in an undefined behavior.",
+                    "description": "Causes the body of the response to be received from the server and\nreturned as a single string. May only be issued for a request that\nis paused in the Response stage and is mutually exclusive with\ntakeResponseBodyForInterceptionAsStream. Calling other methods that\naffect the request or disabling fetch domain before body is received\nresults in an undefined behavior.\nNote that the response body is not available for redirects. Requests\npaused in the _redirect received_ state may be differentiated by\n`responseCode` and presence of `location` response header, see\ncomments to `requestPaused` for details.",
                     "parameters": [
                         {
                             "name": "requestId",
@@ -22053,7 +22331,7 @@
             "events": [
                 {
                     "name": "requestPaused",
-                    "description": "Issued when the domain is enabled and the request URL matches the\nspecified filter. The request is paused until the client responds\nwith one of continueRequest, failRequest or fulfillRequest.\nThe stage of the request can be determined by presence of responseErrorReason\nand responseStatusCode -- the request is at the response stage if either\nof these fields is present and in the request stage otherwise.",
+                    "description": "Issued when the domain is enabled and the request URL matches the\nspecified filter. The request is paused until the client responds\nwith one of continueRequest, failRequest or fulfillRequest.\nThe stage of the request can be determined by presence of responseErrorReason\nand responseStatusCode -- the request is at the response stage if either\nof these fields is present and in the request stage otherwise.\nRedirect responses and subsequent requests are reported similarly to regular\nresponses and requests. Redirect responses may be distinguished by the value\nof `responseStatusCode` (which is one of 301, 302, 303, 307, 308) along with\npresence of the `location` header. Requests resulting from a redirect will\nhave `redirectedRequestId` field set.",
                     "parameters": [
                         {
                             "name": "requestId",
@@ -23467,7 +23745,8 @@
                         "MemoryPressureOnTrigger",
                         "MemoryPressureAfterTriggered",
                         "PrerenderingDisabledByDevTools",
-                        "ResourceLoadBlockedByClient"
+                        "ResourceLoadBlockedByClient",
+                        "SpeculationRuleRemoved"
                     ]
                 },
                 {
@@ -23593,6 +23872,14 @@
                         {
                             "name": "disabledByBatterySaver",
                             "type": "boolean"
+                        },
+                        {
+                            "name": "disabledByHoldbackPrefetchSpeculationRules",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "disabledByHoldbackPrerenderSpeculationRules",
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -23620,6 +23907,10 @@
                         {
                             "name": "prefetchStatus",
                             "$ref": "PrefetchStatus"
+                        },
+                        {
+                            "name": "requestId",
+                            "$ref": "Network.RequestId"
                         }
                     ]
                 },
@@ -23639,6 +23930,12 @@
                             "name": "prerenderStatus",
                             "optional": true,
                             "$ref": "PrerenderFinalStatus"
+                        },
+                        {
+                            "name": "disallowedMojoInterface",
+                            "description": "This is used to give users more information about the name of Mojo interface\nthat is incompatible with prerender and has caused the cancellation of the attempt.",
+                            "optional": true,
+                            "type": "string"
                         }
                     ]
                 },

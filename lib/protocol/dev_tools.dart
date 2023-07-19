@@ -2,6 +2,7 @@ import '../src/connection.dart';
 import 'accessibility.dart';
 import 'animation.dart';
 import 'audits.dart';
+import 'autofill.dart';
 import 'background_service.dart';
 import 'browser.dart';
 import 'cache_storage.dart';
@@ -62,6 +63,10 @@ class DevTools {
   /// Audits domain allows investigation of page violations and possible improvements.
   AuditsApi get audits => _audits ??= AuditsApi(client);
   AuditsApi? _audits;
+
+  /// Defines commands and events for Autofill.
+  AutofillApi get autofill => _autofill ??= AutofillApi(client);
+  AutofillApi? _autofill;
 
   /// Defines events for background web platform features.
   BackgroundServiceApi get backgroundService =>

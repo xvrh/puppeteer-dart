@@ -27,11 +27,11 @@ class PreloadApi {
               PrerenderAttemptCompletedEvent.fromJson(event.parameters));
 
   /// Fired when a preload enabled state is updated.
-  Stream<PreloadEnabledState> get onPreloadEnabledStateUpdated => _client
-      .onEvent
-      .where((event) => event.name == 'Preload.preloadEnabledStateUpdated')
-      .map((event) =>
-          PreloadEnabledState.fromJson(event.parameters['state'] as String));
+  Stream<PreloadEnabledStateUpdatedEvent> get onPreloadEnabledStateUpdated =>
+      _client.onEvent
+          .where((event) => event.name == 'Preload.preloadEnabledStateUpdated')
+          .map((event) =>
+              PreloadEnabledStateUpdatedEvent.fromJson(event.parameters));
 
   /// Fired when a prefetch attempt is updated.
   Stream<PrefetchStatusUpdatedEvent> get onPrefetchStatusUpdated => _client
@@ -97,6 +97,27 @@ class PrerenderAttemptCompletedEvent {
   }
 }
 
+class PreloadEnabledStateUpdatedEvent {
+  final bool disabledByPreference;
+
+  final bool disabledByDataSaver;
+
+  final bool disabledByBatterySaver;
+
+  PreloadEnabledStateUpdatedEvent(
+      {required this.disabledByPreference,
+      required this.disabledByDataSaver,
+      required this.disabledByBatterySaver});
+
+  factory PreloadEnabledStateUpdatedEvent.fromJson(Map<String, dynamic> json) {
+    return PreloadEnabledStateUpdatedEvent(
+      disabledByPreference: json['disabledByPreference'] as bool? ?? false,
+      disabledByDataSaver: json['disabledByDataSaver'] as bool? ?? false,
+      disabledByBatterySaver: json['disabledByBatterySaver'] as bool? ?? false,
+    );
+  }
+}
+
 class PrefetchStatusUpdatedEvent {
   final PreloadingAttemptKey key;
 
@@ -107,11 +128,14 @@ class PrefetchStatusUpdatedEvent {
 
   final PreloadingStatus status;
 
+  final PrefetchStatus prefetchStatus;
+
   PrefetchStatusUpdatedEvent(
       {required this.key,
       required this.initiatingFrameId,
       required this.prefetchUrl,
-      required this.status});
+      required this.status,
+      required this.prefetchStatus});
 
   factory PrefetchStatusUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return PrefetchStatusUpdatedEvent(
@@ -120,6 +144,7 @@ class PrefetchStatusUpdatedEvent {
           page.FrameId.fromJson(json['initiatingFrameId'] as String),
       prefetchUrl: json['prefetchUrl'] as String,
       status: PreloadingStatus.fromJson(json['status'] as String),
+      prefetchStatus: PrefetchStatus.fromJson(json['prefetchStatus'] as String),
     );
   }
 }
@@ -127,26 +152,20 @@ class PrefetchStatusUpdatedEvent {
 class PrerenderStatusUpdatedEvent {
   final PreloadingAttemptKey key;
 
-  /// The frame id of the frame initiating prerender.
-  final page.FrameId initiatingFrameId;
-
-  final String prerenderingUrl;
-
   final PreloadingStatus status;
 
+  final PrerenderFinalStatus? prerenderStatus;
+
   PrerenderStatusUpdatedEvent(
-      {required this.key,
-      required this.initiatingFrameId,
-      required this.prerenderingUrl,
-      required this.status});
+      {required this.key, required this.status, this.prerenderStatus});
 
   factory PrerenderStatusUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return PrerenderStatusUpdatedEvent(
       key: PreloadingAttemptKey.fromJson(json['key'] as Map<String, dynamic>),
-      initiatingFrameId:
-          page.FrameId.fromJson(json['initiatingFrameId'] as String),
-      prerenderingUrl: json['prerenderingUrl'] as String,
       status: PreloadingStatus.fromJson(json['status'] as String),
+      prerenderStatus: json.containsKey('prerenderStatus')
+          ? PrerenderFinalStatus.fromJson(json['prerenderStatus'] as String)
+          : null,
     );
   }
 }
@@ -208,6 +227,22 @@ class RuleSet {
   /// - https://github.com/WICG/nav-speculation/blob/main/triggers.md
   final String sourceText;
 
+  /// A speculation rule set is either added through an inline
+  /// <script> tag or through an external resource via the
+  /// 'Speculation-Rules' HTTP header. For the first case, we include
+  /// the BackendNodeId of the relevant <script> tag. For the second
+  /// case, we include the external URL where the rule set was loaded
+  /// from, and also RequestId if Network domain is enabled.
+  ///
+  /// See also:
+  /// - https://wicg.github.io/nav-speculation/speculation-rules.html#speculation-rules-script
+  /// - https://wicg.github.io/nav-speculation/speculation-rules.html#speculation-rules-header
+  final dom.BackendNodeId? backendNodeId;
+
+  final String? url;
+
+  final network.RequestId? requestId;
+
   /// Error information
   /// `errorMessage` is null iff `errorType` is null.
   final RuleSetErrorType? errorType;
@@ -216,6 +251,9 @@ class RuleSet {
       {required this.id,
       required this.loaderId,
       required this.sourceText,
+      this.backendNodeId,
+      this.url,
+      this.requestId,
       this.errorType});
 
   factory RuleSet.fromJson(Map<String, dynamic> json) {
@@ -223,6 +261,13 @@ class RuleSet {
       id: RuleSetId.fromJson(json['id'] as String),
       loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
       sourceText: json['sourceText'] as String,
+      backendNodeId: json.containsKey('backendNodeId')
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
+          : null,
+      url: json.containsKey('url') ? json['url'] as String : null,
+      requestId: json.containsKey('requestId')
+          ? network.RequestId.fromJson(json['requestId'] as String)
+          : null,
       errorType: json.containsKey('errorType')
           ? RuleSetErrorType.fromJson(json['errorType'] as String)
           : null,
@@ -234,6 +279,9 @@ class RuleSet {
       'id': id.toJson(),
       'loaderId': loaderId.toJson(),
       'sourceText': sourceText,
+      if (backendNodeId != null) 'backendNodeId': backendNodeId!.toJson(),
+      if (url != null) 'url': url,
+      if (requestId != null) 'requestId': requestId!.toJson(),
       if (errorType != null) 'errorType': errorType!.toJson(),
     };
   }
@@ -465,27 +513,6 @@ enum PrerenderFinalStatus {
   String toString() => value.toString();
 }
 
-enum PreloadEnabledState {
-  enabled('Enabled'),
-  disabledByDataSaver('DisabledByDataSaver'),
-  disabledByBatterySaver('DisabledByBatterySaver'),
-  disabledByPreference('DisabledByPreference'),
-  notSupported('NotSupported'),
-  ;
-
-  final String value;
-
-  const PreloadEnabledState(this.value);
-
-  factory PreloadEnabledState.fromJson(String value) =>
-      PreloadEnabledState.values.firstWhere((e) => e.value == value);
-
-  String toJson() => value;
-
-  @override
-  String toString() => value.toString();
-}
-
 /// Preloading status values, see also PreloadingTriggeringOutcome. This
 /// status is shared by prefetchStatusUpdated and prerenderStatusUpdated.
 enum PreloadingStatus {
@@ -503,6 +530,60 @@ enum PreloadingStatus {
 
   factory PreloadingStatus.fromJson(String value) =>
       PreloadingStatus.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// TODO(https://crbug.com/1384419): revisit the list of PrefetchStatus and
+/// filter out the ones that aren't necessary to the developers.
+enum PrefetchStatus {
+  prefetchAllowed('PrefetchAllowed'),
+  prefetchFailedIneligibleRedirect('PrefetchFailedIneligibleRedirect'),
+  prefetchFailedInvalidRedirect('PrefetchFailedInvalidRedirect'),
+  prefetchFailedMimeNotSupported('PrefetchFailedMIMENotSupported'),
+  prefetchFailedNetError('PrefetchFailedNetError'),
+  prefetchFailedNon2xx('PrefetchFailedNon2XX'),
+  prefetchFailedPerPageLimitExceeded('PrefetchFailedPerPageLimitExceeded'),
+  prefetchEvicted('PrefetchEvicted'),
+  prefetchHeldback('PrefetchHeldback'),
+  prefetchIneligibleRetryAfter('PrefetchIneligibleRetryAfter'),
+  prefetchIsPrivacyDecoy('PrefetchIsPrivacyDecoy'),
+  prefetchIsStale('PrefetchIsStale'),
+  prefetchNotEligibleBrowserContextOffTheRecord(
+      'PrefetchNotEligibleBrowserContextOffTheRecord'),
+  prefetchNotEligibleDataSaverEnabled('PrefetchNotEligibleDataSaverEnabled'),
+  prefetchNotEligibleExistingProxy('PrefetchNotEligibleExistingProxy'),
+  prefetchNotEligibleHostIsNonUnique('PrefetchNotEligibleHostIsNonUnique'),
+  prefetchNotEligibleNonDefaultStoragePartition(
+      'PrefetchNotEligibleNonDefaultStoragePartition'),
+  prefetchNotEligibleSameSiteCrossOriginPrefetchRequiredProxy(
+      'PrefetchNotEligibleSameSiteCrossOriginPrefetchRequiredProxy'),
+  prefetchNotEligibleSchemeIsNotHttps('PrefetchNotEligibleSchemeIsNotHttps'),
+  prefetchNotEligibleUserHasCookies('PrefetchNotEligibleUserHasCookies'),
+  prefetchNotEligibleUserHasServiceWorker(
+      'PrefetchNotEligibleUserHasServiceWorker'),
+  prefetchNotEligibleBatterySaverEnabled(
+      'PrefetchNotEligibleBatterySaverEnabled'),
+  prefetchNotEligiblePreloadingDisabled(
+      'PrefetchNotEligiblePreloadingDisabled'),
+  prefetchNotFinishedInTime('PrefetchNotFinishedInTime'),
+  prefetchNotStarted('PrefetchNotStarted'),
+  prefetchNotUsedCookiesChanged('PrefetchNotUsedCookiesChanged'),
+  prefetchProxyNotAvailable('PrefetchProxyNotAvailable'),
+  prefetchResponseUsed('PrefetchResponseUsed'),
+  prefetchSuccessfulButNotUsed('PrefetchSuccessfulButNotUsed'),
+  prefetchNotUsedProbeFailed('PrefetchNotUsedProbeFailed'),
+  ;
+
+  final String value;
+
+  const PrefetchStatus(this.value);
+
+  factory PrefetchStatus.fromJson(String value) =>
+      PrefetchStatus.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 

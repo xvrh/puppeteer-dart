@@ -1,3 +1,6 @@
+## 3.2.0
+- Update to Chrome 115
+
 ## 3.1.1
 - Update to Chrome 114.0.5735.133
 - Widen constraint on dependency `package:http`

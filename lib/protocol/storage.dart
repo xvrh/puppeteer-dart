@@ -51,7 +51,7 @@ class StorageApi {
       .onEvent
       .where((event) => event.name == 'Storage.storageBucketCreatedOrUpdated')
       .map((event) => StorageBucketInfo.fromJson(
-          event.parameters['bucket'] as Map<String, dynamic>));
+          event.parameters['bucketInfo'] as Map<String, dynamic>));
 
   Stream<String> get onStorageBucketDeleted => _client.onEvent
       .where((event) => event.name == 'Storage.storageBucketDeleted')
@@ -319,10 +319,9 @@ class StorageApi {
   }
 
   /// Deletes the Storage Bucket with the given storage key and bucket name.
-  Future<void> deleteStorageBucket(String storageKey, String bucketName) async {
+  Future<void> deleteStorageBucket(StorageBucket bucket) async {
     await _client.send('Storage.deleteStorageBucket', {
-      'storageKey': storageKey,
-      'bucketName': bucketName,
+      'bucket': bucket,
     });
   }
 
@@ -340,18 +339,23 @@ class CacheStorageContentUpdatedEvent {
   /// Storage key to update.
   final String storageKey;
 
+  /// Storage bucket to update.
+  final String bucketId;
+
   /// Name of cache in origin.
   final String cacheName;
 
   CacheStorageContentUpdatedEvent(
       {required this.origin,
       required this.storageKey,
+      required this.bucketId,
       required this.cacheName});
 
   factory CacheStorageContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return CacheStorageContentUpdatedEvent(
       origin: json['origin'] as String,
       storageKey: json['storageKey'] as String,
+      bucketId: json['bucketId'] as String,
       cacheName: json['cacheName'] as String,
     );
   }
@@ -364,13 +368,17 @@ class CacheStorageListUpdatedEvent {
   /// Storage key to update.
   final String storageKey;
 
+  /// Storage bucket to update.
+  final String bucketId;
+
   CacheStorageListUpdatedEvent(
-      {required this.origin, required this.storageKey});
+      {required this.origin, required this.storageKey, required this.bucketId});
 
   factory CacheStorageListUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return CacheStorageListUpdatedEvent(
       origin: json['origin'] as String,
       storageKey: json['storageKey'] as String,
+      bucketId: json['bucketId'] as String,
     );
   }
 }
@@ -382,6 +390,9 @@ class IndexedDBContentUpdatedEvent {
   /// Storage key to update.
   final String storageKey;
 
+  /// Storage bucket to update.
+  final String bucketId;
+
   /// Database to update.
   final String databaseName;
 
@@ -391,6 +402,7 @@ class IndexedDBContentUpdatedEvent {
   IndexedDBContentUpdatedEvent(
       {required this.origin,
       required this.storageKey,
+      required this.bucketId,
       required this.databaseName,
       required this.objectStoreName});
 
@@ -398,6 +410,7 @@ class IndexedDBContentUpdatedEvent {
     return IndexedDBContentUpdatedEvent(
       origin: json['origin'] as String,
       storageKey: json['storageKey'] as String,
+      bucketId: json['bucketId'] as String,
       databaseName: json['databaseName'] as String,
       objectStoreName: json['objectStoreName'] as String,
     );
@@ -411,12 +424,17 @@ class IndexedDBListUpdatedEvent {
   /// Storage key to update.
   final String storageKey;
 
-  IndexedDBListUpdatedEvent({required this.origin, required this.storageKey});
+  /// Storage bucket to update.
+  final String bucketId;
+
+  IndexedDBListUpdatedEvent(
+      {required this.origin, required this.storageKey, required this.bucketId});
 
   factory IndexedDBListUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return IndexedDBListUpdatedEvent(
       origin: json['origin'] as String,
       storageKey: json['storageKey'] as String,
+      bucketId: json['bucketId'] as String,
     );
   }
 }
@@ -1002,14 +1020,33 @@ enum StorageBucketsDurability {
   String toString() => value.toString();
 }
 
-class StorageBucketInfo {
+class StorageBucket {
   final SerializedStorageKey storageKey;
 
+  /// If not specified, it is the default bucket of the storageKey.
+  final String? name;
+
+  StorageBucket({required this.storageKey, this.name});
+
+  factory StorageBucket.fromJson(Map<String, dynamic> json) {
+    return StorageBucket(
+      storageKey: SerializedStorageKey.fromJson(json['storageKey'] as String),
+      name: json.containsKey('name') ? json['name'] as String : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'storageKey': storageKey.toJson(),
+      if (name != null) 'name': name,
+    };
+  }
+}
+
+class StorageBucketInfo {
+  final StorageBucket bucket;
+
   final String id;
-
-  final String name;
-
-  final bool isDefault;
 
   final network.TimeSinceEpoch expiration;
 
@@ -1021,10 +1058,8 @@ class StorageBucketInfo {
   final StorageBucketsDurability durability;
 
   StorageBucketInfo(
-      {required this.storageKey,
+      {required this.bucket,
       required this.id,
-      required this.name,
-      required this.isDefault,
       required this.expiration,
       required this.quota,
       required this.persistent,
@@ -1032,10 +1067,8 @@ class StorageBucketInfo {
 
   factory StorageBucketInfo.fromJson(Map<String, dynamic> json) {
     return StorageBucketInfo(
-      storageKey: SerializedStorageKey.fromJson(json['storageKey'] as String),
+      bucket: StorageBucket.fromJson(json['bucket'] as Map<String, dynamic>),
       id: json['id'] as String,
-      name: json['name'] as String,
-      isDefault: json['isDefault'] as bool? ?? false,
       expiration: network.TimeSinceEpoch.fromJson(json['expiration'] as num),
       quota: json['quota'] as num,
       persistent: json['persistent'] as bool? ?? false,
@@ -1046,10 +1079,8 @@ class StorageBucketInfo {
 
   Map<String, dynamic> toJson() {
     return {
-      'storageKey': storageKey.toJson(),
+      'bucket': bucket.toJson(),
       'id': id,
-      'name': name,
-      'isDefault': isDefault,
       'expiration': expiration.toJson(),
       'quota': quota,
       'persistent': persistent,
