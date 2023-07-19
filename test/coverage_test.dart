@@ -182,7 +182,7 @@ void main() {
       var coverage = await page.coverage.stopCSSCoverage();
       expect(coverage.length, equals(1));
       expect(coverage[0].url, contains('/csscoverage/media.html'));
-      expect(coverage[0].ranges, equals([Range(8, 40)]));
+      expect(coverage[0].ranges, equals([Range(8, 15), Range(17, 38)]));
     });
     test('should work with complicated usecases', () async {
       await page.coverage.startCSSCoverage();

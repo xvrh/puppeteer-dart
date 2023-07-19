@@ -19,7 +19,7 @@ void main() {
     server.clearRoutes();
   });
 
-  var extensionPath = p.join('test', 'assets', 'simple-extension');
+  var extensionPath = p.absolute(p.join('test', 'assets', 'simple-extension'));
   var extensionOptions = [
     '--disable-extensions-except=$extensionPath',
     '--load-extension=$extensionPath',
@@ -40,7 +40,7 @@ void main() {
       } finally {
         await browserWithExtension.close();
       }
-    }, onPlatform: {'windows': Skip('TODO debug on windows')});
+    });
     test('target.page() should return a background_page', () async {
       var browserWithExtension =
           await puppeteer.launch(headless: false, args: extensionOptions);
@@ -55,7 +55,7 @@ void main() {
       } finally {
         await browserWithExtension.close();
       }
-    }, onPlatform: {'windows': Skip('TODO debug on windows')});
+    });
     test('should have default url when launching browser', () async {
       var browser = await puppeteer.launch(args: extensionOptions);
 
@@ -94,7 +94,7 @@ void main() {
       }
       // This might throw. See https://github.com/GoogleChrome/puppeteer/issues/2778
       _tryDeleteDirectory(userDataDir);
-    }, onPlatform: {'windows': Skip('TODO debug on windows')});
+    });
     // TODO:
     test('OOPIF: should report google.com frame', () async {
       // https://google.com is isolated by default in Chromium embedder.
