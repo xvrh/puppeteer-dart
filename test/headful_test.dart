@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
@@ -51,6 +52,7 @@ void main() {
             .waitForTarget((target) => target.type == 'background_page');
         var page = await backgroundPageTarget.page;
         expect(await page.evaluate('() => 2 * 3'), 6);
+        await waitFor(() => page.evaluate('() => !!window.MAGIC'));
         expect(await page.evaluate('() => window.MAGIC'), 42);
       } finally {
         await browserWithExtension.close();
@@ -177,4 +179,20 @@ void _tryDeleteDirectory(Directory directory) {
   try {
     directory.deleteSync(recursive: true);
   } catch (_) {}
+}
+
+Future<void> waitFor(FutureOr<bool> Function() predicate,
+    {Duration? pollInterval, Duration? timeout}) async {
+  pollInterval ??= Duration(milliseconds: 100);
+  timeout ??= Duration(seconds: 10);
+  var stopwatch = Stopwatch()..start();
+  while (true) {
+    var result = await predicate();
+    if (result) return;
+    if (stopwatch.elapsed > timeout) {
+      throw TimeoutException('waitFor has timed out');
+    }
+
+    await Future.delayed(pollInterval);
+  }
 }
