@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:logging/logging.dart';
+
 import '../protocol/target.dart';
 import 'websocket.dart';
 
@@ -257,7 +259,7 @@ class Session implements Client {
       }
     } else {
       _eventController.add(Event._(object['method'] as String,
-          object['params'] as Map<String, dynamic>));
+          (object['params'] ?? {}) as Map<String, dynamic>));
     }
   }
 
