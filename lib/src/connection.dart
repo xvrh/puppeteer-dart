@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:logging/logging.dart';
-
 import '../protocol/target.dart';
 import 'websocket.dart';
 
