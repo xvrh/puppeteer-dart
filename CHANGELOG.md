@@ -1,3 +1,6 @@
+## 3.3.0
+- Update to Chrome 115.0.5790.102
+
 ## 3.2.0
 - Update to Chrome 115
 
