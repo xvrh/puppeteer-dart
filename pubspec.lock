@@ -361,14 +361,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.4.0"
-  platform:
-    dependency: transitive
-    description:
-      name: platform
-      sha256: "57c07bf82207aee366dfaa3867b3164e4f03a238a461a11b0e8a3a510d51203d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.1"
   pointycastle:
     dependency: transitive
     description:
@@ -385,24 +377,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.1"
-  process:
-    dependency: transitive
-    description:
-      name: process
-      sha256: "53fd8db9cec1d37b0574e12f07520d582019cb6c44abf5479a01505099a34a09"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.2.4"
-  process_runner:
-    dependency: "direct dev"
-    description:
-      name: process_runner
-      sha256: a3511a69d42216522166583f19cce6bf44efe109f3ca52fc7994f64bbdbe01e6
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.1.2"
   pub_semver:
-    dependency: "direct dev"
+    dependency: transitive
     description:
       name: pub_semver
       sha256: "40d3ab1bbd474c4c2328c91e3a7df8c6dd629b79ece4c4bd04bee496a224fb0c"
@@ -593,6 +569,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.7"
+  version:
+    dependency: "direct dev"
+    description:
+      name: version
+      sha256: "3d4140128e6ea10d83da32fef2fa4003fccbf6852217bb854845802f04191f94"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.2"
   vm_service:
     dependency: transitive
     description:

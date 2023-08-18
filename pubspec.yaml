@@ -32,11 +32,11 @@ dev_dependencies:
   json_annotation:
   json_serializable:
   lints:
-  pub_semver:
   shelf:
   shelf_router:
   shelf_static:
   shelf_web_socket:
   test:
+  version:
   web_socket_channel:
   yaml:

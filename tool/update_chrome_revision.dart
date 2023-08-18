@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:github_actions_toolkit/github_actions_toolkit.dart' as gaction;
 import 'package:http/http.dart';
-import 'package:pub_semver/pub_semver.dart';
+import 'package:version/version.dart';
 
 final _downloaderFile = File('lib/src/downloader.dart');
 final _variablePrefix = 'const _lastVersion = ';
