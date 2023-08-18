@@ -9,6 +9,9 @@ on:
     # Run everyday at: https://crontab.guru/#0_6_*_*_*.
     - cron: '0 6 * * *'
   workflow_dispatch:
+  push:
+    branches:
+      - 'xha/chrome116'
 
 jobs:
   update:
