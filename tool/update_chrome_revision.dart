@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:github_actions_toolkit/github_actions_toolkit.dart' as gaction;
 import 'package:http/http.dart';
 
@@ -13,10 +12,10 @@ void main() async {
   var stableVersion = await _getVersionAndRevisionForStable();
   var currentVersion = await _readCurrentVersion();
 
-  var message = 'roll to Chrome $stableVersion';
-  gaction.setOutput('commit', message);
-
-  await _updateCurrentVersion(stableVersion);
+  if (stableVersion != currentVersion) {
+    await _updateCurrentVersion(stableVersion);
+    gaction.setOutput('commit', 'roll to Chrome $stableVersion');
+  }
 }
 
 Future<String> _getVersionAndRevisionForStable() async {
