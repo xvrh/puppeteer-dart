@@ -22,7 +22,6 @@ void main() async {
   } else {
     print('No update needed. Current: $currentVersion, stable: $stableVersion');
   }
-
 }
 
 Future<Version> _getVersionAndRevisionForStable() async {

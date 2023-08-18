@@ -24,6 +24,13 @@ jobs:
         run: |
           dart pub get
           dart tools/update_chrome_revision.dart
+      - name: Run various update
+        if: ${{ steps.update.outputs.commit }}
+        run: |
+          dart tools/download_protocol_from_chrome.dart
+          dart tools/download_protocol_from_repo.dart
+          dart tools/generate_protocol.dart
+          dart tools/prepare_submit.dart
       - name: Create Pull Request
         if: ${{ steps.update.outputs.commit }}
         uses: peter-evans/create-pull-request@v5
