@@ -73,7 +73,7 @@ class ScreenshotParams {
   /// Image compression format (defaults to png).
   final ScreenshotParamsFormat? format;
 
-  /// Compression quality from range [0..100] (jpeg only).
+  /// Compression quality from range [0..100] (jpeg and webp only).
   final int? quality;
 
   /// Optimize image encoding for speed, not for resulting size (defaults to false)

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:github_actions_toolkit/github_actions_toolkit.dart' as gaction;
 import 'package:http/http.dart';
 

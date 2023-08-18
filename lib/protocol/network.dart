@@ -1928,6 +1928,9 @@ class ResourceTiming {
   /// Time the server finished pushing request.
   final num pushEnd;
 
+  /// Started receiving response headers.
+  final num receiveHeadersStart;
+
   /// Finished receiving response headers.
   final num receiveHeadersEnd;
 
@@ -1949,6 +1952,7 @@ class ResourceTiming {
       required this.sendEnd,
       required this.pushStart,
       required this.pushEnd,
+      required this.receiveHeadersStart,
       required this.receiveHeadersEnd});
 
   factory ResourceTiming.fromJson(Map<String, dynamic> json) {
@@ -1970,6 +1974,7 @@ class ResourceTiming {
       sendEnd: json['sendEnd'] as num,
       pushStart: json['pushStart'] as num,
       pushEnd: json['pushEnd'] as num,
+      receiveHeadersStart: json['receiveHeadersStart'] as num,
       receiveHeadersEnd: json['receiveHeadersEnd'] as num,
     );
   }
@@ -1993,6 +1998,7 @@ class ResourceTiming {
       'sendEnd': sendEnd,
       'pushStart': pushStart,
       'pushEnd': pushEnd,
+      'receiveHeadersStart': receiveHeadersStart,
       'receiveHeadersEnd': receiveHeadersEnd,
     };
   }
@@ -4031,12 +4037,61 @@ class CrossOriginEmbedderPolicyStatus {
   }
 }
 
+enum ContentSecurityPolicySource {
+  http('HTTP'),
+  meta('Meta'),
+  ;
+
+  final String value;
+
+  const ContentSecurityPolicySource(this.value);
+
+  factory ContentSecurityPolicySource.fromJson(String value) =>
+      ContentSecurityPolicySource.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+class ContentSecurityPolicyStatus {
+  final String effectiveDirectives;
+
+  final bool isEnforced;
+
+  final ContentSecurityPolicySource source;
+
+  ContentSecurityPolicyStatus(
+      {required this.effectiveDirectives,
+      required this.isEnforced,
+      required this.source});
+
+  factory ContentSecurityPolicyStatus.fromJson(Map<String, dynamic> json) {
+    return ContentSecurityPolicyStatus(
+      effectiveDirectives: json['effectiveDirectives'] as String,
+      isEnforced: json['isEnforced'] as bool? ?? false,
+      source: ContentSecurityPolicySource.fromJson(json['source'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'effectiveDirectives': effectiveDirectives,
+      'isEnforced': isEnforced,
+      'source': source.toJson(),
+    };
+  }
+}
+
 class SecurityIsolationStatus {
   final CrossOriginOpenerPolicyStatus? coop;
 
   final CrossOriginEmbedderPolicyStatus? coep;
 
-  SecurityIsolationStatus({this.coop, this.coep});
+  final List<ContentSecurityPolicyStatus>? csp;
+
+  SecurityIsolationStatus({this.coop, this.coep, this.csp});
 
   factory SecurityIsolationStatus.fromJson(Map<String, dynamic> json) {
     return SecurityIsolationStatus(
@@ -4048,6 +4103,12 @@ class SecurityIsolationStatus {
           ? CrossOriginEmbedderPolicyStatus.fromJson(
               json['coep'] as Map<String, dynamic>)
           : null,
+      csp: json.containsKey('csp')
+          ? (json['csp'] as List)
+              .map((e) => ContentSecurityPolicyStatus.fromJson(
+                  e as Map<String, dynamic>))
+              .toList()
+          : null,
     );
   }
 
@@ -4055,6 +4116,7 @@ class SecurityIsolationStatus {
     return {
       if (coop != null) 'coop': coop!.toJson(),
       if (coep != null) 'coep': coep!.toJson(),
+      if (csp != null) 'csp': csp!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -4274,6 +4336,7 @@ class LoadNetworkResourceOptions {
 enum TrustTokenOperationDoneEventStatus {
   ok('Ok'),
   invalidArgument('InvalidArgument'),
+  missingIssuerKeys('MissingIssuerKeys'),
   failedPrecondition('FailedPrecondition'),
   resourceExhausted('ResourceExhausted'),
   alreadyExists('AlreadyExists'),

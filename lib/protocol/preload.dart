@@ -498,6 +498,8 @@ enum PrerenderFinalStatus {
       'SameSiteCrossOriginNavigationNotOptInInMainFrameNavigation'),
   memoryPressureOnTrigger('MemoryPressureOnTrigger'),
   memoryPressureAfterTriggered('MemoryPressureAfterTriggered'),
+  prerenderingDisabledByDevTools('PrerenderingDisabledByDevTools'),
+  resourceLoadBlockedByClient('ResourceLoadBlockedByClient'),
   ;
 
   final String value;
