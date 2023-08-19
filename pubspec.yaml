@@ -36,6 +36,6 @@ dev_dependencies:
   shelf_router:
   shelf_static:
   shelf_web_socket:
-  test:
+  test: any
   web_socket_channel:
   yaml:
