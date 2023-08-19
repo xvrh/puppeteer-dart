@@ -10,7 +10,7 @@ platforms:
   windows:
 
 environment:
-  sdk: '^3.0.0'
+  sdk: '^3.1.0'
 
 dependencies:
   archive: ^3.0.0
