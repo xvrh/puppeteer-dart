@@ -10,7 +10,7 @@ String? convertToFunctionDeclaration(String javascript) {
   var grammar = JsGrammarDefinition().build();
   var result = grammar.parse(javascript);
 
-  if (result.isSuccess) {
+  if (result is Success) {
     var tokens = result.value as List;
 
     if (tokens.contains(_isFunction)) {
