@@ -27,6 +27,7 @@ dev_dependencies:
   build_runner:
   crypto:
   dart_style:
+  github_actions_toolkit:
   image:
   json_annotation:
   json_serializable:
