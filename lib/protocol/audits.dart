@@ -1213,6 +1213,7 @@ enum FederatedAuthRequestIssueReason {
   canceled('Canceled'),
   rpPageNotVisible('RpPageNotVisible'),
   silentMediationFailure('SilentMediationFailure'),
+  thirdPartyCookiesBlocked('ThirdPartyCookiesBlocked'),
   ;
 
   final String value;
@@ -1221,6 +1222,59 @@ enum FederatedAuthRequestIssueReason {
 
   factory FederatedAuthRequestIssueReason.fromJson(String value) =>
       FederatedAuthRequestIssueReason.values
+          .firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+class FederatedAuthUserInfoRequestIssueDetails {
+  final FederatedAuthUserInfoRequestIssueReason
+      federatedAuthUserInfoRequestIssueReason;
+
+  FederatedAuthUserInfoRequestIssueDetails(
+      {required this.federatedAuthUserInfoRequestIssueReason});
+
+  factory FederatedAuthUserInfoRequestIssueDetails.fromJson(
+      Map<String, dynamic> json) {
+    return FederatedAuthUserInfoRequestIssueDetails(
+      federatedAuthUserInfoRequestIssueReason:
+          FederatedAuthUserInfoRequestIssueReason.fromJson(
+              json['federatedAuthUserInfoRequestIssueReason'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'federatedAuthUserInfoRequestIssueReason':
+          federatedAuthUserInfoRequestIssueReason.toJson(),
+    };
+  }
+}
+
+/// Represents the failure reason when a getUserInfo() call fails.
+/// Should be updated alongside FederatedAuthUserInfoRequestResult in
+/// third_party/blink/public/mojom/devtools/inspector_issue.mojom.
+enum FederatedAuthUserInfoRequestIssueReason {
+  notSameOrigin('NotSameOrigin'),
+  notIframe('NotIframe'),
+  notPotentiallyTrustworthy('NotPotentiallyTrustworthy'),
+  noApiPermission('NoApiPermission'),
+  notSignedInWithIdp('NotSignedInWithIdp'),
+  noAccountSharingPermission('NoAccountSharingPermission'),
+  invalidConfigOrWellKnown('InvalidConfigOrWellKnown'),
+  invalidAccountsResponse('InvalidAccountsResponse'),
+  noReturningUserFromFetchedAccounts('NoReturningUserFromFetchedAccounts'),
+  ;
+
+  final String value;
+
+  const FederatedAuthUserInfoRequestIssueReason(this.value);
+
+  factory FederatedAuthUserInfoRequestIssueReason.fromJson(String value) =>
+      FederatedAuthUserInfoRequestIssueReason.values
           .firstWhere((e) => e.value == value);
 
   String toJson() => value;
@@ -1256,6 +1310,94 @@ class ClientHintIssueDetails {
   }
 }
 
+class FailedRequestInfo {
+  /// The URL that failed to load.
+  final String url;
+
+  /// The failure message for the failed request.
+  final String failureMessage;
+
+  final network.RequestId? requestId;
+
+  FailedRequestInfo(
+      {required this.url, required this.failureMessage, this.requestId});
+
+  factory FailedRequestInfo.fromJson(Map<String, dynamic> json) {
+    return FailedRequestInfo(
+      url: json['url'] as String,
+      failureMessage: json['failureMessage'] as String,
+      requestId: json.containsKey('requestId')
+          ? network.RequestId.fromJson(json['requestId'] as String)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      'failureMessage': failureMessage,
+      if (requestId != null) 'requestId': requestId!.toJson(),
+    };
+  }
+}
+
+enum StyleSheetLoadingIssueReason {
+  lateImportRule('LateImportRule'),
+  requestFailed('RequestFailed'),
+  ;
+
+  final String value;
+
+  const StyleSheetLoadingIssueReason(this.value);
+
+  factory StyleSheetLoadingIssueReason.fromJson(String value) =>
+      StyleSheetLoadingIssueReason.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// This issue warns when a referenced stylesheet couldn't be loaded.
+class StylesheetLoadingIssueDetails {
+  /// Source code position that referenced the failing stylesheet.
+  final SourceCodeLocation sourceCodeLocation;
+
+  /// Reason why the stylesheet couldn't be loaded.
+  final StyleSheetLoadingIssueReason styleSheetLoadingIssueReason;
+
+  /// Contains additional info when the failure was due to a request.
+  final FailedRequestInfo? failedRequestInfo;
+
+  StylesheetLoadingIssueDetails(
+      {required this.sourceCodeLocation,
+      required this.styleSheetLoadingIssueReason,
+      this.failedRequestInfo});
+
+  factory StylesheetLoadingIssueDetails.fromJson(Map<String, dynamic> json) {
+    return StylesheetLoadingIssueDetails(
+      sourceCodeLocation: SourceCodeLocation.fromJson(
+          json['sourceCodeLocation'] as Map<String, dynamic>),
+      styleSheetLoadingIssueReason: StyleSheetLoadingIssueReason.fromJson(
+          json['styleSheetLoadingIssueReason'] as String),
+      failedRequestInfo: json.containsKey('failedRequestInfo')
+          ? FailedRequestInfo.fromJson(
+              json['failedRequestInfo'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sourceCodeLocation': sourceCodeLocation.toJson(),
+      'styleSheetLoadingIssueReason': styleSheetLoadingIssueReason.toJson(),
+      if (failedRequestInfo != null)
+        'failedRequestInfo': failedRequestInfo!.toJson(),
+    };
+  }
+}
+
 /// A unique identifier for the type of issue. Each type may use one of the
 /// optional fields in InspectorIssueDetails to convey more specific
 /// information about the kind of issue.
@@ -1276,6 +1418,8 @@ enum InspectorIssueCode {
   clientHintIssue('ClientHintIssue'),
   federatedAuthRequestIssue('FederatedAuthRequestIssue'),
   bounceTrackingIssue('BounceTrackingIssue'),
+  stylesheetLoadingIssue('StylesheetLoadingIssue'),
+  federatedAuthUserInfoRequestIssue('FederatedAuthUserInfoRequestIssue'),
   ;
 
   final String value;
@@ -1327,6 +1471,11 @@ class InspectorIssueDetails {
 
   final BounceTrackingIssueDetails? bounceTrackingIssueDetails;
 
+  final StylesheetLoadingIssueDetails? stylesheetLoadingIssueDetails;
+
+  final FederatedAuthUserInfoRequestIssueDetails?
+      federatedAuthUserInfoRequestIssueDetails;
+
   InspectorIssueDetails(
       {this.cookieIssueDetails,
       this.mixedContentIssueDetails,
@@ -1343,7 +1492,9 @@ class InspectorIssueDetails {
       this.deprecationIssueDetails,
       this.clientHintIssueDetails,
       this.federatedAuthRequestIssueDetails,
-      this.bounceTrackingIssueDetails});
+      this.bounceTrackingIssueDetails,
+      this.stylesheetLoadingIssueDetails,
+      this.federatedAuthUserInfoRequestIssueDetails});
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
     return InspectorIssueDetails(
@@ -1418,6 +1569,17 @@ class InspectorIssueDetails {
           ? BounceTrackingIssueDetails.fromJson(
               json['bounceTrackingIssueDetails'] as Map<String, dynamic>)
           : null,
+      stylesheetLoadingIssueDetails:
+          json.containsKey('stylesheetLoadingIssueDetails')
+              ? StylesheetLoadingIssueDetails.fromJson(
+                  json['stylesheetLoadingIssueDetails'] as Map<String, dynamic>)
+              : null,
+      federatedAuthUserInfoRequestIssueDetails:
+          json.containsKey('federatedAuthUserInfoRequestIssueDetails')
+              ? FederatedAuthUserInfoRequestIssueDetails.fromJson(
+                  json['federatedAuthUserInfoRequestIssueDetails']
+                      as Map<String, dynamic>)
+              : null,
     );
   }
 
@@ -1461,6 +1623,12 @@ class InspectorIssueDetails {
             federatedAuthRequestIssueDetails!.toJson(),
       if (bounceTrackingIssueDetails != null)
         'bounceTrackingIssueDetails': bounceTrackingIssueDetails!.toJson(),
+      if (stylesheetLoadingIssueDetails != null)
+        'stylesheetLoadingIssueDetails':
+            stylesheetLoadingIssueDetails!.toJson(),
+      if (federatedAuthUserInfoRequestIssueDetails != null)
+        'federatedAuthUserInfoRequestIssueDetails':
+            federatedAuthUserInfoRequestIssueDetails!.toJson(),
     };
   }
 }

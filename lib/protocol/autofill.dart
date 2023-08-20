@@ -22,6 +22,13 @@ class AutofillApi {
       if (frameId != null) 'frameId': frameId,
     });
   }
+
+  /// Set addresses so that developers can verify their forms implementation.
+  Future<void> setAddresses(List<Address> addresses) async {
+    await _client.send('Autofill.setAddresses', {
+      'addresses': [...addresses],
+    });
+  }
 }
 
 class CreditCard {
@@ -64,6 +71,51 @@ class CreditCard {
       'expiryMonth': expiryMonth,
       'expiryYear': expiryYear,
       'cvc': cvc,
+    };
+  }
+}
+
+class AddressField {
+  /// address field name, for example GIVEN_NAME.
+  final String name;
+
+  /// address field name, for example Jon Doe.
+  final String value;
+
+  AddressField({required this.name, required this.value});
+
+  factory AddressField.fromJson(Map<String, dynamic> json) {
+    return AddressField(
+      name: json['name'] as String,
+      value: json['value'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'value': value,
+    };
+  }
+}
+
+class Address {
+  /// fields and values defining a test address.
+  final List<AddressField> fields;
+
+  Address({required this.fields});
+
+  factory Address.fromJson(Map<String, dynamic> json) {
+    return Address(
+      fields: (json['fields'] as List)
+          .map((e) => AddressField.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'fields': fields.map((e) => e.toJson()).toList(),
     };
   }
 }

@@ -849,6 +849,19 @@ class PageApi {
       'enabled': enabled,
     });
   }
+
+  /// Enable/disable prerendering manually.
+  ///
+  /// This command is a short-term solution for https://crbug.com/1440085.
+  /// See https://docs.google.com/document/d/12HVmFxYj5Jc-eJr5OmWsa2bqTJsbgGLKI6ZIyx0_wpA
+  /// for more details.
+  ///
+  /// TODO(https://crbug.com/1440085): Remove this once Puppeteer supports tab targets.
+  Future<void> setPrerenderingAllowed(bool isAllowed) async {
+    await _client.send('Page.setPrerenderingAllowed', {
+      'isAllowed': isAllowed,
+    });
+  }
 }
 
 class FileChooserOpenedEvent {
@@ -1613,11 +1626,9 @@ enum PermissionsPolicyFeature {
   chUaPlatform('ch-ua-platform'),
   chUaModel('ch-ua-model'),
   chUaMobile('ch-ua-mobile'),
-  chUaFull('ch-ua-full'),
   chUaFullVersion('ch-ua-full-version'),
   chUaFullVersionList('ch-ua-full-version-list'),
   chUaPlatformVersion('ch-ua-platform-version'),
-  chUaReduced('ch-ua-reduced'),
   chUaWow64('ch-ua-wow64'),
   chViewportHeight('ch-viewport-height'),
   chViewportWidth('ch-viewport-width'),
@@ -2921,6 +2932,8 @@ enum BackForwardCacheNotRestoredReason {
       'ActivationNavigationsDisallowedForBug1234857'),
   errorDocument('ErrorDocument'),
   fencedFramesEmbedder('FencedFramesEmbedder'),
+  cookieDisabled('CookieDisabled'),
+  httpAuthRequired('HTTPAuthRequired'),
   webSocket('WebSocket'),
   webTransport('WebTransport'),
   webRtc('WebRTC'),
@@ -2968,7 +2981,11 @@ enum BackForwardCacheNotRestoredReason {
   keepaliveRequest('KeepaliveRequest'),
   indexedDbEvent('IndexedDBEvent'),
   dummy('Dummy'),
-  authorizationHeader('AuthorizationHeader'),
+  jsNetworkRequestReceivedCacheControlNoStoreResource(
+      'JsNetworkRequestReceivedCacheControlNoStoreResource'),
+  webRtcSticky('WebRTCSticky'),
+  webTransportSticky('WebTransportSticky'),
+  webSocketSticky('WebSocketSticky'),
   contentSecurityHandler('ContentSecurityHandler'),
   contentWebAuthenticationApi('ContentWebAuthenticationAPI'),
   contentFileChooser('ContentFileChooser'),
