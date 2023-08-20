@@ -96,7 +96,7 @@ class RuntimeApi {
   /// boundaries).
   /// This is mutually exclusive with `executionContextId`.
   /// [serializationOptions] Specifies the result serialization. If provided, overrides
-  /// `returnByValue` and `generateWebDriverValue`.
+  /// `generatePreview`, `returnByValue` and `generateWebDriverValue`.
   Future<CallFunctionOnResult> callFunctionOn(String functionDeclaration,
       {RemoteObjectId? objectId,
       List<CallArgument>? arguments,
@@ -202,7 +202,7 @@ class RuntimeApi {
   /// boundaries).
   /// This is mutually exclusive with `contextId`.
   /// [serializationOptions] Specifies the result serialization. If provided, overrides
-  /// `returnByValue` and `generateWebDriverValue`.
+  /// `generatePreview`, `returnByValue` and `generateWebDriverValue`.
   Future<EvaluateResult> evaluate(String expression,
       {String? objectGroup,
       bool? includeCommandLineAPI,
