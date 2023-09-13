@@ -172,6 +172,7 @@ enum CookieExclusionReason {
   excludeDomainNonAscii('ExcludeDomainNonASCII'),
   excludeThirdPartyCookieBlockedInFirstPartySet(
       'ExcludeThirdPartyCookieBlockedInFirstPartySet'),
+  excludeThirdPartyPhaseout('ExcludeThirdPartyPhaseout'),
   ;
 
   final String value;
@@ -201,6 +202,7 @@ enum CookieWarningReason {
   warnSameSiteLaxCrossDowngradeLax('WarnSameSiteLaxCrossDowngradeLax'),
   warnAttributeValueExceedsMaxSize('WarnAttributeValueExceedsMaxSize'),
   warnDomainNonAscii('WarnDomainNonASCII'),
+  warnThirdPartyPhaseout('WarnThirdPartyPhaseout'),
   ;
 
   final String value;
@@ -875,6 +877,8 @@ enum AttributionReportingIssueType {
   invalidRegisterOsTriggerHeader('InvalidRegisterOsTriggerHeader'),
   webAndOsHeaders('WebAndOsHeaders'),
   noWebOrOsSupport('NoWebOrOsSupport'),
+  navigationRegistrationWithoutTransientUserActivation(
+      'NavigationRegistrationWithoutTransientUserActivation'),
   ;
 
   final String value;
@@ -1017,6 +1021,7 @@ enum GenericIssueErrorType {
       'FormLabelForMatchesNonExistingIdError'),
   formInputHasWrongButWellIntendedAutocompleteValueError(
       'FormInputHasWrongButWellIntendedAutocompleteValueError'),
+  responseWasBlockedByOrb('ResponseWasBlockedByORB'),
   ;
 
   final String value;
@@ -1043,11 +1048,14 @@ class GenericIssueDetails {
 
   final String? violatingNodeAttribute;
 
+  final AffectedRequest? request;
+
   GenericIssueDetails(
       {required this.errorType,
       this.frameId,
       this.violatingNodeId,
-      this.violatingNodeAttribute});
+      this.violatingNodeAttribute,
+      this.request});
 
   factory GenericIssueDetails.fromJson(Map<String, dynamic> json) {
     return GenericIssueDetails(
@@ -1061,6 +1069,9 @@ class GenericIssueDetails {
       violatingNodeAttribute: json.containsKey('violatingNodeAttribute')
           ? json['violatingNodeAttribute'] as String
           : null,
+      request: json.containsKey('request')
+          ? AffectedRequest.fromJson(json['request'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -1071,6 +1082,7 @@ class GenericIssueDetails {
       if (violatingNodeId != null) 'violatingNodeId': violatingNodeId!.toJson(),
       if (violatingNodeAttribute != null)
         'violatingNodeAttribute': violatingNodeAttribute,
+      if (request != null) 'request': request!.toJson(),
     };
   }
 }
@@ -1459,8 +1471,6 @@ class InspectorIssueDetails {
 
   final QuirksModeIssueDetails? quirksModeIssueDetails;
 
-  final NavigatorUserAgentIssueDetails? navigatorUserAgentIssueDetails;
-
   final GenericIssueDetails? genericIssueDetails;
 
   final DeprecationIssueDetails? deprecationIssueDetails;
@@ -1487,7 +1497,6 @@ class InspectorIssueDetails {
       this.corsIssueDetails,
       this.attributionReportingIssueDetails,
       this.quirksModeIssueDetails,
-      this.navigatorUserAgentIssueDetails,
       this.genericIssueDetails,
       this.deprecationIssueDetails,
       this.clientHintIssueDetails,
@@ -1542,11 +1551,6 @@ class InspectorIssueDetails {
       quirksModeIssueDetails: json.containsKey('quirksModeIssueDetails')
           ? QuirksModeIssueDetails.fromJson(
               json['quirksModeIssueDetails'] as Map<String, dynamic>)
-          : null,
-      navigatorUserAgentIssueDetails: json
-              .containsKey('navigatorUserAgentIssueDetails')
-          ? NavigatorUserAgentIssueDetails.fromJson(
-              json['navigatorUserAgentIssueDetails'] as Map<String, dynamic>)
           : null,
       genericIssueDetails: json.containsKey('genericIssueDetails')
           ? GenericIssueDetails.fromJson(
@@ -1609,9 +1613,6 @@ class InspectorIssueDetails {
             attributionReportingIssueDetails!.toJson(),
       if (quirksModeIssueDetails != null)
         'quirksModeIssueDetails': quirksModeIssueDetails!.toJson(),
-      if (navigatorUserAgentIssueDetails != null)
-        'navigatorUserAgentIssueDetails':
-            navigatorUserAgentIssueDetails!.toJson(),
       if (genericIssueDetails != null)
         'genericIssueDetails': genericIssueDetails!.toJson(),
       if (deprecationIssueDetails != null)

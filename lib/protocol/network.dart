@@ -753,24 +753,16 @@ class LoadingFinishedEvent {
   /// Total number of bytes received for this request.
   final num encodedDataLength;
 
-  /// Set when 1) response was blocked by Cross-Origin Read Blocking and also
-  /// 2) this needs to be reported to the DevTools console.
-  final bool? shouldReportCorbBlocking;
-
   LoadingFinishedEvent(
       {required this.requestId,
       required this.timestamp,
-      required this.encodedDataLength,
-      this.shouldReportCorbBlocking});
+      required this.encodedDataLength});
 
   factory LoadingFinishedEvent.fromJson(Map<String, dynamic> json) {
     return LoadingFinishedEvent(
       requestId: RequestId.fromJson(json['requestId'] as String),
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
       encodedDataLength: json['encodedDataLength'] as num,
-      shouldReportCorbBlocking: json.containsKey('shouldReportCorbBlocking')
-          ? json['shouldReportCorbBlocking'] as bool
-          : null,
     );
   }
 }
@@ -2455,6 +2447,13 @@ enum CorsError {
   invalidPrivateNetworkAccess('InvalidPrivateNetworkAccess'),
   unexpectedPrivateNetworkAccess('UnexpectedPrivateNetworkAccess'),
   noCorsRedirectModeNotFollow('NoCorsRedirectModeNotFollow'),
+  preflightMissingPrivateNetworkAccessId(
+      'PreflightMissingPrivateNetworkAccessId'),
+  preflightMissingPrivateNetworkAccessName(
+      'PreflightMissingPrivateNetworkAccessName'),
+  privateNetworkAccessPermissionUnavailable(
+      'PrivateNetworkAccessPermissionUnavailable'),
+  privateNetworkAccessPermissionDenied('PrivateNetworkAccessPermissionDenied'),
   ;
 
   final String value;
@@ -3167,6 +3166,7 @@ enum SetCookieBlockedReason {
   samePartyConflictsWithOtherAttributes(
       'SamePartyConflictsWithOtherAttributes'),
   nameValuePairExceedsMaxSize('NameValuePairExceedsMaxSize'),
+  disallowedCharacter('DisallowedCharacter'),
   ;
 
   final String value;
@@ -3656,7 +3656,7 @@ class SignedExchangeHeader {
   /// Signed exchange response signature.
   final List<SignedExchangeSignature> signatures;
 
-  /// Signed exchange header integrity hash in the form of "sha256-<base64-hash-value>".
+  /// Signed exchange header integrity hash in the form of `sha256-<base64-hash-value>`.
   final String headerIntegrity;
 
   SignedExchangeHeader(
@@ -3805,6 +3805,7 @@ enum ContentEncoding {
   deflate('deflate'),
   gzip('gzip'),
   br('br'),
+  zstd('zstd'),
   ;
 
   final String value;

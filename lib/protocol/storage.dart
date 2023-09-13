@@ -57,6 +57,15 @@ class StorageApi {
       .where((event) => event.name == 'Storage.storageBucketDeleted')
       .map((event) => event.parameters['bucketId'] as String);
 
+  /// TODO(crbug.com/1458532): Add other Attribution Reporting events, e.g.
+  /// trigger registration.
+  Stream<AttributionReportingSourceRegisteredEvent>
+      get onAttributionReportingSourceRegistered => _client.onEvent
+          .where((event) =>
+              event.name == 'Storage.attributionReportingSourceRegistered')
+          .map((event) => AttributionReportingSourceRegisteredEvent.fromJson(
+              event.parameters));
+
   /// Returns a storage key given a frame id.
   Future<SerializedStorageKey> getStorageKeyForFrame(
       page.FrameId frameId) async {
@@ -330,6 +339,21 @@ class StorageApi {
     var result = await _client.send('Storage.runBounceTrackingMitigations');
     return (result['deletedSites'] as List).map((e) => e as String).toList();
   }
+
+  /// https://wicg.github.io/attribution-reporting-api/
+  /// [enabled] If enabled, noise is suppressed and reports are sent immediately.
+  Future<void> setAttributionReportingLocalTestingMode(bool enabled) async {
+    await _client.send('Storage.setAttributionReportingLocalTestingMode', {
+      'enabled': enabled,
+    });
+  }
+
+  /// Enables/disables issuing of Attribution Reporting events.
+  Future<void> setAttributionReportingTracking(bool enable) async {
+    await _client.send('Storage.setAttributionReportingTracking', {
+      'enable': enable,
+    });
+  }
 }
 
 class CacheStorageContentUpdatedEvent {
@@ -496,6 +520,25 @@ class SharedStorageAccessedEvent {
       ownerOrigin: json['ownerOrigin'] as String,
       params: SharedStorageAccessParams.fromJson(
           json['params'] as Map<String, dynamic>),
+    );
+  }
+}
+
+class AttributionReportingSourceRegisteredEvent {
+  final AttributionReportingSourceRegistration registration;
+
+  final AttributionReportingSourceRegistrationResult result;
+
+  AttributionReportingSourceRegisteredEvent(
+      {required this.registration, required this.result});
+
+  factory AttributionReportingSourceRegisteredEvent.fromJson(
+      Map<String, dynamic> json) {
+    return AttributionReportingSourceRegisteredEvent(
+      registration: AttributionReportingSourceRegistration.fromJson(
+          json['registration'] as Map<String, dynamic>),
+      result: AttributionReportingSourceRegistrationResult.fromJson(
+          json['result'] as String),
     );
   }
 }
@@ -1087,4 +1130,262 @@ class StorageBucketInfo {
       'durability': durability.toJson(),
     };
   }
+}
+
+enum AttributionReportingSourceType {
+  navigation('navigation'),
+  event('event'),
+  ;
+
+  final String value;
+
+  const AttributionReportingSourceType(this.value);
+
+  factory AttributionReportingSourceType.fromJson(String value) =>
+      AttributionReportingSourceType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+class UnsignedInt64AsBase10 {
+  final String value;
+
+  UnsignedInt64AsBase10(this.value);
+
+  factory UnsignedInt64AsBase10.fromJson(String value) =>
+      UnsignedInt64AsBase10(value);
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is UnsignedInt64AsBase10 && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class UnsignedInt128AsBase16 {
+  final String value;
+
+  UnsignedInt128AsBase16(this.value);
+
+  factory UnsignedInt128AsBase16.fromJson(String value) =>
+      UnsignedInt128AsBase16(value);
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is UnsignedInt128AsBase16 && other.value == value) ||
+      value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class SignedInt64AsBase10 {
+  final String value;
+
+  SignedInt64AsBase10(this.value);
+
+  factory SignedInt64AsBase10.fromJson(String value) =>
+      SignedInt64AsBase10(value);
+
+  String toJson() => value;
+
+  @override
+  bool operator ==(other) =>
+      (other is SignedInt64AsBase10 && other.value == value) || value == other;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => value.toString();
+}
+
+class AttributionReportingFilterDataEntry {
+  final String key;
+
+  final List<String> values;
+
+  AttributionReportingFilterDataEntry(
+      {required this.key, required this.values});
+
+  factory AttributionReportingFilterDataEntry.fromJson(
+      Map<String, dynamic> json) {
+    return AttributionReportingFilterDataEntry(
+      key: json['key'] as String,
+      values: (json['values'] as List).map((e) => e as String).toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'key': key,
+      'values': [...values],
+    };
+  }
+}
+
+class AttributionReportingAggregationKeysEntry {
+  final String key;
+
+  final UnsignedInt128AsBase16 value;
+
+  AttributionReportingAggregationKeysEntry(
+      {required this.key, required this.value});
+
+  factory AttributionReportingAggregationKeysEntry.fromJson(
+      Map<String, dynamic> json) {
+    return AttributionReportingAggregationKeysEntry(
+      key: json['key'] as String,
+      value: UnsignedInt128AsBase16.fromJson(json['value'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'key': key,
+      'value': value.toJson(),
+    };
+  }
+}
+
+class AttributionReportingSourceRegistration {
+  final network.TimeSinceEpoch time;
+
+  /// duration in seconds
+  final int? expiry;
+
+  /// duration in seconds
+  final int? eventReportWindow;
+
+  /// duration in seconds
+  final int? aggregatableReportWindow;
+
+  final AttributionReportingSourceType type;
+
+  final String sourceOrigin;
+
+  final String reportingOrigin;
+
+  final List<String> destinationSites;
+
+  final UnsignedInt64AsBase10 eventId;
+
+  final SignedInt64AsBase10 priority;
+
+  final List<AttributionReportingFilterDataEntry> filterData;
+
+  final List<AttributionReportingAggregationKeysEntry> aggregationKeys;
+
+  final UnsignedInt64AsBase10? debugKey;
+
+  AttributionReportingSourceRegistration(
+      {required this.time,
+      this.expiry,
+      this.eventReportWindow,
+      this.aggregatableReportWindow,
+      required this.type,
+      required this.sourceOrigin,
+      required this.reportingOrigin,
+      required this.destinationSites,
+      required this.eventId,
+      required this.priority,
+      required this.filterData,
+      required this.aggregationKeys,
+      this.debugKey});
+
+  factory AttributionReportingSourceRegistration.fromJson(
+      Map<String, dynamic> json) {
+    return AttributionReportingSourceRegistration(
+      time: network.TimeSinceEpoch.fromJson(json['time'] as num),
+      expiry: json.containsKey('expiry') ? json['expiry'] as int : null,
+      eventReportWindow: json.containsKey('eventReportWindow')
+          ? json['eventReportWindow'] as int
+          : null,
+      aggregatableReportWindow: json.containsKey('aggregatableReportWindow')
+          ? json['aggregatableReportWindow'] as int
+          : null,
+      type: AttributionReportingSourceType.fromJson(json['type'] as String),
+      sourceOrigin: json['sourceOrigin'] as String,
+      reportingOrigin: json['reportingOrigin'] as String,
+      destinationSites:
+          (json['destinationSites'] as List).map((e) => e as String).toList(),
+      eventId: UnsignedInt64AsBase10.fromJson(json['eventId'] as String),
+      priority: SignedInt64AsBase10.fromJson(json['priority'] as String),
+      filterData: (json['filterData'] as List)
+          .map((e) => AttributionReportingFilterDataEntry.fromJson(
+              e as Map<String, dynamic>))
+          .toList(),
+      aggregationKeys: (json['aggregationKeys'] as List)
+          .map((e) => AttributionReportingAggregationKeysEntry.fromJson(
+              e as Map<String, dynamic>))
+          .toList(),
+      debugKey: json.containsKey('debugKey')
+          ? UnsignedInt64AsBase10.fromJson(json['debugKey'] as String)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'time': time.toJson(),
+      'type': type.toJson(),
+      'sourceOrigin': sourceOrigin,
+      'reportingOrigin': reportingOrigin,
+      'destinationSites': [...destinationSites],
+      'eventId': eventId.toJson(),
+      'priority': priority.toJson(),
+      'filterData': filterData.map((e) => e.toJson()).toList(),
+      'aggregationKeys': aggregationKeys.map((e) => e.toJson()).toList(),
+      if (expiry != null) 'expiry': expiry,
+      if (eventReportWindow != null) 'eventReportWindow': eventReportWindow,
+      if (aggregatableReportWindow != null)
+        'aggregatableReportWindow': aggregatableReportWindow,
+      if (debugKey != null) 'debugKey': debugKey!.toJson(),
+    };
+  }
+}
+
+enum AttributionReportingSourceRegistrationResult {
+  success('success'),
+  internalError('internalError'),
+  insufficientSourceCapacity('insufficientSourceCapacity'),
+  insufficientUniqueDestinationCapacity(
+      'insufficientUniqueDestinationCapacity'),
+  excessiveReportingOrigins('excessiveReportingOrigins'),
+  prohibitedByBrowserPolicy('prohibitedByBrowserPolicy'),
+  successNoised('successNoised'),
+  destinationReportingLimitReached('destinationReportingLimitReached'),
+  destinationGlobalLimitReached('destinationGlobalLimitReached'),
+  destinationBothLimitsReached('destinationBothLimitsReached'),
+  reportingOriginsPerSiteLimitReached('reportingOriginsPerSiteLimitReached'),
+  exceedsMaxChannelCapacity('exceedsMaxChannelCapacity'),
+  ;
+
+  final String value;
+
+  const AttributionReportingSourceRegistrationResult(this.value);
+
+  factory AttributionReportingSourceRegistrationResult.fromJson(String value) =>
+      AttributionReportingSourceRegistrationResult.values
+          .firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }

@@ -104,16 +104,26 @@ class PreloadEnabledStateUpdatedEvent {
 
   final bool disabledByBatterySaver;
 
+  final bool disabledByHoldbackPrefetchSpeculationRules;
+
+  final bool disabledByHoldbackPrerenderSpeculationRules;
+
   PreloadEnabledStateUpdatedEvent(
       {required this.disabledByPreference,
       required this.disabledByDataSaver,
-      required this.disabledByBatterySaver});
+      required this.disabledByBatterySaver,
+      required this.disabledByHoldbackPrefetchSpeculationRules,
+      required this.disabledByHoldbackPrerenderSpeculationRules});
 
   factory PreloadEnabledStateUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return PreloadEnabledStateUpdatedEvent(
       disabledByPreference: json['disabledByPreference'] as bool? ?? false,
       disabledByDataSaver: json['disabledByDataSaver'] as bool? ?? false,
       disabledByBatterySaver: json['disabledByBatterySaver'] as bool? ?? false,
+      disabledByHoldbackPrefetchSpeculationRules:
+          json['disabledByHoldbackPrefetchSpeculationRules'] as bool? ?? false,
+      disabledByHoldbackPrerenderSpeculationRules:
+          json['disabledByHoldbackPrerenderSpeculationRules'] as bool? ?? false,
     );
   }
 }
@@ -130,12 +140,15 @@ class PrefetchStatusUpdatedEvent {
 
   final PrefetchStatus prefetchStatus;
 
+  final network.RequestId requestId;
+
   PrefetchStatusUpdatedEvent(
       {required this.key,
       required this.initiatingFrameId,
       required this.prefetchUrl,
       required this.status,
-      required this.prefetchStatus});
+      required this.prefetchStatus,
+      required this.requestId});
 
   factory PrefetchStatusUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return PrefetchStatusUpdatedEvent(
@@ -145,6 +158,7 @@ class PrefetchStatusUpdatedEvent {
       prefetchUrl: json['prefetchUrl'] as String,
       status: PreloadingStatus.fromJson(json['status'] as String),
       prefetchStatus: PrefetchStatus.fromJson(json['prefetchStatus'] as String),
+      requestId: network.RequestId.fromJson(json['requestId'] as String),
     );
   }
 }
@@ -156,8 +170,15 @@ class PrerenderStatusUpdatedEvent {
 
   final PrerenderFinalStatus? prerenderStatus;
 
+  /// This is used to give users more information about the name of Mojo interface
+  /// that is incompatible with prerender and has caused the cancellation of the attempt.
+  final String? disallowedMojoInterface;
+
   PrerenderStatusUpdatedEvent(
-      {required this.key, required this.status, this.prerenderStatus});
+      {required this.key,
+      required this.status,
+      this.prerenderStatus,
+      this.disallowedMojoInterface});
 
   factory PrerenderStatusUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return PrerenderStatusUpdatedEvent(
@@ -165,6 +186,9 @@ class PrerenderStatusUpdatedEvent {
       status: PreloadingStatus.fromJson(json['status'] as String),
       prerenderStatus: json.containsKey('prerenderStatus')
           ? PrerenderFinalStatus.fromJson(json['prerenderStatus'] as String)
+          : null,
+      disallowedMojoInterface: json.containsKey('disallowedMojoInterface')
+          ? json['disallowedMojoInterface'] as String
           : null,
     );
   }
@@ -219,7 +243,7 @@ class RuleSet {
   final network.LoaderId loaderId;
 
   /// Source text of JSON representing the rule set. If it comes from
-  /// <script> tag, it is the textContent of the node. Note that it is
+  /// `<script>` tag, it is the textContent of the node. Note that it is
   /// a JSON for valid case.
   ///
   /// See also:
@@ -228,9 +252,9 @@ class RuleSet {
   final String sourceText;
 
   /// A speculation rule set is either added through an inline
-  /// <script> tag or through an external resource via the
+  /// `<script>` tag or through an external resource via the
   /// 'Speculation-Rules' HTTP header. For the first case, we include
-  /// the BackendNodeId of the relevant <script> tag. For the second
+  /// the BackendNodeId of the relevant `<script>` tag. For the second
   /// case, we include the external URL where the rule set was loaded
   /// from, and also RequestId if Network domain is enabled.
   ///
@@ -454,8 +478,6 @@ enum PrerenderFinalStatus {
   audioOutputDeviceRequested('AudioOutputDeviceRequested'),
   mixedContent('MixedContent'),
   triggerBackgrounded('TriggerBackgrounded'),
-  embedderTriggeredAndCrossOriginRedirected(
-      'EmbedderTriggeredAndCrossOriginRedirected'),
   memoryLimitExceeded('MemoryLimitExceeded'),
   failToGetMemoryUsage('FailToGetMemoryUsage'),
   dataSaverEnabled('DataSaverEnabled'),
@@ -500,6 +522,9 @@ enum PrerenderFinalStatus {
   memoryPressureAfterTriggered('MemoryPressureAfterTriggered'),
   prerenderingDisabledByDevTools('PrerenderingDisabledByDevTools'),
   resourceLoadBlockedByClient('ResourceLoadBlockedByClient'),
+  speculationRuleRemoved('SpeculationRuleRemoved'),
+  activatedWithAuxiliaryBrowsingContexts(
+      'ActivatedWithAuxiliaryBrowsingContexts'),
   ;
 
   final String value;
