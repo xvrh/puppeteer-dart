@@ -1,3 +1,6 @@
+## 3.4.0
+- Update to Chrome 117
+
 ## 3.3.0
 - Update to Chrome 116
 - Require Dart 3.1.0
