@@ -271,7 +271,7 @@ class AXValueSource {
   /// Whether this source is superseded by a higher priority source.
   final bool? superseded;
 
-  /// The native markup source for this value, e.g. a <label> element.
+  /// The native markup source for this value, e.g. a `<label>` element.
   final AXValueNativeSourceType? nativeSource;
 
   /// The value, such as a node or node list, of the native source.

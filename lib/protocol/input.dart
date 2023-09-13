@@ -212,6 +212,11 @@ class InputApi {
     });
   }
 
+  /// Cancels any active dragging in the page.
+  Future<void> cancelDragging() async {
+    await _client.send('Input.cancelDragging');
+  }
+
   /// Emulates touch event from the mouse event parameters.
   /// [type] Type of the mouse event.
   /// [x] X coordinate of the mouse pointer in DIP.

@@ -771,13 +771,22 @@ class SerializationOptions {
   /// Deep serialization depth. Default is full depth. Respected only in `deep` serialization mode.
   final int? maxDepth;
 
-  SerializationOptions({required this.serialization, this.maxDepth});
+  /// Embedder-specific parameters. For example if connected to V8 in Chrome these control DOM
+  /// serialization via `maxNodeDepth: integer` and `includeShadowTree: "none" | "open" | "all"`.
+  /// Values can be only of type string or integer.
+  final Map<String, dynamic>? additionalParameters;
+
+  SerializationOptions(
+      {required this.serialization, this.maxDepth, this.additionalParameters});
 
   factory SerializationOptions.fromJson(Map<String, dynamic> json) {
     return SerializationOptions(
       serialization: SerializationOptionsSerialization.fromJson(
           json['serialization'] as String),
       maxDepth: json.containsKey('maxDepth') ? json['maxDepth'] as int : null,
+      additionalParameters: json.containsKey('additionalParameters')
+          ? json['additionalParameters'] as Map<String, dynamic>
+          : null,
     );
   }
 
@@ -785,6 +794,8 @@ class SerializationOptions {
     return {
       'serialization': serialization,
       if (maxDepth != null) 'maxDepth': maxDepth,
+      if (additionalParameters != null)
+        'additionalParameters': additionalParameters,
     };
   }
 }

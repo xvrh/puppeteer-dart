@@ -789,7 +789,7 @@ class CSSStyleSheetHeader {
 
   /// Whether this stylesheet is mutable. Inline stylesheets become mutable
   /// after they have been modified via CSSOM API.
-  /// <link> element's stylesheets become mutable only if DevTools modifies them.
+  /// `<link>` element's stylesheets become mutable only if DevTools modifies them.
   /// Constructed stylesheets (new CSSStyleSheet()) are mutable immediately after creation.
   final bool isMutable;
 
@@ -928,6 +928,9 @@ class CSSRule {
   /// The array enumerates @scope at-rules starting with the innermost one, going outwards.
   final List<CSSScope>? scopes;
 
+  /// The array keeps the types of ancestor CSSRules from the innermost going outwards.
+  final List<CSSRuleType>? ruleTypes;
+
   CSSRule(
       {this.styleSheetId,
       required this.selectorList,
@@ -938,7 +941,8 @@ class CSSRule {
       this.containerQueries,
       this.supports,
       this.layers,
-      this.scopes});
+      this.scopes,
+      this.ruleTypes});
 
   factory CSSRule.fromJson(Map<String, dynamic> json) {
     return CSSRule(
@@ -977,6 +981,11 @@ class CSSRule {
               .map((e) => CSSScope.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
+      ruleTypes: json.containsKey('ruleTypes')
+          ? (json['ruleTypes'] as List)
+              .map((e) => CSSRuleType.fromJson(e as String))
+              .toList()
+          : null,
     );
   }
 
@@ -994,8 +1003,34 @@ class CSSRule {
         'supports': supports!.map((e) => e.toJson()).toList(),
       if (layers != null) 'layers': layers!.map((e) => e.toJson()).toList(),
       if (scopes != null) 'scopes': scopes!.map((e) => e.toJson()).toList(),
+      if (ruleTypes != null)
+        'ruleTypes': ruleTypes!.map((e) => e.toJson()).toList(),
     };
   }
+}
+
+/// Enum indicating the type of a CSS rule, used to represent the order of a style rule's ancestors.
+/// This list only contains rule types that are collected during the ancestor rule collection.
+enum CSSRuleType {
+  mediaRule('MediaRule'),
+  supportsRule('SupportsRule'),
+  containerRule('ContainerRule'),
+  layerRule('LayerRule'),
+  scopeRule('ScopeRule'),
+  styleRule('StyleRule'),
+  ;
+
+  final String value;
+
+  const CSSRuleType(this.value);
+
+  factory CSSRuleType.fromJson(String value) =>
+      CSSRuleType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }
 
 /// CSS coverage information.

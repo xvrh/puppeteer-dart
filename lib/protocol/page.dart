@@ -177,14 +177,19 @@ class PageApi {
   /// event is emitted.
   /// [includeCommandLineAPI] Specifies whether command line API should be available to the script, defaults
   /// to false.
+  /// [runImmediately] If true, runs the script immediately on existing execution contexts or worlds.
+  /// Default: false.
   /// Returns: Identifier of the added script.
   Future<ScriptIdentifier> addScriptToEvaluateOnNewDocument(String source,
-      {String? worldName, bool? includeCommandLineAPI}) async {
+      {String? worldName,
+      bool? includeCommandLineAPI,
+      bool? runImmediately}) async {
     var result = await _client.send('Page.addScriptToEvaluateOnNewDocument', {
       'source': source,
       if (worldName != null) 'worldName': worldName,
       if (includeCommandLineAPI != null)
         'includeCommandLineAPI': includeCommandLineAPI,
+      if (runImmediately != null) 'runImmediately': runImmediately,
     });
     return ScriptIdentifier.fromJson(result['identifier'] as String);
   }
@@ -454,6 +459,7 @@ class PageApi {
   /// [preferCSSPageSize] Whether or not to prefer page size as defined by css. Defaults to false,
   /// in which case the content will be scaled to fit the paper size.
   /// [transferMode] return as stream
+  /// [generateTaggedPDF] Whether or not to generate tagged (accessible) PDF. Defaults to embedder choice.
   Future<PrintToPDFResult> printToPDF(
       {bool? landscape,
       bool? displayHeaderFooter,
@@ -469,7 +475,8 @@ class PageApi {
       String? headerTemplate,
       String? footerTemplate,
       bool? preferCSSPageSize,
-      @Enum(['ReturnAsBase64', 'ReturnAsStream']) String? transferMode}) async {
+      @Enum(['ReturnAsBase64', 'ReturnAsStream']) String? transferMode,
+      bool? generateTaggedPDF}) async {
     assert(transferMode == null ||
         const ['ReturnAsBase64', 'ReturnAsStream'].contains(transferMode));
     var result = await _client.send('Page.printToPDF', {
@@ -489,6 +496,7 @@ class PageApi {
       if (footerTemplate != null) 'footerTemplate': footerTemplate,
       if (preferCSSPageSize != null) 'preferCSSPageSize': preferCSSPageSize,
       if (transferMode != null) 'transferMode': transferMode,
+      if (generateTaggedPDF != null) 'generateTaggedPDF': generateTaggedPDF,
     });
     return PrintToPDFResult.fromJson(result);
   }
@@ -871,7 +879,7 @@ class FileChooserOpenedEvent {
   /// Input mode.
   final FileChooserOpenedEventMode mode;
 
-  /// Input node id. Only present for file choosers opened via an <input type="file"> element.
+  /// Input node id. Only present for file choosers opened via an `<input type="file">` element.
   final dom.BackendNodeId? backendNodeId;
 
   FileChooserOpenedEvent(
@@ -1626,6 +1634,7 @@ enum PermissionsPolicyFeature {
   chUaPlatform('ch-ua-platform'),
   chUaModel('ch-ua-model'),
   chUaMobile('ch-ua-mobile'),
+  chUaFormFactor('ch-ua-form-factor'),
   chUaFullVersion('ch-ua-full-version'),
   chUaFullVersionList('ch-ua-full-version-list'),
   chUaPlatformVersion('ch-ua-platform-version'),
@@ -2934,6 +2943,7 @@ enum BackForwardCacheNotRestoredReason {
   fencedFramesEmbedder('FencedFramesEmbedder'),
   cookieDisabled('CookieDisabled'),
   httpAuthRequired('HTTPAuthRequired'),
+  cookieFlushed('CookieFlushed'),
   webSocket('WebSocket'),
   webTransport('WebTransport'),
   webRtc('WebRTC'),
@@ -2945,7 +2955,6 @@ enum BackForwardCacheNotRestoredReason {
   documentLoaded('DocumentLoaded'),
   dedicatedWorkerOrWorklet('DedicatedWorkerOrWorklet'),
   outstandingNetworkRequestOthers('OutstandingNetworkRequestOthers'),
-  outstandingIndexedDbTransaction('OutstandingIndexedDBTransaction'),
   requestedMidiPermission('RequestedMIDIPermission'),
   requestedAudioCapturePermission('RequestedAudioCapturePermission'),
   requestedVideoCapturePermission('RequestedVideoCapturePermission'),
@@ -2953,7 +2962,6 @@ enum BackForwardCacheNotRestoredReason {
       'RequestedBackForwardCacheBlockedSensors'),
   requestedBackgroundWorkPermission('RequestedBackgroundWorkPermission'),
   broadcastChannel('BroadcastChannel'),
-  indexedDbConnection('IndexedDBConnection'),
   webXr('WebXR'),
   sharedWorker('SharedWorker'),
   webLocks('WebLocks'),

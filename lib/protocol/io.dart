@@ -64,8 +64,8 @@ class ReadResult {
   }
 }
 
-/// This is either obtained from another method or specified as `blob:&lt;uuid&gt;` where
-/// `&lt;uuid&gt` is an UUID of a Blob.
+/// This is either obtained from another method or specified as `blob:<uuid>` where
+/// `<uuid>` is an UUID of a Blob.
 class StreamHandle {
   final String value;
 
