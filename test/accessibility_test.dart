@@ -152,7 +152,7 @@ void main() {
             value: 'Edit this image: ',
             children: [
               AXNode(role: 'StaticText', name: 'Edit this image: '),
-              AXNode(role: 'img', name: 'my fake image')
+              AXNode(role: 'image', name: 'my fake image')
             ]);
         var snapshot = await page.accessibility.snapshot();
         expect(snapshot.children[0], equals(golden));
