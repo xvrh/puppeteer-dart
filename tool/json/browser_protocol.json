@@ -1735,6 +1735,39 @@
                     ]
                 },
                 {
+                    "id": "PropertyRuleIssueReason",
+                    "type": "string",
+                    "enum": [
+                        "InvalidSyntax",
+                        "InvalidInitialValue",
+                        "InvalidInherits",
+                        "InvalidName"
+                    ]
+                },
+                {
+                    "id": "PropertyRuleIssueDetails",
+                    "description": "This issue warns about errors in property rules that lead to property\nregistrations being ignored.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "sourceCodeLocation",
+                            "description": "Source code position of the property rule.",
+                            "$ref": "SourceCodeLocation"
+                        },
+                        {
+                            "name": "propertyRuleIssueReason",
+                            "description": "Reason why the property rule was discarded.",
+                            "$ref": "PropertyRuleIssueReason"
+                        },
+                        {
+                            "name": "propertyValue",
+                            "description": "The value of the property rule property that failed to parse",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
                     "id": "InspectorIssueCode",
                     "description": "A unique identifier for the type of issue. Each type may use one of the\noptional fields in InspectorIssueDetails to convey more specific\ninformation about the kind of issue.",
                     "type": "string",
@@ -1756,7 +1789,8 @@
                         "FederatedAuthRequestIssue",
                         "BounceTrackingIssue",
                         "StylesheetLoadingIssue",
-                        "FederatedAuthUserInfoRequestIssue"
+                        "FederatedAuthUserInfoRequestIssue",
+                        "PropertyRuleIssue"
                     ]
                 },
                 {
@@ -1849,6 +1883,11 @@
                             "name": "stylesheetLoadingIssueDetails",
                             "optional": true,
                             "$ref": "StylesheetLoadingIssueDetails"
+                        },
+                        {
+                            "name": "propertyRuleIssueDetails",
+                            "optional": true,
+                            "$ref": "PropertyRuleIssueDetails"
                         },
                         {
                             "name": "federatedAuthUserInfoRequestIssueDetails",
@@ -12397,6 +12436,7 @@
                         "SameSiteUnspecifiedTreatedAsLax",
                         "SameSiteNoneInsecure",
                         "UserPreferences",
+                        "ThirdPartyPhaseout",
                         "ThirdPartyBlockedInFirstPartySet",
                         "SyntaxError",
                         "SchemeNotSupported",
@@ -12410,7 +12450,8 @@
                         "SamePartyFromCrossPartyContext",
                         "SamePartyConflictsWithOtherAttributes",
                         "NameValuePairExceedsMaxSize",
-                        "DisallowedCharacter"
+                        "DisallowedCharacter",
+                        "NoCookieContent"
                     ]
                 },
                 {
@@ -12427,6 +12468,7 @@
                         "SameSiteUnspecifiedTreatedAsLax",
                         "SameSiteNoneInsecure",
                         "UserPreferences",
+                        "ThirdPartyPhaseout",
                         "ThirdPartyBlockedInFirstPartySet",
                         "UnknownError",
                         "SchemefulSameSiteStrict",
@@ -19789,7 +19831,9 @@
                         "update",
                         "loaded",
                         "bid",
-                        "win"
+                        "win",
+                        "additionalBid",
+                        "additionalBidWin"
                     ]
                 },
                 {
@@ -23948,7 +23992,7 @@
                         "TriggerBackgrounded",
                         "MemoryLimitExceeded",
                         "DataSaverEnabled",
-                        "HasEffectiveUrl",
+                        "TriggerUrlHasEffectiveUrl",
                         "ActivatedBeforeStarted",
                         "InactivePageRestriction",
                         "StartFailed",
@@ -23982,7 +24026,10 @@
                         "ActivatedWithAuxiliaryBrowsingContexts",
                         "MaxNumOfRunningEagerPrerendersExceeded",
                         "MaxNumOfRunningNonEagerPrerendersExceeded",
-                        "MaxNumOfRunningEmbedderPrerendersExceeded"
+                        "MaxNumOfRunningEmbedderPrerendersExceeded",
+                        "PrerenderingUrlHasEffectiveUrl",
+                        "RedirectedPrerenderingUrlHasEffectiveUrl",
+                        "ActivationUrlHasEffectiveUrl"
                     ]
                 },
                 {
