@@ -182,7 +182,7 @@ class Page {
     return page;
   }
 
-  Future _initialize() async {
+  Future<void> _initialize() async {
     await Future.wait([
       _frameManager.initialize(),
       devTools.performance.enable(),
@@ -297,7 +297,7 @@ class Page {
   Stream<Worker> get onWorkerDestroyed => _workerDestroyed.stream;
 
   /// Emitted when the page crashes.
-  Stream get onPageCrashed => devTools.inspector.onTargetCrashed;
+  Stream<void> get onPageCrashed => devTools.inspector.onTargetCrashed;
 
   /// Emitted when a frame is attached.
   Stream<Frame> get onFrameAttached => _frameManager.onFrameAttached;
@@ -585,7 +585,7 @@ class Page {
   /// in-page object (JSHandle)
   Future<T> evaluateHandle<T extends JsHandle>(
       @Language('js') String pageFunction,
-      {List? args}) async {
+      {List<dynamic>? args}) async {
     var context = await mainFrame.executionContext;
     return context.evaluateHandle(pageFunction, args: args);
   }
@@ -637,7 +637,7 @@ class Page {
   ///
   /// Shortcut for [Page.mainFrame.$eval(selector, pageFunction)].
   Future<T?> $eval<T>(String selector, @Language('js') String pageFunction,
-      {List? args}) {
+      {List<dynamic>? args}) {
     return mainFrame.$eval<T>(selector, pageFunction, args: args);
   }
 
@@ -658,7 +658,7 @@ class Page {
   /// [args] Arguments to pass to `pageFunction`
   /// Returns a [Future] which resolves to the return value of `pageFunction`
   Future<T?> $$eval<T>(String selector, @Language('js') String pageFunction,
-      {List? args}) {
+      {List<dynamic>? args}) {
     return mainFrame.$$eval<T>(selector, pageFunction, args: args);
   }
 
@@ -926,7 +926,7 @@ function addPageBinding(bindingName) {
     Future(() => _dispose('Target crashed'));
   }
 
-  Future _onBindingCalled(BindingCalledEvent event) async {
+  Future<void> _onBindingCalled(BindingCalledEvent event) async {
     var payload = jsonDecode(event.payload) as Map<String, dynamic>;
     var name = payload['name'] as String?;
     var seq = payload['seq'] as int?;
@@ -1384,7 +1384,8 @@ function deliverError(name, seq, message, stack) {
   /// - [pageFunction] Function to be evaluated in the page context
   /// - [args] Arguments to pass to `pageFunction`
   /// - Returns: Future which resolves to the return value of `pageFunction`
-  Future<T> evaluate<T>(@Language('js') String pageFunction, {List? args}) {
+  Future<T> evaluate<T>(@Language('js') String pageFunction,
+      {List<dynamic>? args}) {
     return mainFrame.evaluate<T>(pageFunction, args: args);
   }
 
@@ -1419,7 +1420,8 @@ function deliverError(name, seq, message, stack) {
   /// Parameters:
   /// - [pageFunction] Function to be evaluated in browser context
   /// - [args] Arguments to pass to [pageFunction]
-  Future<void> evaluateOnNewDocument(String pageFunction, {List? args}) async {
+  Future<void> evaluateOnNewDocument(String pageFunction,
+      {List<dynamic>? args}) async {
     var source = evaluationString(pageFunction, args);
     await devTools.page.addScriptToEvaluateOnNewDocument(source);
   }
@@ -1951,7 +1953,7 @@ function deliverError(name, seq, message, stack) {
   ///
   /// Shortcut for [page.mainFrame().waitForFunction(pageFunction[, options[, ...args]])](#framewaitforfunctionpagefunction-options-args).
   Future<JsHandle> waitForFunction(@Language('js') String pageFunction,
-      {List? args, Duration? timeout, Polling? polling}) {
+      {List<dynamic>? args, Duration? timeout, Polling? polling}) {
     return mainFrame.waitForFunction(pageFunction,
         args: args, timeout: timeout, polling: polling);
   }

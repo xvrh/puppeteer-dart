@@ -74,7 +74,7 @@ Future<DownloadedBrowserInfo> downloadChrome({
       version: version);
 }
 
-Future _downloadFile(
+Future<void> _downloadFile(
   String url,
   String output,
   void Function(int, int)? onReceiveProgress,

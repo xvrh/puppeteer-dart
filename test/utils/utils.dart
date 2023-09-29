@@ -7,7 +7,7 @@ import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_static/shelf_static.dart';
 
-Future server(String location, Function(String) callback) async {
+Future<void> server(String location, Function(String) callback) async {
   var handler = createStaticHandler(location);
 
   var host = 'localhost';
@@ -105,7 +105,7 @@ class Server {
         .future;
   }
 
-  Future close() => _httpServer.close(force: true);
+  Future<void> close() => _httpServer.close(force: true);
 }
 
 Future<Frame> attachFrame(Page page, String frameId, String url) async {
@@ -133,10 +133,10 @@ function detachFrame(frameId) {
 ''', args: [frameId]);
 }
 
-Future<T /*!*/ > waitFutures<T>(
-    Future<T> firstFuture, List<Future> others) async {
-  var futures = <Future>[firstFuture, ...others];
-  return (await Future.wait(futures))[0] as T /*!*/;
+Future<T> waitFutures<T>(
+    Future<T> firstFuture, List<Future<dynamic>> others) async {
+  var futures = <Future<dynamic>>[firstFuture, ...others];
+  return (await Future.wait(futures))[0] as T;
 }
 
 Future<void> navigateFrame(Page page, String frameId, String url) async {

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
@@ -62,7 +63,7 @@ void main() {
       await page.setViewport(
           DeviceViewport(width: 500, height: 500, deviceScaleFactor: 1));
       await page.goto(server.prefix + '/grid.html');
-      var promises = <Future>[];
+      var promises = <Future<Uint8List>>[];
       for (var i = 0; i < 3; ++i) {
         promises.add(page.screenshot(clip: Rectangle(50 * i, 0, 50, 50)));
       }
@@ -84,7 +85,7 @@ void main() {
         await page.goto(server.prefix + '/grid.html');
         return page;
       }));
-      var promises = <Future>[];
+      var promises = <Future<Uint8List>>[];
       for (var i = 0; i < N; ++i) {
         promises.add(pages[i].screenshot(clip: Rectangle(50 * i, 0, 50, 50)));
       }

@@ -55,7 +55,7 @@ class DOMApi {
       .map((event) => DistributedNodesUpdatedEvent.fromJson(event.parameters));
 
   /// Fired when `Document` has been totally updated. Node ids are no longer valid.
-  Stream get onDocumentUpdated =>
+  Stream<void> get onDocumentUpdated =>
       _client.onEvent.where((event) => event.name == 'DOM.documentUpdated');
 
   /// Fired when `Element`'s inline style is modified via a CSS property modification.
@@ -71,7 +71,7 @@ class DOMApi {
       .map((event) => PseudoElementAddedEvent.fromJson(event.parameters));
 
   /// Called when top layer elements are changed.
-  Stream get onTopLayerElementsUpdated => _client.onEvent
+  Stream<void> get onTopLayerElementsUpdated => _client.onEvent
       .where((event) => event.name == 'DOM.topLayerElementsUpdated');
 
   /// Called when a pseudo element is removed from an element.

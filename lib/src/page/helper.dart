@@ -7,7 +7,7 @@ import '../javascript_function_parser.dart';
 
 final _logger = Logger('puppeteer.helper');
 
-String evaluationString(String function, List? args) {
+String evaluationString(String function, List<dynamic>? args) {
   var functionDeclaration = convertToFunctionDeclaration(function);
 
   if (functionDeclaration == null) {

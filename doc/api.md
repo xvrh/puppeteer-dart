@@ -58,7 +58,7 @@
   * [page.emulateMediaType](#pageemulatemediatypemediatype-mediatype)
   * [page.evaluate](#pageevaluate)
   * [page.evaluateHandle](#pageevaluatehandle)
-  * [page.evaluateOnNewDocument](#pageevaluateonnewdocumentstring-pagefunction-list-args)
+  * [page.evaluateOnNewDocument](#pageevaluateonnewdocument)
   * [page.exposeFunction](#pageexposefunctionstring-name-function-callbackfunction)
   * [page.focus](#pagefocusstring-selector)
   * [page.frames](#pageframes)
@@ -349,7 +349,7 @@ Closes Chromium and all of its pages (if any were opened). The Browser
 object itself is considered to be disposed and cannot be used anymore.
 
 ```dart
-browser.close() → Future 
+browser.close() → Future<void> 
 ```
 
 #### browser.createIncognitoBrowserContext()
@@ -676,7 +676,7 @@ A [selector] to query page for
 Returns a [Future] which resolves to the return value of `pageFunction`
 
 ```dart
-page.$$eval(String selector, @Language('js') String pageFunction, {List? args}) → Future<T?> 
+page.$$eval(String selector, @Language('js') String pageFunction, {List<dynamic>? args}) → Future<T?> 
 ```
 
 #### page.$OrNull(String selector)
@@ -711,7 +711,7 @@ var html = await page.$eval(
 Shortcut for [Page.mainFrame.$eval(selector, pageFunction)].
 
 ```dart
-page.$eval(String selector, @Language('js') String pageFunction, {List? args}) → Future<T?> 
+page.$eval(String selector, @Language('js') String pageFunction, {List<dynamic>? args}) → Future<T?> 
 ```
 
 #### page.$x(String expression)
@@ -1026,7 +1026,7 @@ Parameters:
 - Returns: Future which resolves to the return value of `pageFunction`
 
 ```dart
-page.evaluate(@Language('js') String pageFunction, {List? args}) → Future<T> 
+page.evaluate(@Language('js') String pageFunction, {List<dynamic>? args}) → Future<T> 
 ```
 
 #### page.evaluateHandle(...)
@@ -1062,10 +1062,10 @@ returns: Future which resolves to the return value of `pageFunction` as
 in-page object (JSHandle)
 
 ```dart
-page.evaluateHandle(@Language('js') String pageFunction, {List? args}) → Future<T> 
+page.evaluateHandle(@Language('js') String pageFunction, {List<dynamic>? args}) → Future<T> 
 ```
 
-#### page.evaluateOnNewDocument(String pageFunction, {List? args})
+#### page.evaluateOnNewDocument(...)
 Adds a function which would be invoked in one of the following scenarios:
 - whenever the page is navigated
 - whenever the child frame is attached or navigated. In this case, the
@@ -1099,7 +1099,7 @@ Parameters:
 - [args] Arguments to pass to [pageFunction]
 
 ```dart
-page.evaluateOnNewDocument(String pageFunction, {List? args}) → Future<void> 
+page.evaluateOnNewDocument(String pageFunction, {List<dynamic>? args}) → Future<void> 
 ```
 
 #### page.exposeFunction(String name, Function callbackFunction)
@@ -1447,7 +1447,7 @@ page.onMetrics → Stream<MetricsEvent>
 Emitted when the page crashes.
 
 ```dart
-page.onPageCrashed → Stream
+page.onPageCrashed → Stream<void>
 ```
 
 #### page.onPopup
@@ -1959,7 +1959,7 @@ await page.waitForFunction('selector => !!document.querySelector(selector)',
 Shortcut for [page.mainFrame().waitForFunction(pageFunction[, options[, ...args]])](#framewaitforfunctionpagefunction-options-args).
 
 ```dart
-page.waitForFunction(@Language('js') String pageFunction, {List? args, Duration? timeout, Polling? polling}) → Future<JsHandle> 
+page.waitForFunction(@Language('js') String pageFunction, {List<dynamic>? args, Duration? timeout, Polling? polling}) → Future<JsHandle> 
 ```
 
 #### page.waitForNavigation({Duration? timeout, Until? wait})
@@ -2158,7 +2158,7 @@ Parameters:
 - Returns: Future which resolves to the return value of `pageFunction`
 
 ```dart
-worker.evaluate(@Language('js') String pageFunction, {List? args}) → Future<T?> 
+worker.evaluate(@Language('js') String pageFunction, {List<dynamic>? args}) → Future<T?> 
 ```
 
 #### worker.evaluateHandle(...)
@@ -2179,7 +2179,7 @@ returns: Future which resolves to the return value of `pageFunction` as
 in-page object (JSHandle)
 
 ```dart
-worker.evaluateHandle(@Language('js') String pageFunction, {List? args}) → Future<T> 
+worker.evaluateHandle(@Language('js') String pageFunction, {List<dynamic>? args}) → Future<T> 
 ```
 
 ### class: Accessibility
@@ -2637,7 +2637,7 @@ var divsCounts = await frame.$$eval('div', 'divs => divs.length');
 ```
 
 ```dart
-frame.$$eval(String selector, @Language('js') String pageFunction, {List? args}) → Future<T?> 
+frame.$$eval(String selector, @Language('js') String pageFunction, {List<dynamic>? args}) → Future<T?> 
 ```
 
 #### frame.$OrNull(String selector)
@@ -2677,7 +2677,7 @@ var html = await frame.$eval(
 Returns a Future which resolves to the return value of pageFunction
 
 ```dart
-frame.$eval(String selector, @Language('js') String pageFunction, {List? args}) → Future<T?> 
+frame.$eval(String selector, @Language('js') String pageFunction, {List<dynamic>? args}) → Future<T?> 
 ```
 
 #### frame.$x(String expression)
@@ -2794,7 +2794,7 @@ Parameters:
 - Returns: Future which resolves to the return value of `pageFunction`
 
 ```dart
-frame.evaluate(@Language('js') String pageFunction, {List? args}) → Future<T> 
+frame.evaluate(@Language('js') String pageFunction, {List<dynamic>? args}) → Future<T> 
 ```
 
 #### frame.evaluateHandle(...)
@@ -2828,7 +2828,7 @@ returns: Future which resolves to the return value of `pageFunction` as
 in-page object (JSHandle)
 
 ```dart
-frame.evaluateHandle(@Language('js') String pageFunction, {List? args}) → Future<T> 
+frame.evaluateHandle(@Language('js') String pageFunction, {List<dynamic>? args}) → Future<T> 
 ```
 
 #### frame.executionContext
@@ -3074,7 +3074,7 @@ await page.mainFrame.waitForFunction(
 ```
 
 ```dart
-frame.waitForFunction(@Language('js') String pageFunction, {List? args, Duration? timeout, Polling? polling}) → Future<JsHandle> 
+frame.waitForFunction(@Language('js') String pageFunction, {List<dynamic>? args, Duration? timeout, Polling? polling}) → Future<JsHandle> 
 ```
 
 #### frame.waitForSelector(...)
@@ -3200,7 +3200,7 @@ Parameters:
 Returns [Future] which resolves to the return value of `pageFunction`
 
 ```dart
-executionContext.evaluate(@Language('js') String pageFunction, {List? args}) → Future<T> 
+executionContext.evaluate(@Language('js') String pageFunction, {List<dynamic>? args}) → Future<T> 
 ```
 
 #### executionContext.evaluateHandle(...)
@@ -3236,7 +3236,7 @@ await resultHandle.dispose();
 ```
 
 ```dart
-executionContext.evaluateHandle(@Language('js') String pageFunction, {List? args}) → Future<T> 
+executionContext.evaluateHandle(@Language('js') String pageFunction, {List<dynamic>? args}) → Future<T> 
 ```
 
 #### executionContext.frame
@@ -3309,7 +3309,7 @@ Parameters:
 - returns: Future which resolves to the return value of `pageFunction`
 
 ```dart
-jsHandle.evaluate(@Language('js') String pageFunction, {List? args}) → Future<T?> 
+jsHandle.evaluate(@Language('js') String pageFunction, {List<dynamic>? args}) → Future<T?> 
 ```
 
 #### jsHandle.evaluateHandle(...)
@@ -3327,7 +3327,7 @@ Parameters:
 - `pageFunction`: Function to be evaluated
 
 ```dart
-jsHandle.evaluateHandle(@Language('js') String pageFunction, {List? args}) → Future<T> 
+jsHandle.evaluateHandle(@Language('js') String pageFunction, {List<dynamic>? args}) → Future<T> 
 ```
 
 #### jsHandle.executionContext
@@ -3452,7 +3452,7 @@ Parameters:
 Returns: [Future] which resolves to the return value of `pageFunction`
 
 ```dart
-elementHandle.$$eval(String selector, @Language('js') String pageFunction, {List? args}) → Future<T?> 
+elementHandle.$$eval(String selector, @Language('js') String pageFunction, {List<dynamic>? args}) → Future<T?> 
 ```
 
 #### elementHandle.$eval(...)
@@ -3478,7 +3478,7 @@ Parameters:
 Returns [Future] which resolves to the return value of `pageFunction`.
 
 ```dart
-elementHandle.$eval(String selector, @Language('js') String pageFunction, {List? args}) → Future<T?> 
+elementHandle.$eval(String selector, @Language('js') String pageFunction, {List<dynamic>? args}) → Future<T?> 
 ```
 
 #### elementHandle.$x(String expression)

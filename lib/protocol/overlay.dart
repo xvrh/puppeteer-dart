@@ -29,7 +29,7 @@ class OverlayApi {
           event.parameters['viewport'] as Map<String, dynamic>));
 
   /// Fired when user cancels the inspect mode.
-  Stream get onInspectModeCanceled => _client.onEvent
+  Stream<void> get onInspectModeCanceled => _client.onEvent
       .where((event) => event.name == 'Overlay.inspectModeCanceled');
 
   /// Disables domain notifications.

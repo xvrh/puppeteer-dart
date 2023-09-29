@@ -5,7 +5,7 @@ void main() async {
   var page = await browser.newPage();
 
   // Define a window.onCustomEvent function on the page.
-  await page.exposeFunction('onCustomEvent', (Map e) {
+  await page.exposeFunction('onCustomEvent', (Map<dynamic, dynamic> e) {
     print('${e['type']} fired');
   });
 

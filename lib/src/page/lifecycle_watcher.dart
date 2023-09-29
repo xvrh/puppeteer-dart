@@ -7,7 +7,7 @@ class LifecycleWatcher {
   final Frame frame;
   final Until wait;
   final Duration? timeout;
-  late List<StreamSubscription> _subscriptions;
+  late List<StreamSubscription<dynamic>> _subscriptions;
   Request? _navigationRequest;
   final _sameDocumentNavigationCompleter = Completer<Exception?>(),
       _lifecycleCompleter = Completer<Exception?>(),

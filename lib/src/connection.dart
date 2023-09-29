@@ -37,7 +37,7 @@ class Connection implements Client {
   final _sessionDetachedController = StreamController<Session>.broadcast();
   final _manuallyAttached = <TargetID>{};
   late final _targetApi = TargetApi(this);
-  final List<StreamSubscription> _subscriptions = [];
+  final List<StreamSubscription<dynamic>> _subscriptions = [];
   final Duration? _delay;
 
   Connection._(this._webSocket, this.url, {Duration? delay}) : _delay = delay {
@@ -189,7 +189,7 @@ class Connection implements Client {
     }
   }
 
-  Future dispose(String reason) async {
+  Future<void> dispose(String reason) async {
     _onClose(reason);
     await _webSocket.close('Connection.dispose');
     await _sessionAttachedController.close();
@@ -198,7 +198,7 @@ class Connection implements Client {
 
   bool get isClosed => _eventController.isClosed;
 
-  Future get disconnected => _webSocket.done;
+  Future<void> get disconnected => _webSocket.done;
 }
 
 String _encodeMessage(int id, String method, Map<String, dynamic>? parameters,
@@ -244,7 +244,7 @@ class Session implements Client {
 
   Future<void> get closed => _onClose.future;
 
-  void _onMessage(Map object) {
+  void _onMessage(Map<String, dynamic> object) {
     var id = object['id'] as int?;
     if (id != null) {
       var message = _messagesInFly.remove(id);

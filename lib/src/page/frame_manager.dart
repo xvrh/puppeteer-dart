@@ -74,7 +74,7 @@ class FrameManager {
     _frameDetachedController.close();
   }
 
-  Future initialize() async {
+  Future<void> initialize() async {
     await _pageApi.enable();
     _handleFrameTree(await _pageApi.getFrameTree());
     await Future.wait([
@@ -492,7 +492,7 @@ class Frame {
   /// in-page object (JSHandle)
   Future<T> evaluateHandle<T extends JsHandle>(
       @Language('js') String pageFunction,
-      {List? args}) {
+      {List<dynamic>? args}) {
     return _mainWorld.evaluateHandle(pageFunction, args: args);
   }
 
@@ -532,7 +532,8 @@ class Frame {
   /// - [pageFunction] Function to be evaluated in the page context
   /// - [args] Arguments to pass to `pageFunction`
   /// - Returns: Future which resolves to the return value of `pageFunction`
-  Future<T> evaluate<T>(@Language('js') String pageFunction, {List? args}) {
+  Future<T> evaluate<T>(@Language('js') String pageFunction,
+      {List<dynamic>? args}) {
     return _mainWorld.evaluate<T>(pageFunction, args: args);
   }
 
@@ -584,7 +585,7 @@ class Frame {
   /// [args]: Arguments to pass to pageFunction
   /// Returns a Future which resolves to the return value of pageFunction
   Future<T?> $eval<T>(String selector, @Language('js') String pageFunction,
-      {List? args}) {
+      {List<dynamic>? args}) {
     return _mainWorld.$eval<T>(selector, pageFunction, args: args);
   }
 
@@ -599,7 +600,7 @@ class Frame {
   /// var divsCounts = await frame.$$eval('div', 'divs => divs.length');
   /// ```
   Future<T?> $$eval<T>(String selector, @Language('js') String pageFunction,
-      {List? args}) {
+      {List<dynamic>? args}) {
     return _mainWorld.$$eval<T>(selector, pageFunction, args: args);
   }
 
@@ -912,7 +913,7 @@ class Frame {
   ///     args: [selector]);
   /// ```
   Future<JsHandle> waitForFunction(@Language('js') String pageFunction,
-      {List? args, Duration? timeout, Polling? polling}) {
+      {List<dynamic>? args, Duration? timeout, Polling? polling}) {
     return _mainWorld.waitForFunction(pageFunction, args,
         timeout: timeout, polling: polling);
   }

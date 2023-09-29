@@ -364,8 +364,7 @@ class _Event {
     code.writeln(toComment(event.description, indent: 2));
 
     var streamName = 'on${firstLetterUpper(name)}';
-    code.writeln(
-        'Stream${_typeName != null ? '<$_typeName>' : ''} get $streamName => '
+    code.writeln('Stream<${_typeName ?? 'void'}> get $streamName => '
         "_client.onEvent.where((event) => event.name == '${context.domain.name}.$name')");
 
     if (parameters.isNotEmpty) {

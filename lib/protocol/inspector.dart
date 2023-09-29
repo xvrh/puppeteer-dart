@@ -12,11 +12,11 @@ class InspectorApi {
       .map((event) => event.parameters['reason'] as String);
 
   /// Fired when debugging target has crashed
-  Stream get onTargetCrashed =>
+  Stream<void> get onTargetCrashed =>
       _client.onEvent.where((event) => event.name == 'Inspector.targetCrashed');
 
   /// Fired when debugging target has reloaded after crash
-  Stream get onTargetReloadedAfterCrash => _client.onEvent
+  Stream<void> get onTargetReloadedAfterCrash => _client.onEvent
       .where((event) => event.name == 'Inspector.targetReloadedAfterCrash');
 
   /// Disables inspector domain notifications.

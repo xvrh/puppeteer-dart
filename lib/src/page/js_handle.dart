@@ -60,7 +60,8 @@ class JsHandle {
   /// - `pageFunction` Function to be evaluated in browser context
   /// - `args` Arguments to pass to `pageFunction`
   /// - returns: Future which resolves to the return value of `pageFunction`
-  Future<T?> evaluate<T>(@Language('js') String pageFunction, {List? args}) {
+  Future<T?> evaluate<T>(@Language('js') String pageFunction,
+      {List<dynamic>? args}) {
     return executionContext.evaluate(pageFunction, args: [this, ...?args]);
   }
 
@@ -80,7 +81,7 @@ class JsHandle {
   //  Returns: Future which resolves to the return value of `pageFunction` as in-page object (JSHandle)
   Future<T> evaluateHandle<T extends JsHandle>(
       @Language('js') String pageFunction,
-      {List? args}) {
+      {List<dynamic>? args}) {
     return executionContext
         .evaluateHandle(pageFunction, args: [this, ...?args]);
   }
@@ -407,7 +408,7 @@ async function _(element, pageJavascriptEnabled) {
   ///
   ///  Returns: A list of option values that have been successfully selected.
   Future<List<String>> select(List<String> values) async {
-    return evaluate<List>(r'''(element, values) => {
+    return evaluate<List<dynamic>>(r'''(element, values) => {
   if (element.nodeName.toLowerCase() !== 'select')
     throw new Error('Element is not a <select> element.');
 
@@ -665,7 +666,7 @@ async function _(element, pageJavascriptEnabled) {
   ///
   /// Returns [Future] which resolves to the return value of `pageFunction`.
   Future<T?> $eval<T>(String selector, @Language('js') String pageFunction,
-      {List? args}) async {
+      {List<dynamic>? args}) async {
     var elementHandle = await $OrNull(selector);
     if (elementHandle == null) {
       throw Exception(
@@ -705,7 +706,7 @@ async function _(element, pageJavascriptEnabled) {
   ///
   /// Returns: [Future] which resolves to the return value of `pageFunction`
   Future<T?> $$eval<T>(String selector, @Language('js') String pageFunction,
-      {List? args}) async {
+      {List<dynamic>? args}) async {
     var arrayHandle = await evaluateHandle(
         //language=js
         'function _(element, selector) {return Array.from(element.querySelectorAll(selector));}',
