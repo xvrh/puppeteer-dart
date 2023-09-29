@@ -61,7 +61,8 @@ function dimensions() {
   });
 }''');
       await page.mouse.click(Point(50, 60));
-      var event = await page.evaluate<Map<dynamic, dynamic>>('() => window.clickPromise');
+      var event = await page
+          .evaluate<Map<dynamic, dynamic>>('() => window.clickPromise');
       expect(event['type'], 'click');
       expect(event['detail'], 1);
       expect(event['clientX'], 50);
