@@ -77,7 +77,7 @@ void main() {
           .listen((target) => events.add('DESTROYED: ' + target.url));
       var page = await context.newPage();
       await page.goto(server.emptyPage);
-      Future targetDestroyFuture = context.onTargetDestroyed.first;
+      var targetDestroyFuture = context.onTargetDestroyed.first;
       await page.close();
       await targetDestroyFuture;
       expect(

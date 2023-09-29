@@ -46,7 +46,7 @@ class RuntimeApi {
               ExecutionContextDestroyedEvent.fromJson(event.parameters));
 
   /// Issued when all executionContexts were cleared in browser
-  Stream get onExecutionContextsCleared => _client.onEvent
+  Stream<void> get onExecutionContextsCleared => _client.onEvent
       .where((event) => event.name == 'Runtime.executionContextsCleared');
 
   /// Issued when object should be inspected (for example, as a result of inspect() command line API

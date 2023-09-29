@@ -69,8 +69,10 @@ class TargetManager {
   final _TargetFactory _targetFactory;
 
   final _targetInterceptors = Expando<List<TargetInterceptor>>();
-  final _attachedToTargetListenersBySession = Expando<StreamSubscription>();
-  final _detachedFromTargetListenersBySession = Expando<StreamSubscription>();
+  final _attachedToTargetListenersBySession =
+      Expando<StreamSubscription<dynamic>>();
+  final _detachedFromTargetListenersBySession =
+      Expando<StreamSubscription<dynamic>>();
 
   final _initializeCompleter = Completer<void>();
   final _targetsIdsForInit = <TargetID>{};
@@ -80,7 +82,7 @@ class TargetManager {
   final _targetGoneController = StreamController<Target>.broadcast();
   final _targetChangedController =
       StreamController<TargetChangedEvent>.broadcast();
-  final _subscriptions = <StreamSubscription>[];
+  final _subscriptions = <StreamSubscription<dynamic>>[];
 
   TargetManager(this._connection, this._targetFactory,
       {TargetPredicate? targetFilterCallback})

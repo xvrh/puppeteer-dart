@@ -21,7 +21,7 @@ class DebuggerApi {
       .map((event) => PausedEvent.fromJson(event.parameters));
 
   /// Fired when the virtual machine resumed execution.
-  Stream get onResumed =>
+  Stream<void> get onResumed =>
       _client.onEvent.where((event) => event.name == 'Debugger.resumed');
 
   /// Fired when virtual machine fails to parse the script.

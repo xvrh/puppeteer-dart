@@ -141,7 +141,7 @@ class JsCoverage {
   final DevTools _devTools;
   final _scriptUrls = <ScriptId, String?>{};
   final _scriptSources = <ScriptId, String?>{};
-  late List<StreamSubscription> _subscriptions;
+  late List<StreamSubscription<dynamic>> _subscriptions;
   bool _enabled = false;
   bool _resetOnNavigation = false;
   bool _reportAnonymousScripts = false;
@@ -237,7 +237,7 @@ class CssCoverage {
   final DevTools _devTools;
   final _stylesheetUrls = <StyleSheetId, String?>{};
   final _stylesheetSources = <StyleSheetId, String?>{};
-  late List<StreamSubscription> _subscriptions;
+  late List<StreamSubscription<dynamic>> _subscriptions;
   bool _enabled = false;
   bool _resetOnNavigation = false;
 

@@ -58,13 +58,13 @@ class DomWorld {
 
   Future<T> evaluateHandle<T extends JsHandle>(
       @Language('js') String pageFunction,
-      {List? args}) async {
+      {List<dynamic>? args}) async {
     var context = await executionContext;
     return context.evaluateHandle(pageFunction, args: args);
   }
 
   Future<T> evaluate<T>(@Language('js') String pageFunction,
-      {List? args}) async {
+      {List<dynamic>? args}) async {
     var context = await executionContext;
     return context.evaluate<T>(pageFunction, args: args);
   }
@@ -98,13 +98,13 @@ class DomWorld {
   }
 
   Future<T?> $eval<T>(String selector, @Language('js') String pageFunction,
-      {List? args}) async {
+      {List<dynamic>? args}) async {
     var document = await _document;
     return document.$eval<T>(selector, pageFunction, args: args);
   }
 
   Future<T?> $$eval<T>(String selector, @Language('js') String pageFunction,
-      {List? args}) async {
+      {List<dynamic>? args}) async {
     var document = await _document;
     return document.$$eval<T>(selector, pageFunction, args: args);
   }
@@ -330,7 +330,7 @@ async function _(content) {
   }
 
   Future<JsHandle> waitForFunction(
-      @Language('js') String pageFunction, List? args,
+      @Language('js') String pageFunction, List<dynamic>? args,
       {Duration? timeout, Polling? polling}) async {
     var functionDeclaration = convertToFunctionDeclaration(pageFunction);
     if (functionDeclaration == null) {
@@ -415,7 +415,7 @@ class WaitTask {
   final String title;
   final Polling polling;
   final Duration? timeout;
-  final List? predicateArgs;
+  final List<dynamic>? predicateArgs;
   final _completer = Completer<JsHandle>();
   int _runCount = 0;
   Timer? _timeoutTimer;

@@ -282,7 +282,7 @@ void main() {
           .overridePermissions(server.hostUrl, [PermissionType.geolocation]);
       await page.goto(server.emptyPage);
       await page.setGeolocation(longitude: 10, latitude: 10);
-      var geolocation = await page.evaluate<Map>(
+      var geolocation = await page.evaluate<Map<dynamic, dynamic>>(
           '''() => new Promise((resolve, failure) => navigator.geolocation.getCurrentPosition(position => {
       resolve({latitude: position.coords.latitude, longitude: position.coords.longitude});
       }, error => failure(error.message)))''');
@@ -449,7 +449,7 @@ void main() {
   });
   group('Page.Events.DOMContentLoaded', () {
     test('should fire when expected', () async {
-      Future blankFuture = page.goto('about:blank');
+      var blankFuture = page.goto('about:blank');
       await page.onDomContentLoaded.first;
       await blankFuture;
     });
@@ -627,11 +627,12 @@ void main() {
       expect(result, equals(15));
     });
     test('should work with complex objects', () async {
-      await page.exposeFunction('complexObject', (Map a, Map b) {
+      await page.exposeFunction('complexObject',
+          (Map<dynamic, dynamic> a, Map<dynamic, dynamic> b) {
         return {'x': (a['x'] as num) + (b['x'] as num)};
       });
-      var result =
-          await page.evaluate<Map>('async() => complexObject({x: 5}, {x: 2})');
+      var result = await page.evaluate<Map<dynamic, dynamic>>(
+          'async() => complexObject({x: 5}, {x: 2})');
       expect(result['x'], equals(7));
     });
   });

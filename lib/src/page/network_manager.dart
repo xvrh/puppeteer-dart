@@ -510,7 +510,7 @@ class Response {
   final Request request;
   final ResponseData data;
   final _bodyLoadedCompleter = Completer();
-  Future? _contentFuture;
+  Future<dynamic>? _contentFuture;
   final NetworkApi _networkApi;
   final _headers =
       CanonicalizedMap<String, String, String>((key) => key.toLowerCase());
@@ -598,7 +598,7 @@ class Response {
   /// the range 200-299) or not.
   bool get ok => status == 0 || (status >= 200 && status <= 299);
 
-  Future? get content {
+  Future<dynamic>? get content {
     _contentFuture ??= _bodyLoadedCompleter.future.then((error) async {
       if (error is Exception) throw error;
       var response = await _networkApi

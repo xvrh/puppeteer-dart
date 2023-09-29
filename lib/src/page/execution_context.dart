@@ -12,7 +12,7 @@ import 'page.dart';
 
 const evaluationScriptUrl = '__puppeteer_evaluation_script__';
 final RegExp sourceUrlRegExp =
-    RegExp(r'^[\040\t]*\/\/[@#] sourceURL=\s*(\S*?)\s*$', multiLine: true);
+    RegExp(r'^[\040\t]*//[@#] sourceURL=\s*(\S*?)\s*$', multiLine: true);
 
 /// The class represents a context for JavaScript execution. A [Page] might have
 /// many execution contexts:
@@ -71,7 +71,7 @@ class ExecutionContext {
   ///
   /// Returns [Future] which resolves to the return value of `pageFunction`
   Future<T> evaluate<T>(@Language('js') String pageFunction,
-      {List? args}) async {
+      {List<dynamic>? args}) async {
     try {
       var result = await _evaluateInternal<T>(pageFunction,
           args: args, returnByValue: true);
@@ -119,11 +119,11 @@ class ExecutionContext {
   /// ```
   Future<T> evaluateHandle<T extends JsHandle>(
           @Language('js') String pageFunction,
-          {List? args}) async =>
+          {List<dynamic>? args}) async =>
       await _evaluateInternal(pageFunction, args: args, returnByValue: false);
 
   Future<T> _evaluateInternal<T>(@Language('js') String pageFunction,
-      {List? args, required bool returnByValue}) async {
+      {List<dynamic>? args, required bool returnByValue}) async {
     // Try to convert a function shorthand (ie: '(el) => el.value;' to a full
     // function declaration (function(el) { return el.value; })
     // If it can't parse the shorthand function, it considers it as a

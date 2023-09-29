@@ -32,7 +32,7 @@ class HeapProfilerApi {
           .map((event) =>
               ReportHeapSnapshotProgressEvent.fromJson(event.parameters));
 
-  Stream get onResetProfiles => _client.onEvent
+  Stream<void> get onResetProfiles => _client.onEvent
       .where((event) => event.name == 'HeapProfiler.resetProfiles');
 
   /// Enables console to refer to the node with given id via $x (see Command Line API for more details

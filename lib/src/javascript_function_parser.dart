@@ -82,7 +82,8 @@ class JsGrammarDefinition extends GrammarDefinition {
 
   Parser argument() => ref1(token, '...').optional() & ref0(identifier);
 
-  Parser identifier() => ref1(token, ref0(IDENTIFIER)).cast<Token>().map((v) {
+  Parser identifier() =>
+      ref1(token, ref0(IDENTIFIER)).cast<Token<dynamic>>().map((v) {
         var values = v.value as List;
         return (values[0] as String) + (values[1] as List).join('');
       });

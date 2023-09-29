@@ -11,6 +11,7 @@ import 'devices.dart' as devices_lib;
 import 'downloader.dart';
 import 'page/emulation_manager.dart';
 import 'plugin.dart';
+import 'target.dart';
 
 final Logger _logger = Logger('puppeteer.launcher');
 
@@ -196,7 +197,7 @@ class Puppeteer {
         return chromeProcessExit;
       }, ignoreHttpsErrors: ignoreHttpsErrors, plugins: allPlugins);
 
-      Future? initialWait;
+      Future<Target>? initialWait;
       if (waitForInitialPage) {
         initialWait = browser.waitForTarget((target) => target.type == 'page');
       }
@@ -310,7 +311,7 @@ Future<String> _wsEndpoint(String browserURL) async {
   return decodedResponse['webSocketDebuggerUrl'] as String;
 }
 
-Future _killChrome(Process process) {
+Future<int> _killChrome(Process process) {
   if (Platform.isWindows) {
     // Allow a clean exit on Windows.
     // With `process.kill`, it seems that chrome retain a lock on the user-data directory

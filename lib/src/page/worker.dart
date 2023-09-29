@@ -74,7 +74,7 @@ class Worker {
   /// - [args] Arguments to pass to `pageFunction`
   /// - Returns: Future which resolves to the return value of `pageFunction`
   Future<T?> evaluate<T>(@Language('js') String pageFunction,
-      {List? args}) async {
+      {List<dynamic>? args}) async {
     return (await executionContext).evaluate<T>(pageFunction, args: args);
   }
 
@@ -95,7 +95,7 @@ class Worker {
   /// in-page object (JSHandle)
   Future<T> evaluateHandle<T extends JsHandle>(
       @Language('js') String pageFunction,
-      {List? args}) async {
+      {List<dynamic>? args}) async {
     return (await executionContext).evaluateHandle(pageFunction, args: args);
   }
 }

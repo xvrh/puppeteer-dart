@@ -25,7 +25,7 @@ class _GoldenMatcher extends Matcher {
   }
 
   @override
-  bool matches(covariant Uint8List item, Map matchState) {
+  bool matches(covariant Uint8List item, Map<dynamic, dynamic> matchState) {
     if (_skipGoldenComparison) return true;
 
     var goldenFile = File(goldenPath);
@@ -48,8 +48,8 @@ class _GoldenMatcher extends Matcher {
   }
 
   @override
-  Description describeMismatch(
-      item, Description mismatchDescription, Map matchState, bool verbose) {
+  Description describeMismatch(item, Description mismatchDescription,
+      Map<dynamic, dynamic> matchState, bool verbose) {
     var difference = matchState['comparison'] as ImageDifference;
     mismatchDescription.replace(difference.toString());
     return mismatchDescription;

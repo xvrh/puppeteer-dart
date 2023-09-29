@@ -36,7 +36,7 @@ class Browser {
   final Pool _screenshotsPool = Pool(1);
   final bool ignoreHttpsErrors;
   final DeviceViewport? defaultViewport;
-  final Future Function() _closeCallback;
+  final Future<void> Function() _closeCallback;
   final _contexts = <BrowserContextID, BrowserContext>{};
   late final _targetManager = TargetManager(connection, _createTarget);
   late final BrowserContext _defaultContext;
@@ -49,7 +49,7 @@ class Browser {
       {required this.defaultViewport,
       required List<BrowserContextID>? browserContextIds,
       required bool? ignoreHttpsErrors,
-      required Future Function() closeCallback,
+      required Future<void> Function() closeCallback,
       required List<Plugin> plugins})
       : _closeCallback = closeCallback,
         ignoreHttpsErrors = ignoreHttpsErrors ?? false,
@@ -103,7 +103,7 @@ class Browser {
   /// NOTE This includes target destructions in incognito browser contexts.
   Stream<Target> get onTargetDestroyed => _onTargetDestroyedController.stream;
 
-  Future get disconnected => connection.disconnected;
+  Future<void> get disconnected => connection.disconnected;
 
   /// Creates a new incognito browser context. This won't share cookies/cache
   /// with other browser contexts.
@@ -269,7 +269,7 @@ class Browser {
 
   /// Closes Chromium and all of its pages (if any were opened). The Browser
   /// object itself is considered to be disposed and cannot be used anymore.
-  Future close() async {
+  Future<void> close() async {
     // Try to give a chance to other message to arrive before we complete the future
     // with an error
     await Future.delayed(Duration.zero);
@@ -292,7 +292,7 @@ class Browser {
 Future<Browser> createBrowser(Process? process, Connection connection,
     {required DeviceViewport? defaultViewport,
     List<BrowserContextID>? browserContextIds,
-    required Future Function() closeCallback,
+    required Future<void> Function() closeCallback,
     required bool? ignoreHttpsErrors,
     required List<Plugin> plugins}) async {
   var browser = Browser._(process, connection,

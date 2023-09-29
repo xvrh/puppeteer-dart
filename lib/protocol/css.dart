@@ -23,7 +23,7 @@ class CSSApi {
 
   /// Fires whenever a MediaQuery result changes (for example, after a browser window has been
   /// resized.) The current implementation considers only viewport-dependent media features.
-  Stream get onMediaQueryResultChanged => _client.onEvent
+  Stream<void> get onMediaQueryResultChanged => _client.onEvent
       .where((event) => event.name == 'CSS.mediaQueryResultChanged');
 
   /// Fired whenever an active document stylesheet is added.

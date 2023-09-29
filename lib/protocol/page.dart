@@ -49,7 +49,7 @@ class PageApi {
       .map((event) => FrameInfo.fromJson(
           event.parameters['frame'] as Map<String, dynamic>));
 
-  Stream get onFrameResized =>
+  Stream<void> get onFrameResized =>
       _client.onEvent.where((event) => event.name == 'Page.frameResized');
 
   /// Fired when a renderer-initiated navigation is requested.
@@ -90,11 +90,11 @@ class PageApi {
       .map((event) => DownloadProgressEvent.fromJson(event.parameters));
 
   /// Fired when interstitial page was hidden
-  Stream get onInterstitialHidden =>
+  Stream<void> get onInterstitialHidden =>
       _client.onEvent.where((event) => event.name == 'Page.interstitialHidden');
 
   /// Fired when interstitial page was shown
-  Stream get onInterstitialShown =>
+  Stream<void> get onInterstitialShown =>
       _client.onEvent.where((event) => event.name == 'Page.interstitialShown');
 
   /// Fired when a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload) has been

@@ -32,7 +32,7 @@ class Domain {
   final List<Event> events;
   final bool deprecated;
 
-  Domain.fromJson(Map json)
+  Domain.fromJson(Map<String, dynamic> json)
       : name = json['domain'] as String,
         description = json['description'] as String?,
         types = json.containsKey('types')
@@ -73,7 +73,7 @@ class ComplexType {
       : id = _aliases[id] ?? id,
         rawId = id;
 
-  ComplexType.fromJson(Map json, String? domain)
+  ComplexType.fromJson(Map<dynamic, dynamic> json, String? domain)
       : id = _aliases[json['id'] as String] ?? json['id'] as String,
         rawId = json['id'] as String,
         description = json['description'] as String?,
@@ -96,7 +96,7 @@ class Command {
   final List<Parameter> returns;
   final bool deprecated;
 
-  Command.fromJson(Map json)
+  Command.fromJson(Map<String, dynamic> json)
       : name = json['name'] as String,
         description = json['description'] as String?,
         deprecated = json['deprecated'] as bool? ?? false,
@@ -117,7 +117,7 @@ class Event {
   final String? description;
   final List<Parameter> parameters;
 
-  Event.fromJson(Map json)
+  Event.fromJson(Map<String, dynamic> json)
       : name = json['name'] as String,
         description = json['description'] as String?,
         parameters = json.containsKey('parameters')
@@ -174,7 +174,7 @@ class Parameter implements Typed {
       this.enumValues})
       : ref = _ref(ref);
 
-  Parameter.fromJson(Map json)
+  Parameter.fromJson(Map<String, dynamic> json)
       : name = json['name'] as String,
         description = json['description'] as String?,
         type = json['type'] as String?,
