@@ -42,7 +42,6 @@ void main() {
   test('should load oopif iframes with subresources and request interception',
       () async {
     var framePromise = page.waitForFrame((frame) {
-      print("Frame ${frame.url}");
       return frame.url.endsWith('/oopif.html');
     });
     page.onRequest.listen((request) {
