@@ -15,8 +15,16 @@ import 'target.dart';
 
 final Logger _logger = Logger('puppeteer.launcher');
 
+final _disabledFeatures = [
+  'Translate',
+  // AcceptCHFrame disabled because of crbug.com/1348106.
+  'AcceptCHFrame',
+  'MediaRouter',
+  'OptimizationHints',
+];
+
 // See https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md
-final List<String> _defaultArgs = <String>[
+final _defaultArgs = <String>[
   '--allow-pre-commit-input',
   '--disable-background-networking',
   '--disable-background-timer-throttling',
@@ -28,14 +36,13 @@ final List<String> _defaultArgs = <String>[
   '--disable-default-apps',
   '--disable-dev-shm-usage',
   '--disable-extensions',
-  // AcceptCHFrame disabled because of crbug.com/1348106.
-  // DIPS is disabled because of crbug.com/1439578. TODO: enable after M115.
-  '--disable-features=Translate,BackForwardCache,AcceptCHFrame,MediaRouter,OptimizationHints,DIPS',
+  '--disable-features=${_disabledFeatures.join(',')}',
   '--disable-hang-monitor',
   '--disable-ipc-flooding-protection',
   '--disable-popup-blocking',
   '--disable-prompt-on-repost',
   '--disable-renderer-backgrounding',
+  '--disable-search-engine-choice-screen',
   '--disable-sync',
   '--enable-automation',
   // TODO(sadym): remove '--enable-blink-features=IdleDetection' once

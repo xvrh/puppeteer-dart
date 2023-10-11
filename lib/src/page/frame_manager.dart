@@ -370,7 +370,7 @@ class Frame {
   FrameId _id;
   final lifecycleEvents = <String?>{};
   final childFrames = <Frame>[];
-  late String _url;
+  String? _url;
   String? _name;
   bool _detached = false;
   LoaderId? _loaderId;
@@ -388,7 +388,7 @@ class Frame {
   FrameId get id => _id;
 
   /// Returns frame's url.
-  String get url => _url;
+  String get url => _url ?? '';
 
   /// Returns frame's name attribute as specified in the tag.
   ///

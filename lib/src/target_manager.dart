@@ -114,8 +114,8 @@ class TargetManager {
     await _connection.targetApi.setDiscoverTargets(true,
         filter: TargetFilter(
             [FilterEntry(type: 'tab', exclude: true), FilterEntry()]));
-    await _connection.targetApi.setAutoAttach(true, true, flatten: true);
     _storeExistingTargetsForInit();
+    await _connection.targetApi.setAutoAttach(true, true, flatten: true);
     _finishInitializationIfReady(null);
     await _initializeCompleter.future;
   }
