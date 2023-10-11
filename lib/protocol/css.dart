@@ -423,6 +423,12 @@ class GetMatchedStylesForNodeResult {
   /// A list of CSS position fallbacks matching this node.
   final List<CSSPositionFallbackRule>? cssPositionFallbackRules;
 
+  /// A list of CSS at-property rules matching this node.
+  final List<CSSPropertyRule>? cssPropertyRules;
+
+  /// A list of CSS property registrations matching this node.
+  final List<CSSPropertyRegistration>? cssPropertyRegistrations;
+
   /// Id of the first parent element that does not have display: contents.
   final dom.NodeId? parentLayoutNodeId;
 
@@ -435,6 +441,8 @@ class GetMatchedStylesForNodeResult {
       this.inheritedPseudoElements,
       this.cssKeyframesRules,
       this.cssPositionFallbackRules,
+      this.cssPropertyRules,
+      this.cssPropertyRegistrations,
       this.parentLayoutNodeId});
 
   factory GetMatchedStylesForNodeResult.fromJson(Map<String, dynamic> json) {
@@ -477,6 +485,17 @@ class GetMatchedStylesForNodeResult {
           ? (json['cssPositionFallbackRules'] as List)
               .map((e) =>
                   CSSPositionFallbackRule.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+      cssPropertyRules: json.containsKey('cssPropertyRules')
+          ? (json['cssPropertyRules'] as List)
+              .map((e) => CSSPropertyRule.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+      cssPropertyRegistrations: json.containsKey('cssPropertyRegistrations')
+          ? (json['cssPropertyRegistrations'] as List)
+              .map((e) =>
+                  CSSPropertyRegistration.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       parentLayoutNodeId: json.containsKey('parentLayoutNodeId')
@@ -1912,6 +1931,86 @@ class CSSKeyframesRule {
     return {
       'animationName': animationName.toJson(),
       'keyframes': keyframes.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+/// Representation of a custom property registration through CSS.registerProperty
+class CSSPropertyRegistration {
+  final String propertyName;
+
+  final Value? initialValue;
+
+  final bool inherits;
+
+  final String syntax;
+
+  CSSPropertyRegistration(
+      {required this.propertyName,
+      this.initialValue,
+      required this.inherits,
+      required this.syntax});
+
+  factory CSSPropertyRegistration.fromJson(Map<String, dynamic> json) {
+    return CSSPropertyRegistration(
+      propertyName: json['propertyName'] as String,
+      initialValue: json.containsKey('initialValue')
+          ? Value.fromJson(json['initialValue'] as Map<String, dynamic>)
+          : null,
+      inherits: json['inherits'] as bool? ?? false,
+      syntax: json['syntax'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'propertyName': propertyName,
+      'inherits': inherits,
+      'syntax': syntax,
+      if (initialValue != null) 'initialValue': initialValue!.toJson(),
+    };
+  }
+}
+
+/// CSS property at-rule representation.
+class CSSPropertyRule {
+  /// The css style sheet identifier (absent for user agent stylesheet and user-specified
+  /// stylesheet rules) this rule came from.
+  final StyleSheetId? styleSheetId;
+
+  /// Parent stylesheet's origin.
+  final StyleSheetOrigin origin;
+
+  /// Associated property name.
+  final Value propertyName;
+
+  /// Associated style declaration.
+  final CSSStyle style;
+
+  CSSPropertyRule(
+      {this.styleSheetId,
+      required this.origin,
+      required this.propertyName,
+      required this.style});
+
+  factory CSSPropertyRule.fromJson(Map<String, dynamic> json) {
+    return CSSPropertyRule(
+      styleSheetId: json.containsKey('styleSheetId')
+          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          : null,
+      origin: StyleSheetOrigin.fromJson(json['origin'] as String),
+      propertyName:
+          Value.fromJson(json['propertyName'] as Map<String, dynamic>),
+      style: CSSStyle.fromJson(json['style'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'origin': origin.toJson(),
+      'propertyName': propertyName.toJson(),
+      'style': style.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
     };
   }
 }
