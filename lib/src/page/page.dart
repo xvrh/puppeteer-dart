@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
+import 'package:async/async.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 import '../../protocol/dev_tools.dart';
@@ -16,6 +17,7 @@ import '../../protocol/target.dart';
 import '../browser.dart';
 import '../connection.dart';
 import '../target.dart';
+import '../utils/take_until.dart';
 import 'accessibility.dart';
 import 'coverage.dart';
 import 'dialog.dart';
@@ -1151,6 +1153,14 @@ function deliverError(name, seq, message, stack) {
             path.url.normalize(response.url) == path.url.normalize(url))
         .first
         .timeout(timeout);
+  }
+
+  Future<Frame> waitForFrame(bool Function(Frame) predicate) async {
+    return StreamGroup.merge([
+      onFrameAttached,
+      onFrameNavigated,
+      for (var frame in frames) Stream.value(frame),
+    ]).takeUntil(onClose).firstWhere(predicate);
   }
 
   /// Navigate to the previous page in history.

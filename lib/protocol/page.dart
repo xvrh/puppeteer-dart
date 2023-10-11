@@ -1626,6 +1626,7 @@ enum PermissionsPolicyFeature {
   chEct('ch-ect'),
   chPrefersColorScheme('ch-prefers-color-scheme'),
   chPrefersReducedMotion('ch-prefers-reduced-motion'),
+  chPrefersReducedTransparency('ch-prefers-reduced-transparency'),
   chRtt('ch-rtt'),
   chSaveData('ch-save-data'),
   chUa('ch-ua'),

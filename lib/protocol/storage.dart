@@ -1263,14 +1263,43 @@ class AttributionReportingAggregationKeysEntry {
   }
 }
 
+class AttributionReportingEventReportWindows {
+  /// duration in seconds
+  final int start;
+
+  /// duration in seconds
+  final List<int> ends;
+
+  AttributionReportingEventReportWindows(
+      {required this.start, required this.ends});
+
+  factory AttributionReportingEventReportWindows.fromJson(
+      Map<String, dynamic> json) {
+    return AttributionReportingEventReportWindows(
+      start: json['start'] as int,
+      ends: (json['ends'] as List).map((e) => e as int).toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'start': start,
+      'ends': [...ends],
+    };
+  }
+}
+
 class AttributionReportingSourceRegistration {
   final network.TimeSinceEpoch time;
 
   /// duration in seconds
   final int? expiry;
 
+  /// eventReportWindow and eventReportWindows are mutually exclusive
   /// duration in seconds
   final int? eventReportWindow;
+
+  final AttributionReportingEventReportWindows? eventReportWindows;
 
   /// duration in seconds
   final int? aggregatableReportWindow;
@@ -1297,6 +1326,7 @@ class AttributionReportingSourceRegistration {
       {required this.time,
       this.expiry,
       this.eventReportWindow,
+      this.eventReportWindows,
       this.aggregatableReportWindow,
       required this.type,
       required this.sourceOrigin,
@@ -1315,6 +1345,10 @@ class AttributionReportingSourceRegistration {
       expiry: json.containsKey('expiry') ? json['expiry'] as int : null,
       eventReportWindow: json.containsKey('eventReportWindow')
           ? json['eventReportWindow'] as int
+          : null,
+      eventReportWindows: json.containsKey('eventReportWindows')
+          ? AttributionReportingEventReportWindows.fromJson(
+              json['eventReportWindows'] as Map<String, dynamic>)
           : null,
       aggregatableReportWindow: json.containsKey('aggregatableReportWindow')
           ? json['aggregatableReportWindow'] as int
@@ -1353,6 +1387,8 @@ class AttributionReportingSourceRegistration {
       'aggregationKeys': aggregationKeys.map((e) => e.toJson()).toList(),
       if (expiry != null) 'expiry': expiry,
       if (eventReportWindow != null) 'eventReportWindow': eventReportWindow,
+      if (eventReportWindows != null)
+        'eventReportWindows': eventReportWindows!.toJson(),
       if (aggregatableReportWindow != null)
         'aggregatableReportWindow': aggregatableReportWindow,
       if (debugKey != null) 'debugKey': debugKey!.toJson(),

@@ -32,6 +32,14 @@ class FedCmApi {
     });
   }
 
+  /// Only valid if the dialog type is ConfirmIdpSignin. Acts as if the user had
+  /// clicked the continue button.
+  Future<void> confirmIdpSignin(String dialogId) async {
+    await _client.send('FedCm.confirmIdpSignin', {
+      'dialogId': dialogId,
+    });
+  }
+
   Future<void> dismissDialog(String dialogId, {bool? triggerCooldown}) async {
     await _client.send('FedCm.dismissDialog', {
       'dialogId': dialogId,
@@ -104,6 +112,7 @@ enum LoginState {
 enum DialogType {
   accountChooser('AccountChooser'),
   autoReauthn('AutoReauthn'),
+  confirmIdpSignin('ConfirmIdpSignin'),
   ;
 
   final String value;

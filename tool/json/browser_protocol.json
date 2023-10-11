@@ -9870,16 +9870,14 @@
                         {
                             "name": "tiltX",
                             "description": "The plane angle between the Y-Z plane and the plane containing both the stylus axis and the Y axis, in degrees of the range [-90,90], a positive tiltX is to the right (default: 0)",
-                            "experimental": true,
                             "optional": true,
-                            "type": "integer"
+                            "type": "number"
                         },
                         {
                             "name": "tiltY",
                             "description": "The plane angle between the X-Z plane and the plane containing both the stylus axis and the X axis, in degrees of the range [-90,90], a positive tiltY is towards the user (default: 0).",
-                            "experimental": true,
                             "optional": true,
-                            "type": "integer"
+                            "type": "number"
                         },
                         {
                             "name": "twist",
@@ -10243,16 +10241,14 @@
                         {
                             "name": "tiltX",
                             "description": "The plane angle between the Y-Z plane and the plane containing both the stylus axis and the Y axis, in degrees of the range [-90,90], a positive tiltX is to the right (default: 0).",
-                            "experimental": true,
                             "optional": true,
-                            "type": "integer"
+                            "type": "number"
                         },
                         {
                             "name": "tiltY",
                             "description": "The plane angle between the X-Z plane and the plane containing both the stylus axis and the X axis, in degrees of the range [-90,90], a positive tiltY is towards the user (default: 0).",
-                            "experimental": true,
                             "optional": true,
-                            "type": "integer"
+                            "type": "number"
                         },
                         {
                             "name": "twist",
@@ -20218,24 +20214,15 @@
                         {
                             "name": "expiry",
                             "description": "duration in seconds",
-                            "optional": true,
-                            "type": "integer"
-                        },
-                        {
-                            "name": "eventReportWindow",
-                            "description": "eventReportWindow and eventReportWindows are mutually exclusive\nduration in seconds",
-                            "optional": true,
                             "type": "integer"
                         },
                         {
                             "name": "eventReportWindows",
-                            "optional": true,
                             "$ref": "AttributionReportingEventReportWindows"
                         },
                         {
                             "name": "aggregatableReportWindow",
                             "description": "duration in seconds",
-                            "optional": true,
                             "type": "integer"
                         },
                         {
@@ -24029,7 +24016,6 @@
                         "MemoryPressureOnTrigger",
                         "MemoryPressureAfterTriggered",
                         "PrerenderingDisabledByDevTools",
-                        "ResourceLoadBlockedByClient",
                         "SpeculationRuleRemoved",
                         "ActivatedWithAuxiliaryBrowsingContexts",
                         "MaxNumOfRunningEagerPrerendersExceeded",
