@@ -1,3 +1,6 @@
+## 3.5.0
+- Update to Chrome 118.0.5993.70
+
 ## 3.4.1
 - Update to Chrome 117.0.5938.92
 
