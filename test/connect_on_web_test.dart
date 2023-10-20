@@ -53,7 +53,7 @@ void main() {
       }))
       ..mount('/', createStaticHandler(tempDirectory.path));
 
-    httpServer = await shelf.serve(router, InternetAddress.anyIPv4, 0);
+    httpServer = await shelf.serve(router.call, InternetAddress.anyIPv4, 0);
 
     try {
       var jsFile = p.join(tempDirectory.path, 'script.js');

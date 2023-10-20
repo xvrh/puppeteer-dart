@@ -18,7 +18,7 @@ class FrameManager {
   final Page page;
   late final NetworkManager _networkManager;
   final _frames = <FrameId, Frame>{};
-  final _contextIdToContext = <ExecutionContextId, ExecutionContext>{};
+  final _contextIdToContext = <String, ExecutionContext>{};
   final _isolatedWorlds = <String?>{};
   final _lifecycleEventController = StreamController<Frame>.broadcast(),
       _frameAttachedController = StreamController<Frame>.broadcast(),
@@ -286,7 +286,8 @@ class FrameManager {
     if (world != null) {
       world.setContext(context);
     }
-    _contextIdToContext[contextPayload.id] = context;
+    var key = contextPayload.id.value.toString();
+    _contextIdToContext[key] = context;
   }
 
   void _onExecutionContextDestroyed(ExecutionContextDestroyedEvent event) {
@@ -309,7 +310,7 @@ class FrameManager {
   }
 
   ExecutionContext executionContextById(ExecutionContextId contextId) {
-    var context = _contextIdToContext[contextId];
+    var context = _contextIdToContext[contextId.value.toString()];
     assert(context != null,
         'INTERNAL ERROR: missing context with id = ${contextId.value}');
     return context!;
