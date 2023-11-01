@@ -3151,6 +3151,7 @@ enum SetCookieBlockedReason {
   sameSiteUnspecifiedTreatedAsLax('SameSiteUnspecifiedTreatedAsLax'),
   sameSiteNoneInsecure('SameSiteNoneInsecure'),
   userPreferences('UserPreferences'),
+  thirdPartyPhaseout('ThirdPartyPhaseout'),
   thirdPartyBlockedInFirstPartySet('ThirdPartyBlockedInFirstPartySet'),
   syntaxError('SyntaxError'),
   schemeNotSupported('SchemeNotSupported'),
@@ -3167,6 +3168,7 @@ enum SetCookieBlockedReason {
       'SamePartyConflictsWithOtherAttributes'),
   nameValuePairExceedsMaxSize('NameValuePairExceedsMaxSize'),
   disallowedCharacter('DisallowedCharacter'),
+  noCookieContent('NoCookieContent'),
   ;
 
   final String value;
@@ -3192,6 +3194,7 @@ enum CookieBlockedReason {
   sameSiteUnspecifiedTreatedAsLax('SameSiteUnspecifiedTreatedAsLax'),
   sameSiteNoneInsecure('SameSiteNoneInsecure'),
   userPreferences('UserPreferences'),
+  thirdPartyPhaseout('ThirdPartyPhaseout'),
   thirdPartyBlockedInFirstPartySet('ThirdPartyBlockedInFirstPartySet'),
   unknownError('UnknownError'),
   schemefulSameSiteStrict('SchemefulSameSiteStrict'),

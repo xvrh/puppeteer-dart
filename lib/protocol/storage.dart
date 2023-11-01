@@ -683,6 +683,9 @@ enum InterestGroupAccessType {
   loaded('loaded'),
   bid('bid'),
   win('win'),
+  additionalBid('additionalBid'),
+  additionalBidWin('additionalBidWin'),
+  clear('clear'),
   ;
 
   final String value;
@@ -700,15 +703,15 @@ enum InterestGroupAccessType {
 
 /// Ad advertising element inside an interest group.
 class InterestGroupAd {
-  final String renderUrl;
+  final String renderURL;
 
   final String? metadata;
 
-  InterestGroupAd({required this.renderUrl, this.metadata});
+  InterestGroupAd({required this.renderURL, this.metadata});
 
   factory InterestGroupAd.fromJson(Map<String, dynamic> json) {
     return InterestGroupAd(
-      renderUrl: json['renderUrl'] as String,
+      renderURL: json['renderURL'] as String,
       metadata:
           json.containsKey('metadata') ? json['metadata'] as String : null,
     );
@@ -716,7 +719,7 @@ class InterestGroupAd {
 
   Map<String, dynamic> toJson() {
     return {
-      'renderUrl': renderUrl,
+      'renderURL': renderURL,
       if (metadata != null) 'metadata': metadata,
     };
   }
@@ -732,13 +735,13 @@ class InterestGroupDetails {
 
   final String joiningOrigin;
 
-  final String? biddingUrl;
+  final String? biddingLogicURL;
 
-  final String? biddingWasmHelperUrl;
+  final String? biddingWasmHelperURL;
 
-  final String? updateUrl;
+  final String? updateURL;
 
-  final String? trustedBiddingSignalsUrl;
+  final String? trustedBiddingSignalsURL;
 
   final List<String> trustedBiddingSignalsKeys;
 
@@ -753,10 +756,10 @@ class InterestGroupDetails {
       required this.name,
       required this.expirationTime,
       required this.joiningOrigin,
-      this.biddingUrl,
-      this.biddingWasmHelperUrl,
-      this.updateUrl,
-      this.trustedBiddingSignalsUrl,
+      this.biddingLogicURL,
+      this.biddingWasmHelperURL,
+      this.updateURL,
+      this.trustedBiddingSignalsURL,
       required this.trustedBiddingSignalsKeys,
       this.userBiddingSignals,
       required this.ads,
@@ -769,15 +772,16 @@ class InterestGroupDetails {
       expirationTime:
           network.TimeSinceEpoch.fromJson(json['expirationTime'] as num),
       joiningOrigin: json['joiningOrigin'] as String,
-      biddingUrl:
-          json.containsKey('biddingUrl') ? json['biddingUrl'] as String : null,
-      biddingWasmHelperUrl: json.containsKey('biddingWasmHelperUrl')
-          ? json['biddingWasmHelperUrl'] as String
+      biddingLogicURL: json.containsKey('biddingLogicURL')
+          ? json['biddingLogicURL'] as String
           : null,
-      updateUrl:
-          json.containsKey('updateUrl') ? json['updateUrl'] as String : null,
-      trustedBiddingSignalsUrl: json.containsKey('trustedBiddingSignalsUrl')
-          ? json['trustedBiddingSignalsUrl'] as String
+      biddingWasmHelperURL: json.containsKey('biddingWasmHelperURL')
+          ? json['biddingWasmHelperURL'] as String
+          : null,
+      updateURL:
+          json.containsKey('updateURL') ? json['updateURL'] as String : null,
+      trustedBiddingSignalsURL: json.containsKey('trustedBiddingSignalsURL')
+          ? json['trustedBiddingSignalsURL'] as String
           : null,
       trustedBiddingSignalsKeys: (json['trustedBiddingSignalsKeys'] as List)
           .map((e) => e as String)
@@ -803,12 +807,12 @@ class InterestGroupDetails {
       'trustedBiddingSignalsKeys': [...trustedBiddingSignalsKeys],
       'ads': ads.map((e) => e.toJson()).toList(),
       'adComponents': adComponents.map((e) => e.toJson()).toList(),
-      if (biddingUrl != null) 'biddingUrl': biddingUrl,
-      if (biddingWasmHelperUrl != null)
-        'biddingWasmHelperUrl': biddingWasmHelperUrl,
-      if (updateUrl != null) 'updateUrl': updateUrl,
-      if (trustedBiddingSignalsUrl != null)
-        'trustedBiddingSignalsUrl': trustedBiddingSignalsUrl,
+      if (biddingLogicURL != null) 'biddingLogicURL': biddingLogicURL,
+      if (biddingWasmHelperURL != null)
+        'biddingWasmHelperURL': biddingWasmHelperURL,
+      if (updateURL != null) 'updateURL': updateURL,
+      if (trustedBiddingSignalsURL != null)
+        'trustedBiddingSignalsURL': trustedBiddingSignalsURL,
       if (userBiddingSignals != null) 'userBiddingSignals': userBiddingSignals,
     };
   }

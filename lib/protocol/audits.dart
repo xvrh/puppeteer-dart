@@ -1410,6 +1410,64 @@ class StylesheetLoadingIssueDetails {
   }
 }
 
+enum PropertyRuleIssueReason {
+  invalidSyntax('InvalidSyntax'),
+  invalidInitialValue('InvalidInitialValue'),
+  invalidInherits('InvalidInherits'),
+  invalidName('InvalidName'),
+  ;
+
+  final String value;
+
+  const PropertyRuleIssueReason(this.value);
+
+  factory PropertyRuleIssueReason.fromJson(String value) =>
+      PropertyRuleIssueReason.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// This issue warns about errors in property rules that lead to property
+/// registrations being ignored.
+class PropertyRuleIssueDetails {
+  /// Source code position of the property rule.
+  final SourceCodeLocation sourceCodeLocation;
+
+  /// Reason why the property rule was discarded.
+  final PropertyRuleIssueReason propertyRuleIssueReason;
+
+  /// The value of the property rule property that failed to parse
+  final String? propertyValue;
+
+  PropertyRuleIssueDetails(
+      {required this.sourceCodeLocation,
+      required this.propertyRuleIssueReason,
+      this.propertyValue});
+
+  factory PropertyRuleIssueDetails.fromJson(Map<String, dynamic> json) {
+    return PropertyRuleIssueDetails(
+      sourceCodeLocation: SourceCodeLocation.fromJson(
+          json['sourceCodeLocation'] as Map<String, dynamic>),
+      propertyRuleIssueReason: PropertyRuleIssueReason.fromJson(
+          json['propertyRuleIssueReason'] as String),
+      propertyValue: json.containsKey('propertyValue')
+          ? json['propertyValue'] as String
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sourceCodeLocation': sourceCodeLocation.toJson(),
+      'propertyRuleIssueReason': propertyRuleIssueReason.toJson(),
+      if (propertyValue != null) 'propertyValue': propertyValue,
+    };
+  }
+}
+
 /// A unique identifier for the type of issue. Each type may use one of the
 /// optional fields in InspectorIssueDetails to convey more specific
 /// information about the kind of issue.
@@ -1432,6 +1490,7 @@ enum InspectorIssueCode {
   bounceTrackingIssue('BounceTrackingIssue'),
   stylesheetLoadingIssue('StylesheetLoadingIssue'),
   federatedAuthUserInfoRequestIssue('FederatedAuthUserInfoRequestIssue'),
+  propertyRuleIssue('PropertyRuleIssue'),
   ;
 
   final String value;
@@ -1483,6 +1542,8 @@ class InspectorIssueDetails {
 
   final StylesheetLoadingIssueDetails? stylesheetLoadingIssueDetails;
 
+  final PropertyRuleIssueDetails? propertyRuleIssueDetails;
+
   final FederatedAuthUserInfoRequestIssueDetails?
       federatedAuthUserInfoRequestIssueDetails;
 
@@ -1503,6 +1564,7 @@ class InspectorIssueDetails {
       this.federatedAuthRequestIssueDetails,
       this.bounceTrackingIssueDetails,
       this.stylesheetLoadingIssueDetails,
+      this.propertyRuleIssueDetails,
       this.federatedAuthUserInfoRequestIssueDetails});
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
@@ -1578,6 +1640,10 @@ class InspectorIssueDetails {
               ? StylesheetLoadingIssueDetails.fromJson(
                   json['stylesheetLoadingIssueDetails'] as Map<String, dynamic>)
               : null,
+      propertyRuleIssueDetails: json.containsKey('propertyRuleIssueDetails')
+          ? PropertyRuleIssueDetails.fromJson(
+              json['propertyRuleIssueDetails'] as Map<String, dynamic>)
+          : null,
       federatedAuthUserInfoRequestIssueDetails:
           json.containsKey('federatedAuthUserInfoRequestIssueDetails')
               ? FederatedAuthUserInfoRequestIssueDetails.fromJson(
@@ -1627,6 +1693,8 @@ class InspectorIssueDetails {
       if (stylesheetLoadingIssueDetails != null)
         'stylesheetLoadingIssueDetails':
             stylesheetLoadingIssueDetails!.toJson(),
+      if (propertyRuleIssueDetails != null)
+        'propertyRuleIssueDetails': propertyRuleIssueDetails!.toJson(),
       if (federatedAuthUserInfoRequestIssueDetails != null)
         'federatedAuthUserInfoRequestIssueDetails':
             federatedAuthUserInfoRequestIssueDetails!.toJson(),

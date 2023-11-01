@@ -1735,6 +1735,39 @@
                     ]
                 },
                 {
+                    "id": "PropertyRuleIssueReason",
+                    "type": "string",
+                    "enum": [
+                        "InvalidSyntax",
+                        "InvalidInitialValue",
+                        "InvalidInherits",
+                        "InvalidName"
+                    ]
+                },
+                {
+                    "id": "PropertyRuleIssueDetails",
+                    "description": "This issue warns about errors in property rules that lead to property\nregistrations being ignored.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "sourceCodeLocation",
+                            "description": "Source code position of the property rule.",
+                            "$ref": "SourceCodeLocation"
+                        },
+                        {
+                            "name": "propertyRuleIssueReason",
+                            "description": "Reason why the property rule was discarded.",
+                            "$ref": "PropertyRuleIssueReason"
+                        },
+                        {
+                            "name": "propertyValue",
+                            "description": "The value of the property rule property that failed to parse",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
                     "id": "InspectorIssueCode",
                     "description": "A unique identifier for the type of issue. Each type may use one of the\noptional fields in InspectorIssueDetails to convey more specific\ninformation about the kind of issue.",
                     "type": "string",
@@ -1756,7 +1789,8 @@
                         "FederatedAuthRequestIssue",
                         "BounceTrackingIssue",
                         "StylesheetLoadingIssue",
-                        "FederatedAuthUserInfoRequestIssue"
+                        "FederatedAuthUserInfoRequestIssue",
+                        "PropertyRuleIssue"
                     ]
                 },
                 {
@@ -1849,6 +1883,11 @@
                             "name": "stylesheetLoadingIssueDetails",
                             "optional": true,
                             "$ref": "StylesheetLoadingIssueDetails"
+                        },
+                        {
+                            "name": "propertyRuleIssueDetails",
+                            "optional": true,
+                            "$ref": "PropertyRuleIssueDetails"
                         },
                         {
                             "name": "federatedAuthUserInfoRequestIssueDetails",
@@ -4459,6 +4498,31 @@
                         {
                             "name": "value",
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "setPropertyRulePropertyName",
+                    "description": "Modifies the property rule property name.",
+                    "parameters": [
+                        {
+                            "name": "styleSheetId",
+                            "$ref": "StyleSheetId"
+                        },
+                        {
+                            "name": "range",
+                            "$ref": "SourceRange"
+                        },
+                        {
+                            "name": "propertyName",
+                            "type": "string"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "propertyName",
+                            "description": "The resulting key text after modification.",
+                            "$ref": "Value"
                         }
                     ]
                 },
@@ -12372,6 +12436,7 @@
                         "SameSiteUnspecifiedTreatedAsLax",
                         "SameSiteNoneInsecure",
                         "UserPreferences",
+                        "ThirdPartyPhaseout",
                         "ThirdPartyBlockedInFirstPartySet",
                         "SyntaxError",
                         "SchemeNotSupported",
@@ -12385,7 +12450,8 @@
                         "SamePartyFromCrossPartyContext",
                         "SamePartyConflictsWithOtherAttributes",
                         "NameValuePairExceedsMaxSize",
-                        "DisallowedCharacter"
+                        "DisallowedCharacter",
+                        "NoCookieContent"
                     ]
                 },
                 {
@@ -12402,6 +12468,7 @@
                         "SameSiteUnspecifiedTreatedAsLax",
                         "SameSiteNoneInsecure",
                         "UserPreferences",
+                        "ThirdPartyPhaseout",
                         "ThirdPartyBlockedInFirstPartySet",
                         "UnknownError",
                         "SchemefulSameSiteStrict",
@@ -19764,7 +19831,10 @@
                         "update",
                         "loaded",
                         "bid",
-                        "win"
+                        "win",
+                        "additionalBid",
+                        "additionalBidWin",
+                        "clear"
                     ]
                 },
                 {
@@ -19773,7 +19843,7 @@
                     "type": "object",
                     "properties": [
                         {
-                            "name": "renderUrl",
+                            "name": "renderURL",
                             "type": "string"
                         },
                         {
@@ -19805,22 +19875,22 @@
                             "type": "string"
                         },
                         {
-                            "name": "biddingUrl",
+                            "name": "biddingLogicURL",
                             "optional": true,
                             "type": "string"
                         },
                         {
-                            "name": "biddingWasmHelperUrl",
+                            "name": "biddingWasmHelperURL",
                             "optional": true,
                             "type": "string"
                         },
                         {
-                            "name": "updateUrl",
+                            "name": "updateURL",
                             "optional": true,
                             "type": "string"
                         },
                         {
-                            "name": "trustedBiddingSignalsUrl",
+                            "name": "trustedBiddingSignalsURL",
                             "optional": true,
                             "type": "string"
                         },
@@ -23899,7 +23969,6 @@
                         "LowEndDevice",
                         "InvalidSchemeRedirect",
                         "InvalidSchemeNavigation",
-                        "InProgressNavigation",
                         "NavigationRequestBlockedByCsp",
                         "MainFrameNavigation",
                         "MojoBinderPolicy",
@@ -23911,7 +23980,6 @@
                         "NavigationBadHttpStatus",
                         "ClientCertRequested",
                         "NavigationRequestNetworkError",
-                        "MaxNumOfRunningPrerendersExceeded",
                         "CancelAllHostsForTesting",
                         "DidFailLoad",
                         "Stop",
@@ -23923,9 +23991,8 @@
                         "MixedContent",
                         "TriggerBackgrounded",
                         "MemoryLimitExceeded",
-                        "FailToGetMemoryUsage",
                         "DataSaverEnabled",
-                        "HasEffectiveUrl",
+                        "TriggerUrlHasEffectiveUrl",
                         "ActivatedBeforeStarted",
                         "InactivePageRestriction",
                         "StartFailed",
@@ -23956,7 +24023,13 @@
                         "PrerenderingDisabledByDevTools",
                         "ResourceLoadBlockedByClient",
                         "SpeculationRuleRemoved",
-                        "ActivatedWithAuxiliaryBrowsingContexts"
+                        "ActivatedWithAuxiliaryBrowsingContexts",
+                        "MaxNumOfRunningEagerPrerendersExceeded",
+                        "MaxNumOfRunningNonEagerPrerendersExceeded",
+                        "MaxNumOfRunningEmbedderPrerendersExceeded",
+                        "PrerenderingUrlHasEffectiveUrl",
+                        "RedirectedPrerenderingUrlHasEffectiveUrl",
+                        "ActivationUrlHasEffectiveUrl"
                     ]
                 },
                 {
@@ -24035,35 +24108,6 @@
                         {
                             "name": "id",
                             "$ref": "RuleSetId"
-                        }
-                    ]
-                },
-                {
-                    "name": "prerenderAttemptCompleted",
-                    "description": "Fired when a prerender attempt is completed.",
-                    "parameters": [
-                        {
-                            "name": "key",
-                            "$ref": "PreloadingAttemptKey"
-                        },
-                        {
-                            "name": "initiatingFrameId",
-                            "description": "The frame id of the frame initiating prerendering.",
-                            "$ref": "Page.FrameId"
-                        },
-                        {
-                            "name": "prerenderingUrl",
-                            "type": "string"
-                        },
-                        {
-                            "name": "finalStatus",
-                            "$ref": "PrerenderFinalStatus"
-                        },
-                        {
-                            "name": "disallowedApiMethod",
-                            "description": "This is used to give users more information about the name of the API call\nthat is incompatible with prerender and has caused the cancellation of the attempt",
-                            "optional": true,
-                            "type": "string"
                         }
                     ]
                 },
@@ -24189,7 +24233,7 @@
                     "enum": [
                         "AccountChooser",
                         "AutoReauthn",
-                        "ConfirmIdpSignin"
+                        "ConfirmIdpLogin"
                     ]
                 },
                 {
@@ -24222,7 +24266,7 @@
                             "type": "string"
                         },
                         {
-                            "name": "idpSigninUrl",
+                            "name": "idpLoginUrl",
                             "type": "string"
                         },
                         {
@@ -24304,8 +24348,8 @@
                     ]
                 },
                 {
-                    "name": "confirmIdpSignin",
-                    "description": "Only valid if the dialog type is ConfirmIdpSignin. Acts as if the user had\nclicked the continue button.",
+                    "name": "confirmIdpLogin",
+                    "description": "Only valid if the dialog type is ConfirmIdpLogin. Acts as if the user had\nclicked the continue button.",
                     "parameters": [
                         {
                             "name": "dialogId",
@@ -26492,7 +26536,7 @@
                 },
                 {
                     "id": "SerializationOptions",
-                    "description": "Represents options for serialization. Overrides `generatePreview`, `returnByValue` and\n`generateWebDriverValue`.",
+                    "description": "Represents options for serialization. Overrides `generatePreview` and `returnByValue`.",
                     "type": "object",
                     "properties": [
                         {
@@ -26549,7 +26593,8 @@
                                 "typedarray",
                                 "arraybuffer",
                                 "node",
-                                "window"
+                                "window",
+                                "generator"
                             ]
                         },
                         {
@@ -26650,13 +26695,6 @@
                             "description": "String representation of the object.",
                             "optional": true,
                             "type": "string"
-                        },
-                        {
-                            "name": "webDriverValue",
-                            "description": "Deprecated. Use `deepSerializedValue` instead. WebDriver BiDi representation of the value.",
-                            "deprecated": true,
-                            "optional": true,
-                            "$ref": "DeepSerializedValue"
                         },
                         {
                             "name": "deepSerializedValue",
@@ -27327,15 +27365,8 @@
                             "type": "string"
                         },
                         {
-                            "name": "generateWebDriverValue",
-                            "description": "Deprecated. Use `serializationOptions: {serialization:\"deep\"}` instead.\nWhether the result should contain `webDriverValue`, serialized according to\nhttps://w3c.github.io/webdriver-bidi. This is mutually exclusive with `returnByValue`, but\nresulting `objectId` is still provided.",
-                            "deprecated": true,
-                            "optional": true,
-                            "type": "boolean"
-                        },
-                        {
                             "name": "serializationOptions",
-                            "description": "Specifies the result serialization. If provided, overrides\n`generatePreview`, `returnByValue` and `generateWebDriverValue`.",
+                            "description": "Specifies the result serialization. If provided, overrides\n`generatePreview` and `returnByValue`.",
                             "experimental": true,
                             "optional": true,
                             "$ref": "SerializationOptions"
@@ -27509,15 +27540,8 @@
                             "type": "string"
                         },
                         {
-                            "name": "generateWebDriverValue",
-                            "description": "Deprecated. Use `serializationOptions: {serialization:\"deep\"}` instead.\nWhether the result should contain `webDriverValue`, serialized\naccording to\nhttps://w3c.github.io/webdriver-bidi. This is mutually exclusive with `returnByValue`, but\nresulting `objectId` is still provided.",
-                            "deprecated": true,
-                            "optional": true,
-                            "type": "boolean"
-                        },
-                        {
                             "name": "serializationOptions",
-                            "description": "Specifies the result serialization. If provided, overrides\n`generatePreview`, `returnByValue` and `generateWebDriverValue`.",
+                            "description": "Specifies the result serialization. If provided, overrides\n`generatePreview` and `returnByValue`.",
                             "experimental": true,
                             "optional": true,
                             "$ref": "SerializationOptions"

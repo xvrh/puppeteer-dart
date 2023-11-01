@@ -32,10 +32,10 @@ class FedCmApi {
     });
   }
 
-  /// Only valid if the dialog type is ConfirmIdpSignin. Acts as if the user had
+  /// Only valid if the dialog type is ConfirmIdpLogin. Acts as if the user had
   /// clicked the continue button.
-  Future<void> confirmIdpSignin(String dialogId) async {
-    await _client.send('FedCm.confirmIdpSignin', {
+  Future<void> confirmIdpLogin(String dialogId) async {
+    await _client.send('FedCm.confirmIdpLogin', {
       'dialogId': dialogId,
     });
   }
@@ -112,7 +112,7 @@ enum LoginState {
 enum DialogType {
   accountChooser('AccountChooser'),
   autoReauthn('AutoReauthn'),
-  confirmIdpSignin('ConfirmIdpSignin'),
+  confirmIdpLogin('ConfirmIdpLogin'),
   ;
 
   final String value;
@@ -142,7 +142,7 @@ class Account {
 
   final String idpConfigUrl;
 
-  final String idpSigninUrl;
+  final String idpLoginUrl;
 
   final LoginState loginState;
 
@@ -158,7 +158,7 @@ class Account {
       required this.givenName,
       required this.pictureUrl,
       required this.idpConfigUrl,
-      required this.idpSigninUrl,
+      required this.idpLoginUrl,
       required this.loginState,
       this.termsOfServiceUrl,
       this.privacyPolicyUrl});
@@ -171,7 +171,7 @@ class Account {
       givenName: json['givenName'] as String,
       pictureUrl: json['pictureUrl'] as String,
       idpConfigUrl: json['idpConfigUrl'] as String,
-      idpSigninUrl: json['idpSigninUrl'] as String,
+      idpLoginUrl: json['idpLoginUrl'] as String,
       loginState: LoginState.fromJson(json['loginState'] as String),
       termsOfServiceUrl: json.containsKey('termsOfServiceUrl')
           ? json['termsOfServiceUrl'] as String
@@ -190,7 +190,7 @@ class Account {
       'givenName': givenName,
       'pictureUrl': pictureUrl,
       'idpConfigUrl': idpConfigUrl,
-      'idpSigninUrl': idpSigninUrl,
+      'idpLoginUrl': idpLoginUrl,
       'loginState': loginState.toJson(),
       if (termsOfServiceUrl != null) 'termsOfServiceUrl': termsOfServiceUrl,
       if (privacyPolicyUrl != null) 'privacyPolicyUrl': privacyPolicyUrl,
