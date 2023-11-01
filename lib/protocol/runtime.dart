@@ -96,7 +96,7 @@ class RuntimeApi {
   /// boundaries).
   /// This is mutually exclusive with `executionContextId`.
   /// [serializationOptions] Specifies the result serialization. If provided, overrides
-  /// `generatePreview`, `returnByValue` and `generateWebDriverValue`.
+  /// `generatePreview` and `returnByValue`.
   Future<CallFunctionOnResult> callFunctionOn(String functionDeclaration,
       {RemoteObjectId? objectId,
       List<CallArgument>? arguments,
@@ -109,8 +109,6 @@ class RuntimeApi {
       String? objectGroup,
       bool? throwOnSideEffect,
       String? uniqueContextId,
-      @Deprecated('Use `serializationOptions: {serialization:"deep"}` instead')
-      bool? generateWebDriverValue,
       SerializationOptions? serializationOptions}) async {
     var result = await _client.send('Runtime.callFunctionOn', {
       'functionDeclaration': functionDeclaration,
@@ -125,8 +123,6 @@ class RuntimeApi {
       if (objectGroup != null) 'objectGroup': objectGroup,
       if (throwOnSideEffect != null) 'throwOnSideEffect': throwOnSideEffect,
       if (uniqueContextId != null) 'uniqueContextId': uniqueContextId,
-      if (generateWebDriverValue != null)
-        'generateWebDriverValue': generateWebDriverValue,
       if (serializationOptions != null)
         'serializationOptions': serializationOptions,
     });
@@ -202,7 +198,7 @@ class RuntimeApi {
   /// boundaries).
   /// This is mutually exclusive with `contextId`.
   /// [serializationOptions] Specifies the result serialization. If provided, overrides
-  /// `generatePreview`, `returnByValue` and `generateWebDriverValue`.
+  /// `generatePreview` and `returnByValue`.
   Future<EvaluateResult> evaluate(String expression,
       {String? objectGroup,
       bool? includeCommandLineAPI,
@@ -218,8 +214,6 @@ class RuntimeApi {
       bool? replMode,
       bool? allowUnsafeEvalBlockedByCSP,
       String? uniqueContextId,
-      @Deprecated('Use `serializationOptions: {serialization:"deep"}` instead')
-      bool? generateWebDriverValue,
       SerializationOptions? serializationOptions}) async {
     var result = await _client.send('Runtime.evaluate', {
       'expression': expression,
@@ -239,8 +233,6 @@ class RuntimeApi {
       if (allowUnsafeEvalBlockedByCSP != null)
         'allowUnsafeEvalBlockedByCSP': allowUnsafeEvalBlockedByCSP,
       if (uniqueContextId != null) 'uniqueContextId': uniqueContextId,
-      if (generateWebDriverValue != null)
-        'generateWebDriverValue': generateWebDriverValue,
       if (serializationOptions != null)
         'serializationOptions': serializationOptions,
     });
@@ -763,8 +755,7 @@ class ScriptId {
   String toString() => value.toString();
 }
 
-/// Represents options for serialization. Overrides `generatePreview`, `returnByValue` and
-/// `generateWebDriverValue`.
+/// Represents options for serialization. Overrides `generatePreview` and `returnByValue`.
 class SerializationOptions {
   final SerializationOptionsSerialization serialization;
 
@@ -886,6 +877,7 @@ enum DeepSerializedValueType {
   arraybuffer('arraybuffer'),
   node('node'),
   window('window'),
+  generator('generator'),
   ;
 
   final String value;

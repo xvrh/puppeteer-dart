@@ -1,3 +1,6 @@
+@Retry(3)
+library;
+
 import 'dart:async';
 import 'dart:io';
 import 'package:collection/collection.dart';

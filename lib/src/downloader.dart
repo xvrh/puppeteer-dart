@@ -4,7 +4,7 @@ import 'package:archive/archive.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 
-const _lastVersion = '118.0.5993.70';
+const _lastVersion = '119.0.6045.105';
 
 class DownloadedBrowserInfo {
   final String executablePath;

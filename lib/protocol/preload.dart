@@ -19,13 +19,6 @@ class PreloadApi {
       .where((event) => event.name == 'Preload.ruleSetRemoved')
       .map((event) => RuleSetId.fromJson(event.parameters['id'] as String));
 
-  /// Fired when a prerender attempt is completed.
-  Stream<PrerenderAttemptCompletedEvent> get onPrerenderAttemptCompleted =>
-      _client.onEvent
-          .where((event) => event.name == 'Preload.prerenderAttemptCompleted')
-          .map((event) =>
-              PrerenderAttemptCompletedEvent.fromJson(event.parameters));
-
   /// Fired when a preload enabled state is updated.
   Stream<PreloadEnabledStateUpdatedEvent> get onPreloadEnabledStateUpdated =>
       _client.onEvent
@@ -59,41 +52,6 @@ class PreloadApi {
 
   Future<void> disable() async {
     await _client.send('Preload.disable');
-  }
-}
-
-class PrerenderAttemptCompletedEvent {
-  final PreloadingAttemptKey key;
-
-  /// The frame id of the frame initiating prerendering.
-  final page.FrameId initiatingFrameId;
-
-  final String prerenderingUrl;
-
-  final PrerenderFinalStatus finalStatus;
-
-  /// This is used to give users more information about the name of the API call
-  /// that is incompatible with prerender and has caused the cancellation of the attempt
-  final String? disallowedApiMethod;
-
-  PrerenderAttemptCompletedEvent(
-      {required this.key,
-      required this.initiatingFrameId,
-      required this.prerenderingUrl,
-      required this.finalStatus,
-      this.disallowedApiMethod});
-
-  factory PrerenderAttemptCompletedEvent.fromJson(Map<String, dynamic> json) {
-    return PrerenderAttemptCompletedEvent(
-      key: PreloadingAttemptKey.fromJson(json['key'] as Map<String, dynamic>),
-      initiatingFrameId:
-          page.FrameId.fromJson(json['initiatingFrameId'] as String),
-      prerenderingUrl: json['prerenderingUrl'] as String,
-      finalStatus: PrerenderFinalStatus.fromJson(json['finalStatus'] as String),
-      disallowedApiMethod: json.containsKey('disallowedApiMethod')
-          ? json['disallowedApiMethod'] as String
-          : null,
-    );
   }
 }
 
@@ -455,7 +413,6 @@ enum PrerenderFinalStatus {
   lowEndDevice('LowEndDevice'),
   invalidSchemeRedirect('InvalidSchemeRedirect'),
   invalidSchemeNavigation('InvalidSchemeNavigation'),
-  inProgressNavigation('InProgressNavigation'),
   navigationRequestBlockedByCsp('NavigationRequestBlockedByCsp'),
   mainFrameNavigation('MainFrameNavigation'),
   mojoBinderPolicy('MojoBinderPolicy'),
@@ -467,7 +424,6 @@ enum PrerenderFinalStatus {
   navigationBadHttpStatus('NavigationBadHttpStatus'),
   clientCertRequested('ClientCertRequested'),
   navigationRequestNetworkError('NavigationRequestNetworkError'),
-  maxNumOfRunningPrerendersExceeded('MaxNumOfRunningPrerendersExceeded'),
   cancelAllHostsForTesting('CancelAllHostsForTesting'),
   didFailLoad('DidFailLoad'),
   stop('Stop'),
@@ -479,9 +435,8 @@ enum PrerenderFinalStatus {
   mixedContent('MixedContent'),
   triggerBackgrounded('TriggerBackgrounded'),
   memoryLimitExceeded('MemoryLimitExceeded'),
-  failToGetMemoryUsage('FailToGetMemoryUsage'),
   dataSaverEnabled('DataSaverEnabled'),
-  hasEffectiveUrl('HasEffectiveUrl'),
+  triggerUrlHasEffectiveUrl('TriggerUrlHasEffectiveUrl'),
   activatedBeforeStarted('ActivatedBeforeStarted'),
   inactivePageRestriction('InactivePageRestriction'),
   startFailed('StartFailed'),
@@ -525,6 +480,16 @@ enum PrerenderFinalStatus {
   speculationRuleRemoved('SpeculationRuleRemoved'),
   activatedWithAuxiliaryBrowsingContexts(
       'ActivatedWithAuxiliaryBrowsingContexts'),
+  maxNumOfRunningEagerPrerendersExceeded(
+      'MaxNumOfRunningEagerPrerendersExceeded'),
+  maxNumOfRunningNonEagerPrerendersExceeded(
+      'MaxNumOfRunningNonEagerPrerendersExceeded'),
+  maxNumOfRunningEmbedderPrerendersExceeded(
+      'MaxNumOfRunningEmbedderPrerendersExceeded'),
+  prerenderingUrlHasEffectiveUrl('PrerenderingUrlHasEffectiveUrl'),
+  redirectedPrerenderingUrlHasEffectiveUrl(
+      'RedirectedPrerenderingUrlHasEffectiveUrl'),
+  activationUrlHasEffectiveUrl('ActivationUrlHasEffectiveUrl'),
   ;
 
   final String value;

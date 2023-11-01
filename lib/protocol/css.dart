@@ -218,6 +218,18 @@ class CSSApi {
     });
   }
 
+  /// Modifies the property rule property name.
+  /// Returns: The resulting key text after modification.
+  Future<Value> setPropertyRulePropertyName(
+      StyleSheetId styleSheetId, SourceRange range, String propertyName) async {
+    var result = await _client.send('CSS.setPropertyRulePropertyName', {
+      'styleSheetId': styleSheetId,
+      'range': range,
+      'propertyName': propertyName,
+    });
+    return Value.fromJson(result['propertyName'] as Map<String, dynamic>);
+  }
+
   /// Modifies the keyframe rule key text.
   /// Returns: The resulting key text after modification.
   Future<Value> setKeyframeKey(
