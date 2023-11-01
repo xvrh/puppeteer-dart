@@ -1,3 +1,6 @@
+## 3.6.0
+- Update to Chrome 119.0.6045.105
+
 ## 3.5.1
 - Fix new lints from package:lints v3.0.0
 
