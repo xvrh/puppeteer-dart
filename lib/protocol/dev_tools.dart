@@ -109,10 +109,9 @@ class DevTools {
   DOMDebuggerApi get domDebugger => _domDebugger ??= DOMDebuggerApi(client);
   DOMDebuggerApi? _domDebugger;
 
-  /// EventBreakpoints permits setting breakpoints on particular operations and
-  /// events in targets that run JavaScript but do not have a DOM.
-  /// JavaScript execution will stop on these operations as if there was a regular
-  /// breakpoint set.
+  /// EventBreakpoints permits setting JavaScript breakpoints on operations and events
+  /// occurring in native code invoked from JavaScript. Once breakpoint is hit, it is
+  /// reported through Debugger domain, similarly to regular breakpoints being hit.
   EventBreakpointsApi get eventBreakpoints =>
       _eventBreakpoints ??= EventBreakpointsApi(client);
   EventBreakpointsApi? _eventBreakpoints;

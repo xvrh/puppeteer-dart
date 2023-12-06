@@ -325,6 +325,16 @@ class OverlayApi {
       'isolatedElementHighlightConfigs': [...isolatedElementHighlightConfigs],
     });
   }
+
+  /// Show Window Controls Overlay for PWA
+  /// [windowControlsOverlayConfig] Window Controls Overlay data, null means hide Window Controls Overlay
+  Future<void> setShowWindowControlsOverlay(
+      {WindowControlsOverlayConfig? windowControlsOverlayConfig}) async {
+    await _client.send('Overlay.setShowWindowControlsOverlay', {
+      if (windowControlsOverlayConfig != null)
+        'windowControlsOverlayConfig': windowControlsOverlayConfig,
+    });
+  }
 }
 
 /// Configuration data for drawing the source order of an elements children.
@@ -1097,6 +1107,39 @@ class HingeConfig {
       'rect': rect.toJson(),
       if (contentColor != null) 'contentColor': contentColor!.toJson(),
       if (outlineColor != null) 'outlineColor': outlineColor!.toJson(),
+    };
+  }
+}
+
+/// Configuration for Window Controls Overlay
+class WindowControlsOverlayConfig {
+  /// Whether the title bar CSS should be shown when emulating the Window Controls Overlay.
+  final bool showCSS;
+
+  /// Seleted platforms to show the overlay.
+  final String selectedPlatform;
+
+  /// The theme color defined in app manifest.
+  final String themeColor;
+
+  WindowControlsOverlayConfig(
+      {required this.showCSS,
+      required this.selectedPlatform,
+      required this.themeColor});
+
+  factory WindowControlsOverlayConfig.fromJson(Map<String, dynamic> json) {
+    return WindowControlsOverlayConfig(
+      showCSS: json['showCSS'] as bool? ?? false,
+      selectedPlatform: json['selectedPlatform'] as String,
+      themeColor: json['themeColor'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'showCSS': showCSS,
+      'selectedPlatform': selectedPlatform,
+      'themeColor': themeColor,
     };
   }
 }

@@ -203,6 +203,8 @@ enum CookieWarningReason {
   warnAttributeValueExceedsMaxSize('WarnAttributeValueExceedsMaxSize'),
   warnDomainNonAscii('WarnDomainNonASCII'),
   warnThirdPartyPhaseout('WarnThirdPartyPhaseout'),
+  warnCrossSiteRedirectDowngradeChangesInclusion(
+      'WarnCrossSiteRedirectDowngradeChangesInclusion'),
   ;
 
   final String value;
@@ -1147,6 +1149,31 @@ class BounceTrackingIssueDetails {
   }
 }
 
+/// This issue warns about third-party sites that are accessing cookies on the
+/// current page, and have been permitted due to having a global metadata grant.
+/// Note that in this context 'site' means eTLD+1. For example, if the URL
+/// `https://example.test:80/web_page` was accessing cookies, the site reported
+/// would be `example.test`.
+class CookieDeprecationMetadataIssueDetails {
+  final List<String> allowedSites;
+
+  CookieDeprecationMetadataIssueDetails({required this.allowedSites});
+
+  factory CookieDeprecationMetadataIssueDetails.fromJson(
+      Map<String, dynamic> json) {
+    return CookieDeprecationMetadataIssueDetails(
+      allowedSites:
+          (json['allowedSites'] as List).map((e) => e as String).toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'allowedSites': [...allowedSites],
+    };
+  }
+}
+
 enum ClientHintIssueReason {
   metaTagAllowListInvalidOrigin('MetaTagAllowListInvalidOrigin'),
   metaTagModifiedHtml('MetaTagModifiedHTML'),
@@ -1219,6 +1246,8 @@ enum FederatedAuthRequestIssueReason {
   idTokenHttpNotFound('IdTokenHttpNotFound'),
   idTokenNoResponse('IdTokenNoResponse'),
   idTokenInvalidResponse('IdTokenInvalidResponse'),
+  idTokenIdpErrorResponse('IdTokenIdpErrorResponse'),
+  idTokenCrossSiteIdpErrorResponse('IdTokenCrossSiteIdpErrorResponse'),
   idTokenInvalidRequest('IdTokenInvalidRequest'),
   idTokenInvalidContentType('IdTokenInvalidContentType'),
   errorIdToken('ErrorIdToken'),
@@ -1226,6 +1255,7 @@ enum FederatedAuthRequestIssueReason {
   rpPageNotVisible('RpPageNotVisible'),
   silentMediationFailure('SilentMediationFailure'),
   thirdPartyCookiesBlocked('ThirdPartyCookiesBlocked'),
+  notSignedInWithIdp('NotSignedInWithIdp'),
   ;
 
   final String value;
@@ -1488,6 +1518,7 @@ enum InspectorIssueCode {
   clientHintIssue('ClientHintIssue'),
   federatedAuthRequestIssue('FederatedAuthRequestIssue'),
   bounceTrackingIssue('BounceTrackingIssue'),
+  cookieDeprecationMetadataIssue('CookieDeprecationMetadataIssue'),
   stylesheetLoadingIssue('StylesheetLoadingIssue'),
   federatedAuthUserInfoRequestIssue('FederatedAuthUserInfoRequestIssue'),
   propertyRuleIssue('PropertyRuleIssue'),
@@ -1540,6 +1571,9 @@ class InspectorIssueDetails {
 
   final BounceTrackingIssueDetails? bounceTrackingIssueDetails;
 
+  final CookieDeprecationMetadataIssueDetails?
+      cookieDeprecationMetadataIssueDetails;
+
   final StylesheetLoadingIssueDetails? stylesheetLoadingIssueDetails;
 
   final PropertyRuleIssueDetails? propertyRuleIssueDetails;
@@ -1563,6 +1597,7 @@ class InspectorIssueDetails {
       this.clientHintIssueDetails,
       this.federatedAuthRequestIssueDetails,
       this.bounceTrackingIssueDetails,
+      this.cookieDeprecationMetadataIssueDetails,
       this.stylesheetLoadingIssueDetails,
       this.propertyRuleIssueDetails,
       this.federatedAuthUserInfoRequestIssueDetails});
@@ -1635,6 +1670,12 @@ class InspectorIssueDetails {
           ? BounceTrackingIssueDetails.fromJson(
               json['bounceTrackingIssueDetails'] as Map<String, dynamic>)
           : null,
+      cookieDeprecationMetadataIssueDetails:
+          json.containsKey('cookieDeprecationMetadataIssueDetails')
+              ? CookieDeprecationMetadataIssueDetails.fromJson(
+                  json['cookieDeprecationMetadataIssueDetails']
+                      as Map<String, dynamic>)
+              : null,
       stylesheetLoadingIssueDetails:
           json.containsKey('stylesheetLoadingIssueDetails')
               ? StylesheetLoadingIssueDetails.fromJson(
@@ -1690,6 +1731,9 @@ class InspectorIssueDetails {
             federatedAuthRequestIssueDetails!.toJson(),
       if (bounceTrackingIssueDetails != null)
         'bounceTrackingIssueDetails': bounceTrackingIssueDetails!.toJson(),
+      if (cookieDeprecationMetadataIssueDetails != null)
+        'cookieDeprecationMetadataIssueDetails':
+            cookieDeprecationMetadataIssueDetails!.toJson(),
       if (stylesheetLoadingIssueDetails != null)
         'stylesheetLoadingIssueDetails':
             stylesheetLoadingIssueDetails!.toJson(),

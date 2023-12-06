@@ -1293,20 +1293,35 @@ class AttributionReportingEventReportWindows {
   }
 }
 
+enum AttributionReportingTriggerDataMatching {
+  exact('exact'),
+  modulus('modulus'),
+  ;
+
+  final String value;
+
+  const AttributionReportingTriggerDataMatching(this.value);
+
+  factory AttributionReportingTriggerDataMatching.fromJson(String value) =>
+      AttributionReportingTriggerDataMatching.values
+          .firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
 class AttributionReportingSourceRegistration {
   final network.TimeSinceEpoch time;
 
   /// duration in seconds
-  final int? expiry;
+  final int expiry;
 
-  /// eventReportWindow and eventReportWindows are mutually exclusive
-  /// duration in seconds
-  final int? eventReportWindow;
-
-  final AttributionReportingEventReportWindows? eventReportWindows;
+  final AttributionReportingEventReportWindows eventReportWindows;
 
   /// duration in seconds
-  final int? aggregatableReportWindow;
+  final int aggregatableReportWindow;
 
   final AttributionReportingSourceType type;
 
@@ -1326,12 +1341,13 @@ class AttributionReportingSourceRegistration {
 
   final UnsignedInt64AsBase10? debugKey;
 
+  final AttributionReportingTriggerDataMatching triggerDataMatching;
+
   AttributionReportingSourceRegistration(
       {required this.time,
-      this.expiry,
-      this.eventReportWindow,
-      this.eventReportWindows,
-      this.aggregatableReportWindow,
+      required this.expiry,
+      required this.eventReportWindows,
+      required this.aggregatableReportWindow,
       required this.type,
       required this.sourceOrigin,
       required this.reportingOrigin,
@@ -1340,23 +1356,17 @@ class AttributionReportingSourceRegistration {
       required this.priority,
       required this.filterData,
       required this.aggregationKeys,
-      this.debugKey});
+      this.debugKey,
+      required this.triggerDataMatching});
 
   factory AttributionReportingSourceRegistration.fromJson(
       Map<String, dynamic> json) {
     return AttributionReportingSourceRegistration(
       time: network.TimeSinceEpoch.fromJson(json['time'] as num),
-      expiry: json.containsKey('expiry') ? json['expiry'] as int : null,
-      eventReportWindow: json.containsKey('eventReportWindow')
-          ? json['eventReportWindow'] as int
-          : null,
-      eventReportWindows: json.containsKey('eventReportWindows')
-          ? AttributionReportingEventReportWindows.fromJson(
-              json['eventReportWindows'] as Map<String, dynamic>)
-          : null,
-      aggregatableReportWindow: json.containsKey('aggregatableReportWindow')
-          ? json['aggregatableReportWindow'] as int
-          : null,
+      expiry: json['expiry'] as int,
+      eventReportWindows: AttributionReportingEventReportWindows.fromJson(
+          json['eventReportWindows'] as Map<String, dynamic>),
+      aggregatableReportWindow: json['aggregatableReportWindow'] as int,
       type: AttributionReportingSourceType.fromJson(json['type'] as String),
       sourceOrigin: json['sourceOrigin'] as String,
       reportingOrigin: json['reportingOrigin'] as String,
@@ -1375,12 +1385,17 @@ class AttributionReportingSourceRegistration {
       debugKey: json.containsKey('debugKey')
           ? UnsignedInt64AsBase10.fromJson(json['debugKey'] as String)
           : null,
+      triggerDataMatching: AttributionReportingTriggerDataMatching.fromJson(
+          json['triggerDataMatching'] as String),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'time': time.toJson(),
+      'expiry': expiry,
+      'eventReportWindows': eventReportWindows.toJson(),
+      'aggregatableReportWindow': aggregatableReportWindow,
       'type': type.toJson(),
       'sourceOrigin': sourceOrigin,
       'reportingOrigin': reportingOrigin,
@@ -1389,12 +1404,7 @@ class AttributionReportingSourceRegistration {
       'priority': priority.toJson(),
       'filterData': filterData.map((e) => e.toJson()).toList(),
       'aggregationKeys': aggregationKeys.map((e) => e.toJson()).toList(),
-      if (expiry != null) 'expiry': expiry,
-      if (eventReportWindow != null) 'eventReportWindow': eventReportWindow,
-      if (eventReportWindows != null)
-        'eventReportWindows': eventReportWindows!.toJson(),
-      if (aggregatableReportWindow != null)
-        'aggregatableReportWindow': aggregatableReportWindow,
+      'triggerDataMatching': triggerDataMatching.toJson(),
       if (debugKey != null) 'debugKey': debugKey!.toJson(),
     };
   }

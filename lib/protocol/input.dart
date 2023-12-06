@@ -159,8 +159,8 @@ class InputApi {
       int? clickCount,
       num? force,
       num? tangentialPressure,
-      int? tiltX,
-      int? tiltY,
+      num? tiltX,
+      num? tiltY,
       int? twist,
       num? deltaX,
       num? deltaY,
@@ -377,10 +377,10 @@ class TouchPoint {
   final num? tangentialPressure;
 
   /// The plane angle between the Y-Z plane and the plane containing both the stylus axis and the Y axis, in degrees of the range [-90,90], a positive tiltX is to the right (default: 0)
-  final int? tiltX;
+  final num? tiltX;
 
   /// The plane angle between the X-Z plane and the plane containing both the stylus axis and the X axis, in degrees of the range [-90,90], a positive tiltY is towards the user (default: 0).
-  final int? tiltY;
+  final num? tiltY;
 
   /// The clockwise rotation of a pen stylus around its own major axis, in degrees in the range [0,359] (default: 0).
   final int? twist;
@@ -414,8 +414,8 @@ class TouchPoint {
       tangentialPressure: json.containsKey('tangentialPressure')
           ? json['tangentialPressure'] as num
           : null,
-      tiltX: json.containsKey('tiltX') ? json['tiltX'] as int : null,
-      tiltY: json.containsKey('tiltY') ? json['tiltY'] as int : null,
+      tiltX: json.containsKey('tiltX') ? json['tiltX'] as num : null,
+      tiltY: json.containsKey('tiltY') ? json['tiltY'] as num : null,
       twist: json.containsKey('twist') ? json['twist'] as int : null,
       id: json.containsKey('id') ? json['id'] as num : null,
     );

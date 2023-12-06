@@ -1011,7 +1011,8 @@
                         "WarnSameSiteLaxCrossDowngradeLax",
                         "WarnAttributeValueExceedsMaxSize",
                         "WarnDomainNonASCII",
-                        "WarnThirdPartyPhaseout"
+                        "WarnThirdPartyPhaseout",
+                        "WarnCrossSiteRedirectDowngradeChangesInclusion"
                     ]
                 },
                 {
@@ -1582,6 +1583,20 @@
                     ]
                 },
                 {
+                    "id": "CookieDeprecationMetadataIssueDetails",
+                    "description": "This issue warns about third-party sites that are accessing cookies on the\ncurrent page, and have been permitted due to having a global metadata grant.\nNote that in this context 'site' means eTLD+1. For example, if the URL\n`https://example.test:80/web_page` was accessing cookies, the site reported\nwould be `example.test`.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "allowedSites",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "ClientHintIssueReason",
                     "type": "string",
                     "enum": [
@@ -1632,13 +1647,16 @@
                         "IdTokenHttpNotFound",
                         "IdTokenNoResponse",
                         "IdTokenInvalidResponse",
+                        "IdTokenIdpErrorResponse",
+                        "IdTokenCrossSiteIdpErrorResponse",
                         "IdTokenInvalidRequest",
                         "IdTokenInvalidContentType",
                         "ErrorIdToken",
                         "Canceled",
                         "RpPageNotVisible",
                         "SilentMediationFailure",
-                        "ThirdPartyCookiesBlocked"
+                        "ThirdPartyCookiesBlocked",
+                        "NotSignedInWithIdp"
                     ]
                 },
                 {
@@ -1788,6 +1806,7 @@
                         "ClientHintIssue",
                         "FederatedAuthRequestIssue",
                         "BounceTrackingIssue",
+                        "CookieDeprecationMetadataIssue",
                         "StylesheetLoadingIssue",
                         "FederatedAuthUserInfoRequestIssue",
                         "PropertyRuleIssue"
@@ -1878,6 +1897,11 @@
                             "name": "bounceTrackingIssueDetails",
                             "optional": true,
                             "$ref": "BounceTrackingIssueDetails"
+                        },
+                        {
+                            "name": "cookieDeprecationMetadataIssueDetails",
+                            "optional": true,
+                            "$ref": "CookieDeprecationMetadataIssueDetails"
                         },
                         {
                             "name": "stylesheetLoadingIssueDetails",
@@ -6980,7 +7004,6 @@
             "description": "DOM debugging allows setting breakpoints on particular DOM operations and events. JavaScript\nexecution will stop on these operations as if there was a regular breakpoint set.",
             "dependencies": [
                 "DOM",
-                "Debugger",
                 "Runtime"
             ],
             "types": [
@@ -7137,6 +7160,8 @@
                     "name": "removeInstrumentationBreakpoint",
                     "description": "Removes breakpoint on particular native event.",
                     "experimental": true,
+                    "deprecated": true,
+                    "redirect": "EventBreakpoints",
                     "parameters": [
                         {
                             "name": "eventName",
@@ -7209,6 +7234,8 @@
                     "name": "setInstrumentationBreakpoint",
                     "description": "Sets breakpoint on particular native event.",
                     "experimental": true,
+                    "deprecated": true,
+                    "redirect": "EventBreakpoints",
                     "parameters": [
                         {
                             "name": "eventName",
@@ -7232,7 +7259,7 @@
         },
         {
             "domain": "EventBreakpoints",
-            "description": "EventBreakpoints permits setting breakpoints on particular operations and\nevents in targets that run JavaScript but do not have a DOM.\nJavaScript execution will stop on these operations as if there was a regular\nbreakpoint set.",
+            "description": "EventBreakpoints permits setting JavaScript breakpoints on operations and events\noccurring in native code invoked from JavaScript. Once breakpoint is hit, it is\nreported through Debugger domain, similarly to regular breakpoints being hit.",
             "experimental": true,
             "commands": [
                 {
@@ -7256,6 +7283,10 @@
                             "type": "string"
                         }
                     ]
+                },
+                {
+                    "name": "disable",
+                    "description": "Removes all breakpoints"
                 }
             ]
         },
@@ -8605,6 +8636,120 @@
                     ]
                 },
                 {
+                    "id": "SensorType",
+                    "description": "Used to specify sensor types to emulate.\nSee https://w3c.github.io/sensors/#automation for more information.",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "absolute-orientation",
+                        "accelerometer",
+                        "ambient-light",
+                        "gravity",
+                        "gyroscope",
+                        "linear-acceleration",
+                        "magnetometer",
+                        "proximity",
+                        "relative-orientation"
+                    ]
+                },
+                {
+                    "id": "SensorMetadata",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "available",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "minimumFrequency",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "maximumFrequency",
+                            "optional": true,
+                            "type": "number"
+                        }
+                    ]
+                },
+                {
+                    "id": "SensorReadingSingle",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "value",
+                            "type": "number"
+                        }
+                    ]
+                },
+                {
+                    "id": "SensorReadingXYZ",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "x",
+                            "type": "number"
+                        },
+                        {
+                            "name": "y",
+                            "type": "number"
+                        },
+                        {
+                            "name": "z",
+                            "type": "number"
+                        }
+                    ]
+                },
+                {
+                    "id": "SensorReadingQuaternion",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "x",
+                            "type": "number"
+                        },
+                        {
+                            "name": "y",
+                            "type": "number"
+                        },
+                        {
+                            "name": "z",
+                            "type": "number"
+                        },
+                        {
+                            "name": "w",
+                            "type": "number"
+                        }
+                    ]
+                },
+                {
+                    "id": "SensorReading",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "single",
+                            "optional": true,
+                            "$ref": "SensorReadingSingle"
+                        },
+                        {
+                            "name": "xyz",
+                            "optional": true,
+                            "$ref": "SensorReadingXYZ"
+                        },
+                        {
+                            "name": "quaternion",
+                            "optional": true,
+                            "$ref": "SensorReadingQuaternion"
+                        }
+                    ]
+                },
+                {
                     "id": "DisabledImageType",
                     "description": "Enum of image types that can be disabled.",
                     "experimental": true,
@@ -8883,6 +9028,57 @@
                             "description": "Mock accuracy",
                             "optional": true,
                             "type": "number"
+                        }
+                    ]
+                },
+                {
+                    "name": "getOverriddenSensorInformation",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "type",
+                            "$ref": "SensorType"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "requestedSamplingFrequency",
+                            "type": "number"
+                        }
+                    ]
+                },
+                {
+                    "name": "setSensorOverrideEnabled",
+                    "description": "Overrides a platform sensor of a given type. If |enabled| is true, calls to\nSensor.start() will use a virtual sensor as backend rather than fetching\ndata from a real hardware sensor. Otherwise, existing virtual\nsensor-backend Sensor objects will fire an error event and new calls to\nSensor.start() will attempt to use a real sensor instead.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "enabled",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "type",
+                            "$ref": "SensorType"
+                        },
+                        {
+                            "name": "metadata",
+                            "optional": true,
+                            "$ref": "SensorMetadata"
+                        }
+                    ]
+                },
+                {
+                    "name": "setSensorOverrideReadings",
+                    "description": "Updates the sensor readings reported by a sensor type previously overriden\nby setSensorOverrideEnabled.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "type",
+                            "$ref": "SensorType"
+                        },
+                        {
+                            "name": "reading",
+                            "$ref": "SensorReading"
                         }
                     ]
                 },
@@ -9862,16 +10058,14 @@
                         {
                             "name": "tiltX",
                             "description": "The plane angle between the Y-Z plane and the plane containing both the stylus axis and the Y axis, in degrees of the range [-90,90], a positive tiltX is to the right (default: 0)",
-                            "experimental": true,
                             "optional": true,
-                            "type": "integer"
+                            "type": "number"
                         },
                         {
                             "name": "tiltY",
                             "description": "The plane angle between the X-Z plane and the plane containing both the stylus axis and the X axis, in degrees of the range [-90,90], a positive tiltY is towards the user (default: 0).",
-                            "experimental": true,
                             "optional": true,
-                            "type": "integer"
+                            "type": "number"
                         },
                         {
                             "name": "twist",
@@ -10235,16 +10429,14 @@
                         {
                             "name": "tiltX",
                             "description": "The plane angle between the Y-Z plane and the plane containing both the stylus axis and the Y axis, in degrees of the range [-90,90], a positive tiltX is to the right (default: 0).",
-                            "experimental": true,
                             "optional": true,
-                            "type": "integer"
+                            "type": "number"
                         },
                         {
                             "name": "tiltY",
                             "description": "The plane angle between the X-Z plane and the plane containing both the stylus axis and the X axis, in degrees of the range [-90,90], a positive tiltY is towards the user (default: 0).",
-                            "experimental": true,
                             "optional": true,
-                            "type": "integer"
+                            "type": "number"
                         },
                         {
                             "name": "twist",
@@ -15275,6 +15467,28 @@
                     ]
                 },
                 {
+                    "id": "WindowControlsOverlayConfig",
+                    "description": "Configuration for Window Controls Overlay",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "showCSS",
+                            "description": "Whether the title bar CSS should be shown when emulating the Window Controls Overlay.",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "selectedPlatform",
+                            "description": "Seleted platforms to show the overlay.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "themeColor",
+                            "description": "The theme color defined in app manifest.",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
                     "id": "ContainerQueryHighlightConfig",
                     "type": "object",
                     "properties": [
@@ -15806,6 +16020,18 @@
                             "items": {
                                 "$ref": "IsolatedElementHighlightConfig"
                             }
+                        }
+                    ]
+                },
+                {
+                    "name": "setShowWindowControlsOverlay",
+                    "description": "Show Window Controls Overlay for PWA",
+                    "parameters": [
+                        {
+                            "name": "windowControlsOverlayConfig",
+                            "description": "Window Controls Overlay data, null means hide Window Controls Overlay",
+                            "optional": true,
+                            "$ref": "WindowControlsOverlayConfig"
                         }
                     ]
                 }
@@ -17013,6 +17239,35 @@
                     ]
                 },
                 {
+                    "id": "BackForwardCacheBlockingDetails",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "url",
+                            "description": "Url of the file where blockage happened. Optional because of tests.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "function",
+                            "description": "Function name where blockage happened. Optional because of anonymous functions and tests.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "lineNumber",
+                            "description": "Line number in the script (0-based).",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "columnNumber",
+                            "description": "Column number in the script (0-based).",
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
                     "id": "BackForwardCacheNotRestoredExplanation",
                     "experimental": true,
                     "type": "object",
@@ -17032,6 +17287,14 @@
                             "description": "Context associated with the reason. The meaning of this context is\ndependent on the reason:\n- EmbedderExtensionSentMessageToCachedFrame: the extension ID.",
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "details",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "BackForwardCacheBlockingDetails"
+                            }
                         }
                     ]
                 },
@@ -20199,6 +20462,15 @@
                     ]
                 },
                 {
+                    "id": "AttributionReportingTriggerDataMatching",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "exact",
+                        "modulus"
+                    ]
+                },
+                {
                     "id": "AttributionReportingSourceRegistration",
                     "experimental": true,
                     "type": "object",
@@ -20210,24 +20482,15 @@
                         {
                             "name": "expiry",
                             "description": "duration in seconds",
-                            "optional": true,
-                            "type": "integer"
-                        },
-                        {
-                            "name": "eventReportWindow",
-                            "description": "eventReportWindow and eventReportWindows are mutually exclusive\nduration in seconds",
-                            "optional": true,
                             "type": "integer"
                         },
                         {
                             "name": "eventReportWindows",
-                            "optional": true,
                             "$ref": "AttributionReportingEventReportWindows"
                         },
                         {
                             "name": "aggregatableReportWindow",
                             "description": "duration in seconds",
-                            "optional": true,
                             "type": "integer"
                         },
                         {
@@ -20275,6 +20538,10 @@
                             "name": "debugKey",
                             "optional": true,
                             "$ref": "UnsignedInt64AsBase10"
+                        },
+                        {
+                            "name": "triggerDataMatching",
+                            "$ref": "AttributionReportingTriggerDataMatching"
                         }
                     ]
                 },
@@ -24021,7 +24288,6 @@
                         "MemoryPressureOnTrigger",
                         "MemoryPressureAfterTriggered",
                         "PrerenderingDisabledByDevTools",
-                        "ResourceLoadBlockedByClient",
                         "SpeculationRuleRemoved",
                         "ActivatedWithAuxiliaryBrowsingContexts",
                         "MaxNumOfRunningEagerPrerendersExceeded",

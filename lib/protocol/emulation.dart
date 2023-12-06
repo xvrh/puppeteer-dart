@@ -197,6 +197,38 @@ class EmulationApi {
     });
   }
 
+  Future<num> getOverriddenSensorInformation(SensorType type) async {
+    var result =
+        await _client.send('Emulation.getOverriddenSensorInformation', {
+      'type': type,
+    });
+    return result['requestedSamplingFrequency'] as num;
+  }
+
+  /// Overrides a platform sensor of a given type. If |enabled| is true, calls to
+  /// Sensor.start() will use a virtual sensor as backend rather than fetching
+  /// data from a real hardware sensor. Otherwise, existing virtual
+  /// sensor-backend Sensor objects will fire an error event and new calls to
+  /// Sensor.start() will attempt to use a real sensor instead.
+  Future<void> setSensorOverrideEnabled(bool enabled, SensorType type,
+      {SensorMetadata? metadata}) async {
+    await _client.send('Emulation.setSensorOverrideEnabled', {
+      'enabled': enabled,
+      'type': type,
+      if (metadata != null) 'metadata': metadata,
+    });
+  }
+
+  /// Updates the sensor readings reported by a sensor type previously overriden
+  /// by setSensorOverrideEnabled.
+  Future<void> setSensorOverrideReadings(
+      SensorType type, SensorReading reading) async {
+    await _client.send('Emulation.setSensorOverrideReadings', {
+      'type': type,
+      'reading': reading,
+    });
+  }
+
   /// Overrides the Idle state.
   /// [isUserActive] Mock isUserActive
   /// [isScreenUnlocked] Mock isScreenUnlocked
@@ -578,6 +610,173 @@ class UserAgentMetadata {
         'fullVersionList': fullVersionList!.map((e) => e.toJson()).toList(),
       if (bitness != null) 'bitness': bitness,
       if (wow64 != null) 'wow64': wow64,
+    };
+  }
+}
+
+/// Used to specify sensor types to emulate.
+/// See https://w3c.github.io/sensors/#automation for more information.
+enum SensorType {
+  absoluteOrientation('absolute-orientation'),
+  accelerometer('accelerometer'),
+  ambientLight('ambient-light'),
+  gravity('gravity'),
+  gyroscope('gyroscope'),
+  linearAcceleration('linear-acceleration'),
+  magnetometer('magnetometer'),
+  proximity('proximity'),
+  relativeOrientation('relative-orientation'),
+  ;
+
+  final String value;
+
+  const SensorType(this.value);
+
+  factory SensorType.fromJson(String value) =>
+      SensorType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+class SensorMetadata {
+  final bool? available;
+
+  final num? minimumFrequency;
+
+  final num? maximumFrequency;
+
+  SensorMetadata(
+      {this.available, this.minimumFrequency, this.maximumFrequency});
+
+  factory SensorMetadata.fromJson(Map<String, dynamic> json) {
+    return SensorMetadata(
+      available:
+          json.containsKey('available') ? json['available'] as bool : null,
+      minimumFrequency: json.containsKey('minimumFrequency')
+          ? json['minimumFrequency'] as num
+          : null,
+      maximumFrequency: json.containsKey('maximumFrequency')
+          ? json['maximumFrequency'] as num
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (available != null) 'available': available,
+      if (minimumFrequency != null) 'minimumFrequency': minimumFrequency,
+      if (maximumFrequency != null) 'maximumFrequency': maximumFrequency,
+    };
+  }
+}
+
+class SensorReadingSingle {
+  final num value;
+
+  SensorReadingSingle({required this.value});
+
+  factory SensorReadingSingle.fromJson(Map<String, dynamic> json) {
+    return SensorReadingSingle(
+      value: json['value'] as num,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'value': value,
+    };
+  }
+}
+
+class SensorReadingXYZ {
+  final num x;
+
+  final num y;
+
+  final num z;
+
+  SensorReadingXYZ({required this.x, required this.y, required this.z});
+
+  factory SensorReadingXYZ.fromJson(Map<String, dynamic> json) {
+    return SensorReadingXYZ(
+      x: json['x'] as num,
+      y: json['y'] as num,
+      z: json['z'] as num,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'x': x,
+      'y': y,
+      'z': z,
+    };
+  }
+}
+
+class SensorReadingQuaternion {
+  final num x;
+
+  final num y;
+
+  final num z;
+
+  final num w;
+
+  SensorReadingQuaternion(
+      {required this.x, required this.y, required this.z, required this.w});
+
+  factory SensorReadingQuaternion.fromJson(Map<String, dynamic> json) {
+    return SensorReadingQuaternion(
+      x: json['x'] as num,
+      y: json['y'] as num,
+      z: json['z'] as num,
+      w: json['w'] as num,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'x': x,
+      'y': y,
+      'z': z,
+      'w': w,
+    };
+  }
+}
+
+class SensorReading {
+  final SensorReadingSingle? single;
+
+  final SensorReadingXYZ? xyz;
+
+  final SensorReadingQuaternion? quaternion;
+
+  SensorReading({this.single, this.xyz, this.quaternion});
+
+  factory SensorReading.fromJson(Map<String, dynamic> json) {
+    return SensorReading(
+      single: json.containsKey('single')
+          ? SensorReadingSingle.fromJson(json['single'] as Map<String, dynamic>)
+          : null,
+      xyz: json.containsKey('xyz')
+          ? SensorReadingXYZ.fromJson(json['xyz'] as Map<String, dynamic>)
+          : null,
+      quaternion: json.containsKey('quaternion')
+          ? SensorReadingQuaternion.fromJson(
+              json['quaternion'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (single != null) 'single': single!.toJson(),
+      if (xyz != null) 'xyz': xyz!.toJson(),
+      if (quaternion != null) 'quaternion': quaternion!.toJson(),
     };
   }
 }
