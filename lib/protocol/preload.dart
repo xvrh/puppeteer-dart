@@ -476,7 +476,6 @@ enum PrerenderFinalStatus {
   memoryPressureOnTrigger('MemoryPressureOnTrigger'),
   memoryPressureAfterTriggered('MemoryPressureAfterTriggered'),
   prerenderingDisabledByDevTools('PrerenderingDisabledByDevTools'),
-  resourceLoadBlockedByClient('ResourceLoadBlockedByClient'),
   speculationRuleRemoved('SpeculationRuleRemoved'),
   activatedWithAuxiliaryBrowsingContexts(
       'ActivatedWithAuxiliaryBrowsingContexts'),

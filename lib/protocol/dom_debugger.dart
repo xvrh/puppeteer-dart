@@ -53,6 +53,7 @@ class DOMDebuggerApi {
 
   /// Removes breakpoint on particular native event.
   /// [eventName] Instrumentation name to stop on.
+  @Deprecated('This command is deprecated')
   Future<void> removeInstrumentationBreakpoint(String eventName) async {
     await _client.send('DOMDebugger.removeInstrumentationBreakpoint', {
       'eventName': eventName,
@@ -101,6 +102,7 @@ class DOMDebuggerApi {
 
   /// Sets breakpoint on particular native event.
   /// [eventName] Instrumentation name to stop on.
+  @Deprecated('This command is deprecated')
   Future<void> setInstrumentationBreakpoint(String eventName) async {
     await _client.send('DOMDebugger.setInstrumentationBreakpoint', {
       'eventName': eventName,

@@ -3062,6 +3062,45 @@ enum BackForwardCacheNotRestoredReasonType {
   String toString() => value.toString();
 }
 
+class BackForwardCacheBlockingDetails {
+  /// Url of the file where blockage happened. Optional because of tests.
+  final String? url;
+
+  /// Function name where blockage happened. Optional because of anonymous functions and tests.
+  final String? function;
+
+  /// Line number in the script (0-based).
+  final int lineNumber;
+
+  /// Column number in the script (0-based).
+  final int columnNumber;
+
+  BackForwardCacheBlockingDetails(
+      {this.url,
+      this.function,
+      required this.lineNumber,
+      required this.columnNumber});
+
+  factory BackForwardCacheBlockingDetails.fromJson(Map<String, dynamic> json) {
+    return BackForwardCacheBlockingDetails(
+      url: json.containsKey('url') ? json['url'] as String : null,
+      function:
+          json.containsKey('function') ? json['function'] as String : null,
+      lineNumber: json['lineNumber'] as int,
+      columnNumber: json['columnNumber'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'lineNumber': lineNumber,
+      'columnNumber': columnNumber,
+      if (url != null) 'url': url,
+      if (function != null) 'function': function,
+    };
+  }
+}
+
 class BackForwardCacheNotRestoredExplanation {
   /// Type of the reason
   final BackForwardCacheNotRestoredReasonType type;
@@ -3074,8 +3113,10 @@ class BackForwardCacheNotRestoredExplanation {
   /// - EmbedderExtensionSentMessageToCachedFrame: the extension ID.
   final String? context;
 
+  final List<BackForwardCacheBlockingDetails>? details;
+
   BackForwardCacheNotRestoredExplanation(
-      {required this.type, required this.reason, this.context});
+      {required this.type, required this.reason, this.context, this.details});
 
   factory BackForwardCacheNotRestoredExplanation.fromJson(
       Map<String, dynamic> json) {
@@ -3085,6 +3126,12 @@ class BackForwardCacheNotRestoredExplanation {
       reason:
           BackForwardCacheNotRestoredReason.fromJson(json['reason'] as String),
       context: json.containsKey('context') ? json['context'] as String : null,
+      details: json.containsKey('details')
+          ? (json['details'] as List)
+              .map((e) => BackForwardCacheBlockingDetails.fromJson(
+                  e as Map<String, dynamic>))
+              .toList()
+          : null,
     );
   }
 
@@ -3093,6 +3140,7 @@ class BackForwardCacheNotRestoredExplanation {
       'type': type.toJson(),
       'reason': reason.toJson(),
       if (context != null) 'context': context,
+      if (details != null) 'details': details!.map((e) => e.toJson()).toList(),
     };
   }
 }
