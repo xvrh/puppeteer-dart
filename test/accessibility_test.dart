@@ -53,7 +53,6 @@ void main() {
       await page.focus('[placeholder="Empty input"]');
       var golden =
           AXNode(role: 'RootWebArea', name: 'Accessibility Test', children: [
-        AXNode(role: 'StaticText', name: 'Hello World'),
         AXNode(role: 'heading', name: 'Inputs', level: 1),
         AXNode(role: 'textbox', name: 'Empty input', focused: true),
         AXNode(role: 'textbox', name: 'readonly input', readonly: true),
@@ -88,10 +87,12 @@ void main() {
           focused: true,
           multiLine: true,
           children: [
-            AXNode(
-                role: 'generic',
-                name: '',
-                children: [AXNode(role: 'StaticText', name: 'hi')])
+            AXNode(role: 'generic', name: '', children: [
+              AXNode(
+                  role: 'StaticText',
+                  name: 'hi',
+                  children: [AXNode(role: 'InlineTextBox', children: [])])
+            ])
           ]);
       expect(
           findFocusedNode(
@@ -151,7 +152,10 @@ void main() {
             name: '',
             value: 'Edit this image: ',
             children: [
-              AXNode(role: 'StaticText', name: 'Edit this image: '),
+              AXNode(
+                  role: 'StaticText',
+                  name: 'Edit this image: ',
+                  children: [AXNode(role: 'InlineTextBox', children: [])]),
               AXNode(role: 'image', name: 'my fake image')
             ]);
         var snapshot = await page.accessibility.snapshot();
@@ -168,7 +172,10 @@ void main() {
             name: '',
             value: 'Edit this image: ',
             children: [
-              AXNode(role: 'StaticText', name: 'Edit this image: '),
+              AXNode(
+                  role: 'StaticText',
+                  name: 'Edit this image: ',
+                  children: [AXNode(role: 'InlineTextBox', children: [])]),
             ],
             multiLine: true);
         var snapshot = await page.accessibility.snapshot();
@@ -290,7 +297,9 @@ void main() {
                     role: 'button',
                     name: 'My Button',
                     children: [
-                      AXNode(role: 'StaticText', name: 'My Button'),
+                      AXNode(role: 'StaticText', name: 'My Button', children: [
+                        AXNode(role: 'InlineTextBox', children: [])
+                      ]),
                     ],
                   ),
                 ],
