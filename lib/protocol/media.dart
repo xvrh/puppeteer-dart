@@ -121,44 +121,16 @@ class PlayerErrorsRaisedEvent {
 }
 
 /// Players will get an ID that is unique within the agent context.
-class PlayerId {
-  final String value;
-
-  PlayerId(this.value);
-
+extension type PlayerId(String value) {
   factory PlayerId.fromJson(String value) => PlayerId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is PlayerId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
-class Timestamp {
-  final num value;
-
-  Timestamp(this.value);
-
+extension type Timestamp(num value) {
   factory Timestamp.fromJson(num value) => Timestamp(value);
 
   num toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is Timestamp && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Have one type per entry in MediaLogRecord::Type

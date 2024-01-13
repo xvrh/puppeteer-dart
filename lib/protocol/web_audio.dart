@@ -280,24 +280,10 @@ class NodeParamDisconnectedEvent {
 }
 
 /// An unique ID for a graph object (AudioContext, AudioNode, AudioParam) in Web Audio API
-class GraphObjectId {
-  final String value;
-
-  GraphObjectId(this.value);
-
+extension type GraphObjectId(String value) {
   factory GraphObjectId.fromJson(String value) => GraphObjectId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is GraphObjectId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Enum of BaseAudioContext types
@@ -340,24 +326,10 @@ enum ContextState {
 }
 
 /// Enum of AudioNode types
-class NodeType {
-  final String value;
-
-  NodeType(this.value);
-
+extension type NodeType(String value) {
   factory NodeType.fromJson(String value) => NodeType(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is NodeType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Enum of AudioNode::ChannelCountMode from the spec
@@ -400,24 +372,10 @@ enum ChannelInterpretation {
 }
 
 /// Enum of AudioParam types
-class ParamType {
-  final String value;
-
-  ParamType(this.value);
-
+extension type ParamType(String value) {
   factory ParamType.fromJson(String value) => ParamType(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ParamType && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Enum of AudioParam::AutomationRate from the spec

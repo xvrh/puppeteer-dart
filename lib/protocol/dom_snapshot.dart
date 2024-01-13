@@ -516,46 +516,18 @@ class NameValue {
 }
 
 /// Index of the string in the strings table.
-class StringIndex {
-  final int value;
-
-  StringIndex(this.value);
-
+extension type StringIndex(int value) {
   factory StringIndex.fromJson(int value) => StringIndex(value);
 
   int toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is StringIndex && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Index of the string in the strings table.
-class ArrayOfStrings {
-  final List<StringIndex> value;
-
-  ArrayOfStrings(this.value);
-
+extension type ArrayOfStrings(List<StringIndex> value) {
   factory ArrayOfStrings.fromJson(List<dynamic> value) =>
       ArrayOfStrings(value.map((e) => StringIndex.fromJson(e as int)).toList());
 
   List<StringIndex> toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ArrayOfStrings && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Data that is only present on rare nodes.
@@ -623,25 +595,11 @@ class RareIntegerData {
   }
 }
 
-class Rectangle {
-  final List<num> value;
-
-  Rectangle(this.value);
-
+extension type Rectangle(List<num> value) {
   factory Rectangle.fromJson(List<dynamic> value) =>
       Rectangle(value.map((e) => e as num).toList());
 
   List<num> toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is Rectangle && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Document snapshot.

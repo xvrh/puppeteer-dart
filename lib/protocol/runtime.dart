@@ -735,24 +735,10 @@ class RunScriptResult {
 }
 
 /// Unique script identifier.
-class ScriptId {
-  final String value;
-
-  ScriptId(this.value);
-
+extension type ScriptId(String value) {
   factory ScriptId.fromJson(String value) => ScriptId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ScriptId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Represents options for serialization. Overrides `generatePreview` and `returnByValue`.
@@ -894,47 +880,19 @@ enum DeepSerializedValueType {
 }
 
 /// Unique object identifier.
-class RemoteObjectId {
-  final String value;
-
-  RemoteObjectId(this.value);
-
+extension type RemoteObjectId(String value) {
   factory RemoteObjectId.fromJson(String value) => RemoteObjectId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is RemoteObjectId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Primitive value which cannot be JSON-stringified. Includes values `-0`, `NaN`, `Infinity`,
 /// `-Infinity`, and bigint literals.
-class UnserializableValue {
-  final String value;
-
-  UnserializableValue(this.value);
-
+extension type UnserializableValue(String value) {
   factory UnserializableValue.fromJson(String value) =>
       UnserializableValue(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is UnserializableValue && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Mirror object referencing original JavaScript object.
@@ -1571,24 +1529,10 @@ class CallArgument {
 }
 
 /// Id of an execution context.
-class ExecutionContextId {
-  final int value;
-
-  ExecutionContextId(this.value);
-
+extension type ExecutionContextId(int value) {
   factory ExecutionContextId.fromJson(int value) => ExecutionContextId(value);
 
   int toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ExecutionContextId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Description of an isolated world.
@@ -1731,45 +1675,17 @@ class ExceptionDetails {
 }
 
 /// Number of milliseconds since epoch.
-class Timestamp {
-  final num value;
-
-  Timestamp(this.value);
-
+extension type Timestamp(num value) {
   factory Timestamp.fromJson(num value) => Timestamp(value);
 
   num toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is Timestamp && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Number of milliseconds.
-class TimeDelta {
-  final num value;
-
-  TimeDelta(this.value);
-
+extension type TimeDelta(num value) {
   factory TimeDelta.fromJson(num value) => TimeDelta(value);
 
   num toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is TimeDelta && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Stack entry for runtime errors and assertions.
@@ -1863,24 +1779,10 @@ class StackTraceData {
 }
 
 /// Unique identifier of current debugger.
-class UniqueDebuggerId {
-  final String value;
-
-  UniqueDebuggerId(this.value);
-
+extension type UniqueDebuggerId(String value) {
   factory UniqueDebuggerId.fromJson(String value) => UniqueDebuggerId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is UniqueDebuggerId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// If `debuggerId` is set stack trace comes from another debugger and can be resolved there. This

@@ -174,24 +174,10 @@ class CredentialAssertedEvent {
   }
 }
 
-class AuthenticatorId {
-  final String value;
-
-  AuthenticatorId(this.value);
-
+extension type AuthenticatorId(String value) {
   factory AuthenticatorId.fromJson(String value) => AuthenticatorId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is AuthenticatorId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 enum AuthenticatorProtocol {

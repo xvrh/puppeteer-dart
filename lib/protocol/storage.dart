@@ -574,25 +574,11 @@ class GetUsageAndQuotaResult {
   }
 }
 
-class SerializedStorageKey {
-  final String value;
-
-  SerializedStorageKey(this.value);
-
+extension type SerializedStorageKey(String value) {
   factory SerializedStorageKey.fromJson(String value) =>
       SerializedStorageKey(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is SerializedStorageKey && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Enum of possible storage types.
@@ -1154,69 +1140,25 @@ enum AttributionReportingSourceType {
   String toString() => value.toString();
 }
 
-class UnsignedInt64AsBase10 {
-  final String value;
-
-  UnsignedInt64AsBase10(this.value);
-
+extension type UnsignedInt64AsBase10(String value) {
   factory UnsignedInt64AsBase10.fromJson(String value) =>
       UnsignedInt64AsBase10(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is UnsignedInt64AsBase10 && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
-class UnsignedInt128AsBase16 {
-  final String value;
-
-  UnsignedInt128AsBase16(this.value);
-
+extension type UnsignedInt128AsBase16(String value) {
   factory UnsignedInt128AsBase16.fromJson(String value) =>
       UnsignedInt128AsBase16(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is UnsignedInt128AsBase16 && other.value == value) ||
-      value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
-class SignedInt64AsBase10 {
-  final String value;
-
-  SignedInt64AsBase10(this.value);
-
+extension type SignedInt64AsBase10(String value) {
   factory SignedInt64AsBase10.fromJson(String value) =>
       SignedInt64AsBase10(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is SignedInt64AsBase10 && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 class AttributionReportingFilterDataEntry {

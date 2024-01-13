@@ -904,45 +904,17 @@ class SetScriptSourceResult {
 }
 
 /// Breakpoint identifier.
-class BreakpointId {
-  final String value;
-
-  BreakpointId(this.value);
-
+extension type BreakpointId(String value) {
   factory BreakpointId.fromJson(String value) => BreakpointId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is BreakpointId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Call frame identifier.
-class CallFrameId {
-  final String value;
-
-  CallFrameId(this.value);
-
+extension type CallFrameId(String value) {
   factory CallFrameId.fromJson(String value) => CallFrameId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CallFrameId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Location in the source code.

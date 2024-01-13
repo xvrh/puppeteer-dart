@@ -66,22 +66,8 @@ class ReadResult {
 
 /// This is either obtained from another method or specified as `blob:<uuid>` where
 /// `<uuid>` is an UUID of a Blob.
-class StreamHandle {
-  final String value;
-
-  StreamHandle(this.value);
-
+extension type StreamHandle(String value) {
   factory StreamHandle.fromJson(String value) => StreamHandle(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is StreamHandle && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }

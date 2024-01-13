@@ -111,24 +111,10 @@ class ServiceWorkerApi {
   }
 }
 
-class RegistrationID {
-  final String value;
-
-  RegistrationID(this.value);
-
+extension type RegistrationID(String value) {
   factory RegistrationID.fromJson(String value) => RegistrationID(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is RegistrationID && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// ServiceWorker registration.

@@ -150,24 +150,10 @@ class AccessibilityApi {
 }
 
 /// Unique accessibility node identifier.
-class AXNodeId {
-  final String value;
-
-  AXNodeId(this.value);
-
+extension type AXNodeId(String value) {
   factory AXNodeId.fromJson(String value) => AXNodeId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is AXNodeId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Enum of possible property types.

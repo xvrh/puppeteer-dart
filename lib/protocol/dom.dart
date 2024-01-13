@@ -1005,46 +1005,18 @@ class GetFrameOwnerResult {
 }
 
 /// Unique DOM node identifier.
-class NodeId {
-  final int value;
-
-  NodeId(this.value);
-
+extension type NodeId(int value) {
   factory NodeId.fromJson(int value) => NodeId(value);
 
   int toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is NodeId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Unique DOM node identifier used to reference a node that may not have been pushed to the
 /// front-end.
-class BackendNodeId {
-  final int value;
-
-  BackendNodeId(this.value);
-
+extension type BackendNodeId(int value) {
   factory BackendNodeId.fromJson(int value) => BackendNodeId(value);
 
   int toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is BackendNodeId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Backend node with a friendly name.
@@ -1484,25 +1456,11 @@ class RGBA {
 }
 
 /// An array of quad vertices, x immediately followed by y for each point, points clock-wise.
-class Quad {
-  final List<num> value;
-
-  Quad(this.value);
-
+extension type Quad(List<num> value) {
   factory Quad.fromJson(List<dynamic> value) =>
       Quad(value.map((e) => e as num).toList());
 
   List<num> toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is Quad && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Box model.

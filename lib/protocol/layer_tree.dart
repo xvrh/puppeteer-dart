@@ -152,45 +152,17 @@ class CompositingReasonsResult {
 }
 
 /// Unique Layer identifier.
-class LayerId {
-  final String value;
-
-  LayerId(this.value);
-
+extension type LayerId(String value) {
   factory LayerId.fromJson(String value) => LayerId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is LayerId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Unique snapshot identifier.
-class SnapshotId {
-  final String value;
-
-  SnapshotId(this.value);
-
+extension type SnapshotId(String value) {
   factory SnapshotId.fromJson(String value) => SnapshotId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is SnapshotId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Rectangle where scrolling happens on the main thread.
@@ -448,23 +420,9 @@ class Layer {
 }
 
 /// Array of timings, one per paint step.
-class PaintProfile {
-  final List<num> value;
-
-  PaintProfile(this.value);
-
+extension type PaintProfile(List<num> value) {
   factory PaintProfile.fromJson(List<dynamic> value) =>
       PaintProfile(value.map((e) => e as num).toList());
 
   List<num> toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is PaintProfile && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }

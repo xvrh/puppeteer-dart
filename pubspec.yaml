@@ -3,6 +3,9 @@ description: A high-level API to control headless Chrome over the DevTools Proto
 version: 3.6.0
 homepage: https://github.com/xvrh/puppeteer-dart
 
+funding:
+  - https://www.buymeacoffee.com/xvrh
+
 platforms:
   linux:
   macos:
@@ -10,7 +13,7 @@ platforms:
   windows:
 
 environment:
-  sdk: '^3.1.0'
+  sdk: '^3.3.0-0'
 
 dependencies:
   archive: ^3.0.0
@@ -32,6 +35,7 @@ dev_dependencies:
   json_annotation:
   json_serializable:
   lints:
+  pub_semver:
   shelf:
   shelf_router:
   shelf_static:

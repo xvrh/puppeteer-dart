@@ -480,24 +480,10 @@ enum MouseButton {
 }
 
 /// UTC time in seconds, counted from January 1, 1970.
-class TimeSinceEpoch {
-  final num value;
-
-  TimeSinceEpoch(this.value);
-
+extension type TimeSinceEpoch(num value) {
   factory TimeSinceEpoch.fromJson(num value) => TimeSinceEpoch(value);
 
   num toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is TimeSinceEpoch && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 class DragDataItem {

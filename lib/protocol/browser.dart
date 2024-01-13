@@ -313,44 +313,16 @@ class GetWindowForTargetResult {
   }
 }
 
-class BrowserContextID {
-  final String value;
-
-  BrowserContextID(this.value);
-
+extension type BrowserContextID(String value) {
   factory BrowserContextID.fromJson(String value) => BrowserContextID(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is BrowserContextID && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
-class WindowID {
-  final int value;
-
-  WindowID(this.value);
-
+extension type WindowID(int value) {
   factory WindowID.fromJson(int value) => WindowID(value);
 
   int toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is WindowID && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// The state of the browser window.

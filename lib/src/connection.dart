@@ -101,7 +101,7 @@ class Connection implements Client {
 
   Future<void> _onMessage(String message) async {
     if (_delay != null) {
-      await Future.delayed(_delay!);
+      await Future.delayed(_delay);
     }
     if (_eventController.isClosed) return;
 

@@ -57,45 +57,17 @@ class DeviceRequestPromptedEvent {
 }
 
 /// Device request id.
-class RequestId {
-  final String value;
-
-  RequestId(this.value);
-
+extension type RequestId(String value) {
   factory RequestId.fromJson(String value) => RequestId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is RequestId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// A device id.
-class DeviceId {
-  final String value;
-
-  DeviceId(this.value);
-
+extension type DeviceId(String value) {
   factory DeviceId.fromJson(String value) => DeviceId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is DeviceId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Device information displayed in a user prompt to select a device.

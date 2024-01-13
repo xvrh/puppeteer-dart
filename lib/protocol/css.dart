@@ -535,24 +535,10 @@ class TakeCoverageDeltaResult {
   }
 }
 
-class StyleSheetId {
-  final String value;
-
-  StyleSheetId(this.value);
-
+extension type StyleSheetId(String value) {
   factory StyleSheetId.fromJson(String value) => StyleSheetId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is StyleSheetId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Stylesheet type: "injected" for stylesheets injected via extension, "user-agent" for user-agent

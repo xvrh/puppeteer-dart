@@ -288,7 +288,7 @@ class TargetManager {
       return;
     }
 
-    if (_targetFilterCallback != null && !_targetFilterCallback!(targetInfo)) {
+    if (_targetFilterCallback != null && !_targetFilterCallback(targetInfo)) {
       _ignoredTargets.add(targetInfo.targetId);
       _finishInitializationIfReady(targetInfo.targetId);
       await silentDetach();

@@ -127,25 +127,11 @@ class DomStorageItemUpdatedEvent {
   }
 }
 
-class SerializedStorageKey {
-  final String value;
-
-  SerializedStorageKey(this.value);
-
+extension type SerializedStorageKey(String value) {
   factory SerializedStorageKey.fromJson(String value) =>
       SerializedStorageKey(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is SerializedStorageKey && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// DOM Storage identifier.
@@ -184,23 +170,9 @@ class StorageId {
 }
 
 /// DOM Storage item.
-class Item {
-  final List<String> value;
-
-  Item(this.value);
-
+extension type Item(List<String> value) {
   factory Item.fromJson(List<dynamic> value) =>
       Item(value.map((e) => e as String).toList());
 
   List<String> toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is Item && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }

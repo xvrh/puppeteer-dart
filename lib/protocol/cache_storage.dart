@@ -99,24 +99,10 @@ class RequestEntriesResult {
 }
 
 /// Unique identifier of the Cache object.
-class CacheId {
-  final String value;
-
-  CacheId(this.value);
-
+extension type CacheId(String value) {
   factory CacheId.fromJson(String value) => CacheId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CacheId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// type of HTTP response cached
