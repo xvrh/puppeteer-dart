@@ -1748,24 +1748,10 @@ class InspectorIssueDetails {
 
 /// A unique id for a DevTools inspector issue. Allows other entities (e.g.
 /// exceptions, CDP message, console messages, etc.) to reference an issue.
-class IssueId {
-  final String value;
-
-  IssueId(this.value);
-
+extension type IssueId(String value) {
   factory IssueId.fromJson(String value) => IssueId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is IssueId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// An inspector issue reported from the back-end.

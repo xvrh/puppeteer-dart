@@ -108,24 +108,10 @@ class SecurityStateChangedEvent {
 }
 
 /// An internal certificate ID value.
-class CertificateId {
-  final int value;
-
-  CertificateId(this.value);
-
+extension type CertificateId(int value) {
   factory CertificateId.fromJson(int value) => CertificateId(value);
 
   int toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is CertificateId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// A description of mixed content (HTTP resources on HTTPS pages), as defined by

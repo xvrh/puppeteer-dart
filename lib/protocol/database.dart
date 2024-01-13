@@ -63,24 +63,10 @@ class ExecuteSQLResult {
 }
 
 /// Unique identifier of Database object.
-class DatabaseId {
-  final String value;
-
-  DatabaseId(this.value);
-
+extension type DatabaseId(String value) {
   factory DatabaseId.fromJson(String value) => DatabaseId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is DatabaseId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Database object.

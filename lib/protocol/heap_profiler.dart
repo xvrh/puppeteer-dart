@@ -205,25 +205,11 @@ class ReportHeapSnapshotProgressEvent {
 }
 
 /// Heap snapshot object id.
-class HeapSnapshotObjectId {
-  final String value;
-
-  HeapSnapshotObjectId(this.value);
-
+extension type HeapSnapshotObjectId(String value) {
   factory HeapSnapshotObjectId.fromJson(String value) =>
       HeapSnapshotObjectId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is HeapSnapshotObjectId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Sampling Heap Profile node. Holds callsite information, allocation statistics and child nodes.

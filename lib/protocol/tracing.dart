@@ -175,25 +175,11 @@ class RequestMemoryDumpResult {
 }
 
 /// Configuration for memory dump. Used only when "memory-infra" category is enabled.
-class MemoryDumpConfig {
-  final Map<String, dynamic> value;
-
-  MemoryDumpConfig(this.value);
-
+extension type MemoryDumpConfig(Map<String, dynamic> value) {
   factory MemoryDumpConfig.fromJson(Map<String, dynamic> value) =>
       MemoryDumpConfig(value);
 
   Map<String, dynamic> toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is MemoryDumpConfig && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 class TraceConfig {

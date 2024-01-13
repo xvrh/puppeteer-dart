@@ -462,14 +462,22 @@ class _InternalType {
     var enumValues = type.enums;
     var isEnum = enumValues != null;
 
-    var code = StringBuffer();
-
-    code.writeln(toComment(type.description));
-    code.writeln('${isEnum ? 'enum' : 'class'} $id {');
-
     var properties = <Parameter>[];
     var jsonProperties = type.properties;
     var hasProperties = jsonProperties.isNotEmpty;
+
+    var code = StringBuffer();
+
+    code.writeln(toComment(type.description));
+    if (hasProperties) {
+      code.writeln('class $id {');
+    } else if (isEnum) {
+      code.writeln('enum $id {');
+    } else {
+      var innerType = _propertyTypeName(
+          Parameter(name: 'value', type: type.type, items: type.items));
+      code.writeln('extension type $id($innerType value) {');
+    }
 
     if (hasProperties) {
       properties.addAll(jsonProperties);
@@ -487,14 +495,16 @@ class _InternalType {
       }
     }
 
-    for (var property in properties.where((p) => !p.deprecated)) {
-      code.writeln(toComment(property.description, indent: 2));
+    if (hasProperties || isEnum) {
+      for (var property in properties.where((p) => !p.deprecated)) {
+        code.writeln(toComment(property.description, indent: 2));
 
-      var typeName = _propertyTypeName(property);
-      var isOptional = property.optional;
-      code.writeln(
-          'final $typeName${isOptional ? '?' : ''} ${property.normalizedName};');
-      code.writeln('');
+        var typeName = _propertyTypeName(property);
+        var isOptional = property.optional;
+        code.writeln(
+            'final $typeName${isOptional ? '?' : ''} ${property.normalizedName};');
+        code.writeln('');
+      }
     }
 
     var optionals = properties.where((p) => p.optional).toList();
@@ -514,8 +524,6 @@ class _InternalType {
       code.writeln('$id($constructorSignature);');
     } else if (isEnum) {
       code.writeln('const $id(this.value);');
-    } else {
-      code.writeln('$id(this.value);');
     }
 
     code.writeln();
@@ -578,19 +586,8 @@ class _InternalType {
       }
     }
 
-    if (!hasProperties) {
-      if (!isEnum) {
-        //TODO(xha): generate operator== and hashcode also for complex type?
-        code.writeln();
-        code.writeln('@override');
-        code.writeln(
-            'bool operator ==(other) => (other is $id && other.value == value) || value == other;');
-        code.writeln();
-        code.writeln('@override');
-        code.writeln('int get hashCode => value.hashCode;');
-      }
+    if (!hasProperties && isEnum) {
       code.writeln();
-      //TODO(xha): generate a readable toString() method for the complex type
       code.writeln('@override');
       code.writeln('String toString() => value.toString();');
     }

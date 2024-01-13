@@ -324,24 +324,10 @@ class GetResponseBodyResult {
 }
 
 /// Unique request identifier.
-class RequestId {
-  final String value;
-
-  RequestId(this.value);
-
+extension type RequestId(String value) {
   factory RequestId.fromJson(String value) => RequestId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is RequestId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Stages of the request to handle. Request will intercept before the request is

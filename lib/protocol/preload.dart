@@ -173,24 +173,10 @@ class PreloadingAttemptSourcesUpdatedEvent {
 }
 
 /// Unique id
-class RuleSetId {
-  final String value;
-
-  RuleSetId(this.value);
-
+extension type RuleSetId(String value) {
   factory RuleSetId.fromJson(String value) => RuleSetId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is RuleSetId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Corresponds to SpeculationRuleSet

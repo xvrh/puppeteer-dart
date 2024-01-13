@@ -1434,24 +1434,10 @@ class PrintToPDFResult {
 }
 
 /// Unique frame identifier.
-class FrameId {
-  final String value;
-
-  FrameId(this.value);
-
+extension type FrameId(String value) {
   factory FrameId.fromJson(String value) => FrameId(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is FrameId && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Indicates whether a frame has been identified as an ad.
@@ -2204,24 +2190,10 @@ class FrameTree {
 }
 
 /// Unique script identifier.
-class ScriptIdentifier {
-  final String value;
-
-  ScriptIdentifier(this.value);
-
+extension type ScriptIdentifier(String value) {
   factory ScriptIdentifier.fromJson(String value) => ScriptIdentifier(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is ScriptIdentifier && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Transition type.

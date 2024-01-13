@@ -366,45 +366,17 @@ class TargetCrashedEvent {
   }
 }
 
-class TargetID {
-  final String value;
-
-  TargetID(this.value);
-
+extension type TargetID(String value) {
   factory TargetID.fromJson(String value) => TargetID(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is TargetID && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// Unique identifier of attached debugging session.
-class SessionID {
-  final String value;
-
-  SessionID(this.value);
-
+extension type SessionID(String value) {
   factory SessionID.fromJson(String value) => SessionID(value);
 
   String toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is SessionID && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 class TargetInfo {
@@ -516,26 +488,12 @@ class FilterEntry {
 /// If filter is not specified, the one assumed is
 /// [{type: "browser", exclude: true}, {type: "tab", exclude: true}, {}]
 /// (i.e. include everything but `browser` and `tab`).
-class TargetFilter {
-  final List<FilterEntry> value;
-
-  TargetFilter(this.value);
-
+extension type TargetFilter(List<FilterEntry> value) {
   factory TargetFilter.fromJson(List<dynamic> value) => TargetFilter(value
       .map((e) => FilterEntry.fromJson(e as Map<String, dynamic>))
       .toList());
 
   List<FilterEntry> toJson() => value;
-
-  @override
-  bool operator ==(other) =>
-      (other is TargetFilter && other.value == value) || value == other;
-
-  @override
-  int get hashCode => value.hashCode;
-
-  @override
-  String toString() => value.toString();
 }
 
 class RemoteLocation {
