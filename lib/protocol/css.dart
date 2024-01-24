@@ -441,6 +441,9 @@ class GetMatchedStylesForNodeResult {
   /// A list of CSS property registrations matching this node.
   final List<CSSPropertyRegistration>? cssPropertyRegistrations;
 
+  /// A font-palette-values rule matching this node.
+  final CSSFontPaletteValuesRule? cssFontPaletteValuesRule;
+
   /// Id of the first parent element that does not have display: contents.
   final dom.NodeId? parentLayoutNodeId;
 
@@ -455,6 +458,7 @@ class GetMatchedStylesForNodeResult {
       this.cssPositionFallbackRules,
       this.cssPropertyRules,
       this.cssPropertyRegistrations,
+      this.cssFontPaletteValuesRule,
       this.parentLayoutNodeId});
 
   factory GetMatchedStylesForNodeResult.fromJson(Map<String, dynamic> json) {
@@ -509,6 +513,10 @@ class GetMatchedStylesForNodeResult {
               .map((e) =>
                   CSSPropertyRegistration.fromJson(e as Map<String, dynamic>))
               .toList()
+          : null,
+      cssFontPaletteValuesRule: json.containsKey('cssFontPaletteValuesRule')
+          ? CSSFontPaletteValuesRule.fromJson(
+              json['cssFontPaletteValuesRule'] as Map<String, dynamic>)
           : null,
       parentLayoutNodeId: json.containsKey('parentLayoutNodeId')
           ? dom.NodeId.fromJson(json['parentLayoutNodeId'] as int)
@@ -1692,6 +1700,9 @@ class PlatformFontUsage {
   /// Font's family name reported by platform.
   final String familyName;
 
+  /// Font's PostScript name reported by platform.
+  final String postScriptName;
+
   /// Indicates if the font was downloaded or resolved locally.
   final bool isCustomFont;
 
@@ -1700,12 +1711,14 @@ class PlatformFontUsage {
 
   PlatformFontUsage(
       {required this.familyName,
+      required this.postScriptName,
       required this.isCustomFont,
       required this.glyphCount});
 
   factory PlatformFontUsage.fromJson(Map<String, dynamic> json) {
     return PlatformFontUsage(
       familyName: json['familyName'] as String,
+      postScriptName: json['postScriptName'] as String,
       isCustomFont: json['isCustomFont'] as bool? ?? false,
       glyphCount: json['glyphCount'] as num,
     );
@@ -1714,6 +1727,7 @@ class PlatformFontUsage {
   Map<String, dynamic> toJson() {
     return {
       'familyName': familyName,
+      'postScriptName': postScriptName,
       'isCustomFont': isCustomFont,
       'glyphCount': glyphCount,
     };
@@ -1966,6 +1980,49 @@ class CSSPropertyRegistration {
       'inherits': inherits,
       'syntax': syntax,
       if (initialValue != null) 'initialValue': initialValue!.toJson(),
+    };
+  }
+}
+
+/// CSS font-palette-values rule representation.
+class CSSFontPaletteValuesRule {
+  /// The css style sheet identifier (absent for user agent stylesheet and user-specified
+  /// stylesheet rules) this rule came from.
+  final StyleSheetId? styleSheetId;
+
+  /// Parent stylesheet's origin.
+  final StyleSheetOrigin origin;
+
+  /// Associated font palette name.
+  final Value fontPaletteName;
+
+  /// Associated style declaration.
+  final CSSStyle style;
+
+  CSSFontPaletteValuesRule(
+      {this.styleSheetId,
+      required this.origin,
+      required this.fontPaletteName,
+      required this.style});
+
+  factory CSSFontPaletteValuesRule.fromJson(Map<String, dynamic> json) {
+    return CSSFontPaletteValuesRule(
+      styleSheetId: json.containsKey('styleSheetId')
+          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          : null,
+      origin: StyleSheetOrigin.fromJson(json['origin'] as String),
+      fontPaletteName:
+          Value.fromJson(json['fontPaletteName'] as Map<String, dynamic>),
+      style: CSSStyle.fromJson(json['style'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'origin': origin.toJson(),
+      'fontPaletteName': fontPaletteName.toJson(),
+      'style': style.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
     };
   }
 }

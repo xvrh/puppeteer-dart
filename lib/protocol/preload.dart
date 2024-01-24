@@ -132,11 +132,14 @@ class PrerenderStatusUpdatedEvent {
   /// that is incompatible with prerender and has caused the cancellation of the attempt.
   final String? disallowedMojoInterface;
 
+  final List<PrerenderMismatchedHeaders>? mismatchedHeaders;
+
   PrerenderStatusUpdatedEvent(
       {required this.key,
       required this.status,
       this.prerenderStatus,
-      this.disallowedMojoInterface});
+      this.disallowedMojoInterface,
+      this.mismatchedHeaders});
 
   factory PrerenderStatusUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return PrerenderStatusUpdatedEvent(
@@ -147,6 +150,12 @@ class PrerenderStatusUpdatedEvent {
           : null,
       disallowedMojoInterface: json.containsKey('disallowedMojoInterface')
           ? json['disallowedMojoInterface'] as String
+          : null,
+      mismatchedHeaders: json.containsKey('mismatchedHeaders')
+          ? (json['mismatchedHeaders'] as List)
+              .map((e) => PrerenderMismatchedHeaders.fromJson(
+                  e as Map<String, dynamic>))
+              .toList()
           : null,
     );
   }
@@ -566,4 +575,36 @@ enum PrefetchStatus {
 
   @override
   String toString() => value.toString();
+}
+
+/// Information of headers to be displayed when the header mismatch occurred.
+class PrerenderMismatchedHeaders {
+  final String headerName;
+
+  final String? initialValue;
+
+  final String? activationValue;
+
+  PrerenderMismatchedHeaders(
+      {required this.headerName, this.initialValue, this.activationValue});
+
+  factory PrerenderMismatchedHeaders.fromJson(Map<String, dynamic> json) {
+    return PrerenderMismatchedHeaders(
+      headerName: json['headerName'] as String,
+      initialValue: json.containsKey('initialValue')
+          ? json['initialValue'] as String
+          : null,
+      activationValue: json.containsKey('activationValue')
+          ? json['activationValue'] as String
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'headerName': headerName,
+      if (initialValue != null) 'initialValue': initialValue,
+      if (activationValue != null) 'activationValue': activationValue,
+    };
+  }
 }

@@ -451,7 +451,7 @@ enum PermissionSetting {
 }
 
 /// Definition of PermissionDescriptor defined in the Permissions API:
-/// https://w3c.github.io/permissions/#dictdef-permissiondescriptor.
+/// https://w3c.github.io/permissions/#dom-permissiondescriptor.
 class PermissionDescriptor {
   /// Name of permission.
   /// See https://cs.chromium.org/chromium/src/third_party/blink/renderer/modules/permissions/permission_descriptor.idl for valid permission names.
