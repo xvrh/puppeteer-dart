@@ -578,7 +578,7 @@ class NetworkApi {
 
   /// Allows overriding user agent with the given string.
   /// [userAgent] User agent to use.
-  /// [acceptLanguage] Browser langugage to emulate.
+  /// [acceptLanguage] Browser language to emulate.
   /// [platform] The platform navigator.platform should return.
   /// [userAgentMetadata] To be sent in Sec-CH-UA-* headers and returned in navigator.userAgentData
   Future<void> setUserAgentOverride(String userAgent,
@@ -2527,6 +2527,24 @@ enum AlternateProtocolUsage {
   String toString() => value.toString();
 }
 
+class ServiceWorkerRouterInfo {
+  final int ruleIdMatched;
+
+  ServiceWorkerRouterInfo({required this.ruleIdMatched});
+
+  factory ServiceWorkerRouterInfo.fromJson(Map<String, dynamic> json) {
+    return ServiceWorkerRouterInfo(
+      ruleIdMatched: json['ruleIdMatched'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'ruleIdMatched': ruleIdMatched,
+    };
+  }
+}
+
 /// HTTP response data.
 class ResponseData {
   /// Response URL. This URL can be different from CachedResource.url in case of redirect.
@@ -2567,6 +2585,9 @@ class ResponseData {
 
   /// Specifies that the request was served from the prefetch cache.
   final bool? fromPrefetchCache;
+
+  /// Infomation about how Service Worker Static Router was used.
+  final ServiceWorkerRouterInfo? serviceWorkerRouterInfo;
 
   /// Total number of bytes received for this request so far.
   final num encodedDataLength;
@@ -2609,6 +2630,7 @@ class ResponseData {
       this.fromDiskCache,
       this.fromServiceWorker,
       this.fromPrefetchCache,
+      this.serviceWorkerRouterInfo,
       required this.encodedDataLength,
       this.timing,
       this.serviceWorkerResponseSource,
@@ -2644,6 +2666,10 @@ class ResponseData {
           : null,
       fromPrefetchCache: json.containsKey('fromPrefetchCache')
           ? json['fromPrefetchCache'] as bool
+          : null,
+      serviceWorkerRouterInfo: json.containsKey('serviceWorkerRouterInfo')
+          ? ServiceWorkerRouterInfo.fromJson(
+              json['serviceWorkerRouterInfo'] as Map<String, dynamic>)
           : null,
       encodedDataLength: json['encodedDataLength'] as num,
       timing: json.containsKey('timing')
@@ -2692,6 +2718,8 @@ class ResponseData {
       if (fromDiskCache != null) 'fromDiskCache': fromDiskCache,
       if (fromServiceWorker != null) 'fromServiceWorker': fromServiceWorker,
       if (fromPrefetchCache != null) 'fromPrefetchCache': fromPrefetchCache,
+      if (serviceWorkerRouterInfo != null)
+        'serviceWorkerRouterInfo': serviceWorkerRouterInfo!.toJson(),
       if (timing != null) 'timing': timing!.toJson(),
       if (serviceWorkerResponseSource != null)
         'serviceWorkerResponseSource': serviceWorkerResponseSource!.toJson(),
@@ -2974,9 +3002,6 @@ class Cookie {
   /// Cookie Priority
   final CookiePriority priority;
 
-  /// True if cookie is SameParty.
-  final bool sameParty;
-
   /// Cookie source scheme type.
   final CookieSourceScheme sourceScheme;
 
@@ -3004,7 +3029,6 @@ class Cookie {
       required this.session,
       this.sameSite,
       required this.priority,
-      required this.sameParty,
       required this.sourceScheme,
       required this.sourcePort,
       this.partitionKey,
@@ -3025,7 +3049,6 @@ class Cookie {
           ? CookieSameSite.fromJson(json['sameSite'] as String)
           : null,
       priority: CookiePriority.fromJson(json['priority'] as String),
-      sameParty: json['sameParty'] as bool? ?? false,
       sourceScheme: CookieSourceScheme.fromJson(json['sourceScheme'] as String),
       sourcePort: json['sourcePort'] as int,
       partitionKey: json.containsKey('partitionKey')
@@ -3049,7 +3072,6 @@ class Cookie {
       'secure': secure,
       'session': session,
       'priority': priority.toJson(),
-      'sameParty': sameParty,
       'sourceScheme': sourceScheme.toJson(),
       'sourcePort': sourcePort,
       if (sameSite != null) 'sameSite': sameSite!.toJson(),

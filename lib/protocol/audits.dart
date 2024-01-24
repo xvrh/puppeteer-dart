@@ -357,6 +357,7 @@ enum MixedContentResourceType {
   script('Script'),
   serviceWorker('ServiceWorker'),
   sharedWorker('SharedWorker'),
+  speculationRules('SpeculationRules'),
   stylesheet('Stylesheet'),
   track('Track'),
   video('Video'),

@@ -331,18 +331,6 @@ class PageApi {
     return AdScriptId.fromJson(result['adScriptId'] as Map<String, dynamic>);
   }
 
-  /// Returns all browser cookies for the page and all of its subframes. Depending
-  /// on the backend support, will return detailed cookie information in the
-  /// `cookies` field.
-  /// Returns: Array of cookie objects.
-  @Deprecated('This command is deprecated')
-  Future<List<network.Cookie>> getCookies() async {
-    var result = await _client.send('Page.getCookies');
-    return (result['cookies'] as List)
-        .map((e) => network.Cookie.fromJson(e as Map<String, dynamic>))
-        .toList();
-  }
-
   /// Returns present frame tree structure.
   /// Returns: Present frame tree structure.
   Future<FrameTree> getFrameTree() async {
@@ -460,6 +448,7 @@ class PageApi {
   /// in which case the content will be scaled to fit the paper size.
   /// [transferMode] return as stream
   /// [generateTaggedPDF] Whether or not to generate tagged (accessible) PDF. Defaults to embedder choice.
+  /// [generateDocumentOutline] Whether or not to embed the document outline into the PDF.
   Future<PrintToPDFResult> printToPDF(
       {bool? landscape,
       bool? displayHeaderFooter,
@@ -476,7 +465,8 @@ class PageApi {
       String? footerTemplate,
       bool? preferCSSPageSize,
       @Enum(['ReturnAsBase64', 'ReturnAsStream']) String? transferMode,
-      bool? generateTaggedPDF}) async {
+      bool? generateTaggedPDF,
+      bool? generateDocumentOutline}) async {
     assert(transferMode == null ||
         const ['ReturnAsBase64', 'ReturnAsStream'].contains(transferMode));
     var result = await _client.send('Page.printToPDF', {
@@ -497,6 +487,8 @@ class PageApi {
       if (preferCSSPageSize != null) 'preferCSSPageSize': preferCSSPageSize,
       if (transferMode != null) 'transferMode': transferMode,
       if (generateTaggedPDF != null) 'generateTaggedPDF': generateTaggedPDF,
+      if (generateDocumentOutline != null)
+        'generateDocumentOutline': generateDocumentOutline,
     });
     return PrintToPDFResult.fromJson(result);
   }
@@ -1673,7 +1665,9 @@ enum PermissionsPolicyFeature {
   syncXhr('sync-xhr'),
   unload('unload'),
   usb('usb'),
+  usbUnrestricted('usb-unrestricted'),
   verticalScroll('vertical-scroll'),
+  webPrinting('web-printing'),
   webShare('web-share'),
   windowManagement('window-management'),
   windowPlacement('window-placement'),

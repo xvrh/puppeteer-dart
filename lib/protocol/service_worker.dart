@@ -213,6 +213,8 @@ class ServiceWorkerVersion {
 
   final target.TargetID? targetId;
 
+  final String? routerRules;
+
   ServiceWorkerVersion(
       {required this.versionId,
       required this.registrationId,
@@ -222,7 +224,8 @@ class ServiceWorkerVersion {
       this.scriptLastModified,
       this.scriptResponseTime,
       this.controlledClients,
-      this.targetId});
+      this.targetId,
+      this.routerRules});
 
   factory ServiceWorkerVersion.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerVersion(
@@ -246,6 +249,9 @@ class ServiceWorkerVersion {
       targetId: json.containsKey('targetId')
           ? target.TargetID.fromJson(json['targetId'] as String)
           : null,
+      routerRules: json.containsKey('routerRules')
+          ? json['routerRules'] as String
+          : null,
     );
   }
 
@@ -261,6 +267,7 @@ class ServiceWorkerVersion {
       if (controlledClients != null)
         'controlledClients': controlledClients!.map((e) => e.toJson()).toList(),
       if (targetId != null) 'targetId': targetId!.toJson(),
+      if (routerRules != null) 'routerRules': routerRules,
     };
   }
 }

@@ -1235,6 +1235,32 @@ class AttributionReportingEventReportWindows {
   }
 }
 
+class AttributionReportingTriggerSpec {
+  /// number instead of integer because not all uint32 can be represented by
+  /// int
+  final List<num> triggerData;
+
+  final AttributionReportingEventReportWindows eventReportWindows;
+
+  AttributionReportingTriggerSpec(
+      {required this.triggerData, required this.eventReportWindows});
+
+  factory AttributionReportingTriggerSpec.fromJson(Map<String, dynamic> json) {
+    return AttributionReportingTriggerSpec(
+      triggerData: (json['triggerData'] as List).map((e) => e as num).toList(),
+      eventReportWindows: AttributionReportingEventReportWindows.fromJson(
+          json['eventReportWindows'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'triggerData': [...triggerData],
+      'eventReportWindows': eventReportWindows.toJson(),
+    };
+  }
+}
+
 enum AttributionReportingTriggerDataMatching {
   exact('exact'),
   modulus('modulus'),
@@ -1260,7 +1286,7 @@ class AttributionReportingSourceRegistration {
   /// duration in seconds
   final int expiry;
 
-  final AttributionReportingEventReportWindows eventReportWindows;
+  final List<AttributionReportingTriggerSpec> triggerSpecs;
 
   /// duration in seconds
   final int aggregatableReportWindow;
@@ -1288,7 +1314,7 @@ class AttributionReportingSourceRegistration {
   AttributionReportingSourceRegistration(
       {required this.time,
       required this.expiry,
-      required this.eventReportWindows,
+      required this.triggerSpecs,
       required this.aggregatableReportWindow,
       required this.type,
       required this.sourceOrigin,
@@ -1306,8 +1332,10 @@ class AttributionReportingSourceRegistration {
     return AttributionReportingSourceRegistration(
       time: network.TimeSinceEpoch.fromJson(json['time'] as num),
       expiry: json['expiry'] as int,
-      eventReportWindows: AttributionReportingEventReportWindows.fromJson(
-          json['eventReportWindows'] as Map<String, dynamic>),
+      triggerSpecs: (json['triggerSpecs'] as List)
+          .map((e) => AttributionReportingTriggerSpec.fromJson(
+              e as Map<String, dynamic>))
+          .toList(),
       aggregatableReportWindow: json['aggregatableReportWindow'] as int,
       type: AttributionReportingSourceType.fromJson(json['type'] as String),
       sourceOrigin: json['sourceOrigin'] as String,
@@ -1336,7 +1364,7 @@ class AttributionReportingSourceRegistration {
     return {
       'time': time.toJson(),
       'expiry': expiry,
-      'eventReportWindows': eventReportWindows.toJson(),
+      'triggerSpecs': triggerSpecs.map((e) => e.toJson()).toList(),
       'aggregatableReportWindow': aggregatableReportWindow,
       'type': type.toJson(),
       'sourceOrigin': sourceOrigin,

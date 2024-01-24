@@ -279,6 +279,16 @@ class VirtualAuthenticatorOptions {
   /// Defaults to false.
   final bool? isUserVerified;
 
+  /// Credentials created by this authenticator will have the backup
+  /// eligibility (BE) flag set to this value. Defaults to false.
+  /// https://w3c.github.io/webauthn/#sctn-credential-backup
+  final bool? defaultBackupEligibility;
+
+  /// Credentials created by this authenticator will have the backup state
+  /// (BS) flag set to this value. Defaults to false.
+  /// https://w3c.github.io/webauthn/#sctn-credential-backup
+  final bool? defaultBackupState;
+
   VirtualAuthenticatorOptions(
       {required this.protocol,
       this.ctap2Version,
@@ -290,7 +300,9 @@ class VirtualAuthenticatorOptions {
       this.hasMinPinLength,
       this.hasPrf,
       this.automaticPresenceSimulation,
-      this.isUserVerified});
+      this.isUserVerified,
+      this.defaultBackupEligibility,
+      this.defaultBackupState});
 
   factory VirtualAuthenticatorOptions.fromJson(Map<String, dynamic> json) {
     return VirtualAuthenticatorOptions(
@@ -321,6 +333,12 @@ class VirtualAuthenticatorOptions {
       isUserVerified: json.containsKey('isUserVerified')
           ? json['isUserVerified'] as bool
           : null,
+      defaultBackupEligibility: json.containsKey('defaultBackupEligibility')
+          ? json['defaultBackupEligibility'] as bool
+          : null,
+      defaultBackupState: json.containsKey('defaultBackupState')
+          ? json['defaultBackupState'] as bool
+          : null,
     );
   }
 
@@ -339,6 +357,9 @@ class VirtualAuthenticatorOptions {
       if (automaticPresenceSimulation != null)
         'automaticPresenceSimulation': automaticPresenceSimulation,
       if (isUserVerified != null) 'isUserVerified': isUserVerified,
+      if (defaultBackupEligibility != null)
+        'defaultBackupEligibility': defaultBackupEligibility,
+      if (defaultBackupState != null) 'defaultBackupState': defaultBackupState,
     };
   }
 }

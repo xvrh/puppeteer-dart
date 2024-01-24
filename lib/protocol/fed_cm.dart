@@ -11,6 +11,12 @@ class FedCmApi {
       .where((event) => event.name == 'FedCm.dialogShown')
       .map((event) => DialogShownEvent.fromJson(event.parameters));
 
+  /// Triggered when a dialog is closed, either by user action, JS abort,
+  /// or a command below.
+  Stream<String> get onDialogClosed => _client.onEvent
+      .where((event) => event.name == 'FedCm.dialogClosed')
+      .map((event) => event.parameters['dialogId'] as String);
+
   /// [disableRejectionDelay] Allows callers to disable the promise rejection delay that would
   /// normally happen, if this is unimportant to what's being tested.
   /// (step 4 of https://fedidcg.github.io/FedCM/#browser-api-rp-sign-in)
@@ -32,11 +38,11 @@ class FedCmApi {
     });
   }
 
-  /// Only valid if the dialog type is ConfirmIdpLogin. Acts as if the user had
-  /// clicked the continue button.
-  Future<void> confirmIdpLogin(String dialogId) async {
-    await _client.send('FedCm.confirmIdpLogin', {
+  Future<void> clickDialogButton(
+      String dialogId, DialogButton dialogButton) async {
+    await _client.send('FedCm.clickDialogButton', {
       'dialogId': dialogId,
+      'dialogButton': dialogButton,
     });
   }
 
@@ -108,11 +114,12 @@ enum LoginState {
   String toString() => value.toString();
 }
 
-/// Whether the dialog shown is an account chooser or an auto re-authentication dialog.
+/// The types of FedCM dialogs.
 enum DialogType {
   accountChooser('AccountChooser'),
   autoReauthn('AutoReauthn'),
   confirmIdpLogin('ConfirmIdpLogin'),
+  error('Error'),
   ;
 
   final String value;
@@ -121,6 +128,26 @@ enum DialogType {
 
   factory DialogType.fromJson(String value) =>
       DialogType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// The buttons on the FedCM dialog.
+enum DialogButton {
+  confirmIdpLoginContinue('ConfirmIdpLoginContinue'),
+  errorGotIt('ErrorGotIt'),
+  errorMoreDetails('ErrorMoreDetails'),
+  ;
+
+  final String value;
+
+  const DialogButton(this.value);
+
+  factory DialogButton.fromJson(String value) =>
+      DialogButton.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 

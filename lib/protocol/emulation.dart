@@ -90,6 +90,8 @@ class EmulationApi {
   /// change is not observed by the page, e.g. viewport-relative elements do not change positions.
   /// [displayFeature] If set, the display feature of a multi-segment screen. If not set, multi-segment support
   /// is turned-off.
+  /// [devicePosture] If set, the posture of a foldable device. If not set the posture is set
+  /// to continuous.
   Future<void> setDeviceMetricsOverride(
       int width, int height, num deviceScaleFactor, bool mobile,
       {num? scale,
@@ -100,7 +102,8 @@ class EmulationApi {
       bool? dontSetVisibleSize,
       ScreenOrientation? screenOrientation,
       page.Viewport? viewport,
-      DisplayFeature? displayFeature}) async {
+      DisplayFeature? displayFeature,
+      DevicePosture? devicePosture}) async {
     await _client.send('Emulation.setDeviceMetricsOverride', {
       'width': width,
       'height': height,
@@ -115,6 +118,7 @@ class EmulationApi {
       if (screenOrientation != null) 'screenOrientation': screenOrientation,
       if (viewport != null) 'viewport': viewport,
       if (displayFeature != null) 'displayFeature': displayFeature,
+      if (devicePosture != null) 'devicePosture': devicePosture,
     });
   }
 
@@ -349,7 +353,7 @@ class EmulationApi {
 
   /// Allows overriding user agent with the given string.
   /// [userAgent] User agent to use.
-  /// [acceptLanguage] Browser langugage to emulate.
+  /// [acceptLanguage] Browser language to emulate.
   /// [platform] The platform navigator.platform should return.
   /// [userAgentMetadata] To be sent in Sec-CH-UA-* headers and returned in navigator.userAgentData
   Future<void> setUserAgentOverride(String userAgent,
@@ -465,6 +469,43 @@ enum DisplayFeatureOrientation {
 
   factory DisplayFeatureOrientation.fromJson(String value) =>
       DisplayFeatureOrientation.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+class DevicePosture {
+  /// Current posture of the device
+  final DevicePostureType type;
+
+  DevicePosture({required this.type});
+
+  factory DevicePosture.fromJson(Map<String, dynamic> json) {
+    return DevicePosture(
+      type: DevicePostureType.fromJson(json['type'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type,
+    };
+  }
+}
+
+enum DevicePostureType {
+  continuous('continuous'),
+  folded('folded'),
+  ;
+
+  final String value;
+
+  const DevicePostureType(this.value);
+
+  factory DevicePostureType.fromJson(String value) =>
+      DevicePostureType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 
