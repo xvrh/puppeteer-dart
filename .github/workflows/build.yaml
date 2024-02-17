@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: ['beta']
+        sdk: ['stable']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: dart-lang/setup-dart@v1

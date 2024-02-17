@@ -1,3 +1,7 @@
+## 3.7.0
+- Update to Chrome 121.0.6167.184
+- Requires Dart 3.3.0
+
 ## 3.6.0
 - Update to Chrome 119.0.6045.105
 - Fix new lints from package:lints v3.0.0
