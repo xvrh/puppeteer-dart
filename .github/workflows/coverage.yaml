@@ -19,7 +19,7 @@ jobs:
 
       - run: dart example/download_chrome.dart
 
-      - run: dart test -P ci --platform vm --coverage
+      - run: dart test -P ci --platform vm --coverage=coverage
         env:
           PUPPETEER_SKIP_GOLDEN_COMPARISON: 'true'
 

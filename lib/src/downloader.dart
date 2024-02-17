@@ -135,7 +135,7 @@ void _simpleUnzip(String path, String targetPath) {
   }
 }
 
-const _baseUrl = 'https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing';
+const _baseUrl = 'https://storage.googleapis.com/chrome-for-testing-public';
 
 String _downloadUrl(BrowserPlatform platform, String version) {
   return '$_baseUrl/$version/${platform.folder}/chrome-${platform.folder}.zip';
