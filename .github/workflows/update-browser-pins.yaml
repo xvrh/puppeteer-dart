@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: 'beta'
+          sdk: 'stable'
       - name: Update Chrome to latest stable version
         id: update
         run: |
