@@ -49,13 +49,19 @@ class CSSApi {
   /// [styleSheetId] The css style sheet identifier where a new rule should be inserted.
   /// [ruleText] The text of a new rule.
   /// [location] Text position of a new rule in the target style sheet.
+  /// [nodeForPropertySyntaxValidation] NodeId for the DOM node in whose context custom property declarations for registered properties should be
+  /// validated. If omitted, declarations in the new rule text can only be validated statically, which may produce
+  /// incorrect results if the declaration contains a var() for example.
   /// Returns: The newly created rule.
   Future<CSSRule> addRule(
-      StyleSheetId styleSheetId, String ruleText, SourceRange location) async {
+      StyleSheetId styleSheetId, String ruleText, SourceRange location,
+      {dom.NodeId? nodeForPropertySyntaxValidation}) async {
     var result = await _client.send('CSS.addRule', {
       'styleSheetId': styleSheetId,
       'ruleText': ruleText,
       'location': location,
+      if (nodeForPropertySyntaxValidation != null)
+        'nodeForPropertySyntaxValidation': nodeForPropertySyntaxValidation,
     });
     return CSSRule.fromJson(result['rule'] as Map<String, dynamic>);
   }
@@ -316,10 +322,16 @@ class CSSApi {
   }
 
   /// Applies specified style edits one after another in the given order.
+  /// [nodeForPropertySyntaxValidation] NodeId for the DOM node in whose context custom property declarations for registered properties should be
+  /// validated. If omitted, declarations in the new rule text can only be validated statically, which may produce
+  /// incorrect results if the declaration contains a var() for example.
   /// Returns: The resulting styles after modification.
-  Future<List<CSSStyle>> setStyleTexts(List<StyleDeclarationEdit> edits) async {
+  Future<List<CSSStyle>> setStyleTexts(List<StyleDeclarationEdit> edits,
+      {dom.NodeId? nodeForPropertySyntaxValidation}) async {
     var result = await _client.send('CSS.setStyleTexts', {
       'edits': [...edits],
+      if (nodeForPropertySyntaxValidation != null)
+        'nodeForPropertySyntaxValidation': nodeForPropertySyntaxValidation,
     });
     return (result['styles'] as List)
         .map((e) => CSSStyle.fromJson(e as Map<String, dynamic>))

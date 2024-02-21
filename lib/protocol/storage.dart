@@ -34,11 +34,21 @@ class StorageApi {
           .where((event) => event.name == 'Storage.indexedDBListUpdated')
           .map((event) => IndexedDBListUpdatedEvent.fromJson(event.parameters));
 
-  /// One of the interest groups was accessed by the associated page.
+  /// One of the interest groups was accessed. Note that these events are global
+  /// to all targets sharing an interest group store.
   Stream<InterestGroupAccessedEvent> get onInterestGroupAccessed => _client
       .onEvent
       .where((event) => event.name == 'Storage.interestGroupAccessed')
       .map((event) => InterestGroupAccessedEvent.fromJson(event.parameters));
+
+  /// An auction involving interest groups is taking place. These events are
+  /// target-specific.
+  Stream<InterestGroupAuctionEventOccurredEvent>
+      get onInterestGroupAuctionEventOccurred => _client.onEvent
+          .where((event) =>
+              event.name == 'Storage.interestGroupAuctionEventOccurred')
+          .map((event) => InterestGroupAuctionEventOccurredEvent.fromJson(
+              event.parameters));
 
   /// Shared storage was accessed by the associated page.
   /// The following parameters are included in all events.
@@ -57,13 +67,18 @@ class StorageApi {
       .where((event) => event.name == 'Storage.storageBucketDeleted')
       .map((event) => event.parameters['bucketId'] as String);
 
-  /// TODO(crbug.com/1458532): Add other Attribution Reporting events, e.g.
-  /// trigger registration.
   Stream<AttributionReportingSourceRegisteredEvent>
       get onAttributionReportingSourceRegistered => _client.onEvent
           .where((event) =>
               event.name == 'Storage.attributionReportingSourceRegistered')
           .map((event) => AttributionReportingSourceRegisteredEvent.fromJson(
+              event.parameters));
+
+  Stream<AttributionReportingTriggerRegisteredEvent>
+      get onAttributionReportingTriggerRegistered => _client.onEvent
+          .where((event) =>
+              event.name == 'Storage.attributionReportingTriggerRegistered')
+          .map((event) => AttributionReportingTriggerRegisteredEvent.fromJson(
               event.parameters));
 
   /// Returns a storage key given a frame id.
@@ -251,6 +266,13 @@ class StorageApi {
   /// Enables/Disables issuing of interestGroupAccessed events.
   Future<void> setInterestGroupTracking(bool enable) async {
     await _client.send('Storage.setInterestGroupTracking', {
+      'enable': enable,
+    });
+  }
+
+  /// Enables/Disables issuing of interestGroupAuctionEvent events.
+  Future<void> setInterestGroupAuctionTracking(bool enable) async {
+    await _client.send('Storage.setInterestGroupAuctionTracking', {
       'enable': enable,
     });
   }
@@ -472,11 +494,27 @@ class InterestGroupAccessedEvent {
 
   final String name;
 
+  /// For topLevelBid/topLevelAdditionalBid, and when appropriate,
+  /// win and additionalBidWin
+  final String? componentSellerOrigin;
+
+  /// For bid or somethingBid event, if done locally and not on a server.
+  final num? bid;
+
+  final String? bidCurrency;
+
+  /// For non-global events --- links to interestGroupAuctionEvent
+  final InterestGroupAuctionId? uniqueAuctionId;
+
   InterestGroupAccessedEvent(
       {required this.accessTime,
       required this.type,
       required this.ownerOrigin,
-      required this.name});
+      required this.name,
+      this.componentSellerOrigin,
+      this.bid,
+      this.bidCurrency,
+      this.uniqueAuctionId});
 
   factory InterestGroupAccessedEvent.fromJson(Map<String, dynamic> json) {
     return InterestGroupAccessedEvent(
@@ -484,6 +522,53 @@ class InterestGroupAccessedEvent {
       type: InterestGroupAccessType.fromJson(json['type'] as String),
       ownerOrigin: json['ownerOrigin'] as String,
       name: json['name'] as String,
+      componentSellerOrigin: json.containsKey('componentSellerOrigin')
+          ? json['componentSellerOrigin'] as String
+          : null,
+      bid: json.containsKey('bid') ? json['bid'] as num : null,
+      bidCurrency: json.containsKey('bidCurrency')
+          ? json['bidCurrency'] as String
+          : null,
+      uniqueAuctionId: json.containsKey('uniqueAuctionId')
+          ? InterestGroupAuctionId.fromJson(json['uniqueAuctionId'] as String)
+          : null,
+    );
+  }
+}
+
+class InterestGroupAuctionEventOccurredEvent {
+  final network.TimeSinceEpoch eventTime;
+
+  final InterestGroupAuctionEventType type;
+
+  final InterestGroupAuctionId uniqueAuctionId;
+
+  /// Set for child auctions.
+  final InterestGroupAuctionId? parentAuctionId;
+
+  /// Set for started and configResolved
+  final Map<String, dynamic>? auctionConfig;
+
+  InterestGroupAuctionEventOccurredEvent(
+      {required this.eventTime,
+      required this.type,
+      required this.uniqueAuctionId,
+      this.parentAuctionId,
+      this.auctionConfig});
+
+  factory InterestGroupAuctionEventOccurredEvent.fromJson(
+      Map<String, dynamic> json) {
+    return InterestGroupAuctionEventOccurredEvent(
+      eventTime: network.TimeSinceEpoch.fromJson(json['eventTime'] as num),
+      type: InterestGroupAuctionEventType.fromJson(json['type'] as String),
+      uniqueAuctionId:
+          InterestGroupAuctionId.fromJson(json['uniqueAuctionId'] as String),
+      parentAuctionId: json.containsKey('parentAuctionId')
+          ? InterestGroupAuctionId.fromJson(json['parentAuctionId'] as String)
+          : null,
+      auctionConfig: json.containsKey('auctionConfig')
+          ? json['auctionConfig'] as Map<String, dynamic>
+          : null,
     );
   }
 }
@@ -539,6 +624,31 @@ class AttributionReportingSourceRegisteredEvent {
           json['registration'] as Map<String, dynamic>),
       result: AttributionReportingSourceRegistrationResult.fromJson(
           json['result'] as String),
+    );
+  }
+}
+
+class AttributionReportingTriggerRegisteredEvent {
+  final AttributionReportingTriggerRegistration registration;
+
+  final AttributionReportingEventLevelResult eventLevel;
+
+  final AttributionReportingAggregatableResult aggregatable;
+
+  AttributionReportingTriggerRegisteredEvent(
+      {required this.registration,
+      required this.eventLevel,
+      required this.aggregatable});
+
+  factory AttributionReportingTriggerRegisteredEvent.fromJson(
+      Map<String, dynamic> json) {
+    return AttributionReportingTriggerRegisteredEvent(
+      registration: AttributionReportingTriggerRegistration.fromJson(
+          json['registration'] as Map<String, dynamic>),
+      eventLevel: AttributionReportingEventLevelResult.fromJson(
+          json['eventLevel'] as String),
+      aggregatable: AttributionReportingAggregatableResult.fromJson(
+          json['aggregatable'] as String),
     );
   }
 }
@@ -661,6 +771,14 @@ class TrustTokens {
   }
 }
 
+/// Protected audience interest group auction identifier.
+extension type InterestGroupAuctionId(String value) {
+  factory InterestGroupAuctionId.fromJson(String value) =>
+      InterestGroupAuctionId(value);
+
+  String toJson() => value;
+}
+
 /// Enum of interest group access types.
 enum InterestGroupAccessType {
   join('join'),
@@ -671,6 +789,8 @@ enum InterestGroupAccessType {
   win('win'),
   additionalBid('additionalBid'),
   additionalBidWin('additionalBidWin'),
+  topLevelBid('topLevelBid'),
+  topLevelAdditionalBid('topLevelAdditionalBid'),
   clear('clear'),
   ;
 
@@ -680,6 +800,25 @@ enum InterestGroupAccessType {
 
   factory InterestGroupAccessType.fromJson(String value) =>
       InterestGroupAccessType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Enum of auction events.
+enum InterestGroupAuctionEventType {
+  started('started'),
+  configResolved('configResolved'),
+  ;
+
+  final String value;
+
+  const InterestGroupAuctionEventType(this.value);
+
+  factory InterestGroupAuctionEventType.fromJson(String value) =>
+      InterestGroupAuctionEventType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 
@@ -1185,6 +1324,64 @@ class AttributionReportingFilterDataEntry {
   }
 }
 
+class AttributionReportingFilterConfig {
+  final List<AttributionReportingFilterDataEntry> filterValues;
+
+  /// duration in seconds
+  final int? lookbackWindow;
+
+  AttributionReportingFilterConfig(
+      {required this.filterValues, this.lookbackWindow});
+
+  factory AttributionReportingFilterConfig.fromJson(Map<String, dynamic> json) {
+    return AttributionReportingFilterConfig(
+      filterValues: (json['filterValues'] as List)
+          .map((e) => AttributionReportingFilterDataEntry.fromJson(
+              e as Map<String, dynamic>))
+          .toList(),
+      lookbackWindow: json.containsKey('lookbackWindow')
+          ? json['lookbackWindow'] as int
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'filterValues': filterValues.map((e) => e.toJson()).toList(),
+      if (lookbackWindow != null) 'lookbackWindow': lookbackWindow,
+    };
+  }
+}
+
+class AttributionReportingFilterPair {
+  final List<AttributionReportingFilterConfig> filters;
+
+  final List<AttributionReportingFilterConfig> notFilters;
+
+  AttributionReportingFilterPair(
+      {required this.filters, required this.notFilters});
+
+  factory AttributionReportingFilterPair.fromJson(Map<String, dynamic> json) {
+    return AttributionReportingFilterPair(
+      filters: (json['filters'] as List)
+          .map((e) => AttributionReportingFilterConfig.fromJson(
+              e as Map<String, dynamic>))
+          .toList(),
+      notFilters: (json['notFilters'] as List)
+          .map((e) => AttributionReportingFilterConfig.fromJson(
+              e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'filters': filters.map((e) => e.toJson()).toList(),
+      'notFilters': notFilters.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
 class AttributionReportingAggregationKeysEntry {
   final String key;
 
@@ -1402,6 +1599,307 @@ enum AttributionReportingSourceRegistrationResult {
 
   factory AttributionReportingSourceRegistrationResult.fromJson(String value) =>
       AttributionReportingSourceRegistrationResult.values
+          .firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+enum AttributionReportingSourceRegistrationTimeConfig {
+  include('include'),
+  exclude('exclude'),
+  ;
+
+  final String value;
+
+  const AttributionReportingSourceRegistrationTimeConfig(this.value);
+
+  factory AttributionReportingSourceRegistrationTimeConfig.fromJson(
+          String value) =>
+      AttributionReportingSourceRegistrationTimeConfig.values
+          .firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+class AttributionReportingAggregatableValueEntry {
+  final String key;
+
+  /// number instead of integer because not all uint32 can be represented by
+  /// int
+  final num value;
+
+  AttributionReportingAggregatableValueEntry(
+      {required this.key, required this.value});
+
+  factory AttributionReportingAggregatableValueEntry.fromJson(
+      Map<String, dynamic> json) {
+    return AttributionReportingAggregatableValueEntry(
+      key: json['key'] as String,
+      value: json['value'] as num,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'key': key,
+      'value': value,
+    };
+  }
+}
+
+class AttributionReportingEventTriggerData {
+  final UnsignedInt64AsBase10 data;
+
+  final SignedInt64AsBase10 priority;
+
+  final UnsignedInt64AsBase10? dedupKey;
+
+  final AttributionReportingFilterPair filters;
+
+  AttributionReportingEventTriggerData(
+      {required this.data,
+      required this.priority,
+      this.dedupKey,
+      required this.filters});
+
+  factory AttributionReportingEventTriggerData.fromJson(
+      Map<String, dynamic> json) {
+    return AttributionReportingEventTriggerData(
+      data: UnsignedInt64AsBase10.fromJson(json['data'] as String),
+      priority: SignedInt64AsBase10.fromJson(json['priority'] as String),
+      dedupKey: json.containsKey('dedupKey')
+          ? UnsignedInt64AsBase10.fromJson(json['dedupKey'] as String)
+          : null,
+      filters: AttributionReportingFilterPair.fromJson(
+          json['filters'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'data': data.toJson(),
+      'priority': priority.toJson(),
+      'filters': filters.toJson(),
+      if (dedupKey != null) 'dedupKey': dedupKey!.toJson(),
+    };
+  }
+}
+
+class AttributionReportingAggregatableTriggerData {
+  final UnsignedInt128AsBase16 keyPiece;
+
+  final List<String> sourceKeys;
+
+  final AttributionReportingFilterPair filters;
+
+  AttributionReportingAggregatableTriggerData(
+      {required this.keyPiece,
+      required this.sourceKeys,
+      required this.filters});
+
+  factory AttributionReportingAggregatableTriggerData.fromJson(
+      Map<String, dynamic> json) {
+    return AttributionReportingAggregatableTriggerData(
+      keyPiece: UnsignedInt128AsBase16.fromJson(json['keyPiece'] as String),
+      sourceKeys: (json['sourceKeys'] as List).map((e) => e as String).toList(),
+      filters: AttributionReportingFilterPair.fromJson(
+          json['filters'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'keyPiece': keyPiece.toJson(),
+      'sourceKeys': [...sourceKeys],
+      'filters': filters.toJson(),
+    };
+  }
+}
+
+class AttributionReportingAggregatableDedupKey {
+  final UnsignedInt64AsBase10? dedupKey;
+
+  final AttributionReportingFilterPair filters;
+
+  AttributionReportingAggregatableDedupKey(
+      {this.dedupKey, required this.filters});
+
+  factory AttributionReportingAggregatableDedupKey.fromJson(
+      Map<String, dynamic> json) {
+    return AttributionReportingAggregatableDedupKey(
+      dedupKey: json.containsKey('dedupKey')
+          ? UnsignedInt64AsBase10.fromJson(json['dedupKey'] as String)
+          : null,
+      filters: AttributionReportingFilterPair.fromJson(
+          json['filters'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'filters': filters.toJson(),
+      if (dedupKey != null) 'dedupKey': dedupKey!.toJson(),
+    };
+  }
+}
+
+class AttributionReportingTriggerRegistration {
+  final AttributionReportingFilterPair filters;
+
+  final UnsignedInt64AsBase10? debugKey;
+
+  final List<AttributionReportingAggregatableDedupKey> aggregatableDedupKeys;
+
+  final List<AttributionReportingEventTriggerData> eventTriggerData;
+
+  final List<AttributionReportingAggregatableTriggerData>
+      aggregatableTriggerData;
+
+  final List<AttributionReportingAggregatableValueEntry> aggregatableValues;
+
+  final bool debugReporting;
+
+  final String? aggregationCoordinatorOrigin;
+
+  final AttributionReportingSourceRegistrationTimeConfig
+      sourceRegistrationTimeConfig;
+
+  final String? triggerContextId;
+
+  AttributionReportingTriggerRegistration(
+      {required this.filters,
+      this.debugKey,
+      required this.aggregatableDedupKeys,
+      required this.eventTriggerData,
+      required this.aggregatableTriggerData,
+      required this.aggregatableValues,
+      required this.debugReporting,
+      this.aggregationCoordinatorOrigin,
+      required this.sourceRegistrationTimeConfig,
+      this.triggerContextId});
+
+  factory AttributionReportingTriggerRegistration.fromJson(
+      Map<String, dynamic> json) {
+    return AttributionReportingTriggerRegistration(
+      filters: AttributionReportingFilterPair.fromJson(
+          json['filters'] as Map<String, dynamic>),
+      debugKey: json.containsKey('debugKey')
+          ? UnsignedInt64AsBase10.fromJson(json['debugKey'] as String)
+          : null,
+      aggregatableDedupKeys: (json['aggregatableDedupKeys'] as List)
+          .map((e) => AttributionReportingAggregatableDedupKey.fromJson(
+              e as Map<String, dynamic>))
+          .toList(),
+      eventTriggerData: (json['eventTriggerData'] as List)
+          .map((e) => AttributionReportingEventTriggerData.fromJson(
+              e as Map<String, dynamic>))
+          .toList(),
+      aggregatableTriggerData: (json['aggregatableTriggerData'] as List)
+          .map((e) => AttributionReportingAggregatableTriggerData.fromJson(
+              e as Map<String, dynamic>))
+          .toList(),
+      aggregatableValues: (json['aggregatableValues'] as List)
+          .map((e) => AttributionReportingAggregatableValueEntry.fromJson(
+              e as Map<String, dynamic>))
+          .toList(),
+      debugReporting: json['debugReporting'] as bool? ?? false,
+      aggregationCoordinatorOrigin:
+          json.containsKey('aggregationCoordinatorOrigin')
+              ? json['aggregationCoordinatorOrigin'] as String
+              : null,
+      sourceRegistrationTimeConfig:
+          AttributionReportingSourceRegistrationTimeConfig.fromJson(
+              json['sourceRegistrationTimeConfig'] as String),
+      triggerContextId: json.containsKey('triggerContextId')
+          ? json['triggerContextId'] as String
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'filters': filters.toJson(),
+      'aggregatableDedupKeys':
+          aggregatableDedupKeys.map((e) => e.toJson()).toList(),
+      'eventTriggerData': eventTriggerData.map((e) => e.toJson()).toList(),
+      'aggregatableTriggerData':
+          aggregatableTriggerData.map((e) => e.toJson()).toList(),
+      'aggregatableValues': aggregatableValues.map((e) => e.toJson()).toList(),
+      'debugReporting': debugReporting,
+      'sourceRegistrationTimeConfig': sourceRegistrationTimeConfig.toJson(),
+      if (debugKey != null) 'debugKey': debugKey!.toJson(),
+      if (aggregationCoordinatorOrigin != null)
+        'aggregationCoordinatorOrigin': aggregationCoordinatorOrigin,
+      if (triggerContextId != null) 'triggerContextId': triggerContextId,
+    };
+  }
+}
+
+enum AttributionReportingEventLevelResult {
+  success('success'),
+  successDroppedLowerPriority('successDroppedLowerPriority'),
+  internalError('internalError'),
+  noCapacityForAttributionDestination('noCapacityForAttributionDestination'),
+  noMatchingSources('noMatchingSources'),
+  deduplicated('deduplicated'),
+  excessiveAttributions('excessiveAttributions'),
+  priorityTooLow('priorityTooLow'),
+  neverAttributedSource('neverAttributedSource'),
+  excessiveReportingOrigins('excessiveReportingOrigins'),
+  noMatchingSourceFilterData('noMatchingSourceFilterData'),
+  prohibitedByBrowserPolicy('prohibitedByBrowserPolicy'),
+  noMatchingConfigurations('noMatchingConfigurations'),
+  excessiveReports('excessiveReports'),
+  falselyAttributedSource('falselyAttributedSource'),
+  reportWindowPassed('reportWindowPassed'),
+  notRegistered('notRegistered'),
+  reportWindowNotStarted('reportWindowNotStarted'),
+  noMatchingTriggerData('noMatchingTriggerData'),
+  ;
+
+  final String value;
+
+  const AttributionReportingEventLevelResult(this.value);
+
+  factory AttributionReportingEventLevelResult.fromJson(String value) =>
+      AttributionReportingEventLevelResult.values
+          .firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+enum AttributionReportingAggregatableResult {
+  success('success'),
+  internalError('internalError'),
+  noCapacityForAttributionDestination('noCapacityForAttributionDestination'),
+  noMatchingSources('noMatchingSources'),
+  excessiveAttributions('excessiveAttributions'),
+  excessiveReportingOrigins('excessiveReportingOrigins'),
+  noHistograms('noHistograms'),
+  insufficientBudget('insufficientBudget'),
+  noMatchingSourceFilterData('noMatchingSourceFilterData'),
+  notRegistered('notRegistered'),
+  prohibitedByBrowserPolicy('prohibitedByBrowserPolicy'),
+  deduplicated('deduplicated'),
+  reportWindowPassed('reportWindowPassed'),
+  excessiveReports('excessiveReports'),
+  ;
+
+  final String value;
+
+  const AttributionReportingAggregatableResult(this.value);
+
+  factory AttributionReportingAggregatableResult.fromJson(String value) =>
+      AttributionReportingAggregatableResult.values
           .firstWhere((e) => e.value == value);
 
   String toJson() => value;

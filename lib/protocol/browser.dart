@@ -393,6 +393,7 @@ enum PermissionType {
   audioCapture('audioCapture'),
   backgroundSync('backgroundSync'),
   backgroundFetch('backgroundFetch'),
+  capturedSurfaceControl('capturedSurfaceControl'),
   clipboardReadWrite('clipboardReadWrite'),
   clipboardSanitizedWrite('clipboardSanitizedWrite'),
   displayCapture('displayCapture'),

@@ -46,6 +46,15 @@ class FedCmApi {
     });
   }
 
+  Future<void> openUrl(
+      String dialogId, int accountIndex, AccountUrlType accountUrlType) async {
+    await _client.send('FedCm.openUrl', {
+      'dialogId': dialogId,
+      'accountIndex': accountIndex,
+      'accountUrlType': accountUrlType,
+    });
+  }
+
   Future<void> dismissDialog(String dialogId, {bool? triggerCooldown}) async {
     await _client.send('FedCm.dismissDialog', {
       'dialogId': dialogId,
@@ -148,6 +157,25 @@ enum DialogButton {
 
   factory DialogButton.fromJson(String value) =>
       DialogButton.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// The URLs that each account has
+enum AccountUrlType {
+  termsOfService('TermsOfService'),
+  privacyPolicy('PrivacyPolicy'),
+  ;
+
+  final String value;
+
+  const AccountUrlType(this.value);
+
+  factory AccountUrlType.fromJson(String value) =>
+      AccountUrlType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 

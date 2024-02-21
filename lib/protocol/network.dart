@@ -593,6 +593,17 @@ class NetworkApi {
     });
   }
 
+  /// Enables streaming of the response for the given requestId.
+  /// If enabled, the dataReceived event contains the data that was received during streaming.
+  /// [requestId] Identifier of the request to stream.
+  /// Returns: Data that has been buffered until streaming is enabled.
+  Future<String> streamResourceContent(RequestId requestId) async {
+    var result = await _client.send('Network.streamResourceContent', {
+      'requestId': requestId,
+    });
+    return result['bufferedData'] as String;
+  }
+
   /// Returns information about the COEP/COOP isolation status.
   /// [frameId] If no frameId is provided, the status of the target is provided.
   Future<SecurityIsolationStatus> getSecurityIsolationStatus(
@@ -644,11 +655,15 @@ class DataReceivedEvent {
   /// Actual bytes received (might be less than dataLength for compressed encodings).
   final int encodedDataLength;
 
+  /// Data that was received.
+  final String? data;
+
   DataReceivedEvent(
       {required this.requestId,
       required this.timestamp,
       required this.dataLength,
-      required this.encodedDataLength});
+      required this.encodedDataLength,
+      this.data});
 
   factory DataReceivedEvent.fromJson(Map<String, dynamic> json) {
     return DataReceivedEvent(
@@ -656,6 +671,7 @@ class DataReceivedEvent {
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
       dataLength: json['dataLength'] as int,
       encodedDataLength: json['encodedDataLength'] as int,
+      data: json.containsKey('data') ? json['data'] as String : null,
     );
   }
 }
@@ -2562,6 +2578,9 @@ class ResponseData {
   /// Resource mimeType as determined by the browser.
   final String mimeType;
 
+  /// Resource charset as determined by the browser (if applicable).
+  final String charset;
+
   /// Refined HTTP request headers that were actually transmitted over the network.
   final Headers? requestHeaders;
 
@@ -2622,6 +2641,7 @@ class ResponseData {
       required this.statusText,
       required this.headers,
       required this.mimeType,
+      required this.charset,
       this.requestHeaders,
       required this.connectionReused,
       required this.connectionId,
@@ -2648,6 +2668,7 @@ class ResponseData {
       statusText: json['statusText'] as String,
       headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
       mimeType: json['mimeType'] as String,
+      charset: json['charset'] as String,
       requestHeaders: json.containsKey('requestHeaders')
           ? Headers.fromJson(json['requestHeaders'] as Map<String, dynamic>)
           : null,
@@ -2708,6 +2729,7 @@ class ResponseData {
       'statusText': statusText,
       'headers': headers.toJson(),
       'mimeType': mimeType,
+      'charset': charset,
       'connectionReused': connectionReused,
       'connectionId': connectionId,
       'encodedDataLength': encodedDataLength,
