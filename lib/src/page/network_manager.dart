@@ -555,7 +555,8 @@ class Response {
           connectionReused: false,
           connectionId: 0,
           encodedDataLength: 0,
-          securityState: SecurityState.unknown),
+          securityState: SecurityState.unknown,
+          charset: 'utf8'),
     );
   }
 

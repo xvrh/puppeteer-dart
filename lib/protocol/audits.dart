@@ -348,6 +348,7 @@ enum MixedContentResourceType {
   frame('Frame'),
   image('Image'),
   import$('Import'),
+  json('JSON'),
   manifest('Manifest'),
   ping('Ping'),
   pluginData('PluginData'),
