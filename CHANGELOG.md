@@ -1,3 +1,6 @@
+## 3.8.0
+- Update to Chrome 122.0.6261.69
+
 ## 3.7.0
 - Update to Chrome 121.0.6167.184
 - Requires Dart 3.3.0
