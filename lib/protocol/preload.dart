@@ -221,7 +221,7 @@ class RuleSet {
   final network.RequestId? requestId;
 
   /// Error information
-  /// `errorMessage` is null iff `errorType` is null.
+  /// `errorMessage` is null if `errorType` is null.
   final RuleSetErrorType? errorType;
 
   RuleSet(
@@ -369,7 +369,7 @@ class PreloadingAttemptKey {
 /// that had a speculation rule that triggered the attempt, and the
 /// BackendNodeIds of <a href> or <area href> elements that triggered the
 /// attempt (in the case of attempts triggered by a document rule). It is
-/// possible for mulitple rule sets and links to trigger a single attempt.
+/// possible for multiple rule sets and links to trigger a single attempt.
 class PreloadingAttemptSource {
   final PreloadingAttemptKey key;
 

@@ -18,7 +18,7 @@ class IOApi {
 
   /// Read a chunk of the stream
   /// [handle] Handle of the stream to read.
-  /// [offset] Seek to the specified offset before reading (if not specificed, proceed with offset
+  /// [offset] Seek to the specified offset before reading (if not specified, proceed with offset
   /// following the last read). Some types of streams may only support sequential reads.
   /// [size] Maximum number of bytes to read (left upon the agent discretion if not specified).
   Future<ReadResult> read(StreamHandle handle, {int? offset, int? size}) async {

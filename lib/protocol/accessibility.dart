@@ -61,7 +61,7 @@ class AccessibilityApi {
   /// [depth] The maximum depth at which descendants of the root node should be retrieved.
   /// If omitted, the full tree is returned.
   /// [frameId] The frame for whose document the AX tree should be retrieved.
-  /// If omited, the root frame is used.
+  /// If omitted, the root frame is used.
   Future<List<AXNodeData>> getFullAXTree(
       {int? depth, page.FrameId? frameId}) async {
     var result = await _client.send('Accessibility.getFullAXTree', {
@@ -120,7 +120,7 @@ class AccessibilityApi {
 
   /// Query a DOM node's accessibility subtree for accessible name and role.
   /// This command computes the name and role for all nodes in the subtree, including those that are
-  /// ignored for accessibility, and returns those that mactch the specified name and role. If no DOM
+  /// ignored for accessibility, and returns those that match the specified name and role. If no DOM
   /// node is specified, or the DOM node does not exist, the command returns an error. If neither
   /// `accessibleName` or `role` is specified, it returns all the accessibility nodes in the subtree.
   /// [nodeId] Identifier of the node for the root to query.

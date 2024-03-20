@@ -193,7 +193,7 @@ class CertificateSecurityState {
   /// The highest priority network error code, if the certificate has an error.
   final String? certificateNetworkError;
 
-  /// True if the certificate uses a weak signature aglorithm.
+  /// True if the certificate uses a weak signature algorithm.
   final bool certificateHasWeakSignature;
 
   /// True if the certificate has a SHA1 signature in the chain.

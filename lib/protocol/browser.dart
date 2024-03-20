@@ -58,7 +58,7 @@ class BrowserApi {
   /// Set the behavior when downloading a file.
   /// [behavior] Whether to allow all or deny all download requests, or use default Chrome behavior if
   /// available (otherwise deny). |allowAndName| allows download and names files according to
-  /// their dowmload guids.
+  /// their download guids.
   /// [browserContextId] BrowserContext to set download behavior. When omitted, default browser context is used.
   /// [downloadPath] The default path to save downloaded files to. This is required if behavior is set to 'allow'
   /// or 'allowAndName'.
@@ -411,6 +411,7 @@ enum PermissionType {
   protectedMediaIdentifier('protectedMediaIdentifier'),
   sensors('sensors'),
   storageAccess('storageAccess'),
+  speakerSelection('speakerSelection'),
   topLevelStorageAccess('topLevelStorageAccess'),
   videoCapture('videoCapture'),
   videoCapturePanTiltZoom('videoCapturePanTiltZoom'),

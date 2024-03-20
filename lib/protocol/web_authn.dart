@@ -136,6 +136,19 @@ class WebAuthnApi {
       'enabled': enabled,
     });
   }
+
+  /// Allows setting credential properties.
+  /// https://w3c.github.io/webauthn/#sctn-automation-set-credential-properties
+  Future<void> setCredentialProperties(
+      AuthenticatorId authenticatorId, String credentialId,
+      {bool? backupEligibility, bool? backupState}) async {
+    await _client.send('WebAuthn.setCredentialProperties', {
+      'authenticatorId': authenticatorId,
+      'credentialId': credentialId,
+      if (backupEligibility != null) 'backupEligibility': backupEligibility,
+      if (backupState != null) 'backupState': backupState,
+    });
+  }
 }
 
 class CredentialAddedEvent {
@@ -389,6 +402,16 @@ class Credential {
   /// See https://w3c.github.io/webauthn/#sctn-large-blob-extension
   final String? largeBlob;
 
+  /// Assertions returned by this credential will have the backup eligibility
+  /// (BE) flag set to this value. Defaults to the authenticator's
+  /// defaultBackupEligibility value.
+  final bool? backupEligibility;
+
+  /// Assertions returned by this credential will have the backup state (BS)
+  /// flag set to this value. Defaults to the authenticator's
+  /// defaultBackupState value.
+  final bool? backupState;
+
   Credential(
       {required this.credentialId,
       required this.isResidentCredential,
@@ -396,7 +419,9 @@ class Credential {
       required this.privateKey,
       this.userHandle,
       required this.signCount,
-      this.largeBlob});
+      this.largeBlob,
+      this.backupEligibility,
+      this.backupState});
 
   factory Credential.fromJson(Map<String, dynamic> json) {
     return Credential(
@@ -409,6 +434,11 @@ class Credential {
       signCount: json['signCount'] as int,
       largeBlob:
           json.containsKey('largeBlob') ? json['largeBlob'] as String : null,
+      backupEligibility: json.containsKey('backupEligibility')
+          ? json['backupEligibility'] as bool
+          : null,
+      backupState:
+          json.containsKey('backupState') ? json['backupState'] as bool : null,
     );
   }
 
@@ -421,6 +451,8 @@ class Credential {
       if (rpId != null) 'rpId': rpId,
       if (userHandle != null) 'userHandle': userHandle,
       if (largeBlob != null) 'largeBlob': largeBlob,
+      if (backupEligibility != null) 'backupEligibility': backupEligibility,
+      if (backupState != null) 'backupState': backupState,
     };
   }
 }

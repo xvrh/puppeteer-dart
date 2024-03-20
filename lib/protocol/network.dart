@@ -301,19 +301,22 @@ class NetworkApi {
     });
   }
 
-  /// Deletes browser cookies with matching name and url or domain/path pair.
+  /// Deletes browser cookies with matching name and url or domain/path/partitionKey pair.
   /// [name] Name of the cookies to remove.
   /// [url] If specified, deletes all the cookies with the given name where domain and path match
   /// provided URL.
   /// [domain] If specified, deletes only cookies with the exact domain.
   /// [path] If specified, deletes only cookies with the exact path.
+  /// [partitionKey] If specified, deletes only cookies with the the given name and partitionKey where domain
+  /// matches provided URL.
   Future<void> deleteCookies(String name,
-      {String? url, String? domain, String? path}) async {
+      {String? url, String? domain, String? path, String? partitionKey}) async {
     await _client.send('Network.deleteCookies', {
       'name': name,
       if (url != null) 'url': url,
       if (domain != null) 'domain': domain,
       if (path != null) 'path': path,
+      if (partitionKey != null) 'partitionKey': partitionKey,
     });
   }
 
@@ -720,7 +723,7 @@ class LoadingFailedEvent {
   /// Resource type.
   final ResourceType type;
 
-  /// User friendly error message.
+  /// Error message. List of network errors: https://cs.chromium.org/chromium/src/net/base/net_error_list.h
   final String errorText;
 
   /// True if loading was canceled.
@@ -1285,8 +1288,8 @@ class RequestWillBeSentExtraInfoEvent {
   final RequestId requestId;
 
   /// A list of cookies potentially associated to the requested URL. This includes both cookies sent with
-  /// the request and the ones not sent; the latter are distinguished by having blockedReason field set.
-  final List<BlockedCookieWithReason> associatedCookies;
+  /// the request and the ones not sent; the latter are distinguished by having blockedReasons field set.
+  final List<AssociatedCookie> associatedCookies;
 
   /// Raw request headers as they will be sent over the wire.
   final Headers headers;
@@ -1312,8 +1315,7 @@ class RequestWillBeSentExtraInfoEvent {
     return RequestWillBeSentExtraInfoEvent(
       requestId: RequestId.fromJson(json['requestId'] as String),
       associatedCookies: (json['associatedCookies'] as List)
-          .map((e) =>
-              BlockedCookieWithReason.fromJson(e as Map<String, dynamic>))
+          .map((e) => AssociatedCookie.fromJson(e as Map<String, dynamic>))
           .toList(),
       headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
       connectTiming:
@@ -1359,8 +1361,12 @@ class ResponseReceivedExtraInfoEvent {
   /// Only sent when partitioned cookies are enabled.
   final String? cookiePartitionKey;
 
-  /// True if partitioned cookies are enabled, but the partition key is not serializeable to string.
+  /// True if partitioned cookies are enabled, but the partition key is not serializable to string.
   final bool? cookiePartitionKeyOpaque;
+
+  /// A list of cookies which should have been blocked by 3PCD but are exempted and stored from
+  /// the response with the corresponding reason.
+  final List<ExemptedSetCookieWithReason>? exemptedCookies;
 
   ResponseReceivedExtraInfoEvent(
       {required this.requestId,
@@ -1370,7 +1376,8 @@ class ResponseReceivedExtraInfoEvent {
       required this.statusCode,
       this.headersText,
       this.cookiePartitionKey,
-      this.cookiePartitionKeyOpaque});
+      this.cookiePartitionKeyOpaque,
+      this.exemptedCookies});
 
   factory ResponseReceivedExtraInfoEvent.fromJson(Map<String, dynamic> json) {
     return ResponseReceivedExtraInfoEvent(
@@ -1391,6 +1398,12 @@ class ResponseReceivedExtraInfoEvent {
           : null,
       cookiePartitionKeyOpaque: json.containsKey('cookiePartitionKeyOpaque')
           ? json['cookiePartitionKeyOpaque'] as bool
+          : null,
+      exemptedCookies: json.containsKey('exemptedCookies')
+          ? (json['exemptedCookies'] as List)
+              .map((e) => ExemptedSetCookieWithReason.fromJson(
+                  e as Map<String, dynamic>))
+              .toList()
           : null,
     );
   }
@@ -2009,7 +2022,7 @@ class RequestData {
   final TrustTokenParams? trustTokenParams;
 
   /// True if this resource request is considered to be the 'same site' as the
-  /// request correspondinfg to the main frame.
+  /// request corresponding to the main frame.
   final bool? isSameSite;
 
   RequestData(
@@ -2543,20 +2556,47 @@ enum AlternateProtocolUsage {
   String toString() => value.toString();
 }
 
+/// Source of service worker router.
+enum ServiceWorkerRouterSource {
+  network('network'),
+  cache('cache'),
+  fetchEvent('fetch-event'),
+  raceNetworkAndFetchHandler('race-network-and-fetch-handler'),
+  ;
+
+  final String value;
+
+  const ServiceWorkerRouterSource(this.value);
+
+  factory ServiceWorkerRouterSource.fromJson(String value) =>
+      ServiceWorkerRouterSource.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
 class ServiceWorkerRouterInfo {
   final int ruleIdMatched;
 
-  ServiceWorkerRouterInfo({required this.ruleIdMatched});
+  final ServiceWorkerRouterSource matchedSourceType;
+
+  ServiceWorkerRouterInfo(
+      {required this.ruleIdMatched, required this.matchedSourceType});
 
   factory ServiceWorkerRouterInfo.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerRouterInfo(
       ruleIdMatched: json['ruleIdMatched'] as int,
+      matchedSourceType: ServiceWorkerRouterSource.fromJson(
+          json['matchedSourceType'] as String),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'ruleIdMatched': ruleIdMatched,
+      'matchedSourceType': matchedSourceType.toJson(),
     };
   }
 }
@@ -2605,7 +2645,7 @@ class ResponseData {
   /// Specifies that the request was served from the prefetch cache.
   final bool? fromPrefetchCache;
 
-  /// Infomation about how Service Worker Static Router was used.
+  /// Information about how Service Worker Static Router was used.
   final ServiceWorkerRouterInfo? serviceWorkerRouterInfo;
 
   /// Total number of bytes received for this request so far.
@@ -3178,6 +3218,32 @@ enum CookieBlockedReason {
   String toString() => value.toString();
 }
 
+/// Types of reasons why a cookie should have been blocked by 3PCD but is exempted for the request.
+enum CookieExemptionReason {
+  none('None'),
+  userSetting('UserSetting'),
+  tpcdMetadata('TPCDMetadata'),
+  tpcdDeprecationTrial('TPCDDeprecationTrial'),
+  tpcdHeuristics('TPCDHeuristics'),
+  enterprisePolicy('EnterprisePolicy'),
+  storageAccess('StorageAccess'),
+  topLevelStorageAccess('TopLevelStorageAccess'),
+  corsOptIn('CorsOptIn'),
+  ;
+
+  final String value;
+
+  const CookieExemptionReason(this.value);
+
+  factory CookieExemptionReason.fromJson(String value) =>
+      CookieExemptionReason.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// A cookie which was not stored from a response with the corresponding reason.
 class BlockedSetCookieWithReason {
   /// The reason(s) this cookie was blocked.
@@ -3216,29 +3282,69 @@ class BlockedSetCookieWithReason {
   }
 }
 
-/// A cookie with was not sent with a request with the corresponding reason.
-class BlockedCookieWithReason {
-  /// The reason(s) the cookie was blocked.
-  final List<CookieBlockedReason> blockedReasons;
+/// A cookie should have been blocked by 3PCD but is exempted and stored from a response with the
+/// corresponding reason. A cookie could only have at most one exemption reason.
+class ExemptedSetCookieWithReason {
+  /// The reason the cookie was exempted.
+  final CookieExemptionReason exemptionReason;
 
-  /// The cookie object representing the cookie which was not sent.
+  /// The cookie object representing the cookie.
   final Cookie cookie;
 
-  BlockedCookieWithReason({required this.blockedReasons, required this.cookie});
+  ExemptedSetCookieWithReason(
+      {required this.exemptionReason, required this.cookie});
 
-  factory BlockedCookieWithReason.fromJson(Map<String, dynamic> json) {
-    return BlockedCookieWithReason(
-      blockedReasons: (json['blockedReasons'] as List)
-          .map((e) => CookieBlockedReason.fromJson(e as String))
-          .toList(),
+  factory ExemptedSetCookieWithReason.fromJson(Map<String, dynamic> json) {
+    return ExemptedSetCookieWithReason(
+      exemptionReason:
+          CookieExemptionReason.fromJson(json['exemptionReason'] as String),
       cookie: Cookie.fromJson(json['cookie'] as Map<String, dynamic>),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'blockedReasons': blockedReasons.map((e) => e.toJson()).toList(),
+      'exemptionReason': exemptionReason.toJson(),
       'cookie': cookie.toJson(),
+    };
+  }
+}
+
+/// A cookie associated with the request which may or may not be sent with it.
+/// Includes the cookies itself and reasons for blocking or exemption.
+class AssociatedCookie {
+  /// The cookie object representing the cookie which was not sent.
+  final Cookie cookie;
+
+  /// The reason(s) the cookie was blocked. If empty means the cookie is included.
+  final List<CookieBlockedReason> blockedReasons;
+
+  /// The reason the cookie should have been blocked by 3PCD but is exempted. A cookie could
+  /// only have at most one exemption reason.
+  final CookieExemptionReason? exemptionReason;
+
+  AssociatedCookie(
+      {required this.cookie,
+      required this.blockedReasons,
+      this.exemptionReason});
+
+  factory AssociatedCookie.fromJson(Map<String, dynamic> json) {
+    return AssociatedCookie(
+      cookie: Cookie.fromJson(json['cookie'] as Map<String, dynamic>),
+      blockedReasons: (json['blockedReasons'] as List)
+          .map((e) => CookieBlockedReason.fromJson(e as String))
+          .toList(),
+      exemptionReason: json.containsKey('exemptionReason')
+          ? CookieExemptionReason.fromJson(json['exemptionReason'] as String)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'cookie': cookie.toJson(),
+      'blockedReasons': blockedReasons.map((e) => e.toJson()).toList(),
+      if (exemptionReason != null) 'exemptionReason': exemptionReason!.toJson(),
     };
   }
 }
@@ -3723,7 +3829,7 @@ class SignedExchangeInfo {
   /// Security details for the signed exchange header.
   final SecurityDetails? securityDetails;
 
-  /// Errors occurred while handling the signed exchagne.
+  /// Errors occurred while handling the signed exchange.
   final List<SignedExchangeError>? errors;
 
   SignedExchangeInfo(

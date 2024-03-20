@@ -50,6 +50,18 @@ class StorageApi {
           .map((event) => InterestGroupAuctionEventOccurredEvent.fromJson(
               event.parameters));
 
+  /// Specifies which auctions a particular network fetch may be related to, and
+  /// in what role. Note that it is not ordered with respect to
+  /// Network.requestWillBeSent (but will happen before loadingFinished
+  /// loadingFailed).
+  Stream<InterestGroupAuctionNetworkRequestCreatedEvent>
+      get onInterestGroupAuctionNetworkRequestCreated => _client.onEvent
+          .where((event) =>
+              event.name == 'Storage.interestGroupAuctionNetworkRequestCreated')
+          .map((event) =>
+              InterestGroupAuctionNetworkRequestCreatedEvent.fromJson(
+                  event.parameters));
+
   /// Shared storage was accessed by the associated page.
   /// The following parameters are included in all events.
   Stream<SharedStorageAccessedEvent> get onSharedStorageAccessed => _client
@@ -270,7 +282,8 @@ class StorageApi {
     });
   }
 
-  /// Enables/Disables issuing of interestGroupAuctionEvent events.
+  /// Enables/Disables issuing of interestGroupAuctionEventOccurred and
+  /// interestGroupAuctionNetworkRequestCreated.
   Future<void> setInterestGroupAuctionTracking(bool enable) async {
     await _client.send('Storage.setInterestGroupAuctionTracking', {
       'enable': enable,
@@ -573,6 +586,31 @@ class InterestGroupAuctionEventOccurredEvent {
   }
 }
 
+class InterestGroupAuctionNetworkRequestCreatedEvent {
+  final InterestGroupAuctionFetchType type;
+
+  final network.RequestId requestId;
+
+  /// This is the set of the auctions using the worklet that issued this
+  /// request.  In the case of trusted signals, it's possible that only some of
+  /// them actually care about the keys being queried.
+  final List<InterestGroupAuctionId> auctions;
+
+  InterestGroupAuctionNetworkRequestCreatedEvent(
+      {required this.type, required this.requestId, required this.auctions});
+
+  factory InterestGroupAuctionNetworkRequestCreatedEvent.fromJson(
+      Map<String, dynamic> json) {
+    return InterestGroupAuctionNetworkRequestCreatedEvent(
+      type: InterestGroupAuctionFetchType.fromJson(json['type'] as String),
+      requestId: network.RequestId.fromJson(json['requestId'] as String),
+      auctions: (json['auctions'] as List)
+          .map((e) => InterestGroupAuctionId.fromJson(e as String))
+          .toList(),
+    );
+  }
+}
+
 class SharedStorageAccessedEvent {
   /// Time of the access.
   final network.TimeSinceEpoch accessTime;
@@ -586,7 +624,7 @@ class SharedStorageAccessedEvent {
   /// Serialized origin for the context that invoked the Shared Storage API.
   final String ownerOrigin;
 
-  /// The sub-parameters warapped by `params` are all optional and their
+  /// The sub-parameters wrapped by `params` are all optional and their
   /// presence/absence depends on `type`.
   final SharedStorageAccessParams params;
 
@@ -826,6 +864,28 @@ enum InterestGroupAuctionEventType {
   String toString() => value.toString();
 }
 
+/// Enum of network fetches auctions can do.
+enum InterestGroupAuctionFetchType {
+  bidderJs('bidderJs'),
+  bidderWasm('bidderWasm'),
+  sellerJs('sellerJs'),
+  bidderTrustedSignals('bidderTrustedSignals'),
+  sellerTrustedSignals('sellerTrustedSignals'),
+  ;
+
+  final String value;
+
+  const InterestGroupAuctionFetchType(this.value);
+
+  factory InterestGroupAuctionFetchType.fromJson(String value) =>
+      InterestGroupAuctionFetchType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Ad advertising element inside an interest group.
 class InterestGroupAd {
   final String renderURL;
@@ -1001,16 +1061,24 @@ class SharedStorageEntry {
 
 /// Details for an origin's shared storage.
 class SharedStorageMetadata {
+  /// Time when the origin's shared storage was last created.
   final network.TimeSinceEpoch creationTime;
 
+  /// Number of key-value pairs stored in origin's shared storage.
   final int length;
 
+  /// Current amount of bits of entropy remaining in the navigation budget.
   final num remainingBudget;
+
+  /// Total number of bytes stored as key-value pairs in origin's shared
+  /// storage.
+  final int bytesUsed;
 
   SharedStorageMetadata(
       {required this.creationTime,
       required this.length,
-      required this.remainingBudget});
+      required this.remainingBudget,
+      required this.bytesUsed});
 
   factory SharedStorageMetadata.fromJson(Map<String, dynamic> json) {
     return SharedStorageMetadata(
@@ -1018,6 +1086,7 @@ class SharedStorageMetadata {
           network.TimeSinceEpoch.fromJson(json['creationTime'] as num),
       length: json['length'] as int,
       remainingBudget: json['remainingBudget'] as num,
+      bytesUsed: json['bytesUsed'] as int,
     );
   }
 
@@ -1026,6 +1095,7 @@ class SharedStorageMetadata {
       'creationTime': creationTime.toJson(),
       'length': length,
       'remainingBudget': remainingBudget,
+      'bytesUsed': bytesUsed,
     };
   }
 }
@@ -1627,19 +1697,19 @@ enum AttributionReportingSourceRegistrationTimeConfig {
   String toString() => value.toString();
 }
 
-class AttributionReportingAggregatableValueEntry {
+class AttributionReportingAggregatableValueDictEntry {
   final String key;
 
   /// number instead of integer because not all uint32 can be represented by
   /// int
   final num value;
 
-  AttributionReportingAggregatableValueEntry(
+  AttributionReportingAggregatableValueDictEntry(
       {required this.key, required this.value});
 
-  factory AttributionReportingAggregatableValueEntry.fromJson(
+  factory AttributionReportingAggregatableValueDictEntry.fromJson(
       Map<String, dynamic> json) {
-    return AttributionReportingAggregatableValueEntry(
+    return AttributionReportingAggregatableValueDictEntry(
       key: json['key'] as String,
       value: json['value'] as num,
     );
@@ -1649,6 +1719,34 @@ class AttributionReportingAggregatableValueEntry {
     return {
       'key': key,
       'value': value,
+    };
+  }
+}
+
+class AttributionReportingAggregatableValueEntry {
+  final List<AttributionReportingAggregatableValueDictEntry> values;
+
+  final AttributionReportingFilterPair filters;
+
+  AttributionReportingAggregatableValueEntry(
+      {required this.values, required this.filters});
+
+  factory AttributionReportingAggregatableValueEntry.fromJson(
+      Map<String, dynamic> json) {
+    return AttributionReportingAggregatableValueEntry(
+      values: (json['values'] as List)
+          .map((e) => AttributionReportingAggregatableValueDictEntry.fromJson(
+              e as Map<String, dynamic>))
+          .toList(),
+      filters: AttributionReportingFilterPair.fromJson(
+          json['filters'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'values': values.map((e) => e.toJson()).toList(),
+      'filters': filters.toJson(),
     };
   }
 }

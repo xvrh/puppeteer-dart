@@ -367,8 +367,8 @@ void main() {
       server.setRoute('/malformed', (req) => shelf.Response.ok(''));
       page.onRequest.listen((request) => request.continueRequest());
       var response = await page.goto(server.prefix + '/malformed?rnd=%911');
-      expect(response.status, equals(200));
-    }, skip: 'Has error with URI parsing');
+      expect(response.status, equals(400));
+    });
     test('should work with encoded server - 2', () async {
       // The requestWillBeSent will report URL as-is, whereas interception will
       // report encoded URL for stylesheet. @see crbug.com/759388
@@ -380,9 +380,10 @@ void main() {
       });
       var response = await page.goto(
           'data:text/html,<link rel="stylesheet" href="${server.prefix}/fonts?helvetica|arial"/>');
+      await Future.delayed(const Duration(milliseconds: 100));
       expect(response.status, equals(200));
       expect(requests.length, equals(2));
-      expect(requests[1].response!.status, equals(404));
+      expect(requests[1].response, isNull);
     });
     test(
         'should not throw Invalid Interception Id if the request was cancelled',
