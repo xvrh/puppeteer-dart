@@ -211,7 +211,7 @@ class DOMApi {
   }
 
   /// Returns attributes for the specified node.
-  /// [nodeId] Id of the node to retrieve attibutes for.
+  /// [nodeId] Id of the node to retrieve attributes for.
   /// Returns: An interleaved array of node attribute names and values.
   Future<List<String>> getAttributes(NodeId nodeId) async {
     var result = await _client.send('DOM.getAttributes', {
@@ -1166,6 +1166,25 @@ enum LogicalAxes {
 
   factory LogicalAxes.fromJson(String value) =>
       LogicalAxes.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Physical scroll orientation
+enum ScrollOrientation {
+  horizontal('horizontal'),
+  vertical('vertical'),
+  ;
+
+  final String value;
+
+  const ScrollOrientation(this.value);
+
+  factory ScrollOrientation.fromJson(String value) =>
+      ScrollOrientation.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 

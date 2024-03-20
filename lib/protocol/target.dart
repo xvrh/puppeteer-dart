@@ -93,7 +93,7 @@ class TargetApi {
   ///
   /// Injected object will be available as `window[bindingName]`.
   ///
-  /// The object has the follwing API:
+  /// The object has the following API:
   /// - `binding.send(json)` - a method to send messages over the remote debugging protocol
   /// - `binding.onmessage = json => handleMessage(json)` - a callback that will be called for the protocol notifications and command responses.
   /// [bindingName] Binding name, 'cdp' if not specified.
@@ -384,6 +384,7 @@ class TargetInfo {
 
   final String type;
 
+  /// List of types: https://source.chromium.org/chromium/chromium/src/+/main:content/browser/devtools/devtools_agent_host_impl.cc?ss=chromium&q=f:devtools%20-f:out%20%22::kTypeTab%5B%5D%22
   final String title;
 
   final String url;
@@ -459,7 +460,7 @@ class TargetInfo {
 
 /// A filter used by target query/discovery/auto-attach operations.
 class FilterEntry {
-  /// If set, causes exclusion of mathcing targets from the list.
+  /// If set, causes exclusion of matching targets from the list.
   final bool? exclude;
 
   /// If not present, matches any type.

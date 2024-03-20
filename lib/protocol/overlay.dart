@@ -94,8 +94,8 @@ class OverlayApi {
   }
 
   /// Highlights owner element of the frame with given id.
-  /// Deprecated: Doesn't work reliablity and cannot be fixed due to process
-  /// separatation (the owner node might be in a different process). Determine
+  /// Deprecated: Doesn't work reliably and cannot be fixed due to process
+  /// separation (the owner node might be in a different process). Determine
   /// the owner node in the client and use highlightNode.
   /// [frameId] Identifier of the frame to highlight.
   /// [contentColor] The content box highlight fill color (default: transparent).
@@ -339,7 +339,7 @@ class OverlayApi {
 
 /// Configuration data for drawing the source order of an elements children.
 class SourceOrderConfig {
-  /// the color to outline the givent element in.
+  /// the color to outline the given element in.
   final dom.RGBA parentOutlineColor;
 
   /// the color to outline the child elements in.
@@ -1116,7 +1116,7 @@ class WindowControlsOverlayConfig {
   /// Whether the title bar CSS should be shown when emulating the Window Controls Overlay.
   final bool showCSS;
 
-  /// Seleted platforms to show the overlay.
+  /// Selected platforms to show the overlay.
   final String selectedPlatform;
 
   /// The theme color defined in app manifest.

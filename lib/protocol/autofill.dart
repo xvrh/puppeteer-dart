@@ -184,7 +184,7 @@ class Address {
 /// Jon Doe
 /// Munich 81456
 class AddressUI {
-  /// A two dimension array containing the repesentation of values from an address profile.
+  /// A two dimension array containing the representation of values from an address profile.
   final List<AddressFields> addressFields;
 
   AddressUI({required this.addressFields});
@@ -242,6 +242,9 @@ class FilledField {
   /// The filling strategy
   final FillingStrategy fillingStrategy;
 
+  /// The frame the field belongs to
+  final page.FrameId frameId;
+
   /// The form field's DOM node
   final dom.BackendNodeId fieldId;
 
@@ -252,6 +255,7 @@ class FilledField {
       required this.value,
       required this.autofillType,
       required this.fillingStrategy,
+      required this.frameId,
       required this.fieldId});
 
   factory FilledField.fromJson(Map<String, dynamic> json) {
@@ -263,6 +267,7 @@ class FilledField {
       autofillType: json['autofillType'] as String,
       fillingStrategy:
           FillingStrategy.fromJson(json['fillingStrategy'] as String),
+      frameId: page.FrameId.fromJson(json['frameId'] as String),
       fieldId: dom.BackendNodeId.fromJson(json['fieldId'] as int),
     );
   }
@@ -275,6 +280,7 @@ class FilledField {
       'value': value,
       'autofillType': autofillType,
       'fillingStrategy': fillingStrategy.toJson(),
+      'frameId': frameId.toJson(),
       'fieldId': fieldId.toJson(),
     };
   }

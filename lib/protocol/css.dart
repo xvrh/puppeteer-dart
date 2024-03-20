@@ -798,7 +798,7 @@ class CSSStyleSheetHeader {
   final page.FrameId frameId;
 
   /// Stylesheet resource URL. Empty if this is a constructed stylesheet created using
-  /// new CSSStyleSheet() (but non-empty if this is a constructed sylesheet imported
+  /// new CSSStyleSheet() (but non-empty if this is a constructed stylesheet imported
   /// as a CSS module script).
   final String sourceURL;
 

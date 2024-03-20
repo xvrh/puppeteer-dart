@@ -223,7 +223,7 @@ class EmulationApi {
     });
   }
 
-  /// Updates the sensor readings reported by a sensor type previously overriden
+  /// Updates the sensor readings reported by a sensor type previously overridden
   /// by setSensorOverrideEnabled.
   Future<void> setSensorOverrideReadings(
       SensorType type, SensorReading reading) async {
@@ -316,8 +316,9 @@ class EmulationApi {
   }
 
   /// Overrides default host system timezone with the specified one.
-  /// [timezoneId] The timezone identifier. If empty, disables the override and
-  /// restores default host system timezone.
+  /// [timezoneId] The timezone identifier. List of supported timezones:
+  /// https://source.chromium.org/chromium/chromium/deps/icu.git/+/faee8bc70570192d82d2978a71e2a615788597d1:source/data/misc/metaZones.txt
+  /// If empty, disables the override and restores default host system timezone.
   Future<void> setTimezoneOverride(String timezoneId) async {
     await _client.send('Emulation.setTimezoneOverride', {
       'timezoneId': timezoneId,
@@ -352,6 +353,7 @@ class EmulationApi {
   }
 
   /// Allows overriding user agent with the given string.
+  /// `userAgentMetadata` must be set for Client Hint headers to be sent.
   /// [userAgent] User agent to use.
   /// [acceptLanguage] Browser language to emulate.
   /// [platform] The platform navigator.platform should return.
@@ -558,7 +560,7 @@ enum VirtualTimePolicy {
   String toString() => value.toString();
 }
 
-/// Used to specify User Agent Cient Hints to emulate. See https://wicg.github.io/ua-client-hints
+/// Used to specify User Agent Client Hints to emulate. See https://wicg.github.io/ua-client-hints
 class UserAgentBrandVersion {
   final String brand;
 
@@ -581,7 +583,7 @@ class UserAgentBrandVersion {
   }
 }
 
-/// Used to specify User Agent Cient Hints to emulate. See https://wicg.github.io/ua-client-hints
+/// Used to specify User Agent Client Hints to emulate. See https://wicg.github.io/ua-client-hints
 /// Missing optional values will be filled in by the target with what it would normally use.
 class UserAgentMetadata {
   /// Brands appearing in Sec-CH-UA.

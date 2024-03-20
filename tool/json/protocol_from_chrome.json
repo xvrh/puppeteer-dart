@@ -407,7 +407,7 @@
                         },
                         {
                             "name": "frameId",
-                            "description": "The frame for whose document the AX tree should be retrieved.\nIf omited, the root frame is used.",
+                            "description": "The frame for whose document the AX tree should be retrieved.\nIf omitted, the root frame is used.",
                             "optional": true,
                             "$ref": "Page.FrameId"
                         }
@@ -503,7 +503,7 @@
                 },
                 {
                     "name": "queryAXTree",
-                    "description": "Query a DOM node's accessibility subtree for accessible name and role.\nThis command computes the name and role for all nodes in the subtree, including those that are\nignored for accessibility, and returns those that mactch the specified name and role. If no DOM\nnode is specified, or the DOM node does not exist, the command returns an error. If neither\n`accessibleName` or `role` is specified, it returns all the accessibility nodes in the subtree.",
+                    "description": "Query a DOM node's accessibility subtree for accessible name and role.\nThis command computes the name and role for all nodes in the subtree, including those that are\nignored for accessibility, and returns those that match the specified name and role. If no DOM\nnode is specified, or the DOM node does not exist, the command returns an error. If neither\n`accessibleName` or `role` is specified, it returns all the accessibility nodes in the subtree.",
                     "experimental": true,
                     "parameters": [
                         {
@@ -619,7 +619,7 @@
                         },
                         {
                             "name": "startTime",
-                            "description": "`Animation`'s start time.",
+                            "description": "`Animation`'s start time.\nMilliseconds for time based animations and\npercentage [0 - 100] for scroll driven animations\n(i.e. when viewOrScrollTimeline exists).",
                             "type": "number"
                         },
                         {
@@ -648,6 +648,48 @@
                             "description": "A unique ID for `Animation` representing the sources that triggered this CSS\nanimation/transition.",
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "viewOrScrollTimeline",
+                            "description": "View or scroll timeline",
+                            "optional": true,
+                            "$ref": "ViewOrScrollTimeline"
+                        }
+                    ]
+                },
+                {
+                    "id": "ViewOrScrollTimeline",
+                    "description": "Timeline instance",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "sourceNodeId",
+                            "description": "Scroll container node",
+                            "optional": true,
+                            "$ref": "DOM.BackendNodeId"
+                        },
+                        {
+                            "name": "startOffset",
+                            "description": "Represents the starting scroll position of the timeline\nas a length offset in pixels from scroll origin.",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "endOffset",
+                            "description": "Represents the ending scroll position of the timeline\nas a length offset in pixels from scroll origin.",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "subjectNodeId",
+                            "description": "The element whose principal box's visibility in the\nscrollport defined the progress of the timeline.\nDoes not exist for animations with ScrollTimeline",
+                            "optional": true,
+                            "$ref": "DOM.BackendNodeId"
+                        },
+                        {
+                            "name": "axis",
+                            "description": "Orientation of the scroll",
+                            "$ref": "DOM.ScrollOrientation"
                         }
                     ]
                 },
@@ -678,7 +720,7 @@
                         },
                         {
                             "name": "duration",
-                            "description": "`AnimationEffect`'s iteration duration.",
+                            "description": "`AnimationEffect`'s iteration duration.\nMilliseconds for time based animations and\npercentage [0 - 100] for scroll driven animations\n(i.e. when viewOrScrollTimeline exists).",
                             "type": "number"
                         },
                         {
@@ -2134,7 +2176,7 @@
                     "properties": [
                         {
                             "name": "addressFields",
-                            "description": "A two dimension array containing the repesentation of values from an address profile.",
+                            "description": "A two dimension array containing the representation of values from an address profile.",
                             "type": "array",
                             "items": {
                                 "$ref": "AddressFields"
@@ -2184,6 +2226,11 @@
                             "name": "fillingStrategy",
                             "description": "The filling strategy",
                             "$ref": "FillingStrategy"
+                        },
+                        {
+                            "name": "frameId",
+                            "description": "The frame the field belongs to",
+                            "$ref": "Page.FrameId"
                         },
                         {
                             "name": "fieldId",
@@ -2507,6 +2554,7 @@
                         "protectedMediaIdentifier",
                         "sensors",
                         "storageAccess",
+                        "speakerSelection",
                         "topLevelStorageAccess",
                         "videoCapture",
                         "videoCapturePanTiltZoom",
@@ -2702,7 +2750,7 @@
                     "parameters": [
                         {
                             "name": "behavior",
-                            "description": "Whether to allow all or deny all download requests, or use default Chrome behavior if\navailable (otherwise deny). |allowAndName| allows download and names files according to\ntheir dowmload guids.",
+                            "description": "Whether to allow all or deny all download requests, or use default Chrome behavior if\navailable (otherwise deny). |allowAndName| allows download and names files according to\ntheir download guids.",
                             "type": "string",
                             "enum": [
                                 "deny",
@@ -3217,7 +3265,7 @@
                         },
                         {
                             "name": "sourceURL",
-                            "description": "Stylesheet resource URL. Empty if this is a constructed stylesheet created using\nnew CSSStyleSheet() (but non-empty if this is a constructed sylesheet imported\nas a CSS module script).",
+                            "description": "Stylesheet resource URL. Empty if this is a constructed stylesheet created using\nnew CSSStyleSheet() (but non-empty if this is a constructed stylesheet imported\nas a CSS module script).",
                             "type": "string"
                         },
                         {
@@ -5404,6 +5452,15 @@
                     ]
                 },
                 {
+                    "id": "ScrollOrientation",
+                    "description": "Physical scroll orientation",
+                    "type": "string",
+                    "enum": [
+                        "horizontal",
+                        "vertical"
+                    ]
+                },
+                {
                     "id": "Node",
                     "description": "DOM interaction is implemented in terms of mirror objects that represent the actual DOM nodes.\nDOMNode is a base node mirror type.",
                     "type": "object",
@@ -5944,7 +6001,7 @@
                     "parameters": [
                         {
                             "name": "nodeId",
-                            "description": "Id of the node to retrieve attibutes for.",
+                            "description": "Id of the node to retrieve attributes for.",
                             "$ref": "NodeId"
                         }
                     ],
@@ -8633,7 +8690,7 @@
                 },
                 {
                     "id": "UserAgentBrandVersion",
-                    "description": "Used to specify User Agent Cient Hints to emulate. See https://wicg.github.io/ua-client-hints",
+                    "description": "Used to specify User Agent Client Hints to emulate. See https://wicg.github.io/ua-client-hints",
                     "experimental": true,
                     "type": "object",
                     "properties": [
@@ -8649,7 +8706,7 @@
                 },
                 {
                     "id": "UserAgentMetadata",
-                    "description": "Used to specify User Agent Cient Hints to emulate. See https://wicg.github.io/ua-client-hints\nMissing optional values will be filled in by the target with what it would normally use.",
+                    "description": "Used to specify User Agent Client Hints to emulate. See https://wicg.github.io/ua-client-hints\nMissing optional values will be filled in by the target with what it would normally use.",
                     "experimental": true,
                     "type": "object",
                     "properties": [
@@ -9148,7 +9205,7 @@
                 },
                 {
                     "name": "setSensorOverrideReadings",
-                    "description": "Updates the sensor readings reported by a sensor type previously overriden\nby setSensorOverrideEnabled.",
+                    "description": "Updates the sensor readings reported by a sensor type previously overridden\nby setSensorOverrideEnabled.",
                     "experimental": true,
                     "parameters": [
                         {
@@ -9289,7 +9346,7 @@
                     "parameters": [
                         {
                             "name": "timezoneId",
-                            "description": "The timezone identifier. If empty, disables the override and\nrestores default host system timezone.",
+                            "description": "The timezone identifier. List of supported timezones:\nhttps://source.chromium.org/chromium/chromium/deps/icu.git/+/faee8bc70570192d82d2978a71e2a615788597d1:source/data/misc/metaZones.txt\nIf empty, disables the override and restores default host system timezone.",
                             "type": "string"
                         }
                     ]
@@ -9339,7 +9396,7 @@
                 },
                 {
                     "name": "setUserAgentOverride",
-                    "description": "Allows overriding user agent with the given string.",
+                    "description": "Allows overriding user agent with the given string.\n`userAgentMetadata` must be set for Client Hint headers to be sent.",
                     "parameters": [
                         {
                             "name": "userAgent",
@@ -9517,7 +9574,7 @@
                         },
                         {
                             "name": "offset",
-                            "description": "Seek to the specified offset before reading (if not specificed, proceed with offset\nfollowing the last read). Some types of streams may only support sequential reads.",
+                            "description": "Seek to the specified offset before reading (if not specified, proceed with offset\nfollowing the last read). Some types of streams may only support sequential reads.",
                             "optional": true,
                             "type": "integer"
                         },
@@ -10401,7 +10458,7 @@
                 },
                 {
                     "name": "imeSetComposition",
-                    "description": "This method sets the current candidate text for ime.\nUse imeCommitComposition to commit the final text.\nUse imeSetComposition with empty string as text to cancel composition.",
+                    "description": "This method sets the current candidate text for IME.\nUse imeCommitComposition to commit the final text.\nUse imeSetComposition with empty string as text to cancel composition.",
                     "experimental": true,
                     "parameters": [
                         {
@@ -11273,7 +11330,7 @@
                     "parameters": [
                         {
                             "name": "layers",
-                            "description": "Layer tree, absent if not in the comspositing mode.",
+                            "description": "Layer tree, absent if not in the compositing mode.",
                             "optional": true,
                             "type": "array",
                             "items": {
@@ -12003,7 +12060,7 @@
                         },
                         {
                             "name": "isSameSite",
-                            "description": "True if this resource request is considered to be the 'same site' as the\nrequest correspondinfg to the main frame.",
+                            "description": "True if this resource request is considered to be the 'same site' as the\nrequest corresponding to the main frame.",
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
@@ -12300,6 +12357,17 @@
                     ]
                 },
                 {
+                    "id": "ServiceWorkerRouterSource",
+                    "description": "Source of service worker router.",
+                    "type": "string",
+                    "enum": [
+                        "network",
+                        "cache",
+                        "fetch-event",
+                        "race-network-and-fetch-handler"
+                    ]
+                },
+                {
                     "id": "ServiceWorkerRouterInfo",
                     "experimental": true,
                     "type": "object",
@@ -12307,6 +12375,10 @@
                         {
                             "name": "ruleIdMatched",
                             "type": "integer"
+                        },
+                        {
+                            "name": "matchedSourceType",
+                            "$ref": "ServiceWorkerRouterSource"
                         }
                     ]
                 },
@@ -12407,7 +12479,7 @@
                         },
                         {
                             "name": "serviceWorkerRouterInfo",
-                            "description": "Infomation about how Service Worker Static Router was used.",
+                            "description": "Information about how Service Worker Static Router was used.",
                             "experimental": true,
                             "optional": true,
                             "$ref": "ServiceWorkerRouterInfo"
@@ -12771,6 +12843,23 @@
                     ]
                 },
                 {
+                    "id": "CookieExemptionReason",
+                    "description": "Types of reasons why a cookie should have been blocked by 3PCD but is exempted for the request.",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "None",
+                        "UserSetting",
+                        "TPCDMetadata",
+                        "TPCDDeprecationTrial",
+                        "TPCDHeuristics",
+                        "EnterprisePolicy",
+                        "StorageAccess",
+                        "TopLevelStorageAccess",
+                        "CorsOptIn"
+                    ]
+                },
+                {
                     "id": "BlockedSetCookieWithReason",
                     "description": "A cookie which was not stored from a response with the corresponding reason.",
                     "experimental": true,
@@ -12798,23 +12887,47 @@
                     ]
                 },
                 {
-                    "id": "BlockedCookieWithReason",
-                    "description": "A cookie with was not sent with a request with the corresponding reason.",
+                    "id": "ExemptedSetCookieWithReason",
+                    "description": "A cookie should have been blocked by 3PCD but is exempted and stored from a response with the\ncorresponding reason. A cookie could only have at most one exemption reason.",
                     "experimental": true,
                     "type": "object",
                     "properties": [
                         {
+                            "name": "exemptionReason",
+                            "description": "The reason the cookie was exempted.",
+                            "$ref": "CookieExemptionReason"
+                        },
+                        {
+                            "name": "cookie",
+                            "description": "The cookie object representing the cookie.",
+                            "$ref": "Cookie"
+                        }
+                    ]
+                },
+                {
+                    "id": "AssociatedCookie",
+                    "description": "A cookie associated with the request which may or may not be sent with it.\nIncludes the cookies itself and reasons for blocking or exemption.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "cookie",
+                            "description": "The cookie object representing the cookie which was not sent.",
+                            "$ref": "Cookie"
+                        },
+                        {
                             "name": "blockedReasons",
-                            "description": "The reason(s) the cookie was blocked.",
+                            "description": "The reason(s) the cookie was blocked. If empty means the cookie is included.",
                             "type": "array",
                             "items": {
                                 "$ref": "CookieBlockedReason"
                             }
                         },
                         {
-                            "name": "cookie",
-                            "description": "The cookie object representing the cookie which was not sent.",
-                            "$ref": "Cookie"
+                            "name": "exemptionReason",
+                            "description": "The reason the cookie should have been blocked by 3PCD but is exempted. A cookie could\nonly have at most one exemption reason.",
+                            "optional": true,
+                            "$ref": "CookieExemptionReason"
                         }
                     ]
                 },
@@ -13170,7 +13283,7 @@
                         },
                         {
                             "name": "errors",
-                            "description": "Errors occurred while handling the signed exchagne.",
+                            "description": "Errors occurred while handling the signed exchange.",
                             "optional": true,
                             "type": "array",
                             "items": {
@@ -13633,7 +13746,7 @@
                 },
                 {
                     "name": "deleteCookies",
-                    "description": "Deletes browser cookies with matching name and url or domain/path pair.",
+                    "description": "Deletes browser cookies with matching name and url or domain/path/partitionKey pair.",
                     "parameters": [
                         {
                             "name": "name",
@@ -13655,6 +13768,12 @@
                         {
                             "name": "path",
                             "description": "If specified, deletes only cookies with the exact path.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "partitionKey",
+                            "description": "If specified, deletes only cookies with the the given name and partitionKey where domain\nmatches provided URL.",
                             "optional": true,
                             "type": "string"
                         }
@@ -14304,7 +14423,7 @@
                         },
                         {
                             "name": "errorText",
-                            "description": "User friendly error message.",
+                            "description": "Error message. List of network errors: https://cs.chromium.org/chromium/src/net/base/net_error_list.h",
                             "type": "string"
                         },
                         {
@@ -14805,10 +14924,10 @@
                         },
                         {
                             "name": "associatedCookies",
-                            "description": "A list of cookies potentially associated to the requested URL. This includes both cookies sent with\nthe request and the ones not sent; the latter are distinguished by having blockedReason field set.",
+                            "description": "A list of cookies potentially associated to the requested URL. This includes both cookies sent with\nthe request and the ones not sent; the latter are distinguished by having blockedReasons field set.",
                             "type": "array",
                             "items": {
-                                "$ref": "BlockedCookieWithReason"
+                                "$ref": "AssociatedCookie"
                             }
                         },
                         {
@@ -14883,9 +15002,18 @@
                         },
                         {
                             "name": "cookiePartitionKeyOpaque",
-                            "description": "True if partitioned cookies are enabled, but the partition key is not serializeable to string.",
+                            "description": "True if partitioned cookies are enabled, but the partition key is not serializable to string.",
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "exemptedCookies",
+                            "description": "A list of cookies which should have been blocked by 3PCD but are exempted and stored from\nthe response with the corresponding reason.",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "ExemptedSetCookieWithReason"
+                            }
                         }
                     ]
                 },
@@ -15087,7 +15215,7 @@
                     "properties": [
                         {
                             "name": "parentOutlineColor",
-                            "description": "the color to outline the givent element in.",
+                            "description": "the color to outline the given element in.",
                             "$ref": "DOM.RGBA"
                         },
                         {
@@ -15603,7 +15731,7 @@
                         },
                         {
                             "name": "selectedPlatform",
-                            "description": "Seleted platforms to show the overlay.",
+                            "description": "Selected platforms to show the overlay.",
                             "type": "string"
                         },
                         {
@@ -15795,7 +15923,7 @@
                 },
                 {
                     "name": "highlightFrame",
-                    "description": "Highlights owner element of the frame with given id.\nDeprecated: Doesn't work reliablity and cannot be fixed due to process\nseparatation (the owner node might be in a different process). Determine\nthe owner node in the client and use highlightNode.",
+                    "description": "Highlights owner element of the frame with given id.\nDeprecated: Doesn't work reliably and cannot be fixed due to process\nseparation (the owner node might be in a different process). Determine\nthe owner node in the client and use highlightNode.",
                     "deprecated": true,
                     "parameters": [
                         {
@@ -16387,6 +16515,7 @@
                         "shared-storage",
                         "shared-storage-select-url",
                         "smart-card",
+                        "speaker-selection",
                         "storage-access",
                         "sub-apps",
                         "sync-xhr",
@@ -16877,7 +17006,7 @@
                         },
                         {
                             "name": "critical",
-                            "description": "If criticial, this is a non-recoverable parse error.",
+                            "description": "If critical, this is a non-recoverable parse error.",
                             "type": "integer"
                         },
                         {
@@ -17201,7 +17330,7 @@
                 },
                 {
                     "id": "AutoResponseMode",
-                    "description": "Enum of possible auto-reponse for permisison / prompt dialogs.",
+                    "description": "Enum of possible auto-response for permission / prompt dialogs.",
                     "experimental": true,
                     "type": "string",
                     "enum": [
@@ -17292,7 +17421,6 @@
                         "SubresourceHasCacheControlNoCache",
                         "ContainsPlugins",
                         "DocumentLoaded",
-                        "DedicatedWorkerOrWorklet",
                         "OutstandingNetworkRequestOthers",
                         "RequestedMIDIPermission",
                         "RequestedAudioCapturePermission",
@@ -17333,6 +17461,7 @@
                         "SmartCard",
                         "LiveMediaStreamTrack",
                         "UnloadHandler",
+                        "ParserAborted",
                         "ContentSecurityHandler",
                         "ContentWebAuthenticationAPI",
                         "ContentFileChooser",
@@ -18569,7 +18698,7 @@
                 },
                 {
                     "name": "produceCompilationCache",
-                    "description": "Requests backend to produce compilation cache for the specified scripts.\n`scripts` are appeneded to the list of scripts for which the cache\nwould be produced. The list may be reset during page navigation.\nWhen script with a matching URL is encountered, the cache is optionally\nproduced upon backend discretion, based on internal heuristics.\nSee also: `Page.compilationCacheProduced`.",
+                    "description": "Requests backend to produce compilation cache for the specified scripts.\n`scripts` are appended to the list of scripts for which the cache\nwould be produced. The list may be reset during page navigation.\nWhen script with a matching URL is encountered, the cache is optionally\nproduced upon backend discretion, based on internal heuristics.\nSee also: `Page.compilationCacheProduced`.",
                     "experimental": true,
                     "parameters": [
                         {
@@ -18977,7 +19106,7 @@
                         },
                         {
                             "name": "hasBrowserHandler",
-                            "description": "True iff browser is capable showing or acting on the given dialog. When browser has no\ndialog handler for given target, calling alert while Page domain is engaged will stall\nthe page execution. Execution can be resumed via calling Page.handleJavaScriptDialog.",
+                            "description": "True if browser is capable showing or acting on the given dialog. When browser has no\ndialog handler for given target, calling alert while Page domain is engaged will stall\nthe page execution. Execution can be resumed via calling Page.handleJavaScriptDialog.",
                             "type": "boolean"
                         },
                         {
@@ -19019,7 +19148,7 @@
                     "parameters": [
                         {
                             "name": "loaderId",
-                            "description": "The loader id for the associated navgation.",
+                            "description": "The loader id for the associated navigation.",
                             "$ref": "Network.LoaderId"
                         },
                         {
@@ -19349,7 +19478,7 @@
                         },
                         {
                             "name": "type",
-                            "description": "The event type, as specified in https://w3c.github.io/performance-timeline/#dom-performanceentry-entrytype\nThis determines which of the optional \"details\" fiedls is present.",
+                            "description": "The event type, as specified in https://w3c.github.io/performance-timeline/#dom-performanceentry-entrytype\nThis determines which of the optional \"details\" fields is present.",
                             "type": "string"
                         },
                         {
@@ -19511,7 +19640,7 @@
                         },
                         {
                             "name": "certificateHasWeakSignature",
-                            "description": "True if the certificate uses a weak signature aglorithm.",
+                            "description": "True if the certificate uses a weak signature algorithm.",
                             "type": "boolean"
                         },
                         {
@@ -20240,6 +20369,18 @@
                     ]
                 },
                 {
+                    "id": "InterestGroupAuctionFetchType",
+                    "description": "Enum of network fetches auctions can do.",
+                    "type": "string",
+                    "enum": [
+                        "bidderJs",
+                        "bidderWasm",
+                        "sellerJs",
+                        "bidderTrustedSignals",
+                        "sellerTrustedSignals"
+                    ]
+                },
+                {
                     "id": "InterestGroupAd",
                     "description": "Ad advertising element inside an interest group.",
                     "type": "object",
@@ -20369,15 +20510,23 @@
                     "properties": [
                         {
                             "name": "creationTime",
+                            "description": "Time when the origin's shared storage was last created.",
                             "$ref": "Network.TimeSinceEpoch"
                         },
                         {
                             "name": "length",
+                            "description": "Number of key-value pairs stored in origin's shared storage.",
                             "type": "integer"
                         },
                         {
                             "name": "remainingBudget",
+                            "description": "Current amount of bits of entropy remaining in the navigation budget.",
                             "type": "number"
+                        },
+                        {
+                            "name": "bytesUsed",
+                            "description": "Total number of bytes stored as key-value pairs in origin's shared\nstorage.",
+                            "type": "integer"
                         }
                     ]
                 },
@@ -20776,7 +20925,7 @@
                     ]
                 },
                 {
-                    "id": "AttributionReportingAggregatableValueEntry",
+                    "id": "AttributionReportingAggregatableValueDictEntry",
                     "experimental": true,
                     "type": "object",
                     "properties": [
@@ -20788,6 +20937,24 @@
                             "name": "value",
                             "description": "number instead of integer because not all uint32 can be represented by\nint",
                             "type": "number"
+                        }
+                    ]
+                },
+                {
+                    "id": "AttributionReportingAggregatableValueEntry",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "values",
+                            "type": "array",
+                            "items": {
+                                "$ref": "AttributionReportingAggregatableValueDictEntry"
+                            }
+                        },
+                        {
+                            "name": "filters",
+                            "$ref": "AttributionReportingFilterPair"
                         }
                     ]
                 },
@@ -21274,7 +21441,7 @@
                 },
                 {
                     "name": "setInterestGroupAuctionTracking",
-                    "description": "Enables/Disables issuing of interestGroupAuctionEvent events.",
+                    "description": "Enables/Disables issuing of interestGroupAuctionEventOccurred and\ninterestGroupAuctionNetworkRequestCreated.",
                     "experimental": true,
                     "parameters": [
                         {
@@ -21633,6 +21800,28 @@
                     ]
                 },
                 {
+                    "name": "interestGroupAuctionNetworkRequestCreated",
+                    "description": "Specifies which auctions a particular network fetch may be related to, and\nin what role. Note that it is not ordered with respect to\nNetwork.requestWillBeSent (but will happen before loadingFinished\nloadingFailed).",
+                    "parameters": [
+                        {
+                            "name": "type",
+                            "$ref": "InterestGroupAuctionFetchType"
+                        },
+                        {
+                            "name": "requestId",
+                            "$ref": "Network.RequestId"
+                        },
+                        {
+                            "name": "auctions",
+                            "description": "This is the set of the auctions using the worklet that issued this\nrequest.  In the case of trusted signals, it's possible that only some of\nthem actually care about the keys being queried.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "InterestGroupAuctionId"
+                            }
+                        }
+                    ]
+                },
+                {
                     "name": "sharedStorageAccessed",
                     "description": "Shared storage was accessed by the associated page.\nThe following parameters are included in all events.",
                     "parameters": [
@@ -21658,7 +21847,7 @@
                         },
                         {
                             "name": "params",
-                            "description": "The sub-parameters warapped by `params` are all optional and their\npresence/absence depends on `type`.",
+                            "description": "The sub-parameters wrapped by `params` are all optional and their\npresence/absence depends on `type`.",
                             "$ref": "SharedStorageAccessParams"
                         }
                     ]
@@ -22052,6 +22241,7 @@
                         },
                         {
                             "name": "title",
+                            "description": "List of types: https://source.chromium.org/chromium/chromium/src/+/main:content/browser/devtools/devtools_agent_host_impl.cc?ss=chromium&q=f:devtools%20-f:out%20%22::kTypeTab%5B%5D%22",
                             "type": "string"
                         },
                         {
@@ -22105,7 +22295,7 @@
                     "properties": [
                         {
                             "name": "exclude",
-                            "description": "If set, causes exclusion of mathcing targets from the list.",
+                            "description": "If set, causes exclusion of matching targets from the list.",
                             "optional": true,
                             "type": "boolean"
                         },
@@ -22208,7 +22398,7 @@
                 },
                 {
                     "name": "exposeDevToolsProtocol",
-                    "description": "Inject object to the target's main frame that provides a communication\nchannel with browser target.\n\nInjected object will be available as `window[bindingName]`.\n\nThe object has the follwing API:\n- `binding.send(json)` - a method to send messages over the remote debugging protocol\n- `binding.onmessage = json => handleMessage(json)` - a callback that will be called for the protocol notifications and command responses.",
+                    "description": "Inject object to the target's main frame that provides a communication\nchannel with browser target.\n\nInjected object will be available as `window[bindingName]`.\n\nThe object has the following API:\n- `binding.send(json)` - a method to send messages over the remote debugging protocol\n- `binding.onmessage = json => handleMessage(json)` - a callback that will be called for the protocol notifications and command responses.",
                     "experimental": true,
                     "parameters": [
                         {
@@ -22688,7 +22878,6 @@
         },
         {
             "domain": "Tracing",
-            "experimental": true,
             "dependencies": [
                 "IO"
             ],
@@ -22696,6 +22885,7 @@
                 {
                     "id": "MemoryDumpConfig",
                     "description": "Configuration for memory dump. Used only when \"memory-infra\" category is enabled.",
+                    "experimental": true,
                     "type": "object"
                 },
                 {
@@ -22705,6 +22895,7 @@
                         {
                             "name": "recordMode",
                             "description": "Controls how the trace buffer stores data.",
+                            "experimental": true,
                             "optional": true,
                             "type": "string",
                             "enum": [
@@ -22717,24 +22908,28 @@
                         {
                             "name": "traceBufferSizeInKb",
                             "description": "Size of the trace buffer in kilobytes. If not specified or zero is passed, a default value\nof 200 MB would be used.",
+                            "experimental": true,
                             "optional": true,
                             "type": "number"
                         },
                         {
                             "name": "enableSampling",
                             "description": "Turns on JavaScript stack sampling.",
+                            "experimental": true,
                             "optional": true,
                             "type": "boolean"
                         },
                         {
                             "name": "enableSystrace",
                             "description": "Turns on system tracing.",
+                            "experimental": true,
                             "optional": true,
                             "type": "boolean"
                         },
                         {
                             "name": "enableArgumentFilter",
                             "description": "Turns on argument filter.",
+                            "experimental": true,
                             "optional": true,
                             "type": "boolean"
                         },
@@ -22759,6 +22954,7 @@
                         {
                             "name": "syntheticDelays",
                             "description": "Configuration to synthesize the delays in tracing.",
+                            "experimental": true,
                             "optional": true,
                             "type": "array",
                             "items": {
@@ -22768,6 +22964,7 @@
                         {
                             "name": "memoryDumpConfig",
                             "description": "Configuration for memory dump triggers. Used only when \"memory-infra\" category is enabled.",
+                            "experimental": true,
                             "optional": true,
                             "$ref": "MemoryDumpConfig"
                         }
@@ -22776,6 +22973,7 @@
                 {
                     "id": "StreamFormat",
                     "description": "Data format of a trace. Can be either the legacy JSON format or the\nprotocol buffer format. Note that the JSON format will be deprecated soon.",
+                    "experimental": true,
                     "type": "string",
                     "enum": [
                         "json",
@@ -22785,6 +22983,7 @@
                 {
                     "id": "StreamCompression",
                     "description": "Compression type to use for traces returned via streams.",
+                    "experimental": true,
                     "type": "string",
                     "enum": [
                         "none",
@@ -22794,6 +22993,7 @@
                 {
                     "id": "MemoryDumpLevelOfDetail",
                     "description": "Details exposed when memory request explicitly declared.\nKeep consistent with memory_dump_request_args.h and\nmemory_instrumentation.mojom",
+                    "experimental": true,
                     "type": "string",
                     "enum": [
                         "background",
@@ -22804,6 +23004,7 @@
                 {
                     "id": "TracingBackend",
                     "description": "Backend type to use for tracing. `chrome` uses the Chrome-integrated\ntracing service and is supported on all platforms. `system` is only\nsupported on Chrome OS and uses the Perfetto system tracing service.\n`auto` chooses `system` when the perfettoConfig provided to Tracing.start\nspecifies at least one non-Chrome data source; otherwise uses `chrome`.",
+                    "experimental": true,
                     "type": "string",
                     "enum": [
                         "auto",
@@ -22820,6 +23021,7 @@
                 {
                     "name": "getCategories",
                     "description": "Gets supported tracing categories.",
+                    "experimental": true,
                     "returns": [
                         {
                             "name": "categories",
@@ -22834,6 +23036,7 @@
                 {
                     "name": "recordClockSyncMarker",
                     "description": "Record a clock sync marker in the trace.",
+                    "experimental": true,
                     "parameters": [
                         {
                             "name": "syncId",
@@ -22845,6 +23048,7 @@
                 {
                     "name": "requestMemoryDump",
                     "description": "Request a global memory dump.",
+                    "experimental": true,
                     "parameters": [
                         {
                             "name": "deterministic",
@@ -22879,6 +23083,7 @@
                         {
                             "name": "categories",
                             "description": "Category/tag filter",
+                            "experimental": true,
                             "deprecated": true,
                             "optional": true,
                             "type": "string"
@@ -22886,6 +23091,7 @@
                         {
                             "name": "options",
                             "description": "Tracing options",
+                            "experimental": true,
                             "deprecated": true,
                             "optional": true,
                             "type": "string"
@@ -22893,6 +23099,7 @@
                         {
                             "name": "bufferUsageReportingInterval",
                             "description": "If set, the agent will issue bufferUsage events at this interval, specified in milliseconds",
+                            "experimental": true,
                             "optional": true,
                             "type": "number"
                         },
@@ -22915,6 +23122,7 @@
                         {
                             "name": "streamCompression",
                             "description": "Compression format to use. This only applies when using `ReturnAsStream`\ntransfer mode (defaults to `none`)",
+                            "experimental": true,
                             "optional": true,
                             "$ref": "StreamCompression"
                         },
@@ -22926,12 +23134,14 @@
                         {
                             "name": "perfettoConfig",
                             "description": "Base64-encoded serialized perfetto.protos.TraceConfig protobuf message\nWhen specified, the parameters `categories`, `options`, `traceConfig`\nare ignored.",
+                            "experimental": true,
                             "optional": true,
                             "type": "binary"
                         },
                         {
                             "name": "tracingBackend",
                             "description": "Backend type (defaults to `auto`)",
+                            "experimental": true,
                             "optional": true,
                             "$ref": "TracingBackend"
                         }
@@ -22941,6 +23151,7 @@
             "events": [
                 {
                     "name": "bufferUsage",
+                    "experimental": true,
                     "parameters": [
                         {
                             "name": "percentFull",
@@ -22965,6 +23176,7 @@
                 {
                     "name": "dataCollected",
                     "description": "Contains a bucket of collected trace events. When tracing is stopped collected events will be\nsent as a sequence of dataCollected events followed by tracingComplete event.",
+                    "experimental": true,
                     "parameters": [
                         {
                             "name": "value",
@@ -24074,6 +24286,18 @@
                             "description": "The large blob associated with the credential.\nSee https://w3c.github.io/webauthn/#sctn-large-blob-extension",
                             "optional": true,
                             "type": "binary"
+                        },
+                        {
+                            "name": "backupEligibility",
+                            "description": "Assertions returned by this credential will have the backup eligibility\n(BE) flag set to this value. Defaults to the authenticator's\ndefaultBackupEligibility value.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "backupState",
+                            "description": "Assertions returned by this credential will have the backup state (BS)\nflag set to this value. Defaults to the authenticator's\ndefaultBackupState value.",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 }
@@ -24250,6 +24474,30 @@
                         },
                         {
                             "name": "enabled",
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "name": "setCredentialProperties",
+                    "description": "Allows setting credential properties.\nhttps://w3c.github.io/webauthn/#sctn-automation-set-credential-properties",
+                    "parameters": [
+                        {
+                            "name": "authenticatorId",
+                            "$ref": "AuthenticatorId"
+                        },
+                        {
+                            "name": "credentialId",
+                            "type": "binary"
+                        },
+                        {
+                            "name": "backupEligibility",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "backupState",
+                            "optional": true,
                             "type": "boolean"
                         }
                     ]
@@ -24630,7 +24878,7 @@
                         },
                         {
                             "name": "errorType",
-                            "description": "Error information\n`errorMessage` is null iff `errorType` is null.",
+                            "description": "Error information\n`errorMessage` is null if `errorType` is null.",
                             "optional": true,
                             "$ref": "RuleSetErrorType"
                         },
@@ -24695,7 +24943,7 @@
                 },
                 {
                     "id": "PreloadingAttemptSource",
-                    "description": "Lists sources for a preloading attempt, specifically the ids of rule sets\nthat had a speculation rule that triggered the attempt, and the\nBackendNodeIds of <a href> or <area href> elements that triggered the\nattempt (in the case of attempts triggered by a document rule). It is\npossible for mulitple rule sets and links to trigger a single attempt.",
+                    "description": "Lists sources for a preloading attempt, specifically the ids of rule sets\nthat had a speculation rule that triggered the attempt, and the\nBackendNodeIds of <a href> or <area href> elements that triggered the\nattempt (in the case of attempts triggered by a document rule). It is\npossible for multiple rule sets and links to trigger a single attempt.",
                     "type": "object",
                     "properties": [
                         {

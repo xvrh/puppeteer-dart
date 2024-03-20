@@ -129,6 +129,9 @@ class Animation {
   final num playbackRate;
 
   /// `Animation`'s start time.
+  /// Milliseconds for time based animations and
+  /// percentage [0 - 100] for scroll driven animations
+  /// (i.e. when viewOrScrollTimeline exists).
   final num startTime;
 
   /// `Animation`'s current time.
@@ -144,6 +147,9 @@ class Animation {
   /// animation/transition.
   final String? cssId;
 
+  /// View or scroll timeline
+  final ViewOrScrollTimeline? viewOrScrollTimeline;
+
   Animation(
       {required this.id,
       required this.name,
@@ -154,7 +160,8 @@ class Animation {
       required this.currentTime,
       required this.type,
       this.source,
-      this.cssId});
+      this.cssId,
+      this.viewOrScrollTimeline});
 
   factory Animation.fromJson(Map<String, dynamic> json) {
     return Animation(
@@ -170,6 +177,10 @@ class Animation {
           ? AnimationEffect.fromJson(json['source'] as Map<String, dynamic>)
           : null,
       cssId: json.containsKey('cssId') ? json['cssId'] as String : null,
+      viewOrScrollTimeline: json.containsKey('viewOrScrollTimeline')
+          ? ViewOrScrollTimeline.fromJson(
+              json['viewOrScrollTimeline'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -185,6 +196,8 @@ class Animation {
       'type': type,
       if (source != null) 'source': source!.toJson(),
       if (cssId != null) 'cssId': cssId,
+      if (viewOrScrollTimeline != null)
+        'viewOrScrollTimeline': viewOrScrollTimeline!.toJson(),
     };
   }
 }
@@ -208,6 +221,61 @@ enum AnimationType {
   String toString() => value.toString();
 }
 
+/// Timeline instance
+class ViewOrScrollTimeline {
+  /// Scroll container node
+  final dom.BackendNodeId? sourceNodeId;
+
+  /// Represents the starting scroll position of the timeline
+  /// as a length offset in pixels from scroll origin.
+  final num? startOffset;
+
+  /// Represents the ending scroll position of the timeline
+  /// as a length offset in pixels from scroll origin.
+  final num? endOffset;
+
+  /// The element whose principal box's visibility in the
+  /// scrollport defined the progress of the timeline.
+  /// Does not exist for animations with ScrollTimeline
+  final dom.BackendNodeId? subjectNodeId;
+
+  /// Orientation of the scroll
+  final dom.ScrollOrientation axis;
+
+  ViewOrScrollTimeline(
+      {this.sourceNodeId,
+      this.startOffset,
+      this.endOffset,
+      this.subjectNodeId,
+      required this.axis});
+
+  factory ViewOrScrollTimeline.fromJson(Map<String, dynamic> json) {
+    return ViewOrScrollTimeline(
+      sourceNodeId: json.containsKey('sourceNodeId')
+          ? dom.BackendNodeId.fromJson(json['sourceNodeId'] as int)
+          : null,
+      startOffset:
+          json.containsKey('startOffset') ? json['startOffset'] as num : null,
+      endOffset:
+          json.containsKey('endOffset') ? json['endOffset'] as num : null,
+      subjectNodeId: json.containsKey('subjectNodeId')
+          ? dom.BackendNodeId.fromJson(json['subjectNodeId'] as int)
+          : null,
+      axis: dom.ScrollOrientation.fromJson(json['axis'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'axis': axis.toJson(),
+      if (sourceNodeId != null) 'sourceNodeId': sourceNodeId!.toJson(),
+      if (startOffset != null) 'startOffset': startOffset,
+      if (endOffset != null) 'endOffset': endOffset,
+      if (subjectNodeId != null) 'subjectNodeId': subjectNodeId!.toJson(),
+    };
+  }
+}
+
 /// AnimationEffect instance
 class AnimationEffect {
   /// `AnimationEffect`'s delay.
@@ -223,6 +291,9 @@ class AnimationEffect {
   final num iterations;
 
   /// `AnimationEffect`'s iteration duration.
+  /// Milliseconds for time based animations and
+  /// percentage [0 - 100] for scroll driven animations
+  /// (i.e. when viewOrScrollTimeline exists).
   final num duration;
 
   /// `AnimationEffect`'s playback direction.

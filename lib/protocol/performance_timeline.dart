@@ -158,7 +158,7 @@ class TimelineEvent {
   final page.FrameId frameId;
 
   /// The event type, as specified in https://w3c.github.io/performance-timeline/#dom-performanceentry-entrytype
-  /// This determines which of the optional "details" fiedls is present.
+  /// This determines which of the optional "details" fields is present.
   final String type;
 
   /// Name may be empty depending on the type.

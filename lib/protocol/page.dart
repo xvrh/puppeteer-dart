@@ -783,7 +783,7 @@ class PageApi {
   }
 
   /// Requests backend to produce compilation cache for the specified scripts.
-  /// `scripts` are appeneded to the list of scripts for which the cache
+  /// `scripts` are appended to the list of scripts for which the cache
   /// would be produced. The list may be reset during page navigation.
   /// When script with a matching URL is encountered, the cache is optionally
   /// produced upon backend discretion, based on internal heuristics.
@@ -1090,7 +1090,7 @@ class JavascriptDialogOpeningEvent {
   /// Dialog type.
   final DialogType type;
 
-  /// True iff browser is capable showing or acting on the given dialog. When browser has no
+  /// True if browser is capable showing or acting on the given dialog. When browser has no
   /// dialog handler for given target, calling alert while Page domain is engaged will stall
   /// the page execution. Execution can be resumed via calling Page.handleJavaScriptDialog.
   final bool hasBrowserHandler;
@@ -1146,7 +1146,7 @@ class LifecycleEventEvent {
 }
 
 class BackForwardCacheNotUsedEvent {
-  /// The loader id for the associated navgation.
+  /// The loader id for the associated navigation.
   final network.LoaderId loaderId;
 
   /// The frame id of the associated frame.
@@ -1663,6 +1663,7 @@ enum PermissionsPolicyFeature {
   sharedStorage('shared-storage'),
   sharedStorageSelectUrl('shared-storage-select-url'),
   smartCard('smart-card'),
+  speakerSelection('speaker-selection'),
   storageAccess('storage-access'),
   subApps('sub-apps'),
   syncXhr('sync-xhr'),
@@ -2353,7 +2354,7 @@ class AppManifestError {
   /// Error message.
   final String message;
 
-  /// If criticial, this is a non-recoverable parse error.
+  /// If critical, this is a non-recoverable parse error.
   final int critical;
 
   /// Error line.
@@ -2811,7 +2812,7 @@ class CompilationCacheParams {
   }
 }
 
-/// Enum of possible auto-reponse for permisison / prompt dialogs.
+/// Enum of possible auto-response for permission / prompt dialogs.
 enum AutoResponseMode {
   none('none'),
   autoAccept('autoAccept'),
@@ -2923,7 +2924,6 @@ enum BackForwardCacheNotRestoredReason {
   subresourceHasCacheControlNoCache('SubresourceHasCacheControlNoCache'),
   containsPlugins('ContainsPlugins'),
   documentLoaded('DocumentLoaded'),
-  dedicatedWorkerOrWorklet('DedicatedWorkerOrWorklet'),
   outstandingNetworkRequestOthers('OutstandingNetworkRequestOthers'),
   requestedMidiPermission('RequestedMIDIPermission'),
   requestedAudioCapturePermission('RequestedAudioCapturePermission'),
@@ -2967,6 +2967,7 @@ enum BackForwardCacheNotRestoredReason {
   smartCard('SmartCard'),
   liveMediaStreamTrack('LiveMediaStreamTrack'),
   unloadHandler('UnloadHandler'),
+  parserAborted('ParserAborted'),
   contentSecurityHandler('ContentSecurityHandler'),
   contentWebAuthenticationApi('ContentWebAuthenticationAPI'),
   contentFileChooser('ContentFileChooser'),
