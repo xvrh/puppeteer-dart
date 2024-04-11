@@ -965,6 +965,17 @@
                             "$ref": "Animation"
                         }
                     ]
+                },
+                {
+                    "name": "animationUpdated",
+                    "description": "Event for animation that has been updated.",
+                    "parameters": [
+                        {
+                            "name": "animation",
+                            "description": "Animation that was updated.",
+                            "$ref": "Animation"
+                        }
+                    ]
                 }
             ]
         },
@@ -5464,6 +5475,8 @@
                         "grammar-error",
                         "highlight",
                         "first-line-inherited",
+                        "scroll-marker",
+                        "scroll-markers",
                         "scrollbar",
                         "scrollbar-thumb",
                         "scrollbar-button",
