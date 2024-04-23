@@ -16,6 +16,7 @@ class EmulationApi {
 
   /// Tells whether emulation is supported.
   /// Returns: True if emulation is supported.
+  @Deprecated('This command is deprecated')
   Future<bool> canEmulate() async {
     var result = await _client.send('Emulation.canEmulate');
     return result['result'] as bool;

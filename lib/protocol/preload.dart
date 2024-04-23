@@ -221,7 +221,7 @@ class RuleSet {
   final network.RequestId? requestId;
 
   /// Error information
-  /// `errorMessage` is null if `errorType` is null.
+  /// `errorMessage` is null iff `errorType` is null.
   final RuleSetErrorType? errorType;
 
   RuleSet(

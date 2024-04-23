@@ -342,7 +342,11 @@ class Request {
   String get method => event.request.method;
 
   /// Request's post body, if any.
-  String? get postData => event.request.postData;
+  String? get postData => event.request.postDataEntries
+      ?.map((e) => e.bytes)
+      .nonNulls
+      .map((e) => utf8.decode(base64Decode(e)))
+      .join('');
 
   /// An object with HTTP headers associated with the request. All header names
   /// are lower-case.
