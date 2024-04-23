@@ -71,8 +71,8 @@ void main() {
             value: 'First Option',
             hasPopup: 'menu',
             children: [
-              AXNode(role: 'menuitem', name: 'First Option', selected: true),
-              AXNode(role: 'menuitem', name: 'Second Option')
+              AXNode(role: 'option', name: 'First Option', selected: true),
+              AXNode(role: 'option', name: 'Second Option')
             ])
       ]);
       expect(await page.accessibility.snapshot(), golden);
