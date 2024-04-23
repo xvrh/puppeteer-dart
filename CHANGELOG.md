@@ -1,3 +1,6 @@
+## 3.9.0
+- Update to Chrome 123.0.6312.122
+
 ## 3.8.0
 - Update to Chrome 122.0.6261.69
 
