@@ -331,15 +331,24 @@ class NetworkApi {
   /// [downloadThroughput] Maximal aggregated download throughput (bytes/sec). -1 disables download throttling.
   /// [uploadThroughput] Maximal aggregated upload throughput (bytes/sec).  -1 disables upload throttling.
   /// [connectionType] Connection type if known.
+  /// [packetLoss] WebRTC packet loss (percent, 0-100). 0 disables packet loss emulation, 100 drops all the packets.
+  /// [packetQueueLength] WebRTC packet queue length (packet). 0 removes any queue length limitations.
+  /// [packetReordering] WebRTC packetReordering feature.
   Future<void> emulateNetworkConditions(
       bool offline, num latency, num downloadThroughput, num uploadThroughput,
-      {ConnectionType? connectionType}) async {
+      {ConnectionType? connectionType,
+      num? packetLoss,
+      int? packetQueueLength,
+      bool? packetReordering}) async {
     await _client.send('Network.emulateNetworkConditions', {
       'offline': offline,
       'latency': latency,
       'downloadThroughput': downloadThroughput,
       'uploadThroughput': uploadThroughput,
       if (connectionType != null) 'connectionType': connectionType,
+      if (packetLoss != null) 'packetLoss': packetLoss,
+      if (packetQueueLength != null) 'packetQueueLength': packetQueueLength,
+      if (packetReordering != null) 'packetReordering': packetReordering,
     });
   }
 
@@ -1996,13 +2005,10 @@ class RequestData {
   /// HTTP request headers.
   final Headers headers;
 
-  /// HTTP POST request data.
-  final String? postData;
-
   /// True when the request has POST data. Note that postData might still be omitted when this flag is true when the data is too long.
   final bool? hasPostData;
 
-  /// Request body elements. This will be converted from base64 to binary
+  /// Request body elements (post data broken into individual entries).
   final List<PostDataEntry>? postDataEntries;
 
   /// The mixed content type of the request.
@@ -2030,7 +2036,6 @@ class RequestData {
       this.urlFragment,
       required this.method,
       required this.headers,
-      this.postData,
       this.hasPostData,
       this.postDataEntries,
       this.mixedContentType,
@@ -2048,8 +2053,6 @@ class RequestData {
           : null,
       method: json['method'] as String,
       headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
-      postData:
-          json.containsKey('postData') ? json['postData'] as String : null,
       hasPostData:
           json.containsKey('hasPostData') ? json['hasPostData'] as bool : null,
       postDataEntries: json.containsKey('postDataEntries')
@@ -2085,7 +2088,6 @@ class RequestData {
       'initialPriority': initialPriority.toJson(),
       'referrerPolicy': referrerPolicy,
       if (urlFragment != null) 'urlFragment': urlFragment,
-      if (postData != null) 'postData': postData,
       if (hasPostData != null) 'hasPostData': hasPostData,
       if (postDataEntries != null)
         'postDataEntries': postDataEntries!.map((e) => e.toJson()).toList(),

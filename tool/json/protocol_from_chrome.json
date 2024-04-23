@@ -1468,7 +1468,12 @@
                         "InvalidRegisterOsTriggerHeader",
                         "WebAndOsHeaders",
                         "NoWebOrOsSupport",
-                        "NavigationRegistrationWithoutTransientUserActivation"
+                        "NavigationRegistrationWithoutTransientUserActivation",
+                        "InvalidInfoHeader",
+                        "NoRegisterSourceHeader",
+                        "NoRegisterTriggerHeader",
+                        "NoRegisterOsSourceHeader",
+                        "NoRegisterOsTriggerHeader"
                     ]
                 },
                 {
@@ -4057,6 +4062,7 @@
                 {
                     "id": "CSSPositionFallbackRule",
                     "description": "CSS position-fallback rule representation.",
+                    "deprecated": true,
                     "type": "object",
                     "properties": [
                         {
@@ -4070,6 +4076,34 @@
                             "items": {
                                 "$ref": "CSSTryRule"
                             }
+                        }
+                    ]
+                },
+                {
+                    "id": "CSSPositionTryRule",
+                    "description": "CSS @position-try rule representation.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "description": "The prelude dashed-ident name",
+                            "$ref": "Value"
+                        },
+                        {
+                            "name": "styleSheetId",
+                            "description": "The css style sheet identifier (absent for user agent stylesheet and user-specified\nstylesheet rules) this rule came from.",
+                            "optional": true,
+                            "$ref": "StyleSheetId"
+                        },
+                        {
+                            "name": "origin",
+                            "description": "Parent stylesheet's origin.",
+                            "$ref": "StyleSheetOrigin"
+                        },
+                        {
+                            "name": "style",
+                            "description": "Associated style declaration.",
+                            "$ref": "CSSStyle"
                         }
                     ]
                 },
@@ -4472,10 +4506,20 @@
                         {
                             "name": "cssPositionFallbackRules",
                             "description": "A list of CSS position fallbacks matching this node.",
+                            "deprecated": true,
                             "optional": true,
                             "type": "array",
                             "items": {
                                 "$ref": "CSSPositionFallbackRule"
+                            }
+                        },
+                        {
+                            "name": "cssPositionTryRules",
+                            "description": "A list of CSS @position-try rules matching this node, based on the position-try-options property.",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "CSSPositionTryRule"
                             }
                         },
                         {
@@ -4575,6 +4619,30 @@
                         {
                             "name": "rootLayer",
                             "$ref": "CSSLayerData"
+                        }
+                    ]
+                },
+                {
+                    "name": "getLocationForSelector",
+                    "description": "Given a CSS selector text and a style sheet ID, getLocationForSelector\nreturns an array of locations of the CSS selector in the style sheet.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "styleSheetId",
+                            "$ref": "StyleSheetId"
+                        },
+                        {
+                            "name": "selectorText",
+                            "type": "string"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "ranges",
+                            "type": "array",
+                            "items": {
+                                "$ref": "SourceRange"
+                            }
                         }
                     ]
                 },
@@ -8895,6 +8963,7 @@
                 {
                     "name": "canEmulate",
                     "description": "Tells whether emulation is supported.",
+                    "deprecated": true,
                     "returns": [
                         {
                             "name": "result",
@@ -11999,7 +12068,8 @@
                         },
                         {
                             "name": "postData",
-                            "description": "HTTP POST request data.",
+                            "description": "HTTP POST request data.\nUse postDataEntries instead.",
+                            "deprecated": true,
                             "optional": true,
                             "type": "string"
                         },
@@ -12011,7 +12081,7 @@
                         },
                         {
                             "name": "postDataEntries",
-                            "description": "Request body elements. This will be converted from base64 to binary",
+                            "description": "Request body elements (post data broken into individual entries).",
                             "experimental": true,
                             "optional": true,
                             "type": "array",
@@ -13812,6 +13882,27 @@
                             "description": "Connection type if known.",
                             "optional": true,
                             "$ref": "ConnectionType"
+                        },
+                        {
+                            "name": "packetLoss",
+                            "description": "WebRTC packet loss (percent, 0-100). 0 disables packet loss emulation, 100 drops all the packets.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "packetQueueLength",
+                            "description": "WebRTC packet queue length (packet). 0 removes any queue length limitations.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "packetReordering",
+                            "description": "WebRTC packetReordering feature.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -16466,7 +16557,7 @@
                         "ch-ua-platform",
                         "ch-ua-model",
                         "ch-ua-mobile",
-                        "ch-ua-form-factor",
+                        "ch-ua-form-factors",
                         "ch-ua-full-version",
                         "ch-ua-full-version-list",
                         "ch-ua-platform-version",
@@ -17412,6 +17503,7 @@
                         "CookieDisabled",
                         "HTTPAuthRequired",
                         "CookieFlushed",
+                        "BroadcastChannelOnMessage",
                         "WebSocket",
                         "WebTransport",
                         "WebRTC",
@@ -19106,7 +19198,7 @@
                         },
                         {
                             "name": "hasBrowserHandler",
-                            "description": "True if browser is capable showing or acting on the given dialog. When browser has no\ndialog handler for given target, calling alert while Page domain is engaged will stall\nthe page execution. Execution can be resumed via calling Page.handleJavaScriptDialog.",
+                            "description": "True iff browser is capable showing or acting on the given dialog. When browser has no\ndialog handler for given target, calling alert while Page domain is engaged will stall\nthe page execution. Execution can be resumed via calling Page.handleJavaScriptDialog.",
                             "type": "boolean"
                         },
                         {
@@ -20381,91 +20473,6 @@
                     ]
                 },
                 {
-                    "id": "InterestGroupAd",
-                    "description": "Ad advertising element inside an interest group.",
-                    "type": "object",
-                    "properties": [
-                        {
-                            "name": "renderURL",
-                            "type": "string"
-                        },
-                        {
-                            "name": "metadata",
-                            "optional": true,
-                            "type": "string"
-                        }
-                    ]
-                },
-                {
-                    "id": "InterestGroupDetails",
-                    "description": "The full details of an interest group.",
-                    "type": "object",
-                    "properties": [
-                        {
-                            "name": "ownerOrigin",
-                            "type": "string"
-                        },
-                        {
-                            "name": "name",
-                            "type": "string"
-                        },
-                        {
-                            "name": "expirationTime",
-                            "$ref": "Network.TimeSinceEpoch"
-                        },
-                        {
-                            "name": "joiningOrigin",
-                            "type": "string"
-                        },
-                        {
-                            "name": "biddingLogicURL",
-                            "optional": true,
-                            "type": "string"
-                        },
-                        {
-                            "name": "biddingWasmHelperURL",
-                            "optional": true,
-                            "type": "string"
-                        },
-                        {
-                            "name": "updateURL",
-                            "optional": true,
-                            "type": "string"
-                        },
-                        {
-                            "name": "trustedBiddingSignalsURL",
-                            "optional": true,
-                            "type": "string"
-                        },
-                        {
-                            "name": "trustedBiddingSignalsKeys",
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        {
-                            "name": "userBiddingSignals",
-                            "optional": true,
-                            "type": "string"
-                        },
-                        {
-                            "name": "ads",
-                            "type": "array",
-                            "items": {
-                                "$ref": "InterestGroupAd"
-                            }
-                        },
-                        {
-                            "name": "adComponents",
-                            "type": "array",
-                            "items": {
-                                "$ref": "InterestGroupAd"
-                            }
-                        }
-                    ]
-                },
-                {
                     "id": "SharedStorageAccessType",
                     "description": "Enum of shared storage access types.",
                     "type": "string",
@@ -20477,6 +20484,7 @@
                         "documentAppend",
                         "documentDelete",
                         "documentClear",
+                        "documentGet",
                         "workletSet",
                         "workletAppend",
                         "workletDelete",
@@ -20485,7 +20493,11 @@
                         "workletKeys",
                         "workletEntries",
                         "workletLength",
-                        "workletRemainingBudget"
+                        "workletRemainingBudget",
+                        "headerSet",
+                        "headerAppend",
+                        "headerDelete",
+                        "headerClear"
                     ]
                 },
                 {
@@ -20599,19 +20611,19 @@
                         },
                         {
                             "name": "key",
-                            "description": "Key for a specific entry in an origin's shared storage.\nPresent only for SharedStorageAccessType.documentSet,\nSharedStorageAccessType.documentAppend,\nSharedStorageAccessType.documentDelete,\nSharedStorageAccessType.workletSet,\nSharedStorageAccessType.workletAppend,\nSharedStorageAccessType.workletDelete, and\nSharedStorageAccessType.workletGet.",
+                            "description": "Key for a specific entry in an origin's shared storage.\nPresent only for SharedStorageAccessType.documentSet,\nSharedStorageAccessType.documentAppend,\nSharedStorageAccessType.documentDelete,\nSharedStorageAccessType.workletSet,\nSharedStorageAccessType.workletAppend,\nSharedStorageAccessType.workletDelete,\nSharedStorageAccessType.workletGet,\nSharedStorageAccessType.headerSet,\nSharedStorageAccessType.headerAppend, and\nSharedStorageAccessType.headerDelete.",
                             "optional": true,
                             "type": "string"
                         },
                         {
                             "name": "value",
-                            "description": "Value for a specific entry in an origin's shared storage.\nPresent only for SharedStorageAccessType.documentSet,\nSharedStorageAccessType.documentAppend,\nSharedStorageAccessType.workletSet, and\nSharedStorageAccessType.workletAppend.",
+                            "description": "Value for a specific entry in an origin's shared storage.\nPresent only for SharedStorageAccessType.documentSet,\nSharedStorageAccessType.documentAppend,\nSharedStorageAccessType.workletSet,\nSharedStorageAccessType.workletAppend,\nSharedStorageAccessType.headerSet, and\nSharedStorageAccessType.headerAppend.",
                             "optional": true,
                             "type": "string"
                         },
                         {
                             "name": "ignoreIfPresent",
-                            "description": "Whether or not to set an entry for a key if that key is already present.\nPresent only for SharedStorageAccessType.documentSet and\nSharedStorageAccessType.workletSet.",
+                            "description": "Whether or not to set an entry for a key if that key is already present.\nPresent only for SharedStorageAccessType.documentSet,\nSharedStorageAccessType.workletSet, and\nSharedStorageAccessType.headerSet.",
                             "optional": true,
                             "type": "boolean"
                         }
@@ -21128,6 +21140,38 @@
                         "reportWindowPassed",
                         "excessiveReports"
                     ]
+                },
+                {
+                    "id": "RelatedWebsiteSet",
+                    "description": "A single Related Website Set object.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "primarySites",
+                            "description": "The primary site of this set, along with the ccTLDs if there is any.",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        {
+                            "name": "associatedSites",
+                            "description": "The associated sites of this set, along with the ccTLDs if there is any.",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        {
+                            "name": "serviceSites",
+                            "description": "The service sites of this set, along with the ccTLDs if there is any.",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ]
                 }
             ],
             "commands": [
@@ -21424,7 +21468,8 @@
                     "returns": [
                         {
                             "name": "details",
-                            "$ref": "InterestGroupDetails"
+                            "description": "This largely corresponds to:\nhttps://wicg.github.io/turtledove/#dictdef-generatebidinterestgroup\nbut has absolute expirationTime instead of relative lifetimeMs and\nalso adds joiningOrigin.",
+                            "type": "object"
                         }
                     ]
                 },
@@ -21620,6 +21665,20 @@
                         {
                             "name": "enable",
                             "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "name": "getRelatedWebsiteSets",
+                    "description": "Returns the effective Related Website Sets in use by this profile for the browser\nsession. The effective Related Website Sets will not change during a browser session.",
+                    "experimental": true,
+                    "returns": [
+                        {
+                            "name": "sets",
+                            "type": "array",
+                            "items": {
+                                "$ref": "RelatedWebsiteSet"
+                            }
                         }
                     ]
                 }
@@ -22237,11 +22296,11 @@
                         },
                         {
                             "name": "type",
+                            "description": "List of types: https://source.chromium.org/chromium/chromium/src/+/main:content/browser/devtools/devtools_agent_host_impl.cc?ss=chromium&q=f:devtools%20-f:out%20%22::kTypeTab%5B%5D%22",
                             "type": "string"
                         },
                         {
                             "name": "title",
-                            "description": "List of types: https://source.chromium.org/chromium/chromium/src/+/main:content/browser/devtools/devtools_agent_host_impl.cc?ss=chromium&q=f:devtools%20-f:out%20%22::kTypeTab%5B%5D%22",
                             "type": "string"
                         },
                         {
@@ -24878,7 +24937,7 @@
                         },
                         {
                             "name": "errorType",
-                            "description": "Error information\n`errorMessage` is null if `errorType` is null.",
+                            "description": "Error information\n`errorMessage` is null iff `errorType` is null.",
                             "optional": true,
                             "$ref": "RuleSetErrorType"
                         },

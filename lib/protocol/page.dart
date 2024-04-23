@@ -1090,7 +1090,7 @@ class JavascriptDialogOpeningEvent {
   /// Dialog type.
   final DialogType type;
 
-  /// True if browser is capable showing or acting on the given dialog. When browser has no
+  /// True iff browser is capable showing or acting on the given dialog. When browser has no
   /// dialog handler for given target, calling alert while Page domain is engaged will stall
   /// the page execution. Execution can be resumed via calling Page.handleJavaScriptDialog.
   final bool hasBrowserHandler;
@@ -1614,7 +1614,7 @@ enum PermissionsPolicyFeature {
   chUaPlatform('ch-ua-platform'),
   chUaModel('ch-ua-model'),
   chUaMobile('ch-ua-mobile'),
-  chUaFormFactor('ch-ua-form-factor'),
+  chUaFormFactors('ch-ua-form-factors'),
   chUaFullVersion('ch-ua-full-version'),
   chUaFullVersionList('ch-ua-full-version-list'),
   chUaPlatformVersion('ch-ua-platform-version'),
@@ -2915,6 +2915,7 @@ enum BackForwardCacheNotRestoredReason {
   cookieDisabled('CookieDisabled'),
   httpAuthRequired('HTTPAuthRequired'),
   cookieFlushed('CookieFlushed'),
+  broadcastChannelOnMessage('BroadcastChannelOnMessage'),
   webSocket('WebSocket'),
   webTransport('WebTransport'),
   webRtc('WebRTC'),

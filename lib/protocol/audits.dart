@@ -883,6 +883,11 @@ enum AttributionReportingIssueType {
   noWebOrOsSupport('NoWebOrOsSupport'),
   navigationRegistrationWithoutTransientUserActivation(
       'NavigationRegistrationWithoutTransientUserActivation'),
+  invalidInfoHeader('InvalidInfoHeader'),
+  noRegisterSourceHeader('NoRegisterSourceHeader'),
+  noRegisterTriggerHeader('NoRegisterTriggerHeader'),
+  noRegisterOsSourceHeader('NoRegisterOsSourceHeader'),
+  noRegisterOsTriggerHeader('NoRegisterOsTriggerHeader'),
   ;
 
   final String value;

@@ -265,14 +265,17 @@ class StorageApi {
   }
 
   /// Gets details for a named interest group.
-  Future<InterestGroupDetails> getInterestGroupDetails(
+  /// Returns: This largely corresponds to:
+  /// https://wicg.github.io/turtledove/#dictdef-generatebidinterestgroup
+  /// but has absolute expirationTime instead of relative lifetimeMs and
+  /// also adds joiningOrigin.
+  Future<Map<String, dynamic>> getInterestGroupDetails(
       String ownerOrigin, String name) async {
     var result = await _client.send('Storage.getInterestGroupDetails', {
       'ownerOrigin': ownerOrigin,
       'name': name,
     });
-    return InterestGroupDetails.fromJson(
-        result['details'] as Map<String, dynamic>);
+    return result['details'] as Map<String, dynamic>;
   }
 
   /// Enables/Disables issuing of interestGroupAccessed events.
@@ -388,6 +391,15 @@ class StorageApi {
     await _client.send('Storage.setAttributionReportingTracking', {
       'enable': enable,
     });
+  }
+
+  /// Returns the effective Related Website Sets in use by this profile for the browser
+  /// session. The effective Related Website Sets will not change during a browser session.
+  Future<List<RelatedWebsiteSet>> getRelatedWebsiteSets() async {
+    var result = await _client.send('Storage.getRelatedWebsiteSets');
+    return (result['sets'] as List)
+        .map((e) => RelatedWebsiteSet.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 }
 
@@ -886,123 +898,6 @@ enum InterestGroupAuctionFetchType {
   String toString() => value.toString();
 }
 
-/// Ad advertising element inside an interest group.
-class InterestGroupAd {
-  final String renderURL;
-
-  final String? metadata;
-
-  InterestGroupAd({required this.renderURL, this.metadata});
-
-  factory InterestGroupAd.fromJson(Map<String, dynamic> json) {
-    return InterestGroupAd(
-      renderURL: json['renderURL'] as String,
-      metadata:
-          json.containsKey('metadata') ? json['metadata'] as String : null,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'renderURL': renderURL,
-      if (metadata != null) 'metadata': metadata,
-    };
-  }
-}
-
-/// The full details of an interest group.
-class InterestGroupDetails {
-  final String ownerOrigin;
-
-  final String name;
-
-  final network.TimeSinceEpoch expirationTime;
-
-  final String joiningOrigin;
-
-  final String? biddingLogicURL;
-
-  final String? biddingWasmHelperURL;
-
-  final String? updateURL;
-
-  final String? trustedBiddingSignalsURL;
-
-  final List<String> trustedBiddingSignalsKeys;
-
-  final String? userBiddingSignals;
-
-  final List<InterestGroupAd> ads;
-
-  final List<InterestGroupAd> adComponents;
-
-  InterestGroupDetails(
-      {required this.ownerOrigin,
-      required this.name,
-      required this.expirationTime,
-      required this.joiningOrigin,
-      this.biddingLogicURL,
-      this.biddingWasmHelperURL,
-      this.updateURL,
-      this.trustedBiddingSignalsURL,
-      required this.trustedBiddingSignalsKeys,
-      this.userBiddingSignals,
-      required this.ads,
-      required this.adComponents});
-
-  factory InterestGroupDetails.fromJson(Map<String, dynamic> json) {
-    return InterestGroupDetails(
-      ownerOrigin: json['ownerOrigin'] as String,
-      name: json['name'] as String,
-      expirationTime:
-          network.TimeSinceEpoch.fromJson(json['expirationTime'] as num),
-      joiningOrigin: json['joiningOrigin'] as String,
-      biddingLogicURL: json.containsKey('biddingLogicURL')
-          ? json['biddingLogicURL'] as String
-          : null,
-      biddingWasmHelperURL: json.containsKey('biddingWasmHelperURL')
-          ? json['biddingWasmHelperURL'] as String
-          : null,
-      updateURL:
-          json.containsKey('updateURL') ? json['updateURL'] as String : null,
-      trustedBiddingSignalsURL: json.containsKey('trustedBiddingSignalsURL')
-          ? json['trustedBiddingSignalsURL'] as String
-          : null,
-      trustedBiddingSignalsKeys: (json['trustedBiddingSignalsKeys'] as List)
-          .map((e) => e as String)
-          .toList(),
-      userBiddingSignals: json.containsKey('userBiddingSignals')
-          ? json['userBiddingSignals'] as String
-          : null,
-      ads: (json['ads'] as List)
-          .map((e) => InterestGroupAd.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      adComponents: (json['adComponents'] as List)
-          .map((e) => InterestGroupAd.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'ownerOrigin': ownerOrigin,
-      'name': name,
-      'expirationTime': expirationTime.toJson(),
-      'joiningOrigin': joiningOrigin,
-      'trustedBiddingSignalsKeys': [...trustedBiddingSignalsKeys],
-      'ads': ads.map((e) => e.toJson()).toList(),
-      'adComponents': adComponents.map((e) => e.toJson()).toList(),
-      if (biddingLogicURL != null) 'biddingLogicURL': biddingLogicURL,
-      if (biddingWasmHelperURL != null)
-        'biddingWasmHelperURL': biddingWasmHelperURL,
-      if (updateURL != null) 'updateURL': updateURL,
-      if (trustedBiddingSignalsURL != null)
-        'trustedBiddingSignalsURL': trustedBiddingSignalsURL,
-      if (userBiddingSignals != null) 'userBiddingSignals': userBiddingSignals,
-    };
-  }
-}
-
 /// Enum of shared storage access types.
 enum SharedStorageAccessType {
   documentAddModule('documentAddModule'),
@@ -1012,6 +907,7 @@ enum SharedStorageAccessType {
   documentAppend('documentAppend'),
   documentDelete('documentDelete'),
   documentClear('documentClear'),
+  documentGet('documentGet'),
   workletSet('workletSet'),
   workletAppend('workletAppend'),
   workletDelete('workletDelete'),
@@ -1021,6 +917,10 @@ enum SharedStorageAccessType {
   workletEntries('workletEntries'),
   workletLength('workletLength'),
   workletRemainingBudget('workletRemainingBudget'),
+  headerSet('headerSet'),
+  headerAppend('headerAppend'),
+  headerDelete('headerDelete'),
+  headerClear('headerClear'),
   ;
 
   final String value;
@@ -1180,20 +1080,26 @@ class SharedStorageAccessParams {
   /// SharedStorageAccessType.documentDelete,
   /// SharedStorageAccessType.workletSet,
   /// SharedStorageAccessType.workletAppend,
-  /// SharedStorageAccessType.workletDelete, and
-  /// SharedStorageAccessType.workletGet.
+  /// SharedStorageAccessType.workletDelete,
+  /// SharedStorageAccessType.workletGet,
+  /// SharedStorageAccessType.headerSet,
+  /// SharedStorageAccessType.headerAppend, and
+  /// SharedStorageAccessType.headerDelete.
   final String? key;
 
   /// Value for a specific entry in an origin's shared storage.
   /// Present only for SharedStorageAccessType.documentSet,
   /// SharedStorageAccessType.documentAppend,
-  /// SharedStorageAccessType.workletSet, and
-  /// SharedStorageAccessType.workletAppend.
+  /// SharedStorageAccessType.workletSet,
+  /// SharedStorageAccessType.workletAppend,
+  /// SharedStorageAccessType.headerSet, and
+  /// SharedStorageAccessType.headerAppend.
   final String? value;
 
   /// Whether or not to set an entry for a key if that key is already present.
-  /// Present only for SharedStorageAccessType.documentSet and
-  /// SharedStorageAccessType.workletSet.
+  /// Present only for SharedStorageAccessType.documentSet,
+  /// SharedStorageAccessType.workletSet, and
+  /// SharedStorageAccessType.headerSet.
   final bool? ignoreIfPresent;
 
   SharedStorageAccessParams(
@@ -2004,4 +1910,40 @@ enum AttributionReportingAggregatableResult {
 
   @override
   String toString() => value.toString();
+}
+
+/// A single Related Website Set object.
+class RelatedWebsiteSet {
+  /// The primary site of this set, along with the ccTLDs if there is any.
+  final List<String> primarySites;
+
+  /// The associated sites of this set, along with the ccTLDs if there is any.
+  final List<String> associatedSites;
+
+  /// The service sites of this set, along with the ccTLDs if there is any.
+  final List<String> serviceSites;
+
+  RelatedWebsiteSet(
+      {required this.primarySites,
+      required this.associatedSites,
+      required this.serviceSites});
+
+  factory RelatedWebsiteSet.fromJson(Map<String, dynamic> json) {
+    return RelatedWebsiteSet(
+      primarySites:
+          (json['primarySites'] as List).map((e) => e as String).toList(),
+      associatedSites:
+          (json['associatedSites'] as List).map((e) => e as String).toList(),
+      serviceSites:
+          (json['serviceSites'] as List).map((e) => e as String).toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'primarySites': [...primarySites],
+      'associatedSites': [...associatedSites],
+      'serviceSites': [...serviceSites],
+    };
+  }
 }

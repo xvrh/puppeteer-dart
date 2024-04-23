@@ -190,6 +190,19 @@ class CSSApi {
     return CSSLayerData.fromJson(result['rootLayer'] as Map<String, dynamic>);
   }
 
+  /// Given a CSS selector text and a style sheet ID, getLocationForSelector
+  /// returns an array of locations of the CSS selector in the style sheet.
+  Future<List<SourceRange>> getLocationForSelector(
+      StyleSheetId styleSheetId, String selectorText) async {
+    var result = await _client.send('CSS.getLocationForSelector', {
+      'styleSheetId': styleSheetId,
+      'selectorText': selectorText,
+    });
+    return (result['ranges'] as List)
+        .map((e) => SourceRange.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
   /// Starts tracking the given computed styles for updates. The specified array of properties
   /// replaces the one previously specified. Pass empty array to disable tracking.
   /// Use takeComputedStyleUpdates to retrieve the list of nodes that had properties modified.
@@ -444,8 +457,8 @@ class GetMatchedStylesForNodeResult {
   /// A list of CSS keyframed animations matching this node.
   final List<CSSKeyframesRule>? cssKeyframesRules;
 
-  /// A list of CSS position fallbacks matching this node.
-  final List<CSSPositionFallbackRule>? cssPositionFallbackRules;
+  /// A list of CSS @position-try rules matching this node, based on the position-try-options property.
+  final List<CSSPositionTryRule>? cssPositionTryRules;
 
   /// A list of CSS at-property rules matching this node.
   final List<CSSPropertyRule>? cssPropertyRules;
@@ -467,7 +480,7 @@ class GetMatchedStylesForNodeResult {
       this.inherited,
       this.inheritedPseudoElements,
       this.cssKeyframesRules,
-      this.cssPositionFallbackRules,
+      this.cssPositionTryRules,
       this.cssPropertyRules,
       this.cssPropertyRegistrations,
       this.cssFontPaletteValuesRule,
@@ -509,10 +522,10 @@ class GetMatchedStylesForNodeResult {
               .map((e) => CSSKeyframesRule.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
-      cssPositionFallbackRules: json.containsKey('cssPositionFallbackRules')
-          ? (json['cssPositionFallbackRules'] as List)
-              .map((e) =>
-                  CSSPositionFallbackRule.fromJson(e as Map<String, dynamic>))
+      cssPositionTryRules: json.containsKey('cssPositionTryRules')
+          ? (json['cssPositionTryRules'] as List)
+              .map(
+                  (e) => CSSPositionTryRule.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       cssPropertyRules: json.containsKey('cssPropertyRules')
@@ -1927,6 +1940,48 @@ class CSSPositionFallbackRule {
     return {
       'name': name.toJson(),
       'tryRules': tryRules.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+/// CSS @position-try rule representation.
+class CSSPositionTryRule {
+  /// The prelude dashed-ident name
+  final Value name;
+
+  /// The css style sheet identifier (absent for user agent stylesheet and user-specified
+  /// stylesheet rules) this rule came from.
+  final StyleSheetId? styleSheetId;
+
+  /// Parent stylesheet's origin.
+  final StyleSheetOrigin origin;
+
+  /// Associated style declaration.
+  final CSSStyle style;
+
+  CSSPositionTryRule(
+      {required this.name,
+      this.styleSheetId,
+      required this.origin,
+      required this.style});
+
+  factory CSSPositionTryRule.fromJson(Map<String, dynamic> json) {
+    return CSSPositionTryRule(
+      name: Value.fromJson(json['name'] as Map<String, dynamic>),
+      styleSheetId: json.containsKey('styleSheetId')
+          ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+          : null,
+      origin: StyleSheetOrigin.fromJson(json['origin'] as String),
+      style: CSSStyle.fromJson(json['style'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name.toJson(),
+      'origin': origin.toJson(),
+      'style': style.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
     };
   }
 }
