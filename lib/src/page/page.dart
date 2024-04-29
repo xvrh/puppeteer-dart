@@ -489,6 +489,19 @@ class Page {
     }
   }
 
+  /// Simulates network latency by setting the offline mode and emulating network conditions.
+  ///
+  /// The [offline] parameter determines whether the page should be offline or online.
+  /// The [latency] parameter specifies the additional delay (in milliseconds) for each network request.
+  /// The [downloadThroughput] parameter specifies the maximum download speed (in bytes per second).
+  /// The [uploadThroughput] parameter specifies the maximum upload speed (in bytes per second).
+  ///
+  /// Throws an exception if any error occurs during the simulation.
+  Future<void> simulateNetworkLatency(bool offline, int latency, int downloadThroughput, int uploadThroughput) async {
+    await setOfflineMode(offline);
+    await devTools.network.emulateNetworkConditions(offline, latency, downloadThroughput, uploadThroughput);
+  }
+
   /// Whether to enable request interception.
   ///
   /// Activating request interception enables `request.abort`, `request.continue`
