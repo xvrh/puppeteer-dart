@@ -475,7 +475,9 @@ class WaitTask {
         return;
       }
 
-      _completer.complete(success);
+      if (!_completer.isCompleted) {
+        _completer.complete(success);
+      }
     } on Exception catch (error) {
       // When the page is navigated, the promise is rejected.
       // We will try again in the new execution context.
