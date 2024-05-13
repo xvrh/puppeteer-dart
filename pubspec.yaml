@@ -5,6 +5,7 @@ homepage: https://github.com/xvrh/puppeteer-dart
 
 funding:
   - https://www.buymeacoffee.com/xvrh
+  - https://github.com/sponsors/xvrh
 
 platforms:
   linux:
