@@ -1,3 +1,7 @@
+## 3.10.0
+- Update to Chrome 124.0.6367.201
+- Small bug fix
+
 ## 3.9.0
 - Update to Chrome 123.0.6312.122
 
