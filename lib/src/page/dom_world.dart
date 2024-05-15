@@ -16,7 +16,7 @@ class DomWorld {
   bool _detached = false;
 
   DomWorld(this.frameManager, this.frame) {
-    _contextCompleter = Completer<ExecutionContext>();
+    clearContext();
   }
 
   void setContext(ExecutionContext context) {
