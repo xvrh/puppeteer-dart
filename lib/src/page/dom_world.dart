@@ -38,12 +38,13 @@ class DomWorld {
   }
 
   void clearContext() {
-    _contextCompleter = null;
     _contextCompleter = Completer<ExecutionContext>();
   }
 
   void destroyContext() {
-    _contextCompleter!.completeError('Context was disposed');
+    if (_contextCompleter != null && !_contextCompleter!.isCompleted) {
+      _contextCompleter!.completeError('Context is disposed');
+    }
     _contextCompleter = Completer<ExecutionContext>();
   }
 
