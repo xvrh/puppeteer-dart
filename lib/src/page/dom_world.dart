@@ -31,7 +31,12 @@ class DomWorld {
       }
     } else {
       if (_contextCompleter != null && !_contextCompleter!.isCompleted) {
-        _contextCompleter!.completeError('Context is disposed');
+        try {
+          _contextCompleter!.complete(_contextCompleter!.future);
+          _contextCompleter = null;
+        } catch (e) {
+          _contextCompleter!.completeError('Context is disposed');
+        }
       }
       _contextCompleter = Completer<ExecutionContext>();
     }
