@@ -116,7 +116,8 @@ void main() {
       final startingContext = browser.browserContexts.length;
       var context = await browser.createIncognitoBrowserContext();
       var page = await context.newPage();
-      await page.devTools.network.emulateNetworkConditions(false, 1000, 1000000, 1000000);
+      await page.devTools.network
+          .emulateNetworkConditions(false, 1000, 1000000, 1000000);
       await page.goto('https://www.naver.com');
       await page.goto('https://www.naver.com');
       await context.close();
