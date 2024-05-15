@@ -112,14 +112,15 @@ void main() {
           throwsA(TypeMatcher<TimeoutException>()));
       await context.close();
     });
-    test('Navigation does not result in `Context is disposed` error', () async {
+    test('should complete navigation without context disposal error', () async {
+      final startingContext = browser.browserContexts.length;
       var context = await browser.createIncognitoBrowserContext();
       var page = await context.newPage();
       await page.devTools.network.emulateNetworkConditions(false, 1000, 1000000, 1000000);
       await page.goto('https://www.naver.com');
       await page.goto('https://www.naver.com');
       await context.close();
-      expect(browser.browserContexts, hasLength(1));
+      expect(browser.browserContexts, hasLength(startingContext));
     });
     test('should isolate localStorage and cookies', () async {
       // Create two incognito contexts.
