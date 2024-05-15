@@ -31,15 +31,20 @@ class DomWorld {
       }
     } else {
       if (_contextCompleter != null && !_contextCompleter!.isCompleted) {
-        try {
-          _contextCompleter!.complete(_contextCompleter!.future);
-          _contextCompleter = null;
-        } catch (e) {
-          _contextCompleter!.completeError('Context is disposed');
-        }
+        _contextCompleter!.completeError('Context is disposed');
       }
       _contextCompleter = Completer<ExecutionContext>();
     }
+  }
+
+  void clearContext() {
+    _contextCompleter = null;
+    _contextCompleter = Completer<ExecutionContext>();
+  }
+
+  void destroyContext() {
+    _contextCompleter!.completeError('Context was disposed');
+    _contextCompleter = Completer<ExecutionContext>();
   }
 
   bool get hasContext =>
