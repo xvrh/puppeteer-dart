@@ -296,8 +296,15 @@ class PageApi {
     await _client.send('Page.enable');
   }
 
-  Future<GetAppManifestResult> getAppManifest() async {
-    var result = await _client.send('Page.getAppManifest');
+  /// Gets the processed manifest for this current document.
+  ///   This API always waits for the manifest to be loaded.
+  ///   If manifestId is provided, and it does not match the manifest of the
+  ///     current document, this API errors out.
+  ///   If there isn’t a loaded page, this API errors out immediately.
+  Future<GetAppManifestResult> getAppManifest({String? manifestId}) async {
+    var result = await _client.send('Page.getAppManifest', {
+      if (manifestId != null) 'manifestId': manifestId,
+    });
     return GetAppManifestResult.fromJson(result);
   }
 
@@ -1276,11 +1283,13 @@ class GetAppManifestResult {
   /// Manifest content.
   final String? data;
 
-  /// Parsed manifest properties
-  final AppManifestParsedProperties? parsed;
+  final WebAppManifest manifest;
 
   GetAppManifestResult(
-      {required this.url, required this.errors, this.data, this.parsed});
+      {required this.url,
+      required this.errors,
+      this.data,
+      required this.manifest});
 
   factory GetAppManifestResult.fromJson(Map<String, dynamic> json) {
     return GetAppManifestResult(
@@ -1289,10 +1298,8 @@ class GetAppManifestResult {
           .map((e) => AppManifestError.fromJson(e as Map<String, dynamic>))
           .toList(),
       data: json.containsKey('data') ? json['data'] as String : null,
-      parsed: json.containsKey('parsed')
-          ? AppManifestParsedProperties.fromJson(
-              json['parsed'] as Map<String, dynamic>)
-          : null,
+      manifest:
+          WebAppManifest.fromJson(json['manifest'] as Map<String, dynamic>),
     );
   }
 }
@@ -2808,6 +2815,491 @@ class CompilationCacheParams {
     return {
       'url': url,
       if (eager != null) 'eager': eager,
+    };
+  }
+}
+
+class FileFilter {
+  final String? name;
+
+  final List<String>? accepts;
+
+  FileFilter({this.name, this.accepts});
+
+  factory FileFilter.fromJson(Map<String, dynamic> json) {
+    return FileFilter(
+      name: json.containsKey('name') ? json['name'] as String : null,
+      accepts: json.containsKey('accepts')
+          ? (json['accepts'] as List).map((e) => e as String).toList()
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (name != null) 'name': name,
+      if (accepts != null) 'accepts': [...?accepts],
+    };
+  }
+}
+
+class FileHandler {
+  final String action;
+
+  final String name;
+
+  final List<ImageResource>? icons;
+
+  /// Mimic a map, name is the key, accepts is the value.
+  final List<FileFilter>? accepts;
+
+  /// Won't repeat the enums, using string for easy comparison. Same as the
+  /// other enums below.
+  final String launchType;
+
+  FileHandler(
+      {required this.action,
+      required this.name,
+      this.icons,
+      this.accepts,
+      required this.launchType});
+
+  factory FileHandler.fromJson(Map<String, dynamic> json) {
+    return FileHandler(
+      action: json['action'] as String,
+      name: json['name'] as String,
+      icons: json.containsKey('icons')
+          ? (json['icons'] as List)
+              .map((e) => ImageResource.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+      accepts: json.containsKey('accepts')
+          ? (json['accepts'] as List)
+              .map((e) => FileFilter.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+      launchType: json['launchType'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'action': action,
+      'name': name,
+      'launchType': launchType,
+      if (icons != null) 'icons': icons!.map((e) => e.toJson()).toList(),
+      if (accepts != null) 'accepts': accepts!.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+/// The image definition used in both icon and screenshot.
+class ImageResource {
+  /// The src field in the definition, but changing to url in favor of
+  /// consistency.
+  final String url;
+
+  final String? sizes;
+
+  final String? type;
+
+  ImageResource({required this.url, this.sizes, this.type});
+
+  factory ImageResource.fromJson(Map<String, dynamic> json) {
+    return ImageResource(
+      url: json['url'] as String,
+      sizes: json.containsKey('sizes') ? json['sizes'] as String : null,
+      type: json.containsKey('type') ? json['type'] as String : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      if (sizes != null) 'sizes': sizes,
+      if (type != null) 'type': type,
+    };
+  }
+}
+
+class LaunchHandler {
+  final String clientMode;
+
+  LaunchHandler({required this.clientMode});
+
+  factory LaunchHandler.fromJson(Map<String, dynamic> json) {
+    return LaunchHandler(
+      clientMode: json['clientMode'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'clientMode': clientMode,
+    };
+  }
+}
+
+class ProtocolHandler {
+  final String protocol;
+
+  final String url;
+
+  ProtocolHandler({required this.protocol, required this.url});
+
+  factory ProtocolHandler.fromJson(Map<String, dynamic> json) {
+    return ProtocolHandler(
+      protocol: json['protocol'] as String,
+      url: json['url'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'protocol': protocol,
+      'url': url,
+    };
+  }
+}
+
+class RelatedApplication {
+  final String? id;
+
+  final String url;
+
+  RelatedApplication({this.id, required this.url});
+
+  factory RelatedApplication.fromJson(Map<String, dynamic> json) {
+    return RelatedApplication(
+      id: json.containsKey('id') ? json['id'] as String : null,
+      url: json['url'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      if (id != null) 'id': id,
+    };
+  }
+}
+
+class ScopeExtension {
+  /// Instead of using tuple, this field always returns the serialized string
+  /// for easy understanding and comparison.
+  final String origin;
+
+  final bool hasOriginWildcard;
+
+  ScopeExtension({required this.origin, required this.hasOriginWildcard});
+
+  factory ScopeExtension.fromJson(Map<String, dynamic> json) {
+    return ScopeExtension(
+      origin: json['origin'] as String,
+      hasOriginWildcard: json['hasOriginWildcard'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'origin': origin,
+      'hasOriginWildcard': hasOriginWildcard,
+    };
+  }
+}
+
+class Screenshot {
+  final ImageResource image;
+
+  final String formFactor;
+
+  final String? label;
+
+  Screenshot({required this.image, required this.formFactor, this.label});
+
+  factory Screenshot.fromJson(Map<String, dynamic> json) {
+    return Screenshot(
+      image: ImageResource.fromJson(json['image'] as Map<String, dynamic>),
+      formFactor: json['formFactor'] as String,
+      label: json.containsKey('label') ? json['label'] as String : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'image': image.toJson(),
+      'formFactor': formFactor,
+      if (label != null) 'label': label,
+    };
+  }
+}
+
+class ShareTarget {
+  final String action;
+
+  final String method;
+
+  final String enctype;
+
+  /// Embed the ShareTargetParams
+  final String? title;
+
+  final String? text;
+
+  final String? url;
+
+  final List<FileFilter>? files;
+
+  ShareTarget(
+      {required this.action,
+      required this.method,
+      required this.enctype,
+      this.title,
+      this.text,
+      this.url,
+      this.files});
+
+  factory ShareTarget.fromJson(Map<String, dynamic> json) {
+    return ShareTarget(
+      action: json['action'] as String,
+      method: json['method'] as String,
+      enctype: json['enctype'] as String,
+      title: json.containsKey('title') ? json['title'] as String : null,
+      text: json.containsKey('text') ? json['text'] as String : null,
+      url: json.containsKey('url') ? json['url'] as String : null,
+      files: json.containsKey('files')
+          ? (json['files'] as List)
+              .map((e) => FileFilter.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'action': action,
+      'method': method,
+      'enctype': enctype,
+      if (title != null) 'title': title,
+      if (text != null) 'text': text,
+      if (url != null) 'url': url,
+      if (files != null) 'files': files!.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+class Shortcut {
+  final String name;
+
+  final String url;
+
+  Shortcut({required this.name, required this.url});
+
+  factory Shortcut.fromJson(Map<String, dynamic> json) {
+    return Shortcut(
+      name: json['name'] as String,
+      url: json['url'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'url': url,
+    };
+  }
+}
+
+class WebAppManifest {
+  final String? backgroundColor;
+
+  /// The extra description provided by the manifest.
+  final String? description;
+
+  final String? dir;
+
+  final String? display;
+
+  /// The overrided display mode controlled by the user.
+  final List<String>? displayOverrides;
+
+  /// The handlers to open files.
+  final List<FileHandler>? fileHandlers;
+
+  final List<ImageResource>? icons;
+
+  final String? id;
+
+  final String? lang;
+
+  /// TODO(crbug.com/1231886): This field is non-standard and part of a Chrome
+  /// experiment. See:
+  /// https://github.com/WICG/web-app-launch/blob/main/launch_handler.md
+  final LaunchHandler? launchHandler;
+
+  final String? name;
+
+  final String? orientation;
+
+  final bool? preferRelatedApplications;
+
+  /// The handlers to open protocols.
+  final List<ProtocolHandler>? protocolHandlers;
+
+  final List<RelatedApplication>? relatedApplications;
+
+  final String? scope;
+
+  /// Non-standard, see
+  /// https://github.com/WICG/manifest-incubations/blob/gh-pages/scope_extensions-explainer.md
+  final List<ScopeExtension>? scopeExtensions;
+
+  /// The screenshots used by chromium.
+  final List<Screenshot>? screenshots;
+
+  final ShareTarget? shareTarget;
+
+  final String? shortName;
+
+  final List<Shortcut>? shortcuts;
+
+  final String? startUrl;
+
+  final String? themeColor;
+
+  WebAppManifest(
+      {this.backgroundColor,
+      this.description,
+      this.dir,
+      this.display,
+      this.displayOverrides,
+      this.fileHandlers,
+      this.icons,
+      this.id,
+      this.lang,
+      this.launchHandler,
+      this.name,
+      this.orientation,
+      this.preferRelatedApplications,
+      this.protocolHandlers,
+      this.relatedApplications,
+      this.scope,
+      this.scopeExtensions,
+      this.screenshots,
+      this.shareTarget,
+      this.shortName,
+      this.shortcuts,
+      this.startUrl,
+      this.themeColor});
+
+  factory WebAppManifest.fromJson(Map<String, dynamic> json) {
+    return WebAppManifest(
+      backgroundColor: json.containsKey('backgroundColor')
+          ? json['backgroundColor'] as String
+          : null,
+      description: json.containsKey('description')
+          ? json['description'] as String
+          : null,
+      dir: json.containsKey('dir') ? json['dir'] as String : null,
+      display: json.containsKey('display') ? json['display'] as String : null,
+      displayOverrides: json.containsKey('displayOverrides')
+          ? (json['displayOverrides'] as List).map((e) => e as String).toList()
+          : null,
+      fileHandlers: json.containsKey('fileHandlers')
+          ? (json['fileHandlers'] as List)
+              .map((e) => FileHandler.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+      icons: json.containsKey('icons')
+          ? (json['icons'] as List)
+              .map((e) => ImageResource.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+      id: json.containsKey('id') ? json['id'] as String : null,
+      lang: json.containsKey('lang') ? json['lang'] as String : null,
+      launchHandler: json.containsKey('launchHandler')
+          ? LaunchHandler.fromJson(
+              json['launchHandler'] as Map<String, dynamic>)
+          : null,
+      name: json.containsKey('name') ? json['name'] as String : null,
+      orientation: json.containsKey('orientation')
+          ? json['orientation'] as String
+          : null,
+      preferRelatedApplications: json.containsKey('preferRelatedApplications')
+          ? json['preferRelatedApplications'] as bool
+          : null,
+      protocolHandlers: json.containsKey('protocolHandlers')
+          ? (json['protocolHandlers'] as List)
+              .map((e) => ProtocolHandler.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+      relatedApplications: json.containsKey('relatedApplications')
+          ? (json['relatedApplications'] as List)
+              .map(
+                  (e) => RelatedApplication.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+      scope: json.containsKey('scope') ? json['scope'] as String : null,
+      scopeExtensions: json.containsKey('scopeExtensions')
+          ? (json['scopeExtensions'] as List)
+              .map((e) => ScopeExtension.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+      screenshots: json.containsKey('screenshots')
+          ? (json['screenshots'] as List)
+              .map((e) => Screenshot.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+      shareTarget: json.containsKey('shareTarget')
+          ? ShareTarget.fromJson(json['shareTarget'] as Map<String, dynamic>)
+          : null,
+      shortName:
+          json.containsKey('shortName') ? json['shortName'] as String : null,
+      shortcuts: json.containsKey('shortcuts')
+          ? (json['shortcuts'] as List)
+              .map((e) => Shortcut.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+      startUrl:
+          json.containsKey('startUrl') ? json['startUrl'] as String : null,
+      themeColor:
+          json.containsKey('themeColor') ? json['themeColor'] as String : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (backgroundColor != null) 'backgroundColor': backgroundColor,
+      if (description != null) 'description': description,
+      if (dir != null) 'dir': dir,
+      if (display != null) 'display': display,
+      if (displayOverrides != null) 'displayOverrides': [...?displayOverrides],
+      if (fileHandlers != null)
+        'fileHandlers': fileHandlers!.map((e) => e.toJson()).toList(),
+      if (icons != null) 'icons': icons!.map((e) => e.toJson()).toList(),
+      if (id != null) 'id': id,
+      if (lang != null) 'lang': lang,
+      if (launchHandler != null) 'launchHandler': launchHandler!.toJson(),
+      if (name != null) 'name': name,
+      if (orientation != null) 'orientation': orientation,
+      if (preferRelatedApplications != null)
+        'preferRelatedApplications': preferRelatedApplications,
+      if (protocolHandlers != null)
+        'protocolHandlers': protocolHandlers!.map((e) => e.toJson()).toList(),
+      if (relatedApplications != null)
+        'relatedApplications':
+            relatedApplications!.map((e) => e.toJson()).toList(),
+      if (scope != null) 'scope': scope,
+      if (scopeExtensions != null)
+        'scopeExtensions': scopeExtensions!.map((e) => e.toJson()).toList(),
+      if (screenshots != null)
+        'screenshots': screenshots!.map((e) => e.toJson()).toList(),
+      if (shareTarget != null) 'shareTarget': shareTarget!.toJson(),
+      if (shortName != null) 'shortName': shortName,
+      if (shortcuts != null)
+        'shortcuts': shortcuts!.map((e) => e.toJson()).toList(),
+      if (startUrl != null) 'startUrl': startUrl,
+      if (themeColor != null) 'themeColor': themeColor,
     };
   }
 }
