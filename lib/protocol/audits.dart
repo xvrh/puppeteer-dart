@@ -1263,6 +1263,8 @@ enum FederatedAuthRequestIssueReason {
   silentMediationFailure('SilentMediationFailure'),
   thirdPartyCookiesBlocked('ThirdPartyCookiesBlocked'),
   notSignedInWithIdp('NotSignedInWithIdp'),
+  missingTransientUserActivation('MissingTransientUserActivation'),
+  replacedByButtonMode('ReplacedByButtonMode'),
   ;
 
   final String value;

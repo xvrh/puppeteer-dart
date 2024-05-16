@@ -24,6 +24,12 @@ class AnimationApi {
       .map((event) => Animation.fromJson(
           event.parameters['animation'] as Map<String, dynamic>));
 
+  /// Event for animation that has been updated.
+  Stream<Animation> get onAnimationUpdated => _client.onEvent
+      .where((event) => event.name == 'Animation.animationUpdated')
+      .map((event) => Animation.fromJson(
+          event.parameters['animation'] as Map<String, dynamic>));
+
   /// Disables animation domain notifications.
   Future<void> disable() async {
     await _client.send('Animation.disable');

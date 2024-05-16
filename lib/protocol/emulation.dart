@@ -91,8 +91,6 @@ class EmulationApi {
   /// change is not observed by the page, e.g. viewport-relative elements do not change positions.
   /// [displayFeature] If set, the display feature of a multi-segment screen. If not set, multi-segment support
   /// is turned-off.
-  /// [devicePosture] If set, the posture of a foldable device. If not set the posture is set
-  /// to continuous.
   Future<void> setDeviceMetricsOverride(
       int width, int height, num deviceScaleFactor, bool mobile,
       {num? scale,
@@ -104,6 +102,7 @@ class EmulationApi {
       ScreenOrientation? screenOrientation,
       page.Viewport? viewport,
       DisplayFeature? displayFeature,
+      @Deprecated('use Emulation.setDevicePostureOverride.')
       DevicePosture? devicePosture}) async {
     await _client.send('Emulation.setDeviceMetricsOverride', {
       'width': width,
@@ -121,6 +120,22 @@ class EmulationApi {
       if (displayFeature != null) 'displayFeature': displayFeature,
       if (devicePosture != null) 'devicePosture': devicePosture,
     });
+  }
+
+  /// Start reporting the given posture value to the Device Posture API.
+  /// This override can also be set in setDeviceMetricsOverride().
+  Future<void> setDevicePostureOverride(DevicePosture posture) async {
+    await _client.send('Emulation.setDevicePostureOverride', {
+      'posture': posture,
+    });
+  }
+
+  /// Clears a device posture override set with either setDeviceMetricsOverride()
+  /// or setDevicePostureOverride() and starts using posture information from the
+  /// platform again.
+  /// Does nothing if no override is set.
+  Future<void> clearDevicePostureOverride() async {
+    await _client.send('Emulation.clearDevicePostureOverride');
   }
 
   /// [hidden] Whether scrollbars should be always hidden.

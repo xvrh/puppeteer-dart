@@ -151,6 +151,15 @@ class NetworkApi {
           .map((event) =>
               ResponseReceivedExtraInfoEvent.fromJson(event.parameters));
 
+  /// Fired when 103 Early Hints headers is received in addition to the common response.
+  /// Not every responseReceived event will have an responseReceivedEarlyHints fired.
+  /// Only one responseReceivedEarlyHints may be fired for eached responseReceived event.
+  Stream<ResponseReceivedEarlyHintsEvent> get onResponseReceivedEarlyHints =>
+      _client.onEvent
+          .where((event) => event.name == 'Network.responseReceivedEarlyHints')
+          .map((event) =>
+              ResponseReceivedEarlyHintsEvent.fromJson(event.parameters));
+
   /// Fired exactly once for each Trust Token operation. Depending on
   /// the type of the operation and whether the operation succeeded or
   /// failed, the event is fired before the corresponding request was sent
@@ -1418,6 +1427,24 @@ class ResponseReceivedExtraInfoEvent {
   }
 }
 
+class ResponseReceivedEarlyHintsEvent {
+  /// Request identifier. Used to match this information to another responseReceived event.
+  final RequestId requestId;
+
+  /// Raw response headers as they were received over the wire.
+  final Headers headers;
+
+  ResponseReceivedEarlyHintsEvent(
+      {required this.requestId, required this.headers});
+
+  factory ResponseReceivedEarlyHintsEvent.fromJson(Map<String, dynamic> json) {
+    return ResponseReceivedEarlyHintsEvent(
+      requestId: RequestId.fromJson(json['requestId'] as String),
+      headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
+    );
+  }
+}
+
 class TrustTokenOperationDoneEvent {
   /// Detailed success or error status of the operation.
   /// 'AlreadyExists' also signifies a successful operation, as the result
@@ -2647,6 +2674,9 @@ class ResponseData {
   /// Specifies that the request was served from the prefetch cache.
   final bool? fromPrefetchCache;
 
+  /// Specifies that the request was served from the prefetch cache.
+  final bool? fromEarlyHints;
+
   /// Information about how Service Worker Static Router was used.
   final ServiceWorkerRouterInfo? serviceWorkerRouterInfo;
 
@@ -2692,6 +2722,7 @@ class ResponseData {
       this.fromDiskCache,
       this.fromServiceWorker,
       this.fromPrefetchCache,
+      this.fromEarlyHints,
       this.serviceWorkerRouterInfo,
       required this.encodedDataLength,
       this.timing,
@@ -2729,6 +2760,9 @@ class ResponseData {
           : null,
       fromPrefetchCache: json.containsKey('fromPrefetchCache')
           ? json['fromPrefetchCache'] as bool
+          : null,
+      fromEarlyHints: json.containsKey('fromEarlyHints')
+          ? json['fromEarlyHints'] as bool
           : null,
       serviceWorkerRouterInfo: json.containsKey('serviceWorkerRouterInfo')
           ? ServiceWorkerRouterInfo.fromJson(
@@ -2782,6 +2816,7 @@ class ResponseData {
       if (fromDiskCache != null) 'fromDiskCache': fromDiskCache,
       if (fromServiceWorker != null) 'fromServiceWorker': fromServiceWorker,
       if (fromPrefetchCache != null) 'fromPrefetchCache': fromPrefetchCache,
+      if (fromEarlyHints != null) 'fromEarlyHints': fromEarlyHints,
       if (serviceWorkerRouterInfo != null)
         'serviceWorkerRouterInfo': serviceWorkerRouterInfo!.toJson(),
       if (timing != null) 'timing': timing!.toJson(),
@@ -3290,16 +3325,22 @@ class ExemptedSetCookieWithReason {
   /// The reason the cookie was exempted.
   final CookieExemptionReason exemptionReason;
 
+  /// The string representing this individual cookie as it would appear in the header.
+  final String cookieLine;
+
   /// The cookie object representing the cookie.
   final Cookie cookie;
 
   ExemptedSetCookieWithReason(
-      {required this.exemptionReason, required this.cookie});
+      {required this.exemptionReason,
+      required this.cookieLine,
+      required this.cookie});
 
   factory ExemptedSetCookieWithReason.fromJson(Map<String, dynamic> json) {
     return ExemptedSetCookieWithReason(
       exemptionReason:
           CookieExemptionReason.fromJson(json['exemptionReason'] as String),
+      cookieLine: json['cookieLine'] as String,
       cookie: Cookie.fromJson(json['cookie'] as Map<String, dynamic>),
     );
   }
@@ -3307,6 +3348,7 @@ class ExemptedSetCookieWithReason {
   Map<String, dynamic> toJson() {
     return {
       'exemptionReason': exemptionReason.toJson(),
+      'cookieLine': cookieLine,
       'cookie': cookie.toJson(),
     };
   }

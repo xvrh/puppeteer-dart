@@ -37,6 +37,7 @@ import 'performance.dart';
 import 'performance_timeline.dart';
 import 'preload.dart';
 import 'profiler.dart';
+import 'pwa.dart';
 import 'runtime.dart';
 import 'security.dart';
 import 'service_worker.dart';
@@ -238,6 +239,10 @@ class DevTools {
   /// This domain allows interacting with the FedCM dialog.
   FedCmApi get fedCm => _fedCm ??= FedCmApi(client);
   FedCmApi? _fedCm;
+
+  /// This domain allows interacting with the browser to control PWAs.
+  PWAApi get pwa => _pwa ??= PWAApi(client);
+  PWAApi? _pwa;
 
   /// Debugger domain exposes JavaScript debugging capabilities. It allows setting and removing
   /// breakpoints, stepping through execution, exploring stack traces, etc.

@@ -1065,6 +1065,8 @@ enum PseudoType {
   grammarError('grammar-error'),
   highlight('highlight'),
   firstLineInherited('first-line-inherited'),
+  scrollMarker('scroll-marker'),
+  scrollMarkers('scroll-markers'),
   scrollbar('scrollbar'),
   scrollbarThumb('scrollbar-thumb'),
   scrollbarButton('scrollbar-button'),

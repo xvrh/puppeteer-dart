@@ -393,6 +393,14 @@ class StorageApi {
     });
   }
 
+  /// Sends all pending Attribution Reports immediately, regardless of their
+  /// scheduled report time.
+  /// Returns: The number of reports that were sent.
+  Future<int> sendPendingAttributionReports() async {
+    var result = await _client.send('Storage.sendPendingAttributionReports');
+    return result['numSent'] as int;
+  }
+
   /// Returns the effective Related Website Sets in use by this profile for the browser
   /// session. The effective Related Website Sets will not change during a browser session.
   Future<List<RelatedWebsiteSet>> getRelatedWebsiteSets() async {
@@ -1567,6 +1575,7 @@ enum AttributionReportingSourceRegistrationResult {
   destinationBothLimitsReached('destinationBothLimitsReached'),
   reportingOriginsPerSiteLimitReached('reportingOriginsPerSiteLimitReached'),
   exceedsMaxChannelCapacity('exceedsMaxChannelCapacity'),
+  exceedsMaxTriggerStateCardinality('exceedsMaxTriggerStateCardinality'),
   ;
 
   final String value;
