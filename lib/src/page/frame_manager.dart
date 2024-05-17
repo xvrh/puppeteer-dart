@@ -298,13 +298,13 @@ class FrameManager {
     }
     _contextIdToContext.remove(executionContextId);
     if (context.world != null) {
-      context.world!.setContext(null);
+      context.world!.destroyContext();
     }
   }
 
   void _onExecutionContextsCleared(_) {
     for (var context in _contextIdToContext.values) {
-      if (context.world != null) context.world!.setContext(null);
+      if (context.world != null) context.world!.clearContext();
     }
     _contextIdToContext.clear();
   }

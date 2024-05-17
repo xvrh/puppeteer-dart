@@ -16,25 +16,29 @@ class DomWorld {
   bool _detached = false;
 
   DomWorld(this.frameManager, this.frame) {
-    setContext(null);
+    clearContext();
   }
 
-  void setContext(ExecutionContext? context) {
-    if (context != null) {
-      _documentFuture = null;
-      if (!_contextCompleter!.isCompleted) {
-        _contextCompleter!.complete(context);
+  void setContext(ExecutionContext context) {
+    _documentFuture = null;
+    if (!_contextCompleter!.isCompleted) {
+      _contextCompleter!.complete(context);
 
-        for (var waitTask in _waitTasks) {
-          waitTask.rerun();
-        }
+      for (var waitTask in _waitTasks) {
+        waitTask.rerun();
       }
-    } else {
-      if (_contextCompleter != null && !_contextCompleter!.isCompleted) {
-        _contextCompleter!.completeError('Context is disposed');
-      }
-      _contextCompleter = Completer<ExecutionContext>();
     }
+  }
+
+  void clearContext() {
+    _contextCompleter = Completer<ExecutionContext>();
+  }
+
+  void destroyContext() {
+    if (_contextCompleter != null && !_contextCompleter!.isCompleted) {
+      _contextCompleter!.completeError('Context is disposed');
+    }
+    _contextCompleter = Completer<ExecutionContext>();
   }
 
   bool get hasContext =>
