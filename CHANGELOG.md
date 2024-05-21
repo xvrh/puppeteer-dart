@@ -1,3 +1,7 @@
+## 2.25.0
+- Fix Bad state: Future already completed
+- Fix navigation error
+
 ## 2.24.0
 - Update to Chromium 112
 
