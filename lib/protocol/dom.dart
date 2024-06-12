@@ -485,6 +485,20 @@ class DOMApi {
         .toList();
   }
 
+  /// Returns the NodeId of the matched element according to certain relations.
+  /// [nodeId] Id of the node from which to query the relation.
+  /// [relation] Type of relation to get.
+  /// Returns: NodeId of the element matching the queried relation.
+  Future<NodeId> getElementByRelation(
+      NodeId nodeId, @Enum(['PopoverTarget']) String relation) async {
+    assert(const ['PopoverTarget'].contains(relation));
+    var result = await _client.send('DOM.getElementByRelation', {
+      'nodeId': nodeId,
+      'relation': relation,
+    });
+    return NodeId.fromJson(result['nodeId'] as int);
+  }
+
   /// Re-does the last undone action.
   Future<void> redo() async {
     await _client.send('DOM.redo');
@@ -1060,6 +1074,7 @@ enum PseudoType {
   marker('marker'),
   backdrop('backdrop'),
   selection('selection'),
+  searchText('search-text'),
   targetText('target-text'),
   spellingError('spelling-error'),
   grammarError('grammar-error'),

@@ -300,7 +300,7 @@ class PageApi {
   ///   This API always waits for the manifest to be loaded.
   ///   If manifestId is provided, and it does not match the manifest of the
   ///     current document, this API errors out.
-  ///   If there isn’t a loaded page, this API errors out immediately.
+  ///   If there is not a loaded page, this API errors out immediately.
   Future<GetAppManifestResult> getAppManifest({String? manifestId}) async {
     var result = await _client.send('Page.getAppManifest', {
       if (manifestId != null) 'manifestId': manifestId,
@@ -504,12 +504,18 @@ class PageApi {
   /// [ignoreCache] If true, browser cache is ignored (as if the user pressed Shift+refresh).
   /// [scriptToEvaluateOnLoad] If set, the script will be injected into all frames of the inspected page after reload.
   /// Argument will be ignored if reloading dataURL origin.
+  /// [loaderId] If set, an error will be thrown if the target page's main frame's
+  /// loader id does not match the provided id. This prevents accidentally
+  /// reloading an unintended target in case there's a racing navigation.
   Future<void> reload(
-      {bool? ignoreCache, String? scriptToEvaluateOnLoad}) async {
+      {bool? ignoreCache,
+      String? scriptToEvaluateOnLoad,
+      network.LoaderId? loaderId}) async {
     await _client.send('Page.reload', {
       if (ignoreCache != null) 'ignoreCache': ignoreCache,
       if (scriptToEvaluateOnLoad != null)
         'scriptToEvaluateOnLoad': scriptToEvaluateOnLoad,
+      if (loaderId != null) 'loaderId': loaderId,
     });
   }
 
@@ -1681,7 +1687,6 @@ enum PermissionsPolicyFeature {
   webPrinting('web-printing'),
   webShare('web-share'),
   windowManagement('window-management'),
-  windowPlacement('window-placement'),
   xrSpatialTracking('xr-spatial-tracking'),
   ;
 
@@ -3491,6 +3496,7 @@ enum BackForwardCacheNotRestoredReason {
       'EmbedderExtensionMessagingForOpenPort'),
   embedderExtensionSentMessageToCachedFrame(
       'EmbedderExtensionSentMessageToCachedFrame'),
+  requestedByWebViewClient('RequestedByWebViewClient'),
   ;
 
   final String value;

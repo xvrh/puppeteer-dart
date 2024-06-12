@@ -484,6 +484,9 @@ enum PrerenderFinalStatus {
   redirectedPrerenderingUrlHasEffectiveUrl(
       'RedirectedPrerenderingUrlHasEffectiveUrl'),
   activationUrlHasEffectiveUrl('ActivationUrlHasEffectiveUrl'),
+  javaScriptInterfaceAdded('JavaScriptInterfaceAdded'),
+  javaScriptInterfaceRemoved('JavaScriptInterfaceRemoved'),
+  allPrerenderingCanceled('AllPrerenderingCanceled'),
   ;
 
   final String value;

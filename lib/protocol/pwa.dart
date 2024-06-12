@@ -1,5 +1,6 @@
 import 'dart:async';
 import '../src/connection.dart';
+import 'target.dart' as target;
 
 /// This domain allows interacting with the browser to control PWAs.
 class PWAApi {
@@ -16,6 +17,47 @@ class PWAApi {
       'manifestId': manifestId,
     });
     return GetOsAppStateResult.fromJson(result);
+  }
+
+  /// Installs the given manifest identity, optionally using the given install_url
+  /// or IWA bundle location.
+  ///
+  /// TODO(crbug.com/337872319) Support IWA to meet the following specific
+  /// requirement.
+  /// IWA-specific install description: If the manifest_id is isolated-app://,
+  /// install_url_or_bundle_url is required, and can be either an http(s) URL or
+  /// file:// URL pointing to a signed web bundle (.swbn). The .swbn file's
+  /// signing key must correspond to manifest_id. If Chrome is not in IWA dev
+  /// mode, the installation will fail, regardless of the state of the allowlist.
+  /// [installUrlOrBundleUrl] The location of the app or bundle overriding the one derived from the
+  /// manifestId.
+  Future<void> install(String manifestId,
+      {String? installUrlOrBundleUrl}) async {
+    await _client.send('PWA.install', {
+      'manifestId': manifestId,
+      if (installUrlOrBundleUrl != null)
+        'installUrlOrBundleUrl': installUrlOrBundleUrl,
+    });
+  }
+
+  /// Uninstals the given manifest_id and closes any opened app windows.
+  Future<void> uninstall(String manifestId) async {
+    await _client.send('PWA.uninstall', {
+      'manifestId': manifestId,
+    });
+  }
+
+  /// Launches the installed web app, or an url in the same web app instead of the
+  /// default start url if it is provided. Returns a tab / web contents based
+  /// Target.TargetID which can be used to attach to via Target.attachToTarget or
+  /// similar APIs.
+  /// Returns: ID of the tab target created as a result.
+  Future<target.TargetID> launch(String manifestId, {String? url}) async {
+    var result = await _client.send('PWA.launch', {
+      'manifestId': manifestId,
+      if (url != null) 'url': url,
+    });
+    return target.TargetID.fromJson(result['targetId'] as String);
   }
 }
 
