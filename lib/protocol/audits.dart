@@ -903,6 +903,46 @@ enum AttributionReportingIssueType {
   String toString() => value.toString();
 }
 
+enum SharedDictionaryError {
+  useErrorCrossOriginNoCorsRequest('UseErrorCrossOriginNoCorsRequest'),
+  useErrorDictionaryLoadFailure('UseErrorDictionaryLoadFailure'),
+  useErrorMatchingDictionaryNotUsed('UseErrorMatchingDictionaryNotUsed'),
+  useErrorUnexpectedContentDictionaryHeader(
+      'UseErrorUnexpectedContentDictionaryHeader'),
+  writeErrorCossOriginNoCorsRequest('WriteErrorCossOriginNoCorsRequest'),
+  writeErrorDisallowedBySettings('WriteErrorDisallowedBySettings'),
+  writeErrorExpiredResponse('WriteErrorExpiredResponse'),
+  writeErrorFeatureDisabled('WriteErrorFeatureDisabled'),
+  writeErrorInsufficientResources('WriteErrorInsufficientResources'),
+  writeErrorInvalidMatchField('WriteErrorInvalidMatchField'),
+  writeErrorInvalidStructuredHeader('WriteErrorInvalidStructuredHeader'),
+  writeErrorNavigationRequest('WriteErrorNavigationRequest'),
+  writeErrorNoMatchField('WriteErrorNoMatchField'),
+  writeErrorNonListMatchDestField('WriteErrorNonListMatchDestField'),
+  writeErrorNonSecureContext('WriteErrorNonSecureContext'),
+  writeErrorNonStringIdField('WriteErrorNonStringIdField'),
+  writeErrorNonStringInMatchDestList('WriteErrorNonStringInMatchDestList'),
+  writeErrorNonStringMatchField('WriteErrorNonStringMatchField'),
+  writeErrorNonTokenTypeField('WriteErrorNonTokenTypeField'),
+  writeErrorRequestAborted('WriteErrorRequestAborted'),
+  writeErrorShuttingDown('WriteErrorShuttingDown'),
+  writeErrorTooLongIdField('WriteErrorTooLongIdField'),
+  writeErrorUnsupportedType('WriteErrorUnsupportedType'),
+  ;
+
+  final String value;
+
+  const SharedDictionaryError(this.value);
+
+  factory SharedDictionaryError.fromJson(String value) =>
+      SharedDictionaryError.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Details for issues around "Attribution Reporting API" usage.
 /// Explainer: https://github.com/WICG/attribution-reporting-api
 class AttributionReportingIssueDetails {
@@ -1010,6 +1050,31 @@ class NavigatorUserAgentIssueDetails {
     return {
       'url': url,
       if (location != null) 'location': location!.toJson(),
+    };
+  }
+}
+
+class SharedDictionaryIssueDetails {
+  final SharedDictionaryError sharedDictionaryError;
+
+  final AffectedRequest request;
+
+  SharedDictionaryIssueDetails(
+      {required this.sharedDictionaryError, required this.request});
+
+  factory SharedDictionaryIssueDetails.fromJson(Map<String, dynamic> json) {
+    return SharedDictionaryIssueDetails(
+      sharedDictionaryError: SharedDictionaryError.fromJson(
+          json['sharedDictionaryError'] as String),
+      request:
+          AffectedRequest.fromJson(json['request'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sharedDictionaryError': sharedDictionaryError.toJson(),
+      'request': request.toJson(),
     };
   }
 }
@@ -1164,19 +1229,35 @@ class BounceTrackingIssueDetails {
 class CookieDeprecationMetadataIssueDetails {
   final List<String> allowedSites;
 
-  CookieDeprecationMetadataIssueDetails({required this.allowedSites});
+  final num optOutPercentage;
+
+  final bool isOptOutTopLevel;
+
+  final CookieOperation operation;
+
+  CookieDeprecationMetadataIssueDetails(
+      {required this.allowedSites,
+      required this.optOutPercentage,
+      required this.isOptOutTopLevel,
+      required this.operation});
 
   factory CookieDeprecationMetadataIssueDetails.fromJson(
       Map<String, dynamic> json) {
     return CookieDeprecationMetadataIssueDetails(
       allowedSites:
           (json['allowedSites'] as List).map((e) => e as String).toList(),
+      optOutPercentage: json['optOutPercentage'] as num,
+      isOptOutTopLevel: json['isOptOutTopLevel'] as bool? ?? false,
+      operation: CookieOperation.fromJson(json['operation'] as String),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'allowedSites': [...allowedSites],
+      'optOutPercentage': optOutPercentage,
+      'isOptOutTopLevel': isOptOutTopLevel,
+      'operation': operation.toJson(),
     };
   }
 }
@@ -1531,6 +1612,7 @@ enum InspectorIssueCode {
   stylesheetLoadingIssue('StylesheetLoadingIssue'),
   federatedAuthUserInfoRequestIssue('FederatedAuthUserInfoRequestIssue'),
   propertyRuleIssue('PropertyRuleIssue'),
+  sharedDictionaryIssue('SharedDictionaryIssue'),
   ;
 
   final String value;
@@ -1590,6 +1672,8 @@ class InspectorIssueDetails {
   final FederatedAuthUserInfoRequestIssueDetails?
       federatedAuthUserInfoRequestIssueDetails;
 
+  final SharedDictionaryIssueDetails? sharedDictionaryIssueDetails;
+
   InspectorIssueDetails(
       {this.cookieIssueDetails,
       this.mixedContentIssueDetails,
@@ -1609,7 +1693,8 @@ class InspectorIssueDetails {
       this.cookieDeprecationMetadataIssueDetails,
       this.stylesheetLoadingIssueDetails,
       this.propertyRuleIssueDetails,
-      this.federatedAuthUserInfoRequestIssueDetails});
+      this.federatedAuthUserInfoRequestIssueDetails,
+      this.sharedDictionaryIssueDetails});
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
     return InspectorIssueDetails(
@@ -1700,6 +1785,11 @@ class InspectorIssueDetails {
                   json['federatedAuthUserInfoRequestIssueDetails']
                       as Map<String, dynamic>)
               : null,
+      sharedDictionaryIssueDetails:
+          json.containsKey('sharedDictionaryIssueDetails')
+              ? SharedDictionaryIssueDetails.fromJson(
+                  json['sharedDictionaryIssueDetails'] as Map<String, dynamic>)
+              : null,
     );
   }
 
@@ -1751,6 +1841,8 @@ class InspectorIssueDetails {
       if (federatedAuthUserInfoRequestIssueDetails != null)
         'federatedAuthUserInfoRequestIssueDetails':
             federatedAuthUserInfoRequestIssueDetails!.toJson(),
+      if (sharedDictionaryIssueDetails != null)
+        'sharedDictionaryIssueDetails': sharedDictionaryIssueDetails!.toJson(),
     };
   }
 }

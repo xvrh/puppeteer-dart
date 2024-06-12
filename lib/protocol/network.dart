@@ -2607,25 +2607,33 @@ enum ServiceWorkerRouterSource {
 }
 
 class ServiceWorkerRouterInfo {
-  final int ruleIdMatched;
+  /// ID of the rule matched. If there is a matched rule, this field will
+  /// be set, otherwiser no value will be set.
+  final int? ruleIdMatched;
 
-  final ServiceWorkerRouterSource matchedSourceType;
+  /// The router source of the matched rule. If there is a matched rule, this
+  /// field will be set, otherwise no value will be set.
+  final ServiceWorkerRouterSource? matchedSourceType;
 
-  ServiceWorkerRouterInfo(
-      {required this.ruleIdMatched, required this.matchedSourceType});
+  ServiceWorkerRouterInfo({this.ruleIdMatched, this.matchedSourceType});
 
   factory ServiceWorkerRouterInfo.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerRouterInfo(
-      ruleIdMatched: json['ruleIdMatched'] as int,
-      matchedSourceType: ServiceWorkerRouterSource.fromJson(
-          json['matchedSourceType'] as String),
+      ruleIdMatched: json.containsKey('ruleIdMatched')
+          ? json['ruleIdMatched'] as int
+          : null,
+      matchedSourceType: json.containsKey('matchedSourceType')
+          ? ServiceWorkerRouterSource.fromJson(
+              json['matchedSourceType'] as String)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'ruleIdMatched': ruleIdMatched,
-      'matchedSourceType': matchedSourceType.toJson(),
+      if (ruleIdMatched != null) 'ruleIdMatched': ruleIdMatched,
+      if (matchedSourceType != null)
+        'matchedSourceType': matchedSourceType!.toJson(),
     };
   }
 }
@@ -2677,7 +2685,10 @@ class ResponseData {
   /// Specifies that the request was served from the prefetch cache.
   final bool? fromEarlyHints;
 
-  /// Information about how Service Worker Static Router was used.
+  /// Information about how ServiceWorker Static Router API was used. If this
+  /// field is set with `matchedSourceType` field, a matching rule is found.
+  /// If this field is set without `matchedSource`, no matching rule is found.
+  /// Otherwise, the API is not used.
   final ServiceWorkerRouterInfo? serviceWorkerRouterInfo;
 
   /// Total number of bytes received for this request so far.

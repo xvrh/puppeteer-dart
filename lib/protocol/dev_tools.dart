@@ -18,6 +18,7 @@ import 'dom_snapshot.dart';
 import 'dom_storage.dart';
 import 'emulation.dart';
 import 'event_breakpoints.dart';
+import 'extensions.dart';
 import 'fed_cm.dart';
 import 'fetch.dart';
 import 'headless_experimental.dart';
@@ -64,6 +65,12 @@ class DevTools {
   /// Audits domain allows investigation of page violations and possible improvements.
   AuditsApi get audits => _audits ??= AuditsApi(client);
   AuditsApi? _audits;
+
+  /// Defines commands and events for browser extensions. Available if the client
+  /// is connected using the --remote-debugging-pipe flag and
+  /// the --enable-unsafe-extension-debugging flag is set.
+  ExtensionsApi get extensions => _extensions ??= ExtensionsApi(client);
+  ExtensionsApi? _extensions;
 
   /// Defines commands and events for Autofill.
   AutofillApi get autofill => _autofill ??= AutofillApi(client);

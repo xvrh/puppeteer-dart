@@ -1488,6 +1488,35 @@
                     ]
                 },
                 {
+                    "id": "SharedDictionaryError",
+                    "type": "string",
+                    "enum": [
+                        "UseErrorCrossOriginNoCorsRequest",
+                        "UseErrorDictionaryLoadFailure",
+                        "UseErrorMatchingDictionaryNotUsed",
+                        "UseErrorUnexpectedContentDictionaryHeader",
+                        "WriteErrorCossOriginNoCorsRequest",
+                        "WriteErrorDisallowedBySettings",
+                        "WriteErrorExpiredResponse",
+                        "WriteErrorFeatureDisabled",
+                        "WriteErrorInsufficientResources",
+                        "WriteErrorInvalidMatchField",
+                        "WriteErrorInvalidStructuredHeader",
+                        "WriteErrorNavigationRequest",
+                        "WriteErrorNoMatchField",
+                        "WriteErrorNonListMatchDestField",
+                        "WriteErrorNonSecureContext",
+                        "WriteErrorNonStringIdField",
+                        "WriteErrorNonStringInMatchDestList",
+                        "WriteErrorNonStringMatchField",
+                        "WriteErrorNonTokenTypeField",
+                        "WriteErrorRequestAborted",
+                        "WriteErrorShuttingDown",
+                        "WriteErrorTooLongIdField",
+                        "WriteErrorUnsupportedType"
+                    ]
+                },
+                {
                     "id": "AttributionReportingIssueDetails",
                     "description": "Details for issues around \"Attribution Reporting API\" usage.\nExplainer: https://github.com/WICG/attribution-reporting-api",
                     "type": "object",
@@ -1554,6 +1583,20 @@
                             "name": "location",
                             "optional": true,
                             "$ref": "SourceCodeLocation"
+                        }
+                    ]
+                },
+                {
+                    "id": "SharedDictionaryIssueDetails",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "sharedDictionaryError",
+                            "$ref": "SharedDictionaryError"
+                        },
+                        {
+                            "name": "request",
+                            "$ref": "AffectedRequest"
                         }
                     ]
                 },
@@ -1653,6 +1696,18 @@
                             "items": {
                                 "type": "string"
                             }
+                        },
+                        {
+                            "name": "optOutPercentage",
+                            "type": "number"
+                        },
+                        {
+                            "name": "isOptOutTopLevel",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "operation",
+                            "$ref": "CookieOperation"
                         }
                     ]
                 },
@@ -1871,7 +1926,8 @@
                         "CookieDeprecationMetadataIssue",
                         "StylesheetLoadingIssue",
                         "FederatedAuthUserInfoRequestIssue",
-                        "PropertyRuleIssue"
+                        "PropertyRuleIssue",
+                        "SharedDictionaryIssue"
                     ]
                 },
                 {
@@ -1979,6 +2035,11 @@
                             "name": "federatedAuthUserInfoRequestIssueDetails",
                             "optional": true,
                             "$ref": "FederatedAuthUserInfoRequestIssueDetails"
+                        },
+                        {
+                            "name": "sharedDictionaryIssueDetails",
+                            "optional": true,
+                            "$ref": "SharedDictionaryIssueDetails"
                         }
                     ]
                 },
@@ -2102,6 +2163,31 @@
                         {
                             "name": "issue",
                             "$ref": "InspectorIssue"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "domain": "Extensions",
+            "description": "Defines commands and events for browser extensions. Available if the client\nis connected using the --remote-debugging-pipe flag and\nthe --enable-unsafe-extension-debugging flag is set.",
+            "experimental": true,
+            "commands": [
+                {
+                    "name": "loadUnpacked",
+                    "description": "Installs an unpacked extension from the filesystem similar to\n--load-extension CLI flags. Returns extension ID once the extension\nhas been installed.",
+                    "parameters": [
+                        {
+                            "name": "path",
+                            "description": "Absolute file path.",
+                            "type": "string"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "id",
+                            "description": "Extension id.",
+                            "type": "string"
                         }
                     ]
                 }
@@ -5472,6 +5558,7 @@
                         "marker",
                         "backdrop",
                         "selection",
+                        "search-text",
                         "target-text",
                         "spelling-error",
                         "grammar-error",
@@ -6567,6 +6654,33 @@
                             "items": {
                                 "$ref": "NodeId"
                             }
+                        }
+                    ]
+                },
+                {
+                    "name": "getElementByRelation",
+                    "description": "Returns the NodeId of the matched element according to certain relations.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "nodeId",
+                            "description": "Id of the node from which to query the relation.",
+                            "$ref": "NodeId"
+                        },
+                        {
+                            "name": "relation",
+                            "description": "Type of relation to get.",
+                            "type": "string",
+                            "enum": [
+                                "PopoverTarget"
+                            ]
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "nodeId",
+                            "description": "NodeId of the element matching the queried relation.",
+                            "$ref": "NodeId"
                         }
                     ]
                 },
@@ -12476,10 +12590,14 @@
                     "properties": [
                         {
                             "name": "ruleIdMatched",
+                            "description": "ID of the rule matched. If there is a matched rule, this field will\nbe set, otherwiser no value will be set.",
+                            "optional": true,
                             "type": "integer"
                         },
                         {
                             "name": "matchedSourceType",
+                            "description": "The router source of the matched rule. If there is a matched rule, this\nfield will be set, otherwise no value will be set.",
+                            "optional": true,
                             "$ref": "ServiceWorkerRouterSource"
                         }
                     ]
@@ -12587,7 +12705,7 @@
                         },
                         {
                             "name": "serviceWorkerRouterInfo",
-                            "description": "Information about how Service Worker Static Router was used.",
+                            "description": "Information about how ServiceWorker Static Router API was used. If this\nfield is set with `matchedSourceType` field, a matching rule is found.\nIf this field is set without `matchedSource`, no matching rule is found.\nOtherwise, the API is not used.",
                             "experimental": true,
                             "optional": true,
                             "$ref": "ServiceWorkerRouterInfo"
@@ -13887,6 +14005,7 @@
                         {
                             "name": "partitionKey",
                             "description": "If specified, deletes only cookies with the the given name and partitionKey where domain\nmatches provided URL.",
+                            "experimental": true,
                             "optional": true,
                             "type": "string"
                         }
@@ -16677,7 +16796,6 @@
                         "web-printing",
                         "web-share",
                         "window-management",
-                        "window-placement",
                         "xr-spatial-tracking"
                     ]
                 },
@@ -18007,7 +18125,8 @@
                         "EmbedderExtensions",
                         "EmbedderExtensionMessaging",
                         "EmbedderExtensionMessagingForOpenPort",
-                        "EmbedderExtensionSentMessageToCachedFrame"
+                        "EmbedderExtensionSentMessageToCachedFrame",
+                        "RequestedByWebViewClient"
                     ]
                 },
                 {
@@ -18331,7 +18450,7 @@
                 },
                 {
                     "name": "getAppManifest",
-                    "description": "Gets the processed manifest for this current document.\n  This API always waits for the manifest to be loaded.\n  If manifestId is provided, and it does not match the manifest of the\n    current document, this API errors out.\n  If there isn\u2019t a loaded page, this API errors out immediately.",
+                    "description": "Gets the processed manifest for this current document.\n  This API always waits for the manifest to be loaded.\n  If manifestId is provided, and it does not match the manifest of the\n    current document, this API errors out.\n  If there is not a loaded page, this API errors out immediately.",
                     "parameters": [
                         {
                             "name": "manifestId",
@@ -18777,6 +18896,13 @@
                             "description": "If set, the script will be injected into all frames of the inspected page after reload.\nArgument will be ignored if reloading dataURL origin.",
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "loaderId",
+                            "description": "If set, an error will be thrown if the target page's main frame's\nloader id does not match the provided id. This prevents accidentally\nreloading an unintended target in case there's a racing navigation.",
+                            "experimental": true,
+                            "optional": true,
+                            "$ref": "Network.LoaderId"
                         }
                     ]
                 },
@@ -25550,7 +25676,10 @@
                         "MaxNumOfRunningEmbedderPrerendersExceeded",
                         "PrerenderingUrlHasEffectiveUrl",
                         "RedirectedPrerenderingUrlHasEffectiveUrl",
-                        "ActivationUrlHasEffectiveUrl"
+                        "ActivationUrlHasEffectiveUrl",
+                        "JavaScriptInterfaceAdded",
+                        "JavaScriptInterfaceRemoved",
+                        "AllPrerenderingCanceled"
                     ]
                 },
                 {
@@ -26046,6 +26175,54 @@
                             "items": {
                                 "$ref": "FileHandler"
                             }
+                        }
+                    ]
+                },
+                {
+                    "name": "install",
+                    "description": "Installs the given manifest identity, optionally using the given install_url\nor IWA bundle location.\n\nTODO(crbug.com/337872319) Support IWA to meet the following specific\nrequirement.\nIWA-specific install description: If the manifest_id is isolated-app://,\ninstall_url_or_bundle_url is required, and can be either an http(s) URL or\nfile:// URL pointing to a signed web bundle (.swbn). The .swbn file's\nsigning key must correspond to manifest_id. If Chrome is not in IWA dev\nmode, the installation will fail, regardless of the state of the allowlist.",
+                    "parameters": [
+                        {
+                            "name": "manifestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "installUrlOrBundleUrl",
+                            "description": "The location of the app or bundle overriding the one derived from the\nmanifestId.",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "uninstall",
+                    "description": "Uninstals the given manifest_id and closes any opened app windows.",
+                    "parameters": [
+                        {
+                            "name": "manifestId",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "launch",
+                    "description": "Launches the installed web app, or an url in the same web app instead of the\ndefault start url if it is provided. Returns a tab / web contents based\nTarget.TargetID which can be used to attach to via Target.attachToTarget or\nsimilar APIs.",
+                    "parameters": [
+                        {
+                            "name": "manifestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "url",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "targetId",
+                            "description": "ID of the tab target created as a result.",
+                            "$ref": "Target.TargetID"
                         }
                     ]
                 }
