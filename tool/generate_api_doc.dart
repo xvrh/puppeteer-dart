@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:math';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:collection/collection.dart';
 import 'utils/string_helpers.dart';
 
 final classesOrder = [
@@ -110,7 +109,7 @@ class Class {
     clas.methods.addAll(declaration.members
         .where((member) => member.documentationComment != null)
         .map((member) => Method.fromClassMember(clas, member))
-        .whereNotNull());
+        .nonNulls);
 
     clas.methods.sort((m1, m2) => m1.name.compareTo(m2.name));
 
