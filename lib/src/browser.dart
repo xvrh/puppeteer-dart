@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:async/async.dart';
-import 'package:collection/collection.dart';
 import 'package:pool/pool.dart';
 import '../plugin.dart';
 import '../protocol/browser.dart';
@@ -357,7 +356,7 @@ class BrowserContext {
     var pages = await Future.wait(targets
         .where((target) => target.type == 'page')
         .map((target) => target.page));
-    return pages.whereNotNull().toList();
+    return pages.nonNulls.toList();
   }
 
   /// Returns whether BrowserContext is incognito. The default browser context

@@ -1,3 +1,6 @@
+## 3.12.0
+- Update to Chrome 126.0.6478.126
+
 ## 3.11.0
 - Update to Chrome 125.0.6422.60
 - Fix navigation error

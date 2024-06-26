@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:collection/collection.dart';
 import 'package:puppeteer/puppeteer.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
@@ -88,7 +87,7 @@ void main() {
 
       allPages =
           (await Future.wait(context.targets.map((target) => target.page)))
-              .whereNotNull()
+              .nonNulls
               .toList();
       expect(allPages, contains(page));
       expect(allPages, isNot(contains(otherPage)));
