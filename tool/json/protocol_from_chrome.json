@@ -1220,6 +1220,8 @@
                         "CoopSandboxedIFrameCannotNavigateToCoopPage",
                         "CorpNotSameOrigin",
                         "CorpNotSameOriginAfterDefaultedToSameOriginByCoep",
+                        "CorpNotSameOriginAfterDefaultedToSameOriginByDip",
+                        "CorpNotSameOriginAfterDefaultedToSameOriginByCoepAndDip",
                         "CorpNotSameSite"
                     ]
                 },
@@ -1773,7 +1775,9 @@
                         "ThirdPartyCookiesBlocked",
                         "NotSignedInWithIdp",
                         "MissingTransientUserActivation",
-                        "ReplacedByButtonMode"
+                        "ReplacedByButtonMode",
+                        "RelyingPartyOriginIsOpaque",
+                        "TypeNotMatching"
                     ]
                 },
                 {
@@ -5565,7 +5569,7 @@
                         "highlight",
                         "first-line-inherited",
                         "scroll-marker",
-                        "scroll-markers",
+                        "scroll-marker-group",
                         "scrollbar",
                         "scrollbar-thumb",
                         "scrollbar-button",
@@ -7068,6 +7072,31 @@
                             "items": {
                                 "$ref": "NodeId"
                             }
+                        }
+                    ]
+                },
+                {
+                    "name": "getAnchorElement",
+                    "description": "Returns the target anchor element of the given anchor query according to\nhttps://www.w3.org/TR/css-anchor-position-1/#target.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "nodeId",
+                            "description": "Id of the positioned element from which to find the anchor.",
+                            "$ref": "NodeId"
+                        },
+                        {
+                            "name": "anchorSpecifier",
+                            "description": "An optional anchor specifier, as defined in\nhttps://www.w3.org/TR/css-anchor-position-1/#anchor-specifier.\nIf not provided, it will return the implicit anchor element for\nthe given positioned element.",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "nodeId",
+                            "description": "The anchor element of the given anchor query.",
+                            "$ref": "NodeId"
                         }
                     ]
                 }
@@ -12128,6 +12157,20 @@
                             "type": "number"
                         },
                         {
+                            "name": "workerRouterEvaluationStart",
+                            "description": "Started ServiceWorker static routing source evaluation.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "workerCacheLookupStart",
+                            "description": "Started cache lookup when the source was evaluated to `cache`.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
                             "name": "sendStart",
                             "description": "Started sending request.",
                             "type": "number"
@@ -12447,6 +12490,8 @@
                         "coop-sandboxed-iframe-cannot-navigate-to-coop-page",
                         "corp-not-same-origin",
                         "corp-not-same-origin-after-defaulted-to-same-origin-by-coep",
+                        "corp-not-same-origin-after-defaulted-to-same-origin-by-dip",
+                        "corp-not-same-origin-after-defaulted-to-same-origin-by-coep-and-dip",
                         "corp-not-same-site"
                     ]
                 },
@@ -12597,6 +12642,12 @@
                         {
                             "name": "matchedSourceType",
                             "description": "The router source of the matched rule. If there is a matched rule, this\nfield will be set, otherwise no value will be set.",
+                            "optional": true,
+                            "$ref": "ServiceWorkerRouterSource"
+                        },
+                        {
+                            "name": "actualSourceType",
+                            "description": "The actual router source used.",
                             "optional": true,
                             "$ref": "ServiceWorkerRouterSource"
                         }
@@ -12918,6 +12969,24 @@
                     ]
                 },
                 {
+                    "id": "CookiePartitionKey",
+                    "description": "cookiePartitionKey object\nThe representation of the components of the key that are created by the cookiePartitionKey class contained in net/cookies/cookie_partition_key.h.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "topLevelSite",
+                            "description": "The site of the top-level URL the browser was visiting at the start\nof the request to the endpoint that set the cookie.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "hasCrossSiteAncestor",
+                            "description": "Indicates if the cookie has any ancestors that are cross-site to the topLevelSite.",
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
                     "id": "Cookie",
                     "description": "Cookie object",
                     "type": "object",
@@ -13000,10 +13069,10 @@
                         },
                         {
                             "name": "partitionKey",
-                            "description": "Cookie partition key. The site of the top-level URL the browser was visiting at the start\nof the request to the endpoint that set the cookie.",
+                            "description": "Cookie partition key.",
                             "experimental": true,
                             "optional": true,
-                            "type": "string"
+                            "$ref": "CookiePartitionKey"
                         },
                         {
                             "name": "partitionKeyOpaque",
@@ -13082,7 +13151,8 @@
                         "EnterprisePolicy",
                         "StorageAccess",
                         "TopLevelStorageAccess",
-                        "CorsOptIn"
+                        "CorsOptIn",
+                        "Scheme"
                     ]
                 },
                 {
@@ -13249,10 +13319,10 @@
                         },
                         {
                             "name": "partitionKey",
-                            "description": "Cookie partition key. The site of the top-level URL the browser was visiting at the start\nof the request to the endpoint that set the cookie.\nIf not set, the cookie will be set as not partitioned.",
+                            "description": "Cookie partition key. If not set, the cookie will be set as not partitioned.",
                             "experimental": true,
                             "optional": true,
-                            "type": "string"
+                            "$ref": "CookiePartitionKey"
                         }
                     ]
                 },
@@ -14004,10 +14074,10 @@
                         },
                         {
                             "name": "partitionKey",
-                            "description": "If specified, deletes only cookies with the the given name and partitionKey where domain\nmatches provided URL.",
+                            "description": "If specified, deletes only cookies with the the given name and partitionKey where\nall partition key attributes match the cookie partition key attribute.",
                             "experimental": true,
                             "optional": true,
-                            "type": "string"
+                            "$ref": "CookiePartitionKey"
                         }
                     ]
                 },
@@ -14411,10 +14481,10 @@
                         },
                         {
                             "name": "partitionKey",
-                            "description": "Cookie partition key. The site of the top-level URL the browser was visiting at the start\nof the request to the endpoint that set the cookie.\nIf not set, the cookie will be set as not partitioned.",
+                            "description": "Cookie partition key. If not set, the cookie will be set as not partitioned.",
                             "experimental": true,
                             "optional": true,
-                            "type": "string"
+                            "$ref": "CookiePartitionKey"
                         }
                     ],
                     "returns": [
@@ -15250,8 +15320,9 @@
                         {
                             "name": "cookiePartitionKey",
                             "description": "The cookie partition key that will be used to store partitioned cookies set in this response.\nOnly sent when partitioned cookies are enabled.",
+                            "experimental": true,
                             "optional": true,
-                            "type": "string"
+                            "$ref": "CookiePartitionKey"
                         },
                         {
                             "name": "cookiePartitionKeyOpaque",
@@ -15303,7 +15374,7 @@
                                 "FailedPrecondition",
                                 "ResourceExhausted",
                                 "AlreadyExists",
-                                "Unavailable",
+                                "ResourceLimited",
                                 "Unauthorized",
                                 "BadResponse",
                                 "InternalError",
@@ -16748,6 +16819,7 @@
                         "clipboard-write",
                         "compute-pressure",
                         "cross-origin-isolated",
+                        "deferred-fetch",
                         "direct-sockets",
                         "display-capture",
                         "document-domain",
@@ -18051,6 +18123,11 @@
                         "HTTPAuthRequired",
                         "CookieFlushed",
                         "BroadcastChannelOnMessage",
+                        "WebViewSettingsChanged",
+                        "WebViewJavaScriptObjectChanged",
+                        "WebViewMessageListenerInjected",
+                        "WebViewSafeBrowsingAllowlistChanged",
+                        "WebViewDocumentStartJavascriptChanged",
                         "WebSocket",
                         "WebTransport",
                         "WebRTC",
@@ -26206,7 +26283,7 @@
                 },
                 {
                     "name": "launch",
-                    "description": "Launches the installed web app, or an url in the same web app instead of the\ndefault start url if it is provided. Returns a tab / web contents based\nTarget.TargetID which can be used to attach to via Target.attachToTarget or\nsimilar APIs.",
+                    "description": "Launches the installed web app, or an url in the same web app instead of the\ndefault start url if it is provided. Returns a page Target.TargetID which\ncan be used to attach to via Target.attachToTarget or similar APIs.",
                     "parameters": [
                         {
                             "name": "manifestId",
@@ -26223,6 +26300,43 @@
                             "name": "targetId",
                             "description": "ID of the tab target created as a result.",
                             "$ref": "Target.TargetID"
+                        }
+                    ]
+                },
+                {
+                    "name": "launchFilesInApp",
+                    "description": "Opens one or more local files from an installed web app identified by its\nmanifestId. The web app needs to have file handlers registered to process\nthe files. The API returns one or more page Target.TargetIDs which can be\nused to attach to via Target.attachToTarget or similar APIs.\nIf some files in the parameters cannot be handled by the web app, they will\nbe ignored. If none of the files can be handled, this API returns an error.\nIf no files provided as the parameter, this API also returns an error.\n\nAccording to the definition of the file handlers in the manifest file, one\nTarget.TargetID may represent a page handling one or more files. The order\nof the returned Target.TargetIDs is not guaranteed.\n\nTODO(crbug.com/339454034): Check the existences of the input files.",
+                    "parameters": [
+                        {
+                            "name": "manifestId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "files",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "targetIds",
+                            "description": "IDs of the tab targets created as the result.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "Target.TargetID"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "openCurrentPageInApp",
+                    "description": "Opens the current page in its web app identified by the manifest id, needs\nto be called on a page target. This function returns immediately without\nwaiting for the app finishing loading.",
+                    "parameters": [
+                        {
+                            "name": "manifestId",
+                            "type": "string"
                         }
                     ]
                 }

@@ -730,6 +730,23 @@ class DOMApi {
         .map((e) => NodeId.fromJson(e as int))
         .toList();
   }
+
+  /// Returns the target anchor element of the given anchor query according to
+  /// https://www.w3.org/TR/css-anchor-position-1/#target.
+  /// [nodeId] Id of the positioned element from which to find the anchor.
+  /// [anchorSpecifier] An optional anchor specifier, as defined in
+  /// https://www.w3.org/TR/css-anchor-position-1/#anchor-specifier.
+  /// If not provided, it will return the implicit anchor element for
+  /// the given positioned element.
+  /// Returns: The anchor element of the given anchor query.
+  Future<NodeId> getAnchorElement(NodeId nodeId,
+      {String? anchorSpecifier}) async {
+    var result = await _client.send('DOM.getAnchorElement', {
+      'nodeId': nodeId,
+      if (anchorSpecifier != null) 'anchorSpecifier': anchorSpecifier,
+    });
+    return NodeId.fromJson(result['nodeId'] as int);
+  }
 }
 
 class AttributeModifiedEvent {
@@ -1081,7 +1098,7 @@ enum PseudoType {
   highlight('highlight'),
   firstLineInherited('first-line-inherited'),
   scrollMarker('scroll-marker'),
-  scrollMarkers('scroll-markers'),
+  scrollMarkerGroup('scroll-marker-group'),
   scrollbar('scrollbar'),
   scrollbarThumb('scrollbar-thumb'),
   scrollbarButton('scrollbar-button'),
