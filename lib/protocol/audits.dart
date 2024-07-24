@@ -450,6 +450,10 @@ enum BlockedByResponseReason {
   corpNotSameOrigin('CorpNotSameOrigin'),
   corpNotSameOriginAfterDefaultedToSameOriginByCoep(
       'CorpNotSameOriginAfterDefaultedToSameOriginByCoep'),
+  corpNotSameOriginAfterDefaultedToSameOriginByDip(
+      'CorpNotSameOriginAfterDefaultedToSameOriginByDip'),
+  corpNotSameOriginAfterDefaultedToSameOriginByCoepAndDip(
+      'CorpNotSameOriginAfterDefaultedToSameOriginByCoepAndDip'),
   corpNotSameSite('CorpNotSameSite'),
   ;
 
@@ -1346,6 +1350,8 @@ enum FederatedAuthRequestIssueReason {
   notSignedInWithIdp('NotSignedInWithIdp'),
   missingTransientUserActivation('MissingTransientUserActivation'),
   replacedByButtonMode('ReplacedByButtonMode'),
+  relyingPartyOriginIsOpaque('RelyingPartyOriginIsOpaque'),
+  typeNotMatching('TypeNotMatching'),
   ;
 
   final String value;

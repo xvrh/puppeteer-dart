@@ -316,10 +316,13 @@ class NetworkApi {
   /// provided URL.
   /// [domain] If specified, deletes only cookies with the exact domain.
   /// [path] If specified, deletes only cookies with the exact path.
-  /// [partitionKey] If specified, deletes only cookies with the the given name and partitionKey where domain
-  /// matches provided URL.
+  /// [partitionKey] If specified, deletes only cookies with the the given name and partitionKey where
+  /// all partition key attributes match the cookie partition key attribute.
   Future<void> deleteCookies(String name,
-      {String? url, String? domain, String? path, String? partitionKey}) async {
+      {String? url,
+      String? domain,
+      String? path,
+      CookiePartitionKey? partitionKey}) async {
     await _client.send('Network.deleteCookies', {
       'name': name,
       if (url != null) 'url': url,
@@ -526,9 +529,7 @@ class NetworkApi {
   /// [sourcePort] Cookie source port. Valid values are {-1, [1, 65535]}, -1 indicates an unspecified port.
   /// An unspecified port value allows protocol clients to emulate legacy cookie scope for the port.
   /// This is a temporary ability and it will be removed in the future.
-  /// [partitionKey] Cookie partition key. The site of the top-level URL the browser was visiting at the start
-  /// of the request to the endpoint that set the cookie.
-  /// If not set, the cookie will be set as not partitioned.
+  /// [partitionKey] Cookie partition key. If not set, the cookie will be set as not partitioned.
   /// Returns: Always set to true. If an error occurs, the response indicates protocol error.
   Future<bool> setCookie(String name, String value,
       {String? url,
@@ -542,7 +543,7 @@ class NetworkApi {
       bool? sameParty,
       CookieSourceScheme? sourceScheme,
       int? sourcePort,
-      String? partitionKey}) async {
+      CookiePartitionKey? partitionKey}) async {
     var result = await _client.send('Network.setCookie', {
       'name': name,
       'value': value,
@@ -1377,7 +1378,7 @@ class ResponseReceivedExtraInfoEvent {
 
   /// The cookie partition key that will be used to store partitioned cookies set in this response.
   /// Only sent when partitioned cookies are enabled.
-  final String? cookiePartitionKey;
+  final CookiePartitionKey? cookiePartitionKey;
 
   /// True if partitioned cookies are enabled, but the partition key is not serializable to string.
   final bool? cookiePartitionKeyOpaque;
@@ -1412,7 +1413,8 @@ class ResponseReceivedExtraInfoEvent {
           ? json['headersText'] as String
           : null,
       cookiePartitionKey: json.containsKey('cookiePartitionKey')
-          ? json['cookiePartitionKey'] as String
+          ? CookiePartitionKey.fromJson(
+              json['cookiePartitionKey'] as Map<String, dynamic>)
           : null,
       cookiePartitionKeyOpaque: json.containsKey('cookiePartitionKeyOpaque')
           ? json['cookiePartitionKeyOpaque'] as bool
@@ -1889,6 +1891,12 @@ class ResourceTiming {
   /// Settled fetch event respondWith promise.
   final num workerRespondWithSettled;
 
+  /// Started ServiceWorker static routing source evaluation.
+  final num? workerRouterEvaluationStart;
+
+  /// Started cache lookup when the source was evaluated to `cache`.
+  final num? workerCacheLookupStart;
+
   /// Started sending request.
   final num sendStart;
 
@@ -1921,6 +1929,8 @@ class ResourceTiming {
       required this.workerReady,
       required this.workerFetchStart,
       required this.workerRespondWithSettled,
+      this.workerRouterEvaluationStart,
+      this.workerCacheLookupStart,
       required this.sendStart,
       required this.sendEnd,
       required this.pushStart,
@@ -1943,6 +1953,13 @@ class ResourceTiming {
       workerReady: json['workerReady'] as num,
       workerFetchStart: json['workerFetchStart'] as num,
       workerRespondWithSettled: json['workerRespondWithSettled'] as num,
+      workerRouterEvaluationStart:
+          json.containsKey('workerRouterEvaluationStart')
+              ? json['workerRouterEvaluationStart'] as num
+              : null,
+      workerCacheLookupStart: json.containsKey('workerCacheLookupStart')
+          ? json['workerCacheLookupStart'] as num
+          : null,
       sendStart: json['sendStart'] as num,
       sendEnd: json['sendEnd'] as num,
       pushStart: json['pushStart'] as num,
@@ -1973,6 +1990,10 @@ class ResourceTiming {
       'pushEnd': pushEnd,
       'receiveHeadersStart': receiveHeadersStart,
       'receiveHeadersEnd': receiveHeadersEnd,
+      if (workerRouterEvaluationStart != null)
+        'workerRouterEvaluationStart': workerRouterEvaluationStart,
+      if (workerCacheLookupStart != null)
+        'workerCacheLookupStart': workerCacheLookupStart,
     };
   }
 }
@@ -2373,6 +2394,10 @@ enum BlockedReason {
   corpNotSameOrigin('corp-not-same-origin'),
   corpNotSameOriginAfterDefaultedToSameOriginByCoep(
       'corp-not-same-origin-after-defaulted-to-same-origin-by-coep'),
+  corpNotSameOriginAfterDefaultedToSameOriginByDip(
+      'corp-not-same-origin-after-defaulted-to-same-origin-by-dip'),
+  corpNotSameOriginAfterDefaultedToSameOriginByCoepAndDip(
+      'corp-not-same-origin-after-defaulted-to-same-origin-by-coep-and-dip'),
   corpNotSameSite('corp-not-same-site'),
   ;
 
@@ -2615,7 +2640,11 @@ class ServiceWorkerRouterInfo {
   /// field will be set, otherwise no value will be set.
   final ServiceWorkerRouterSource? matchedSourceType;
 
-  ServiceWorkerRouterInfo({this.ruleIdMatched, this.matchedSourceType});
+  /// The actual router source used.
+  final ServiceWorkerRouterSource? actualSourceType;
+
+  ServiceWorkerRouterInfo(
+      {this.ruleIdMatched, this.matchedSourceType, this.actualSourceType});
 
   factory ServiceWorkerRouterInfo.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerRouterInfo(
@@ -2626,6 +2655,10 @@ class ServiceWorkerRouterInfo {
           ? ServiceWorkerRouterSource.fromJson(
               json['matchedSourceType'] as String)
           : null,
+      actualSourceType: json.containsKey('actualSourceType')
+          ? ServiceWorkerRouterSource.fromJson(
+              json['actualSourceType'] as String)
+          : null,
     );
   }
 
@@ -2634,6 +2667,8 @@ class ServiceWorkerRouterInfo {
       if (ruleIdMatched != null) 'ruleIdMatched': ruleIdMatched,
       if (matchedSourceType != null)
         'matchedSourceType': matchedSourceType!.toJson(),
+      if (actualSourceType != null)
+        'actualSourceType': actualSourceType!.toJson(),
     };
   }
 }
@@ -3077,6 +3112,34 @@ enum InitiatorType {
   String toString() => value.toString();
 }
 
+/// cookiePartitionKey object
+/// The representation of the components of the key that are created by the cookiePartitionKey class contained in net/cookies/cookie_partition_key.h.
+class CookiePartitionKey {
+  /// The site of the top-level URL the browser was visiting at the start
+  /// of the request to the endpoint that set the cookie.
+  final String topLevelSite;
+
+  /// Indicates if the cookie has any ancestors that are cross-site to the topLevelSite.
+  final bool hasCrossSiteAncestor;
+
+  CookiePartitionKey(
+      {required this.topLevelSite, required this.hasCrossSiteAncestor});
+
+  factory CookiePartitionKey.fromJson(Map<String, dynamic> json) {
+    return CookiePartitionKey(
+      topLevelSite: json['topLevelSite'] as String,
+      hasCrossSiteAncestor: json['hasCrossSiteAncestor'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'topLevelSite': topLevelSite,
+      'hasCrossSiteAncestor': hasCrossSiteAncestor,
+    };
+  }
+}
+
 /// Cookie object
 class Cookie {
   /// Cookie name.
@@ -3120,9 +3183,8 @@ class Cookie {
   /// This is a temporary ability and it will be removed in the future.
   final int sourcePort;
 
-  /// Cookie partition key. The site of the top-level URL the browser was visiting at the start
-  /// of the request to the endpoint that set the cookie.
-  final String? partitionKey;
+  /// Cookie partition key.
+  final CookiePartitionKey? partitionKey;
 
   /// True if cookie partition key is opaque.
   final bool? partitionKeyOpaque;
@@ -3162,7 +3224,8 @@ class Cookie {
       sourceScheme: CookieSourceScheme.fromJson(json['sourceScheme'] as String),
       sourcePort: json['sourcePort'] as int,
       partitionKey: json.containsKey('partitionKey')
-          ? json['partitionKey'] as String
+          ? CookiePartitionKey.fromJson(
+              json['partitionKey'] as Map<String, dynamic>)
           : null,
       partitionKeyOpaque: json.containsKey('partitionKeyOpaque')
           ? json['partitionKeyOpaque'] as bool
@@ -3185,7 +3248,7 @@ class Cookie {
       'sourceScheme': sourceScheme.toJson(),
       'sourcePort': sourcePort,
       if (sameSite != null) 'sameSite': sameSite!.toJson(),
-      if (partitionKey != null) 'partitionKey': partitionKey,
+      if (partitionKey != null) 'partitionKey': partitionKey!.toJson(),
       if (partitionKeyOpaque != null) 'partitionKeyOpaque': partitionKeyOpaque,
     };
   }
@@ -3277,6 +3340,7 @@ enum CookieExemptionReason {
   storageAccess('StorageAccess'),
   topLevelStorageAccess('TopLevelStorageAccess'),
   corsOptIn('CorsOptIn'),
+  scheme('Scheme'),
   ;
 
   final String value;
@@ -3448,10 +3512,8 @@ class CookieParam {
   /// This is a temporary ability and it will be removed in the future.
   final int? sourcePort;
 
-  /// Cookie partition key. The site of the top-level URL the browser was visiting at the start
-  /// of the request to the endpoint that set the cookie.
-  /// If not set, the cookie will be set as not partitioned.
-  final String? partitionKey;
+  /// Cookie partition key. If not set, the cookie will be set as not partitioned.
+  final CookiePartitionKey? partitionKey;
 
   CookieParam(
       {required this.name,
@@ -3495,7 +3557,8 @@ class CookieParam {
       sourcePort:
           json.containsKey('sourcePort') ? json['sourcePort'] as int : null,
       partitionKey: json.containsKey('partitionKey')
-          ? json['partitionKey'] as String
+          ? CookiePartitionKey.fromJson(
+              json['partitionKey'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -3515,7 +3578,7 @@ class CookieParam {
       if (sameParty != null) 'sameParty': sameParty,
       if (sourceScheme != null) 'sourceScheme': sourceScheme!.toJson(),
       if (sourcePort != null) 'sourcePort': sourcePort,
-      if (partitionKey != null) 'partitionKey': partitionKey,
+      if (partitionKey != null) 'partitionKey': partitionKey!.toJson(),
     };
   }
 }
@@ -4451,7 +4514,7 @@ enum TrustTokenOperationDoneEventStatus {
   failedPrecondition('FailedPrecondition'),
   resourceExhausted('ResourceExhausted'),
   alreadyExists('AlreadyExists'),
-  unavailable('Unavailable'),
+  resourceLimited('ResourceLimited'),
   unauthorized('Unauthorized'),
   badResponse('BadResponse'),
   internalError('InternalError'),
