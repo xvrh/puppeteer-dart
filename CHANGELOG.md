@@ -1,3 +1,6 @@
+## 2.25.1
+- Add accessibility name
+
 ## 2.25.0
 - Fix Bad state: Future already completed
 - Fix navigation error
