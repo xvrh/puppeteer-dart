@@ -480,6 +480,7 @@ enum AXPropertyName {
   flowto('flowto'),
   labelledby('labelledby'),
   owns('owns'),
+  url('url'),
   uninteresting('uninteresting'),
   ariaHiddenElement('ariaHiddenElement'),
   ariaHiddenSubtree('ariaHiddenSubtree'),
