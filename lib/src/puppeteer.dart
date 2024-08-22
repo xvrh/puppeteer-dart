@@ -58,7 +58,7 @@ final _defaultArgs = <String>[
 ];
 
 final List<String> _headlessArgs = [
-  '--headless',
+  '--headless=old',
   '--hide-scrollbars',
   '--mute-audio',
 ];
