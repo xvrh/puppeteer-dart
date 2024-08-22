@@ -457,8 +457,12 @@ class GetMatchedStylesForNodeResult {
   /// A list of CSS keyframed animations matching this node.
   final List<CSSKeyframesRule>? cssKeyframesRules;
 
-  /// A list of CSS @position-try rules matching this node, based on the position-try-options property.
+  /// A list of CSS @position-try rules matching this node, based on the position-try-fallbacks property.
   final List<CSSPositionTryRule>? cssPositionTryRules;
+
+  /// Index of the active fallback in the applied position-try-fallback property,
+  /// will not be set if there is no active position-try fallback.
+  final int? activePositionFallbackIndex;
 
   /// A list of CSS at-property rules matching this node.
   final List<CSSPropertyRule>? cssPropertyRules;
@@ -481,6 +485,7 @@ class GetMatchedStylesForNodeResult {
       this.inheritedPseudoElements,
       this.cssKeyframesRules,
       this.cssPositionTryRules,
+      this.activePositionFallbackIndex,
       this.cssPropertyRules,
       this.cssPropertyRegistrations,
       this.cssFontPaletteValuesRule,
@@ -528,6 +533,10 @@ class GetMatchedStylesForNodeResult {
                   (e) => CSSPositionTryRule.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
+      activePositionFallbackIndex:
+          json.containsKey('activePositionFallbackIndex')
+              ? json['activePositionFallbackIndex'] as int
+              : null,
       cssPropertyRules: json.containsKey('cssPropertyRules')
           ? (json['cssPropertyRules'] as List)
               .map((e) => CSSPropertyRule.fromJson(e as Map<String, dynamic>))
@@ -1959,11 +1968,14 @@ class CSSPositionTryRule {
   /// Associated style declaration.
   final CSSStyle style;
 
+  final bool active;
+
   CSSPositionTryRule(
       {required this.name,
       this.styleSheetId,
       required this.origin,
-      required this.style});
+      required this.style,
+      required this.active});
 
   factory CSSPositionTryRule.fromJson(Map<String, dynamic> json) {
     return CSSPositionTryRule(
@@ -1973,6 +1985,7 @@ class CSSPositionTryRule {
           : null,
       origin: StyleSheetOrigin.fromJson(json['origin'] as String),
       style: CSSStyle.fromJson(json['style'] as Map<String, dynamic>),
+      active: json['active'] as bool? ?? false,
     );
   }
 
@@ -1981,6 +1994,7 @@ class CSSPositionTryRule {
       'name': name.toJson(),
       'origin': origin.toJson(),
       'style': style.toJson(),
+      'active': active,
       if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
     };
   }

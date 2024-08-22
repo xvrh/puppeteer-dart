@@ -1461,6 +1461,81 @@ enum AttributionReportingTriggerDataMatching {
   String toString() => value.toString();
 }
 
+class AttributionReportingAggregatableDebugReportingData {
+  final UnsignedInt128AsBase16 keyPiece;
+
+  /// number instead of integer because not all uint32 can be represented by
+  /// int
+  final num value;
+
+  final List<String> types;
+
+  AttributionReportingAggregatableDebugReportingData(
+      {required this.keyPiece, required this.value, required this.types});
+
+  factory AttributionReportingAggregatableDebugReportingData.fromJson(
+      Map<String, dynamic> json) {
+    return AttributionReportingAggregatableDebugReportingData(
+      keyPiece: UnsignedInt128AsBase16.fromJson(json['keyPiece'] as String),
+      value: json['value'] as num,
+      types: (json['types'] as List).map((e) => e as String).toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'keyPiece': keyPiece.toJson(),
+      'value': value,
+      'types': [...types],
+    };
+  }
+}
+
+class AttributionReportingAggregatableDebugReportingConfig {
+  /// number instead of integer because not all uint32 can be represented by
+  /// int, only present for source registrations
+  final num? budget;
+
+  final UnsignedInt128AsBase16 keyPiece;
+
+  final List<AttributionReportingAggregatableDebugReportingData> debugData;
+
+  final String? aggregationCoordinatorOrigin;
+
+  AttributionReportingAggregatableDebugReportingConfig(
+      {this.budget,
+      required this.keyPiece,
+      required this.debugData,
+      this.aggregationCoordinatorOrigin});
+
+  factory AttributionReportingAggregatableDebugReportingConfig.fromJson(
+      Map<String, dynamic> json) {
+    return AttributionReportingAggregatableDebugReportingConfig(
+      budget: json.containsKey('budget') ? json['budget'] as num : null,
+      keyPiece: UnsignedInt128AsBase16.fromJson(json['keyPiece'] as String),
+      debugData: (json['debugData'] as List)
+          .map((e) =>
+              AttributionReportingAggregatableDebugReportingData.fromJson(
+                  e as Map<String, dynamic>))
+          .toList(),
+      aggregationCoordinatorOrigin:
+          json.containsKey('aggregationCoordinatorOrigin')
+              ? json['aggregationCoordinatorOrigin'] as String
+              : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'keyPiece': keyPiece.toJson(),
+      'debugData': debugData.map((e) => e.toJson()).toList(),
+      if (budget != null) 'budget': budget,
+      if (aggregationCoordinatorOrigin != null)
+        'aggregationCoordinatorOrigin': aggregationCoordinatorOrigin,
+    };
+  }
+}
+
 class AttributionReportingSourceRegistration {
   final network.TimeSinceEpoch time;
 
@@ -1492,6 +1567,11 @@ class AttributionReportingSourceRegistration {
 
   final AttributionReportingTriggerDataMatching triggerDataMatching;
 
+  final SignedInt64AsBase10 destinationLimitPriority;
+
+  final AttributionReportingAggregatableDebugReportingConfig
+      aggregatableDebugReportingConfig;
+
   AttributionReportingSourceRegistration(
       {required this.time,
       required this.expiry,
@@ -1506,7 +1586,9 @@ class AttributionReportingSourceRegistration {
       required this.filterData,
       required this.aggregationKeys,
       this.debugKey,
-      required this.triggerDataMatching});
+      required this.triggerDataMatching,
+      required this.destinationLimitPriority,
+      required this.aggregatableDebugReportingConfig});
 
   factory AttributionReportingSourceRegistration.fromJson(
       Map<String, dynamic> json) {
@@ -1538,6 +1620,11 @@ class AttributionReportingSourceRegistration {
           : null,
       triggerDataMatching: AttributionReportingTriggerDataMatching.fromJson(
           json['triggerDataMatching'] as String),
+      destinationLimitPriority: SignedInt64AsBase10.fromJson(
+          json['destinationLimitPriority'] as String),
+      aggregatableDebugReportingConfig:
+          AttributionReportingAggregatableDebugReportingConfig.fromJson(
+              json['aggregatableDebugReportingConfig'] as Map<String, dynamic>),
     );
   }
 
@@ -1556,6 +1643,9 @@ class AttributionReportingSourceRegistration {
       'filterData': filterData.map((e) => e.toJson()).toList(),
       'aggregationKeys': aggregationKeys.map((e) => e.toJson()).toList(),
       'triggerDataMatching': triggerDataMatching.toJson(),
+      'destinationLimitPriority': destinationLimitPriority.toJson(),
+      'aggregatableDebugReportingConfig':
+          aggregatableDebugReportingConfig.toJson(),
       if (debugKey != null) 'debugKey': debugKey!.toJson(),
     };
   }
@@ -1576,6 +1666,8 @@ enum AttributionReportingSourceRegistrationResult {
   reportingOriginsPerSiteLimitReached('reportingOriginsPerSiteLimitReached'),
   exceedsMaxChannelCapacity('exceedsMaxChannelCapacity'),
   exceedsMaxTriggerStateCardinality('exceedsMaxTriggerStateCardinality'),
+  destinationPerDayReportingLimitReached(
+      'destinationPerDayReportingLimitReached'),
   ;
 
   final String value;
@@ -1619,14 +1711,18 @@ class AttributionReportingAggregatableValueDictEntry {
   /// int
   final num value;
 
+  final UnsignedInt64AsBase10 filteringId;
+
   AttributionReportingAggregatableValueDictEntry(
-      {required this.key, required this.value});
+      {required this.key, required this.value, required this.filteringId});
 
   factory AttributionReportingAggregatableValueDictEntry.fromJson(
       Map<String, dynamic> json) {
     return AttributionReportingAggregatableValueDictEntry(
       key: json['key'] as String,
       value: json['value'] as num,
+      filteringId:
+          UnsignedInt64AsBase10.fromJson(json['filteringId'] as String),
     );
   }
 
@@ -1634,6 +1730,7 @@ class AttributionReportingAggregatableValueDictEntry {
     return {
       'key': key,
       'value': value,
+      'filteringId': filteringId.toJson(),
     };
   }
 }
@@ -1776,6 +1873,8 @@ class AttributionReportingTriggerRegistration {
 
   final List<AttributionReportingAggregatableValueEntry> aggregatableValues;
 
+  final int aggregatableFilteringIdMaxBytes;
+
   final bool debugReporting;
 
   final String? aggregationCoordinatorOrigin;
@@ -1785,6 +1884,9 @@ class AttributionReportingTriggerRegistration {
 
   final String? triggerContextId;
 
+  final AttributionReportingAggregatableDebugReportingConfig
+      aggregatableDebugReportingConfig;
+
   AttributionReportingTriggerRegistration(
       {required this.filters,
       this.debugKey,
@@ -1792,10 +1894,12 @@ class AttributionReportingTriggerRegistration {
       required this.eventTriggerData,
       required this.aggregatableTriggerData,
       required this.aggregatableValues,
+      required this.aggregatableFilteringIdMaxBytes,
       required this.debugReporting,
       this.aggregationCoordinatorOrigin,
       required this.sourceRegistrationTimeConfig,
-      this.triggerContextId});
+      this.triggerContextId,
+      required this.aggregatableDebugReportingConfig});
 
   factory AttributionReportingTriggerRegistration.fromJson(
       Map<String, dynamic> json) {
@@ -1821,6 +1925,8 @@ class AttributionReportingTriggerRegistration {
           .map((e) => AttributionReportingAggregatableValueEntry.fromJson(
               e as Map<String, dynamic>))
           .toList(),
+      aggregatableFilteringIdMaxBytes:
+          json['aggregatableFilteringIdMaxBytes'] as int,
       debugReporting: json['debugReporting'] as bool? ?? false,
       aggregationCoordinatorOrigin:
           json.containsKey('aggregationCoordinatorOrigin')
@@ -1832,6 +1938,9 @@ class AttributionReportingTriggerRegistration {
       triggerContextId: json.containsKey('triggerContextId')
           ? json['triggerContextId'] as String
           : null,
+      aggregatableDebugReportingConfig:
+          AttributionReportingAggregatableDebugReportingConfig.fromJson(
+              json['aggregatableDebugReportingConfig'] as Map<String, dynamic>),
     );
   }
 
@@ -1844,8 +1953,11 @@ class AttributionReportingTriggerRegistration {
       'aggregatableTriggerData':
           aggregatableTriggerData.map((e) => e.toJson()).toList(),
       'aggregatableValues': aggregatableValues.map((e) => e.toJson()).toList(),
+      'aggregatableFilteringIdMaxBytes': aggregatableFilteringIdMaxBytes,
       'debugReporting': debugReporting,
       'sourceRegistrationTimeConfig': sourceRegistrationTimeConfig.toJson(),
+      'aggregatableDebugReportingConfig':
+          aggregatableDebugReportingConfig.toJson(),
       if (debugKey != null) 'debugKey': debugKey!.toJson(),
       if (aggregationCoordinatorOrigin != null)
         'aggregationCoordinatorOrigin': aggregationCoordinatorOrigin,

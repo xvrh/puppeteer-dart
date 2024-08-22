@@ -21,6 +21,7 @@ import 'event_breakpoints.dart';
 import 'extensions.dart';
 import 'fed_cm.dart';
 import 'fetch.dart';
+import 'file_system.dart';
 import 'headless_experimental.dart';
 import 'heap_profiler.dart';
 import 'indexed_db.dart';
@@ -151,6 +152,9 @@ class DevTools {
   /// Input/Output operations for streams produced by DevTools.
   IOApi get io => _io ??= IOApi(client);
   IOApi? _io;
+
+  FileSystemApi get fileSystem => _fileSystem ??= FileSystemApi(client);
+  FileSystemApi? _fileSystem;
 
   IndexedDBApi get indexedDb => _indexedDb ??= IndexedDBApi(client);
   IndexedDBApi? _indexedDb;

@@ -2281,6 +2281,27 @@
                             "$ref": "StorageArea"
                         }
                     ]
+                },
+                {
+                    "name": "setStorageItems",
+                    "description": "Sets `values` in extension storage in the given `storageArea`. The provided `values`\nwill be merged with existing values in the storage area.",
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "description": "ID of extension.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "storageArea",
+                            "description": "StorageArea to set data in.",
+                            "$ref": "StorageArea"
+                        },
+                        {
+                            "name": "values",
+                            "description": "Values to set.",
+                            "type": "object"
+                        }
+                    ]
                 }
             ]
         },
@@ -17130,6 +17151,7 @@
                         "otp-credentials",
                         "payment",
                         "picture-in-picture",
+                        "popins",
                         "private-aggregation",
                         "private-state-token-issuance",
                         "private-state-token-redemption",
@@ -18474,6 +18496,7 @@
                         "ContentWebUSB",
                         "ContentMediaSessionService",
                         "ContentScreenReader",
+                        "ContentDiscarded",
                         "EmbedderPopupBlockerTabHelper",
                         "EmbedderSafeBrowsingTriggeredPopupBlocker",
                         "EmbedderSafeBrowsingThreatDetails",
