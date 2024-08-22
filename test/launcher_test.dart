@@ -177,9 +177,9 @@ void main() {
       });
       test('should return the default arguments', () {
         expect(puppeteer.defaultArgs(), contains('--no-first-run'));
-        expect(puppeteer.defaultArgs(), contains('--headless'));
+        expect(puppeteer.defaultArgs(), contains(startsWith('--headless')));
         expect(puppeteer.defaultArgs(headless: false),
-            isNot(contains('--headless')));
+            isNot(contains(startsWith('--headless'))));
         expect(
             puppeteer.defaultArgs(userDataDir: 'foo'),
             contains(
