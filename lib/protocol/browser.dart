@@ -469,6 +469,9 @@ class PermissionDescriptor {
   /// For "clipboard" permission, may specify allowWithoutSanitization.
   final bool? allowWithoutSanitization;
 
+  /// For "fullscreen" permission, must specify allowWithoutGesture:true.
+  final bool? allowWithoutGesture;
+
   /// For "camera" permission, may specify panTiltZoom.
   final bool? panTiltZoom;
 
@@ -477,6 +480,7 @@ class PermissionDescriptor {
       this.sysex,
       this.userVisibleOnly,
       this.allowWithoutSanitization,
+      this.allowWithoutGesture,
       this.panTiltZoom});
 
   factory PermissionDescriptor.fromJson(Map<String, dynamic> json) {
@@ -488,6 +492,9 @@ class PermissionDescriptor {
           : null,
       allowWithoutSanitization: json.containsKey('allowWithoutSanitization')
           ? json['allowWithoutSanitization'] as bool
+          : null,
+      allowWithoutGesture: json.containsKey('allowWithoutGesture')
+          ? json['allowWithoutGesture'] as bool
           : null,
       panTiltZoom:
           json.containsKey('panTiltZoom') ? json['panTiltZoom'] as bool : null,
@@ -501,6 +508,8 @@ class PermissionDescriptor {
       if (userVisibleOnly != null) 'userVisibleOnly': userVisibleOnly,
       if (allowWithoutSanitization != null)
         'allowWithoutSanitization': allowWithoutSanitization,
+      if (allowWithoutGesture != null)
+        'allowWithoutGesture': allowWithoutGesture,
       if (panTiltZoom != null) 'panTiltZoom': panTiltZoom,
     };
   }

@@ -1084,7 +1084,6 @@ class SharedDictionaryIssueDetails {
 }
 
 enum GenericIssueErrorType {
-  crossOriginPortalPostMessageError('CrossOriginPortalPostMessageError'),
   formLabelForNameError('FormLabelForNameError'),
   formDuplicateIdForInputError('FormDuplicateIdForInputError'),
   formInputWithNoLabelError('FormInputWithNoLabelError'),
@@ -1327,7 +1326,9 @@ enum FederatedAuthRequestIssueReason {
   clientMetadataNoResponse('ClientMetadataNoResponse'),
   clientMetadataInvalidResponse('ClientMetadataInvalidResponse'),
   clientMetadataInvalidContentType('ClientMetadataInvalidContentType'),
+  idpNotPotentiallyTrustworthy('IdpNotPotentiallyTrustworthy'),
   disabledInSettings('DisabledInSettings'),
+  disabledInFlags('DisabledInFlags'),
   errorFetchingSignin('ErrorFetchingSignin'),
   invalidSigninResponse('InvalidSigninResponse'),
   accountsHttpNotFound('AccountsHttpNotFound'),
@@ -1350,6 +1351,7 @@ enum FederatedAuthRequestIssueReason {
   notSignedInWithIdp('NotSignedInWithIdp'),
   missingTransientUserActivation('MissingTransientUserActivation'),
   replacedByButtonMode('ReplacedByButtonMode'),
+  invalidFieldsSpecified('InvalidFieldsSpecified'),
   relyingPartyOriginIsOpaque('RelyingPartyOriginIsOpaque'),
   typeNotMatching('TypeNotMatching'),
   ;

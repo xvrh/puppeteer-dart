@@ -169,6 +169,10 @@ class NetworkApi {
       .where((event) => event.name == 'Network.trustTokenOperationDone')
       .map((event) => TrustTokenOperationDoneEvent.fromJson(event.parameters));
 
+  /// Fired once security policy has been updated.
+  Stream<void> get onPolicyUpdated =>
+      _client.onEvent.where((event) => event.name == 'Network.policyUpdated');
+
   /// Fired once when parsing the .wbn file has succeeded.
   /// The event contains the information about the web bundle contents.
   Stream<SubresourceWebBundleMetadataReceivedEvent>
@@ -4109,6 +4113,7 @@ enum CrossOriginOpenerPolicyValue {
   unsafeNone('UnsafeNone'),
   sameOriginPlusCoep('SameOriginPlusCoep'),
   restrictPropertiesPlusCoep('RestrictPropertiesPlusCoep'),
+  noopenerAllowPopups('NoopenerAllowPopups'),
   ;
 
   final String value;

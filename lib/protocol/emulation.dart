@@ -249,6 +249,31 @@ class EmulationApi {
     });
   }
 
+  /// Overrides a pressure source of a given type, as used by the Compute
+  /// Pressure API, so that updates to PressureObserver.observe() are provided
+  /// via setPressureStateOverride instead of being retrieved from
+  /// platform-provided telemetry data.
+  Future<void> setPressureSourceOverrideEnabled(
+      bool enabled, PressureSource source,
+      {PressureMetadata? metadata}) async {
+    await _client.send('Emulation.setPressureSourceOverrideEnabled', {
+      'enabled': enabled,
+      'source': source,
+      if (metadata != null) 'metadata': metadata,
+    });
+  }
+
+  /// Provides a given pressure state that will be processed and eventually be
+  /// delivered to PressureObserver users. |source| must have been previously
+  /// overridden by setPressureSourceOverrideEnabled.
+  Future<void> setPressureStateOverride(
+      PressureSource source, PressureState state) async {
+    await _client.send('Emulation.setPressureStateOverride', {
+      'source': source,
+      'state': state,
+    });
+  }
+
   /// Overrides the Idle state.
   /// [isUserActive] Mock isUserActive
   /// [isScreenUnlocked] Mock isScreenUnlocked
@@ -836,6 +861,62 @@ class SensorReading {
       if (single != null) 'single': single!.toJson(),
       if (xyz != null) 'xyz': xyz!.toJson(),
       if (quaternion != null) 'quaternion': quaternion!.toJson(),
+    };
+  }
+}
+
+enum PressureSource {
+  cpu('cpu'),
+  ;
+
+  final String value;
+
+  const PressureSource(this.value);
+
+  factory PressureSource.fromJson(String value) =>
+      PressureSource.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+enum PressureState {
+  nominal('nominal'),
+  fair('fair'),
+  serious('serious'),
+  critical('critical'),
+  ;
+
+  final String value;
+
+  const PressureState(this.value);
+
+  factory PressureState.fromJson(String value) =>
+      PressureState.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+class PressureMetadata {
+  final bool? available;
+
+  PressureMetadata({this.available});
+
+  factory PressureMetadata.fromJson(Map<String, dynamic> json) {
+    return PressureMetadata(
+      available:
+          json.containsKey('available') ? json['available'] as bool : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (available != null) 'available': available,
     };
   }
 }
