@@ -1487,7 +1487,8 @@
                         "NoRegisterSourceHeader",
                         "NoRegisterTriggerHeader",
                         "NoRegisterOsSourceHeader",
-                        "NoRegisterOsTriggerHeader"
+                        "NoRegisterOsTriggerHeader",
+                        "NavigationRegistrationUniqueScopeAlreadySet"
                     ]
                 },
                 {
@@ -2776,6 +2777,7 @@
                         "videoCapturePanTiltZoom",
                         "wakeLockScreen",
                         "wakeLockSystem",
+                        "webAppInstallation",
                         "windowManagement"
                     ]
                 },
@@ -12143,11 +12145,29 @@
                             "type": "number"
                         }
                     ]
+                },
+                {
+                    "id": "DOMCounter",
+                    "description": "DOM object counter data.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "description": "Object name. Note: object names should be presumed volatile and clients should not expect\nthe returned names to be consistent across runs.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "count",
+                            "description": "Object count.",
+                            "type": "integer"
+                        }
+                    ]
                 }
             ],
             "commands": [
                 {
                     "name": "getDOMCounters",
+                    "description": "Retruns current DOM object counters.",
                     "returns": [
                         {
                             "name": "documents",
@@ -12164,7 +12184,22 @@
                     ]
                 },
                 {
-                    "name": "prepareForLeakDetection"
+                    "name": "getDOMCountersForLeakDetection",
+                    "description": "Retruns DOM object counters after preparing renderer for leak detection.",
+                    "returns": [
+                        {
+                            "name": "counters",
+                            "description": "DOM object counters.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "DOMCounter"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "prepareForLeakDetection",
+                    "description": "Prepares for leak detection by terminating workers, stopping spellcheckers,\ndropping non-essential internal caches, running garbage collections, etc."
                 },
                 {
                     "name": "forciblyPurgeJavaScriptMemory",
@@ -13444,6 +13479,7 @@
                         "UserSetting",
                         "TPCDMetadata",
                         "TPCDDeprecationTrial",
+                        "TopLevelTPCDDeprecationTrial",
                         "TPCDHeuristics",
                         "EnterprisePolicy",
                         "StorageAccess",
@@ -17172,6 +17208,7 @@
                         "usb",
                         "usb-unrestricted",
                         "vertical-scroll",
+                        "web-app-installation",
                         "web-printing",
                         "web-share",
                         "window-management",
@@ -19938,6 +19975,18 @@
                     ]
                 },
                 {
+                    "name": "frameSubtreeWillBeDetached",
+                    "description": "Fired before frame subtree is detached. Emitted before any frame of the\nsubtree is actually detached.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "frameId",
+                            "description": "Id of the frame that is the root of the subtree that will be detached.",
+                            "$ref": "FrameId"
+                        }
+                    ]
+                },
+                {
                     "name": "frameNavigated",
                     "description": "Fired once navigation of the frame has completed. Frame is now associated with the new loader.",
                     "parameters": [
@@ -21950,7 +21999,9 @@
                         "destinationBothLimitsReached",
                         "reportingOriginsPerSiteLimitReached",
                         "exceedsMaxChannelCapacity",
+                        "exceedsMaxScopesChannelCapacity",
                         "exceedsMaxTriggerStateCardinality",
+                        "exceedsMaxEventStatesLimit",
                         "destinationPerDayReportingLimitReached"
                     ]
                 },
