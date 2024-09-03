@@ -5930,6 +5930,12 @@
                             "name": "assignedSlot",
                             "optional": true,
                             "$ref": "BackendNode"
+                        },
+                        {
+                            "name": "isScrollable",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -7399,6 +7405,23 @@
                     "name": "topLayerElementsUpdated",
                     "description": "Called when top layer elements are changed.",
                     "experimental": true
+                },
+                {
+                    "name": "scrollableFlagUpdated",
+                    "description": "Fired when a node's scrollability state changes.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "nodeId",
+                            "description": "The id of the node.",
+                            "$ref": "DOM.NodeId"
+                        },
+                        {
+                            "name": "isScrollable",
+                            "description": "If the node is scrollable.",
+                            "type": "boolean"
+                        }
+                    ]
                 },
                 {
                     "name": "pseudoElementRemoved",
@@ -21897,6 +21920,29 @@
                     ]
                 },
                 {
+                    "id": "AttributionScopesData",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "values",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        {
+                            "name": "limit",
+                            "description": "number instead of integer because not all uint32 can be represented by\nint",
+                            "type": "number"
+                        },
+                        {
+                            "name": "maxEventStates",
+                            "type": "number"
+                        }
+                    ]
+                },
+                {
                     "id": "AttributionReportingSourceRegistration",
                     "experimental": true,
                     "type": "object",
@@ -21979,6 +22025,11 @@
                         {
                             "name": "aggregatableDebugReportingConfig",
                             "$ref": "AttributionReportingAggregatableDebugReportingConfig"
+                        },
+                        {
+                            "name": "scopesData",
+                            "optional": true,
+                            "$ref": "AttributionScopesData"
                         }
                     ]
                 },
@@ -22181,6 +22232,13 @@
                         {
                             "name": "aggregatableDebugReportingConfig",
                             "$ref": "AttributionReportingAggregatableDebugReportingConfig"
+                        },
+                        {
+                            "name": "scopes",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     ]
                 },
@@ -26229,7 +26287,6 @@
                         "PrefetchFailedMIMENotSupported",
                         "PrefetchFailedNetError",
                         "PrefetchFailedNon2XX",
-                        "PrefetchFailedPerPageLimitExceeded",
                         "PrefetchEvictedAfterCandidateRemoved",
                         "PrefetchEvictedForNewerPrefetch",
                         "PrefetchHeldback",
