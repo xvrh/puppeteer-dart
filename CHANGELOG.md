@@ -1,3 +1,6 @@
+## 3.14.0
+- Update to Chrome 128.0.6613.137
+
 ## 3.13.0
 - Update to Chrome 127.0.6533.119
 
