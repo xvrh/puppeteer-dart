@@ -29,7 +29,7 @@ class _Websocket implements WebSocket {
   @override
   Future<void> close(String reason) async {
     _closeReason = reason;
-    return _socket.close(1, reason);
+    return _socket.close(1000, reason);
   }
 
   @override
