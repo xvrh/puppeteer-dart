@@ -1,3 +1,7 @@
+## 3.15.0
+- Update to Chrome 129.0.6668.58
+- Change close code for websocket in web to 1000
+
 ## 3.14.0
 - Update to Chrome 128.0.6613.137
 
