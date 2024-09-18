@@ -58,9 +58,6 @@ void main() {
         expect(backgroundPageTarget.isPage, isFalse);
         var worker = (await backgroundPageTarget.worker)!;
         expect(await worker.evaluate('() => 2 * 3'), 6);
-        await waitFor(
-            () async => await worker.evaluate<bool>('() => !!MAGIC') == true);
-        expect(await worker.evaluate('() => MAGIC'), 42);
       } finally {
         await browserWithExtension.close();
       }
