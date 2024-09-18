@@ -1066,7 +1066,9 @@
                         "WarnAttributeValueExceedsMaxSize",
                         "WarnDomainNonASCII",
                         "WarnThirdPartyPhaseout",
-                        "WarnCrossSiteRedirectDowngradeChangesInclusion"
+                        "WarnCrossSiteRedirectDowngradeChangesInclusion",
+                        "WarnDeprecationTrialMetadata",
+                        "WarnThirdPartyCookieHeuristic"
                     ]
                 },
                 {
@@ -5657,6 +5659,7 @@
                         "after",
                         "marker",
                         "backdrop",
+                        "column",
                         "selection",
                         "search-text",
                         "target-text",
@@ -9165,7 +9168,6 @@
                         "gyroscope",
                         "linear-acceleration",
                         "magnetometer",
-                        "proximity",
                         "relative-orientation"
                     ]
                 },
@@ -16939,7 +16941,8 @@
                 },
                 {
                     "name": "setShowWebVitals",
-                    "description": "Request that backend shows an overlay with web vital metrics.",
+                    "description": "Deprecated, no longer has any effect.",
+                    "deprecated": true,
                     "parameters": [
                         {
                             "name": "show",

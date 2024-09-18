@@ -4,6 +4,7 @@ import 'animation.dart';
 import 'audits.dart';
 import 'autofill.dart';
 import 'background_service.dart';
+import 'bluetooth_emulation.dart';
 import 'browser.dart';
 import 'cache_storage.dart';
 import 'cast.dart';
@@ -67,9 +68,7 @@ class DevTools {
   AuditsApi get audits => _audits ??= AuditsApi(client);
   AuditsApi? _audits;
 
-  /// Defines commands and events for browser extensions. Available if the client
-  /// is connected using the --remote-debugging-pipe flag and
-  /// the --enable-unsafe-extension-debugging flag is set.
+  /// Defines commands and events for browser extensions.
   ExtensionsApi get extensions => _extensions ??= ExtensionsApi(client);
   ExtensionsApi? _extensions;
 
@@ -254,6 +253,12 @@ class DevTools {
   /// This domain allows interacting with the browser to control PWAs.
   PWAApi get pwa => _pwa ??= PWAApi(client);
   PWAApi? _pwa;
+
+  /// This domain allows configuring virtual Bluetooth devices to test
+  /// the web-bluetooth API.
+  BluetoothEmulationApi get bluetoothEmulation =>
+      _bluetoothEmulation ??= BluetoothEmulationApi(client);
+  BluetoothEmulationApi? _bluetoothEmulation;
 
   /// Debugger domain exposes JavaScript debugging capabilities. It allows setting and removing
   /// breakpoints, stepping through execution, exploring stack traces, etc.

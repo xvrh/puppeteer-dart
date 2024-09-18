@@ -1927,32 +1927,6 @@ class CSSTryRule {
   }
 }
 
-/// CSS position-fallback rule representation.
-class CSSPositionFallbackRule {
-  final Value name;
-
-  /// List of keyframes.
-  final List<CSSTryRule> tryRules;
-
-  CSSPositionFallbackRule({required this.name, required this.tryRules});
-
-  factory CSSPositionFallbackRule.fromJson(Map<String, dynamic> json) {
-    return CSSPositionFallbackRule(
-      name: Value.fromJson(json['name'] as Map<String, dynamic>),
-      tryRules: (json['tryRules'] as List)
-          .map((e) => CSSTryRule.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name.toJson(),
-      'tryRules': tryRules.map((e) => e.toJson()).toList(),
-    };
-  }
-}
-
 /// CSS @position-try rule representation.
 class CSSPositionTryRule {
   /// The prelude dashed-ident name

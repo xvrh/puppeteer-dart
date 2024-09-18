@@ -488,6 +488,8 @@ enum PrerenderFinalStatus {
   javaScriptInterfaceRemoved('JavaScriptInterfaceRemoved'),
   allPrerenderingCanceled('AllPrerenderingCanceled'),
   windowClosed('WindowClosed'),
+  slowNetwork('SlowNetwork'),
+  otherPrerenderedPageActivated('OtherPrerenderedPageActivated'),
   ;
 
   final String value;
