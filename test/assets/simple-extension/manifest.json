@@ -1,14 +1,15 @@
 {
   "name": "Simple extension",
-  "version": "0.1",
+  "description": "Simple extension",
+  "version": "1.0",
+  "manifest_version": 3,
   "background": {
-    "scripts": ["index.js"]
+    "service_worker": "index.js"
   },
+  "permissions": ["background", "tab"],
   "content_scripts": [{
     "matches": ["<all_urls>"],
     "css": [],
     "js": ["content-script.js"]
-  }],
-  "permissions": ["background", "activeTab"],
-  "manifest_version": 2
+  }]
 }

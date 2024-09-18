@@ -30,33 +30,37 @@ void main() {
   ];
 
   group('HEADFUL', () {
-    test('background_page target type should be available', () async {
+    test('service_worker target type should be available', () async {
       var browserWithExtension =
           await puppeteer.launch(headless: false, args: extensionOptions);
       try {
         var page = await browserWithExtension.newPage();
+        var targetName = 'service_worker';
         var backgroundPageTarget = browserWithExtension.targets
-            .firstWhereOrNull((t) => t.type == 'background_page');
+            .firstWhereOrNull((t) => t.type == targetName);
         backgroundPageTarget ??= await browserWithExtension
-            .waitForTarget((target) => target.type == 'background_page');
+            .waitForTarget((target) => target.type == targetName);
         expect(backgroundPageTarget, isNotNull);
         await page.close();
       } finally {
         await browserWithExtension.close();
       }
     });
-    test('target.page() should return a background_page', () async {
+    test('target.page() should return a service_worker', () async {
       var browserWithExtension =
           await puppeteer.launch(headless: false, args: extensionOptions);
       try {
+        var targetName = 'service_worker';
         var backgroundPageTarget = browserWithExtension.targets
-            .firstWhereOrNull((t) => t.type == 'background_page');
+            .firstWhereOrNull((t) => t.type == targetName);
         backgroundPageTarget ??= await browserWithExtension
-            .waitForTarget((target) => target.type == 'background_page');
-        var page = await backgroundPageTarget.page;
-        expect(await page.evaluate('() => 2 * 3'), 6);
-        await waitFor(() => page.evaluate('() => !!window.MAGIC'));
-        expect(await page.evaluate('() => window.MAGIC'), 42);
+            .waitForTarget((target) => target.type == targetName);
+        expect(backgroundPageTarget.isPage, isFalse);
+        var worker = (await backgroundPageTarget.worker)!;
+        expect(await worker.evaluate('() => 2 * 3'), 6);
+        await waitFor(
+            () async => await worker.evaluate<bool>('() => !!MAGIC') == true);
+        expect(await worker.evaluate('() => MAGIC'), 42);
       } finally {
         await browserWithExtension.close();
       }
