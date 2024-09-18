@@ -1201,12 +1201,18 @@ class NavigatedWithinDocumentEvent {
   /// Frame's new url.
   final String url;
 
-  NavigatedWithinDocumentEvent({required this.frameId, required this.url});
+  /// Navigation type
+  final NavigatedWithinDocumentEventNavigationType navigationType;
+
+  NavigatedWithinDocumentEvent(
+      {required this.frameId, required this.url, required this.navigationType});
 
   factory NavigatedWithinDocumentEvent.fromJson(Map<String, dynamic> json) {
     return NavigatedWithinDocumentEvent(
       frameId: FrameId.fromJson(json['frameId'] as String),
       url: json['url'] as String,
+      navigationType: NavigatedWithinDocumentEventNavigationType.fromJson(
+          json['navigationType'] as String),
     );
   }
 }
@@ -1605,6 +1611,7 @@ enum GatedAPIFeatures {
 /// in third_party/blink/renderer/core/permissions_policy/permissions_policy_features.json5.
 enum PermissionsPolicyFeature {
   accelerometer('accelerometer'),
+  allScreensCapture('all-screens-capture'),
   ambientLightSensor('ambient-light-sensor'),
   attributionReporting('attribution-reporting'),
   autoplay('autoplay'),
@@ -1661,6 +1668,7 @@ enum PermissionsPolicyFeature {
   keyboardMap('keyboard-map'),
   localFonts('local-fonts'),
   magnetometer('magnetometer'),
+  mediaPlaybackWhileNotVisible('media-playback-while-not-visible'),
   microphone('microphone'),
   midi('midi'),
   otpCredentials('otp-credentials'),
@@ -2680,14 +2688,16 @@ class FontSizes {
 }
 
 enum ClientNavigationReason {
+  anchorClick('anchorClick'),
   formSubmissionGet('formSubmissionGet'),
   formSubmissionPost('formSubmissionPost'),
   httpHeaderRefresh('httpHeaderRefresh'),
-  scriptInitiated('scriptInitiated'),
+  initialFrameNavigation('initialFrameNavigation'),
   metaTagRefresh('metaTagRefresh'),
+  other('other'),
   pageBlockInterstitial('pageBlockInterstitial'),
   reload('reload'),
-  anchorClick('anchorClick'),
+  scriptInitiated('scriptInitiated'),
   ;
 
   final String value;
@@ -3709,6 +3719,26 @@ enum DownloadProgressEventState {
 
   factory DownloadProgressEventState.fromJson(String value) =>
       DownloadProgressEventState.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+enum NavigatedWithinDocumentEventNavigationType {
+  fragment('fragment'),
+  historyApi('historyApi'),
+  other('other'),
+  ;
+
+  final String value;
+
+  const NavigatedWithinDocumentEventNavigationType(this.value);
+
+  factory NavigatedWithinDocumentEventNavigationType.fromJson(String value) =>
+      NavigatedWithinDocumentEventNavigationType.values
+          .firstWhere((e) => e.value == value);
 
   String toJson() => value;
 

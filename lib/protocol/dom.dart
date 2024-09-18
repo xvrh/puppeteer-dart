@@ -646,6 +646,15 @@ class DOMApi {
     return result['path'] as String;
   }
 
+  /// Returns list of detached nodes
+  /// Returns: The list of detached nodes
+  Future<List<DetachedElementInfo>> getDetachedDomNodes() async {
+    var result = await _client.send('DOM.getDetachedDomNodes');
+    return (result['detachedNodes'] as List)
+        .map((e) => DetachedElementInfo.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
   /// Enables console to refer to the node with given id via $x (see Command Line API for more details
   /// $x functions).
   /// [nodeId] DOM node id to be accessible by means of $x command line API.
@@ -1099,6 +1108,8 @@ enum PseudoType {
   firstLineInherited('first-line-inherited'),
   scrollMarker('scroll-marker'),
   scrollMarkerGroup('scroll-marker-group'),
+  scrollNextButton('scroll-next-button'),
+  scrollPrevButton('scroll-prev-button'),
   scrollbar('scrollbar'),
   scrollbarThumb('scrollbar-thumb'),
   scrollbarButton('scrollbar-button'),
@@ -1469,6 +1480,31 @@ class Node {
       if (compatibilityMode != null)
         'compatibilityMode': compatibilityMode!.toJson(),
       if (assignedSlot != null) 'assignedSlot': assignedSlot!.toJson(),
+    };
+  }
+}
+
+/// A structure to hold the top-level node of a detached tree and an array of its retained descendants.
+class DetachedElementInfo {
+  final Node treeNode;
+
+  final List<NodeId> retainedNodeIds;
+
+  DetachedElementInfo({required this.treeNode, required this.retainedNodeIds});
+
+  factory DetachedElementInfo.fromJson(Map<String, dynamic> json) {
+    return DetachedElementInfo(
+      treeNode: Node.fromJson(json['treeNode'] as Map<String, dynamic>),
+      retainedNodeIds: (json['retainedNodeIds'] as List)
+          .map((e) => NodeId.fromJson(e as int))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'treeNode': treeNode.toJson(),
+      'retainedNodeIds': retainedNodeIds.map((e) => e.toJson()).toList(),
     };
   }
 }
