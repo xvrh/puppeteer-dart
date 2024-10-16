@@ -538,7 +538,6 @@ enum PrefetchStatus {
   prefetchFailedMimeNotSupported('PrefetchFailedMIMENotSupported'),
   prefetchFailedNetError('PrefetchFailedNetError'),
   prefetchFailedNon2xx('PrefetchFailedNon2XX'),
-  prefetchFailedPerPageLimitExceeded('PrefetchFailedPerPageLimitExceeded'),
   prefetchEvictedAfterCandidateRemoved('PrefetchEvictedAfterCandidateRemoved'),
   prefetchEvictedForNewerPrefetch('PrefetchEvictedForNewerPrefetch'),
   prefetchHeldback('PrefetchHeldback'),

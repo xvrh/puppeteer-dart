@@ -6,11 +6,23 @@ class MemoryApi {
 
   MemoryApi(this._client);
 
+  /// Retruns current DOM object counters.
   Future<GetDOMCountersResult> getDOMCounters() async {
     var result = await _client.send('Memory.getDOMCounters');
     return GetDOMCountersResult.fromJson(result);
   }
 
+  /// Retruns DOM object counters after preparing renderer for leak detection.
+  /// Returns: DOM object counters.
+  Future<List<DOMCounter>> getDOMCountersForLeakDetection() async {
+    var result = await _client.send('Memory.getDOMCountersForLeakDetection');
+    return (result['counters'] as List)
+        .map((e) => DOMCounter.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Prepares for leak detection by terminating workers, stopping spellcheckers,
+  /// dropping non-essential internal caches, running garbage collections, etc.
   Future<void> prepareForLeakDetection() async {
     await _client.send('Memory.prepareForLeakDetection');
   }
@@ -208,6 +220,32 @@ class Module {
       'uuid': uuid,
       'baseAddress': baseAddress,
       'size': size,
+    };
+  }
+}
+
+/// DOM object counter data.
+class DOMCounter {
+  /// Object name. Note: object names should be presumed volatile and clients should not expect
+  /// the returned names to be consistent across runs.
+  final String name;
+
+  /// Object count.
+  final int count;
+
+  DOMCounter({required this.name, required this.count});
+
+  factory DOMCounter.fromJson(Map<String, dynamic> json) {
+    return DOMCounter(
+      name: json['name'] as String,
+      count: json['count'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'count': count,
     };
   }
 }

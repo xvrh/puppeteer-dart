@@ -417,6 +417,7 @@ enum PermissionType {
   videoCapturePanTiltZoom('videoCapturePanTiltZoom'),
   wakeLockScreen('wakeLockScreen'),
   wakeLockSystem('wakeLockSystem'),
+  webAppInstallation('webAppInstallation'),
   windowManagement('windowManagement'),
   ;
 

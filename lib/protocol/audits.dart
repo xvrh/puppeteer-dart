@@ -892,6 +892,8 @@ enum AttributionReportingIssueType {
   noRegisterTriggerHeader('NoRegisterTriggerHeader'),
   noRegisterOsSourceHeader('NoRegisterOsSourceHeader'),
   noRegisterOsTriggerHeader('NoRegisterOsTriggerHeader'),
+  navigationRegistrationUniqueScopeAlreadySet(
+      'NavigationRegistrationUniqueScopeAlreadySet'),
   ;
 
   final String value;
