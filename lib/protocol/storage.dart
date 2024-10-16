@@ -1536,6 +1536,37 @@ class AttributionReportingAggregatableDebugReportingConfig {
   }
 }
 
+class AttributionScopesData {
+  final List<String> values;
+
+  /// number instead of integer because not all uint32 can be represented by
+  /// int
+  final num limit;
+
+  final num maxEventStates;
+
+  AttributionScopesData(
+      {required this.values,
+      required this.limit,
+      required this.maxEventStates});
+
+  factory AttributionScopesData.fromJson(Map<String, dynamic> json) {
+    return AttributionScopesData(
+      values: (json['values'] as List).map((e) => e as String).toList(),
+      limit: json['limit'] as num,
+      maxEventStates: json['maxEventStates'] as num,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'values': [...values],
+      'limit': limit,
+      'maxEventStates': maxEventStates,
+    };
+  }
+}
+
 class AttributionReportingSourceRegistration {
   final network.TimeSinceEpoch time;
 
@@ -1572,6 +1603,8 @@ class AttributionReportingSourceRegistration {
   final AttributionReportingAggregatableDebugReportingConfig
       aggregatableDebugReportingConfig;
 
+  final AttributionScopesData? scopesData;
+
   AttributionReportingSourceRegistration(
       {required this.time,
       required this.expiry,
@@ -1588,7 +1621,8 @@ class AttributionReportingSourceRegistration {
       this.debugKey,
       required this.triggerDataMatching,
       required this.destinationLimitPriority,
-      required this.aggregatableDebugReportingConfig});
+      required this.aggregatableDebugReportingConfig,
+      this.scopesData});
 
   factory AttributionReportingSourceRegistration.fromJson(
       Map<String, dynamic> json) {
@@ -1625,6 +1659,10 @@ class AttributionReportingSourceRegistration {
       aggregatableDebugReportingConfig:
           AttributionReportingAggregatableDebugReportingConfig.fromJson(
               json['aggregatableDebugReportingConfig'] as Map<String, dynamic>),
+      scopesData: json.containsKey('scopesData')
+          ? AttributionScopesData.fromJson(
+              json['scopesData'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -1647,6 +1685,7 @@ class AttributionReportingSourceRegistration {
       'aggregatableDebugReportingConfig':
           aggregatableDebugReportingConfig.toJson(),
       if (debugKey != null) 'debugKey': debugKey!.toJson(),
+      if (scopesData != null) 'scopesData': scopesData!.toJson(),
     };
   }
 }
@@ -1665,7 +1704,9 @@ enum AttributionReportingSourceRegistrationResult {
   destinationBothLimitsReached('destinationBothLimitsReached'),
   reportingOriginsPerSiteLimitReached('reportingOriginsPerSiteLimitReached'),
   exceedsMaxChannelCapacity('exceedsMaxChannelCapacity'),
+  exceedsMaxScopesChannelCapacity('exceedsMaxScopesChannelCapacity'),
   exceedsMaxTriggerStateCardinality('exceedsMaxTriggerStateCardinality'),
+  exceedsMaxEventStatesLimit('exceedsMaxEventStatesLimit'),
   destinationPerDayReportingLimitReached(
       'destinationPerDayReportingLimitReached'),
   ;
@@ -1887,6 +1928,8 @@ class AttributionReportingTriggerRegistration {
   final AttributionReportingAggregatableDebugReportingConfig
       aggregatableDebugReportingConfig;
 
+  final List<String> scopes;
+
   AttributionReportingTriggerRegistration(
       {required this.filters,
       this.debugKey,
@@ -1899,7 +1942,8 @@ class AttributionReportingTriggerRegistration {
       this.aggregationCoordinatorOrigin,
       required this.sourceRegistrationTimeConfig,
       this.triggerContextId,
-      required this.aggregatableDebugReportingConfig});
+      required this.aggregatableDebugReportingConfig,
+      required this.scopes});
 
   factory AttributionReportingTriggerRegistration.fromJson(
       Map<String, dynamic> json) {
@@ -1941,6 +1985,7 @@ class AttributionReportingTriggerRegistration {
       aggregatableDebugReportingConfig:
           AttributionReportingAggregatableDebugReportingConfig.fromJson(
               json['aggregatableDebugReportingConfig'] as Map<String, dynamic>),
+      scopes: (json['scopes'] as List).map((e) => e as String).toList(),
     );
   }
 
@@ -1958,6 +2003,7 @@ class AttributionReportingTriggerRegistration {
       'sourceRegistrationTimeConfig': sourceRegistrationTimeConfig.toJson(),
       'aggregatableDebugReportingConfig':
           aggregatableDebugReportingConfig.toJson(),
+      'scopes': [...scopes],
       if (debugKey != null) 'debugKey': debugKey!.toJson(),
       if (aggregationCoordinatorOrigin != null)
         'aggregationCoordinatorOrigin': aggregationCoordinatorOrigin,

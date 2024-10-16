@@ -38,6 +38,12 @@ class PageApi {
       .where((event) => event.name == 'Page.frameDetached')
       .map((event) => FrameDetachedEvent.fromJson(event.parameters));
 
+  /// Fired before frame subtree is detached. Emitted before any frame of the
+  /// subtree is actually detached.
+  Stream<FrameId> get onFrameSubtreeWillBeDetached => _client.onEvent
+      .where((event) => event.name == 'Page.frameSubtreeWillBeDetached')
+      .map((event) => FrameId.fromJson(event.parameters['frameId'] as String));
+
   /// Fired once navigation of the frame has completed. Frame is now associated with the new loader.
   Stream<FrameNavigatedEvent> get onFrameNavigated => _client.onEvent
       .where((event) => event.name == 'Page.frameNavigated')
@@ -1645,6 +1651,7 @@ enum PermissionsPolicyFeature {
   clipboardRead('clipboard-read'),
   clipboardWrite('clipboard-write'),
   computePressure('compute-pressure'),
+  controlledFrame('controlled-frame'),
   crossOriginIsolated('cross-origin-isolated'),
   deferredFetch('deferred-fetch'),
   digitalCredentialsGet('digital-credentials-get'),
@@ -1674,6 +1681,7 @@ enum PermissionsPolicyFeature {
   otpCredentials('otp-credentials'),
   payment('payment'),
   pictureInPicture('picture-in-picture'),
+  popins('popins'),
   privateAggregation('private-aggregation'),
   privateStateTokenIssuance('private-state-token-issuance'),
   privateStateTokenRedemption('private-state-token-redemption'),
@@ -1694,6 +1702,7 @@ enum PermissionsPolicyFeature {
   usb('usb'),
   usbUnrestricted('usb-unrestricted'),
   verticalScroll('vertical-scroll'),
+  webAppInstallation('web-app-installation'),
   webPrinting('web-printing'),
   webShare('web-share'),
   windowManagement('window-management'),
@@ -3493,6 +3502,7 @@ enum BackForwardCacheNotRestoredReason {
   contentWebUsb('ContentWebUSB'),
   contentMediaSessionService('ContentMediaSessionService'),
   contentScreenReader('ContentScreenReader'),
+  contentDiscarded('ContentDiscarded'),
   embedderPopupBlockerTabHelper('EmbedderPopupBlockerTabHelper'),
   embedderSafeBrowsingTriggeredPopupBlocker(
       'EmbedderSafeBrowsingTriggeredPopupBlocker'),

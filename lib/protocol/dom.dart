@@ -74,6 +74,12 @@ class DOMApi {
   Stream<void> get onTopLayerElementsUpdated => _client.onEvent
       .where((event) => event.name == 'DOM.topLayerElementsUpdated');
 
+  /// Fired when a node's scrollability state changes.
+  Stream<ScrollableFlagUpdatedEvent> get onScrollableFlagUpdated => _client
+      .onEvent
+      .where((event) => event.name == 'DOM.scrollableFlagUpdated')
+      .map((event) => ScrollableFlagUpdatedEvent.fromJson(event.parameters));
+
   /// Called when a pseudo element is removed from an element.
   Stream<PseudoElementRemovedEvent> get onPseudoElementRemoved =>
       _client.onEvent
@@ -913,6 +919,24 @@ class PseudoElementAddedEvent {
   }
 }
 
+class ScrollableFlagUpdatedEvent {
+  /// The id of the node.
+  final dom.NodeId nodeId;
+
+  /// If the node is scrollable.
+  final bool isScrollable;
+
+  ScrollableFlagUpdatedEvent(
+      {required this.nodeId, required this.isScrollable});
+
+  factory ScrollableFlagUpdatedEvent.fromJson(Map<String, dynamic> json) {
+    return ScrollableFlagUpdatedEvent(
+      nodeId: dom.NodeId.fromJson(json['nodeId'] as int),
+      isScrollable: json['isScrollable'] as bool? ?? false,
+    );
+  }
+}
+
 class PseudoElementRemovedEvent {
   /// Pseudo element's parent element id.
   final NodeId parentId;
@@ -1099,6 +1123,7 @@ enum PseudoType {
   after('after'),
   marker('marker'),
   backdrop('backdrop'),
+  column('column'),
   selection('selection'),
   searchText('search-text'),
   targetText('target-text'),
@@ -1123,6 +1148,12 @@ enum PseudoType {
   viewTransitionImagePair('view-transition-image-pair'),
   viewTransitionOld('view-transition-old'),
   viewTransitionNew('view-transition-new'),
+  placeholder('placeholder'),
+  fileSelectorButton('file-selector-button'),
+  detailsContent('details-content'),
+  selectFallbackButton('select-fallback-button'),
+  selectFallbackButtonText('select-fallback-button-text'),
+  picker('picker'),
   ;
 
   final String value;
@@ -1331,6 +1362,8 @@ class Node {
 
   final BackendNode? assignedSlot;
 
+  final bool? isScrollable;
+
   Node(
       {required this.nodeId,
       this.parentId,
@@ -1361,7 +1394,8 @@ class Node {
       this.distributedNodes,
       this.isSVG,
       this.compatibilityMode,
-      this.assignedSlot});
+      this.assignedSlot,
+      this.isScrollable});
 
   factory Node.fromJson(Map<String, dynamic> json) {
     return Node(
@@ -1440,6 +1474,9 @@ class Node {
       assignedSlot: json.containsKey('assignedSlot')
           ? BackendNode.fromJson(json['assignedSlot'] as Map<String, dynamic>)
           : null,
+      isScrollable: json.containsKey('isScrollable')
+          ? json['isScrollable'] as bool
+          : null,
     );
   }
 
@@ -1480,6 +1517,7 @@ class Node {
       if (compatibilityMode != null)
         'compatibilityMode': compatibilityMode!.toJson(),
       if (assignedSlot != null) 'assignedSlot': assignedSlot!.toJson(),
+      if (isScrollable != null) 'isScrollable': isScrollable,
     };
   }
 }

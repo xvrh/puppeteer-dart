@@ -1487,7 +1487,8 @@
                         "NoRegisterSourceHeader",
                         "NoRegisterTriggerHeader",
                         "NoRegisterOsSourceHeader",
-                        "NoRegisterOsTriggerHeader"
+                        "NoRegisterOsTriggerHeader",
+                        "NavigationRegistrationUniqueScopeAlreadySet"
                     ]
                 },
                 {
@@ -2776,6 +2777,7 @@
                         "videoCapturePanTiltZoom",
                         "wakeLockScreen",
                         "wakeLockSystem",
+                        "webAppInstallation",
                         "windowManagement"
                     ]
                 },
@@ -5655,6 +5657,7 @@
                         "after",
                         "marker",
                         "backdrop",
+                        "column",
                         "selection",
                         "search-text",
                         "target-text",
@@ -5678,7 +5681,13 @@
                         "view-transition-group",
                         "view-transition-image-pair",
                         "view-transition-old",
-                        "view-transition-new"
+                        "view-transition-new",
+                        "placeholder",
+                        "file-selector-button",
+                        "details-content",
+                        "select-fallback-button",
+                        "select-fallback-button-text",
+                        "picker"
                     ]
                 },
                 {
@@ -5928,6 +5937,12 @@
                             "name": "assignedSlot",
                             "optional": true,
                             "$ref": "BackendNode"
+                        },
+                        {
+                            "name": "isScrollable",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -7397,6 +7412,23 @@
                     "name": "topLayerElementsUpdated",
                     "description": "Called when top layer elements are changed.",
                     "experimental": true
+                },
+                {
+                    "name": "scrollableFlagUpdated",
+                    "description": "Fired when a node's scrollability state changes.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "nodeId",
+                            "description": "The id of the node.",
+                            "$ref": "DOM.NodeId"
+                        },
+                        {
+                            "name": "isScrollable",
+                            "description": "If the node is scrollable.",
+                            "type": "boolean"
+                        }
+                    ]
                 },
                 {
                     "name": "pseudoElementRemoved",
@@ -12143,11 +12175,29 @@
                             "type": "number"
                         }
                     ]
+                },
+                {
+                    "id": "DOMCounter",
+                    "description": "DOM object counter data.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "description": "Object name. Note: object names should be presumed volatile and clients should not expect\nthe returned names to be consistent across runs.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "count",
+                            "description": "Object count.",
+                            "type": "integer"
+                        }
+                    ]
                 }
             ],
             "commands": [
                 {
                     "name": "getDOMCounters",
+                    "description": "Retruns current DOM object counters.",
                     "returns": [
                         {
                             "name": "documents",
@@ -12164,7 +12214,22 @@
                     ]
                 },
                 {
-                    "name": "prepareForLeakDetection"
+                    "name": "getDOMCountersForLeakDetection",
+                    "description": "Retruns DOM object counters after preparing renderer for leak detection.",
+                    "returns": [
+                        {
+                            "name": "counters",
+                            "description": "DOM object counters.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "DOMCounter"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "prepareForLeakDetection",
+                    "description": "Prepares for leak detection by terminating workers, stopping spellcheckers,\ndropping non-essential internal caches, running garbage collections, etc."
                 },
                 {
                     "name": "forciblyPurgeJavaScriptMemory",
@@ -13444,11 +13509,11 @@
                         "UserSetting",
                         "TPCDMetadata",
                         "TPCDDeprecationTrial",
+                        "TopLevelTPCDDeprecationTrial",
                         "TPCDHeuristics",
                         "EnterprisePolicy",
                         "StorageAccess",
                         "TopLevelStorageAccess",
-                        "CorsOptIn",
                         "Scheme"
                     ]
                 },
@@ -17122,6 +17187,7 @@
                         "clipboard-read",
                         "clipboard-write",
                         "compute-pressure",
+                        "controlled-frame",
                         "cross-origin-isolated",
                         "deferred-fetch",
                         "digital-credentials-get",
@@ -17151,6 +17217,7 @@
                         "otp-credentials",
                         "payment",
                         "picture-in-picture",
+                        "popins",
                         "private-aggregation",
                         "private-state-token-issuance",
                         "private-state-token-redemption",
@@ -17171,6 +17238,7 @@
                         "usb",
                         "usb-unrestricted",
                         "vertical-scroll",
+                        "web-app-installation",
                         "web-printing",
                         "web-share",
                         "window-management",
@@ -18495,6 +18563,7 @@
                         "ContentWebUSB",
                         "ContentMediaSessionService",
                         "ContentScreenReader",
+                        "ContentDiscarded",
                         "EmbedderPopupBlockerTabHelper",
                         "EmbedderSafeBrowsingTriggeredPopupBlocker",
                         "EmbedderSafeBrowsingThreatDetails",
@@ -19932,6 +20001,18 @@
                                 "remove",
                                 "swap"
                             ]
+                        }
+                    ]
+                },
+                {
+                    "name": "frameSubtreeWillBeDetached",
+                    "description": "Fired before frame subtree is detached. Emitted before any frame of the\nsubtree is actually detached.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "frameId",
+                            "description": "Id of the frame that is the root of the subtree that will be detached.",
+                            "$ref": "FrameId"
                         }
                     ]
                 },
@@ -21846,6 +21927,29 @@
                     ]
                 },
                 {
+                    "id": "AttributionScopesData",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "values",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        {
+                            "name": "limit",
+                            "description": "number instead of integer because not all uint32 can be represented by\nint",
+                            "type": "number"
+                        },
+                        {
+                            "name": "maxEventStates",
+                            "type": "number"
+                        }
+                    ]
+                },
+                {
                     "id": "AttributionReportingSourceRegistration",
                     "experimental": true,
                     "type": "object",
@@ -21928,6 +22032,11 @@
                         {
                             "name": "aggregatableDebugReportingConfig",
                             "$ref": "AttributionReportingAggregatableDebugReportingConfig"
+                        },
+                        {
+                            "name": "scopesData",
+                            "optional": true,
+                            "$ref": "AttributionScopesData"
                         }
                     ]
                 },
@@ -21948,7 +22057,9 @@
                         "destinationBothLimitsReached",
                         "reportingOriginsPerSiteLimitReached",
                         "exceedsMaxChannelCapacity",
+                        "exceedsMaxScopesChannelCapacity",
                         "exceedsMaxTriggerStateCardinality",
+                        "exceedsMaxEventStatesLimit",
                         "destinationPerDayReportingLimitReached"
                     ]
                 },
@@ -22128,6 +22239,13 @@
                         {
                             "name": "aggregatableDebugReportingConfig",
                             "$ref": "AttributionReportingAggregatableDebugReportingConfig"
+                        },
+                        {
+                            "name": "scopes",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     ]
                 },
@@ -26176,7 +26294,6 @@
                         "PrefetchFailedMIMENotSupported",
                         "PrefetchFailedNetError",
                         "PrefetchFailedNon2XX",
-                        "PrefetchFailedPerPageLimitExceeded",
                         "PrefetchEvictedAfterCandidateRemoved",
                         "PrefetchEvictedForNewerPrefetch",
                         "PrefetchHeldback",
