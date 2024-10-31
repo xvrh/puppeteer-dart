@@ -17199,7 +17199,7 @@
                         "encrypted-media",
                         "execution-while-out-of-viewport",
                         "execution-while-not-rendered",
-                        "fenced-frame-unpartitioned-data",
+                        "fenced-unpartitioned-storage-read",
                         "focus-without-user-activation",
                         "fullscreen",
                         "frobulate",
@@ -22041,6 +22041,10 @@
                             "name": "scopesData",
                             "optional": true,
                             "$ref": "AttributionScopesData"
+                        },
+                        {
+                            "name": "maxEventLevelReports",
+                            "type": "integer"
                         }
                     ]
                 },
@@ -24923,7 +24927,8 @@
                     "enum": [
                         "suspended",
                         "running",
-                        "closed"
+                        "closed",
+                        "interrupted"
                     ]
                 },
                 {
