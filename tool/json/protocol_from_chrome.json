@@ -1066,7 +1066,9 @@
                         "WarnAttributeValueExceedsMaxSize",
                         "WarnDomainNonASCII",
                         "WarnThirdPartyPhaseout",
-                        "WarnCrossSiteRedirectDowngradeChangesInclusion"
+                        "WarnCrossSiteRedirectDowngradeChangesInclusion",
+                        "WarnDeprecationTrialMetadata",
+                        "WarnThirdPartyCookieHeuristic"
                     ]
                 },
                 {
@@ -1778,7 +1780,7 @@
                         "ThirdPartyCookiesBlocked",
                         "NotSignedInWithIdp",
                         "MissingTransientUserActivation",
-                        "ReplacedByButtonMode",
+                        "ReplacedByActiveMode",
                         "InvalidFieldsSpecified",
                         "RelyingPartyOriginIsOpaque",
                         "TypeNotMatching"
@@ -9166,7 +9168,6 @@
                         "gyroscope",
                         "linear-acceleration",
                         "magnetometer",
-                        "proximity",
                         "relative-orientation"
                     ]
                 },
@@ -16940,7 +16941,8 @@
                 },
                 {
                     "name": "setShowWebVitals",
-                    "description": "Request that backend shows an overlay with web vital metrics.",
+                    "description": "Deprecated, no longer has any effect.",
+                    "deprecated": true,
                     "parameters": [
                         {
                             "name": "show",
@@ -17192,6 +17194,7 @@
                         "deferred-fetch",
                         "digital-credentials-get",
                         "direct-sockets",
+                        "direct-sockets-private",
                         "display-capture",
                         "document-domain",
                         "encrypted-media",
@@ -18579,7 +18582,8 @@
                         "EmbedderExtensionMessaging",
                         "EmbedderExtensionMessagingForOpenPort",
                         "EmbedderExtensionSentMessageToCachedFrame",
-                        "RequestedByWebViewClient"
+                        "RequestedByWebViewClient",
+                        "PostMessageByWebViewClient"
                     ]
                 },
                 {
@@ -25524,6 +25528,18 @@
                             "description": "Assertions returned by this credential will have the backup state (BS)\nflag set to this value. Defaults to the authenticator's\ndefaultBackupState value.",
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "userName",
+                            "description": "The credential's user.name property. Equivalent to empty if not set.\nhttps://w3c.github.io/webauthn/#dom-publickeycredentialentity-name",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "userDisplayName",
+                            "description": "The credential's user.displayName property. Equivalent to empty if\nnot set.\nhttps://w3c.github.io/webauthn/#dom-publickeycredentialuserentity-displayname",
+                            "optional": true,
+                            "type": "string"
                         }
                     ]
                 }
@@ -25733,6 +25749,34 @@
                 {
                     "name": "credentialAdded",
                     "description": "Triggered when a credential is added to an authenticator.",
+                    "parameters": [
+                        {
+                            "name": "authenticatorId",
+                            "$ref": "AuthenticatorId"
+                        },
+                        {
+                            "name": "credential",
+                            "$ref": "Credential"
+                        }
+                    ]
+                },
+                {
+                    "name": "credentialDeleted",
+                    "description": "Triggered when a credential is deleted, e.g. through\nPublicKeyCredential.signalUnknownCredential().",
+                    "parameters": [
+                        {
+                            "name": "authenticatorId",
+                            "$ref": "AuthenticatorId"
+                        },
+                        {
+                            "name": "credentialId",
+                            "type": "binary"
+                        }
+                    ]
+                },
+                {
+                    "name": "credentialUpdated",
+                    "description": "Triggered when a credential is updated, e.g. through\nPublicKeyCredential.signalCurrentUserDetails().",
                     "parameters": [
                         {
                             "name": "authenticatorId",
@@ -26267,7 +26311,9 @@
                         "AllPrerenderingCanceled",
                         "WindowClosed",
                         "SlowNetwork",
-                        "OtherPrerenderedPageActivated"
+                        "OtherPrerenderedPageActivated",
+                        "V8OptimizerDisabled",
+                        "PrerenderFailedDuringPrefetch"
                     ]
                 },
                 {
@@ -27401,7 +27447,6 @@
                             "description": "Type of the debug symbols.",
                             "type": "string",
                             "enum": [
-                                "None",
                                 "SourceMap",
                                 "EmbeddedDWARF",
                                 "ExternalDWARF"
@@ -27817,6 +27862,21 @@
                     ]
                 },
                 {
+                    "name": "setBlackboxExecutionContexts",
+                    "description": "Replace previous blackbox execution contexts with passed ones. Forces backend to skip\nstepping/pausing in scripts in these execution contexts. VM will try to leave blackboxed script by\nperforming 'step in' several times, finally resorting to 'step out' if unsuccessful.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "uniqueIds",
+                            "description": "Array of execution context unique ids for the debugger to ignore.",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ]
+                },
+                {
                     "name": "setBlackboxPatterns",
                     "description": "Replace previous blackbox patterns with passed ones. Forces backend to skip stepping/pausing in\nscripts with url matching one of the patterns. VM will try to leave blackboxed script by\nperforming 'step in' several times, finally resorting to 'step out' if unsuccessful.",
                     "experimental": true,
@@ -27828,6 +27888,12 @@
                             "items": {
                                 "type": "string"
                             }
+                        },
+                        {
+                            "name": "skipAnonymous",
+                            "description": "If true, also ignore scripts with no source url.",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ]
                 },
@@ -28483,10 +28549,13 @@
                         },
                         {
                             "name": "debugSymbols",
-                            "description": "If the scriptLanguage is WebASsembly, the source of debug symbols for the module.",
+                            "description": "If the scriptLanguage is WebAssembly, the source of debug symbols for the module.",
                             "experimental": true,
                             "optional": true,
-                            "$ref": "Debugger.DebugSymbols"
+                            "type": "array",
+                            "items": {
+                                "$ref": "Debugger.DebugSymbols"
+                            }
                         },
                         {
                             "name": "embedderName",

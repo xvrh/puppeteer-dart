@@ -293,7 +293,8 @@ class OverlayApi {
     });
   }
 
-  /// Request that backend shows an overlay with web vital metrics.
+  /// Deprecated, no longer has any effect.
+  @Deprecated('no longer has any effect.')
   Future<void> setShowWebVitals(bool show) async {
     await _client.send('Overlay.setShowWebVitals', {
       'show': show,

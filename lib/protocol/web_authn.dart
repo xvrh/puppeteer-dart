@@ -13,6 +13,18 @@ class WebAuthnApi {
       .where((event) => event.name == 'WebAuthn.credentialAdded')
       .map((event) => CredentialAddedEvent.fromJson(event.parameters));
 
+  /// Triggered when a credential is deleted, e.g. through
+  /// PublicKeyCredential.signalUnknownCredential().
+  Stream<CredentialDeletedEvent> get onCredentialDeleted => _client.onEvent
+      .where((event) => event.name == 'WebAuthn.credentialDeleted')
+      .map((event) => CredentialDeletedEvent.fromJson(event.parameters));
+
+  /// Triggered when a credential is updated, e.g. through
+  /// PublicKeyCredential.signalCurrentUserDetails().
+  Stream<CredentialUpdatedEvent> get onCredentialUpdated => _client.onEvent
+      .where((event) => event.name == 'WebAuthn.credentialUpdated')
+      .map((event) => CredentialUpdatedEvent.fromJson(event.parameters));
+
   /// Triggered when a credential is used in a webauthn assertion.
   Stream<CredentialAssertedEvent> get onCredentialAsserted => _client.onEvent
       .where((event) => event.name == 'WebAuthn.credentialAsserted')
@@ -161,6 +173,41 @@ class CredentialAddedEvent {
 
   factory CredentialAddedEvent.fromJson(Map<String, dynamic> json) {
     return CredentialAddedEvent(
+      authenticatorId:
+          AuthenticatorId.fromJson(json['authenticatorId'] as String),
+      credential:
+          Credential.fromJson(json['credential'] as Map<String, dynamic>),
+    );
+  }
+}
+
+class CredentialDeletedEvent {
+  final AuthenticatorId authenticatorId;
+
+  final String credentialId;
+
+  CredentialDeletedEvent(
+      {required this.authenticatorId, required this.credentialId});
+
+  factory CredentialDeletedEvent.fromJson(Map<String, dynamic> json) {
+    return CredentialDeletedEvent(
+      authenticatorId:
+          AuthenticatorId.fromJson(json['authenticatorId'] as String),
+      credentialId: json['credentialId'] as String,
+    );
+  }
+}
+
+class CredentialUpdatedEvent {
+  final AuthenticatorId authenticatorId;
+
+  final Credential credential;
+
+  CredentialUpdatedEvent(
+      {required this.authenticatorId, required this.credential});
+
+  factory CredentialUpdatedEvent.fromJson(Map<String, dynamic> json) {
+    return CredentialUpdatedEvent(
       authenticatorId:
           AuthenticatorId.fromJson(json['authenticatorId'] as String),
       credential:
@@ -412,6 +459,15 @@ class Credential {
   /// defaultBackupState value.
   final bool? backupState;
 
+  /// The credential's user.name property. Equivalent to empty if not set.
+  /// https://w3c.github.io/webauthn/#dom-publickeycredentialentity-name
+  final String? userName;
+
+  /// The credential's user.displayName property. Equivalent to empty if
+  /// not set.
+  /// https://w3c.github.io/webauthn/#dom-publickeycredentialuserentity-displayname
+  final String? userDisplayName;
+
   Credential(
       {required this.credentialId,
       required this.isResidentCredential,
@@ -421,7 +477,9 @@ class Credential {
       required this.signCount,
       this.largeBlob,
       this.backupEligibility,
-      this.backupState});
+      this.backupState,
+      this.userName,
+      this.userDisplayName});
 
   factory Credential.fromJson(Map<String, dynamic> json) {
     return Credential(
@@ -439,6 +497,11 @@ class Credential {
           : null,
       backupState:
           json.containsKey('backupState') ? json['backupState'] as bool : null,
+      userName:
+          json.containsKey('userName') ? json['userName'] as String : null,
+      userDisplayName: json.containsKey('userDisplayName')
+          ? json['userDisplayName'] as String
+          : null,
     );
   }
 
@@ -453,6 +516,8 @@ class Credential {
       if (largeBlob != null) 'largeBlob': largeBlob,
       if (backupEligibility != null) 'backupEligibility': backupEligibility,
       if (backupState != null) 'backupState': backupState,
+      if (userName != null) 'userName': userName,
+      if (userDisplayName != null) 'userDisplayName': userDisplayName,
     };
   }
 }

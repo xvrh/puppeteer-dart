@@ -490,6 +490,8 @@ enum PrerenderFinalStatus {
   windowClosed('WindowClosed'),
   slowNetwork('SlowNetwork'),
   otherPrerenderedPageActivated('OtherPrerenderedPageActivated'),
+  v8OptimizerDisabled('V8OptimizerDisabled'),
+  prerenderFailedDuringPrefetch('PrerenderFailedDuringPrefetch'),
   ;
 
   final String value;

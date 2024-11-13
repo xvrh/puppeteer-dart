@@ -708,7 +708,6 @@ enum SensorType {
   gyroscope('gyroscope'),
   linearAcceleration('linear-acceleration'),
   magnetometer('magnetometer'),
-  proximity('proximity'),
   relativeOrientation('relative-orientation'),
   ;
 

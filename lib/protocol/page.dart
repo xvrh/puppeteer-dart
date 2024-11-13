@@ -1656,6 +1656,7 @@ enum PermissionsPolicyFeature {
   deferredFetch('deferred-fetch'),
   digitalCredentialsGet('digital-credentials-get'),
   directSockets('direct-sockets'),
+  directSocketsPrivate('direct-sockets-private'),
   displayCapture('display-capture'),
   documentDomain('document-domain'),
   encryptedMedia('encrypted-media'),
@@ -3524,6 +3525,7 @@ enum BackForwardCacheNotRestoredReason {
   embedderExtensionSentMessageToCachedFrame(
       'EmbedderExtensionSentMessageToCachedFrame'),
   requestedByWebViewClient('RequestedByWebViewClient'),
+  postMessageByWebViewClient('PostMessageByWebViewClient'),
   ;
 
   final String value;

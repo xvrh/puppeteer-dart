@@ -261,13 +261,26 @@ class DebuggerApi {
     });
   }
 
+  /// Replace previous blackbox execution contexts with passed ones. Forces backend to skip
+  /// stepping/pausing in scripts in these execution contexts. VM will try to leave blackboxed script by
+  /// performing 'step in' several times, finally resorting to 'step out' if unsuccessful.
+  /// [uniqueIds] Array of execution context unique ids for the debugger to ignore.
+  Future<void> setBlackboxExecutionContexts(List<String> uniqueIds) async {
+    await _client.send('Debugger.setBlackboxExecutionContexts', {
+      'uniqueIds': [...uniqueIds],
+    });
+  }
+
   /// Replace previous blackbox patterns with passed ones. Forces backend to skip stepping/pausing in
   /// scripts with url matching one of the patterns. VM will try to leave blackboxed script by
   /// performing 'step in' several times, finally resorting to 'step out' if unsuccessful.
   /// [patterns] Array of regexps that will be used to check script url for blackbox state.
-  Future<void> setBlackboxPatterns(List<String> patterns) async {
+  /// [skipAnonymous] If true, also ignore scripts with no source url.
+  Future<void> setBlackboxPatterns(List<String> patterns,
+      {bool? skipAnonymous}) async {
     await _client.send('Debugger.setBlackboxPatterns', {
       'patterns': [...patterns],
+      if (skipAnonymous != null) 'skipAnonymous': skipAnonymous,
     });
   }
 
@@ -690,8 +703,8 @@ class ScriptParsedEvent {
   /// The language of the script.
   final debugger.ScriptLanguage? scriptLanguage;
 
-  /// If the scriptLanguage is WebASsembly, the source of debug symbols for the module.
-  final debugger.DebugSymbols? debugSymbols;
+  /// If the scriptLanguage is WebAssembly, the source of debug symbols for the module.
+  final List<debugger.DebugSymbols>? debugSymbols;
 
   /// The name the embedder supplied for this script.
   final String? embedderName;
@@ -751,8 +764,10 @@ class ScriptParsedEvent {
           ? debugger.ScriptLanguage.fromJson(json['scriptLanguage'] as String)
           : null,
       debugSymbols: json.containsKey('debugSymbols')
-          ? debugger.DebugSymbols.fromJson(
-              json['debugSymbols'] as Map<String, dynamic>)
+          ? (json['debugSymbols'] as List)
+              .map((e) =>
+                  debugger.DebugSymbols.fromJson(e as Map<String, dynamic>))
+              .toList()
           : null,
       embedderName: json.containsKey('embedderName')
           ? json['embedderName'] as String
@@ -1310,7 +1325,6 @@ class DebugSymbols {
 }
 
 enum DebugSymbolsType {
-  none('None'),
   sourceMap('SourceMap'),
   embeddedDwarf('EmbeddedDWARF'),
   externalDwarf('ExternalDWARF'),

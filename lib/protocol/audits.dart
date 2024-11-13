@@ -205,6 +205,8 @@ enum CookieWarningReason {
   warnThirdPartyPhaseout('WarnThirdPartyPhaseout'),
   warnCrossSiteRedirectDowngradeChangesInclusion(
       'WarnCrossSiteRedirectDowngradeChangesInclusion'),
+  warnDeprecationTrialMetadata('WarnDeprecationTrialMetadata'),
+  warnThirdPartyCookieHeuristic('WarnThirdPartyCookieHeuristic'),
   ;
 
   final String value;
@@ -1352,7 +1354,7 @@ enum FederatedAuthRequestIssueReason {
   thirdPartyCookiesBlocked('ThirdPartyCookiesBlocked'),
   notSignedInWithIdp('NotSignedInWithIdp'),
   missingTransientUserActivation('MissingTransientUserActivation'),
-  replacedByButtonMode('ReplacedByButtonMode'),
+  replacedByActiveMode('ReplacedByActiveMode'),
   invalidFieldsSpecified('InvalidFieldsSpecified'),
   relyingPartyOriginIsOpaque('RelyingPartyOriginIsOpaque'),
   typeNotMatching('TypeNotMatching'),
