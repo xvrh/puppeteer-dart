@@ -1083,6 +1083,33 @@
                     ]
                 },
                 {
+                    "id": "InsightType",
+                    "description": "Represents the category of insight that a cookie issue falls under.",
+                    "type": "string",
+                    "enum": [
+                        "GitHubResource",
+                        "GracePeriod",
+                        "Heuristics"
+                    ]
+                },
+                {
+                    "id": "CookieIssueInsight",
+                    "description": "Information about the suggested solution to a cookie issue.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "type",
+                            "$ref": "InsightType"
+                        },
+                        {
+                            "name": "tableEntryUrl",
+                            "description": "Link to table entry in third-party cookie migration readiness list.",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
                     "id": "CookieIssueDetails",
                     "description": "This information is currently necessary, as the front-end has a difficult\ntime finding a specific cookie. With this, we can convey specific error\ninformation without the cookie.",
                     "type": "object",
@@ -1131,6 +1158,12 @@
                             "name": "request",
                             "optional": true,
                             "$ref": "AffectedRequest"
+                        },
+                        {
+                            "name": "insight",
+                            "description": "The recommended solution to the issue.",
+                            "optional": true,
+                            "$ref": "CookieIssueInsight"
                         }
                     ]
                 },
@@ -1228,7 +1261,8 @@
                         "CorpNotSameOriginAfterDefaultedToSameOriginByCoep",
                         "CorpNotSameOriginAfterDefaultedToSameOriginByDip",
                         "CorpNotSameOriginAfterDefaultedToSameOriginByCoepAndDip",
-                        "CorpNotSameSite"
+                        "CorpNotSameSite",
+                        "SRIMessageSignatureMismatch"
                     ]
                 },
                 {
@@ -2754,18 +2788,21 @@
                     "experimental": true,
                     "type": "string",
                     "enum": [
-                        "accessibilityEvents",
+                        "ar",
                         "audioCapture",
-                        "backgroundSync",
+                        "automaticFullscreen",
                         "backgroundFetch",
+                        "backgroundSync",
+                        "cameraPanTiltZoom",
                         "capturedSurfaceControl",
                         "clipboardReadWrite",
                         "clipboardSanitizedWrite",
                         "displayCapture",
                         "durableStorage",
-                        "flash",
                         "geolocation",
+                        "handTracking",
                         "idleDetection",
+                        "keyboardLock",
                         "localFonts",
                         "midi",
                         "midiSysex",
@@ -2773,16 +2810,19 @@
                         "notifications",
                         "paymentHandler",
                         "periodicBackgroundSync",
+                        "pointerLock",
                         "protectedMediaIdentifier",
                         "sensors",
-                        "storageAccess",
+                        "smartCard",
                         "speakerSelection",
+                        "storageAccess",
                         "topLevelStorageAccess",
                         "videoCapture",
-                        "videoCapturePanTiltZoom",
+                        "vr",
                         "wakeLockScreen",
                         "wakeLockSystem",
                         "webAppInstallation",
+                        "webPrinting",
                         "windowManagement"
                     ]
                 },
@@ -5718,10 +5758,10 @@
                     "enum": [
                         "first-line",
                         "first-letter",
-                        "check",
+                        "checkmark",
                         "before",
                         "after",
-                        "select-arrow",
+                        "picker-icon",
                         "marker",
                         "backdrop",
                         "column",
@@ -5734,8 +5774,7 @@
                         "first-line-inherited",
                         "scroll-marker",
                         "scroll-marker-group",
-                        "scroll-next-button",
-                        "scroll-prev-button",
+                        "scroll-button",
                         "scrollbar",
                         "scrollbar-thumb",
                         "scrollbar-button",
@@ -12923,7 +12962,8 @@
                         "corp-not-same-origin-after-defaulted-to-same-origin-by-coep",
                         "corp-not-same-origin-after-defaulted-to-same-origin-by-dip",
                         "corp-not-same-origin-after-defaulted-to-same-origin-by-coep-and-dip",
-                        "corp-not-same-site"
+                        "corp-not-same-site",
+                        "sri-message-signature-mismatch"
                     ]
                 },
                 {
