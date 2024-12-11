@@ -606,12 +606,16 @@ class Response {
   Future<dynamic>? get content {
     _contentFuture ??= _bodyLoadedCompleter.future.then((error) async {
       if (error is Exception) throw error;
-      var response = await _networkApi
-          .getResponseBody(network.RequestId(request.requestId));
-      if (response.base64Encoded) {
-        return base64.decode(response.body);
-      } else {
-        return response.body;
+      try {
+        var response = await _networkApi
+            .getResponseBody(network.RequestId(request.requestId));
+        if (response.base64Encoded) {
+          return base64.decode(response.body);
+        } else {
+          return response.body;
+        }
+      } catch (message) {
+        _logger.fine('[Response.content] getResponse error: $message');
       }
     });
     return _contentFuture;
