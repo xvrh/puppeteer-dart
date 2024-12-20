@@ -12,9 +12,12 @@ class CastApi {
   /// device or a software surface that you can cast to.
   Stream<List<Sink>> get onSinksUpdated => _client.onEvent
       .where((event) => event.name == 'Cast.sinksUpdated')
-      .map((event) => (event.parameters['sinks'] as List)
-          .map((e) => Sink.fromJson(e as Map<String, dynamic>))
-          .toList());
+      .map(
+        (event) =>
+            (event.parameters['sinks'] as List)
+                .map((e) => Sink.fromJson(e as Map<String, dynamic>))
+                .toList(),
+      );
 
   /// This is fired whenever the outstanding issue/error message changes.
   /// |issueMessage| is empty if there is no issue.
@@ -41,30 +44,22 @@ class CastApi {
   /// Sets a sink to be used when the web page requests the browser to choose a
   /// sink via Presentation API, Remote Playback API, or Cast SDK.
   Future<void> setSinkToUse(String sinkName) async {
-    await _client.send('Cast.setSinkToUse', {
-      'sinkName': sinkName,
-    });
+    await _client.send('Cast.setSinkToUse', {'sinkName': sinkName});
   }
 
   /// Starts mirroring the desktop to the sink.
   Future<void> startDesktopMirroring(String sinkName) async {
-    await _client.send('Cast.startDesktopMirroring', {
-      'sinkName': sinkName,
-    });
+    await _client.send('Cast.startDesktopMirroring', {'sinkName': sinkName});
   }
 
   /// Starts mirroring the tab to the sink.
   Future<void> startTabMirroring(String sinkName) async {
-    await _client.send('Cast.startTabMirroring', {
-      'sinkName': sinkName,
-    });
+    await _client.send('Cast.startTabMirroring', {'sinkName': sinkName});
   }
 
   /// Stops the active Cast session on the sink.
   Future<void> stopCasting(String sinkName) async {
-    await _client.send('Cast.stopCasting', {
-      'sinkName': sinkName,
-    });
+    await _client.send('Cast.stopCasting', {'sinkName': sinkName});
   }
 }
 
@@ -88,10 +83,6 @@ class Sink {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'id': id,
-      if (session != null) 'session': session,
-    };
+    return {'name': name, 'id': id, if (session != null) 'session': session};
   }
 }

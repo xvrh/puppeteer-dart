@@ -9,27 +9,46 @@ class ServiceWorkerApi {
 
   Stream<ServiceWorkerErrorMessage> get onWorkerErrorReported => _client.onEvent
       .where((event) => event.name == 'ServiceWorker.workerErrorReported')
-      .map((event) => ServiceWorkerErrorMessage.fromJson(
-          event.parameters['errorMessage'] as Map<String, dynamic>));
+      .map(
+        (event) => ServiceWorkerErrorMessage.fromJson(
+          event.parameters['errorMessage'] as Map<String, dynamic>,
+        ),
+      );
 
   Stream<List<ServiceWorkerRegistration>> get onWorkerRegistrationUpdated =>
       _client.onEvent
-          .where((event) =>
-              event.name == 'ServiceWorker.workerRegistrationUpdated')
-          .map((event) => (event.parameters['registrations'] as List)
-              .map((e) =>
-                  ServiceWorkerRegistration.fromJson(e as Map<String, dynamic>))
-              .toList());
+          .where(
+            (event) => event.name == 'ServiceWorker.workerRegistrationUpdated',
+          )
+          .map(
+            (event) =>
+                (event.parameters['registrations'] as List)
+                    .map(
+                      (e) => ServiceWorkerRegistration.fromJson(
+                        e as Map<String, dynamic>,
+                      ),
+                    )
+                    .toList(),
+          );
 
   Stream<List<ServiceWorkerVersion>> get onWorkerVersionUpdated => _client
       .onEvent
       .where((event) => event.name == 'ServiceWorker.workerVersionUpdated')
-      .map((event) => (event.parameters['versions'] as List)
-          .map((e) => ServiceWorkerVersion.fromJson(e as Map<String, dynamic>))
-          .toList());
+      .map(
+        (event) =>
+            (event.parameters['versions'] as List)
+                .map(
+                  (e) =>
+                      ServiceWorkerVersion.fromJson(e as Map<String, dynamic>),
+                )
+                .toList(),
+      );
 
   Future<void> deliverPushMessage(
-      String origin, RegistrationID registrationId, String data) async {
+    String origin,
+    RegistrationID registrationId,
+    String data,
+  ) async {
     await _client.send('ServiceWorker.deliverPushMessage', {
       'origin': origin,
       'registrationId': registrationId,
@@ -41,8 +60,12 @@ class ServiceWorkerApi {
     await _client.send('ServiceWorker.disable');
   }
 
-  Future<void> dispatchSyncEvent(String origin, RegistrationID registrationId,
-      String tag, bool lastChance) async {
+  Future<void> dispatchSyncEvent(
+    String origin,
+    RegistrationID registrationId,
+    String tag,
+    bool lastChance,
+  ) async {
     await _client.send('ServiceWorker.dispatchSyncEvent', {
       'origin': origin,
       'registrationId': registrationId,
@@ -52,7 +75,10 @@ class ServiceWorkerApi {
   }
 
   Future<void> dispatchPeriodicSyncEvent(
-      String origin, RegistrationID registrationId, String tag) async {
+    String origin,
+    RegistrationID registrationId,
+    String tag,
+  ) async {
     await _client.send('ServiceWorker.dispatchPeriodicSyncEvent', {
       'origin': origin,
       'registrationId': registrationId,
@@ -65,9 +91,7 @@ class ServiceWorkerApi {
   }
 
   Future<void> inspectWorker(String versionId) async {
-    await _client.send('ServiceWorker.inspectWorker', {
-      'versionId': versionId,
-    });
+    await _client.send('ServiceWorker.inspectWorker', {'versionId': versionId});
   }
 
   Future<void> setForceUpdateOnPageLoad(bool forceUpdateOnPageLoad) async {
@@ -77,15 +101,11 @@ class ServiceWorkerApi {
   }
 
   Future<void> skipWaiting(String scopeURL) async {
-    await _client.send('ServiceWorker.skipWaiting', {
-      'scopeURL': scopeURL,
-    });
+    await _client.send('ServiceWorker.skipWaiting', {'scopeURL': scopeURL});
   }
 
   Future<void> startWorker(String scopeURL) async {
-    await _client.send('ServiceWorker.startWorker', {
-      'scopeURL': scopeURL,
-    });
+    await _client.send('ServiceWorker.startWorker', {'scopeURL': scopeURL});
   }
 
   Future<void> stopAllWorkers() async {
@@ -93,15 +113,11 @@ class ServiceWorkerApi {
   }
 
   Future<void> stopWorker(String versionId) async {
-    await _client.send('ServiceWorker.stopWorker', {
-      'versionId': versionId,
-    });
+    await _client.send('ServiceWorker.stopWorker', {'versionId': versionId});
   }
 
   Future<void> unregister(String scopeURL) async {
-    await _client.send('ServiceWorker.unregister', {
-      'scopeURL': scopeURL,
-    });
+    await _client.send('ServiceWorker.unregister', {'scopeURL': scopeURL});
   }
 
   Future<void> updateRegistration(String scopeURL) async {
@@ -125,10 +141,11 @@ class ServiceWorkerRegistration {
 
   final bool isDeleted;
 
-  ServiceWorkerRegistration(
-      {required this.registrationId,
-      required this.scopeURL,
-      required this.isDeleted});
+  ServiceWorkerRegistration({
+    required this.registrationId,
+    required this.scopeURL,
+    required this.isDeleted,
+  });
 
   factory ServiceWorkerRegistration.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerRegistration(
@@ -151,16 +168,16 @@ enum ServiceWorkerVersionRunningStatus {
   stopped('stopped'),
   starting('starting'),
   running('running'),
-  stopping('stopping'),
-  ;
+  stopping('stopping');
 
   final String value;
 
   const ServiceWorkerVersionRunningStatus(this.value);
 
   factory ServiceWorkerVersionRunningStatus.fromJson(String value) =>
-      ServiceWorkerVersionRunningStatus.values
-          .firstWhere((e) => e.value == value);
+      ServiceWorkerVersionRunningStatus.values.firstWhere(
+        (e) => e.value == value,
+      );
 
   String toJson() => value;
 
@@ -174,8 +191,7 @@ enum ServiceWorkerVersionStatus {
   installed('installed'),
   activating('activating'),
   activated('activated'),
-  redundant('redundant'),
-  ;
+  redundant('redundant');
 
   final String value;
 
@@ -215,17 +231,18 @@ class ServiceWorkerVersion {
 
   final String? routerRules;
 
-  ServiceWorkerVersion(
-      {required this.versionId,
-      required this.registrationId,
-      required this.scriptURL,
-      required this.runningStatus,
-      required this.status,
-      this.scriptLastModified,
-      this.scriptResponseTime,
-      this.controlledClients,
-      this.targetId,
-      this.routerRules});
+  ServiceWorkerVersion({
+    required this.versionId,
+    required this.registrationId,
+    required this.scriptURL,
+    required this.runningStatus,
+    required this.status,
+    this.scriptLastModified,
+    this.scriptResponseTime,
+    this.controlledClients,
+    this.targetId,
+    this.routerRules,
+  });
 
   factory ServiceWorkerVersion.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerVersion(
@@ -233,25 +250,31 @@ class ServiceWorkerVersion {
       registrationId: RegistrationID.fromJson(json['registrationId'] as String),
       scriptURL: json['scriptURL'] as String,
       runningStatus: ServiceWorkerVersionRunningStatus.fromJson(
-          json['runningStatus'] as String),
+        json['runningStatus'] as String,
+      ),
       status: ServiceWorkerVersionStatus.fromJson(json['status'] as String),
-      scriptLastModified: json.containsKey('scriptLastModified')
-          ? json['scriptLastModified'] as num
-          : null,
-      scriptResponseTime: json.containsKey('scriptResponseTime')
-          ? json['scriptResponseTime'] as num
-          : null,
-      controlledClients: json.containsKey('controlledClients')
-          ? (json['controlledClients'] as List)
-              .map((e) => target.TargetID.fromJson(e as String))
-              .toList()
-          : null,
-      targetId: json.containsKey('targetId')
-          ? target.TargetID.fromJson(json['targetId'] as String)
-          : null,
-      routerRules: json.containsKey('routerRules')
-          ? json['routerRules'] as String
-          : null,
+      scriptLastModified:
+          json.containsKey('scriptLastModified')
+              ? json['scriptLastModified'] as num
+              : null,
+      scriptResponseTime:
+          json.containsKey('scriptResponseTime')
+              ? json['scriptResponseTime'] as num
+              : null,
+      controlledClients:
+          json.containsKey('controlledClients')
+              ? (json['controlledClients'] as List)
+                  .map((e) => target.TargetID.fromJson(e as String))
+                  .toList()
+              : null,
+      targetId:
+          json.containsKey('targetId')
+              ? target.TargetID.fromJson(json['targetId'] as String)
+              : null,
+      routerRules:
+          json.containsKey('routerRules')
+              ? json['routerRules'] as String
+              : null,
     );
   }
 
@@ -286,13 +309,14 @@ class ServiceWorkerErrorMessage {
 
   final int columnNumber;
 
-  ServiceWorkerErrorMessage(
-      {required this.errorMessage,
-      required this.registrationId,
-      required this.versionId,
-      required this.sourceURL,
-      required this.lineNumber,
-      required this.columnNumber});
+  ServiceWorkerErrorMessage({
+    required this.errorMessage,
+    required this.registrationId,
+    required this.versionId,
+    required this.sourceURL,
+    required this.lineNumber,
+    required this.columnNumber,
+  });
 
   factory ServiceWorkerErrorMessage.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerErrorMessage(

@@ -34,7 +34,9 @@ class JsHandle {
   JsHandle(this.executionContext, this.remoteObject);
 
   factory JsHandle.fromRemoteObject(
-      ExecutionContext context, RemoteObject remoteObject) {
+    ExecutionContext context,
+    RemoteObject remoteObject,
+  ) {
     var frame = context.frame;
     if (remoteObject.subtype == RemoteObjectSubtype.node && frame != null) {
       var frameManager = context.world!.frameManager;
@@ -60,8 +62,10 @@ class JsHandle {
   /// - `pageFunction` Function to be evaluated in browser context
   /// - `args` Arguments to pass to `pageFunction`
   /// - returns: Future which resolves to the return value of `pageFunction`
-  Future<T?> evaluate<T>(@Language('js') String pageFunction,
-      {List<dynamic>? args}) {
+  Future<T?> evaluate<T>(
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) {
     return executionContext.evaluate(pageFunction, args: [this, ...?args]);
   }
 
@@ -80,23 +84,28 @@ class JsHandle {
   //  - `args`: Arguments to pass to `pageFunction`
   //  Returns: Future which resolves to the return value of `pageFunction` as in-page object (JSHandle)
   Future<T> evaluateHandle<T extends JsHandle>(
-      @Language('js') String pageFunction,
-      {List<dynamic>? args}) {
-    return executionContext
-        .evaluateHandle(pageFunction, args: [this, ...?args]);
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) {
+    return executionContext.evaluateHandle(
+      pageFunction,
+      args: [this, ...?args],
+    );
   }
 
   /// Fetches a single property from the referenced object.
   Future<T> property<T extends JsHandle>(String propertyName) async {
     var objectHandle = await evaluateHandle(
-        //language=js
-        '''
+      //language=js
+      '''
 function _(object, propertyName) {
   const result = {__proto__: null};
   result[propertyName] = object[propertyName];
   return result;
 }
-''', args: [propertyName]);
+''',
+      args: [propertyName],
+    );
     var properties = await objectHandle.properties;
     var result = properties[propertyName]! as T;
     await objectHandle.dispose();
@@ -120,13 +129,17 @@ function _(object, propertyName) {
   /// await handle.dispose();
   /// ```
   Future<Map<String, JsHandle>> get properties async {
-    var response = await executionContext.runtimeApi
-        .getProperties(remoteObject.objectId!, ownProperties: true);
+    var response = await executionContext.runtimeApi.getProperties(
+      remoteObject.objectId!,
+      ownProperties: true,
+    );
     var result = <String, JsHandle>{};
     for (var property in response.result) {
       if (!property.enumerable) continue;
-      result[property.name] =
-          JsHandle.fromRemoteObject(executionContext, property.value!);
+      result[property.name] = JsHandle.fromRemoteObject(
+        executionContext,
+        property.value!,
+      );
     }
     return result;
   }
@@ -141,10 +154,11 @@ function _(object, propertyName) {
   Future<dynamic> get jsonValue async {
     if (remoteObject.objectId != null) {
       var response = await executionContext.runtimeApi.callFunctionOn(
-          'function() { return this; }',
-          objectId: remoteObject.objectId,
-          returnByValue: true,
-          awaitPromise: true);
+        'function() { return this; }',
+        objectId: remoteObject.objectId,
+        returnByValue: true,
+        awaitPromise: true,
+      );
 
       return valueFromRemoteObject(response.result);
     }
@@ -167,9 +181,9 @@ function _(object, propertyName) {
       await executionContext.runtimeApi
           .releaseObject(remoteObject.objectId!)
           .catchError((_) {
-        // Exceptions might happen in case of a page been navigated or closed.
-        // Swallow these since they are harmless and we don't leak anything in this case.
-      });
+            // Exceptions might happen in case of a page been navigated or closed.
+            // Swallow these since they are harmless and we don't leak anything in this case.
+          });
     }
   }
 
@@ -212,7 +226,11 @@ class ElementHandle extends JsHandle {
   final FrameManager frameManager;
 
   ElementHandle(
-      super.context, super.remoteObject, this.frame, this.frameManager);
+    super.context,
+    super.remoteObject,
+    this.frame,
+    this.frameManager,
+  );
 
   Page get page => frameManager.page;
 
@@ -222,8 +240,9 @@ class ElementHandle extends JsHandle {
   /// Resolves to the content frame for element handles referencing iframe nodes,
   /// or null otherwise
   Future<Frame?> get contentFrame async {
-    var nodeInfo = await executionContext.domApi
-        .describeNode(objectId: remoteObject.objectId);
+    var nodeInfo = await executionContext.domApi.describeNode(
+      objectId: remoteObject.objectId,
+    );
 
     if (nodeInfo.frameId == null) return null;
     return frameManager.frame(nodeInfo.frameId);
@@ -231,8 +250,8 @@ class ElementHandle extends JsHandle {
 
   Future<void> _scrollIntoViewIfNeeded() async {
     var error = await evaluate(
-        //language=js
-        '''
+      //language=js
+      '''
 async function _(element, pageJavascriptEnabled) {
   if (!element.isConnected) {
     return 'Node is detached from document';
@@ -257,7 +276,9 @@ async function _(element, pageJavascriptEnabled) {
   }
   return false;
 }
-''', args: [page.javascriptEnabled]);
+''',
+      args: [page.javascriptEnabled],
+    );
     if (error != null && error != false) {
       throw Exception(error);
     }
@@ -266,8 +287,9 @@ async function _(element, pageJavascriptEnabled) {
   Future<Point> _clickablePoint() async {
     List<Quad>? quads;
     try {
-      quads = await executionContext.domApi
-          .getContentQuads(objectId: remoteObject.objectId);
+      quads = await executionContext.domApi.getContentQuads(
+        objectId: remoteObject.objectId,
+      );
     } catch (e) {
       if (!ServerException.matcher('Could not compute content quads.')(e)) {
         rethrow;
@@ -282,12 +304,18 @@ async function _(element, pageJavascriptEnabled) {
     var layoutViewport = layoutMetrics.cssLayoutViewport;
 
     // Filter out quads that have too small area to click into.
-    var pointsList = quads
-        .map(quadToPoints)
-        .map((quad) => _intersectQuadWithViewport(
-            quad, layoutViewport.clientWidth, layoutViewport.clientHeight))
-        .where((quad) => _computeQuadArea(quad) > 1)
-        .toList();
+    var pointsList =
+        quads
+            .map(quadToPoints)
+            .map(
+              (quad) => _intersectQuadWithViewport(
+                quad,
+                layoutViewport.clientWidth,
+                layoutViewport.clientHeight,
+              ),
+            )
+            .where((quad) => _computeQuadArea(quad) > 1)
+            .toList();
     if (pointsList.isEmpty) {
       throw NodeIsNotVisibleException();
     }
@@ -307,15 +335,20 @@ async function _(element, pageJavascriptEnabled) {
       Point(quad.value[0], quad.value[1]),
       Point(quad.value[2], quad.value[3]),
       Point(quad.value[4], quad.value[5]),
-      Point(quad.value[6], quad.value[7])
+      Point(quad.value[6], quad.value[7]),
     ];
   }
 
   List<Point> _intersectQuadWithViewport(
-      List<Point> quad, num width, num height) {
+    List<Point> quad,
+    num width,
+    num height,
+  ) {
     return quad
-        .map((point) =>
-            Point(min(max(point.x, 0), width), min(max(point.y, 0), height)))
+        .map(
+          (point) =>
+              Point(min(max(point.x, 0), width), min(max(point.y, 0), height)),
+        )
         .toList();
   }
 
@@ -348,12 +381,19 @@ async function _(element, pageJavascriptEnabled) {
   ///
   /// Returns [Future] which resolves when the element is successfully clicked.
   /// [Future] gets rejected if the element is detached from DOM.
-  Future<void> click(
-      {Duration? delay, MouseButton? button, int? clickCount}) async {
+  Future<void> click({
+    Duration? delay,
+    MouseButton? button,
+    int? clickCount,
+  }) async {
     await _scrollIntoViewIfNeeded();
     var point = await _clickablePoint();
-    await page.mouse
-        .click(point, delay: delay, button: button, clickCount: clickCount);
+    await page.mouse.click(
+      point,
+      delay: delay,
+      button: button,
+      clickCount: clickCount,
+    );
   }
 
   /// This method creates and captures a dragevent from the element.
@@ -408,7 +448,8 @@ async function _(element, pageJavascriptEnabled) {
   ///
   ///  Returns: A list of option values that have been successfully selected.
   Future<List<String>> select(List<String> values) async {
-    return evaluate<List<dynamic>>(r'''(element, values) => {
+    return evaluate<List<dynamic>>(
+      r'''(element, values) => {
   if (element.nodeName.toLowerCase() !== 'select')
     throw new Error('Element is not a <select> element.');
 
@@ -422,7 +463,9 @@ async function _(element, pageJavascriptEnabled) {
   element.dispatchEvent(new Event('input', { 'bubbles': true }));
   element.dispatchEvent(new Event('change', { 'bubbles': true }));
   return options.filter(option => option.selected).map(option => option.value);
-}''', args: [values]).then((result) => result!.cast<String>());
+}''',
+      args: [values],
+    ).then((result) => result!.cast<String>());
   }
 
   /// This method expects `elementHandle` to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input).
@@ -432,7 +475,8 @@ async function _(element, pageJavascriptEnabled) {
     var isMultiple = await evaluate<bool>('element => element.multiple');
     if (files.length > 1 && !isMultiple!) {
       throw Exception(
-          'Multiple file uploads only work with <input type=file multiple>');
+        'Multiple file uploads only work with <input type=file multiple>',
+      );
     }
 
     var objectId = remoteObject.objectId;
@@ -451,9 +495,10 @@ async function _(element, pageJavascriptEnabled) {
       }''');
     } else {
       await executionContext.domApi.setFileInputFiles(
-          files.map((file) => file.absolute.path).toList(),
-          objectId: objectId,
-          backendNodeId: node.backendNodeId);
+        files.map((file) => file.absolute.path).toList(),
+        objectId: objectId,
+        backendNodeId: node.backendNodeId,
+      );
     }
   }
 
@@ -470,8 +515,9 @@ async function _(element, pageJavascriptEnabled) {
   /// on the element.
   Future<void> focus() {
     return evaluate(
-        //language=js
-        'function _(element) {return element.focus();}');
+      //language=js
+      'function _(element) {return element.focus();}',
+    );
   }
 
   /// Focuses the element, and then sends a `keydown`, `keypress`/`input`, and
@@ -538,8 +584,9 @@ async function _(element, pageJavascriptEnabled) {
   /// Box points are sorted clock-wise.
   Future<BoxModel?> get boxModel async {
     try {
-      return await executionContext.domApi
-          .getBoxModel(objectId: remoteObject.objectId);
+      return await executionContext.domApi.getBoxModel(
+        objectId: remoteObject.objectId,
+      );
     } on ServerException catch (e) {
       if (ServerException.matcher('Could not compute box model.')(e)) {
         return null;
@@ -553,8 +600,11 @@ async function _(element, pageJavascriptEnabled) {
   /// If the element is detached from DOM, the method throws an error.
   ///
   /// See [Page.screenshot] for more info.
-  Future<List<int>> screenshot(
-      {ScreenshotFormat? format, int? quality, bool? omitBackground}) async {
+  Future<List<int>> screenshot({
+    ScreenshotFormat? format,
+    int? quality,
+    bool? omitBackground,
+  }) async {
     var needsViewportReset = false;
 
     var boundingBox = await this.boundingBox;
@@ -567,9 +617,12 @@ async function _(element, pageJavascriptEnabled) {
     if (viewport != null &&
         (boundingBox.width > viewport.width ||
             boundingBox.height > viewport.height)) {
-      await page.setViewport(viewport.copyWith(
+      await page.setViewport(
+        viewport.copyWith(
           width: max(viewport.width, boundingBox.width.ceil()),
-          height: max(viewport.height, boundingBox.height.ceil())));
+          height: max(viewport.height, boundingBox.height.ceil()),
+        ),
+      );
 
       needsViewportReset = true;
     }
@@ -587,16 +640,18 @@ async function _(element, pageJavascriptEnabled) {
         (await executionContext.pageApi.getLayoutMetrics()).cssLayoutViewport;
 
     var clip = Rectangle(
-        boundingBox.left + layoutViewPort.pageX,
-        boundingBox.top + layoutViewPort.pageY,
-        boundingBox.width,
-        boundingBox.height);
+      boundingBox.left + layoutViewPort.pageX,
+      boundingBox.top + layoutViewPort.pageY,
+      boundingBox.width,
+      boundingBox.height,
+    );
 
     var imageData = await page.screenshot(
-        format: format,
-        clip: clip,
-        quality: quality,
-        omitBackground: omitBackground);
+      format: format,
+      clip: clip,
+      quality: quality,
+      omitBackground: omitBackground,
+    );
 
     if (needsViewportReset) {
       await page.setViewport(viewport!);
@@ -611,7 +666,8 @@ async function _(element, pageJavascriptEnabled) {
     return $OrNull(selector).then((e) {
       if (e == null) {
         throw Exception(
-            'Error: failed to find element matching selector "$selector"');
+          'Error: failed to find element matching selector "$selector"',
+        );
       }
       return e;
     });
@@ -619,9 +675,10 @@ async function _(element, pageJavascriptEnabled) {
 
   Future<ElementHandle?> $OrNull(String selector) async {
     var handle = await evaluateHandle(
-        //language=js
-        '(element, selector) => element.querySelector(selector);',
-        args: [selector]);
+      //language=js
+      '(element, selector) => element.querySelector(selector);',
+      args: [selector],
+    );
     var element = handle.asElement;
     if (element != null) return element;
     await handle.dispose();
@@ -632,9 +689,10 @@ async function _(element, pageJavascriptEnabled) {
   /// match the selector, the return value resolves to `[]`.
   Future<List<ElementHandle>> $$(String selector) async {
     var arrayHandle = await evaluateHandle(
-        //language=js
-        'function _(element, selector) {return element.querySelectorAll(selector);}',
-        args: [selector]);
+      //language=js
+      'function _(element, selector) {return element.querySelectorAll(selector);}',
+      args: [selector],
+    );
     var properties = await arrayHandle.properties;
     await arrayHandle.dispose();
     var result = <ElementHandle>[];
@@ -665,12 +723,16 @@ async function _(element, pageJavascriptEnabled) {
   /// - [args]: Arguments to pass to `pageFunction`
   ///
   /// Returns [Future] which resolves to the return value of `pageFunction`.
-  Future<T?> $eval<T>(String selector, @Language('js') String pageFunction,
-      {List<dynamic>? args}) async {
+  Future<T?> $eval<T>(
+    String selector,
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) async {
     var elementHandle = await $OrNull(selector);
     if (elementHandle == null) {
       throw Exception(
-          'Error: failed to find element matching selector "$selector"');
+        'Error: failed to find element matching selector "$selector"',
+      );
     }
 
     var result = await elementHandle.evaluate<T>(pageFunction, args: args);
@@ -695,8 +757,9 @@ async function _(element, pageJavascriptEnabled) {
   /// ```dart
   /// var feedHandle = await page.$('.feed');
   /// expect(
-  ///     await feedHandle.$$eval('.tweet', 'nodes => nodes.map(n => n.innerText)'),
-  ///     equals(['Hello!', 'Hi!']));
+  ///   await feedHandle.$$eval('.tweet', 'nodes => nodes.map(n => n.innerText)'),
+  ///   equals(['Hello!', 'Hi!']),
+  /// );
   /// ```
   ///
   /// Parameters:
@@ -705,12 +768,16 @@ async function _(element, pageJavascriptEnabled) {
   /// - [args]: Arguments to pass to `pageFunction`
   ///
   /// Returns: [Future] which resolves to the return value of `pageFunction`
-  Future<T?> $$eval<T>(String selector, @Language('js') String pageFunction,
-      {List<dynamic>? args}) async {
+  Future<T?> $$eval<T>(
+    String selector,
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) async {
     var arrayHandle = await evaluateHandle(
-        //language=js
-        'function _(element, selector) {return Array.from(element.querySelectorAll(selector));}',
-        args: [selector]);
+      //language=js
+      'function _(element, selector) {return Array.from(element.querySelectorAll(selector));}',
+      args: [selector],
+    );
 
     var result = await arrayHandle.evaluate<T>(pageFunction, args: args);
     await arrayHandle.dispose();
@@ -721,8 +788,8 @@ async function _(element, pageJavascriptEnabled) {
   /// If there are no such elements, the method will resolve to an empty array.
   Future<List<ElementHandle>> $x(String expression) async {
     var arrayHandle = await evaluateHandle(
-        //language=js
-        '''
+      //language=js
+      '''
 function _(element, expression) {
   const document = element.ownerDocument || element;
   const iterator = document.evaluate(expression, element, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE);
@@ -732,7 +799,9 @@ function _(element, expression) {
     array.push(item);
   return array;
 }
-''', args: [expression]);
+''',
+      args: [expression],
+    );
     var properties = await arrayHandle.properties;
     await arrayHandle.dispose();
     var result = <ElementHandle>[];
@@ -746,8 +815,8 @@ function _(element, expression) {
   /// Resolves to true if the element is visible in the current viewport.
   Future<bool?> get isIntersectingViewport {
     return evaluate(
-        //language=js
-        '''
+      //language=js
+      '''
 async function _(element) {
   const visibleRatio = await new Promise(resolve => {
     const observer = new IntersectionObserver(entries => {
@@ -757,7 +826,8 @@ async function _(element) {
     observer.observe(element);
   });
   return visibleRatio > 0;
-}''');
+}''',
+    );
   }
 }
 

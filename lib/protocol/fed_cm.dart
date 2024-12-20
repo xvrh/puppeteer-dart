@@ -39,7 +39,9 @@ class FedCmApi {
   }
 
   Future<void> clickDialogButton(
-      String dialogId, DialogButton dialogButton) async {
+    String dialogId,
+    DialogButton dialogButton,
+  ) async {
     await _client.send('FedCm.clickDialogButton', {
       'dialogId': dialogId,
       'dialogButton': dialogButton,
@@ -47,7 +49,10 @@ class FedCmApi {
   }
 
   Future<void> openUrl(
-      String dialogId, int accountIndex, AccountUrlType accountUrlType) async {
+    String dialogId,
+    int accountIndex,
+    AccountUrlType accountUrlType,
+  ) async {
     await _client.send('FedCm.openUrl', {
       'dialogId': dialogId,
       'accountIndex': accountIndex,
@@ -82,20 +87,22 @@ class DialogShownEvent {
 
   final String? subtitle;
 
-  DialogShownEvent(
-      {required this.dialogId,
-      required this.dialogType,
-      required this.accounts,
-      required this.title,
-      this.subtitle});
+  DialogShownEvent({
+    required this.dialogId,
+    required this.dialogType,
+    required this.accounts,
+    required this.title,
+    this.subtitle,
+  });
 
   factory DialogShownEvent.fromJson(Map<String, dynamic> json) {
     return DialogShownEvent(
       dialogId: json['dialogId'] as String,
       dialogType: DialogType.fromJson(json['dialogType'] as String),
-      accounts: (json['accounts'] as List)
-          .map((e) => Account.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      accounts:
+          (json['accounts'] as List)
+              .map((e) => Account.fromJson(e as Map<String, dynamic>))
+              .toList(),
       title: json['title'] as String,
       subtitle:
           json.containsKey('subtitle') ? json['subtitle'] as String : null,
@@ -107,8 +114,7 @@ class DialogShownEvent {
 /// whether this account has ever been used to sign in to this RP before.
 enum LoginState {
   signIn('SignIn'),
-  signUp('SignUp'),
-  ;
+  signUp('SignUp');
 
   final String value;
 
@@ -128,8 +134,7 @@ enum DialogType {
   accountChooser('AccountChooser'),
   autoReauthn('AutoReauthn'),
   confirmIdpLogin('ConfirmIdpLogin'),
-  error('Error'),
-  ;
+  error('Error');
 
   final String value;
 
@@ -148,8 +153,7 @@ enum DialogType {
 enum DialogButton {
   confirmIdpLoginContinue('ConfirmIdpLoginContinue'),
   errorGotIt('ErrorGotIt'),
-  errorMoreDetails('ErrorMoreDetails'),
-  ;
+  errorMoreDetails('ErrorMoreDetails');
 
   final String value;
 
@@ -167,8 +171,7 @@ enum DialogButton {
 /// The URLs that each account has
 enum AccountUrlType {
   termsOfService('TermsOfService'),
-  privacyPolicy('PrivacyPolicy'),
-  ;
+  privacyPolicy('PrivacyPolicy');
 
   final String value;
 
@@ -206,17 +209,18 @@ class Account {
 
   final String? privacyPolicyUrl;
 
-  Account(
-      {required this.accountId,
-      required this.email,
-      required this.name,
-      required this.givenName,
-      required this.pictureUrl,
-      required this.idpConfigUrl,
-      required this.idpLoginUrl,
-      required this.loginState,
-      this.termsOfServiceUrl,
-      this.privacyPolicyUrl});
+  Account({
+    required this.accountId,
+    required this.email,
+    required this.name,
+    required this.givenName,
+    required this.pictureUrl,
+    required this.idpConfigUrl,
+    required this.idpLoginUrl,
+    required this.loginState,
+    this.termsOfServiceUrl,
+    this.privacyPolicyUrl,
+  });
 
   factory Account.fromJson(Map<String, dynamic> json) {
     return Account(
@@ -228,12 +232,14 @@ class Account {
       idpConfigUrl: json['idpConfigUrl'] as String,
       idpLoginUrl: json['idpLoginUrl'] as String,
       loginState: LoginState.fromJson(json['loginState'] as String),
-      termsOfServiceUrl: json.containsKey('termsOfServiceUrl')
-          ? json['termsOfServiceUrl'] as String
-          : null,
-      privacyPolicyUrl: json.containsKey('privacyPolicyUrl')
-          ? json['privacyPolicyUrl'] as String
-          : null,
+      termsOfServiceUrl:
+          json.containsKey('termsOfServiceUrl')
+              ? json['termsOfServiceUrl'] as String
+              : null,
+      privacyPolicyUrl:
+          json.containsKey('privacyPolicyUrl')
+              ? json['privacyPolicyUrl'] as String
+              : null,
     );
   }
 

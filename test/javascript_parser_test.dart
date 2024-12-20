@@ -59,11 +59,13 @@ async function() { return await compute(9, 4);
       }''',
       '''
 async () => await compute(9, 4);''': '''
-async function() { return await compute(9, 4); }'''
+async function() { return await compute(9, 4); }''',
     };
     for (var declaration in declarations.entries) {
-      expect(convertToFunctionDeclaration(declaration.key),
-          equals(declaration.value));
+      expect(
+        convertToFunctionDeclaration(declaration.key),
+        equals(declaration.value),
+      );
     }
   });
 }

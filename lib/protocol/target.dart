@@ -25,20 +25,26 @@ class TargetApi {
   Stream<ReceivedMessageFromTargetEvent> get onReceivedMessageFromTarget =>
       _client.onEvent
           .where((event) => event.name == 'Target.receivedMessageFromTarget')
-          .map((event) =>
-              ReceivedMessageFromTargetEvent.fromJson(event.parameters));
+          .map(
+            (event) =>
+                ReceivedMessageFromTargetEvent.fromJson(event.parameters),
+          );
 
   /// Issued when a possible inspection target is created.
   Stream<TargetInfo> get onTargetCreated => _client.onEvent
       .where((event) => event.name == 'Target.targetCreated')
-      .map((event) => TargetInfo.fromJson(
-          event.parameters['targetInfo'] as Map<String, dynamic>));
+      .map(
+        (event) => TargetInfo.fromJson(
+          event.parameters['targetInfo'] as Map<String, dynamic>,
+        ),
+      );
 
   /// Issued when a target is destroyed.
   Stream<TargetID> get onTargetDestroyed => _client.onEvent
       .where((event) => event.name == 'Target.targetDestroyed')
       .map(
-          (event) => TargetID.fromJson(event.parameters['targetId'] as String));
+        (event) => TargetID.fromJson(event.parameters['targetId'] as String),
+      );
 
   /// Issued when a target has crashed.
   Stream<TargetCrashedEvent> get onTargetCrashed => _client.onEvent
@@ -49,14 +55,15 @@ class TargetApi {
   /// `targetCreated` and `targetDestroyed`.
   Stream<TargetInfo> get onTargetInfoChanged => _client.onEvent
       .where((event) => event.name == 'Target.targetInfoChanged')
-      .map((event) => TargetInfo.fromJson(
-          event.parameters['targetInfo'] as Map<String, dynamic>));
+      .map(
+        (event) => TargetInfo.fromJson(
+          event.parameters['targetInfo'] as Map<String, dynamic>,
+        ),
+      );
 
   /// Activates (focuses) the target.
   Future<void> activateTarget(TargetID targetId) async {
-    await _client.send('Target.activateTarget', {
-      'targetId': targetId,
-    });
+    await _client.send('Target.activateTarget', {'targetId': targetId});
   }
 
   /// Attaches to the target with given id.
@@ -97,8 +104,10 @@ class TargetApi {
   /// - `binding.send(json)` - a method to send messages over the remote debugging protocol
   /// - `binding.onmessage = json => handleMessage(json)` - a callback that will be called for the protocol notifications and command responses.
   /// [bindingName] Binding name, 'cdp' if not specified.
-  Future<void> exposeDevToolsProtocol(TargetID targetId,
-      {String? bindingName}) async {
+  Future<void> exposeDevToolsProtocol(
+    TargetID targetId, {
+    String? bindingName,
+  }) async {
     await _client.send('Target.exposeDevToolsProtocol', {
       'targetId': targetId,
       if (bindingName != null) 'bindingName': bindingName,
@@ -113,22 +122,24 @@ class TargetApi {
   /// [originsWithUniversalNetworkAccess] An optional list of origins to grant unlimited cross-origin access to.
   /// Parts of the URL other than those constituting origin are ignored.
   /// Returns: The id of the context created.
-  Future<browser.BrowserContextID> createBrowserContext(
-      {bool? disposeOnDetach,
-      String? proxyServer,
-      String? proxyBypassList,
-      List<String>? originsWithUniversalNetworkAccess}) async {
+  Future<browser.BrowserContextID> createBrowserContext({
+    bool? disposeOnDetach,
+    String? proxyServer,
+    String? proxyBypassList,
+    List<String>? originsWithUniversalNetworkAccess,
+  }) async {
     var result = await _client.send('Target.createBrowserContext', {
       if (disposeOnDetach != null) 'disposeOnDetach': disposeOnDetach,
       if (proxyServer != null) 'proxyServer': proxyServer,
       if (proxyBypassList != null) 'proxyBypassList': proxyBypassList,
       if (originsWithUniversalNetworkAccess != null)
         'originsWithUniversalNetworkAccess': [
-          ...originsWithUniversalNetworkAccess
+          ...originsWithUniversalNetworkAccess,
         ],
     });
     return browser.BrowserContextID.fromJson(
-        result['browserContextId'] as String);
+      result['browserContextId'] as String,
+    );
   }
 
   /// Returns all browser contexts created with `Target.createBrowserContext` method.
@@ -152,14 +163,16 @@ class TargetApi {
   /// false by default).
   /// [forTab] Whether to create the target of type "tab".
   /// Returns: The id of the page opened.
-  Future<TargetID> createTarget(String url,
-      {int? width,
-      int? height,
-      browser.BrowserContextID? browserContextId,
-      bool? enableBeginFrameControl,
-      bool? newWindow,
-      bool? background,
-      bool? forTab}) async {
+  Future<TargetID> createTarget(
+    String url, {
+    int? width,
+    int? height,
+    browser.BrowserContextID? browserContextId,
+    bool? enableBeginFrameControl,
+    bool? newWindow,
+    bool? background,
+    bool? forTab,
+  }) async {
     var result = await _client.send('Target.createTarget', {
       'url': url,
       if (width != null) 'width': width,
@@ -176,9 +189,10 @@ class TargetApi {
 
   /// Detaches session with given id.
   /// [sessionId] Session to detach.
-  Future<void> detachFromTarget(
-      {SessionID? sessionId,
-      @Deprecated('This parameter is deprecated') TargetID? targetId}) async {
+  Future<void> detachFromTarget({
+    SessionID? sessionId,
+    @Deprecated('This parameter is deprecated') TargetID? targetId,
+  }) async {
     await _client.send('Target.detachFromTarget', {
       if (sessionId != null) 'sessionId': sessionId,
       if (targetId != null) 'targetId': targetId,
@@ -188,7 +202,8 @@ class TargetApi {
   /// Deletes a BrowserContext. All the belonging pages will be closed without calling their
   /// beforeunload hooks.
   Future<void> disposeBrowserContext(
-      browser.BrowserContextID browserContextId) async {
+    browser.BrowserContextID browserContextId,
+  ) async {
     await _client.send('Target.disposeBrowserContext', {
       'browserContextId': browserContextId,
     });
@@ -221,9 +236,11 @@ class TargetApi {
   /// and crbug.com/991325.
   /// [sessionId] Identifier of the session.
   @Deprecated('This command is deprecated')
-  Future<void> sendMessageToTarget(String message,
-      {SessionID? sessionId,
-      @Deprecated('This parameter is deprecated') TargetID? targetId}) async {
+  Future<void> sendMessageToTarget(
+    String message, {
+    SessionID? sessionId,
+    @Deprecated('This parameter is deprecated') TargetID? targetId,
+  }) async {
     await _client.send('Target.sendMessageToTarget', {
       'message': message,
       if (sessionId != null) 'sessionId': sessionId,
@@ -243,8 +260,12 @@ class TargetApi {
   /// We plan to make this the default, deprecate non-flattened mode,
   /// and eventually retire it. See crbug.com/991325.
   /// [filter] Only targets matching filter will be attached.
-  Future<void> setAutoAttach(bool autoAttach, bool waitForDebuggerOnStart,
-      {bool? flatten, TargetFilter? filter}) async {
+  Future<void> setAutoAttach(
+    bool autoAttach,
+    bool waitForDebuggerOnStart, {
+    bool? flatten,
+    TargetFilter? filter,
+  }) async {
     await _client.send('Target.setAutoAttach', {
       'autoAttach': autoAttach,
       'waitForDebuggerOnStart': waitForDebuggerOnStart,
@@ -261,8 +282,11 @@ class TargetApi {
   /// [waitForDebuggerOnStart] Whether to pause new targets when attaching to them. Use `Runtime.runIfWaitingForDebugger`
   /// to run paused targets.
   /// [filter] Only targets matching filter will be attached.
-  Future<void> autoAttachRelated(TargetID targetId, bool waitForDebuggerOnStart,
-      {TargetFilter? filter}) async {
+  Future<void> autoAttachRelated(
+    TargetID targetId,
+    bool waitForDebuggerOnStart, {
+    TargetFilter? filter,
+  }) async {
     await _client.send('Target.autoAttachRelated', {
       'targetId': targetId,
       'waitForDebuggerOnStart': waitForDebuggerOnStart,
@@ -300,16 +324,18 @@ class AttachedToTargetEvent {
 
   final bool waitingForDebugger;
 
-  AttachedToTargetEvent(
-      {required this.sessionId,
-      required this.targetInfo,
-      required this.waitingForDebugger});
+  AttachedToTargetEvent({
+    required this.sessionId,
+    required this.targetInfo,
+    required this.waitingForDebugger,
+  });
 
   factory AttachedToTargetEvent.fromJson(Map<String, dynamic> json) {
     return AttachedToTargetEvent(
       sessionId: SessionID.fromJson(json['sessionId'] as String),
-      targetInfo:
-          TargetInfo.fromJson(json['targetInfo'] as Map<String, dynamic>),
+      targetInfo: TargetInfo.fromJson(
+        json['targetInfo'] as Map<String, dynamic>,
+      ),
       waitingForDebugger: json['waitingForDebugger'] as bool? ?? false,
     );
   }
@@ -334,8 +360,10 @@ class ReceivedMessageFromTargetEvent {
 
   final String message;
 
-  ReceivedMessageFromTargetEvent(
-      {required this.sessionId, required this.message});
+  ReceivedMessageFromTargetEvent({
+    required this.sessionId,
+    required this.message,
+  });
 
   factory ReceivedMessageFromTargetEvent.fromJson(Map<String, dynamic> json) {
     return ReceivedMessageFromTargetEvent(
@@ -354,8 +382,11 @@ class TargetCrashedEvent {
   /// Termination error code.
   final int errorCode;
 
-  TargetCrashedEvent(
-      {required this.targetId, required this.status, required this.errorCode});
+  TargetCrashedEvent({
+    required this.targetId,
+    required this.status,
+    required this.errorCode,
+  });
 
   factory TargetCrashedEvent.fromJson(Map<String, dynamic> json) {
     return TargetCrashedEvent(
@@ -407,17 +438,18 @@ class TargetInfo {
   /// the type of "page", this may be set to "prerender".
   final String? subtype;
 
-  TargetInfo(
-      {required this.targetId,
-      required this.type,
-      required this.title,
-      required this.url,
-      required this.attached,
-      this.openerId,
-      required this.canAccessOpener,
-      this.openerFrameId,
-      this.browserContextId,
-      this.subtype});
+  TargetInfo({
+    required this.targetId,
+    required this.type,
+    required this.title,
+    required this.url,
+    required this.attached,
+    this.openerId,
+    required this.canAccessOpener,
+    this.openerFrameId,
+    this.browserContextId,
+    this.subtype,
+  });
 
   factory TargetInfo.fromJson(Map<String, dynamic> json) {
     return TargetInfo(
@@ -426,17 +458,21 @@ class TargetInfo {
       title: json['title'] as String,
       url: json['url'] as String,
       attached: json['attached'] as bool? ?? false,
-      openerId: json.containsKey('openerId')
-          ? TargetID.fromJson(json['openerId'] as String)
-          : null,
+      openerId:
+          json.containsKey('openerId')
+              ? TargetID.fromJson(json['openerId'] as String)
+              : null,
       canAccessOpener: json['canAccessOpener'] as bool? ?? false,
-      openerFrameId: json.containsKey('openerFrameId')
-          ? page.FrameId.fromJson(json['openerFrameId'] as String)
-          : null,
-      browserContextId: json.containsKey('browserContextId')
-          ? browser.BrowserContextID.fromJson(
-              json['browserContextId'] as String)
-          : null,
+      openerFrameId:
+          json.containsKey('openerFrameId')
+              ? page.FrameId.fromJson(json['openerFrameId'] as String)
+              : null,
+      browserContextId:
+          json.containsKey('browserContextId')
+              ? browser.BrowserContextID.fromJson(
+                json['browserContextId'] as String,
+              )
+              : null,
       subtype: json.containsKey('subtype') ? json['subtype'] as String : null,
     );
   }
@@ -490,9 +526,9 @@ class FilterEntry {
 /// [{type: "browser", exclude: true}, {type: "tab", exclude: true}, {}]
 /// (i.e. include everything but `browser` and `tab`).
 extension type TargetFilter(List<FilterEntry> value) {
-  factory TargetFilter.fromJson(List<dynamic> value) => TargetFilter(value
-      .map((e) => FilterEntry.fromJson(e as Map<String, dynamic>))
-      .toList());
+  factory TargetFilter.fromJson(List<dynamic> value) => TargetFilter(
+    value.map((e) => FilterEntry.fromJson(e as Map<String, dynamic>)).toList(),
+  );
 
   List<FilterEntry> toJson() => value;
 }
@@ -512,9 +548,6 @@ class RemoteLocation {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'host': host,
-      'port': port,
-    };
+    return {'host': host, 'port': port};
   }
 }

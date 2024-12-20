@@ -37,10 +37,12 @@ void main() {
 
     var unit = parseString(content: fileContent).unit;
 
-    classes.addAll(unit.declarations
-        .whereType<ClassDeclaration>()
-        .where((declaration) => declaration.documentationComment != null)
-        .map(Class.fromDeclaration));
+    classes.addAll(
+      unit.declarations
+          .whereType<ClassDeclaration>()
+          .where((declaration) => declaration.documentationComment != null)
+          .map(Class.fromDeclaration),
+    );
   }
 
   var buffer = StringBuffer();
@@ -103,13 +105,17 @@ class Class {
   Class(this.name, this.documentation);
 
   static Class fromDeclaration(ClassDeclaration declaration) {
-    var clas = Class(declaration.name.toString(),
-        readComment(declaration.documentationComment));
+    var clas = Class(
+      declaration.name.toString(),
+      readComment(declaration.documentationComment),
+    );
 
-    clas.methods.addAll(declaration.members
-        .where((member) => member.documentationComment != null)
-        .map((member) => Method.fromClassMember(clas, member))
-        .nonNulls);
+    clas.methods.addAll(
+      declaration.members
+          .where((member) => member.documentationComment != null)
+          .map((member) => Method.fromClassMember(clas, member))
+          .nonNulls,
+    );
 
     clas.methods.sort((m1, m2) => m1.name.compareTo(m2.name));
 
@@ -129,10 +135,14 @@ class Method {
   final String title, shortTitle, fullSignature;
   final String documentation;
 
-  Method(this.parent, this.name, this.documentation,
-      {required this.title,
-      required this.shortTitle,
-      required this.fullSignature});
+  Method(
+    this.parent,
+    this.name,
+    this.documentation, {
+    required this.title,
+    required this.shortTitle,
+    required this.fullSignature,
+  });
 
   static Method? fromClassMember(Class parent, ClassMember member) {
     String name;
@@ -163,8 +173,14 @@ class Method {
       return null;
     }
 
-    return Method(parent, name, readComment(member.documentationComment),
-        title: title, shortTitle: shortTitle, fullSignature: fullSignature);
+    return Method(
+      parent,
+      name,
+      readComment(member.documentationComment),
+      title: title,
+      shortTitle: shortTitle,
+      fullSignature: fullSignature,
+    );
   }
 
   @override

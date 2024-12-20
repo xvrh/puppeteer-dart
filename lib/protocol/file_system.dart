@@ -10,7 +10,8 @@ class FileSystemApi {
 
   /// Returns: Returns the directory object at the path.
   Future<Directory> getDirectory(
-      BucketFileSystemLocator bucketFileSystemLocator) async {
+    BucketFileSystemLocator bucketFileSystemLocator,
+  ) async {
     var result = await _client.send('FileSystem.getDirectory', {
       'bucketFileSystemLocator': bucketFileSystemLocator,
     });
@@ -29,17 +30,19 @@ class File {
 
   final String type;
 
-  File(
-      {required this.name,
-      required this.lastModified,
-      required this.size,
-      required this.type});
+  File({
+    required this.name,
+    required this.lastModified,
+    required this.size,
+    required this.type,
+  });
 
   factory File.fromJson(Map<String, dynamic> json) {
     return File(
       name: json['name'] as String,
-      lastModified:
-          network.TimeSinceEpoch.fromJson(json['lastModified'] as num),
+      lastModified: network.TimeSinceEpoch.fromJson(
+        json['lastModified'] as num,
+      ),
       size: json['size'] as num,
       type: json['type'] as String,
     );
@@ -63,19 +66,21 @@ class Directory {
   /// Files that are directly nested under this directory.
   final List<File> nestedFiles;
 
-  Directory(
-      {required this.name,
-      required this.nestedDirectories,
-      required this.nestedFiles});
+  Directory({
+    required this.name,
+    required this.nestedDirectories,
+    required this.nestedFiles,
+  });
 
   factory Directory.fromJson(Map<String, dynamic> json) {
     return Directory(
       name: json['name'] as String,
       nestedDirectories:
           (json['nestedDirectories'] as List).map((e) => e as String).toList(),
-      nestedFiles: (json['nestedFiles'] as List)
-          .map((e) => File.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      nestedFiles:
+          (json['nestedFiles'] as List)
+              .map((e) => File.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 
@@ -98,15 +103,17 @@ class BucketFileSystemLocator {
   /// Path to the directory using each path component as an array item.
   final List<String> pathComponents;
 
-  BucketFileSystemLocator(
-      {required this.storageKey,
-      this.bucketName,
-      required this.pathComponents});
+  BucketFileSystemLocator({
+    required this.storageKey,
+    this.bucketName,
+    required this.pathComponents,
+  });
 
   factory BucketFileSystemLocator.fromJson(Map<String, dynamic> json) {
     return BucketFileSystemLocator(
-      storageKey:
-          storage.SerializedStorageKey.fromJson(json['storageKey'] as String),
+      storageKey: storage.SerializedStorageKey.fromJson(
+        json['storageKey'] as String,
+      ),
       bucketName:
           json.containsKey('bucketName') ? json['bucketName'] as String : null,
       pathComponents:

@@ -469,8 +469,9 @@ This searches for a target in all browser contexts.
 
 An example of finding a target for a page opened via window.open:
 ```dart
-var newWindowTarget =
-    browser.waitForTarget((target) => target.url == 'https://example.com/');
+var newWindowTarget = browser.waitForTarget(
+  (target) => target.url == 'https://example.com/',
+);
 await page.evaluate("() => window.open('https://example.com/')");
 await newWindowTarget;
 ```
@@ -504,8 +505,9 @@ Clears all permission overrides for the browser context.
 
 ```dart
 var context = browser.defaultBrowserContext;
-await context.overridePermissions(
-    'https://example.com', [PermissionType.clipboardReadWrite]);
+await context.overridePermissions('https://example.com', [
+  PermissionType.clipboardReadWrite,
+]);
 // do stuff ..
 await context.clearPermissionOverrides();
 ```
@@ -563,14 +565,15 @@ browserContext.onTargetDestroyed → Stream<Target>
 ```
 
 #### browserContext.overridePermissions(...)
-origin <string> The origin to grant permissions to, e.g. "https://example.com".
-permissions <Array<string>> An array of permissions to grant. All
+origin [string] The origin to grant permissions to, e.g. "https://example.com".
+permissions [Array<string>] An array of permissions to grant. All
 permissions that are not listed here will be automatically denied.
 
 ```dart
 var context = browser.defaultBrowserContext;
-await context.overridePermissions(
-    'https://html5demos.com', [PermissionType.geolocation]);
+await context.overridePermissions('https://html5demos.com', [
+  PermissionType.geolocation,
+]);
 ```
 
 ```dart
@@ -700,12 +703,18 @@ the promise to resolve and return its value.
 
 Examples:
 ```dart
-var searchValue =
-    await page.$eval('#search', 'function (el) { return el.value; }');
+var searchValue = await page.$eval(
+  '#search',
+  'function (el) { return el.value; }',
+);
 var preloadHref = await page.$eval(
-    'link[rel=preload]', 'function (el) { return el.href; }');
+  'link[rel=preload]',
+  'function (el) { return el.href; }',
+);
 var html = await page.$eval(
-    '.main-container', 'function (e) { return e.outerHTML; }');
+  '.main-container',
+  'function (e) { return e.outerHTML; }',
+);
 ```
 
 Shortcut for [Page.mainFrame.$eval(selector, pageFunction)].
@@ -812,10 +821,7 @@ var response = await responseFuture;
 
 Or simpler, if you don't need the [Response]
 ```dart
-await Future.wait([
-  page.waitForNavigation(),
-  page.click('a'),
-]);
+await Future.wait([page.waitForNavigation(), page.click('a')]);
 ```
 
 Shortcut for [Page.mainFrame.click]
@@ -847,10 +853,7 @@ await page.clickAndWaitForNavigation('input#submitData');
 as opposed to:
 
 ```dart
-await Future.wait([
-  page.waitForNavigation(),
-  page.click('input#submitData'),
-]);
+await Future.wait([page.waitForNavigation(), page.click('input#submitData')]);
 ```
 
 ```dart
@@ -997,9 +1000,12 @@ bigint literals.
 
 Passing arguments to `pageFunction`:
 ```dart
-var result = await page.evaluate<int>('''x => {
+var result = await page.evaluate<int>(
+  '''x => {
           return Promise.resolve(8 * x);
-        }''', args: [7]);
+        }''',
+  args: [7],
+);
 print(result); // prints "56"
 ```
 
@@ -1046,8 +1052,10 @@ var aHandle = await page.evaluateHandle('document');
 [JSHandle] instances can be passed as arguments to the [Page.evaluateHandle]:
 ```dart
 var aHandle = await page.evaluateHandle('() => document.body');
-var resultHandle =
-    await page.evaluateHandle('body => body.innerHTML', args: [aHandle]);
+var resultHandle = await page.evaluateHandle(
+  'body => body.innerHTML',
+  args: [aHandle],
+);
 print(await resultHandle.jsonValue);
 await resultHandle.dispose();
 ```
@@ -1121,8 +1129,10 @@ void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   page.onConsole.listen((msg) => print(msg.text));
-  await page.exposeFunction('md5',
-      (String text) => crypto.md5.convert(utf8.encode(text)).toString());
+  await page.exposeFunction(
+    'md5',
+    (String text) => crypto.md5.convert(utf8.encode(text)).toString(),
+  );
   await page.evaluate(r'''async () => {
             // use window.md5 to compute hashes
             const myString = 'PUPPETEER';
@@ -1670,8 +1680,11 @@ error.
 
 ```dart
 await page.select('select#colors', ['blue']); // single selection
-await page
-    .select('select#colors', ['red', 'green', 'blue']); // multiple selections
+await page.select('select#colors', [
+  'red',
+  'green',
+  'blue',
+]); // multiple selections
 ```
 
 Shortcut for [Page.mainFrame.select]
@@ -1952,8 +1965,10 @@ To pass arguments from node.js to the predicate of `page.waitForFunction` functi
 
 ```dart
 var selector = '.foo';
-await page.waitForFunction('selector => !!document.querySelector(selector)',
-    args: [selector]);
+await page.waitForFunction(
+  'selector => !!document.querySelector(selector)',
+  args: [selector],
+);
 ```
 
 Shortcut for [page.mainFrame().waitForFunction(pageFunction[, options[, ...args]])](#framewaitforfunctionpagefunction-options-args).
@@ -2016,9 +2031,11 @@ var firstRequest = page.waitForRequest('https://example.com');
 // You can achieve the same effect (and more powerful) with the `onRequest`
 // stream.
 var finalRequest = page.onRequest
-    .where((request) =>
-        request.url.startsWith('https://example.com') &&
-        request.method == 'GET')
+    .where(
+      (request) =>
+          request.url.startsWith('https://example.com') &&
+          request.method == 'GET',
+    )
     .first
     .timeout(Duration(seconds: 30));
 
@@ -2130,10 +2147,12 @@ The events `workercreated` and `workerdestroyed` are emitted on the page
 object to signal the worker lifecycle.
 
 ```dart
-page.onWorkerCreated
-    .listen((worker) => print('Worker created: ${worker.url}'));
-page.onWorkerDestroyed
-    .listen((worker) => print('Worker destroyed: ${worker.url}'));
+page.onWorkerCreated.listen(
+  (worker) => print('Worker created: ${worker.url}'),
+);
+page.onWorkerDestroyed.listen(
+  (worker) => print('Worker destroyed: ${worker.url}'),
+);
 print('Current workers:');
 for (var worker in page.workers) {
   print('  ${worker.url}');
@@ -2453,11 +2472,16 @@ Dispatches a `mousewheel` event.
 An example of zooming into an element:
 ```dart
 await page.goto(
-    r'https://mdn.mozillademos.org/en-US/docs/Web/API/Element/wheel_event$samples/Scaling_an_element_via_the_wheel?revision=1587366');
+  r'https://mdn.mozillademos.org/en-US/docs/Web/API/Element/wheel_event$samples/Scaling_an_element_via_the_wheel?revision=1587366',
+);
 var elem = await page.$('div');
 var boundingBox = (await elem.boundingBox)!;
-await page.mouse.move(Point(boundingBox.left + boundingBox.width / 2,
-    boundingBox.top + boundingBox.height / 2));
+await page.mouse.move(
+  Point(
+    boundingBox.left + boundingBox.width / 2,
+    boundingBox.top + boundingBox.height / 2,
+  ),
+);
 await page.mouse.wheel(deltaY: -100);
 ```
 
@@ -2663,12 +2687,18 @@ selector, the method throws an error.
 Examples:
 
 ```dart
-var searchValue =
-    await frame.$eval('#search', 'function (el) { return el.value; }');
+var searchValue = await frame.$eval(
+  '#search',
+  'function (el) { return el.value; }',
+);
 var preloadHref = await frame.$eval(
-    'link[rel=preload]', 'function (el) { return el.href; }');
+  'link[rel=preload]',
+  'function (el) { return el.href; }',
+);
 var html = await frame.$eval(
-    '.main-container', 'function (e) { return e.outerHTML; }');
+  '.main-container',
+  'function (e) { return e.outerHTML; }',
+);
 ```
 
 [selector]: A selector to query frame for
@@ -2767,9 +2797,12 @@ bigint literals.
 
 Passing arguments to `pageFunction`:
 ```dart
-var result = await frame.evaluate<int>('''x => {
+var result = await frame.evaluate<int>(
+  '''x => {
           return Promise.resolve(8 * x);
-        }''', args: [7]);
+        }''',
+  args: [7],
+);
 print(result); // prints "56"
 ```
 
@@ -2814,8 +2847,10 @@ var aHandle = await frame.evaluateHandle('document');
 [JSHandle] instances can be passed as arguments to the [Frame.evaluateHandle]:
 ```dart
 var aHandle = await frame.evaluateHandle('() => document.body');
-var resultHandle =
-    await frame.evaluateHandle('body => body.innerHTML', args: [aHandle]);
+var resultHandle = await frame.evaluateHandle(
+  'body => body.innerHTML',
+  args: [aHandle],
+);
 print(await resultHandle.jsonValue);
 await resultHandle.dispose();
 ```
@@ -2950,8 +2985,11 @@ error.
 
 ```dart
 await frame.select('select#colors', ['blue']); // single selection
-await frame
-    .select('select#colors', ['red', 'green', 'blue']); // multiple selections
+await frame.select('select#colors', [
+  'red',
+  'green',
+  'blue',
+]); // multiple selections
 ```
 
 Shortcut for [Page.mainFrame.select]
@@ -3069,8 +3107,9 @@ To pass arguments from node.js to the predicate of `page.waitForFunction` functi
 ```dart
 var selector = '.foo';
 await page.mainFrame.waitForFunction(
-    'selector => !!document.querySelector(selector)',
-    args: [selector]);
+  'selector => !!document.querySelector(selector)',
+  args: [selector],
+);
 ```
 
 ```dart
@@ -3221,15 +3260,18 @@ print(aHandle); // Handle for the global object.
 A string can also be passed in instead of a function.
 
 ```dart
-var aHandle =
-    await context.evaluateHandle('1 + 2'); // Handle for the '3' object.
+var aHandle = await context.evaluateHandle(
+  '1 + 2',
+); // Handle for the '3' object.
 ```
 
 [JSHandle] instances can be passed as arguments to the `executionContext.evaluateHandle`:
 ```dart
 var aHandle = await context.evaluateHandle('() => document.body');
-var resultHandle =
-    await context.evaluateHandle('body => body.innerHTML', args: [aHandle]);
+var resultHandle = await context.evaluateHandle(
+  'body => body.innerHTML',
+  args: [aHandle],
+);
 print(await resultHandle.jsonValue); // prints body's innerHTML
 await aHandle.dispose();
 await resultHandle.dispose();
@@ -3440,8 +3482,9 @@ Examples:
 ```dart
 var feedHandle = await page.$('.feed');
 expect(
-    await feedHandle.$$eval('.tweet', 'nodes => nodes.map(n => n.innerText)'),
-    equals(['Hello!', 'Hi!']));
+  await feedHandle.$$eval('.tweet', 'nodes => nodes.map(n => n.innerText)'),
+  equals(['Hello!', 'Hi!']),
+);
 ```
 
 Parameters:
@@ -3712,9 +3755,10 @@ Exception is immediately thrown if the request interception is not enabled.
 await page.setRequestInterception(true);
 page.onRequest.listen((request) {
   // Override headers
-  var headers = Map<String, String>.from(request.headers)
-    ..['foo'] = 'bar'
-    ..remove('origin');
+  var headers =
+      Map<String, String>.from(request.headers)
+        ..['foo'] = 'bar'
+        ..remove('origin');
   request.continueRequest(headers: headers);
 });
 ```
@@ -3985,8 +4029,10 @@ executed code:
 
 ```dart
 // Enable both JavaScript and CSS coverage
-await Future.wait(
-    [page.coverage.startJSCoverage(), page.coverage.startCSSCoverage()]);
+await Future.wait([
+  page.coverage.startJSCoverage(),
+  page.coverage.startCSSCoverage(),
+]);
 // Navigate to page
 await page.goto('https://example.com');
 // Disable both JavaScript and CSS coverage

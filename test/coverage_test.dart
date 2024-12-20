@@ -34,17 +34,14 @@ void main() {
   group('JSCoverage', () {
     test('should work', () async {
       await page.coverage.startJSCoverage();
-      await page.goto(server.prefix + '/jscoverage/simple.html',
-          wait: Until.networkIdle);
+      await page.goto(
+        server.prefix + '/jscoverage/simple.html',
+        wait: Until.networkIdle,
+      );
       var coverage = await page.coverage.stopJSCoverage();
       expect(coverage.length, 1);
       expect(coverage[0].url, contains('/jscoverage/simple.html'));
-      expect(
-          coverage[0].ranges,
-          equals([
-            Range(0, 17),
-            Range(35, 61),
-          ]));
+      expect(coverage[0].ranges, equals([Range(0, 17), Range(35, 61)]));
     });
     test('should report sourceURLs', () async {
       await page.coverage.startJSCoverage();
@@ -59,26 +56,30 @@ void main() {
       var coverage = await page.coverage.stopJSCoverage();
       expect(coverage.length, 1);
     });
-    test('shouldnt ignore eval() scripts if reportAnonymousScripts is true',
-        () async {
-      await page.coverage.startJSCoverage(reportAnonymousScripts: true);
-      await page.goto(server.prefix + '/jscoverage/eval.html');
-      var coverage = await page.coverage.stopJSCoverage();
-      expect(
-          coverage.firstWhere((entry) => entry.url.startsWith('debugger://')),
-          isNotNull);
-      expect(coverage.length, 2);
-    });
     test(
-        'should ignore pptr internal scripts if reportAnonymousScripts is true',
-        () async {
-      await page.coverage.startJSCoverage(reportAnonymousScripts: true);
-      await page.goto(server.emptyPage);
-      await page.evaluate('console.log("foo")');
-      await page.evaluate("() => console.log('bar')");
-      var coverage = await page.coverage.stopJSCoverage();
-      expect(coverage.length, 0);
-    });
+      'shouldnt ignore eval() scripts if reportAnonymousScripts is true',
+      () async {
+        await page.coverage.startJSCoverage(reportAnonymousScripts: true);
+        await page.goto(server.prefix + '/jscoverage/eval.html');
+        var coverage = await page.coverage.stopJSCoverage();
+        expect(
+          coverage.firstWhere((entry) => entry.url.startsWith('debugger://')),
+          isNotNull,
+        );
+        expect(coverage.length, 2);
+      },
+    );
+    test(
+      'should ignore pptr internal scripts if reportAnonymousScripts is true',
+      () async {
+        await page.coverage.startJSCoverage(reportAnonymousScripts: true);
+        await page.goto(server.emptyPage);
+        await page.evaluate('console.log("foo")');
+        await page.evaluate("() => console.log('bar')");
+        var coverage = await page.coverage.stopJSCoverage();
+        expect(coverage.length, 0);
+      },
+    );
     test('should report multiple scripts', () async {
       await page.coverage.startJSCoverage();
       await page.goto(server.prefix + '/jscoverage/multiple.html');
@@ -96,8 +97,10 @@ void main() {
       var entry = coverage[0];
       expect(entry.ranges.length, 1);
       var range = entry.ranges[0];
-      expect(entry.text.substring(range.start, range.end),
-          "console.log('used!');");
+      expect(
+        entry.text.substring(range.start, range.end),
+        "console.log('used!');",
+      );
     });
     test('should report scripts that have no coverage', () async {
       await page.coverage.startJSCoverage();
@@ -113,13 +116,17 @@ void main() {
       await page.goto(server.prefix + '/jscoverage/involved.html');
       var coverage = await page.coverage.stopJSCoverage();
 
-      var formattedCoverage = JsonEncoder.withIndent('  ')
-          .convert(coverage)
-          .replaceAll(RegExp(r':\d+/'), ':<PORT>/');
+      var formattedCoverage = JsonEncoder.withIndent(
+        '  ',
+      ).convert(coverage).replaceAll(RegExp(r':\d+/'), ':<PORT>/');
       expect(
-          normalizeNewLines(formattedCoverage),
-          equals(normalizeNewLines(
-              File('test/golden/jscoverage-involved.txt').readAsStringSync())));
+        normalizeNewLines(formattedCoverage),
+        equals(
+          normalizeNewLines(
+            File('test/golden/jscoverage-involved.txt').readAsStringSync(),
+          ),
+        ),
+      );
     });
     group('resetOnNavigation', () {
       test('should report scripts across navigations when disabled', () async {
@@ -129,14 +136,16 @@ void main() {
         var coverage = await page.coverage.stopJSCoverage();
         expect(coverage.length, equals(2));
       });
-      test('should NOT report scripts across navigations when enabled',
-          () async {
-        await page.coverage.startJSCoverage(); // Enabled by default.
-        await page.goto(server.prefix + '/jscoverage/multiple.html');
-        await page.goto(server.emptyPage);
-        var coverage = await page.coverage.stopJSCoverage();
-        expect(coverage.length, equals(0));
-      });
+      test(
+        'should NOT report scripts across navigations when enabled',
+        () async {
+          await page.coverage.startJSCoverage(); // Enabled by default.
+          await page.goto(server.prefix + '/jscoverage/multiple.html');
+          await page.goto(server.emptyPage);
+          var coverage = await page.coverage.stopJSCoverage();
+          expect(coverage.length, equals(0));
+        },
+      );
     });
   });
 
@@ -149,8 +158,10 @@ void main() {
       expect(coverage[0].url, contains('/csscoverage/simple.html'));
       expect(coverage[0].ranges, equals([Range(1, 22)]));
       var range = coverage[0].ranges[0];
-      expect(coverage[0].text.substring(range.start, range.end),
-          'div { color: green; }');
+      expect(
+        coverage[0].text.substring(range.start, range.end),
+        'div { color: green; }',
+      );
     });
     test('should report sourceURLs', () async {
       await page.coverage.startCSSCoverage();
@@ -188,20 +199,25 @@ void main() {
       await page.coverage.startCSSCoverage();
       await page.goto(server.prefix + '/csscoverage/involved.html');
       var coverage = await page.coverage.stopCSSCoverage();
-      var formattedCoverage = JsonEncoder.withIndent('  ')
-          .convert(coverage)
-          .replaceAll(RegExp(r':\d+/'), ':<PORT>/');
+      var formattedCoverage = JsonEncoder.withIndent(
+        '  ',
+      ).convert(coverage).replaceAll(RegExp(r':\d+/'), ':<PORT>/');
       expect(
-          normalizeNewLines(formattedCoverage),
-          equals(normalizeNewLines(File('test/golden/csscoverage-involved.txt')
-              .readAsStringSync())));
+        normalizeNewLines(formattedCoverage),
+        equals(
+          normalizeNewLines(
+            File('test/golden/csscoverage-involved.txt').readAsStringSync(),
+          ),
+        ),
+      );
     });
     test('should ignore injected stylesheets', () async {
       await page.coverage.startCSSCoverage();
       await page.addStyleTag(content: 'body { margin: 10px;}');
       // trigger style recalc
-      var margin = await page
-          .evaluate('() => window.getComputedStyle(document.body).margin');
+      var margin = await page.evaluate(
+        '() => window.getComputedStyle(document.body).margin',
+      );
       expect(margin, equals('10px'));
       var coverage = await page.coverage.stopCSSCoverage();
       expect(coverage.length, equals(0));
@@ -224,7 +240,8 @@ void main() {
     });
     test('should work with a recently loaded stylesheet', () async {
       await page.coverage.startCSSCoverage();
-      await page.evaluate('''async url => {
+      await page.evaluate(
+        '''async url => {
 document.body.textContent = 'hello, world';
 
 var link = document.createElement('link');
@@ -232,7 +249,9 @@ link.rel = 'stylesheet';
 link.href = url;
 document.head.appendChild(link);
 await new Promise(x => link.onload = x);
-}''', args: [server.prefix + '/csscoverage/stylesheet1.css']);
+}''',
+        args: [server.prefix + '/csscoverage/stylesheet1.css'],
+      );
       var coverage = await page.coverage.stopCSSCoverage();
       expect(coverage.length, equals(1));
     });

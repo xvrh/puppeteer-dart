@@ -62,29 +62,37 @@ class Accessibility {
     var nodes = await _devTools.accessibility.getFullAXTree();
     BackendNodeId? backendNodeId;
     if (root != null) {
-      var node = await _devTools.dom
-          .describeNode(objectId: root.remoteObject.objectId);
+      var node = await _devTools.dom.describeNode(
+        objectId: root.remoteObject.objectId,
+      );
       backendNodeId = node.backendNodeId;
     }
     var defaultRoot = _AXNode.createTree(nodes);
     _AXNode? needle = defaultRoot;
     if (backendNodeId != null) {
-      needle = defaultRoot
-          .find((node) => node._payload.backendDOMNodeId == backendNodeId);
+      needle = defaultRoot.find(
+        (node) => node._payload.backendDOMNodeId == backendNodeId,
+      );
       if (needle == null) return AXNode.empty;
     }
     if (!interestingOnly) return _serializeTree(needle)[0];
 
     var interestingNodes = <_AXNode>{};
-    _collectInterestingNodes(interestingNodes, defaultRoot,
-        insideControl: false);
+    _collectInterestingNodes(
+      interestingNodes,
+      defaultRoot,
+      insideControl: false,
+    );
     if (!interestingNodes.contains(needle)) return AXNode.empty;
     return _serializeTree(needle, whitelistedNodes: interestingNodes)[0];
   }
 }
 
-void _collectInterestingNodes(Set<_AXNode> collection, _AXNode node,
-    {required bool insideControl}) {
+void _collectInterestingNodes(
+  Set<_AXNode> collection,
+  _AXNode node, {
+  required bool insideControl,
+}) {
   if (node.isInteresting(insideControl: insideControl)) {
     collection.add(node);
   }
@@ -126,62 +134,62 @@ class AXNode {
 
   final Map<String, dynamic> _properties;
 
-  AXNode(
-      {String? role,
-      String? name,
-      Object? value,
-      String? description,
-      String? keyShortcuts,
-      String? roleDescription,
-      String? valueText,
-      bool? disabled,
-      bool? expanded,
-      bool? focused,
-      bool? modal,
-      bool? multiLine,
-      bool? multiSelectable,
-      bool? readonly,
-      bool? required,
-      bool? selected,
-      TriState? checked,
-      TriState? pressed,
-      num? level,
-      num? valueMin,
-      num? valueMax,
-      String? autocomplete,
-      String? hasPopup,
-      String? invalid,
-      String? orientation,
-      List<AXNode>? children})
-      : children = children ?? <AXNode>[],
-        _properties = {
-          'role': role,
-          'name': name,
-          'value': value,
-          'description': description,
-          'keyShortcuts': keyShortcuts,
-          'roleDescription': roleDescription,
-          'valueText': valueText,
-          'disabled': disabled,
-          'expanded': expanded,
-          'focused': focused,
-          'modal': modal,
-          'multiLine': multiLine,
-          'multiSelectable': multiSelectable,
-          'readonly': readonly,
-          'required': required,
-          'selected': selected,
-          'checked': checked,
-          'pressed': pressed,
-          'level': level,
-          'valueMin': valueMin,
-          'valueMax': valueMax,
-          'autocomplete': autocomplete,
-          'hasPopup': hasPopup,
-          'invalid': invalid,
-          'orientation': orientation,
-          'children': children,
-        }..removeWhere((k, v) => v == null);
+  AXNode({
+    String? role,
+    String? name,
+    Object? value,
+    String? description,
+    String? keyShortcuts,
+    String? roleDescription,
+    String? valueText,
+    bool? disabled,
+    bool? expanded,
+    bool? focused,
+    bool? modal,
+    bool? multiLine,
+    bool? multiSelectable,
+    bool? readonly,
+    bool? required,
+    bool? selected,
+    TriState? checked,
+    TriState? pressed,
+    num? level,
+    num? valueMin,
+    num? valueMax,
+    String? autocomplete,
+    String? hasPopup,
+    String? invalid,
+    String? orientation,
+    List<AXNode>? children,
+  }) : children = children ?? <AXNode>[],
+       _properties = {
+         'role': role,
+         'name': name,
+         'value': value,
+         'description': description,
+         'keyShortcuts': keyShortcuts,
+         'roleDescription': roleDescription,
+         'valueText': valueText,
+         'disabled': disabled,
+         'expanded': expanded,
+         'focused': focused,
+         'modal': modal,
+         'multiLine': multiLine,
+         'multiSelectable': multiSelectable,
+         'readonly': readonly,
+         'required': required,
+         'selected': selected,
+         'checked': checked,
+         'pressed': pressed,
+         'level': level,
+         'valueMin': valueMin,
+         'valueMax': valueMax,
+         'autocomplete': autocomplete,
+         'hasPopup': hasPopup,
+         'invalid': invalid,
+         'orientation': orientation,
+         'children': children,
+       }..removeWhere((k, v) => v == null);
 
   /// The [role](https://www.w3.org/TR/wai-aria/#usage_intro).
   String? get role => _properties['role'] as String?;
@@ -261,8 +269,10 @@ class AXNode {
   /// Child [_AXNode]s of this node, if any.
   final List<AXNode> children;
 
-  Map<String, dynamic> get _propertiesAndChildren =>
-      {..._properties, 'children': children};
+  Map<String, dynamic> get _propertiesAndChildren => {
+    ..._properties,
+    'children': children,
+  };
 
   @override
   String toString() {
@@ -275,8 +285,10 @@ class AXNode {
   @override
   bool operator ==(other) =>
       other is AXNode &&
-      const DeepCollectionEquality.unordered()
-          .equals(_propertiesAndChildren, other._propertiesAndChildren);
+      const DeepCollectionEquality.unordered().equals(
+        _propertiesAndChildren,
+        other._propertiesAndChildren,
+      );
 
   @override
   int get hashCode =>
@@ -320,8 +332,8 @@ class _AXNode {
   bool? _cachedHasFocusableChild;
 
   _AXNode(this._payload)
-      : _name = _payload.name?.value as String? ?? '',
-        _role = _payload.role?.value as String? ?? 'Unknown' {
+    : _name = _payload.name?.value as String? ?? '',
+      _role = _payload.role?.value as String? ?? 'Unknown' {
     if (_payload.properties != null) {
       for (var property in _payload.properties!) {
         if (property.name == AXPropertyName.editable) {

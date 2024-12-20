@@ -15,10 +15,13 @@ class IndexedDBApi {
   /// [storageBucket] Storage bucket. If not specified, it uses the default bucket.
   /// [databaseName] Database name.
   /// [objectStoreName] Object store name.
-  Future<void> clearObjectStore(String databaseName, String objectStoreName,
-      {String? securityOrigin,
-      String? storageKey,
-      storage.StorageBucket? storageBucket}) async {
+  Future<void> clearObjectStore(
+    String databaseName,
+    String objectStoreName, {
+    String? securityOrigin,
+    String? storageKey,
+    storage.StorageBucket? storageBucket,
+  }) async {
     await _client.send('IndexedDB.clearObjectStore', {
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
@@ -34,10 +37,12 @@ class IndexedDBApi {
   /// [storageKey] Storage key.
   /// [storageBucket] Storage bucket. If not specified, it uses the default bucket.
   /// [databaseName] Database name.
-  Future<void> deleteDatabase(String databaseName,
-      {String? securityOrigin,
-      String? storageKey,
-      storage.StorageBucket? storageBucket}) async {
+  Future<void> deleteDatabase(
+    String databaseName, {
+    String? securityOrigin,
+    String? storageKey,
+    storage.StorageBucket? storageBucket,
+  }) async {
     await _client.send('IndexedDB.deleteDatabase', {
       'databaseName': databaseName,
       if (securityOrigin != null) 'securityOrigin': securityOrigin,
@@ -53,10 +58,13 @@ class IndexedDBApi {
   /// [storageBucket] Storage bucket. If not specified, it uses the default bucket.
   /// [keyRange] Range of entry keys to delete
   Future<void> deleteObjectStoreEntries(
-      String databaseName, String objectStoreName, KeyRange keyRange,
-      {String? securityOrigin,
-      String? storageKey,
-      storage.StorageBucket? storageBucket}) async {
+    String databaseName,
+    String objectStoreName,
+    KeyRange keyRange, {
+    String? securityOrigin,
+    String? storageKey,
+    storage.StorageBucket? storageBucket,
+  }) async {
     await _client.send('IndexedDB.deleteObjectStoreEntries', {
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
@@ -88,12 +96,17 @@ class IndexedDBApi {
   /// [skipCount] Number of records to skip.
   /// [pageSize] Number of records to fetch.
   /// [keyRange] Key range.
-  Future<RequestDataResult> requestData(String databaseName,
-      String objectStoreName, String indexName, int skipCount, int pageSize,
-      {String? securityOrigin,
-      String? storageKey,
-      storage.StorageBucket? storageBucket,
-      KeyRange? keyRange}) async {
+  Future<RequestDataResult> requestData(
+    String databaseName,
+    String objectStoreName,
+    String indexName,
+    int skipCount,
+    int pageSize, {
+    String? securityOrigin,
+    String? storageKey,
+    storage.StorageBucket? storageBucket,
+    KeyRange? keyRange,
+  }) async {
     var result = await _client.send('IndexedDB.requestData', {
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
@@ -116,10 +129,12 @@ class IndexedDBApi {
   /// [databaseName] Database name.
   /// [objectStoreName] Object store name.
   Future<GetMetadataResult> getMetadata(
-      String databaseName, String objectStoreName,
-      {String? securityOrigin,
-      String? storageKey,
-      storage.StorageBucket? storageBucket}) async {
+    String databaseName,
+    String objectStoreName, {
+    String? securityOrigin,
+    String? storageKey,
+    storage.StorageBucket? storageBucket,
+  }) async {
     var result = await _client.send('IndexedDB.getMetadata', {
       'databaseName': databaseName,
       'objectStoreName': objectStoreName,
@@ -137,10 +152,12 @@ class IndexedDBApi {
   /// [storageBucket] Storage bucket. If not specified, it uses the default bucket.
   /// [databaseName] Database name.
   /// Returns: Database with an array of object stores.
-  Future<DatabaseWithObjectStores> requestDatabase(String databaseName,
-      {String? securityOrigin,
-      String? storageKey,
-      storage.StorageBucket? storageBucket}) async {
+  Future<DatabaseWithObjectStores> requestDatabase(
+    String databaseName, {
+    String? securityOrigin,
+    String? storageKey,
+    storage.StorageBucket? storageBucket,
+  }) async {
     var result = await _client.send('IndexedDB.requestDatabase', {
       'databaseName': databaseName,
       if (securityOrigin != null) 'securityOrigin': securityOrigin,
@@ -148,7 +165,8 @@ class IndexedDBApi {
       if (storageBucket != null) 'storageBucket': storageBucket,
     });
     return DatabaseWithObjectStores.fromJson(
-        result['databaseWithObjectStores'] as Map<String, dynamic>);
+      result['databaseWithObjectStores'] as Map<String, dynamic>,
+    );
   }
 
   /// Requests database names for given security origin.
@@ -157,10 +175,11 @@ class IndexedDBApi {
   /// [storageKey] Storage key.
   /// [storageBucket] Storage bucket. If not specified, it uses the default bucket.
   /// Returns: Database names for origin.
-  Future<List<String>> requestDatabaseNames(
-      {String? securityOrigin,
-      String? storageKey,
-      storage.StorageBucket? storageBucket}) async {
+  Future<List<String>> requestDatabaseNames({
+    String? securityOrigin,
+    String? storageKey,
+    storage.StorageBucket? storageBucket,
+  }) async {
     var result = await _client.send('IndexedDB.requestDatabaseNames', {
       if (securityOrigin != null) 'securityOrigin': securityOrigin,
       if (storageKey != null) 'storageKey': storageKey,
@@ -177,14 +196,17 @@ class RequestDataResult {
   /// If true, there are more entries to fetch in the given range.
   final bool hasMore;
 
-  RequestDataResult(
-      {required this.objectStoreDataEntries, required this.hasMore});
+  RequestDataResult({
+    required this.objectStoreDataEntries,
+    required this.hasMore,
+  });
 
   factory RequestDataResult.fromJson(Map<String, dynamic> json) {
     return RequestDataResult(
-      objectStoreDataEntries: (json['objectStoreDataEntries'] as List)
-          .map((e) => DataEntry.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      objectStoreDataEntries:
+          (json['objectStoreDataEntries'] as List)
+              .map((e) => DataEntry.fromJson(e as Map<String, dynamic>))
+              .toList(),
       hasMore: json['hasMore'] as bool? ?? false,
     );
   }
@@ -199,8 +221,10 @@ class GetMetadataResult {
   /// is true.
   final num keyGeneratorValue;
 
-  GetMetadataResult(
-      {required this.entriesCount, required this.keyGeneratorValue});
+  GetMetadataResult({
+    required this.entriesCount,
+    required this.keyGeneratorValue,
+  });
 
   factory GetMetadataResult.fromJson(Map<String, dynamic> json) {
     return GetMetadataResult(
@@ -222,16 +246,20 @@ class DatabaseWithObjectStores {
   /// Object stores in this database.
   final List<ObjectStore> objectStores;
 
-  DatabaseWithObjectStores(
-      {required this.name, required this.version, required this.objectStores});
+  DatabaseWithObjectStores({
+    required this.name,
+    required this.version,
+    required this.objectStores,
+  });
 
   factory DatabaseWithObjectStores.fromJson(Map<String, dynamic> json) {
     return DatabaseWithObjectStores(
       name: json['name'] as String,
       version: json['version'] as num,
-      objectStores: (json['objectStores'] as List)
-          .map((e) => ObjectStore.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      objectStores:
+          (json['objectStores'] as List)
+              .map((e) => ObjectStore.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 
@@ -258,20 +286,22 @@ class ObjectStore {
   /// Indexes in this object store.
   final List<ObjectStoreIndex> indexes;
 
-  ObjectStore(
-      {required this.name,
-      required this.keyPath,
-      required this.autoIncrement,
-      required this.indexes});
+  ObjectStore({
+    required this.name,
+    required this.keyPath,
+    required this.autoIncrement,
+    required this.indexes,
+  });
 
   factory ObjectStore.fromJson(Map<String, dynamic> json) {
     return ObjectStore(
       name: json['name'] as String,
       keyPath: KeyPath.fromJson(json['keyPath'] as Map<String, dynamic>),
       autoIncrement: json['autoIncrement'] as bool? ?? false,
-      indexes: (json['indexes'] as List)
-          .map((e) => ObjectStoreIndex.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      indexes:
+          (json['indexes'] as List)
+              .map((e) => ObjectStoreIndex.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 
@@ -299,11 +329,12 @@ class ObjectStoreIndex {
   /// If true, index allows multiple entries for a key.
   final bool multiEntry;
 
-  ObjectStoreIndex(
-      {required this.name,
-      required this.keyPath,
-      required this.unique,
-      required this.multiEntry});
+  ObjectStoreIndex({
+    required this.name,
+    required this.keyPath,
+    required this.unique,
+    required this.multiEntry,
+  });
 
   factory ObjectStoreIndex.fromJson(Map<String, dynamic> json) {
     return ObjectStoreIndex(
@@ -349,11 +380,12 @@ class Key {
       number: json.containsKey('number') ? json['number'] as num : null,
       string: json.containsKey('string') ? json['string'] as String : null,
       date: json.containsKey('date') ? json['date'] as num : null,
-      array: json.containsKey('array')
-          ? (json['array'] as List)
-              .map((e) => Key.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
+      array:
+          json.containsKey('array')
+              ? (json['array'] as List)
+                  .map((e) => Key.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : null,
     );
   }
 
@@ -372,8 +404,7 @@ enum KeyType {
   number('number'),
   string('string'),
   date('date'),
-  array('array'),
-  ;
+  array('array');
 
   final String value;
 
@@ -402,20 +433,23 @@ class KeyRange {
   /// If true upper bound is open.
   final bool upperOpen;
 
-  KeyRange(
-      {this.lower,
-      this.upper,
-      required this.lowerOpen,
-      required this.upperOpen});
+  KeyRange({
+    this.lower,
+    this.upper,
+    required this.lowerOpen,
+    required this.upperOpen,
+  });
 
   factory KeyRange.fromJson(Map<String, dynamic> json) {
     return KeyRange(
-      lower: json.containsKey('lower')
-          ? Key.fromJson(json['lower'] as Map<String, dynamic>)
-          : null,
-      upper: json.containsKey('upper')
-          ? Key.fromJson(json['upper'] as Map<String, dynamic>)
-          : null,
+      lower:
+          json.containsKey('lower')
+              ? Key.fromJson(json['lower'] as Map<String, dynamic>)
+              : null,
+      upper:
+          json.containsKey('upper')
+              ? Key.fromJson(json['upper'] as Map<String, dynamic>)
+              : null,
       lowerOpen: json['lowerOpen'] as bool? ?? false,
       upperOpen: json['upperOpen'] as bool? ?? false,
     );
@@ -448,9 +482,11 @@ class DataEntry {
     return DataEntry(
       key: runtime.RemoteObject.fromJson(json['key'] as Map<String, dynamic>),
       primaryKey: runtime.RemoteObject.fromJson(
-          json['primaryKey'] as Map<String, dynamic>),
-      value:
-          runtime.RemoteObject.fromJson(json['value'] as Map<String, dynamic>),
+        json['primaryKey'] as Map<String, dynamic>,
+      ),
+      value: runtime.RemoteObject.fromJson(
+        json['value'] as Map<String, dynamic>,
+      ),
     );
   }
 
@@ -480,9 +516,10 @@ class KeyPath {
     return KeyPath(
       type: KeyPathType.fromJson(json['type'] as String),
       string: json.containsKey('string') ? json['string'] as String : null,
-      array: json.containsKey('array')
-          ? (json['array'] as List).map((e) => e as String).toList()
-          : null,
+      array:
+          json.containsKey('array')
+              ? (json['array'] as List).map((e) => e as String).toList()
+              : null,
     );
   }
 
@@ -498,8 +535,7 @@ class KeyPath {
 enum KeyPathType {
   null$('null'),
   string('string'),
-  array('array'),
-  ;
+  array('array');
 
   final String value;
 

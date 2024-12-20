@@ -7,7 +7,7 @@ class Device {
   final DeviceViewport viewport;
 
   const Device(this.name, {required this.viewport, required String userAgent})
-      : _userAgentTemplate = userAgent;
+    : _userAgentTemplate = userAgent;
 
   String userAgent(String chromeVersion) =>
       _userAgentTemplate.replaceAll('%s', chromeVersion);
@@ -31,21 +31,23 @@ class DeviceViewport {
   final bool isLandscape;
   final bool hasTouch;
 
-  const DeviceViewport(
-      {this.width = 1280,
-      this.height = 1024,
-      this.deviceScaleFactor = 1,
-      this.isMobile = false,
-      this.isLandscape = false,
-      this.hasTouch = false});
+  const DeviceViewport({
+    this.width = 1280,
+    this.height = 1024,
+    this.deviceScaleFactor = 1,
+    this.isMobile = false,
+    this.isLandscape = false,
+    this.hasTouch = false,
+  });
 
-  DeviceViewport copyWith(
-      {int? width,
-      int? height,
-      num? deviceScaleFactor,
-      bool? isMobile,
-      bool? isLandscape,
-      bool? hasTouch}) {
+  DeviceViewport copyWith({
+    int? width,
+    int? height,
+    num? deviceScaleFactor,
+    bool? isMobile,
+    bool? isLandscape,
+    bool? hasTouch,
+  }) {
     return DeviceViewport(
       width: width ?? this.width,
       height: height ?? this.height,
@@ -77,10 +79,14 @@ class DeviceViewport {
 }
 
 class EmulationManager {
-  static final portrait =
-      ScreenOrientation(angle: 0, type: ScreenOrientationType.portraitPrimary);
+  static final portrait = ScreenOrientation(
+    angle: 0,
+    type: ScreenOrientationType.portraitPrimary,
+  );
   static final landscape = ScreenOrientation(
-      angle: 90, type: ScreenOrientationType.landscapePrimary);
+    angle: 90,
+    type: ScreenOrientationType.landscapePrimary,
+  );
 
   final DevTools devTools;
   bool _emulatingMobile = false;
@@ -92,9 +98,13 @@ class EmulationManager {
     var screenOrientation = viewport.isLandscape ? landscape : portrait;
 
     await Future.wait([
-      devTools.emulation.setDeviceMetricsOverride(viewport.width,
-          viewport.height, viewport.deviceScaleFactor, viewport.isMobile,
-          screenOrientation: screenOrientation),
+      devTools.emulation.setDeviceMetricsOverride(
+        viewport.width,
+        viewport.height,
+        viewport.deviceScaleFactor,
+        viewport.isMobile,
+        screenOrientation: screenOrientation,
+      ),
       devTools.emulation.setTouchEmulationEnabled(viewport.hasTouch),
     ]);
 

@@ -13,8 +13,10 @@ class StorageApi {
   Stream<CacheStorageContentUpdatedEvent> get onCacheStorageContentUpdated =>
       _client.onEvent
           .where((event) => event.name == 'Storage.cacheStorageContentUpdated')
-          .map((event) =>
-              CacheStorageContentUpdatedEvent.fromJson(event.parameters));
+          .map(
+            (event) =>
+                CacheStorageContentUpdatedEvent.fromJson(event.parameters),
+          );
 
   /// A cache has been added/deleted.
   Stream<CacheStorageListUpdatedEvent> get onCacheStorageListUpdated => _client
@@ -29,10 +31,10 @@ class StorageApi {
       .map((event) => IndexedDBContentUpdatedEvent.fromJson(event.parameters));
 
   /// The origin's IndexedDB database list has been modified.
-  Stream<IndexedDBListUpdatedEvent> get onIndexedDBListUpdated =>
-      _client.onEvent
-          .where((event) => event.name == 'Storage.indexedDBListUpdated')
-          .map((event) => IndexedDBListUpdatedEvent.fromJson(event.parameters));
+  Stream<IndexedDBListUpdatedEvent> get onIndexedDBListUpdated => _client
+      .onEvent
+      .where((event) => event.name == 'Storage.indexedDBListUpdated')
+      .map((event) => IndexedDBListUpdatedEvent.fromJson(event.parameters));
 
   /// One of the interest groups was accessed. Note that these events are global
   /// to all targets sharing an interest group store.
@@ -44,23 +46,30 @@ class StorageApi {
   /// An auction involving interest groups is taking place. These events are
   /// target-specific.
   Stream<InterestGroupAuctionEventOccurredEvent>
-      get onInterestGroupAuctionEventOccurred => _client.onEvent
-          .where((event) =>
-              event.name == 'Storage.interestGroupAuctionEventOccurred')
-          .map((event) => InterestGroupAuctionEventOccurredEvent.fromJson(
-              event.parameters));
+  get onInterestGroupAuctionEventOccurred => _client.onEvent
+      .where(
+        (event) => event.name == 'Storage.interestGroupAuctionEventOccurred',
+      )
+      .map(
+        (event) =>
+            InterestGroupAuctionEventOccurredEvent.fromJson(event.parameters),
+      );
 
   /// Specifies which auctions a particular network fetch may be related to, and
   /// in what role. Note that it is not ordered with respect to
   /// Network.requestWillBeSent (but will happen before loadingFinished
   /// loadingFailed).
   Stream<InterestGroupAuctionNetworkRequestCreatedEvent>
-      get onInterestGroupAuctionNetworkRequestCreated => _client.onEvent
-          .where((event) =>
-              event.name == 'Storage.interestGroupAuctionNetworkRequestCreated')
-          .map((event) =>
-              InterestGroupAuctionNetworkRequestCreatedEvent.fromJson(
-                  event.parameters));
+  get onInterestGroupAuctionNetworkRequestCreated => _client.onEvent
+      .where(
+        (event) =>
+            event.name == 'Storage.interestGroupAuctionNetworkRequestCreated',
+      )
+      .map(
+        (event) => InterestGroupAuctionNetworkRequestCreatedEvent.fromJson(
+          event.parameters,
+        ),
+      );
 
   /// Shared storage was accessed by the associated page.
   /// The following parameters are included in all events.
@@ -72,30 +81,43 @@ class StorageApi {
   Stream<StorageBucketInfo> get onStorageBucketCreatedOrUpdated => _client
       .onEvent
       .where((event) => event.name == 'Storage.storageBucketCreatedOrUpdated')
-      .map((event) => StorageBucketInfo.fromJson(
-          event.parameters['bucketInfo'] as Map<String, dynamic>));
+      .map(
+        (event) => StorageBucketInfo.fromJson(
+          event.parameters['bucketInfo'] as Map<String, dynamic>,
+        ),
+      );
 
   Stream<String> get onStorageBucketDeleted => _client.onEvent
       .where((event) => event.name == 'Storage.storageBucketDeleted')
       .map((event) => event.parameters['bucketId'] as String);
 
   Stream<AttributionReportingSourceRegisteredEvent>
-      get onAttributionReportingSourceRegistered => _client.onEvent
-          .where((event) =>
-              event.name == 'Storage.attributionReportingSourceRegistered')
-          .map((event) => AttributionReportingSourceRegisteredEvent.fromJson(
-              event.parameters));
+  get onAttributionReportingSourceRegistered => _client.onEvent
+      .where(
+        (event) => event.name == 'Storage.attributionReportingSourceRegistered',
+      )
+      .map(
+        (event) => AttributionReportingSourceRegisteredEvent.fromJson(
+          event.parameters,
+        ),
+      );
 
   Stream<AttributionReportingTriggerRegisteredEvent>
-      get onAttributionReportingTriggerRegistered => _client.onEvent
-          .where((event) =>
-              event.name == 'Storage.attributionReportingTriggerRegistered')
-          .map((event) => AttributionReportingTriggerRegisteredEvent.fromJson(
-              event.parameters));
+  get onAttributionReportingTriggerRegistered => _client.onEvent
+      .where(
+        (event) =>
+            event.name == 'Storage.attributionReportingTriggerRegistered',
+      )
+      .map(
+        (event) => AttributionReportingTriggerRegisteredEvent.fromJson(
+          event.parameters,
+        ),
+      );
 
   /// Returns a storage key given a frame id.
   Future<SerializedStorageKey> getStorageKeyForFrame(
-      page.FrameId frameId) async {
+    page.FrameId frameId,
+  ) async {
     var result = await _client.send('Storage.getStorageKeyForFrame', {
       'frameId': frameId,
     });
@@ -116,7 +138,9 @@ class StorageApi {
   /// [storageKey] Storage key.
   /// [storageTypes] Comma separated list of StorageType to clear.
   Future<void> clearDataForStorageKey(
-      String storageKey, String storageTypes) async {
+    String storageKey,
+    String storageTypes,
+  ) async {
     await _client.send('Storage.clearDataForStorageKey', {
       'storageKey': storageKey,
       'storageTypes': storageTypes,
@@ -126,8 +150,9 @@ class StorageApi {
   /// Returns all browser cookies.
   /// [browserContextId] Browser context to use when called on the browser endpoint.
   /// Returns: Array of cookie objects.
-  Future<List<network.Cookie>> getCookies(
-      {browser.BrowserContextID? browserContextId}) async {
+  Future<List<network.Cookie>> getCookies({
+    browser.BrowserContextID? browserContextId,
+  }) async {
     var result = await _client.send('Storage.getCookies', {
       if (browserContextId != null) 'browserContextId': browserContextId,
     });
@@ -139,8 +164,10 @@ class StorageApi {
   /// Sets given cookies.
   /// [cookies] Cookies to be set.
   /// [browserContextId] Browser context to use when called on the browser endpoint.
-  Future<void> setCookies(List<network.CookieParam> cookies,
-      {browser.BrowserContextID? browserContextId}) async {
+  Future<void> setCookies(
+    List<network.CookieParam> cookies, {
+    browser.BrowserContextID? browserContextId,
+  }) async {
     await _client.send('Storage.setCookies', {
       'cookies': [...cookies],
       if (browserContextId != null) 'browserContextId': browserContextId,
@@ -149,8 +176,9 @@ class StorageApi {
 
   /// Clears cookies.
   /// [browserContextId] Browser context to use when called on the browser endpoint.
-  Future<void> clearCookies(
-      {browser.BrowserContextID? browserContextId}) async {
+  Future<void> clearCookies({
+    browser.BrowserContextID? browserContextId,
+  }) async {
     await _client.send('Storage.clearCookies', {
       if (browserContextId != null) 'browserContextId': browserContextId,
     });
@@ -200,9 +228,7 @@ class StorageApi {
   /// Registers origin to be notified when an update occurs to its IndexedDB.
   /// [origin] Security origin.
   Future<void> trackIndexedDBForOrigin(String origin) async {
-    await _client.send('Storage.trackIndexedDBForOrigin', {
-      'origin': origin,
-    });
+    await _client.send('Storage.trackIndexedDBForOrigin', {'origin': origin});
   }
 
   /// Registers storage key to be notified when an update occurs to its IndexedDB.
@@ -232,9 +258,7 @@ class StorageApi {
   /// Unregisters origin from receiving notifications for IndexedDB.
   /// [origin] Security origin.
   Future<void> untrackIndexedDBForOrigin(String origin) async {
-    await _client.send('Storage.untrackIndexedDBForOrigin', {
-      'origin': origin,
-    });
+    await _client.send('Storage.untrackIndexedDBForOrigin', {'origin': origin});
   }
 
   /// Unregisters storage key from receiving notifications for IndexedDB.
@@ -270,7 +294,9 @@ class StorageApi {
   /// but has absolute expirationTime instead of relative lifetimeMs and
   /// also adds joiningOrigin.
   Future<Map<String, dynamic>> getInterestGroupDetails(
-      String ownerOrigin, String name) async {
+    String ownerOrigin,
+    String name,
+  ) async {
     var result = await _client.send('Storage.getInterestGroupDetails', {
       'ownerOrigin': ownerOrigin,
       'name': name,
@@ -280,9 +306,7 @@ class StorageApi {
 
   /// Enables/Disables issuing of interestGroupAccessed events.
   Future<void> setInterestGroupTracking(bool enable) async {
-    await _client.send('Storage.setInterestGroupTracking', {
-      'enable': enable,
-    });
+    await _client.send('Storage.setInterestGroupTracking', {'enable': enable});
   }
 
   /// Enables/Disables issuing of interestGroupAuctionEventOccurred and
@@ -295,17 +319,20 @@ class StorageApi {
 
   /// Gets metadata for an origin's shared storage.
   Future<SharedStorageMetadata> getSharedStorageMetadata(
-      String ownerOrigin) async {
+    String ownerOrigin,
+  ) async {
     var result = await _client.send('Storage.getSharedStorageMetadata', {
       'ownerOrigin': ownerOrigin,
     });
     return SharedStorageMetadata.fromJson(
-        result['metadata'] as Map<String, dynamic>);
+      result['metadata'] as Map<String, dynamic>,
+    );
   }
 
   /// Gets the entries in an given origin's shared storage.
   Future<List<SharedStorageEntry>> getSharedStorageEntries(
-      String ownerOrigin) async {
+    String ownerOrigin,
+  ) async {
     var result = await _client.send('Storage.getSharedStorageEntries', {
       'ownerOrigin': ownerOrigin,
     });
@@ -318,8 +345,11 @@ class StorageApi {
   /// [ignoreIfPresent] If `ignoreIfPresent` is included and true, then only sets the entry if
   /// `key` doesn't already exist.
   Future<void> setSharedStorageEntry(
-      String ownerOrigin, String key, String value,
-      {bool? ignoreIfPresent}) async {
+    String ownerOrigin,
+    String key,
+    String value, {
+    bool? ignoreIfPresent,
+  }) async {
     await _client.send('Storage.setSharedStorageEntry', {
       'ownerOrigin': ownerOrigin,
       'key': key,
@@ -352,9 +382,7 @@ class StorageApi {
 
   /// Enables/disables issuing of sharedStorageAccessed events.
   Future<void> setSharedStorageTracking(bool enable) async {
-    await _client.send('Storage.setSharedStorageTracking', {
-      'enable': enable,
-    });
+    await _client.send('Storage.setSharedStorageTracking', {'enable': enable});
   }
 
   /// Set tracking for a storage key's buckets.
@@ -367,9 +395,7 @@ class StorageApi {
 
   /// Deletes the Storage Bucket with the given storage key and bucket name.
   Future<void> deleteStorageBucket(StorageBucket bucket) async {
-    await _client.send('Storage.deleteStorageBucket', {
-      'bucket': bucket,
-    });
+    await _client.send('Storage.deleteStorageBucket', {'bucket': bucket});
   }
 
   /// Deletes state for sites identified as potential bounce trackers, immediately.
@@ -424,11 +450,12 @@ class CacheStorageContentUpdatedEvent {
   /// Name of cache in origin.
   final String cacheName;
 
-  CacheStorageContentUpdatedEvent(
-      {required this.origin,
-      required this.storageKey,
-      required this.bucketId,
-      required this.cacheName});
+  CacheStorageContentUpdatedEvent({
+    required this.origin,
+    required this.storageKey,
+    required this.bucketId,
+    required this.cacheName,
+  });
 
   factory CacheStorageContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return CacheStorageContentUpdatedEvent(
@@ -450,8 +477,11 @@ class CacheStorageListUpdatedEvent {
   /// Storage bucket to update.
   final String bucketId;
 
-  CacheStorageListUpdatedEvent(
-      {required this.origin, required this.storageKey, required this.bucketId});
+  CacheStorageListUpdatedEvent({
+    required this.origin,
+    required this.storageKey,
+    required this.bucketId,
+  });
 
   factory CacheStorageListUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return CacheStorageListUpdatedEvent(
@@ -478,12 +508,13 @@ class IndexedDBContentUpdatedEvent {
   /// ObjectStore to update.
   final String objectStoreName;
 
-  IndexedDBContentUpdatedEvent(
-      {required this.origin,
-      required this.storageKey,
-      required this.bucketId,
-      required this.databaseName,
-      required this.objectStoreName});
+  IndexedDBContentUpdatedEvent({
+    required this.origin,
+    required this.storageKey,
+    required this.bucketId,
+    required this.databaseName,
+    required this.objectStoreName,
+  });
 
   factory IndexedDBContentUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return IndexedDBContentUpdatedEvent(
@@ -506,8 +537,11 @@ class IndexedDBListUpdatedEvent {
   /// Storage bucket to update.
   final String bucketId;
 
-  IndexedDBListUpdatedEvent(
-      {required this.origin, required this.storageKey, required this.bucketId});
+  IndexedDBListUpdatedEvent({
+    required this.origin,
+    required this.storageKey,
+    required this.bucketId,
+  });
 
   factory IndexedDBListUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return IndexedDBListUpdatedEvent(
@@ -539,15 +573,16 @@ class InterestGroupAccessedEvent {
   /// For non-global events --- links to interestGroupAuctionEvent
   final InterestGroupAuctionId? uniqueAuctionId;
 
-  InterestGroupAccessedEvent(
-      {required this.accessTime,
-      required this.type,
-      required this.ownerOrigin,
-      required this.name,
-      this.componentSellerOrigin,
-      this.bid,
-      this.bidCurrency,
-      this.uniqueAuctionId});
+  InterestGroupAccessedEvent({
+    required this.accessTime,
+    required this.type,
+    required this.ownerOrigin,
+    required this.name,
+    this.componentSellerOrigin,
+    this.bid,
+    this.bidCurrency,
+    this.uniqueAuctionId,
+  });
 
   factory InterestGroupAccessedEvent.fromJson(Map<String, dynamic> json) {
     return InterestGroupAccessedEvent(
@@ -555,16 +590,21 @@ class InterestGroupAccessedEvent {
       type: InterestGroupAccessType.fromJson(json['type'] as String),
       ownerOrigin: json['ownerOrigin'] as String,
       name: json['name'] as String,
-      componentSellerOrigin: json.containsKey('componentSellerOrigin')
-          ? json['componentSellerOrigin'] as String
-          : null,
+      componentSellerOrigin:
+          json.containsKey('componentSellerOrigin')
+              ? json['componentSellerOrigin'] as String
+              : null,
       bid: json.containsKey('bid') ? json['bid'] as num : null,
-      bidCurrency: json.containsKey('bidCurrency')
-          ? json['bidCurrency'] as String
-          : null,
-      uniqueAuctionId: json.containsKey('uniqueAuctionId')
-          ? InterestGroupAuctionId.fromJson(json['uniqueAuctionId'] as String)
-          : null,
+      bidCurrency:
+          json.containsKey('bidCurrency')
+              ? json['bidCurrency'] as String
+              : null,
+      uniqueAuctionId:
+          json.containsKey('uniqueAuctionId')
+              ? InterestGroupAuctionId.fromJson(
+                json['uniqueAuctionId'] as String,
+              )
+              : null,
     );
   }
 }
@@ -582,26 +622,33 @@ class InterestGroupAuctionEventOccurredEvent {
   /// Set for started and configResolved
   final Map<String, dynamic>? auctionConfig;
 
-  InterestGroupAuctionEventOccurredEvent(
-      {required this.eventTime,
-      required this.type,
-      required this.uniqueAuctionId,
-      this.parentAuctionId,
-      this.auctionConfig});
+  InterestGroupAuctionEventOccurredEvent({
+    required this.eventTime,
+    required this.type,
+    required this.uniqueAuctionId,
+    this.parentAuctionId,
+    this.auctionConfig,
+  });
 
   factory InterestGroupAuctionEventOccurredEvent.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return InterestGroupAuctionEventOccurredEvent(
       eventTime: network.TimeSinceEpoch.fromJson(json['eventTime'] as num),
       type: InterestGroupAuctionEventType.fromJson(json['type'] as String),
-      uniqueAuctionId:
-          InterestGroupAuctionId.fromJson(json['uniqueAuctionId'] as String),
-      parentAuctionId: json.containsKey('parentAuctionId')
-          ? InterestGroupAuctionId.fromJson(json['parentAuctionId'] as String)
-          : null,
-      auctionConfig: json.containsKey('auctionConfig')
-          ? json['auctionConfig'] as Map<String, dynamic>
-          : null,
+      uniqueAuctionId: InterestGroupAuctionId.fromJson(
+        json['uniqueAuctionId'] as String,
+      ),
+      parentAuctionId:
+          json.containsKey('parentAuctionId')
+              ? InterestGroupAuctionId.fromJson(
+                json['parentAuctionId'] as String,
+              )
+              : null,
+      auctionConfig:
+          json.containsKey('auctionConfig')
+              ? json['auctionConfig'] as Map<String, dynamic>
+              : null,
     );
   }
 }
@@ -616,17 +663,22 @@ class InterestGroupAuctionNetworkRequestCreatedEvent {
   /// them actually care about the keys being queried.
   final List<InterestGroupAuctionId> auctions;
 
-  InterestGroupAuctionNetworkRequestCreatedEvent(
-      {required this.type, required this.requestId, required this.auctions});
+  InterestGroupAuctionNetworkRequestCreatedEvent({
+    required this.type,
+    required this.requestId,
+    required this.auctions,
+  });
 
   factory InterestGroupAuctionNetworkRequestCreatedEvent.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return InterestGroupAuctionNetworkRequestCreatedEvent(
       type: InterestGroupAuctionFetchType.fromJson(json['type'] as String),
       requestId: network.RequestId.fromJson(json['requestId'] as String),
-      auctions: (json['auctions'] as List)
-          .map((e) => InterestGroupAuctionId.fromJson(e as String))
-          .toList(),
+      auctions:
+          (json['auctions'] as List)
+              .map((e) => InterestGroupAuctionId.fromJson(e as String))
+              .toList(),
     );
   }
 }
@@ -648,12 +700,13 @@ class SharedStorageAccessedEvent {
   /// presence/absence depends on `type`.
   final SharedStorageAccessParams params;
 
-  SharedStorageAccessedEvent(
-      {required this.accessTime,
-      required this.type,
-      required this.mainFrameId,
-      required this.ownerOrigin,
-      required this.params});
+  SharedStorageAccessedEvent({
+    required this.accessTime,
+    required this.type,
+    required this.mainFrameId,
+    required this.ownerOrigin,
+    required this.params,
+  });
 
   factory SharedStorageAccessedEvent.fromJson(Map<String, dynamic> json) {
     return SharedStorageAccessedEvent(
@@ -662,7 +715,8 @@ class SharedStorageAccessedEvent {
       mainFrameId: page.FrameId.fromJson(json['mainFrameId'] as String),
       ownerOrigin: json['ownerOrigin'] as String,
       params: SharedStorageAccessParams.fromJson(
-          json['params'] as Map<String, dynamic>),
+        json['params'] as Map<String, dynamic>,
+      ),
     );
   }
 }
@@ -672,16 +726,21 @@ class AttributionReportingSourceRegisteredEvent {
 
   final AttributionReportingSourceRegistrationResult result;
 
-  AttributionReportingSourceRegisteredEvent(
-      {required this.registration, required this.result});
+  AttributionReportingSourceRegisteredEvent({
+    required this.registration,
+    required this.result,
+  });
 
   factory AttributionReportingSourceRegisteredEvent.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return AttributionReportingSourceRegisteredEvent(
       registration: AttributionReportingSourceRegistration.fromJson(
-          json['registration'] as Map<String, dynamic>),
+        json['registration'] as Map<String, dynamic>,
+      ),
       result: AttributionReportingSourceRegistrationResult.fromJson(
-          json['result'] as String),
+        json['result'] as String,
+      ),
     );
   }
 }
@@ -693,20 +752,25 @@ class AttributionReportingTriggerRegisteredEvent {
 
   final AttributionReportingAggregatableResult aggregatable;
 
-  AttributionReportingTriggerRegisteredEvent(
-      {required this.registration,
-      required this.eventLevel,
-      required this.aggregatable});
+  AttributionReportingTriggerRegisteredEvent({
+    required this.registration,
+    required this.eventLevel,
+    required this.aggregatable,
+  });
 
   factory AttributionReportingTriggerRegisteredEvent.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return AttributionReportingTriggerRegisteredEvent(
       registration: AttributionReportingTriggerRegistration.fromJson(
-          json['registration'] as Map<String, dynamic>),
+        json['registration'] as Map<String, dynamic>,
+      ),
       eventLevel: AttributionReportingEventLevelResult.fromJson(
-          json['eventLevel'] as String),
+        json['eventLevel'] as String,
+      ),
       aggregatable: AttributionReportingAggregatableResult.fromJson(
-          json['aggregatable'] as String),
+        json['aggregatable'] as String,
+      ),
     );
   }
 }
@@ -724,20 +788,22 @@ class GetUsageAndQuotaResult {
   /// Storage usage per type (bytes).
   final List<UsageForType> usageBreakdown;
 
-  GetUsageAndQuotaResult(
-      {required this.usage,
-      required this.quota,
-      required this.overrideActive,
-      required this.usageBreakdown});
+  GetUsageAndQuotaResult({
+    required this.usage,
+    required this.quota,
+    required this.overrideActive,
+    required this.usageBreakdown,
+  });
 
   factory GetUsageAndQuotaResult.fromJson(Map<String, dynamic> json) {
     return GetUsageAndQuotaResult(
       usage: json['usage'] as num,
       quota: json['quota'] as num,
       overrideActive: json['overrideActive'] as bool? ?? false,
-      usageBreakdown: (json['usageBreakdown'] as List)
-          .map((e) => UsageForType.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      usageBreakdown:
+          (json['usageBreakdown'] as List)
+              .map((e) => UsageForType.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 }
@@ -764,8 +830,7 @@ enum StorageType {
   sharedStorage('shared_storage'),
   storageBuckets('storage_buckets'),
   all('all'),
-  other('other'),
-  ;
+  other('other');
 
   final String value;
 
@@ -798,10 +863,7 @@ class UsageForType {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'storageType': storageType.toJson(),
-      'usage': usage,
-    };
+    return {'storageType': storageType.toJson(), 'usage': usage};
   }
 }
 
@@ -822,10 +884,7 @@ class TrustTokens {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'issuerOrigin': issuerOrigin,
-      'count': count,
-    };
+    return {'issuerOrigin': issuerOrigin, 'count': count};
   }
 }
 
@@ -849,8 +908,7 @@ enum InterestGroupAccessType {
   additionalBidWin('additionalBidWin'),
   topLevelBid('topLevelBid'),
   topLevelAdditionalBid('topLevelAdditionalBid'),
-  clear('clear'),
-  ;
+  clear('clear');
 
   final String value;
 
@@ -868,8 +926,7 @@ enum InterestGroupAccessType {
 /// Enum of auction events.
 enum InterestGroupAuctionEventType {
   started('started'),
-  configResolved('configResolved'),
-  ;
+  configResolved('configResolved');
 
   final String value;
 
@@ -890,8 +947,7 @@ enum InterestGroupAuctionFetchType {
   bidderWasm('bidderWasm'),
   sellerJs('sellerJs'),
   bidderTrustedSignals('bidderTrustedSignals'),
-  sellerTrustedSignals('sellerTrustedSignals'),
-  ;
+  sellerTrustedSignals('sellerTrustedSignals');
 
   final String value;
 
@@ -928,8 +984,7 @@ enum SharedStorageAccessType {
   headerSet('headerSet'),
   headerAppend('headerAppend'),
   headerDelete('headerDelete'),
-  headerClear('headerClear'),
-  ;
+  headerClear('headerClear');
 
   final String value;
 
@@ -960,10 +1015,7 @@ class SharedStorageEntry {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'key': key,
-      'value': value,
-    };
+    return {'key': key, 'value': value};
   }
 }
 
@@ -982,16 +1034,18 @@ class SharedStorageMetadata {
   /// storage.
   final int bytesUsed;
 
-  SharedStorageMetadata(
-      {required this.creationTime,
-      required this.length,
-      required this.remainingBudget,
-      required this.bytesUsed});
+  SharedStorageMetadata({
+    required this.creationTime,
+    required this.length,
+    required this.remainingBudget,
+    required this.bytesUsed,
+  });
 
   factory SharedStorageMetadata.fromJson(Map<String, dynamic> json) {
     return SharedStorageMetadata(
-      creationTime:
-          network.TimeSinceEpoch.fromJson(json['creationTime'] as num),
+      creationTime: network.TimeSinceEpoch.fromJson(
+        json['creationTime'] as num,
+      ),
       length: json['length'] as int,
       remainingBudget: json['remainingBudget'] as num,
       bytesUsed: json['bytesUsed'] as int,
@@ -1014,8 +1068,10 @@ class SharedStorageReportingMetadata {
 
   final String reportingUrl;
 
-  SharedStorageReportingMetadata(
-      {required this.eventType, required this.reportingUrl});
+  SharedStorageReportingMetadata({
+    required this.eventType,
+    required this.reportingUrl,
+  });
 
   factory SharedStorageReportingMetadata.fromJson(Map<String, dynamic> json) {
     return SharedStorageReportingMetadata(
@@ -1025,10 +1081,7 @@ class SharedStorageReportingMetadata {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'eventType': eventType,
-      'reportingUrl': reportingUrl,
-    };
+    return {'eventType': eventType, 'reportingUrl': reportingUrl};
   }
 }
 
@@ -1040,16 +1093,22 @@ class SharedStorageUrlWithMetadata {
   /// Any associated reporting metadata.
   final List<SharedStorageReportingMetadata> reportingMetadata;
 
-  SharedStorageUrlWithMetadata(
-      {required this.url, required this.reportingMetadata});
+  SharedStorageUrlWithMetadata({
+    required this.url,
+    required this.reportingMetadata,
+  });
 
   factory SharedStorageUrlWithMetadata.fromJson(Map<String, dynamic> json) {
     return SharedStorageUrlWithMetadata(
       url: json['url'] as String,
-      reportingMetadata: (json['reportingMetadata'] as List)
-          .map((e) => SharedStorageReportingMetadata.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
+      reportingMetadata:
+          (json['reportingMetadata'] as List)
+              .map(
+                (e) => SharedStorageReportingMetadata.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
     );
   }
 
@@ -1110,37 +1169,46 @@ class SharedStorageAccessParams {
   /// SharedStorageAccessType.headerSet.
   final bool? ignoreIfPresent;
 
-  SharedStorageAccessParams(
-      {this.scriptSourceUrl,
-      this.operationName,
-      this.serializedData,
-      this.urlsWithMetadata,
-      this.key,
-      this.value,
-      this.ignoreIfPresent});
+  SharedStorageAccessParams({
+    this.scriptSourceUrl,
+    this.operationName,
+    this.serializedData,
+    this.urlsWithMetadata,
+    this.key,
+    this.value,
+    this.ignoreIfPresent,
+  });
 
   factory SharedStorageAccessParams.fromJson(Map<String, dynamic> json) {
     return SharedStorageAccessParams(
-      scriptSourceUrl: json.containsKey('scriptSourceUrl')
-          ? json['scriptSourceUrl'] as String
-          : null,
-      operationName: json.containsKey('operationName')
-          ? json['operationName'] as String
-          : null,
-      serializedData: json.containsKey('serializedData')
-          ? json['serializedData'] as String
-          : null,
-      urlsWithMetadata: json.containsKey('urlsWithMetadata')
-          ? (json['urlsWithMetadata'] as List)
-              .map((e) => SharedStorageUrlWithMetadata.fromJson(
-                  e as Map<String, dynamic>))
-              .toList()
-          : null,
+      scriptSourceUrl:
+          json.containsKey('scriptSourceUrl')
+              ? json['scriptSourceUrl'] as String
+              : null,
+      operationName:
+          json.containsKey('operationName')
+              ? json['operationName'] as String
+              : null,
+      serializedData:
+          json.containsKey('serializedData')
+              ? json['serializedData'] as String
+              : null,
+      urlsWithMetadata:
+          json.containsKey('urlsWithMetadata')
+              ? (json['urlsWithMetadata'] as List)
+                  .map(
+                    (e) => SharedStorageUrlWithMetadata.fromJson(
+                      e as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList()
+              : null,
       key: json.containsKey('key') ? json['key'] as String : null,
       value: json.containsKey('value') ? json['value'] as String : null,
-      ignoreIfPresent: json.containsKey('ignoreIfPresent')
-          ? json['ignoreIfPresent'] as bool
-          : null,
+      ignoreIfPresent:
+          json.containsKey('ignoreIfPresent')
+              ? json['ignoreIfPresent'] as bool
+              : null,
     );
   }
 
@@ -1160,8 +1228,7 @@ class SharedStorageAccessParams {
 
 enum StorageBucketsDurability {
   relaxed('relaxed'),
-  strict('strict'),
-  ;
+  strict('strict');
 
   final String value;
 
@@ -1192,10 +1259,7 @@ class StorageBucket {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'storageKey': storageKey.toJson(),
-      if (name != null) 'name': name,
-    };
+    return {'storageKey': storageKey.toJson(), if (name != null) 'name': name};
   }
 }
 
@@ -1213,13 +1277,14 @@ class StorageBucketInfo {
 
   final StorageBucketsDurability durability;
 
-  StorageBucketInfo(
-      {required this.bucket,
-      required this.id,
-      required this.expiration,
-      required this.quota,
-      required this.persistent,
-      required this.durability});
+  StorageBucketInfo({
+    required this.bucket,
+    required this.id,
+    required this.expiration,
+    required this.quota,
+    required this.persistent,
+    required this.durability,
+  });
 
   factory StorageBucketInfo.fromJson(Map<String, dynamic> json) {
     return StorageBucketInfo(
@@ -1228,8 +1293,9 @@ class StorageBucketInfo {
       expiration: network.TimeSinceEpoch.fromJson(json['expiration'] as num),
       quota: json['quota'] as num,
       persistent: json['persistent'] as bool? ?? false,
-      durability:
-          StorageBucketsDurability.fromJson(json['durability'] as String),
+      durability: StorageBucketsDurability.fromJson(
+        json['durability'] as String,
+      ),
     );
   }
 
@@ -1247,8 +1313,7 @@ class StorageBucketInfo {
 
 enum AttributionReportingSourceType {
   navigation('navigation'),
-  event('event'),
-  ;
+  event('event');
 
   final String value;
 
@@ -1289,11 +1354,14 @@ class AttributionReportingFilterDataEntry {
 
   final List<String> values;
 
-  AttributionReportingFilterDataEntry(
-      {required this.key, required this.values});
+  AttributionReportingFilterDataEntry({
+    required this.key,
+    required this.values,
+  });
 
   factory AttributionReportingFilterDataEntry.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return AttributionReportingFilterDataEntry(
       key: json['key'] as String,
       values: (json['values'] as List).map((e) => e as String).toList(),
@@ -1314,18 +1382,25 @@ class AttributionReportingFilterConfig {
   /// duration in seconds
   final int? lookbackWindow;
 
-  AttributionReportingFilterConfig(
-      {required this.filterValues, this.lookbackWindow});
+  AttributionReportingFilterConfig({
+    required this.filterValues,
+    this.lookbackWindow,
+  });
 
   factory AttributionReportingFilterConfig.fromJson(Map<String, dynamic> json) {
     return AttributionReportingFilterConfig(
-      filterValues: (json['filterValues'] as List)
-          .map((e) => AttributionReportingFilterDataEntry.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
-      lookbackWindow: json.containsKey('lookbackWindow')
-          ? json['lookbackWindow'] as int
-          : null,
+      filterValues:
+          (json['filterValues'] as List)
+              .map(
+                (e) => AttributionReportingFilterDataEntry.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+      lookbackWindow:
+          json.containsKey('lookbackWindow')
+              ? json['lookbackWindow'] as int
+              : null,
     );
   }
 
@@ -1342,19 +1417,29 @@ class AttributionReportingFilterPair {
 
   final List<AttributionReportingFilterConfig> notFilters;
 
-  AttributionReportingFilterPair(
-      {required this.filters, required this.notFilters});
+  AttributionReportingFilterPair({
+    required this.filters,
+    required this.notFilters,
+  });
 
   factory AttributionReportingFilterPair.fromJson(Map<String, dynamic> json) {
     return AttributionReportingFilterPair(
-      filters: (json['filters'] as List)
-          .map((e) => AttributionReportingFilterConfig.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
-      notFilters: (json['notFilters'] as List)
-          .map((e) => AttributionReportingFilterConfig.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
+      filters:
+          (json['filters'] as List)
+              .map(
+                (e) => AttributionReportingFilterConfig.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+      notFilters:
+          (json['notFilters'] as List)
+              .map(
+                (e) => AttributionReportingFilterConfig.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
     );
   }
 
@@ -1371,11 +1456,14 @@ class AttributionReportingAggregationKeysEntry {
 
   final UnsignedInt128AsBase16 value;
 
-  AttributionReportingAggregationKeysEntry(
-      {required this.key, required this.value});
+  AttributionReportingAggregationKeysEntry({
+    required this.key,
+    required this.value,
+  });
 
   factory AttributionReportingAggregationKeysEntry.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return AttributionReportingAggregationKeysEntry(
       key: json['key'] as String,
       value: UnsignedInt128AsBase16.fromJson(json['value'] as String),
@@ -1383,10 +1471,7 @@ class AttributionReportingAggregationKeysEntry {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'key': key,
-      'value': value.toJson(),
-    };
+    return {'key': key, 'value': value.toJson()};
   }
 }
 
@@ -1397,11 +1482,14 @@ class AttributionReportingEventReportWindows {
   /// duration in seconds
   final List<int> ends;
 
-  AttributionReportingEventReportWindows(
-      {required this.start, required this.ends});
+  AttributionReportingEventReportWindows({
+    required this.start,
+    required this.ends,
+  });
 
   factory AttributionReportingEventReportWindows.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return AttributionReportingEventReportWindows(
       start: json['start'] as int,
       ends: (json['ends'] as List).map((e) => e as int).toList(),
@@ -1423,14 +1511,17 @@ class AttributionReportingTriggerSpec {
 
   final AttributionReportingEventReportWindows eventReportWindows;
 
-  AttributionReportingTriggerSpec(
-      {required this.triggerData, required this.eventReportWindows});
+  AttributionReportingTriggerSpec({
+    required this.triggerData,
+    required this.eventReportWindows,
+  });
 
   factory AttributionReportingTriggerSpec.fromJson(Map<String, dynamic> json) {
     return AttributionReportingTriggerSpec(
       triggerData: (json['triggerData'] as List).map((e) => e as num).toList(),
       eventReportWindows: AttributionReportingEventReportWindows.fromJson(
-          json['eventReportWindows'] as Map<String, dynamic>),
+        json['eventReportWindows'] as Map<String, dynamic>,
+      ),
     );
   }
 
@@ -1444,16 +1535,16 @@ class AttributionReportingTriggerSpec {
 
 enum AttributionReportingTriggerDataMatching {
   exact('exact'),
-  modulus('modulus'),
-  ;
+  modulus('modulus');
 
   final String value;
 
   const AttributionReportingTriggerDataMatching(this.value);
 
   factory AttributionReportingTriggerDataMatching.fromJson(String value) =>
-      AttributionReportingTriggerDataMatching.values
-          .firstWhere((e) => e.value == value);
+      AttributionReportingTriggerDataMatching.values.firstWhere(
+        (e) => e.value == value,
+      );
 
   String toJson() => value;
 
@@ -1470,11 +1561,15 @@ class AttributionReportingAggregatableDebugReportingData {
 
   final List<String> types;
 
-  AttributionReportingAggregatableDebugReportingData(
-      {required this.keyPiece, required this.value, required this.types});
+  AttributionReportingAggregatableDebugReportingData({
+    required this.keyPiece,
+    required this.value,
+    required this.types,
+  });
 
   factory AttributionReportingAggregatableDebugReportingData.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return AttributionReportingAggregatableDebugReportingData(
       keyPiece: UnsignedInt128AsBase16.fromJson(json['keyPiece'] as String),
       value: json['value'] as num,
@@ -1502,22 +1597,28 @@ class AttributionReportingAggregatableDebugReportingConfig {
 
   final String? aggregationCoordinatorOrigin;
 
-  AttributionReportingAggregatableDebugReportingConfig(
-      {this.budget,
-      required this.keyPiece,
-      required this.debugData,
-      this.aggregationCoordinatorOrigin});
+  AttributionReportingAggregatableDebugReportingConfig({
+    this.budget,
+    required this.keyPiece,
+    required this.debugData,
+    this.aggregationCoordinatorOrigin,
+  });
 
   factory AttributionReportingAggregatableDebugReportingConfig.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return AttributionReportingAggregatableDebugReportingConfig(
       budget: json.containsKey('budget') ? json['budget'] as num : null,
       keyPiece: UnsignedInt128AsBase16.fromJson(json['keyPiece'] as String),
-      debugData: (json['debugData'] as List)
-          .map((e) =>
-              AttributionReportingAggregatableDebugReportingData.fromJson(
-                  e as Map<String, dynamic>))
-          .toList(),
+      debugData:
+          (json['debugData'] as List)
+              .map(
+                (e) =>
+                    AttributionReportingAggregatableDebugReportingData.fromJson(
+                      e as Map<String, dynamic>,
+                    ),
+              )
+              .toList(),
       aggregationCoordinatorOrigin:
           json.containsKey('aggregationCoordinatorOrigin')
               ? json['aggregationCoordinatorOrigin'] as String
@@ -1545,10 +1646,11 @@ class AttributionScopesData {
 
   final num maxEventStates;
 
-  AttributionScopesData(
-      {required this.values,
-      required this.limit,
-      required this.maxEventStates});
+  AttributionScopesData({
+    required this.values,
+    required this.limit,
+    required this.maxEventStates,
+  });
 
   factory AttributionScopesData.fromJson(Map<String, dynamic> json) {
     return AttributionScopesData(
@@ -1601,38 +1703,44 @@ class AttributionReportingSourceRegistration {
   final SignedInt64AsBase10 destinationLimitPriority;
 
   final AttributionReportingAggregatableDebugReportingConfig
-      aggregatableDebugReportingConfig;
+  aggregatableDebugReportingConfig;
 
   final AttributionScopesData? scopesData;
 
-  AttributionReportingSourceRegistration(
-      {required this.time,
-      required this.expiry,
-      required this.triggerSpecs,
-      required this.aggregatableReportWindow,
-      required this.type,
-      required this.sourceOrigin,
-      required this.reportingOrigin,
-      required this.destinationSites,
-      required this.eventId,
-      required this.priority,
-      required this.filterData,
-      required this.aggregationKeys,
-      this.debugKey,
-      required this.triggerDataMatching,
-      required this.destinationLimitPriority,
-      required this.aggregatableDebugReportingConfig,
-      this.scopesData});
+  AttributionReportingSourceRegistration({
+    required this.time,
+    required this.expiry,
+    required this.triggerSpecs,
+    required this.aggregatableReportWindow,
+    required this.type,
+    required this.sourceOrigin,
+    required this.reportingOrigin,
+    required this.destinationSites,
+    required this.eventId,
+    required this.priority,
+    required this.filterData,
+    required this.aggregationKeys,
+    this.debugKey,
+    required this.triggerDataMatching,
+    required this.destinationLimitPriority,
+    required this.aggregatableDebugReportingConfig,
+    this.scopesData,
+  });
 
   factory AttributionReportingSourceRegistration.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return AttributionReportingSourceRegistration(
       time: network.TimeSinceEpoch.fromJson(json['time'] as num),
       expiry: json['expiry'] as int,
-      triggerSpecs: (json['triggerSpecs'] as List)
-          .map((e) => AttributionReportingTriggerSpec.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
+      triggerSpecs:
+          (json['triggerSpecs'] as List)
+              .map(
+                (e) => AttributionReportingTriggerSpec.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
       aggregatableReportWindow: json['aggregatableReportWindow'] as int,
       type: AttributionReportingSourceType.fromJson(json['type'] as String),
       sourceOrigin: json['sourceOrigin'] as String,
@@ -1641,28 +1749,42 @@ class AttributionReportingSourceRegistration {
           (json['destinationSites'] as List).map((e) => e as String).toList(),
       eventId: UnsignedInt64AsBase10.fromJson(json['eventId'] as String),
       priority: SignedInt64AsBase10.fromJson(json['priority'] as String),
-      filterData: (json['filterData'] as List)
-          .map((e) => AttributionReportingFilterDataEntry.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
-      aggregationKeys: (json['aggregationKeys'] as List)
-          .map((e) => AttributionReportingAggregationKeysEntry.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
-      debugKey: json.containsKey('debugKey')
-          ? UnsignedInt64AsBase10.fromJson(json['debugKey'] as String)
-          : null,
+      filterData:
+          (json['filterData'] as List)
+              .map(
+                (e) => AttributionReportingFilterDataEntry.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+      aggregationKeys:
+          (json['aggregationKeys'] as List)
+              .map(
+                (e) => AttributionReportingAggregationKeysEntry.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+      debugKey:
+          json.containsKey('debugKey')
+              ? UnsignedInt64AsBase10.fromJson(json['debugKey'] as String)
+              : null,
       triggerDataMatching: AttributionReportingTriggerDataMatching.fromJson(
-          json['triggerDataMatching'] as String),
+        json['triggerDataMatching'] as String,
+      ),
       destinationLimitPriority: SignedInt64AsBase10.fromJson(
-          json['destinationLimitPriority'] as String),
+        json['destinationLimitPriority'] as String,
+      ),
       aggregatableDebugReportingConfig:
           AttributionReportingAggregatableDebugReportingConfig.fromJson(
-              json['aggregatableDebugReportingConfig'] as Map<String, dynamic>),
-      scopesData: json.containsKey('scopesData')
-          ? AttributionScopesData.fromJson(
-              json['scopesData'] as Map<String, dynamic>)
-          : null,
+            json['aggregatableDebugReportingConfig'] as Map<String, dynamic>,
+          ),
+      scopesData:
+          json.containsKey('scopesData')
+              ? AttributionScopesData.fromJson(
+                json['scopesData'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 
@@ -1695,7 +1817,8 @@ enum AttributionReportingSourceRegistrationResult {
   internalError('internalError'),
   insufficientSourceCapacity('insufficientSourceCapacity'),
   insufficientUniqueDestinationCapacity(
-      'insufficientUniqueDestinationCapacity'),
+    'insufficientUniqueDestinationCapacity',
+  ),
   excessiveReportingOrigins('excessiveReportingOrigins'),
   prohibitedByBrowserPolicy('prohibitedByBrowserPolicy'),
   successNoised('successNoised'),
@@ -1708,16 +1831,17 @@ enum AttributionReportingSourceRegistrationResult {
   exceedsMaxTriggerStateCardinality('exceedsMaxTriggerStateCardinality'),
   exceedsMaxEventStatesLimit('exceedsMaxEventStatesLimit'),
   destinationPerDayReportingLimitReached(
-      'destinationPerDayReportingLimitReached'),
-  ;
+    'destinationPerDayReportingLimitReached',
+  );
 
   final String value;
 
   const AttributionReportingSourceRegistrationResult(this.value);
 
   factory AttributionReportingSourceRegistrationResult.fromJson(String value) =>
-      AttributionReportingSourceRegistrationResult.values
-          .firstWhere((e) => e.value == value);
+      AttributionReportingSourceRegistrationResult.values.firstWhere(
+        (e) => e.value == value,
+      );
 
   String toJson() => value;
 
@@ -1727,17 +1851,17 @@ enum AttributionReportingSourceRegistrationResult {
 
 enum AttributionReportingSourceRegistrationTimeConfig {
   include('include'),
-  exclude('exclude'),
-  ;
+  exclude('exclude');
 
   final String value;
 
   const AttributionReportingSourceRegistrationTimeConfig(this.value);
 
   factory AttributionReportingSourceRegistrationTimeConfig.fromJson(
-          String value) =>
-      AttributionReportingSourceRegistrationTimeConfig.values
-          .firstWhere((e) => e.value == value);
+    String value,
+  ) => AttributionReportingSourceRegistrationTimeConfig.values.firstWhere(
+    (e) => e.value == value,
+  );
 
   String toJson() => value;
 
@@ -1754,25 +1878,26 @@ class AttributionReportingAggregatableValueDictEntry {
 
   final UnsignedInt64AsBase10 filteringId;
 
-  AttributionReportingAggregatableValueDictEntry(
-      {required this.key, required this.value, required this.filteringId});
+  AttributionReportingAggregatableValueDictEntry({
+    required this.key,
+    required this.value,
+    required this.filteringId,
+  });
 
   factory AttributionReportingAggregatableValueDictEntry.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return AttributionReportingAggregatableValueDictEntry(
       key: json['key'] as String,
       value: json['value'] as num,
-      filteringId:
-          UnsignedInt64AsBase10.fromJson(json['filteringId'] as String),
+      filteringId: UnsignedInt64AsBase10.fromJson(
+        json['filteringId'] as String,
+      ),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'key': key,
-      'value': value,
-      'filteringId': filteringId.toJson(),
-    };
+    return {'key': key, 'value': value, 'filteringId': filteringId.toJson()};
   }
 }
 
@@ -1781,18 +1906,26 @@ class AttributionReportingAggregatableValueEntry {
 
   final AttributionReportingFilterPair filters;
 
-  AttributionReportingAggregatableValueEntry(
-      {required this.values, required this.filters});
+  AttributionReportingAggregatableValueEntry({
+    required this.values,
+    required this.filters,
+  });
 
   factory AttributionReportingAggregatableValueEntry.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return AttributionReportingAggregatableValueEntry(
-      values: (json['values'] as List)
-          .map((e) => AttributionReportingAggregatableValueDictEntry.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
+      values:
+          (json['values'] as List)
+              .map(
+                (e) => AttributionReportingAggregatableValueDictEntry.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
       filters: AttributionReportingFilterPair.fromJson(
-          json['filters'] as Map<String, dynamic>),
+        json['filters'] as Map<String, dynamic>,
+      ),
     );
   }
 
@@ -1813,22 +1946,26 @@ class AttributionReportingEventTriggerData {
 
   final AttributionReportingFilterPair filters;
 
-  AttributionReportingEventTriggerData(
-      {required this.data,
-      required this.priority,
-      this.dedupKey,
-      required this.filters});
+  AttributionReportingEventTriggerData({
+    required this.data,
+    required this.priority,
+    this.dedupKey,
+    required this.filters,
+  });
 
   factory AttributionReportingEventTriggerData.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return AttributionReportingEventTriggerData(
       data: UnsignedInt64AsBase10.fromJson(json['data'] as String),
       priority: SignedInt64AsBase10.fromJson(json['priority'] as String),
-      dedupKey: json.containsKey('dedupKey')
-          ? UnsignedInt64AsBase10.fromJson(json['dedupKey'] as String)
-          : null,
+      dedupKey:
+          json.containsKey('dedupKey')
+              ? UnsignedInt64AsBase10.fromJson(json['dedupKey'] as String)
+              : null,
       filters: AttributionReportingFilterPair.fromJson(
-          json['filters'] as Map<String, dynamic>),
+        json['filters'] as Map<String, dynamic>,
+      ),
     );
   }
 
@@ -1849,18 +1986,21 @@ class AttributionReportingAggregatableTriggerData {
 
   final AttributionReportingFilterPair filters;
 
-  AttributionReportingAggregatableTriggerData(
-      {required this.keyPiece,
-      required this.sourceKeys,
-      required this.filters});
+  AttributionReportingAggregatableTriggerData({
+    required this.keyPiece,
+    required this.sourceKeys,
+    required this.filters,
+  });
 
   factory AttributionReportingAggregatableTriggerData.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return AttributionReportingAggregatableTriggerData(
       keyPiece: UnsignedInt128AsBase16.fromJson(json['keyPiece'] as String),
       sourceKeys: (json['sourceKeys'] as List).map((e) => e as String).toList(),
       filters: AttributionReportingFilterPair.fromJson(
-          json['filters'] as Map<String, dynamic>),
+        json['filters'] as Map<String, dynamic>,
+      ),
     );
   }
 
@@ -1878,17 +2018,22 @@ class AttributionReportingAggregatableDedupKey {
 
   final AttributionReportingFilterPair filters;
 
-  AttributionReportingAggregatableDedupKey(
-      {this.dedupKey, required this.filters});
+  AttributionReportingAggregatableDedupKey({
+    this.dedupKey,
+    required this.filters,
+  });
 
   factory AttributionReportingAggregatableDedupKey.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return AttributionReportingAggregatableDedupKey(
-      dedupKey: json.containsKey('dedupKey')
-          ? UnsignedInt64AsBase10.fromJson(json['dedupKey'] as String)
-          : null,
+      dedupKey:
+          json.containsKey('dedupKey')
+              ? UnsignedInt64AsBase10.fromJson(json['dedupKey'] as String)
+              : null,
       filters: AttributionReportingFilterPair.fromJson(
-          json['filters'] as Map<String, dynamic>),
+        json['filters'] as Map<String, dynamic>,
+      ),
     );
   }
 
@@ -1910,7 +2055,7 @@ class AttributionReportingTriggerRegistration {
   final List<AttributionReportingEventTriggerData> eventTriggerData;
 
   final List<AttributionReportingAggregatableTriggerData>
-      aggregatableTriggerData;
+  aggregatableTriggerData;
 
   final List<AttributionReportingAggregatableValueEntry> aggregatableValues;
 
@@ -1921,54 +2066,74 @@ class AttributionReportingTriggerRegistration {
   final String? aggregationCoordinatorOrigin;
 
   final AttributionReportingSourceRegistrationTimeConfig
-      sourceRegistrationTimeConfig;
+  sourceRegistrationTimeConfig;
 
   final String? triggerContextId;
 
   final AttributionReportingAggregatableDebugReportingConfig
-      aggregatableDebugReportingConfig;
+  aggregatableDebugReportingConfig;
 
   final List<String> scopes;
 
-  AttributionReportingTriggerRegistration(
-      {required this.filters,
-      this.debugKey,
-      required this.aggregatableDedupKeys,
-      required this.eventTriggerData,
-      required this.aggregatableTriggerData,
-      required this.aggregatableValues,
-      required this.aggregatableFilteringIdMaxBytes,
-      required this.debugReporting,
-      this.aggregationCoordinatorOrigin,
-      required this.sourceRegistrationTimeConfig,
-      this.triggerContextId,
-      required this.aggregatableDebugReportingConfig,
-      required this.scopes});
+  AttributionReportingTriggerRegistration({
+    required this.filters,
+    this.debugKey,
+    required this.aggregatableDedupKeys,
+    required this.eventTriggerData,
+    required this.aggregatableTriggerData,
+    required this.aggregatableValues,
+    required this.aggregatableFilteringIdMaxBytes,
+    required this.debugReporting,
+    this.aggregationCoordinatorOrigin,
+    required this.sourceRegistrationTimeConfig,
+    this.triggerContextId,
+    required this.aggregatableDebugReportingConfig,
+    required this.scopes,
+  });
 
   factory AttributionReportingTriggerRegistration.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return AttributionReportingTriggerRegistration(
       filters: AttributionReportingFilterPair.fromJson(
-          json['filters'] as Map<String, dynamic>),
-      debugKey: json.containsKey('debugKey')
-          ? UnsignedInt64AsBase10.fromJson(json['debugKey'] as String)
-          : null,
-      aggregatableDedupKeys: (json['aggregatableDedupKeys'] as List)
-          .map((e) => AttributionReportingAggregatableDedupKey.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
-      eventTriggerData: (json['eventTriggerData'] as List)
-          .map((e) => AttributionReportingEventTriggerData.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
-      aggregatableTriggerData: (json['aggregatableTriggerData'] as List)
-          .map((e) => AttributionReportingAggregatableTriggerData.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
-      aggregatableValues: (json['aggregatableValues'] as List)
-          .map((e) => AttributionReportingAggregatableValueEntry.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
+        json['filters'] as Map<String, dynamic>,
+      ),
+      debugKey:
+          json.containsKey('debugKey')
+              ? UnsignedInt64AsBase10.fromJson(json['debugKey'] as String)
+              : null,
+      aggregatableDedupKeys:
+          (json['aggregatableDedupKeys'] as List)
+              .map(
+                (e) => AttributionReportingAggregatableDedupKey.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+      eventTriggerData:
+          (json['eventTriggerData'] as List)
+              .map(
+                (e) => AttributionReportingEventTriggerData.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+      aggregatableTriggerData:
+          (json['aggregatableTriggerData'] as List)
+              .map(
+                (e) => AttributionReportingAggregatableTriggerData.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+      aggregatableValues:
+          (json['aggregatableValues'] as List)
+              .map(
+                (e) => AttributionReportingAggregatableValueEntry.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
       aggregatableFilteringIdMaxBytes:
           json['aggregatableFilteringIdMaxBytes'] as int,
       debugReporting: json['debugReporting'] as bool? ?? false,
@@ -1978,13 +2143,16 @@ class AttributionReportingTriggerRegistration {
               : null,
       sourceRegistrationTimeConfig:
           AttributionReportingSourceRegistrationTimeConfig.fromJson(
-              json['sourceRegistrationTimeConfig'] as String),
-      triggerContextId: json.containsKey('triggerContextId')
-          ? json['triggerContextId'] as String
-          : null,
+            json['sourceRegistrationTimeConfig'] as String,
+          ),
+      triggerContextId:
+          json.containsKey('triggerContextId')
+              ? json['triggerContextId'] as String
+              : null,
       aggregatableDebugReportingConfig:
           AttributionReportingAggregatableDebugReportingConfig.fromJson(
-              json['aggregatableDebugReportingConfig'] as Map<String, dynamic>),
+            json['aggregatableDebugReportingConfig'] as Map<String, dynamic>,
+          ),
       scopes: (json['scopes'] as List).map((e) => e as String).toList(),
     );
   }
@@ -2031,16 +2199,16 @@ enum AttributionReportingEventLevelResult {
   reportWindowPassed('reportWindowPassed'),
   notRegistered('notRegistered'),
   reportWindowNotStarted('reportWindowNotStarted'),
-  noMatchingTriggerData('noMatchingTriggerData'),
-  ;
+  noMatchingTriggerData('noMatchingTriggerData');
 
   final String value;
 
   const AttributionReportingEventLevelResult(this.value);
 
   factory AttributionReportingEventLevelResult.fromJson(String value) =>
-      AttributionReportingEventLevelResult.values
-          .firstWhere((e) => e.value == value);
+      AttributionReportingEventLevelResult.values.firstWhere(
+        (e) => e.value == value,
+      );
 
   String toJson() => value;
 
@@ -2062,16 +2230,16 @@ enum AttributionReportingAggregatableResult {
   prohibitedByBrowserPolicy('prohibitedByBrowserPolicy'),
   deduplicated('deduplicated'),
   reportWindowPassed('reportWindowPassed'),
-  excessiveReports('excessiveReports'),
-  ;
+  excessiveReports('excessiveReports');
 
   final String value;
 
   const AttributionReportingAggregatableResult(this.value);
 
   factory AttributionReportingAggregatableResult.fromJson(String value) =>
-      AttributionReportingAggregatableResult.values
-          .firstWhere((e) => e.value == value);
+      AttributionReportingAggregatableResult.values.firstWhere(
+        (e) => e.value == value,
+      );
 
   String toJson() => value;
 
@@ -2090,10 +2258,11 @@ class RelatedWebsiteSet {
   /// The service sites of this set, along with the ccTLDs if there is any.
   final List<String> serviceSites;
 
-  RelatedWebsiteSet(
-      {required this.primarySites,
-      required this.associatedSites,
-      required this.serviceSites});
+  RelatedWebsiteSet({
+    required this.primarySites,
+    required this.associatedSites,
+    required this.serviceSites,
+  });
 
   factory RelatedWebsiteSet.fromJson(Map<String, dynamic> json) {
     return RelatedWebsiteSet(

@@ -15,8 +15,11 @@ class PageApi {
 
   Stream<network.MonotonicTime> get onDomContentEventFired => _client.onEvent
       .where((event) => event.name == 'Page.domContentEventFired')
-      .map((event) =>
-          network.MonotonicTime.fromJson(event.parameters['timestamp'] as num));
+      .map(
+        (event) => network.MonotonicTime.fromJson(
+          event.parameters['timestamp'] as num,
+        ),
+      );
 
   /// Emitted only when `page.interceptFileChooser` is enabled.
   Stream<FileChooserOpenedEvent> get onFileChooserOpened => _client.onEvent
@@ -52,8 +55,11 @@ class PageApi {
   /// Fired when opening document to write to.
   Stream<FrameInfo> get onDocumentOpened => _client.onEvent
       .where((event) => event.name == 'Page.documentOpened')
-      .map((event) => FrameInfo.fromJson(
-          event.parameters['frame'] as Map<String, dynamic>));
+      .map(
+        (event) => FrameInfo.fromJson(
+          event.parameters['frame'] as Map<String, dynamic>,
+        ),
+      );
 
   Stream<void> get onFrameResized =>
       _client.onEvent.where((event) => event.name == 'Page.frameResized');
@@ -63,15 +69,17 @@ class PageApi {
   Stream<FrameRequestedNavigationEvent> get onFrameRequestedNavigation =>
       _client.onEvent
           .where((event) => event.name == 'Page.frameRequestedNavigation')
-          .map((event) =>
-              FrameRequestedNavigationEvent.fromJson(event.parameters));
+          .map(
+            (event) => FrameRequestedNavigationEvent.fromJson(event.parameters),
+          );
 
   /// Fired when frame schedules a potential navigation.
   Stream<FrameScheduledNavigationEvent> get onFrameScheduledNavigation =>
       _client.onEvent
           .where((event) => event.name == 'Page.frameScheduledNavigation')
-          .map((event) =>
-              FrameScheduledNavigationEvent.fromJson(event.parameters));
+          .map(
+            (event) => FrameScheduledNavigationEvent.fromJson(event.parameters),
+          );
 
   /// Fired when frame has started loading.
   Stream<FrameId> get onFrameStartedLoading => _client.onEvent
@@ -133,8 +141,11 @@ class PageApi {
 
   Stream<network.MonotonicTime> get onLoadEventFired => _client.onEvent
       .where((event) => event.name == 'Page.loadEventFired')
-      .map((event) =>
-          network.MonotonicTime.fromJson(event.parameters['timestamp'] as num));
+      .map(
+        (event) => network.MonotonicTime.fromJson(
+          event.parameters['timestamp'] as num,
+        ),
+      );
 
   /// Fired when same-document navigation happens, e.g. due to history API usage or anchor navigation.
   Stream<NavigatedWithinDocumentEvent> get onNavigatedWithinDocument => _client
@@ -163,14 +174,16 @@ class PageApi {
   Stream<CompilationCacheProducedEvent> get onCompilationCacheProduced =>
       _client.onEvent
           .where((event) => event.name == 'Page.compilationCacheProduced')
-          .map((event) =>
-              CompilationCacheProducedEvent.fromJson(event.parameters));
+          .map(
+            (event) => CompilationCacheProducedEvent.fromJson(event.parameters),
+          );
 
   /// Deprecated, please use addScriptToEvaluateOnNewDocument instead.
   /// Returns: Identifier of the added script.
   @Deprecated('use addScriptToEvaluateOnNewDocument instead')
   Future<ScriptIdentifier> addScriptToEvaluateOnLoad(
-      String scriptSource) async {
+    String scriptSource,
+  ) async {
     var result = await _client.send('Page.addScriptToEvaluateOnLoad', {
       'scriptSource': scriptSource,
     });
@@ -186,10 +199,12 @@ class PageApi {
   /// [runImmediately] If true, runs the script immediately on existing execution contexts or worlds.
   /// Default: false.
   /// Returns: Identifier of the added script.
-  Future<ScriptIdentifier> addScriptToEvaluateOnNewDocument(String source,
-      {String? worldName,
-      bool? includeCommandLineAPI,
-      bool? runImmediately}) async {
+  Future<ScriptIdentifier> addScriptToEvaluateOnNewDocument(
+    String source, {
+    String? worldName,
+    bool? includeCommandLineAPI,
+    bool? runImmediately,
+  }) async {
     var result = await _client.send('Page.addScriptToEvaluateOnNewDocument', {
       'source': source,
       if (worldName != null) 'worldName': worldName,
@@ -213,13 +228,14 @@ class PageApi {
   /// [captureBeyondViewport] Capture the screenshot beyond the viewport. Defaults to false.
   /// [optimizeForSpeed] Optimize image encoding for speed, not for resulting size (defaults to false)
   /// Returns: Base64-encoded image data.
-  Future<String> captureScreenshot(
-      {@Enum(['jpeg', 'png', 'webp']) String? format,
-      int? quality,
-      Viewport? clip,
-      bool? fromSurface,
-      bool? captureBeyondViewport,
-      bool? optimizeForSpeed}) async {
+  Future<String> captureScreenshot({
+    @Enum(['jpeg', 'png', 'webp']) String? format,
+    int? quality,
+    Viewport? clip,
+    bool? fromSurface,
+    bool? captureBeyondViewport,
+    bool? optimizeForSpeed,
+  }) async {
     assert(format == null || const ['jpeg', 'png', 'webp'].contains(format));
     var result = await _client.send('Page.captureScreenshot', {
       if (format != null) 'format': format,
@@ -269,8 +285,11 @@ class PageApi {
   /// [grantUniveralAccess] Whether or not universal access should be granted to the isolated world. This is a powerful
   /// option, use with caution.
   /// Returns: Execution context of the isolated world.
-  Future<runtime.ExecutionContextId> createIsolatedWorld(FrameId frameId,
-      {String? worldName, bool? grantUniveralAccess}) async {
+  Future<runtime.ExecutionContextId> createIsolatedWorld(
+    FrameId frameId, {
+    String? worldName,
+    bool? grantUniveralAccess,
+  }) async {
     var result = await _client.send('Page.createIsolatedWorld', {
       'frameId': frameId,
       if (worldName != null) 'worldName': worldName,
@@ -278,7 +297,8 @@ class PageApi {
         'grantUniveralAccess': grantUniveralAccess,
     });
     return runtime.ExecutionContextId.fromJson(
-        result['executionContextId'] as int);
+      result['executionContextId'] as int,
+    );
   }
 
   /// Deletes browser cookie with given name, domain and path.
@@ -338,9 +358,7 @@ class PageApi {
   /// Returns: Identifies the bottom-most script which caused the frame to be labelled
   /// as an ad. Only sent if frame is labelled as an ad and id is available.
   Future<AdScriptId> getAdScriptId(FrameId frameId) async {
-    var result = await _client.send('Page.getAdScriptId', {
-      'frameId': frameId,
-    });
+    var result = await _client.send('Page.getAdScriptId', {'frameId': frameId});
     return AdScriptId.fromJson(result['adScriptId'] as Map<String, dynamic>);
   }
 
@@ -372,7 +390,9 @@ class PageApi {
   /// [frameId] Frame id to get resource for.
   /// [url] URL of the resource to get content for.
   Future<GetResourceContentResult> getResourceContent(
-      FrameId frameId, String url) async {
+    FrameId frameId,
+    String url,
+  ) async {
     var result = await _client.send('Page.getResourceContent', {
       'frameId': frameId,
       'url': url,
@@ -385,7 +405,8 @@ class PageApi {
   Future<FrameResourceTree> getResourceTree() async {
     var result = await _client.send('Page.getResourceTree');
     return FrameResourceTree.fromJson(
-        result['frameTree'] as Map<String, dynamic>);
+      result['frameTree'] as Map<String, dynamic>,
+    );
   }
 
   /// Accepts or dismisses a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload).
@@ -405,11 +426,13 @@ class PageApi {
   /// [transitionType] Intended transition type.
   /// [frameId] Frame id to navigate, if not specified navigates the top frame.
   /// [referrerPolicy] Referrer-policy used for the navigation.
-  Future<NavigateResult> navigate(String url,
-      {String? referrer,
-      TransitionType? transitionType,
-      FrameId? frameId,
-      ReferrerPolicy? referrerPolicy}) async {
+  Future<NavigateResult> navigate(
+    String url, {
+    String? referrer,
+    TransitionType? transitionType,
+    FrameId? frameId,
+    ReferrerPolicy? referrerPolicy,
+  }) async {
     var result = await _client.send('Page.navigate', {
       'url': url,
       if (referrer != null) 'referrer': referrer,
@@ -423,9 +446,7 @@ class PageApi {
   /// Navigates current page to the given history entry.
   /// [entryId] Unique id of the entry to navigate to.
   Future<void> navigateToHistoryEntry(int entryId) async {
-    await _client.send('Page.navigateToHistoryEntry', {
-      'entryId': entryId,
-    });
+    await _client.send('Page.navigateToHistoryEntry', {'entryId': entryId});
   }
 
   /// Print page as PDF.
@@ -462,26 +483,29 @@ class PageApi {
   /// [transferMode] return as stream
   /// [generateTaggedPDF] Whether or not to generate tagged (accessible) PDF. Defaults to embedder choice.
   /// [generateDocumentOutline] Whether or not to embed the document outline into the PDF.
-  Future<PrintToPDFResult> printToPDF(
-      {bool? landscape,
-      bool? displayHeaderFooter,
-      bool? printBackground,
-      num? scale,
-      num? paperWidth,
-      num? paperHeight,
-      num? marginTop,
-      num? marginBottom,
-      num? marginLeft,
-      num? marginRight,
-      String? pageRanges,
-      String? headerTemplate,
-      String? footerTemplate,
-      bool? preferCSSPageSize,
-      @Enum(['ReturnAsBase64', 'ReturnAsStream']) String? transferMode,
-      bool? generateTaggedPDF,
-      bool? generateDocumentOutline}) async {
-    assert(transferMode == null ||
-        const ['ReturnAsBase64', 'ReturnAsStream'].contains(transferMode));
+  Future<PrintToPDFResult> printToPDF({
+    bool? landscape,
+    bool? displayHeaderFooter,
+    bool? printBackground,
+    num? scale,
+    num? paperWidth,
+    num? paperHeight,
+    num? marginTop,
+    num? marginBottom,
+    num? marginLeft,
+    num? marginRight,
+    String? pageRanges,
+    String? headerTemplate,
+    String? footerTemplate,
+    bool? preferCSSPageSize,
+    @Enum(['ReturnAsBase64', 'ReturnAsStream']) String? transferMode,
+    bool? generateTaggedPDF,
+    bool? generateDocumentOutline,
+  }) async {
+    assert(
+      transferMode == null ||
+          const ['ReturnAsBase64', 'ReturnAsStream'].contains(transferMode),
+    );
     var result = await _client.send('Page.printToPDF', {
       if (landscape != null) 'landscape': landscape,
       if (displayHeaderFooter != null)
@@ -513,10 +537,11 @@ class PageApi {
   /// [loaderId] If set, an error will be thrown if the target page's main frame's
   /// loader id does not match the provided id. This prevents accidentally
   /// reloading an unintended target in case there's a racing navigation.
-  Future<void> reload(
-      {bool? ignoreCache,
-      String? scriptToEvaluateOnLoad,
-      network.LoaderId? loaderId}) async {
+  Future<void> reload({
+    bool? ignoreCache,
+    String? scriptToEvaluateOnLoad,
+    network.LoaderId? loaderId,
+  }) async {
     await _client.send('Page.reload', {
       if (ignoreCache != null) 'ignoreCache': ignoreCache,
       if (scriptToEvaluateOnLoad != null)
@@ -535,7 +560,8 @@ class PageApi {
 
   /// Removes given script from the list.
   Future<void> removeScriptToEvaluateOnNewDocument(
-      ScriptIdentifier identifier) async {
+    ScriptIdentifier identifier,
+  ) async {
     await _client.send('Page.removeScriptToEvaluateOnNewDocument', {
       'identifier': identifier,
     });
@@ -544,9 +570,7 @@ class PageApi {
   /// Acknowledges that a screencast frame has been received by the frontend.
   /// [sessionId] Frame number.
   Future<void> screencastFrameAck(int sessionId) async {
-    await _client.send('Page.screencastFrameAck', {
-      'sessionId': sessionId,
-    });
+    await _client.send('Page.screencastFrameAck', {'sessionId': sessionId});
   }
 
   /// Searches for given string in resource content.
@@ -557,8 +581,12 @@ class PageApi {
   /// [isRegex] If true, treats string parameter as regex.
   /// Returns: List of search matches.
   Future<List<debugger.SearchMatch>> searchInResource(
-      FrameId frameId, String url, String query,
-      {bool? caseSensitive, bool? isRegex}) async {
+    FrameId frameId,
+    String url,
+    String query, {
+    bool? caseSensitive,
+    bool? isRegex,
+  }) async {
     var result = await _client.send('Page.searchInResource', {
       'frameId': frameId,
       'url': url,
@@ -574,28 +602,27 @@ class PageApi {
   /// Enable Chrome's experimental ad filter on all sites.
   /// [enabled] Whether to block ads.
   Future<void> setAdBlockingEnabled(bool enabled) async {
-    await _client.send('Page.setAdBlockingEnabled', {
-      'enabled': enabled,
-    });
+    await _client.send('Page.setAdBlockingEnabled', {'enabled': enabled});
   }
 
   /// Enable page Content Security Policy by-passing.
   /// [enabled] Whether to bypass page CSP.
   Future<void> setBypassCSP(bool enabled) async {
-    await _client.send('Page.setBypassCSP', {
-      'enabled': enabled,
-    });
+    await _client.send('Page.setBypassCSP', {'enabled': enabled});
   }
 
   /// Get Permissions Policy state on given frame.
   Future<List<PermissionsPolicyFeatureState>> getPermissionsPolicyState(
-      FrameId frameId) async {
+    FrameId frameId,
+  ) async {
     var result = await _client.send('Page.getPermissionsPolicyState', {
       'frameId': frameId,
     });
     return (result['states'] as List)
-        .map((e) =>
-            PermissionsPolicyFeatureState.fromJson(e as Map<String, dynamic>))
+        .map(
+          (e) =>
+              PermissionsPolicyFeatureState.fromJson(e as Map<String, dynamic>),
+        )
         .toList();
   }
 
@@ -627,15 +654,19 @@ class PageApi {
   /// [viewport] The viewport dimensions and scale. If not set, the override is cleared.
   @Deprecated('This command is deprecated')
   Future<void> setDeviceMetricsOverride(
-      int width, int height, num deviceScaleFactor, bool mobile,
-      {num? scale,
-      int? screenWidth,
-      int? screenHeight,
-      int? positionX,
-      int? positionY,
-      bool? dontSetVisibleSize,
-      emulation.ScreenOrientation? screenOrientation,
-      Viewport? viewport}) async {
+    int width,
+    int height,
+    num deviceScaleFactor,
+    bool mobile, {
+    num? scale,
+    int? screenWidth,
+    int? screenHeight,
+    int? positionX,
+    int? positionY,
+    bool? dontSetVisibleSize,
+    emulation.ScreenOrientation? screenOrientation,
+    Viewport? viewport,
+  }) async {
     await _client.send('Page.setDeviceMetricsOverride', {
       'width': width,
       'height': height,
@@ -658,7 +689,10 @@ class PageApi {
   /// [gamma] Mock gamma
   @Deprecated('This command is deprecated')
   Future<void> setDeviceOrientationOverride(
-      num alpha, num beta, num gamma) async {
+    num alpha,
+    num beta,
+    num gamma,
+  ) async {
     await _client.send('Page.setDeviceOrientationOverride', {
       'alpha': alpha,
       'beta': beta,
@@ -669,8 +703,10 @@ class PageApi {
   /// Set generic font families.
   /// [fontFamilies] Specifies font families to set. If a font family is not specified, it won't be changed.
   /// [forScripts] Specifies font families to set for individual scripts.
-  Future<void> setFontFamilies(FontFamilies fontFamilies,
-      {List<ScriptFontFamilies>? forScripts}) async {
+  Future<void> setFontFamilies(
+    FontFamilies fontFamilies, {
+    List<ScriptFontFamilies>? forScripts,
+  }) async {
     await _client.send('Page.setFontFamilies', {
       'fontFamilies': fontFamilies,
       if (forScripts != null) 'forScripts': [...forScripts],
@@ -680,9 +716,7 @@ class PageApi {
   /// Set default font sizes.
   /// [fontSizes] Specifies font sizes to set. If a font size is not specified, it won't be changed.
   Future<void> setFontSizes(FontSizes fontSizes) async {
-    await _client.send('Page.setFontSizes', {
-      'fontSizes': fontSizes,
-    });
+    await _client.send('Page.setFontSizes', {'fontSizes': fontSizes});
   }
 
   /// Sets given markup as the document's HTML.
@@ -701,8 +735,9 @@ class PageApi {
   /// [downloadPath] The default path to save downloaded files to. This is required if behavior is set to 'allow'
   @Deprecated('This command is deprecated')
   Future<void> setDownloadBehavior(
-      @Enum(['deny', 'allow', 'default']) String behavior,
-      {String? downloadPath}) async {
+    @Enum(['deny', 'allow', 'default']) String behavior, {
+    String? downloadPath,
+  }) async {
     assert(const ['deny', 'allow', 'default'].contains(behavior));
     await _client.send('Page.setDownloadBehavior', {
       'behavior': behavior,
@@ -716,8 +751,11 @@ class PageApi {
   /// [longitude] Mock longitude
   /// [accuracy] Mock accuracy
   @Deprecated('This command is deprecated')
-  Future<void> setGeolocationOverride(
-      {num? latitude, num? longitude, num? accuracy}) async {
+  Future<void> setGeolocationOverride({
+    num? latitude,
+    num? longitude,
+    num? accuracy,
+  }) async {
     await _client.send('Page.setGeolocationOverride', {
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
@@ -728,19 +766,21 @@ class PageApi {
   /// Controls whether page will emit lifecycle events.
   /// [enabled] If true, starts emitting lifecycle events.
   Future<void> setLifecycleEventsEnabled(bool enabled) async {
-    await _client.send('Page.setLifecycleEventsEnabled', {
-      'enabled': enabled,
-    });
+    await _client.send('Page.setLifecycleEventsEnabled', {'enabled': enabled});
   }
 
   /// Toggles mouse event-based touch event emulation.
   /// [enabled] Whether the touch event emulation should be enabled.
   /// [configuration] Touch/gesture events configuration. Default: current platform.
   @Deprecated('This command is deprecated')
-  Future<void> setTouchEmulationEnabled(bool enabled,
-      {@Enum(['mobile', 'desktop']) String? configuration}) async {
-    assert(configuration == null ||
-        const ['mobile', 'desktop'].contains(configuration));
+  Future<void> setTouchEmulationEnabled(
+    bool enabled, {
+    @Enum(['mobile', 'desktop']) String? configuration,
+  }) async {
+    assert(
+      configuration == null ||
+          const ['mobile', 'desktop'].contains(configuration),
+    );
     await _client.send('Page.setTouchEmulationEnabled', {
       'enabled': enabled,
       if (configuration != null) 'configuration': configuration,
@@ -753,12 +793,13 @@ class PageApi {
   /// [maxWidth] Maximum screenshot width.
   /// [maxHeight] Maximum screenshot height.
   /// [everyNthFrame] Send every n-th frame.
-  Future<void> startScreencast(
-      {@Enum(['jpeg', 'png']) String? format,
-      int? quality,
-      int? maxWidth,
-      int? maxHeight,
-      int? everyNthFrame}) async {
+  Future<void> startScreencast({
+    @Enum(['jpeg', 'png']) String? format,
+    int? quality,
+    int? maxWidth,
+    int? maxHeight,
+    int? everyNthFrame,
+  }) async {
     assert(format == null || const ['jpeg', 'png'].contains(format));
     await _client.send('Page.startScreencast', {
       if (format != null) 'format': format,
@@ -789,11 +830,10 @@ class PageApi {
   /// https://github.com/WICG/web-lifecycle/
   /// [state] Target lifecycle state
   Future<void> setWebLifecycleState(
-      @Enum(['frozen', 'active']) String state) async {
+    @Enum(['frozen', 'active']) String state,
+  ) async {
     assert(const ['frozen', 'active'].contains(state));
-    await _client.send('Page.setWebLifecycleState', {
-      'state': state,
-    });
+    await _client.send('Page.setWebLifecycleState', {'state': state});
   }
 
   /// Stops sending each frame in the `screencastFrame`.
@@ -808,7 +848,8 @@ class PageApi {
   /// produced upon backend discretion, based on internal heuristics.
   /// See also: `Page.compilationCacheProduced`.
   Future<void> produceCompilationCache(
-      List<CompilationCacheParams> scripts) async {
+    List<CompilationCacheParams> scripts,
+  ) async {
     await _client.send('Page.produceCompilationCache', {
       'scripts': [...scripts],
     });
@@ -818,10 +859,7 @@ class PageApi {
   /// cross-process navigation.
   /// [data] Base64-encoded data
   Future<void> addCompilationCache(String url, String data) async {
-    await _client.send('Page.addCompilationCache', {
-      'url': url,
-      'data': data,
-    });
+    await _client.send('Page.addCompilationCache', {'url': url, 'data': data});
   }
 
   /// Clears seeded compilation cache.
@@ -832,17 +870,13 @@ class PageApi {
   /// Sets the Secure Payment Confirmation transaction mode.
   /// https://w3c.github.io/secure-payment-confirmation/#sctn-automation-set-spc-transaction-mode
   Future<void> setSPCTransactionMode(AutoResponseMode mode) async {
-    await _client.send('Page.setSPCTransactionMode', {
-      'mode': mode,
-    });
+    await _client.send('Page.setSPCTransactionMode', {'mode': mode});
   }
 
   /// Extensions for Custom Handlers API:
   /// https://html.spec.whatwg.org/multipage/system-state.html#rph-automation
   Future<void> setRPHRegistrationMode(AutoResponseMode mode) async {
-    await _client.send('Page.setRPHRegistrationMode', {
-      'mode': mode,
-    });
+    await _client.send('Page.setRPHRegistrationMode', {'mode': mode});
   }
 
   /// Generates a report for testing.
@@ -877,9 +911,7 @@ class PageApi {
   ///
   /// TODO(https://crbug.com/1440085): Remove this once Puppeteer supports tab targets.
   Future<void> setPrerenderingAllowed(bool isAllowed) async {
-    await _client.send('Page.setPrerenderingAllowed', {
-      'isAllowed': isAllowed,
-    });
+    await _client.send('Page.setPrerenderingAllowed', {'isAllowed': isAllowed});
   }
 }
 
@@ -893,16 +925,20 @@ class FileChooserOpenedEvent {
   /// Input node id. Only present for file choosers opened via an `<input type="file">` element.
   final dom.BackendNodeId? backendNodeId;
 
-  FileChooserOpenedEvent(
-      {required this.frameId, required this.mode, this.backendNodeId});
+  FileChooserOpenedEvent({
+    required this.frameId,
+    required this.mode,
+    this.backendNodeId,
+  });
 
   factory FileChooserOpenedEvent.fromJson(Map<String, dynamic> json) {
     return FileChooserOpenedEvent(
       frameId: FrameId.fromJson(json['frameId'] as String),
       mode: FileChooserOpenedEventMode.fromJson(json['mode'] as String),
-      backendNodeId: json.containsKey('backendNodeId')
-          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
-          : null,
+      backendNodeId:
+          json.containsKey('backendNodeId')
+              ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
+              : null,
     );
   }
 }
@@ -917,17 +953,22 @@ class FrameAttachedEvent {
   /// JavaScript stack trace of when frame was attached, only set if frame initiated from script.
   final runtime.StackTraceData? stack;
 
-  FrameAttachedEvent(
-      {required this.frameId, required this.parentFrameId, this.stack});
+  FrameAttachedEvent({
+    required this.frameId,
+    required this.parentFrameId,
+    this.stack,
+  });
 
   factory FrameAttachedEvent.fromJson(Map<String, dynamic> json) {
     return FrameAttachedEvent(
       frameId: FrameId.fromJson(json['frameId'] as String),
       parentFrameId: FrameId.fromJson(json['parentFrameId'] as String),
-      stack: json.containsKey('stack')
-          ? runtime.StackTraceData.fromJson(
-              json['stack'] as Map<String, dynamic>)
-          : null,
+      stack:
+          json.containsKey('stack')
+              ? runtime.StackTraceData.fromJson(
+                json['stack'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 }
@@ -977,19 +1018,21 @@ class FrameRequestedNavigationEvent {
   /// The disposition for the navigation.
   final ClientNavigationDisposition disposition;
 
-  FrameRequestedNavigationEvent(
-      {required this.frameId,
-      required this.reason,
-      required this.url,
-      required this.disposition});
+  FrameRequestedNavigationEvent({
+    required this.frameId,
+    required this.reason,
+    required this.url,
+    required this.disposition,
+  });
 
   factory FrameRequestedNavigationEvent.fromJson(Map<String, dynamic> json) {
     return FrameRequestedNavigationEvent(
       frameId: FrameId.fromJson(json['frameId'] as String),
       reason: ClientNavigationReason.fromJson(json['reason'] as String),
       url: json['url'] as String,
-      disposition:
-          ClientNavigationDisposition.fromJson(json['disposition'] as String),
+      disposition: ClientNavigationDisposition.fromJson(
+        json['disposition'] as String,
+      ),
     );
   }
 }
@@ -1008,11 +1051,12 @@ class FrameScheduledNavigationEvent {
   /// The destination URL for the scheduled navigation.
   final String url;
 
-  FrameScheduledNavigationEvent(
-      {required this.frameId,
-      required this.delay,
-      required this.reason,
-      required this.url});
+  FrameScheduledNavigationEvent({
+    required this.frameId,
+    required this.delay,
+    required this.reason,
+    required this.url,
+  });
 
   factory FrameScheduledNavigationEvent.fromJson(Map<String, dynamic> json) {
     return FrameScheduledNavigationEvent(
@@ -1037,11 +1081,12 @@ class DownloadWillBeginEvent {
   /// Suggested file name of the resource (the actual name of the file saved on disk may differ).
   final String suggestedFilename;
 
-  DownloadWillBeginEvent(
-      {required this.frameId,
-      required this.guid,
-      required this.url,
-      required this.suggestedFilename});
+  DownloadWillBeginEvent({
+    required this.frameId,
+    required this.guid,
+    required this.url,
+    required this.suggestedFilename,
+  });
 
   factory DownloadWillBeginEvent.fromJson(Map<String, dynamic> json) {
     return DownloadWillBeginEvent(
@@ -1066,11 +1111,12 @@ class DownloadProgressEvent {
   /// Download status.
   final DownloadProgressEventState state;
 
-  DownloadProgressEvent(
-      {required this.guid,
-      required this.totalBytes,
-      required this.receivedBytes,
-      required this.state});
+  DownloadProgressEvent({
+    required this.guid,
+    required this.totalBytes,
+    required this.receivedBytes,
+    required this.state,
+  });
 
   factory DownloadProgressEvent.fromJson(Map<String, dynamic> json) {
     return DownloadProgressEvent(
@@ -1117,12 +1163,13 @@ class JavascriptDialogOpeningEvent {
   /// Default dialog prompt.
   final String? defaultPrompt;
 
-  JavascriptDialogOpeningEvent(
-      {required this.url,
-      required this.message,
-      required this.type,
-      required this.hasBrowserHandler,
-      this.defaultPrompt});
+  JavascriptDialogOpeningEvent({
+    required this.url,
+    required this.message,
+    required this.type,
+    required this.hasBrowserHandler,
+    this.defaultPrompt,
+  });
 
   factory JavascriptDialogOpeningEvent.fromJson(Map<String, dynamic> json) {
     return JavascriptDialogOpeningEvent(
@@ -1130,9 +1177,10 @@ class JavascriptDialogOpeningEvent {
       message: json['message'] as String,
       type: DialogType.fromJson(json['type'] as String),
       hasBrowserHandler: json['hasBrowserHandler'] as bool? ?? false,
-      defaultPrompt: json.containsKey('defaultPrompt')
-          ? json['defaultPrompt'] as String
-          : null,
+      defaultPrompt:
+          json.containsKey('defaultPrompt')
+              ? json['defaultPrompt'] as String
+              : null,
     );
   }
 }
@@ -1148,11 +1196,12 @@ class LifecycleEventEvent {
 
   final network.MonotonicTime timestamp;
 
-  LifecycleEventEvent(
-      {required this.frameId,
-      required this.loaderId,
-      required this.name,
-      required this.timestamp});
+  LifecycleEventEvent({
+    required this.frameId,
+    required this.loaderId,
+    required this.name,
+    required this.timestamp,
+  });
 
   factory LifecycleEventEvent.fromJson(Map<String, dynamic> json) {
     return LifecycleEventEvent(
@@ -1177,24 +1226,30 @@ class BackForwardCacheNotUsedEvent {
   /// Tree structure of reasons why the page could not be cached for each frame.
   final BackForwardCacheNotRestoredExplanationTree? notRestoredExplanationsTree;
 
-  BackForwardCacheNotUsedEvent(
-      {required this.loaderId,
-      required this.frameId,
-      required this.notRestoredExplanations,
-      this.notRestoredExplanationsTree});
+  BackForwardCacheNotUsedEvent({
+    required this.loaderId,
+    required this.frameId,
+    required this.notRestoredExplanations,
+    this.notRestoredExplanationsTree,
+  });
 
   factory BackForwardCacheNotUsedEvent.fromJson(Map<String, dynamic> json) {
     return BackForwardCacheNotUsedEvent(
       loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
       frameId: FrameId.fromJson(json['frameId'] as String),
-      notRestoredExplanations: (json['notRestoredExplanations'] as List)
-          .map((e) => BackForwardCacheNotRestoredExplanation.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
+      notRestoredExplanations:
+          (json['notRestoredExplanations'] as List)
+              .map(
+                (e) => BackForwardCacheNotRestoredExplanation.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
       notRestoredExplanationsTree:
           json.containsKey('notRestoredExplanationsTree')
               ? BackForwardCacheNotRestoredExplanationTree.fromJson(
-                  json['notRestoredExplanationsTree'] as Map<String, dynamic>)
+                json['notRestoredExplanationsTree'] as Map<String, dynamic>,
+              )
               : null,
     );
   }
@@ -1210,15 +1265,19 @@ class NavigatedWithinDocumentEvent {
   /// Navigation type
   final NavigatedWithinDocumentEventNavigationType navigationType;
 
-  NavigatedWithinDocumentEvent(
-      {required this.frameId, required this.url, required this.navigationType});
+  NavigatedWithinDocumentEvent({
+    required this.frameId,
+    required this.url,
+    required this.navigationType,
+  });
 
   factory NavigatedWithinDocumentEvent.fromJson(Map<String, dynamic> json) {
     return NavigatedWithinDocumentEvent(
       frameId: FrameId.fromJson(json['frameId'] as String),
       url: json['url'] as String,
       navigationType: NavigatedWithinDocumentEventNavigationType.fromJson(
-          json['navigationType'] as String),
+        json['navigationType'] as String,
+      ),
     );
   }
 }
@@ -1233,14 +1292,18 @@ class ScreencastFrameEvent {
   /// Frame number.
   final int sessionId;
 
-  ScreencastFrameEvent(
-      {required this.data, required this.metadata, required this.sessionId});
+  ScreencastFrameEvent({
+    required this.data,
+    required this.metadata,
+    required this.sessionId,
+  });
 
   factory ScreencastFrameEvent.fromJson(Map<String, dynamic> json) {
     return ScreencastFrameEvent(
       data: json['data'] as String,
       metadata: ScreencastFrameMetadata.fromJson(
-          json['metadata'] as Map<String, dynamic>),
+        json['metadata'] as Map<String, dynamic>,
+      ),
       sessionId: json['sessionId'] as int,
     );
   }
@@ -1259,11 +1322,12 @@ class WindowOpenEvent {
   /// Whether or not it was triggered by user gesture.
   final bool userGesture;
 
-  WindowOpenEvent(
-      {required this.url,
-      required this.windowName,
-      required this.windowFeatures,
-      required this.userGesture});
+  WindowOpenEvent({
+    required this.url,
+    required this.windowName,
+    required this.windowFeatures,
+    required this.userGesture,
+  });
 
   factory WindowOpenEvent.fromJson(Map<String, dynamic> json) {
     return WindowOpenEvent(
@@ -1303,21 +1367,24 @@ class GetAppManifestResult {
 
   final WebAppManifest manifest;
 
-  GetAppManifestResult(
-      {required this.url,
-      required this.errors,
-      this.data,
-      required this.manifest});
+  GetAppManifestResult({
+    required this.url,
+    required this.errors,
+    this.data,
+    required this.manifest,
+  });
 
   factory GetAppManifestResult.fromJson(Map<String, dynamic> json) {
     return GetAppManifestResult(
       url: json['url'] as String,
-      errors: (json['errors'] as List)
-          .map((e) => AppManifestError.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      errors:
+          (json['errors'] as List)
+              .map((e) => AppManifestError.fromJson(e as Map<String, dynamic>))
+              .toList(),
       data: json.containsKey('data') ? json['data'] as String : null,
-      manifest:
-          WebAppManifest.fromJson(json['manifest'] as Map<String, dynamic>),
+      manifest: WebAppManifest.fromJson(
+        json['manifest'] as Map<String, dynamic>,
+      ),
     );
   }
 }
@@ -1334,9 +1401,10 @@ class GetAppIdResult {
   factory GetAppIdResult.fromJson(Map<String, dynamic> json) {
     return GetAppIdResult(
       appId: json.containsKey('appId') ? json['appId'] as String : null,
-      recommendedId: json.containsKey('recommendedId')
-          ? json['recommendedId'] as String
-          : null,
+      recommendedId:
+          json.containsKey('recommendedId')
+              ? json['recommendedId'] as String
+              : null,
     );
   }
 }
@@ -1351,19 +1419,23 @@ class GetLayoutMetricsResult {
   /// Size of scrollable area in CSS pixels.
   final dom.Rect cssContentSize;
 
-  GetLayoutMetricsResult(
-      {required this.cssLayoutViewport,
-      required this.cssVisualViewport,
-      required this.cssContentSize});
+  GetLayoutMetricsResult({
+    required this.cssLayoutViewport,
+    required this.cssVisualViewport,
+    required this.cssContentSize,
+  });
 
   factory GetLayoutMetricsResult.fromJson(Map<String, dynamic> json) {
     return GetLayoutMetricsResult(
       cssLayoutViewport: LayoutViewport.fromJson(
-          json['cssLayoutViewport'] as Map<String, dynamic>),
+        json['cssLayoutViewport'] as Map<String, dynamic>,
+      ),
       cssVisualViewport: VisualViewport.fromJson(
-          json['cssVisualViewport'] as Map<String, dynamic>),
-      cssContentSize:
-          dom.Rect.fromJson(json['cssContentSize'] as Map<String, dynamic>),
+        json['cssVisualViewport'] as Map<String, dynamic>,
+      ),
+      cssContentSize: dom.Rect.fromJson(
+        json['cssContentSize'] as Map<String, dynamic>,
+      ),
     );
   }
 }
@@ -1375,15 +1447,18 @@ class GetNavigationHistoryResult {
   /// Array of navigation history entries.
   final List<NavigationEntry> entries;
 
-  GetNavigationHistoryResult(
-      {required this.currentIndex, required this.entries});
+  GetNavigationHistoryResult({
+    required this.currentIndex,
+    required this.entries,
+  });
 
   factory GetNavigationHistoryResult.fromJson(Map<String, dynamic> json) {
     return GetNavigationHistoryResult(
       currentIndex: json['currentIndex'] as int,
-      entries: (json['entries'] as List)
-          .map((e) => NavigationEntry.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      entries:
+          (json['entries'] as List)
+              .map((e) => NavigationEntry.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 }
@@ -1395,8 +1470,10 @@ class GetResourceContentResult {
   /// True, if content was served as base64.
   final bool base64Encoded;
 
-  GetResourceContentResult(
-      {required this.content, required this.base64Encoded});
+  GetResourceContentResult({
+    required this.content,
+    required this.base64Encoded,
+  });
 
   factory GetResourceContentResult.fromJson(Map<String, dynamic> json) {
     return GetResourceContentResult(
@@ -1422,9 +1499,10 @@ class NavigateResult {
   factory NavigateResult.fromJson(Map<String, dynamic> json) {
     return NavigateResult(
       frameId: FrameId.fromJson(json['frameId'] as String),
-      loaderId: json.containsKey('loaderId')
-          ? network.LoaderId.fromJson(json['loaderId'] as String)
-          : null,
+      loaderId:
+          json.containsKey('loaderId')
+              ? network.LoaderId.fromJson(json['loaderId'] as String)
+              : null,
       errorText:
           json.containsKey('errorText') ? json['errorText'] as String : null,
     );
@@ -1443,9 +1521,10 @@ class PrintToPDFResult {
   factory PrintToPDFResult.fromJson(Map<String, dynamic> json) {
     return PrintToPDFResult(
       data: json['data'] as String,
-      stream: json.containsKey('stream')
-          ? io.StreamHandle.fromJson(json['stream'] as String)
-          : null,
+      stream:
+          json.containsKey('stream')
+              ? io.StreamHandle.fromJson(json['stream'] as String)
+              : null,
     );
   }
 }
@@ -1461,8 +1540,7 @@ extension type FrameId(String value) {
 enum AdFrameType {
   none('none'),
   child('child'),
-  root('root'),
-  ;
+  root('root');
 
   final String value;
 
@@ -1480,8 +1558,7 @@ enum AdFrameType {
 enum AdFrameExplanation {
   parentIsAd('ParentIsAd'),
   createdByAdScript('CreatedByAdScript'),
-  matchedBlockingRule('MatchedBlockingRule'),
-  ;
+  matchedBlockingRule('MatchedBlockingRule');
 
   final String value;
 
@@ -1507,11 +1584,12 @@ class AdFrameStatus {
   factory AdFrameStatus.fromJson(Map<String, dynamic> json) {
     return AdFrameStatus(
       adFrameType: AdFrameType.fromJson(json['adFrameType'] as String),
-      explanations: json.containsKey('explanations')
-          ? (json['explanations'] as List)
-              .map((e) => AdFrameExplanation.fromJson(e as String))
-              .toList()
-          : null,
+      explanations:
+          json.containsKey('explanations')
+              ? (json['explanations'] as List)
+                  .map((e) => AdFrameExplanation.fromJson(e as String))
+                  .toList()
+              : null,
     );
   }
 
@@ -1539,16 +1617,14 @@ class AdScriptId {
   factory AdScriptId.fromJson(Map<String, dynamic> json) {
     return AdScriptId(
       scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
-      debuggerId:
-          runtime.UniqueDebuggerId.fromJson(json['debuggerId'] as String),
+      debuggerId: runtime.UniqueDebuggerId.fromJson(
+        json['debuggerId'] as String,
+      ),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'scriptId': scriptId.toJson(),
-      'debuggerId': debuggerId.toJson(),
-    };
+    return {'scriptId': scriptId.toJson(), 'debuggerId': debuggerId.toJson()};
   }
 }
 
@@ -1557,8 +1633,7 @@ enum SecureContextType {
   secure('Secure'),
   secureLocalhost('SecureLocalhost'),
   insecureScheme('InsecureScheme'),
-  insecureAncestor('InsecureAncestor'),
-  ;
+  insecureAncestor('InsecureAncestor');
 
   final String value;
 
@@ -1577,8 +1652,7 @@ enum SecureContextType {
 enum CrossOriginIsolatedContextType {
   isolated('Isolated'),
   notIsolated('NotIsolated'),
-  notIsolatedFeatureDisabled('NotIsolatedFeatureDisabled'),
-  ;
+  notIsolatedFeatureDisabled('NotIsolatedFeatureDisabled');
 
   final String value;
 
@@ -1597,8 +1671,7 @@ enum GatedAPIFeatures {
   sharedArrayBuffers('SharedArrayBuffers'),
   sharedArrayBuffersTransferAllowed('SharedArrayBuffersTransferAllowed'),
   performanceMeasureMemory('PerformanceMeasureMemory'),
-  performanceProfile('PerformanceProfile'),
-  ;
+  performanceProfile('PerformanceProfile');
 
   final String value;
 
@@ -1707,8 +1780,7 @@ enum PermissionsPolicyFeature {
   webPrinting('web-printing'),
   webShare('web-share'),
   windowManagement('window-management'),
-  xrSpatialTracking('xr-spatial-tracking'),
-  ;
+  xrSpatialTracking('xr-spatial-tracking');
 
   final String value;
 
@@ -1728,8 +1800,7 @@ enum PermissionsPolicyBlockReason {
   header('Header'),
   iframeAttribute('IframeAttribute'),
   inFencedFrameTree('InFencedFrameTree'),
-  inIsolatedApp('InIsolatedApp'),
-  ;
+  inIsolatedApp('InIsolatedApp');
 
   final String value;
 
@@ -1749,22 +1820,22 @@ class PermissionsPolicyBlockLocator {
 
   final PermissionsPolicyBlockReason blockReason;
 
-  PermissionsPolicyBlockLocator(
-      {required this.frameId, required this.blockReason});
+  PermissionsPolicyBlockLocator({
+    required this.frameId,
+    required this.blockReason,
+  });
 
   factory PermissionsPolicyBlockLocator.fromJson(Map<String, dynamic> json) {
     return PermissionsPolicyBlockLocator(
       frameId: FrameId.fromJson(json['frameId'] as String),
-      blockReason:
-          PermissionsPolicyBlockReason.fromJson(json['blockReason'] as String),
+      blockReason: PermissionsPolicyBlockReason.fromJson(
+        json['blockReason'] as String,
+      ),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'frameId': frameId.toJson(),
-      'blockReason': blockReason.toJson(),
-    };
+    return {'frameId': frameId.toJson(), 'blockReason': blockReason.toJson()};
   }
 }
 
@@ -1775,17 +1846,22 @@ class PermissionsPolicyFeatureState {
 
   final PermissionsPolicyBlockLocator? locator;
 
-  PermissionsPolicyFeatureState(
-      {required this.feature, required this.allowed, this.locator});
+  PermissionsPolicyFeatureState({
+    required this.feature,
+    required this.allowed,
+    this.locator,
+  });
 
   factory PermissionsPolicyFeatureState.fromJson(Map<String, dynamic> json) {
     return PermissionsPolicyFeatureState(
       feature: PermissionsPolicyFeature.fromJson(json['feature'] as String),
       allowed: json['allowed'] as bool? ?? false,
-      locator: json.containsKey('locator')
-          ? PermissionsPolicyBlockLocator.fromJson(
-              json['locator'] as Map<String, dynamic>)
-          : null,
+      locator:
+          json.containsKey('locator')
+              ? PermissionsPolicyBlockLocator.fromJson(
+                json['locator'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 
@@ -1812,8 +1888,7 @@ enum OriginTrialTokenStatus {
   featureDisabled('FeatureDisabled'),
   tokenDisabled('TokenDisabled'),
   featureDisabledForUser('FeatureDisabledForUser'),
-  unknownTrial('UnknownTrial'),
-  ;
+  unknownTrial('UnknownTrial');
 
   final String value;
 
@@ -1833,8 +1908,7 @@ enum OriginTrialStatus {
   enabled('Enabled'),
   validTokenNotProvided('ValidTokenNotProvided'),
   osNotSupported('OSNotSupported'),
-  trialNotAllowed('TrialNotAllowed'),
-  ;
+  trialNotAllowed('TrialNotAllowed');
 
   final String value;
 
@@ -1851,8 +1925,7 @@ enum OriginTrialStatus {
 
 enum OriginTrialUsageRestriction {
   none('None'),
-  subset('Subset'),
-  ;
+  subset('Subset');
 
   final String value;
 
@@ -1880,13 +1953,14 @@ class OriginTrialToken {
 
   final OriginTrialUsageRestriction usageRestriction;
 
-  OriginTrialToken(
-      {required this.origin,
-      required this.matchSubDomains,
-      required this.trialName,
-      required this.expiryTime,
-      required this.isThirdParty,
-      required this.usageRestriction});
+  OriginTrialToken({
+    required this.origin,
+    required this.matchSubDomains,
+    required this.trialName,
+    required this.expiryTime,
+    required this.isThirdParty,
+    required this.usageRestriction,
+  });
 
   factory OriginTrialToken.fromJson(Map<String, dynamic> json) {
     return OriginTrialToken(
@@ -1896,7 +1970,8 @@ class OriginTrialToken {
       expiryTime: network.TimeSinceEpoch.fromJson(json['expiryTime'] as num),
       isThirdParty: json['isThirdParty'] as bool? ?? false,
       usageRestriction: OriginTrialUsageRestriction.fromJson(
-          json['usageRestriction'] as String),
+        json['usageRestriction'] as String,
+      ),
     );
   }
 
@@ -1921,16 +1996,21 @@ class OriginTrialTokenWithStatus {
 
   final OriginTrialTokenStatus status;
 
-  OriginTrialTokenWithStatus(
-      {required this.rawTokenText, this.parsedToken, required this.status});
+  OriginTrialTokenWithStatus({
+    required this.rawTokenText,
+    this.parsedToken,
+    required this.status,
+  });
 
   factory OriginTrialTokenWithStatus.fromJson(Map<String, dynamic> json) {
     return OriginTrialTokenWithStatus(
       rawTokenText: json['rawTokenText'] as String,
-      parsedToken: json.containsKey('parsedToken')
-          ? OriginTrialToken.fromJson(
-              json['parsedToken'] as Map<String, dynamic>)
-          : null,
+      parsedToken:
+          json.containsKey('parsedToken')
+              ? OriginTrialToken.fromJson(
+                json['parsedToken'] as Map<String, dynamic>,
+              )
+              : null,
       status: OriginTrialTokenStatus.fromJson(json['status'] as String),
     );
   }
@@ -1951,19 +2031,24 @@ class OriginTrial {
 
   final List<OriginTrialTokenWithStatus> tokensWithStatus;
 
-  OriginTrial(
-      {required this.trialName,
-      required this.status,
-      required this.tokensWithStatus});
+  OriginTrial({
+    required this.trialName,
+    required this.status,
+    required this.tokensWithStatus,
+  });
 
   factory OriginTrial.fromJson(Map<String, dynamic> json) {
     return OriginTrial(
       trialName: json['trialName'] as String,
       status: OriginTrialStatus.fromJson(json['status'] as String),
-      tokensWithStatus: (json['tokensWithStatus'] as List)
-          .map((e) =>
-              OriginTrialTokenWithStatus.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      tokensWithStatus:
+          (json['tokensWithStatus'] as List)
+              .map(
+                (e) => OriginTrialTokenWithStatus.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
     );
   }
 
@@ -2023,51 +2108,60 @@ class FrameInfo {
   /// Indicated which gated APIs / features are available.
   final List<GatedAPIFeatures> gatedAPIFeatures;
 
-  FrameInfo(
-      {required this.id,
-      this.parentId,
-      required this.loaderId,
-      this.name,
-      required this.url,
-      this.urlFragment,
-      required this.domainAndRegistry,
-      required this.securityOrigin,
-      required this.mimeType,
-      this.unreachableUrl,
-      this.adFrameStatus,
-      required this.secureContextType,
-      required this.crossOriginIsolatedContextType,
-      required this.gatedAPIFeatures});
+  FrameInfo({
+    required this.id,
+    this.parentId,
+    required this.loaderId,
+    this.name,
+    required this.url,
+    this.urlFragment,
+    required this.domainAndRegistry,
+    required this.securityOrigin,
+    required this.mimeType,
+    this.unreachableUrl,
+    this.adFrameStatus,
+    required this.secureContextType,
+    required this.crossOriginIsolatedContextType,
+    required this.gatedAPIFeatures,
+  });
 
   factory FrameInfo.fromJson(Map<String, dynamic> json) {
     return FrameInfo(
       id: FrameId.fromJson(json['id'] as String),
-      parentId: json.containsKey('parentId')
-          ? FrameId.fromJson(json['parentId'] as String)
-          : null,
+      parentId:
+          json.containsKey('parentId')
+              ? FrameId.fromJson(json['parentId'] as String)
+              : null,
       loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
       name: json.containsKey('name') ? json['name'] as String : null,
       url: json['url'] as String,
-      urlFragment: json.containsKey('urlFragment')
-          ? json['urlFragment'] as String
-          : null,
+      urlFragment:
+          json.containsKey('urlFragment')
+              ? json['urlFragment'] as String
+              : null,
       domainAndRegistry: json['domainAndRegistry'] as String,
       securityOrigin: json['securityOrigin'] as String,
       mimeType: json['mimeType'] as String,
-      unreachableUrl: json.containsKey('unreachableUrl')
-          ? json['unreachableUrl'] as String
-          : null,
-      adFrameStatus: json.containsKey('adFrameStatus')
-          ? AdFrameStatus.fromJson(
-              json['adFrameStatus'] as Map<String, dynamic>)
-          : null,
-      secureContextType:
-          SecureContextType.fromJson(json['secureContextType'] as String),
+      unreachableUrl:
+          json.containsKey('unreachableUrl')
+              ? json['unreachableUrl'] as String
+              : null,
+      adFrameStatus:
+          json.containsKey('adFrameStatus')
+              ? AdFrameStatus.fromJson(
+                json['adFrameStatus'] as Map<String, dynamic>,
+              )
+              : null,
+      secureContextType: SecureContextType.fromJson(
+        json['secureContextType'] as String,
+      ),
       crossOriginIsolatedContextType: CrossOriginIsolatedContextType.fromJson(
-          json['crossOriginIsolatedContextType'] as String),
-      gatedAPIFeatures: (json['gatedAPIFeatures'] as List)
-          .map((e) => GatedAPIFeatures.fromJson(e as String))
-          .toList(),
+        json['crossOriginIsolatedContextType'] as String,
+      ),
+      gatedAPIFeatures:
+          (json['gatedAPIFeatures'] as List)
+              .map((e) => GatedAPIFeatures.fromJson(e as String))
+              .toList(),
     );
   }
 
@@ -2114,23 +2208,25 @@ class FrameResource {
   /// True if the resource was canceled during loading.
   final bool? canceled;
 
-  FrameResource(
-      {required this.url,
-      required this.type,
-      required this.mimeType,
-      this.lastModified,
-      this.contentSize,
-      this.failed,
-      this.canceled});
+  FrameResource({
+    required this.url,
+    required this.type,
+    required this.mimeType,
+    this.lastModified,
+    this.contentSize,
+    this.failed,
+    this.canceled,
+  });
 
   factory FrameResource.fromJson(Map<String, dynamic> json) {
     return FrameResource(
       url: json['url'] as String,
       type: network.ResourceType.fromJson(json['type'] as String),
       mimeType: json['mimeType'] as String,
-      lastModified: json.containsKey('lastModified')
-          ? network.TimeSinceEpoch.fromJson(json['lastModified'] as num)
-          : null,
+      lastModified:
+          json.containsKey('lastModified')
+              ? network.TimeSinceEpoch.fromJson(json['lastModified'] as num)
+              : null,
       contentSize:
           json.containsKey('contentSize') ? json['contentSize'] as num : null,
       failed: json.containsKey('failed') ? json['failed'] as bool : null,
@@ -2162,20 +2258,28 @@ class FrameResourceTree {
   /// Information about frame resources.
   final List<FrameResource> resources;
 
-  FrameResourceTree(
-      {required this.frame, this.childFrames, required this.resources});
+  FrameResourceTree({
+    required this.frame,
+    this.childFrames,
+    required this.resources,
+  });
 
   factory FrameResourceTree.fromJson(Map<String, dynamic> json) {
     return FrameResourceTree(
       frame: FrameInfo.fromJson(json['frame'] as Map<String, dynamic>),
-      childFrames: json.containsKey('childFrames')
-          ? (json['childFrames'] as List)
-              .map((e) => FrameResourceTree.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-      resources: (json['resources'] as List)
-          .map((e) => FrameResource.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      childFrames:
+          json.containsKey('childFrames')
+              ? (json['childFrames'] as List)
+                  .map(
+                    (e) =>
+                        FrameResourceTree.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList()
+              : null,
+      resources:
+          (json['resources'] as List)
+              .map((e) => FrameResource.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 
@@ -2202,11 +2306,12 @@ class FrameTree {
   factory FrameTree.fromJson(Map<String, dynamic> json) {
     return FrameTree(
       frame: FrameInfo.fromJson(json['frame'] as Map<String, dynamic>),
-      childFrames: json.containsKey('childFrames')
-          ? (json['childFrames'] as List)
-              .map((e) => FrameTree.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
+      childFrames:
+          json.containsKey('childFrames')
+              ? (json['childFrames'] as List)
+                  .map((e) => FrameTree.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : null,
     );
   }
 
@@ -2240,8 +2345,7 @@ enum TransitionType {
   reload('reload'),
   keyword('keyword'),
   keywordGenerated('keyword_generated'),
-  other('other'),
-  ;
+  other('other');
 
   final String value;
 
@@ -2273,12 +2377,13 @@ class NavigationEntry {
   /// Transition type.
   final TransitionType transitionType;
 
-  NavigationEntry(
-      {required this.id,
-      required this.url,
-      required this.userTypedURL,
-      required this.title,
-      required this.transitionType});
+  NavigationEntry({
+    required this.id,
+    required this.url,
+    required this.userTypedURL,
+    required this.title,
+    required this.transitionType,
+  });
 
   factory NavigationEntry.fromJson(Map<String, dynamic> json) {
     return NavigationEntry(
@@ -2324,14 +2429,15 @@ class ScreencastFrameMetadata {
   /// Frame swap timestamp.
   final network.TimeSinceEpoch? timestamp;
 
-  ScreencastFrameMetadata(
-      {required this.offsetTop,
-      required this.pageScaleFactor,
-      required this.deviceWidth,
-      required this.deviceHeight,
-      required this.scrollOffsetX,
-      required this.scrollOffsetY,
-      this.timestamp});
+  ScreencastFrameMetadata({
+    required this.offsetTop,
+    required this.pageScaleFactor,
+    required this.deviceWidth,
+    required this.deviceHeight,
+    required this.scrollOffsetX,
+    required this.scrollOffsetY,
+    this.timestamp,
+  });
 
   factory ScreencastFrameMetadata.fromJson(Map<String, dynamic> json) {
     return ScreencastFrameMetadata(
@@ -2341,9 +2447,10 @@ class ScreencastFrameMetadata {
       deviceHeight: json['deviceHeight'] as num,
       scrollOffsetX: json['scrollOffsetX'] as num,
       scrollOffsetY: json['scrollOffsetY'] as num,
-      timestamp: json.containsKey('timestamp')
-          ? network.TimeSinceEpoch.fromJson(json['timestamp'] as num)
-          : null,
+      timestamp:
+          json.containsKey('timestamp')
+              ? network.TimeSinceEpoch.fromJson(json['timestamp'] as num)
+              : null,
     );
   }
 
@@ -2365,8 +2472,7 @@ enum DialogType {
   alert('alert'),
   confirm('confirm'),
   prompt('prompt'),
-  beforeunload('beforeunload'),
-  ;
+  beforeunload('beforeunload');
 
   final String value;
 
@@ -2395,11 +2501,12 @@ class AppManifestError {
   /// Error column.
   final int column;
 
-  AppManifestError(
-      {required this.message,
-      required this.critical,
-      required this.line,
-      required this.column});
+  AppManifestError({
+    required this.message,
+    required this.critical,
+    required this.line,
+    required this.column,
+  });
 
   factory AppManifestError.fromJson(Map<String, dynamic> json) {
     return AppManifestError(
@@ -2428,15 +2535,11 @@ class AppManifestParsedProperties {
   AppManifestParsedProperties({required this.scope});
 
   factory AppManifestParsedProperties.fromJson(Map<String, dynamic> json) {
-    return AppManifestParsedProperties(
-      scope: json['scope'] as String,
-    );
+    return AppManifestParsedProperties(scope: json['scope'] as String);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'scope': scope,
-    };
+    return {'scope': scope};
   }
 }
 
@@ -2454,11 +2557,12 @@ class LayoutViewport {
   /// Height (CSS pixels), excludes scrollbar if present.
   final int clientHeight;
 
-  LayoutViewport(
-      {required this.pageX,
-      required this.pageY,
-      required this.clientWidth,
-      required this.clientHeight});
+  LayoutViewport({
+    required this.pageX,
+    required this.pageY,
+    required this.clientWidth,
+    required this.clientHeight,
+  });
 
   factory LayoutViewport.fromJson(Map<String, dynamic> json) {
     return LayoutViewport(
@@ -2505,15 +2609,16 @@ class VisualViewport {
   /// Page zoom factor (CSS to device independent pixels ratio).
   final num? zoom;
 
-  VisualViewport(
-      {required this.offsetX,
-      required this.offsetY,
-      required this.pageX,
-      required this.pageY,
-      required this.clientWidth,
-      required this.clientHeight,
-      required this.scale,
-      this.zoom});
+  VisualViewport({
+    required this.offsetX,
+    required this.offsetY,
+    required this.pageX,
+    required this.pageY,
+    required this.clientWidth,
+    required this.clientHeight,
+    required this.scale,
+    this.zoom,
+  });
 
   factory VisualViewport.fromJson(Map<String, dynamic> json) {
     return VisualViewport(
@@ -2559,12 +2664,13 @@ class Viewport {
   /// Page scale factor.
   final num scale;
 
-  Viewport(
-      {required this.x,
-      required this.y,
-      required this.width,
-      required this.height,
-      required this.scale});
+  Viewport({
+    required this.x,
+    required this.y,
+    required this.width,
+    required this.height,
+    required this.scale,
+  });
 
   factory Viewport.fromJson(Map<String, dynamic> json) {
     return Viewport(
@@ -2577,13 +2683,7 @@ class Viewport {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'x': x,
-      'y': y,
-      'width': width,
-      'height': height,
-      'scale': scale,
-    };
+    return {'x': x, 'y': y, 'width': width, 'height': height, 'scale': scale};
   }
 }
 
@@ -2610,14 +2710,15 @@ class FontFamilies {
   /// The math font-family.
   final String? math;
 
-  FontFamilies(
-      {this.standard,
-      this.fixed,
-      this.serif,
-      this.sansSerif,
-      this.cursive,
-      this.fantasy,
-      this.math});
+  FontFamilies({
+    this.standard,
+    this.fixed,
+    this.serif,
+    this.sansSerif,
+    this.cursive,
+    this.fantasy,
+    this.math,
+  });
 
   factory FontFamilies.fromJson(Map<String, dynamic> json) {
     return FontFamilies(
@@ -2659,16 +2760,14 @@ class ScriptFontFamilies {
   factory ScriptFontFamilies.fromJson(Map<String, dynamic> json) {
     return ScriptFontFamilies(
       script: json['script'] as String,
-      fontFamilies:
-          FontFamilies.fromJson(json['fontFamilies'] as Map<String, dynamic>),
+      fontFamilies: FontFamilies.fromJson(
+        json['fontFamilies'] as Map<String, dynamic>,
+      ),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'script': script,
-      'fontFamilies': fontFamilies.toJson(),
-    };
+    return {'script': script, 'fontFamilies': fontFamilies.toJson()};
   }
 }
 
@@ -2707,8 +2806,7 @@ enum ClientNavigationReason {
   other('other'),
   pageBlockInterstitial('pageBlockInterstitial'),
   reload('reload'),
-  scriptInitiated('scriptInitiated'),
-  ;
+  scriptInitiated('scriptInitiated');
 
   final String value;
 
@@ -2727,8 +2825,7 @@ enum ClientNavigationDisposition {
   currentTab('currentTab'),
   newTab('newTab'),
   newWindow('newWindow'),
-  download('download'),
-  ;
+  download('download');
 
   final String value;
 
@@ -2760,10 +2857,7 @@ class InstallabilityErrorArgument {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'value': value,
-    };
+    return {'name': name, 'value': value};
   }
 }
 
@@ -2780,10 +2874,14 @@ class InstallabilityError {
   factory InstallabilityError.fromJson(Map<String, dynamic> json) {
     return InstallabilityError(
       errorId: json['errorId'] as String,
-      errorArguments: (json['errorArguments'] as List)
-          .map((e) =>
-              InstallabilityErrorArgument.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      errorArguments:
+          (json['errorArguments'] as List)
+              .map(
+                (e) => InstallabilityErrorArgument.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
     );
   }
 
@@ -2804,8 +2902,7 @@ enum ReferrerPolicy {
   sameOrigin('sameOrigin'),
   strictOrigin('strictOrigin'),
   strictOriginWhenCrossOrigin('strictOriginWhenCrossOrigin'),
-  unsafeUrl('unsafeUrl'),
-  ;
+  unsafeUrl('unsafeUrl');
 
   final String value;
 
@@ -2839,10 +2936,7 @@ class CompilationCacheParams {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'url': url,
-      if (eager != null) 'eager': eager,
-    };
+    return {'url': url, if (eager != null) 'eager': eager};
   }
 }
 
@@ -2856,9 +2950,10 @@ class FileFilter {
   factory FileFilter.fromJson(Map<String, dynamic> json) {
     return FileFilter(
       name: json.containsKey('name') ? json['name'] as String : null,
-      accepts: json.containsKey('accepts')
-          ? (json['accepts'] as List).map((e) => e as String).toList()
-          : null,
+      accepts:
+          json.containsKey('accepts')
+              ? (json['accepts'] as List).map((e) => e as String).toList()
+              : null,
     );
   }
 
@@ -2884,27 +2979,30 @@ class FileHandler {
   /// other enums below.
   final String launchType;
 
-  FileHandler(
-      {required this.action,
-      required this.name,
-      this.icons,
-      this.accepts,
-      required this.launchType});
+  FileHandler({
+    required this.action,
+    required this.name,
+    this.icons,
+    this.accepts,
+    required this.launchType,
+  });
 
   factory FileHandler.fromJson(Map<String, dynamic> json) {
     return FileHandler(
       action: json['action'] as String,
       name: json['name'] as String,
-      icons: json.containsKey('icons')
-          ? (json['icons'] as List)
-              .map((e) => ImageResource.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-      accepts: json.containsKey('accepts')
-          ? (json['accepts'] as List)
-              .map((e) => FileFilter.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
+      icons:
+          json.containsKey('icons')
+              ? (json['icons'] as List)
+                  .map((e) => ImageResource.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : null,
+      accepts:
+          json.containsKey('accepts')
+              ? (json['accepts'] as List)
+                  .map((e) => FileFilter.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : null,
       launchType: json['launchType'] as String,
     );
   }
@@ -2955,15 +3053,11 @@ class LaunchHandler {
   LaunchHandler({required this.clientMode});
 
   factory LaunchHandler.fromJson(Map<String, dynamic> json) {
-    return LaunchHandler(
-      clientMode: json['clientMode'] as String,
-    );
+    return LaunchHandler(clientMode: json['clientMode'] as String);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'clientMode': clientMode,
-    };
+    return {'clientMode': clientMode};
   }
 }
 
@@ -2982,10 +3076,7 @@ class ProtocolHandler {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'protocol': protocol,
-      'url': url,
-    };
+    return {'protocol': protocol, 'url': url};
   }
 }
 
@@ -3004,10 +3095,7 @@ class RelatedApplication {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'url': url,
-      if (id != null) 'id': id,
-    };
+    return {'url': url, if (id != null) 'id': id};
   }
 }
 
@@ -3028,10 +3116,7 @@ class ScopeExtension {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'origin': origin,
-      'hasOriginWildcard': hasOriginWildcard,
-    };
+    return {'origin': origin, 'hasOriginWildcard': hasOriginWildcard};
   }
 }
 
@@ -3077,14 +3162,15 @@ class ShareTarget {
 
   final List<FileFilter>? files;
 
-  ShareTarget(
-      {required this.action,
-      required this.method,
-      required this.enctype,
-      this.title,
-      this.text,
-      this.url,
-      this.files});
+  ShareTarget({
+    required this.action,
+    required this.method,
+    required this.enctype,
+    this.title,
+    this.text,
+    this.url,
+    this.files,
+  });
 
   factory ShareTarget.fromJson(Map<String, dynamic> json) {
     return ShareTarget(
@@ -3094,11 +3180,12 @@ class ShareTarget {
       title: json.containsKey('title') ? json['title'] as String : null,
       text: json.containsKey('text') ? json['text'] as String : null,
       url: json.containsKey('url') ? json['url'] as String : null,
-      files: json.containsKey('files')
-          ? (json['files'] as List)
-              .map((e) => FileFilter.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
+      files:
+          json.containsKey('files')
+              ? (json['files'] as List)
+                  .map((e) => FileFilter.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : null,
     );
   }
 
@@ -3123,17 +3210,11 @@ class Shortcut {
   Shortcut({required this.name, required this.url});
 
   factory Shortcut.fromJson(Map<String, dynamic> json) {
-    return Shortcut(
-      name: json['name'] as String,
-      url: json['url'] as String,
-    );
+    return Shortcut(name: json['name'] as String, url: json['url'] as String);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'url': url,
-    };
+    return {'name': name, 'url': url};
   }
 }
 
@@ -3194,99 +3275,125 @@ class WebAppManifest {
 
   final String? themeColor;
 
-  WebAppManifest(
-      {this.backgroundColor,
-      this.description,
-      this.dir,
-      this.display,
-      this.displayOverrides,
-      this.fileHandlers,
-      this.icons,
-      this.id,
-      this.lang,
-      this.launchHandler,
-      this.name,
-      this.orientation,
-      this.preferRelatedApplications,
-      this.protocolHandlers,
-      this.relatedApplications,
-      this.scope,
-      this.scopeExtensions,
-      this.screenshots,
-      this.shareTarget,
-      this.shortName,
-      this.shortcuts,
-      this.startUrl,
-      this.themeColor});
+  WebAppManifest({
+    this.backgroundColor,
+    this.description,
+    this.dir,
+    this.display,
+    this.displayOverrides,
+    this.fileHandlers,
+    this.icons,
+    this.id,
+    this.lang,
+    this.launchHandler,
+    this.name,
+    this.orientation,
+    this.preferRelatedApplications,
+    this.protocolHandlers,
+    this.relatedApplications,
+    this.scope,
+    this.scopeExtensions,
+    this.screenshots,
+    this.shareTarget,
+    this.shortName,
+    this.shortcuts,
+    this.startUrl,
+    this.themeColor,
+  });
 
   factory WebAppManifest.fromJson(Map<String, dynamic> json) {
     return WebAppManifest(
-      backgroundColor: json.containsKey('backgroundColor')
-          ? json['backgroundColor'] as String
-          : null,
-      description: json.containsKey('description')
-          ? json['description'] as String
-          : null,
+      backgroundColor:
+          json.containsKey('backgroundColor')
+              ? json['backgroundColor'] as String
+              : null,
+      description:
+          json.containsKey('description')
+              ? json['description'] as String
+              : null,
       dir: json.containsKey('dir') ? json['dir'] as String : null,
       display: json.containsKey('display') ? json['display'] as String : null,
-      displayOverrides: json.containsKey('displayOverrides')
-          ? (json['displayOverrides'] as List).map((e) => e as String).toList()
-          : null,
-      fileHandlers: json.containsKey('fileHandlers')
-          ? (json['fileHandlers'] as List)
-              .map((e) => FileHandler.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-      icons: json.containsKey('icons')
-          ? (json['icons'] as List)
-              .map((e) => ImageResource.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
+      displayOverrides:
+          json.containsKey('displayOverrides')
+              ? (json['displayOverrides'] as List)
+                  .map((e) => e as String)
+                  .toList()
+              : null,
+      fileHandlers:
+          json.containsKey('fileHandlers')
+              ? (json['fileHandlers'] as List)
+                  .map((e) => FileHandler.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : null,
+      icons:
+          json.containsKey('icons')
+              ? (json['icons'] as List)
+                  .map((e) => ImageResource.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : null,
       id: json.containsKey('id') ? json['id'] as String : null,
       lang: json.containsKey('lang') ? json['lang'] as String : null,
-      launchHandler: json.containsKey('launchHandler')
-          ? LaunchHandler.fromJson(
-              json['launchHandler'] as Map<String, dynamic>)
-          : null,
+      launchHandler:
+          json.containsKey('launchHandler')
+              ? LaunchHandler.fromJson(
+                json['launchHandler'] as Map<String, dynamic>,
+              )
+              : null,
       name: json.containsKey('name') ? json['name'] as String : null,
-      orientation: json.containsKey('orientation')
-          ? json['orientation'] as String
-          : null,
-      preferRelatedApplications: json.containsKey('preferRelatedApplications')
-          ? json['preferRelatedApplications'] as bool
-          : null,
-      protocolHandlers: json.containsKey('protocolHandlers')
-          ? (json['protocolHandlers'] as List)
-              .map((e) => ProtocolHandler.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-      relatedApplications: json.containsKey('relatedApplications')
-          ? (json['relatedApplications'] as List)
-              .map(
-                  (e) => RelatedApplication.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
+      orientation:
+          json.containsKey('orientation')
+              ? json['orientation'] as String
+              : null,
+      preferRelatedApplications:
+          json.containsKey('preferRelatedApplications')
+              ? json['preferRelatedApplications'] as bool
+              : null,
+      protocolHandlers:
+          json.containsKey('protocolHandlers')
+              ? (json['protocolHandlers'] as List)
+                  .map(
+                    (e) => ProtocolHandler.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList()
+              : null,
+      relatedApplications:
+          json.containsKey('relatedApplications')
+              ? (json['relatedApplications'] as List)
+                  .map(
+                    (e) =>
+                        RelatedApplication.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList()
+              : null,
       scope: json.containsKey('scope') ? json['scope'] as String : null,
-      scopeExtensions: json.containsKey('scopeExtensions')
-          ? (json['scopeExtensions'] as List)
-              .map((e) => ScopeExtension.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-      screenshots: json.containsKey('screenshots')
-          ? (json['screenshots'] as List)
-              .map((e) => Screenshot.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-      shareTarget: json.containsKey('shareTarget')
-          ? ShareTarget.fromJson(json['shareTarget'] as Map<String, dynamic>)
-          : null,
+      scopeExtensions:
+          json.containsKey('scopeExtensions')
+              ? (json['scopeExtensions'] as List)
+                  .map(
+                    (e) => ScopeExtension.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList()
+              : null,
+      screenshots:
+          json.containsKey('screenshots')
+              ? (json['screenshots'] as List)
+                  .map((e) => Screenshot.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : null,
+      shareTarget:
+          json.containsKey('shareTarget')
+              ? ShareTarget.fromJson(
+                json['shareTarget'] as Map<String, dynamic>,
+              )
+              : null,
       shortName:
           json.containsKey('shortName') ? json['shortName'] as String : null,
-      shortcuts: json.containsKey('shortcuts')
-          ? (json['shortcuts'] as List)
-              .map((e) => Shortcut.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
+      shortcuts:
+          json.containsKey('shortcuts')
+              ? (json['shortcuts'] as List)
+                  .map((e) => Shortcut.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : null,
       startUrl:
           json.containsKey('startUrl') ? json['startUrl'] as String : null,
       themeColor:
@@ -3336,8 +3443,7 @@ enum AutoResponseMode {
   none('none'),
   autoAccept('autoAccept'),
   autoReject('autoReject'),
-  autoOptOut('autoOptOut'),
-  ;
+  autoOptOut('autoOptOut');
 
   final String value;
 
@@ -3355,8 +3461,7 @@ enum AutoResponseMode {
 /// The type of a frameNavigated event.
 enum NavigationType {
   navigation('Navigation'),
-  backForwardCacheRestore('BackForwardCacheRestore'),
-  ;
+  backForwardCacheRestore('BackForwardCacheRestore');
 
   final String value;
 
@@ -3396,7 +3501,8 @@ enum BackForwardCacheNotRestoredReason {
   sessionRestored('SessionRestored'),
   serviceWorkerPostMessage('ServiceWorkerPostMessage'),
   enteredBackForwardCacheBeforeServiceWorkerHostAdded(
-      'EnteredBackForwardCacheBeforeServiceWorkerHostAdded'),
+    'EnteredBackForwardCacheBeforeServiceWorkerHostAdded',
+  ),
   renderFrameHostReusedSameSite('RenderFrameHostReused_SameSite'),
   renderFrameHostReusedCrossSite('RenderFrameHostReused_CrossSite'),
   serviceWorkerClaim('ServiceWorkerClaim'),
@@ -3405,9 +3511,11 @@ enum BackForwardCacheNotRestoredReason {
   timeoutPuttingInCache('TimeoutPuttingInCache'),
   backForwardCacheDisabledByLowMemory('BackForwardCacheDisabledByLowMemory'),
   backForwardCacheDisabledByCommandLine(
-      'BackForwardCacheDisabledByCommandLine'),
+    'BackForwardCacheDisabledByCommandLine',
+  ),
   networkRequestDatapipeDrainedAsBytesConsumer(
-      'NetworkRequestDatapipeDrainedAsBytesConsumer'),
+    'NetworkRequestDatapipeDrainedAsBytesConsumer',
+  ),
   networkRequestRedirected('NetworkRequestRedirected'),
   networkRequestTimeout('NetworkRequestTimeout'),
   networkExceedsBufferLimit('NetworkExceedsBufferLimit'),
@@ -3424,11 +3532,13 @@ enum BackForwardCacheNotRestoredReason {
   cacheControlNoStore('CacheControlNoStore'),
   cacheControlNoStoreCookieModified('CacheControlNoStoreCookieModified'),
   cacheControlNoStoreHttpOnlyCookieModified(
-      'CacheControlNoStoreHTTPOnlyCookieModified'),
+    'CacheControlNoStoreHTTPOnlyCookieModified',
+  ),
   noResponseHead('NoResponseHead'),
   unknown('Unknown'),
   activationNavigationsDisallowedForBug1234857(
-      'ActivationNavigationsDisallowedForBug1234857'),
+    'ActivationNavigationsDisallowedForBug1234857',
+  ),
   errorDocument('ErrorDocument'),
   fencedFramesEmbedder('FencedFramesEmbedder'),
   cookieDisabled('CookieDisabled'),
@@ -3440,7 +3550,8 @@ enum BackForwardCacheNotRestoredReason {
   webViewMessageListenerInjected('WebViewMessageListenerInjected'),
   webViewSafeBrowsingAllowlistChanged('WebViewSafeBrowsingAllowlistChanged'),
   webViewDocumentStartJavascriptChanged(
-      'WebViewDocumentStartJavascriptChanged'),
+    'WebViewDocumentStartJavascriptChanged',
+  ),
   webSocket('WebSocket'),
   webTransport('WebTransport'),
   webRtc('WebRTC'),
@@ -3455,7 +3566,8 @@ enum BackForwardCacheNotRestoredReason {
   requestedAudioCapturePermission('RequestedAudioCapturePermission'),
   requestedVideoCapturePermission('RequestedVideoCapturePermission'),
   requestedBackForwardCacheBlockedSensors(
-      'RequestedBackForwardCacheBlockedSensors'),
+    'RequestedBackForwardCacheBlockedSensors',
+  ),
   requestedBackgroundWorkPermission('RequestedBackgroundWorkPermission'),
   broadcastChannel('BroadcastChannel'),
   webXr('WebXR'),
@@ -3478,14 +3590,16 @@ enum BackForwardCacheNotRestoredReason {
   keyboardLock('KeyboardLock'),
   webOtpService('WebOTPService'),
   outstandingNetworkRequestDirectSocket(
-      'OutstandingNetworkRequestDirectSocket'),
+    'OutstandingNetworkRequestDirectSocket',
+  ),
   injectedJavascript('InjectedJavascript'),
   injectedStyleSheet('InjectedStyleSheet'),
   keepaliveRequest('KeepaliveRequest'),
   indexedDbEvent('IndexedDBEvent'),
   dummy('Dummy'),
   jsNetworkRequestReceivedCacheControlNoStoreResource(
-      'JsNetworkRequestReceivedCacheControlNoStoreResource'),
+    'JsNetworkRequestReceivedCacheControlNoStoreResource',
+  ),
   webRtcSticky('WebRTCSticky'),
   webTransportSticky('WebTransportSticky'),
   webSocketSticky('WebSocketSticky'),
@@ -3506,35 +3620,40 @@ enum BackForwardCacheNotRestoredReason {
   contentDiscarded('ContentDiscarded'),
   embedderPopupBlockerTabHelper('EmbedderPopupBlockerTabHelper'),
   embedderSafeBrowsingTriggeredPopupBlocker(
-      'EmbedderSafeBrowsingTriggeredPopupBlocker'),
+    'EmbedderSafeBrowsingTriggeredPopupBlocker',
+  ),
   embedderSafeBrowsingThreatDetails('EmbedderSafeBrowsingThreatDetails'),
   embedderAppBannerManager('EmbedderAppBannerManager'),
   embedderDomDistillerViewerSource('EmbedderDomDistillerViewerSource'),
   embedderDomDistillerSelfDeletingRequestDelegate(
-      'EmbedderDomDistillerSelfDeletingRequestDelegate'),
+    'EmbedderDomDistillerSelfDeletingRequestDelegate',
+  ),
   embedderOomInterventionTabHelper('EmbedderOomInterventionTabHelper'),
   embedderOfflinePage('EmbedderOfflinePage'),
   embedderChromePasswordManagerClientBindCredentialManager(
-      'EmbedderChromePasswordManagerClientBindCredentialManager'),
+    'EmbedderChromePasswordManagerClientBindCredentialManager',
+  ),
   embedderPermissionRequestManager('EmbedderPermissionRequestManager'),
   embedderModalDialog('EmbedderModalDialog'),
   embedderExtensions('EmbedderExtensions'),
   embedderExtensionMessaging('EmbedderExtensionMessaging'),
   embedderExtensionMessagingForOpenPort(
-      'EmbedderExtensionMessagingForOpenPort'),
+    'EmbedderExtensionMessagingForOpenPort',
+  ),
   embedderExtensionSentMessageToCachedFrame(
-      'EmbedderExtensionSentMessageToCachedFrame'),
+    'EmbedderExtensionSentMessageToCachedFrame',
+  ),
   requestedByWebViewClient('RequestedByWebViewClient'),
-  postMessageByWebViewClient('PostMessageByWebViewClient'),
-  ;
+  postMessageByWebViewClient('PostMessageByWebViewClient');
 
   final String value;
 
   const BackForwardCacheNotRestoredReason(this.value);
 
   factory BackForwardCacheNotRestoredReason.fromJson(String value) =>
-      BackForwardCacheNotRestoredReason.values
-          .firstWhere((e) => e.value == value);
+      BackForwardCacheNotRestoredReason.values.firstWhere(
+        (e) => e.value == value,
+      );
 
   String toJson() => value;
 
@@ -3546,16 +3665,16 @@ enum BackForwardCacheNotRestoredReason {
 enum BackForwardCacheNotRestoredReasonType {
   supportPending('SupportPending'),
   pageSupportNeeded('PageSupportNeeded'),
-  circumstantial('Circumstantial'),
-  ;
+  circumstantial('Circumstantial');
 
   final String value;
 
   const BackForwardCacheNotRestoredReasonType(this.value);
 
   factory BackForwardCacheNotRestoredReasonType.fromJson(String value) =>
-      BackForwardCacheNotRestoredReasonType.values
-          .firstWhere((e) => e.value == value);
+      BackForwardCacheNotRestoredReasonType.values.firstWhere(
+        (e) => e.value == value,
+      );
 
   String toJson() => value;
 
@@ -3576,11 +3695,12 @@ class BackForwardCacheBlockingDetails {
   /// Column number in the script (0-based).
   final int columnNumber;
 
-  BackForwardCacheBlockingDetails(
-      {this.url,
-      this.function,
-      required this.lineNumber,
-      required this.columnNumber});
+  BackForwardCacheBlockingDetails({
+    this.url,
+    this.function,
+    required this.lineNumber,
+    required this.columnNumber,
+  });
 
   factory BackForwardCacheBlockingDetails.fromJson(Map<String, dynamic> json) {
     return BackForwardCacheBlockingDetails(
@@ -3616,23 +3736,34 @@ class BackForwardCacheNotRestoredExplanation {
 
   final List<BackForwardCacheBlockingDetails>? details;
 
-  BackForwardCacheNotRestoredExplanation(
-      {required this.type, required this.reason, this.context, this.details});
+  BackForwardCacheNotRestoredExplanation({
+    required this.type,
+    required this.reason,
+    this.context,
+    this.details,
+  });
 
   factory BackForwardCacheNotRestoredExplanation.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return BackForwardCacheNotRestoredExplanation(
       type: BackForwardCacheNotRestoredReasonType.fromJson(
-          json['type'] as String),
-      reason:
-          BackForwardCacheNotRestoredReason.fromJson(json['reason'] as String),
+        json['type'] as String,
+      ),
+      reason: BackForwardCacheNotRestoredReason.fromJson(
+        json['reason'] as String,
+      ),
       context: json.containsKey('context') ? json['context'] as String : null,
-      details: json.containsKey('details')
-          ? (json['details'] as List)
-              .map((e) => BackForwardCacheBlockingDetails.fromJson(
-                  e as Map<String, dynamic>))
-              .toList()
-          : null,
+      details:
+          json.containsKey('details')
+              ? (json['details'] as List)
+                  .map(
+                    (e) => BackForwardCacheBlockingDetails.fromJson(
+                      e as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList()
+              : null,
     );
   }
 
@@ -3656,21 +3787,33 @@ class BackForwardCacheNotRestoredExplanationTree {
   /// Array of children frame
   final List<BackForwardCacheNotRestoredExplanationTree> children;
 
-  BackForwardCacheNotRestoredExplanationTree(
-      {required this.url, required this.explanations, required this.children});
+  BackForwardCacheNotRestoredExplanationTree({
+    required this.url,
+    required this.explanations,
+    required this.children,
+  });
 
   factory BackForwardCacheNotRestoredExplanationTree.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return BackForwardCacheNotRestoredExplanationTree(
       url: json['url'] as String,
-      explanations: (json['explanations'] as List)
-          .map((e) => BackForwardCacheNotRestoredExplanation.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
-      children: (json['children'] as List)
-          .map((e) => BackForwardCacheNotRestoredExplanationTree.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
+      explanations:
+          (json['explanations'] as List)
+              .map(
+                (e) => BackForwardCacheNotRestoredExplanation.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+      children:
+          (json['children'] as List)
+              .map(
+                (e) => BackForwardCacheNotRestoredExplanationTree.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
     );
   }
 
@@ -3685,8 +3828,7 @@ class BackForwardCacheNotRestoredExplanationTree {
 
 enum FileChooserOpenedEventMode {
   selectSingle('selectSingle'),
-  selectMultiple('selectMultiple'),
-  ;
+  selectMultiple('selectMultiple');
 
   final String value;
 
@@ -3703,8 +3845,7 @@ enum FileChooserOpenedEventMode {
 
 enum FrameDetachedEventReason {
   remove('remove'),
-  swap('swap'),
-  ;
+  swap('swap');
 
   final String value;
 
@@ -3722,8 +3863,7 @@ enum FrameDetachedEventReason {
 enum DownloadProgressEventState {
   inProgress('inProgress'),
   completed('completed'),
-  canceled('canceled'),
-  ;
+  canceled('canceled');
 
   final String value;
 
@@ -3741,16 +3881,16 @@ enum DownloadProgressEventState {
 enum NavigatedWithinDocumentEventNavigationType {
   fragment('fragment'),
   historyApi('historyApi'),
-  other('other'),
-  ;
+  other('other');
 
   final String value;
 
   const NavigatedWithinDocumentEventNavigationType(this.value);
 
   factory NavigatedWithinDocumentEventNavigationType.fromJson(String value) =>
-      NavigatedWithinDocumentEventNavigationType.values
-          .firstWhere((e) => e.value == value);
+      NavigatedWithinDocumentEventNavigationType.values.firstWhere(
+        (e) => e.value == value,
+      );
 
   String toJson() => value;
 

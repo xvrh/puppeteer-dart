@@ -11,9 +11,7 @@ class IOApi {
   /// Close the stream, discard any temporary backing storage.
   /// [handle] Handle of the stream to close.
   Future<void> close(StreamHandle handle) async {
-    await _client.send('IO.close', {
-      'handle': handle,
-    });
+    await _client.send('IO.close', {'handle': handle});
   }
 
   /// Read a chunk of the stream
@@ -34,9 +32,7 @@ class IOApi {
   /// [objectId] Object id of a Blob object wrapper.
   /// Returns: UUID of the specified Blob.
   Future<String> resolveBlob(runtime.RemoteObjectId objectId) async {
-    var result = await _client.send('IO.resolveBlob', {
-      'objectId': objectId,
-    });
+    var result = await _client.send('IO.resolveBlob', {'objectId': objectId});
     return result['uuid'] as String;
   }
 }
@@ -55,9 +51,10 @@ class ReadResult {
 
   factory ReadResult.fromJson(Map<String, dynamic> json) {
     return ReadResult(
-      base64Encoded: json.containsKey('base64Encoded')
-          ? json['base64Encoded'] as bool
-          : null,
+      base64Encoded:
+          json.containsKey('base64Encoded')
+              ? json['base64Encoded'] as bool
+              : null,
       data: json['data'] as String,
       eof: json['eof'] as bool? ?? false,
     );

@@ -43,8 +43,10 @@ class FetchApi {
   /// all requests will be affected.
   /// [handleAuthRequests] If true, authRequired events will be issued and requests will be paused
   /// expecting a call to continueWithAuth.
-  Future<void> enable(
-      {List<RequestPattern>? patterns, bool? handleAuthRequests}) async {
+  Future<void> enable({
+    List<RequestPattern>? patterns,
+    bool? handleAuthRequests,
+  }) async {
     await _client.send('Fetch.enable', {
       if (patterns != null) 'patterns': [...patterns],
       if (handleAuthRequests != null) 'handleAuthRequests': handleAuthRequests,
@@ -55,7 +57,9 @@ class FetchApi {
   /// [requestId] An id the client received in requestPaused event.
   /// [errorReason] Causes the request to fail with the given reason.
   Future<void> failRequest(
-      RequestId requestId, network.ErrorReason errorReason) async {
+    RequestId requestId,
+    network.ErrorReason errorReason,
+  ) async {
     await _client.send('Fetch.failRequest', {
       'requestId': requestId,
       'errorReason': errorReason,
@@ -75,11 +79,14 @@ class FetchApi {
   /// will be used if the request is intercepted at the request stage.
   /// [responsePhrase] A textual representation of responseCode.
   /// If absent, a standard phrase matching responseCode is used.
-  Future<void> fulfillRequest(RequestId requestId, int responseCode,
-      {List<HeaderEntry>? responseHeaders,
-      String? binaryResponseHeaders,
-      String? body,
-      String? responsePhrase}) async {
+  Future<void> fulfillRequest(
+    RequestId requestId,
+    int responseCode, {
+    List<HeaderEntry>? responseHeaders,
+    String? binaryResponseHeaders,
+    String? body,
+    String? responsePhrase,
+  }) async {
     await _client.send('Fetch.fulfillRequest', {
       'requestId': requestId,
       'responseCode': responseCode,
@@ -100,12 +107,14 @@ class FetchApi {
   /// extend to subsequent redirect hops, if a redirect happens. Another override
   /// may be applied to a different request produced by a redirect.
   /// [interceptResponse] If set, overrides response interception behavior for this request.
-  Future<void> continueRequest(RequestId requestId,
-      {String? url,
-      String? method,
-      String? postData,
-      List<HeaderEntry>? headers,
-      bool? interceptResponse}) async {
+  Future<void> continueRequest(
+    RequestId requestId, {
+    String? url,
+    String? method,
+    String? postData,
+    List<HeaderEntry>? headers,
+    bool? interceptResponse,
+  }) async {
     await _client.send('Fetch.continueRequest', {
       'requestId': requestId,
       if (url != null) 'url': url,
@@ -120,7 +129,9 @@ class FetchApi {
   /// [requestId] An id the client received in authRequired event.
   /// [authChallengeResponse] Response to  with an authChallenge.
   Future<void> continueWithAuth(
-      RequestId requestId, AuthChallengeResponse authChallengeResponse) async {
+    RequestId requestId,
+    AuthChallengeResponse authChallengeResponse,
+  ) async {
     await _client.send('Fetch.continueWithAuth', {
       'requestId': requestId,
       'authChallengeResponse': authChallengeResponse,
@@ -139,11 +150,13 @@ class FetchApi {
   /// series of name: value pairs. Prefer the above method unless you
   /// need to represent some non-UTF8 values that can't be transmitted
   /// over the protocol as text.
-  Future<void> continueResponse(RequestId requestId,
-      {int? responseCode,
-      String? responsePhrase,
-      List<HeaderEntry>? responseHeaders,
-      String? binaryResponseHeaders}) async {
+  Future<void> continueResponse(
+    RequestId requestId, {
+    int? responseCode,
+    String? responsePhrase,
+    List<HeaderEntry>? responseHeaders,
+    String? binaryResponseHeaders,
+  }) async {
     await _client.send('Fetch.continueResponse', {
       'requestId': requestId,
       if (responseCode != null) 'responseCode': responseCode,
@@ -223,46 +236,57 @@ class RequestPausedEvent {
   /// has caused the redirect.
   final RequestId? redirectedRequestId;
 
-  RequestPausedEvent(
-      {required this.requestId,
-      required this.request,
-      required this.frameId,
-      required this.resourceType,
-      this.responseErrorReason,
-      this.responseStatusCode,
-      this.responseStatusText,
-      this.responseHeaders,
-      this.networkId,
-      this.redirectedRequestId});
+  RequestPausedEvent({
+    required this.requestId,
+    required this.request,
+    required this.frameId,
+    required this.resourceType,
+    this.responseErrorReason,
+    this.responseStatusCode,
+    this.responseStatusText,
+    this.responseHeaders,
+    this.networkId,
+    this.redirectedRequestId,
+  });
 
   factory RequestPausedEvent.fromJson(Map<String, dynamic> json) {
     return RequestPausedEvent(
       requestId: RequestId.fromJson(json['requestId'] as String),
-      request:
-          network.RequestData.fromJson(json['request'] as Map<String, dynamic>),
+      request: network.RequestData.fromJson(
+        json['request'] as Map<String, dynamic>,
+      ),
       frameId: page.FrameId.fromJson(json['frameId'] as String),
-      resourceType:
-          network.ResourceType.fromJson(json['resourceType'] as String),
-      responseErrorReason: json.containsKey('responseErrorReason')
-          ? network.ErrorReason.fromJson(json['responseErrorReason'] as String)
-          : null,
-      responseStatusCode: json.containsKey('responseStatusCode')
-          ? json['responseStatusCode'] as int
-          : null,
-      responseStatusText: json.containsKey('responseStatusText')
-          ? json['responseStatusText'] as String
-          : null,
-      responseHeaders: json.containsKey('responseHeaders')
-          ? (json['responseHeaders'] as List)
-              .map((e) => HeaderEntry.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-      networkId: json.containsKey('networkId')
-          ? network.RequestId.fromJson(json['networkId'] as String)
-          : null,
-      redirectedRequestId: json.containsKey('redirectedRequestId')
-          ? RequestId.fromJson(json['redirectedRequestId'] as String)
-          : null,
+      resourceType: network.ResourceType.fromJson(
+        json['resourceType'] as String,
+      ),
+      responseErrorReason:
+          json.containsKey('responseErrorReason')
+              ? network.ErrorReason.fromJson(
+                json['responseErrorReason'] as String,
+              )
+              : null,
+      responseStatusCode:
+          json.containsKey('responseStatusCode')
+              ? json['responseStatusCode'] as int
+              : null,
+      responseStatusText:
+          json.containsKey('responseStatusText')
+              ? json['responseStatusText'] as String
+              : null,
+      responseHeaders:
+          json.containsKey('responseHeaders')
+              ? (json['responseHeaders'] as List)
+                  .map((e) => HeaderEntry.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : null,
+      networkId:
+          json.containsKey('networkId')
+              ? network.RequestId.fromJson(json['networkId'] as String)
+              : null,
+      redirectedRequestId:
+          json.containsKey('redirectedRequestId')
+              ? RequestId.fromJson(json['redirectedRequestId'] as String)
+              : null,
     );
   }
 }
@@ -285,23 +309,27 @@ class AuthRequiredEvent {
   /// contains AuthChallengeResponse.
   final AuthChallenge authChallenge;
 
-  AuthRequiredEvent(
-      {required this.requestId,
-      required this.request,
-      required this.frameId,
-      required this.resourceType,
-      required this.authChallenge});
+  AuthRequiredEvent({
+    required this.requestId,
+    required this.request,
+    required this.frameId,
+    required this.resourceType,
+    required this.authChallenge,
+  });
 
   factory AuthRequiredEvent.fromJson(Map<String, dynamic> json) {
     return AuthRequiredEvent(
       requestId: RequestId.fromJson(json['requestId'] as String),
-      request:
-          network.RequestData.fromJson(json['request'] as Map<String, dynamic>),
+      request: network.RequestData.fromJson(
+        json['request'] as Map<String, dynamic>,
+      ),
       frameId: page.FrameId.fromJson(json['frameId'] as String),
-      resourceType:
-          network.ResourceType.fromJson(json['resourceType'] as String),
-      authChallenge:
-          AuthChallenge.fromJson(json['authChallenge'] as Map<String, dynamic>),
+      resourceType: network.ResourceType.fromJson(
+        json['resourceType'] as String,
+      ),
+      authChallenge: AuthChallenge.fromJson(
+        json['authChallenge'] as Map<String, dynamic>,
+      ),
     );
   }
 }
@@ -335,8 +363,7 @@ extension type RequestId(String value) {
 /// body is received).
 enum RequestStage {
   request('Request'),
-  response('Response'),
-  ;
+  response('Response');
 
   final String value;
 
@@ -368,12 +395,14 @@ class RequestPattern {
     return RequestPattern(
       urlPattern:
           json.containsKey('urlPattern') ? json['urlPattern'] as String : null,
-      resourceType: json.containsKey('resourceType')
-          ? network.ResourceType.fromJson(json['resourceType'] as String)
-          : null,
-      requestStage: json.containsKey('requestStage')
-          ? RequestStage.fromJson(json['requestStage'] as String)
-          : null,
+      resourceType:
+          json.containsKey('resourceType')
+              ? network.ResourceType.fromJson(json['resourceType'] as String)
+              : null,
+      requestStage:
+          json.containsKey('requestStage')
+              ? RequestStage.fromJson(json['requestStage'] as String)
+              : null,
     );
   }
 
@@ -402,10 +431,7 @@ class HeaderEntry {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'value': value,
-    };
+    return {'name': name, 'value': value};
   }
 }
 
@@ -423,17 +449,19 @@ class AuthChallenge {
   /// The realm of the challenge. May be empty.
   final String realm;
 
-  AuthChallenge(
-      {this.source,
-      required this.origin,
-      required this.scheme,
-      required this.realm});
+  AuthChallenge({
+    this.source,
+    required this.origin,
+    required this.scheme,
+    required this.realm,
+  });
 
   factory AuthChallenge.fromJson(Map<String, dynamic> json) {
     return AuthChallenge(
-      source: json.containsKey('source')
-          ? AuthChallengeSource.fromJson(json['source'] as String)
-          : null,
+      source:
+          json.containsKey('source')
+              ? AuthChallengeSource.fromJson(json['source'] as String)
+              : null,
       origin: json['origin'] as String,
       scheme: json['scheme'] as String,
       realm: json['realm'] as String,
@@ -452,8 +480,7 @@ class AuthChallenge {
 
 enum AuthChallengeSource {
   server('Server'),
-  proxy('Proxy'),
-  ;
+  proxy('Proxy');
 
   final String value;
 
@@ -487,8 +514,9 @@ class AuthChallengeResponse {
 
   factory AuthChallengeResponse.fromJson(Map<String, dynamic> json) {
     return AuthChallengeResponse(
-      response:
-          AuthChallengeResponseResponse.fromJson(json['response'] as String),
+      response: AuthChallengeResponseResponse.fromJson(
+        json['response'] as String,
+      ),
       username:
           json.containsKey('username') ? json['username'] as String : null,
       password:
@@ -508,8 +536,7 @@ class AuthChallengeResponse {
 enum AuthChallengeResponseResponse {
   default$('Default'),
   cancelAuth('CancelAuth'),
-  provideCredentials('ProvideCredentials'),
-  ;
+  provideCredentials('ProvideCredentials');
 
   final String value;
 

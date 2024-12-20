@@ -14,8 +14,11 @@ class PerformanceTimelineApi {
   /// Sent when a performance timeline event is added. See reportPerformanceTimeline method.
   Stream<TimelineEvent> get onTimelineEventAdded => _client.onEvent
       .where((event) => event.name == 'PerformanceTimeline.timelineEventAdded')
-      .map((event) => TimelineEvent.fromJson(
-          event.parameters['event'] as Map<String, dynamic>));
+      .map(
+        (event) => TimelineEvent.fromJson(
+          event.parameters['event'] as Map<String, dynamic>,
+        ),
+      );
 
   /// Previously buffered events would be reported before method returns.
   /// See also: timelineEventAdded
@@ -48,13 +51,14 @@ class LargestContentfulPaint {
 
   final dom.BackendNodeId? nodeId;
 
-  LargestContentfulPaint(
-      {required this.renderTime,
-      required this.loadTime,
-      required this.size,
-      this.elementId,
-      this.url,
-      this.nodeId});
+  LargestContentfulPaint({
+    required this.renderTime,
+    required this.loadTime,
+    required this.size,
+    this.elementId,
+    this.url,
+    this.nodeId,
+  });
 
   factory LargestContentfulPaint.fromJson(Map<String, dynamic> json) {
     return LargestContentfulPaint(
@@ -64,9 +68,10 @@ class LargestContentfulPaint {
       elementId:
           json.containsKey('elementId') ? json['elementId'] as String : null,
       url: json.containsKey('url') ? json['url'] as String : null,
-      nodeId: json.containsKey('nodeId')
-          ? dom.BackendNodeId.fromJson(json['nodeId'] as int)
-          : null,
+      nodeId:
+          json.containsKey('nodeId')
+              ? dom.BackendNodeId.fromJson(json['nodeId'] as int)
+              : null,
     );
   }
 
@@ -89,18 +94,24 @@ class LayoutShiftAttribution {
 
   final dom.BackendNodeId? nodeId;
 
-  LayoutShiftAttribution(
-      {required this.previousRect, required this.currentRect, this.nodeId});
+  LayoutShiftAttribution({
+    required this.previousRect,
+    required this.currentRect,
+    this.nodeId,
+  });
 
   factory LayoutShiftAttribution.fromJson(Map<String, dynamic> json) {
     return LayoutShiftAttribution(
-      previousRect:
-          dom.Rect.fromJson(json['previousRect'] as Map<String, dynamic>),
-      currentRect:
-          dom.Rect.fromJson(json['currentRect'] as Map<String, dynamic>),
-      nodeId: json.containsKey('nodeId')
-          ? dom.BackendNodeId.fromJson(json['nodeId'] as int)
-          : null,
+      previousRect: dom.Rect.fromJson(
+        json['previousRect'] as Map<String, dynamic>,
+      ),
+      currentRect: dom.Rect.fromJson(
+        json['currentRect'] as Map<String, dynamic>,
+      ),
+      nodeId:
+          json.containsKey('nodeId')
+              ? dom.BackendNodeId.fromJson(json['nodeId'] as int)
+              : null,
     );
   }
 
@@ -124,22 +135,27 @@ class LayoutShift {
 
   final List<LayoutShiftAttribution> sources;
 
-  LayoutShift(
-      {required this.value,
-      required this.hadRecentInput,
-      required this.lastInputTime,
-      required this.sources});
+  LayoutShift({
+    required this.value,
+    required this.hadRecentInput,
+    required this.lastInputTime,
+    required this.sources,
+  });
 
   factory LayoutShift.fromJson(Map<String, dynamic> json) {
     return LayoutShift(
       value: json['value'] as num,
       hadRecentInput: json['hadRecentInput'] as bool? ?? false,
-      lastInputTime:
-          network.TimeSinceEpoch.fromJson(json['lastInputTime'] as num),
-      sources: (json['sources'] as List)
-          .map(
-              (e) => LayoutShiftAttribution.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      lastInputTime: network.TimeSinceEpoch.fromJson(
+        json['lastInputTime'] as num,
+      ),
+      sources:
+          (json['sources'] as List)
+              .map(
+                (e) =>
+                    LayoutShiftAttribution.fromJson(e as Map<String, dynamic>),
+              )
+              .toList(),
     );
   }
 
@@ -174,14 +190,15 @@ class TimelineEvent {
 
   final LayoutShift? layoutShiftDetails;
 
-  TimelineEvent(
-      {required this.frameId,
-      required this.type,
-      required this.name,
-      required this.time,
-      this.duration,
-      this.lcpDetails,
-      this.layoutShiftDetails});
+  TimelineEvent({
+    required this.frameId,
+    required this.type,
+    required this.name,
+    required this.time,
+    this.duration,
+    this.lcpDetails,
+    this.layoutShiftDetails,
+  });
 
   factory TimelineEvent.fromJson(Map<String, dynamic> json) {
     return TimelineEvent(
@@ -190,14 +207,18 @@ class TimelineEvent {
       name: json['name'] as String,
       time: network.TimeSinceEpoch.fromJson(json['time'] as num),
       duration: json.containsKey('duration') ? json['duration'] as num : null,
-      lcpDetails: json.containsKey('lcpDetails')
-          ? LargestContentfulPaint.fromJson(
-              json['lcpDetails'] as Map<String, dynamic>)
-          : null,
-      layoutShiftDetails: json.containsKey('layoutShiftDetails')
-          ? LayoutShift.fromJson(
-              json['layoutShiftDetails'] as Map<String, dynamic>)
-          : null,
+      lcpDetails:
+          json.containsKey('lcpDetails')
+              ? LargestContentfulPaint.fromJson(
+                json['lcpDetails'] as Map<String, dynamic>,
+              )
+              : null,
+      layoutShiftDetails:
+          json.containsKey('layoutShiftDetails')
+              ? LayoutShift.fromJson(
+                json['layoutShiftDetails'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 

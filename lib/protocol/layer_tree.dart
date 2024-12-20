@@ -13,9 +13,12 @@ class LayerTreeApi {
 
   Stream<List<Layer>> get onLayerTreeDidChange => _client.onEvent
       .where((event) => event.name == 'LayerTree.layerTreeDidChange')
-      .map((event) => (event.parameters['layers'] as List)
-          .map((e) => Layer.fromJson(e as Map<String, dynamic>))
-          .toList());
+      .map(
+        (event) =>
+            (event.parameters['layers'] as List)
+                .map((e) => Layer.fromJson(e as Map<String, dynamic>))
+                .toList(),
+      );
 
   /// Provides the reasons why the given layer was composited.
   /// [layerId] The id of the layer for which we want to get the reasons it was composited.
@@ -61,8 +64,12 @@ class LayerTreeApi {
   /// [minDuration] The minimum duration (in seconds) to replay the snapshot.
   /// [clipRect] The clip rectangle to apply when replaying the snapshot.
   /// Returns: The array of paint profiles, one per run.
-  Future<List<PaintProfile>> profileSnapshot(SnapshotId snapshotId,
-      {int? minRepeatCount, num? minDuration, dom.Rect? clipRect}) async {
+  Future<List<PaintProfile>> profileSnapshot(
+    SnapshotId snapshotId, {
+    int? minRepeatCount,
+    num? minDuration,
+    dom.Rect? clipRect,
+  }) async {
     var result = await _client.send('LayerTree.profileSnapshot', {
       'snapshotId': snapshotId,
       if (minRepeatCount != null) 'minRepeatCount': minRepeatCount,
@@ -77,9 +84,7 @@ class LayerTreeApi {
   /// Releases layer snapshot captured by the back-end.
   /// [snapshotId] The id of the layer snapshot.
   Future<void> releaseSnapshot(SnapshotId snapshotId) async {
-    await _client.send('LayerTree.releaseSnapshot', {
-      'snapshotId': snapshotId,
-    });
+    await _client.send('LayerTree.releaseSnapshot', {'snapshotId': snapshotId});
   }
 
   /// Replays the layer snapshot and returns the resulting bitmap.
@@ -88,8 +93,12 @@ class LayerTreeApi {
   /// [toStep] The last step to replay to (replay till the end if not specified).
   /// [scale] The scale to apply while replaying (defaults to 1).
   /// Returns: A data: URL for resulting image.
-  Future<String> replaySnapshot(SnapshotId snapshotId,
-      {int? fromStep, int? toStep, num? scale}) async {
+  Future<String> replaySnapshot(
+    SnapshotId snapshotId, {
+    int? fromStep,
+    int? toStep,
+    num? scale,
+  }) async {
     var result = await _client.send('LayerTree.replaySnapshot', {
       'snapshotId': snapshotId,
       if (fromStep != null) 'fromStep': fromStep,
@@ -103,7 +112,8 @@ class LayerTreeApi {
   /// [snapshotId] The id of the layer snapshot.
   /// Returns: The array of canvas function calls.
   Future<List<Map<String, dynamic>>> snapshotCommandLog(
-      SnapshotId snapshotId) async {
+    SnapshotId snapshotId,
+  ) async {
     var result = await _client.send('LayerTree.snapshotCommandLog', {
       'snapshotId': snapshotId,
     });
@@ -137,16 +147,19 @@ class CompositingReasonsResult {
   /// A list of strings specifying reason IDs for the given layer to become composited.
   final List<String> compositingReasonIds;
 
-  CompositingReasonsResult(
-      {required this.compositingReasons, required this.compositingReasonIds});
+  CompositingReasonsResult({
+    required this.compositingReasons,
+    required this.compositingReasonIds,
+  });
 
   factory CompositingReasonsResult.fromJson(Map<String, dynamic> json) {
     return CompositingReasonsResult(
       compositingReasons:
           (json['compositingReasons'] as List).map((e) => e as String).toList(),
-      compositingReasonIds: (json['compositingReasonIds'] as List)
-          .map((e) => e as String)
-          .toList(),
+      compositingReasonIds:
+          (json['compositingReasonIds'] as List)
+              .map((e) => e as String)
+              .toList(),
     );
   }
 }
@@ -183,18 +196,14 @@ class ScrollRect {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'rect': rect.toJson(),
-      'type': type,
-    };
+    return {'rect': rect.toJson(), 'type': type};
   }
 }
 
 enum ScrollRectType {
   repaintsOnScroll('RepaintsOnScroll'),
   touchEventHandler('TouchEventHandler'),
-  wheelEventHandler('WheelEventHandler'),
-  ;
+  wheelEventHandler('WheelEventHandler');
 
   final String value;
 
@@ -223,26 +232,32 @@ class StickyPositionConstraint {
   /// The nearest sticky layer that shifts the containing block
   final LayerId? nearestLayerShiftingContainingBlock;
 
-  StickyPositionConstraint(
-      {required this.stickyBoxRect,
-      required this.containingBlockRect,
-      this.nearestLayerShiftingStickyBox,
-      this.nearestLayerShiftingContainingBlock});
+  StickyPositionConstraint({
+    required this.stickyBoxRect,
+    required this.containingBlockRect,
+    this.nearestLayerShiftingStickyBox,
+    this.nearestLayerShiftingContainingBlock,
+  });
 
   factory StickyPositionConstraint.fromJson(Map<String, dynamic> json) {
     return StickyPositionConstraint(
-      stickyBoxRect:
-          dom.Rect.fromJson(json['stickyBoxRect'] as Map<String, dynamic>),
+      stickyBoxRect: dom.Rect.fromJson(
+        json['stickyBoxRect'] as Map<String, dynamic>,
+      ),
       containingBlockRect: dom.Rect.fromJson(
-          json['containingBlockRect'] as Map<String, dynamic>),
-      nearestLayerShiftingStickyBox: json
-              .containsKey('nearestLayerShiftingStickyBox')
-          ? LayerId.fromJson(json['nearestLayerShiftingStickyBox'] as String)
-          : null,
+        json['containingBlockRect'] as Map<String, dynamic>,
+      ),
+      nearestLayerShiftingStickyBox:
+          json.containsKey('nearestLayerShiftingStickyBox')
+              ? LayerId.fromJson(
+                json['nearestLayerShiftingStickyBox'] as String,
+              )
+              : null,
       nearestLayerShiftingContainingBlock:
           json.containsKey('nearestLayerShiftingContainingBlock')
               ? LayerId.fromJson(
-                  json['nearestLayerShiftingContainingBlock'] as String)
+                json['nearestLayerShiftingContainingBlock'] as String,
+              )
               : null,
     );
   }
@@ -283,11 +298,7 @@ class PictureTile {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'x': x,
-      'y': y,
-      'picture': picture,
-    };
+    return {'x': x, 'y': y, 'picture': picture};
   }
 }
 
@@ -342,40 +353,44 @@ class Layer {
   /// Sticky position constraint information
   final StickyPositionConstraint? stickyPositionConstraint;
 
-  Layer(
-      {required this.layerId,
-      this.parentLayerId,
-      this.backendNodeId,
-      required this.offsetX,
-      required this.offsetY,
-      required this.width,
-      required this.height,
-      this.transform,
-      this.anchorX,
-      this.anchorY,
-      this.anchorZ,
-      required this.paintCount,
-      required this.drawsContent,
-      this.invisible,
-      this.scrollRects,
-      this.stickyPositionConstraint});
+  Layer({
+    required this.layerId,
+    this.parentLayerId,
+    this.backendNodeId,
+    required this.offsetX,
+    required this.offsetY,
+    required this.width,
+    required this.height,
+    this.transform,
+    this.anchorX,
+    this.anchorY,
+    this.anchorZ,
+    required this.paintCount,
+    required this.drawsContent,
+    this.invisible,
+    this.scrollRects,
+    this.stickyPositionConstraint,
+  });
 
   factory Layer.fromJson(Map<String, dynamic> json) {
     return Layer(
       layerId: LayerId.fromJson(json['layerId'] as String),
-      parentLayerId: json.containsKey('parentLayerId')
-          ? LayerId.fromJson(json['parentLayerId'] as String)
-          : null,
-      backendNodeId: json.containsKey('backendNodeId')
-          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
-          : null,
+      parentLayerId:
+          json.containsKey('parentLayerId')
+              ? LayerId.fromJson(json['parentLayerId'] as String)
+              : null,
+      backendNodeId:
+          json.containsKey('backendNodeId')
+              ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
+              : null,
       offsetX: json['offsetX'] as num,
       offsetY: json['offsetY'] as num,
       width: json['width'] as num,
       height: json['height'] as num,
-      transform: json.containsKey('transform')
-          ? (json['transform'] as List).map((e) => e as num).toList()
-          : null,
+      transform:
+          json.containsKey('transform')
+              ? (json['transform'] as List).map((e) => e as num).toList()
+              : null,
       anchorX: json.containsKey('anchorX') ? json['anchorX'] as num : null,
       anchorY: json.containsKey('anchorY') ? json['anchorY'] as num : null,
       anchorZ: json.containsKey('anchorZ') ? json['anchorZ'] as num : null,
@@ -383,15 +398,18 @@ class Layer {
       drawsContent: json['drawsContent'] as bool? ?? false,
       invisible:
           json.containsKey('invisible') ? json['invisible'] as bool : null,
-      scrollRects: json.containsKey('scrollRects')
-          ? (json['scrollRects'] as List)
-              .map((e) => ScrollRect.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-      stickyPositionConstraint: json.containsKey('stickyPositionConstraint')
-          ? StickyPositionConstraint.fromJson(
-              json['stickyPositionConstraint'] as Map<String, dynamic>)
-          : null,
+      scrollRects:
+          json.containsKey('scrollRects')
+              ? (json['scrollRects'] as List)
+                  .map((e) => ScrollRect.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : null,
+      stickyPositionConstraint:
+          json.containsKey('stickyPositionConstraint')
+              ? StickyPositionConstraint.fromJson(
+                json['stickyPositionConstraint'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 

@@ -31,8 +31,10 @@ class Dialog {
   Future<void> accept({String? promptText}) async {
     assert(!_handled, 'Cannot accept dialog which is already handled!');
     _handled = true;
-    await page.devTools.page
-        .handleJavaScriptDialog(true, promptText: promptText);
+    await page.devTools.page.handleJavaScriptDialog(
+      true,
+      promptText: promptText,
+    );
   }
 
   /// Returns [Future] which resolves when the dialog has been dismissed.

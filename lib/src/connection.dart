@@ -5,8 +5,10 @@ import '../protocol/target.dart';
 import 'websocket.dart';
 
 abstract class Client {
-  Future<Map<String, dynamic>> send(String method,
-      [Map<String, dynamic>? parameters]);
+  Future<Map<String, dynamic>> send(
+    String method, [
+    Map<String, dynamic>? parameters,
+  ]);
 
   Stream<Event> get onEvent;
 }
@@ -41,18 +43,26 @@ class Connection implements Client {
   final Duration? _delay;
 
   Connection._(this._webSocket, this.url, {Duration? delay}) : _delay = delay {
-    _subscriptions.add(_webSocket.events.listen(_onMessage, onError: (error) {
-      print('Websocket error: $error');
-    }));
+    _subscriptions.add(
+      _webSocket.events.listen(
+        _onMessage,
+        onError: (error) {
+          print('Websocket error: $error');
+        },
+      ),
+    );
 
     _webSocket.done.then(
-        (_) => _onClose('Websocket.done(reason: ${_webSocket.closeReason})'));
+      (_) => _onClose('Websocket.done(reason: ${_webSocket.closeReason})'),
+    );
   }
 
   TargetApi get targetApi => _targetApi;
 
-  static Future<Connection> create(String url,
-      {required Duration? delay}) async {
+  static Future<Connection> create(
+    String url, {
+    required Duration? delay,
+  }) async {
     return Connection._(await WebSocket.connect(url), url, delay: delay);
   }
 
@@ -62,8 +72,10 @@ class Connection implements Client {
   Stream<Session> get onSessionDetached => _sessionDetachedController.stream;
 
   @override
-  Future<Map<String, dynamic>> send(String method,
-      [Map<String, dynamic>? parameters]) {
+  Future<Map<String, dynamic>> send(
+    String method, [
+    Map<String, dynamic>? parameters,
+  ]) {
     var id = _rawSend(method, parameters);
     var message = _Message(method);
     _messagesInFly[id] = message;
@@ -71,8 +83,11 @@ class Connection implements Client {
     return message.completer.future;
   }
 
-  int _rawSend(String method, Map<String, dynamic>? parameters,
-      {SessionID? sessionId}) {
+  int _rawSend(
+    String method,
+    Map<String, dynamic>? parameters, {
+    SessionID? sessionId,
+  }) {
     var id = ++_lastId;
     var message = _encodeMessage(id, method, parameters, sessionId: sessionId);
 
@@ -86,13 +101,17 @@ class Connection implements Client {
     return !_manuallyAttached.contains(targetId);
   }
 
-  Future<Session> createSession(TargetInfo targetInfo,
-      {bool isAutoAttachEmulated = true}) async {
+  Future<Session> createSession(
+    TargetInfo targetInfo, {
+    bool isAutoAttachEmulated = true,
+  }) async {
     if (!isAutoAttachEmulated) {
       _manuallyAttached.add(targetInfo.targetId);
     }
-    var sessionId =
-        await _targetApi.attachToTarget(targetInfo.targetId, flatten: true);
+    var sessionId = await _targetApi.attachToTarget(
+      targetInfo.targetId,
+      flatten: true,
+    );
     _manuallyAttached.remove(targetInfo.targetId);
 
     var session = sessions[sessionId]!;
@@ -112,10 +131,14 @@ class Connection implements Client {
     var parentId = rawParentId != null ? SessionID(rawParentId) : null;
     if (method == 'Target.attachedToTarget') {
       var params = AttachedToTargetEvent.fromJson(
-          object['params'] as Map<String, dynamic>);
+        object['params'] as Map<String, dynamic>,
+      );
       var sessionId = params.sessionId;
-      var session =
-          Session(this, sessionId, targetType: params.targetInfo.type);
+      var session = Session(
+        this,
+        sessionId,
+        targetType: params.targetInfo.type,
+      );
       sessions[sessionId] = session;
       _sessionAttachedController.add(session);
       final parentSession = sessions[parentId];
@@ -124,7 +147,8 @@ class Connection implements Client {
       }
     } else if (method == 'Target.detachedFromTarget') {
       var params = DetachedFromTargetEvent.fromJson(
-          object['params'] as Map<String, dynamic>);
+        object['params'] as Map<String, dynamic>,
+      );
       var session = sessions[params.sessionId];
       if (session != null) {
         session.dispose(reason: 'Target.detachedFromTarget');
@@ -152,11 +176,13 @@ class Connection implements Client {
       if (messageInFly != null) {
         var error = object['error'] as Map<String, dynamic>?;
         if (error != null) {
-          messageInFly.completer
-              .completeError(ServerException(error['message'] as String));
+          messageInFly.completer.completeError(
+            ServerException(error['message'] as String),
+          );
         } else {
-          messageInFly.completer
-              .complete(object['result'] as Map<String, dynamic>?);
+          messageInFly.completer.complete(
+            object['result'] as Map<String, dynamic>?,
+          );
         }
       }
     } else {
@@ -174,8 +200,9 @@ class Connection implements Client {
 
     _eventController.close();
     for (var message in _messagesInFly.values) {
-      message.completer
-          .completeError(TargetClosedException(message.method, reason: reason));
+      message.completer.completeError(
+        TargetClosedException(message.method, reason: reason),
+      );
     }
     _messagesInFly.clear();
 
@@ -201,13 +228,13 @@ class Connection implements Client {
   Future<void> get disconnected => _webSocket.done;
 }
 
-String _encodeMessage(int id, String method, Map<String, dynamic>? parameters,
-    {SessionID? sessionId}) {
-  var message = {
-    'id': id,
-    'method': method,
-    'params': parameters,
-  };
+String _encodeMessage(
+  int id,
+  String method,
+  Map<String, dynamic>? parameters, {
+  SessionID? sessionId,
+}) {
+  var message = {'id': id, 'method': method, 'params': parameters};
   if (sessionId != null) {
     message['sessionId'] = sessionId.value;
   }
@@ -225,11 +252,14 @@ class Session implements Client {
   Session(this.connection, this.sessionId, {required this.targetType});
 
   @override
-  Future<Map<String, dynamic>> send(String method,
-      [Map<String, dynamic>? parameters]) {
+  Future<Map<String, dynamic>> send(
+    String method, [
+    Map<String, dynamic>? parameters,
+  ]) {
     if (_eventController.isClosed) {
       throw Exception(
-          'Protocol error ($method): Session closed. Most likely the $targetType has been closed.');
+        'Protocol error ($method): Session closed. Most likely the $targetType has been closed.',
+      );
     }
     var id = connection._rawSend(method, parameters, sessionId: sessionId);
 
@@ -250,14 +280,19 @@ class Session implements Client {
       var message = _messagesInFly.remove(id);
       var error = object['error'] as Map<String, dynamic>?;
       if (error != null) {
-        message!.completer
-            .completeError(ServerException(error['message'] as String));
+        message!.completer.completeError(
+          ServerException(error['message'] as String),
+        );
       } else {
         message!.completer.complete(object['result'] as Map<String, dynamic>?);
       }
     } else {
-      _eventController.add(Event._(object['method'] as String,
-          (object['params']) as Map<String, dynamic>? ?? {}));
+      _eventController.add(
+        Event._(
+          object['method'] as String,
+          (object['params']) as Map<String, dynamic>? ?? {},
+        ),
+      );
     }
   }
 
@@ -272,8 +307,9 @@ class Session implements Client {
 
     _eventController.close();
     for (var message in _messagesInFly.values) {
-      message.completer
-          .completeError(TargetClosedException(message.method, reason: reason));
+      message.completer.completeError(
+        TargetClosedException(message.method, reason: reason),
+      );
     }
     _messagesInFly.clear();
     _onClose.complete();

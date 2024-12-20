@@ -41,8 +41,10 @@ void main() {
       await page.goto(server.prefix + '/input/touches.html');
       var button = await page.$('button');
       await button.tap();
-      expect(await page.evaluate('() => getResult()'),
-          equals(['Touchstart: 0', 'Touchend: 0']));
+      expect(
+        await page.evaluate('() => getResult()'),
+        equals(['Touchstart: 0', 'Touchend: 0']),
+      );
     });
   });
 }

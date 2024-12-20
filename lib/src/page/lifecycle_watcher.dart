@@ -20,11 +20,12 @@ class LifecycleWatcher {
   Timer? _timeoutTimer;
 
   LifecycleWatcher(this.frameManager, this.frame, {Until? wait, this.timeout})
-      : wait = wait ?? Until.load {
+    : wait = wait ?? Until.load {
     _subscriptions = [
       frameManager.onLifecycleEvent.listen(_checkLifecycleComplete),
-      frameManager.onFrameNavigatedWithinDocument
-          .listen(_navigatedWithinDocument),
+      frameManager.onFrameNavigatedWithinDocument.listen(
+        _navigatedWithinDocument,
+      ),
       frameManager.onFrameNavigated.listen(_navigated),
       frameManager.onFrameSwapped.listen(_frameSwapped),
       frameManager.onFrameDetached.listen(_onFrameDetached),
@@ -39,8 +40,9 @@ class LifecycleWatcher {
     return Future.any([
       _timeoutFuture,
       _terminationCompleter.future,
-      frameManager.page.session.closed.then((_) =>
-          Exception('Navigation failed because browser has disconnected!'))
+      frameManager.page.session.closed.then(
+        (_) => Exception('Navigation failed because browser has disconnected!'),
+      ),
     ]);
   }
 
@@ -67,8 +69,9 @@ class LifecycleWatcher {
 
   void _onFrameDetached(Frame? frame) {
     if (this.frame == frame) {
-      _terminationCompleter
-          .complete(Exception('Navigating frame was detached'));
+      _terminationCompleter.complete(
+        Exception('Navigating frame was detached'),
+      );
       return;
     }
     _checkLifecycleComplete();
@@ -82,7 +85,9 @@ class LifecycleWatcher {
         'Navigation Timeout Exceeded: ${timeout!.inMilliseconds}ms exceeded';
     var completer = Completer<Exception>();
     _timeoutTimer = Timer(
-        timeout!, () => completer.complete(TimeoutException(errorMessage)));
+      timeout!,
+      () => completer.complete(TimeoutException(errorMessage)),
+    );
     return completer.future;
   }
 

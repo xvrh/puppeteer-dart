@@ -28,12 +28,14 @@ void main() async {
 
   await normalTab1.evaluate('window.localStorage.setItem("name", "xavier")');
 
-  var itemValue =
-      await normalTab2.evaluate<String>('window.localStorage.getItem("name")');
+  var itemValue = await normalTab2.evaluate<String>(
+    'window.localStorage.getItem("name")',
+  );
   assert(itemValue == 'xavier');
 
-  var incognitoValue = await incognitoTab1
-      .evaluate<String?>('window.localStorage.getItem("name")');
+  var incognitoValue = await incognitoTab1.evaluate<String?>(
+    'window.localStorage.getItem("name")',
+  );
   assert(incognitoValue == null);
 
   print('$itemValue vs $incognitoValue');

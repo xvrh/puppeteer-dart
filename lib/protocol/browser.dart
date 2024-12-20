@@ -25,8 +25,11 @@ class BrowserApi {
   /// [origin] Origin the permission applies to, all origins if not specified.
   /// [browserContextId] Context to override. When omitted, default browser context is used.
   Future<void> setPermission(
-      PermissionDescriptor permission, PermissionSetting setting,
-      {String? origin, BrowserContextID? browserContextId}) async {
+    PermissionDescriptor permission,
+    PermissionSetting setting, {
+    String? origin,
+    BrowserContextID? browserContextId,
+  }) async {
     await _client.send('Browser.setPermission', {
       'permission': permission,
       'setting': setting,
@@ -38,8 +41,11 @@ class BrowserApi {
   /// Grant specific permissions to the given origin and reject all others.
   /// [origin] Origin the permission applies to, all origins if not specified.
   /// [browserContextId] BrowserContext to override permissions. When omitted, default browser context is used.
-  Future<void> grantPermissions(List<PermissionType> permissions,
-      {String? origin, BrowserContextID? browserContextId}) async {
+  Future<void> grantPermissions(
+    List<PermissionType> permissions, {
+    String? origin,
+    BrowserContextID? browserContextId,
+  }) async {
     await _client.send('Browser.grantPermissions', {
       'permissions': [...permissions],
       if (origin != null) 'origin': origin,
@@ -64,12 +70,14 @@ class BrowserApi {
   /// or 'allowAndName'.
   /// [eventsEnabled] Whether to emit download events (defaults to false).
   Future<void> setDownloadBehavior(
-      @Enum(['deny', 'allow', 'allowAndName', 'default']) String behavior,
-      {BrowserContextID? browserContextId,
-      String? downloadPath,
-      bool? eventsEnabled}) async {
+    @Enum(['deny', 'allow', 'allowAndName', 'default']) String behavior, {
+    BrowserContextID? browserContextId,
+    String? downloadPath,
+    bool? eventsEnabled,
+  }) async {
     assert(
-        const ['deny', 'allow', 'allowAndName', 'default'].contains(behavior));
+      const ['deny', 'allow', 'allowAndName', 'default'].contains(behavior),
+    );
     await _client.send('Browser.setDownloadBehavior', {
       'behavior': behavior,
       if (browserContextId != null) 'browserContextId': browserContextId,
@@ -81,8 +89,10 @@ class BrowserApi {
   /// Cancel a download if in progress
   /// [guid] Global unique identifier of the download.
   /// [browserContextId] BrowserContext to perform the action in. When omitted, default browser context is used.
-  Future<void> cancelDownload(String guid,
-      {BrowserContextID? browserContextId}) async {
+  Future<void> cancelDownload(
+    String guid, {
+    BrowserContextID? browserContextId,
+  }) async {
     await _client.send('Browser.cancelDownload', {
       'guid': guid,
       if (browserContextId != null) 'browserContextId': browserContextId,
@@ -159,8 +169,9 @@ class BrowserApi {
 
   /// Get the browser window that contains the devtools target.
   /// [targetId] Devtools agent host id. If called as a part of the session, associated targetId is used.
-  Future<GetWindowForTargetResult> getWindowForTarget(
-      {target.TargetID? targetId}) async {
+  Future<GetWindowForTargetResult> getWindowForTarget({
+    target.TargetID? targetId,
+  }) async {
     var result = await _client.send('Browser.getWindowForTarget', {
       if (targetId != null) 'targetId': targetId,
     });
@@ -216,11 +227,12 @@ class DownloadWillBeginEvent {
   /// Suggested file name of the resource (the actual name of the file saved on disk may differ).
   final String suggestedFilename;
 
-  DownloadWillBeginEvent(
-      {required this.frameId,
-      required this.guid,
-      required this.url,
-      required this.suggestedFilename});
+  DownloadWillBeginEvent({
+    required this.frameId,
+    required this.guid,
+    required this.url,
+    required this.suggestedFilename,
+  });
 
   factory DownloadWillBeginEvent.fromJson(Map<String, dynamic> json) {
     return DownloadWillBeginEvent(
@@ -245,11 +257,12 @@ class DownloadProgressEvent {
   /// Download status.
   final DownloadProgressEventState state;
 
-  DownloadProgressEvent(
-      {required this.guid,
-      required this.totalBytes,
-      required this.receivedBytes,
-      required this.state});
+  DownloadProgressEvent({
+    required this.guid,
+    required this.totalBytes,
+    required this.receivedBytes,
+    required this.state,
+  });
 
   factory DownloadProgressEvent.fromJson(Map<String, dynamic> json) {
     return DownloadProgressEvent(
@@ -277,12 +290,13 @@ class GetVersionResult {
   /// V8 version.
   final String jsVersion;
 
-  GetVersionResult(
-      {required this.protocolVersion,
-      required this.product,
-      required this.revision,
-      required this.userAgent,
-      required this.jsVersion});
+  GetVersionResult({
+    required this.protocolVersion,
+    required this.product,
+    required this.revision,
+    required this.userAgent,
+    required this.jsVersion,
+  });
 
   factory GetVersionResult.fromJson(Map<String, dynamic> json) {
     return GetVersionResult(
@@ -330,8 +344,7 @@ enum WindowState {
   normal('normal'),
   minimized('minimized'),
   maximized('maximized'),
-  fullscreen('fullscreen'),
-  ;
+  fullscreen('fullscreen');
 
   final String value;
 
@@ -371,9 +384,10 @@ class Bounds {
       top: json.containsKey('top') ? json['top'] as int : null,
       width: json.containsKey('width') ? json['width'] as int : null,
       height: json.containsKey('height') ? json['height'] as int : null,
-      windowState: json.containsKey('windowState')
-          ? WindowState.fromJson(json['windowState'] as String)
-          : null,
+      windowState:
+          json.containsKey('windowState')
+              ? WindowState.fromJson(json['windowState'] as String)
+              : null,
     );
   }
 
@@ -418,8 +432,7 @@ enum PermissionType {
   wakeLockScreen('wakeLockScreen'),
   wakeLockSystem('wakeLockSystem'),
   webAppInstallation('webAppInstallation'),
-  windowManagement('windowManagement'),
-  ;
+  windowManagement('windowManagement');
 
   final String value;
 
@@ -437,8 +450,7 @@ enum PermissionType {
 enum PermissionSetting {
   granted('granted'),
   denied('denied'),
-  prompt('prompt'),
-  ;
+  prompt('prompt');
 
   final String value;
 
@@ -476,27 +488,31 @@ class PermissionDescriptor {
   /// For "camera" permission, may specify panTiltZoom.
   final bool? panTiltZoom;
 
-  PermissionDescriptor(
-      {required this.name,
-      this.sysex,
-      this.userVisibleOnly,
-      this.allowWithoutSanitization,
-      this.allowWithoutGesture,
-      this.panTiltZoom});
+  PermissionDescriptor({
+    required this.name,
+    this.sysex,
+    this.userVisibleOnly,
+    this.allowWithoutSanitization,
+    this.allowWithoutGesture,
+    this.panTiltZoom,
+  });
 
   factory PermissionDescriptor.fromJson(Map<String, dynamic> json) {
     return PermissionDescriptor(
       name: json['name'] as String,
       sysex: json.containsKey('sysex') ? json['sysex'] as bool : null,
-      userVisibleOnly: json.containsKey('userVisibleOnly')
-          ? json['userVisibleOnly'] as bool
-          : null,
-      allowWithoutSanitization: json.containsKey('allowWithoutSanitization')
-          ? json['allowWithoutSanitization'] as bool
-          : null,
-      allowWithoutGesture: json.containsKey('allowWithoutGesture')
-          ? json['allowWithoutGesture'] as bool
-          : null,
+      userVisibleOnly:
+          json.containsKey('userVisibleOnly')
+              ? json['userVisibleOnly'] as bool
+              : null,
+      allowWithoutSanitization:
+          json.containsKey('allowWithoutSanitization')
+              ? json['allowWithoutSanitization'] as bool
+              : null,
+      allowWithoutGesture:
+          json.containsKey('allowWithoutGesture')
+              ? json['allowWithoutGesture'] as bool
+              : null,
       panTiltZoom:
           json.containsKey('panTiltZoom') ? json['panTiltZoom'] as bool : null,
     );
@@ -519,8 +535,7 @@ class PermissionDescriptor {
 /// Browser command ids used by executeBrowserCommand.
 enum BrowserCommandId {
   openTabSearch('openTabSearch'),
-  closeTabSearch('closeTabSearch'),
-  ;
+  closeTabSearch('closeTabSearch');
 
   final String value;
 
@@ -557,11 +572,7 @@ class Bucket {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'low': low,
-      'high': high,
-      'count': count,
-    };
+    return {'low': low, 'high': high, 'count': count};
   }
 }
 
@@ -579,20 +590,22 @@ class Histogram {
   /// Buckets.
   final List<Bucket> buckets;
 
-  Histogram(
-      {required this.name,
-      required this.sum,
-      required this.count,
-      required this.buckets});
+  Histogram({
+    required this.name,
+    required this.sum,
+    required this.count,
+    required this.buckets,
+  });
 
   factory Histogram.fromJson(Map<String, dynamic> json) {
     return Histogram(
       name: json['name'] as String,
       sum: json['sum'] as int,
       count: json['count'] as int,
-      buckets: (json['buckets'] as List)
-          .map((e) => Bucket.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      buckets:
+          (json['buckets'] as List)
+              .map((e) => Bucket.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 
@@ -609,8 +622,7 @@ class Histogram {
 enum DownloadProgressEventState {
   inProgress('inProgress'),
   completed('completed'),
-  canceled('canceled'),
-  ;
+  canceled('canceled');
 
   final String value;
 

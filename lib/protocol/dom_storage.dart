@@ -23,13 +23,14 @@ class DOMStorageApi {
 
   Stream<StorageId> get onDomStorageItemsCleared => _client.onEvent
       .where((event) => event.name == 'DOMStorage.domStorageItemsCleared')
-      .map((event) => StorageId.fromJson(
-          event.parameters['storageId'] as Map<String, dynamic>));
+      .map(
+        (event) => StorageId.fromJson(
+          event.parameters['storageId'] as Map<String, dynamic>,
+        ),
+      );
 
   Future<void> clear(StorageId storageId) async {
-    await _client.send('DOMStorage.clear', {
-      'storageId': storageId,
-    });
+    await _client.send('DOMStorage.clear', {'storageId': storageId});
   }
 
   /// Disables storage tracking, prevents storage events from being sent to the client.
@@ -59,7 +60,10 @@ class DOMStorageApi {
   }
 
   Future<void> setDOMStorageItem(
-      StorageId storageId, String key, String value) async {
+    StorageId storageId,
+    String key,
+    String value,
+  ) async {
     await _client.send('DOMStorage.setDOMStorageItem', {
       'storageId': storageId,
       'key': key,
@@ -75,8 +79,11 @@ class DomStorageItemAddedEvent {
 
   final String newValue;
 
-  DomStorageItemAddedEvent(
-      {required this.storageId, required this.key, required this.newValue});
+  DomStorageItemAddedEvent({
+    required this.storageId,
+    required this.key,
+    required this.newValue,
+  });
 
   factory DomStorageItemAddedEvent.fromJson(Map<String, dynamic> json) {
     return DomStorageItemAddedEvent(
@@ -111,11 +118,12 @@ class DomStorageItemUpdatedEvent {
 
   final String newValue;
 
-  DomStorageItemUpdatedEvent(
-      {required this.storageId,
-      required this.key,
-      required this.oldValue,
-      required this.newValue});
+  DomStorageItemUpdatedEvent({
+    required this.storageId,
+    required this.key,
+    required this.oldValue,
+    required this.newValue,
+  });
 
   factory DomStorageItemUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return DomStorageItemUpdatedEvent(
@@ -145,17 +153,22 @@ class StorageId {
   /// Whether the storage is local storage (not session storage).
   final bool isLocalStorage;
 
-  StorageId(
-      {this.securityOrigin, this.storageKey, required this.isLocalStorage});
+  StorageId({
+    this.securityOrigin,
+    this.storageKey,
+    required this.isLocalStorage,
+  });
 
   factory StorageId.fromJson(Map<String, dynamic> json) {
     return StorageId(
-      securityOrigin: json.containsKey('securityOrigin')
-          ? json['securityOrigin'] as String
-          : null,
-      storageKey: json.containsKey('storageKey')
-          ? SerializedStorageKey.fromJson(json['storageKey'] as String)
-          : null,
+      securityOrigin:
+          json.containsKey('securityOrigin')
+              ? json['securityOrigin'] as String
+              : null,
+      storageKey:
+          json.containsKey('storageKey')
+              ? SerializedStorageKey.fromJson(json['storageKey'] as String)
+              : null,
       isLocalStorage: json['isLocalStorage'] as bool? ?? false,
     );
   }

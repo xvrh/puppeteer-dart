@@ -18,6 +18,7 @@ void main() async {
 
 Future<void> _download(Uri url, String fileName) async {
   var json = await read(url);
-  await File.fromUri(Platform.script.resolve(p.posix.join('json', fileName)))
-      .writeAsString(json);
+  await File.fromUri(
+    Platform.script.resolve(p.posix.join('json', fileName)),
+  ).writeAsString(json);
 }

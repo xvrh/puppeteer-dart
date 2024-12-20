@@ -47,28 +47,33 @@ class DomWorld {
   void detach() {
     _detached = true;
     for (var waitTask in _waitTasks.toList()) {
-      waitTask
-          .terminate(Exception('waitForFunction failed: frame got detached.'));
+      waitTask.terminate(
+        Exception('waitForFunction failed: frame got detached.'),
+      );
     }
   }
 
   Future<ExecutionContext> get executionContext {
     if (_detached) {
       throw Exception(
-          'Execution Context is not available in detached frame "${frame.url}" (are you trying to evaluate?)');
+        'Execution Context is not available in detached frame "${frame.url}" (are you trying to evaluate?)',
+      );
     }
     return _contextCompleter!.future;
   }
 
   Future<T> evaluateHandle<T extends JsHandle>(
-      @Language('js') String pageFunction,
-      {List<dynamic>? args}) async {
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) async {
     var context = await executionContext;
     return context.evaluateHandle(pageFunction, args: args);
   }
 
-  Future<T> evaluate<T>(@Language('js') String pageFunction,
-      {List<dynamic>? args}) async {
+  Future<T> evaluate<T>(
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) async {
     var context = await executionContext;
     return context.evaluate<T>(pageFunction, args: args);
   }
@@ -101,14 +106,20 @@ class DomWorld {
     return value;
   }
 
-  Future<T?> $eval<T>(String selector, @Language('js') String pageFunction,
-      {List<dynamic>? args}) async {
+  Future<T?> $eval<T>(
+    String selector,
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) async {
     var document = await _document;
     return document.$eval<T>(selector, pageFunction, args: args);
   }
 
-  Future<T?> $$eval<T>(String selector, @Language('js') String pageFunction,
-      {List<dynamic>? args}) async {
+  Future<T?> $$eval<T>(
+    String selector,
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) async {
     var document = await _document;
     return document.$$eval<T>(selector, pageFunction, args: args);
   }
@@ -121,8 +132,8 @@ class DomWorld {
 
   Future<String?> get content async {
     return await evaluate(
-        //language=js
-        '''
+      //language=js
+      '''
 function _() {
   let retVal = '';
   if (document.doctype) {
@@ -133,7 +144,8 @@ function _() {
   }
   return retVal;
 }
-''');
+''',
+    );
   }
 
   Future<void> setContent(String html, {Duration? timeout, Until? wait}) async {
@@ -143,16 +155,22 @@ function _() {
     // We rely upon the fact that document.open() will reset frame lifecycle with "init"
     // lifecycle event. @see https://crrev.com/608658
     await evaluate(
-        //language=js
-        '''
+      //language=js
+      '''
 function _(html) {
   document.open();
   document.write(html);
   document.close();
 }
-''', args: [html]);
-    var watcher =
-        LifecycleWatcher(frameManager, frame, wait: wait, timeout: timeout);
+''',
+      args: [html],
+    );
+    var watcher = LifecycleWatcher(
+      frameManager,
+      frame,
+      wait: wait,
+      timeout: timeout,
+    );
     var error = await Future.any([
       watcher.timeoutOrTermination,
       watcher.lifecycle,
@@ -163,8 +181,12 @@ function _(html) {
     }
   }
 
-  Future<ElementHandle> addScriptTag(
-      {String? url, File? file, String? content, String? type}) async {
+  Future<ElementHandle> addScriptTag({
+    String? url,
+    File? file,
+    String? content,
+    String? type,
+  }) async {
     assert(url != null || file != null || content != null);
     type ??= '';
 
@@ -172,8 +194,8 @@ function _(html) {
 
     if (url != null) {
       return (await context.evaluateHandle(
-          //language=js
-          '''
+        //language=js
+        '''
 async function _(url, type) {
   const script = document.createElement('script');
   script.src = url;
@@ -187,12 +209,14 @@ async function _(url, type) {
   await promise;
   return script;
 }
-''', args: [url, type])).asElement!;
+''',
+        args: [url, type],
+      )).asElement!;
     }
 
     var addScriptContent =
-        //language=js
-        '''
+    //language=js
+    '''
 function _(content, type) {
   const script = document.createElement('script');
   script.type = type;
@@ -209,30 +233,35 @@ function _(content, type) {
     if (file != null) {
       var contents = await file.readAsString();
       contents += '//# sourceURL=${file.absolute.path}';
-      return (await context
-              .evaluateHandle(addScriptContent, args: [contents, type]))
-          .asElement!;
+      return (await context.evaluateHandle(
+        addScriptContent,
+        args: [contents, type],
+      )).asElement!;
     }
 
     if (content != null) {
-      return (await context
-              .evaluateHandle(addScriptContent, args: [content, type]))
-          .asElement!;
+      return (await context.evaluateHandle(
+        addScriptContent,
+        args: [content, type],
+      )).asElement!;
     }
 
     throw StateError('');
   }
 
-  Future<ElementHandle> addStyleTag(
-      {String? url, File? file, String? content}) async {
+  Future<ElementHandle> addStyleTag({
+    String? url,
+    File? file,
+    String? content,
+  }) async {
     assert(url != null || file != null || content != null);
 
     var context = await executionContext;
 
     if (url != null) {
       return (await context.evaluateHandle(
-          //language=js
-          '''
+        //language=js
+        '''
 async function _(url) {
   const link = document.createElement('link');
   link.rel = 'stylesheet';
@@ -245,12 +274,14 @@ async function _(url) {
   await promise;
   return link;   
 }
-''', args: [url])).asElement!;
+''',
+        args: [url],
+      )).asElement!;
     }
 
     var addStyleContent =
-        //language=js
-        '''
+    //language=js
+    '''
 async function _(content) {
   const style = document.createElement('style');
   style.type = 'text/css';
@@ -268,20 +299,28 @@ async function _(content) {
     if (file != null) {
       var contents = await file.readAsString();
       contents += '/*# sourceURL=${file.absolute.path}*/';
-      return (await context.evaluateHandle(addStyleContent, args: [contents]))
-          .asElement!;
+      return (await context.evaluateHandle(
+        addStyleContent,
+        args: [contents],
+      )).asElement!;
     }
 
     if (content != null) {
-      return (await context.evaluateHandle(addStyleContent, args: [content]))
-          .asElement!;
+      return (await context.evaluateHandle(
+        addStyleContent,
+        args: [content],
+      )).asElement!;
     }
 
     throw StateError('');
   }
 
-  Future<void> click(String selector,
-      {Duration? delay, MouseButton? button, int? clickCount}) async {
+  Future<void> click(
+    String selector, {
+    Duration? delay,
+    MouseButton? button,
+    int? clickCount,
+  }) async {
     var handle = await $OrNull(selector);
     if (handle == null) {
       throw Exception('No node found for selector: $selector');
@@ -321,37 +360,60 @@ async function _(content) {
     await handle.dispose();
   }
 
-  Future<ElementHandle?> waitForSelector(String selector,
-      {bool? visible, bool? hidden, Duration? timeout}) {
-    return _waitForSelectorOrXPath(selector,
-        isXPath: false, visible: visible, hidden: hidden, timeout: timeout);
+  Future<ElementHandle?> waitForSelector(
+    String selector, {
+    bool? visible,
+    bool? hidden,
+    Duration? timeout,
+  }) {
+    return _waitForSelectorOrXPath(
+      selector,
+      isXPath: false,
+      visible: visible,
+      hidden: hidden,
+      timeout: timeout,
+    );
   }
 
-  Future<ElementHandle?> waitForXPath(String xpath,
-      {bool? visible, bool? hidden, Duration? timeout}) {
-    return _waitForSelectorOrXPath(xpath,
-        isXPath: true, visible: visible, hidden: hidden, timeout: timeout);
+  Future<ElementHandle?> waitForXPath(
+    String xpath, {
+    bool? visible,
+    bool? hidden,
+    Duration? timeout,
+  }) {
+    return _waitForSelectorOrXPath(
+      xpath,
+      isXPath: true,
+      visible: visible,
+      hidden: hidden,
+      timeout: timeout,
+    );
   }
 
   Future<JsHandle> waitForFunction(
-      @Language('js') String pageFunction, List<dynamic>? args,
-      {Duration? timeout, Polling? polling}) async {
+    @Language('js') String pageFunction,
+    List<dynamic>? args, {
+    Duration? timeout,
+    Polling? polling,
+  }) async {
     var functionDeclaration = convertToFunctionDeclaration(pageFunction);
     if (functionDeclaration == null) {
       pageFunction = 'function _() { return $pageFunction; }';
     }
 
-    return await WaitTask(this, pageFunction,
-            title: 'function',
-            polling: polling ?? Polling.everyFrame,
-            timeout: timeout ?? frameManager.page.defaultTimeout,
-            predicateArgs: args)
-        .future;
+    return await WaitTask(
+      this,
+      pageFunction,
+      title: 'function',
+      polling: polling ?? Polling.everyFrame,
+      timeout: timeout ?? frameManager.page.defaultTimeout,
+      predicateArgs: args,
+    ).future;
   }
 
   static final _predicate =
-      //language=js
-      '''
+  //language=js
+  '''
 function _(selectorOrXPath, isXPath, waitForVisible, waitForHidden) {
   const node = isXPath
     ? document.evaluate(selectorOrXPath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
@@ -377,11 +439,13 @@ function _(selectorOrXPath, isXPath, waitForVisible, waitForHidden) {
 }
 ''';
 
-  Future<ElementHandle?> _waitForSelectorOrXPath(String selectorOrXPath,
-      {bool isXPath = false,
-      bool? visible,
-      bool? hidden,
-      Duration? timeout}) async {
+  Future<ElementHandle?> _waitForSelectorOrXPath(
+    String selectorOrXPath, {
+    bool isXPath = false,
+    bool? visible,
+    bool? hidden,
+    Duration? timeout,
+  }) async {
     var waitForVisible = visible ?? false;
     var waitForHidden = hidden ?? false;
 
@@ -389,16 +453,14 @@ function _(selectorOrXPath, isXPath, waitForVisible, waitForHidden) {
         waitForVisible || waitForHidden ? Polling.everyFrame : Polling.mutation;
     var title =
         '${isXPath ? 'XPath' : 'selector'} "$selectorOrXPath"${waitForHidden ? ' to be hidden' : ''}';
-    var waitTask = WaitTask(this, _predicate,
-        title: title,
-        polling: polling,
-        timeout: timeout ?? frameManager.page.defaultTimeout,
-        predicateArgs: [
-          selectorOrXPath,
-          isXPath,
-          waitForVisible,
-          waitForHidden
-        ]);
+    var waitTask = WaitTask(
+      this,
+      _predicate,
+      title: title,
+      polling: polling,
+      timeout: timeout ?? frameManager.page.defaultTimeout,
+      predicateArgs: [selectorOrXPath, isXPath, waitForVisible, waitForHidden],
+    );
     var handle = await waitTask.future;
     if (handle.asElement == null) {
       await handle.dispose();
@@ -425,11 +487,14 @@ class WaitTask {
   Timer? _timeoutTimer;
   bool _terminated = false;
 
-  WaitTask(this.domWorld, @Language('js') this.predicate,
-      {required this.title,
-      required this.polling,
-      required this.timeout,
-      required this.predicateArgs}) {
+  WaitTask(
+    this.domWorld,
+    @Language('js') this.predicate, {
+    required this.title,
+    required this.polling,
+    required this.timeout,
+    required this.predicateArgs,
+  }) {
     domWorld._waitTasks.add(this);
 
     var timeout = this.timeout;
@@ -437,7 +502,8 @@ class WaitTask {
     // timeout on our end.
     if (timeout != null && timeout.inMicroseconds > 0) {
       var timeoutError = TimeoutException(
-          'waiting for $title failed: timeout ${timeout.inMilliseconds}ms exceeded');
+        'waiting for $title failed: timeout ${timeout.inMilliseconds}ms exceeded',
+      );
       _timeoutTimer = Timer(timeout, () => terminate(timeoutError));
     }
     rerun();
@@ -457,13 +523,15 @@ class WaitTask {
       var args = <dynamic>[
         'return ($predicate)(...args)',
         polling.value,
-        timeout!.inMilliseconds
+        timeout!.inMilliseconds,
       ];
       if (predicateArgs != null) {
         args.addAll(predicateArgs!);
       }
-      var success = await domWorld.evaluateHandle(_waitForPredicatePageFunction,
-          args: args);
+      var success = await domWorld.evaluateHandle(
+        _waitForPredicatePageFunction,
+        args: args,
+      );
 
       if (_terminated || runCount != _runCount) {
         await success.dispose();
@@ -473,8 +541,9 @@ class WaitTask {
       // Ignore timeouts in pageScript - we track timeouts ourselves.
       // If the frame's execution context has already changed, `frame.evaluate` will
       // throw an error - ignore this predicate run altogether.
-      if (await domWorld.evaluate<bool>('function(s) { return !s; }',
-          args: [success]).catchError((_) => true)) {
+      if (await domWorld
+          .evaluate<bool>('function(s) { return !s; }', args: [success])
+          .catchError((_) => true)) {
         await success.dispose();
         return;
       }
@@ -504,8 +573,8 @@ class WaitTask {
 }
 
 final _waitForPredicatePageFunction =
-    //language=js
-    '''
+//language=js
+'''
 async function _(predicateBody, polling, timeout, ...args) {
   const predicate = new Function('...args', predicateBody);
   let timedOut = false;

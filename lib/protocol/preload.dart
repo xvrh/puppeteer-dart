@@ -12,8 +12,11 @@ class PreloadApi {
   /// Upsert. Currently, it is only emitted when a rule set added.
   Stream<RuleSet> get onRuleSetUpdated => _client.onEvent
       .where((event) => event.name == 'Preload.ruleSetUpdated')
-      .map((event) => RuleSet.fromJson(
-          event.parameters['ruleSet'] as Map<String, dynamic>));
+      .map(
+        (event) => RuleSet.fromJson(
+          event.parameters['ruleSet'] as Map<String, dynamic>,
+        ),
+      );
 
   Stream<RuleSetId> get onRuleSetRemoved => _client.onEvent
       .where((event) => event.name == 'Preload.ruleSetRemoved')
@@ -23,8 +26,10 @@ class PreloadApi {
   Stream<PreloadEnabledStateUpdatedEvent> get onPreloadEnabledStateUpdated =>
       _client.onEvent
           .where((event) => event.name == 'Preload.preloadEnabledStateUpdated')
-          .map((event) =>
-              PreloadEnabledStateUpdatedEvent.fromJson(event.parameters));
+          .map(
+            (event) =>
+                PreloadEnabledStateUpdatedEvent.fromJson(event.parameters),
+          );
 
   /// Fired when a prefetch attempt is updated.
   Stream<PrefetchStatusUpdatedEvent> get onPrefetchStatusUpdated => _client
@@ -40,11 +45,12 @@ class PreloadApi {
 
   /// Send a list of sources for all preloading attempts in a document.
   Stream<PreloadingAttemptSourcesUpdatedEvent>
-      get onPreloadingAttemptSourcesUpdated => _client.onEvent
-          .where((event) =>
-              event.name == 'Preload.preloadingAttemptSourcesUpdated')
-          .map((event) =>
-              PreloadingAttemptSourcesUpdatedEvent.fromJson(event.parameters));
+  get onPreloadingAttemptSourcesUpdated => _client.onEvent
+      .where((event) => event.name == 'Preload.preloadingAttemptSourcesUpdated')
+      .map(
+        (event) =>
+            PreloadingAttemptSourcesUpdatedEvent.fromJson(event.parameters),
+      );
 
   Future<void> enable() async {
     await _client.send('Preload.enable');
@@ -66,12 +72,13 @@ class PreloadEnabledStateUpdatedEvent {
 
   final bool disabledByHoldbackPrerenderSpeculationRules;
 
-  PreloadEnabledStateUpdatedEvent(
-      {required this.disabledByPreference,
-      required this.disabledByDataSaver,
-      required this.disabledByBatterySaver,
-      required this.disabledByHoldbackPrefetchSpeculationRules,
-      required this.disabledByHoldbackPrerenderSpeculationRules});
+  PreloadEnabledStateUpdatedEvent({
+    required this.disabledByPreference,
+    required this.disabledByDataSaver,
+    required this.disabledByBatterySaver,
+    required this.disabledByHoldbackPrefetchSpeculationRules,
+    required this.disabledByHoldbackPrerenderSpeculationRules,
+  });
 
   factory PreloadEnabledStateUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return PreloadEnabledStateUpdatedEvent(
@@ -100,19 +107,21 @@ class PrefetchStatusUpdatedEvent {
 
   final network.RequestId requestId;
 
-  PrefetchStatusUpdatedEvent(
-      {required this.key,
-      required this.initiatingFrameId,
-      required this.prefetchUrl,
-      required this.status,
-      required this.prefetchStatus,
-      required this.requestId});
+  PrefetchStatusUpdatedEvent({
+    required this.key,
+    required this.initiatingFrameId,
+    required this.prefetchUrl,
+    required this.status,
+    required this.prefetchStatus,
+    required this.requestId,
+  });
 
   factory PrefetchStatusUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return PrefetchStatusUpdatedEvent(
       key: PreloadingAttemptKey.fromJson(json['key'] as Map<String, dynamic>),
-      initiatingFrameId:
-          page.FrameId.fromJson(json['initiatingFrameId'] as String),
+      initiatingFrameId: page.FrameId.fromJson(
+        json['initiatingFrameId'] as String,
+      ),
       prefetchUrl: json['prefetchUrl'] as String,
       status: PreloadingStatus.fromJson(json['status'] as String),
       prefetchStatus: PrefetchStatus.fromJson(json['prefetchStatus'] as String),
@@ -134,29 +143,36 @@ class PrerenderStatusUpdatedEvent {
 
   final List<PrerenderMismatchedHeaders>? mismatchedHeaders;
 
-  PrerenderStatusUpdatedEvent(
-      {required this.key,
-      required this.status,
-      this.prerenderStatus,
-      this.disallowedMojoInterface,
-      this.mismatchedHeaders});
+  PrerenderStatusUpdatedEvent({
+    required this.key,
+    required this.status,
+    this.prerenderStatus,
+    this.disallowedMojoInterface,
+    this.mismatchedHeaders,
+  });
 
   factory PrerenderStatusUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return PrerenderStatusUpdatedEvent(
       key: PreloadingAttemptKey.fromJson(json['key'] as Map<String, dynamic>),
       status: PreloadingStatus.fromJson(json['status'] as String),
-      prerenderStatus: json.containsKey('prerenderStatus')
-          ? PrerenderFinalStatus.fromJson(json['prerenderStatus'] as String)
-          : null,
-      disallowedMojoInterface: json.containsKey('disallowedMojoInterface')
-          ? json['disallowedMojoInterface'] as String
-          : null,
-      mismatchedHeaders: json.containsKey('mismatchedHeaders')
-          ? (json['mismatchedHeaders'] as List)
-              .map((e) => PrerenderMismatchedHeaders.fromJson(
-                  e as Map<String, dynamic>))
-              .toList()
-          : null,
+      prerenderStatus:
+          json.containsKey('prerenderStatus')
+              ? PrerenderFinalStatus.fromJson(json['prerenderStatus'] as String)
+              : null,
+      disallowedMojoInterface:
+          json.containsKey('disallowedMojoInterface')
+              ? json['disallowedMojoInterface'] as String
+              : null,
+      mismatchedHeaders:
+          json.containsKey('mismatchedHeaders')
+              ? (json['mismatchedHeaders'] as List)
+                  .map(
+                    (e) => PrerenderMismatchedHeaders.fromJson(
+                      e as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList()
+              : null,
     );
   }
 }
@@ -166,17 +182,23 @@ class PreloadingAttemptSourcesUpdatedEvent {
 
   final List<PreloadingAttemptSource> preloadingAttemptSources;
 
-  PreloadingAttemptSourcesUpdatedEvent(
-      {required this.loaderId, required this.preloadingAttemptSources});
+  PreloadingAttemptSourcesUpdatedEvent({
+    required this.loaderId,
+    required this.preloadingAttemptSources,
+  });
 
   factory PreloadingAttemptSourcesUpdatedEvent.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return PreloadingAttemptSourcesUpdatedEvent(
       loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
-      preloadingAttemptSources: (json['preloadingAttemptSources'] as List)
-          .map((e) =>
-              PreloadingAttemptSource.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      preloadingAttemptSources:
+          (json['preloadingAttemptSources'] as List)
+              .map(
+                (e) =>
+                    PreloadingAttemptSource.fromJson(e as Map<String, dynamic>),
+              )
+              .toList(),
     );
   }
 }
@@ -224,30 +246,34 @@ class RuleSet {
   /// `errorMessage` is null iff `errorType` is null.
   final RuleSetErrorType? errorType;
 
-  RuleSet(
-      {required this.id,
-      required this.loaderId,
-      required this.sourceText,
-      this.backendNodeId,
-      this.url,
-      this.requestId,
-      this.errorType});
+  RuleSet({
+    required this.id,
+    required this.loaderId,
+    required this.sourceText,
+    this.backendNodeId,
+    this.url,
+    this.requestId,
+    this.errorType,
+  });
 
   factory RuleSet.fromJson(Map<String, dynamic> json) {
     return RuleSet(
       id: RuleSetId.fromJson(json['id'] as String),
       loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
       sourceText: json['sourceText'] as String,
-      backendNodeId: json.containsKey('backendNodeId')
-          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
-          : null,
+      backendNodeId:
+          json.containsKey('backendNodeId')
+              ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
+              : null,
       url: json.containsKey('url') ? json['url'] as String : null,
-      requestId: json.containsKey('requestId')
-          ? network.RequestId.fromJson(json['requestId'] as String)
-          : null,
-      errorType: json.containsKey('errorType')
-          ? RuleSetErrorType.fromJson(json['errorType'] as String)
-          : null,
+      requestId:
+          json.containsKey('requestId')
+              ? network.RequestId.fromJson(json['requestId'] as String)
+              : null,
+      errorType:
+          json.containsKey('errorType')
+              ? RuleSetErrorType.fromJson(json['errorType'] as String)
+              : null,
     );
   }
 
@@ -266,8 +292,7 @@ class RuleSet {
 
 enum RuleSetErrorType {
   sourceIsNotJsonObject('SourceIsNotJsonObject'),
-  invalidRulesSkipped('InvalidRulesSkipped'),
-  ;
+  invalidRulesSkipped('InvalidRulesSkipped');
 
   final String value;
 
@@ -287,8 +312,7 @@ enum RuleSetErrorType {
 /// isn't being used by clients).
 enum SpeculationAction {
   prefetch('Prefetch'),
-  prerender('Prerender'),
-  ;
+  prerender('Prerender');
 
   final String value;
 
@@ -307,8 +331,7 @@ enum SpeculationAction {
 /// See https://github.com/WICG/nav-speculation/blob/main/triggers.md#window-name-targeting-hints
 enum SpeculationTargetHint {
   blank('Blank'),
-  self('Self'),
-  ;
+  self('Self');
 
   final String value;
 
@@ -338,20 +361,22 @@ class PreloadingAttemptKey {
 
   final SpeculationTargetHint? targetHint;
 
-  PreloadingAttemptKey(
-      {required this.loaderId,
-      required this.action,
-      required this.url,
-      this.targetHint});
+  PreloadingAttemptKey({
+    required this.loaderId,
+    required this.action,
+    required this.url,
+    this.targetHint,
+  });
 
   factory PreloadingAttemptKey.fromJson(Map<String, dynamic> json) {
     return PreloadingAttemptKey(
       loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
       action: SpeculationAction.fromJson(json['action'] as String),
       url: json['url'] as String,
-      targetHint: json.containsKey('targetHint')
-          ? SpeculationTargetHint.fromJson(json['targetHint'] as String)
-          : null,
+      targetHint:
+          json.containsKey('targetHint')
+              ? SpeculationTargetHint.fromJson(json['targetHint'] as String)
+              : null,
     );
   }
 
@@ -377,18 +402,23 @@ class PreloadingAttemptSource {
 
   final List<dom.BackendNodeId> nodeIds;
 
-  PreloadingAttemptSource(
-      {required this.key, required this.ruleSetIds, required this.nodeIds});
+  PreloadingAttemptSource({
+    required this.key,
+    required this.ruleSetIds,
+    required this.nodeIds,
+  });
 
   factory PreloadingAttemptSource.fromJson(Map<String, dynamic> json) {
     return PreloadingAttemptSource(
       key: PreloadingAttemptKey.fromJson(json['key'] as Map<String, dynamic>),
-      ruleSetIds: (json['ruleSetIds'] as List)
-          .map((e) => RuleSetId.fromJson(e as String))
-          .toList(),
-      nodeIds: (json['nodeIds'] as List)
-          .map((e) => dom.BackendNodeId.fromJson(e as int))
-          .toList(),
+      ruleSetIds:
+          (json['ruleSetIds'] as List)
+              .map((e) => RuleSetId.fromJson(e as String))
+              .toList(),
+      nodeIds:
+          (json['nodeIds'] as List)
+              .map((e) => dom.BackendNodeId.fromJson(e as int))
+              .toList(),
     );
   }
 
@@ -438,51 +468,67 @@ enum PrerenderFinalStatus {
   timeoutBackgrounded('TimeoutBackgrounded'),
   crossSiteRedirectInInitialNavigation('CrossSiteRedirectInInitialNavigation'),
   crossSiteNavigationInInitialNavigation(
-      'CrossSiteNavigationInInitialNavigation'),
+    'CrossSiteNavigationInInitialNavigation',
+  ),
   sameSiteCrossOriginRedirectNotOptInInInitialNavigation(
-      'SameSiteCrossOriginRedirectNotOptInInInitialNavigation'),
+    'SameSiteCrossOriginRedirectNotOptInInInitialNavigation',
+  ),
   sameSiteCrossOriginNavigationNotOptInInInitialNavigation(
-      'SameSiteCrossOriginNavigationNotOptInInInitialNavigation'),
+    'SameSiteCrossOriginNavigationNotOptInInInitialNavigation',
+  ),
   activationNavigationParameterMismatch(
-      'ActivationNavigationParameterMismatch'),
+    'ActivationNavigationParameterMismatch',
+  ),
   activatedInBackground('ActivatedInBackground'),
   embedderHostDisallowed('EmbedderHostDisallowed'),
   activationNavigationDestroyedBeforeSuccess(
-      'ActivationNavigationDestroyedBeforeSuccess'),
+    'ActivationNavigationDestroyedBeforeSuccess',
+  ),
   tabClosedByUserGesture('TabClosedByUserGesture'),
   tabClosedWithoutUserGesture('TabClosedWithoutUserGesture'),
   primaryMainFrameRendererProcessCrashed(
-      'PrimaryMainFrameRendererProcessCrashed'),
+    'PrimaryMainFrameRendererProcessCrashed',
+  ),
   primaryMainFrameRendererProcessKilled(
-      'PrimaryMainFrameRendererProcessKilled'),
+    'PrimaryMainFrameRendererProcessKilled',
+  ),
   activationFramePolicyNotCompatible('ActivationFramePolicyNotCompatible'),
   preloadingDisabled('PreloadingDisabled'),
   batterySaverEnabled('BatterySaverEnabled'),
   activatedDuringMainFrameNavigation('ActivatedDuringMainFrameNavigation'),
   preloadingUnsupportedByWebContents('PreloadingUnsupportedByWebContents'),
   crossSiteRedirectInMainFrameNavigation(
-      'CrossSiteRedirectInMainFrameNavigation'),
+    'CrossSiteRedirectInMainFrameNavigation',
+  ),
   crossSiteNavigationInMainFrameNavigation(
-      'CrossSiteNavigationInMainFrameNavigation'),
+    'CrossSiteNavigationInMainFrameNavigation',
+  ),
   sameSiteCrossOriginRedirectNotOptInInMainFrameNavigation(
-      'SameSiteCrossOriginRedirectNotOptInInMainFrameNavigation'),
+    'SameSiteCrossOriginRedirectNotOptInInMainFrameNavigation',
+  ),
   sameSiteCrossOriginNavigationNotOptInInMainFrameNavigation(
-      'SameSiteCrossOriginNavigationNotOptInInMainFrameNavigation'),
+    'SameSiteCrossOriginNavigationNotOptInInMainFrameNavigation',
+  ),
   memoryPressureOnTrigger('MemoryPressureOnTrigger'),
   memoryPressureAfterTriggered('MemoryPressureAfterTriggered'),
   prerenderingDisabledByDevTools('PrerenderingDisabledByDevTools'),
   speculationRuleRemoved('SpeculationRuleRemoved'),
   activatedWithAuxiliaryBrowsingContexts(
-      'ActivatedWithAuxiliaryBrowsingContexts'),
+    'ActivatedWithAuxiliaryBrowsingContexts',
+  ),
   maxNumOfRunningEagerPrerendersExceeded(
-      'MaxNumOfRunningEagerPrerendersExceeded'),
+    'MaxNumOfRunningEagerPrerendersExceeded',
+  ),
   maxNumOfRunningNonEagerPrerendersExceeded(
-      'MaxNumOfRunningNonEagerPrerendersExceeded'),
+    'MaxNumOfRunningNonEagerPrerendersExceeded',
+  ),
   maxNumOfRunningEmbedderPrerendersExceeded(
-      'MaxNumOfRunningEmbedderPrerendersExceeded'),
+    'MaxNumOfRunningEmbedderPrerendersExceeded',
+  ),
   prerenderingUrlHasEffectiveUrl('PrerenderingUrlHasEffectiveUrl'),
   redirectedPrerenderingUrlHasEffectiveUrl(
-      'RedirectedPrerenderingUrlHasEffectiveUrl'),
+    'RedirectedPrerenderingUrlHasEffectiveUrl',
+  ),
   activationUrlHasEffectiveUrl('ActivationUrlHasEffectiveUrl'),
   javaScriptInterfaceAdded('JavaScriptInterfaceAdded'),
   javaScriptInterfaceRemoved('JavaScriptInterfaceRemoved'),
@@ -491,8 +537,7 @@ enum PrerenderFinalStatus {
   slowNetwork('SlowNetwork'),
   otherPrerenderedPageActivated('OtherPrerenderedPageActivated'),
   v8OptimizerDisabled('V8OptimizerDisabled'),
-  prerenderFailedDuringPrefetch('PrerenderFailedDuringPrefetch'),
-  ;
+  prerenderFailedDuringPrefetch('PrerenderFailedDuringPrefetch');
 
   final String value;
 
@@ -515,8 +560,7 @@ enum PreloadingStatus {
   ready('Ready'),
   success('Success'),
   failure('Failure'),
-  notSupported('NotSupported'),
-  ;
+  notSupported('NotSupported');
 
   final String value;
 
@@ -547,30 +591,35 @@ enum PrefetchStatus {
   prefetchIsPrivacyDecoy('PrefetchIsPrivacyDecoy'),
   prefetchIsStale('PrefetchIsStale'),
   prefetchNotEligibleBrowserContextOffTheRecord(
-      'PrefetchNotEligibleBrowserContextOffTheRecord'),
+    'PrefetchNotEligibleBrowserContextOffTheRecord',
+  ),
   prefetchNotEligibleDataSaverEnabled('PrefetchNotEligibleDataSaverEnabled'),
   prefetchNotEligibleExistingProxy('PrefetchNotEligibleExistingProxy'),
   prefetchNotEligibleHostIsNonUnique('PrefetchNotEligibleHostIsNonUnique'),
   prefetchNotEligibleNonDefaultStoragePartition(
-      'PrefetchNotEligibleNonDefaultStoragePartition'),
+    'PrefetchNotEligibleNonDefaultStoragePartition',
+  ),
   prefetchNotEligibleSameSiteCrossOriginPrefetchRequiredProxy(
-      'PrefetchNotEligibleSameSiteCrossOriginPrefetchRequiredProxy'),
+    'PrefetchNotEligibleSameSiteCrossOriginPrefetchRequiredProxy',
+  ),
   prefetchNotEligibleSchemeIsNotHttps('PrefetchNotEligibleSchemeIsNotHttps'),
   prefetchNotEligibleUserHasCookies('PrefetchNotEligibleUserHasCookies'),
   prefetchNotEligibleUserHasServiceWorker(
-      'PrefetchNotEligibleUserHasServiceWorker'),
+    'PrefetchNotEligibleUserHasServiceWorker',
+  ),
   prefetchNotEligibleBatterySaverEnabled(
-      'PrefetchNotEligibleBatterySaverEnabled'),
+    'PrefetchNotEligibleBatterySaverEnabled',
+  ),
   prefetchNotEligiblePreloadingDisabled(
-      'PrefetchNotEligiblePreloadingDisabled'),
+    'PrefetchNotEligiblePreloadingDisabled',
+  ),
   prefetchNotFinishedInTime('PrefetchNotFinishedInTime'),
   prefetchNotStarted('PrefetchNotStarted'),
   prefetchNotUsedCookiesChanged('PrefetchNotUsedCookiesChanged'),
   prefetchProxyNotAvailable('PrefetchProxyNotAvailable'),
   prefetchResponseUsed('PrefetchResponseUsed'),
   prefetchSuccessfulButNotUsed('PrefetchSuccessfulButNotUsed'),
-  prefetchNotUsedProbeFailed('PrefetchNotUsedProbeFailed'),
-  ;
+  prefetchNotUsedProbeFailed('PrefetchNotUsedProbeFailed');
 
   final String value;
 
@@ -593,18 +642,23 @@ class PrerenderMismatchedHeaders {
 
   final String? activationValue;
 
-  PrerenderMismatchedHeaders(
-      {required this.headerName, this.initialValue, this.activationValue});
+  PrerenderMismatchedHeaders({
+    required this.headerName,
+    this.initialValue,
+    this.activationValue,
+  });
 
   factory PrerenderMismatchedHeaders.fromJson(Map<String, dynamic> json) {
     return PrerenderMismatchedHeaders(
       headerName: json['headerName'] as String,
-      initialValue: json.containsKey('initialValue')
-          ? json['initialValue'] as String
-          : null,
-      activationValue: json.containsKey('activationValue')
-          ? json['activationValue'] as String
-          : null,
+      initialValue:
+          json.containsKey('initialValue')
+              ? json['initialValue'] as String
+              : null,
+      activationValue:
+          json.containsKey('activationValue')
+              ? json['activationValue'] as String
+              : null,
     );
   }
 

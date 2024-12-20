@@ -20,14 +20,17 @@ class SecurityApi {
   Stream<VisibleSecurityState> get onVisibleSecurityStateChanged => _client
       .onEvent
       .where((event) => event.name == 'Security.visibleSecurityStateChanged')
-      .map((event) => VisibleSecurityState.fromJson(
-          event.parameters['visibleSecurityState'] as Map<String, dynamic>));
+      .map(
+        (event) => VisibleSecurityState.fromJson(
+          event.parameters['visibleSecurityState'] as Map<String, dynamic>,
+        ),
+      );
 
   /// The security state of the page changed. No longer being sent.
-  Stream<SecurityStateChangedEvent> get onSecurityStateChanged =>
-      _client.onEvent
-          .where((event) => event.name == 'Security.securityStateChanged')
-          .map((event) => SecurityStateChangedEvent.fromJson(event.parameters));
+  Stream<SecurityStateChangedEvent> get onSecurityStateChanged => _client
+      .onEvent
+      .where((event) => event.name == 'Security.securityStateChanged')
+      .map((event) => SecurityStateChangedEvent.fromJson(event.parameters));
 
   /// Disables tracking security state changes.
   Future<void> disable() async {
@@ -52,7 +55,9 @@ class SecurityApi {
   /// [action] The action to take on the certificate error.
   @Deprecated('This command is deprecated')
   Future<void> handleCertificateError(
-      int eventId, CertificateErrorAction action) async {
+    int eventId,
+    CertificateErrorAction action,
+  ) async {
     await _client.send('Security.handleCertificateError', {
       'eventId': eventId,
       'action': action,
@@ -80,10 +85,11 @@ class CertificateErrorEvent {
   /// The url that was requested.
   final String requestURL;
 
-  CertificateErrorEvent(
-      {required this.eventId,
-      required this.errorType,
-      required this.requestURL});
+  CertificateErrorEvent({
+    required this.eventId,
+    required this.errorType,
+    required this.requestURL,
+  });
 
   factory CertificateErrorEvent.fromJson(Map<String, dynamic> json) {
     return CertificateErrorEvent(
@@ -119,8 +125,7 @@ extension type CertificateId(int value) {
 enum MixedContentType {
   blockable('blockable'),
   optionallyBlockable('optionally-blockable'),
-  none('none'),
-  ;
+  none('none');
 
   final String value;
 
@@ -142,8 +147,7 @@ enum SecurityState {
   insecure('insecure'),
   secure('secure'),
   info('info'),
-  insecureBroken('insecure-broken'),
-  ;
+  insecureBroken('insecure-broken');
 
   final String value;
 
@@ -214,33 +218,35 @@ class CertificateSecurityState {
   /// True if the connection is using an obsolete SSL signature.
   final bool obsoleteSslSignature;
 
-  CertificateSecurityState(
-      {required this.protocol,
-      required this.keyExchange,
-      this.keyExchangeGroup,
-      required this.cipher,
-      this.mac,
-      required this.certificate,
-      required this.subjectName,
-      required this.issuer,
-      required this.validFrom,
-      required this.validTo,
-      this.certificateNetworkError,
-      required this.certificateHasWeakSignature,
-      required this.certificateHasSha1Signature,
-      required this.modernSSL,
-      required this.obsoleteSslProtocol,
-      required this.obsoleteSslKeyExchange,
-      required this.obsoleteSslCipher,
-      required this.obsoleteSslSignature});
+  CertificateSecurityState({
+    required this.protocol,
+    required this.keyExchange,
+    this.keyExchangeGroup,
+    required this.cipher,
+    this.mac,
+    required this.certificate,
+    required this.subjectName,
+    required this.issuer,
+    required this.validFrom,
+    required this.validTo,
+    this.certificateNetworkError,
+    required this.certificateHasWeakSignature,
+    required this.certificateHasSha1Signature,
+    required this.modernSSL,
+    required this.obsoleteSslProtocol,
+    required this.obsoleteSslKeyExchange,
+    required this.obsoleteSslCipher,
+    required this.obsoleteSslSignature,
+  });
 
   factory CertificateSecurityState.fromJson(Map<String, dynamic> json) {
     return CertificateSecurityState(
       protocol: json['protocol'] as String,
       keyExchange: json['keyExchange'] as String,
-      keyExchangeGroup: json.containsKey('keyExchangeGroup')
-          ? json['keyExchangeGroup'] as String
-          : null,
+      keyExchangeGroup:
+          json.containsKey('keyExchangeGroup')
+              ? json['keyExchangeGroup'] as String
+              : null,
       cipher: json['cipher'] as String,
       mac: json.containsKey('mac') ? json['mac'] as String : null,
       certificate:
@@ -249,9 +255,10 @@ class CertificateSecurityState {
       issuer: json['issuer'] as String,
       validFrom: network.TimeSinceEpoch.fromJson(json['validFrom'] as num),
       validTo: network.TimeSinceEpoch.fromJson(json['validTo'] as num),
-      certificateNetworkError: json.containsKey('certificateNetworkError')
-          ? json['certificateNetworkError'] as String
-          : null,
+      certificateNetworkError:
+          json.containsKey('certificateNetworkError')
+              ? json['certificateNetworkError'] as String
+              : null,
       certificateHasWeakSignature:
           json['certificateHasWeakSignature'] as bool? ?? false,
       certificateHasSha1Signature:
@@ -291,8 +298,7 @@ class CertificateSecurityState {
 
 enum SafetyTipStatus {
   badReputation('badReputation'),
-  lookalike('lookalike'),
-  ;
+  lookalike('lookalike');
 
   final String value;
 
@@ -318,8 +324,9 @@ class SafetyTipInfo {
 
   factory SafetyTipInfo.fromJson(Map<String, dynamic> json) {
     return SafetyTipInfo(
-      safetyTipStatus:
-          SafetyTipStatus.fromJson(json['safetyTipStatus'] as String),
+      safetyTipStatus: SafetyTipStatus.fromJson(
+        json['safetyTipStatus'] as String,
+      ),
       safeUrl: json.containsKey('safeUrl') ? json['safeUrl'] as String : null,
     );
   }
@@ -346,26 +353,32 @@ class VisibleSecurityState {
   /// Array of security state issues ids.
   final List<String> securityStateIssueIds;
 
-  VisibleSecurityState(
-      {required this.securityState,
-      this.certificateSecurityState,
-      this.safetyTipInfo,
-      required this.securityStateIssueIds});
+  VisibleSecurityState({
+    required this.securityState,
+    this.certificateSecurityState,
+    this.safetyTipInfo,
+    required this.securityStateIssueIds,
+  });
 
   factory VisibleSecurityState.fromJson(Map<String, dynamic> json) {
     return VisibleSecurityState(
       securityState: SecurityState.fromJson(json['securityState'] as String),
-      certificateSecurityState: json.containsKey('certificateSecurityState')
-          ? CertificateSecurityState.fromJson(
-              json['certificateSecurityState'] as Map<String, dynamic>)
-          : null,
-      safetyTipInfo: json.containsKey('safetyTipInfo')
-          ? SafetyTipInfo.fromJson(
-              json['safetyTipInfo'] as Map<String, dynamic>)
-          : null,
-      securityStateIssueIds: (json['securityStateIssueIds'] as List)
-          .map((e) => e as String)
-          .toList(),
+      certificateSecurityState:
+          json.containsKey('certificateSecurityState')
+              ? CertificateSecurityState.fromJson(
+                json['certificateSecurityState'] as Map<String, dynamic>,
+              )
+              : null,
+      safetyTipInfo:
+          json.containsKey('safetyTipInfo')
+              ? SafetyTipInfo.fromJson(
+                json['safetyTipInfo'] as Map<String, dynamic>,
+              )
+              : null,
+      securityStateIssueIds:
+          (json['securityStateIssueIds'] as List)
+              .map((e) => e as String)
+              .toList(),
     );
   }
 
@@ -403,14 +416,15 @@ class SecurityStateExplanation {
   /// Recommendations to fix any issues.
   final List<String>? recommendations;
 
-  SecurityStateExplanation(
-      {required this.securityState,
-      required this.title,
-      required this.summary,
-      required this.description,
-      required this.mixedContentType,
-      required this.certificate,
-      this.recommendations});
+  SecurityStateExplanation({
+    required this.securityState,
+    required this.title,
+    required this.summary,
+    required this.description,
+    required this.mixedContentType,
+    required this.certificate,
+    this.recommendations,
+  });
 
   factory SecurityStateExplanation.fromJson(Map<String, dynamic> json) {
     return SecurityStateExplanation(
@@ -418,13 +432,17 @@ class SecurityStateExplanation {
       title: json['title'] as String,
       summary: json['summary'] as String,
       description: json['description'] as String,
-      mixedContentType:
-          MixedContentType.fromJson(json['mixedContentType'] as String),
+      mixedContentType: MixedContentType.fromJson(
+        json['mixedContentType'] as String,
+      ),
       certificate:
           (json['certificate'] as List).map((e) => e as String).toList(),
-      recommendations: json.containsKey('recommendations')
-          ? (json['recommendations'] as List).map((e) => e as String).toList()
-          : null,
+      recommendations:
+          json.containsKey('recommendations')
+              ? (json['recommendations'] as List)
+                  .map((e) => e as String)
+                  .toList()
+              : null,
     );
   }
 
@@ -464,14 +482,15 @@ class InsecureContentStatus {
   /// Always set to unknown.
   final SecurityState displayedInsecureContentStyle;
 
-  InsecureContentStatus(
-      {required this.ranMixedContent,
-      required this.displayedMixedContent,
-      required this.containedMixedForm,
-      required this.ranContentWithCertErrors,
-      required this.displayedContentWithCertErrors,
-      required this.ranInsecureContentStyle,
-      required this.displayedInsecureContentStyle});
+  InsecureContentStatus({
+    required this.ranMixedContent,
+    required this.displayedMixedContent,
+    required this.containedMixedForm,
+    required this.ranContentWithCertErrors,
+    required this.displayedContentWithCertErrors,
+    required this.ranInsecureContentStyle,
+    required this.displayedInsecureContentStyle,
+  });
 
   factory InsecureContentStatus.fromJson(Map<String, dynamic> json) {
     return InsecureContentStatus(
@@ -482,10 +501,12 @@ class InsecureContentStatus {
           json['ranContentWithCertErrors'] as bool? ?? false,
       displayedContentWithCertErrors:
           json['displayedContentWithCertErrors'] as bool? ?? false,
-      ranInsecureContentStyle:
-          SecurityState.fromJson(json['ranInsecureContentStyle'] as String),
+      ranInsecureContentStyle: SecurityState.fromJson(
+        json['ranInsecureContentStyle'] as String,
+      ),
       displayedInsecureContentStyle: SecurityState.fromJson(
-          json['displayedInsecureContentStyle'] as String),
+        json['displayedInsecureContentStyle'] as String,
+      ),
     );
   }
 
@@ -506,8 +527,7 @@ class InsecureContentStatus {
 /// request and cancel will cancel the request.
 enum CertificateErrorAction {
   continue$('continue'),
-  cancel('cancel'),
-  ;
+  cancel('cancel');
 
   final String value;
 

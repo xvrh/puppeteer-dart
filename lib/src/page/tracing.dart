@@ -25,7 +25,8 @@ class Tracing {
   Future<void> start({bool? screenshots, List<String>? categories}) async {
     if (_recording) {
       throw Exception(
-          'Cannot start recording trace while already recording trace.');
+        'Cannot start recording trace while already recording trace.',
+      );
     }
     screenshots ??= false;
 
@@ -41,7 +42,7 @@ class Tracing {
       'latencyInfo',
       'disabled-by-default-devtools.timeline.stack',
       'disabled-by-default-v8.cpu_profiler',
-      'disabled-by-default-v8.cpu_profiler.hires'
+      'disabled-by-default-v8.cpu_profiler.hires',
     ];
 
     categories ??= defaultCategories.toList();
@@ -52,16 +53,18 @@ class Tracing {
 
     _recording = true;
     await _devTools.tracing.start(
-        transferMode: 'ReturnAsStream',
-        //TODO(xha): use the new api
-        // ignore: deprecated_member_use_from_same_package
-        categories: categories.join(','));
+      transferMode: 'ReturnAsStream',
+      //TODO(xha): use the new api
+      // ignore: deprecated_member_use_from_same_package
+      categories: categories.join(','),
+    );
   }
 
   /// Promise which resolves to buffer with trace data.
   Future<void> stop(StringSink output) async {
-    var contentFuture = _devTools.tracing.onTracingComplete.first
-        .then((e) => _readStream(e.stream!, output));
+    var contentFuture = _devTools.tracing.onTracingComplete.first.then(
+      (e) => _readStream(e.stream!, output),
+    );
     await _devTools.tracing.end();
 
     _recording = false;

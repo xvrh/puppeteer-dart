@@ -70,11 +70,14 @@ void main() {
     });
     test('waitForTarget', () async {
       //---
-      var newWindowTarget = browser.waitForTarget((target) =>
-          target.url ==
-          exampleValue('${server.hostUrl}/', 'https://example.com/'));
+      var newWindowTarget = browser.waitForTarget(
+        (target) =>
+            target.url ==
+            exampleValue('${server.hostUrl}/', 'https://example.com/'),
+      );
       await page.evaluate(
-          "() => window.open('${exampleValue(server.hostUrl, 'https://example.com')}/')");
+        "() => window.open('${exampleValue(server.hostUrl, 'https://example.com')}/')",
+      );
       await newWindowTarget;
       //---
       expect(newWindowTarget, isNotNull);
@@ -83,14 +86,16 @@ void main() {
   group('BrowserContext', () {
     test('overridePermissions', () async {
       var context = browser.defaultBrowserContext;
-      await context.overridePermissions(
-          'https://html5demos.com', [PermissionType.geolocation]);
+      await context.overridePermissions('https://html5demos.com', [
+        PermissionType.geolocation,
+      ]);
     });
     test('clearPermissionOverrides', () async {
       var context = browser.defaultBrowserContext;
       await context.overridePermissions(
-          exampleValue(server.hostUrl, 'https://example.com'),
-          [PermissionType.clipboardReadWrite]);
+        exampleValue(server.hostUrl, 'https://example.com'),
+        [PermissionType.clipboardReadWrite],
+      );
       // do stuff ..
       await context.clearPermissionOverrides();
     });
@@ -120,8 +125,9 @@ void main() {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
           await page.goto(exampleValue(server.hostUrl, 'https://example.com'));
-          await File(exampleValue('_screenshot.png', 'screenshot.png'))
-              .writeAsBytes(await page.screenshot());
+          await File(
+            exampleValue('_screenshot.png', 'screenshot.png'),
+          ).writeAsBytes(await page.screenshot());
           await browser.close();
         }
 
@@ -163,7 +169,8 @@ void main() {
         //----
         var popupFuture = page.onPopup.first;
         await page.evaluate(
-            "() => window.open('${exampleValue(server.hostUrl, 'https://example.com')}')");
+          "() => window.open('${exampleValue(server.hostUrl, 'https://example.com')}')",
+        );
         var popup = await popupFuture;
         //----
         expect(popup, isNotNull);
@@ -177,12 +184,18 @@ void main() {
     });
     test('Seval', () async {
       //---
-      var searchValue =
-          await page.$eval('#search', 'function (el) { return el.value; }');
+      var searchValue = await page.$eval(
+        '#search',
+        'function (el) { return el.value; }',
+      );
       var preloadHref = await page.$eval(
-          'link[rel=preload]', 'function (el) { return el.href; }');
+        'link[rel=preload]',
+        'function (el) { return el.href; }',
+      );
       var html = await page.$eval(
-          '.main-container', 'function (e) { return e.outerHTML; }');
+        '.main-container',
+        'function (e) { return e.outerHTML; }',
+      );
       //---
       expect(searchValue, isNotNull);
       expect(preloadHref, isNotNull);
@@ -198,10 +211,7 @@ void main() {
         print(response);
       });
       test(1, () async {
-        await Future.wait([
-          page.waitForNavigation(),
-          page.click('a'),
-        ]);
+        await Future.wait([page.waitForNavigation(), page.click('a')]);
       });
     });
     group('clickAndWaitForNavigation', () {
@@ -221,8 +231,12 @@ void main() {
       var browser = await puppeteer.launch();
       var page = await browser.newPage();
       await page.emulate(iPhone);
-      await page.goto(exampleValue(
-          server.assetUrl('doc_examples.html'), 'https://example.com'));
+      await page.goto(
+        exampleValue(
+          server.assetUrl('doc_examples.html'),
+          'https://example.com',
+        ),
+      );
       // other actions...
       await browser.close();
     });
@@ -232,7 +246,9 @@ void main() {
 
       await page.emulateMediaType(MediaType.print);
       expect(
-          await page.evaluate("() => matchMedia('screen').matches"), isFalse);
+        await page.evaluate("() => matchMedia('screen').matches"),
+        isFalse,
+      );
       expect(await page.evaluate("() => matchMedia('print').matches"), isTrue);
 
       await page.emulateMediaType(null);
@@ -241,9 +257,12 @@ void main() {
     });
     group('evaluate', () {
       test(0, () async {
-        var result = await page.evaluate<int>('''x => {
+        var result = await page.evaluate<int>(
+          '''x => {
           return Promise.resolve(8 * x);
-        }''', args: [7]);
+        }''',
+          args: [7],
+        );
         print(result); // prints "56"
       });
       test(1, () async {
@@ -253,8 +272,10 @@ void main() {
       });
       test(2, () async {
         var bodyHandle = await page.$('body');
-        var html =
-            await page.evaluate('body => body.innerHTML', args: [bodyHandle]);
+        var html = await page.evaluate(
+          'body => body.innerHTML',
+          args: [bodyHandle],
+        );
         await bodyHandle.dispose();
         print(html);
       });
@@ -269,8 +290,10 @@ void main() {
       });
       test(1, () async {
         var aHandle = await page.evaluateHandle('() => document.body');
-        var resultHandle = await page
-            .evaluateHandle('body => body.innerHTML', args: [aHandle]);
+        var resultHandle = await page.evaluateHandle(
+          'body => body.innerHTML',
+          args: [aHandle],
+        );
         print(await resultHandle.jsonValue);
         await resultHandle.dispose();
       });
@@ -291,9 +314,9 @@ void main() {
           var page = await browser.newPage();
           page.onConsole.listen((msg) => print(msg.text));
           await page.exposeFunction(
-              'md5',
-              (String text) =>
-                  crypto.md5.convert(utf8.encode(text)).toString());
+            'md5',
+            (String text) => crypto.md5.convert(utf8.encode(text)).toString(),
+          );
           await page.evaluate(r'''async () => {
             // use window.md5 to compute hashes
             const myString = 'PUPPETEER';
@@ -336,7 +359,8 @@ void main() {
       // Generates a PDF with 'screen' media type.
       await page.emulateMediaType(MediaType.screen);
       await page.pdf(
-          output: File(exampleValue('_page.pdf', 'page.pdf')).openWrite());
+        output: File(exampleValue('_page.pdf', 'page.pdf')).openWrite(),
+      );
     });
     test('queryObjects', () async {
       // There is a bug currently with queryObjects if the page has navigated
@@ -355,8 +379,10 @@ void main() {
       // Query all map instances into an array
       var mapInstances = await page.queryObjects(mapPrototype);
       // Count amount of map objects in heap
-      var count =
-          await page.evaluate('maps => maps.length', args: [mapInstances]);
+      var count = await page.evaluate(
+        'maps => maps.length',
+        args: [mapInstances],
+      );
       await mapInstances.dispose();
       await mapPrototype.dispose();
       //----
@@ -366,8 +392,11 @@ void main() {
     });
     test('select', () async {
       await page.select('select#colors', ['blue']); // single selection
-      await page.select(
-          'select#colors', ['red', 'green', 'blue']); // multiple selections
+      await page.select('select#colors', [
+        'red',
+        'green',
+        'blue',
+      ]); // multiple selections
     });
     test('setGeolocation', () async {
       await page.setGeolocation(latitude: 59.95, longitude: 30.31667);
@@ -392,8 +421,11 @@ void main() {
       await page.type('#mytextarea', 'Hello');
 
       // Types slower, like a user
-      await page.type('#mytextarea', 'World',
-          delay: Duration(milliseconds: 100));
+      await page.type(
+        '#mytextarea',
+        'World',
+        delay: Duration(milliseconds: 100),
+      );
     });
     group('waitForFunction', () {
       test(0, () async {
@@ -416,8 +448,9 @@ void main() {
       test(1, () async {
         var selector = '.foo';
         await page.waitForFunction(
-            'selector => !!document.querySelector(selector)',
-            args: [selector]);
+          'selector => !!document.querySelector(selector)',
+          args: [selector],
+        );
       });
     });
     test('waitForNavigation', () async {
@@ -430,16 +463,20 @@ void main() {
     });
     test('waitForRequest', () async {
       //---
-      var firstRequest = page
-          .waitForRequest(exampleValue(server.hostUrl, 'https://example.com'));
+      var firstRequest = page.waitForRequest(
+        exampleValue(server.hostUrl, 'https://example.com'),
+      );
 
       // You can achieve the same effect (and more powerful) with the `onRequest`
       // stream.
       var finalRequest = page.onRequest
-          .where((request) =>
-              request.url.startsWith(
-                  exampleValue(server.hostUrl, 'https://example.com')) &&
-              request.method == 'GET')
+          .where(
+            (request) =>
+                request.url.startsWith(
+                  exampleValue(server.hostUrl, 'https://example.com'),
+                ) &&
+                request.method == 'GET',
+          )
           .first
           .timeout(Duration(seconds: 30));
 
@@ -455,8 +492,12 @@ void main() {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.waitForSelector('img');
-        await page.goto(exampleValue(
-            server.assetUrl('doc_examples_2.html'), 'https://example.com'));
+        await page.goto(
+          exampleValue(
+            server.assetUrl('doc_examples_2.html'),
+            'https://example.com',
+          ),
+        );
         var image = await watchImg;
         print(await image!.propertyValue('src'));
         await browser.close();
@@ -474,8 +515,12 @@ void main() {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.waitForXPath('//img');
-        await page.goto(exampleValue(
-            server.assetUrl('doc_examples_2.html'), 'https://example.com'));
+        await page.goto(
+          exampleValue(
+            server.assetUrl('doc_examples_2.html'),
+            'https://example.com',
+          ),
+        );
         var image = await watchImg;
         print(await image!.propertyValue('src'));
         await browser.close();
@@ -493,8 +538,9 @@ void main() {
       await page.click('#upload-file-button');
       var fileChooser = await futureFileChooser;
 
-      await fileChooser.accept(
-          [File(exampleValue('test/assets/file-to-upload.txt', 'myfile.pdf'))]);
+      await fileChooser.accept([
+        File(exampleValue('test/assets/file-to-upload.txt', 'myfile.pdf')),
+      ]);
       //----
     });
   });
@@ -522,12 +568,18 @@ void main() {
     });
     test('Seval', () async {
       //---
-      var searchValue =
-          await frame.$eval('#search', 'function (el) { return el.value; }');
+      var searchValue = await frame.$eval(
+        '#search',
+        'function (el) { return el.value; }',
+      );
       var preloadHref = await frame.$eval(
-          'link[rel=preload]', 'function (el) { return el.href; }');
+        'link[rel=preload]',
+        'function (el) { return el.href; }',
+      );
       var html = await frame.$eval(
-          '.main-container', 'function (e) { return e.outerHTML; }');
+        '.main-container',
+        'function (e) { return e.outerHTML; }',
+      );
       //---
       expect(searchValue, isNotNull);
       expect(preloadHref, isNotNull);
@@ -550,9 +602,12 @@ void main() {
     });
     group('evaluate', () {
       test(0, () async {
-        var result = await frame.evaluate<int>('''x => {
+        var result = await frame.evaluate<int>(
+          '''x => {
           return Promise.resolve(8 * x);
-        }''', args: [7]);
+        }''',
+          args: [7],
+        );
         print(result); // prints "56"
       });
       test(1, () async {
@@ -562,8 +617,10 @@ void main() {
       });
       test(2, () async {
         var bodyHandle = await frame.$('body');
-        var html =
-            await frame.evaluate('body => body.innerHTML', args: [bodyHandle]);
+        var html = await frame.evaluate(
+          'body => body.innerHTML',
+          args: [bodyHandle],
+        );
         await bodyHandle.dispose();
         print(html);
       });
@@ -578,24 +635,32 @@ void main() {
       });
       test(1, () async {
         var aHandle = await frame.evaluateHandle('() => document.body');
-        var resultHandle = await frame
-            .evaluateHandle('body => body.innerHTML', args: [aHandle]);
+        var resultHandle = await frame.evaluateHandle(
+          'body => body.innerHTML',
+          args: [aHandle],
+        );
         print(await resultHandle.jsonValue);
         await resultHandle.dispose();
       });
     });
     test('select', () async {
       await frame.select('select#colors', ['blue']); // single selection
-      await frame.select(
-          'select#colors', ['red', 'green', 'blue']); // multiple selections
+      await frame.select('select#colors', [
+        'red',
+        'green',
+        'blue',
+      ]); // multiple selections
     });
     test('type', () async {
       // Types instantly
       await frame.type('#mytextarea', 'Hello');
 
       // Types slower, like a user
-      await frame.type('#mytextarea', 'World',
-          delay: Duration(milliseconds: 100));
+      await frame.type(
+        '#mytextarea',
+        'World',
+        delay: Duration(milliseconds: 100),
+      );
     });
     group('waitForFunction', () {
       test(0, () async {
@@ -605,8 +670,9 @@ void main() {
         Future<void> main() async {
           var browser = await puppeteer.launch();
           var page = await browser.newPage();
-          var watchDog =
-              page.mainFrame.waitForFunction('window.innerWidth < 100');
+          var watchDog = page.mainFrame.waitForFunction(
+            'window.innerWidth < 100',
+          );
           await page.setViewport(DeviceViewport(width: 50, height: 50));
           await watchDog;
           await browser.close();
@@ -619,8 +685,9 @@ void main() {
       test(1, () async {
         var selector = '.foo';
         await page.mainFrame.waitForFunction(
-            'selector => !!document.querySelector(selector)',
-            args: [selector]);
+          'selector => !!document.querySelector(selector)',
+          args: [selector],
+        );
       });
     });
     test('waitForSelector', () async {
@@ -631,8 +698,12 @@ void main() {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.mainFrame.waitForSelector('img');
-        await page.goto(exampleValue(
-            server.assetUrl('doc_examples_2.html'), 'https://example.com'));
+        await page.goto(
+          exampleValue(
+            server.assetUrl('doc_examples_2.html'),
+            'https://example.com',
+          ),
+        );
         var image = await watchImg;
         print(await image!.propertyValue('src'));
         await browser.close();
@@ -650,8 +721,12 @@ void main() {
         var browser = await puppeteer.launch();
         var page = await browser.newPage();
         var watchImg = page.mainFrame.waitForXPath('//img');
-        await page.goto(exampleValue(
-            server.assetUrl('doc_examples_2.html'), 'https://example.com'));
+        await page.goto(
+          exampleValue(
+            server.assetUrl('doc_examples_2.html'),
+            'https://example.com',
+          ),
+        );
         var image = await watchImg;
         print(await image!.propertyValue('src'));
         await browser.close();
@@ -724,12 +799,20 @@ void main() {
       await page.mouse.up();
     });
     test('wheel', () async {
-      await page.goto(exampleValue(server.assetUrl('input/wheel.html'),
-          r'https://mdn.mozillademos.org/en-US/docs/Web/API/Element/wheel_event$samples/Scaling_an_element_via_the_wheel?revision=1587366'));
+      await page.goto(
+        exampleValue(
+          server.assetUrl('input/wheel.html'),
+          r'https://mdn.mozillademos.org/en-US/docs/Web/API/Element/wheel_event$samples/Scaling_an_element_via_the_wheel?revision=1587366',
+        ),
+      );
       var elem = await page.$('div');
       var boundingBox = (await elem.boundingBox)!;
-      await page.mouse.move(Point(boundingBox.left + boundingBox.width / 2,
-          boundingBox.top + boundingBox.height / 2));
+      await page.mouse.move(
+        Point(
+          boundingBox.left + boundingBox.width / 2,
+          boundingBox.top + boundingBox.height / 2,
+        ),
+      );
       await page.mouse.wheel(deltaY: -100);
     });
   });
@@ -737,8 +820,9 @@ void main() {
     group('evaluate', () {
       test(0, () async {
         var executionContext = await page.mainFrame.executionContext;
-        var result =
-            await executionContext.evaluate('() => Promise.resolve(8 * 7)');
+        var result = await executionContext.evaluate(
+          '() => Promise.resolve(8 * 7)',
+        );
         print(result); // prints "56"
       });
       test(1, () async {
@@ -752,8 +836,9 @@ void main() {
       test(0, () async {
         //---
         var context = await page.mainFrame.executionContext;
-        var aHandle =
-            await context.evaluateHandle('() => Promise.resolve(self)');
+        var aHandle = await context.evaluateHandle(
+          '() => Promise.resolve(self)',
+        );
         print(aHandle); // Handle for the global object.
         //---
         expect(aHandle, isNotNull);
@@ -761,8 +846,9 @@ void main() {
       test(1, () async {
         var context = await page.mainFrame.executionContext;
         //---
-        var aHandle =
-            await context.evaluateHandle('1 + 2'); // Handle for the '3' object.
+        var aHandle = await context.evaluateHandle(
+          '1 + 2',
+        ); // Handle for the '3' object.
         //----
         expect(aHandle, isNotNull);
       });
@@ -770,8 +856,10 @@ void main() {
         var context = await page.mainFrame.executionContext;
         //---
         var aHandle = await context.evaluateHandle('() => document.body');
-        var resultHandle = await context
-            .evaluateHandle('body => body.innerHTML', args: [aHandle]);
+        var resultHandle = await context.evaluateHandle(
+          'body => body.innerHTML',
+          args: [aHandle],
+        );
         print(await resultHandle.jsonValue); // prints body's innerHTML
         await aHandle.dispose();
         await resultHandle.dispose();
@@ -787,11 +875,15 @@ void main() {
     });
     test('evaluate', () async {
       server.setRoute('feed.html', (request) {
-        return shelf.Response(404, body: '''
+        return shelf.Response(
+          404,
+          body: '''
 <div class="tweet">
   <div class="retweets">10</div>
 </div>
-        ''', headers: {'content-type': 'text/html'});
+        ''',
+          headers: {'content-type': 'text/html'},
+        );
       });
       await page.goto(server.assetUrl('feed.html'));
       //---
@@ -820,8 +912,12 @@ void main() {
         var browser = await puppeteer.launch();
 
         var page = await browser.newPage();
-        await page.goto(exampleValue(
-            server.assetUrl('doc_examples.html'), 'https://example.com'));
+        await page.goto(
+          exampleValue(
+            server.assetUrl('doc_examples.html'),
+            'https://example.com',
+          ),
+        );
         var hrefElement = await page.$('a');
         await hrefElement.click();
 
@@ -834,37 +930,50 @@ void main() {
     });
     test('SSeval', () async {
       server.setRoute('feed.html', (request) {
-        return shelf.Response(404, body: '''
+        return shelf.Response(
+          404,
+          body: '''
 <div class="feed">
   <div class="tweet">Hello!</div>
   <div class="tweet">Hi!</div>
 </div>
-        ''', headers: {'content-type': 'text/html'});
+        ''',
+          headers: {'content-type': 'text/html'},
+        );
       });
       await page.goto(server.assetUrl('feed.html'));
       //---
       var feedHandle = await page.$('.feed');
       expect(
-          await feedHandle.$$eval(
-              '.tweet', 'nodes => nodes.map(n => n.innerText)'),
-          equals(['Hello!', 'Hi!']));
+        await feedHandle.$$eval(
+          '.tweet',
+          'nodes => nodes.map(n => n.innerText)',
+        ),
+        equals(['Hello!', 'Hi!']),
+      );
       //---
     });
     test('Seval', () async {
       server.setRoute('feed.html', (request) {
-        return shelf.Response(404, body: '''
+        return shelf.Response(
+          404,
+          body: '''
 <div class="tweet">
   <div class="like">100</div>
   <div class="retweets">10</div>
 </div>
-        ''', headers: {'content-type': 'text/html'});
+        ''',
+          headers: {'content-type': 'text/html'},
+        );
       });
       await page.goto(server.assetUrl('feed.html'));
       //---
       var tweetHandle = await page.$('.tweet');
       expect(await tweetHandle.$eval('.like', 'node => node.innerText'), '100');
       expect(
-          await tweetHandle.$eval('.retweets', 'node => node.innerText'), '10');
+        await tweetHandle.$eval('.retweets', 'node => node.innerText'),
+        '10',
+      );
       //--
     });
     group('type', () {
@@ -898,9 +1007,10 @@ void main() {
       await page.setRequestInterception(true);
       page.onRequest.listen((request) {
         // Override headers
-        var headers = Map<String, String>.from(request.headers)
-          ..['foo'] = 'bar'
-          ..remove('origin');
+        var headers =
+            Map<String, String>.from(request.headers)
+              ..['foo'] = 'bar'
+              ..remove('origin');
         request.continueRequest(headers: headers);
       });
       //---
@@ -921,16 +1031,23 @@ void main() {
         });
         //---
         var response = await page.goto(
-            exampleValue(server.assetUrl('empty2.html'), 'http://example.com'));
+          exampleValue(server.assetUrl('empty2.html'), 'http://example.com'),
+        );
         var chain = response.request.redirectChain;
         expect(chain, hasLength(1));
-        expect(chain[0].url,
-            exampleValue(server.assetUrl('empty2.html'), 'http://example.com'));
+        expect(
+          chain[0].url,
+          exampleValue(server.assetUrl('empty2.html'), 'http://example.com'),
+        );
         //--
       });
       test(1, () async {
-        var response = await page.goto(exampleValue(
-            server.assetUrl('doc_examples.html'), 'https://example.com'));
+        var response = await page.goto(
+          exampleValue(
+            server.assetUrl('doc_examples.html'),
+            'https://example.com',
+          ),
+        );
         var chain = response.request.redirectChain;
         expect(chain, isEmpty);
       });
@@ -939,16 +1056,21 @@ void main() {
       await page.setRequestInterception(true);
       page.onRequest.listen((request) {
         request.respond(
-            status: 404, contentType: 'text/plain', body: 'Not Found!');
+          status: 404,
+          contentType: 'text/plain',
+          body: 'Not Found!',
+        );
       });
     });
   });
   group('Worker', () {
     test('class', () async {
-      page.onWorkerCreated
-          .listen((worker) => print('Worker created: ${worker.url}'));
-      page.onWorkerDestroyed
-          .listen((worker) => print('Worker destroyed: ${worker.url}'));
+      page.onWorkerCreated.listen(
+        (worker) => print('Worker created: ${worker.url}'),
+      );
+      page.onWorkerDestroyed.listen(
+        (worker) => print('Worker destroyed: ${worker.url}'),
+      );
       print('Current workers:');
       for (var worker in page.workers) {
         print('  ${worker.url}');
@@ -959,11 +1081,17 @@ void main() {
     test('class', () async {
       //---
       // Enable both JavaScript and CSS coverage
-      await Future.wait(
-          [page.coverage.startJSCoverage(), page.coverage.startCSSCoverage()]);
+      await Future.wait([
+        page.coverage.startJSCoverage(),
+        page.coverage.startCSSCoverage(),
+      ]);
       // Navigate to page
-      await page.goto(exampleValue(
-          server.assetUrl('doc_examples.html'), 'https://example.com'));
+      await page.goto(
+        exampleValue(
+          server.assetUrl('doc_examples.html'),
+          'https://example.com',
+        ),
+      );
       // Disable both JavaScript and CSS coverage
       var jsCoverage = await page.coverage.stopJSCoverage();
       var cssCoverage = await page.coverage.stopCSSCoverage();
@@ -986,10 +1114,15 @@ void main() {
     test('class', () async {
       //----
       await page.tracing.start();
-      await page.goto(exampleValue(
-          server.assetUrl('doc_examples.html'), 'https://www.google.com'));
-      await page.tracing
-          .stop(File(exampleValue('_trace.json', 'trace.json')).openWrite());
+      await page.goto(
+        exampleValue(
+          server.assetUrl('doc_examples.html'),
+          'https://www.google.com',
+        ),
+      );
+      await page.tracing.stop(
+        File(exampleValue('_trace.json', 'trace.json')).openWrite(),
+      );
       //---
       expect(File('_trace.json').existsSync(), isTrue);
     });
@@ -1025,8 +1158,9 @@ void main() {
       await page.click('#upload-file-button');
       var fileChooser = await futureFileChooser;
 
-      await fileChooser.accept(
-          [File(exampleValue('test/assets/file-to-upload.txt', 'myfile.pdf'))]);
+      await fileChooser.accept([
+        File(exampleValue('test/assets/file-to-upload.txt', 'myfile.pdf')),
+      ]);
       //----
     });
   });

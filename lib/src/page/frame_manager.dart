@@ -33,14 +33,16 @@ class FrameManager {
     _networkManager = NetworkManager(page.session, this);
 
     _pageApi.onFrameAttached.listen(
-        (event) => _onFrameAttached(event.frameId, event.parentFrameId));
+      (event) => _onFrameAttached(event.frameId, event.parentFrameId),
+    );
     _pageApi.onFrameNavigated.listen((e) => _onFrameNavigated(e.frame));
     _pageApi.onNavigatedWithinDocument.listen(_onFrameNavigatedWithinDocument);
     _pageApi.onFrameDetached.listen(_onFrameDetached);
     _pageApi.onFrameStoppedLoading.listen(_onFrameStoppedLoading);
     _runtimeApi.onExecutionContextCreated.listen(_onExecutionContextCreated);
-    _runtimeApi.onExecutionContextDestroyed
-        .listen(_onExecutionContextDestroyed);
+    _runtimeApi.onExecutionContextDestroyed.listen(
+      _onExecutionContextDestroyed,
+    );
     _runtimeApi.onExecutionContextsCleared.listen(_onExecutionContextsCleared);
     _pageApi.onLifecycleEvent.listen(_onLifecycleEvent);
   }
@@ -80,7 +82,7 @@ class FrameManager {
     await Future.wait([
       _pageApi.setLifecycleEventsEnabled(true),
       _runtimeApi.enable(),
-      _networkManager.initialize()
+      _networkManager.initialize(),
     ]);
 
     await _ensureIsolatedWorld(_utilityWorldName);
@@ -88,28 +90,39 @@ class FrameManager {
 
   Frame? frame(FrameId? frameId) => _frames[frameId];
 
-  Future<Response> navigateFrame(Frame frame, String url,
-      {String? referrer, Duration? timeout, Until? wait}) async {
+  Future<Response> navigateFrame(
+    Frame frame,
+    String url, {
+    String? referrer,
+    Duration? timeout,
+    Until? wait,
+  }) async {
     referrer ??= _networkManager.extraHTTPHeaders['referer'];
-    var watcher = LifecycleWatcher(this, frame,
-        wait: wait, timeout: timeout ?? page.navigationTimeoutOrDefault);
+    var watcher = LifecycleWatcher(
+      this,
+      frame,
+      wait: wait,
+      timeout: timeout ?? page.navigationTimeoutOrDefault,
+    );
 
     Future<Object?> navigate() async {
-      var response =
-          await _pageApi.navigate(url, referrer: referrer, frameId: frame.id);
+      var response = await _pageApi.navigate(
+        url,
+        referrer: referrer,
+        frameId: frame.id,
+      );
       if (response.errorText != null) {
         throw Exception('${response.errorText} at $url');
       }
-      await Future.any(
-          [watcher.newDocumentNavigation, watcher.sameDocumentNavigation]);
+      await Future.any([
+        watcher.newDocumentNavigation,
+        watcher.sameDocumentNavigation,
+      ]);
       return null;
     }
 
     try {
-      var error = await Future.any([
-        navigate(),
-        watcher.timeoutOrTermination,
-      ]);
+      var error = await Future.any([navigate(), watcher.timeoutOrTermination]);
 
       if (error != null) {
         return Future.error(error);
@@ -122,10 +135,17 @@ class FrameManager {
         Response.aborted(page.devTools, watcher.navigationRequest);
   }
 
-  Future<Response> waitForFrameNavigation(Frame frame,
-      {Until? wait, Duration? timeout}) async {
-    var watcher = LifecycleWatcher(this, frame,
-        wait: wait, timeout: timeout ?? page.navigationTimeoutOrDefault);
+  Future<Response> waitForFrameNavigation(
+    Frame frame, {
+    Until? wait,
+    Duration? timeout,
+  }) async {
+    var watcher = LifecycleWatcher(
+      this,
+      frame,
+      wait: wait,
+      timeout: timeout ?? page.navigationTimeoutOrDefault,
+    );
     try {
       var error = await Future.any([
         watcher.timeoutOrTermination,
@@ -192,8 +212,10 @@ class FrameManager {
   void _onFrameNavigated(FrameInfo framePayload) {
     var isMainFrame = framePayload.parentId == null;
     var frame = isMainFrame ? _mainFrame : _frames[framePayload.id];
-    assert(isMainFrame || frame != null,
-        'We either navigate top level or have old version of the navigated frame');
+    assert(
+      isMainFrame || frame != null,
+      'We either navigate top level or have old version of the navigated frame',
+    );
 
     // Detach all child frames first.
     if (frame != null) {
@@ -229,13 +251,19 @@ class FrameManager {
     }
     _isolatedWorlds.add(name);
     await _pageApi.addScriptToEvaluateOnNewDocument(
-        '//# sourceURL=$evaluationScriptUrl',
-        worldName: name);
+      '//# sourceURL=$evaluationScriptUrl',
+      worldName: name,
+    );
 
-    await Future.wait(frames.map((frame) => _pageApi.createIsolatedWorld(
-        frame.id,
-        grantUniveralAccess: true,
-        worldName: name)));
+    await Future.wait(
+      frames.map(
+        (frame) => _pageApi.createIsolatedWorld(
+          frame.id,
+          grantUniveralAccess: true,
+          worldName: name,
+        ),
+      ),
+    );
   }
 
   void _onFrameNavigatedWithinDocument(NavigatedWithinDocumentEvent event) {
@@ -261,9 +289,10 @@ class FrameManager {
   }
 
   void _onExecutionContextCreated(ExecutionContextDescription contextPayload) {
-    var frameId = contextPayload.auxData != null
-        ? contextPayload.auxData!['frameId'] as String?
-        : null;
+    var frameId =
+        contextPayload.auxData != null
+            ? contextPayload.auxData!['frameId'] as String?
+            : null;
     var frame = frameId != null ? _frames[FrameId(frameId)] : null;
     DomWorld? world;
     if (frame != null) {
@@ -311,8 +340,10 @@ class FrameManager {
 
   ExecutionContext executionContextById(ExecutionContextId contextId) {
     var context = _contextIdToContext[contextId.value.toString()];
-    assert(context != null,
-        'INTERNAL ERROR: missing context with id = ${contextId.value}');
+    assert(
+      context != null,
+      'INTERNAL ERROR: missing context with id = ${contextId.value}',
+    );
     return context!;
   }
 
@@ -447,15 +478,27 @@ class Frame {
   /// Returns: [Future] which resolves to the main resource response. In case
   /// of multiple redirects, the navigation will resolve with the response of
   /// the last redirect.
-  Future<Response> goto(String url,
-      {String? referrer, Duration? timeout, Until? wait}) {
-    return frameManager.navigateFrame(this, url,
-        referrer: referrer, timeout: timeout, wait: wait);
+  Future<Response> goto(
+    String url, {
+    String? referrer,
+    Duration? timeout,
+    Until? wait,
+  }) {
+    return frameManager.navigateFrame(
+      this,
+      url,
+      referrer: referrer,
+      timeout: timeout,
+      wait: wait,
+    );
   }
 
   Future<Response> waitForNavigation({Duration? timeout, Until? wait}) {
-    return frameManager.waitForFrameNavigation(this,
-        timeout: timeout, wait: wait);
+    return frameManager.waitForFrameNavigation(
+      this,
+      timeout: timeout,
+      wait: wait,
+    );
   }
 
   /// Returns promise that resolves to the frame's default execution context.
@@ -479,8 +522,10 @@ class Frame {
   /// [JSHandle] instances can be passed as arguments to the [Frame.evaluateHandle]:
   /// ```dart
   /// var aHandle = await frame.evaluateHandle('() => document.body');
-  /// var resultHandle =
-  ///     await frame.evaluateHandle('body => body.innerHTML', args: [aHandle]);
+  /// var resultHandle = await frame.evaluateHandle(
+  ///   'body => body.innerHTML',
+  ///   args: [aHandle],
+  /// );
   /// print(await resultHandle.jsonValue);
   /// await resultHandle.dispose();
   /// ```
@@ -492,8 +537,9 @@ class Frame {
   /// returns: Future which resolves to the return value of `pageFunction` as
   /// in-page object (JSHandle)
   Future<T> evaluateHandle<T extends JsHandle>(
-      @Language('js') String pageFunction,
-      {List<dynamic>? args}) {
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) {
     return _mainWorld.evaluateHandle(pageFunction, args: args);
   }
 
@@ -508,9 +554,12 @@ class Frame {
   ///
   /// Passing arguments to `pageFunction`:
   /// ```dart
-  /// var result = await frame.evaluate<int>('''x => {
+  /// var result = await frame.evaluate<int>(
+  ///   '''x => {
   ///           return Promise.resolve(8 * x);
-  ///         }''', args: [7]);
+  ///         }''',
+  ///   args: [7],
+  /// );
   /// print(result); // prints "56"
   /// ```
   ///
@@ -533,8 +582,10 @@ class Frame {
   /// - [pageFunction] Function to be evaluated in the page context
   /// - [args] Arguments to pass to `pageFunction`
   /// - Returns: Future which resolves to the return value of `pageFunction`
-  Future<T> evaluate<T>(@Language('js') String pageFunction,
-      {List<dynamic>? args}) {
+  Future<T> evaluate<T>(
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) {
     return _mainWorld.evaluate<T>(pageFunction, args: args);
   }
 
@@ -573,20 +624,29 @@ class Frame {
   /// Examples:
   ///
   /// ```dart
-  /// var searchValue =
-  ///     await frame.$eval('#search', 'function (el) { return el.value; }');
+  /// var searchValue = await frame.$eval(
+  ///   '#search',
+  ///   'function (el) { return el.value; }',
+  /// );
   /// var preloadHref = await frame.$eval(
-  ///     'link[rel=preload]', 'function (el) { return el.href; }');
+  ///   'link[rel=preload]',
+  ///   'function (el) { return el.href; }',
+  /// );
   /// var html = await frame.$eval(
-  ///     '.main-container', 'function (e) { return e.outerHTML; }');
+  ///   '.main-container',
+  ///   'function (e) { return e.outerHTML; }',
+  /// );
   /// ```
   ///
   /// [selector]: A selector to query frame for
   /// [pageFunction]: Function to be evaluated in browser context
   /// [args]: Arguments to pass to pageFunction
   /// Returns a Future which resolves to the return value of pageFunction
-  Future<T?> $eval<T>(String selector, @Language('js') String pageFunction,
-      {List<dynamic>? args}) {
+  Future<T?> $eval<T>(
+    String selector,
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) {
     return _mainWorld.$eval<T>(selector, pageFunction, args: args);
   }
 
@@ -600,8 +660,11 @@ class Frame {
   /// ```dart
   /// var divsCounts = await frame.$$eval('div', 'divs => divs.length');
   /// ```
-  Future<T?> $$eval<T>(String selector, @Language('js') String pageFunction,
-      {List<dynamic>? args}) {
+  Future<T?> $$eval<T>(
+    String selector,
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) {
     return _mainWorld.$$eval<T>(selector, pageFunction, args: args);
   }
 
@@ -654,10 +717,18 @@ class Frame {
   ///
   /// Returns a [Future<ElementHandle>] which resolves to the added tag when the
   /// script's onload fires or when the script content was injected into frame.
-  Future<ElementHandle> addScriptTag(
-      {String? url, File? file, String? content, String? type}) {
+  Future<ElementHandle> addScriptTag({
+    String? url,
+    File? file,
+    String? content,
+    String? type,
+  }) {
     return _mainWorld.addScriptTag(
-        url: url, file: file, content: content, type: type);
+      url: url,
+      file: file,
+      content: content,
+      type: type,
+    );
   }
 
   /// Adds a `<link rel="stylesheet">` tag into the page with the desired url or
@@ -670,8 +741,11 @@ class Frame {
   ///
   /// Returns a [Future<ElementHandle>] which resolves to the added tag when the
   /// stylesheet's onload fires or when the CSS content was injected into frame.
-  Future<ElementHandle> addStyleTag(
-      {String? url, File? file, String? content}) {
+  Future<ElementHandle> addStyleTag({
+    String? url,
+    File? file,
+    String? content,
+  }) {
     return _mainWorld.addStyleTag(url: url, file: file, content: content);
   }
 
@@ -696,10 +770,18 @@ class Frame {
   /// - [button]: <"left"|"right"|"middle"> Defaults to `left`
   /// - [clickCount]: defaults to 1
   /// - [delay]: Time to wait between `mousedown` and `mouseup`. Default to zero.
-  Future<void> click(String selector,
-      {Duration? delay, MouseButton? button, int? clickCount}) {
-    return _secondaryWorld.click(selector,
-        delay: delay, button: button, clickCount: clickCount);
+  Future<void> click(
+    String selector, {
+    Duration? delay,
+    MouseButton? button,
+    int? clickCount,
+  }) {
+    return _secondaryWorld.click(
+      selector,
+      delay: delay,
+      button: button,
+      clickCount: clickCount,
+    );
   }
 
   /// This method fetches an element with `selector` and focuses it.
@@ -737,8 +819,11 @@ class Frame {
   ///
   /// ```dart
   /// await frame.select('select#colors', ['blue']); // single selection
-  /// await frame
-  ///     .select('select#colors', ['red', 'green', 'blue']); // multiple selections
+  /// await frame.select('select#colors', [
+  ///   'red',
+  ///   'green',
+  ///   'blue',
+  /// ]); // multiple selections
   /// ```
   ///
   /// Shortcut for [Page.mainFrame.select]
@@ -816,10 +901,18 @@ class Frame {
   /// Returns a [Future] which resolves when element specified by selector string
   /// is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
   /// is not found in DOM.
-  Future<ElementHandle?> waitForSelector(String selector,
-      {bool? visible, bool? hidden, Duration? timeout}) async {
-    var handle = await _secondaryWorld.waitForSelector(selector,
-        visible: visible, hidden: hidden, timeout: timeout);
+  Future<ElementHandle?> waitForSelector(
+    String selector, {
+    bool? visible,
+    bool? hidden,
+    Duration? timeout,
+  }) async {
+    var handle = await _secondaryWorld.waitForSelector(
+      selector,
+      visible: visible,
+      hidden: hidden,
+      timeout: timeout,
+    );
     if (handle == null) {
       return null;
     }
@@ -864,10 +957,18 @@ class Frame {
   /// Returns a [Future] which resolves when element specified by xpath string
   /// is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
   /// is not found in DOM.
-  Future<ElementHandle?> waitForXPath(String xpath,
-      {bool? visible, bool? hidden, Duration? timeout}) async {
-    var handle = await _secondaryWorld.waitForXPath(xpath,
-        visible: visible, hidden: hidden, timeout: timeout);
+  Future<ElementHandle?> waitForXPath(
+    String xpath, {
+    bool? visible,
+    bool? hidden,
+    Duration? timeout,
+  }) async {
+    var handle = await _secondaryWorld.waitForXPath(
+      xpath,
+      visible: visible,
+      hidden: hidden,
+      timeout: timeout,
+    );
     if (handle == null) {
       return null;
     }
@@ -910,13 +1011,22 @@ class Frame {
   /// ```dart
   /// var selector = '.foo';
   /// await page.mainFrame.waitForFunction(
-  ///     'selector => !!document.querySelector(selector)',
-  ///     args: [selector]);
+  ///   'selector => !!document.querySelector(selector)',
+  ///   args: [selector],
+  /// );
   /// ```
-  Future<JsHandle> waitForFunction(@Language('js') String pageFunction,
-      {List<dynamic>? args, Duration? timeout, Polling? polling}) {
-    return _mainWorld.waitForFunction(pageFunction, args,
-        timeout: timeout, polling: polling);
+  Future<JsHandle> waitForFunction(
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+    Duration? timeout,
+    Polling? polling,
+  }) {
+    return _mainWorld.waitForFunction(
+      pageFunction,
+      args,
+      timeout: timeout,
+      polling: polling,
+    );
   }
 
   /// The page's title.

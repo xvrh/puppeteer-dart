@@ -36,10 +36,14 @@ void main() {
   });
 
   group('Browser.target', () {
-    test('should return browser target', () async {
-      var target = browser.target;
-      expect(target.type, 'browser');
-    }, skip: 'Investigate to use autoAttach and fix failure');
+    test(
+      'should return browser target',
+      () async {
+        var target = browser.target;
+        expect(target.type, 'browser');
+      },
+      skip: 'Investigate to use autoAttach and fix failure',
+    );
   });
 
   group('Browser.process', () {
@@ -49,8 +53,9 @@ void main() {
     });
     test('should not return child_process for remote browser', () async {
       var browserWsEndpoint = browser.wsEndpoint;
-      var remoteBrowser =
-          await puppeteer.connect(browserWsEndpoint: browserWsEndpoint);
+      var remoteBrowser = await puppeteer.connect(
+        browserWsEndpoint: browserWsEndpoint,
+      );
       expect(remoteBrowser.process, isNull);
       remoteBrowser.disconnect();
     });
@@ -59,8 +64,9 @@ void main() {
   group('Browser.isConnected', () {
     test('should set the browser connected state', () async {
       var browserWSEndpoint = browser.wsEndpoint;
-      var newBrowser =
-          await puppeteer.connect(browserWsEndpoint: browserWSEndpoint);
+      var newBrowser = await puppeteer.connect(
+        browserWsEndpoint: browserWSEndpoint,
+      );
       expect(newBrowser.isConnected, isTrue);
       newBrowser.disconnect();
       expect(newBrowser.isConnected, isFalse);

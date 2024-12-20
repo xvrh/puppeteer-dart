@@ -19,12 +19,15 @@ String evaluationString(String function, List<dynamic>? args) {
 }
 
 dynamic valueFromRemoteObject(RemoteObject remoteObject) {
-  assert(remoteObject.objectId == null,
-      'Cannot extract value when objectId is given');
+  assert(
+    remoteObject.objectId == null,
+    'Cannot extract value when objectId is given',
+  );
   if (remoteObject.unserializableValue != null) {
     if (remoteObject.type == RemoteObjectType.bigint) {
       return BigInt.tryParse(
-          remoteObject.unserializableValue!.value.replaceAll('n', ''));
+        remoteObject.unserializableValue!.value.replaceAll('n', ''),
+      );
     }
     switch (remoteObject.unserializableValue!.value) {
       case '-0':
@@ -37,19 +40,23 @@ dynamic valueFromRemoteObject(RemoteObject remoteObject) {
         return double.negativeInfinity;
       default:
         throw Exception(
-            'Unsupported unserializable value: ${remoteObject.unserializableValue!.value}');
+          'Unsupported unserializable value: ${remoteObject.unserializableValue!.value}',
+        );
     }
   }
   return remoteObject.value;
 }
 
 Future<void> releaseObject(
-    RuntimeApi runtimeApi, RemoteObject remoteObject) async {
+  RuntimeApi runtimeApi,
+  RemoteObject remoteObject,
+) async {
   if (remoteObject.objectId == null) return;
 
-  await runtimeApi
-      .releaseObject(remoteObject.objectId!)
-      .catchError((e, StackTrace stackTrace) {
+  await runtimeApi.releaseObject(remoteObject.objectId!).catchError((
+    e,
+    StackTrace stackTrace,
+  ) {
     // Exceptions might happen in case of a page been navigated or closed.
     // Swallow these since they are harmless and we don't leak anything in this case.
     _logger.finer(e, e, stackTrace);

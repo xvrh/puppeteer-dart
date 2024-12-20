@@ -43,27 +43,31 @@ void main() {
   test('Can type into a textarea', () async {
     await page.goto(server.emptyPage);
     await page.evaluate(
-        //language=js
-        '''
+      //language=js
+      '''
 function _() {
   var textarea = document.createElement('textarea');
   document.body.appendChild(textarea);
   textarea.focus();
 }
-''');
+''',
+    );
     var text = 'Hello world. éàê^';
     await page.keyboard.type(text);
-    expect(await page.evaluate('document.querySelector("textarea").value'),
-        equals(text));
+    expect(
+      await page.evaluate('document.querySelector("textarea").value'),
+      equals(text),
+    );
   });
   test('Press the metaKey', () async {
     await page.evaluate(
-        //language=js
-        '''
+      //language=js
+      '''
 function _() {
   window.keyPromise = new Promise(resolve => document.addEventListener('keydown', event => resolve(event.key)));
 }
-''');
+''',
+    );
     await page.keyboard.press(Key.meta);
     expect(await page.evaluate('keyPromise'), equals('Meta'));
   });
@@ -71,15 +75,17 @@ function _() {
     await page.goto(server.assetUrl('input/textarea.html'));
     await page.type('textarea', 'Hello World!');
     expect(
-        await page.evaluate("() => document.querySelector('textarea').value"),
-        equals('Hello World!'));
+      await page.evaluate("() => document.querySelector('textarea').value"),
+      equals('Hello World!'),
+    );
     for (var i = 0; i < 'World!'.length; i++) {
       await page.keyboard.press(Key.arrowLeft);
     }
     await page.keyboard.type('inserted ');
     expect(
-        await page.evaluate("() => document.querySelector('textarea').value"),
-        equals('Hello inserted World!'));
+      await page.evaluate("() => document.querySelector('textarea').value"),
+      equals('Hello inserted World!'),
+    );
     await page.keyboard.down(Key.shift);
     for (var i = 0; i < 'inserted '.length; i++) {
       await page.keyboard.press(Key.arrowLeft);
@@ -87,8 +93,9 @@ function _() {
     await page.keyboard.up(Key.shift);
     await page.keyboard.press(Key.backspace);
     expect(
-        await page.evaluate("() => document.querySelector('textarea').value"),
-        equals('Hello World!'));
+      await page.evaluate("() => document.querySelector('textarea').value"),
+      equals('Hello World!'),
+    );
   });
   test('should send a character with sendCharacter', () async {
     await page.goto(server.assetUrl('input/textarea.html'));
@@ -98,7 +105,8 @@ function _() {
         'function() { return document.querySelector("textarea").value; }';
     expect(await page.evaluate(textareaValue), equals('嗨'));
     await page.evaluate(
-        'function() { window.addEventListener("keydown", e => e.preventDefault(), true); }');
+      'function() { window.addEventListener("keydown", e => e.preventDefault(), true); }',
+    );
     await page.keyboard.sendCharacter('a');
     expect(await page.evaluate(textareaValue), equals('嗨a'));
   });
@@ -107,20 +115,30 @@ function _() {
     var keyboard = page.keyboard;
     await keyboard.down(Key.control);
     var getResult = '() => getResult()';
-    expect(await page.evaluate(getResult),
-        equals('Keydown: Control ControlLeft 17 [Control]'));
+    expect(
+      await page.evaluate(getResult),
+      equals('Keydown: Control ControlLeft 17 [Control]'),
+    );
     await keyboard.down(Key.alt);
-    expect(await page.evaluate(getResult),
-        equals('Keydown: Alt AltLeft 18 [Alt Control]'));
+    expect(
+      await page.evaluate(getResult),
+      equals('Keydown: Alt AltLeft 18 [Alt Control]'),
+    );
     await keyboard.down(Key.semicolon);
-    expect(await page.evaluate(getResult),
-        equals('Keydown: ; Semicolon 186 [Alt Control]'));
+    expect(
+      await page.evaluate(getResult),
+      equals('Keydown: ; Semicolon 186 [Alt Control]'),
+    );
     await keyboard.up(Key.semicolon);
-    expect(await page.evaluate(getResult),
-        equals('Keyup: ; Semicolon 186 [Alt Control]'));
+    expect(
+      await page.evaluate(getResult),
+      equals('Keyup: ; Semicolon 186 [Alt Control]'),
+    );
     await keyboard.up(Key.control);
-    expect(await page.evaluate(getResult),
-        equals('Keyup: Control ControlLeft 17 [Alt]'));
+    expect(
+      await page.evaluate(getResult),
+      equals('Keyup: Control ControlLeft 17 [Alt]'),
+    );
     await keyboard.up(Key.alt);
     expect(await page.evaluate(getResult), equals('Keyup: Alt AltLeft 18 []'));
   });
@@ -128,20 +146,26 @@ function _() {
     await page.goto(server.assetUrl('input/keyboard.html'));
     await page.keyboard.type('!');
     expect(
-        await page.evaluate('() => getResult()'),
-        equals([
+      await page.evaluate('() => getResult()'),
+      equals(
+        [
           'Keydown: ! Digit1 49 []',
           'Keypress: ! Digit1 33 33 []',
-          'Keyup: ! Digit1 49 []'
-        ].join('\n')));
+          'Keyup: ! Digit1 49 []',
+        ].join('\n'),
+      ),
+    );
     await page.keyboard.type('^');
     expect(
-        await page.evaluate('() => getResult()'),
-        equals([
+      await page.evaluate('() => getResult()'),
+      equals(
+        [
           'Keydown: ^ Digit6 54 []',
           'Keypress: ^ Digit6 94 94 []',
-          'Keyup: ^ Digit6 54 []'
-        ].join('\n')));
+          'Keyup: ^ Digit6 54 []',
+        ].join('\n'),
+      ),
+    );
   });
   test('should send proper codes while typing with shift', () async {
     await page.goto(server.assetUrl('input/keyboard.html'));
@@ -149,13 +173,16 @@ function _() {
     await keyboard.down(Key.shift);
     await page.keyboard.type('~');
     expect(
-        await page.evaluate('() => getResult()'),
-        equals([
+      await page.evaluate('() => getResult()'),
+      equals(
+        [
           'Keydown: Shift ShiftLeft 16 [Shift]',
           'Keydown: ~ Backquote 192 [Shift]', // 192 is ` keyCode
           'Keypress: ~ Backquote 126 126 [Shift]', // 126 is ~ charCode
-          'Keyup: ~ Backquote 192 [Shift]'
-        ].join('\n')));
+          'Keyup: ~ Backquote 192 [Shift]',
+        ].join('\n'),
+      ),
+    );
     await keyboard.up(Key.shift);
   });
   test('should not type canceled events', () async {
@@ -180,7 +207,8 @@ function _() {
     await page.goto(server.assetUrl('input/textarea.html'));
     await page.focus('textarea');
     await page.evaluate(
-        "() => document.querySelector('textarea').addEventListener('keydown', e => window.lastEvent = e, true)");
+      "() => document.querySelector('textarea').addEventListener('keydown', e => window.lastEvent = e, true)",
+    );
     await page.keyboard.down(Key.keyA);
     expect(await page.evaluate('() => window.lastEvent.repeat'), isFalse);
     await page.keyboard.press(Key.keyA);
@@ -224,17 +252,24 @@ function _() {
   test('Type emoji', () async {
     await page.goto(server.assetUrl('input/textarea.html'));
     await page.type('textarea', '👹 Tokyo street Japan 🇯🇵');
-    expect(await page.$eval('textarea', '(textarea) => textarea.value'),
-        equals('👹 Tokyo street Japan 🇯🇵'));
+    expect(
+      await page.$eval('textarea', '(textarea) => textarea.value'),
+      equals('👹 Tokyo street Japan 🇯🇵'),
+    );
   });
   test('should type emoji into an iframe', () async {
     await page.goto(server.emptyPage);
     await attachFrame(
-        page, 'emoji-test', server.assetUrl('input/textarea.html'));
+      page,
+      'emoji-test',
+      server.assetUrl('input/textarea.html'),
+    );
     var frame = page.frames[1];
     var textarea = await frame.$('textarea');
     await textarea.type('👹 Tokyo street Japan 🇯🇵');
-    expect(await frame.$eval('textarea', '(textarea)=>textarea.value'),
-        equals('👹 Tokyo street Japan 🇯🇵'));
+    expect(
+      await frame.$eval('textarea', '(textarea)=>textarea.value'),
+      equals('👹 Tokyo street Japan 🇯🇵'),
+    );
   });
 }

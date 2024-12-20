@@ -16,7 +16,10 @@ class DeviceOrientationApi {
   /// [beta] Mock beta
   /// [gamma] Mock gamma
   Future<void> setDeviceOrientationOverride(
-      num alpha, num beta, num gamma) async {
+    num alpha,
+    num beta,
+    num gamma,
+  ) async {
     await _client.send('DeviceOrientation.setDeviceOrientationOverride', {
       'alpha': alpha,
       'beta': beta,

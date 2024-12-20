@@ -11,18 +11,23 @@ void main() async {
 
   // Attach an event listener to page to capture a custom event on page load/navigation.
   Future<void> listenFor(String type) {
-    return page.evaluateOnNewDocument('''type => {
+    return page.evaluateOnNewDocument(
+      '''type => {
       document.addEventListener(type, e => {
         window.onCustomEvent({type, detail: e.detail});
       });
-    }''', args: [type]);
+    }''',
+      args: [type],
+    );
   }
 
   // Listen for "app-ready" custom event on page load.
   await listenFor('app-ready');
 
-  await page.goto('https://pub.dev/documentation/puppeteer/latest/',
-      wait: Until.networkIdle);
+  await page.goto(
+    'https://pub.dev/documentation/puppeteer/latest/',
+    wait: Until.networkIdle,
+  );
 
   await browser.close();
 }

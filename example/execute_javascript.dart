@@ -11,14 +11,20 @@ void main() async {
   await page.evaluate('(x) => x > 0', args: [7]);
 
   // Multi line shorthand syntax
-  await page.evaluate('''(x) => {  
+  await page.evaluate(
+    '''(x) => {  
     return x > 0;
-  }''', args: [7]);
+  }''',
+    args: [7],
+  );
 
   // shorthand syntax with async
-  await page.evaluate('''async (x) => {
+  await page.evaluate(
+    '''async (x) => {
     return await x;
-  }''', args: [7]);
+  }''',
+    args: [7],
+  );
 
   // An expression.
   await page.evaluate('document.body');

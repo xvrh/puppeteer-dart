@@ -19,8 +19,11 @@ class AutofillApi {
   /// [fieldId] Identifies a field that serves as an anchor for autofill.
   /// [frameId] Identifies the frame that field belongs to.
   /// [card] Credit card information to fill out the form. Credit card data is not saved.
-  Future<void> trigger(dom.BackendNodeId fieldId, CreditCard card,
-      {page.FrameId? frameId}) async {
+  Future<void> trigger(
+    dom.BackendNodeId fieldId,
+    CreditCard card, {
+    page.FrameId? frameId,
+  }) async {
     await _client.send('Autofill.trigger', {
       'fieldId': fieldId,
       'card': card,
@@ -58,9 +61,10 @@ class AddressFormFilledEvent {
 
   factory AddressFormFilledEvent.fromJson(Map<String, dynamic> json) {
     return AddressFormFilledEvent(
-      filledFields: (json['filledFields'] as List)
-          .map((e) => FilledField.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      filledFields:
+          (json['filledFields'] as List)
+              .map((e) => FilledField.fromJson(e as Map<String, dynamic>))
+              .toList(),
       addressUi: AddressUI.fromJson(json['addressUi'] as Map<String, dynamic>),
     );
   }
@@ -82,12 +86,13 @@ class CreditCard {
   /// 3-digit card verification code.
   final String cvc;
 
-  CreditCard(
-      {required this.number,
-      required this.name,
-      required this.expiryMonth,
-      required this.expiryYear,
-      required this.cvc});
+  CreditCard({
+    required this.number,
+    required this.name,
+    required this.expiryMonth,
+    required this.expiryYear,
+    required this.cvc,
+  });
 
   factory CreditCard.fromJson(Map<String, dynamic> json) {
     return CreditCard(
@@ -127,10 +132,7 @@ class AddressField {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'value': value,
-    };
+    return {'name': name, 'value': value};
   }
 }
 
@@ -142,16 +144,15 @@ class AddressFields {
 
   factory AddressFields.fromJson(Map<String, dynamic> json) {
     return AddressFields(
-      fields: (json['fields'] as List)
-          .map((e) => AddressField.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      fields:
+          (json['fields'] as List)
+              .map((e) => AddressField.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'fields': fields.map((e) => e.toJson()).toList(),
-    };
+    return {'fields': fields.map((e) => e.toJson()).toList()};
   }
 }
 
@@ -163,16 +164,15 @@ class Address {
 
   factory Address.fromJson(Map<String, dynamic> json) {
     return Address(
-      fields: (json['fields'] as List)
-          .map((e) => AddressField.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      fields:
+          (json['fields'] as List)
+              .map((e) => AddressField.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'fields': fields.map((e) => e.toJson()).toList(),
-    };
+    return {'fields': fields.map((e) => e.toJson()).toList()};
   }
 }
 
@@ -191,24 +191,22 @@ class AddressUI {
 
   factory AddressUI.fromJson(Map<String, dynamic> json) {
     return AddressUI(
-      addressFields: (json['addressFields'] as List)
-          .map((e) => AddressFields.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      addressFields:
+          (json['addressFields'] as List)
+              .map((e) => AddressFields.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'addressFields': addressFields.map((e) => e.toJson()).toList(),
-    };
+    return {'addressFields': addressFields.map((e) => e.toJson()).toList()};
   }
 }
 
 /// Specified whether a filled field was done so by using the html autocomplete attribute or autofill heuristics.
 enum FillingStrategy {
   autocompleteAttribute('autocompleteAttribute'),
-  autofillInferred('autofillInferred'),
-  ;
+  autofillInferred('autofillInferred');
 
   final String value;
 
@@ -248,15 +246,16 @@ class FilledField {
   /// The form field's DOM node
   final dom.BackendNodeId fieldId;
 
-  FilledField(
-      {required this.htmlType,
-      required this.id,
-      required this.name,
-      required this.value,
-      required this.autofillType,
-      required this.fillingStrategy,
-      required this.frameId,
-      required this.fieldId});
+  FilledField({
+    required this.htmlType,
+    required this.id,
+    required this.name,
+    required this.value,
+    required this.autofillType,
+    required this.fillingStrategy,
+    required this.frameId,
+    required this.fieldId,
+  });
 
   factory FilledField.fromJson(Map<String, dynamic> json) {
     return FilledField(
@@ -265,8 +264,9 @@ class FilledField {
       name: json['name'] as String,
       value: json['value'] as String,
       autofillType: json['autofillType'] as String,
-      fillingStrategy:
-          FillingStrategy.fromJson(json['fillingStrategy'] as String),
+      fillingStrategy: FillingStrategy.fromJson(
+        json['fillingStrategy'] as String,
+      ),
       frameId: page.FrameId.fromJson(json['frameId'] as String),
       fieldId: dom.BackendNodeId.fromJson(json['fieldId'] as int),
     );

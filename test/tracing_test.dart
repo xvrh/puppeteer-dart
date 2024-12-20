@@ -39,14 +39,17 @@ void main() {
       expect(result.toString().length, greaterThan(0));
     });
     test('should run with custom categories if provided', () async {
-      await page.tracing
-          .start(categories: ['disabled-by-default-v8.cpu_profiler.hires']);
+      await page.tracing.start(
+        categories: ['disabled-by-default-v8.cpu_profiler.hires'],
+      );
       var buffer = StringBuffer();
       await page.tracing.stop(buffer);
       var traceJson = jsonDecode(buffer.toString()) as Map<String, dynamic>;
 
-      expect((traceJson['metadata'] as Map<String, dynamic>)['trace-config'],
-          contains('disabled-by-default-v8.cpu_profiler.hires'));
+      expect(
+        (traceJson['metadata'] as Map<String, dynamic>)['trace-config'],
+        contains('disabled-by-default-v8.cpu_profiler.hires'),
+      );
     });
     test('should throw if tracing on two pages', () async {
       await page.tracing.start();

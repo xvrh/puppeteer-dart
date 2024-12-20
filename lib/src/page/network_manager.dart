@@ -18,8 +18,9 @@ class NetworkManager {
   final FrameManager frameManager;
   final _requestIdToRequest = <String, Request>{};
   final _requestIdToRequestWillBeSentEvent = <String, RequestWillBeSentEvent>{};
-  final _extraHTTPHeaders =
-      CanonicalizedMap<String, String, String?>((key) => key.toLowerCase());
+  final _extraHTTPHeaders = CanonicalizedMap<String, String, String?>(
+    (key) => key.toLowerCase(),
+  );
   bool _offline = false;
   Credentials? _credentials;
   final _attemptedAuthentications = <String?>{};
@@ -113,20 +114,19 @@ class NetworkManager {
       await Future.wait([
         _updateProtocolCacheDisabled(),
         _fetch.enable(
-            handleAuthRequests: true,
-            patterns: [fetch.RequestPattern(urlPattern: '*')]),
+          handleAuthRequests: true,
+          patterns: [fetch.RequestPattern(urlPattern: '*')],
+        ),
       ]);
     } else {
-      await Future.wait([
-        _updateProtocolCacheDisabled(),
-        _fetch.disable(),
-      ]);
+      await Future.wait([_updateProtocolCacheDisabled(), _fetch.disable()]);
     }
   }
 
   Future<void> _updateProtocolCacheDisabled() {
     return _network.setCacheDisabled(
-        _userCacheDisabled || _protocolRequestInterceptionEnabled);
+      _userCacheDisabled || _protocolRequestInterceptionEnabled,
+    );
   }
 
   void _onRequestWillBeSent(RequestWillBeSentEvent event) {
@@ -156,11 +156,13 @@ class NetworkManager {
     }
 
     _fetch.continueWithAuth(
-        event.requestId,
-        fetch.AuthChallengeResponse(
-            response: response,
-            username: _credentials?.username,
-            password: _credentials?.password));
+      event.requestId,
+      fetch.AuthChallengeResponse(
+        response: response,
+        username: _credentials?.username,
+        password: _credentials?.password,
+      ),
+    );
   }
 
   Future<void> _onRequestPaused(RequestPausedEvent event) async {
@@ -196,9 +198,14 @@ class NetworkManager {
     }
     var frame =
         event.frameId != null ? frameManager.frame(event.frameId) : null;
-    var request = Request(FetchApi(client), frame, interceptionId, event,
-        allowInterception: _userRequestInterceptionEnabled,
-        redirectChain: redirectChain);
+    var request = Request(
+      FetchApi(client),
+      frame,
+      interceptionId,
+      event,
+      allowInterception: _userRequestInterceptionEnabled,
+      redirectChain: redirectChain,
+    );
     _requestIdToRequest[event.requestId.value] = request;
     _onRequestController.add(request);
   }
@@ -213,7 +220,8 @@ class NetworkManager {
     request._response = response;
     request.redirectChain.add(request);
     response._bodyLoadedCompleter.complete(
-        Exception('Response body is unavailable for redirect responses'));
+      Exception('Response body is unavailable for redirect responses'),
+    );
     _requestIdToRequest.remove(request.requestId);
     _attemptedAuthentications.remove(request.interceptionId);
     _onResponseController.add(response);
@@ -308,17 +316,23 @@ class Request {
   final List<Request> redirectChain;
 
   final bool allowInterception;
-  final _headers =
-      CanonicalizedMap<String, String, String>((key) => key.toLowerCase());
+  final _headers = CanonicalizedMap<String, String, String>(
+    (key) => key.toLowerCase(),
+  );
   Response? _response;
   String? _failureText;
   bool _fromMemoryCache = false;
   bool _interceptionHandled = false;
   final FetchApi _fetchApi;
 
-  Request(this._fetchApi, this.frame, this.interceptionId, this.event,
-      {required this.redirectChain, required bool? allowInterception})
-      : allowInterception = allowInterception ?? false {
+  Request(
+    this._fetchApi,
+    this.frame,
+    this.interceptionId,
+    this.event, {
+    required this.redirectChain,
+    required bool? allowInterception,
+  }) : allowInterception = allowInterception ?? false {
     for (var header in event.request.headers.value.keys) {
       _headers[header] = event.request.headers.value[header] as String;
     }
@@ -376,9 +390,10 @@ class Request {
   /// await page.setRequestInterception(true);
   /// page.onRequest.listen((request) {
   ///   // Override headers
-  ///   var headers = Map<String, String>.from(request.headers)
-  ///     ..['foo'] = 'bar'
-  ///     ..remove('origin');
+  ///   var headers =
+  ///       Map<String, String>.from(request.headers)
+  ///         ..['foo'] = 'bar'
+  ///         ..remove('origin');
   ///   request.continueRequest(headers: headers);
   /// });
   /// ```
@@ -390,11 +405,12 @@ class Request {
   /// - [method]: If set changes the request method (e.g. `GET` or `POST`)
   /// - [postData]: If set changes the post data of request
   /// - [headers]: If set changes the request HTTP headers
-  Future<void> continueRequest(
-      {String? url,
-      String? method,
-      String? postData,
-      Map<String, String>? headers}) async {
+  Future<void> continueRequest({
+    String? url,
+    String? method,
+    String? postData,
+    Map<String, String>? headers,
+  }) async {
     // Request interception is not supported for data: urls.
     if (this.url.startsWith('data:')) return;
     assert(allowInterception, 'Request Interception is not enabled!');
@@ -405,18 +421,21 @@ class Request {
         postData != null ? base64Encode(utf8.encode(postData)) : null;
 
     await _fetchApi
-        .continueRequest(fetch.RequestId(interceptionId!),
-            url: url,
-            method: method,
-            postData: postDataBinaryBase64,
-            headers: headers?.entries
-                .map((e) => fetch.HeaderEntry(name: e.key, value: e.value))
-                .toList())
+        .continueRequest(
+          fetch.RequestId(interceptionId!),
+          url: url,
+          method: method,
+          postData: postDataBinaryBase64,
+          headers:
+              headers?.entries
+                  .map((e) => fetch.HeaderEntry(name: e.key, value: e.value))
+                  .toList(),
+        )
         .catchError((error) {
-      // In certain cases, protocol will return error if the request was already canceled
-      // or the page was closed. We should tolerate these errors.
-      _logger.finer('[Request.continueRequest] swallow error: $error');
-    });
+          // In certain cases, protocol will return error if the request was already canceled
+          // or the page was closed. We should tolerate these errors.
+          _logger.finer('[Request.continueRequest] swallow error: $error');
+        });
   }
 
   /// Fulfills request with given response. To use this, request interception should
@@ -440,11 +459,12 @@ class Request {
   /// - [headers]: Optional response headers
   /// - [contentType]: If set, equals to setting `Content-Type` response header
   /// - [body]: Optional response body
-  Future<void> respond(
-      {int? status,
-      Map<String, String>? headers,
-      String? contentType,
-      body}) async {
+  Future<void> respond({
+    int? status,
+    Map<String, String>? headers,
+    String? contentType,
+    body,
+  }) async {
     // Mocking responses for dataURL requests is not currently supported.
     if (url.startsWith('data:')) return;
     assert(allowInterception, 'Request Interception is not enabled!');
@@ -470,18 +490,26 @@ class Request {
     }
 
     await _fetchApi
-        .fulfillRequest(fetch.RequestId(interceptionId!), status ?? 200,
-            responseHeaders: headers.entries
-                .map((e) => fetch.HeaderEntry(
-                    name: e.key.toLowerCase(), value: e.value))
-                .toList(),
-            responsePhrase: _statusTexts[status ?? 200],
-            body: body != null ? base64.encode(bodyBytes!) : null)
+        .fulfillRequest(
+          fetch.RequestId(interceptionId!),
+          status ?? 200,
+          responseHeaders:
+              headers.entries
+                  .map(
+                    (e) => fetch.HeaderEntry(
+                      name: e.key.toLowerCase(),
+                      value: e.value,
+                    ),
+                  )
+                  .toList(),
+          responsePhrase: _statusTexts[status ?? 200],
+          body: body != null ? base64.encode(bodyBytes!) : null,
+        )
         .catchError((error) {
-      // In certain cases, protocol will return error if the request was already canceled
-      // or the page was closed. We should tolerate these errors.
-      _logger.finer('[Request.respond] swallow error: $error');
-    });
+          // In certain cases, protocol will return error if the request was already canceled
+          // or the page was closed. We should tolerate these errors.
+          _logger.finer('[Request.respond] swallow error: $error');
+        });
   }
 
   /// Aborts request. To use this, request interception should be enabled with
@@ -501,10 +529,10 @@ class Request {
     await _fetchApi
         .failRequest(fetch.RequestId(interceptionId!), error)
         .catchError((error) {
-      // In certain cases, protocol will return error if the request was already canceled
-      // or the page was closed. We should tolerate these errors.
-      _logger.finer('[Request.abort] swallow error: $error');
-    });
+          // In certain cases, protocol will return error if the request was already canceled
+          // or the page was closed. We should tolerate these errors.
+          _logger.finer('[Request.abort] swallow error: $error');
+        });
   }
 }
 
@@ -516,8 +544,9 @@ class Response {
   final _bodyLoadedCompleter = Completer();
   Future<dynamic>? _contentFuture;
   final NetworkApi _networkApi;
-  final _headers =
-      CanonicalizedMap<String, String, String>((key) => key.toLowerCase());
+  final _headers = CanonicalizedMap<String, String, String>(
+    (key) => key.toLowerCase(),
+  );
 
   Response(this._networkApi, this.request, this.data) {
     for (var header in data.headers.value.keys) {
@@ -530,37 +559,40 @@ class Response {
       apis.network,
       request ??
           Request(
-              apis.fetch,
-              null,
-              null,
-              RequestWillBeSentEvent(
-                requestId: network.RequestId(''),
-                loaderId: network.LoaderId(''),
-                documentURL: '',
-                request: RequestData(
-                    url: '',
-                    method: '',
-                    headers: Headers({}),
-                    initialPriority: network.ResourcePriority.medium,
-                    referrerPolicy: network.RequestReferrerPolicy.noReferrer),
-                timestamp: network.MonotonicTime(0),
-                wallTime: network.TimeSinceEpoch(0),
-                initiator: network.Initiator(type: InitiatorType.other),
-                redirectHasExtraInfo: false,
+            apis.fetch,
+            null,
+            null,
+            RequestWillBeSentEvent(
+              requestId: network.RequestId(''),
+              loaderId: network.LoaderId(''),
+              documentURL: '',
+              request: RequestData(
+                url: '',
+                method: '',
+                headers: Headers({}),
+                initialPriority: network.ResourcePriority.medium,
+                referrerPolicy: network.RequestReferrerPolicy.noReferrer,
               ),
-              redirectChain: [],
-              allowInterception: false),
+              timestamp: network.MonotonicTime(0),
+              wallTime: network.TimeSinceEpoch(0),
+              initiator: network.Initiator(type: InitiatorType.other),
+              redirectHasExtraInfo: false,
+            ),
+            redirectChain: [],
+            allowInterception: false,
+          ),
       ResponseData(
-          url: '',
-          status: 0,
-          statusText: '',
-          headers: Headers({}),
-          mimeType: '',
-          connectionReused: false,
-          connectionId: 0,
-          encodedDataLength: 0,
-          securityState: SecurityState.unknown,
-          charset: 'utf8'),
+        url: '',
+        status: 0,
+        statusText: '',
+        headers: Headers({}),
+        mimeType: '',
+        connectionReused: false,
+        connectionId: 0,
+        encodedDataLength: 0,
+        securityState: SecurityState.unknown,
+        charset: 'utf8',
+      ),
     );
   }
 
@@ -606,8 +638,9 @@ class Response {
   Future<dynamic>? get content {
     _contentFuture ??= _bodyLoadedCompleter.future.then((error) async {
       if (error is Exception) throw error;
-      var response = await _networkApi
-          .getResponseBody(network.RequestId(request.requestId));
+      var response = await _networkApi.getResponseBody(
+        network.RequestId(request.requestId),
+      );
       if (response.base64Encoded) {
         return base64.decode(response.body);
       } else {
@@ -618,12 +651,16 @@ class Response {
   }
 
   /// Promise which resolves to the bytes with response body.
-  Future<List<int>> get bytes => content!.then((content) =>
-      content is List<int> ? content : utf8.encode(content as String));
+  Future<List<int>> get bytes => content!.then(
+    (content) =>
+        content is List<int> ? content : utf8.encode(content as String),
+  );
 
   /// Promise which resolves to a text representation of response body.
-  Future<String> get text => content!.then((content) =>
-      content is String ? content : utf8.decode(content as List<int>));
+  Future<String> get text => content!.then(
+    (content) =>
+        content is String ? content : utf8.decode(content as List<int>),
+  );
 
   /// This method will throw if the response body is not parsable via `jsonDecode`.
   Future<dynamic> get json => text.then(jsonDecode);

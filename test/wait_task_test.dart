@@ -66,46 +66,58 @@ void main() {
       await page.evaluate('() => window.__FOO = 1');
       await watchdog;
     });
-    test('should work when resolved right before execution context disposal',
-        () async {
-      await page.evaluateOnNewDocument('() => window.__RELOADED = true');
-      await page.waitForFunction('''() => {
+    test(
+      'should work when resolved right before execution context disposal',
+      () async {
+        await page.evaluateOnNewDocument('() => window.__RELOADED = true');
+        await page.waitForFunction('''() => {
   if (!window.__RELOADED)
     window.location.reload();
   return true;
 }''');
-    });
+      },
+    );
     test('should poll on interval', () async {
       var success = false;
       var startTime = DateTime.now();
       var polling = 100;
       var watchdog = page
-          .waitForFunction("() => window.__FOO === 'hit'",
-              polling: Polling.interval(Duration(milliseconds: polling)))
+          .waitForFunction(
+            "() => window.__FOO === 'hit'",
+            polling: Polling.interval(Duration(milliseconds: polling)),
+          )
           .then((_) => success = true);
       await page.evaluate("() => window.__FOO = 'hit'");
       expect(success, isFalse);
       await page.evaluate(
-          "() => document.body.appendChild(document.createElement('div'))");
+        "() => document.body.appendChild(document.createElement('div'))",
+      );
       await watchdog;
-      expect(DateTime.now().difference(startTime),
-          isNot(lessThan(Duration(milliseconds: polling ~/ 2))));
+      expect(
+        DateTime.now().difference(startTime),
+        isNot(lessThan(Duration(milliseconds: polling ~/ 2))),
+      );
     });
     test('should poll on mutation', () async {
       var success = false;
       var watchdog = page
-          .waitForFunction("() => window.__FOO === 'hit'",
-              polling: Polling.mutation)
+          .waitForFunction(
+            "() => window.__FOO === 'hit'",
+            polling: Polling.mutation,
+          )
           .then((_) => success = true);
       await page.evaluate("() => window.__FOO = 'hit'");
       expect(success, isFalse);
       await page.evaluate(
-          "() => document.body.appendChild(document.createElement('div'))");
+        "() => document.body.appendChild(document.createElement('div'))",
+      );
       await watchdog;
     });
     test('should poll on raf', () async {
-      var watchdog = page.waitForFunction("() => window.__FOO === 'hit'",
-          polling: Polling.everyFrame);
+      var watchdog = page.waitForFunction(
+        "() => window.__FOO === 'hit'",
+        polling: Polling.everyFrame,
+      );
       await page.evaluate("() => window.__FOO = 'hit'");
       await watchdog;
     });
@@ -119,25 +131,27 @@ void main() {
       await page.setContent('<div></div>');
       var div = await page.$('div');
       var resolved = false;
-      var waitForFunction = page.waitForFunction(
-          'element => !element.parentElement',
-          args: [div]).then((_) => resolved = true);
+      var waitForFunction = page
+          .waitForFunction('element => !element.parentElement', args: [div])
+          .then((_) => resolved = true);
       expect(resolved, isFalse);
       await page.evaluate('element => element.remove()', args: [div]);
       await waitForFunction;
     });
     test('should respect timeout', () async {
       expect(
-          () => page.waitForFunction('false',
-              timeout: Duration(milliseconds: 10)),
-          throwsA(TypeMatcher<TimeoutException>()));
+        () =>
+            page.waitForFunction('false', timeout: Duration(milliseconds: 10)),
+        throwsA(TypeMatcher<TimeoutException>()),
+      );
     });
     test('should respect default timeout', () async {
       page.defaultTimeout = Duration(milliseconds: 1);
       expect(
-          () => page.waitForFunction('false',
-              timeout: Duration(milliseconds: 10)),
-          throwsA(TypeMatcher<TimeoutException>()));
+        () =>
+            page.waitForFunction('false', timeout: Duration(milliseconds: 10)),
+        throwsA(TypeMatcher<TimeoutException>()),
+      );
     });
     test('should disable timeout when its set to 0', () async {
       var watchdog = page.waitForFunction('''() => {
@@ -189,8 +203,10 @@ void main() {
       var handle = await waitFutures(page.waitForSelector('.zombo'), [
         page.setContent("<div class='zombo'>anything</div>"),
       ]);
-      expect(await page.evaluate('x => x.textContent', args: [handle]),
-          'anything');
+      expect(
+        await page.evaluate('x => x.textContent', args: [handle]),
+        'anything',
+      );
     });
 
     test('should resolve promise when node is added', () async {
@@ -209,7 +225,8 @@ void main() {
       var watchdog = page.waitForSelector('h3 div');
       await page.evaluate(addElement, args: ['span']);
       await page.evaluate(
-          "() => document.querySelector('span').innerHTML = '<h3><div></div></h3>'");
+        "() => document.querySelector('span').innerHTML = '<h3><div></div></h3>'",
+      );
       await watchdog;
     });
 
@@ -244,19 +261,22 @@ void main() {
           .waitForSelector('.box')
           .then<ElementHandle?>((e) => e)
           .catchError((e) {
-        waitError = e;
-        return null;
-      });
+            waitError = e;
+            return null;
+          });
       await detachFrame(page, 'frame1');
       await waitPromise;
       expect(waitError, isNotNull);
-      expect(waitError.toString(),
-          contains('waitForFunction failed: frame got detached.'));
+      expect(
+        waitError.toString(),
+        contains('waitForFunction failed: frame got detached.'),
+      );
     });
     test('should survive cross-process navigation', () async {
       var boxFound = false;
-      var waitForSelector =
-          page.waitForSelector('.box').then((_) => boxFound = true);
+      var waitForSelector = page
+          .waitForSelector('.box')
+          .then((_) => boxFound = true);
       await page.goto(server.emptyPage);
       expect(boxFound, isFalse);
       await page.reload();
@@ -271,13 +291,16 @@ void main() {
           .waitForSelector('div', visible: true)
           .then((_) => divFound = true);
       await page.setContent(
-          "<div style='display: none; visibility: hidden;'>1</div>");
+        "<div style='display: none; visibility: hidden;'>1</div>",
+      );
       expect(divFound, isFalse);
       await page.evaluate(
-          "() => document.querySelector('div').style.removeProperty('display')");
+        "() => document.querySelector('div').style.removeProperty('display')",
+      );
       expect(divFound, isFalse);
       await page.evaluate(
-          "() => document.querySelector('div').style.removeProperty('visibility')");
+        "() => document.querySelector('div').style.removeProperty('visibility')",
+      );
       expect(await waitForSelector, isTrue);
       expect(divFound, isTrue);
     });
@@ -287,13 +310,16 @@ void main() {
           .waitForSelector('div#inner', visible: true)
           .then((_) => divVisible = true);
       await page.setContent(
-          """<div style='display: none; visibility: hidden;'><div id="inner">hi</div></div>""");
+        """<div style='display: none; visibility: hidden;'><div id="inner">hi</div></div>""",
+      );
       expect(divVisible, isFalse);
       await page.evaluate(
-          "() => document.querySelector('div').style.removeProperty('display')");
+        "() => document.querySelector('div').style.removeProperty('display')",
+      );
       expect(divVisible, isFalse);
       await page.evaluate(
-          "() => document.querySelector('div').style.removeProperty('visibility')");
+        "() => document.querySelector('div').style.removeProperty('visibility')",
+      );
       expect(await waitForSelector, isTrue);
       expect(divVisible, isTrue);
     });
@@ -306,7 +332,8 @@ void main() {
       await page.waitForSelector('div'); // do a round trip
       expect(divHidden, isFalse);
       await page.evaluate(
-          "() => document.querySelector('div').style.setProperty('visibility', 'hidden')");
+        "() => document.querySelector('div').style.setProperty('visibility', 'hidden')",
+      );
       expect(await waitForSelector, isTrue);
       expect(divHidden, isTrue);
     });
@@ -319,7 +346,8 @@ void main() {
       await page.waitForSelector('div'); // do a round trip
       expect(divHidden, isFalse);
       await page.evaluate(
-          "() => document.querySelector('div').style.setProperty('display', 'none')");
+        "() => document.querySelector('div').style.setProperty('display', 'none')",
+      );
       expect(await waitForSelector, isTrue);
       expect(divHidden, isTrue);
     });
@@ -335,44 +363,56 @@ void main() {
       expect(await waitForSelector, isTrue);
       expect(divRemoved, isTrue);
     });
-    test('should return null if waiting to hide non-existing element',
-        () async {
-      var handle = await page.waitForSelector('non-existing', hidden: true);
-      expect(handle, isNull);
-    });
+    test(
+      'should return null if waiting to hide non-existing element',
+      () async {
+        var handle = await page.waitForSelector('non-existing', hidden: true);
+        expect(handle, isNull);
+      },
+    );
     test('should respect timeout', () async {
       expect(
-          () =>
-              page.waitForSelector('div', timeout: Duration(milliseconds: 10)),
-          throwsA(TypeMatcher<TimeoutException>()));
+        () => page.waitForSelector('div', timeout: Duration(milliseconds: 10)),
+        throwsA(TypeMatcher<TimeoutException>()),
+      );
     });
     test(
-        'should have an error message specifically for awaiting an element to be hidden',
-        () async {
-      await page.setContent('<div></div>');
-      expect(
-          () => page.waitForSelector('div',
-              hidden: true, timeout: Duration(milliseconds: 10)),
-          throwsA(TypeMatcher<TimeoutException>()));
-    });
+      'should have an error message specifically for awaiting an element to be hidden',
+      () async {
+        await page.setContent('<div></div>');
+        expect(
+          () => page.waitForSelector(
+            'div',
+            hidden: true,
+            timeout: Duration(milliseconds: 10),
+          ),
+          throwsA(TypeMatcher<TimeoutException>()),
+        );
+      },
+    );
 
     test('should respond to node attribute mutation', () async {
       var divFound = false;
-      var waitForSelector =
-          page.waitForSelector('.zombo').then((_) => divFound = true);
+      var waitForSelector = page
+          .waitForSelector('.zombo')
+          .then((_) => divFound = true);
       await page.setContent("<div class='notZombo'></div>");
       expect(divFound, isFalse);
-      await page
-          .evaluate("() => document.querySelector('div').className = 'zombo'");
+      await page.evaluate(
+        "() => document.querySelector('div').className = 'zombo'",
+      );
       expect(await waitForSelector, isTrue);
     });
     test('should return the element handle', () async {
       var waitForSelector = page.waitForSelector('.zombo');
       await page.setContent("<div class='zombo'>anything</div>");
       expect(
-          await page
-              .evaluate('x => x.textContent', args: [await waitForSelector]),
-          'anything');
+        await page.evaluate(
+          'x => x.textContent',
+          args: [await waitForSelector],
+        ),
+        'anything',
+      );
     });
     test('should disable timeout if Duration.zero is passed', () async {
       var page = await browser.newPage();
@@ -380,14 +420,17 @@ void main() {
       var frame = page.mainFrame;
       var completed = false;
       Object? error;
-      unawaited(frame
-          .waitForSelector('noexist', timeout: Duration.zero)
-          .whenComplete(() async {
-        completed = true;
-      }).catchError((e) {
-        error = e;
-        return null;
-      }));
+      unawaited(
+        frame
+            .waitForSelector('noexist', timeout: Duration.zero)
+            .whenComplete(() async {
+              completed = true;
+            })
+            .catchError((e) {
+              error = e;
+              return null;
+            }),
+      );
       await Future.delayed(const Duration(milliseconds: 500));
       expect(completed, false);
       await page.close();
@@ -402,11 +445,13 @@ void main() {
 
     test('should support some fancy xpath', () async {
       await page.setContent('<p>red herring</p><p>hello  world  </p>');
-      var waitForXPath =
-          page.waitForXPath('//p[normalize-space(.)="hello world"]');
+      var waitForXPath = page.waitForXPath(
+        '//p[normalize-space(.)="hello world"]',
+      );
       expect(
-          await page.evaluate('x => x.textContent', args: [await waitForXPath]),
-          equals('hello  world  '));
+        await page.evaluate('x => x.textContent', args: [await waitForXPath]),
+        equals('hello  world  '),
+      );
     });
     test('should run in specified frame', () async {
       await attachFrame(page, 'frame1', server.emptyPage);
@@ -430,8 +475,10 @@ void main() {
       await detachFrame(page, 'frame1');
       await waitPromise;
       expect(waitError, isNotNull);
-      expect('$waitError',
-          contains('waitForFunction failed: frame got detached.'));
+      expect(
+        '$waitError',
+        contains('waitForFunction failed: frame got detached.'),
+      );
     });
     test('hidden should wait for display: none', () async {
       var divHidden = false;
@@ -442,7 +489,8 @@ void main() {
       await page.waitForXPath('//div'); // do a round trip
       expect(divHidden, isFalse);
       await page.evaluate(
-          "() => document.querySelector('div').style.setProperty('display', 'none')");
+        "() => document.querySelector('div').style.setProperty('display', 'none')",
+      );
       expect(await waitForXPath, isTrue);
       expect(divHidden, isTrue);
     });
@@ -450,8 +498,9 @@ void main() {
       var waitForXPath = page.waitForXPath('//*[@class="zombo"]');
       await page.setContent("<div class='zombo'>anything</div>");
       expect(
-          await page.evaluate('x => x.textContent', args: [await waitForXPath]),
-          equals('anything'));
+        await page.evaluate('x => x.textContent', args: [await waitForXPath]),
+        equals('anything'),
+      );
     });
     test('should allow you to select a text node', () async {
       await page.setContent('<div>some text</div>');
@@ -462,8 +511,9 @@ void main() {
       await page.setContent('<div>some text</div>');
       var waitForXPath = page.waitForXPath('/html/body/div');
       expect(
-          await page.evaluate('x => x.textContent', args: [await waitForXPath]),
-          equals('some text'));
+        await page.evaluate('x => x.textContent', args: [await waitForXPath]),
+        equals('some text'),
+      );
     });
   });
 }

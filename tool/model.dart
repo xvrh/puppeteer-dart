@@ -16,9 +16,10 @@ class Protocol {
   final List<Domain> domains;
 
   Protocol.fromJson(Map<String, dynamic> json)
-      : domains = (json['domains'] as List)
-            .map((j) => Domain.fromJson(j as Map<String, dynamic>))
-            .toList();
+    : domains =
+          (json['domains'] as List)
+              .map((j) => Domain.fromJson(j as Map<String, dynamic>))
+              .toList();
 
   factory Protocol.fromString(String protocol) =>
       Protocol.fromJson(jsonDecode(protocol) as Map<String, dynamic>);
@@ -33,25 +34,32 @@ class Domain {
   final bool deprecated;
 
   Domain.fromJson(Map<String, dynamic> json)
-      : name = json['domain'] as String,
-        description = json['description'] as String?,
-        types = json.containsKey('types')
-            ? (json['types'] as List)
-                .map((j) => ComplexType.fromJson(
-                    j as Map<String, dynamic>, json['domain'] as String?))
-                .toList()
-            : const [],
-        commands = json.containsKey('commands')
-            ? (json['commands'] as List)
-                .map((j) => Command.fromJson(j as Map<String, dynamic>))
-                .toList()
-            : const [],
-        events = json.containsKey('events')
-            ? (json['events'] as List)
-                .map((j) => Event.fromJson(j as Map<String, dynamic>))
-                .toList()
-            : const [],
-        deprecated = json['deprecated'] as bool? ?? false;
+    : name = json['domain'] as String,
+      description = json['description'] as String?,
+      types =
+          json.containsKey('types')
+              ? (json['types'] as List)
+                  .map(
+                    (j) => ComplexType.fromJson(
+                      j as Map<String, dynamic>,
+                      json['domain'] as String?,
+                    ),
+                  )
+                  .toList()
+              : const [],
+      commands =
+          json.containsKey('commands')
+              ? (json['commands'] as List)
+                  .map((j) => Command.fromJson(j as Map<String, dynamic>))
+                  .toList()
+              : const [],
+      events =
+          json.containsKey('events')
+              ? (json['events'] as List)
+                  .map((j) => Event.fromJson(j as Map<String, dynamic>))
+                  .toList()
+              : const [],
+      deprecated = json['deprecated'] as bool? ?? false;
 }
 
 class ComplexType {
@@ -63,30 +71,32 @@ class ComplexType {
   final List<String>? enums;
   final ListItems? items;
 
-  ComplexType(
-      {required String id,
-      this.properties = const [],
-      this.description,
-      this.type = '',
-      this.enums,
-      this.items})
-      : id = _aliases[id] ?? id,
-        rawId = id;
+  ComplexType({
+    required String id,
+    this.properties = const [],
+    this.description,
+    this.type = '',
+    this.enums,
+    this.items,
+  }) : id = _aliases[id] ?? id,
+       rawId = id;
 
   ComplexType.fromJson(Map<dynamic, dynamic> json, String? domain)
-      : id = _aliases[json['id'] as String] ?? json['id'] as String,
-        rawId = json['id'] as String,
-        description = json['description'] as String?,
-        type = json['type'] as String? ?? '',
-        properties = json.containsKey('properties')
-            ? (json['properties'] as List)
-                .map((j) => Parameter.fromJson(j as Map<String, dynamic>))
-                .toList()
-            : const [],
-        enums = (json['enum'] as List?)?.cast<String>(),
-        items = json.containsKey('items')
-            ? ListItems.fromJson(json['items'] as Map<String, dynamic>)
-            : null;
+    : id = _aliases[json['id'] as String] ?? json['id'] as String,
+      rawId = json['id'] as String,
+      description = json['description'] as String?,
+      type = json['type'] as String? ?? '',
+      properties =
+          json.containsKey('properties')
+              ? (json['properties'] as List)
+                  .map((j) => Parameter.fromJson(j as Map<String, dynamic>))
+                  .toList()
+              : const [],
+      enums = (json['enum'] as List?)?.cast<String>(),
+      items =
+          json.containsKey('items')
+              ? ListItems.fromJson(json['items'] as Map<String, dynamic>)
+              : null;
 }
 
 class Command {
@@ -97,19 +107,21 @@ class Command {
   final bool deprecated;
 
   Command.fromJson(Map<String, dynamic> json)
-      : name = json['name'] as String,
-        description = json['description'] as String?,
-        deprecated = json['deprecated'] as bool? ?? false,
-        parameters = json.containsKey('parameters')
-            ? (json['parameters'] as List)
-                .map((j) => Parameter.fromJson(j as Map<String, dynamic>))
-                .toList()
-            : const [],
-        returns = json.containsKey('returns')
-            ? (json['returns'] as List)
-                .map((j) => Parameter.fromJson(j as Map<String, dynamic>))
-                .toList()
-            : const [];
+    : name = json['name'] as String,
+      description = json['description'] as String?,
+      deprecated = json['deprecated'] as bool? ?? false,
+      parameters =
+          json.containsKey('parameters')
+              ? (json['parameters'] as List)
+                  .map((j) => Parameter.fromJson(j as Map<String, dynamic>))
+                  .toList()
+              : const [],
+      returns =
+          json.containsKey('returns')
+              ? (json['returns'] as List)
+                  .map((j) => Parameter.fromJson(j as Map<String, dynamic>))
+                  .toList()
+              : const [];
 }
 
 class Event {
@@ -118,13 +130,14 @@ class Event {
   final List<Parameter> parameters;
 
   Event.fromJson(Map<String, dynamic> json)
-      : name = json['name'] as String,
-        description = json['description'] as String?,
-        parameters = json.containsKey('parameters')
-            ? (json['parameters'] as List)
-                .map((j) => Parameter.fromJson(j as Map<String, dynamic>))
-                .toList()
-            : const [];
+    : name = json['name'] as String,
+      description = json['description'] as String?,
+      parameters =
+          json.containsKey('parameters')
+              ? (json['parameters'] as List)
+                  .map((j) => Parameter.fromJson(j as Map<String, dynamic>))
+                  .toList()
+              : const [];
 }
 
 String? _ref(String? ref) {
@@ -163,36 +176,39 @@ class Parameter implements Typed {
   @override
   final String? ref;
 
-  Parameter(
-      {required this.name,
-      this.description,
-      this.type,
-      String? ref,
-      this.optional = false,
-      this.deprecated = false,
-      this.items,
-      this.enumValues})
-      : ref = _ref(ref);
+  Parameter({
+    required this.name,
+    this.description,
+    this.type,
+    String? ref,
+    this.optional = false,
+    this.deprecated = false,
+    this.items,
+    this.enumValues,
+  }) : ref = _ref(ref);
 
   Parameter.fromJson(Map<String, dynamic> json)
-      : name = json['name'] as String,
-        description = json['description'] as String?,
-        type = json['type'] as String?,
-        ref = _ref(json[r'$ref'] as String?),
-        optional = json['optional'] as bool? ?? false,
-        deprecated = json['deprecated'] as bool? ?? false,
-        items = json.containsKey('items')
-            ? ListItems.fromJson(json['items'] as Map<String, dynamic>)
-            : null,
-        enumValues = json.containsKey('enum')
-            ? (json['enum'] as List).cast<String>()
-            : null;
+    : name = json['name'] as String,
+      description = json['description'] as String?,
+      type = json['type'] as String?,
+      ref = _ref(json[r'$ref'] as String?),
+      optional = json['optional'] as bool? ?? false,
+      deprecated = json['deprecated'] as bool? ?? false,
+      items =
+          json.containsKey('items')
+              ? ListItems.fromJson(json['items'] as Map<String, dynamic>)
+              : null,
+      enumValues =
+          json.containsKey('enum')
+              ? (json['enum'] as List).cast<String>()
+              : null;
 
   String? get normalizedName => preventKeywords(lowerCamel(splitWords(name)));
 
-  String get deprecatedAttribute => deprecated
-      ? '@Deprecated(${escapeDartString(deprecatedDocumentation(description) ?? 'This parameter is deprecated')})'
-      : '';
+  String get deprecatedAttribute =>
+      deprecated
+          ? '@Deprecated(${escapeDartString(deprecatedDocumentation(description) ?? 'This parameter is deprecated')})'
+          : '';
 }
 
 class ListItems implements Typed {
@@ -203,8 +219,8 @@ class ListItems implements Typed {
   final String? ref;
 
   ListItems.fromJson(Map<String, dynamic> json)
-      : type = json['type'] as String?,
-        ref = _ref(json[r'$ref'] as String?);
+    : type = json['type'] as String?,
+      ref = _ref(json[r'$ref'] as String?);
 }
 
 abstract class Typed {
@@ -226,7 +242,7 @@ const Set<String> _dartKeywords = {
   'const', 'final', 'rethrow', 'while',
   'continue', 'finally', 'return', 'with',
   'covariant', 'for', 'yield',
-  'default', 'static' //
+  'default', 'static', //
 };
 
 String preventKeywords(String input) {

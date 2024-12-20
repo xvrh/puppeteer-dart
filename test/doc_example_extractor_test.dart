@@ -41,17 +41,22 @@ main() async {
 
     expect(snippets[5].target, equals('Page.class'));
     expect(snippets[5].index, equals(1));
-    expect(snippets[5].code,
-        equals("page.onLoad.listen((_) => print('Page loaded!'));"));
+    expect(
+      snippets[5].code,
+      equals("page.onLoad.listen((_) => print('Page loaded!'));"),
+    );
 
     expect(snippets[8].target, equals('Frame.Seval'));
-    expect(snippets[8].code, equals(r'''
+    expect(
+      snippets[8].code,
+      equals(r'''
 var searchValue =
     await frame.$eval('#search', 'function (el) { return el.value; }');
 var preloadHref = await frame.$eval(
     'link[rel=preload]', 'function (el) { return el.href; }');
 var html = await frame.$eval(
-    '.main-container', 'function (e) { return e.outerHTML; }');'''));
+    '.main-container', 'function (e) { return e.outerHTML; }');'''),
+    );
   });
 
   test('Replace examples', () {
@@ -63,36 +68,45 @@ var html = await frame.$eval(
   });
 
   test('Replace simple exampleValue', () {
-    expect(CodeSnippet.fixCode(r'''
+    expect(
+      CodeSnippet.fixCode(r'''
 await page.goto(exampleValue(server.hostUrl, 'https://example.com'));
 await browser.close();
-    '''), equals(r'''
+    '''),
+      equals(r'''
 await page.goto('https://example.com');
-await browser.close();'''));
+await browser.close();'''),
+    );
   });
 
   test('Replace import', () {
-    expect(CodeSnippet.fixCode(r'''
+    expect(
+      CodeSnippet.fixCode(r'''
 //+import 'dart:io';
 //+import 'package:puppeteer/puppeteer.dart';
 
 main() async {
   var browser = await puppeteer.launch();
 }
-    '''), equals(r'''
+    '''),
+      equals(r'''
 import 'dart:io';
 import 'package:puppeteer/puppeteer.dart';
 
 main() async {
   var browser = await puppeteer.launch();
-}'''));
+}'''),
+    );
   });
 
   test('Replace exampleValue remove string interpolation', () {
-    expect(CodeSnippet.fixCode(r'''
+    expect(
+      CodeSnippet.fixCode(r'''
 await page.evaluate("() => window.open('${exampleValue(server.hostUrl, 'https://example.com')}/')");
-    '''), equals(r'''
-await page.evaluate("() => window.open('https://example.com/')");'''));
+    '''),
+      equals(r'''
+await page.evaluate("() => window.open('https://example.com/')");'''),
+    );
   });
 }
 

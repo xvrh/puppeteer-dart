@@ -14,9 +14,12 @@ class HeapProfilerApi {
   /// If heap objects tracking has been started then backend may send update for one or more fragments
   Stream<List<int>> get onHeapStatsUpdate => _client.onEvent
       .where((event) => event.name == 'HeapProfiler.heapStatsUpdate')
-      .map((event) => (event.parameters['statsUpdate'] as List)
-          .map((e) => e as int)
-          .toList());
+      .map(
+        (event) =>
+            (event.parameters['statsUpdate'] as List)
+                .map((e) => e as int)
+                .toList(),
+      );
 
   /// If heap objects tracking has been started then backend regularly sends a current value for last
   /// seen object id and corresponding timestamp. If the were changes in the heap since last event
@@ -27,13 +30,17 @@ class HeapProfilerApi {
 
   Stream<ReportHeapSnapshotProgressEvent> get onReportHeapSnapshotProgress =>
       _client.onEvent
-          .where((event) =>
-              event.name == 'HeapProfiler.reportHeapSnapshotProgress')
-          .map((event) =>
-              ReportHeapSnapshotProgressEvent.fromJson(event.parameters));
+          .where(
+            (event) => event.name == 'HeapProfiler.reportHeapSnapshotProgress',
+          )
+          .map(
+            (event) =>
+                ReportHeapSnapshotProgressEvent.fromJson(event.parameters),
+          );
 
-  Stream<void> get onResetProfiles => _client.onEvent
-      .where((event) => event.name == 'HeapProfiler.resetProfiles');
+  Stream<void> get onResetProfiles => _client.onEvent.where(
+    (event) => event.name == 'HeapProfiler.resetProfiles',
+  );
 
   /// Enables console to refer to the node with given id via $x (see Command Line API for more details
   /// $x functions).
@@ -59,32 +66,37 @@ class HeapProfilerApi {
   /// [objectId] Identifier of the object to get heap object id for.
   /// Returns: Id of the heap snapshot object corresponding to the passed remote object id.
   Future<HeapSnapshotObjectId> getHeapObjectId(
-      runtime.RemoteObjectId objectId) async {
+    runtime.RemoteObjectId objectId,
+  ) async {
     var result = await _client.send('HeapProfiler.getHeapObjectId', {
       'objectId': objectId,
     });
     return HeapSnapshotObjectId.fromJson(
-        result['heapSnapshotObjectId'] as String);
+      result['heapSnapshotObjectId'] as String,
+    );
   }
 
   /// [objectGroup] Symbolic group name that can be used to release multiple objects.
   /// Returns: Evaluation result.
   Future<runtime.RemoteObject> getObjectByHeapObjectId(
-      HeapSnapshotObjectId objectId,
-      {String? objectGroup}) async {
+    HeapSnapshotObjectId objectId, {
+    String? objectGroup,
+  }) async {
     var result = await _client.send('HeapProfiler.getObjectByHeapObjectId', {
       'objectId': objectId,
       if (objectGroup != null) 'objectGroup': objectGroup,
     });
     return runtime.RemoteObject.fromJson(
-        result['result'] as Map<String, dynamic>);
+      result['result'] as Map<String, dynamic>,
+    );
   }
 
   /// Returns: Return the sampling profile being collected.
   Future<SamplingHeapProfile> getSamplingProfile() async {
     var result = await _client.send('HeapProfiler.getSamplingProfile');
     return SamplingHeapProfile.fromJson(
-        result['profile'] as Map<String, dynamic>);
+      result['profile'] as Map<String, dynamic>,
+    );
   }
 
   /// [samplingInterval] Average sample interval in bytes. Poisson distribution is used for the intervals. The
@@ -103,10 +115,11 @@ class HeapProfilerApi {
   /// heap profiler to also include information about objects discarded by
   /// minor GC, which is useful when tuning a latency-sensitive application
   /// for minimal GC activity.
-  Future<void> startSampling(
-      {num? samplingInterval,
-      bool? includeObjectsCollectedByMajorGC,
-      bool? includeObjectsCollectedByMinorGC}) async {
+  Future<void> startSampling({
+    num? samplingInterval,
+    bool? includeObjectsCollectedByMajorGC,
+    bool? includeObjectsCollectedByMinorGC,
+  }) async {
     await _client.send('HeapProfiler.startSampling', {
       if (samplingInterval != null) 'samplingInterval': samplingInterval,
       if (includeObjectsCollectedByMajorGC != null)
@@ -126,19 +139,20 @@ class HeapProfilerApi {
   Future<SamplingHeapProfile> stopSampling() async {
     var result = await _client.send('HeapProfiler.stopSampling');
     return SamplingHeapProfile.fromJson(
-        result['profile'] as Map<String, dynamic>);
+      result['profile'] as Map<String, dynamic>,
+    );
   }
 
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken
   /// when the tracking is stopped.
   /// [captureNumericValue] If true, numerical values are included in the snapshot
   /// [exposeInternals] If true, exposes internals of the snapshot.
-  Future<void> stopTrackingHeapObjects(
-      {bool? reportProgress,
-      @Deprecated('This parameter is deprecated')
-      bool? treatGlobalObjectsAsRoots,
-      bool? captureNumericValue,
-      bool? exposeInternals}) async {
+  Future<void> stopTrackingHeapObjects({
+    bool? reportProgress,
+    @Deprecated('This parameter is deprecated') bool? treatGlobalObjectsAsRoots,
+    bool? captureNumericValue,
+    bool? exposeInternals,
+  }) async {
     await _client.send('HeapProfiler.stopTrackingHeapObjects', {
       if (reportProgress != null) 'reportProgress': reportProgress,
       if (treatGlobalObjectsAsRoots != null)
@@ -152,12 +166,12 @@ class HeapProfilerApi {
   /// [reportProgress] If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken.
   /// [captureNumericValue] If true, numerical values are included in the snapshot
   /// [exposeInternals] If true, exposes internals of the snapshot.
-  Future<void> takeHeapSnapshot(
-      {bool? reportProgress,
-      @Deprecated('This parameter is deprecated')
-      bool? treatGlobalObjectsAsRoots,
-      bool? captureNumericValue,
-      bool? exposeInternals}) async {
+  Future<void> takeHeapSnapshot({
+    bool? reportProgress,
+    @Deprecated('This parameter is deprecated') bool? treatGlobalObjectsAsRoots,
+    bool? captureNumericValue,
+    bool? exposeInternals,
+  }) async {
     await _client.send('HeapProfiler.takeHeapSnapshot', {
       if (reportProgress != null) 'reportProgress': reportProgress,
       if (treatGlobalObjectsAsRoots != null)
@@ -174,8 +188,10 @@ class LastSeenObjectIdEvent {
 
   final num timestamp;
 
-  LastSeenObjectIdEvent(
-      {required this.lastSeenObjectId, required this.timestamp});
+  LastSeenObjectIdEvent({
+    required this.lastSeenObjectId,
+    required this.timestamp,
+  });
 
   factory LastSeenObjectIdEvent.fromJson(Map<String, dynamic> json) {
     return LastSeenObjectIdEvent(
@@ -192,8 +208,11 @@ class ReportHeapSnapshotProgressEvent {
 
   final bool? finished;
 
-  ReportHeapSnapshotProgressEvent(
-      {required this.done, required this.total, this.finished});
+  ReportHeapSnapshotProgressEvent({
+    required this.done,
+    required this.total,
+    this.finished,
+  });
 
   factory ReportHeapSnapshotProgressEvent.fromJson(Map<String, dynamic> json) {
     return ReportHeapSnapshotProgressEvent(
@@ -226,22 +245,27 @@ class SamplingHeapProfileNode {
   /// Child nodes.
   final List<SamplingHeapProfileNode> children;
 
-  SamplingHeapProfileNode(
-      {required this.callFrame,
-      required this.selfSize,
-      required this.id,
-      required this.children});
+  SamplingHeapProfileNode({
+    required this.callFrame,
+    required this.selfSize,
+    required this.id,
+    required this.children,
+  });
 
   factory SamplingHeapProfileNode.fromJson(Map<String, dynamic> json) {
     return SamplingHeapProfileNode(
-      callFrame:
-          runtime.CallFrame.fromJson(json['callFrame'] as Map<String, dynamic>),
+      callFrame: runtime.CallFrame.fromJson(
+        json['callFrame'] as Map<String, dynamic>,
+      ),
       selfSize: json['selfSize'] as num,
       id: json['id'] as int,
-      children: (json['children'] as List)
-          .map((e) =>
-              SamplingHeapProfileNode.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      children:
+          (json['children'] as List)
+              .map(
+                (e) =>
+                    SamplingHeapProfileNode.fromJson(e as Map<String, dynamic>),
+              )
+              .toList(),
     );
   }
 
@@ -267,8 +291,11 @@ class SamplingHeapProfileSample {
   /// between startSampling and stopSampling.
   final num ordinal;
 
-  SamplingHeapProfileSample(
-      {required this.size, required this.nodeId, required this.ordinal});
+  SamplingHeapProfileSample({
+    required this.size,
+    required this.nodeId,
+    required this.ordinal,
+  });
 
   factory SamplingHeapProfileSample.fromJson(Map<String, dynamic> json) {
     return SamplingHeapProfileSample(
@@ -279,11 +306,7 @@ class SamplingHeapProfileSample {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'size': size,
-      'nodeId': nodeId,
-      'ordinal': ordinal,
-    };
+    return {'size': size, 'nodeId': nodeId, 'ordinal': ordinal};
   }
 }
 
@@ -298,11 +321,16 @@ class SamplingHeapProfile {
   factory SamplingHeapProfile.fromJson(Map<String, dynamic> json) {
     return SamplingHeapProfile(
       head: SamplingHeapProfileNode.fromJson(
-          json['head'] as Map<String, dynamic>),
-      samples: (json['samples'] as List)
-          .map((e) =>
-              SamplingHeapProfileSample.fromJson(e as Map<String, dynamic>))
-          .toList(),
+        json['head'] as Map<String, dynamic>,
+      ),
+      samples:
+          (json['samples'] as List)
+              .map(
+                (e) => SamplingHeapProfileSample.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
     );
   }
 

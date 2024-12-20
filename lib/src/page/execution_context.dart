@@ -11,8 +11,10 @@ import 'js_handle.dart';
 import 'page.dart';
 
 const evaluationScriptUrl = '__puppeteer_evaluation_script__';
-final RegExp sourceUrlRegExp =
-    RegExp(r'^[\040\t]*//[@#] sourceURL=\s*(\S*?)\s*$', multiLine: true);
+final RegExp sourceUrlRegExp = RegExp(
+  r'^[\040\t]*//[@#] sourceURL=\s*(\S*?)\s*$',
+  multiLine: true,
+);
 
 /// The class represents a context for JavaScript execution. A [Page] might have
 /// many execution contexts:
@@ -32,9 +34,9 @@ class ExecutionContext {
   final DomWorld? world;
 
   ExecutionContext(this.client, this.context, this.world)
-      : runtimeApi = RuntimeApi(client),
-        domApi = DOMApi(client),
-        pageApi = PageApi(client);
+    : runtimeApi = RuntimeApi(client),
+      domApi = DOMApi(client),
+      pageApi = PageApi(client);
 
   /// Frame associated with this execution context.
   ///
@@ -70,11 +72,16 @@ class ExecutionContext {
   /// - [args]:  Arguments to pass to `pageFunction`
   ///
   /// Returns [Future] which resolves to the return value of `pageFunction`
-  Future<T> evaluate<T>(@Language('js') String pageFunction,
-      {List<dynamic>? args}) async {
+  Future<T> evaluate<T>(
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) async {
     try {
-      var result = await _evaluateInternal<T>(pageFunction,
-          args: args, returnByValue: true);
+      var result = await _evaluateInternal<T>(
+        pageFunction,
+        args: args,
+        returnByValue: true,
+      );
       return result;
     } catch (error) {
       if (error is ServerException &&
@@ -104,26 +111,33 @@ class ExecutionContext {
   /// A string can also be passed in instead of a function.
   ///
   /// ```dart
-  /// var aHandle =
-  ///     await context.evaluateHandle('1 + 2'); // Handle for the '3' object.
+  /// var aHandle = await context.evaluateHandle(
+  ///   '1 + 2',
+  /// ); // Handle for the '3' object.
   /// ```
   ///
   /// [JSHandle] instances can be passed as arguments to the `executionContext.evaluateHandle`:
   /// ```dart
   /// var aHandle = await context.evaluateHandle('() => document.body');
-  /// var resultHandle =
-  ///     await context.evaluateHandle('body => body.innerHTML', args: [aHandle]);
+  /// var resultHandle = await context.evaluateHandle(
+  ///   'body => body.innerHTML',
+  ///   args: [aHandle],
+  /// );
   /// print(await resultHandle.jsonValue); // prints body's innerHTML
   /// await aHandle.dispose();
   /// await resultHandle.dispose();
   /// ```
   Future<T> evaluateHandle<T extends JsHandle>(
-          @Language('js') String pageFunction,
-          {List<dynamic>? args}) async =>
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) async =>
       await _evaluateInternal(pageFunction, args: args, returnByValue: false);
 
-  Future<T> _evaluateInternal<T>(@Language('js') String pageFunction,
-      {List<dynamic>? args, required bool returnByValue}) async {
+  Future<T> _evaluateInternal<T>(
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+    required bool returnByValue,
+  }) async {
     // Try to convert a function shorthand (ie: '(el) => el.value;' to a full
     // function declaration (function(el) { return el.value; })
     // If it can't parse the shorthand function, it considers it as a
@@ -134,44 +148,52 @@ class ExecutionContext {
 
     try {
       if (functionDeclaration == null) {
-        assert(args == null || args.isEmpty,
-            "Javascript expression can't have arguments ($pageFunction)");
+        assert(
+          args == null || args.isEmpty,
+          "Javascript expression can't have arguments ($pageFunction)",
+        );
 
-        var pageFunctionWithSourceUrl = sourceUrlRegExp.hasMatch(pageFunction)
-            ? pageFunction
-            : '$pageFunction\n$suffix';
+        var pageFunctionWithSourceUrl =
+            sourceUrlRegExp.hasMatch(pageFunction)
+                ? pageFunction
+                : '$pageFunction\n$suffix';
 
-        var response = await runtimeApi.evaluate(pageFunctionWithSourceUrl,
-            contextId: context.id,
-            returnByValue: returnByValue,
-            awaitPromise: true,
-            userGesture: true);
+        var response = await runtimeApi.evaluate(
+          pageFunctionWithSourceUrl,
+          contextId: context.id,
+          returnByValue: returnByValue,
+          awaitPromise: true,
+          userGesture: true,
+        );
 
         if (response.exceptionDetails != null) {
           throw ClientError(response.exceptionDetails!);
         }
 
         return (returnByValue
-            ? valueFromRemoteObject(response.result)
-            : _createHandle(response.result)) as T;
+                ? valueFromRemoteObject(response.result)
+                : _createHandle(response.result))
+            as T;
       } else {
         args ??= [];
 
         var result = await runtimeApi.callFunctionOn(
-            '$functionDeclaration\n$suffix\n',
-            executionContextId: context.id,
-            arguments: args.map(_convertArgument).toList(),
-            returnByValue: returnByValue,
-            awaitPromise: true,
-            userGesture: true);
+          '$functionDeclaration\n$suffix\n',
+          executionContextId: context.id,
+          arguments: args.map(_convertArgument).toList(),
+          returnByValue: returnByValue,
+          awaitPromise: true,
+          userGesture: true,
+        );
 
         if (result.exceptionDetails != null) {
           throw ClientError(result.exceptionDetails!);
         }
 
         return (returnByValue
-            ? valueFromRemoteObject(result.result)
-            : _createHandle(result.result)) as T;
+                ? valueFromRemoteObject(result.result)
+                : _createHandle(result.result))
+            as T;
       }
     } on ServerException catch (e) {
       if (e.message.contains('Cannot find context with specified id') ||
@@ -193,8 +215,10 @@ class ExecutionContext {
       }
       if (arg.isInfinite) {
         return CallArgument(
-            unserializableValue:
-                UnserializableValue("${arg.isNegative ? '-' : ''}Infinity"));
+          unserializableValue: UnserializableValue(
+            "${arg.isNegative ? '-' : ''}Infinity",
+          ),
+        );
       }
       if (arg.isNaN) {
         return CallArgument(unserializableValue: UnserializableValue('NaN'));
@@ -203,14 +227,16 @@ class ExecutionContext {
     if (arg is JsHandle) {
       if (arg.executionContext != this) {
         throw Exception(
-            'JSHandles can be evaluated only in the context they were created!');
+          'JSHandles can be evaluated only in the context they were created!',
+        );
       }
       if (arg.isDisposed) {
         throw Exception('JSHandle is disposed!');
       }
       if (arg.remoteObject.unserializableValue != null) {
         return CallArgument(
-            unserializableValue: arg.remoteObject.unserializableValue);
+          unserializableValue: arg.remoteObject.unserializableValue,
+        );
       }
       if (arg.remoteObject.objectId != null) {
         return CallArgument(objectId: arg.remoteObject.objectId);
@@ -229,27 +255,34 @@ class ExecutionContext {
     }
     if (prototypeHandle.remoteObject.objectId == null) {
       throw Exception(
-          'Prototype JSHandle must not be referencing primitive value');
+        'Prototype JSHandle must not be referencing primitive value',
+      );
     }
-    var response =
-        await runtimeApi.queryObjects(prototypeHandle.remoteObject.objectId!);
+    var response = await runtimeApi.queryObjects(
+      prototypeHandle.remoteObject.objectId!,
+    );
 
     return _createHandle(response);
   }
 
   Future<ElementHandle> adoptBackendNodeId(BackendNodeId backendNodeId) async {
     var object = await domApi.resolveNode(
-        backendNodeId: backendNodeId, executionContextId: context.id);
+      backendNodeId: backendNodeId,
+      executionContextId: context.id,
+    );
     return _createHandle(object) as ElementHandle;
   }
 
   Future<ElementHandle> adoptElementHandle(ElementHandle elementHandle) async {
-    assert(elementHandle.executionContext != this,
-        'Cannot adopt handle that already belongs to this execution context');
+    assert(
+      elementHandle.executionContext != this,
+      'Cannot adopt handle that already belongs to this execution context',
+    );
     assert(world != null, 'Cannot adopt handle without DOMWorld');
 
     var nodeInfo = await domApi.describeNode(
-        objectId: elementHandle.remoteObject.objectId);
+      objectId: elementHandle.remoteObject.objectId,
+    );
     return adoptBackendNodeId(nodeInfo.backendNodeId);
   }
 

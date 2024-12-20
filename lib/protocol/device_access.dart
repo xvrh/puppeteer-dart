@@ -33,9 +33,7 @@ class DeviceAccessApi {
 
   /// Cancel a prompt in response to a DeviceAccess.deviceRequestPrompted event.
   Future<void> cancelPrompt(RequestId id) async {
-    await _client.send('DeviceAccess.cancelPrompt', {
-      'id': id,
-    });
+    await _client.send('DeviceAccess.cancelPrompt', {'id': id});
   }
 }
 
@@ -49,9 +47,10 @@ class DeviceRequestPromptedEvent {
   factory DeviceRequestPromptedEvent.fromJson(Map<String, dynamic> json) {
     return DeviceRequestPromptedEvent(
       id: RequestId.fromJson(json['id'] as String),
-      devices: (json['devices'] as List)
-          .map((e) => PromptDevice.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      devices:
+          (json['devices'] as List)
+              .map((e) => PromptDevice.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 }
@@ -87,9 +86,6 @@ class PromptDevice {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id.toJson(),
-      'name': name,
-    };
+    return {'id': id.toJson(), 'name': name};
   }
 }

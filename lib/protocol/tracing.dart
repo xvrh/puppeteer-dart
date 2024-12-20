@@ -15,9 +15,12 @@ class TracingApi {
   /// sent as a sequence of dataCollected events followed by tracingComplete event.
   Stream<List<Map<String, dynamic>>> get onDataCollected => _client.onEvent
       .where((event) => event.name == 'Tracing.dataCollected')
-      .map((event) => (event.parameters['value'] as List)
-          .map((e) => e as Map<String, dynamic>)
-          .toList());
+      .map(
+        (event) =>
+            (event.parameters['value'] as List)
+                .map((e) => e as Map<String, dynamic>)
+                .toList(),
+      );
 
   /// Signals that tracing is stopped and there is no trace buffers pending flush, all data were
   /// delivered via dataCollected events.
@@ -40,16 +43,16 @@ class TracingApi {
   /// Record a clock sync marker in the trace.
   /// [syncId] The ID of this clock sync marker
   Future<void> recordClockSyncMarker(String syncId) async {
-    await _client.send('Tracing.recordClockSyncMarker', {
-      'syncId': syncId,
-    });
+    await _client.send('Tracing.recordClockSyncMarker', {'syncId': syncId});
   }
 
   /// Request a global memory dump.
   /// [deterministic] Enables more deterministic results by forcing garbage collection
   /// [levelOfDetail] Specifies level of details in memory dump. Defaults to "detailed".
-  Future<RequestMemoryDumpResult> requestMemoryDump(
-      {bool? deterministic, MemoryDumpLevelOfDetail? levelOfDetail}) async {
+  Future<RequestMemoryDumpResult> requestMemoryDump({
+    bool? deterministic,
+    MemoryDumpLevelOfDetail? levelOfDetail,
+  }) async {
     var result = await _client.send('Tracing.requestMemoryDump', {
       if (deterministic != null) 'deterministic': deterministic,
       if (levelOfDetail != null) 'levelOfDetail': levelOfDetail,
@@ -69,18 +72,21 @@ class TracingApi {
   /// When specified, the parameters `categories`, `options`, `traceConfig`
   /// are ignored.
   /// [tracingBackend] Backend type (defaults to `auto`)
-  Future<void> start(
-      {@Deprecated('This parameter is deprecated') String? categories,
-      @Deprecated('This parameter is deprecated') String? options,
-      num? bufferUsageReportingInterval,
-      @Enum(['ReportEvents', 'ReturnAsStream']) String? transferMode,
-      StreamFormat? streamFormat,
-      StreamCompression? streamCompression,
-      TraceConfig? traceConfig,
-      String? perfettoConfig,
-      TracingBackend? tracingBackend}) async {
-    assert(transferMode == null ||
-        const ['ReportEvents', 'ReturnAsStream'].contains(transferMode));
+  Future<void> start({
+    @Deprecated('This parameter is deprecated') String? categories,
+    @Deprecated('This parameter is deprecated') String? options,
+    num? bufferUsageReportingInterval,
+    @Enum(['ReportEvents', 'ReturnAsStream']) String? transferMode,
+    StreamFormat? streamFormat,
+    StreamCompression? streamCompression,
+    TraceConfig? traceConfig,
+    String? perfettoConfig,
+    TracingBackend? tracingBackend,
+  }) async {
+    assert(
+      transferMode == null ||
+          const ['ReportEvents', 'ReturnAsStream'].contains(transferMode),
+    );
     await _client.send('Tracing.start', {
       if (categories != null) 'categories': categories,
       if (options != null) 'options': options,
@@ -135,24 +141,28 @@ class TracingCompleteEvent {
   /// Compression format of returned stream.
   final StreamCompression? streamCompression;
 
-  TracingCompleteEvent(
-      {required this.dataLossOccurred,
-      this.stream,
-      this.traceFormat,
-      this.streamCompression});
+  TracingCompleteEvent({
+    required this.dataLossOccurred,
+    this.stream,
+    this.traceFormat,
+    this.streamCompression,
+  });
 
   factory TracingCompleteEvent.fromJson(Map<String, dynamic> json) {
     return TracingCompleteEvent(
       dataLossOccurred: json['dataLossOccurred'] as bool? ?? false,
-      stream: json.containsKey('stream')
-          ? io.StreamHandle.fromJson(json['stream'] as String)
-          : null,
-      traceFormat: json.containsKey('traceFormat')
-          ? StreamFormat.fromJson(json['traceFormat'] as String)
-          : null,
-      streamCompression: json.containsKey('streamCompression')
-          ? StreamCompression.fromJson(json['streamCompression'] as String)
-          : null,
+      stream:
+          json.containsKey('stream')
+              ? io.StreamHandle.fromJson(json['stream'] as String)
+              : null,
+      traceFormat:
+          json.containsKey('traceFormat')
+              ? StreamFormat.fromJson(json['traceFormat'] as String)
+              : null,
+      streamCompression:
+          json.containsKey('streamCompression')
+              ? StreamCompression.fromJson(json['streamCompression'] as String)
+              : null,
     );
   }
 }
@@ -211,51 +221,64 @@ class TraceConfig {
   /// Configuration for memory dump triggers. Used only when "memory-infra" category is enabled.
   final MemoryDumpConfig? memoryDumpConfig;
 
-  TraceConfig(
-      {this.recordMode,
-      this.traceBufferSizeInKb,
-      this.enableSampling,
-      this.enableSystrace,
-      this.enableArgumentFilter,
-      this.includedCategories,
-      this.excludedCategories,
-      this.syntheticDelays,
-      this.memoryDumpConfig});
+  TraceConfig({
+    this.recordMode,
+    this.traceBufferSizeInKb,
+    this.enableSampling,
+    this.enableSystrace,
+    this.enableArgumentFilter,
+    this.includedCategories,
+    this.excludedCategories,
+    this.syntheticDelays,
+    this.memoryDumpConfig,
+  });
 
   factory TraceConfig.fromJson(Map<String, dynamic> json) {
     return TraceConfig(
-      recordMode: json.containsKey('recordMode')
-          ? TraceConfigRecordMode.fromJson(json['recordMode'] as String)
-          : null,
-      traceBufferSizeInKb: json.containsKey('traceBufferSizeInKb')
-          ? json['traceBufferSizeInKb'] as num
-          : null,
-      enableSampling: json.containsKey('enableSampling')
-          ? json['enableSampling'] as bool
-          : null,
-      enableSystrace: json.containsKey('enableSystrace')
-          ? json['enableSystrace'] as bool
-          : null,
-      enableArgumentFilter: json.containsKey('enableArgumentFilter')
-          ? json['enableArgumentFilter'] as bool
-          : null,
-      includedCategories: json.containsKey('includedCategories')
-          ? (json['includedCategories'] as List)
-              .map((e) => e as String)
-              .toList()
-          : null,
-      excludedCategories: json.containsKey('excludedCategories')
-          ? (json['excludedCategories'] as List)
-              .map((e) => e as String)
-              .toList()
-          : null,
-      syntheticDelays: json.containsKey('syntheticDelays')
-          ? (json['syntheticDelays'] as List).map((e) => e as String).toList()
-          : null,
-      memoryDumpConfig: json.containsKey('memoryDumpConfig')
-          ? MemoryDumpConfig.fromJson(
-              json['memoryDumpConfig'] as Map<String, dynamic>)
-          : null,
+      recordMode:
+          json.containsKey('recordMode')
+              ? TraceConfigRecordMode.fromJson(json['recordMode'] as String)
+              : null,
+      traceBufferSizeInKb:
+          json.containsKey('traceBufferSizeInKb')
+              ? json['traceBufferSizeInKb'] as num
+              : null,
+      enableSampling:
+          json.containsKey('enableSampling')
+              ? json['enableSampling'] as bool
+              : null,
+      enableSystrace:
+          json.containsKey('enableSystrace')
+              ? json['enableSystrace'] as bool
+              : null,
+      enableArgumentFilter:
+          json.containsKey('enableArgumentFilter')
+              ? json['enableArgumentFilter'] as bool
+              : null,
+      includedCategories:
+          json.containsKey('includedCategories')
+              ? (json['includedCategories'] as List)
+                  .map((e) => e as String)
+                  .toList()
+              : null,
+      excludedCategories:
+          json.containsKey('excludedCategories')
+              ? (json['excludedCategories'] as List)
+                  .map((e) => e as String)
+                  .toList()
+              : null,
+      syntheticDelays:
+          json.containsKey('syntheticDelays')
+              ? (json['syntheticDelays'] as List)
+                  .map((e) => e as String)
+                  .toList()
+              : null,
+      memoryDumpConfig:
+          json.containsKey('memoryDumpConfig')
+              ? MemoryDumpConfig.fromJson(
+                json['memoryDumpConfig'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 
@@ -283,8 +306,7 @@ enum TraceConfigRecordMode {
   recordUntilFull('recordUntilFull'),
   recordContinuously('recordContinuously'),
   recordAsMuchAsPossible('recordAsMuchAsPossible'),
-  echoToConsole('echoToConsole'),
-  ;
+  echoToConsole('echoToConsole');
 
   final String value;
 
@@ -303,8 +325,7 @@ enum TraceConfigRecordMode {
 /// protocol buffer format. Note that the JSON format will be deprecated soon.
 enum StreamFormat {
   json('json'),
-  proto('proto'),
-  ;
+  proto('proto');
 
   final String value;
 
@@ -322,8 +343,7 @@ enum StreamFormat {
 /// Compression type to use for traces returned via streams.
 enum StreamCompression {
   none('none'),
-  gzip('gzip'),
-  ;
+  gzip('gzip');
 
   final String value;
 
@@ -344,8 +364,7 @@ enum StreamCompression {
 enum MemoryDumpLevelOfDetail {
   background('background'),
   light('light'),
-  detailed('detailed'),
-  ;
+  detailed('detailed');
 
   final String value;
 
@@ -368,8 +387,7 @@ enum MemoryDumpLevelOfDetail {
 enum TracingBackend {
   auto('auto'),
   chrome('chrome'),
-  system('system'),
-  ;
+  system('system');
 
   final String value;
 

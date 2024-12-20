@@ -17,9 +17,10 @@ String firstLetterLower(String src) {
 }
 
 String lowerCamel(Iterable<String> input) {
-  return _mapWithIndex<String, String>(input,
-          (s, index) => index != 0 ? firstLetterUpper(s) : s.toLowerCase())
-      .join('');
+  return _mapWithIndex<String, String>(
+    input,
+    (s, index) => index != 0 ? firstLetterUpper(s) : s.toLowerCase(),
+  ).join('');
 }
 
 String upperCamel(Iterable<String> input) {
@@ -35,7 +36,9 @@ String snakeCase(Iterable<String> input) {
 }
 
 Iterable<T> _mapWithIndex<E, T>(
-    Iterable<E> collection, T Function(E, int) f) sync* {
+  Iterable<E> collection,
+  T Function(E, int) f,
+) sync* {
   var index = 0;
   for (var element in collection) {
     yield f(element, index);

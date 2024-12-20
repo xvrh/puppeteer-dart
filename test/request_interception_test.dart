@@ -68,21 +68,23 @@ void main() {
       ''');
       await Future.wait([
         page.$eval('form', 'form => form.submit()'),
-        page.waitForNavigation()
+        page.waitForNavigation(),
       ]);
     });
     // @see https://github.com/GoogleChrome/puppeteer/issues/3973
-    test('should work when header manipulation headers with redirect',
-        () async {
-      server.setRedirect('/rrredirect', '/empty.html');
-      await page.setRequestInterception(true);
-      page.onRequest.listen((request) {
-        var headers = Map<String, String>.from(request.headers)
-          ..['foo'] = 'bar';
-        request.continueRequest(headers: headers);
-      });
-      await page.goto(server.prefix + '/rrredirect');
-    });
+    test(
+      'should work when header manipulation headers with redirect',
+      () async {
+        server.setRedirect('/rrredirect', '/empty.html');
+        await page.setRequestInterception(true);
+        page.onRequest.listen((request) {
+          var headers = Map<String, String>.from(request.headers)
+            ..['foo'] = 'bar';
+          request.continueRequest(headers: headers);
+        });
+        await page.goto(server.prefix + '/rrredirect');
+      },
+    );
     // @see https://github.com/GoogleChrome/puppeteer/issues/4743
     test('should be able to remove headers', () async {
       await page.setRequestInterception(true);
@@ -94,8 +96,9 @@ void main() {
       });
 
       var serverRequest = await waitFutures(
-          server.waitForRequest('/empty.html'),
-          [page.goto(server.prefix + '/empty.html')]);
+        server.waitForRequest('/empty.html'),
+        [page.goto(server.prefix + '/empty.html')],
+      );
 
       expect(serverRequest.headers['origin'], isNull);
     });
@@ -110,22 +113,25 @@ void main() {
       expect(requests[1].url, contains('/one-style.css'));
       expect(requests[1].headers['referer'], contains('/one-style.html'));
     });
-    test('should properly return navigation response when URL has cookies',
-        () async {
-      // Setup cookie.
-      await page.goto(server.emptyPage);
-      await page.setCookies([CookieParam(name: 'foo', value: 'bar')]);
+    test(
+      'should properly return navigation response when URL has cookies',
+      () async {
+        // Setup cookie.
+        await page.goto(server.emptyPage);
+        await page.setCookies([CookieParam(name: 'foo', value: 'bar')]);
 
-      // Setup request interception.
-      await page.setRequestInterception(true);
-      page.onRequest.listen((request) => request.continueRequest());
-      var response = await page.reload();
-      expect(response.status, equals(200));
-    });
+        // Setup request interception.
+        await page.setRequestInterception(true);
+        page.onRequest.listen((request) => request.continueRequest());
+        var response = await page.reload();
+        expect(response.status, equals(200));
+      },
+    );
     test('should stop intercepting', () async {
       await page.setRequestInterception(true);
-      var interception =
-          page.onRequest.listen((request) => request.continueRequest());
+      var interception = page.onRequest.listen(
+        (request) => request.continueRequest(),
+      );
       await page.goto(server.emptyPage);
       await page.setRequestInterception(false);
       await interception.cancel();
@@ -209,8 +215,10 @@ void main() {
     test('should fail navigation when aborting main resource', () async {
       await page.setRequestInterception(true);
       page.onRequest.listen((request) => request.abort());
-      expect(() => page.goto(server.emptyPage),
-          throwsA(predicate((e) => '$e'.contains('net::ERR_FAILED'))));
+      expect(
+        () => page.goto(server.emptyPage),
+        throwsA(predicate((e) => '$e'.contains('net::ERR_FAILED'))),
+      );
     });
     test('should work with redirects', () async {
       await page.setRequestInterception(true);
@@ -220,11 +228,17 @@ void main() {
         requests.add(request);
       });
       server.setRedirect(
-          '/non-existing-page.html', '/non-existing-page-2.html');
+        '/non-existing-page.html',
+        '/non-existing-page-2.html',
+      );
       server.setRedirect(
-          '/non-existing-page-2.html', '/non-existing-page-3.html');
+        '/non-existing-page-2.html',
+        '/non-existing-page-3.html',
+      );
       server.setRedirect(
-          '/non-existing-page-3.html', '/non-existing-page-4.html');
+        '/non-existing-page-3.html',
+        '/non-existing-page-4.html',
+      );
       server.setRedirect('/non-existing-page-4.html', '/empty.html');
       var response = await page.goto(server.prefix + '/non-existing-page.html');
       expect(response.status, equals(200));
@@ -252,8 +266,10 @@ void main() {
       server.setRedirect('/one-style.css', '/two-style.css');
       server.setRedirect('/two-style.css', '/three-style.css');
       server.setRedirect('/three-style.css', '/four-style.css');
-      server.setRoute('/four-style.css',
-          (req) => shelf.Response.ok('body {box-sizing: border-box; }'));
+      server.setRoute(
+        '/four-style.css',
+        (req) => shelf.Response.ok('body {box-sizing: border-box; }'),
+      );
 
       var response = await page.goto(server.prefix + '/one-style.html');
       expect(response.status, equals(200));
@@ -292,7 +308,9 @@ void main() {
       await page.goto(server.emptyPage);
       var responseCount = 1;
       server.setRoute(
-          '/zzz', (req) => shelf.Response.ok('${(responseCount++) * 11}'));
+        '/zzz',
+        (req) => shelf.Response.ok('${(responseCount++) * 11}'),
+      );
       await page.setRequestInterception(true);
 
       var spinner = false;
@@ -334,26 +352,30 @@ void main() {
         request.continueRequest();
       });
       var dataURL = 'data:text/html,<div>yo</div>';
-      var text = await page
-          .evaluate('url => fetch(url).then(r => r.text())', args: [dataURL]);
+      var text = await page.evaluate(
+        'url => fetch(url).then(r => r.text())',
+        args: [dataURL],
+      );
       expect(requests, hasLength(1));
       expect(requests[0].url, equals(dataURL));
       expect(text, equals('<div>yo</div>'));
     });
-    test('should navigate to URL with hash and and fire requests without hash',
-        () async {
-      await page.setRequestInterception(true);
-      var requests = <Request>[];
-      page.onRequest.listen((request) {
-        requests.add(request);
-        request.continueRequest();
-      });
-      var response = await page.goto(server.emptyPage + '#hash');
-      expect(response.status, equals(200));
-      expect(response.url, equals(server.emptyPage));
-      expect(requests.length, equals(1));
-      expect(requests[0].url, equals(server.emptyPage));
-    });
+    test(
+      'should navigate to URL with hash and and fire requests without hash',
+      () async {
+        await page.setRequestInterception(true);
+        var requests = <Request>[];
+        page.onRequest.listen((request) {
+          requests.add(request);
+          request.continueRequest();
+        });
+        var response = await page.goto(server.emptyPage + '#hash');
+        expect(response.status, equals(200));
+        expect(response.url, equals(server.emptyPage));
+        expect(requests.length, equals(1));
+        expect(requests[0].url, equals(server.emptyPage));
+      },
+    );
     test('should work with encoded server', () async {
       // The requestWillBeSent will report encoded URL, whereas interception will
       // report URL as-is. @see crbug.com/759388
@@ -379,30 +401,35 @@ void main() {
         requests.add(request);
       });
       var response = await page.goto(
-          'data:text/html,<link rel="stylesheet" href="${server.prefix}/fonts?helvetica|arial"/>');
+        'data:text/html,<link rel="stylesheet" href="${server.prefix}/fonts?helvetica|arial"/>',
+      );
       await Future.delayed(const Duration(milliseconds: 100));
       expect(response.status, equals(200));
       expect(requests.length, equals(2));
       expect(requests[1].response, isNull);
     });
     test(
-        'should not throw Invalid Interception Id if the request was cancelled',
-        () async {
-      await page.setContent('<iframe></iframe>');
-      await page.setRequestInterception(true);
-      Request? request;
-      page.onRequest.listen((r) {
-        request = r;
-      });
-      // ignore: unawaited_futures
-      page.$eval('iframe', '(frame, url) => frame.src = url',
-          args: [server.emptyPage]);
-      // Wait for request interception.
-      await page.onRequest.first;
-      // Delete frame to cause request to be canceled.
-      await page.$eval('iframe', 'frame => frame.remove()');
-      await request!.continueRequest();
-    });
+      'should not throw Invalid Interception Id if the request was cancelled',
+      () async {
+        await page.setContent('<iframe></iframe>');
+        await page.setRequestInterception(true);
+        Request? request;
+        page.onRequest.listen((r) {
+          request = r;
+        });
+        // ignore: unawaited_futures
+        page.$eval(
+          'iframe',
+          '(frame, url) => frame.src = url',
+          args: [server.emptyPage],
+        );
+        // Wait for request interception.
+        await page.onRequest.first;
+        // Delete frame to cause request to be canceled.
+        await page.$eval('iframe', 'frame => frame.remove()');
+        await request!.continueRequest();
+      },
+    );
     test('should throw if interception is not enabled', () async {
       AssertionError? error;
       page.onRequest.listen((request) async {
@@ -422,9 +449,11 @@ void main() {
         urls.add(request.url.split('/').last);
         request.continueRequest();
       });
-      await page.goto(Uri.file(
-              File(p.join('test', 'assets', 'one-style.html')).absolute.path)
-          .toString());
+      await page.goto(
+        Uri.file(
+          File(p.join('test', 'assets', 'one-style.html')).absolute.path,
+        ).toString(),
+      );
       expect(urls.length, equals(2));
       expect(urls.contains('one-style.html'), isTrue);
       expect(urls.contains('one-style.css'), isTrue);
@@ -445,16 +474,18 @@ void main() {
         request.continueRequest(headers: headers);
       });
       await page.goto(server.emptyPage);
-      var request = await waitFutures(server.waitForRequest('/sleep.zzz'),
-          [page.evaluate("() => fetch('/sleep.zzz')")]);
+      var request = await waitFutures(server.waitForRequest('/sleep.zzz'), [
+        page.evaluate("() => fetch('/sleep.zzz')"),
+      ]);
       expect(request.headers['foo'], equals('bar'));
     });
     test('should redirect in a way non-observable to page', () async {
       await page.setRequestInterception(true);
       page.onRequest.listen((request) {
-        var redirectURL = request.url.contains('/empty.html')
-            ? server.prefix + '/consolelog.html'
-            : null;
+        var redirectURL =
+            request.url.contains('/empty.html')
+                ? server.prefix + '/consolelog.html'
+                : null;
         request.continueRequest(url: redirectURL);
       });
       ConsoleMessage? consoleMessage;
@@ -470,8 +501,9 @@ void main() {
       page.onRequest.listen((request) {
         request.continueRequest(method: 'POST');
       });
-      var request = await waitFutures(server.waitForRequest('/sleep.zzz'),
-          [page.evaluate("() => fetch('/sleep.zzz')")]);
+      var request = await waitFutures(server.waitForRequest('/sleep.zzz'), [
+        page.evaluate("() => fetch('/sleep.zzz')"),
+      ]);
       expect(request.method, equals('POST'));
     });
     test('should amend post data', () async {
@@ -486,11 +518,12 @@ void main() {
         body = await request.readAsString();
         return shelf.Response.ok('ok');
       });
-      var serverRequest = await waitFutures(
-          server.waitForRequest('/sleep.zzz'), [
-        page.evaluate(
-            "() => fetch('/sleep.zzz', { method: 'POST', body: 'birdy' })")
-      ]);
+      var serverRequest =
+          await waitFutures(server.waitForRequest('/sleep.zzz'), [
+            page.evaluate(
+              "() => fetch('/sleep.zzz', { method: 'POST', body: 'birdy' })",
+            ),
+          ]);
       expect(serverRequest, isNotNull);
       expect(body, equals('doggo'));
     });
@@ -504,10 +537,10 @@ void main() {
         body = await request.readAsString();
         return shelf.Response.ok('ok');
       });
-      var serverRequest =
-          await waitFutures(server.waitForRequest('/empty.html'), [
-        page.goto(server.emptyPage),
-      ]);
+      var serverRequest = await waitFutures(
+        server.waitForRequest('/empty.html'),
+        [page.goto(server.emptyPage)],
+      );
       expect(serverRequest.method, equals('POST'));
       expect(body, equals('doggo'));
     });
@@ -518,13 +551,18 @@ void main() {
       await page.setRequestInterception(true);
       page.onRequest.listen((request) {
         request.respond(
-            status: 201, headers: {'foo': 'bar'}, body: 'Yo, page!');
+          status: 201,
+          headers: {'foo': 'bar'},
+          body: 'Yo, page!',
+        );
       });
       var response = await page.goto(server.emptyPage);
       expect(response.status, equals(201));
       expect(response.headers['foo'], equals('bar'));
-      expect(await page.evaluate('() => document.body.textContent'),
-          equals('Yo, page!'));
+      expect(
+        await page.evaluate('() => document.body.textContent'),
+        equals('Yo, page!'),
+      );
     });
     test('should work with status code 422', () async {
       await page.setRequestInterception(true);
@@ -534,8 +572,10 @@ void main() {
       var response = await page.goto(server.emptyPage);
       expect(response.status, equals(422));
       expect(response.statusText, equals('Unprocessable Entity'));
-      expect(await page.evaluate('() => document.body.textContent'),
-          equals('Yo, page!'));
+      expect(
+        await page.evaluate('() => document.body.textContent'),
+        equals('Yo, page!'),
+      );
     });
     test('should redirect', () async {
       await page.setRequestInterception(true);
@@ -544,41 +584,44 @@ void main() {
           request.continueRequest();
           return;
         }
-        request.respond(
-          status: 302,
-          headers: {
-            'location': server.emptyPage,
-          },
-        );
+        request.respond(status: 302, headers: {'location': server.emptyPage});
       });
       var response = await page.goto(server.prefix + '/rrredirect');
       expect(response.request.redirectChain.length, equals(1));
-      expect(response.request.redirectChain[0].url,
-          equals(server.prefix + '/rrredirect'));
+      expect(
+        response.request.redirectChain[0].url,
+        equals(server.prefix + '/rrredirect'),
+      );
       expect(response.url, equals(server.emptyPage));
     });
     test('should allow mocking binary responses', () async {
-      await page.emulate(Device('Laptop with MDPI screen',
+      await page.emulate(
+        Device(
+          'Laptop with MDPI screen',
           userAgent: '',
-          viewport: DeviceViewport(
-            width: 800,
-            height: 1280,
-          )));
+          viewport: DeviceViewport(width: 800, height: 1280),
+        ),
+      );
       await page.setRequestInterception(true);
       page.onRequest.listen((request) {
         var imageBuffer =
             File(p.join('test', 'assets', 'pptr.png')).readAsBytesSync();
         request.respond(contentType: 'image/png', body: imageBuffer);
       });
-      await page.evaluate('''PREFIX => {
+      await page.evaluate(
+        '''PREFIX => {
       var img = document.createElement('img');
       img.src = PREFIX + '/does-not-exist.png';
       document.body.appendChild(img);
       return new Promise(fulfill => img.onload = fulfill);
-      }''', args: [server.prefix]);
+      }''',
+        args: [server.prefix],
+      );
       var img = await page.$('img');
-      expect(await img.screenshot(),
-          equalsGolden('test/golden/mock-binary-response.png'));
+      expect(
+        await img.screenshot(),
+        equalsGolden('test/golden/mock-binary-response.png'),
+      );
     }, tags: ['golden']);
   });
 }

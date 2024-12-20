@@ -7,16 +7,16 @@ part of 'generate_devices.dart';
 // **************************************************************************
 
 Device _$DeviceFromJson(Map<String, dynamic> json) => Device(
-      json['name'] as String,
-      json['userAgent'] as String,
-      DeviceViewport.fromJson(json['viewport'] as Map<String, dynamic>),
-    );
+  json['name'] as String,
+  json['userAgent'] as String,
+  DeviceViewport.fromJson(json['viewport'] as Map<String, dynamic>),
+);
 
 Map<String, dynamic> _$DeviceToJson(Device instance) => <String, dynamic>{
-      'name': instance.name,
-      'userAgent': instance.userAgent,
-      'viewport': instance.viewport,
-    };
+  'name': instance.name,
+  'userAgent': instance.userAgent,
+  'viewport': instance.viewport,
+};
 
 DeviceViewport _$DeviceViewportFromJson(Map<String, dynamic> json) =>
     DeviceViewport(
