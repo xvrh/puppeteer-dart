@@ -11,60 +11,80 @@ class WebAudioApi {
   /// Notifies that a new BaseAudioContext has been created.
   Stream<BaseAudioContext> get onContextCreated => _client.onEvent
       .where((event) => event.name == 'WebAudio.contextCreated')
-      .map((event) => BaseAudioContext.fromJson(
-          event.parameters['context'] as Map<String, dynamic>));
+      .map(
+        (event) => BaseAudioContext.fromJson(
+          event.parameters['context'] as Map<String, dynamic>,
+        ),
+      );
 
   /// Notifies that an existing BaseAudioContext will be destroyed.
   Stream<GraphObjectId> get onContextWillBeDestroyed => _client.onEvent
       .where((event) => event.name == 'WebAudio.contextWillBeDestroyed')
-      .map((event) =>
-          GraphObjectId.fromJson(event.parameters['contextId'] as String));
+      .map(
+        (event) =>
+            GraphObjectId.fromJson(event.parameters['contextId'] as String),
+      );
 
   /// Notifies that existing BaseAudioContext has changed some properties (id stays the same)..
   Stream<BaseAudioContext> get onContextChanged => _client.onEvent
       .where((event) => event.name == 'WebAudio.contextChanged')
-      .map((event) => BaseAudioContext.fromJson(
-          event.parameters['context'] as Map<String, dynamic>));
+      .map(
+        (event) => BaseAudioContext.fromJson(
+          event.parameters['context'] as Map<String, dynamic>,
+        ),
+      );
 
   /// Notifies that the construction of an AudioListener has finished.
   Stream<AudioListener> get onAudioListenerCreated => _client.onEvent
       .where((event) => event.name == 'WebAudio.audioListenerCreated')
-      .map((event) => AudioListener.fromJson(
-          event.parameters['listener'] as Map<String, dynamic>));
+      .map(
+        (event) => AudioListener.fromJson(
+          event.parameters['listener'] as Map<String, dynamic>,
+        ),
+      );
 
   /// Notifies that a new AudioListener has been created.
   Stream<AudioListenerWillBeDestroyedEvent>
-      get onAudioListenerWillBeDestroyed => _client.onEvent
-          .where(
-              (event) => event.name == 'WebAudio.audioListenerWillBeDestroyed')
-          .map((event) =>
-              AudioListenerWillBeDestroyedEvent.fromJson(event.parameters));
+  get onAudioListenerWillBeDestroyed => _client.onEvent
+      .where((event) => event.name == 'WebAudio.audioListenerWillBeDestroyed')
+      .map(
+        (event) => AudioListenerWillBeDestroyedEvent.fromJson(event.parameters),
+      );
 
   /// Notifies that a new AudioNode has been created.
   Stream<AudioNode> get onAudioNodeCreated => _client.onEvent
       .where((event) => event.name == 'WebAudio.audioNodeCreated')
-      .map((event) =>
-          AudioNode.fromJson(event.parameters['node'] as Map<String, dynamic>));
+      .map(
+        (event) => AudioNode.fromJson(
+          event.parameters['node'] as Map<String, dynamic>,
+        ),
+      );
 
   /// Notifies that an existing AudioNode has been destroyed.
   Stream<AudioNodeWillBeDestroyedEvent> get onAudioNodeWillBeDestroyed =>
       _client.onEvent
           .where((event) => event.name == 'WebAudio.audioNodeWillBeDestroyed')
-          .map((event) =>
-              AudioNodeWillBeDestroyedEvent.fromJson(event.parameters));
+          .map(
+            (event) => AudioNodeWillBeDestroyedEvent.fromJson(event.parameters),
+          );
 
   /// Notifies that a new AudioParam has been created.
   Stream<AudioParam> get onAudioParamCreated => _client.onEvent
       .where((event) => event.name == 'WebAudio.audioParamCreated')
-      .map((event) => AudioParam.fromJson(
-          event.parameters['param'] as Map<String, dynamic>));
+      .map(
+        (event) => AudioParam.fromJson(
+          event.parameters['param'] as Map<String, dynamic>,
+        ),
+      );
 
   /// Notifies that an existing AudioParam has been destroyed.
   Stream<AudioParamWillBeDestroyedEvent> get onAudioParamWillBeDestroyed =>
       _client.onEvent
           .where((event) => event.name == 'WebAudio.audioParamWillBeDestroyed')
-          .map((event) =>
-              AudioParamWillBeDestroyedEvent.fromJson(event.parameters));
+          .map(
+            (event) =>
+                AudioParamWillBeDestroyedEvent.fromJson(event.parameters),
+          );
 
   /// Notifies that two AudioNodes are connected.
   Stream<NodesConnectedEvent> get onNodesConnected => _client.onEvent
@@ -103,7 +123,8 @@ class WebAudioApi {
       'contextId': contextId,
     });
     return ContextRealtimeData.fromJson(
-        result['realtimeData'] as Map<String, dynamic>);
+      result['realtimeData'] as Map<String, dynamic>,
+    );
   }
 }
 
@@ -112,11 +133,14 @@ class AudioListenerWillBeDestroyedEvent {
 
   final GraphObjectId listenerId;
 
-  AudioListenerWillBeDestroyedEvent(
-      {required this.contextId, required this.listenerId});
+  AudioListenerWillBeDestroyedEvent({
+    required this.contextId,
+    required this.listenerId,
+  });
 
   factory AudioListenerWillBeDestroyedEvent.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return AudioListenerWillBeDestroyedEvent(
       contextId: GraphObjectId.fromJson(json['contextId'] as String),
       listenerId: GraphObjectId.fromJson(json['listenerId'] as String),
@@ -129,8 +153,10 @@ class AudioNodeWillBeDestroyedEvent {
 
   final GraphObjectId nodeId;
 
-  AudioNodeWillBeDestroyedEvent(
-      {required this.contextId, required this.nodeId});
+  AudioNodeWillBeDestroyedEvent({
+    required this.contextId,
+    required this.nodeId,
+  });
 
   factory AudioNodeWillBeDestroyedEvent.fromJson(Map<String, dynamic> json) {
     return AudioNodeWillBeDestroyedEvent(
@@ -147,8 +173,11 @@ class AudioParamWillBeDestroyedEvent {
 
   final GraphObjectId paramId;
 
-  AudioParamWillBeDestroyedEvent(
-      {required this.contextId, required this.nodeId, required this.paramId});
+  AudioParamWillBeDestroyedEvent({
+    required this.contextId,
+    required this.nodeId,
+    required this.paramId,
+  });
 
   factory AudioParamWillBeDestroyedEvent.fromJson(Map<String, dynamic> json) {
     return AudioParamWillBeDestroyedEvent(
@@ -170,24 +199,27 @@ class NodesConnectedEvent {
 
   final num? destinationInputIndex;
 
-  NodesConnectedEvent(
-      {required this.contextId,
-      required this.sourceId,
-      required this.destinationId,
-      this.sourceOutputIndex,
-      this.destinationInputIndex});
+  NodesConnectedEvent({
+    required this.contextId,
+    required this.sourceId,
+    required this.destinationId,
+    this.sourceOutputIndex,
+    this.destinationInputIndex,
+  });
 
   factory NodesConnectedEvent.fromJson(Map<String, dynamic> json) {
     return NodesConnectedEvent(
       contextId: GraphObjectId.fromJson(json['contextId'] as String),
       sourceId: GraphObjectId.fromJson(json['sourceId'] as String),
       destinationId: GraphObjectId.fromJson(json['destinationId'] as String),
-      sourceOutputIndex: json.containsKey('sourceOutputIndex')
-          ? json['sourceOutputIndex'] as num
-          : null,
-      destinationInputIndex: json.containsKey('destinationInputIndex')
-          ? json['destinationInputIndex'] as num
-          : null,
+      sourceOutputIndex:
+          json.containsKey('sourceOutputIndex')
+              ? json['sourceOutputIndex'] as num
+              : null,
+      destinationInputIndex:
+          json.containsKey('destinationInputIndex')
+              ? json['destinationInputIndex'] as num
+              : null,
     );
   }
 }
@@ -203,24 +235,27 @@ class NodesDisconnectedEvent {
 
   final num? destinationInputIndex;
 
-  NodesDisconnectedEvent(
-      {required this.contextId,
-      required this.sourceId,
-      required this.destinationId,
-      this.sourceOutputIndex,
-      this.destinationInputIndex});
+  NodesDisconnectedEvent({
+    required this.contextId,
+    required this.sourceId,
+    required this.destinationId,
+    this.sourceOutputIndex,
+    this.destinationInputIndex,
+  });
 
   factory NodesDisconnectedEvent.fromJson(Map<String, dynamic> json) {
     return NodesDisconnectedEvent(
       contextId: GraphObjectId.fromJson(json['contextId'] as String),
       sourceId: GraphObjectId.fromJson(json['sourceId'] as String),
       destinationId: GraphObjectId.fromJson(json['destinationId'] as String),
-      sourceOutputIndex: json.containsKey('sourceOutputIndex')
-          ? json['sourceOutputIndex'] as num
-          : null,
-      destinationInputIndex: json.containsKey('destinationInputIndex')
-          ? json['destinationInputIndex'] as num
-          : null,
+      sourceOutputIndex:
+          json.containsKey('sourceOutputIndex')
+              ? json['sourceOutputIndex'] as num
+              : null,
+      destinationInputIndex:
+          json.containsKey('destinationInputIndex')
+              ? json['destinationInputIndex'] as num
+              : null,
     );
   }
 }
@@ -234,20 +269,22 @@ class NodeParamConnectedEvent {
 
   final num? sourceOutputIndex;
 
-  NodeParamConnectedEvent(
-      {required this.contextId,
-      required this.sourceId,
-      required this.destinationId,
-      this.sourceOutputIndex});
+  NodeParamConnectedEvent({
+    required this.contextId,
+    required this.sourceId,
+    required this.destinationId,
+    this.sourceOutputIndex,
+  });
 
   factory NodeParamConnectedEvent.fromJson(Map<String, dynamic> json) {
     return NodeParamConnectedEvent(
       contextId: GraphObjectId.fromJson(json['contextId'] as String),
       sourceId: GraphObjectId.fromJson(json['sourceId'] as String),
       destinationId: GraphObjectId.fromJson(json['destinationId'] as String),
-      sourceOutputIndex: json.containsKey('sourceOutputIndex')
-          ? json['sourceOutputIndex'] as num
-          : null,
+      sourceOutputIndex:
+          json.containsKey('sourceOutputIndex')
+              ? json['sourceOutputIndex'] as num
+              : null,
     );
   }
 }
@@ -261,20 +298,22 @@ class NodeParamDisconnectedEvent {
 
   final num? sourceOutputIndex;
 
-  NodeParamDisconnectedEvent(
-      {required this.contextId,
-      required this.sourceId,
-      required this.destinationId,
-      this.sourceOutputIndex});
+  NodeParamDisconnectedEvent({
+    required this.contextId,
+    required this.sourceId,
+    required this.destinationId,
+    this.sourceOutputIndex,
+  });
 
   factory NodeParamDisconnectedEvent.fromJson(Map<String, dynamic> json) {
     return NodeParamDisconnectedEvent(
       contextId: GraphObjectId.fromJson(json['contextId'] as String),
       sourceId: GraphObjectId.fromJson(json['sourceId'] as String),
       destinationId: GraphObjectId.fromJson(json['destinationId'] as String),
-      sourceOutputIndex: json.containsKey('sourceOutputIndex')
-          ? json['sourceOutputIndex'] as num
-          : null,
+      sourceOutputIndex:
+          json.containsKey('sourceOutputIndex')
+              ? json['sourceOutputIndex'] as num
+              : null,
     );
   }
 }
@@ -289,8 +328,7 @@ extension type GraphObjectId(String value) {
 /// Enum of BaseAudioContext types
 enum ContextType {
   realtime('realtime'),
-  offline('offline'),
-  ;
+  offline('offline');
 
   final String value;
 
@@ -309,8 +347,7 @@ enum ContextType {
 enum ContextState {
   suspended('suspended'),
   running('running'),
-  closed('closed'),
-  ;
+  closed('closed');
 
   final String value;
 
@@ -336,8 +373,7 @@ extension type NodeType(String value) {
 enum ChannelCountMode {
   clampedMax('clamped-max'),
   explicit('explicit'),
-  max('max'),
-  ;
+  max('max');
 
   final String value;
 
@@ -355,8 +391,7 @@ enum ChannelCountMode {
 /// Enum of AudioNode::ChannelInterpretation from the spec
 enum ChannelInterpretation {
   discrete('discrete'),
-  speakers('speakers'),
-  ;
+  speakers('speakers');
 
   final String value;
 
@@ -381,8 +416,7 @@ extension type ParamType(String value) {
 /// Enum of AudioParam::AutomationRate from the spec
 enum AutomationRate {
   aRate('a-rate'),
-  kRate('k-rate'),
-  ;
+  kRate('k-rate');
 
   final String value;
 
@@ -413,11 +447,12 @@ class ContextRealtimeData {
   /// A running variance of callback interval.
   final num callbackIntervalVariance;
 
-  ContextRealtimeData(
-      {required this.currentTime,
-      required this.renderCapacity,
-      required this.callbackIntervalMean,
-      required this.callbackIntervalVariance});
+  ContextRealtimeData({
+    required this.currentTime,
+    required this.renderCapacity,
+    required this.callbackIntervalMean,
+    required this.callbackIntervalVariance,
+  });
 
   factory ContextRealtimeData.fromJson(Map<String, dynamic> json) {
     return ContextRealtimeData(
@@ -457,24 +492,27 @@ class BaseAudioContext {
   /// Context sample rate.
   final num sampleRate;
 
-  BaseAudioContext(
-      {required this.contextId,
-      required this.contextType,
-      required this.contextState,
-      this.realtimeData,
-      required this.callbackBufferSize,
-      required this.maxOutputChannelCount,
-      required this.sampleRate});
+  BaseAudioContext({
+    required this.contextId,
+    required this.contextType,
+    required this.contextState,
+    this.realtimeData,
+    required this.callbackBufferSize,
+    required this.maxOutputChannelCount,
+    required this.sampleRate,
+  });
 
   factory BaseAudioContext.fromJson(Map<String, dynamic> json) {
     return BaseAudioContext(
       contextId: GraphObjectId.fromJson(json['contextId'] as String),
       contextType: ContextType.fromJson(json['contextType'] as String),
       contextState: ContextState.fromJson(json['contextState'] as String),
-      realtimeData: json.containsKey('realtimeData')
-          ? ContextRealtimeData.fromJson(
-              json['realtimeData'] as Map<String, dynamic>)
-          : null,
+      realtimeData:
+          json.containsKey('realtimeData')
+              ? ContextRealtimeData.fromJson(
+                json['realtimeData'] as Map<String, dynamic>,
+              )
+              : null,
       callbackBufferSize: json['callbackBufferSize'] as num,
       maxOutputChannelCount: json['maxOutputChannelCount'] as num,
       sampleRate: json['sampleRate'] as num,
@@ -510,10 +548,7 @@ class AudioListener {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'listenerId': listenerId.toJson(),
-      'contextId': contextId.toJson(),
-    };
+    return {'listenerId': listenerId.toJson(), 'contextId': contextId.toJson()};
   }
 }
 
@@ -535,15 +570,16 @@ class AudioNode {
 
   final ChannelInterpretation channelInterpretation;
 
-  AudioNode(
-      {required this.nodeId,
-      required this.contextId,
-      required this.nodeType,
-      required this.numberOfInputs,
-      required this.numberOfOutputs,
-      required this.channelCount,
-      required this.channelCountMode,
-      required this.channelInterpretation});
+  AudioNode({
+    required this.nodeId,
+    required this.contextId,
+    required this.nodeType,
+    required this.numberOfInputs,
+    required this.numberOfOutputs,
+    required this.channelCount,
+    required this.channelCountMode,
+    required this.channelInterpretation,
+  });
 
   factory AudioNode.fromJson(Map<String, dynamic> json) {
     return AudioNode(
@@ -553,10 +589,12 @@ class AudioNode {
       numberOfInputs: json['numberOfInputs'] as num,
       numberOfOutputs: json['numberOfOutputs'] as num,
       channelCount: json['channelCount'] as num,
-      channelCountMode:
-          ChannelCountMode.fromJson(json['channelCountMode'] as String),
+      channelCountMode: ChannelCountMode.fromJson(
+        json['channelCountMode'] as String,
+      ),
       channelInterpretation: ChannelInterpretation.fromJson(
-          json['channelInterpretation'] as String),
+        json['channelInterpretation'] as String,
+      ),
     );
   }
 
@@ -592,15 +630,16 @@ class AudioParam {
 
   final num maxValue;
 
-  AudioParam(
-      {required this.paramId,
-      required this.nodeId,
-      required this.contextId,
-      required this.paramType,
-      required this.rate,
-      required this.defaultValue,
-      required this.minValue,
-      required this.maxValue});
+  AudioParam({
+    required this.paramId,
+    required this.nodeId,
+    required this.contextId,
+    required this.paramType,
+    required this.rate,
+    required this.defaultValue,
+    required this.minValue,
+    required this.maxValue,
+  });
 
   factory AudioParam.fromJson(Map<String, dynamic> json) {
     return AudioParam(

@@ -29,8 +29,10 @@ void main() {
       expect(browser.browserContexts, hasLength(1));
       var defaultContext = browser.browserContexts[0];
       expect(defaultContext.isIncognito, isFalse);
-      expect(() => defaultContext.close(),
-          throwsA(predicate((e) => '$e'.contains('cannot be closed'))));
+      expect(
+        () => defaultContext.close(),
+        throwsA(predicate((e) => '$e'.contains('cannot be closed'))),
+      );
       expect(browser.defaultBrowserContext, defaultContext);
     });
     test('should create new incognito context', () async {
@@ -59,8 +61,10 @@ void main() {
       await page.goto(server.emptyPage);
 
       var popupTargetFuture = browser.onTargetCreated.first;
-      await page
-          .evaluate('(url) => window.open(url)', args: [server.emptyPage]);
+      await page.evaluate(
+        '(url) => window.open(url)',
+        args: [server.emptyPage],
+      );
       var popupTarget = await popupTargetFuture;
 
       expect(popupTarget.browserContext, context);
@@ -69,31 +73,36 @@ void main() {
     test('should fire target events', () async {
       var context = await browser.createIncognitoBrowserContext();
       var events = [];
-      context.onTargetCreated
-          .listen((target) => events.add('CREATED: ' + target.url));
-      context.onTargetChanged
-          .listen((target) => events.add('CHANGED: ' + target.url));
-      context.onTargetDestroyed
-          .listen((target) => events.add('DESTROYED: ' + target.url));
+      context.onTargetCreated.listen(
+        (target) => events.add('CREATED: ' + target.url),
+      );
+      context.onTargetChanged.listen(
+        (target) => events.add('CHANGED: ' + target.url),
+      );
+      context.onTargetDestroyed.listen(
+        (target) => events.add('DESTROYED: ' + target.url),
+      );
       var page = await context.newPage();
       await page.goto(server.emptyPage);
       var targetDestroyFuture = context.onTargetDestroyed.first;
       await page.close();
       await targetDestroyFuture;
       expect(
-          events,
-          equals([
-            'CREATED: about:blank',
-            'CHANGED: ${server.emptyPage}',
-            'DESTROYED: ${server.emptyPage}'
-          ]));
+        events,
+        equals([
+          'CREATED: about:blank',
+          'CHANGED: ${server.emptyPage}',
+          'DESTROYED: ${server.emptyPage}',
+        ]),
+      );
       await context.close();
     });
     test('should wait for a target', () async {
       var context = await browser.createIncognitoBrowserContext();
       var resolved = false;
-      var targetPromise =
-          context.waitForTarget((target) => target.url == server.emptyPage);
+      var targetPromise = context.waitForTarget(
+        (target) => target.url == server.emptyPage,
+      );
       // ignore: unawaited_futures
       targetPromise.then((_) => resolved = true);
       var page = await context.newPage();
@@ -106,18 +115,24 @@ void main() {
     test('should timeout waiting for a non-existent target', () async {
       var context = await browser.createIncognitoBrowserContext();
       expect(
-          () => context.waitForTarget(
-              (target) => target.url == server.emptyPage,
-              timeout: Duration(milliseconds: 1)),
-          throwsA(TypeMatcher<TimeoutException>()));
+        () => context.waitForTarget(
+          (target) => target.url == server.emptyPage,
+          timeout: Duration(milliseconds: 1),
+        ),
+        throwsA(TypeMatcher<TimeoutException>()),
+      );
       await context.close();
     });
     test('should complete navigation without context disposal error', () async {
       final startingContext = browser.browserContexts.length;
       var context = await browser.createIncognitoBrowserContext();
       var page = await context.newPage();
-      await page.devTools.network
-          .emulateNetworkConditions(false, 1000, 1000000, 1000000);
+      await page.devTools.network.emulateNetworkConditions(
+        false,
+        1000,
+        1000000,
+        1000000,
+      );
       await page.goto('https://www.naver.com');
       await page.goto('https://www.naver.com');
       await context.close();
@@ -156,10 +171,14 @@ void main() {
 
       // Make sure pages don't share localstorage or cookies.
       expect(
-          await page1.evaluate("() => localStorage.getItem('name')"), 'page1');
+        await page1.evaluate("() => localStorage.getItem('name')"),
+        'page1',
+      );
       expect(await page1.evaluate('() => document.cookie'), 'name=page1');
       expect(
-          await page2.evaluate("() => localStorage.getItem('name')"), 'page2');
+        await page2.evaluate("() => localStorage.getItem('name')"),
+        'page2',
+      );
       expect(await page2.evaluate('() => document.cookie'), 'name=page2');
 
       // Cleanup contexts.

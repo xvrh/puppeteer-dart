@@ -16,8 +16,9 @@ class InspectorApi {
       _client.onEvent.where((event) => event.name == 'Inspector.targetCrashed');
 
   /// Fired when debugging target has reloaded after crash
-  Stream<void> get onTargetReloadedAfterCrash => _client.onEvent
-      .where((event) => event.name == 'Inspector.targetReloadedAfterCrash');
+  Stream<void> get onTargetReloadedAfterCrash => _client.onEvent.where(
+    (event) => event.name == 'Inspector.targetReloadedAfterCrash',
+  );
 
   /// Disables inspector domain notifications.
   Future<void> disable() async {

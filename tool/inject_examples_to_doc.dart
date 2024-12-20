@@ -10,8 +10,9 @@ import 'package:dart_style/dart_style.dart';
 // Extrat the samples from the file test/doc_examples_test.dart and inject
 // it in the source code
 void main() {
-  var snippets =
-      extractSnippets(File('test/doc_examples_test.dart').readAsStringSync());
+  var snippets = extractSnippets(
+    File('test/doc_examples_test.dart').readAsStringSync(),
+  );
 
   for (var dartFile
       in Directory('lib/src').listSync(recursive: true).whereType<File>()) {
@@ -32,7 +33,9 @@ void main() {
   }
 }
 
-final _formatter = DartFormatter();
+final _formatter = DartFormatter(
+  languageVersion: DartFormatter.latestLanguageVersion,
+);
 
 String replaceExamples(String sourceFile, List<CodeSnippet> snippets) {
   var unit = parseString(content: sourceFile).unit;
@@ -55,8 +58,11 @@ String replaceExamples(String sourceFile, List<CodeSnippet> snippets) {
         }
 
         if (memberName != null) {
-          var newComment =
-              _newComment('$className.$memberName', comment, snippets);
+          var newComment = _newComment(
+            '$className.$memberName',
+            comment,
+            snippets,
+          );
           sourceFile = replaceComment(sourceFile, comment, newComment);
         }
       }
@@ -78,21 +84,26 @@ String replaceExamples(String sourceFile, List<CodeSnippet> snippets) {
 final _dartExampleExtractor = RegExp(r'\`\`\`dart[\s\S]*?\`\`\`');
 
 String _newComment(
-    String target, Comment comment, List<CodeSnippet> allSnippets) {
+  String target,
+  Comment comment,
+  List<CodeSnippet> allSnippets,
+) {
   var lines = comment.tokens.map((t) => t.toString()).toList();
 
   var index = 0;
   return lines.join('\n').replaceAllMapped(_dartExampleExtractor, (match) {
     var snippet = allSnippets.firstWhereOrNull(
-        (s) => s.target == target.replaceAll(r'$', 'S') && s.index == index);
+      (s) => s.target == target.replaceAll(r'$', 'S') && s.index == index,
+    );
     if (snippet == null) {
       throw Exception("Can't find snippet for [$target] at index $index");
     }
     ++index;
     allSnippets.remove(snippet);
 
-    var commentedCode =
-        LineSplitter.split(snippet.code).map((line) => ' /// $line').join('\n');
+    var commentedCode = LineSplitter.split(
+      snippet.code,
+    ).map((line) => ' /// $line').join('\n');
 
     return '''
 ```dart
@@ -122,12 +133,17 @@ List<CodeSnippet> extractSnippets(String sourceCode) {
   return results;
 }
 
-void findGroupAndTests(String fileCode, Block block, List<CodeSnippet> snippets,
-    String namePrefix) {
-  for (var expression in block.statements
-      .whereType<ExpressionStatement>()
-      .map((s) => s.expression)
-      .whereType<MethodInvocation>()) {
+void findGroupAndTests(
+  String fileCode,
+  Block block,
+  List<CodeSnippet> snippets,
+  String namePrefix,
+) {
+  for (var expression
+      in block.statements
+          .whereType<ExpressionStatement>()
+          .map((s) => s.expression)
+          .whereType<MethodInvocation>()) {
     var methodName = expression.methodName.name;
     if (methodName == 'group') {
       var groupName = expression.argumentList.arguments[0] as StringLiteral;
@@ -135,22 +151,32 @@ void findGroupAndTests(String fileCode, Block block, List<CodeSnippet> snippets,
           expression.argumentList.arguments[1] as FunctionExpression;
       var innerBody = innerBlock.body as BlockFunctionBody;
 
-      findGroupAndTests(fileCode, innerBody.block, snippets,
-          _joinPrefix(namePrefix, groupName.stringValue!));
+      findGroupAndTests(
+        fileCode,
+        innerBody.block,
+        snippets,
+        _joinPrefix(namePrefix, groupName.stringValue!),
+      );
     } else if (methodName == 'test') {
       var innerBlock =
           expression.argumentList.arguments[1] as FunctionExpression;
       var innerBody = innerBlock.body as BlockFunctionBody;
-      var code = _extractCode(fileCode.substring(
-          innerBody.block.offset + 1, innerBody.block.end - 1));
+      var code = _extractCode(
+        fileCode.substring(innerBody.block.offset + 1, innerBody.block.end - 1),
+      );
       var firstArgument = expression.argumentList.arguments[0] as Literal;
       if (firstArgument is StringLiteral) {
-        snippets.add(CodeSnippet(
-            _joinPrefix(namePrefix, firstArgument.stringValue!), code));
+        snippets.add(
+          CodeSnippet(
+            _joinPrefix(namePrefix, firstArgument.stringValue!),
+            code,
+          ),
+        );
       } else {
         var indexArgument = firstArgument as IntegerLiteral;
-        snippets
-            .add(CodeSnippet(namePrefix, code, index: indexArgument.value!));
+        snippets.add(
+          CodeSnippet(namePrefix, code, index: indexArgument.value!),
+        );
       }
     }
   }
@@ -160,11 +186,12 @@ String _extractCode(String content) {
   var lines = LineSplitter.split(content);
   bool isBlockStarter(String line) => line.trim().startsWith('//--');
   if (lines.any(isBlockStarter)) {
-    lines = lines
-        .skipWhile((l) => !isBlockStarter(l))
-        .skip(1)
-        .takeWhile((l) => !isBlockStarter(l))
-        .toList();
+    lines =
+        lines
+            .skipWhile((l) => !isBlockStarter(l))
+            .skip(1)
+            .takeWhile((l) => !isBlockStarter(l))
+            .toList();
   } else {
     lines = lines.skipWhile((l) => l.trim().isEmpty).toList();
   }
@@ -182,7 +209,7 @@ class CodeSnippet {
   final int index;
 
   CodeSnippet(this.target, String code, {this.index = 0})
-      : code = fixCode(code);
+    : code = fixCode(code);
 
   static String fixCode(String code) {
     code = '''

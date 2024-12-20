@@ -8,8 +8,11 @@ class DatabaseApi {
 
   Stream<Database> get onAddDatabase => _client.onEvent
       .where((event) => event.name == 'Database.addDatabase')
-      .map((event) => Database.fromJson(
-          event.parameters['database'] as Map<String, dynamic>));
+      .map(
+        (event) => Database.fromJson(
+          event.parameters['database'] as Map<String, dynamic>,
+        ),
+      );
 
   /// Disables database tracking, prevents database events from being sent to the client.
   Future<void> disable() async {
@@ -22,7 +25,9 @@ class DatabaseApi {
   }
 
   Future<ExecuteSQLResult> executeSQL(
-      DatabaseId databaseId, String query) async {
+    DatabaseId databaseId,
+    String query,
+  ) async {
     var result = await _client.send('Database.executeSQL', {
       'databaseId': databaseId,
       'query': query,
@@ -49,15 +54,18 @@ class ExecuteSQLResult {
 
   factory ExecuteSQLResult.fromJson(Map<String, dynamic> json) {
     return ExecuteSQLResult(
-      columnNames: json.containsKey('columnNames')
-          ? (json['columnNames'] as List).map((e) => e as String).toList()
-          : null,
-      values: json.containsKey('values')
-          ? (json['values'] as List).map((e) => e as dynamic).toList()
-          : null,
-      sqlError: json.containsKey('sqlError')
-          ? Error.fromJson(json['sqlError'] as Map<String, dynamic>)
-          : null,
+      columnNames:
+          json.containsKey('columnNames')
+              ? (json['columnNames'] as List).map((e) => e as String).toList()
+              : null,
+      values:
+          json.containsKey('values')
+              ? (json['values'] as List).map((e) => e as dynamic).toList()
+              : null,
+      sqlError:
+          json.containsKey('sqlError')
+              ? Error.fromJson(json['sqlError'] as Map<String, dynamic>)
+              : null,
     );
   }
 }
@@ -83,11 +91,12 @@ class Database {
   /// Database version.
   final String version;
 
-  Database(
-      {required this.id,
-      required this.domain,
-      required this.name,
-      required this.version});
+  Database({
+    required this.id,
+    required this.domain,
+    required this.name,
+    required this.version,
+  });
 
   factory Database.fromJson(Map<String, dynamic> json) {
     return Database(
@@ -119,16 +128,10 @@ class Error {
   Error({required this.message, required this.code});
 
   factory Error.fromJson(Map<String, dynamic> json) {
-    return Error(
-      message: json['message'] as String,
-      code: json['code'] as int,
-    );
+    return Error(message: json['message'] as String, code: json['code'] as int);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'message': message,
-      'code': code,
-    };
+    return {'message': message, 'code': code};
   }
 }

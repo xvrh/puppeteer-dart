@@ -31,8 +31,10 @@ class PWAApi {
   /// mode, the installation will fail, regardless of the state of the allowlist.
   /// [installUrlOrBundleUrl] The location of the app or bundle overriding the one derived from the
   /// manifestId.
-  Future<void> install(String manifestId,
-      {String? installUrlOrBundleUrl}) async {
+  Future<void> install(
+    String manifestId, {
+    String? installUrlOrBundleUrl,
+  }) async {
     await _client.send('PWA.install', {
       'manifestId': manifestId,
       if (installUrlOrBundleUrl != null)
@@ -42,9 +44,7 @@ class PWAApi {
 
   /// Uninstalls the given manifest_id and closes any opened app windows.
   Future<void> uninstall(String manifestId) async {
-    await _client.send('PWA.uninstall', {
-      'manifestId': manifestId,
-    });
+    await _client.send('PWA.uninstall', {'manifestId': manifestId});
   }
 
   /// Launches the installed web app, or an url in the same web app instead of the
@@ -74,7 +74,9 @@ class PWAApi {
   /// TODO(crbug.com/339454034): Check the existences of the input files.
   /// Returns: IDs of the tab targets created as the result.
   Future<List<target.TargetID>> launchFilesInApp(
-      String manifestId, List<String> files) async {
+    String manifestId,
+    List<String> files,
+  ) async {
     var result = await _client.send('PWA.launchFilesInApp', {
       'manifestId': manifestId,
       'files': [...files],
@@ -88,9 +90,7 @@ class PWAApi {
   /// to be called on a page target. This function returns immediately without
   /// waiting for the app to finish loading.
   Future<void> openCurrentPageInApp(String manifestId) async {
-    await _client.send('PWA.openCurrentPageInApp', {
-      'manifestId': manifestId,
-    });
+    await _client.send('PWA.openCurrentPageInApp', {'manifestId': manifestId});
   }
 
   /// Changes user settings of the web app identified by its manifestId. If the
@@ -113,8 +113,11 @@ class PWAApi {
   ///
   /// TODO(crbug.com/339453269): Setting this value on ChromeOS is not
   /// supported yet.
-  Future<void> changeAppUserSettings(String manifestId,
-      {bool? linkCapturing, DisplayMode? displayMode}) async {
+  Future<void> changeAppUserSettings(
+    String manifestId, {
+    bool? linkCapturing,
+    DisplayMode? displayMode,
+  }) async {
     await _client.send('PWA.changeAppUserSettings', {
       'manifestId': manifestId,
       if (linkCapturing != null) 'linkCapturing': linkCapturing,
@@ -133,9 +136,10 @@ class GetOsAppStateResult {
   factory GetOsAppStateResult.fromJson(Map<String, dynamic> json) {
     return GetOsAppStateResult(
       badgeCount: json['badgeCount'] as int,
-      fileHandlers: (json['fileHandlers'] as List)
-          .map((e) => FileHandler.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      fileHandlers:
+          (json['fileHandlers'] as List)
+              .map((e) => FileHandler.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 }
@@ -174,15 +178,19 @@ class FileHandler {
 
   final String displayName;
 
-  FileHandler(
-      {required this.action, required this.accepts, required this.displayName});
+  FileHandler({
+    required this.action,
+    required this.accepts,
+    required this.displayName,
+  });
 
   factory FileHandler.fromJson(Map<String, dynamic> json) {
     return FileHandler(
       action: json['action'] as String,
-      accepts: (json['accepts'] as List)
-          .map((e) => FileHandlerAccept.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      accepts:
+          (json['accepts'] as List)
+              .map((e) => FileHandlerAccept.fromJson(e as Map<String, dynamic>))
+              .toList(),
       displayName: json['displayName'] as String,
     );
   }
@@ -199,8 +207,7 @@ class FileHandler {
 /// If user prefers opening the app in browser or an app window.
 enum DisplayMode {
   standalone('standalone'),
-  browser('browser'),
-  ;
+  browser('browser');
 
   final String value;
 

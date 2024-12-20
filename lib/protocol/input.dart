@@ -10,8 +10,10 @@ class InputApi {
   /// restore normal drag and drop behavior.
   Stream<DragData> get onDragIntercepted => _client.onEvent
       .where((event) => event.name == 'Input.dragIntercepted')
-      .map((event) =>
-          DragData.fromJson(event.parameters['data'] as Map<String, dynamic>));
+      .map(
+        (event) =>
+            DragData.fromJson(event.parameters['data'] as Map<String, dynamic>),
+      );
 
   /// Dispatches a drag event into the page.
   /// [type] Type of the drag event.
@@ -21,13 +23,15 @@ class InputApi {
   /// [modifiers] Bit field representing pressed modifier keys. Alt=1, Ctrl=2, Meta/Command=4, Shift=8
   /// (default: 0).
   Future<void> dispatchDragEvent(
-      @Enum(['dragEnter', 'dragOver', 'drop', 'dragCancel']) String type,
-      num x,
-      num y,
-      DragData data,
-      {int? modifiers}) async {
+    @Enum(['dragEnter', 'dragOver', 'drop', 'dragCancel']) String type,
+    num x,
+    num y,
+    DragData data, {
+    int? modifiers,
+  }) async {
     assert(
-        const ['dragEnter', 'dragOver', 'drop', 'dragCancel'].contains(type));
+      const ['dragEnter', 'dragOver', 'drop', 'dragCancel'].contains(type),
+    );
     await _client.send('Input.dispatchDragEvent', {
       'type': type,
       'x': x,
@@ -61,21 +65,22 @@ class InputApi {
   /// These are related to but not equal the command names used in `document.execCommand` and NSStandardKeyBindingResponding.
   /// See https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/editing/commands/editor_command_names.h for valid command names.
   Future<void> dispatchKeyEvent(
-      @Enum(['keyDown', 'keyUp', 'rawKeyDown', 'char']) String type,
-      {int? modifiers,
-      TimeSinceEpoch? timestamp,
-      String? text,
-      String? unmodifiedText,
-      String? keyIdentifier,
-      String? code,
-      String? key,
-      int? windowsVirtualKeyCode,
-      int? nativeVirtualKeyCode,
-      bool? autoRepeat,
-      bool? isKeypad,
-      bool? isSystemKey,
-      int? location,
-      List<String>? commands}) async {
+    @Enum(['keyDown', 'keyUp', 'rawKeyDown', 'char']) String type, {
+    int? modifiers,
+    TimeSinceEpoch? timestamp,
+    String? text,
+    String? unmodifiedText,
+    String? keyIdentifier,
+    String? code,
+    String? key,
+    int? windowsVirtualKeyCode,
+    int? nativeVirtualKeyCode,
+    bool? autoRepeat,
+    bool? isKeypad,
+    bool? isSystemKey,
+    int? location,
+    List<String>? commands,
+  }) async {
     assert(const ['keyDown', 'keyUp', 'rawKeyDown', 'char'].contains(type));
     await _client.send('Input.dispatchKeyEvent', {
       'type': type,
@@ -102,9 +107,7 @@ class InputApi {
   /// for example an emoji keyboard or an IME.
   /// [text] The text to insert.
   Future<void> insertText(String text) async {
-    await _client.send('Input.insertText', {
-      'text': text,
-    });
+    await _client.send('Input.insertText', {'text': text});
   }
 
   /// This method sets the current candidate text for IME.
@@ -116,8 +119,12 @@ class InputApi {
   /// [replacementStart] replacement start
   /// [replacementEnd] replacement end
   Future<void> imeSetComposition(
-      String text, int selectionStart, int selectionEnd,
-      {int? replacementStart, int? replacementEnd}) async {
+    String text,
+    int selectionStart,
+    int selectionEnd, {
+    int? replacementStart,
+    int? replacementEnd,
+  }) async {
     await _client.send('Input.imeSetComposition', {
       'text': text,
       'selectionStart': selectionStart,
@@ -148,25 +155,32 @@ class InputApi {
   /// [deltaY] Y delta in CSS pixels for mouse wheel event (default: 0).
   /// [pointerType] Pointer type (default: "mouse").
   Future<void> dispatchMouseEvent(
-      @Enum(['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel'])
-      String type,
-      num x,
-      num y,
-      {int? modifiers,
-      TimeSinceEpoch? timestamp,
-      MouseButton? button,
-      int? buttons,
-      int? clickCount,
-      num? force,
-      num? tangentialPressure,
-      num? tiltX,
-      num? tiltY,
-      int? twist,
-      num? deltaX,
-      num? deltaY,
-      @Enum(['mouse', 'pen']) String? pointerType}) async {
-    assert(const ['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel']
-        .contains(type));
+    @Enum(['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel'])
+    String type,
+    num x,
+    num y, {
+    int? modifiers,
+    TimeSinceEpoch? timestamp,
+    MouseButton? button,
+    int? buttons,
+    int? clickCount,
+    num? force,
+    num? tangentialPressure,
+    num? tiltX,
+    num? tiltY,
+    int? twist,
+    num? deltaX,
+    num? deltaY,
+    @Enum(['mouse', 'pen']) String? pointerType,
+  }) async {
+    assert(
+      const [
+        'mousePressed',
+        'mouseReleased',
+        'mouseMoved',
+        'mouseWheel',
+      ].contains(type),
+    );
     assert(pointerType == null || const ['mouse', 'pen'].contains(pointerType));
     await _client.send('Input.dispatchMouseEvent', {
       'type': type,
@@ -198,12 +212,19 @@ class InputApi {
   /// (default: 0).
   /// [timestamp] Time at which the event occurred.
   Future<void> dispatchTouchEvent(
-      @Enum(['touchStart', 'touchEnd', 'touchMove', 'touchCancel']) String type,
-      List<TouchPoint> touchPoints,
-      {int? modifiers,
-      TimeSinceEpoch? timestamp}) async {
-    assert(const ['touchStart', 'touchEnd', 'touchMove', 'touchCancel']
-        .contains(type));
+    @Enum(['touchStart', 'touchEnd', 'touchMove', 'touchCancel']) String type,
+    List<TouchPoint> touchPoints, {
+    int? modifiers,
+    TimeSinceEpoch? timestamp,
+  }) async {
+    assert(
+      const [
+        'touchStart',
+        'touchEnd',
+        'touchMove',
+        'touchCancel',
+      ].contains(type),
+    );
     await _client.send('Input.dispatchTouchEvent', {
       'type': type,
       'touchPoints': [...touchPoints],
@@ -229,18 +250,25 @@ class InputApi {
   /// (default: 0).
   /// [clickCount] Number of times the mouse button was clicked (default: 0).
   Future<void> emulateTouchFromMouseEvent(
-      @Enum(['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel'])
-      String type,
-      int x,
-      int y,
-      MouseButton button,
-      {TimeSinceEpoch? timestamp,
-      num? deltaX,
-      num? deltaY,
-      int? modifiers,
-      int? clickCount}) async {
-    assert(const ['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel']
-        .contains(type));
+    @Enum(['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel'])
+    String type,
+    int x,
+    int y,
+    MouseButton button, {
+    TimeSinceEpoch? timestamp,
+    num? deltaX,
+    num? deltaY,
+    int? modifiers,
+    int? clickCount,
+  }) async {
+    assert(
+      const [
+        'mousePressed',
+        'mouseReleased',
+        'mouseMoved',
+        'mouseWheel',
+      ].contains(type),
+    );
     await _client.send('Input.emulateTouchFromMouseEvent', {
       'type': type,
       'x': x,
@@ -257,17 +285,13 @@ class InputApi {
   /// Ignores input events (useful while auditing page).
   /// [ignore] Ignores input events processing when set to true.
   Future<void> setIgnoreInputEvents(bool ignore) async {
-    await _client.send('Input.setIgnoreInputEvents', {
-      'ignore': ignore,
-    });
+    await _client.send('Input.setIgnoreInputEvents', {'ignore': ignore});
   }
 
   /// Prevents default drag and drop behavior and instead emits `Input.dragIntercepted` events.
   /// Drag and drop behavior can be directly controlled via `Input.dispatchDragEvent`.
   Future<void> setInterceptDrags(bool enabled) async {
-    await _client.send('Input.setInterceptDrags', {
-      'enabled': enabled,
-    });
+    await _client.send('Input.setInterceptDrags', {'enabled': enabled});
   }
 
   /// Synthesizes a pinch gesture over a time period by issuing appropriate touch events.
@@ -277,8 +301,13 @@ class InputApi {
   /// [relativeSpeed] Relative pointer speed in pixels per second (default: 800).
   /// [gestureSourceType] Which type of input events to be generated (default: 'default', which queries the platform
   /// for the preferred input type).
-  Future<void> synthesizePinchGesture(num x, num y, num scaleFactor,
-      {int? relativeSpeed, GestureSourceType? gestureSourceType}) async {
+  Future<void> synthesizePinchGesture(
+    num x,
+    num y,
+    num scaleFactor, {
+    int? relativeSpeed,
+    GestureSourceType? gestureSourceType,
+  }) async {
     await _client.send('Input.synthesizePinchGesture', {
       'x': x,
       'y': y,
@@ -304,17 +333,20 @@ class InputApi {
   /// [repeatCount] The number of times to repeat the gesture (default: 0).
   /// [repeatDelayMs] The number of milliseconds delay between each repeat. (default: 250).
   /// [interactionMarkerName] The name of the interaction markers to generate, if not empty (default: "").
-  Future<void> synthesizeScrollGesture(num x, num y,
-      {num? xDistance,
-      num? yDistance,
-      num? xOverscroll,
-      num? yOverscroll,
-      bool? preventFling,
-      int? speed,
-      GestureSourceType? gestureSourceType,
-      int? repeatCount,
-      int? repeatDelayMs,
-      String? interactionMarkerName}) async {
+  Future<void> synthesizeScrollGesture(
+    num x,
+    num y, {
+    num? xDistance,
+    num? yDistance,
+    num? xOverscroll,
+    num? yOverscroll,
+    bool? preventFling,
+    int? speed,
+    GestureSourceType? gestureSourceType,
+    int? repeatCount,
+    int? repeatDelayMs,
+    String? interactionMarkerName,
+  }) async {
     await _client.send('Input.synthesizeScrollGesture', {
       'x': x,
       'y': y,
@@ -339,10 +371,13 @@ class InputApi {
   /// [tapCount] Number of times to perform the tap (e.g. 2 for double tap, default: 1).
   /// [gestureSourceType] Which type of input events to be generated (default: 'default', which queries the platform
   /// for the preferred input type).
-  Future<void> synthesizeTapGesture(num x, num y,
-      {int? duration,
-      int? tapCount,
-      GestureSourceType? gestureSourceType}) async {
+  Future<void> synthesizeTapGesture(
+    num x,
+    num y, {
+    int? duration,
+    int? tapCount,
+    GestureSourceType? gestureSourceType,
+  }) async {
     await _client.send('Input.synthesizeTapGesture', {
       'x': x,
       'y': y,
@@ -388,18 +423,19 @@ class TouchPoint {
   /// Identifier used to track touch sources between events, must be unique within an event.
   final num? id;
 
-  TouchPoint(
-      {required this.x,
-      required this.y,
-      this.radiusX,
-      this.radiusY,
-      this.rotationAngle,
-      this.force,
-      this.tangentialPressure,
-      this.tiltX,
-      this.tiltY,
-      this.twist,
-      this.id});
+  TouchPoint({
+    required this.x,
+    required this.y,
+    this.radiusX,
+    this.radiusY,
+    this.rotationAngle,
+    this.force,
+    this.tangentialPressure,
+    this.tiltX,
+    this.tiltY,
+    this.twist,
+    this.id,
+  });
 
   factory TouchPoint.fromJson(Map<String, dynamic> json) {
     return TouchPoint(
@@ -407,13 +443,15 @@ class TouchPoint {
       y: json['y'] as num,
       radiusX: json.containsKey('radiusX') ? json['radiusX'] as num : null,
       radiusY: json.containsKey('radiusY') ? json['radiusY'] as num : null,
-      rotationAngle: json.containsKey('rotationAngle')
-          ? json['rotationAngle'] as num
-          : null,
+      rotationAngle:
+          json.containsKey('rotationAngle')
+              ? json['rotationAngle'] as num
+              : null,
       force: json.containsKey('force') ? json['force'] as num : null,
-      tangentialPressure: json.containsKey('tangentialPressure')
-          ? json['tangentialPressure'] as num
-          : null,
+      tangentialPressure:
+          json.containsKey('tangentialPressure')
+              ? json['tangentialPressure'] as num
+              : null,
       tiltX: json.containsKey('tiltX') ? json['tiltX'] as num : null,
       tiltY: json.containsKey('tiltY') ? json['tiltY'] as num : null,
       twist: json.containsKey('twist') ? json['twist'] as int : null,
@@ -441,8 +479,7 @@ class TouchPoint {
 enum GestureSourceType {
   default$('default'),
   touch('touch'),
-  mouse('mouse'),
-  ;
+  mouse('mouse');
 
   final String value;
 
@@ -463,8 +500,7 @@ enum MouseButton {
   middle('middle'),
   right('right'),
   back('back'),
-  forward('forward'),
-  ;
+  forward('forward');
 
   final String value;
 
@@ -501,8 +537,12 @@ class DragDataItem {
   /// == "text/html".
   final String? baseURL;
 
-  DragDataItem(
-      {required this.mimeType, required this.data, this.title, this.baseURL});
+  DragDataItem({
+    required this.mimeType,
+    required this.data,
+    this.title,
+    this.baseURL,
+  });
 
   factory DragDataItem.fromJson(Map<String, dynamic> json) {
     return DragDataItem(
@@ -536,12 +576,14 @@ class DragData {
 
   factory DragData.fromJson(Map<String, dynamic> json) {
     return DragData(
-      items: (json['items'] as List)
-          .map((e) => DragDataItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      files: json.containsKey('files')
-          ? (json['files'] as List).map((e) => e as String).toList()
-          : null,
+      items:
+          (json['items'] as List)
+              .map((e) => DragDataItem.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      files:
+          json.containsKey('files')
+              ? (json['files'] as List).map((e) => e as String).toList()
+              : null,
       dragOperationsMask: json['dragOperationsMask'] as int,
     );
   }

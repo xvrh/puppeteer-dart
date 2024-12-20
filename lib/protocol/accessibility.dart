@@ -13,15 +13,21 @@ class AccessibilityApi {
   /// technology when the web page has finished loading.
   Stream<AXNodeData> get onLoadComplete => _client.onEvent
       .where((event) => event.name == 'Accessibility.loadComplete')
-      .map((event) => AXNodeData.fromJson(
-          event.parameters['root'] as Map<String, dynamic>));
+      .map(
+        (event) => AXNodeData.fromJson(
+          event.parameters['root'] as Map<String, dynamic>,
+        ),
+      );
 
   /// The nodesUpdated event is sent every time a previously requested node has changed the in tree.
   Stream<List<AXNodeData>> get onNodesUpdated => _client.onEvent
       .where((event) => event.name == 'Accessibility.nodesUpdated')
-      .map((event) => (event.parameters['nodes'] as List)
-          .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
-          .toList());
+      .map(
+        (event) =>
+            (event.parameters['nodes'] as List)
+                .map((e) => AXNodeData.fromJson(e as Map<String, dynamic>))
+                .toList(),
+      );
 
   /// Disables the accessibility domain.
   Future<void> disable() async {
@@ -41,11 +47,12 @@ class AccessibilityApi {
   /// [fetchRelatives] Whether to fetch this node's ancestors, siblings and children. Defaults to true.
   /// Returns: The `Accessibility.AXNode` for this DOM node, if it exists, plus its ancestors, siblings and
   /// children, if requested.
-  Future<List<AXNodeData>> getPartialAXTree(
-      {dom.NodeId? nodeId,
-      dom.BackendNodeId? backendNodeId,
-      runtime.RemoteObjectId? objectId,
-      bool? fetchRelatives}) async {
+  Future<List<AXNodeData>> getPartialAXTree({
+    dom.NodeId? nodeId,
+    dom.BackendNodeId? backendNodeId,
+    runtime.RemoteObjectId? objectId,
+    bool? fetchRelatives,
+  }) async {
     var result = await _client.send('Accessibility.getPartialAXTree', {
       if (nodeId != null) 'nodeId': nodeId,
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
@@ -62,8 +69,10 @@ class AccessibilityApi {
   /// If omitted, the full tree is returned.
   /// [frameId] The frame for whose document the AX tree should be retrieved.
   /// If omitted, the root frame is used.
-  Future<List<AXNodeData>> getFullAXTree(
-      {int? depth, page.FrameId? frameId}) async {
+  Future<List<AXNodeData>> getFullAXTree({
+    int? depth,
+    page.FrameId? frameId,
+  }) async {
     var result = await _client.send('Accessibility.getFullAXTree', {
       if (depth != null) 'depth': depth,
       if (frameId != null) 'frameId': frameId,
@@ -89,10 +98,11 @@ class AccessibilityApi {
   /// [nodeId] Identifier of the node to get.
   /// [backendNodeId] Identifier of the backend node to get.
   /// [objectId] JavaScript object id of the node wrapper to get.
-  Future<List<AXNodeData>> getAXNodeAndAncestors(
-      {dom.NodeId? nodeId,
-      dom.BackendNodeId? backendNodeId,
-      runtime.RemoteObjectId? objectId}) async {
+  Future<List<AXNodeData>> getAXNodeAndAncestors({
+    dom.NodeId? nodeId,
+    dom.BackendNodeId? backendNodeId,
+    runtime.RemoteObjectId? objectId,
+  }) async {
     var result = await _client.send('Accessibility.getAXNodeAndAncestors', {
       if (nodeId != null) 'nodeId': nodeId,
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
@@ -107,8 +117,10 @@ class AccessibilityApi {
   /// Requires `enable()` to have been called previously.
   /// [frameId] The frame in whose document the node resides.
   /// If omitted, the root frame is used.
-  Future<List<AXNodeData>> getChildAXNodes(AXNodeId id,
-      {page.FrameId? frameId}) async {
+  Future<List<AXNodeData>> getChildAXNodes(
+    AXNodeId id, {
+    page.FrameId? frameId,
+  }) async {
     var result = await _client.send('Accessibility.getChildAXNodes', {
       'id': id,
       if (frameId != null) 'frameId': frameId,
@@ -130,12 +142,13 @@ class AccessibilityApi {
   /// [role] Find nodes with this computed role.
   /// Returns: A list of `Accessibility.AXNode` matching the specified attributes,
   /// including nodes that are ignored for accessibility.
-  Future<List<AXNodeData>> queryAXTree(
-      {dom.NodeId? nodeId,
-      dom.BackendNodeId? backendNodeId,
-      runtime.RemoteObjectId? objectId,
-      String? accessibleName,
-      String? role}) async {
+  Future<List<AXNodeData>> queryAXTree({
+    dom.NodeId? nodeId,
+    dom.BackendNodeId? backendNodeId,
+    runtime.RemoteObjectId? objectId,
+    String? accessibleName,
+    String? role,
+  }) async {
     var result = await _client.send('Accessibility.queryAXTree', {
       if (nodeId != null) 'nodeId': nodeId,
       if (backendNodeId != null) 'backendNodeId': backendNodeId,
@@ -174,8 +187,7 @@ enum AXValueType {
   domRelation('domRelation'),
   role('role'),
   internalRole('internalRole'),
-  valueUndefined('valueUndefined'),
-  ;
+  valueUndefined('valueUndefined');
 
   final String value;
 
@@ -197,8 +209,7 @@ enum AXValueSourceType {
   style('style'),
   contents('contents'),
   placeholder('placeholder'),
-  relatedElement('relatedElement'),
-  ;
+  relatedElement('relatedElement');
 
   final String value;
 
@@ -224,8 +235,7 @@ enum AXValueNativeSourceType {
   rubyannotation('rubyannotation'),
   tablecaption('tablecaption'),
   title('title'),
-  other('other'),
-  ;
+  other('other');
 
   final String value;
 
@@ -269,40 +279,48 @@ class AXValueSource {
   /// Reason for the value being invalid, if it is.
   final String? invalidReason;
 
-  AXValueSource(
-      {required this.type,
-      this.value,
-      this.attribute,
-      this.attributeValue,
-      this.superseded,
-      this.nativeSource,
-      this.nativeSourceValue,
-      this.invalid,
-      this.invalidReason});
+  AXValueSource({
+    required this.type,
+    this.value,
+    this.attribute,
+    this.attributeValue,
+    this.superseded,
+    this.nativeSource,
+    this.nativeSourceValue,
+    this.invalid,
+    this.invalidReason,
+  });
 
   factory AXValueSource.fromJson(Map<String, dynamic> json) {
     return AXValueSource(
       type: AXValueSourceType.fromJson(json['type'] as String),
-      value: json.containsKey('value')
-          ? AXValue.fromJson(json['value'] as Map<String, dynamic>)
-          : null,
+      value:
+          json.containsKey('value')
+              ? AXValue.fromJson(json['value'] as Map<String, dynamic>)
+              : null,
       attribute:
           json.containsKey('attribute') ? json['attribute'] as String : null,
-      attributeValue: json.containsKey('attributeValue')
-          ? AXValue.fromJson(json['attributeValue'] as Map<String, dynamic>)
-          : null,
+      attributeValue:
+          json.containsKey('attributeValue')
+              ? AXValue.fromJson(json['attributeValue'] as Map<String, dynamic>)
+              : null,
       superseded:
           json.containsKey('superseded') ? json['superseded'] as bool : null,
-      nativeSource: json.containsKey('nativeSource')
-          ? AXValueNativeSourceType.fromJson(json['nativeSource'] as String)
-          : null,
-      nativeSourceValue: json.containsKey('nativeSourceValue')
-          ? AXValue.fromJson(json['nativeSourceValue'] as Map<String, dynamic>)
-          : null,
+      nativeSource:
+          json.containsKey('nativeSource')
+              ? AXValueNativeSourceType.fromJson(json['nativeSource'] as String)
+              : null,
+      nativeSourceValue:
+          json.containsKey('nativeSourceValue')
+              ? AXValue.fromJson(
+                json['nativeSourceValue'] as Map<String, dynamic>,
+              )
+              : null,
       invalid: json.containsKey('invalid') ? json['invalid'] as bool : null,
-      invalidReason: json.containsKey('invalidReason')
-          ? json['invalidReason'] as String
-          : null,
+      invalidReason:
+          json.containsKey('invalidReason')
+              ? json['invalidReason'] as String
+              : null,
     );
   }
 
@@ -336,8 +354,9 @@ class AXRelatedNode {
 
   factory AXRelatedNode.fromJson(Map<String, dynamic> json) {
     return AXRelatedNode(
-      backendDOMNodeId:
-          dom.BackendNodeId.fromJson(json['backendDOMNodeId'] as int),
+      backendDOMNodeId: dom.BackendNodeId.fromJson(
+        json['backendDOMNodeId'] as int,
+      ),
       idref: json.containsKey('idref') ? json['idref'] as String : null,
       text: json.containsKey('text') ? json['text'] as String : null,
     );
@@ -369,10 +388,7 @@ class AXProperty {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name.toJson(),
-      'value': value.toJson(),
-    };
+    return {'name': name.toJson(), 'value': value.toJson()};
   }
 }
 
@@ -396,16 +412,18 @@ class AXValue {
     return AXValue(
       type: AXValueType.fromJson(json['type'] as String),
       value: json.containsKey('value') ? json['value'] as dynamic : null,
-      relatedNodes: json.containsKey('relatedNodes')
-          ? (json['relatedNodes'] as List)
-              .map((e) => AXRelatedNode.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-      sources: json.containsKey('sources')
-          ? (json['sources'] as List)
-              .map((e) => AXValueSource.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
+      relatedNodes:
+          json.containsKey('relatedNodes')
+              ? (json['relatedNodes'] as List)
+                  .map((e) => AXRelatedNode.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : null,
+      sources:
+          json.containsKey('sources')
+              ? (json['sources'] as List)
+                  .map((e) => AXValueSource.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : null,
     );
   }
 
@@ -474,8 +492,7 @@ enum AXPropertyName {
   notVisible('notVisible'),
   labelFor('labelFor'),
   presentationalRole('presentationalRole'),
-  emptyAlt('emptyAlt'),
-  ;
+  emptyAlt('emptyAlt');
 
   final String value;
 
@@ -531,64 +548,76 @@ class AXNodeData {
   /// The frame ID for the frame associated with this nodes document.
   final page.FrameId? frameId;
 
-  AXNodeData(
-      {required this.nodeId,
-      required this.ignored,
-      this.ignoredReasons,
-      this.role,
-      this.chromeRole,
-      this.name,
-      this.description,
-      this.value,
-      this.properties,
-      this.parentId,
-      this.childIds,
-      this.backendDOMNodeId,
-      this.frameId});
+  AXNodeData({
+    required this.nodeId,
+    required this.ignored,
+    this.ignoredReasons,
+    this.role,
+    this.chromeRole,
+    this.name,
+    this.description,
+    this.value,
+    this.properties,
+    this.parentId,
+    this.childIds,
+    this.backendDOMNodeId,
+    this.frameId,
+  });
 
   factory AXNodeData.fromJson(Map<String, dynamic> json) {
     return AXNodeData(
       nodeId: AXNodeId.fromJson(json['nodeId'] as String),
       ignored: json['ignored'] as bool? ?? false,
-      ignoredReasons: json.containsKey('ignoredReasons')
-          ? (json['ignoredReasons'] as List)
-              .map((e) => AXProperty.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-      role: json.containsKey('role')
-          ? AXValue.fromJson(json['role'] as Map<String, dynamic>)
-          : null,
-      chromeRole: json.containsKey('chromeRole')
-          ? AXValue.fromJson(json['chromeRole'] as Map<String, dynamic>)
-          : null,
-      name: json.containsKey('name')
-          ? AXValue.fromJson(json['name'] as Map<String, dynamic>)
-          : null,
-      description: json.containsKey('description')
-          ? AXValue.fromJson(json['description'] as Map<String, dynamic>)
-          : null,
-      value: json.containsKey('value')
-          ? AXValue.fromJson(json['value'] as Map<String, dynamic>)
-          : null,
-      properties: json.containsKey('properties')
-          ? (json['properties'] as List)
-              .map((e) => AXProperty.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-      parentId: json.containsKey('parentId')
-          ? AXNodeId.fromJson(json['parentId'] as String)
-          : null,
-      childIds: json.containsKey('childIds')
-          ? (json['childIds'] as List)
-              .map((e) => AXNodeId.fromJson(e as String))
-              .toList()
-          : null,
-      backendDOMNodeId: json.containsKey('backendDOMNodeId')
-          ? dom.BackendNodeId.fromJson(json['backendDOMNodeId'] as int)
-          : null,
-      frameId: json.containsKey('frameId')
-          ? page.FrameId.fromJson(json['frameId'] as String)
-          : null,
+      ignoredReasons:
+          json.containsKey('ignoredReasons')
+              ? (json['ignoredReasons'] as List)
+                  .map((e) => AXProperty.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : null,
+      role:
+          json.containsKey('role')
+              ? AXValue.fromJson(json['role'] as Map<String, dynamic>)
+              : null,
+      chromeRole:
+          json.containsKey('chromeRole')
+              ? AXValue.fromJson(json['chromeRole'] as Map<String, dynamic>)
+              : null,
+      name:
+          json.containsKey('name')
+              ? AXValue.fromJson(json['name'] as Map<String, dynamic>)
+              : null,
+      description:
+          json.containsKey('description')
+              ? AXValue.fromJson(json['description'] as Map<String, dynamic>)
+              : null,
+      value:
+          json.containsKey('value')
+              ? AXValue.fromJson(json['value'] as Map<String, dynamic>)
+              : null,
+      properties:
+          json.containsKey('properties')
+              ? (json['properties'] as List)
+                  .map((e) => AXProperty.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : null,
+      parentId:
+          json.containsKey('parentId')
+              ? AXNodeId.fromJson(json['parentId'] as String)
+              : null,
+      childIds:
+          json.containsKey('childIds')
+              ? (json['childIds'] as List)
+                  .map((e) => AXNodeId.fromJson(e as String))
+                  .toList()
+              : null,
+      backendDOMNodeId:
+          json.containsKey('backendDOMNodeId')
+              ? dom.BackendNodeId.fromJson(json['backendDOMNodeId'] as int)
+              : null,
+      frameId:
+          json.containsKey('frameId')
+              ? page.FrameId.fromJson(json['frameId'] as String)
+              : null,
     );
   }
 

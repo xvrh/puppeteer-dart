@@ -20,8 +20,8 @@ typedef _TargetFactory = Target Function(TargetInfo, Session?);
 
 typedef TargetPredicate = bool Function(TargetInfo);
 
-typedef TargetInterceptor = Future<void> Function(
-    Target created, Target? parent);
+typedef TargetInterceptor =
+    Future<void> Function(Target created, Target? parent);
 
 class TargetChangedEvent {
   final Target target;
@@ -84,17 +84,23 @@ class TargetManager {
       StreamController<TargetChangedEvent>.broadcast();
   final _subscriptions = <StreamSubscription<dynamic>>[];
 
-  TargetManager(this._connection, this._targetFactory,
-      {TargetPredicate? targetFilterCallback})
-      : _targetFilterCallback = targetFilterCallback {
-    _subscriptions
-        .add(_connection.targetApi.onTargetCreated.listen(_onTargetCreated));
+  TargetManager(
+    this._connection,
+    this._targetFactory, {
+    TargetPredicate? targetFilterCallback,
+  }) : _targetFilterCallback = targetFilterCallback {
     _subscriptions.add(
-        _connection.targetApi.onTargetDestroyed.listen(_onTargetDestroyed));
+      _connection.targetApi.onTargetCreated.listen(_onTargetCreated),
+    );
     _subscriptions.add(
-        _connection.targetApi.onTargetInfoChanged.listen(_onTargetInfoChanged));
-    _subscriptions
-        .add(_connection.onSessionDetached.listen(_onSessionDetached));
+      _connection.targetApi.onTargetDestroyed.listen(_onTargetDestroyed),
+    );
+    _subscriptions.add(
+      _connection.targetApi.onTargetInfoChanged.listen(_onTargetInfoChanged),
+    );
+    _subscriptions.add(
+      _connection.onSessionDetached.listen(_onSessionDetached),
+    );
     _setupAttachmentListeners(_connection);
   }
 
@@ -111,9 +117,13 @@ class TargetManager {
   }
 
   Future<void> initialize() async {
-    await _connection.targetApi.setDiscoverTargets(true,
-        filter: TargetFilter(
-            [FilterEntry(type: 'tab', exclude: true), FilterEntry()]));
+    await _connection.targetApi.setDiscoverTargets(
+      true,
+      filter: TargetFilter([
+        FilterEntry(type: 'tab', exclude: true),
+        FilterEntry(),
+      ]),
+    );
     _storeExistingTargetsForInit();
     await _connection.targetApi.setAutoAttach(true, true, flatten: true);
     _finishInitializationIfReady(null);
@@ -152,24 +162,26 @@ class TargetManager {
 
   void removeTargetInterceptor(Client client, TargetInterceptor interceptor) {
     final interceptors = _targetInterceptors[client] ?? [];
-    _targetInterceptors[client] = interceptors.where((currentInterceptor) {
-      return currentInterceptor != interceptor;
-    }).toList();
+    _targetInterceptors[client] =
+        interceptors.where((currentInterceptor) {
+          return currentInterceptor != interceptor;
+        }).toList();
   }
 
   void _setupAttachmentListeners(Client session) {
     assert(_attachedToTargetListenersBySession[session] == null);
     var targetApi = TargetApi(session);
-    _attachedToTargetListenersBySession[session] =
-        targetApi.onAttachedToTarget.listen((AttachedToTargetEvent event) {
-      _onAttachedToTarget(session, event);
-    });
+    _attachedToTargetListenersBySession[session] = targetApi.onAttachedToTarget
+        .listen((AttachedToTargetEvent event) {
+          _onAttachedToTarget(session, event);
+        });
 
     assert(_detachedFromTargetListenersBySession[session] == null);
-    _detachedFromTargetListenersBySession[session] =
-        targetApi.onDetachedFromTarget.listen((DetachedFromTargetEvent event) {
-      _onDetachedFromTarget(session, event);
-    });
+    _detachedFromTargetListenersBySession[session] = targetApi
+        .onDetachedFromTarget
+        .listen((DetachedFromTargetEvent event) {
+          _onDetachedFromTarget(session, event);
+        });
   }
 
   void _removeAttachmentListeners(Client session) {
@@ -314,13 +326,15 @@ class TargetManager {
         // Sanity check: if parent session is not a connection, it should be
         // present in #attachedTargetsBySessionId.
         assert(
-            _attachedTargetsBySessionId.containsKey(parentSession.sessionId));
+          _attachedTargetsBySessionId.containsKey(parentSession.sessionId),
+        );
       }
       await interceptor(
-          target,
-          parentSession is Session
-              ? _attachedTargetsBySessionId[parentSession.sessionId]!
-              : null);
+        target,
+        parentSession is Session
+            ? _attachedTargetsBySessionId[parentSession.sessionId]!
+            : null,
+      );
     }
 
     _targetsIdsForInit.remove(target.targetID);
@@ -351,7 +365,9 @@ class TargetManager {
   }
 
   void _onDetachedFromTarget(
-      Client parentSession, DetachedFromTargetEvent event) {
+    Client parentSession,
+    DetachedFromTargetEvent event,
+  ) {
     final target = _attachedTargetsBySessionId[event.sessionId];
 
     _attachedTargetsBySessionId.remove(event.sessionId);

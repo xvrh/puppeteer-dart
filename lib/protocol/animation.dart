@@ -21,14 +21,20 @@ class AnimationApi {
   /// Event for animation that has been started.
   Stream<Animation> get onAnimationStarted => _client.onEvent
       .where((event) => event.name == 'Animation.animationStarted')
-      .map((event) => Animation.fromJson(
-          event.parameters['animation'] as Map<String, dynamic>));
+      .map(
+        (event) => Animation.fromJson(
+          event.parameters['animation'] as Map<String, dynamic>,
+        ),
+      );
 
   /// Event for animation that has been updated.
   Stream<Animation> get onAnimationUpdated => _client.onEvent
       .where((event) => event.name == 'Animation.animationUpdated')
-      .map((event) => Animation.fromJson(
-          event.parameters['animation'] as Map<String, dynamic>));
+      .map(
+        (event) => Animation.fromJson(
+          event.parameters['animation'] as Map<String, dynamic>,
+        ),
+      );
 
   /// Disables animation domain notifications.
   Future<void> disable() async {
@@ -44,9 +50,7 @@ class AnimationApi {
   /// [id] Id of animation.
   /// Returns: Current time of the page.
   Future<num> getCurrentTime(String id) async {
-    var result = await _client.send('Animation.getCurrentTime', {
-      'id': id,
-    });
+    var result = await _client.send('Animation.getCurrentTime', {'id': id});
     return result['currentTime'] as num;
   }
 
@@ -73,7 +77,8 @@ class AnimationApi {
       'animationId': animationId,
     });
     return runtime.RemoteObject.fromJson(
-        result['remoteObject'] as Map<String, dynamic>);
+      result['remoteObject'] as Map<String, dynamic>,
+    );
   }
 
   /// Seek a set of animations to a particular time within each animation.
@@ -156,18 +161,19 @@ class Animation {
   /// View or scroll timeline
   final ViewOrScrollTimeline? viewOrScrollTimeline;
 
-  Animation(
-      {required this.id,
-      required this.name,
-      required this.pausedState,
-      required this.playState,
-      required this.playbackRate,
-      required this.startTime,
-      required this.currentTime,
-      required this.type,
-      this.source,
-      this.cssId,
-      this.viewOrScrollTimeline});
+  Animation({
+    required this.id,
+    required this.name,
+    required this.pausedState,
+    required this.playState,
+    required this.playbackRate,
+    required this.startTime,
+    required this.currentTime,
+    required this.type,
+    this.source,
+    this.cssId,
+    this.viewOrScrollTimeline,
+  });
 
   factory Animation.fromJson(Map<String, dynamic> json) {
     return Animation(
@@ -179,14 +185,17 @@ class Animation {
       startTime: json['startTime'] as num,
       currentTime: json['currentTime'] as num,
       type: AnimationType.fromJson(json['type'] as String),
-      source: json.containsKey('source')
-          ? AnimationEffect.fromJson(json['source'] as Map<String, dynamic>)
-          : null,
+      source:
+          json.containsKey('source')
+              ? AnimationEffect.fromJson(json['source'] as Map<String, dynamic>)
+              : null,
       cssId: json.containsKey('cssId') ? json['cssId'] as String : null,
-      viewOrScrollTimeline: json.containsKey('viewOrScrollTimeline')
-          ? ViewOrScrollTimeline.fromJson(
-              json['viewOrScrollTimeline'] as Map<String, dynamic>)
-          : null,
+      viewOrScrollTimeline:
+          json.containsKey('viewOrScrollTimeline')
+              ? ViewOrScrollTimeline.fromJson(
+                json['viewOrScrollTimeline'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 
@@ -211,8 +220,7 @@ class Animation {
 enum AnimationType {
   cssTransition('CSSTransition'),
   cssAnimation('CSSAnimation'),
-  webAnimation('WebAnimation'),
-  ;
+  webAnimation('WebAnimation');
 
   final String value;
 
@@ -248,25 +256,28 @@ class ViewOrScrollTimeline {
   /// Orientation of the scroll
   final dom.ScrollOrientation axis;
 
-  ViewOrScrollTimeline(
-      {this.sourceNodeId,
-      this.startOffset,
-      this.endOffset,
-      this.subjectNodeId,
-      required this.axis});
+  ViewOrScrollTimeline({
+    this.sourceNodeId,
+    this.startOffset,
+    this.endOffset,
+    this.subjectNodeId,
+    required this.axis,
+  });
 
   factory ViewOrScrollTimeline.fromJson(Map<String, dynamic> json) {
     return ViewOrScrollTimeline(
-      sourceNodeId: json.containsKey('sourceNodeId')
-          ? dom.BackendNodeId.fromJson(json['sourceNodeId'] as int)
-          : null,
+      sourceNodeId:
+          json.containsKey('sourceNodeId')
+              ? dom.BackendNodeId.fromJson(json['sourceNodeId'] as int)
+              : null,
       startOffset:
           json.containsKey('startOffset') ? json['startOffset'] as num : null,
       endOffset:
           json.containsKey('endOffset') ? json['endOffset'] as num : null,
-      subjectNodeId: json.containsKey('subjectNodeId')
-          ? dom.BackendNodeId.fromJson(json['subjectNodeId'] as int)
-          : null,
+      subjectNodeId:
+          json.containsKey('subjectNodeId')
+              ? dom.BackendNodeId.fromJson(json['subjectNodeId'] as int)
+              : null,
       axis: dom.ScrollOrientation.fromJson(json['axis'] as String),
     );
   }
@@ -317,17 +328,18 @@ class AnimationEffect {
   /// `AnimationEffect`'s timing function.
   final String easing;
 
-  AnimationEffect(
-      {required this.delay,
-      required this.endDelay,
-      required this.iterationStart,
-      required this.iterations,
-      required this.duration,
-      required this.direction,
-      required this.fill,
-      this.backendNodeId,
-      this.keyframesRule,
-      required this.easing});
+  AnimationEffect({
+    required this.delay,
+    required this.endDelay,
+    required this.iterationStart,
+    required this.iterations,
+    required this.duration,
+    required this.direction,
+    required this.fill,
+    this.backendNodeId,
+    this.keyframesRule,
+    required this.easing,
+  });
 
   factory AnimationEffect.fromJson(Map<String, dynamic> json) {
     return AnimationEffect(
@@ -338,13 +350,16 @@ class AnimationEffect {
       duration: json['duration'] as num,
       direction: json['direction'] as String,
       fill: json['fill'] as String,
-      backendNodeId: json.containsKey('backendNodeId')
-          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
-          : null,
-      keyframesRule: json.containsKey('keyframesRule')
-          ? KeyframesRule.fromJson(
-              json['keyframesRule'] as Map<String, dynamic>)
-          : null,
+      backendNodeId:
+          json.containsKey('backendNodeId')
+              ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
+              : null,
+      keyframesRule:
+          json.containsKey('keyframesRule')
+              ? KeyframesRule.fromJson(
+                json['keyframesRule'] as Map<String, dynamic>,
+              )
+              : null,
       easing: json['easing'] as String,
     );
   }
@@ -378,9 +393,10 @@ class KeyframesRule {
   factory KeyframesRule.fromJson(Map<String, dynamic> json) {
     return KeyframesRule(
       name: json.containsKey('name') ? json['name'] as String : null,
-      keyframes: (json['keyframes'] as List)
-          .map((e) => KeyframeStyle.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      keyframes:
+          (json['keyframes'] as List)
+              .map((e) => KeyframeStyle.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 
@@ -410,9 +426,6 @@ class KeyframeStyle {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'offset': offset,
-      'easing': easing,
-    };
+    return {'offset': offset, 'easing': easing};
   }
 }

@@ -33,18 +33,21 @@ bool fixFile(DartFile dartFile) {
 }
 
 final DartFormatter _dartFormatter = DartFormatter(
-  fixes: StyleFix.all,
-  experimentFlags: ['inline-class'],
+  languageVersion: DartFormatter.latestLanguageVersion,
 );
 
 final analyzerFeatureSet = FeatureSet.fromEnableFlags2(
-    sdkLanguageVersion: Version(3, 3, 0), flags: ['inline-class']);
+  sdkLanguageVersion: Version(3, 3, 0),
+  flags: ['inline-class'],
+);
 
 final String newLineChar = Platform.isWindows ? '\r\n' : '\n';
 
 String reorderImports(String source) {
-  return _reorderImports(source,
-      parseString(content: source, featureSet: analyzerFeatureSet).unit);
+  return _reorderImports(
+    source,
+    parseString(content: source, featureSet: analyzerFeatureSet).unit,
+  );
 }
 
 String _reorderImports(String content, CompilationUnit unit) {
@@ -62,7 +65,8 @@ String _reorderImports(String content, CompilationUnit unit) {
       if (isFirst) {
         isFirst = false;
 
-        var token = directive.metadata.beginToken ??
+        var token =
+            directive.metadata.beginToken ??
             directive.firstTokenAfterCommentAndMetadata;
 
         for (var testMeta in const [
@@ -120,13 +124,18 @@ String _reorderImports(String content, CompilationUnit unit) {
     var result = '';
     for (var directive in directives) {
       var wholeDirective = wholeDirectives.firstWhere(
-          (wholeDirective) => wholeDirective.directive == directive);
-      var directiveString = content.substring(wholeDirective.countedOffset,
-          wholeDirective.countedOffset + wholeDirective.countedLength);
+        (wholeDirective) => wholeDirective.directive == directive,
+      );
+      var directiveString = content.substring(
+        wholeDirective.countedOffset,
+        wholeDirective.countedOffset + wholeDirective.countedLength,
+      );
 
       var normalizedDirective = directive.toString().replaceAll('"', "'");
-      directiveString =
-          directiveString.replaceAll(directive.toString(), normalizedDirective);
+      directiveString = directiveString.replaceAll(
+        directive.toString(),
+        normalizedDirective,
+      );
 
       result += directiveString;
     }

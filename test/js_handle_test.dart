@@ -35,8 +35,10 @@ void main() {
     });
     test('should accept object handle as an argument', () async {
       var navigatorHandle = await page.evaluateHandle('() => navigator');
-      var text =
-          await page.evaluate('e => e.userAgent', args: [navigatorHandle]);
+      var text = await page.evaluate(
+        'e => e.userAgent',
+        args: [navigatorHandle],
+      );
       expect(text, contains('Mozilla'));
     });
     test('should accept object handle to primitive types', () async {
@@ -47,17 +49,21 @@ void main() {
     test('should warn on nested object handles', () async {
       var aHandle = await page.evaluateHandle('() => document.body');
       expect(
-          () => page.evaluateHandle("opts => opts.elem.querySelector('p')",
-                  args: [
-                    {'elem': aHandle}
-                  ]),
-          throwsA(TypeMatcher<JsonUnsupportedObjectError>()));
+        () => page.evaluateHandle(
+          "opts => opts.elem.querySelector('p')",
+          args: [
+            {'elem': aHandle},
+          ],
+        ),
+        throwsA(TypeMatcher<JsonUnsupportedObjectError>()),
+      );
     });
     test('should accept object handle to unserializable value', () async {
       var aHandle = await page.evaluateHandle('() => Infinity');
       expect(
-          await page.evaluate('e => Object.is(e, Infinity)', args: [aHandle]),
-          isTrue);
+        await page.evaluate('e => Object.is(e, Infinity)', args: [aHandle]),
+        isTrue,
+      );
     });
     test('should use the same JS wrappers', () async {
       var aHandle = await page.evaluateHandle('''() => {
@@ -94,17 +100,18 @@ void main() {
       expect(json, {'foo': 'bar'});
     });
     test('should not work with dates', () async {
-      var dateHandle = await page
-          .evaluateHandle("() => new Date('2017-09-26T00:00:00.000Z')");
+      var dateHandle = await page.evaluateHandle(
+        "() => new Date('2017-09-26T00:00:00.000Z')",
+      );
       var json = await dateHandle.jsonValue;
       expect(json, equals({}));
     });
     test('should throw for circular objects', () async {
       var windowHandle = await page.evaluateHandle('window');
       expect(
-          () => windowHandle.jsonValue,
-          throwsA(
-              predicate((e) => '$e' == 'Object reference chain is too long')));
+        () => windowHandle.jsonValue,
+        throwsA(predicate((e) => '$e' == 'Object reference chain is too long')),
+      );
     });
   });
 
@@ -152,20 +159,25 @@ void main() {
     });
     test('should return ElementHandle for TextNodes', () async {
       await page.setContent('<div>ee!</div>');
-      var aHandle = await page
-          .evaluateHandle("() => document.querySelector('div').firstChild");
+      var aHandle = await page.evaluateHandle(
+        "() => document.querySelector('div').firstChild",
+      );
       var element = aHandle.asElement;
       expect(element, isNotNull);
       expect(
-          await page.evaluate('e => e.nodeType === HTMLElement.TEXT_NODE',
-              args: [element]),
-          isTrue);
+        await page.evaluate(
+          'e => e.nodeType === HTMLElement.TEXT_NODE',
+          args: [element],
+        ),
+        isTrue,
+      );
     });
     test('should work with nullified Node', () async {
       await page.setContent('<section>test</section>');
       await page.evaluate('() => delete Node');
-      var handle =
-          await page.evaluateHandle("() => document.querySelector('section')");
+      var handle = await page.evaluateHandle(
+        "() => document.querySelector('section')",
+      );
       var element = handle.asElement;
       expect(element, isNotNull);
     });
@@ -183,42 +195,78 @@ void main() {
       expect(aHandle.toString(), equals('JSHandle@object'));
     });
     test('should work with different subtypes', () async {
-      expect((await page.evaluateHandle('(function(){})')).toString(),
-          equals('JSHandle@function'));
       expect(
-          (await page.evaluateHandle('12')).toString(), equals('JSHandle:12'));
-      expect((await page.evaluateHandle('true')).toString(),
-          equals('JSHandle:true'));
-      expect((await page.evaluateHandle('undefined')).toString(),
-          equals('JSHandle:null'));
-      expect((await page.evaluateHandle('"foo"')).toString(),
-          equals('JSHandle:foo'));
-      expect((await page.evaluateHandle('Symbol()')).toString(),
-          equals('JSHandle@symbol'));
-      expect((await page.evaluateHandle('new Map()')).toString(),
-          equals('JSHandle@map'));
-      expect((await page.evaluateHandle('new Set()')).toString(),
-          equals('JSHandle@set'));
-      expect((await page.evaluateHandle('[]')).toString(),
-          equals('JSHandle@array'));
-      expect((await page.evaluateHandle('null')).toString(),
-          equals('JSHandle:null'));
-      expect((await page.evaluateHandle('/foo/')).toString(),
-          equals('JSHandle@regexp'));
-      expect((await page.evaluateHandle('document.body')).toString(),
-          equals('JSHandle@node'));
-      expect((await page.evaluateHandle('new Date()')).toString(),
-          equals('JSHandle@date'));
-      expect((await page.evaluateHandle('new WeakMap()')).toString(),
-          equals('JSHandle@weakmap'));
-      expect((await page.evaluateHandle('new WeakSet()')).toString(),
-          equals('JSHandle@weakset'));
-      expect((await page.evaluateHandle('new Error()')).toString(),
-          equals('JSHandle@error'));
-      expect((await page.evaluateHandle('new Int32Array()')).toString(),
-          equals('JSHandle@typedarray'));
-      expect((await page.evaluateHandle('new Proxy({}, {})')).toString(),
-          equals('JSHandle@proxy'));
+        (await page.evaluateHandle('(function(){})')).toString(),
+        equals('JSHandle@function'),
+      );
+      expect(
+        (await page.evaluateHandle('12')).toString(),
+        equals('JSHandle:12'),
+      );
+      expect(
+        (await page.evaluateHandle('true')).toString(),
+        equals('JSHandle:true'),
+      );
+      expect(
+        (await page.evaluateHandle('undefined')).toString(),
+        equals('JSHandle:null'),
+      );
+      expect(
+        (await page.evaluateHandle('"foo"')).toString(),
+        equals('JSHandle:foo'),
+      );
+      expect(
+        (await page.evaluateHandle('Symbol()')).toString(),
+        equals('JSHandle@symbol'),
+      );
+      expect(
+        (await page.evaluateHandle('new Map()')).toString(),
+        equals('JSHandle@map'),
+      );
+      expect(
+        (await page.evaluateHandle('new Set()')).toString(),
+        equals('JSHandle@set'),
+      );
+      expect(
+        (await page.evaluateHandle('[]')).toString(),
+        equals('JSHandle@array'),
+      );
+      expect(
+        (await page.evaluateHandle('null')).toString(),
+        equals('JSHandle:null'),
+      );
+      expect(
+        (await page.evaluateHandle('/foo/')).toString(),
+        equals('JSHandle@regexp'),
+      );
+      expect(
+        (await page.evaluateHandle('document.body')).toString(),
+        equals('JSHandle@node'),
+      );
+      expect(
+        (await page.evaluateHandle('new Date()')).toString(),
+        equals('JSHandle@date'),
+      );
+      expect(
+        (await page.evaluateHandle('new WeakMap()')).toString(),
+        equals('JSHandle@weakmap'),
+      );
+      expect(
+        (await page.evaluateHandle('new WeakSet()')).toString(),
+        equals('JSHandle@weakset'),
+      );
+      expect(
+        (await page.evaluateHandle('new Error()')).toString(),
+        equals('JSHandle@error'),
+      );
+      expect(
+        (await page.evaluateHandle('new Int32Array()')).toString(),
+        equals('JSHandle@typedarray'),
+      );
+      expect(
+        (await page.evaluateHandle('new Proxy({}, {})')).toString(),
+        equals('JSHandle@proxy'),
+      );
     });
   });
 }

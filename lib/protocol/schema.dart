@@ -36,9 +36,6 @@ class Domain {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'version': version,
-    };
+    return {'name': name, 'version': version};
   }
 }

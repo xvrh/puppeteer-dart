@@ -44,16 +44,18 @@ class Browser {
       _onTargetChangedController = StreamController<Target>.broadcast();
   final _plugins = <Plugin>[];
 
-  Browser._(this.process, this.connection,
-      {required this.defaultViewport,
-      required List<BrowserContextID>? browserContextIds,
-      required bool? ignoreHttpsErrors,
-      required Future<void> Function() closeCallback,
-      required List<Plugin> plugins})
-      : _closeCallback = closeCallback,
-        ignoreHttpsErrors = ignoreHttpsErrors ?? false,
-        browser = BrowserApi(connection),
-        systemInfo = SystemInfoApi(connection) {
+  Browser._(
+    this.process,
+    this.connection, {
+    required this.defaultViewport,
+    required List<BrowserContextID>? browserContextIds,
+    required bool? ignoreHttpsErrors,
+    required Future<void> Function() closeCallback,
+    required List<Plugin> plugins,
+  }) : _closeCallback = closeCallback,
+       ignoreHttpsErrors = ignoreHttpsErrors ?? false,
+       browser = BrowserApi(connection),
+       systemInfo = SystemInfoApi(connection) {
     _defaultContext = BrowserContext(connection, this, null);
 
     _plugins.addAll(plugins);
@@ -128,8 +130,10 @@ class Browser {
 
   /// Returns a list of all open browser contexts. In a newly created browser,
   /// this will return a single instance of BrowserContext.
-  List<BrowserContext> get browserContexts =>
-      [_defaultContext, ..._contexts.values];
+  List<BrowserContext> get browserContexts => [
+    _defaultContext,
+    ..._contexts.values,
+  ];
 
   /// Returns the default browser context. The default browser context can not
   /// be closed.
@@ -139,12 +143,15 @@ class Browser {
     var context = _contexts[event.browserContextId] ?? _defaultContext;
 
     return Target(
-        session,
-        _targetManager,
+      session,
+      _targetManager,
+      event,
+      ({required isAutoAttachEmulated}) => connection.createSession(
         event,
-        ({required isAutoAttachEmulated}) => connection.createSession(event,
-            isAutoAttachEmulated: isAutoAttachEmulated),
-        browserContext: context);
+        isAutoAttachEmulated: isAutoAttachEmulated,
+      ),
+      browserContext: context,
+    );
   }
 
   void _onAttachedToTarget(Target target) async {
@@ -185,8 +192,10 @@ class Browser {
   }
 
   Future<Page> _createPageInContext(BrowserContextID? contextId) async {
-    var targetId = await connection.targetApi
-        .createTarget('about:blank', browserContextId: contextId);
+    var targetId = await connection.targetApi.createTarget(
+      'about:blank',
+      browserContextId: contextId,
+    );
     var target = _targetManager.availableTargets()[targetId];
     if (target == null) {
       throw Exception('Missing target for page (id = $targetId)');
@@ -202,11 +211,12 @@ class Browser {
   /// A list of all active targets inside the Browser. In case of multiple
   /// browser contexts, the method will return an array with all the targets in
   /// all browser contexts.
-  List<Target> get targets => _targetManager
-      .availableTargets()
-      .values
-      .where((target) => target.isInitialized)
-      .toList();
+  List<Target> get targets =>
+      _targetManager
+          .availableTargets()
+          .values
+          .where((target) => target.isInitialized)
+          .toList();
 
   /// A target associated with the browser.
   Target get target => targets.firstWhere((t) => t.type == 'browser');
@@ -219,8 +229,9 @@ class Browser {
   /// contexts, the method will return an array with all the pages in all
   /// browser contexts.
   Future<List<Page>> get pages async {
-    var contextPages =
-        await Future.wait(browserContexts.map((context) => context.pages));
+    var contextPages = await Future.wait(
+      browserContexts.map((context) => context.pages),
+    );
     return contextPages.expand((l) => l).toList();
   }
 
@@ -228,13 +239,16 @@ class Browser {
   ///
   /// An example of finding a target for a page opened via window.open:
   /// ```dart
-  /// var newWindowTarget =
-  ///     browser.waitForTarget((target) => target.url == 'https://example.com/');
+  /// var newWindowTarget = browser.waitForTarget(
+  ///   (target) => target.url == 'https://example.com/',
+  /// );
   /// await page.evaluate("() => window.open('https://example.com/')");
   /// await newWindowTarget;
   /// ```
-  Future<Target> waitForTarget(bool Function(Target) predicate,
-      {Duration? timeout}) {
+  Future<Target> waitForTarget(
+    bool Function(Target) predicate, {
+    Duration? timeout,
+  }) {
     timeout ??= const Duration(seconds: 30);
     for (var target in targets) {
       if (predicate(target)) return Future.value(target);
@@ -288,18 +302,24 @@ class Browser {
   }
 }
 
-Future<Browser> createBrowser(Process? process, Connection connection,
-    {required DeviceViewport? defaultViewport,
-    List<BrowserContextID>? browserContextIds,
-    required Future<void> Function() closeCallback,
-    required bool? ignoreHttpsErrors,
-    required List<Plugin> plugins}) async {
-  var browser = Browser._(process, connection,
-      defaultViewport: defaultViewport,
-      browserContextIds: browserContextIds,
-      closeCallback: closeCallback,
-      ignoreHttpsErrors: ignoreHttpsErrors,
-      plugins: plugins);
+Future<Browser> createBrowser(
+  Process? process,
+  Connection connection, {
+  required DeviceViewport? defaultViewport,
+  List<BrowserContextID>? browserContextIds,
+  required Future<void> Function() closeCallback,
+  required bool? ignoreHttpsErrors,
+  required List<Plugin> plugins,
+}) async {
+  var browser = Browser._(
+    process,
+    connection,
+    defaultViewport: defaultViewport,
+    browserContextIds: browserContextIds,
+    closeCallback: closeCallback,
+    ignoreHttpsErrors: ignoreHttpsErrors,
+    plugins: plugins,
+  );
   return browser;
 }
 
@@ -353,9 +373,11 @@ class BrowserContext {
 
   /// An array of all pages inside the browser context.
   Future<List<Page>> get pages async {
-    var pages = await Future.wait(targets
-        .where((target) => target.type == 'page')
-        .map((target) => target.page));
+    var pages = await Future.wait(
+      targets
+          .where((target) => target.type == 'page')
+          .map((target) => target.page),
+    );
     return pages.nonNulls.toList();
   }
 
@@ -365,27 +387,34 @@ class BrowserContext {
     return id != null;
   }
 
-  /// origin <string> The origin to grant permissions to, e.g. "https://example.com".
-  /// permissions <Array<string>> An array of permissions to grant. All
+  /// origin [string] The origin to grant permissions to, e.g. "https://example.com".
+  /// permissions [Array<string>] An array of permissions to grant. All
   /// permissions that are not listed here will be automatically denied.
   ///
   /// ```dart
   /// var context = browser.defaultBrowserContext;
-  /// await context.overridePermissions(
-  ///     'https://html5demos.com', [PermissionType.geolocation]);
+  /// await context.overridePermissions('https://html5demos.com', [
+  ///   PermissionType.geolocation,
+  /// ]);
   /// ```
   Future<void> overridePermissions(
-      String origin, List<PermissionType> permissions) async {
-    await browser.browser
-        .grantPermissions(permissions, origin: origin, browserContextId: id);
+    String origin,
+    List<PermissionType> permissions,
+  ) async {
+    await browser.browser.grantPermissions(
+      permissions,
+      origin: origin,
+      browserContextId: id,
+    );
   }
 
   /// Clears all permission overrides for the browser context.
   ///
   /// ```dart
   /// var context = browser.defaultBrowserContext;
-  /// await context.overridePermissions(
-  ///     'https://example.com', [PermissionType.clipboardReadWrite]);
+  /// await context.overridePermissions('https://example.com', [
+  ///   PermissionType.clipboardReadWrite,
+  /// ]);
   /// // do stuff ..
   /// await context.clearPermissionOverrides();
   /// ```
@@ -399,11 +428,14 @@ class BrowserContext {
   }
 
   /// This searches for a target in this specific browser context.
-  Future<Target> waitForTarget(bool Function(Target) predicate,
-      {Duration? timeout}) {
+  Future<Target> waitForTarget(
+    bool Function(Target) predicate, {
+    Duration? timeout,
+  }) {
     return browser.waitForTarget(
-        (target) => target.browserContext == this && predicate(target),
-        timeout: timeout);
+      (target) => target.browserContext == this && predicate(target),
+      timeout: timeout,
+    );
   }
 
   /// Closes the browser context. All the targets that belong to the browser

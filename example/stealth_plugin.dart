@@ -10,8 +10,9 @@ void main() async {
 
   await page.goto('https://bot.sannysoft.com/');
   await Future.delayed(Duration(seconds: 5));
-  File('example/_stealth.png')
-      .writeAsBytesSync(await page.screenshot(fullPage: true));
+  File(
+    'example/_stealth.png',
+  ).writeAsBytesSync(await page.screenshot(fullPage: true));
 
   await browser.close();
 }

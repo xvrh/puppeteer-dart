@@ -10,9 +10,7 @@ class CacheStorageApi {
   /// Deletes a cache.
   /// [cacheId] Id of cache for deletion.
   Future<void> deleteCache(CacheId cacheId) async {
-    await _client.send('CacheStorage.deleteCache', {
-      'cacheId': cacheId,
-    });
+    await _client.send('CacheStorage.deleteCache', {'cacheId': cacheId});
   }
 
   /// Deletes a cache entry.
@@ -31,10 +29,11 @@ class CacheStorageApi {
   /// [storageKey] Storage key.
   /// [storageBucket] Storage bucket. If not specified, it uses the default bucket.
   /// Returns: Caches for the security origin.
-  Future<List<Cache>> requestCacheNames(
-      {String? securityOrigin,
-      String? storageKey,
-      storage.StorageBucket? storageBucket}) async {
+  Future<List<Cache>> requestCacheNames({
+    String? securityOrigin,
+    String? storageKey,
+    storage.StorageBucket? storageBucket,
+  }) async {
     var result = await _client.send('CacheStorage.requestCacheNames', {
       if (securityOrigin != null) 'securityOrigin': securityOrigin,
       if (storageKey != null) 'storageKey': storageKey,
@@ -51,7 +50,10 @@ class CacheStorageApi {
   /// [requestHeaders] headers of the request.
   /// Returns: Response read from the cache.
   Future<CachedResponse> requestCachedResponse(
-      CacheId cacheId, String requestURL, List<Header> requestHeaders) async {
+    CacheId cacheId,
+    String requestURL,
+    List<Header> requestHeaders,
+  ) async {
     var result = await _client.send('CacheStorage.requestCachedResponse', {
       'cacheId': cacheId,
       'requestURL': requestURL,
@@ -65,8 +67,12 @@ class CacheStorageApi {
   /// [skipCount] Number of records to skip.
   /// [pageSize] Number of records to fetch.
   /// [pathFilter] If present, only return the entries containing this substring in the path
-  Future<RequestEntriesResult> requestEntries(CacheId cacheId,
-      {int? skipCount, int? pageSize, String? pathFilter}) async {
+  Future<RequestEntriesResult> requestEntries(
+    CacheId cacheId, {
+    int? skipCount,
+    int? pageSize,
+    String? pathFilter,
+  }) async {
     var result = await _client.send('CacheStorage.requestEntries', {
       'cacheId': cacheId,
       if (skipCount != null) 'skipCount': skipCount,
@@ -85,14 +91,17 @@ class RequestEntriesResult {
   /// is the count of all entries from this storage.
   final num returnCount;
 
-  RequestEntriesResult(
-      {required this.cacheDataEntries, required this.returnCount});
+  RequestEntriesResult({
+    required this.cacheDataEntries,
+    required this.returnCount,
+  });
 
   factory RequestEntriesResult.fromJson(Map<String, dynamic> json) {
     return RequestEntriesResult(
-      cacheDataEntries: (json['cacheDataEntries'] as List)
-          .map((e) => DataEntry.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      cacheDataEntries:
+          (json['cacheDataEntries'] as List)
+              .map((e) => DataEntry.fromJson(e as Map<String, dynamic>))
+              .toList(),
       returnCount: json['returnCount'] as num,
     );
   }
@@ -112,8 +121,7 @@ enum CachedResponseType {
   default$('default'),
   error('error'),
   opaqueResponse('opaqueResponse'),
-  opaqueRedirect('opaqueRedirect'),
-  ;
+  opaqueRedirect('opaqueRedirect');
 
   final String value;
 
@@ -154,30 +162,33 @@ class DataEntry {
   /// Response headers
   final List<Header> responseHeaders;
 
-  DataEntry(
-      {required this.requestURL,
-      required this.requestMethod,
-      required this.requestHeaders,
-      required this.responseTime,
-      required this.responseStatus,
-      required this.responseStatusText,
-      required this.responseType,
-      required this.responseHeaders});
+  DataEntry({
+    required this.requestURL,
+    required this.requestMethod,
+    required this.requestHeaders,
+    required this.responseTime,
+    required this.responseStatus,
+    required this.responseStatusText,
+    required this.responseType,
+    required this.responseHeaders,
+  });
 
   factory DataEntry.fromJson(Map<String, dynamic> json) {
     return DataEntry(
       requestURL: json['requestURL'] as String,
       requestMethod: json['requestMethod'] as String,
-      requestHeaders: (json['requestHeaders'] as List)
-          .map((e) => Header.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      requestHeaders:
+          (json['requestHeaders'] as List)
+              .map((e) => Header.fromJson(e as Map<String, dynamic>))
+              .toList(),
       responseTime: json['responseTime'] as num,
       responseStatus: json['responseStatus'] as int,
       responseStatusText: json['responseStatusText'] as String,
       responseType: CachedResponseType.fromJson(json['responseType'] as String),
-      responseHeaders: (json['responseHeaders'] as List)
-          .map((e) => Header.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      responseHeaders:
+          (json['responseHeaders'] as List)
+              .map((e) => Header.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 
@@ -212,22 +223,25 @@ class Cache {
   /// The name of the cache.
   final String cacheName;
 
-  Cache(
-      {required this.cacheId,
-      required this.securityOrigin,
-      required this.storageKey,
-      this.storageBucket,
-      required this.cacheName});
+  Cache({
+    required this.cacheId,
+    required this.securityOrigin,
+    required this.storageKey,
+    this.storageBucket,
+    required this.cacheName,
+  });
 
   factory Cache.fromJson(Map<String, dynamic> json) {
     return Cache(
       cacheId: CacheId.fromJson(json['cacheId'] as String),
       securityOrigin: json['securityOrigin'] as String,
       storageKey: json['storageKey'] as String,
-      storageBucket: json.containsKey('storageBucket')
-          ? storage.StorageBucket.fromJson(
-              json['storageBucket'] as Map<String, dynamic>)
-          : null,
+      storageBucket:
+          json.containsKey('storageBucket')
+              ? storage.StorageBucket.fromJson(
+                json['storageBucket'] as Map<String, dynamic>,
+              )
+              : null,
       cacheName: json['cacheName'] as String,
     );
   }
@@ -251,17 +265,11 @@ class Header {
   Header({required this.name, required this.value});
 
   factory Header.fromJson(Map<String, dynamic> json) {
-    return Header(
-      name: json['name'] as String,
-      value: json['value'] as String,
-    );
+    return Header(name: json['name'] as String, value: json['value'] as String);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'value': value,
-    };
+    return {'name': name, 'value': value};
   }
 }
 
@@ -273,14 +281,10 @@ class CachedResponse {
   CachedResponse({required this.body});
 
   factory CachedResponse.fromJson(Map<String, dynamic> json) {
-    return CachedResponse(
-      body: json['body'] as String,
-    );
+    return CachedResponse(body: json['body'] as String);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'body': body,
-    };
+    return {'body': body};
   }
 }

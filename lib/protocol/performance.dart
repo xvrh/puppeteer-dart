@@ -18,10 +18,13 @@ class PerformanceApi {
 
   /// Enable collecting and reporting metrics.
   /// [timeDomain] Time domain to use for collecting and reporting duration metrics.
-  Future<void> enable(
-      {@Enum(['timeTicks', 'threadTicks']) String? timeDomain}) async {
-    assert(timeDomain == null ||
-        const ['timeTicks', 'threadTicks'].contains(timeDomain));
+  Future<void> enable({
+    @Enum(['timeTicks', 'threadTicks']) String? timeDomain,
+  }) async {
+    assert(
+      timeDomain == null ||
+          const ['timeTicks', 'threadTicks'].contains(timeDomain),
+    );
     await _client.send('Performance.enable', {
       if (timeDomain != null) 'timeDomain': timeDomain,
     });
@@ -33,11 +36,10 @@ class PerformanceApi {
   /// [timeDomain] Time domain
   @Deprecated('This command is deprecated')
   Future<void> setTimeDomain(
-      @Enum(['timeTicks', 'threadTicks']) String timeDomain) async {
+    @Enum(['timeTicks', 'threadTicks']) String timeDomain,
+  ) async {
     assert(const ['timeTicks', 'threadTicks'].contains(timeDomain));
-    await _client.send('Performance.setTimeDomain', {
-      'timeDomain': timeDomain,
-    });
+    await _client.send('Performance.setTimeDomain', {'timeDomain': timeDomain});
   }
 
   /// Retrieve current values of run-time metrics.
@@ -61,9 +63,10 @@ class MetricsEvent {
 
   factory MetricsEvent.fromJson(Map<String, dynamic> json) {
     return MetricsEvent(
-      metrics: (json['metrics'] as List)
-          .map((e) => Metric.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      metrics:
+          (json['metrics'] as List)
+              .map((e) => Metric.fromJson(e as Map<String, dynamic>))
+              .toList(),
       title: json['title'] as String,
     );
   }
@@ -80,16 +83,10 @@ class Metric {
   Metric({required this.name, required this.value});
 
   factory Metric.fromJson(Map<String, dynamic> json) {
-    return Metric(
-      name: json['name'] as String,
-      value: json['value'] as num,
-    );
+    return Metric(name: json['name'] as String, value: json['value'] as num);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'value': value,
-    };
+    return {'name': name, 'value': value};
   }
 }

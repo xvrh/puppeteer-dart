@@ -17,8 +17,11 @@ class DOMDebuggerApi {
   /// [pierce] Whether or not iframes and shadow roots should be traversed when returning the subtree
   /// (default is false). Reports listeners for all contexts if pierce is enabled.
   /// Returns: Array of relevant listeners.
-  Future<List<EventListener>> getEventListeners(runtime.RemoteObjectId objectId,
-      {int? depth, bool? pierce}) async {
+  Future<List<EventListener>> getEventListeners(
+    runtime.RemoteObjectId objectId, {
+    int? depth,
+    bool? pierce,
+  }) async {
     var result = await _client.send('DOMDebugger.getEventListeners', {
       'objectId': objectId,
       if (depth != null) 'depth': depth,
@@ -33,7 +36,9 @@ class DOMDebuggerApi {
   /// [nodeId] Identifier of the node to remove breakpoint from.
   /// [type] Type of the breakpoint to remove.
   Future<void> removeDOMBreakpoint(
-      dom.NodeId nodeId, DOMBreakpointType type) async {
+    dom.NodeId nodeId,
+    DOMBreakpointType type,
+  ) async {
     await _client.send('DOMDebugger.removeDOMBreakpoint', {
       'nodeId': nodeId,
       'type': type,
@@ -43,8 +48,10 @@ class DOMDebuggerApi {
   /// Removes breakpoint on particular DOM event.
   /// [eventName] Event name.
   /// [targetName] EventTarget interface name.
-  Future<void> removeEventListenerBreakpoint(String eventName,
-      {String? targetName}) async {
+  Future<void> removeEventListenerBreakpoint(
+    String eventName, {
+    String? targetName,
+  }) async {
     await _client.send('DOMDebugger.removeEventListenerBreakpoint', {
       'eventName': eventName,
       if (targetName != null) 'targetName': targetName,
@@ -63,15 +70,14 @@ class DOMDebuggerApi {
   /// Removes breakpoint from XMLHttpRequest.
   /// [url] Resource URL substring.
   Future<void> removeXHRBreakpoint(String url) async {
-    await _client.send('DOMDebugger.removeXHRBreakpoint', {
-      'url': url,
-    });
+    await _client.send('DOMDebugger.removeXHRBreakpoint', {'url': url});
   }
 
   /// Sets breakpoint on particular CSP violations.
   /// [violationTypes] CSP Violations to stop upon.
   Future<void> setBreakOnCSPViolation(
-      List<CSPViolationType> violationTypes) async {
+    List<CSPViolationType> violationTypes,
+  ) async {
     await _client.send('DOMDebugger.setBreakOnCSPViolation', {
       'violationTypes': [...violationTypes],
     });
@@ -81,7 +87,9 @@ class DOMDebuggerApi {
   /// [nodeId] Identifier of the node to set breakpoint on.
   /// [type] Type of the operation to stop upon.
   Future<void> setDOMBreakpoint(
-      dom.NodeId nodeId, DOMBreakpointType type) async {
+    dom.NodeId nodeId,
+    DOMBreakpointType type,
+  ) async {
     await _client.send('DOMDebugger.setDOMBreakpoint', {
       'nodeId': nodeId,
       'type': type,
@@ -92,8 +100,10 @@ class DOMDebuggerApi {
   /// [eventName] DOM Event name to stop on (any DOM event will do).
   /// [targetName] EventTarget interface name to stop on. If equal to `"*"` or not provided, will stop on any
   /// EventTarget.
-  Future<void> setEventListenerBreakpoint(String eventName,
-      {String? targetName}) async {
+  Future<void> setEventListenerBreakpoint(
+    String eventName, {
+    String? targetName,
+  }) async {
     await _client.send('DOMDebugger.setEventListenerBreakpoint', {
       'eventName': eventName,
       if (targetName != null) 'targetName': targetName,
@@ -112,9 +122,7 @@ class DOMDebuggerApi {
   /// Sets breakpoint on XMLHttpRequest.
   /// [url] Resource URL substring. All XHRs having this substring in the URL will get stopped upon.
   Future<void> setXHRBreakpoint(String url) async {
-    await _client.send('DOMDebugger.setXHRBreakpoint', {
-      'url': url,
-    });
+    await _client.send('DOMDebugger.setXHRBreakpoint', {'url': url});
   }
 }
 
@@ -122,8 +130,7 @@ class DOMDebuggerApi {
 enum DOMBreakpointType {
   subtreeModified('subtree-modified'),
   attributeModified('attribute-modified'),
-  nodeRemoved('node-removed'),
-  ;
+  nodeRemoved('node-removed');
 
   final String value;
 
@@ -141,8 +148,7 @@ enum DOMBreakpointType {
 /// CSP Violation type.
 enum CSPViolationType {
   trustedtypeSinkViolation('trustedtype-sink-violation'),
-  trustedtypePolicyViolation('trustedtype-policy-violation'),
-  ;
+  trustedtypePolicyViolation('trustedtype-policy-violation');
 
   final String value;
 
@@ -189,17 +195,18 @@ class EventListener {
   /// Node the listener is added to (if any).
   final dom.BackendNodeId? backendNodeId;
 
-  EventListener(
-      {required this.type,
-      required this.useCapture,
-      required this.passive,
-      required this.once,
-      required this.scriptId,
-      required this.lineNumber,
-      required this.columnNumber,
-      this.handler,
-      this.originalHandler,
-      this.backendNodeId});
+  EventListener({
+    required this.type,
+    required this.useCapture,
+    required this.passive,
+    required this.once,
+    required this.scriptId,
+    required this.lineNumber,
+    required this.columnNumber,
+    this.handler,
+    this.originalHandler,
+    this.backendNodeId,
+  });
 
   factory EventListener.fromJson(Map<String, dynamic> json) {
     return EventListener(
@@ -210,17 +217,22 @@ class EventListener {
       scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
       lineNumber: json['lineNumber'] as int,
       columnNumber: json['columnNumber'] as int,
-      handler: json.containsKey('handler')
-          ? runtime.RemoteObject.fromJson(
-              json['handler'] as Map<String, dynamic>)
-          : null,
-      originalHandler: json.containsKey('originalHandler')
-          ? runtime.RemoteObject.fromJson(
-              json['originalHandler'] as Map<String, dynamic>)
-          : null,
-      backendNodeId: json.containsKey('backendNodeId')
-          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
-          : null,
+      handler:
+          json.containsKey('handler')
+              ? runtime.RemoteObject.fromJson(
+                json['handler'] as Map<String, dynamic>,
+              )
+              : null,
+      originalHandler:
+          json.containsKey('originalHandler')
+              ? runtime.RemoteObject.fromJson(
+                json['originalHandler'] as Map<String, dynamic>,
+              )
+              : null,
+      backendNodeId:
+          json.containsKey('backendNodeId')
+              ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
+              : null,
     );
   }
 

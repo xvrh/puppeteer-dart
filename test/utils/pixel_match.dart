@@ -1,17 +1,22 @@
 import 'dart:math' as math;
 import 'dart:typed_data';
 
-int pixelMatch(Uint8List img1, Uint8List img2,
-    {required int width,
-    required int height,
-    Uint8List? output,
-    num? threshold,
-    bool? includeAA}) {
+int pixelMatch(
+  Uint8List img1,
+  Uint8List img2, {
+  required int width,
+  required int height,
+  Uint8List? output,
+  num? threshold,
+  bool? includeAA,
+}) {
   if (img1.length != img2.length) {
     throw Exception('Image sizes do not match.');
   }
-  assert(img1.length == width * height * 4,
-      '${img1.length} != ${width * height * 4}');
+  assert(
+    img1.length == width * height * 4,
+    '${img1.length} != ${width * height * 4}',
+  );
 
   includeAA ??= false;
   threshold ??= 0.1;
@@ -58,7 +63,13 @@ int pixelMatch(Uint8List img1, Uint8List img2,
 // based on "Anti-aliased Pixel and Intensity Slope Detector" paper by V. Vysniauskas, 2009
 
 bool _antialiased(
-    Uint8List img, int x1, int y1, int width, int height, Uint8List img2) {
+  Uint8List img,
+  int x1,
+  int y1,
+  int width,
+  int height,
+  Uint8List img2,
+) {
   var x0 = math.max(x1 - 1, 0);
   var y0 = math.max(y1 - 1, 0);
   var x2 = math.min(x1 + 1, width - 1);
@@ -127,7 +138,9 @@ bool _hasManySiblings(Uint8List img, int x1, int y1, int width, int height) {
       if (img[pos] == img[pos2] &&
           img[pos + 1] == img[pos2 + 1] &&
           img[pos + 2] == img[pos2 + 2] &&
-          img[pos + 3] == img[pos2 + 3]) zeroes++;
+          img[pos + 3] == img[pos2 + 3]) {
+        zeroes++;
+      }
 
       if (zeroes > 2) return true;
     }

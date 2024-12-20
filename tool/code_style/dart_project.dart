@@ -24,8 +24,12 @@ DartProject? getContainingProject(String currentPath) {
   var dir = Directory(currentPath);
 
   while (true) {
-    if (dir.listSync(followLinks: false).any((r) =>
-        r is File && p.basename(r.path).toLowerCase() == 'pubspec.yaml')) {
+    if (dir
+        .listSync(followLinks: false)
+        .any(
+          (r) =>
+              r is File && p.basename(r.path).toLowerCase() == 'pubspec.yaml',
+        )) {
       return DartProject(dir.path, listingPath: currentPath);
     }
     var parent = dir.parent;
@@ -80,14 +84,20 @@ class DartProject {
     return files;
   }
 
-  void _visitDirectory(Directory directory, List<DartFile> files,
-      {bool isRoot = true}) {
+  void _visitDirectory(
+    Directory directory,
+    List<DartFile> files, {
+    bool isRoot = true,
+  }) {
     var directoryContent = directory.listSync();
 
     // On ne visite pas les sous dossiers qui contiennent un autre package
     if (!isRoot &&
-        directoryContent
-            .any((f) => f is File && f.path.endsWith('pubspec.yaml'))) return;
+        directoryContent.any(
+          (f) => f is File && f.path.endsWith('pubspec.yaml'),
+        )) {
+      return;
+    }
 
     for (var entity in directoryContent) {
       if (entity is File && entity.path.endsWith('.dart')) {
@@ -110,8 +120,10 @@ class DartFile {
   final String _relativePath;
 
   DartFile(this.project, this.file)
-      : _relativePath =
-            p.relative(file.absolute.path, from: project.rootDirectory);
+    : _relativePath = p.relative(
+        file.absolute.path,
+        from: project.rootDirectory,
+      );
 
   String get path => file.path;
 

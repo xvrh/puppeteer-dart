@@ -11,9 +11,7 @@ class BluetoothEmulationApi {
   /// Enable the BluetoothEmulation domain.
   /// [state] State of the simulated central.
   Future<void> enable(CentralState state) async {
-    await _client.send('BluetoothEmulation.enable', {
-      'state': state,
-    });
+    await _client.send('BluetoothEmulation.enable', {'state': state});
   }
 
   /// Disable the BluetoothEmulation domain.
@@ -24,10 +22,11 @@ class BluetoothEmulationApi {
   /// Simulates a peripheral with |address|, |name| and |knownServiceUuids|
   /// that has already been connected to the system.
   Future<void> simulatePreconnectedPeripheral(
-      String address,
-      String name,
-      List<ManufacturerData> manufacturerData,
-      List<String> knownServiceUuids) async {
+    String address,
+    String name,
+    List<ManufacturerData> manufacturerData,
+    List<String> knownServiceUuids,
+  ) async {
     await _client.send('BluetoothEmulation.simulatePreconnectedPeripheral', {
       'address': address,
       'name': name,
@@ -49,8 +48,7 @@ class BluetoothEmulationApi {
 enum CentralState {
   absent('absent'),
   poweredOff('powered-off'),
-  poweredOn('powered-on'),
-  ;
+  poweredOn('powered-on');
 
   final String value;
 
@@ -85,10 +83,7 @@ class ManufacturerData {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'key': key,
-      'data': data,
-    };
+    return {'key': key, 'data': data};
   }
 }
 
@@ -108,27 +103,32 @@ class ScanRecord {
   /// manufacturer specific data.
   final List<ManufacturerData>? manufacturerData;
 
-  ScanRecord(
-      {this.name,
-      this.uuids,
-      this.appearance,
-      this.txPower,
-      this.manufacturerData});
+  ScanRecord({
+    this.name,
+    this.uuids,
+    this.appearance,
+    this.txPower,
+    this.manufacturerData,
+  });
 
   factory ScanRecord.fromJson(Map<String, dynamic> json) {
     return ScanRecord(
       name: json.containsKey('name') ? json['name'] as String : null,
-      uuids: json.containsKey('uuids')
-          ? (json['uuids'] as List).map((e) => e as String).toList()
-          : null,
+      uuids:
+          json.containsKey('uuids')
+              ? (json['uuids'] as List).map((e) => e as String).toList()
+              : null,
       appearance:
           json.containsKey('appearance') ? json['appearance'] as int : null,
       txPower: json.containsKey('txPower') ? json['txPower'] as int : null,
-      manufacturerData: json.containsKey('manufacturerData')
-          ? (json['manufacturerData'] as List)
-              .map((e) => ManufacturerData.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
+      manufacturerData:
+          json.containsKey('manufacturerData')
+              ? (json['manufacturerData'] as List)
+                  .map(
+                    (e) => ManufacturerData.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList()
+              : null,
     );
   }
 
@@ -152,17 +152,19 @@ class ScanEntry {
 
   final ScanRecord scanRecord;
 
-  ScanEntry(
-      {required this.deviceAddress,
-      required this.rssi,
-      required this.scanRecord});
+  ScanEntry({
+    required this.deviceAddress,
+    required this.rssi,
+    required this.scanRecord,
+  });
 
   factory ScanEntry.fromJson(Map<String, dynamic> json) {
     return ScanEntry(
       deviceAddress: json['deviceAddress'] as String,
       rssi: json['rssi'] as int,
-      scanRecord:
-          ScanRecord.fromJson(json['scanRecord'] as Map<String, dynamic>),
+      scanRecord: ScanRecord.fromJson(
+        json['scanRecord'] as Map<String, dynamic>,
+      ),
     );
   }
 

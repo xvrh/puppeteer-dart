@@ -100,9 +100,10 @@ void main() {
         }
       });
       await page.evaluate("() => fetch('/digits/1.png')");
-      requests = requests
-          .where((request) => !request.url.contains('favicon'))
-          .toList();
+      requests =
+          requests
+              .where((request) => !request.url.contains('favicon'))
+              .toList();
       expect(requests.length, equals(1));
       expect(requests[0].frame, equals(page.mainFrame));
     });
@@ -164,8 +165,10 @@ void main() {
       });
 
       // Load and re-load to make sure serviceworker is installed and running.
-      await page.goto(server.prefix + '/serviceworkers/fetch/sw.html',
-          wait: Until.networkAlmostIdle);
+      await page.goto(
+        server.prefix + '/serviceworkers/fetch/sw.html',
+        wait: Until.networkAlmostIdle,
+      );
       await page.evaluate('async() => await window.activationPromise');
       await page.reload();
 
@@ -186,7 +189,8 @@ void main() {
         request = r;
       });
       await page.evaluate(
-          "() => fetch('./post', { method: 'POST', body: JSON.stringify({foo: 'bar'})})");
+        "() => fetch('./post', { method: 'POST', body: JSON.stringify({foo: 'bar'})})",
+      );
       expect(request, isNotNull);
       expect(request.postData, equals('{"foo":"bar"}'));
     });
@@ -201,13 +205,17 @@ void main() {
       var response = await page.goto(server.prefix + '/simple.json');
       expect(await response.text, startsWith('{"foo": "bar"}'));
     });
-    test('should return uncompressed text', () async {
-      //TODO(xha): add feature to server and enable test
-      //server.enableGzip('/simple.json');
-      var response = await page.goto(server.prefix + '/simple.json');
-      expect(response.headers['content-encoding'], equals('gzip'));
-      expect(await response.text, equals('{"foo": "bar"}\n'));
-    }, skip: "Test server doesn't have enableGzip");
+    test(
+      'should return uncompressed text',
+      () async {
+        //TODO(xha): add feature to server and enable test
+        //server.enableGzip('/simple.json');
+        var response = await page.goto(server.prefix + '/simple.json');
+        expect(response.headers['content-encoding'], equals('gzip'));
+        expect(await response.text, equals('{"foo": "bar"}\n'));
+      },
+      skip: "Test server doesn't have enableGzip",
+    );
     test('should throw when requesting body of redirected response', () async {
       server.setRedirect('/foo.html', '/empty.html');
       var response = await page.goto(server.prefix + '/foo.html');
@@ -216,9 +224,15 @@ void main() {
       var redirected = redirectChain[0].response!;
       expect(redirected.status, equals(302));
       expect(
-          () => redirected.text,
-          throwsA(predicate((e) => '$e'.contains(
-              'Response body is unavailable for redirect responses'))));
+        () => redirected.text,
+        throwsA(
+          predicate(
+            (e) => '$e'.contains(
+              'Response body is unavailable for redirect responses',
+            ),
+          ),
+        ),
+      );
     });
     test('should wait until response completes', () async {
       await page.goto(server.emptyPage);
@@ -232,8 +246,10 @@ void main() {
 
         // In Firefox, |fetch| will be hanging until it receives |Content-Type| header
         // from server.
-        return shelf.Response.ok(responseStream.stream,
-            headers: {'Content-Type': 'text/plain; charset=utf-8'});
+        return shelf.Response.ok(
+          responseStream.stream,
+          headers: {'Content-Type': 'text/plain; charset=utf-8'},
+        );
       });
       // Setup page to trap response.
       var requestFinished = false;
@@ -242,10 +258,12 @@ void main() {
       });
       // send request and wait for server response
       var pageResponse = await waitFutures(
-          page.onResponse.where((r) => !isFavicon(r.url)).first, [
-        page.evaluate("() => fetch('./get', { method: 'GET'})"),
-        server.waitForRequest('/get'),
-      ]);
+        page.onResponse.where((r) => !isFavicon(r.url)).first,
+        [
+          page.evaluate("() => fetch('./get', { method: 'GET'})"),
+          server.waitForRequest('/get'),
+        ],
+      );
 
       expect(serverResponse, isNotNull);
       expect(pageResponse, isNotNull);
@@ -321,9 +339,10 @@ void main() {
       expect(responses[0].request, isNotNull);
       // Either IPv6 or IPv4, depending on environment.
       expect(
-          responses[0].remoteIPAddress!.contains('::1') ||
-              responses[0].remoteIPAddress == '127.0.0.1',
-          isTrue);
+        responses[0].remoteIPAddress!.contains('::1') ||
+            responses[0].remoteIPAddress == '127.0.0.1',
+        isTrue,
+      );
       expect(responses[0].remotePort, equals(server.port));
     });
 
@@ -366,27 +385,32 @@ void main() {
     });
     test('should support redirects', () async {
       var events = <String>[];
-      page.onRequest
-          .listen((request) => events.add('${request.method} ${request.url}'));
+      page.onRequest.listen(
+        (request) => events.add('${request.method} ${request.url}'),
+      );
       page.onResponse.listen(
-          (response) => events.add('${response.status} ${response.url}'));
-      page.onRequestFinished
-          .listen((request) => events.add('DONE ${request.url}'));
-      page.onRequestFailed
-          .listen((request) => events.add('FAIL ${request.url}'));
+        (response) => events.add('${response.status} ${response.url}'),
+      );
+      page.onRequestFinished.listen(
+        (request) => events.add('DONE ${request.url}'),
+      );
+      page.onRequestFailed.listen(
+        (request) => events.add('FAIL ${request.url}'),
+      );
       server.setRedirect('/foo.html', '/empty.html');
       var fooUrl = server.prefix + '/foo.html';
       var response = await page.goto(fooUrl);
       expect(
-          events,
-          equals([
-            'GET $fooUrl',
-            '302 $fooUrl',
-            'DONE $fooUrl',
-            'GET ${server.emptyPage}',
-            '200 ${server.emptyPage}',
-            'DONE ${server.emptyPage}'
-          ]));
+        events,
+        equals([
+          'GET $fooUrl',
+          '302 $fooUrl',
+          'DONE $fooUrl',
+          'GET ${server.emptyPage}',
+          '200 ${server.emptyPage}',
+          'DONE ${server.emptyPage}',
+        ]),
+      );
 
       // Check redirect chain
       var redirectChain = response.request.redirectChain;
@@ -399,8 +423,9 @@ void main() {
   group('Request.isNavigationRequest', () {
     test('should work', () async {
       var requests = <String, Request>{};
-      page.onRequest
-          .listen((request) => requests[request.url.split('/').last] = request);
+      page.onRequest.listen(
+        (request) => requests[request.url.split('/').last] = request,
+      );
       server.setRedirect('/rrredirect', '/frames/one-frame.html');
       await page.goto(server.prefix + '/rrredirect');
       expect(requests['rrredirect']!.isNavigationRequest, isTrue);
@@ -431,14 +456,17 @@ void main() {
       await page.setRequestInterception(true);
 
       server.setRoute('/', (request) {
-        return shelf.Response.ok('''<script>
+        return shelf.Response.ok(
+          '''<script>
 fetch('/handler', {
   headers: {
     'authorization': 'abc',
     'x-some-header': 'efg',
   }
 })        
-</script>''', headers: {'content-type': 'text/html'});
+</script>''',
+          headers: {'content-type': 'text/html'},
+        );
       });
 
       late Map<String, String> headers;
@@ -454,21 +482,24 @@ fetch('/handler', {
     });
     test('Request interception can change original  headers', () async {
       page.onRequest.listen((request) {
-        request.continueRequest(headers: {
-          'authorization': 'authorization-override',
-        });
+        request.continueRequest(
+          headers: {'authorization': 'authorization-override'},
+        );
       });
       await page.setRequestInterception(true);
 
       server.setRoute('/', (request) {
-        return shelf.Response.ok('''<script>
+        return shelf.Response.ok(
+          '''<script>
 fetch('/handler', {
   headers: {
     'authorization': 'abc',
     'x-some-header': 'efg',
   }
 })        
-</script>''', headers: {'content-type': 'text/html'});
+</script>''',
+          headers: {'content-type': 'text/html'},
+        );
       });
 
       late Map<String, String> headers;

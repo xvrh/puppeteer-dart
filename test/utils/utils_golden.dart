@@ -4,15 +4,17 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 import 'pixel_match.dart';
 
-final bool _updateGolden = (() {
-  var env = Platform.environment['PUPPETEER_UPDATE_GOLDEN'];
-  return env != null && env != 'false';
-})();
+final bool _updateGolden =
+    (() {
+      var env = Platform.environment['PUPPETEER_UPDATE_GOLDEN'];
+      return env != null && env != 'false';
+    })();
 
-final bool _skipGoldenComparison = (() {
-  var env = Platform.environment['PUPPETEER_SKIP_GOLDEN_COMPARISON'];
-  return env != null && env != 'false';
-})();
+final bool _skipGoldenComparison =
+    (() {
+      var env = Platform.environment['PUPPETEER_SKIP_GOLDEN_COMPARISON'];
+      return env != null && env != 'false';
+    })();
 
 class _GoldenMatcher extends Matcher {
   final String goldenPath;
@@ -48,8 +50,12 @@ class _GoldenMatcher extends Matcher {
   }
 
   @override
-  Description describeMismatch(item, Description mismatchDescription,
-      Map<dynamic, dynamic> matchState, bool verbose) {
+  Description describeMismatch(
+    item,
+    Description mismatchDescription,
+    Map<dynamic, dynamic> matchState,
+    bool verbose,
+  ) {
     var difference = matchState['comparison'] as ImageDifference;
     mismatchDescription.replace(difference.toString());
     return mismatchDescription;
@@ -61,29 +67,45 @@ Matcher equalsGolden(String goldenPath) {
 }
 
 ImageDifference? _compareImages(
-    Uint8List actualBytes, Uint8List expectedBytes) {
+  Uint8List actualBytes,
+  Uint8List expectedBytes,
+) {
   var actual = decodeImage(actualBytes)!.convert(numChannels: 4);
   var expected = decodeImage(expectedBytes)!.convert(numChannels: 4);
 
   if (expected.width != actual.width || expected.height != actual.height) {
     return SizeDifference(
-        expected.width, expected.height, actual.width, actual.height);
+      expected.width,
+      expected.height,
+      actual.width,
+      actual.height,
+    );
   }
 
   var output = Uint8List(actual.buffer.lengthInBytes);
 
   num threshold = 0.1;
   var count = pixelMatch(
-      Uint8List.view(expected.buffer), Uint8List.view(actual.buffer),
-      width: expected.width, height: expected.height, threshold: threshold);
+    Uint8List.view(expected.buffer),
+    Uint8List.view(actual.buffer),
+    width: expected.width,
+    height: expected.height,
+    threshold: threshold,
+  );
   if (count > 0) {
     return ContentDifference(
-        count,
-        actualBytes,
-        expectedBytes,
-        PngEncoder().encode(Image.fromBytes(
-            width: actual.width, height: actual.height, bytes: output.buffer)),
-        usedThreshold: threshold);
+      count,
+      actualBytes,
+      expectedBytes,
+      PngEncoder().encode(
+        Image.fromBytes(
+          width: actual.width,
+          height: actual.height,
+          bytes: output.buffer,
+        ),
+      ),
+      usedThreshold: threshold,
+    );
   }
   return null;
 }
@@ -93,8 +115,12 @@ class ImageDifference {}
 class SizeDifference implements ImageDifference {
   final int expectedWidth, expectedHeight, actualWidth, actualHeight;
 
-  SizeDifference(this.expectedWidth, this.expectedHeight, this.actualWidth,
-      this.actualHeight);
+  SizeDifference(
+    this.expectedWidth,
+    this.expectedHeight,
+    this.actualWidth,
+    this.actualHeight,
+  );
 
   @override
   String toString() =>
@@ -106,14 +132,20 @@ class ContentDifference implements ImageDifference {
   final List<int> actual, golden, diff;
   final num usedThreshold;
 
-  ContentDifference(this.differenceCount, this.actual, this.golden, this.diff,
-      {required this.usedThreshold});
+  ContentDifference(
+    this.differenceCount,
+    this.actual,
+    this.golden,
+    this.diff, {
+    required this.usedThreshold,
+  });
 
   static String _bytesToPng(List<int> bytes) =>
       Uri.dataFromBytes(bytes, mimeType: 'image/png').toString();
 
   @override
-  String toString() => 'Image content has $differenceCount different pixels.'
+  String toString() =>
+      'Image content has $differenceCount different pixels.'
       '\n\nActual: ${_bytesToPng(actual)}'
       '\n\nGolden: ${_bytesToPng(golden)}'
       '\n\nDiff: ${_bytesToPng(diff)}';

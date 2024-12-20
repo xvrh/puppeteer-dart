@@ -11,7 +11,8 @@ void main() {
   setUpAll(() async {
     server = await Server.create();
     browser = await puppeteer.launch(
-        defaultViewport: DeviceViewport(width: 800, height: 600));
+      defaultViewport: DeviceViewport(width: 800, height: 600),
+    );
   });
 
   tearDownAll(() async {
@@ -47,11 +48,11 @@ void main() {
 
       await Future.wait([
         context1.evaluate('() => window.a = 1'),
-        context2.evaluate('() => window.a = 2')
+        context2.evaluate('() => window.a = 2'),
       ]);
       var as = await Future.wait([
         context1.evaluate('() => window.a'),
-        context2.evaluate('() => window.a')
+        context2.evaluate('() => window.a'),
       ]);
       expect(as[0], equals(1));
       expect(as[1], equals(2));
@@ -72,9 +73,15 @@ void main() {
       var frame1 = await attachFrame(page, 'frame1', server.emptyPage);
       await detachFrame(page, 'frame1');
       expect(
-          () => frame1.evaluate('() => 7 * 8'),
-          throwsA(predicate((e) => '$e'.contains(
-              'Execution Context is not available in detached frame'))));
+        () => frame1.evaluate('() => 7 * 8'),
+        throwsA(
+          predicate(
+            (e) => '$e'.contains(
+              'Execution Context is not available in detached frame',
+            ),
+          ),
+        ),
+      );
     });
   });
 
@@ -82,48 +89,53 @@ void main() {
     test('should handle nested frames', () async {
       await page.goto(server.prefix + '/frames/nested-frames.html');
       expect(
-          dumpFrames(page.mainFrame),
-          equals([
-            'http://<host>/frames/nested-frames.html',
-            '    http://<host>/frames/two-frames.html (2frames)',
-            '        http://<host>/frames/frame.html (uno)',
-            '        http://<host>/frames/frame.html (dos)',
-            '    http://<host>/frames/frame.html (aframe)'
-          ]));
+        dumpFrames(page.mainFrame),
+        equals([
+          'http://<host>/frames/nested-frames.html',
+          '    http://<host>/frames/two-frames.html (2frames)',
+          '        http://<host>/frames/frame.html (uno)',
+          '        http://<host>/frames/frame.html (dos)',
+          '    http://<host>/frames/frame.html (aframe)',
+        ]),
+      );
     });
-    test('should send events when frames are manipulated dynamically',
-        () async {
-      await page.goto(server.emptyPage);
-      // validate frameattached events
-      var attachedFrames = <Frame>[];
-      page.onFrameAttached.listen((frame) => attachedFrames.add(frame));
-      await attachFrame(page, 'frame1', './frame.html');
-      expect(attachedFrames.length, equals(1));
-      expect(attachedFrames[0].url, contains('/frame.html'));
+    test(
+      'should send events when frames are manipulated dynamically',
+      () async {
+        await page.goto(server.emptyPage);
+        // validate frameattached events
+        var attachedFrames = <Frame>[];
+        page.onFrameAttached.listen((frame) => attachedFrames.add(frame));
+        await attachFrame(page, 'frame1', './frame.html');
+        expect(attachedFrames.length, equals(1));
+        expect(attachedFrames[0].url, contains('/frame.html'));
 
-      // validate framenavigated events
-      var navigatedFrames = <Frame>[];
-      page.onFrameNavigated.listen((frame) => navigatedFrames.add(frame));
-      await navigateFrame(page, 'frame1', './empty.html');
-      expect(navigatedFrames.length, equals(1));
-      expect(navigatedFrames[0].url, equals(server.emptyPage));
+        // validate framenavigated events
+        var navigatedFrames = <Frame>[];
+        page.onFrameNavigated.listen((frame) => navigatedFrames.add(frame));
+        await navigateFrame(page, 'frame1', './empty.html');
+        expect(navigatedFrames.length, equals(1));
+        expect(navigatedFrames[0].url, equals(server.emptyPage));
 
-      // validate framedetached events
-      var detachedFrames = <Frame>[];
-      page.onFrameDetached.listen((frame) => detachedFrames.add(frame));
-      await detachFrame(page, 'frame1');
-      expect(detachedFrames.length, equals(1));
-      expect(detachedFrames[0].isDetached, isTrue);
-    });
-    test('should send "framenavigated" when navigating on anchor URLs',
-        () async {
-      await page.goto(server.emptyPage);
-      await Future.wait([
-        page.onFrameNavigated.first,
-        page.goto(server.emptyPage + '#foo'),
-      ]);
-      expect(page.url, equals(server.emptyPage + '#foo'));
-    });
+        // validate framedetached events
+        var detachedFrames = <Frame>[];
+        page.onFrameDetached.listen((frame) => detachedFrames.add(frame));
+        await detachFrame(page, 'frame1');
+        expect(detachedFrames.length, equals(1));
+        expect(detachedFrames[0].isDetached, isTrue);
+      },
+    );
+    test(
+      'should send "framenavigated" when navigating on anchor URLs',
+      () async {
+        await page.goto(server.emptyPage);
+        await Future.wait([
+          page.onFrameNavigated.first,
+          page.goto(server.emptyPage + '#foo'),
+        ]);
+        expect(page.url, equals(server.emptyPage + '#foo'));
+      },
+    );
     test('should persist mainFrame on cross-process navigation', () async {
       await page.goto(server.emptyPage);
       var mainFrame = page.mainFrame;
@@ -147,7 +159,7 @@ void main() {
 
       var eventsFuture = Future.wait([
         page.onFrameAttached.take(4).toList(),
-        page.onFrameNavigated.take(5).toList()
+        page.onFrameNavigated.take(5).toList(),
       ]);
 
       await page.goto(server.prefix + '/frames/nested-frames.html');
@@ -165,7 +177,7 @@ void main() {
 
       eventsFuture = Future.wait([
         page.onFrameDetached.take(4).toList(),
-        page.onFrameNavigated.take(1).toList()
+        page.onFrameNavigated.take(1).toList(),
       ]);
 
       await page.goto(server.emptyPage);
@@ -187,7 +199,7 @@ void main() {
 
       var eventsFuture = Future.wait([
         page.onFrameAttached.take(4).toList(),
-        page.onFrameNavigated.take(5).toList()
+        page.onFrameNavigated.take(5).toList(),
       ]);
 
       await page.goto(server.prefix + '/frames/frameset.html');
@@ -205,7 +217,7 @@ void main() {
 
       eventsFuture = Future.wait([
         page.onFrameDetached.take(4).toList(),
-        page.onFrameNavigated.take(1).toList()
+        page.onFrameNavigated.take(1).toList(),
       ]);
 
       await page.goto(server.emptyPage);
@@ -219,24 +231,30 @@ void main() {
     });
     test('should report frame from-inside shadow DOM', () async {
       await page.goto(server.prefix + '/shadow.html');
-      await page.evaluate('''async url => {
+      await page.evaluate(
+        '''async url => {
       var frame = document.createElement('iframe');
       frame.src = url;
       document.body.shadowRoot.appendChild(frame);
       await new Promise(x => frame.onload = x);
-      }''', args: [server.emptyPage]);
+      }''',
+        args: [server.emptyPage],
+      );
       expect(page.frames.length, equals(2));
       expect(page.frames[1].url, equals(server.emptyPage));
     });
     test('should report frame.name()', () async {
       await attachFrame(page, 'theFrameId', server.emptyPage);
-      await page.evaluate('''url => {
+      await page.evaluate(
+        '''url => {
       var frame = document.createElement('iframe');
       frame.name = 'theFrameName';
       frame.src = url;
       document.body.appendChild(frame);
       return new Promise(x => frame.onload = x);
-      }''', args: [server.emptyPage]);
+      }''',
+        args: [server.emptyPage],
+      );
       expect(page.frames[0].name, isNull);
       expect(page.frames[1].name, equals('theFrameId'));
       expect(page.frames[2].name, equals('theFrameName'));
@@ -248,26 +266,30 @@ void main() {
       expect(page.frames[1].parentFrame, equals(page.mainFrame));
       expect(page.frames[2].parentFrame, equals(page.mainFrame));
     });
-    test('should report different frame instance when frame re-attaches',
-        () async {
-      var frame1 = await attachFrame(page, 'frame1', server.emptyPage);
-      await page.evaluate('''() => {
+    test(
+      'should report different frame instance when frame re-attaches',
+      () async {
+        var frame1 = await attachFrame(page, 'frame1', server.emptyPage);
+        await page.evaluate('''() => {
       window.frame = document.querySelector('#frame1');
           window.frame.remove();
     }''');
-      expect(frame1.isDetached, isTrue);
-      var frame2 = await waitFutures(page.onFrameAttached.first, [
-        page.evaluate('() => document.body.appendChild(window.frame)'),
-      ]);
-      expect(frame2.isDetached, isFalse);
-      expect(frame1, isNot(equals(frame2)));
-    });
+        expect(frame1.isDetached, isTrue);
+        var frame2 = await waitFutures(page.onFrameAttached.first, [
+          page.evaluate('() => document.body.appendChild(window.frame)'),
+        ]);
+        expect(frame2.isDetached, isFalse);
+        expect(frame1, isNot(equals(frame2)));
+      },
+    );
     test('should support url fragment', () async {
       await page.goto(server.prefix + '/frames/one-frame-url-fragment.html');
 
       expect(page.frames.length, 2);
-      expect(page.frames[1].url,
-          server.prefix + '/frames/frame.html&test=fragment');
+      expect(
+        page.frames[1].url,
+        server.prefix + '/frames/frame.html&test=fragment',
+      );
       print(page.frames[1].url);
     });
   });

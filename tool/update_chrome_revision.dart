@@ -19,8 +19,11 @@ void main() async {
 }
 
 Future<String> _getVersionAndRevisionForStable() async {
-  var result = await read(Uri.parse(
-      'https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions.json'));
+  var result = await read(
+    Uri.parse(
+      'https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions.json',
+    ),
+  );
   var json = jsonDecode(result);
   //ignore: avoid_dynamic_calls
   var version = json['channels']['Stable']['version'] as String;
@@ -36,7 +39,9 @@ Future<String> _readCurrentVersion() async {
 
 Future<void> _updateCurrentVersion(String newVersion) async {
   var content = await _downloaderFile.readAsString();
-  var newContent =
-      content.replaceFirst(_versionExtractor, _replaceVersion(newVersion));
+  var newContent = content.replaceFirst(
+    _versionExtractor,
+    _replaceVersion(newVersion),
+  );
   await _downloaderFile.writeAsString(newContent);
 }

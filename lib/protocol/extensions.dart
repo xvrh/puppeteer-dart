@@ -15,9 +15,7 @@ class ExtensionsApi {
   /// [path] Absolute file path.
   /// Returns: Extension id.
   Future<String> loadUnpacked(String path) async {
-    var result = await _client.send('Extensions.loadUnpacked', {
-      'path': path,
-    });
+    var result = await _client.send('Extensions.loadUnpacked', {'path': path});
     return result['id'] as String;
   }
 
@@ -27,8 +25,10 @@ class ExtensionsApi {
   /// [storageArea] StorageArea to retrieve data from.
   /// [keys] Keys to retrieve.
   Future<Map<String, dynamic>> getStorageItems(
-      String id, StorageArea storageArea,
-      {List<String>? keys}) async {
+    String id,
+    StorageArea storageArea, {
+    List<String>? keys,
+  }) async {
     var result = await _client.send('Extensions.getStorageItems', {
       'id': id,
       'storageArea': storageArea,
@@ -42,7 +42,10 @@ class ExtensionsApi {
   /// [storageArea] StorageArea to remove data from.
   /// [keys] Keys to remove.
   Future<void> removeStorageItems(
-      String id, StorageArea storageArea, List<String> keys) async {
+    String id,
+    StorageArea storageArea,
+    List<String> keys,
+  ) async {
     await _client.send('Extensions.removeStorageItems', {
       'id': id,
       'storageArea': storageArea,
@@ -66,7 +69,10 @@ class ExtensionsApi {
   /// [storageArea] StorageArea to set data in.
   /// [values] Values to set.
   Future<void> setStorageItems(
-      String id, StorageArea storageArea, Map<String, dynamic> values) async {
+    String id,
+    StorageArea storageArea,
+    Map<String, dynamic> values,
+  ) async {
     await _client.send('Extensions.setStorageItems', {
       'id': id,
       'storageArea': storageArea,
@@ -80,8 +86,7 @@ enum StorageArea {
   session('session'),
   local('local'),
   sync$('sync'),
-  managed('managed'),
-  ;
+  managed('managed');
 
   final String value;
 

@@ -9,10 +9,12 @@ import 'execution_context.dart';
 /// object to signal the worker lifecycle.
 ///
 /// ```dart
-/// page.onWorkerCreated
-///     .listen((worker) => print('Worker created: ${worker.url}'));
-/// page.onWorkerDestroyed
-///     .listen((worker) => print('Worker destroyed: ${worker.url}'));
+/// page.onWorkerCreated.listen(
+///   (worker) => print('Worker created: ${worker.url}'),
+/// );
+/// page.onWorkerDestroyed.listen(
+///   (worker) => print('Worker destroyed: ${worker.url}'),
+/// );
 /// print('Current workers:');
 /// for (var worker in page.workers) {
 ///   print('  ${worker.url}');
@@ -23,11 +25,17 @@ class Worker {
   final String? url;
   final _executionContextCompleter = Completer<ExecutionContext>();
 
-  Worker(this.client, this.url,
-      {required void Function(
-              ConsoleAPICalledEventType, List<JsHandle>, StackTraceData?)?
-          onConsoleApiCalled,
-      required void Function(ExceptionThrownEvent)? onExceptionThrown}) {
+  Worker(
+    this.client,
+    this.url, {
+    required void Function(
+      ConsoleAPICalledEventType,
+      List<JsHandle>,
+      StackTraceData?,
+    )?
+    onConsoleApiCalled,
+    required void Function(ExceptionThrownEvent)? onExceptionThrown,
+  }) {
     var runtimeApi = RuntimeApi(client);
 
     late JsHandle Function(RemoteObject) jsHandleFactory;
@@ -40,8 +48,11 @@ class Worker {
 
     runtimeApi.onConsoleAPICalled.listen((event) {
       if (onConsoleApiCalled != null) {
-        onConsoleApiCalled(event.type, event.args.map(jsHandleFactory).toList(),
-            event.stackTrace);
+        onConsoleApiCalled(
+          event.type,
+          event.args.map(jsHandleFactory).toList(),
+          event.stackTrace,
+        );
       }
     });
     runtimeApi.onExceptionThrown.listen((event) {
@@ -73,8 +84,10 @@ class Worker {
   /// - [pageFunction] Function to be evaluated in the page context
   /// - [args] Arguments to pass to `pageFunction`
   /// - Returns: Future which resolves to the return value of `pageFunction`
-  Future<T?> evaluate<T>(@Language('js') String pageFunction,
-      {List<dynamic>? args}) async {
+  Future<T?> evaluate<T>(
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) async {
     return (await executionContext).evaluate<T>(pageFunction, args: args);
   }
 
@@ -94,8 +107,9 @@ class Worker {
   /// returns: Future which resolves to the return value of `pageFunction` as
   /// in-page object (JSHandle)
   Future<T> evaluateHandle<T extends JsHandle>(
-      @Language('js') String pageFunction,
-      {List<dynamic>? args}) async {
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) async {
     return (await executionContext).evaluateHandle(pageFunction, args: args);
   }
 }

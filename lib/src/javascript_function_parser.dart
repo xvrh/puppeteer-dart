@@ -21,9 +21,10 @@ String? convertToFunctionDeclaration(String javascript) {
       var functionBody = tokens.whereType<_FunctionBody>().single;
       var isAsync = tokens.contains(_isAsync);
 
-      var body = hasBodyStatement
-          ? '{ ${functionBody.value}'
-          : '{ return ${functionBody.value} }';
+      var body =
+          hasBodyStatement
+              ? '{ ${functionBody.value}'
+              : '{ return ${functionBody.value} }';
 
       var argumentString = arguments.arguments;
       if (!argumentString.startsWith('(')) {
@@ -68,9 +69,10 @@ class JsGrammarDefinition extends GrammarDefinition {
       ref1(token, 'async').optional().map((t) => t != null ? _isAsync : null) &
       ref0(functionShorthandArguments).flatten().map((t) => _Arguments(t)) &
       ref1(token, '=>') &
-      ref1(token, '{')
-          .optional()
-          .map((v) => v != null ? _hasBodyStatements : null) &
+      ref1(
+        token,
+        '{',
+      ).optional().map((v) => v != null ? _hasBodyStatements : null) &
       ref0(body);
 
   Parser functionShorthandArguments() => ref0(arguments) | ref0(identifier);

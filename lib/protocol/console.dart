@@ -11,8 +11,11 @@ class ConsoleApi {
   /// Issued when new console message is added.
   Stream<ConsoleMessage> get onMessageAdded => _client.onEvent
       .where((event) => event.name == 'Console.messageAdded')
-      .map((event) => ConsoleMessage.fromJson(
-          event.parameters['message'] as Map<String, dynamic>));
+      .map(
+        (event) => ConsoleMessage.fromJson(
+          event.parameters['message'] as Map<String, dynamic>,
+        ),
+      );
 
   /// Does nothing.
   Future<void> clearMessages() async {
@@ -51,13 +54,14 @@ class ConsoleMessage {
   /// Column number in the resource that generated this message (1-based).
   final int? column;
 
-  ConsoleMessage(
-      {required this.source,
-      required this.level,
-      required this.text,
-      this.url,
-      this.line,
-      this.column});
+  ConsoleMessage({
+    required this.source,
+    required this.level,
+    required this.text,
+    this.url,
+    this.line,
+    this.column,
+  });
 
   factory ConsoleMessage.fromJson(Map<String, dynamic> json) {
     return ConsoleMessage(
@@ -93,8 +97,7 @@ enum ConsoleMessageSource {
   security('security'),
   other('other'),
   deprecation('deprecation'),
-  worker('worker'),
-  ;
+  worker('worker');
 
   final String value;
 
@@ -114,8 +117,7 @@ enum ConsoleMessageLevel {
   warning('warning'),
   error('error'),
   debug('debug'),
-  info('info'),
-  ;
+  info('info');
 
   final String value;
 

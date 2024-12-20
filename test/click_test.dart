@@ -67,9 +67,10 @@ void main() {
       await Future.wait([page.click('a'), page.waitForNavigation()]);
       expect(page.url, server.prefix + '/wrappedlink.html#clicked');
     });
-    test('should click when one of inline box children is outside of viewport',
-        () async {
-      await page.setContent('''
+    test(
+      'should click when one of inline box children is outside of viewport',
+      () async {
+        await page.setContent('''
   <style>
   i {
   position: absolute;
@@ -78,9 +79,10 @@ void main() {
   </style>
   <span onclick='javascript:window.CLICKED = 42;'><i>woof</i><b>doggo</b></span>
   ''');
-      await page.click('span');
-      expect(await page.evaluate('() => window.CLICKED'), 42);
-    });
+        await page.click('span');
+        expect(await page.evaluate('() => window.CLICKED'), 42);
+      },
+    );
     test('should select the text by triple clicking', () async {
       await page.goto(server.prefix + '/input/textarea.html');
       await page.focus('textarea');
@@ -90,10 +92,13 @@ void main() {
       await page.click('textarea');
       await page.click('textarea', clickCount: 2);
       await page.click('textarea', clickCount: 3);
-      expect(await page.evaluate('''() => {
+      expect(
+        await page.evaluate('''() => {
   var textarea = document.querySelector('textarea');
   return textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
-  }'''), text);
+  }'''),
+        text,
+      );
     });
     test('should click offscreen buttons', () async {
       await page.goto(server.prefix + '/offscreenbuttons.html');
@@ -107,20 +112,21 @@ void main() {
         await page.click('#btn$i');
       }
       expect(
-          messages,
-          equals([
-            'button #0 clicked',
-            'button #1 clicked',
-            'button #2 clicked',
-            'button #3 clicked',
-            'button #4 clicked',
-            'button #5 clicked',
-            'button #6 clicked',
-            'button #7 clicked',
-            'button #8 clicked',
-            'button #9 clicked',
-            'button #10 clicked'
-          ]));
+        messages,
+        equals([
+          'button #0 clicked',
+          'button #1 clicked',
+          'button #2 clicked',
+          'button #3 clicked',
+          'button #4 clicked',
+          'button #5 clicked',
+          'button #6 clicked',
+          'button #7 clicked',
+          'button #8 clicked',
+          'button #9 clicked',
+          'button #10 clicked',
+        ]),
+      );
     });
 
     test('should click wrapped links', () async {
@@ -135,17 +141,18 @@ void main() {
       await page.click('input#agree');
       expect(await page.evaluate('() => result.check'), isTrue);
       expect(
-          await page.evaluate('() => result.events'),
-          equals([
-            'mouseover',
-            'mouseenter',
-            'mousemove',
-            'mousedown',
-            'mouseup',
-            'click',
-            'input',
-            'change',
-          ]));
+        await page.evaluate('() => result.events'),
+        equals([
+          'mouseover',
+          'mouseenter',
+          'mousemove',
+          'mousedown',
+          'mouseup',
+          'click',
+          'input',
+          'change',
+        ]),
+      );
       await page.click('input#agree');
       expect(await page.evaluate('() => result.check'), isFalse);
     });
@@ -156,12 +163,9 @@ void main() {
       await page.click('label[for="agree"]');
       expect(await page.evaluate('() => result.check'), isTrue);
       expect(
-          await page.evaluate('() => result.events'),
-          equals([
-            'click',
-            'input',
-            'change',
-          ]));
+        await page.evaluate('() => result.events'),
+        equals(['click', 'input', 'change']),
+      );
       await page.click('label[for="agree"]');
       expect(await page.evaluate('() => result.check'), isFalse);
     });
@@ -169,9 +173,15 @@ void main() {
     test('should fail to click a missing button', () async {
       await page.goto(server.prefix + '/input/button.html');
       expect(
-          () => page.click('button.does-not-exist'),
-          throwsA(predicate((e) => '$e'
-              .contains('No node found for selector: button.does-not-exist'))));
+        () => page.click('button.does-not-exist'),
+        throwsA(
+          predicate(
+            (e) => '$e'.contains(
+              'No node found for selector: button.does-not-exist',
+            ),
+          ),
+        ),
+      );
     });
     // @see https://github.com/GoogleChrome/puppeteer/issues/161
     test('should not hang with touch-enabled viewports', () async {
@@ -184,14 +194,18 @@ void main() {
       await page.goto(server.prefix + '/input/scrollable.html');
       await page.click('#button-5');
       expect(
-          await page.evaluate(
-              "() => document.querySelector('#button-5').textContent"),
-          'clicked');
+        await page.evaluate(
+          "() => document.querySelector('#button-5').textContent",
+        ),
+        'clicked',
+      );
       await page.click('#button-80');
       expect(
-          await page.evaluate(
-              "() => document.querySelector('#button-80').textContent"),
-          'clicked');
+        await page.evaluate(
+          "() => document.querySelector('#button-80').textContent",
+        ),
+        'clicked',
+      );
     });
     test('should double click the button', () async {
       await page.goto(server.prefix + '/input/button.html');
@@ -227,9 +241,11 @@ void main() {
       await page.goto(server.prefix + '/input/scrollable.html');
       await page.click('#button-8', button: MouseButton.right);
       expect(
-          await page.evaluate(
-              "() => document.querySelector('#button-8').textContent"),
-          equals('context menu'));
+        await page.evaluate(
+          "() => document.querySelector('#button-8').textContent",
+        ),
+        equals('context menu'),
+      );
     });
     // @see https://github.com/GoogleChrome/puppeteer/issues/206
     test('should click links which cause navigation', () async {
@@ -239,39 +255,57 @@ void main() {
     });
     test('should click the button inside an iframe', () async {
       await page.goto(server.emptyPage);
-      await page
-          .setContent('<div style="width:100px;height:100px">spacer</div>');
+      await page.setContent(
+        '<div style="width:100px;height:100px">spacer</div>',
+      );
       await attachFrame(
-          page, 'button-test', server.prefix + '/input/button.html');
+        page,
+        'button-test',
+        server.prefix + '/input/button.html',
+      );
       var frame = page.frames[1];
       var button = await frame.$('button');
       await button.click();
       expect(await frame.evaluate('() => window.result'), equals('Clicked'));
     });
     // @see https://github.com/GoogleChrome/puppeteer/issues/4110
-    test('should click the button with fixed position inside an iframe',
-        () async {
-      await page.goto(server.emptyPage);
-      await page.setViewport(DeviceViewport(width: 500, height: 500));
-      await page
-          .setContent('<div style="width:100px;height:2000px">spacer</div>');
-      await attachFrame(page, 'button-test',
-          server.crossProcessPrefix + '/input/button.html');
-      var frame = page.frames[1];
-      await frame.$eval(
-          'button', "button => button.style.setProperty('position', 'fixed')");
-      await frame.click('button');
-      expect(await frame.evaluate('() => window.result'), equals('Clicked'));
-    }, skip: true);
+    test(
+      'should click the button with fixed position inside an iframe',
+      () async {
+        await page.goto(server.emptyPage);
+        await page.setViewport(DeviceViewport(width: 500, height: 500));
+        await page.setContent(
+          '<div style="width:100px;height:2000px">spacer</div>',
+        );
+        await attachFrame(
+          page,
+          'button-test',
+          server.crossProcessPrefix + '/input/button.html',
+        );
+        var frame = page.frames[1];
+        await frame.$eval(
+          'button',
+          "button => button.style.setProperty('position', 'fixed')",
+        );
+        await frame.click('button');
+        expect(await frame.evaluate('() => window.result'), equals('Clicked'));
+      },
+      skip: true,
+    );
     test('should click the button with deviceScaleFactor set', () async {
       await page.goto(server.emptyPage);
       await page.setViewport(
-          DeviceViewport(width: 400, height: 400, deviceScaleFactor: 5));
+        DeviceViewport(width: 400, height: 400, deviceScaleFactor: 5),
+      );
       expect(await page.evaluate('() => window.devicePixelRatio'), equals(5));
-      await page
-          .setContent('<div style="width:100px;height:100px">spacer</div>');
+      await page.setContent(
+        '<div style="width:100px;height:100px">spacer</div>',
+      );
       await attachFrame(
-          page, 'button-test', server.prefix + '/input/button.html');
+        page,
+        'button-test',
+        server.prefix + '/input/button.html',
+      );
       var frame = page.frames[1];
       var button = await frame.$('button');
       await button.click();

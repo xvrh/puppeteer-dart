@@ -20,7 +20,7 @@ class Target {
 
   final TargetID targetID;
   final Future<Session> Function({required bool isAutoAttachEmulated})
-      _sessionFactory;
+  _sessionFactory;
   TargetInfo _info;
   final _initializeCompleter = Completer<bool>();
   Future<Page>? _pageFuture;
@@ -30,10 +30,13 @@ class Target {
   bool _isInitialized = false;
 
   Target(
-      this.session, this.targetManager, TargetInfo info, this._sessionFactory,
-      {required this.browserContext})
-      : _info = info,
-        targetID = info.targetId {
+    this.session,
+    this.targetManager,
+    TargetInfo info,
+    this._sessionFactory, {
+    required this.browserContext,
+  }) : _info = info,
+       targetID = info.targetId {
     _initialized = _initializeCompleter.future.then((success) async {
       if (!success) return false;
       var opener = this.opener;
@@ -106,8 +109,10 @@ class Target {
       _pageFuture = (session != null
               ? Future.value(session)
               : _sessionFactory(isAutoAttachEmulated: true))
-          .then((session) =>
-              Page.create(this, session, viewport: browser.defaultViewport));
+          .then(
+            (session) =>
+                Page.create(this, session, viewport: browser.defaultViewport),
+          );
     }
     return await _pageFuture;
   }
@@ -117,10 +122,15 @@ class Target {
     if (!const ['service_worker', 'shared_worker'].contains(_info.type)) {
       return null;
     }
-    _workerFuture ??=
-        _sessionFactory(isAutoAttachEmulated: false).then((client) async {
-      return Worker(client, _info.url,
-          onConsoleApiCalled: null, onExceptionThrown: null);
+    _workerFuture ??= _sessionFactory(isAutoAttachEmulated: false).then((
+      client,
+    ) async {
+      return Worker(
+        client,
+        _info.url,
+        onConsoleApiCalled: null,
+        onExceptionThrown: null,
+      );
     });
     return _workerFuture;
   }

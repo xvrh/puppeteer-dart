@@ -36,9 +36,11 @@ void main() {
       // The pages will be the testing page and the original newtab page
       var targets = browser.targets;
       expect(
-          targets.where(
-              (target) => target.type == 'page' && target.url == 'about:blank'),
-          isNotEmpty);
+        targets.where(
+          (target) => target.type == 'page' && target.url == 'about:blank',
+        ),
+        isNotEmpty,
+      );
       expect(targets.where((target) => target.type == 'browser'), isNotEmpty);
     });
     test('Browser.pages should return all of the pages', () async {
@@ -57,85 +59,108 @@ void main() {
       // The pages will be the testing page and the original newtab page
       var allPages = await browser.pages;
       var originalPage = allPages.firstWhere((p) => p != page);
-      expect(await originalPage.evaluate("() => ['Hello', 'world'].join(' ')"),
-          'Hello world');
+      expect(
+        await originalPage.evaluate("() => ['Hello', 'world'].join(' ')"),
+        'Hello world',
+      );
       expect(await originalPage.$('body'), isNotNull);
     });
     test('should report when a new page is created and closed', () async {
       var otherPage = await waitFutures(
-          context
-              .waitForTarget((target) =>
-                  target.url == server.crossProcessPrefix + '/empty.html')
-              .then((target) async => await target.page),
-          [
-            page.evaluate('url => window.open(url)',
-                args: [server.crossProcessPrefix + '/empty.html']),
-          ]);
+        context
+            .waitForTarget(
+              (target) =>
+                  target.url == server.crossProcessPrefix + '/empty.html',
+            )
+            .then((target) async => await target.page),
+        [
+          page.evaluate(
+            'url => window.open(url)',
+            args: [server.crossProcessPrefix + '/empty.html'],
+          ),
+        ],
+      );
       expect(otherPage.url, contains(server.crossProcessPrefix));
-      expect(await otherPage.evaluate("() => ['Hello', 'world'].join(' ')"),
-          'Hello world');
+      expect(
+        await otherPage.evaluate("() => ['Hello', 'world'].join(' ')"),
+        'Hello world',
+      );
       expect(await otherPage.$('body'), isNotNull);
 
       var allPages = await context.pages;
       expect(allPages, contains(page));
       expect(allPages, contains(otherPage));
 
-      var closePagePromise =
-          context.onTargetDestroyed.first.then((target) => target.page);
+      var closePagePromise = context.onTargetDestroyed.first.then(
+        (target) => target.page,
+      );
       await otherPage.close();
       expect(await closePagePromise, otherPage);
 
       allPages =
-          (await Future.wait(context.targets.map((target) => target.page)))
-              .nonNulls
-              .toList();
+          (await Future.wait(
+            context.targets.map((target) => target.page),
+          )).nonNulls.toList();
       expect(allPages, contains(page));
       expect(allPages, isNot(contains(otherPage)));
     });
-    test('should report when a service worker is created and destroyed',
-        () async {
-      await page.goto(server.emptyPage);
-      var createdTarget = context.onTargetCreated.first;
+    test(
+      'should report when a service worker is created and destroyed',
+      () async {
+        await page.goto(server.emptyPage);
+        var createdTarget = context.onTargetCreated.first;
 
-      await page.goto(server.prefix + '/serviceworkers/empty/sw.html');
+        await page.goto(server.prefix + '/serviceworkers/empty/sw.html');
 
-      expect((await createdTarget).type, 'service_worker');
-      expect((await createdTarget).url,
-          server.prefix + '/serviceworkers/empty/sw.js');
+        expect((await createdTarget).type, 'service_worker');
+        expect(
+          (await createdTarget).url,
+          server.prefix + '/serviceworkers/empty/sw.js',
+        );
 
-      var destroyedTarget = context.onTargetDestroyed.first;
-      await page.evaluate(
-          '() => window.registrationPromise.then(registration => registration.unregister())');
-      expect(await destroyedTarget, await createdTarget);
-    });
+        var destroyedTarget = context.onTargetDestroyed.first;
+        await page.evaluate(
+          '() => window.registrationPromise.then(registration => registration.unregister())',
+        );
+        expect(await destroyedTarget, await createdTarget);
+      },
+    );
     test('should create a worker from a service worker', () async {
-      var targetFuture =
-          context.waitForTarget((target) => target.type == 'service_worker');
+      var targetFuture = context.waitForTarget(
+        (target) => target.type == 'service_worker',
+      );
       await page.goto(server.prefix + '/serviceworkers/empty/sw.html');
 
       var target = await targetFuture;
       var worker = (await target.worker)!;
-      expect(await worker.evaluate('() => self.toString()'),
-          '[object ServiceWorkerGlobalScope]');
+      expect(
+        await worker.evaluate('() => self.toString()'),
+        '[object ServiceWorkerGlobalScope]',
+      );
     });
     test('should create a worker from a shared worker', () async {
       await page.goto(server.emptyPage);
-      var targetFuture =
-          context.waitForTarget((target) => target.type == 'shared_worker');
+      var targetFuture = context.waitForTarget(
+        (target) => target.type == 'shared_worker',
+      );
       await page.evaluate('''() => {
     new SharedWorker('data:text/javascript,console.log("hi")');
     }''');
       var target = await targetFuture;
       var worker = (await target.worker)!;
-      expect(await worker.evaluate('() => self.toString()'),
-          equals('[object SharedWorkerGlobalScope]'));
+      expect(
+        await worker.evaluate('() => self.toString()'),
+        equals('[object SharedWorkerGlobalScope]'),
+      );
     });
     test('should report when a target url changes', () async {
       await page.goto(server.emptyPage);
       var changedTarget = context.onTargetChanged.first;
       await page.goto(server.crossProcessPrefix + '/');
       expect(
-          (await changedTarget).url, equals(server.crossProcessPrefix + '/'));
+        (await changedTarget).url,
+        equals(server.crossProcessPrefix + '/'),
+      );
 
       changedTarget = context.onTargetChanged.first;
       await page.goto(server.emptyPage);
@@ -143,8 +168,9 @@ void main() {
     });
     test('should not report uninitialized pages', () async {
       var targetChanged = false;
-      var listener =
-          context.onTargetChanged.listen((_) => targetChanged = true);
+      var listener = context.onTargetChanged.listen(
+        (_) => targetChanged = true,
+      );
       var targetPromise = context.onTargetCreated.first;
       var newPagePromise = context.newPage();
       var target = await targetPromise;
@@ -152,47 +178,59 @@ void main() {
 
       var newPage = await newPagePromise;
       var targetPromise2 = context.onTargetCreated.first;
-      var evaluatePromise =
-          newPage.evaluate("() => window.open('about:blank')");
+      var evaluatePromise = newPage.evaluate(
+        "() => window.open('about:blank')",
+      );
       var target2 = await targetPromise2;
       expect(target2.url, equals('about:blank'));
       await evaluatePromise;
       await newPage.close();
-      expect(targetChanged, isFalse,
-          reason: 'target should not be reported as changed');
+      expect(
+        targetChanged,
+        isFalse,
+        reason: 'target should not be reported as changed',
+      );
       await listener.cancel();
     });
-    test('should not crash while redirecting if original request was missed',
-        () async {
-      var serverResponse = Completer<shelf.Response>();
-      server.setRoute('one-style.css', (req) {
-        return serverResponse.future;
-      });
+    test(
+      'should not crash while redirecting if original request was missed',
+      () async {
+        var serverResponse = Completer<shelf.Response>();
+        server.setRoute('one-style.css', (req) {
+          return serverResponse.future;
+        });
 
-      var targetFuture = context
-          .waitForTarget((target) => target.url.contains('one-style.html'));
-      // Open a new page. Use window.open to connect to the page later.
-      await Future.wait([
-        page.evaluate('url => window.open(url)',
-            args: [server.prefix + '/one-style.html']),
-        server.waitForRequest('one-style.css')
-      ]);
-      // Connect to the opened page.
-      var target = await targetFuture;
-      var newPage = await target.page;
-      // Issue a redirect.
-      serverResponse.complete(shelf.Response.found('/injectedstyle.css'));
-      // Wait for the new page to load.
-      await newPage.onLoad.first;
-      // Cleanup.
-      await newPage.close();
-    });
+        var targetFuture = context.waitForTarget(
+          (target) => target.url.contains('one-style.html'),
+        );
+        // Open a new page. Use window.open to connect to the page later.
+        await Future.wait([
+          page.evaluate(
+            'url => window.open(url)',
+            args: [server.prefix + '/one-style.html'],
+          ),
+          server.waitForRequest('one-style.css'),
+        ]);
+        // Connect to the opened page.
+        var target = await targetFuture;
+        var newPage = await target.page;
+        // Issue a redirect.
+        serverResponse.complete(shelf.Response.found('/injectedstyle.css'));
+        // Wait for the new page to load.
+        await newPage.onLoad.first;
+        // Cleanup.
+        await newPage.close();
+      },
+    );
     test('should have an opener', () async {
       await page.goto(server.emptyPage);
-      var createdTarget = await waitFutures(context.onTargetCreated.first,
-          [page.goto(server.prefix + '/popup/window-open.html')]);
-      expect((await createdTarget.page).url,
-          equals(server.prefix + '/popup/popup.html'));
+      var createdTarget = await waitFutures(context.onTargetCreated.first, [
+        page.goto(server.prefix + '/popup/window-open.html'),
+      ]);
+      expect(
+        (await createdTarget.page).url,
+        equals(server.prefix + '/popup/popup.html'),
+      );
       expect(createdTarget.opener, equals(page.target));
       expect(page.target.opener, isNull);
     });
@@ -201,8 +239,9 @@ void main() {
   group('Browser.waitForTarget', () {
     test('should wait for a target', () async {
       var resolved = false;
-      var targetPromise =
-          browser.waitForTarget((target) => target.url == server.emptyPage);
+      var targetPromise = browser.waitForTarget(
+        (target) => target.url == server.emptyPage,
+      );
       // ignore: unawaited_futures
       targetPromise.then((_) => resolved = true);
       var page = await browser.newPage();
@@ -214,10 +253,12 @@ void main() {
     });
     test('should timeout waiting for a non-existent target', () async {
       expect(
-          () => browser.waitForTarget(
-              (target) => target.url == server.emptyPage,
-              timeout: Duration(milliseconds: 1)),
-          throwsA(TypeMatcher<TimeoutException>()));
+        () => browser.waitForTarget(
+          (target) => target.url == server.emptyPage,
+          timeout: Duration(milliseconds: 1),
+        ),
+        throwsA(TypeMatcher<TimeoutException>()),
+      );
     });
   });
 }

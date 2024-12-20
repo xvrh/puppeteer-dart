@@ -19,10 +19,15 @@ class BackgroundServiceApi {
   /// events afterwards if enabled and recording.
   Stream<BackgroundServiceEvent> get onBackgroundServiceEventReceived => _client
       .onEvent
-      .where((event) =>
-          event.name == 'BackgroundService.backgroundServiceEventReceived')
-      .map((event) => BackgroundServiceEvent.fromJson(
-          event.parameters['backgroundServiceEvent'] as Map<String, dynamic>));
+      .where(
+        (event) =>
+            event.name == 'BackgroundService.backgroundServiceEventReceived',
+      )
+      .map(
+        (event) => BackgroundServiceEvent.fromJson(
+          event.parameters['backgroundServiceEvent'] as Map<String, dynamic>,
+        ),
+      );
 
   /// Enables event updates for the service.
   Future<void> startObserving(ServiceName service) async {
@@ -33,9 +38,7 @@ class BackgroundServiceApi {
 
   /// Disables event updates for the service.
   Future<void> stopObserving(ServiceName service) async {
-    await _client.send('BackgroundService.stopObserving', {
-      'service': service,
-    });
+    await _client.send('BackgroundService.stopObserving', {'service': service});
   }
 
   /// Set the recording state for the service.
@@ -48,9 +51,7 @@ class BackgroundServiceApi {
 
   /// Clears all stored data for the service.
   Future<void> clearEvents(ServiceName service) async {
-    await _client.send('BackgroundService.clearEvents', {
-      'service': service,
-    });
+    await _client.send('BackgroundService.clearEvents', {'service': service});
   }
 }
 
@@ -59,8 +60,10 @@ class RecordingStateChangedEvent {
 
   final ServiceName service;
 
-  RecordingStateChangedEvent(
-      {required this.isRecording, required this.service});
+  RecordingStateChangedEvent({
+    required this.isRecording,
+    required this.service,
+  });
 
   factory RecordingStateChangedEvent.fromJson(Map<String, dynamic> json) {
     return RecordingStateChangedEvent(
@@ -79,8 +82,7 @@ enum ServiceName {
   pushMessaging('pushMessaging'),
   notifications('notifications'),
   paymentHandler('paymentHandler'),
-  periodicBackgroundSync('periodicBackgroundSync'),
-  ;
+  periodicBackgroundSync('periodicBackgroundSync');
 
   final String value;
 
@@ -111,10 +113,7 @@ class EventMetadata {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'key': key,
-      'value': value,
-    };
+    return {'key': key, 'value': value};
   }
 }
 
@@ -143,28 +142,31 @@ class BackgroundServiceEvent {
   /// Storage key this event belongs to.
   final String storageKey;
 
-  BackgroundServiceEvent(
-      {required this.timestamp,
-      required this.origin,
-      required this.serviceWorkerRegistrationId,
-      required this.service,
-      required this.eventName,
-      required this.instanceId,
-      required this.eventMetadata,
-      required this.storageKey});
+  BackgroundServiceEvent({
+    required this.timestamp,
+    required this.origin,
+    required this.serviceWorkerRegistrationId,
+    required this.service,
+    required this.eventName,
+    required this.instanceId,
+    required this.eventMetadata,
+    required this.storageKey,
+  });
 
   factory BackgroundServiceEvent.fromJson(Map<String, dynamic> json) {
     return BackgroundServiceEvent(
       timestamp: network.TimeSinceEpoch.fromJson(json['timestamp'] as num),
       origin: json['origin'] as String,
       serviceWorkerRegistrationId: service_worker.RegistrationID.fromJson(
-          json['serviceWorkerRegistrationId'] as String),
+        json['serviceWorkerRegistrationId'] as String,
+      ),
       service: ServiceName.fromJson(json['service'] as String),
       eventName: json['eventName'] as String,
       instanceId: json['instanceId'] as String,
-      eventMetadata: (json['eventMetadata'] as List)
-          .map((e) => EventMetadata.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      eventMetadata:
+          (json['eventMetadata'] as List)
+              .map((e) => EventMetadata.fromJson(e as Map<String, dynamic>))
+              .toList(),
       storageKey: json['storageKey'] as String,
     );
   }

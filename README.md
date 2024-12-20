@@ -81,10 +81,11 @@ void main() async {
 
   // Capture the PDF and save it to a file.
   await page.pdf(
-      format: PaperFormat.a4,
-      printBackground: true,
-      pageRanges: '1',
-      output: File('example/_dart.pdf').openWrite());
+    format: PaperFormat.a4,
+    printBackground: true,
+    pageRanges: '1',
+    output: File('example/_dart.pdf').openWrite(),
+  );
   await browser.close();
 }
 ```
@@ -124,8 +125,10 @@ void main() async {
   // Start the browser and go to a web page
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
-  await page.goto('https://pub.dev/documentation/puppeteer/latest/',
-      wait: Until.networkIdle);
+  await page.goto(
+    'https://pub.dev/documentation/puppeteer/latest/',
+    wait: Until.networkIdle,
+  );
 
   // Select an element on the page
   var form = await page.$('input[id="search-box"]');
@@ -148,8 +151,10 @@ void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
 
-  await page.goto('https://developers.google.com/web/',
-      wait: Until.networkIdle);
+  await page.goto(
+    'https://developers.google.com/web/',
+    wait: Until.networkIdle,
+  );
 
   // Type into search box.
   await page.type('.devsite-search-field', 'Headless Chrome');
@@ -164,13 +169,16 @@ void main() async {
   await page.waitForSelector(resultsSelector);
 
   // Extract the results from the page.
-  var links = await page.evaluate<List<dynamic>>(r'''resultsSelector => {
+  var links = await page.evaluate<List<dynamic>>(
+    r'''resultsSelector => {
   const anchors = Array.from(document.querySelectorAll(resultsSelector));
   return anchors.map(anchor => {
     const title = anchor.textContent.split('|')[0].trim();
     return `${title} - ${anchor.href}`;
   });
-}''', args: [resultsSelector]);
+}''',
+    args: [resultsSelector],
+  );
   print(links.join('\n'));
 
   await browser.close();
@@ -191,8 +199,9 @@ void main() async {
   print(pageContent);
 
   // Or get the content directly by executing some Javascript
-  var pageContent2 =
-      await page.evaluate<String>('document.documentElement.outerHTML');
+  var pageContent2 = await page.evaluate<String>(
+    'document.documentElement.outerHTML',
+  );
   print(pageContent2);
 
   await browser.close();
@@ -213,8 +222,11 @@ import 'package:shelf_static/shelf_static.dart';
 
 void main() async {
   // Start a local web server and open the page
-  var server =
-      await io.serve(createStaticHandler('example/html'), 'localhost', 0);
+  var server = await io.serve(
+    createStaticHandler('example/html'),
+    'localhost',
+    0,
+  );
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   await page.goto('http://localhost:${server.port}/rubiks_cube/index.html');
@@ -244,8 +256,9 @@ void main() async {
   await page.devTools.page.stopScreencast();
 
   // Encode all the frames in an animated Gif file.
-  File('example/_rubkis_cube.gif')
-      .writeAsBytesSync(image.GifEncoder().encode(animation!));
+  File(
+    'example/_rubkis_cube.gif',
+  ).writeAsBytesSync(image.GifEncoder().encode(animation!));
 
   // Alternatively, we can save all the frames on disk and use ffmpeg to convert
   // it to a video file. (for example: ffmpeg -i frames/%3d.png -r 10 output.mp4)
@@ -350,14 +363,20 @@ void main() async {
   await page.evaluate('(x) => x > 0', args: [7]);
 
   // Multi line shorthand syntax
-  await page.evaluate('''(x) => {  
+  await page.evaluate(
+    '''(x) => {  
     return x > 0;
-  }''', args: [7]);
+  }''',
+    args: [7],
+  );
 
   // shorthand syntax with async
-  await page.evaluate('''async (x) => {
+  await page.evaluate(
+    '''async (x) => {
     return await x;
-  }''', args: [7]);
+  }''',
+    args: [7],
+  );
 
   // An expression.
   await page.evaluate('document.body');

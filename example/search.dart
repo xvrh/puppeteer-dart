@@ -4,8 +4,10 @@ void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
 
-  await page.goto('https://developers.google.com/web/',
-      wait: Until.networkIdle);
+  await page.goto(
+    'https://developers.google.com/web/',
+    wait: Until.networkIdle,
+  );
 
   // Type into search box.
   await page.type('.devsite-search-field', 'Headless Chrome');
@@ -20,13 +22,16 @@ void main() async {
   await page.waitForSelector(resultsSelector);
 
   // Extract the results from the page.
-  var links = await page.evaluate<List<dynamic>>(r'''resultsSelector => {
+  var links = await page.evaluate<List<dynamic>>(
+    r'''resultsSelector => {
   const anchors = Array.from(document.querySelectorAll(resultsSelector));
   return anchors.map(anchor => {
     const title = anchor.textContent.split('|')[0].trim();
     return `${title} - ${anchor.href}`;
   });
-}''', args: [resultsSelector]);
+}''',
+    args: [resultsSelector],
+  );
   print(links.join('\n'));
 
   await browser.close();

@@ -11,8 +11,9 @@ class EmulationApi {
   EmulationApi(this._client);
 
   /// Notification sent after the virtual time budget for the current VirtualTimePolicy has run out.
-  Stream<void> get onVirtualTimeBudgetExpired => _client.onEvent
-      .where((event) => event.name == 'Emulation.virtualTimeBudgetExpired');
+  Stream<void> get onVirtualTimeBudgetExpired => _client.onEvent.where(
+    (event) => event.name == 'Emulation.virtualTimeBudgetExpired',
+  );
 
   /// Tells whether emulation is supported.
   /// Returns: True if emulation is supported.
@@ -57,9 +58,7 @@ class EmulationApi {
   /// Enables CPU throttling to emulate slow CPUs.
   /// [rate] Throttling rate as a slowdown factor (1 is no throttle, 2 is 2x slowdown, etc).
   Future<void> setCPUThrottlingRate(num rate) async {
-    await _client.send('Emulation.setCPUThrottlingRate', {
-      'rate': rate,
-    });
+    await _client.send('Emulation.setCPUThrottlingRate', {'rate': rate});
   }
 
   /// Sets or clears an override of the default background color of the frame. This override is used
@@ -92,18 +91,22 @@ class EmulationApi {
   /// [displayFeature] If set, the display feature of a multi-segment screen. If not set, multi-segment support
   /// is turned-off.
   Future<void> setDeviceMetricsOverride(
-      int width, int height, num deviceScaleFactor, bool mobile,
-      {num? scale,
-      int? screenWidth,
-      int? screenHeight,
-      int? positionX,
-      int? positionY,
-      bool? dontSetVisibleSize,
-      ScreenOrientation? screenOrientation,
-      page.Viewport? viewport,
-      DisplayFeature? displayFeature,
-      @Deprecated('use Emulation.setDevicePostureOverride.')
-      DevicePosture? devicePosture}) async {
+    int width,
+    int height,
+    num deviceScaleFactor,
+    bool mobile, {
+    num? scale,
+    int? screenWidth,
+    int? screenHeight,
+    int? positionX,
+    int? positionY,
+    bool? dontSetVisibleSize,
+    ScreenOrientation? screenOrientation,
+    page.Viewport? viewport,
+    DisplayFeature? displayFeature,
+    @Deprecated('use Emulation.setDevicePostureOverride.')
+    DevicePosture? devicePosture,
+  }) async {
     await _client.send('Emulation.setDeviceMetricsOverride', {
       'width': width,
       'height': height,
@@ -140,9 +143,7 @@ class EmulationApi {
 
   /// [hidden] Whether scrollbars should be always hidden.
   Future<void> setScrollbarsHidden(bool hidden) async {
-    await _client.send('Emulation.setScrollbarsHidden', {
-      'hidden': hidden,
-    });
+    await _client.send('Emulation.setScrollbarsHidden', {'hidden': hidden});
   }
 
   /// [disabled] Whether document.coookie API should be disabled.
@@ -154,10 +155,14 @@ class EmulationApi {
 
   /// [enabled] Whether touch emulation based on mouse input should be enabled.
   /// [configuration] Touch/gesture events configuration. Default: current platform.
-  Future<void> setEmitTouchEventsForMouse(bool enabled,
-      {@Enum(['mobile', 'desktop']) String? configuration}) async {
-    assert(configuration == null ||
-        const ['mobile', 'desktop'].contains(configuration));
+  Future<void> setEmitTouchEventsForMouse(
+    bool enabled, {
+    @Enum(['mobile', 'desktop']) String? configuration,
+  }) async {
+    assert(
+      configuration == null ||
+          const ['mobile', 'desktop'].contains(configuration),
+    );
     await _client.send('Emulation.setEmitTouchEventsForMouse', {
       'enabled': enabled,
       if (configuration != null) 'configuration': configuration,
@@ -167,8 +172,10 @@ class EmulationApi {
   /// Emulates the given media type or media feature for CSS media queries.
   /// [media] Media type to emulate. Empty string disables the override.
   /// [features] Media features to emulate.
-  Future<void> setEmulatedMedia(
-      {String? media, List<MediaFeature>? features}) async {
+  Future<void> setEmulatedMedia({
+    String? media,
+    List<MediaFeature>? features,
+  }) async {
     await _client.send('Emulation.setEmulatedMedia', {
       if (media != null) 'media': media,
       if (features != null) 'features': [...features],
@@ -179,28 +186,29 @@ class EmulationApi {
   /// [type] Vision deficiency to emulate. Order: best-effort emulations come first, followed by any
   /// physiologically accurate emulations for medically recognized color vision deficiencies.
   Future<void> setEmulatedVisionDeficiency(
-      @Enum([
-        'none',
-        'blurredVision',
-        'reducedContrast',
-        'achromatopsia',
-        'deuteranopia',
-        'protanopia',
-        'tritanopia'
-      ])
-      String type) async {
-    assert(const [
+    @Enum([
       'none',
       'blurredVision',
       'reducedContrast',
       'achromatopsia',
       'deuteranopia',
       'protanopia',
-      'tritanopia'
-    ].contains(type));
-    await _client.send('Emulation.setEmulatedVisionDeficiency', {
-      'type': type,
-    });
+      'tritanopia',
+    ])
+    String type,
+  ) async {
+    assert(
+      const [
+        'none',
+        'blurredVision',
+        'reducedContrast',
+        'achromatopsia',
+        'deuteranopia',
+        'protanopia',
+        'tritanopia',
+      ].contains(type),
+    );
+    await _client.send('Emulation.setEmulatedVisionDeficiency', {'type': type});
   }
 
   /// Overrides the Geolocation Position or Error. Omitting any of the parameters emulates position
@@ -208,8 +216,11 @@ class EmulationApi {
   /// [latitude] Mock latitude
   /// [longitude] Mock longitude
   /// [accuracy] Mock accuracy
-  Future<void> setGeolocationOverride(
-      {num? latitude, num? longitude, num? accuracy}) async {
+  Future<void> setGeolocationOverride({
+    num? latitude,
+    num? longitude,
+    num? accuracy,
+  }) async {
     await _client.send('Emulation.setGeolocationOverride', {
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
@@ -218,10 +229,10 @@ class EmulationApi {
   }
 
   Future<num> getOverriddenSensorInformation(SensorType type) async {
-    var result =
-        await _client.send('Emulation.getOverriddenSensorInformation', {
-      'type': type,
-    });
+    var result = await _client.send(
+      'Emulation.getOverriddenSensorInformation',
+      {'type': type},
+    );
     return result['requestedSamplingFrequency'] as num;
   }
 
@@ -230,8 +241,11 @@ class EmulationApi {
   /// data from a real hardware sensor. Otherwise, existing virtual
   /// sensor-backend Sensor objects will fire an error event and new calls to
   /// Sensor.start() will attempt to use a real sensor instead.
-  Future<void> setSensorOverrideEnabled(bool enabled, SensorType type,
-      {SensorMetadata? metadata}) async {
+  Future<void> setSensorOverrideEnabled(
+    bool enabled,
+    SensorType type, {
+    SensorMetadata? metadata,
+  }) async {
     await _client.send('Emulation.setSensorOverrideEnabled', {
       'enabled': enabled,
       'type': type,
@@ -242,7 +256,9 @@ class EmulationApi {
   /// Updates the sensor readings reported by a sensor type previously overridden
   /// by setSensorOverrideEnabled.
   Future<void> setSensorOverrideReadings(
-      SensorType type, SensorReading reading) async {
+    SensorType type,
+    SensorReading reading,
+  ) async {
     await _client.send('Emulation.setSensorOverrideReadings', {
       'type': type,
       'reading': reading,
@@ -254,8 +270,10 @@ class EmulationApi {
   /// via setPressureStateOverride instead of being retrieved from
   /// platform-provided telemetry data.
   Future<void> setPressureSourceOverrideEnabled(
-      bool enabled, PressureSource source,
-      {PressureMetadata? metadata}) async {
+    bool enabled,
+    PressureSource source, {
+    PressureMetadata? metadata,
+  }) async {
     await _client.send('Emulation.setPressureSourceOverrideEnabled', {
       'enabled': enabled,
       'source': source,
@@ -267,7 +285,9 @@ class EmulationApi {
   /// delivered to PressureObserver users. |source| must have been previously
   /// overridden by setPressureSourceOverrideEnabled.
   Future<void> setPressureStateOverride(
-      PressureSource source, PressureState state) async {
+    PressureSource source,
+    PressureState state,
+  ) async {
     await _client.send('Emulation.setPressureStateOverride', {
       'source': source,
       'state': state,
@@ -317,8 +337,10 @@ class EmulationApi {
   /// Enables touch on platforms which do not support them.
   /// [enabled] Whether the touch event emulation should be enabled.
   /// [maxTouchPoints] Maximum touch points supported. Defaults to one.
-  Future<void> setTouchEmulationEnabled(bool enabled,
-      {int? maxTouchPoints}) async {
+  Future<void> setTouchEmulationEnabled(
+    bool enabled, {
+    int? maxTouchPoints,
+  }) async {
     await _client.send('Emulation.setTouchEmulationEnabled', {
       'enabled': enabled,
       if (maxTouchPoints != null) 'maxTouchPoints': maxTouchPoints,
@@ -333,10 +355,12 @@ class EmulationApi {
   /// forwards to prevent deadlock.
   /// [initialVirtualTime] If set, base::Time::Now will be overridden to initially return this value.
   /// Returns: Absolute timestamp at which virtual time was first enabled (up time in milliseconds).
-  Future<num> setVirtualTimePolicy(VirtualTimePolicy policy,
-      {num? budget,
-      int? maxVirtualTimeTaskStarvationCount,
-      network.TimeSinceEpoch? initialVirtualTime}) async {
+  Future<num> setVirtualTimePolicy(
+    VirtualTimePolicy policy, {
+    num? budget,
+    int? maxVirtualTimeTaskStarvationCount,
+    network.TimeSinceEpoch? initialVirtualTime,
+  }) async {
     var result = await _client.send('Emulation.setVirtualTimePolicy', {
       'policy': policy,
       if (budget != null) 'budget': budget,
@@ -399,10 +423,12 @@ class EmulationApi {
   /// [acceptLanguage] Browser language to emulate.
   /// [platform] The platform navigator.platform should return.
   /// [userAgentMetadata] To be sent in Sec-CH-UA-* headers and returned in navigator.userAgentData
-  Future<void> setUserAgentOverride(String userAgent,
-      {String? acceptLanguage,
-      String? platform,
-      UserAgentMetadata? userAgentMetadata}) async {
+  Future<void> setUserAgentOverride(
+    String userAgent, {
+    String? acceptLanguage,
+    String? platform,
+    UserAgentMetadata? userAgentMetadata,
+  }) async {
     await _client.send('Emulation.setUserAgentOverride', {
       'userAgent': userAgent,
       if (acceptLanguage != null) 'acceptLanguage': acceptLanguage,
@@ -414,9 +440,7 @@ class EmulationApi {
   /// Allows overriding the automation flag.
   /// [enabled] Whether the override should be enabled.
   Future<void> setAutomationOverride(bool enabled) async {
-    await _client.send('Emulation.setAutomationOverride', {
-      'enabled': enabled,
-    });
+    await _client.send('Emulation.setAutomationOverride', {'enabled': enabled});
   }
 }
 
@@ -438,10 +462,7 @@ class ScreenOrientation {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'type': type,
-      'angle': angle,
-    };
+    return {'type': type, 'angle': angle};
   }
 }
 
@@ -449,8 +470,7 @@ enum ScreenOrientationType {
   portraitPrimary('portraitPrimary'),
   portraitSecondary('portraitSecondary'),
   landscapePrimary('landscapePrimary'),
-  landscapeSecondary('landscapeSecondary'),
-  ;
+  landscapeSecondary('landscapeSecondary');
 
   final String value;
 
@@ -478,15 +498,17 @@ class DisplayFeature {
   /// A display feature that only splits content will have a 0 mask_length.
   final int maskLength;
 
-  DisplayFeature(
-      {required this.orientation,
-      required this.offset,
-      required this.maskLength});
+  DisplayFeature({
+    required this.orientation,
+    required this.offset,
+    required this.maskLength,
+  });
 
   factory DisplayFeature.fromJson(Map<String, dynamic> json) {
     return DisplayFeature(
-      orientation:
-          DisplayFeatureOrientation.fromJson(json['orientation'] as String),
+      orientation: DisplayFeatureOrientation.fromJson(
+        json['orientation'] as String,
+      ),
       offset: json['offset'] as int,
       maskLength: json['maskLength'] as int,
     );
@@ -503,8 +525,7 @@ class DisplayFeature {
 
 enum DisplayFeatureOrientation {
   vertical('vertical'),
-  horizontal('horizontal'),
-  ;
+  horizontal('horizontal');
 
   final String value;
 
@@ -532,16 +553,13 @@ class DevicePosture {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'type': type,
-    };
+    return {'type': type};
   }
 }
 
 enum DevicePostureType {
   continuous('continuous'),
-  folded('folded'),
-  ;
+  folded('folded');
 
   final String value;
 
@@ -571,10 +589,7 @@ class MediaFeature {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'value': value,
-    };
+    return {'name': name, 'value': value};
   }
 }
 
@@ -585,8 +600,7 @@ class MediaFeature {
 enum VirtualTimePolicy {
   advance('advance'),
   pause('pause'),
-  pauseIfNetworkFetchesPending('pauseIfNetworkFetchesPending'),
-  ;
+  pauseIfNetworkFetchesPending('pauseIfNetworkFetchesPending');
 
   final String value;
 
@@ -617,10 +631,7 @@ class UserAgentBrandVersion {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'brand': brand,
-      'version': version,
-    };
+    return {'brand': brand, 'version': version};
   }
 }
 
@@ -647,31 +658,40 @@ class UserAgentMetadata {
 
   final bool? wow64;
 
-  UserAgentMetadata(
-      {this.brands,
-      this.fullVersionList,
-      required this.platform,
-      required this.platformVersion,
-      required this.architecture,
-      required this.model,
-      required this.mobile,
-      this.bitness,
-      this.wow64});
+  UserAgentMetadata({
+    this.brands,
+    this.fullVersionList,
+    required this.platform,
+    required this.platformVersion,
+    required this.architecture,
+    required this.model,
+    required this.mobile,
+    this.bitness,
+    this.wow64,
+  });
 
   factory UserAgentMetadata.fromJson(Map<String, dynamic> json) {
     return UserAgentMetadata(
-      brands: json.containsKey('brands')
-          ? (json['brands'] as List)
-              .map((e) =>
-                  UserAgentBrandVersion.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-      fullVersionList: json.containsKey('fullVersionList')
-          ? (json['fullVersionList'] as List)
-              .map((e) =>
-                  UserAgentBrandVersion.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
+      brands:
+          json.containsKey('brands')
+              ? (json['brands'] as List)
+                  .map(
+                    (e) => UserAgentBrandVersion.fromJson(
+                      e as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList()
+              : null,
+      fullVersionList:
+          json.containsKey('fullVersionList')
+              ? (json['fullVersionList'] as List)
+                  .map(
+                    (e) => UserAgentBrandVersion.fromJson(
+                      e as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList()
+              : null,
       platform: json['platform'] as String,
       platformVersion: json['platformVersion'] as String,
       architecture: json['architecture'] as String,
@@ -708,8 +728,7 @@ enum SensorType {
   gyroscope('gyroscope'),
   linearAcceleration('linear-acceleration'),
   magnetometer('magnetometer'),
-  relativeOrientation('relative-orientation'),
-  ;
+  relativeOrientation('relative-orientation');
 
   final String value;
 
@@ -731,19 +750,24 @@ class SensorMetadata {
 
   final num? maximumFrequency;
 
-  SensorMetadata(
-      {this.available, this.minimumFrequency, this.maximumFrequency});
+  SensorMetadata({
+    this.available,
+    this.minimumFrequency,
+    this.maximumFrequency,
+  });
 
   factory SensorMetadata.fromJson(Map<String, dynamic> json) {
     return SensorMetadata(
       available:
           json.containsKey('available') ? json['available'] as bool : null,
-      minimumFrequency: json.containsKey('minimumFrequency')
-          ? json['minimumFrequency'] as num
-          : null,
-      maximumFrequency: json.containsKey('maximumFrequency')
-          ? json['maximumFrequency'] as num
-          : null,
+      minimumFrequency:
+          json.containsKey('minimumFrequency')
+              ? json['minimumFrequency'] as num
+              : null,
+      maximumFrequency:
+          json.containsKey('maximumFrequency')
+              ? json['maximumFrequency'] as num
+              : null,
     );
   }
 
@@ -762,15 +786,11 @@ class SensorReadingSingle {
   SensorReadingSingle({required this.value});
 
   factory SensorReadingSingle.fromJson(Map<String, dynamic> json) {
-    return SensorReadingSingle(
-      value: json['value'] as num,
-    );
+    return SensorReadingSingle(value: json['value'] as num);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'value': value,
-    };
+    return {'value': value};
   }
 }
 
@@ -792,11 +812,7 @@ class SensorReadingXYZ {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'x': x,
-      'y': y,
-      'z': z,
-    };
+    return {'x': x, 'y': y, 'z': z};
   }
 }
 
@@ -809,8 +825,12 @@ class SensorReadingQuaternion {
 
   final num w;
 
-  SensorReadingQuaternion(
-      {required this.x, required this.y, required this.z, required this.w});
+  SensorReadingQuaternion({
+    required this.x,
+    required this.y,
+    required this.z,
+    required this.w,
+  });
 
   factory SensorReadingQuaternion.fromJson(Map<String, dynamic> json) {
     return SensorReadingQuaternion(
@@ -822,12 +842,7 @@ class SensorReadingQuaternion {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'x': x,
-      'y': y,
-      'z': z,
-      'w': w,
-    };
+    return {'x': x, 'y': y, 'z': z, 'w': w};
   }
 }
 
@@ -842,16 +857,22 @@ class SensorReading {
 
   factory SensorReading.fromJson(Map<String, dynamic> json) {
     return SensorReading(
-      single: json.containsKey('single')
-          ? SensorReadingSingle.fromJson(json['single'] as Map<String, dynamic>)
-          : null,
-      xyz: json.containsKey('xyz')
-          ? SensorReadingXYZ.fromJson(json['xyz'] as Map<String, dynamic>)
-          : null,
-      quaternion: json.containsKey('quaternion')
-          ? SensorReadingQuaternion.fromJson(
-              json['quaternion'] as Map<String, dynamic>)
-          : null,
+      single:
+          json.containsKey('single')
+              ? SensorReadingSingle.fromJson(
+                json['single'] as Map<String, dynamic>,
+              )
+              : null,
+      xyz:
+          json.containsKey('xyz')
+              ? SensorReadingXYZ.fromJson(json['xyz'] as Map<String, dynamic>)
+              : null,
+      quaternion:
+          json.containsKey('quaternion')
+              ? SensorReadingQuaternion.fromJson(
+                json['quaternion'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 
@@ -865,8 +886,7 @@ class SensorReading {
 }
 
 enum PressureSource {
-  cpu('cpu'),
-  ;
+  cpu('cpu');
 
   final String value;
 
@@ -885,8 +905,7 @@ enum PressureState {
   nominal('nominal'),
   fair('fair'),
   serious('serious'),
-  critical('critical'),
-  ;
+  critical('critical');
 
   final String value;
 
@@ -914,17 +933,14 @@ class PressureMetadata {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      if (available != null) 'available': available,
-    };
+    return {if (available != null) 'available': available};
   }
 }
 
 /// Enum of image types that can be disabled.
 enum DisabledImageType {
   avif('avif'),
-  webp('webp'),
-  ;
+  webp('webp');
 
   final String value;
 

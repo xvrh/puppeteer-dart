@@ -24,10 +24,12 @@ typedef _RouteCallback = FutureOr<shelf.Response> Function(shelf.Request);
 class Server {
   late final HttpServer _httpServer;
   final _routes = CanonicalizedMap<String, String, _RouteCallback>(
-      (key) => p.url.normalize(_removeLeadingSlash(key)));
+    (key) => p.url.normalize(_removeLeadingSlash(key)),
+  );
   final _requestCallbacks =
       CanonicalizedMap<String, String, Completer<shelf.Request>>(
-          (key) => p.url.normalize(_removeLeadingSlash(key)));
+        (key) => p.url.normalize(_removeLeadingSlash(key)),
+      );
 
   Server._();
 
@@ -39,23 +41,28 @@ class Server {
 
   Future<void> _setup() async {
     var staticHandler = createStaticHandler('test/assets');
-    _httpServer = await io.serve((request) async {
-      var notificationCompleter = _requestCallbacks[request.url.toString()];
-      if (notificationCompleter != null) {
-        notificationCompleter.complete(request);
-        _requestCallbacks.remove(request.url.toString());
-      }
+    _httpServer = await io.serve(
+      (request) async {
+        var notificationCompleter = _requestCallbacks[request.url.toString()];
+        if (notificationCompleter != null) {
+          notificationCompleter.complete(request);
+          _requestCallbacks.remove(request.url.toString());
+        }
 
-      var callback = _routes[request.url.path];
-      if (callback != null) {
-        return callback(request);
-      } else {
-        var staticResponse = await staticHandler(request);
-        staticResponse
-            .change(headers: {HttpHeaders.cacheControlHeader: 'no-cache'});
-        return staticResponse;
-      }
-    }, InternetAddress.anyIPv4, 0);
+        var callback = _routes[request.url.path];
+        if (callback != null) {
+          return callback(request);
+        } else {
+          var staticResponse = await staticHandler(request);
+          staticResponse.change(
+            headers: {HttpHeaders.cacheControlHeader: 'no-cache'},
+          );
+          return staticResponse;
+        }
+      },
+      InternetAddress.anyIPv4,
+      0,
+    );
   }
 
   String get hostUrl => 'http://localhost:${_httpServer.port}';
@@ -80,8 +87,10 @@ class Server {
     return path;
   }
 
-  void setRoute(String url,
-      FutureOr<shelf.Response> Function(shelf.Request request) callback) {
+  void setRoute(
+    String url,
+    FutureOr<shelf.Response> Function(shelf.Request request) callback,
+  ) {
     _routes[url] = callback;
   }
 
@@ -110,8 +119,8 @@ class Server {
 
 Future<Frame> attachFrame(Page page, String frameId, String url) async {
   var handle = await page.evaluateHandle(
-      //language=js
-      '''
+    //language=js
+    '''
 async function attachFrame(frameId, url) {
     const frame = document.createElement('iframe');
     frame.src = url;
@@ -120,33 +129,43 @@ async function attachFrame(frameId, url) {
     await new Promise(x => frame.onload = x);
     return frame;
   }  
-''', args: [frameId, url]);
+''',
+    args: [frameId, url],
+  );
   return (await handle.asElement!.contentFrame)!;
 }
 
 Future<void> detachFrame(Page page, String frameId) async {
-  await page.evaluate('''
+  await page.evaluate(
+    '''
 function detachFrame(frameId) {
     const frame = document.getElementById(frameId);
     frame.remove();
   }
-''', args: [frameId]);
+''',
+    args: [frameId],
+  );
 }
 
 Future<T> waitFutures<T>(
-    Future<T> firstFuture, List<Future<dynamic>> others) async {
+  Future<T> firstFuture,
+  List<Future<dynamic>> others,
+) async {
   var futures = <Future<dynamic>>[firstFuture, ...others];
   return (await Future.wait(futures))[0] as T;
 }
 
 Future<void> navigateFrame(Page page, String frameId, String url) async {
-  await page.evaluate('''
+  await page.evaluate(
+    '''
 function navigateFrame(frameId, url) {
   const frame = document.getElementById(frameId);
   frame.src = url;
   return new Promise(x => frame.onload = x);
 }  
-''', args: [frameId, url]);
+''',
+    args: [frameId, url],
+  );
 }
 
 List<String> dumpFrames(Frame frame, [String? indentation]) {

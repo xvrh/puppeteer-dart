@@ -11,31 +11,36 @@ void main() async {
   // List extracted from https://github.com/puppeteer/puppeteer/blob/main/packages/puppeteer-core/src/common/Device.ts
   var content = await File('tool/known_devices.json').readAsString();
 
-  var devices = (jsonDecode(content) as List<dynamic>)
-      .map((e) => Device.fromJson(e as Map<String, dynamic>));
+  var devices = (jsonDecode(content) as List<dynamic>).map(
+    (e) => Device.fromJson(e as Map<String, dynamic>),
+  );
 
   var buffer = StringBuffer();
   buffer.writeln("import 'dart:collection';");
   buffer.writeln("import 'package:collection/collection.dart';");
   buffer.writeln(
-      "import 'page/emulation_manager.dart' show Device, DeviceViewport;");
+    "import 'page/emulation_manager.dart' show Device, DeviceViewport;",
+  );
   buffer.writeln('class Devices with IterableMixin<Device> {');
   var allNames = <String?, String>{};
   for (var device in devices) {
     var variableName = firstLetterLower(
-        splitWords(device.name).map(firstLetterUpper).join(''));
+      splitWords(device.name).map(firstLetterUpper).join(''),
+    );
     allNames[device.name] = variableName;
 
     buffer.writeln('final $variableName = ${device.toCode()};');
     buffer.writeln();
   }
-  var allNamesMap =
-      allNames.entries.map((e) => "'${e.key}': ${e.value}").join(', ');
+  var allNamesMap = allNames.entries
+      .map((e) => "'${e.key}': ${e.value}")
+      .join(', ');
   buffer.writeln('late final Map<String, Device> _all;');
   buffer.writeln('Devices._() {');
   buffer.writeln(
-      '_all = CanonicalizedMap<String, String, Device>.from({$allNamesMap,}, '
-      "(key) => key.replaceAll(' ', '').toLowerCase());");
+    '_all = CanonicalizedMap<String, String, Device>.from({$allNamesMap,}, '
+    "(key) => key.replaceAll(' ', '').toLowerCase());",
+  );
   buffer.writeln('}');
   buffer.writeln();
   buffer.writeln('Device? operator[](String name) => _all[name];');
@@ -45,8 +50,11 @@ void main() async {
   buffer.writeln();
   buffer.writeln('}');
   buffer.writeln('final devices = Devices._();');
-  File('lib/src/devices.dart')
-      .writeAsStringSync(DartFormatter().format(buffer.toString()));
+  File('lib/src/devices.dart').writeAsStringSync(
+    DartFormatter(
+      languageVersion: DartFormatter.latestLanguageVersion,
+    ).format(buffer.toString()),
+  );
 }
 
 @JsonSerializable()
@@ -74,8 +82,14 @@ class DeviceViewport {
   final bool hasTouch;
   final bool isLandscape;
 
-  DeviceViewport(this.width, this.height, this.deviceScaleFactor, this.isMobile,
-      this.hasTouch, this.isLandscape);
+  DeviceViewport(
+    this.width,
+    this.height,
+    this.deviceScaleFactor,
+    this.isMobile,
+    this.hasTouch,
+    this.isLandscape,
+  );
 
   factory DeviceViewport.fromJson(Map<String, dynamic> json) =>
       _$DeviceViewportFromJson(json);

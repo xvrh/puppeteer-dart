@@ -47,11 +47,12 @@ class GetInfoResult {
   /// supported.
   final String commandLine;
 
-  GetInfoResult(
-      {required this.gpu,
-      required this.modelName,
-      required this.modelVersion,
-      required this.commandLine});
+  GetInfoResult({
+    required this.gpu,
+    required this.modelName,
+    required this.modelVersion,
+    required this.commandLine,
+  });
 
   factory GetInfoResult.fromJson(Map<String, dynamic> json) {
     return GetInfoResult(
@@ -89,15 +90,16 @@ class GPUDevice {
   /// String description of the GPU driver version.
   final String driverVersion;
 
-  GPUDevice(
-      {required this.vendorId,
-      required this.deviceId,
-      this.subSysId,
-      this.revision,
-      required this.vendorString,
-      required this.deviceString,
-      required this.driverVendor,
-      required this.driverVersion});
+  GPUDevice({
+    required this.vendorId,
+    required this.deviceId,
+    this.subSysId,
+    this.revision,
+    required this.vendorString,
+    required this.deviceString,
+    required this.driverVendor,
+    required this.driverVersion,
+  });
 
   factory GPUDevice.fromJson(Map<String, dynamic> json) {
     return GPUDevice(
@@ -137,17 +139,11 @@ class Size {
   Size({required this.width, required this.height});
 
   factory Size.fromJson(Map<String, dynamic> json) {
-    return Size(
-      width: json['width'] as int,
-      height: json['height'] as int,
-    );
+    return Size(width: json['width'] as int, height: json['height'] as int);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'width': width,
-      'height': height,
-    };
+    return {'width': width, 'height': height};
   }
 }
 
@@ -163,18 +159,21 @@ class VideoDecodeAcceleratorCapability {
   /// Minimum video dimensions in pixels supported for this |profile|.
   final Size minResolution;
 
-  VideoDecodeAcceleratorCapability(
-      {required this.profile,
-      required this.maxResolution,
-      required this.minResolution});
+  VideoDecodeAcceleratorCapability({
+    required this.profile,
+    required this.maxResolution,
+    required this.minResolution,
+  });
 
   factory VideoDecodeAcceleratorCapability.fromJson(Map<String, dynamic> json) {
     return VideoDecodeAcceleratorCapability(
       profile: json['profile'] as String,
-      maxResolution:
-          Size.fromJson(json['maxResolution'] as Map<String, dynamic>),
-      minResolution:
-          Size.fromJson(json['minResolution'] as Map<String, dynamic>),
+      maxResolution: Size.fromJson(
+        json['maxResolution'] as Map<String, dynamic>,
+      ),
+      minResolution: Size.fromJson(
+        json['minResolution'] as Map<String, dynamic>,
+      ),
     );
   }
 
@@ -203,17 +202,19 @@ class VideoEncodeAcceleratorCapability {
 
   final int maxFramerateDenominator;
 
-  VideoEncodeAcceleratorCapability(
-      {required this.profile,
-      required this.maxResolution,
-      required this.maxFramerateNumerator,
-      required this.maxFramerateDenominator});
+  VideoEncodeAcceleratorCapability({
+    required this.profile,
+    required this.maxResolution,
+    required this.maxFramerateNumerator,
+    required this.maxFramerateDenominator,
+  });
 
   factory VideoEncodeAcceleratorCapability.fromJson(Map<String, dynamic> json) {
     return VideoEncodeAcceleratorCapability(
       profile: json['profile'] as String,
-      maxResolution:
-          Size.fromJson(json['maxResolution'] as Map<String, dynamic>),
+      maxResolution: Size.fromJson(
+        json['maxResolution'] as Map<String, dynamic>,
+      ),
       maxFramerateNumerator: json['maxFramerateNumerator'] as int,
       maxFramerateDenominator: json['maxFramerateDenominator'] as int,
     );
@@ -233,8 +234,7 @@ class VideoEncodeAcceleratorCapability {
 enum SubsamplingFormat {
   yuv420('yuv420'),
   yuv422('yuv422'),
-  yuv444('yuv444'),
-  ;
+  yuv444('yuv444');
 
   final String value;
 
@@ -253,8 +253,7 @@ enum SubsamplingFormat {
 enum ImageType {
   jpeg('jpeg'),
   webp('webp'),
-  unknown('unknown'),
-  ;
+  unknown('unknown');
 
   final String value;
 
@@ -284,22 +283,26 @@ class ImageDecodeAcceleratorCapability {
   /// Optional array of supported subsampling formats, e.g. 4:2:0, if known.
   final List<SubsamplingFormat> subsamplings;
 
-  ImageDecodeAcceleratorCapability(
-      {required this.imageType,
-      required this.maxDimensions,
-      required this.minDimensions,
-      required this.subsamplings});
+  ImageDecodeAcceleratorCapability({
+    required this.imageType,
+    required this.maxDimensions,
+    required this.minDimensions,
+    required this.subsamplings,
+  });
 
   factory ImageDecodeAcceleratorCapability.fromJson(Map<String, dynamic> json) {
     return ImageDecodeAcceleratorCapability(
       imageType: ImageType.fromJson(json['imageType'] as String),
-      maxDimensions:
-          Size.fromJson(json['maxDimensions'] as Map<String, dynamic>),
-      minDimensions:
-          Size.fromJson(json['minDimensions'] as Map<String, dynamic>),
-      subsamplings: (json['subsamplings'] as List)
-          .map((e) => SubsamplingFormat.fromJson(e as String))
-          .toList(),
+      maxDimensions: Size.fromJson(
+        json['maxDimensions'] as Map<String, dynamic>,
+      ),
+      minDimensions: Size.fromJson(
+        json['minDimensions'] as Map<String, dynamic>,
+      ),
+      subsamplings:
+          (json['subsamplings'] as List)
+              .map((e) => SubsamplingFormat.fromJson(e as String))
+              .toList(),
     );
   }
 
@@ -336,41 +339,58 @@ class GPUInfo {
   /// Supported accelerated image decoding capabilities.
   final List<ImageDecodeAcceleratorCapability> imageDecoding;
 
-  GPUInfo(
-      {required this.devices,
-      this.auxAttributes,
-      this.featureStatus,
-      required this.driverBugWorkarounds,
-      required this.videoDecoding,
-      required this.videoEncoding,
-      required this.imageDecoding});
+  GPUInfo({
+    required this.devices,
+    this.auxAttributes,
+    this.featureStatus,
+    required this.driverBugWorkarounds,
+    required this.videoDecoding,
+    required this.videoEncoding,
+    required this.imageDecoding,
+  });
 
   factory GPUInfo.fromJson(Map<String, dynamic> json) {
     return GPUInfo(
-      devices: (json['devices'] as List)
-          .map((e) => GPUDevice.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      auxAttributes: json.containsKey('auxAttributes')
-          ? json['auxAttributes'] as Map<String, dynamic>
-          : null,
-      featureStatus: json.containsKey('featureStatus')
-          ? json['featureStatus'] as Map<String, dynamic>
-          : null,
-      driverBugWorkarounds: (json['driverBugWorkarounds'] as List)
-          .map((e) => e as String)
-          .toList(),
-      videoDecoding: (json['videoDecoding'] as List)
-          .map((e) => VideoDecodeAcceleratorCapability.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
-      videoEncoding: (json['videoEncoding'] as List)
-          .map((e) => VideoEncodeAcceleratorCapability.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
-      imageDecoding: (json['imageDecoding'] as List)
-          .map((e) => ImageDecodeAcceleratorCapability.fromJson(
-              e as Map<String, dynamic>))
-          .toList(),
+      devices:
+          (json['devices'] as List)
+              .map((e) => GPUDevice.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      auxAttributes:
+          json.containsKey('auxAttributes')
+              ? json['auxAttributes'] as Map<String, dynamic>
+              : null,
+      featureStatus:
+          json.containsKey('featureStatus')
+              ? json['featureStatus'] as Map<String, dynamic>
+              : null,
+      driverBugWorkarounds:
+          (json['driverBugWorkarounds'] as List)
+              .map((e) => e as String)
+              .toList(),
+      videoDecoding:
+          (json['videoDecoding'] as List)
+              .map(
+                (e) => VideoDecodeAcceleratorCapability.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+      videoEncoding:
+          (json['videoEncoding'] as List)
+              .map(
+                (e) => VideoEncodeAcceleratorCapability.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+      imageDecoding:
+          (json['imageDecoding'] as List)
+              .map(
+                (e) => ImageDecodeAcceleratorCapability.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
     );
   }
 
@@ -410,10 +430,6 @@ class ProcessInfo {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'type': type,
-      'id': id,
-      'cpuTime': cpuTime,
-    };
+    return {'type': type, 'id': id, 'cpuTime': cpuTime};
   }
 }

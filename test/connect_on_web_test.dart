@@ -16,9 +16,11 @@ void main() {
     var tempDirectory = Directory.systemTemp.createTempSync();
 
     late HttpServer httpServer;
-    var router = Router()
-      ..get('/index.html', (request) {
-        return shelf.Response.ok('''
+    var router =
+        Router()
+          ..get('/index.html', (request) {
+            return shelf.Response.ok(
+              '''
 <html>
   <head>
     <title>Puppeteer</title>
@@ -29,29 +31,38 @@ void main() {
     <h1>Puppeteer</h1>
   </body>
 </html>          
-''', headers: {
-          'content-type': 'text/html',
-        });
-      })
-      // Since chromium 111, the chromium devtools server doesn't accept a connection from a web page
-      // The test workaround this by adding a proxy in-between.
-      // Ideally we can just pass x-puppeteer-endpoint="${browser.wsEndpoint}" in the html
-      // There is a workaround for this with the "--remote-allow-origins=*" flag in
-      // connect_on_web_directly_test.dart test.
-      ..mount('/proxy', webSocketHandler((WebSocketChannel webSocket) async {
-        var browserSocket = await WebSocket.connect(browser.wsEndpoint);
-        var websocketSubscription = webSocket.stream.listen((message) {
-          browserSocket.add(message);
-        }, onDone: () {
-          browserSocket.close();
-        });
-        browserSocket.listen((event) {
-          webSocket.sink.add(event);
-        }, onDone: () {
-          websocketSubscription.cancel();
-        });
-      }))
-      ..mount('/', createStaticHandler(tempDirectory.path));
+''',
+              headers: {'content-type': 'text/html'},
+            );
+          })
+          // Since chromium 111, the chromium devtools server doesn't accept a connection from a web page
+          // The test workaround this by adding a proxy in-between.
+          // Ideally we can just pass x-puppeteer-endpoint="${browser.wsEndpoint}" in the html
+          // There is a workaround for this with the "--remote-allow-origins=*" flag in
+          // connect_on_web_directly_test.dart test.
+          ..mount(
+            '/proxy',
+            webSocketHandler((WebSocketChannel webSocket) async {
+              var browserSocket = await WebSocket.connect(browser.wsEndpoint);
+              var websocketSubscription = webSocket.stream.listen(
+                (message) {
+                  browserSocket.add(message);
+                },
+                onDone: () {
+                  browserSocket.close();
+                },
+              );
+              browserSocket.listen(
+                (event) {
+                  webSocket.sink.add(event);
+                },
+                onDone: () {
+                  websocketSubscription.cancel();
+                },
+              );
+            }),
+          )
+          ..mount('/', createStaticHandler(tempDirectory.path));
 
     httpServer = await shelf.serve(router.call, InternetAddress.anyIPv4, 0);
 
@@ -62,17 +73,21 @@ void main() {
         'js',
         '--output',
         jsFile,
-        'test/connect_on_web_part.dart'
+        'test/connect_on_web_part.dart',
       ]);
-      expect(compileResult.exitCode, 0,
-          reason: '${compileResult.stdout}\n${compileResult.stderr}');
+      expect(
+        compileResult.exitCode,
+        0,
+        reason: '${compileResult.stdout}\n${compileResult.stderr}',
+      );
       assert(File(jsFile).existsSync());
 
       var page = await browser.newPage();
       await page.goto('http://localhost:${httpServer.port}/index.html');
 
-      await page.onConsole
-          .firstWhere((e) => e.text == 'Hello from puppeteer in js');
+      await page.onConsole.firstWhere(
+        (e) => e.text == 'Hello from puppeteer in js',
+      );
     } finally {
       await httpServer.close();
       tempDirectory.deleteSync(recursive: true);

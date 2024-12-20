@@ -37,10 +37,14 @@ class DebuggerApi {
 
   /// Continues execution until specific location is reached.
   /// [location] Location to continue to.
-  Future<void> continueToLocation(Location location,
-      {@Enum(['any', 'current']) String? targetCallFrames}) async {
-    assert(targetCallFrames == null ||
-        const ['any', 'current'].contains(targetCallFrames));
+  Future<void> continueToLocation(
+    Location location, {
+    @Enum(['any', 'current']) String? targetCallFrames,
+  }) async {
+    assert(
+      targetCallFrames == null ||
+          const ['any', 'current'].contains(targetCallFrames),
+    );
     await _client.send('Debugger.continueToLocation', {
       'location': location,
       if (targetCallFrames != null) 'targetCallFrames': targetCallFrames,
@@ -79,14 +83,16 @@ class DebuggerApi {
   /// [throwOnSideEffect] Whether to throw an exception if side effect cannot be ruled out during evaluation.
   /// [timeout] Terminate execution after timing out (number of milliseconds).
   Future<EvaluateOnCallFrameResult> evaluateOnCallFrame(
-      CallFrameId callFrameId, String expression,
-      {String? objectGroup,
-      bool? includeCommandLineAPI,
-      bool? silent,
-      bool? returnByValue,
-      bool? generatePreview,
-      bool? throwOnSideEffect,
-      runtime.TimeDelta? timeout}) async {
+    CallFrameId callFrameId,
+    String expression, {
+    String? objectGroup,
+    bool? includeCommandLineAPI,
+    bool? silent,
+    bool? returnByValue,
+    bool? generatePreview,
+    bool? throwOnSideEffect,
+    runtime.TimeDelta? timeout,
+  }) async {
     var result = await _client.send('Debugger.evaluateOnCallFrame', {
       'callFrameId': callFrameId,
       'expression': expression,
@@ -109,8 +115,11 @@ class DebuggerApi {
   /// of scripts is used as end of range.
   /// [restrictToFunction] Only consider locations which are in the same (non-nested) function as start.
   /// Returns: List of the possible breakpoint locations.
-  Future<List<BreakLocation>> getPossibleBreakpoints(Location start,
-      {Location? end, bool? restrictToFunction}) async {
+  Future<List<BreakLocation>> getPossibleBreakpoints(
+    Location start, {
+    Location? end,
+    bool? restrictToFunction,
+  }) async {
     var result = await _client.send('Debugger.getPossibleBreakpoints', {
       'start': start,
       if (end != null) 'end': end,
@@ -124,7 +133,8 @@ class DebuggerApi {
   /// Returns source for the script with given id.
   /// [scriptId] Id of the script to get source for.
   Future<GetScriptSourceResult> getScriptSource(
-      runtime.ScriptId scriptId) async {
+    runtime.ScriptId scriptId,
+  ) async {
     var result = await _client.send('Debugger.getScriptSource', {
       'scriptId': scriptId,
     });
@@ -133,7 +143,8 @@ class DebuggerApi {
 
   /// [scriptId] Id of the script to disassemble
   Future<DisassembleWasmModuleResult> disassembleWasmModule(
-      runtime.ScriptId scriptId) async {
+    runtime.ScriptId scriptId,
+  ) async {
     var result = await _client.send('Debugger.disassembleWasmModule', {
       'scriptId': scriptId,
     });
@@ -150,7 +161,8 @@ class DebuggerApi {
       'streamId': streamId,
     });
     return WasmDisassemblyChunk.fromJson(
-        result['chunk'] as Map<String, dynamic>);
+      result['chunk'] as Map<String, dynamic>,
+    );
   }
 
   /// This command is deprecated. Use getScriptSource instead.
@@ -166,12 +178,14 @@ class DebuggerApi {
 
   /// Returns stack trace with given `stackTraceId`.
   Future<runtime.StackTraceData> getStackTrace(
-      runtime.StackTraceId stackTraceId) async {
+    runtime.StackTraceId stackTraceId,
+  ) async {
     var result = await _client.send('Debugger.getStackTrace', {
       'stackTraceId': stackTraceId,
     });
     return runtime.StackTraceData.fromJson(
-        result['stackTrace'] as Map<String, dynamic>);
+      result['stackTrace'] as Map<String, dynamic>,
+    );
   }
 
   /// Stops on the next JavaScript statement.
@@ -210,8 +224,10 @@ class DebuggerApi {
   /// [callFrameId] Call frame identifier to evaluate on.
   /// [mode] The `mode` parameter must be present and set to 'StepInto', otherwise
   /// `restartFrame` will error out.
-  Future<RestartFrameResult> restartFrame(CallFrameId callFrameId,
-      {@Enum(['StepInto']) String? mode}) async {
+  Future<RestartFrameResult> restartFrame(
+    CallFrameId callFrameId, {
+    @Enum(['StepInto']) String? mode,
+  }) async {
     assert(mode == null || const ['StepInto'].contains(mode));
     var result = await _client.send('Debugger.restartFrame', {
       'callFrameId': callFrameId,
@@ -239,8 +255,11 @@ class DebuggerApi {
   /// [isRegex] If true, treats string parameter as regex.
   /// Returns: List of search matches.
   Future<List<SearchMatch>> searchInContent(
-      runtime.ScriptId scriptId, String query,
-      {bool? caseSensitive, bool? isRegex}) async {
+    runtime.ScriptId scriptId,
+    String query, {
+    bool? caseSensitive,
+    bool? isRegex,
+  }) async {
     var result = await _client.send('Debugger.searchInContent', {
       'scriptId': scriptId,
       'query': query,
@@ -276,8 +295,10 @@ class DebuggerApi {
   /// performing 'step in' several times, finally resorting to 'step out' if unsuccessful.
   /// [patterns] Array of regexps that will be used to check script url for blackbox state.
   /// [skipAnonymous] If true, also ignore scripts with no source url.
-  Future<void> setBlackboxPatterns(List<String> patterns,
-      {bool? skipAnonymous}) async {
+  Future<void> setBlackboxPatterns(
+    List<String> patterns, {
+    bool? skipAnonymous,
+  }) async {
     await _client.send('Debugger.setBlackboxPatterns', {
       'patterns': [...patterns],
       if (skipAnonymous != null) 'skipAnonymous': skipAnonymous,
@@ -290,7 +311,9 @@ class DebuggerApi {
   /// blackboxed. Array should be sorted.
   /// [scriptId] Id of the script.
   Future<void> setBlackboxedRanges(
-      runtime.ScriptId scriptId, List<ScriptPosition> positions) async {
+    runtime.ScriptId scriptId,
+    List<ScriptPosition> positions,
+  ) async {
     await _client.send('Debugger.setBlackboxedRanges', {
       'scriptId': scriptId,
       'positions': [...positions],
@@ -301,8 +324,10 @@ class DebuggerApi {
   /// [location] Location to set breakpoint in.
   /// [condition] Expression to use as a breakpoint condition. When specified, debugger will only stop on the
   /// breakpoint if this expression evaluates to true.
-  Future<SetBreakpointResult> setBreakpoint(Location location,
-      {String? condition}) async {
+  Future<SetBreakpointResult> setBreakpoint(
+    Location location, {
+    String? condition,
+  }) async {
     var result = await _client.send('Debugger.setBreakpoint', {
       'location': location,
       if (condition != null) 'condition': condition,
@@ -314,10 +339,15 @@ class DebuggerApi {
   /// [instrumentation] Instrumentation name.
   /// Returns: Id of the created breakpoint for further reference.
   Future<BreakpointId> setInstrumentationBreakpoint(
-      @Enum(['beforeScriptExecution', 'beforeScriptWithSourceMapExecution'])
-      String instrumentation) async {
-    assert(const ['beforeScriptExecution', 'beforeScriptWithSourceMapExecution']
-        .contains(instrumentation));
+    @Enum(['beforeScriptExecution', 'beforeScriptWithSourceMapExecution'])
+    String instrumentation,
+  ) async {
+    assert(
+      const [
+        'beforeScriptExecution',
+        'beforeScriptWithSourceMapExecution',
+      ].contains(instrumentation),
+    );
     var result = await _client.send('Debugger.setInstrumentationBreakpoint', {
       'instrumentation': instrumentation,
     });
@@ -336,12 +366,14 @@ class DebuggerApi {
   /// [columnNumber] Offset in the line to set breakpoint at.
   /// [condition] Expression to use as a breakpoint condition. When specified, debugger will only stop on the
   /// breakpoint if this expression evaluates to true.
-  Future<SetBreakpointByUrlResult> setBreakpointByUrl(int lineNumber,
-      {String? url,
-      String? urlRegex,
-      String? scriptHash,
-      int? columnNumber,
-      String? condition}) async {
+  Future<SetBreakpointByUrlResult> setBreakpointByUrl(
+    int lineNumber, {
+    String? url,
+    String? urlRegex,
+    String? scriptHash,
+    int? columnNumber,
+    String? condition,
+  }) async {
     var result = await _client.send('Debugger.setBreakpointByUrl', {
       'lineNumber': lineNumber,
       if (url != null) 'url': url,
@@ -361,8 +393,9 @@ class DebuggerApi {
   /// stop on the breakpoint if this expression evaluates to true.
   /// Returns: Id of the created breakpoint for further reference.
   Future<BreakpointId> setBreakpointOnFunctionCall(
-      runtime.RemoteObjectId objectId,
-      {String? condition}) async {
+    runtime.RemoteObjectId objectId, {
+    String? condition,
+  }) async {
     var result = await _client.send('Debugger.setBreakpointOnFunctionCall', {
       'objectId': objectId,
       if (condition != null) 'condition': condition,
@@ -373,28 +406,23 @@ class DebuggerApi {
   /// Activates / deactivates all breakpoints on the page.
   /// [active] New value for breakpoints active state.
   Future<void> setBreakpointsActive(bool active) async {
-    await _client.send('Debugger.setBreakpointsActive', {
-      'active': active,
-    });
+    await _client.send('Debugger.setBreakpointsActive', {'active': active});
   }
 
   /// Defines pause on exceptions state. Can be set to stop on all exceptions, uncaught exceptions,
   /// or caught exceptions, no exceptions. Initial pause on exceptions state is `none`.
   /// [state] Pause on exceptions mode.
   Future<void> setPauseOnExceptions(
-      @Enum(['none', 'caught', 'uncaught', 'all']) String state) async {
+    @Enum(['none', 'caught', 'uncaught', 'all']) String state,
+  ) async {
     assert(const ['none', 'caught', 'uncaught', 'all'].contains(state));
-    await _client.send('Debugger.setPauseOnExceptions', {
-      'state': state,
-    });
+    await _client.send('Debugger.setPauseOnExceptions', {'state': state});
   }
 
   /// Changes return value in top frame. Available only at return break position.
   /// [newValue] New return value.
   Future<void> setReturnValue(runtime.CallArgument newValue) async {
-    await _client.send('Debugger.setReturnValue', {
-      'newValue': newValue,
-    });
+    await _client.send('Debugger.setReturnValue', {'newValue': newValue});
   }
 
   /// Edits JavaScript source live.
@@ -411,8 +439,11 @@ class DebuggerApi {
   /// [allowTopFrameEditing] If true, then `scriptSource` is allowed to change the function on top of the stack
   /// as long as the top-most stack frame is the only activation of that function.
   Future<SetScriptSourceResult> setScriptSource(
-      runtime.ScriptId scriptId, String scriptSource,
-      {bool? dryRun, bool? allowTopFrameEditing}) async {
+    runtime.ScriptId scriptId,
+    String scriptSource, {
+    bool? dryRun,
+    bool? allowTopFrameEditing,
+  }) async {
     var result = await _client.send('Debugger.setScriptSource', {
       'scriptId': scriptId,
       'scriptSource': scriptSource,
@@ -426,9 +457,7 @@ class DebuggerApi {
   /// Makes page not interrupt on any pauses (breakpoint, exception, dom exception etc).
   /// [skip] New value for skip pauses state.
   Future<void> setSkipAllPauses(bool skip) async {
-    await _client.send('Debugger.setSkipAllPauses', {
-      'skip': skip,
-    });
+    await _client.send('Debugger.setSkipAllPauses', {'skip': skip});
   }
 
   /// Changes value of variable in a callframe. Object-based scopes are not supported and must be
@@ -438,8 +467,12 @@ class DebuggerApi {
   /// [variableName] Variable name.
   /// [newValue] New variable value.
   /// [callFrameId] Id of callframe that holds variable.
-  Future<void> setVariableValue(int scopeNumber, String variableName,
-      runtime.CallArgument newValue, CallFrameId callFrameId) async {
+  Future<void> setVariableValue(
+    int scopeNumber,
+    String variableName,
+    runtime.CallArgument newValue,
+    CallFrameId callFrameId,
+  ) async {
     await _client.send('Debugger.setVariableValue', {
       'scopeNumber': scopeNumber,
       'variableName': variableName,
@@ -452,8 +485,10 @@ class DebuggerApi {
   /// [breakOnAsyncCall] Debugger will pause on the execution of the first async task which was scheduled
   /// before next pause.
   /// [skipList] The skipList specifies location ranges that should be skipped on step into.
-  Future<void> stepInto(
-      {bool? breakOnAsyncCall, List<LocationRange>? skipList}) async {
+  Future<void> stepInto({
+    bool? breakOnAsyncCall,
+    List<LocationRange>? skipList,
+  }) async {
     await _client.send('Debugger.stepInto', {
       if (breakOnAsyncCall != null) 'breakOnAsyncCall': breakOnAsyncCall,
       if (skipList != null) 'skipList': [...skipList],
@@ -510,34 +545,44 @@ class PausedEvent {
   /// Async stack trace, if any.
   final runtime.StackTraceId? asyncStackTraceId;
 
-  PausedEvent(
-      {required this.callFrames,
-      required this.reason,
-      this.data,
-      this.hitBreakpoints,
-      this.asyncStackTrace,
-      this.asyncStackTraceId});
+  PausedEvent({
+    required this.callFrames,
+    required this.reason,
+    this.data,
+    this.hitBreakpoints,
+    this.asyncStackTrace,
+    this.asyncStackTraceId,
+  });
 
   factory PausedEvent.fromJson(Map<String, dynamic> json) {
     return PausedEvent(
-      callFrames: (json['callFrames'] as List)
-          .map((e) => CallFrame.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      callFrames:
+          (json['callFrames'] as List)
+              .map((e) => CallFrame.fromJson(e as Map<String, dynamic>))
+              .toList(),
       reason: PausedEventReason.fromJson(json['reason'] as String),
-      data: json.containsKey('data')
-          ? json['data'] as Map<String, dynamic>
-          : null,
-      hitBreakpoints: json.containsKey('hitBreakpoints')
-          ? (json['hitBreakpoints'] as List).map((e) => e as String).toList()
-          : null,
-      asyncStackTrace: json.containsKey('asyncStackTrace')
-          ? runtime.StackTraceData.fromJson(
-              json['asyncStackTrace'] as Map<String, dynamic>)
-          : null,
-      asyncStackTraceId: json.containsKey('asyncStackTraceId')
-          ? runtime.StackTraceId.fromJson(
-              json['asyncStackTraceId'] as Map<String, dynamic>)
-          : null,
+      data:
+          json.containsKey('data')
+              ? json['data'] as Map<String, dynamic>
+              : null,
+      hitBreakpoints:
+          json.containsKey('hitBreakpoints')
+              ? (json['hitBreakpoints'] as List)
+                  .map((e) => e as String)
+                  .toList()
+              : null,
+      asyncStackTrace:
+          json.containsKey('asyncStackTrace')
+              ? runtime.StackTraceData.fromJson(
+                json['asyncStackTrace'] as Map<String, dynamic>,
+              )
+              : null,
+      asyncStackTraceId:
+          json.containsKey('asyncStackTraceId')
+              ? runtime.StackTraceId.fromJson(
+                json['asyncStackTraceId'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 }
@@ -594,24 +639,25 @@ class ScriptFailedToParseEvent {
   /// The name the embedder supplied for this script.
   final String? embedderName;
 
-  ScriptFailedToParseEvent(
-      {required this.scriptId,
-      required this.url,
-      required this.startLine,
-      required this.startColumn,
-      required this.endLine,
-      required this.endColumn,
-      required this.executionContextId,
-      required this.hash,
-      this.executionContextAuxData,
-      this.sourceMapURL,
-      this.hasSourceURL,
-      this.isModule,
-      this.length,
-      this.stackTrace,
-      this.codeOffset,
-      this.scriptLanguage,
-      this.embedderName});
+  ScriptFailedToParseEvent({
+    required this.scriptId,
+    required this.url,
+    required this.startLine,
+    required this.startColumn,
+    required this.endLine,
+    required this.endColumn,
+    required this.executionContextId,
+    required this.hash,
+    this.executionContextAuxData,
+    this.sourceMapURL,
+    this.hasSourceURL,
+    this.isModule,
+    this.length,
+    this.stackTrace,
+    this.codeOffset,
+    this.scriptLanguage,
+    this.embedderName,
+  });
 
   factory ScriptFailedToParseEvent.fromJson(Map<String, dynamic> json) {
     return ScriptFailedToParseEvent(
@@ -622,31 +668,41 @@ class ScriptFailedToParseEvent {
       endLine: json['endLine'] as int,
       endColumn: json['endColumn'] as int,
       executionContextId: runtime.ExecutionContextId.fromJson(
-          json['executionContextId'] as int),
+        json['executionContextId'] as int,
+      ),
       hash: json['hash'] as String,
-      executionContextAuxData: json.containsKey('executionContextAuxData')
-          ? json['executionContextAuxData'] as Map<String, dynamic>
-          : null,
-      sourceMapURL: json.containsKey('sourceMapURL')
-          ? json['sourceMapURL'] as String
-          : null,
-      hasSourceURL: json.containsKey('hasSourceURL')
-          ? json['hasSourceURL'] as bool
-          : null,
+      executionContextAuxData:
+          json.containsKey('executionContextAuxData')
+              ? json['executionContextAuxData'] as Map<String, dynamic>
+              : null,
+      sourceMapURL:
+          json.containsKey('sourceMapURL')
+              ? json['sourceMapURL'] as String
+              : null,
+      hasSourceURL:
+          json.containsKey('hasSourceURL')
+              ? json['hasSourceURL'] as bool
+              : null,
       isModule: json.containsKey('isModule') ? json['isModule'] as bool : null,
       length: json.containsKey('length') ? json['length'] as int : null,
-      stackTrace: json.containsKey('stackTrace')
-          ? runtime.StackTraceData.fromJson(
-              json['stackTrace'] as Map<String, dynamic>)
-          : null,
+      stackTrace:
+          json.containsKey('stackTrace')
+              ? runtime.StackTraceData.fromJson(
+                json['stackTrace'] as Map<String, dynamic>,
+              )
+              : null,
       codeOffset:
           json.containsKey('codeOffset') ? json['codeOffset'] as int : null,
-      scriptLanguage: json.containsKey('scriptLanguage')
-          ? debugger.ScriptLanguage.fromJson(json['scriptLanguage'] as String)
-          : null,
-      embedderName: json.containsKey('embedderName')
-          ? json['embedderName'] as String
-          : null,
+      scriptLanguage:
+          json.containsKey('scriptLanguage')
+              ? debugger.ScriptLanguage.fromJson(
+                json['scriptLanguage'] as String,
+              )
+              : null,
+      embedderName:
+          json.containsKey('embedderName')
+              ? json['embedderName'] as String
+              : null,
     );
   }
 }
@@ -709,26 +765,27 @@ class ScriptParsedEvent {
   /// The name the embedder supplied for this script.
   final String? embedderName;
 
-  ScriptParsedEvent(
-      {required this.scriptId,
-      required this.url,
-      required this.startLine,
-      required this.startColumn,
-      required this.endLine,
-      required this.endColumn,
-      required this.executionContextId,
-      required this.hash,
-      this.executionContextAuxData,
-      this.isLiveEdit,
-      this.sourceMapURL,
-      this.hasSourceURL,
-      this.isModule,
-      this.length,
-      this.stackTrace,
-      this.codeOffset,
-      this.scriptLanguage,
-      this.debugSymbols,
-      this.embedderName});
+  ScriptParsedEvent({
+    required this.scriptId,
+    required this.url,
+    required this.startLine,
+    required this.startColumn,
+    required this.endLine,
+    required this.endColumn,
+    required this.executionContextId,
+    required this.hash,
+    this.executionContextAuxData,
+    this.isLiveEdit,
+    this.sourceMapURL,
+    this.hasSourceURL,
+    this.isModule,
+    this.length,
+    this.stackTrace,
+    this.codeOffset,
+    this.scriptLanguage,
+    this.debugSymbols,
+    this.embedderName,
+  });
 
   factory ScriptParsedEvent.fromJson(Map<String, dynamic> json) {
     return ScriptParsedEvent(
@@ -739,39 +796,53 @@ class ScriptParsedEvent {
       endLine: json['endLine'] as int,
       endColumn: json['endColumn'] as int,
       executionContextId: runtime.ExecutionContextId.fromJson(
-          json['executionContextId'] as int),
+        json['executionContextId'] as int,
+      ),
       hash: json['hash'] as String,
-      executionContextAuxData: json.containsKey('executionContextAuxData')
-          ? json['executionContextAuxData'] as Map<String, dynamic>
-          : null,
+      executionContextAuxData:
+          json.containsKey('executionContextAuxData')
+              ? json['executionContextAuxData'] as Map<String, dynamic>
+              : null,
       isLiveEdit:
           json.containsKey('isLiveEdit') ? json['isLiveEdit'] as bool : null,
-      sourceMapURL: json.containsKey('sourceMapURL')
-          ? json['sourceMapURL'] as String
-          : null,
-      hasSourceURL: json.containsKey('hasSourceURL')
-          ? json['hasSourceURL'] as bool
-          : null,
+      sourceMapURL:
+          json.containsKey('sourceMapURL')
+              ? json['sourceMapURL'] as String
+              : null,
+      hasSourceURL:
+          json.containsKey('hasSourceURL')
+              ? json['hasSourceURL'] as bool
+              : null,
       isModule: json.containsKey('isModule') ? json['isModule'] as bool : null,
       length: json.containsKey('length') ? json['length'] as int : null,
-      stackTrace: json.containsKey('stackTrace')
-          ? runtime.StackTraceData.fromJson(
-              json['stackTrace'] as Map<String, dynamic>)
-          : null,
+      stackTrace:
+          json.containsKey('stackTrace')
+              ? runtime.StackTraceData.fromJson(
+                json['stackTrace'] as Map<String, dynamic>,
+              )
+              : null,
       codeOffset:
           json.containsKey('codeOffset') ? json['codeOffset'] as int : null,
-      scriptLanguage: json.containsKey('scriptLanguage')
-          ? debugger.ScriptLanguage.fromJson(json['scriptLanguage'] as String)
-          : null,
-      debugSymbols: json.containsKey('debugSymbols')
-          ? (json['debugSymbols'] as List)
-              .map((e) =>
-                  debugger.DebugSymbols.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-      embedderName: json.containsKey('embedderName')
-          ? json['embedderName'] as String
-          : null,
+      scriptLanguage:
+          json.containsKey('scriptLanguage')
+              ? debugger.ScriptLanguage.fromJson(
+                json['scriptLanguage'] as String,
+              )
+              : null,
+      debugSymbols:
+          json.containsKey('debugSymbols')
+              ? (json['debugSymbols'] as List)
+                  .map(
+                    (e) => debugger.DebugSymbols.fromJson(
+                      e as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList()
+              : null,
+      embedderName:
+          json.containsKey('embedderName')
+              ? json['embedderName'] as String
+              : null,
     );
   }
 }
@@ -787,12 +858,15 @@ class EvaluateOnCallFrameResult {
 
   factory EvaluateOnCallFrameResult.fromJson(Map<String, dynamic> json) {
     return EvaluateOnCallFrameResult(
-      result:
-          runtime.RemoteObject.fromJson(json['result'] as Map<String, dynamic>),
-      exceptionDetails: json.containsKey('exceptionDetails')
-          ? runtime.ExceptionDetails.fromJson(
-              json['exceptionDetails'] as Map<String, dynamic>)
-          : null,
+      result: runtime.RemoteObject.fromJson(
+        json['result'] as Map<String, dynamic>,
+      ),
+      exceptionDetails:
+          json.containsKey('exceptionDetails')
+              ? runtime.ExceptionDetails.fromJson(
+                json['exceptionDetails'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 }
@@ -830,11 +904,12 @@ class DisassembleWasmModuleResult {
   /// The first chunk of disassembly.
   final WasmDisassemblyChunk chunk;
 
-  DisassembleWasmModuleResult(
-      {this.streamId,
-      required this.totalNumberOfLines,
-      required this.functionBodyOffsets,
-      required this.chunk});
+  DisassembleWasmModuleResult({
+    this.streamId,
+    required this.totalNumberOfLines,
+    required this.functionBodyOffsets,
+    required this.chunk,
+  });
 
   factory DisassembleWasmModuleResult.fromJson(Map<String, dynamic> json) {
     return DisassembleWasmModuleResult(
@@ -843,8 +918,9 @@ class DisassembleWasmModuleResult {
       totalNumberOfLines: json['totalNumberOfLines'] as int,
       functionBodyOffsets:
           (json['functionBodyOffsets'] as List).map((e) => e as int).toList(),
-      chunk:
-          WasmDisassemblyChunk.fromJson(json['chunk'] as Map<String, dynamic>),
+      chunk: WasmDisassemblyChunk.fromJson(
+        json['chunk'] as Map<String, dynamic>,
+      ),
     );
   }
 }
@@ -864,14 +940,17 @@ class SetBreakpointResult {
   /// Location this breakpoint resolved into.
   final Location actualLocation;
 
-  SetBreakpointResult(
-      {required this.breakpointId, required this.actualLocation});
+  SetBreakpointResult({
+    required this.breakpointId,
+    required this.actualLocation,
+  });
 
   factory SetBreakpointResult.fromJson(Map<String, dynamic> json) {
     return SetBreakpointResult(
       breakpointId: BreakpointId.fromJson(json['breakpointId'] as String),
-      actualLocation:
-          Location.fromJson(json['actualLocation'] as Map<String, dynamic>),
+      actualLocation: Location.fromJson(
+        json['actualLocation'] as Map<String, dynamic>,
+      ),
     );
   }
 }
@@ -883,15 +962,18 @@ class SetBreakpointByUrlResult {
   /// List of the locations this breakpoint resolved into upon addition.
   final List<Location> locations;
 
-  SetBreakpointByUrlResult(
-      {required this.breakpointId, required this.locations});
+  SetBreakpointByUrlResult({
+    required this.breakpointId,
+    required this.locations,
+  });
 
   factory SetBreakpointByUrlResult.fromJson(Map<String, dynamic> json) {
     return SetBreakpointByUrlResult(
       breakpointId: BreakpointId.fromJson(json['breakpointId'] as String),
-      locations: (json['locations'] as List)
-          .map((e) => Location.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      locations:
+          (json['locations'] as List)
+              .map((e) => Location.fromJson(e as Map<String, dynamic>))
+              .toList(),
     );
   }
 }
@@ -910,10 +992,12 @@ class SetScriptSourceResult {
   factory SetScriptSourceResult.fromJson(Map<String, dynamic> json) {
     return SetScriptSourceResult(
       status: SetScriptSourceResultStatus.fromJson(json['status'] as String),
-      exceptionDetails: json.containsKey('exceptionDetails')
-          ? runtime.ExceptionDetails.fromJson(
-              json['exceptionDetails'] as Map<String, dynamic>)
-          : null,
+      exceptionDetails:
+          json.containsKey('exceptionDetails')
+              ? runtime.ExceptionDetails.fromJson(
+                json['exceptionDetails'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 }
@@ -943,8 +1027,11 @@ class Location {
   /// Column number in the script (0-based).
   final int? columnNumber;
 
-  Location(
-      {required this.scriptId, required this.lineNumber, this.columnNumber});
+  Location({
+    required this.scriptId,
+    required this.lineNumber,
+    this.columnNumber,
+  });
 
   factory Location.fromJson(Map<String, dynamic> json) {
     return Location(
@@ -980,10 +1067,7 @@ class ScriptPosition {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'lineNumber': lineNumber,
-      'columnNumber': columnNumber,
-    };
+    return {'lineNumber': lineNumber, 'columnNumber': columnNumber};
   }
 }
 
@@ -995,8 +1079,11 @@ class LocationRange {
 
   final ScriptPosition end;
 
-  LocationRange(
-      {required this.scriptId, required this.start, required this.end});
+  LocationRange({
+    required this.scriptId,
+    required this.start,
+    required this.end,
+  });
 
   factory LocationRange.fromJson(Map<String, dynamic> json) {
     return LocationRange(
@@ -1044,36 +1131,45 @@ class CallFrame {
   /// successful, but it is very likely.
   final bool? canBeRestarted;
 
-  CallFrame(
-      {required this.callFrameId,
-      required this.functionName,
-      this.functionLocation,
-      required this.location,
-      required this.scopeChain,
-      required this.this$,
-      this.returnValue,
-      this.canBeRestarted});
+  CallFrame({
+    required this.callFrameId,
+    required this.functionName,
+    this.functionLocation,
+    required this.location,
+    required this.scopeChain,
+    required this.this$,
+    this.returnValue,
+    this.canBeRestarted,
+  });
 
   factory CallFrame.fromJson(Map<String, dynamic> json) {
     return CallFrame(
       callFrameId: CallFrameId.fromJson(json['callFrameId'] as String),
       functionName: json['functionName'] as String,
-      functionLocation: json.containsKey('functionLocation')
-          ? Location.fromJson(json['functionLocation'] as Map<String, dynamic>)
-          : null,
+      functionLocation:
+          json.containsKey('functionLocation')
+              ? Location.fromJson(
+                json['functionLocation'] as Map<String, dynamic>,
+              )
+              : null,
       location: Location.fromJson(json['location'] as Map<String, dynamic>),
-      scopeChain: (json['scopeChain'] as List)
-          .map((e) => Scope.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      this$:
-          runtime.RemoteObject.fromJson(json['this'] as Map<String, dynamic>),
-      returnValue: json.containsKey('returnValue')
-          ? runtime.RemoteObject.fromJson(
-              json['returnValue'] as Map<String, dynamic>)
-          : null,
-      canBeRestarted: json.containsKey('canBeRestarted')
-          ? json['canBeRestarted'] as bool
-          : null,
+      scopeChain:
+          (json['scopeChain'] as List)
+              .map((e) => Scope.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      this$: runtime.RemoteObject.fromJson(
+        json['this'] as Map<String, dynamic>,
+      ),
+      returnValue:
+          json.containsKey('returnValue')
+              ? runtime.RemoteObject.fromJson(
+                json['returnValue'] as Map<String, dynamic>,
+              )
+              : null,
+      canBeRestarted:
+          json.containsKey('canBeRestarted')
+              ? json['canBeRestarted'] as bool
+              : null,
     );
   }
 
@@ -1110,25 +1206,29 @@ class Scope {
   /// Location in the source code where scope ends
   final Location? endLocation;
 
-  Scope(
-      {required this.type,
-      required this.object,
-      this.name,
-      this.startLocation,
-      this.endLocation});
+  Scope({
+    required this.type,
+    required this.object,
+    this.name,
+    this.startLocation,
+    this.endLocation,
+  });
 
   factory Scope.fromJson(Map<String, dynamic> json) {
     return Scope(
       type: ScopeType.fromJson(json['type'] as String),
-      object:
-          runtime.RemoteObject.fromJson(json['object'] as Map<String, dynamic>),
+      object: runtime.RemoteObject.fromJson(
+        json['object'] as Map<String, dynamic>,
+      ),
       name: json.containsKey('name') ? json['name'] as String : null,
-      startLocation: json.containsKey('startLocation')
-          ? Location.fromJson(json['startLocation'] as Map<String, dynamic>)
-          : null,
-      endLocation: json.containsKey('endLocation')
-          ? Location.fromJson(json['endLocation'] as Map<String, dynamic>)
-          : null,
+      startLocation:
+          json.containsKey('startLocation')
+              ? Location.fromJson(json['startLocation'] as Map<String, dynamic>)
+              : null,
+      endLocation:
+          json.containsKey('endLocation')
+              ? Location.fromJson(json['endLocation'] as Map<String, dynamic>)
+              : null,
     );
   }
 
@@ -1153,8 +1253,7 @@ enum ScopeType {
   script('script'),
   eval('eval'),
   module('module'),
-  wasmExpressionStack('wasm-expression-stack'),
-  ;
+  wasmExpressionStack('wasm-expression-stack');
 
   final String value;
 
@@ -1187,10 +1286,7 @@ class SearchMatch {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'lineNumber': lineNumber,
-      'lineContent': lineContent,
-    };
+    return {'lineNumber': lineNumber, 'lineContent': lineContent};
   }
 }
 
@@ -1206,11 +1302,12 @@ class BreakLocation {
 
   final BreakLocationType? type;
 
-  BreakLocation(
-      {required this.scriptId,
-      required this.lineNumber,
-      this.columnNumber,
-      this.type});
+  BreakLocation({
+    required this.scriptId,
+    required this.lineNumber,
+    this.columnNumber,
+    this.type,
+  });
 
   factory BreakLocation.fromJson(Map<String, dynamic> json) {
     return BreakLocation(
@@ -1218,9 +1315,10 @@ class BreakLocation {
       lineNumber: json['lineNumber'] as int,
       columnNumber:
           json.containsKey('columnNumber') ? json['columnNumber'] as int : null,
-      type: json.containsKey('type')
-          ? BreakLocationType.fromJson(json['type'] as String)
-          : null,
+      type:
+          json.containsKey('type')
+              ? BreakLocationType.fromJson(json['type'] as String)
+              : null,
     );
   }
 
@@ -1237,8 +1335,7 @@ class BreakLocation {
 enum BreakLocationType {
   debuggerStatement('debuggerStatement'),
   call('call'),
-  return$('return'),
-  ;
+  return$('return');
 
   final String value;
 
@@ -1281,8 +1378,7 @@ class WasmDisassemblyChunk {
 /// Enum of possible script languages.
 enum ScriptLanguage {
   javaScript('JavaScript'),
-  webAssembly('WebAssembly'),
-  ;
+  webAssembly('WebAssembly');
 
   final String value;
 
@@ -1310,25 +1406,22 @@ class DebugSymbols {
   factory DebugSymbols.fromJson(Map<String, dynamic> json) {
     return DebugSymbols(
       type: DebugSymbolsType.fromJson(json['type'] as String),
-      externalURL: json.containsKey('externalURL')
-          ? json['externalURL'] as String
-          : null,
+      externalURL:
+          json.containsKey('externalURL')
+              ? json['externalURL'] as String
+              : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'type': type,
-      if (externalURL != null) 'externalURL': externalURL,
-    };
+    return {'type': type, if (externalURL != null) 'externalURL': externalURL};
   }
 }
 
 enum DebugSymbolsType {
   sourceMap('SourceMap'),
   embeddedDwarf('EmbeddedDWARF'),
-  externalDwarf('ExternalDWARF'),
-  ;
+  externalDwarf('ExternalDWARF');
 
   final String value;
 
@@ -1348,8 +1441,7 @@ enum SetScriptSourceResultStatus {
   compileError('CompileError'),
   blockedByActiveGenerator('BlockedByActiveGenerator'),
   blockedByActiveFunction('BlockedByActiveFunction'),
-  blockedByTopLevelEsModuleChange('BlockedByTopLevelEsModuleChange'),
-  ;
+  blockedByTopLevelEsModuleChange('BlockedByTopLevelEsModuleChange');
 
   final String value;
 
@@ -1377,8 +1469,7 @@ enum PausedEventReason {
   other('other'),
   promiseRejection('promiseRejection'),
   xhr('XHR'),
-  step('step'),
-  ;
+  step('step');
 
   final String value;
 

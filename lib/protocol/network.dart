@@ -24,8 +24,10 @@ class NetworkApi {
   Stream<EventSourceMessageReceivedEvent> get onEventSourceMessageReceived =>
       _client.onEvent
           .where((event) => event.name == 'Network.eventSourceMessageReceived')
-          .map((event) =>
-              EventSourceMessageReceivedEvent.fromJson(event.parameters));
+          .map(
+            (event) =>
+                EventSourceMessageReceivedEvent.fromJson(event.parameters),
+          );
 
   /// Fired when HTTP request has failed to load.
   Stream<LoadingFailedEvent> get onLoadingFailed => _client.onEvent
@@ -47,8 +49,9 @@ class NetworkApi {
   /// Fired if request ended up loading from cache.
   Stream<RequestId> get onRequestServedFromCache => _client.onEvent
       .where((event) => event.name == 'Network.requestServedFromCache')
-      .map((event) =>
-          RequestId.fromJson(event.parameters['requestId'] as String));
+      .map(
+        (event) => RequestId.fromJson(event.parameters['requestId'] as String),
+      );
 
   /// Fired when page is about to send HTTP request.
   Stream<RequestWillBeSentEvent> get onRequestWillBeSent => _client.onEvent
@@ -100,19 +103,25 @@ class NetworkApi {
 
   /// Fired when WebSocket handshake response becomes available.
   Stream<WebSocketHandshakeResponseReceivedEvent>
-      get onWebSocketHandshakeResponseReceived => _client.onEvent
-          .where((event) =>
-              event.name == 'Network.webSocketHandshakeResponseReceived')
-          .map((event) => WebSocketHandshakeResponseReceivedEvent.fromJson(
-              event.parameters));
+  get onWebSocketHandshakeResponseReceived => _client.onEvent
+      .where(
+        (event) => event.name == 'Network.webSocketHandshakeResponseReceived',
+      )
+      .map(
+        (event) =>
+            WebSocketHandshakeResponseReceivedEvent.fromJson(event.parameters),
+      );
 
   /// Fired when WebSocket is about to initiate handshake.
   Stream<WebSocketWillSendHandshakeRequestEvent>
-      get onWebSocketWillSendHandshakeRequest => _client.onEvent
-          .where((event) =>
-              event.name == 'Network.webSocketWillSendHandshakeRequest')
-          .map((event) => WebSocketWillSendHandshakeRequestEvent.fromJson(
-              event.parameters));
+  get onWebSocketWillSendHandshakeRequest => _client.onEvent
+      .where(
+        (event) => event.name == 'Network.webSocketWillSendHandshakeRequest',
+      )
+      .map(
+        (event) =>
+            WebSocketWillSendHandshakeRequestEvent.fromJson(event.parameters),
+      );
 
   /// Fired upon WebTransport creation.
   Stream<WebTransportCreatedEvent> get onWebTransportCreated => _client.onEvent
@@ -121,11 +130,14 @@ class NetworkApi {
 
   /// Fired when WebTransport handshake is finished.
   Stream<WebTransportConnectionEstablishedEvent>
-      get onWebTransportConnectionEstablished => _client.onEvent
-          .where((event) =>
-              event.name == 'Network.webTransportConnectionEstablished')
-          .map((event) => WebTransportConnectionEstablishedEvent.fromJson(
-              event.parameters));
+  get onWebTransportConnectionEstablished => _client.onEvent
+      .where(
+        (event) => event.name == 'Network.webTransportConnectionEstablished',
+      )
+      .map(
+        (event) =>
+            WebTransportConnectionEstablishedEvent.fromJson(event.parameters),
+      );
 
   /// Fired when WebTransport is disposed.
   Stream<WebTransportClosedEvent> get onWebTransportClosed => _client.onEvent
@@ -139,8 +151,10 @@ class NetworkApi {
   Stream<RequestWillBeSentExtraInfoEvent> get onRequestWillBeSentExtraInfo =>
       _client.onEvent
           .where((event) => event.name == 'Network.requestWillBeSentExtraInfo')
-          .map((event) =>
-              RequestWillBeSentExtraInfoEvent.fromJson(event.parameters));
+          .map(
+            (event) =>
+                RequestWillBeSentExtraInfoEvent.fromJson(event.parameters),
+          );
 
   /// Fired when additional information about a responseReceived event is available from the network
   /// stack. Not every responseReceived event will have an additional responseReceivedExtraInfo for
@@ -148,8 +162,10 @@ class NetworkApi {
   Stream<ResponseReceivedExtraInfoEvent> get onResponseReceivedExtraInfo =>
       _client.onEvent
           .where((event) => event.name == 'Network.responseReceivedExtraInfo')
-          .map((event) =>
-              ResponseReceivedExtraInfoEvent.fromJson(event.parameters));
+          .map(
+            (event) =>
+                ResponseReceivedExtraInfoEvent.fromJson(event.parameters),
+          );
 
   /// Fired when 103 Early Hints headers is received in addition to the common response.
   /// Not every responseReceived event will have an responseReceivedEarlyHints fired.
@@ -157,8 +173,10 @@ class NetworkApi {
   Stream<ResponseReceivedEarlyHintsEvent> get onResponseReceivedEarlyHints =>
       _client.onEvent
           .where((event) => event.name == 'Network.responseReceivedEarlyHints')
-          .map((event) =>
-              ResponseReceivedEarlyHintsEvent.fromJson(event.parameters));
+          .map(
+            (event) =>
+                ResponseReceivedEarlyHintsEvent.fromJson(event.parameters),
+          );
 
   /// Fired exactly once for each Trust Token operation. Depending on
   /// the type of the operation and whether the operation succeeded or
@@ -176,55 +194,83 @@ class NetworkApi {
   /// Fired once when parsing the .wbn file has succeeded.
   /// The event contains the information about the web bundle contents.
   Stream<SubresourceWebBundleMetadataReceivedEvent>
-      get onSubresourceWebBundleMetadataReceived => _client.onEvent
-          .where((event) =>
-              event.name == 'Network.subresourceWebBundleMetadataReceived')
-          .map((event) => SubresourceWebBundleMetadataReceivedEvent.fromJson(
-              event.parameters));
+  get onSubresourceWebBundleMetadataReceived => _client.onEvent
+      .where(
+        (event) => event.name == 'Network.subresourceWebBundleMetadataReceived',
+      )
+      .map(
+        (event) => SubresourceWebBundleMetadataReceivedEvent.fromJson(
+          event.parameters,
+        ),
+      );
 
   /// Fired once when parsing the .wbn file has failed.
   Stream<SubresourceWebBundleMetadataErrorEvent>
-      get onSubresourceWebBundleMetadataError => _client.onEvent
-          .where((event) =>
-              event.name == 'Network.subresourceWebBundleMetadataError')
-          .map((event) => SubresourceWebBundleMetadataErrorEvent.fromJson(
-              event.parameters));
+  get onSubresourceWebBundleMetadataError => _client.onEvent
+      .where(
+        (event) => event.name == 'Network.subresourceWebBundleMetadataError',
+      )
+      .map(
+        (event) =>
+            SubresourceWebBundleMetadataErrorEvent.fromJson(event.parameters),
+      );
 
   /// Fired when handling requests for resources within a .wbn file.
   /// Note: this will only be fired for resources that are requested by the webpage.
   Stream<SubresourceWebBundleInnerResponseParsedEvent>
-      get onSubresourceWebBundleInnerResponseParsed => _client.onEvent
-          .where((event) =>
-              event.name == 'Network.subresourceWebBundleInnerResponseParsed')
-          .map((event) => SubresourceWebBundleInnerResponseParsedEvent.fromJson(
-              event.parameters));
+  get onSubresourceWebBundleInnerResponseParsed => _client.onEvent
+      .where(
+        (event) =>
+            event.name == 'Network.subresourceWebBundleInnerResponseParsed',
+      )
+      .map(
+        (event) => SubresourceWebBundleInnerResponseParsedEvent.fromJson(
+          event.parameters,
+        ),
+      );
 
   /// Fired when request for resources within a .wbn file failed.
   Stream<SubresourceWebBundleInnerResponseErrorEvent>
-      get onSubresourceWebBundleInnerResponseError => _client.onEvent
-          .where((event) =>
-              event.name == 'Network.subresourceWebBundleInnerResponseError')
-          .map((event) => SubresourceWebBundleInnerResponseErrorEvent.fromJson(
-              event.parameters));
+  get onSubresourceWebBundleInnerResponseError => _client.onEvent
+      .where(
+        (event) =>
+            event.name == 'Network.subresourceWebBundleInnerResponseError',
+      )
+      .map(
+        (event) => SubresourceWebBundleInnerResponseErrorEvent.fromJson(
+          event.parameters,
+        ),
+      );
 
   /// Is sent whenever a new report is added.
   /// And after 'enableReportingApi' for all existing reports.
   Stream<ReportingApiReport> get onReportingApiReportAdded => _client.onEvent
       .where((event) => event.name == 'Network.reportingApiReportAdded')
-      .map((event) => ReportingApiReport.fromJson(
-          event.parameters['report'] as Map<String, dynamic>));
+      .map(
+        (event) => ReportingApiReport.fromJson(
+          event.parameters['report'] as Map<String, dynamic>,
+        ),
+      );
 
   Stream<ReportingApiReport> get onReportingApiReportUpdated => _client.onEvent
       .where((event) => event.name == 'Network.reportingApiReportUpdated')
-      .map((event) => ReportingApiReport.fromJson(
-          event.parameters['report'] as Map<String, dynamic>));
+      .map(
+        (event) => ReportingApiReport.fromJson(
+          event.parameters['report'] as Map<String, dynamic>,
+        ),
+      );
 
   Stream<ReportingApiEndpointsChangedForOriginEvent>
-      get onReportingApiEndpointsChangedForOrigin => _client.onEvent
-          .where((event) =>
-              event.name == 'Network.reportingApiEndpointsChangedForOrigin')
-          .map((event) => ReportingApiEndpointsChangedForOriginEvent.fromJson(
-              event.parameters));
+  get onReportingApiEndpointsChangedForOrigin => _client.onEvent
+      .where(
+        (event) =>
+            event.name == 'Network.reportingApiEndpointsChangedForOrigin',
+      )
+      .map(
+        (event) => ReportingApiEndpointsChangedForOriginEvent.fromJson(
+          event.parameters,
+        ),
+      );
 
   /// Sets a list of content encodings that will be accepted. Empty list means no encoding is accepted.
   /// [encodings] List of accepted content encodings.
@@ -292,15 +338,18 @@ class NetworkApi {
   /// authChallenge.
   /// [authChallengeResponse] Response to a requestIntercepted with an authChallenge. Must not be set otherwise.
   @Deprecated(
-      'use Fetch.continueRequest, Fetch.fulfillRequest and Fetch.failRequest instead')
-  Future<void> continueInterceptedRequest(InterceptionId interceptionId,
-      {ErrorReason? errorReason,
-      String? rawResponse,
-      String? url,
-      String? method,
-      String? postData,
-      Headers? headers,
-      AuthChallengeResponse? authChallengeResponse}) async {
+    'use Fetch.continueRequest, Fetch.fulfillRequest and Fetch.failRequest instead',
+  )
+  Future<void> continueInterceptedRequest(
+    InterceptionId interceptionId, {
+    ErrorReason? errorReason,
+    String? rawResponse,
+    String? url,
+    String? method,
+    String? postData,
+    Headers? headers,
+    AuthChallengeResponse? authChallengeResponse,
+  }) async {
     await _client.send('Network.continueInterceptedRequest', {
       'interceptionId': interceptionId,
       if (errorReason != null) 'errorReason': errorReason,
@@ -322,11 +371,13 @@ class NetworkApi {
   /// [path] If specified, deletes only cookies with the exact path.
   /// [partitionKey] If specified, deletes only cookies with the the given name and partitionKey where
   /// all partition key attributes match the cookie partition key attribute.
-  Future<void> deleteCookies(String name,
-      {String? url,
-      String? domain,
-      String? path,
-      CookiePartitionKey? partitionKey}) async {
+  Future<void> deleteCookies(
+    String name, {
+    String? url,
+    String? domain,
+    String? path,
+    CookiePartitionKey? partitionKey,
+  }) async {
     await _client.send('Network.deleteCookies', {
       'name': name,
       if (url != null) 'url': url,
@@ -351,11 +402,15 @@ class NetworkApi {
   /// [packetQueueLength] WebRTC packet queue length (packet). 0 removes any queue length limitations.
   /// [packetReordering] WebRTC packetReordering feature.
   Future<void> emulateNetworkConditions(
-      bool offline, num latency, num downloadThroughput, num uploadThroughput,
-      {ConnectionType? connectionType,
-      num? packetLoss,
-      int? packetQueueLength,
-      bool? packetReordering}) async {
+    bool offline,
+    num latency,
+    num downloadThroughput,
+    num uploadThroughput, {
+    ConnectionType? connectionType,
+    num? packetLoss,
+    int? packetQueueLength,
+    bool? packetReordering,
+  }) async {
     await _client.send('Network.emulateNetworkConditions', {
       'offline': offline,
       'latency': latency,
@@ -372,10 +427,11 @@ class NetworkApi {
   /// [maxTotalBufferSize] Buffer size in bytes to use when preserving network payloads (XHRs, etc).
   /// [maxResourceBufferSize] Per-resource buffer size in bytes to use when preserving network payloads (XHRs, etc).
   /// [maxPostDataSize] Longest post body size (in bytes) that would be included in requestWillBeSent notification
-  Future<void> enable(
-      {int? maxTotalBufferSize,
-      int? maxResourceBufferSize,
-      int? maxPostDataSize}) async {
+  Future<void> enable({
+    int? maxTotalBufferSize,
+    int? maxResourceBufferSize,
+    int? maxPostDataSize,
+  }) async {
     await _client.send('Network.enable', {
       if (maxTotalBufferSize != null) 'maxTotalBufferSize': maxTotalBufferSize,
       if (maxResourceBufferSize != null)
@@ -442,7 +498,8 @@ class NetworkApi {
   /// Returns content served for the given currently intercepted request.
   /// [interceptionId] Identifier for the intercepted request to get body for.
   Future<GetResponseBodyForInterceptionResult> getResponseBodyForInterception(
-      InterceptionId interceptionId) async {
+    InterceptionId interceptionId,
+  ) async {
     var result = await _client.send('Network.getResponseBodyForInterception', {
       'interceptionId': interceptionId,
     });
@@ -454,11 +511,12 @@ class NetworkApi {
   /// the response body. The stream only supports sequential read, IO.read will fail if the position
   /// is specified.
   Future<io.StreamHandle> takeResponseBodyForInterceptionAsStream(
-      InterceptionId interceptionId) async {
-    var result =
-        await _client.send('Network.takeResponseBodyForInterceptionAsStream', {
-      'interceptionId': interceptionId,
-    });
+    InterceptionId interceptionId,
+  ) async {
+    var result = await _client.send(
+      'Network.takeResponseBodyForInterceptionAsStream',
+      {'interceptionId': interceptionId},
+    );
     return io.StreamHandle.fromJson(result['stream'] as String);
   }
 
@@ -467,9 +525,7 @@ class NetworkApi {
   /// attribute, user, password.
   /// [requestId] Identifier of XHR to replay.
   Future<void> replayXHR(RequestId requestId) async {
-    await _client.send('Network.replayXHR', {
-      'requestId': requestId,
-    });
+    await _client.send('Network.replayXHR', {'requestId': requestId});
   }
 
   /// Searches for given string in response content.
@@ -479,8 +535,11 @@ class NetworkApi {
   /// [isRegex] If true, treats string parameter as regex.
   /// Returns: List of search matches.
   Future<List<debugger.SearchMatch>> searchInResponseBody(
-      RequestId requestId, String query,
-      {bool? caseSensitive, bool? isRegex}) async {
+    RequestId requestId,
+    String query, {
+    bool? caseSensitive,
+    bool? isRegex,
+  }) async {
     var result = await _client.send('Network.searchInResponseBody', {
       'requestId': requestId,
       'query': query,
@@ -503,9 +562,7 @@ class NetworkApi {
   /// Toggles ignoring of service worker for each request.
   /// [bypass] Bypass service worker and load from network.
   Future<void> setBypassServiceWorker(bool bypass) async {
-    await _client.send('Network.setBypassServiceWorker', {
-      'bypass': bypass,
-    });
+    await _client.send('Network.setBypassServiceWorker', {'bypass': bypass});
   }
 
   /// Toggles ignoring cache for each request. If `true`, cache will not be used.
@@ -535,19 +592,22 @@ class NetworkApi {
   /// This is a temporary ability and it will be removed in the future.
   /// [partitionKey] Cookie partition key. If not set, the cookie will be set as not partitioned.
   /// Returns: Always set to true. If an error occurs, the response indicates protocol error.
-  Future<bool> setCookie(String name, String value,
-      {String? url,
-      String? domain,
-      String? path,
-      bool? secure,
-      bool? httpOnly,
-      CookieSameSite? sameSite,
-      TimeSinceEpoch? expires,
-      CookiePriority? priority,
-      bool? sameParty,
-      CookieSourceScheme? sourceScheme,
-      int? sourcePort,
-      CookiePartitionKey? partitionKey}) async {
+  Future<bool> setCookie(
+    String name,
+    String value, {
+    String? url,
+    String? domain,
+    String? path,
+    bool? secure,
+    bool? httpOnly,
+    CookieSameSite? sameSite,
+    TimeSinceEpoch? expires,
+    CookiePriority? priority,
+    bool? sameParty,
+    CookieSourceScheme? sourceScheme,
+    int? sourcePort,
+    CookiePartitionKey? partitionKey,
+  }) async {
     var result = await _client.send('Network.setCookie', {
       'name': name,
       'value': value,
@@ -578,17 +638,13 @@ class NetworkApi {
   /// Specifies whether to always send extra HTTP headers with the requests from this page.
   /// [headers] Map with extra HTTP headers.
   Future<void> setExtraHTTPHeaders(Headers headers) async {
-    await _client.send('Network.setExtraHTTPHeaders', {
-      'headers': headers,
-    });
+    await _client.send('Network.setExtraHTTPHeaders', {'headers': headers});
   }
 
   /// Specifies whether to attach a page script stack id in requests
   /// [enabled] Whether to attach a page script stack for debugging purpose.
   Future<void> setAttachDebugStack(bool enabled) async {
-    await _client.send('Network.setAttachDebugStack', {
-      'enabled': enabled,
-    });
+    await _client.send('Network.setAttachDebugStack', {'enabled': enabled});
   }
 
   /// Sets the requests to intercept that match the provided patterns and optionally resource types.
@@ -607,10 +663,12 @@ class NetworkApi {
   /// [acceptLanguage] Browser language to emulate.
   /// [platform] The platform navigator.platform should return.
   /// [userAgentMetadata] To be sent in Sec-CH-UA-* headers and returned in navigator.userAgentData
-  Future<void> setUserAgentOverride(String userAgent,
-      {String? acceptLanguage,
-      String? platform,
-      emulation.UserAgentMetadata? userAgentMetadata}) async {
+  Future<void> setUserAgentOverride(
+    String userAgent, {
+    String? acceptLanguage,
+    String? platform,
+    emulation.UserAgentMetadata? userAgentMetadata,
+  }) async {
     await _client.send('Network.setUserAgentOverride', {
       'userAgent': userAgent,
       if (acceptLanguage != null) 'acceptLanguage': acceptLanguage,
@@ -632,22 +690,22 @@ class NetworkApi {
 
   /// Returns information about the COEP/COOP isolation status.
   /// [frameId] If no frameId is provided, the status of the target is provided.
-  Future<SecurityIsolationStatus> getSecurityIsolationStatus(
-      {page.FrameId? frameId}) async {
+  Future<SecurityIsolationStatus> getSecurityIsolationStatus({
+    page.FrameId? frameId,
+  }) async {
     var result = await _client.send('Network.getSecurityIsolationStatus', {
       if (frameId != null) 'frameId': frameId,
     });
     return SecurityIsolationStatus.fromJson(
-        result['status'] as Map<String, dynamic>);
+      result['status'] as Map<String, dynamic>,
+    );
   }
 
   /// Enables tracking for the Reporting API, events generated by the Reporting API will now be delivered to the client.
   /// Enabling triggers 'reportingApiReportAdded' for all existing reports.
   /// [enable] Whether to enable or disable events for the Reporting API
   Future<void> enableReportingApi(bool enable) async {
-    await _client.send('Network.enableReportingApi', {
-      'enable': enable,
-    });
+    await _client.send('Network.enableReportingApi', {'enable': enable});
   }
 
   /// Fetches the resource and returns the content.
@@ -656,15 +714,18 @@ class NetworkApi {
   /// [url] URL of the resource to get content for.
   /// [options] Options for the request.
   Future<LoadNetworkResourcePageResult> loadNetworkResource(
-      String url, LoadNetworkResourceOptions options,
-      {page.FrameId? frameId}) async {
+    String url,
+    LoadNetworkResourceOptions options, {
+    page.FrameId? frameId,
+  }) async {
     var result = await _client.send('Network.loadNetworkResource', {
       'url': url,
       'options': options,
       if (frameId != null) 'frameId': frameId,
     });
     return LoadNetworkResourcePageResult.fromJson(
-        result['resource'] as Map<String, dynamic>);
+      result['resource'] as Map<String, dynamic>,
+    );
   }
 }
 
@@ -684,12 +745,13 @@ class DataReceivedEvent {
   /// Data that was received.
   final String? data;
 
-  DataReceivedEvent(
-      {required this.requestId,
-      required this.timestamp,
-      required this.dataLength,
-      required this.encodedDataLength,
-      this.data});
+  DataReceivedEvent({
+    required this.requestId,
+    required this.timestamp,
+    required this.dataLength,
+    required this.encodedDataLength,
+    this.data,
+  });
 
   factory DataReceivedEvent.fromJson(Map<String, dynamic> json) {
     return DataReceivedEvent(
@@ -718,12 +780,13 @@ class EventSourceMessageReceivedEvent {
   /// Message content.
   final String data;
 
-  EventSourceMessageReceivedEvent(
-      {required this.requestId,
-      required this.timestamp,
-      required this.eventName,
-      required this.eventId,
-      required this.data});
+  EventSourceMessageReceivedEvent({
+    required this.requestId,
+    required this.timestamp,
+    required this.eventName,
+    required this.eventId,
+    required this.data,
+  });
 
   factory EventSourceMessageReceivedEvent.fromJson(Map<String, dynamic> json) {
     return EventSourceMessageReceivedEvent(
@@ -758,14 +821,15 @@ class LoadingFailedEvent {
   /// The reason why loading was blocked by CORS, if any.
   final CorsErrorStatus? corsErrorStatus;
 
-  LoadingFailedEvent(
-      {required this.requestId,
-      required this.timestamp,
-      required this.type,
-      required this.errorText,
-      this.canceled,
-      this.blockedReason,
-      this.corsErrorStatus});
+  LoadingFailedEvent({
+    required this.requestId,
+    required this.timestamp,
+    required this.type,
+    required this.errorText,
+    this.canceled,
+    this.blockedReason,
+    this.corsErrorStatus,
+  });
 
   factory LoadingFailedEvent.fromJson(Map<String, dynamic> json) {
     return LoadingFailedEvent(
@@ -774,13 +838,16 @@ class LoadingFailedEvent {
       type: ResourceType.fromJson(json['type'] as String),
       errorText: json['errorText'] as String,
       canceled: json.containsKey('canceled') ? json['canceled'] as bool : null,
-      blockedReason: json.containsKey('blockedReason')
-          ? BlockedReason.fromJson(json['blockedReason'] as String)
-          : null,
-      corsErrorStatus: json.containsKey('corsErrorStatus')
-          ? CorsErrorStatus.fromJson(
-              json['corsErrorStatus'] as Map<String, dynamic>)
-          : null,
+      blockedReason:
+          json.containsKey('blockedReason')
+              ? BlockedReason.fromJson(json['blockedReason'] as String)
+              : null,
+      corsErrorStatus:
+          json.containsKey('corsErrorStatus')
+              ? CorsErrorStatus.fromJson(
+                json['corsErrorStatus'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 }
@@ -795,10 +862,11 @@ class LoadingFinishedEvent {
   /// Total number of bytes received for this request.
   final num encodedDataLength;
 
-  LoadingFinishedEvent(
-      {required this.requestId,
-      required this.timestamp,
-      required this.encodedDataLength});
+  LoadingFinishedEvent({
+    required this.requestId,
+    required this.timestamp,
+    required this.encodedDataLength,
+  });
 
   factory LoadingFinishedEvent.fromJson(Map<String, dynamic> json) {
     return LoadingFinishedEvent(
@@ -853,19 +921,20 @@ class RequestInterceptedEvent {
   /// this requestId will be the same as the requestId present in the requestWillBeSent event.
   final RequestId? requestId;
 
-  RequestInterceptedEvent(
-      {required this.interceptionId,
-      required this.request,
-      required this.frameId,
-      required this.resourceType,
-      required this.isNavigationRequest,
-      this.isDownload,
-      this.redirectUrl,
-      this.authChallenge,
-      this.responseErrorReason,
-      this.responseStatusCode,
-      this.responseHeaders,
-      this.requestId});
+  RequestInterceptedEvent({
+    required this.interceptionId,
+    required this.request,
+    required this.frameId,
+    required this.resourceType,
+    required this.isNavigationRequest,
+    this.isDownload,
+    this.redirectUrl,
+    this.authChallenge,
+    this.responseErrorReason,
+    this.responseStatusCode,
+    this.responseHeaders,
+    this.requestId,
+  });
 
   factory RequestInterceptedEvent.fromJson(Map<String, dynamic> json) {
     return RequestInterceptedEvent(
@@ -876,25 +945,34 @@ class RequestInterceptedEvent {
       isNavigationRequest: json['isNavigationRequest'] as bool? ?? false,
       isDownload:
           json.containsKey('isDownload') ? json['isDownload'] as bool : null,
-      redirectUrl: json.containsKey('redirectUrl')
-          ? json['redirectUrl'] as String
-          : null,
-      authChallenge: json.containsKey('authChallenge')
-          ? AuthChallenge.fromJson(
-              json['authChallenge'] as Map<String, dynamic>)
-          : null,
-      responseErrorReason: json.containsKey('responseErrorReason')
-          ? ErrorReason.fromJson(json['responseErrorReason'] as String)
-          : null,
-      responseStatusCode: json.containsKey('responseStatusCode')
-          ? json['responseStatusCode'] as int
-          : null,
-      responseHeaders: json.containsKey('responseHeaders')
-          ? Headers.fromJson(json['responseHeaders'] as Map<String, dynamic>)
-          : null,
-      requestId: json.containsKey('requestId')
-          ? RequestId.fromJson(json['requestId'] as String)
-          : null,
+      redirectUrl:
+          json.containsKey('redirectUrl')
+              ? json['redirectUrl'] as String
+              : null,
+      authChallenge:
+          json.containsKey('authChallenge')
+              ? AuthChallenge.fromJson(
+                json['authChallenge'] as Map<String, dynamic>,
+              )
+              : null,
+      responseErrorReason:
+          json.containsKey('responseErrorReason')
+              ? ErrorReason.fromJson(json['responseErrorReason'] as String)
+              : null,
+      responseStatusCode:
+          json.containsKey('responseStatusCode')
+              ? json['responseStatusCode'] as int
+              : null,
+      responseHeaders:
+          json.containsKey('responseHeaders')
+              ? Headers.fromJson(
+                json['responseHeaders'] as Map<String, dynamic>,
+              )
+              : null,
+      requestId:
+          json.containsKey('requestId')
+              ? RequestId.fromJson(json['requestId'] as String)
+              : null,
     );
   }
 }
@@ -938,19 +1016,20 @@ class RequestWillBeSentEvent {
   /// Whether the request is initiated by a user gesture. Defaults to false.
   final bool? hasUserGesture;
 
-  RequestWillBeSentEvent(
-      {required this.requestId,
-      required this.loaderId,
-      required this.documentURL,
-      required this.request,
-      required this.timestamp,
-      required this.wallTime,
-      required this.initiator,
-      required this.redirectHasExtraInfo,
-      this.redirectResponse,
-      this.type,
-      this.frameId,
-      this.hasUserGesture});
+  RequestWillBeSentEvent({
+    required this.requestId,
+    required this.loaderId,
+    required this.documentURL,
+    required this.request,
+    required this.timestamp,
+    required this.wallTime,
+    required this.initiator,
+    required this.redirectHasExtraInfo,
+    this.redirectResponse,
+    this.type,
+    this.frameId,
+    this.hasUserGesture,
+  });
 
   factory RequestWillBeSentEvent.fromJson(Map<String, dynamic> json) {
     return RequestWillBeSentEvent(
@@ -962,19 +1041,24 @@ class RequestWillBeSentEvent {
       wallTime: TimeSinceEpoch.fromJson(json['wallTime'] as num),
       initiator: Initiator.fromJson(json['initiator'] as Map<String, dynamic>),
       redirectHasExtraInfo: json['redirectHasExtraInfo'] as bool? ?? false,
-      redirectResponse: json.containsKey('redirectResponse')
-          ? ResponseData.fromJson(
-              json['redirectResponse'] as Map<String, dynamic>)
-          : null,
-      type: json.containsKey('type')
-          ? ResourceType.fromJson(json['type'] as String)
-          : null,
-      frameId: json.containsKey('frameId')
-          ? page.FrameId.fromJson(json['frameId'] as String)
-          : null,
-      hasUserGesture: json.containsKey('hasUserGesture')
-          ? json['hasUserGesture'] as bool
-          : null,
+      redirectResponse:
+          json.containsKey('redirectResponse')
+              ? ResponseData.fromJson(
+                json['redirectResponse'] as Map<String, dynamic>,
+              )
+              : null,
+      type:
+          json.containsKey('type')
+              ? ResourceType.fromJson(json['type'] as String)
+              : null,
+      frameId:
+          json.containsKey('frameId')
+              ? page.FrameId.fromJson(json['frameId'] as String)
+              : null,
+      hasUserGesture:
+          json.containsKey('hasUserGesture')
+              ? json['hasUserGesture'] as bool
+              : null,
     );
   }
 }
@@ -989,10 +1073,11 @@ class ResourceChangedPriorityEvent {
   /// Timestamp.
   final MonotonicTime timestamp;
 
-  ResourceChangedPriorityEvent(
-      {required this.requestId,
-      required this.newPriority,
-      required this.timestamp});
+  ResourceChangedPriorityEvent({
+    required this.requestId,
+    required this.newPriority,
+    required this.timestamp,
+  });
 
   factory ResourceChangedPriorityEvent.fromJson(Map<String, dynamic> json) {
     return ResourceChangedPriorityEvent(
@@ -1043,14 +1128,15 @@ class ResponseReceivedEvent {
   /// Frame identifier.
   final page.FrameId? frameId;
 
-  ResponseReceivedEvent(
-      {required this.requestId,
-      required this.loaderId,
-      required this.timestamp,
-      required this.type,
-      required this.response,
-      required this.hasExtraInfo,
-      this.frameId});
+  ResponseReceivedEvent({
+    required this.requestId,
+    required this.loaderId,
+    required this.timestamp,
+    required this.type,
+    required this.response,
+    required this.hasExtraInfo,
+    this.frameId,
+  });
 
   factory ResponseReceivedEvent.fromJson(Map<String, dynamic> json) {
     return ResponseReceivedEvent(
@@ -1060,9 +1146,10 @@ class ResponseReceivedEvent {
       type: ResourceType.fromJson(json['type'] as String),
       response: ResponseData.fromJson(json['response'] as Map<String, dynamic>),
       hasExtraInfo: json['hasExtraInfo'] as bool? ?? false,
-      frameId: json.containsKey('frameId')
-          ? page.FrameId.fromJson(json['frameId'] as String)
-          : null,
+      frameId:
+          json.containsKey('frameId')
+              ? page.FrameId.fromJson(json['frameId'] as String)
+              : null,
     );
   }
 }
@@ -1094,16 +1181,20 @@ class WebSocketCreatedEvent {
   /// Request initiator.
   final Initiator? initiator;
 
-  WebSocketCreatedEvent(
-      {required this.requestId, required this.url, this.initiator});
+  WebSocketCreatedEvent({
+    required this.requestId,
+    required this.url,
+    this.initiator,
+  });
 
   factory WebSocketCreatedEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketCreatedEvent(
       requestId: RequestId.fromJson(json['requestId'] as String),
       url: json['url'] as String,
-      initiator: json.containsKey('initiator')
-          ? Initiator.fromJson(json['initiator'] as Map<String, dynamic>)
-          : null,
+      initiator:
+          json.containsKey('initiator')
+              ? Initiator.fromJson(json['initiator'] as Map<String, dynamic>)
+              : null,
     );
   }
 }
@@ -1118,10 +1209,11 @@ class WebSocketFrameErrorEvent {
   /// WebSocket error message.
   final String errorMessage;
 
-  WebSocketFrameErrorEvent(
-      {required this.requestId,
-      required this.timestamp,
-      required this.errorMessage});
+  WebSocketFrameErrorEvent({
+    required this.requestId,
+    required this.timestamp,
+    required this.errorMessage,
+  });
 
   factory WebSocketFrameErrorEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketFrameErrorEvent(
@@ -1142,17 +1234,19 @@ class WebSocketFrameReceivedEvent {
   /// WebSocket response data.
   final WebSocketFrame response;
 
-  WebSocketFrameReceivedEvent(
-      {required this.requestId,
-      required this.timestamp,
-      required this.response});
+  WebSocketFrameReceivedEvent({
+    required this.requestId,
+    required this.timestamp,
+    required this.response,
+  });
 
   factory WebSocketFrameReceivedEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketFrameReceivedEvent(
       requestId: RequestId.fromJson(json['requestId'] as String),
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
-      response:
-          WebSocketFrame.fromJson(json['response'] as Map<String, dynamic>),
+      response: WebSocketFrame.fromJson(
+        json['response'] as Map<String, dynamic>,
+      ),
     );
   }
 }
@@ -1167,17 +1261,19 @@ class WebSocketFrameSentEvent {
   /// WebSocket response data.
   final WebSocketFrame response;
 
-  WebSocketFrameSentEvent(
-      {required this.requestId,
-      required this.timestamp,
-      required this.response});
+  WebSocketFrameSentEvent({
+    required this.requestId,
+    required this.timestamp,
+    required this.response,
+  });
 
   factory WebSocketFrameSentEvent.fromJson(Map<String, dynamic> json) {
     return WebSocketFrameSentEvent(
       requestId: RequestId.fromJson(json['requestId'] as String),
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
-      response:
-          WebSocketFrame.fromJson(json['response'] as Map<String, dynamic>),
+      response: WebSocketFrame.fromJson(
+        json['response'] as Map<String, dynamic>,
+      ),
     );
   }
 }
@@ -1192,18 +1288,21 @@ class WebSocketHandshakeResponseReceivedEvent {
   /// WebSocket response data.
   final WebSocketResponse response;
 
-  WebSocketHandshakeResponseReceivedEvent(
-      {required this.requestId,
-      required this.timestamp,
-      required this.response});
+  WebSocketHandshakeResponseReceivedEvent({
+    required this.requestId,
+    required this.timestamp,
+    required this.response,
+  });
 
   factory WebSocketHandshakeResponseReceivedEvent.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return WebSocketHandshakeResponseReceivedEvent(
       requestId: RequestId.fromJson(json['requestId'] as String),
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
-      response:
-          WebSocketResponse.fromJson(json['response'] as Map<String, dynamic>),
+      response: WebSocketResponse.fromJson(
+        json['response'] as Map<String, dynamic>,
+      ),
     );
   }
 }
@@ -1221,20 +1320,23 @@ class WebSocketWillSendHandshakeRequestEvent {
   /// WebSocket request data.
   final WebSocketRequest request;
 
-  WebSocketWillSendHandshakeRequestEvent(
-      {required this.requestId,
-      required this.timestamp,
-      required this.wallTime,
-      required this.request});
+  WebSocketWillSendHandshakeRequestEvent({
+    required this.requestId,
+    required this.timestamp,
+    required this.wallTime,
+    required this.request,
+  });
 
   factory WebSocketWillSendHandshakeRequestEvent.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return WebSocketWillSendHandshakeRequestEvent(
       requestId: RequestId.fromJson(json['requestId'] as String),
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
       wallTime: TimeSinceEpoch.fromJson(json['wallTime'] as num),
-      request:
-          WebSocketRequest.fromJson(json['request'] as Map<String, dynamic>),
+      request: WebSocketRequest.fromJson(
+        json['request'] as Map<String, dynamic>,
+      ),
     );
   }
 }
@@ -1252,20 +1354,22 @@ class WebTransportCreatedEvent {
   /// Request initiator.
   final Initiator? initiator;
 
-  WebTransportCreatedEvent(
-      {required this.transportId,
-      required this.url,
-      required this.timestamp,
-      this.initiator});
+  WebTransportCreatedEvent({
+    required this.transportId,
+    required this.url,
+    required this.timestamp,
+    this.initiator,
+  });
 
   factory WebTransportCreatedEvent.fromJson(Map<String, dynamic> json) {
     return WebTransportCreatedEvent(
       transportId: RequestId.fromJson(json['transportId'] as String),
       url: json['url'] as String,
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
-      initiator: json.containsKey('initiator')
-          ? Initiator.fromJson(json['initiator'] as Map<String, dynamic>)
-          : null,
+      initiator:
+          json.containsKey('initiator')
+              ? Initiator.fromJson(json['initiator'] as Map<String, dynamic>)
+              : null,
     );
   }
 }
@@ -1277,11 +1381,14 @@ class WebTransportConnectionEstablishedEvent {
   /// Timestamp.
   final MonotonicTime timestamp;
 
-  WebTransportConnectionEstablishedEvent(
-      {required this.transportId, required this.timestamp});
+  WebTransportConnectionEstablishedEvent({
+    required this.transportId,
+    required this.timestamp,
+  });
 
   factory WebTransportConnectionEstablishedEvent.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return WebTransportConnectionEstablishedEvent(
       transportId: RequestId.fromJson(json['transportId'] as String),
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
@@ -1326,27 +1433,32 @@ class RequestWillBeSentExtraInfoEvent {
   /// Whether the site has partitioned cookies stored in a partition different than the current one.
   final bool? siteHasCookieInOtherPartition;
 
-  RequestWillBeSentExtraInfoEvent(
-      {required this.requestId,
-      required this.associatedCookies,
-      required this.headers,
-      required this.connectTiming,
-      this.clientSecurityState,
-      this.siteHasCookieInOtherPartition});
+  RequestWillBeSentExtraInfoEvent({
+    required this.requestId,
+    required this.associatedCookies,
+    required this.headers,
+    required this.connectTiming,
+    this.clientSecurityState,
+    this.siteHasCookieInOtherPartition,
+  });
 
   factory RequestWillBeSentExtraInfoEvent.fromJson(Map<String, dynamic> json) {
     return RequestWillBeSentExtraInfoEvent(
       requestId: RequestId.fromJson(json['requestId'] as String),
-      associatedCookies: (json['associatedCookies'] as List)
-          .map((e) => AssociatedCookie.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      associatedCookies:
+          (json['associatedCookies'] as List)
+              .map((e) => AssociatedCookie.fromJson(e as Map<String, dynamic>))
+              .toList(),
       headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
-      connectTiming:
-          ConnectTiming.fromJson(json['connectTiming'] as Map<String, dynamic>),
-      clientSecurityState: json.containsKey('clientSecurityState')
-          ? ClientSecurityState.fromJson(
-              json['clientSecurityState'] as Map<String, dynamic>)
-          : null,
+      connectTiming: ConnectTiming.fromJson(
+        json['connectTiming'] as Map<String, dynamic>,
+      ),
+      clientSecurityState:
+          json.containsKey('clientSecurityState')
+              ? ClientSecurityState.fromJson(
+                json['clientSecurityState'] as Map<String, dynamic>,
+              )
+              : null,
       siteHasCookieInOtherPartition:
           json.containsKey('siteHasCookieInOtherPartition')
               ? json['siteHasCookieInOtherPartition'] as bool
@@ -1391,44 +1503,58 @@ class ResponseReceivedExtraInfoEvent {
   /// the response with the corresponding reason.
   final List<ExemptedSetCookieWithReason>? exemptedCookies;
 
-  ResponseReceivedExtraInfoEvent(
-      {required this.requestId,
-      required this.blockedCookies,
-      required this.headers,
-      required this.resourceIPAddressSpace,
-      required this.statusCode,
-      this.headersText,
-      this.cookiePartitionKey,
-      this.cookiePartitionKeyOpaque,
-      this.exemptedCookies});
+  ResponseReceivedExtraInfoEvent({
+    required this.requestId,
+    required this.blockedCookies,
+    required this.headers,
+    required this.resourceIPAddressSpace,
+    required this.statusCode,
+    this.headersText,
+    this.cookiePartitionKey,
+    this.cookiePartitionKeyOpaque,
+    this.exemptedCookies,
+  });
 
   factory ResponseReceivedExtraInfoEvent.fromJson(Map<String, dynamic> json) {
     return ResponseReceivedExtraInfoEvent(
       requestId: RequestId.fromJson(json['requestId'] as String),
-      blockedCookies: (json['blockedCookies'] as List)
-          .map((e) =>
-              BlockedSetCookieWithReason.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      blockedCookies:
+          (json['blockedCookies'] as List)
+              .map(
+                (e) => BlockedSetCookieWithReason.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
       headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
-      resourceIPAddressSpace:
-          IPAddressSpace.fromJson(json['resourceIPAddressSpace'] as String),
+      resourceIPAddressSpace: IPAddressSpace.fromJson(
+        json['resourceIPAddressSpace'] as String,
+      ),
       statusCode: json['statusCode'] as int,
-      headersText: json.containsKey('headersText')
-          ? json['headersText'] as String
-          : null,
-      cookiePartitionKey: json.containsKey('cookiePartitionKey')
-          ? CookiePartitionKey.fromJson(
-              json['cookiePartitionKey'] as Map<String, dynamic>)
-          : null,
-      cookiePartitionKeyOpaque: json.containsKey('cookiePartitionKeyOpaque')
-          ? json['cookiePartitionKeyOpaque'] as bool
-          : null,
-      exemptedCookies: json.containsKey('exemptedCookies')
-          ? (json['exemptedCookies'] as List)
-              .map((e) => ExemptedSetCookieWithReason.fromJson(
-                  e as Map<String, dynamic>))
-              .toList()
-          : null,
+      headersText:
+          json.containsKey('headersText')
+              ? json['headersText'] as String
+              : null,
+      cookiePartitionKey:
+          json.containsKey('cookiePartitionKey')
+              ? CookiePartitionKey.fromJson(
+                json['cookiePartitionKey'] as Map<String, dynamic>,
+              )
+              : null,
+      cookiePartitionKeyOpaque:
+          json.containsKey('cookiePartitionKeyOpaque')
+              ? json['cookiePartitionKeyOpaque'] as bool
+              : null,
+      exemptedCookies:
+          json.containsKey('exemptedCookies')
+              ? (json['exemptedCookies'] as List)
+                  .map(
+                    (e) => ExemptedSetCookieWithReason.fromJson(
+                      e as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList()
+              : null,
     );
   }
 }
@@ -1440,8 +1566,10 @@ class ResponseReceivedEarlyHintsEvent {
   /// Raw response headers as they were received over the wire.
   final Headers headers;
 
-  ResponseReceivedEarlyHintsEvent(
-      {required this.requestId, required this.headers});
+  ResponseReceivedEarlyHintsEvent({
+    required this.requestId,
+    required this.headers,
+  });
 
   factory ResponseReceivedEarlyHintsEvent.fromJson(Map<String, dynamic> json) {
     return ResponseReceivedEarlyHintsEvent(
@@ -1471,29 +1599,34 @@ class TrustTokenOperationDoneEvent {
   /// The number of obtained Trust Tokens on a successful "Issuance" operation.
   final int? issuedTokenCount;
 
-  TrustTokenOperationDoneEvent(
-      {required this.status,
-      required this.type,
-      required this.requestId,
-      this.topLevelOrigin,
-      this.issuerOrigin,
-      this.issuedTokenCount});
+  TrustTokenOperationDoneEvent({
+    required this.status,
+    required this.type,
+    required this.requestId,
+    this.topLevelOrigin,
+    this.issuerOrigin,
+    this.issuedTokenCount,
+  });
 
   factory TrustTokenOperationDoneEvent.fromJson(Map<String, dynamic> json) {
     return TrustTokenOperationDoneEvent(
-      status:
-          TrustTokenOperationDoneEventStatus.fromJson(json['status'] as String),
+      status: TrustTokenOperationDoneEventStatus.fromJson(
+        json['status'] as String,
+      ),
       type: TrustTokenOperationType.fromJson(json['type'] as String),
       requestId: RequestId.fromJson(json['requestId'] as String),
-      topLevelOrigin: json.containsKey('topLevelOrigin')
-          ? json['topLevelOrigin'] as String
-          : null,
-      issuerOrigin: json.containsKey('issuerOrigin')
-          ? json['issuerOrigin'] as String
-          : null,
-      issuedTokenCount: json.containsKey('issuedTokenCount')
-          ? json['issuedTokenCount'] as int
-          : null,
+      topLevelOrigin:
+          json.containsKey('topLevelOrigin')
+              ? json['topLevelOrigin'] as String
+              : null,
+      issuerOrigin:
+          json.containsKey('issuerOrigin')
+              ? json['issuerOrigin'] as String
+              : null,
+      issuedTokenCount:
+          json.containsKey('issuedTokenCount')
+              ? json['issuedTokenCount'] as int
+              : null,
     );
   }
 }
@@ -1505,11 +1638,14 @@ class SubresourceWebBundleMetadataReceivedEvent {
   /// A list of URLs of resources in the subresource Web Bundle.
   final List<String> urls;
 
-  SubresourceWebBundleMetadataReceivedEvent(
-      {required this.requestId, required this.urls});
+  SubresourceWebBundleMetadataReceivedEvent({
+    required this.requestId,
+    required this.urls,
+  });
 
   factory SubresourceWebBundleMetadataReceivedEvent.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return SubresourceWebBundleMetadataReceivedEvent(
       requestId: RequestId.fromJson(json['requestId'] as String),
       urls: (json['urls'] as List).map((e) => e as String).toList(),
@@ -1524,11 +1660,14 @@ class SubresourceWebBundleMetadataErrorEvent {
   /// Error message
   final String errorMessage;
 
-  SubresourceWebBundleMetadataErrorEvent(
-      {required this.requestId, required this.errorMessage});
+  SubresourceWebBundleMetadataErrorEvent({
+    required this.requestId,
+    required this.errorMessage,
+  });
 
   factory SubresourceWebBundleMetadataErrorEvent.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return SubresourceWebBundleMetadataErrorEvent(
       requestId: RequestId.fromJson(json['requestId'] as String),
       errorMessage: json['errorMessage'] as String,
@@ -1548,19 +1687,22 @@ class SubresourceWebBundleInnerResponseParsedEvent {
   /// after webbundle was parsed.
   final RequestId? bundleRequestId;
 
-  SubresourceWebBundleInnerResponseParsedEvent(
-      {required this.innerRequestId,
-      required this.innerRequestURL,
-      this.bundleRequestId});
+  SubresourceWebBundleInnerResponseParsedEvent({
+    required this.innerRequestId,
+    required this.innerRequestURL,
+    this.bundleRequestId,
+  });
 
   factory SubresourceWebBundleInnerResponseParsedEvent.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return SubresourceWebBundleInnerResponseParsedEvent(
       innerRequestId: RequestId.fromJson(json['innerRequestId'] as String),
       innerRequestURL: json['innerRequestURL'] as String,
-      bundleRequestId: json.containsKey('bundleRequestId')
-          ? RequestId.fromJson(json['bundleRequestId'] as String)
-          : null,
+      bundleRequestId:
+          json.containsKey('bundleRequestId')
+              ? RequestId.fromJson(json['bundleRequestId'] as String)
+              : null,
     );
   }
 }
@@ -1580,21 +1722,24 @@ class SubresourceWebBundleInnerResponseErrorEvent {
   /// after webbundle was parsed.
   final RequestId? bundleRequestId;
 
-  SubresourceWebBundleInnerResponseErrorEvent(
-      {required this.innerRequestId,
-      required this.innerRequestURL,
-      required this.errorMessage,
-      this.bundleRequestId});
+  SubresourceWebBundleInnerResponseErrorEvent({
+    required this.innerRequestId,
+    required this.innerRequestURL,
+    required this.errorMessage,
+    this.bundleRequestId,
+  });
 
   factory SubresourceWebBundleInnerResponseErrorEvent.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return SubresourceWebBundleInnerResponseErrorEvent(
       innerRequestId: RequestId.fromJson(json['innerRequestId'] as String),
       innerRequestURL: json['innerRequestURL'] as String,
       errorMessage: json['errorMessage'] as String,
-      bundleRequestId: json.containsKey('bundleRequestId')
-          ? RequestId.fromJson(json['bundleRequestId'] as String)
-          : null,
+      bundleRequestId:
+          json.containsKey('bundleRequestId')
+              ? RequestId.fromJson(json['bundleRequestId'] as String)
+              : null,
     );
   }
 }
@@ -1605,16 +1750,22 @@ class ReportingApiEndpointsChangedForOriginEvent {
 
   final List<ReportingApiEndpoint> endpoints;
 
-  ReportingApiEndpointsChangedForOriginEvent(
-      {required this.origin, required this.endpoints});
+  ReportingApiEndpointsChangedForOriginEvent({
+    required this.origin,
+    required this.endpoints,
+  });
 
   factory ReportingApiEndpointsChangedForOriginEvent.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return ReportingApiEndpointsChangedForOriginEvent(
       origin: json['origin'] as String,
-      endpoints: (json['endpoints'] as List)
-          .map((e) => ReportingApiEndpoint.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      endpoints:
+          (json['endpoints'] as List)
+              .map(
+                (e) => ReportingApiEndpoint.fromJson(e as Map<String, dynamic>),
+              )
+              .toList(),
     );
   }
 }
@@ -1643,11 +1794,14 @@ class GetResponseBodyForInterceptionResult {
   /// True, if content was sent as base64.
   final bool base64Encoded;
 
-  GetResponseBodyForInterceptionResult(
-      {required this.body, required this.base64Encoded});
+  GetResponseBodyForInterceptionResult({
+    required this.body,
+    required this.base64Encoded,
+  });
 
   factory GetResponseBodyForInterceptionResult.fromJson(
-      Map<String, dynamic> json) {
+    Map<String, dynamic> json,
+  ) {
     return GetResponseBodyForInterceptionResult(
       body: json['body'] as String,
       base64Encoded: json['base64Encoded'] as bool? ?? false,
@@ -1674,8 +1828,7 @@ enum ResourceType {
   ping('Ping'),
   cspViolationReport('CSPViolationReport'),
   preflight('Preflight'),
-  other('Other'),
-  ;
+  other('Other');
 
   final String value;
 
@@ -1726,8 +1879,7 @@ enum ErrorReason {
   internetDisconnected('InternetDisconnected'),
   addressUnreachable('AddressUnreachable'),
   blockedByClient('BlockedByClient'),
-  blockedByResponse('BlockedByResponse'),
-  ;
+  blockedByResponse('BlockedByResponse');
 
   final String value;
 
@@ -1773,8 +1925,7 @@ enum ConnectionType {
   ethernet('ethernet'),
   wifi('wifi'),
   wimax('wimax'),
-  other('other'),
-  ;
+  other('other');
 
   final String value;
 
@@ -1794,8 +1945,7 @@ enum ConnectionType {
 enum CookieSameSite {
   strict('Strict'),
   lax('Lax'),
-  none('None'),
-  ;
+  none('None');
 
   final String value;
 
@@ -1815,8 +1965,7 @@ enum CookieSameSite {
 enum CookiePriority {
   low('Low'),
   medium('Medium'),
-  high('High'),
-  ;
+  high('High');
 
   final String value;
 
@@ -1837,8 +1986,7 @@ enum CookiePriority {
 enum CookieSourceScheme {
   unset('Unset'),
   nonSecure('NonSecure'),
-  secure('Secure'),
-  ;
+  secure('Secure');
 
   final String value;
 
@@ -1919,28 +2067,29 @@ class ResourceTiming {
   /// Finished receiving response headers.
   final num receiveHeadersEnd;
 
-  ResourceTiming(
-      {required this.requestTime,
-      required this.proxyStart,
-      required this.proxyEnd,
-      required this.dnsStart,
-      required this.dnsEnd,
-      required this.connectStart,
-      required this.connectEnd,
-      required this.sslStart,
-      required this.sslEnd,
-      required this.workerStart,
-      required this.workerReady,
-      required this.workerFetchStart,
-      required this.workerRespondWithSettled,
-      this.workerRouterEvaluationStart,
-      this.workerCacheLookupStart,
-      required this.sendStart,
-      required this.sendEnd,
-      required this.pushStart,
-      required this.pushEnd,
-      required this.receiveHeadersStart,
-      required this.receiveHeadersEnd});
+  ResourceTiming({
+    required this.requestTime,
+    required this.proxyStart,
+    required this.proxyEnd,
+    required this.dnsStart,
+    required this.dnsEnd,
+    required this.connectStart,
+    required this.connectEnd,
+    required this.sslStart,
+    required this.sslEnd,
+    required this.workerStart,
+    required this.workerReady,
+    required this.workerFetchStart,
+    required this.workerRespondWithSettled,
+    this.workerRouterEvaluationStart,
+    this.workerCacheLookupStart,
+    required this.sendStart,
+    required this.sendEnd,
+    required this.pushStart,
+    required this.pushEnd,
+    required this.receiveHeadersStart,
+    required this.receiveHeadersEnd,
+  });
 
   factory ResourceTiming.fromJson(Map<String, dynamic> json) {
     return ResourceTiming(
@@ -1961,9 +2110,10 @@ class ResourceTiming {
           json.containsKey('workerRouterEvaluationStart')
               ? json['workerRouterEvaluationStart'] as num
               : null,
-      workerCacheLookupStart: json.containsKey('workerCacheLookupStart')
-          ? json['workerCacheLookupStart'] as num
-          : null,
+      workerCacheLookupStart:
+          json.containsKey('workerCacheLookupStart')
+              ? json['workerCacheLookupStart'] as num
+              : null,
       sendStart: json['sendStart'] as num,
       sendEnd: json['sendEnd'] as num,
       pushStart: json['pushStart'] as num,
@@ -2008,8 +2158,7 @@ enum ResourcePriority {
   low('Low'),
   medium('Medium'),
   high('High'),
-  veryHigh('VeryHigh'),
-  ;
+  veryHigh('VeryHigh');
 
   final String value;
 
@@ -2037,9 +2186,7 @@ class PostDataEntry {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      if (bytes != null) 'bytes': bytes,
-    };
+    return {if (bytes != null) 'bytes': bytes};
   }
 }
 
@@ -2083,50 +2230,60 @@ class RequestData {
   /// request corresponding to the main frame.
   final bool? isSameSite;
 
-  RequestData(
-      {required this.url,
-      this.urlFragment,
-      required this.method,
-      required this.headers,
-      this.hasPostData,
-      this.postDataEntries,
-      this.mixedContentType,
-      required this.initialPriority,
-      required this.referrerPolicy,
-      this.isLinkPreload,
-      this.trustTokenParams,
-      this.isSameSite});
+  RequestData({
+    required this.url,
+    this.urlFragment,
+    required this.method,
+    required this.headers,
+    this.hasPostData,
+    this.postDataEntries,
+    this.mixedContentType,
+    required this.initialPriority,
+    required this.referrerPolicy,
+    this.isLinkPreload,
+    this.trustTokenParams,
+    this.isSameSite,
+  });
 
   factory RequestData.fromJson(Map<String, dynamic> json) {
     return RequestData(
       url: json['url'] as String,
-      urlFragment: json.containsKey('urlFragment')
-          ? json['urlFragment'] as String
-          : null,
+      urlFragment:
+          json.containsKey('urlFragment')
+              ? json['urlFragment'] as String
+              : null,
       method: json['method'] as String,
       headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
       hasPostData:
           json.containsKey('hasPostData') ? json['hasPostData'] as bool : null,
-      postDataEntries: json.containsKey('postDataEntries')
-          ? (json['postDataEntries'] as List)
-              .map((e) => PostDataEntry.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
-      mixedContentType: json.containsKey('mixedContentType')
-          ? security.MixedContentType.fromJson(
-              json['mixedContentType'] as String)
-          : null,
-      initialPriority:
-          ResourcePriority.fromJson(json['initialPriority'] as String),
-      referrerPolicy:
-          RequestReferrerPolicy.fromJson(json['referrerPolicy'] as String),
-      isLinkPreload: json.containsKey('isLinkPreload')
-          ? json['isLinkPreload'] as bool
-          : null,
-      trustTokenParams: json.containsKey('trustTokenParams')
-          ? TrustTokenParams.fromJson(
-              json['trustTokenParams'] as Map<String, dynamic>)
-          : null,
+      postDataEntries:
+          json.containsKey('postDataEntries')
+              ? (json['postDataEntries'] as List)
+                  .map((e) => PostDataEntry.fromJson(e as Map<String, dynamic>))
+                  .toList()
+              : null,
+      mixedContentType:
+          json.containsKey('mixedContentType')
+              ? security.MixedContentType.fromJson(
+                json['mixedContentType'] as String,
+              )
+              : null,
+      initialPriority: ResourcePriority.fromJson(
+        json['initialPriority'] as String,
+      ),
+      referrerPolicy: RequestReferrerPolicy.fromJson(
+        json['referrerPolicy'] as String,
+      ),
+      isLinkPreload:
+          json.containsKey('isLinkPreload')
+              ? json['isLinkPreload'] as bool
+              : null,
+      trustTokenParams:
+          json.containsKey('trustTokenParams')
+              ? TrustTokenParams.fromJson(
+                json['trustTokenParams'] as Map<String, dynamic>,
+              )
+              : null,
       isSameSite:
           json.containsKey('isSameSite') ? json['isSameSite'] as bool : null,
     );
@@ -2161,8 +2318,7 @@ enum RequestReferrerPolicy {
   originWhenCrossOrigin('origin-when-cross-origin'),
   sameOrigin('same-origin'),
   strictOrigin('strict-origin'),
-  strictOriginWhenCrossOrigin('strict-origin-when-cross-origin'),
-  ;
+  strictOriginWhenCrossOrigin('strict-origin-when-cross-origin');
 
   final String value;
 
@@ -2204,15 +2360,16 @@ class SignedCertificateTimestamp {
   /// Signature data.
   final String signatureData;
 
-  SignedCertificateTimestamp(
-      {required this.status,
-      required this.origin,
-      required this.logDescription,
-      required this.logId,
-      required this.timestamp,
-      required this.hashAlgorithm,
-      required this.signatureAlgorithm,
-      required this.signatureData});
+  SignedCertificateTimestamp({
+    required this.status,
+    required this.origin,
+    required this.logDescription,
+    required this.logId,
+    required this.timestamp,
+    required this.hashAlgorithm,
+    required this.signatureAlgorithm,
+    required this.signatureData,
+  });
 
   factory SignedCertificateTimestamp.fromJson(Map<String, dynamic> json) {
     return SignedCertificateTimestamp(
@@ -2290,50 +2447,58 @@ class SecurityDetails {
   /// Whether the connection used Encrypted ClientHello
   final bool encryptedClientHello;
 
-  SecurityDetails(
-      {required this.protocol,
-      required this.keyExchange,
-      this.keyExchangeGroup,
-      required this.cipher,
-      this.mac,
-      required this.certificateId,
-      required this.subjectName,
-      required this.sanList,
-      required this.issuer,
-      required this.validFrom,
-      required this.validTo,
-      required this.signedCertificateTimestampList,
-      required this.certificateTransparencyCompliance,
-      this.serverSignatureAlgorithm,
-      required this.encryptedClientHello});
+  SecurityDetails({
+    required this.protocol,
+    required this.keyExchange,
+    this.keyExchangeGroup,
+    required this.cipher,
+    this.mac,
+    required this.certificateId,
+    required this.subjectName,
+    required this.sanList,
+    required this.issuer,
+    required this.validFrom,
+    required this.validTo,
+    required this.signedCertificateTimestampList,
+    required this.certificateTransparencyCompliance,
+    this.serverSignatureAlgorithm,
+    required this.encryptedClientHello,
+  });
 
   factory SecurityDetails.fromJson(Map<String, dynamic> json) {
     return SecurityDetails(
       protocol: json['protocol'] as String,
       keyExchange: json['keyExchange'] as String,
-      keyExchangeGroup: json.containsKey('keyExchangeGroup')
-          ? json['keyExchangeGroup'] as String
-          : null,
+      keyExchangeGroup:
+          json.containsKey('keyExchangeGroup')
+              ? json['keyExchangeGroup'] as String
+              : null,
       cipher: json['cipher'] as String,
       mac: json.containsKey('mac') ? json['mac'] as String : null,
-      certificateId:
-          security.CertificateId.fromJson(json['certificateId'] as int),
+      certificateId: security.CertificateId.fromJson(
+        json['certificateId'] as int,
+      ),
       subjectName: json['subjectName'] as String,
       sanList: (json['sanList'] as List).map((e) => e as String).toList(),
       issuer: json['issuer'] as String,
       validFrom: TimeSinceEpoch.fromJson(json['validFrom'] as num),
       validTo: TimeSinceEpoch.fromJson(json['validTo'] as num),
-      signedCertificateTimestampList: (json['signedCertificateTimestampList']
-              as List)
-          .map((e) =>
-              SignedCertificateTimestamp.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      signedCertificateTimestampList:
+          (json['signedCertificateTimestampList'] as List)
+              .map(
+                (e) => SignedCertificateTimestamp.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
       certificateTransparencyCompliance:
           CertificateTransparencyCompliance.fromJson(
-              json['certificateTransparencyCompliance'] as String),
-      serverSignatureAlgorithm: json.containsKey('serverSignatureAlgorithm')
-          ? json['serverSignatureAlgorithm'] as int
-          : null,
+            json['certificateTransparencyCompliance'] as String,
+          ),
+      serverSignatureAlgorithm:
+          json.containsKey('serverSignatureAlgorithm')
+              ? json['serverSignatureAlgorithm'] as int
+              : null,
       encryptedClientHello: json['encryptedClientHello'] as bool? ?? false,
     );
   }
@@ -2366,16 +2531,16 @@ class SecurityDetails {
 enum CertificateTransparencyCompliance {
   unknown('unknown'),
   notCompliant('not-compliant'),
-  compliant('compliant'),
-  ;
+  compliant('compliant');
 
   final String value;
 
   const CertificateTransparencyCompliance(this.value);
 
   factory CertificateTransparencyCompliance.fromJson(String value) =>
-      CertificateTransparencyCompliance.values
-          .firstWhere((e) => e.value == value);
+      CertificateTransparencyCompliance.values.firstWhere(
+        (e) => e.value == value,
+      );
 
   String toJson() => value;
 
@@ -2394,16 +2559,19 @@ enum BlockedReason {
   contentType('content-type'),
   coepFrameResourceNeedsCoepHeader('coep-frame-resource-needs-coep-header'),
   coopSandboxedIframeCannotNavigateToCoopPage(
-      'coop-sandboxed-iframe-cannot-navigate-to-coop-page'),
+    'coop-sandboxed-iframe-cannot-navigate-to-coop-page',
+  ),
   corpNotSameOrigin('corp-not-same-origin'),
   corpNotSameOriginAfterDefaultedToSameOriginByCoep(
-      'corp-not-same-origin-after-defaulted-to-same-origin-by-coep'),
+    'corp-not-same-origin-after-defaulted-to-same-origin-by-coep',
+  ),
   corpNotSameOriginAfterDefaultedToSameOriginByDip(
-      'corp-not-same-origin-after-defaulted-to-same-origin-by-dip'),
+    'corp-not-same-origin-after-defaulted-to-same-origin-by-dip',
+  ),
   corpNotSameOriginAfterDefaultedToSameOriginByCoepAndDip(
-      'corp-not-same-origin-after-defaulted-to-same-origin-by-coep-and-dip'),
-  corpNotSameSite('corp-not-same-site'),
-  ;
+    'corp-not-same-origin-after-defaulted-to-same-origin-by-coep-and-dip',
+  ),
+  corpNotSameSite('corp-not-same-site');
 
   final String value;
 
@@ -2451,13 +2619,15 @@ enum CorsError {
   unexpectedPrivateNetworkAccess('UnexpectedPrivateNetworkAccess'),
   noCorsRedirectModeNotFollow('NoCorsRedirectModeNotFollow'),
   preflightMissingPrivateNetworkAccessId(
-      'PreflightMissingPrivateNetworkAccessId'),
+    'PreflightMissingPrivateNetworkAccessId',
+  ),
   preflightMissingPrivateNetworkAccessName(
-      'PreflightMissingPrivateNetworkAccessName'),
+    'PreflightMissingPrivateNetworkAccessName',
+  ),
   privateNetworkAccessPermissionUnavailable(
-      'PrivateNetworkAccessPermissionUnavailable'),
-  privateNetworkAccessPermissionDenied('PrivateNetworkAccessPermissionDenied'),
-  ;
+    'PrivateNetworkAccessPermissionUnavailable',
+  ),
+  privateNetworkAccessPermissionDenied('PrivateNetworkAccessPermissionDenied');
 
   final String value;
 
@@ -2499,8 +2669,7 @@ enum ServiceWorkerResponseSource {
   cacheStorage('cache-storage'),
   httpCache('http-cache'),
   fallbackCode('fallback-code'),
-  network('network'),
-  ;
+  network('network');
 
   final String value;
 
@@ -2529,17 +2698,22 @@ class TrustTokenParams {
   /// records.
   final List<String>? issuers;
 
-  TrustTokenParams(
-      {required this.operation, required this.refreshPolicy, this.issuers});
+  TrustTokenParams({
+    required this.operation,
+    required this.refreshPolicy,
+    this.issuers,
+  });
 
   factory TrustTokenParams.fromJson(Map<String, dynamic> json) {
     return TrustTokenParams(
       operation: TrustTokenOperationType.fromJson(json['operation'] as String),
       refreshPolicy: TrustTokenParamsRefreshPolicy.fromJson(
-          json['refreshPolicy'] as String),
-      issuers: json.containsKey('issuers')
-          ? (json['issuers'] as List).map((e) => e as String).toList()
-          : null,
+        json['refreshPolicy'] as String,
+      ),
+      issuers:
+          json.containsKey('issuers')
+              ? (json['issuers'] as List).map((e) => e as String).toList()
+              : null,
     );
   }
 
@@ -2554,8 +2728,7 @@ class TrustTokenParams {
 
 enum TrustTokenParamsRefreshPolicy {
   useCached('UseCached'),
-  refresh('Refresh'),
-  ;
+  refresh('Refresh');
 
   final String value;
 
@@ -2573,8 +2746,7 @@ enum TrustTokenParamsRefreshPolicy {
 enum TrustTokenOperationType {
   issuance('Issuance'),
   redemption('Redemption'),
-  signing('Signing'),
-  ;
+  signing('Signing');
 
   final String value;
 
@@ -2598,8 +2770,7 @@ enum AlternateProtocolUsage {
   broken('broken'),
   dnsAlpnH3JobWonWithoutRace('dnsAlpnH3JobWonWithoutRace'),
   dnsAlpnH3JobWonRace('dnsAlpnH3JobWonRace'),
-  unspecifiedReason('unspecifiedReason'),
-  ;
+  unspecifiedReason('unspecifiedReason');
 
   final String value;
 
@@ -2619,8 +2790,7 @@ enum ServiceWorkerRouterSource {
   network('network'),
   cache('cache'),
   fetchEvent('fetch-event'),
-  raceNetworkAndFetchHandler('race-network-and-fetch-handler'),
-  ;
+  raceNetworkAndFetchHandler('race-network-and-fetch-handler');
 
   final String value;
 
@@ -2647,22 +2817,30 @@ class ServiceWorkerRouterInfo {
   /// The actual router source used.
   final ServiceWorkerRouterSource? actualSourceType;
 
-  ServiceWorkerRouterInfo(
-      {this.ruleIdMatched, this.matchedSourceType, this.actualSourceType});
+  ServiceWorkerRouterInfo({
+    this.ruleIdMatched,
+    this.matchedSourceType,
+    this.actualSourceType,
+  });
 
   factory ServiceWorkerRouterInfo.fromJson(Map<String, dynamic> json) {
     return ServiceWorkerRouterInfo(
-      ruleIdMatched: json.containsKey('ruleIdMatched')
-          ? json['ruleIdMatched'] as int
-          : null,
-      matchedSourceType: json.containsKey('matchedSourceType')
-          ? ServiceWorkerRouterSource.fromJson(
-              json['matchedSourceType'] as String)
-          : null,
-      actualSourceType: json.containsKey('actualSourceType')
-          ? ServiceWorkerRouterSource.fromJson(
-              json['actualSourceType'] as String)
-          : null,
+      ruleIdMatched:
+          json.containsKey('ruleIdMatched')
+              ? json['ruleIdMatched'] as int
+              : null,
+      matchedSourceType:
+          json.containsKey('matchedSourceType')
+              ? ServiceWorkerRouterSource.fromJson(
+                json['matchedSourceType'] as String,
+              )
+              : null,
+      actualSourceType:
+          json.containsKey('actualSourceType')
+              ? ServiceWorkerRouterSource.fromJson(
+                json['actualSourceType'] as String,
+              )
+              : null,
     );
   }
 
@@ -2757,32 +2935,33 @@ class ResponseData {
   /// Security details for the request.
   final SecurityDetails? securityDetails;
 
-  ResponseData(
-      {required this.url,
-      required this.status,
-      required this.statusText,
-      required this.headers,
-      required this.mimeType,
-      required this.charset,
-      this.requestHeaders,
-      required this.connectionReused,
-      required this.connectionId,
-      this.remoteIPAddress,
-      this.remotePort,
-      this.fromDiskCache,
-      this.fromServiceWorker,
-      this.fromPrefetchCache,
-      this.fromEarlyHints,
-      this.serviceWorkerRouterInfo,
-      required this.encodedDataLength,
-      this.timing,
-      this.serviceWorkerResponseSource,
-      this.responseTime,
-      this.cacheStorageCacheName,
-      this.protocol,
-      this.alternateProtocolUsage,
-      required this.securityState,
-      this.securityDetails});
+  ResponseData({
+    required this.url,
+    required this.status,
+    required this.statusText,
+    required this.headers,
+    required this.mimeType,
+    required this.charset,
+    this.requestHeaders,
+    required this.connectionReused,
+    required this.connectionId,
+    this.remoteIPAddress,
+    this.remotePort,
+    this.fromDiskCache,
+    this.fromServiceWorker,
+    this.fromPrefetchCache,
+    this.fromEarlyHints,
+    this.serviceWorkerRouterInfo,
+    required this.encodedDataLength,
+    this.timing,
+    this.serviceWorkerResponseSource,
+    this.responseTime,
+    this.cacheStorageCacheName,
+    this.protocol,
+    this.alternateProtocolUsage,
+    required this.securityState,
+    this.securityDetails,
+  });
 
   factory ResponseData.fromJson(Map<String, dynamic> json) {
     return ResponseData(
@@ -2792,59 +2971,76 @@ class ResponseData {
       headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
       mimeType: json['mimeType'] as String,
       charset: json['charset'] as String,
-      requestHeaders: json.containsKey('requestHeaders')
-          ? Headers.fromJson(json['requestHeaders'] as Map<String, dynamic>)
-          : null,
+      requestHeaders:
+          json.containsKey('requestHeaders')
+              ? Headers.fromJson(json['requestHeaders'] as Map<String, dynamic>)
+              : null,
       connectionReused: json['connectionReused'] as bool? ?? false,
       connectionId: json['connectionId'] as num,
-      remoteIPAddress: json.containsKey('remoteIPAddress')
-          ? json['remoteIPAddress'] as String
-          : null,
+      remoteIPAddress:
+          json.containsKey('remoteIPAddress')
+              ? json['remoteIPAddress'] as String
+              : null,
       remotePort:
           json.containsKey('remotePort') ? json['remotePort'] as int : null,
-      fromDiskCache: json.containsKey('fromDiskCache')
-          ? json['fromDiskCache'] as bool
-          : null,
-      fromServiceWorker: json.containsKey('fromServiceWorker')
-          ? json['fromServiceWorker'] as bool
-          : null,
-      fromPrefetchCache: json.containsKey('fromPrefetchCache')
-          ? json['fromPrefetchCache'] as bool
-          : null,
-      fromEarlyHints: json.containsKey('fromEarlyHints')
-          ? json['fromEarlyHints'] as bool
-          : null,
-      serviceWorkerRouterInfo: json.containsKey('serviceWorkerRouterInfo')
-          ? ServiceWorkerRouterInfo.fromJson(
-              json['serviceWorkerRouterInfo'] as Map<String, dynamic>)
-          : null,
+      fromDiskCache:
+          json.containsKey('fromDiskCache')
+              ? json['fromDiskCache'] as bool
+              : null,
+      fromServiceWorker:
+          json.containsKey('fromServiceWorker')
+              ? json['fromServiceWorker'] as bool
+              : null,
+      fromPrefetchCache:
+          json.containsKey('fromPrefetchCache')
+              ? json['fromPrefetchCache'] as bool
+              : null,
+      fromEarlyHints:
+          json.containsKey('fromEarlyHints')
+              ? json['fromEarlyHints'] as bool
+              : null,
+      serviceWorkerRouterInfo:
+          json.containsKey('serviceWorkerRouterInfo')
+              ? ServiceWorkerRouterInfo.fromJson(
+                json['serviceWorkerRouterInfo'] as Map<String, dynamic>,
+              )
+              : null,
       encodedDataLength: json['encodedDataLength'] as num,
-      timing: json.containsKey('timing')
-          ? ResourceTiming.fromJson(json['timing'] as Map<String, dynamic>)
-          : null,
+      timing:
+          json.containsKey('timing')
+              ? ResourceTiming.fromJson(json['timing'] as Map<String, dynamic>)
+              : null,
       serviceWorkerResponseSource:
           json.containsKey('serviceWorkerResponseSource')
               ? ServiceWorkerResponseSource.fromJson(
-                  json['serviceWorkerResponseSource'] as String)
+                json['serviceWorkerResponseSource'] as String,
+              )
               : null,
-      responseTime: json.containsKey('responseTime')
-          ? TimeSinceEpoch.fromJson(json['responseTime'] as num)
-          : null,
-      cacheStorageCacheName: json.containsKey('cacheStorageCacheName')
-          ? json['cacheStorageCacheName'] as String
-          : null,
+      responseTime:
+          json.containsKey('responseTime')
+              ? TimeSinceEpoch.fromJson(json['responseTime'] as num)
+              : null,
+      cacheStorageCacheName:
+          json.containsKey('cacheStorageCacheName')
+              ? json['cacheStorageCacheName'] as String
+              : null,
       protocol:
           json.containsKey('protocol') ? json['protocol'] as String : null,
-      alternateProtocolUsage: json.containsKey('alternateProtocolUsage')
-          ? AlternateProtocolUsage.fromJson(
-              json['alternateProtocolUsage'] as String)
-          : null,
-      securityState:
-          security.SecurityState.fromJson(json['securityState'] as String),
-      securityDetails: json.containsKey('securityDetails')
-          ? SecurityDetails.fromJson(
-              json['securityDetails'] as Map<String, dynamic>)
-          : null,
+      alternateProtocolUsage:
+          json.containsKey('alternateProtocolUsage')
+              ? AlternateProtocolUsage.fromJson(
+                json['alternateProtocolUsage'] as String,
+              )
+              : null,
+      securityState: security.SecurityState.fromJson(
+        json['securityState'] as String,
+      ),
+      securityDetails:
+          json.containsKey('securityDetails')
+              ? SecurityDetails.fromJson(
+                json['securityDetails'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 
@@ -2897,9 +3093,7 @@ class WebSocketRequest {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'headers': headers.toJson(),
-    };
+    return {'headers': headers.toJson()};
   }
 }
 
@@ -2923,28 +3117,32 @@ class WebSocketResponse {
   /// HTTP request headers text.
   final String? requestHeadersText;
 
-  WebSocketResponse(
-      {required this.status,
-      required this.statusText,
-      required this.headers,
-      this.headersText,
-      this.requestHeaders,
-      this.requestHeadersText});
+  WebSocketResponse({
+    required this.status,
+    required this.statusText,
+    required this.headers,
+    this.headersText,
+    this.requestHeaders,
+    this.requestHeadersText,
+  });
 
   factory WebSocketResponse.fromJson(Map<String, dynamic> json) {
     return WebSocketResponse(
       status: json['status'] as int,
       statusText: json['statusText'] as String,
       headers: Headers.fromJson(json['headers'] as Map<String, dynamic>),
-      headersText: json.containsKey('headersText')
-          ? json['headersText'] as String
-          : null,
-      requestHeaders: json.containsKey('requestHeaders')
-          ? Headers.fromJson(json['requestHeaders'] as Map<String, dynamic>)
-          : null,
-      requestHeadersText: json.containsKey('requestHeadersText')
-          ? json['requestHeadersText'] as String
-          : null,
+      headersText:
+          json.containsKey('headersText')
+              ? json['headersText'] as String
+              : null,
+      requestHeaders:
+          json.containsKey('requestHeaders')
+              ? Headers.fromJson(json['requestHeaders'] as Map<String, dynamic>)
+              : null,
+      requestHeadersText:
+          json.containsKey('requestHeadersText')
+              ? json['requestHeadersText'] as String
+              : null,
     );
   }
 
@@ -2973,8 +3171,11 @@ class WebSocketFrame {
   /// If the opcode isn't 1, then payloadData is a base64 encoded string representing binary data.
   final String payloadData;
 
-  WebSocketFrame(
-      {required this.opcode, required this.mask, required this.payloadData});
+  WebSocketFrame({
+    required this.opcode,
+    required this.mask,
+    required this.payloadData,
+  });
 
   factory WebSocketFrame.fromJson(Map<String, dynamic> json) {
     return WebSocketFrame(
@@ -2985,11 +3186,7 @@ class WebSocketFrame {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'opcode': opcode,
-      'mask': mask,
-      'payloadData': payloadData,
-    };
+    return {'opcode': opcode, 'mask': mask, 'payloadData': payloadData};
   }
 }
 
@@ -3007,19 +3204,21 @@ class CachedResource {
   /// Cached response body size.
   final num bodySize;
 
-  CachedResource(
-      {required this.url,
-      required this.type,
-      this.response,
-      required this.bodySize});
+  CachedResource({
+    required this.url,
+    required this.type,
+    this.response,
+    required this.bodySize,
+  });
 
   factory CachedResource.fromJson(Map<String, dynamic> json) {
     return CachedResource(
       url: json['url'] as String,
       type: ResourceType.fromJson(json['type'] as String),
-      response: json.containsKey('response')
-          ? ResponseData.fromJson(json['response'] as Map<String, dynamic>)
-          : null,
+      response:
+          json.containsKey('response')
+              ? ResponseData.fromJson(json['response'] as Map<String, dynamic>)
+              : null,
       bodySize: json['bodySize'] as num,
     );
   }
@@ -3056,29 +3255,33 @@ class Initiator {
   /// Set if another request triggered this request (e.g. preflight).
   final RequestId? requestId;
 
-  Initiator(
-      {required this.type,
-      this.stack,
-      this.url,
-      this.lineNumber,
-      this.columnNumber,
-      this.requestId});
+  Initiator({
+    required this.type,
+    this.stack,
+    this.url,
+    this.lineNumber,
+    this.columnNumber,
+    this.requestId,
+  });
 
   factory Initiator.fromJson(Map<String, dynamic> json) {
     return Initiator(
       type: InitiatorType.fromJson(json['type'] as String),
-      stack: json.containsKey('stack')
-          ? runtime.StackTraceData.fromJson(
-              json['stack'] as Map<String, dynamic>)
-          : null,
+      stack:
+          json.containsKey('stack')
+              ? runtime.StackTraceData.fromJson(
+                json['stack'] as Map<String, dynamic>,
+              )
+              : null,
       url: json.containsKey('url') ? json['url'] as String : null,
       lineNumber:
           json.containsKey('lineNumber') ? json['lineNumber'] as num : null,
       columnNumber:
           json.containsKey('columnNumber') ? json['columnNumber'] as num : null,
-      requestId: json.containsKey('requestId')
-          ? RequestId.fromJson(json['requestId'] as String)
-          : null,
+      requestId:
+          json.containsKey('requestId')
+              ? RequestId.fromJson(json['requestId'] as String)
+              : null,
     );
   }
 
@@ -3100,8 +3303,7 @@ enum InitiatorType {
   preload('preload'),
   signedExchange('SignedExchange'),
   preflight('preflight'),
-  other('other'),
-  ;
+  other('other');
 
   final String value;
 
@@ -3126,8 +3328,10 @@ class CookiePartitionKey {
   /// Indicates if the cookie has any ancestors that are cross-site to the topLevelSite.
   final bool hasCrossSiteAncestor;
 
-  CookiePartitionKey(
-      {required this.topLevelSite, required this.hasCrossSiteAncestor});
+  CookiePartitionKey({
+    required this.topLevelSite,
+    required this.hasCrossSiteAncestor,
+  });
 
   factory CookiePartitionKey.fromJson(Map<String, dynamic> json) {
     return CookiePartitionKey(
@@ -3193,22 +3397,23 @@ class Cookie {
   /// True if cookie partition key is opaque.
   final bool? partitionKeyOpaque;
 
-  Cookie(
-      {required this.name,
-      required this.value,
-      required this.domain,
-      required this.path,
-      required this.expires,
-      required this.size,
-      required this.httpOnly,
-      required this.secure,
-      required this.session,
-      this.sameSite,
-      required this.priority,
-      required this.sourceScheme,
-      required this.sourcePort,
-      this.partitionKey,
-      this.partitionKeyOpaque});
+  Cookie({
+    required this.name,
+    required this.value,
+    required this.domain,
+    required this.path,
+    required this.expires,
+    required this.size,
+    required this.httpOnly,
+    required this.secure,
+    required this.session,
+    this.sameSite,
+    required this.priority,
+    required this.sourceScheme,
+    required this.sourcePort,
+    this.partitionKey,
+    this.partitionKeyOpaque,
+  });
 
   factory Cookie.fromJson(Map<String, dynamic> json) {
     return Cookie(
@@ -3221,19 +3426,23 @@ class Cookie {
       httpOnly: json['httpOnly'] as bool? ?? false,
       secure: json['secure'] as bool? ?? false,
       session: json['session'] as bool? ?? false,
-      sameSite: json.containsKey('sameSite')
-          ? CookieSameSite.fromJson(json['sameSite'] as String)
-          : null,
+      sameSite:
+          json.containsKey('sameSite')
+              ? CookieSameSite.fromJson(json['sameSite'] as String)
+              : null,
       priority: CookiePriority.fromJson(json['priority'] as String),
       sourceScheme: CookieSourceScheme.fromJson(json['sourceScheme'] as String),
       sourcePort: json['sourcePort'] as int,
-      partitionKey: json.containsKey('partitionKey')
-          ? CookiePartitionKey.fromJson(
-              json['partitionKey'] as Map<String, dynamic>)
-          : null,
-      partitionKeyOpaque: json.containsKey('partitionKeyOpaque')
-          ? json['partitionKeyOpaque'] as bool
-          : null,
+      partitionKey:
+          json.containsKey('partitionKey')
+              ? CookiePartitionKey.fromJson(
+                json['partitionKey'] as Map<String, dynamic>,
+              )
+              : null,
+      partitionKeyOpaque:
+          json.containsKey('partitionKeyOpaque')
+              ? json['partitionKeyOpaque'] as bool
+              : null,
     );
   }
 
@@ -3277,14 +3486,15 @@ enum SetCookieBlockedReason {
   schemefulSameSiteStrict('SchemefulSameSiteStrict'),
   schemefulSameSiteLax('SchemefulSameSiteLax'),
   schemefulSameSiteUnspecifiedTreatedAsLax(
-      'SchemefulSameSiteUnspecifiedTreatedAsLax'),
+    'SchemefulSameSiteUnspecifiedTreatedAsLax',
+  ),
   samePartyFromCrossPartyContext('SamePartyFromCrossPartyContext'),
   samePartyConflictsWithOtherAttributes(
-      'SamePartyConflictsWithOtherAttributes'),
+    'SamePartyConflictsWithOtherAttributes',
+  ),
   nameValuePairExceedsMaxSize('NameValuePairExceedsMaxSize'),
   disallowedCharacter('DisallowedCharacter'),
-  noCookieContent('NoCookieContent'),
-  ;
+  noCookieContent('NoCookieContent');
 
   final String value;
 
@@ -3315,10 +3525,10 @@ enum CookieBlockedReason {
   schemefulSameSiteStrict('SchemefulSameSiteStrict'),
   schemefulSameSiteLax('SchemefulSameSiteLax'),
   schemefulSameSiteUnspecifiedTreatedAsLax(
-      'SchemefulSameSiteUnspecifiedTreatedAsLax'),
+    'SchemefulSameSiteUnspecifiedTreatedAsLax',
+  ),
   samePartyFromCrossPartyContext('SamePartyFromCrossPartyContext'),
-  nameValuePairExceedsMaxSize('NameValuePairExceedsMaxSize'),
-  ;
+  nameValuePairExceedsMaxSize('NameValuePairExceedsMaxSize');
 
   final String value;
 
@@ -3344,8 +3554,7 @@ enum CookieExemptionReason {
   enterprisePolicy('EnterprisePolicy'),
   storageAccess('StorageAccess'),
   topLevelStorageAccess('TopLevelStorageAccess'),
-  scheme('Scheme'),
-  ;
+  scheme('Scheme');
 
   final String value;
 
@@ -3374,18 +3583,23 @@ class BlockedSetCookieWithReason {
   /// errors.
   final Cookie? cookie;
 
-  BlockedSetCookieWithReason(
-      {required this.blockedReasons, required this.cookieLine, this.cookie});
+  BlockedSetCookieWithReason({
+    required this.blockedReasons,
+    required this.cookieLine,
+    this.cookie,
+  });
 
   factory BlockedSetCookieWithReason.fromJson(Map<String, dynamic> json) {
     return BlockedSetCookieWithReason(
-      blockedReasons: (json['blockedReasons'] as List)
-          .map((e) => SetCookieBlockedReason.fromJson(e as String))
-          .toList(),
+      blockedReasons:
+          (json['blockedReasons'] as List)
+              .map((e) => SetCookieBlockedReason.fromJson(e as String))
+              .toList(),
       cookieLine: json['cookieLine'] as String,
-      cookie: json.containsKey('cookie')
-          ? Cookie.fromJson(json['cookie'] as Map<String, dynamic>)
-          : null,
+      cookie:
+          json.containsKey('cookie')
+              ? Cookie.fromJson(json['cookie'] as Map<String, dynamic>)
+              : null,
     );
   }
 
@@ -3410,15 +3624,17 @@ class ExemptedSetCookieWithReason {
   /// The cookie object representing the cookie.
   final Cookie cookie;
 
-  ExemptedSetCookieWithReason(
-      {required this.exemptionReason,
-      required this.cookieLine,
-      required this.cookie});
+  ExemptedSetCookieWithReason({
+    required this.exemptionReason,
+    required this.cookieLine,
+    required this.cookie,
+  });
 
   factory ExemptedSetCookieWithReason.fromJson(Map<String, dynamic> json) {
     return ExemptedSetCookieWithReason(
-      exemptionReason:
-          CookieExemptionReason.fromJson(json['exemptionReason'] as String),
+      exemptionReason: CookieExemptionReason.fromJson(
+        json['exemptionReason'] as String,
+      ),
       cookieLine: json['cookieLine'] as String,
       cookie: Cookie.fromJson(json['cookie'] as Map<String, dynamic>),
     );
@@ -3446,20 +3662,25 @@ class AssociatedCookie {
   /// only have at most one exemption reason.
   final CookieExemptionReason? exemptionReason;
 
-  AssociatedCookie(
-      {required this.cookie,
-      required this.blockedReasons,
-      this.exemptionReason});
+  AssociatedCookie({
+    required this.cookie,
+    required this.blockedReasons,
+    this.exemptionReason,
+  });
 
   factory AssociatedCookie.fromJson(Map<String, dynamic> json) {
     return AssociatedCookie(
       cookie: Cookie.fromJson(json['cookie'] as Map<String, dynamic>),
-      blockedReasons: (json['blockedReasons'] as List)
-          .map((e) => CookieBlockedReason.fromJson(e as String))
-          .toList(),
-      exemptionReason: json.containsKey('exemptionReason')
-          ? CookieExemptionReason.fromJson(json['exemptionReason'] as String)
-          : null,
+      blockedReasons:
+          (json['blockedReasons'] as List)
+              .map((e) => CookieBlockedReason.fromJson(e as String))
+              .toList(),
+      exemptionReason:
+          json.containsKey('exemptionReason')
+              ? CookieExemptionReason.fromJson(
+                json['exemptionReason'] as String,
+              )
+              : null,
     );
   }
 
@@ -3519,21 +3740,22 @@ class CookieParam {
   /// Cookie partition key. If not set, the cookie will be set as not partitioned.
   final CookiePartitionKey? partitionKey;
 
-  CookieParam(
-      {required this.name,
-      required this.value,
-      this.url,
-      this.domain,
-      this.path,
-      this.secure,
-      this.httpOnly,
-      this.sameSite,
-      this.expires,
-      this.priority,
-      this.sameParty,
-      this.sourceScheme,
-      this.sourcePort,
-      this.partitionKey});
+  CookieParam({
+    required this.name,
+    required this.value,
+    this.url,
+    this.domain,
+    this.path,
+    this.secure,
+    this.httpOnly,
+    this.sameSite,
+    this.expires,
+    this.priority,
+    this.sameParty,
+    this.sourceScheme,
+    this.sourcePort,
+    this.partitionKey,
+  });
 
   factory CookieParam.fromJson(Map<String, dynamic> json) {
     return CookieParam(
@@ -3544,26 +3766,32 @@ class CookieParam {
       path: json.containsKey('path') ? json['path'] as String : null,
       secure: json.containsKey('secure') ? json['secure'] as bool : null,
       httpOnly: json.containsKey('httpOnly') ? json['httpOnly'] as bool : null,
-      sameSite: json.containsKey('sameSite')
-          ? CookieSameSite.fromJson(json['sameSite'] as String)
-          : null,
-      expires: json.containsKey('expires')
-          ? TimeSinceEpoch.fromJson(json['expires'] as num)
-          : null,
-      priority: json.containsKey('priority')
-          ? CookiePriority.fromJson(json['priority'] as String)
-          : null,
+      sameSite:
+          json.containsKey('sameSite')
+              ? CookieSameSite.fromJson(json['sameSite'] as String)
+              : null,
+      expires:
+          json.containsKey('expires')
+              ? TimeSinceEpoch.fromJson(json['expires'] as num)
+              : null,
+      priority:
+          json.containsKey('priority')
+              ? CookiePriority.fromJson(json['priority'] as String)
+              : null,
       sameParty:
           json.containsKey('sameParty') ? json['sameParty'] as bool : null,
-      sourceScheme: json.containsKey('sourceScheme')
-          ? CookieSourceScheme.fromJson(json['sourceScheme'] as String)
-          : null,
+      sourceScheme:
+          json.containsKey('sourceScheme')
+              ? CookieSourceScheme.fromJson(json['sourceScheme'] as String)
+              : null,
       sourcePort:
           json.containsKey('sourcePort') ? json['sourcePort'] as int : null,
-      partitionKey: json.containsKey('partitionKey')
-          ? CookiePartitionKey.fromJson(
-              json['partitionKey'] as Map<String, dynamic>)
-          : null,
+      partitionKey:
+          json.containsKey('partitionKey')
+              ? CookiePartitionKey.fromJson(
+                json['partitionKey'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 
@@ -3601,17 +3829,19 @@ class AuthChallenge {
   /// The realm of the challenge. May be empty.
   final String realm;
 
-  AuthChallenge(
-      {this.source,
-      required this.origin,
-      required this.scheme,
-      required this.realm});
+  AuthChallenge({
+    this.source,
+    required this.origin,
+    required this.scheme,
+    required this.realm,
+  });
 
   factory AuthChallenge.fromJson(Map<String, dynamic> json) {
     return AuthChallenge(
-      source: json.containsKey('source')
-          ? AuthChallengeSource.fromJson(json['source'] as String)
-          : null,
+      source:
+          json.containsKey('source')
+              ? AuthChallengeSource.fromJson(json['source'] as String)
+              : null,
       origin: json['origin'] as String,
       scheme: json['scheme'] as String,
       realm: json['realm'] as String,
@@ -3630,8 +3860,7 @@ class AuthChallenge {
 
 enum AuthChallengeSource {
   server('Server'),
-  proxy('Proxy'),
-  ;
+  proxy('Proxy');
 
   final String value;
 
@@ -3665,8 +3894,9 @@ class AuthChallengeResponse {
 
   factory AuthChallengeResponse.fromJson(Map<String, dynamic> json) {
     return AuthChallengeResponse(
-      response:
-          AuthChallengeResponseResponse.fromJson(json['response'] as String),
+      response: AuthChallengeResponseResponse.fromJson(
+        json['response'] as String,
+      ),
       username:
           json.containsKey('username') ? json['username'] as String : null,
       password:
@@ -3686,8 +3916,7 @@ class AuthChallengeResponse {
 enum AuthChallengeResponseResponse {
   default$('Default'),
   cancelAuth('CancelAuth'),
-  provideCredentials('ProvideCredentials'),
-  ;
+  provideCredentials('ProvideCredentials');
 
   final String value;
 
@@ -3706,8 +3935,7 @@ enum AuthChallengeResponseResponse {
 /// sent. Response will intercept after the response is received.
 enum InterceptionStage {
   request('Request'),
-  headersReceived('HeadersReceived'),
-  ;
+  headersReceived('HeadersReceived');
 
   final String value;
 
@@ -3740,12 +3968,14 @@ class RequestPattern {
     return RequestPattern(
       urlPattern:
           json.containsKey('urlPattern') ? json['urlPattern'] as String : null,
-      resourceType: json.containsKey('resourceType')
-          ? ResourceType.fromJson(json['resourceType'] as String)
-          : null,
-      interceptionStage: json.containsKey('interceptionStage')
-          ? InterceptionStage.fromJson(json['interceptionStage'] as String)
-          : null,
+      resourceType:
+          json.containsKey('resourceType')
+              ? ResourceType.fromJson(json['resourceType'] as String)
+              : null,
+      interceptionStage:
+          json.containsKey('interceptionStage')
+              ? InterceptionStage.fromJson(json['interceptionStage'] as String)
+              : null,
     );
   }
 
@@ -3789,16 +4019,17 @@ class SignedExchangeSignature {
   /// The encoded certificates.
   final List<String>? certificates;
 
-  SignedExchangeSignature(
-      {required this.label,
-      required this.signature,
-      required this.integrity,
-      this.certUrl,
-      this.certSha256,
-      required this.validityUrl,
-      required this.date,
-      required this.expires,
-      this.certificates});
+  SignedExchangeSignature({
+    required this.label,
+    required this.signature,
+    required this.integrity,
+    this.certUrl,
+    this.certSha256,
+    required this.validityUrl,
+    required this.date,
+    required this.expires,
+    this.certificates,
+  });
 
   factory SignedExchangeSignature.fromJson(Map<String, dynamic> json) {
     return SignedExchangeSignature(
@@ -3811,9 +4042,10 @@ class SignedExchangeSignature {
       validityUrl: json['validityUrl'] as String,
       date: json['date'] as int,
       expires: json['expires'] as int,
-      certificates: json.containsKey('certificates')
-          ? (json['certificates'] as List).map((e) => e as String).toList()
-          : null,
+      certificates:
+          json.containsKey('certificates')
+              ? (json['certificates'] as List).map((e) => e as String).toList()
+              : null,
     );
   }
 
@@ -3850,23 +4082,28 @@ class SignedExchangeHeader {
   /// Signed exchange header integrity hash in the form of `sha256-<base64-hash-value>`.
   final String headerIntegrity;
 
-  SignedExchangeHeader(
-      {required this.requestUrl,
-      required this.responseCode,
-      required this.responseHeaders,
-      required this.signatures,
-      required this.headerIntegrity});
+  SignedExchangeHeader({
+    required this.requestUrl,
+    required this.responseCode,
+    required this.responseHeaders,
+    required this.signatures,
+    required this.headerIntegrity,
+  });
 
   factory SignedExchangeHeader.fromJson(Map<String, dynamic> json) {
     return SignedExchangeHeader(
       requestUrl: json['requestUrl'] as String,
       responseCode: json['responseCode'] as int,
-      responseHeaders:
-          Headers.fromJson(json['responseHeaders'] as Map<String, dynamic>),
-      signatures: (json['signatures'] as List)
-          .map((e) =>
-              SignedExchangeSignature.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      responseHeaders: Headers.fromJson(
+        json['responseHeaders'] as Map<String, dynamic>,
+      ),
+      signatures:
+          (json['signatures'] as List)
+              .map(
+                (e) =>
+                    SignedExchangeSignature.fromJson(e as Map<String, dynamic>),
+              )
+              .toList(),
       headerIntegrity: json['headerIntegrity'] as String,
     );
   }
@@ -3889,8 +4126,7 @@ enum SignedExchangeErrorField {
   signatureCertUrl('signatureCertUrl'),
   signatureCertSha256('signatureCertSha256'),
   signatureValidityUrl('signatureValidityUrl'),
-  signatureTimestamps('signatureTimestamps'),
-  ;
+  signatureTimestamps('signatureTimestamps');
 
   final String value;
 
@@ -3916,18 +4152,23 @@ class SignedExchangeError {
   /// The field which caused the error.
   final SignedExchangeErrorField? errorField;
 
-  SignedExchangeError(
-      {required this.message, this.signatureIndex, this.errorField});
+  SignedExchangeError({
+    required this.message,
+    this.signatureIndex,
+    this.errorField,
+  });
 
   factory SignedExchangeError.fromJson(Map<String, dynamic> json) {
     return SignedExchangeError(
       message: json['message'] as String,
-      signatureIndex: json.containsKey('signatureIndex')
-          ? json['signatureIndex'] as int
-          : null,
-      errorField: json.containsKey('errorField')
-          ? SignedExchangeErrorField.fromJson(json['errorField'] as String)
-          : null,
+      signatureIndex:
+          json.containsKey('signatureIndex')
+              ? json['signatureIndex'] as int
+              : null,
+      errorField:
+          json.containsKey('errorField')
+              ? SignedExchangeErrorField.fromJson(json['errorField'] as String)
+              : null,
     );
   }
 
@@ -3954,30 +4195,39 @@ class SignedExchangeInfo {
   /// Errors occurred while handling the signed exchange.
   final List<SignedExchangeError>? errors;
 
-  SignedExchangeInfo(
-      {required this.outerResponse,
-      this.header,
-      this.securityDetails,
-      this.errors});
+  SignedExchangeInfo({
+    required this.outerResponse,
+    this.header,
+    this.securityDetails,
+    this.errors,
+  });
 
   factory SignedExchangeInfo.fromJson(Map<String, dynamic> json) {
     return SignedExchangeInfo(
-      outerResponse:
-          ResponseData.fromJson(json['outerResponse'] as Map<String, dynamic>),
-      header: json.containsKey('header')
-          ? SignedExchangeHeader.fromJson(
-              json['header'] as Map<String, dynamic>)
-          : null,
-      securityDetails: json.containsKey('securityDetails')
-          ? SecurityDetails.fromJson(
-              json['securityDetails'] as Map<String, dynamic>)
-          : null,
-      errors: json.containsKey('errors')
-          ? (json['errors'] as List)
-              .map((e) =>
-                  SignedExchangeError.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
+      outerResponse: ResponseData.fromJson(
+        json['outerResponse'] as Map<String, dynamic>,
+      ),
+      header:
+          json.containsKey('header')
+              ? SignedExchangeHeader.fromJson(
+                json['header'] as Map<String, dynamic>,
+              )
+              : null,
+      securityDetails:
+          json.containsKey('securityDetails')
+              ? SecurityDetails.fromJson(
+                json['securityDetails'] as Map<String, dynamic>,
+              )
+              : null,
+      errors:
+          json.containsKey('errors')
+              ? (json['errors'] as List)
+                  .map(
+                    (e) =>
+                        SignedExchangeError.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList()
+              : null,
     );
   }
 
@@ -3996,8 +4246,7 @@ enum ContentEncoding {
   deflate('deflate'),
   gzip('gzip'),
   br('br'),
-  zstd('zstd'),
-  ;
+  zstd('zstd');
 
   final String value;
 
@@ -4017,8 +4266,7 @@ enum PrivateNetworkRequestPolicy {
   blockFromInsecureToMorePrivate('BlockFromInsecureToMorePrivate'),
   warnFromInsecureToMorePrivate('WarnFromInsecureToMorePrivate'),
   preflightBlock('PreflightBlock'),
-  preflightWarn('PreflightWarn'),
-  ;
+  preflightWarn('PreflightWarn');
 
   final String value;
 
@@ -4037,8 +4285,7 @@ enum IPAddressSpace {
   local('Local'),
   private('Private'),
   public('Public'),
-  unknown('Unknown'),
-  ;
+  unknown('Unknown');
 
   final String value;
 
@@ -4062,15 +4309,11 @@ class ConnectTiming {
   ConnectTiming({required this.requestTime});
 
   factory ConnectTiming.fromJson(Map<String, dynamic> json) {
-    return ConnectTiming(
-      requestTime: json['requestTime'] as num,
-    );
+    return ConnectTiming(requestTime: json['requestTime'] as num);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'requestTime': requestTime,
-    };
+    return {'requestTime': requestTime};
   }
 }
 
@@ -4081,19 +4324,22 @@ class ClientSecurityState {
 
   final PrivateNetworkRequestPolicy privateNetworkRequestPolicy;
 
-  ClientSecurityState(
-      {required this.initiatorIsSecureContext,
-      required this.initiatorIPAddressSpace,
-      required this.privateNetworkRequestPolicy});
+  ClientSecurityState({
+    required this.initiatorIsSecureContext,
+    required this.initiatorIPAddressSpace,
+    required this.privateNetworkRequestPolicy,
+  });
 
   factory ClientSecurityState.fromJson(Map<String, dynamic> json) {
     return ClientSecurityState(
       initiatorIsSecureContext:
           json['initiatorIsSecureContext'] as bool? ?? false,
-      initiatorIPAddressSpace:
-          IPAddressSpace.fromJson(json['initiatorIPAddressSpace'] as String),
+      initiatorIPAddressSpace: IPAddressSpace.fromJson(
+        json['initiatorIPAddressSpace'] as String,
+      ),
       privateNetworkRequestPolicy: PrivateNetworkRequestPolicy.fromJson(
-          json['privateNetworkRequestPolicy'] as String),
+        json['privateNetworkRequestPolicy'] as String,
+      ),
     );
   }
 
@@ -4113,8 +4359,7 @@ enum CrossOriginOpenerPolicyValue {
   unsafeNone('UnsafeNone'),
   sameOriginPlusCoep('SameOriginPlusCoep'),
   restrictPropertiesPlusCoep('RestrictPropertiesPlusCoep'),
-  noopenerAllowPopups('NoopenerAllowPopups'),
-  ;
+  noopenerAllowPopups('NoopenerAllowPopups');
 
   final String value;
 
@@ -4138,20 +4383,23 @@ class CrossOriginOpenerPolicyStatus {
 
   final String? reportOnlyReportingEndpoint;
 
-  CrossOriginOpenerPolicyStatus(
-      {required this.value,
-      required this.reportOnlyValue,
-      this.reportingEndpoint,
-      this.reportOnlyReportingEndpoint});
+  CrossOriginOpenerPolicyStatus({
+    required this.value,
+    required this.reportOnlyValue,
+    this.reportingEndpoint,
+    this.reportOnlyReportingEndpoint,
+  });
 
   factory CrossOriginOpenerPolicyStatus.fromJson(Map<String, dynamic> json) {
     return CrossOriginOpenerPolicyStatus(
       value: CrossOriginOpenerPolicyValue.fromJson(json['value'] as String),
       reportOnlyValue: CrossOriginOpenerPolicyValue.fromJson(
-          json['reportOnlyValue'] as String),
-      reportingEndpoint: json.containsKey('reportingEndpoint')
-          ? json['reportingEndpoint'] as String
-          : null,
+        json['reportOnlyValue'] as String,
+      ),
+      reportingEndpoint:
+          json.containsKey('reportingEndpoint')
+              ? json['reportingEndpoint'] as String
+              : null,
       reportOnlyReportingEndpoint:
           json.containsKey('reportOnlyReportingEndpoint')
               ? json['reportOnlyReportingEndpoint'] as String
@@ -4173,8 +4421,7 @@ class CrossOriginOpenerPolicyStatus {
 enum CrossOriginEmbedderPolicyValue {
   none('None'),
   credentialless('Credentialless'),
-  requireCorp('RequireCorp'),
-  ;
+  requireCorp('RequireCorp');
 
   final String value;
 
@@ -4198,20 +4445,23 @@ class CrossOriginEmbedderPolicyStatus {
 
   final String? reportOnlyReportingEndpoint;
 
-  CrossOriginEmbedderPolicyStatus(
-      {required this.value,
-      required this.reportOnlyValue,
-      this.reportingEndpoint,
-      this.reportOnlyReportingEndpoint});
+  CrossOriginEmbedderPolicyStatus({
+    required this.value,
+    required this.reportOnlyValue,
+    this.reportingEndpoint,
+    this.reportOnlyReportingEndpoint,
+  });
 
   factory CrossOriginEmbedderPolicyStatus.fromJson(Map<String, dynamic> json) {
     return CrossOriginEmbedderPolicyStatus(
       value: CrossOriginEmbedderPolicyValue.fromJson(json['value'] as String),
       reportOnlyValue: CrossOriginEmbedderPolicyValue.fromJson(
-          json['reportOnlyValue'] as String),
-      reportingEndpoint: json.containsKey('reportingEndpoint')
-          ? json['reportingEndpoint'] as String
-          : null,
+        json['reportOnlyValue'] as String,
+      ),
+      reportingEndpoint:
+          json.containsKey('reportingEndpoint')
+              ? json['reportingEndpoint'] as String
+              : null,
       reportOnlyReportingEndpoint:
           json.containsKey('reportOnlyReportingEndpoint')
               ? json['reportOnlyReportingEndpoint'] as String
@@ -4232,8 +4482,7 @@ class CrossOriginEmbedderPolicyStatus {
 
 enum ContentSecurityPolicySource {
   http('HTTP'),
-  meta('Meta'),
-  ;
+  meta('Meta');
 
   final String value;
 
@@ -4255,10 +4504,11 @@ class ContentSecurityPolicyStatus {
 
   final ContentSecurityPolicySource source;
 
-  ContentSecurityPolicyStatus(
-      {required this.effectiveDirectives,
-      required this.isEnforced,
-      required this.source});
+  ContentSecurityPolicyStatus({
+    required this.effectiveDirectives,
+    required this.isEnforced,
+    required this.source,
+  });
 
   factory ContentSecurityPolicyStatus.fromJson(Map<String, dynamic> json) {
     return ContentSecurityPolicyStatus(
@@ -4288,20 +4538,28 @@ class SecurityIsolationStatus {
 
   factory SecurityIsolationStatus.fromJson(Map<String, dynamic> json) {
     return SecurityIsolationStatus(
-      coop: json.containsKey('coop')
-          ? CrossOriginOpenerPolicyStatus.fromJson(
-              json['coop'] as Map<String, dynamic>)
-          : null,
-      coep: json.containsKey('coep')
-          ? CrossOriginEmbedderPolicyStatus.fromJson(
-              json['coep'] as Map<String, dynamic>)
-          : null,
-      csp: json.containsKey('csp')
-          ? (json['csp'] as List)
-              .map((e) => ContentSecurityPolicyStatus.fromJson(
-                  e as Map<String, dynamic>))
-              .toList()
-          : null,
+      coop:
+          json.containsKey('coop')
+              ? CrossOriginOpenerPolicyStatus.fromJson(
+                json['coop'] as Map<String, dynamic>,
+              )
+              : null,
+      coep:
+          json.containsKey('coep')
+              ? CrossOriginEmbedderPolicyStatus.fromJson(
+                json['coep'] as Map<String, dynamic>,
+              )
+              : null,
+      csp:
+          json.containsKey('csp')
+              ? (json['csp'] as List)
+                  .map(
+                    (e) => ContentSecurityPolicyStatus.fromJson(
+                      e as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList()
+              : null,
     );
   }
 
@@ -4319,8 +4577,7 @@ enum ReportStatus {
   queued('Queued'),
   pending('Pending'),
   markedForRemoval('MarkedForRemoval'),
-  success('Success'),
-  ;
+  success('Success');
 
   final String value;
 
@@ -4367,16 +4624,17 @@ class ReportingApiReport {
 
   final ReportStatus status;
 
-  ReportingApiReport(
-      {required this.id,
-      required this.initiatorUrl,
-      required this.destination,
-      required this.type,
-      required this.timestamp,
-      required this.depth,
-      required this.completedAttempts,
-      required this.body,
-      required this.status});
+  ReportingApiReport({
+    required this.id,
+    required this.initiatorUrl,
+    required this.destination,
+    required this.type,
+    required this.timestamp,
+    required this.depth,
+    required this.completedAttempts,
+    required this.body,
+    required this.status,
+  });
 
   factory ReportingApiReport.fromJson(Map<String, dynamic> json) {
     return ReportingApiReport(
@@ -4424,10 +4682,7 @@ class ReportingApiEndpoint {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'url': url,
-      'groupName': groupName,
-    };
+    return {'url': url, 'groupName': groupName};
   }
 }
 
@@ -4448,30 +4703,37 @@ class LoadNetworkResourcePageResult {
   /// Response headers.
   final network.Headers? headers;
 
-  LoadNetworkResourcePageResult(
-      {required this.success,
-      this.netError,
-      this.netErrorName,
-      this.httpStatusCode,
-      this.stream,
-      this.headers});
+  LoadNetworkResourcePageResult({
+    required this.success,
+    this.netError,
+    this.netErrorName,
+    this.httpStatusCode,
+    this.stream,
+    this.headers,
+  });
 
   factory LoadNetworkResourcePageResult.fromJson(Map<String, dynamic> json) {
     return LoadNetworkResourcePageResult(
       success: json['success'] as bool? ?? false,
       netError: json.containsKey('netError') ? json['netError'] as num : null,
-      netErrorName: json.containsKey('netErrorName')
-          ? json['netErrorName'] as String
-          : null,
-      httpStatusCode: json.containsKey('httpStatusCode')
-          ? json['httpStatusCode'] as num
-          : null,
-      stream: json.containsKey('stream')
-          ? io.StreamHandle.fromJson(json['stream'] as String)
-          : null,
-      headers: json.containsKey('headers')
-          ? network.Headers.fromJson(json['headers'] as Map<String, dynamic>)
-          : null,
+      netErrorName:
+          json.containsKey('netErrorName')
+              ? json['netErrorName'] as String
+              : null,
+      httpStatusCode:
+          json.containsKey('httpStatusCode')
+              ? json['httpStatusCode'] as num
+              : null,
+      stream:
+          json.containsKey('stream')
+              ? io.StreamHandle.fromJson(json['stream'] as String)
+              : null,
+      headers:
+          json.containsKey('headers')
+              ? network.Headers.fromJson(
+                json['headers'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 
@@ -4494,8 +4756,10 @@ class LoadNetworkResourceOptions {
 
   final bool includeCredentials;
 
-  LoadNetworkResourceOptions(
-      {required this.disableCache, required this.includeCredentials});
+  LoadNetworkResourceOptions({
+    required this.disableCache,
+    required this.includeCredentials,
+  });
 
   factory LoadNetworkResourceOptions.fromJson(Map<String, dynamic> json) {
     return LoadNetworkResourceOptions(
@@ -4524,16 +4788,16 @@ enum TrustTokenOperationDoneEventStatus {
   badResponse('BadResponse'),
   internalError('InternalError'),
   unknownError('UnknownError'),
-  fulfilledLocally('FulfilledLocally'),
-  ;
+  fulfilledLocally('FulfilledLocally');
 
   final String value;
 
   const TrustTokenOperationDoneEventStatus(this.value);
 
   factory TrustTokenOperationDoneEventStatus.fromJson(String value) =>
-      TrustTokenOperationDoneEventStatus.values
-          .firstWhere((e) => e.value == value);
+      TrustTokenOperationDoneEventStatus.values.firstWhere(
+        (e) => e.value == value,
+      );
 
   String toJson() => value;
 

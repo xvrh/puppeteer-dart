@@ -21,11 +21,12 @@ class HeadlessExperimentalApi {
   /// [screenshot] If set, a screenshot of the frame will be captured and returned in the response. Otherwise,
   /// no screenshot will be captured. Note that capturing a screenshot can fail, for example,
   /// during renderer initialization. In such a case, no screenshot data will be returned.
-  Future<BeginFrameResult> beginFrame(
-      {num? frameTimeTicks,
-      num? interval,
-      bool? noDisplayUpdates,
-      ScreenshotParams? screenshot}) async {
+  Future<BeginFrameResult> beginFrame({
+    num? frameTimeTicks,
+    num? interval,
+    bool? noDisplayUpdates,
+    ScreenshotParams? screenshot,
+  }) async {
     var result = await _client.send('HeadlessExperimental.beginFrame', {
       if (frameTimeTicks != null) 'frameTimeTicks': frameTimeTicks,
       if (interval != null) 'interval': interval,
@@ -61,9 +62,10 @@ class BeginFrameResult {
   factory BeginFrameResult.fromJson(Map<String, dynamic> json) {
     return BeginFrameResult(
       hasDamage: json['hasDamage'] as bool? ?? false,
-      screenshotData: json.containsKey('screenshotData')
-          ? json['screenshotData'] as String
-          : null,
+      screenshotData:
+          json.containsKey('screenshotData')
+              ? json['screenshotData'] as String
+              : null,
     );
   }
 }
@@ -83,13 +85,15 @@ class ScreenshotParams {
 
   factory ScreenshotParams.fromJson(Map<String, dynamic> json) {
     return ScreenshotParams(
-      format: json.containsKey('format')
-          ? ScreenshotParamsFormat.fromJson(json['format'] as String)
-          : null,
+      format:
+          json.containsKey('format')
+              ? ScreenshotParamsFormat.fromJson(json['format'] as String)
+              : null,
       quality: json.containsKey('quality') ? json['quality'] as int : null,
-      optimizeForSpeed: json.containsKey('optimizeForSpeed')
-          ? json['optimizeForSpeed'] as bool
-          : null,
+      optimizeForSpeed:
+          json.containsKey('optimizeForSpeed')
+              ? json['optimizeForSpeed'] as bool
+              : null,
     );
   }
 
@@ -105,8 +109,7 @@ class ScreenshotParams {
 enum ScreenshotParamsFormat {
   jpeg('jpeg'),
   png('png'),
-  webp('webp'),
-  ;
+  webp('webp');
 
   final String value;
 

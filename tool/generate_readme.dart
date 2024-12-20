@@ -3,11 +3,15 @@ import 'package:dart_style/dart_style.dart';
 import 'download_protocol_from_repo.dart' show protocols;
 
 final RegExp _importRegex = RegExp(r"import '([^']+)';\r?\n");
-final RegExp _ignoreForFileRegex =
-    RegExp(r'^// ignore_for_file:.*$', multiLine: true);
+final RegExp _ignoreForFileRegex = RegExp(
+  r'^// ignore_for_file:.*$',
+  multiLine: true,
+);
 
-final DartFormatter _dartFormatter =
-    DartFormatter(lineEnding: Platform.isWindows ? '\r\n' : '\n');
+final DartFormatter _dartFormatter = DartFormatter(
+  languageVersion: DartFormatter.latestLanguageVersion,
+  lineEnding: Platform.isWindows ? '\r\n' : '\n',
+);
 
 void main() {
   File('README.md').writeAsStringSync(generateReadme());
@@ -31,7 +35,9 @@ String generateReadme() {
 
   for (var protocolName in protocols.keys) {
     readme = readme.replaceAll(
-        '[$protocolName]()', '[$protocolName](${protocols[protocolName]})');
+      '[$protocolName]()',
+      '[$protocolName](${protocols[protocolName]})',
+    );
   }
 
   return readme;

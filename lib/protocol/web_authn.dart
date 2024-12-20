@@ -50,7 +50,8 @@ class WebAuthnApi {
 
   /// Creates and adds a virtual authenticator.
   Future<AuthenticatorId> addVirtualAuthenticator(
-      VirtualAuthenticatorOptions options) async {
+    VirtualAuthenticatorOptions options,
+  ) async {
     var result = await _client.send('WebAuthn.addVirtualAuthenticator', {
       'options': options,
     });
@@ -64,8 +65,12 @@ class WebAuthnApi {
   /// be zero. Defaults to false.
   /// [isBadUP] If isBadUP is set, overrides the UP bit in the flags in the authenticator response to
   /// be zero. Defaults to false.
-  Future<void> setResponseOverrideBits(AuthenticatorId authenticatorId,
-      {bool? isBogusSignature, bool? isBadUV, bool? isBadUP}) async {
+  Future<void> setResponseOverrideBits(
+    AuthenticatorId authenticatorId, {
+    bool? isBogusSignature,
+    bool? isBadUV,
+    bool? isBadUP,
+  }) async {
     await _client.send('WebAuthn.setResponseOverrideBits', {
       'authenticatorId': authenticatorId,
       if (isBogusSignature != null) 'isBogusSignature': isBogusSignature,
@@ -76,7 +81,8 @@ class WebAuthnApi {
 
   /// Removes the given authenticator.
   Future<void> removeVirtualAuthenticator(
-      AuthenticatorId authenticatorId) async {
+    AuthenticatorId authenticatorId,
+  ) async {
     await _client.send('WebAuthn.removeVirtualAuthenticator', {
       'authenticatorId': authenticatorId,
     });
@@ -84,7 +90,9 @@ class WebAuthnApi {
 
   /// Adds the credential to the specified authenticator.
   Future<void> addCredential(
-      AuthenticatorId authenticatorId, Credential credential) async {
+    AuthenticatorId authenticatorId,
+    Credential credential,
+  ) async {
     await _client.send('WebAuthn.addCredential', {
       'authenticatorId': authenticatorId,
       'credential': credential,
@@ -94,7 +102,9 @@ class WebAuthnApi {
   /// Returns a single credential stored in the given virtual authenticator that
   /// matches the credential ID.
   Future<Credential> getCredential(
-      AuthenticatorId authenticatorId, String credentialId) async {
+    AuthenticatorId authenticatorId,
+    String credentialId,
+  ) async {
     var result = await _client.send('WebAuthn.getCredential', {
       'authenticatorId': authenticatorId,
       'credentialId': credentialId,
@@ -104,7 +114,8 @@ class WebAuthnApi {
 
   /// Returns all the credentials stored in the given virtual authenticator.
   Future<List<Credential>> getCredentials(
-      AuthenticatorId authenticatorId) async {
+    AuthenticatorId authenticatorId,
+  ) async {
     var result = await _client.send('WebAuthn.getCredentials', {
       'authenticatorId': authenticatorId,
     });
@@ -115,7 +126,9 @@ class WebAuthnApi {
 
   /// Removes a credential from the authenticator.
   Future<void> removeCredential(
-      AuthenticatorId authenticatorId, String credentialId) async {
+    AuthenticatorId authenticatorId,
+    String credentialId,
+  ) async {
     await _client.send('WebAuthn.removeCredential', {
       'authenticatorId': authenticatorId,
       'credentialId': credentialId,
@@ -132,7 +145,9 @@ class WebAuthnApi {
   /// Sets whether User Verification succeeds or fails for an authenticator.
   /// The default is true.
   Future<void> setUserVerified(
-      AuthenticatorId authenticatorId, bool isUserVerified) async {
+    AuthenticatorId authenticatorId,
+    bool isUserVerified,
+  ) async {
     await _client.send('WebAuthn.setUserVerified', {
       'authenticatorId': authenticatorId,
       'isUserVerified': isUserVerified,
@@ -142,7 +157,9 @@ class WebAuthnApi {
   /// Sets whether tests of user presence will succeed immediately (if true) or fail to resolve (if false) for an authenticator.
   /// The default is true.
   Future<void> setAutomaticPresenceSimulation(
-      AuthenticatorId authenticatorId, bool enabled) async {
+    AuthenticatorId authenticatorId,
+    bool enabled,
+  ) async {
     await _client.send('WebAuthn.setAutomaticPresenceSimulation', {
       'authenticatorId': authenticatorId,
       'enabled': enabled,
@@ -152,8 +169,11 @@ class WebAuthnApi {
   /// Allows setting credential properties.
   /// https://w3c.github.io/webauthn/#sctn-automation-set-credential-properties
   Future<void> setCredentialProperties(
-      AuthenticatorId authenticatorId, String credentialId,
-      {bool? backupEligibility, bool? backupState}) async {
+    AuthenticatorId authenticatorId,
+    String credentialId, {
+    bool? backupEligibility,
+    bool? backupState,
+  }) async {
     await _client.send('WebAuthn.setCredentialProperties', {
       'authenticatorId': authenticatorId,
       'credentialId': credentialId,
@@ -168,15 +188,19 @@ class CredentialAddedEvent {
 
   final Credential credential;
 
-  CredentialAddedEvent(
-      {required this.authenticatorId, required this.credential});
+  CredentialAddedEvent({
+    required this.authenticatorId,
+    required this.credential,
+  });
 
   factory CredentialAddedEvent.fromJson(Map<String, dynamic> json) {
     return CredentialAddedEvent(
-      authenticatorId:
-          AuthenticatorId.fromJson(json['authenticatorId'] as String),
-      credential:
-          Credential.fromJson(json['credential'] as Map<String, dynamic>),
+      authenticatorId: AuthenticatorId.fromJson(
+        json['authenticatorId'] as String,
+      ),
+      credential: Credential.fromJson(
+        json['credential'] as Map<String, dynamic>,
+      ),
     );
   }
 }
@@ -186,13 +210,16 @@ class CredentialDeletedEvent {
 
   final String credentialId;
 
-  CredentialDeletedEvent(
-      {required this.authenticatorId, required this.credentialId});
+  CredentialDeletedEvent({
+    required this.authenticatorId,
+    required this.credentialId,
+  });
 
   factory CredentialDeletedEvent.fromJson(Map<String, dynamic> json) {
     return CredentialDeletedEvent(
-      authenticatorId:
-          AuthenticatorId.fromJson(json['authenticatorId'] as String),
+      authenticatorId: AuthenticatorId.fromJson(
+        json['authenticatorId'] as String,
+      ),
       credentialId: json['credentialId'] as String,
     );
   }
@@ -203,15 +230,19 @@ class CredentialUpdatedEvent {
 
   final Credential credential;
 
-  CredentialUpdatedEvent(
-      {required this.authenticatorId, required this.credential});
+  CredentialUpdatedEvent({
+    required this.authenticatorId,
+    required this.credential,
+  });
 
   factory CredentialUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return CredentialUpdatedEvent(
-      authenticatorId:
-          AuthenticatorId.fromJson(json['authenticatorId'] as String),
-      credential:
-          Credential.fromJson(json['credential'] as Map<String, dynamic>),
+      authenticatorId: AuthenticatorId.fromJson(
+        json['authenticatorId'] as String,
+      ),
+      credential: Credential.fromJson(
+        json['credential'] as Map<String, dynamic>,
+      ),
     );
   }
 }
@@ -221,15 +252,19 @@ class CredentialAssertedEvent {
 
   final Credential credential;
 
-  CredentialAssertedEvent(
-      {required this.authenticatorId, required this.credential});
+  CredentialAssertedEvent({
+    required this.authenticatorId,
+    required this.credential,
+  });
 
   factory CredentialAssertedEvent.fromJson(Map<String, dynamic> json) {
     return CredentialAssertedEvent(
-      authenticatorId:
-          AuthenticatorId.fromJson(json['authenticatorId'] as String),
-      credential:
-          Credential.fromJson(json['credential'] as Map<String, dynamic>),
+      authenticatorId: AuthenticatorId.fromJson(
+        json['authenticatorId'] as String,
+      ),
+      credential: Credential.fromJson(
+        json['credential'] as Map<String, dynamic>,
+      ),
     );
   }
 }
@@ -242,8 +277,7 @@ extension type AuthenticatorId(String value) {
 
 enum AuthenticatorProtocol {
   u2f('u2f'),
-  ctap2('ctap2'),
-  ;
+  ctap2('ctap2');
 
   final String value;
 
@@ -260,8 +294,7 @@ enum AuthenticatorProtocol {
 
 enum Ctap2Version {
   ctap20('ctap2_0'),
-  ctap21('ctap2_1'),
-  ;
+  ctap21('ctap2_1');
 
   final String value;
 
@@ -281,8 +314,7 @@ enum AuthenticatorTransport {
   nfc('nfc'),
   ble('ble'),
   cable('cable'),
-  internal('internal'),
-  ;
+  internal('internal');
 
   final String value;
 
@@ -349,56 +381,65 @@ class VirtualAuthenticatorOptions {
   /// https://w3c.github.io/webauthn/#sctn-credential-backup
   final bool? defaultBackupState;
 
-  VirtualAuthenticatorOptions(
-      {required this.protocol,
-      this.ctap2Version,
-      required this.transport,
-      this.hasResidentKey,
-      this.hasUserVerification,
-      this.hasLargeBlob,
-      this.hasCredBlob,
-      this.hasMinPinLength,
-      this.hasPrf,
-      this.automaticPresenceSimulation,
-      this.isUserVerified,
-      this.defaultBackupEligibility,
-      this.defaultBackupState});
+  VirtualAuthenticatorOptions({
+    required this.protocol,
+    this.ctap2Version,
+    required this.transport,
+    this.hasResidentKey,
+    this.hasUserVerification,
+    this.hasLargeBlob,
+    this.hasCredBlob,
+    this.hasMinPinLength,
+    this.hasPrf,
+    this.automaticPresenceSimulation,
+    this.isUserVerified,
+    this.defaultBackupEligibility,
+    this.defaultBackupState,
+  });
 
   factory VirtualAuthenticatorOptions.fromJson(Map<String, dynamic> json) {
     return VirtualAuthenticatorOptions(
       protocol: AuthenticatorProtocol.fromJson(json['protocol'] as String),
-      ctap2Version: json.containsKey('ctap2Version')
-          ? Ctap2Version.fromJson(json['ctap2Version'] as String)
-          : null,
+      ctap2Version:
+          json.containsKey('ctap2Version')
+              ? Ctap2Version.fromJson(json['ctap2Version'] as String)
+              : null,
       transport: AuthenticatorTransport.fromJson(json['transport'] as String),
-      hasResidentKey: json.containsKey('hasResidentKey')
-          ? json['hasResidentKey'] as bool
-          : null,
-      hasUserVerification: json.containsKey('hasUserVerification')
-          ? json['hasUserVerification'] as bool
-          : null,
-      hasLargeBlob: json.containsKey('hasLargeBlob')
-          ? json['hasLargeBlob'] as bool
-          : null,
+      hasResidentKey:
+          json.containsKey('hasResidentKey')
+              ? json['hasResidentKey'] as bool
+              : null,
+      hasUserVerification:
+          json.containsKey('hasUserVerification')
+              ? json['hasUserVerification'] as bool
+              : null,
+      hasLargeBlob:
+          json.containsKey('hasLargeBlob')
+              ? json['hasLargeBlob'] as bool
+              : null,
       hasCredBlob:
           json.containsKey('hasCredBlob') ? json['hasCredBlob'] as bool : null,
-      hasMinPinLength: json.containsKey('hasMinPinLength')
-          ? json['hasMinPinLength'] as bool
-          : null,
+      hasMinPinLength:
+          json.containsKey('hasMinPinLength')
+              ? json['hasMinPinLength'] as bool
+              : null,
       hasPrf: json.containsKey('hasPrf') ? json['hasPrf'] as bool : null,
       automaticPresenceSimulation:
           json.containsKey('automaticPresenceSimulation')
               ? json['automaticPresenceSimulation'] as bool
               : null,
-      isUserVerified: json.containsKey('isUserVerified')
-          ? json['isUserVerified'] as bool
-          : null,
-      defaultBackupEligibility: json.containsKey('defaultBackupEligibility')
-          ? json['defaultBackupEligibility'] as bool
-          : null,
-      defaultBackupState: json.containsKey('defaultBackupState')
-          ? json['defaultBackupState'] as bool
-          : null,
+      isUserVerified:
+          json.containsKey('isUserVerified')
+              ? json['isUserVerified'] as bool
+              : null,
+      defaultBackupEligibility:
+          json.containsKey('defaultBackupEligibility')
+              ? json['defaultBackupEligibility'] as bool
+              : null,
+      defaultBackupState:
+          json.containsKey('defaultBackupState')
+              ? json['defaultBackupState'] as bool
+              : null,
     );
   }
 
@@ -468,18 +509,19 @@ class Credential {
   /// https://w3c.github.io/webauthn/#dom-publickeycredentialuserentity-displayname
   final String? userDisplayName;
 
-  Credential(
-      {required this.credentialId,
-      required this.isResidentCredential,
-      this.rpId,
-      required this.privateKey,
-      this.userHandle,
-      required this.signCount,
-      this.largeBlob,
-      this.backupEligibility,
-      this.backupState,
-      this.userName,
-      this.userDisplayName});
+  Credential({
+    required this.credentialId,
+    required this.isResidentCredential,
+    this.rpId,
+    required this.privateKey,
+    this.userHandle,
+    required this.signCount,
+    this.largeBlob,
+    this.backupEligibility,
+    this.backupState,
+    this.userName,
+    this.userDisplayName,
+  });
 
   factory Credential.fromJson(Map<String, dynamic> json) {
     return Credential(
@@ -492,16 +534,18 @@ class Credential {
       signCount: json['signCount'] as int,
       largeBlob:
           json.containsKey('largeBlob') ? json['largeBlob'] as String : null,
-      backupEligibility: json.containsKey('backupEligibility')
-          ? json['backupEligibility'] as bool
-          : null,
+      backupEligibility:
+          json.containsKey('backupEligibility')
+              ? json['backupEligibility'] as bool
+              : null,
       backupState:
           json.containsKey('backupState') ? json['backupState'] as bool : null,
       userName:
           json.containsKey('userName') ? json['userName'] as String : null,
-      userDisplayName: json.containsKey('userDisplayName')
-          ? json['userDisplayName'] as String
-          : null,
+      userDisplayName:
+          json.containsKey('userDisplayName')
+              ? json['userDisplayName'] as String
+              : null,
     );
   }
 

@@ -133,16 +133,18 @@ class Puppeteer {
 
     var chromeArgs = <String>[];
     var defaultArguments = defaultArgs(
-        args: args,
-        userDataDir: userDataDir,
-        devTools: devTools,
-        headless: headless,
-        noSandboxFlag: noSandboxFlag);
+      args: args,
+      userDataDir: userDataDir,
+      devTools: devTools,
+      headless: headless,
+      noSandboxFlag: noSandboxFlag,
+    );
     if (ignoreDefaultArgs == null) {
       chromeArgs.addAll(defaultArguments);
     } else if (ignoreDefaultArgs is List) {
       chromeArgs.addAll(
-          defaultArguments.where((arg) => !ignoreDefaultArgs.contains(arg)));
+        defaultArguments.where((arg) => !ignoreDefaultArgs.contains(arg)),
+      );
     } else if (args != null) {
       chromeArgs.addAll(args);
     }
@@ -153,15 +155,18 @@ class Puppeteer {
 
     Directory? temporaryUserDataDir;
     if (!chromeArgs.any((a) => a.startsWith('--user-data-dir'))) {
-      temporaryUserDataDir =
-          await Directory.systemTemp.createTemp('puppeteer_dev_profile-');
+      temporaryUserDataDir = await Directory.systemTemp.createTemp(
+        'puppeteer_dev_profile-',
+      );
       chromeArgs.add('--user-data-dir=${temporaryUserDataDir.path}');
     }
 
     executablePath ??= await _inferExecutablePath();
 
-    var launchOptions =
-        LaunchOptions(args: chromeArgs, defaultViewport: defaultViewport);
+    var launchOptions = LaunchOptions(
+      args: chromeArgs,
+      defaultViewport: defaultViewport,
+    );
 
     var allPlugins = this.plugins.toList();
     if (plugins != null) {
@@ -172,8 +177,11 @@ class Puppeteer {
     }
 
     _logger.info('Start $executablePath with $chromeArgs');
-    var chromeProcess = await Process.start(executablePath, launchOptions.args,
-        environment: environment);
+    var chromeProcess = await Process.start(
+      executablePath,
+      launchOptions.args,
+      environment: environment,
+    );
 
     // ignore: unawaited_futures
     var chromeProcessExit = chromeProcess.exitCode.then((exitCode) {
@@ -188,21 +196,26 @@ class Puppeteer {
       }
     });
 
-    var webSocketUrl = await _waitForWebSocketUrl(chromeProcess)
-        .then<String?>((f) => f)
-        .timeout(timeout, onTimeout: () => null);
+    var webSocketUrl = await _waitForWebSocketUrl(
+      chromeProcess,
+    ).then<String?>((f) => f).timeout(timeout, onTimeout: () => null);
     if (webSocketUrl != null) {
       var connection = await Connection.create(webSocketUrl, delay: slowMo);
 
-      var browser = await createBrowser(chromeProcess, connection,
-          defaultViewport: launchOptions.computedDefaultViewport,
-          closeCallback: () async {
-        await BrowserApi(connection).close().catchError((error) async {
-          await _killChrome(chromeProcess);
-        });
+      var browser = await createBrowser(
+        chromeProcess,
+        connection,
+        defaultViewport: launchOptions.computedDefaultViewport,
+        closeCallback: () async {
+          await BrowserApi(connection).close().catchError((error) async {
+            await _killChrome(chromeProcess);
+          });
 
-        return chromeProcessExit;
-      }, ignoreHttpsErrors: ignoreHttpsErrors, plugins: allPlugins);
+          return chromeProcessExit;
+        },
+        ignoreHttpsErrors: ignoreHttpsErrors,
+        plugins: allPlugins,
+      );
 
       Future<Target>? initialWait;
       if (waitForInitialPage) {
@@ -238,24 +251,28 @@ class Puppeteer {
   ///     an 1280x1024 viewport.  `null` disables the default viewport.
   ///  - `slowMo`: Slows down Puppeteer operations by the specified amount of milliseconds.
   ///     Useful so that you can see what is going on.
-  Future<Browser> connect(
-      {String? browserWsEndpoint,
-      String? browserUrl,
-      DeviceViewport? defaultViewport = LaunchOptions.viewportNotSpecified,
-      bool? ignoreHttpsErrors,
-      Duration? slowMo,
-      List<Plugin>? plugins}) async {
+  Future<Browser> connect({
+    String? browserWsEndpoint,
+    String? browserUrl,
+    DeviceViewport? defaultViewport = LaunchOptions.viewportNotSpecified,
+    bool? ignoreHttpsErrors,
+    Duration? slowMo,
+    List<Plugin>? plugins,
+  }) async {
     assert(
-        (browserWsEndpoint != null || browserUrl != null) &&
-            browserWsEndpoint != browserUrl,
-        'Exactly one of browserWSEndpoint, browserURL or transport must be passed to puppeteer.connect');
+      (browserWsEndpoint != null || browserUrl != null) &&
+          browserWsEndpoint != browserUrl,
+      'Exactly one of browserWSEndpoint, browserURL or transport must be passed to puppeteer.connect',
+    );
 
     var allPlugins = this.plugins.toList();
     if (plugins != null) {
       allPlugins.addAll(plugins);
     }
-    var connectOptions =
-        LaunchOptions(args: null, defaultViewport: defaultViewport);
+    var connectOptions = LaunchOptions(
+      args: null,
+      defaultViewport: defaultViewport,
+    );
     for (var plugin in allPlugins) {
       connectOptions = await plugin.willLaunchBrowser(connectOptions);
     }
@@ -269,17 +286,21 @@ class Puppeteer {
     }
 
     var browserContextIds = await connection!.targetApi.getBrowserContexts();
-    var browser = await createBrowser(null, connection,
-        browserContextIds: browserContextIds,
-        ignoreHttpsErrors: ignoreHttpsErrors,
-        defaultViewport: connectOptions.computedDefaultViewport,
-        plugins: allPlugins, closeCallback: () async {
-      try {
-        await connection!.send('Browser.close');
-      } catch (e) {
-        // ignore
-      }
-    });
+    var browser = await createBrowser(
+      null,
+      connection,
+      browserContextIds: browserContextIds,
+      ignoreHttpsErrors: ignoreHttpsErrors,
+      defaultViewport: connectOptions.computedDefaultViewport,
+      plugins: allPlugins,
+      closeCallback: () async {
+        try {
+          await connection!.send('Browser.close');
+        } catch (e) {
+          // ignore
+        }
+      },
+    );
     await attachBrowser(browser);
     await browser.pages;
     return browser;
@@ -287,12 +308,13 @@ class Puppeteer {
 
   Devices get devices => devices_lib.devices;
 
-  List<String> defaultArgs(
-      {bool? devTools,
-      bool? headless,
-      List<String>? args,
-      String? userDataDir,
-      bool? noSandboxFlag}) {
+  List<String> defaultArgs({
+    bool? devTools,
+    bool? headless,
+    List<String>? args,
+    String? userDataDir,
+    bool? noSandboxFlag,
+  }) {
     devTools ??= false;
     headless ??= !devTools;
     // In docker environment we want to force the '--no-sandbox' flag automatically
@@ -306,7 +328,7 @@ class Puppeteer {
       if (devTools) '--auto-open-devtools-for-tabs',
       if (headless) ..._headlessArgs,
       if (args == null || args.every((a) => a.startsWith('-'))) 'about:blank',
-      ...?args
+      ...?args,
     ];
   }
 }
@@ -350,13 +372,16 @@ Future<String> _inferExecutablePath() async {
   if (executablePath != null) {
     var file = File(executablePath);
     if (!file.existsSync()) {
-      executablePath =
-          p.join(executablePath, getExecutablePath(BrowserPlatform.current));
+      executablePath = p.join(
+        executablePath,
+        getExecutablePath(BrowserPlatform.current),
+      );
       if (!File(executablePath).existsSync()) {
         throw Exception(
-            'The environment variable contains PUPPETEER_EXECUTABLE_PATH with '
-            'value (${Platform.environment['PUPPETEER_EXECUTABLE_PATH']}) but we cannot '
-            'find the Chrome executable');
+          'The environment variable contains PUPPETEER_EXECUTABLE_PATH with '
+          'value (${Platform.environment['PUPPETEER_EXECUTABLE_PATH']}) but we cannot '
+          'find the Chrome executable',
+        );
       }
     }
     return executablePath;
@@ -373,16 +398,19 @@ class LaunchOptions {
   final DeviceViewport? defaultViewport;
 
   LaunchOptions({required List<String>? args, required this.defaultViewport})
-      : args = args ?? [];
+    : args = args ?? [];
 
-  LaunchOptions replace(
-      {List<String>? args,
-      DeviceViewport? defaultViewport = viewportNotOverride}) {
+  LaunchOptions replace({
+    List<String>? args,
+    DeviceViewport? defaultViewport = viewportNotOverride,
+  }) {
     return LaunchOptions(
-        args: args ?? this.args,
-        defaultViewport: identical(defaultViewport, viewportNotOverride)
-            ? this.defaultViewport
-            : defaultViewport);
+      args: args ?? this.args,
+      defaultViewport:
+          identical(defaultViewport, viewportNotOverride)
+              ? this.defaultViewport
+              : defaultViewport,
+    );
   }
 
   DeviceViewport? get computedDefaultViewport =>

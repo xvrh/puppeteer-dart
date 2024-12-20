@@ -15,8 +15,12 @@ void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
 
-  await page.goto(p.url.join(
-      'http://${server.address.host}:${server.port}', 'html/keyboard.html'));
+  await page.goto(
+    p.url.join(
+      'http://${server.address.host}:${server.port}',
+      'html/keyboard.html',
+    ),
+  );
 
   var input = await page.$('input');
 

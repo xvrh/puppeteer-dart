@@ -4,17 +4,18 @@ import 'package:archive/archive.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 
-const _lastVersion = '131.0.6778.108';
+const _lastVersion = '131.0.6778.204';
 
 class DownloadedBrowserInfo {
   final String executablePath;
   final String folderPath;
   final String version;
 
-  DownloadedBrowserInfo(
-      {required this.executablePath,
-      required this.folderPath,
-      required this.version});
+  DownloadedBrowserInfo({
+    required this.executablePath,
+    required this.folderPath,
+    required this.version,
+  });
 }
 
 ///
@@ -69,9 +70,10 @@ Future<DownloadedBrowserInfo> downloadChrome({
   }
 
   return DownloadedBrowserInfo(
-      folderPath: revisionDirectory.path,
-      executablePath: executableFile.path,
-      version: version);
+    folderPath: revisionDirectory.path,
+    executablePath: executableFile.path,
+    version: version,
+  );
 }
 
 Future<void> _downloadFile(
@@ -85,11 +87,13 @@ Future<void> _downloadFile(
   final outputFile = File(output);
   var receivedBytes = 0;
 
-  await response.stream.map((s) {
-    receivedBytes += s.length;
-    onReceiveProgress?.call(receivedBytes, totalBytes);
-    return s;
-  }).pipe(outputFile.openWrite());
+  await response.stream
+      .map((s) {
+        receivedBytes += s.length;
+        onReceiveProgress?.call(receivedBytes, totalBytes);
+        return s;
+      })
+      .pipe(outputFile.openWrite());
 
   client.close();
   if (!outputFile.existsSync() || outputFile.lengthSync() == 0) {
@@ -144,15 +148,17 @@ String _downloadUrl(BrowserPlatform platform, String version) {
 String getExecutablePath(BrowserPlatform platform) {
   return switch (platform) {
     BrowserPlatform.macArm64 || BrowserPlatform.macX64 => p.join(
-        'chrome-${platform.folder}',
-        'Google Chrome for Testing.app',
-        'Contents',
-        'MacOS',
-        'Google Chrome for Testing'),
+      'chrome-${platform.folder}',
+      'Google Chrome for Testing.app',
+      'Contents',
+      'MacOS',
+      'Google Chrome for Testing',
+    ),
     BrowserPlatform.linux64 => p.join('chrome-${platform.folder}', 'chrome'),
-    BrowserPlatform.windows32 ||
-    BrowserPlatform.windows64 =>
-      p.join('chrome-${platform.folder}', 'chrome.exe'),
+    BrowserPlatform.windows32 || BrowserPlatform.windows64 => p.join(
+      'chrome-${platform.folder}',
+      'chrome.exe',
+    ),
   };
 }
 
@@ -161,8 +167,7 @@ enum BrowserPlatform {
   macX64._('macos_x64', 'mac-x64'),
   linux64._('linux_x64', 'linux64'),
   windows32._('windows_ia32', 'win32'),
-  windows64._('windows_x64', 'win64'),
-  ;
+  windows64._('windows_x64', 'win64');
 
   final String dartPlatform;
   final String folder;
@@ -173,15 +178,22 @@ enum BrowserPlatform {
     final split = versionStringFull.split('"');
     if (split.length < 2) {
       throw FormatException(
-          "Unknown version from Platform.version '$versionStringFull'.");
+        "Unknown version from Platform.version '$versionStringFull'.",
+      );
     }
     final versionString = split[1];
-    return values.firstWhere((e) => e.dartPlatform == versionString,
-        orElse: () => throw FormatException(
-            "Unknown '$versionString' from Platform.version"
-            " '$versionStringFull'."));
+    return values.firstWhere(
+      (e) => e.dartPlatform == versionString,
+      orElse:
+          () =>
+              throw FormatException(
+                "Unknown '$versionString' from Platform.version"
+                " '$versionStringFull'.",
+              ),
+    );
   }
 
-  static final BrowserPlatform current =
-      BrowserPlatform.fromDartPlatform(Platform.version);
+  static final BrowserPlatform current = BrowserPlatform.fromDartPlatform(
+    Platform.version,
+  );
 }

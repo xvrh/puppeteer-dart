@@ -27,7 +27,8 @@ void main() {
     await context.close();
   });
 
-  Future<Rectangle> getDimensions() => page.evaluate<Map<dynamic, dynamic>>('''
+  Future<Rectangle> getDimensions() => page
+      .evaluate<Map<dynamic, dynamic>>('''
 function dimensions() {
   const rect = document.querySelector('textarea').getBoundingClientRect();
   return {
@@ -37,12 +38,15 @@ function dimensions() {
     height: rect.height
   };
 }
-''').then((result) => Rectangle(
-        result['x'] as num,
-        result['y'] as num,
-        result['width'] as num,
-        result['height'] as num,
-      ));
+''')
+      .then(
+        (result) => Rectangle(
+          result['x'] as num,
+          result['y'] as num,
+          result['width'] as num,
+          result['height'] as num,
+        ),
+      );
 
   group('Mouse', () {
     test('should click the document', () async {
@@ -61,8 +65,9 @@ function dimensions() {
   });
 }''');
       await page.mouse.click(Point(50, 60));
-      var event = await page
-          .evaluate<Map<dynamic, dynamic>>('() => window.clickPromise');
+      var event = await page.evaluate<Map<dynamic, dynamic>>(
+        '() => window.clickPromise',
+      );
       expect(event['type'], 'click');
       expect(event['detail'], 1);
       expect(event['clientX'], 50);
@@ -74,11 +79,19 @@ function dimensions() {
       await page.goto('${server.prefix}/input/textarea.html');
       var dimensions = await getDimensions();
       var mouse = page.mouse;
-      await mouse.move(Point(dimensions.left + dimensions.width - 4,
-          dimensions.top + dimensions.height - 4));
+      await mouse.move(
+        Point(
+          dimensions.left + dimensions.width - 4,
+          dimensions.top + dimensions.height - 4,
+        ),
+      );
       await mouse.down();
-      await mouse.move(Point(dimensions.left + dimensions.width + 100,
-          dimensions.top + dimensions.height + 100));
+      await mouse.move(
+        Point(
+          dimensions.left + dimensions.width + 100,
+          dimensions.top + dimensions.height + 100,
+        ),
+      );
       await mouse.up();
       var newDimensions = await getDimensions();
       expect(newDimensions.width, (dimensions.width + 104).round());
@@ -92,60 +105,67 @@ function dimensions() {
       await page.keyboard.type(text);
       // Firefox needs an extra frame here after typing or it will fail to set the scrollTop
       await page.evaluate('() => new Promise(requestAnimationFrame)');
-      await page
-          .evaluate("() => document.querySelector('textarea').scrollTop = 0");
+      await page.evaluate(
+        "() => document.querySelector('textarea').scrollTop = 0",
+      );
       var dimensions = await getDimensions();
       await page.mouse.move(Point(dimensions.left + 2, dimensions.top + 2));
       await page.mouse.down();
       await page.mouse.move(Point(100, 100));
       await page.mouse.up();
-      expect(await page.evaluate('''() => {
+      expect(
+        await page.evaluate('''() => {
       var textarea = document.querySelector('textarea');
       return textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
-      }'''), text);
+      }'''),
+        text,
+      );
     });
     test('should trigger hover state', () async {
       await page.goto('${server.prefix}/input/scrollable.html');
       await page.hover('#button-6');
       expect(
-          await page
-              .evaluate("() => document.querySelector('button:hover').id"),
-          'button-6');
+        await page.evaluate("() => document.querySelector('button:hover').id"),
+        'button-6',
+      );
       await page.hover('#button-2');
       expect(
-          await page
-              .evaluate("() => document.querySelector('button:hover').id"),
-          'button-2');
+        await page.evaluate("() => document.querySelector('button:hover').id"),
+        'button-2',
+      );
       await page.hover('#button-91');
       expect(
-          await page
-              .evaluate("() => document.querySelector('button:hover').id"),
-          'button-91');
+        await page.evaluate("() => document.querySelector('button:hover').id"),
+        'button-91',
+      );
     });
     test('should trigger hover state with removed window.Node', () async {
       await page.goto('${server.prefix}/input/scrollable.html');
       await page.evaluate('() => delete window.Node');
       await page.hover('#button-6');
       expect(
-          await page
-              .evaluate("() => document.querySelector('button:hover').id"),
-          'button-6');
+        await page.evaluate("() => document.querySelector('button:hover').id"),
+        'button-6',
+      );
     });
     test('should set modifier keys on click', () async {
       await page.goto('${server.prefix}/input/scrollable.html');
       await page.evaluate(
-          "() => document.querySelector('#button-3').addEventListener('mousedown', e => window.lastEvent = e, true)");
+        "() => document.querySelector('#button-3').addEventListener('mousedown', e => window.lastEvent = e, true)",
+      );
       var modifiers = {
         Key.shift: 'shiftKey',
         Key.control: 'ctrlKey',
         Key.alt: 'altKey',
-        Key.meta: 'metaKey'
+        Key.meta: 'metaKey',
       };
       for (var modifier in modifiers.keys) {
         await page.keyboard.down(modifier);
         await page.click('#button-3');
-        if ((await page.evaluate('mod => window.lastEvent[mod]',
-                args: [modifiers[modifier]])) ==
+        if ((await page.evaluate(
+              'mod => window.lastEvent[mod]',
+              args: [modifiers[modifier]],
+            )) ==
             null) {
           throw Exception('${modifiers[modifier]} should be true');
         }
@@ -153,8 +173,10 @@ function dimensions() {
       }
       await page.click('#button-3');
       for (var modifier in modifiers.keys) {
-        if ((await page.evaluate('mod => window.lastEvent[mod]',
-                    args: [modifiers[modifier]]) ??
+        if ((await page.evaluate(
+                  'mod => window.lastEvent[mod]',
+                  args: [modifiers[modifier]],
+                ) ??
                 false) !=
             false) {
           throw Exception('${modifiers[modifier]} should be false');
@@ -168,9 +190,12 @@ function dimensions() {
       expect(boundingBoxBefore.width, 115);
       expect(boundingBoxBefore.height, 115);
 
-      await page.mouse.move(Point(
+      await page.mouse.move(
+        Point(
           boundingBoxBefore.left + boundingBoxBefore.width / 2,
-          boundingBoxBefore.top + boundingBoxBefore.height / 2));
+          boundingBoxBefore.top + boundingBoxBefore.height / 2,
+        ),
+      );
 
       await page.mouse.wheel(deltaY: -100);
       var boundingBoxAfter = (await elem.boundingBox)!;
@@ -187,22 +212,25 @@ function dimensions() {
     }''');
       await page.mouse.move(Point(200, 300), steps: 5);
       expect(
-          await page.evaluate('result'),
-          equals([
-            [120, 140],
-            [140, 180],
-            [160, 220],
-            [180, 260],
-            [200, 300]
-          ]));
+        await page.evaluate('result'),
+        equals([
+          [120, 140],
+          [140, 180],
+          [160, 220],
+          [180, 260],
+          [200, 300],
+        ]),
+      );
     });
-    test('should work with mobile viewports and cross process navigations',
-        () async {
-      await page.goto(server.emptyPage);
-      await page
-          .setViewport(DeviceViewport(width: 360, height: 640, isMobile: true));
-      await page.goto('${server.crossProcessPrefix}/mobile.html');
-      await page.evaluate('''() => {
+    test(
+      'should work with mobile viewports and cross process navigations',
+      () async {
+        await page.goto(server.emptyPage);
+        await page.setViewport(
+          DeviceViewport(width: 360, height: 640, isMobile: true),
+        );
+        await page.goto('${server.crossProcessPrefix}/mobile.html');
+        await page.evaluate('''() => {
       document.addEventListener('click', event => {
         window.result = {
           x: event.clientX, y: event.clientY
@@ -210,9 +238,10 @@ function dimensions() {
       });
     }''');
 
-      await page.mouse.click(Point(30, 40));
+        await page.mouse.click(Point(30, 40));
 
-      expect(await page.evaluate('result'), {'x': 30, 'y': 40});
-    });
+        expect(await page.evaluate('result'), {'x': 30, 'y': 40});
+      },
+    );
   });
 }

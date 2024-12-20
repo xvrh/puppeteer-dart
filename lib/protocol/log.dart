@@ -12,8 +12,11 @@ class LogApi {
   /// Issued when new message was logged.
   Stream<LogEntry> get onEntryAdded => _client.onEvent
       .where((event) => event.name == 'Log.entryAdded')
-      .map((event) =>
-          LogEntry.fromJson(event.parameters['entry'] as Map<String, dynamic>));
+      .map(
+        (event) => LogEntry.fromJson(
+          event.parameters['entry'] as Map<String, dynamic>,
+        ),
+      );
 
   /// Clears the log.
   Future<void> clear() async {
@@ -79,46 +82,55 @@ class LogEntry {
   /// Call arguments.
   final List<runtime.RemoteObject>? args;
 
-  LogEntry(
-      {required this.source,
-      required this.level,
-      required this.text,
-      this.category,
-      required this.timestamp,
-      this.url,
-      this.lineNumber,
-      this.stackTrace,
-      this.networkRequestId,
-      this.workerId,
-      this.args});
+  LogEntry({
+    required this.source,
+    required this.level,
+    required this.text,
+    this.category,
+    required this.timestamp,
+    this.url,
+    this.lineNumber,
+    this.stackTrace,
+    this.networkRequestId,
+    this.workerId,
+    this.args,
+  });
 
   factory LogEntry.fromJson(Map<String, dynamic> json) {
     return LogEntry(
       source: LogEntrySource.fromJson(json['source'] as String),
       level: LogEntryLevel.fromJson(json['level'] as String),
       text: json['text'] as String,
-      category: json.containsKey('category')
-          ? LogEntryCategory.fromJson(json['category'] as String)
-          : null,
+      category:
+          json.containsKey('category')
+              ? LogEntryCategory.fromJson(json['category'] as String)
+              : null,
       timestamp: runtime.Timestamp.fromJson(json['timestamp'] as num),
       url: json.containsKey('url') ? json['url'] as String : null,
       lineNumber:
           json.containsKey('lineNumber') ? json['lineNumber'] as int : null,
-      stackTrace: json.containsKey('stackTrace')
-          ? runtime.StackTraceData.fromJson(
-              json['stackTrace'] as Map<String, dynamic>)
-          : null,
-      networkRequestId: json.containsKey('networkRequestId')
-          ? network.RequestId.fromJson(json['networkRequestId'] as String)
-          : null,
+      stackTrace:
+          json.containsKey('stackTrace')
+              ? runtime.StackTraceData.fromJson(
+                json['stackTrace'] as Map<String, dynamic>,
+              )
+              : null,
+      networkRequestId:
+          json.containsKey('networkRequestId')
+              ? network.RequestId.fromJson(json['networkRequestId'] as String)
+              : null,
       workerId:
           json.containsKey('workerId') ? json['workerId'] as String : null,
-      args: json.containsKey('args')
-          ? (json['args'] as List)
-              .map((e) =>
-                  runtime.RemoteObject.fromJson(e as Map<String, dynamic>))
-              .toList()
-          : null,
+      args:
+          json.containsKey('args')
+              ? (json['args'] as List)
+                  .map(
+                    (e) => runtime.RemoteObject.fromJson(
+                      e as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList()
+              : null,
     );
   }
 
@@ -153,8 +165,7 @@ enum LogEntrySource {
   violation('violation'),
   intervention('intervention'),
   recommendation('recommendation'),
-  other('other'),
-  ;
+  other('other');
 
   final String value;
 
@@ -173,8 +184,7 @@ enum LogEntryLevel {
   verbose('verbose'),
   info('info'),
   warning('warning'),
-  error('error'),
-  ;
+  error('error');
 
   final String value;
 
@@ -190,8 +200,7 @@ enum LogEntryLevel {
 }
 
 enum LogEntryCategory {
-  cors('cors'),
-  ;
+  cors('cors');
 
   final String value;
 
@@ -224,10 +233,7 @@ class ViolationSetting {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'threshold': threshold,
-    };
+    return {'name': name, 'threshold': threshold};
   }
 }
 
@@ -238,8 +244,7 @@ enum ViolationSettingName {
   blockedParser('blockedParser'),
   discouragedApiUse('discouragedAPIUse'),
   handler('handler'),
-  recurringHandler('recurringHandler'),
-  ;
+  recurringHandler('recurringHandler');
 
   final String value;
 

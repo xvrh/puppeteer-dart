@@ -15,11 +15,7 @@ class CoverageEntry {
 
   CoverageEntry({required this.url, required this.text, required this.ranges});
 
-  Map<String, dynamic> toJson() => {
-        'url': url,
-        'ranges': ranges,
-        'text': text,
-      };
+  Map<String, dynamic> toJson() => {'url': url, 'ranges': ranges, 'text': text};
 
   @override
   String toString() => 'CoverageEntry(url: $url, ranges: $ranges, text: $text)';
@@ -55,8 +51,10 @@ class Range {
 ///
 /// ```dart
 /// // Enable both JavaScript and CSS coverage
-/// await Future.wait(
-///     [page.coverage.startJSCoverage(), page.coverage.startCSSCoverage()]);
+/// await Future.wait([
+///   page.coverage.startJSCoverage(),
+///   page.coverage.startCSSCoverage(),
+/// ]);
 /// // Navigate to page
 /// await page.goto('https://example.com');
 /// // Disable both JavaScript and CSS coverage
@@ -78,8 +76,8 @@ class Coverage {
   final CssCoverage _cssCoverage;
 
   Coverage(DevTools devTools)
-      : _jsCoverage = JsCoverage(devTools),
-        _cssCoverage = CssCoverage(devTools);
+    : _jsCoverage = JsCoverage(devTools),
+      _cssCoverage = CssCoverage(devTools);
 
   /// Parameters:
   ///   - `resetOnNavigation` Whether to reset coverage on every navigation.
@@ -93,11 +91,14 @@ class Coverage {
   /// These are scripts that are dynamically created on the page using `eval` or
   /// `new Function`. If `reportAnonymousScripts` is set to `true`, anonymous
   /// scripts will have `__puppeteer_evaluation_script__` as their URL.
-  Future<void> startJSCoverage(
-      {bool? resetOnNavigation, bool? reportAnonymousScripts}) {
+  Future<void> startJSCoverage({
+    bool? resetOnNavigation,
+    bool? reportAnonymousScripts,
+  }) {
     return _jsCoverage.start(
-        resetOnNavigation: resetOnNavigation,
-        reportAnonymousScripts: reportAnonymousScripts);
+      resetOnNavigation: resetOnNavigation,
+      reportAnonymousScripts: reportAnonymousScripts,
+    );
   }
 
   /// Returns a Future that resolves to the array of coverage reports for all scripts
@@ -148,8 +149,10 @@ class JsCoverage {
 
   JsCoverage(this._devTools);
 
-  Future<void> start(
-      {bool? resetOnNavigation, bool? reportAnonymousScripts}) async {
+  Future<void> start({
+    bool? resetOnNavigation,
+    bool? reportAnonymousScripts,
+  }) async {
     assert(!_enabled, 'JSCoverage is already enabled');
 
     resetOnNavigation ??= true;
@@ -162,8 +165,9 @@ class JsCoverage {
     _scriptSources.clear();
     _subscriptions = [
       _devTools.debugger.onScriptParsed.listen(_onScriptParsed),
-      _devTools.runtime.onExecutionContextsCleared
-          .listen(_onExecutionContextsCleared),
+      _devTools.runtime.onExecutionContextsCleared.listen(
+        _onExecutionContextsCleared,
+      ),
     ];
     await Future.wait([
       _devTools.profiler.enable(),
@@ -253,8 +257,9 @@ class CssCoverage {
     _stylesheetSources.clear();
     _subscriptions = [
       _devTools.css.onStyleSheetAdded.listen(_onStyleSheet),
-      _devTools.runtime.onExecutionContextsCleared
-          .listen(_onExecutionContextsCleared),
+      _devTools.runtime.onExecutionContextsCleared.listen(
+        _onExecutionContextsCleared,
+      ),
     ];
     await Future.wait([
       _devTools.dom.enable(),
@@ -286,10 +291,7 @@ class CssCoverage {
     assert(_enabled, 'CSSCoverage is not enabled');
     _enabled = false;
     var ruleTrackingResponse = await _devTools.css.stopRuleUsageTracking();
-    await Future.wait([
-      _devTools.css.disable(),
-      _devTools.dom.disable(),
-    ]);
+    await Future.wait([_devTools.css.disable(), _devTools.dom.disable()]);
     for (var sub in _subscriptions) {
       await sub.cancel();
     }
@@ -302,18 +304,22 @@ class CssCoverage {
         ranges = <CoverageRange>[];
         styleSheetIdToCoverage[entry.styleSheetId] = ranges;
       }
-      ranges.add(CoverageRange(
+      ranges.add(
+        CoverageRange(
           startOffset: entry.startOffset.toInt(),
           endOffset: entry.endOffset.toInt(),
-          count: entry.used ? 1 : 0));
+          count: entry.used ? 1 : 0,
+        ),
+      );
     }
 
     var coverage = <CoverageEntry>[];
     for (var styleSheetId in _stylesheetUrls.keys) {
       var url = _stylesheetUrls[styleSheetId]!;
       var text = _stylesheetSources[styleSheetId]!;
-      var ranges =
-          _convertToDisjointRanges(styleSheetIdToCoverage[styleSheetId] ?? []);
+      var ranges = _convertToDisjointRanges(
+        styleSheetIdToCoverage[styleSheetId] ?? [],
+      );
       coverage.add(CoverageEntry(url: url, text: text, ranges: ranges));
     }
 

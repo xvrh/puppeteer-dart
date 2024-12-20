@@ -14,12 +14,14 @@ void main() {
     var diff = readPng('test/golden/2diff.png');
     var output = Uint8List(img1.width * img2.height * 4);
 
-    var count = pixelMatch(img1.getBytes(order: ChannelOrder.rgba),
-        img2.getBytes(order: ChannelOrder.rgba),
-        width: img1.width,
-        height: img1.height,
-        output: output,
-        threshold: 0.05);
+    var count = pixelMatch(
+      img1.getBytes(order: ChannelOrder.rgba),
+      img2.getBytes(order: ChannelOrder.rgba),
+      width: img1.width,
+      height: img1.height,
+      output: output,
+      threshold: 0.05,
+    );
     expect(count, greaterThan(0));
 
     expect(diff.getBytes(order: ChannelOrder.rgba), output);

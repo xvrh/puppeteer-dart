@@ -36,15 +36,16 @@ class BrowserPath {
 
 List<String> _linuxPath(String folder) => ['/opt/google/$folder/chrome'];
 
-List<String> _macOsPath(String folder) =>
-    ['/Applications/$folder.app/Contents/MacOS/$folder'];
+List<String> _macOsPath(String folder) => [
+  '/Applications/$folder.app/Contents/MacOS/$folder',
+];
 
 List<String> _windowsPaths(String folder) {
   var paths = <String>[];
   for (var envName in const [
     'LOCALAPPDATA',
     'PROGRAMFILES',
-    'PROGRAMFILES(X86)'
+    'PROGRAMFILES(X86)',
   ]) {
     var env = Platform.environment[envName];
     if (env != null) {
@@ -60,8 +61,12 @@ class _BrowserPath {
   final List<String> linux;
   final List<String> macOS;
 
-  _BrowserPath(this.name,
-      {required this.windows, required this.linux, required this.macOS});
+  _BrowserPath(
+    this.name, {
+    required this.windows,
+    required this.linux,
+    required this.macOS,
+  });
 
   String forPlatform(BrowserPlatform platform) {
     var possiblePaths = switch (platform) {
@@ -76,7 +81,8 @@ class _BrowserPath {
       }
     }
     throw Exception(
-        'Chrome $name is not installed on the system ${Platform.operatingSystem}');
+      'Chrome $name is not installed on the system ${Platform.operatingSystem}',
+    );
   }
 
   String get forCurrentPlatform => forPlatform(BrowserPlatform.current);

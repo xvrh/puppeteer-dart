@@ -128,21 +128,27 @@ class Page {
   DeviceViewport? _viewport;
   final EmulationManager _emulationManager;
   late final Mouse _mouse = Mouse(devTools.input, _keyboard);
-  late final Touchscreen _touchscreen =
-      Touchscreen(devTools.runtime, devTools.input, _keyboard);
+  late final Touchscreen _touchscreen = Touchscreen(
+    devTools.runtime,
+    devTools.input,
+    _keyboard,
+  );
   late final Keyboard _keyboard = Keyboard(devTools.input);
   final _fileChooserInterceptors = <Completer<FileChooser>>{};
   bool _userDragInterceptionEnabled = false;
 
   Page._(this.target, this.devTools)
-      : _emulationManager = EmulationManager(devTools),
-        accessibility = Accessibility(devTools),
-        coverage = Coverage(devTools),
-        tracing = Tracing(devTools) {
-    target.targetManager
-        .addTargetInterceptor(devTools.client, _onAttachedToTarget);
-    var onTargetGoneSubscription =
-        target.targetManager.onTargetGone.listen(_onDetachedFromTarget);
+    : _emulationManager = EmulationManager(devTools),
+      accessibility = Accessibility(devTools),
+      coverage = Coverage(devTools),
+      tracing = Tracing(devTools) {
+    target.targetManager.addTargetInterceptor(
+      devTools.client,
+      _onAttachedToTarget,
+    );
+    var onTargetGoneSubscription = target.targetManager.onTargetGone.listen(
+      _onDetachedFromTarget,
+    );
 
     devTools.runtime.onBindingCalled.listen(_onBindingCalled);
     devTools.page.onJavascriptDialogOpening.listen(_onDialog);
@@ -152,8 +158,10 @@ class Page {
     devTools.log.onEntryAdded.listen(_onLogEntryAdded);
     devTools.page.onFileChooserOpened.listen(_onFileChooser);
     onClose.then((_) {
-      target.targetManager
-          .removeTargetInterceptor(devTools.client, _onAttachedToTarget);
+      target.targetManager.removeTargetInterceptor(
+        devTools.client,
+        _onAttachedToTarget,
+      );
       onTargetGoneSubscription.cancel();
       _dispose('Page.onClose completed');
     });
@@ -162,8 +170,11 @@ class Page {
     });
   }
 
-  static Future<Page> create(Target target, Session session,
-      {DeviceViewport? viewport}) async {
+  static Future<Page> create(
+    Target target,
+    Session session, {
+    DeviceViewport? viewport,
+  }) async {
     var devTools = DevTools(session);
     var page = Page._(target, devTools);
 
@@ -193,12 +204,17 @@ class Page {
   }
 
   Future<void> _onAttachedToTarget(
-      Target createdTarget, Target? parentTarget) async {
+    Target createdTarget,
+    Target? parentTarget,
+  ) async {
     var session = createdTarget.session;
     if (createdTarget.targetInfo.type == 'worker') {
-      var worker = Worker(session!, createdTarget.targetInfo.url,
-          onConsoleApiCalled: _addConsoleMessage,
-          onExceptionThrown: _handleException);
+      var worker = Worker(
+        session!,
+        createdTarget.targetInfo.url,
+        onConsoleApiCalled: _addConsoleMessage,
+        onExceptionThrown: _handleException,
+      );
       _workers[session.sessionId] = worker;
       _workerCreated.add(worker);
     }
@@ -382,8 +398,9 @@ class Page {
   /// Result:
   ///  - `title` The title passed to `console.timeStamp`.
   ///  - `metrics` Object containing the metrics.
-  Stream<MetricsEvent> get onMetrics => devTools.performance.onMetrics
-      .map((e) => MetricsEvent(e.title, Metrics.fromBrowser(e.metrics)));
+  Stream<MetricsEvent> get onMetrics => devTools.performance.onMetrics.map(
+    (e) => MetricsEvent(e.title, Metrics.fromBrowser(e.metrics)),
+  );
 
   FrameManager get frameManager => _frameManager;
 
@@ -437,14 +454,18 @@ class Page {
       return;
     }
     var context = frameManager.executionContextById(event.executionContextId);
-    var values = event.args
-        .map((arg) => JsHandle.fromRemoteObject(context, arg))
-        .toList();
+    var values =
+        event.args
+            .map((arg) => JsHandle.fromRemoteObject(context, arg))
+            .toList();
     _addConsoleMessage(event.type, values, event.stackTrace);
   }
 
-  void _addConsoleMessage(ConsoleAPICalledEventType type, List<JsHandle> args,
-      StackTraceData? stackTrace) {
+  void _addConsoleMessage(
+    ConsoleAPICalledEventType type,
+    List<JsHandle> args,
+    StackTraceData? stackTrace,
+  ) {
     if (!_onConsoleController.hasListener) {
       for (var arg in args) {
         arg.dispose();
@@ -468,9 +489,15 @@ class Page {
       lineNumber = stackTrace.callFrames[0].lineNumber;
       columnNumber = stackTrace.callFrames[0].columnNumber;
     }
-    var message = ConsoleMessage(ConsoleMessageType._fromEventType(type),
-        type.value, textTokens.join(' '), args,
-        url: url, lineNumber: lineNumber, columnNumber: columnNumber);
+    var message = ConsoleMessage(
+      ConsoleMessageType._fromEventType(type),
+      type.value,
+      textTokens.join(' '),
+      args,
+      url: url,
+      lineNumber: lineNumber,
+      columnNumber: columnNumber,
+    );
     _onConsoleController.add(message);
   }
 
@@ -479,13 +506,16 @@ class Page {
       event.args!.map((arg) => releaseObject(devTools.runtime, arg));
     }
     if (event.source != LogEntrySource.worker) {
-      _onConsoleController.add(ConsoleMessage(
+      _onConsoleController.add(
+        ConsoleMessage(
           ConsoleMessageType._fromLogLevel(event.level),
           event.level.value,
           event.text,
           [],
           url: event.url,
-          lineNumber: event.lineNumber));
+          lineNumber: event.lineNumber,
+        ),
+      );
     }
   }
 
@@ -571,8 +601,10 @@ class Page {
   /// [JSHandle] instances can be passed as arguments to the [Page.evaluateHandle]:
   /// ```dart
   /// var aHandle = await page.evaluateHandle('() => document.body');
-  /// var resultHandle =
-  ///     await page.evaluateHandle('body => body.innerHTML', args: [aHandle]);
+  /// var resultHandle = await page.evaluateHandle(
+  ///   'body => body.innerHTML',
+  ///   args: [aHandle],
+  /// );
   /// print(await resultHandle.jsonValue);
   /// await resultHandle.dispose();
   /// ```
@@ -586,8 +618,9 @@ class Page {
   /// returns: Future which resolves to the return value of `pageFunction` as
   /// in-page object (JSHandle)
   Future<T> evaluateHandle<T extends JsHandle>(
-      @Language('js') String pageFunction,
-      {List<dynamic>? args}) async {
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) async {
     var context = await mainFrame.executionContext;
     return context.evaluateHandle(pageFunction, args: args);
   }
@@ -629,17 +662,26 @@ class Page {
   ///
   /// Examples:
   /// ```dart
-  /// var searchValue =
-  ///     await page.$eval('#search', 'function (el) { return el.value; }');
+  /// var searchValue = await page.$eval(
+  ///   '#search',
+  ///   'function (el) { return el.value; }',
+  /// );
   /// var preloadHref = await page.$eval(
-  ///     'link[rel=preload]', 'function (el) { return el.href; }');
+  ///   'link[rel=preload]',
+  ///   'function (el) { return el.href; }',
+  /// );
   /// var html = await page.$eval(
-  ///     '.main-container', 'function (e) { return e.outerHTML; }');
+  ///   '.main-container',
+  ///   'function (e) { return e.outerHTML; }',
+  /// );
   /// ```
   ///
   /// Shortcut for [Page.mainFrame.$eval(selector, pageFunction)].
-  Future<T?> $eval<T>(String selector, @Language('js') String pageFunction,
-      {List<dynamic>? args}) {
+  Future<T?> $eval<T>(
+    String selector,
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) {
     return mainFrame.$eval<T>(selector, pageFunction, args: args);
   }
 
@@ -659,8 +701,11 @@ class Page {
   /// [pageFunction] Function to be evaluated in browser context
   /// [args] Arguments to pass to `pageFunction`
   /// Returns a [Future] which resolves to the return value of `pageFunction`
-  Future<T?> $$eval<T>(String selector, @Language('js') String pageFunction,
-      {List<dynamic>? args}) {
+  Future<T?> $$eval<T>(
+    String selector,
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) {
     return mainFrame.$$eval<T>(selector, pageFunction, args: args);
   }
 
@@ -690,37 +735,45 @@ class Page {
 
   Future<void> deleteCookie(String name, {String? domain, String? path}) async {
     var pageUrl = url!;
-    await devTools.network.deleteCookies(name,
-        url: pageUrl.startsWith('http') ? pageUrl : null,
-        domain: domain,
-        path: path);
+    await devTools.network.deleteCookies(
+      name,
+      url: pageUrl.startsWith('http') ? pageUrl : null,
+      domain: domain,
+      path: path,
+    );
   }
 
   Future<void> setCookies(List<CookieParam> cookies) async {
     var pageURL = url!;
     var startsWithHTTP = pageURL.startsWith('http');
-    var items = cookies.map((cookie) {
-      String? cookieUrl;
-      if (cookie.url == null && startsWithHTTP) {
-        cookieUrl = pageURL;
-      }
-      if (cookieUrl != null) {
-        assert(cookieUrl != 'about:blank',
-            'Blank page can not have cookie "${cookie.name}"');
-        assert(!cookieUrl.startsWith('data:'),
-            'Data URL page can not have cookie "${cookie.name}"');
-      }
-      return CookieParam(
-          name: cookie.name,
-          value: cookie.value,
-          url: cookieUrl,
-          domain: cookie.domain,
-          path: cookie.path,
-          secure: cookie.secure,
-          httpOnly: cookie.httpOnly,
-          sameSite: cookie.sameSite,
-          expires: cookie.expires);
-    }).toList();
+    var items =
+        cookies.map((cookie) {
+          String? cookieUrl;
+          if (cookie.url == null && startsWithHTTP) {
+            cookieUrl = pageURL;
+          }
+          if (cookieUrl != null) {
+            assert(
+              cookieUrl != 'about:blank',
+              'Blank page can not have cookie "${cookie.name}"',
+            );
+            assert(
+              !cookieUrl.startsWith('data:'),
+              'Data URL page can not have cookie "${cookie.name}"',
+            );
+          }
+          return CookieParam(
+            name: cookie.name,
+            value: cookie.value,
+            url: cookieUrl,
+            domain: cookie.domain,
+            path: cookie.path,
+            secure: cookie.secure,
+            httpOnly: cookie.httpOnly,
+            sameSite: cookie.sameSite,
+            expires: cookie.expires,
+          );
+        }).toList();
     for (var cookie in items) {
       await deleteCookie(cookie.name, domain: cookie.domain, path: cookie.path);
     }
@@ -737,17 +790,29 @@ class Page {
   ///
   /// > **NOTE** Consider using [BrowserContext.overridePermissions] to grant
   /// permissions for the page to read its geolocation.
-  Future<void> setGeolocation(
-      {required num latitude, required num longitude, num? accuracy}) async {
+  Future<void> setGeolocation({
+    required num latitude,
+    required num longitude,
+    num? accuracy,
+  }) async {
     accuracy ??= 0;
-    assert(longitude >= -180 && longitude <= 180,
-        'Invalid longitude "$longitude": precondition -180 <= LONGITUDE <= 180 failed.');
-    assert(latitude >= -90 && latitude <= 90,
-        'Invalid latitude "$latitude": precondition -90 <= LATITUDE <= 90 failed.');
-    assert(accuracy >= 0,
-        'Invalid accuracy "$accuracy": precondition 0 <= ACCURACY failed.');
+    assert(
+      longitude >= -180 && longitude <= 180,
+      'Invalid longitude "$longitude": precondition -180 <= LONGITUDE <= 180 failed.',
+    );
+    assert(
+      latitude >= -90 && latitude <= 90,
+      'Invalid latitude "$latitude": precondition -90 <= LATITUDE <= 90 failed.',
+    );
+    assert(
+      accuracy >= 0,
+      'Invalid accuracy "$accuracy": precondition 0 <= ACCURACY failed.',
+    );
     await devTools.emulation.setGeolocationOverride(
-        latitude: latitude, longitude: longitude, accuracy: accuracy);
+      latitude: latitude,
+      longitude: longitude,
+      accuracy: accuracy,
+    );
   }
 
   /// Adds a `<script>` tag into the page with the desired url or content.
@@ -764,10 +829,18 @@ class Page {
   ///
   /// Returns a [Future<ElementHandle>] which resolves to the added tag when the
   /// script's onload fires or when the script content was injected into frame.
-  Future<ElementHandle> addScriptTag(
-      {String? url, File? file, String? content, String? type}) {
+  Future<ElementHandle> addScriptTag({
+    String? url,
+    File? file,
+    String? content,
+    String? type,
+  }) {
     return mainFrame.addScriptTag(
-        url: url, file: file, content: content, type: type);
+      url: url,
+      file: file,
+      content: content,
+      type: type,
+    );
   }
 
   /// Adds a `<link rel="stylesheet">` tag into the page with the desired url or
@@ -782,14 +855,17 @@ class Page {
   ///
   /// Returns a [Future<ElementHandle>] which resolves to the added tag when the
   /// stylesheet's onload fires or when the CSS content was injected into frame.
-  Future<ElementHandle> addStyleTag(
-      {String? url, File? file, String? content}) {
+  Future<ElementHandle> addStyleTag({
+    String? url,
+    File? file,
+    String? content,
+  }) {
     return mainFrame.addStyleTag(url: url, file: file, content: content);
   }
 
   static final _addPageBinding =
-      //language=js
-      '''
+  //language=js
+  '''
 function addPageBinding(bindingName) {
   const binding = window[bindingName];
   window[bindingName] = (...args) => {
@@ -826,8 +902,10 @@ function addPageBinding(bindingName) {
   ///   var browser = await puppeteer.launch();
   ///   var page = await browser.newPage();
   ///   page.onConsole.listen((msg) => print(msg.text));
-  ///   await page.exposeFunction('md5',
-  ///       (String text) => crypto.md5.convert(utf8.encode(text)).toString());
+  ///   await page.exposeFunction(
+  ///     'md5',
+  ///     (String text) => crypto.md5.convert(utf8.encode(text)).toString(),
+  ///   );
   ///   await page.evaluate(r'''async () => {
   ///             // use window.md5 to compute hashes
   ///             const myString = 'PUPPETEER';
@@ -866,7 +944,8 @@ function addPageBinding(bindingName) {
   Future<void> exposeFunction(String name, Function callbackFunction) async {
     if (_pageBindings.containsKey(name)) {
       throw Exception(
-          'Failed to add page binding with name $name: window["$name"] already exists!');
+        'Failed to add page binding with name $name: window["$name"] already exists!',
+      );
     }
     _pageBindings[name] = callbackFunction;
 
@@ -874,7 +953,8 @@ function addPageBinding(bindingName) {
     await devTools.runtime.addBinding(name);
     await devTools.page.addScriptToEvaluateOnNewDocument(expression);
     await Future.wait(
-        frameManager.frames.map((frame) => frame.evaluate(expression)));
+      frameManager.frames.map((frame) => frame.evaluate(expression)),
+    );
   }
 
   /// Provide credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
@@ -882,7 +962,8 @@ function addPageBinding(bindingName) {
   /// To disable authentication, pass `null`.
   Future<void> authenticate({String? username, String? password}) {
     return _frameManager.networkManager.authenticate(
-        username == null ? null : Credentials(username, password));
+      username == null ? null : Credentials(username, password),
+    );
   }
 
   /// The extra HTTP headers will be sent with every request the page initiates.
@@ -940,12 +1021,18 @@ function addPageBinding(bindingName) {
       var result = await Function.apply(callback, args);
       expression = evaluationString(_deliverResult, [name, seq, result]);
     } catch (error, stackTrace) {
-      expression = evaluationString(
-          _deliverError, [name, seq, error.toString(), stackTrace.toString()]);
+      expression = evaluationString(_deliverError, [
+        name,
+        seq,
+        error.toString(),
+        stackTrace.toString(),
+      ]);
     }
     try {
-      await devTools.runtime
-          .evaluate(expression, contextId: event.executionContextId);
+      await devTools.runtime.evaluate(
+        expression,
+        contextId: event.executionContextId,
+      );
     } on TargetClosedException catch (_) {
       // It is possible to have a data race, so we don't care if we don't
       // receive the response here.
@@ -1040,10 +1127,18 @@ function deliverError(name, seq, message, stack) {
   /// Returns: [Future] which resolves to the main resource response. In case
   /// of multiple redirects, the navigation will resolve with the response of
   /// the last redirect.
-  Future<Response> goto(String url,
-      {String? referrer, Duration? timeout, Until? wait}) {
-    return mainFrame.goto(url,
-        referrer: referrer, timeout: timeout, wait: wait);
+  Future<Response> goto(
+    String url, {
+    String? referrer,
+    Duration? timeout,
+    Until? wait,
+  }) {
+    return mainFrame.goto(
+      url,
+      referrer: referrer,
+      timeout: timeout,
+      wait: wait,
+    );
   }
 
   /// Parameters:
@@ -1126,9 +1221,11 @@ function deliverError(name, seq, message, stack) {
   /// // You can achieve the same effect (and more powerful) with the `onRequest`
   /// // stream.
   /// var finalRequest = page.onRequest
-  ///     .where((request) =>
-  ///         request.url.startsWith('https://example.com') &&
-  ///         request.method == 'GET')
+  ///     .where(
+  ///       (request) =>
+  ///           request.url.startsWith('https://example.com') &&
+  ///           request.method == 'GET',
+  ///     )
   ///     .first
   ///     .timeout(Duration(seconds: 30));
   ///
@@ -1139,8 +1236,10 @@ function deliverError(name, seq, message, stack) {
     timeout ??= defaultTimeout ?? globalDefaultTimeout;
 
     return onRequest
-        .where((request) =>
-            path.url.normalize(request.url) == path.url.normalize(url))
+        .where(
+          (request) =>
+              path.url.normalize(request.url) == path.url.normalize(url),
+        )
         .first
         .timeout(timeout);
   }
@@ -1149,8 +1248,10 @@ function deliverError(name, seq, message, stack) {
     timeout ??= defaultTimeout ?? globalDefaultTimeout;
 
     return frameManager.networkManager.onResponse
-        .where((response) =>
-            path.url.normalize(response.url) == path.url.normalize(url))
+        .where(
+          (response) =>
+              path.url.normalize(response.url) == path.url.normalize(url),
+        )
         .first
         .timeout(timeout);
   }
@@ -1258,8 +1359,11 @@ function deliverError(name, seq, message, stack) {
   /// [devices.dart](https://github.com/xvrh/puppeteer-dart/blob/master/lib/src/devices.dart).
   Future<void> emulate(Device device) async {
     await setViewport(device.viewport);
-    await setUserAgent(device.userAgent(
-        (await devTools.browser.getVersion()).product.split('/').last));
+    await setUserAgent(
+      device.userAgent(
+        (await devTools.browser.getVersion()).product.split('/').last,
+      ),
+    );
   }
 
   bool get javascriptEnabled => _javascriptEnabled;
@@ -1288,8 +1392,10 @@ function deliverError(name, seq, message, stack) {
 
   @Deprecated('Use emulateMediaType(mediaType)')
   Future<void> emulateMedia(String? mediaType) {
-    assert(mediaType == 'screen' || mediaType == 'print' || mediaType == null,
-        'Unsupported media type: $mediaType');
+    assert(
+      mediaType == 'screen' || mediaType == 'print' || mediaType == null,
+      'Unsupported media type: $mediaType',
+    );
     mediaType ??= '';
     return devTools.emulation.setEmulatedMedia(media: mediaType);
   }
@@ -1320,13 +1426,16 @@ function deliverError(name, seq, message, stack) {
     if (features == null || features.isEmpty) {
       // We cannot use the generated client because sending null or omiting the
       // value has different signification
-      await devTools.client
-          .send('Emulation.setEmulatedMedia', {'features': null});
+      await devTools.client.send('Emulation.setEmulatedMedia', {
+        'features': null,
+      });
     } else {
       await devTools.emulation.setEmulatedMedia(
-          features: features
-              .map((f) => protocol.MediaFeature(name: f.name, value: f.value))
-              .toList());
+        features:
+            features
+                .map((f) => protocol.MediaFeature(name: f.name, value: f.value))
+                .toList(),
+      );
     }
   }
 
@@ -1367,9 +1476,12 @@ function deliverError(name, seq, message, stack) {
   ///
   /// Passing arguments to `pageFunction`:
   /// ```dart
-  /// var result = await page.evaluate<int>('''x => {
+  /// var result = await page.evaluate<int>(
+  ///   '''x => {
   ///           return Promise.resolve(8 * x);
-  ///         }''', args: [7]);
+  ///         }''',
+  ///   args: [7],
+  /// );
   /// print(result); // prints "56"
   /// ```
   ///
@@ -1394,8 +1506,10 @@ function deliverError(name, seq, message, stack) {
   /// - [pageFunction] Function to be evaluated in the page context
   /// - [args] Arguments to pass to `pageFunction`
   /// - Returns: Future which resolves to the return value of `pageFunction`
-  Future<T> evaluate<T>(@Language('js') String pageFunction,
-      {List<dynamic>? args}) {
+  Future<T> evaluate<T>(
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+  }) {
     return mainFrame.evaluate<T>(pageFunction, args: args);
   }
 
@@ -1430,8 +1544,10 @@ function deliverError(name, seq, message, stack) {
   /// Parameters:
   /// - [pageFunction] Function to be evaluated in browser context
   /// - [args] Arguments to pass to [pageFunction]
-  Future<void> evaluateOnNewDocument(String pageFunction,
-      {List<dynamic>? args}) async {
+  Future<void> evaluateOnNewDocument(
+    String pageFunction, {
+    List<dynamic>? args,
+  }) async {
     var source = evaluationString(pageFunction, args);
     await devTools.page.addScriptToEvaluateOnNewDocument(source);
   }
@@ -1463,22 +1579,26 @@ function deliverError(name, seq, message, stack) {
   ///
   /// > **NOTE** Screenshots take at least 1/6 second on OS X. See
   /// https://crbug.com/741689 for discussion.
-  Future<Uint8List> screenshot(
-      {ScreenshotFormat? format,
-      bool? fullPage,
-      Rectangle? clip,
-      int? quality,
-      bool? omitBackground,
-      bool? captureBeyondViewport,
-      bool? fromSurface}) async {
-    return base64Decode(await screenshotBase64(
+  Future<Uint8List> screenshot({
+    ScreenshotFormat? format,
+    bool? fullPage,
+    Rectangle? clip,
+    int? quality,
+    bool? omitBackground,
+    bool? captureBeyondViewport,
+    bool? fromSurface,
+  }) async {
+    return base64Decode(
+      await screenshotBase64(
         format: format,
         fullPage: fullPage,
         clip: clip,
         quality: quality,
         omitBackground: omitBackground,
         captureBeyondViewport: captureBeyondViewport,
-        fromSurface: fromSurface));
+        fromSurface: fromSurface,
+      ),
+    );
   }
 
   /// Parameters:
@@ -1502,22 +1622,25 @@ function deliverError(name, seq, message, stack) {
   ///
   /// > **NOTE** Screenshots take at least 1/6 second on OS X. See
   /// https://crbug.com/741689 for discussion.
-  Future<String> screenshotBase64(
-      {ScreenshotFormat? format,
-      bool? fullPage,
-      Rectangle? clip,
-      int? quality,
-      bool? omitBackground,
-      bool? captureBeyondViewport,
-      bool? fromSurface}) {
+  Future<String> screenshotBase64({
+    ScreenshotFormat? format,
+    bool? fullPage,
+    Rectangle? clip,
+    int? quality,
+    bool? omitBackground,
+    bool? captureBeyondViewport,
+    bool? fromSurface,
+  }) {
     final localFormat = format ?? ScreenshotFormat.png;
     final localFullPage = fullPage ?? false;
     captureBeyondViewport ??= true;
     fromSurface ??= true;
     omitBackground ??= false;
 
-    assert(quality == null || localFormat == ScreenshotFormat.jpeg,
-        'Quality is only supported for the jpeg screenshots');
+    assert(
+      quality == null || localFormat == ScreenshotFormat.jpeg,
+      'Quality is only supported for the jpeg screenshots',
+    );
     assert(clip == null || !localFullPage, 'clip and fullPage are exclusive');
 
     return screenshotPool(target.browser).withResource(() async {
@@ -1526,11 +1649,12 @@ function deliverError(name, seq, message, stack) {
       Viewport? roundedClip;
       if (clip != null) {
         roundedClip = Viewport(
-            x: clip.left.round(),
-            y: clip.top.round(),
-            width: (clip.width + clip.left - clip.left.round()).round(),
-            height: (clip.height + clip.top - clip.top.round()).round(),
-            scale: 1);
+          x: clip.left.round(),
+          y: clip.top.round(),
+          width: (clip.width + clip.left - clip.left.round()).round(),
+          height: (clip.height + clip.top - clip.top.round()).round(),
+          scale: 1,
+        );
       }
 
       if (localFullPage) {
@@ -1538,24 +1662,27 @@ function deliverError(name, seq, message, stack) {
 
         // Overwrite clip for full page
         roundedClip = Viewport(
-            x: 0,
-            y: 0,
-            width: metrics.cssContentSize.width.ceil(),
-            height: metrics.cssContentSize.height.ceil(),
-            scale: 1);
+          x: 0,
+          y: 0,
+          width: metrics.cssContentSize.width.ceil(),
+          height: metrics.cssContentSize.height.ceil(),
+          scale: 1,
+        );
       }
       var shouldSetDefaultBackground =
           omitBackground! && localFormat == ScreenshotFormat.png;
       if (shouldSetDefaultBackground) {
         await devTools.emulation.setDefaultBackgroundColorOverride(
-            color: RGBA(r: 0, g: 0, b: 0, a: 0));
+          color: RGBA(r: 0, g: 0, b: 0, a: 0),
+        );
       }
       var result = await devTools.page.captureScreenshot(
-          format: localFormat.name,
-          quality: quality,
-          clip: roundedClip,
-          captureBeyondViewport: captureBeyondViewport,
-          fromSurface: fromSurface);
+        format: localFormat.name,
+        quality: quality,
+        clip: roundedClip,
+        captureBeyondViewport: captureBeyondViewport,
+        fromSurface: fromSurface,
+      );
       if (shouldSetDefaultBackground) {
         await devTools.emulation.setDefaultBackgroundColorOverride();
       }
@@ -1616,18 +1743,19 @@ function deliverError(name, seq, message, stack) {
   /// limitations:
   /// > 1. Script tags inside templates are not evaluated.
   /// > 2. Page styles are not visible inside templates.
-  Future<Uint8List?> pdf(
-      {PaperFormat? format,
-      num? scale,
-      bool? displayHeaderFooter,
-      String? headerTemplate,
-      String? footerTemplate,
-      bool? printBackground,
-      bool? landscape,
-      String? pageRanges,
-      bool? preferCssPageSize,
-      PdfMargins? margins,
-      IOSink? output}) async {
+  Future<Uint8List?> pdf({
+    PaperFormat? format,
+    num? scale,
+    bool? displayHeaderFooter,
+    String? headerTemplate,
+    String? footerTemplate,
+    bool? printBackground,
+    bool? landscape,
+    String? pageRanges,
+    bool? preferCssPageSize,
+    PdfMargins? margins,
+    IOSink? output,
+  }) async {
     scale ??= 1;
     displayHeaderFooter ??= false;
     headerTemplate ??= '';
@@ -1640,21 +1768,22 @@ function deliverError(name, seq, message, stack) {
     margins ??= PdfMargins.zero;
 
     var result = await devTools.page.printToPDF(
-        transferMode: output == null ? 'ReturnAsBase64' : 'ReturnAsStream',
-        landscape: landscape,
-        displayHeaderFooter: displayHeaderFooter,
-        headerTemplate: headerTemplate,
-        footerTemplate: footerTemplate,
-        printBackground: printBackground,
-        scale: scale,
-        paperWidth: format.width,
-        paperHeight: format.height,
-        marginTop: margins.top,
-        marginBottom: margins.bottom,
-        marginLeft: margins.left,
-        marginRight: margins.right,
-        pageRanges: pageRanges,
-        preferCSSPageSize: preferCssPageSize);
+      transferMode: output == null ? 'ReturnAsBase64' : 'ReturnAsStream',
+      landscape: landscape,
+      displayHeaderFooter: displayHeaderFooter,
+      headerTemplate: headerTemplate,
+      footerTemplate: footerTemplate,
+      printBackground: printBackground,
+      scale: scale,
+      paperWidth: format.width,
+      paperHeight: format.height,
+      marginTop: margins.top,
+      marginBottom: margins.bottom,
+      marginLeft: margins.left,
+      marginRight: margins.right,
+      pageRanges: pageRanges,
+      preferCSSPageSize: preferCssPageSize,
+    );
 
     if (output == null) {
       return base64Decode(result.data);
@@ -1707,10 +1836,7 @@ function deliverError(name, seq, message, stack) {
   ///
   /// Or simpler, if you don't need the [Response]
   /// ```dart
-  /// await Future.wait([
-  ///   page.waitForNavigation(),
-  ///   page.click('a'),
-  /// ]);
+  /// await Future.wait([page.waitForNavigation(), page.click('a')]);
   /// ```
   ///
   /// Shortcut for [Page.mainFrame.click]
@@ -1724,10 +1850,18 @@ function deliverError(name, seq, message, stack) {
   /// [clickCount]: defaults to 1
   ///
   /// [delay]: Time to wait between `mousedown` and `mouseup`. Default to zero.
-  Future<void> click(String selector,
-      {Duration? delay, MouseButton? button, int? clickCount}) {
-    return mainFrame.click(selector,
-        delay: delay, button: button, clickCount: clickCount);
+  Future<void> click(
+    String selector, {
+    Duration? delay,
+    MouseButton? button,
+    int? clickCount,
+  }) {
+    return mainFrame.click(
+      selector,
+      delay: delay,
+      button: button,
+      clickCount: clickCount,
+    );
   }
 
   /// Convenience function to wait for navigation to complete after clicking on an element.
@@ -1742,13 +1876,13 @@ function deliverError(name, seq, message, stack) {
   /// as opposed to:
   ///
   /// ```dart
-  /// await Future.wait([
-  ///   page.waitForNavigation(),
-  ///   page.click('input#submitData'),
-  /// ]);
+  /// await Future.wait([page.waitForNavigation(), page.click('input#submitData')]);
   /// ```
-  Future<Response?> clickAndWaitForNavigation(String selector,
-      {Duration? timeout, Until? wait}) async {
+  Future<Response?> clickAndWaitForNavigation(
+    String selector, {
+    Duration? timeout,
+    Until? wait,
+  }) async {
     var navigationFuture = waitForNavigation(timeout: timeout, wait: wait);
     await click(selector);
     return await navigationFuture;
@@ -1793,8 +1927,11 @@ function deliverError(name, seq, message, stack) {
   ///
   /// ```dart
   /// await page.select('select#colors', ['blue']); // single selection
-  /// await page
-  ///     .select('select#colors', ['red', 'green', 'blue']); // multiple selections
+  /// await page.select('select#colors', [
+  ///   'red',
+  ///   'green',
+  ///   'blue',
+  /// ]); // multiple selections
   /// ```
   ///
   /// Shortcut for [Page.mainFrame.select]
@@ -1877,10 +2014,18 @@ function deliverError(name, seq, message, stack) {
   /// Returns a [Future] which resolves when element specified by selector string
   /// is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
   /// is not found in DOM.
-  Future<ElementHandle?> waitForSelector(String selector,
-      {bool? visible, bool? hidden, Duration? timeout}) {
-    return mainFrame.waitForSelector(selector,
-        visible: visible, hidden: hidden, timeout: timeout);
+  Future<ElementHandle?> waitForSelector(
+    String selector, {
+    bool? visible,
+    bool? hidden,
+    Duration? timeout,
+  }) {
+    return mainFrame.waitForSelector(
+      selector,
+      visible: visible,
+      hidden: hidden,
+      timeout: timeout,
+    );
   }
 
   /// Wait for the `xpath` to appear in page. If at the moment of calling
@@ -1919,10 +2064,18 @@ function deliverError(name, seq, message, stack) {
   /// Returns a [Future] which resolves when element specified by xpath string
   /// is added to DOM. Resolves to `null` if waiting for `hidden: true` and selector
   /// is not found in DOM.
-  Future<ElementHandle?> waitForXPath(String xpath,
-      {bool? visible, bool? hidden, Duration? timeout}) {
-    return mainFrame.waitForXPath(xpath,
-        visible: visible, hidden: hidden, timeout: timeout);
+  Future<ElementHandle?> waitForXPath(
+    String xpath, {
+    bool? visible,
+    bool? hidden,
+    Duration? timeout,
+  }) {
+    return mainFrame.waitForXPath(
+      xpath,
+      visible: visible,
+      hidden: hidden,
+      timeout: timeout,
+    );
   }
 
   /// Parameters:
@@ -1957,15 +2110,25 @@ function deliverError(name, seq, message, stack) {
   ///
   /// ```dart
   /// var selector = '.foo';
-  /// await page.waitForFunction('selector => !!document.querySelector(selector)',
-  ///     args: [selector]);
+  /// await page.waitForFunction(
+  ///   'selector => !!document.querySelector(selector)',
+  ///   args: [selector],
+  /// );
   /// ```
   ///
   /// Shortcut for [page.mainFrame().waitForFunction(pageFunction[, options[, ...args]])](#framewaitforfunctionpagefunction-options-args).
-  Future<JsHandle> waitForFunction(@Language('js') String pageFunction,
-      {List<dynamic>? args, Duration? timeout, Polling? polling}) {
-    return mainFrame.waitForFunction(pageFunction,
-        args: args, timeout: timeout, polling: polling);
+  Future<JsHandle> waitForFunction(
+    @Language('js') String pageFunction, {
+    List<dynamic>? args,
+    Duration? timeout,
+    Polling? polling,
+  }) {
+    return mainFrame.waitForFunction(
+      pageFunction,
+      args: args,
+      timeout: timeout,
+      polling: polling,
+    );
   }
 
   bool get hasPopupListener => _onPopupController.hasListener;
@@ -1984,8 +2147,15 @@ class ConsoleMessage {
   final String? url;
   final int? lineNumber, columnNumber;
 
-  ConsoleMessage(this.type, this.typeName, this.text, this.args,
-      {this.url, this.lineNumber, this.columnNumber});
+  ConsoleMessage(
+    this.type,
+    this.typeName,
+    this.text,
+    this.args, {
+    this.url,
+    this.lineNumber,
+    this.columnNumber,
+  });
 
   @override
   String toString() =>
@@ -2018,9 +2188,7 @@ class ConsoleMessageType {
   }
 
   factory ConsoleMessageType._fromLogLevel(LogEntryLevel level) {
-    return {
-          LogEntryLevel.verbose: ConsoleMessageType.debug,
-        }[level] ??
+    return {LogEntryLevel.verbose: ConsoleMessageType.debug}[level] ??
         values[level.value] ??
         other;
   }
@@ -2058,16 +2226,16 @@ class PaperFormat {
   const PaperFormat.inches({required this.width, required this.height});
 
   PaperFormat.px({required int width, required int height})
-      : width = _pxToInches(width),
-        height = _pxToInches(height);
+    : width = _pxToInches(width),
+      height = _pxToInches(height);
 
   PaperFormat.cm({required num width, required num height})
-      : width = _cmToInches(width),
-        height = _cmToInches(height);
+    : width = _cmToInches(width),
+      height = _cmToInches(height);
 
   PaperFormat.mm({required num width, required num height})
-      : width = _mmToInches(width),
-        height = _mmToInches(height);
+    : width = _mmToInches(width),
+      height = _mmToInches(height);
 
   @override
   String toString() => 'PaperFormat.inches(width: $width, height: $height)';
@@ -2085,10 +2253,10 @@ class PdfMargins {
   static final zero = PdfMargins.inches();
 
   PdfMargins.inches({num? top, num? bottom, num? left, num? right})
-      : top = top ?? 0,
-        bottom = bottom ?? 0,
-        left = left ?? 0,
-        right = right ?? 0;
+    : top = top ?? 0,
+      bottom = bottom ?? 0,
+      left = left ?? 0,
+      right = right ?? 0;
 
   factory PdfMargins.px({int? top, int? bottom, int? left, int? right}) {
     return PdfMargins.inches(
@@ -2128,9 +2296,7 @@ class ClientError implements Exception {
 
   ClientError(ExceptionDetails this.details) : message = _message(details);
 
-  ClientError.pageCrashed()
-      : message = 'Page crashed!',
-        details = null;
+  ClientError.pageCrashed() : message = 'Page crashed!', details = null;
 
   @override
   String toString() => 'Evaluation failed: $message';
@@ -2152,9 +2318,10 @@ class ClientError implements Exception {
         for (var callFrame in details.stackTrace!.callFrames) {
           var location =
               '${callFrame.url}:${callFrame.lineNumber}:${callFrame.columnNumber}';
-          var functionName = callFrame.functionName.isEmpty
-              ? '<anonymous>'
-              : callFrame.functionName;
+          var functionName =
+              callFrame.functionName.isEmpty
+                  ? '<anonymous>'
+                  : callFrame.functionName;
           message += '\n    at $functionName ($location)';
         }
       }
@@ -2190,7 +2357,7 @@ class FileChooser {
   bool _handled = false;
 
   FileChooser(this.devTools, this.element, FileChooserOpenedEvent event)
-      : isMultiple = event.mode != FileChooserOpenedEventMode.selectSingle;
+    : isMultiple = event.mode != FileChooserOpenedEventMode.selectSingle;
 
   /// Accept the file chooser request with given files.
   Future<void> accept(List<File> files) async {
