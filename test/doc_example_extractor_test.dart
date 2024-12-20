@@ -50,12 +50,18 @@ main() async {
     expect(
       snippets[8].code,
       equals(r'''
-var searchValue =
-    await frame.$eval('#search', 'function (el) { return el.value; }');
+var searchValue = await frame.$eval(
+  '#search',
+  'function (el) { return el.value; }',
+);
 var preloadHref = await frame.$eval(
-    'link[rel=preload]', 'function (el) { return el.href; }');
+  'link[rel=preload]',
+  'function (el) { return el.href; }',
+);
 var html = await frame.$eval(
-    '.main-container', 'function (e) { return e.outerHTML; }');'''),
+  '.main-container',
+  'function (e) { return e.outerHTML; }',
+);'''),
     );
   });
 
