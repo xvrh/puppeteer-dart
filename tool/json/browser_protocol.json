@@ -1017,11 +1017,11 @@
                         {
                             "name": "requestId",
                             "description": "The unique request id.",
+                            "optional": true,
                             "$ref": "Network.RequestId"
                         },
                         {
                             "name": "url",
-                            "optional": true,
                             "type": "string"
                         }
                     ]
@@ -1886,6 +1886,36 @@
                     ]
                 },
                 {
+                    "id": "SelectElementAccessibilityIssueReason",
+                    "type": "string",
+                    "enum": [
+                        "DisallowedSelectChild",
+                        "DisallowedOptGroupChild",
+                        "NonPhrasingContentOptionChild",
+                        "InteractiveContentOptionChild",
+                        "InteractiveContentLegendChild"
+                    ]
+                },
+                {
+                    "id": "SelectElementAccessibilityIssueDetails",
+                    "description": "This issue warns about errors in the select element content model.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "nodeId",
+                            "$ref": "DOM.BackendNodeId"
+                        },
+                        {
+                            "name": "selectElementAccessibilityIssueReason",
+                            "$ref": "SelectElementAccessibilityIssueReason"
+                        },
+                        {
+                            "name": "hasDisallowedAttributes",
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
                     "id": "StyleSheetLoadingIssueReason",
                     "type": "string",
                     "enum": [
@@ -1974,7 +2004,8 @@
                         "StylesheetLoadingIssue",
                         "FederatedAuthUserInfoRequestIssue",
                         "PropertyRuleIssue",
-                        "SharedDictionaryIssue"
+                        "SharedDictionaryIssue",
+                        "SelectElementAccessibilityIssue"
                     ]
                 },
                 {
@@ -2087,6 +2118,11 @@
                             "name": "sharedDictionaryIssueDetails",
                             "optional": true,
                             "$ref": "SharedDictionaryIssueDetails"
+                        },
+                        {
+                            "name": "selectElementAccessibilityIssueDetails",
+                            "optional": true,
+                            "$ref": "SelectElementAccessibilityIssueDetails"
                         }
                     ]
                 },
@@ -4797,6 +4833,29 @@
                             "type": "array",
                             "items": {
                                 "type": "string"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "getLonghandProperties",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "shorthandName",
+                            "type": "string"
+                        },
+                        {
+                            "name": "value",
+                            "type": "string"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "longhandProperties",
+                            "type": "array",
+                            "items": {
+                                "$ref": "CSSProperty"
                             }
                         }
                     ]
@@ -15273,6 +15332,28 @@
                             "$ref": "LoadNetworkResourcePageResult"
                         }
                     ]
+                },
+                {
+                    "name": "setCookieControls",
+                    "description": "Sets Controls for third-party cookie access\nPage reload is required before the new cookie bahavior will be observed",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "enableThirdPartyCookieRestriction",
+                            "description": "Whether 3pc restriction is enabled.",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "disableThirdPartyCookieMetadata",
+                            "description": "Whether 3pc grace period exception should be enabled; false by default.",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "disableThirdPartyCookieHeuristics",
+                            "description": "Whether 3pc heuristics exceptions should be enabled; false by default.",
+                            "type": "boolean"
+                        }
+                    ]
                 }
             ],
             "events": [
@@ -15994,7 +16075,8 @@
                                 "BadResponse",
                                 "InternalError",
                                 "UnknownError",
-                                "FulfilledLocally"
+                                "FulfilledLocally",
+                                "SiteIssuerLimit"
                             ]
                         },
                         {
@@ -21680,7 +21762,6 @@
                     "description": "Enum of possible storage types.",
                     "type": "string",
                     "enum": [
-                        "appcache",
                         "cookies",
                         "file_systems",
                         "indexeddb",
@@ -23967,6 +24048,20 @@
                             "name": "url",
                             "description": "The initial URL the page will be navigated to. An empty string indicates about:blank.",
                             "type": "string"
+                        },
+                        {
+                            "name": "left",
+                            "description": "Frame left origin in DIP (headless chrome only).",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "top",
+                            "description": "Frame top origin in DIP (headless chrome only).",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "integer"
                         },
                         {
                             "name": "width",
