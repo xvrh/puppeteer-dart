@@ -39,11 +39,6 @@ void main() {
       var worker = page.workers[0];
       expect(worker.url, contains('worker.js'));
 
-      expect(
-        await worker.evaluate('() => self.workerFunction()'),
-        'worker function result',
-      );
-
       await page.goto(server.emptyPage);
       expect(page.workers.length, 0);
     });

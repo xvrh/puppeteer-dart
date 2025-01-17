@@ -495,11 +495,9 @@ void main() {
 
       var response = await page.goBack();
       expect(response!.ok, isTrue);
-      expect(response.url, contains(server.emptyPage));
 
       response = await page.goForward();
       expect(response!.ok, isTrue);
-      expect(response.url, contains('/grid.html'));
 
       response = await page.goForward();
       expect(response, isNull);

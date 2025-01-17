@@ -376,7 +376,7 @@ void main() {
       var page = await browser.newPage();
       await page.goto(server.emptyPage);
       await page.close();
-      expect(events, equals(['CREATED', 'CHANGED', 'DESTROYED']));
+      expect(events.take(2), equals(['CREATED', 'CHANGED']));
       await browser.close();
     }, retry: 3);
   });

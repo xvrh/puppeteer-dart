@@ -25,7 +25,7 @@ void main() async {
   await listenFor('app-ready');
 
   await page.goto(
-    'https://pub.dev/documentation/puppeteer/latest/',
+    'https://pub.dev/documentation/puppeteer/latest',
     wait: Until.networkIdle,
   );
 

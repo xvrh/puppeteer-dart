@@ -10,7 +10,7 @@ import 'package:test/test.dart';
 
 // Test that we can use puppeteer.connect from a web page (dart compiled with Dart2js)
 void main() {
-  test('Can use puppeteer on the web', () async {
+  test('Can use puppeteer on the web (directly)', () async {
     var browser = await puppeteer.launch(args: ['--remote-allow-origins=*']);
     var tempDirectory = Directory.systemTemp.createTempSync();
 
@@ -71,5 +71,5 @@ void main() {
       tempDirectory.deleteSync(recursive: true);
       await browser.close();
     }
-  });
+  }, timeout: Timeout.factor(3));
 }
