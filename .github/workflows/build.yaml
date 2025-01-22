@@ -9,7 +9,7 @@ jobs:
     name: Run tests ${{matrix.sdk}} on ${{matrix.os}}
     strategy:
       matrix:
-        os: [ubuntu-22.04, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         sdk: ['stable']
     runs-on: ${{ matrix.os }}
     steps:
@@ -17,9 +17,12 @@ jobs:
         with:
           sdk: ${{ matrix.sdk }}
       - uses: actions/checkout@v4
+      - name: Disable AppArmor
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
       - run: dart --version
       - run: dart pub get
-#      - run: dart analyze --fatal-infos .
+      - run: dart analyze --fatal-infos .
       - run: dart example/download_chrome.dart
       - run: xvfb-run --auto-servernum dart test -P ci --platform vm
         if: runner.os == 'Linux'
