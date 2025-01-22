@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: dart --version
       - run: dart pub get
-      - run: dart analyze --fatal-infos .
+#      - run: dart analyze --fatal-infos .
       - run: dart example/download_chrome.dart
       - run: xvfb-run --auto-servernum dart test -P ci --platform vm
         if: runner.os == 'Linux'

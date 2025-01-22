@@ -355,9 +355,14 @@ Future<int> _killChrome(Process process) {
 final _devToolRegExp = RegExp(r'^DevTools listening on (ws://.*)$');
 
 Future<String> _waitForWebSocketUrl(Process chromeProcess) async {
+  chromeProcess.stdout.transform(Utf8Decoder())
+      .transform(LineSplitter()).listen((l) {
+        print("Stdout: $l");
+  });
   await for (String line in chromeProcess.stderr
       .transform(Utf8Decoder())
       .transform(LineSplitter())) {
+    print("Stderr: $line");
     _logger.warning('[Chrome stderr]: $line');
     var match = _devToolRegExp.firstMatch(line);
     if (match != null) {
