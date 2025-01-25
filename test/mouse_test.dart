@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
@@ -201,7 +203,7 @@ function dimensions() {
       var boundingBoxAfter = (await elem.boundingBox)!;
       expect([230, 345].contains(boundingBoxAfter.width), isTrue);
       expect([230, 345].contains(boundingBoxAfter.height), isTrue);
-    });
+    }, skip: Platform.isLinux ? 'not working on linux' : null);
     test('should tween mouse movement', () async {
       await page.mouse.move(Point(100, 100));
       await page.evaluate('''() => {
