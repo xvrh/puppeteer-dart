@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:puppeteer/puppeteer.dart';
 import 'package:test/test.dart';
 import 'utils/utils.dart';
@@ -185,25 +184,29 @@ function dimensions() {
         }
       }
     });
-    test('should send mouse wheel events', () async {
-      await page.goto('${server.prefix}/input/wheel.html');
-      var elem = await page.$('div');
-      var boundingBoxBefore = (await elem.boundingBox)!;
-      expect(boundingBoxBefore.width, 115);
-      expect(boundingBoxBefore.height, 115);
+    test(
+      'should send mouse wheel events',
+      () async {
+        await page.goto('${server.prefix}/input/wheel.html');
+        var elem = await page.$('div');
+        var boundingBoxBefore = (await elem.boundingBox)!;
+        expect(boundingBoxBefore.width, 115);
+        expect(boundingBoxBefore.height, 115);
 
-      await page.mouse.move(
-        Point(
-          boundingBoxBefore.left + boundingBoxBefore.width / 2,
-          boundingBoxBefore.top + boundingBoxBefore.height / 2,
-        ),
-      );
+        await page.mouse.move(
+          Point(
+            boundingBoxBefore.left + boundingBoxBefore.width / 2,
+            boundingBoxBefore.top + boundingBoxBefore.height / 2,
+          ),
+        );
 
-      await page.mouse.wheel(deltaY: -100);
-      var boundingBoxAfter = (await elem.boundingBox)!;
-      expect([230, 345].contains(boundingBoxAfter.width), isTrue);
-      expect([230, 345].contains(boundingBoxAfter.height), isTrue);
-    }, skip: Platform.isLinux ? 'not working on linux' : null);
+        await page.mouse.wheel(deltaY: -100);
+        var boundingBoxAfter = (await elem.boundingBox)!;
+        expect([230, 345].contains(boundingBoxAfter.width), isTrue);
+        expect([230, 345].contains(boundingBoxAfter.height), isTrue);
+      },
+      skip: Platform.isLinux ? 'not working on linux' : null,
+    );
     test('should tween mouse movement', () async {
       await page.mouse.move(Point(100, 100));
       await page.evaluate('''() => {
