@@ -20,10 +20,10 @@ void main() {
   });
 
   group('Browser.version', () {
-    test('should return whether we are in headless', () async {
+    test('should return a version string', () async {
       var version = await browser.version;
       expect(version.length, greaterThan(0));
-      expect(version.startsWith('Headless'), isTrue);
+      expect(version, startsWith('Chrome/'));
     });
   });
 

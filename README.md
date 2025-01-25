@@ -51,7 +51,10 @@ void main() async {
   var myPage = await browser.newPage();
 
   // Go to a page and wait to be fully loaded
-  await myPage.goto('https://dart.dev', wait: Until.networkIdle);
+  await myPage.goto(
+    'https://pub.dev/documentation/puppeteer/latest',
+    wait: Until.networkIdle,
+  );
 
   // Do something... See other examples
   await myPage.screenshot();
@@ -73,7 +76,10 @@ void main() async {
   // Start the browser and go to a web page
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
-  await page.goto('https://dart.dev', wait: Until.networkAlmostIdle);
+  await page.goto(
+    'https://pub.dev/documentation/puppeteer/latest/',
+    wait: Until.networkAlmostIdle,
+  );
 
   // For this example, we force the "screen" media-type because sometime
   // CSS rules with "@media print" can change the look of the page.
@@ -104,7 +110,10 @@ void main() async {
   // Setup the dimensions and user-agent of a particular phone
   await page.emulate(puppeteer.devices.pixel2XL);
 
-  await page.goto('https://dart.dev', wait: Until.networkIdle);
+  await page.goto(
+    'https://pub.dev/documentation/puppeteer/latest',
+    wait: Until.networkIdle,
+  );
 
   // Take a screenshot of the page
   var screenshot = await page.screenshot();
@@ -192,7 +201,7 @@ import 'package:puppeteer/puppeteer.dart';
 void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
-  await page.goto('https://w3c.github.io/');
+  await page.goto('https://pub.dev/documentation/puppeteer/latest/');
 
   // Either use the helper to get the content
   var pageContent = await page.content;

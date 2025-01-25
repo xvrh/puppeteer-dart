@@ -10,7 +10,7 @@ void main() async {
   await page.emulate(puppeteer.devices.pixel2XL);
 
   await page.goto(
-    'https://pub.dev/packages/puppeteer',
+    'https://pub.dev/documentation/puppeteer/latest',
     wait: Until.networkIdle,
   );
 

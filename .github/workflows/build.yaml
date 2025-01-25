@@ -17,16 +17,23 @@ jobs:
         with:
           sdk: ${{ matrix.sdk }}
       - uses: actions/checkout@v4
+      - name: Disable AppArmor
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
       - run: dart --version
       - run: dart pub get
       - run: dart analyze --fatal-infos .
       - run: dart example/download_chrome.dart
       - run: xvfb-run --auto-servernum dart test -P ci --platform vm
         if: runner.os == 'Linux'
-      - run: dart test -P ci --platform vm --concurrency 1
-        if: runner.os != 'Linux'
         env:
           PUPPETEER_SKIP_GOLDEN_COMPARISON: 'true'
+      - run: dart test -P ci --platform vm
+        if: runner.os == 'Windows'
+        env:
+          PUPPETEER_SKIP_GOLDEN_COMPARISON: 'true'
+      - run: dart test -P ci --platform vm
+        if: runner.os == 'macOS'
       - run: dart tool/prepare_submit.dart
       - name: "check for uncommitted changes"
         run: |

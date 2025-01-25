@@ -17,7 +17,7 @@ environment:
   sdk: '^3.3.0'
 
 dependencies:
-  archive: ^3.0.0
+  archive: ^4.0.0
   async: ^2.5.0
   collection: ^1.15.0
   http: '>=0.13.0 <2.0.0'

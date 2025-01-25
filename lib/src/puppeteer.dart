@@ -58,7 +58,7 @@ final _defaultArgs = <String>[
 ];
 
 final List<String> _headlessArgs = [
-  '--headless=old',
+  '--headless=new',
   '--hide-scrollbars',
   '--mute-audio',
 ];
@@ -355,16 +355,18 @@ Future<int> _killChrome(Process process) {
 final _devToolRegExp = RegExp(r'^DevTools listening on (ws://.*)$');
 
 Future<String> _waitForWebSocketUrl(Process chromeProcess) async {
+  var accumulatedLines = <String>[];
   await for (String line in chromeProcess.stderr
       .transform(Utf8Decoder())
       .transform(LineSplitter())) {
+    accumulatedLines.add(line);
     _logger.warning('[Chrome stderr]: $line');
     var match = _devToolRegExp.firstMatch(line);
     if (match != null) {
       return match.group(1)!;
     }
   }
-  throw Exception('Websocket url not found');
+  throw Exception('Websocket url not found.\n${accumulatedLines.join('\n')}');
 }
 
 Future<String> _inferExecutablePath() async {

@@ -4,7 +4,7 @@ void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
   await page.goto(
-    'https://pub.dev/packages/puppeteer',
+    'https://pub.dev/documentation/puppeteer/latest',
     wait: Until.networkIdle,
   );
 
