@@ -26,10 +26,14 @@ jobs:
       - run: dart example/download_chrome.dart
       - run: xvfb-run --auto-servernum dart test -P ci --platform vm
         if: runner.os == 'Linux'
-      - run: dart test -P ci --platform vm --concurrency 1
-        if: runner.os != 'Linux'
         env:
           PUPPETEER_SKIP_GOLDEN_COMPARISON: 'true'
+      - run: dart test -P ci --platform vm
+        if: runner.os == 'Windows'
+        env:
+          PUPPETEER_SKIP_GOLDEN_COMPARISON: 'true'
+      - run: dart test -P ci --platform vm
+        if: runner.os == 'macOS'
       - run: dart tool/prepare_submit.dart
       - name: "check for uncommitted changes"
         run: |

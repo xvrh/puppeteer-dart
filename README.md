@@ -201,7 +201,7 @@ import 'package:puppeteer/puppeteer.dart';
 void main() async {
   var browser = await puppeteer.launch();
   var page = await browser.newPage();
-  await page.goto('https://w3c.github.io/');
+  await page.goto('https://pub.dev/documentation/puppeteer/latest/');
 
   // Either use the helper to get the content
   var pageContent = await page.content;
