@@ -17,7 +17,6 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Disable AppArmor
-        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
       - uses: dart-lang/setup-dart@v1
         with:
