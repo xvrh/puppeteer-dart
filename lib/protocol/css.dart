@@ -54,6 +54,10 @@ class CSSApi {
             StyleSheetId.fromJson(event.parameters['styleSheetId'] as String),
       );
 
+  Stream<dom.NodeId> get onComputedStyleUpdated => _client.onEvent
+      .where((event) => event.name == 'CSS.computedStyleUpdated')
+      .map((event) => dom.NodeId.fromJson(event.parameters['nodeId'] as int));
+
   /// Inserts a new rule with the given `ruleText` in a stylesheet with given `styleSheetId`, at the
   /// position specified by `location`.
   /// [styleSheetId] The css style sheet identifier where a new rule should be inserted.
@@ -222,6 +226,18 @@ class CSSApi {
     return (result['ranges'] as List)
         .map((e) => SourceRange.fromJson(e as Map<String, dynamic>))
         .toList();
+  }
+
+  /// Starts tracking the given node for the computed style updates
+  /// and whenever the computed style is updated for node, it queues
+  /// a `computedStyleUpdated` event with throttling.
+  /// There can only be 1 node tracked for computed style updates
+  /// so passing a new node id removes tracking from the previous node.
+  /// Pass `undefined` to disable tracking.
+  Future<void> trackComputedStyleUpdatesForNode({dom.NodeId? nodeId}) async {
+    await _client.send('CSS.trackComputedStyleUpdatesForNode', {
+      if (nodeId != null) 'nodeId': nodeId,
+    });
   }
 
   /// Starts tracking the given computed styles for updates. The specified array of properties
@@ -1099,6 +1115,10 @@ class CSSRule {
   /// The array keeps the types of ancestor CSSRules from the innermost going outwards.
   final List<CSSRuleType>? ruleTypes;
 
+  /// @starting-style CSS at-rule array.
+  /// The array enumerates @starting-style at-rules starting with the innermost one, going outwards.
+  final List<CSSStartingStyle>? startingStyles;
+
   CSSRule({
     this.styleSheetId,
     required this.selectorList,
@@ -1111,6 +1131,7 @@ class CSSRule {
     this.layers,
     this.scopes,
     this.ruleTypes,
+    this.startingStyles,
   });
 
   factory CSSRule.fromJson(Map<String, dynamic> json) {
@@ -1169,6 +1190,14 @@ class CSSRule {
                   .map((e) => CSSRuleType.fromJson(e as String))
                   .toList()
               : null,
+      startingStyles:
+          json.containsKey('startingStyles')
+              ? (json['startingStyles'] as List)
+                  .map(
+                    (e) => CSSStartingStyle.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList()
+              : null,
     );
   }
 
@@ -1188,6 +1217,8 @@ class CSSRule {
       if (scopes != null) 'scopes': scopes!.map((e) => e.toJson()).toList(),
       if (ruleTypes != null)
         'ruleTypes': ruleTypes!.map((e) => e.toJson()).toList(),
+      if (startingStyles != null)
+        'startingStyles': startingStyles!.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -1200,7 +1231,8 @@ enum CSSRuleType {
   containerRule('ContainerRule'),
   layerRule('LayerRule'),
   scopeRule('ScopeRule'),
-  styleRule('StyleRule');
+  styleRule('StyleRule'),
+  startingStyleRule('StartingStyleRule');
 
   final String value;
 
@@ -1679,6 +1711,9 @@ class CSSContainerQuery {
   /// Optional logical axes queried for the container.
   final dom.LogicalAxes? logicalAxes;
 
+  /// true if the query contains scroll-state() queries.
+  final bool? queriesScrollState;
+
   CSSContainerQuery({
     required this.text,
     this.range,
@@ -1686,6 +1721,7 @@ class CSSContainerQuery {
     this.name,
     this.physicalAxes,
     this.logicalAxes,
+    this.queriesScrollState,
   });
 
   factory CSSContainerQuery.fromJson(Map<String, dynamic> json) {
@@ -1708,6 +1744,10 @@ class CSSContainerQuery {
           json.containsKey('logicalAxes')
               ? dom.LogicalAxes.fromJson(json['logicalAxes'] as String)
               : null,
+      queriesScrollState:
+          json.containsKey('queriesScrollState')
+              ? json['queriesScrollState'] as bool
+              : null,
     );
   }
 
@@ -1719,6 +1759,7 @@ class CSSContainerQuery {
       if (name != null) 'name': name,
       if (physicalAxes != null) 'physicalAxes': physicalAxes!.toJson(),
       if (logicalAxes != null) 'logicalAxes': logicalAxes!.toJson(),
+      if (queriesScrollState != null) 'queriesScrollState': queriesScrollState,
     };
   }
 }
@@ -1838,6 +1879,38 @@ class CSSLayer {
   Map<String, dynamic> toJson() {
     return {
       'text': text,
+      if (range != null) 'range': range!.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
+    };
+  }
+}
+
+/// CSS Starting Style at-rule descriptor.
+class CSSStartingStyle {
+  /// The associated rule header range in the enclosing stylesheet (if
+  /// available).
+  final SourceRange? range;
+
+  /// Identifier of the stylesheet containing this object (if exists).
+  final StyleSheetId? styleSheetId;
+
+  CSSStartingStyle({this.range, this.styleSheetId});
+
+  factory CSSStartingStyle.fromJson(Map<String, dynamic> json) {
+    return CSSStartingStyle(
+      range:
+          json.containsKey('range')
+              ? SourceRange.fromJson(json['range'] as Map<String, dynamic>)
+              : null,
+      styleSheetId:
+          json.containsKey('styleSheetId')
+              ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+              : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
       if (range != null) 'range': range!.toJson(),
       if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
     };

@@ -125,7 +125,8 @@ class PageApi {
       .where((event) => event.name == 'Page.javascriptDialogOpening')
       .map((event) => JavascriptDialogOpeningEvent.fromJson(event.parameters));
 
-  /// Fired for top level page lifecycle events such as navigation, load, paint, etc.
+  /// Fired for lifecycle events (navigation, load, paint, etc) in the current
+  /// target (including local frames).
   Stream<LifecycleEventEvent> get onLifecycleEvent => _client.onEvent
       .where((event) => event.name == 'Page.lifecycleEvent')
       .map((event) => LifecycleEventEvent.fromJson(event.parameters));
@@ -1735,6 +1736,7 @@ enum PermissionsPolicyFeature {
   encryptedMedia('encrypted-media'),
   executionWhileOutOfViewport('execution-while-out-of-viewport'),
   executionWhileNotRendered('execution-while-not-rendered'),
+  fencedUnpartitionedStorageRead('fenced-unpartitioned-storage-read'),
   focusWithoutUserActivation('focus-without-user-activation'),
   fullscreen('fullscreen'),
   frobulate('frobulate'),

@@ -352,6 +352,8 @@ class GetResponseBodyResult {
 }
 
 /// Unique request identifier.
+/// Note that this does not identify individual HTTP requests that are part of
+/// a network request.
 extension type RequestId(String value) {
   factory RequestId.fromJson(String value) => RequestId(value);
 

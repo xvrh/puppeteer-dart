@@ -347,7 +347,8 @@ enum ContextType {
 enum ContextState {
   suspended('suspended'),
   running('running'),
-  closed('closed');
+  closed('closed'),
+  interrupted('interrupted');
 
   final String value;
 
