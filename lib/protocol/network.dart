@@ -1850,7 +1850,9 @@ extension type LoaderId(String value) {
   String toJson() => value;
 }
 
-/// Unique request identifier.
+/// Unique network request identifier.
+/// Note that this does not identify individual HTTP requests that are part of
+/// a network request.
 extension type RequestId(String value) {
   factory RequestId.fromJson(String value) => RequestId(value);
 
@@ -3239,6 +3241,7 @@ class Initiator {
   final InitiatorType type;
 
   /// Initiator JavaScript stack trace, set for Script only.
+  /// Requires the Debugger domain to be enabled.
   final runtime.StackTraceData? stack;
 
   /// Initiator URL, set for Parser type or for Script type (when script is importing module) or for SignedExchange type.
@@ -3528,7 +3531,9 @@ enum CookieBlockedReason {
     'SchemefulSameSiteUnspecifiedTreatedAsLax',
   ),
   samePartyFromCrossPartyContext('SamePartyFromCrossPartyContext'),
-  nameValuePairExceedsMaxSize('NameValuePairExceedsMaxSize');
+  nameValuePairExceedsMaxSize('NameValuePairExceedsMaxSize'),
+  portMismatch('PortMismatch'),
+  schemeMismatch('SchemeMismatch');
 
   final String value;
 
