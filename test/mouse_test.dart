@@ -27,7 +27,8 @@ void main() {
     await context.close();
   });
 
-  Future<Rectangle> getDimensions() => page.evaluate<Map<dynamic, dynamic>>('''
+  Future<Rectangle> getDimensions() => page
+      .evaluate<Map<dynamic, dynamic>>('''
 function dimensions() {
   const rect = document.querySelector('textarea').getBoundingClientRect();
   return {
@@ -37,7 +38,8 @@ function dimensions() {
     height: rect.height
   };
 }
-''').then(
+''')
+      .then(
         (result) => Rectangle(
           result['x'] as num,
           result['y'] as num,
