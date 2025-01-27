@@ -1707,6 +1707,8 @@ class AttributionReportingSourceRegistration {
 
   final AttributionScopesData? scopesData;
 
+  final int maxEventLevelReports;
+
   AttributionReportingSourceRegistration({
     required this.time,
     required this.expiry,
@@ -1725,6 +1727,7 @@ class AttributionReportingSourceRegistration {
     required this.destinationLimitPriority,
     required this.aggregatableDebugReportingConfig,
     this.scopesData,
+    required this.maxEventLevelReports,
   });
 
   factory AttributionReportingSourceRegistration.fromJson(
@@ -1785,6 +1788,7 @@ class AttributionReportingSourceRegistration {
                 json['scopesData'] as Map<String, dynamic>,
               )
               : null,
+      maxEventLevelReports: json['maxEventLevelReports'] as int,
     );
   }
 
@@ -1806,6 +1810,7 @@ class AttributionReportingSourceRegistration {
       'destinationLimitPriority': destinationLimitPriority.toJson(),
       'aggregatableDebugReportingConfig':
           aggregatableDebugReportingConfig.toJson(),
+      'maxEventLevelReports': maxEventLevelReports,
       if (debugKey != null) 'debugKey': debugKey!.toJson(),
       if (scopesData != null) 'scopesData': scopesData!.toJson(),
     };
@@ -2225,6 +2230,7 @@ enum AttributionReportingAggregatableResult {
   excessiveReportingOrigins('excessiveReportingOrigins'),
   noHistograms('noHistograms'),
   insufficientBudget('insufficientBudget'),
+  insufficientNamedBudget('insufficientNamedBudget'),
   noMatchingSourceFilterData('noMatchingSourceFilterData'),
   notRegistered('notRegistered'),
   prohibitedByBrowserPolicy('prohibitedByBrowserPolicy'),

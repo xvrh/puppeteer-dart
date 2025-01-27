@@ -1820,7 +1820,8 @@
                         "ReplacedByActiveMode",
                         "InvalidFieldsSpecified",
                         "RelyingPartyOriginIsOpaque",
-                        "TypeNotMatching"
+                        "TypeNotMatching",
+                        "UiDismissedNoEmbargo"
                     ]
                 },
                 {
@@ -9127,136 +9128,6 @@
             ]
         },
         {
-            "domain": "Database",
-            "experimental": true,
-            "types": [
-                {
-                    "id": "DatabaseId",
-                    "description": "Unique identifier of Database object.",
-                    "type": "string"
-                },
-                {
-                    "id": "Database",
-                    "description": "Database object.",
-                    "type": "object",
-                    "properties": [
-                        {
-                            "name": "id",
-                            "description": "Database ID.",
-                            "$ref": "DatabaseId"
-                        },
-                        {
-                            "name": "domain",
-                            "description": "Database domain.",
-                            "type": "string"
-                        },
-                        {
-                            "name": "name",
-                            "description": "Database name.",
-                            "type": "string"
-                        },
-                        {
-                            "name": "version",
-                            "description": "Database version.",
-                            "type": "string"
-                        }
-                    ]
-                },
-                {
-                    "id": "Error",
-                    "description": "Database error.",
-                    "type": "object",
-                    "properties": [
-                        {
-                            "name": "message",
-                            "description": "Error message.",
-                            "type": "string"
-                        },
-                        {
-                            "name": "code",
-                            "description": "Error code.",
-                            "type": "integer"
-                        }
-                    ]
-                }
-            ],
-            "commands": [
-                {
-                    "name": "disable",
-                    "description": "Disables database tracking, prevents database events from being sent to the client."
-                },
-                {
-                    "name": "enable",
-                    "description": "Enables database tracking, database events will now be delivered to the client."
-                },
-                {
-                    "name": "executeSQL",
-                    "parameters": [
-                        {
-                            "name": "databaseId",
-                            "$ref": "DatabaseId"
-                        },
-                        {
-                            "name": "query",
-                            "type": "string"
-                        }
-                    ],
-                    "returns": [
-                        {
-                            "name": "columnNames",
-                            "optional": true,
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        {
-                            "name": "values",
-                            "optional": true,
-                            "type": "array",
-                            "items": {
-                                "type": "any"
-                            }
-                        },
-                        {
-                            "name": "sqlError",
-                            "optional": true,
-                            "$ref": "Error"
-                        }
-                    ]
-                },
-                {
-                    "name": "getDatabaseTableNames",
-                    "parameters": [
-                        {
-                            "name": "databaseId",
-                            "$ref": "DatabaseId"
-                        }
-                    ],
-                    "returns": [
-                        {
-                            "name": "tableNames",
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    ]
-                }
-            ],
-            "events": [
-                {
-                    "name": "addDatabase",
-                    "parameters": [
-                        {
-                            "name": "database",
-                            "$ref": "Database"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "domain": "DeviceOrientation",
             "experimental": true,
             "commands": [
@@ -13825,7 +13696,8 @@
                         "EnterprisePolicy",
                         "StorageAccess",
                         "TopLevelStorageAccess",
-                        "Scheme"
+                        "Scheme",
+                        "SameSiteNoneCookiesInSandbox"
                     ]
                 },
                 {
@@ -17508,6 +17380,7 @@
                         "ch-ua",
                         "ch-ua-arch",
                         "ch-ua-bitness",
+                        "ch-ua-high-entropy-values",
                         "ch-ua-platform",
                         "ch-ua-model",
                         "ch-ua-mobile",
@@ -23191,6 +23064,36 @@
                             }
                         }
                     ]
+                },
+                {
+                    "name": "getAffectedUrlsForThirdPartyCookieMetadata",
+                    "description": "Returns the list of URLs from a page and its embedded resources that match\nexisting grace period URL pattern rules.\nhttps://developers.google.com/privacy-sandbox/cookies/temporary-exceptions/grace-period",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "firstPartyUrl",
+                            "description": "The URL of the page currently being visited.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "thirdPartyUrls",
+                            "description": "The list of embedded resource URLs from the page.",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "matchedUrls",
+                            "description": "Array of matching URLs. If there is a primary pattern match for the first-\nparty URL, only the first-party URL is returned in the array.",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ]
                 }
             ],
             "events": [
@@ -23899,6 +23802,18 @@
                             "type": "integer"
                         }
                     ]
+                },
+                {
+                    "id": "WindowState",
+                    "description": "The state of the target window.",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "normal",
+                        "minimized",
+                        "maximized",
+                        "fullscreen"
+                    ]
                 }
             ],
             "commands": [
@@ -24051,29 +23966,35 @@
                         },
                         {
                             "name": "left",
-                            "description": "Frame left origin in DIP (headless chrome only).",
+                            "description": "Frame left origin in DIP (requires newWindow to be true or headless shell).",
                             "experimental": true,
                             "optional": true,
                             "type": "integer"
                         },
                         {
                             "name": "top",
-                            "description": "Frame top origin in DIP (headless chrome only).",
+                            "description": "Frame top origin in DIP (requires newWindow to be true or headless shell).",
                             "experimental": true,
                             "optional": true,
                             "type": "integer"
                         },
                         {
                             "name": "width",
-                            "description": "Frame width in DIP (headless chrome only).",
+                            "description": "Frame width in DIP (requires newWindow to be true or headless shell).",
                             "optional": true,
                             "type": "integer"
                         },
                         {
                             "name": "height",
-                            "description": "Frame height in DIP (headless chrome only).",
+                            "description": "Frame height in DIP (requires newWindow to be true or headless shell).",
                             "optional": true,
                             "type": "integer"
+                        },
+                        {
+                            "name": "windowState",
+                            "description": "Frame window state (requires newWindow to be true or headless shell).\nDefault is normal.",
+                            "optional": true,
+                            "$ref": "WindowState"
                         },
                         {
                             "name": "browserContextId",
@@ -24084,20 +24005,20 @@
                         },
                         {
                             "name": "enableBeginFrameControl",
-                            "description": "Whether BeginFrames for this target will be controlled via DevTools (headless chrome only,\nnot supported on MacOS yet, false by default).",
+                            "description": "Whether BeginFrames for this target will be controlled via DevTools (headless shell only,\nnot supported on MacOS yet, false by default).",
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
                         },
                         {
                             "name": "newWindow",
-                            "description": "Whether to create a new Window or Tab (chrome-only, false by default).",
+                            "description": "Whether to create a new Window or Tab (false by default, not supported by headless shell).",
                             "optional": true,
                             "type": "boolean"
                         },
                         {
                             "name": "background",
-                            "description": "Whether to create the target in background or foreground (chrome-only,\nfalse by default).",
+                            "description": "Whether to create the target in background or foreground (false by default, not supported\nby headless shell).",
                             "optional": true,
                             "type": "boolean"
                         },

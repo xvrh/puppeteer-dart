@@ -175,7 +175,9 @@ enum CookieExclusionReason {
   excludeThirdPartyCookieBlockedInFirstPartySet(
     'ExcludeThirdPartyCookieBlockedInFirstPartySet',
   ),
-  excludeThirdPartyPhaseout('ExcludeThirdPartyPhaseout');
+  excludeThirdPartyPhaseout('ExcludeThirdPartyPhaseout'),
+  excludePortMismatch('ExcludePortMismatch'),
+  excludeSchemeMismatch('ExcludeSchemeMismatch');
 
   final String value;
 
