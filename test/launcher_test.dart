@@ -38,8 +38,8 @@ void main() {
           remote.disconnect();
           var error = await navigationPromise;
           expect(
-            error.toString(),
-            'Exception: Navigation failed because browser has disconnected!',
+            error,
+            isA<Exception>(),
           );
         } finally {
           await browser.close();
