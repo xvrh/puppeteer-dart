@@ -741,21 +741,24 @@ class DOMApi {
   }
 
   /// Returns the query container of the given node based on container query
-  /// conditions: containerName, physical, and logical axes. If no axes are
-  /// provided, the style container is returned, which is the direct parent or the
-  /// closest element with a matching container-name.
+  /// conditions: containerName, physical and logical axes, and whether it queries
+  /// scroll-state. If no axes are provided and queriesScrollState is false, the
+  /// style container is returned, which is the direct parent or the closest
+  /// element with a matching container-name.
   /// Returns: The container node for the given node, or null if not found.
   Future<NodeId> getContainerForNode(
     NodeId nodeId, {
     String? containerName,
     PhysicalAxes? physicalAxes,
     LogicalAxes? logicalAxes,
+    bool? queriesScrollState,
   }) async {
     var result = await _client.send('DOM.getContainerForNode', {
       'nodeId': nodeId,
       if (containerName != null) 'containerName': containerName,
       if (physicalAxes != null) 'physicalAxes': physicalAxes,
       if (logicalAxes != null) 'logicalAxes': logicalAxes,
+      if (queriesScrollState != null) 'queriesScrollState': queriesScrollState,
     });
     return NodeId.fromJson(result['nodeId'] as int);
   }
@@ -1173,8 +1176,10 @@ class BackendNode {
 enum PseudoType {
   firstLine('first-line'),
   firstLetter('first-letter'),
+  check('check'),
   before('before'),
   after('after'),
+  selectArrow('select-arrow'),
   marker('marker'),
   backdrop('backdrop'),
   column('column'),
@@ -1205,8 +1210,6 @@ enum PseudoType {
   placeholder('placeholder'),
   fileSelectorButton('file-selector-button'),
   detailsContent('details-content'),
-  selectFallbackButton('select-fallback-button'),
-  selectFallbackButtonText('select-fallback-button-text'),
   picker('picker');
 
   final String value;
