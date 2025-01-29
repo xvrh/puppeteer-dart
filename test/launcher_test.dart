@@ -37,10 +37,7 @@ void main() {
           await server.waitForRequest('/one-style.css');
           remote.disconnect();
           var error = await navigationPromise;
-          expect(
-            error,
-            isA<Exception>(),
-          );
+          expect(error, isA<Exception>());
         } finally {
           await browser.close();
         }
