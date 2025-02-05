@@ -127,21 +127,27 @@ class AffectedCookie {
 /// Information about a request that is affected by an inspector issue.
 class AffectedRequest {
   /// The unique request id.
-  final network.RequestId requestId;
+  final network.RequestId? requestId;
 
-  final String? url;
+  final String url;
 
-  AffectedRequest({required this.requestId, this.url});
+  AffectedRequest({this.requestId, required this.url});
 
   factory AffectedRequest.fromJson(Map<String, dynamic> json) {
     return AffectedRequest(
-      requestId: network.RequestId.fromJson(json['requestId'] as String),
-      url: json.containsKey('url') ? json['url'] as String : null,
+      requestId:
+          json.containsKey('requestId')
+              ? network.RequestId.fromJson(json['requestId'] as String)
+              : null,
+      url: json['url'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'requestId': requestId.toJson(), if (url != null) 'url': url};
+    return {
+      'url': url,
+      if (requestId != null) 'requestId': requestId!.toJson(),
+    };
   }
 }
 
@@ -246,6 +252,52 @@ enum CookieOperation {
   String toString() => value.toString();
 }
 
+/// Represents the category of insight that a cookie issue falls under.
+enum InsightType {
+  gitHubResource('GitHubResource'),
+  gracePeriod('GracePeriod'),
+  heuristics('Heuristics');
+
+  final String value;
+
+  const InsightType(this.value);
+
+  factory InsightType.fromJson(String value) =>
+      InsightType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Information about the suggested solution to a cookie issue.
+class CookieIssueInsight {
+  final InsightType type;
+
+  /// Link to table entry in third-party cookie migration readiness list.
+  final String? tableEntryUrl;
+
+  CookieIssueInsight({required this.type, this.tableEntryUrl});
+
+  factory CookieIssueInsight.fromJson(Map<String, dynamic> json) {
+    return CookieIssueInsight(
+      type: InsightType.fromJson(json['type'] as String),
+      tableEntryUrl:
+          json.containsKey('tableEntryUrl')
+              ? json['tableEntryUrl'] as String
+              : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type.toJson(),
+      if (tableEntryUrl != null) 'tableEntryUrl': tableEntryUrl,
+    };
+  }
+}
+
 /// This information is currently necessary, as the front-end has a difficult
 /// time finding a specific cookie. With this, we can convey specific error
 /// information without the cookie.
@@ -272,6 +324,9 @@ class CookieIssueDetails {
 
   final AffectedRequest? request;
 
+  /// The recommended solution to the issue.
+  final CookieIssueInsight? insight;
+
   CookieIssueDetails({
     this.cookie,
     this.rawCookieLine,
@@ -281,6 +336,7 @@ class CookieIssueDetails {
     this.siteForCookies,
     this.cookieUrl,
     this.request,
+    this.insight,
   });
 
   factory CookieIssueDetails.fromJson(Map<String, dynamic> json) {
@@ -314,6 +370,12 @@ class CookieIssueDetails {
                 json['request'] as Map<String, dynamic>,
               )
               : null,
+      insight:
+          json.containsKey('insight')
+              ? CookieIssueInsight.fromJson(
+                json['insight'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 
@@ -329,6 +391,7 @@ class CookieIssueDetails {
       if (siteForCookies != null) 'siteForCookies': siteForCookies,
       if (cookieUrl != null) 'cookieUrl': cookieUrl,
       if (request != null) 'request': request!.toJson(),
+      if (insight != null) 'insight': insight!.toJson(),
     };
   }
 }
@@ -482,7 +545,8 @@ enum BlockedByResponseReason {
   corpNotSameOriginAfterDefaultedToSameOriginByCoepAndDip(
     'CorpNotSameOriginAfterDefaultedToSameOriginByCoepAndDip',
   ),
-  corpNotSameSite('CorpNotSameSite');
+  corpNotSameSite('CorpNotSameSite'),
+  sriMessageSignatureMismatch('SRIMessageSignatureMismatch');
 
   final String value;
 
@@ -1583,6 +1647,67 @@ class FailedRequestInfo {
   }
 }
 
+enum SelectElementAccessibilityIssueReason {
+  disallowedSelectChild('DisallowedSelectChild'),
+  disallowedOptGroupChild('DisallowedOptGroupChild'),
+  nonPhrasingContentOptionChild('NonPhrasingContentOptionChild'),
+  interactiveContentOptionChild('InteractiveContentOptionChild'),
+  interactiveContentLegendChild('InteractiveContentLegendChild');
+
+  final String value;
+
+  const SelectElementAccessibilityIssueReason(this.value);
+
+  factory SelectElementAccessibilityIssueReason.fromJson(String value) =>
+      SelectElementAccessibilityIssueReason.values.firstWhere(
+        (e) => e.value == value,
+      );
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// This isue warns about errors in the select element content model.
+class SelectElementAccessibilityIssueDetails {
+  final dom.BackendNodeId nodeId;
+
+  final SelectElementAccessibilityIssueReason
+  selectElementAccessibilityIssueReason;
+
+  final bool hasDisallowedAttributes;
+
+  SelectElementAccessibilityIssueDetails({
+    required this.nodeId,
+    required this.selectElementAccessibilityIssueReason,
+    required this.hasDisallowedAttributes,
+  });
+
+  factory SelectElementAccessibilityIssueDetails.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return SelectElementAccessibilityIssueDetails(
+      nodeId: dom.BackendNodeId.fromJson(json['nodeId'] as int),
+      selectElementAccessibilityIssueReason:
+          SelectElementAccessibilityIssueReason.fromJson(
+            json['selectElementAccessibilityIssueReason'] as String,
+          ),
+      hasDisallowedAttributes:
+          json['hasDisallowedAttributes'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'nodeId': nodeId.toJson(),
+      'selectElementAccessibilityIssueReason':
+          selectElementAccessibilityIssueReason.toJson(),
+      'hasDisallowedAttributes': hasDisallowedAttributes,
+    };
+  }
+}
+
 enum StyleSheetLoadingIssueReason {
   lateImportRule('LateImportRule'),
   requestFailed('RequestFailed');
@@ -1729,7 +1854,8 @@ enum InspectorIssueCode {
   stylesheetLoadingIssue('StylesheetLoadingIssue'),
   federatedAuthUserInfoRequestIssue('FederatedAuthUserInfoRequestIssue'),
   propertyRuleIssue('PropertyRuleIssue'),
-  sharedDictionaryIssue('SharedDictionaryIssue');
+  sharedDictionaryIssue('SharedDictionaryIssue'),
+  selectElementAccessibilityIssue('SelectElementAccessibilityIssue');
 
   final String value;
 
@@ -1790,6 +1916,9 @@ class InspectorIssueDetails {
 
   final SharedDictionaryIssueDetails? sharedDictionaryIssueDetails;
 
+  final SelectElementAccessibilityIssueDetails?
+  selectElementAccessibilityIssueDetails;
+
   InspectorIssueDetails({
     this.cookieIssueDetails,
     this.mixedContentIssueDetails,
@@ -1811,6 +1940,7 @@ class InspectorIssueDetails {
     this.propertyRuleIssueDetails,
     this.federatedAuthUserInfoRequestIssueDetails,
     this.sharedDictionaryIssueDetails,
+    this.selectElementAccessibilityIssueDetails,
   });
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
@@ -1940,6 +2070,13 @@ class InspectorIssueDetails {
                 json['sharedDictionaryIssueDetails'] as Map<String, dynamic>,
               )
               : null,
+      selectElementAccessibilityIssueDetails:
+          json.containsKey('selectElementAccessibilityIssueDetails')
+              ? SelectElementAccessibilityIssueDetails.fromJson(
+                json['selectElementAccessibilityIssueDetails']
+                    as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 
@@ -1993,6 +2130,9 @@ class InspectorIssueDetails {
             federatedAuthUserInfoRequestIssueDetails!.toJson(),
       if (sharedDictionaryIssueDetails != null)
         'sharedDictionaryIssueDetails': sharedDictionaryIssueDetails!.toJson(),
+      if (selectElementAccessibilityIssueDetails != null)
+        'selectElementAccessibilityIssueDetails':
+            selectElementAccessibilityIssueDetails!.toJson(),
     };
   }
 }

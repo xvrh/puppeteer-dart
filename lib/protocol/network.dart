@@ -727,6 +727,23 @@ class NetworkApi {
       result['resource'] as Map<String, dynamic>,
     );
   }
+
+  /// Sets Controls for third-party cookie access
+  /// Page reload is required before the new cookie bahavior will be observed
+  /// [enableThirdPartyCookieRestriction] Whether 3pc restriction is enabled.
+  /// [disableThirdPartyCookieMetadata] Whether 3pc grace period exception should be enabled; false by default.
+  /// [disableThirdPartyCookieHeuristics] Whether 3pc heuristics exceptions should be enabled; false by default.
+  Future<void> setCookieControls(
+    bool enableThirdPartyCookieRestriction,
+    bool disableThirdPartyCookieMetadata,
+    bool disableThirdPartyCookieHeuristics,
+  ) async {
+    await _client.send('Network.setCookieControls', {
+      'enableThirdPartyCookieRestriction': enableThirdPartyCookieRestriction,
+      'disableThirdPartyCookieMetadata': disableThirdPartyCookieMetadata,
+      'disableThirdPartyCookieHeuristics': disableThirdPartyCookieHeuristics,
+    });
+  }
 }
 
 class DataReceivedEvent {
@@ -1477,6 +1494,9 @@ class ResponseReceivedExtraInfoEvent {
   final List<BlockedSetCookieWithReason> blockedCookies;
 
   /// Raw response headers as they were received over the wire.
+  /// Duplicate headers in the response are represented as a single key with their values
+  /// concatentated using `\n` as the separator.
+  /// See also `headersText` that contains verbatim text for HTTP/1.*.
   final Headers headers;
 
   /// The IP address space of the resource. The address space can only be determined once the transport
@@ -1564,6 +1584,9 @@ class ResponseReceivedEarlyHintsEvent {
   final RequestId requestId;
 
   /// Raw response headers as they were received over the wire.
+  /// Duplicate headers in the response are represented as a single key with their values
+  /// concatentated using `\n` as the separator.
+  /// See also `headersText` that contains verbatim text for HTTP/1.*.
   final Headers headers;
 
   ResponseReceivedEarlyHintsEvent({
@@ -2573,7 +2596,8 @@ enum BlockedReason {
   corpNotSameOriginAfterDefaultedToSameOriginByCoepAndDip(
     'corp-not-same-origin-after-defaulted-to-same-origin-by-coep-and-dip',
   ),
-  corpNotSameSite('corp-not-same-site');
+  corpNotSameSite('corp-not-same-site'),
+  sriMessageSignatureMismatch('sri-message-signature-mismatch');
 
   final String value;
 
@@ -4793,7 +4817,8 @@ enum TrustTokenOperationDoneEventStatus {
   badResponse('BadResponse'),
   internalError('InternalError'),
   unknownError('UnknownError'),
-  fulfilledLocally('FulfilledLocally');
+  fulfilledLocally('FulfilledLocally'),
+  siteIssuerLimit('SiteIssuerLimit');
 
   final String value;
 

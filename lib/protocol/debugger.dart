@@ -612,6 +612,9 @@ class ScriptFailedToParseEvent {
   /// Content hash of the script, SHA-256.
   final String hash;
 
+  /// For Wasm modules, the content of the `build_id` custom section.
+  final String buildId;
+
   /// Embedder-specific auxiliary data likely matching {isDefault: boolean, type: 'default'|'isolated'|'worker', frameId: string}
   final Map<String, dynamic>? executionContextAuxData;
 
@@ -648,6 +651,7 @@ class ScriptFailedToParseEvent {
     required this.endColumn,
     required this.executionContextId,
     required this.hash,
+    required this.buildId,
     this.executionContextAuxData,
     this.sourceMapURL,
     this.hasSourceURL,
@@ -671,6 +675,7 @@ class ScriptFailedToParseEvent {
         json['executionContextId'] as int,
       ),
       hash: json['hash'] as String,
+      buildId: json['buildId'] as String,
       executionContextAuxData:
           json.containsKey('executionContextAuxData')
               ? json['executionContextAuxData'] as Map<String, dynamic>
@@ -732,6 +737,9 @@ class ScriptParsedEvent {
   /// Content hash of the script, SHA-256.
   final String hash;
 
+  /// For Wasm modules, the content of the `build_id` custom section.
+  final String buildId;
+
   /// Embedder-specific auxiliary data likely matching {isDefault: boolean, type: 'default'|'isolated'|'worker', frameId: string}
   final Map<String, dynamic>? executionContextAuxData;
 
@@ -774,6 +782,7 @@ class ScriptParsedEvent {
     required this.endColumn,
     required this.executionContextId,
     required this.hash,
+    required this.buildId,
     this.executionContextAuxData,
     this.isLiveEdit,
     this.sourceMapURL,
@@ -799,6 +808,7 @@ class ScriptParsedEvent {
         json['executionContextId'] as int,
       ),
       hash: json['hash'] as String,
+      buildId: json['buildId'] as String,
       executionContextAuxData:
           json.containsKey('executionContextAuxData')
               ? json['executionContextAuxData'] as Map<String, dynamic>
