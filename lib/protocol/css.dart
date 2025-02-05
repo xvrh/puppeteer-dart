@@ -127,6 +127,16 @@ class CSSApi {
     });
   }
 
+  /// Ensures that the given node is in its starting-style state.
+  /// [nodeId] The element id for which to force the starting-style state.
+  /// [forced] Boolean indicating if this is on or off.
+  Future<void> forceStartingStyle(dom.NodeId nodeId, bool forced) async {
+    await _client.send('CSS.forceStartingStyle', {
+      'nodeId': nodeId,
+      'forced': forced,
+    });
+  }
+
   /// [nodeId] Id of the node to get background colors for.
   Future<GetBackgroundColorsResult> getBackgroundColors(
     dom.NodeId nodeId,
@@ -152,6 +162,47 @@ class CSSApi {
         .toList();
   }
 
+  /// Resolve the specified values in the context of the provided element.
+  /// For example, a value of '1em' is evaluated according to the computed
+  /// 'font-size' of the element and a value 'calc(1px + 2px)' will be
+  /// resolved to '3px'.
+  /// [values] Substitution functions (var()/env()/attr()) and cascade-dependent
+  /// keywords (revert/revert-layer) do not work.
+  /// [nodeId] Id of the node in whose context the expression is evaluated
+  /// [propertyName] Only longhands and custom property names are accepted.
+  /// [pseudoType] Pseudo element type, only works for pseudo elements that generate
+  /// elements in the tree, such as ::before and ::after.
+  /// [pseudoIdentifier] Pseudo element custom ident.
+  Future<List<String>> resolveValues(
+    List<String> values,
+    dom.NodeId nodeId, {
+    String? propertyName,
+    dom.PseudoType? pseudoType,
+    String? pseudoIdentifier,
+  }) async {
+    var result = await _client.send('CSS.resolveValues', {
+      'values': [...values],
+      'nodeId': nodeId,
+      if (propertyName != null) 'propertyName': propertyName,
+      if (pseudoType != null) 'pseudoType': pseudoType,
+      if (pseudoIdentifier != null) 'pseudoIdentifier': pseudoIdentifier,
+    });
+    return (result['results'] as List).map((e) => e as String).toList();
+  }
+
+  Future<List<CSSProperty>> getLonghandProperties(
+    String shorthandName,
+    String value,
+  ) async {
+    var result = await _client.send('CSS.getLonghandProperties', {
+      'shorthandName': shorthandName,
+      'value': value,
+    });
+    return (result['longhandProperties'] as List)
+        .map((e) => CSSProperty.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
   /// Returns the styles defined inline (explicitly in the "style" attribute and implicitly, using DOM
   /// attributes) for a DOM node identified by `nodeId`.
   Future<GetInlineStylesForNodeResult> getInlineStylesForNode(
@@ -161,6 +212,17 @@ class CSSApi {
       'nodeId': nodeId,
     });
     return GetInlineStylesForNodeResult.fromJson(result);
+  }
+
+  /// Returns the styles coming from animations & transitions
+  /// including the animation & transition styles coming from inheritance chain.
+  Future<GetAnimatedStylesForNodeResult> getAnimatedStylesForNode(
+    dom.NodeId nodeId,
+  ) async {
+    var result = await _client.send('CSS.getAnimatedStylesForNode', {
+      'nodeId': nodeId,
+    });
+    return GetAnimatedStylesForNodeResult.fromJson(result);
   }
 
   /// Returns requested styles for a DOM node identified by `nodeId`.
@@ -513,6 +575,54 @@ class GetInlineStylesForNodeResult {
   }
 }
 
+class GetAnimatedStylesForNodeResult {
+  /// Styles coming from animations.
+  final List<CSSAnimationStyle>? animationStyles;
+
+  /// Style coming from transitions.
+  final CSSStyle? transitionsStyle;
+
+  /// Inherited style entries for animationsStyle and transitionsStyle from
+  /// the inheritance chain of the element.
+  final List<InheritedAnimatedStyleEntry>? inherited;
+
+  GetAnimatedStylesForNodeResult({
+    this.animationStyles,
+    this.transitionsStyle,
+    this.inherited,
+  });
+
+  factory GetAnimatedStylesForNodeResult.fromJson(Map<String, dynamic> json) {
+    return GetAnimatedStylesForNodeResult(
+      animationStyles:
+          json.containsKey('animationStyles')
+              ? (json['animationStyles'] as List)
+                  .map(
+                    (e) =>
+                        CSSAnimationStyle.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList()
+              : null,
+      transitionsStyle:
+          json.containsKey('transitionsStyle')
+              ? CSSStyle.fromJson(
+                json['transitionsStyle'] as Map<String, dynamic>,
+              )
+              : null,
+      inherited:
+          json.containsKey('inherited')
+              ? (json['inherited'] as List)
+                  .map(
+                    (e) => InheritedAnimatedStyleEntry.fromJson(
+                      e as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList()
+              : null,
+    );
+  }
+}
+
 class GetMatchedStylesForNodeResult {
   /// Inline style for the specified DOM node.
   final CSSStyle? inlineStyle;
@@ -757,6 +867,28 @@ class PseudoElementMatches {
   }
 }
 
+/// CSS style coming from animations with the name of the animation.
+class CSSAnimationStyle {
+  /// The name of the animation.
+  final String? name;
+
+  /// The style coming from the animation.
+  final CSSStyle style;
+
+  CSSAnimationStyle({this.name, required this.style});
+
+  factory CSSAnimationStyle.fromJson(Map<String, dynamic> json) {
+    return CSSAnimationStyle(
+      name: json.containsKey('name') ? json['name'] as String : null,
+      style: CSSStyle.fromJson(json['style'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'style': style.toJson(), if (name != null) 'name': name};
+  }
+}
+
 /// Inherited CSS rule collection from ancestor node.
 class InheritedStyleEntry {
   /// The ancestor node's inline style, if any, in the style inheritance chain.
@@ -784,6 +916,46 @@ class InheritedStyleEntry {
     return {
       'matchedCSSRules': matchedCSSRules.map((e) => e.toJson()).toList(),
       if (inlineStyle != null) 'inlineStyle': inlineStyle!.toJson(),
+    };
+  }
+}
+
+/// Inherited CSS style collection for animated styles from ancestor node.
+class InheritedAnimatedStyleEntry {
+  /// Styles coming from the animations of the ancestor, if any, in the style inheritance chain.
+  final List<CSSAnimationStyle>? animationStyles;
+
+  /// The style coming from the transitions of the ancestor, if any, in the style inheritance chain.
+  final CSSStyle? transitionsStyle;
+
+  InheritedAnimatedStyleEntry({this.animationStyles, this.transitionsStyle});
+
+  factory InheritedAnimatedStyleEntry.fromJson(Map<String, dynamic> json) {
+    return InheritedAnimatedStyleEntry(
+      animationStyles:
+          json.containsKey('animationStyles')
+              ? (json['animationStyles'] as List)
+                  .map(
+                    (e) =>
+                        CSSAnimationStyle.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList()
+              : null,
+      transitionsStyle:
+          json.containsKey('transitionsStyle')
+              ? CSSStyle.fromJson(
+                json['transitionsStyle'] as Map<String, dynamic>,
+              )
+              : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (animationStyles != null)
+        'animationStyles': animationStyles!.map((e) => e.toJson()).toList(),
+      if (transitionsStyle != null)
+        'transitionsStyle': transitionsStyle!.toJson(),
     };
   }
 }

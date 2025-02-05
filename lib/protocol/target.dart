@@ -153,6 +153,8 @@ class TargetApi {
 
   /// Creates a new page.
   /// [url] The initial URL the page will be navigated to. An empty string indicates about:blank.
+  /// [left] Frame left origin in DIP (headless chrome only).
+  /// [top] Frame top origin in DIP (headless chrome only).
   /// [width] Frame width in DIP (headless chrome only).
   /// [height] Frame height in DIP (headless chrome only).
   /// [browserContextId] The browser context to create the page in.
@@ -165,6 +167,8 @@ class TargetApi {
   /// Returns: The id of the page opened.
   Future<TargetID> createTarget(
     String url, {
+    int? left,
+    int? top,
     int? width,
     int? height,
     browser.BrowserContextID? browserContextId,
@@ -175,6 +179,8 @@ class TargetApi {
   }) async {
     var result = await _client.send('Target.createTarget', {
       'url': url,
+      if (left != null) 'left': left,
+      if (top != null) 'top': top,
       if (width != null) 'width': width,
       if (height != null) 'height': height,
       if (browserContextId != null) 'browserContextId': browserContextId,

@@ -96,6 +96,8 @@ class PreloadEnabledStateUpdatedEvent {
 class PrefetchStatusUpdatedEvent {
   final PreloadingAttemptKey key;
 
+  final PreloadPipelineId pipelineId;
+
   /// The frame id of the frame initiating prefetch.
   final page.FrameId initiatingFrameId;
 
@@ -109,6 +111,7 @@ class PrefetchStatusUpdatedEvent {
 
   PrefetchStatusUpdatedEvent({
     required this.key,
+    required this.pipelineId,
     required this.initiatingFrameId,
     required this.prefetchUrl,
     required this.status,
@@ -119,6 +122,7 @@ class PrefetchStatusUpdatedEvent {
   factory PrefetchStatusUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return PrefetchStatusUpdatedEvent(
       key: PreloadingAttemptKey.fromJson(json['key'] as Map<String, dynamic>),
+      pipelineId: PreloadPipelineId.fromJson(json['pipelineId'] as String),
       initiatingFrameId: page.FrameId.fromJson(
         json['initiatingFrameId'] as String,
       ),
@@ -133,6 +137,8 @@ class PrefetchStatusUpdatedEvent {
 class PrerenderStatusUpdatedEvent {
   final PreloadingAttemptKey key;
 
+  final PreloadPipelineId pipelineId;
+
   final PreloadingStatus status;
 
   final PrerenderFinalStatus? prerenderStatus;
@@ -145,6 +151,7 @@ class PrerenderStatusUpdatedEvent {
 
   PrerenderStatusUpdatedEvent({
     required this.key,
+    required this.pipelineId,
     required this.status,
     this.prerenderStatus,
     this.disallowedMojoInterface,
@@ -154,6 +161,7 @@ class PrerenderStatusUpdatedEvent {
   factory PrerenderStatusUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return PrerenderStatusUpdatedEvent(
       key: PreloadingAttemptKey.fromJson(json['key'] as Map<String, dynamic>),
+      pipelineId: PreloadPipelineId.fromJson(json['pipelineId'] as String),
       status: PreloadingStatus.fromJson(json['status'] as String),
       prerenderStatus:
           json.containsKey('prerenderStatus')
@@ -429,6 +437,19 @@ class PreloadingAttemptSource {
       'nodeIds': nodeIds.map((e) => e.toJson()).toList(),
     };
   }
+}
+
+/// Chrome manages different types of preloads together using a
+/// concept of preloading pipeline. For example, if a site uses a
+/// SpeculationRules for prerender, Chrome first starts a prefetch and
+/// then upgrades it to prerender.
+///
+/// CDP events for them are emitted separately but they share
+/// `PreloadPipelineId`.
+extension type PreloadPipelineId(String value) {
+  factory PreloadPipelineId.fromJson(String value) => PreloadPipelineId(value);
+
+  String toJson() => value;
 }
 
 /// List of FinalStatus reasons for Prerender2.

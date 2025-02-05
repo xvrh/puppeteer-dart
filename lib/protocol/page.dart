@@ -1728,6 +1728,7 @@ enum PermissionsPolicyFeature {
   controlledFrame('controlled-frame'),
   crossOriginIsolated('cross-origin-isolated'),
   deferredFetch('deferred-fetch'),
+  deferredFetchMinimal('deferred-fetch-minimal'),
   digitalCredentialsGet('digital-credentials-get'),
   directSockets('direct-sockets'),
   directSocketsPrivate('direct-sockets-private'),
