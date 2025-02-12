@@ -19,7 +19,7 @@ class _Websocket implements WebSocket {
   Future<void> get done => _socket.onClose.first;
 
   @override
-  Stream<String> get events => _socket.onMessage.map((m) => m.data as String);
+  Stream<String> get events => _socket.onMessage.map((m) => (m.data! as JSString).toDart);
 
   @override
   void add(String message) {
