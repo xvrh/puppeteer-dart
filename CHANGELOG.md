@@ -1,3 +1,6 @@
+## 3.17.0
+- Update to Chrome 133.0.6943.53.
+
 ## 3.16.0
 - Update to Chrome 131.0.6778.204
 
