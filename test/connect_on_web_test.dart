@@ -7,7 +7,6 @@ import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf_static/shelf_static.dart';
 import 'package:shelf_web_socket/shelf_web_socket.dart';
 import 'package:test/test.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 // Test that we can use puppeteer.connect from a web page (dart compiled with Dart2js)
 void main() {
@@ -42,7 +41,7 @@ void main() {
           // connect_on_web_directly_test.dart test.
           ..mount(
             '/proxy',
-            webSocketHandler((WebSocketChannel webSocket) async {
+            webSocketHandler((webSocket, _) async {
               var browserSocket = await WebSocket.connect(browser.wsEndpoint);
               var websocketSubscription = webSocket.stream.listen(
                 (message) {

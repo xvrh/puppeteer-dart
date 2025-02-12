@@ -1,8 +1,9 @@
-import 'dart:html';
 import 'package:puppeteer/puppeteer.dart';
+import 'package:web/web.dart';
 
 void main() async {
-  var endpoint = document.body!.attributes['x-puppeteer-endpoint'];
+  var endpoint =
+      document.body!.attributes.getNamedItem('x-puppeteer-endpoint')!.value;
   var browser = await puppeteer.connect(browserWsEndpoint: endpoint);
 
   var currentPage =
