@@ -1335,6 +1335,7 @@
                         "kInlineViolation",
                         "kEvalViolation",
                         "kURLViolation",
+                        "kSRIViolation",
                         "kTrustedTypesSinkViolation",
                         "kTrustedTypesPolicyViolation",
                         "kWasmEvalViolation"
@@ -1560,6 +1561,32 @@
                     ]
                 },
                 {
+                    "id": "SRIMessageSignatureError",
+                    "type": "string",
+                    "enum": [
+                        "MissingSignatureHeader",
+                        "MissingSignatureInputHeader",
+                        "InvalidSignatureHeader",
+                        "InvalidSignatureInputHeader",
+                        "SignatureHeaderValueIsNotByteSequence",
+                        "SignatureHeaderValueIsParameterized",
+                        "SignatureHeaderValueIsIncorrectLength",
+                        "SignatureInputHeaderMissingLabel",
+                        "SignatureInputHeaderValueNotInnerList",
+                        "SignatureInputHeaderValueMissingComponents",
+                        "SignatureInputHeaderInvalidComponentType",
+                        "SignatureInputHeaderInvalidComponentName",
+                        "SignatureInputHeaderInvalidHeaderComponentParameter",
+                        "SignatureInputHeaderInvalidDerivedComponentParameter",
+                        "SignatureInputHeaderKeyIdLength",
+                        "SignatureInputHeaderInvalidParameter",
+                        "SignatureInputHeaderMissingRequiredParameters",
+                        "ValidationFailedSignatureExpired",
+                        "ValidationFailedInvalidLength",
+                        "ValidationFailedSignatureMismatch"
+                    ]
+                },
+                {
                     "id": "AttributionReportingIssueDetails",
                     "description": "Details for issues around \"Attribution Reporting API\" usage.\nExplainer: https://github.com/WICG/attribution-reporting-api",
                     "type": "object",
@@ -1636,6 +1663,20 @@
                         {
                             "name": "sharedDictionaryError",
                             "$ref": "SharedDictionaryError"
+                        },
+                        {
+                            "name": "request",
+                            "$ref": "AffectedRequest"
+                        }
+                    ]
+                },
+                {
+                    "id": "SRIMessageSignatureIssueDetails",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "error",
+                            "$ref": "SRIMessageSignatureError"
                         },
                         {
                             "name": "request",
@@ -2032,7 +2073,8 @@
                         "FederatedAuthUserInfoRequestIssue",
                         "PropertyRuleIssue",
                         "SharedDictionaryIssue",
-                        "SelectElementAccessibilityIssue"
+                        "SelectElementAccessibilityIssue",
+                        "SRIMessageSignatureIssue"
                     ]
                 },
                 {
@@ -2155,6 +2197,11 @@
                             "name": "selectElementAccessibilityIssueDetails",
                             "optional": true,
                             "$ref": "SelectElementAccessibilityIssueDetails"
+                        },
+                        {
+                            "name": "sriMessageSignatureIssueDetails",
+                            "optional": true,
+                            "$ref": "SRIMessageSignatureIssueDetails"
                         }
                     ]
                 },
@@ -7158,7 +7205,8 @@
                             "description": "Type of relation to get.",
                             "type": "string",
                             "enum": [
-                                "PopoverTarget"
+                                "PopoverTarget",
+                                "InterestTarget"
                             ]
                         }
                     ],
