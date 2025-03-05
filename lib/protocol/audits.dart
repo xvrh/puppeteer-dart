@@ -1508,7 +1508,8 @@ enum FederatedAuthRequestIssueReason {
   replacedByActiveMode('ReplacedByActiveMode'),
   invalidFieldsSpecified('InvalidFieldsSpecified'),
   relyingPartyOriginIsOpaque('RelyingPartyOriginIsOpaque'),
-  typeNotMatching('TypeNotMatching');
+  typeNotMatching('TypeNotMatching'),
+  uiDismissedNoEmbargo('UiDismissedNoEmbargo');
 
   final String value;
 
@@ -1669,7 +1670,7 @@ enum SelectElementAccessibilityIssueReason {
   String toString() => value.toString();
 }
 
-/// This isue warns about errors in the select element content model.
+/// This issue warns about errors in the select element content model.
 class SelectElementAccessibilityIssueDetails {
   final dom.BackendNodeId nodeId;
 

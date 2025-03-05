@@ -19,6 +19,14 @@ class ExtensionsApi {
     return result['id'] as String;
   }
 
+  /// Uninstalls an unpacked extension (others not supported) from the profile.
+  /// Available if the client is connected using the --remote-debugging-pipe flag
+  /// and the --enable-unsafe-extension-debugging.
+  /// [id] Extension id.
+  Future<void> uninstall(String id) async {
+    await _client.send('Extensions.uninstall', {'id': id});
+  }
+
   /// Gets data from extension storage in the given `storageArea`. If `keys` is
   /// specified, these are used to filter the result.
   /// [id] ID of extension.

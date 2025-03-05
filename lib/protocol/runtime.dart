@@ -699,18 +699,31 @@ class EvaluateResult {
 }
 
 class GetHeapUsageResult {
-  /// Used heap size in bytes.
+  /// Used JavaScript heap size in bytes.
   final num usedSize;
 
-  /// Allocated heap size in bytes.
+  /// Allocated JavaScript heap size in bytes.
   final num totalSize;
 
-  GetHeapUsageResult({required this.usedSize, required this.totalSize});
+  /// Used size in bytes in the embedder's garbage-collected heap.
+  final num embedderHeapUsedSize;
+
+  /// Size in bytes of backing storage for array buffers and external strings.
+  final num backingStorageSize;
+
+  GetHeapUsageResult({
+    required this.usedSize,
+    required this.totalSize,
+    required this.embedderHeapUsedSize,
+    required this.backingStorageSize,
+  });
 
   factory GetHeapUsageResult.fromJson(Map<String, dynamic> json) {
     return GetHeapUsageResult(
       usedSize: json['usedSize'] as num,
       totalSize: json['totalSize'] as num,
+      embedderHeapUsedSize: json['embedderHeapUsedSize'] as num,
+      backingStorageSize: json['backingStorageSize'] as num,
     );
   }
 }

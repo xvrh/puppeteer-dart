@@ -4659,6 +4659,119 @@
                     ]
                 },
                 {
+                    "id": "CSSFunctionParameter",
+                    "description": "CSS function argument representation.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "description": "The parameter name.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "type",
+                            "description": "The parameter type.",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "id": "CSSFunctionConditionNode",
+                    "description": "CSS function conditional block representation.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "media",
+                            "description": "Media query for this conditional block. Only one type of condition should be set.",
+                            "optional": true,
+                            "$ref": "CSSMedia"
+                        },
+                        {
+                            "name": "containerQueries",
+                            "description": "Container query for this conditional block. Only one type of condition should be set.",
+                            "optional": true,
+                            "$ref": "CSSContainerQuery"
+                        },
+                        {
+                            "name": "supports",
+                            "description": "@supports CSS at-rule condition. Only one type of condition should be set.",
+                            "optional": true,
+                            "$ref": "CSSSupports"
+                        },
+                        {
+                            "name": "children",
+                            "description": "Block body.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "CSSFunctionNode"
+                            }
+                        },
+                        {
+                            "name": "conditionText",
+                            "description": "The condition text.",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "id": "CSSFunctionNode",
+                    "description": "Section of the body of a CSS function rule.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "condition",
+                            "description": "A conditional block. If set, style should not be set.",
+                            "optional": true,
+                            "$ref": "CSSFunctionConditionNode"
+                        },
+                        {
+                            "name": "style",
+                            "description": "Values set by this node. If set, condition should not be set.",
+                            "optional": true,
+                            "$ref": "CSSStyle"
+                        }
+                    ]
+                },
+                {
+                    "id": "CSSFunctionRule",
+                    "description": "CSS function at-rule representation.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "description": "Name of the function.",
+                            "$ref": "Value"
+                        },
+                        {
+                            "name": "styleSheetId",
+                            "description": "The css style sheet identifier (absent for user agent stylesheet and user-specified\nstylesheet rules) this rule came from.",
+                            "optional": true,
+                            "$ref": "StyleSheetId"
+                        },
+                        {
+                            "name": "origin",
+                            "description": "Parent stylesheet's origin.",
+                            "$ref": "StyleSheetOrigin"
+                        },
+                        {
+                            "name": "parameters",
+                            "description": "List of parameters.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "CSSFunctionParameter"
+                            }
+                        },
+                        {
+                            "name": "children",
+                            "description": "Function body.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "CSSFunctionNode"
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "CSSKeyframeRule",
                     "description": "CSS keyframe rule representation.",
                     "type": "object",
@@ -5129,6 +5242,16 @@
                             "experimental": true,
                             "optional": true,
                             "$ref": "DOM.NodeId"
+                        },
+                        {
+                            "name": "cssFunctionRules",
+                            "description": "A list of CSS at-function rules referenced by styles of this node.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "CSSFunctionRule"
+                            }
                         }
                     ]
                 },
@@ -9264,6 +9387,61 @@
             ],
             "types": [
                 {
+                    "id": "SafeAreaInsets",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "top",
+                            "description": "Overrides safe-area-inset-top.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "topMax",
+                            "description": "Overrides safe-area-max-inset-top.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "left",
+                            "description": "Overrides safe-area-inset-left.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "leftMax",
+                            "description": "Overrides safe-area-max-inset-left.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "bottom",
+                            "description": "Overrides safe-area-inset-bottom.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "bottomMax",
+                            "description": "Overrides safe-area-max-inset-bottom.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "right",
+                            "description": "Overrides safe-area-inset-right.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "rightMax",
+                            "description": "Overrides safe-area-max-inset-right.",
+                            "optional": true,
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
                     "id": "ScreenOrientation",
                     "description": "Screen orientation.",
                     "type": "object",
@@ -9655,6 +9833,17 @@
                             "description": "RGBA of the default background color. If not specified, any existing override will be\ncleared.",
                             "optional": true,
                             "$ref": "DOM.RGBA"
+                        }
+                    ]
+                },
+                {
+                    "name": "setSafeAreaInsetsOverride",
+                    "description": "Overrides the values for env(safe-area-inset-*) and env(safe-area-max-inset-*). Unset values will cause the\nrespective variables to be undefined, even if previously overridden.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "insets",
+                            "$ref": "SafeAreaInsets"
                         }
                     ]
                 },
@@ -13171,7 +13360,8 @@
                         "PreflightMissingPrivateNetworkAccessId",
                         "PreflightMissingPrivateNetworkAccessName",
                         "PrivateNetworkAccessPermissionUnavailable",
-                        "PrivateNetworkAccessPermissionDenied"
+                        "PrivateNetworkAccessPermissionDenied",
+                        "LocalNetworkAccessPermissionDenied"
                     ]
                 },
                 {
@@ -14255,7 +14445,8 @@
                         "BlockFromInsecureToMorePrivate",
                         "WarnFromInsecureToMorePrivate",
                         "PreflightBlock",
-                        "PreflightWarn"
+                        "PreflightWarn",
+                        "PermissionBlock"
                     ]
                 },
                 {
@@ -17451,7 +17642,7 @@
                 },
                 {
                     "id": "PermissionsPolicyFeature",
-                    "description": "All Permissions Policy features. This enum should match the one defined\nin third_party/blink/renderer/core/permissions_policy/permissions_policy_features.json5.",
+                    "description": "All Permissions Policy features. This enum should match the one defined\nin services/network/public/cpp/permissions_policy/permissions_policy_features.json5.",
                     "experimental": true,
                     "type": "string",
                     "enum": [

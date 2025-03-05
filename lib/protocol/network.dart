@@ -3583,7 +3583,8 @@ enum CookieExemptionReason {
   enterprisePolicy('EnterprisePolicy'),
   storageAccess('StorageAccess'),
   topLevelStorageAccess('TopLevelStorageAccess'),
-  scheme('Scheme');
+  scheme('Scheme'),
+  sameSiteNoneCookiesInSandbox('SameSiteNoneCookiesInSandbox');
 
   final String value;
 

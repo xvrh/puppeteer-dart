@@ -94,10 +94,18 @@ class CSSApi {
 
   /// Creates a new special "via-inspector" stylesheet in the frame with given `frameId`.
   /// [frameId] Identifier of the frame where "via-inspector" stylesheet should be created.
+  /// [force] If true, creates a new stylesheet for every call. If false,
+  /// returns a stylesheet previously created by a call with force=false
+  /// for the frame's document if it exists or creates a new stylesheet
+  /// (default: false).
   /// Returns: Identifier of the created "via-inspector" stylesheet.
-  Future<StyleSheetId> createStyleSheet(page.FrameId frameId) async {
+  Future<StyleSheetId> createStyleSheet(
+    page.FrameId frameId, {
+    bool? force,
+  }) async {
     var result = await _client.send('CSS.createStyleSheet', {
       'frameId': frameId,
+      if (force != null) 'force': force,
     });
     return StyleSheetId.fromJson(result['styleSheetId'] as String);
   }

@@ -153,16 +153,18 @@ class TargetApi {
 
   /// Creates a new page.
   /// [url] The initial URL the page will be navigated to. An empty string indicates about:blank.
-  /// [left] Frame left origin in DIP (headless chrome only).
-  /// [top] Frame top origin in DIP (headless chrome only).
-  /// [width] Frame width in DIP (headless chrome only).
-  /// [height] Frame height in DIP (headless chrome only).
+  /// [left] Frame left origin in DIP (requires newWindow to be true or headless shell).
+  /// [top] Frame top origin in DIP (requires newWindow to be true or headless shell).
+  /// [width] Frame width in DIP (requires newWindow to be true or headless shell).
+  /// [height] Frame height in DIP (requires newWindow to be true or headless shell).
+  /// [windowState] Frame window state (requires newWindow to be true or headless shell).
+  /// Default is normal.
   /// [browserContextId] The browser context to create the page in.
-  /// [enableBeginFrameControl] Whether BeginFrames for this target will be controlled via DevTools (headless chrome only,
+  /// [enableBeginFrameControl] Whether BeginFrames for this target will be controlled via DevTools (headless shell only,
   /// not supported on MacOS yet, false by default).
-  /// [newWindow] Whether to create a new Window or Tab (chrome-only, false by default).
-  /// [background] Whether to create the target in background or foreground (chrome-only,
-  /// false by default).
+  /// [newWindow] Whether to create a new Window or Tab (false by default, not supported by headless shell).
+  /// [background] Whether to create the target in background or foreground (false by default, not supported
+  /// by headless shell).
   /// [forTab] Whether to create the target of type "tab".
   /// Returns: The id of the page opened.
   Future<TargetID> createTarget(
@@ -171,6 +173,7 @@ class TargetApi {
     int? top,
     int? width,
     int? height,
+    WindowState? windowState,
     browser.BrowserContextID? browserContextId,
     bool? enableBeginFrameControl,
     bool? newWindow,
@@ -183,6 +186,7 @@ class TargetApi {
       if (top != null) 'top': top,
       if (width != null) 'width': width,
       if (height != null) 'height': height,
+      if (windowState != null) 'windowState': windowState,
       if (browserContextId != null) 'browserContextId': browserContextId,
       if (enableBeginFrameControl != null)
         'enableBeginFrameControl': enableBeginFrameControl,
@@ -556,4 +560,24 @@ class RemoteLocation {
   Map<String, dynamic> toJson() {
     return {'host': host, 'port': port};
   }
+}
+
+/// The state of the target window.
+enum WindowState {
+  normal('normal'),
+  minimized('minimized'),
+  maximized('maximized'),
+  fullscreen('fullscreen');
+
+  final String value;
+
+  const WindowState(this.value);
+
+  factory WindowState.fromJson(String value) =>
+      WindowState.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }

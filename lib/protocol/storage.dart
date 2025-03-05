@@ -435,6 +435,27 @@ class StorageApi {
         .map((e) => RelatedWebsiteSet.fromJson(e as Map<String, dynamic>))
         .toList();
   }
+
+  /// Returns the list of URLs from a page and its embedded resources that match
+  /// existing grace period URL pattern rules.
+  /// https://developers.google.com/privacy-sandbox/cookies/temporary-exceptions/grace-period
+  /// [firstPartyUrl] The URL of the page currently being visited.
+  /// [thirdPartyUrls] The list of embedded resource URLs from the page.
+  /// Returns: Array of matching URLs. If there is a primary pattern match for the first-
+  /// party URL, only the first-party URL is returned in the array.
+  Future<List<String>> getAffectedUrlsForThirdPartyCookieMetadata(
+    String firstPartyUrl,
+    List<String> thirdPartyUrls,
+  ) async {
+    var result = await _client.send(
+      'Storage.getAffectedUrlsForThirdPartyCookieMetadata',
+      {
+        'firstPartyUrl': firstPartyUrl,
+        'thirdPartyUrls': [...thirdPartyUrls],
+      },
+    );
+    return (result['matchedUrls'] as List).map((e) => e as String).toList();
+  }
 }
 
 class CacheStorageContentUpdatedEvent {
@@ -817,7 +838,6 @@ extension type SerializedStorageKey(String value) {
 
 /// Enum of possible storage types.
 enum StorageType {
-  appcache('appcache'),
   cookies('cookies'),
   fileSystems('file_systems'),
   indexeddb('indexeddb'),
