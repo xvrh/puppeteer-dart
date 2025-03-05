@@ -11,6 +11,7 @@ class DebuggerApi {
   DebuggerApi(this._client);
 
   /// Fired when breakpoint is resolved to an actual script and location.
+  /// Deprecated in favor of `resolvedBreakpoints` in the `scriptParsed` event.
   Stream<BreakpointResolvedEvent> get onBreakpointResolved => _client.onEvent
       .where((event) => event.name == 'Debugger.breakpointResolved')
       .map((event) => BreakpointResolvedEvent.fromJson(event.parameters));
@@ -773,6 +774,11 @@ class ScriptParsedEvent {
   /// The name the embedder supplied for this script.
   final String? embedderName;
 
+  /// The list of set breakpoints in this script if calls to `setBreakpointByUrl`
+  /// matches this script's URL or hash. Clients that use this list can ignore the
+  /// `breakpointResolved` event. They are equivalent.
+  final List<ResolvedBreakpoint>? resolvedBreakpoints;
+
   ScriptParsedEvent({
     required this.scriptId,
     required this.url,
@@ -794,6 +800,7 @@ class ScriptParsedEvent {
     this.scriptLanguage,
     this.debugSymbols,
     this.embedderName,
+    this.resolvedBreakpoints,
   });
 
   factory ScriptParsedEvent.fromJson(Map<String, dynamic> json) {
@@ -852,6 +859,15 @@ class ScriptParsedEvent {
       embedderName:
           json.containsKey('embedderName')
               ? json['embedderName'] as String
+              : null,
+      resolvedBreakpoints:
+          json.containsKey('resolvedBreakpoints')
+              ? (json['resolvedBreakpoints'] as List)
+                  .map(
+                    (e) =>
+                        ResolvedBreakpoint.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList()
               : null,
     );
   }
@@ -1444,6 +1460,30 @@ enum DebugSymbolsType {
 
   @override
   String toString() => value.toString();
+}
+
+class ResolvedBreakpoint {
+  /// Breakpoint unique identifier.
+  final BreakpointId breakpointId;
+
+  /// Actual breakpoint location.
+  final Location location;
+
+  ResolvedBreakpoint({required this.breakpointId, required this.location});
+
+  factory ResolvedBreakpoint.fromJson(Map<String, dynamic> json) {
+    return ResolvedBreakpoint(
+      breakpointId: BreakpointId.fromJson(json['breakpointId'] as String),
+      location: Location.fromJson(json['location'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'breakpointId': breakpointId.toJson(),
+      'location': location.toJson(),
+    };
+  }
 }
 
 enum SetScriptSourceResultStatus {

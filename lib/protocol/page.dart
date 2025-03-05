@@ -64,6 +64,18 @@ class PageApi {
   Stream<void> get onFrameResized =>
       _client.onEvent.where((event) => event.name == 'Page.frameResized');
 
+  /// Fired when a navigation starts. This event is fired for both
+  /// renderer-initiated and browser-initiated navigations. For renderer-initiated
+  /// navigations, the event is fired after `frameRequestedNavigation`.
+  /// Navigation may still be cancelled after the event is issued. Multiple events
+  /// can be fired for a single navigation, for example, when a same-document
+  /// navigation becomes a cross-document navigation (such as in the case of a
+  /// frameset).
+  Stream<FrameStartedNavigatingEvent> get onFrameStartedNavigating => _client
+      .onEvent
+      .where((event) => event.name == 'Page.frameStartedNavigating')
+      .map((event) => FrameStartedNavigatingEvent.fromJson(event.parameters));
+
   /// Fired when a renderer-initiated navigation is requested.
   /// Navigation may still be cancelled after the event is issued.
   Stream<FrameRequestedNavigationEvent> get onFrameRequestedNavigation =>
@@ -1006,6 +1018,40 @@ class FrameNavigatedEvent {
   }
 }
 
+class FrameStartedNavigatingEvent {
+  /// ID of the frame that is being navigated.
+  final FrameId frameId;
+
+  /// The URL the navigation started with. The final URL can be different.
+  final String url;
+
+  /// Loader identifier. Even though it is present in case of same-document
+  /// navigation, the previously committed loaderId would not change unless
+  /// the navigation changes from a same-document to a cross-document
+  /// navigation.
+  final network.LoaderId loaderId;
+
+  final FrameStartedNavigatingEventNavigationType navigationType;
+
+  FrameStartedNavigatingEvent({
+    required this.frameId,
+    required this.url,
+    required this.loaderId,
+    required this.navigationType,
+  });
+
+  factory FrameStartedNavigatingEvent.fromJson(Map<String, dynamic> json) {
+    return FrameStartedNavigatingEvent(
+      frameId: FrameId.fromJson(json['frameId'] as String),
+      url: json['url'] as String,
+      loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
+      navigationType: FrameStartedNavigatingEventNavigationType.fromJson(
+        json['navigationType'] as String,
+      ),
+    );
+  }
+}
+
 class FrameRequestedNavigationEvent {
   /// Id of the frame that is being navigated.
   final FrameId frameId;
@@ -1711,6 +1757,7 @@ enum PermissionsPolicyFeature {
   chUa('ch-ua'),
   chUaArch('ch-ua-arch'),
   chUaBitness('ch-ua-bitness'),
+  chUaHighEntropyValues('ch-ua-high-entropy-values'),
   chUaPlatform('ch-ua-platform'),
   chUaModel('ch-ua-model'),
   chUaMobile('ch-ua-mobile'),
@@ -3856,6 +3903,31 @@ enum FrameDetachedEventReason {
 
   factory FrameDetachedEventReason.fromJson(String value) =>
       FrameDetachedEventReason.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+enum FrameStartedNavigatingEventNavigationType {
+  reload('reload'),
+  reloadBypassingCache('reloadBypassingCache'),
+  restore('restore'),
+  restoreWithPost('restoreWithPost'),
+  historySameDocument('historySameDocument'),
+  historyDifferentDocument('historyDifferentDocument'),
+  sameDocument('sameDocument'),
+  differentDocument('differentDocument');
+
+  final String value;
+
+  const FrameStartedNavigatingEventNavigationType(this.value);
+
+  factory FrameStartedNavigatingEventNavigationType.fromJson(String value) =>
+      FrameStartedNavigatingEventNavigationType.values.firstWhere(
+        (e) => e.value == value,
+      );
 
   String toJson() => value;
 

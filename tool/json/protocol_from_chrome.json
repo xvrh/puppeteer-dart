@@ -1820,7 +1820,8 @@
                         "ReplacedByActiveMode",
                         "InvalidFieldsSpecified",
                         "RelyingPartyOriginIsOpaque",
-                        "TypeNotMatching"
+                        "TypeNotMatching",
+                        "UiDismissedNoEmbargo"
                     ]
                 },
                 {
@@ -1898,7 +1899,7 @@
                 },
                 {
                     "id": "SelectElementAccessibilityIssueDetails",
-                    "description": "This isue warns about errors in the select element content model.",
+                    "description": "This issue warns about errors in the select element content model.",
                     "type": "object",
                     "properties": [
                         {
@@ -2280,6 +2281,17 @@
                         }
                     ],
                     "returns": [
+                        {
+                            "name": "id",
+                            "description": "Extension id.",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "uninstall",
+                    "description": "Uninstalls an unpacked extension (others not supported) from the profile.\nAvailable if the client is connected using the --remote-debugging-pipe flag\nand the --enable-unsafe-extension-debugging.",
+                    "parameters": [
                         {
                             "name": "id",
                             "description": "Extension id.",
@@ -4683,6 +4695,12 @@
                             "name": "frameId",
                             "description": "Identifier of the frame where \"via-inspector\" stylesheet should be created.",
                             "$ref": "Page.FrameId"
+                        },
+                        {
+                            "name": "force",
+                            "description": "If true, creates a new stylesheet for every call. If false,\nreturns a stylesheet previously created by a call with force=false\nfor the frame's document if it exists or creates a new stylesheet\n(default: false).",
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ],
                     "returns": [
@@ -9121,136 +9139,6 @@
                         {
                             "name": "storageId",
                             "$ref": "StorageId"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "domain": "Database",
-            "experimental": true,
-            "types": [
-                {
-                    "id": "DatabaseId",
-                    "description": "Unique identifier of Database object.",
-                    "type": "string"
-                },
-                {
-                    "id": "Database",
-                    "description": "Database object.",
-                    "type": "object",
-                    "properties": [
-                        {
-                            "name": "id",
-                            "description": "Database ID.",
-                            "$ref": "DatabaseId"
-                        },
-                        {
-                            "name": "domain",
-                            "description": "Database domain.",
-                            "type": "string"
-                        },
-                        {
-                            "name": "name",
-                            "description": "Database name.",
-                            "type": "string"
-                        },
-                        {
-                            "name": "version",
-                            "description": "Database version.",
-                            "type": "string"
-                        }
-                    ]
-                },
-                {
-                    "id": "Error",
-                    "description": "Database error.",
-                    "type": "object",
-                    "properties": [
-                        {
-                            "name": "message",
-                            "description": "Error message.",
-                            "type": "string"
-                        },
-                        {
-                            "name": "code",
-                            "description": "Error code.",
-                            "type": "integer"
-                        }
-                    ]
-                }
-            ],
-            "commands": [
-                {
-                    "name": "disable",
-                    "description": "Disables database tracking, prevents database events from being sent to the client."
-                },
-                {
-                    "name": "enable",
-                    "description": "Enables database tracking, database events will now be delivered to the client."
-                },
-                {
-                    "name": "executeSQL",
-                    "parameters": [
-                        {
-                            "name": "databaseId",
-                            "$ref": "DatabaseId"
-                        },
-                        {
-                            "name": "query",
-                            "type": "string"
-                        }
-                    ],
-                    "returns": [
-                        {
-                            "name": "columnNames",
-                            "optional": true,
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        {
-                            "name": "values",
-                            "optional": true,
-                            "type": "array",
-                            "items": {
-                                "type": "any"
-                            }
-                        },
-                        {
-                            "name": "sqlError",
-                            "optional": true,
-                            "$ref": "Error"
-                        }
-                    ]
-                },
-                {
-                    "name": "getDatabaseTableNames",
-                    "parameters": [
-                        {
-                            "name": "databaseId",
-                            "$ref": "DatabaseId"
-                        }
-                    ],
-                    "returns": [
-                        {
-                            "name": "tableNames",
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    ]
-                }
-            ],
-            "events": [
-                {
-                    "name": "addDatabase",
-                    "parameters": [
-                        {
-                            "name": "database",
-                            "$ref": "Database"
                         }
                     ]
                 }
@@ -13825,7 +13713,8 @@
                         "EnterprisePolicy",
                         "StorageAccess",
                         "TopLevelStorageAccess",
-                        "Scheme"
+                        "Scheme",
+                        "SameSiteNoneCookiesInSandbox"
                     ]
                 },
                 {
@@ -17508,6 +17397,7 @@
                         "ch-ua",
                         "ch-ua-arch",
                         "ch-ua-bitness",
+                        "ch-ua-high-entropy-values",
                         "ch-ua-platform",
                         "ch-ua-model",
                         "ch-ua-mobile",
@@ -20388,6 +20278,42 @@
                     "experimental": true
                 },
                 {
+                    "name": "frameStartedNavigating",
+                    "description": "Fired when a navigation starts. This event is fired for both\nrenderer-initiated and browser-initiated navigations. For renderer-initiated\nnavigations, the event is fired after `frameRequestedNavigation`.\nNavigation may still be cancelled after the event is issued. Multiple events\ncan be fired for a single navigation, for example, when a same-document\nnavigation becomes a cross-document navigation (such as in the case of a\nframeset).",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "frameId",
+                            "description": "ID of the frame that is being navigated.",
+                            "$ref": "FrameId"
+                        },
+                        {
+                            "name": "url",
+                            "description": "The URL the navigation started with. The final URL can be different.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "loaderId",
+                            "description": "Loader identifier. Even though it is present in case of same-document\nnavigation, the previously committed loaderId would not change unless\nthe navigation changes from a same-document to a cross-document\nnavigation.",
+                            "$ref": "Network.LoaderId"
+                        },
+                        {
+                            "name": "navigationType",
+                            "type": "string",
+                            "enum": [
+                                "reload",
+                                "reloadBypassingCache",
+                                "restore",
+                                "restoreWithPost",
+                                "historySameDocument",
+                                "historyDifferentDocument",
+                                "sameDocument",
+                                "differentDocument"
+                            ]
+                        }
+                    ]
+                },
+                {
                     "name": "frameRequestedNavigation",
                     "description": "Fired when a renderer-initiated navigation is requested.\nNavigation may still be cancelled after the event is issued.",
                     "experimental": true,
@@ -21762,7 +21688,6 @@
                     "description": "Enum of possible storage types.",
                     "type": "string",
                     "enum": [
-                        "appcache",
                         "cookies",
                         "file_systems",
                         "indexeddb",
@@ -23192,6 +23117,36 @@
                             }
                         }
                     ]
+                },
+                {
+                    "name": "getAffectedUrlsForThirdPartyCookieMetadata",
+                    "description": "Returns the list of URLs from a page and its embedded resources that match\nexisting grace period URL pattern rules.\nhttps://developers.google.com/privacy-sandbox/cookies/temporary-exceptions/grace-period",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "firstPartyUrl",
+                            "description": "The URL of the page currently being visited.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "thirdPartyUrls",
+                            "description": "The list of embedded resource URLs from the page.",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "matchedUrls",
+                            "description": "Array of matching URLs. If there is a primary pattern match for the first-\nparty URL, only the first-party URL is returned in the array.",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ]
                 }
             ],
             "events": [
@@ -23900,6 +23855,18 @@
                             "type": "integer"
                         }
                     ]
+                },
+                {
+                    "id": "WindowState",
+                    "description": "The state of the target window.",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "normal",
+                        "minimized",
+                        "maximized",
+                        "fullscreen"
+                    ]
                 }
             ],
             "commands": [
@@ -24052,29 +24019,35 @@
                         },
                         {
                             "name": "left",
-                            "description": "Frame left origin in DIP (headless chrome only).",
+                            "description": "Frame left origin in DIP (requires newWindow to be true or headless shell).",
                             "experimental": true,
                             "optional": true,
                             "type": "integer"
                         },
                         {
                             "name": "top",
-                            "description": "Frame top origin in DIP (headless chrome only).",
+                            "description": "Frame top origin in DIP (requires newWindow to be true or headless shell).",
                             "experimental": true,
                             "optional": true,
                             "type": "integer"
                         },
                         {
                             "name": "width",
-                            "description": "Frame width in DIP (headless chrome only).",
+                            "description": "Frame width in DIP (requires newWindow to be true or headless shell).",
                             "optional": true,
                             "type": "integer"
                         },
                         {
                             "name": "height",
-                            "description": "Frame height in DIP (headless chrome only).",
+                            "description": "Frame height in DIP (requires newWindow to be true or headless shell).",
                             "optional": true,
                             "type": "integer"
+                        },
+                        {
+                            "name": "windowState",
+                            "description": "Frame window state (requires newWindow to be true or headless shell).\nDefault is normal.",
+                            "optional": true,
+                            "$ref": "WindowState"
                         },
                         {
                             "name": "browserContextId",
@@ -24085,20 +24058,20 @@
                         },
                         {
                             "name": "enableBeginFrameControl",
-                            "description": "Whether BeginFrames for this target will be controlled via DevTools (headless chrome only,\nnot supported on MacOS yet, false by default).",
+                            "description": "Whether BeginFrames for this target will be controlled via DevTools (headless shell only,\nnot supported on MacOS yet, false by default).",
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
                         },
                         {
                             "name": "newWindow",
-                            "description": "Whether to create a new Window or Tab (chrome-only, false by default).",
+                            "description": "Whether to create a new Window or Tab (false by default, not supported by headless shell).",
                             "optional": true,
                             "type": "boolean"
                         },
                         {
                             "name": "background",
-                            "description": "Whether to create the target in background or foreground (chrome-only,\nfalse by default).",
+                            "description": "Whether to create the target in background or foreground (false by default, not supported\nby headless shell).",
                             "optional": true,
                             "type": "boolean"
                         },
@@ -27827,6 +27800,22 @@
                             "type": "string"
                         }
                     ]
+                },
+                {
+                    "id": "ResolvedBreakpoint",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "breakpointId",
+                            "description": "Breakpoint unique identifier.",
+                            "$ref": "BreakpointId"
+                        },
+                        {
+                            "name": "location",
+                            "description": "Actual breakpoint location.",
+                            "$ref": "Location"
+                        }
+                    ]
                 }
             ],
             "commands": [
@@ -28621,7 +28610,8 @@
             "events": [
                 {
                     "name": "breakpointResolved",
-                    "description": "Fired when breakpoint is resolved to an actual script and location.",
+                    "description": "Fired when breakpoint is resolved to an actual script and location.\nDeprecated in favor of `resolvedBreakpoints` in the `scriptParsed` event.",
+                    "deprecated": true,
                     "parameters": [
                         {
                             "name": "breakpointId",
@@ -28941,6 +28931,16 @@
                             "experimental": true,
                             "optional": true,
                             "type": "string"
+                        },
+                        {
+                            "name": "resolvedBreakpoints",
+                            "description": "The list of set breakpoints in this script if calls to `setBreakpointByUrl`\nmatches this script's URL or hash. Clients that use this list can ignore the\n`breakpointResolved` event. They are equivalent.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "$ref": "ResolvedBreakpoint"
+                            }
                         }
                     ]
                 }
@@ -30681,12 +30681,22 @@
                     "returns": [
                         {
                             "name": "usedSize",
-                            "description": "Used heap size in bytes.",
+                            "description": "Used JavaScript heap size in bytes.",
                             "type": "number"
                         },
                         {
                             "name": "totalSize",
-                            "description": "Allocated heap size in bytes.",
+                            "description": "Allocated JavaScript heap size in bytes.",
+                            "type": "number"
+                        },
+                        {
+                            "name": "embedderHeapUsedSize",
+                            "description": "Used size in bytes in the embedder's garbage-collected heap.",
+                            "type": "number"
+                        },
+                        {
+                            "name": "backingStorageSize",
+                            "description": "Size in bytes of backing storage for array buffers and external strings.",
                             "type": "number"
                         }
                     ]

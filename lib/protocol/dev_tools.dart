@@ -9,7 +9,6 @@ import 'browser.dart';
 import 'cache_storage.dart';
 import 'cast.dart';
 import 'css.dart';
-import 'database.dart';
 import 'debugger.dart';
 import 'device_access.dart';
 import 'device_orientation.dart';
@@ -131,9 +130,6 @@ class DevTools {
   /// Query and modify DOM storage.
   DOMStorageApi get domStorage => _domStorage ??= DOMStorageApi(client);
   DOMStorageApi? _domStorage;
-
-  DatabaseApi get database => _database ??= DatabaseApi(client);
-  DatabaseApi? _database;
 
   DeviceOrientationApi get deviceOrientation =>
       _deviceOrientation ??= DeviceOrientationApi(client);
