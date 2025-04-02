@@ -331,8 +331,13 @@ class PageApi {
   }
 
   /// Enables page domain notifications.
-  Future<void> enable() async {
-    await _client.send('Page.enable');
+  /// [enableFileChooserOpenedEvent] If true, the `Page.fileChooserOpened` event will be emitted regardless of the state set by
+  /// `Page.setInterceptFileChooserDialog` command (default: false).
+  Future<void> enable({bool? enableFileChooserOpenedEvent}) async {
+    await _client.send('Page.enable', {
+      if (enableFileChooserOpenedEvent != null)
+        'enableFileChooserOpenedEvent': enableFileChooserOpenedEvent,
+    });
   }
 
   /// Gets the processed manifest for this current document.
@@ -1734,7 +1739,7 @@ enum GatedAPIFeatures {
 }
 
 /// All Permissions Policy features. This enum should match the one defined
-/// in third_party/blink/renderer/core/permissions_policy/permissions_policy_features.json5.
+/// in services/network/public/cpp/permissions_policy/permissions_policy_features.json5.
 enum PermissionsPolicyFeature {
   accelerometer('accelerometer'),
   allScreensCapture('all-screens-capture'),
@@ -2111,6 +2116,26 @@ class OriginTrial {
   }
 }
 
+/// Additional information about the frame document's security origin.
+class SecurityOriginDetails {
+  /// Indicates whether the frame document's security origin is one
+  /// of the local hostnames (e.g. "localhost") or IP addresses (IPv4
+  /// 127.0.0.0/8 or IPv6 ::1).
+  final bool isLocalhost;
+
+  SecurityOriginDetails({required this.isLocalhost});
+
+  factory SecurityOriginDetails.fromJson(Map<String, dynamic> json) {
+    return SecurityOriginDetails(
+      isLocalhost: json['isLocalhost'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'isLocalhost': isLocalhost};
+  }
+}
+
 /// Information about the Frame on the page.
 class FrameInfo {
   /// Frame unique identifier.
@@ -2140,6 +2165,9 @@ class FrameInfo {
   /// Frame document's security origin.
   final String securityOrigin;
 
+  /// Additional details about the frame document's security origin.
+  final SecurityOriginDetails? securityOriginDetails;
+
   /// Frame document's mimeType as determined by the browser.
   final String mimeType;
 
@@ -2167,6 +2195,7 @@ class FrameInfo {
     this.urlFragment,
     required this.domainAndRegistry,
     required this.securityOrigin,
+    this.securityOriginDetails,
     required this.mimeType,
     this.unreachableUrl,
     this.adFrameStatus,
@@ -2191,6 +2220,12 @@ class FrameInfo {
               : null,
       domainAndRegistry: json['domainAndRegistry'] as String,
       securityOrigin: json['securityOrigin'] as String,
+      securityOriginDetails:
+          json.containsKey('securityOriginDetails')
+              ? SecurityOriginDetails.fromJson(
+                json['securityOriginDetails'] as Map<String, dynamic>,
+              )
+              : null,
       mimeType: json['mimeType'] as String,
       unreachableUrl:
           json.containsKey('unreachableUrl')
@@ -2229,6 +2264,8 @@ class FrameInfo {
       if (parentId != null) 'parentId': parentId!.toJson(),
       if (name != null) 'name': name,
       if (urlFragment != null) 'urlFragment': urlFragment,
+      if (securityOriginDetails != null)
+        'securityOriginDetails': securityOriginDetails!.toJson(),
       if (unreachableUrl != null) 'unreachableUrl': unreachableUrl,
       if (adFrameStatus != null) 'adFrameStatus': adFrameStatus!.toJson(),
     };
@@ -3694,7 +3731,10 @@ enum BackForwardCacheNotRestoredReason {
     'EmbedderExtensionSentMessageToCachedFrame',
   ),
   requestedByWebViewClient('RequestedByWebViewClient'),
-  postMessageByWebViewClient('PostMessageByWebViewClient');
+  postMessageByWebViewClient('PostMessageByWebViewClient'),
+  cacheControlNoStoreDeviceBoundSessionTerminated(
+    'CacheControlNoStoreDeviceBoundSessionTerminated',
+  );
 
   final String value;
 

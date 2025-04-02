@@ -524,9 +524,9 @@ class DOMApi {
   /// Returns: NodeId of the element matching the queried relation.
   Future<NodeId> getElementByRelation(
     NodeId nodeId,
-    @Enum(['PopoverTarget']) String relation,
+    @Enum(['PopoverTarget', 'InterestTarget']) String relation,
   ) async {
-    assert(const ['PopoverTarget'].contains(relation));
+    assert(const ['PopoverTarget', 'InterestTarget'].contains(relation));
     var result = await _client.send('DOM.getElementByRelation', {
       'nodeId': nodeId,
       'relation': relation,

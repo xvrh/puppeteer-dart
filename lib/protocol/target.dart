@@ -104,13 +104,16 @@ class TargetApi {
   /// - `binding.send(json)` - a method to send messages over the remote debugging protocol
   /// - `binding.onmessage = json => handleMessage(json)` - a callback that will be called for the protocol notifications and command responses.
   /// [bindingName] Binding name, 'cdp' if not specified.
+  /// [inheritPermissions] If true, inherits the current root session's permissions (default: false).
   Future<void> exposeDevToolsProtocol(
     TargetID targetId, {
     String? bindingName,
+    bool? inheritPermissions,
   }) async {
     await _client.send('Target.exposeDevToolsProtocol', {
       'targetId': targetId,
       if (bindingName != null) 'bindingName': bindingName,
+      if (inheritPermissions != null) 'inheritPermissions': inheritPermissions,
     });
   }
 

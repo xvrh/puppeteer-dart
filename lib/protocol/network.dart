@@ -2653,7 +2653,8 @@ enum CorsError {
   privateNetworkAccessPermissionUnavailable(
     'PrivateNetworkAccessPermissionUnavailable',
   ),
-  privateNetworkAccessPermissionDenied('PrivateNetworkAccessPermissionDenied');
+  privateNetworkAccessPermissionDenied('PrivateNetworkAccessPermissionDenied'),
+  localNetworkAccessPermissionDenied('LocalNetworkAccessPermissionDenied');
 
   final String value;
 
@@ -4296,7 +4297,8 @@ enum PrivateNetworkRequestPolicy {
   blockFromInsecureToMorePrivate('BlockFromInsecureToMorePrivate'),
   warnFromInsecureToMorePrivate('WarnFromInsecureToMorePrivate'),
   preflightBlock('PreflightBlock'),
-  preflightWarn('PreflightWarn');
+  preflightWarn('PreflightWarn'),
+  permissionBlock('PermissionBlock');
 
   final String value;
 

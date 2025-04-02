@@ -672,6 +672,9 @@ class GetMatchedStylesForNodeResult {
   /// Id of the first parent element that does not have display: contents.
   final dom.NodeId? parentLayoutNodeId;
 
+  /// A list of CSS at-function rules referenced by styles of this node.
+  final List<CSSFunctionRule>? cssFunctionRules;
+
   GetMatchedStylesForNodeResult({
     this.inlineStyle,
     this.attributesStyle,
@@ -686,6 +689,7 @@ class GetMatchedStylesForNodeResult {
     this.cssPropertyRegistrations,
     this.cssFontPaletteValuesRule,
     this.parentLayoutNodeId,
+    this.cssFunctionRules,
   });
 
   factory GetMatchedStylesForNodeResult.fromJson(Map<String, dynamic> json) {
@@ -783,6 +787,14 @@ class GetMatchedStylesForNodeResult {
       parentLayoutNodeId:
           json.containsKey('parentLayoutNodeId')
               ? dom.NodeId.fromJson(json['parentLayoutNodeId'] as int)
+              : null,
+      cssFunctionRules:
+          json.containsKey('cssFunctionRules')
+              ? (json['cssFunctionRules'] as List)
+                  .map(
+                    (e) => CSSFunctionRule.fromJson(e as Map<String, dynamic>),
+                  )
+                  .toList()
               : null,
     );
   }
@@ -2545,6 +2557,180 @@ class CSSPropertyRule {
       'origin': origin.toJson(),
       'propertyName': propertyName.toJson(),
       'style': style.toJson(),
+      if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
+    };
+  }
+}
+
+/// CSS function argument representation.
+class CSSFunctionParameter {
+  /// The parameter name.
+  final String name;
+
+  /// The parameter type.
+  final String type;
+
+  CSSFunctionParameter({required this.name, required this.type});
+
+  factory CSSFunctionParameter.fromJson(Map<String, dynamic> json) {
+    return CSSFunctionParameter(
+      name: json['name'] as String,
+      type: json['type'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'name': name, 'type': type};
+  }
+}
+
+/// CSS function conditional block representation.
+class CSSFunctionConditionNode {
+  /// Media query for this conditional block. Only one type of condition should be set.
+  final CSSMedia? media;
+
+  /// Container query for this conditional block. Only one type of condition should be set.
+  final CSSContainerQuery? containerQueries;
+
+  /// @supports CSS at-rule condition. Only one type of condition should be set.
+  final CSSSupports? supports;
+
+  /// Block body.
+  final List<CSSFunctionNode> children;
+
+  /// The condition text.
+  final String conditionText;
+
+  CSSFunctionConditionNode({
+    this.media,
+    this.containerQueries,
+    this.supports,
+    required this.children,
+    required this.conditionText,
+  });
+
+  factory CSSFunctionConditionNode.fromJson(Map<String, dynamic> json) {
+    return CSSFunctionConditionNode(
+      media:
+          json.containsKey('media')
+              ? CSSMedia.fromJson(json['media'] as Map<String, dynamic>)
+              : null,
+      containerQueries:
+          json.containsKey('containerQueries')
+              ? CSSContainerQuery.fromJson(
+                json['containerQueries'] as Map<String, dynamic>,
+              )
+              : null,
+      supports:
+          json.containsKey('supports')
+              ? CSSSupports.fromJson(json['supports'] as Map<String, dynamic>)
+              : null,
+      children:
+          (json['children'] as List)
+              .map((e) => CSSFunctionNode.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      conditionText: json['conditionText'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'children': children.map((e) => e.toJson()).toList(),
+      'conditionText': conditionText,
+      if (media != null) 'media': media!.toJson(),
+      if (containerQueries != null)
+        'containerQueries': containerQueries!.toJson(),
+      if (supports != null) 'supports': supports!.toJson(),
+    };
+  }
+}
+
+/// Section of the body of a CSS function rule.
+class CSSFunctionNode {
+  /// A conditional block. If set, style should not be set.
+  final CSSFunctionConditionNode? condition;
+
+  /// Values set by this node. If set, condition should not be set.
+  final CSSStyle? style;
+
+  CSSFunctionNode({this.condition, this.style});
+
+  factory CSSFunctionNode.fromJson(Map<String, dynamic> json) {
+    return CSSFunctionNode(
+      condition:
+          json.containsKey('condition')
+              ? CSSFunctionConditionNode.fromJson(
+                json['condition'] as Map<String, dynamic>,
+              )
+              : null,
+      style:
+          json.containsKey('style')
+              ? CSSStyle.fromJson(json['style'] as Map<String, dynamic>)
+              : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (condition != null) 'condition': condition!.toJson(),
+      if (style != null) 'style': style!.toJson(),
+    };
+  }
+}
+
+/// CSS function at-rule representation.
+class CSSFunctionRule {
+  /// Name of the function.
+  final Value name;
+
+  /// The css style sheet identifier (absent for user agent stylesheet and user-specified
+  /// stylesheet rules) this rule came from.
+  final StyleSheetId? styleSheetId;
+
+  /// Parent stylesheet's origin.
+  final StyleSheetOrigin origin;
+
+  /// List of parameters.
+  final List<CSSFunctionParameter> parameters;
+
+  /// Function body.
+  final List<CSSFunctionNode> children;
+
+  CSSFunctionRule({
+    required this.name,
+    this.styleSheetId,
+    required this.origin,
+    required this.parameters,
+    required this.children,
+  });
+
+  factory CSSFunctionRule.fromJson(Map<String, dynamic> json) {
+    return CSSFunctionRule(
+      name: Value.fromJson(json['name'] as Map<String, dynamic>),
+      styleSheetId:
+          json.containsKey('styleSheetId')
+              ? StyleSheetId.fromJson(json['styleSheetId'] as String)
+              : null,
+      origin: StyleSheetOrigin.fromJson(json['origin'] as String),
+      parameters:
+          (json['parameters'] as List)
+              .map(
+                (e) => CSSFunctionParameter.fromJson(e as Map<String, dynamic>),
+              )
+              .toList(),
+      children:
+          (json['children'] as List)
+              .map((e) => CSSFunctionNode.fromJson(e as Map<String, dynamic>))
+              .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name.toJson(),
+      'origin': origin.toJson(),
+      'parameters': parameters.map((e) => e.toJson()).toList(),
+      'children': children.map((e) => e.toJson()).toList(),
       if (styleSheetId != null) 'styleSheetId': styleSheetId!.toJson(),
     };
   }

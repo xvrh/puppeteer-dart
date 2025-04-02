@@ -558,7 +558,8 @@ enum PrerenderFinalStatus {
   slowNetwork('SlowNetwork'),
   otherPrerenderedPageActivated('OtherPrerenderedPageActivated'),
   v8OptimizerDisabled('V8OptimizerDisabled'),
-  prerenderFailedDuringPrefetch('PrerenderFailedDuringPrefetch');
+  prerenderFailedDuringPrefetch('PrerenderFailedDuringPrefetch'),
+  browsingDataRemoved('BrowsingDataRemoved');
 
   final String value;
 

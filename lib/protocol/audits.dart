@@ -685,6 +685,7 @@ enum ContentSecurityPolicyViolationType {
   kInlineViolation('kInlineViolation'),
   kEvalViolation('kEvalViolation'),
   kUrlViolation('kURLViolation'),
+  kSriViolation('kSRIViolation'),
   kTrustedTypesSinkViolation('kTrustedTypesSinkViolation'),
   kTrustedTypesPolicyViolation('kTrustedTypesPolicyViolation'),
   kWasmEvalViolation('kWasmEvalViolation');
@@ -1074,6 +1075,59 @@ enum SharedDictionaryError {
   String toString() => value.toString();
 }
 
+enum SRIMessageSignatureError {
+  missingSignatureHeader('MissingSignatureHeader'),
+  missingSignatureInputHeader('MissingSignatureInputHeader'),
+  invalidSignatureHeader('InvalidSignatureHeader'),
+  invalidSignatureInputHeader('InvalidSignatureInputHeader'),
+  signatureHeaderValueIsNotByteSequence(
+    'SignatureHeaderValueIsNotByteSequence',
+  ),
+  signatureHeaderValueIsParameterized('SignatureHeaderValueIsParameterized'),
+  signatureHeaderValueIsIncorrectLength(
+    'SignatureHeaderValueIsIncorrectLength',
+  ),
+  signatureInputHeaderMissingLabel('SignatureInputHeaderMissingLabel'),
+  signatureInputHeaderValueNotInnerList(
+    'SignatureInputHeaderValueNotInnerList',
+  ),
+  signatureInputHeaderValueMissingComponents(
+    'SignatureInputHeaderValueMissingComponents',
+  ),
+  signatureInputHeaderInvalidComponentType(
+    'SignatureInputHeaderInvalidComponentType',
+  ),
+  signatureInputHeaderInvalidComponentName(
+    'SignatureInputHeaderInvalidComponentName',
+  ),
+  signatureInputHeaderInvalidHeaderComponentParameter(
+    'SignatureInputHeaderInvalidHeaderComponentParameter',
+  ),
+  signatureInputHeaderInvalidDerivedComponentParameter(
+    'SignatureInputHeaderInvalidDerivedComponentParameter',
+  ),
+  signatureInputHeaderKeyIdLength('SignatureInputHeaderKeyIdLength'),
+  signatureInputHeaderInvalidParameter('SignatureInputHeaderInvalidParameter'),
+  signatureInputHeaderMissingRequiredParameters(
+    'SignatureInputHeaderMissingRequiredParameters',
+  ),
+  validationFailedSignatureExpired('ValidationFailedSignatureExpired'),
+  validationFailedInvalidLength('ValidationFailedInvalidLength'),
+  validationFailedSignatureMismatch('ValidationFailedSignatureMismatch');
+
+  final String value;
+
+  const SRIMessageSignatureError(this.value);
+
+  factory SRIMessageSignatureError.fromJson(String value) =>
+      SRIMessageSignatureError.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
 /// Details for issues around "Attribution Reporting API" usage.
 /// Explainer: https://github.com/WICG/attribution-reporting-api
 class AttributionReportingIssueDetails {
@@ -1218,6 +1272,27 @@ class SharedDictionaryIssueDetails {
       'sharedDictionaryError': sharedDictionaryError.toJson(),
       'request': request.toJson(),
     };
+  }
+}
+
+class SRIMessageSignatureIssueDetails {
+  final SRIMessageSignatureError error;
+
+  final AffectedRequest request;
+
+  SRIMessageSignatureIssueDetails({required this.error, required this.request});
+
+  factory SRIMessageSignatureIssueDetails.fromJson(Map<String, dynamic> json) {
+    return SRIMessageSignatureIssueDetails(
+      error: SRIMessageSignatureError.fromJson(json['error'] as String),
+      request: AffectedRequest.fromJson(
+        json['request'] as Map<String, dynamic>,
+      ),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'error': error.toJson(), 'request': request.toJson()};
   }
 }
 
@@ -1509,7 +1584,8 @@ enum FederatedAuthRequestIssueReason {
   invalidFieldsSpecified('InvalidFieldsSpecified'),
   relyingPartyOriginIsOpaque('RelyingPartyOriginIsOpaque'),
   typeNotMatching('TypeNotMatching'),
-  uiDismissedNoEmbargo('UiDismissedNoEmbargo');
+  uiDismissedNoEmbargo('UiDismissedNoEmbargo'),
+  corsError('CorsError');
 
   final String value;
 
@@ -1644,6 +1720,52 @@ class FailedRequestInfo {
       'url': url,
       'failureMessage': failureMessage,
       if (requestId != null) 'requestId': requestId!.toJson(),
+    };
+  }
+}
+
+enum PartitioningBlobURLInfo {
+  blockedCrossPartitionFetching('BlockedCrossPartitionFetching'),
+  enforceNoopenerForNavigation('EnforceNoopenerForNavigation');
+
+  final String value;
+
+  const PartitioningBlobURLInfo(this.value);
+
+  factory PartitioningBlobURLInfo.fromJson(String value) =>
+      PartitioningBlobURLInfo.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+class PartitioningBlobURLIssueDetails {
+  /// The BlobURL that failed to load.
+  final String url;
+
+  /// Additional information about the Partitioning Blob URL issue.
+  final PartitioningBlobURLInfo partitioningBlobURLInfo;
+
+  PartitioningBlobURLIssueDetails({
+    required this.url,
+    required this.partitioningBlobURLInfo,
+  });
+
+  factory PartitioningBlobURLIssueDetails.fromJson(Map<String, dynamic> json) {
+    return PartitioningBlobURLIssueDetails(
+      url: json['url'] as String,
+      partitioningBlobURLInfo: PartitioningBlobURLInfo.fromJson(
+        json['partitioningBlobURLInfo'] as String,
+      ),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      'partitioningBlobURLInfo': partitioningBlobURLInfo.toJson(),
     };
   }
 }
@@ -1845,6 +1967,7 @@ enum InspectorIssueCode {
   corsIssue('CorsIssue'),
   attributionReportingIssue('AttributionReportingIssue'),
   quirksModeIssue('QuirksModeIssue'),
+  partitioningBlobUrlIssue('PartitioningBlobURLIssue'),
   navigatorUserAgentIssue('NavigatorUserAgentIssue'),
   genericIssue('GenericIssue'),
   deprecationIssue('DeprecationIssue'),
@@ -1856,7 +1979,8 @@ enum InspectorIssueCode {
   federatedAuthUserInfoRequestIssue('FederatedAuthUserInfoRequestIssue'),
   propertyRuleIssue('PropertyRuleIssue'),
   sharedDictionaryIssue('SharedDictionaryIssue'),
-  selectElementAccessibilityIssue('SelectElementAccessibilityIssue');
+  selectElementAccessibilityIssue('SelectElementAccessibilityIssue'),
+  sriMessageSignatureIssue('SRIMessageSignatureIssue');
 
   final String value;
 
@@ -1895,6 +2019,8 @@ class InspectorIssueDetails {
 
   final QuirksModeIssueDetails? quirksModeIssueDetails;
 
+  final PartitioningBlobURLIssueDetails? partitioningBlobURLIssueDetails;
+
   final GenericIssueDetails? genericIssueDetails;
 
   final DeprecationIssueDetails? deprecationIssueDetails;
@@ -1920,6 +2046,8 @@ class InspectorIssueDetails {
   final SelectElementAccessibilityIssueDetails?
   selectElementAccessibilityIssueDetails;
 
+  final SRIMessageSignatureIssueDetails? sriMessageSignatureIssueDetails;
+
   InspectorIssueDetails({
     this.cookieIssueDetails,
     this.mixedContentIssueDetails,
@@ -1931,6 +2059,7 @@ class InspectorIssueDetails {
     this.corsIssueDetails,
     this.attributionReportingIssueDetails,
     this.quirksModeIssueDetails,
+    this.partitioningBlobURLIssueDetails,
     this.genericIssueDetails,
     this.deprecationIssueDetails,
     this.clientHintIssueDetails,
@@ -1942,6 +2071,7 @@ class InspectorIssueDetails {
     this.federatedAuthUserInfoRequestIssueDetails,
     this.sharedDictionaryIssueDetails,
     this.selectElementAccessibilityIssueDetails,
+    this.sriMessageSignatureIssueDetails,
   });
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
@@ -2006,6 +2136,12 @@ class InspectorIssueDetails {
           json.containsKey('quirksModeIssueDetails')
               ? QuirksModeIssueDetails.fromJson(
                 json['quirksModeIssueDetails'] as Map<String, dynamic>,
+              )
+              : null,
+      partitioningBlobURLIssueDetails:
+          json.containsKey('partitioningBlobURLIssueDetails')
+              ? PartitioningBlobURLIssueDetails.fromJson(
+                json['partitioningBlobURLIssueDetails'] as Map<String, dynamic>,
               )
               : null,
       genericIssueDetails:
@@ -2078,6 +2214,12 @@ class InspectorIssueDetails {
                     as Map<String, dynamic>,
               )
               : null,
+      sriMessageSignatureIssueDetails:
+          json.containsKey('sriMessageSignatureIssueDetails')
+              ? SRIMessageSignatureIssueDetails.fromJson(
+                json['sriMessageSignatureIssueDetails'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 
@@ -2107,6 +2249,9 @@ class InspectorIssueDetails {
             attributionReportingIssueDetails!.toJson(),
       if (quirksModeIssueDetails != null)
         'quirksModeIssueDetails': quirksModeIssueDetails!.toJson(),
+      if (partitioningBlobURLIssueDetails != null)
+        'partitioningBlobURLIssueDetails':
+            partitioningBlobURLIssueDetails!.toJson(),
       if (genericIssueDetails != null)
         'genericIssueDetails': genericIssueDetails!.toJson(),
       if (deprecationIssueDetails != null)
@@ -2134,6 +2279,9 @@ class InspectorIssueDetails {
       if (selectElementAccessibilityIssueDetails != null)
         'selectElementAccessibilityIssueDetails':
             selectElementAccessibilityIssueDetails!.toJson(),
+      if (sriMessageSignatureIssueDetails != null)
+        'sriMessageSignatureIssueDetails':
+            sriMessageSignatureIssueDetails!.toJson(),
     };
   }
 }
