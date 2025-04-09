@@ -17900,6 +17900,7 @@
                         "cross-origin-isolated",
                         "deferred-fetch",
                         "deferred-fetch-minimal",
+                        "device-attributes",
                         "digital-credentials-get",
                         "direct-sockets",
                         "direct-sockets-private",
@@ -24629,6 +24630,13 @@
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "hidden",
+                            "description": "Whether to create a hidden target. The hidden target is observable via protocol, but not\npresent in the tab UI strip. Cannot be created with `forTab: true`, `newWindow: true` or\n`background: false`. The life-time of the tab is limited to the life-time of the session.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ],
                     "returns": [
@@ -24735,7 +24743,7 @@
                 },
                 {
                     "name": "setAutoAttach",
-                    "description": "Controls whether to automatically attach to new targets which are considered to be related to\nthis one. When turned on, attaches to all existing related targets as well. When turned off,\nautomatically detaches from all currently attached targets.\nThis also clears all targets added by `autoAttachRelated` from the list of targets to watch\nfor creation of related targets.",
+                    "description": "Controls whether to automatically attach to new targets which are considered\nto be directly related to this one (for example, iframes or workers).\nWhen turned on, attaches to all existing related targets as well. When turned off,\nautomatically detaches from all currently attached targets.\nThis also clears all targets added by `autoAttachRelated` from the list of targets to watch\nfor creation of related targets.\nYou might want to call this recursively for auto-attached targets to attach\nto all available targets.",
                     "parameters": [
                         {
                             "name": "autoAttach",
@@ -28082,12 +28090,8 @@
                 },
                 {
                     "name": "removeService",
-                    "description": "Removes the service respresented by |serviceId| from the peripheral with\n|address|.",
+                    "description": "Removes the service respresented by |serviceId| from the simulated central.",
                     "parameters": [
-                        {
-                            "name": "address",
-                            "type": "string"
-                        },
                         {
                             "name": "serviceId",
                             "type": "string"
@@ -28096,12 +28100,8 @@
                 },
                 {
                     "name": "addCharacteristic",
-                    "description": "Adds a characteristic with |characteristicUuid| and |properties| to the\nservice represented by |serviceId| in the peripheral with |address|.",
+                    "description": "Adds a characteristic with |characteristicUuid| and |properties| to the\nservice represented by |serviceId|.",
                     "parameters": [
-                        {
-                            "name": "address",
-                            "type": "string"
-                        },
                         {
                             "name": "serviceId",
                             "type": "string"
@@ -28125,16 +28125,8 @@
                 },
                 {
                     "name": "removeCharacteristic",
-                    "description": "Removes the characteristic respresented by |characteristicId| from the\nservice respresented by |serviceId| in the peripheral with |address|.",
+                    "description": "Removes the characteristic respresented by |characteristicId| from the\nsimulated central.",
                     "parameters": [
-                        {
-                            "name": "address",
-                            "type": "string"
-                        },
-                        {
-                            "name": "serviceId",
-                            "type": "string"
-                        },
                         {
                             "name": "characteristicId",
                             "type": "string"
@@ -28143,16 +28135,8 @@
                 },
                 {
                     "name": "addDescriptor",
-                    "description": "Adds a descriptor with |descriptorUuid| to the characteristic respresented\nby |characteristicId| in the service represented by |serviceId| of the\nperipheral with |address|.",
+                    "description": "Adds a descriptor with |descriptorUuid| to the characteristic respresented\nby |characteristicId|.",
                     "parameters": [
-                        {
-                            "name": "address",
-                            "type": "string"
-                        },
-                        {
-                            "name": "serviceId",
-                            "type": "string"
-                        },
                         {
                             "name": "characteristicId",
                             "type": "string"
@@ -28172,20 +28156,8 @@
                 },
                 {
                     "name": "removeDescriptor",
-                    "description": "Removes the descriptor with |descriptorId| from the characteristic\nrespresented by |characteristicId| in the service represented by |serviceId|\nof the peripheral with |address|.",
+                    "description": "Removes the descriptor with |descriptorId| from the simulated central.",
                     "parameters": [
-                        {
-                            "name": "address",
-                            "type": "string"
-                        },
-                        {
-                            "name": "serviceId",
-                            "type": "string"
-                        },
-                        {
-                            "name": "characteristicId",
-                            "type": "string"
-                        },
                         {
                             "name": "descriptorId",
                             "type": "string"
