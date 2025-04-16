@@ -3026,7 +3026,8 @@
                     "type": "string",
                     "enum": [
                         "openTabSearch",
-                        "closeTabSearch"
+                        "closeTabSearch",
+                        "openGlic"
                     ]
                 },
                 {
@@ -10111,7 +10112,7 @@
                 },
                 {
                     "name": "setGeolocationOverride",
-                    "description": "Overrides the Geolocation Position or Error. Omitting any of the parameters emulates position\nunavailable.",
+                    "description": "Overrides the Geolocation Position or Error. Omitting latitude, longitude or\naccuracy emulates position unavailable.",
                     "parameters": [
                         {
                             "name": "latitude",
@@ -10128,6 +10129,30 @@
                         {
                             "name": "accuracy",
                             "description": "Mock accuracy",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "altitude",
+                            "description": "Mock altitude",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "altitudeAccuracy",
+                            "description": "Mock altitudeAccuracy",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "heading",
+                            "description": "Mock heading",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "speed",
+                            "description": "Mock speed",
                             "optional": true,
                             "type": "number"
                         }
@@ -13519,7 +13544,8 @@
                         "network",
                         "cache",
                         "fetch-event",
-                        "race-network-and-fetch-handler"
+                        "race-network-and-fetch-handler",
+                        "race-network-and-cache"
                     ]
                 },
                 {
@@ -16297,6 +16323,63 @@
                         {
                             "name": "identifier",
                             "$ref": "RequestId"
+                        },
+                        {
+                            "name": "timestamp",
+                            "$ref": "MonotonicTime"
+                        }
+                    ]
+                },
+                {
+                    "name": "directTCPSocketChunkSent",
+                    "description": "Fired when data is sent to tcp direct socket stream.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "identifier",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "data",
+                            "type": "string"
+                        },
+                        {
+                            "name": "timestamp",
+                            "$ref": "MonotonicTime"
+                        }
+                    ]
+                },
+                {
+                    "name": "directTCPSocketChunkReceived",
+                    "description": "Fired when data is received from tcp direct socket stream.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "identifier",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "data",
+                            "type": "string"
+                        },
+                        {
+                            "name": "timestamp",
+                            "$ref": "MonotonicTime"
+                        }
+                    ]
+                },
+                {
+                    "name": "directTCPSocketChunkError",
+                    "description": "Fired when there is an error\nwhen writing to tcp direct socket stream.\nFor example, if user writes illegal type like string\ninstead of ArrayBuffer or ArrayBufferView.\nThere's no reporting for reading, because\nwe cannot know errors on the other side.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "identifier",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "errorMessage",
+                            "type": "string"
                         },
                         {
                             "name": "timestamp",
