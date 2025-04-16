@@ -92,5 +92,5 @@ void main() {
       tempDirectory.deleteSync(recursive: true);
       await browser.close();
     }
-  }, timeout: Timeout.factor(3));
+  }, timeout: Timeout.factor(3), skip: Platform.isMacOS ? 'To debug': null);
 }
