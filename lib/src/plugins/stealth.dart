@@ -322,20 +322,31 @@ function _() {
 final _webglVendor = '''
 function _() {
   try {
-    /* global WebGLRenderingContext */
-    const getParameter = WebGLRenderingContext.getParameter;
-    WebGLRenderingContext.prototype.getParameter = function (parameter) {
-      // UNMASKED_VENDOR_WEBGL
-      if (parameter === 37445) {
-        return 'Intel Inc.'
-      }
-      // UNMASKED_RENDERER_WEBGL
-      if (parameter === 37446) {
-        return 'Intel Iris OpenGL Engine'
-      }
-      return getParameter(parameter)
+    // Patch WebGLRenderingContext.getParameter
+    const glProto = WebGLRenderingContext.prototype;
+    const origGet = glProto.getParameter;
+    glProto.getParameter = function(parameter) {
+      // UNMASKED_VENDOR_WEBGL (37445)
+      if (parameter === 37445) return 'Intel Inc.';
+      // UNMASKED_RENDERER_WEBGL (37446)
+      if (parameter === 37446) return 'Intel Iris OpenGL Engine';
+      // Call the original with correct this-binding
+      return origGet.apply(this, [parameter]);
+    };
+
+    // Also patch WebGL2RenderingContext.getParameter if available
+    if (typeof WebGL2RenderingContext !== 'undefined') {
+      const gl2Proto = WebGL2RenderingContext.prototype;
+      const origGet2 = gl2Proto.getParameter;
+      gl2Proto.getParameter = function(parameter) {
+        if (parameter === 37445) return 'Intel Inc.';
+        if (parameter === 37446) return 'Intel Iris OpenGL Engine';
+        return origGet2.apply(this, [parameter]);
+      };
     }
-  } catch (err) {}
+  } catch (err) {
+    // ignore any errors
+  }
 }
 ''';
 
