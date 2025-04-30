@@ -8,10 +8,31 @@ class BluetoothEmulationApi {
 
   BluetoothEmulationApi(this._client);
 
+  /// Event for when a GATT operation of |type| to the peripheral with |address|
+  /// happened.
+  Stream<GattOperationReceivedEvent> get onGattOperationReceived => _client
+      .onEvent
+      .where(
+        (event) => event.name == 'BluetoothEmulation.gattOperationReceived',
+      )
+      .map((event) => GattOperationReceivedEvent.fromJson(event.parameters));
+
   /// Enable the BluetoothEmulation domain.
   /// [state] State of the simulated central.
-  Future<void> enable(CentralState state) async {
-    await _client.send('BluetoothEmulation.enable', {'state': state});
+  /// [leSupported] If the simulated central supports low-energy.
+  Future<void> enable(CentralState state, bool leSupported) async {
+    await _client.send('BluetoothEmulation.enable', {
+      'state': state,
+      'leSupported': leSupported,
+    });
+  }
+
+  /// Set the state of the simulated central.
+  /// [state] State of the simulated central.
+  Future<void> setSimulatedCentralState(CentralState state) async {
+    await _client.send('BluetoothEmulation.setSimulatedCentralState', {
+      'state': state,
+    });
   }
 
   /// Disable the BluetoothEmulation domain.
@@ -42,6 +63,87 @@ class BluetoothEmulationApi {
       'entry': entry,
     });
   }
+
+  /// Simulates the response code from the peripheral with |address| for a
+  /// GATT operation of |type|. The |code| value follows the HCI Error Codes from
+  /// Bluetooth Core Specification Vol 2 Part D 1.3 List Of Error Codes.
+  Future<void> simulateGATTOperationResponse(
+    String address,
+    GATTOperationType type,
+    int code,
+  ) async {
+    await _client.send('BluetoothEmulation.simulateGATTOperationResponse', {
+      'address': address,
+      'type': type,
+      'code': code,
+    });
+  }
+
+  /// Adds a service with |serviceUuid| to the peripheral with |address|.
+  /// Returns: An identifier that uniquely represents this service.
+  Future<String> addService(String address, String serviceUuid) async {
+    var result = await _client.send('BluetoothEmulation.addService', {
+      'address': address,
+      'serviceUuid': serviceUuid,
+    });
+    return result['serviceId'] as String;
+  }
+
+  /// Removes the service respresented by |serviceId| from the peripheral with
+  /// |address|.
+  Future<void> removeService(String address, String serviceId) async {
+    await _client.send('BluetoothEmulation.removeService', {
+      'address': address,
+      'serviceId': serviceId,
+    });
+  }
+
+  /// Adds a characteristic with |characteristicUuid| and |properties| to the
+  /// service represented by |serviceId| in the peripheral with |address|.
+  /// Returns: An identifier that uniquely represents this characteristic.
+  Future<String> addCharacteristic(
+    String address,
+    String serviceId,
+    String characteristicUuid,
+    CharacteristicProperties properties,
+  ) async {
+    var result = await _client.send('BluetoothEmulation.addCharacteristic', {
+      'address': address,
+      'serviceId': serviceId,
+      'characteristicUuid': characteristicUuid,
+      'properties': properties,
+    });
+    return result['characteristicId'] as String;
+  }
+
+  /// Removes the characteristic respresented by |characteristicId| from the
+  /// service respresented by |serviceId| in the peripheral with |address|.
+  Future<void> removeCharacteristic(
+    String address,
+    String serviceId,
+    String characteristicId,
+  ) async {
+    await _client.send('BluetoothEmulation.removeCharacteristic', {
+      'address': address,
+      'serviceId': serviceId,
+      'characteristicId': characteristicId,
+    });
+  }
+}
+
+class GattOperationReceivedEvent {
+  final String address;
+
+  final GATTOperationType type;
+
+  GattOperationReceivedEvent({required this.address, required this.type});
+
+  factory GattOperationReceivedEvent.fromJson(Map<String, dynamic> json) {
+    return GattOperationReceivedEvent(
+      address: json['address'] as String,
+      type: GATTOperationType.fromJson(json['type'] as String),
+    );
+  }
 }
 
 /// Indicates the various states of Central.
@@ -56,6 +158,24 @@ enum CentralState {
 
   factory CentralState.fromJson(String value) =>
       CentralState.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Indicates the various types of GATT event.
+enum GATTOperationType {
+  connection('connection'),
+  discovery('discovery');
+
+  final String value;
+
+  const GATTOperationType(this.value);
+
+  factory GATTOperationType.fromJson(String value) =>
+      GATTOperationType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 
@@ -173,6 +293,75 @@ class ScanEntry {
       'deviceAddress': deviceAddress,
       'rssi': rssi,
       'scanRecord': scanRecord.toJson(),
+    };
+  }
+}
+
+/// Describes the properties of a characteristic. This follows Bluetooth Core
+/// Specification BT 4.2 Vol 3 Part G 3.3.1. Characteristic Properties.
+class CharacteristicProperties {
+  final bool? broadcast;
+
+  final bool? read;
+
+  final bool? writeWithoutResponse;
+
+  final bool? write;
+
+  final bool? notify;
+
+  final bool? indicate;
+
+  final bool? authenticatedSignedWrites;
+
+  final bool? extendedProperties;
+
+  CharacteristicProperties({
+    this.broadcast,
+    this.read,
+    this.writeWithoutResponse,
+    this.write,
+    this.notify,
+    this.indicate,
+    this.authenticatedSignedWrites,
+    this.extendedProperties,
+  });
+
+  factory CharacteristicProperties.fromJson(Map<String, dynamic> json) {
+    return CharacteristicProperties(
+      broadcast:
+          json.containsKey('broadcast') ? json['broadcast'] as bool : null,
+      read: json.containsKey('read') ? json['read'] as bool : null,
+      writeWithoutResponse:
+          json.containsKey('writeWithoutResponse')
+              ? json['writeWithoutResponse'] as bool
+              : null,
+      write: json.containsKey('write') ? json['write'] as bool : null,
+      notify: json.containsKey('notify') ? json['notify'] as bool : null,
+      indicate: json.containsKey('indicate') ? json['indicate'] as bool : null,
+      authenticatedSignedWrites:
+          json.containsKey('authenticatedSignedWrites')
+              ? json['authenticatedSignedWrites'] as bool
+              : null,
+      extendedProperties:
+          json.containsKey('extendedProperties')
+              ? json['extendedProperties'] as bool
+              : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (broadcast != null) 'broadcast': broadcast,
+      if (read != null) 'read': read,
+      if (writeWithoutResponse != null)
+        'writeWithoutResponse': writeWithoutResponse,
+      if (write != null) 'write': write,
+      if (notify != null) 'notify': notify,
+      if (indicate != null) 'indicate': indicate,
+      if (authenticatedSignedWrites != null)
+        'authenticatedSignedWrites': authenticatedSignedWrites,
+      if (extendedProperties != null) 'extendedProperties': extendedProperties,
     };
   }
 }

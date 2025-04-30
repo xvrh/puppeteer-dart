@@ -2060,6 +2060,31 @@
                     ]
                 },
                 {
+                    "id": "UserReidentificationIssueType",
+                    "type": "string",
+                    "enum": [
+                        "BlockedFrameNavigation",
+                        "BlockedSubresource"
+                    ]
+                },
+                {
+                    "id": "UserReidentificationIssueDetails",
+                    "description": "This issue warns about uses of APIs that may be considered misuse to\nre-identify users.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "type",
+                            "$ref": "UserReidentificationIssueType"
+                        },
+                        {
+                            "name": "request",
+                            "description": "Applies to BlockedFrameNavigation and BlockedSubresource issue types.",
+                            "optional": true,
+                            "$ref": "AffectedRequest"
+                        }
+                    ]
+                },
+                {
                     "id": "InspectorIssueCode",
                     "description": "A unique identifier for the type of issue. Each type may use one of the\noptional fields in InspectorIssueDetails to convey more specific\ninformation about the kind of issue.",
                     "type": "string",
@@ -2087,7 +2112,8 @@
                         "PropertyRuleIssue",
                         "SharedDictionaryIssue",
                         "SelectElementAccessibilityIssue",
-                        "SRIMessageSignatureIssue"
+                        "SRIMessageSignatureIssue",
+                        "UserReidentificationIssue"
                     ]
                 },
                 {
@@ -2215,6 +2241,11 @@
                             "name": "sriMessageSignatureIssueDetails",
                             "optional": true,
                             "$ref": "SRIMessageSignatureIssueDetails"
+                        },
+                        {
+                            "name": "userReidentificationIssueDetails",
+                            "optional": true,
+                            "$ref": "UserReidentificationIssueDetails"
                         }
                     ]
                 },
@@ -17951,7 +17982,7 @@
                 },
                 {
                     "id": "PermissionsPolicyFeature",
-                    "description": "All Permissions Policy features. This enum should match the one defined\nin services/network/public/cpp/permissions_policy/permissions_policy_features.json5.",
+                    "description": "All Permissions Policy features. This enum should match the one defined\nin services/network/public/cpp/permissions_policy/permissions_policy_features.json5.\nLINT.IfChange(PermissionsPolicyFeature)",
                     "experimental": true,
                     "type": "string",
                     "enum": [
@@ -18019,6 +18050,7 @@
                         "keyboard-map",
                         "language-detector",
                         "local-fonts",
+                        "local-network-access",
                         "magnetometer",
                         "media-playback-while-not-visible",
                         "microphone",
@@ -18032,6 +18064,7 @@
                         "private-state-token-redemption",
                         "publickey-credentials-create",
                         "publickey-credentials-get",
+                        "record-ad-auction-events",
                         "rewriter",
                         "run-ad-auction",
                         "screen-wake-lock",
@@ -19837,7 +19870,7 @@
                     ]
                 },
                 {
-                    "name": "getAdScriptId",
+                    "name": "getAdScriptAncestryIds",
                     "experimental": true,
                     "parameters": [
                         {
@@ -19847,10 +19880,12 @@
                     ],
                     "returns": [
                         {
-                            "name": "adScriptId",
-                            "description": "Identifies the bottom-most script which caused the frame to be labelled\nas an ad. Only sent if frame is labelled as an ad and id is available.",
-                            "optional": true,
-                            "$ref": "AdScriptId"
+                            "name": "adScriptAncestryIds",
+                            "description": "The ancestry chain of ad script identifiers leading to this frame's\ncreation, ordered from the most immediate script (in the frame creation\nstack) to more distant ancestors (that created the immediately preceding\nscript). Only sent if frame is labelled as an ad and ids are available.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "AdScriptId"
+                            }
                         }
                     ]
                 },
@@ -21089,6 +21124,12 @@
                     "description": "Fired when a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload) has been\nclosed.",
                     "parameters": [
                         {
+                            "name": "frameId",
+                            "description": "Frame id.",
+                            "experimental": true,
+                            "$ref": "FrameId"
+                        },
+                        {
                             "name": "result",
                             "description": "Whether dialog was confirmed.",
                             "type": "boolean"
@@ -21108,6 +21149,12 @@
                             "name": "url",
                             "description": "Frame url.",
                             "type": "string"
+                        },
+                        {
+                            "name": "frameId",
+                            "description": "Frame id.",
+                            "experimental": true,
+                            "$ref": "FrameId"
                         },
                         {
                             "name": "message",
@@ -28102,6 +28149,27 @@
                     ]
                 },
                 {
+                    "id": "CharacteristicWriteType",
+                    "description": "Indicates the various types of characteristic write.",
+                    "type": "string",
+                    "enum": [
+                        "write-default-deprecated",
+                        "write-with-response",
+                        "write-without-response"
+                    ]
+                },
+                {
+                    "id": "CharacteristicOperationType",
+                    "description": "Indicates the various types of characteristic operation.",
+                    "type": "string",
+                    "enum": [
+                        "read",
+                        "write",
+                        "subscribe-to-notifications",
+                        "unsubscribe-from-notifications"
+                    ]
+                },
+                {
                     "id": "ManufacturerData",
                     "description": "Stores the manufacturer data",
                     "type": "object",
@@ -28315,6 +28383,29 @@
                     ]
                 },
                 {
+                    "name": "simulateCharacteristicOperationResponse",
+                    "description": "Simulates the response from the characteristic with |characteristicId| for a\ncharacteristic operation of |type|. The |code| value follows the Error\nCodes from Bluetooth Core Specification Vol 3 Part F 3.4.1.1 Error Response.\nThe |data| is expected to exist when simulating a successful read operation\nresponse.",
+                    "parameters": [
+                        {
+                            "name": "characteristicId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "type",
+                            "$ref": "CharacteristicOperationType"
+                        },
+                        {
+                            "name": "code",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "data",
+                            "optional": true,
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
                     "name": "addService",
                     "description": "Adds a service with |serviceUuid| to the peripheral with |address|.",
                     "parameters": [
@@ -28424,6 +28515,30 @@
                         {
                             "name": "type",
                             "$ref": "GATTOperationType"
+                        }
+                    ]
+                },
+                {
+                    "name": "characteristicOperationReceived",
+                    "description": "Event for when a characteristic operation of |type| to the characteristic\nrespresented by |characteristicId| happened. |data| and |writeType| is\nexpected to exist when |type| is write.",
+                    "parameters": [
+                        {
+                            "name": "characteristicId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "type",
+                            "$ref": "CharacteristicOperationType"
+                        },
+                        {
+                            "name": "data",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "writeType",
+                            "optional": true,
+                            "$ref": "CharacteristicWriteType"
                         }
                     ]
                 }
