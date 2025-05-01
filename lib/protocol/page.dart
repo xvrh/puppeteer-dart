@@ -915,9 +915,16 @@ class PageApi {
   /// Intercept file chooser requests and transfer control to protocol clients.
   /// When file chooser interception is enabled, native file chooser dialog is not shown.
   /// Instead, a protocol event `Page.fileChooserOpened` is emitted.
-  Future<void> setInterceptFileChooserDialog(bool enabled) async {
+  /// [cancel] If true, cancels the dialog by emitting relevant events (if any)
+  /// in addition to not showing it if the interception is enabled
+  /// (default: false).
+  Future<void> setInterceptFileChooserDialog(
+    bool enabled, {
+    bool? cancel,
+  }) async {
     await _client.send('Page.setInterceptFileChooserDialog', {
       'enabled': enabled,
+      if (cancel != null) 'cancel': cancel,
     });
   }
 
@@ -1802,6 +1809,7 @@ enum PermissionsPolicyFeature {
   interestCohort('interest-cohort'),
   joinAdInterestGroup('join-ad-interest-group'),
   keyboardMap('keyboard-map'),
+  languageDetector('language-detector'),
   localFonts('local-fonts'),
   magnetometer('magnetometer'),
   mediaPlaybackWhileNotVisible('media-playback-while-not-visible'),
@@ -1816,6 +1824,7 @@ enum PermissionsPolicyFeature {
   privateStateTokenRedemption('private-state-token-redemption'),
   publickeyCredentialsCreate('publickey-credentials-create'),
   publickeyCredentialsGet('publickey-credentials-get'),
+  rewriter('rewriter'),
   runAdAuction('run-ad-auction'),
   screenWakeLock('screen-wake-lock'),
   serial('serial'),
@@ -1826,7 +1835,9 @@ enum PermissionsPolicyFeature {
   speakerSelection('speaker-selection'),
   storageAccess('storage-access'),
   subApps('sub-apps'),
+  summarizer('summarizer'),
   syncXhr('sync-xhr'),
+  translator('translator'),
   unload('unload'),
   usb('usb'),
   usbUnrestricted('usb-unrestricted'),
@@ -1835,6 +1846,7 @@ enum PermissionsPolicyFeature {
   webPrinting('web-printing'),
   webShare('web-share'),
   windowManagement('window-management'),
+  writer('writer'),
   xrSpatialTracking('xr-spatial-tracking');
 
   final String value;
@@ -3734,7 +3746,8 @@ enum BackForwardCacheNotRestoredReason {
   postMessageByWebViewClient('PostMessageByWebViewClient'),
   cacheControlNoStoreDeviceBoundSessionTerminated(
     'CacheControlNoStoreDeviceBoundSessionTerminated',
-  );
+  ),
+  cacheLimitPruned('CacheLimitPruned');
 
   final String value;
 

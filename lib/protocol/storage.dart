@@ -708,14 +708,20 @@ class SharedStorageAccessedEvent {
   /// Time of the access.
   final network.TimeSinceEpoch accessTime;
 
+  /// Enum value indicating the access scope.
+  final SharedStorageAccessScope scope;
+
   /// Enum value indicating the Shared Storage API method invoked.
-  final SharedStorageAccessType type;
+  final SharedStorageAccessMethod method;
 
   /// DevTools Frame Token for the primary frame tree's root.
   final page.FrameId mainFrameId;
 
-  /// Serialized origin for the context that invoked the Shared Storage API.
+  /// Serialization of the origin owning the Shared Storage data.
   final String ownerOrigin;
+
+  /// Serialization of the site owning the Shared Storage data.
+  final String ownerSite;
 
   /// The sub-parameters wrapped by `params` are all optional and their
   /// presence/absence depends on `type`.
@@ -723,18 +729,22 @@ class SharedStorageAccessedEvent {
 
   SharedStorageAccessedEvent({
     required this.accessTime,
-    required this.type,
+    required this.scope,
+    required this.method,
     required this.mainFrameId,
     required this.ownerOrigin,
+    required this.ownerSite,
     required this.params,
   });
 
   factory SharedStorageAccessedEvent.fromJson(Map<String, dynamic> json) {
     return SharedStorageAccessedEvent(
       accessTime: network.TimeSinceEpoch.fromJson(json['accessTime'] as num),
-      type: SharedStorageAccessType.fromJson(json['type'] as String),
+      scope: SharedStorageAccessScope.fromJson(json['scope'] as String),
+      method: SharedStorageAccessMethod.fromJson(json['method'] as String),
       mainFrameId: page.FrameId.fromJson(json['mainFrameId'] as String),
       ownerOrigin: json['ownerOrigin'] as String,
+      ownerSite: json['ownerSite'] as String,
       params: SharedStorageAccessParams.fromJson(
         json['params'] as Map<String, dynamic>,
       ),
@@ -982,36 +992,50 @@ enum InterestGroupAuctionFetchType {
   String toString() => value.toString();
 }
 
-/// Enum of shared storage access types.
-enum SharedStorageAccessType {
-  documentAddModule('documentAddModule'),
-  documentSelectUrl('documentSelectURL'),
-  documentRun('documentRun'),
-  documentSet('documentSet'),
-  documentAppend('documentAppend'),
-  documentDelete('documentDelete'),
-  documentClear('documentClear'),
-  documentGet('documentGet'),
-  workletSet('workletSet'),
-  workletAppend('workletAppend'),
-  workletDelete('workletDelete'),
-  workletClear('workletClear'),
-  workletGet('workletGet'),
-  workletKeys('workletKeys'),
-  workletEntries('workletEntries'),
-  workletLength('workletLength'),
-  workletRemainingBudget('workletRemainingBudget'),
-  headerSet('headerSet'),
-  headerAppend('headerAppend'),
-  headerDelete('headerDelete'),
-  headerClear('headerClear');
+/// Enum of shared storage access scopes.
+enum SharedStorageAccessScope {
+  window('window'),
+  sharedStorageWorklet('sharedStorageWorklet'),
+  protectedAudienceWorklet('protectedAudienceWorklet'),
+  header('header');
 
   final String value;
 
-  const SharedStorageAccessType(this.value);
+  const SharedStorageAccessScope(this.value);
 
-  factory SharedStorageAccessType.fromJson(String value) =>
-      SharedStorageAccessType.values.firstWhere((e) => e.value == value);
+  factory SharedStorageAccessScope.fromJson(String value) =>
+      SharedStorageAccessScope.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Enum of shared storage access methods.
+enum SharedStorageAccessMethod {
+  addModule('addModule'),
+  createWorklet('createWorklet'),
+  selectUrl('selectURL'),
+  run('run'),
+  batchUpdate('batchUpdate'),
+  set('set'),
+  append('append'),
+  delete('delete'),
+  clear('clear'),
+  get('get'),
+  keys('keys'),
+  values('values'),
+  entries('entries'),
+  length('length'),
+  remainingBudget('remainingBudget');
+
+  final String value;
+
+  const SharedStorageAccessMethod(this.value);
+
+  factory SharedStorageAccessMethod.fromJson(String value) =>
+      SharedStorageAccessMethod.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 
