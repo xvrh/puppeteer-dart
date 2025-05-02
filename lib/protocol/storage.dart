@@ -1025,7 +1025,7 @@ enum SharedStorageAccessMethod {
   clear('clear'),
   get('get'),
   keys('keys'),
-  values('values'),
+  values$('values'),
   entries('entries'),
   length('length'),
   remainingBudget('remainingBudget');
