@@ -1113,7 +1113,8 @@ enum SRIMessageSignatureError {
   ),
   validationFailedSignatureExpired('ValidationFailedSignatureExpired'),
   validationFailedInvalidLength('ValidationFailedInvalidLength'),
-  validationFailedSignatureMismatch('ValidationFailedSignatureMismatch');
+  validationFailedSignatureMismatch('ValidationFailedSignatureMismatch'),
+  validationFailedIntegrityMismatch('ValidationFailedIntegrityMismatch');
 
   final String value;
 
@@ -1278,13 +1279,27 @@ class SharedDictionaryIssueDetails {
 class SRIMessageSignatureIssueDetails {
   final SRIMessageSignatureError error;
 
+  final String signatureBase;
+
+  final List<String> integrityAssertions;
+
   final AffectedRequest request;
 
-  SRIMessageSignatureIssueDetails({required this.error, required this.request});
+  SRIMessageSignatureIssueDetails({
+    required this.error,
+    required this.signatureBase,
+    required this.integrityAssertions,
+    required this.request,
+  });
 
   factory SRIMessageSignatureIssueDetails.fromJson(Map<String, dynamic> json) {
     return SRIMessageSignatureIssueDetails(
       error: SRIMessageSignatureError.fromJson(json['error'] as String),
+      signatureBase: json['signatureBase'] as String,
+      integrityAssertions:
+          (json['integrityAssertions'] as List)
+              .map((e) => e as String)
+              .toList(),
       request: AffectedRequest.fromJson(
         json['request'] as Map<String, dynamic>,
       ),
@@ -1292,7 +1307,12 @@ class SRIMessageSignatureIssueDetails {
   }
 
   Map<String, dynamic> toJson() {
-    return {'error': error.toJson(), 'request': request.toJson()};
+    return {
+      'error': error.toJson(),
+      'signatureBase': signatureBase,
+      'integrityAssertions': [...integrityAssertions],
+      'request': request.toJson(),
+    };
   }
 }
 
@@ -1585,7 +1605,8 @@ enum FederatedAuthRequestIssueReason {
   relyingPartyOriginIsOpaque('RelyingPartyOriginIsOpaque'),
   typeNotMatching('TypeNotMatching'),
   uiDismissedNoEmbargo('UiDismissedNoEmbargo'),
-  corsError('CorsError');
+  corsError('CorsError'),
+  suppressedBySegmentationPlatform('SuppressedBySegmentationPlatform');
 
   final String value;
 

@@ -1583,7 +1583,8 @@
                         "SignatureInputHeaderMissingRequiredParameters",
                         "ValidationFailedSignatureExpired",
                         "ValidationFailedInvalidLength",
-                        "ValidationFailedSignatureMismatch"
+                        "ValidationFailedSignatureMismatch",
+                        "ValidationFailedIntegrityMismatch"
                     ]
                 },
                 {
@@ -1677,6 +1678,17 @@
                         {
                             "name": "error",
                             "$ref": "SRIMessageSignatureError"
+                        },
+                        {
+                            "name": "signatureBase",
+                            "type": "string"
+                        },
+                        {
+                            "name": "integrityAssertions",
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         },
                         {
                             "name": "request",
@@ -1863,7 +1875,8 @@
                         "RelyingPartyOriginIsOpaque",
                         "TypeNotMatching",
                         "UiDismissedNoEmbargo",
-                        "CorsError"
+                        "CorsError",
+                        "SuppressedBySegmentationPlatform"
                     ]
                 },
                 {
@@ -2930,6 +2943,7 @@
                         "idleDetection",
                         "keyboardLock",
                         "localFonts",
+                        "localNetworkAccess",
                         "midi",
                         "midiSysex",
                         "nfc",
@@ -3067,6 +3081,15 @@
                                 "$ref": "Bucket"
                             }
                         }
+                    ]
+                },
+                {
+                    "id": "PrivacySandboxAPI",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "BiddingAndAuctionServices",
+                        "TrustedKeyValue"
                     ]
                 }
             ],
@@ -3403,6 +3426,30 @@
                         {
                             "name": "url",
                             "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "addPrivacySandboxCoordinatorKeyConfig",
+                    "description": "Configures encryption keys used with a given privacy sandbox API to talk\nto a trusted coordinator.  Since this is intended for test automation only,\ncoordinatorOrigin must be a .test domain. No existing coordinator\nconfiguration for the origin may exist.",
+                    "parameters": [
+                        {
+                            "name": "api",
+                            "$ref": "PrivacySandboxAPI"
+                        },
+                        {
+                            "name": "coordinatorOrigin",
+                            "type": "string"
+                        },
+                        {
+                            "name": "keyConfig",
+                            "type": "string"
+                        },
+                        {
+                            "name": "browserContextId",
+                            "description": "BrowserContext to perform the action in. When omitted, default browser\ncontext is used.",
+                            "optional": true,
+                            "$ref": "BrowserContextID"
                         }
                     ]
                 }
@@ -9387,6 +9434,61 @@
             ],
             "types": [
                 {
+                    "id": "SafeAreaInsets",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "top",
+                            "description": "Overrides safe-area-inset-top.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "topMax",
+                            "description": "Overrides safe-area-max-inset-top.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "left",
+                            "description": "Overrides safe-area-inset-left.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "leftMax",
+                            "description": "Overrides safe-area-max-inset-left.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "bottom",
+                            "description": "Overrides safe-area-inset-bottom.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "bottomMax",
+                            "description": "Overrides safe-area-max-inset-bottom.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "right",
+                            "description": "Overrides safe-area-inset-right.",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "rightMax",
+                            "description": "Overrides safe-area-max-inset-right.",
+                            "optional": true,
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
                     "id": "ScreenOrientation",
                     "description": "Screen orientation.",
                     "type": "object",
@@ -9782,6 +9884,17 @@
                     ]
                 },
                 {
+                    "name": "setSafeAreaInsetsOverride",
+                    "description": "Overrides the values for env(safe-area-inset-*) and env(safe-area-max-inset-*). Unset values will cause the\nrespective variables to be undefined, even if previously overridden.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "insets",
+                            "$ref": "SafeAreaInsets"
+                        }
+                    ]
+                },
+                {
                     "name": "setDeviceMetricsOverride",
                     "description": "Overrides the values of device screen dimensions (window.screen.width, window.screen.height,\nwindow.innerWidth, window.innerHeight, and \"device-width\"/\"device-height\"-related CSS media\nquery results).",
                     "parameters": [
@@ -9862,8 +9975,9 @@
                         },
                         {
                             "name": "displayFeature",
-                            "description": "If set, the display feature of a multi-segment screen. If not set, multi-segment support\nis turned-off.",
+                            "description": "If set, the display feature of a multi-segment screen. If not set, multi-segment support\nis turned-off.\nDeprecated, use Emulation.setDisplayFeaturesOverride.",
                             "experimental": true,
+                            "deprecated": true,
                             "optional": true,
                             "$ref": "DisplayFeature"
                         },
@@ -9891,6 +10005,25 @@
                 {
                     "name": "clearDevicePostureOverride",
                     "description": "Clears a device posture override set with either setDeviceMetricsOverride()\nor setDevicePostureOverride() and starts using posture information from the\nplatform again.\nDoes nothing if no override is set.",
+                    "experimental": true
+                },
+                {
+                    "name": "setDisplayFeaturesOverride",
+                    "description": "Start using the given display features to pupulate the Viewport Segments API.\nThis override can also be set in setDeviceMetricsOverride().",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "features",
+                            "type": "array",
+                            "items": {
+                                "$ref": "DisplayFeature"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "clearDisplayFeaturesOverride",
+                    "description": "Clears the display features override set with either setDeviceMetricsOverride()\nor setDisplayFeaturesOverride() and starts using display features from the\nplatform again.\nDoes nothing if no override is set.",
                     "experimental": true
                 },
                 {
@@ -13898,7 +14031,8 @@
                         "SamePartyFromCrossPartyContext",
                         "NameValuePairExceedsMaxSize",
                         "PortMismatch",
-                        "SchemeMismatch"
+                        "SchemeMismatch",
+                        "AnonymousContext"
                     ]
                 },
                 {
@@ -14371,6 +14505,50 @@
                     ]
                 },
                 {
+                    "id": "DirectSocketDnsQueryType",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "ipv4",
+                        "ipv6"
+                    ]
+                },
+                {
+                    "id": "DirectTCPSocketOptions",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "noDelay",
+                            "description": "TCP_NODELAY option",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "keepAliveDelay",
+                            "description": "Expected to be unsigned integer.",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "sendBufferSize",
+                            "description": "Expected to be unsigned integer.",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "receiveBufferSize",
+                            "description": "Expected to be unsigned integer.",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "dnsQueryType",
+                            "optional": true,
+                            "$ref": "DirectSocketDnsQueryType"
+                        }
+                    ]
+                },
+                {
                     "id": "PrivateNetworkRequestPolicy",
                     "experimental": true,
                     "type": "string",
@@ -14380,7 +14558,8 @@
                         "WarnFromInsecureToMorePrivate",
                         "PreflightBlock",
                         "PreflightWarn",
-                        "PermissionBlock"
+                        "PermissionBlock",
+                        "PermissionWarn"
                     ]
                 },
                 {
@@ -16025,6 +16204,108 @@
                     ]
                 },
                 {
+                    "name": "directTCPSocketCreated",
+                    "description": "Fired upon direct_socket.TCPSocket creation.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "identifier",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "remoteAddr",
+                            "type": "string"
+                        },
+                        {
+                            "name": "remotePort",
+                            "description": "Unsigned int 16.",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "options",
+                            "$ref": "DirectTCPSocketOptions"
+                        },
+                        {
+                            "name": "timestamp",
+                            "$ref": "MonotonicTime"
+                        },
+                        {
+                            "name": "initiator",
+                            "optional": true,
+                            "$ref": "Initiator"
+                        }
+                    ]
+                },
+                {
+                    "name": "directTCPSocketOpened",
+                    "description": "Fired when direct_socket.TCPSocket connection is opened.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "identifier",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "remoteAddr",
+                            "type": "string"
+                        },
+                        {
+                            "name": "remotePort",
+                            "description": "Expected to be unsigned integer.",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "timestamp",
+                            "$ref": "MonotonicTime"
+                        },
+                        {
+                            "name": "localAddr",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "localPort",
+                            "description": "Expected to be unsigned integer.",
+                            "optional": true,
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "name": "directTCPSocketAborted",
+                    "description": "Fired when direct_socket.TCPSocket is aborted.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "identifier",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "errorMessage",
+                            "type": "string"
+                        },
+                        {
+                            "name": "timestamp",
+                            "$ref": "MonotonicTime"
+                        }
+                    ]
+                },
+                {
+                    "name": "directTCPSocketClosed",
+                    "description": "Fired when direct_socket.TCPSocket is closed.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "identifier",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "timestamp",
+                            "$ref": "MonotonicTime"
+                        }
+                    ]
+                },
+                {
                     "name": "requestWillBeSentExtraInfo",
                     "description": "Fired when additional information about a requestWillBeSent event is available from the\nnetwork stack. Not every requestWillBeSent event will have an additional\nrequestWillBeSentExtraInfo fired for it, and there is no guarantee whether requestWillBeSent\nor requestWillBeSentExtraInfo will be fired first for the same request.",
                     "experimental": true,
@@ -17641,6 +17922,7 @@
                         "interest-cohort",
                         "join-ad-interest-group",
                         "keyboard-map",
+                        "language-detector",
                         "local-fonts",
                         "magnetometer",
                         "media-playback-while-not-visible",
@@ -17655,6 +17937,7 @@
                         "private-state-token-redemption",
                         "publickey-credentials-create",
                         "publickey-credentials-get",
+                        "rewriter",
                         "run-ad-auction",
                         "screen-wake-lock",
                         "serial",
@@ -17665,7 +17948,9 @@
                         "speaker-selection",
                         "storage-access",
                         "sub-apps",
+                        "summarizer",
                         "sync-xhr",
+                        "translator",
                         "unload",
                         "usb",
                         "usb-unrestricted",
@@ -17674,6 +17959,7 @@
                         "web-printing",
                         "web-share",
                         "window-management",
+                        "writer",
                         "xr-spatial-tracking"
                     ]
                 },
@@ -19033,7 +19319,8 @@
                         "EmbedderExtensionSentMessageToCachedFrame",
                         "RequestedByWebViewClient",
                         "PostMessageByWebViewClient",
-                        "CacheControlNoStoreDeviceBoundSessionTerminated"
+                        "CacheControlNoStoreDeviceBoundSessionTerminated",
+                        "CacheLimitPruned"
                     ]
                 },
                 {
@@ -20359,6 +20646,13 @@
                     "parameters": [
                         {
                             "name": "enabled",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "cancel",
+                            "description": "If true, cancels the dialog by emitting relevant events (if any)\nin addition to not showing it if the interception is enabled\n(default: false).",
+                            "experimental": true,
+                            "optional": true,
                             "type": "boolean"
                         }
                     ]
@@ -22015,31 +22309,36 @@
                     ]
                 },
                 {
-                    "id": "SharedStorageAccessType",
-                    "description": "Enum of shared storage access types.",
+                    "id": "SharedStorageAccessScope",
+                    "description": "Enum of shared storage access scopes.",
                     "type": "string",
                     "enum": [
-                        "documentAddModule",
-                        "documentSelectURL",
-                        "documentRun",
-                        "documentSet",
-                        "documentAppend",
-                        "documentDelete",
-                        "documentClear",
-                        "documentGet",
-                        "workletSet",
-                        "workletAppend",
-                        "workletDelete",
-                        "workletClear",
-                        "workletGet",
-                        "workletKeys",
-                        "workletEntries",
-                        "workletLength",
-                        "workletRemainingBudget",
-                        "headerSet",
-                        "headerAppend",
-                        "headerDelete",
-                        "headerClear"
+                        "window",
+                        "sharedStorageWorklet",
+                        "protectedAudienceWorklet",
+                        "header"
+                    ]
+                },
+                {
+                    "id": "SharedStorageAccessMethod",
+                    "description": "Enum of shared storage access methods.",
+                    "type": "string",
+                    "enum": [
+                        "addModule",
+                        "createWorklet",
+                        "selectURL",
+                        "run",
+                        "batchUpdate",
+                        "set",
+                        "append",
+                        "delete",
+                        "clear",
+                        "get",
+                        "keys",
+                        "values",
+                        "entries",
+                        "length",
+                        "remainingBudget"
                     ]
                 },
                 {
@@ -23590,9 +23889,14 @@
                             "$ref": "Network.TimeSinceEpoch"
                         },
                         {
-                            "name": "type",
+                            "name": "scope",
+                            "description": "Enum value indicating the access scope.",
+                            "$ref": "SharedStorageAccessScope"
+                        },
+                        {
+                            "name": "method",
                             "description": "Enum value indicating the Shared Storage API method invoked.",
-                            "$ref": "SharedStorageAccessType"
+                            "$ref": "SharedStorageAccessMethod"
                         },
                         {
                             "name": "mainFrameId",
@@ -23601,7 +23905,12 @@
                         },
                         {
                             "name": "ownerOrigin",
-                            "description": "Serialized origin for the context that invoked the Shared Storage API.",
+                            "description": "Serialization of the origin owning the Shared Storage data.",
+                            "type": "string"
+                        },
+                        {
+                            "name": "ownerSite",
+                            "description": "Serialization of the site owning the Shared Storage data.",
                             "type": "string"
                         },
                         {
@@ -26914,6 +27223,7 @@
                         "PrefetchFailedMIMENotSupported",
                         "PrefetchFailedNetError",
                         "PrefetchFailedNon2XX",
+                        "PrefetchEvictedAfterBrowsingDataRemoved",
                         "PrefetchEvictedAfterCandidateRemoved",
                         "PrefetchEvictedForNewerPrefetch",
                         "PrefetchHeldback",
@@ -26929,6 +27239,9 @@
                         "PrefetchNotEligibleSchemeIsNotHttps",
                         "PrefetchNotEligibleUserHasCookies",
                         "PrefetchNotEligibleUserHasServiceWorker",
+                        "PrefetchNotEligibleUserHasServiceWorkerNoFetchHandler",
+                        "PrefetchNotEligibleRedirectFromServiceWorker",
+                        "PrefetchNotEligibleRedirectToServiceWorker",
                         "PrefetchNotEligibleBatterySaverEnabled",
                         "PrefetchNotEligiblePreloadingDisabled",
                         "PrefetchNotFinishedInTime",
@@ -27526,6 +27839,15 @@
                     ]
                 },
                 {
+                    "id": "GATTOperationType",
+                    "description": "Indicates the various types of GATT event.",
+                    "type": "string",
+                    "enum": [
+                        "connection",
+                        "discovery"
+                    ]
+                },
+                {
                     "id": "ManufacturerData",
                     "description": "Stores the manufacturer data",
                     "type": "object",
@@ -27601,12 +27923,75 @@
                             "$ref": "ScanRecord"
                         }
                     ]
+                },
+                {
+                    "id": "CharacteristicProperties",
+                    "description": "Describes the properties of a characteristic. This follows Bluetooth Core\nSpecification BT 4.2 Vol 3 Part G 3.3.1. Characteristic Properties.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "broadcast",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "read",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "writeWithoutResponse",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "write",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "notify",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "indicate",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "authenticatedSignedWrites",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "extendedProperties",
+                            "optional": true,
+                            "type": "boolean"
+                        }
+                    ]
                 }
             ],
             "commands": [
                 {
                     "name": "enable",
                     "description": "Enable the BluetoothEmulation domain.",
+                    "parameters": [
+                        {
+                            "name": "state",
+                            "description": "State of the simulated central.",
+                            "$ref": "CentralState"
+                        },
+                        {
+                            "name": "leSupported",
+                            "description": "If the simulated central supports low-energy.",
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "name": "setSimulatedCentralState",
+                    "description": "Set the state of the simulated central.",
                     "parameters": [
                         {
                             "name": "state",
@@ -27654,6 +28039,122 @@
                         {
                             "name": "entry",
                             "$ref": "ScanEntry"
+                        }
+                    ]
+                },
+                {
+                    "name": "simulateGATTOperationResponse",
+                    "description": "Simulates the response code from the peripheral with |address| for a\nGATT operation of |type|. The |code| value follows the HCI Error Codes from\nBluetooth Core Specification Vol 2 Part D 1.3 List Of Error Codes.",
+                    "parameters": [
+                        {
+                            "name": "address",
+                            "type": "string"
+                        },
+                        {
+                            "name": "type",
+                            "$ref": "GATTOperationType"
+                        },
+                        {
+                            "name": "code",
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
+                    "name": "addService",
+                    "description": "Adds a service with |serviceUuid| to the peripheral with |address|.",
+                    "parameters": [
+                        {
+                            "name": "address",
+                            "type": "string"
+                        },
+                        {
+                            "name": "serviceUuid",
+                            "type": "string"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "serviceId",
+                            "description": "An identifier that uniquely represents this service.",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "removeService",
+                    "description": "Removes the service respresented by |serviceId| from the peripheral with\n|address|.",
+                    "parameters": [
+                        {
+                            "name": "address",
+                            "type": "string"
+                        },
+                        {
+                            "name": "serviceId",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "addCharacteristic",
+                    "description": "Adds a characteristic with |characteristicUuid| and |properties| to the\nservice represented by |serviceId| in the peripheral with |address|.",
+                    "parameters": [
+                        {
+                            "name": "address",
+                            "type": "string"
+                        },
+                        {
+                            "name": "serviceId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "characteristicUuid",
+                            "type": "string"
+                        },
+                        {
+                            "name": "properties",
+                            "$ref": "CharacteristicProperties"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "characteristicId",
+                            "description": "An identifier that uniquely represents this characteristic.",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "removeCharacteristic",
+                    "description": "Removes the characteristic respresented by |characteristicId| from the\nservice respresented by |serviceId| in the peripheral with |address|.",
+                    "parameters": [
+                        {
+                            "name": "address",
+                            "type": "string"
+                        },
+                        {
+                            "name": "serviceId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "characteristicId",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "events": [
+                {
+                    "name": "gattOperationReceived",
+                    "description": "Event for when a GATT operation of |type| to the peripheral with |address|\nhappened.",
+                    "parameters": [
+                        {
+                            "name": "address",
+                            "type": "string"
+                        },
+                        {
+                            "name": "type",
+                            "$ref": "GATTOperationType"
                         }
                     ]
                 }

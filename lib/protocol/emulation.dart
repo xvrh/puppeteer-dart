@@ -71,6 +71,14 @@ class EmulationApi {
     });
   }
 
+  /// Overrides the values for env(safe-area-inset-*) and env(safe-area-max-inset-*). Unset values will cause the
+  /// respective variables to be undefined, even if previously overridden.
+  Future<void> setSafeAreaInsetsOverride(SafeAreaInsets insets) async {
+    await _client.send('Emulation.setSafeAreaInsetsOverride', {
+      'insets': insets,
+    });
+  }
+
   /// Overrides the values of device screen dimensions (window.screen.width, window.screen.height,
   /// window.innerWidth, window.innerHeight, and "device-width"/"device-height"-related CSS media
   /// query results).
@@ -88,8 +96,6 @@ class EmulationApi {
   /// [screenOrientation] Screen orientation override.
   /// [viewport] If set, the visible area of the page will be overridden to this viewport. This viewport
   /// change is not observed by the page, e.g. viewport-relative elements do not change positions.
-  /// [displayFeature] If set, the display feature of a multi-segment screen. If not set, multi-segment support
-  /// is turned-off.
   Future<void> setDeviceMetricsOverride(
     int width,
     int height,
@@ -103,6 +109,7 @@ class EmulationApi {
     bool? dontSetVisibleSize,
     ScreenOrientation? screenOrientation,
     page.Viewport? viewport,
+    @Deprecated('use Emulation.setDisplayFeaturesOverride.')
     DisplayFeature? displayFeature,
     @Deprecated('use Emulation.setDevicePostureOverride.')
     DevicePosture? devicePosture,
@@ -139,6 +146,22 @@ class EmulationApi {
   /// Does nothing if no override is set.
   Future<void> clearDevicePostureOverride() async {
     await _client.send('Emulation.clearDevicePostureOverride');
+  }
+
+  /// Start using the given display features to pupulate the Viewport Segments API.
+  /// This override can also be set in setDeviceMetricsOverride().
+  Future<void> setDisplayFeaturesOverride(List<DisplayFeature> features) async {
+    await _client.send('Emulation.setDisplayFeaturesOverride', {
+      'features': [...features],
+    });
+  }
+
+  /// Clears the display features override set with either setDeviceMetricsOverride()
+  /// or setDisplayFeaturesOverride() and starts using display features from the
+  /// platform again.
+  /// Does nothing if no override is set.
+  Future<void> clearDisplayFeaturesOverride() async {
+    await _client.send('Emulation.clearDisplayFeaturesOverride');
   }
 
   /// [hidden] Whether scrollbars should be always hidden.
@@ -441,6 +464,70 @@ class EmulationApi {
   /// [enabled] Whether the override should be enabled.
   Future<void> setAutomationOverride(bool enabled) async {
     await _client.send('Emulation.setAutomationOverride', {'enabled': enabled});
+  }
+}
+
+class SafeAreaInsets {
+  /// Overrides safe-area-inset-top.
+  final int? top;
+
+  /// Overrides safe-area-max-inset-top.
+  final int? topMax;
+
+  /// Overrides safe-area-inset-left.
+  final int? left;
+
+  /// Overrides safe-area-max-inset-left.
+  final int? leftMax;
+
+  /// Overrides safe-area-inset-bottom.
+  final int? bottom;
+
+  /// Overrides safe-area-max-inset-bottom.
+  final int? bottomMax;
+
+  /// Overrides safe-area-inset-right.
+  final int? right;
+
+  /// Overrides safe-area-max-inset-right.
+  final int? rightMax;
+
+  SafeAreaInsets({
+    this.top,
+    this.topMax,
+    this.left,
+    this.leftMax,
+    this.bottom,
+    this.bottomMax,
+    this.right,
+    this.rightMax,
+  });
+
+  factory SafeAreaInsets.fromJson(Map<String, dynamic> json) {
+    return SafeAreaInsets(
+      top: json.containsKey('top') ? json['top'] as int : null,
+      topMax: json.containsKey('topMax') ? json['topMax'] as int : null,
+      left: json.containsKey('left') ? json['left'] as int : null,
+      leftMax: json.containsKey('leftMax') ? json['leftMax'] as int : null,
+      bottom: json.containsKey('bottom') ? json['bottom'] as int : null,
+      bottomMax:
+          json.containsKey('bottomMax') ? json['bottomMax'] as int : null,
+      right: json.containsKey('right') ? json['right'] as int : null,
+      rightMax: json.containsKey('rightMax') ? json['rightMax'] as int : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (top != null) 'top': top,
+      if (topMax != null) 'topMax': topMax,
+      if (left != null) 'left': left,
+      if (leftMax != null) 'leftMax': leftMax,
+      if (bottom != null) 'bottom': bottom,
+      if (bottomMax != null) 'bottomMax': bottomMax,
+      if (right != null) 'right': right,
+      if (rightMax != null) 'rightMax': rightMax,
+    };
   }
 }
 

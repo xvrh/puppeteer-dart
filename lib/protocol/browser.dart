@@ -212,6 +212,26 @@ class BrowserApi {
       'url': url,
     });
   }
+
+  /// Configures encryption keys used with a given privacy sandbox API to talk
+  /// to a trusted coordinator.  Since this is intended for test automation only,
+  /// coordinatorOrigin must be a .test domain. No existing coordinator
+  /// configuration for the origin may exist.
+  /// [browserContextId] BrowserContext to perform the action in. When omitted, default browser
+  /// context is used.
+  Future<void> addPrivacySandboxCoordinatorKeyConfig(
+    PrivacySandboxAPI api,
+    String coordinatorOrigin,
+    String keyConfig, {
+    BrowserContextID? browserContextId,
+  }) async {
+    await _client.send('Browser.addPrivacySandboxCoordinatorKeyConfig', {
+      'api': api,
+      'coordinatorOrigin': coordinatorOrigin,
+      'keyConfig': keyConfig,
+      if (browserContextId != null) 'browserContextId': browserContextId,
+    });
+  }
 }
 
 class DownloadWillBeginEvent {
@@ -419,6 +439,7 @@ enum PermissionType {
   idleDetection('idleDetection'),
   keyboardLock('keyboardLock'),
   localFonts('localFonts'),
+  localNetworkAccess('localNetworkAccess'),
   midi('midi'),
   midiSysex('midiSysex'),
   nfc('nfc'),
@@ -623,6 +644,23 @@ class Histogram {
       'buckets': buckets.map((e) => e.toJson()).toList(),
     };
   }
+}
+
+enum PrivacySandboxAPI {
+  biddingAndAuctionServices('BiddingAndAuctionServices'),
+  trustedKeyValue('TrustedKeyValue');
+
+  final String value;
+
+  const PrivacySandboxAPI(this.value);
+
+  factory PrivacySandboxAPI.fromJson(String value) =>
+      PrivacySandboxAPI.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
 }
 
 enum DownloadProgressEventState {
