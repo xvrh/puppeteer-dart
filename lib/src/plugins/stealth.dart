@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:math';                                        // for Random()
-import 'package:random_user_agents/random_user_agents.dart'; // for RandomUserAgents.random()
+import 'package:puppeteer/lib/src/plugins/lib/random_user_agents.dart'; // for RandomUserAgents.random()
 import '../../puppeteer.dart';
 import '../plugin.dart';
 import '../puppeteer.dart';
