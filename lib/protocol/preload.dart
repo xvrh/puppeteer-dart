@@ -606,6 +606,9 @@ enum PrefetchStatus {
   prefetchFailedMimeNotSupported('PrefetchFailedMIMENotSupported'),
   prefetchFailedNetError('PrefetchFailedNetError'),
   prefetchFailedNon2xx('PrefetchFailedNon2XX'),
+  prefetchEvictedAfterBrowsingDataRemoved(
+    'PrefetchEvictedAfterBrowsingDataRemoved',
+  ),
   prefetchEvictedAfterCandidateRemoved('PrefetchEvictedAfterCandidateRemoved'),
   prefetchEvictedForNewerPrefetch('PrefetchEvictedForNewerPrefetch'),
   prefetchHeldback('PrefetchHeldback'),
@@ -628,6 +631,15 @@ enum PrefetchStatus {
   prefetchNotEligibleUserHasCookies('PrefetchNotEligibleUserHasCookies'),
   prefetchNotEligibleUserHasServiceWorker(
     'PrefetchNotEligibleUserHasServiceWorker',
+  ),
+  prefetchNotEligibleUserHasServiceWorkerNoFetchHandler(
+    'PrefetchNotEligibleUserHasServiceWorkerNoFetchHandler',
+  ),
+  prefetchNotEligibleRedirectFromServiceWorker(
+    'PrefetchNotEligibleRedirectFromServiceWorker',
+  ),
+  prefetchNotEligibleRedirectToServiceWorker(
+    'PrefetchNotEligibleRedirectToServiceWorker',
   ),
   prefetchNotEligibleBatterySaverEnabled(
     'PrefetchNotEligibleBatterySaverEnabled',

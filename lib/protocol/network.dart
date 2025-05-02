@@ -144,6 +144,30 @@ class NetworkApi {
       .where((event) => event.name == 'Network.webTransportClosed')
       .map((event) => WebTransportClosedEvent.fromJson(event.parameters));
 
+  /// Fired upon direct_socket.TCPSocket creation.
+  Stream<DirectTCPSocketCreatedEvent> get onDirectTCPSocketCreated => _client
+      .onEvent
+      .where((event) => event.name == 'Network.directTCPSocketCreated')
+      .map((event) => DirectTCPSocketCreatedEvent.fromJson(event.parameters));
+
+  /// Fired when direct_socket.TCPSocket connection is opened.
+  Stream<DirectTCPSocketOpenedEvent> get onDirectTCPSocketOpened => _client
+      .onEvent
+      .where((event) => event.name == 'Network.directTCPSocketOpened')
+      .map((event) => DirectTCPSocketOpenedEvent.fromJson(event.parameters));
+
+  /// Fired when direct_socket.TCPSocket is aborted.
+  Stream<DirectTCPSocketAbortedEvent> get onDirectTCPSocketAborted => _client
+      .onEvent
+      .where((event) => event.name == 'Network.directTCPSocketAborted')
+      .map((event) => DirectTCPSocketAbortedEvent.fromJson(event.parameters));
+
+  /// Fired when direct_socket.TCPSocket is closed.
+  Stream<DirectTCPSocketClosedEvent> get onDirectTCPSocketClosed => _client
+      .onEvent
+      .where((event) => event.name == 'Network.directTCPSocketClosed')
+      .map((event) => DirectTCPSocketClosedEvent.fromJson(event.parameters));
+
   /// Fired when additional information about a requestWillBeSent event is available from the
   /// network stack. Not every requestWillBeSent event will have an additional
   /// requestWillBeSentExtraInfo fired for it, and there is no guarantee whether requestWillBeSent
@@ -1425,6 +1449,124 @@ class WebTransportClosedEvent {
   factory WebTransportClosedEvent.fromJson(Map<String, dynamic> json) {
     return WebTransportClosedEvent(
       transportId: RequestId.fromJson(json['transportId'] as String),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+    );
+  }
+}
+
+class DirectTCPSocketCreatedEvent {
+  final RequestId identifier;
+
+  final String remoteAddr;
+
+  /// Unsigned int 16.
+  final int remotePort;
+
+  final DirectTCPSocketOptions options;
+
+  final MonotonicTime timestamp;
+
+  final Initiator? initiator;
+
+  DirectTCPSocketCreatedEvent({
+    required this.identifier,
+    required this.remoteAddr,
+    required this.remotePort,
+    required this.options,
+    required this.timestamp,
+    this.initiator,
+  });
+
+  factory DirectTCPSocketCreatedEvent.fromJson(Map<String, dynamic> json) {
+    return DirectTCPSocketCreatedEvent(
+      identifier: RequestId.fromJson(json['identifier'] as String),
+      remoteAddr: json['remoteAddr'] as String,
+      remotePort: json['remotePort'] as int,
+      options: DirectTCPSocketOptions.fromJson(
+        json['options'] as Map<String, dynamic>,
+      ),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+      initiator:
+          json.containsKey('initiator')
+              ? Initiator.fromJson(json['initiator'] as Map<String, dynamic>)
+              : null,
+    );
+  }
+}
+
+class DirectTCPSocketOpenedEvent {
+  final RequestId identifier;
+
+  final String remoteAddr;
+
+  /// Expected to be unsigned integer.
+  final int remotePort;
+
+  final MonotonicTime timestamp;
+
+  final String? localAddr;
+
+  /// Expected to be unsigned integer.
+  final int? localPort;
+
+  DirectTCPSocketOpenedEvent({
+    required this.identifier,
+    required this.remoteAddr,
+    required this.remotePort,
+    required this.timestamp,
+    this.localAddr,
+    this.localPort,
+  });
+
+  factory DirectTCPSocketOpenedEvent.fromJson(Map<String, dynamic> json) {
+    return DirectTCPSocketOpenedEvent(
+      identifier: RequestId.fromJson(json['identifier'] as String),
+      remoteAddr: json['remoteAddr'] as String,
+      remotePort: json['remotePort'] as int,
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+      localAddr:
+          json.containsKey('localAddr') ? json['localAddr'] as String : null,
+      localPort:
+          json.containsKey('localPort') ? json['localPort'] as int : null,
+    );
+  }
+}
+
+class DirectTCPSocketAbortedEvent {
+  final RequestId identifier;
+
+  final String errorMessage;
+
+  final MonotonicTime timestamp;
+
+  DirectTCPSocketAbortedEvent({
+    required this.identifier,
+    required this.errorMessage,
+    required this.timestamp,
+  });
+
+  factory DirectTCPSocketAbortedEvent.fromJson(Map<String, dynamic> json) {
+    return DirectTCPSocketAbortedEvent(
+      identifier: RequestId.fromJson(json['identifier'] as String),
+      errorMessage: json['errorMessage'] as String,
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+    );
+  }
+}
+
+class DirectTCPSocketClosedEvent {
+  final RequestId identifier;
+
+  final MonotonicTime timestamp;
+
+  DirectTCPSocketClosedEvent({
+    required this.identifier,
+    required this.timestamp,
+  });
+
+  factory DirectTCPSocketClosedEvent.fromJson(Map<String, dynamic> json) {
+    return DirectTCPSocketClosedEvent(
+      identifier: RequestId.fromJson(json['identifier'] as String),
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
     );
   }
@@ -3558,7 +3700,8 @@ enum CookieBlockedReason {
   samePartyFromCrossPartyContext('SamePartyFromCrossPartyContext'),
   nameValuePairExceedsMaxSize('NameValuePairExceedsMaxSize'),
   portMismatch('PortMismatch'),
-  schemeMismatch('SchemeMismatch');
+  schemeMismatch('SchemeMismatch'),
+  anonymousContext('AnonymousContext');
 
   final String value;
 
@@ -4292,13 +4435,89 @@ enum ContentEncoding {
   String toString() => value.toString();
 }
 
+enum DirectSocketDnsQueryType {
+  ipv4('ipv4'),
+  ipv6('ipv6');
+
+  final String value;
+
+  const DirectSocketDnsQueryType(this.value);
+
+  factory DirectSocketDnsQueryType.fromJson(String value) =>
+      DirectSocketDnsQueryType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+class DirectTCPSocketOptions {
+  /// TCP_NODELAY option
+  final bool noDelay;
+
+  /// Expected to be unsigned integer.
+  final num? keepAliveDelay;
+
+  /// Expected to be unsigned integer.
+  final num? sendBufferSize;
+
+  /// Expected to be unsigned integer.
+  final num? receiveBufferSize;
+
+  final DirectSocketDnsQueryType? dnsQueryType;
+
+  DirectTCPSocketOptions({
+    required this.noDelay,
+    this.keepAliveDelay,
+    this.sendBufferSize,
+    this.receiveBufferSize,
+    this.dnsQueryType,
+  });
+
+  factory DirectTCPSocketOptions.fromJson(Map<String, dynamic> json) {
+    return DirectTCPSocketOptions(
+      noDelay: json['noDelay'] as bool? ?? false,
+      keepAliveDelay:
+          json.containsKey('keepAliveDelay')
+              ? json['keepAliveDelay'] as num
+              : null,
+      sendBufferSize:
+          json.containsKey('sendBufferSize')
+              ? json['sendBufferSize'] as num
+              : null,
+      receiveBufferSize:
+          json.containsKey('receiveBufferSize')
+              ? json['receiveBufferSize'] as num
+              : null,
+      dnsQueryType:
+          json.containsKey('dnsQueryType')
+              ? DirectSocketDnsQueryType.fromJson(
+                json['dnsQueryType'] as String,
+              )
+              : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'noDelay': noDelay,
+      if (keepAliveDelay != null) 'keepAliveDelay': keepAliveDelay,
+      if (sendBufferSize != null) 'sendBufferSize': sendBufferSize,
+      if (receiveBufferSize != null) 'receiveBufferSize': receiveBufferSize,
+      if (dnsQueryType != null) 'dnsQueryType': dnsQueryType!.toJson(),
+    };
+  }
+}
+
 enum PrivateNetworkRequestPolicy {
   allow('Allow'),
   blockFromInsecureToMorePrivate('BlockFromInsecureToMorePrivate'),
   warnFromInsecureToMorePrivate('WarnFromInsecureToMorePrivate'),
   preflightBlock('PreflightBlock'),
   preflightWarn('PreflightWarn'),
-  permissionBlock('PermissionBlock');
+  permissionBlock('PermissionBlock'),
+  permissionWarn('PermissionWarn');
 
   final String value;
 

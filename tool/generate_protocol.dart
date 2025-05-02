@@ -663,6 +663,9 @@ class _InternalType {
     input = _sanitizeName(input);
     String? normalizedValue = firstLetterLower(_camelizeName(input));
     normalizedValue = preventKeywords(normalizedValue);
+    if (const ['values'].contains(normalizedValue)) {
+      normalizedValue = '$normalizedValue\$';
+    }
 
     return normalizedValue;
   }
