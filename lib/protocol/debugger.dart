@@ -613,7 +613,7 @@ class ScriptFailedToParseEvent {
   /// Content hash of the script, SHA-256.
   final String hash;
 
-  /// For Wasm modules, the content of the `build_id` custom section.
+  /// For Wasm modules, the content of the `build_id` custom section. For JavaScript the `debugId` magic comment.
   final String buildId;
 
   /// Embedder-specific auxiliary data likely matching {isDefault: boolean, type: 'default'|'isolated'|'worker', frameId: string}
@@ -738,7 +738,7 @@ class ScriptParsedEvent {
   /// Content hash of the script, SHA-256.
   final String hash;
 
-  /// For Wasm modules, the content of the `build_id` custom section.
+  /// For Wasm modules, the content of the `build_id` custom section. For JavaScript the `debugId` magic comment.
   final String buildId;
 
   /// Embedder-specific auxiliary data likely matching {isDefault: boolean, type: 'default'|'isolated'|'worker', frameId: string}

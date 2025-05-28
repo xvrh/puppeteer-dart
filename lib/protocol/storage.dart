@@ -456,6 +456,18 @@ class StorageApi {
     );
     return (result['matchedUrls'] as List).map((e) => e as String).toList();
   }
+
+  Future<void> setProtectedAudienceKAnonymity(
+    String owner,
+    String name,
+    List<String> hashes,
+  ) async {
+    await _client.send('Storage.setProtectedAudienceKAnonymity', {
+      'owner': owner,
+      'name': name,
+      'hashes': [...hashes],
+    });
+  }
 }
 
 class CacheStorageContentUpdatedEvent {
@@ -1106,6 +1118,57 @@ class SharedStorageMetadata {
   }
 }
 
+/// Represents a dictionary object passed in as privateAggregationConfig to
+/// run or selectURL.
+class SharedStoragePrivateAggregationConfig {
+  /// The chosen aggregation service deployment.
+  final String? aggregationCoordinatorOrigin;
+
+  /// The context ID provided.
+  final String? contextId;
+
+  /// Configures the maximum size allowed for filtering IDs.
+  final int filteringIdMaxBytes;
+
+  /// The limit on the number of contributions in the final report.
+  final int? maxContributions;
+
+  SharedStoragePrivateAggregationConfig({
+    this.aggregationCoordinatorOrigin,
+    this.contextId,
+    required this.filteringIdMaxBytes,
+    this.maxContributions,
+  });
+
+  factory SharedStoragePrivateAggregationConfig.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return SharedStoragePrivateAggregationConfig(
+      aggregationCoordinatorOrigin:
+          json.containsKey('aggregationCoordinatorOrigin')
+              ? json['aggregationCoordinatorOrigin'] as String
+              : null,
+      contextId:
+          json.containsKey('contextId') ? json['contextId'] as String : null,
+      filteringIdMaxBytes: json['filteringIdMaxBytes'] as int,
+      maxContributions:
+          json.containsKey('maxContributions')
+              ? json['maxContributions'] as int
+              : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'filteringIdMaxBytes': filteringIdMaxBytes,
+      if (aggregationCoordinatorOrigin != null)
+        'aggregationCoordinatorOrigin': aggregationCoordinatorOrigin,
+      if (contextId != null) 'contextId': contextId,
+      if (maxContributions != null) 'maxContributions': maxContributions,
+    };
+  }
+}
+
 /// Pair of reporting metadata details for a candidate URL for `selectURL()`.
 class SharedStorageReportingMetadata {
   final String eventType;
@@ -1168,59 +1231,92 @@ class SharedStorageUrlWithMetadata {
 /// presence/absence can vary according to SharedStorageAccessType.
 class SharedStorageAccessParams {
   /// Spec of the module script URL.
-  /// Present only for SharedStorageAccessType.documentAddModule.
+  /// Present only for SharedStorageAccessMethods: addModule and
+  /// createWorklet.
   final String? scriptSourceUrl;
 
+  /// String denoting "context-origin", "script-origin", or a custom
+  /// origin to be used as the worklet's data origin.
+  /// Present only for SharedStorageAccessMethod: createWorklet.
+  final String? dataOrigin;
+
   /// Name of the registered operation to be run.
-  /// Present only for SharedStorageAccessType.documentRun and
-  /// SharedStorageAccessType.documentSelectURL.
+  /// Present only for SharedStorageAccessMethods: run and selectURL.
   final String? operationName;
 
+  /// Whether or not to keep the worket alive for future run or selectURL
+  /// calls.
+  /// Present only for SharedStorageAccessMethods: run and selectURL.
+  final bool? keepAlive;
+
+  /// Configures the private aggregation options.
+  /// Present only for SharedStorageAccessMethods: run and selectURL.
+  final SharedStoragePrivateAggregationConfig? privateAggregationConfig;
+
   /// The operation's serialized data in bytes (converted to a string).
-  /// Present only for SharedStorageAccessType.documentRun and
-  /// SharedStorageAccessType.documentSelectURL.
+  /// Present only for SharedStorageAccessMethods: run and selectURL.
+  /// TODO(crbug.com/401011862): Consider updating this parameter to binary.
   final String? serializedData;
 
   /// Array of candidate URLs' specs, along with any associated metadata.
-  /// Present only for SharedStorageAccessType.documentSelectURL.
+  /// Present only for SharedStorageAccessMethod: selectURL.
   final List<SharedStorageUrlWithMetadata>? urlsWithMetadata;
 
+  /// Spec of the URN:UUID generated for a selectURL call.
+  /// Present only for SharedStorageAccessMethod: selectURL.
+  final String? urnUuid;
+
   /// Key for a specific entry in an origin's shared storage.
-  /// Present only for SharedStorageAccessType.documentSet,
-  /// SharedStorageAccessType.documentAppend,
-  /// SharedStorageAccessType.documentDelete,
-  /// SharedStorageAccessType.workletSet,
-  /// SharedStorageAccessType.workletAppend,
-  /// SharedStorageAccessType.workletDelete,
-  /// SharedStorageAccessType.workletGet,
-  /// SharedStorageAccessType.headerSet,
-  /// SharedStorageAccessType.headerAppend, and
-  /// SharedStorageAccessType.headerDelete.
+  /// Present only for SharedStorageAccessMethods: set, append, delete, and
+  /// get.
   final String? key;
 
   /// Value for a specific entry in an origin's shared storage.
-  /// Present only for SharedStorageAccessType.documentSet,
-  /// SharedStorageAccessType.documentAppend,
-  /// SharedStorageAccessType.workletSet,
-  /// SharedStorageAccessType.workletAppend,
-  /// SharedStorageAccessType.headerSet, and
-  /// SharedStorageAccessType.headerAppend.
+  /// Present only for SharedStorageAccessMethods: set and append.
   final String? value;
 
   /// Whether or not to set an entry for a key if that key is already present.
-  /// Present only for SharedStorageAccessType.documentSet,
-  /// SharedStorageAccessType.workletSet, and
-  /// SharedStorageAccessType.headerSet.
+  /// Present only for SharedStorageAccessMethod: set.
   final bool? ignoreIfPresent;
+
+  /// If the method is called on a worklet, or as part of
+  /// a worklet script, it will have an ID for the associated worklet.
+  /// Present only for SharedStorageAccessMethods: addModule, createWorklet,
+  /// run, selectURL, and any other SharedStorageAccessMethod when the
+  /// SharedStorageAccessScope is worklet.
+  final String? workletId;
+
+  /// Name of the lock to be acquired, if present.
+  /// Optionally present only for SharedStorageAccessMethods: batchUpdate,
+  /// set, append, delete, and clear.
+  final String? withLock;
+
+  /// If the method has been called as part of a batchUpdate, then this
+  /// number identifies the batch to which it belongs.
+  /// Optionally present only for SharedStorageAccessMethods:
+  /// batchUpdate (required), set, append, delete, and clear.
+  final String? batchUpdateId;
+
+  /// Number of modifier methods sent in batch.
+  /// Present only for SharedStorageAccessMethod: batchUpdate.
+  final int? batchSize;
 
   SharedStorageAccessParams({
     this.scriptSourceUrl,
+    this.dataOrigin,
     this.operationName,
+    this.keepAlive,
+    this.privateAggregationConfig,
     this.serializedData,
     this.urlsWithMetadata,
+    this.urnUuid,
     this.key,
     this.value,
     this.ignoreIfPresent,
+    this.workletId,
+    this.withLock,
+    this.batchUpdateId,
+    this.batchSize,
   });
 
   factory SharedStorageAccessParams.fromJson(Map<String, dynamic> json) {
@@ -1229,9 +1325,19 @@ class SharedStorageAccessParams {
           json.containsKey('scriptSourceUrl')
               ? json['scriptSourceUrl'] as String
               : null,
+      dataOrigin:
+          json.containsKey('dataOrigin') ? json['dataOrigin'] as String : null,
       operationName:
           json.containsKey('operationName')
               ? json['operationName'] as String
+              : null,
+      keepAlive:
+          json.containsKey('keepAlive') ? json['keepAlive'] as bool : null,
+      privateAggregationConfig:
+          json.containsKey('privateAggregationConfig')
+              ? SharedStoragePrivateAggregationConfig.fromJson(
+                json['privateAggregationConfig'] as Map<String, dynamic>,
+              )
               : null,
       serializedData:
           json.containsKey('serializedData')
@@ -1247,25 +1353,45 @@ class SharedStorageAccessParams {
                   )
                   .toList()
               : null,
+      urnUuid: json.containsKey('urnUuid') ? json['urnUuid'] as String : null,
       key: json.containsKey('key') ? json['key'] as String : null,
       value: json.containsKey('value') ? json['value'] as String : null,
       ignoreIfPresent:
           json.containsKey('ignoreIfPresent')
               ? json['ignoreIfPresent'] as bool
               : null,
+      workletId:
+          json.containsKey('workletId') ? json['workletId'] as String : null,
+      withLock:
+          json.containsKey('withLock') ? json['withLock'] as String : null,
+      batchUpdateId:
+          json.containsKey('batchUpdateId')
+              ? json['batchUpdateId'] as String
+              : null,
+      batchSize:
+          json.containsKey('batchSize') ? json['batchSize'] as int : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       if (scriptSourceUrl != null) 'scriptSourceUrl': scriptSourceUrl,
+      if (dataOrigin != null) 'dataOrigin': dataOrigin,
       if (operationName != null) 'operationName': operationName,
+      if (keepAlive != null) 'keepAlive': keepAlive,
+      if (privateAggregationConfig != null)
+        'privateAggregationConfig': privateAggregationConfig!.toJson(),
       if (serializedData != null) 'serializedData': serializedData,
       if (urlsWithMetadata != null)
         'urlsWithMetadata': urlsWithMetadata!.map((e) => e.toJson()).toList(),
+      if (urnUuid != null) 'urnUuid': urnUuid,
       if (key != null) 'key': key,
       if (value != null) 'value': value,
       if (ignoreIfPresent != null) 'ignoreIfPresent': ignoreIfPresent,
+      if (workletId != null) 'workletId': workletId,
+      if (withLock != null) 'withLock': withLock,
+      if (batchUpdateId != null) 'batchUpdateId': batchUpdateId,
+      if (batchSize != null) 'batchSize': batchSize,
     };
   }
 }
@@ -1713,6 +1839,30 @@ class AttributionScopesData {
   }
 }
 
+class AttributionReportingNamedBudgetDef {
+  final String name;
+
+  final int budget;
+
+  AttributionReportingNamedBudgetDef({
+    required this.name,
+    required this.budget,
+  });
+
+  factory AttributionReportingNamedBudgetDef.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return AttributionReportingNamedBudgetDef(
+      name: json['name'] as String,
+      budget: json['budget'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'name': name, 'budget': budget};
+  }
+}
+
 class AttributionReportingSourceRegistration {
   final network.TimeSinceEpoch time;
 
@@ -1753,6 +1903,12 @@ class AttributionReportingSourceRegistration {
 
   final int maxEventLevelReports;
 
+  final List<AttributionReportingNamedBudgetDef> namedBudgets;
+
+  final bool debugReporting;
+
+  final num eventLevelEpsilon;
+
   AttributionReportingSourceRegistration({
     required this.time,
     required this.expiry,
@@ -1772,6 +1928,9 @@ class AttributionReportingSourceRegistration {
     required this.aggregatableDebugReportingConfig,
     this.scopesData,
     required this.maxEventLevelReports,
+    required this.namedBudgets,
+    required this.debugReporting,
+    required this.eventLevelEpsilon,
   });
 
   factory AttributionReportingSourceRegistration.fromJson(
@@ -1833,6 +1992,16 @@ class AttributionReportingSourceRegistration {
               )
               : null,
       maxEventLevelReports: json['maxEventLevelReports'] as int,
+      namedBudgets:
+          (json['namedBudgets'] as List)
+              .map(
+                (e) => AttributionReportingNamedBudgetDef.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+      debugReporting: json['debugReporting'] as bool? ?? false,
+      eventLevelEpsilon: json['eventLevelEpsilon'] as num,
     );
   }
 
@@ -1855,6 +2024,9 @@ class AttributionReportingSourceRegistration {
       'aggregatableDebugReportingConfig':
           aggregatableDebugReportingConfig.toJson(),
       'maxEventLevelReports': maxEventLevelReports,
+      'namedBudgets': namedBudgets.map((e) => e.toJson()).toList(),
+      'debugReporting': debugReporting,
+      'eventLevelEpsilon': eventLevelEpsilon,
       if (debugKey != null) 'debugKey': debugKey!.toJson(),
       if (scopesData != null) 'scopesData': scopesData!.toJson(),
     };
@@ -2094,6 +2266,29 @@ class AttributionReportingAggregatableDedupKey {
   }
 }
 
+class AttributionReportingNamedBudgetCandidate {
+  final String? name;
+
+  final AttributionReportingFilterPair filters;
+
+  AttributionReportingNamedBudgetCandidate({this.name, required this.filters});
+
+  factory AttributionReportingNamedBudgetCandidate.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return AttributionReportingNamedBudgetCandidate(
+      name: json.containsKey('name') ? json['name'] as String : null,
+      filters: AttributionReportingFilterPair.fromJson(
+        json['filters'] as Map<String, dynamic>,
+      ),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'filters': filters.toJson(), if (name != null) 'name': name};
+  }
+}
+
 class AttributionReportingTriggerRegistration {
   final AttributionReportingFilterPair filters;
 
@@ -2124,6 +2319,8 @@ class AttributionReportingTriggerRegistration {
 
   final List<String> scopes;
 
+  final List<AttributionReportingNamedBudgetCandidate> namedBudgets;
+
   AttributionReportingTriggerRegistration({
     required this.filters,
     this.debugKey,
@@ -2138,6 +2335,7 @@ class AttributionReportingTriggerRegistration {
     this.triggerContextId,
     required this.aggregatableDebugReportingConfig,
     required this.scopes,
+    required this.namedBudgets,
   });
 
   factory AttributionReportingTriggerRegistration.fromJson(
@@ -2203,6 +2401,14 @@ class AttributionReportingTriggerRegistration {
             json['aggregatableDebugReportingConfig'] as Map<String, dynamic>,
           ),
       scopes: (json['scopes'] as List).map((e) => e as String).toList(),
+      namedBudgets:
+          (json['namedBudgets'] as List)
+              .map(
+                (e) => AttributionReportingNamedBudgetCandidate.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
     );
   }
 
@@ -2221,6 +2427,7 @@ class AttributionReportingTriggerRegistration {
       'aggregatableDebugReportingConfig':
           aggregatableDebugReportingConfig.toJson(),
       'scopes': [...scopes],
+      'namedBudgets': namedBudgets.map((e) => e.toJson()).toList(),
       if (debugKey != null) 'debugKey': debugKey!.toJson(),
       if (aggregationCoordinatorOrigin != null)
         'aggregationCoordinatorOrigin': aggregationCoordinatorOrigin,

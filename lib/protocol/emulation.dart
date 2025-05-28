@@ -234,20 +234,32 @@ class EmulationApi {
     await _client.send('Emulation.setEmulatedVisionDeficiency', {'type': type});
   }
 
-  /// Overrides the Geolocation Position or Error. Omitting any of the parameters emulates position
-  /// unavailable.
+  /// Overrides the Geolocation Position or Error. Omitting latitude, longitude or
+  /// accuracy emulates position unavailable.
   /// [latitude] Mock latitude
   /// [longitude] Mock longitude
   /// [accuracy] Mock accuracy
+  /// [altitude] Mock altitude
+  /// [altitudeAccuracy] Mock altitudeAccuracy
+  /// [heading] Mock heading
+  /// [speed] Mock speed
   Future<void> setGeolocationOverride({
     num? latitude,
     num? longitude,
     num? accuracy,
+    num? altitude,
+    num? altitudeAccuracy,
+    num? heading,
+    num? speed,
   }) async {
     await _client.send('Emulation.setGeolocationOverride', {
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
       if (accuracy != null) 'accuracy': accuracy,
+      if (altitude != null) 'altitude': altitude,
+      if (altitudeAccuracy != null) 'altitudeAccuracy': altitudeAccuracy,
+      if (heading != null) 'heading': heading,
+      if (speed != null) 'speed': speed,
     });
   }
 
@@ -464,6 +476,16 @@ class EmulationApi {
   /// [enabled] Whether the override should be enabled.
   Future<void> setAutomationOverride(bool enabled) async {
     await _client.send('Emulation.setAutomationOverride', {'enabled': enabled});
+  }
+
+  /// Allows overriding the difference between the small and large viewport sizes, which determine the
+  /// value of the `svh` and `lvh` unit, respectively. Only supported for top-level frames.
+  /// [difference] This will cause an element of size 100svh to be `difference` pixels smaller than an element
+  /// of size 100lvh.
+  Future<void> setSmallViewportHeightDifferenceOverride(int difference) async {
+    await _client.send('Emulation.setSmallViewportHeightDifferenceOverride', {
+      'difference': difference,
+    });
   }
 }
 

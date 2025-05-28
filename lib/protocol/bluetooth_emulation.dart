@@ -17,6 +17,20 @@ class BluetoothEmulationApi {
       )
       .map((event) => GattOperationReceivedEvent.fromJson(event.parameters));
 
+  /// Event for when a characteristic operation of |type| to the characteristic
+  /// respresented by |characteristicId| happened. |data| and |writeType| is
+  /// expected to exist when |type| is write.
+  Stream<CharacteristicOperationReceivedEvent>
+  get onCharacteristicOperationReceived => _client.onEvent
+      .where(
+        (event) =>
+            event.name == 'BluetoothEmulation.characteristicOperationReceived',
+      )
+      .map(
+        (event) =>
+            CharacteristicOperationReceivedEvent.fromJson(event.parameters),
+      );
+
   /// Enable the BluetoothEmulation domain.
   /// [state] State of the simulated central.
   /// [leSupported] If the simulated central supports low-energy.
@@ -79,6 +93,26 @@ class BluetoothEmulationApi {
     });
   }
 
+  /// Simulates the response from the characteristic with |characteristicId| for a
+  /// characteristic operation of |type|. The |code| value follows the Error
+  /// Codes from Bluetooth Core Specification Vol 3 Part F 3.4.1.1 Error Response.
+  /// The |data| is expected to exist when simulating a successful read operation
+  /// response.
+  Future<void> simulateCharacteristicOperationResponse(
+    String characteristicId,
+    CharacteristicOperationType type,
+    int code, {
+    String? data,
+  }) async {
+    await _client
+        .send('BluetoothEmulation.simulateCharacteristicOperationResponse', {
+          'characteristicId': characteristicId,
+          'type': type,
+          'code': code,
+          if (data != null) 'data': data,
+        });
+  }
+
   /// Adds a service with |serviceUuid| to the peripheral with |address|.
   /// Returns: An identifier that uniquely represents this service.
   Future<String> addService(String address, String serviceUuid) async {
@@ -89,26 +123,22 @@ class BluetoothEmulationApi {
     return result['serviceId'] as String;
   }
 
-  /// Removes the service respresented by |serviceId| from the peripheral with
-  /// |address|.
-  Future<void> removeService(String address, String serviceId) async {
+  /// Removes the service respresented by |serviceId| from the simulated central.
+  Future<void> removeService(String serviceId) async {
     await _client.send('BluetoothEmulation.removeService', {
-      'address': address,
       'serviceId': serviceId,
     });
   }
 
   /// Adds a characteristic with |characteristicUuid| and |properties| to the
-  /// service represented by |serviceId| in the peripheral with |address|.
+  /// service represented by |serviceId|.
   /// Returns: An identifier that uniquely represents this characteristic.
   Future<String> addCharacteristic(
-    String address,
     String serviceId,
     String characteristicUuid,
     CharacteristicProperties properties,
   ) async {
     var result = await _client.send('BluetoothEmulation.addCharacteristic', {
-      'address': address,
       'serviceId': serviceId,
       'characteristicUuid': characteristicUuid,
       'properties': properties,
@@ -117,16 +147,31 @@ class BluetoothEmulationApi {
   }
 
   /// Removes the characteristic respresented by |characteristicId| from the
-  /// service respresented by |serviceId| in the peripheral with |address|.
-  Future<void> removeCharacteristic(
-    String address,
-    String serviceId,
-    String characteristicId,
-  ) async {
+  /// simulated central.
+  Future<void> removeCharacteristic(String characteristicId) async {
     await _client.send('BluetoothEmulation.removeCharacteristic', {
-      'address': address,
-      'serviceId': serviceId,
       'characteristicId': characteristicId,
+    });
+  }
+
+  /// Adds a descriptor with |descriptorUuid| to the characteristic respresented
+  /// by |characteristicId|.
+  /// Returns: An identifier that uniquely represents this descriptor.
+  Future<String> addDescriptor(
+    String characteristicId,
+    String descriptorUuid,
+  ) async {
+    var result = await _client.send('BluetoothEmulation.addDescriptor', {
+      'characteristicId': characteristicId,
+      'descriptorUuid': descriptorUuid,
+    });
+    return result['descriptorId'] as String;
+  }
+
+  /// Removes the descriptor with |descriptorId| from the simulated central.
+  Future<void> removeDescriptor(String descriptorId) async {
+    await _client.send('BluetoothEmulation.removeDescriptor', {
+      'descriptorId': descriptorId,
     });
   }
 }
@@ -142,6 +187,37 @@ class GattOperationReceivedEvent {
     return GattOperationReceivedEvent(
       address: json['address'] as String,
       type: GATTOperationType.fromJson(json['type'] as String),
+    );
+  }
+}
+
+class CharacteristicOperationReceivedEvent {
+  final String characteristicId;
+
+  final CharacteristicOperationType type;
+
+  final String? data;
+
+  final CharacteristicWriteType? writeType;
+
+  CharacteristicOperationReceivedEvent({
+    required this.characteristicId,
+    required this.type,
+    this.data,
+    this.writeType,
+  });
+
+  factory CharacteristicOperationReceivedEvent.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return CharacteristicOperationReceivedEvent(
+      characteristicId: json['characteristicId'] as String,
+      type: CharacteristicOperationType.fromJson(json['type'] as String),
+      data: json.containsKey('data') ? json['data'] as String : null,
+      writeType:
+          json.containsKey('writeType')
+              ? CharacteristicWriteType.fromJson(json['writeType'] as String)
+              : null,
     );
   }
 }
@@ -176,6 +252,45 @@ enum GATTOperationType {
 
   factory GATTOperationType.fromJson(String value) =>
       GATTOperationType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Indicates the various types of characteristic write.
+enum CharacteristicWriteType {
+  writeDefaultDeprecated('write-default-deprecated'),
+  writeWithResponse('write-with-response'),
+  writeWithoutResponse('write-without-response');
+
+  final String value;
+
+  const CharacteristicWriteType(this.value);
+
+  factory CharacteristicWriteType.fromJson(String value) =>
+      CharacteristicWriteType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Indicates the various types of characteristic operation.
+enum CharacteristicOperationType {
+  read('read'),
+  write('write'),
+  subscribeToNotifications('subscribe-to-notifications'),
+  unsubscribeFromNotifications('unsubscribe-from-notifications');
+
+  final String value;
+
+  const CharacteristicOperationType(this.value);
+
+  factory CharacteristicOperationType.fromJson(String value) =>
+      CharacteristicOperationType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 

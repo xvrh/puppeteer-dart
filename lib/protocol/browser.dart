@@ -562,7 +562,8 @@ class PermissionDescriptor {
 /// Browser command ids used by executeBrowserCommand.
 enum BrowserCommandId {
   openTabSearch('openTabSearch'),
-  closeTabSearch('closeTabSearch');
+  closeTabSearch('closeTabSearch'),
+  openGlic('openGlic');
 
   final String value;
 

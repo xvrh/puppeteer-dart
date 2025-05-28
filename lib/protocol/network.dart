@@ -168,6 +168,36 @@ class NetworkApi {
       .where((event) => event.name == 'Network.directTCPSocketClosed')
       .map((event) => DirectTCPSocketClosedEvent.fromJson(event.parameters));
 
+  /// Fired when data is sent to tcp direct socket stream.
+  Stream<DirectTCPSocketChunkSentEvent> get onDirectTCPSocketChunkSent =>
+      _client.onEvent
+          .where((event) => event.name == 'Network.directTCPSocketChunkSent')
+          .map(
+            (event) => DirectTCPSocketChunkSentEvent.fromJson(event.parameters),
+          );
+
+  /// Fired when data is received from tcp direct socket stream.
+  Stream<DirectTCPSocketChunkReceivedEvent>
+  get onDirectTCPSocketChunkReceived => _client.onEvent
+      .where((event) => event.name == 'Network.directTCPSocketChunkReceived')
+      .map(
+        (event) => DirectTCPSocketChunkReceivedEvent.fromJson(event.parameters),
+      );
+
+  /// Fired when there is an error
+  /// when writing to tcp direct socket stream.
+  /// For example, if user writes illegal type like string
+  /// instead of ArrayBuffer or ArrayBufferView.
+  /// There's no reporting for reading, because
+  /// we cannot know errors on the other side.
+  Stream<DirectTCPSocketChunkErrorEvent> get onDirectTCPSocketChunkError =>
+      _client.onEvent
+          .where((event) => event.name == 'Network.directTCPSocketChunkError')
+          .map(
+            (event) =>
+                DirectTCPSocketChunkErrorEvent.fromJson(event.parameters),
+          );
+
   /// Fired when additional information about a requestWillBeSent event is available from the
   /// network stack. Not every requestWillBeSent event will have an additional
   /// requestWillBeSentExtraInfo fired for it, and there is no guarantee whether requestWillBeSent
@@ -1572,6 +1602,74 @@ class DirectTCPSocketClosedEvent {
   }
 }
 
+class DirectTCPSocketChunkSentEvent {
+  final RequestId identifier;
+
+  final String data;
+
+  final MonotonicTime timestamp;
+
+  DirectTCPSocketChunkSentEvent({
+    required this.identifier,
+    required this.data,
+    required this.timestamp,
+  });
+
+  factory DirectTCPSocketChunkSentEvent.fromJson(Map<String, dynamic> json) {
+    return DirectTCPSocketChunkSentEvent(
+      identifier: RequestId.fromJson(json['identifier'] as String),
+      data: json['data'] as String,
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+    );
+  }
+}
+
+class DirectTCPSocketChunkReceivedEvent {
+  final RequestId identifier;
+
+  final String data;
+
+  final MonotonicTime timestamp;
+
+  DirectTCPSocketChunkReceivedEvent({
+    required this.identifier,
+    required this.data,
+    required this.timestamp,
+  });
+
+  factory DirectTCPSocketChunkReceivedEvent.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return DirectTCPSocketChunkReceivedEvent(
+      identifier: RequestId.fromJson(json['identifier'] as String),
+      data: json['data'] as String,
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+    );
+  }
+}
+
+class DirectTCPSocketChunkErrorEvent {
+  final RequestId identifier;
+
+  final String errorMessage;
+
+  final MonotonicTime timestamp;
+
+  DirectTCPSocketChunkErrorEvent({
+    required this.identifier,
+    required this.errorMessage,
+    required this.timestamp,
+  });
+
+  factory DirectTCPSocketChunkErrorEvent.fromJson(Map<String, dynamic> json) {
+    return DirectTCPSocketChunkErrorEvent(
+      identifier: RequestId.fromJson(json['identifier'] as String),
+      errorMessage: json['errorMessage'] as String,
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+    );
+  }
+}
+
 class RequestWillBeSentExtraInfoEvent {
   /// Request identifier. Used to match this information to an existing requestWillBeSent event.
   final RequestId requestId;
@@ -2959,7 +3057,8 @@ enum ServiceWorkerRouterSource {
   network('network'),
   cache('cache'),
   fetchEvent('fetch-event'),
-  raceNetworkAndFetchHandler('race-network-and-fetch-handler');
+  raceNetworkAndFetchHandler('race-network-and-fetch-handler'),
+  raceNetworkAndCache('race-network-and-cache');
 
   final String value;
 
