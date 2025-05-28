@@ -169,6 +169,9 @@ class TargetApi {
   /// [background] Whether to create the target in background or foreground (false by default, not supported
   /// by headless shell).
   /// [forTab] Whether to create the target of type "tab".
+  /// [hidden] Whether to create a hidden target. The hidden target is observable via protocol, but not
+  /// present in the tab UI strip. Cannot be created with `forTab: true`, `newWindow: true` or
+  /// `background: false`. The life-time of the tab is limited to the life-time of the session.
   /// Returns: The id of the page opened.
   Future<TargetID> createTarget(
     String url, {
@@ -182,6 +185,7 @@ class TargetApi {
     bool? newWindow,
     bool? background,
     bool? forTab,
+    bool? hidden,
   }) async {
     var result = await _client.send('Target.createTarget', {
       'url': url,
@@ -196,6 +200,7 @@ class TargetApi {
       if (newWindow != null) 'newWindow': newWindow,
       if (background != null) 'background': background,
       if (forTab != null) 'forTab': forTab,
+      if (hidden != null) 'hidden': hidden,
     });
     return TargetID.fromJson(result['targetId'] as String);
   }
@@ -261,11 +266,14 @@ class TargetApi {
     });
   }
 
-  /// Controls whether to automatically attach to new targets which are considered to be related to
-  /// this one. When turned on, attaches to all existing related targets as well. When turned off,
+  /// Controls whether to automatically attach to new targets which are considered
+  /// to be directly related to this one (for example, iframes or workers).
+  /// When turned on, attaches to all existing related targets as well. When turned off,
   /// automatically detaches from all currently attached targets.
   /// This also clears all targets added by `autoAttachRelated` from the list of targets to watch
   /// for creation of related targets.
+  /// You might want to call this recursively for auto-attached targets to attach
+  /// to all available targets.
   /// [autoAttach] Whether to auto-attach to related targets.
   /// [waitForDebuggerOnStart] Whether to pause new targets when attaching to them. Use `Runtime.runIfWaitingForDebugger`
   /// to run paused targets.

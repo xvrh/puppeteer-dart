@@ -373,11 +373,17 @@ class PageApi {
     return GetAppIdResult.fromJson(result);
   }
 
-  /// Returns: Identifies the bottom-most script which caused the frame to be labelled
-  /// as an ad. Only sent if frame is labelled as an ad and id is available.
-  Future<AdScriptId> getAdScriptId(FrameId frameId) async {
-    var result = await _client.send('Page.getAdScriptId', {'frameId': frameId});
-    return AdScriptId.fromJson(result['adScriptId'] as Map<String, dynamic>);
+  /// Returns: The ancestry chain of ad script identifiers leading to this frame's
+  /// creation, ordered from the most immediate script (in the frame creation
+  /// stack) to more distant ancestors (that created the immediately preceding
+  /// script). Only sent if frame is labelled as an ad and ids are available.
+  Future<List<AdScriptId>> getAdScriptAncestryIds(FrameId frameId) async {
+    var result = await _client.send('Page.getAdScriptAncestryIds', {
+      'frameId': frameId,
+    });
+    return (result['adScriptAncestryIds'] as List)
+        .map((e) => AdScriptId.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// Returns present frame tree structure.
@@ -1188,16 +1194,24 @@ class DownloadProgressEvent {
 }
 
 class JavascriptDialogClosedEvent {
+  /// Frame id.
+  final FrameId frameId;
+
   /// Whether dialog was confirmed.
   final bool result;
 
   /// User input in case of prompt.
   final String userInput;
 
-  JavascriptDialogClosedEvent({required this.result, required this.userInput});
+  JavascriptDialogClosedEvent({
+    required this.frameId,
+    required this.result,
+    required this.userInput,
+  });
 
   factory JavascriptDialogClosedEvent.fromJson(Map<String, dynamic> json) {
     return JavascriptDialogClosedEvent(
+      frameId: FrameId.fromJson(json['frameId'] as String),
       result: json['result'] as bool? ?? false,
       userInput: json['userInput'] as String,
     );
@@ -1207,6 +1221,9 @@ class JavascriptDialogClosedEvent {
 class JavascriptDialogOpeningEvent {
   /// Frame url.
   final String url;
+
+  /// Frame id.
+  final FrameId frameId;
 
   /// Message that will be displayed by the dialog.
   final String message;
@@ -1224,6 +1241,7 @@ class JavascriptDialogOpeningEvent {
 
   JavascriptDialogOpeningEvent({
     required this.url,
+    required this.frameId,
     required this.message,
     required this.type,
     required this.hasBrowserHandler,
@@ -1233,6 +1251,7 @@ class JavascriptDialogOpeningEvent {
   factory JavascriptDialogOpeningEvent.fromJson(Map<String, dynamic> json) {
     return JavascriptDialogOpeningEvent(
       url: json['url'] as String,
+      frameId: FrameId.fromJson(json['frameId'] as String),
       message: json['message'] as String,
       type: DialogType.fromJson(json['type'] as String),
       hasBrowserHandler: json['hasBrowserHandler'] as bool? ?? false,
@@ -1747,6 +1766,7 @@ enum GatedAPIFeatures {
 
 /// All Permissions Policy features. This enum should match the one defined
 /// in services/network/public/cpp/permissions_policy/permissions_policy_features.json5.
+/// LINT.IfChange(PermissionsPolicyFeature)
 enum PermissionsPolicyFeature {
   accelerometer('accelerometer'),
   allScreensCapture('all-screens-capture'),
@@ -1788,6 +1808,7 @@ enum PermissionsPolicyFeature {
   crossOriginIsolated('cross-origin-isolated'),
   deferredFetch('deferred-fetch'),
   deferredFetchMinimal('deferred-fetch-minimal'),
+  deviceAttributes('device-attributes'),
   digitalCredentialsGet('digital-credentials-get'),
   directSockets('direct-sockets'),
   directSocketsPrivate('direct-sockets-private'),
@@ -1811,6 +1832,7 @@ enum PermissionsPolicyFeature {
   keyboardMap('keyboard-map'),
   languageDetector('language-detector'),
   localFonts('local-fonts'),
+  localNetworkAccess('local-network-access'),
   magnetometer('magnetometer'),
   mediaPlaybackWhileNotVisible('media-playback-while-not-visible'),
   microphone('microphone'),
@@ -1824,6 +1846,7 @@ enum PermissionsPolicyFeature {
   privateStateTokenRedemption('private-state-token-redemption'),
   publickeyCredentialsCreate('publickey-credentials-create'),
   publickeyCredentialsGet('publickey-credentials-get'),
+  recordAdAuctionEvents('record-ad-auction-events'),
   rewriter('rewriter'),
   runAdAuction('run-ad-auction'),
   screenWakeLock('screen-wake-lock'),
@@ -3747,7 +3770,12 @@ enum BackForwardCacheNotRestoredReason {
   cacheControlNoStoreDeviceBoundSessionTerminated(
     'CacheControlNoStoreDeviceBoundSessionTerminated',
   ),
-  cacheLimitPruned('CacheLimitPruned');
+  cacheLimitPrunedOnModerateMemoryPressure(
+    'CacheLimitPrunedOnModerateMemoryPressure',
+  ),
+  cacheLimitPrunedOnCriticalMemoryPressure(
+    'CacheLimitPrunedOnCriticalMemoryPressure',
+  );
 
   final String value;
 

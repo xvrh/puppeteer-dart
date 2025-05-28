@@ -3026,7 +3026,8 @@
                     "type": "string",
                     "enum": [
                         "openTabSearch",
-                        "closeTabSearch"
+                        "closeTabSearch",
+                        "openGlic"
                     ]
                 },
                 {
@@ -5047,7 +5048,8 @@
                 },
                 {
                     "name": "resolveValues",
-                    "description": "Resolve the specified values in the context of the provided element.\nFor example, a value of '1em' is evaluated according to the computed\n'font-size' of the element and a value 'calc(1px + 2px)' will be\nresolved to '3px'.",
+                    "description": "Resolve the specified values in the context of the provided element.\nFor example, a value of '1em' is evaluated according to the computed\n'font-size' of the element and a value 'calc(1px + 2px)' will be\nresolved to '3px'.\nIf the `propertyName` was specified the `values` are resolved as if\nthey were property's declaration. If a value cannot be parsed according\nto the provided property syntax, the value is parsed using combined\nsyntax as if null `propertyName` was provided. If the value cannot be\nresolved even then, return the provided value without any changes.",
+                    "experimental": true,
                     "parameters": [
                         {
                             "name": "values",
@@ -5071,14 +5073,12 @@
                         {
                             "name": "pseudoType",
                             "description": "Pseudo element type, only works for pseudo elements that generate\nelements in the tree, such as ::before and ::after.",
-                            "experimental": true,
                             "optional": true,
                             "$ref": "DOM.PseudoType"
                         },
                         {
                             "name": "pseudoIdentifier",
                             "description": "Pseudo element custom ident.",
-                            "experimental": true,
                             "optional": true,
                             "type": "string"
                         }
@@ -10112,7 +10112,7 @@
                 },
                 {
                     "name": "setGeolocationOverride",
-                    "description": "Overrides the Geolocation Position or Error. Omitting any of the parameters emulates position\nunavailable.",
+                    "description": "Overrides the Geolocation Position or Error. Omitting latitude, longitude or\naccuracy emulates position unavailable.",
                     "parameters": [
                         {
                             "name": "latitude",
@@ -10129,6 +10129,30 @@
                         {
                             "name": "accuracy",
                             "description": "Mock accuracy",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "altitude",
+                            "description": "Mock altitude",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "altitudeAccuracy",
+                            "description": "Mock altitudeAccuracy",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "heading",
+                            "description": "Mock heading",
+                            "optional": true,
+                            "type": "number"
+                        },
+                        {
+                            "name": "speed",
+                            "description": "Mock speed",
                             "optional": true,
                             "type": "number"
                         }
@@ -10435,6 +10459,18 @@
                             "name": "enabled",
                             "description": "Whether the override should be enabled.",
                             "type": "boolean"
+                        }
+                    ]
+                },
+                {
+                    "name": "setSmallViewportHeightDifferenceOverride",
+                    "description": "Allows overriding the difference between the small and large viewport sizes, which determine the\nvalue of the `svh` and `lvh` unit, respectively. Only supported for top-level frames.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "difference",
+                            "description": "This will cause an element of size 100svh to be `difference` pixels smaller than an element\nof size 100lvh.",
+                            "type": "integer"
                         }
                     ]
                 }
@@ -13520,7 +13556,8 @@
                         "network",
                         "cache",
                         "fetch-event",
-                        "race-network-and-fetch-handler"
+                        "race-network-and-fetch-handler",
+                        "race-network-and-cache"
                     ]
                 },
                 {
@@ -16306,6 +16343,63 @@
                     ]
                 },
                 {
+                    "name": "directTCPSocketChunkSent",
+                    "description": "Fired when data is sent to tcp direct socket stream.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "identifier",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "data",
+                            "type": "binary"
+                        },
+                        {
+                            "name": "timestamp",
+                            "$ref": "MonotonicTime"
+                        }
+                    ]
+                },
+                {
+                    "name": "directTCPSocketChunkReceived",
+                    "description": "Fired when data is received from tcp direct socket stream.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "identifier",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "data",
+                            "type": "binary"
+                        },
+                        {
+                            "name": "timestamp",
+                            "$ref": "MonotonicTime"
+                        }
+                    ]
+                },
+                {
+                    "name": "directTCPSocketChunkError",
+                    "description": "Fired when there is an error\nwhen writing to tcp direct socket stream.\nFor example, if user writes illegal type like string\ninstead of ArrayBuffer or ArrayBufferView.\nThere's no reporting for reading, because\nwe cannot know errors on the other side.",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "identifier",
+                            "$ref": "RequestId"
+                        },
+                        {
+                            "name": "errorMessage",
+                            "type": "string"
+                        },
+                        {
+                            "name": "timestamp",
+                            "$ref": "MonotonicTime"
+                        }
+                    ]
+                },
+                {
                     "name": "requestWillBeSentExtraInfo",
                     "description": "Fired when additional information about a requestWillBeSent event is available from the\nnetwork stack. Not every requestWillBeSent event will have an additional\nrequestWillBeSentExtraInfo fired for it, and there is no guarantee whether requestWillBeSent\nor requestWillBeSentExtraInfo will be fired first for the same request.",
                     "experimental": true,
@@ -17857,7 +17951,7 @@
                 },
                 {
                     "id": "PermissionsPolicyFeature",
-                    "description": "All Permissions Policy features. This enum should match the one defined\nin services/network/public/cpp/permissions_policy/permissions_policy_features.json5.",
+                    "description": "All Permissions Policy features. This enum should match the one defined\nin services/network/public/cpp/permissions_policy/permissions_policy_features.json5.\nLINT.IfChange(PermissionsPolicyFeature)",
                     "experimental": true,
                     "type": "string",
                     "enum": [
@@ -17901,6 +17995,7 @@
                         "cross-origin-isolated",
                         "deferred-fetch",
                         "deferred-fetch-minimal",
+                        "device-attributes",
                         "digital-credentials-get",
                         "direct-sockets",
                         "direct-sockets-private",
@@ -17924,6 +18019,7 @@
                         "keyboard-map",
                         "language-detector",
                         "local-fonts",
+                        "local-network-access",
                         "magnetometer",
                         "media-playback-while-not-visible",
                         "microphone",
@@ -17937,6 +18033,7 @@
                         "private-state-token-redemption",
                         "publickey-credentials-create",
                         "publickey-credentials-get",
+                        "record-ad-auction-events",
                         "rewriter",
                         "run-ad-auction",
                         "screen-wake-lock",
@@ -19320,7 +19417,8 @@
                         "RequestedByWebViewClient",
                         "PostMessageByWebViewClient",
                         "CacheControlNoStoreDeviceBoundSessionTerminated",
-                        "CacheLimitPruned"
+                        "CacheLimitPrunedOnModerateMemoryPressure",
+                        "CacheLimitPrunedOnCriticalMemoryPressure"
                     ]
                 },
                 {
@@ -19741,7 +19839,7 @@
                     ]
                 },
                 {
-                    "name": "getAdScriptId",
+                    "name": "getAdScriptAncestryIds",
                     "experimental": true,
                     "parameters": [
                         {
@@ -19751,10 +19849,12 @@
                     ],
                     "returns": [
                         {
-                            "name": "adScriptId",
-                            "description": "Identifies the bottom-most script which caused the frame to be labelled\nas an ad. Only sent if frame is labelled as an ad and id is available.",
-                            "optional": true,
-                            "$ref": "AdScriptId"
+                            "name": "adScriptAncestryIds",
+                            "description": "The ancestry chain of ad script identifiers leading to this frame's\ncreation, ordered from the most immediate script (in the frame creation\nstack) to more distant ancestors (that created the immediately preceding\nscript). Only sent if frame is labelled as an ad and ids are available.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "AdScriptId"
+                            }
                         }
                     ]
                 },
@@ -20993,6 +21093,12 @@
                     "description": "Fired when a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload) has been\nclosed.",
                     "parameters": [
                         {
+                            "name": "frameId",
+                            "description": "Frame id.",
+                            "experimental": true,
+                            "$ref": "FrameId"
+                        },
+                        {
                             "name": "result",
                             "description": "Whether dialog was confirmed.",
                             "type": "boolean"
@@ -21012,6 +21118,12 @@
                             "name": "url",
                             "description": "Frame url.",
                             "type": "string"
+                        },
+                        {
+                            "name": "frameId",
+                            "description": "Frame id.",
+                            "experimental": true,
+                            "$ref": "FrameId"
                         },
                         {
                             "name": "message",
@@ -22384,6 +22496,36 @@
                     ]
                 },
                 {
+                    "id": "SharedStoragePrivateAggregationConfig",
+                    "description": "Represents a dictionary object passed in as privateAggregationConfig to\nrun or selectURL.",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "aggregationCoordinatorOrigin",
+                            "description": "The chosen aggregation service deployment.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "contextId",
+                            "description": "The context ID provided.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "filteringIdMaxBytes",
+                            "description": "Configures the maximum size allowed for filtering IDs.",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "maxContributions",
+                            "description": "The limit on the number of contributions in the final report.",
+                            "optional": true,
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
                     "id": "SharedStorageReportingMetadata",
                     "description": "Pair of reporting metadata details for a candidate URL for `selectURL()`.",
                     "type": "object",
@@ -22425,25 +22567,43 @@
                     "properties": [
                         {
                             "name": "scriptSourceUrl",
-                            "description": "Spec of the module script URL.\nPresent only for SharedStorageAccessType.documentAddModule.",
+                            "description": "Spec of the module script URL.\nPresent only for SharedStorageAccessMethods: addModule and\ncreateWorklet.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "dataOrigin",
+                            "description": "String denoting \"context-origin\", \"script-origin\", or a custom\norigin to be used as the worklet's data origin.\nPresent only for SharedStorageAccessMethod: createWorklet.",
                             "optional": true,
                             "type": "string"
                         },
                         {
                             "name": "operationName",
-                            "description": "Name of the registered operation to be run.\nPresent only for SharedStorageAccessType.documentRun and\nSharedStorageAccessType.documentSelectURL.",
+                            "description": "Name of the registered operation to be run.\nPresent only for SharedStorageAccessMethods: run and selectURL.",
                             "optional": true,
                             "type": "string"
                         },
                         {
+                            "name": "keepAlive",
+                            "description": "Whether or not to keep the worket alive for future run or selectURL\ncalls.\nPresent only for SharedStorageAccessMethods: run and selectURL.",
+                            "optional": true,
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "privateAggregationConfig",
+                            "description": "Configures the private aggregation options.\nPresent only for SharedStorageAccessMethods: run and selectURL.",
+                            "optional": true,
+                            "$ref": "SharedStoragePrivateAggregationConfig"
+                        },
+                        {
                             "name": "serializedData",
-                            "description": "The operation's serialized data in bytes (converted to a string).\nPresent only for SharedStorageAccessType.documentRun and\nSharedStorageAccessType.documentSelectURL.",
+                            "description": "The operation's serialized data in bytes (converted to a string).\nPresent only for SharedStorageAccessMethods: run and selectURL.\nTODO(crbug.com/401011862): Consider updating this parameter to binary.",
                             "optional": true,
                             "type": "string"
                         },
                         {
                             "name": "urlsWithMetadata",
-                            "description": "Array of candidate URLs' specs, along with any associated metadata.\nPresent only for SharedStorageAccessType.documentSelectURL.",
+                            "description": "Array of candidate URLs' specs, along with any associated metadata.\nPresent only for SharedStorageAccessMethod: selectURL.",
                             "optional": true,
                             "type": "array",
                             "items": {
@@ -22451,22 +22611,52 @@
                             }
                         },
                         {
+                            "name": "urnUuid",
+                            "description": "Spec of the URN:UUID generated for a selectURL call.\nPresent only for SharedStorageAccessMethod: selectURL.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
                             "name": "key",
-                            "description": "Key for a specific entry in an origin's shared storage.\nPresent only for SharedStorageAccessType.documentSet,\nSharedStorageAccessType.documentAppend,\nSharedStorageAccessType.documentDelete,\nSharedStorageAccessType.workletSet,\nSharedStorageAccessType.workletAppend,\nSharedStorageAccessType.workletDelete,\nSharedStorageAccessType.workletGet,\nSharedStorageAccessType.headerSet,\nSharedStorageAccessType.headerAppend, and\nSharedStorageAccessType.headerDelete.",
+                            "description": "Key for a specific entry in an origin's shared storage.\nPresent only for SharedStorageAccessMethods: set, append, delete, and\nget.",
                             "optional": true,
                             "type": "string"
                         },
                         {
                             "name": "value",
-                            "description": "Value for a specific entry in an origin's shared storage.\nPresent only for SharedStorageAccessType.documentSet,\nSharedStorageAccessType.documentAppend,\nSharedStorageAccessType.workletSet,\nSharedStorageAccessType.workletAppend,\nSharedStorageAccessType.headerSet, and\nSharedStorageAccessType.headerAppend.",
+                            "description": "Value for a specific entry in an origin's shared storage.\nPresent only for SharedStorageAccessMethods: set and append.",
                             "optional": true,
                             "type": "string"
                         },
                         {
                             "name": "ignoreIfPresent",
-                            "description": "Whether or not to set an entry for a key if that key is already present.\nPresent only for SharedStorageAccessType.documentSet,\nSharedStorageAccessType.workletSet, and\nSharedStorageAccessType.headerSet.",
+                            "description": "Whether or not to set an entry for a key if that key is already present.\nPresent only for SharedStorageAccessMethod: set.",
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "workletId",
+                            "description": "If the method is called on a worklet, or as part of\na worklet script, it will have an ID for the associated worklet.\nPresent only for SharedStorageAccessMethods: addModule, createWorklet,\nrun, selectURL, and any other SharedStorageAccessMethod when the\nSharedStorageAccessScope is worklet.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "withLock",
+                            "description": "Name of the lock to be acquired, if present.\nOptionally present only for SharedStorageAccessMethods: batchUpdate,\nset, append, delete, and clear.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "batchUpdateId",
+                            "description": "If the method has been called as part of a batchUpdate, then this\nnumber identifies the batch to which it belongs.\nOptionally present only for SharedStorageAccessMethods:\nbatchUpdate (required), set, append, delete, and clear.",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "batchSize",
+                            "description": "Number of modifier methods sent in batch.\nPresent only for SharedStorageAccessMethod: batchUpdate.",
+                            "optional": true,
+                            "type": "integer"
                         }
                     ]
                 },
@@ -22747,6 +22937,21 @@
                     ]
                 },
                 {
+                    "id": "AttributionReportingNamedBudgetDef",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "name": "budget",
+                            "type": "integer"
+                        }
+                    ]
+                },
+                {
                     "id": "AttributionReportingSourceRegistration",
                     "experimental": true,
                     "type": "object",
@@ -22838,6 +23043,21 @@
                         {
                             "name": "maxEventLevelReports",
                             "type": "integer"
+                        },
+                        {
+                            "name": "namedBudgets",
+                            "type": "array",
+                            "items": {
+                                "$ref": "AttributionReportingNamedBudgetDef"
+                            }
+                        },
+                        {
+                            "name": "debugReporting",
+                            "type": "boolean"
+                        },
+                        {
+                            "name": "eventLevelEpsilon",
+                            "type": "number"
                         }
                     ]
                 },
@@ -22974,6 +23194,22 @@
                     ]
                 },
                 {
+                    "id": "AttributionReportingNamedBudgetCandidate",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "name",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "filters",
+                            "$ref": "AttributionReportingFilterPair"
+                        }
+                    ]
+                },
+                {
                     "id": "AttributionReportingTriggerRegistration",
                     "experimental": true,
                     "type": "object",
@@ -23046,6 +23282,13 @@
                             "type": "array",
                             "items": {
                                 "type": "string"
+                            }
+                        },
+                        {
+                            "name": "namedBudgets",
+                            "type": "array",
+                            "items": {
+                                "$ref": "AttributionReportingNamedBudgetCandidate"
                             }
                         }
                     ]
@@ -23677,6 +23920,26 @@
                             "type": "array",
                             "items": {
                                 "type": "string"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "setProtectedAudienceKAnonymity",
+                    "parameters": [
+                        {
+                            "name": "owner",
+                            "type": "string"
+                        },
+                        {
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "name": "hashes",
+                            "type": "array",
+                            "items": {
+                                "type": "binary"
                             }
                         }
                     ]
@@ -24630,6 +24893,13 @@
                             "experimental": true,
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "hidden",
+                            "description": "Whether to create a hidden target. The hidden target is observable via protocol, but not\npresent in the tab UI strip. Cannot be created with `forTab: true`, `newWindow: true` or\n`background: false`. The life-time of the tab is limited to the life-time of the session.",
+                            "experimental": true,
+                            "optional": true,
+                            "type": "boolean"
                         }
                     ],
                     "returns": [
@@ -24736,7 +25006,7 @@
                 },
                 {
                     "name": "setAutoAttach",
-                    "description": "Controls whether to automatically attach to new targets which are considered to be related to\nthis one. When turned on, attaches to all existing related targets as well. When turned off,\nautomatically detaches from all currently attached targets.\nThis also clears all targets added by `autoAttachRelated` from the list of targets to watch\nfor creation of related targets.",
+                    "description": "Controls whether to automatically attach to new targets which are considered\nto be directly related to this one (for example, iframes or workers).\nWhen turned on, attaches to all existing related targets as well. When turned off,\nautomatically detaches from all currently attached targets.\nThis also clears all targets added by `autoAttachRelated` from the list of targets to watch\nfor creation of related targets.\nYou might want to call this recursively for auto-attached targets to attach\nto all available targets.",
                     "parameters": [
                         {
                             "name": "autoAttach",
@@ -27848,6 +28118,27 @@
                     ]
                 },
                 {
+                    "id": "CharacteristicWriteType",
+                    "description": "Indicates the various types of characteristic write.",
+                    "type": "string",
+                    "enum": [
+                        "write-default-deprecated",
+                        "write-with-response",
+                        "write-without-response"
+                    ]
+                },
+                {
+                    "id": "CharacteristicOperationType",
+                    "description": "Indicates the various types of characteristic operation.",
+                    "type": "string",
+                    "enum": [
+                        "read",
+                        "write",
+                        "subscribe-to-notifications",
+                        "unsubscribe-from-notifications"
+                    ]
+                },
+                {
                     "id": "ManufacturerData",
                     "description": "Stores the manufacturer data",
                     "type": "object",
@@ -28061,6 +28352,29 @@
                     ]
                 },
                 {
+                    "name": "simulateCharacteristicOperationResponse",
+                    "description": "Simulates the response from the characteristic with |characteristicId| for a\ncharacteristic operation of |type|. The |code| value follows the Error\nCodes from Bluetooth Core Specification Vol 3 Part F 3.4.1.1 Error Response.\nThe |data| is expected to exist when simulating a successful read operation\nresponse.",
+                    "parameters": [
+                        {
+                            "name": "characteristicId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "type",
+                            "$ref": "CharacteristicOperationType"
+                        },
+                        {
+                            "name": "code",
+                            "type": "integer"
+                        },
+                        {
+                            "name": "data",
+                            "optional": true,
+                            "type": "binary"
+                        }
+                    ]
+                },
+                {
                     "name": "addService",
                     "description": "Adds a service with |serviceUuid| to the peripheral with |address|.",
                     "parameters": [
@@ -28083,12 +28397,8 @@
                 },
                 {
                     "name": "removeService",
-                    "description": "Removes the service respresented by |serviceId| from the peripheral with\n|address|.",
+                    "description": "Removes the service respresented by |serviceId| from the simulated central.",
                     "parameters": [
-                        {
-                            "name": "address",
-                            "type": "string"
-                        },
                         {
                             "name": "serviceId",
                             "type": "string"
@@ -28097,12 +28407,8 @@
                 },
                 {
                     "name": "addCharacteristic",
-                    "description": "Adds a characteristic with |characteristicUuid| and |properties| to the\nservice represented by |serviceId| in the peripheral with |address|.",
+                    "description": "Adds a characteristic with |characteristicUuid| and |properties| to the\nservice represented by |serviceId|.",
                     "parameters": [
-                        {
-                            "name": "address",
-                            "type": "string"
-                        },
                         {
                             "name": "serviceId",
                             "type": "string"
@@ -28126,18 +28432,41 @@
                 },
                 {
                     "name": "removeCharacteristic",
-                    "description": "Removes the characteristic respresented by |characteristicId| from the\nservice respresented by |serviceId| in the peripheral with |address|.",
+                    "description": "Removes the characteristic respresented by |characteristicId| from the\nsimulated central.",
                     "parameters": [
                         {
-                            "name": "address",
+                            "name": "characteristicId",
                             "type": "string"
-                        },
-                        {
-                            "name": "serviceId",
-                            "type": "string"
-                        },
+                        }
+                    ]
+                },
+                {
+                    "name": "addDescriptor",
+                    "description": "Adds a descriptor with |descriptorUuid| to the characteristic respresented\nby |characteristicId|.",
+                    "parameters": [
                         {
                             "name": "characteristicId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "descriptorUuid",
+                            "type": "string"
+                        }
+                    ],
+                    "returns": [
+                        {
+                            "name": "descriptorId",
+                            "description": "An identifier that uniquely represents this descriptor.",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "removeDescriptor",
+                    "description": "Removes the descriptor with |descriptorId| from the simulated central.",
+                    "parameters": [
+                        {
+                            "name": "descriptorId",
                             "type": "string"
                         }
                     ]
@@ -28155,6 +28484,30 @@
                         {
                             "name": "type",
                             "$ref": "GATTOperationType"
+                        }
+                    ]
+                },
+                {
+                    "name": "characteristicOperationReceived",
+                    "description": "Event for when a characteristic operation of |type| to the characteristic\nrespresented by |characteristicId| happened. |data| and |writeType| is\nexpected to exist when |type| is write.",
+                    "parameters": [
+                        {
+                            "name": "characteristicId",
+                            "type": "string"
+                        },
+                        {
+                            "name": "type",
+                            "$ref": "CharacteristicOperationType"
+                        },
+                        {
+                            "name": "data",
+                            "optional": true,
+                            "type": "binary"
+                        },
+                        {
+                            "name": "writeType",
+                            "optional": true,
+                            "$ref": "CharacteristicWriteType"
                         }
                     ]
                 }
@@ -29487,7 +29840,7 @@
                         },
                         {
                             "name": "buildId",
-                            "description": "For Wasm modules, the content of the `build_id` custom section.",
+                            "description": "For Wasm modules, the content of the `build_id` custom section. For JavaScript the `debugId` magic comment.",
                             "type": "string"
                         },
                         {
@@ -29596,7 +29949,7 @@
                         },
                         {
                             "name": "buildId",
-                            "description": "For Wasm modules, the content of the `build_id` custom section.",
+                            "description": "For Wasm modules, the content of the `build_id` custom section. For JavaScript the `debugId` magic comment.",
                             "type": "string"
                         },
                         {
