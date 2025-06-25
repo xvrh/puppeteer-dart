@@ -1837,6 +1837,7 @@ enum PermissionsPolicyFeature {
   mediaPlaybackWhileNotVisible('media-playback-while-not-visible'),
   microphone('microphone'),
   midi('midi'),
+  onDeviceSpeechRecognition('on-device-speech-recognition'),
   otpCredentials('otp-credentials'),
   payment('payment'),
   pictureInPicture('picture-in-picture'),

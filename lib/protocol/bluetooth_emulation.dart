@@ -31,6 +31,20 @@ class BluetoothEmulationApi {
             CharacteristicOperationReceivedEvent.fromJson(event.parameters),
       );
 
+  /// Event for when a descriptor operation of |type| to the descriptor
+  /// respresented by |descriptorId| happened. |data| is expected to exist when
+  /// |type| is write.
+  Stream<DescriptorOperationReceivedEvent> get onDescriptorOperationReceived =>
+      _client.onEvent
+          .where(
+            (event) =>
+                event.name == 'BluetoothEmulation.descriptorOperationReceived',
+          )
+          .map(
+            (event) =>
+                DescriptorOperationReceivedEvent.fromJson(event.parameters),
+          );
+
   /// Enable the BluetoothEmulation domain.
   /// [state] State of the simulated central.
   /// [leSupported] If the simulated central supports low-energy.
@@ -113,6 +127,26 @@ class BluetoothEmulationApi {
         });
   }
 
+  /// Simulates the response from the descriptor with |descriptorId| for a
+  /// descriptor operation of |type|. The |code| value follows the Error
+  /// Codes from Bluetooth Core Specification Vol 3 Part F 3.4.1.1 Error Response.
+  /// The |data| is expected to exist when simulating a successful read operation
+  /// response.
+  Future<void> simulateDescriptorOperationResponse(
+    String descriptorId,
+    DescriptorOperationType type,
+    int code, {
+    String? data,
+  }) async {
+    await _client
+        .send('BluetoothEmulation.simulateDescriptorOperationResponse', {
+          'descriptorId': descriptorId,
+          'type': type,
+          'code': code,
+          if (data != null) 'data': data,
+        });
+  }
+
   /// Adds a service with |serviceUuid| to the peripheral with |address|.
   /// Returns: An identifier that uniquely represents this service.
   Future<String> addService(String address, String serviceUuid) async {
@@ -174,6 +208,13 @@ class BluetoothEmulationApi {
       'descriptorId': descriptorId,
     });
   }
+
+  /// Simulates a GATT disconnection from the peripheral with |address|.
+  Future<void> simulateGATTDisconnection(String address) async {
+    await _client.send('BluetoothEmulation.simulateGATTDisconnection', {
+      'address': address,
+    });
+  }
 }
 
 class GattOperationReceivedEvent {
@@ -218,6 +259,28 @@ class CharacteristicOperationReceivedEvent {
           json.containsKey('writeType')
               ? CharacteristicWriteType.fromJson(json['writeType'] as String)
               : null,
+    );
+  }
+}
+
+class DescriptorOperationReceivedEvent {
+  final String descriptorId;
+
+  final DescriptorOperationType type;
+
+  final String? data;
+
+  DescriptorOperationReceivedEvent({
+    required this.descriptorId,
+    required this.type,
+    this.data,
+  });
+
+  factory DescriptorOperationReceivedEvent.fromJson(Map<String, dynamic> json) {
+    return DescriptorOperationReceivedEvent(
+      descriptorId: json['descriptorId'] as String,
+      type: DescriptorOperationType.fromJson(json['type'] as String),
+      data: json.containsKey('data') ? json['data'] as String : null,
     );
   }
 }
@@ -291,6 +354,24 @@ enum CharacteristicOperationType {
 
   factory CharacteristicOperationType.fromJson(String value) =>
       CharacteristicOperationType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// Indicates the various types of descriptor operation.
+enum DescriptorOperationType {
+  read('read'),
+  write('write');
+
+  final String value;
+
+  const DescriptorOperationType(this.value);
+
+  factory DescriptorOperationType.fromJson(String value) =>
+      DescriptorOperationType.values.firstWhere((e) => e.value == value);
 
   String toJson() => value;
 

@@ -1974,6 +1974,53 @@ class PropertyRuleIssueDetails {
   }
 }
 
+enum UserReidentificationIssueType {
+  blockedFrameNavigation('BlockedFrameNavigation'),
+  blockedSubresource('BlockedSubresource');
+
+  final String value;
+
+  const UserReidentificationIssueType(this.value);
+
+  factory UserReidentificationIssueType.fromJson(String value) =>
+      UserReidentificationIssueType.values.firstWhere((e) => e.value == value);
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+/// This issue warns about uses of APIs that may be considered misuse to
+/// re-identify users.
+class UserReidentificationIssueDetails {
+  final UserReidentificationIssueType type;
+
+  /// Applies to BlockedFrameNavigation and BlockedSubresource issue types.
+  final AffectedRequest? request;
+
+  UserReidentificationIssueDetails({required this.type, this.request});
+
+  factory UserReidentificationIssueDetails.fromJson(Map<String, dynamic> json) {
+    return UserReidentificationIssueDetails(
+      type: UserReidentificationIssueType.fromJson(json['type'] as String),
+      request:
+          json.containsKey('request')
+              ? AffectedRequest.fromJson(
+                json['request'] as Map<String, dynamic>,
+              )
+              : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type.toJson(),
+      if (request != null) 'request': request!.toJson(),
+    };
+  }
+}
+
 /// A unique identifier for the type of issue. Each type may use one of the
 /// optional fields in InspectorIssueDetails to convey more specific
 /// information about the kind of issue.
@@ -2001,7 +2048,8 @@ enum InspectorIssueCode {
   propertyRuleIssue('PropertyRuleIssue'),
   sharedDictionaryIssue('SharedDictionaryIssue'),
   selectElementAccessibilityIssue('SelectElementAccessibilityIssue'),
-  sriMessageSignatureIssue('SRIMessageSignatureIssue');
+  sriMessageSignatureIssue('SRIMessageSignatureIssue'),
+  userReidentificationIssue('UserReidentificationIssue');
 
   final String value;
 
@@ -2069,6 +2117,8 @@ class InspectorIssueDetails {
 
   final SRIMessageSignatureIssueDetails? sriMessageSignatureIssueDetails;
 
+  final UserReidentificationIssueDetails? userReidentificationIssueDetails;
+
   InspectorIssueDetails({
     this.cookieIssueDetails,
     this.mixedContentIssueDetails,
@@ -2093,6 +2143,7 @@ class InspectorIssueDetails {
     this.sharedDictionaryIssueDetails,
     this.selectElementAccessibilityIssueDetails,
     this.sriMessageSignatureIssueDetails,
+    this.userReidentificationIssueDetails,
   });
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
@@ -2241,6 +2292,13 @@ class InspectorIssueDetails {
                 json['sriMessageSignatureIssueDetails'] as Map<String, dynamic>,
               )
               : null,
+      userReidentificationIssueDetails:
+          json.containsKey('userReidentificationIssueDetails')
+              ? UserReidentificationIssueDetails.fromJson(
+                json['userReidentificationIssueDetails']
+                    as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 
@@ -2303,6 +2361,9 @@ class InspectorIssueDetails {
       if (sriMessageSignatureIssueDetails != null)
         'sriMessageSignatureIssueDetails':
             sriMessageSignatureIssueDetails!.toJson(),
+      if (userReidentificationIssueDetails != null)
+        'userReidentificationIssueDetails':
+            userReidentificationIssueDetails!.toJson(),
     };
   }
 }

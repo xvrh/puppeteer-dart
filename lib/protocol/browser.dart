@@ -277,11 +277,17 @@ class DownloadProgressEvent {
   /// Download status.
   final DownloadProgressEventState state;
 
+  /// If download is "completed", provides the path of the downloaded file.
+  /// Depending on the platform, it is not guaranteed to be set, nor the file
+  /// is guaranteed to exist.
+  final String? filePath;
+
   DownloadProgressEvent({
     required this.guid,
     required this.totalBytes,
     required this.receivedBytes,
     required this.state,
+    this.filePath,
   });
 
   factory DownloadProgressEvent.fromJson(Map<String, dynamic> json) {
@@ -290,6 +296,8 @@ class DownloadProgressEvent {
       totalBytes: json['totalBytes'] as num,
       receivedBytes: json['receivedBytes'] as num,
       state: DownloadProgressEventState.fromJson(json['state'] as String),
+      filePath:
+          json.containsKey('filePath') ? json['filePath'] as String : null,
     );
   }
 }
