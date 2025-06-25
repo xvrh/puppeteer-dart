@@ -184,19 +184,45 @@ class NetworkApi {
         (event) => DirectTCPSocketChunkReceivedEvent.fromJson(event.parameters),
       );
 
-  /// Fired when there is an error
-  /// when writing to tcp direct socket stream.
-  /// For example, if user writes illegal type like string
-  /// instead of ArrayBuffer or ArrayBufferView.
-  /// There's no reporting for reading, because
-  /// we cannot know errors on the other side.
-  Stream<DirectTCPSocketChunkErrorEvent> get onDirectTCPSocketChunkError =>
+  /// Fired upon direct_socket.UDPSocket creation.
+  Stream<DirectUDPSocketCreatedEvent> get onDirectUDPSocketCreated => _client
+      .onEvent
+      .where((event) => event.name == 'Network.directUDPSocketCreated')
+      .map((event) => DirectUDPSocketCreatedEvent.fromJson(event.parameters));
+
+  /// Fired when direct_socket.UDPSocket connection is opened.
+  Stream<DirectUDPSocketOpenedEvent> get onDirectUDPSocketOpened => _client
+      .onEvent
+      .where((event) => event.name == 'Network.directUDPSocketOpened')
+      .map((event) => DirectUDPSocketOpenedEvent.fromJson(event.parameters));
+
+  /// Fired when direct_socket.UDPSocket is aborted.
+  Stream<DirectUDPSocketAbortedEvent> get onDirectUDPSocketAborted => _client
+      .onEvent
+      .where((event) => event.name == 'Network.directUDPSocketAborted')
+      .map((event) => DirectUDPSocketAbortedEvent.fromJson(event.parameters));
+
+  /// Fired when direct_socket.UDPSocket is closed.
+  Stream<DirectUDPSocketClosedEvent> get onDirectUDPSocketClosed => _client
+      .onEvent
+      .where((event) => event.name == 'Network.directUDPSocketClosed')
+      .map((event) => DirectUDPSocketClosedEvent.fromJson(event.parameters));
+
+  /// Fired when message is sent to udp direct socket stream.
+  Stream<DirectUDPSocketChunkSentEvent> get onDirectUDPSocketChunkSent =>
       _client.onEvent
-          .where((event) => event.name == 'Network.directTCPSocketChunkError')
+          .where((event) => event.name == 'Network.directUDPSocketChunkSent')
           .map(
-            (event) =>
-                DirectTCPSocketChunkErrorEvent.fromJson(event.parameters),
+            (event) => DirectUDPSocketChunkSentEvent.fromJson(event.parameters),
           );
+
+  /// Fired when message is received from udp direct socket stream.
+  Stream<DirectUDPSocketChunkReceivedEvent>
+  get onDirectUDPSocketChunkReceived => _client.onEvent
+      .where((event) => event.name == 'Network.directUDPSocketChunkReceived')
+      .map(
+        (event) => DirectUDPSocketChunkReceivedEvent.fromJson(event.parameters),
+      );
 
   /// Fired when additional information about a requestWillBeSent event is available from the
   /// network stack. Not every requestWillBeSent event will have an additional
@@ -481,16 +507,20 @@ class NetworkApi {
   /// [maxTotalBufferSize] Buffer size in bytes to use when preserving network payloads (XHRs, etc).
   /// [maxResourceBufferSize] Per-resource buffer size in bytes to use when preserving network payloads (XHRs, etc).
   /// [maxPostDataSize] Longest post body size (in bytes) that would be included in requestWillBeSent notification
+  /// [reportDirectSocketTraffic] Whether DirectSocket chunk send/receive events should be reported.
   Future<void> enable({
     int? maxTotalBufferSize,
     int? maxResourceBufferSize,
     int? maxPostDataSize,
+    bool? reportDirectSocketTraffic,
   }) async {
     await _client.send('Network.enable', {
       if (maxTotalBufferSize != null) 'maxTotalBufferSize': maxTotalBufferSize,
       if (maxResourceBufferSize != null)
         'maxResourceBufferSize': maxResourceBufferSize,
       if (maxPostDataSize != null) 'maxPostDataSize': maxPostDataSize,
+      if (reportDirectSocketTraffic != null)
+        'reportDirectSocketTraffic': reportDirectSocketTraffic,
     });
   }
 
@@ -783,7 +813,7 @@ class NetworkApi {
   }
 
   /// Sets Controls for third-party cookie access
-  /// Page reload is required before the new cookie bahavior will be observed
+  /// Page reload is required before the new cookie behavior will be observed
   /// [enableThirdPartyCookieRestriction] Whether 3pc restriction is enabled.
   /// [disableThirdPartyCookieMetadata] Whether 3pc grace period exception should be enabled; false by default.
   /// [disableThirdPartyCookieHeuristics] Whether 3pc heuristics exceptions should be enabled; false by default.
@@ -1648,23 +1678,160 @@ class DirectTCPSocketChunkReceivedEvent {
   }
 }
 
-class DirectTCPSocketChunkErrorEvent {
+class DirectUDPSocketCreatedEvent {
+  final RequestId identifier;
+
+  final DirectUDPSocketOptions options;
+
+  final MonotonicTime timestamp;
+
+  final Initiator? initiator;
+
+  DirectUDPSocketCreatedEvent({
+    required this.identifier,
+    required this.options,
+    required this.timestamp,
+    this.initiator,
+  });
+
+  factory DirectUDPSocketCreatedEvent.fromJson(Map<String, dynamic> json) {
+    return DirectUDPSocketCreatedEvent(
+      identifier: RequestId.fromJson(json['identifier'] as String),
+      options: DirectUDPSocketOptions.fromJson(
+        json['options'] as Map<String, dynamic>,
+      ),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+      initiator:
+          json.containsKey('initiator')
+              ? Initiator.fromJson(json['initiator'] as Map<String, dynamic>)
+              : null,
+    );
+  }
+}
+
+class DirectUDPSocketOpenedEvent {
+  final RequestId identifier;
+
+  final String localAddr;
+
+  /// Expected to be unsigned integer.
+  final int localPort;
+
+  final MonotonicTime timestamp;
+
+  final String? remoteAddr;
+
+  /// Expected to be unsigned integer.
+  final int? remotePort;
+
+  DirectUDPSocketOpenedEvent({
+    required this.identifier,
+    required this.localAddr,
+    required this.localPort,
+    required this.timestamp,
+    this.remoteAddr,
+    this.remotePort,
+  });
+
+  factory DirectUDPSocketOpenedEvent.fromJson(Map<String, dynamic> json) {
+    return DirectUDPSocketOpenedEvent(
+      identifier: RequestId.fromJson(json['identifier'] as String),
+      localAddr: json['localAddr'] as String,
+      localPort: json['localPort'] as int,
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+      remoteAddr:
+          json.containsKey('remoteAddr') ? json['remoteAddr'] as String : null,
+      remotePort:
+          json.containsKey('remotePort') ? json['remotePort'] as int : null,
+    );
+  }
+}
+
+class DirectUDPSocketAbortedEvent {
   final RequestId identifier;
 
   final String errorMessage;
 
   final MonotonicTime timestamp;
 
-  DirectTCPSocketChunkErrorEvent({
+  DirectUDPSocketAbortedEvent({
     required this.identifier,
     required this.errorMessage,
     required this.timestamp,
   });
 
-  factory DirectTCPSocketChunkErrorEvent.fromJson(Map<String, dynamic> json) {
-    return DirectTCPSocketChunkErrorEvent(
+  factory DirectUDPSocketAbortedEvent.fromJson(Map<String, dynamic> json) {
+    return DirectUDPSocketAbortedEvent(
       identifier: RequestId.fromJson(json['identifier'] as String),
       errorMessage: json['errorMessage'] as String,
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+    );
+  }
+}
+
+class DirectUDPSocketClosedEvent {
+  final RequestId identifier;
+
+  final MonotonicTime timestamp;
+
+  DirectUDPSocketClosedEvent({
+    required this.identifier,
+    required this.timestamp,
+  });
+
+  factory DirectUDPSocketClosedEvent.fromJson(Map<String, dynamic> json) {
+    return DirectUDPSocketClosedEvent(
+      identifier: RequestId.fromJson(json['identifier'] as String),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+    );
+  }
+}
+
+class DirectUDPSocketChunkSentEvent {
+  final RequestId identifier;
+
+  final DirectUDPMessage message;
+
+  final MonotonicTime timestamp;
+
+  DirectUDPSocketChunkSentEvent({
+    required this.identifier,
+    required this.message,
+    required this.timestamp,
+  });
+
+  factory DirectUDPSocketChunkSentEvent.fromJson(Map<String, dynamic> json) {
+    return DirectUDPSocketChunkSentEvent(
+      identifier: RequestId.fromJson(json['identifier'] as String),
+      message: DirectUDPMessage.fromJson(
+        json['message'] as Map<String, dynamic>,
+      ),
+      timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
+    );
+  }
+}
+
+class DirectUDPSocketChunkReceivedEvent {
+  final RequestId identifier;
+
+  final DirectUDPMessage message;
+
+  final MonotonicTime timestamp;
+
+  DirectUDPSocketChunkReceivedEvent({
+    required this.identifier,
+    required this.message,
+    required this.timestamp,
+  });
+
+  factory DirectUDPSocketChunkReceivedEvent.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return DirectUDPSocketChunkReceivedEvent(
+      identifier: RequestId.fromJson(json['identifier'] as String),
+      message: DirectUDPMessage.fromJson(
+        json['message'] as Map<String, dynamic>,
+      ),
       timestamp: MonotonicTime.fromJson(json['timestamp'] as num),
     );
   }
@@ -2091,6 +2258,7 @@ enum ResourceType {
   ping('Ping'),
   cspViolationReport('CSPViolationReport'),
   preflight('Preflight'),
+  fedCm('FedCM'),
   other('Other');
 
   final String value;
@@ -2820,6 +2988,7 @@ enum BlockedReason {
   mixedContent('mixed-content'),
   origin('origin'),
   inspector('inspector'),
+  integrity('integrity'),
   subresourceFilter('subresource-filter'),
   contentType('content-type'),
   coepFrameResourceNeedsCoepHeader('coep-frame-resource-needs-coep-header'),
@@ -4605,6 +4774,106 @@ class DirectTCPSocketOptions {
       if (sendBufferSize != null) 'sendBufferSize': sendBufferSize,
       if (receiveBufferSize != null) 'receiveBufferSize': receiveBufferSize,
       if (dnsQueryType != null) 'dnsQueryType': dnsQueryType!.toJson(),
+    };
+  }
+}
+
+class DirectUDPSocketOptions {
+  final String? remoteAddr;
+
+  /// Unsigned int 16.
+  final int? remotePort;
+
+  final String? localAddr;
+
+  /// Unsigned int 16.
+  final int? localPort;
+
+  final DirectSocketDnsQueryType? dnsQueryType;
+
+  /// Expected to be unsigned integer.
+  final num? sendBufferSize;
+
+  /// Expected to be unsigned integer.
+  final num? receiveBufferSize;
+
+  DirectUDPSocketOptions({
+    this.remoteAddr,
+    this.remotePort,
+    this.localAddr,
+    this.localPort,
+    this.dnsQueryType,
+    this.sendBufferSize,
+    this.receiveBufferSize,
+  });
+
+  factory DirectUDPSocketOptions.fromJson(Map<String, dynamic> json) {
+    return DirectUDPSocketOptions(
+      remoteAddr:
+          json.containsKey('remoteAddr') ? json['remoteAddr'] as String : null,
+      remotePort:
+          json.containsKey('remotePort') ? json['remotePort'] as int : null,
+      localAddr:
+          json.containsKey('localAddr') ? json['localAddr'] as String : null,
+      localPort:
+          json.containsKey('localPort') ? json['localPort'] as int : null,
+      dnsQueryType:
+          json.containsKey('dnsQueryType')
+              ? DirectSocketDnsQueryType.fromJson(
+                json['dnsQueryType'] as String,
+              )
+              : null,
+      sendBufferSize:
+          json.containsKey('sendBufferSize')
+              ? json['sendBufferSize'] as num
+              : null,
+      receiveBufferSize:
+          json.containsKey('receiveBufferSize')
+              ? json['receiveBufferSize'] as num
+              : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      if (remoteAddr != null) 'remoteAddr': remoteAddr,
+      if (remotePort != null) 'remotePort': remotePort,
+      if (localAddr != null) 'localAddr': localAddr,
+      if (localPort != null) 'localPort': localPort,
+      if (dnsQueryType != null) 'dnsQueryType': dnsQueryType!.toJson(),
+      if (sendBufferSize != null) 'sendBufferSize': sendBufferSize,
+      if (receiveBufferSize != null) 'receiveBufferSize': receiveBufferSize,
+    };
+  }
+}
+
+class DirectUDPMessage {
+  final String data;
+
+  /// Null for connected mode.
+  final String? remoteAddr;
+
+  /// Null for connected mode.
+  /// Expected to be unsigned integer.
+  final int? remotePort;
+
+  DirectUDPMessage({required this.data, this.remoteAddr, this.remotePort});
+
+  factory DirectUDPMessage.fromJson(Map<String, dynamic> json) {
+    return DirectUDPMessage(
+      data: json['data'] as String,
+      remoteAddr:
+          json.containsKey('remoteAddr') ? json['remoteAddr'] as String : null,
+      remotePort:
+          json.containsKey('remotePort') ? json['remotePort'] as int : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'data': data,
+      if (remoteAddr != null) 'remoteAddr': remoteAddr,
+      if (remotePort != null) 'remotePort': remotePort,
     };
   }
 }

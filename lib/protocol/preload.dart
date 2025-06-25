@@ -460,7 +460,6 @@ enum PrerenderFinalStatus {
   invalidSchemeRedirect('InvalidSchemeRedirect'),
   invalidSchemeNavigation('InvalidSchemeNavigation'),
   navigationRequestBlockedByCsp('NavigationRequestBlockedByCsp'),
-  mainFrameNavigation('MainFrameNavigation'),
   mojoBinderPolicy('MojoBinderPolicy'),
   rendererProcessCrashed('RendererProcessCrashed'),
   rendererProcessKilled('RendererProcessKilled'),

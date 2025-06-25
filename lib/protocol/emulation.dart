@@ -316,6 +316,7 @@ class EmulationApi {
     });
   }
 
+  /// TODO: OBSOLETE: To remove when setPressureDataOverride is merged.
   /// Provides a given pressure state that will be processed and eventually be
   /// delivered to PressureObserver users. |source| must have been previously
   /// overridden by setPressureSourceOverrideEnabled.
@@ -326,6 +327,22 @@ class EmulationApi {
     await _client.send('Emulation.setPressureStateOverride', {
       'source': source,
       'state': state,
+    });
+  }
+
+  /// Provides a given pressure data set that will be processed and eventually be
+  /// delivered to PressureObserver users. |source| must have been previously
+  /// overridden by setPressureSourceOverrideEnabled.
+  Future<void> setPressureDataOverride(
+    PressureSource source,
+    PressureState state, {
+    num? ownContributionEstimate,
+  }) async {
+    await _client.send('Emulation.setPressureDataOverride', {
+      'source': source,
+      'state': state,
+      if (ownContributionEstimate != null)
+        'ownContributionEstimate': ownContributionEstimate,
     });
   }
 

@@ -3,6 +3,7 @@ import '../src/connection.dart';
 import 'browser.dart' as browser;
 import 'network.dart' as network;
 import 'page.dart' as page;
+import 'target.dart' as target;
 
 class StorageApi {
   final Client _client;
@@ -78,6 +79,21 @@ class StorageApi {
       .where((event) => event.name == 'Storage.sharedStorageAccessed')
       .map((event) => SharedStorageAccessedEvent.fromJson(event.parameters));
 
+  /// A shared storage run or selectURL operation finished its execution.
+  /// The following parameters are included in all events.
+  Stream<SharedStorageWorkletOperationExecutionFinishedEvent>
+  get onSharedStorageWorkletOperationExecutionFinished => _client.onEvent
+      .where(
+        (event) =>
+            event.name ==
+            'Storage.sharedStorageWorkletOperationExecutionFinished',
+      )
+      .map(
+        (event) => SharedStorageWorkletOperationExecutionFinishedEvent.fromJson(
+          event.parameters,
+        ),
+      );
+
   Stream<StorageBucketInfo> get onStorageBucketCreatedOrUpdated => _client
       .onEvent
       .where((event) => event.name == 'Storage.storageBucketCreatedOrUpdated')
@@ -112,6 +128,14 @@ class StorageApi {
         (event) => AttributionReportingTriggerRegisteredEvent.fromJson(
           event.parameters,
         ),
+      );
+
+  Stream<AttributionReportingReportSentEvent>
+  get onAttributionReportingReportSent => _client.onEvent
+      .where((event) => event.name == 'Storage.attributionReportingReportSent')
+      .map(
+        (event) =>
+            AttributionReportingReportSentEvent.fromJson(event.parameters),
       );
 
   /// Returns a storage key given a frame id.
@@ -764,6 +788,59 @@ class SharedStorageAccessedEvent {
   }
 }
 
+class SharedStorageWorkletOperationExecutionFinishedEvent {
+  /// Time that the operation finished.
+  final network.TimeSinceEpoch finishedTime;
+
+  /// Time, in microseconds, from start of shared storage JS API call until
+  /// end of operation execution in the worklet.
+  final int executionTime;
+
+  /// Enum value indicating the Shared Storage API method invoked.
+  final SharedStorageAccessMethod method;
+
+  /// ID of the operation call.
+  final String operationId;
+
+  /// Hex representation of the DevTools token used as the TargetID for the
+  /// associated shared storage worklet.
+  final target.TargetID workletTargetId;
+
+  /// DevTools Frame Token for the primary frame tree's root.
+  final page.FrameId mainFrameId;
+
+  /// Serialization of the origin owning the Shared Storage data.
+  final String ownerOrigin;
+
+  SharedStorageWorkletOperationExecutionFinishedEvent({
+    required this.finishedTime,
+    required this.executionTime,
+    required this.method,
+    required this.operationId,
+    required this.workletTargetId,
+    required this.mainFrameId,
+    required this.ownerOrigin,
+  });
+
+  factory SharedStorageWorkletOperationExecutionFinishedEvent.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return SharedStorageWorkletOperationExecutionFinishedEvent(
+      finishedTime: network.TimeSinceEpoch.fromJson(
+        json['finishedTime'] as num,
+      ),
+      executionTime: json['executionTime'] as int,
+      method: SharedStorageAccessMethod.fromJson(json['method'] as String),
+      operationId: json['operationId'] as String,
+      workletTargetId: target.TargetID.fromJson(
+        json['workletTargetId'] as String,
+      ),
+      mainFrameId: page.FrameId.fromJson(json['mainFrameId'] as String),
+      ownerOrigin: json['ownerOrigin'] as String,
+    );
+  }
+}
+
 class AttributionReportingSourceRegisteredEvent {
   final AttributionReportingSourceRegistration registration;
 
@@ -814,6 +891,51 @@ class AttributionReportingTriggerRegisteredEvent {
       aggregatable: AttributionReportingAggregatableResult.fromJson(
         json['aggregatable'] as String,
       ),
+    );
+  }
+}
+
+class AttributionReportingReportSentEvent {
+  final String url;
+
+  final Map<String, dynamic> body;
+
+  final AttributionReportingReportResult result;
+
+  /// If result is `sent`, populated with net/HTTP status.
+  final int? netError;
+
+  final String? netErrorName;
+
+  final int? httpStatusCode;
+
+  AttributionReportingReportSentEvent({
+    required this.url,
+    required this.body,
+    required this.result,
+    this.netError,
+    this.netErrorName,
+    this.httpStatusCode,
+  });
+
+  factory AttributionReportingReportSentEvent.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return AttributionReportingReportSentEvent(
+      url: json['url'] as String,
+      body: json['body'] as Map<String, dynamic>,
+      result: AttributionReportingReportResult.fromJson(
+        json['result'] as String,
+      ),
+      netError: json.containsKey('netError') ? json['netError'] as int : null,
+      netErrorName:
+          json.containsKey('netErrorName')
+              ? json['netErrorName'] as String
+              : null,
+      httpStatusCode:
+          json.containsKey('httpStatusCode')
+              ? json['httpStatusCode'] as int
+              : null,
     );
   }
 }
@@ -1244,6 +1366,10 @@ class SharedStorageAccessParams {
   /// Present only for SharedStorageAccessMethods: run and selectURL.
   final String? operationName;
 
+  /// ID of the operation call.
+  /// Present only for SharedStorageAccessMethods: run and selectURL.
+  final String? operationId;
+
   /// Whether or not to keep the worket alive for future run or selectURL
   /// calls.
   /// Present only for SharedStorageAccessMethods: run and selectURL.
@@ -1279,12 +1405,23 @@ class SharedStorageAccessParams {
   /// Present only for SharedStorageAccessMethod: set.
   final bool? ignoreIfPresent;
 
-  /// If the method is called on a worklet, or as part of
-  /// a worklet script, it will have an ID for the associated worklet.
+  /// If the method is called on a shared storage worklet, or as part of
+  /// a shared storage worklet script, it will have a number for the
+  /// associated worklet, denoting the (0-indexed) order of the worklet's
+  /// creation relative to all other shared storage worklets created by
+  /// documents using the current storage partition.
   /// Present only for SharedStorageAccessMethods: addModule, createWorklet,
   /// run, selectURL, and any other SharedStorageAccessMethod when the
-  /// SharedStorageAccessScope is worklet.
-  final String? workletId;
+  /// SharedStorageAccessScope is sharedStorageWorklet.
+  /// TODO(crbug.com/401011862): Pass this only for addModule & createWorklet.
+  final int? workletOrdinal;
+
+  /// Hex representation of the DevTools token used as the TargetID for the
+  /// associated shared storage worklet.
+  /// Present only for SharedStorageAccessMethods: addModule, createWorklet,
+  /// run, selectURL, and any other SharedStorageAccessMethod when the
+  /// SharedStorageAccessScope is sharedStorageWorklet.
+  final target.TargetID? workletTargetId;
 
   /// Name of the lock to be acquired, if present.
   /// Optionally present only for SharedStorageAccessMethods: batchUpdate,
@@ -1305,6 +1442,7 @@ class SharedStorageAccessParams {
     this.scriptSourceUrl,
     this.dataOrigin,
     this.operationName,
+    this.operationId,
     this.keepAlive,
     this.privateAggregationConfig,
     this.serializedData,
@@ -1313,7 +1451,8 @@ class SharedStorageAccessParams {
     this.key,
     this.value,
     this.ignoreIfPresent,
-    this.workletId,
+    this.workletOrdinal,
+    this.workletTargetId,
     this.withLock,
     this.batchUpdateId,
     this.batchSize,
@@ -1330,6 +1469,10 @@ class SharedStorageAccessParams {
       operationName:
           json.containsKey('operationName')
               ? json['operationName'] as String
+              : null,
+      operationId:
+          json.containsKey('operationId')
+              ? json['operationId'] as String
               : null,
       keepAlive:
           json.containsKey('keepAlive') ? json['keepAlive'] as bool : null,
@@ -1360,8 +1503,14 @@ class SharedStorageAccessParams {
           json.containsKey('ignoreIfPresent')
               ? json['ignoreIfPresent'] as bool
               : null,
-      workletId:
-          json.containsKey('workletId') ? json['workletId'] as String : null,
+      workletOrdinal:
+          json.containsKey('workletOrdinal')
+              ? json['workletOrdinal'] as int
+              : null,
+      workletTargetId:
+          json.containsKey('workletTargetId')
+              ? target.TargetID.fromJson(json['workletTargetId'] as String)
+              : null,
       withLock:
           json.containsKey('withLock') ? json['withLock'] as String : null,
       batchUpdateId:
@@ -1378,6 +1527,7 @@ class SharedStorageAccessParams {
       if (scriptSourceUrl != null) 'scriptSourceUrl': scriptSourceUrl,
       if (dataOrigin != null) 'dataOrigin': dataOrigin,
       if (operationName != null) 'operationName': operationName,
+      if (operationId != null) 'operationId': operationId,
       if (keepAlive != null) 'keepAlive': keepAlive,
       if (privateAggregationConfig != null)
         'privateAggregationConfig': privateAggregationConfig!.toJson(),
@@ -1388,7 +1538,8 @@ class SharedStorageAccessParams {
       if (key != null) 'key': key,
       if (value != null) 'value': value,
       if (ignoreIfPresent != null) 'ignoreIfPresent': ignoreIfPresent,
-      if (workletId != null) 'workletId': workletId,
+      if (workletOrdinal != null) 'workletOrdinal': workletOrdinal,
+      if (workletTargetId != null) 'workletTargetId': workletTargetId!.toJson(),
       if (withLock != null) 'withLock': withLock,
       if (batchUpdateId != null) 'batchUpdateId': batchUpdateId,
       if (batchSize != null) 'batchSize': batchSize,
@@ -1674,35 +1825,6 @@ class AttributionReportingEventReportWindows {
   }
 }
 
-class AttributionReportingTriggerSpec {
-  /// number instead of integer because not all uint32 can be represented by
-  /// int
-  final List<num> triggerData;
-
-  final AttributionReportingEventReportWindows eventReportWindows;
-
-  AttributionReportingTriggerSpec({
-    required this.triggerData,
-    required this.eventReportWindows,
-  });
-
-  factory AttributionReportingTriggerSpec.fromJson(Map<String, dynamic> json) {
-    return AttributionReportingTriggerSpec(
-      triggerData: (json['triggerData'] as List).map((e) => e as num).toList(),
-      eventReportWindows: AttributionReportingEventReportWindows.fromJson(
-        json['eventReportWindows'] as Map<String, dynamic>,
-      ),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'triggerData': [...triggerData],
-      'eventReportWindows': eventReportWindows.toJson(),
-    };
-  }
-}
-
 enum AttributionReportingTriggerDataMatching {
   exact('exact'),
   modulus('modulus');
@@ -1869,7 +1991,11 @@ class AttributionReportingSourceRegistration {
   /// duration in seconds
   final int expiry;
 
-  final List<AttributionReportingTriggerSpec> triggerSpecs;
+  /// number instead of integer because not all uint32 can be represented by
+  /// int
+  final List<num> triggerData;
+
+  final AttributionReportingEventReportWindows eventReportWindows;
 
   /// duration in seconds
   final int aggregatableReportWindow;
@@ -1912,7 +2038,8 @@ class AttributionReportingSourceRegistration {
   AttributionReportingSourceRegistration({
     required this.time,
     required this.expiry,
-    required this.triggerSpecs,
+    required this.triggerData,
+    required this.eventReportWindows,
     required this.aggregatableReportWindow,
     required this.type,
     required this.sourceOrigin,
@@ -1939,14 +2066,10 @@ class AttributionReportingSourceRegistration {
     return AttributionReportingSourceRegistration(
       time: network.TimeSinceEpoch.fromJson(json['time'] as num),
       expiry: json['expiry'] as int,
-      triggerSpecs:
-          (json['triggerSpecs'] as List)
-              .map(
-                (e) => AttributionReportingTriggerSpec.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+      triggerData: (json['triggerData'] as List).map((e) => e as num).toList(),
+      eventReportWindows: AttributionReportingEventReportWindows.fromJson(
+        json['eventReportWindows'] as Map<String, dynamic>,
+      ),
       aggregatableReportWindow: json['aggregatableReportWindow'] as int,
       type: AttributionReportingSourceType.fromJson(json['type'] as String),
       sourceOrigin: json['sourceOrigin'] as String,
@@ -2009,7 +2132,8 @@ class AttributionReportingSourceRegistration {
     return {
       'time': time.toJson(),
       'expiry': expiry,
-      'triggerSpecs': triggerSpecs.map((e) => e.toJson()).toList(),
+      'triggerData': [...triggerData],
+      'eventReportWindows': eventReportWindows.toJson(),
       'aggregatableReportWindow': aggregatableReportWindow,
       'type': type.toJson(),
       'sourceOrigin': sourceOrigin,
@@ -2495,6 +2619,27 @@ enum AttributionReportingAggregatableResult {
 
   factory AttributionReportingAggregatableResult.fromJson(String value) =>
       AttributionReportingAggregatableResult.values.firstWhere(
+        (e) => e.value == value,
+      );
+
+  String toJson() => value;
+
+  @override
+  String toString() => value.toString();
+}
+
+enum AttributionReportingReportResult {
+  sent('sent'),
+  prohibited('prohibited'),
+  failedToAssemble('failedToAssemble'),
+  expired('expired');
+
+  final String value;
+
+  const AttributionReportingReportResult(this.value);
+
+  factory AttributionReportingReportResult.fromJson(String value) =>
+      AttributionReportingReportResult.values.firstWhere(
         (e) => e.value == value,
       );
 
