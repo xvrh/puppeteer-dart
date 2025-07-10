@@ -97,10 +97,9 @@ void main() {
       await otherPage.close();
       expect(await closePagePromise, otherPage);
 
-      allPages =
-          (await Future.wait(
-            context.targets.map((target) => target.page),
-          )).nonNulls.toList();
+      allPages = (await Future.wait(
+        context.targets.map((target) => target.page),
+      )).nonNulls.toList();
       expect(allPages, contains(page));
       expect(allPages, isNot(contains(otherPage)));
     });

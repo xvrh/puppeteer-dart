@@ -35,8 +35,10 @@ void main() {
   }
   targetDir.createSync();
 
-  var domains =
-      protocolFiles.map(_readProtocol).expand((f) => f.domains).toList();
+  var domains = protocolFiles
+      .map(_readProtocol)
+      .expand((f) => f.domains)
+      .toList();
 
   _applyTemporaryFixes(domains);
 
@@ -293,8 +295,9 @@ class _Command {
 
     for (var parameter in parameters) {
       if (parameter.enumValues != null) {
-        var optionalCode =
-            parameter.optional ? '${parameter.normalizedName} == null || ' : '';
+        var optionalCode = parameter.optional
+            ? '${parameter.normalizedName} == null || '
+            : '';
         code.writeln(
           'assert($optionalCode const ${enumList(parameter.enumValues!)}.contains(${parameter.normalizedName}));',
         );

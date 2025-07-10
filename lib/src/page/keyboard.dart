@@ -163,14 +163,14 @@ class Keyboard {
 
   _KeyDescription _keyDescription(Key key) {
     var shift = _modifiers & 8 != 0;
-    var description =
-        _KeyDescription()
-          ..key = shift && key.shiftKey != null ? key.shiftKey : key.key
-          ..keyCode =
-              shift && key.shiftKeyCode != null ? key.shiftKeyCode : key.keyCode
-          ..code = key.code
-          ..location = key.location ?? KeyLocation.standard
-          ..text = key.text;
+    var description = _KeyDescription()
+      ..key = shift && key.shiftKey != null ? key.shiftKey : key.key
+      ..keyCode = shift && key.shiftKeyCode != null
+          ? key.shiftKeyCode
+          : key.keyCode
+      ..code = key.code
+      ..location = key.location ?? KeyLocation.standard
+      ..text = key.text;
 
     // if any modifiers besides shift are pressed, no text should be sent
     if (_modifiers & ~8 != 0) {

@@ -20,10 +20,9 @@ extension TakeUntil<T> on Stream<T> {
   /// If [trigger] completes as a value or as an error after this stream has
   /// already ended, the completion will be ignored.
   Stream<T> takeUntil(Future<void> trigger) {
-    var controller =
-        isBroadcast
-            ? StreamController<T>.broadcast(sync: true)
-            : StreamController<T>(sync: true);
+    var controller = isBroadcast
+        ? StreamController<T>.broadcast(sync: true)
+        : StreamController<T>(sync: true);
 
     StreamSubscription<T>? subscription;
     var isDone = false;

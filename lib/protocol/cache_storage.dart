@@ -98,10 +98,9 @@ class RequestEntriesResult {
 
   factory RequestEntriesResult.fromJson(Map<String, dynamic> json) {
     return RequestEntriesResult(
-      cacheDataEntries:
-          (json['cacheDataEntries'] as List)
-              .map((e) => DataEntry.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      cacheDataEntries: (json['cacheDataEntries'] as List)
+          .map((e) => DataEntry.fromJson(e as Map<String, dynamic>))
+          .toList(),
       returnCount: json['returnCount'] as num,
     );
   }
@@ -177,18 +176,16 @@ class DataEntry {
     return DataEntry(
       requestURL: json['requestURL'] as String,
       requestMethod: json['requestMethod'] as String,
-      requestHeaders:
-          (json['requestHeaders'] as List)
-              .map((e) => Header.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      requestHeaders: (json['requestHeaders'] as List)
+          .map((e) => Header.fromJson(e as Map<String, dynamic>))
+          .toList(),
       responseTime: json['responseTime'] as num,
       responseStatus: json['responseStatus'] as int,
       responseStatusText: json['responseStatusText'] as String,
       responseType: CachedResponseType.fromJson(json['responseType'] as String),
-      responseHeaders:
-          (json['responseHeaders'] as List)
-              .map((e) => Header.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      responseHeaders: (json['responseHeaders'] as List)
+          .map((e) => Header.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -236,12 +233,11 @@ class Cache {
       cacheId: CacheId.fromJson(json['cacheId'] as String),
       securityOrigin: json['securityOrigin'] as String,
       storageKey: json['storageKey'] as String,
-      storageBucket:
-          json.containsKey('storageBucket')
-              ? storage.StorageBucket.fromJson(
-                json['storageBucket'] as Map<String, dynamic>,
-              )
-              : null,
+      storageBucket: json.containsKey('storageBucket')
+          ? storage.StorageBucket.fromJson(
+              json['storageBucket'] as Map<String, dynamic>,
+            )
+          : null,
       cacheName: json['cacheName'] as String,
     );
   }

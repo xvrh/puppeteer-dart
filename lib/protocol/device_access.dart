@@ -47,10 +47,9 @@ class DeviceRequestPromptedEvent {
   factory DeviceRequestPromptedEvent.fromJson(Map<String, dynamic> json) {
     return DeviceRequestPromptedEvent(
       id: RequestId.fromJson(json['id'] as String),
-      devices:
-          (json['devices'] as List)
-              .map((e) => PromptDevice.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      devices: (json['devices'] as List)
+          .map((e) => PromptDevice.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }

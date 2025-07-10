@@ -3,13 +3,12 @@ import 'package:dart_style/dart_style.dart';
 import 'package:path/path.dart' as p;
 
 void main() {
-  var allFiles =
-      Directory('test')
-          .listSync()
-          .whereType<File>()
-          .where((f) => f.path.endsWith('_test.dart'))
-          .map((file) => p.relative(file.path, from: 'test'))
-          .toList();
+  var allFiles = Directory('test')
+      .listSync()
+      .whereType<File>()
+      .where((f) => f.path.endsWith('_test.dart'))
+      .map((file) => p.relative(file.path, from: 'test'))
+      .toList();
   allFiles.sort();
 
   var buffer = StringBuffer();

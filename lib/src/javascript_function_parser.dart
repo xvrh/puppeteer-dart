@@ -21,10 +21,9 @@ String? convertToFunctionDeclaration(String javascript) {
       var functionBody = tokens.whereType<_FunctionBody>().single;
       var isAsync = tokens.contains(_isAsync);
 
-      var body =
-          hasBodyStatement
-              ? '{ ${functionBody.value}'
-              : '{ return ${functionBody.value} }';
+      var body = hasBodyStatement
+          ? '{ ${functionBody.value}'
+          : '{ return ${functionBody.value} }';
 
       var argumentString = arguments.arguments;
       if (!argumentString.startsWith('(')) {
@@ -39,7 +38,7 @@ String? convertToFunctionDeclaration(String javascript) {
 }
 
 class JsGrammarDefinition extends GrammarDefinition {
-  Parser token(input) {
+  Parser token(dynamic input) {
     if (input is String) {
       input = input.length == 1 ? char(input) : string(input);
     } else if (input is Parser Function()) {

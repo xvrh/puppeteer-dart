@@ -109,7 +109,7 @@ class LifecycleWatcher {
     _checkLifecycleComplete();
   }
 
-  void _checkLifecycleComplete([_]) {
+  void _checkLifecycleComplete([dynamic _]) {
     // We expect navigation to commit.
     if (!_checkLifecycle(frame)) return;
 

@@ -41,8 +41,8 @@ class Worker {
     late JsHandle Function(RemoteObject) jsHandleFactory;
     runtimeApi.onExecutionContextCreated.listen((event) {
       var executionContext = ExecutionContext(client, event, null);
-      jsHandleFactory =
-          (remoteObject) => JsHandle(executionContext, remoteObject);
+      jsHandleFactory = (remoteObject) =>
+          JsHandle(executionContext, remoteObject);
       _executionContextCompleter.complete(executionContext);
     });
 

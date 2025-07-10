@@ -61,10 +61,9 @@ class AddressFormFilledEvent {
 
   factory AddressFormFilledEvent.fromJson(Map<String, dynamic> json) {
     return AddressFormFilledEvent(
-      filledFields:
-          (json['filledFields'] as List)
-              .map((e) => FilledField.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      filledFields: (json['filledFields'] as List)
+          .map((e) => FilledField.fromJson(e as Map<String, dynamic>))
+          .toList(),
       addressUi: AddressUI.fromJson(json['addressUi'] as Map<String, dynamic>),
     );
   }
@@ -144,10 +143,9 @@ class AddressFields {
 
   factory AddressFields.fromJson(Map<String, dynamic> json) {
     return AddressFields(
-      fields:
-          (json['fields'] as List)
-              .map((e) => AddressField.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      fields: (json['fields'] as List)
+          .map((e) => AddressField.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -164,10 +162,9 @@ class Address {
 
   factory Address.fromJson(Map<String, dynamic> json) {
     return Address(
-      fields:
-          (json['fields'] as List)
-              .map((e) => AddressField.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      fields: (json['fields'] as List)
+          .map((e) => AddressField.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -191,10 +188,9 @@ class AddressUI {
 
   factory AddressUI.fromJson(Map<String, dynamic> json) {
     return AddressUI(
-      addressFields:
-          (json['addressFields'] as List)
-              .map((e) => AddressFields.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      addressFields: (json['addressFields'] as List)
+          .map((e) => AddressFields.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 

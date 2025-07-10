@@ -16,10 +16,9 @@ class TracingApi {
   Stream<List<Map<String, dynamic>>> get onDataCollected => _client.onEvent
       .where((event) => event.name == 'Tracing.dataCollected')
       .map(
-        (event) =>
-            (event.parameters['value'] as List)
-                .map((e) => e as Map<String, dynamic>)
-                .toList(),
+        (event) => (event.parameters['value'] as List)
+            .map((e) => e as Map<String, dynamic>)
+            .toList(),
       );
 
   /// Signals that tracing is stopped and there is no trace buffers pending flush, all data were
@@ -118,10 +117,12 @@ class BufferUsageEvent {
 
   factory BufferUsageEvent.fromJson(Map<String, dynamic> json) {
     return BufferUsageEvent(
-      percentFull:
-          json.containsKey('percentFull') ? json['percentFull'] as num : null,
-      eventCount:
-          json.containsKey('eventCount') ? json['eventCount'] as num : null,
+      percentFull: json.containsKey('percentFull')
+          ? json['percentFull'] as num
+          : null,
+      eventCount: json.containsKey('eventCount')
+          ? json['eventCount'] as num
+          : null,
       value: json.containsKey('value') ? json['value'] as num : null,
     );
   }
@@ -151,18 +152,15 @@ class TracingCompleteEvent {
   factory TracingCompleteEvent.fromJson(Map<String, dynamic> json) {
     return TracingCompleteEvent(
       dataLossOccurred: json['dataLossOccurred'] as bool? ?? false,
-      stream:
-          json.containsKey('stream')
-              ? io.StreamHandle.fromJson(json['stream'] as String)
-              : null,
-      traceFormat:
-          json.containsKey('traceFormat')
-              ? StreamFormat.fromJson(json['traceFormat'] as String)
-              : null,
-      streamCompression:
-          json.containsKey('streamCompression')
-              ? StreamCompression.fromJson(json['streamCompression'] as String)
-              : null,
+      stream: json.containsKey('stream')
+          ? io.StreamHandle.fromJson(json['stream'] as String)
+          : null,
+      traceFormat: json.containsKey('traceFormat')
+          ? StreamFormat.fromJson(json['traceFormat'] as String)
+          : null,
+      streamCompression: json.containsKey('streamCompression')
+          ? StreamCompression.fromJson(json['streamCompression'] as String)
+          : null,
     );
   }
 }
@@ -235,50 +233,39 @@ class TraceConfig {
 
   factory TraceConfig.fromJson(Map<String, dynamic> json) {
     return TraceConfig(
-      recordMode:
-          json.containsKey('recordMode')
-              ? TraceConfigRecordMode.fromJson(json['recordMode'] as String)
-              : null,
-      traceBufferSizeInKb:
-          json.containsKey('traceBufferSizeInKb')
-              ? json['traceBufferSizeInKb'] as num
-              : null,
-      enableSampling:
-          json.containsKey('enableSampling')
-              ? json['enableSampling'] as bool
-              : null,
-      enableSystrace:
-          json.containsKey('enableSystrace')
-              ? json['enableSystrace'] as bool
-              : null,
-      enableArgumentFilter:
-          json.containsKey('enableArgumentFilter')
-              ? json['enableArgumentFilter'] as bool
-              : null,
-      includedCategories:
-          json.containsKey('includedCategories')
-              ? (json['includedCategories'] as List)
-                  .map((e) => e as String)
-                  .toList()
-              : null,
-      excludedCategories:
-          json.containsKey('excludedCategories')
-              ? (json['excludedCategories'] as List)
-                  .map((e) => e as String)
-                  .toList()
-              : null,
-      syntheticDelays:
-          json.containsKey('syntheticDelays')
-              ? (json['syntheticDelays'] as List)
-                  .map((e) => e as String)
-                  .toList()
-              : null,
-      memoryDumpConfig:
-          json.containsKey('memoryDumpConfig')
-              ? MemoryDumpConfig.fromJson(
-                json['memoryDumpConfig'] as Map<String, dynamic>,
-              )
-              : null,
+      recordMode: json.containsKey('recordMode')
+          ? TraceConfigRecordMode.fromJson(json['recordMode'] as String)
+          : null,
+      traceBufferSizeInKb: json.containsKey('traceBufferSizeInKb')
+          ? json['traceBufferSizeInKb'] as num
+          : null,
+      enableSampling: json.containsKey('enableSampling')
+          ? json['enableSampling'] as bool
+          : null,
+      enableSystrace: json.containsKey('enableSystrace')
+          ? json['enableSystrace'] as bool
+          : null,
+      enableArgumentFilter: json.containsKey('enableArgumentFilter')
+          ? json['enableArgumentFilter'] as bool
+          : null,
+      includedCategories: json.containsKey('includedCategories')
+          ? (json['includedCategories'] as List)
+                .map((e) => e as String)
+                .toList()
+          : null,
+      excludedCategories: json.containsKey('excludedCategories')
+          ? (json['excludedCategories'] as List)
+                .map((e) => e as String)
+                .toList()
+          : null,
+      syntheticDelays: json.containsKey('syntheticDelays')
+          ? (json['syntheticDelays'] as List).map((e) => e as String).toList()
+          : null,
+      memoryDumpConfig: json.containsKey('memoryDumpConfig')
+          ? MemoryDumpConfig.fromJson(
+              json['memoryDumpConfig'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 

@@ -14,8 +14,9 @@ void main() {
     File('test/doc_examples_test.dart').readAsStringSync(),
   );
 
-  for (var dartFile
-      in Directory('lib/src').listSync(recursive: true).whereType<File>()) {
+  for (var dartFile in Directory(
+    'lib/src',
+  ).listSync(recursive: true).whereType<File>()) {
     var fileContent = dartFile.readAsStringSync();
     var newContent = replaceExamples(fileContent, snippets);
 
@@ -186,12 +187,11 @@ String _extractCode(String content) {
   var lines = LineSplitter.split(content);
   bool isBlockStarter(String line) => line.trim().startsWith('//--');
   if (lines.any(isBlockStarter)) {
-    lines =
-        lines
-            .skipWhile((l) => !isBlockStarter(l))
-            .skip(1)
-            .takeWhile((l) => !isBlockStarter(l))
-            .toList();
+    lines = lines
+        .skipWhile((l) => !isBlockStarter(l))
+        .skip(1)
+        .takeWhile((l) => !isBlockStarter(l))
+        .toList();
   } else {
     lines = lines.skipWhile((l) => l.trim().isEmpty).toList();
   }
@@ -212,7 +212,8 @@ class CodeSnippet {
     : code = fixCode(code);
 
   static String fixCode(String code) {
-    code = '''
+    code =
+        '''
 main() async {
 ${LineSplitter.split(code).map((line) => '  $line').join('\n')}
 }''';

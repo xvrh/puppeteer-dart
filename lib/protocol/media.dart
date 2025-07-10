@@ -37,10 +37,9 @@ class MediaApi {
   Stream<List<PlayerId>> get onPlayersCreated => _client.onEvent
       .where((event) => event.name == 'Media.playersCreated')
       .map(
-        (event) =>
-            (event.parameters['players'] as List)
-                .map((e) => PlayerId.fromJson(e as String))
-                .toList(),
+        (event) => (event.parameters['players'] as List)
+            .map((e) => PlayerId.fromJson(e as String))
+            .toList(),
       );
 
   /// Enables the Media domain
@@ -67,10 +66,9 @@ class PlayerPropertiesChangedEvent {
   factory PlayerPropertiesChangedEvent.fromJson(Map<String, dynamic> json) {
     return PlayerPropertiesChangedEvent(
       playerId: PlayerId.fromJson(json['playerId'] as String),
-      properties:
-          (json['properties'] as List)
-              .map((e) => PlayerProperty.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      properties: (json['properties'] as List)
+          .map((e) => PlayerProperty.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -85,10 +83,9 @@ class PlayerEventsAddedEvent {
   factory PlayerEventsAddedEvent.fromJson(Map<String, dynamic> json) {
     return PlayerEventsAddedEvent(
       playerId: PlayerId.fromJson(json['playerId'] as String),
-      events:
-          (json['events'] as List)
-              .map((e) => PlayerEvent.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      events: (json['events'] as List)
+          .map((e) => PlayerEvent.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -103,10 +100,9 @@ class PlayerMessagesLoggedEvent {
   factory PlayerMessagesLoggedEvent.fromJson(Map<String, dynamic> json) {
     return PlayerMessagesLoggedEvent(
       playerId: PlayerId.fromJson(json['playerId'] as String),
-      messages:
-          (json['messages'] as List)
-              .map((e) => PlayerMessage.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      messages: (json['messages'] as List)
+          .map((e) => PlayerMessage.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -121,10 +117,9 @@ class PlayerErrorsRaisedEvent {
   factory PlayerErrorsRaisedEvent.fromJson(Map<String, dynamic> json) {
     return PlayerErrorsRaisedEvent(
       playerId: PlayerId.fromJson(json['playerId'] as String),
-      errors:
-          (json['errors'] as List)
-              .map((e) => PlayerError.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      errors: (json['errors'] as List)
+          .map((e) => PlayerError.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -282,18 +277,15 @@ class PlayerError {
     return PlayerError(
       errorType: json['errorType'] as String,
       code: json['code'] as int,
-      stack:
-          (json['stack'] as List)
-              .map(
-                (e) => PlayerErrorSourceLocation.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
-      cause:
-          (json['cause'] as List)
-              .map((e) => PlayerError.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      stack: (json['stack'] as List)
+          .map(
+            (e) =>
+                PlayerErrorSourceLocation.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
+      cause: (json['cause'] as List)
+          .map((e) => PlayerError.fromJson(e as Map<String, dynamic>))
+          .toList(),
       data: json['data'] as Map<String, dynamic>,
     );
   }

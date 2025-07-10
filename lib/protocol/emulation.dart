@@ -549,8 +549,9 @@ class SafeAreaInsets {
       left: json.containsKey('left') ? json['left'] as int : null,
       leftMax: json.containsKey('leftMax') ? json['leftMax'] as int : null,
       bottom: json.containsKey('bottom') ? json['bottom'] as int : null,
-      bottomMax:
-          json.containsKey('bottomMax') ? json['bottomMax'] as int : null,
+      bottomMax: json.containsKey('bottomMax')
+          ? json['bottomMax'] as int
+          : null,
       right: json.containsKey('right') ? json['right'] as int : null,
       rightMax: json.containsKey('rightMax') ? json['rightMax'] as int : null,
     );
@@ -798,26 +799,22 @@ class UserAgentMetadata {
 
   factory UserAgentMetadata.fromJson(Map<String, dynamic> json) {
     return UserAgentMetadata(
-      brands:
-          json.containsKey('brands')
-              ? (json['brands'] as List)
-                  .map(
-                    (e) => UserAgentBrandVersion.fromJson(
-                      e as Map<String, dynamic>,
-                    ),
-                  )
-                  .toList()
-              : null,
-      fullVersionList:
-          json.containsKey('fullVersionList')
-              ? (json['fullVersionList'] as List)
-                  .map(
-                    (e) => UserAgentBrandVersion.fromJson(
-                      e as Map<String, dynamic>,
-                    ),
-                  )
-                  .toList()
-              : null,
+      brands: json.containsKey('brands')
+          ? (json['brands'] as List)
+                .map(
+                  (e) =>
+                      UserAgentBrandVersion.fromJson(e as Map<String, dynamic>),
+                )
+                .toList()
+          : null,
+      fullVersionList: json.containsKey('fullVersionList')
+          ? (json['fullVersionList'] as List)
+                .map(
+                  (e) =>
+                      UserAgentBrandVersion.fromJson(e as Map<String, dynamic>),
+                )
+                .toList()
+          : null,
       platform: json['platform'] as String,
       platformVersion: json['platformVersion'] as String,
       architecture: json['architecture'] as String,
@@ -884,16 +881,15 @@ class SensorMetadata {
 
   factory SensorMetadata.fromJson(Map<String, dynamic> json) {
     return SensorMetadata(
-      available:
-          json.containsKey('available') ? json['available'] as bool : null,
-      minimumFrequency:
-          json.containsKey('minimumFrequency')
-              ? json['minimumFrequency'] as num
-              : null,
-      maximumFrequency:
-          json.containsKey('maximumFrequency')
-              ? json['maximumFrequency'] as num
-              : null,
+      available: json.containsKey('available')
+          ? json['available'] as bool
+          : null,
+      minimumFrequency: json.containsKey('minimumFrequency')
+          ? json['minimumFrequency'] as num
+          : null,
+      maximumFrequency: json.containsKey('maximumFrequency')
+          ? json['maximumFrequency'] as num
+          : null,
     );
   }
 
@@ -983,22 +979,17 @@ class SensorReading {
 
   factory SensorReading.fromJson(Map<String, dynamic> json) {
     return SensorReading(
-      single:
-          json.containsKey('single')
-              ? SensorReadingSingle.fromJson(
-                json['single'] as Map<String, dynamic>,
-              )
-              : null,
-      xyz:
-          json.containsKey('xyz')
-              ? SensorReadingXYZ.fromJson(json['xyz'] as Map<String, dynamic>)
-              : null,
-      quaternion:
-          json.containsKey('quaternion')
-              ? SensorReadingQuaternion.fromJson(
-                json['quaternion'] as Map<String, dynamic>,
-              )
-              : null,
+      single: json.containsKey('single')
+          ? SensorReadingSingle.fromJson(json['single'] as Map<String, dynamic>)
+          : null,
+      xyz: json.containsKey('xyz')
+          ? SensorReadingXYZ.fromJson(json['xyz'] as Map<String, dynamic>)
+          : null,
+      quaternion: json.containsKey('quaternion')
+          ? SensorReadingQuaternion.fromJson(
+              json['quaternion'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -1053,8 +1044,9 @@ class PressureMetadata {
 
   factory PressureMetadata.fromJson(Map<String, dynamic> json) {
     return PressureMetadata(
-      available:
-          json.containsKey('available') ? json['available'] as bool : null,
+      available: json.containsKey('available')
+          ? json['available'] as bool
+          : null,
     );
   }
 

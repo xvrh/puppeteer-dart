@@ -13,10 +13,9 @@ class CastApi {
   Stream<List<Sink>> get onSinksUpdated => _client.onEvent
       .where((event) => event.name == 'Cast.sinksUpdated')
       .map(
-        (event) =>
-            (event.parameters['sinks'] as List)
-                .map((e) => Sink.fromJson(e as Map<String, dynamic>))
-                .toList(),
+        (event) => (event.parameters['sinks'] as List)
+            .map((e) => Sink.fromJson(e as Map<String, dynamic>))
+            .toList(),
       );
 
   /// This is fired whenever the outstanding issue/error message changes.

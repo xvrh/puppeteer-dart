@@ -966,10 +966,9 @@ class FileChooserOpenedEvent {
     return FileChooserOpenedEvent(
       frameId: FrameId.fromJson(json['frameId'] as String),
       mode: FileChooserOpenedEventMode.fromJson(json['mode'] as String),
-      backendNodeId:
-          json.containsKey('backendNodeId')
-              ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
-              : null,
+      backendNodeId: json.containsKey('backendNodeId')
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
+          : null,
     );
   }
 }
@@ -994,12 +993,11 @@ class FrameAttachedEvent {
     return FrameAttachedEvent(
       frameId: FrameId.fromJson(json['frameId'] as String),
       parentFrameId: FrameId.fromJson(json['parentFrameId'] as String),
-      stack:
-          json.containsKey('stack')
-              ? runtime.StackTraceData.fromJson(
-                json['stack'] as Map<String, dynamic>,
-              )
-              : null,
+      stack: json.containsKey('stack')
+          ? runtime.StackTraceData.fromJson(
+              json['stack'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 }
@@ -1255,10 +1253,9 @@ class JavascriptDialogOpeningEvent {
       message: json['message'] as String,
       type: DialogType.fromJson(json['type'] as String),
       hasBrowserHandler: json['hasBrowserHandler'] as bool? ?? false,
-      defaultPrompt:
-          json.containsKey('defaultPrompt')
-              ? json['defaultPrompt'] as String
-              : null,
+      defaultPrompt: json.containsKey('defaultPrompt')
+          ? json['defaultPrompt'] as String
+          : null,
     );
   }
 }
@@ -1315,20 +1312,19 @@ class BackForwardCacheNotUsedEvent {
     return BackForwardCacheNotUsedEvent(
       loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
       frameId: FrameId.fromJson(json['frameId'] as String),
-      notRestoredExplanations:
-          (json['notRestoredExplanations'] as List)
-              .map(
-                (e) => BackForwardCacheNotRestoredExplanation.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+      notRestoredExplanations: (json['notRestoredExplanations'] as List)
+          .map(
+            (e) => BackForwardCacheNotRestoredExplanation.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
       notRestoredExplanationsTree:
           json.containsKey('notRestoredExplanationsTree')
-              ? BackForwardCacheNotRestoredExplanationTree.fromJson(
-                json['notRestoredExplanationsTree'] as Map<String, dynamic>,
-              )
-              : null,
+          ? BackForwardCacheNotRestoredExplanationTree.fromJson(
+              json['notRestoredExplanationsTree'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 }
@@ -1411,8 +1407,9 @@ class WindowOpenEvent {
     return WindowOpenEvent(
       url: json['url'] as String,
       windowName: json['windowName'] as String,
-      windowFeatures:
-          (json['windowFeatures'] as List).map((e) => e as String).toList(),
+      windowFeatures: (json['windowFeatures'] as List)
+          .map((e) => e as String)
+          .toList(),
       userGesture: json['userGesture'] as bool? ?? false,
     );
   }
@@ -1455,10 +1452,9 @@ class GetAppManifestResult {
   factory GetAppManifestResult.fromJson(Map<String, dynamic> json) {
     return GetAppManifestResult(
       url: json['url'] as String,
-      errors:
-          (json['errors'] as List)
-              .map((e) => AppManifestError.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      errors: (json['errors'] as List)
+          .map((e) => AppManifestError.fromJson(e as Map<String, dynamic>))
+          .toList(),
       data: json.containsKey('data') ? json['data'] as String : null,
       manifest: WebAppManifest.fromJson(
         json['manifest'] as Map<String, dynamic>,
@@ -1479,10 +1475,9 @@ class GetAppIdResult {
   factory GetAppIdResult.fromJson(Map<String, dynamic> json) {
     return GetAppIdResult(
       appId: json.containsKey('appId') ? json['appId'] as String : null,
-      recommendedId:
-          json.containsKey('recommendedId')
-              ? json['recommendedId'] as String
-              : null,
+      recommendedId: json.containsKey('recommendedId')
+          ? json['recommendedId'] as String
+          : null,
     );
   }
 }
@@ -1533,10 +1528,9 @@ class GetNavigationHistoryResult {
   factory GetNavigationHistoryResult.fromJson(Map<String, dynamic> json) {
     return GetNavigationHistoryResult(
       currentIndex: json['currentIndex'] as int,
-      entries:
-          (json['entries'] as List)
-              .map((e) => NavigationEntry.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      entries: (json['entries'] as List)
+          .map((e) => NavigationEntry.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -1577,12 +1571,12 @@ class NavigateResult {
   factory NavigateResult.fromJson(Map<String, dynamic> json) {
     return NavigateResult(
       frameId: FrameId.fromJson(json['frameId'] as String),
-      loaderId:
-          json.containsKey('loaderId')
-              ? network.LoaderId.fromJson(json['loaderId'] as String)
-              : null,
-      errorText:
-          json.containsKey('errorText') ? json['errorText'] as String : null,
+      loaderId: json.containsKey('loaderId')
+          ? network.LoaderId.fromJson(json['loaderId'] as String)
+          : null,
+      errorText: json.containsKey('errorText')
+          ? json['errorText'] as String
+          : null,
     );
   }
 }
@@ -1599,10 +1593,9 @@ class PrintToPDFResult {
   factory PrintToPDFResult.fromJson(Map<String, dynamic> json) {
     return PrintToPDFResult(
       data: json['data'] as String,
-      stream:
-          json.containsKey('stream')
-              ? io.StreamHandle.fromJson(json['stream'] as String)
-              : null,
+      stream: json.containsKey('stream')
+          ? io.StreamHandle.fromJson(json['stream'] as String)
+          : null,
     );
   }
 }
@@ -1662,12 +1655,11 @@ class AdFrameStatus {
   factory AdFrameStatus.fromJson(Map<String, dynamic> json) {
     return AdFrameStatus(
       adFrameType: AdFrameType.fromJson(json['adFrameType'] as String),
-      explanations:
-          json.containsKey('explanations')
-              ? (json['explanations'] as List)
-                  .map((e) => AdFrameExplanation.fromJson(e as String))
-                  .toList()
-              : null,
+      explanations: json.containsKey('explanations')
+          ? (json['explanations'] as List)
+                .map((e) => AdFrameExplanation.fromJson(e as String))
+                .toList()
+          : null,
     );
   }
 
@@ -1947,12 +1939,11 @@ class PermissionsPolicyFeatureState {
     return PermissionsPolicyFeatureState(
       feature: PermissionsPolicyFeature.fromJson(json['feature'] as String),
       allowed: json['allowed'] as bool? ?? false,
-      locator:
-          json.containsKey('locator')
-              ? PermissionsPolicyBlockLocator.fromJson(
-                json['locator'] as Map<String, dynamic>,
-              )
-              : null,
+      locator: json.containsKey('locator')
+          ? PermissionsPolicyBlockLocator.fromJson(
+              json['locator'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -2096,12 +2087,11 @@ class OriginTrialTokenWithStatus {
   factory OriginTrialTokenWithStatus.fromJson(Map<String, dynamic> json) {
     return OriginTrialTokenWithStatus(
       rawTokenText: json['rawTokenText'] as String,
-      parsedToken:
-          json.containsKey('parsedToken')
-              ? OriginTrialToken.fromJson(
-                json['parsedToken'] as Map<String, dynamic>,
-              )
-              : null,
+      parsedToken: json.containsKey('parsedToken')
+          ? OriginTrialToken.fromJson(
+              json['parsedToken'] as Map<String, dynamic>,
+            )
+          : null,
       status: OriginTrialTokenStatus.fromJson(json['status'] as String),
     );
   }
@@ -2132,14 +2122,12 @@ class OriginTrial {
     return OriginTrial(
       trialName: json['trialName'] as String,
       status: OriginTrialStatus.fromJson(json['status'] as String),
-      tokensWithStatus:
-          (json['tokensWithStatus'] as List)
-              .map(
-                (e) => OriginTrialTokenWithStatus.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+      tokensWithStatus: (json['tokensWithStatus'] as List)
+          .map(
+            (e) =>
+                OriginTrialTokenWithStatus.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
     );
   }
 
@@ -2243,46 +2231,40 @@ class FrameInfo {
   factory FrameInfo.fromJson(Map<String, dynamic> json) {
     return FrameInfo(
       id: FrameId.fromJson(json['id'] as String),
-      parentId:
-          json.containsKey('parentId')
-              ? FrameId.fromJson(json['parentId'] as String)
-              : null,
+      parentId: json.containsKey('parentId')
+          ? FrameId.fromJson(json['parentId'] as String)
+          : null,
       loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
       name: json.containsKey('name') ? json['name'] as String : null,
       url: json['url'] as String,
-      urlFragment:
-          json.containsKey('urlFragment')
-              ? json['urlFragment'] as String
-              : null,
+      urlFragment: json.containsKey('urlFragment')
+          ? json['urlFragment'] as String
+          : null,
       domainAndRegistry: json['domainAndRegistry'] as String,
       securityOrigin: json['securityOrigin'] as String,
-      securityOriginDetails:
-          json.containsKey('securityOriginDetails')
-              ? SecurityOriginDetails.fromJson(
-                json['securityOriginDetails'] as Map<String, dynamic>,
-              )
-              : null,
+      securityOriginDetails: json.containsKey('securityOriginDetails')
+          ? SecurityOriginDetails.fromJson(
+              json['securityOriginDetails'] as Map<String, dynamic>,
+            )
+          : null,
       mimeType: json['mimeType'] as String,
-      unreachableUrl:
-          json.containsKey('unreachableUrl')
-              ? json['unreachableUrl'] as String
-              : null,
-      adFrameStatus:
-          json.containsKey('adFrameStatus')
-              ? AdFrameStatus.fromJson(
-                json['adFrameStatus'] as Map<String, dynamic>,
-              )
-              : null,
+      unreachableUrl: json.containsKey('unreachableUrl')
+          ? json['unreachableUrl'] as String
+          : null,
+      adFrameStatus: json.containsKey('adFrameStatus')
+          ? AdFrameStatus.fromJson(
+              json['adFrameStatus'] as Map<String, dynamic>,
+            )
+          : null,
       secureContextType: SecureContextType.fromJson(
         json['secureContextType'] as String,
       ),
       crossOriginIsolatedContextType: CrossOriginIsolatedContextType.fromJson(
         json['crossOriginIsolatedContextType'] as String,
       ),
-      gatedAPIFeatures:
-          (json['gatedAPIFeatures'] as List)
-              .map((e) => GatedAPIFeatures.fromJson(e as String))
-              .toList(),
+      gatedAPIFeatures: (json['gatedAPIFeatures'] as List)
+          .map((e) => GatedAPIFeatures.fromJson(e as String))
+          .toList(),
     );
   }
 
@@ -2346,12 +2328,12 @@ class FrameResource {
       url: json['url'] as String,
       type: network.ResourceType.fromJson(json['type'] as String),
       mimeType: json['mimeType'] as String,
-      lastModified:
-          json.containsKey('lastModified')
-              ? network.TimeSinceEpoch.fromJson(json['lastModified'] as num)
-              : null,
-      contentSize:
-          json.containsKey('contentSize') ? json['contentSize'] as num : null,
+      lastModified: json.containsKey('lastModified')
+          ? network.TimeSinceEpoch.fromJson(json['lastModified'] as num)
+          : null,
+      contentSize: json.containsKey('contentSize')
+          ? json['contentSize'] as num
+          : null,
       failed: json.containsKey('failed') ? json['failed'] as bool : null,
       canceled: json.containsKey('canceled') ? json['canceled'] as bool : null,
     );
@@ -2390,19 +2372,16 @@ class FrameResourceTree {
   factory FrameResourceTree.fromJson(Map<String, dynamic> json) {
     return FrameResourceTree(
       frame: FrameInfo.fromJson(json['frame'] as Map<String, dynamic>),
-      childFrames:
-          json.containsKey('childFrames')
-              ? (json['childFrames'] as List)
-                  .map(
-                    (e) =>
-                        FrameResourceTree.fromJson(e as Map<String, dynamic>),
-                  )
-                  .toList()
-              : null,
-      resources:
-          (json['resources'] as List)
-              .map((e) => FrameResource.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      childFrames: json.containsKey('childFrames')
+          ? (json['childFrames'] as List)
+                .map(
+                  (e) => FrameResourceTree.fromJson(e as Map<String, dynamic>),
+                )
+                .toList()
+          : null,
+      resources: (json['resources'] as List)
+          .map((e) => FrameResource.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -2429,12 +2408,11 @@ class FrameTree {
   factory FrameTree.fromJson(Map<String, dynamic> json) {
     return FrameTree(
       frame: FrameInfo.fromJson(json['frame'] as Map<String, dynamic>),
-      childFrames:
-          json.containsKey('childFrames')
-              ? (json['childFrames'] as List)
-                  .map((e) => FrameTree.fromJson(e as Map<String, dynamic>))
-                  .toList()
-              : null,
+      childFrames: json.containsKey('childFrames')
+          ? (json['childFrames'] as List)
+                .map((e) => FrameTree.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
     );
   }
 
@@ -2570,10 +2548,9 @@ class ScreencastFrameMetadata {
       deviceHeight: json['deviceHeight'] as num,
       scrollOffsetX: json['scrollOffsetX'] as num,
       scrollOffsetY: json['scrollOffsetY'] as num,
-      timestamp:
-          json.containsKey('timestamp')
-              ? network.TimeSinceEpoch.fromJson(json['timestamp'] as num)
-              : null,
+      timestamp: json.containsKey('timestamp')
+          ? network.TimeSinceEpoch.fromJson(json['timestamp'] as num)
+          : null,
     );
   }
 
@@ -2845,12 +2822,14 @@ class FontFamilies {
 
   factory FontFamilies.fromJson(Map<String, dynamic> json) {
     return FontFamilies(
-      standard:
-          json.containsKey('standard') ? json['standard'] as String : null,
+      standard: json.containsKey('standard')
+          ? json['standard'] as String
+          : null,
       fixed: json.containsKey('fixed') ? json['fixed'] as String : null,
       serif: json.containsKey('serif') ? json['serif'] as String : null,
-      sansSerif:
-          json.containsKey('sansSerif') ? json['sansSerif'] as String : null,
+      sansSerif: json.containsKey('sansSerif')
+          ? json['sansSerif'] as String
+          : null,
       cursive: json.containsKey('cursive') ? json['cursive'] as String : null,
       fantasy: json.containsKey('fantasy') ? json['fantasy'] as String : null,
       math: json.containsKey('math') ? json['math'] as String : null,
@@ -2997,14 +2976,12 @@ class InstallabilityError {
   factory InstallabilityError.fromJson(Map<String, dynamic> json) {
     return InstallabilityError(
       errorId: json['errorId'] as String,
-      errorArguments:
-          (json['errorArguments'] as List)
-              .map(
-                (e) => InstallabilityErrorArgument.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+      errorArguments: (json['errorArguments'] as List)
+          .map(
+            (e) =>
+                InstallabilityErrorArgument.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
     );
   }
 
@@ -3073,10 +3050,9 @@ class FileFilter {
   factory FileFilter.fromJson(Map<String, dynamic> json) {
     return FileFilter(
       name: json.containsKey('name') ? json['name'] as String : null,
-      accepts:
-          json.containsKey('accepts')
-              ? (json['accepts'] as List).map((e) => e as String).toList()
-              : null,
+      accepts: json.containsKey('accepts')
+          ? (json['accepts'] as List).map((e) => e as String).toList()
+          : null,
     );
   }
 
@@ -3114,18 +3090,16 @@ class FileHandler {
     return FileHandler(
       action: json['action'] as String,
       name: json['name'] as String,
-      icons:
-          json.containsKey('icons')
-              ? (json['icons'] as List)
-                  .map((e) => ImageResource.fromJson(e as Map<String, dynamic>))
-                  .toList()
-              : null,
-      accepts:
-          json.containsKey('accepts')
-              ? (json['accepts'] as List)
-                  .map((e) => FileFilter.fromJson(e as Map<String, dynamic>))
-                  .toList()
-              : null,
+      icons: json.containsKey('icons')
+          ? (json['icons'] as List)
+                .map((e) => ImageResource.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
+      accepts: json.containsKey('accepts')
+          ? (json['accepts'] as List)
+                .map((e) => FileFilter.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
       launchType: json['launchType'] as String,
     );
   }
@@ -3303,12 +3277,11 @@ class ShareTarget {
       title: json.containsKey('title') ? json['title'] as String : null,
       text: json.containsKey('text') ? json['text'] as String : null,
       url: json.containsKey('url') ? json['url'] as String : null,
-      files:
-          json.containsKey('files')
-              ? (json['files'] as List)
-                  .map((e) => FileFilter.fromJson(e as Map<String, dynamic>))
-                  .toList()
-              : null,
+      files: json.containsKey('files')
+          ? (json['files'] as List)
+                .map((e) => FileFilter.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
     );
   }
 
@@ -3426,101 +3399,81 @@ class WebAppManifest {
 
   factory WebAppManifest.fromJson(Map<String, dynamic> json) {
     return WebAppManifest(
-      backgroundColor:
-          json.containsKey('backgroundColor')
-              ? json['backgroundColor'] as String
-              : null,
-      description:
-          json.containsKey('description')
-              ? json['description'] as String
-              : null,
+      backgroundColor: json.containsKey('backgroundColor')
+          ? json['backgroundColor'] as String
+          : null,
+      description: json.containsKey('description')
+          ? json['description'] as String
+          : null,
       dir: json.containsKey('dir') ? json['dir'] as String : null,
       display: json.containsKey('display') ? json['display'] as String : null,
-      displayOverrides:
-          json.containsKey('displayOverrides')
-              ? (json['displayOverrides'] as List)
-                  .map((e) => e as String)
-                  .toList()
-              : null,
-      fileHandlers:
-          json.containsKey('fileHandlers')
-              ? (json['fileHandlers'] as List)
-                  .map((e) => FileHandler.fromJson(e as Map<String, dynamic>))
-                  .toList()
-              : null,
-      icons:
-          json.containsKey('icons')
-              ? (json['icons'] as List)
-                  .map((e) => ImageResource.fromJson(e as Map<String, dynamic>))
-                  .toList()
-              : null,
+      displayOverrides: json.containsKey('displayOverrides')
+          ? (json['displayOverrides'] as List).map((e) => e as String).toList()
+          : null,
+      fileHandlers: json.containsKey('fileHandlers')
+          ? (json['fileHandlers'] as List)
+                .map((e) => FileHandler.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
+      icons: json.containsKey('icons')
+          ? (json['icons'] as List)
+                .map((e) => ImageResource.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
       id: json.containsKey('id') ? json['id'] as String : null,
       lang: json.containsKey('lang') ? json['lang'] as String : null,
-      launchHandler:
-          json.containsKey('launchHandler')
-              ? LaunchHandler.fromJson(
-                json['launchHandler'] as Map<String, dynamic>,
-              )
-              : null,
+      launchHandler: json.containsKey('launchHandler')
+          ? LaunchHandler.fromJson(
+              json['launchHandler'] as Map<String, dynamic>,
+            )
+          : null,
       name: json.containsKey('name') ? json['name'] as String : null,
-      orientation:
-          json.containsKey('orientation')
-              ? json['orientation'] as String
-              : null,
-      preferRelatedApplications:
-          json.containsKey('preferRelatedApplications')
-              ? json['preferRelatedApplications'] as bool
-              : null,
-      protocolHandlers:
-          json.containsKey('protocolHandlers')
-              ? (json['protocolHandlers'] as List)
-                  .map(
-                    (e) => ProtocolHandler.fromJson(e as Map<String, dynamic>),
-                  )
-                  .toList()
-              : null,
-      relatedApplications:
-          json.containsKey('relatedApplications')
-              ? (json['relatedApplications'] as List)
-                  .map(
-                    (e) =>
-                        RelatedApplication.fromJson(e as Map<String, dynamic>),
-                  )
-                  .toList()
-              : null,
+      orientation: json.containsKey('orientation')
+          ? json['orientation'] as String
+          : null,
+      preferRelatedApplications: json.containsKey('preferRelatedApplications')
+          ? json['preferRelatedApplications'] as bool
+          : null,
+      protocolHandlers: json.containsKey('protocolHandlers')
+          ? (json['protocolHandlers'] as List)
+                .map((e) => ProtocolHandler.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
+      relatedApplications: json.containsKey('relatedApplications')
+          ? (json['relatedApplications'] as List)
+                .map(
+                  (e) => RelatedApplication.fromJson(e as Map<String, dynamic>),
+                )
+                .toList()
+          : null,
       scope: json.containsKey('scope') ? json['scope'] as String : null,
-      scopeExtensions:
-          json.containsKey('scopeExtensions')
-              ? (json['scopeExtensions'] as List)
-                  .map(
-                    (e) => ScopeExtension.fromJson(e as Map<String, dynamic>),
-                  )
-                  .toList()
-              : null,
-      screenshots:
-          json.containsKey('screenshots')
-              ? (json['screenshots'] as List)
-                  .map((e) => Screenshot.fromJson(e as Map<String, dynamic>))
-                  .toList()
-              : null,
-      shareTarget:
-          json.containsKey('shareTarget')
-              ? ShareTarget.fromJson(
-                json['shareTarget'] as Map<String, dynamic>,
-              )
-              : null,
-      shortName:
-          json.containsKey('shortName') ? json['shortName'] as String : null,
-      shortcuts:
-          json.containsKey('shortcuts')
-              ? (json['shortcuts'] as List)
-                  .map((e) => Shortcut.fromJson(e as Map<String, dynamic>))
-                  .toList()
-              : null,
-      startUrl:
-          json.containsKey('startUrl') ? json['startUrl'] as String : null,
-      themeColor:
-          json.containsKey('themeColor') ? json['themeColor'] as String : null,
+      scopeExtensions: json.containsKey('scopeExtensions')
+          ? (json['scopeExtensions'] as List)
+                .map((e) => ScopeExtension.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
+      screenshots: json.containsKey('screenshots')
+          ? (json['screenshots'] as List)
+                .map((e) => Screenshot.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
+      shareTarget: json.containsKey('shareTarget')
+          ? ShareTarget.fromJson(json['shareTarget'] as Map<String, dynamic>)
+          : null,
+      shortName: json.containsKey('shortName')
+          ? json['shortName'] as String
+          : null,
+      shortcuts: json.containsKey('shortcuts')
+          ? (json['shortcuts'] as List)
+                .map((e) => Shortcut.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
+      startUrl: json.containsKey('startUrl')
+          ? json['startUrl'] as String
+          : null,
+      themeColor: json.containsKey('themeColor')
+          ? json['themeColor'] as String
+          : null,
     );
   }
 
@@ -3544,8 +3497,9 @@ class WebAppManifest {
       if (protocolHandlers != null)
         'protocolHandlers': protocolHandlers!.map((e) => e.toJson()).toList(),
       if (relatedApplications != null)
-        'relatedApplications':
-            relatedApplications!.map((e) => e.toJson()).toList(),
+        'relatedApplications': relatedApplications!
+            .map((e) => e.toJson())
+            .toList(),
       if (scope != null) 'scope': scope,
       if (scopeExtensions != null)
         'scopeExtensions': scopeExtensions!.map((e) => e.toJson()).toList(),
@@ -3837,8 +3791,9 @@ class BackForwardCacheBlockingDetails {
   factory BackForwardCacheBlockingDetails.fromJson(Map<String, dynamic> json) {
     return BackForwardCacheBlockingDetails(
       url: json.containsKey('url') ? json['url'] as String : null,
-      function:
-          json.containsKey('function') ? json['function'] as String : null,
+      function: json.containsKey('function')
+          ? json['function'] as String
+          : null,
       lineNumber: json['lineNumber'] as int,
       columnNumber: json['columnNumber'] as int,
     );
@@ -3886,16 +3841,15 @@ class BackForwardCacheNotRestoredExplanation {
         json['reason'] as String,
       ),
       context: json.containsKey('context') ? json['context'] as String : null,
-      details:
-          json.containsKey('details')
-              ? (json['details'] as List)
-                  .map(
-                    (e) => BackForwardCacheBlockingDetails.fromJson(
-                      e as Map<String, dynamic>,
-                    ),
-                  )
-                  .toList()
-              : null,
+      details: json.containsKey('details')
+          ? (json['details'] as List)
+                .map(
+                  (e) => BackForwardCacheBlockingDetails.fromJson(
+                    e as Map<String, dynamic>,
+                  ),
+                )
+                .toList()
+          : null,
     );
   }
 
@@ -3930,22 +3884,20 @@ class BackForwardCacheNotRestoredExplanationTree {
   ) {
     return BackForwardCacheNotRestoredExplanationTree(
       url: json['url'] as String,
-      explanations:
-          (json['explanations'] as List)
-              .map(
-                (e) => BackForwardCacheNotRestoredExplanation.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
-      children:
-          (json['children'] as List)
-              .map(
-                (e) => BackForwardCacheNotRestoredExplanationTree.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+      explanations: (json['explanations'] as List)
+          .map(
+            (e) => BackForwardCacheNotRestoredExplanation.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
+      children: (json['children'] as List)
+          .map(
+            (e) => BackForwardCacheNotRestoredExplanationTree.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
     );
   }
 

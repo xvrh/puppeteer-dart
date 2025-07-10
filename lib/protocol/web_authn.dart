@@ -400,46 +400,39 @@ class VirtualAuthenticatorOptions {
   factory VirtualAuthenticatorOptions.fromJson(Map<String, dynamic> json) {
     return VirtualAuthenticatorOptions(
       protocol: AuthenticatorProtocol.fromJson(json['protocol'] as String),
-      ctap2Version:
-          json.containsKey('ctap2Version')
-              ? Ctap2Version.fromJson(json['ctap2Version'] as String)
-              : null,
+      ctap2Version: json.containsKey('ctap2Version')
+          ? Ctap2Version.fromJson(json['ctap2Version'] as String)
+          : null,
       transport: AuthenticatorTransport.fromJson(json['transport'] as String),
-      hasResidentKey:
-          json.containsKey('hasResidentKey')
-              ? json['hasResidentKey'] as bool
-              : null,
-      hasUserVerification:
-          json.containsKey('hasUserVerification')
-              ? json['hasUserVerification'] as bool
-              : null,
-      hasLargeBlob:
-          json.containsKey('hasLargeBlob')
-              ? json['hasLargeBlob'] as bool
-              : null,
-      hasCredBlob:
-          json.containsKey('hasCredBlob') ? json['hasCredBlob'] as bool : null,
-      hasMinPinLength:
-          json.containsKey('hasMinPinLength')
-              ? json['hasMinPinLength'] as bool
-              : null,
+      hasResidentKey: json.containsKey('hasResidentKey')
+          ? json['hasResidentKey'] as bool
+          : null,
+      hasUserVerification: json.containsKey('hasUserVerification')
+          ? json['hasUserVerification'] as bool
+          : null,
+      hasLargeBlob: json.containsKey('hasLargeBlob')
+          ? json['hasLargeBlob'] as bool
+          : null,
+      hasCredBlob: json.containsKey('hasCredBlob')
+          ? json['hasCredBlob'] as bool
+          : null,
+      hasMinPinLength: json.containsKey('hasMinPinLength')
+          ? json['hasMinPinLength'] as bool
+          : null,
       hasPrf: json.containsKey('hasPrf') ? json['hasPrf'] as bool : null,
       automaticPresenceSimulation:
           json.containsKey('automaticPresenceSimulation')
-              ? json['automaticPresenceSimulation'] as bool
-              : null,
-      isUserVerified:
-          json.containsKey('isUserVerified')
-              ? json['isUserVerified'] as bool
-              : null,
-      defaultBackupEligibility:
-          json.containsKey('defaultBackupEligibility')
-              ? json['defaultBackupEligibility'] as bool
-              : null,
-      defaultBackupState:
-          json.containsKey('defaultBackupState')
-              ? json['defaultBackupState'] as bool
-              : null,
+          ? json['automaticPresenceSimulation'] as bool
+          : null,
+      isUserVerified: json.containsKey('isUserVerified')
+          ? json['isUserVerified'] as bool
+          : null,
+      defaultBackupEligibility: json.containsKey('defaultBackupEligibility')
+          ? json['defaultBackupEligibility'] as bool
+          : null,
+      defaultBackupState: json.containsKey('defaultBackupState')
+          ? json['defaultBackupState'] as bool
+          : null,
     );
   }
 
@@ -529,23 +522,25 @@ class Credential {
       isResidentCredential: json['isResidentCredential'] as bool? ?? false,
       rpId: json.containsKey('rpId') ? json['rpId'] as String : null,
       privateKey: json['privateKey'] as String,
-      userHandle:
-          json.containsKey('userHandle') ? json['userHandle'] as String : null,
+      userHandle: json.containsKey('userHandle')
+          ? json['userHandle'] as String
+          : null,
       signCount: json['signCount'] as int,
-      largeBlob:
-          json.containsKey('largeBlob') ? json['largeBlob'] as String : null,
-      backupEligibility:
-          json.containsKey('backupEligibility')
-              ? json['backupEligibility'] as bool
-              : null,
-      backupState:
-          json.containsKey('backupState') ? json['backupState'] as bool : null,
-      userName:
-          json.containsKey('userName') ? json['userName'] as String : null,
-      userDisplayName:
-          json.containsKey('userDisplayName')
-              ? json['userDisplayName'] as String
-              : null,
+      largeBlob: json.containsKey('largeBlob')
+          ? json['largeBlob'] as String
+          : null,
+      backupEligibility: json.containsKey('backupEligibility')
+          ? json['backupEligibility'] as bool
+          : null,
+      backupState: json.containsKey('backupState')
+          ? json['backupState'] as bool
+          : null,
+      userName: json.containsKey('userName')
+          ? json['userName'] as String
+          : null,
+      userDisplayName: json.containsKey('userDisplayName')
+          ? json['userDisplayName'] as String
+          : null,
     );
   }
 

@@ -454,10 +454,9 @@ class Page {
       return;
     }
     var context = frameManager.executionContextById(event.executionContextId);
-    var values =
-        event.args
-            .map((arg) => JsHandle.fromRemoteObject(context, arg))
-            .toList();
+    var values = event.args
+        .map((arg) => JsHandle.fromRemoteObject(context, arg))
+        .toList();
     _addConsoleMessage(event.type, values, event.stackTrace);
   }
 
@@ -746,34 +745,33 @@ class Page {
   Future<void> setCookies(List<CookieParam> cookies) async {
     var pageURL = url!;
     var startsWithHTTP = pageURL.startsWith('http');
-    var items =
-        cookies.map((cookie) {
-          String? cookieUrl;
-          if (cookie.url == null && startsWithHTTP) {
-            cookieUrl = pageURL;
-          }
-          if (cookieUrl != null) {
-            assert(
-              cookieUrl != 'about:blank',
-              'Blank page can not have cookie "${cookie.name}"',
-            );
-            assert(
-              !cookieUrl.startsWith('data:'),
-              'Data URL page can not have cookie "${cookie.name}"',
-            );
-          }
-          return CookieParam(
-            name: cookie.name,
-            value: cookie.value,
-            url: cookieUrl,
-            domain: cookie.domain,
-            path: cookie.path,
-            secure: cookie.secure,
-            httpOnly: cookie.httpOnly,
-            sameSite: cookie.sameSite,
-            expires: cookie.expires,
-          );
-        }).toList();
+    var items = cookies.map((cookie) {
+      String? cookieUrl;
+      if (cookie.url == null && startsWithHTTP) {
+        cookieUrl = pageURL;
+      }
+      if (cookieUrl != null) {
+        assert(
+          cookieUrl != 'about:blank',
+          'Blank page can not have cookie "${cookie.name}"',
+        );
+        assert(
+          !cookieUrl.startsWith('data:'),
+          'Data URL page can not have cookie "${cookie.name}"',
+        );
+      }
+      return CookieParam(
+        name: cookie.name,
+        value: cookie.value,
+        url: cookieUrl,
+        domain: cookie.domain,
+        path: cookie.path,
+        secure: cookie.secure,
+        httpOnly: cookie.httpOnly,
+        sameSite: cookie.sameSite,
+        expires: cookie.expires,
+      );
+    }).toList();
     for (var cookie in items) {
       await deleteCookie(cookie.name, domain: cookie.domain, path: cookie.path);
     }
@@ -864,8 +862,8 @@ class Page {
   }
 
   static final _addPageBinding =
-  //language=js
-  '''
+      //language=js
+      '''
 function addPageBinding(bindingName) {
   const binding = window[bindingName];
   window[bindingName] = (...args) => {
@@ -1004,7 +1002,7 @@ function addPageBinding(bindingName) {
     _onErrorController.add(ClientError(event.exceptionDetails));
   }
 
-  void _handleTargetCrashed(_) {
+  void _handleTargetCrashed(void _) {
     _onErrorController.add(ClientError.pageCrashed());
     Future(() => _dispose('Target crashed'));
   }
@@ -1431,10 +1429,9 @@ function deliverError(name, seq, message, stack) {
       });
     } else {
       await devTools.emulation.setEmulatedMedia(
-        features:
-            features
-                .map((f) => protocol.MediaFeature(name: f.name, value: f.value))
-                .toList(),
+        features: features
+            .map((f) => protocol.MediaFeature(name: f.name, value: f.value))
+            .toList(),
       );
     }
   }
@@ -2318,10 +2315,9 @@ class ClientError implements Exception {
         for (var callFrame in details.stackTrace!.callFrames) {
           var location =
               '${callFrame.url}:${callFrame.lineNumber}:${callFrame.columnNumber}';
-          var functionName =
-              callFrame.functionName.isEmpty
-                  ? '<anonymous>'
-                  : callFrame.functionName;
+          var functionName = callFrame.functionName.isEmpty
+              ? '<anonymous>'
+              : callFrame.functionName;
           message += '\n    at $functionName ($location)';
         }
       }

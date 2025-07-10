@@ -162,10 +162,9 @@ class TargetManager {
 
   void removeTargetInterceptor(Client client, TargetInterceptor interceptor) {
     final interceptors = _targetInterceptors[client] ?? [];
-    _targetInterceptors[client] =
-        interceptors.where((currentInterceptor) {
-          return currentInterceptor != interceptor;
-        }).toList();
+    _targetInterceptors[client] = interceptors.where((currentInterceptor) {
+      return currentInterceptor != interceptor;
+    }).toList();
   }
 
   void _setupAttachmentListeners(Client session) {

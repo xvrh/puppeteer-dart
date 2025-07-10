@@ -53,20 +53,20 @@ Future<DownloadedBrowserInfo> downloadChrome({
     await _downloadFile(url, zipPath, onDownloadProgress);
     _unzip(zipPath, revisionDirectory.path);
     File(zipPath).deleteSync();
-  }
 
-  if (!executableFile.existsSync()) {
-    throw Exception("$exePath doesn't exist");
-  }
+    if (!executableFile.existsSync()) {
+      throw Exception("$exePath doesn't exist");
+    }
 
-  if (!Platform.isWindows) {
-    await Process.run('chmod', ['+x', executableFile.absolute.path]);
-  }
+    if (!Platform.isWindows) {
+      await Process.run('chmod', ['+x', executableFile.absolute.path]);
+    }
 
-  if (Platform.isMacOS) {
-    final chromeAppPath = executableFile.absolute.parent.parent.parent.path;
+    if (Platform.isMacOS) {
+      final chromeAppPath = executableFile.absolute.parent.parent.parent.path;
 
-    await Process.run('xattr', ['-d', 'com.apple.quarantine', chromeAppPath]);
+      await Process.run('xattr', ['-d', 'com.apple.quarantine', chromeAppPath]);
+    }
   }
 
   return DownloadedBrowserInfo(
@@ -184,12 +184,10 @@ enum BrowserPlatform {
     final versionString = split[1];
     return values.firstWhere(
       (e) => e.dartPlatform == versionString,
-      orElse:
-          () =>
-              throw FormatException(
-                "Unknown '$versionString' from Platform.version"
-                " '$versionStringFull'.",
-              ),
+      orElse: () => throw FormatException(
+        "Unknown '$versionString' from Platform.version"
+        " '$versionStringFull'.",
+      ),
     );
   }
 

@@ -479,21 +479,18 @@ class TargetInfo {
       title: json['title'] as String,
       url: json['url'] as String,
       attached: json['attached'] as bool? ?? false,
-      openerId:
-          json.containsKey('openerId')
-              ? TargetID.fromJson(json['openerId'] as String)
-              : null,
+      openerId: json.containsKey('openerId')
+          ? TargetID.fromJson(json['openerId'] as String)
+          : null,
       canAccessOpener: json['canAccessOpener'] as bool? ?? false,
-      openerFrameId:
-          json.containsKey('openerFrameId')
-              ? page.FrameId.fromJson(json['openerFrameId'] as String)
-              : null,
-      browserContextId:
-          json.containsKey('browserContextId')
-              ? browser.BrowserContextID.fromJson(
-                json['browserContextId'] as String,
-              )
-              : null,
+      openerFrameId: json.containsKey('openerFrameId')
+          ? page.FrameId.fromJson(json['openerFrameId'] as String)
+          : null,
+      browserContextId: json.containsKey('browserContextId')
+          ? browser.BrowserContextID.fromJson(
+              json['browserContextId'] as String,
+            )
+          : null,
       subtype: json.containsKey('subtype') ? json['subtype'] as String : null,
     );
   }

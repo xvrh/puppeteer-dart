@@ -259,34 +259,26 @@ class RequestPausedEvent {
       resourceType: network.ResourceType.fromJson(
         json['resourceType'] as String,
       ),
-      responseErrorReason:
-          json.containsKey('responseErrorReason')
-              ? network.ErrorReason.fromJson(
-                json['responseErrorReason'] as String,
-              )
-              : null,
-      responseStatusCode:
-          json.containsKey('responseStatusCode')
-              ? json['responseStatusCode'] as int
-              : null,
-      responseStatusText:
-          json.containsKey('responseStatusText')
-              ? json['responseStatusText'] as String
-              : null,
-      responseHeaders:
-          json.containsKey('responseHeaders')
-              ? (json['responseHeaders'] as List)
-                  .map((e) => HeaderEntry.fromJson(e as Map<String, dynamic>))
-                  .toList()
-              : null,
-      networkId:
-          json.containsKey('networkId')
-              ? network.RequestId.fromJson(json['networkId'] as String)
-              : null,
-      redirectedRequestId:
-          json.containsKey('redirectedRequestId')
-              ? RequestId.fromJson(json['redirectedRequestId'] as String)
-              : null,
+      responseErrorReason: json.containsKey('responseErrorReason')
+          ? network.ErrorReason.fromJson(json['responseErrorReason'] as String)
+          : null,
+      responseStatusCode: json.containsKey('responseStatusCode')
+          ? json['responseStatusCode'] as int
+          : null,
+      responseStatusText: json.containsKey('responseStatusText')
+          ? json['responseStatusText'] as String
+          : null,
+      responseHeaders: json.containsKey('responseHeaders')
+          ? (json['responseHeaders'] as List)
+                .map((e) => HeaderEntry.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
+      networkId: json.containsKey('networkId')
+          ? network.RequestId.fromJson(json['networkId'] as String)
+          : null,
+      redirectedRequestId: json.containsKey('redirectedRequestId')
+          ? RequestId.fromJson(json['redirectedRequestId'] as String)
+          : null,
     );
   }
 }
@@ -395,16 +387,15 @@ class RequestPattern {
 
   factory RequestPattern.fromJson(Map<String, dynamic> json) {
     return RequestPattern(
-      urlPattern:
-          json.containsKey('urlPattern') ? json['urlPattern'] as String : null,
-      resourceType:
-          json.containsKey('resourceType')
-              ? network.ResourceType.fromJson(json['resourceType'] as String)
-              : null,
-      requestStage:
-          json.containsKey('requestStage')
-              ? RequestStage.fromJson(json['requestStage'] as String)
-              : null,
+      urlPattern: json.containsKey('urlPattern')
+          ? json['urlPattern'] as String
+          : null,
+      resourceType: json.containsKey('resourceType')
+          ? network.ResourceType.fromJson(json['resourceType'] as String)
+          : null,
+      requestStage: json.containsKey('requestStage')
+          ? RequestStage.fromJson(json['requestStage'] as String)
+          : null,
     );
   }
 
@@ -460,10 +451,9 @@ class AuthChallenge {
 
   factory AuthChallenge.fromJson(Map<String, dynamic> json) {
     return AuthChallenge(
-      source:
-          json.containsKey('source')
-              ? AuthChallengeSource.fromJson(json['source'] as String)
-              : null,
+      source: json.containsKey('source')
+          ? AuthChallengeSource.fromJson(json['source'] as String)
+          : null,
       origin: json['origin'] as String,
       scheme: json['scheme'] as String,
       realm: json['realm'] as String,
@@ -519,10 +509,12 @@ class AuthChallengeResponse {
       response: AuthChallengeResponseResponse.fromJson(
         json['response'] as String,
       ),
-      username:
-          json.containsKey('username') ? json['username'] as String : null,
-      password:
-          json.containsKey('password') ? json['password'] as String : null,
+      username: json.containsKey('username')
+          ? json['username'] as String
+          : null,
+      password: json.containsKey('password')
+          ? json['password'] as String
+          : null,
     );
   }
 

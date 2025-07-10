@@ -14,10 +14,9 @@ class LayerTreeApi {
   Stream<List<Layer>> get onLayerTreeDidChange => _client.onEvent
       .where((event) => event.name == 'LayerTree.layerTreeDidChange')
       .map(
-        (event) =>
-            (event.parameters['layers'] as List)
-                .map((e) => Layer.fromJson(e as Map<String, dynamic>))
-                .toList(),
+        (event) => (event.parameters['layers'] as List)
+            .map((e) => Layer.fromJson(e as Map<String, dynamic>))
+            .toList(),
       );
 
   /// Provides the reasons why the given layer was composited.
@@ -154,12 +153,12 @@ class CompositingReasonsResult {
 
   factory CompositingReasonsResult.fromJson(Map<String, dynamic> json) {
     return CompositingReasonsResult(
-      compositingReasons:
-          (json['compositingReasons'] as List).map((e) => e as String).toList(),
-      compositingReasonIds:
-          (json['compositingReasonIds'] as List)
-              .map((e) => e as String)
-              .toList(),
+      compositingReasons: (json['compositingReasons'] as List)
+          .map((e) => e as String)
+          .toList(),
+      compositingReasonIds: (json['compositingReasonIds'] as List)
+          .map((e) => e as String)
+          .toList(),
     );
   }
 }
@@ -249,16 +248,14 @@ class StickyPositionConstraint {
       ),
       nearestLayerShiftingStickyBox:
           json.containsKey('nearestLayerShiftingStickyBox')
-              ? LayerId.fromJson(
-                json['nearestLayerShiftingStickyBox'] as String,
-              )
-              : null,
+          ? LayerId.fromJson(json['nearestLayerShiftingStickyBox'] as String)
+          : null,
       nearestLayerShiftingContainingBlock:
           json.containsKey('nearestLayerShiftingContainingBlock')
-              ? LayerId.fromJson(
-                json['nearestLayerShiftingContainingBlock'] as String,
-              )
-              : null,
+          ? LayerId.fromJson(
+              json['nearestLayerShiftingContainingBlock'] as String,
+            )
+          : null,
     );
   }
 
@@ -267,8 +264,8 @@ class StickyPositionConstraint {
       'stickyBoxRect': stickyBoxRect.toJson(),
       'containingBlockRect': containingBlockRect.toJson(),
       if (nearestLayerShiftingStickyBox != null)
-        'nearestLayerShiftingStickyBox':
-            nearestLayerShiftingStickyBox!.toJson(),
+        'nearestLayerShiftingStickyBox': nearestLayerShiftingStickyBox!
+            .toJson(),
       if (nearestLayerShiftingContainingBlock != null)
         'nearestLayerShiftingContainingBlock':
             nearestLayerShiftingContainingBlock!.toJson(),
@@ -375,41 +372,37 @@ class Layer {
   factory Layer.fromJson(Map<String, dynamic> json) {
     return Layer(
       layerId: LayerId.fromJson(json['layerId'] as String),
-      parentLayerId:
-          json.containsKey('parentLayerId')
-              ? LayerId.fromJson(json['parentLayerId'] as String)
-              : null,
-      backendNodeId:
-          json.containsKey('backendNodeId')
-              ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
-              : null,
+      parentLayerId: json.containsKey('parentLayerId')
+          ? LayerId.fromJson(json['parentLayerId'] as String)
+          : null,
+      backendNodeId: json.containsKey('backendNodeId')
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
+          : null,
       offsetX: json['offsetX'] as num,
       offsetY: json['offsetY'] as num,
       width: json['width'] as num,
       height: json['height'] as num,
-      transform:
-          json.containsKey('transform')
-              ? (json['transform'] as List).map((e) => e as num).toList()
-              : null,
+      transform: json.containsKey('transform')
+          ? (json['transform'] as List).map((e) => e as num).toList()
+          : null,
       anchorX: json.containsKey('anchorX') ? json['anchorX'] as num : null,
       anchorY: json.containsKey('anchorY') ? json['anchorY'] as num : null,
       anchorZ: json.containsKey('anchorZ') ? json['anchorZ'] as num : null,
       paintCount: json['paintCount'] as int,
       drawsContent: json['drawsContent'] as bool? ?? false,
-      invisible:
-          json.containsKey('invisible') ? json['invisible'] as bool : null,
-      scrollRects:
-          json.containsKey('scrollRects')
-              ? (json['scrollRects'] as List)
-                  .map((e) => ScrollRect.fromJson(e as Map<String, dynamic>))
-                  .toList()
-              : null,
-      stickyPositionConstraint:
-          json.containsKey('stickyPositionConstraint')
-              ? StickyPositionConstraint.fromJson(
-                json['stickyPositionConstraint'] as Map<String, dynamic>,
-              )
-              : null,
+      invisible: json.containsKey('invisible')
+          ? json['invisible'] as bool
+          : null,
+      scrollRects: json.containsKey('scrollRects')
+          ? (json['scrollRects'] as List)
+                .map((e) => ScrollRect.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
+      stickyPositionConstraint: json.containsKey('stickyPositionConstraint')
+          ? StickyPositionConstraint.fromJson(
+              json['stickyPositionConstraint'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 

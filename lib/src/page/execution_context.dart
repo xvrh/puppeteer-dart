@@ -153,10 +153,9 @@ class ExecutionContext {
           "Javascript expression can't have arguments ($pageFunction)",
         );
 
-        var pageFunctionWithSourceUrl =
-            sourceUrlRegExp.hasMatch(pageFunction)
-                ? pageFunction
-                : '$pageFunction\n$suffix';
+        var pageFunctionWithSourceUrl = sourceUrlRegExp.hasMatch(pageFunction)
+            ? pageFunction
+            : '$pageFunction\n$suffix';
 
         var response = await runtimeApi.evaluate(
           pageFunctionWithSourceUrl,
@@ -205,7 +204,7 @@ class ExecutionContext {
     }
   }
 
-  CallArgument _convertArgument(arg) {
+  CallArgument _convertArgument(dynamic arg) {
     if (arg is BigInt) {
       return CallArgument(unserializableValue: UnserializableValue('${arg}n'));
     }

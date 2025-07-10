@@ -161,14 +161,12 @@ class StorageId {
 
   factory StorageId.fromJson(Map<String, dynamic> json) {
     return StorageId(
-      securityOrigin:
-          json.containsKey('securityOrigin')
-              ? json['securityOrigin'] as String
-              : null,
-      storageKey:
-          json.containsKey('storageKey')
-              ? SerializedStorageKey.fromJson(json['storageKey'] as String)
-              : null,
+      securityOrigin: json.containsKey('securityOrigin')
+          ? json['securityOrigin'] as String
+          : null,
+      storageKey: json.containsKey('storageKey')
+          ? SerializedStorageKey.fromJson(json['storageKey'] as String)
+          : null,
       isLocalStorage: json['isLocalStorage'] as bool? ?? false,
     );
   }

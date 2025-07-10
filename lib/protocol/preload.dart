@@ -163,24 +163,21 @@ class PrerenderStatusUpdatedEvent {
       key: PreloadingAttemptKey.fromJson(json['key'] as Map<String, dynamic>),
       pipelineId: PreloadPipelineId.fromJson(json['pipelineId'] as String),
       status: PreloadingStatus.fromJson(json['status'] as String),
-      prerenderStatus:
-          json.containsKey('prerenderStatus')
-              ? PrerenderFinalStatus.fromJson(json['prerenderStatus'] as String)
-              : null,
-      disallowedMojoInterface:
-          json.containsKey('disallowedMojoInterface')
-              ? json['disallowedMojoInterface'] as String
-              : null,
-      mismatchedHeaders:
-          json.containsKey('mismatchedHeaders')
-              ? (json['mismatchedHeaders'] as List)
-                  .map(
-                    (e) => PrerenderMismatchedHeaders.fromJson(
-                      e as Map<String, dynamic>,
-                    ),
-                  )
-                  .toList()
-              : null,
+      prerenderStatus: json.containsKey('prerenderStatus')
+          ? PrerenderFinalStatus.fromJson(json['prerenderStatus'] as String)
+          : null,
+      disallowedMojoInterface: json.containsKey('disallowedMojoInterface')
+          ? json['disallowedMojoInterface'] as String
+          : null,
+      mismatchedHeaders: json.containsKey('mismatchedHeaders')
+          ? (json['mismatchedHeaders'] as List)
+                .map(
+                  (e) => PrerenderMismatchedHeaders.fromJson(
+                    e as Map<String, dynamic>,
+                  ),
+                )
+                .toList()
+          : null,
     );
   }
 }
@@ -200,13 +197,11 @@ class PreloadingAttemptSourcesUpdatedEvent {
   ) {
     return PreloadingAttemptSourcesUpdatedEvent(
       loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
-      preloadingAttemptSources:
-          (json['preloadingAttemptSources'] as List)
-              .map(
-                (e) =>
-                    PreloadingAttemptSource.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
+      preloadingAttemptSources: (json['preloadingAttemptSources'] as List)
+          .map(
+            (e) => PreloadingAttemptSource.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
     );
   }
 }
@@ -269,19 +264,16 @@ class RuleSet {
       id: RuleSetId.fromJson(json['id'] as String),
       loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
       sourceText: json['sourceText'] as String,
-      backendNodeId:
-          json.containsKey('backendNodeId')
-              ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
-              : null,
+      backendNodeId: json.containsKey('backendNodeId')
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
+          : null,
       url: json.containsKey('url') ? json['url'] as String : null,
-      requestId:
-          json.containsKey('requestId')
-              ? network.RequestId.fromJson(json['requestId'] as String)
-              : null,
-      errorType:
-          json.containsKey('errorType')
-              ? RuleSetErrorType.fromJson(json['errorType'] as String)
-              : null,
+      requestId: json.containsKey('requestId')
+          ? network.RequestId.fromJson(json['requestId'] as String)
+          : null,
+      errorType: json.containsKey('errorType')
+          ? RuleSetErrorType.fromJson(json['errorType'] as String)
+          : null,
     );
   }
 
@@ -381,10 +373,9 @@ class PreloadingAttemptKey {
       loaderId: network.LoaderId.fromJson(json['loaderId'] as String),
       action: SpeculationAction.fromJson(json['action'] as String),
       url: json['url'] as String,
-      targetHint:
-          json.containsKey('targetHint')
-              ? SpeculationTargetHint.fromJson(json['targetHint'] as String)
-              : null,
+      targetHint: json.containsKey('targetHint')
+          ? SpeculationTargetHint.fromJson(json['targetHint'] as String)
+          : null,
     );
   }
 
@@ -419,14 +410,12 @@ class PreloadingAttemptSource {
   factory PreloadingAttemptSource.fromJson(Map<String, dynamic> json) {
     return PreloadingAttemptSource(
       key: PreloadingAttemptKey.fromJson(json['key'] as Map<String, dynamic>),
-      ruleSetIds:
-          (json['ruleSetIds'] as List)
-              .map((e) => RuleSetId.fromJson(e as String))
-              .toList(),
-      nodeIds:
-          (json['nodeIds'] as List)
-              .map((e) => dom.BackendNodeId.fromJson(e as int))
-              .toList(),
+      ruleSetIds: (json['ruleSetIds'] as List)
+          .map((e) => RuleSetId.fromJson(e as String))
+          .toList(),
+      nodeIds: (json['nodeIds'] as List)
+          .map((e) => dom.BackendNodeId.fromJson(e as int))
+          .toList(),
     );
   }
 
@@ -684,14 +673,12 @@ class PrerenderMismatchedHeaders {
   factory PrerenderMismatchedHeaders.fromJson(Map<String, dynamic> json) {
     return PrerenderMismatchedHeaders(
       headerName: json['headerName'] as String,
-      initialValue:
-          json.containsKey('initialValue')
-              ? json['initialValue'] as String
-              : null,
-      activationValue:
-          json.containsKey('activationValue')
-              ? json['activationValue'] as String
-              : null,
+      initialValue: json.containsKey('initialValue')
+          ? json['initialValue'] as String
+          : null,
+      activationValue: json.containsKey('activationValue')
+          ? json['activationValue'] as String
+          : null,
     );
   }
 

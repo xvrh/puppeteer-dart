@@ -196,8 +196,9 @@ class NetworkManager {
         redirectChain = request.redirectChain;
       }
     }
-    var frame =
-        event.frameId != null ? frameManager.frame(event.frameId) : null;
+    var frame = event.frameId != null
+        ? frameManager.frame(event.frameId)
+        : null;
     var request = Request(
       FetchApi(client),
       frame,
@@ -390,10 +391,9 @@ class Request {
   /// await page.setRequestInterception(true);
   /// page.onRequest.listen((request) {
   ///   // Override headers
-  ///   var headers =
-  ///       Map<String, String>.from(request.headers)
-  ///         ..['foo'] = 'bar'
-  ///         ..remove('origin');
+  ///   var headers = Map<String, String>.from(request.headers)
+  ///     ..['foo'] = 'bar'
+  ///     ..remove('origin');
   ///   request.continueRequest(headers: headers);
   /// });
   /// ```
@@ -417,8 +417,9 @@ class Request {
     assert(!_interceptionHandled, 'Request is already handled!');
     _interceptionHandled = true;
 
-    var postDataBinaryBase64 =
-        postData != null ? base64Encode(utf8.encode(postData)) : null;
+    var postDataBinaryBase64 = postData != null
+        ? base64Encode(utf8.encode(postData))
+        : null;
 
     await _fetchApi
         .continueRequest(
@@ -426,10 +427,9 @@ class Request {
           url: url,
           method: method,
           postData: postDataBinaryBase64,
-          headers:
-              headers?.entries
-                  .map((e) => fetch.HeaderEntry(name: e.key, value: e.value))
-                  .toList(),
+          headers: headers?.entries
+              .map((e) => fetch.HeaderEntry(name: e.key, value: e.value))
+              .toList(),
         )
         .catchError((error) {
           // In certain cases, protocol will return error if the request was already canceled
@@ -493,15 +493,14 @@ class Request {
         .fulfillRequest(
           fetch.RequestId(interceptionId!),
           status ?? 200,
-          responseHeaders:
-              headers.entries
-                  .map(
-                    (e) => fetch.HeaderEntry(
-                      name: e.key.toLowerCase(),
-                      value: e.value,
-                    ),
-                  )
-                  .toList(),
+          responseHeaders: headers.entries
+              .map(
+                (e) => fetch.HeaderEntry(
+                  name: e.key.toLowerCase(),
+                  value: e.value,
+                ),
+              )
+              .toList(),
           responsePhrase: _statusTexts[status ?? 200],
           body: body != null ? base64.encode(bodyBytes!) : null,
         )

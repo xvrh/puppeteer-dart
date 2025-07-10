@@ -173,10 +173,9 @@ void main() {
     },
     tags: ['golden'],
     //TODO(xha): re-enable once the current difference disappear
-    skip:
-        !Platform.isLinux
-            ? 'Skip for all platform except Linux because of small difference in golden images'
-            : null,
+    skip: !Platform.isLinux
+        ? 'Skip for all platform except Linux because of small difference in golden images'
+        : null,
   );
 
   group(
@@ -350,9 +349,8 @@ void main() {
     },
     tags: ['golden'],
     //TODO(xha): re-enable once the current difference disappear
-    skip:
-        !Platform.isLinux
-            ? 'Skip for all platform except Linux because of small difference in golden images'
-            : null,
+    skip: !Platform.isLinux
+        ? 'Skip for all platform except Linux because of small difference in golden images'
+        : null,
   );
 }

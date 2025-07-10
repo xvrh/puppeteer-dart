@@ -482,10 +482,9 @@ void main() {
     test('should redirect in a way non-observable to page', () async {
       await page.setRequestInterception(true);
       page.onRequest.listen((request) {
-        var redirectURL =
-            request.url.contains('/empty.html')
-                ? server.prefix + '/consolelog.html'
-                : null;
+        var redirectURL = request.url.contains('/empty.html')
+            ? server.prefix + '/consolelog.html'
+            : null;
         request.continueRequest(url: redirectURL);
       });
       ConsoleMessage? consoleMessage;
@@ -604,8 +603,9 @@ void main() {
       );
       await page.setRequestInterception(true);
       page.onRequest.listen((request) {
-        var imageBuffer =
-            File(p.join('test', 'assets', 'pptr.png')).readAsBytesSync();
+        var imageBuffer = File(
+          p.join('test', 'assets', 'pptr.png'),
+        ).readAsBytesSync();
         request.respond(contentType: 'image/png', body: imageBuffer);
       });
       await page.evaluate(

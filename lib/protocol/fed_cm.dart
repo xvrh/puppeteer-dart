@@ -99,13 +99,13 @@ class DialogShownEvent {
     return DialogShownEvent(
       dialogId: json['dialogId'] as String,
       dialogType: DialogType.fromJson(json['dialogType'] as String),
-      accounts:
-          (json['accounts'] as List)
-              .map((e) => Account.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      accounts: (json['accounts'] as List)
+          .map((e) => Account.fromJson(e as Map<String, dynamic>))
+          .toList(),
       title: json['title'] as String,
-      subtitle:
-          json.containsKey('subtitle') ? json['subtitle'] as String : null,
+      subtitle: json.containsKey('subtitle')
+          ? json['subtitle'] as String
+          : null,
     );
   }
 }
@@ -232,14 +232,12 @@ class Account {
       idpConfigUrl: json['idpConfigUrl'] as String,
       idpLoginUrl: json['idpLoginUrl'] as String,
       loginState: LoginState.fromJson(json['loginState'] as String),
-      termsOfServiceUrl:
-          json.containsKey('termsOfServiceUrl')
-              ? json['termsOfServiceUrl'] as String
-              : null,
-      privacyPolicyUrl:
-          json.containsKey('privacyPolicyUrl')
-              ? json['privacyPolicyUrl'] as String
-              : null,
+      termsOfServiceUrl: json.containsKey('termsOfServiceUrl')
+          ? json['termsOfServiceUrl'] as String
+          : null,
+      privacyPolicyUrl: json.containsKey('privacyPolicyUrl')
+          ? json['privacyPolicyUrl'] as String
+          : null,
     );
   }
 

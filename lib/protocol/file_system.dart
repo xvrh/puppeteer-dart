@@ -75,12 +75,12 @@ class Directory {
   factory Directory.fromJson(Map<String, dynamic> json) {
     return Directory(
       name: json['name'] as String,
-      nestedDirectories:
-          (json['nestedDirectories'] as List).map((e) => e as String).toList(),
-      nestedFiles:
-          (json['nestedFiles'] as List)
-              .map((e) => File.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      nestedDirectories: (json['nestedDirectories'] as List)
+          .map((e) => e as String)
+          .toList(),
+      nestedFiles: (json['nestedFiles'] as List)
+          .map((e) => File.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -114,10 +114,12 @@ class BucketFileSystemLocator {
       storageKey: storage.SerializedStorageKey.fromJson(
         json['storageKey'] as String,
       ),
-      bucketName:
-          json.containsKey('bucketName') ? json['bucketName'] as String : null,
-      pathComponents:
-          (json['pathComponents'] as List).map((e) => e as String).toList(),
+      bucketName: json.containsKey('bucketName')
+          ? json['bucketName'] as String
+          : null,
+      pathComponents: (json['pathComponents'] as List)
+          .map((e) => e as String)
+          .toList(),
     );
   }
 
