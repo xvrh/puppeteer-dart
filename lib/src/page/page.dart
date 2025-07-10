@@ -138,10 +138,10 @@ class Page {
   bool _userDragInterceptionEnabled = false;
 
   Page._(this.target, this.devTools)
-      : _emulationManager = EmulationManager(devTools),
-        accessibility = Accessibility(devTools),
-        coverage = Coverage(devTools),
-        tracing = Tracing(devTools) {
+    : _emulationManager = EmulationManager(devTools),
+      accessibility = Accessibility(devTools),
+      coverage = Coverage(devTools),
+      tracing = Tracing(devTools) {
     target.targetManager.addTargetInterceptor(
       devTools.client,
       _onAttachedToTarget,
@@ -399,8 +399,8 @@ class Page {
   ///  - `title` The title passed to `console.timeStamp`.
   ///  - `metrics` Object containing the metrics.
   Stream<MetricsEvent> get onMetrics => devTools.performance.onMetrics.map(
-        (e) => MetricsEvent(e.title, Metrics.fromBrowser(e.metrics)),
-      );
+    (e) => MetricsEvent(e.title, Metrics.fromBrowser(e.metrics)),
+  );
 
   FrameManager get frameManager => _frameManager;
 
@@ -2223,16 +2223,16 @@ class PaperFormat {
   const PaperFormat.inches({required this.width, required this.height});
 
   PaperFormat.px({required int width, required int height})
-      : width = _pxToInches(width),
-        height = _pxToInches(height);
+    : width = _pxToInches(width),
+      height = _pxToInches(height);
 
   PaperFormat.cm({required num width, required num height})
-      : width = _cmToInches(width),
-        height = _cmToInches(height);
+    : width = _cmToInches(width),
+      height = _cmToInches(height);
 
   PaperFormat.mm({required num width, required num height})
-      : width = _mmToInches(width),
-        height = _mmToInches(height);
+    : width = _mmToInches(width),
+      height = _mmToInches(height);
 
   @override
   String toString() => 'PaperFormat.inches(width: $width, height: $height)';
@@ -2250,10 +2250,10 @@ class PdfMargins {
   static final zero = PdfMargins.inches();
 
   PdfMargins.inches({num? top, num? bottom, num? left, num? right})
-      : top = top ?? 0,
-        bottom = bottom ?? 0,
-        left = left ?? 0,
-        right = right ?? 0;
+    : top = top ?? 0,
+      bottom = bottom ?? 0,
+      left = left ?? 0,
+      right = right ?? 0;
 
   factory PdfMargins.px({int? top, int? bottom, int? left, int? right}) {
     return PdfMargins.inches(
@@ -2293,9 +2293,7 @@ class ClientError implements Exception {
 
   ClientError(ExceptionDetails this.details) : message = _message(details);
 
-  ClientError.pageCrashed()
-      : message = 'Page crashed!',
-        details = null;
+  ClientError.pageCrashed() : message = 'Page crashed!', details = null;
 
   @override
   String toString() => 'Evaluation failed: $message';
@@ -2355,7 +2353,7 @@ class FileChooser {
   bool _handled = false;
 
   FileChooser(this.devTools, this.element, FileChooserOpenedEvent event)
-      : isMultiple = event.mode != FileChooserOpenedEventMode.selectSingle;
+    : isMultiple = event.mode != FileChooserOpenedEventMode.selectSingle;
 
   /// Accept the file chooser request with given files.
   Future<void> accept(List<File> files) async {

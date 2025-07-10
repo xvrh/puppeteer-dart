@@ -34,9 +34,9 @@ class ExecutionContext {
   final DomWorld? world;
 
   ExecutionContext(this.client, this.context, this.world)
-      : runtimeApi = RuntimeApi(client),
-        domApi = DOMApi(client),
-        pageApi = PageApi(client);
+    : runtimeApi = RuntimeApi(client),
+      domApi = DOMApi(client),
+      pageApi = PageApi(client);
 
   /// Frame associated with this execution context.
   ///
@@ -170,8 +170,9 @@ class ExecutionContext {
         }
 
         return (returnByValue
-            ? valueFromRemoteObject(response.result)
-            : _createHandle(response.result)) as T;
+                ? valueFromRemoteObject(response.result)
+                : _createHandle(response.result))
+            as T;
       } else {
         args ??= [];
 
@@ -189,8 +190,9 @@ class ExecutionContext {
         }
 
         return (returnByValue
-            ? valueFromRemoteObject(result.result)
-            : _createHandle(result.result)) as T;
+                ? valueFromRemoteObject(result.result)
+                : _createHandle(result.result))
+            as T;
       }
     } on ServerException catch (e) {
       if (e.message.contains('Cannot find context with specified id') ||

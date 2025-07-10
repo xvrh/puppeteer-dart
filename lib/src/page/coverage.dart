@@ -76,8 +76,8 @@ class Coverage {
   final CssCoverage _cssCoverage;
 
   Coverage(DevTools devTools)
-      : _jsCoverage = JsCoverage(devTools),
-        _cssCoverage = CssCoverage(devTools);
+    : _jsCoverage = JsCoverage(devTools),
+      _cssCoverage = CssCoverage(devTools);
 
   /// Parameters:
   ///   - `resetOnNavigation` Whether to reset coverage on every navigation.

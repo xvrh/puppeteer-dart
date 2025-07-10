@@ -20,7 +20,7 @@ class LifecycleWatcher {
   Timer? _timeoutTimer;
 
   LifecycleWatcher(this.frameManager, this.frame, {Until? wait, this.timeout})
-      : wait = wait ?? Until.load {
+    : wait = wait ?? Until.load {
     _subscriptions = [
       frameManager.onLifecycleEvent.listen(_checkLifecycleComplete),
       frameManager.onFrameNavigatedWithinDocument.listen(
