@@ -1,3 +1,6 @@
+## 3.19.0
+- Update to Chrome 138.0.7204.94.
+
 ## 3.18.0
 - Update to Chrome 135.0.7049.95.
 
