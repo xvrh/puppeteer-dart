@@ -330,7 +330,7 @@ class FrameManager {
     }
   }
 
-  void _onExecutionContextsCleared(_) {
+  void _onExecutionContextsCleared(void _) {
     for (var context in _contextIdToContext.values) {
       if (context.world != null) context.world!.clearContext();
     }

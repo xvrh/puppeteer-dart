@@ -76,8 +76,8 @@ class Coverage {
   final CssCoverage _cssCoverage;
 
   Coverage(DevTools devTools)
-    : _jsCoverage = JsCoverage(devTools),
-      _cssCoverage = CssCoverage(devTools);
+      : _jsCoverage = JsCoverage(devTools),
+        _cssCoverage = CssCoverage(devTools);
 
   /// Parameters:
   ///   - `resetOnNavigation` Whether to reset coverage on every navigation.
@@ -177,7 +177,7 @@ class JsCoverage {
     ]);
   }
 
-  void _onExecutionContextsCleared(_) {
+  void _onExecutionContextsCleared(void _) {
     if (!_resetOnNavigation) return;
     _scriptUrls.clear();
     _scriptSources.clear();
@@ -268,7 +268,7 @@ class CssCoverage {
     ]);
   }
 
-  void _onExecutionContextsCleared(_) {
+  void _onExecutionContextsCleared(void _) {
     if (!_resetOnNavigation) return;
     _stylesheetUrls.clear();
     _stylesheetSources.clear();

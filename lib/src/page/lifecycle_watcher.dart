@@ -20,7 +20,7 @@ class LifecycleWatcher {
   Timer? _timeoutTimer;
 
   LifecycleWatcher(this.frameManager, this.frame, {Until? wait, this.timeout})
-    : wait = wait ?? Until.load {
+      : wait = wait ?? Until.load {
     _subscriptions = [
       frameManager.onLifecycleEvent.listen(_checkLifecycleComplete),
       frameManager.onFrameNavigatedWithinDocument.listen(
@@ -109,7 +109,7 @@ class LifecycleWatcher {
     _checkLifecycleComplete();
   }
 
-  void _checkLifecycleComplete([_]) {
+  void _checkLifecycleComplete([dynamic _]) {
     // We expect navigation to commit.
     if (!_checkLifecycle(frame)) return;
 

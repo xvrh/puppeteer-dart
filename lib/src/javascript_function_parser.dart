@@ -38,7 +38,7 @@ String? convertToFunctionDeclaration(String javascript) {
 }
 
 class JsGrammarDefinition extends GrammarDefinition {
-  Parser token(input) {
+  Parser token(dynamic input) {
     if (input is String) {
       input = input.length == 1 ? char(input) : string(input);
     } else if (input is Parser Function()) {
