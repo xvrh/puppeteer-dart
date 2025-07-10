@@ -21,27 +21,24 @@ class ServiceWorkerApi {
             (event) => event.name == 'ServiceWorker.workerRegistrationUpdated',
           )
           .map(
-            (event) =>
-                (event.parameters['registrations'] as List)
-                    .map(
-                      (e) => ServiceWorkerRegistration.fromJson(
-                        e as Map<String, dynamic>,
-                      ),
-                    )
-                    .toList(),
+            (event) => (event.parameters['registrations'] as List)
+                .map(
+                  (e) => ServiceWorkerRegistration.fromJson(
+                    e as Map<String, dynamic>,
+                  ),
+                )
+                .toList(),
           );
 
   Stream<List<ServiceWorkerVersion>> get onWorkerVersionUpdated => _client
       .onEvent
       .where((event) => event.name == 'ServiceWorker.workerVersionUpdated')
       .map(
-        (event) =>
-            (event.parameters['versions'] as List)
-                .map(
-                  (e) =>
-                      ServiceWorkerVersion.fromJson(e as Map<String, dynamic>),
-                )
-                .toList(),
+        (event) => (event.parameters['versions'] as List)
+            .map(
+              (e) => ServiceWorkerVersion.fromJson(e as Map<String, dynamic>),
+            )
+            .toList(),
       );
 
   Future<void> deliverPushMessage(
@@ -253,28 +250,23 @@ class ServiceWorkerVersion {
         json['runningStatus'] as String,
       ),
       status: ServiceWorkerVersionStatus.fromJson(json['status'] as String),
-      scriptLastModified:
-          json.containsKey('scriptLastModified')
-              ? json['scriptLastModified'] as num
-              : null,
-      scriptResponseTime:
-          json.containsKey('scriptResponseTime')
-              ? json['scriptResponseTime'] as num
-              : null,
-      controlledClients:
-          json.containsKey('controlledClients')
-              ? (json['controlledClients'] as List)
-                  .map((e) => target.TargetID.fromJson(e as String))
-                  .toList()
-              : null,
-      targetId:
-          json.containsKey('targetId')
-              ? target.TargetID.fromJson(json['targetId'] as String)
-              : null,
-      routerRules:
-          json.containsKey('routerRules')
-              ? json['routerRules'] as String
-              : null,
+      scriptLastModified: json.containsKey('scriptLastModified')
+          ? json['scriptLastModified'] as num
+          : null,
+      scriptResponseTime: json.containsKey('scriptResponseTime')
+          ? json['scriptResponseTime'] as num
+          : null,
+      controlledClients: json.containsKey('controlledClients')
+          ? (json['controlledClients'] as List)
+                .map((e) => target.TargetID.fromJson(e as String))
+                .toList()
+          : null,
+      targetId: json.containsKey('targetId')
+          ? target.TargetID.fromJson(json['targetId'] as String)
+          : null,
+      routerRules: json.containsKey('routerRules')
+          ? json['routerRules'] as String
+          : null,
     );
   }
 

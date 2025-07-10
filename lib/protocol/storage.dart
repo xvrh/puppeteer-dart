@@ -647,21 +647,16 @@ class InterestGroupAccessedEvent {
       type: InterestGroupAccessType.fromJson(json['type'] as String),
       ownerOrigin: json['ownerOrigin'] as String,
       name: json['name'] as String,
-      componentSellerOrigin:
-          json.containsKey('componentSellerOrigin')
-              ? json['componentSellerOrigin'] as String
-              : null,
+      componentSellerOrigin: json.containsKey('componentSellerOrigin')
+          ? json['componentSellerOrigin'] as String
+          : null,
       bid: json.containsKey('bid') ? json['bid'] as num : null,
-      bidCurrency:
-          json.containsKey('bidCurrency')
-              ? json['bidCurrency'] as String
-              : null,
-      uniqueAuctionId:
-          json.containsKey('uniqueAuctionId')
-              ? InterestGroupAuctionId.fromJson(
-                json['uniqueAuctionId'] as String,
-              )
-              : null,
+      bidCurrency: json.containsKey('bidCurrency')
+          ? json['bidCurrency'] as String
+          : null,
+      uniqueAuctionId: json.containsKey('uniqueAuctionId')
+          ? InterestGroupAuctionId.fromJson(json['uniqueAuctionId'] as String)
+          : null,
     );
   }
 }
@@ -696,16 +691,12 @@ class InterestGroupAuctionEventOccurredEvent {
       uniqueAuctionId: InterestGroupAuctionId.fromJson(
         json['uniqueAuctionId'] as String,
       ),
-      parentAuctionId:
-          json.containsKey('parentAuctionId')
-              ? InterestGroupAuctionId.fromJson(
-                json['parentAuctionId'] as String,
-              )
-              : null,
-      auctionConfig:
-          json.containsKey('auctionConfig')
-              ? json['auctionConfig'] as Map<String, dynamic>
-              : null,
+      parentAuctionId: json.containsKey('parentAuctionId')
+          ? InterestGroupAuctionId.fromJson(json['parentAuctionId'] as String)
+          : null,
+      auctionConfig: json.containsKey('auctionConfig')
+          ? json['auctionConfig'] as Map<String, dynamic>
+          : null,
     );
   }
 }
@@ -732,10 +723,9 @@ class InterestGroupAuctionNetworkRequestCreatedEvent {
     return InterestGroupAuctionNetworkRequestCreatedEvent(
       type: InterestGroupAuctionFetchType.fromJson(json['type'] as String),
       requestId: network.RequestId.fromJson(json['requestId'] as String),
-      auctions:
-          (json['auctions'] as List)
-              .map((e) => InterestGroupAuctionId.fromJson(e as String))
-              .toList(),
+      auctions: (json['auctions'] as List)
+          .map((e) => InterestGroupAuctionId.fromJson(e as String))
+          .toList(),
     );
   }
 }
@@ -928,14 +918,12 @@ class AttributionReportingReportSentEvent {
         json['result'] as String,
       ),
       netError: json.containsKey('netError') ? json['netError'] as int : null,
-      netErrorName:
-          json.containsKey('netErrorName')
-              ? json['netErrorName'] as String
-              : null,
-      httpStatusCode:
-          json.containsKey('httpStatusCode')
-              ? json['httpStatusCode'] as int
-              : null,
+      netErrorName: json.containsKey('netErrorName')
+          ? json['netErrorName'] as String
+          : null,
+      httpStatusCode: json.containsKey('httpStatusCode')
+          ? json['httpStatusCode'] as int
+          : null,
     );
   }
 }
@@ -965,10 +953,9 @@ class GetUsageAndQuotaResult {
       usage: json['usage'] as num,
       quota: json['quota'] as num,
       overrideActive: json['overrideActive'] as bool? ?? false,
-      usageBreakdown:
-          (json['usageBreakdown'] as List)
-              .map((e) => UsageForType.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      usageBreakdown: (json['usageBreakdown'] as List)
+          .map((e) => UsageForType.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -1268,15 +1255,15 @@ class SharedStoragePrivateAggregationConfig {
     return SharedStoragePrivateAggregationConfig(
       aggregationCoordinatorOrigin:
           json.containsKey('aggregationCoordinatorOrigin')
-              ? json['aggregationCoordinatorOrigin'] as String
-              : null,
-      contextId:
-          json.containsKey('contextId') ? json['contextId'] as String : null,
+          ? json['aggregationCoordinatorOrigin'] as String
+          : null,
+      contextId: json.containsKey('contextId')
+          ? json['contextId'] as String
+          : null,
       filteringIdMaxBytes: json['filteringIdMaxBytes'] as int,
-      maxContributions:
-          json.containsKey('maxContributions')
-              ? json['maxContributions'] as int
-              : null,
+      maxContributions: json.containsKey('maxContributions')
+          ? json['maxContributions'] as int
+          : null,
     );
   }
 
@@ -1330,14 +1317,13 @@ class SharedStorageUrlWithMetadata {
   factory SharedStorageUrlWithMetadata.fromJson(Map<String, dynamic> json) {
     return SharedStorageUrlWithMetadata(
       url: json['url'] as String,
-      reportingMetadata:
-          (json['reportingMetadata'] as List)
-              .map(
-                (e) => SharedStorageReportingMetadata.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+      reportingMetadata: (json['reportingMetadata'] as List)
+          .map(
+            (e) => SharedStorageReportingMetadata.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -1460,65 +1446,59 @@ class SharedStorageAccessParams {
 
   factory SharedStorageAccessParams.fromJson(Map<String, dynamic> json) {
     return SharedStorageAccessParams(
-      scriptSourceUrl:
-          json.containsKey('scriptSourceUrl')
-              ? json['scriptSourceUrl'] as String
-              : null,
-      dataOrigin:
-          json.containsKey('dataOrigin') ? json['dataOrigin'] as String : null,
-      operationName:
-          json.containsKey('operationName')
-              ? json['operationName'] as String
-              : null,
-      operationId:
-          json.containsKey('operationId')
-              ? json['operationId'] as String
-              : null,
-      keepAlive:
-          json.containsKey('keepAlive') ? json['keepAlive'] as bool : null,
-      privateAggregationConfig:
-          json.containsKey('privateAggregationConfig')
-              ? SharedStoragePrivateAggregationConfig.fromJson(
-                json['privateAggregationConfig'] as Map<String, dynamic>,
-              )
-              : null,
-      serializedData:
-          json.containsKey('serializedData')
-              ? json['serializedData'] as String
-              : null,
-      urlsWithMetadata:
-          json.containsKey('urlsWithMetadata')
-              ? (json['urlsWithMetadata'] as List)
-                  .map(
-                    (e) => SharedStorageUrlWithMetadata.fromJson(
-                      e as Map<String, dynamic>,
-                    ),
-                  )
-                  .toList()
-              : null,
+      scriptSourceUrl: json.containsKey('scriptSourceUrl')
+          ? json['scriptSourceUrl'] as String
+          : null,
+      dataOrigin: json.containsKey('dataOrigin')
+          ? json['dataOrigin'] as String
+          : null,
+      operationName: json.containsKey('operationName')
+          ? json['operationName'] as String
+          : null,
+      operationId: json.containsKey('operationId')
+          ? json['operationId'] as String
+          : null,
+      keepAlive: json.containsKey('keepAlive')
+          ? json['keepAlive'] as bool
+          : null,
+      privateAggregationConfig: json.containsKey('privateAggregationConfig')
+          ? SharedStoragePrivateAggregationConfig.fromJson(
+              json['privateAggregationConfig'] as Map<String, dynamic>,
+            )
+          : null,
+      serializedData: json.containsKey('serializedData')
+          ? json['serializedData'] as String
+          : null,
+      urlsWithMetadata: json.containsKey('urlsWithMetadata')
+          ? (json['urlsWithMetadata'] as List)
+                .map(
+                  (e) => SharedStorageUrlWithMetadata.fromJson(
+                    e as Map<String, dynamic>,
+                  ),
+                )
+                .toList()
+          : null,
       urnUuid: json.containsKey('urnUuid') ? json['urnUuid'] as String : null,
       key: json.containsKey('key') ? json['key'] as String : null,
       value: json.containsKey('value') ? json['value'] as String : null,
-      ignoreIfPresent:
-          json.containsKey('ignoreIfPresent')
-              ? json['ignoreIfPresent'] as bool
-              : null,
-      workletOrdinal:
-          json.containsKey('workletOrdinal')
-              ? json['workletOrdinal'] as int
-              : null,
-      workletTargetId:
-          json.containsKey('workletTargetId')
-              ? target.TargetID.fromJson(json['workletTargetId'] as String)
-              : null,
-      withLock:
-          json.containsKey('withLock') ? json['withLock'] as String : null,
-      batchUpdateId:
-          json.containsKey('batchUpdateId')
-              ? json['batchUpdateId'] as String
-              : null,
-      batchSize:
-          json.containsKey('batchSize') ? json['batchSize'] as int : null,
+      ignoreIfPresent: json.containsKey('ignoreIfPresent')
+          ? json['ignoreIfPresent'] as bool
+          : null,
+      workletOrdinal: json.containsKey('workletOrdinal')
+          ? json['workletOrdinal'] as int
+          : null,
+      workletTargetId: json.containsKey('workletTargetId')
+          ? target.TargetID.fromJson(json['workletTargetId'] as String)
+          : null,
+      withLock: json.containsKey('withLock')
+          ? json['withLock'] as String
+          : null,
+      batchUpdateId: json.containsKey('batchUpdateId')
+          ? json['batchUpdateId'] as String
+          : null,
+      batchSize: json.containsKey('batchSize')
+          ? json['batchSize'] as int
+          : null,
     );
   }
 
@@ -1710,18 +1690,16 @@ class AttributionReportingFilterConfig {
 
   factory AttributionReportingFilterConfig.fromJson(Map<String, dynamic> json) {
     return AttributionReportingFilterConfig(
-      filterValues:
-          (json['filterValues'] as List)
-              .map(
-                (e) => AttributionReportingFilterDataEntry.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
-      lookbackWindow:
-          json.containsKey('lookbackWindow')
-              ? json['lookbackWindow'] as int
-              : null,
+      filterValues: (json['filterValues'] as List)
+          .map(
+            (e) => AttributionReportingFilterDataEntry.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
+      lookbackWindow: json.containsKey('lookbackWindow')
+          ? json['lookbackWindow'] as int
+          : null,
     );
   }
 
@@ -1745,22 +1723,20 @@ class AttributionReportingFilterPair {
 
   factory AttributionReportingFilterPair.fromJson(Map<String, dynamic> json) {
     return AttributionReportingFilterPair(
-      filters:
-          (json['filters'] as List)
-              .map(
-                (e) => AttributionReportingFilterConfig.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
-      notFilters:
-          (json['notFilters'] as List)
-              .map(
-                (e) => AttributionReportingFilterConfig.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+      filters: (json['filters'] as List)
+          .map(
+            (e) => AttributionReportingFilterConfig.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
+      notFilters: (json['notFilters'] as List)
+          .map(
+            (e) => AttributionReportingFilterConfig.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -1902,19 +1878,17 @@ class AttributionReportingAggregatableDebugReportingConfig {
     return AttributionReportingAggregatableDebugReportingConfig(
       budget: json.containsKey('budget') ? json['budget'] as num : null,
       keyPiece: UnsignedInt128AsBase16.fromJson(json['keyPiece'] as String),
-      debugData:
-          (json['debugData'] as List)
-              .map(
-                (e) =>
-                    AttributionReportingAggregatableDebugReportingData.fromJson(
-                      e as Map<String, dynamic>,
-                    ),
-              )
-              .toList(),
+      debugData: (json['debugData'] as List)
+          .map(
+            (e) => AttributionReportingAggregatableDebugReportingData.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
       aggregationCoordinatorOrigin:
           json.containsKey('aggregationCoordinatorOrigin')
-              ? json['aggregationCoordinatorOrigin'] as String
-              : null,
+          ? json['aggregationCoordinatorOrigin'] as String
+          : null,
     );
   }
 
@@ -2074,30 +2048,28 @@ class AttributionReportingSourceRegistration {
       type: AttributionReportingSourceType.fromJson(json['type'] as String),
       sourceOrigin: json['sourceOrigin'] as String,
       reportingOrigin: json['reportingOrigin'] as String,
-      destinationSites:
-          (json['destinationSites'] as List).map((e) => e as String).toList(),
+      destinationSites: (json['destinationSites'] as List)
+          .map((e) => e as String)
+          .toList(),
       eventId: UnsignedInt64AsBase10.fromJson(json['eventId'] as String),
       priority: SignedInt64AsBase10.fromJson(json['priority'] as String),
-      filterData:
-          (json['filterData'] as List)
-              .map(
-                (e) => AttributionReportingFilterDataEntry.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
-      aggregationKeys:
-          (json['aggregationKeys'] as List)
-              .map(
-                (e) => AttributionReportingAggregationKeysEntry.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
-      debugKey:
-          json.containsKey('debugKey')
-              ? UnsignedInt64AsBase10.fromJson(json['debugKey'] as String)
-              : null,
+      filterData: (json['filterData'] as List)
+          .map(
+            (e) => AttributionReportingFilterDataEntry.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
+      aggregationKeys: (json['aggregationKeys'] as List)
+          .map(
+            (e) => AttributionReportingAggregationKeysEntry.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
+      debugKey: json.containsKey('debugKey')
+          ? UnsignedInt64AsBase10.fromJson(json['debugKey'] as String)
+          : null,
       triggerDataMatching: AttributionReportingTriggerDataMatching.fromJson(
         json['triggerDataMatching'] as String,
       ),
@@ -2108,21 +2080,19 @@ class AttributionReportingSourceRegistration {
           AttributionReportingAggregatableDebugReportingConfig.fromJson(
             json['aggregatableDebugReportingConfig'] as Map<String, dynamic>,
           ),
-      scopesData:
-          json.containsKey('scopesData')
-              ? AttributionScopesData.fromJson(
-                json['scopesData'] as Map<String, dynamic>,
-              )
-              : null,
+      scopesData: json.containsKey('scopesData')
+          ? AttributionScopesData.fromJson(
+              json['scopesData'] as Map<String, dynamic>,
+            )
+          : null,
       maxEventLevelReports: json['maxEventLevelReports'] as int,
-      namedBudgets:
-          (json['namedBudgets'] as List)
-              .map(
-                (e) => AttributionReportingNamedBudgetDef.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+      namedBudgets: (json['namedBudgets'] as List)
+          .map(
+            (e) => AttributionReportingNamedBudgetDef.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
       debugReporting: json['debugReporting'] as bool? ?? false,
       eventLevelEpsilon: json['eventLevelEpsilon'] as num,
     );
@@ -2145,8 +2115,8 @@ class AttributionReportingSourceRegistration {
       'aggregationKeys': aggregationKeys.map((e) => e.toJson()).toList(),
       'triggerDataMatching': triggerDataMatching.toJson(),
       'destinationLimitPriority': destinationLimitPriority.toJson(),
-      'aggregatableDebugReportingConfig':
-          aggregatableDebugReportingConfig.toJson(),
+      'aggregatableDebugReportingConfig': aggregatableDebugReportingConfig
+          .toJson(),
       'maxEventLevelReports': maxEventLevelReports,
       'namedBudgets': namedBudgets.map((e) => e.toJson()).toList(),
       'debugReporting': debugReporting,
@@ -2260,14 +2230,13 @@ class AttributionReportingAggregatableValueEntry {
     Map<String, dynamic> json,
   ) {
     return AttributionReportingAggregatableValueEntry(
-      values:
-          (json['values'] as List)
-              .map(
-                (e) => AttributionReportingAggregatableValueDictEntry.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+      values: (json['values'] as List)
+          .map(
+            (e) => AttributionReportingAggregatableValueDictEntry.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
       filters: AttributionReportingFilterPair.fromJson(
         json['filters'] as Map<String, dynamic>,
       ),
@@ -2304,10 +2273,9 @@ class AttributionReportingEventTriggerData {
     return AttributionReportingEventTriggerData(
       data: UnsignedInt64AsBase10.fromJson(json['data'] as String),
       priority: SignedInt64AsBase10.fromJson(json['priority'] as String),
-      dedupKey:
-          json.containsKey('dedupKey')
-              ? UnsignedInt64AsBase10.fromJson(json['dedupKey'] as String)
-              : null,
+      dedupKey: json.containsKey('dedupKey')
+          ? UnsignedInt64AsBase10.fromJson(json['dedupKey'] as String)
+          : null,
       filters: AttributionReportingFilterPair.fromJson(
         json['filters'] as Map<String, dynamic>,
       ),
@@ -2372,10 +2340,9 @@ class AttributionReportingAggregatableDedupKey {
     Map<String, dynamic> json,
   ) {
     return AttributionReportingAggregatableDedupKey(
-      dedupKey:
-          json.containsKey('dedupKey')
-              ? UnsignedInt64AsBase10.fromJson(json['dedupKey'] as String)
-              : null,
+      dedupKey: json.containsKey('dedupKey')
+          ? UnsignedInt64AsBase10.fromJson(json['dedupKey'] as String)
+          : null,
       filters: AttributionReportingFilterPair.fromJson(
         json['filters'] as Map<String, dynamic>,
       ),
@@ -2469,87 +2436,82 @@ class AttributionReportingTriggerRegistration {
       filters: AttributionReportingFilterPair.fromJson(
         json['filters'] as Map<String, dynamic>,
       ),
-      debugKey:
-          json.containsKey('debugKey')
-              ? UnsignedInt64AsBase10.fromJson(json['debugKey'] as String)
-              : null,
-      aggregatableDedupKeys:
-          (json['aggregatableDedupKeys'] as List)
-              .map(
-                (e) => AttributionReportingAggregatableDedupKey.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
-      eventTriggerData:
-          (json['eventTriggerData'] as List)
-              .map(
-                (e) => AttributionReportingEventTriggerData.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
-      aggregatableTriggerData:
-          (json['aggregatableTriggerData'] as List)
-              .map(
-                (e) => AttributionReportingAggregatableTriggerData.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
-      aggregatableValues:
-          (json['aggregatableValues'] as List)
-              .map(
-                (e) => AttributionReportingAggregatableValueEntry.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+      debugKey: json.containsKey('debugKey')
+          ? UnsignedInt64AsBase10.fromJson(json['debugKey'] as String)
+          : null,
+      aggregatableDedupKeys: (json['aggregatableDedupKeys'] as List)
+          .map(
+            (e) => AttributionReportingAggregatableDedupKey.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
+      eventTriggerData: (json['eventTriggerData'] as List)
+          .map(
+            (e) => AttributionReportingEventTriggerData.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
+      aggregatableTriggerData: (json['aggregatableTriggerData'] as List)
+          .map(
+            (e) => AttributionReportingAggregatableTriggerData.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
+      aggregatableValues: (json['aggregatableValues'] as List)
+          .map(
+            (e) => AttributionReportingAggregatableValueEntry.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
       aggregatableFilteringIdMaxBytes:
           json['aggregatableFilteringIdMaxBytes'] as int,
       debugReporting: json['debugReporting'] as bool? ?? false,
       aggregationCoordinatorOrigin:
           json.containsKey('aggregationCoordinatorOrigin')
-              ? json['aggregationCoordinatorOrigin'] as String
-              : null,
+          ? json['aggregationCoordinatorOrigin'] as String
+          : null,
       sourceRegistrationTimeConfig:
           AttributionReportingSourceRegistrationTimeConfig.fromJson(
             json['sourceRegistrationTimeConfig'] as String,
           ),
-      triggerContextId:
-          json.containsKey('triggerContextId')
-              ? json['triggerContextId'] as String
-              : null,
+      triggerContextId: json.containsKey('triggerContextId')
+          ? json['triggerContextId'] as String
+          : null,
       aggregatableDebugReportingConfig:
           AttributionReportingAggregatableDebugReportingConfig.fromJson(
             json['aggregatableDebugReportingConfig'] as Map<String, dynamic>,
           ),
       scopes: (json['scopes'] as List).map((e) => e as String).toList(),
-      namedBudgets:
-          (json['namedBudgets'] as List)
-              .map(
-                (e) => AttributionReportingNamedBudgetCandidate.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+      namedBudgets: (json['namedBudgets'] as List)
+          .map(
+            (e) => AttributionReportingNamedBudgetCandidate.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'filters': filters.toJson(),
-      'aggregatableDedupKeys':
-          aggregatableDedupKeys.map((e) => e.toJson()).toList(),
+      'aggregatableDedupKeys': aggregatableDedupKeys
+          .map((e) => e.toJson())
+          .toList(),
       'eventTriggerData': eventTriggerData.map((e) => e.toJson()).toList(),
-      'aggregatableTriggerData':
-          aggregatableTriggerData.map((e) => e.toJson()).toList(),
+      'aggregatableTriggerData': aggregatableTriggerData
+          .map((e) => e.toJson())
+          .toList(),
       'aggregatableValues': aggregatableValues.map((e) => e.toJson()).toList(),
       'aggregatableFilteringIdMaxBytes': aggregatableFilteringIdMaxBytes,
       'debugReporting': debugReporting,
       'sourceRegistrationTimeConfig': sourceRegistrationTimeConfig.toJson(),
-      'aggregatableDebugReportingConfig':
-          aggregatableDebugReportingConfig.toJson(),
+      'aggregatableDebugReportingConfig': aggregatableDebugReportingConfig
+          .toJson(),
       'scopes': [...scopes],
       'namedBudgets': namedBudgets.map((e) => e.toJson()).toList(),
       if (debugKey != null) 'debugKey': debugKey!.toJson(),
@@ -2668,12 +2630,15 @@ class RelatedWebsiteSet {
 
   factory RelatedWebsiteSet.fromJson(Map<String, dynamic> json) {
     return RelatedWebsiteSet(
-      primarySites:
-          (json['primarySites'] as List).map((e) => e as String).toList(),
-      associatedSites:
-          (json['associatedSites'] as List).map((e) => e as String).toList(),
-      serviceSites:
-          (json['serviceSites'] as List).map((e) => e as String).toList(),
+      primarySites: (json['primarySites'] as List)
+          .map((e) => e as String)
+          .toList(),
+      associatedSites: (json['associatedSites'] as List)
+          .map((e) => e as String)
+          .toList(),
+      serviceSites: (json['serviceSites'] as List)
+          .map((e) => e as String)
+          .toList(),
     );
   }
 

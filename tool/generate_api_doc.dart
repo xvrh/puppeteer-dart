@@ -29,10 +29,11 @@ final classesOrder = [
 
 void main() {
   var classes = <Class>[];
-  for (var dartFile in Directory('lib/src')
-      .listSync(recursive: true)
-      .whereType<File>()
-      .where((file) => file.path.endsWith('.dart'))) {
+  for (var dartFile
+      in Directory('lib/src')
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((file) => file.path.endsWith('.dart'))) {
     var fileContent = dartFile.readAsStringSync();
 
     var unit = parseString(content: fileContent).unit;

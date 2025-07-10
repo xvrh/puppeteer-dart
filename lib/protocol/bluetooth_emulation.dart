@@ -255,10 +255,9 @@ class CharacteristicOperationReceivedEvent {
       characteristicId: json['characteristicId'] as String,
       type: CharacteristicOperationType.fromJson(json['type'] as String),
       data: json.containsKey('data') ? json['data'] as String : null,
-      writeType:
-          json.containsKey('writeType')
-              ? CharacteristicWriteType.fromJson(json['writeType'] as String)
-              : null,
+      writeType: json.containsKey('writeType')
+          ? CharacteristicWriteType.fromJson(json['writeType'] as String)
+          : null,
     );
   }
 }
@@ -430,21 +429,20 @@ class ScanRecord {
   factory ScanRecord.fromJson(Map<String, dynamic> json) {
     return ScanRecord(
       name: json.containsKey('name') ? json['name'] as String : null,
-      uuids:
-          json.containsKey('uuids')
-              ? (json['uuids'] as List).map((e) => e as String).toList()
-              : null,
-      appearance:
-          json.containsKey('appearance') ? json['appearance'] as int : null,
+      uuids: json.containsKey('uuids')
+          ? (json['uuids'] as List).map((e) => e as String).toList()
+          : null,
+      appearance: json.containsKey('appearance')
+          ? json['appearance'] as int
+          : null,
       txPower: json.containsKey('txPower') ? json['txPower'] as int : null,
-      manufacturerData:
-          json.containsKey('manufacturerData')
-              ? (json['manufacturerData'] as List)
-                  .map(
-                    (e) => ManufacturerData.fromJson(e as Map<String, dynamic>),
-                  )
-                  .toList()
-              : null,
+      manufacturerData: json.containsKey('manufacturerData')
+          ? (json['manufacturerData'] as List)
+                .map(
+                  (e) => ManufacturerData.fromJson(e as Map<String, dynamic>),
+                )
+                .toList()
+          : null,
     );
   }
 
@@ -525,24 +523,22 @@ class CharacteristicProperties {
 
   factory CharacteristicProperties.fromJson(Map<String, dynamic> json) {
     return CharacteristicProperties(
-      broadcast:
-          json.containsKey('broadcast') ? json['broadcast'] as bool : null,
+      broadcast: json.containsKey('broadcast')
+          ? json['broadcast'] as bool
+          : null,
       read: json.containsKey('read') ? json['read'] as bool : null,
-      writeWithoutResponse:
-          json.containsKey('writeWithoutResponse')
-              ? json['writeWithoutResponse'] as bool
-              : null,
+      writeWithoutResponse: json.containsKey('writeWithoutResponse')
+          ? json['writeWithoutResponse'] as bool
+          : null,
       write: json.containsKey('write') ? json['write'] as bool : null,
       notify: json.containsKey('notify') ? json['notify'] as bool : null,
       indicate: json.containsKey('indicate') ? json['indicate'] as bool : null,
-      authenticatedSignedWrites:
-          json.containsKey('authenticatedSignedWrites')
-              ? json['authenticatedSignedWrites'] as bool
-              : null,
-      extendedProperties:
-          json.containsKey('extendedProperties')
-              ? json['extendedProperties'] as bool
-              : null,
+      authenticatedSignedWrites: json.containsKey('authenticatedSignedWrites')
+          ? json['authenticatedSignedWrites'] as bool
+          : null,
+      extendedProperties: json.containsKey('extendedProperties')
+          ? json['extendedProperties'] as bool
+          : null,
     );
   }
 

@@ -62,10 +62,9 @@ class DOMApi {
   Stream<List<NodeId>> get onInlineStyleInvalidated => _client.onEvent
       .where((event) => event.name == 'DOM.inlineStyleInvalidated')
       .map(
-        (event) =>
-            (event.parameters['nodeIds'] as List)
-                .map((e) => NodeId.fromJson(e as int))
-                .toList(),
+        (event) => (event.parameters['nodeIds'] as List)
+            .map((e) => NodeId.fromJson(e as int))
+            .toList(),
       );
 
   /// Called when a pseudo element is added to an element.
@@ -941,10 +940,9 @@ class DistributedNodesUpdatedEvent {
   factory DistributedNodesUpdatedEvent.fromJson(Map<String, dynamic> json) {
     return DistributedNodesUpdatedEvent(
       insertionPointId: NodeId.fromJson(json['insertionPointId'] as int),
-      distributedNodes:
-          (json['distributedNodes'] as List)
-              .map((e) => BackendNode.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      distributedNodes: (json['distributedNodes'] as List)
+          .map((e) => BackendNode.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -1023,10 +1021,9 @@ class SetChildNodesEvent {
   factory SetChildNodesEvent.fromJson(Map<String, dynamic> json) {
     return SetChildNodesEvent(
       parentId: NodeId.fromJson(json['parentId'] as int),
-      nodes:
-          (json['nodes'] as List)
-              .map((e) => Node.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      nodes: (json['nodes'] as List)
+          .map((e) => Node.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -1085,10 +1082,9 @@ class GetNodeForLocationResult {
     return GetNodeForLocationResult(
       backendNodeId: BackendNodeId.fromJson(json['backendNodeId'] as int),
       frameId: page.FrameId.fromJson(json['frameId'] as String),
-      nodeId:
-          json.containsKey('nodeId')
-              ? NodeId.fromJson(json['nodeId'] as int)
-              : null,
+      nodeId: json.containsKey('nodeId')
+          ? NodeId.fromJson(json['nodeId'] as int)
+          : null,
     );
   }
 }
@@ -1122,10 +1118,9 @@ class GetFrameOwnerResult {
   factory GetFrameOwnerResult.fromJson(Map<String, dynamic> json) {
     return GetFrameOwnerResult(
       backendNodeId: BackendNodeId.fromJson(json['backendNodeId'] as int),
-      nodeId:
-          json.containsKey('nodeId')
-              ? NodeId.fromJson(json['nodeId'] as int)
-              : null,
+      nodeId: json.containsKey('nodeId')
+          ? NodeId.fromJson(json['nodeId'] as int)
+          : null,
     );
   }
 }
@@ -1458,103 +1453,86 @@ class Node {
   factory Node.fromJson(Map<String, dynamic> json) {
     return Node(
       nodeId: NodeId.fromJson(json['nodeId'] as int),
-      parentId:
-          json.containsKey('parentId')
-              ? NodeId.fromJson(json['parentId'] as int)
-              : null,
+      parentId: json.containsKey('parentId')
+          ? NodeId.fromJson(json['parentId'] as int)
+          : null,
       backendNodeId: BackendNodeId.fromJson(json['backendNodeId'] as int),
       nodeType: json['nodeType'] as int,
       nodeName: json['nodeName'] as String,
       localName: json['localName'] as String,
       nodeValue: json['nodeValue'] as String,
-      childNodeCount:
-          json.containsKey('childNodeCount')
-              ? json['childNodeCount'] as int
-              : null,
-      children:
-          json.containsKey('children')
-              ? (json['children'] as List)
-                  .map((e) => Node.fromJson(e as Map<String, dynamic>))
-                  .toList()
-              : null,
-      attributes:
-          json.containsKey('attributes')
-              ? (json['attributes'] as List).map((e) => e as String).toList()
-              : null,
-      documentURL:
-          json.containsKey('documentURL')
-              ? json['documentURL'] as String
-              : null,
+      childNodeCount: json.containsKey('childNodeCount')
+          ? json['childNodeCount'] as int
+          : null,
+      children: json.containsKey('children')
+          ? (json['children'] as List)
+                .map((e) => Node.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
+      attributes: json.containsKey('attributes')
+          ? (json['attributes'] as List).map((e) => e as String).toList()
+          : null,
+      documentURL: json.containsKey('documentURL')
+          ? json['documentURL'] as String
+          : null,
       baseURL: json.containsKey('baseURL') ? json['baseURL'] as String : null,
-      publicId:
-          json.containsKey('publicId') ? json['publicId'] as String : null,
-      systemId:
-          json.containsKey('systemId') ? json['systemId'] as String : null,
-      internalSubset:
-          json.containsKey('internalSubset')
-              ? json['internalSubset'] as String
-              : null,
-      xmlVersion:
-          json.containsKey('xmlVersion') ? json['xmlVersion'] as String : null,
+      publicId: json.containsKey('publicId')
+          ? json['publicId'] as String
+          : null,
+      systemId: json.containsKey('systemId')
+          ? json['systemId'] as String
+          : null,
+      internalSubset: json.containsKey('internalSubset')
+          ? json['internalSubset'] as String
+          : null,
+      xmlVersion: json.containsKey('xmlVersion')
+          ? json['xmlVersion'] as String
+          : null,
       name: json.containsKey('name') ? json['name'] as String : null,
       value: json.containsKey('value') ? json['value'] as String : null,
-      pseudoType:
-          json.containsKey('pseudoType')
-              ? PseudoType.fromJson(json['pseudoType'] as String)
-              : null,
-      pseudoIdentifier:
-          json.containsKey('pseudoIdentifier')
-              ? json['pseudoIdentifier'] as String
-              : null,
-      shadowRootType:
-          json.containsKey('shadowRootType')
-              ? ShadowRootType.fromJson(json['shadowRootType'] as String)
-              : null,
-      frameId:
-          json.containsKey('frameId')
-              ? page.FrameId.fromJson(json['frameId'] as String)
-              : null,
-      contentDocument:
-          json.containsKey('contentDocument')
-              ? Node.fromJson(json['contentDocument'] as Map<String, dynamic>)
-              : null,
-      shadowRoots:
-          json.containsKey('shadowRoots')
-              ? (json['shadowRoots'] as List)
-                  .map((e) => Node.fromJson(e as Map<String, dynamic>))
-                  .toList()
-              : null,
-      templateContent:
-          json.containsKey('templateContent')
-              ? Node.fromJson(json['templateContent'] as Map<String, dynamic>)
-              : null,
-      pseudoElements:
-          json.containsKey('pseudoElements')
-              ? (json['pseudoElements'] as List)
-                  .map((e) => Node.fromJson(e as Map<String, dynamic>))
-                  .toList()
-              : null,
-      distributedNodes:
-          json.containsKey('distributedNodes')
-              ? (json['distributedNodes'] as List)
-                  .map((e) => BackendNode.fromJson(e as Map<String, dynamic>))
-                  .toList()
-              : null,
+      pseudoType: json.containsKey('pseudoType')
+          ? PseudoType.fromJson(json['pseudoType'] as String)
+          : null,
+      pseudoIdentifier: json.containsKey('pseudoIdentifier')
+          ? json['pseudoIdentifier'] as String
+          : null,
+      shadowRootType: json.containsKey('shadowRootType')
+          ? ShadowRootType.fromJson(json['shadowRootType'] as String)
+          : null,
+      frameId: json.containsKey('frameId')
+          ? page.FrameId.fromJson(json['frameId'] as String)
+          : null,
+      contentDocument: json.containsKey('contentDocument')
+          ? Node.fromJson(json['contentDocument'] as Map<String, dynamic>)
+          : null,
+      shadowRoots: json.containsKey('shadowRoots')
+          ? (json['shadowRoots'] as List)
+                .map((e) => Node.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
+      templateContent: json.containsKey('templateContent')
+          ? Node.fromJson(json['templateContent'] as Map<String, dynamic>)
+          : null,
+      pseudoElements: json.containsKey('pseudoElements')
+          ? (json['pseudoElements'] as List)
+                .map((e) => Node.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
+      distributedNodes: json.containsKey('distributedNodes')
+          ? (json['distributedNodes'] as List)
+                .map((e) => BackendNode.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
       isSVG: json.containsKey('isSVG') ? json['isSVG'] as bool : null,
-      compatibilityMode:
-          json.containsKey('compatibilityMode')
-              ? CompatibilityMode.fromJson(json['compatibilityMode'] as String)
-              : null,
-      assignedSlot:
-          json.containsKey('assignedSlot')
-              ? BackendNode.fromJson(
-                json['assignedSlot'] as Map<String, dynamic>,
-              )
-              : null,
-      isScrollable:
-          json.containsKey('isScrollable')
-              ? json['isScrollable'] as bool
-              : null,
+      compatibilityMode: json.containsKey('compatibilityMode')
+          ? CompatibilityMode.fromJson(json['compatibilityMode'] as String)
+          : null,
+      assignedSlot: json.containsKey('assignedSlot')
+          ? BackendNode.fromJson(json['assignedSlot'] as Map<String, dynamic>)
+          : null,
+      isScrollable: json.containsKey('isScrollable')
+          ? json['isScrollable'] as bool
+          : null,
     );
   }
 
@@ -1611,10 +1589,9 @@ class DetachedElementInfo {
   factory DetachedElementInfo.fromJson(Map<String, dynamic> json) {
     return DetachedElementInfo(
       treeNode: Node.fromJson(json['treeNode'] as Map<String, dynamic>),
-      retainedNodeIds:
-          (json['retainedNodeIds'] as List)
-              .map((e) => NodeId.fromJson(e as int))
-              .toList(),
+      retainedNodeIds: (json['retainedNodeIds'] as List)
+          .map((e) => NodeId.fromJson(e as int))
+          .toList(),
     );
   }
 
@@ -1705,12 +1682,11 @@ class BoxModel {
       margin: Quad.fromJson(json['margin'] as List),
       width: json['width'] as int,
       height: json['height'] as int,
-      shapeOutside:
-          json.containsKey('shapeOutside')
-              ? ShapeOutsideInfo.fromJson(
-                json['shapeOutside'] as Map<String, dynamic>,
-              )
-              : null,
+      shapeOutside: json.containsKey('shapeOutside')
+          ? ShapeOutsideInfo.fromJson(
+              json['shapeOutside'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -1748,8 +1724,9 @@ class ShapeOutsideInfo {
     return ShapeOutsideInfo(
       bounds: Quad.fromJson(json['bounds'] as List),
       shape: (json['shape'] as List).map((e) => e as dynamic).toList(),
-      marginShape:
-          (json['marginShape'] as List).map((e) => e as dynamic).toList(),
+      marginShape: (json['marginShape'] as List)
+          .map((e) => e as dynamic)
+          .toList(),
     );
   }
 

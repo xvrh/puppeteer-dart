@@ -443,15 +443,13 @@ class TouchPoint {
       y: json['y'] as num,
       radiusX: json.containsKey('radiusX') ? json['radiusX'] as num : null,
       radiusY: json.containsKey('radiusY') ? json['radiusY'] as num : null,
-      rotationAngle:
-          json.containsKey('rotationAngle')
-              ? json['rotationAngle'] as num
-              : null,
+      rotationAngle: json.containsKey('rotationAngle')
+          ? json['rotationAngle'] as num
+          : null,
       force: json.containsKey('force') ? json['force'] as num : null,
-      tangentialPressure:
-          json.containsKey('tangentialPressure')
-              ? json['tangentialPressure'] as num
-              : null,
+      tangentialPressure: json.containsKey('tangentialPressure')
+          ? json['tangentialPressure'] as num
+          : null,
       tiltX: json.containsKey('tiltX') ? json['tiltX'] as num : null,
       tiltY: json.containsKey('tiltY') ? json['tiltY'] as num : null,
       twist: json.containsKey('twist') ? json['twist'] as int : null,
@@ -576,14 +574,12 @@ class DragData {
 
   factory DragData.fromJson(Map<String, dynamic> json) {
     return DragData(
-      items:
-          (json['items'] as List)
-              .map((e) => DragDataItem.fromJson(e as Map<String, dynamic>))
-              .toList(),
-      files:
-          json.containsKey('files')
-              ? (json['files'] as List).map((e) => e as String).toList()
-              : null,
+      items: (json['items'] as List)
+          .map((e) => DragDataItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      files: json.containsKey('files')
+          ? (json['files'] as List).map((e) => e as String).toList()
+          : null,
       dragOperationsMask: json['dragOperationsMask'] as int,
     );
   }

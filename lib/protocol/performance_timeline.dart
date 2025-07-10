@@ -65,13 +65,13 @@ class LargestContentfulPaint {
       renderTime: network.TimeSinceEpoch.fromJson(json['renderTime'] as num),
       loadTime: network.TimeSinceEpoch.fromJson(json['loadTime'] as num),
       size: json['size'] as num,
-      elementId:
-          json.containsKey('elementId') ? json['elementId'] as String : null,
+      elementId: json.containsKey('elementId')
+          ? json['elementId'] as String
+          : null,
       url: json.containsKey('url') ? json['url'] as String : null,
-      nodeId:
-          json.containsKey('nodeId')
-              ? dom.BackendNodeId.fromJson(json['nodeId'] as int)
-              : null,
+      nodeId: json.containsKey('nodeId')
+          ? dom.BackendNodeId.fromJson(json['nodeId'] as int)
+          : null,
     );
   }
 
@@ -108,10 +108,9 @@ class LayoutShiftAttribution {
       currentRect: dom.Rect.fromJson(
         json['currentRect'] as Map<String, dynamic>,
       ),
-      nodeId:
-          json.containsKey('nodeId')
-              ? dom.BackendNodeId.fromJson(json['nodeId'] as int)
-              : null,
+      nodeId: json.containsKey('nodeId')
+          ? dom.BackendNodeId.fromJson(json['nodeId'] as int)
+          : null,
     );
   }
 
@@ -149,13 +148,11 @@ class LayoutShift {
       lastInputTime: network.TimeSinceEpoch.fromJson(
         json['lastInputTime'] as num,
       ),
-      sources:
-          (json['sources'] as List)
-              .map(
-                (e) =>
-                    LayoutShiftAttribution.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
+      sources: (json['sources'] as List)
+          .map(
+            (e) => LayoutShiftAttribution.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
     );
   }
 
@@ -207,18 +204,16 @@ class TimelineEvent {
       name: json['name'] as String,
       time: network.TimeSinceEpoch.fromJson(json['time'] as num),
       duration: json.containsKey('duration') ? json['duration'] as num : null,
-      lcpDetails:
-          json.containsKey('lcpDetails')
-              ? LargestContentfulPaint.fromJson(
-                json['lcpDetails'] as Map<String, dynamic>,
-              )
-              : null,
-      layoutShiftDetails:
-          json.containsKey('layoutShiftDetails')
-              ? LayoutShift.fromJson(
-                json['layoutShiftDetails'] as Map<String, dynamic>,
-              )
-              : null,
+      lcpDetails: json.containsKey('lcpDetails')
+          ? LargestContentfulPaint.fromJson(
+              json['lcpDetails'] as Map<String, dynamic>,
+            )
+          : null,
+      layoutShiftDetails: json.containsKey('layoutShiftDetails')
+          ? LayoutShift.fromJson(
+              json['layoutShiftDetails'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 

@@ -304,18 +304,17 @@ async function _(element, pageJavascriptEnabled) {
     var layoutViewport = layoutMetrics.cssLayoutViewport;
 
     // Filter out quads that have too small area to click into.
-    var pointsList =
-        quads
-            .map(quadToPoints)
-            .map(
-              (quad) => _intersectQuadWithViewport(
-                quad,
-                layoutViewport.clientWidth,
-                layoutViewport.clientHeight,
-              ),
-            )
-            .where((quad) => _computeQuadArea(quad) > 1)
-            .toList();
+    var pointsList = quads
+        .map(quadToPoints)
+        .map(
+          (quad) => _intersectQuadWithViewport(
+            quad,
+            layoutViewport.clientWidth,
+            layoutViewport.clientHeight,
+          ),
+        )
+        .where((quad) => _computeQuadArea(quad) > 1)
+        .toList();
     if (pointsList.isEmpty) {
       throw NodeIsNotVisibleException();
     }

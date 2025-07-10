@@ -170,16 +170,12 @@ class SamplingProfile {
 
   factory SamplingProfile.fromJson(Map<String, dynamic> json) {
     return SamplingProfile(
-      samples:
-          (json['samples'] as List)
-              .map(
-                (e) => SamplingProfileNode.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
-      modules:
-          (json['modules'] as List)
-              .map((e) => Module.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      samples: (json['samples'] as List)
+          .map((e) => SamplingProfileNode.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      modules: (json['modules'] as List)
+          .map((e) => Module.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 

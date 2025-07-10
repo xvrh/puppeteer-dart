@@ -21,10 +21,9 @@ String? convertToFunctionDeclaration(String javascript) {
       var functionBody = tokens.whereType<_FunctionBody>().single;
       var isAsync = tokens.contains(_isAsync);
 
-      var body =
-          hasBodyStatement
-              ? '{ ${functionBody.value}'
-              : '{ return ${functionBody.value} }';
+      var body = hasBodyStatement
+          ? '{ ${functionBody.value}'
+          : '{ return ${functionBody.value} }';
 
       var argumentString = arguments.arguments;
       if (!argumentString.startsWith('(')) {

@@ -356,9 +356,10 @@ final _devToolRegExp = RegExp(r'^DevTools listening on (ws://.*)$');
 
 Future<String> _waitForWebSocketUrl(Process chromeProcess) async {
   var accumulatedLines = <String>[];
-  await for (String line in chromeProcess.stderr
-      .transform(Utf8Decoder())
-      .transform(LineSplitter())) {
+  await for (String line
+      in chromeProcess.stderr
+          .transform(Utf8Decoder())
+          .transform(LineSplitter())) {
     accumulatedLines.add(line);
     _logger.warning('[Chrome stderr]: $line');
     var match = _devToolRegExp.firstMatch(line);
@@ -408,15 +409,14 @@ class LaunchOptions {
   }) {
     return LaunchOptions(
       args: args ?? this.args,
-      defaultViewport:
-          identical(defaultViewport, viewportNotOverride)
-              ? this.defaultViewport
-              : defaultViewport,
+      defaultViewport: identical(defaultViewport, viewportNotOverride)
+          ? this.defaultViewport
+          : defaultViewport,
     );
   }
 
   DeviceViewport? get computedDefaultViewport =>
       identical(defaultViewport, LaunchOptions.viewportNotSpecified)
-          ? DeviceViewport()
-          : defaultViewport;
+      ? DeviceViewport()
+      : defaultViewport;
 }

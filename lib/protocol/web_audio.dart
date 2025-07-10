@@ -212,14 +212,12 @@ class NodesConnectedEvent {
       contextId: GraphObjectId.fromJson(json['contextId'] as String),
       sourceId: GraphObjectId.fromJson(json['sourceId'] as String),
       destinationId: GraphObjectId.fromJson(json['destinationId'] as String),
-      sourceOutputIndex:
-          json.containsKey('sourceOutputIndex')
-              ? json['sourceOutputIndex'] as num
-              : null,
-      destinationInputIndex:
-          json.containsKey('destinationInputIndex')
-              ? json['destinationInputIndex'] as num
-              : null,
+      sourceOutputIndex: json.containsKey('sourceOutputIndex')
+          ? json['sourceOutputIndex'] as num
+          : null,
+      destinationInputIndex: json.containsKey('destinationInputIndex')
+          ? json['destinationInputIndex'] as num
+          : null,
     );
   }
 }
@@ -248,14 +246,12 @@ class NodesDisconnectedEvent {
       contextId: GraphObjectId.fromJson(json['contextId'] as String),
       sourceId: GraphObjectId.fromJson(json['sourceId'] as String),
       destinationId: GraphObjectId.fromJson(json['destinationId'] as String),
-      sourceOutputIndex:
-          json.containsKey('sourceOutputIndex')
-              ? json['sourceOutputIndex'] as num
-              : null,
-      destinationInputIndex:
-          json.containsKey('destinationInputIndex')
-              ? json['destinationInputIndex'] as num
-              : null,
+      sourceOutputIndex: json.containsKey('sourceOutputIndex')
+          ? json['sourceOutputIndex'] as num
+          : null,
+      destinationInputIndex: json.containsKey('destinationInputIndex')
+          ? json['destinationInputIndex'] as num
+          : null,
     );
   }
 }
@@ -281,10 +277,9 @@ class NodeParamConnectedEvent {
       contextId: GraphObjectId.fromJson(json['contextId'] as String),
       sourceId: GraphObjectId.fromJson(json['sourceId'] as String),
       destinationId: GraphObjectId.fromJson(json['destinationId'] as String),
-      sourceOutputIndex:
-          json.containsKey('sourceOutputIndex')
-              ? json['sourceOutputIndex'] as num
-              : null,
+      sourceOutputIndex: json.containsKey('sourceOutputIndex')
+          ? json['sourceOutputIndex'] as num
+          : null,
     );
   }
 }
@@ -310,10 +305,9 @@ class NodeParamDisconnectedEvent {
       contextId: GraphObjectId.fromJson(json['contextId'] as String),
       sourceId: GraphObjectId.fromJson(json['sourceId'] as String),
       destinationId: GraphObjectId.fromJson(json['destinationId'] as String),
-      sourceOutputIndex:
-          json.containsKey('sourceOutputIndex')
-              ? json['sourceOutputIndex'] as num
-              : null,
+      sourceOutputIndex: json.containsKey('sourceOutputIndex')
+          ? json['sourceOutputIndex'] as num
+          : null,
     );
   }
 }
@@ -508,12 +502,11 @@ class BaseAudioContext {
       contextId: GraphObjectId.fromJson(json['contextId'] as String),
       contextType: ContextType.fromJson(json['contextType'] as String),
       contextState: ContextState.fromJson(json['contextState'] as String),
-      realtimeData:
-          json.containsKey('realtimeData')
-              ? ContextRealtimeData.fromJson(
-                json['realtimeData'] as Map<String, dynamic>,
-              )
-              : null,
+      realtimeData: json.containsKey('realtimeData')
+          ? ContextRealtimeData.fromJson(
+              json['realtimeData'] as Map<String, dynamic>,
+            )
+          : null,
       callbackBufferSize: json['callbackBufferSize'] as num,
       maxOutputChannelCount: json['maxOutputChannelCount'] as num,
       sampleRate: json['sampleRate'] as num,

@@ -15,10 +15,9 @@ class HeapProfilerApi {
   Stream<List<int>> get onHeapStatsUpdate => _client.onEvent
       .where((event) => event.name == 'HeapProfiler.heapStatsUpdate')
       .map(
-        (event) =>
-            (event.parameters['statsUpdate'] as List)
-                .map((e) => e as int)
-                .toList(),
+        (event) => (event.parameters['statsUpdate'] as List)
+            .map((e) => e as int)
+            .toList(),
       );
 
   /// If heap objects tracking has been started then backend regularly sends a current value for last
@@ -259,13 +258,11 @@ class SamplingHeapProfileNode {
       ),
       selfSize: json['selfSize'] as num,
       id: json['id'] as int,
-      children:
-          (json['children'] as List)
-              .map(
-                (e) =>
-                    SamplingHeapProfileNode.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
+      children: (json['children'] as List)
+          .map(
+            (e) => SamplingHeapProfileNode.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
     );
   }
 
@@ -323,14 +320,12 @@ class SamplingHeapProfile {
       head: SamplingHeapProfileNode.fromJson(
         json['head'] as Map<String, dynamic>,
       ),
-      samples:
-          (json['samples'] as List)
-              .map(
-                (e) => SamplingHeapProfileSample.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+      samples: (json['samples'] as List)
+          .map(
+            (e) =>
+                SamplingHeapProfileSample.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
     );
   }
 

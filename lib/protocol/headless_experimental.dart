@@ -62,10 +62,9 @@ class BeginFrameResult {
   factory BeginFrameResult.fromJson(Map<String, dynamic> json) {
     return BeginFrameResult(
       hasDamage: json['hasDamage'] as bool? ?? false,
-      screenshotData:
-          json.containsKey('screenshotData')
-              ? json['screenshotData'] as String
-              : null,
+      screenshotData: json.containsKey('screenshotData')
+          ? json['screenshotData'] as String
+          : null,
     );
   }
 }
@@ -85,15 +84,13 @@ class ScreenshotParams {
 
   factory ScreenshotParams.fromJson(Map<String, dynamic> json) {
     return ScreenshotParams(
-      format:
-          json.containsKey('format')
-              ? ScreenshotParamsFormat.fromJson(json['format'] as String)
-              : null,
+      format: json.containsKey('format')
+          ? ScreenshotParamsFormat.fromJson(json['format'] as String)
+          : null,
       quality: json.containsKey('quality') ? json['quality'] as int : null,
-      optimizeForSpeed:
-          json.containsKey('optimizeForSpeed')
-              ? json['optimizeForSpeed'] as bool
-              : null,
+      optimizeForSpeed: json.containsKey('optimizeForSpeed')
+          ? json['optimizeForSpeed'] as bool
+          : null,
     );
   }
 

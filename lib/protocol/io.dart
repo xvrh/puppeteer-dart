@@ -51,10 +51,9 @@ class ReadResult {
 
   factory ReadResult.fromJson(Map<String, dynamic> json) {
     return ReadResult(
-      base64Encoded:
-          json.containsKey('base64Encoded')
-              ? json['base64Encoded'] as bool
-              : null,
+      base64Encoded: json.containsKey('base64Encoded')
+          ? json['base64Encoded'] as bool
+          : null,
       data: json['data'] as String,
       eof: json['eof'] as bool? ?? false,
     );

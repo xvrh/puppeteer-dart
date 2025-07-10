@@ -203,10 +203,9 @@ class RequestDataResult {
 
   factory RequestDataResult.fromJson(Map<String, dynamic> json) {
     return RequestDataResult(
-      objectStoreDataEntries:
-          (json['objectStoreDataEntries'] as List)
-              .map((e) => DataEntry.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      objectStoreDataEntries: (json['objectStoreDataEntries'] as List)
+          .map((e) => DataEntry.fromJson(e as Map<String, dynamic>))
+          .toList(),
       hasMore: json['hasMore'] as bool? ?? false,
     );
   }
@@ -256,10 +255,9 @@ class DatabaseWithObjectStores {
     return DatabaseWithObjectStores(
       name: json['name'] as String,
       version: json['version'] as num,
-      objectStores:
-          (json['objectStores'] as List)
-              .map((e) => ObjectStore.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      objectStores: (json['objectStores'] as List)
+          .map((e) => ObjectStore.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -298,10 +296,9 @@ class ObjectStore {
       name: json['name'] as String,
       keyPath: KeyPath.fromJson(json['keyPath'] as Map<String, dynamic>),
       autoIncrement: json['autoIncrement'] as bool? ?? false,
-      indexes:
-          (json['indexes'] as List)
-              .map((e) => ObjectStoreIndex.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      indexes: (json['indexes'] as List)
+          .map((e) => ObjectStoreIndex.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -380,12 +377,11 @@ class Key {
       number: json.containsKey('number') ? json['number'] as num : null,
       string: json.containsKey('string') ? json['string'] as String : null,
       date: json.containsKey('date') ? json['date'] as num : null,
-      array:
-          json.containsKey('array')
-              ? (json['array'] as List)
-                  .map((e) => Key.fromJson(e as Map<String, dynamic>))
-                  .toList()
-              : null,
+      array: json.containsKey('array')
+          ? (json['array'] as List)
+                .map((e) => Key.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
     );
   }
 
@@ -442,14 +438,12 @@ class KeyRange {
 
   factory KeyRange.fromJson(Map<String, dynamic> json) {
     return KeyRange(
-      lower:
-          json.containsKey('lower')
-              ? Key.fromJson(json['lower'] as Map<String, dynamic>)
-              : null,
-      upper:
-          json.containsKey('upper')
-              ? Key.fromJson(json['upper'] as Map<String, dynamic>)
-              : null,
+      lower: json.containsKey('lower')
+          ? Key.fromJson(json['lower'] as Map<String, dynamic>)
+          : null,
+      upper: json.containsKey('upper')
+          ? Key.fromJson(json['upper'] as Map<String, dynamic>)
+          : null,
       lowerOpen: json['lowerOpen'] as bool? ?? false,
       upperOpen: json['upperOpen'] as bool? ?? false,
     );
@@ -516,10 +510,9 @@ class KeyPath {
     return KeyPath(
       type: KeyPathType.fromJson(json['type'] as String),
       string: json.containsKey('string') ? json['string'] as String : null,
-      array:
-          json.containsKey('array')
-              ? (json['array'] as List).map((e) => e as String).toList()
-              : null,
+      array: json.containsKey('array')
+          ? (json['array'] as List).map((e) => e as String).toList()
+          : null,
     );
   }
 

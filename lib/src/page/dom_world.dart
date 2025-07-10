@@ -215,8 +215,8 @@ async function _(url, type) {
     }
 
     var addScriptContent =
-    //language=js
-    '''
+        //language=js
+        '''
 function _(content, type) {
   const script = document.createElement('script');
   script.type = type;
@@ -280,8 +280,8 @@ async function _(url) {
     }
 
     var addStyleContent =
-    //language=js
-    '''
+        //language=js
+        '''
 async function _(content) {
   const style = document.createElement('style');
   style.type = 'text/css';
@@ -412,8 +412,8 @@ async function _(content) {
   }
 
   static final _predicate =
-  //language=js
-  '''
+      //language=js
+      '''
 function _(selectorOrXPath, isXPath, waitForVisible, waitForHidden) {
   const node = isXPath
     ? document.evaluate(selectorOrXPath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
@@ -449,8 +449,9 @@ function _(selectorOrXPath, isXPath, waitForVisible, waitForHidden) {
     var waitForVisible = visible ?? false;
     var waitForHidden = hidden ?? false;
 
-    var polling =
-        waitForVisible || waitForHidden ? Polling.everyFrame : Polling.mutation;
+    var polling = waitForVisible || waitForHidden
+        ? Polling.everyFrame
+        : Polling.mutation;
     var title =
         '${isXPath ? 'XPath' : 'selector'} "$selectorOrXPath"${waitForHidden ? ' to be hidden' : ''}';
     var waitTask = WaitTask(
@@ -573,8 +574,8 @@ class WaitTask {
 }
 
 final _waitForPredicatePageFunction =
-//language=js
-'''
+    //language=js
+    '''
 async function _(predicateBody, polling, timeout, ...args) {
   const predicate = new Function('...args', predicateBody);
   let timedOut = false;

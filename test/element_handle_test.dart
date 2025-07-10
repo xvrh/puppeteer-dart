@@ -126,8 +126,7 @@ void main() {
 
       // Step 2: Add div and position it absolutely inside frame.
       var frame = page.frames[1];
-      var divHandle =
-          (await frame.evaluateHandle('''() => {
+      var divHandle = (await frame.evaluateHandle('''() => {
   var div = document.createElement('div');
   document.body.appendChild(div);
   div.style = `

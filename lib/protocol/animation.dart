@@ -185,17 +185,15 @@ class Animation {
       startTime: json['startTime'] as num,
       currentTime: json['currentTime'] as num,
       type: AnimationType.fromJson(json['type'] as String),
-      source:
-          json.containsKey('source')
-              ? AnimationEffect.fromJson(json['source'] as Map<String, dynamic>)
-              : null,
+      source: json.containsKey('source')
+          ? AnimationEffect.fromJson(json['source'] as Map<String, dynamic>)
+          : null,
       cssId: json.containsKey('cssId') ? json['cssId'] as String : null,
-      viewOrScrollTimeline:
-          json.containsKey('viewOrScrollTimeline')
-              ? ViewOrScrollTimeline.fromJson(
-                json['viewOrScrollTimeline'] as Map<String, dynamic>,
-              )
-              : null,
+      viewOrScrollTimeline: json.containsKey('viewOrScrollTimeline')
+          ? ViewOrScrollTimeline.fromJson(
+              json['viewOrScrollTimeline'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -266,18 +264,18 @@ class ViewOrScrollTimeline {
 
   factory ViewOrScrollTimeline.fromJson(Map<String, dynamic> json) {
     return ViewOrScrollTimeline(
-      sourceNodeId:
-          json.containsKey('sourceNodeId')
-              ? dom.BackendNodeId.fromJson(json['sourceNodeId'] as int)
-              : null,
-      startOffset:
-          json.containsKey('startOffset') ? json['startOffset'] as num : null,
-      endOffset:
-          json.containsKey('endOffset') ? json['endOffset'] as num : null,
-      subjectNodeId:
-          json.containsKey('subjectNodeId')
-              ? dom.BackendNodeId.fromJson(json['subjectNodeId'] as int)
-              : null,
+      sourceNodeId: json.containsKey('sourceNodeId')
+          ? dom.BackendNodeId.fromJson(json['sourceNodeId'] as int)
+          : null,
+      startOffset: json.containsKey('startOffset')
+          ? json['startOffset'] as num
+          : null,
+      endOffset: json.containsKey('endOffset')
+          ? json['endOffset'] as num
+          : null,
+      subjectNodeId: json.containsKey('subjectNodeId')
+          ? dom.BackendNodeId.fromJson(json['subjectNodeId'] as int)
+          : null,
       axis: dom.ScrollOrientation.fromJson(json['axis'] as String),
     );
   }
@@ -350,16 +348,14 @@ class AnimationEffect {
       duration: json['duration'] as num,
       direction: json['direction'] as String,
       fill: json['fill'] as String,
-      backendNodeId:
-          json.containsKey('backendNodeId')
-              ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
-              : null,
-      keyframesRule:
-          json.containsKey('keyframesRule')
-              ? KeyframesRule.fromJson(
-                json['keyframesRule'] as Map<String, dynamic>,
-              )
-              : null,
+      backendNodeId: json.containsKey('backendNodeId')
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
+          : null,
+      keyframesRule: json.containsKey('keyframesRule')
+          ? KeyframesRule.fromJson(
+              json['keyframesRule'] as Map<String, dynamic>,
+            )
+          : null,
       easing: json['easing'] as String,
     );
   }
@@ -393,10 +389,9 @@ class KeyframesRule {
   factory KeyframesRule.fromJson(Map<String, dynamic> json) {
     return KeyframesRule(
       name: json.containsKey('name') ? json['name'] as String : null,
-      keyframes:
-          (json['keyframes'] as List)
-              .map((e) => KeyframeStyle.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      keyframes: (json['keyframes'] as List)
+          .map((e) => KeyframeStyle.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 

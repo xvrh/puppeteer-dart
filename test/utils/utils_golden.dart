@@ -4,17 +4,15 @@ import 'package:image/image.dart';
 import 'package:test/test.dart';
 import 'pixel_match.dart';
 
-final bool _updateGolden =
-    (() {
-      var env = Platform.environment['PUPPETEER_UPDATE_GOLDEN'];
-      return env != null && env != 'false';
-    })();
+final bool _updateGolden = (() {
+  var env = Platform.environment['PUPPETEER_UPDATE_GOLDEN'];
+  return env != null && env != 'false';
+})();
 
-final bool _skipGoldenComparison =
-    (() {
-      var env = Platform.environment['PUPPETEER_SKIP_GOLDEN_COMPARISON'];
-      return env != null && env != 'false';
-    })();
+final bool _skipGoldenComparison = (() {
+  var env = Platform.environment['PUPPETEER_SKIP_GOLDEN_COMPARISON'];
+  return env != null && env != 'false';
+})();
 
 class _GoldenMatcher extends Matcher {
   final String goldenPath;

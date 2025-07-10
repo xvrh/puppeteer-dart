@@ -49,10 +49,9 @@ void main() {
         request.continueRequest();
       });
       await page.setRequestInterception(true);
-      var requestPromise =
-          page.onRequest.where((request) {
-            return request.url.contains('requestFromOOPIF');
-          }).first;
+      var requestPromise = page.onRequest.where((request) {
+        return request.url.contains('requestFromOOPIF');
+      }).first;
       await page.goto('${server.prefix}/dynamic-oopif.html');
       var frame = await framePromise;
       var request = await requestPromise;

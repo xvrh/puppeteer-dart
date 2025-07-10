@@ -153,10 +153,9 @@ class ExecutionContext {
           "Javascript expression can't have arguments ($pageFunction)",
         );
 
-        var pageFunctionWithSourceUrl =
-            sourceUrlRegExp.hasMatch(pageFunction)
-                ? pageFunction
-                : '$pageFunction\n$suffix';
+        var pageFunctionWithSourceUrl = sourceUrlRegExp.hasMatch(pageFunction)
+            ? pageFunction
+            : '$pageFunction\n$suffix';
 
         var response = await runtimeApi.evaluate(
           pageFunctionWithSourceUrl,

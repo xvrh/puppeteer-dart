@@ -464,88 +464,62 @@ class GridHighlightConfig {
 
   factory GridHighlightConfig.fromJson(Map<String, dynamic> json) {
     return GridHighlightConfig(
-      showGridExtensionLines:
-          json.containsKey('showGridExtensionLines')
-              ? json['showGridExtensionLines'] as bool
-              : null,
-      showPositiveLineNumbers:
-          json.containsKey('showPositiveLineNumbers')
-              ? json['showPositiveLineNumbers'] as bool
-              : null,
-      showNegativeLineNumbers:
-          json.containsKey('showNegativeLineNumbers')
-              ? json['showNegativeLineNumbers'] as bool
-              : null,
-      showAreaNames:
-          json.containsKey('showAreaNames')
-              ? json['showAreaNames'] as bool
-              : null,
-      showLineNames:
-          json.containsKey('showLineNames')
-              ? json['showLineNames'] as bool
-              : null,
-      showTrackSizes:
-          json.containsKey('showTrackSizes')
-              ? json['showTrackSizes'] as bool
-              : null,
-      gridBorderColor:
-          json.containsKey('gridBorderColor')
-              ? dom.RGBA.fromJson(
-                json['gridBorderColor'] as Map<String, dynamic>,
-              )
-              : null,
-      rowLineColor:
-          json.containsKey('rowLineColor')
-              ? dom.RGBA.fromJson(json['rowLineColor'] as Map<String, dynamic>)
-              : null,
-      columnLineColor:
-          json.containsKey('columnLineColor')
-              ? dom.RGBA.fromJson(
-                json['columnLineColor'] as Map<String, dynamic>,
-              )
-              : null,
-      gridBorderDash:
-          json.containsKey('gridBorderDash')
-              ? json['gridBorderDash'] as bool
-              : null,
-      rowLineDash:
-          json.containsKey('rowLineDash') ? json['rowLineDash'] as bool : null,
-      columnLineDash:
-          json.containsKey('columnLineDash')
-              ? json['columnLineDash'] as bool
-              : null,
-      rowGapColor:
-          json.containsKey('rowGapColor')
-              ? dom.RGBA.fromJson(json['rowGapColor'] as Map<String, dynamic>)
-              : null,
-      rowHatchColor:
-          json.containsKey('rowHatchColor')
-              ? dom.RGBA.fromJson(json['rowHatchColor'] as Map<String, dynamic>)
-              : null,
-      columnGapColor:
-          json.containsKey('columnGapColor')
-              ? dom.RGBA.fromJson(
-                json['columnGapColor'] as Map<String, dynamic>,
-              )
-              : null,
-      columnHatchColor:
-          json.containsKey('columnHatchColor')
-              ? dom.RGBA.fromJson(
-                json['columnHatchColor'] as Map<String, dynamic>,
-              )
-              : null,
-      areaBorderColor:
-          json.containsKey('areaBorderColor')
-              ? dom.RGBA.fromJson(
-                json['areaBorderColor'] as Map<String, dynamic>,
-              )
-              : null,
-      gridBackgroundColor:
-          json.containsKey('gridBackgroundColor')
-              ? dom.RGBA.fromJson(
-                json['gridBackgroundColor'] as Map<String, dynamic>,
-              )
-              : null,
+      showGridExtensionLines: json.containsKey('showGridExtensionLines')
+          ? json['showGridExtensionLines'] as bool
+          : null,
+      showPositiveLineNumbers: json.containsKey('showPositiveLineNumbers')
+          ? json['showPositiveLineNumbers'] as bool
+          : null,
+      showNegativeLineNumbers: json.containsKey('showNegativeLineNumbers')
+          ? json['showNegativeLineNumbers'] as bool
+          : null,
+      showAreaNames: json.containsKey('showAreaNames')
+          ? json['showAreaNames'] as bool
+          : null,
+      showLineNames: json.containsKey('showLineNames')
+          ? json['showLineNames'] as bool
+          : null,
+      showTrackSizes: json.containsKey('showTrackSizes')
+          ? json['showTrackSizes'] as bool
+          : null,
+      gridBorderColor: json.containsKey('gridBorderColor')
+          ? dom.RGBA.fromJson(json['gridBorderColor'] as Map<String, dynamic>)
+          : null,
+      rowLineColor: json.containsKey('rowLineColor')
+          ? dom.RGBA.fromJson(json['rowLineColor'] as Map<String, dynamic>)
+          : null,
+      columnLineColor: json.containsKey('columnLineColor')
+          ? dom.RGBA.fromJson(json['columnLineColor'] as Map<String, dynamic>)
+          : null,
+      gridBorderDash: json.containsKey('gridBorderDash')
+          ? json['gridBorderDash'] as bool
+          : null,
+      rowLineDash: json.containsKey('rowLineDash')
+          ? json['rowLineDash'] as bool
+          : null,
+      columnLineDash: json.containsKey('columnLineDash')
+          ? json['columnLineDash'] as bool
+          : null,
+      rowGapColor: json.containsKey('rowGapColor')
+          ? dom.RGBA.fromJson(json['rowGapColor'] as Map<String, dynamic>)
+          : null,
+      rowHatchColor: json.containsKey('rowHatchColor')
+          ? dom.RGBA.fromJson(json['rowHatchColor'] as Map<String, dynamic>)
+          : null,
+      columnGapColor: json.containsKey('columnGapColor')
+          ? dom.RGBA.fromJson(json['columnGapColor'] as Map<String, dynamic>)
+          : null,
+      columnHatchColor: json.containsKey('columnHatchColor')
+          ? dom.RGBA.fromJson(json['columnHatchColor'] as Map<String, dynamic>)
+          : null,
+      areaBorderColor: json.containsKey('areaBorderColor')
+          ? dom.RGBA.fromJson(json['areaBorderColor'] as Map<String, dynamic>)
+          : null,
+      gridBackgroundColor: json.containsKey('gridBackgroundColor')
+          ? dom.RGBA.fromJson(
+              json['gridBackgroundColor'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -617,52 +591,34 @@ class FlexContainerHighlightConfig {
 
   factory FlexContainerHighlightConfig.fromJson(Map<String, dynamic> json) {
     return FlexContainerHighlightConfig(
-      containerBorder:
-          json.containsKey('containerBorder')
-              ? LineStyle.fromJson(
-                json['containerBorder'] as Map<String, dynamic>,
-              )
-              : null,
-      lineSeparator:
-          json.containsKey('lineSeparator')
-              ? LineStyle.fromJson(
-                json['lineSeparator'] as Map<String, dynamic>,
-              )
-              : null,
-      itemSeparator:
-          json.containsKey('itemSeparator')
-              ? LineStyle.fromJson(
-                json['itemSeparator'] as Map<String, dynamic>,
-              )
-              : null,
-      mainDistributedSpace:
-          json.containsKey('mainDistributedSpace')
-              ? BoxStyle.fromJson(
-                json['mainDistributedSpace'] as Map<String, dynamic>,
-              )
-              : null,
-      crossDistributedSpace:
-          json.containsKey('crossDistributedSpace')
-              ? BoxStyle.fromJson(
-                json['crossDistributedSpace'] as Map<String, dynamic>,
-              )
-              : null,
-      rowGapSpace:
-          json.containsKey('rowGapSpace')
-              ? BoxStyle.fromJson(json['rowGapSpace'] as Map<String, dynamic>)
-              : null,
-      columnGapSpace:
-          json.containsKey('columnGapSpace')
-              ? BoxStyle.fromJson(
-                json['columnGapSpace'] as Map<String, dynamic>,
-              )
-              : null,
-      crossAlignment:
-          json.containsKey('crossAlignment')
-              ? LineStyle.fromJson(
-                json['crossAlignment'] as Map<String, dynamic>,
-              )
-              : null,
+      containerBorder: json.containsKey('containerBorder')
+          ? LineStyle.fromJson(json['containerBorder'] as Map<String, dynamic>)
+          : null,
+      lineSeparator: json.containsKey('lineSeparator')
+          ? LineStyle.fromJson(json['lineSeparator'] as Map<String, dynamic>)
+          : null,
+      itemSeparator: json.containsKey('itemSeparator')
+          ? LineStyle.fromJson(json['itemSeparator'] as Map<String, dynamic>)
+          : null,
+      mainDistributedSpace: json.containsKey('mainDistributedSpace')
+          ? BoxStyle.fromJson(
+              json['mainDistributedSpace'] as Map<String, dynamic>,
+            )
+          : null,
+      crossDistributedSpace: json.containsKey('crossDistributedSpace')
+          ? BoxStyle.fromJson(
+              json['crossDistributedSpace'] as Map<String, dynamic>,
+            )
+          : null,
+      rowGapSpace: json.containsKey('rowGapSpace')
+          ? BoxStyle.fromJson(json['rowGapSpace'] as Map<String, dynamic>)
+          : null,
+      columnGapSpace: json.containsKey('columnGapSpace')
+          ? BoxStyle.fromJson(json['columnGapSpace'] as Map<String, dynamic>)
+          : null,
+      crossAlignment: json.containsKey('crossAlignment')
+          ? LineStyle.fromJson(json['crossAlignment'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -701,22 +657,15 @@ class FlexItemHighlightConfig {
 
   factory FlexItemHighlightConfig.fromJson(Map<String, dynamic> json) {
     return FlexItemHighlightConfig(
-      baseSizeBox:
-          json.containsKey('baseSizeBox')
-              ? BoxStyle.fromJson(json['baseSizeBox'] as Map<String, dynamic>)
-              : null,
-      baseSizeBorder:
-          json.containsKey('baseSizeBorder')
-              ? LineStyle.fromJson(
-                json['baseSizeBorder'] as Map<String, dynamic>,
-              )
-              : null,
-      flexibilityArrow:
-          json.containsKey('flexibilityArrow')
-              ? LineStyle.fromJson(
-                json['flexibilityArrow'] as Map<String, dynamic>,
-              )
-              : null,
+      baseSizeBox: json.containsKey('baseSizeBox')
+          ? BoxStyle.fromJson(json['baseSizeBox'] as Map<String, dynamic>)
+          : null,
+      baseSizeBorder: json.containsKey('baseSizeBorder')
+          ? LineStyle.fromJson(json['baseSizeBorder'] as Map<String, dynamic>)
+          : null,
+      flexibilityArrow: json.containsKey('flexibilityArrow')
+          ? LineStyle.fromJson(json['flexibilityArrow'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -742,14 +691,12 @@ class LineStyle {
 
   factory LineStyle.fromJson(Map<String, dynamic> json) {
     return LineStyle(
-      color:
-          json.containsKey('color')
-              ? dom.RGBA.fromJson(json['color'] as Map<String, dynamic>)
-              : null,
-      pattern:
-          json.containsKey('pattern')
-              ? LineStylePattern.fromJson(json['pattern'] as String)
-              : null,
+      color: json.containsKey('color')
+          ? dom.RGBA.fromJson(json['color'] as Map<String, dynamic>)
+          : null,
+      pattern: json.containsKey('pattern')
+          ? LineStylePattern.fromJson(json['pattern'] as String)
+          : null,
     );
   }
 
@@ -790,14 +737,12 @@ class BoxStyle {
 
   factory BoxStyle.fromJson(Map<String, dynamic> json) {
     return BoxStyle(
-      fillColor:
-          json.containsKey('fillColor')
-              ? dom.RGBA.fromJson(json['fillColor'] as Map<String, dynamic>)
-              : null,
-      hatchColor:
-          json.containsKey('hatchColor')
-              ? dom.RGBA.fromJson(json['hatchColor'] as Map<String, dynamic>)
-              : null,
+      fillColor: json.containsKey('fillColor')
+          ? dom.RGBA.fromJson(json['fillColor'] as Map<String, dynamic>)
+          : null,
+      hatchColor: json.containsKey('hatchColor')
+          ? dom.RGBA.fromJson(json['hatchColor'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -912,87 +857,71 @@ class HighlightConfig {
   factory HighlightConfig.fromJson(Map<String, dynamic> json) {
     return HighlightConfig(
       showInfo: json.containsKey('showInfo') ? json['showInfo'] as bool : null,
-      showStyles:
-          json.containsKey('showStyles') ? json['showStyles'] as bool : null,
-      showRulers:
-          json.containsKey('showRulers') ? json['showRulers'] as bool : null,
-      showAccessibilityInfo:
-          json.containsKey('showAccessibilityInfo')
-              ? json['showAccessibilityInfo'] as bool
-              : null,
-      showExtensionLines:
-          json.containsKey('showExtensionLines')
-              ? json['showExtensionLines'] as bool
-              : null,
-      contentColor:
-          json.containsKey('contentColor')
-              ? dom.RGBA.fromJson(json['contentColor'] as Map<String, dynamic>)
-              : null,
-      paddingColor:
-          json.containsKey('paddingColor')
-              ? dom.RGBA.fromJson(json['paddingColor'] as Map<String, dynamic>)
-              : null,
-      borderColor:
-          json.containsKey('borderColor')
-              ? dom.RGBA.fromJson(json['borderColor'] as Map<String, dynamic>)
-              : null,
-      marginColor:
-          json.containsKey('marginColor')
-              ? dom.RGBA.fromJson(json['marginColor'] as Map<String, dynamic>)
-              : null,
-      eventTargetColor:
-          json.containsKey('eventTargetColor')
-              ? dom.RGBA.fromJson(
-                json['eventTargetColor'] as Map<String, dynamic>,
-              )
-              : null,
-      shapeColor:
-          json.containsKey('shapeColor')
-              ? dom.RGBA.fromJson(json['shapeColor'] as Map<String, dynamic>)
-              : null,
-      shapeMarginColor:
-          json.containsKey('shapeMarginColor')
-              ? dom.RGBA.fromJson(
-                json['shapeMarginColor'] as Map<String, dynamic>,
-              )
-              : null,
-      cssGridColor:
-          json.containsKey('cssGridColor')
-              ? dom.RGBA.fromJson(json['cssGridColor'] as Map<String, dynamic>)
-              : null,
-      colorFormat:
-          json.containsKey('colorFormat')
-              ? ColorFormat.fromJson(json['colorFormat'] as String)
-              : null,
-      gridHighlightConfig:
-          json.containsKey('gridHighlightConfig')
-              ? GridHighlightConfig.fromJson(
-                json['gridHighlightConfig'] as Map<String, dynamic>,
-              )
-              : null,
+      showStyles: json.containsKey('showStyles')
+          ? json['showStyles'] as bool
+          : null,
+      showRulers: json.containsKey('showRulers')
+          ? json['showRulers'] as bool
+          : null,
+      showAccessibilityInfo: json.containsKey('showAccessibilityInfo')
+          ? json['showAccessibilityInfo'] as bool
+          : null,
+      showExtensionLines: json.containsKey('showExtensionLines')
+          ? json['showExtensionLines'] as bool
+          : null,
+      contentColor: json.containsKey('contentColor')
+          ? dom.RGBA.fromJson(json['contentColor'] as Map<String, dynamic>)
+          : null,
+      paddingColor: json.containsKey('paddingColor')
+          ? dom.RGBA.fromJson(json['paddingColor'] as Map<String, dynamic>)
+          : null,
+      borderColor: json.containsKey('borderColor')
+          ? dom.RGBA.fromJson(json['borderColor'] as Map<String, dynamic>)
+          : null,
+      marginColor: json.containsKey('marginColor')
+          ? dom.RGBA.fromJson(json['marginColor'] as Map<String, dynamic>)
+          : null,
+      eventTargetColor: json.containsKey('eventTargetColor')
+          ? dom.RGBA.fromJson(json['eventTargetColor'] as Map<String, dynamic>)
+          : null,
+      shapeColor: json.containsKey('shapeColor')
+          ? dom.RGBA.fromJson(json['shapeColor'] as Map<String, dynamic>)
+          : null,
+      shapeMarginColor: json.containsKey('shapeMarginColor')
+          ? dom.RGBA.fromJson(json['shapeMarginColor'] as Map<String, dynamic>)
+          : null,
+      cssGridColor: json.containsKey('cssGridColor')
+          ? dom.RGBA.fromJson(json['cssGridColor'] as Map<String, dynamic>)
+          : null,
+      colorFormat: json.containsKey('colorFormat')
+          ? ColorFormat.fromJson(json['colorFormat'] as String)
+          : null,
+      gridHighlightConfig: json.containsKey('gridHighlightConfig')
+          ? GridHighlightConfig.fromJson(
+              json['gridHighlightConfig'] as Map<String, dynamic>,
+            )
+          : null,
       flexContainerHighlightConfig:
           json.containsKey('flexContainerHighlightConfig')
-              ? FlexContainerHighlightConfig.fromJson(
-                json['flexContainerHighlightConfig'] as Map<String, dynamic>,
-              )
-              : null,
-      flexItemHighlightConfig:
-          json.containsKey('flexItemHighlightConfig')
-              ? FlexItemHighlightConfig.fromJson(
-                json['flexItemHighlightConfig'] as Map<String, dynamic>,
-              )
-              : null,
-      contrastAlgorithm:
-          json.containsKey('contrastAlgorithm')
-              ? ContrastAlgorithm.fromJson(json['contrastAlgorithm'] as String)
-              : null,
+          ? FlexContainerHighlightConfig.fromJson(
+              json['flexContainerHighlightConfig'] as Map<String, dynamic>,
+            )
+          : null,
+      flexItemHighlightConfig: json.containsKey('flexItemHighlightConfig')
+          ? FlexItemHighlightConfig.fromJson(
+              json['flexItemHighlightConfig'] as Map<String, dynamic>,
+            )
+          : null,
+      contrastAlgorithm: json.containsKey('contrastAlgorithm')
+          ? ContrastAlgorithm.fromJson(json['contrastAlgorithm'] as String)
+          : null,
       containerQueryContainerHighlightConfig:
           json.containsKey('containerQueryContainerHighlightConfig')
-              ? ContainerQueryContainerHighlightConfig.fromJson(
-                json['containerQueryContainerHighlightConfig']
-                    as Map<String, dynamic>,
-              )
-              : null,
+          ? ContainerQueryContainerHighlightConfig.fromJson(
+              json['containerQueryContainerHighlightConfig']
+                  as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -1132,30 +1061,20 @@ class ScrollSnapContainerHighlightConfig {
     Map<String, dynamic> json,
   ) {
     return ScrollSnapContainerHighlightConfig(
-      snapportBorder:
-          json.containsKey('snapportBorder')
-              ? LineStyle.fromJson(
-                json['snapportBorder'] as Map<String, dynamic>,
-              )
-              : null,
-      snapAreaBorder:
-          json.containsKey('snapAreaBorder')
-              ? LineStyle.fromJson(
-                json['snapAreaBorder'] as Map<String, dynamic>,
-              )
-              : null,
-      scrollMarginColor:
-          json.containsKey('scrollMarginColor')
-              ? dom.RGBA.fromJson(
-                json['scrollMarginColor'] as Map<String, dynamic>,
-              )
-              : null,
-      scrollPaddingColor:
-          json.containsKey('scrollPaddingColor')
-              ? dom.RGBA.fromJson(
-                json['scrollPaddingColor'] as Map<String, dynamic>,
-              )
-              : null,
+      snapportBorder: json.containsKey('snapportBorder')
+          ? LineStyle.fromJson(json['snapportBorder'] as Map<String, dynamic>)
+          : null,
+      snapAreaBorder: json.containsKey('snapAreaBorder')
+          ? LineStyle.fromJson(json['snapAreaBorder'] as Map<String, dynamic>)
+          : null,
+      scrollMarginColor: json.containsKey('scrollMarginColor')
+          ? dom.RGBA.fromJson(json['scrollMarginColor'] as Map<String, dynamic>)
+          : null,
+      scrollPaddingColor: json.containsKey('scrollPaddingColor')
+          ? dom.RGBA.fromJson(
+              json['scrollPaddingColor'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -1195,8 +1114,8 @@ class ScrollSnapHighlightConfig {
 
   Map<String, dynamic> toJson() {
     return {
-      'scrollSnapContainerHighlightConfig':
-          scrollSnapContainerHighlightConfig.toJson(),
+      'scrollSnapContainerHighlightConfig': scrollSnapContainerHighlightConfig
+          .toJson(),
       'nodeId': nodeId.toJson(),
     };
   }
@@ -1218,14 +1137,12 @@ class HingeConfig {
   factory HingeConfig.fromJson(Map<String, dynamic> json) {
     return HingeConfig(
       rect: dom.Rect.fromJson(json['rect'] as Map<String, dynamic>),
-      contentColor:
-          json.containsKey('contentColor')
-              ? dom.RGBA.fromJson(json['contentColor'] as Map<String, dynamic>)
-              : null,
-      outlineColor:
-          json.containsKey('outlineColor')
-              ? dom.RGBA.fromJson(json['outlineColor'] as Map<String, dynamic>)
-              : null,
+      contentColor: json.containsKey('contentColor')
+          ? dom.RGBA.fromJson(json['contentColor'] as Map<String, dynamic>)
+          : null,
+      outlineColor: json.containsKey('outlineColor')
+          ? dom.RGBA.fromJson(json['outlineColor'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -1321,18 +1238,12 @@ class ContainerQueryContainerHighlightConfig {
     Map<String, dynamic> json,
   ) {
     return ContainerQueryContainerHighlightConfig(
-      containerBorder:
-          json.containsKey('containerBorder')
-              ? LineStyle.fromJson(
-                json['containerBorder'] as Map<String, dynamic>,
-              )
-              : null,
-      descendantBorder:
-          json.containsKey('descendantBorder')
-              ? LineStyle.fromJson(
-                json['descendantBorder'] as Map<String, dynamic>,
-              )
-              : null,
+      containerBorder: json.containsKey('containerBorder')
+          ? LineStyle.fromJson(json['containerBorder'] as Map<String, dynamic>)
+          : null,
+      descendantBorder: json.containsKey('descendantBorder')
+          ? LineStyle.fromJson(json['descendantBorder'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -1392,20 +1303,17 @@ class IsolationModeHighlightConfig {
 
   factory IsolationModeHighlightConfig.fromJson(Map<String, dynamic> json) {
     return IsolationModeHighlightConfig(
-      resizerColor:
-          json.containsKey('resizerColor')
-              ? dom.RGBA.fromJson(json['resizerColor'] as Map<String, dynamic>)
-              : null,
-      resizerHandleColor:
-          json.containsKey('resizerHandleColor')
-              ? dom.RGBA.fromJson(
-                json['resizerHandleColor'] as Map<String, dynamic>,
-              )
-              : null,
-      maskColor:
-          json.containsKey('maskColor')
-              ? dom.RGBA.fromJson(json['maskColor'] as Map<String, dynamic>)
-              : null,
+      resizerColor: json.containsKey('resizerColor')
+          ? dom.RGBA.fromJson(json['resizerColor'] as Map<String, dynamic>)
+          : null,
+      resizerHandleColor: json.containsKey('resizerHandleColor')
+          ? dom.RGBA.fromJson(
+              json['resizerHandleColor'] as Map<String, dynamic>,
+            )
+          : null,
+      maskColor: json.containsKey('maskColor')
+          ? dom.RGBA.fromJson(json['maskColor'] as Map<String, dynamic>)
+          : null,
     );
   }
 

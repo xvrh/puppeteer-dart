@@ -296,8 +296,9 @@ class DownloadProgressEvent {
       totalBytes: json['totalBytes'] as num,
       receivedBytes: json['receivedBytes'] as num,
       state: DownloadProgressEventState.fromJson(json['state'] as String),
-      filePath:
-          json.containsKey('filePath') ? json['filePath'] as String : null,
+      filePath: json.containsKey('filePath')
+          ? json['filePath'] as String
+          : null,
     );
   }
 }
@@ -412,10 +413,9 @@ class Bounds {
       top: json.containsKey('top') ? json['top'] as int : null,
       width: json.containsKey('width') ? json['width'] as int : null,
       height: json.containsKey('height') ? json['height'] as int : null,
-      windowState:
-          json.containsKey('windowState')
-              ? WindowState.fromJson(json['windowState'] as String)
-              : null,
+      windowState: json.containsKey('windowState')
+          ? WindowState.fromJson(json['windowState'] as String)
+          : null,
     );
   }
 
@@ -536,20 +536,18 @@ class PermissionDescriptor {
     return PermissionDescriptor(
       name: json['name'] as String,
       sysex: json.containsKey('sysex') ? json['sysex'] as bool : null,
-      userVisibleOnly:
-          json.containsKey('userVisibleOnly')
-              ? json['userVisibleOnly'] as bool
-              : null,
-      allowWithoutSanitization:
-          json.containsKey('allowWithoutSanitization')
-              ? json['allowWithoutSanitization'] as bool
-              : null,
-      allowWithoutGesture:
-          json.containsKey('allowWithoutGesture')
-              ? json['allowWithoutGesture'] as bool
-              : null,
-      panTiltZoom:
-          json.containsKey('panTiltZoom') ? json['panTiltZoom'] as bool : null,
+      userVisibleOnly: json.containsKey('userVisibleOnly')
+          ? json['userVisibleOnly'] as bool
+          : null,
+      allowWithoutSanitization: json.containsKey('allowWithoutSanitization')
+          ? json['allowWithoutSanitization'] as bool
+          : null,
+      allowWithoutGesture: json.containsKey('allowWithoutGesture')
+          ? json['allowWithoutGesture'] as bool
+          : null,
+      panTiltZoom: json.containsKey('panTiltZoom')
+          ? json['panTiltZoom'] as bool
+          : null,
     );
   }
 
@@ -638,10 +636,9 @@ class Histogram {
       name: json['name'] as String,
       sum: json['sum'] as int,
       count: json['count'] as int,
-      buckets:
-          (json['buckets'] as List)
-              .map((e) => Bucket.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      buckets: (json['buckets'] as List)
+          .map((e) => Bucket.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 

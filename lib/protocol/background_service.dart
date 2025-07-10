@@ -163,10 +163,9 @@ class BackgroundServiceEvent {
       service: ServiceName.fromJson(json['service'] as String),
       eventName: json['eventName'] as String,
       instanceId: json['instanceId'] as String,
-      eventMetadata:
-          (json['eventMetadata'] as List)
-              .map((e) => EventMetadata.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      eventMetadata: (json['eventMetadata'] as List)
+          .map((e) => EventMetadata.fromJson(e as Map<String, dynamic>))
+          .toList(),
       storageKey: json['storageKey'] as String,
     );
   }

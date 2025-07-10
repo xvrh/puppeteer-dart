@@ -135,10 +135,9 @@ class AffectedRequest {
 
   factory AffectedRequest.fromJson(Map<String, dynamic> json) {
     return AffectedRequest(
-      requestId:
-          json.containsKey('requestId')
-              ? network.RequestId.fromJson(json['requestId'] as String)
-              : null,
+      requestId: json.containsKey('requestId')
+          ? network.RequestId.fromJson(json['requestId'] as String)
+          : null,
       url: json['url'] as String,
     );
   }
@@ -283,10 +282,9 @@ class CookieIssueInsight {
   factory CookieIssueInsight.fromJson(Map<String, dynamic> json) {
     return CookieIssueInsight(
       type: InsightType.fromJson(json['type'] as String),
-      tableEntryUrl:
-          json.containsKey('tableEntryUrl')
-              ? json['tableEntryUrl'] as String
-              : null,
+      tableEntryUrl: json.containsKey('tableEntryUrl')
+          ? json['tableEntryUrl'] as String
+          : null,
     );
   }
 
@@ -341,50 +339,42 @@ class CookieIssueDetails {
 
   factory CookieIssueDetails.fromJson(Map<String, dynamic> json) {
     return CookieIssueDetails(
-      cookie:
-          json.containsKey('cookie')
-              ? AffectedCookie.fromJson(json['cookie'] as Map<String, dynamic>)
-              : null,
-      rawCookieLine:
-          json.containsKey('rawCookieLine')
-              ? json['rawCookieLine'] as String
-              : null,
-      cookieWarningReasons:
-          (json['cookieWarningReasons'] as List)
-              .map((e) => CookieWarningReason.fromJson(e as String))
-              .toList(),
-      cookieExclusionReasons:
-          (json['cookieExclusionReasons'] as List)
-              .map((e) => CookieExclusionReason.fromJson(e as String))
-              .toList(),
+      cookie: json.containsKey('cookie')
+          ? AffectedCookie.fromJson(json['cookie'] as Map<String, dynamic>)
+          : null,
+      rawCookieLine: json.containsKey('rawCookieLine')
+          ? json['rawCookieLine'] as String
+          : null,
+      cookieWarningReasons: (json['cookieWarningReasons'] as List)
+          .map((e) => CookieWarningReason.fromJson(e as String))
+          .toList(),
+      cookieExclusionReasons: (json['cookieExclusionReasons'] as List)
+          .map((e) => CookieExclusionReason.fromJson(e as String))
+          .toList(),
       operation: CookieOperation.fromJson(json['operation'] as String),
-      siteForCookies:
-          json.containsKey('siteForCookies')
-              ? json['siteForCookies'] as String
-              : null,
-      cookieUrl:
-          json.containsKey('cookieUrl') ? json['cookieUrl'] as String : null,
-      request:
-          json.containsKey('request')
-              ? AffectedRequest.fromJson(
-                json['request'] as Map<String, dynamic>,
-              )
-              : null,
-      insight:
-          json.containsKey('insight')
-              ? CookieIssueInsight.fromJson(
-                json['insight'] as Map<String, dynamic>,
-              )
-              : null,
+      siteForCookies: json.containsKey('siteForCookies')
+          ? json['siteForCookies'] as String
+          : null,
+      cookieUrl: json.containsKey('cookieUrl')
+          ? json['cookieUrl'] as String
+          : null,
+      request: json.containsKey('request')
+          ? AffectedRequest.fromJson(json['request'] as Map<String, dynamic>)
+          : null,
+      insight: json.containsKey('insight')
+          ? CookieIssueInsight.fromJson(json['insight'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'cookieWarningReasons':
-          cookieWarningReasons.map((e) => e.toJson()).toList(),
-      'cookieExclusionReasons':
-          cookieExclusionReasons.map((e) => e.toJson()).toList(),
+      'cookieWarningReasons': cookieWarningReasons
+          .map((e) => e.toJson())
+          .toList(),
+      'cookieExclusionReasons': cookieExclusionReasons
+          .map((e) => e.toJson())
+          .toList(),
       'operation': operation.toJson(),
       if (cookie != null) 'cookie': cookie!.toJson(),
       if (rawCookieLine != null) 'rawCookieLine': rawCookieLine,
@@ -492,27 +482,20 @@ class MixedContentIssueDetails {
 
   factory MixedContentIssueDetails.fromJson(Map<String, dynamic> json) {
     return MixedContentIssueDetails(
-      resourceType:
-          json.containsKey('resourceType')
-              ? MixedContentResourceType.fromJson(
-                json['resourceType'] as String,
-              )
-              : null,
+      resourceType: json.containsKey('resourceType')
+          ? MixedContentResourceType.fromJson(json['resourceType'] as String)
+          : null,
       resolutionStatus: MixedContentResolutionStatus.fromJson(
         json['resolutionStatus'] as String,
       ),
       insecureURL: json['insecureURL'] as String,
       mainResourceURL: json['mainResourceURL'] as String,
-      request:
-          json.containsKey('request')
-              ? AffectedRequest.fromJson(
-                json['request'] as Map<String, dynamic>,
-              )
-              : null,
-      frame:
-          json.containsKey('frame')
-              ? AffectedFrame.fromJson(json['frame'] as Map<String, dynamic>)
-              : null,
+      request: json.containsKey('request')
+          ? AffectedRequest.fromJson(json['request'] as Map<String, dynamic>)
+          : null,
+      frame: json.containsKey('frame')
+          ? AffectedFrame.fromJson(json['frame'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -585,18 +568,12 @@ class BlockedByResponseIssueDetails {
       request: AffectedRequest.fromJson(
         json['request'] as Map<String, dynamic>,
       ),
-      parentFrame:
-          json.containsKey('parentFrame')
-              ? AffectedFrame.fromJson(
-                json['parentFrame'] as Map<String, dynamic>,
-              )
-              : null,
-      blockedFrame:
-          json.containsKey('blockedFrame')
-              ? AffectedFrame.fromJson(
-                json['blockedFrame'] as Map<String, dynamic>,
-              )
-              : null,
+      parentFrame: json.containsKey('parentFrame')
+          ? AffectedFrame.fromJson(json['parentFrame'] as Map<String, dynamic>)
+          : null,
+      blockedFrame: json.containsKey('blockedFrame')
+          ? AffectedFrame.fromJson(json['blockedFrame'] as Map<String, dynamic>)
+          : null,
       reason: BlockedByResponseReason.fromJson(json['reason'] as String),
     );
   }
@@ -723,10 +700,9 @@ class SourceCodeLocation {
 
   factory SourceCodeLocation.fromJson(Map<String, dynamic> json) {
     return SourceCodeLocation(
-      scriptId:
-          json.containsKey('scriptId')
-              ? runtime.ScriptId.fromJson(json['scriptId'] as String)
-              : null,
+      scriptId: json.containsKey('scriptId')
+          ? runtime.ScriptId.fromJson(json['scriptId'] as String)
+          : null,
       url: json['url'] as String,
       lineNumber: json['lineNumber'] as int,
       columnNumber: json['columnNumber'] as int,
@@ -774,30 +750,28 @@ class ContentSecurityPolicyIssueDetails {
     Map<String, dynamic> json,
   ) {
     return ContentSecurityPolicyIssueDetails(
-      blockedURL:
-          json.containsKey('blockedURL') ? json['blockedURL'] as String : null,
+      blockedURL: json.containsKey('blockedURL')
+          ? json['blockedURL'] as String
+          : null,
       violatedDirective: json['violatedDirective'] as String,
       isReportOnly: json['isReportOnly'] as bool? ?? false,
       contentSecurityPolicyViolationType:
           ContentSecurityPolicyViolationType.fromJson(
             json['contentSecurityPolicyViolationType'] as String,
           ),
-      frameAncestor:
-          json.containsKey('frameAncestor')
-              ? AffectedFrame.fromJson(
-                json['frameAncestor'] as Map<String, dynamic>,
-              )
-              : null,
-      sourceCodeLocation:
-          json.containsKey('sourceCodeLocation')
-              ? SourceCodeLocation.fromJson(
-                json['sourceCodeLocation'] as Map<String, dynamic>,
-              )
-              : null,
-      violatingNodeId:
-          json.containsKey('violatingNodeId')
-              ? dom.BackendNodeId.fromJson(json['violatingNodeId'] as int)
-              : null,
+      frameAncestor: json.containsKey('frameAncestor')
+          ? AffectedFrame.fromJson(
+              json['frameAncestor'] as Map<String, dynamic>,
+            )
+          : null,
+      sourceCodeLocation: json.containsKey('sourceCodeLocation')
+          ? SourceCodeLocation.fromJson(
+              json['sourceCodeLocation'] as Map<String, dynamic>,
+            )
+          : null,
+      violatingNodeId: json.containsKey('violatingNodeId')
+          ? dom.BackendNodeId.fromJson(json['violatingNodeId'] as int)
+          : null,
     );
   }
 
@@ -805,8 +779,8 @@ class ContentSecurityPolicyIssueDetails {
     return {
       'violatedDirective': violatedDirective,
       'isReportOnly': isReportOnly,
-      'contentSecurityPolicyViolationType':
-          contentSecurityPolicyViolationType.toJson(),
+      'contentSecurityPolicyViolationType': contentSecurityPolicyViolationType
+          .toJson(),
       if (blockedURL != null) 'blockedURL': blockedURL,
       if (frameAncestor != null) 'frameAncestor': frameAncestor!.toJson(),
       if (sourceCodeLocation != null)
@@ -955,28 +929,24 @@ class CorsIssueDetails {
       request: AffectedRequest.fromJson(
         json['request'] as Map<String, dynamic>,
       ),
-      location:
-          json.containsKey('location')
-              ? SourceCodeLocation.fromJson(
-                json['location'] as Map<String, dynamic>,
-              )
-              : null,
-      initiatorOrigin:
-          json.containsKey('initiatorOrigin')
-              ? json['initiatorOrigin'] as String
-              : null,
-      resourceIPAddressSpace:
-          json.containsKey('resourceIPAddressSpace')
-              ? network.IPAddressSpace.fromJson(
-                json['resourceIPAddressSpace'] as String,
-              )
-              : null,
-      clientSecurityState:
-          json.containsKey('clientSecurityState')
-              ? network.ClientSecurityState.fromJson(
-                json['clientSecurityState'] as Map<String, dynamic>,
-              )
-              : null,
+      location: json.containsKey('location')
+          ? SourceCodeLocation.fromJson(
+              json['location'] as Map<String, dynamic>,
+            )
+          : null,
+      initiatorOrigin: json.containsKey('initiatorOrigin')
+          ? json['initiatorOrigin'] as String
+          : null,
+      resourceIPAddressSpace: json.containsKey('resourceIPAddressSpace')
+          ? network.IPAddressSpace.fromJson(
+              json['resourceIPAddressSpace'] as String,
+            )
+          : null,
+      clientSecurityState: json.containsKey('clientSecurityState')
+          ? network.ClientSecurityState.fromJson(
+              json['clientSecurityState'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -1152,20 +1122,15 @@ class AttributionReportingIssueDetails {
       violationType: AttributionReportingIssueType.fromJson(
         json['violationType'] as String,
       ),
-      request:
-          json.containsKey('request')
-              ? AffectedRequest.fromJson(
-                json['request'] as Map<String, dynamic>,
-              )
-              : null,
-      violatingNodeId:
-          json.containsKey('violatingNodeId')
-              ? dom.BackendNodeId.fromJson(json['violatingNodeId'] as int)
-              : null,
-      invalidParameter:
-          json.containsKey('invalidParameter')
-              ? json['invalidParameter'] as String
-              : null,
+      request: json.containsKey('request')
+          ? AffectedRequest.fromJson(json['request'] as Map<String, dynamic>)
+          : null,
+      violatingNodeId: json.containsKey('violatingNodeId')
+          ? dom.BackendNodeId.fromJson(json['violatingNodeId'] as int)
+          : null,
+      invalidParameter: json.containsKey('invalidParameter')
+          ? json['invalidParameter'] as String
+          : null,
     );
   }
 
@@ -1233,12 +1198,11 @@ class NavigatorUserAgentIssueDetails {
   factory NavigatorUserAgentIssueDetails.fromJson(Map<String, dynamic> json) {
     return NavigatorUserAgentIssueDetails(
       url: json['url'] as String,
-      location:
-          json.containsKey('location')
-              ? SourceCodeLocation.fromJson(
-                json['location'] as Map<String, dynamic>,
-              )
-              : null,
+      location: json.containsKey('location')
+          ? SourceCodeLocation.fromJson(
+              json['location'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -1296,10 +1260,9 @@ class SRIMessageSignatureIssueDetails {
     return SRIMessageSignatureIssueDetails(
       error: SRIMessageSignatureError.fromJson(json['error'] as String),
       signatureBase: json['signatureBase'] as String,
-      integrityAssertions:
-          (json['integrityAssertions'] as List)
-              .map((e) => e as String)
-              .toList(),
+      integrityAssertions: (json['integrityAssertions'] as List)
+          .map((e) => e as String)
+          .toList(),
       request: AffectedRequest.fromJson(
         json['request'] as Map<String, dynamic>,
       ),
@@ -1374,24 +1337,18 @@ class GenericIssueDetails {
   factory GenericIssueDetails.fromJson(Map<String, dynamic> json) {
     return GenericIssueDetails(
       errorType: GenericIssueErrorType.fromJson(json['errorType'] as String),
-      frameId:
-          json.containsKey('frameId')
-              ? page.FrameId.fromJson(json['frameId'] as String)
-              : null,
-      violatingNodeId:
-          json.containsKey('violatingNodeId')
-              ? dom.BackendNodeId.fromJson(json['violatingNodeId'] as int)
-              : null,
-      violatingNodeAttribute:
-          json.containsKey('violatingNodeAttribute')
-              ? json['violatingNodeAttribute'] as String
-              : null,
-      request:
-          json.containsKey('request')
-              ? AffectedRequest.fromJson(
-                json['request'] as Map<String, dynamic>,
-              )
-              : null,
+      frameId: json.containsKey('frameId')
+          ? page.FrameId.fromJson(json['frameId'] as String)
+          : null,
+      violatingNodeId: json.containsKey('violatingNodeId')
+          ? dom.BackendNodeId.fromJson(json['violatingNodeId'] as int)
+          : null,
+      violatingNodeAttribute: json.containsKey('violatingNodeAttribute')
+          ? json['violatingNodeAttribute'] as String
+          : null,
+      request: json.containsKey('request')
+          ? AffectedRequest.fromJson(json['request'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -1425,12 +1382,11 @@ class DeprecationIssueDetails {
 
   factory DeprecationIssueDetails.fromJson(Map<String, dynamic> json) {
     return DeprecationIssueDetails(
-      affectedFrame:
-          json.containsKey('affectedFrame')
-              ? AffectedFrame.fromJson(
-                json['affectedFrame'] as Map<String, dynamic>,
-              )
-              : null,
+      affectedFrame: json.containsKey('affectedFrame')
+          ? AffectedFrame.fromJson(
+              json['affectedFrame'] as Map<String, dynamic>,
+            )
+          : null,
       sourceCodeLocation: SourceCodeLocation.fromJson(
         json['sourceCodeLocation'] as Map<String, dynamic>,
       ),
@@ -1459,8 +1415,9 @@ class BounceTrackingIssueDetails {
 
   factory BounceTrackingIssueDetails.fromJson(Map<String, dynamic> json) {
     return BounceTrackingIssueDetails(
-      trackingSites:
-          (json['trackingSites'] as List).map((e) => e as String).toList(),
+      trackingSites: (json['trackingSites'] as List)
+          .map((e) => e as String)
+          .toList(),
     );
   }
 
@@ -1496,8 +1453,9 @@ class CookieDeprecationMetadataIssueDetails {
     Map<String, dynamic> json,
   ) {
     return CookieDeprecationMetadataIssueDetails(
-      allowedSites:
-          (json['allowedSites'] as List).map((e) => e as String).toList(),
+      allowedSites: (json['allowedSites'] as List)
+          .map((e) => e as String)
+          .toList(),
       optOutPercentage: json['optOutPercentage'] as num,
       isOptOutTopLevel: json['isOptOutTopLevel'] as bool? ?? false,
       operation: CookieOperation.fromJson(json['operation'] as String),
@@ -1548,8 +1506,8 @@ class FederatedAuthRequestIssueDetails {
 
   Map<String, dynamic> toJson() {
     return {
-      'federatedAuthRequestIssueReason':
-          federatedAuthRequestIssueReason.toJson(),
+      'federatedAuthRequestIssueReason': federatedAuthRequestIssueReason
+          .toJson(),
     };
   }
 }
@@ -1729,10 +1687,9 @@ class FailedRequestInfo {
     return FailedRequestInfo(
       url: json['url'] as String,
       failureMessage: json['failureMessage'] as String,
-      requestId:
-          json.containsKey('requestId')
-              ? network.RequestId.fromJson(json['requestId'] as String)
-              : null,
+      requestId: json.containsKey('requestId')
+          ? network.RequestId.fromJson(json['requestId'] as String)
+          : null,
     );
   }
 
@@ -1894,12 +1851,11 @@ class StylesheetLoadingIssueDetails {
       styleSheetLoadingIssueReason: StyleSheetLoadingIssueReason.fromJson(
         json['styleSheetLoadingIssueReason'] as String,
       ),
-      failedRequestInfo:
-          json.containsKey('failedRequestInfo')
-              ? FailedRequestInfo.fromJson(
-                json['failedRequestInfo'] as Map<String, dynamic>,
-              )
-              : null,
+      failedRequestInfo: json.containsKey('failedRequestInfo')
+          ? FailedRequestInfo.fromJson(
+              json['failedRequestInfo'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -1958,10 +1914,9 @@ class PropertyRuleIssueDetails {
       propertyRuleIssueReason: PropertyRuleIssueReason.fromJson(
         json['propertyRuleIssueReason'] as String,
       ),
-      propertyValue:
-          json.containsKey('propertyValue')
-              ? json['propertyValue'] as String
-              : null,
+      propertyValue: json.containsKey('propertyValue')
+          ? json['propertyValue'] as String
+          : null,
     );
   }
 
@@ -2004,12 +1959,9 @@ class UserReidentificationIssueDetails {
   factory UserReidentificationIssueDetails.fromJson(Map<String, dynamic> json) {
     return UserReidentificationIssueDetails(
       type: UserReidentificationIssueType.fromJson(json['type'] as String),
-      request:
-          json.containsKey('request')
-              ? AffectedRequest.fromJson(
-                json['request'] as Map<String, dynamic>,
-              )
-              : null,
+      request: json.containsKey('request')
+          ? AffectedRequest.fromJson(json['request'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -2148,157 +2100,143 @@ class InspectorIssueDetails {
 
   factory InspectorIssueDetails.fromJson(Map<String, dynamic> json) {
     return InspectorIssueDetails(
-      cookieIssueDetails:
-          json.containsKey('cookieIssueDetails')
-              ? CookieIssueDetails.fromJson(
-                json['cookieIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
-      mixedContentIssueDetails:
-          json.containsKey('mixedContentIssueDetails')
-              ? MixedContentIssueDetails.fromJson(
-                json['mixedContentIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
+      cookieIssueDetails: json.containsKey('cookieIssueDetails')
+          ? CookieIssueDetails.fromJson(
+              json['cookieIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
+      mixedContentIssueDetails: json.containsKey('mixedContentIssueDetails')
+          ? MixedContentIssueDetails.fromJson(
+              json['mixedContentIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
       blockedByResponseIssueDetails:
           json.containsKey('blockedByResponseIssueDetails')
-              ? BlockedByResponseIssueDetails.fromJson(
-                json['blockedByResponseIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
-      heavyAdIssueDetails:
-          json.containsKey('heavyAdIssueDetails')
-              ? HeavyAdIssueDetails.fromJson(
-                json['heavyAdIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
+          ? BlockedByResponseIssueDetails.fromJson(
+              json['blockedByResponseIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
+      heavyAdIssueDetails: json.containsKey('heavyAdIssueDetails')
+          ? HeavyAdIssueDetails.fromJson(
+              json['heavyAdIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
       contentSecurityPolicyIssueDetails:
           json.containsKey('contentSecurityPolicyIssueDetails')
-              ? ContentSecurityPolicyIssueDetails.fromJson(
-                json['contentSecurityPolicyIssueDetails']
-                    as Map<String, dynamic>,
-              )
-              : null,
+          ? ContentSecurityPolicyIssueDetails.fromJson(
+              json['contentSecurityPolicyIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
       sharedArrayBufferIssueDetails:
           json.containsKey('sharedArrayBufferIssueDetails')
-              ? SharedArrayBufferIssueDetails.fromJson(
-                json['sharedArrayBufferIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
+          ? SharedArrayBufferIssueDetails.fromJson(
+              json['sharedArrayBufferIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
       lowTextContrastIssueDetails:
           json.containsKey('lowTextContrastIssueDetails')
-              ? LowTextContrastIssueDetails.fromJson(
-                json['lowTextContrastIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
-      corsIssueDetails:
-          json.containsKey('corsIssueDetails')
-              ? CorsIssueDetails.fromJson(
-                json['corsIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
+          ? LowTextContrastIssueDetails.fromJson(
+              json['lowTextContrastIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
+      corsIssueDetails: json.containsKey('corsIssueDetails')
+          ? CorsIssueDetails.fromJson(
+              json['corsIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
       attributionReportingIssueDetails:
           json.containsKey('attributionReportingIssueDetails')
-              ? AttributionReportingIssueDetails.fromJson(
-                json['attributionReportingIssueDetails']
-                    as Map<String, dynamic>,
-              )
-              : null,
-      quirksModeIssueDetails:
-          json.containsKey('quirksModeIssueDetails')
-              ? QuirksModeIssueDetails.fromJson(
-                json['quirksModeIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
+          ? AttributionReportingIssueDetails.fromJson(
+              json['attributionReportingIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
+      quirksModeIssueDetails: json.containsKey('quirksModeIssueDetails')
+          ? QuirksModeIssueDetails.fromJson(
+              json['quirksModeIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
       partitioningBlobURLIssueDetails:
           json.containsKey('partitioningBlobURLIssueDetails')
-              ? PartitioningBlobURLIssueDetails.fromJson(
-                json['partitioningBlobURLIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
-      genericIssueDetails:
-          json.containsKey('genericIssueDetails')
-              ? GenericIssueDetails.fromJson(
-                json['genericIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
-      deprecationIssueDetails:
-          json.containsKey('deprecationIssueDetails')
-              ? DeprecationIssueDetails.fromJson(
-                json['deprecationIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
-      clientHintIssueDetails:
-          json.containsKey('clientHintIssueDetails')
-              ? ClientHintIssueDetails.fromJson(
-                json['clientHintIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
+          ? PartitioningBlobURLIssueDetails.fromJson(
+              json['partitioningBlobURLIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
+      genericIssueDetails: json.containsKey('genericIssueDetails')
+          ? GenericIssueDetails.fromJson(
+              json['genericIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
+      deprecationIssueDetails: json.containsKey('deprecationIssueDetails')
+          ? DeprecationIssueDetails.fromJson(
+              json['deprecationIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
+      clientHintIssueDetails: json.containsKey('clientHintIssueDetails')
+          ? ClientHintIssueDetails.fromJson(
+              json['clientHintIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
       federatedAuthRequestIssueDetails:
           json.containsKey('federatedAuthRequestIssueDetails')
-              ? FederatedAuthRequestIssueDetails.fromJson(
-                json['federatedAuthRequestIssueDetails']
-                    as Map<String, dynamic>,
-              )
-              : null,
-      bounceTrackingIssueDetails:
-          json.containsKey('bounceTrackingIssueDetails')
-              ? BounceTrackingIssueDetails.fromJson(
-                json['bounceTrackingIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
+          ? FederatedAuthRequestIssueDetails.fromJson(
+              json['federatedAuthRequestIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
+      bounceTrackingIssueDetails: json.containsKey('bounceTrackingIssueDetails')
+          ? BounceTrackingIssueDetails.fromJson(
+              json['bounceTrackingIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
       cookieDeprecationMetadataIssueDetails:
           json.containsKey('cookieDeprecationMetadataIssueDetails')
-              ? CookieDeprecationMetadataIssueDetails.fromJson(
-                json['cookieDeprecationMetadataIssueDetails']
-                    as Map<String, dynamic>,
-              )
-              : null,
+          ? CookieDeprecationMetadataIssueDetails.fromJson(
+              json['cookieDeprecationMetadataIssueDetails']
+                  as Map<String, dynamic>,
+            )
+          : null,
       stylesheetLoadingIssueDetails:
           json.containsKey('stylesheetLoadingIssueDetails')
-              ? StylesheetLoadingIssueDetails.fromJson(
-                json['stylesheetLoadingIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
-      propertyRuleIssueDetails:
-          json.containsKey('propertyRuleIssueDetails')
-              ? PropertyRuleIssueDetails.fromJson(
-                json['propertyRuleIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
+          ? StylesheetLoadingIssueDetails.fromJson(
+              json['stylesheetLoadingIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
+      propertyRuleIssueDetails: json.containsKey('propertyRuleIssueDetails')
+          ? PropertyRuleIssueDetails.fromJson(
+              json['propertyRuleIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
       federatedAuthUserInfoRequestIssueDetails:
           json.containsKey('federatedAuthUserInfoRequestIssueDetails')
-              ? FederatedAuthUserInfoRequestIssueDetails.fromJson(
-                json['federatedAuthUserInfoRequestIssueDetails']
-                    as Map<String, dynamic>,
-              )
-              : null,
+          ? FederatedAuthUserInfoRequestIssueDetails.fromJson(
+              json['federatedAuthUserInfoRequestIssueDetails']
+                  as Map<String, dynamic>,
+            )
+          : null,
       sharedDictionaryIssueDetails:
           json.containsKey('sharedDictionaryIssueDetails')
-              ? SharedDictionaryIssueDetails.fromJson(
-                json['sharedDictionaryIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
+          ? SharedDictionaryIssueDetails.fromJson(
+              json['sharedDictionaryIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
       selectElementAccessibilityIssueDetails:
           json.containsKey('selectElementAccessibilityIssueDetails')
-              ? SelectElementAccessibilityIssueDetails.fromJson(
-                json['selectElementAccessibilityIssueDetails']
-                    as Map<String, dynamic>,
-              )
-              : null,
+          ? SelectElementAccessibilityIssueDetails.fromJson(
+              json['selectElementAccessibilityIssueDetails']
+                  as Map<String, dynamic>,
+            )
+          : null,
       sriMessageSignatureIssueDetails:
           json.containsKey('sriMessageSignatureIssueDetails')
-              ? SRIMessageSignatureIssueDetails.fromJson(
-                json['sriMessageSignatureIssueDetails'] as Map<String, dynamic>,
-              )
-              : null,
+          ? SRIMessageSignatureIssueDetails.fromJson(
+              json['sriMessageSignatureIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
       userReidentificationIssueDetails:
           json.containsKey('userReidentificationIssueDetails')
-              ? UserReidentificationIssueDetails.fromJson(
-                json['userReidentificationIssueDetails']
-                    as Map<String, dynamic>,
-              )
-              : null,
+          ? UserReidentificationIssueDetails.fromJson(
+              json['userReidentificationIssueDetails'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -2309,28 +2247,28 @@ class InspectorIssueDetails {
       if (mixedContentIssueDetails != null)
         'mixedContentIssueDetails': mixedContentIssueDetails!.toJson(),
       if (blockedByResponseIssueDetails != null)
-        'blockedByResponseIssueDetails':
-            blockedByResponseIssueDetails!.toJson(),
+        'blockedByResponseIssueDetails': blockedByResponseIssueDetails!
+            .toJson(),
       if (heavyAdIssueDetails != null)
         'heavyAdIssueDetails': heavyAdIssueDetails!.toJson(),
       if (contentSecurityPolicyIssueDetails != null)
-        'contentSecurityPolicyIssueDetails':
-            contentSecurityPolicyIssueDetails!.toJson(),
+        'contentSecurityPolicyIssueDetails': contentSecurityPolicyIssueDetails!
+            .toJson(),
       if (sharedArrayBufferIssueDetails != null)
-        'sharedArrayBufferIssueDetails':
-            sharedArrayBufferIssueDetails!.toJson(),
+        'sharedArrayBufferIssueDetails': sharedArrayBufferIssueDetails!
+            .toJson(),
       if (lowTextContrastIssueDetails != null)
         'lowTextContrastIssueDetails': lowTextContrastIssueDetails!.toJson(),
       if (corsIssueDetails != null)
         'corsIssueDetails': corsIssueDetails!.toJson(),
       if (attributionReportingIssueDetails != null)
-        'attributionReportingIssueDetails':
-            attributionReportingIssueDetails!.toJson(),
+        'attributionReportingIssueDetails': attributionReportingIssueDetails!
+            .toJson(),
       if (quirksModeIssueDetails != null)
         'quirksModeIssueDetails': quirksModeIssueDetails!.toJson(),
       if (partitioningBlobURLIssueDetails != null)
-        'partitioningBlobURLIssueDetails':
-            partitioningBlobURLIssueDetails!.toJson(),
+        'partitioningBlobURLIssueDetails': partitioningBlobURLIssueDetails!
+            .toJson(),
       if (genericIssueDetails != null)
         'genericIssueDetails': genericIssueDetails!.toJson(),
       if (deprecationIssueDetails != null)
@@ -2338,16 +2276,16 @@ class InspectorIssueDetails {
       if (clientHintIssueDetails != null)
         'clientHintIssueDetails': clientHintIssueDetails!.toJson(),
       if (federatedAuthRequestIssueDetails != null)
-        'federatedAuthRequestIssueDetails':
-            federatedAuthRequestIssueDetails!.toJson(),
+        'federatedAuthRequestIssueDetails': federatedAuthRequestIssueDetails!
+            .toJson(),
       if (bounceTrackingIssueDetails != null)
         'bounceTrackingIssueDetails': bounceTrackingIssueDetails!.toJson(),
       if (cookieDeprecationMetadataIssueDetails != null)
         'cookieDeprecationMetadataIssueDetails':
             cookieDeprecationMetadataIssueDetails!.toJson(),
       if (stylesheetLoadingIssueDetails != null)
-        'stylesheetLoadingIssueDetails':
-            stylesheetLoadingIssueDetails!.toJson(),
+        'stylesheetLoadingIssueDetails': stylesheetLoadingIssueDetails!
+            .toJson(),
       if (propertyRuleIssueDetails != null)
         'propertyRuleIssueDetails': propertyRuleIssueDetails!.toJson(),
       if (federatedAuthUserInfoRequestIssueDetails != null)
@@ -2359,11 +2297,11 @@ class InspectorIssueDetails {
         'selectElementAccessibilityIssueDetails':
             selectElementAccessibilityIssueDetails!.toJson(),
       if (sriMessageSignatureIssueDetails != null)
-        'sriMessageSignatureIssueDetails':
-            sriMessageSignatureIssueDetails!.toJson(),
+        'sriMessageSignatureIssueDetails': sriMessageSignatureIssueDetails!
+            .toJson(),
       if (userReidentificationIssueDetails != null)
-        'userReidentificationIssueDetails':
-            userReidentificationIssueDetails!.toJson(),
+        'userReidentificationIssueDetails': userReidentificationIssueDetails!
+            .toJson(),
     };
   }
 }
@@ -2394,10 +2332,9 @@ class InspectorIssue {
       details: InspectorIssueDetails.fromJson(
         json['details'] as Map<String, dynamic>,
       ),
-      issueId:
-          json.containsKey('issueId')
-              ? IssueId.fromJson(json['issueId'] as String)
-              : null,
+      issueId: json.containsKey('issueId')
+          ? IssueId.fromJson(json['issueId'] as String)
+          : null,
     );
   }
 

@@ -289,10 +289,9 @@ class FrameManager {
   }
 
   void _onExecutionContextCreated(ExecutionContextDescription contextPayload) {
-    var frameId =
-        contextPayload.auxData != null
-            ? contextPayload.auxData!['frameId'] as String?
-            : null;
+    var frameId = contextPayload.auxData != null
+        ? contextPayload.auxData!['frameId'] as String?
+        : null;
     var frame = frameId != null ? _frames[FrameId(frameId)] : null;
     DomWorld? world;
     if (frame != null) {

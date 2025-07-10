@@ -243,22 +243,21 @@ class CertificateSecurityState {
     return CertificateSecurityState(
       protocol: json['protocol'] as String,
       keyExchange: json['keyExchange'] as String,
-      keyExchangeGroup:
-          json.containsKey('keyExchangeGroup')
-              ? json['keyExchangeGroup'] as String
-              : null,
+      keyExchangeGroup: json.containsKey('keyExchangeGroup')
+          ? json['keyExchangeGroup'] as String
+          : null,
       cipher: json['cipher'] as String,
       mac: json.containsKey('mac') ? json['mac'] as String : null,
-      certificate:
-          (json['certificate'] as List).map((e) => e as String).toList(),
+      certificate: (json['certificate'] as List)
+          .map((e) => e as String)
+          .toList(),
       subjectName: json['subjectName'] as String,
       issuer: json['issuer'] as String,
       validFrom: network.TimeSinceEpoch.fromJson(json['validFrom'] as num),
       validTo: network.TimeSinceEpoch.fromJson(json['validTo'] as num),
-      certificateNetworkError:
-          json.containsKey('certificateNetworkError')
-              ? json['certificateNetworkError'] as String
-              : null,
+      certificateNetworkError: json.containsKey('certificateNetworkError')
+          ? json['certificateNetworkError'] as String
+          : null,
       certificateHasWeakSignature:
           json['certificateHasWeakSignature'] as bool? ?? false,
       certificateHasSha1Signature:
@@ -363,22 +362,19 @@ class VisibleSecurityState {
   factory VisibleSecurityState.fromJson(Map<String, dynamic> json) {
     return VisibleSecurityState(
       securityState: SecurityState.fromJson(json['securityState'] as String),
-      certificateSecurityState:
-          json.containsKey('certificateSecurityState')
-              ? CertificateSecurityState.fromJson(
-                json['certificateSecurityState'] as Map<String, dynamic>,
-              )
-              : null,
-      safetyTipInfo:
-          json.containsKey('safetyTipInfo')
-              ? SafetyTipInfo.fromJson(
-                json['safetyTipInfo'] as Map<String, dynamic>,
-              )
-              : null,
-      securityStateIssueIds:
-          (json['securityStateIssueIds'] as List)
-              .map((e) => e as String)
-              .toList(),
+      certificateSecurityState: json.containsKey('certificateSecurityState')
+          ? CertificateSecurityState.fromJson(
+              json['certificateSecurityState'] as Map<String, dynamic>,
+            )
+          : null,
+      safetyTipInfo: json.containsKey('safetyTipInfo')
+          ? SafetyTipInfo.fromJson(
+              json['safetyTipInfo'] as Map<String, dynamic>,
+            )
+          : null,
+      securityStateIssueIds: (json['securityStateIssueIds'] as List)
+          .map((e) => e as String)
+          .toList(),
     );
   }
 
@@ -435,14 +431,12 @@ class SecurityStateExplanation {
       mixedContentType: MixedContentType.fromJson(
         json['mixedContentType'] as String,
       ),
-      certificate:
-          (json['certificate'] as List).map((e) => e as String).toList(),
-      recommendations:
-          json.containsKey('recommendations')
-              ? (json['recommendations'] as List)
-                  .map((e) => e as String)
-                  .toList()
-              : null,
+      certificate: (json['certificate'] as List)
+          .map((e) => e as String)
+          .toList(),
+      recommendations: json.containsKey('recommendations')
+          ? (json['recommendations'] as List).map((e) => e as String).toList()
+          : null,
     );
   }
 

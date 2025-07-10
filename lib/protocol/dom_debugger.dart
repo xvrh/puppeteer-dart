@@ -217,22 +217,19 @@ class EventListener {
       scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
       lineNumber: json['lineNumber'] as int,
       columnNumber: json['columnNumber'] as int,
-      handler:
-          json.containsKey('handler')
-              ? runtime.RemoteObject.fromJson(
-                json['handler'] as Map<String, dynamic>,
-              )
-              : null,
-      originalHandler:
-          json.containsKey('originalHandler')
-              ? runtime.RemoteObject.fromJson(
-                json['originalHandler'] as Map<String, dynamic>,
-              )
-              : null,
-      backendNodeId:
-          json.containsKey('backendNodeId')
-              ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
-              : null,
+      handler: json.containsKey('handler')
+          ? runtime.RemoteObject.fromJson(
+              json['handler'] as Map<String, dynamic>,
+            )
+          : null,
+      originalHandler: json.containsKey('originalHandler')
+          ? runtime.RemoteObject.fromJson(
+              json['originalHandler'] as Map<String, dynamic>,
+            )
+          : null,
+      backendNodeId: json.containsKey('backendNodeId')
+          ? dom.BackendNodeId.fromJson(json['backendNodeId'] as int)
+          : null,
     );
   }
 

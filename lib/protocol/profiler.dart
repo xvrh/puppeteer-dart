@@ -176,10 +176,9 @@ class PreciseCoverageDeltaUpdateEvent {
     return PreciseCoverageDeltaUpdateEvent(
       timestamp: json['timestamp'] as num,
       occasion: json['occasion'] as String,
-      result:
-          (json['result'] as List)
-              .map((e) => ScriptCoverage.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      result: (json['result'] as List)
+          .map((e) => ScriptCoverage.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -195,10 +194,9 @@ class TakePreciseCoverageResult {
 
   factory TakePreciseCoverageResult.fromJson(Map<String, dynamic> json) {
     return TakePreciseCoverageResult(
-      result:
-          (json['result'] as List)
-              .map((e) => ScriptCoverage.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      result: (json['result'] as List)
+          .map((e) => ScriptCoverage.fromJson(e as Map<String, dynamic>))
+          .toList(),
       timestamp: json['timestamp'] as num,
     );
   }
@@ -241,22 +239,19 @@ class ProfileNode {
         json['callFrame'] as Map<String, dynamic>,
       ),
       hitCount: json.containsKey('hitCount') ? json['hitCount'] as int : null,
-      children:
-          json.containsKey('children')
-              ? (json['children'] as List).map((e) => e as int).toList()
-              : null,
-      deoptReason:
-          json.containsKey('deoptReason')
-              ? json['deoptReason'] as String
-              : null,
-      positionTicks:
-          json.containsKey('positionTicks')
-              ? (json['positionTicks'] as List)
-                  .map(
-                    (e) => PositionTickInfo.fromJson(e as Map<String, dynamic>),
-                  )
-                  .toList()
-              : null,
+      children: json.containsKey('children')
+          ? (json['children'] as List).map((e) => e as int).toList()
+          : null,
+      deoptReason: json.containsKey('deoptReason')
+          ? json['deoptReason'] as String
+          : null,
+      positionTicks: json.containsKey('positionTicks')
+          ? (json['positionTicks'] as List)
+                .map(
+                  (e) => PositionTickInfo.fromJson(e as Map<String, dynamic>),
+                )
+                .toList()
+          : null,
     );
   }
 
@@ -301,20 +296,17 @@ class Profile {
 
   factory Profile.fromJson(Map<String, dynamic> json) {
     return Profile(
-      nodes:
-          (json['nodes'] as List)
-              .map((e) => ProfileNode.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      nodes: (json['nodes'] as List)
+          .map((e) => ProfileNode.fromJson(e as Map<String, dynamic>))
+          .toList(),
       startTime: json['startTime'] as num,
       endTime: json['endTime'] as num,
-      samples:
-          json.containsKey('samples')
-              ? (json['samples'] as List).map((e) => e as int).toList()
-              : null,
-      timeDeltas:
-          json.containsKey('timeDeltas')
-              ? (json['timeDeltas'] as List).map((e) => e as int).toList()
-              : null,
+      samples: json.containsKey('samples')
+          ? (json['samples'] as List).map((e) => e as int).toList()
+          : null,
+      timeDeltas: json.containsKey('timeDeltas')
+          ? (json['timeDeltas'] as List).map((e) => e as int).toList()
+          : null,
     );
   }
 
@@ -401,10 +393,9 @@ class FunctionCoverage {
   factory FunctionCoverage.fromJson(Map<String, dynamic> json) {
     return FunctionCoverage(
       functionName: json['functionName'] as String,
-      ranges:
-          (json['ranges'] as List)
-              .map((e) => CoverageRange.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      ranges: (json['ranges'] as List)
+          .map((e) => CoverageRange.fromJson(e as Map<String, dynamic>))
+          .toList(),
       isBlockCoverage: json['isBlockCoverage'] as bool? ?? false,
     );
   }
@@ -439,10 +430,9 @@ class ScriptCoverage {
     return ScriptCoverage(
       scriptId: runtime.ScriptId.fromJson(json['scriptId'] as String),
       url: json['url'] as String,
-      functions:
-          (json['functions'] as List)
-              .map((e) => FunctionCoverage.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      functions: (json['functions'] as List)
+          .map((e) => FunctionCoverage.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 

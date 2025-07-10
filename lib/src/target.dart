@@ -106,13 +106,17 @@ class Target {
   Future<Page?> get pageOrNull async {
     if (_isPageTarget(_info) && _pageFuture == null) {
       var session = this.session;
-      _pageFuture = (session != null
-              ? Future.value(session)
-              : _sessionFactory(isAutoAttachEmulated: true))
-          .then(
-            (session) =>
-                Page.create(this, session, viewport: browser.defaultViewport),
-          );
+      _pageFuture =
+          (session != null
+                  ? Future.value(session)
+                  : _sessionFactory(isAutoAttachEmulated: true))
+              .then(
+                (session) => Page.create(
+                  this,
+                  session,
+                  viewport: browser.defaultViewport,
+                ),
+              );
     }
     return await _pageFuture;
   }

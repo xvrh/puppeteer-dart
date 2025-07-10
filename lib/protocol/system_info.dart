@@ -299,10 +299,9 @@ class ImageDecodeAcceleratorCapability {
       minDimensions: Size.fromJson(
         json['minDimensions'] as Map<String, dynamic>,
       ),
-      subsamplings:
-          (json['subsamplings'] as List)
-              .map((e) => SubsamplingFormat.fromJson(e as String))
-              .toList(),
+      subsamplings: (json['subsamplings'] as List)
+          .map((e) => SubsamplingFormat.fromJson(e as String))
+          .toList(),
     );
   }
 
@@ -351,46 +350,39 @@ class GPUInfo {
 
   factory GPUInfo.fromJson(Map<String, dynamic> json) {
     return GPUInfo(
-      devices:
-          (json['devices'] as List)
-              .map((e) => GPUDevice.fromJson(e as Map<String, dynamic>))
-              .toList(),
-      auxAttributes:
-          json.containsKey('auxAttributes')
-              ? json['auxAttributes'] as Map<String, dynamic>
-              : null,
-      featureStatus:
-          json.containsKey('featureStatus')
-              ? json['featureStatus'] as Map<String, dynamic>
-              : null,
-      driverBugWorkarounds:
-          (json['driverBugWorkarounds'] as List)
-              .map((e) => e as String)
-              .toList(),
-      videoDecoding:
-          (json['videoDecoding'] as List)
-              .map(
-                (e) => VideoDecodeAcceleratorCapability.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
-      videoEncoding:
-          (json['videoEncoding'] as List)
-              .map(
-                (e) => VideoEncodeAcceleratorCapability.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
-      imageDecoding:
-          (json['imageDecoding'] as List)
-              .map(
-                (e) => ImageDecodeAcceleratorCapability.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+      devices: (json['devices'] as List)
+          .map((e) => GPUDevice.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      auxAttributes: json.containsKey('auxAttributes')
+          ? json['auxAttributes'] as Map<String, dynamic>
+          : null,
+      featureStatus: json.containsKey('featureStatus')
+          ? json['featureStatus'] as Map<String, dynamic>
+          : null,
+      driverBugWorkarounds: (json['driverBugWorkarounds'] as List)
+          .map((e) => e as String)
+          .toList(),
+      videoDecoding: (json['videoDecoding'] as List)
+          .map(
+            (e) => VideoDecodeAcceleratorCapability.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
+      videoEncoding: (json['videoEncoding'] as List)
+          .map(
+            (e) => VideoEncodeAcceleratorCapability.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
+      imageDecoding: (json['imageDecoding'] as List)
+          .map(
+            (e) => ImageDecodeAcceleratorCapability.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
     );
   }
 

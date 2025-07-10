@@ -3755,10 +3755,9 @@ Exception is immediately thrown if the request interception is not enabled.
 await page.setRequestInterception(true);
 page.onRequest.listen((request) {
   // Override headers
-  var headers =
-      Map<String, String>.from(request.headers)
-        ..['foo'] = 'bar'
-        ..remove('origin');
+  var headers = Map<String, String>.from(request.headers)
+    ..['foo'] = 'bar'
+    ..remove('origin');
   request.continueRequest(headers: headers);
 });
 ```

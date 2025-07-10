@@ -4,11 +4,10 @@ import 'package:test/test.dart';
 
 // Test all the dart scripts in the example/ folder.
 void main() {
-  for (var exampleFile in Directory(
-    'example',
-  ).listSync().whereType<File>().where(
-    (f) => f.path.endsWith('.dart') && !p.basename(f.path).startsWith('_'),
-  )) {
+  for (var exampleFile
+      in Directory('example').listSync().whereType<File>().where(
+        (f) => f.path.endsWith('.dart') && !p.basename(f.path).startsWith('_'),
+      )) {
     var fileContent = exampleFile.readAsStringSync();
 
     if (fileContent.contains('main()')) {
@@ -26,10 +25,9 @@ void main() {
           }
         },
         // Don't test some examples that are too complex and not reliable
-        skip:
-            const ['search.dart'].contains(p.basename(exampleFile.path))
-                ? 'Skip'
-                : null,
+        skip: const ['search.dart'].contains(p.basename(exampleFile.path))
+            ? 'Skip'
+            : null,
       );
     }
   }

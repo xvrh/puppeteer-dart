@@ -34,8 +34,10 @@ String fixCode(DartFile dartFile, String content) {
   try {
     var newContent = content;
 
-    var unit =
-        parseString(content: content, featureSet: analyzerFeatureSet).unit;
+    var unit = parseString(
+      content: content,
+      featureSet: analyzerFeatureSet,
+    ).unit;
 
     for (var directive
         in unit.directives.reversed.whereType<NamespaceDirective>()) {

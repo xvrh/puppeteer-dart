@@ -101,36 +101,33 @@ class LogEntry {
       source: LogEntrySource.fromJson(json['source'] as String),
       level: LogEntryLevel.fromJson(json['level'] as String),
       text: json['text'] as String,
-      category:
-          json.containsKey('category')
-              ? LogEntryCategory.fromJson(json['category'] as String)
-              : null,
+      category: json.containsKey('category')
+          ? LogEntryCategory.fromJson(json['category'] as String)
+          : null,
       timestamp: runtime.Timestamp.fromJson(json['timestamp'] as num),
       url: json.containsKey('url') ? json['url'] as String : null,
-      lineNumber:
-          json.containsKey('lineNumber') ? json['lineNumber'] as int : null,
-      stackTrace:
-          json.containsKey('stackTrace')
-              ? runtime.StackTraceData.fromJson(
-                json['stackTrace'] as Map<String, dynamic>,
-              )
-              : null,
-      networkRequestId:
-          json.containsKey('networkRequestId')
-              ? network.RequestId.fromJson(json['networkRequestId'] as String)
-              : null,
-      workerId:
-          json.containsKey('workerId') ? json['workerId'] as String : null,
-      args:
-          json.containsKey('args')
-              ? (json['args'] as List)
-                  .map(
-                    (e) => runtime.RemoteObject.fromJson(
-                      e as Map<String, dynamic>,
-                    ),
-                  )
-                  .toList()
-              : null,
+      lineNumber: json.containsKey('lineNumber')
+          ? json['lineNumber'] as int
+          : null,
+      stackTrace: json.containsKey('stackTrace')
+          ? runtime.StackTraceData.fromJson(
+              json['stackTrace'] as Map<String, dynamic>,
+            )
+          : null,
+      networkRequestId: json.containsKey('networkRequestId')
+          ? network.RequestId.fromJson(json['networkRequestId'] as String)
+          : null,
+      workerId: json.containsKey('workerId')
+          ? json['workerId'] as String
+          : null,
+      args: json.containsKey('args')
+          ? (json['args'] as List)
+                .map(
+                  (e) =>
+                      runtime.RemoteObject.fromJson(e as Map<String, dynamic>),
+                )
+                .toList()
+          : null,
     );
   }
 

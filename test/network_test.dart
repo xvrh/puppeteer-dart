@@ -100,10 +100,9 @@ void main() {
         }
       });
       await page.evaluate("() => fetch('/digits/1.png')");
-      requests =
-          requests
-              .where((request) => !request.url.contains('favicon'))
-              .toList();
+      requests = requests
+          .where((request) => !request.url.contains('favicon'))
+          .toList();
       expect(requests.length, equals(1));
       expect(requests[0].frame, equals(page.mainFrame));
     });

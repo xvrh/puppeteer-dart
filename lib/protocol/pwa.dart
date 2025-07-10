@@ -136,10 +136,9 @@ class GetOsAppStateResult {
   factory GetOsAppStateResult.fromJson(Map<String, dynamic> json) {
     return GetOsAppStateResult(
       badgeCount: json['badgeCount'] as int,
-      fileHandlers:
-          (json['fileHandlers'] as List)
-              .map((e) => FileHandler.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      fileHandlers: (json['fileHandlers'] as List)
+          .map((e) => FileHandler.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -158,8 +157,9 @@ class FileHandlerAccept {
   factory FileHandlerAccept.fromJson(Map<String, dynamic> json) {
     return FileHandlerAccept(
       mediaType: json['mediaType'] as String,
-      fileExtensions:
-          (json['fileExtensions'] as List).map((e) => e as String).toList(),
+      fileExtensions: (json['fileExtensions'] as List)
+          .map((e) => e as String)
+          .toList(),
     );
   }
 
@@ -187,10 +187,9 @@ class FileHandler {
   factory FileHandler.fromJson(Map<String, dynamic> json) {
     return FileHandler(
       action: json['action'] as String,
-      accepts:
-          (json['accepts'] as List)
-              .map((e) => FileHandlerAccept.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      accepts: (json['accepts'] as List)
+          .map((e) => FileHandlerAccept.fromJson(e as Map<String, dynamic>))
+          .toList(),
       displayName: json['displayName'] as String,
     );
   }

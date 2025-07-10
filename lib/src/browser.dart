@@ -211,12 +211,11 @@ class Browser {
   /// A list of all active targets inside the Browser. In case of multiple
   /// browser contexts, the method will return an array with all the targets in
   /// all browser contexts.
-  List<Target> get targets =>
-      _targetManager
-          .availableTargets()
-          .values
-          .where((target) => target.isInitialized)
-          .toList();
+  List<Target> get targets => _targetManager
+      .availableTargets()
+      .values
+      .where((target) => target.isInitialized)
+      .toList();
 
   /// A target associated with the browser.
   Target get target => targets.firstWhere((t) => t.type == 'browser');
