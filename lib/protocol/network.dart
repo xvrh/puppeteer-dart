@@ -4559,6 +4559,10 @@ class SignedExchangeInfo {
   /// The outer response of signed HTTP exchange which was received from network.
   final ResponseData outerResponse;
 
+  /// Whether network response for the signed exchange was accompanied by
+  /// extra headers.
+  final bool hasExtraInfo;
+
   /// Information about the signed exchange header.
   final SignedExchangeHeader? header;
 
@@ -4570,6 +4574,7 @@ class SignedExchangeInfo {
 
   SignedExchangeInfo({
     required this.outerResponse,
+    required this.hasExtraInfo,
     this.header,
     this.securityDetails,
     this.errors,
@@ -4580,6 +4585,7 @@ class SignedExchangeInfo {
       outerResponse: ResponseData.fromJson(
         json['outerResponse'] as Map<String, dynamic>,
       ),
+      hasExtraInfo: json['hasExtraInfo'] as bool? ?? false,
       header: json.containsKey('header')
           ? SignedExchangeHeader.fromJson(
               json['header'] as Map<String, dynamic>,
@@ -4604,6 +4610,7 @@ class SignedExchangeInfo {
   Map<String, dynamic> toJson() {
     return {
       'outerResponse': outerResponse.toJson(),
+      'hasExtraInfo': hasExtraInfo,
       if (header != null) 'header': header!.toJson(),
       if (securityDetails != null) 'securityDetails': securityDetails!.toJson(),
       if (errors != null) 'errors': errors!.map((e) => e.toJson()).toList(),

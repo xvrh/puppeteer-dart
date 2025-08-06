@@ -6290,6 +6290,7 @@
                         "view-transition",
                         "view-transition-group",
                         "view-transition-image-pair",
+                        "view-transition-group-children",
                         "view-transition-old",
                         "view-transition-new",
                         "placeholder",
@@ -9691,6 +9692,15 @@
                             "name": "wow64",
                             "optional": true,
                             "type": "boolean"
+                        },
+                        {
+                            "name": "formFactors",
+                            "description": "Used to specify User Agent form-factor values.\nSee https://wicg.github.io/ua-client-hints/#sec-ch-ua-form-factors",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     ]
                 },
@@ -10147,6 +10157,17 @@
                                 "protanopia",
                                 "tritanopia"
                             ]
+                        }
+                    ]
+                },
+                {
+                    "name": "setEmulatedOSTextScale",
+                    "description": "Emulates the given OS text scale.",
+                    "parameters": [
+                        {
+                            "name": "scale",
+                            "optional": true,
+                            "type": "number"
                         }
                     ]
                 },
@@ -14569,6 +14590,11 @@
                             "$ref": "Response"
                         },
                         {
+                            "name": "hasExtraInfo",
+                            "description": "Whether network response for the signed exchange was accompanied by\nextra headers.",
+                            "type": "boolean"
+                        },
+                        {
                             "name": "header",
                             "description": "Information about the signed exchange header.",
                             "optional": true,
@@ -18149,19 +18175,41 @@
                 },
                 {
                     "id": "AdScriptId",
-                    "description": "Identifies the bottom-most script which caused the frame to be labelled\nas an ad.",
+                    "description": "Identifies the script which caused a script or frame to be labelled as an\nad.",
                     "experimental": true,
                     "type": "object",
                     "properties": [
                         {
                             "name": "scriptId",
-                            "description": "Script Id of the bottom-most script which caused the frame to be labelled\nas an ad.",
+                            "description": "Script Id of the script which caused a script or frame to be labelled as\nan ad.",
                             "$ref": "Runtime.ScriptId"
                         },
                         {
                             "name": "debuggerId",
-                            "description": "Id of adScriptId's debugger.",
+                            "description": "Id of scriptId's debugger.",
                             "$ref": "Runtime.UniqueDebuggerId"
+                        }
+                    ]
+                },
+                {
+                    "id": "AdScriptAncestry",
+                    "description": "Encapsulates the script ancestry and the root script filterlist rule that\ncaused the frame to be labelled as an ad. Only created when `ancestryChain`\nis not empty.",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "ancestryChain",
+                            "description": "A chain of `AdScriptId`s representing the ancestry of an ad script that\nled to the creation of a frame. The chain is ordered from the script\nitself (lower level) up to its root ancestor that was flagged by\nfilterlist.",
+                            "type": "array",
+                            "items": {
+                                "$ref": "AdScriptId"
+                            }
+                        },
+                        {
+                            "name": "rootScriptFilterlistRule",
+                            "description": "The filterlist rule that caused the root (last) script in\n`ancestryChain` to be ad-tagged. Only populated if the rule is\navailable.",
+                            "optional": true,
+                            "type": "string"
                         }
                     ]
                 },
@@ -18268,6 +18316,7 @@
                         "join-ad-interest-group",
                         "keyboard-map",
                         "language-detector",
+                        "language-model",
                         "local-fonts",
                         "local-network-access",
                         "magnetometer",
@@ -19501,18 +19550,6 @@
                     ]
                 },
                 {
-                    "id": "AutoResponseMode",
-                    "description": "Enum of possible auto-response for permission / prompt dialogs.",
-                    "experimental": true,
-                    "type": "string",
-                    "enum": [
-                        "none",
-                        "autoAccept",
-                        "autoReject",
-                        "autoOptOut"
-                    ]
-                },
-                {
                     "id": "NavigationType",
                     "description": "The type of a frameNavigated event.",
                     "experimental": true,
@@ -20090,7 +20127,7 @@
                     ]
                 },
                 {
-                    "name": "getAdScriptAncestryIds",
+                    "name": "getAdScriptAncestry",
                     "experimental": true,
                     "parameters": [
                         {
@@ -20100,12 +20137,10 @@
                     ],
                     "returns": [
                         {
-                            "name": "adScriptAncestryIds",
-                            "description": "The ancestry chain of ad script identifiers leading to this frame's\ncreation, ordered from the most immediate script (in the frame creation\nstack) to more distant ancestors (that created the immediately preceding\nscript). Only sent if frame is labelled as an ad and ids are available.",
-                            "type": "array",
-                            "items": {
-                                "$ref": "AdScriptId"
-                            }
+                            "name": "adScriptAncestry",
+                            "description": "The ancestry chain of ad script identifiers leading to this frame's\ncreation, along with the root script's filterlist rule. The ancestry\nchain is ordered from the most immediate script (in the frame creation\nstack) to more distant ancestors (that created the immediately preceding\nscript). Only sent if frame is labelled as an ad and ids are available.",
+                            "optional": true,
+                            "$ref": "AdScriptAncestry"
                         }
                     ]
                 },
@@ -20953,7 +20988,14 @@
                     "parameters": [
                         {
                             "name": "mode",
-                            "$ref": "AutoResponseMode"
+                            "type": "string",
+                            "enum": [
+                                "none",
+                                "autoAccept",
+                                "autoChooseToAuthAnotherWay",
+                                "autoReject",
+                                "autoOptOut"
+                            ]
                         }
                     ]
                 },
@@ -20964,7 +21006,12 @@
                     "parameters": [
                         {
                             "name": "mode",
-                            "$ref": "AutoResponseMode"
+                            "type": "string",
+                            "enum": [
+                                "none",
+                                "autoAccept",
+                                "autoReject"
+                            ]
                         }
                     ]
                 },
@@ -22893,7 +22940,7 @@
                         },
                         {
                             "name": "workletOrdinal",
-                            "description": "If the method is called on a shared storage worklet, or as part of\na shared storage worklet script, it will have a number for the\nassociated worklet, denoting the (0-indexed) order of the worklet's\ncreation relative to all other shared storage worklets created by\ndocuments using the current storage partition.\nPresent only for SharedStorageAccessMethods: addModule, createWorklet,\nrun, selectURL, and any other SharedStorageAccessMethod when the\nSharedStorageAccessScope is sharedStorageWorklet.\nTODO(crbug.com/401011862): Pass this only for addModule & createWorklet.",
+                            "description": "A number denoting the (0-based) order of the worklet's\ncreation relative to all other shared storage worklets created by\ndocuments using the current storage partition.\nPresent only for SharedStorageAccessMethods: addModule, createWorklet.",
                             "optional": true,
                             "type": "integer"
                         },
@@ -24567,6 +24614,39 @@
                             "type": "integer"
                         }
                     ]
+                },
+                {
+                    "name": "attributionReportingVerboseDebugReportSent",
+                    "experimental": true,
+                    "parameters": [
+                        {
+                            "name": "url",
+                            "type": "string"
+                        },
+                        {
+                            "name": "body",
+                            "optional": true,
+                            "type": "array",
+                            "items": {
+                                "type": "object"
+                            }
+                        },
+                        {
+                            "name": "netError",
+                            "optional": true,
+                            "type": "integer"
+                        },
+                        {
+                            "name": "netErrorName",
+                            "optional": true,
+                            "type": "string"
+                        },
+                        {
+                            "name": "httpStatusCode",
+                            "optional": true,
+                            "type": "integer"
+                        }
+                    ]
                 }
             ]
         },
@@ -25605,7 +25685,7 @@
                     "properties": [
                         {
                             "name": "recordMode",
-                            "description": "Controls how the trace buffer stores data.",
+                            "description": "Controls how the trace buffer stores data. The default is `recordUntilFull`.",
                             "experimental": true,
                             "optional": true,
                             "type": "string",
@@ -28321,7 +28401,7 @@
                 },
                 {
                     "name": "install",
-                    "description": "Installs the given manifest identity, optionally using the given install_url\nor IWA bundle location.\n\nTODO(crbug.com/337872319) Support IWA to meet the following specific\nrequirement.\nIWA-specific install description: If the manifest_id is isolated-app://,\ninstall_url_or_bundle_url is required, and can be either an http(s) URL or\nfile:// URL pointing to a signed web bundle (.swbn). The .swbn file's\nsigning key must correspond to manifest_id. If Chrome is not in IWA dev\nmode, the installation will fail, regardless of the state of the allowlist.",
+                    "description": "Installs the given manifest identity, optionally using the given installUrlOrBundleUrl\n\nIWA-specific install description:\nmanifestId corresponds to isolated-app:// + web_package::SignedWebBundleId\n\nFile installation mode:\nThe installUrlOrBundleUrl can be either file:// or http(s):// pointing\nto a signed web bundle (.swbn). In this case SignedWebBundleId must correspond to\nThe .swbn file's signing key.\n\nDev proxy installation mode:\ninstallUrlOrBundleUrl must be http(s):// that serves dev mode IWA.\nweb_package::SignedWebBundleId must be of type dev proxy.\n\nThe advantage of dev proxy mode is that all changes to IWA\nautomatically will be reflected in the running app without\nreinstallation.\n\nTo generate bundle id for proxy mode:\n1. Generate 32 random bytes.\n2. Add a specific suffix 0x00 at the end.\n3. Encode the entire sequence using Base32 without padding.\n\nIf Chrome is not in IWA dev\nmode, the installation will fail, regardless of the state of the allowlist.",
                     "parameters": [
                         {
                             "name": "manifestId",

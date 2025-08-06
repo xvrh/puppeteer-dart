@@ -1205,6 +1205,7 @@ enum PseudoType {
   viewTransition('view-transition'),
   viewTransitionGroup('view-transition-group'),
   viewTransitionImagePair('view-transition-image-pair'),
+  viewTransitionGroupChildren('view-transition-group-children'),
   viewTransitionOld('view-transition-old'),
   viewTransitionNew('view-transition-new'),
   placeholder('placeholder'),

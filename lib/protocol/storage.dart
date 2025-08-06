@@ -138,6 +138,18 @@ class StorageApi {
             AttributionReportingReportSentEvent.fromJson(event.parameters),
       );
 
+  Stream<AttributionReportingVerboseDebugReportSentEvent>
+  get onAttributionReportingVerboseDebugReportSent => _client.onEvent
+      .where(
+        (event) =>
+            event.name == 'Storage.attributionReportingVerboseDebugReportSent',
+      )
+      .map(
+        (event) => AttributionReportingVerboseDebugReportSentEvent.fromJson(
+          event.parameters,
+        ),
+      );
+
   /// Returns a storage key given a frame id.
   Future<SerializedStorageKey> getStorageKeyForFrame(
     page.FrameId frameId,
@@ -928,6 +940,46 @@ class AttributionReportingReportSentEvent {
   }
 }
 
+class AttributionReportingVerboseDebugReportSentEvent {
+  final String url;
+
+  final List<Map<String, dynamic>>? body;
+
+  final int? netError;
+
+  final String? netErrorName;
+
+  final int? httpStatusCode;
+
+  AttributionReportingVerboseDebugReportSentEvent({
+    required this.url,
+    this.body,
+    this.netError,
+    this.netErrorName,
+    this.httpStatusCode,
+  });
+
+  factory AttributionReportingVerboseDebugReportSentEvent.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return AttributionReportingVerboseDebugReportSentEvent(
+      url: json['url'] as String,
+      body: json.containsKey('body')
+          ? (json['body'] as List)
+                .map((e) => e as Map<String, dynamic>)
+                .toList()
+          : null,
+      netError: json.containsKey('netError') ? json['netError'] as int : null,
+      netErrorName: json.containsKey('netErrorName')
+          ? json['netErrorName'] as String
+          : null,
+      httpStatusCode: json.containsKey('httpStatusCode')
+          ? json['httpStatusCode'] as int
+          : null,
+    );
+  }
+}
+
 class GetUsageAndQuotaResult {
   /// Storage usage (bytes).
   final num usage;
@@ -1391,15 +1443,10 @@ class SharedStorageAccessParams {
   /// Present only for SharedStorageAccessMethod: set.
   final bool? ignoreIfPresent;
 
-  /// If the method is called on a shared storage worklet, or as part of
-  /// a shared storage worklet script, it will have a number for the
-  /// associated worklet, denoting the (0-indexed) order of the worklet's
+  /// A number denoting the (0-based) order of the worklet's
   /// creation relative to all other shared storage worklets created by
   /// documents using the current storage partition.
-  /// Present only for SharedStorageAccessMethods: addModule, createWorklet,
-  /// run, selectURL, and any other SharedStorageAccessMethod when the
-  /// SharedStorageAccessScope is sharedStorageWorklet.
-  /// TODO(crbug.com/401011862): Pass this only for addModule & createWorklet.
+  /// Present only for SharedStorageAccessMethods: addModule, createWorklet.
   final int? workletOrdinal;
 
   /// Hex representation of the DevTools token used as the TargetID for the
