@@ -234,6 +234,13 @@ class EmulationApi {
     await _client.send('Emulation.setEmulatedVisionDeficiency', {'type': type});
   }
 
+  /// Emulates the given OS text scale.
+  Future<void> setEmulatedOSTextScale({num? scale}) async {
+    await _client.send('Emulation.setEmulatedOSTextScale', {
+      if (scale != null) 'scale': scale,
+    });
+  }
+
   /// Overrides the Geolocation Position or Error. Omitting latitude, longitude or
   /// accuracy emulates position unavailable.
   /// [latitude] Mock latitude
@@ -785,6 +792,10 @@ class UserAgentMetadata {
 
   final bool? wow64;
 
+  /// Used to specify User Agent form-factor values.
+  /// See https://wicg.github.io/ua-client-hints/#sec-ch-ua-form-factors
+  final List<String>? formFactors;
+
   UserAgentMetadata({
     this.brands,
     this.fullVersionList,
@@ -795,6 +806,7 @@ class UserAgentMetadata {
     required this.mobile,
     this.bitness,
     this.wow64,
+    this.formFactors,
   });
 
   factory UserAgentMetadata.fromJson(Map<String, dynamic> json) {
@@ -822,6 +834,9 @@ class UserAgentMetadata {
       mobile: json['mobile'] as bool? ?? false,
       bitness: json.containsKey('bitness') ? json['bitness'] as String : null,
       wow64: json.containsKey('wow64') ? json['wow64'] as bool : null,
+      formFactors: json.containsKey('formFactors')
+          ? (json['formFactors'] as List).map((e) => e as String).toList()
+          : null,
     );
   }
 
@@ -837,6 +852,7 @@ class UserAgentMetadata {
         'fullVersionList': fullVersionList!.map((e) => e.toJson()).toList(),
       if (bitness != null) 'bitness': bitness,
       if (wow64 != null) 'wow64': wow64,
+      if (formFactors != null) 'formFactors': [...?formFactors],
     };
   }
 }

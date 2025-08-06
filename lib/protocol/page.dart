@@ -374,16 +374,17 @@ class PageApi {
   }
 
   /// Returns: The ancestry chain of ad script identifiers leading to this frame's
-  /// creation, ordered from the most immediate script (in the frame creation
+  /// creation, along with the root script's filterlist rule. The ancestry
+  /// chain is ordered from the most immediate script (in the frame creation
   /// stack) to more distant ancestors (that created the immediately preceding
   /// script). Only sent if frame is labelled as an ad and ids are available.
-  Future<List<AdScriptId>> getAdScriptAncestryIds(FrameId frameId) async {
-    var result = await _client.send('Page.getAdScriptAncestryIds', {
+  Future<AdScriptAncestry> getAdScriptAncestry(FrameId frameId) async {
+    var result = await _client.send('Page.getAdScriptAncestry', {
       'frameId': frameId,
     });
-    return (result['adScriptAncestryIds'] as List)
-        .map((e) => AdScriptId.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return AdScriptAncestry.fromJson(
+      result['adScriptAncestry'] as Map<String, dynamic>,
+    );
   }
 
   /// Returns present frame tree structure.
@@ -893,13 +894,34 @@ class PageApi {
 
   /// Sets the Secure Payment Confirmation transaction mode.
   /// https://w3c.github.io/secure-payment-confirmation/#sctn-automation-set-spc-transaction-mode
-  Future<void> setSPCTransactionMode(AutoResponseMode mode) async {
+  Future<void> setSPCTransactionMode(
+    @Enum([
+      'none',
+      'autoAccept',
+      'autoChooseToAuthAnotherWay',
+      'autoReject',
+      'autoOptOut',
+    ])
+    String mode,
+  ) async {
+    assert(
+      const [
+        'none',
+        'autoAccept',
+        'autoChooseToAuthAnotherWay',
+        'autoReject',
+        'autoOptOut',
+      ].contains(mode),
+    );
     await _client.send('Page.setSPCTransactionMode', {'mode': mode});
   }
 
   /// Extensions for Custom Handlers API:
   /// https://html.spec.whatwg.org/multipage/system-state.html#rph-automation
-  Future<void> setRPHRegistrationMode(AutoResponseMode mode) async {
+  Future<void> setRPHRegistrationMode(
+    @Enum(['none', 'autoAccept', 'autoReject']) String mode,
+  ) async {
+    assert(const ['none', 'autoAccept', 'autoReject'].contains(mode));
     await _client.send('Page.setRPHRegistrationMode', {'mode': mode});
   }
 
@@ -1672,14 +1694,14 @@ class AdFrameStatus {
   }
 }
 
-/// Identifies the bottom-most script which caused the frame to be labelled
-/// as an ad.
+/// Identifies the script which caused a script or frame to be labelled as an
+/// ad.
 class AdScriptId {
-  /// Script Id of the bottom-most script which caused the frame to be labelled
-  /// as an ad.
+  /// Script Id of the script which caused a script or frame to be labelled as
+  /// an ad.
   final runtime.ScriptId scriptId;
 
-  /// Id of adScriptId's debugger.
+  /// Id of scriptId's debugger.
   final runtime.UniqueDebuggerId debuggerId;
 
   AdScriptId({required this.scriptId, required this.debuggerId});
@@ -1695,6 +1717,46 @@ class AdScriptId {
 
   Map<String, dynamic> toJson() {
     return {'scriptId': scriptId.toJson(), 'debuggerId': debuggerId.toJson()};
+  }
+}
+
+/// Encapsulates the script ancestry and the root script filterlist rule that
+/// caused the frame to be labelled as an ad. Only created when `ancestryChain`
+/// is not empty.
+class AdScriptAncestry {
+  /// A chain of `AdScriptId`s representing the ancestry of an ad script that
+  /// led to the creation of a frame. The chain is ordered from the script
+  /// itself (lower level) up to its root ancestor that was flagged by
+  /// filterlist.
+  final List<AdScriptId> ancestryChain;
+
+  /// The filterlist rule that caused the root (last) script in
+  /// `ancestryChain` to be ad-tagged. Only populated if the rule is
+  /// available.
+  final String? rootScriptFilterlistRule;
+
+  AdScriptAncestry({
+    required this.ancestryChain,
+    this.rootScriptFilterlistRule,
+  });
+
+  factory AdScriptAncestry.fromJson(Map<String, dynamic> json) {
+    return AdScriptAncestry(
+      ancestryChain: (json['ancestryChain'] as List)
+          .map((e) => AdScriptId.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      rootScriptFilterlistRule: json.containsKey('rootScriptFilterlistRule')
+          ? json['rootScriptFilterlistRule'] as String
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'ancestryChain': ancestryChain.map((e) => e.toJson()).toList(),
+      if (rootScriptFilterlistRule != null)
+        'rootScriptFilterlistRule': rootScriptFilterlistRule,
+    };
   }
 }
 
@@ -1823,6 +1885,7 @@ enum PermissionsPolicyFeature {
   joinAdInterestGroup('join-ad-interest-group'),
   keyboardMap('keyboard-map'),
   languageDetector('language-detector'),
+  languageModel('language-model'),
   localFonts('local-fonts'),
   localNetworkAccess('local-network-access'),
   magnetometer('magnetometer'),
@@ -3513,26 +3576,6 @@ class WebAppManifest {
       if (themeColor != null) 'themeColor': themeColor,
     };
   }
-}
-
-/// Enum of possible auto-response for permission / prompt dialogs.
-enum AutoResponseMode {
-  none('none'),
-  autoAccept('autoAccept'),
-  autoReject('autoReject'),
-  autoOptOut('autoOptOut');
-
-  final String value;
-
-  const AutoResponseMode(this.value);
-
-  factory AutoResponseMode.fromJson(String value) =>
-      AutoResponseMode.values.firstWhere((e) => e.value == value);
-
-  String toJson() => value;
-
-  @override
-  String toString() => value.toString();
 }
 
 /// The type of a frameNavigated event.

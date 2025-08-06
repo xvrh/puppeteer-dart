@@ -191,7 +191,7 @@ extension type MemoryDumpConfig(Map<String, dynamic> value) {
 }
 
 class TraceConfig {
-  /// Controls how the trace buffer stores data.
+  /// Controls how the trace buffer stores data. The default is `recordUntilFull`.
   final TraceConfigRecordMode? recordMode;
 
   /// Size of the trace buffer in kilobytes. If not specified or zero is passed, a default value
