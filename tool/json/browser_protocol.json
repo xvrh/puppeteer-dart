@@ -4488,6 +4488,18 @@
                     ]
                 },
                 {
+                    "id": "ComputedStyleExtraFields",
+                    "experimental": true,
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "isAppearanceBase",
+                            "description": "Returns whether or not this node is being rendered with base appearance,\nwhich happens when it has its appearance property set to base/base-select\nor it is in the subtree of an element being rendered with base appearance.",
+                            "type": "boolean"
+                        }
+                    ]
+                },
+                {
                     "id": "CSSStyle",
                     "description": "CSS style representation.",
                     "type": "object",
@@ -5489,6 +5501,12 @@
                             "items": {
                                 "$ref": "CSSComputedStyleProperty"
                             }
+                        },
+                        {
+                            "name": "extraFields",
+                            "description": "A list of non-standard \"extra fields\" which blink stores alongside each\ncomputed style.",
+                            "experimental": true,
+                            "$ref": "ComputedStyleExtraFields"
                         }
                     ]
                 },
@@ -14435,6 +14453,21 @@
                             "type": "object"
                         }
                     ]
+                },
+                {
+                    "id": "Player",
+                    "type": "object",
+                    "properties": [
+                        {
+                            "name": "playerId",
+                            "$ref": "PlayerId"
+                        },
+                        {
+                            "name": "domNodeId",
+                            "optional": true,
+                            "$ref": "DOM.BackendNodeId"
+                        }
+                    ]
                 }
             ],
             "events": [
@@ -14507,15 +14540,12 @@
                     ]
                 },
                 {
-                    "name": "playersCreated",
-                    "description": "Called whenever a player is created, or when a new agent joins and receives\na list of active players. If an agent is restored, it will receive the full\nlist of player ids and all events again.",
+                    "name": "playerCreated",
+                    "description": "Called whenever a player is created, or when a new agent joins and receives\na list of active players. If an agent is restored, it will receive one\nevent for each active player.",
                     "parameters": [
                         {
-                            "name": "players",
-                            "type": "array",
-                            "items": {
-                                "$ref": "PlayerId"
-                            }
+                            "name": "player",
+                            "$ref": "Player"
                         }
                     ]
                 }
@@ -15299,6 +15329,21 @@
                         "corp-not-same-origin-after-defaulted-to-same-origin-by-coep-and-dip",
                         "corp-not-same-site",
                         "sri-message-signature-mismatch"
+                    ]
+                },
+                {
+                    "id": "IpProxyStatus",
+                    "description": "Sets Controls for IP Proxy of requests.\nPage reload is required before the new behavior will be observed.",
+                    "experimental": true,
+                    "type": "string",
+                    "enum": [
+                        "Available",
+                        "FeatureNotEnabled",
+                        "MaskedDomainListNotEnabled",
+                        "MaskedDomainListNotPopulated",
+                        "AuthTokensUnavailable",
+                        "Unavailable",
+                        "BypassedByDevTools"
                     ]
                 },
                 {
@@ -16867,6 +16912,18 @@
                 }
             ],
             "commands": [
+                {
+                    "name": "getIPProtectionProxyStatus",
+                    "description": "Returns enum representing if IP Proxy of requests is available\nor reason it is not active.",
+                    "experimental": true,
+                    "returns": [
+                        {
+                            "name": "status",
+                            "description": "Whether IP proxy is available",
+                            "$ref": "IpProxyStatus"
+                        }
+                    ]
+                },
                 {
                     "name": "setAcceptedEncodings",
                     "description": "Sets a list of content encodings that will be accepted. Empty list means no encoding is accepted.",
